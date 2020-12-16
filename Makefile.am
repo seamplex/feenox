@@ -1,6 +1,6 @@
 SUBDIRS = src doc
 
-# dist_doc_DATA = AUTHORS ChangeLog README TODO \
+dist_doc_DATA = AUTHORS ChangeLog README TODO \
                 doc/feenox.texi doc/feenox.info doc/logo.svg doc/feenox.xml doc/reference.md
 
 # dist_man_MANS = doc/feenox.1

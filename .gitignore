@@ -14,3 +14,5 @@ depcomp
 install-sh
 missing
 version.m4
+
+*.tar.gz

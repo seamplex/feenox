@@ -9,7 +9,7 @@ dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 m4_include([version.m4])
-AC_INIT([wasora],wasoraversion,[jeremy@seamplex.com])
+AC_INIT([feenox],feenoxversion,[jeremy@seamplex.com])
 
 AC_CONFIG_SRCDIR([src/feenox.c])
 AC_CANONICAL_HOST
