@@ -41,7 +41,7 @@
 #include "feenox.h"
 #include "version.h"
 
-void feenox_show_help(char *progname) {
+void feenox_show_help(const char *progname) {
   // in parallel runs only print from first processor
   if (feenox.rank != 0) {
     return;
@@ -52,12 +52,13 @@ void feenox_show_help(char *progname) {
   printf("\n\
   -h, --help            display this help and exit\n\
   -i, --info            display detailed code information and exit\n\
-  -v, --version         display version information and exit\n\n\
+  -v, --version         display version information and exit\n\
   -l, --list            list defined symbols and exit\n\
       --debug           start in debug mode\n\
       --no-debug        ignore standard input, avoid debug mode\n\
- instructions are read from standard input if \"-\" is passed as inputfile, i.e.\n\
-   $ echo 2+2 | feenox -\n\
+\n\
+ Instructions will be read from standard input if \"-\" is passed as inputfile, i.e.\n\
+   $ echo \"PRINT 2+2\" | feenox -\n\
    4\n\
    $\n");
   

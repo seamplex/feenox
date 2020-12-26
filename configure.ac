@@ -94,24 +94,24 @@ AC_ARG_WITH(
 AS_IF([test "x${with_ida}" != "xno"] , [
   AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
     [],
-    AS_IF([test "x${with_ida}" != "xcheck"], AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida headers failed]))
+    AS_IF([test "x${with_ida}" != "xcheck"], AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev headers failed]))
   )
   AC_CHECK_LIB([sundials_ida], [IDAInit],
     [],
     AS_IF([test "x${with_ida}" != "xcheck"],
-      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida libray failed])
+      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev libray failed])
     )
   )  
   AC_CHECK_HEADER([nvector/nvector_serial.h],
     [],
     AS_IF([test "x${with_ida}" != "xcheck"],
-      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida libray failed])
+      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev libray failed])
     )
   )
   AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
     [],
     AS_IF([test "x${with_ida}" != "xcheck"],
-      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida libray failed])
+      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev libray failed])
     )  
   )
 ])

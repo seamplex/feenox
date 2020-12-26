@@ -4,3 +4,10 @@
  
  * m4 as a library?
  * gmsh as a library?
+
+ * see if we need argv_orig
+ * list symbols with "-l" (is there any clash with petsc?)
+ * gsl error handling
+ * feenox_nan_error()
+ * feenox_gsl_handler()
+ * $1 = ${1}

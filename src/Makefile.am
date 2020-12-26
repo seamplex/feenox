@@ -12,5 +12,12 @@ feenox_LDADD = $(SLEPC_LIB) $(PETSC_LIB) $(all_libraries)
 
 feenox_SOURCES = \
 ./feenox.c \
-./version.c
+./version.c \
+./flow/init.c \
+./flow/error.c \
+./flow/cleanup.c \
+./flow/abort.c \
+./parser/parser.c \
+./parser/auxiliary.c \
+./io/file.c
 
