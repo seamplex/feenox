@@ -2,3 +2,5 @@
  * definitions and instructions in an API-friendly way
     * the parser detects a "=" and then calls a function to define an assignment or a function definition passing the left and right hand side strings
  
+ * m4 as a library?
+ * gmsh as a library?

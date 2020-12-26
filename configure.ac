@@ -36,90 +36,208 @@ AS_IF([test "$CFLAGS" = "-g -O2"], [CFLAGS="-O3"])
 
 ######################
 # check for GSL (required)
-AC_CHECK_HEADER([gsl/gsl_vector.h],[],AC_MSG_ERROR[libgsl-dev not found])
-AC_CHECK_LIB([gslcblas],[cblas_dgemm],[],AC_MSG_ERROR[libgsl-dev not found])
-AC_CHECK_LIB([gsl],[gsl_blas_dgemm],[],AC_MSG_ERROR[libgsl-dev not found])
-
-
-######################
-# check for SUNDIALS IDA (optional)
-# the default is read from the macro argument, but the help string
-# does not expand variables so it always states that it is "check"
-ida_default=m4_default([$1],[check])
-ida_version=0
-
-AC_ARG_WITH([ida],
-  [AS_HELP_STRING([--with-ida],
-    [support differential-algebraic equations @<:@default=check@:>@])],
-  [],
-  [with_ida=${ida_default}])
-
-AS_IF([test "x$with_ida" != xno],[
-  AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h],
-  [
-    AC_CHECK_HEADERS([sundials/sundials_linearsolver.h])
-  ],
-  [
-    AS_IF([test "x$with_ida" != xcheck],
-      [AC_MSG_FAILURE([--with-ida was given, but test for ida headers failed])],
-      [AC_MSG_WARN([sundials ida headers not found])
-    ])
-  ])
-  AC_CHECK_LIB([sundials_ida], [IDAInit],,
-    [AS_IF([test "x$with_ida" != xcheck],
-      [AC_MSG_FAILURE([--with-ida was given, but test for ida libray failed])],
-      [AC_MSG_WARN([sundials ida library (libsundials-ida) not found])])
-    ])
-  AC_CHECK_HEADER([nvector/nvector_serial.h], [],
-    [AS_IF([test "x$with_ida" != xcheck],
-      [AC_MSG_FAILURE([--with-ida was given, but test for sundials nvecserial headers failed])],
-      [AC_MSG_WARN([sundials ida headers not found])
-    ])
-  ])
-  AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],,
-    [AS_IF([test "x$with_ida" != xcheck],
-      [AC_MSG_FAILURE([--with-ida was given, but test for sundials nvecserial libray failed])],
-      [AC_MSG_WARN([sundials nvecserial library (libsundials-nvecserial) not found])
-    ])
-  ])
-])
-
-# check if we have everything
-AS_IF([test "x$ac_cv_lib_sundials_ida_IDAInit" = xyes -a "x$ac_cv_header_sundials_sundials_types_h" = xyes -a "x$ac_cv_lib_sundials_nvecserial_N_VNew_Serial" = xyes -a "x$ac_cv_header_nvector_nvector_serial_h" = xyes ],
-  [AC_DEFINE(HAVE_IDA)]
-)
-  
+AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR[libgsl-dev not found])
+AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR[libgsl-dev not found])
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR[libgsl-dev not found])
 
 
 ######################
 # check for Readline (optional)
 # the default is read from the macro argument, but the help string
 # does not expand variables so it always states that it is "check"
-readline_default=m4_default([$1],[check])
-
-AC_ARG_WITH([readline],
-  [AS_HELP_STRING([--with-readline],
-    [support interactive debug mode @<:@default=check@:>@])],
+AC_ARG_WITH(
+  [readline],
+  AS_HELP_STRING([--with-readline], [support interactive debug mode @<:@default=check@:>@]),
   [],
-  [with_readline=${readline_default}])
+  [with_readline=check]
+)
 
-AS_IF([test "x$with_readline" != xno],[
-   AC_CHECK_HEADER([readline/readline.h], [],
-    [AS_IF([test "x$with_readline" != xcheck],
-       [AC_MSG_FAILURE([--with-readline was given, but test for readline headers failed])],
-       [AC_MSG_WARN([GNU readline headers (libreadline-dev) not found.])])
-    ])
-   AC_CHECK_LIB([readline], [readline],,
-    [AS_IF([test "x$with_readline" != xcheck],
-       [AC_MSG_FAILURE([--with-readline was given, but test for readline libray failed])],
-       [AC_MSG_WARN([GNU readline library (libreadline) not found.])])
-    ])
-  ])
+AS_IF([test "x${with_readline}" != "xno"] , [
+  AC_CHECK_HEADER([readline/readline.h],
+    [],
+    AS_IF([test "x${with_readline}" != "xcheck"], AC_MSG_FAILURE([--with-readline was given, but test for readline headers failed]))
+  )
+  AC_CHECK_LIB([readline], [readline],
+    [],
+    AS_IF([test "x${with_readline}" != "xcheck"],
+      AC_MSG_FAILURE([--with-readline was given, but test for readline libray failed])
+    )
+  )  
+])
 
 # check if we have everything
-AS_IF([test "x$ac_cv_lib_readline_readline" = xyes -a "x$ac_cv_header_readline_readline_h" = xyes ],
-  [AC_DEFINE(HAVE_READLINE)]
+AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
+            "x${ac_cv_header_readline_readline_h}" = "xyes" ],
+  [
+    AC_DEFINE(HAVE_READLINE)
+    have_readline="yes"
+  ],
+  [
+    have_readline="no"
+  ]
 )
+
+
+
+######################
+# check for SUNDIALS IDA (optional)
+# the default is read from the macro argument, but the help string
+# does not expand variables so it always states that it is "check"
+AC_ARG_WITH(
+  [ida],
+  AS_HELP_STRING([--with-ida], [use SUNDIALS IDA to solve DAEs @<:@default=check@:>@]),
+  [],
+  [with_ida=check]
+)
+
+ 
+AS_IF([test "x${with_ida}" != "xno"] , [
+  AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
+    [],
+    AS_IF([test "x${with_ida}" != "xcheck"], AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida headers failed]))
+  )
+  AC_CHECK_LIB([sundials_ida], [IDAInit],
+    [],
+    AS_IF([test "x${with_ida}" != "xcheck"],
+      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida libray failed])
+    )
+  )  
+  AC_CHECK_HEADER([nvector/nvector_serial.h],
+    [],
+    AS_IF([test "x${with_ida}" != "xcheck"],
+      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida libray failed])
+    )
+  )
+  AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
+    [],
+    AS_IF([test "x${with_ida}" != "xcheck"],
+      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-ida libray failed])
+    )  
+  )
+])
+
+# check if we have everything
+AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
+            "x${ac_cv_header_sundials_sundials_types_h}" = "xyes" -a  \
+            "x${ac_cv_lib_sundials_nvecserial_N_VNew_Serial}" = "xyes" -a \
+            "x${ac_cv_header_nvector_nvector_serial_h}" = "xyes"],
+  [
+    AC_DEFINE(HAVE_IDA)
+    have_ida="yes"
+  ],
+  [
+    have_ida="no"
+  ]
+)
+  
+  
+
+
+######################
+# check for PETSc (optional)
+AC_ARG_WITH([petsc],
+  [AS_HELP_STRING([--with-petsc],
+    [use PETSc to solve PDEs @<:@default=check@:>@])],
+  [],
+  [with_petsc=check]
+)
+
+AS_IF([test "x${with_petsc}" != xno], [
+  AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
+  AC_ARG_VAR(PETSC_ARCH, [PETSc architecture])
+
+  # asume we found it
+  petsc_found=1
+
+  AC_MSG_CHECKING([for PETSc dir])
+  AS_IF([test -z "$PETSC_DIR"], [
+    AC_MSG_RESULT([empty, trying /usr/lib/petsc])
+    export PETSC_DIR=/usr/lib/petsc
+  ])
+  AS_IF([test ! -d "$PETSC_DIR"], [
+    AC_MSG_RESULT([no])
+    petsc_found=0
+  ], [test ! -d "$PETSC_DIR/include"], [
+    AC_MSG_RESULT([broken])
+    petsc_found=0
+  ], [test ! -f "$PETSC_DIR/include/petscversion.h"], [
+    AC_MSG_RESULT([broken])
+    petsc_found=0
+  ],[
+    AC_MSG_RESULT([$PETSC_DIR])
+  ])
+
+  AS_IF([test ${petsc_found} -eq 1], [
+    AC_MSG_CHECKING([for PETSc arch])
+    AS_IF([test ! -e "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables"], [
+      AC_MSG_RESULT([broken])
+      AC_MSG_ERROR([cannot find ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables.
+Do you have a working PETSc > 3.6.0 installation?])
+      petsc_found=0
+    ],
+      AC_MSG_RESULT([$PETSC_ARCH])
+    ) 
+  ])
+
+  AS_IF([test ${petsc_found} -eq 1],
+    [
+      AC_DEFINE(HAVE_PETSC)
+      have_petsc="yes"
+    ],
+    [
+      have_petsc="no"
+    ]
+  )  
+])
+
+
+######################
+# check for SLEPc (optional)
+AC_ARG_WITH([slepc],
+  [AS_HELP_STRING([--with-slepc],
+    [use PETSc to solve PDEs @<:@default=check@:>@])],
+  [],
+  [with_slepc=check]
+)
+
+AS_IF([test "x${with_slepc}" != xno], [
+  AC_ARG_VAR(SLEPC_DIR, [location of SLEPc installation])
+
+  # asume we found it
+  slepc_found=1
+
+  AC_MSG_CHECKING([for SLEPc dir])
+  AS_IF([ test -z "$SLEPC_DIR" ], [
+    AC_MSG_RESULT([empty, trying /usr/lib/slepc])
+    export SLEPC_DIR=/usr/lib/slepc
+  ])
+  AS_IF([ test ! -d "$SLEPC_DIR" ], [
+    AC_MSG_RESULT([no])
+    slepc_found=0
+  ], [test ! -d "$SLEPC_DIR/include"], [
+    AC_MSG_RESULT([broken])
+    slepc_found=0
+  ], [test ! -f "$SLEPC_DIR/include/slepcversion.h"], [
+    AC_MSG_RESULT([broken])
+    slepc_found=0
+  ], [test ! -f "$SLEPC_DIR/$PETSC_ARCH/lib/slepc/conf/slepcvariables"], [
+    AC_MSG_RESULT([broken])
+    slepc_found=0
+  ],
+    AC_MSG_RESULT([$SLEPC_DIR])
+  )
+
+  AS_IF([test ${slepc_found} -eq 1],
+    [
+      AC_DEFINE(HAVE_SLEPC)
+      have_slepc="yes"
+    ],
+    [
+      have_slepc="no"
+    ]
+  )  
+])
+
 
 
 ######################
@@ -153,6 +271,18 @@ EOF
   
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile]) 
 
-echo ${gsl_version}
+AS_BOX([Summary of optional dependencies])
+AS_ECHO(  ["  Readline       ${have_readline}"])
+AS_ECHO(  ["  SUNDIALS IDA   ${have_ida}"])
+AS_ECHO_N(["  PETSc          ${have_petsc}"])
+AS_IF([test "x${have_petsc}" = "xyes"],
+ AS_ECHO([" ${PETSC_DIR} ${PETSC_ARCH}"]),
+ AS_ECHO
+)
+AS_ECHO_N(["  SLEPc          ${have_slepc}"])
+AS_IF([test "x${have_slepc}" = "xyes"],
+ AS_ECHO([" ${SLEPC_DIR}"]),
+ AS_ECHO
+)
 
 AC_OUTPUT
