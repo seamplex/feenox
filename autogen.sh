@@ -16,6 +16,7 @@ for i in git autoconf m4 make; do
 done
 
 ./autoclean.sh
+touch src/variables.mak
 
 if test ! -d ".git"; then
   echo "error: this tree is not a repository (did you download instead of clone?)" 
@@ -28,13 +29,6 @@ echo "define(feenoxversion, ${version})dnl" > version.m4
 
 branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 commitdate=$(git log -1 --pretty=format:"%ad")
-
-cat << EOF > src/version-vcs.h
-#define FEENOX_GIT_BRANCH    "${branch}"
-#define FEENOX_GIT_VERSION   "${version}"
-#define FEENOX_GIT_DATE      "${commitdate}"
-#define FEENOX_GIT_CLEAN     $(git status --porcelain | wc -l)
-EOF
 
 if test ! -z "$(which pandoc)"; then
  pandoc README.md  -t plain -o README

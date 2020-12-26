@@ -8,3 +8,4 @@ if test -e Makefile; then
 fi
 rm -f *~ .*~ src/*~
 cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$/ d' | sed 's/^/rm -rf /' | bash
+rm -f src/petscslepc.mak

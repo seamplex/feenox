@@ -239,6 +239,17 @@ AS_IF([test "x${with_slepc}" != xno], [
 ])
 
 
+# if slepc is found we need to include its makefile,
+# otherwise petsc and otherwise nothing
+AS_IF([test "x${have_slepc}" = "xyes"],
+  [echo "include \$(SLEPC_DIR)/lib/slepc/conf/slepc_variables" > src/variables.mak],
+  AS_IF([test "x${have_petsc}" = "xyes"],
+    [echo "include \$(PETSC_DIR)/lib/petsc/conf/variables" > src/variables.mak],
+    [touch src/variables.mak]
+  )
+)
+
+
 
 ######################
 # create version.h
@@ -262,6 +273,11 @@ EOF
 ])
 
 cat << EOF >> src/version.h
+#define FEENOX_COMPILATION_DATE     "$(date +'%a %b %d %H:%M:%S %Y %z')"
+
+#define FEENOX_COMPILATION_USERNAME "$(whoami | sed s/\\\\\\\\//)"
+#define FEENOX_COMPILATION_HOSTNAME "$(hostname)"
+
 #define FEENOX_COMPILER_ARCH     "${host_os} ${host_cpu}"
 #define FEENOX_COMPILER_VERSION  "$($CC --version | head -n1)"
 #define FEENOX_COMPILER_CFLAGS   "$CFLAGS"
