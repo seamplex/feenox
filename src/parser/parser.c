@@ -2943,6 +2943,7 @@ int feenox_parse_include(void) {
         feenox_push_error_message("expected a positive line number");
         return FEENOX_PARSER_ERROR;
       }
+      printf("from %g\n", xi);
 ///kw+INCLUDE+usage [ TO <num_expr> ]
     } else if (strcasecmp(token, "TO") == 0) {
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -2950,6 +2951,7 @@ int feenox_parse_include(void) {
         feenox_push_error_message("expected a positive line number");
         return FEENOX_PARSER_ERROR;
       }
+      printf("to %g\n", xi);
     }
   }
 

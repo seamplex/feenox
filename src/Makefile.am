@@ -19,5 +19,6 @@ feenox_SOURCES = \
 ./flow/abort.c \
 ./parser/parser.c \
 ./parser/auxiliary.c \
-./io/file.c
+./io/file.c \
+./math/algebra.c
 

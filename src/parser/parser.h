@@ -30,24 +30,6 @@
 extern const char operators[];
 extern const char factorseparators[];
 
-// no son enums porque hacemos operaciones con las mascaras de abajo
-#define EXPR_OPERATOR                             0
-#define EXPR_CONSTANT                             1
-#define EXPR_VARIABLE                             2
-#define EXPR_VECTOR                               3
-#define EXPR_MATRIX                               4
-// old-school numbers
-//#define EXPR_NUM                                  5
-#define EXPR_BUILTIN_FUNCTION                     6
-#define EXPR_BUILTIN_VECTORFUNCTION               7
-#define EXPR_BUILTIN_FUNCTIONAL                   8
-#define EXPR_FUNCTION                             9
-
-#define EXPR_BASICTYPE_MASK                    1023
-#define EXPR_CURRENT                              0
-#define EXPR_INITIAL_TRANSIENT                 2048
-#define EXPR_INITIAL_STATIC                    4096
-
 
 struct {
   size_t page_size;
@@ -73,16 +55,15 @@ extern int feenox_parse_default_argument_value(void);
 extern int feenox_parse_implicit(void);
 
 
-// parseraux.c
+// auxiliary.c
 extern int feenox_read_line(FILE *file_ptr);
 extern char *feenox_get_next_token(char *line);
 extern void feenox_strip_blanks(char *string);
 extern void feenox_add_leading_zeros(char **string);
 
-extern int feenox_parse_expression(const char *string, expr_t *expr);
 extern int feenox_parser_expression_in_string(double *result);
-extern int feenox_parse_madeup_expression(char *string, expr_factor_t *factor);
-extern int feenox_parse_factor(char *string, expr_factor_t *factor);
+extern int feenox_parse_madeup_expression(char *string, expr_t *expr);
+extern expr_factor_t *feenox_parse_factor(char *string);
 
 extern char *feenox_ends_in_init(char *name);
 extern char *feenox_ends_in_zero(char *name);

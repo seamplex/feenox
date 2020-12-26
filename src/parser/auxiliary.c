@@ -182,32 +182,16 @@ int feenox_parse_expression(const char *string, expr_t *expr) {
   // the parser does not like blanks
   feenox_strip_blanks(string_local_copy);
   
-  //
+  // the expr structure contains the original string for debugging purposes
+  expr->string = strdup(string_local_copy);
+  
   // this function needs takes care of the unary negative operator by
   // re-writing "-a" as "0-a"
   // it needs the address of the local copy because it might be needed to do
   // a realloc and a plain pointer would get lost (donde judas perdió el poncho)
   feenox_add_leading_zeros(&string_local_copy);
 
-  // the expr structure contains the original string for debugging purposes
-  expr->string = strdup(string_local_copy);
-
-  // first we need to evaluate how many tokens are there with NULL in the second argument
-/*  
-  if ((expr->n_tokens = feenox_parse_madeup_expression(string_local_copy, NULL)) < 0) {
-    free(string_local_copy);
-    return FEENOX_PARSER_ERROR;
-  }
-*/
-  // alocamos los tokens
-//  expr->token = calloc(expr->n_tokens, sizeof(factor_t));
-
-  // y los rellenamos
-  if ((feenox_parse_madeup_expression(string_local_copy, expr->token)) < 0) {
-    free(expr->token);
-    free(string_local_copy);
-    return FEENOX_PARSER_ERROR;
-  }
+  feenox_call(feenox_parse_madeup_expression(string_local_copy, expr));
 
   free(string_local_copy);
 
@@ -216,15 +200,13 @@ int feenox_parse_expression(const char *string, expr_t *expr) {
 
 
 // parsea una expresion ya maquillada
-// si expr == null entones solamente contamos cuantos tokens hays
-// si expr != null rellenamos los tokens
-int feenox_parse_madeup_expression(char *string, expr_factor_t *factor) {
+int feenox_parse_madeup_expression(char *string, expr_t *expr) {
 
   char *current_op;
   int level = 1;
   int count = 0;
-  int last_one_operator = 0;
-  int n;
+  int last_one_was_an_operator = 0;
+  expr_factor_t *factor;
 
   while (*string != '\0') {
 
@@ -239,36 +221,39 @@ int feenox_parse_madeup_expression(char *string, expr_factor_t *factor) {
         // si hay un signo y es el primer termino o el anterior ya es un
         // operador, entonces el signo forma parte del factor
         // esto no deberia pasar, para eso rellenamos con ceros al principio
-        if ((count == 0) || last_one_operator != 0) {
+        if ((count == 0) || last_one_was_an_operator != 0) {
           // una constante, variable o funcion
-          if ((n = feenox_parse_factor(string, factor)) == -1) {
+          if ((factor = feenox_parse_factor(string)) == NULL) {
             return FEENOX_PARSER_ERROR;
           }
           factor->level = level;
-          factor = factor->next;
-          string += n;
-          last_one_operator = 0;
+          LL_APPEND(expr->factors, factor);
+          string += factor->n_chars;
+          last_one_was_an_operator = 0;
           count++;
+          
         } else {
-          last_one_operator = 1;
+          
+          last_one_was_an_operator = 1;
           count++;
+          factor = calloc(1, sizeof(expr_factor_t));
+          LL_APPEND(expr->factors, factor);
           factor->type = EXPR_OPERATOR;
           factor->oper = current_op-operators+1;
           // precedencia de a dos, izquierda a derecha
           factor->level = level+(current_op-operators)/2*2; 
-          factor = factor->next;
           string++;
         }
       }
     } else {
       // una constante, variable o funcion
-      if ((n = feenox_parse_factor(string, factor)) == -1) {
+      if ((factor = feenox_parse_factor(string)) == NULL) {
         return FEENOX_PARSER_ERROR;
       }
+      LL_APPEND(expr->factors, factor);
       factor->level = level;
-      factor = factor->next;
-      string += n;
-      last_one_operator = 0;
+      string += factor->n_chars;
+      last_one_was_an_operator = 0;
       count++;
     }
   }
@@ -281,14 +266,14 @@ int feenox_parse_madeup_expression(char *string, expr_factor_t *factor) {
     return FEENOX_PARSER_ERROR;
   }
 
-  return count;
+  return FEENOX_PARSER_OK;
 
 }
 
 
 // parsea un factor (una constante, una variable o una funcion)
 // y rellena la estructura expr
-int feenox_parse_factor(char *string, expr_factor_t *factor) {
+expr_factor_t *feenox_parse_factor(char *string) {
 
   char *backup;
 //  char *argument;
@@ -298,6 +283,7 @@ int feenox_parse_factor(char *string, expr_factor_t *factor) {
 //  int n_arguments;
 //  int n_allocs;
   char *token;
+  
 /*  
   char *dummy_argument;
 
@@ -318,19 +304,22 @@ int feenox_parse_factor(char *string, expr_factor_t *factor) {
   int got_it = 0;
 
   backup = strdup(string);
+  
+  expr_factor_t *factor = calloc(1, sizeof(expr_factor_t));
+  
 
   // o un numero explicito, o un signo explicito o un punto para los yanquis que escriben ".1" en lugar de "0.1"  
   if (isdigit((int)(*string)) || *string == '-' || *string == '+' || *string == '.') {
     // un numerito
     sscanf(string, "%lf%n", &constant, &n);
-    if (factor != NULL) {
-      factor->type = EXPR_CONSTANT;
-      factor->constant = constant;
-    }
+    factor->type = EXPR_CONSTANT;
+    factor->constant = constant;
+    factor->n_chars = n;
+
   } else {
     // letritas
     if ((token = strtok(backup, factorseparators)) == NULL || strlen(token) == 0) {
-      return FEENOX_PARSER_ERROR;
+      return NULL;
     }
 
     // miramos si termina en _0 indicando que es el valor inicial de algo
@@ -354,7 +343,7 @@ int feenox_parse_factor(char *string, expr_factor_t *factor) {
     // MOMENTO! no vale pedir combinaciones!
     if (wants_initial_transient && wants_initial_static) {
       feenox_push_error_message("cannot ask for both _0 and _init");
-      return FEENOX_PARSER_ERROR;
+      return NULL;
     }
     
     // matriz, vector o variable
@@ -652,13 +641,13 @@ int feenox_parse_factor(char *string, expr_factor_t *factor) {
     if (got_it == 0) {
       feenox_push_error_message("unknown symbol '%s'", token);
       free(backup);
-      return FEENOX_PARSER_ERROR;
+      return NULL;
     }
   }
 
   free(backup);
 
-  return n;
+  return factor;
 
 }
 
@@ -740,10 +729,8 @@ int feenox_parser_expression_in_string(double *result) {
     return FEENOX_PARSER_ERROR;
   }
   
-  // TODO
-/*  
   *result = feenox_evaluate_expression_in_string(token);
-*/  
+
   return FEENOX_PARSER_OK;
 }
 
