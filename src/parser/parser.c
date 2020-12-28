@@ -61,9 +61,8 @@ int feenox_parse_main_input_file(const char *filepath) {
 //  feenox_call(feenox_init_after_parser());
 
   free(feenox_parser.line);
-  feenox_parser.line = NULL;
 
-  return 0;
+  return FEENOX_PARSER_OK;
 }
 
 
@@ -115,7 +114,6 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
     fclose(input_file_stream);
   }
   
-  // everything apple
   return FEENOX_PARSER_OK;
 
 }
@@ -138,8 +136,14 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "ABORT") == 0) {
       feenox_call(feenox_parse_abort());
       return FEENOX_PARSER_OK;
+    } else if (strcasecmp(token, "DEFAULT_ARGUMENT_VALUE") == 0) {
+      feenox_call(feenox_parse_default_argument_value());
+      return FEENOX_PARSER_OK;
     } else if (strcasecmp(token, "IMPLICIT") == 0) {
       feenox_call(feenox_parse_implicit());
+      return FEENOX_PARSER_OK;
+    } else if (strcasecmp(token, "TIME_PATH") == 0) {
+      feenox_call(feenox_parse_time_path());
       return FEENOX_PARSER_OK;
     }
   }
@@ -147,31 +151,6 @@ int feenox_parse_line(void) {
 
       
 /*
- // ---------------------------------------------------------------------
-///kw+TIME_PATH+usage TIME_PATH
-///kw+TIME_PATH+desc Force transient problems to pass through specific instants of time.
-///kw+TIME_PATH+detail The time step `dt` will be reduced whenever the distance between
-///kw+TIME_PATH+detail the current time `t` and the next expression in the list is greater
-///kw+TIME_PATH+detail than `dt` so as to force `t` to coincide with the expressions given.
-///kw+TIME_PATH+detail The list of expresssions should evaluate to a sorted list of values.          
-    } else if ((strcasecmp(token, "TIME_PATH") == 0)) {
-
-///kw+TIME_PATH+usage <expr_1> [ <expr_2>  [ ... <expr_n> ] ]
-      i = 0;
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        // el +2 es porque necesito +1 de por si y otro +1 para guardar el ultimo vacio
-        feenox.time_path = realloc(feenox.time_path, (i+2)*sizeof(expr_t));
-        feenox_call(feenox_parse_expression(token, &feenox.time_path[i]));
-        i++;
-      }
-
-      // ponemos en vacio el ultimo
-      feenox.time_path[i].n_tokens = 0;
-
-      // y apuntamos el current al primero
-      feenox.current_time_path = &feenox.time_path[0];
-
-      return WASORA_PARSER_OK;
 
 // ---------------------------------------------------------------------      
 ///kw+INITIAL_CONDITIONS_MODE+usage INITIAL_CONDITIONS_MODE
@@ -2908,7 +2887,6 @@ char *feenox_get_nth_token(char *string, int n) {
 
 int feenox_parse_include(void) {
   
-  char *token;
   
 ///kw+INCLUDE+usage INCLUDE
 ///kw+INCLUDE+desc Include another feenox input file.
@@ -2923,8 +2901,9 @@ int feenox_parse_include(void) {
 ///kw+INCLUDE+detail commandline replacement argument such as `$1` so `INCLUDE $1.fee` will include the
 ///kw+INCLUDE+detail file specified after the main input file in the command line.
 
-  double xi;
+  char *token;
   char *filepath;
+  double xi;
   int from = 0;
   int to = 0;
     
@@ -2940,24 +2919,20 @@ int feenox_parse_include(void) {
     if (strcasecmp(token, "FROM") == 0) {
       feenox_call(feenox_parser_expression_in_string(&xi));
       if ((from = (int)(xi)) <= 0) {
-        feenox_push_error_message("expected a positive line number");
+        feenox_push_error_message("expected a positive line number for FROM instead of '%s'", token);
         return FEENOX_PARSER_ERROR;
       }
-      printf("from %g\n", xi);
 ///kw+INCLUDE+usage [ TO <num_expr> ]
     } else if (strcasecmp(token, "TO") == 0) {
       feenox_call(feenox_parser_expression_in_string(&xi));
       if ((to = (int)(xi)) <= 0) {
-        feenox_push_error_message("expected a positive line number");
+        feenox_push_error_message("expected a positive line number for TO instead of '%s'", token);
         return FEENOX_PARSER_ERROR;
       }
-      printf("to %g\n", xi);
     }
   }
 
-  if (feenox_parse_input_file(filepath, from, to) != 0) {
-    return FEENOX_PARSER_ERROR;
-  }
+  feenox_call(feenox_parse_input_file(filepath, from, to));
 
   return FEENOX_PARSER_OK;
 }
@@ -2973,16 +2948,60 @@ int feenox_parse_default_argument_value(void) {
 ///kw+DEFAULT_ARGUMENT_VALUE+detail commandline. With this keyword, a default value can be assigned if
 ///kw+DEFAULT_ARGUMENT_VALUE+detail no argument is given, thus avoiding the failure and making the argument
 ///kw+DEFAULT_ARGUMENT_VALUE+detail optional.
-
+///kw+DEFAULT_ARGUMENT_VALUE+detail The `<constant>` should be 1, 2, 3, etc. and `<string>` will be expanded
+///kw+DEFAULT_ARGUMENT_VALUE+detail character-by-character where the `$n` construction is. 
+///kw+DEFAULT_ARGUMENT_VALUE+detail Whether the resulting expression is to be interpreted as a string or as a
+///kw+DEFAULT_ARGUMENT_VALUE+detail numerical expression will depend on the context.
+  
 ///kw+DEFAULT_ARGUMENT_VALUE+usage <constant> <string>
-      
+
+  char *token;
+  int n;
+
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected argument number for DEFAULT_ARGUMENT_VALUE");
+    return FEENOX_PARSER_ERROR;
+  }
+
+  if ((n = (int)feenox_evaluate_expression_in_string(token)) <= 0) {
+    feenox_push_error_message("expected a positive value instead of 'token", token);
+    return FEENOX_PARSER_ERROR;
+  }
+
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected value for DEFAULT_ARUGMENT_VALUE number %d", n);
+    return FEENOX_PARSER_ERROR;
+  }
+
+  if ((feenox.optind+n) >= feenox.argc) {
+    feenox.argv = realloc(feenox.argv, sizeof(char *)*(feenox.optind+n + 1));
+    feenox.argc = feenox.optind+n + 1;
+    feenox.argv[feenox.optind+n] = strdup(token);
+  }
+  
   return FEENOX_PARSER_OK;
 }
+
+int feenox_parse_abort(void) {
+  
+///kw+ABORT+usage ABORT
+///kw+ABORT+desc Catastrophically abort the execution and quit FeenoX.
+///kw+ABORT+detail Whenever the instruction `ABORT` is executed, FeenoX quits with a non-zero error leve.
+///kw+ABORT+detail It does not close files nor unlock shared memory objects.
+///kw+ABORT+detail The objective of this instruction is to either debug complex input files
+///kw+ABORT+detail by using only parts of them or to conditionally abort the execution using `IF` clauses.
+  
+  feenox_call(feenox_add_instruction(feenox_instruction_abort, NULL));
+
+  return FEENOX_PARSER_OK;
+}
+
+
 
 int feenox_parse_implicit(void) {
 ///kw+IMPLICIT+usage IMPLICIT
 ///kw+IMPLICIT+desc Define whether implicit declaration of variables is allowed or not.
-///kw+IMPLICIT+detail By default, feenox allows variables (but not vectors nor matrices) to be
+///kw+IMPLICIT+detail By default, FeenoX allows variables (but not vectors nor matrices) to be
 ///kw+IMPLICIT+detail implicitly declared. To avoid introducing errors due to typos, explicit
 ///kw+IMPLICIT+detail declaration of variables can be forced by giving `IMPLICIT NONE`.
 ///kw+IMPLICIT+detail Whether implicit declaration is allowed or explicit declaration is required
@@ -2996,3 +3015,26 @@ int feenox_parse_implicit(void) {
 
   return FEENOX_PARSER_OK;
 }  
+
+
+int feenox_parse_time_path(void) {
+///kw+TIME_PATH+usage TIME_PATH
+///kw+TIME_PATH+desc Force transient problems to pass through specific instants of time.
+///kw+TIME_PATH+detail The time step `dt` will be reduced whenever the distance between
+///kw+TIME_PATH+detail the current time `t` and the next expression in the list is greater
+///kw+TIME_PATH+detail than `dt` so as to force `t` to coincide with the expressions given.
+///kw+TIME_PATH+detail The list of expresssions should evaluate to a sorted list of values for all times.          
+
+  char *token;
+  
+///kw+TIME_PATH+usage <expr_1> [ <expr_2>  [ ... <expr_n> ] ]
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    feenox_call(feenox_add_time_path(token));
+  }
+
+  // y apuntamos el current al primero
+  feenox.time_path_current = feenox.time_paths;
+
+  return FEENOX_PARSER_OK;
+
+}

@@ -29,10 +29,9 @@ int main(int argc, char **argv) {
 
   feenox_initialize(argc, argv);
 
-  // argv[optind] has the input file path
-  if (feenox_parse_main_input_file(argv[feenox.optind]) != 0) {
+  if (feenox_parse_main_input_file(feenox.main_input_filepath) != FEENOX_PARSER_OK) {
     feenox_pop_errors();
-    exit(1);
+    exit(EXIT_FAILURE);
   }
  
 /*  

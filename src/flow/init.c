@@ -121,6 +121,9 @@ int feenox_initialize(int argc, char **argv) {
   }
   feenox.argv[i] = NULL;
   
+  // get a pointer to the main input file
+  feenox.main_input_filepath = feenox.argv[feenox.optind];
+  
   // remember the base directory of the input file so we can try harder to find files
   feenox.main_input_dirname = dirname(strdup(argv[feenox.optind]));
   

@@ -36,6 +36,7 @@ struct {
   size_t actual_buffer_size; 
   
   int implicit_none;
+  int reading_daes;
   
   char *line;
   
@@ -46,14 +47,9 @@ struct {
   
 } feenox_parser;
 
-
 // parser.c
 extern int feenox_parse_input_file(const char *filepath, int from, int to);
 extern int feenox_parse_line(void);
-extern int feenox_parse_include(void);
-extern int feenox_parse_default_argument_value(void);
-extern int feenox_parse_implicit(void);
-
 
 // auxiliary.c
 extern int feenox_read_line(FILE *file_ptr);
@@ -69,5 +65,13 @@ extern char *feenox_ends_in_init(char *name);
 extern char *feenox_ends_in_zero(char *name);
 
 extern int feenox_parser_keywords_ints(char *keyword[], int *value, int *option);
+
+
+
+extern int feenox_parse_include(void);
+extern int feenox_parse_default_argument_value(void);
+extern int feenox_parse_abort(void);
+extern int feenox_parse_implicit(void);
+extern int feenox_parse_time_path(void);
 
 #endif  

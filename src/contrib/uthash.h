@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2003-2018, Troy D. Hanson     http://troydhanson.github.com/uthash/
+Copyright (c) 2003-2020, Troy D. Hanson     http://troydhanson.github.com/uthash/
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,11 +24,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTHASH_H
 #define UTHASH_H
 
-#define UTHASH_VERSION 2.1.0
+#define UTHASH_VERSION 2.2.0
 
 #include <string.h>   /* memcmp, memset, strlen */
 #include <stddef.h>   /* ptrdiff_t */
 #include <stdlib.h>   /* exit */
+
+#if defined(HASH_DEFINE_OWN_STDINT) && HASH_DEFINE_OWN_STDINT
+/* This codepath is provided for backward compatibility, but I plan to remove it. */
+#warning "HASH_DEFINE_OWN_STDINT is deprecated; please use HASH_NO_STDINT instead"
+typedef unsigned int uint32_t;
+typedef unsigned char uint8_t;
+#elif defined(HASH_NO_STDINT) && HASH_NO_STDINT
+#else
+#include <stdint.h>   /* uint8_t, uint32_t */
+#endif
 
 /* These macros use decltype or the earlier __typeof GNU extension.
    As decltype is only available in newer compilers (VS2010 or gcc 4.3+
@@ -60,23 +70,6 @@ do {                                                                            
 do {                                                                             \
   (dst) = DECLTYPE(dst)(src);                                                    \
 } while (0)
-#endif
-
-/* a number of the hash function use uint32_t which isn't defined on Pre VS2010 */
-#if defined(_WIN32)
-#if defined(_MSC_VER) && _MSC_VER >= 1600
-#include <stdint.h>
-#elif defined(__WATCOMC__) || defined(__MINGW32__) || defined(__CYGWIN__)
-#include <stdint.h>
-#else
-typedef unsigned int uint32_t;
-typedef unsigned char uint8_t;
-#endif
-#elif defined(__GNUC__) && !defined(__VXWORKS__)
-#include <stdint.h>
-#else
-typedef unsigned int uint32_t;
-typedef unsigned char uint8_t;
 #endif
 
 #ifndef uthash_malloc
@@ -408,7 +401,7 @@ do {                                                                            
 do {                                                                             \
   IF_HASH_NONFATAL_OOM( int _ha_oomed = 0; )                                     \
   (add)->hh.hashv = (hashval);                                                   \
-  (add)->hh.key = (char*) (keyptr);                                              \
+  (add)->hh.key = (const void*) (keyptr);                                        \
   (add)->hh.keylen = (unsigned) (keylen_in);                                     \
   if (!(head)) {                                                                 \
     (add)->hh.next = NULL;                                                       \
@@ -764,7 +757,7 @@ do {                                                                            
   }                                                                              \
   while ((out) != NULL) {                                                        \
     if ((out)->hh.hashv == (hashval) && (out)->hh.keylen == (keylen_in)) {       \
-      if (HASH_KEYCMP((out)->hh.key, keyptr, keylen_in) == 0) {              \
+      if (HASH_KEYCMP((out)->hh.key, keyptr, keylen_in) == 0) {                  \
         break;                                                                   \
       }                                                                          \
     }                                                                            \
@@ -850,12 +843,12 @@ do {                                                                            
   struct UT_hash_handle *_he_thh, *_he_hh_nxt;                                   \
   UT_hash_bucket *_he_new_buckets, *_he_newbkt;                                  \
   _he_new_buckets = (UT_hash_bucket*)uthash_malloc(                              \
-           2UL * (tbl)->num_buckets * sizeof(struct UT_hash_bucket));            \
+           sizeof(struct UT_hash_bucket) * (tbl)->num_buckets * 2U);             \
   if (!_he_new_buckets) {                                                        \
     HASH_RECORD_OOM(oomed);                                                      \
   } else {                                                                       \
     uthash_bzero(_he_new_buckets,                                                \
-        2UL * (tbl)->num_buckets * sizeof(struct UT_hash_bucket));               \
+        sizeof(struct UT_hash_bucket) * (tbl)->num_buckets * 2U);                \
     (tbl)->ideal_chain_maxlen =                                                  \
        ((tbl)->num_items >> ((tbl)->log2_num_buckets+1U)) +                      \
        ((((tbl)->num_items & (((tbl)->num_buckets*2U)-1U)) != 0U) ? 1U : 0U);    \
@@ -1142,7 +1135,7 @@ typedef struct UT_hash_handle {
    void *next;                       /* next element in app order      */
    struct UT_hash_handle *hh_prev;   /* previous hh in bucket order    */
    struct UT_hash_handle *hh_next;   /* next hh in bucket order        */
-   void *key;                        /* ptr to enclosing struct's key  */
+   const void *key;                  /* ptr to enclosing struct's key  */
    unsigned keylen;                  /* enclosing struct's key len     */
    unsigned hashv;                   /* result of hash-fcn(key)        */
 } UT_hash_handle;
