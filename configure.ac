@@ -31,8 +31,8 @@ AS_IF([test "$CFLAGS" = "-g -O2"], [CFLAGS="-O3"])
 #AC_CHECK_HEADER([dlfcn.h],[],AC_MSG_ERROR([dlfcn.h not found]))
 
 # check for math
-#AC_SEARCH_LIBS([cos],[m],[],AC_MSG_ERROR([libm not found]))
-#AC_CHECK_HEADER([math.h],[],AC_MSG_ERROR([math.h not found]))
+AC_SEARCH_LIBS([cos],[m],[],AC_MSG_ERROR([libm not found]))
+AC_CHECK_HEADER([math.h],[],AC_MSG_ERROR([math.h not found]))
 
 ######################
 # check for GSL (required)
@@ -52,6 +52,7 @@ AC_ARG_WITH(
   [with_readline=check]
 )
 
+have_readline="no"
 AS_IF([test "x${with_readline}" != "xno"] , [
   AC_CHECK_HEADER([readline/readline.h],
     [],
@@ -72,9 +73,6 @@ AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
     AC_DEFINE(HAVE_READLINE)
     have_readline="yes"
   ],
-  [
-    have_readline="no"
-  ]
 )
 
 
@@ -91,6 +89,7 @@ AC_ARG_WITH(
 )
 
  
+have_ida="no"
 AS_IF([test "x${with_ida}" != "xno"] , [
   AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
     [],
@@ -124,9 +123,6 @@ AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
   [
     AC_DEFINE(HAVE_IDA)
     have_ida="yes"
-  ],
-  [
-    have_ida="no"
   ]
 )
   
@@ -142,7 +138,8 @@ AC_ARG_WITH([petsc],
   [with_petsc=check]
 )
 
-AS_IF([test "x${with_petsc}" != xno], [
+have_petsc="no"
+AS_IF([test "x${with_petsc}" != "xno"], [
   AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
   AC_ARG_VAR(PETSC_ARCH, [PETSc architecture])
 
@@ -183,9 +180,6 @@ Do you have a working PETSc > 3.6.0 installation?])
     [
       AC_DEFINE(HAVE_PETSC)
       have_petsc="yes"
-    ],
-    [
-      have_petsc="no"
     ]
   )  
 ])
@@ -200,7 +194,8 @@ AC_ARG_WITH([slepc],
   [with_slepc=check]
 )
 
-AS_IF([test "x${with_slepc}" != xno], [
+have_slepc="no"
+AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
   AC_ARG_VAR(SLEPC_DIR, [location of SLEPc installation])
 
   # asume we found it
@@ -231,9 +226,6 @@ AS_IF([test "x${with_slepc}" != xno], [
     [
       AC_DEFINE(HAVE_SLEPC)
       have_slepc="yes"
-    ],
-    [
-      have_slepc="no"
     ]
   )  
 ])
@@ -241,6 +233,7 @@ AS_IF([test "x${with_slepc}" != xno], [
 
 # if slepc is found we need to include its makefile,
 # otherwise petsc and otherwise nothing
+rm -f src/variables.mak
 AS_IF([test "x${have_slepc}" = "xyes"],
   [echo "include \$(SLEPC_DIR)/lib/slepc/conf/slepc_variables" > src/variables.mak],
   AS_IF([test "x${have_petsc}" = "xyes"],
