@@ -5,15 +5,12 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
 
 # dist_man_MANS = doc/feenox.1
 
-# EXTRA_DIST = examples doc locateruntest.sh \
-#              src/version.sh
+EXTRA_DIST = examples test locateruntest.sh
 
 # TESTS = tests/fibonacci.sh \
 #         tests/pi.sh \
 #         tests/interp1d.sh \
 #         tests/lorenz.sh
 
-# all-local:
-# 	cp -r src/wasora$(EXEEXT) .
-# 	rm -f src/version.$(OBJEXT) src/version.h src/version.lo src/.lib/version.$(OBJEXT)
-
+all-local:
+	cp -r src/feenox$(EXEEXT) .

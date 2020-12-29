@@ -73,5 +73,7 @@ extern int feenox_parse_default_argument_value(void);
 extern int feenox_parse_abort(void);
 extern int feenox_parse_implicit(void);
 extern int feenox_parse_time_path(void);
+extern int feenox_parse_initial_conditions(void);
+extern int feenox_parse_variables(void);
 
 #endif  

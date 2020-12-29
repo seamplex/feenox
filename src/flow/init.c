@@ -52,13 +52,14 @@ int feenox_initialize(int argc, char **argv) {
  
   // before getop() breaks them we make a copy of the arguments
   // TODO: de we need this?
+/*  
   feenox.argc_orig = argc;
   feenox.argv_orig = malloc((argc+1) * sizeof(char *));
   for (i = 0; i < argc; i++) {
     feenox.argv_orig[i] = strdup(argv[i]);
   }
   feenox.argv_orig[i] = NULL;
-  
+*/  
   // don't complain about unknown options, they can be for PETSc/SLEPc
   opterr = 0;
   while ((optc = getopt_long_only(argc, argv, "hvil", longopts, &option_index)) != -1) {
@@ -133,11 +134,13 @@ int feenox_initialize(int argc, char **argv) {
   // TODO: use our own
   // gsl_set_error_handler(feenox_gsl_handler);
 
-  // instal signal handlers for int & kill
   signal(SIGINT,  feenox_signal_handler);
   signal(SIGTERM, feenox_signal_handler);
   
-  return FEENOX_RUNTIME_OK;
+  feenox_call(feenox_init_special_objects());
+  feenox_call(feenox_parse_main_input_file(feenox.main_input_filepath));
+  
+  return FEENOX_OK;
 }
 
 // esta se llama despues de haber alocado los objetos
@@ -381,13 +384,13 @@ int feenox_init_special_objects(void) {
     wasora_call(wasora_mesh_init_before_parser());
   }
 */
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 
 }
 
 // esta se llama despues del parser, hay que verificar que everything este manzana
 // y pedir shared memory objecst y esas cosas
-int wasora_init_after_parser(void) {
+int feenox_init_after_parser(void) {
 
 /*  
   int i;
@@ -504,7 +507,7 @@ int wasora_init_before_run(void) {
     wasora_call(wasora.plugin[i].init_before_run());
   }
 */
-  return FEENOX_RUNTIME_OK;
+  return FEENOX_OK;
 }
 
 

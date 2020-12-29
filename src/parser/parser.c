@@ -52,17 +52,14 @@ int feenox_parse_main_input_file(const char *filepath) {
   // we can ask for more if we need
   feenox_parser.page_size = (size_t)sysconf(_SC_PAGESIZE);
   feenox_parser.actual_buffer_size = feenox_parser.page_size-64;
+  
   feenox_parser.line = malloc(feenox_parser.actual_buffer_size);
-
   feenox_call(feenox_parse_input_file(filepath, 0, 0));
-
-  // TODO
-  // inicializamos cosas que se tienen que inicializar despues de haber leido el feenox_input
-//  feenox_call(feenox_init_after_parser());
-
   free(feenox_parser.line);
+  
+  feenox_call(feenox_init_after_parser());
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
@@ -74,7 +71,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
   int line_num, delta_line_num;
 
   if (filepath == NULL) {
-    return FEENOX_PARSER_OK;
+    return FEENOX_OK;
   } else if (strcmp(filepath, "-") == 0) {
     input_file_stream = stdin;
   } else {
@@ -84,7 +81,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       } else {
         feenox_push_error_message("included file '%s' could not be opened: % ", filepath, strerror(errno));
       }
-      return FEENOX_PARSER_ERROR;
+      return FEENOX_ERROR;
     }  
   }
 
@@ -100,12 +97,12 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       // we do have to process the line so if delta_line_num is negative, we complain now
       if (delta_line_num < 0) {
         feenox_push_error_message("input file needs at least one more argument in commandline");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       
-      if (feenox_parse_line() == FEENOX_PARSER_ERROR) {
+      if (feenox_parse_line() != FEENOX_OK) {
         feenox_push_error_message("%s: %d:", filepath, line_num);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
     }
   }
@@ -114,7 +111,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
     fclose(input_file_stream);
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 
 }
 
@@ -125,26 +122,51 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
 int feenox_parse_line(void) {
 
   char *token;
-//  int i, j;
-//  char *dummy;
 
   if ((token = feenox_get_next_token(feenox_parser.line)) != NULL) {
     
+///kw+INCLUDE+usage INCLUDE
+///kw+INCLUDE+desc Include another FeenoX input file.
     if (strcasecmp(token, "INCLUDE") == 0) {
       feenox_call(feenox_parse_include());
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
+      
+///kw+ABORT+usage ABORT
+///kw+ABORT+desc Catastrophically abort the execution and quit FeenoX.
     } else if (strcasecmp(token, "ABORT") == 0) {
       feenox_call(feenox_parse_abort());
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
+      
+///kw+DEFAULT_ARGUMENT_VALUE+usage DEFAULT_ARGUMENT_VALUE
+///kw+DEFAULT_ARGUMENT_VALUE+desc Give a default value for an optional commandline argument.
     } else if (strcasecmp(token, "DEFAULT_ARGUMENT_VALUE") == 0) {
       feenox_call(feenox_parse_default_argument_value());
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
+      
+///kw+IMPLICIT+usage IMPLICIT
+///kw+IMPLICIT+desc Define whether implicit definition of variables is allowed or not.
     } else if (strcasecmp(token, "IMPLICIT") == 0) {
       feenox_call(feenox_parse_implicit());
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
+      
+///kw+TIME_PATH+usage TIME_PATH
+///kw+TIME_PATH+desc Force time-dependent problems to pass through specific instants of time.
     } else if (strcasecmp(token, "TIME_PATH") == 0) {
       feenox_call(feenox_parse_time_path());
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
+      
+///kw+INITIAL_CONDITIONS+usage INITIAL_CONDITIONS
+///kw+INITIAL_CONDITIONS+desc Define how initial conditions of DAE problems are computed.
+    } else if (strcasecmp(token, "INITIAL_CONDITIONS") == 0 || strcasecmp(token, "INITIAL_CONDITIONS_MODE") == 0) {
+      feenox_call(feenox_parse_initial_conditions());
+      return FEENOX_OK;
+      
+///kw+VAR+usage VAR
+///kw+VAR+desc Explicitly define one or more scalar variables.
+    } else if (strcasecmp(token, "VAR") == 0  || strcasecmp(token, "VARIABLE") == 0 ||
+               strcasecmp(token, "VARS") == 0 || strcasecmp(token, "VARIABLES") == 0) {
+      feenox_call(feenox_parse_variables());
+      return FEENOX_OK;
     }
   }
 
@@ -152,46 +174,8 @@ int feenox_parse_line(void) {
       
 /*
 
-// ---------------------------------------------------------------------      
-///kw+INITIAL_CONDITIONS_MODE+usage INITIAL_CONDITIONS_MODE
-///kw+INITIAL_CONDITIONS_MODE+desc Define how initial conditions of DAE problems are computed.
-    } else if ((strcasecmp(token, "INITIAL_CONDITIONS_MODE") == 0)) {
-
-///kw+INITIAL_CONDITIONS_MODE+usage { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
-///kw+INITIAL_CONDITIONS_MODE+detail In DAE problems, initial conditions may be either:
-///kw+INITIAL_CONDITIONS_MODE+detail @
-///kw+INITIAL_CONDITIONS_MODE+detail  * equal to the provided expressions (`AS_PROVIDED`)@
-///kw+INITIAL_CONDITIONS_MODE+detail  * the derivatives computed from the provided phase-space variables (`FROM_VARIABLES`)@
-///kw+INITIAL_CONDITIONS_MODE+detail  * the phase-space variables computed from the provided derivatives (`FROM_DERIVATIVES`)@
-///kw+INITIAL_CONDITIONS_MODE+detail @
-///kw+INITIAL_CONDITIONS_MODE+detail In the first case, it is up to the user to fulfill the DAE system at\ $t = 0$.
-///kw+INITIAL_CONDITIONS_MODE+detail If the residuals are not small enough, a convergence error will occur.
-///kw+INITIAL_CONDITIONS_MODE+detail The `FROM_VARIABLES` option means calling IDA’s `IDACalcIC` routine with the parameter `IDA_YA_YDP_INIT`. 
-///kw+INITIAL_CONDITIONS_MODE+detail The `FROM_DERIVATIVES` option means calling IDA’s `IDACalcIC` routine with the parameter IDA_Y_INIT.
-///kw+INITIAL_CONDITIONS_MODE+detail Wasora should be able to automatically detect which variables in phase-space are differential and
-///kw+INITIAL_CONDITIONS_MODE+detail which are purely algebraic. However, the `DIFFERENTIAL` keyword may be used to explicitly define them.
-///kw+INITIAL_CONDITIONS_MODE+detail See the (SUNDIALS documentation)[https:/\/computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
-      char *keywords[] = {"AS_PROVIDED", "FROM_VARIABLES", "FROM_DERIVATIVES", ""};
-      int values[] = {as_provided, from_variables, from_derivatives, 0};
-      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox_dae.initial_conditions_mode));
-
-      return WASORA_PARSER_OK;
 
 
-// ---------------------------------------------------------------------      
-///kw+VAR+usage VAR
-///kw+VAR+desc Define one or more scalar variables.
-    } else if ((strcasecmp(token, "VAR") == 0)) {
-
-///kw+VAR+usage <name_1> [ <name_2> ] ... [ <name_n> ]
-      // los nombres de las variables uno atras de otro como punalada de manco
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        if (feenox_define_variable(token) == NULL) {
-          return FEENOX_PARSER_ERROR;
-        }
-      }
-
-      return WASORA_PARSER_OK;
 
 
 // ---------------------------------------------------------------------      
@@ -226,7 +210,7 @@ int feenox_parse_line(void) {
         existing_object = left;
       } else {
         feenox_push_error_message("either IS or AS expected instead of '%s'", keyword);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if ((dummy_par = strchr(existing_object, '(')) != NULL) {
@@ -237,7 +221,7 @@ int feenox_parse_line(void) {
         if ((alias->vector = feenox_get_vector_ptr(existing_object)) == NULL) {
           if ((alias->variable = feenox_get_variable_ptr(existing_object)) == NULL) {
            feenox_push_error_message("unknown allegedly existing object '%s'", existing_object);
-           return FEENOX_PARSER_ERROR;
+           return FEENOX_ERROR;
           }
         }
       }
@@ -246,18 +230,18 @@ int feenox_parse_line(void) {
       if (dummy_par != NULL) {
         if (alias->matrix == NULL && alias->vector == NULL) {
           feenox_push_error_message("symbol '%s' cannot be subscripted", existing_object);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         *dummy_par = '(';
 
         if (alias->matrix != NULL) {
           if (feenox_parse_range(dummy_par, '(', ',', ')', &alias->row, &alias->col) != 0) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
         } else if (alias->vector != NULL) {
           if ((dummy = strrchr(dummy_par, ')')) == NULL) {
             feenox_push_error_message("unmatched parenthesis for '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           *dummy = '\0';
           feenox_call(feenox_parse_expression(dummy_par+1, &alias->row));
@@ -266,12 +250,12 @@ int feenox_parse_line(void) {
       }
       
       if ((alias->new_variable = feenox_define_variable(new_name)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       LL_APPEND(feenox.aliases, alias);
 
       if (feenox_define_instruction(feenox_instruction_alias, alias) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       
       return WASORA_PARSER_OK;
@@ -290,7 +274,7 @@ int feenox_parse_line(void) {
 
 ///kw+VECTOR+usage <name>
       if (feenox_parser_string(&vectorname) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       while ((token = feenox_get_next_token(NULL)) != NULL) {
@@ -313,19 +297,19 @@ int feenox_parse_line(void) {
           
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected function name");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if ((function = feenox_get_function_ptr(token)) == NULL) {
             feenox_push_error_message("unknown function '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
         }
       }
 
       // listoooo
       if ((vector = feenox_define_vector(vectorname, vectorsize, size_expr, datas)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       // TODO: ya demasiado raro es el API para feenox_define_vector, hacemos esto por afuer
@@ -360,7 +344,7 @@ int feenox_parse_line(void) {
           continue;
         } else {
           feenox_push_error_message("unknown keyword or vector identifier '%s'", token);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
       
@@ -382,7 +366,7 @@ int feenox_parse_line(void) {
 
 ///kw+MATRIX+usage <name>
       if (feenox_parser_string(&matrixname) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       while ((token = feenox_get_next_token(NULL)) != NULL) {
@@ -406,12 +390,12 @@ int feenox_parse_line(void) {
 
         } else {
           feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
       if (feenox_define_matrix(matrixname, rows, rows_expr, cols, cols_expr, datas) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       
       free(matrixname);
@@ -439,28 +423,28 @@ int feenox_parse_line(void) {
       if (strcasecmp(token, "FUNCTION") == 0) {
         if ((token = feenox_get_next_token(NULL)) == NULL) {
           feenox_push_error_message("expected function name");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
       // parseamos los argumentos
       if ((dummy = strchr(token, '(')) == NULL) {
         feenox_push_error_message("expected opening parenthesis '(' after function name '%s' (no spaces allowed)", token);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       argument = strdup(dummy);
       feenox_strip_blanks(argument);
 
       if ((nargs = feenox_count_arguments(argument)) <= 0) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       dummy = strchr(token, '(');
       *dummy = '\0';
 
       if ((function = feenox_define_function(token, nargs)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       arg_name = calloc(nargs, sizeof(char *));
@@ -479,7 +463,7 @@ int feenox_parse_line(void) {
         arg_name[0] = strdup(argument+1);
         if ((dummy = strchr(arg_name[0], ')')) == NULL) {
           feenox_push_error_message("expected ')' after function name (no spaces allowed)");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         *dummy = '\0';
 
@@ -508,7 +492,7 @@ int feenox_parse_line(void) {
                 level--;
               } else if (*dummy == '\0') {
                 feenox_push_error_message("when parsing arguments");
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               }
               dummy++;
             }
@@ -541,7 +525,7 @@ int feenox_parse_line(void) {
       // linkeamos los argumentos a las variables correctas
       for (i = 0; i < nargs; i++) {
         if ((function->var_argument[i] = feenox_get_or_define_variable_ptr(arg_name[i])) == NULL) {
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
@@ -588,12 +572,12 @@ int feenox_parse_line(void) {
 
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected routine name");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if ((function->routine = feenox_get_routine_ptr(token)) == NULL) {
             feenox_push_error_message("undefined routine '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+FUNCTION+usage | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } |
@@ -608,43 +592,43 @@ int feenox_parse_line(void) {
 
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected mesh name");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if ((function->mesh = feenox_get_mesh_ptr(token)) == NULL) {
             feenox_push_error_message("undefined mesh '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected keyword DATA or VECTOR");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (strcasecmp(token, "DATA") == 0) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected data name");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
             if ((function->vector_value = feenox_define_vector(token, 0, NULL, NULL)) == NULL) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           } else if (strcasecmp(token, "VECTOR") == 0) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected vector name");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
             if ((function->vector_value = feenox_define_vector(token, 0, NULL, NULL)) == NULL) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           } else {
             feenox_push_error_message("expected keyword DATA or VECTOR instead of '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected either NODES or CELLS");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (strcasecmp(token, "NODES") == 0) {
             function->type = type_pointwise_mesh_node;
@@ -652,25 +636,25 @@ int feenox_parse_line(void) {
             function->type = type_pointwise_mesh_cell;
           } else {
             feenox_push_error_message("expected either NODES or CELLS instead of '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           
           if (function->var_argument[0] != feenox_mesh.vars.x) {
             feenox_push_error_message("first argument of function '%s' should be 'x'", function->name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (function->n_arguments > 1 && function->var_argument[1] != feenox_mesh.vars.y) {
             feenox_push_error_message("second argument of function '%s' should be 'y'", function->name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (function->n_arguments > 2 && function->var_argument[2] != feenox_mesh.vars.z) {
             feenox_push_error_message("third argument of function '%s' should be 'z'", function->name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (function->n_arguments > 3) {
             feenox_push_error_message("function '%s' cannot be MESH and have more than 3 arguments", function->name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
 ///kw+FUNCTION+usage [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ]
@@ -687,12 +671,12 @@ int feenox_parse_line(void) {
 
           for (i = 0; i < nargs; i++) {
             if (feenox_parser_vector(&function->vector_argument[i]) != WASORA_PARSER_OK) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           }
 
           if (feenox_parser_vector(&function->vector_value) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 
@@ -701,13 +685,13 @@ int feenox_parse_line(void) {
 
           if (nargs == 0) {
             feenox_push_error_message("number of arguments is equal to zero");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           for (i = 0; i < nargs+1; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected %d columns specifications", nargs);
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
             function->column[i] = (int)(feenox_evaluate_expression_in_string(token));
 
@@ -719,7 +703,7 @@ int feenox_parse_line(void) {
 
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected interpolation method");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
 ///kw+FUNCTION+detail Available schemes for $n=1$ are:
@@ -783,7 +767,7 @@ int feenox_parse_line(void) {
 ///kw+FUNCTION+usage } ]
           } else {
             feenox_push_error_message("undefined interpolation method '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 ///kw+FUNCTION+detail @
 
@@ -826,7 +810,7 @@ int feenox_parse_line(void) {
           
         } else {
           feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
@@ -842,7 +826,7 @@ int feenox_parse_line(void) {
 
           if ((data_file = feenox_fopen(function->data_file, "r")) == NULL) {
             feenox_push_error_message("\"%s\" opening file '%s'", strerror(errno), function->data_file);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           // contamos cuantas lineas no vacias hay -> ese es el tamanio del size
@@ -860,7 +844,7 @@ int feenox_parse_line(void) {
 
                 if (n_columns < (nargs+1)) {
                   feenox_push_error_message("at least %d columns expected but %d were given in  file '%s'", nargs+1, n_columns, function->data_file);
-                  return FEENOX_PARSER_ERROR;
+                  return FEENOX_ERROR;
                 }
 
               }
@@ -885,7 +869,7 @@ int feenox_parse_line(void) {
               for (i = 0; i < nargs; i++) {
                 if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
                   feenox_push_error_message("wrong-formatted file '%s' at line %d", function->data_file, j+1);
-                  return FEENOX_PARSER_ERROR;
+                  return FEENOX_ERROR;
                 }
                 sscanf(token, "%lf", &function->data_argument[i][j]);
                 free(token);
@@ -905,7 +889,7 @@ int feenox_parse_line(void) {
               }
               if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
                 feenox_push_error_message("not enough columns in file '%s' at line %d", function->data_file, j+1);
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               }
               sscanf(token, "%lf", &function->data_value[j]);
               free(token);
@@ -933,14 +917,14 @@ int feenox_parse_line(void) {
           // contamos cuanta informacion hay
           function->data_size = 0;
           if ((token = feenox_get_next_token(backup1)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           while ((token = feenox_get_next_token(NULL)) != NULL) {
             function->data_size++;
           }
           if (function->data_size % (nargs+1) != 0) {
             feenox_push_error_message("data mismatch for function '%s'", function->name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           function->data_size /= (nargs+1);
 
@@ -954,13 +938,13 @@ int feenox_parse_line(void) {
 
           // leemos la informacion
           if ((token = feenox_get_next_token(backup2)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           for (i = 0; i < function->data_size; i++) {
             // argumentos
             for (j = 0; j < nargs; j++) {
               if ((token = feenox_get_next_token(NULL)) == NULL) {
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               }
               function->data_argument[j][i] = feenox_evaluate_expression_in_string(token);
 
@@ -972,7 +956,7 @@ int feenox_parse_line(void) {
 
             // valor
             if ((token = feenox_get_next_token(NULL)) == NULL) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
             function->data_value[i] = feenox_evaluate_expression_in_string(token);
           }
@@ -989,7 +973,7 @@ int feenox_parse_line(void) {
 
           snprintf(dummy_aux, strlen(function->name) + 4, "%s_a", function->name);
           if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (function->data_size != 0) {
             feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
@@ -997,7 +981,7 @@ int feenox_parse_line(void) {
 
           snprintf(dummy_aux, strlen(function->name) + 4, "%s_b", function->name);
           if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (function->data_size != 0) {
             feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
@@ -1005,7 +989,7 @@ int feenox_parse_line(void) {
 
           snprintf(dummy_aux, strlen(function->name) + 4, "%s_n", function->name);
           if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (function->data_size != 0) {
             feenox_value(dummy_var) = (double)function->data_size;
@@ -1046,20 +1030,20 @@ int feenox_parse_line(void) {
 
 ///kw+FILE+usage <name>
       if (feenox_parser_string(&name) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 ///kw+FILE+usage <printf_format>
 ///kw+FILE+usage [ expr_1 expr_2 ... expr_n ]
       if (feenox_parser_string_format(&format, &n_args) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (n_args != 0) {
         arg = calloc(n_args, sizeof(expr_t));
         for (i = 0; i < n_args; i++) {
           if (feenox_parser_expression(&arg[i]) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
         }
       }
@@ -1069,7 +1053,7 @@ int feenox_parse_line(void) {
         if (strcasecmp(token, "MODE") == 0) {
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected a mode");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           mode = strdup(token);
         } else if (strcasecmp(token, "INPUT") == 0) {
@@ -1083,7 +1067,7 @@ int feenox_parse_line(void) {
           do_not_open = 1;
         } else {
           feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
 
       }
@@ -1094,11 +1078,11 @@ int feenox_parse_line(void) {
       }
 
       if ((file = feenox_define_file(name, format, n_args, arg, mode, do_not_open)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (feenox_define_instruction(feenox_instruction_file, file) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       free(format);
@@ -1116,7 +1100,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parser_file(&file) != WASORA_PARSER_OK);
       
       if (feenox_define_instruction(feenox_instruction_close_file, file) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       return WASORA_PARSER_OK;
       
@@ -1140,18 +1124,18 @@ int feenox_parse_line(void) {
 
       conditional_block->condition = malloc(sizeof(expr_t));
       if (feenox_parser_expression(conditional_block->condition) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (feenox_get_next_token(NULL) != NULL) {
         feenox_push_error_message("conditional blocks should start in a separate line");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       conditional_block->father = feenox.active_conditional_block;
 
       if (feenox_define_instruction(feenox_instruction_if, conditional_block) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       feenox.active_conditional_block = conditional_block;
@@ -1169,11 +1153,11 @@ int feenox_parse_line(void) {
 
       if (feenox.active_conditional_block->else_of != NULL) {
         feenox_push_error_message("more than one ELSE clause for a single IF clause", token);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if ((instruction = feenox_define_instruction(feenox_instruction_else, conditional_block)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       feenox.active_conditional_block->first_false_instruction = instruction;
@@ -1190,7 +1174,7 @@ int feenox_parse_line(void) {
       instruction_t *instruction;
 
       if ((instruction = feenox_define_instruction(feenox_instruction_endif, feenox.active_conditional_block)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (feenox.active_conditional_block->else_of == NULL) {
@@ -1214,7 +1198,7 @@ int feenox_parse_line(void) {
 
 ///kw+SEMAPHORE+usage <name>
       if (feenox_parser_string(&semaphore->name) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 ///kw+SEMAPHORE+usage { WAIT | POST }
@@ -1223,7 +1207,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&semaphore->operation));
 
       if (feenox_define_instruction(feenox_instruction_sem, semaphore) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1252,7 +1236,7 @@ int feenox_parse_line(void) {
           io->type = io_shm;
 
           if (feenox_parser_string(&io->shm_name) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
         // ---- FILE_PATH ----------------------------------------------------
@@ -1285,7 +1269,7 @@ int feenox_parse_line(void) {
           }
 
           if (feenox_parser_file(&io->file) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           // ---- FILE ----------------------------------------------------
@@ -1332,12 +1316,12 @@ int feenox_parse_line(void) {
             
             if (feenox_parse_expression(token, &thing->expr) != WASORA_PARSER_OK) {
               feenox_push_error_message("undefined keyword, variable, vector, matrix, alias or invalid expression '%s'", token);
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
             
             if (io->direction == io_read) {
               feenox_push_error_message("expressions cannot be used in a READ instruction", token);
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           
           }
@@ -1347,11 +1331,11 @@ int feenox_parse_line(void) {
 
       if (io->type == io_undefined)  {
         feenox_push_error_message("undefined I/O resource type");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (feenox_define_instruction(feenox_instruction_io, io) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1393,7 +1377,7 @@ int feenox_parse_line(void) {
 ///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to stdout.
         if (strcasecmp(token, "FILE") == 0) {
           if (feenox_parser_file(&print->file) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 ///kw+PRINT+usage FILE_PATH <file_path> ]
         } else if (strcasecmp(token, "FILE_PATH") == 0) {
@@ -1407,7 +1391,7 @@ int feenox_parse_line(void) {
 ///kw+PRINT+usage [ SEP <string> ]
         } else if (strcasecmp(token, "SEP") == 0 || strcasecmp(token, "SEPARATOR") == 0) {
           if (feenox_parser_string(&print->separator) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 ///kw+PRINT+detail The `SEP` keywords expects a string used to separate printed objects, the default is a tab 'DEFAULT_PRINT_SEPARATOR' character.
 
@@ -1435,8 +1419,8 @@ int feenox_parse_line(void) {
 ///kw+PRINT+usage [ SKIP_TIME <expr> ]
 ///kw+PRINT+usage [ SKIP_HEADER_STEP <expr> ]
         } else if ((n = feenox_parser_match_keyword_expression(token, keywords, expressions, sizeof(expressions)/sizeof(expr_t *))) != WASORA_PARSER_UNHANDLED) {
-          if (n == FEENOX_PARSER_ERROR) {
-            return FEENOX_PARSER_ERROR;
+          if (n == FEENOX_ERROR) {
+            return FEENOX_ERROR;
           }
 
         } else {
@@ -1452,7 +1436,7 @@ int feenox_parse_line(void) {
 
           } else if (strcasecmp(token, "STRING") == 0 || strcasecmp(token, "TEXT") == 0) {
             if (feenox_parser_string(&print_token->text) != WASORA_PARSER_OK) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
 
           } else if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
@@ -1470,7 +1454,7 @@ int feenox_parse_line(void) {
               // solo si no tenemos implicit none
               if (feenox.implicit_none) {
                 feenox_push_error_message("implicit definition is not allowed");
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               } else {
                 print_token->expression.n_tokens = 0;
                 print_token->text = strdup(token);
@@ -1493,7 +1477,7 @@ int feenox_parse_line(void) {
       }
 
       if (feenox_define_instruction(feenox_instruction_print, print) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1529,11 +1513,11 @@ int feenox_parse_line(void) {
 
           if (print_function->first_function == NULL) {
             feenox_push_error_message("MIN before actual function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (feenox_parser_expressions(&print_function->range.min, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 
@@ -1542,11 +1526,11 @@ int feenox_parse_line(void) {
 
           if (print_function->first_function == NULL) {
             feenox_push_error_message("MAX before actual function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (feenox_parser_expressions(&print_function->range.max, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+PRINT_FUNCTION+usage [ STEP <expr_1> <expr_2> ... <expr_m> ]
@@ -1554,11 +1538,11 @@ int feenox_parse_line(void) {
 
           if (print_function->first_function == NULL) {
             feenox_push_error_message("STEP before actual function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (feenox_parser_expressions(&print_function->range.step, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+PRINT_FUNCTION+usage [ NSTEPs <expr_1> <expr_2> ... <expr_m> ]
@@ -1566,17 +1550,17 @@ int feenox_parse_line(void) {
 
           if (print_function->first_function == NULL) {
             feenox_push_error_message("NSTEPS before actual function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (feenox_parser_expressions(&print_function->range.nsteps, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+PRINT_FUNCTION+usage [ FORMAT <print_format> ]
         } else if (strcasecmp(token, "FORMAT") == 0) {
           if (feenox_parser_string(&print_function->format) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
 ///kw+PRINT_FUNCTION+usage [ PHYSICAL_ENTITY <name> ]
@@ -1586,7 +1570,7 @@ int feenox_parse_line(void) {
           if ((print_function->physical_entity = feenox_get_physical_entity_ptr(name, NULL)) == NULL) {
             feenox_push_error_message("unknown physical entity '%s'", name);
             free(name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
         } else {
@@ -1605,7 +1589,7 @@ int feenox_parse_line(void) {
 
             } else if (dummy_function->n_arguments !=  print_function->first_function->n_arguments) {
               feenox_push_error_message("functions do not have the same number of arguments");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
 
             }
 
@@ -1618,21 +1602,21 @@ int feenox_parse_line(void) {
 
       if (print_function->first_function == NULL) {
         feenox_push_error_message("at least one function expected");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       
       if (print_function->first_function->type == type_algebraic || print_function->first_function->type == type_routine) {
         if (print_function->range.min == NULL) {
           feenox_push_error_message("need MIN keyword (function %s is not point-wise defined)", print_function->first_function->name);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         if (print_function->range.max == NULL) {
           feenox_push_error_message("need MAX keyword (function %s is not point-wise defined)", print_function->first_function->name);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         if (print_function->range.step == NULL && print_function->range.nsteps == NULL) {
           feenox_push_error_message("need either STEP or NSTEPS keyword (function %s is not point-wise defined)", print_function->first_function->name);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
       
@@ -1649,7 +1633,7 @@ int feenox_parse_line(void) {
       }
 
       if (feenox_define_instruction(feenox_instruction_print_function, print_function) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1684,13 +1668,13 @@ int feenox_parse_line(void) {
         } else if (strcasecmp(token, "ELEMS_PER_LINE") == 0) {
           print_vector->horizontal = 1;
           if (feenox_parser_expression(&print_vector->elems_per_line) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+PRINT_VECTOR+usage [ FORMAT <print_format> ]
         } else if (strcasecmp(token, "FORMAT") == 0) {
           if (feenox_parser_string(&print_vector->format) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
         } else {
@@ -1728,7 +1712,7 @@ int feenox_parse_line(void) {
       }
 
       if (feenox_define_instruction(feenox_instruction_print_vector, print_vector) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1750,7 +1734,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parser_expression_in_string(&xi));
       if ((solve->n = (int)(xi)) <= 0) {
         feenox_push_error_message("expected a positive number of unknowns instead of %d", solve->n);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       solve->unknown = calloc(solve->n, sizeof(var_t *));
@@ -1765,7 +1749,7 @@ int feenox_parse_line(void) {
               feenox_push_error_message("expected %d variables and found only %d", solve->n, i);
             }
             if ((solve->unknown[i] = feenox_get_or_define_variable_ptr(token)) == NULL) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           }
           
@@ -1792,7 +1776,7 @@ int feenox_parse_line(void) {
 
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected method name");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+SOLVE+usage {
@@ -1827,7 +1811,7 @@ int feenox_parse_line(void) {
           feenox_call(feenox_parser_expression_in_string(&xi));
           if ((solve->max_iter = (int)xi) < 0) {
             feenox_push_error_message("expected a positive integer for MAX_ITER");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+SOLVE+usage [ VERBOSE ]
@@ -1837,14 +1821,14 @@ int feenox_parse_line(void) {
 
         } else {
           feenox_push_error_message("unkown keyword '%s'", token);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         
       }
         
       if (solve->residual[0].n_tokens == 0) {
         feenox_push_error_message("no RESIDUALs to solve");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       
       if (solve->type == NULL) {
@@ -1852,7 +1836,7 @@ int feenox_parse_line(void) {
       }
 
       if (feenox_define_instruction(feenox_instruction_solve, solve) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;      
@@ -1894,7 +1878,7 @@ int feenox_parse_line(void) {
           macro->print_token.format = strdup(DEFAULT_M4_FORMAT);
           if (feenox_parse_expression(macro->name, &macro->print_token.expression) != WASORA_PARSER_OK) {
             feenox_push_error_message("m4 expansion of '%s' failed", macro->name);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+M4+usage [ MACRO <name> [ <format> ] <definition> ] ... }
@@ -1907,14 +1891,14 @@ int feenox_parse_line(void) {
           
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected either macro format or definition");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (token[0] == '%') {
             macro->print_token.format = strdup(token);
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected macro definition");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
             if (macro->print_token.format[0] == 'd') {
               macro->print_token.format[0] = 'g';
@@ -1931,12 +1915,12 @@ int feenox_parse_line(void) {
           
         } else {
           feenox_push_error_message("unkown keyword '%s'", token);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
       if (feenox_define_instruction(feenox_instruction_m4, m4) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1952,18 +1936,18 @@ int feenox_parse_line(void) {
 
 ///kw+SHELL+usage <print_format> [ expr_1 expr_2 ... expr_n ]
       if (feenox_parser_string_format(&shell->format, &shell->n_args) != WASORA_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       shell->arg = calloc(shell->n_args, sizeof(expr_t));
       for (i = 0; i < shell->n_args; i++) {
         if (feenox_parser_expression(&shell->arg[i]) != WASORA_PARSER_OK) {
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
       if (feenox_define_instruction(feenox_instruction_shell, shell) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -1980,25 +1964,25 @@ int feenox_parse_line(void) {
 ///kw+HISTORY+usage <variable>
       // el nombre de la variable
       if (feenox_parser_variable(&history->variable)) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 ///kw+HISTORY+usage <function>
       // el nombre de la funcion
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected function name");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if ((history->function = feenox_define_function(token, 1)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       // proposed by rvignolo
 //      history->function->arg_name = malloc(1 * sizeof(char *));
 //      history->function->arg_name[0] = strdup(feenox.special_vars.t->name);
 
       if (feenox_define_instruction(feenox_instruction_history, history) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -2039,7 +2023,7 @@ int feenox_parse_line(void) {
 
           if (feenox.parametric.dimensions == 0) {
             feenox_push_error_message("MIN before variables, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           feenox_call(feenox_parser_expressions(&feenox.parametric.range.min, feenox.parametric.dimensions));
@@ -2049,7 +2033,7 @@ int feenox_parse_line(void) {
 
           if (feenox.parametric.dimensions == 0) {
             feenox_push_error_message("MAX before variables, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           feenox_call(feenox_parser_expressions(&feenox.parametric.range.max, feenox.parametric.dimensions));
@@ -2059,7 +2043,7 @@ int feenox_parse_line(void) {
 
           if (feenox.parametric.dimensions == 0) {
             feenox_push_error_message("STEP before variables, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           feenox_call(feenox_parser_expressions(&feenox.parametric.range.step, feenox.parametric.dimensions));
@@ -2069,7 +2053,7 @@ int feenox_parse_line(void) {
 
           if (feenox.parametric.dimensions == 0) {
             feenox_push_error_message("NSTEPS before variables, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           feenox_call(feenox_parser_expressions(&feenox.parametric.range.nsteps, feenox.parametric.dimensions));
@@ -2080,7 +2064,7 @@ int feenox_parse_line(void) {
           feenox_call(feenox_parser_expression_in_string(&xi));
           if ((feenox.parametric.outer_steps = (int)xi) <= 0) {
             feenox_push_error_message("OUTER_STEPS has to be positive");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+PARAMETRIC+usage [ MAX_DAUGHTERS <num_expr>  ]
@@ -2094,7 +2078,7 @@ int feenox_parse_line(void) {
           feenox_call(feenox_parser_expression_in_string(&xi));
           if ((feenox.parametric.offset = (int)(round(xi))) < 0) {
             feenox_push_error_message("expected a non-negative offset");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+PARAMETRIC+usage [ ADIABATIC ]
@@ -2109,14 +2093,14 @@ int feenox_parse_line(void) {
               feenox.parametric.range.nsteps != NULL) {
 
             feenox_push_error_message("already given MIN, MAX, STEP or NSTEPS, cannot add variable '%s' to the parametric list", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           
           varitem = calloc(1, sizeof(varlist_t));
           if ((varitem->var = feenox_get_variable_ptr(token)) == NULL) {
             if ((varitem->var = feenox_define_variable(token)) == NULL) {
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           } 
           
@@ -2128,7 +2112,7 @@ int feenox_parse_line(void) {
 
       if (feenox.parametric.dimensions == 0) {
         feenox_push_error_message("no parametric variables given");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       
       feenox.parametric.variable = calloc(feenox.parametric.dimensions, sizeof(var_t *));
@@ -2138,12 +2122,12 @@ int feenox_parse_line(void) {
         feenox.parametric.variable[i] = varitem->var;
         if ((varitem = varitem->next) == NULL && i != feenox.parametric.dimensions-1) {
           feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
       
       if (feenox_define_instruction(feenox_instruction_parametric, NULL) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       LL_FOREACH_SAFE(varlist, varitem, tmp) {
         LL_DELETE(varlist, varitem);
@@ -2173,7 +2157,7 @@ int feenox_parse_line(void) {
       // la funcion cuyos parametros vamos a ajustar
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected function name");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if ((feenox.fit.function = feenox_get_function_ptr(token)) == NULL) {
@@ -2182,13 +2166,13 @@ int feenox_parse_line(void) {
         } else {
           feenox_push_error_message("function '%s' undefined", token);
         }
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 ///kw+FIT+usage TO <function_with_data>
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected function name");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       if (strcasecmp(token, "TO") != 0) {
         feenox_push_error_message("expected keyword 'TO' instead of '%s'", token);
@@ -2197,7 +2181,7 @@ int feenox_parse_line(void) {
 // la funcion con los datos experimentales
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected function name");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       if ((feenox.fit.data = feenox_get_function_ptr(token)) == NULL) {
         if (strchr(token, '(') != NULL) {
@@ -2205,28 +2189,28 @@ int feenox_parse_line(void) {
         } else {
           feenox_push_error_message("function '%s' undefined", token);
         }
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (feenox.fit.function->n_arguments != feenox.fit.data->n_arguments) {
         feenox_push_error_message("function '%s' has %d arguments and '%s' has %d", feenox.fit.function->name, feenox.fit.function->n_arguments, feenox.fit.data->name, feenox.fit.data->n_arguments);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if ((feenox.fit.n = feenox.fit.data->data_size) == 0) {
         feenox_push_error_message("function '%s' has to be point-wise defined", feenox.fit.data->name);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 ///kw+FIT+usage VIA
 ///kw+FIT+detail The initial guess of the solution is given by the initial value of the variables listed in the `VIA` keyword.
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected function name");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       if (strcasecmp(token, "VIA") != 0) {
         feenox_push_error_message("expected keyword 'VIA' instead of '%s'", token);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 ///kw+FIT+usage <var_1> <var_2> ... <var_n>@
@@ -2241,14 +2225,14 @@ int feenox_parse_line(void) {
  
           if (feenox.fit.p == 0) {
             feenox_push_error_message("GRADIENT keyword before parameters");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           feenox.fit.gradient = malloc(feenox.fit.p * sizeof(expr_t));
           for (i = 0; i < feenox.fit.p; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected an expression");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
 
             feenox_call(feenox_parse_expression(token, &feenox.fit.gradient[i]));
@@ -2263,7 +2247,7 @@ int feenox_parse_line(void) {
 
           if (feenox.fit.data->n_arguments == 0) {
             feenox_push_error_message("RANGE_MIN before target function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           feenox_call(feenox_parser_expressions(&feenox.fit.range.min, feenox.fit.data->n_arguments));
@@ -2273,7 +2257,7 @@ int feenox_parse_line(void) {
 
           if (feenox.fit.data->n_arguments == 0) {
             feenox_push_error_message("RANGE_MAX before target function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           feenox_call(feenox_parser_expressions(&feenox.fit.range.max, feenox.fit.data->n_arguments));
@@ -2300,7 +2284,7 @@ int feenox_parse_line(void) {
           feenox_call(feenox_parser_expression_in_string(&xi));
           if ((feenox.fit.max_iter = (int)xi) < 0) {
             feenox_push_error_message("expected a positive integer for MAX_ITER");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+FIT+usage [ VERBOSE ]
@@ -2323,7 +2307,7 @@ int feenox_parse_line(void) {
           varitem = calloc(1, sizeof(varlist_t));
           if ((varitem->var = feenox_get_variable_ptr(token)) == NULL) {
             feenox_push_error_message("unknown variable '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           } 
           
           LL_APPEND(varlist, varitem);
@@ -2334,7 +2318,7 @@ int feenox_parse_line(void) {
 
       if (feenox.fit.p == 0) {
         feenox_push_error_message("no fit parameters given");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       feenox.fit.param = malloc(feenox.fit.p * sizeof(var_t *));
@@ -2346,13 +2330,13 @@ int feenox_parse_line(void) {
         sigma_name = malloc(strlen(varitem->var->name)+strlen("sigma_")+8);
         snprintf(sigma_name, strlen(varitem->var->name)+strlen("sigma_")+8, "sigma_%s", varitem->var->name);
         if ((feenox.fit.sigma[i] = feenox_define_variable(sigma_name)) == NULL) {
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         free(sigma_name);
         
         if ((varitem = varitem->next) == NULL && i != feenox.fit.p-1) {
           feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
@@ -2378,7 +2362,7 @@ int feenox_parse_line(void) {
 ///kw+FIT+detail So if `f(x,y)` is to be minimized, after a `MINIMIZE f` both `x` and `y` would have the appropriate values.
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected a function");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       if ((feenox.min.function = feenox_get_function_ptr(token)) == NULL) {
         if (strchr(token, '(') != NULL) {
@@ -2386,7 +2370,7 @@ int feenox_parse_line(void) {
         } else {
           feenox_push_error_message("function '%s' undefined", token);
         }
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       feenox.min.n = feenox.min.function->n_arguments;
@@ -2403,7 +2387,7 @@ int feenox_parse_line(void) {
         if (strcasecmp(token, "METHOD") == 0 || strcasecmp(token, "ALGORITHM") == 0) {
           if ((token = feenox_get_next_token(NULL)) == NULL) {
             feenox_push_error_message("expected algorithm name");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+MINIMIZE+usage nmsimplex2 |
@@ -2432,7 +2416,7 @@ int feenox_parse_line(void) {
             feenox.min.fdf_type = gsl_multimin_fdfminimizer_steepest_descent;
           } else {
             feenox_push_error_message("unknown minimization method '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+MINIMIZE+usage [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]@
@@ -2442,7 +2426,7 @@ int feenox_parse_line(void) {
           for (i = 0; i < feenox.min.n; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected an expression");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
 
             feenox_call(feenox_parse_expression(token, &feenox.min.gradient[i]));
@@ -2455,7 +2439,7 @@ int feenox_parse_line(void) {
           for (i = 0; i < feenox.min.n; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected an expression");
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
 
             feenox_call(feenox_parse_expression(token, &feenox.min.guess[i]));
@@ -2466,11 +2450,11 @@ int feenox_parse_line(void) {
 
           if (feenox.min.n == 0) {
             feenox_push_error_message("MIN before target function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (feenox_parser_expressions(&feenox.min.range.min, feenox.min.n) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+MINIMIZE+usage [ MAX <expr_1> <expr_2> ... <expr_n> ]@
@@ -2478,11 +2462,11 @@ int feenox_parse_line(void) {
 
           if (feenox.min.n == 0) {
             feenox_push_error_message("MAX before target function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (feenox_parser_expressions(&feenox.min.range.max, feenox.min.n) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
 ///kw+MINIMIZE+usage [ STEP <expr_1> <expr_2> ... <expr_n> ]@
@@ -2490,7 +2474,7 @@ int feenox_parse_line(void) {
 
           if (feenox.min.n == 0) {
             feenox_push_error_message("STEP before target function, cannot determine number of arguments");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           // los algoritmos con derivadas necesitan un solo step
@@ -2501,7 +2485,7 @@ int feenox_parse_line(void) {
           feenox.min.range.step = malloc(feenox.min.n_steps * sizeof(expr_t));
 
           if (feenox_parser_expressions(&feenox.min.range.step, feenox.min.n_steps) != WASORA_PARSER_OK) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
         } else if (strcasecmp(token, "VERBOSE") == 0) {
           feenox.min.verbose = 1;
@@ -2530,7 +2514,7 @@ int feenox_parse_line(void) {
 
           if (feenox_parser_match_keyword_expression(token, keywords, expressions, sizeof(expressions)/sizeof(expr_t *)) == WASORA_PARSER_UNHANDLED) {
             feenox_push_error_message("unknown keyword '%s'", token);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
         }
       }
@@ -2538,18 +2522,18 @@ int feenox_parse_line(void) {
 
       if (feenox.min.function == NULL && feenox.min.siman_Efunc == NULL) {
         feenox_push_error_message("nothing to optimize!");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       if (feenox.min.genetic != 0) {
         if (feenox.min.range.min == NULL) {
           feenox_push_error_message("need a MIN keyword for genetic algorithms");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
 
         if (feenox.min.range.max == NULL) {
           feenox_push_error_message("need a MAX keyword for genetic algorithms");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
@@ -2561,23 +2545,23 @@ int feenox_parse_line(void) {
       if (feenox.min.siman_Efunc != NULL) {
         if (feenox.min.siman_init == NULL) {
           feenox_push_error_message("a siman init routine has to be provided");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         if (feenox.min.siman_step == NULL) {
           feenox_push_error_message("a siman step routine has to be provided");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         if (feenox.min.siman_copy == NULL) {
           feenox_push_error_message("a siman copy routine has to be provided");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         if (feenox.min.siman_copy_construct == NULL) {
           feenox_push_error_message("a siman copy_construct routine has to be provided");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         if (feenox.min.siman_destroy == NULL) {
           feenox_push_error_message("a siman destroy routine has to be provided");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
@@ -2595,12 +2579,12 @@ int feenox_parse_line(void) {
 
       if (feenox_dae.dimension != 0) {
         feenox_push_error_message("PHASE_SPACE keyword already given");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 #ifdef HAVE_IDA
       if (sizeof(realtype) != sizeof(double)) {
         feenox_push_error_message("\nSUNDIALS was compiled using a different word size than feenox.\nPlease recompile with double precision floating point arithmetic.");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 #endif
 
@@ -2653,7 +2637,7 @@ int feenox_parse_line(void) {
         } else {
 
           if ((variable = feenox_get_or_define_variable_ptr(token)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           phase_object->variable = variable;
@@ -2702,7 +2686,7 @@ int feenox_parse_line(void) {
       if (feenox_dae.daes == NULL) {
         // si es la primera dae, anotamos a que instruccion corresponde
         if ((feenox_dae.instruction = feenox_define_instruction(&feenox_instruction_dae, NULL)) == NULL) {
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         // y ponemos una finite-state machine en modo "leyendo daes"
 //        feenox_dae.reading_daes = 1;
@@ -2716,7 +2700,7 @@ int feenox_parse_line(void) {
         dae->equation_type |= EQN_FLAG_IMPLICIT;
         if ((dummy = strchr((char *)(token+strlen(token)+1), '=')) == NULL) {
           feenox_push_error_message("expecting equal sign after keyword 0");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         equation = strdup(dummy+1);
 
@@ -2725,7 +2709,7 @@ int feenox_parse_line(void) {
           dae->equation_type |= EQN_FLAG_MATRICIAL;
           if ((dae->matrix = feenox_get_first_matrix(equation)) == NULL) {
             feenox_push_error_message("matrix equations need at least one matrix in the expression");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           
           if (token[6] == '<') {
@@ -2738,7 +2722,7 @@ int feenox_parse_line(void) {
           dae->equation_type |= EQN_FLAG_VECTORIAL;
           if ((dae->vector = feenox_get_first_vector(equation)) == NULL) {
             feenox_push_error_message("vectorial equations need at least one vector in the expression");
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           if (token[4] == '<') {
@@ -2758,7 +2742,7 @@ int feenox_parse_line(void) {
 
         if (strchr((char *)(token+strlen(token)+1), '=') == NULL) {
           feenox_push_error_message("syntax error, the equal sign should come right after the dot with no spaces between them");
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         dummy = strchr((char *)(token+strlen(token)+1), '=')+1;
         equation = malloc(strlen(dummy)+strlen(token)+16);
@@ -2787,7 +2771,7 @@ int feenox_parse_line(void) {
         sprintf(equation, "(%s)-(%s)", token, dummy);
 
       } else {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
 
@@ -2805,7 +2789,7 @@ int feenox_parse_line(void) {
         free(dummy);
         if (found == 0) {
           feenox_push_error_message("requested derivative of object '%s' but it is not in the phase space", dummy);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
 
       } else {
@@ -2833,7 +2817,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_assignment(feenox.line, assignment));
       
       if (feenox_define_instruction(feenox_instruction_assignment, assignment) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       return WASORA_PARSER_OK;
@@ -2847,7 +2831,7 @@ int feenox_parse_line(void) {
   }
 */
   feenox_push_error_message("unknown keyword '%s'", feenox_parser.line);
-  return FEENOX_PARSER_ERROR;
+  return FEENOX_ERROR;
 
 }
 
@@ -2888,8 +2872,6 @@ char *feenox_get_nth_token(char *string, int n) {
 int feenox_parse_include(void) {
   
   
-///kw+INCLUDE+usage INCLUDE
-///kw+INCLUDE+desc Include another feenox input file.
 ///kw+INCLUDE+detail Includes the input file located in the string `file_path` at the current location.
 ///kw+INCLUDE+detail The effect is the same as copying and pasting the contents of the included file
 ///kw+INCLUDE+detail at the location of the `INCLUDE` keyword. The path can be relative or absolute.
@@ -2910,7 +2892,7 @@ int feenox_parse_include(void) {
 ///kw+INCLUDE+usage <file_path>
   if ((filepath = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected file path");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   while ((token = feenox_get_next_token(NULL)) != NULL) {
@@ -2920,28 +2902,26 @@ int feenox_parse_include(void) {
       feenox_call(feenox_parser_expression_in_string(&xi));
       if ((from = (int)(xi)) <= 0) {
         feenox_push_error_message("expected a positive line number for FROM instead of '%s'", token);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 ///kw+INCLUDE+usage [ TO <num_expr> ]
     } else if (strcasecmp(token, "TO") == 0) {
       feenox_call(feenox_parser_expression_in_string(&xi));
       if ((to = (int)(xi)) <= 0) {
         feenox_push_error_message("expected a positive line number for TO instead of '%s'", token);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
     }
   }
 
   feenox_call(feenox_parse_input_file(filepath, from, to));
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
 int feenox_parse_default_argument_value(void) {
-// ---------------------------------------------------------------------
-///kw+DEFAULT_ARGUMENT_VALUE+usage DEFAULT_ARGUMENT_VALUE
-///kw+DEFAULT_ARGUMENT_VALUE+desc Give a default value for an optional commandline argument.
+  
 ///kw+DEFAULT_ARGUMENT_VALUE+detail If a `$n` construction is found in the input file but the
 ///kw+DEFAULT_ARGUMENT_VALUE+detail commandline argument was not given, the default behavior is to
 ///kw+DEFAULT_ARGUMENT_VALUE+detail fail complaining that an extra argument has to be given in the
@@ -2953,39 +2933,41 @@ int feenox_parse_default_argument_value(void) {
 ///kw+DEFAULT_ARGUMENT_VALUE+detail Whether the resulting expression is to be interpreted as a string or as a
 ///kw+DEFAULT_ARGUMENT_VALUE+detail numerical expression will depend on the context.
   
-///kw+DEFAULT_ARGUMENT_VALUE+usage <constant> <string>
 
   char *token;
   int n;
 
+///kw+DEFAULT_ARGUMENT_VALUE+usage <constant>
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected argument number for DEFAULT_ARGUMENT_VALUE");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((n = (int)feenox_evaluate_expression_in_string(token)) <= 0) {
     feenox_push_error_message("expected a positive value instead of 'token", token);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
+///kw+DEFAULT_ARGUMENT_VALUE+usage <string>
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected value for DEFAULT_ARUGMENT_VALUE number %d", n);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((feenox.optind+n) >= feenox.argc) {
-    feenox.argv = realloc(feenox.argv, sizeof(char *)*(feenox.optind+n + 1));
+    if ((feenox.argv = realloc(feenox.argv, sizeof(char *)*(feenox.optind+n + 1))) == NULL) {
+      feenox_push_error_message("failed to allocate memory for DEFAULT_ARGUMENT_VALUE");
+      return FEENOX_ERROR;
+    }
     feenox.argc = feenox.optind+n + 1;
     feenox.argv[feenox.optind+n] = strdup(token);
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 int feenox_parse_abort(void) {
   
-///kw+ABORT+usage ABORT
-///kw+ABORT+desc Catastrophically abort the execution and quit FeenoX.
 ///kw+ABORT+detail Whenever the instruction `ABORT` is executed, FeenoX quits with a non-zero error leve.
 ///kw+ABORT+detail It does not close files nor unlock shared memory objects.
 ///kw+ABORT+detail The objective of this instruction is to either debug complex input files
@@ -2993,14 +2975,13 @@ int feenox_parse_abort(void) {
   
   feenox_call(feenox_add_instruction(feenox_instruction_abort, NULL));
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
 
 int feenox_parse_implicit(void) {
-///kw+IMPLICIT+usage IMPLICIT
-///kw+IMPLICIT+desc Define whether implicit declaration of variables is allowed or not.
+  
 ///kw+IMPLICIT+detail By default, FeenoX allows variables (but not vectors nor matrices) to be
 ///kw+IMPLICIT+detail implicitly declared. To avoid introducing errors due to typos, explicit
 ///kw+IMPLICIT+detail declaration of variables can be forced by giving `IMPLICIT NONE`.
@@ -3013,13 +2994,12 @@ int feenox_parse_implicit(void) {
   int values[] = {1, 0, 0};
   feenox_call(feenox_parser_keywords_ints(keywords, values, &feenox_parser.implicit_none));
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }  
 
 
 int feenox_parse_time_path(void) {
-///kw+TIME_PATH+usage TIME_PATH
-///kw+TIME_PATH+desc Force transient problems to pass through specific instants of time.
+  
 ///kw+TIME_PATH+detail The time step `dt` will be reduced whenever the distance between
 ///kw+TIME_PATH+detail the current time `t` and the next expression in the list is greater
 ///kw+TIME_PATH+detail than `dt` so as to force `t` to coincide with the expressions given.
@@ -3035,6 +3015,57 @@ int feenox_parse_time_path(void) {
   // y apuntamos el current al primero
   feenox.time_path_current = feenox.time_paths;
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
+}
 
+int feenox_parse_initial_conditions(void) {
+ 
+///kw+INITIAL_CONDITIONS+detail In DAE problems, initial conditions may be either:
+///kw+INITIAL_CONDITIONS+detail @
+///kw+INITIAL_CONDITIONS+detail  * equal to the provided expressions (`AS_PROVIDED`)@
+///kw+INITIAL_CONDITIONS+detail  * the derivatives computed from the provided phase-space variables (`FROM_VARIABLES`)@
+///kw+INITIAL_CONDITIONS+detail  * the phase-space variables computed from the provided derivatives (`FROM_DERIVATIVES`)@
+///kw+INITIAL_CONDITIONS+detail @
+///kw+INITIAL_CONDITIONS+detail In the first case, it is up to the user to fulfill the DAE system at\ $t = 0$.
+///kw+INITIAL_CONDITIONS+detail If the residuals are not small enough, a convergence error will occur.
+///kw+INITIAL_CONDITIONS+detail The `FROM_VARIABLES` option means calling IDA’s `IDACalcIC` routine with the parameter `IDA_YA_YDP_INIT`. 
+///kw+INITIAL_CONDITIONS+detail The `FROM_DERIVATIVES` option means calling IDA’s `IDACalcIC` routine with the parameter IDA_Y_INIT.
+///kw+INITIAL_CONDITIONS+detail Wasora should be able to automatically detect which variables in phase-space are differential and
+///kw+INITIAL_CONDITIONS+detail which are purely algebraic. However, the [`DIFFERENTIAL`] keyword may be used to explicitly define them.
+///kw+INITIAL_CONDITIONS+detail See the (SUNDIALS documentation)[https:/\/computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
+  
+///kw+INITIAL_CONDITIONS+usage { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
+  char *keywords[] = {"AS_PROVIDED",
+                      "FROM_VARIABLES",
+                      "FROM_DERIVATIVES", ""};
+  int values[] = {initial_conditions_as_provided,
+                  initial_conditions_from_variables,
+                  initial_conditions_from_derivatives, 0};
+  feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&feenox.dae.initial_conditions_mode)));
+
+  return FEENOX_OK;
+
+}
+
+int feenox_parse_variables(void) {
+  
+  char *token;
+
+///kw+VAR+detail When implicit definition is allowed (see [`IMPLICIT`]), scalar variables
+///kw+VAR+detail need not to be defined before being used if from the context FeenoX can tell
+///kw+VAR+detail that an scalar variable is needed. For instance, when defining a function like
+///kw+VAR+detail `f(x) = x^2` it is not needed to declare `x` explictly as a scalar variable.
+///kw+VAR+detail But if one wants to define a function like `g(x) = integral(f(x'), x', 0, x)` then
+///kw+VAR+detail the variable `x'` needs to be explicitly defined as `VAR x'` before the integral. 
+
+///kw+VAR+usage <name_1> [ <name_2> ] ... [ <name_n> ]
+  
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    if (feenox_define_variable(token) == NULL) {
+      return FEENOX_ERROR;
+    }
+  }
+
+  return FEENOX_OK;
+  
 }

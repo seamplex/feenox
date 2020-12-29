@@ -27,13 +27,13 @@ int feenox_add_time_path(const char *token) {
   
   if ((expr = calloc(1, sizeof(expr))) == NULL) {
     feenox_push_error_message("memory allocation failed for expression in feenox_add_time_path()");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   feenox_call(feenox_parse_expression(token, expr));
   LL_APPEND(feenox.time_paths, expr);
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 /*

@@ -510,7 +510,7 @@ void feenox_destroy_expression(expr_t *expr) {
 
 void feenox_finalize(void) {
 
-  int i;
+//  int i;
 
 /*  
   if (feenox.min.n != 0) {
@@ -568,11 +568,14 @@ void feenox_finalize(void) {
   free(feenox.error);
   free(feenox.line);
 */
+
+/*  
   for (i = 0; i < feenox.argc_orig; i++) {
     free(feenox.argv_orig[i]);
   }  
   free(feenox.argv_orig);
-//  free(feenox.main_input_dirname_aux);
+*/
+//  free(feenox.main_input_filepath);
   
   return;
 

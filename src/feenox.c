@@ -27,9 +27,7 @@
 
 int main(int argc, char **argv) {
 
-  feenox_initialize(argc, argv);
-
-  if (feenox_parse_main_input_file(feenox.main_input_filepath) != FEENOX_PARSER_OK) {
+  if (feenox_initialize(argc, argv) != FEENOX_OK) {
     feenox_pop_errors();
     exit(EXIT_FAILURE);
   }

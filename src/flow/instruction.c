@@ -13,7 +13,7 @@ int feenox_add_instruction(int (*routine)(void *), void *argument) {
 */
   if ((instruction = calloc(1, sizeof(instruction_t))) == NULL) {
     feenox_push_error_message("memory allocation error in feenox_add_instruction()");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   instruction->routine = routine;
   instruction->argument = argument;
@@ -34,5 +34,5 @@ int feenox_add_instruction(int (*routine)(void *), void *argument) {
 
   LL_APPEND(feenox.instructions, instruction);
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_ERROR;
 }

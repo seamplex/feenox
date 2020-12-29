@@ -7,6 +7,7 @@
 
  * see if we need argv_orig
  * list symbols with "-l" (is there any clash with petsc?)
+ * -info clashes with PETSc
  * gsl error handling
  * feenox_nan_error()
  * feenox_gsl_handler()

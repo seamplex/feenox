@@ -81,7 +81,7 @@ int feenox_read_line(FILE *file_ptr) {
 
         j = 0;
         if (feenox.argv[feenox.optind+n] == NULL) {
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
         while (feenox.argv[feenox.optind+n][j] != 0) {
           // watch out!
@@ -146,7 +146,7 @@ int feenox_read_line(FILE *file_ptr) {
       feenox_parser.actual_buffer_size += feenox_parser.page_size;
       if ((feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size)) == NULL) {
         feenox_push_error_message("out of memory");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
     }
 
@@ -174,7 +174,7 @@ int feenox_read_line(FILE *file_ptr) {
 int feenox_parse_expression(const char *string, expr_t *expr) {
 
   if (string == NULL || strcmp(string, "") == 0) {
-    return FEENOX_PARSER_OK;
+    return FEENOX_OK;
   }
   // let's make a copy so the parser can break it up as it wants
   char *string_local_copy = strdup(string);
@@ -195,7 +195,7 @@ int feenox_parse_expression(const char *string, expr_t *expr) {
 
   free(string_local_copy);
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
@@ -224,7 +224,7 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
         if ((count == 0) || last_one_was_an_operator != 0) {
           // una constante, variable o funcion
           if ((factor = feenox_parse_factor(string)) == NULL) {
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           factor->level = level;
           LL_APPEND(expr->factors, factor);
@@ -248,7 +248,7 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
     } else {
       // una constante, variable o funcion
       if ((factor = feenox_parse_factor(string)) == NULL) {
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       LL_APPEND(expr->factors, factor);
       factor->level = level;
@@ -260,13 +260,13 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
 
   if (level != 1) {
     feenox_push_error_message("unmatched opening bracket in algebraic expression");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   } else if (current_op != NULL && *current_op != ')') {
     feenox_push_error_message("missing argument for operator '%c'", *current_op);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 
 }
 
@@ -365,7 +365,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
       if (string[strlen(token)] == '(') {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
         free(backup);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       got_it = 1;
       if (factor != NULL) {
@@ -412,7 +412,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
         feenox_push_error_message("expected parenthesis after '%s'", token);
         free(argument);
         free(backup);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       // contamos cuantos argumentos hay, teniendo en cuenta posibles
@@ -420,7 +420,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
       if ((n_arguments = feenox_count_arguments(argument)) <= 0) {
         free(argument);
         free(backup);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
 
       // n es la cantidad de caracteres que vamos a parsear
@@ -433,7 +433,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("vector '%s' takes exactly one subindex expression", dummy_vector->name);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           n_allocs = 1;
         } else if (dummy_matrix != NULL) {
@@ -441,7 +441,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("matrix '%s' takes exactly two subindex expressions", dummy_matrix->name);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           n_allocs = 2;
         } else if (dummy_builtin_function != NULL) {
@@ -454,13 +454,13 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_function->min_arguments, (factor->builtin_function->min_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (n_arguments > factor->builtin_function->max_arguments) {
             feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_function->max_arguments, (factor->builtin_function->max_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           n_allocs = factor->builtin_function->max_arguments;
@@ -475,13 +475,13 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_vectorfunction->min_arguments, (factor->builtin_vectorfunction->min_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (n_arguments > factor->builtin_vectorfunction->max_arguments) {
             feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_vectorfunction->max_arguments, (factor->builtin_vectorfunction->max_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           n_allocs = factor->builtin_vectorfunction->max_arguments;
@@ -497,13 +497,13 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("functional '%s' takes at least %d argument%s instead of %d", token, factor->builtin_functional->min_arguments, (factor->builtin_functional->min_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
           if (n_arguments > factor->builtin_functional->max_arguments) {
             feenox_push_error_message("functional '%s' takes at most %d argument%s instead of %d", token, factor->builtin_functional->max_arguments, (factor->builtin_functional->max_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           n_allocs = factor->builtin_functional->max_arguments;
@@ -518,7 +518,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, factor->function->n_arguments, (factor->function->n_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
           n_allocs = factor->function->n_arguments;
@@ -526,7 +526,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
         } else {
           free(backup);
           free(argument);
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         }
 
         if (factor->type != EXPR_BUILTIN_VECTORFUNCTION) {
@@ -543,7 +543,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             if (feenox_parse_expression(argument, &factor->arg[0]) != 0) {
               free(argument);
               free(backup);
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           } else if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
             // le sacamos los parentesis
@@ -552,7 +552,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
               feenox_push_error_message("undefined vector '%s'", &argument[1]);
               free(argument);
               free(backup);
-              return FEENOX_PARSER_ERROR;
+              return FEENOX_ERROR;
             }
           }
 
@@ -581,7 +581,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
                 } else if (*dummy == '\0') {
                   free(argument);
                   free(backup);
-                  return FEENOX_PARSER_ERROR;
+                  return FEENOX_ERROR;
                 }
                 dummy++;
               }
@@ -605,7 +605,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
                 feenox_push_error_message("undefined vector '%s'", &dummy_argument[1]);
                 free(argument);
                 free(backup);
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               }
               
             } else if (factor->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
@@ -615,13 +615,13 @@ expr_factor_t *feenox_parse_factor(char *string) {
               if ((factor->functional_var_arg = feenox_get_variable_ptr(dummy_argument+1)) == NULL) {
                 free(argument);
                 free(backup);
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               }
             } else {
               if (feenox_parse_expression(dummy_argument, &factor->arg[i]) != 0) {
                 free(argument);
                 free(backup);
-                return FEENOX_PARSER_ERROR;
+                return FEENOX_ERROR;
               }
             }
 
@@ -659,14 +659,14 @@ int feenox_parser_expression(expr_t *expr) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected expression");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
-  if (feenox_parse_expression(token, expr) != FEENOX_PARSER_OK) {
-    return FEENOX_PARSER_ERROR;
+  if (feenox_parse_expression(token, expr) != FEENOX_OK) {
+    return FEENOX_ERROR;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
@@ -680,15 +680,15 @@ int feenox_parser_expressions(expr_t *expr[], size_t n) {
   for (i = 0; i < n; i++) {
     if ((token = feenox_get_next_token(NULL)) == NULL) {
       feenox_push_error_message("expected expression");
-      return FEENOX_PARSER_ERROR;
+      return FEENOX_ERROR;
     }
   
-    if (feenox_parse_expression(token, (*expr)+i) != FEENOX_PARSER_OK) {
-      return FEENOX_PARSER_ERROR;
+    if (feenox_parse_expression(token, (*expr)+i) != FEENOX_OK) {
+      return FEENOX_ERROR;
     }
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 int feenox_parser_match_keyword_expression(char *token, char *keyword[], expr_t *expr[], size_t n) {
@@ -703,20 +703,20 @@ int feenox_parser_match_keyword_expression(char *token, char *keyword[], expr_t 
       
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected expression");
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
               
-      if (feenox_parse_expression(token, expr[i]) != FEENOX_PARSER_OK) {
-        return FEENOX_PARSER_ERROR;
+      if (feenox_parse_expression(token, expr[i]) != FEENOX_OK) {
+        return FEENOX_ERROR;
       }
     }
   }
           
   if (found == 0) {
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
@@ -726,12 +726,12 @@ int feenox_parser_expression_in_string(double *result) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected expression");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   *result = feenox_evaluate_expression_in_string(token);
 
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
@@ -741,12 +741,12 @@ int feenox_parser_string(char **string) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected string");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   *string = strdup(token);
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 int feenox_parser_string_format(char **string, int *n_args) {
@@ -758,7 +758,7 @@ int feenox_parser_string_format(char **string, int *n_args) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected a string with optional printf format data");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   *string = strdup(token);
       
@@ -777,7 +777,7 @@ int feenox_parser_string_format(char **string, int *n_args) {
     dummy++;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
   
 }
 
@@ -788,12 +788,12 @@ int feenox_parser_file(file_t **file) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected file identifier");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((*file = feenox_get_file_ptr(token)) == NULL) {
     feenox_push_error_message("undefined file identifier '%s'", token);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   // si alguien hace referencia a stdin entonces no nos metemos en debug
@@ -801,15 +801,15 @@ int feenox_parser_file(file_t **file) {
     feenox.mode = mode_ignore_debug;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
 int feenox_parser_file_path(file_t **file, char *mode) {
   
   char *token;
-  if (feenox_parser_string(&token) != FEENOX_PARSER_OK) {
-    return FEENOX_PARSER_ERROR;
+  if (feenox_parser_string(&token) != FEENOX_OK) {
+    return FEENOX_ERROR;
   };
   
   if ((*file = feenox_define_file(token, token, 0, NULL, mode, 0)) == NULL) {
@@ -817,7 +817,7 @@ int feenox_parser_file_path(file_t **file, char *mode) {
   }
   free(token);
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 int feenox_parser_function(function_t **function) {
@@ -826,15 +826,15 @@ int feenox_parser_function(function_t **function) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected function name");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((*function = feenox_get_function_ptr(token)) == NULL) {
     feenox_push_error_message("undefined function identifier '%s' (remember that only the function name is needed, not the arguments)", token);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 int feenox_parser_vector(vector_t **vector) {
@@ -843,15 +843,15 @@ int feenox_parser_vector(vector_t **vector) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected vector name");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((*vector = feenox_get_vector_ptr(token)) == NULL) {
     feenox_push_error_message("undefined vector identifier '%s'", token);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 int feenox_parser_variable(var_t **var) {
@@ -860,15 +860,15 @@ int feenox_parser_variable(var_t **var) {
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected variable name");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((*var = feenox_get_variable_ptr(token)) == NULL) {
     feenox_push_error_message("undefined variable identifier '%s'", token);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 */
@@ -882,13 +882,13 @@ int feenox_parser_keywords_ints(char *keyword[], int *value, int *option) {
       feenox_push_error_message("%s", keyword[i++]);
     }
     feenox_push_error_message("expected one of");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   while (keyword[i][0] != '\0') {
     if (strcasecmp(token, keyword[i]) == 0) {
       *option = value[i];
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
     }
     i++;
   }
@@ -899,7 +899,7 @@ int feenox_parser_keywords_ints(char *keyword[], int *value, int *option) {
   }
   feenox_push_error_message("unknown keyword '%s', expected one of", token);
   
-  return FEENOX_PARSER_ERROR;
+  return FEENOX_ERROR;
   
 }
 
@@ -914,13 +914,13 @@ int feenox_parser_read_keywords_voids(char *keyword[], void *value[], void **opt
       feenox_push_error_message("%s", keyword[i++]);
     }
     feenox_push_error_message("expected one of");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   while (keyword[i][0] != '\0') {
     if (strcasecmp(token, keyword[i]) == 0) {
       *option = value[i];
-      return FEENOX_PARSER_OK;
+      return FEENOX_OK;
     }
     i++;
   }
@@ -931,7 +931,7 @@ int feenox_parser_read_keywords_voids(char *keyword[], void *value[], void **opt
   }
   feenox_push_error_message("unknown keyword '%s', expected one of", token);
   
-  return FEENOX_PARSER_ERROR;
+  return FEENOX_ERROR;
   
 }
 
@@ -1015,35 +1015,35 @@ int feenox_parse_range(char *string, const char left_delim, const char middle_de
 
   if ((first_bracket = strchr(string, left_delim)) == NULL) {
     feenox_push_error_message("range '%s' does not start with '%c'", string, left_delim);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   if ((second_bracket = strrchr(string, right_delim)) == NULL) {
     feenox_push_error_message("unmatched '%c' for range in '%s'", left_delim, string);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   *second_bracket = '\0';
 
   if ((colon = strchr(string, middle_delim)) == NULL) {
     feenox_push_error_message("delimiter '%c' not found when giving range", middle_delim);
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   *colon = '\0';
 
   if (feenox_parse_expression(first_bracket+1, a) != 0) {
     feenox_push_error_message("in min range expression");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   if (feenox_parse_expression(colon+1, b) != 0) {
     feenox_push_error_message("in max range expression");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   *second_bracket = right_delim;;
   *colon = middle_delim;
           
-  return FEENOX_PARSER_OK;
+  return FEENOX_OK;
 }
 
 
@@ -1096,7 +1096,7 @@ int feenox_read_data_line(FILE *file_ptr, char *buffer) {
   do {
     l = strlen(buffer);
     if (fgets(buffer + l + 1, (BUFFER_SIZE*BUFFER_SIZE)-1, file_ptr) == 0) {
-      return FEENOX_PARSER_ERROR;
+      return FEENOX_ERROR;
     }
     buffer[l] = ' ';
     feenox_strip_comments(buffer);  // limpiamos la linea
@@ -1230,7 +1230,7 @@ int feenox_count_arguments(char *string) {
   // los argumentos tienen que estar entre parentesis
   if (string[0] != '(') {
     feenox_push_error_message("expected arguments for function");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
 
   // contamos cuantos argumentos hay, teniendo en cuenta posibles
@@ -1245,7 +1245,7 @@ int feenox_count_arguments(char *string) {
       level--;
     } else if (*dummy == '\0') {
       feenox_push_error_message("argument list needs to be closed with ')'");
-      return FEENOX_PARSER_ERROR;
+      return FEENOX_ERROR;
     }
     if (*dummy == ',' && level == 1) {
       n_arguments++;
@@ -1287,7 +1287,7 @@ int feenox_parse_assignment(char *line, assignment_t *assignment) {
   feenox_strip_blanks(right_hand);
   if (strlen(right_hand) == 0) {
     feenox_push_error_message("empty right-hand side");
-    return FEENOX_PARSER_ERROR;
+    return FEENOX_ERROR;
   }
   
   // y despues sacamos blancos y otras porquerias que nos molestan
@@ -1342,10 +1342,10 @@ int feenox_parse_assignment(char *line, assignment_t *assignment) {
     if ((assignment->variable = feenox_get_variable_ptr(left_hand)) == NULL) {
       if (feenox.implicit_none) {
         feenox_push_error_message("undefined symbol '%s' and disabled implicit definition", left_hand);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       } else {
         if ((assignment->variable = feenox_define_variable(left_hand)) == NULL) {
-          return FEENOX_PARSER_ERROR;
+          return FEENOX_ERROR;
         } else {
           // las variables siempre son escalares
           assignment->plain = 0;
@@ -1376,7 +1376,7 @@ int feenox_parse_assignment(char *line, assignment_t *assignment) {
       } else {
         feenox_push_error_message("'%s' is neither a vector nor a matrix", left_hand);
       }
-      return FEENOX_PARSER_ERROR;
+      return FEENOX_ERROR;
     }
     *dummy_par = '(';
     
@@ -1395,7 +1395,7 @@ int feenox_parse_assignment(char *line, assignment_t *assignment) {
     } else if (vector != NULL) {
       if ((dummy = strrchr(dummy_par, ')')) == NULL) {
         feenox_push_error_message("unmatched parenthesis for '%s'", left_hand);
-        return FEENOX_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
       *dummy = '\0';
       
@@ -1419,7 +1419,7 @@ int feenox_parse_assignment(char *line, assignment_t *assignment) {
       } else {
         feenox_push_error_message("'%s' is neither a vector nor a matrix", left_hand);
       }
-      return FEENOX_PARSER_ERROR;
+      return FEENOX_ERROR;
     }
     *dummy_index_range = '<';
     

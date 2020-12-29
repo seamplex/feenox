@@ -52,14 +52,23 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_version.h>
 
+#ifdef HAVE_IDA
+ #include <ida/ida.h>
+ #include <ida/ida_direct.h>
+ #include <nvector/nvector_serial.h>
+ #include <sundials/sundials_types.h>
+ #include <sundials/sundials_math.h>
+ #include <sunmatrix/sunmatrix_dense.h>
+ #include <sunlinsol/sunlinsol_dense.h>
+#endif
+
+
 #include "contrib/uthash.h"
 #include "contrib/utlist.h"
 
 
-#define FEENOX_PARSER_OK         0
-#define FEENOX_RUNTIME_OK        0
-#define FEENOX_RUNTIME_ERROR     (-1)
-#define FEENOX_PARSER_ERROR      (+1)
+#define FEENOX_OK         0
+#define FEENOX_ERROR      1
 
 #define BUFFER_TOKEN_SIZE        255
 #define BUFFER_LINE_SIZE        4095
@@ -91,7 +100,7 @@ enum version_type {
 };
 
 // macro to check error returns in function calls
-#define feenox_call(function)   if ((function) != 0) return -1
+#define feenox_call(function)   if ((function) != FEENOX_OK) return FEENOX_ERROR
 
 // macro to access internal special variables
 #define feenox_special_var(var) (feenox.special_vars.var)
@@ -106,8 +115,18 @@ typedef struct expr_t expr_t;
 typedef struct expr_factor_t expr_factor_t;
 
 typedef struct var_t var_t;
+typedef struct vector_t vector_t;
+typedef struct matrix_t matrix_t;
+typedef struct function_t function_t;
+
+typedef struct alias_t alias_t;
 
 typedef struct instruction_t instruction_t;
+
+typedef struct phase_object_t phase_object_t;
+typedef struct dae_t dae_t;
+
+typedef struct mesh_t mesh_t;
 
 
 // individual factor of an algebraic expression
@@ -132,7 +151,6 @@ struct expr_factor_t {
   builtin_functional_t *builtin_functional;
  */
   var_t *variable;
-/*
   vector_t *vector;
   matrix_t *matrix;
   function_t *function;
@@ -140,7 +158,7 @@ struct expr_factor_t {
   vector_t **vector_arg;
 
   var_t *functional_var_arg;
-*/
+
   // algebraic expression of the arguments of the function
   expr_t *arg;
 
@@ -177,6 +195,191 @@ struct var_t {
 };
 
 
+// vector
+struct vector_t {
+  char *name;
+  int initialized;
+  
+//  expr_t *size_expr;
+  int size;
+  int constant;
+
+  gsl_vector *value;
+  gsl_vector *initial_transient;
+  gsl_vector *initial_static;
+
+  // flag to know if the pointer above is owned by us or by anybody else
+  int reallocated;
+  
+  // pointer to a function where we should get the data from
+  function_t *function;
+  
+  // linked list con las expresiones de datos
+//  expr_t *datas;
+
+  UT_hash_handle hh;
+};
+
+
+// matrix
+struct matrix_t {
+  char *name;
+  int initialized;  
+  expr_t *cols_expr;
+  expr_t *rows_expr;
+  
+  int cols;
+  int rows;
+  int constant;
+  
+  gsl_matrix *value;
+  gsl_matrix *initial_transient;
+  gsl_matrix *initial_static;
+
+  // flag para saber si el apuntador de arriba lo alocamos nosotros o alguien mas
+  int realloced;
+  
+  expr_t *datas;
+  
+  UT_hash_handle hh;
+};
+
+// alias
+struct alias_t {
+  int initialized;
+  
+  var_t *new_variable;
+  
+  expr_t row;
+  expr_t col;
+  
+  var_t *variable;
+  vector_t *vector;
+  matrix_t *matrix;
+  
+  alias_t *next;
+};
+
+// function
+struct function_t {
+  char *name;
+  char *name_in_mesh;
+  int initialized;
+  
+  // might be:
+  //   - algebraic
+  //   - pointwise-defined
+  //       + given in the input
+  //       + given in a file
+  //       + given in wasora vectors
+  //       + in a mesh
+  //          * as another function defined over materials (physical groups)
+  //          * data at nodes
+  //          * data at cells
+  //  - comptued in a user-provided routine
+  //
+  enum  {
+    function_type_undefined,
+    function_type_algebraic,
+    function_type_pointwise_data,
+    function_type_pointwise_file,
+    function_type_pointwise_vector,
+    function_type_pointwise_mesh_property,
+    function_type_pointwise_mesh_node,
+    function_type_pointwise_mesh_cell,
+    function_type_routine,
+    function_type_routine_internal,
+  } type;
+  
+  // number of arguments the function takes
+  int n_arguments;
+
+  // array of pointers to already-existing variables for the arguments
+  var_t **var_argument;
+  int var_argument_allocated;
+
+
+  // expression for algebraic functions
+  expr_t algebraic_expression;
+
+  // number of pairs of x-y data for pointwise functions
+  size_t data_size;
+
+  // arrays with the adata 
+  double **data_argument;
+  int data_argument_allocated;
+  double *data_value;
+  
+  // this is in case there is a derivative of a mesh-based function and
+  // we want to interoplate with the shape functions
+  // warning! we need to put data on the original function and not on the derivatives
+  function_t *spatial_derivative_of;
+  int spatial_derivative_with_respect_to;
+
+  // hints in case the grid is tensor-product regular
+  int rectangular_mesh;
+  expr_t expr_x_increases_first;
+  int x_increases_first;
+  expr_t *expr_rectangular_mesh_size;
+  int *rectangular_mesh_size;
+  double **rectangular_mesh_point;
+
+  // file with the point-wise data
+  char *data_file_path;
+
+  // columns where the data is within the file
+  // size = n_arguments+1 (n independent variables + 1 dependent variable) 
+  int *column;
+
+  // vectors with the point-wise data already read
+  vector_t **vector_argument;
+  vector_t *vector_value;
+  
+  // helpers to interpolate 1D with GSL
+  gsl_interp *interp;
+  gsl_interp_accel *interp_accel;
+  gsl_interp_type interp_type;
+
+  // multidimensional interpolation type
+  enum {
+    interp_nearest,
+    interp_shepard,
+    interp_shepard_kd,
+    interp_bilinear
+  } multidim_interp;
+
+  
+  expr_t expr_multidim_threshold;
+  double multidim_threshold;
+  expr_t expr_shepard_radius;
+  double shepard_radius;
+  expr_t expr_shepard_exponent;
+  double shepard_exponent;
+
+  // propiedad
+  void *property;
+
+  // malla no-estructurada sobre la que esta definida la funcion
+  mesh_t *mesh;
+  double mesh_time;
+  
+  // apuntador a un arbol k-dimensional para nearest neighbors 
+  void *kd;
+  
+  // ----- ------- -----------   --        -       - 
+  // funcion que hay que llamar para funciones tipo usercall 
+  double (*routine)(const double *);
+  
+  // ----- ------- -----------   --        -       - 
+  // funcion que hay que llamar para funciones internas
+  double (*routine_internal)(const double *, function_t *);
+  void *params;
+
+  UT_hash_handle hh;
+};
+
+
+
 // instruction
 struct instruction_t {
   int (*routine)(void *);
@@ -187,6 +390,42 @@ struct instruction_t {
 };
 
 
+struct phase_object_t {
+  int offset;
+  int size;
+  int differential;
+  char *name;
+
+  var_t *variable;
+  var_t *variable_dot;
+  vector_t *vector;
+  vector_t *vector_dot;
+  matrix_t *matrix;
+  matrix_t *matrix_dot;
+
+  phase_object_t *next;
+};
+
+struct dae_t {
+  expr_t residual;
+  
+  vector_t *vector;
+  matrix_t *matrix;
+  
+  expr_t expr_i_min;
+  expr_t expr_i_max;
+  expr_t expr_j_min;
+  expr_t expr_j_max;
+  
+  int i_min;
+  int i_max;
+  int j_min;
+  int j_max;
+  
+  int equation_type;
+  
+  dae_t *next;
+};
 
 // global FeenoX singleton structure
 struct {
@@ -194,12 +433,13 @@ struct {
   char **argv;
   int optind;
 
+/*  
   int argc_orig;       // copy of the original arguments before calling getopt()
   char **argv_orig;
 
   int argc_unknown;
   char **argv_unknown;
-
+*/
   char *main_input_filepath;
   char *main_input_dirname;
   
@@ -223,6 +463,10 @@ struct {
   instruction_t *instructions;
 //  instruction_t *last_defined_instruction;
   
+  var_t *vars;
+  vector_t *vectors;
+  matrix_t *matrices;
+  function_t *functions;
   
   struct {
     var_t *done;
@@ -280,6 +524,33 @@ struct {
     file_t *stderr_;
   } special_files;  
 */  
+  struct {
+    int dimension;
+    double **phase_value;
+    double **phase_derivative;
+    phase_object_t *phase_objects;
+  
+    dae_t *daes;
+    void *system;
+
+    enum {
+      initial_conditions_as_provided,
+      initial_conditions_from_variables,
+      initial_conditions_from_derivatives,
+    } initial_conditions_mode;
+
+    instruction_t *instruction;
+
+#if HAVE_IDA
+    N_Vector x;
+    N_Vector dxdt;
+    N_Vector id;
+    N_Vector abs_error;
+    SUNMatrix A;
+    SUNLinearSolver LS;
+#endif
+  } dae;
+  
 } feenox;
 
 
@@ -287,7 +558,9 @@ struct {
 
 // init.c
 extern int feenox_initialize(int argc, char **argv);
+extern int feenox_init_special_objects(void);
 extern int feenox_init_after_parser(void);
+
 
 // version.c
 extern void feenox_show_help(const char *progname);
@@ -295,6 +568,7 @@ extern void feenox_show_version(int version);
 extern void feenox_copyright(void);
 extern void feenox_shortversion(void);
 extern void feenox_longversion(void);
+
 
 // error.c
 void feenox_push_error_message(const char *fmt, ...);
@@ -305,27 +579,44 @@ void feenox_nan_error(void);
 void feenox_gsl_handler (const char *reason, const char *file_ptr, int line, int gsl_errno);
 void feenox_signal_handler(int sig_num);
 
+
 // cleanup.c
 void feenox_polite_exit(int error);
 void feenox_finalize(void);
+
 
 // parser.c
 extern int feenox_parse_main_input_file(const char *filepath);
 extern int feenox_parse_expression(const char *string, expr_t *expr);
 
+
 // file.c
 FILE *feenox_fopen(const char *filepath, const char *mode);
+
 
 // abort.c
 extern int feenox_instruction_abort(void *arg);
 
+
 // algebra.c
 extern double feenox_evaluate_expression_in_string(const char *string);
+
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
 
+
 // instruction.c
 extern int feenox_add_instruction(int (*routine)(void *), void *argument);
+
+
+// define.c
+extern int feenox_check_name(const char *name);
+extern var_t *feenox_define_variable(char *name);
+  
+
+// getptr.c
+extern var_t *feenox_get_variable_ptr(const char *name);
+
 
 #endif
