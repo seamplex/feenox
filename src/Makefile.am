@@ -26,8 +26,12 @@ feenox_SOURCES = \
 ./parser/parser.h \
 ./parser/auxiliary.c \
 ./io/file.c \
+./math/alias.c \
 ./math/algebra.c \
 ./math/dae.c \
+./math/matrix.c \
+./math/function.c \
+./math/vector.c \
 ./contrib/kdtree.c \
 ./contrib/kdtree.h \
 ./contrib/utlist.h \

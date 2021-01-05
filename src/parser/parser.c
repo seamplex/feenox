@@ -167,99 +167,23 @@ int feenox_parse_line(void) {
                strcasecmp(token, "VARS") == 0 || strcasecmp(token, "VARIABLES") == 0) {
       feenox_call(feenox_parse_variables());
       return FEENOX_OK;
+    
+///kw+ALIAS+usage ALIAS
+///kw+ALIAS+desc Define a scalar alias of an already-defined indentifier.
+    } else if (strcasecmp(token, "ALIAS") == 0) {
+      feenox_call(feenox_parse_alias());
+      return FEENOX_OK;
+      
     }
+    
   }
 
 
       
 /*
 
-
-
-
-
 // ---------------------------------------------------------------------      
 ///kw+ALIAS+usage ALIAS
-///kw+ALIAS+desc Define a scalar alias of an already-defined indentifier.
-///kw+ALIAS+detail The existing object can be a variable, a vector element or a matrix element. 
-///kw+ALIAS+detail In the first case, the name of the variable should be given as the existing object.
-///kw+ALIAS+detail In the second case, to alias the second element of vector `v` to the new name `new`, `v(2)` should be given as the existing object.
-///kw+ALIAS+detail In the third case, to alias second element (2,3) of matrix `M` to the new name `new`, `M(2,3)` should be given as the existing object.
-      
-    } else if ((strcasecmp(token, "ALIAS") == 0)) {
-
-      char *dummy_par;
-      char *left;
-      char *keyword;
-      char *right;
-      char *existing_object;
-      char *new_name;
-      
-      alias_t *alias = calloc(1, sizeof(alias_t));
-
-///kw+ALIAS+usage { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }
-      feenox_call(feenox_parser_string(&left));
-      feenox_call(feenox_parser_string(&keyword));
-      feenox_call(feenox_parser_string(&right));
-
-      if (strcasecmp(keyword, "IS") == 0) {
-        new_name = left;
-        existing_object = right;
-      } else if (strcasecmp(keyword, "AS") == 0) {
-        new_name = right;
-        existing_object = left;
-      } else {
-        feenox_push_error_message("either IS or AS expected instead of '%s'", keyword);
-        return FEENOX_ERROR;
-      }
-
-      if ((dummy_par = strchr(existing_object, '(')) != NULL) {
-        *dummy_par = '\0';
-      }
-
-      if ((alias->matrix = feenox_get_matrix_ptr(existing_object)) == NULL) {
-        if ((alias->vector = feenox_get_vector_ptr(existing_object)) == NULL) {
-          if ((alias->variable = feenox_get_variable_ptr(existing_object)) == NULL) {
-           feenox_push_error_message("unknown allegedly existing object '%s'", existing_object);
-           return FEENOX_ERROR;
-          }
-        }
-      }
-
-      // si hay parentesis son subindices
-      if (dummy_par != NULL) {
-        if (alias->matrix == NULL && alias->vector == NULL) {
-          feenox_push_error_message("symbol '%s' cannot be subscripted", existing_object);
-          return FEENOX_ERROR;
-        }
-        *dummy_par = '(';
-
-        if (alias->matrix != NULL) {
-          if (feenox_parse_range(dummy_par, '(', ',', ')', &alias->row, &alias->col) != 0) {
-            return FEENOX_ERROR;
-          }
-        } else if (alias->vector != NULL) {
-          if ((dummy = strrchr(dummy_par, ')')) == NULL) {
-            feenox_push_error_message("unmatched parenthesis for '%s'", token);
-            return FEENOX_ERROR;
-          }
-          *dummy = '\0';
-          feenox_call(feenox_parse_expression(dummy_par+1, &alias->row));
-          *dummy = ')';
-        }
-      }
-      
-      if ((alias->new_variable = feenox_define_variable(new_name)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      LL_APPEND(feenox.aliases, alias);
-
-      if (feenox_define_instruction(feenox_instruction_alias, alias) == NULL) {
-        return FEENOX_ERROR;
-      }
-      
-      return WASORA_PARSER_OK;
-
 // ---------------------------------------------------------------------
 ///kw+VECTOR+usage VECTOR
 ///kw+VECTOR+desc Define a vector.
@@ -3068,4 +2992,62 @@ int feenox_parse_variables(void) {
 
   return FEENOX_OK;
   
+}
+
+
+int feenox_parse_alias(void) {
+
+///kw+ALIAS+detail The existing object can be a variable, a vector element or a matrix element. 
+///kw+ALIAS+detail In the first case, the name of the variable should be given as the existing object.
+///kw+ALIAS+detail In the second case, to alias the second element of vector `v` to the new name `new`, `v(2)` should be given as the existing object.
+///kw+ALIAS+detail In the third case, to alias second element (2,3) of matrix `M` to the new name `new`, `M(2,3)` should be given as the existing object.
+      
+  char *left;
+  char *keyword;
+  char *right;
+  char *existing_object;
+  char *new_name;
+  
+  char *dummy_openpar = NULL;
+  char *dummy_comma = NULL;
+  char *dummy_closepar = NULL;
+  char *row = NULL;
+  char *col = NULL;
+  
+  
+///kw+ALIAS+usage { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }
+  feenox_call(feenox_parser_string(&left));
+  feenox_call(feenox_parser_string(&keyword));
+  feenox_call(feenox_parser_string(&right));
+
+  if (strcasecmp(keyword, "IS") == 0) {
+    new_name = left;
+    existing_object = right;
+  } else if (strcasecmp(keyword, "AS") == 0) {
+    new_name = right;
+    existing_object = left;
+  } else {
+    feenox_push_error_message("either IS or AS expected instead of '%s'", keyword);
+    return FEENOX_ERROR;
+  }
+
+  // if there are parenthesis they are sub-indexes
+  if ((dummy_openpar = strchr(existing_object, '(')) != NULL) {
+    dummy_comma = strchr(existing_object, ',');
+    if ((dummy_closepar = strchr(existing_object, ')')) == NULL) {
+      feenox_push_error_message("expecting closing parenthesis in expression '%s'", existing_object);
+    }
+    
+    *dummy_openpar = '\0';
+    *dummy_closepar = '\0';
+    row = dummy_openpar + 1;
+    if (dummy_comma != NULL) {
+      *dummy_comma = '\0';
+      col = dummy_comma + 1;
+    }
+  }
+  
+  feenox_call(feenox_define_alias(new_name, existing_object, row, col));
+      
+  return FEENOX_OK;
 }

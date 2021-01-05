@@ -34,5 +34,5 @@ int feenox_add_instruction(int (*routine)(void *), void *argument) {
 
   LL_APPEND(feenox.instructions, instruction);
 
-  return FEENOX_ERROR;
+  return FEENOX_OK;
 }

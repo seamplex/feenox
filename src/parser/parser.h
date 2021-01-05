@@ -60,6 +60,8 @@ extern void feenox_add_leading_zeros(char **string);
 extern int feenox_parser_expression_in_string(double *result);
 extern int feenox_parse_madeup_expression(char *string, expr_t *expr);
 extern expr_factor_t *feenox_parse_factor(char *string);
+extern int feenox_parser_string(char **string);
+
 
 extern char *feenox_ends_in_init(char *name);
 extern char *feenox_ends_in_zero(char *name);
@@ -75,5 +77,6 @@ extern int feenox_parse_implicit(void);
 extern int feenox_parse_time_path(void);
 extern int feenox_parse_initial_conditions(void);
 extern int feenox_parse_variables(void);
+extern int feenox_parse_alias(void);
 
 #endif  

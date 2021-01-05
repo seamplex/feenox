@@ -47,19 +47,10 @@ int feenox_initialize(int argc, char **argv) {
     { "no-debug", no_argument,       NULL, 'n'},
     { "debug",    no_argument,       NULL, 'd'},
     { "list",     no_argument,       NULL, 'l'},
+// TODO: progress, mumps, elements, volumes, s2, s4, etc.
     { NULL, 0, NULL, 0 }
   };  
  
-  // before getop() breaks them we make a copy of the arguments
-  // TODO: de we need this?
-/*  
-  feenox.argc_orig = argc;
-  feenox.argv_orig = malloc((argc+1) * sizeof(char *));
-  for (i = 0; i < argc; i++) {
-    feenox.argv_orig[i] = strdup(argv[i]);
-  }
-  feenox.argv_orig[i] = NULL;
-*/  
   // don't complain about unknown options, they can be for PETSc/SLEPc
   opterr = 0;
   while ((optc = getopt_long_only(argc, argv, "hvil", longopts, &option_index)) != -1) {
@@ -94,16 +85,8 @@ int feenox_initialize(int argc, char **argv) {
   if (show_help) {
     feenox_show_help(argv[0]);
     exit(EXIT_SUCCESS);
-  } else if (show_version && feenox.optind == argc) {
+  } else if (show_version) {
     feenox_show_version(show_version);
-    exit(EXIT_SUCCESS);
-  } else if (feenox.mode && feenox.optind == argc) {
-    // TODO
-/*    
-    feenox_call(feenox_init_before_parser());
-    feenox_list_symbols();
-    feenox_finalize();
- */
     exit(EXIT_SUCCESS);
   } else if (feenox.optind == argc) {
     feenox_show_version(version_compact);

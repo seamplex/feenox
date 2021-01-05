@@ -52,7 +52,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_version.h>
 
-#ifdef HAVE_IDA
+#if HAVE_IDA
  #include <ida/ida.h>
  #include <ida/ida_direct.h>
  #include <nvector/nvector_serial.h>
@@ -108,6 +108,8 @@ enum version_type {
 // value of a variable
 #define feenox_var_value(var)  (*(var->value))
 
+// pointer to the content of an object
+#define feenox_value_ptr(obj)  (obj->value)
 
 
 // forward type definitions
@@ -182,7 +184,7 @@ struct expr_t {
 struct var_t {
   char *name;
   int initialized;
-  int realloced;
+  int reallocated;
   
   // these are pointers so the actual holder can be anything, from another
   // variable (i.e. an alias), a vector element (another alias) or even
@@ -200,7 +202,7 @@ struct vector_t {
   char *name;
   int initialized;
   
-//  expr_t *size_expr;
+  expr_t *size_expr;
   int size;
   int constant;
 
@@ -214,8 +216,8 @@ struct vector_t {
   // pointer to a function where we should get the data from
   function_t *function;
   
-  // linked list con las expresiones de datos
-//  expr_t *datas;
+  // linked list with the expressions of the initial elements
+  expr_t *datas;
 
   UT_hash_handle hh;
 };
@@ -466,7 +468,9 @@ struct {
   var_t *vars;
   vector_t *vectors;
   matrix_t *matrices;
+  alias_t *aliases;
   function_t *functions;
+  
   
   struct {
     var_t *done;
@@ -600,7 +604,7 @@ extern int feenox_instruction_abort(void *arg);
 
 // algebra.c
 extern double feenox_evaluate_expression_in_string(const char *string);
-
+extern double feenox_evaluate_expression(expr_t *this);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
@@ -612,11 +616,28 @@ extern int feenox_add_instruction(int (*routine)(void *), void *argument);
 
 // define.c
 extern int feenox_check_name(const char *name);
-extern var_t *feenox_define_variable(char *name);
-  
+extern var_t *feenox_define_variable(const char *name);
+extern int feenox_define_alias(const char *new_name, const char *existing_object, const char *row, const char *col);
+extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
+extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
 
 // getptr.c
 extern var_t *feenox_get_variable_ptr(const char *name);
+extern vector_t *feenox_get_vector_ptr(const char *name);
+extern matrix_t *feenox_get_matrix_ptr(const char *name);
+extern function_t *feenox_get_function_ptr(const char *name);
 
+// alias.c
+extern int feenox_instruction_alias(void *arg);
 
-#endif
+// matrix.c
+extern int feenox_matrix_init(matrix_t *this);
+
+// vector.c
+extern int feenox_vector_init(vector_t *this);
+
+// function.c
+extern int feenox_function_init(function_t *this);
+  
+
+#endif    /* FEENOX_H  */

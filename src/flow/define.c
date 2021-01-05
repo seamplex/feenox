@@ -26,56 +26,56 @@
 #include <string.h>
 
 extern const char factorseparators[];
-/*
-void feenox_realloc_variable_ptr(var_t *var, double *newptr, int copy_contents) {
+
+void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents) {
   
   // si copy_contents es true copiamos el contenido del vector de feenox
   // antes de tirar el apuntador a la basura
   if (copy_contents) {
-    *newptr = feenox_value(var);
+    *newptr = feenox_var_value(this);
   }
   
   // si el puntero es de feenox, lo liberamos
-  if (var->realloced == 0) {
-    free(feenox_value_ptr(var));
+  if (this->reallocated == 0) {
+    free(feenox_value_ptr(this));
   }
   
-  var->realloced = 1;
-  feenox_value_ptr(var) = newptr;
+  this->reallocated = 1;
+  feenox_value_ptr(this) = newptr;
   
   return;
 }
 
-void feenox_realloc_vector_ptr(vector_t *vector, double *newptr, int copy_contents) {
+void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents) {
   
-  double *oldptr = gsl_vector_ptr(feenox_value_ptr(vector), 0);
+  double *oldptr = gsl_vector_ptr(feenox_value_ptr(this), 0);
 
   // si copy_contents es true copiamos el contenido del vector de feenox
   // antes de tirar el apuntador a la basura
   if (copy_contents) {
-    memcpy(newptr, oldptr, vector->size * sizeof(double));
+    memcpy(newptr, oldptr, this->size * sizeof(double));
   }
 
   // si el puntero es de feenox, lo liberamos
-  if (vector->realloced == 0) {
-    if (feenox_value_ptr(vector)->stride != 1) {
-      feenox_push_error_message("vector '%s' cannot be realloced: stride not equal to 1", vector->name);
+  if (this->reallocated == 0) {
+    if (feenox_value_ptr(this)->stride != 1) {
+      feenox_push_error_message("vector '%s' cannot be realloced: stride not equal to 1", this->name);
       feenox_runtime_error();
     }
-    if (feenox_value_ptr(vector)->owner == 0) {
-      feenox_push_error_message("vector '%s' cannot be realloced: not the data owner", vector->name);
+    if (feenox_value_ptr(this)->owner == 0) {
+      feenox_push_error_message("vector '%s' cannot be realloced: not the data owner", this->name);
       feenox_runtime_error();
     }
-    if (feenox_value_ptr(vector)->block->data != feenox_value_ptr(vector)->data) {
-      feenox_push_error_message("vector '%s' cannot be realloced: data not pointing to block", vector->name);
+    if (feenox_value_ptr(this)->block->data != feenox_value_ptr(this)->data) {
+      feenox_push_error_message("vector '%s' cannot be realloced: data not pointing to block", this->name);
       feenox_runtime_error();
     }
 
     free(oldptr);
   }
   
-  vector->realloced = 1;
-  feenox_value_ptr(vector)->data = newptr;
+  this->reallocated = 1;
+  feenox_value_ptr(this)->data = newptr;
   
   return;
 }
@@ -100,15 +100,16 @@ void feenox_realloc_matrix_ptr(matrix_t *matrix, double *newptr, int copy_conten
   
   return;
 }
-*/
 
-var_t *feenox_define_variable(char *name) {
+
+// visible through the API
+var_t *feenox_define_variable(const char *name) {
 
   var_t *var;
-
+  
   if (feenox_check_name(name) != FEENOX_OK) {
     if ((var = feenox_get_variable_ptr(name)) != NULL) {
-      // the variable already exist, check_name() should have complained
+      // the variable already exists, check_name() should have complained
       // so we remove the error and return the existing variable
       feenox_pop_error_message();
       return var;
@@ -127,6 +128,39 @@ var_t *feenox_define_variable(char *name) {
 
   return var;
 }
+
+// visible through the API
+int feenox_define_alias(const char *new_name, const char *existing_object, const char *row, const char *col) {
+
+  feenox_call((feenox_check_name(new_name)));
+  
+  alias_t *alias = calloc(1, sizeof(alias_t));
+  if ((alias->new_variable = feenox_define_variable(new_name)) == NULL) {
+    return FEENOX_ERROR;
+  }
+  
+  if ((alias->matrix = feenox_get_matrix_ptr(existing_object)) == NULL) {
+    if ((alias->vector = feenox_get_vector_ptr(existing_object)) == NULL) {
+      if ((alias->variable = feenox_get_variable_ptr(existing_object)) == NULL) {
+       feenox_push_error_message("unknown allegedly existing object '%s'", existing_object);
+       return FEENOX_ERROR;
+      }
+    }
+  }
+  
+  if (row != NULL) {
+    feenox_call(feenox_parse_expression(row, &alias->row));
+  }
+  if (col != NULL) {
+    feenox_call(feenox_parse_expression(col, &alias->col));
+  }
+  
+  LL_APPEND(feenox.aliases, alias);
+  feenox_call(feenox_add_instruction(feenox_instruction_alias, alias));
+  
+  return FEENOX_OK;
+}
+
 
 
 /*

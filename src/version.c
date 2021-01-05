@@ -35,9 +35,10 @@
 #include <petscsys.h>
 #include <petscconfiginfo.h>
 #endif
-#ifdef HAVE_SLEPC
+#if HAVE_SLEPC
 #include <slepcsys.h>
 #endif
+
 #include "feenox.h"
 #include "version.h"
 
@@ -60,7 +61,10 @@ void feenox_show_help(const char *progname) {
  Instructions will be read from standard input if \"-\" is passed as inputfile, i.e.\n\
    $ echo \"PRINT 2+2\" | feenox -\n\
    4\n\
-   $\n");
+   $\n\
+\n\
+Report bugs to: jeremy@seamplex.com\n\
+Feenox home page: <https://www.seamplex.com/feenox/>\n");
   
   return;
 }
@@ -110,7 +114,7 @@ void feenox_shortversion(void) {
   printf("%s\n", PACKAGE_VERSION);
 #endif
 
-  printf("a free no-fee no-X uniX-like finite-elementish computational engineering tool\n");
+  printf("a free no-fee no-X uniX-like finite-element(ish) computational engineering tool\n");
 
   return;
 }
@@ -126,8 +130,8 @@ void feenox_copyright(void) {
   /* It is important to separate the year from the rest of the message,
      as done here, to avoid having to retranslate the message when a new
      year comes around.  */  
-  printf("FeenoX is copyright (C) %d-%d %s\n\
-an is licensed under GNU GPL version 3 or later.\n\
+  printf("Copyright (C) %d--%d %s\n\
+GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. \n\
 FeenoX is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2021, "jeremy theler"); 
 }
@@ -160,29 +164,52 @@ void feenox_longversion(void) {
   
   printf("GSL version        : %s\n", gsl_version);
   
+  printf("SUNDIALs version   : %s\n",
 #if HAVE_IDA
-  printf("SUNDIALs version   : %s\n", SUNDIALS_VERSION);  
+         SUNDIALS_VERSION
+#else
+         "N/A"
 #endif
+        );  
+  printf("Readline version   : %s\n", 
 #if HAVE_READLINE
-  printf("Readline version   : %s\n", rl_library_version);
+         rl_library_version
+#else
+         "N/A"
 #endif
-    
+        );
+
 #if HAVE_PETSC
   char petscversion[BUFFER_TOKEN_SIZE];
   char petscarch[BUFFER_TOKEN_SIZE];
   
   PetscGetVersion(petscversion, BUFFER_TOKEN_SIZE);
   PetscGetArchType(petscarch, BUFFER_TOKEN_SIZE);
-  printf("PETSc version      : %s\n", petscversion);
+#endif  
+  printf("PETSc version      : %s\n",
+#if HAVE_PETSC
+         petscversion
+#else
+         "N/A"
+#endif      
+        );
+#if HAVE_PETSC
   printf("PETSc arch         : %s\n", petscarch);
   printf("PETSc options      : %s\n", petscconfigureoptions);
-#endif  
+#endif
   
 #ifdef HAVE_SLEPC
   char slepcversion[BUFFER_TOKEN_SIZE];
   SlepcGetVersion(slepcversion, BUFFER_TOKEN_SIZE);  
-  printf("SLEPc version      : %s\n", slepcversion);
 #endif  
+  printf("SLEPc version      : %s\n",
+#if HAVE_SLEPC
+         slepcversion
+#else
+         "N/A"
+#endif
+        );
+
   return;
 }
 
