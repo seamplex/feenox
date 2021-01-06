@@ -2994,6 +2994,10 @@ int feenox_parse_alias(void) {
   }
   
   feenox_call(feenox_define_alias(new_name, existing_object, row, col));
+  
+  free(left);
+  free(keyword);
+  free(right);
       
   return FEENOX_OK;
 }
@@ -3067,6 +3071,12 @@ int feenox_parse_vector(void) {
     feenox_call(feenox_vector_attach_data(name, datas));
   }
 
+  free(name);
+  if (dummy_openpar == NULL) {
+    free(size);
+  }
+  free(function_data);
+    
   return FEENOX_OK;
       
 }
