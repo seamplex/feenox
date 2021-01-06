@@ -174,6 +174,12 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_alias());
       return FEENOX_OK;
       
+///kw+VECTOR+usage VECTOR
+///kw+VECTOR+desc Define a vector.
+    } else if (strcasecmp(token, "VECTOR") == 0) {
+      feenox_call(feenox_parse_vector());
+      return FEENOX_OK;
+      
     }
     
   }
@@ -182,67 +188,9 @@ int feenox_parse_line(void) {
       
 /*
 
-// ---------------------------------------------------------------------      
-///kw+ALIAS+usage ALIAS
-// ---------------------------------------------------------------------
-///kw+VECTOR+usage VECTOR
-///kw+VECTOR+desc Define a vector.
     } else if ((strcasecmp(token, "VECTOR") == 0)) {
 
-      vector_t *vector = NULL;
-      char *vectorname = NULL;
-      function_t *function = NULL;
-      expr_t *size_expr = calloc(1, sizeof(expr_t));
-      expr_t *datas = NULL;
-      int vectorsize = 0;
 
-///kw+VECTOR+usage <name>
-      if (feenox_parser_string(&vectorname) != WASORA_PARSER_OK) {
-        return FEENOX_ERROR;
-      }
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-///kw+VECTOR+usage SIZE <expr>
-        if (strcasecmp(token, "SIZE") == 0) {
-          feenox_call(feenox_parser_expression(size_expr));
-
-///kw+VECTOR+usage [ DATA <expr_1> <expr_2> ... <expr_n> |
-        } else if (strcasecmp(token, "DATA") == 0) {
-                      
-          while ((token = feenox_get_next_token(NULL)) != NULL) {
-            expr_t *data = calloc(1, sizeof(expr_t));
-            feenox_call(feenox_parse_expression(token, data));
-            LL_APPEND(datas, data);
-          }
-
-///kw+VECTOR+usage FUNCTION_DATA <function> ]
-        } else if (strcasecmp(token, "FUNCTION_DATA") == 0) {
-          
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected function name");
-            return FEENOX_ERROR;
-          }
-
-          if ((function = feenox_get_function_ptr(token)) == NULL) {
-            feenox_push_error_message("unknown function '%s'", token);
-            return FEENOX_ERROR;
-          }
-        }
-      }
-
-      // listoooo
-      if ((vector = feenox_define_vector(vectorname, vectorsize, size_expr, datas)) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      // TODO: ya demasiado raro es el API para feenox_define_vector, hacemos esto por afuer
-      if (function != NULL) {
-        vector->function = function;
-      }
-      
-      free(vectorname);
-      return WASORA_PARSER_OK;
 
 // ---------------------------------------------------------------------
 ///kw+VECTOR_SORT+usage VECTOR_SORT
@@ -2985,9 +2933,7 @@ int feenox_parse_variables(void) {
 ///kw+VAR+usage <name_1> [ <name_2> ] ... [ <name_n> ]
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-    if (feenox_define_variable(token) == NULL) {
-      return FEENOX_ERROR;
-    }
+    feenox_call(feenox_define_variable(token));
   }
 
   return FEENOX_OK;
@@ -3050,4 +2996,77 @@ int feenox_parse_alias(void) {
   feenox_call(feenox_define_alias(new_name, existing_object, row, col));
       
   return FEENOX_OK;
+}
+
+int feenox_parse_vector(void) {
+  char *token = NULL;
+  char *name = NULL;
+  char *size = NULL;
+  char *function_data = NULL;
+  expr_t *datas = NULL;
+  char *dummy_openpar = NULL;
+  char *dummy_closepar = NULL;
+
+///kw+VECTOR+detail A new vector of the prescribed size is defined. The size can be an expression which will be
+///kw+VECTOR+detail evaluated the very first time the vector is used and then kept at that constant value.
+  
+///kw+VECTOR+usage <name>
+  feenox_call(feenox_parser_string(&name));
+  
+  // if there are parenthesis, the size is between them
+  if ((dummy_openpar = strchr(name, '(')) != NULL) {
+    if ((dummy_closepar = strchr(name, ')')) == NULL) {
+      feenox_push_error_message("expecting closing parenthesis in expression '%s'", name);
+    }
+    *dummy_openpar = '\0';
+    *dummy_closepar = '\0';
+    size = dummy_openpar+1;
+  }
+
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+VECTOR+usage SIZE <expr>
+    if (strcasecmp(token, "SIZE") == 0) {
+      feenox_call(feenox_parser_string(&size));
+
+///kw+VECTOR+detail If the keyword `FUNCTION_DATA` is given, the elements of the vector will be synchronized
+///kw+VECTOR+detail with the inpedendent values of the function, which should be point-wise defined.
+///kw+VECTOR+detail The sizes of both the function and the vector should match.
+      
+///kw+VECTOR+usage [ FUNCTION_DATA <function> ]
+    } else if (strcasecmp(token, "FUNCTION_DATA") == 0) {
+      feenox_call(feenox_parser_string(&function_data));
+    
+
+///kw+VECTOR+detail All elements will be initialized to zero unless `DATA` is given (which should be the last keyword of the line),
+///kw+VECTOR+detail in which case the expressions will be evaluated the very first time the vector is used
+///kw+VECTOR+detail and assigned to each of the elements.
+///kw+VECTOR+detail If there are less elements than the vector size, the remaining values will be zero.
+///kw+VECTOR+detail If there are more elements than the vector size, the values will be ignored.
+///kw+VECTOR+usage [ DATA <expr_1> <expr_2> ... <expr_n> |
+    } else if (strcasecmp(token, "DATA") == 0) {
+      while ((token = feenox_get_next_token(NULL)) != NULL) {
+        expr_t *data = calloc(1, sizeof(expr_t));
+        feenox_call(feenox_parse_expression(token, data));
+        LL_APPEND(datas, data);
+      }
+    }
+  }
+
+  if (size == NULL) {
+    feenox_push_error_message("vector '%s' does not have a size", name);
+    return FEENOX_ERROR;
+  }
+  
+  feenox_call(feenox_define_vector(name, size));
+  
+  if (function_data != NULL) {
+    feenox_call(feenox_vector_attach_function(name, function_data));
+  }
+  if (datas != NULL) {
+    feenox_call(feenox_vector_attach_data(name, datas));
+  }
+
+  return FEENOX_OK;
+      
 }

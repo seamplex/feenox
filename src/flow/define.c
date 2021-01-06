@@ -103,7 +103,7 @@ void feenox_realloc_matrix_ptr(matrix_t *matrix, double *newptr, int copy_conten
 
 
 // visible through the API
-var_t *feenox_define_variable(const char *name) {
+int feenox_define_variable(const char *name) {
 
   var_t *var;
   
@@ -112,10 +112,10 @@ var_t *feenox_define_variable(const char *name) {
       // the variable already exists, check_name() should have complained
       // so we remove the error and return the existing variable
       feenox_pop_error_message();
-      return var;
+      return FEENOX_OK;
     } else {
       // invalid name
-      return NULL;
+      return FEENOX_ERROR;
     }
   }
 
@@ -126,7 +126,7 @@ var_t *feenox_define_variable(const char *name) {
   var->initial_static = calloc(1, sizeof(double));
   HASH_ADD_KEYPTR(hh, feenox.vars, var->name, strlen(var->name), var);
 
-  return var;
+  return FEENOX_OK;
 }
 
 // visible through the API
@@ -135,7 +135,8 @@ int feenox_define_alias(const char *new_name, const char *existing_object, const
   feenox_call((feenox_check_name(new_name)));
   
   alias_t *alias = calloc(1, sizeof(alias_t));
-  if ((alias->new_variable = feenox_define_variable(new_name)) == NULL) {
+  feenox_call(feenox_define_variable(new_name));
+  if ((alias->new_variable = feenox_get_variable_ptr(new_name)) == NULL) {
     return FEENOX_ERROR;
   }
   
@@ -162,37 +163,61 @@ int feenox_define_alias(const char *new_name, const char *existing_object, const
 }
 
 
-
-/*
-vector_t *feenox_define_vector(char *name, int size, expr_t *size_expr, expr_t *datas) {
+int feenox_define_vector(const char *name, const char *size) {
 
   vector_t *vector;
   char *dummy;
   
-  // como hay cosas que pueden venir de physical names que pueden tener espacios, los
-  // reemplazamos por underscores
+  // since there are names which can come from physical names or some other weird places
+  // we replace spaces with underscores
   while ((dummy = strchr(name, ' ')) != NULL) {
     *dummy = '_';
   }
 
-  if (feenox_check_name(name) != FEENOX_OK) {
-    return NULL;
-  }
+  feenox_call(feenox_check_name(name));
 
   vector = calloc(1, sizeof(vector_t));
   vector->name = strdup(name);
-  vector->size_expr = size_expr;
-  if (size != 0) {
-    vector->size = size;
-  }
-  vector->datas = datas;
+  feenox_call(feenox_parse_expression(size, &vector->size_expr));
 
   HASH_ADD_KEYPTR(hh, feenox.vectors, vector->name, strlen(vector->name), vector);
 
-  return vector;
+  return FEENOX_OK;
 
 }
 
+// API
+int feenox_vector_attach_function(const char *name, const char *function_data) {
+  
+  vector_t *vector;
+  function_t *function;
+  if ((vector = feenox_get_vector_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown vector '%s'", name);
+    return FEENOX_ERROR;
+  }
+  if ((function = feenox_get_function_ptr(function_data)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", function_data);
+    return FEENOX_ERROR;
+  }
+  
+  vector->function = function;
+  
+  return FEENOX_OK;
+}
+
+int feenox_vector_attach_data(const char *name, expr_t *datas) {
+
+  vector_t *vector;
+  if ((vector = feenox_get_vector_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown vector '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  vector->datas = datas;
+
+  return FEENOX_OK;
+}
+/*
 matrix_t *feenox_define_matrix(char *name, int rows, expr_t *rows_expr, int cols, expr_t *cols_expr, expr_t *datas) {
 
   matrix_t *matrix;

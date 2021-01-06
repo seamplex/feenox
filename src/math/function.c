@@ -84,10 +84,11 @@ double feenox_evaluate_factor_function(factor_expr_t *token) {
 */
 
 int feenox_function_init(function_t *this) {
-  
+
+/*  
   int i, j, k;
   int nx, ny, nz;
-  
+*/
   if (this->initialized) {
     return 0;
   }

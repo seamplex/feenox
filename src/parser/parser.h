@@ -78,5 +78,6 @@ extern int feenox_parse_time_path(void);
 extern int feenox_parse_initial_conditions(void);
 extern int feenox_parse_variables(void);
 extern int feenox_parse_alias(void);
+extern int feenox_parse_vector(void);
 
 #endif  

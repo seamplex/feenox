@@ -202,7 +202,7 @@ struct vector_t {
   char *name;
   int initialized;
   
-  expr_t *size_expr;
+  expr_t size_expr;
   int size;
   int constant;
 
@@ -616,8 +616,12 @@ extern int feenox_add_instruction(int (*routine)(void *), void *argument);
 
 // define.c
 extern int feenox_check_name(const char *name);
-extern var_t *feenox_define_variable(const char *name);
+extern int feenox_define_variable(const char *name);
 extern int feenox_define_alias(const char *new_name, const char *existing_object, const char *row, const char *col);
+extern int feenox_define_vector(const char *name, const char *size);
+extern int feenox_vector_attach_function(const char *name, const char *function_data);
+extern int feenox_vector_attach_data(const char *name, expr_t *datas);
+
 extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
 extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
 
