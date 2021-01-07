@@ -125,6 +125,7 @@ typedef struct alias_t alias_t;
 
 typedef struct instruction_t instruction_t;
 
+typedef struct sort_vector_t sort_vector_t;
 typedef struct phase_object_t phase_object_t;
 typedef struct dae_t dae_t;
 
@@ -227,8 +228,8 @@ struct vector_t {
 struct matrix_t {
   char *name;
   int initialized;  
-  expr_t *cols_expr;
-  expr_t *rows_expr;
+  expr_t cols_expr;
+  expr_t rows_expr;
   
   int cols;
   int rows;
@@ -389,6 +390,14 @@ struct instruction_t {
   int argument_alloced;
 
   instruction_t *next;
+};
+
+
+struct sort_vector_t {
+  int descending;
+  
+  vector_t *v1;
+  vector_t *v2;
 };
 
 
@@ -618,9 +627,14 @@ extern int feenox_add_instruction(int (*routine)(void *), void *argument);
 extern int feenox_check_name(const char *name);
 extern int feenox_define_variable(const char *name);
 extern int feenox_define_alias(const char *new_name, const char *existing_object, const char *row, const char *col);
+
 extern int feenox_define_vector(const char *name, const char *size);
 extern int feenox_vector_attach_function(const char *name, const char *function_data);
 extern int feenox_vector_attach_data(const char *name, expr_t *datas);
+
+extern int feenox_define_matrix(const char *name, const char *rows, const char *cols);
+extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
+
 
 extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
 extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
@@ -639,6 +653,7 @@ extern int feenox_matrix_init(matrix_t *this);
 
 // vector.c
 extern int feenox_vector_init(vector_t *this);
+extern int feenox_instruction_sort_vector(void *arg);
 
 // function.c
 extern int feenox_function_init(function_t *this);

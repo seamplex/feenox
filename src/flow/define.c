@@ -162,7 +162,7 @@ int feenox_define_alias(const char *new_name, const char *existing_object, const
   return FEENOX_OK;
 }
 
-
+// API
 int feenox_define_vector(const char *name, const char *size) {
 
   vector_t *vector;
@@ -217,38 +217,38 @@ int feenox_vector_attach_data(const char *name, expr_t *datas) {
 
   return FEENOX_OK;
 }
-/*
-matrix_t *feenox_define_matrix(char *name, int rows, expr_t *rows_expr, int cols, expr_t *cols_expr, expr_t *datas) {
 
-  matrix_t *matrix;
 
-  if (feenox_check_name(name) != FEENOX_OK) {
-      return NULL;
-    }
+// API
+int feenox_define_matrix(const char *name, const char *rows, const char *cols) {
 
-    matrix = calloc(1, sizeof(matrix_t));
-    matrix->name = strdup(name);
-  matrix->rows_expr = rows_expr;
-  matrix->cols_expr = cols_expr;
-  
-  matrix->datas = datas;
+  feenox_call(feenox_check_name(name));
 
-  if (rows != 0 && cols != 0) {
-    matrix->initialized = 1;
-    matrix->rows = rows;
-    matrix->cols = cols;
-    
-    feenox_value_ptr(matrix) = gsl_matrix_calloc(rows, cols);
-    matrix->initial_transient = gsl_matrix_calloc(rows, cols);
-    matrix->initial_static = gsl_matrix_calloc(rows, cols);
-  }
+  matrix_t *matrix = calloc(1, sizeof(matrix_t));
+  matrix->name = strdup(name);
+  feenox_call(feenox_parse_expression(rows, &matrix->rows_expr));
+  feenox_call(feenox_parse_expression(cols, &matrix->cols_expr));
 
   HASH_ADD_KEYPTR(hh, feenox.matrices, matrix->name, strlen(matrix->name), matrix);
 
-  return matrix;
+  return FEENOX_OK;
 
 }
 
+int feenox_matrix_attach_data(const char *name, expr_t *datas) {
+
+  matrix_t *matrix;
+  if ((matrix = feenox_get_matrix_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown matrix '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  matrix->datas = datas;
+
+  return FEENOX_OK;
+}
+
+/*
 // ojo! esto es una mezcla de decisiones de diseno que hay que
 // revisar, porque la idea es que los define_algo tomen como argumento
 // lo que despues se va a meter en la estructura administrativa para

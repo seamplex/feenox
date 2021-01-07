@@ -115,23 +115,21 @@ int feenox_vector_init(vector_t *this) {
 
 }
 
-/*
-int feenox_instruction_vector_sort(void *arg) {
+int feenox_instruction_sort_vector(void *arg) {
   
-  vector_sort_t *vector_sort = (vector_sort_t *)arg;
+  sort_vector_t *sort_vector = (sort_vector_t *)arg;
   
-  if (vector_sort->v2 == NULL)
-    gsl_sort_vector(vector_sort->v1->value);
+  if (sort_vector->v2 == NULL)
+    gsl_sort_vector(sort_vector->v1->value);
   else
-    gsl_sort_vector2(vector_sort->v1->value, vector_sort->v2->value);
+    gsl_sort_vector2(sort_vector->v1->value, sort_vector->v2->value);
   
-  if (vector_sort->descending) {
-    gsl_vector_reverse(vector_sort->v1->value);
+  if (sort_vector->descending) {
+    gsl_vector_reverse(sort_vector->v1->value);
     
-    if (vector_sort->v2 != NULL)
-      gsl_vector_reverse(vector_sort->v2->value);
+    if (sort_vector->v2 != NULL)
+      gsl_vector_reverse(sort_vector->v2->value);
   }
   
   return FEENOX_OK;
 }
-*/

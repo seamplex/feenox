@@ -836,7 +836,7 @@ int feenox_parser_function(function_t **function) {
   
   return FEENOX_OK;
 }
-
+*/
 int feenox_parser_vector(vector_t **vector) {
   
   char *token;
@@ -871,7 +871,7 @@ int feenox_parser_variable(var_t **var) {
   return FEENOX_OK;
 }
 
-*/
+
 int feenox_parser_keywords_ints(char *keyword[], int *value, int *option) {
 
   char *token;

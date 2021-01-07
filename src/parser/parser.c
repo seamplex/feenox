@@ -25,8 +25,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
-
+#if HAVE_SYSCONF
+ #include <unistd.h>
+#endif
 /*
 */
 /*
@@ -50,7 +51,11 @@ int feenox_parse_main_input_file(const char *filepath) {
   
   // check the page size to use a reasonable buffer size
   // we can ask for more if we need
+#if HAVE_SYSCONF
   feenox_parser.page_size = (size_t)sysconf(_SC_PAGESIZE);
+#else  
+  feenox_parser.page_size = 4096;  
+#endif
   feenox_parser.actual_buffer_size = feenox_parser.page_size-64;
   
   feenox_parser.line = malloc(feenox_parser.actual_buffer_size);
@@ -179,6 +184,18 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "VECTOR") == 0) {
       feenox_call(feenox_parse_vector());
       return FEENOX_OK;
+
+///kw+SORT_VECTOR+usage SORT_VECTOR
+///kw+SORT_VECTOR+desc Sort the elements of a vector, optionally making the same rearrangement in another vector.
+    } else if (strcasecmp(token, "SORT_VECTOR") == 0 || strcasecmp(token, "VECTOR_SORT") == 0) {
+      feenox_call(feenox_parse_sort_vector());
+      return FEENOX_OK;
+
+///kw+MATRIX+usage MATRIX
+///kw+MATRIX+desc Define a matrix.
+    } else if (strcasecmp(token, "MATRIX") == 0) {
+      feenox_call(feenox_parse_matrix());
+      return FEENOX_OK;
       
     }
     
@@ -188,90 +205,6 @@ int feenox_parse_line(void) {
       
 /*
 
-    } else if ((strcasecmp(token, "VECTOR") == 0)) {
-
-
-
-// ---------------------------------------------------------------------
-///kw+VECTOR_SORT+usage VECTOR_SORT
-///kw+VECTOR_SORT+desc Sort the elements of a vector using a specific numerical order,
-///kw+VECTOR_SORT+desc potentially making the same rearrangement of another vector.
-    } else if ((strcasecmp(token, "VECTOR_SORT") == 0)) {
-      
-      vector_sort_t *vector_sort = calloc(1, sizeof(vector_sort_t));
-
-///kw+VECTOR_SORT+usage <vector>
-      feenox_call(feenox_parser_vector(&vector_sort->v1));
-      
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        
-///kw+VECTOR_SORT+usage [ ASCENDING_ORDER | DESCENDING_ORDER ]
-        if (strcasecmp(token, "ASCENDING_ORDER") == 0)
-          vector_sort->descending = 0;
-        else if (strcasecmp(token, "DESCENDING_ORDER") == 0)
-          vector_sort->descending = 1;
-        
-///kw+VECTOR_SORT+usage [ <vector> ]
-        else if ((vector_sort->v2 = feenox_get_vector_ptr(token)) != NULL) {
-          continue;
-        } else {
-          feenox_push_error_message("unknown keyword or vector identifier '%s'", token);
-          return FEENOX_ERROR;
-        }
-      }
-      
-      feenox_define_instruction(feenox_instruction_vector_sort, vector_sort);
-      
-      return WASORA_PARSER_OK;
-      
-// ---------------------------------------------------------------------
-///kw+MATRIX+usage MATRIX
-///kw+MATRIX+desc Define a matrix.
-    } else if ((strcasecmp(token, "MATRIX") == 0)) {
-
-      char *matrixname = NULL;
-      expr_t *rows_expr = calloc(1, sizeof(expr_t));
-      expr_t *cols_expr = calloc(1, sizeof(expr_t));
-      expr_t *datas = NULL;
-      int rows = 0;
-      int cols = 0;
-
-///kw+MATRIX+usage <name>
-      if (feenox_parser_string(&matrixname) != WASORA_PARSER_OK) {
-        return FEENOX_ERROR;
-      }
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-///kw+MATRIX+usage ROWS <expr>
-        if (strcasecmp(token, "ROWS") == 0) {
-          feenox_call(feenox_parser_expression(rows_expr));
-          
-///kw+MATRIX+usage COLS <expr>
-        } else if (strcasecmp(token, "COLS") == 0) {
-          feenox_call(feenox_parser_expression(cols_expr));
-        
-///kw+MATRIX+usage [ DATA num_expr_1 num_expr_2 ... num_expr_n ]
-        } else if (strcasecmp(token, "DATA") == 0) {
-
-          while ((token = feenox_get_next_token(NULL)) != NULL) {
-            expr_t *data = calloc(1, sizeof(expr_t));
-            feenox_call(feenox_parse_expression(token, data));
-            LL_APPEND(datas, data);
-          }
-
-        } else {
-          feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_ERROR;
-        }
-      }
-
-      if (feenox_define_matrix(matrixname, rows, rows_expr, cols, cols_expr, datas) == NULL) {
-        return FEENOX_ERROR;
-      }
-      
-      free(matrixname);
-      return WASORA_PARSER_OK;
 
 // ---------------------------------------------------------------------
 ///kw+FUNCTION+usage FUNCTION
@@ -3007,9 +2940,9 @@ int feenox_parse_vector(void) {
   char *name = NULL;
   char *size = NULL;
   char *function_data = NULL;
-  expr_t *datas = NULL;
   char *dummy_openpar = NULL;
   char *dummy_closepar = NULL;
+  expr_t *datas = NULL;
 
 ///kw+VECTOR+detail A new vector of the prescribed size is defined. The size can be an expression which will be
 ///kw+VECTOR+detail evaluated the very first time the vector is used and then kept at that constant value.
@@ -3079,4 +3012,120 @@ int feenox_parse_vector(void) {
     
   return FEENOX_OK;
       
+}
+
+int feenox_parse_matrix(void) {
+  char *token = NULL;
+  char *name = NULL;
+  char *rows = NULL;
+  char *cols = NULL;
+  char *dummy_openpar = NULL;
+  char *dummy_comma = NULL;
+  char *dummy_closepar = NULL;
+  expr_t *datas = NULL;
+
+///kw+MATRIX+detail A new matrix of the prescribed size is defined. The number of rows and columns can be an expression which will be
+///kw+MATRIX+detail evaluated the very first time the matrix is used and then kept at those constant values.
+  
+///kw+MATRIX+usage <name>
+  feenox_call(feenox_parser_string(&name));
+  
+  // if there are parenthesis, the size is between them
+  if ((dummy_openpar = strchr(name, '(')) != NULL) {
+    if ((dummy_comma = strchr(name, ',')) == NULL) {
+      feenox_push_error_message("expecting comma in expression '%s'", name);
+    }
+    if ((dummy_closepar = strchr(name, ')')) == NULL) {
+      feenox_push_error_message("expecting closing parenthesis in expression '%s'", name);
+    }
+    *dummy_openpar = '\0';
+    *dummy_comma = '\0';
+    *dummy_closepar = '\0';
+    rows = dummy_openpar+1;
+    cols = dummy_comma+1;
+  }
+
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+MATRIX+usage ROWS <expr>
+    if (strcasecmp(token, "ROWS") == 0) {
+      feenox_call(feenox_parser_string(&rows));
+///kw+MATRIX+usage COLS <expr>
+    } else if (strcasecmp(token, "COLS") == 0) {
+      feenox_call(feenox_parser_string(&cols));
+
+///kw+MATRIX+detail All elements will be initialized to zero unless `DATA` is given (which should be the last keyword of the line),
+///kw+MATRIX+detail in which case the expressions will be evaluated the very first time the matrix is used
+///kw+MATRIX+detail and row-major-assigned to each of the elements.
+///kw+MATRIX+detail If there are less elements than the matrix size, the remaining values will be zero.
+///kw+MATRIX+detail If there are more elements than the matrix size, the values will be ignored.
+///kw+MATRIX+usage [ DATA <expr_1> <expr_2> ... <expr_n> |
+    } else if (strcasecmp(token, "DATA") == 0) {
+      while ((token = feenox_get_next_token(NULL)) != NULL) {
+        expr_t *data = calloc(1, sizeof(expr_t));
+        feenox_call(feenox_parse_expression(token, data));
+        LL_APPEND(datas, data);
+      }
+    }
+  }
+
+  if (rows == NULL) {
+    feenox_push_error_message("matrix '%s' does not have a row size", name);
+    return FEENOX_ERROR;
+  }
+  if (cols == NULL) {
+    feenox_push_error_message("matrix '%s' does not have a column size", name);
+    return FEENOX_ERROR;
+  }
+  
+  feenox_call(feenox_define_matrix(name, rows, cols));
+  
+  if (datas != NULL) {
+    feenox_call(feenox_matrix_attach_data(name, datas));
+  }
+
+  free(name);
+  if (dummy_openpar == NULL) {
+    free(rows);
+    free(cols);
+  }
+    
+  return FEENOX_OK;
+      
+}
+
+
+int feenox_parse_sort_vector(void) {
+      
+  char *token;
+  sort_vector_t *sort_vector = calloc(1, sizeof(sort_vector_t));
+
+///kw+SORT_VECTOR+usage <vector>
+  feenox_call(feenox_parser_vector(&sort_vector->v1));
+
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+        
+///kw+SORT_VECTOR+detail This instruction sorts the elements of `<vector>` into either ascending or descending numerical order.
+///kw+SORT_VECTOR+detail If `<other_vector>` is given, the same rearrangement is made on it.
+///kw+SORT_VECTOR+detail Default is ascending order.
+    
+///kw+SORT_VECTOR+usage [ ASCENDING | DESCENDING ]
+    if (strcasecmp(token, "ASCENDING") == 0 || strcasecmp(token, "ASCENDING_ORDER") == 0) {
+      sort_vector->descending = 0;
+    } else if (strcasecmp(token, "DESCENDING") == 0 || strcasecmp(token, "DESCENDING_ORDER") == 0) {
+      sort_vector->descending = 1;
+        
+///kw+SORT_VECTOR+usage [ <other_vector> ]
+    } else if ((sort_vector->v2 = feenox_get_vector_ptr(token)) != NULL) {
+      continue;
+    } else {
+      feenox_push_error_message("unknown keyword or vector identifier '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+      
+  feenox_call(feenox_add_instruction(feenox_instruction_sort_vector, sort_vector));
+      
+  return FEENOX_OK;
+        
 }

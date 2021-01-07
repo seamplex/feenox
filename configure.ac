@@ -34,6 +34,9 @@ AS_IF([test "$CFLAGS" = "-g -O2"], [CFLAGS="-O3"])
 AC_SEARCH_LIBS([cos],[m],[],AC_MSG_ERROR([libm not found]))
 AC_CHECK_HEADER([math.h],[],AC_MSG_ERROR([math.h not found]))
 
+# check for sysconf() for page size
+AC_CHECK_FUNCS([sysconf],[],[])
+
 ######################
 # check for GSL (required)
 AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR[libgsl-dev not found])
