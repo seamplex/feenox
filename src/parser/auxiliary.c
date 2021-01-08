@@ -218,11 +218,11 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
         level -= sizeof(operators);
         string++;
       } else {       // +-*/^.
-        // si hay un signo y es el primer termino o el anterior ya es un
-        // operador, entonces el signo forma parte del factor
-        // esto no deberia pasar, para eso rellenamos con ceros al principio
+        // if there is a sign and it is the first factor of the term or
+        // if the previous factor was already an operator then the sign is part of the factor
+        // this should not happen because we already "make up" the expression with (0-xxxx)
         if ((count == 0) || last_one_was_an_operator != 0) {
-          // una constante, variable o funcion
+          // a constant, variable or funcion
           if ((factor = feenox_parse_factor(string)) == NULL) {
             return FEENOX_ERROR;
           }
@@ -252,6 +252,9 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
       }
       LL_APPEND(expr->factors, factor);
       factor->level = level;
+      if (factor->n_chars <= 0) {
+        return FEENOX_ERROR;
+      }
       string += factor->n_chars;
       last_one_was_an_operator = 0;
       count++;
@@ -271,34 +274,33 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
 }
 
 
-// parsea un factor (una constante, una variable o una funcion)
-// y rellena la estructura expr
+// parse a factor (which means a constant, a variable or a function)
 expr_factor_t *feenox_parse_factor(char *string) {
 
   char *backup;
-//  char *argument;
+  char *argument;
   double constant;
-//  int i;
+  int i;
   int n;
-//  int n_arguments;
-//  int n_allocs;
+  int n_arguments;
+  int n_allocs;
   char *token;
   
-/*  
   char *dummy_argument;
 
   var_t *dummy_var = NULL;
   vector_t *dummy_vector = NULL;
   matrix_t *dummy_matrix = NULL;
+/*  
   builtin_function_t *dummy_builtin_function = NULL;
   builtin_vectorfunction_t *dummy_builtin_vectorfunction = NULL;
   builtin_functional_t *dummy_builtin_functional = NULL;
+ */
   function_t *dummy_function = NULL;
-*/  
+
   char *dummy = NULL;
-//  char char_backup = ' ';
+  char char_backup = ' ';
   
-  // estas flags se podrian agrupar en una unica variable y trabajar con mascaras
   int wants_initial_static = 0;
   int wants_initial_transient = 0;
   int got_it = 0;
@@ -308,122 +310,108 @@ expr_factor_t *feenox_parse_factor(char *string) {
   expr_factor_t *factor = calloc(1, sizeof(expr_factor_t));
   
 
-  // o un numero explicito, o un signo explicito o un punto para los yanquis que escriben ".1" en lugar de "0.1"  
+  // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
   if (isdigit((int)(*string)) || *string == '-' || *string == '+' || *string == '.') {
-    // un numerito
-    sscanf(string, "%lf%n", &constant, &n);
+    // a number
+    if (sscanf(string, "%lf%n", &constant, &n) == 0) {
+      return NULL;
+    }
     factor->type = EXPR_CONSTANT;
     factor->constant = constant;
-    factor->n_chars = n;
 
   } else {
-    // letritas
+    // we got letters
     if ((token = strtok(backup, factorseparators)) == NULL || strlen(token) == 0) {
       return NULL;
     }
 
-    // miramos si termina en _0 indicando que es el valor inicial de algo
-    // y le sacamos el pedazo
+    // if the name ends in _0 it means the user wants the initial value
     if (feenox_ends_in_zero(token) != NULL) {
       dummy = feenox_ends_in_zero(token);
       wants_initial_transient = 1;
       *dummy = '\0';
     }
 
-    // miramos si termina en _init indicando que es el valor inicial de algo
-    // y le sacamos el pedazo
-    // si pusiesemos if (dummy = feenox_ends_in_init) y el chabon devuelve null, rompemos
-    //   el dummy que nos devolvio el feenox_ends_in_zero de arribenio!! muy sutil...
+    // same for _init
+    // if we put if (dummy = feenox_ends_in_init) and the guy returns null we break
+    // the dummy the the feenox_ends_in_zero() got us
     if (feenox_ends_in_init(token) != NULL) {
       dummy = feenox_ends_in_init(token);
       wants_initial_static = 1;
       *dummy = '\0';
     }
 
-    // MOMENTO! no vale pedir combinaciones!
+    // cannot ask for both
     if (wants_initial_transient && wants_initial_static) {
       feenox_push_error_message("cannot ask for both _0 and _init");
       return NULL;
     }
     
-    // matriz, vector o variable
-/*    
+    // matrix, vector or variable
     if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
       got_it = 1;
-      if (factor != NULL) {
-        factor->matrix = dummy_matrix;
-        factor->type = EXPR_MATRIX;
-      }
+      factor->matrix = dummy_matrix;
+      factor->type = EXPR_MATRIX;
     } else if ((dummy_vector = feenox_get_vector_ptr(token)) != NULL) {
       got_it = 1;
-      if (factor != NULL) {
-        factor->vector = dummy_vector;
-        factor->type = EXPR_VECTOR;
-      }
+      factor->vector = dummy_vector;
+      factor->type = EXPR_VECTOR;
     } else if ((dummy_var = feenox_get_variable_ptr(token)) != NULL) {
-      // verificamos que a las variables no quieran pasarles argumentos
+      // check that variables don't need arguments
       if (string[strlen(token)] == '(') {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
         free(backup);
-        return FEENOX_ERROR;
+        return NULL;
       }
       got_it = 1;
-      if (factor != NULL) {
-        factor->variable = dummy_var;
-        factor->type = EXPR_VARIABLE;
-      }
+      factor->variable = dummy_var;
+      factor->type = EXPR_VARIABLE;
     }
-*/
+
     if (got_it) {
       n = strlen(token);
       if (wants_initial_transient) {
         n += 2;
-        if (factor != NULL) {
-          factor->type |= EXPR_INITIAL_TRANSIENT;
-        }
+        factor->type |= EXPR_INITIAL_TRANSIENT;
       } else if (wants_initial_static) {
         n += 5;
-        if (factor != NULL) {
-          factor->type |= EXPR_INITIAL_STATIC;
-        }
+        factor->type |= EXPR_INITIAL_STATIC;
       }
-      // le volvemos a poner el underscore
+      // put the underscore back
       if (wants_initial_transient || wants_initial_static)  {
         *dummy = '_';
       }
     }
 
-/*    
     if (dummy_matrix != NULL || dummy_vector != NULL ||
-        (dummy_builtin_function = feenox_get_builtin_function_ptr(token)) != NULL ||
-        (dummy_builtin_vectorfunction = feenox_get_builtin_vectorfunction_ptr(token)) != NULL ||
-        (dummy_builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL || 
+//        (dummy_builtin_function = feenox_get_builtin_function_ptr(token)) != NULL ||
+//        (dummy_builtin_vectorfunction = feenox_get_builtin_vectorfunction_ptr(token)) != NULL ||
+//        (dummy_builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL || 
         (dummy_function = feenox_get_function_ptr(token)) != NULL) {
 
       int level;
       
       got_it = 1;
 
-      // copiamos en argument lo que esta inmediatamente despues del nombre
+      // copy into argument whatever is after the name
       argument = strdup(string+strlen(token));
 
-      // los argumentos tienen que estar entre parentesis
+      // arguments have to be in parenthesis
       if (argument[0] != '(') {
         feenox_push_error_message("expected parenthesis after '%s'", token);
         free(argument);
         free(backup);
-        return FEENOX_ERROR;
+        return NULL;
       }
 
-      // contamos cuantos argumentos hay, teniendo en cuenta posibles
-      // parentesis dentro de los argumentos
+      // count how many arguments are there
       if ((n_arguments = feenox_count_arguments(argument)) <= 0) {
         free(argument);
         free(backup);
-        return FEENOX_ERROR;
+        return NULL;
       }
 
-      // n es la cantidad de caracteres que vamos a parsear
+      // n is the number of characters to parse
       n = strlen(token)+strlen(argument);
 
       if (factor != NULL) {
@@ -433,7 +421,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("vector '%s' takes exactly one subindex expression", dummy_vector->name);
             free(argument);
             free(backup);
-            return FEENOX_ERROR;
+            return NULL;
           }
           n_allocs = 1;
         } else if (dummy_matrix != NULL) {
@@ -441,9 +429,10 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("matrix '%s' takes exactly two subindex expressions", dummy_matrix->name);
             free(argument);
             free(backup);
-            return FEENOX_ERROR;
+            return NULL;
           }
           n_allocs = 2;
+/*          
         } else if (dummy_builtin_function != NULL) {
 
           // tenemos una funcion interna
@@ -507,7 +496,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
           }
 
           n_allocs = factor->builtin_functional->max_arguments;
-
+*/
         } else if (dummy_function != NULL) {
 
           // tenemos una funcion del input
@@ -518,7 +507,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, factor->function->n_arguments, (factor->function->n_arguments==1)?"":"s", n_arguments);
             free(argument);
             free(backup);
-            return FEENOX_ERROR;
+            return NULL;
           }
 
           n_allocs = factor->function->n_arguments;
@@ -526,7 +515,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
         } else {
           free(backup);
           free(argument);
-          return FEENOX_ERROR;
+          return NULL;
         }
 
         if (factor->type != EXPR_BUILTIN_VECTORFUNCTION) {
@@ -543,7 +532,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
             if (feenox_parse_expression(argument, &factor->arg[0]) != 0) {
               free(argument);
               free(backup);
-              return FEENOX_ERROR;
+              return NULL;
             }
           } else if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
             // le sacamos los parentesis
@@ -552,7 +541,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
               feenox_push_error_message("undefined vector '%s'", &argument[1]);
               free(argument);
               free(backup);
-              return FEENOX_ERROR;
+              return NULL;
             }
           }
 
@@ -581,7 +570,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
                 } else if (*dummy == '\0') {
                   free(argument);
                   free(backup);
-                  return FEENOX_ERROR;
+                  return NULL;
                 }
                 dummy++;
               }
@@ -596,7 +585,6 @@ expr_factor_t *feenox_parse_factor(char *string) {
 
             // en dummy_argument tenemos el argumento i-esimo
             // entre parentesis
-
             if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
               
               // le sacamos los parentesis
@@ -605,7 +593,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
                 feenox_push_error_message("undefined vector '%s'", &dummy_argument[1]);
                 free(argument);
                 free(backup);
-                return FEENOX_ERROR;
+                return NULL;
               }
               
             } else if (factor->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
@@ -615,13 +603,13 @@ expr_factor_t *feenox_parse_factor(char *string) {
               if ((factor->functional_var_arg = feenox_get_variable_ptr(dummy_argument+1)) == NULL) {
                 free(argument);
                 free(backup);
-                return FEENOX_ERROR;
+                return NULL;
               }
             } else {
               if (feenox_parse_expression(dummy_argument, &factor->arg[i]) != 0) {
                 free(argument);
                 free(backup);
-                return FEENOX_ERROR;
+                return NULL;
               }
             }
 
@@ -637,7 +625,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
       free(argument);
       
     } 
-*/
+
     if (got_it == 0) {
       feenox_push_error_message("unknown symbol '%s'", token);
       free(backup);
@@ -646,6 +634,7 @@ expr_factor_t *feenox_parse_factor(char *string) {
   }
 
   free(backup);
+  factor->n_chars = n;
 
   return factor;
 
@@ -1227,14 +1216,13 @@ int feenox_count_arguments(char *string) {
   int level;
   char *dummy;
 
-  // los argumentos tienen que estar entre parentesis
+  // arguments have to be inside parenthesis
   if (string[0] != '(') {
     feenox_push_error_message("expected arguments for function");
-    return FEENOX_ERROR;
+    return -1;
   }
 
-  // contamos cuantos argumentos hay, teniendo en cuenta posibles
-  // parentesis dentro de los argumentos 
+  // count how many arguments are there (take into account nested parenthesis)
   dummy = string+1;
   level = 1;
   n_arguments = 1;
@@ -1245,7 +1233,7 @@ int feenox_count_arguments(char *string) {
       level--;
     } else if (*dummy == '\0') {
       feenox_push_error_message("argument list needs to be closed with ')'");
-      return FEENOX_ERROR;
+      return -1;
     }
     if (*dummy == ',' && level == 1) {
       n_arguments++;
@@ -1255,6 +1243,87 @@ int feenox_count_arguments(char *string) {
   *dummy = '\0';
   
   return n_arguments;
+}
+
+int feenox_read_arguments(char *string, int n_arguments, char ***arg_name) {
+ 
+  char *dummy;
+  char *dummy_openpar = NULL;
+  char *dummy_closepar = NULL;
+  char char_backup;
+  
+  if ((dummy_openpar = strchr(string, '(')) == NULL) {
+    feenox_push_error_message("arguments must start with a parenthesis");
+    return FEENOX_ERROR;
+  }
+  *dummy_openpar = '\0';
+
+  if (((*arg_name) = calloc(n_arguments, sizeof(char *))) == NULL) {
+    feenox_push_error_message("calloc() failed");
+    return FEENOX_ERROR;
+  }
+  
+  if (n_arguments == 1) {
+    
+    // if there's a single argument, that's easy
+    *arg_name[0] = strdup(string+1);
+    if ((dummy_closepar = strchr(*arg_name[0], ')')) == NULL) {
+      feenox_push_error_message("expected ')' after function name (no spaces allowed)");
+      return FEENOX_ERROR;
+    }
+    *dummy_closepar = '\0';
+
+  } else {
+    
+    // otherwise one at a time
+    int i;
+    int level;
+    
+    for (i = 0; i < n_arguments; i++) {
+      if (i != n_arguments-1) {
+
+        // if we are not on the last argument, we need to put a ")\0" where it ends
+        level = 1;
+        dummy = string+1;
+        while (1) {
+          if (*dummy == ',' && level == 1) {
+            break;
+          }
+          if (*dummy == '(') {
+            level++;
+          } else if (*dummy == ')') {
+            level--;
+          } else if (*dummy == '\0') {
+            feenox_push_error_message("when parsing arguments");
+            return FEENOX_ERROR;
+          }
+          dummy++;
+        }
+
+        // put a '\0' after dummy but make a backup of what there was there
+        char_backup = *dummy;
+        *dummy = '\0';
+        
+      } else {
+
+        // strip the final ')'
+        *(dummy+strlen(dummy)-1) = '\0';
+
+      }
+
+
+      // en dummy_argument+1 tenemos el argumento i-esimo
+      (*arg_name)[i] = strdup(string+1);
+
+
+      if (i != n_arguments-1) {
+        *(dummy) = char_backup;
+        string = dummy;
+      }
+    }
+  }  
+  
+  return FEENOX_OK;
 }
 
 /*

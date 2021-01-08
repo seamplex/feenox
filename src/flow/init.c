@@ -109,7 +109,8 @@ int feenox_initialize(int argc, char **argv) {
   feenox.main_input_filepath = feenox.argv[feenox.optind];
   
   // remember the base directory of the input file so we can try harder to find files
-  feenox.main_input_dirname = dirname(strdup(argv[feenox.optind]));
+  char *argv_optind = strdup(argv[feenox.optind]);
+  feenox.main_input_dirname = dirname(argv_optind);
   
   
   // turn of GSL error handler
@@ -122,6 +123,7 @@ int feenox_initialize(int argc, char **argv) {
   
   feenox_call(feenox_init_special_objects());
   feenox_call(feenox_parse_main_input_file(feenox.main_input_filepath));
+  free(argv_optind);
   
   return FEENOX_OK;
 }

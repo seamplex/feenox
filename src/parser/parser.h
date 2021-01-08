@@ -61,7 +61,8 @@ extern int feenox_parser_expression_in_string(double *result);
 extern int feenox_parse_madeup_expression(char *string, expr_t *expr);
 extern expr_factor_t *feenox_parse_factor(char *string);
 extern int feenox_parser_string(char **string);
-
+extern int feenox_count_arguments(char *string);
+extern int feenox_read_arguments(char *string, int n_arguments, char ***arg_name);
 
 extern char *feenox_ends_in_init(char *name);
 extern char *feenox_ends_in_zero(char *name);
@@ -69,7 +70,6 @@ extern char *feenox_ends_in_zero(char *name);
 extern int feenox_parser_vector(vector_t **vector);
 extern int feenox_parser_variable(var_t **var);
 extern int feenox_parser_keywords_ints(char *keyword[], int *value, int *option);
-
 
 
 extern int feenox_parse_include(void);
@@ -82,6 +82,7 @@ extern int feenox_parse_variables(void);
 extern int feenox_parse_alias(void);
 extern int feenox_parse_vector(void);
 extern int feenox_parse_matrix(void);
+extern int feenox_parse_function(void);
 
 extern int feenox_parse_sort_vector(void);
 

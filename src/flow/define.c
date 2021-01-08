@@ -248,32 +248,72 @@ int feenox_matrix_attach_data(const char *name, expr_t *datas) {
   return FEENOX_OK;
 }
 
-/*
-// ojo! esto es una mezcla de decisiones de diseno que hay que
-// revisar, porque la idea es que los define_algo tomen como argumento
-// lo que despues se va a meter en la estructura administrativa para
-// que los callers no tengan por que saber que hay adentro de las
-// estructuras. Pero esta es tan complicada que no conviene pedir
-// cualquier cosa que se pueda meter adentro por argumento, asi que
-// pedimos solamente el nombre y la cantidad de argumentos y que el caller
-// rellene lo que le falta de la estrutura que devuelve el define_function
-function_t *feenox_define_function(const char *name, int n_arguments) {
-
+int feenox_define_function(const char *name, int n_arguments) {
+  
   function_t *function;
 
-  if (feenox_check_name(name) != FEENOX_OK) {
-    return NULL;
-  }
+  feenox_call(feenox_check_name(name));
 
   function = calloc(1, sizeof(function_t));
   function->name = strdup(name);
   function->n_arguments = n_arguments;
-
+  
+  function->var_argument = calloc(n_arguments, sizeof(var_t *));
+  function->var_argument_allocated = 1;
+  function->column = calloc((n_arguments+1), sizeof(int));
+  
+  // default columns
+  int i;
+  for (i = 0; i < n_arguments+1; i++) {
+    function->column[i] = i+1;
+  }
+  
   HASH_ADD_KEYPTR(hh, feenox.functions, function->name, strlen(function->name), function);
 
-  return function;
+  return FEENOX_OK;
 }
 
+int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name) {
+  
+  function_t *function;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  if (i < 0) {
+    feenox_push_error_message("negative argument number '%d'", i);
+    return FEENOX_ERROR;
+  }
+  if (i >= function->n_arguments) {
+    feenox_push_error_message("argument number '%d' greater or equal than the number of arguments '%d' (they start from zero)", i, function->n_arguments);
+    return FEENOX_ERROR;
+  }
+  
+  if ((function->var_argument[i] = feenox_get_or_define_variable_ptr(variable_name)) == NULL) {
+    return FEENOX_ERROR;
+  }
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_function_set_expression(const char *name, const char *expression) {
+  
+  function_t *function;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  function->type = function_type_algebraic;
+  feenox_call(feenox_parse_expression(expression, &function->algebraic_expression));  
+  
+  return FEENOX_OK;
+}
+
+
+/*
 file_t *feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *mode, int do_not_open) {
 
   file_t *file;
@@ -329,18 +369,19 @@ loadable_routine_t *feenox_define_loadable_routine(char *name, void *library) {
   return loadable_routine;
 }
 
+*/
+var_t *feenox_get_or_define_variable_ptr(const char *name) {
+  var_t *var;
 
-var_t *feenox_get_or_define_variable_ptr(char *name) {
-  var_t *dummy;
-
-  if ((dummy = feenox_get_variable_ptr(name)) == NULL) {
-    return feenox_define_variable(name);
+  if ((var = feenox_get_variable_ptr(name)) == NULL) {
+    if (feenox_define_variable(name) != FEENOX_OK) {
+      return NULL;
+    }
+    var = feenox_get_variable_ptr(name);
   }
 
-  return dummy;
+  return var;
 }
-
-*/
   
 // check if an object name is valid and is available for further usage
 int feenox_check_name(const char *name) {

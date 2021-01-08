@@ -84,7 +84,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       if (strcmp(filepath, feenox.argv[feenox.optind]) == 0) {
         feenox_push_error_message("input file '%s' could not be opened: %s", filepath, strerror(errno));
       } else {
-        feenox_push_error_message("included file '%s' could not be opened: % ", filepath, strerror(errno));
+        feenox_push_error_message("included file '%s' could not be opened: %s", filepath, strerror(errno));
       }
       return FEENOX_ERROR;
     }  
@@ -197,6 +197,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_matrix());
       return FEENOX_OK;
       
+///kw+FUNCTION+usage FUNCTION
+///kw+FUNCTION+desc Define a function of one or more variables.
+    } else if (strcasecmp(token, "FUNCTION") == 0) {
+ // || ((dummy = strchr(feenox_parser.line, '=')) != NULL && *(dummy-1) == ':')      
+      feenox_call(feenox_parse_function());
+      return FEENOX_OK;
+      
     }
     
   }
@@ -206,694 +213,86 @@ int feenox_parse_line(void) {
 /*
 
 
-// ---------------------------------------------------------------------
-///kw+FUNCTION+usage FUNCTION
-///kw+FUNCTION+desc Define a function of one or more variables.
-    } else if (strcasecmp(token, "FUNCTION") == 0 || ((dummy = strchr(feenox.line, '=')) != NULL && *(dummy-1) == ':')) {
-
-      function_t *function = NULL;
-      char *argument = NULL;
-      char *dummy_argument = NULL;
-      char **arg_name = NULL;
-      char *backup1 = NULL;
-      char *backup2 = NULL;
-      char char_backup = 0;
-      int level, nargs;
-
-///kw+FUNCTION+usage <name>(<var_1>[,var2,...,var_n])
-///kw+FUNCTION+detail The number of variables $n$ is given by the number of arguments given between parenthesis after the function name.
-///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined as variables.
-      // si nos dieron el keyword FUNCTION tenemos que hacer un feenox_get_next_token
-      // para obtener el nombre de la funcion, sino ya esta en token
-      if (strcasecmp(token, "FUNCTION") == 0) {
-        if ((token = feenox_get_next_token(NULL)) == NULL) {
-          feenox_push_error_message("expected function name");
-          return FEENOX_ERROR;
-        }
-      }
-
-      // parseamos los argumentos
-      if ((dummy = strchr(token, '(')) == NULL) {
-        feenox_push_error_message("expected opening parenthesis '(' after function name '%s' (no spaces allowed)", token);
-        return FEENOX_ERROR;
-      }
-
-      argument = strdup(dummy);
-      feenox_strip_blanks(argument);
-
-      if ((nargs = feenox_count_arguments(argument)) <= 0) {
-        return FEENOX_ERROR;
-      }
-
-      dummy = strchr(token, '(');
-      *dummy = '\0';
-
-      if ((function = feenox_define_function(token, nargs)) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      arg_name = calloc(nargs, sizeof(char *));
-      function->var_argument = calloc(nargs, sizeof(var_t *));
-      function->var_argument_alloced = 1;
-      function->column = calloc((nargs+1), sizeof(int));
-      // por default ponemos en las columnas 1 2 3 4 ...
-      for (i = 0; i < nargs+1; i++) {
-        function->column[i] = i+1;
-      }
-
-
-
-      if (nargs == 1) {
-        // si la funcion toma un solo argumento es facil
-        arg_name[0] = strdup(argument+1);
-        if ((dummy = strchr(arg_name[0], ')')) == NULL) {
-          feenox_push_error_message("expected ')' after function name (no spaces allowed)");
-          return FEENOX_ERROR;
-        }
-        *dummy = '\0';
-
-      } else {
-
-        // si la funcion toma mas argumentos tenemos que buscarlos de a uno
-
-        // si incrementamos argument despues no podemos hacer free, asi
-        // que tenemos un apuntador dummy para argument
-        dummy_argument = argument;
-
-        for (i = 0; i < nargs; i++) {
-          if (i != nargs-1) {
-
-            // si no estamos en el ultimo argumento, tenemos que
-            // poner un ")\0" donde termina el argumento
-            level = 1;
-            dummy = dummy_argument+1;
-            while (1) {
-              if (*dummy == ',' && level == 1) {
-                break;
-              }
-              if (*dummy == '(') {
-                level++;
-              } else if (*dummy == ')') {
-                level--;
-              } else if (*dummy == '\0') {
-                feenox_push_error_message("when parsing arguments");
-                return FEENOX_ERROR;
-              }
-              dummy++;
-            }
-
-            // ponemos un \0 despues de dummy, pero necesitamos despues
-            // restaurar el caracter que habia ahi
-            char_backup = *(dummy);
-            *(dummy) = '\0';
-          } else {
-
-            // le sacamos el ) final
-            dummy[strlen(dummy)-1] = '\0';
-
-          }
-
-
-          // en dummy_argument+1 tenemos el argumento i-esimo
-          arg_name[i] = strdup(dummy_argument+1);
-
-
-          if (i != nargs-1) {
-            *(dummy) = char_backup;
-            dummy_argument = dummy;
-          }
-        }
-      }
-      free(argument);
-
-
-      // linkeamos los argumentos a las variables correctas
-      for (i = 0; i < nargs; i++) {
-        if ((function->var_argument[i] = feenox_get_or_define_variable_ptr(arg_name[i])) == NULL) {
-          return FEENOX_ERROR;
-        }
-      }
-
-
-      while ((token = feenox_get_next_token(NULL)) != NULL && strcasecmp(token, "DATA") != 0) {
-///kw+FUNCTION+usage {
-///kw+FUNCTION+usage [ = <expr> |
-///kw+FUNCTION+detail If the function is given as an algebraic expression, the short-hand operator `:=` can be used.
-///kw+FUNCTION+detail That is to say, `FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`.
-        
-        if (strcasecmp(token, "=") == 0 || strcasecmp(token, ":=") == 0) {
-
-          function->type = type_algebraic;
-
-          // todo lo que sigue al ':=' o al '=' deberia ser la expresion
-          // no funciona el ()?:
-//          dummy = token + (token[0] == ':')? 3 : 2;
-          if (token[0] == ':') {
-            dummy = token + 3;
-          } else {
-            dummy = token + 2;
-          }
-
-          feenox_call(feenox_parse_expression(dummy, &function->algebraic_expression));
-
-          // terminamos con esta linea
-          break;
-
-///kw+FUNCTION+usage FILE_PATH <file_path> |
-        } else if (strcasecmp(token, "FILE_PATH") == 0) {
-///kw+FUNCTION+detail If a `FILE_PATH` is given, an ASCII file containing at least $n+1$ columns is expected.
-///kw+FUNCTION+detail By default, the first $n$ columns are the values of the arguments and the last column is the value of the function at those points.
-///kw+FUNCTION+detail The order of the columns can be changed with the keyword `COLUMNS`, which expects $n+1$ expressions corresponding to the column numbers.
-          
-          // TODO: poder pedir que se refresquen los datos en cada paso
-          function->type = type_pointwise_file;
-          feenox_parser_string(&function->data_file);
-
-///kw+FUNCTION+usage ROUTINE <name> |
-        } else if (strcasecmp(token, "ROUTINE") == 0) {
-///kw+FUNCTION+detail A function of type `ROUTINE` calls an already-defined user-provided routine using the `CALL` keyword and passes the values of the variables in each required evaluation as a `double *` argument.
-
-          function->type = type_routine;
-
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected routine name");
-            return FEENOX_ERROR;
-          }
-
-          if ((function->routine = feenox_get_routine_ptr(token)) == NULL) {
-            feenox_push_error_message("undefined routine '%s'", token);
-            return FEENOX_ERROR;
-          }
-
-///kw+FUNCTION+usage | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } |
-///kw+FUNCTION+detail If `MESH` is given, the definition points are the nodes or the cells of the mesh.
-///kw+FUNCTION+detail The function arguments should be $(x)$, $(x,y)$ or $(x,y,z)$ matching the dimension the mesh.
-///kw+FUNCTION+detail If the keyword `DATA` is used, a new empty vector of the appropriate size is defined.
-///kw+FUNCTION+detail The elements of this new vector can be assigned to the values of the function at the $i$-th node or cell.
-///kw+FUNCTION+detail If the keyword `VECTOR` is used, the values of the dependent variable are taken to be the values of the already-existing vector.
-///kw+FUNCTION+detail Note that this vector should have the size of the number of nodes or cells the mesh has, depending on whether `NODES` or `CELLS` is given.
-          
-        } else if (strcasecmp(token, "MESH") == 0) {
-
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected mesh name");
-            return FEENOX_ERROR;
-          }
-
-          if ((function->mesh = feenox_get_mesh_ptr(token)) == NULL) {
-            feenox_push_error_message("undefined mesh '%s'", token);
-            return FEENOX_ERROR;
-          }
-          
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected keyword DATA or VECTOR");
-            return FEENOX_ERROR;
-          }
-
-          if (strcasecmp(token, "DATA") == 0) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected data name");
-              return FEENOX_ERROR;
-            }
-            if ((function->vector_value = feenox_define_vector(token, 0, NULL, NULL)) == NULL) {
-              return FEENOX_ERROR;
-            }
-          } else if (strcasecmp(token, "VECTOR") == 0) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected vector name");
-              return FEENOX_ERROR;
-            }
-            if ((function->vector_value = feenox_define_vector(token, 0, NULL, NULL)) == NULL) {
-              return FEENOX_ERROR;
-            }
-          } else {
-            feenox_push_error_message("expected keyword DATA or VECTOR instead of '%s'", token);
-            return FEENOX_ERROR;
-          }
-          
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected either NODES or CELLS");
-            return FEENOX_ERROR;
-          }
-          if (strcasecmp(token, "NODES") == 0) {
-            function->type = type_pointwise_mesh_node;
-          } else if (strcasecmp(token, "CELLS") == 0) {
-            function->type = type_pointwise_mesh_cell;
-          } else {
-            feenox_push_error_message("expected either NODES or CELLS instead of '%s'", token);
-            return FEENOX_ERROR;
-          }
-          
-          
-          if (function->var_argument[0] != feenox_mesh.vars.x) {
-            feenox_push_error_message("first argument of function '%s' should be 'x'", function->name);
-            return FEENOX_ERROR;
-          }
-          if (function->n_arguments > 1 && function->var_argument[1] != feenox_mesh.vars.y) {
-            feenox_push_error_message("second argument of function '%s' should be 'y'", function->name);
-            return FEENOX_ERROR;
-          }
-          if (function->n_arguments > 2 && function->var_argument[2] != feenox_mesh.vars.z) {
-            feenox_push_error_message("third argument of function '%s' should be 'z'", function->name);
-            return FEENOX_ERROR;
-          }
-          if (function->n_arguments > 3) {
-            feenox_push_error_message("function '%s' cannot be MESH and have more than 3 arguments", function->name);
-            return FEENOX_ERROR;
-          }
-          
-///kw+FUNCTION+usage [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ]
-///kw+FUNCTION+usage }
-///kw+FUNCTION+detail If `VECTOR_DATA` is given, a set of $n+1$ vectors of the same size is expected.
-///kw+FUNCTION+detail The first $n+1$ correspond to the arguments and the last one is the function value.
-          
-        } else if (strcasecmp(token, "VECTOR_DATA") == 0 || strcasecmp(token, "VECTORS") == 0) {
-
-          function->type = type_pointwise_vector;
-          function->vector_argument = calloc(nargs, sizeof(vector_t *));
-          function->data_argument = calloc(nargs, sizeof(double *));
-          function->data_size = 0;
-
-          for (i = 0; i < nargs; i++) {
-            if (feenox_parser_vector(&function->vector_argument[i]) != WASORA_PARSER_OK) {
-              return FEENOX_ERROR;
-            }
-          }
-
-          if (feenox_parser_vector(&function->vector_value) != WASORA_PARSER_OK) {
-            return FEENOX_ERROR;
-          }
-
-
-///kw+FUNCTION+usage [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ]
-        } else if (strcasecmp(token, "COLUMNS") == 0) {
-
-          if (nargs == 0) {
-            feenox_push_error_message("number of arguments is equal to zero");
-            return FEENOX_ERROR;
-          }
-
-          for (i = 0; i < nargs+1; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected %d columns specifications", nargs);
-              return FEENOX_ERROR;
-            }
-            function->column[i] = (int)(feenox_evaluate_expression_in_string(token));
-
-          }
-
-///kw+FUNCTION+usage [ INTERPOLATION
-///kw+FUNCTION+detail Interpolation schemes can be given for either one or multi-dimensional functions with `INTERPOLATION`.
-        } else if (strcasecmp(token, "INTERPOLATION") == 0) {
-
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected interpolation method");
-            return FEENOX_ERROR;
-          }
-          
-///kw+FUNCTION+detail Available schemes for $n=1$ are:
-///kw+FUNCTION+detail @
-///kw+FUNCTION+usage {
-///kw+FUNCTION+usage linear |
-///kw+FUNCTION+detail  * linear
-          if (strcasecmp(token, "linear") == 0) {
-            function->interp_type = *gsl_interp_linear;
-///kw+FUNCTION+usage polynomial |
-///kw+FUNCTION+detail  * polynomial, the grade is equal to the number of data minus one
-          } else if (strcasecmp(token, "polynomial") == 0) {
-            function->interp_type = *gsl_interp_polynomial;
-///kw+FUNCTION+usage spline |
-///kw+FUNCTION+detail  * spline, cubic (needs at least 3 points)
-          } else if (strcasecmp(token, "spline") == 0 || strcasecmp(token, "cspline") == 0 || strcasecmp(token, "splines") == 0) {
-            function->interp_type = *gsl_interp_cspline;
-///kw+FUNCTION+usage spline_periodic |
-///kw+FUNCTION+detail  * spline_periodic 
-          } else if (strcasecmp(token, "spline_periodic") == 0 || strcasecmp(token, "cspline_periodic") == 0 || strcasecmp(token, "splines_periodic") == 0) {
-            function->interp_type = *gsl_interp_cspline_periodic;
-///kw+FUNCTION+usage akima |
-///kw+FUNCTION+detail  * akima (needs at least 5 points)
-          } else if (strcasecmp(token, "akima") == 0) {
-            function->interp_type = *gsl_interp_akima;
-///kw+FUNCTION+usage akima_periodic |
-///kw+FUNCTION+detail  * akima_periodic (needs at least 5 points)
-          } else if (strcasecmp(token, "akima_periodic") == 0) {
-            function->interp_type = *gsl_interp_akima_periodic;
-            
-///kw+FUNCTION+usage steffen |
-///kw+FUNCTION+detail  * steffen, always-monotonic splines-like (available only with GSL >= 2.0)
-          } else if (strcasecmp(token, "steffen") == 0) {
-#if (GSL_MAJOR_VERSION < 2)  
-//            feenox_push_error_message("inerpolation steffen is available only for GSL >= 2.0, you have version %s", GSL_VERSION);
-            function->interp_type = *gsl_interp_linear;
-#else
-            function->interp_type = *gsl_interp_steffen;
-#endif
-///kw+FUNCTION+detail @ 
-///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
-///kw+FUNCTION+detail @ 
-///kw+FUNCTION+detail Available schemes for $n>1$ are:
-///kw+FUNCTION+detail @
-///kw+FUNCTION+usage nearest |
-///kw+FUNCTION+detail  * nearest, $f(\vec{x})$ is equal to the value of the closest definition point
-          } else if (strcasecmp(token, "nearest") == 0) {
-            function->multidim_interp = nearest;
-///kw+FUNCTION+usage shepard |
-///kw+FUNCTION+detail  * shepard, [inverse distance weighted average definition points](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting) (might lead to inefficient evaluation)
-          } else if (strcasecmp(token, "shepard") == 0) {
-            function->multidim_interp = shepard;
-///kw+FUNCTION+usage shepard_kd |
-///kw+FUNCTION+detail  * shepard_kd, [average of definition points within a kd-tree](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
-          } else if (strcasecmp(token, "shepard_kd") == 0 || strcasecmp(token, "modified_shepard") == 0) {
-            function->multidim_interp = shepard_kd;
-///kw+FUNCTION+usage bilinear
-///kw+FUNCTION+detail  * bilinear, only available if the definition points configure an structured hypercube-like grid. If $n>3$, `SIZES` should be given.
-          } else if (strcasecmp(token, "bilinear") == 0 || strcasecmp(token, "rectangle") == 0 || strcasecmp(token, "rectangular") == 0) {
-            function->multidim_interp = bilinear;
-///kw+FUNCTION+usage } ]
-          } else {
-            feenox_push_error_message("undefined interpolation method '%s'", token);
-            return FEENOX_ERROR;
-          }
-///kw+FUNCTION+detail @
-
-///kw+FUNCTION+usage [ INTERPOLATION_THRESHOLD <expr> ]
-///kw+FUNCTION+detail For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.
-///kw+FUNCTION+detail Default value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`.
-        } else if (strcasecmp(token, "INTERPOLATION_THRESHOLD") == 0) {
-
-           feenox_parser_expression(&function->expr_multidim_threshold);
-           
-///kw+FUNCTION+usage [ SHEPARD_RADIUS <expr> ]
-///kw+FUNCTION+detail The initial radius of points to take into account in `shepard_kd` is given by `SHEPARD_RADIUS`. If no points are found, the radius is double until at least one definition point is found.
-///kw+FUNCTION+detail The radius is doubled until at least one point is found.
-///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_RADIUS`.
-        } else if (strcasecmp(token, "SHEPARD_RADIUS") == 0) {
-
-           feenox_parser_expression(&function->expr_shepard_radius);
-
-///kw+FUNCTION+usage [ SHEPARD_EXPONENT <expr> ]
-///kw+FUNCTION+detail The exponent of the `shepard` method is given by `SHEPARD_EXPONENT`.
-///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_EXPONENT`.
-        } else if (strcasecmp(token, "SHEPARD_EXPONENT") == 0) {
-           feenox_parser_expression(&function->expr_shepard_exponent);
-
-///kw+FUNCTION+usage [ SIZES <expr_1> <expr_2> ... <expr_n> ]
-///kw+FUNCTION+detail When requesting `bilinear` interpolation for $n>3$, the number of definition points for each argument variable has to be given with `SIZES`,
-        } else if (strcasecmp(token, "SIZES") == 0) {
-          
-          function->expr_rectangular_mesh_size = calloc(function->n_arguments, sizeof(expr_t));
-          
-          for (i = 0; i < function->n_arguments; i++) {
-            feenox_call(feenox_parser_expression(&function->expr_rectangular_mesh_size[i]));
-          }
-          
-///kw+FUNCTION+usage [ X_INCREASES_FIRST <expr> ]
-///kw+FUNCTION+detail and wether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
-        } else if (strcasecmp(token,"X_INCREASES_FIRST") == 0) {
-          
-          feenox_call(feenox_parser_expression(&function->expr_x_increases_first));
-          
-        } else {
-          feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_ERROR;
-        }
-      }
-
-
-      // si no nos dieron expresion algebraica, hay que leer e interpolar datos
-      if (function->algebraic_expression.n_tokens == 0) {
-        if (function->type == type_pointwise_file) {
-
-          // si nos dieron un archivo, leemos de ahi
-          FILE *data_file;
-          char data_line[BUFFER_SIZE*BUFFER_SIZE];
-          int n_columns;
-
-          if ((data_file = feenox_fopen(function->data_file, "r")) == NULL) {
-            feenox_push_error_message("\"%s\" opening file '%s'", strerror(errno), function->data_file);
-            return FEENOX_ERROR;
-          }
-
-          // contamos cuantas lineas no vacias hay -> ese es el tamanio del size
-          function->data_size = 0;
-          while (feenox_read_data_line(data_file, data_line) != 0) {
-            if (data_line[0] != '\0') {
-              // en la primera vuelta miramos cuantas columnas hay
-              if (function->data_size == 0) {
-                n_columns = 0;
-                token = strtok(data_line, " \t");
-                while (token != NULL) {
-                  n_columns++;
-                  token = strtok(NULL, " \t");
-                }
-
-                if (n_columns < (nargs+1)) {
-                  feenox_push_error_message("at least %d columns expected but %d were given in  file '%s'", nargs+1, n_columns, function->data_file);
-                  return FEENOX_ERROR;
-                }
-
-              }
-              function->data_size++;
-            }
-          }
-
-          function->data_argument = calloc(nargs, sizeof(double *));
-          function->data_argument_alloced = 1;
-          for (i = 0; i < nargs; i++) {
-            function->data_argument[i] = calloc(function->data_size, sizeof(double));
-          }
-          function->data_value = calloc(function->data_size, sizeof(double));
-
-          rewind(data_file);
-
-          // ahora leemos los datos
-          j = 0;
-          while (feenox_read_data_line(data_file, data_line) != 0) {
-
-            if (data_line[0] != '\0') {
-              for (i = 0; i < nargs; i++) {
-                if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
-                  feenox_push_error_message("wrong-formatted file '%s' at line %d", function->data_file, j+1);
-                  return FEENOX_ERROR;
-                }
-                sscanf(token, "%lf", &function->data_argument[i][j]);
-                free(token);
-
-                //  para poder meter steps o numeros repetidos
-                if (nargs == 1 && j > 0 && gsl_fcmp(function->data_argument[i][j], function->data_argument[i][j-1], 1e-12) == 0) {
-                  if (j >= 2) {
-                    // si es un step tratamos de manejarlo
-                    function->data_argument[i][j] += 0.005*(function->data_argument[i][j-1]-function->data_argument[i][j-2]);
-                  } else {
-                    // si es el primer punto, lo tiramos
-                    function->data_size--;
-                    j--;
-                  }
-                }
-              
-              }
-              if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
-                feenox_push_error_message("not enough columns in file '%s' at line %d", function->data_file, j+1);
-                return FEENOX_ERROR;
-              }
-              sscanf(token, "%lf", &function->data_value[j]);
-              free(token);
-
-              j++;
-            }
-          }
-
-          fclose(data_file);
-
-
-///kw+FUNCTION+usage [ DATA <num_1> <num_2> ... <num_N> ]
-///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`. This should be the last keyword of the line, followed by $N=k\cdot (n+1)$ expresions giving $k$ definition points: $n$ arguments and the value of the function.
-///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization. See the examples.
-        } else if (token != NULL && strcasecmp(token, "DATA") == 0) {
-          // leemos del mismo archivo de entrada
-          dummy = token + strlen(token)+1;
-
-          // nos dieron los datos hard en el feenox_input
-          backup1 = malloc(strlen(dummy)+8);
-          snprintf(backup1, strlen(dummy)+8, "dummy %s", dummy);
-          backup2 = malloc(strlen(dummy)+8);
-          snprintf(backup2, strlen(dummy)+8, "dummy %s", dummy);
-
-          // contamos cuanta informacion hay
-          function->data_size = 0;
-          if ((token = feenox_get_next_token(backup1)) == NULL) {
-            return FEENOX_ERROR;
-          }
-          while ((token = feenox_get_next_token(NULL)) != NULL) {
-            function->data_size++;
-          }
-          if (function->data_size % (nargs+1) != 0) {
-            feenox_push_error_message("data mismatch for function '%s'", function->name);
-            return FEENOX_ERROR;
-          }
-          function->data_size /= (nargs+1);
-
-          function->data_argument = calloc(nargs, sizeof(double *));
-          function->data_argument_alloced = 1;
-          for (i = 0; i < nargs; i++) {
-            function->data_argument[i] = calloc(function->data_size, sizeof(double));
-          }
-          
-          function->data_value = calloc(function->data_size, sizeof(double));
-
-          // leemos la informacion
-          if ((token = feenox_get_next_token(backup2)) == NULL) {
-            return FEENOX_ERROR;
-          }
-          for (i = 0; i < function->data_size; i++) {
-            // argumentos
-            for (j = 0; j < nargs; j++) {
-              if ((token = feenox_get_next_token(NULL)) == NULL) {
-                return FEENOX_ERROR;
-              }
-              function->data_argument[j][i] = feenox_evaluate_expression_in_string(token);
-
-              //  para poder meter steps
-              if (nargs == 1 && i >= 2 && function->data_argument[j][i] == function->data_argument[j][i-1]) {
-                  function->data_argument[j][i] += 0.005*(function->data_argument[j][i-1]-function->data_argument[j][i-2]);
-                }
-              }
-
-            // valor
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              return FEENOX_ERROR;
-            }
-            function->data_value[i] = feenox_evaluate_expression_in_string(token);
-          }
-
-          free(backup2);
-          free(backup1);
-        }
-
-
-        // creamos tres variables (constantes) extra: func_a, func_b y func_n
-        if (nargs == 1) {
-          var_t *dummy_var;
-          char *dummy_aux = malloc(strlen(function->name) + 4);
-
-          snprintf(dummy_aux, strlen(function->name) + 4, "%s_a", function->name);
-          if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-            return FEENOX_ERROR;
-          }
-          if (function->data_size != 0) {
-            feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
-          }
-
-          snprintf(dummy_aux, strlen(function->name) + 4, "%s_b", function->name);
-          if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-            return FEENOX_ERROR;
-          }
-          if (function->data_size != 0) {
-            feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
-          }
-
-          snprintf(dummy_aux, strlen(function->name) + 4, "%s_n", function->name);
-          if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-            return FEENOX_ERROR;
-          }
-          if (function->data_size != 0) {
-            feenox_value(dummy_var) = (double)function->data_size;
-          }
-
-          free(dummy_aux);
-        }
-
-      }
-
-      if (arg_name != NULL) {
-        for (i = 0; i < nargs; i++) {
-          free(arg_name[i]);
-        }
-        free(arg_name);
-      }
-      
-      return WASORA_PARSER_OK;
-
-// --- FILE -----------------------------------------------------
+ // --- FILE -----------------------------------------------------
 ///kw+FILE+desc Define a file, either as input or as output, for further usage.
 ///kw+FILE+usage < FILE | OUTPUT_FILE | INPUT_FILE >
-    } else if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "OUTPUT_FILE") == 0 || strcasecmp(token, "INPUT_FILE") == 0) {
+} else if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "OUTPUT_FILE") == 0 || strcasecmp(token, "INPUT_FILE") == 0) {
 
-      file_t *file;
-      char *name = NULL;
-      char *format = NULL;
-      char *mode = NULL;
-      expr_t *arg = NULL;
-      int n_args = 0;
-      int do_not_open = 0;
+  file_t *file;
+  char *name = NULL;
+  char *format = NULL;
+  char *mode = NULL;
+  expr_t *arg = NULL;
+  int n_args = 0;
+  int do_not_open = 0;
 
-      if (strcasecmp(token, "OUTPUT_FILE") == 0) {
-        mode = strdup("w");
-      } else if (strcasecmp(token, "INPUT_FILE") == 0) {
-        mode = strdup("r");
-      }
+  if (strcasecmp(token, "OUTPUT_FILE") == 0) {
+    mode = strdup("w");
+  } else if (strcasecmp(token, "INPUT_FILE") == 0) {
+    mode = strdup("r");
+  }
 
 ///kw+FILE+usage <name>
-      if (feenox_parser_string(&name) != WASORA_PARSER_OK) {
-        return FEENOX_ERROR;
-      }
+  if (feenox_parser_string(&name) != WASORA_PARSER_OK) {
+    return FEENOX_ERROR;
+  }
 
 ///kw+FILE+usage <printf_format>
 ///kw+FILE+usage [ expr_1 expr_2 ... expr_n ]
-      if (feenox_parser_string_format(&format, &n_args) != WASORA_PARSER_OK) {
+  if (feenox_parser_string_format(&format, &n_args) != WASORA_PARSER_OK) {
+    return FEENOX_ERROR;
+  }
+
+  if (n_args != 0) {
+    arg = calloc(n_args, sizeof(expr_t));
+    for (i = 0; i < n_args; i++) {
+      if (feenox_parser_expression(&arg[i]) != WASORA_PARSER_OK) {
         return FEENOX_ERROR;
       }
-
-      if (n_args != 0) {
-        arg = calloc(n_args, sizeof(expr_t));
-        for (i = 0; i < n_args; i++) {
-          if (feenox_parser_expression(&arg[i]) != WASORA_PARSER_OK) {
-            return FEENOX_ERROR;
-          }
-        }
-      }
+    }
+  }
 
 ///kw+FILE+usage [ INPUT | OUTPUT | MODE <fopen_mode> ]
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        if (strcasecmp(token, "MODE") == 0) {
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected a mode");
-            return FEENOX_ERROR;
-          }
-          mode = strdup(token);
-        } else if (strcasecmp(token, "INPUT") == 0) {
-          mode = strdup("r");
-        } else if (strcasecmp(token, "OUTPUT") == 0) {
-          mode = strdup("w");
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    if (strcasecmp(token, "MODE") == 0) {
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected a mode");
+        return FEENOX_ERROR;
+      }
+      mode = strdup(token);
+    } else if (strcasecmp(token, "INPUT") == 0) {
+      mode = strdup("r");
+    } else if (strcasecmp(token, "OUTPUT") == 0) {
+      mode = strdup("w");
 ///kw+FILE+usage [ OPEN | DO_NOT_OPEN ]
-        } else if (strcasecmp(token, "OPEN") == 0) {
-          do_not_open = 0;
-        } else if (strcasecmp(token, "DO_NOT_OPEN") == 0) {
-          do_not_open = 1;
-        } else {
-          feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_ERROR;
-        }
+    } else if (strcasecmp(token, "OPEN") == 0) {
+      do_not_open = 0;
+    } else if (strcasecmp(token, "DO_NOT_OPEN") == 0) {
+      do_not_open = 1;
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
 
-      }
+  }
 
-      // si no nos dicen que es, no abrimos
-      if (mode == NULL) {
-        do_not_open = 1;
-      }
+  // si no nos dicen que es, no abrimos
+  if (mode == NULL) {
+    do_not_open = 1;
+  }
 
-      if ((file = feenox_define_file(name, format, n_args, arg, mode, do_not_open)) == NULL) {
-        return FEENOX_ERROR;
-      }
+  if ((file = feenox_define_file(name, format, n_args, arg, mode, do_not_open)) == NULL) {
+    return FEENOX_ERROR;
+  }
 
-      if (feenox_define_instruction(feenox_instruction_file, file) == NULL) {
-        return FEENOX_ERROR;
-      }
+  if (feenox_define_instruction(feenox_instruction_file, file) == NULL) {
+    return FEENOX_ERROR;
+  }
 
-      free(format);
-      free(mode);
-      free(name);
-      return WASORA_PARSER_OK;
+  free(format);
+  free(mode);
+  free(name);
+  return WASORA_PARSER_OK;
 
 // ---- CLOSE ----------------------------------------------------
 ///kw+CLOSE+usage CLOSE
@@ -3094,6 +2493,515 @@ int feenox_parse_matrix(void) {
       
 }
 
+
+int feenox_parse_function(void) {
+
+  char *token = NULL;
+  char *dummy_openpar = NULL;
+  char *arguments = NULL;
+  char *name = NULL;
+  
+  char **arg_name = NULL;
+  int n_arguments;
+  int i;
+
+///kw+FUNCTION+usage <function_name>(<var_1>[,var2,...,var_n])
+///kw+FUNCTION+detail The number of variables $n$ is given by the number of arguments given between parenthesis after the function name.
+///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined explictly as scalar variables.
+  feenox_call(feenox_parser_string(&name));
+  
+  if ((dummy_openpar = strchr(name, '(')) == NULL) {
+    feenox_push_error_message("expected opening parenthesis '(' after function name '%s' (no spaces allowed)", token);
+    return FEENOX_ERROR;
+  }
+
+  arguments = strdup(dummy_openpar);
+  feenox_strip_blanks(arguments);
+  if ((n_arguments = feenox_count_arguments(arguments)) <= 0) {
+    return FEENOX_ERROR;
+  }
+  feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name));
+  free(arguments);
+
+  // we can now define the function and set the arguments
+  *dummy_openpar = '\0';
+  feenox_call(feenox_define_function(name, n_arguments));
+  for (i = 0; i < n_arguments; i++) {
+    feenox_call(feenox_function_set_argument_variable(name, i, arg_name[i]));
+  }
+  
+  while ((token = feenox_get_next_token(NULL)) != NULL && strcasecmp(token, "DATA") != 0) {
+///kw+FUNCTION+usage {
+///kw+FUNCTION+usage [ = <expr> |
+///kw+FUNCTION+detail If the function is given as an algebraic expression, the short-hand operator `:=` can be used.
+///kw+FUNCTION+detail That is to say, `FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`.
+
+    if (strcasecmp(token, "=") == 0 || strcasecmp(token, ":=") == 0) {
+      feenox_call(feenox_function_set_expression(name, token + ((token[0] == ':')? 3 : 2)));
+      break;    // we are done with the while() over the line
+    }
+  }
+
+/*      
+///kw+FUNCTION+usage FILE_PATH <file_path> |
+    } else if (strcasecmp(token, "FILE_PATH") == 0) {
+///kw+FUNCTION+detail If a `FILE_PATH` is given, an ASCII file containing at least $n+1$ columns is expected.
+///kw+FUNCTION+detail By default, the first $n$ columns are the values of the arguments and the last column is the value of the function at those points.
+///kw+FUNCTION+detail The order of the columns can be changed with the keyword `COLUMNS`, which expects $n+1$ expressions corresponding to the column numbers.
+
+      // TODO: poder pedir que se refresquen los datos en cada paso
+      function->type = type_pointwise_file;
+      feenox_parser_string(&function->data_file);
+
+///kw+FUNCTION+usage ROUTINE <name> |
+    } else if (strcasecmp(token, "ROUTINE") == 0) {
+///kw+FUNCTION+detail A function of type `ROUTINE` calls an already-defined user-provided routine using the `CALL` keyword and passes the values of the variables in each required evaluation as a `double *` argument.
+
+      function->type = type_routine;
+
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected routine name");
+        return FEENOX_ERROR;
+      }
+
+      if ((function->routine = feenox_get_routine_ptr(token)) == NULL) {
+        feenox_push_error_message("undefined routine '%s'", token);
+        return FEENOX_ERROR;
+      }
+
+///kw+FUNCTION+usage | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } |
+///kw+FUNCTION+detail If `MESH` is given, the definition points are the nodes or the cells of the mesh.
+///kw+FUNCTION+detail The function arguments should be $(x)$, $(x,y)$ or $(x,y,z)$ matching the dimension the mesh.
+///kw+FUNCTION+detail If the keyword `DATA` is used, a new empty vector of the appropriate size is defined.
+///kw+FUNCTION+detail The elements of this new vector can be assigned to the values of the function at the $i$-th node or cell.
+///kw+FUNCTION+detail If the keyword `VECTOR` is used, the values of the dependent variable are taken to be the values of the already-existing vector.
+///kw+FUNCTION+detail Note that this vector should have the size of the number of nodes or cells the mesh has, depending on whether `NODES` or `CELLS` is given.
+
+    } else if (strcasecmp(token, "MESH") == 0) {
+
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected mesh name");
+        return FEENOX_ERROR;
+      }
+
+      if ((function->mesh = feenox_get_mesh_ptr(token)) == NULL) {
+        feenox_push_error_message("undefined mesh '%s'", token);
+        return FEENOX_ERROR;
+      }
+
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected keyword DATA or VECTOR");
+        return FEENOX_ERROR;
+      }
+
+      if (strcasecmp(token, "DATA") == 0) {
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected data name");
+          return FEENOX_ERROR;
+        }
+        if ((function->vector_value = feenox_define_vector(token, 0, NULL, NULL)) == NULL) {
+          return FEENOX_ERROR;
+        }
+      } else if (strcasecmp(token, "VECTOR") == 0) {
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected vector name");
+          return FEENOX_ERROR;
+        }
+        if ((function->vector_value = feenox_define_vector(token, 0, NULL, NULL)) == NULL) {
+          return FEENOX_ERROR;
+        }
+      } else {
+        feenox_push_error_message("expected keyword DATA or VECTOR instead of '%s'", token);
+        return FEENOX_ERROR;
+      }
+
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected either NODES or CELLS");
+        return FEENOX_ERROR;
+      }
+      if (strcasecmp(token, "NODES") == 0) {
+        function->type = type_pointwise_mesh_node;
+      } else if (strcasecmp(token, "CELLS") == 0) {
+        function->type = type_pointwise_mesh_cell;
+      } else {
+        feenox_push_error_message("expected either NODES or CELLS instead of '%s'", token);
+        return FEENOX_ERROR;
+      }
+
+
+      if (function->var_argument[0] != feenox_mesh.vars.x) {
+        feenox_push_error_message("first argument of function '%s' should be 'x'", function->name);
+        return FEENOX_ERROR;
+      }
+      if (function->n_arguments > 1 && function->var_argument[1] != feenox_mesh.vars.y) {
+        feenox_push_error_message("second argument of function '%s' should be 'y'", function->name);
+        return FEENOX_ERROR;
+      }
+      if (function->n_arguments > 2 && function->var_argument[2] != feenox_mesh.vars.z) {
+        feenox_push_error_message("third argument of function '%s' should be 'z'", function->name);
+        return FEENOX_ERROR;
+      }
+      if (function->n_arguments > 3) {
+        feenox_push_error_message("function '%s' cannot be MESH and have more than 3 arguments", function->name);
+        return FEENOX_ERROR;
+      }
+
+///kw+FUNCTION+usage [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ]
+///kw+FUNCTION+usage }
+///kw+FUNCTION+detail If `VECTOR_DATA` is given, a set of $n+1$ vectors of the same size is expected.
+///kw+FUNCTION+detail The first $n+1$ correspond to the arguments and the last one is the function value.
+
+    } else if (strcasecmp(token, "VECTOR_DATA") == 0 || strcasecmp(token, "VECTORS") == 0) {
+
+      function->type = type_pointwise_vector;
+      function->vector_argument = calloc(nargs, sizeof(vector_t *));
+      function->data_argument = calloc(nargs, sizeof(double *));
+      function->data_size = 0;
+
+      for (i = 0; i < nargs; i++) {
+        if (feenox_parser_vector(&function->vector_argument[i]) != WASORA_PARSER_OK) {
+          return FEENOX_ERROR;
+        }
+      }
+
+      if (feenox_parser_vector(&function->vector_value) != WASORA_PARSER_OK) {
+        return FEENOX_ERROR;
+      }
+
+
+///kw+FUNCTION+usage [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ]
+    } else if (strcasecmp(token, "COLUMNS") == 0) {
+
+      if (nargs == 0) {
+        feenox_push_error_message("number of arguments is equal to zero");
+        return FEENOX_ERROR;
+      }
+
+      for (i = 0; i < nargs+1; i++) {
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected %d columns specifications", nargs);
+          return FEENOX_ERROR;
+        }
+        function->column[i] = (int)(feenox_evaluate_expression_in_string(token));
+
+      }
+
+///kw+FUNCTION+usage [ INTERPOLATION
+///kw+FUNCTION+detail Interpolation schemes can be given for either one or multi-dimensional functions with `INTERPOLATION`.
+    } else if (strcasecmp(token, "INTERPOLATION") == 0) {
+
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected interpolation method");
+        return FEENOX_ERROR;
+      }
+
+///kw+FUNCTION+detail Available schemes for $n=1$ are:
+///kw+FUNCTION+detail @
+///kw+FUNCTION+usage {
+///kw+FUNCTION+usage linear |
+///kw+FUNCTION+detail  * linear
+      if (strcasecmp(token, "linear") == 0) {
+        function->interp_type = *gsl_interp_linear;
+///kw+FUNCTION+usage polynomial |
+///kw+FUNCTION+detail  * polynomial, the grade is equal to the number of data minus one
+      } else if (strcasecmp(token, "polynomial") == 0) {
+        function->interp_type = *gsl_interp_polynomial;
+///kw+FUNCTION+usage spline |
+///kw+FUNCTION+detail  * spline, cubic (needs at least 3 points)
+      } else if (strcasecmp(token, "spline") == 0 || strcasecmp(token, "cspline") == 0 || strcasecmp(token, "splines") == 0) {
+        function->interp_type = *gsl_interp_cspline;
+///kw+FUNCTION+usage spline_periodic |
+///kw+FUNCTION+detail  * spline_periodic 
+      } else if (strcasecmp(token, "spline_periodic") == 0 || strcasecmp(token, "cspline_periodic") == 0 || strcasecmp(token, "splines_periodic") == 0) {
+        function->interp_type = *gsl_interp_cspline_periodic;
+///kw+FUNCTION+usage akima |
+///kw+FUNCTION+detail  * akima (needs at least 5 points)
+      } else if (strcasecmp(token, "akima") == 0) {
+        function->interp_type = *gsl_interp_akima;
+///kw+FUNCTION+usage akima_periodic |
+///kw+FUNCTION+detail  * akima_periodic (needs at least 5 points)
+      } else if (strcasecmp(token, "akima_periodic") == 0) {
+        function->interp_type = *gsl_interp_akima_periodic;
+
+///kw+FUNCTION+usage steffen |
+///kw+FUNCTION+detail  * steffen, always-monotonic splines-like (available only with GSL >= 2.0)
+      } else if (strcasecmp(token, "steffen") == 0) {
+#if (GSL_MAJOR_VERSION < 2)  
+//            feenox_push_error_message("inerpolation steffen is available only for GSL >= 2.0, you have version %s", GSL_VERSION);
+        function->interp_type = *gsl_interp_linear;
+#else
+        function->interp_type = *gsl_interp_steffen;
+#endif
+///kw+FUNCTION+detail @ 
+///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
+///kw+FUNCTION+detail @ 
+///kw+FUNCTION+detail Available schemes for $n>1$ are:
+///kw+FUNCTION+detail @
+///kw+FUNCTION+usage nearest |
+///kw+FUNCTION+detail  * nearest, $f(\vec{x})$ is equal to the value of the closest definition point
+      } else if (strcasecmp(token, "nearest") == 0) {
+        function->multidim_interp = nearest;
+///kw+FUNCTION+usage shepard |
+///kw+FUNCTION+detail  * shepard, [inverse distance weighted average definition points](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting) (might lead to inefficient evaluation)
+      } else if (strcasecmp(token, "shepard") == 0) {
+        function->multidim_interp = shepard;
+///kw+FUNCTION+usage shepard_kd |
+///kw+FUNCTION+detail  * shepard_kd, [average of definition points within a kd-tree](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
+      } else if (strcasecmp(token, "shepard_kd") == 0 || strcasecmp(token, "modified_shepard") == 0) {
+        function->multidim_interp = shepard_kd;
+///kw+FUNCTION+usage bilinear
+///kw+FUNCTION+detail  * bilinear, only available if the definition points configure an structured hypercube-like grid. If $n>3$, `SIZES` should be given.
+      } else if (strcasecmp(token, "bilinear") == 0 || strcasecmp(token, "rectangle") == 0 || strcasecmp(token, "rectangular") == 0) {
+        function->multidim_interp = bilinear;
+///kw+FUNCTION+usage } ]
+      } else {
+        feenox_push_error_message("undefined interpolation method '%s'", token);
+        return FEENOX_ERROR;
+      }
+///kw+FUNCTION+detail @
+
+///kw+FUNCTION+usage [ INTERPOLATION_THRESHOLD <expr> ]
+///kw+FUNCTION+detail For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.
+///kw+FUNCTION+detail Default value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`.
+    } else if (strcasecmp(token, "INTERPOLATION_THRESHOLD") == 0) {
+
+       feenox_parser_expression(&function->expr_multidim_threshold);
+
+///kw+FUNCTION+usage [ SHEPARD_RADIUS <expr> ]
+///kw+FUNCTION+detail The initial radius of points to take into account in `shepard_kd` is given by `SHEPARD_RADIUS`. If no points are found, the radius is double until at least one definition point is found.
+///kw+FUNCTION+detail The radius is doubled until at least one point is found.
+///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_RADIUS`.
+    } else if (strcasecmp(token, "SHEPARD_RADIUS") == 0) {
+
+       feenox_parser_expression(&function->expr_shepard_radius);
+
+///kw+FUNCTION+usage [ SHEPARD_EXPONENT <expr> ]
+///kw+FUNCTION+detail The exponent of the `shepard` method is given by `SHEPARD_EXPONENT`.
+///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_EXPONENT`.
+    } else if (strcasecmp(token, "SHEPARD_EXPONENT") == 0) {
+       feenox_parser_expression(&function->expr_shepard_exponent);
+
+///kw+FUNCTION+usage [ SIZES <expr_1> <expr_2> ... <expr_n> ]
+///kw+FUNCTION+detail When requesting `bilinear` interpolation for $n>3$, the number of definition points for each argument variable has to be given with `SIZES`,
+    } else if (strcasecmp(token, "SIZES") == 0) {
+
+      function->expr_rectangular_mesh_size = calloc(function->n_arguments, sizeof(expr_t));
+
+      for (i = 0; i < function->n_arguments; i++) {
+        feenox_call(feenox_parser_expression(&function->expr_rectangular_mesh_size[i]));
+      }
+
+///kw+FUNCTION+usage [ X_INCREASES_FIRST <expr> ]
+///kw+FUNCTION+detail and wether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
+    } else if (strcasecmp(token,"X_INCREASES_FIRST") == 0) {
+
+      feenox_call(feenox_parser_expression(&function->expr_x_increases_first));
+
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+
+
+  // si no nos dieron expresion algebraica, hay que leer e interpolar datos
+  if (function->algebraic_expression.n_tokens == 0) {
+    if (function->type == type_pointwise_file) {
+
+      // si nos dieron un archivo, leemos de ahi
+      FILE *data_file;
+      char data_line[BUFFER_SIZE*BUFFER_SIZE];
+      int n_columns;
+
+      if ((data_file = feenox_fopen(function->data_file, "r")) == NULL) {
+        feenox_push_error_message("\"%s\" opening file '%s'", strerror(errno), function->data_file);
+        return FEENOX_ERROR;
+      }
+
+      // contamos cuantas lineas no vacias hay -> ese es el tamanio del size
+      function->data_size = 0;
+      while (feenox_read_data_line(data_file, data_line) != 0) {
+        if (data_line[0] != '\0') {
+          // en la primera vuelta miramos cuantas columnas hay
+          if (function->data_size == 0) {
+            n_columns = 0;
+            token = strtok(data_line, " \t");
+            while (token != NULL) {
+              n_columns++;
+              token = strtok(NULL, " \t");
+            }
+
+            if (n_columns < (nargs+1)) {
+              feenox_push_error_message("at least %d columns expected but %d were given in  file '%s'", nargs+1, n_columns, function->data_file);
+              return FEENOX_ERROR;
+            }
+
+          }
+          function->data_size++;
+        }
+      }
+
+      function->data_argument = calloc(nargs, sizeof(double *));
+      function->data_argument_alloced = 1;
+      for (i = 0; i < nargs; i++) {
+        function->data_argument[i] = calloc(function->data_size, sizeof(double));
+      }
+      function->data_value = calloc(function->data_size, sizeof(double));
+
+      rewind(data_file);
+
+      // ahora leemos los datos
+      j = 0;
+      while (feenox_read_data_line(data_file, data_line) != 0) {
+
+        if (data_line[0] != '\0') {
+          for (i = 0; i < nargs; i++) {
+            if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
+              feenox_push_error_message("wrong-formatted file '%s' at line %d", function->data_file, j+1);
+              return FEENOX_ERROR;
+            }
+            sscanf(token, "%lf", &function->data_argument[i][j]);
+            free(token);
+
+            //  para poder meter steps o numeros repetidos
+            if (nargs == 1 && j > 0 && gsl_fcmp(function->data_argument[i][j], function->data_argument[i][j-1], 1e-12) == 0) {
+              if (j >= 2) {
+                // si es un step tratamos de manejarlo
+                function->data_argument[i][j] += 0.005*(function->data_argument[i][j-1]-function->data_argument[i][j-2]);
+              } else {
+                // si es el primer punto, lo tiramos
+                function->data_size--;
+                j--;
+              }
+            }
+
+          }
+          if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
+            feenox_push_error_message("not enough columns in file '%s' at line %d", function->data_file, j+1);
+            return FEENOX_ERROR;
+          }
+          sscanf(token, "%lf", &function->data_value[j]);
+          free(token);
+
+          j++;
+        }
+      }
+
+      fclose(data_file);
+
+
+///kw+FUNCTION+usage [ DATA <num_1> <num_2> ... <num_N> ]
+///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`. This should be the last keyword of the line, followed by $N=k\cdot (n+1)$ expresions giving $k$ definition points: $n$ arguments and the value of the function.
+///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization. See the examples.
+    } else if (token != NULL && strcasecmp(token, "DATA") == 0) {
+      // leemos del mismo archivo de entrada
+      dummy = token + strlen(token)+1;
+
+      // nos dieron los datos hard en el feenox_input
+      backup1 = malloc(strlen(dummy)+8);
+      snprintf(backup1, strlen(dummy)+8, "dummy %s", dummy);
+      backup2 = malloc(strlen(dummy)+8);
+      snprintf(backup2, strlen(dummy)+8, "dummy %s", dummy);
+
+      // contamos cuanta informacion hay
+      function->data_size = 0;
+      if ((token = feenox_get_next_token(backup1)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      while ((token = feenox_get_next_token(NULL)) != NULL) {
+        function->data_size++;
+      }
+      if (function->data_size % (nargs+1) != 0) {
+        feenox_push_error_message("data mismatch for function '%s'", function->name);
+        return FEENOX_ERROR;
+      }
+      function->data_size /= (nargs+1);
+
+      function->data_argument = calloc(nargs, sizeof(double *));
+      function->data_argument_alloced = 1;
+      for (i = 0; i < nargs; i++) {
+        function->data_argument[i] = calloc(function->data_size, sizeof(double));
+      }
+
+      function->data_value = calloc(function->data_size, sizeof(double));
+
+      // leemos la informacion
+      if ((token = feenox_get_next_token(backup2)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      for (i = 0; i < function->data_size; i++) {
+        // argumentos
+        for (j = 0; j < nargs; j++) {
+          if ((token = feenox_get_next_token(NULL)) == NULL) {
+            return FEENOX_ERROR;
+          }
+          function->data_argument[j][i] = feenox_evaluate_expression_in_string(token);
+
+          //  para poder meter steps
+          if (nargs == 1 && i >= 2 && function->data_argument[j][i] == function->data_argument[j][i-1]) {
+              function->data_argument[j][i] += 0.005*(function->data_argument[j][i-1]-function->data_argument[j][i-2]);
+            }
+          }
+
+        // valor
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          return FEENOX_ERROR;
+        }
+        function->data_value[i] = feenox_evaluate_expression_in_string(token);
+      }
+
+      free(backup2);
+      free(backup1);
+    }
+
+
+    // creamos tres variables (constantes) extra: func_a, func_b y func_n
+    if (nargs == 1) {
+      var_t *dummy_var;
+      char *dummy_aux = malloc(strlen(function->name) + 4);
+
+      snprintf(dummy_aux, strlen(function->name) + 4, "%s_a", function->name);
+      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (function->data_size != 0) {
+        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
+      }
+
+      snprintf(dummy_aux, strlen(function->name) + 4, "%s_b", function->name);
+      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (function->data_size != 0) {
+        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
+      }
+
+      snprintf(dummy_aux, strlen(function->name) + 4, "%s_n", function->name);
+      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (function->data_size != 0) {
+        feenox_value(dummy_var) = (double)function->data_size;
+      }
+
+      free(dummy_aux);
+    }
+
+  }
+*/
+
+  // clean up this (partial) mess
+  if (arg_name != NULL) {
+    for (i = 0; i < n_arguments; i++) {
+      free(arg_name[i]);
+    }
+    free(arg_name);
+  }
+  free(name);
+  
+  return FEENOX_OK;
+  
+}
 
 int feenox_parse_sort_vector(void) {
       

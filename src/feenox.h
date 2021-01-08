@@ -635,6 +635,11 @@ extern int feenox_vector_attach_data(const char *name, expr_t *datas);
 extern int feenox_define_matrix(const char *name, const char *rows, const char *cols);
 extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
 
+extern int feenox_define_function(const char *name, int n_arguments);
+extern int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name);
+extern int feenox_function_set_expression(const char *name, const char *expression);
+extern var_t *feenox_get_or_define_variable_ptr(const char *name);
+
 
 extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
 extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
