@@ -1,2 +1,3 @@
-INCLUDE pepe.fee FROM 1 TO 1+2
-ABORT
+f(x) := x^2
+PRINT f(2)
+

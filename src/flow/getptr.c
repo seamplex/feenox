@@ -48,13 +48,13 @@ function_t *feenox_get_function_ptr(const char *name) {
   HASH_FIND_STR(feenox.functions, name, function);
   return function;
 }
-/*
-file_t  *feenox_get_file_ptr(const char *name) {
+
+file_t *feenox_get_file_ptr(const char *name) {
   file_t *file;
   HASH_FIND_STR(feenox.files, name, file);
   return file;
 }
-
+/*
 double (*feenox_get_routine_ptr(const char *name))(const double *) {
   loadable_routine_t *loadable_routine;
   HASH_FIND_STR(feenox.loadable_routines, name, loadable_routine);

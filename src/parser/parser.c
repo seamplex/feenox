@@ -61,8 +61,14 @@ int feenox_parse_main_input_file(const char *filepath) {
   feenox_parser.line = malloc(feenox_parser.actual_buffer_size);
   feenox_call(feenox_parse_input_file(filepath, 0, 0));
   free(feenox_parser.line);
-  
-  feenox_call(feenox_init_after_parser());
+
+/*  
+  if (feenox_parser.active_conditional_block != NULL) {
+    feenox_push_error_message("conditional block not closed");
+    return FEENOX_ERROR;
+  }
+ */
+
 
   return FEENOX_OK;
 }
@@ -200,8 +206,13 @@ int feenox_parse_line(void) {
 ///kw+FUNCTION+usage FUNCTION
 ///kw+FUNCTION+desc Define a function of one or more variables.
     } else if (strcasecmp(token, "FUNCTION") == 0) {
- // || ((dummy = strchr(feenox_parser.line, '=')) != NULL && *(dummy-1) == ':')      
       feenox_call(feenox_parse_function());
+      return FEENOX_OK;
+    
+///kw+PRINT+desc Write plain-text and/or formatted data to the standard output or into an output file.
+///kw+PRINT+usage PRINT
+    } else if (strcasecmp(token, "PRINT") == 0) {
+      feenox_call(feenox_parse_print());
       return FEENOX_OK;
       
     }
@@ -233,20 +244,20 @@ int feenox_parse_line(void) {
   }
 
 ///kw+FILE+usage <name>
-  if (feenox_parser_string(&name) != WASORA_PARSER_OK) {
+  if (feenox_parser_string(&name) != FEENOX_OK) {
     return FEENOX_ERROR;
   }
 
 ///kw+FILE+usage <printf_format>
 ///kw+FILE+usage [ expr_1 expr_2 ... expr_n ]
-  if (feenox_parser_string_format(&format, &n_args) != WASORA_PARSER_OK) {
+  if (feenox_parser_string_format(&format, &n_args) != FEENOX_OK) {
     return FEENOX_ERROR;
   }
 
   if (n_args != 0) {
     arg = calloc(n_args, sizeof(expr_t));
     for (i = 0; i < n_args; i++) {
-      if (feenox_parser_expression(&arg[i]) != WASORA_PARSER_OK) {
+      if (feenox_parser_expression(&arg[i]) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
     }
@@ -292,7 +303,7 @@ int feenox_parse_line(void) {
   free(format);
   free(mode);
   free(name);
-  return WASORA_PARSER_OK;
+  return FEENOX_OK;
 
 // ---- CLOSE ----------------------------------------------------
 ///kw+CLOSE+usage CLOSE
@@ -301,12 +312,12 @@ int feenox_parse_line(void) {
       
       file_t *file;
       
-      feenox_call(feenox_parser_file(&file) != WASORA_PARSER_OK);
+      feenox_call(feenox_parser_file(&file) != FEENOX_OK);
       
       if (feenox_define_instruction(feenox_instruction_close_file, file) == NULL) {
         return FEENOX_ERROR;
       }
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
       
 
 // --- IF -----------------------------------------------------
@@ -327,7 +338,7 @@ int feenox_parse_line(void) {
       LL_APPEND(feenox.conditional_blocks, conditional_block);
 
       conditional_block->condition = malloc(sizeof(expr_t));
-      if (feenox_parser_expression(conditional_block->condition) != WASORA_PARSER_OK) {
+      if (feenox_parser_expression(conditional_block->condition) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
 
@@ -344,7 +355,7 @@ int feenox_parse_line(void) {
 
       feenox.active_conditional_block = conditional_block;
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     // ---- ELSE  ----------------------------------------------------
     } else if (strcasecmp(token, "ELSE") == 0) {
@@ -370,7 +381,7 @@ int feenox_parse_line(void) {
       conditional_block->father = feenox.active_conditional_block->father;
       feenox.active_conditional_block = conditional_block;
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
 // ---- ENDIF  ----------------------------------------------------
     } else if (strcasecmp(token, "ENDIF") == 0) {
@@ -389,7 +400,7 @@ int feenox_parse_line(void) {
 
       feenox.active_conditional_block = feenox.active_conditional_block->father;
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
 // ---- SEMAPHORE ----------------------------------------------------
 ///kw+SEMAPHORE+desc Perform either a wait or a post operation on a named shared semaphore.
@@ -401,7 +412,7 @@ int feenox_parse_line(void) {
       LL_APPEND(feenox.semaphores, semaphore);
 
 ///kw+SEMAPHORE+usage <name>
-      if (feenox_parser_string(&semaphore->name) != WASORA_PARSER_OK) {
+      if (feenox_parser_string(&semaphore->name) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
 
@@ -414,7 +425,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
 // ---- READ / WRITE  ----------------------------------------------------
 ///kw+READ+desc Read data (variables, vectors o matrices) from files or shared-memory segments.
@@ -439,7 +450,7 @@ int feenox_parse_line(void) {
 
           io->type = io_shm;
 
-          if (feenox_parser_string(&io->shm_name) != WASORA_PARSER_OK) {
+          if (feenox_parser_string(&io->shm_name) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -472,7 +483,7 @@ int feenox_parse_line(void) {
             io->type = io_file_binary;
           }
 
-          if (feenox_parser_file(&io->file) != WASORA_PARSER_OK) {
+          if (feenox_parser_file(&io->file) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -518,7 +529,7 @@ int feenox_parse_line(void) {
  
           } else {
             
-            if (feenox_parse_expression(token, &thing->expr) != WASORA_PARSER_OK) {
+            if (feenox_parse_expression(token, &thing->expr) != FEENOX_OK) {
               feenox_push_error_message("undefined keyword, variable, vector, matrix, alias or invalid expression '%s'", token);
               return FEENOX_ERROR;
             }
@@ -542,149 +553,8 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
-// --- PRINT -----------------------------------------------------
-///kw+PRINT+desc Print plain-text and/or formatted data to the standard output or into an output file.
-///kw+PRINT+usage PRINT
-    } else if (strcasecmp(token, "PRINT") == 0) {
-
-      print_t *print;
-      matrix_t *dummy_matrix;
-      vector_t *dummy_vector;
-      int n;
-
-      print = calloc(1, sizeof(print_t));
-      LL_APPEND(feenox.prints, print);
-
-      char *keywords[] = {"SKIP_STEP", "SKIP_STATIC_STEP", "SKIP_TIME", "SKIP_HEADER_STEP", ""};
-      expr_t *expressions[] = {
-        &print->skip_step,
-        &print->skip_static_step,
-        &print->skip_time,
-        &print->skip_header_step,
-        NULL
-      };
-
-///kw+PRINT+detail Each argument `object` that is not a keyword is expected to be part of the output, can be either a matrix, a vector, an scalar algebraic expression.
-///kw+PRINT+detail If the given object cannot be solved into a valid matrix, vector or expression, it is treated as a string literal if `IMPLICIT` is `ALLOWED`, otherwise a parser error is raised.
-///kw+PRINT+detail To explicitly interpret an object as a literal string even if it resolves to a valid numerical expression, it should be prefixed with the `TEXT` keyword.
-///kw+PRINT+detail Hashes `#` appearing literal in text strings have to be quoted to prevent the parser to treat them as comments within the feenox input file and thus ignoring the rest of the line.
-///kw+PRINT+detail Whenever an argument starts with a porcentage sign  `%`, it is treated as a C `printf`-compatible format definition and all the objects that follow it are printed using the given format until a new format definition is found.
-///kw+PRINT+detail The objects are treated as double-precision floating point numbers, so only floating point formats should be given. The default format is `DEFAULT_PRINT_FORMAT`.
-///kw+PRINT+detail Matrices, vectors, scalar expressions, format modifiers and string literals can be given in any desired order, and are processed from left to right.
-///kw+PRINT+detail Vectors are printed element-by-element in a single row. See `PRINT_VECTOR` to print vectors column-wise.
-///kw+PRINT+detail Matrices are printed element-by-element in a single line using row-major ordering if mixed with other objects but in the natural row and column fashion if it is the only given object.
-      
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+PRINT+usage [ FILE <file_id> |
-///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to stdout.
-        if (strcasecmp(token, "FILE") == 0) {
-          if (feenox_parser_file(&print->file) != WASORA_PARSER_OK) {
-            return FEENOX_ERROR;
-          }
-///kw+PRINT+usage FILE_PATH <file_path> ]
-        } else if (strcasecmp(token, "FILE_PATH") == 0) {
-            feenox_call(feenox_parser_file_path(&print->file, "w"));
-
-///kw+PRINT+usage [ NONEWLINE ]
-        } else if (strcasecmp(token, "NONEWLINE") == 0) {
-///kw+PRINT+detail If the `NONEWLINE` keyword is not provided, default is to write a newline `\n` character after all the objects are processed.
-          print->nonewline = 1;
-
-///kw+PRINT+usage [ SEP <string> ]
-        } else if (strcasecmp(token, "SEP") == 0 || strcasecmp(token, "SEPARATOR") == 0) {
-          if (feenox_parser_string(&print->separator) != WASORA_PARSER_OK) {
-            return FEENOX_ERROR;
-          }
-///kw+PRINT+detail The `SEP` keywords expects a string used to separate printed objects, the default is a tab 'DEFAULT_PRINT_SEPARATOR' character.
-
-///kw+PRINT+usage [ NOSEP ]
-        } else if (strcasecmp(token, "NOSEP") == 0) {
-          print->separator = strdup("");
-///kw+PRINT+detail Use the `NOSEP` keyword to define an empty string as object separator.
-          
-///kw+PRINT+usage [ HEADER ]
-        } else if (strcasecmp(token, "HEADER") == 0) {
-          print->header = 1;
-///kw+PRINT+detail If the `HEADER` keyword is given, a single line containing the literal text
-///kw+PRINT+detail given for each object is printed at the very first time the `PRINT` instruction is
-///kw+PRINT+detail processed, starting with a hash `#` character.           
-
-///kw+PRINT+usage [ SKIP_STEP <expr> ]
-///kw+PRINT+detail If the `SKIP_STEP` (`SKIP_STATIC_STEP`)keyword is given, the instruction is processed only every
-///kw+PRINT+detail the number of transient (static) steps that results in evaluating the expression,
-///kw+PRINT+detail which may not be constant. By default the `PRINT` instruction is evaluated every
-///kw+PRINT+detail step. The `SKIP_HEADER_STEP` keyword works similarly for the optional `HEADER` but
-///kw+PRINT+detail by default it is only printed once. The `SKIP_TIME` keyword use time advancements
-///kw+PRINT+detail to choose how to skip printing and may be useful for non-constant time-step problems.
-          
-///kw+PRINT+usage [ SKIP_STATIC_STEP <expr> ]
-///kw+PRINT+usage [ SKIP_TIME <expr> ]
-///kw+PRINT+usage [ SKIP_HEADER_STEP <expr> ]
-        } else if ((n = feenox_parser_match_keyword_expression(token, keywords, expressions, sizeof(expressions)/sizeof(expr_t *))) != WASORA_PARSER_UNHANDLED) {
-          if (n == FEENOX_ERROR) {
-            return FEENOX_ERROR;
-          }
-
-        } else {
-///kw+PRINT+usage [ <object_1> <object_2> ... <object_n> ]
-///kw+PRINT+usage [ TEXT <string_1> ... TEXT <string_n> ]
-          // es un formato, una expresion o texto
-          // asi que agregamos un eslabon a la lista de tokens
-          print_token_t *print_token = calloc(1, sizeof(print_token_t));
-          LL_APPEND(print->tokens, print_token);
-
-          if (token[0] == '%') {
-            print_token->format = strdup(token);
-
-          } else if (strcasecmp(token, "STRING") == 0 || strcasecmp(token, "TEXT") == 0) {
-            if (feenox_parser_string(&print_token->text) != WASORA_PARSER_OK) {
-              return FEENOX_ERROR;
-            }
-
-          } else if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
-            print_token->text = strdup(token);   // nos quedamos con el texto para el header
-            print_token->matrix = dummy_matrix;
-
-          } else if ((dummy_vector = feenox_get_vector_ptr(token)) != NULL) {
-            print_token->text = strdup(token);   // nos quedamos con el texto para el header
-            print_token->vector = dummy_vector;
-
-          } else {
-            if (feenox_parse_expression(token, &print_token->expression) != WASORA_PARSER_OK) {
-
-              // dejamos que las expresiones no resueltas se transformen en texto
-              // solo si no tenemos implicit none
-              if (feenox.implicit_none) {
-                feenox_push_error_message("implicit definition is not allowed");
-                return FEENOX_ERROR;
-              } else {
-                print_token->expression.n_tokens = 0;
-                print_token->text = strdup(token);
-                feenox_pop_error_message();
-              }
-            } else {
-              print_token->text = strdup(token);   // nos quedamos con el texto para el header
-            }
-          }
-        }
-      }
-
-      // llenamos defaults
-      if (print->separator == NULL) {
-        print->separator = strdup(DEFAULT_PRINT_SEPARATOR);
-      }
-
-      if (print->file == NULL) {
-        print->file = feenox.special_files.stdout_;
-      }
-
-      if (feenox_define_instruction(feenox_instruction_print, print) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return WASORA_PARSER_OK;
 
 
 // --- PRINT_FUNCTION -----------------------------------------------------
@@ -720,7 +590,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-          if (feenox_parser_expressions(&print_function->range.min, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&print_function->range.min, print_function->first_function->n_arguments) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -733,7 +603,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-          if (feenox_parser_expressions(&print_function->range.max, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&print_function->range.max, print_function->first_function->n_arguments) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -745,7 +615,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-          if (feenox_parser_expressions(&print_function->range.step, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&print_function->range.step, print_function->first_function->n_arguments) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -757,13 +627,13 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-          if (feenox_parser_expressions(&print_function->range.nsteps, print_function->first_function->n_arguments) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&print_function->range.nsteps, print_function->first_function->n_arguments) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
 ///kw+PRINT_FUNCTION+usage [ FORMAT <print_format> ]
         } else if (strcasecmp(token, "FORMAT") == 0) {
-          if (feenox_parser_string(&print_function->format) != WASORA_PARSER_OK) {
+          if (feenox_parser_string(&print_function->format) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
           
@@ -840,7 +710,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
 // --- PRINT_VECTOR -----------------------------------------------------
 ///kw+PRINT_VECTOR+desc Print the elements of one or more vectors.
@@ -871,13 +741,13 @@ int feenox_parse_line(void) {
 ///kw+PRINT_VECTOR+usage [ ELEMS_PER_LINE <expr> ]
         } else if (strcasecmp(token, "ELEMS_PER_LINE") == 0) {
           print_vector->horizontal = 1;
-          if (feenox_parser_expression(&print_vector->elems_per_line) != WASORA_PARSER_OK) {
+          if (feenox_parser_expression(&print_vector->elems_per_line) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
 ///kw+PRINT_VECTOR+usage [ FORMAT <print_format> ]
         } else if (strcasecmp(token, "FORMAT") == 0) {
-          if (feenox_parser_string(&print_vector->format) != WASORA_PARSER_OK) {
+          if (feenox_parser_string(&print_vector->format) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -919,7 +789,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
       
 // --- SOLVE -----------------------------------------------------
 ///kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
@@ -1043,7 +913,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;      
+      return FEENOX_OK;      
 
 // --- M4 -----------------------------------------------------
 ///kw+M4+desc Call the `m4` macro processor with definitions from feenox variables or expressions.
@@ -1080,7 +950,7 @@ int feenox_parse_line(void) {
           
           feenox_call(feenox_parser_string(&macro->name));
           macro->print_token.format = strdup(DEFAULT_M4_FORMAT);
-          if (feenox_parse_expression(macro->name, &macro->print_token.expression) != WASORA_PARSER_OK) {
+          if (feenox_parse_expression(macro->name, &macro->print_token.expression) != FEENOX_OK) {
             feenox_push_error_message("m4 expansion of '%s' failed", macro->name);
             return FEENOX_ERROR;
           }
@@ -1113,7 +983,7 @@ int feenox_parse_line(void) {
 
           // si el formato es %s o la expresion no evalua, lo tomamos como string
           if (strcasecmp(macro->print_token.format, "%s") == 0 ||
-              feenox_parse_expression(token, &macro->print_token.expression) != WASORA_PARSER_OK) {
+              feenox_parse_expression(token, &macro->print_token.expression) != FEENOX_OK) {
             macro->print_token.text = strdup(token);
           }
           
@@ -1127,7 +997,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
 // --- SHELL -----------------------------------------------------
 ///kw+SHELL+desc Execute a shell command.
@@ -1139,13 +1009,13 @@ int feenox_parse_line(void) {
       LL_APPEND(feenox.shells, shell);
 
 ///kw+SHELL+usage <print_format> [ expr_1 expr_2 ... expr_n ]
-      if (feenox_parser_string_format(&shell->format, &shell->n_args) != WASORA_PARSER_OK) {
+      if (feenox_parser_string_format(&shell->format, &shell->n_args) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
 
       shell->arg = calloc(shell->n_args, sizeof(expr_t));
       for (i = 0; i < shell->n_args; i++) {
-        if (feenox_parser_expression(&shell->arg[i]) != WASORA_PARSER_OK) {
+        if (feenox_parser_expression(&shell->arg[i]) != FEENOX_OK) {
           return FEENOX_ERROR;
         }
       }
@@ -1154,7 +1024,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
 // ----- HISTORY  -----------------------------------------------------------------
 ///kw+HISTORY+desc Record the time history of a variable as a function of time.
@@ -1189,7 +1059,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     // ----- PARAMETRIC  -----------------------------------------------------------------
 ///kw+PARAMETRIC+desc Systematically sweep a zone of the parameter space, i.e. perform a parametric run.
@@ -1337,7 +1207,7 @@ int feenox_parse_line(void) {
         LL_DELETE(varlist, varitem);
         free(varitem);
       }
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     // ----- FIT  -----------------------------------------------------------------
     } else if ((strcasecmp(token, "FIT") == 0)) {
@@ -1551,7 +1421,7 @@ int feenox_parse_line(void) {
         feenox.fit.max_iter = DEFAULT_NLIN_FIT_MAX_ITER;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     // ----- MINIMIZE  -----------------------------------------------------------------
 ///kw+MINIMIZE+usage MINIMIZE
@@ -1657,7 +1527,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-          if (feenox_parser_expressions(&feenox.min.range.min, feenox.min.n) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&feenox.min.range.min, feenox.min.n) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -1669,7 +1539,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-          if (feenox_parser_expressions(&feenox.min.range.max, feenox.min.n) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&feenox.min.range.max, feenox.min.n) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
 
@@ -1688,7 +1558,7 @@ int feenox_parse_line(void) {
           feenox.min.n_steps = (feenox.min.f_type != NULL) ? feenox.min.n : 1;
           feenox.min.range.step = malloc(feenox.min.n_steps * sizeof(expr_t));
 
-          if (feenox_parser_expressions(&feenox.min.range.step, feenox.min.n_steps) != WASORA_PARSER_OK) {
+          if (feenox_parser_expressions(&feenox.min.range.step, feenox.min.n_steps) != FEENOX_OK) {
             return FEENOX_ERROR;
           }
         } else if (strcasecmp(token, "VERBOSE") == 0) {
@@ -1769,7 +1639,7 @@ int feenox_parse_line(void) {
         }
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     // ----- PHASE_SPACE -----------------------------------------------------------
     } else if (strcasecmp(token, "PHASE_SPACE") == 0) {
@@ -1855,7 +1725,7 @@ int feenox_parse_line(void) {
         }
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
               
     // ----- DIFFERENTIAL -----------------------------------------------------------
     } else if (strcasecmp(token, "DIFFERENTIAL") == 0) {
@@ -1874,7 +1744,7 @@ int feenox_parse_line(void) {
         }          
       }
       
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
       
       // --- DAE -----------------------------------------------------
     } else if (token[0] == '0' || strstr(feenox.line, ".=") != NULL) {
@@ -2005,7 +1875,7 @@ int feenox_parse_line(void) {
 
       free(equation);
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     // ----- ASSIGNMENT -----------------------------------------------------------
     } else if ((token = feenox_get_next_token(NULL)) != NULL && strcmp(token, "=") == 0) {
@@ -2024,7 +1894,7 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
 
-      return WASORA_PARSER_OK;
+      return FEENOX_OK;
 
     } else {
       // si no entendimos la linea, probamos pasarsela al parser de mallas
@@ -2659,12 +2529,12 @@ int feenox_parse_function(void) {
       function->data_size = 0;
 
       for (i = 0; i < nargs; i++) {
-        if (feenox_parser_vector(&function->vector_argument[i]) != WASORA_PARSER_OK) {
+        if (feenox_parser_vector(&function->vector_argument[i]) != FEENOX_OK) {
           return FEENOX_ERROR;
         }
       }
 
-      if (feenox_parser_vector(&function->vector_value) != WASORA_PARSER_OK) {
+      if (feenox_parser_vector(&function->vector_value) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
 
@@ -3036,4 +2906,153 @@ int feenox_parse_sort_vector(void) {
       
   return FEENOX_OK;
         
+}
+
+
+int feenox_parse_print(void) {
+ 
+  char *token;
+  print_t *print;
+  matrix_t *dummy_matrix;
+  vector_t *dummy_vector;
+  int n;
+
+  // I don't expect anybody to want to use this PRINT instruction through the API
+  // so we just parse and define everything here
+  print = calloc(1, sizeof(print_t));
+
+  char *keywords[] = {"SKIP_STEP", "SKIP_STATIC_STEP", "SKIP_TIME", "SKIP_HEADER_STEP", ""};
+  expr_t *expressions[] = {
+    &print->skip_step,
+    &print->skip_static_step,
+    &print->skip_time,
+    &print->skip_header_step,
+    NULL
+  };
+
+///kw+PRINT+detail Each argument `object` which is not a keyword of the `PRINT` instruction will be part of the output.
+///kw+PRINT+detail Objects can be either a matrix, a vector or any valid scalar algebraic expression.
+///kw+PRINT+detail If the given object cannot be solved into a valid matrix, vector or expression, it is treated as a string literal
+///kw+PRINT+detail if `IMPLICIT` is `ALLOWED`, otherwise a parser error is raised.
+///kw+PRINT+detail To explicitly interpret an object as a literal string even if it resolves to a valid numerical expression,
+///kw+PRINT+detail it should be prefixed with the `TEXT` keyword such as `PRINT TEXT 1+1` that would print `1+1` instead of `2`.
+///kw+PRINT+detail Objects and string literals can be mixed and given in any order.
+///kw+PRINT+detail Hashes `#` appearing literal in text strings have to be quoted to prevent the parser to treat them as comments
+///kw+PRINT+detail within the FeenoX input file and thus ignoring the rest of the line, like `PRINT "\# this is a printed comment"`.
+///kw+PRINT+detail Whenever an argument starts with a porcentage sign `%`, it is treated as a C `printf`-compatible format
+///kw+PRINT+detail specifier and all the objects that follow it are printed using the given format until a new format definition is found.
+///kw+PRINT+detail The objects are treated as double-precision floating point numbers, so only floating point formats should be given.
+///kw+PRINT+detail See the `printf(3)` man page for further details. The default format is `DEFAULT_PRINT_FORMAT`.
+///kw+PRINT+detail Matrices, vectors, scalar expressions, format modifiers and string literals can be given in any desired order,
+///kw+PRINT+detail and are processed from left to right.
+///kw+PRINT+detail Vectors are printed element-by-element in a single row. See `PRINT_VECTOR` to print vectors column-wise.
+///kw+PRINT+detail Matrices are printed element-by-element in a single line using row-major ordering if mixed
+///kw+PRINT+detail with other objects but in the natural row and column fashion if it is the only given object in the `PRINT` instruction.
+
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+PRINT+usage [ FILE < <file_path> | <file_id> > ]
+///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
+    if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+//      if (feenox_parser_file(&print->file) != FEENOX_OK) {
+        return FEENOX_ERROR;
+//      }
+ 
+///kw+PRINT+usage [ SEP <string> ]
+///kw+PRINT+detail The `SEP` keyword expects a string used to separate printed objects.
+///kw+PRINT+detail To print objects without any separation in between give an empty string like `SEP ""`.
+///kw+PRINT+detail The default is a tabulator character 'DEFAULT_PRINT_SEPARATOR' character. 
+    } else if (strcasecmp(token, "SEP") == 0 || strcasecmp(token, "SEPARATOR") == 0) {
+      feenox_call(feenox_parser_string(&print->separator));
+
+///kw+PRINT+usage [ NONEWLINE ]
+    } else if (strcasecmp(token, "NONEWLINE") == 0) {
+///kw+PRINT+detail If the `NONEWLINE` keyword is not provided, default is to write a newline `\n` character after
+///kw+PRINT+detail all the objects are processed.
+///kw+PRINT+detail Otherwise, after the last token a separator string will be printed but not the newline `\n` character.
+      print->nonewline = 1;
+
+///kw+PRINT+detail To print an empty line write `PRINT` without arguments.
+      
+///kw+PRINT+usage [ HEADER ]
+    } else if (strcasecmp(token, "HEADER") == 0) {
+      print->header = 1;
+///kw+PRINT+detail If the `HEADER` keyword is given, a single line containing the literal text
+///kw+PRINT+detail given for each object is printed at the very first time the `PRINT` instruction is
+///kw+PRINT+detail processed, starting with a hash `#` character.           
+
+///kw+PRINT+usage [ SKIP_STEP <expr> ]
+///kw+PRINT+detail By default the `PRINT` instruction is evaluated every step.
+///kw+PRINT+detail If the `SKIP_STEP` (`SKIP_STATIC_STEP`) keyword is given, the instruction is processed 
+///kw+PRINT+detail only every the number of transient (static) steps that results in evaluating the expression,
+///kw+PRINT+detail which may not be constant.
+///kw+PRINT+detail The `SKIP_HEADER_STEP` keyword works similarly for the optional `HEADER` but
+///kw+PRINT+detail by default it is only printed once. The `SKIP_TIME` keyword use time advancements
+///kw+PRINT+detail to choose how to skip printing and may be useful for non-constant time-step problems.
+
+///kw+PRINT+usage [ SKIP_STATIC_STEP <expr> ]
+///kw+PRINT+usage [ SKIP_TIME <expr> ]
+///kw+PRINT+usage [ SKIP_HEADER_STEP <expr> ]
+    } else if ((n = feenox_parser_match_keyword_expression(token, keywords, expressions, sizeof(expressions)/sizeof(expr_t *))) != FEENOX_UNHANDLED) {
+      if (n == FEENOX_ERROR) {
+        return FEENOX_ERROR;
+      }
+
+    } else {
+      
+///kw+PRINT+usage [ <object_1> <object_2> ... <object_n> ]
+///kw+PRINT+usage [ TEXT <string_1> ... TEXT <string_n> ]
+      print_token_t *print_token = calloc(1, sizeof(print_token_t));
+      LL_APPEND(print->tokens, print_token);
+
+      if (token[0] == '%') {
+        print_token->format = strdup(token);
+
+      } else if (strcasecmp(token, "STRING") == 0 || strcasecmp(token, "TEXT") == 0) {
+        if (feenox_parser_string(&print_token->text) != FEENOX_OK) {
+          return FEENOX_ERROR;
+        }
+
+      } else if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
+        print_token->text = strdup(token);   // nos quedamos con el texto para el header
+        print_token->matrix = dummy_matrix;
+
+      } else if ((dummy_vector = feenox_get_vector_ptr(token)) != NULL) {
+        print_token->text = strdup(token);   // nos quedamos con el texto para el header
+        print_token->vector = dummy_vector;
+
+      } else {
+        if (feenox_parse_expression(token, &print_token->expression) != FEENOX_OK) {
+
+          // let the not-resolved expressions to be casted as string literals 
+          // only if implicit is allowed
+          if (feenox_parser.implicit_none) {
+            feenox_push_error_message("implicit definition is not allowed and expression '%s' is invalid", token);
+            return FEENOX_ERROR;
+          } else {
+            print_token->expression.factors = NULL;
+            print_token->text = strdup(token);
+            feenox_pop_error_message();
+          }
+        } else {
+          print_token->text = strdup(token);   // nos quedamos con el texto para el header
+        }
+      }
+    }
+  }
+
+  // default separator
+  if (print->separator == NULL) {
+    print->separator = strdup(DEFAULT_PRINT_SEPARATOR);
+  }
+  
+  // default file is stdout
+  if (print->file == NULL) {
+    print->file = feenox.special_files.stdout_;
+  }
+  
+
+  LL_APPEND(feenox.prints, print);
+  feenox_call(feenox_add_instruction(feenox_instruction_print, print));
+  
+  return FEENOX_OK;
 }

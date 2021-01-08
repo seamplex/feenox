@@ -164,16 +164,16 @@ double feenox_evaluate_expression(expr_t *this) {
           break;
           case '=':
            if (fabs(P->value) < 1 || fabs(E->value) < 1) {
-             P->value = (fabs(P->value - E->value) < feenox_var_value(feenox_special_var(zero)))?1:0;
+             P->value = (fabs(P->value - E->value) < feenox_special_var_value(zero))?1:0;
            } else {
-             P->value = (gsl_fcmp(P->value, E->value, feenox_var_value(feenox_special_var(zero))) == 0)?1:0;
+             P->value = (gsl_fcmp(P->value, E->value, feenox_special_var_value(zero)) == 0)?1:0;
            }
           break;
           case '!':
            if (fabs(P->value) < 1 || fabs(E->value) < 1) {
-             P->value = (fabs(P->value - E->value) < feenox_var_value(feenox_special_var(zero)))?0:1;
+             P->value = (fabs(P->value - E->value) < feenox_special_var_value(zero))?0:1;
            } else {
-             P->value = (gsl_fcmp(P->value, E->value, feenox_var_value(feenox_special_var(zero))) == 0)?0:1;
+             P->value = (gsl_fcmp(P->value, E->value, feenox_special_var_value(zero)) == 0)?0:1;
            }
           break;
           case '<':

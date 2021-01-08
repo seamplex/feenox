@@ -19,11 +19,9 @@
  *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-
-#include <stdio.h>
-
 #include "feenox.h"
 
+#include <stdlib.h>
 
 int main(int argc, char **argv) {
 
@@ -31,32 +29,13 @@ int main(int argc, char **argv) {
     feenox_pop_errors();
     exit(EXIT_FAILURE);
   }
- 
-/*  
-  // vemos como tenemos que correr
-  if (show_version) {
-    feenox_show_version(1);
-    exit(EXIT_SUCCESS);
-  } else if (feenox.mode == mode_list_vars) {
-    feenox_list_symbols();
-    i = WASORA_RUNTIME_OK;
-  } else if (feenox.parametric_mode) {
-    i = feenox_parametric_run();
-  } else if (feenox.min_mode) {
-    i = feenox_min_run();
-  } else if (feenox.fit_mode) {
-    i = feenox_fit_run();
-  } else {
-    i = feenox_standard_run();
-  }
-  
-  if (i != WASORA_RUNTIME_OK) {
-//    feenox_pop_errors();
+
+  if (feenox.run() == FEENOX_ERROR) {
     feenox_runtime_error();
+    exit(EXIT_FAILURE);
   }
 
-  // bye bye
   feenox_finalize();
-*/  
-   return 0;
+
+  return 0;
 }

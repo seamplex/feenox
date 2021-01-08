@@ -25,7 +25,7 @@
 
 void feenox_polite_exit(int error) {
 
-  feenox_var_value(feenox_special_var(done)) = 1;
+  feenox_special_var_value(done) = 1;
   feenox_finalize();
   exit(error);
 

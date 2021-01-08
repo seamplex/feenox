@@ -355,9 +355,9 @@ double feenox_evaluate_function(function_t *function, const double *x) {
   
   // if the function is mesh, check if the time is the correct one
   if (function->mesh != NULL && function->name_in_mesh != NULL && function->mesh->format == mesh_format_gmsh
-      && function->mesh_time < feenox_var_value(feenox_special_var(t))-0.001*feenox_var_value(feenox_special_var(dt))) {
-    feenox_call(mesh_gmsh_update_function(function, feenox_var_value(feenox_special_var(t)), feenox_var_value(feenox_special_var(dt))));
-    function->mesh_time = feenox_var_value(feenox_special_var(t));
+      && function->mesh_time < feenox_special_var_value(t)-0.001*feenox_special_var_value(dt)) {
+    feenox_call(mesh_gmsh_update_function(function, feenox_special_var_value(t), feenox_special_var_value(dt)));
+    function->mesh_time = feenox_special_var_value(t);
   }
     
 

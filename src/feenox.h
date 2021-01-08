@@ -69,6 +69,7 @@
 
 #define FEENOX_OK         0
 #define FEENOX_ERROR      1
+#define FEENOX_UNHANDLED  2
 
 #define BUFFER_TOKEN_SIZE        255
 #define BUFFER_LINE_SIZE        4095
@@ -92,6 +93,34 @@
 #define EXPR_INITIAL_TRANSIENT                 2048
 #define EXPR_INITIAL_STATIC                    4096
 
+// constants for custom error handling
+#define ON_ERROR_NO_QUIT            1
+#define ON_ERROR_NO_REPORT          2
+
+
+// type of phase space componentes (the values come from SUNDIALs, do not change!)
+#define DAE_ALGEBRAIC                      0.0
+#define DAE_DIFFERENTIAL                   1.0
+
+
+#define STEP_ALL                           0
+#define STEP_BEFORE_DAE                    1
+#define STEP_AFTER_DAE                     3
+
+
+// reasonable defaults
+#define DEFAULT_DT                         1.0/16.0
+#define DEFAULT_REL_ERROR                  1e-6
+
+#define DEFAULT_PRINT_FORMAT               "%g"
+#define DEFAULT_PRINT_SEPARATOR            "\t"
+
+// zero & infinite
+#define ZERO          (8.881784197001252323389053344727e-16)  // (1/2)^-50
+#define INFTY         (1125899906842624.0)                    // 2^50
+
+#define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
+
 
 enum version_type {
   version_compact,
@@ -106,10 +135,15 @@ enum version_type {
 #define feenox_special_var(var) (feenox.special_vars.var)
 
 // value of a variable
-#define feenox_var_value(var)  (*(var->value))
+#define feenox_var_value(var)   (*(var->value))
+
+// value of a special variable
+#define feenox_special_var_value(var)  feenox_var_value(feenox_special_var(var))
 
 // pointer to the content of an object
 #define feenox_value_ptr(obj)  (obj->value)
+
+
 
 
 // forward type definitions
@@ -124,6 +158,10 @@ typedef struct function_t function_t;
 typedef struct alias_t alias_t;
 
 typedef struct instruction_t instruction_t;
+
+typedef struct file_t file_t;
+typedef struct print_t print_t;
+typedef struct print_token_t print_token_t;
 
 typedef struct sort_vector_t sort_vector_t;
 typedef struct phase_object_t phase_object_t;
@@ -393,6 +431,70 @@ struct instruction_t {
 };
 
 
+// a file, either input or output
+struct file_t {
+  char *name;
+  int initialized;
+  
+  char *format;
+  int n_args;
+  expr_t *arg;
+  char *mode;
+  int do_not_open;
+
+  char *path;
+  FILE *pointer;
+
+  UT_hash_handle hh;
+};
+
+
+// print a single line
+struct print_t {
+  // pointer to the output file (if null, print to stdout)
+  file_t *file;
+
+  // a linked list with the stuff to print
+  print_token_t *tokens;
+ 
+  // token separator, by default it is a tab "\t" 
+  char *separator;
+
+  // flag to indicate if we need to send the newline char "\n" at the end
+  // it's called nonewline so the default is zero and the "\n" is sent
+  int nonewline;
+
+  // stuff to help with the SKIP_*
+  int last_static_step;
+  int last_step;
+  double last_time;
+
+  expr_t skip_static_step;
+  expr_t skip_step;
+  expr_t skip_time;
+
+  int header;
+  expr_t skip_header_step;
+  int last_header_step;
+  int header_already_printed;
+  
+  print_t *next;
+};
+
+
+// an individual token to be PRINTed
+struct print_token_t {
+  char *format;
+  char *text;
+  expr_t expression;
+  
+  vector_t *vector;
+  matrix_t *matrix;
+  function_t *function;
+  
+  print_token_t *next;
+};
+
 struct sort_vector_t {
   int descending;
   
@@ -444,29 +546,30 @@ struct {
   char **argv;
   int optind;
 
-/*  
-  int argc_orig;       // copy of the original arguments before calling getopt()
-  char **argv_orig;
-
-  int argc_unknown;
-  char **argv_unknown;
-*/
   char *main_input_filepath;
   char *main_input_dirname;
   
   enum {
     mode_normal,
-    mode_ignore_debug,
-    mode_debug,
-    mode_single_step,
+    mode_parametric,
+    mode_optimize,
+    mode_fit,
     mode_list_vars
   } mode;
+  
+  // pointer to the run function (normal, parametric, optimize, fit, etc)
+  int (*run)(void);
+  
+  int debug;
   
   int rank;            // in serial or without petsc, this is always zero
   int nprocs;
 
   char **error;
   int error_level;
+  
+  // if this is not null then a conditional is wanting us to branch
+  instruction_t *next_instruction;
   
   expr_t *time_paths;
   expr_t *time_path_current;
@@ -480,6 +583,8 @@ struct {
   alias_t *aliases;
   function_t *functions;
   
+  file_t *files;
+  print_t *prints;
   
   struct {
     var_t *done;
@@ -488,7 +593,6 @@ struct {
     var_t *done_outer;
   
     var_t *step_outer;
-//    var_t *step_inner;
     var_t *step_static;
     var_t *step_transient;
 
@@ -517,8 +621,8 @@ struct {
     var_t *zero;
     var_t *infinite;
 
-//    var_t *ncores;
-//    var_t *pid;
+    var_t *ncores;
+    var_t *pid;
     
     var_t *on_nan;
     var_t *on_gsl_error;
@@ -526,17 +630,18 @@ struct {
     var_t *realtime_scale;
   } special_vars;
 
-/*	
+
   struct {
     vector_t *abs_error;
   } special_vectors;
 
+  
   struct {
-    file_t *stdin_;
+//    file_t *stdin_;
     file_t *stdout_;
-    file_t *stderr_;
+//    file_t *stderr_;
   } special_files;  
-*/  
+  
   struct {
     int dimension;
     double **phase_value;
@@ -553,7 +658,7 @@ struct {
     } initial_conditions_mode;
 
     instruction_t *instruction;
-
+    
 #if HAVE_IDA
     N_Vector x;
     N_Vector dxdt;
@@ -563,16 +668,23 @@ struct {
     SUNLinearSolver LS;
 #endif
   } dae;
-  
+
 } feenox;
 
 
 // function declarations
 
+// run_standard.c
+int feenox_run_standard(void);
+
+// step.c
+int feenox_step(int whence);
+
 // init.c
 extern int feenox_initialize(int argc, char **argv);
 extern int feenox_init_special_objects(void);
 extern int feenox_init_after_parser(void);
+extern int feenox_init_before_run(void);
 
 
 // version.c
@@ -605,7 +717,7 @@ extern int feenox_parse_expression(const char *string, expr_t *expr);
 
 // file.c
 FILE *feenox_fopen(const char *filepath, const char *mode);
-
+extern int feenox_instruction_open_file(void *arg);
 
 // abort.c
 extern int feenox_instruction_abort(void *arg);
@@ -617,7 +729,13 @@ extern double feenox_evaluate_expression(expr_t *this);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
-
+extern int feenox_dae_init(void);
+extern int feenox_dae_ic(void);
+#ifdef HAVE_IDA
+extern int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params);
+#else
+extern int feenox_ida_dae(void);
+#endif
 
 // instruction.c
 extern int feenox_add_instruction(int (*routine)(void *), void *argument);
@@ -638,8 +756,11 @@ extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
 extern int feenox_define_function(const char *name, int n_arguments);
 extern int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name);
 extern int feenox_function_set_expression(const char *name, const char *expression);
-extern var_t *feenox_get_or_define_variable_ptr(const char *name);
 
+extern int feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *mode, int do_not_open);
+
+extern var_t *feenox_get_or_define_variable_ptr(const char *name);
+extern var_t *feenox_define_variable_ptr(const char *name);
 
 extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
 extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
@@ -649,6 +770,7 @@ extern var_t *feenox_get_variable_ptr(const char *name);
 extern vector_t *feenox_get_vector_ptr(const char *name);
 extern matrix_t *feenox_get_matrix_ptr(const char *name);
 extern function_t *feenox_get_function_ptr(const char *name);
+extern file_t *feenox_get_file_ptr(const char *name);
 
 // alias.c
 extern int feenox_instruction_alias(void *arg);
@@ -662,6 +784,8 @@ extern int feenox_instruction_sort_vector(void *arg);
 
 // function.c
 extern int feenox_function_init(function_t *this);
-  
+
+// print.c
+extern int feenox_instruction_print(void *arg);
 
 #endif    /* FEENOX_H  */

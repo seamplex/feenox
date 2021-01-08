@@ -45,7 +45,7 @@ FILE *feenox_fopen(const char *filepath, const char *mode) {
   return handle;
   
 }
-/*
+
 char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
 
   int size = strlen(format)+1 + nargs*32;
@@ -124,15 +124,15 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
   return string;
   
 }
-*/
-/*
+
+
 int feenox_instruction_open_file(void *arg) {
   
   file_t *file = (file_t *)arg;
   char *newfilepath;
   
   if ((newfilepath = feenox_evaluate_string(file->format, file->n_args, file->arg)) == NULL) {
-    return WASORA_RUNTIME_ERROR;
+    return FEENOX_ERROR;
   }
 
   if (file->pointer == NULL || file->path == NULL || strcmp(newfilepath, file->path) != 0) {
@@ -144,16 +144,16 @@ int feenox_instruction_open_file(void *arg) {
     }
     if (file->mode == NULL) {
       feenox_push_error_message("unknown open mode for file '%s' ('%s')", file->name, file->path);
-      return WASORA_RUNTIME_ERROR;
+      return FEENOX_ERROR;
     }
     if ((file->pointer = feenox_fopen(file->path, file->mode)) == NULL) {
       feenox_push_error_message("'%s' when opening file '%s' with mode '%s'", strerror(errno), file->path, file->mode);
-      return WASORA_RUNTIME_ERROR;
+      return FEENOX_ERROR;
     }
   }
   
   free(newfilepath);
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }
 
@@ -165,7 +165,7 @@ int feenox_instruction_close_file(void *arg) {
     fclose(file->pointer);
     file->pointer = NULL;
   }
-  return WASORA_RUNTIME_OK;
+  return FEENOX_ERROR;
   
 }
 
@@ -177,7 +177,7 @@ int feenox_instruction_file(void *arg) {
     feenox_call(feenox_instruction_open_file(arg));
   }
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
-*/
+
 

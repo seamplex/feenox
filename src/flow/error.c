@@ -122,7 +122,7 @@ void feenox_signal_handler(int sig_num) {
   fprintf(stderr, "\npid %d: signal #%d caught, finnishing... ", getpid(), sig_num);
   fflush(stderr);
 
-  feenox_var_value(feenox_special_var(done)) = (double)1.0;
+  feenox_special_var_value(done) = (double)1.0;
 
   fprintf(stderr, "ok\n");
   feenox_polite_exit(EXIT_SUCCESS);

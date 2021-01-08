@@ -702,7 +702,7 @@ int feenox_parser_match_keyword_expression(char *token, char *keyword[], expr_t 
   }
           
   if (found == 0) {
-    return FEENOX_ERROR;
+    return FEENOX_UNHANDLED;
   }
   
   return FEENOX_OK;

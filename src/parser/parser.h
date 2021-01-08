@@ -70,7 +70,7 @@ extern char *feenox_ends_in_zero(char *name);
 extern int feenox_parser_vector(vector_t **vector);
 extern int feenox_parser_variable(var_t **var);
 extern int feenox_parser_keywords_ints(char *keyword[], int *value, int *option);
-
+extern int feenox_parser_match_keyword_expression(char *token, char *keyword[], expr_t *expr[], size_t n);
 
 extern int feenox_parse_include(void);
 extern int feenox_parse_default_argument_value(void);
@@ -85,6 +85,7 @@ extern int feenox_parse_matrix(void);
 extern int feenox_parse_function(void);
 
 extern int feenox_parse_sort_vector(void);
+extern int feenox_parse_print(void);
 
 
 #endif  

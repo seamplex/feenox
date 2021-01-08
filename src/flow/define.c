@@ -313,15 +313,15 @@ int feenox_function_set_expression(const char *name, const char *expression) {
 }
 
 
-/*
-file_t *feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *mode, int do_not_open) {
+
+int feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *mode, int do_not_open) {
 
   file_t *file;
 
   HASH_FIND_STR(feenox.files, name, file);
   if (file != NULL) {
     feenox_push_error_message("there already exists a file named '%s'", name);
-    return NULL;
+    return FEENOX_ERROR;
   }
 
   file = calloc(1, sizeof(file_t));
@@ -336,9 +336,10 @@ file_t *feenox_define_file(char *name, char *format, int n_args, expr_t *arg, ch
 
   HASH_ADD_KEYPTR(hh, feenox.files, file->name, strlen(file->name), file);
 
-  return file;
+  return FEENOX_OK;
 }
 
+/*
 loadable_routine_t *feenox_define_loadable_routine(char *name, void *library) {
 
   loadable_routine_t *loadable_routine;
@@ -370,6 +371,14 @@ loadable_routine_t *feenox_define_loadable_routine(char *name, void *library) {
 }
 
 */
+
+var_t *feenox_define_variable_ptr(const char *name) {
+  if (feenox_define_variable(name) != FEENOX_OK) {
+    return NULL;
+  }
+  return feenox_get_variable_ptr(name);
+}
+
 var_t *feenox_get_or_define_variable_ptr(const char *name) {
   var_t *var;
 
