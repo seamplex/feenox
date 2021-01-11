@@ -1,1 +1,3 @@
+PRINT "before"
 ABORT
+PRINT "after"

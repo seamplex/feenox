@@ -60,7 +60,13 @@ extern void feenox_add_leading_zeros(char **string);
 extern int feenox_parser_expression_in_string(double *result);
 extern int feenox_parse_madeup_expression(char *string, expr_t *expr);
 extern expr_factor_t *feenox_parse_factor(char *string);
+
 extern int feenox_parser_string(char **string);
+extern int feenox_parser_expression(expr_t *expr);
+extern int feenox_parser_string_format(char **string, int *n_args);
+
+extern int feenox_parser_file(file_t **file);
+
 extern int feenox_count_arguments(char *string);
 extern int feenox_read_arguments(char *string, int n_arguments, char ***arg_name);
 
@@ -85,6 +91,7 @@ extern int feenox_parse_matrix(void);
 extern int feenox_parse_function(void);
 
 extern int feenox_parse_sort_vector(void);
+extern int feenox_parse_file(char *mode);
 extern int feenox_parse_print(void);
 
 

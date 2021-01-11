@@ -294,6 +294,9 @@ int feenox_function_set_argument_variable(const char *name, int i, const char *v
     return FEENOX_ERROR;
   }
   
+  // mark that we received an argument to see if we got them all when initializing
+  function->n_arguments_given++;
+  
   return FEENOX_OK;
 }
 
@@ -314,7 +317,7 @@ int feenox_function_set_expression(const char *name, const char *expression) {
 
 
 
-int feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *mode, int do_not_open) {
+int feenox_define_file(const char *name, const char *format, int n_format_args, const char *mode) {
 
   file_t *file;
 
@@ -327,17 +330,43 @@ int feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *
   file = calloc(1, sizeof(file_t));
   file->name = strdup(name);
   file->format = strdup(format);
-  file->n_args = n_args;
-  file->arg = arg;
+  file->n_format_args = n_format_args;
+  file->arg = calloc(file->n_format_args, sizeof(expr_t *));
   if (mode != NULL) {
     file->mode = strdup(mode);
   }
-  file->do_not_open = do_not_open;
 
   HASH_ADD_KEYPTR(hh, feenox.files, file->name, strlen(file->name), file);
 
   return FEENOX_OK;
 }
+
+
+int feenox_file_set_path_argument(const char *name, int i, const char *expression) {
+  
+  file_t *file;
+  if ((file = feenox_get_file_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown file '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  if (i < 0) {
+    feenox_push_error_message("negative argument number '%d'", i);
+    return FEENOX_ERROR;
+  }
+  if (i >= file->n_format_args) {
+    feenox_push_error_message("argument number '%d' greater or equal than the number of arguments '%d' (they start from zero)", i, file->n_format_args);
+    return FEENOX_ERROR;
+  }
+  
+  feenox_call(feenox_parse_expression(expression, &file->arg[i]));
+  
+  // mark that we received an argument to see if we got them all when initializing
+  file->n_format_args_given++;
+  
+  return FEENOX_OK;
+}
+
 
 /*
 loadable_routine_t *feenox_define_loadable_routine(char *name, void *library) {

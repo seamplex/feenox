@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox auxiliary parsing routines
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -770,7 +770,7 @@ int feenox_parser_string_format(char **string, int *n_args) {
   
 }
 
-/*
+
 int feenox_parser_file(file_t **file) {
   
   char *token;
@@ -785,15 +785,12 @@ int feenox_parser_file(file_t **file) {
     return FEENOX_ERROR;
   }
   
-  // si alguien hace referencia a stdin entonces no nos metemos en debug
-  if (*file == feenox.special_files.stdin_) {
-    feenox.mode = mode_ignore_debug;
-  }
+  // XXXXX
   
   return FEENOX_OK;
 }
 
-
+/*
 int feenox_parser_file_path(file_t **file, char *mode) {
   
   char *token;

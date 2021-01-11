@@ -342,7 +342,7 @@ int feenox_init_special_objects(void) {
   feenox.special_files.stdin_ = feenox_define_file("stdin", "stdin", 0, NULL, "r", 0);
   feenox.special_files.stdin_->pointer = stdin;
 */
-  feenox_call(feenox_define_file("stdout", "stdout", 0, NULL, "w", 0));
+  feenox_call(feenox_define_file("stdout", "stdout", 0, "w"));
   feenox.special_files.stdout_ = feenox_get_file_ptr("stdout");
   feenox.special_files.stdout_->pointer = stdout;
 /*

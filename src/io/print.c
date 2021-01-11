@@ -60,7 +60,7 @@ int feenox_instruction_print(void *arg) {
   }
 
   if (print->file->pointer == NULL) {
-    feenox_call(feenox_instruction_open_file(print->file));
+    feenox_call(feenox_instruction_file_open(print->file));
   }
 
   if (print->tokens == NULL || print->tokens->format == NULL) {

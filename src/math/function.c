@@ -93,6 +93,10 @@ int feenox_function_init(function_t *this) {
     return 0;
   }
   
+  if (this->n_arguments_given != this->n_arguments) {
+    feenox_push_error_message("function '%s' needs %d arguments and %d were given", this->name, this->n_arguments, this->n_arguments_given);
+  }
+  
   this->initialized = 1;
 
 /*  

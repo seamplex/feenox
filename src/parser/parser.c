@@ -63,6 +63,7 @@ int feenox_parse_main_input_file(const char *filepath) {
   free(feenox_parser.line);
 
 /*  
+  // TODO 
   if (feenox_parser.active_conditional_block != NULL) {
     feenox_push_error_message("conditional block not closed");
     return FEENOX_ERROR;
@@ -214,6 +215,18 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "PRINT") == 0) {
       feenox_call(feenox_parse_print());
       return FEENOX_OK;
+
+///kw+FILE+desc Define a file with a particularly formatted name to be used either as input or as output.
+///kw+FILE+usage < FILE | OUTPUT_FILE | INPUT_FILE >
+    } else if (strcasecmp(token, "FILE") == 0) {
+      feenox_call(feenox_parse_file(NULL));
+      return FEENOX_OK;
+    } else if (strcasecmp(token, "OUTPUT_FILE") == 0) {
+      feenox_call(feenox_parse_file("w"));
+      return FEENOX_OK;
+    } else if (strcasecmp(token, "INPUT_FILE") == 0) {
+      feenox_call(feenox_parse_file("r"));
+      return FEENOX_OK;
       
     }
     
@@ -222,89 +235,6 @@ int feenox_parse_line(void) {
 
       
 /*
-
-
- // --- FILE -----------------------------------------------------
-///kw+FILE+desc Define a file, either as input or as output, for further usage.
-///kw+FILE+usage < FILE | OUTPUT_FILE | INPUT_FILE >
-} else if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "OUTPUT_FILE") == 0 || strcasecmp(token, "INPUT_FILE") == 0) {
-
-  file_t *file;
-  char *name = NULL;
-  char *format = NULL;
-  char *mode = NULL;
-  expr_t *arg = NULL;
-  int n_args = 0;
-  int do_not_open = 0;
-
-  if (strcasecmp(token, "OUTPUT_FILE") == 0) {
-    mode = strdup("w");
-  } else if (strcasecmp(token, "INPUT_FILE") == 0) {
-    mode = strdup("r");
-  }
-
-///kw+FILE+usage <name>
-  if (feenox_parser_string(&name) != FEENOX_OK) {
-    return FEENOX_ERROR;
-  }
-
-///kw+FILE+usage <printf_format>
-///kw+FILE+usage [ expr_1 expr_2 ... expr_n ]
-  if (feenox_parser_string_format(&format, &n_args) != FEENOX_OK) {
-    return FEENOX_ERROR;
-  }
-
-  if (n_args != 0) {
-    arg = calloc(n_args, sizeof(expr_t));
-    for (i = 0; i < n_args; i++) {
-      if (feenox_parser_expression(&arg[i]) != FEENOX_OK) {
-        return FEENOX_ERROR;
-      }
-    }
-  }
-
-///kw+FILE+usage [ INPUT | OUTPUT | MODE <fopen_mode> ]
-  while ((token = feenox_get_next_token(NULL)) != NULL) {
-    if (strcasecmp(token, "MODE") == 0) {
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected a mode");
-        return FEENOX_ERROR;
-      }
-      mode = strdup(token);
-    } else if (strcasecmp(token, "INPUT") == 0) {
-      mode = strdup("r");
-    } else if (strcasecmp(token, "OUTPUT") == 0) {
-      mode = strdup("w");
-///kw+FILE+usage [ OPEN | DO_NOT_OPEN ]
-    } else if (strcasecmp(token, "OPEN") == 0) {
-      do_not_open = 0;
-    } else if (strcasecmp(token, "DO_NOT_OPEN") == 0) {
-      do_not_open = 1;
-    } else {
-      feenox_push_error_message("unknown keyword '%s'", token);
-      return FEENOX_ERROR;
-    }
-
-  }
-
-  // si no nos dicen que es, no abrimos
-  if (mode == NULL) {
-    do_not_open = 1;
-  }
-
-  if ((file = feenox_define_file(name, format, n_args, arg, mode, do_not_open)) == NULL) {
-    return FEENOX_ERROR;
-  }
-
-  if (feenox_define_instruction(feenox_instruction_file, file) == NULL) {
-    return FEENOX_ERROR;
-  }
-
-  free(format);
-  free(mode);
-  free(name);
-  return FEENOX_OK;
-
 // ---- CLOSE ----------------------------------------------------
 ///kw+CLOSE+usage CLOSE
 ///kw+CLOSE+desc Explicitly close an already-`OPEN`ed file.
@@ -2909,6 +2839,87 @@ int feenox_parse_sort_vector(void) {
 }
 
 
+int feenox_parse_file(char *mode) {
+ 
+  char *token = NULL;
+  char *name = NULL;
+  char *format = NULL;
+  char *custom_mode = NULL;
+  char **arg = NULL;
+  int n_args = 0;
+
+///kw+FILE+usage <name>
+  if (feenox_parser_string(&name) != FEENOX_OK) {
+    return FEENOX_ERROR;
+  }
+
+///kw+FILE+detail For reading or writing into files with a fixed path, this instruction is usually not needed as
+///kw+FILE+detail the `FILE` keyword of other instructions (such as `PRINT` or `MESH`) can take a fixed-string path as an argument.
+///kw+FILE+detail However, if the file name changes as the execution progresses (say because one file for each step is needed),
+///kw+FILE+detail then an explicit `FILE` needs to be defined with this keyword and later referenced by the given name.  
+  
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+FILE+usage PATH <format>
+///kw+FILE+usage expr_1 expr_2 ... expr_n
+///kw+FILE+detail The path should be given as a `printf`-like format string followed by the expressions which shuold be
+///kw+FILE+detail evaluated in order to obtain the actual file path. The expressions will always be floating-point expressions,
+///kw+FILE+detail but the particular integer specifier `%d` is allowed and internally transformed to `%.0f`.
+    if (strcasecmp(token, "PATH") == 0) {
+      feenox_call(feenox_parser_string_format(&format, &n_args));
+
+      if (n_args != 0) {
+        arg = calloc(n_args, sizeof(char *));
+        int i;
+        for (i = 0; i < n_args; i++) {
+          feenox_call(feenox_parser_string(&arg[i]));
+        }
+      }
+
+///kw+FILE+detail The file can be explicitly defined and `INPUT`, `OUTPUT` or a certain `fopen()` mode can be given (i.e. "a").
+///kw+FILE+detail If not explicitly given, the nature of the file will be taken from context, i.e. `FILE`s in `PRINT`
+///kw+FILE+detail will be `OUTPUT`  and `FILE`s in `FUNCTION` will be `INPUT`.
+   
+///kw+FILE+usage [ INPUT | OUTPUT | MODE <fopen_mode> ]
+    } else if (strcasecmp(token, "MODE") == 0) {
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected a mode");
+        return FEENOX_ERROR;
+      }
+      custom_mode = strdup(token);
+    } else if (strcasecmp(token, "INPUT") == 0) {
+      custom_mode = strdup("r");
+    } else if (strcasecmp(token, "OUTPUT") == 0) {
+      custom_mode = strdup("w");
+
+///kw+FILE+detail This keyword justs defines the `FILE`, it does not open it.
+///kw+FILE+detail The file will be actually openened (and eventually closed) automatically.
+///kw+FILE+detail In the rare case where the automated opening and closing does not fit the expected workflow,
+///kw+FILE+detail the file can be explicitly opened or closed with the instructions `FILE_OPEN` and `FILE_CLOSE`.
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+
+  // the custom mode takes precedende over the argument's mode
+  if (custom_mode == NULL) {
+    custom_mode = mode;
+  }
+
+  feenox_call(feenox_define_file(name, format, n_args, mode));
+  
+  int i;
+  for (i = 0; i < n_args; i++) {
+    feenox_call(feenox_file_set_path_argument(name, i, arg[i]));
+  }
+
+  free(format);
+  free(custom_mode);
+  free(name);
+  
+  return FEENOX_OK;
+}
+
 int feenox_parse_print(void) {
  
   char *token;
@@ -2953,9 +2964,13 @@ int feenox_parse_print(void) {
 ///kw+PRINT+usage [ FILE < <file_path> | <file_id> > ]
 ///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
-//      if (feenox_parser_file(&print->file) != FEENOX_OK) {
-        return FEENOX_ERROR;
-//      }
+      feenox_call(feenox_parser_file(&print->file));
+      // we don't have the file name becuase it was already consumed by the above call
+      // and we do not expect the PRINT instruction to be used from the API
+      // so we directly access the internals of the structure
+      if (print->file->mode == NULL) {
+        print->file->mode = strdup("w");
+      }
  
 ///kw+PRINT+usage [ SEP <string> ]
 ///kw+PRINT+detail The `SEP` keyword expects a string used to separate printed objects.

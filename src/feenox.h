@@ -334,6 +334,7 @@ struct function_t {
   
   // number of arguments the function takes
   int n_arguments;
+  int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
 
   // array of pointers to already-existing variables for the arguments
   var_t **var_argument;
@@ -437,10 +438,10 @@ struct file_t {
   int initialized;
   
   char *format;
-  int n_args;
+  int n_format_args;
+  int n_format_args_given;
   expr_t *arg;
   char *mode;
-  int do_not_open;
 
   char *path;
   FILE *pointer;
@@ -716,8 +717,10 @@ extern int feenox_parse_expression(const char *string, expr_t *expr);
 
 
 // file.c
+extern int feenox_instruction_file(void *arg);
 FILE *feenox_fopen(const char *filepath, const char *mode);
-extern int feenox_instruction_open_file(void *arg);
+extern int feenox_instruction_file_open(void *arg);
+extern int feenox_instruction_file_close(void *arg);
 
 // abort.c
 extern int feenox_instruction_abort(void *arg);
@@ -757,7 +760,8 @@ extern int feenox_define_function(const char *name, int n_arguments);
 extern int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name);
 extern int feenox_function_set_expression(const char *name, const char *expression);
 
-extern int feenox_define_file(char *name, char *format, int n_args, expr_t *arg, char *mode, int do_not_open);
+extern int feenox_define_file(const char *name, const char *format, int n_args, const char *mode);
+extern int feenox_file_set_path_argument(const char *name, int i, const char *expression);
 
 extern var_t *feenox_get_or_define_variable_ptr(const char *name);
 extern var_t *feenox_define_variable_ptr(const char *name);

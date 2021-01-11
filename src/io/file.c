@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox file access routines
  *
- *  Copyright (C) 2013-2020 jeremy theler
+ *  Copyright (C) 2013-2021 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -19,13 +19,13 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
 
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 
 
-#include "feenox.h"
 
 
 FILE *feenox_fopen(const char *filepath, const char *mode) {
@@ -126,12 +126,12 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
 }
 
 
-int feenox_instruction_open_file(void *arg) {
+int feenox_instruction_file_open(void *arg) {
   
   file_t *file = (file_t *)arg;
   char *newfilepath;
   
-  if ((newfilepath = feenox_evaluate_string(file->format, file->n_args, file->arg)) == NULL) {
+  if ((newfilepath = feenox_evaluate_string(file->format, file->n_format_args, file->arg)) == NULL) {
     return FEENOX_ERROR;
   }
 
@@ -158,7 +158,7 @@ int feenox_instruction_open_file(void *arg) {
 }
 
 
-int feenox_instruction_close_file(void *arg) {
+int feenox_instruction_file_close(void *arg) {
   
   file_t *file = (file_t *)arg;
   if (file->pointer != NULL) {
@@ -168,16 +168,3 @@ int feenox_instruction_close_file(void *arg) {
   return FEENOX_ERROR;
   
 }
-
-int feenox_instruction_file(void *arg) {
-  
-  file_t *file = (file_t *)arg;
-  
-  if (file->do_not_open == 0) {
-    feenox_call(feenox_instruction_open_file(arg));
-  }
-  
-  return FEENOX_OK;
-}
-
-
