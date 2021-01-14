@@ -44,17 +44,19 @@ int feenox_initialize(int argc, char **argv) {
   feenox.run = feenox_run_standard;
   
   const struct option longopts[] = {
-    { "help",     no_argument,       NULL, 'h'},
-    { "version",  no_argument,       NULL, 'v'},
-    { "versions", no_argument,       NULL, 'V'},
-    { "debug",    no_argument,       NULL, 'd'},
-    { "list",     no_argument,       NULL, 'l'},
-// TODO: progress, mumps, elements, volumes, s2, s4, etc.
+    { "help",         no_argument,       NULL, 'h'},
+    { "version",      no_argument,       NULL, 'v'},
+    { "versions",     no_argument,       NULL, 'V'},
+    { "long-version", no_argument,       NULL, 'V'},
+    { "version-long", no_argument,       NULL, 'V'},
+    { "debug",        no_argument,       NULL, 'd'},
+    { "summarize",    no_argument,       NULL, 's'},
+    // --progress, --mumps, etc. are handled by the pde initialization routines    
     { NULL, 0, NULL, 0 }
   };  
  
   opterr = 0;   // don't complain about unknown options, they can be for PETSc/SLEPc
-  while ((optc = getopt_long_only(argc, argv, "hvil", longopts, &option_index)) != -1) {
+  while ((optc = getopt_long_only(argc, argv, "hvVis", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
         show_help = 1;
@@ -68,7 +70,7 @@ int feenox_initialize(int argc, char **argv) {
       case 'd':
         feenox.debug = 1;
         break;
-      case 'l':
+      case 's':
         feenox.mode = mode_list_vars;
         break;
       case '?':

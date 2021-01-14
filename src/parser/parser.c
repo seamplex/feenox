@@ -228,26 +228,25 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_file("r"));
       return FEENOX_OK;
       
+///kw+OPEN+desc Explicitly open a file for input/output.
+///kw+OPEN+usage OPEN
+    } else if (strcasecmp(token, "OPEN") == 0) {
+      feenox_call(feenox_parse_open_close("OPEN"));
+      return FEENOX_OK;
+
+///kw+CLOSE+desc Explicitly close a file after input/output.
+///kw+CLOSE+usage CLOSE
+    } else if (strcasecmp(token, "CLOSE") == 0) {
+      feenox_call(feenox_parse_open_close("CLOSE"));
+      return FEENOX_OK;
+      
     }
-    
+      
   }
 
 
       
 /*
-// ---- CLOSE ----------------------------------------------------
-///kw+CLOSE+usage CLOSE
-///kw+CLOSE+desc Explicitly close an already-`OPEN`ed file.
-    } else if (strcasecmp(token, "CLOSE") == 0) {
-      
-      file_t *file;
-      
-      feenox_call(feenox_parser_file(&file) != FEENOX_OK);
-      
-      if (feenox_define_instruction(feenox_instruction_close_file, file) == NULL) {
-        return FEENOX_ERROR;
-      }
-      return FEENOX_OK;
       
 
 // --- IF -----------------------------------------------------
@@ -2881,11 +2880,7 @@ int feenox_parse_file(char *mode) {
    
 ///kw+FILE+usage [ INPUT | OUTPUT | MODE <fopen_mode> ]
     } else if (strcasecmp(token, "MODE") == 0) {
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected a mode");
-        return FEENOX_ERROR;
-      }
-      custom_mode = strdup(token);
+      feenox_call(feenox_parser_string(&custom_mode));
     } else if (strcasecmp(token, "INPUT") == 0) {
       custom_mode = strdup("r");
     } else if (strcasecmp(token, "OUTPUT") == 0) {
@@ -2918,6 +2913,53 @@ int feenox_parse_file(char *mode) {
   free(name);
   
   return FEENOX_OK;
+}
+
+
+int feenox_parse_open_close(const char *what) {
+
+  char *token = NULL;
+  char *name = NULL;
+  char *mode = NULL;
+  
+///kw+OPEN+usage <name>
+///kw+CLOSE+usage <name>
+  if (feenox_parser_string(&name) != FEENOX_OK) {
+    return FEENOX_ERROR;
+  }
+
+///kw+OPEN+detail The given `<name>` can be either a fixed-string path or an already-defined `FILE`.
+///kw+CLOSE+detail The given `<name>` can be either a fixed-string path or an already-defined `FILE`.
+  
+  if (strcmp(what, "OPEN") == 0) {
+    while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+OPEN+detail The mode is only taken into account if the file is not already defined.
+///kw+OPEN+detail Default is write `w`.
+    
+///kw+OPEN+usage [ MODE <fopen_mode> ]
+      if (strcasecmp(token, "MODE") == 0) {
+        feenox_call(feenox_parser_string(&mode));
+      }  
+    }  
+  }
+  
+  
+  file_t *file;
+  if ((file = feenox_get_file_ptr(name)) == NULL) {
+    feenox_call(feenox_define_file(name, name, 0, mode));
+    if ((file = feenox_get_file_ptr(name)) == NULL) {
+      return FEENOX_ERROR;
+    }
+  }
+
+  // to add an instruction from the API one needs to pass a string and not a file_t   
+  if (strcmp(what, "OPEN") == 0) {
+    feenox_call(feenox_add_instruction(feenox_instruction_file_open, file));
+  } else if (strcmp(what, "CLOSE") == 0) {
+    feenox_call(feenox_add_instruction(feenox_instruction_file_close, file));
+  }
+  
+  return FEENOX_OK;  
 }
 
 int feenox_parse_print(void) {
@@ -3066,7 +3108,6 @@ int feenox_parse_print(void) {
     print->file = feenox.special_files.stdout_;
   }
   
-
   LL_APPEND(feenox.prints, print);
   feenox_call(feenox_add_instruction(feenox_instruction_print, print));
   

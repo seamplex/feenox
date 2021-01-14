@@ -1,0 +1,3 @@
+OPEN test-file.txt MODE w
+PRINT test FILE test-file.txt
+CLOSE test-file.txt

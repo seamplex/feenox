@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX version and description routines
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -52,11 +52,10 @@ void feenox_show_help(const char *progname) {
   
   printf("\n\
   -h, --help            display this help and exit\n\
-  -i, --info            display detailed code information and exit\n\
   -v, --version         display version information and exit\n\
+  -V, --long-version    display detailed code information and exit\n\
   -l, --list            list defined symbols and exit\n\
-      --debug           start in debug mode\n\
-      --no-debug        ignore standard input, avoid debug mode\n\
+  -d, --debug           start in debug mode\n\
 \n\
  Instructions will be read from standard input if \"-\" is passed as inputfile, i.e.\n\
    $ echo \"PRINT 2+2\" | feenox -\n\

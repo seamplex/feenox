@@ -165,6 +165,6 @@ int feenox_instruction_file_close(void *arg) {
     fclose(file->pointer);
     file->pointer = NULL;
   }
-  return FEENOX_ERROR;
+  return FEENOX_OK;
   
 }
