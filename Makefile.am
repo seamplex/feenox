@@ -7,10 +7,8 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
 
 EXTRA_DIST = examples tests locateruntest.sh
 
-# TESTS = tests/fibonacci.sh \
-#         tests/pi.sh \
-#         tests/interp1d.sh \
-#         tests/lorenz.sh
+TESTS = tests/abort.sh \
+        tests/expr.sh
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .

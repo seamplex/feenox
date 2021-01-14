@@ -13,6 +13,8 @@ configure
 depcomp
 install-sh
 missing
+test-driver
+test-suite.log
 version.m4
 
 feenox

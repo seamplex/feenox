@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX text output routines
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -145,7 +145,10 @@ int feenox_instruction_print(void *arg) {
       flag = 0;
       
     } else if (print_token->text != NULL) {
-      fprintf(print->file->pointer, "%s%s", print_token->text, print->separator);
+      fprintf(print->file->pointer, "%s", print_token->text);
+      if (print_token->next != NULL) {
+        fprintf(print->file->pointer, "%s", print->separator);
+      }
       
       flag = 0;
       

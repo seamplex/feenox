@@ -2983,7 +2983,8 @@ int feenox_parse_print(void) {
     } else if (strcasecmp(token, "NONEWLINE") == 0) {
 ///kw+PRINT+detail If the `NONEWLINE` keyword is not provided, default is to write a newline `\n` character after
 ///kw+PRINT+detail all the objects are processed.
-///kw+PRINT+detail Otherwise, after the last token a separator string will be printed but not the newline `\n` character.
+///kw+PRINT+detail Otherwise, if the last token to be printed is a numerical value, a separator string will be printed but not the newline `\n` character.
+///kw+PRINT+detail If the last token is a string, neither the separator nor the newline will be printed.
       print->nonewline = 1;
 
 ///kw+PRINT+detail To print an empty line write `PRINT` without arguments.

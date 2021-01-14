@@ -172,13 +172,13 @@ typedef struct mesh_t mesh_t;
 
 // individual factor of an algebraic expression
 struct expr_factor_t {
-  int n_chars;
+  size_t n_chars;
   int type;        // defines #EXPR_ because we need to operate with masks
   
-  int level;       // hierarchical level
-  int tmp_level;   // for partial sums
+  size_t level;       // hierarchical level
+  size_t tmp_level;   // for partial sums
 
-  int oper;        // number of the operator if applicable
+  size_t oper;        // number of the operator if applicable
   double constant; // value of the numerical constant if applicable
   double value;    // current value
   

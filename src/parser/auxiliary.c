@@ -171,82 +171,64 @@ int feenox_read_line(FILE *file_ptr) {
 
 
 //  parse a string with an algebraic expression and fills in the struct expr
-int feenox_parse_expression(const char *string, expr_t *expr) {
+int feenox_parse_expression(const char *orig_string, expr_t *expr) {
 
-  if (string == NULL || strcmp(string, "") == 0) {
+  if (orig_string == NULL || strcmp(orig_string, "") == 0) {
     return FEENOX_OK;
   }
+
   // let's make a copy so the parser can break it up as it wants
-  char *string_local_copy = strdup(string);
+  char *string_copy = strdup(orig_string);
 
-  // the parser does not like blanks
-  feenox_strip_blanks(string_local_copy);
+  // the expr structure contains another copy of the original string for debugging purposes
+  expr->string = strdup(string_copy);
   
-  // the expr structure contains the original string for debugging purposes
-  expr->string = strdup(string_local_copy);
-  
-  // this function needs takes care of the unary negative operator by
-  // re-writing "-a" as "0-a"
-  // it needs the address of the local copy because it might be needed to do
-  // a realloc and a plain pointer would get lost (donde judas perdió el poncho)
-  feenox_add_leading_zeros(&string_local_copy);
-
-  feenox_call(feenox_parse_madeup_expression(string_local_copy, expr));
-
-  free(string_local_copy);
-
-  return FEENOX_OK;
-}
-
-
-// parsea una expresion ya maquillada
-int feenox_parse_madeup_expression(char *string, expr_t *expr) {
-
-  char *current_op;
-  int level = 1;
-  int count = 0;
-  int last_one_was_an_operator = 0;
+  char *string = string_copy;
+  char *oper = NULL;
+  int last_was_an_op = 0;
+  size_t level = 1;
   expr_factor_t *factor;
 
   while (*string != '\0') {
 
-    if ((current_op = strchr(operators, *string)) != NULL) {
+    if (isblank(*string)) {
+      string++;
+    } else if ((oper = strchr(operators, *string)) != NULL) {
       if (*string == '(') {
         level += sizeof(operators);
         string++;
+        last_was_an_op = 1;
       } else if (*string == ')') {
         level -= sizeof(operators);
         string++;
+        last_was_an_op = 0;
       } else {       // +-*/^.
-        // if there is a sign and it is the first factor of the term or
-        // if the previous factor was already an operator then the sign is part of the factor
-        // this should not happen because we already "make up" the expression with (0-xxxx)
-        if ((count == 0) || last_one_was_an_operator != 0) {
-          // a constant, variable or funcion
-          if ((factor = feenox_parse_factor(string)) == NULL) {
+        if (last_was_an_op == 1) {
+          if ((*oper == '+' || *oper == '-')) {
+            if ((factor = feenox_parse_factor(string)) == NULL) {
+              return FEENOX_ERROR;
+            }
+            factor->level = level;
+            LL_APPEND(expr->factors, factor);
+            string += factor->n_chars;
+            last_was_an_op = 0;
+          } else {
+            feenox_push_error_message("two adjacent operators");
             return FEENOX_ERROR;
           }
-          factor->level = level;
-          LL_APPEND(expr->factors, factor);
-          string += factor->n_chars;
-          last_one_was_an_operator = 0;
-          count++;
-          
-        } else {
-          
-          last_one_was_an_operator = 1;
-          count++;
+        } else { 
           factor = calloc(1, sizeof(expr_factor_t));
-          LL_APPEND(expr->factors, factor);
           factor->type = EXPR_OPERATOR;
-          factor->oper = current_op-operators+1;
-          // precedencia de a dos, izquierda a derecha
-          factor->level = level+(current_op-operators)/2*2; 
+          factor->oper = oper-operators+1;
+          // precedence two by two from left to right
+          factor->level = level+(oper-operators)/2*2; 
+          LL_APPEND(expr->factors, factor);
           string++;
+          last_was_an_op = 1;
         }
       }
     } else {
-      // una constante, variable o funcion
+      // a constant, variable or function
       if ((factor = feenox_parse_factor(string)) == NULL) {
         return FEENOX_ERROR;
       }
@@ -256,19 +238,19 @@ int feenox_parse_madeup_expression(char *string, expr_t *expr) {
         return FEENOX_ERROR;
       }
       string += factor->n_chars;
-      last_one_was_an_operator = 0;
-      count++;
+      last_was_an_op = 0;
     }
   }
 
   if (level != 1) {
     feenox_push_error_message("unmatched opening bracket in algebraic expression");
     return FEENOX_ERROR;
-  } else if (current_op != NULL && *current_op != ')') {
-    feenox_push_error_message("missing argument for operator '%c'", *current_op);
+  } else if (oper != NULL && *oper != ')') {
+    feenox_push_error_message("missing argument for operator '%c'", *oper);
     return FEENOX_ERROR;
   }
 
+  free(string_copy);
   return FEENOX_OK;
 
 }
@@ -1111,60 +1093,6 @@ void feenox_strip_blanks(char *string) {
   }
 
   string[j] = '\0';
-  free(buff);
-
-  return;
-
-}
-
-
-// change stuff like "(-variable" by "(0-variable"
-// the argument is **string because eventually we might need to do a realloc
-void feenox_add_leading_zeros(char **string) {
-  int i = 0;
-  int j = 0;
-  int chars_to_add = 0;
-  char *buff;
-
-  if ((*string)[0] == '-' || (*string)[0] == '+') {
-    chars_to_add = 1;
-  }
-  if (strlen(*string) > 2) {
-    for (i = 0; i < strlen(*string)-2; i++) {
-      if ((*string)[i] == '(' && ((*string)[i+1] == '-' || (*string)[i+1] == '+') && !isdigit((int)(*string)[i+2])) {
-        chars_to_add++;
-      }
-    }
-  }
-
-  if (chars_to_add == 0) {
-    return;
-  }
-
-  buff = malloc(strlen(*string)+chars_to_add+2);
-
-
-  if ((*string)[0] == '-' || (*string)[0] == '+') {
-    buff[j++] = '0';
-  }
-  if (strlen(*string) > 2) {
-    for (i = 0; i < strlen(*string)-2; i++) {
-      if ((*string)[i] == '(' && ((*string)[i+1] == '-' || (*string)[i+1] == '+') && !isdigit((int)(*string)[i+2])) {
-        buff[j++] = (*string)[i];
-        buff[j++] = '0';
-      } else {
-        buff[j++] = (*string)[i];
-      }
-    }
-  }
-  buff[j++] = (*string)[i++];
-  buff[j++] = (*string)[i++];
-  buff[j++] = '\0';
-
-
-  *string = realloc(*string, j+1);
-  strncpy(*string, buff, strlen(*string)+chars_to_add+2);
-
   free(buff);
 
   return;

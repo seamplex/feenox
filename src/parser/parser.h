@@ -55,10 +55,8 @@ extern int feenox_parse_line(void);
 extern int feenox_read_line(FILE *file_ptr);
 extern char *feenox_get_next_token(char *line);
 extern void feenox_strip_blanks(char *string);
-extern void feenox_add_leading_zeros(char **string);
 
 extern int feenox_parser_expression_in_string(double *result);
-extern int feenox_parse_madeup_expression(char *string, expr_t *expr);
 extern expr_factor_t *feenox_parse_factor(char *string);
 
 extern int feenox_parser_string(char **string);
