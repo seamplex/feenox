@@ -239,6 +239,22 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "CLOSE") == 0) {
       feenox_call(feenox_parse_open_close("CLOSE"));
       return FEENOX_OK;
+
+///kw+IF+desc Execute a set of instructions if a condition is met.
+///kw+IF+usage IF expr @
+///kw+IF+usage  <block_of_instructions_if_expr_is_true> @
+    } else if (strcasecmp(token, "IF") == 0) {
+      feenox_call(feenox_parse_if());
+      return FEENOX_OK;
+///kw+IF+usage [ ELSE  @
+///kw+IF+usage  <block_of_instructions_if_expr_is_false> ] @
+    } else if (strcasecmp(token, "ELSE") == 0) {
+      feenox_call(feenox_parse_else());
+      return FEENOX_OK;
+///kw+IF+usage ENDIF
+    } else if (strcasecmp(token, "ENDIF") == 0) {
+      feenox_call(feenox_parse_endif());
+      return FEENOX_OK;
       
     }
       
@@ -249,87 +265,17 @@ int feenox_parse_line(void) {
 /*
       
 
-// --- IF -----------------------------------------------------
-///kw+IF+desc Begin a conditional block.
-///kw+IF+usage IF expr
-///kw+IF+usage &nbsp;
-///kw+IF+usage  <block_of_instructions_if_expr_is_true>
-///kw+IF+usage &nbsp;
-///kw+IF+usage [ ELSE ]
-///kw+IF+usage &nbsp;
-///kw+IF+usage  [block_of_instructions_if_expr_is_false]
-///kw+IF+usage &nbsp;
-///kw+IF+usage ENDIF
     } else if (strcasecmp(token, "IF") == 0) {
 
-      conditional_block_t *conditional_block;
-      conditional_block = calloc(1, sizeof(conditional_block_t));
-      LL_APPEND(feenox.conditional_blocks, conditional_block);
-
-      conditional_block->condition = malloc(sizeof(expr_t));
-      if (feenox_parser_expression(conditional_block->condition) != FEENOX_OK) {
-        return FEENOX_ERROR;
-      }
-
-      if (feenox_get_next_token(NULL) != NULL) {
-        feenox_push_error_message("conditional blocks should start in a separate line");
-        return FEENOX_ERROR;
-      }
-
-      conditional_block->father = feenox.active_conditional_block;
-
-      if (feenox_define_instruction(feenox_instruction_if, conditional_block) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      feenox.active_conditional_block = conditional_block;
-
-      return FEENOX_OK;
 
     // ---- ELSE  ----------------------------------------------------
     } else if (strcasecmp(token, "ELSE") == 0) {
 
-      instruction_t *instruction;
-
-      conditional_block_t *conditional_block;
-      conditional_block = calloc(1, sizeof(conditional_block_t));
-      LL_APPEND(feenox.conditional_blocks, conditional_block);
-
-      if (feenox.active_conditional_block->else_of != NULL) {
-        feenox_push_error_message("more than one ELSE clause for a single IF clause", token);
-        return FEENOX_ERROR;
-      }
-
-      if ((instruction = feenox_define_instruction(feenox_instruction_else, conditional_block)) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      feenox.active_conditional_block->first_false_instruction = instruction;
-
-      conditional_block->else_of = feenox.active_conditional_block;
-      conditional_block->father = feenox.active_conditional_block->father;
-      feenox.active_conditional_block = conditional_block;
-
-      return FEENOX_OK;
 
 // ---- ENDIF  ----------------------------------------------------
     } else if (strcasecmp(token, "ENDIF") == 0) {
 
-      instruction_t *instruction;
 
-      if ((instruction = feenox_define_instruction(feenox_instruction_endif, feenox.active_conditional_block)) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      if (feenox.active_conditional_block->else_of == NULL) {
-        feenox.active_conditional_block->first_false_instruction = instruction;
-      } else {
-        feenox.active_conditional_block->first_true_instruction = instruction;
-      }
-
-      feenox.active_conditional_block = feenox.active_conditional_block->father;
-
-      return FEENOX_OK;
 
 // ---- SEMAPHORE ----------------------------------------------------
 ///kw+SEMAPHORE+desc Perform either a wait or a post operation on a named shared semaphore.
@@ -3112,4 +3058,70 @@ int feenox_parse_print(void) {
   feenox_call(feenox_add_instruction(feenox_instruction_print, print));
   
   return FEENOX_OK;
+}
+
+int feenox_parse_if(void) {
+  
+  conditional_block_t *conditional_block = calloc(1, sizeof(conditional_block_t));
+  feenox_call(feenox_parser_expression(&conditional_block->condition));
+
+  if (feenox_get_next_token(NULL) != NULL) {
+    feenox_push_error_message("conditional blocks should start in a separate line");
+    return FEENOX_ERROR;
+  }
+
+  conditional_block->father = feenox.active_conditional_block;
+
+  feenox_call(feenox_add_instruction(feenox_instruction_if, conditional_block));
+
+  LL_APPEND(feenox.conditional_blocks, conditional_block);
+  feenox.active_conditional_block = conditional_block;
+
+  return FEENOX_OK;
+}
+
+int feenox_parse_else(void) {
+  
+  conditional_block_t *conditional_block = calloc(1, sizeof(conditional_block_t));
+
+  if (feenox.active_conditional_block->else_of != NULL) {
+    feenox_push_error_message("more than one ELSE clause for a single IF clause");
+    return FEENOX_ERROR;
+  }
+  
+  if (feenox_get_next_token(NULL) != NULL) {
+    feenox_push_error_message("conditional blocks should start in a separate line");
+    return FEENOX_ERROR;
+  }
+
+  instruction_t *instruction = feenox_add_instruction_and_get_ptr(feenox_instruction_else, conditional_block);
+  if (instruction == NULL) {
+    return FEENOX_ERROR;
+  }
+  feenox.active_conditional_block->first_false_instruction = instruction;
+  conditional_block->else_of = feenox.active_conditional_block;
+  conditional_block->father = feenox.active_conditional_block->father;
+      
+  LL_APPEND(feenox.conditional_blocks, conditional_block);
+  feenox.active_conditional_block = conditional_block;
+
+  return FEENOX_OK;
+}
+
+int feenox_parse_endif(void) {
+  
+  instruction_t *instruction = feenox_add_instruction_and_get_ptr(feenox_instruction_endif, feenox.active_conditional_block);
+  if (instruction == NULL) {
+    return FEENOX_ERROR;
+  }
+
+  if (feenox.active_conditional_block->else_of == NULL) {
+    feenox.active_conditional_block->first_false_instruction = instruction;
+  } else {
+    feenox.active_conditional_block->first_true_instruction = instruction;
+  }
+
+  feenox.active_conditional_block = feenox.active_conditional_block->father;
+
+  return EXIT_SUCCESS;
 }

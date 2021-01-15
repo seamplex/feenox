@@ -1,0 +1,11 @@
+IF 1<2
+  PRINT "we are good"
+ELSE
+  PRINT "it rains upside down"
+ENDIF
+
+IF 1>2
+  PRINT "it rains upside down"
+ELSE
+  PRINT "we are good"
+ENDIF

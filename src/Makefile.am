@@ -15,8 +15,9 @@ feenox_SOURCES = \
 ./feenox.h \
 ./version.c \
 ./version.h \
-./flow/abort.c \
 ./flow/init.c \
+./flow/abort.c \
+./flow/conditional.c \
 ./flow/error.c \
 ./flow/define.c \
 ./flow/getptr.c \

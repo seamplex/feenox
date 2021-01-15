@@ -51,7 +51,7 @@ int feenox_step(int whence) {
     break;
   }
 
-  // sweep the first & last raange but do mind the conditionals
+  // sweep the first & last range but minding the conditional blocks
   ip = first;
   while (ip != last) {
     feenox_call(ip->routine(ip->argument));

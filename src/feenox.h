@@ -143,6 +143,8 @@ enum version_type {
 // pointer to the content of an object
 #define feenox_value_ptr(obj)  (obj->value)
 
+// check return value of alloc/calloc
+#define feenox_check_alloc(a,b)  if ((a) == NULL) { feenox_push_error_message("memory allocation error"); return b; }
 
 
 
@@ -158,6 +160,7 @@ typedef struct function_t function_t;
 typedef struct alias_t alias_t;
 
 typedef struct instruction_t instruction_t;
+typedef struct conditional_block_t conditional_block_t;
 
 typedef struct file_t file_t;
 typedef struct print_t print_t;
@@ -432,6 +435,23 @@ struct instruction_t {
 };
 
 
+// conditional block
+struct conditional_block_t {
+  conditional_block_t *father;
+  conditional_block_t *else_of;
+  
+  expr_t condition;
+  
+  instruction_t *first_true_instruction;
+  instruction_t *first_false_instruction;
+  
+  int evaluated_to_true;
+  int evaluated_to_false;
+  
+  conditional_block_t *next;
+};
+
+
 // a file, either input or output
 struct file_t {
   char *name;
@@ -576,7 +596,10 @@ struct {
   expr_t *time_path_current;
   
   instruction_t *instructions;
-//  instruction_t *last_defined_instruction;
+  instruction_t *last_defined_instruction;  // TODO: see if we can put this somewhere else
+  
+  conditional_block_t *conditional_blocks;
+  conditional_block_t *active_conditional_block;
   
   var_t *vars;
   vector_t *vectors;
@@ -741,6 +764,7 @@ extern int feenox_ida_dae(void);
 #endif
 
 // instruction.c
+extern instruction_t *feenox_add_instruction_and_get_ptr(int (*routine)(void *), void *argument);
 extern int feenox_add_instruction(int (*routine)(void *), void *argument);
 
 
@@ -791,5 +815,10 @@ extern int feenox_function_init(function_t *this);
 
 // print.c
 extern int feenox_instruction_print(void *arg);
+
+// conditional.c
+extern int feenox_instruction_if(void *arg);
+extern int feenox_instruction_else(void *arg);
+extern int feenox_instruction_endif(void *arg);
 
 #endif    /* FEENOX_H  */

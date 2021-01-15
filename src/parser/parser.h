@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser header
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -44,7 +44,7 @@ struct {
 // so we can parse stuff between quotation marks as a single token
   char *strtok_internal;
 
-  
+  conditional_block_t *active_conditional_block;  
 } feenox_parser;
 
 // parser.c
@@ -94,6 +94,10 @@ extern int feenox_parse_file(char *mode);
 extern int feenox_parse_open_close(const char *what);
 
 extern int feenox_parse_print(void);
+
+extern int feenox_parse_if(void);
+extern int feenox_parse_else(void);
+extern int feenox_parse_endif(void);
 
 
 #endif  

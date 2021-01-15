@@ -21,7 +21,6 @@
  */
 #include "feenox.h"
 
-//#include <dlfcn.h>
 #include <ctype.h>
 #include <string.h>
 
