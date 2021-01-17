@@ -19,6 +19,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
 
 #include <assert.h>
 #include <stdio.h>
@@ -28,8 +30,6 @@
 #include <sys/types.h>
 
 #include <gsl/gsl_errno.h>
-
-#include "feenox.h"
 
 void feenox_push_error_message(const char *fmt, ...) {
   

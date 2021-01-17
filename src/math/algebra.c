@@ -19,10 +19,11 @@
  *  along with Feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
+
 #include <ctype.h>
 #include <string.h>
-
-#include "feenox.h"
 
 extern const char operators[];
 extern const char factorseparators[];

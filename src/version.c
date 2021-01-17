@@ -19,6 +19,8 @@
  *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
 
 #include <stdio.h>
 #include <gsl/gsl_version.h>

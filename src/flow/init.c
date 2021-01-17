@@ -19,6 +19,9 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
+
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
@@ -28,10 +31,6 @@
 #ifdef HAVE_READLINE
 #include <readline/readline.h>
 #endif
-
-#include "feenox.h"
-//#include "thirdparty/kdtree.h"
-
 
 int feenox_initialize(int argc, char **argv) {
   

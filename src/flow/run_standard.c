@@ -20,7 +20,9 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "math.h"
+extern feenox_t feenox;
+
+// #include <math.h>
 
 
 int feenox_run_standard(void) {

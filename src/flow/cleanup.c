@@ -19,9 +19,12 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "feenox.h"
+
 
 void feenox_polite_exit(int error) {
 

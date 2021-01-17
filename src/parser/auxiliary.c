@@ -19,14 +19,16 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
+#include "parser.h"
+extern feenox_parser_t feenox_parser;
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-#include "feenox.h"
-#include "parser.h"
 
 
 const char operators[]        = "&|=!<>+-*/^()";
