@@ -693,8 +693,8 @@ double feenox_builtin_abs(expr_factor_t *expr) {
 
 
 ///fn+sqrt+name sqrt
-///fn+sqrt+desc Computes the positive square root of the argument $x$. If $x$ is negative,
-///fn+sqrt+desc a NaN error is issued.
+///fn+sqrt+desc Computes the positive square root of the argument $x$.
+///fn+sqrt+desc If $x$ is negative, a NaN error is issued.
 ///fn+sqrt+usage sqrt(x)
 ///fn+sqrt+math \sqrt{x}
 ///fn+sqrt+plotx 0 2.75 1e-2
@@ -1301,8 +1301,8 @@ double feenox_builtin_if(expr_factor_t *expr) {
 
 
 ///fn+is_in_interval+name is_in_interval
-///fn+is_in_interval+desc Returns true if the argument~$x$ is in the interval~$[a,b)$, i.e. including~$a$
-///fn+is_in_interval+desc but excluding~$b$.
+///fn+is_in_interval+desc Returns true if the argument\ $x$ is in the interval\ $[a,b)$, i.e. including\ $a$
+///fn+is_in_interval+desc but excluding\ $b$.
 ///fn+is_in_interval+usage is_in_interval(x, a, b)
 ///fn+is_in_interval+math \begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}
 double feenox_builtin_is_in_interval(expr_factor_t *expr) {
