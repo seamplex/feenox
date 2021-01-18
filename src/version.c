@@ -110,7 +110,7 @@ void feenox_shortversion(void) {
 #ifdef FEENOX_GIT_BRANCH
   printf("%s%s %s\n", FEENOX_GIT_VERSION,
                              (FEENOX_GIT_CLEAN==0)?"":"-dirty",
-                             strcmp(FEENOX_GIT_BRANCH, "master")?FEENOX_GIT_BRANCH:"");
+                             strcmp(FEENOX_GIT_BRANCH, "main")?FEENOX_GIT_BRANCH:"");
 #else
   printf("%s\n", PACKAGE_VERSION);
 #endif
