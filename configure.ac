@@ -39,9 +39,9 @@ AC_CHECK_FUNCS([sysconf],[],[])
 
 ######################
 # check for GSL (required)
-AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR[libgsl-dev not found])
-AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR[libgsl-dev not found])
-AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR[libgsl-dev not found])
+AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR([GNU Scientific library headers libgsl-dev not found]))
+AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR([GNU Scientific library CBLAS libgsl-dev not found]))
+AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library BLAS libgsl-dev not found]))
 
 
 ######################

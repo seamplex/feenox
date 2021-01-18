@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+extern feenox_t feenox;
 
 double feenox_matrix_get(matrix_t *this, const size_t i,  const size_t j) {
   

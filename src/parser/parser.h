@@ -30,8 +30,9 @@
 extern const char operators[];
 extern const char factorseparators[];
 
+typedef struct feenox_parser_t feenox_parser_t;
 
-struct {
+struct feenox_parser_t {
   size_t page_size;
   size_t actual_buffer_size; 
   
@@ -45,7 +46,7 @@ struct {
   char *strtok_internal;
 
   conditional_block_t *active_conditional_block;  
-} feenox_parser;
+};
 
 // parser.c
 extern int feenox_parse_input_file(const char *filepath, int from, int to);

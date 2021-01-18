@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+feenox_t feenox;
 
 #include <stdlib.h>
 

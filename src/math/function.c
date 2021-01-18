@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+extern feenox_t feenox;
 
 // setea las variables que son argumento de una funcion al valor pedido en el vector x
 void feenox_set_function_args(function_t *function, double *x) {

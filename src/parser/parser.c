@@ -20,7 +20,9 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+extern feenox_t feenox;
 #include "parser.h"
+feenox_parser_t feenox_parser;
 
 #include <stdio.h>
 #include <string.h>

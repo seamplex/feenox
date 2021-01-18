@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+extern feenox_t feenox;
 
 int feenox_step(int whence) {
   instruction_t *ip, *first, *last;

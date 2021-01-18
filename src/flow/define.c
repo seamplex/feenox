@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+extern feenox_t feenox;
 
 #include <ctype.h>
 #include <string.h>

@@ -149,6 +149,8 @@ enum version_type {
 
 
 // forward declarations
+typedef struct feenox_t feenox_t;
+
 typedef struct expr_t expr_t;
 typedef struct expr_factor_t expr_factor_t;
 
@@ -562,7 +564,7 @@ struct dae_t {
 };
 
 // global FeenoX singleton structure
-struct {
+struct feenox_t {
   int argc;
   char **argv;
   int optind;
@@ -693,7 +695,7 @@ struct {
 #endif
   } dae;
 
-} feenox;
+};
 
 
 // function declarations
