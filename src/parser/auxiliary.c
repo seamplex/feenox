@@ -97,9 +97,9 @@ int feenox_read_line(FILE *file_ptr) {
         switch (c = fgetc(file_ptr)) {
           case '"':
             // if there's an escaped quote, we take away the escape char and put
-            // a magic marker 0xff, afterwards in get_next_token() we change back
-            // te 0xff with the unescaped quote
-            feenox_parser.line[i++] = 0xff;
+            // a magic marker 0x1e, afterwards in get_next_token() we change back
+            // te 0x1e with the unescaped quote
+            feenox_parser.line[i++] = 0x1e;
           break;
             // escape sequences
           case 'a':
@@ -936,10 +936,10 @@ char *feenox_get_next_token(char *line) {
     if (*feenox_parser.strtok_internal == '"') {
       token = strtok_r(line, QUOTED_DELIM, &(feenox_parser.strtok_internal));
 
-      // si es quoted, barremos token y reemplazamos el caracter 255 por un quote
+      // si es quoted, barremos token y reemplazamos el caracter 0x1E por un quote
       n = strlen(token);
       for (i = 0; i < n; i++) {
-        if (token[i] == -1 || token[i] == 255) {
+        if (token[i] == -1 || token[i] == 0x1e) {
           token[i] = '"';
         }
       }

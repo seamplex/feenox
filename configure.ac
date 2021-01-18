@@ -275,8 +275,8 @@ cat << EOF >> src/version.h
 #define FEENOX_COMPILATION_HOSTNAME "$(hostname)"
 
 #define FEENOX_COMPILER_ARCH     "${host_os} ${host_cpu}"
-#define FEENOX_COMPILER_VERSION  "$($CC --version | head -n1)"
-#define FEENOX_COMPILER_CFLAGS   "$CFLAGS"
+#define FEENOX_COMPILER_VERSION  "$(${CC} --version | head -n1)"
+#define FEENOX_COMPILER_CFLAGS   "${CFLAGS}"
 EOF
 
   
