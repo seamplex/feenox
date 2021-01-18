@@ -1,24 +1,27 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  wasora builtin functions
+ *  FeenoX builtin functions
  *
- *  Copyright (C) 2009--2015 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
- *  This file is part of wasora.
+ *  This file is part of FeenoX.
  *
- *  wasora is free software: you can redistribute it and/or modify
+ *  FeenoX is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  wasora is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with wasora.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include "feenox.h"
+extern feenox_t feenox;
+
 #include <stdlib.h>
 #include <limits.h>
 #ifdef __MACH__
@@ -27,9 +30,117 @@
 #endif
 #include <time.h>
 
-#ifndef _WASORA_H_
-#include "wasora.h"
-#endif
+
+double feenox_builtin_abs(struct expr_factor_t *);
+double feenox_builtin_asin(struct expr_factor_t *);
+double feenox_builtin_acos(struct expr_factor_t *);
+double feenox_builtin_atan(struct expr_factor_t *);
+double feenox_builtin_atan2(struct expr_factor_t *);
+double feenox_builtin_ceil(struct expr_factor_t *);
+double feenox_builtin_clock(struct expr_factor_t *);
+double feenox_builtin_cos(struct expr_factor_t *);
+double feenox_builtin_cosh(struct expr_factor_t *);
+double feenox_builtin_d_dt(struct expr_factor_t *);
+double feenox_builtin_deadband(struct expr_factor_t *);
+double feenox_builtin_equal(struct expr_factor_t *);
+double feenox_builtin_exp(struct expr_factor_t *);
+double feenox_builtin_expint1(struct expr_factor_t *);
+double feenox_builtin_expint2(struct expr_factor_t *);
+double feenox_builtin_expint3(struct expr_factor_t *);
+double feenox_builtin_expintn(struct expr_factor_t *);
+double feenox_builtin_floor(struct expr_factor_t *);
+double feenox_builtin_heaviside(struct expr_factor_t *);
+double feenox_builtin_if(struct expr_factor_t *);
+double feenox_builtin_is_in_interval(struct expr_factor_t *);
+double feenox_builtin_integral_dt(struct expr_factor_t *);
+double feenox_builtin_integral_euler_dt(struct expr_factor_t *);
+double feenox_builtin_lag(struct expr_factor_t *);
+double feenox_builtin_lag_bilinear(struct expr_factor_t *);
+double feenox_builtin_lag_euler(struct expr_factor_t *);
+double feenox_builtin_last(struct expr_factor_t *);
+double feenox_builtin_limit(struct expr_factor_t *);
+double feenox_builtin_limit_dt(struct expr_factor_t *);
+double feenox_builtin_log(struct expr_factor_t *);
+double feenox_builtin_mark_max(struct expr_factor_t *);
+double feenox_builtin_mark_min(struct expr_factor_t *);
+double feenox_builtin_max(struct expr_factor_t *);
+double feenox_builtin_min(struct expr_factor_t *);
+double feenox_builtin_mod(struct expr_factor_t *);
+double feenox_builtin_not(struct expr_factor_t *);
+double feenox_builtin_random(struct expr_factor_t *);
+double feenox_builtin_random_gauss(struct expr_factor_t *);
+double feenox_builtin_round(struct expr_factor_t *);
+double feenox_builtin_sawtooth_wave(struct expr_factor_t *);
+double feenox_builtin_sgn(struct expr_factor_t *);
+double feenox_builtin_is_even(struct expr_factor_t *);
+double feenox_builtin_is_odd(struct expr_factor_t *);
+double feenox_builtin_sin(struct expr_factor_t *);
+double feenox_builtin_j0(struct expr_factor_t *);
+double feenox_builtin_sinh(struct expr_factor_t *);
+double feenox_builtin_sqrt(struct expr_factor_t *);
+double feenox_builtin_square_wave(struct expr_factor_t *);
+double feenox_builtin_tan(struct expr_factor_t *);
+double feenox_builtin_tanh(struct expr_factor_t *);
+double feenox_builtin_threshold_max(struct expr_factor_t *);
+double feenox_builtin_threshold_min(struct expr_factor_t *);
+double feenox_builtin_triangular_wave(struct expr_factor_t *);
+
+struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
+    {"abs",                 1, 1, &feenox_builtin_abs},
+    {"asin",                1, 1, &feenox_builtin_asin},
+    {"acos",                1, 1, &feenox_builtin_acos},
+    {"atan",                1, 1, &feenox_builtin_atan},
+    {"atan2",               2, 2, &feenox_builtin_atan2},
+    {"ceil",                1, 1, &feenox_builtin_ceil},
+    {"clock",               0, 1, &feenox_builtin_clock},
+    {"cos",                 1, 1, &feenox_builtin_cos},
+    {"cosh",                1, 1, &feenox_builtin_cosh},
+    {"d_dt",                1, 1, &feenox_builtin_d_dt},
+    {"deadband",            2, 2, &feenox_builtin_deadband},
+    {"equal",               2, 3, &feenox_builtin_equal},
+    {"exp",                 1, 1, &feenox_builtin_exp},
+    {"expint1",             1, 1, &feenox_builtin_expint1},
+    {"expint2",             1, 1, &feenox_builtin_expint2},
+    {"expint3",             1, 1, &feenox_builtin_expint3},
+    {"expintn",             2, 2, &feenox_builtin_expintn},
+    {"floor",               1, 1, &feenox_builtin_floor},
+    {"heaviside",           1, 2, &feenox_builtin_heaviside},
+    {"if",                  1, 4, &feenox_builtin_if},
+    {"integral_dt",         1, 1, &feenox_builtin_integral_dt},
+    {"integral_euler_dt",   1, 1, &feenox_builtin_integral_euler_dt},
+    {"is_even",             1, 1, &feenox_builtin_is_even},
+    {"is_in_interval",      3, 3, &feenox_builtin_is_in_interval},
+    {"is_odd",              1, 1, &feenox_builtin_is_odd},
+    {"lag",                 2, 2, &feenox_builtin_lag},
+    {"lag_bilinear",        2, 2, &feenox_builtin_lag_bilinear},
+    {"lag_euler",           2, 2, &feenox_builtin_lag_euler},
+    {"last",                1, 2, &feenox_builtin_last},
+    {"limit",               3, 3, &feenox_builtin_limit},
+    {"limit_dt",            3, 3, &feenox_builtin_limit_dt},
+    {"log",                 1, 1, &feenox_builtin_log},
+    {"mark_max",            2, MINMAX_ARGS, &feenox_builtin_mark_max},
+    {"mark_min",            2, MINMAX_ARGS, &feenox_builtin_mark_min},
+    {"max",                 2, MINMAX_ARGS, &feenox_builtin_max},
+    {"min",                 2, MINMAX_ARGS, &feenox_builtin_min},
+    {"mod",                 2, 2, &feenox_builtin_mod},
+    {"not",                 1, 2, &feenox_builtin_not},
+    {"random",              2, 3, &feenox_builtin_random},
+    {"random_gauss",        2, 3, &feenox_builtin_random_gauss},
+    {"round",               1, 1, &feenox_builtin_round},
+    {"sawtooth_wave",       1, 1, &feenox_builtin_sawtooth_wave},
+    {"sgn",                 1, 2, &feenox_builtin_sgn},
+    {"sin",                 1, 1, &feenox_builtin_sin},
+    {"j0",                  1, 1, &feenox_builtin_j0},
+    {"sinh",                1, 1, &feenox_builtin_sinh},
+    {"sqrt",                1, 1, &feenox_builtin_sqrt},
+    {"square_wave",         1, 1, &feenox_builtin_square_wave},
+    {"tan",                 1, 1, &feenox_builtin_tan},
+    {"tanh",                1, 1, &feenox_builtin_tanh},
+    {"threshold_max",       2, 3, &feenox_builtin_threshold_max},
+    {"threshold_min",       2, 3, &feenox_builtin_threshold_min},
+    {"triangular_wave",     1, 1, &feenox_builtin_triangular_wave},
+};
+
 
 ///fn+clock+name clock
 ///fn+clock+usage clock([f])
@@ -39,7 +150,7 @@
 ///fn+clock+desc The list and the meanings of the other available values for $f$ can be checked
 ///fn+clock+desc in the `clock_gettime (2)` system call manual page.
 ///fn+clock+example clock.was
-double builtin_clock(factor_t *expr) {
+double feenox_builtin_clock(expr_factor_t *expr) {
 
   struct timespec tp;
 
@@ -47,8 +158,8 @@ double builtin_clock(factor_t *expr) {
   // OS X does not have clock_gettime, use clock_get_time
   clock_id_t clk_id;
 
-  if (expr->arg[0].n_tokens != 0) {
-    clk_id = (int)wasora_evaluate_expression(&expr->arg[0]);
+  if (expr->arg[0].factors != NULL) {
+    clk_id = (int)feenox_expression_eval(&expr->arg[0]);
   } else {
     clk_id = SYSTEM_CLOCK; // Same meaning than monotonic in linux
   }
@@ -65,14 +176,14 @@ double builtin_clock(factor_t *expr) {
 #else
   clockid_t clk_id;
 
-  if (expr->arg[0].n_tokens != 0) {
-    clk_id = (int)wasora_evaluate_expression(&expr->arg[0]);
+  if (expr->arg[0].factors != NULL) {
+    clk_id = (int)feenox_expression_eval(&expr->arg[0]);
   } else {
     clk_id = CLOCK_MONOTONIC;
   }
 
   if (clock_gettime(clk_id, &tp) < 0) {
-    wasora_runtime_error();
+    feenox_runtime_error();
   }
 
   return (float)tp.tv_sec + ((float)tp.tv_nsec * 1E-9);
@@ -82,19 +193,19 @@ double builtin_clock(factor_t *expr) {
 ///fn+last+name last
 ///fn+last+usage last(x,[p])
 ///fn+last+math z^{-1}\left[ x \right] = x(t-\Delta t)
-///fn+last+desc Returns the value the signal $x$ had in the previous time step.
+///fn+last+desc Returns the value the variable $x$ had in the previous time step.
 ///fn+last+desc This function is equivalent to the $Z$-transform operator "delay" denoted by $z^{-1}\left[ x\right]$.
 ///fn+last+desc For $t=0$ the function returns the actual value of $x$.
 ///fn+last+desc The optional flag $p$ should be set to one if the reference to `last`
-///fn+last+desc is done in an assignment over a variable that already appears insi
+///fn+last+desc is done in an assignment over a variable that already appears inside
 ///fn+last+desc expression $x$. See example number 2.
 ///fn+last+example last1.was last2.was
-double builtin_last(factor_t *expr) {
+double feenox_builtin_last(expr_factor_t *expr) {
 
   double y;
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(3*sizeof(double));
@@ -103,18 +214,18 @@ double builtin_last(factor_t *expr) {
     expr->aux[2] = 0;
   } else {
     
-    if ((int)wasora_value(wasora_special_var(in_static))) {
-      if ((int)round(expr->aux[2]) != (int)(wasora_value(wasora_special_var(step_static)))) {
+    if ((int)feenox_special_var_value(in_static)) {
+      if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_static))) {
         expr->aux[0] = expr->aux[1];
         expr->aux[1] = x[0];
-        expr->aux[2] = (int)(wasora_value(wasora_special_var(step_static)));
+        expr->aux[2] = (int)(feenox_special_var_value(step_static));
       }
       
     } else {
-      if ((int)round(expr->aux[2]) != (int)(wasora_value(wasora_special_var(step_transient)))) {
+      if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
         expr->aux[0] = expr->aux[1];
         expr->aux[1] = x[0];
-        expr->aux[2] = (int)(wasora_value(wasora_special_var(step_transient)));
+        expr->aux[2] = (int)(feenox_special_var_value(step_transient));
       }
     }
   }
@@ -126,7 +237,7 @@ double builtin_last(factor_t *expr) {
     y = x[0];
   }
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -144,14 +255,14 @@ double builtin_last(factor_t *expr) {
 ///fn+d_dt+desc involving a variable that may be read from a shared-memory object, whose
 ///fn+d_dt+desc time derivative cannot be computed with `derivative`.
 ///fn+d_dt+example d_dt.was
-double builtin_d_dt(factor_t *expr) {
+double feenox_builtin_d_dt(expr_factor_t *expr) {
 
   double y;
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
-  if (wasora_var(wasora_special_var(dt)) == 0) {
-    wasora_nan_error();
+  if (feenox_special_var_value(dt) == 0) {
+    feenox_nan_error();
     return 0;
   }
 
@@ -160,19 +271,19 @@ double builtin_d_dt(factor_t *expr) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static))) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(wasora_value(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
     expr->aux[0] = expr->aux[1];
     expr->aux[1] = x[0];
-    expr->aux[2] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[2] = (int)(feenox_special_var_value(step_transient));
   }
 
-  y = (x[0] - expr->aux[0])/wasora_var(wasora_special_var(dt));
+  y = (x[0] - expr->aux[0])/feenox_special_var_value(dt);
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -190,11 +301,11 @@ double builtin_d_dt(factor_t *expr) {
 ///fn+integral_dt+desc involving a variable that may be read from a shared-memory object, whose
 ///fn+integral_dt+desc time integral cannot be computed with `integral`.
 ///fn+integral_dt+example integral_dt.was
-double builtin_integral_dt(factor_t *expr) {
+double feenox_builtin_integral_dt(expr_factor_t *expr) {
 
   double y;
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(4*sizeof(double));
@@ -202,21 +313,21 @@ double builtin_integral_dt(factor_t *expr) {
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
     expr->aux[3] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static))) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
     expr->aux[3] = 0;
-  } else if ((int)round(expr->aux[3]) != (int)(wasora_value(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[3]) != (int)(feenox_special_var_value(step_transient))) {
     expr->aux[0] = expr->aux[1];
     expr->aux[1] = x[0];
-    expr->aux[2] += 0.5*(expr->aux[0]+x[0])*wasora_var(wasora_special_var(dt));
-    expr->aux[3] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[2] += 0.5*(expr->aux[0]+x[0])*feenox_special_var_value(dt);
+    expr->aux[3] = (int)(feenox_special_var_value(step_transient));
   }
 
   y = expr->aux[2];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -230,27 +341,27 @@ double builtin_integral_dt(factor_t *expr) {
 ///fn+integral_euler_dt+desc integral value.
 ///fn+integral_euler_dt+desc This function is provided in case this particular way
 ///fn+integral_euler_dt+desc of approximating time integrals is needed.
-double builtin_integral_euler_dt(factor_t *expr) {
+double feenox_builtin_integral_euler_dt(expr_factor_t *expr) {
 
   double y;
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(2*sizeof(double));
     expr->aux[0] = 0;
     expr->aux[1] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static))) {
     expr->aux[0] = 0;
     expr->aux[1] = 0;
-  } else if ((int)round(expr->aux[1]) != (int)(wasora_value(wasora_special_var(step_transient)))) {
-    expr->aux[0] += x[0]*wasora_var(wasora_special_var(dt));
-    expr->aux[1] = (int)(wasora_value(wasora_special_var(step_transient)));
+  } else if ((int)round(expr->aux[1]) != (int)(feenox_special_var_value(step_transient))) {
+    expr->aux[0] += x[0]*feenox_special_var_value(dt);
+    expr->aux[1] = (int)(feenox_special_var_value(step_transient));
   }
 
   y = expr->aux[0];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -267,10 +378,10 @@ double builtin_integral_euler_dt(factor_t *expr) {
 ///fn+square_wave+math \begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}
 ///fn+square_wave+plotx 0 2.75 1e-2
 ///fn+square_wave+example square_wave.was
-double builtin_square_wave(factor_t *expr) {
+double feenox_builtin_square_wave(expr_factor_t *expr) {
 
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if ((x[0] - floor(x[0])) < 0.5) {
     return 1;
@@ -286,10 +397,10 @@ double builtin_square_wave(factor_t *expr) {
 ///fn+triangular_wave+desc a linear function of time such as $\omega t+\phi$, where $\omega $ controls the frequency of the wave
 ///fn+triangular_wave+desc and $\phi$ controls its phase.
 ///fn+triangular_wave+plotx 0 2.75 0.1
-double builtin_triangular_wave(factor_t *expr) {
+double feenox_builtin_triangular_wave(expr_factor_t *expr) {
 
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if ((x[0] - floor(x[0])) < 0.5) {
     return 2*(x[0] - floor(x[0]));
@@ -307,10 +418,10 @@ double builtin_triangular_wave(factor_t *expr) {
 ///fn+sawtooth_wave+desc and $\phi$ controls its phase.
 ///fn+sawtooth_wave+plotx 0 2.75 1e-2
 ///fn+sawtooth_wave+example sawtooth_wave.was
-double builtin_sawtooth_wave(factor_t *expr) {
+double feenox_builtin_sawtooth_wave(expr_factor_t *expr) {
 
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return x[0] - floor(x[0]);
 }
@@ -323,9 +434,9 @@ double builtin_sawtooth_wave(factor_t *expr) {
 ///fn+sin+desc a linear function of time such as $\omega t+\phi$, where $\omega$ controls the frequency of the wave
 ///fn+sin+desc and $\phi$ controls its phase.
 ///fn+sin+plotx -2*pi 2*pi pi/100
-double builtin_sin(factor_t *expr) {
+double feenox_builtin_sin(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return sin(x[0]);
 }
@@ -336,13 +447,13 @@ double builtin_sin(factor_t *expr) {
 ///fn+asin+desc Computes arc in radians whose sine is equal to the argument $x$.
 ///fn+asin+desc A NaN error is raised if $|x|>1$.
 ///fn+asin+plotx -1 1 1/100 -1 1 0.5 -1 1 1
-double builtin_asin(factor_t *expr) {
+double feenox_builtin_asin(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (fabs(x[0]) > 1.0) {
-    wasora_push_error_message("argument greater than one to function asin");
-    wasora_nan_error();
+    feenox_push_error_message("argument greater than one to function asin");
+    feenox_nan_error();
     return 0;
   }
 
@@ -356,13 +467,13 @@ double builtin_asin(factor_t *expr) {
 ///fn+acos+desc Computes arc in radians whose cosine is equal to the argument $x$.
 ///fn+acos+desc A NaN error is raised if $|x|>1$.
 ///fn+acos+plotx -1 1 1/100 -1 1 0.5 0 2.8 1
-double builtin_acos(factor_t *expr) {
+double feenox_builtin_acos(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (fabs(x[0]) > 1.0) {
-    wasora_push_error_message("argument greater than one to function acos");
-    wasora_nan_error();
+    feenox_push_error_message("argument greater than one to function acos");
+    feenox_nan_error();
     return 0;
   }
 
@@ -374,9 +485,9 @@ double builtin_acos(factor_t *expr) {
 ///fn+j0+math J_0(x)
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument $x$.
 ///fn+j0+plotx 0 10 0.05
-double builtin_j0(factor_t *expr) {
+double feenox_builtin_j0(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return gsl_sf_bessel_J0(x[0]);
 }
@@ -389,9 +500,9 @@ double builtin_j0(factor_t *expr) {
 ///fn+cos+desc a linear function of time such as $\omega t+\phi$, where $\omega$ controls the frequency of the wave
 ///fn+cos+desc and $\phi$ controls its phase.
 ///fn+cos+plotx -2*pi 2*pi pi/100
-double builtin_cos(factor_t *expr) {
+double feenox_builtin_cos(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return cos(x[0]);
 }
@@ -401,9 +512,9 @@ double builtin_cos(factor_t *expr) {
 ///fn+tan+math  \tan(x)
 ///fn+tan+desc Computes the tangent of the argument $x$, where $x$ is in radians.
 ///fn+tan+plotx -pi/3 pi/3 pi/100
-double builtin_tan(factor_t *expr) {
+double feenox_builtin_tan(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return tan(x[0]);
 }
@@ -413,9 +524,9 @@ double builtin_tan(factor_t *expr) {
 ///fn+sinh+math \sinh(x)
 ///fn+sinh+desc Computes the hyperbolic sine of the argument $x$, where $x$ is in radians.
 ///fn+sinh+plotx -pi/2 pi/2 pi/100
-double builtin_sinh(factor_t *expr) {
+double feenox_builtin_sinh(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return sinh(x[0]);
 }
@@ -425,9 +536,9 @@ double builtin_sinh(factor_t *expr) {
 ///fn+cosh+math \cosh(x)
 ///fn+cosh+desc Computes the hyperbolic cosine of the argument $x$, where $x$ is in radians.
 ///fn+cosh+plotx -2*pi 2*pi pi/100
-double builtin_cosh(factor_t *expr) {
+double feenox_builtin_cosh(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return cosh(x[0]);
 }
@@ -437,9 +548,9 @@ double builtin_cosh(factor_t *expr) {
 ///fn+tanh+math \tanh(x)
 ///fn+tanh+desc Computes the hyperbolic tangent of the argument $x$, where $x$ is in radians.
 ///fn+tanh+plotx -pi/2 pi/2 pi/100
-double builtin_tanh(factor_t *expr) {
+double feenox_builtin_tanh(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return tanh(x[0]);
 }
@@ -451,9 +562,9 @@ double builtin_tanh(factor_t *expr) {
 ///fn+atan+desc Computes, in radians, the arc tangent of the argument $x$.
 ///fn+atan+plotx -pi pi pi/100
 ///fn+atan2+example atan.was
-double builtin_atan(factor_t *expr) {
+double feenox_builtin_atan(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return atan(x[0]);
 }
@@ -464,10 +575,10 @@ double builtin_atan(factor_t *expr) {
 ///fn+atan2+desc Computes, in radians, the arc tangent of quotient $y/x$, using the signs of the two arguments
 ///fn+atan2+desc to determine the quadrant of the result, which is in the range $[-\pi,\pi]$.
 ///fn+atan2+example atan2.was
-double builtin_atan2(factor_t *expr) {
+double feenox_builtin_atan2(expr_factor_t *expr) {
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   return atan2(x[0], x[1]);
 }
@@ -479,9 +590,9 @@ double builtin_atan2(factor_t *expr) {
 ///fn+exp+math e^x
 ///fn+exp+plotx -1 2.75 1e-2
 ///fn+exp+example exp.was
-double builtin_exp(factor_t *expr) {
+double feenox_builtin_exp(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return (x[0] < GSL_LOG_DBL_MIN)?0:gsl_sf_exp(x[0]);
 }
@@ -493,12 +604,12 @@ double builtin_exp(factor_t *expr) {
 ///fn+expint1+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]
 ///fn+expint1+plotx 1e-2 2.0 1e-2
 ///fn+expint1+example expint1.was
-double builtin_expint1(factor_t *expr) {
+double feenox_builtin_expint1(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (x[0] == 0) {
-    wasora_nan_error();
+    feenox_nan_error();
     return 0;
   }
 
@@ -511,9 +622,9 @@ double builtin_expint1(factor_t *expr) {
 ///fn+expint2+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]
 ///fn+expint2+plotx 0.0 2.0 1e-2
 ///fn+expint2+example expint2.was
-double builtin_expint2(factor_t *expr) {
+double feenox_builtin_expint2(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return gsl_sf_expint_E2(x[0]);
 }
@@ -523,9 +634,9 @@ double builtin_expint2(factor_t *expr) {
 ///fn+expint3+usage expint3(x)
 ///fn+expint3+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]
 ///fn+expint3+plotx 0.0 2.0 1e-2
-double builtin_expint3(factor_t *expr) {
+double feenox_builtin_expint3(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return gsl_sf_expint_En(3, x[0]);
 }
@@ -536,14 +647,14 @@ double builtin_expint3(factor_t *expr) {
 ///fn+expintn+usage expintn(n,x)
 ///fn+expintn+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]
 ///fn+expintn+example expintn.was
-double builtin_expintn(factor_t *expr) {
+double feenox_builtin_expintn(expr_factor_t *expr) {
   double x[1];
   int n;
-  n = ((int)(round(wasora_evaluate_expression(&expr->arg[0]))));
-  x[0] = wasora_evaluate_expression(&expr->arg[1]);
+  n = ((int)(round(feenox_expression_eval(&expr->arg[0]))));
+  x[0] = feenox_expression_eval(&expr->arg[1]);
 
   if ((n == 1 || n == 0) && x[0] == 0) {
-    wasora_nan_error();
+    feenox_nan_error();
     return 0;
   }
 
@@ -557,12 +668,12 @@ double builtin_expintn(factor_t *expr) {
 ///fn+log+math \ln(x)
 ///fn+log+plotx 1e-2 2.75 1e-2
 ///fn+log+example log.was
-double builtin_log(factor_t *expr) {
+double feenox_builtin_log(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (x[0] <= 0) {
-    wasora_nan_error();
+    feenox_nan_error();
     return 0;
   }
 
@@ -576,9 +687,9 @@ double builtin_log(factor_t *expr) {
 ///fn+abs+math y = |x|
 ///fn+abs+plotx -2.5 2.5 1e-2   -2 2 1   0 2 1
 ///fn+abs+example abs.was
-double builtin_abs(factor_t *expr) {
+double feenox_builtin_abs(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return fabs(x[0]);
 }
@@ -590,12 +701,12 @@ double builtin_abs(factor_t *expr) {
 ///fn+sqrt+usage sqrt(x)
 ///fn+sqrt+math \sqrt{x}
 ///fn+sqrt+plotx 0 2.75 1e-2
-double builtin_sqrt(factor_t *expr) {
+double feenox_builtin_sqrt(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   if (x[0] < 0) {
-    wasora_nan_error();
+    feenox_nan_error();
     return 0;
   }
   return sqrt(x[0]);
@@ -606,16 +717,16 @@ double builtin_sqrt(factor_t *expr) {
 ///fn+is_even+desc Returns one if the argument $x$ rounded to the nearest integer is even.
 ///fn+is_even+usage y = is_even(x)
 ///fn+is_even+math  y = \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$} is odd} \end{cases}
-double builtin_is_even(factor_t *expr) {
-  return GSL_IS_EVEN((int)(round(wasora_evaluate_expression(&expr->arg[0]))));
+double feenox_builtin_is_even(expr_factor_t *expr) {
+  return GSL_IS_EVEN((int)(round(feenox_expression_eval(&expr->arg[0]))));
 }
 
 ///fn+is_odd+name is_odd
 ///fn+is_odd+desc Returns one if the argument $x$ rounded to the nearest integer is odd.
 ///fn+is_odd+usage y = is_odd(x)
 ///fn+is_odd+math  y = \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$} is even} \end{cases}
-double builtin_is_odd(factor_t *expr) {
-  return GSL_IS_ODD((int)(round(wasora_evaluate_expression(&expr->arg[0]))));
+double feenox_builtin_is_odd(expr_factor_t *expr) {
+  return GSL_IS_ODD((int)(round(feenox_expression_eval(&expr->arg[0]))));
 }
 
 
@@ -627,11 +738,11 @@ double builtin_is_odd(factor_t *expr) {
 ///fn+heaviside+math \begin{cases} 0 & \text{if $x < 0$} \\ x / \epsilon & \text{if $0 < x < \epsilon$} \\ 1 & \text{if $x > \epsilon$} \end{cases}
 ///fn+heaviside+plotx -2.75 2.75 1e-2
 ///fn+heaviside+example heaviside.was
-double builtin_heaviside(factor_t *expr) {
+double feenox_builtin_heaviside(expr_factor_t *expr) {
   double x[2];
 
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (x[0] <= 0) {
     return 0;
@@ -650,14 +761,14 @@ double builtin_heaviside(factor_t *expr) {
 ///fn+sgn+usage sgn(x, [eps])
 ///fn+sgn+math  \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}
 ///fn+sgn+plotx -2.75 2.75 1e-2
-double builtin_sgn(factor_t *expr) {
+double feenox_builtin_sgn(expr_factor_t *expr) {
   double x[2];
   double eps = 1e-16;
 
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
-  if (expr->arg[1].n_tokens != 0) {
+  if (expr->arg[1].factors != NULL) {
     eps = x[1];
   }
   if (fabs(x[0]) < eps) {
@@ -674,14 +785,14 @@ double builtin_sgn(factor_t *expr) {
 ///fn+not+desc evaluation. If not given, default is $\epsilon = 10^{-16}$.
 ///fn+not+usage not(x, [eps])
 ///fn+not+math  \begin{cases}0 &\text{if $|x| < \epsilon$} \\ 1 &\text{otherwise} \end{cases}
-double builtin_not(factor_t *expr) {
+double feenox_builtin_not(expr_factor_t *expr) {
   double x[2];
   double eps = 1e-16;
 
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
-  if (expr->arg[1].n_tokens != 0) {
+  if (expr->arg[1].factors != NULL) {
     eps = x[1];
   }
   if (fabs(x[0]) < eps) {
@@ -696,11 +807,11 @@ double builtin_not(factor_t *expr) {
 ///fn+mod+desc second $b$. Both arguments may be non-integral.
 ///fn+mod+usage mod(a, b)
 ///fn+mod+math \displaystyle y = a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b
-double builtin_mod(factor_t *expr) {
+double feenox_builtin_mod(expr_factor_t *expr) {
   double x[2];
 
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (x[1] == 0) {
     return 0;
@@ -715,9 +826,9 @@ double builtin_mod(factor_t *expr) {
 ///fn+floor+usage floor(x)
 ///fn+floor+math \lfloor x \rfloor
 ///fn+floor+plotx -2.75 2.75 1e-2
-double builtin_floor(factor_t *expr) {
+double feenox_builtin_floor(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return floor(x[0]);
 }
@@ -728,9 +839,9 @@ double builtin_floor(factor_t *expr) {
 ///fn+ceil+usage ceil(x)
 ///fn+ceil+math \lceil x \rceil
 ///fn+ceil+plotx -2.75 2.75 1e-2
-double builtin_ceil(factor_t *expr) {
+double feenox_builtin_ceil(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return ceil(x[0]);
 }
@@ -741,9 +852,9 @@ double builtin_ceil(factor_t *expr) {
 ///fn+round+usage round(x)
 ///fn+round+math \begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}
 ///fn+round+plotx -2.75 2.75 1e-2
-double builtin_round(factor_t *expr) {
+double feenox_builtin_round(expr_factor_t *expr) {
   double x[1];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
   return round(x[0]);
 }
@@ -754,10 +865,10 @@ double builtin_round(factor_t *expr) {
 ///fn+deadband+desc given by the second argument $a$.
 ///fn+deadband+usage deadband(x, a)
 ///fn+deadband+math \begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}
-double builtin_deadband(factor_t *expr) {
+double feenox_builtin_deadband(expr_factor_t *expr) {
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   return (fabs(x[0])<x[1])?0:(x[0]+((x[0]>0)?(-1):1)*x[1]);
 }
@@ -773,12 +884,12 @@ double builtin_deadband(factor_t *expr) {
 ///fn+lag+desc at $t = \Delta t$ with the initial condition $y(0) = y(t-\Delta t)$.
 ///fn+lag+usage lag(x, tau)
 ///fn+lag+math x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)
-double builtin_lag(factor_t *expr) {
+double feenox_builtin_lag(expr_factor_t *expr) {
 
   double y;
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (expr->aux == NULL) {
     // si es la primera vez que se llama a este lag, allocamos
@@ -787,25 +898,25 @@ double builtin_lag(factor_t *expr) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static))) || x[1] < ZERO) {
+  } else if ((int)(feenox_special_var_value(in_static)) || x[1] < ZERO) {
     // si no es la primera vez que se llama a este lag pero estamos
     // en el paso estatico o el tau es muy chiquito, pasa de largo
     // el valor del primer argumento
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(wasora_value(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
     // si nos llamaron, nos aseguramos de que solamente hagamos el lag
     //   cuando corresponda para evitar problemas en cosas que se llaman
     //   iterativa o implicitamente
     expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0] - (x[0] - expr->aux[0])*exp(-wasora_var(wasora_special_var(dt))/x[1]);
-    expr->aux[2] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[1] = x[0] - (x[0] - expr->aux[0])*exp(-feenox_special_var_value(dt)/x[1]);
+    expr->aux[2] = (int)(feenox_special_var_value(step_transient));
   }
 
   // si termino la corrida rompemos todo para que si tenemos que volver
   // a arrcancar, empiece todo como si nada
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     double dummy = expr->aux[1];
     free(expr->aux);
     expr->aux = NULL;
@@ -814,7 +925,7 @@ double builtin_lag(factor_t *expr) {
 
   y = expr->aux[1];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -830,12 +941,12 @@ double builtin_lag(factor_t *expr) {
 ///fn+lag_euler+desc to the time-dependent signal $x(t)$ by using the Euler forward rule.
 ///fn+lag_euler+usage lag_euler(x, tau)
 ///fn+lag_euler+math y(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}
-double builtin_lag_euler(factor_t *expr) {
+double feenox_builtin_lag_euler(expr_factor_t *expr) {
 
   double y;
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(5*sizeof(double));
@@ -844,23 +955,23 @@ double builtin_lag_euler(factor_t *expr) {
     expr->aux[2] = x[0];
     expr->aux[3] = x[0];
     expr->aux[4] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static))) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = x[0];
     expr->aux[3] = x[0];
     expr->aux[4] = 0;
-  } else if ((int)round(expr->aux[4]) != (int)(wasora_var(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[4]) != (int)(feenox_special_var_value(step_transient))) {
     expr->aux[0] = expr->aux[1];
     expr->aux[1] = x[0];
     expr->aux[2] = expr->aux[3];
-    expr->aux[3] = expr->aux[2] + wasora_var(wasora_special_var(dt))/x[1]*(x[0]-expr->aux[2]);
-    expr->aux[4] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[3] = expr->aux[2] + feenox_special_var_value(dt)/x[1]*(x[0]-expr->aux[2]);
+    expr->aux[4] = (int)(feenox_special_var_value(step_transient));
   }
 
   y = expr->aux[3];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -876,12 +987,12 @@ double builtin_lag_euler(factor_t *expr) {
 ///fn+lag_bilinear+desc to the time-dependent signal $x(t)$ by using the bilinear transformation formula.
 ///fn+lag_bilinear+usage lag_bilinear(x, tau)
 ///fn+lag_bilinear+math y = y(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}
-double builtin_lag_bilinear(factor_t *expr) {
+double feenox_builtin_lag_bilinear(expr_factor_t *expr) {
 
   double y;
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(5*sizeof(double));
@@ -890,23 +1001,23 @@ double builtin_lag_bilinear(factor_t *expr) {
     expr->aux[2] = x[0];
     expr->aux[3] = x[0];
     expr->aux[4] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static))) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = x[0];
     expr->aux[3] = x[0];
     expr->aux[4] = 0;
-  } else if ((int)round(expr->aux[4]) != (int)(wasora_var(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[4]) != (int)(feenox_special_var_value(step_transient))) {
     expr->aux[0] = expr->aux[1];
     expr->aux[1] = x[0];
     expr->aux[2] = expr->aux[3];
-    expr->aux[3] = (expr->aux[2] * (1 - 0.5*wasora_var(wasora_special_var(dt))/x[1]) + 0.5*wasora_var(wasora_special_var(dt))/x[1]*(x[0] + expr->aux[0]))/(1 + 0.5*wasora_var(wasora_special_var(dt))/x[1]);
-    expr->aux[4] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[3] = (expr->aux[2] * (1 - 0.5*feenox_special_var_value(dt)/x[1]) + 0.5*feenox_special_var_value(dt)/x[1]*(x[0] + expr->aux[0]))/(1 + 0.5*feenox_special_var_value(dt)/x[1]);
+    expr->aux[4] = (int)(feenox_special_var_value(step_transient));
   }
 
   y = expr->aux[3];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -916,31 +1027,31 @@ double builtin_lag_bilinear(factor_t *expr) {
 
 // lead(x, tau) implementa la fucion de transferencia s.tau/(1+s.tau)
 /*
-double builtin_lead(factor_t *expr) {
+double feenox_builtin_lead(expr_factor_t *expr) {
 
   double y;
   double x[2];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(3*sizeof(double));
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static)))) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(wasora_value(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient)))) {
     expr->aux[0] = expr->aux[1];
-    expr->aux[1] = (x[0] - expr->aux[0])/(0.5*wasora_var(wasora_special_var(dt))/x[1] + 1) - (0.5*wasora_var(wasora_special_var(dt))/x[1] - 1)/(0.5*wasora_var(wasora_special_var(dt))/x[1] + 1) * (expr->aux[0]);
-    expr->aux[2] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[1] = (x[0] - expr->aux[0])/(0.5*feenox_special_var_value(dt))/x[1] + 1) - (0.5*feenox_special_var_value(dt))/x[1] - 1)/(0.5*feenox_special_var_value(dt))/x[1] + 1) * (expr->aux[0]);
+    expr->aux[2] = (int)(feenox_special_var_value(step_transient)));
   }
 
   y = expr->aux[1];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done))) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -950,9 +1061,9 @@ double builtin_lead(factor_t *expr) {
 
 // deriv_lag(x, tau) implementa la fucion de transferencia s.tau/(1+s.tau)
 /*
-double builtin_lead_euler(algebraic_token_t *expr) {
+double feenox_builtin_lead_euler(algebraic_token_t *expr) {
   if (expr->nofirst_time) {
-    return (expr->arg_value[0] - expr->arg_last_value[0])/(0.5*wasora_var(wasora_special_var(dt))/expr->arg_value[1] + 1) - (0.5*wasora_var(wasora_special_var(dt))/expr->arg_value[1] - 1)/(0.5*wasora_var(wasora_special_var(dt))/expr->arg_value[1] + 1) * (expr->last_value);
+    return (expr->arg_value[0] - expr->arg_last_value[0])/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) - (0.5*feenox_special_var_value(dt))/expr->arg_value[1] - 1)/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) * (expr->last_value);
   } else {
     expr->nofirst_time = 1;
     return 0;
@@ -961,9 +1072,9 @@ double builtin_lead_euler(algebraic_token_t *expr) {
 
 
 // deriv_lag(x, tau) implementa la fucion de transferencia s.tau/(1+s.tau)
-double builtin_lead_bilinear(algebraic_token_t *expr) {
+double feenox_builtin_lead_bilinear(algebraic_token_t *expr) {
   if (expr->nofirst_time) {
-    return (expr->arg_value[0] - expr->arg_last_value[0])/(0.5*wasora_var(wasora_special_var(dt))/expr->arg_value[1] + 1) - (0.5*wasora_var(wasora_special_var(dt))/expr->arg_value[1] - 1)/(0.5*wasora_var(wasora_special_var(dt))/expr->arg_value[1] + 1) * (expr->last_value);
+    return (expr->arg_value[0] - expr->arg_last_value[0])/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) - (0.5*feenox_special_var_value(dt))/expr->arg_value[1] - 1)/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) * (expr->last_value);
   } else {
     expr->nofirst_time = 1;
     return 0;
@@ -980,15 +1091,15 @@ double builtin_lead_bilinear(algebraic_token_t *expr) {
 ///fn+equal+desc Default value for $\epsilon = 10^{-16}$.
 ///fn+equal+usage equal(a, b, [eps])
 ///fn+equal+math \begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}
-double builtin_equal(factor_t *expr) {
+double feenox_builtin_equal(expr_factor_t *expr) {
   double eps = 1e-16;
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
 
-  if (expr->arg[2].n_tokens != 0) {
+  if (expr->arg[2].factors != NULL) {
     eps = x[2];
   }
 
@@ -1014,19 +1125,19 @@ double builtin_equal(factor_t *expr) {
 ///fn+random+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random+usage random(x1, x2, [s])
 ///fn+random+math  x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1
-double builtin_random(factor_t *expr) {
+double feenox_builtin_random(expr_factor_t *expr) {
 
   double y;
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
   // si es la primera llamada inicializamos el generador
   if (expr->aux == NULL) {
     expr->aux = (double *)gsl_rng_alloc(DEFAULT_RANDOM_METHOD);
     // si nos dieron tercer argumento, lo usamos como semilla, sino usamos time()
-    if (expr->arg[2].n_tokens == 0) {
+    if (expr->arg[2].factors == NULL) {
       gsl_rng_set((gsl_rng *)expr->aux, (unsigned long int)(time(NULL)) + (unsigned long int)(&expr->aux));
     } else {
       gsl_rng_set((gsl_rng *)expr->aux, (unsigned long int)(x[2]));
@@ -1037,7 +1148,7 @@ double builtin_random(factor_t *expr) {
   // TODO: memory leaks en fiteo, minimizacion, etc
   y = x[0] + gsl_rng_uniform((const gsl_rng *)expr->aux)*(x[1]-x[0]);
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     gsl_rng_free((gsl_rng *)expr->aux);
     expr->aux = NULL;
   }
@@ -1059,18 +1170,18 @@ double builtin_random(factor_t *expr) {
 ///fn+random_gauss+desc This function uses a second-order multiple recursive generator described by
 ///fn+random_gauss+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random_gauss+usage random_gauss(x1, x2, [s])
-double builtin_random_gauss(factor_t *expr) {
+double feenox_builtin_random_gauss(expr_factor_t *expr) {
 
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
   // si es la primera llamada inicializamos el generador
   if (expr->aux == NULL) {
     expr->aux = (double *)gsl_rng_alloc(DEFAULT_RANDOM_METHOD);
     // si nos dieron tercer argumento, lo usamos como semilla, sino usamos time()
-    if (expr->arg[2].n_tokens == 0) {
+    if (expr->arg[2].factors == NULL) {
       gsl_rng_set((const gsl_rng *)expr->aux, (unsigned long int)(time(NULL)) + (unsigned long int)(&expr->aux));
 //      gsl_rng_set((const gsl_rng *)expr->aux, (unsigned long int)(time(NULL)));
     } else {
@@ -1089,11 +1200,11 @@ double builtin_random_gauss(factor_t *expr) {
 ///fn+limit+desc be less than the third argument $b$.
 ///fn+limit+usage limit(x, a, b)
 ///fn+limit+math \begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}
-double builtin_limit(factor_t *expr) {
+double feenox_builtin_limit(expr_factor_t *expr) {
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
   if (x[0] < x[1]) {
     return x[1];
@@ -1110,17 +1221,17 @@ double builtin_limit(factor_t *expr) {
 ///fn+limit_dt+desc be less than the third argument $b$.
 ///fn+limit_dt+usage limit_dt(x, a, b)
 ///fn+limit_dt+math \begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}
-double builtin_limit_dt(factor_t *expr) {
+double feenox_builtin_limit_dt(expr_factor_t *expr) {
 
   double y;
   double derivative;
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
-  if (wasora_var(wasora_special_var(dt)) == 0) {
-    wasora_nan_error();
+  if (feenox_special_var_value(dt) == 0) {
+    feenox_nan_error();
     return 0;
   }
 
@@ -1129,17 +1240,17 @@ double builtin_limit_dt(factor_t *expr) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)(wasora_value(wasora_special_var(in_static)))) {
+  } else if ((int)(feenox_special_var_value(in_static))) {
     expr->aux[0] = x[0];
     expr->aux[1] = x[0];
     expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(wasora_var(wasora_special_var(step_transient)))) {
+  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
     expr->aux[0] = expr->aux[1];
     expr->aux[1] = x[0];
-    expr->aux[2] = (int)(wasora_value(wasora_special_var(step_transient)));
+    expr->aux[2] = (int)(feenox_special_var_value(step_transient));
   }
 
-  derivative = (x[0] - expr->aux[0])/wasora_var(wasora_special_var(dt));
+  derivative = (x[0] - expr->aux[0])/feenox_special_var_value(dt);
 
 
 //  if (!expr->nofirst_time) {
@@ -1147,14 +1258,14 @@ double builtin_limit_dt(factor_t *expr) {
 //  }
 
   if (derivative < x[1]) {
-    y = expr->aux[0] + x[1]*wasora_var(wasora_special_var(dt));
+    y = expr->aux[0] + x[1]*feenox_special_var_value(dt);
   } else if (derivative > x[2]) {
-    y = expr->aux[0] + x[2]*wasora_var(wasora_special_var(dt));
+    y = expr->aux[0] + x[2]*feenox_special_var_value(dt);
   } else {
     y = x[0];
   }
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -1174,19 +1285,19 @@ double builtin_limit_dt(factor_t *expr) {
 ///fn+if+usage if(a, [b], [c], [eps])
 ///fn+if+math \begin{cases} b & \text{if $a \neq 0$} \\ c & \text{if $a = b$} \end{cases}
 
-double builtin_if(factor_t *expr) {
+double feenox_builtin_if(expr_factor_t *expr) {
   double eps = 1e-16;
   double x[4];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
 
-  if (expr->arg[3].n_tokens != 0) {
-    eps = wasora_evaluate_expression(&expr->arg[3]);
+  if (expr->arg[3].factors != NULL) {
+    eps = feenox_expression_eval(&expr->arg[3]);
   }
 
   if (fabs(x[0]) > eps) {
-    return (expr->arg[1].n_tokens!=0) ? wasora_evaluate_expression(&expr->arg[1]) : 1.0;
+    return (expr->arg[1].factors != NULL) ? feenox_expression_eval(&expr->arg[1]) : 1.0;
   } else {
-    return (expr->arg[2].n_tokens!=0) ? wasora_evaluate_expression(&expr->arg[2]) : 0.0;
+    return (expr->arg[2].factors != NULL) ? feenox_expression_eval(&expr->arg[2]) : 0.0;
   }
 
 }
@@ -1197,13 +1308,13 @@ double builtin_if(factor_t *expr) {
 ///fn+is_in_interval+desc but excluding~$b$.
 ///fn+is_in_interval+usage is_in_interval(x, a, b)
 ///fn+is_in_interval+math \begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}
-double builtin_is_in_interval(factor_t *expr) {
+double feenox_builtin_is_in_interval(expr_factor_t *expr) {
 
   double y;
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
   y = (x[0] >= x[1] && x[0] < x[2]);
 
@@ -1220,13 +1331,13 @@ double builtin_is_in_interval(factor_t *expr) {
 ///fn+threshold_max+usage threshold_max(x, a, [b])
 ///fn+threshold_max+math \begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}
 
-double builtin_threshold_max(factor_t *expr) {
+double feenox_builtin_threshold_max(expr_factor_t *expr) {
 
   double y;
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(1*sizeof(double));
@@ -1240,7 +1351,7 @@ double builtin_threshold_max(factor_t *expr) {
   }
   y = expr->aux[0];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -1257,13 +1368,13 @@ double builtin_threshold_max(factor_t *expr) {
 ///fn+threshold_min+usage threshold_min(x, a, [b])
 ///fn+threshold_min+math \begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}
 
-double builtin_threshold_min(factor_t *expr) {
+double feenox_builtin_threshold_min(expr_factor_t *expr) {
 
   double y;
   double x[3];
-  x[0] = wasora_evaluate_expression(&expr->arg[0]);
-  x[1] = wasora_evaluate_expression(&expr->arg[1]);
-  x[2] = wasora_evaluate_expression(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[2] = feenox_expression_eval(&expr->arg[2]);
 
   if (expr->aux == NULL) {
     expr->aux = malloc(1*sizeof(double));
@@ -1278,7 +1389,7 @@ double builtin_threshold_min(factor_t *expr) {
 
   y = expr->aux[0];
 
-  if (wasora_var(wasora_special_var(done))) {
+  if (feenox_special_var_value(done)) {
     free(expr->aux);
     expr->aux = NULL;
   }
@@ -1287,17 +1398,17 @@ double builtin_threshold_min(factor_t *expr) {
 
 
 ///fn+min+name min
-///fn+min+desc Returns the minimum of the arguments $x_i$ provided. Currently only maximum of ten arguments can be provided.
+///fn+min+desc Returns the minimum of the $n$ arguments $x_i$ provided.
 ///fn+min+usage min(x1, x2, [...], [x10])
 ///fn+min+math  \min \Big (x_1, x_2, \dots, x_{10} \Big)
 
-double builtin_min(factor_t *expr) {
+double feenox_builtin_min(expr_factor_t *expr) {
   int i;
-  double min = wasora_evaluate_expression(&expr->arg[0]);
+  double min = feenox_expression_eval(&expr->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].n_tokens != 0 && wasora_evaluate_expression(&expr->arg[i]) < min) {
-      min = wasora_evaluate_expression(&expr->arg[i]);
+    if (expr->arg[i].factors != NULL && feenox_expression_eval(&expr->arg[i]) < min) {
+      min = feenox_expression_eval(&expr->arg[i]);
     }
   }
   return min;
@@ -1308,13 +1419,13 @@ double builtin_min(factor_t *expr) {
 ///fn+max+usage max(x1, x2, [...], [x10])
 ///fn+max+math  \max \Big (x_1, x_2, \dots, x_{10} \Big)
 
-double builtin_max(factor_t *expr) {
+double feenox_builtin_max(expr_factor_t *expr) {
   int i;
-  double max = wasora_evaluate_expression(&expr->arg[0]);
+  double max = feenox_expression_eval(&expr->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].n_tokens != 0 && wasora_evaluate_expression(&expr->arg[i]) > max) {
-      max = wasora_evaluate_expression(&expr->arg[i]);
+    if (expr->arg[i].factors != NULL && feenox_expression_eval(&expr->arg[i]) > max) {
+      max = feenox_expression_eval(&expr->arg[i]);
     }
   }
   return max;
@@ -1326,14 +1437,14 @@ double builtin_max(factor_t *expr) {
 ///fn+mark_min+usage mark_max(x1, x2, [...], [x10])
 ///fn+mark_min+math  i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i
 
-double builtin_mark_min(factor_t *expr) {
+double feenox_builtin_mark_min(expr_factor_t *expr) {
   int i;
   int i_min = 0;
-  double min = wasora_evaluate_expression(&expr->arg[0]);
+  double min = feenox_expression_eval(&expr->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].n_tokens != 0 && wasora_evaluate_expression(&expr->arg[i]) < min) {
-      min = wasora_evaluate_expression(&expr->arg[i]);
+    if (expr->arg[i].factors != NULL && feenox_expression_eval(&expr->arg[i]) < min) {
+      min = feenox_expression_eval(&expr->arg[i]);
       i_min = i;
     }
   }
@@ -1345,14 +1456,14 @@ double builtin_mark_min(factor_t *expr) {
 ///fn+mark_max+usage mark_max(x1, x2, [...], [x10])
 ///fn+mark_max+math  i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i
 
-double builtin_mark_max(factor_t *expr) {
+double feenox_builtin_mark_max(expr_factor_t *expr) {
   int i;
   int i_max = 0;
-  double max = wasora_evaluate_expression(&expr->arg[0]);
+  double max = feenox_expression_eval(&expr->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].n_tokens != 0 && wasora_evaluate_expression(&expr->arg[i]) > max) {
-      max = wasora_evaluate_expression(&expr->arg[i]);
+    if (expr->arg[i].factors != NULL && feenox_expression_eval(&expr->arg[i]) > max) {
+      max = feenox_expression_eval(&expr->arg[i]);
       i_max = i;
     }
   }

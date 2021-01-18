@@ -26,7 +26,7 @@ int feenox_instruction_if(void *arg) {
   conditional_block_t *conditional_block = (conditional_block_t *)arg;
   int condition;
 
-  condition = (int)feenox_evaluate_expression(&conditional_block->condition);
+  condition = (int)feenox_expression_eval(&conditional_block->condition);
 
   if (condition) {
     conditional_block->evaluated_to_true = 1;

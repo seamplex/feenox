@@ -22,13 +22,14 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-#include <gsl/gsl_sort_vector.h>
-
 
 double feenox_vector_get(vector_t *this, const size_t i) {
-  
-  if (!this->initialized) {
-    feenox_call(feenox_vector_init(this));
+
+  if (this->initialized == 0) {
+    if (feenox_vector_init(this) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+      feenox_runtime_error();
+    }
   }
   
   return gsl_vector_get(feenox_value_ptr(this), i);
@@ -36,8 +37,11 @@ double feenox_vector_get(vector_t *this, const size_t i) {
 
 double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
   
-  if (!this->initialized) {
-    feenox_call(feenox_vector_init(this));
+  if (this->initialized == 0) {
+    if (feenox_vector_init(this) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+      feenox_runtime_error();
+    }
   }
   
   return gsl_vector_get(this->initial_static, i);
@@ -45,8 +49,11 @@ double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
 
 double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
   
-  if (!this->initialized) {
-    feenox_call(feenox_vector_init(this));
+  if (this->initialized == 0) {
+    if (feenox_vector_init(this) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+      feenox_runtime_error();
+    }
   }
   
   return gsl_vector_get(this->initial_transient, i);
@@ -54,8 +61,11 @@ double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
 
 int feenox_vector_set(vector_t *this, const size_t i, double value) {
   
-  if (!this->initialized) {
-    feenox_call(feenox_vector_init(this));
+  if (this->initialized == 0) {
+    if (feenox_vector_init(this) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+      feenox_runtime_error();
+    }
   }
   
   gsl_vector_set(feenox_value_ptr(this), i, value);
@@ -81,12 +91,12 @@ int feenox_vector_init(vector_t *this) {
     }
     if (this->size_expr.factors == NULL) {
       size = this->function->data_size;
-    } else if ((size = (int)(round(feenox_evaluate_expression(&this->size_expr)))) != this->function->data_size) {
+    } else if ((size = (int)(round(feenox_expression_eval(&this->size_expr)))) != this->function->data_size) {
       feenox_push_error_message("vector '%s' has size mismatch, SIZE = %d and FUNCTION = %d", this->name, size, this->function->data_size);
       return FEENOX_ERROR;
     }
     
-  } else if ((size = this->size) == 0 && (size = (int)(round(feenox_evaluate_expression(&this->size_expr)))) == 0) {
+  } else if ((size = this->size) == 0 && (size = (int)(round(feenox_expression_eval(&this->size_expr)))) == 0) {
     feenox_push_error_message("vector '%s' has zero size", this->name);
     return FEENOX_ERROR;
   } else if (size < 0) {
@@ -102,7 +112,7 @@ int feenox_vector_init(vector_t *this) {
   if (this->datas != NULL) {
     i = 0;
     LL_FOREACH(this->datas, data) {
-      gsl_vector_set(feenox_value_ptr(this), i++, feenox_evaluate_expression(data));
+      gsl_vector_set(feenox_value_ptr(this), i++, feenox_expression_eval(data));
     }
   }
   

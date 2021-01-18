@@ -58,7 +58,6 @@ extern char *feenox_get_next_token(char *line);
 extern void feenox_strip_blanks(char *string);
 
 extern int feenox_parser_expression_in_string(double *result);
-extern expr_factor_t *feenox_parse_factor(char *string);
 
 extern int feenox_parser_string(char **string);
 extern int feenox_parser_expression(expr_t *expr);

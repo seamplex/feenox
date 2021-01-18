@@ -21,6 +21,9 @@
  */
 #include "feenox.h"
 extern feenox_t feenox;
+extern builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS];
+extern builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTIONS];
+extern builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS];
 
 #include <ctype.h>
 #include <string.h>
@@ -150,10 +153,10 @@ int feenox_define_alias(const char *new_name, const char *existing_object, const
   }
   
   if (row != NULL) {
-    feenox_call(feenox_parse_expression(row, &alias->row));
+    feenox_call(feenox_expression_parse(&alias->row, row));
   }
   if (col != NULL) {
-    feenox_call(feenox_parse_expression(col, &alias->col));
+    feenox_call(feenox_expression_parse(&alias->col, col));
   }
   
   LL_APPEND(feenox.aliases, alias);
@@ -178,7 +181,7 @@ int feenox_define_vector(const char *name, const char *size) {
 
   vector = calloc(1, sizeof(vector_t));
   vector->name = strdup(name);
-  feenox_call(feenox_parse_expression(size, &vector->size_expr));
+  feenox_call(feenox_expression_parse(&vector->size_expr, size));
 
   HASH_ADD_KEYPTR(hh, feenox.vectors, vector->name, strlen(vector->name), vector);
 
@@ -226,8 +229,8 @@ int feenox_define_matrix(const char *name, const char *rows, const char *cols) {
 
   matrix_t *matrix = calloc(1, sizeof(matrix_t));
   matrix->name = strdup(name);
-  feenox_call(feenox_parse_expression(rows, &matrix->rows_expr));
-  feenox_call(feenox_parse_expression(cols, &matrix->cols_expr));
+  feenox_call(feenox_expression_parse(&matrix->rows_expr, rows));
+  feenox_call(feenox_expression_parse(&matrix->cols_expr, cols));
 
   HASH_ADD_KEYPTR(hh, feenox.matrices, matrix->name, strlen(matrix->name), matrix);
 
@@ -310,7 +313,7 @@ int feenox_function_set_expression(const char *name, const char *expression) {
   }
   
   function->type = function_type_algebraic;
-  feenox_call(feenox_parse_expression(expression, &function->algebraic_expression));  
+  feenox_call(feenox_expression_parse(&function->algebraic_expression, expression));  
   
   return FEENOX_OK;
 }
@@ -359,7 +362,7 @@ int feenox_file_set_path_argument(const char *name, int i, const char *expressio
     return FEENOX_ERROR;
   }
   
-  feenox_call(feenox_parse_expression(expression, &file->arg[i]));
+  feenox_call(feenox_expression_parse(&file->arg[i], expression));
   
   // mark that we received an argument to see if we got them all when initializing
   file->n_format_args_given++;
@@ -469,9 +472,7 @@ int feenox_check_name(const char *name) {
     return FEENOX_ERROR;
   }
 
-  // TODO
-/*  
-//  int i;
+  int i;
   for (i = 0; i < N_BUILTIN_FUNCTIONS; i++) {
     if (builtin_function[i].name != NULL && strcmp(name, builtin_function[i].name) == 0) {
       feenox_push_error_message("there already exists a built-in function named '%s'", name);
@@ -479,6 +480,9 @@ int feenox_check_name(const char *name) {
     }
   }
 
+  // TODO
+  
+/*  
   for (i = 0; i < N_BUILTIN_VECTOR_FUNCTIONS; i++) {
     if (builtin_vectorfunction[i].name != NULL && strcmp(name, builtin_vectorfunction[i].name) == 0) {
       feenox_push_error_message("there already exists a built-in vector function named '%s'", name);

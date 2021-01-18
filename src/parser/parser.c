@@ -2130,7 +2130,7 @@ int feenox_parse_vector(void) {
     } else if (strcasecmp(token, "DATA") == 0) {
       while ((token = feenox_get_next_token(NULL)) != NULL) {
         expr_t *data = calloc(1, sizeof(expr_t));
-        feenox_call(feenox_parse_expression(token, data));
+        feenox_call(feenox_expression_parse(data, token));
         LL_APPEND(datas, data);
       }
     }
@@ -2209,7 +2209,7 @@ int feenox_parse_matrix(void) {
     } else if (strcasecmp(token, "DATA") == 0) {
       while ((token = feenox_get_next_token(NULL)) != NULL) {
         expr_t *data = calloc(1, sizeof(expr_t));
-        feenox_call(feenox_parse_expression(token, data));
+        feenox_call(feenox_expression_parse(data, token));
         LL_APPEND(datas, data);
       }
     }
@@ -3027,7 +3027,7 @@ int feenox_parse_print(void) {
         print_token->vector = dummy_vector;
 
       } else {
-        if (feenox_parse_expression(token, &print_token->expression) != FEENOX_OK) {
+        if (feenox_expression_parse(&print_token->expression, token) != FEENOX_OK) {
 
           // let the not-resolved expressions to be casted as string literals 
           // only if implicit is allowed

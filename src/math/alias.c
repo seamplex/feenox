@@ -29,8 +29,8 @@ int feenox_instruction_alias(void *arg) {
   if (!alias->initialized) {
 
     alias->initialized = 1;
-    row = (size_t)(feenox_evaluate_expression(&alias->row)) - 1;
-    col = (size_t)(feenox_evaluate_expression(&alias->col)) - 1;
+    row = (size_t)(feenox_expression_eval(&alias->row)) - 1;
+    col = (size_t)(feenox_expression_eval(&alias->col)) - 1;
     
     if (alias->matrix != NULL) {
       

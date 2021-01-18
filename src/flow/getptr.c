@@ -21,6 +21,9 @@
  */
 #include "feenox.h"
 extern feenox_t feenox;
+extern builtin_function_t       builtin_function[N_BUILTIN_FUNCTIONS];
+extern builtin_functional_t     builtin_functional[N_BUILTIN_FUNCTIONALS];
+extern builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTIONS];
 
 #include <string.h>
 
@@ -70,6 +73,7 @@ loadable_routine_t *feenox_get_loadable_routine(const char *name) {
   HASH_FIND_STR(feenox.loadable_routines, name, loadable_routine);
   return loadable_routine;
 }
+*/
 
 builtin_function_t *feenox_get_builtin_function_ptr(const char *name) {
   int i;
@@ -110,6 +114,7 @@ builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name) {
 
 }
 
+/*
 vector_t *feenox_get_first_vector(const char *s) {
   
   char *line = strdup(s);

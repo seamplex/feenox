@@ -56,7 +56,7 @@ int feenox_matrix_init(matrix_t *this) {
   int i, j;
   expr_t *data;
 
-  if ((rows = (int)(round(feenox_evaluate_expression(&this->rows_expr)))) == 0 &&
+  if ((rows = (int)(round(feenox_expression_eval(&this->rows_expr)))) == 0 &&
       (rows = this->rows) == 0) {
     feenox_push_error_message("matrix '%s' has zero rows", this->name);
     return FEENOX_ERROR;
@@ -65,7 +65,7 @@ int feenox_matrix_init(matrix_t *this) {
     return FEENOX_ERROR;
   }
   
-  if ((cols = (int)(round(feenox_evaluate_expression(&this->cols_expr)))) == 0  && (cols = this->cols) == 0) {
+  if ((cols = (int)(round(feenox_expression_eval(&this->cols_expr)))) == 0  && (cols = this->cols) == 0) {
     feenox_push_error_message("matrix '%s' has zero cols", this->name);
     return FEENOX_ERROR;
   } else if (cols < 0) {
@@ -83,7 +83,7 @@ int feenox_matrix_init(matrix_t *this) {
     i = 0;
     j = 0;
     LL_FOREACH(this->datas, data) {
-      gsl_matrix_set(feenox_value_ptr(this), i, j++, feenox_evaluate_expression(data));
+      gsl_matrix_set(feenox_value_ptr(this), i, j++, feenox_expression_eval(data));
       if (j == this->cols) {
         j = 0;
         i++;

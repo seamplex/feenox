@@ -111,9 +111,22 @@
 // reasonable defaults
 #define DEFAULT_DT                         1.0/16.0
 #define DEFAULT_REL_ERROR                  1e-6
+#define DEFAULT_RANDOM_METHOD              gsl_rng_mt19937
 
 #define DEFAULT_PRINT_FORMAT               "%g"
 #define DEFAULT_PRINT_SEPARATOR            "\t"
+
+#define DEFAULT_ROOT_MAX_TER               1024
+#define DEFAULT_ROOT_TOLERANCE             (9.765625e-4)         // (1/2)^-10
+
+#define DEFAULT_INTEGRATION_INTERVALS      1024
+#define DEFAULT_INTEGRATION_TOLERANCE      (9.765625e-4)         // (1/2)^-10
+#define DEFAULT_INTEGRATION_KEY            GSL_INTEG_GAUSS31
+
+#define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
+
+#define MINMAX_ARGS       10
+
 
 // zero & infinite
 #define ZERO          (8.881784197001252323389053344727e-16)  // (1/2)^-50
@@ -148,8 +161,18 @@ enum version_type {
 
 
 
+// number of internal functions, functional adn vector functions
+#define N_BUILTIN_FUNCTIONS         53
+#define N_BUILTIN_FUNCTIONALS       8
+#define N_BUILTIN_VECTOR_FUNCTIONS  8
+
+
+
 // forward declarations
 typedef struct feenox_t feenox_t;
+typedef struct builtin_function_t builtin_function_t;
+typedef struct builtin_functional_t builtin_functional_t;
+typedef struct builtin_vectorfunction_t builtin_vectorfunction_t;
 
 typedef struct expr_t expr_t;
 typedef struct expr_factor_t expr_factor_t;
@@ -191,11 +214,10 @@ struct expr_factor_t {
 // (last value, integral accumulator, rng, etc)
   double *aux;
 
-/*
   builtin_function_t *builtin_function;
   builtin_vectorfunction_t *builtin_vectorfunction;
   builtin_functional_t *builtin_functional;
- */
+
   var_t *variable;
   vector_t *vector;
   matrix_t *matrix;
@@ -425,6 +447,38 @@ struct function_t {
   UT_hash_handle hh;
 };
 
+
+// internal function (this is initialized directly into the data space from builtin_functions.h)
+struct builtin_function_t {
+  char name[BUFFER_TOKEN_SIZE];
+  int min_arguments;
+  int max_arguments;
+  double (*routine)(struct expr_factor_t *);
+};
+
+
+// internal function over vectors
+struct builtin_vectorfunction_t {
+  char name[BUFFER_TOKEN_SIZE];
+  int min_arguments;
+  int max_arguments;
+  double (*routine)(struct vector_t **);
+};
+
+
+// internal functional
+// a functional is _like_ a regular function but its second argument is a variable
+// (not an expression) that is used to evaluate the first argument (which is an expression
+// of this variable) for different values and do something about it, for instance
+// compute a derivative or an integral.
+// There can also be more optional arguments (expressions) after this second special argument,
+// i.e. integral(1+x,x,0,1) or derivative(1+x,x,0.5)
+struct builtin_functional_t {
+  char name[BUFFER_TOKEN_SIZE];
+  int min_arguments; // contando la variable del segundo argumento
+  int max_arguments;
+  double (*routine)(struct expr_factor_t *, struct var_t *);
+};
 
 
 // instruction
@@ -738,8 +792,6 @@ void feenox_finalize(void);
 
 // parser.c
 extern int feenox_parse_main_input_file(const char *filepath);
-extern int feenox_parse_expression(const char *string, expr_t *expr);
-
 
 // file.c
 extern int feenox_instruction_file(void *arg);
@@ -751,9 +803,13 @@ extern int feenox_instruction_file_close(void *arg);
 extern int feenox_instruction_abort(void *arg);
 
 
-// algebra.c
+// expressions.c
+extern int feenox_expression_parse(expr_t *this, const char *string);
+extern expr_factor_t *feenox_expression_parse_factor(const char *string);
+
+
+extern double feenox_expression_eval(expr_t *this);
 extern double feenox_evaluate_expression_in_string(const char *string);
-extern double feenox_evaluate_expression(expr_t *this);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
@@ -800,6 +856,10 @@ extern var_t *feenox_get_variable_ptr(const char *name);
 extern vector_t *feenox_get_vector_ptr(const char *name);
 extern matrix_t *feenox_get_matrix_ptr(const char *name);
 extern function_t *feenox_get_function_ptr(const char *name);
+extern builtin_function_t *feenox_get_builtin_function_ptr(const char *name);
+extern builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const char *name);
+extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name);
+
 extern file_t *feenox_get_file_ptr(const char *name);
 
 // alias.c
@@ -811,6 +871,10 @@ extern int feenox_matrix_init(matrix_t *this);
 // vector.c
 extern int feenox_vector_init(vector_t *this);
 extern int feenox_instruction_sort_vector(void *arg);
+extern double feenox_vector_get(vector_t *this, const size_t i);
+extern double feenox_vector_get_initial_static(vector_t *this, const size_t i);
+extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i);
+
 
 // function.c
 extern int feenox_function_init(function_t *this);
@@ -822,5 +886,8 @@ extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_if(void *arg);
 extern int feenox_instruction_else(void *arg);
 extern int feenox_instruction_endif(void *arg);
+
+// functionals.c
+extern double feenox_gsl_function(double x, void *params);
 
 #endif    /* FEENOX_H  */

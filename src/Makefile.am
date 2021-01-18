@@ -31,8 +31,11 @@ feenox_SOURCES = \
 ./io/file.c \
 ./io/print.c \
 ./math/alias.c \
-./math/algebra.c \
+./math/builtin_functions.c \
+./math/builtin_functionals.c \
+./math/builtin_vectorfunctions.c \
 ./math/dae.c \
+./math/expressions.c \
 ./math/matrix.c \
 ./math/function.c \
 ./math/vector.c \

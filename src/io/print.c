@@ -39,16 +39,16 @@ int feenox_instruction_print(void *arg) {
   
   if ((int)feenox_special_var_value(in_static) != 0) {
     if (print->skip_static_step.factors != NULL && print->last_static_step != 0 &&
-        ((int)(feenox_special_var_value(step_static)) == 1 || ((int)(feenox_special_var_value(step_static)) - print->last_static_step) < feenox_evaluate_expression(&print->skip_static_step))) {
+        ((int)(feenox_special_var_value(step_static)) == 1 || ((int)(feenox_special_var_value(step_static)) - print->last_static_step) < feenox_expression_eval(&print->skip_static_step))) {
       have_to_print = 0;
     }
   } else {
     if (print->skip_step.factors != NULL && 
-        ((int)(feenox_special_var_value(step_transient)) - print->last_step) < feenox_evaluate_expression(&print->skip_step)) {
+        ((int)(feenox_special_var_value(step_transient)) - print->last_step) < feenox_expression_eval(&print->skip_step)) {
       have_to_print = 0;
     }
     if (print->skip_time.factors != NULL && 
-        (feenox_special_var_value(t) == 0 || (feenox_special_var_value(t) - print->last_time) < feenox_evaluate_expression(&print->skip_time))) {
+        (feenox_special_var_value(t) == 0 || (feenox_special_var_value(t) - print->last_time) < feenox_expression_eval(&print->skip_time))) {
       have_to_print = 0;
     }
   }
@@ -75,7 +75,7 @@ int feenox_instruction_print(void *arg) {
   if (print->header && (feenox.mode != mode_parametric || (int)feenox_special_var_value(step_outer) == 1)) {
     if (print->skip_header_step.factors != NULL && print->header_already_printed == 0) {
       have_to_header = 1;
-    } else if (((int)(feenox_special_var_value(step_transient)) - print->last_header_step) < feenox_evaluate_expression(&print->skip_header_step)) {
+    } else if (((int)(feenox_special_var_value(step_transient)) - print->last_header_step) < feenox_expression_eval(&print->skip_header_step)) {
       have_to_header = 1;
     }
   }
@@ -101,7 +101,7 @@ int feenox_instruction_print(void *arg) {
   LL_FOREACH(print->tokens, print_token) {
 
     if (print_token->expression.factors != NULL) {
-      fprintf(print->file->pointer, current_format, feenox_evaluate_expression(&print_token->expression));
+      fprintf(print->file->pointer, current_format, feenox_expression_eval(&print_token->expression));
       // if there's not the last token or there's no newline print the separator
       if ((print_token->next != NULL) || (print->nonewline)) {
         fprintf(print->file->pointer, "%s", print->separator);
@@ -225,15 +225,15 @@ int feenox_instruction_print_function(void *arg) {
     x_step = calloc(print_function->first_function->n_arguments, sizeof(double));
 
     for (j = 0; j < print_function->first_function->n_arguments; j++) {
-      x_min[j] = feenox_evaluate_expression(&print_function->range.min[j]);
+      x_min[j] = feenox_expression_eval(&print_function->range.min[j]);
       if (print_function->range.nsteps != NULL &&
-          feenox_evaluate_expression(&print_function->range.nsteps[j]) != 1) {
-        x_max[j] = feenox_evaluate_expression(&print_function->range.max[j]);
-        x_step[j] = (print_function->range.step != NULL) ? feenox_evaluate_expression(&print_function->range.step[j]) :
-                                     (x_max[j]-x_min[j])/feenox_evaluate_expression(&print_function->range.nsteps[j]);
+          feenox_expression_eval(&print_function->range.nsteps[j]) != 1) {
+        x_max[j] = feenox_expression_eval(&print_function->range.max[j]);
+        x_step[j] = (print_function->range.step != NULL) ? feenox_expression_eval(&print_function->range.step[j]) :
+                                     (x_max[j]-x_min[j])/feenox_expression_eval(&print_function->range.nsteps[j]);
       } else if (print_function->range.step != NULL) {
-        x_max[j] = feenox_evaluate_expression(&print_function->range.max[j]);
-        x_step[j] = feenox_evaluate_expression(&print_function->range.step[j]);
+        x_max[j] = feenox_expression_eval(&print_function->range.max[j]);
+        x_step[j] = feenox_expression_eval(&print_function->range.step[j]);
        
       } else {
         x_max[j] = x_min[j] + 0.1;
@@ -260,7 +260,7 @@ int feenox_instruction_print_function(void *arg) {
           
         } else if (print_token->expression.n_tokens != 0) {
           feenox_set_function_args(print_function->first_function, x);
-          fprintf(print_function->file->pointer, print_function->format, feenox_evaluate_expression(&print_token->expression));
+          fprintf(print_function->file->pointer, print_function->format, feenox_expression_eval(&print_token->expression));
           
         }
         
@@ -347,7 +347,7 @@ int feenox_instruction_print_function(void *arg) {
 
           } else if (print_token->expression.n_tokens != 0) {
             feenox_set_function_args(print_function->first_function, x);
-            fprintf(print_function->file->pointer, print_function->format, feenox_evaluate_expression(&print_token->expression));
+            fprintf(print_function->file->pointer, print_function->format, feenox_expression_eval(&print_token->expression));
 
           }
 
@@ -416,7 +416,7 @@ int feenox_instruction_print_vector(void *arg) {
     feenox_call(feenox_vector_init(print_vector->first_vector));
   }
   
-  if ((n_elems_per_line = (int)feenox_evaluate_expression(&print_vector->elems_per_line)) || print_vector->horizontal) {
+  if ((n_elems_per_line = (int)feenox_expression_eval(&print_vector->elems_per_line)) || print_vector->horizontal) {
 
     LL_FOREACH(print_vector->tokens, print_token) {
       
@@ -437,7 +437,7 @@ int feenox_instruction_print_vector(void *arg) {
 
         } else if (print_token->expression.n_tokens != 0) {
           feenox_var(feenox.special_vars.i) = k+1;
-          fprintf(print_vector->file->pointer, print_vector->format, feenox_evaluate_expression(&print_token->expression));
+          fprintf(print_vector->file->pointer, print_vector->format, feenox_expression_eval(&print_token->expression));
           
         }
 
@@ -470,7 +470,7 @@ int feenox_instruction_print_vector(void *arg) {
 
         } else if (print_token->expression.n_tokens != 0) {
           feenox_var(feenox.special_vars.i) = k+1;
-          fprintf(print_vector->file->pointer, print_vector->format, feenox_evaluate_expression(&print_token->expression));
+          fprintf(print_vector->file->pointer, print_vector->format, feenox_expression_eval(&print_token->expression));
           
         }
 

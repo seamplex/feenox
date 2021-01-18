@@ -1,28 +1,26 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  wasora builtin functionals
+ *  feenox builtin functionals
  *
  *  Copyright (C) 2009--2020 jeremy theler
  *
- *  This file is part of wasora.
+ *  This file is part of feenox.
  *
- *  wasora is free software: you can redistribute it and/or modify
+ *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  wasora is distributed in the hope that it will be useful,
+ *  feenox is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with wasora.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-
-#ifndef _WASORA_H_
-#include "wasora.h"
-#endif
+#include "feenox.h"
+extern feenox_t feenox;
 
 // from gsl/roots/root.h
 #define SAFE_FUNC_CALL(f, x, yp) \
@@ -33,8 +31,31 @@ do { \
 } while (0)
 
 
+double feenox_builtin_derivative(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_integral(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_simpson(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_gauss_kronrod(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_gauss_legendre(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_prod(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_sum(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_root(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_func_min(struct expr_factor_t *, struct var_t *);
+
+
+struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
+    {"derivative",          3, 5, &feenox_builtin_derivative},
+    {"integral",            4, 7, &feenox_builtin_integral},
+    {"gauss_kronrod",       4, 5, &feenox_builtin_gauss_kronrod},
+    {"gauss_legendre",      4, 5, &feenox_builtin_gauss_legendre},
+    {"prod",                4, 4, &feenox_builtin_prod},
+    {"sum",                 4, 4, &feenox_builtin_sum},
+    {"root",                4, 7, &feenox_builtin_root},
+    {"func_min",            4, 8, &feenox_builtin_func_min},
+};
+
+
 typedef struct {
-  factor_t *function;
+  expr_factor_t *function;
   var_t *variable;
 } gsl_function_arguments_t;
 
@@ -56,7 +77,7 @@ typedef struct {
 ///fu+derivative+desc Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 ///fu+derivative+math \left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} 
 ///fu+derivative+example derivative.was
-double builtin_derivative(factor_t *a, var_t *var_x) {
+double feenox_builtin_derivative(expr_factor_t *a, var_t *var_x) {
 
   double error;
 
@@ -68,23 +89,23 @@ double builtin_derivative(factor_t *a, var_t *var_x) {
   gsl_function_arguments_t function_arguments;
 
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  x = wasora_evaluate_expression(&a->arg[2]);
-  if ((h = wasora_evaluate_expression(&a->arg[3])) == 0) {
+  x = feenox_expression_eval(&a->arg[2]);
+  if ((h = feenox_expression_eval(&a->arg[3])) == 0) {
     h = DEFAULT_DERIVATIVE_STEP;
   }
 
   function_arguments.function = a;
   function_arguments.variable = var_x;
 
-  function_to_derive.function = wasora_gsl_function;
+  function_to_derive.function = feenox_gsl_function;
   function_to_derive.params = (void *)(&function_arguments);
 
 
-  if (wasora_evaluate_expression(&a->arg[4]) == 0) {
+  if (feenox_expression_eval(&a->arg[4]) == 0) {
     gsl_deriv_central(&function_to_derive, x, h, &result, &error);
-  } else if (wasora_evaluate_expression(&a->arg[4]) > 0) {
+  } else if (feenox_expression_eval(&a->arg[4]) > 0) {
     gsl_deriv_forward(&function_to_derive, x, h, &result, &error);
   } else {
     gsl_deriv_backward(&function_to_derive, x, h, &result, &error);
@@ -92,7 +113,7 @@ double builtin_derivative(factor_t *a, var_t *var_x) {
 
 
   // le volvemos a poner el valor de x que tenia antes
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
 
 
   return result;
@@ -136,7 +157,7 @@ double builtin_derivative(factor_t *a, var_t *var_x) {
 ///fu+integral+desc See GSL reference for further information.
 ///fu+integral+math \int_a^b f(x) \, dx  
 ///fu+integral+example integral1.was integral2.was integral3.was
-double builtin_integral(factor_t *a, var_t *var_x) {
+double feenox_builtin_integral(expr_factor_t *a, var_t *var_x) {
   double x_old;
   double x_lower;
   double x_upper;
@@ -154,20 +175,20 @@ double builtin_integral(factor_t *a, var_t *var_x) {
 
   
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  x_lower = wasora_evaluate_expression(&a->arg[2]);
-  x_upper = wasora_evaluate_expression(&a->arg[3]);
+  x_lower = feenox_expression_eval(&a->arg[2]);
+  x_upper = feenox_expression_eval(&a->arg[3]);
   
-  if ((epsrel = wasora_evaluate_expression(&a->arg[4])) == 0) {
+  if ((epsrel = feenox_expression_eval(&a->arg[4])) == 0) {
     epsrel = DEFAULT_INTEGRATION_TOLERANCE;
   }
 
-  if ((pointskey = (int)wasora_evaluate_expression(&a->arg[5])) == 0) {
+  if ((pointskey = (int)feenox_expression_eval(&a->arg[5])) == 0) {
     pointskey = DEFAULT_INTEGRATION_KEY;
   }
   
-  if ((intervals = (int)wasora_evaluate_expression(&a->arg[6])) == 0) {
+  if ((intervals = (int)feenox_expression_eval(&a->arg[6])) == 0) {
     intervals = DEFAULT_INTEGRATION_INTERVALS;
   }
   
@@ -175,17 +196,17 @@ double builtin_integral(factor_t *a, var_t *var_x) {
   function_arguments.function = a;
   function_arguments.variable = var_x;
 
-  function_to_integrate.function = wasora_gsl_function;
+  function_to_integrate.function = feenox_gsl_function;
   function_to_integrate.params = (void *)(&function_arguments);
 
   // TODO: poner en aux para no tener que hacer alloc cada vez
   w = gsl_integration_workspace_alloc(intervals);
 
-  if (x_lower < -0.9*wasora_var(wasora_special_var(infinite)) && x_upper > +0.9*wasora_var(wasora_special_var(infinite))) {
+  if (x_lower < -0.9*feenox_special_var_value(infinite) && x_upper > +0.9*feenox_special_var_value(infinite)) {
     gsl_integration_qagi(&function_to_integrate, 1e-8, epsrel, intervals, w, &result, &error);
-  } else if (x_lower < -0.9*wasora_var(wasora_special_var(infinite))) {
+  } else if (x_lower < -0.9*feenox_special_var_value(infinite)) {
     gsl_integration_qagil(&function_to_integrate, x_upper, 1e-8, epsrel, intervals, w, &result, &error);
-  } else if (x_upper > +0.9*wasora_var(wasora_special_var(infinite))) {
+  } else if (x_upper > +0.9*feenox_special_var_value(infinite)) {
     gsl_integration_qagiu(&function_to_integrate, x_lower, 1e-8, epsrel, intervals, w, &result, &error);
   } else {
     gsl_integration_qag(&function_to_integrate, x_lower, x_upper, 1e-8, epsrel, intervals, pointskey, w, &result, &error);
@@ -193,7 +214,7 @@ double builtin_integral(factor_t *a, var_t *var_x) {
 
 
   // le volvemos a poner el valor de x que tenia antes
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
 
   gsl_integration_workspace_free(w);
 
@@ -222,7 +243,7 @@ double builtin_integral(factor_t *a, var_t *var_x) {
 ///fu+gauss_kronrod+math \int_a^b f(x) \, dx  
 ///fu+gauss_kronrod+examples integral3.was
 
-double builtin_gauss_kronrod(factor_t *a, var_t *var_x) {
+double feenox_builtin_gauss_kronrod(expr_factor_t *a, var_t *var_x) {
   double error;
 
   double x_old;
@@ -238,24 +259,24 @@ double builtin_gauss_kronrod(factor_t *a, var_t *var_x) {
 
   
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  x_lower = wasora_evaluate_expression(&a->arg[2]);
-  x_upper = wasora_evaluate_expression(&a->arg[3]);
-  if ((epsrel = wasora_evaluate_expression(&a->arg[4])) == 0) {
+  x_lower = feenox_expression_eval(&a->arg[2]);
+  x_upper = feenox_expression_eval(&a->arg[3]);
+  if ((epsrel = feenox_expression_eval(&a->arg[4])) == 0) {
     epsrel = DEFAULT_INTEGRATION_TOLERANCE;
   }
 
   function_arguments.function = a;
   function_arguments.variable = var_x;
 
-  function_to_integrate.function = wasora_gsl_function;
+  function_to_integrate.function = feenox_gsl_function;
   function_to_integrate.params = (void *)(&function_arguments);
 
   gsl_integration_qng(&function_to_integrate, x_lower, x_upper, 0, epsrel, &result, &error, &neval);
   
   // le volvemos a poner el valor de x que tenia antes
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
 
 
   return result;
@@ -277,7 +298,7 @@ double builtin_gauss_kronrod(factor_t *a, var_t *var_x) {
 ///fu+gauss_legendre+desc See GSL reference for further information.
 ///fu+gauss_legendre+math \int_a^b f(x) \, dx  
 ///fu+gauss_legendre+examples integral3.was
-double builtin_gauss_legendre(factor_t *a, var_t *var_x) {
+double feenox_builtin_gauss_legendre(expr_factor_t *a, var_t *var_x) {
 
 #ifdef HAVE_GLFIXED_TABLE
   double x_old;
@@ -293,18 +314,18 @@ double builtin_gauss_legendre(factor_t *a, var_t *var_x) {
   gsl_integration_glfixed_table *points;
 
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  x_lower = wasora_evaluate_expression(&a->arg[2]);
-  x_upper = wasora_evaluate_expression(&a->arg[3]);
-  if ((n = (int)wasora_evaluate_expression(&a->arg[4])) == 0) {
+  x_lower = feenox_expression_eval(&a->arg[2]);
+  x_upper = feenox_expression_eval(&a->arg[3]);
+  if ((n = (int)feenox_expression_eval(&a->arg[4])) == 0) {
     n = 12;
   }
 
   function_arguments.function = a;
   function_arguments.variable = var_x;
 
-  function_to_integrate.function = wasora_gsl_function;
+  function_to_integrate.function = feenox_gsl_function;
   function_to_integrate.params = (void *)(&function_arguments);
 
   // TODO: poner en aux para no tener que hacer alloc cada vez
@@ -313,14 +334,14 @@ double builtin_gauss_legendre(factor_t *a, var_t *var_x) {
   gsl_integration_glfixed_table_free(points);
   
   // le volvemos a poner el valor de x que tenia antes
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
 
   return result;
   
 #else
 
-  wasora_push_error_message("the GSL version used to compile wasora does not have gsl_integration_glfixed_table");
-  wasora_runtime_error();
+  feenox_push_error_message("the GSL version used to compile feenox does not have gsl_integration_glfixed_table");
+  feenox_runtime_error();
   
   return 0;
   
@@ -339,7 +360,7 @@ double builtin_gauss_legendre(factor_t *a, var_t *var_x) {
 ///fu+prod+desc given in the third argument and~$b$
 ///fu+prod+desc given in the fourth argument,~$i = a, a+1, \dots ,b-1,b$. 
 ///fu+prod+math \prod_{i=a}^b f_i  
-double builtin_prod(factor_t *a, var_t *var_x) {
+double feenox_builtin_prod(expr_factor_t *a, var_t *var_x) {
 
   int i;
   int i_lower, i_upper;
@@ -348,18 +369,18 @@ double builtin_prod(factor_t *a, var_t *var_x) {
   double S;
   
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  i_lower = (int)(round(wasora_evaluate_expression(&a->arg[2])));
-  i_upper = (int)(round(wasora_evaluate_expression(&a->arg[3])));
+  i_lower = (int)(round(feenox_expression_eval(&a->arg[2])));
+  i_upper = (int)(round(feenox_expression_eval(&a->arg[3])));
   
   S = 1;
   for (i = i_lower; i <= i_upper; i++) {
-    wasora_value(var_x) = (double)i;
-    S *= wasora_evaluate_expression(&a->arg[0]);
+    feenox_var_value(var_x) = (double)i;
+    S *= feenox_expression_eval(&a->arg[0]);
   }
   
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
   
   return S;
   
@@ -374,7 +395,7 @@ double builtin_prod(factor_t *a, var_t *var_x) {
 ///fu+sum+desc given in the fourth argument, $i=a,a+1,\dots,b-1,b$. 
 ///fu+sum+math \sum_{i=a}^b f_i  
 ///fu+sum+example sum1.was sum2.was sum3.was
-double builtin_sum(factor_t *a, var_t *var_x) {
+double feenox_builtin_sum(expr_factor_t *a, var_t *var_x) {
 
   int i;
   int i_lower, i_upper;
@@ -383,18 +404,18 @@ double builtin_sum(factor_t *a, var_t *var_x) {
   double S;
   
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  i_lower = (int)(round(wasora_evaluate_expression(&a->arg[2])));
-  i_upper = (int)(round(wasora_evaluate_expression(&a->arg[3])));
+  i_lower = (int)(round(feenox_expression_eval(&a->arg[2])));
+  i_upper = (int)(round(feenox_expression_eval(&a->arg[3])));
   
   S = 0;
   for (i = i_lower; i <= i_upper; i++) {
-    wasora_value(var_x) = (double)i;
-    S += wasora_evaluate_expression(&a->arg[0]);
+    feenox_var_value(var_x) = (double)i;
+    S += feenox_expression_eval(&a->arg[0]);
   }
   
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
   
   return S;
   
@@ -426,7 +447,7 @@ double builtin_sum(factor_t *a, var_t *var_x) {
 ///fu+root+desc $p \neq 0$, the returned value can be any value.
 ///fu+root+desc Default is $\epsilon = (1/2)^{-10} \approx 10^{3}$.
 ///fu+root+example root1.was root2.was root3.was root4.was
-double builtin_root(factor_t *a, var_t *var_x) {
+double feenox_builtin_root(expr_factor_t *a, var_t *var_x) {
   int iter;
   int gsl_status;
   double x, x_old;
@@ -444,10 +465,10 @@ double builtin_root(factor_t *a, var_t *var_x) {
 
   // evaluamos el intervalo donde sospechamos esta la solucion
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  x_lower = wasora_evaluate_expression(&a->arg[2]);
-  x_upper = wasora_evaluate_expression(&a->arg[3]);
+  x_lower = feenox_expression_eval(&a->arg[2]);
+  x_upper = feenox_expression_eval(&a->arg[3]);
   // si estan al reves los damos vuelta para evitar GSL_EINVAL
   if (x_lower > x_upper) {
     // manual de la CZ1000 de 1981
@@ -460,13 +481,13 @@ double builtin_root(factor_t *a, var_t *var_x) {
   x = 0.5*(x_lower + x_upper);
 
   // evaluamos la precision buscada (no necesariamente es una constante)
-  if ((epsrel = wasora_evaluate_expression(&a->arg[4])) == 0) {
+  if ((epsrel = feenox_expression_eval(&a->arg[4])) == 0) {
     epsrel = DEFAULT_ROOT_TOLERANCE;
   }
 
   // el algoritmo
   // TODO: poner en aux para no tener que hacer alloc cada vez
-  switch((int)wasora_evaluate_expression(&a->arg[5])) {
+  switch((int)feenox_expression_eval(&a->arg[5])) {
     case 0:
       s = gsl_root_fsolver_alloc(gsl_root_fsolver_brent);
     break;
@@ -479,13 +500,13 @@ double builtin_root(factor_t *a, var_t *var_x) {
   }
   
   // un flag que nos indica si tenemos que ser quejosos o no
-  nocomplain = wasora_evaluate_expression(&a->arg[6]);
+  nocomplain = feenox_expression_eval(&a->arg[6]);
 
 
   function_arguments.function = a;
   function_arguments.variable = var_x;
 
-  function_to_solve.function = wasora_gsl_function;
+  function_to_solve.function = feenox_gsl_function;
   function_to_solve.params = (void *)(&function_arguments);
 
   // apagamos el handler para mirar el do not straddle y=0 nosotros
@@ -496,20 +517,20 @@ double builtin_root(factor_t *a, var_t *var_x) {
   SAFE_FUNC_CALL (&function_to_solve, x_upper, &f_upper);  
   
   if ((f_lower < 0.0 && f_upper < 0.0) || (f_lower > 0.0 && f_upper > 0.0)) {
-    wasora_value(var_x) = x_old;
+    feenox_var_value(var_x) = x_old;
     if (nocomplain) {
       return 0;
     } else {
       
-      int on_gsl_error = (int)(wasora_value(wasora_special_var(on_gsl_error)));
+      int on_gsl_error = (int)(feenox_var_value(feenox_special_var(on_gsl_error)));
 
       if (!(on_gsl_error & ON_ERROR_NO_REPORT)) {
-        wasora_push_error_message("range does not contain a root, f(%g) = %g and f(%g) = %g", x_lower, f_lower, x_upper, f_upper);
-        wasora_pop_errors();
+        feenox_push_error_message("range does not contain a root, f(%g) = %g and f(%g) = %g", x_lower, f_lower, x_upper, f_upper);
+        feenox_pop_errors();
       }
 
       if (!(on_gsl_error & ON_ERROR_NO_QUIT)) {
-        wasora_polite_exit(WASORA_RUNTIME_ERROR);
+        feenox_polite_exit(FEENOX_ERROR);
       }
     }
   }
@@ -517,7 +538,7 @@ double builtin_root(factor_t *a, var_t *var_x) {
   gsl_root_fsolver_set(s, &function_to_solve, x_lower, x_upper);
   
   // volvemos al poner el handler para lo que sigue
-  gsl_set_error_handler(wasora_gsl_handler);
+  gsl_set_error_handler(feenox_gsl_handler);
   
   // si no tenemos que ser quejosos entonces sacamos temporalmente
   // el handler de errores de la GSL
@@ -536,7 +557,7 @@ double builtin_root(factor_t *a, var_t *var_x) {
     gsl_status= gsl_root_test_interval(x_lower, x_upper, epsrel, epsrel);
   } while (gsl_status == GSL_CONTINUE && iter < max_iter);
 
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
 
   gsl_root_fsolver_free(s);
 
@@ -570,7 +591,7 @@ double builtin_root(factor_t *a, var_t *var_x) {
 ///fu+func_min+math y = \left\{ x \in [a,b] / f(x) = \min_{[a,b]} f(x) \right \} 
 ///fu+func_min+example func_min.was
 
-double builtin_func_min(factor_t *a, var_t *var_x) {
+double feenox_builtin_func_min(expr_factor_t *a, var_t *var_x) {
   
   int iter, gsl_status;
   double x, x_old;
@@ -589,22 +610,22 @@ double builtin_func_min(factor_t *a, var_t *var_x) {
   
   // evaluamos el intervalo donde sospechamos esta la solucion
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = wasora_value(var_x);
+  x_old = feenox_var_value(var_x);
 
-  x_lower = wasora_evaluate_expression(&a->arg[2]);
-  x_upper = wasora_evaluate_expression(&a->arg[3]);
+  x_lower = feenox_expression_eval(&a->arg[2]);
+  x_upper = feenox_expression_eval(&a->arg[3]);
 
   // arrancamos desde la mitad
   x = 0.5*(x_lower + x_upper);
   
   // la precision
-  if ((epsrel = wasora_evaluate_expression(&a->arg[4])) == 0) {
+  if ((epsrel = feenox_expression_eval(&a->arg[4])) == 0) {
     epsrel = DEFAULT_ROOT_TOLERANCE;
   }
 
 
   // el algoritmo
-  switch((int)wasora_evaluate_expression(&a->arg[5])) {
+  switch((int)feenox_expression_eval(&a->arg[5])) {
     case 0:
       T = gsl_min_fminimizer_quad_golden;
     break;
@@ -617,13 +638,13 @@ double builtin_func_min(factor_t *a, var_t *var_x) {
   }
   
   // un flag que nos indica si tenemos que ser quejosos o no
-  nocomplain = wasora_evaluate_expression(&a->arg[6]);  
+  nocomplain = feenox_expression_eval(&a->arg[6]);  
 
 
   function_arguments.function = a;
   function_arguments.variable = var_x;
 
-  function_to_solve.function = wasora_gsl_function;
+  function_to_solve.function = feenox_gsl_function;
   function_to_solve.params = (void *)(&function_arguments);
 
   // TODO: poner en aux para no tener que hacer alloc cada vez
@@ -634,20 +655,20 @@ double builtin_func_min(factor_t *a, var_t *var_x) {
   if (nocomplain) {
     gsl_set_error_handler_off();
     gsl_min_fminimizer_set(s, &function_to_solve, x, x_lower, x_upper);
-    gsl_set_error_handler(wasora_gsl_handler);
+    gsl_set_error_handler(feenox_gsl_handler);
   } else {
     gsl_set_error_handler_off();
     if (gsl_min_fminimizer_set(s, &function_to_solve, x, x_lower, x_upper) != GSL_SUCCESS) {
-      gsl_set_error_handler(wasora_gsl_handler);
+      gsl_set_error_handler(feenox_gsl_handler);
       
       gsl_min_fminimizer_free(s);
-      if (wasora_gsl_function(x_lower, function_to_solve.params) < wasora_gsl_function(x_upper, function_to_solve.params)) {
+      if (feenox_gsl_function(x_lower, function_to_solve.params) < feenox_gsl_function(x_upper, function_to_solve.params)) {
         return x_lower;
       } else {
         return x_upper;
       }
     }
-    gsl_set_error_handler(wasora_gsl_handler);
+    gsl_set_error_handler(feenox_gsl_handler);
   }
   
   iter = 0;
@@ -660,7 +681,7 @@ double builtin_func_min(factor_t *a, var_t *var_x) {
     gsl_status = gsl_min_test_interval(x_lower, x_upper, epsrel, epsrel);
   } while (gsl_status == GSL_CONTINUE && iter < max_iter);
 
-  wasora_value(var_x) = x_old;
+  feenox_var_value(var_x) = x_old;
 
   gsl_min_fminimizer_free(s);
 
@@ -669,17 +690,17 @@ double builtin_func_min(factor_t *a, var_t *var_x) {
 }
 
 
-double wasora_gsl_function(double x, void *params) {
+double feenox_gsl_function(double x, void *params) {
 
   double y;
 
   gsl_function_arguments_t *dummy = (gsl_function_arguments_t *)params;
-  wasora_value(dummy->variable) = x;
+  feenox_var_value(dummy->variable) = x;
 
-  y = wasora_evaluate_expression(&dummy->function->arg[0]);
+  y = feenox_expression_eval(&dummy->function->arg[0]);
 
   if (gsl_isnan(y) || gsl_isinf(y)) {
-    wasora_nan_error();
+    feenox_nan_error();
   }
 
   return y;
