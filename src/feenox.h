@@ -148,7 +148,7 @@ enum version_type {
 
 
 
-// forward type definitions
+// forward declarations
 typedef struct expr_t expr_t;
 typedef struct expr_factor_t expr_factor_t;
 

@@ -7,5 +7,5 @@ if test -e Makefile; then
   make clean
 fi
 rm -f *~ .*~ src/*~
-rm -r src/variables.mak
+rm -f src/variables.mak
 cat .gitignore | grep -v nbproject | sed '/^#.*/ d' | sed '/^\s*$/ d' | sed 's/^/rm -rf /' | bash
