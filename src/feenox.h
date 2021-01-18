@@ -878,6 +878,8 @@ extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i
 
 // function.c
 extern int feenox_function_init(function_t *this);
+extern double feenox_function_eval(function_t *this, const double *x);
+extern double feenox_factor_function_eval(expr_factor_t *this);
 
 // print.c
 extern int feenox_instruction_print(void *arg);

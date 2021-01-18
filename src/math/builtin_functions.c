@@ -688,10 +688,7 @@ double feenox_builtin_log(expr_factor_t *expr) {
 ///fn+abs+plotx -2.5 2.5 1e-2   -2 2 1   0 2 1
 ///fn+abs+example abs.was
 double feenox_builtin_abs(expr_factor_t *expr) {
-  double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-
-  return fabs(x[0]);
+  return fabs(feenox_expression_eval(&expr->arg[0]));
 }
 
 
