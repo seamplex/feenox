@@ -351,7 +351,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       char *argument = strdup(string+strlen(token));
 
       // arguments have to be in parenthesis
-      if (argument[0] != '(') {
+      if (*argument != '(') {
         feenox_push_error_message("expected parenthesis after '%s'", token);
         return NULL;
       }
