@@ -387,10 +387,8 @@ double feenox_function_eval(function_t *this, const double *x) {
       
       // TODO: should we keep this or leave the arguments as they are?
 //      double x_old = feenox_var_value(this->var_argument[0]);
-//      feenox_var_value(this->var_argument[0]) = x[0];
-      
+      feenox_var_value(this->var_argument[0]) = x[0];
       y = feenox_expression_eval(&this->algebraic_expression);
-      
 //      feenox_var_value(this->var_argument[0]) = x_old;
       
     } else {

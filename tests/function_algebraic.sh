@@ -9,5 +9,5 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer function_algebraic.fee "0    37"
+answer function_algebraic.fee "4	37"
 exitifwrong $?
