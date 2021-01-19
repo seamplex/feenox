@@ -2264,7 +2264,7 @@ int feenox_parse_function(void) {
 
   arguments = strdup(dummy_openpar);
   feenox_strip_blanks(arguments);
-  if ((n_arguments = feenox_count_arguments(arguments)) <= 0) {
+  if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {
     return FEENOX_ERROR;
   }
   feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));

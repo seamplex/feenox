@@ -1,22 +1,22 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox auxiliary parsing routines
+ *  FeenoX auxiliary parsing routines
  *
  *  Copyright (C) 2009--2021 jeremy theler
  *
- *  This file is part of feenox.
+ *  This file is part of FeenoX.
  *
- *  feenox is free software: you can redistribute it and/or modify
+ *  FeenoX is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
@@ -639,130 +639,6 @@ void feenox_strip_blanks(char *string) {
 
   return;
 
-}
-
-
-char *feenox_ends_in_zero(char *name) {
-
-  char *dummy;
-
-  if (((dummy = strstr(name, "_0")) != 0) && (*(dummy+2) == 0)) {
-    return dummy;
-  } else {
-    return NULL;
-  }
-  
-}
-
-char *feenox_ends_in_init(char *name) {
-
-  char *dummy;
-
-  if (((dummy = strstr(name, "_init")) != 0) && (dummy[5] == '\0' || dummy[5] == '(')) {
-    return dummy;
-  } else {
-    return NULL;
-  }
-}
-
-
-char *feenox_ends_in_dot(char *name) {
-
-  char *dummy;
-
-  if (((dummy = strstr(name, "_dot")) != 0) && (dummy[4] == '\0' || dummy[4] == '(')) {
-    return dummy;
-  } else {
-    return NULL;
-  }
-}
-
-int feenox_count_arguments(char *string) {
-
-  // arguments have to be inside parenthesis
-  if (string[0] != '(') {
-    feenox_push_error_message("argument list needs to start with ')'");
-    return -1;
-  }
-
-  // count how many arguments are there (take into account nested parenthesis)
-  char *dummy = string+1;
-  int level = 1;
-  int n_arguments = 1;
-  while (level != 0) {
-    if (*dummy == '(') {
-      level++;
-    } else if (*dummy == ')') {
-      level--;
-    } else if (*dummy == '\0') {
-      feenox_push_error_message("argument list needs to be closed with ')'");
-      return -1;
-    }
-    if (*dummy == ',' && level == 1) {
-      n_arguments++;
-    }
-    dummy++;
-  }
-  *dummy = '\0';
-  
-  return n_arguments;
-}
-
-
-int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars) {
- 
-
-  if (strchr(string, '(') == NULL) {
-    feenox_push_error_message("arguments must start with a parenthesis");
-    return FEENOX_ERROR;
-  }
-  
-  if (((*arg) = calloc(n_arguments, sizeof(char *))) == NULL) {
-    feenox_push_error_message("calloc() failed");
-    return FEENOX_ERROR;
-  }
-
-  int i;
-  size_t n = 0;
-  char *dummy = string;
-  char char_backup;
-  for (i = 0; i < n_arguments; i++) {
-    int level = 1;
-    dummy++;
-    n++;
-    char *argument = dummy;
-    while (1) {
-      // if level is 1 and next char is ',' or ')' and we are on the last argument, we are done
-      if (level == 1 && ((i != n_arguments-1 && *dummy == ',') || (i == n_arguments-1 && *dummy == ')'))) {
-        break;
-      }
-          
-      if (*dummy == '(') {
-        level++;
-      } else if (*dummy == ')') {
-        level--;
-      } else if (*dummy == '\0') {
-        feenox_push_error_message("when parsing arguments");
-        return FEENOX_ERROR;
-      }
-      dummy++;
-      n++;
-    }
-
-    // put a '\0' after dummy but make a backup of what there was there
-    char_backup = *dummy;
-    *dummy = '\0';
-    // in argument we have the i-th argument
-    (*arg)[i] = strdup(argument);
-    *dummy = char_backup;
-  }
-  
-  if (n_chars != NULL) {
-    // the +1 is because of the final closing parenthesis
-    *n_chars = n+1;
-  }
-  
-  return FEENOX_OK;
 }
 
 /*

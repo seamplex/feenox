@@ -8,6 +8,7 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
 EXTRA_DIST = examples tests locateruntest.sh
 
 TESTS = tests/abort.sh \
+        tests/default_argument_value.sh \
         tests/expr.sh \
         tests/trig.sh
 

@@ -15,8 +15,8 @@ exitifwrong $?
 answer1 expr.fee "sin(1)^2+cos(1)^2" 1
 exitifwrong $?
 
-answerfloat cos.fee 0
+answer1float expr.fee "cos(30*pi/180)-sqrt(3)/2" 0
 exitifwrong $?
 
-answerfloat atan2.fee "pi/4"
+answer1float expr.fee "atan2(1,-1)-pi/2" "pi/4"
 exitifwrong $?

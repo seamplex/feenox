@@ -65,12 +65,6 @@ extern int feenox_parser_string_format(char **string, int *n_args);
 
 extern int feenox_parser_file(file_t **file);
 
-extern int feenox_count_arguments(char *string);
-extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
-
-extern char *feenox_ends_in_init(char *name);
-extern char *feenox_ends_in_zero(char *name);
-
 extern int feenox_parser_vector(vector_t **vector);
 extern int feenox_parser_variable(var_t **var);
 extern int feenox_parser_keywords_ints(char *keyword[], int *value, int *option);

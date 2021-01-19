@@ -29,10 +29,134 @@ extern feenox_t feenox;
 extern const char operators[];
 extern const char factorseparators[];
 
-extern char *feenox_ends_in_init(char *name);
-extern char *feenox_ends_in_zero(char *name);
-extern int feenox_count_arguments(char *string);
-extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
+char *feenox_ends_in_zero(char *name) {
+
+  char *dummy;
+
+  if (((dummy = strstr(name, "_0")) != 0) && (*(dummy+2) == 0)) {
+    return dummy;
+  } else {
+    return NULL;
+  }
+  
+}
+
+char *feenox_ends_in_init(char *name) {
+
+  char *dummy;
+
+  if (((dummy = strstr(name, "_init")) != 0) && (dummy[5] == '\0' || dummy[5] == '(')) {
+    return dummy;
+  } else {
+    return NULL;
+  }
+}
+
+
+char *feenox_ends_in_dot(char *name) {
+
+  char *dummy;
+
+  if (((dummy = strstr(name, "_dot")) != 0) && (dummy[4] == '\0' || dummy[4] == '(')) {
+    return dummy;
+  } else {
+    return NULL;
+  }
+}
+
+int feenox_count_arguments(char *string, size_t *n_chars) {
+
+  // arguments have to be inside parenthesis
+  if (string[0] != '(') {
+    feenox_push_error_message("argument list needs to start with ')'");
+    return -1;
+  }
+
+  // count how many arguments are there (take into account nested parenthesis)
+  char *s = string+1;
+  size_t n = 1;
+  int level = 1;
+  int n_arguments = 1;
+  while (level != 0) {
+    if (*s == '(') {
+      level++;
+    } else if (*s == ')') {
+      level--;
+    } else if (*s == '\0') {
+      feenox_push_error_message("argument list needs to be closed with ')'");
+      return -1;
+    }
+    if (*s == ',' && level == 1) {
+      n_arguments++;
+    }
+    s++;
+    n++;
+  }
+  *s = '\0';
+
+  if (n_chars != NULL) {
+    *n_chars = n;
+  }
+  
+  return n_arguments;
+}
+
+
+int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars) {
+
+  if (strchr(string, '(') == NULL) {
+    feenox_push_error_message("arguments must start with a parenthesis");
+    return FEENOX_ERROR;
+  }
+  
+  if (((*arg) = calloc(n_arguments, sizeof(char *))) == NULL) {
+    feenox_push_error_message("calloc() failed");
+    return FEENOX_ERROR;
+  }
+
+  int i;
+  size_t n = 0;
+  char *dummy = string;
+  char char_backup;
+  for (i = 0; i < n_arguments; i++) {
+    int level = 1;
+    dummy++;
+    n++;
+    char *argument = dummy;
+    while (1) {
+      // if level is 1 and next char is ',' or ')' and we are on the last argument, we are done
+      if (level == 1 && ((i != n_arguments-1 && *dummy == ',') || (i == n_arguments-1 && *dummy == ')'))) {
+        break;
+      }
+          
+      if (*dummy == '(') {
+        level++;
+      } else if (*dummy == ')') {
+        level--;
+      } else if (*dummy == '\0') {
+        feenox_push_error_message("when parsing arguments");
+        return FEENOX_ERROR;
+      }
+      dummy++;
+      n++;
+    }
+
+    // put a '\0' after dummy but make a backup of what there was there
+    char_backup = *dummy;
+    *dummy = '\0';
+    // in argument we have the i-th argument
+    (*arg)[i] = strdup(argument);
+    *dummy = char_backup;
+  }
+  
+  if (n_chars != NULL) {
+    // the +1 is because of the final closing parenthesis
+    *n_chars = n+1;
+  }
+  
+  return FEENOX_OK;
+}
+
 
 //  parse a string with an algebraic expression and fills in the struct expr
 int feenox_expression_parse(expr_t *this, const char *orig_string) {
@@ -127,7 +251,8 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
 expr_factor_t *feenox_expression_parse_factor(const char *string) {
 
   // number of characters read, we put this into the allocated factor at the end of this routine
-  int n; 
+  size_t n;
+  int n_int; // sscanf can only return ints, not size_t
   char *backup = strdup(string);
   expr_factor_t *factor = calloc(1, sizeof(expr_factor_t));
 
@@ -135,9 +260,10 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
   if (isdigit((int)(*string)) || *string == '-' || *string == '+' || *string == '.') {
     // a number
     double constant;
-    if (sscanf(string, "%lf%n", &constant, &n) == 0) {
+    if (sscanf(string, "%lf%n", &constant, &n_int) == 0) {
       return NULL;
     }
+    n = n_int;
     factor->type = EXPR_CONSTANT;
     factor->constant = constant;
 
@@ -231,19 +357,25 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
       }
 
       // read the arguments and keep them as an array of strings
-      int n_arguments = feenox_count_arguments(argument);
+      size_t n_chars_count;
+      int n_arguments = feenox_count_arguments(argument, &n_chars_count);
       if (n_arguments <= 0) {
         return NULL;
       }
 
       char **arg = NULL;
-      size_t n_chars;
-      if (feenox_read_arguments(argument, n_arguments, &arg, &n_chars) == FEENOX_ERROR) {
+      size_t n_chars_parse;
+      if (feenox_read_arguments(argument, n_arguments, &arg, &n_chars_parse) == FEENOX_ERROR) {
+        return NULL;
+      }
+      
+      if (n_chars_count != n_chars_parse) {
+        feenox_push_error_message("internal parser mismatch");
         return NULL;
       }
 
       // n is the number of characters to parse (it will get copied into the output factor_t)
-      n = strlen(token) + n_chars;
+      n = strlen(token) + n_chars_count;
       
       int n_arguments_max;
 

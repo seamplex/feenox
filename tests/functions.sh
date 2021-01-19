@@ -49,12 +49,6 @@ answer() {
 
 answerfloat() {
   echo -n "${1}... "
-
-  if [ -z "$(which bc)" ]; then
-    echo "skipped"
-    exit 77
-  fi  
-
   answer=$(${feenox} ${dir}/${1})
   
   if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${2}")" = "0.000000" ]; then
@@ -73,6 +67,21 @@ answer1() {
   answer=$(${feenox} ${dir}/${1} ${2})
   
   if [ "${answer}" = "${3}" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected '${3}' and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
+answer1float() {
+  echo -n "${1} ${2}... "
+  answer=$(${feenox} ${dir}/${1} ${2})
+  
+  if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${3}")" = "0.000000" ]; then
     echo "ok"
     level=0
   else

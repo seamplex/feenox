@@ -791,6 +791,11 @@ void feenox_finalize(void);
 
 // parser.c
 extern int feenox_parse_main_input_file(const char *filepath);
+extern char *feenox_ends_in_init(char *name);
+extern char *feenox_ends_in_zero(char *name);
+extern int feenox_count_arguments(char *string, size_t *);
+extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
+
 
 // file.c
 extern int feenox_instruction_file(void *arg);

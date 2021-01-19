@@ -1,2 +1,2 @@
 FILE two PATH two-is-%d.txt 1+1
-PRINT 1+1 FILE two
+PRINT 4*0.5 FILE two
