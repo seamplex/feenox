@@ -38,16 +38,16 @@ int feenox_instruction_print(void *arg) {
   int flag = 1;  // flag to know if we already printed something or not (for matrices)
   
   if ((int)feenox_special_var_value(in_static) != 0) {
-    if (print->skip_static_step.factors != NULL && print->last_static_step != 0 &&
+    if (print->skip_static_step.items != NULL && print->last_static_step != 0 &&
         ((int)(feenox_special_var_value(step_static)) == 1 || ((int)(feenox_special_var_value(step_static)) - print->last_static_step) < feenox_expression_eval(&print->skip_static_step))) {
       have_to_print = 0;
     }
   } else {
-    if (print->skip_step.factors != NULL && 
+    if (print->skip_step.items != NULL && 
         ((int)(feenox_special_var_value(step_transient)) - print->last_step) < feenox_expression_eval(&print->skip_step)) {
       have_to_print = 0;
     }
-    if (print->skip_time.factors != NULL && 
+    if (print->skip_time.items != NULL && 
         (feenox_special_var_value(t) == 0 || (feenox_special_var_value(t) - print->last_time) < feenox_expression_eval(&print->skip_time))) {
       have_to_print = 0;
     }
@@ -73,7 +73,7 @@ int feenox_instruction_print(void *arg) {
   print->last_static_step = (int)(feenox_special_var_value(step_static));
 
   if (print->header && (feenox.mode != mode_parametric || (int)feenox_special_var_value(step_outer) == 1)) {
-    if (print->skip_header_step.factors != NULL && print->header_already_printed == 0) {
+    if (print->skip_header_step.items != NULL && print->header_already_printed == 0) {
       have_to_header = 1;
     } else if (((int)(feenox_special_var_value(step_transient)) - print->last_header_step) < feenox_expression_eval(&print->skip_header_step)) {
       have_to_header = 1;
@@ -100,7 +100,7 @@ int feenox_instruction_print(void *arg) {
   // now print the tokens!
   LL_FOREACH(print->tokens, print_token) {
 
-    if (print_token->expression.factors != NULL) {
+    if (print_token->expression.items != NULL) {
       fprintf(print->file->pointer, current_format, feenox_expression_eval(&print_token->expression));
       // if there's not the last token or there's no newline print the separator
       if ((print_token->next != NULL) || (print->nonewline)) {

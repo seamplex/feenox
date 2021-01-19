@@ -31,15 +31,15 @@ do { \
 } while (0)
 
 
-double feenox_builtin_derivative(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_integral(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_simpson(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_gauss_kronrod(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_gauss_legendre(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_prod(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_sum(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_root(struct expr_factor_t *, struct var_t *);
-double feenox_builtin_func_min(struct expr_factor_t *, struct var_t *);
+double feenox_builtin_derivative(struct expr_item_t *, struct var_t *);
+double feenox_builtin_integral(struct expr_item_t *, struct var_t *);
+double feenox_builtin_simpson(struct expr_item_t *, struct var_t *);
+double feenox_builtin_gauss_kronrod(struct expr_item_t *, struct var_t *);
+double feenox_builtin_gauss_legendre(struct expr_item_t *, struct var_t *);
+double feenox_builtin_prod(struct expr_item_t *, struct var_t *);
+double feenox_builtin_sum(struct expr_item_t *, struct var_t *);
+double feenox_builtin_root(struct expr_item_t *, struct var_t *);
+double feenox_builtin_func_min(struct expr_item_t *, struct var_t *);
 
 
 struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
@@ -55,7 +55,7 @@ struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
 
 
 typedef struct {
-  expr_factor_t *function;
+  expr_item_t *function;
   var_t *variable;
 } gsl_function_arguments_t;
 
@@ -77,7 +77,7 @@ typedef struct {
 ///fu+derivative+desc Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 ///fu+derivative+math \left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} 
 ///fu+derivative+example derivative.was
-double feenox_builtin_derivative(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 
   double error;
 
@@ -157,7 +157,7 @@ double feenox_builtin_derivative(expr_factor_t *a, var_t *var_x) {
 ///fu+integral+desc See GSL reference for further information.
 ///fu+integral+math \int_a^b f(x) \, dx  
 ///fu+integral+example integral1.was integral2.was integral3.was
-double feenox_builtin_integral(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
   double x_old;
   double x_lower;
   double x_upper;
@@ -243,7 +243,7 @@ double feenox_builtin_integral(expr_factor_t *a, var_t *var_x) {
 ///fu+gauss_kronrod+math \int_a^b f(x) \, dx  
 ///fu+gauss_kronrod+examples integral3.was
 
-double feenox_builtin_gauss_kronrod(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
   double error;
 
   double x_old;
@@ -298,7 +298,7 @@ double feenox_builtin_gauss_kronrod(expr_factor_t *a, var_t *var_x) {
 ///fu+gauss_legendre+desc See GSL reference for further information.
 ///fu+gauss_legendre+math \int_a^b f(x) \, dx  
 ///fu+gauss_legendre+examples integral3.was
-double feenox_builtin_gauss_legendre(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
 
 #ifdef HAVE_GLFIXED_TABLE
   double x_old;
@@ -360,7 +360,7 @@ double feenox_builtin_gauss_legendre(expr_factor_t *a, var_t *var_x) {
 ///fu+prod+desc given in the third argument and~$b$
 ///fu+prod+desc given in the fourth argument,~$i = a, a+1, \dots ,b-1,b$. 
 ///fu+prod+math \prod_{i=a}^b f_i  
-double feenox_builtin_prod(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_prod(expr_item_t *a, var_t *var_x) {
 
   int i;
   int i_lower, i_upper;
@@ -395,7 +395,7 @@ double feenox_builtin_prod(expr_factor_t *a, var_t *var_x) {
 ///fu+sum+desc given in the fourth argument, $i=a,a+1,\dots,b-1,b$. 
 ///fu+sum+math \sum_{i=a}^b f_i  
 ///fu+sum+example sum1.was sum2.was sum3.was
-double feenox_builtin_sum(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_sum(expr_item_t *a, var_t *var_x) {
 
   int i;
   int i_lower, i_upper;
@@ -447,7 +447,7 @@ double feenox_builtin_sum(expr_factor_t *a, var_t *var_x) {
 ///fu+root+desc $p \neq 0$, the returned value can be any value.
 ///fu+root+desc Default is $\epsilon = (1/2)^{-10} \approx 10^{3}$.
 ///fu+root+example root1.was root2.was root3.was root4.was
-double feenox_builtin_root(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
   int iter;
   int gsl_status;
   double x, x_old;
@@ -591,7 +591,7 @@ double feenox_builtin_root(expr_factor_t *a, var_t *var_x) {
 ///fu+func_min+math y = \left\{ x \in [a,b] / f(x) = \min_{[a,b]} f(x) \right \} 
 ///fu+func_min+example func_min.was
 
-double feenox_builtin_func_min(expr_factor_t *a, var_t *var_x) {
+double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   
   int iter, gsl_status;
   double x, x_old;

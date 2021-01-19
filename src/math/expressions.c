@@ -175,7 +175,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   char *oper = NULL;
   int last_was_an_op = 0;
   size_t level = 1;
-  expr_factor_t *factor;
+  expr_item_t *item;
   size_t delta_level = strlen(operators);
 
   while (*string != '\0') {
@@ -196,39 +196,39 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       } else {       // +-*/^.
         if (last_was_an_op == 1) {
           if ((*oper == '+' || *oper == '-')) {
-            if ((factor = feenox_expression_parse_factor(string)) == NULL) {
+            if ((item = feenox_expression_parse_item(string)) == NULL) {
               return FEENOX_ERROR;
             }
-            factor->level = level;
-            LL_APPEND(this->factors, factor);
-            string += factor->n_chars;
+            item->level = level;
+            LL_APPEND(this->items, item);
+            string += item->n_chars;
             last_was_an_op = 0;
           } else {
             feenox_push_error_message("two adjacent operators");
             return FEENOX_ERROR;
           }
         } else { 
-          factor = calloc(1, sizeof(expr_factor_t));
-          factor->type = EXPR_OPERATOR;
-          factor->oper = oper-operators+1;
+          item = calloc(1, sizeof(expr_item_t));
+          item->type = EXPR_OPERATOR;
+          item->oper = oper-operators+1;
           // precedence two by two from left to right
-          factor->level = level+(oper-operators)/2*2; 
-          LL_APPEND(this->factors, factor);
+          item->level = level+(oper-operators)/2*2; 
+          LL_APPEND(this->items, item);
           string++;
           last_was_an_op = 1;
         }
       }
     } else {
       // a constant, variable or function
-      if ((factor = feenox_expression_parse_factor(string)) == NULL) {
+      if ((item = feenox_expression_parse_item(string)) == NULL) {
         return FEENOX_ERROR;
       }
-      LL_APPEND(this->factors, factor);
-      factor->level = level;
-      if (factor->n_chars <= 0) {
+      LL_APPEND(this->items, item);
+      item->level = level;
+      if (item->n_chars <= 0) {
         return FEENOX_ERROR;
       }
-      string += factor->n_chars;
+      string += item->n_chars;
       last_was_an_op = 0;
     }
   }
@@ -247,14 +247,14 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
 }
 
 
-// parse a factor within an expression (which means a constant, a variable or a function)
-expr_factor_t *feenox_expression_parse_factor(const char *string) {
+// parse a item within an expression (which means a constant, a variable or a function)
+expr_item_t *feenox_expression_parse_item(const char *string) {
 
-  // number of characters read, we put this into the allocated factor at the end of this routine
+  // number of characters read, we put this into the allocated item at the end of this routine
   size_t n;
   int n_int; // sscanf can only return ints, not size_t
   char *backup = strdup(string);
-  expr_factor_t *factor = calloc(1, sizeof(expr_factor_t));
+  expr_item_t *item = calloc(1, sizeof(expr_item_t));
 
   // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
   if (isdigit((int)(*string)) || *string == '-' || *string == '+' || *string == '.') {
@@ -264,8 +264,8 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
       return NULL;
     }
     n = n_int;
-    factor->type = EXPR_CONSTANT;
-    factor->constant = constant;
+    item->type = EXPR_CONSTANT;
+    item->constant = constant;
 
   } else {
     // we got letters
@@ -300,7 +300,7 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
     }
     
     // matrix, vector or variable
-    factor->type = EXPR_UNDEFINED;
+    item->type = EXPR_UNDEFINED;
     var_t *var = NULL;
     vector_t *vector = NULL;
     matrix_t *matrix = NULL;
@@ -310,29 +310,29 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
     function_t *function = NULL;
     
     if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
-      factor->type = EXPR_MATRIX;
-      factor->matrix = matrix;
+      item->type = EXPR_MATRIX;
+      item->matrix = matrix;
     } else if ((vector = feenox_get_vector_ptr(token)) != NULL) {
-      factor->type = EXPR_VECTOR;
-      factor->vector = vector;
+      item->type = EXPR_VECTOR;
+      item->vector = vector;
     } else if ((var = feenox_get_variable_ptr(token)) != NULL) {
       // check that variables don't need arguments
       if (string[strlen(token)] == '(') {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
         return NULL;
       }
-      factor->type = EXPR_VARIABLE;
-      factor->variable = var;
+      item->type = EXPR_VARIABLE;
+      item->variable = var;
     }
 
     if (matrix != NULL || vector != NULL || var != NULL) {
       n = strlen(token);
       if (wants_initial_transient) {
         n += 2;
-        factor->type |= EXPR_INITIAL_TRANSIENT;
+        item->type |= EXPR_INITIAL_TRANSIENT;
       } else if (wants_initial_static) {
         n += 5;
-        factor->type |= EXPR_INITIAL_STATIC;
+        item->type |= EXPR_INITIAL_STATIC;
       }
       // put the underscore back
       if (wants_initial_transient || wants_initial_static)  {
@@ -374,7 +374,7 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
         return NULL;
       }
 
-      // n is the number of characters to parse (it will get copied into the output factor_t)
+      // n is the number of characters to parse (it will get copied into the output item_t)
       n = strlen(token) + n_chars_count;
       
       int n_arguments_max;
@@ -397,90 +397,90 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
 
       } else if (builtin_function != NULL) {
 
-        factor->type = EXPR_BUILTIN_FUNCTION;
-        factor->builtin_function = builtin_function;
+        item->type = EXPR_BUILTIN_FUNCTION;
+        item->builtin_function = builtin_function;
 
-        if (n_arguments < factor->builtin_function->min_arguments) {
-          feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_function->min_arguments, (factor->builtin_function->min_arguments==1)?"":"s", n_arguments);
+        if (n_arguments < item->builtin_function->min_arguments) {
+          feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, item->builtin_function->min_arguments, (item->builtin_function->min_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
-        if (n_arguments > factor->builtin_function->max_arguments) {
-          feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_function->max_arguments, (factor->builtin_function->max_arguments==1)?"":"s", n_arguments);
+        if (n_arguments > item->builtin_function->max_arguments) {
+          feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, item->builtin_function->max_arguments, (item->builtin_function->max_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
 
-        n_arguments_max = factor->builtin_function->max_arguments;
+        n_arguments_max = item->builtin_function->max_arguments;
 
       } else if (builtin_vectorfunction != NULL) {
 
         // tenemos una funcion sobre vectores interna
-        factor->type = EXPR_BUILTIN_VECTORFUNCTION;
-        factor->builtin_vectorfunction = builtin_vectorfunction;
+        item->type = EXPR_BUILTIN_VECTORFUNCTION;
+        item->builtin_vectorfunction = builtin_vectorfunction;
 
-        if (n_arguments < factor->builtin_vectorfunction->min_arguments) {
-          feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_vectorfunction->min_arguments, (factor->builtin_vectorfunction->min_arguments==1)?"":"s", n_arguments);
+        if (n_arguments < item->builtin_vectorfunction->min_arguments) {
+          feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, item->builtin_vectorfunction->min_arguments, (item->builtin_vectorfunction->min_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
-        if (n_arguments > factor->builtin_vectorfunction->max_arguments) {
-          feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_vectorfunction->max_arguments, (factor->builtin_vectorfunction->max_arguments==1)?"":"s", n_arguments);
+        if (n_arguments > item->builtin_vectorfunction->max_arguments) {
+          feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, item->builtin_vectorfunction->max_arguments, (item->builtin_vectorfunction->max_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
 
-        n_arguments_max = factor->builtin_vectorfunction->max_arguments;
+        n_arguments_max = item->builtin_vectorfunction->max_arguments;
 
       } else if (builtin_functional != NULL) {
 
-        factor->type = EXPR_BUILTIN_FUNCTIONAL;
-        factor->builtin_functional = builtin_functional;
+        item->type = EXPR_BUILTIN_FUNCTIONAL;
+        item->builtin_functional = builtin_functional;
 
-        if (n_arguments < factor->builtin_functional->min_arguments) {
-          feenox_push_error_message("functional '%s' takes at least %d argument%s instead of %d", token, factor->builtin_functional->min_arguments, (factor->builtin_functional->min_arguments==1)?"":"s", n_arguments);
+        if (n_arguments < item->builtin_functional->min_arguments) {
+          feenox_push_error_message("functional '%s' takes at least %d argument%s instead of %d", token, item->builtin_functional->min_arguments, (item->builtin_functional->min_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
-        if (n_arguments > factor->builtin_functional->max_arguments) {
-          feenox_push_error_message("functional '%s' takes at most %d argument%s instead of %d", token, factor->builtin_functional->max_arguments, (factor->builtin_functional->max_arguments==1)?"":"s", n_arguments);
+        if (n_arguments > item->builtin_functional->max_arguments) {
+          feenox_push_error_message("functional '%s' takes at most %d argument%s instead of %d", token, item->builtin_functional->max_arguments, (item->builtin_functional->max_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
 
-        n_arguments_max = factor->builtin_functional->max_arguments;
+        n_arguments_max = item->builtin_functional->max_arguments;
 
       } else if (function != NULL) {
 
-        factor->type = EXPR_FUNCTION;
-        factor->function = function;
+        item->type = EXPR_FUNCTION;
+        item->function = function;
 
-        if (n_arguments != factor->function->n_arguments) {
-          feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, factor->function->n_arguments, (factor->function->n_arguments==1)?"":"s", n_arguments);
+        if (n_arguments != item->function->n_arguments) {
+          feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, item->function->n_arguments, (item->function->n_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
 
-        n_arguments_max = factor->function->n_arguments;
+        n_arguments_max = item->function->n_arguments;
 
       } else {
         return NULL;
       }
 
-      if (factor->type != EXPR_BUILTIN_VECTORFUNCTION) {
-        factor->arg = calloc(n_arguments_max, sizeof(expr_t));
+      if (item->type != EXPR_BUILTIN_VECTORFUNCTION) {
+        item->arg = calloc(n_arguments_max, sizeof(expr_t));
       } else {
-        factor->vector_arg = calloc(n_arguments_max, sizeof(vector_t *));
+        item->vector_arg = calloc(n_arguments_max, sizeof(vector_t *));
       }
 
 
       int i;
       for (i = 0; i < n_arguments; i++) {
-        if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
-          if ((factor->vector_arg[i] = feenox_get_vector_ptr(arg[i])) == NULL) {
+        if (item->type == EXPR_BUILTIN_VECTORFUNCTION) {
+          if ((item->vector_arg[i] = feenox_get_vector_ptr(arg[i])) == NULL) {
             feenox_push_error_message("undefined vector '%s'", arg[i]);
             return NULL;
           }
-        } else if (factor->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
+        } else if (item->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
           // if it is a functional the second argument is a variable
-          if ((factor->functional_var_arg = feenox_get_variable_ptr(arg[i])) == NULL) {
+          if ((item->functional_var_arg = feenox_get_variable_ptr(arg[i])) == NULL) {
             return NULL;
           }
         } else {
-          if (feenox_expression_parse(&factor->arg[i], arg[i]) != FEENOX_OK) {
+          if (feenox_expression_parse(&item->arg[i], arg[i]) != FEENOX_OK) {
             return NULL;
           }
         }
@@ -490,16 +490,16 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
       
     } 
 
-    if (factor->type == EXPR_UNDEFINED) {
+    if (item->type == EXPR_UNDEFINED) {
       feenox_push_error_message("unknown symbol '%s'", token);
       return NULL;
     }
   }
 
   free(backup);
-  factor->n_chars = n;
+  item->n_chars = n;
 
-  return factor;
+  return item;
 
 }
 
@@ -510,14 +510,14 @@ double feenox_expression_eval(expr_t *this) {
   size_t i, j;
   int level;
   char tmp_operator;
-  expr_factor_t *factor;
-  expr_factor_t *E,*P;
+  expr_item_t *factor;
+  expr_item_t *E,*P;
 
-  if (this == NULL || this->factors == NULL) {
+  if (this == NULL || this->items == NULL) {
     return 0;
   }
   
-  LL_FOREACH(this->factors, factor) {
+  LL_FOREACH(this->items, factor) {
     factor->tmp_level = factor->level;
 
     // TODO: replace the switch by pointer to functions (i.e. virtual methods in C++ slang)?
@@ -621,7 +621,7 @@ double feenox_expression_eval(expr_t *this) {
   }
 
   level = 0;
-  LL_FOREACH(this->factors, factor) {
+  LL_FOREACH(this->items, factor) {
     if (factor->level > level) {
       level = factor->level;
     }
@@ -629,7 +629,7 @@ double feenox_expression_eval(expr_t *this) {
 
   while (level > 0) {
 
-    for (E = P = this->factors; E != NULL; E->tmp_level != 0 && !E->oper ? P=E : NULL, E = E->next) {
+    for (E = P = this->items; E != NULL; E->tmp_level != 0 && !E->oper ? P=E : NULL, E = E->next) {
       
       if (E->tmp_level == level && E->oper != 0) {
         tmp_operator = operators[E->oper-1];
@@ -691,13 +691,13 @@ double feenox_expression_eval(expr_t *this) {
 
   }
 
-  if (gsl_isnan(this->factors->value) || gsl_isinf(this->factors->value)) {
+  if (gsl_isnan(this->items->value) || gsl_isinf(this->items->value)) {
     feenox_push_error_message("in '%s'", this->string);
     feenox_nan_error();
   }
 
 
-  return this->factors->value;
+  return this->items->value;
 
 }
 

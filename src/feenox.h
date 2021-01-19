@@ -174,7 +174,7 @@ typedef struct builtin_functional_t builtin_functional_t;
 typedef struct builtin_vectorfunction_t builtin_vectorfunction_t;
 
 typedef struct expr_t expr_t;
-typedef struct expr_factor_t expr_factor_t;
+typedef struct expr_item_t expr_item_t;
 
 typedef struct var_t var_t;
 typedef struct vector_t vector_t;
@@ -198,7 +198,7 @@ typedef struct mesh_t mesh_t;
 
 
 // individual factor of an algebraic expression
-struct expr_factor_t {
+struct expr_item_t {
   size_t n_chars;
   int type;        // defines #EXPR_ because we need to operate with masks
   
@@ -229,17 +229,15 @@ struct expr_factor_t {
   // algebraic expression of the arguments of the function
   expr_t *arg;
 
-  expr_factor_t *next;
+  expr_item_t *next;
 };
 
 
 // algebraic expression
 struct expr_t {
-  expr_factor_t *factors;
+  expr_item_t *items;
   double value;
-  
   char *string;     // just in case we keep the original string
-
   expr_t *next;
 };
 
@@ -452,7 +450,7 @@ struct builtin_function_t {
   char name[BUFFER_TOKEN_SIZE];
   int min_arguments;
   int max_arguments;
-  double (*routine)(struct expr_factor_t *);
+  double (*routine)(struct expr_item_t *);
 };
 
 
@@ -476,7 +474,7 @@ struct builtin_functional_t {
   char name[BUFFER_TOKEN_SIZE];
   int min_arguments; // contando la variable del segundo argumento
   int max_arguments;
-  double (*routine)(struct expr_factor_t *, struct var_t *);
+  double (*routine)(struct expr_item_t *, struct var_t *);
 };
 
 
@@ -809,7 +807,7 @@ extern int feenox_instruction_abort(void *arg);
 
 // expressions.c
 extern int feenox_expression_parse(expr_t *this, const char *string);
-extern expr_factor_t *feenox_expression_parse_factor(const char *string);
+extern expr_item_t *feenox_expression_parse_item(const char *string);
 
 
 extern double feenox_expression_eval(expr_t *this);
@@ -883,7 +881,7 @@ extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i
 // function.c
 extern int feenox_function_init(function_t *this);
 extern double feenox_function_eval(function_t *this, const double *x);
-extern double feenox_factor_function_eval(expr_factor_t *this);
+extern double feenox_factor_function_eval(expr_item_t *this);
 
 // print.c
 extern int feenox_instruction_print(void *arg);

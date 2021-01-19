@@ -132,14 +132,14 @@ int feenox_dae_init(void) {
         feenox_call(feenox_matrix_init(dae->matrix));
       }
       
-      dae->i_min = (dae->expr_i_min.factors != NULL) ? feenox_expression_eval(&dae->expr_i_min)-1 : 0;
-      dae->i_max = (dae->expr_i_max.factors != NULL) ? feenox_expression_eval(&dae->expr_i_max)   : dae->matrix->rows;
+      dae->i_min = (dae->expr_i_min.items != NULL) ? feenox_expression_eval(&dae->expr_i_min)-1 : 0;
+      dae->i_max = (dae->expr_i_max.items != NULL) ? feenox_expression_eval(&dae->expr_i_max)   : dae->matrix->rows;
       if (dae->i_max <= dae->i_min) {
         feenox_push_error_message("i_max %d is smaller or equal than i_min %d", dae->i_max, dae->i_min+1);
       }
 
-      dae->j_min = (dae->expr_j_min.factors != NULL) ? feenox_expression_eval(&dae->expr_j_min)-1 : 0;
-      dae->j_max = (dae->expr_j_max.factors != NULL) ? feenox_expression_eval(&dae->expr_j_max)   : dae->matrix->cols;
+      dae->j_min = (dae->expr_j_min.items != NULL) ? feenox_expression_eval(&dae->expr_j_min)-1 : 0;
+      dae->j_max = (dae->expr_j_max.items != NULL) ? feenox_expression_eval(&dae->expr_j_max)   : dae->matrix->cols;
       if (dae->j_max <= dae->j_min) {
         feenox_push_error_message("j_max %d is smaller or equal than j_min %d", dae->j_max, dae->j_min+1);
       }
@@ -151,8 +151,8 @@ int feenox_dae_init(void) {
         feenox_call(feenox_vector_init(dae->vector));
       }
       
-      dae->i_min = (dae->expr_i_min.factors != NULL) ? feenox_expression_eval(&dae->expr_i_min)-1 : 0;
-      dae->i_max = (dae->expr_i_max.factors != NULL) ? feenox_expression_eval(&dae->expr_i_max)   : dae->vector->size;
+      dae->i_min = (dae->expr_i_min.items != NULL) ? feenox_expression_eval(&dae->expr_i_min)-1 : 0;
+      dae->i_max = (dae->expr_i_max.items != NULL) ? feenox_expression_eval(&dae->expr_i_max)   : dae->vector->size;
       if (dae->i_max <= dae->i_min) {
         feenox_push_error_message("i_max %d is smaller or equal than i_max %d", dae->i_max, dae->i_min+1);
       }

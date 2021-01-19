@@ -3035,7 +3035,7 @@ int feenox_parse_print(void) {
             feenox_push_error_message("implicit definition is not allowed and expression '%s' is invalid", token);
             return FEENOX_ERROR;
           } else {
-            print_token->expression.factors = NULL;
+            print_token->expression.items = NULL;
             print_token->text = strdup(token);
             feenox_pop_error_message();
           }

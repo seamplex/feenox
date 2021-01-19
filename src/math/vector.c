@@ -89,7 +89,7 @@ int feenox_vector_init(vector_t *this) {
     if (!this->function->initialized) {
       feenox_call(feenox_function_init(this->function));
     }
-    if (this->size_expr.factors == NULL) {
+    if (this->size_expr.items == NULL) {
       size = this->function->data_size;
     } else if ((size = (int)(round(feenox_expression_eval(&this->size_expr)))) != this->function->data_size) {
       feenox_push_error_message("vector '%s' has size mismatch, SIZE = %d and FUNCTION = %d", this->name, size, this->function->data_size);

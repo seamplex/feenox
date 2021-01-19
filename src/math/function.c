@@ -40,7 +40,7 @@ void feenox_set_function_args(function_t *this, double *x) {
 
 // evaluates a function inside a factor
 // the arguments are inside the structure
-double feenox_factor_function_eval(expr_factor_t *this) {
+double feenox_factor_function_eval(expr_item_t *this) {
 
   int i;
   double *x;
@@ -382,7 +382,7 @@ double feenox_function_eval(function_t *this, const double *x) {
   } else if (this->algebraic_expression.n_tokens != 0 && this->n_arguments == 1) {
 */
   
-  if (this->algebraic_expression.factors != NULL) {
+  if (this->algebraic_expression.items != NULL) {
     if (this->n_arguments == 1) {
       
       // TODO: should we keep this or leave the arguments as they are?
