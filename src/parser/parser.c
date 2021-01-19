@@ -2267,7 +2267,7 @@ int feenox_parse_function(void) {
   if ((n_arguments = feenox_count_arguments(arguments)) <= 0) {
     return FEENOX_ERROR;
   }
-  feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name));
+  feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
   free(arguments);
 
   // we can now define the function and set the arguments

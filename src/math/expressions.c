@@ -32,6 +32,7 @@ extern const char factorseparators[];
 extern char *feenox_ends_in_init(char *name);
 extern char *feenox_ends_in_zero(char *name);
 extern int feenox_count_arguments(char *string);
+extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
 
 //  parse a string with an algebraic expression and fills in the struct expr
 int feenox_expression_parse(expr_t *this, const char *orig_string) {
@@ -56,8 +57,10 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   while (*string != '\0') {
 
     if (isblank(*string)) {
+      // blanks are ignored
       string++;
     } else if ((oper = strchr(operators, *string)) != NULL) {
+      // handle one of the operatos
       if (*string == '(') {
         level += delta_level;
         string++;
@@ -171,36 +174,32 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
     }
     
     // matrix, vector or variable
-    int got_it = 0;
-    var_t *dummy_var = NULL;
-    vector_t *dummy_vector = NULL;
-    matrix_t *dummy_matrix = NULL;
-    builtin_function_t *dummy_builtin_function = NULL;
-    builtin_vectorfunction_t *dummy_builtin_vectorfunction = NULL;
-    builtin_functional_t *dummy_builtin_functional = NULL;
-    function_t *dummy_function = NULL;
+    factor->type = EXPR_UNDEFINED;
+    var_t *var = NULL;
+    vector_t *vector = NULL;
+    matrix_t *matrix = NULL;
+    builtin_function_t *builtin_function = NULL;
+    builtin_vectorfunction_t *builtin_vectorfunction = NULL;
+    builtin_functional_t *builtin_functional = NULL;
+    function_t *function = NULL;
     
-    if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
-      got_it = 1;
-      factor->matrix = dummy_matrix;
+    if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
       factor->type = EXPR_MATRIX;
-    } else if ((dummy_vector = feenox_get_vector_ptr(token)) != NULL) {
-      got_it = 1;
-      factor->vector = dummy_vector;
+      factor->matrix = matrix;
+    } else if ((vector = feenox_get_vector_ptr(token)) != NULL) {
       factor->type = EXPR_VECTOR;
-    } else if ((dummy_var = feenox_get_variable_ptr(token)) != NULL) {
+      factor->vector = vector;
+    } else if ((var = feenox_get_variable_ptr(token)) != NULL) {
       // check that variables don't need arguments
       if (string[strlen(token)] == '(') {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
-        free(backup);
         return NULL;
       }
-      got_it = 1;
-      factor->variable = dummy_var;
       factor->type = EXPR_VARIABLE;
+      factor->variable = var;
     }
 
-    if (got_it) {
+    if (matrix != NULL || vector != NULL || var != NULL) {
       n = strlen(token);
       if (wants_initial_transient) {
         n += 2;
@@ -215,16 +214,12 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
       }
     }
 
-    if ( dummy_matrix != NULL ||
-         dummy_vector != NULL ||
-        (dummy_function = feenox_get_function_ptr(token)) != NULL ||
-        (dummy_builtin_function = feenox_get_builtin_function_ptr(token)) != NULL ||
-        (dummy_builtin_vectorfunction = feenox_get_builtin_vectorfunction_ptr(token)) != NULL ||
-        (dummy_builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL) {
-
-      int level;
-      
-      got_it = 1;
+    if ( matrix != NULL ||
+         vector != NULL ||
+        (function = feenox_get_function_ptr(token)) != NULL ||
+        (builtin_function = feenox_get_builtin_function_ptr(token)) != NULL ||
+        (builtin_vectorfunction = feenox_get_builtin_vectorfunction_ptr(token)) != NULL ||
+        (builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL) {
 
       // copy into argument whatever is after the name
       char *argument = strdup(string+strlen(token));
@@ -232,221 +227,129 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
       // arguments have to be in parenthesis
       if (argument[0] != '(') {
         feenox_push_error_message("expected parenthesis after '%s'", token);
-        free(argument);
-        free(backup);
         return NULL;
       }
 
-      // count how many arguments are there
+      // read the arguments and keep them as an array of strings
       int n_arguments = feenox_count_arguments(argument);
       if (n_arguments <= 0) {
-        free(argument);
-        free(backup);
         return NULL;
       }
 
-      int n_arguments_max;
+      char **arg = NULL;
+      size_t n_chars;
+      if (feenox_read_arguments(argument, n_arguments, &arg, &n_chars) == FEENOX_ERROR) {
+        return NULL;
+      }
+
       // n is the number of characters to parse (it will get copied into the output factor_t)
-      n = strlen(token)+strlen(argument);
+      n = strlen(token) + n_chars;
+      
+      int n_arguments_max;
 
-      if (factor != NULL) {
+      if (vector != NULL) {
 
-        if (dummy_vector != NULL) {
-          
-          if (n_arguments < 1 || n_arguments > 1) {
-            feenox_push_error_message("vector '%s' takes exactly one subindex expression", dummy_vector->name);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-          n_arguments_max = 1;
-          
-        } else if (dummy_matrix != NULL) {
-          
-          if (n_arguments < 2 || n_arguments > 2) {
-            feenox_push_error_message("matrix '%s' takes exactly two subindex expressions", dummy_matrix->name);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-          n_arguments_max = 2;
-          
-        } else if (dummy_builtin_function != NULL) {
+        if (n_arguments < 1 || n_arguments > 1) {
+          feenox_push_error_message("vector '%s' takes exactly one subindex expression", vector->name);
+          return NULL;
+        }
+        n_arguments_max = 1;
 
-          factor->type = EXPR_BUILTIN_FUNCTION;
-          factor->builtin_function = dummy_builtin_function;
+      } else if (matrix != NULL) {
 
-          if (n_arguments < factor->builtin_function->min_arguments) {
-            feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_function->min_arguments, (factor->builtin_function->min_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-          if (n_arguments > factor->builtin_function->max_arguments) {
-            feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_function->max_arguments, (factor->builtin_function->max_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
+        if (n_arguments < 2 || n_arguments > 2) {
+          feenox_push_error_message("matrix '%s' takes exactly two subindex expressions", matrix->name);
+          return NULL;
+        }
+        n_arguments_max = 2;
 
-          n_arguments_max = factor->builtin_function->max_arguments;
+      } else if (builtin_function != NULL) {
 
-        } else if (dummy_builtin_vectorfunction != NULL) {
-          
-          // tenemos una funcion sobre vectores interna
-          factor->type = EXPR_BUILTIN_VECTORFUNCTION;
-          factor->builtin_vectorfunction = dummy_builtin_vectorfunction;
-          
-          if (n_arguments < factor->builtin_vectorfunction->min_arguments) {
-            feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_vectorfunction->min_arguments, (factor->builtin_vectorfunction->min_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-          if (n_arguments > factor->builtin_vectorfunction->max_arguments) {
-            feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_vectorfunction->max_arguments, (factor->builtin_vectorfunction->max_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
+        factor->type = EXPR_BUILTIN_FUNCTION;
+        factor->builtin_function = builtin_function;
 
-          n_arguments_max = factor->builtin_vectorfunction->max_arguments;
-          
-        } else if (dummy_builtin_functional != NULL) {
-
-          factor->type = EXPR_BUILTIN_FUNCTIONAL;
-          factor->builtin_functional = dummy_builtin_functional;
-
-          if (n_arguments < factor->builtin_functional->min_arguments) {
-            feenox_push_error_message("functional '%s' takes at least %d argument%s instead of %d", token, factor->builtin_functional->min_arguments, (factor->builtin_functional->min_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-          if (n_arguments > factor->builtin_functional->max_arguments) {
-            feenox_push_error_message("functional '%s' takes at most %d argument%s instead of %d", token, factor->builtin_functional->max_arguments, (factor->builtin_functional->max_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-
-          n_arguments_max = factor->builtin_functional->max_arguments;
-
-        } else if (dummy_function != NULL) {
-
-          factor->type = EXPR_FUNCTION;
-          factor->function = dummy_function;
-
-          if (n_arguments != factor->function->n_arguments) {
-            feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, factor->function->n_arguments, (factor->function->n_arguments==1)?"":"s", n_arguments);
-            free(argument);
-            free(backup);
-            return NULL;
-          }
-
-          n_arguments_max = factor->function->n_arguments;
-
-        } else {
-          free(backup);
-          free(argument);
+        if (n_arguments < factor->builtin_function->min_arguments) {
+          feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_function->min_arguments, (factor->builtin_function->min_arguments==1)?"":"s", n_arguments);
+          return NULL;
+        }
+        if (n_arguments > factor->builtin_function->max_arguments) {
+          feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_function->max_arguments, (factor->builtin_function->max_arguments==1)?"":"s", n_arguments);
           return NULL;
         }
 
-        if (factor->type != EXPR_BUILTIN_VECTORFUNCTION) {
-          factor->arg = calloc(n_arguments_max, sizeof(expr_t));
-        } else {
-          factor->vector_arg = calloc(n_arguments_max, sizeof(vector_t *));
+        n_arguments_max = factor->builtin_function->max_arguments;
+
+      } else if (builtin_vectorfunction != NULL) {
+
+        // tenemos una funcion sobre vectores interna
+        factor->type = EXPR_BUILTIN_VECTORFUNCTION;
+        factor->builtin_vectorfunction = builtin_vectorfunction;
+
+        if (n_arguments < factor->builtin_vectorfunction->min_arguments) {
+          feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, factor->builtin_vectorfunction->min_arguments, (factor->builtin_vectorfunction->min_arguments==1)?"":"s", n_arguments);
+          return NULL;
+        }
+        if (n_arguments > factor->builtin_vectorfunction->max_arguments) {
+          feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, factor->builtin_vectorfunction->max_arguments, (factor->builtin_vectorfunction->max_arguments==1)?"":"s", n_arguments);
+          return NULL;
         }
 
+        n_arguments_max = factor->builtin_vectorfunction->max_arguments;
 
-        if (n_arguments == 1) {
+      } else if (builtin_functional != NULL) {
 
-          // if the functions takes only one argument this is easy
-          if (factor->type != EXPR_BUILTIN_VECTORFUNCTION) {
-            if (feenox_expression_parse(&factor->arg[0], argument) != 0) {
-              free(argument);
-              free(backup);
-              return NULL;
-            }
-          } else if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
-            argument[strlen(argument)-1] = '\0';
-            if ((factor->vector_arg[0] = feenox_get_vector_ptr(&argument[1])) == NULL) {
-              feenox_push_error_message("undefined vector '%s'", &argument[1]);
-              free(argument);
-              free(backup);
-              return NULL;
-            }
+        factor->type = EXPR_BUILTIN_FUNCTIONAL;
+        factor->builtin_functional = builtin_functional;
+
+        if (n_arguments < factor->builtin_functional->min_arguments) {
+          feenox_push_error_message("functional '%s' takes at least %d argument%s instead of %d", token, factor->builtin_functional->min_arguments, (factor->builtin_functional->min_arguments==1)?"":"s", n_arguments);
+          return NULL;
+        }
+        if (n_arguments > factor->builtin_functional->max_arguments) {
+          feenox_push_error_message("functional '%s' takes at most %d argument%s instead of %d", token, factor->builtin_functional->max_arguments, (factor->builtin_functional->max_arguments==1)?"":"s", n_arguments);
+          return NULL;
+        }
+
+        n_arguments_max = factor->builtin_functional->max_arguments;
+
+      } else if (function != NULL) {
+
+        factor->type = EXPR_FUNCTION;
+        factor->function = function;
+
+        if (n_arguments != factor->function->n_arguments) {
+          feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, factor->function->n_arguments, (factor->function->n_arguments==1)?"":"s", n_arguments);
+          return NULL;
+        }
+
+        n_arguments_max = factor->function->n_arguments;
+
+      } else {
+        return NULL;
+      }
+
+      if (factor->type != EXPR_BUILTIN_VECTORFUNCTION) {
+        factor->arg = calloc(n_arguments_max, sizeof(expr_t));
+      } else {
+        factor->vector_arg = calloc(n_arguments_max, sizeof(vector_t *));
+      }
+
+
+      int i;
+      for (i = 0; i < n_arguments; i++) {
+        if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
+          if ((factor->vector_arg[i] = feenox_get_vector_ptr(arg[i])) == NULL) {
+            feenox_push_error_message("undefined vector '%s'", arg[i]);
+            return NULL;
           }
-
+        } else if (factor->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
+          // if it is a functional the second argument is a variable
+          if ((factor->functional_var_arg = feenox_get_variable_ptr(arg[i])) == NULL) {
+            return NULL;
+          }
         } else {
-
-          // if the function takes more arguments we need to read them one by one
-
-          // if we directly increment argument then we cannot free() it
-          char *dummy_argument = argument;
-          char char_backup = '\0';
-          int i;
-          for (i = 0; i < n_arguments; i++) {
-            if (i != n_arguments-1) {
-
-              level = 1;
-              dummy = dummy_argument+1;
-              while (1) {
-                if (*dummy == ',' && level == 1) {
-                  break;
-                }
-                if (*dummy == '(') {
-                  level++;
-                } else if (*dummy == ')') {
-                  level--;
-                } else if (*dummy == '\0') {
-                  free(argument);
-                  free(backup);
-                  return NULL;
-                }
-                dummy++;
-              }
-
-              *dummy = ')';
-              char_backup = *(dummy+1);
-              *(dummy+1) = '\0';
-            }
-
-
-            // in dummy_argument we have the i-th argument between parenthesis
-            if (factor->type == EXPR_BUILTIN_VECTORFUNCTION) {
-              
-              // le sacamos los parentesis
-              dummy_argument[strlen(dummy_argument)-1] = '\0';
-              if ((factor->vector_arg[i] = feenox_get_vector_ptr(&dummy_argument[1])) == NULL) {
-                feenox_push_error_message("undefined vector '%s'", &dummy_argument[1]);
-                free(argument);
-                free(backup);
-                return NULL;
-              }
-              
-            } else if (factor->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
-              // if it is a functional the second argument is a variable
-              // but we need to remove parenthesis
-              *(dummy) = '\0';
-              if ((factor->functional_var_arg = feenox_get_variable_ptr(dummy_argument+1)) == NULL) {
-                free(argument);
-                free(backup);
-                return NULL;
-              }
-            } else {
-              if (feenox_expression_parse(&factor->arg[i], dummy_argument) != 0) {
-                free(argument);
-                free(backup);
-                return NULL;
-              }
-            }
-
-            if (i != n_arguments-1) {
-              *dummy = '(';
-              *(dummy+1) = char_backup;
-              dummy_argument = dummy;
-            }
+          if (feenox_expression_parse(&factor->arg[i], arg[i]) != FEENOX_OK) {
+            return NULL;
           }
         }
       }
@@ -455,9 +358,8 @@ expr_factor_t *feenox_expression_parse_factor(const char *string) {
       
     } 
 
-    if (got_it == 0) {
+    if (factor->type == EXPR_UNDEFINED) {
       feenox_push_error_message("unknown symbol '%s'", token);
-      free(backup);
       return NULL;
     }
   }

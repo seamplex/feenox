@@ -76,13 +76,12 @@
 
 
 // no son enums porque hacemos operaciones con las mascaras de abajo
-#define EXPR_OPERATOR                             0
-#define EXPR_CONSTANT                             1
-#define EXPR_VARIABLE                             2
-#define EXPR_VECTOR                               3
-#define EXPR_MATRIX                               4
-// old-school numbers
-//#define EXPR_NUM                                  5
+#define EXPR_UNDEFINED                            0 
+#define EXPR_OPERATOR                             1
+#define EXPR_CONSTANT                             2
+#define EXPR_VARIABLE                             3
+#define EXPR_VECTOR                               4
+#define EXPR_MATRIX                               5
 #define EXPR_BUILTIN_FUNCTION                     6
 #define EXPR_BUILTIN_VECTORFUNCTION               7
 #define EXPR_BUILTIN_FUNCTIONAL                   8

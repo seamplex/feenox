@@ -679,20 +679,16 @@ char *feenox_ends_in_dot(char *name) {
 
 int feenox_count_arguments(char *string) {
 
-  int n_arguments;
-  int level;
-  char *dummy;
-
   // arguments have to be inside parenthesis
   if (string[0] != '(') {
-    feenox_push_error_message("expected arguments for function");
+    feenox_push_error_message("argument list needs to start with ')'");
     return -1;
   }
 
   // count how many arguments are there (take into account nested parenthesis)
-  dummy = string+1;
-  level = 1;
-  n_arguments = 1;
+  char *dummy = string+1;
+  int level = 1;
+  int n_arguments = 1;
   while (level != 0) {
     if (*dummy == '(') {
       level++;
@@ -712,83 +708,59 @@ int feenox_count_arguments(char *string) {
   return n_arguments;
 }
 
-int feenox_read_arguments(char *string, int n_arguments, char ***arg_name) {
+
+int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars) {
  
-  char *dummy;
-  char *dummy_openpar = NULL;
-  char *dummy_closepar = NULL;
-  char char_backup;
-  
-  if ((dummy_openpar = strchr(string, '(')) == NULL) {
+
+  if (strchr(string, '(') == NULL) {
     feenox_push_error_message("arguments must start with a parenthesis");
     return FEENOX_ERROR;
   }
-  *dummy_openpar = '\0';
-
-  if (((*arg_name) = calloc(n_arguments, sizeof(char *))) == NULL) {
+  
+  if (((*arg) = calloc(n_arguments, sizeof(char *))) == NULL) {
     feenox_push_error_message("calloc() failed");
     return FEENOX_ERROR;
   }
+
+  int i;
+  size_t n = 0;
+  char *dummy = string;
+  char char_backup;
+  for (i = 0; i < n_arguments; i++) {
+    int level = 1;
+    dummy++;
+    n++;
+    char *argument = dummy;
+    while (1) {
+      // if level is 1 and next char is ',' or ')' and we are on the last argument, we are done
+      if (level == 1 && ((i != n_arguments-1 && *dummy == ',') || (i == n_arguments-1 && *dummy == ')'))) {
+        break;
+      }
+          
+      if (*dummy == '(') {
+        level++;
+      } else if (*dummy == ')') {
+        level--;
+      } else if (*dummy == '\0') {
+        feenox_push_error_message("when parsing arguments");
+        return FEENOX_ERROR;
+      }
+      dummy++;
+      n++;
+    }
+
+    // put a '\0' after dummy but make a backup of what there was there
+    char_backup = *dummy;
+    *dummy = '\0';
+    // in argument we have the i-th argument
+    (*arg)[i] = strdup(argument);
+    *dummy = char_backup;
+  }
   
-  if (n_arguments == 1) {
-    
-    // if there's a single argument, that's easy
-    *arg_name[0] = strdup(string+1);
-    if ((dummy_closepar = strchr(*arg_name[0], ')')) == NULL) {
-      feenox_push_error_message("expected ')' after function name (no spaces allowed)");
-      return FEENOX_ERROR;
-    }
-    *dummy_closepar = '\0';
-
-  } else {
-    
-    // otherwise one at a time
-    int i;
-    int level;
-    
-    for (i = 0; i < n_arguments; i++) {
-      if (i != n_arguments-1) {
-
-        // if we are not on the last argument, we need to put a ")\0" where it ends
-        level = 1;
-        dummy = string+1;
-        while (1) {
-          if (*dummy == ',' && level == 1) {
-            break;
-          }
-          if (*dummy == '(') {
-            level++;
-          } else if (*dummy == ')') {
-            level--;
-          } else if (*dummy == '\0') {
-            feenox_push_error_message("when parsing arguments");
-            return FEENOX_ERROR;
-          }
-          dummy++;
-        }
-
-        // put a '\0' after dummy but make a backup of what there was there
-        char_backup = *dummy;
-        *dummy = '\0';
-        
-      } else {
-
-        // strip the final ')'
-        *(dummy+strlen(dummy)-1) = '\0';
-
-      }
-
-
-      // en dummy_argument+1 tenemos el argumento i-esimo
-      (*arg_name)[i] = strdup(string+1);
-
-
-      if (i != n_arguments-1) {
-        *(dummy) = char_backup;
-        string = dummy;
-      }
-    }
-  }  
+  if (n_chars != NULL) {
+    // the +1 is because of the final closing parenthesis
+    *n_chars = n+1;
+  }
   
   return FEENOX_OK;
 }
