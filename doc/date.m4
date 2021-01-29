@@ -1,0 +1,3 @@
+---
+date: esyscmd(git log --pretty=format:"%aI" | head -n1 | cut -c-10)dnl
+...

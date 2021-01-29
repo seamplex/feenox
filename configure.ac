@@ -37,6 +37,11 @@ AC_CHECK_HEADER([math.h],[],AC_MSG_ERROR([math.h not found]))
 # check for sysconf() for page size
 AC_CHECK_FUNCS([sysconf],[],[])
 
+# check for clock_gettime() for unix time
+AC_CHECK_FUNCS([clock_gettime],[],[])
+
+
+
 
 ######################
 # check for Readline (optional)

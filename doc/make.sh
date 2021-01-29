@@ -7,6 +7,9 @@ for i in m4 pandoc; do
  fi
 done
 
+# unix man page
+m4 header.m4 date.m4 feenox.1.md | pandoc -s -t man -o feenox.1
+
 # manual
 m4 header.m4 feenox.md | \
   pandoc --toc --template template.texi \

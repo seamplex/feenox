@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- copy this file to $HOME/.local/share/katepart5/syntax/ to get Kate Syntax Highlighting for FeenoX input files -->
+<language name="FeenoX" version="1" kateversion="5.54.0" section="Scientific" extensions="*.fee" author="jeremy theler" license="GPL">
+  <highlighting>
+    <list name="prim_keywords">
+      <item>ABORT</item>
+      <item>ADIABATIC</item>
+      <item>ALGORITHM</item>
+      <item>ALIAS</item>
+      <item>AS</item>
+      <item>ASCENDING</item>
+      <item>ASCENDING_ORDER</item>
+      <item>ASCII_FILE</item>
+      <item>ASCII_FILE_PATH</item>
+      <item>BINARY_FILE</item>
+      <item>BINARY_FILE_PATH</item>
+      <item>CELLS</item>
+      <item>CLOSE</item>
+      <item>COLS</item>
+      <item>COLUMNS</item>
+      <item>DATA</item>
+      <item>DEFAULT_ARGUMENT_VALUE</item>
+      <item>DELTAEPSABS</item>
+      <item>DELTAEPSREL</item>
+      <item>DESCENDING</item>
+      <item>DESCENDING_ORDER</item>
+      <item>DIFFERENTIAL</item>
+      <item>DO_NOT_RERUN</item>
+      <item>ELEMS_PER_LINE</item>
+      <item>ELSE</item>
+      <item>ENDIF</item>
+      <item>EPSABS</item>
+      <item>EPSREL</item>
+      <item>EXPAND</item>
+      <item>FILE</item>
+      <item>FILE_PATH</item>
+      <item>FIT</item>
+      <item>FORMAT</item>
+      <item>FROM</item>
+      <item>FUNCTION</item>
+      <item>FUNCTION_DATA</item>
+      <item>GRADIENT</item>
+      <item>GUESS</item>
+      <item>HEADER</item>
+      <item>HISTORY</item>
+      <item>HORIZONTAL</item>
+      <item>IF</item>
+      <item>IGNORE_NULL</item>
+      <item>IMPLICIT</item>
+      <item>INCLUDE</item>
+      <item>INITIAL_CONDITIONS</item>
+      <item>INITIAL_CONDITIONS_MODE</item>
+      <item>INPUT</item>
+      <item>INPUT_FILE</item>
+      <item>INPUT_FILE_PATH</item>
+      <item>INTERPOLATION</item>
+      <item>INTERPOLATION_THRESHOLD</item>
+      <item>IS</item>
+      <item>M4</item>
+      <item>MACRO</item>
+      <item>MATRIX</item>
+      <item>MAX</item>
+      <item>MAX_DAUGHTERS</item>
+      <item>MAX_ITER</item>
+      <item>MESH</item>
+      <item>METHOD</item>
+      <item>MIN</item>
+      <item>MINIMIZE</item>
+      <item>MODE</item>
+      <item>NODES</item>
+      <item>NONEWLINE</item>
+      <item>NORERUN</item>
+      <item>NSTEPS</item>
+      <item>OFFSET</item>
+      <item>OPEN</item>
+      <item>OPTIMIZE</item>
+      <item>OUTER_STEPS</item>
+      <item>OUTPUT</item>
+      <item>OUTPUT_FILE</item>
+      <item>OUTPUT_FILE_PATH</item>
+      <item>PARAMETRIC</item>
+      <item>PATH</item>
+      <item>PHASE_SPACE</item>
+      <item>PHYSICAL_ENTITY</item>
+      <item>PRINT</item>
+      <item>PRINT_FUNCTION</item>
+      <item>PRINT_VECTOR</item>
+      <item>RANGE_MAX</item>
+      <item>RANGE_MIN</item>
+      <item>READ</item>
+      <item>RERUN</item>
+      <item>RESIDUALS</item>
+      <item>ROUTINE</item>
+      <item>ROWS</item>
+      <item>SEM</item>
+      <item>SEMAPHORE</item>
+      <item>SEP</item>
+      <item>SEPARATOR</item>
+      <item>SHELL</item>
+      <item>SHEPARD_EXPONENT</item>
+      <item>SHEPARD_RADIUS</item>
+      <item>SHM</item>
+      <item>SHM_OBJECT</item>
+      <item>SIZE</item>
+      <item>SIZES</item>
+      <item>SOLVE</item>
+      <item>SORT_VECTOR</item>
+      <item>STEP</item>
+      <item>STRING</item>
+      <item>TEXT</item>
+      <item>TIME_PATH</item>
+      <item>TO</item>
+      <item>TYPE</item>
+      <item>UNKNOWNS</item>
+      <item>VAR</item>
+      <item>VARIABLE</item>
+      <item>VARIABLES</item>
+      <item>VARS</item>
+      <item>VECTOR</item>
+      <item>VECTOR_DATA</item>
+      <item>VECTORS</item>
+      <item>VECTOR_SORT</item>
+      <item>VERBOSE</item>
+      <item>VERTICAL</item>
+      <item>VIA</item>
+      <item>WRITE</item>
+      <item>X_INCREASES_FIRST</item>
+      <item>ALLOWED</item>
+      <item>AS_PROVIDED</item>
+      <item>GRADTOL</item>
+      <item>MAX_ITER</item>
+      <item>NONE</item>
+      <item>POST</item>
+      <item>SKIP_HEADER_STEP</item>
+      <item>SKIP_STATIC_STEP</item>
+      <item>SKIP_STEP</item>
+      <item>SKIP_TIME</item>
+      <item>TOL</item>
+      <item>WAIT</item>
+    </list>
+    <list name="sec_keywords">
+    </list>
+    <list name="internals">
+      <item>done</item>
+      <item>done_outer</item>
+      <item>done_static</item>
+      <item>done_transient</item>
+      <item>dont_quit</item>
+      <item>dont_report</item>
+      <item>dt</item>
+      <item>end_time</item>
+      <item>i</item>
+      <item>infinite</item>
+      <item>in_outer_initial</item>
+      <item>in_static</item>
+      <item>in_static_first</item>
+      <item>in_static_last</item>
+      <item>in_transient</item>
+      <item>in_transient_first</item>
+      <item>in_transient_last</item>
+      <item>j</item>
+      <item>max_dt</item>
+      <item>min_dt</item>
+      <item>ncores</item>
+      <item>on_gsl_error</item>
+      <item>on_ida_error</item>
+      <item>on_nan</item>
+      <item>pi</item>
+      <item>pid</item>
+      <item>quit</item>
+      <item>realtime_scale</item>
+      <item>rel_error</item>
+      <item>report</item>
+      <item>static_steps</item>
+      <item>step_outer</item>
+      <item>step_static</item>
+      <item>step_transient</item>
+      <item>t</item>
+      <item>zero</item>
+    </list>
+    <list name="functions">
+      <item>abs</item>
+      <item>acos</item>
+      <item>asin</item>
+      <item>atan</item>
+      <item>atan2</item>
+      <item>ceil</item>
+      <item>clock</item>
+      <item>cos</item>
+      <item>cosh</item>
+      <item>d_dt</item>
+      <item>deadband</item>
+      <item>equal</item>
+      <item>exp</item>
+      <item>expint1</item>
+      <item>expint2</item>
+      <item>expint3</item>
+      <item>expintn</item>
+      <item>floor</item>
+      <item>heaviside</item>
+      <item>if</item>
+      <item>integral_dt</item>
+      <item>integral_euler_dt</item>
+      <item>is_even</item>
+      <item>is_in_interval</item>
+      <item>is_odd</item>
+      <item>j0</item>
+      <item>lag</item>
+      <item>lag_bilinear</item>
+      <item>lag_euler</item>
+      <item>last</item>
+      <item>limit</item>
+      <item>limit_dt</item>
+      <item>log</item>
+      <item>mark_max</item>
+      <item>mark_min</item>
+      <item>max</item>
+      <item>min</item>
+      <item>mod</item>
+      <item>not</item>
+      <item>random</item>
+      <item>random_gauss</item>
+      <item>round</item>
+      <item>sawtooth_wave</item>
+      <item>sgn</item>
+      <item>sin</item>
+      <item>sinh</item>
+      <item>sqrt</item>
+      <item>square_wave</item>
+      <item>tan</item>
+      <item>tanh</item>
+      <item>threshold_max</item>
+      <item>threshold_min</item>
+      <item>triangular_wave</item>
+    </list>
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
+
+<!-- do not detect strings (for now) -->
+<!--         <DetectChar attribute="String" context="String" char="&quot;"/> -->
+<!--         <DetectChar attribute="Normal Text" context="#stay"  char="&quot;"/> -->
+
+        <keyword attribute="Keyword1" context="#stay" String="prim_keywords"/>
+        <keyword attribute="Keyword2" context="#stay" String="sec_keywords"/>
+        <keyword attribute="Identifier" context="#stay" String="internals"/>
+        <keyword attribute="Function" context="#stay" String="functions"/>
+
+        <DetectChar char="{" attribute="Operator" context="#stay" beginRegion="block" />
+        <DetectChar char="}" attribute="Operator" context="#stay" endRegion="block" />
+
+        <DetectChar char="=" attribute="Operator" context="#stay" />
+        <DetectChar char="!" attribute="Operator" context="#stay" />
+        <DetectChar char="+" attribute="Operator" context="#stay" />
+        <DetectChar char="-" attribute="Operator" context="#stay" />
+        <DetectChar char="/" attribute="Operator" context="#stay" />
+        <DetectChar char="*" attribute="Operator" context="#stay" />
+        <DetectChar char="^" attribute="Operator" context="#stay" />
+<!--        <DetectChar char="<" attribute="Operator" context="#stay" />-->
+<!--        <DetectChar char=">" attribute="Operator" context="#stay" />-->
+        <DetectChar char="^" attribute="Operator" context="#stay" />
+        <DetectChar char="(" attribute="Operator" context="#stay" />
+        <DetectChar char=")" attribute="Operator" context="#stay" />
+
+        <Float attribute="Types" context="#stay"/>
+        <Int attribute="Types" context="#stay"/>
+        <Detect2Chars char="\" char1="#" attribute="Normal Text" context="#stay" />
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+      </context>
+    
+      <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
+
+      <context name="String" attribute="String" lineEndContext="#stay">
+        <DetectChar char="&quot;" attribute="String" context="#pop"/>
+      </context>
+
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword1" defStyleNum="dsKeyword"/>
+      <itemData name="Keyword2" defStyleNum="dsKeyword" color="#003300"/>
+      <itemData name="Operator" defStyleNum="dsOperator" color="#666666"/>
+      <itemData name="Identifier" defStyleNum="dsOthers" color="#663333" italic="1"/>
+      <itemData name="Function" defStyleNum="dsFunction" color="#006600" bold="1"/>
+      <itemData name="Types" defStyleNum="dsDataType" color="#3333CC"/>
+      <itemData name="String" defStyleNum="dsString" color="#666699"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+    </itemDatas>
+  </highlighting>
+
+  <general>
+    <comments>
+      <comment name="singleLine" start="#" />
+    </comments>
+    <keywords casesensitive="1" />
+  </general>
+</language>

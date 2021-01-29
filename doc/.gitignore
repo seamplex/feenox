@@ -3,3 +3,6 @@ Makefile
 Makefile.in
 texinfo.tex
 *.pdf
+example10.1
+gmsh.1
+pandoc.1.md
