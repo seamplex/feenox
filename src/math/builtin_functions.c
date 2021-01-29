@@ -24,12 +24,12 @@ extern feenox_t feenox;
 
 #include <stdlib.h>
 #include <limits.h>
-#ifdef __MACH__
+#ifdef HAVE_CLOCK_GETTIME
+ #include <time.h>
+#else
  #include <mach/clock.h>
  #include <mach/mach.h>
 #endif
-#include <time.h>
-
 
 double feenox_builtin_abs(struct expr_item_t *);
 double feenox_builtin_asin(struct expr_item_t *);
@@ -144,26 +144,26 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
 
 ///fn+clock+name clock
 ///fn+clock+usage clock([f])
-///fn+clock+desc Returns the value of a certain clock in seconds measured from a certain (but specific)
-///fn+clock+desc milestone. The kind of clock and the initial milestone depends on the
-///fn+clock+desc optional flag $f$. It defaults to zero, meaning wall time since the UNIX Epoch.
-///fn+clock+desc The list and the meanings of the other available values for $f$ can be checked
+///fn+clock+desc Returns the value of a certain clock in seconds measured from a certain (but specific) milestone.
+///fn+clock+desc The kind of clock and the initial milestone depend on the optional integer argument\ $f$.
+///fn+clock+desc It defaults to one, meaning `CLOCK_MONOTONIC`.
+///fn+clock+desc The list and the meanings of the other available values for\ $f$ can be checked
 ///fn+clock+desc in the `clock_gettime (2)` system call manual page.
 ///fn+clock+example clock.was
-double feenox_builtin_clock(expr_item_t *expr) {
+double feenox_builtin_clock(expr_item_t *f) {
 
   struct timespec tp;
 
-#if defined (__MACH__)
-  // OS X does not have clock_gettime, use clock_get_time
-  clock_id_t clk_id;
+#ifdef HAVE_CLOCK_GETTIME
+  clockid_t clk_id = (f->arg[0].items != NULL) ? (int)feenox_expression_eval(&f->arg[0]) : CLOCK_MONOTONIC;
 
-  if (expr->arg[0].items != NULL) {
-    clk_id = (int)feenox_expression_eval(&expr->arg[0]);
-  } else {
-    clk_id = SYSTEM_CLOCK; // Same meaning than monotonic in linux
+  if (clock_gettime(clk_id, &tp) < 0) {
+    feenox_runtime_error();
   }
-
+#else
+  // OS X does not have clock_gettime, use clock_get_time
+  clockid_t clk_id = (f->arg[0].items != NULL) ? (int)feenox_expression_eval(&f->arg[0]) : SYSTEM_CLOCK;
+  
   clock_serv_t cclock;
   mach_timespec_t mts;
   host_get_clock_service(mach_host_self(), clk_id, &cclock);
@@ -172,22 +172,10 @@ double feenox_builtin_clock(expr_item_t *expr) {
   tp.tv_sec = mts.tv_sec;
   tp.tv_nsec = mts.tv_nsec;
 
-  return (float)tp.tv_sec + ((float)tp.tv_nsec * 1E-9);
-#else
-  clockid_t clk_id;
+#endif //  HAVE_CLOCK_GETTIME
+  
+  return (double)tp.tv_sec + ((double)tp.tv_nsec * 1e-9);
 
-  if (expr->arg[0].items != NULL) {
-    clk_id = (int)feenox_expression_eval(&expr->arg[0]);
-  } else {
-    clk_id = CLOCK_MONOTONIC;
-  }
-
-  if (clock_gettime(clk_id, &tp) < 0) {
-    feenox_runtime_error();
-  }
-
-  return (float)tp.tv_sec + ((float)tp.tv_nsec * 1E-9);
-#endif
 }
 
 ///fn+last+name last
@@ -198,48 +186,48 @@ double feenox_builtin_clock(expr_item_t *expr) {
 ///fn+last+desc For $t=0$ the function returns the actual value of $x$.
 ///fn+last+desc The optional flag $p$ should be set to one if the reference to `last`
 ///fn+last+desc is done in an assignment over a variable that already appears inside
-///fn+last+desc expression $x$. See example number 2.
+///fn+last+desc expression $x$ such as `x = last(x)`. See example number 2.
 ///fn+last+example last1.was last2.was
-double feenox_builtin_last(expr_item_t *expr) {
+double feenox_builtin_last(expr_item_t *f) {
 
   double y;
-  double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  double x = feenox_expression_eval(&f->arg[0]);
+  double p = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(3*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(3*sizeof(double));
+    f->aux[0] = x;
+    f->aux[1] = x;
+    f->aux[2] = 0;
   } else {
     
     if ((int)feenox_special_var_value(in_static)) {
-      if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_static))) {
-        expr->aux[0] = expr->aux[1];
-        expr->aux[1] = x[0];
-        expr->aux[2] = (int)(feenox_special_var_value(step_static));
+      if ((int)round(f->aux[2]) != (int)(feenox_special_var_value(step_static))) {
+        f->aux[0] = f->aux[1];
+        f->aux[1] = x;
+        f->aux[2] = (int)(feenox_special_var_value(step_static));
       }
       
     } else {
-      if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
-        expr->aux[0] = expr->aux[1];
-        expr->aux[1] = x[0];
-        expr->aux[2] = (int)(feenox_special_var_value(step_transient));
+      if ((int)round(f->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
+        f->aux[0] = f->aux[1];
+        f->aux[1] = x;
+        f->aux[2] = (int)(feenox_special_var_value(step_transient));
       }
     }
   }
 
-  // esto es un maneje para poder hacer x = last(x), TODO: buscar una solucion mas elegante
-  if (x[1] == 0) {
-    y = expr->aux[0];
+  // this is to be able to do x = last(x)
+  // TODO: see if there's a better way
+  if (p == 0) {
+    y = f->aux[0];
   } else {
-    y = x[0];
+    y = x;
   }
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -247,45 +235,47 @@ double feenox_builtin_last(expr_item_t *expr) {
 ///fn+d_dt+name d_dt
 ///fn+d_dt+usage d_dt(x)
 ///fn+d_dt+math \frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)
-///fn+d_dt+desc Computes the time derivative of the signal $x$ using the difference between the
-///fn+d_dt+desc value of the signal in the previous time step and the actual value divided by the
-///fn+d_dt+desc time step. For $t=0$, the return value is zero.
-///fn+d_dt+desc Unlike the functional `derivative`, this function works with expressions and not
-///fn+d_dt+desc with functions. Therefore the argument $x$ may be for example an expression
-///fn+d_dt+desc involving a variable that may be read from a shared-memory object, whose
-///fn+d_dt+desc time derivative cannot be computed with `derivative`.
+///fn+d_dt+desc Computes the time derivative of the expression given in the argument\ $x$
+///fn+d_dt+desc during a transient problem
+///fn+d_dt+desc using the difference between the value of the signal in the previous time step
+///fn+d_dt+desc and the actual value divided by the time step\ $\delta t$ stored in `dt`.
+///fn+d_dt+desc The argument\ $x$ does not neet to be a variable, it can be an expression
+///fn+d_dt+desc involving one or more variables that change in time.
+///fn+d_dt+desc For $t=0$, the return value is zero.
+///fn+d_dt+desc Unlike the functional `derivative`, the full dependence of these variables with time
+///fn+d_dt+desc does not need to be known beforehand, i.e. the expression `x` might involve variables
+///fn+d_dt+desc read from a shared-memory object at each time step.
 ///fn+d_dt+example d_dt.was
-double feenox_builtin_d_dt(expr_item_t *expr) {
+double feenox_builtin_d_dt(expr_item_t *f) {
 
   double y;
-  double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  double x = feenox_expression_eval(&f->arg[0]);
 
   if (feenox_special_var_value(dt) == 0) {
     feenox_nan_error();
     return 0;
   }
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(3*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(3*sizeof(double));
+    f->aux[0] = x;
+    f->aux[1] = x;
+    f->aux[2] = 0;
   } else if ((int)(feenox_special_var_value(in_static))) {
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0];
-    expr->aux[2] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = x;
+    f->aux[1] = x;
+    f->aux[2] = 0;
+  } else if ((int)round(f->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] = f->aux[1];
+    f->aux[1] = x;
+    f->aux[2] = (int)(feenox_special_var_value(step_transient));
   }
 
-  y = (x[0] - expr->aux[0])/feenox_special_var_value(dt);
+  y = (x - f->aux[0])/feenox_special_var_value(dt);
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -293,43 +283,43 @@ double feenox_builtin_d_dt(expr_item_t *expr) {
 ///fn+integral_dt+name integral_dt
 ///fn+integral_dt+usage integral_dt(x)
 ///fn+integral_dt+math z^{-1}\left[ \int_0^t x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'
-///fn+integral_dt+desc Computes the time integral of the signal $x$ using the trapezoidal rule
+///fn+integral_dt+desc Computes the time integral of the expression given in the argument\ $x$
+///fn+integral_dt+desc during a transient problem
+///fn+integral_dt+desc with the trapezoidal rule
 ///fn+integral_dt+desc using the value of the signal in the previous time step and the current value.
 ///fn+integral_dt+desc At $t = 0$ the integral is initialized to zero.
-///fn+integral_dt+desc Unlike the functional `integral`, this function works with expressions and not
-///fn+integral_dt+desc with functions. Therefore the argument $x$ may be for example an expression
-///fn+integral_dt+desc involving a variable that may be read from a shared-memory object, whose
-///fn+integral_dt+desc time integral cannot be computed with `integral`.
+///fn+integral_dt+desc Unlike the functional `integral`, the full dependence of these variables with time
+///fn+integral_dt+desc does not need to be known beforehand, i.e. the expression `x` might involve variables
+///fn+integral_dt+desc read from a shared-memory object at each time step.
 ///fn+integral_dt+example integral_dt.was
-double feenox_builtin_integral_dt(expr_item_t *expr) {
+double feenox_builtin_integral_dt(expr_item_t *f) {
 
   double y;
-  double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  double x = feenox_expression_eval(&f->arg[0]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(4*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
-    expr->aux[3] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(4*sizeof(double));
+    f->aux[0] = x;
+    f->aux[1] = x;
+    f->aux[2] = 0;
+    f->aux[3] = 0;
   } else if ((int)(feenox_special_var_value(in_static))) {
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
-    expr->aux[3] = 0;
-  } else if ((int)round(expr->aux[3]) != (int)(feenox_special_var_value(step_transient))) {
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0];
-    expr->aux[2] += 0.5*(expr->aux[0]+x[0])*feenox_special_var_value(dt);
-    expr->aux[3] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = x;
+    f->aux[1] = x;
+    f->aux[2] = 0;
+    f->aux[3] = 0;
+  } else if ((int)round(f->aux[3]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] = f->aux[1];
+    f->aux[1] = x;
+    f->aux[2] += 0.5*(f->aux[0]+x)*feenox_special_var_value(dt);
+    f->aux[3] = (int)(feenox_special_var_value(step_transient));
   }
 
-  y = expr->aux[2];
+  y = f->aux[2];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -337,33 +327,33 @@ double feenox_builtin_integral_dt(expr_item_t *expr) {
 ///fn+integral_euler_dt+name integral_euler_dt
 ///fn+integral_euler_dt+math z^{-1}\left[ \int_0^t x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'
 ///fn+integral_euler_dt+usage integral_euler_dt(x)
-///fn+integral_euler_dt+desc Idem as `integral_dt` but uses the backward Euler rule to update the
-///fn+integral_euler_dt+desc integral value.
+///fn+integral_euler_dt+desc Idem as `integral_dt` but uses the backward Euler rule to update the instantaenous integral value.
 ///fn+integral_euler_dt+desc This function is provided in case this particular way
-///fn+integral_euler_dt+desc of approximating time integrals is needed.
-double feenox_builtin_integral_euler_dt(expr_item_t *expr) {
+///fn+integral_euler_dt+desc of approximating time integrals is needed,
+///fn+integral_euler_dt+desc for instance to compare FeenoX solutions with other computer codes.
+///fn+integral_euler_dt+desc In general, it is recommended to use `integral_dt`.
+double feenox_builtin_integral_euler_dt(expr_item_t *f) {
 
   double y;
-  double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  double x = feenox_expression_eval(&f->arg[0]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(2*sizeof(double));
-    expr->aux[0] = 0;
-    expr->aux[1] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(2*sizeof(double));
+    f->aux[0] = 0;
+    f->aux[1] = 0;
   } else if ((int)(feenox_special_var_value(in_static))) {
-    expr->aux[0] = 0;
-    expr->aux[1] = 0;
-  } else if ((int)round(expr->aux[1]) != (int)(feenox_special_var_value(step_transient))) {
-    expr->aux[0] += x[0]*feenox_special_var_value(dt);
-    expr->aux[1] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = 0;
+    f->aux[1] = 0;
+  } else if ((int)round(f->aux[1]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] += x*feenox_special_var_value(dt);
+    f->aux[1] = (int)(feenox_special_var_value(step_transient));
   }
 
-  y = expr->aux[0];
+  y = f->aux[0];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -378,15 +368,9 @@ double feenox_builtin_integral_euler_dt(expr_item_t *expr) {
 ///fn+square_wave+math \begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}
 ///fn+square_wave+plotx 0 2.75 1e-2
 ///fn+square_wave+example square_wave.was
-double feenox_builtin_square_wave(expr_item_t *expr) {
-
-  double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-
-  if ((x[0] - floor(x[0])) < 0.5) {
-    return 1;
-  }
-  return 0;
+double feenox_builtin_square_wave(expr_item_t *f) {
+  double x = feenox_expression_eval(&f->arg[0]);
+  return ((x - floor(x)) < 0.5);
 }
 
 ///fn+triangular_wave+name triangular_wave
@@ -397,10 +381,10 @@ double feenox_builtin_square_wave(expr_item_t *expr) {
 ///fn+triangular_wave+desc a linear function of time such as $\omega t+\phi$, where $\omega $ controls the frequency of the wave
 ///fn+triangular_wave+desc and $\phi$ controls its phase.
 ///fn+triangular_wave+plotx 0 2.75 0.1
-double feenox_builtin_triangular_wave(expr_item_t *expr) {
+double feenox_builtin_triangular_wave(expr_item_t *f) {
 
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   if ((x[0] - floor(x[0])) < 0.5) {
     return 2*(x[0] - floor(x[0]));
@@ -418,10 +402,10 @@ double feenox_builtin_triangular_wave(expr_item_t *expr) {
 ///fn+sawtooth_wave+desc and $\phi$ controls its phase.
 ///fn+sawtooth_wave+plotx 0 2.75 1e-2
 ///fn+sawtooth_wave+example sawtooth_wave.was
-double feenox_builtin_sawtooth_wave(expr_item_t *expr) {
+double feenox_builtin_sawtooth_wave(expr_item_t *f) {
 
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return x[0] - floor(x[0]);
 }
@@ -434,8 +418,8 @@ double feenox_builtin_sawtooth_wave(expr_item_t *expr) {
 ///fn+sin+desc a linear function of time such as $\omega t+\phi$, where $\omega$ controls the frequency of the wave
 ///fn+sin+desc and $\phi$ controls its phase.
 ///fn+sin+plotx -2*pi 2*pi pi/100
-double feenox_builtin_sin(expr_item_t *expr) {
-  return sin(feenox_expression_eval(&expr->arg[0]));
+double feenox_builtin_sin(expr_item_t *f) {
+  return sin(feenox_expression_eval(&f->arg[0]));
 }
 
 ///fn+asin+name asin
@@ -444,9 +428,9 @@ double feenox_builtin_sin(expr_item_t *expr) {
 ///fn+asin+desc Computes arc in radians whose sine is equal to the argument $x$.
 ///fn+asin+desc A NaN error is raised if $|x|>1$.
 ///fn+asin+plotx -1 1 1/100 -1 1 0.5 -1 1 1
-double feenox_builtin_asin(expr_item_t *expr) {
+double feenox_builtin_asin(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   if (fabs(x[0]) > 1.0) {
     feenox_push_error_message("argument greater than one to function asin");
@@ -464,9 +448,9 @@ double feenox_builtin_asin(expr_item_t *expr) {
 ///fn+acos+desc Computes arc in radians whose cosine is equal to the argument $x$.
 ///fn+acos+desc A NaN error is raised if $|x|>1$.
 ///fn+acos+plotx -1 1 1/100 -1 1 0.5 0 2.8 1
-double feenox_builtin_acos(expr_item_t *expr) {
+double feenox_builtin_acos(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   if (fabs(x[0]) > 1.0) {
     feenox_push_error_message("argument greater than one to function acos");
@@ -482,9 +466,9 @@ double feenox_builtin_acos(expr_item_t *expr) {
 ///fn+j0+math J_0(x)
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument $x$.
 ///fn+j0+plotx 0 10 0.05
-double feenox_builtin_j0(expr_item_t *expr) {
+double feenox_builtin_j0(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return gsl_sf_bessel_J0(x[0]);
 }
@@ -497,9 +481,9 @@ double feenox_builtin_j0(expr_item_t *expr) {
 ///fn+cos+desc a linear function of time such as $\omega t+\phi$, where $\omega$ controls the frequency of the wave
 ///fn+cos+desc and $\phi$ controls its phase.
 ///fn+cos+plotx -2*pi 2*pi pi/100
-double feenox_builtin_cos(expr_item_t *expr) {
+double feenox_builtin_cos(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return cos(x[0]);
 }
@@ -509,9 +493,9 @@ double feenox_builtin_cos(expr_item_t *expr) {
 ///fn+tan+math  \tan(x)
 ///fn+tan+desc Computes the tangent of the argument $x$, where $x$ is in radians.
 ///fn+tan+plotx -pi/3 pi/3 pi/100
-double feenox_builtin_tan(expr_item_t *expr) {
+double feenox_builtin_tan(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return tan(x[0]);
 }
@@ -521,9 +505,9 @@ double feenox_builtin_tan(expr_item_t *expr) {
 ///fn+sinh+math \sinh(x)
 ///fn+sinh+desc Computes the hyperbolic sine of the argument $x$, where $x$ is in radians.
 ///fn+sinh+plotx -pi/2 pi/2 pi/100
-double feenox_builtin_sinh(expr_item_t *expr) {
+double feenox_builtin_sinh(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return sinh(x[0]);
 }
@@ -533,9 +517,9 @@ double feenox_builtin_sinh(expr_item_t *expr) {
 ///fn+cosh+math \cosh(x)
 ///fn+cosh+desc Computes the hyperbolic cosine of the argument $x$, where $x$ is in radians.
 ///fn+cosh+plotx -2*pi 2*pi pi/100
-double feenox_builtin_cosh(expr_item_t *expr) {
+double feenox_builtin_cosh(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return cosh(x[0]);
 }
@@ -545,9 +529,9 @@ double feenox_builtin_cosh(expr_item_t *expr) {
 ///fn+tanh+math \tanh(x)
 ///fn+tanh+desc Computes the hyperbolic tangent of the argument $x$, where $x$ is in radians.
 ///fn+tanh+plotx -pi/2 pi/2 pi/100
-double feenox_builtin_tanh(expr_item_t *expr) {
+double feenox_builtin_tanh(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return tanh(x[0]);
 }
@@ -559,9 +543,9 @@ double feenox_builtin_tanh(expr_item_t *expr) {
 ///fn+atan+desc Computes, in radians, the arc tangent of the argument $x$.
 ///fn+atan+plotx -pi pi pi/100
 ///fn+atan2+example atan.was
-double feenox_builtin_atan(expr_item_t *expr) {
+double feenox_builtin_atan(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return atan(x[0]);
 }
@@ -572,10 +556,10 @@ double feenox_builtin_atan(expr_item_t *expr) {
 ///fn+atan2+desc Computes, in radians, the arc tangent of quotient $y/x$, using the signs of the two arguments
 ///fn+atan2+desc to determine the quadrant of the result, which is in the range $[-\pi,\pi]$.
 ///fn+atan2+example atan2.was
-double feenox_builtin_atan2(expr_item_t *expr) {
+double feenox_builtin_atan2(expr_item_t *f) {
   double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
   return atan2(x[0], x[1]);
 }
@@ -587,9 +571,9 @@ double feenox_builtin_atan2(expr_item_t *expr) {
 ///fn+exp+math e^x
 ///fn+exp+plotx -1 2.75 1e-2
 ///fn+exp+example exp.was
-double feenox_builtin_exp(expr_item_t *expr) {
+double feenox_builtin_exp(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return (x[0] < GSL_LOG_DBL_MIN)?0:gsl_sf_exp(x[0]);
 }
@@ -601,9 +585,9 @@ double feenox_builtin_exp(expr_item_t *expr) {
 ///fn+expint1+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]
 ///fn+expint1+plotx 1e-2 2.0 1e-2
 ///fn+expint1+example expint1.was
-double feenox_builtin_expint1(expr_item_t *expr) {
+double feenox_builtin_expint1(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   if (x[0] == 0) {
     feenox_nan_error();
@@ -619,9 +603,9 @@ double feenox_builtin_expint1(expr_item_t *expr) {
 ///fn+expint2+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]
 ///fn+expint2+plotx 0.0 2.0 1e-2
 ///fn+expint2+example expint2.was
-double feenox_builtin_expint2(expr_item_t *expr) {
+double feenox_builtin_expint2(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return gsl_sf_expint_E2(x[0]);
 }
@@ -631,9 +615,9 @@ double feenox_builtin_expint2(expr_item_t *expr) {
 ///fn+expint3+usage expint3(x)
 ///fn+expint3+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]
 ///fn+expint3+plotx 0.0 2.0 1e-2
-double feenox_builtin_expint3(expr_item_t *expr) {
+double feenox_builtin_expint3(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return gsl_sf_expint_En(3, x[0]);
 }
@@ -644,11 +628,11 @@ double feenox_builtin_expint3(expr_item_t *expr) {
 ///fn+expintn+usage expintn(n,x)
 ///fn+expintn+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]
 ///fn+expintn+example expintn.was
-double feenox_builtin_expintn(expr_item_t *expr) {
+double feenox_builtin_expintn(expr_item_t *f) {
   double x[1];
   int n;
-  n = ((int)(round(feenox_expression_eval(&expr->arg[0]))));
-  x[0] = feenox_expression_eval(&expr->arg[1]);
+  n = ((int)(round(feenox_expression_eval(&f->arg[0]))));
+  x[0] = feenox_expression_eval(&f->arg[1]);
 
   if ((n == 1 || n == 0) && x[0] == 0) {
     feenox_nan_error();
@@ -665,9 +649,9 @@ double feenox_builtin_expintn(expr_item_t *expr) {
 ///fn+log+math \ln(x)
 ///fn+log+plotx 1e-2 2.75 1e-2
 ///fn+log+example log.was
-double feenox_builtin_log(expr_item_t *expr) {
+double feenox_builtin_log(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   if (x[0] <= 0) {
     feenox_nan_error();
@@ -684,8 +668,8 @@ double feenox_builtin_log(expr_item_t *expr) {
 ///fn+abs+math y = |x|
 ///fn+abs+plotx -2.5 2.5 1e-2   -2 2 1   0 2 1
 ///fn+abs+example abs.was
-double feenox_builtin_abs(expr_item_t *expr) {
-  return fabs(feenox_expression_eval(&expr->arg[0]));
+double feenox_builtin_abs(expr_item_t *f) {
+  return fabs(feenox_expression_eval(&f->arg[0]));
 }
 
 
@@ -695,9 +679,9 @@ double feenox_builtin_abs(expr_item_t *expr) {
 ///fn+sqrt+usage sqrt(x)
 ///fn+sqrt+math \sqrt{x}
 ///fn+sqrt+plotx 0 2.75 1e-2
-double feenox_builtin_sqrt(expr_item_t *expr) {
+double feenox_builtin_sqrt(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   if (x[0] < 0) {
     feenox_nan_error();
@@ -711,32 +695,32 @@ double feenox_builtin_sqrt(expr_item_t *expr) {
 ///fn+is_even+desc Returns one if the argument $x$ rounded to the nearest integer is even.
 ///fn+is_even+usage y = is_even(x)
 ///fn+is_even+math  y = \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$} is odd} \end{cases}
-double feenox_builtin_is_even(expr_item_t *expr) {
-  return GSL_IS_EVEN((int)(round(feenox_expression_eval(&expr->arg[0]))));
+double feenox_builtin_is_even(expr_item_t *f) {
+  return GSL_IS_EVEN((int)(round(feenox_expression_eval(&f->arg[0]))));
 }
 
 ///fn+is_odd+name is_odd
 ///fn+is_odd+desc Returns one if the argument $x$ rounded to the nearest integer is odd.
 ///fn+is_odd+usage y = is_odd(x)
 ///fn+is_odd+math  y = \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$} is even} \end{cases}
-double feenox_builtin_is_odd(expr_item_t *expr) {
-  return GSL_IS_ODD((int)(round(feenox_expression_eval(&expr->arg[0]))));
+double feenox_builtin_is_odd(expr_item_t *f) {
+  return GSL_IS_ODD((int)(round(feenox_expression_eval(&f->arg[0]))));
 }
 
 
 ///fn+heaviside+name heaviside
 ///fn+heaviside+desc Computes the zero-centered Heaviside step function of the argument $x$.
-///fn+heaviside+desc If the optional second argument $\epsilon$ is provided, the discontinuous
-///fn+heaviside+desc step at $x=0$ is replaced by a ramp starting at $x=0$ and finishing at $x=\epsilon$.
-///fn+heaviside+usage heaviside(x, [eps])
-///fn+heaviside+math \begin{cases} 0 & \text{if $x < 0$} \\ x / \epsilon & \text{if $0 < x < \epsilon$} \\ 1 & \text{if $x > \epsilon$} \end{cases}
+///fn+heaviside+desc If the optional second argument $\delta$ is provided, the discontinuous
+///fn+heaviside+desc step at $x=0$ is replaced by a ramp starting at $x=0$ and finishing at $x=\delta$.
+///fn+heaviside+usage heaviside(x, [delta])
+///fn+heaviside+math \begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}
 ///fn+heaviside+plotx -2.75 2.75 1e-2
 ///fn+heaviside+example heaviside.was
-double feenox_builtin_heaviside(expr_item_t *expr) {
+double feenox_builtin_heaviside(expr_item_t *f) {
   double x[2];
 
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
   if (x[0] <= 0) {
     return 0;
@@ -751,18 +735,18 @@ double feenox_builtin_heaviside(expr_item_t *expr) {
 ///fn+sgn+name sgn
 ///fn+sgn+desc Returns minus one, zero or plus one depending on the sign of the first argument $x$.
 ///fn+sgn+desc The second optional argument $\epsilon$ gives the precision of the "zero"
-///fn+sgn+desc evaluation. If not given, default is $\epsilon = 10^{-16}$.
+///fn+sgn+desc evaluation. If not given, default is $\epsilon = 10^{-9}$.
 ///fn+sgn+usage sgn(x, [eps])
 ///fn+sgn+math  \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}
 ///fn+sgn+plotx -2.75 2.75 1e-2
-double feenox_builtin_sgn(expr_item_t *expr) {
+double feenox_builtin_sgn(expr_item_t *f) {
   double x[2];
-  double eps = 1e-16;
+  double eps = 1e-9;
 
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->arg[1].items != NULL) {
+  if (f->arg[1].items != NULL) {
     eps = x[1];
   }
   if (fabs(x[0]) < eps) {
@@ -776,17 +760,17 @@ double feenox_builtin_sgn(expr_item_t *expr) {
 ///fn+not+name not
 ///fn+not+desc Returns one if the first argument $x$ is zero and zero otherwise.
 ///fn+not+desc The second optional argument $\epsilon$ gives the precision of the "zero"
-///fn+not+desc evaluation. If not given, default is $\epsilon = 10^{-16}$.
+///fn+not+desc evaluation. If not given, default is $\epsilon = 10^{-9}$.
 ///fn+not+usage not(x, [eps])
 ///fn+not+math  \begin{cases}0 &\text{if $|x| < \epsilon$} \\ 1 &\text{otherwise} \end{cases}
-double feenox_builtin_not(expr_item_t *expr) {
+double feenox_builtin_not(expr_item_t *f) {
   double x[2];
-  double eps = 1e-16;
+  double eps = 1e-9;
 
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->arg[1].items != NULL) {
+  if (f->arg[1].items != NULL) {
     eps = x[1];
   }
   if (fabs(x[0]) < eps) {
@@ -801,17 +785,17 @@ double feenox_builtin_not(expr_item_t *expr) {
 ///fn+mod+desc second $b$. Both arguments may be non-integral.
 ///fn+mod+usage mod(a, b)
 ///fn+mod+math \displaystyle y = a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b
-double feenox_builtin_mod(expr_item_t *expr) {
+double feenox_builtin_mod(expr_item_t *f) {
   double x[2];
 
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
   if (x[1] == 0) {
     return 0;
-  } else {
-    return x[0] - floor(x[0]/x[1])*x[1];
   }
+  
+  return x[0] - floor(x[0]/x[1])*x[1];
 }
 
 
@@ -820,9 +804,9 @@ double feenox_builtin_mod(expr_item_t *expr) {
 ///fn+floor+usage floor(x)
 ///fn+floor+math \lfloor x \rfloor
 ///fn+floor+plotx -2.75 2.75 1e-2
-double feenox_builtin_floor(expr_item_t *expr) {
+double feenox_builtin_floor(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return floor(x[0]);
 }
@@ -833,9 +817,9 @@ double feenox_builtin_floor(expr_item_t *expr) {
 ///fn+ceil+usage ceil(x)
 ///fn+ceil+math \lceil x \rceil
 ///fn+ceil+plotx -2.75 2.75 1e-2
-double feenox_builtin_ceil(expr_item_t *expr) {
+double feenox_builtin_ceil(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return ceil(x[0]);
 }
@@ -846,9 +830,9 @@ double feenox_builtin_ceil(expr_item_t *expr) {
 ///fn+round+usage round(x)
 ///fn+round+math \begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}
 ///fn+round+plotx -2.75 2.75 1e-2
-double feenox_builtin_round(expr_item_t *expr) {
+double feenox_builtin_round(expr_item_t *f) {
   double x[1];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
   return round(x[0]);
 }
@@ -859,10 +843,10 @@ double feenox_builtin_round(expr_item_t *expr) {
 ///fn+deadband+desc given by the second argument $a$.
 ///fn+deadband+usage deadband(x, a)
 ///fn+deadband+math \begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}
-double feenox_builtin_deadband(expr_item_t *expr) {
+double feenox_builtin_deadband(expr_item_t *f) {
   double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
   return (fabs(x[0])<x[1])?0:(x[0]+((x[0]>0)?(-1):1)*x[1]);
 }
@@ -878,50 +862,50 @@ double feenox_builtin_deadband(expr_item_t *expr) {
 ///fn+lag+desc at $t = \Delta t$ with the initial condition $y(0) = y(t-\Delta t)$.
 ///fn+lag+usage lag(x, tau)
 ///fn+lag+math x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)
-double feenox_builtin_lag(expr_item_t *expr) {
+double feenox_builtin_lag(expr_item_t *f) {
 
   double y;
   double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->aux == NULL) {
+  if (f->aux == NULL) {
     // si es la primera vez que se llama a este lag, allocamos
     // el apuntador interno e inicializamos al valor de entrada
-    expr->aux = malloc(3*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
+    f->aux = malloc(3*sizeof(double));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = 0;
   } else if ((int)(feenox_special_var_value(in_static)) || x[1] < ZERO) {
     // si no es la primera vez que se llama a este lag pero estamos
     // en el paso estatico o el tau es muy chiquito, pasa de largo
     // el valor del primer argumento
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = 0;
+  } else if ((int)round(f->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
     // si nos llamaron, nos aseguramos de que solamente hagamos el lag
     //   cuando corresponda para evitar problemas en cosas que se llaman
     //   iterativa o implicitamente
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0] - (x[0] - expr->aux[0])*exp(-feenox_special_var_value(dt)/x[1]);
-    expr->aux[2] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = f->aux[1];
+    f->aux[1] = x[0] - (x[0] - f->aux[0])*exp(-feenox_special_var_value(dt)/x[1]);
+    f->aux[2] = (int)(feenox_special_var_value(step_transient));
   }
 
   // si termino la corrida rompemos todo para que si tenemos que volver
   // a arrcancar, empiece todo como si nada
   if (feenox_special_var_value(done)) {
-    double dummy = expr->aux[1];
-    free(expr->aux);
-    expr->aux = NULL;
+    double dummy = f->aux[1];
+    free(f->aux);
+    f->aux = NULL;
     return dummy;
   }
 
-  y = expr->aux[1];
+  y = f->aux[1];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -935,39 +919,39 @@ double feenox_builtin_lag(expr_item_t *expr) {
 ///fn+lag_euler+desc to the time-dependent signal $x(t)$ by using the Euler forward rule.
 ///fn+lag_euler+usage lag_euler(x, tau)
 ///fn+lag_euler+math y(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}
-double feenox_builtin_lag_euler(expr_item_t *expr) {
+double feenox_builtin_lag_euler(expr_item_t *f) {
 
   double y;
   double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(5*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = x[0];
-    expr->aux[3] = x[0];
-    expr->aux[4] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(5*sizeof(double));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = x[0];
+    f->aux[3] = x[0];
+    f->aux[4] = 0;
   } else if ((int)(feenox_special_var_value(in_static))) {
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = x[0];
-    expr->aux[3] = x[0];
-    expr->aux[4] = 0;
-  } else if ((int)round(expr->aux[4]) != (int)(feenox_special_var_value(step_transient))) {
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0];
-    expr->aux[2] = expr->aux[3];
-    expr->aux[3] = expr->aux[2] + feenox_special_var_value(dt)/x[1]*(x[0]-expr->aux[2]);
-    expr->aux[4] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = x[0];
+    f->aux[3] = x[0];
+    f->aux[4] = 0;
+  } else if ((int)round(f->aux[4]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] = f->aux[1];
+    f->aux[1] = x[0];
+    f->aux[2] = f->aux[3];
+    f->aux[3] = f->aux[2] + feenox_special_var_value(dt)/x[1]*(x[0]-f->aux[2]);
+    f->aux[4] = (int)(feenox_special_var_value(step_transient));
   }
 
-  y = expr->aux[3];
+  y = f->aux[3];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -981,39 +965,39 @@ double feenox_builtin_lag_euler(expr_item_t *expr) {
 ///fn+lag_bilinear+desc to the time-dependent signal $x(t)$ by using the bilinear transformation formula.
 ///fn+lag_bilinear+usage lag_bilinear(x, tau)
 ///fn+lag_bilinear+math y = y(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}
-double feenox_builtin_lag_bilinear(expr_item_t *expr) {
+double feenox_builtin_lag_bilinear(expr_item_t *f) {
 
   double y;
   double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(5*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = x[0];
-    expr->aux[3] = x[0];
-    expr->aux[4] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(5*sizeof(double));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = x[0];
+    f->aux[3] = x[0];
+    f->aux[4] = 0;
   } else if ((int)(feenox_special_var_value(in_static))) {
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = x[0];
-    expr->aux[3] = x[0];
-    expr->aux[4] = 0;
-  } else if ((int)round(expr->aux[4]) != (int)(feenox_special_var_value(step_transient))) {
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0];
-    expr->aux[2] = expr->aux[3];
-    expr->aux[3] = (expr->aux[2] * (1 - 0.5*feenox_special_var_value(dt)/x[1]) + 0.5*feenox_special_var_value(dt)/x[1]*(x[0] + expr->aux[0]))/(1 + 0.5*feenox_special_var_value(dt)/x[1]);
-    expr->aux[4] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = x[0];
+    f->aux[3] = x[0];
+    f->aux[4] = 0;
+  } else if ((int)round(f->aux[4]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] = f->aux[1];
+    f->aux[1] = x[0];
+    f->aux[2] = f->aux[3];
+    f->aux[3] = (f->aux[2] * (1 - 0.5*feenox_special_var_value(dt)/x[1]) + 0.5*feenox_special_var_value(dt)/x[1]*(x[0] + f->aux[0]))/(1 + 0.5*feenox_special_var_value(dt)/x[1]);
+    f->aux[4] = (int)(feenox_special_var_value(step_transient));
   }
 
-  y = expr->aux[3];
+  y = f->aux[3];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -1025,29 +1009,29 @@ double feenox_builtin_lead(expr_factor_t *expr) {
 
   double y;
   double x[2];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(3*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(3*sizeof(double));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = 0;
   } else if ((int)(feenox_special_var_value(in_static)))) {
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient)))) {
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = (x[0] - expr->aux[0])/(0.5*feenox_special_var_value(dt))/x[1] + 1) - (0.5*feenox_special_var_value(dt))/x[1] - 1)/(0.5*feenox_special_var_value(dt))/x[1] + 1) * (expr->aux[0]);
-    expr->aux[2] = (int)(feenox_special_var_value(step_transient)));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = 0;
+  } else if ((int)round(f->aux[2]) != (int)(feenox_special_var_value(step_transient)))) {
+    f->aux[0] = f->aux[1];
+    f->aux[1] = (x[0] - f->aux[0])/(0.5*feenox_special_var_value(dt))/x[1] + 1) - (0.5*feenox_special_var_value(dt))/x[1] - 1)/(0.5*feenox_special_var_value(dt))/x[1] + 1) * (f->aux[0]);
+    f->aux[2] = (int)(feenox_special_var_value(step_transient)));
   }
 
-  y = expr->aux[1];
+  y = f->aux[1];
 
   if (feenox_special_var_value(done))) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -1057,7 +1041,7 @@ double feenox_builtin_lead(expr_factor_t *expr) {
 /*
 double feenox_builtin_lead_euler(algebraic_token_t *expr) {
   if (expr->nofirst_time) {
-    return (expr->arg_value[0] - expr->arg_last_value[0])/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) - (0.5*feenox_special_var_value(dt))/expr->arg_value[1] - 1)/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) * (expr->last_value);
+    return (f->arg_value[0] - f->arg_last_value[0])/(0.5*feenox_special_var_value(dt))/f->arg_value[1] + 1) - (0.5*feenox_special_var_value(dt))/f->arg_value[1] - 1)/(0.5*feenox_special_var_value(dt))/f->arg_value[1] + 1) * (expr->last_value);
   } else {
     expr->nofirst_time = 1;
     return 0;
@@ -1068,7 +1052,7 @@ double feenox_builtin_lead_euler(algebraic_token_t *expr) {
 // deriv_lag(x, tau) implementa la fucion de transferencia s.tau/(1+s.tau)
 double feenox_builtin_lead_bilinear(algebraic_token_t *expr) {
   if (expr->nofirst_time) {
-    return (expr->arg_value[0] - expr->arg_last_value[0])/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) - (0.5*feenox_special_var_value(dt))/expr->arg_value[1] - 1)/(0.5*feenox_special_var_value(dt))/expr->arg_value[1] + 1) * (expr->last_value);
+    return (f->arg_value[0] - f->arg_last_value[0])/(0.5*feenox_special_var_value(dt))/f->arg_value[1] + 1) - (0.5*feenox_special_var_value(dt))/f->arg_value[1] - 1)/(0.5*feenox_special_var_value(dt))/f->arg_value[1] + 1) * (expr->last_value);
   } else {
     expr->nofirst_time = 1;
     return 0;
@@ -1082,18 +1066,18 @@ double feenox_builtin_lead_bilinear(algebraic_token_t *expr) {
 ///fn+equal+desc the arguments are compared using GSL's `gsl_fcmp`, otherwise the
 ///fn+equal+desc absolute value of their difference is compared against $\epsilon$. This function
 ///fn+equal+desc returns \textsl{exactly} zero if the arguments are not equal and one otherwise.
-///fn+equal+desc Default value for $\epsilon = 10^{-16}$.
+///fn+equal+desc Default value for $\epsilon = 10^{-9}$.
 ///fn+equal+usage equal(a, b, [eps])
 ///fn+equal+math \begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}
-double feenox_builtin_equal(expr_item_t *expr) {
-  double eps = 1e-16;
+double feenox_builtin_equal(expr_item_t *f) {
+  double eps = 1e-9;
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
 
-  if (expr->arg[2].items != NULL) {
+  if (f->arg[2].items != NULL) {
     eps = x[2];
   }
 
@@ -1119,32 +1103,32 @@ double feenox_builtin_equal(expr_item_t *expr) {
 ///fn+random+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random+usage random(x1, x2, [s])
 ///fn+random+math  x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1
-double feenox_builtin_random(expr_item_t *expr) {
+double feenox_builtin_random(expr_item_t *f) {
 
   double y;
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
   // si es la primera llamada inicializamos el generador
-  if (expr->aux == NULL) {
-    expr->aux = (double *)gsl_rng_alloc(DEFAULT_RANDOM_METHOD);
+  if (f->aux == NULL) {
+    f->aux = (double *)gsl_rng_alloc(DEFAULT_RANDOM_METHOD);
     // si nos dieron tercer argumento, lo usamos como semilla, sino usamos time()
-    if (expr->arg[2].items == NULL) {
-      gsl_rng_set((gsl_rng *)expr->aux, (unsigned long int)(time(NULL)) + (unsigned long int)(&expr->aux));
+    if (f->arg[2].items == NULL) {
+      gsl_rng_set((gsl_rng *)f->aux, (unsigned long int)(time(NULL)) + (unsigned long int)(&f->aux));
     } else {
-      gsl_rng_set((gsl_rng *)expr->aux, (unsigned long int)(x[2]));
+      gsl_rng_set((gsl_rng *)f->aux, (unsigned long int)(x[2]));
     }
   }
 
 
   // TODO: memory leaks en fiteo, minimizacion, etc
-  y = x[0] + gsl_rng_uniform((const gsl_rng *)expr->aux)*(x[1]-x[0]);
+  y = x[0] + gsl_rng_uniform((const gsl_rng *)f->aux)*(x[1]-x[0]);
 
   if (feenox_special_var_value(done)) {
-    gsl_rng_free((gsl_rng *)expr->aux);
-    expr->aux = NULL;
+    gsl_rng_free((gsl_rng *)f->aux);
+    f->aux = NULL;
   }
 
   return y;
@@ -1164,26 +1148,26 @@ double feenox_builtin_random(expr_item_t *expr) {
 ///fn+random_gauss+desc This function uses a second-order multiple recursive generator described by
 ///fn+random_gauss+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random_gauss+usage random_gauss(x1, x2, [s])
-double feenox_builtin_random_gauss(expr_item_t *expr) {
+double feenox_builtin_random_gauss(expr_item_t *f) {
 
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
   // si es la primera llamada inicializamos el generador
-  if (expr->aux == NULL) {
-    expr->aux = (double *)gsl_rng_alloc(DEFAULT_RANDOM_METHOD);
+  if (f->aux == NULL) {
+    f->aux = (double *)gsl_rng_alloc(DEFAULT_RANDOM_METHOD);
     // si nos dieron tercer argumento, lo usamos como semilla, sino usamos time()
-    if (expr->arg[2].items == NULL) {
-      gsl_rng_set((const gsl_rng *)expr->aux, (unsigned long int)(time(NULL)) + (unsigned long int)(&expr->aux));
-//      gsl_rng_set((const gsl_rng *)expr->aux, (unsigned long int)(time(NULL)));
+    if (f->arg[2].items == NULL) {
+      gsl_rng_set((const gsl_rng *)f->aux, (unsigned long int)(time(NULL)) + (unsigned long int)(&f->aux));
+//      gsl_rng_set((const gsl_rng *)f->aux, (unsigned long int)(time(NULL)));
     } else {
-      gsl_rng_set((const gsl_rng *)expr->aux, (unsigned long int)(x[2]));
+      gsl_rng_set((const gsl_rng *)f->aux, (unsigned long int)(x[2]));
     }
   }
 
-  return x[0] + gsl_ran_gaussian((const gsl_rng *)expr->aux, x[1]);
+  return x[0] + gsl_ran_gaussian((const gsl_rng *)f->aux, x[1]);
 
   // TODO: no camina con seed y fit al mismo tiempo
 
@@ -1194,11 +1178,11 @@ double feenox_builtin_random_gauss(expr_item_t *expr) {
 ///fn+limit+desc be less than the third argument $b$.
 ///fn+limit+usage limit(x, a, b)
 ///fn+limit+math \begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}
-double feenox_builtin_limit(expr_item_t *expr) {
+double feenox_builtin_limit(expr_item_t *f) {
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
   if (x[0] < x[1]) {
     return x[1];
@@ -1215,36 +1199,36 @@ double feenox_builtin_limit(expr_item_t *expr) {
 ///fn+limit_dt+desc be less than the third argument $b$.
 ///fn+limit_dt+usage limit_dt(x, a, b)
 ///fn+limit_dt+math \begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}
-double feenox_builtin_limit_dt(expr_item_t *expr) {
+double feenox_builtin_limit_dt(expr_item_t *f) {
 
   double y;
   double derivative;
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
   if (feenox_special_var_value(dt) == 0) {
     feenox_nan_error();
     return 0;
   }
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(3*sizeof(double));
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
+  if (f->aux == NULL) {
+    f->aux = malloc(3*sizeof(double));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = 0;
   } else if ((int)(feenox_special_var_value(in_static))) {
-    expr->aux[0] = x[0];
-    expr->aux[1] = x[0];
-    expr->aux[2] = 0;
-  } else if ((int)round(expr->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
-    expr->aux[0] = expr->aux[1];
-    expr->aux[1] = x[0];
-    expr->aux[2] = (int)(feenox_special_var_value(step_transient));
+    f->aux[0] = x[0];
+    f->aux[1] = x[0];
+    f->aux[2] = 0;
+  } else if ((int)round(f->aux[2]) != (int)(feenox_special_var_value(step_transient))) {
+    f->aux[0] = f->aux[1];
+    f->aux[1] = x[0];
+    f->aux[2] = (int)(feenox_special_var_value(step_transient));
   }
 
-  derivative = (x[0] - expr->aux[0])/feenox_special_var_value(dt);
+  derivative = (x[0] - f->aux[0])/feenox_special_var_value(dt);
 
 
 //  if (!expr->nofirst_time) {
@@ -1252,16 +1236,16 @@ double feenox_builtin_limit_dt(expr_item_t *expr) {
 //  }
 
   if (derivative < x[1]) {
-    y = expr->aux[0] + x[1]*feenox_special_var_value(dt);
+    y = f->aux[0] + x[1]*feenox_special_var_value(dt);
   } else if (derivative > x[2]) {
-    y = expr->aux[0] + x[2]*feenox_special_var_value(dt);
+    y = f->aux[0] + x[2]*feenox_special_var_value(dt);
   } else {
     y = x[0];
   }
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -1273,25 +1257,25 @@ double feenox_builtin_limit_dt(expr_item_t *expr) {
 ///fn+if+desc within the precision given by the optional fourth argument $\epsilon$.
 ///fn+if+desc If the second argument $c$ is not given and $a$ is not zero, the function returns one.
 ///fn+if+desc If the third argument $c$ is not given and $a$ is zero, the function returns zero.
-///fn+if+desc The default precision is $\epsilon = 10^{-16}$.
+///fn+if+desc The default precision is $\epsilon = 10^{-9}$.
 ///fn+if+desc Even though `if` is a logical operation, all the arguments and the returned value
 ///fn+if+desc are double-precision floating point numbers.
 ///fn+if+usage if(a, [b], [c], [eps])
 ///fn+if+math \begin{cases} b & \text{if $a \neq 0$} \\ c & \text{if $a = b$} \end{cases}
 
-double feenox_builtin_if(expr_item_t *expr) {
-  double eps = 1e-16;
+double feenox_builtin_if(expr_item_t *f) {
+  double eps = 1e-9;
   double x[4];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
 
-  if (expr->arg[3].items != NULL) {
-    eps = feenox_expression_eval(&expr->arg[3]);
+  if (f->arg[3].items != NULL) {
+    eps = fabs(feenox_expression_eval(&f->arg[3]));
   }
 
   if (fabs(x[0]) > eps) {
-    return (expr->arg[1].items != NULL) ? feenox_expression_eval(&expr->arg[1]) : 1.0;
+    return (f->arg[1].items != NULL) ? feenox_expression_eval(&f->arg[1]) : 1.0;
   } else {
-    return (expr->arg[2].items != NULL) ? feenox_expression_eval(&expr->arg[2]) : 0.0;
+    return (f->arg[2].items != NULL) ? feenox_expression_eval(&f->arg[2]) : 0.0;
   }
 
 }
@@ -1302,13 +1286,13 @@ double feenox_builtin_if(expr_item_t *expr) {
 ///fn+is_in_interval+desc but excluding\ $b$.
 ///fn+is_in_interval+usage is_in_interval(x, a, b)
 ///fn+is_in_interval+math \begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}
-double feenox_builtin_is_in_interval(expr_item_t *expr) {
+double feenox_builtin_is_in_interval(expr_item_t *f) {
 
   double y;
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
   y = (x[0] >= x[1] && x[0] < x[2]);
 
@@ -1325,29 +1309,29 @@ double feenox_builtin_is_in_interval(expr_item_t *expr) {
 ///fn+threshold_max+usage threshold_max(x, a, [b])
 ///fn+threshold_max+math \begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}
 
-double feenox_builtin_threshold_max(expr_item_t *expr) {
+double feenox_builtin_threshold_max(expr_item_t *f) {
 
   double y;
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(1*sizeof(double));
-    expr->aux[0] = x[0] > x[1];
+  if (f->aux == NULL) {
+    f->aux = malloc(1*sizeof(double));
+    f->aux[0] = x[0] > x[1];
   }
 
   if (x[0] > x[1]) {
-    expr->aux[0] = 1;
+    f->aux[0] = 1;
   } else if (x[0] < (x[1]-x[2])) {
-    expr->aux[0] = 0;
+    f->aux[0] = 0;
   }
-  y = expr->aux[0];
+  y = f->aux[0];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 
@@ -1362,30 +1346,30 @@ double feenox_builtin_threshold_max(expr_item_t *expr) {
 ///fn+threshold_min+usage threshold_min(x, a, [b])
 ///fn+threshold_min+math \begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}
 
-double feenox_builtin_threshold_min(expr_item_t *expr) {
+double feenox_builtin_threshold_min(expr_item_t *f) {
 
   double y;
   double x[3];
-  x[0] = feenox_expression_eval(&expr->arg[0]);
-  x[1] = feenox_expression_eval(&expr->arg[1]);
-  x[2] = feenox_expression_eval(&expr->arg[2]);
+  x[0] = feenox_expression_eval(&f->arg[0]);
+  x[1] = feenox_expression_eval(&f->arg[1]);
+  x[2] = feenox_expression_eval(&f->arg[2]);
 
-  if (expr->aux == NULL) {
-    expr->aux = malloc(1*sizeof(double));
-    expr->aux[0] = x[0] > x[1];
+  if (f->aux == NULL) {
+    f->aux = malloc(1*sizeof(double));
+    f->aux[0] = x[0] > x[1];
   }
 
   if (x[0] < x[1]) {
-    expr->aux[0] = 1;
+    f->aux[0] = 1;
   } else if (x[0] > (x[1]+x[2])) {
-    expr->aux[0] = 0;
+    f->aux[0] = 0;
   }
 
-  y = expr->aux[0];
+  y = f->aux[0];
 
   if (feenox_special_var_value(done)) {
-    free(expr->aux);
-    expr->aux = NULL;
+    free(f->aux);
+    f->aux = NULL;
   }
   return y;
 }
@@ -1396,30 +1380,31 @@ double feenox_builtin_threshold_min(expr_item_t *expr) {
 ///fn+min+usage min(x1, x2, [...], [x10])
 ///fn+min+math  \min \Big (x_1, x_2, \dots, x_{10} \Big)
 
-double feenox_builtin_min(expr_item_t *expr) {
+double feenox_builtin_min(expr_item_t *f) {
   int i;
-  double min = feenox_expression_eval(&expr->arg[0]);
+  double min = feenox_expression_eval(&f->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].items != NULL && feenox_expression_eval(&expr->arg[i]) < min) {
-      min = feenox_expression_eval(&expr->arg[i]);
+    if (f->arg[i].items != NULL && feenox_expression_eval(&f->arg[i]) < min) {
+      min = feenox_expression_eval(&f->arg[i]);
     }
   }
   return min;
 }
 
 ///fn+max+name max
-///fn+max+desc Returns the maximum of the arguments $x_i$ provided. Currently only maximum of ten arguments can be provided.
+///fn+max+desc Returns the maximum of the arguments $x_i$ provided. Currently only maximum of ten arguments can be given.
 ///fn+max+usage max(x1, x2, [...], [x10])
 ///fn+max+math  \max \Big (x_1, x_2, \dots, x_{10} \Big)
 
-double feenox_builtin_max(expr_item_t *expr) {
+double feenox_builtin_max(expr_item_t *f) {
   int i;
-  double max = feenox_expression_eval(&expr->arg[0]);
+  double max = feenox_expression_eval(&f->arg[0]);
+  double tmp;
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].items != NULL && feenox_expression_eval(&expr->arg[i]) > max) {
-      max = feenox_expression_eval(&expr->arg[i]);
+    if (f->arg[i].items != NULL && (tmp = feenox_expression_eval(&f->arg[i])) > max) {
+      max = tmp;
     }
   }
   return max;
@@ -1431,14 +1416,14 @@ double feenox_builtin_max(expr_item_t *expr) {
 ///fn+mark_min+usage mark_max(x1, x2, [...], [x10])
 ///fn+mark_min+math  i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i
 
-double feenox_builtin_mark_min(expr_item_t *expr) {
+double feenox_builtin_mark_min(expr_item_t *f) {
   int i;
   int i_min = 0;
-  double min = feenox_expression_eval(&expr->arg[0]);
+  double min = feenox_expression_eval(&f->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].items != NULL && feenox_expression_eval(&expr->arg[i]) < min) {
-      min = feenox_expression_eval(&expr->arg[i]);
+    if (f->arg[i].items != NULL && feenox_expression_eval(&f->arg[i]) < min) {
+      min = feenox_expression_eval(&f->arg[i]);
       i_min = i;
     }
   }
@@ -1450,14 +1435,14 @@ double feenox_builtin_mark_min(expr_item_t *expr) {
 ///fn+mark_max+usage mark_max(x1, x2, [...], [x10])
 ///fn+mark_max+math  i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i
 
-double feenox_builtin_mark_max(expr_item_t *expr) {
+double feenox_builtin_mark_max(expr_item_t *f) {
   int i;
   int i_max = 0;
-  double max = feenox_expression_eval(&expr->arg[0]);
+  double max = feenox_expression_eval(&f->arg[0]);
 
   for (i = 1; i < MINMAX_ARGS; i++) {
-    if (expr->arg[i].items != NULL && feenox_expression_eval(&expr->arg[i]) > max) {
-      max = feenox_expression_eval(&expr->arg[i]);
+    if (f->arg[i].items != NULL && feenox_expression_eval(&f->arg[i]) > max) {
+      max = feenox_expression_eval(&f->arg[i]);
       i_max = i;
     }
   }

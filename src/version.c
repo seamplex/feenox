@@ -22,6 +22,9 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
+#include "version.h"
+#define FEENOX_ONE_LINER "a free no-fee no-X uniX-like finite-element(ish) computational engineering tool"
+
 #include <stdio.h>
 #include <gsl/gsl_version.h>
 
@@ -40,9 +43,6 @@ extern feenox_t feenox;
 #if HAVE_SLEPC
 #include <slepcsys.h>
 #endif
-
-#include "feenox.h"
-#include "version.h"
 
 void feenox_show_help(const char *progname) {
   // in parallel runs only print from first processor
@@ -115,7 +115,7 @@ void feenox_shortversion(void) {
   printf("%s\n", PACKAGE_VERSION);
 #endif
 
-  printf("a free no-fee no-X uniX-like finite-element(ish) computational engineering tool\n");
+  printf("%s\n", FEENOX_ONE_LINER);
 
   return;
 }
