@@ -46,6 +46,11 @@ input files ----->|     FeenoX     |-----> output files
 Following the UNIX programming philosophy, there are no graphical interfaces attached to the FeenoX core, although a wide variety of pre and post-processors can be used with FeenoX. See for example <https://www.caeplex.com> for a web-based interface.
 
 
+# OPTIONS
+
+include(help.md)
+
+
 # EXAMPLES
 
 ## The Lorenz system
@@ -69,9 +74,6 @@ include(../examples/tensile-test.fee)
 ```
 
  
-# OPTIONS
-
-include(help.md)
 
 # EXIT STATUS
 

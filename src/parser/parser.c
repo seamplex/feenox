@@ -2950,6 +2950,10 @@ int feenox_parse_print(void) {
 ///kw+PRINT+detail Matrices are printed element-by-element in a single line using row-major ordering if mixed
 ///kw+PRINT+detail with other objects but in the natural row and column fashion if it is the only given object in the `PRINT` instruction.
 
+///kw+PRINT+usage [ <object_1> <object_2> ... <object_n> ]
+///kw+PRINT+usage [ TEXT <string_1> ... TEXT <string_n> ]
+///kw+PRINT+usage @
+  
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 ///kw+PRINT+usage [ FILE < <file_path> | <file_id> > ]
 ///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
@@ -2962,12 +2966,12 @@ int feenox_parse_print(void) {
         print->file->mode = strdup("w");
       }
  
-///kw+PRINT+usage [ SEP <string> ]
-///kw+PRINT+detail The `SEP` keyword expects a string used to separate printed objects.
-///kw+PRINT+detail To print objects without any separation in between give an empty string like `SEP ""`.
-///kw+PRINT+detail The default is a tabulator character 'DEFAULT_PRINT_SEPARATOR' character. 
-    } else if (strcasecmp(token, "SEP") == 0 || strcasecmp(token, "SEPARATOR") == 0) {
-      feenox_call(feenox_parser_string(&print->separator));
+///kw+PRINT+usage [ HEADER ]
+    } else if (strcasecmp(token, "HEADER") == 0) {
+      print->header = 1;
+///kw+PRINT+detail If the `HEADER` keyword is given, a single line containing the literal text
+///kw+PRINT+detail given for each object is printed at the very first time the `PRINT` instruction is
+///kw+PRINT+detail processed, starting with a hash `#` character.           
 
 ///kw+PRINT+usage [ NONEWLINE ]
     } else if (strcasecmp(token, "NONEWLINE") == 0) {
@@ -2977,15 +2981,16 @@ int feenox_parse_print(void) {
 ///kw+PRINT+detail If the last token is a string, neither the separator nor the newline will be printed.
       print->nonewline = 1;
 
-///kw+PRINT+detail To print an empty line write `PRINT` without arguments.
+///kw+PRINT+usage [ SEP <string> ]
+///kw+PRINT+detail The `SEP` keyword expects a string used to separate printed objects.
+///kw+PRINT+detail To print objects without any separation in between give an empty string like `SEP ""`.
+///kw+PRINT+detail The default is a tabulator character 'DEFAULT_PRINT_SEPARATOR' character. 
+    } else if (strcasecmp(token, "SEP") == 0 || strcasecmp(token, "SEPARATOR") == 0) {
+      feenox_call(feenox_parser_string(&print->separator));
       
-///kw+PRINT+usage [ HEADER ]
-    } else if (strcasecmp(token, "HEADER") == 0) {
-      print->header = 1;
-///kw+PRINT+detail If the `HEADER` keyword is given, a single line containing the literal text
-///kw+PRINT+detail given for each object is printed at the very first time the `PRINT` instruction is
-///kw+PRINT+detail processed, starting with a hash `#` character.           
+///kw+PRINT+detail To print an empty line write `PRINT` without arguments.
 
+///kw+PRINT+usage @
 ///kw+PRINT+usage [ SKIP_STEP <expr> ]
 ///kw+PRINT+detail By default the `PRINT` instruction is evaluated every step.
 ///kw+PRINT+detail If the `SKIP_STEP` (`SKIP_STATIC_STEP`) keyword is given, the instruction is processed 
@@ -3005,8 +3010,8 @@ int feenox_parse_print(void) {
 
     } else {
       
-///kw+PRINT+usage [ <object_1> <object_2> ... <object_n> ]
-///kw+PRINT+usage [ TEXT <string_1> ... TEXT <string_n> ]
+///kw+PRINT+usage @
+// see the objects above
       print_token_t *print_token = calloc(1, sizeof(print_token_t));
       LL_APPEND(print->tokens, print_token);
 

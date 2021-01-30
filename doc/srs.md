@@ -1,16 +1,19 @@
 ---
-title: Software Design Requirements for a FEA tool
+title: Software Requirements Specification for a computational tool
 lang: en-US
-abstract: An hypothetical situation (a thought experiment if you will) where a certain company or agency asks for vendors to develop a piece of engineering software with certain specifications, defined in this imaginary tender.
+abstract: An hypothetical situation (a thought experiment if you will) where a certain company or agency asks for vendors to develop a piece of free and open source engineering software with certain specifications, defined in this imaginary tender.
+number-sections: true
 ...
 
 
 # Introduction {#sec:introduction}
 
 A computational tool (herein after referred to as _the tool_) is required in order to solve engineering problems in the cloud.
-This (imaginary but plausible) Software Requirements Document describes the mandatory features the tool ought to have and lists some features which would be nice the tool had.
-Also the requirements and guidelines about architecture, execution and interfaces in order to fulfill the needs of state-of-the-art cloud-based users as of 2021 (and the years to come) are defined. 
-The tool must be free and open source. The detailed licensing terms are left to the application but they should be such that users can solve their problem the way they need and to eventually modify and improve the tool to suit their needs. If they cannot program themselves, they should have the freedom to hire somebody to do it for them.
+This (imaginary but plausible) Software Requirements Specification document describes the mandatory features the tool ought to have and lists some features which would be nice the tool had.
+Also the requirements and guidelines about architecture, execution and interfaces in order to fulfill the needs of cognizant engineers as of 2021 (and the years to come) are defined. 
+
+On the one hand, the tool should be applicable to solving industrial problems under stringent efficiency ([@sec:efficiency]) and quality ([@sec:qa]) requirements. It is therefore mandatory to be able to assess the source code for potential performance and verification revision by qualified third parties. On the other hand, the initial version of the tool is expected to be a basic framework which might be extended ([@sec:objective] and [@sec:extensibility]) by academic researchers and programmers. It thus should also be free.^[Free as in “free speech,” not as in “free beer.”]
+The detailed licensing terms are left to the offer but it should allow users to solve their problems the way they need and, eventually, to modify and improve the tool to suit their needs. If they cannot program themselves, they should have the freedom to hire somebody to do it for them.
 
 
 ## Objective {#sec:objective}
@@ -27,25 +30,26 @@ The main objective of the tool is to be able to solve engineering problems which
  * computational fluid dynamics
  * ...
 
+\noindent
+on one or more mainstream computers.
+ 
 The initial version of the tool must be able to handle a subset of the above list of problem types.
-Eventually, the set of supported problem types should grow to include other models as well, as described in\ [@sec:extensibility].
+Afterward, the set of supported problem types, models, equations and features of the tool should grow to include other models as well, as required in\ [@sec:extensibility].
 
 
-## Intended use {#sec:usage}
 
-The tool should allow advanced user to define the problem to be solved programmatically, using one or more files either...
+## Scope {#sec:scope}
+
+The tool should allow advanced users to define the problem to be solved programmatically, using one or more files either...
  
  a. specifically formatted for the tool to read such as JSON or a particular input format (historically called input decks in punched-card days), and/or 
  b. written in an high-level interpreted language such as Python or Julia.
   
 For a basic usage involving simple cases, a user interface engine should be able to create these problem-definition files in order to give access to less advanced users to the tool using a desktop, mobile and/or web GUI.
- 
 
-## Scope {#sec:scope}
+The tool should work as a transfer function from the set of input files described above to a set of output files containing the desired results, either a set of scalar outputs (such as maximum stresses or mean temperatures), and/or a time and/or spatial distribution ([@fig:transfer]). If needed, a discretization of the domain may to be taken as a know input, i.e. the tool is not required to create the mesh as long as a suitable mesher can be employed using a similar workflow specified in this\ SRS.
 
-The tool should work as a transfer function from the set of input files described in\ [@sec:usage] to a set of output files containing the desired results, either a set of scalar outputs (such as maximum stresses or mean temperatures), and/or a time and/or spatial distribution (@fig:transfer). If needed, a discretization of the domain may to be taken as a know input, i.e. the tool is not required to create the mesh as long as a suitable mesher can be employed using the workflow specified in\ [@sec:usage] and the rest of this SRS.
-
-![The tool working as a transfer function between input and output files](transfer.svg){#fig:transfer}
+![The tool working as a transfer function between input and output files](transfer.svg){#fig:transfer width=50%}
 
 The tool should define and document ([@sec:documentation]) the way the input files for a solving particular problem are to be prepared ([@sec:input]) and how the results are to be written ([@sec:output]).
 Any GUI, pre-processor, post-processor or other related graphical tool used to provide a graphical interface for the user should integrate in the generic workflow depicted in\ [@fig:transfer].
@@ -68,6 +72,8 @@ The tool should be easily deployed to production servers. Both
  a. an automated method for compiling the sources from scratch aiming at obtaining optimized binaries for a particular host architecture should be provided using a well-established procedures, and
  b. one (or more) generic binary version aiming at common server architectures should be provided.
 
+Either option should be available to be downloaded from suitable online sources.
+ 
 > autoconf vs. cmake, rule of diversity 
 > gcc, clang
 > blas, lapack, atlas
@@ -93,7 +99,7 @@ The computational resources (i.e. costs measured in CPU/GPU time, random-access 
 
 ## Scalability  {#sec:scalability}
 
-The tool ought to be able to start solving small problems first to check the inputs and outputs behave as expected and then allow increasing the problem size up in order to achieve to the desired accuracy of the results. As mentioned in {#sec:architecture}, large problem should be split among different computers to be able to solve them using a finite amount of per-host computational power (RAM and CPU).
+The tool ought to be able to start solving small problems first to check the inputs and outputs behave as expected and then allow increasing the problem size up in order to achieve to the desired accuracy of the results. As mentioned in [@sec:architecture], large problem should be split among different computers to be able to solve them using a finite amount of per-host computational power (RAM and CPU).
 
 > PETSc, MPI
 > error handling, rule of repair
@@ -167,7 +173,7 @@ Common and preferably open-source formats.
 > vtk (vtu), gmsh
 
 
-# Quality assurance
+# Quality assurance {#sec:qa}
 
 Since the results obtained with the tools might be used in verifying existing equipment or in designing new mechanical parts in sensitive industries, a certain level of software quality assurance is needed. Some best-practices for developing generic software as required, such as employment of a version control system, automated unit testing and bug tracking support. But also more particular verification and validation procedures for the particular case of engineering computational software is 
 
@@ -209,10 +215,10 @@ The tool should be verified against known analytical results and other already-v
 
 
 
-## Documentation
+## Documentation {#sec:documentation}
 
-Documentation should be complete and cover both the user and the developer point of view. It should contain a user manual adequate for both reference and tutorial purposes. Other forms of simplified documentation such as quick reference cards or video tutorials are not mandatory but highly recommended. Since the tool should be extendable ([#sec:extensibility]), there should be a separate development manual covering the programming design and implementation and how to extend and add new features.
-Also, since non-trivial mathematics which should be verified ([#sec:verification]) are expected, an explanation what equations are taken into account and how they are solved is required.
+Documentation should be complete and cover both the user and the developer point of view. It should contain a user manual adequate for both reference and tutorial purposes. Other forms of simplified documentation such as quick reference cards or video tutorials are not mandatory but highly recommended. Since the tool should be extendable ([@sec:extensibility]), there should be a separate development manual covering the programming design and implementation and how to extend and add new features.
+Also, as non-trivial mathematics which should be verified ([@sec:verification]) are expected, an explanation what equations are taken into account and how they are solved is required.
 
 It should be possible to make the full documentation available online in a way that it can be both printed in hard copy and accessed easily from a mobile device. Users modifying the tool to suit their own needs should be able to modify the associated documentation as well.
 

@@ -42,20 +42,40 @@ int feenox_initialize(int argc, char **argv) {
   // assume the user wants a standard run
   feenox.run = feenox_run_standard;
   
+///help+usage+desc usage: feenox [options] inputfile [replacement arguments]  
+  
   const struct option longopts[] = {
+///op+help+option `-h`, `--help`
+///op+help+desc display usage and commmand-line help and exit
     { "help",         no_argument,       NULL, 'h'},
+///op+version+option `-v`, `--version`
+///op+version+desc display brief version information and exit
     { "version",      no_argument,       NULL, 'v'},
+///op+versions+option `-V`, `--versions`
+///op+versions+desc display detailed version information
     { "versions",     no_argument,       NULL, 'V'},
     { "long-version", no_argument,       NULL, 'V'},
     { "version-long", no_argument,       NULL, 'V'},
+///op+debug+option `-d`, `--debug`.
+///op+debug+desc start in debug mode
     { "debug",        no_argument,       NULL, 'd'},
+///op+summarize+option `-s`, `--sumarize`
+///op+summarize+desc list all symbols in the input file and exit
     { "summarize",    no_argument,       NULL, 's'},
     // --progress, --mumps, etc. are handled by the pde initialization routines    
     { NULL, 0, NULL, 0 }
   };  
  
+///help+extra+desc Instructions will be read from standard input if "-" is passed as inputfile, i.e.
+///help+extra+desc @
+///help+extra+desc ```{bash}
+///help+extra+desc $ echo "PRINT 2+2" | feenox -
+///help+extra+desc 4
+///help+extra+desc $
+///help+extra+desc ```
+  
   opterr = 0;   // don't complain about unknown options, they can be for PETSc/SLEPc
-  while ((optc = getopt_long_only(argc, argv, "hvVis", longopts, &option_index)) != -1) {
+  while ((optc = getopt_long_only(argc, argv, "hvVs", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
         show_help = 1;
