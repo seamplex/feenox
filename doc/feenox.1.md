@@ -60,7 +60,7 @@ include(help.md)
 The following is a MWE input file for FeenoX that reads a Gmsh-generated _.msh_ file, solves a linear elastic problem and writes the results in a *.vtk* file which can be post-processed by **paraview**`(1)`:
 
 ```
-include(../examples/tensile-mwe.fee)
+dnl include(../examples/tensile-mwe.fee)
 ```
 
 The _.geo_ file that generates the mesh with Gmsh and the CAD file in _.step_ format can be found in the _examples_ directory.
@@ -70,7 +70,7 @@ The _.geo_ file that generates the mesh with Gmsh and the CAD file in _.step_ fo
 The example above can be extended to give more information as the following annotated input shows:
 
 ```
-include(../examples/tensile-test.fee)
+dnl include(../examples/tensile-test.fee)
 ```
 
  
