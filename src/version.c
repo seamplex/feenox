@@ -23,7 +23,22 @@
 extern feenox_t feenox;
 
 #include "version.h"
+
+// TODO: put in a hader and generate it from doc
 #define FEENOX_ONE_LINER "a free no-fee no-X uniX-like finite-element(ish) computational engineering tool"
+#define FEENOX_HELP "\
+  -h, --help         display usage and commmand-line help and exit\n\
+  -v, --version      display brief version information and exit\n\
+  -V, --versions     display detailed version information\n\
+  -d, --debug.       start in debug mode\n\
+  -s, --sumarize     list all symbols in the input file and exit\n\
+\n\
+Instructions will be read from standard input if “-” is passed as\n\
+inputfile, i.e.\n\
+\n\
+    $ echo \"PRINT 2+2\" | feenox -\n\
+    4\n\
+"
 
 #include <stdio.h>
 #include <gsl/gsl_version.h>
@@ -50,22 +65,12 @@ void feenox_show_help(const char *progname) {
     return;
   }
   
-  printf("usage: %s [options] inputfile [replacement arguments]\n", progname);
+  printf("usage: %s [options] inputfile [replacement arguments]\n\n", progname);
   
-  printf("\n\
-  -h, --help            display this help and exit\n\
-  -v, --version         display version information and exit\n\
-  -V, --long-version    display detailed code information and exit\n\
-  -l, --list            list defined symbols and exit\n\
-  -d, --debug           start in debug mode\n\
-\n\
- Instructions will be read from standard input if \"-\" is passed as inputfile, i.e.\n\
-   $ echo \"PRINT 2+2\" | feenox -\n\
-   4\n\
-   $\n\
-\n\
-Report bugs to: jeremy@seamplex.com\n\
-Feenox home page: <https://www.seamplex.com/feenox/>\n");
+  printf("%s\n", FEENOX_HELP);
+  
+  printf("Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com\n");
+  printf("Feenox home page: https://www.seamplex.com/feenox/\n");
   
   return;
 }

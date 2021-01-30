@@ -71,7 +71,6 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc ```{bash}
 ///help+extra+desc $ echo "PRINT 2+2" | feenox -
 ///help+extra+desc 4
-///help+extra+desc $
 ///help+extra+desc ```
   
   opterr = 0;   // don't complain about unknown options, they can be for PETSc/SLEPc
