@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in touch m4 pandoc; do
+for i in touch m4 sed pandoc; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -8,17 +8,17 @@ for i in touch m4 pandoc; do
 done
 
 
-# create the reference markdown from the commented sources
+echo "creating the reference markdown from the commented sources"
+echo " - keywords"
 ./reference.sh ../src/parser/parser.c kw > reference-kw.md
+echo " - variables"
 ./reference.sh ../src/flow/init.c     va > reference-va.md
 
-
-# help as markdown definition list
+echo "help as markdown definition list"
 ./help-md.sh > help.md
 
-# help as a raw txt (which is used in feenox -v)
+echo "help as a raw txt (which is used in feenox -v)"
 ./help-txt.sh > help.txt
-
 
 # including a TOC
 # touch reference-toc.md
@@ -30,13 +30,13 @@ done
 # m4 header.m4 reference-manual.m4 > reference-manual.md
 
 
-# unix man page
+echo "unix man page"
 m4 header.m4 date.m4 feenox.1.md | pandoc -s -t man -o feenox.1
 
-# manual
-m4 header.m4 feenox.md | \
-  pandoc --toc --template template.texi \
-         --filter pandoc-crossref -o feenox.texi
-sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox.texi
-sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox.texi         
-
+# # manual
+# m4 header.m4 feenox.md | \
+#   pandoc --toc --template template.texi \
+#          --filter pandoc-crossref -o feenox.texi
+# sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox.texi
+# sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox.texi         
+# 

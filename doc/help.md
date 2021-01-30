@@ -28,6 +28,5 @@ Instructions will be read from standard input if "-" is passed as inputfile, i.e
 ```{bash}
 $ echo "PRINT 2+2" | feenox -
 4
-$
 ```
 

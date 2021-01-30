@@ -38,7 +38,7 @@ for kw in ${kws}; do
   # keyword
   echo "##  ${kw}"
   echo
-  echo -n '> '
+#   echo -n '> '
   grep "///${tag}+${kw}+desc" ${src} | cut -d" " -f2-
   echo  
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-grep "///help+usage+desc" ../src/flow/init.c | cut -d" " -f2- | sed 's/@$//' | sed 's_/\\/_//_' | pandoc -t plain
-
-echo
+# the usage line involves argv[0] so we hardcode it in version.c
+# grep "///help+usage+desc" ../src/flow/init.c | cut -d" " -f2- | sed 's/@$//' | sed 's_/\\/_//_' | pandoc -t plain
+# echo
 
 kws=$(grep "///op+" ../src/flow/init.c | awk '{print $1}' | awk -F+ '{print $2}' | uniq)
 

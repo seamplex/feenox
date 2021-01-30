@@ -87,38 +87,49 @@ include(../examples/tensile-test.fee)
 # CONFORMING TO
 
 
-# REFERENCE
+# INPUT-FILE KEYWORDS
 
-## Keywords
+include(reference-kw.md)
 
-TBD.
-
-## Special input distributions
+# SPECIAL VARIABLES
 
 TBD.
 
+# MATERIAL PROPERTIES
 
-## Boundary conditions
+TBD.
+
+# BOUNDARY CONDITIONS
+
+TBD.
+
+# RESULTING DISTRIBUTIONS
+
+TBD.
+
+# BUILT-IN FUNCTIONS
+
+TBD.
+
+# BUILT-IN FUNCTIONALS
+
+TBD.
+
+# BUILT-IN VECTOR FUNCTIONS
 
 TBD.
 
 
-## Result functions
-
-TBD.
-
-
-## Special variables
-
-TBD.
 
 
 
 # NOTES
 
+TBD.
 
 # BUGS
 
+Report on Github or at <jeremy@seamplex.com>
 
 # SEE ALSO
 

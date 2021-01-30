@@ -22,6 +22,8 @@ fi
 ./autoclean.sh
 touch src/variables.mak
 
+# echo "#define FEENOX_ONE_LINER \"desc\"" | m4 -Ddesc="$(cat doc/one-liner.md)" > src/help.h
+
 # major version is equal to the latest tag
 version=$(git describe --tags | sed 's/-/./')
 echo "define(feenoxversion, ${version})dnl" > version.m4

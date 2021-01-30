@@ -1,5 +1,3 @@
-usage: feenox [options] inputfile [replacement arguments]
-
   -h, --help         display usage and commmand-line help and exit
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
@@ -11,5 +9,4 @@ inputfile, i.e.
 
     $ echo "PRINT 2+2" | feenox -
     4
-    $
 
