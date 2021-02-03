@@ -171,7 +171,7 @@ int feenox_instruction_print(void *arg) {
 
 }
 
-/*
+
 int feenox_instruction_print_function(void *arg) {
   print_function_t *print_function = (print_function_t *)arg;
   print_token_t *print_token;
@@ -182,11 +182,11 @@ int feenox_instruction_print_function(void *arg) {
 
   // in parallel runs only print from first processor
   if (feenox.rank != 0) {
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
   }
   
   if (print_function->file->pointer == NULL) {
-    feenox_call(feenox_instruction_open_file(print_function->file));
+    feenox_call(feenox_instruction_file_open(print_function->file));
   }
   
   if (!print_function->first_function->initialized) {
@@ -194,7 +194,8 @@ int feenox_instruction_print_function(void *arg) {
   }
   
   // vemos si hay que escribir un header
-  if (print_function->header && (feenox.parametric_mode == 0 || (int)feenox_var(feenox.special_vars.step_outer) == 1)) {
+//   if (print_function->header && (feenox.parametric_mode == 0 ||
+//       (int)feenox_special_var_value(step_outer) == 1)) {
     fprintf(print_function->file->pointer, "# ");
     
     // primero los argumentos de la primera funcion
@@ -212,7 +213,7 @@ int feenox_instruction_print_function(void *arg) {
       }
     }
     fprintf(print_function->file->pointer, "\n");
-  }
+//   }
   
 
   if (print_function->range.min != NULL && print_function->range.max != NULL && 
@@ -245,7 +246,7 @@ int feenox_instruction_print_function(void *arg) {
 
     // hasta que el primer argumento llegue al maximo y se pase un
     // poquito para evitar que por el redondeo se nos escape el ultimo punto
-    while (x[0] < x_max[0] * (1 + feenox_value(feenox_special_var(zero)))) {
+    while (x[0] < x_max[0] * (1 + feenox_special_var_value(zero))) {
 
       // imprimimos los argumentos
       for (j = 0; j < print_function->first_function->n_arguments; j++) {
@@ -256,9 +257,9 @@ int feenox_instruction_print_function(void *arg) {
       LL_FOREACH (print_function->tokens, print_token) {
         // imprimimos lo que nos pidieron
         if (print_token->function != NULL) {
-          fprintf(print_function->file->pointer, print_function->format, feenox_evaluate_function(print_token->function, x));
+          fprintf(print_function->file->pointer, print_function->format, feenox_function_eval(print_token->function, x));
           
-        } else if (print_token->expression.n_tokens != 0) {
+        } else if (print_token->expression.items != NULL) {
           feenox_set_function_args(print_function->first_function, x);
           fprintf(print_function->file->pointer, print_function->format, feenox_expression_eval(&print_token->expression));
           
@@ -304,6 +305,8 @@ int feenox_instruction_print_function(void *arg) {
 
     for (j = 0; j < print_function->first_function->data_size; j++) {
 
+      // TODO
+/*        
       if (print_function->physical_entity != NULL) {
         element_list_item_t *element_list_item;
         flag = 0;
@@ -313,8 +316,8 @@ int feenox_instruction_print_function(void *arg) {
           }
         }
       }
-          
-      if (print_function->physical_entity == NULL || flag) {
+*/          
+//       if (print_function->physical_entity == NULL || flag) {
       
         // los argumentos de la primera funcion
         for (k = 0; k < print_function->first_function->n_arguments; k++) {
@@ -342,10 +345,10 @@ int feenox_instruction_print_function(void *arg) {
                 fprintf(print_function->file->pointer, print_function->format, 0.0);
               }
             } else {
-              fprintf(print_function->file->pointer, print_function->format, feenox_evaluate_function(print_token->function, x));
+              fprintf(print_function->file->pointer, print_function->format, feenox_function_eval(print_token->function, x));
             }
 
-          } else if (print_token->expression.n_tokens != 0) {
+          } else if (print_token->expression.items != NULL) {
             feenox_set_function_args(print_function->first_function, x);
             fprintf(print_function->file->pointer, print_function->format, feenox_expression_eval(&print_token->expression));
 
@@ -371,7 +374,7 @@ int feenox_instruction_print_function(void *arg) {
           }
           
         }
-      }
+//       }
 //      fprintf(print_function->file->pointer, "\n");
 
     }
@@ -380,7 +383,7 @@ int feenox_instruction_print_function(void *arg) {
 
   } else {
     feenox_push_error_message("mandatory range needed for PRINT_FUNCTION instruction (function %s is not point-wise defined)", print_function->first_function->name);
-    return WASORA_RUNTIME_ERROR;
+    return FEENOX_ERROR;
       
   }
 
@@ -390,7 +393,7 @@ int feenox_instruction_print_function(void *arg) {
 
 }
 
-
+/*
 
 int feenox_instruction_print_vector(void *arg) {
   print_vector_t *print_vector = (print_vector_t *)arg;
@@ -401,7 +404,7 @@ int feenox_instruction_print_vector(void *arg) {
   
   // in parallel runs only print from first processor
   if (feenox.rank != 0) {
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
   }
 
   if (print_vector->file->pointer == NULL) {
@@ -409,7 +412,7 @@ int feenox_instruction_print_vector(void *arg) {
   }
 
   if (print_vector->first_vector == NULL) {
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
   }
   
   if (!print_vector->first_vector->initialized) {
@@ -426,7 +429,7 @@ int feenox_instruction_print_vector(void *arg) {
       
       if (print_token->vector->size != print_vector->first_vector->size) {
         feenox_push_error_message("vectors %s and %s do not have the same size", print_token->vector->name, print_vector->first_vector->name);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
       j = 0;
@@ -463,7 +466,7 @@ int feenox_instruction_print_vector(void *arg) {
           }
           if (print_token->vector->size != print_vector->first_vector->size) {
             feenox_push_error_message("vectors %s and %s do not have the same size", print_token->vector->name, print_vector->first_vector->name);
-            return WASORA_RUNTIME_ERROR;
+            return FEENOX_ERROR;
           }
           
           fprintf(print_vector->file->pointer, print_vector->format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));

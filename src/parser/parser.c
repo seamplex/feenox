@@ -257,6 +257,12 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "ENDIF") == 0) {
       feenox_call(feenox_parse_endif());
       return FEENOX_OK;
+
+///kw+PRINT_FUNCTION+desc Print one or more functions as a table of values of dependent and independent variables.
+///kw+PRINT_FUNCTION+usage PRINT_FUNCTION
+    } else if (strcasecmp(token, "PRINT_FUNCTION") == 0) {
+      feenox_call(feenox_parse_print_function());
+      return FEENOX_OK;
       
     }
       
@@ -434,160 +440,6 @@ int feenox_parse_line(void) {
 
 
 
-// --- PRINT_FUNCTION -----------------------------------------------------
-///kw+PRINT_FUNCTION+desc Print one or more functions as a table of values of dependent and independent variables.
-///kw+PRINT_FUNCTION+usage PRINT_FUNCTION
-///kw+PRINT_FUNCTION+usage <function_1> [ { function_2 | expr_1 } ... { function_n | expr_n-1 } ]
-    } else if (strcasecmp(token, "PRINT_FUNCTION") == 0) {
-
-      print_function_t *print_function;
-      function_t *dummy_function;
-
-      print_function = calloc(1, sizeof(print_function_t));
-      LL_APPEND(feenox.print_functions, print_function);
-
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+PRINT_FUNCTION+usage [ FILE <file_id> |
-        if (strcasecmp(token, "FILE") == 0) {
-          feenox_call(feenox_parser_file(&print_function->file));
-///kw+PRINT_FUNCTION+usage FILE_PATH <file_path> ]
-        } else if (strcasecmp(token, "FILE_PATH") == 0) {
-          feenox_call(feenox_parser_file_path(&print_function->file, "w"));
-
-///kw+PRINT_FUNCTION+usage [ HEADER ]
-        } else if (strcasecmp(token, "HEADER") == 0) {
-          print_function->header = 1;
-          
-///kw+PRINT_FUNCTION+usage [ MIN <expr_1> <expr_2> ... <expr_m> ]
-        } else if (strcasecmp(token, "MIN") == 0) {
-
-          if (print_function->first_function == NULL) {
-            feenox_push_error_message("MIN before actual function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          if (feenox_parser_expressions(&print_function->range.min, print_function->first_function->n_arguments) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-
-///kw+PRINT_FUNCTION+usage [ MAX <expr_1> <expr_2> ... <expr_m> ]
-        } else if (strcasecmp(token, "MAX") == 0) {
-
-          if (print_function->first_function == NULL) {
-            feenox_push_error_message("MAX before actual function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          if (feenox_parser_expressions(&print_function->range.max, print_function->first_function->n_arguments) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-///kw+PRINT_FUNCTION+usage [ STEP <expr_1> <expr_2> ... <expr_m> ]
-        } else if (strcasecmp(token, "STEP") == 0) {
-
-          if (print_function->first_function == NULL) {
-            feenox_push_error_message("STEP before actual function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          if (feenox_parser_expressions(&print_function->range.step, print_function->first_function->n_arguments) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-///kw+PRINT_FUNCTION+usage [ NSTEPs <expr_1> <expr_2> ... <expr_m> ]
-        } else if (strcasecmp(token, "NSTEPS") == 0) {
-
-          if (print_function->first_function == NULL) {
-            feenox_push_error_message("NSTEPS before actual function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          if (feenox_parser_expressions(&print_function->range.nsteps, print_function->first_function->n_arguments) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-///kw+PRINT_FUNCTION+usage [ FORMAT <print_format> ]
-        } else if (strcasecmp(token, "FORMAT") == 0) {
-          if (feenox_parser_string(&print_function->format) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-          
-///kw+PRINT_FUNCTION+usage [ PHYSICAL_ENTITY <name> ]
-        } else if (strcasecmp(token, "PHYSICAL_ENTITY") == 0) {
-          char *name;
-          feenox_call(feenox_parser_string(&name));
-          if ((print_function->physical_entity = feenox_get_physical_entity_ptr(name, NULL)) == NULL) {
-            feenox_push_error_message("unknown physical entity '%s'", name);
-            free(name);
-            return FEENOX_ERROR;
-          }
-
-        } else {
-
-          // agregamos un eslabon a la lista de tokens
-          print_token_t *print_token = calloc(1, sizeof(print_token_t));
-          LL_APPEND(print_function->tokens, print_token);
-
-          print_token->text = strdup(token);   // nos quedamos con el texto para el header
-          
-          if ((dummy_function = feenox_get_function_ptr(token)) != NULL) {
-            print_token->function = dummy_function;
-            if (print_function->first_function == NULL) {
-              // es la primer funcion
-              print_function->first_function = dummy_function;
-
-            } else if (dummy_function->n_arguments !=  print_function->first_function->n_arguments) {
-              feenox_push_error_message("functions do not have the same number of arguments");
-              return FEENOX_ERROR;
-
-            }
-
-          } else {
-            feenox_call(feenox_parse_expression(token, &print_token->expression));
-
-          }
-        }
-      }
-
-      if (print_function->first_function == NULL) {
-        feenox_push_error_message("at least one function expected");
-        return FEENOX_ERROR;
-      }
-      
-      if (print_function->first_function->type == type_algebraic || print_function->first_function->type == type_routine) {
-        if (print_function->range.min == NULL) {
-          feenox_push_error_message("need MIN keyword (function %s is not point-wise defined)", print_function->first_function->name);
-          return FEENOX_ERROR;
-        }
-        if (print_function->range.max == NULL) {
-          feenox_push_error_message("need MAX keyword (function %s is not point-wise defined)", print_function->first_function->name);
-          return FEENOX_ERROR;
-        }
-        if (print_function->range.step == NULL && print_function->range.nsteps == NULL) {
-          feenox_push_error_message("need either STEP or NSTEPS keyword (function %s is not point-wise defined)", print_function->first_function->name);
-          return FEENOX_ERROR;
-        }
-      }
-      
-      if (print_function->separator == NULL) {
-        print_function->separator = strdup(DEFAULT_PRINT_SEPARATOR);
-      }
-
-      if (print_function->format == NULL) {
-        print_function->format = strdup(DEFAULT_PRINT_FORMAT);
-      }
-
-      if (print_function->file == NULL) {
-        print_function->file = feenox.special_files.stdout_;
-      }
-
-      if (feenox_define_instruction(feenox_instruction_print_function, print_function) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return FEENOX_OK;
 
 // --- PRINT_VECTOR -----------------------------------------------------
 ///kw+PRINT_VECTOR+desc Print the elements of one or more vectors.
@@ -3063,6 +2915,161 @@ int feenox_parse_print(void) {
   
   LL_APPEND(feenox.prints, print);
   feenox_call(feenox_add_instruction(feenox_instruction_print, print));
+  
+  return FEENOX_OK;
+}
+
+int feenox_parse_print_function(void) {
+
+  char *token;
+
+  print_function_t *print_function;
+  function_t *dummy_function;
+
+  // TODO: api?
+  print_function = calloc(1, sizeof(print_function_t));
+
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+      
+///kw+PRINT_FUNCTION+usage <function_1> [ { function_2 | expr_1 } ... { function_n | expr_n } ]
+
+///kw+PRINT_FUNCTION+usage [ FILE < <file_path> | <file_id> > ]
+///kw+PRINT_FUNCTION+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
+    if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+      feenox_call(feenox_parser_file(&print_function->file));
+      if (print_function->file->mode == NULL) {
+        print_function->file->mode = strdup("w");
+      }
+      
+///kw+PRINT_FUNCTION+usage [ HEADER ]
+    } else if (strcasecmp(token, "HEADER") == 0) {
+      print_function->header = 1;
+          
+///kw+PRINT_FUNCTION+usage [ MIN <expr_1> <expr_2> ... <expr_m> ]
+    } else if (strcasecmp(token, "MIN") == 0) {
+      if (print_function->first_function == NULL) {
+        feenox_push_error_message("MIN before actual function, cannot determine number of arguments");
+        return FEENOX_ERROR;
+      }
+
+      if (feenox_parser_expressions(&print_function->range.min, print_function->first_function->n_arguments) != FEENOX_OK) {
+        return FEENOX_ERROR;
+      }
+
+///kw+PRINT_FUNCTION+usage [ MAX <expr_1> <expr_2> ... <expr_m> ]
+    } else if (strcasecmp(token, "MAX") == 0) {
+
+      if (print_function->first_function == NULL) {
+        feenox_push_error_message("MAX before actual function, cannot determine number of arguments");
+        return FEENOX_ERROR;
+      }
+
+      if (feenox_parser_expressions(&print_function->range.max, print_function->first_function->n_arguments) != FEENOX_OK) {
+        return FEENOX_ERROR;
+      }
+
+///kw+PRINT_FUNCTION+usage [ STEP <expr_1> <expr_2> ... <expr_m> ]
+    } else if (strcasecmp(token, "STEP") == 0) {
+
+      if (print_function->first_function == NULL) {
+        feenox_push_error_message("STEP before actual function, cannot determine number of arguments");
+        return FEENOX_ERROR;
+      }
+
+      if (feenox_parser_expressions(&print_function->range.step, print_function->first_function->n_arguments) != FEENOX_OK) {
+        return FEENOX_ERROR;
+      }
+
+///kw+PRINT_FUNCTION+usage [ NSTEPs <expr_1> <expr_2> ... <expr_m> ]
+    } else if (strcasecmp(token, "NSTEPS") == 0) {
+
+      if (print_function->first_function == NULL) {
+        feenox_push_error_message("NSTEPS before actual function, cannot determine number of arguments");
+        return FEENOX_ERROR;
+      }
+
+      if (feenox_parser_expressions(&print_function->range.nsteps, print_function->first_function->n_arguments) != FEENOX_OK) {
+        return FEENOX_ERROR;
+      }
+
+///kw+PRINT_FUNCTION+usage [ FORMAT <print_format> ]
+    } else if (strcasecmp(token, "FORMAT") == 0) {
+      // TODO: like in PRINT  
+      if (feenox_parser_string(&print_function->format) != FEENOX_OK) {
+          return FEENOX_ERROR;
+      }
+          
+// TODO: mesh & physical group
+///kw+PRINT_FUNCTION+usage [ PHYSICAL_ENTITY <name> ]
+/*
+    } else if (strcasecmp(token, "PHYSICAL_ENTITY") == 0) {
+      char *name;
+      feenox_call(feenox_parser_string(&name));
+      if ((print_function->physical_entity = feenox_get_physical_entity_ptr(name, NULL)) == NULL) {
+        feenox_push_error_message("unknown physical entity '%s'", name);
+        free(name);
+        return FEENOX_ERROR;
+      }
+*/
+    } else {
+
+      // add an item to the list of tokens
+      print_token_t *print_token = calloc(1, sizeof(print_token_t));
+      LL_APPEND(print_function->tokens, print_token);
+
+      print_token->text = strdup(token);   // nos quedamos con el texto para el header
+          
+      if ((dummy_function = feenox_get_function_ptr(token)) != NULL) {
+        print_token->function = dummy_function;
+        if (print_function->first_function == NULL) {
+          // the first function
+          print_function->first_function = dummy_function;
+        } else if (dummy_function->n_arguments !=  print_function->first_function->n_arguments) {
+          feenox_push_error_message("functions do not have the same number of arguments");
+          return FEENOX_ERROR;
+        }
+
+      } else {
+        feenox_call(feenox_expression_parse(&print_token->expression, token));
+      }
+    }
+  }
+
+  if (print_function->first_function == NULL) {
+    feenox_push_error_message("at least one function expected");
+    return FEENOX_ERROR;
+  }
+      
+  if (print_function->first_function->type == function_type_algebraic ||
+      print_function->first_function->type == function_type_routine) {
+    if (print_function->range.min == NULL) {
+      feenox_push_error_message("need MIN keyword (function %s is not point-wise defined)", print_function->first_function->name);
+      return FEENOX_ERROR;
+    }
+    if (print_function->range.max == NULL) {
+      feenox_push_error_message("need MAX keyword (function %s is not point-wise defined)", print_function->first_function->name);
+      return FEENOX_ERROR;
+    }
+    if (print_function->range.step == NULL && print_function->range.nsteps == NULL) {
+      feenox_push_error_message("need either STEP or NSTEPS keyword (function %s is not point-wise defined)", print_function->first_function->name);
+      return FEENOX_ERROR;
+    }
+  }
+      
+  if (print_function->separator == NULL) {
+    print_function->separator = strdup(DEFAULT_PRINT_SEPARATOR);
+  }
+
+  if (print_function->format == NULL) {
+    print_function->format = strdup(DEFAULT_PRINT_FORMAT);
+  }
+
+  if (print_function->file == NULL) {
+    print_function->file = feenox.special_files.stdout_;
+  }
+
+  LL_APPEND(feenox.print_functions, print_function);
+  feenox_call(feenox_add_instruction(feenox_instruction_print_function, print_function));
   
   return FEENOX_OK;
 }

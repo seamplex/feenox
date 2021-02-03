@@ -189,6 +189,8 @@ typedef struct conditional_block_t conditional_block_t;
 typedef struct file_t file_t;
 typedef struct print_t print_t;
 typedef struct print_token_t print_token_t;
+typedef struct print_function_t print_function_t;
+typedef struct multidim_range_t multidim_range_t;
 
 typedef struct sort_vector_t sort_vector_t;
 typedef struct phase_object_t phase_object_t;
@@ -569,6 +571,46 @@ struct print_token_t {
   print_token_t *next;
 };
 
+struct multidim_range_t {
+  int dimensions;
+
+  expr_t *min;
+  expr_t *max;
+  expr_t *step;
+  expr_t *nsteps;
+};
+
+
+// print one or more functions
+struct print_function_t {
+  file_t *file;
+
+  // linked list with the stuff to be printed
+  print_token_t *tokens;
+
+  // pointer to the first function (the one that defines the number of arguments
+  // note that this might not be the same as as token->function, that can be NULL
+  function_t *first_function;
+
+  // explicit range to print the function
+  multidim_range_t range;
+  
+  // mesh and physical entity that tells where to print a function
+//  mesh_t *mesh;
+//  physical_entity_t *physical_entity;
+
+  // flag to add a header explaining what the columns are
+  int header;
+  // formato de los numeritos "%e"
+  char *format;
+  // separador de cosas "\t"
+  char *separator;
+
+  print_function_t *next;
+
+};
+
+
 struct sort_vector_t {
   int descending;
   
@@ -662,6 +704,7 @@ struct feenox_t {
   
   file_t *files;
   print_t *prints;
+  print_function_t *print_functions;
   
   struct {
     var_t *done;
@@ -880,11 +923,13 @@ extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i
 
 // function.c
 extern int feenox_function_init(function_t *this);
+extern void feenox_set_function_args(function_t *this, double *x);
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
 
 // print.c
 extern int feenox_instruction_print(void *arg);
+extern int feenox_instruction_print_function(void *arg);
 
 // conditional.c
 extern int feenox_instruction_if(void *arg);

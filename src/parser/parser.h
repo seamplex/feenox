@@ -57,10 +57,10 @@ extern int feenox_read_line(FILE *file_ptr);
 extern char *feenox_get_next_token(char *line);
 extern void feenox_strip_blanks(char *string);
 
-extern int feenox_parser_expression_in_string(double *result);
-
 extern int feenox_parser_string(char **string);
 extern int feenox_parser_expression(expr_t *expr);
+extern int feenox_parser_expressions(expr_t *expr[], size_t n);
+extern int feenox_parser_expression_in_string(double *result);
 extern int feenox_parser_string_format(char **string, int *n_args);
 
 extern int feenox_parser_file(file_t **file);
@@ -88,6 +88,7 @@ extern int feenox_parse_file(char *mode);
 extern int feenox_parse_open_close(const char *what);
 
 extern int feenox_parse_print(void);
+extern int feenox_parse_print_function(void);
 
 extern int feenox_parse_if(void);
 extern int feenox_parse_else(void);
