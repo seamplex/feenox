@@ -32,7 +32,7 @@ kws=$(grep "///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | sort 
 
 for kw in ${kws}; do
 
-  escapedkw=$(echo ${kw} | sed 's/_/\_/g')
+  escapedkw=$(echo ${kw} | sed 's/_/\\_/g')
 
 #   echo $kw > /dev/stderr
   # keyword
@@ -67,25 +67,27 @@ for kw in ${kws}; do
     echo
 
     range=$(grep "///${tag}+${kw}+plotx" ${src} | cut -d" " -f2-)
-    if [ -n "${range}" ]; then
-     if [ -z "$(which pyxplot)" ]; then
-      if [[ !( -e figures/${kw}.svg ) ]]; then
+#     echo hola ${range} $(which pyxplot) $(which feenox) $(which svg2pdf) > /dev/stderr
+    if [[ -n "${range}" &&  -n "$(which pyxplot)" && -n "$(which feenox)" && -n "$(which pdf2svg)" ]]; then
+#       echo pepe > /dev/stderr
+      if [ ! -e figures/${kw}.svg ]; then
+#         echo xxx > /dev/stderr
         mkdir -p figures
         cd figures
-        min=$(echo ${range} | awk '{printf $1}')
-        max=$(echo ${range} | awk '{printf $2}')
-        step=$(echo ${range} | awk '{printf $3}')
-        minxtics=$(echo ${range} | awk '{printf $4}')
-        maxxtics=$(echo ${range} | awk '{printf $5}')
+        min=$(echo ${range}       | awk '{printf $1}')
+        max=$(echo ${range}       | awk '{printf $2}')
+        step=$(echo ${range}      | awk '{printf $3}')
+        minxtics=$(echo ${range}  | awk '{printf $4}')
+        maxxtics=$(echo ${range}  | awk '{printf $5}')
         stepxtics=$(echo ${range} | awk '{printf $6}')
-        minytics=$(echo ${range} | awk '{printf $7}')
-        maxytics=$(echo ${range} | awk '{printf $8}')
+        minytics=$(echo ${range}  | awk '{printf $7}')
+        maxytics=$(echo ${range}  | awk '{printf $8}')
         stepytics=$(echo ${range} | awk '{printf $9}')
-        cat << EOF > ${kw}.was
-f(x) := ${kw}(x)
+        cat << EOF > ${kw}.fee
+FUNCTION f(x) = ${kw}(x)
 PRINT_FUNCTION f MIN ${min} MAX ${max} STEP ${step}
 EOF
-        wasora ${kw}.was > ${kw}.dat
+        feenox ${kw}.fee > ${kw}.dat
         cat << EOF > ${kw}.ppl
 set preamble "\usepackage{amsmath} \usepackage{amssymb}"
 set width 10*unit(cm)
@@ -114,14 +116,14 @@ plot "${kw}.dat" w l lw 3 color blue
 replot
 EOF
         pyxplot ${kw}.ppl
-#       rm -f ${kw}.was
-#       rm -f ${kw}.ppl
-#       rm -f ${kw}.dat
+        pdf2svg ${kw}.pdf ${kw}.svg
+        rm -f ${kw}.fee
+        rm -f ${kw}.ppl
+        rm -f ${kw}.dat
         cd ..
       fi  
-     fi
 
-     cat << EOF
+      cat << EOF
 
 ![${kw}](figures/${kw}.svg)
 
