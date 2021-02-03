@@ -200,7 +200,7 @@ int feenox_parser_expressions(expr_t *expr[], size_t n) {
       return FEENOX_ERROR;
     }
   
-    feenox_call(feenox_expression_parse(expr[i], token));
+    feenox_call(feenox_expression_parse(&((*expr)[i]), token));
   }
   
   return FEENOX_OK;

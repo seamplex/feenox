@@ -177,7 +177,7 @@ int feenox_instruction_print_function(void *arg) {
   print_token_t *print_token;
   
   int j, k;
-  int flag = 0;
+//  int flag = 0;
   double *x, *x_min, *x_max, *x_step;
 
   // in parallel runs only print from first processor
@@ -194,7 +194,8 @@ int feenox_instruction_print_function(void *arg) {
   }
   
   // vemos si hay que escribir un header
-//   if (print_function->header && (feenox.parametric_mode == 0 ||
+  if (print_function->header) {
+//  && (feenox.parametric_mode == 0 ||
 //       (int)feenox_special_var_value(step_outer) == 1)) {
     fprintf(print_function->file->pointer, "# ");
     
@@ -213,7 +214,7 @@ int feenox_instruction_print_function(void *arg) {
       }
     }
     fprintf(print_function->file->pointer, "\n");
-//   }
+  }
   
 
   if (print_function->range.min != NULL && print_function->range.max != NULL && 

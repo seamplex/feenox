@@ -218,6 +218,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_print());
       return FEENOX_OK;
 
+///kw+PRINT_FUNCTION+desc Print one or more functions as a table of values of dependent and independent variables.
+///kw+PRINT_FUNCTION+usage PRINT_FUNCTION
+    } else if (strcasecmp(token, "PRINT_FUNCTION") == 0) {
+      feenox_call(feenox_parse_print_function());
+      return FEENOX_OK;
+      
+      
 ///kw+FILE+desc Define a file with a particularly formatted name to be used either as input or as output.
 ///kw+FILE+usage < FILE | OUTPUT_FILE | INPUT_FILE >
     } else if (strcasecmp(token, "FILE") == 0) {
@@ -258,12 +265,6 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_endif());
       return FEENOX_OK;
 
-///kw+PRINT_FUNCTION+desc Print one or more functions as a table of values of dependent and independent variables.
-///kw+PRINT_FUNCTION+usage PRINT_FUNCTION
-    } else if (strcasecmp(token, "PRINT_FUNCTION") == 0) {
-      feenox_call(feenox_parse_print_function());
-      return FEENOX_OK;
-      
     }
       
   }
@@ -2930,10 +2931,23 @@ int feenox_parse_print_function(void) {
   print_function = calloc(1, sizeof(print_function_t));
 
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-      
-///kw+PRINT_FUNCTION+usage <function_1> [ { function_2 | expr_1 } ... { function_n | expr_n } ]
 
-///kw+PRINT_FUNCTION+usage [ FILE < <file_path> | <file_id> > ]
+///kw+PRINT_FUNCTION+detail Each argument should be either a function or an expression.
+///kw+PRINT_FUNCTION+detail The output of this instruction consists of\ $n+k$ columns,
+///kw+PRINT_FUNCTION+detail where\ $n$ is the number of arguments of the first function of the list
+///kw+PRINT_FUNCTION+detail and\ $k$ is the number of functions and expressions given.
+///kw+PRINT_FUNCTION+detail The first\ $n$ columns are the arguments (independent variables) and 
+///kw+PRINT_FUNCTION+detail the last\ $k$ one has the evaluated functions and expressions.
+///kw+PRINT_FUNCTION+detail The columns are separated by a tabulator, which is the format that most
+///kw+PRINT_FUNCTION+detail plotting tools understand.
+///kw+PRINT_FUNCTION+detail Only function names without arguments are expected.
+///kw+PRINT_FUNCTION+detail All functions should have the same number of arguments.
+///kw+PRINT_FUNCTION+detail Expressions can involve the arguments of the first function.
+    
+///kw+PRINT_FUNCTION+usage <function_1> [ { function | expr } ... { function | expr } ]
+
+///kw+PRINT_FUNCTION+usage @
+///kw+PRINT_FUNCTION+usage [ FILE { <file_path> | <file_id> } ]
 ///kw+PRINT_FUNCTION+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
       feenox_call(feenox_parser_file(&print_function->file));
@@ -2942,10 +2956,21 @@ int feenox_parse_print_function(void) {
       }
       
 ///kw+PRINT_FUNCTION+usage [ HEADER ]
+///kw+PRINT_FUNCTION+detail If `HEADER` is given, the output is prepended with a single line containing the
+///kw+PRINT_FUNCTION+detail names of the arguments and the names of the functions, separated by tabs.
+///kw+PRINT_FUNCTION+detail The header starts with a hash\ `#` that usually acts as a comment and is ignored
+///kw+PRINT_FUNCTION+detail by most plotting tools.
     } else if (strcasecmp(token, "HEADER") == 0) {
       print_function->header = 1;
           
-///kw+PRINT_FUNCTION+usage [ MIN <expr_1> <expr_2> ... <expr_m> ]
+///kw+PRINT_FUNCTION+usage @
+///kw+PRINT_FUNCTION+usage [ MIN <expr_1> <expr_2> ... <expr_k> ]
+///kw+PRINT_FUNCTION+detail If there is no explicit range where to evaluate the functions and the first function
+///kw+PRINT_FUNCTION+detail is point-wise defined, they are evalauted at the points of definition of the first one.
+///kw+PRINT_FUNCTION+detail The range can be explicitly given as a product of\ $n$ ranges\ $[x_{i,\min},x_{i,\max}]$
+///kw+PRINT_FUNCTION+detail for $i=1,\dots,n$.      
+      
+///kw+PRINT_FUNCTION+detail The values $x_{i,\min}$ and $x_{i,\max}$ are given with the `MIN` _and_ `MAX` keywords.
     } else if (strcasecmp(token, "MIN") == 0) {
       if (print_function->first_function == NULL) {
         feenox_push_error_message("MIN before actual function, cannot determine number of arguments");
@@ -2956,7 +2981,7 @@ int feenox_parse_print_function(void) {
         return FEENOX_ERROR;
       }
 
-///kw+PRINT_FUNCTION+usage [ MAX <expr_1> <expr_2> ... <expr_m> ]
+///kw+PRINT_FUNCTION+usage [ MAX <expr_1> <expr_2> ... <expr_k> ]
     } else if (strcasecmp(token, "MAX") == 0) {
 
       if (print_function->first_function == NULL) {
@@ -2968,7 +2993,10 @@ int feenox_parse_print_function(void) {
         return FEENOX_ERROR;
       }
 
-///kw+PRINT_FUNCTION+usage [ STEP <expr_1> <expr_2> ... <expr_m> ]
+///kw+PRINT_FUNCTION+detail The discretization steps of the ranges are given by either `STEP` that gives\ $\delta x$ _or_
+///kw+PRINT_FUNCTION+detail `NSTEPS` that gives the number of steps.
+///kw+PRINT_FUNCTION+usage @
+///kw+PRINT_FUNCTION+usage [ STEP <expr_1> <expr_2> ... <expr_k> ]
     } else if (strcasecmp(token, "STEP") == 0) {
 
       if (print_function->first_function == NULL) {
@@ -2980,7 +3008,7 @@ int feenox_parse_print_function(void) {
         return FEENOX_ERROR;
       }
 
-///kw+PRINT_FUNCTION+usage [ NSTEPs <expr_1> <expr_2> ... <expr_m> ]
+///kw+PRINT_FUNCTION+usage [ NSTEPs <expr_1> <expr_2> ... <expr_k> ]
     } else if (strcasecmp(token, "NSTEPS") == 0) {
 
       if (print_function->first_function == NULL) {
@@ -2991,7 +3019,9 @@ int feenox_parse_print_function(void) {
       if (feenox_parser_expressions(&print_function->range.nsteps, print_function->first_function->n_arguments) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
+///kw+PRINT_FUNCTION+detail If the first function is not point-wise defined, the ranges are mandatory.
 
+///kw+PRINT_FUNCTION+usage @
 ///kw+PRINT_FUNCTION+usage [ FORMAT <print_format> ]
     } else if (strcasecmp(token, "FORMAT") == 0) {
       // TODO: like in PRINT  
