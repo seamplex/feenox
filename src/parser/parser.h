@@ -94,5 +94,6 @@ extern int feenox_parse_if(void);
 extern int feenox_parse_else(void);
 extern int feenox_parse_endif(void);
 
+extern int feenox_parse_phase_space(void);
 
 #endif  

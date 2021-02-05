@@ -37,6 +37,57 @@ int feenox_add_time_path(const char *token) {
   return FEENOX_OK;
 }
 
+// API
+int feenox_add_phase_space_object(const char *token) {
+
+  var_t *variable = NULL;
+  vector_t *vector = NULL;
+  matrix_t *matrix = NULL;
+  char *buffer = NULL;
+  
+  phase_object_t *phase_object = calloc(1, sizeof(phase_object_t));
+  if ((vector = feenox_get_vector_ptr(token)) != NULL) {
+
+//     phase_object->offset = i;
+    phase_object->vector = vector;
+    phase_object->name = vector->name;
+
+    buffer = malloc(strlen(vector->name)+8);
+    sprintf(buffer, "%s_dot", vector->name);
+    feenox_call(feenox_define_vector(buffer, vector->size_expr.string));
+    free(buffer);
+
+  } else if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
+
+    phase_object->matrix = matrix;
+    phase_object->name = matrix->name;
+
+    buffer = malloc(strlen(matrix->name)+8);
+    sprintf(buffer, "%s_dot", matrix->name);
+    feenox_call(feenox_define_matrix(buffer, matrix->rows_expr.string, matrix->cols_expr.string));
+    free(buffer);
+
+  } else {
+
+    if ((variable = feenox_get_or_define_variable_ptr(token)) == NULL) {
+      return FEENOX_ERROR;
+    }
+
+    phase_object->variable = variable;
+    phase_object->name = variable->name;
+
+    buffer = malloc(strlen(variable->name)+8);
+    sprintf(buffer, "%s_dot", variable->name);
+    if ((phase_object->variable_dot = feenox_get_or_define_variable_ptr(buffer)) == NULL) {
+      return FEENOX_ERROR;
+    }
+    free(buffer);
+
+  }
+  
+  LL_APPEND(feenox.dae.phase_objects, phase_object);
+  return FEENOX_OK;
+}
 
 int feenox_dae_init(void) {
   

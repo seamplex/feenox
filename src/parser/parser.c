@@ -265,6 +265,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_endif());
       return FEENOX_OK;
 
+///kw+PHASE_SPACE+desc Define the variables, vectors and/or matrices that span the phase space of the DAE system of equations.
+///kw+PHASE_SPACE+usage PHASE_SPACE
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "PHASE_SPACE") == 0) {
+      feenox_call(feenox_parse_phase_space());
+      return FEENOX_OK;
+      
     }
       
   }
@@ -272,19 +279,6 @@ int feenox_parse_line(void) {
 
       
 /*
-      
-
-    } else if (strcasecmp(token, "IF") == 0) {
-
-
-    // ---- ELSE  ----------------------------------------------------
-    } else if (strcasecmp(token, "ELSE") == 0) {
-
-
-// ---- ENDIF  ----------------------------------------------------
-    } else if (strcasecmp(token, "ENDIF") == 0) {
-
-
 
 // ---- SEMAPHORE ----------------------------------------------------
 ///kw+SEMAPHORE+desc Perform either a wait or a post operation on a named shared semaphore.
@@ -1371,110 +1365,6 @@ int feenox_parse_line(void) {
 
       return FEENOX_OK;
 
-    // ----- PHASE_SPACE -----------------------------------------------------------
-    } else if (strcasecmp(token, "PHASE_SPACE") == 0) {
-///kw+PHASE_SPACE+usage PHASE_SPACE { <vars> | <vectors> | <matrices> }
-///kw+PHASE_SPACE+desc Define which variables, vectors and/or matrices belong to the phase space of the DAE system to be solved.
-
-      var_t *variable;
-      vector_t *vector;
-      matrix_t *matrix;
-      char *buffer;
-
-      if (feenox_dae.dimension != 0) {
-        feenox_push_error_message("PHASE_SPACE keyword already given");
-        return FEENOX_ERROR;
-      }
-#ifdef HAVE_IDA
-      if (sizeof(realtype) != sizeof(double)) {
-        feenox_push_error_message("\nSUNDIALS was compiled using a different word size than feenox.\nPlease recompile with double precision floating point arithmetic.");
-        return FEENOX_ERROR;
-      }
-#endif
-
-      i = 0;
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-        phase_object_t *phase_object = calloc(1, sizeof(phase_object_t));
-        LL_APPEND(feenox_dae.phase_objects, phase_object);
-
-        if ((vector = feenox_get_vector_ptr(token)) != NULL) {
-
-          expr_t *size_expr;
-          
-          phase_object->offset = i;
-          phase_object->vector = vector;
-          phase_object->name = vector->name;
-
-          buffer = malloc(strlen(vector->name)+8);
-          sprintf(buffer, "%s_dot", vector->name);
-          
-          // chapuceria, aca habria que duplicar un expr_t completo
-          size_expr = malloc(sizeof(expr_t));
-          feenox_parse_expression(vector->size_expr->string, size_expr);
-          phase_object->vector_dot = feenox_define_vector(buffer, vector->size, size_expr, NULL);
-          
-          free(buffer);
-
-        } else if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
-
-          expr_t *rows_expr;
-          expr_t *cols_expr;
-          
-          phase_object->offset = i;
-          phase_object->matrix = matrix;
-          phase_object->name = matrix->name;
-
-          buffer = malloc(strlen(matrix->name)+8);
-          sprintf(buffer, "%s_dot", matrix->name);
-          
-          // chapuceria, aca habria que duplicar los expr_ts completos
-          rows_expr = malloc(sizeof(expr_t));
-          feenox_parse_expression(matrix->rows_expr->string, rows_expr);
-          cols_expr = malloc(sizeof(expr_t));
-          feenox_parse_expression(matrix->cols_expr->string, cols_expr);
-          
-          phase_object->matrix_dot = feenox_define_matrix(buffer, matrix->rows, rows_expr, matrix->cols, cols_expr, NULL);
-          
-          free(buffer);
-
-        } else {
-
-          if ((variable = feenox_get_or_define_variable_ptr(token)) == NULL) {
-            return FEENOX_ERROR;
-          }
-
-          phase_object->variable = variable;
-          phase_object->name = variable->name;
-
-          buffer = malloc(strlen(variable->name)+8);
-          sprintf(buffer, "%s_dot", variable->name);
-          phase_object->variable_dot = feenox_define_variable(buffer);
-          free(buffer);
-
-        }
-      }
-
-      return FEENOX_OK;
-              
-    // ----- DIFFERENTIAL -----------------------------------------------------------
-    } else if (strcasecmp(token, "DIFFERENTIAL") == 0) {
-///kw+DIFFERENTIAL+desc Explicitly mark variables, vectors or matrices as “differential” to compute intial conditions of DAE systems.
-///kw+DIFFERENTIAL+usage DIFFERENTIAL { <var_1> <var_2> ... | <vector_1> <vector_2> ... | <matrix_1> <matrix_2> ... }
-      
-      phase_object_t *phase_object;
-      
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        LL_FOREACH(feenox_dae.phase_objects, phase_object) {
-          if ((phase_object->variable != NULL && strcmp(token, phase_object->variable->name) == 0) ||
-              (phase_object->vector   != NULL && strcmp(token, phase_object->vector->name) == 0) ||
-              (phase_object->matrix   != NULL && strcmp(token, phase_object->matrix->name) == 0) ) {
-            phase_object->differential = 1;
-          }
-        }          
-      }
-      
-      return FEENOX_OK;
       
       // --- DAE -----------------------------------------------------
     } else if (token[0] == '0' || strstr(feenox.line, ".=") != NULL) {
@@ -3167,5 +3057,52 @@ int feenox_parse_endif(void) {
 
   feenox.active_conditional_block = feenox.active_conditional_block->father;
 
-  return EXIT_SUCCESS;
+  return FEENOX_OK;
+}
+
+int feenox_parse_phase_space(void) {
+    
+///kw+PHASE_SPACE+usage PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }
+
+  if (feenox.dae.dimension != 0) {
+    feenox_push_error_message("PHASE_SPACE keyword already given");
+    return FEENOX_ERROR;
+  }
+#ifdef HAVE_IDA
+  if (sizeof(realtype) != sizeof(double)) {
+    feenox_push_error_message("\nSUNDIALS was compiled using a different word size than FeenoX, please recompile with double precision floating point arithmetic.");
+    return FEENOX_ERROR;
+  }
+#endif
+
+//     i = 0;
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    feenox_call(feenox_add_phase_space_object(token));
+  }
+
+  return FEENOX_OK;
+/*              
+    // ----- DIFFERENTIAL -----------------------------------------------------------
+    } else if (strcasecmp(token, "DIFFERENTIAL") == 0) {
+///kw+DIFFERENTIAL+desc Explicitly mark variables, vectors or matrices as “differential” to compute intial conditions of DAE systems.
+///kw+DIFFERENTIAL+usage DIFFERENTIAL { <var_1> <var_2> ... | <vector_1> <vector_2> ... | <matrix_1> <matrix_2> ... }
+      
+      phase_object_t *phase_object;
+      
+      while ((token = feenox_get_next_token(NULL)) != NULL) {
+        LL_FOREACH(feenox_dae.phase_objects, phase_object) {
+          if ((phase_object->variable != NULL && strcmp(token, phase_object->variable->name) == 0) ||
+              (phase_object->vector   != NULL && strcmp(token, phase_object->vector->name) == 0) ||
+              (phase_object->matrix   != NULL && strcmp(token, phase_object->matrix->name) == 0) ) {
+            phase_object->differential = 1;
+          }
+        }          
+      }
+      
+      return FEENOX_OK;
+  
+ 
+  return FEENOX_OK;
+  */
 }
