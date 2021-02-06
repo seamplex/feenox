@@ -93,10 +93,15 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
         return FEENOX_ERROR;
       }
       
+      // the line is broken by strtok inside parse_line() and we need
+      // the original for assignements and equations
+      feenox_parser.full_line = strdup(feenox_parser.line);
       if (feenox_parse_line() != FEENOX_OK) {
+        free(feenox_parser.full_line);
         feenox_push_error_message("%s: %d:", filepath, line_num);
         return FEENOX_ERROR;
       }
+      free(feenox_parser.full_line);
     }
   }
 
@@ -258,18 +263,16 @@ int feenox_parse_line(void) {
 //  i.   an algebraic function
 //  ii.  an equation for the DAE
 //  iii. an assignment,
-    } else if ((equal_sign = strstr(feenox_parser.line, ":=")) != NULL ||
-               (equal_sign = strstr(feenox_parser.line, ".=")) != NULL ||
-               (equal_sign = strchr(feenox_parser.line, '=')) != NULL) {
+    } else if ((equal_sign = strstr(feenox_parser.full_line, ":=")) != NULL ||
+               (equal_sign = strstr(feenox_parser.full_line, ".=")) != NULL ||
+               (equal_sign = strchr(feenox_parser.full_line, '=')) != NULL) {
         *equal_sign = '\0';
-        char *lhs = strdup(feenox_parser.line);
-        char *rhs = strdup(equal_sign + 1 + (equal_sign[1] == '='));
+        char *lhs = feenox_parser.full_line;
+        char *rhs = equal_sign + 1 + (equal_sign[1] == '=');
     
-        printf("parser lhs = '%s' rhs = '%s'\n", lhs, rhs);
-    
-    
-        free(lhs);
-        free(lhs);
+        char *open_bracket = strchr(lhs, '[');
+        char *open_par = strchr(lhs, '(');
+
         return FEENOX_OK;
     }
       

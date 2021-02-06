@@ -40,6 +40,7 @@ struct feenox_parser_t {
   int reading_daes;
   
   char *line;
+  char *full_line; // strtok breaks line so we keep a copy with the full one
   
 // this is a pointer to an internal buffer to have "memory" for strtoken
 // so we can parse stuff between quotation marks as a single token
