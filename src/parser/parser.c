@@ -30,23 +30,6 @@ feenox_parser_t feenox_parser;
 #if HAVE_SYSCONF
  #include <unistd.h>
 #endif
-/*
-*/
-/*
-#include <ctype.h>
-#include <math.h>
-*/
-/*
-#include <dlfcn.h>
-
-#include "builtin.h"
-
-typedef struct varlist_t varlist_t;
-struct varlist_t {
-  var_t *var;
-  varlist_t *next;
-};
-*/
 
 
 int feenox_parse_main_input_file(const char *filepath) {
@@ -64,14 +47,10 @@ int feenox_parse_main_input_file(const char *filepath) {
   feenox_call(feenox_parse_input_file(filepath, 0, 0));
   free(feenox_parser.line);
 
-/*  
-  // TODO 
   if (feenox_parser.active_conditional_block != NULL) {
     feenox_push_error_message("conditional block not closed");
     return FEENOX_ERROR;
   }
- */
-
 
   return FEENOX_OK;
 }
@@ -135,7 +114,8 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
 // feenox line parser
 int feenox_parse_line(void) {
 
-  char *token;
+  char *token = NULL;
+  char *equal_sign = NULL;
 
   if ((token = feenox_get_next_token(feenox_parser.line)) != NULL) {
     
@@ -271,7 +251,26 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "PHASE_SPACE") == 0) {
       feenox_call(feenox_parse_phase_space());
       return FEENOX_OK;
-      
+
+// this should come last because there is no actual keyword apart from the equal sign
+// so if we came down here, then that means that any line containing a '=' that has
+// not been already processed must be one of these
+//  i.   an algebraic function
+//  ii.  an equation for the DAE
+//  iii. an assignment,
+    } else if ((equal_sign = strstr(feenox_parser.line, ":=")) != NULL ||
+               (equal_sign = strstr(feenox_parser.line, ".=")) != NULL ||
+               (equal_sign = strchr(feenox_parser.line, '=')) != NULL) {
+        *equal_sign = '\0';
+        char *lhs = strdup(feenox_parser.line);
+        char *rhs = strdup(equal_sign + 1 + (equal_sign[1] == '='));
+    
+        printf("parser lhs = '%s' rhs = '%s'\n", lhs, rhs);
+    
+    
+        free(lhs);
+        free(lhs);
+        return FEENOX_OK;
     }
       
   }
@@ -3076,33 +3075,17 @@ int feenox_parse_phase_space(void) {
 #endif
 
 //     i = 0;
+  int differential = 0;
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-    feenox_call(feenox_add_phase_space_object(token));
+    if (strcmp(token, "DIFFERENTIAL") == 0) {
+      differential = 1;
+    } else if (differential == 0) {  
+      feenox_call(feenox_phase_space_add_object(token));
+    } else {
+      feenox_call(feenox_phase_space_mark_diff(token));
+    }
   }
 
   return FEENOX_OK;
-/*              
-    // ----- DIFFERENTIAL -----------------------------------------------------------
-    } else if (strcasecmp(token, "DIFFERENTIAL") == 0) {
-///kw+DIFFERENTIAL+desc Explicitly mark variables, vectors or matrices as “differential” to compute intial conditions of DAE systems.
-///kw+DIFFERENTIAL+usage DIFFERENTIAL { <var_1> <var_2> ... | <vector_1> <vector_2> ... | <matrix_1> <matrix_2> ... }
-      
-      phase_object_t *phase_object;
-      
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        LL_FOREACH(feenox_dae.phase_objects, phase_object) {
-          if ((phase_object->variable != NULL && strcmp(token, phase_object->variable->name) == 0) ||
-              (phase_object->vector   != NULL && strcmp(token, phase_object->vector->name) == 0) ||
-              (phase_object->matrix   != NULL && strcmp(token, phase_object->matrix->name) == 0) ) {
-            phase_object->differential = 1;
-          }
-        }          
-      }
-      
-      return FEENOX_OK;
-  
- 
-  return FEENOX_OK;
-  */
 }
