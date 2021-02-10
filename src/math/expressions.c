@@ -720,6 +720,46 @@ double feenox_evaluate_expression_in_string(const char *string) {
 }
 
 
+// parsea el rango de indices 
+int feenox_parse_range(char *string, const char left_delim, const char middle_delim, const char right_delim, expr_t *a, expr_t *b) {
+  char *first_bracket;
+  char *second_bracket;
+  char *colon;
+
+  if ((first_bracket = strchr(string, left_delim)) == NULL) {
+    feenox_push_error_message("range '%s' does not start with '%c'", string, left_delim);
+    return FEENOX_ERROR;
+  }
+
+  if ((second_bracket = strrchr(string, right_delim)) == NULL) {
+    feenox_push_error_message("unmatched '%c' for range in '%s'", left_delim, string);
+    return FEENOX_ERROR;
+  }
+
+  *second_bracket = '\0';
+
+  if ((colon = strchr(string, middle_delim)) == NULL) {
+    feenox_push_error_message("delimiter '%c' not found when giving range", middle_delim);
+    return FEENOX_ERROR;
+  }
+  *colon = '\0';
+
+  if (feenox_expression_parse(a, first_bracket+1) != 0) {
+    feenox_push_error_message("in min range expression");
+    return FEENOX_ERROR;
+  }
+  if (feenox_expression_parse(b, colon+1) != 0) {
+    feenox_push_error_message("in max range expression");
+    return FEENOX_ERROR;
+  }
+  
+  *second_bracket = right_delim;;
+  *colon = middle_delim;
+          
+  return FEENOX_OK;
+}
+
+
 
 
 /*

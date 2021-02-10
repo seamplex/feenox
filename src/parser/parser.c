@@ -266,12 +266,32 @@ int feenox_parse_line(void) {
     } else if ((equal_sign = strstr(feenox_parser.full_line, ":=")) != NULL ||
                (equal_sign = strstr(feenox_parser.full_line, ".=")) != NULL ||
                (equal_sign = strchr(feenox_parser.full_line, '=')) != NULL) {
+        
+        enum { parser_dae, parser_function, parser_assignment } type;
+        
+        switch (*equal_sign) {
+          case ':':
+            type = parser_function;
+          break;
+          case '.':
+            type = parser_dae;
+          break;
+          case '=':
+            type = parser_assignment;
+          break;
+          default:
+            feenox_push_error_message("unexpected character '%c'", *equal_sign);
+            return FEENOX_ERROR;
+        }     
+                
         *equal_sign = '\0';
         char *lhs = feenox_parser.full_line;
         char *rhs = equal_sign + 1 + (equal_sign[1] == '=');
-    
-        char *open_bracket = strchr(lhs, '[');
-        char *open_par = strchr(lhs, '(');
+        
+        
+        
+//         char *open_bracket = strchr(lhs, '[');
+//         char *open_par = strchr(lhs, '(');
 
         return FEENOX_OK;
     }

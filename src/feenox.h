@@ -186,6 +186,8 @@ typedef struct alias_t alias_t;
 typedef struct instruction_t instruction_t;
 typedef struct conditional_block_t conditional_block_t;
 
+typedef struct assignment_t assignment_t;
+
 typedef struct file_t file_t;
 typedef struct print_t print_t;
 typedef struct print_token_t print_token_t;
@@ -505,6 +507,62 @@ struct conditional_block_t {
   
   conditional_block_t *next;
 };
+
+
+// igualacion algebraica 
+struct  assignment_t {
+  int initialized;
+  
+  var_t *variable;
+  vector_t *vector;
+  matrix_t *matrix;
+  
+  // expresiones que indican el rango de tiempo
+  expr_t t_min;
+  expr_t t_max;
+
+  // expresiones que indican el rango de indices para asignaciones vectoriales/matriciales
+  expr_t i_min;
+  expr_t i_max;
+  expr_t j_min;
+  expr_t j_max;
+
+  // expresiones que indican la fila y la columna en funcion de i y de j
+  expr_t row;
+  expr_t col;
+  
+  // to sum up:
+  // a(row, col)<i_min,i_max;j_min,j_max>[t_min,tmax]
+  
+  // la expresion del miembro derecho
+  expr_t rhs;
+  
+  // flag que indica si el assignment pide _init o _0
+  int initial_static;
+  int initial_transient;
+  
+  // si este es true entonces la asignacion es una sola (aun cuando el miembro
+  // izquierdo sea un vector o matriz), i.e.
+  // A(127,43)  es escalar
+  // A(2*i+1,14) no es escalar
+  int scalar;
+
+  // si esto es true, entonces las asignaciones vector o matriz son plain, i.e.
+  // A(i,j)
+  int plain;
+  
+  // diferenciamos, en caso de las matrices, aquellas dependencias solo en i o en j
+  // A(i,4) = 5 es un assignment que depende solo de i
+  int expression_only_of_i;
+  
+  // A(8,j) = 1 es un assignment que depende solo de j
+  int expression_only_of_j;
+  
+  
+  assignment_t *next;
+
+};
+
 
 
 // a file, either input or output
@@ -851,7 +909,7 @@ extern int feenox_instruction_abort(void *arg);
 // expressions.c
 extern int feenox_expression_parse(expr_t *this, const char *string);
 extern expr_item_t *feenox_expression_parse_item(const char *string);
-
+extern int feenox_parse_range(char *string, const char left_delim, const char middle_delim, const char right_delim, expr_t *a, expr_t *b);
 
 extern double feenox_expression_eval(expr_t *this);
 extern double feenox_evaluate_expression_in_string(const char *string);
