@@ -23,7 +23,7 @@
 extern feenox_t feenox;
 
 // API
-int feenox_add_time_path(const char *token) {
+int feenox_add_time_path(const char *string) {
   expr_t *expr;
   
   if ((expr = calloc(1, sizeof(expr))) == NULL) {
@@ -31,14 +31,14 @@ int feenox_add_time_path(const char *token) {
     return FEENOX_ERROR;
   }
   
-  feenox_call(feenox_expression_parse(expr, token));
+  feenox_call(feenox_expression_parse(expr, string));
   LL_APPEND(feenox.time_paths, expr);
   
   return FEENOX_OK;
 }
 
 // API
-int feenox_add_phase_space_object(const char *token) {
+int feenox_phase_space_add_object(const char *string) {
 
   var_t *variable = NULL;
   vector_t *vector = NULL;
@@ -46,7 +46,7 @@ int feenox_add_phase_space_object(const char *token) {
   char *buffer = NULL;
   
   phase_object_t *phase_object = calloc(1, sizeof(phase_object_t));
-  if ((vector = feenox_get_vector_ptr(token)) != NULL) {
+  if ((vector = feenox_get_vector_ptr(string)) != NULL) {
 
 //     phase_object->offset = i;
     phase_object->vector = vector;
@@ -57,7 +57,7 @@ int feenox_add_phase_space_object(const char *token) {
     feenox_call(feenox_define_vector(buffer, vector->size_expr.string));
     free(buffer);
 
-  } else if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
+  } else if ((matrix = feenox_get_matrix_ptr(string)) != NULL) {
 
     phase_object->matrix = matrix;
     phase_object->name = matrix->name;
@@ -69,7 +69,7 @@ int feenox_add_phase_space_object(const char *token) {
 
   } else {
 
-    if ((variable = feenox_get_or_define_variable_ptr(token)) == NULL) {
+    if ((variable = feenox_get_or_define_variable_ptr(string)) == NULL) {
       return FEENOX_ERROR;
     }
 
@@ -88,6 +88,24 @@ int feenox_add_phase_space_object(const char *token) {
   LL_APPEND(feenox.dae.phase_objects, phase_object);
   return FEENOX_OK;
 }
+
+// API
+int feenox_phase_space_mark_diff(const char *string) {
+
+  phase_object_t *phase_object = NULL;  
+    
+  LL_FOREACH(feenox.dae.phase_objects, phase_object) {
+    if ((phase_object->variable != NULL && strcmp(string, phase_object->variable->name) == 0) ||
+        (phase_object->vector   != NULL && strcmp(string, phase_object->vector->name) == 0) ||
+        (phase_object->matrix   != NULL && strcmp(string, phase_object->matrix->name) == 0) ) {
+         phase_object->differential = 1;
+         return FEENOX_OK;
+    }
+  }
+  
+  feenox_push_error_message("object '%s' is not in the phase space", string);
+  return FEENOX_ERROR;
+}  
 
 int feenox_dae_init(void) {
   

@@ -858,7 +858,8 @@ extern double feenox_evaluate_expression_in_string(const char *string);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
-extern int feenox_add_phase_space_object(const char *token);
+extern int feenox_phase_space_add_object(const char *token);
+extern int feenox_phase_space_mark_diff(const char *string);
 extern int feenox_dae_init(void);
 extern int feenox_dae_ic(void);
 #ifdef HAVE_IDA
