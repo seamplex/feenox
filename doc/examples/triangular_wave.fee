@@ -1,0 +1,4 @@
+FUNCTION f(t) = sin(pi/2 * t)
+FUNCTION g(t) = 2*triangular_wave(0.25 * (t+1)) - 1
+
+PRINT_FUNCTION f g MIN 0 MAX 8 NSTEPS 80
