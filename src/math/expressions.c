@@ -29,7 +29,7 @@ extern feenox_t feenox;
 extern const char operators[];
 extern const char factorseparators[];
 
-char *feenox_ends_in_zero(char *name) {
+char *feenox_ends_in_zero(const char *name) {
 
   char *dummy;
 
@@ -41,7 +41,7 @@ char *feenox_ends_in_zero(char *name) {
   
 }
 
-char *feenox_ends_in_init(char *name) {
+char *feenox_ends_in_init(const char *name) {
 
   char *dummy;
 
@@ -53,7 +53,7 @@ char *feenox_ends_in_init(char *name) {
 }
 
 
-char *feenox_ends_in_dot(char *name) {
+char *feenox_ends_in_dot(const char *name) {
 
   char *dummy;
 

@@ -288,6 +288,11 @@ int feenox_parse_line(void) {
         char *lhs = feenox_parser.full_line;
         char *rhs = equal_sign + 1 + (equal_sign[1] == '=');
         
+        switch (type) {
+          case parser_assignment:
+            feenox_call(feenox_add_assignment(lhs, rhs));
+          break;      
+        }
         
         
 //         char *open_bracket = strchr(lhs, '[');

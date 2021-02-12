@@ -56,7 +56,6 @@ extern int feenox_parse_line(void);
 // auxiliary.c
 extern int feenox_read_line(FILE *file_ptr);
 extern char *feenox_get_next_token(char *line);
-extern void feenox_strip_blanks(char *string);
 
 extern int feenox_parser_string(char **string);
 extern int feenox_parser_expression(expr_t *expr);

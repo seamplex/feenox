@@ -760,6 +760,7 @@ struct feenox_t {
   alias_t *aliases;
   function_t *functions;
   
+  assignment_t *assignments;
   file_t *files;
   print_t *prints;
   print_function_t *print_functions;
@@ -890,8 +891,8 @@ void feenox_finalize(void);
 
 // parser.c
 extern int feenox_parse_main_input_file(const char *filepath);
-extern char *feenox_ends_in_init(char *name);
-extern char *feenox_ends_in_zero(char *name);
+extern char *feenox_ends_in_init(const char *name);
+extern char *feenox_ends_in_zero(const char *name);
 extern int feenox_count_arguments(char *string, size_t *);
 extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
 
@@ -966,6 +967,16 @@ extern builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const cha
 extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name);
 
 extern file_t *feenox_get_file_ptr(const char *name);
+
+// assignment.c
+extern int feenox_add_assignment(char *left_hand, char *right_hand);
+extern int feenox_assign_single(assignment_t *assignment, int row, int col);
+extern int feenox_instruction_assignment_scalar(void *arg);
+extern int feenox_instruction_assignment_vector(void *arg);
+extern int feenox_instruction_assignment_matrix(void *arg);
+
+// auxiliary.c
+extern void feenox_strip_blanks(char *string);
 
 // alias.c
 extern int feenox_instruction_alias(void *arg);

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX assignment of variables/vectors/matrices
  *
- *  Copyright (C) 2009--2015 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -22,17 +22,16 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-
+// API
 int feenox_add_assignment(char *left_hand, char *right_hand) {
   
   char *dummy;
-  char *dummy_time_range;
   char *dummy_index_range;
   char *dummy_par;
   char *dummy_init;
   char *dummy_0;
   
-  assignment_t *assignment = calloc(1, sizeof(assignment));
+  assignment_t *assignment = calloc(1, sizeof(assignment_t));
   
   // let us start assuming the assignment is "plain"
   assignment->plain = 1;
@@ -59,15 +58,18 @@ int feenox_add_assignment(char *left_hand, char *right_hand) {
     assignment->initial_transient = 1;
   }
   
-  // TODO: strip blanks?
-  if ((assignment->matrix = feenox_get_matrix_ptr(left_hand)) == NULL &&
-      (assignment->vector = feenox_get_vector_ptr(left_hand)) == NULL) {
+  char *sanitized_lhs = strdup(left_hand);
+  feenox_strip_blanks(sanitized_lhs);
+  if ((assignment->matrix = feenox_get_matrix_ptr(sanitized_lhs)) == NULL &&
+      (assignment->vector = feenox_get_vector_ptr(sanitized_lhs)) == NULL) {
     
-    assignment->variable = feenox_get_or_define_variable_ptr(left_hand);
+    if ((assignment->variable = feenox_get_or_define_variable_ptr(sanitized_lhs)) == NULL) {
+      return FEENOX_ERROR;  
+    }
     assignment->plain = 0;
     assignment->scalar = 1;
-  
   }
+  free(sanitized_lhs);
     
     // we are looking for a variable
     // TODO: honor IMPLICIT
@@ -168,12 +170,38 @@ int feenox_add_assignment(char *left_hand, char *right_hand) {
   // the right-hand side is easy!
   feenox_call(feenox_expression_parse(&assignment->rhs, right_hand));
   
+  LL_APPEND(feenox.assignments, assignment);
+  if (assignment->variable != NULL) {
+    feenox_call(feenox_add_instruction(feenox_instruction_assignment_scalar, assignment));
+  } else if (assignment->vector != NULL) {
+    feenox_call(feenox_add_instruction(feenox_instruction_assignment_vector, assignment));      
+  } else if (assignment->vector != NULL) {
+    feenox_call(feenox_add_instruction(feenox_instruction_assignment_matrix, assignment));      
+  } else {
+    feenox_push_error_message("invalid assignment");
+    return FEENOX_ERROR;
+  }
+    
   return FEENOX_OK;
 }
 
-/*
-// un assignment puede ser tan sencillo como una variable solita o algo
-// mas complejo como la asignacion de ciertos elementos de una matrix/vector
+int feenox_instruction_assignment_scalar(void *arg) {
+  assignment_t *assignment = (assignment_t *)arg;
+  feenox_call(feenox_assign_single(assignment, 0, 0));
+  return FEENOX_OK;  
+}
+
+int feenox_instruction_assignment_vector(void *arg) {
+  assignment_t *assignment = (assignment_t *)arg;
+  return FEENOX_OK;  
+}
+
+int feenox_instruction_assignment_matrix(void *arg) {
+  assignment_t *assignment = (assignment_t *)arg;
+  return FEENOX_OK;  
+}
+
+/*  
 int feenox_instruction_assignment(void *arg) {
   assignment_t *assignment = (assignment_t *)arg;
 
@@ -181,6 +209,10 @@ int feenox_instruction_assignment(void *arg) {
   int i, j;
   int i_min, i_max, j_min, j_max;
   
+  if (assignment->i_min.items == NULL) {
+    feenox_call(feenox_assign_scalar(assignment, 0, 0));
+  }
+
   feenox_call(feenox_get_assignment_array_boundaries(assignment, &i_min, &i_max, &j_min, &j_max));
  
   for (i = i_min; i < i_max; i++) {
@@ -189,11 +221,11 @@ int feenox_instruction_assignment(void *arg) {
       feenox_call(feenox_assign_scalar(assignment, row, col));
     }
   }
-  
-  return WASORA_RUNTIME_OK;
-
+  return FEENOX_OK;
 }
+*/  
 
+/*
 int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min, int *i_max, int *j_min, int *j_max) {
  
   *i_min = 0;
@@ -253,7 +285,7 @@ int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min,
     }
   }
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }
 
@@ -277,7 +309,7 @@ int feenox_get_assignment_rowcol(assignment_t *assignment, int i, int j, int *ro
     *col = 0;
   }
 
-  return WASORA_RUNTIME_OK;  
+  return FEENOX_OK;  
 }
 
 // verifica si tenemos que poner los valores iniciales de una variable
@@ -324,10 +356,10 @@ void feenox_check_initial_matrix(matrix_t *matrix) {
   }
   return;  
 }
-
+*/
 
 // ejecuta una asignacion escalar 
-int feenox_assign_scalar(assignment_t *assignment, int row, int col) {
+int feenox_assign_single(assignment_t *assignment, int row, int col) {
 
   int i;
   double t_min, t_max;
@@ -340,26 +372,27 @@ int feenox_assign_scalar(assignment_t *assignment, int row, int col) {
   
   if (assignment->variable != NULL) {
     // si es un assignment sobre una variable parametrica, a comerla 
+/*      
     for (i = 0; i < feenox.parametric.dimensions; i++) {
       if (assignment->variable == feenox.parametric.variable[i]) {
-        return WASORA_RUNTIME_OK;
+        return FEENOX_OK;
       }
     }
     // idem sobre un parametro a optimizar, aunque dejamos que en la primera vuelta entre
     if ((int)(feenox_var(feenox_special_var(in_outer_initial))) == 0) {
       for (i = 0; i < feenox.fit.p; i++) {
         if (assignment->variable == feenox.fit.param[i]) {
-          return WASORA_RUNTIME_OK;
+          return FEENOX_OK;
         }
       }
       for (i = 0; i < feenox.min.n; i++) {
         if (assignment->variable == feenox.min.x[i]) {
-          return WASORA_RUNTIME_OK;
+          return FEENOX_OK;
         }
       }
     }
-    
-    constant = assignment->variable->constant;
+*/    
+//    constant = assignment->variable->constant;
     current = feenox_value_ptr(assignment->variable);
     initial_static = assignment->variable->initial_static;
     initial_transient = assignment->variable->initial_transient;
@@ -388,101 +421,50 @@ int feenox_assign_scalar(assignment_t *assignment, int row, int col) {
     initial_static = gsl_matrix_ptr(assignment->matrix->initial_static, row, col);
     initial_transient = gsl_matrix_ptr(assignment->matrix->initial_transient, row, col);
   } else {
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
   }
   
 
   // si tenemos constant y no estamos el primer paso, a comerla
+/*  
   if (constant && ((int)(feenox_var(feenox_special_var(step_static))) != 1 || (int)(feenox_var(feenox_special_var(step_transient))) != 0)) {
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
   }
-  
+*/  
   if (assignment->initial_static) {
     // si pide _init solo asignamos si estamos en static_step y en el paso uno
-    if ((int)(feenox_var(feenox_special_var(in_static))) && (int)(feenox_var(feenox_special_var(step_static))) == 1) {
-      *current = feenox_evaluate_expression(&assignment->rhs);
+    if ((int)(feenox_special_var_value(in_static)) && (int)(feenox_special_var_value(step_static)) == 1) {
+      *current = feenox_expression_eval(&assignment->rhs);
       *initial_static = *current;
       *initial_transient = *current;
     }
     
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
     
   } else if (assignment->initial_transient) {
     // si pide _0 solo asignamos si estamos en static_step    
-    if ((int)(feenox_var(feenox_special_var(in_static)))) {
-      *current = feenox_evaluate_expression(&assignment->rhs);
+    if ((int)(feenox_special_var_value(in_static))) {
+      *current = feenox_expression_eval(&assignment->rhs);
       *initial_transient = *current;
     }
 
-    return WASORA_RUNTIME_OK;
+    return FEENOX_OK;
       
   }
     
-  // si el assignment pedido tiene argumento, vemos si tenemos que igualar
-  if (assignment->t_min.n_tokens != 0) {
-    t_min = feenox_evaluate_expression(&assignment->t_min);
-    t_max = feenox_evaluate_expression(&assignment->t_max);
-    if (feenox_var(feenox_special_var(time)) >= t_min && feenox_var(feenox_special_var(time)) < t_max) {
-      *current = feenox_evaluate_expression(&assignment->rhs);
-    }
-    return WASORA_RUNTIME_OK;
-  }
-
-  // si no tiene argumento y resulta que hay algun assignment que si lo cumple,
-  // o alguno tiene _0 o _init entonces no hacemos nada porque en algun momento va a ganar ese
-  LL_FOREACH(feenox.assignments, other) {
-    if (other != assignment  &&
-           ( (other->variable != NULL && other->variable == assignment->variable)
-           ||(other->vector   != NULL && other->vector   == assignment->vector)
-           ||(other->matrix   != NULL && other->matrix   == assignment->matrix) )) {
-      
-      if (other->t_min.n_tokens != 0) {
-        t_min = feenox_evaluate_expression(&other->t_min);
-        t_max = feenox_evaluate_expression(&other->t_max);
-
-        if (feenox_var(feenox_special_var(time)) >= t_min && feenox_var(feenox_special_var(time)) < t_max) {
-          return WASORA_RUNTIME_OK;
-        }
-      }
-  
-      // si alguno tiene _0, estamos en static y el argumento es el mismo no hacemos nada
-      if ((int)(feenox_var(feenox_special_var(in_static))) && other->initial_transient) {
-        int i, i_min, i_max, j, j_min, j_max;
-        int other_row, other_col;
-        feenox_call(feenox_get_assignment_array_boundaries(other, &i_min, &i_max, &j_min, &j_max));
-        for (i = i_min; i < i_max; i++) {
-          for (j = j_min; j < j_max; j++) {
-            feenox_call(feenox_get_assignment_rowcol(other, i, j, &other_row, &other_col));
-            if (other_row == row && other_col == col) {
-              return WASORA_RUNTIME_OK;
-            }
-          }
-        }
-      }
-
-      // idem para _init
-      if ((int)(feenox_var(feenox_special_var(in_static))) && (int)(feenox_var(feenox_special_var(step_static))) == 1 && other->initial_static) {
-        return WASORA_RUNTIME_OK;
-      }
-    }
-    
-  }
-
   // no gano ningun otro asi que hacemos la asignacion que nos pidieron
   if (current != NULL) {
-    *current = feenox_evaluate_expression(&assignment->rhs);
+    *current = feenox_expression_eval(&assignment->rhs);
 
-    if (feenox_var(feenox_special_var(in_static))) {
+    if (feenox_special_var_value(in_static)) {
       *initial_transient = *current;
-      if ((int)(feenox_var(feenox_special_var(step_static))) == 1) {
+      if ((int)(feenox_special_var_value(step_static)) == 1) {
         *initial_static = *current;
       }
     }
   }
 
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 
 }
 
-
-*/
