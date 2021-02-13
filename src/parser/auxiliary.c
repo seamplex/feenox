@@ -641,193 +641,46 @@ void feenox_strip_blanks(char *string) {
 
 }
 
-
-
-/*
-int feenox_parse_assignment(char *line, assignment_t *assignment) {
-  
-  char *dummy;
-  char *left_hand;
-  char *right_hand;
-  vector_t *vector = NULL;
-  matrix_t *matrix = NULL;
-  char *dummy_at;
-  char *at_expression;
-  int at_offset;
-  char *dummy_time_range;
-  char *dummy_index_range;
-  char *dummy_par;
-  char *dummy_init;
-  char *dummy_0;
-  
-  // comenzamos suponiendo que es plain
-  assignment->plain = 1;
-  
-  // left hand
-  left_hand = strdup(line);
-  dummy = strchr(left_hand, '=');
-  *dummy = '\0';
-  
-  // primero hacemos que el right hand sea dummy+1
-  right_hand = strdup(dummy+1);
-  feenox_strip_blanks(right_hand);
-  if (strlen(right_hand) == 0) {
-    feenox_push_error_message("empty right-hand side");
+// this function parses a string like "f(x,y,z)"
+// it creates the function and sets the arguments
+// it returns the name of the function in name which should be freed
+int feenox_add_function_from_string(const char *string, char **name) {
+    
+  char *dummy_openpar = strchr(string, '(');
+  if (dummy_openpar == NULL) {
+    feenox_push_error_message("expecting open parenthesis in '%s'", string);
     return FEENOX_ERROR;
   }
-  
-  // y despues sacamos blancos y otras porquerias que nos molestan
-  feenox_strip_blanks(left_hand);
-  
-  // este es el orden inverso en el que se tienen que dar los subindices
-  // por ejemplo un construcciones validas serian
-  // matrix_0(i,j)<1:3;2:4> = algo
-  // matrix(i,j)<1:3;2:4>[0.99:1.01] = algo
-  
-  // como ultima cosa, la arroba para hacer steps
-  if ((dummy_at = strchr(left_hand, '@')) != NULL) {
-    at_offset = dummy_at - left_hand;
-    at_expression = strdup(dummy_at+1);
-    left_hand = realloc(left_hand, strlen(left_hand) + 2*strlen(at_expression) + 32);
-    sprintf(left_hand+at_offset, "[(%s)-0.1*dt:%s+(0.1)*dt]", at_expression, at_expression);
-    free(at_expression);
+  *dummy_openpar = '\0';
+  *name = strdup(string);
+  *dummy_openpar = '(';
+  feenox_strip_blanks(*name);
+
+  char *arguments = strdup(dummy_openpar);
+  feenox_strip_blanks(arguments);
+
+  size_t n_arguments;
+  if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {
+    return FEENOX_ERROR;
   }
-  
-  // como anteultima cosa, el rango en tiempo
-  if ((dummy_time_range = strchr(left_hand, '[')) != NULL) {
-    *dummy_time_range = '\0';
+  char **arg_name = NULL;
+  feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
+  free(arguments);
+
+  *dummy_openpar = '\0';
+  feenox_call(feenox_define_function(*name, n_arguments));
+  int i;
+  for (i = 0; i < n_arguments; i++) {
+    feenox_call(feenox_function_set_argument_variable(*name, i, arg_name[i]));
   }
-  
-  // el rango en indices
-  if ((dummy_index_range = strchr(left_hand, '<')) != NULL) {
-    *dummy_index_range = '\0';
-  }
-  
-  // despues los subindices entre parentesis si es un vector o matriz
-  if ((dummy_par = strchr(left_hand, '(')) != NULL) {
-    *dummy_par = '\0';
-  }
-  
-  // despues _init o _0
-  if ((dummy_init = feenox_ends_in_init(left_hand)) != NULL) {
-    *dummy_init = '\0';
-    assignment->initial_static = 1;
-  }
-  
-  if ((dummy_0 = feenox_ends_in_zero(left_hand)) != NULL) {
-    *dummy_0 = '\0';
-    assignment->initial_transient = 1;
-  }
-  
-  if ((matrix = feenox_get_matrix_ptr(left_hand)) != NULL) {
-    assignment->matrix = matrix;
-  } else if ((vector = feenox_get_vector_ptr(left_hand)) != NULL) {
-    assignment->vector = vector;
-  } else {
-    // buscamos una variable, y si no existe vemos si tenemos que declararla implicitamente
-    if ((assignment->variable = feenox_get_variable_ptr(left_hand)) == NULL) {
-      if (feenox.implicit_none) {
-        feenox_push_error_message("undefined symbol '%s' and disabled implicit definition", left_hand);
-        return FEENOX_ERROR;
-      } else {
-        if ((assignment->variable = feenox_define_variable(left_hand)) == NULL) {
-          return FEENOX_ERROR;
-        } else {
-          // las variables siempre son escalares
-          assignment->plain = 0;
-          assignment->scalar = 1;
-        }
-      }
-    } else {
-      // las variables siempre son escalares
-      assignment->plain = 0;
-      assignment->scalar = 1;
+
+  // clean up this (partial) mess
+  if (arg_name != NULL) {
+    for (i = 0; i < n_arguments; i++) {
+      free(arg_name[i]);
     }
+    free(arg_name);
   }
   
-  // ahora vamos de izquierda a derecha
-  // reconstruimos el string
-  if (dummy_0 != NULL) {
-    *dummy_0 = '_';
-  }
-  if (dummy_init != NULL) {
-    *dummy_init = '_';
-  }
-  
-  // si hay parentesis son subindices
-  if (dummy_par != NULL) {
-    if (matrix == NULL && vector == NULL) {
-      if (feenox_get_function_ptr(left_hand) != NULL) {
-        feenox_push_error_message("functions are defined using ':=' instead of '='", left_hand);  
-      } else {
-        feenox_push_error_message("'%s' is neither a vector nor a matrix", left_hand);
-      }
-      return FEENOX_ERROR;
-    }
-    *dummy_par = '(';
-    
-    if (matrix != NULL) {
-      // si aparecen o la letra "i" o la letra "j" entonces no es escalar
-      assignment->scalar = (strchr(dummy_par, 'i') == NULL) && (strchr(dummy_par, 'j') == NULL);
-      // si aparece la letra "i" y no la letra "j" entonces se varia solo las filas
-      assignment->expression_only_of_i = (strchr(dummy_par, 'j') == NULL) && (strchr(dummy_par, 'i') != NULL);
-      // si no aparece la letra "i" pero si la letra "j" entonces se varia solo las columnas
-      assignment->expression_only_of_j = (strchr(dummy_par, 'i') == NULL) && (strchr(dummy_par, 'j') != NULL);
-      // si no es es "i,j" entonces no es plain
-      if (strcmp("(i,j)", dummy_par) != 0) {
-        assignment->plain = 0;
-      }
-      feenox_call(feenox_parse_range(dummy_par, '(', ',', ')', &assignment->row, &assignment->col));
-    } else if (vector != NULL) {
-      if ((dummy = strrchr(dummy_par, ')')) == NULL) {
-        feenox_push_error_message("unmatched parenthesis for '%s'", left_hand);
-        return FEENOX_ERROR;
-      }
-      *dummy = '\0';
-      
-      // si aparece la letra "i" entonces no es escalar
-      assignment->scalar = strchr(dummy_par+1, 'i') == NULL;
-      
-      // si no es "i" entonces no es plain
-      if (strcmp("i", dummy_par+1) != 0) {
-        assignment->plain = 0;
-      }
-      feenox_call(feenox_parse_expression(dummy_par+1, &assignment->row));
-      *dummy = ')';
-    }
-  }
-  
-  // si hay rango de indices
-  if (dummy_index_range != NULL) {
-    if (matrix == NULL && vector == NULL) {
-      if (feenox_get_function_ptr(left_hand) != NULL) {
-        feenox_push_error_message("functions are defined using ':=' instead of '='", left_hand);  
-      } else {
-        feenox_push_error_message("'%s' is neither a vector nor a matrix", left_hand);
-      }
-      return FEENOX_ERROR;
-    }
-    *dummy_index_range = '<';
-    
-    if (matrix != NULL) {
-      feenox_call(feenox_parse_range(dummy_index_range, '<', ':', ';', &assignment->i_min, &assignment->i_max));
-      feenox_call(feenox_parse_range(strchr(dummy_index_range, ';'), ';', ':', '>', &assignment->j_min, &assignment->j_max));
-    } else if (vector != NULL) {
-      feenox_call(feenox_parse_range(dummy_index_range, '<', ':', '>', &assignment->i_min, &assignment->i_max));
-    }
-  }
-  
-  // rango de tiempo
-  if (dummy_time_range != NULL)  {
-    *dummy_time_range = '[';
-    feenox_call(feenox_parse_range(dummy_time_range, '[', ':', ']', &assignment->t_min, &assignment->t_max));
-  }
-  
-  feenox_call(feenox_parse_expression(right_hand, &assignment->rhs));
-  
-  free(left_hand);
-  free(right_hand);
-  
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
-*/

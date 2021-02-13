@@ -63,6 +63,8 @@ extern int feenox_parser_expressions(expr_t *expr[], size_t n);
 extern int feenox_parser_expression_in_string(double *result);
 extern int feenox_parser_string_format(char **string, int *n_args);
 
+extern int feenox_add_function_from_string(const char *string, char **name);
+
 extern int feenox_parser_file(file_t **file);
 
 extern int feenox_parser_vector(vector_t **vector);

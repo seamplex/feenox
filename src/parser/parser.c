@@ -294,30 +294,8 @@ int feenox_parse_line(void) {
           break;
           case parser_function:
           {
-            char *dummy_openpar = strchr(lhs, '(');
-            *dummy_openpar = '\0';
-            char *name = strdup(lhs);
-            feenox_strip_blanks(name);
-              
-            *dummy_openpar = '(';
-            char *arguments = strdup(dummy_openpar);
-            feenox_strip_blanks(arguments);
-              
-            size_t n_arguments;
-            if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {
-              return FEENOX_ERROR;
-            }
-            char **arg_name = NULL;
-            feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
-            free(arguments);
-
-            *dummy_openpar = '\0';
-            feenox_call(feenox_define_function(name, n_arguments));
-            int i;
-            for (i = 0; i < n_arguments; i++) {
-              feenox_call(feenox_function_set_argument_variable(name, i, arg_name[i]));
-            }
-              
+            char *name;
+            feenox_add_function_from_string(lhs, &name);
             feenox_call(feenox_function_set_expression(name, rhs));
             free(name);
           }  
@@ -2045,39 +2023,24 @@ int feenox_parse_function(void) {
 
   // TODO: RAII
   char *token = NULL;
-  char *dummy_openpar = NULL;
-  char *arguments = NULL;
-  char *name = NULL;
   
-  char **arg_name = NULL;
-  int n_arguments;
-  int i;
+//  char **arg_name = NULL;
+//  int n_arguments;
+//  int i;
 
 ///kw+FUNCTION+usage <function_name>(<var_1>[,var2,...,var_n])
 ///kw+FUNCTION+detail The number of variables $n$ is given by the number of arguments given between parenthesis after the function name.
 ///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined explictly as scalar variables.
-  feenox_call(feenox_parser_string(&name));
+  feenox_call(feenox_parser_string(&token));
   
-  if ((dummy_openpar = strchr(name, '(')) == NULL) {
+    char *dummy_openpar;
+    if ((dummy_openpar = strchr(token, '(')) == NULL) {
     feenox_push_error_message("expected opening parenthesis '(' after function name '%s' (no spaces allowed)", token);
     return FEENOX_ERROR;
   }
 
-  // TODO: unify in feenox_add_function_from_string
-  arguments = strdup(dummy_openpar);
-  feenox_strip_blanks(arguments);
-  if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {
-    return FEENOX_ERROR;
-  }
-  feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
-  free(arguments);
-
-  // we can now define the function and set the arguments
-  *dummy_openpar = '\0';
-  feenox_call(feenox_define_function(name, n_arguments));
-  for (i = 0; i < n_arguments; i++) {
-    feenox_call(feenox_function_set_argument_variable(name, i, arg_name[i]));
-  }
+  char *name = NULL;
+  feenox_call(feenox_add_function_from_string(token, &name));
   
   while ((token = feenox_get_next_token(NULL)) != NULL && strcasecmp(token, "DATA") != 0) {
 ///kw+FUNCTION+usage {
@@ -2539,13 +2502,6 @@ int feenox_parse_function(void) {
   }
 */
 
-  // clean up this (partial) mess
-  if (arg_name != NULL) {
-    for (i = 0; i < n_arguments; i++) {
-      free(arg_name[i]);
-    }
-    free(arg_name);
-  }
   free(name);
   
   return FEENOX_OK;
