@@ -1,0 +1,15 @@
+# algebraic expressions do whatever one expects them to do
+# thus a should evaluate to 7
+a = 1 + 2*3
+# and b should evaluate to 9
+b = (1+2) * 3
+
+# expressions can contain variables and functions, whose
+# arguments may be expressions themselves, and so on
+c = (1 + sin(pi/4)^(5/2))/(1 - log(abs(a-b)))
+
+PRINT %g a b c
+
+# when an expression appears as an argument of a keyword and
+# contains spaces it should be written within double quotes
+PRINT %g 1 -1 "1 -1"

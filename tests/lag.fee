@@ -1,0 +1,22 @@
+# this is a transient problem and lasts 5 units of time
+end_time = 5
+# each time step is equal to 1/20th of a unit of time
+dt = 1/20
+
+# some parameters, which we define as constants
+# CONST a b tau
+a = 1
+b = 3
+tau = 1.234
+
+# signal r is equal to zero except for a < t < b
+r = heaviside(t-a)-heaviside(t-b)
+
+# signal y is equal to signal r fitered through a lag
+# of characteristic time tau
+y = lag(r, tau)
+
+PRINT t r y
+
+# exercise: investigate how the result of the lag
+# depends on the time step

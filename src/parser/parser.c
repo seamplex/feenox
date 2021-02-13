@@ -291,7 +291,37 @@ int feenox_parse_line(void) {
         switch (type) {
           case parser_assignment:
             feenox_call(feenox_add_assignment(lhs, rhs));
-          break;      
+          break;
+          case parser_function:
+          {
+            char *dummy_openpar = strchr(lhs, '(');
+            *dummy_openpar = '\0';
+            char *name = strdup(lhs);
+            feenox_strip_blanks(name);
+              
+            *dummy_openpar = '(';
+            char *arguments = strdup(dummy_openpar);
+            feenox_strip_blanks(arguments);
+              
+            size_t n_arguments;
+            if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {
+              return FEENOX_ERROR;
+            }
+            char **arg_name = NULL;
+            feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
+            free(arguments);
+
+            *dummy_openpar = '\0';
+            feenox_call(feenox_define_function(name, n_arguments));
+            int i;
+            for (i = 0; i < n_arguments; i++) {
+              feenox_call(feenox_function_set_argument_variable(name, i, arg_name[i]));
+            }
+              
+            feenox_call(feenox_function_set_expression(name, rhs));
+            free(name);
+          }  
+          break;  
         }
         
         
@@ -2013,6 +2043,7 @@ int feenox_parse_matrix(void) {
 
 int feenox_parse_function(void) {
 
+  // TODO: RAII
   char *token = NULL;
   char *dummy_openpar = NULL;
   char *arguments = NULL;
@@ -2032,6 +2063,7 @@ int feenox_parse_function(void) {
     return FEENOX_ERROR;
   }
 
+  // TODO: unify in feenox_add_function_from_string
   arguments = strdup(dummy_openpar);
   feenox_strip_blanks(arguments);
   if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {

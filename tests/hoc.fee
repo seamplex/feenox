@@ -1,0 +1,6 @@
+# actually arguments of the PRINT keyword may be either text
+# strings, scalar expresions, vectors or matrices (more about
+# these latter two issues in more complex examples)
+
+# the example of Kernighan & Ritchie HOC (high-order calculator) code
+PRINT TEXT "1+2*sin(0.7)" "=" %.6f 1+2*sin(0.7)

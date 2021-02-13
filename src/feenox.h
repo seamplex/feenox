@@ -747,6 +747,8 @@ struct feenox_t {
   
   expr_t *time_paths;
   expr_t *time_path_current;
+  double next_time;
+
   
   instruction_t *instructions;
   instruction_t *last_defined_instruction;  // TODO: see if we can put this somewhere else

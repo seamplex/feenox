@@ -71,51 +71,37 @@ int feenox_run_standard(void) {
   feenox_special_var_value(step_static) = 0;
 
   
-/*  
-  
 #ifdef HAVE_IDA
   ida_step_dt = INFTY;
 #endif
 
-  // si hay realtime, inicializamos despues del calculo estationario por si tuvimos
-  // que esperar el semaforo de alguien o algo por el estilo
-  if (feenox_special_var_value(realtime_scale)) != 0) {
-    feenox_init_realtime();
-  }
-  
   // transient/quasistatic loop  (if needed)
-  feenox_special_var_value(in_transient)) = 1;
-  feenox_special_var_value(in_transient_first)) = 1;
-  while (feenox_special_var_value(done)) == 0) {
+  feenox_special_var_value(in_transient) = 1;
+  feenox_special_var_value(in_transient_first) = 1;
+  while (feenox_special_var_value(done) == 0) {
 
 //    feenox_debug();
     
-    feenox_special_var_value(step_transient)) = feenox_special_var_value(step_transient)) + 1;
+    feenox_special_var_value(step_transient) = feenox_special_var_value(step_transient) + 1;
 
     if (feenox.dae.dimension == 0) {
     
-      feenox.next_time = feenox_var(feenox_special_var(time)) + feenox_var(feenox_special_var(dt));
-      // si nos dieron un time path, vemos que no nos hayamos pasado
-      if (feenox.time_path != NULL && feenox.current_time_path->n_tokens != 0 && feenox.next_time > feenox_evaluate_expression(feenox.current_time_path)) {
-        // nos paramos un cachito mas adelante del next time asi ya los
-        // assigns toman los nuevos valores de la posible discontinuidad
-        // que hay en el punto en cuestion
-        feenox.next_time = feenox_evaluate_expression(feenox.current_time_path) + feenox_var(feenox_special_var(zero));
-        feenox.current_time_path++;
+      feenox.next_time = feenox_special_var_value(t) + feenox_special_var_value(dt);
+      // see if we overshoot the next time path
+      if (feenox.time_paths != NULL && feenox.time_path_current->items != NULL && feenox.next_time > feenox_expression_eval(feenox.time_path_current)) {
+        // go a little bit ahead of the next time so if there's a 
+        // discontinuity all the stuff gets updated
+        feenox.next_time = feenox_expression_eval(feenox.time_path_current) + 1e-4*(feenox_special_var_value(dt));
+        feenox.time_path_current++;
       }
 
-      // dormimos si hay que hacer realtime
-      if (feenox_var(feenox.special_vars.realtime_scale) != 0) {
-        feenox_wait_realtime();
-      }
-
-      // actualizamos time, si esta importada despues nos la pisan asi que no pasa nada
-      feenox_var(feenox_special_var(dt)) = feenox.next_time - feenox_var(feenox_special_var(time));
-      feenox_var(feenox_special_var(time)) = feenox.next_time;
+      // updat time (if it is read from a shared-memory segment it will be overwritten, which is fine)
+      feenox_special_var_value(dt) = feenox.next_time - feenox_special_var_value(t);
+      feenox_special_var_value(t) = feenox.next_time;
       
-      if (feenox_var(feenox_special_var(time)) >= feenox_var(feenox_special_var(end_time))) {
-        feenox_value(feenox_special_var(in_transient_last)) = 1;
-        feenox_value(feenox_special_var(done_transient)) = 1;
+      if (feenox_special_var_value(t) >= feenox_special_var_value(end_time)) {
+        feenox_special_var_value(in_transient_last) = 1;
+        feenox_special_var_value(done_transient) = 1;
       }
       
       // transient step
@@ -129,7 +115,7 @@ int feenox_run_standard(void) {
       // integration step
       // nos acordamos de cuanto valia el tiempo antes de avanzar un paso
       // para despues saber cuanto vale dt
-      t_old = feenox_var(feenox_special_var(time));
+      t_old = feenox_special_var_value(time));
 
       // miramos si hay max_dt
       if (feenox_var(feenox_special_var(max_dt)) != 0) {
@@ -208,11 +194,11 @@ int feenox_run_standard(void) {
 #endif      
     }
     
-    // listo! (bug encontrado por ramiro)
-    feenox_value(feenox_special_var(in_transient_first)) = 0;
+    // done! (the following line fixes a subtle bug found by rvignolo)
+    feenox_special_var_value(in_transient_first) = 0;
 
   }
-*/
+
   
   return FEENOX_OK;
 }
