@@ -1,7 +1,7 @@
 ---
 title: FeenoX programming guide
 language: en-US
-...
+---
 
 # Why we program FeenoX
 

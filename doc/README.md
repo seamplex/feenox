@@ -1,4 +1,7 @@
-# FeenoX docs
+---
+title: FeenoX documenation directory
+language: en-US
+---
 
 This directory contains the FeenoX documentation.
 Everything is created out of the source files which are a mixture of Bash, M4 and Markdown.

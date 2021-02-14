@@ -3,7 +3,7 @@ title: Software Requirements Specification for a computational tool
 lang: en-US
 abstract: An hypothetical situation (a thought experiment if you will) where a certain company or agency asks for vendors to develop a piece of free and open source engineering software with certain specifications, defined in this imaginary tender.
 number-sections: true
-...
+---
 
 
 # Introduction {#sec:introduction}

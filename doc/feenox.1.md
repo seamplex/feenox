@@ -1,7 +1,7 @@
 ---
 title: FEENOX(1) FeenoX | FeenoX User Manual
 author: Jeremy Theler <jeremy@seamplex.com>
-... 
+---
   
 # NAME
 

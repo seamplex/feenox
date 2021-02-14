@@ -1,12 +1,34 @@
-# Frequently asked questions about Feenox
+---
+title: Frequently asked questions about Feenox
+author: Jeremy Theler
+lang: en-US
+---
 
-## Why nothing happens when I double click on `feenox.exe`?
+# What is FeenoX?
+
+It is "a free no-fee no-X uniX-like finite-element(ish) computational engineering tool."
+Essentially, a finite-element program with a particular design basis.
+
+# What does FeenoX mean?
+
+It does not mean anything particular, but
+
+ * the last X makes it rhyme with UNIX and Linux
+ * noX means that there is no graphical (i.e. _X_) interface
+ * Fee-no means that there are no fees involved (free as in "free beer")
+ * FeenoX is the successor of the now-superseded FEA program Fino
+ * it rhymes with FEniCS
+ * with some luck one can read "Finite ElEments NO-X"
+ * with mode luck "FrEE" (as in "free speech")
+
+
+# Why nothing happens when I double click on `feenox.exe`?
 
 
 
-## Why is FeenoX written in C and not in...
+# Why is FeenoX written in C and not in...
 
-### C++?
+## C++?
 
 <https://www.quora.com/Why-is-C-still-in-use-even-though-we-have-C++-Is-there-anything-that-C-can-do-but-C++-cant-or-maybe-something-that-is-easier-to-do-in-C-rather-than-C++>
 
@@ -29,15 +51,15 @@
 > <http://harmful.cat-v.org/software/c++/linus>
 
 
-### Fortran?
+## Fortran?
 
 Because I am not insane (yet).
 
-### Python?
+## Python?
 
 If you actually asked this then FeenoX is not for you.
 
-### Go, Python or Julia?
+## Go, Python or Julia?
 
 I don't know either of them nor if any of these languages would be a good fit for FeenoX.
 Keep in mind that it took me a while to know why not Fortran nor C++ even though there are people that would choose them over C.
