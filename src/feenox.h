@@ -142,6 +142,9 @@ enum version_type {
 
 // macro to check error returns in function calls
 #define feenox_call(function)   if ((function) != FEENOX_OK) return FEENOX_ERROR
+#ifdef HAVE_IDA
+#define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
+#endif
 
 // macro to access internal special variables
 #define feenox_special_var(var) (feenox.special_vars.var)
@@ -210,11 +213,11 @@ struct expr_item_t {
   size_t tmp_level;   // for partial sums
 
   size_t oper;        // number of the operator if applicable
+  double sign;
   double constant; // value of the numerical constant if applicable
   double value;    // current value
   
-// vector with (optional) auxiliary stuff
-// (last value, integral accumulator, rng, etc)
+// vector with (optional) auxiliary stuff (last value, integral accumulator, rng, etc)
   double *aux;
 
   builtin_function_t *builtin_function;
@@ -917,13 +920,13 @@ extern expr_item_t *feenox_expression_parse_item(const char *string);
 extern int feenox_parse_range(char *string, const char left_delim, const char middle_delim, const char right_delim, expr_t *a, expr_t *b);
 
 extern double feenox_expression_eval(expr_t *this);
-extern double feenox_evaluate_expression_in_string(const char *string);
+extern double feenox_expression_evaluate_in_string(const char *string);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
 extern int feenox_phase_space_add_object(const char *token);
 extern int feenox_phase_space_mark_diff(const char *string);
-extern char *feenox_get_first_dot(const char *s);
+extern char *feenox_find_first_dot(const char *s);
 extern int feenox_add_dae(const char *lhs, const char *rhs);
 extern int feenox_dae_init(void);
 extern int feenox_dae_ic(void);

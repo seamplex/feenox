@@ -192,12 +192,12 @@ int feenox_instruction_assignment_scalar(void *arg) {
 }
 
 int feenox_instruction_assignment_vector(void *arg) {
-  assignment_t *assignment = (assignment_t *)arg;
+//  assignment_t *assignment = (assignment_t *)arg;
   return FEENOX_OK;  
 }
 
 int feenox_instruction_assignment_matrix(void *arg) {
-  assignment_t *assignment = (assignment_t *)arg;
+//  assignment_t *assignment = (assignment_t *)arg;
   return FEENOX_OK;  
 }
 
@@ -361,15 +361,10 @@ void feenox_check_initial_matrix(matrix_t *matrix) {
 // ejecuta una asignacion escalar 
 int feenox_assign_single(assignment_t *assignment, int row, int col) {
 
-  int i;
-  double t_min, t_max;
-  int constant;
   double *current;
   double *initial_static;
   double *initial_transient;
 
-  assignment_t *other;
-  
   if (assignment->variable != NULL) {
     // si es un assignment sobre una variable parametrica, a comerla 
 /*      
@@ -405,7 +400,7 @@ int feenox_assign_single(assignment_t *assignment, int row, int col) {
       feenox_vector_init(assignment->vector);
     }
     
-    constant = assignment->vector->constant;
+//    constant = assignment->vector->constant;
     current = gsl_vector_ptr(feenox_value_ptr(assignment->vector), row);
     initial_static = gsl_vector_ptr(assignment->vector->initial_static, row);
     initial_transient = gsl_vector_ptr(assignment->vector->initial_transient, row);
@@ -416,7 +411,7 @@ int feenox_assign_single(assignment_t *assignment, int row, int col) {
       feenox_matrix_init(assignment->matrix);
     }
     
-    constant = assignment->matrix->constant;
+//    constant = assignment->matrix->constant;
     current = gsl_matrix_ptr(feenox_value_ptr(assignment->matrix), row, col);
     initial_static = gsl_matrix_ptr(assignment->matrix->initial_static, row, col);
     initial_transient = gsl_matrix_ptr(assignment->matrix->initial_transient, row, col);

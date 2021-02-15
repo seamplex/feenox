@@ -242,7 +242,7 @@ int feenox_parser_expression_in_string(double *result) {
     return FEENOX_ERROR;
   }
   
-  *result = feenox_evaluate_expression_in_string(token);
+  *result = feenox_expression_evaluate_in_string(token);
 
   return FEENOX_OK;
 }

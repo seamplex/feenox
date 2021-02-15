@@ -1679,7 +1679,7 @@ int feenox_parse_default_argument_value(void) {
     return FEENOX_ERROR;
   }
 
-  if ((n = (int)feenox_evaluate_expression_in_string(token)) <= 0) {
+  if ((n = (int)feenox_expression_evaluate_in_string(token)) <= 0) {
     feenox_push_error_message("expected a positive value instead of 'token", token);
     return FEENOX_ERROR;
   }

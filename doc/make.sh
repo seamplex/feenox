@@ -40,3 +40,6 @@ m4 header.m4 date.m4 feenox.1.md | pandoc -s -t man -o feenox.1
 # sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox.texi
 # sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox.texi         
 # 
+
+# srs
+pandoc srs.md --number-sections --filter pandoc-crossref  -o srs.pdf

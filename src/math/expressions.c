@@ -251,24 +251,27 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
 expr_item_t *feenox_expression_parse_item(const char *string) {
 
   // number of characters read, we put this into the allocated item at the end of this routine
-  size_t n;
-  int n_int; // sscanf can only return ints, not size_t
+  size_t n = 0;
+  int n_int = 0; // sscanf can only return ints, not size_t
   char *backup = strdup(string);
   expr_item_t *item = calloc(1, sizeof(expr_item_t));
 
   // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
-  if (isdigit((int)(*string)) || *string == '-' || *string == '+' || *string == '.') {
+  if (isdigit((int)(*string)) || ((*string == '-' || *string == '+' || *string == '.') && isdigit((int)string[1]))) {
     // a number
     double constant;
     if (sscanf(string, "%lf%n", &constant, &n_int) == 0) {
       return NULL;
     }
-    n = n_int;
+    n += n_int;
     item->type = EXPR_CONSTANT;
     item->constant = constant;
+    item->sign = 1.0;
 
   } else {
     // we got letters
+    // if there's a negative sign, meaning something like (-x) or (-f(x)) then we take the sign into account
+    item->sign = (*string == '-') ? -1.0 : +1.0;
     char *token = strtok(backup, factorseparators);
     if (token == NULL || strlen(token) == 0) {
       return NULL;
@@ -618,8 +621,11 @@ double feenox_expression_eval(expr_t *this) {
       break;
  
     }
+    // have (-x) or (-f(x)) into account
+    factor->value *= factor->sign;
   }
 
+  
   level = 0;
   LL_FOREACH(this->items, factor) {
     if (factor->level > level) {
@@ -704,7 +710,7 @@ double feenox_expression_eval(expr_t *this) {
 
 
 // evaluates the expression contained in the string
-double feenox_evaluate_expression_in_string(const char *string) {
+double feenox_expression_evaluate_in_string(const char *string) {
   
   expr_t expr = {NULL, 0, NULL, NULL};
   double val;

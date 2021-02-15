@@ -21,6 +21,8 @@
  */
 #include "feenox.h"
 extern feenox_t feenox;
+extern const char factorseparators[];
+
 
 // API
 int feenox_add_time_path(const char *string) {
@@ -109,9 +111,7 @@ int feenox_phase_space_mark_diff(const char *string) {
 
 
 int feenox_add_dae(const char *lhs, const char *rhs) {
-  char *equation;
   char *dummy;
-  char *bracket;
   phase_object_t *phase_object;
       
   dae_t *dae = calloc(1, sizeof(dae_t));
@@ -132,7 +132,7 @@ int feenox_add_dae(const char *lhs, const char *rhs) {
   snprintf(residual, n, "(%s)-(%s)", rhs, lhs);
 
   // check if the equation is differential or algebraic
-  if ((dummy = feenox_find_first_dot(equation)) != NULL) {
+  if ((dummy = feenox_find_first_dot(residual)) != NULL) {
     int found = 0;
     LL_FOREACH(feenox.dae.phase_objects, phase_object) {
       if (strcmp(dummy, phase_object->name) == 0) {
@@ -169,7 +169,7 @@ int feenox_add_dae(const char *lhs, const char *rhs) {
   
 }
 
-char *feenox_get_first_dot(const char *s) {
+char *feenox_find_first_dot(const char *s) {
 
   char *line = strdup(s);
   char *token;

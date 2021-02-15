@@ -72,7 +72,7 @@ int feenox_run_standard(void) {
 
   
 #ifdef HAVE_IDA
-  ida_step_dt = INFTY;
+  double ida_step_dt = INFTY;
 #endif
 
   // transient/quasistatic loop  (if needed)
@@ -113,84 +113,65 @@ int feenox_run_standard(void) {
         
       feenox_call(feenox_step(STEP_BEFORE_DAE));
       // integration step
-      // nos acordamos de cuanto valia el tiempo antes de avanzar un paso
-      // para despues saber cuanto vale dt
-      t_old = feenox_special_var_value(time));
+      // remember what the time was so we can then compute dt
+      double t_old = feenox_special_var_value(t);
+      double ida_step_t_old = 0;
+      double ida_step_t_new = 0;
+      int err = 0;
 
-      // miramos si hay max_dt
-      if (feenox_var(feenox_special_var(max_dt)) != 0) {
-        IDASetMaxStep(feenox_dae.system, feenox_var(feenox_special_var(max_dt)));
+      // is there a max dt?
+      if (feenox_special_var_value(max_dt) != 0) {
+        ida_call(IDASetMaxStep(feenox.dae.system, feenox_special_var_value(max_dt)));
       }
 
-      // miramos si el dt actual (del paso interno de ida) es mas chiquito que min_dt
-      if (ida_step_dt < feenox_var(feenox_special_var(min_dt)) || (feenox_var(feenox_special_var(min_dt)) != 0 && feenox_var(feenox_special_var(time)) == 0)) {
+      // if the actual IDA's dt is smaller than FeenoX' min_dt
+      if (ida_step_dt < feenox_special_var_value(min_dt) || (feenox_special_var_value(min_dt) != 0 && feenox_special_var_value(t) == 0)) {
 
-        if (feenox.current_time_path != NULL && feenox.current_time_path->n_tokens != 0) {
+        if (feenox.time_path_current != NULL && feenox.time_path_current->items != NULL) {
           feenox_push_error_message("both min_dt and TIME_PATH given");
-          feenox_runtime_error();
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
 
-        // ponemos stop time para que no nos pasemos
-        // TODO: ver si no conviene llamar con el flag IDA_NORMAL
-        IDASetStopTime(feenox_dae.system, feenox_var(feenox_special_var(time))+feenox_var(feenox_special_var(min_dt)));
+        // set a stop time so we don't overshoot
+        // TODO: is it better to call with IDA_NORMAL?
+        ida_call(IDASetStopTime(feenox.dae.system, feenox_special_var_value(t)+feenox_special_var_value(min_dt)));
         do {
-          ida_step_t_old = feenox_var(feenox_special_var(time));
-          ida_step_t_new = feenox_var(feenox_special_var(time))+feenox_var(feenox_special_var(min_dt));
-          err = IDASolve(feenox_dae.system, feenox_var(feenox_special_var(dt)), &ida_step_t_new, feenox_dae.x, feenox_dae.dxdt, IDA_ONE_STEP);
-  //        err = IDASolve(feenox_dae.system, feenox_var(feenox_special_var(dt)), &ida_step_t_new, feenox_dae.x, feenox_dae.dxdt, IDA_NORMAL);
-          if (err < 0) {
-            feenox_push_error_message("ida returned error code %d", err);
-            feenox_runtime_error();
-            return WASORA_RUNTIME_ERROR;
-          }
-          feenox_var(feenox_special_var(time)) = ida_step_t_new;
+          ida_step_t_old = feenox_special_var_value(t);
+          ida_step_t_new = feenox_special_var_value(t)+feenox_special_var_value(min_dt);
+          ida_call(IDASolve(feenox.dae.system, feenox_special_var_value(dt), &ida_step_t_new, feenox.dae.x, feenox.dae.dxdt, IDA_ONE_STEP));
+  //        err = IDASolve(feenox.dae.system, feenox_special_var_value((dt)), &ida_step_t_new, feenox.dae.x, feenox.dae.dxdt, IDA_NORMAL);
+          feenox_special_var_value(t) = ida_step_t_new;
           ida_step_dt = ida_step_t_new - ida_step_t_old;
         } while (err != IDA_TSTOP_RETURN);
 
       } else {
 
-        // miramos si hay TIME_PATH
-        // nos paramos un cachito mas adelante para q los steps ya hayan actuado
-        if (feenox.current_time_path != NULL && feenox.current_time_path->n_tokens != 0) {
-          IDASetStopTime(feenox_dae.system, feenox_evaluate_expression(feenox.current_time_path)+feenox_var(feenox_special_var(zero)));
-  //        IDASetStopTime(feenox_dae.system, evaluate_expression(feenox.current_time_path)+dt0);
+        // check for TIME_PATH
+        if (feenox.time_path_current != NULL && feenox.time_path_current->items != NULL) {
+          ida_call(IDASetStopTime(feenox.dae.system, feenox_expression_eval(feenox.time_path_current)+1e-4*feenox_special_var_value(dt)));
         }
 
-        ida_step_t_old = feenox_var(feenox_special_var(time));
-        err = IDASolve(feenox_dae.system, feenox_var(feenox_special_var(end_time)), &feenox_var(feenox_special_var(time)), feenox_dae.x, feenox_dae.dxdt, IDA_ONE_STEP);
-        ida_step_dt = feenox_var(feenox_special_var(time)) - ida_step_t_old;
+        ida_step_t_old = feenox_special_var_value(t);
+        err = IDASolve(feenox.dae.system, feenox_special_var_value(end_time), &feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt, IDA_ONE_STEP);
+        ida_step_dt = feenox_special_var_value(t) - ida_step_t_old;
 
-
-//        if (feenox.in_static_step == 0 && (ida_step_dt = feenox_var(feenox_special_var(time)) - ida_step_t_old) < feenox_var(feenox_special_var(zero))) {
-//          feenox_push_error_message("ida returned dt = 0, usually meaning that the equations do not converge to the selected tolerance, try setting a higher error_bound or smoothing discontinuous functions of time");
-//          feenox_runtine_error();
-//          return;
-//        }
-  
         if (err == IDA_SUCCESS) {
           ; // ok!
         } else if (err == IDA_TSTOP_RETURN) {
-          ++feenox.current_time_path;
+          ++feenox.time_path_current;
         } else {
           feenox_push_error_message("ida returned error code %d", err);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
       }
 
-      feenox_var(feenox_special_var(dt)) = feenox_var(feenox_special_var(time)) - t_old;
-      if (feenox_var(feenox_special_var(time)) >= feenox_var(feenox_special_var(end_time))) {
-        feenox_value(feenox_special_var(in_transient_last)) = 1;
-        feenox_value(feenox_special_var(done_transient)) = 1;
+      feenox_special_var_value(dt) = feenox_special_var_value(t) - t_old;
+      if (feenox_special_var_value(t) >= feenox_special_var_value(end_time)) {
+        feenox_special_var_value(in_transient_last) = 1;
+        feenox_special_var_value(done_transient) = 1;
       }
       
       feenox_call(feenox_step(STEP_AFTER_DAE));
-      
-      // dormimos si hay que hacer realtime
-      if (feenox_var(feenox.special_vars.realtime_scale) != 0) {
-        feenox_wait_realtime();
-      }
-      
 #endif      
     }
     
