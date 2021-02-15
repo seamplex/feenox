@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  DAE evaluation routines
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -106,6 +106,93 @@ int feenox_phase_space_mark_diff(const char *string) {
   feenox_push_error_message("object '%s' is not in the phase space", string);
   return FEENOX_ERROR;
 }  
+
+
+int feenox_add_dae(const char *lhs, const char *rhs) {
+  char *equation;
+  char *dummy;
+  char *bracket;
+  phase_object_t *phase_object;
+      
+  dae_t *dae = calloc(1, sizeof(dae_t));
+      
+  if (feenox.dae.daes == NULL) {
+    // if this is the first DAE we define a instruction
+    if ((feenox.dae.instruction = feenox_add_instruction_and_get_ptr(&feenox_instruction_dae, NULL)) == NULL) {
+      return FEENOX_ERROR;
+    }
+    // and we need to put a "finite-state machine" in mode "reading daes"
+    // to prevent other instructions to be defined before finishing the DAEs
+    // this flag cannot be in the parser structure
+    feenox.dae.reading_daes = 1;
+  }
+
+  size_t n = strlen(rhs)+strlen(lhs)+8;
+  char *residual = malloc(n);
+  snprintf(residual, n, "(%s)-(%s)", rhs, lhs);
+
+  // check if the equation is differential or algebraic
+  if ((dummy = feenox_find_first_dot(equation)) != NULL) {
+    int found = 0;
+    LL_FOREACH(feenox.dae.phase_objects, phase_object) {
+      if (strcmp(dummy, phase_object->name) == 0) {
+        phase_object->differential = 1;
+        found = 1;
+      }
+    }
+    free(dummy);
+    if (found == 0) {
+      feenox_push_error_message("requested derivative of object '%s' but it is not in the phase space", dummy);
+      return FEENOX_ERROR;
+    }
+  } 
+
+  feenox_call(feenox_expression_parse(&dae->residual, residual));
+
+  size_t n_daes;
+  dae_t *tmp;
+  LL_COUNT(feenox.dae.daes, tmp, n_daes);
+  if (n_daes == feenox.dae.dimension) {
+    // if this is the last equation, check if there were any other instructions
+    if (feenox.last_defined_instruction != feenox.dae.instruction) {
+      feenox_push_error_message("cannot have instructions within DAEs\n");
+      return FEENOX_ERROR;
+    }
+    // turn off the "finite-state machine"
+    feenox.dae.reading_daes = 0;
+  }
+    
+  free(residual);
+
+  LL_APPEND(feenox.dae.daes, dae);
+  return FEENOX_OK;
+  
+}
+
+char *feenox_get_first_dot(const char *s) {
+
+  char *line = strdup(s);
+  char *token;
+  char *dummy;
+  char *wanted;
+
+  token = strtok(line, factorseparators);
+  while (token != NULL) {
+
+    if ((dummy = strstr(token, "_dot")) != NULL) {
+      *dummy = '\0';
+      wanted = strdup(token);
+      free(line);
+      return wanted;
+    }
+
+    token = strtok(NULL, factorseparators);
+  }
+
+  free(line);
+  return NULL;
+
+}
 
 int feenox_dae_init(void) {
   
@@ -421,7 +508,7 @@ int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *para
 
 }
 
-// instruccion dummy
+// dummy instruction
 int feenox_instruction_dae(void *arg) {
   
   return FEENOX_OK;

@@ -10,13 +10,10 @@ instruction_t *feenox_add_instruction_and_get_ptr(int (*routine)(void *), void *
 
   instruction_t *instruction;
 
-  // TODO
-/*  
-  if (feenox_parser.reading_daes) {
+  if (feenox.dae.reading_daes == 1) {
     feenox_push_error_message("cannot have instructions within DAEs");
     return NULL;
   }
-*/
   
   feenox_check_alloc(instruction = calloc(1, sizeof(instruction_t)), NULL);
       

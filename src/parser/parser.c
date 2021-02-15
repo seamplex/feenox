@@ -262,7 +262,9 @@ int feenox_parse_line(void) {
 // not been already processed must be one of these
 //  i.   an algebraic function
 //  ii.  an equation for the DAE
-//  iii. an assignment,
+//  iii. an assignment
+     
+// TODO: explain syntax for reference      
     } else if ((equal_sign = strstr(feenox_parser.full_line, ":=")) != NULL ||
                (equal_sign = strstr(feenox_parser.full_line, ".=")) != NULL ||
                (equal_sign = strchr(feenox_parser.full_line, '=')) != NULL) {
@@ -270,18 +272,19 @@ int feenox_parse_line(void) {
         enum { parser_dae, parser_function, parser_assignment } type;
         
         switch (*equal_sign) {
+          case '=':
+            type = parser_assignment;
+          break;
           case ':':
             type = parser_function;
           break;
           case '.':
             type = parser_dae;
           break;
-          case '=':
-            type = parser_assignment;
-          break;
           default:
             feenox_push_error_message("unexpected character '%c'", *equal_sign);
             return FEENOX_ERROR;
+          break;  
         }     
                 
         *equal_sign = '\0';
@@ -300,6 +303,10 @@ int feenox_parse_line(void) {
             free(name);
           }  
           break;  
+          case parser_dae:
+            // TODO: handle vector/matrix DAEs
+            feenox_call(feenox_add_dae(lhs, rhs));
+          break;
         }
         
         

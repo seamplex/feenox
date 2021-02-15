@@ -825,12 +825,14 @@ struct feenox_t {
   
   struct {
     int dimension;
+    int reading_daes;
     double **phase_value;
     double **phase_derivative;
     phase_object_t *phase_objects;
   
     dae_t *daes;
     void *system;
+    
 
     enum {
       initial_conditions_as_provided,
@@ -921,6 +923,8 @@ extern double feenox_evaluate_expression_in_string(const char *string);
 extern int feenox_add_time_path(const char *token);
 extern int feenox_phase_space_add_object(const char *token);
 extern int feenox_phase_space_mark_diff(const char *string);
+extern char *feenox_get_first_dot(const char *s);
+extern int feenox_add_dae(const char *lhs, const char *rhs);
 extern int feenox_dae_init(void);
 extern int feenox_dae_ic(void);
 #ifdef HAVE_IDA
@@ -928,6 +932,7 @@ extern int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, voi
 #else
 extern int feenox_ida_dae(void);
 #endif
+extern int feenox_instruction_dae(void *arg);
 
 // instruction.c
 extern instruction_t *feenox_add_instruction_and_get_ptr(int (*routine)(void *), void *argument);
