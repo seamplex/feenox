@@ -332,7 +332,7 @@ int feenox_dae_init(void) {
   
   
   
-
+  // TODO: make sure that dimension is of type sundindex
   feenox.dae.x = N_VNew_Serial(feenox.dae.dimension);
   feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension);
   feenox.dae.id = N_VNew_Serial(feenox.dae.dimension);
@@ -347,10 +347,9 @@ int feenox_dae_init(void) {
     // pero hay que inicializar el vector id!
     NV_DATA_S(feenox.dae.id)[i] = DAE_ALGEBRAIC; 
   }
-  // inicializamos IDA  
-  if (IDAInit(feenox.dae.system, feenox_ida_dae, feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt) != IDA_SUCCESS) {
-    return FEENOX_ERROR;
-  }
+  // initialize IDA
+  int err;
+  ida_call(IDAInit(feenox.dae.system, feenox_ida_dae, feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt));
 
   // seteo de tolerancias 
   if ((feenox.special_vectors.abs_error = feenox_get_vector_ptr("abs_error")) != NULL) {
@@ -371,14 +370,10 @@ int feenox_dae_init(void) {
       }
     }
 
-    if (IDASVtolerances(feenox.dae.system, feenox_special_var_value(rel_error), feenox.dae.abs_error) != IDA_SUCCESS) {
-      return FEENOX_ERROR;
-    }
+    ida_call(IDASVtolerances(feenox.dae.system, feenox_special_var_value(rel_error), feenox.dae.abs_error));
   } else {
     // si no nos dieron vector de absolutas, ponemos absolutas igual a relativas 
-    if (IDASStolerances(feenox.dae.system, feenox_special_var_value(rel_error), feenox_special_var_value(rel_error)) != IDA_SUCCESS) {
-      return FEENOX_ERROR;
-    }
+    ida_call(IDASStolerances(feenox.dae.system, feenox_special_var_value(rel_error), feenox_special_var_value(rel_error)));
   }
 
   //  estas tienen que venir despues de IDAInit
@@ -393,9 +388,7 @@ int feenox_dae_init(void) {
   }
         
   
-  if (IDASetId(feenox.dae.system, feenox.dae.id) != IDA_SUCCESS) {
-    return FEENOX_ERROR;
-  }
+  ida_call(IDASetId(feenox.dae.system, feenox.dae.id));
  
   if ((feenox.dae.A = SUNDenseMatrix(feenox.dae.dimension, feenox.dae.dimension)) == NULL) {
     return FEENOX_ERROR;
@@ -404,19 +397,17 @@ int feenox_dae_init(void) {
   if ((feenox.dae.LS = SUNDenseLinearSolver(feenox.dae.x, feenox.dae.A)) == NULL) {
     return FEENOX_ERROR;
   }
-  
-  if (IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A) != IDA_SUCCESS) {
-    return FEENOX_ERROR;
-  }
-  
-  if (IDASetInitStep(feenox.dae.system, feenox_special_var_value(dt)) != IDA_SUCCESS) {
-    return FEENOX_ERROR;
-  }
+
+  ida_call(IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));
+  ida_call(IDASetInitStep(feenox.dae.system, feenox_special_var_value(dt)));
+
   if (feenox_special_var_value(max_dt) != 0) {
-    if (IDASetMaxStep(feenox.dae.system, feenox_special_var_value(max_dt)) != IDA_SUCCESS) {
-      return FEENOX_ERROR;
-    }
+    ida_call(IDASetMaxStep(feenox.dae.system, feenox_special_var_value(max_dt)));
   }
+  
+  // set a stop time equal to end_time to prevent overshooting
+  // this only works if end_time is constant!
+  ida_call(IDASetStopTime(feenox.dae.system, feenox_special_var_value(end_time)));
   
   return FEENOX_OK;
 #else
@@ -456,18 +447,18 @@ int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *para
   int i, j, k;
   dae_t *dae;
  
-  // esta funcion se llama un monton de veces en pasos de tiempo
-  // intermedios, entoces le decimos cuanto vale el tiempo nuevo por
-  //  si hay residuos que dependen explicitamente del tiempo
+  // this function is called many times in a single FeenoX time step for intermediate
+  // times which are internal to IDA, nevertheless there might be some residuals
+  // that explicitly depend on time so we update FeenoX's time with IDA's time
   feenox_special_var_value(t) = t;
 
-  // copiamos el estado del solver de IDA a feenox
+  // copy the phase space from IDA to FeenoX
   for (k = 0; k < feenox.dae.dimension; k++) {
     *(feenox.dae.phase_value[k]) = NV_DATA_S(yy)[k];
     *(feenox.dae.phase_derivative[k]) = NV_DATA_S(yp)[k];
   }
 
-  // evaluamos los residuos en feenox y los dejamos en IDA
+  // evaluate the residuals in FeenoX and leave them for IDA
   k = 0;
   LL_FOREACH(feenox.dae.daes, dae) {
     

@@ -22,15 +22,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
-
-
 int feenox_run_standard(void) {
-
-#ifdef HAVE_IDA
-//  int err;
-//  double ida_step_dt, ida_step_t_old, ida_step_t_new, t_old;
-#endif
 
   feenox_call(feenox_init_before_run());
   

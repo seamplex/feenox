@@ -10,6 +10,7 @@ EXTRA_DIST = examples tests locateruntest.sh
 TESTS = tests/abort.sh \
         tests/default_argument_value.sh \
         tests/function_algebraic.sh \
+        tests/exp.sh \
         tests/expr.sh \
         tests/expressions_functions.sh \
         tests/trig.sh

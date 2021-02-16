@@ -1,0 +1,8 @@
+# PHASE_SPACE x
+# x_dot .= -x
+
+VAR x
+# x = 1
+f(x) := x
+g(x) := (-f(x))
+# PRINT -x (-x) -f(x) 

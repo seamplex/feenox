@@ -48,7 +48,7 @@ inputfile, i.e.\n\
 #endif
 
 #if HAVE_IDA
-#include <sundials/sundials_config.h>
+#include <sundials/sundials_version.h>
 #endif
 
 #if HAVE_PETSC
@@ -170,20 +170,22 @@ void feenox_longversion(void) {
   
   printf("GSL version        : %s\n", gsl_version);
   
-  printf("SUNDIALs version   : %s\n",
 #if HAVE_IDA
-         SUNDIALS_VERSION
+  char *sundials_version = malloc(BUFFER_TOKEN_SIZE);
+  SUNDIALSGetVersion(sundials_version, BUFFER_TOKEN_SIZE);
+  printf("SUNDIALs version   : %s\n", sundials_version);
 #else
-         "N/A"
+  printf("SUNDIALs version   : N/A\n", sundials_version);
 #endif
-        );  
+  
   printf("Readline version   : %s\n", 
 #if HAVE_READLINE
          rl_library_version
 #else
          "N/A"
 #endif
-        );
+  );
+
 
 #if HAVE_PETSC
   char petscversion[BUFFER_TOKEN_SIZE];
@@ -191,30 +193,20 @@ void feenox_longversion(void) {
   
   PetscGetVersion(petscversion, BUFFER_TOKEN_SIZE);
   PetscGetArchType(petscarch, BUFFER_TOKEN_SIZE);
-#endif  
-  printf("PETSc version      : %s\n",
-#if HAVE_PETSC
-         petscversion
-#else
-         "N/A"
-#endif      
-        );
-#if HAVE_PETSC
+  printf("PETSc version      : %s\n", petscversion);
   printf("PETSc arch         : %s\n", petscarch);
   printf("PETSc options      : %s\n", petscconfigureoptions);
-#endif
+#else
+  printf("PETSc version      : N/A\n", petscversion);
+#endif      
   
 #ifdef HAVE_SLEPC
   char slepcversion[BUFFER_TOKEN_SIZE];
   SlepcGetVersion(slepcversion, BUFFER_TOKEN_SIZE);  
-#endif  
-  printf("SLEPc version      : %s\n",
-#if HAVE_SLEPC
-         slepcversion
+  printf("SLEPc version      : %s\n", slepcversion);
 #else
-         "N/A"
+  printf("SLEPc version      : N/A\n", slepcversion);
 #endif
-        );
 
   return;
 }
