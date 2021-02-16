@@ -33,7 +33,7 @@ char *feenox_ends_in_zero(const char *name) {
 
   char *dummy;
 
-  if (((dummy = strstr(name, "_0")) != 0) && (*(dummy+2) == 0)) {
+  if (((dummy = strstr(name, "_0")) != 0) && (isblank(dummy[2]) || dummy[2] == '\0')) {
     return dummy;
   } else {
     return NULL;
@@ -255,6 +255,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
   int n_int = 0; // sscanf can only return ints, not size_t
   char *backup = strdup(string);
   expr_item_t *item = calloc(1, sizeof(expr_item_t));
+  item->sign = 1.0; // assume the sign is positive
 
   // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
   if (isdigit((int)(*string)) || ((*string == '-' || *string == '+' || *string == '.') && isdigit((int)string[1]))) {
@@ -266,12 +267,14 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     n += n_int;
     item->type = EXPR_CONSTANT;
     item->constant = constant;
-    item->sign = 1.0;
 
   } else {
     // we got letters
     // if there's a negative sign, meaning something like (-x) or (-f(x)) then we take the sign into account
-    item->sign = (*string == '-') ? -1.0 : +1.0;
+    if (*string == '-') {
+      item->sign =  -1.0;
+      n++; // TODO: what happen if there are blanks? while?
+    }
     char *token = strtok(backup, factorseparators);
     if (token == NULL || strlen(token) == 0) {
       return NULL;
@@ -329,7 +332,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     }
 
     if (matrix != NULL || vector != NULL || var != NULL) {
-      n = strlen(token);
+      n += strlen(token);
       if (wants_initial_transient) {
         n += 2;
         item->type |= EXPR_INITIAL_TRANSIENT;
@@ -350,8 +353,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         (builtin_vectorfunction = feenox_get_builtin_vectorfunction_ptr(token)) != NULL ||
         (builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL) {
 
-      // copy into argument whatever is after the name
-      char *argument = strdup(string+strlen(token));
+      // copy into argument whatever is after the nam
+      char *argument = strdup(string+strlen(token) + (item->sign < 0));
 
       // arguments have to be in parenthesis
       if (*argument != '(') {
@@ -378,7 +381,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       }
 
       // n is the number of characters to parse (it will get copied into the output item_t)
-      n = strlen(token) + n_chars_count;
+      n += strlen(token) + n_chars_count;
       
       int n_arguments_max;
 

@@ -81,3 +81,14 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
  
 # What we program in FeenoX
+
+ * The features described in the SRS.
+ 
+# Release plans
+
+ * v0.x for first development until partially fulfilling the SRS
+ * v1.x first stable release meaning:
+    - usable features
+    - full documentation matching the code features
+ * v2.x further features and improvements 
+ 

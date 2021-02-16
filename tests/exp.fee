@@ -1,0 +1,6 @@
+PHASE_SPACE x   # variable x is in the phase space of the DAE system
+end_time = 1    # time goes from 0 to 1
+x_0 = 1         # initial codition is x = 1 for t = 0
+x_dot .= -x     # differential equation
+# output time, x, the analytical solution and the absolute error
+PRINT %.6f t x exp(-t) %e abs(x-exp(-t))      
