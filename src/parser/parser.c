@@ -257,6 +257,20 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_phase_space());
       return FEENOX_OK;
 
+///kw+READ_MESH+desc Read an unstructured mesh and (optionally) functions of space-time from a file.
+///kw+READ_MESH+usage READ_MESH
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "READ_MESH") == 0) {
+      feenox_call(feenox_parse_read_mesh());
+      return FEENOX_OK;
+
+///kw+WRITE_MESH+desc Write a mesh and functions of space-time to a file for post-processing.
+///kw+WRITE_MESH+usage WRITE_MESH
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "WRITE_MESH") == 0) {
+      feenox_call(feenox_parse_write_mesh());
+      return FEENOX_OK;
+      
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these
@@ -308,10 +322,6 @@ int feenox_parse_line(void) {
             feenox_call(feenox_add_dae(lhs, rhs));
           break;
         }
-        
-        
-//         char *open_bracket = strchr(lhs, '[');
-//         char *open_par = strchr(lhs, '(');
 
         return FEENOX_OK;
     }
@@ -1406,166 +1416,9 @@ int feenox_parse_line(void) {
       }
 
       return FEENOX_OK;
-
-      
-      // --- DAE -----------------------------------------------------
-    } else if (token[0] == '0' || strstr(feenox.line, ".=") != NULL) {
-///kw+_.=+desc Add an equation to the DAE system to be solved in the phase space spanned by `PHASE_SPACE`.
-///kw+_.=+usage { 0[(i[,j]][<imin:imax[;jmin:jmax]>] | <expr1> } .= <expr2>
-      char *equation;
-      char *dummy;
-      char *bracket;
-      phase_object_t *phase_object;
-      
-      dae_t *dae = calloc(1, sizeof(dae_t));
-      
-      if (feenox_dae.daes == NULL) {
-        // si es la primera dae, anotamos a que instruccion corresponde
-        if ((feenox_dae.instruction = feenox_define_instruction(&feenox_instruction_dae, NULL)) == NULL) {
-          return FEENOX_ERROR;
-        }
-        // y ponemos una finite-state machine en modo "leyendo daes"
-//        feenox_dae.reading_daes = 1;
-      }
-      
-      
-      LL_APPEND(feenox_dae.daes, dae);
-
-      if (token[0] == '0') {
-        // ecuacion escrita en forma implicita
-        dae->equation_type |= EQN_FLAG_IMPLICIT;
-        if ((dummy = strchr((char *)(token+strlen(token)+1), '=')) == NULL) {
-          feenox_push_error_message("expecting equal sign after keyword 0");
-          return FEENOX_ERROR;
-        }
-        equation = strdup(dummy+1);
-
-        if (strncmp(token, "0(i,j)", 6) == 0) {
-          //  ecuacion implicita y matricial
-          dae->equation_type |= EQN_FLAG_MATRICIAL;
-          if ((dae->matrix = feenox_get_first_matrix(equation)) == NULL) {
-            feenox_push_error_message("matrix equations need at least one matrix in the expression");
-            return FEENOX_ERROR;
-          }
-          
-          if (token[6] == '<') {
-            feenox_call(feenox_parse_range(token+6, '<', ':', ';', &dae->expr_i_min, &dae->expr_i_max));
-            feenox_call(feenox_parse_range(strchr(dummy+6, ';'), ';', ':', '>', &dae->expr_j_min, &dae->expr_j_max));
-          }
-          
-        } else if (strncmp(token, "0(i)", 4) == 0) {
-          // ecuacion implicita y vectorial
-          dae->equation_type |= EQN_FLAG_VECTORIAL;
-          if ((dae->vector = feenox_get_first_vector(equation)) == NULL) {
-            feenox_push_error_message("vectorial equations need at least one vector in the expression");
-            return FEENOX_ERROR;
-          }
-
-          if (token[4] == '<') {
-            feenox_call(feenox_parse_range(token+4, '<', ':', '>', &dae->expr_i_min, &dae->expr_i_max));
-          }
-          
-        } else {
-          dae->equation_type |= EQN_FLAG_SCALAR;
-        }
-        
-        
-
-      } else if (strstr(feenox.line, ".=") != NULL) {
-
-        // el tipo puso una ecuacion explicita
-        dae->equation_type |= EQN_FLAG_EXPLICIT;
-
-        if (strchr((char *)(token+strlen(token)+1), '=') == NULL) {
-          feenox_push_error_message("syntax error, the equal sign should come right after the dot with no spaces between them");
-          return FEENOX_ERROR;
-        }
-        dummy = strchr((char *)(token+strlen(token)+1), '=')+1;
-        equation = malloc(strlen(dummy)+strlen(token)+16);
-
-        // si en el miembro izquierdo hay un vector o una matriz, entonces araca
-        if ((dae->vector = feenox_get_first_vector(token)) != NULL) {
-          dae->equation_type |= EQN_FLAG_VECTORIAL;
-          if ((bracket = strchr(token, '<')) != NULL) {
-            feenox_call(feenox_parse_range(bracket, '<', ':', '>', &dae->expr_i_min, &dae->expr_i_max));
-            *bracket = '\0';
-          }
-          
-        } else if ((dae->matrix = feenox_get_first_matrix(token)) != NULL) {
-          dae->equation_type |= EQN_FLAG_MATRICIAL;
-          if ((bracket = strchr(token, '<')) != NULL) {
-            feenox_call(feenox_parse_range(bracket, '<', ':', ';', &dae->expr_i_min, &dae->expr_i_max));
-            feenox_call(feenox_parse_range(strchr(bracket, ';'), ';', ':', '>', &dae->expr_j_min, &dae->expr_j_max));
-            *bracket = '\0';
-          }
-          
-        } else {
-          dae->equation_type |= EQN_FLAG_SCALAR;
-        }
-
-        // pasamos el miembro derecho para el otro lado cambiado de signo
-        sprintf(equation, "(%s)-(%s)", token, dummy);
-
-      } else {
-        return FEENOX_ERROR;
-      }
-
-
-      // vemos si es diferencial o algebraica: si aparece alguna derivada en la
-      // expresion implicita, es diferencial
-      if ((dummy = feenox_get_first_dot(equation)) != NULL) {
-        int found = 0;
-        dae->equation_type |= EQN_FLAG_DIFFERENTIAL;
-        LL_FOREACH(feenox_dae.phase_objects, phase_object) {
-          if (strcmp(dummy, phase_object->name) == 0) {
-            phase_object->differential = 1;
-            found = 1;
-          }
-        }
-        free(dummy);
-        if (found == 0) {
-          feenox_push_error_message("requested derivative of object '%s' but it is not in the phase space", dummy);
-          return FEENOX_ERROR;
-        }
-
-      } else {
-        dae->equation_type |= EQN_FLAG_ALGEBRAIC;
-      }
-
-      // la ecuacion propiamente dicha      
-      feenox_call(feenox_parse_expression(equation, &dae->residual));
-
-      free(equation);
-
-      return FEENOX_OK;
-
-    // ----- ASSIGNMENT -----------------------------------------------------------
-    } else if ((token = feenox_get_next_token(NULL)) != NULL && strcmp(token, "=") == 0) {
-///kw+=+desc Assign an expression to a variable, a vector or a matrix.
-///kw+=+usage <var>[ [<expr_tmin>, <expr_tmax>] | @<expr_t> ] = <expr>
-///kw+=+usage <vector>(<expr_i>)[<expr_i_min, expr_i_max>] [ [<expr_tmin>, <expr_tmax>] | @<expr_t> ] = <expr>
-///kw+=+usage <matrix>(<expr_i>,<expr_j>)[<expr_i_min, expr_i_max; expr_j_min, expr_j_max>] [ [<expr_tmin>, <expr_tmax>] | @<expr_t> ] = <expr>
-
-      // metemos de prepo un nuevo elemento en la linked list
-      assignment_t *assignment = calloc(1, sizeof(assignment_t));
-      LL_APPEND(feenox.assignments, assignment);
-      
-      feenox_call(feenox_parse_assignment(feenox.line, assignment));
-      
-      if (feenox_define_instruction(feenox_instruction_assignment, assignment) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return FEENOX_OK;
-
-    } else {
-      // si no entendimos la linea, probamos pasarsela al parser de mallas
-      strcpy(line, feenox.line);
-      return feenox_mesh_parse_line(line);    
-    }
-
-  }
 */
+      
+
   feenox_push_error_message("unknown keyword '%s'", feenox_parser.line);
   return FEENOX_ERROR;
 
@@ -3110,5 +2963,201 @@ int feenox_parse_phase_space(void) {
     }
   }
 
+  return FEENOX_OK;
+}
+
+int feenox_parse_read_mesh(void) {
+  
+  char *token = NULL;
+  mesh_t *mesh;
+
+  // TODO: api?
+  mesh = calloc(1, sizeof(mesh_t));
+  
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+MESH_READ+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+///kw+MESH_READ+detail The format is read from the extension, which should be either
+///kw+MESH_READ+detail @
+///kw+MESH_READ+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\/\/gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
+///kw+MESH_READ+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
+///kw+MESH_READ+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
+///kw+MESH_READ+detail @
+///kw+MESH_READ+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides information about physical groups.
+///kw+MESH_READ+detail The other formats are primarily supported to read function data contained in the file.
+    
+///kw+MESH_READ+usage FILE { <file_path> | <file_id> }
+    if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+      feenox_call(feenox_parser_file(&mesh->file));
+    
+///kw+MESH_READ+usage [ NAME <name> ]
+///kw+MESH_READ+detail If there will be only one mesh in the input file, the `NAME` is optional. 
+///kw+MESH_READ+detail Yet it might be needed in cases where there are many meshes and one needs to refer to a particular mesh,
+///kw+MESH_READ+detail such as in `MESH_WRITE` or `INTEGRATE`.
+    } if (strcasecmp(token, "NAME") == 0) {
+      feenox_call(feenox_parser_string(&mesh->name));
+          
+///kw+MESH_READ+detail The spatial dimensions cab be given with `DIMENSION`.
+///kw+MESH_READ+detail If material properties are uniform and given with variables,
+///kw+MESH_READ+detail the number of dimensions are not needed and will be read from the file at runtime.
+///kw+MESH_READ+detail But if either properties are given by spatial functions or if functions
+///kw+MESH_READ+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
+///kw+MESH_READ+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
+///kw+MESH_READ+detail how many arguments these functions take. 
+///kw+MESH_READ+usage [ DIMENSIONS <num_expr> ]@
+        } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+          double xi;
+          feenox_call(feenox_parser_expression_in_string(&xi));
+          if (xi < 1 || xi > 3) {
+            feenox_push_error_message("mesh dimensions have to be either 1, 2 or 3, not '%g'", xi);
+            return FEENOX_ERROR;
+          }
+          mesh->dimension_spatial = (int)(round(xi));
+
+///kw+MESH_READ+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
+///kw+MESH_READ+usage [ SCALE <expr> ]
+        } else if (strcasecmp(token, "SCALE") == 0) {
+          feenox_call(feenox_parser_expression(&mesh->scale_factor));
+
+///kw+MESH_READ+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
+        } else if (strcasecmp(token, "OFFSET") == 0) {
+          feenox_call(feenox_parser_expression(&mesh->offset_x));
+          feenox_call(feenox_parser_expression(&mesh->offset_y));
+          feenox_call(feenox_parser_expression(&mesh->offset_z));
+
+///kw+MESH_READ+usage [ INTEGRATION { full | reduced } ]
+        } else if (strcasecmp(token, "INTEGRATION") == 0) {
+          char *keywords[] = {"full", "reduced", ""};
+          int values[] = {integration_full, integration_reduced, 0};
+          feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
+
+///kw+MESH_READ+usage [ RE_READ ]@
+        } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
+          mesh->update_each_step = 1;
+          
+
+///kw+MESH_READ+detail For each `READ_SCALAR` keyword, a point-wise defined function of space named `<function_name>` is
+///kw+MESH_READ+detail defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
+///kw+MESH_READ+usage [ READ_SCALAR <name_in_mesh> AS <function_name> ] [...]@
+        } else if (strcasecmp(token, "READ_DATA") == 0 || strcasecmp(token, "READ_SCALAR") == 0) {
+          char *name_in_mesh;
+          char *function_name;
+          node_data_t *node_data;
+
+          if (mesh->dimension_spatial == 0) {
+            feenox_push_error_message("MESH READ_DATA needs DIMENSIONS to be set", token);
+            return FEENOX_ERROR;
+          }
+          
+          feenox_call(feenox_parser_string(&name_in_mesh));
+          // el "AS"
+          feenox_call(feenox_parser_string(&token));
+          if (strcasecmp(token, "AS") != 0) {
+            feenox_push_error_message("expected AS instead of '%s'", token);
+            return FEENOX_ERROR;
+          }
+          free(token); // valgrind told me that token was definitely lost
+          feenox_call(feenox_parser_string(&function_name));
+          
+          node_data = calloc(1, sizeof(node_data_t));
+          node_data->name_in_mesh = strdup(name_in_mesh);
+          node_data->function = feenox_define_function(function_name, dimensions);
+          LL_APPEND(node_datas, node_data);
+          free(name_in_mesh);
+          free(function_name);
+
+
+///kw+MESH_READ+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
+///kw+MESH_READ+usage [ READ_FUNCTION <function_name> ] [...]
+        } else if (strcasecmp(token, "READ_FUNCTION") == 0 ) {
+          // TODO: que funcione con cell-centered
+          char *function_name;
+          node_data_t *node_data;
+
+          if (dimensions == 0) {
+            feenox_push_error_message("MESH READ_FUNCTION needs DIMENSIONS to be set", token);
+            return FEENOX_ERROR;
+          }
+          
+          feenox_call(feenox_parser_string(&function_name));
+          
+          node_data = calloc(1, sizeof(node_data_t));
+          node_data->name_in_mesh = strdup(function_name);
+          node_data->function = feenox_define_function(function_name, dimensions);
+          LL_APPEND(node_datas, node_data);
+          free(function_name);
+          
+        } else {
+          feenox_push_error_message("unknown keyword '%s'", token);
+          return FEENOX_ERROR;
+        }
+      }
+
+///kw+MESH_READ+detail If no `NAME` is given, the first mesh to be defined is called `first`.
+      // si no tenemos nombre 
+      if (name == NULL) {
+        if (feenox_mesh.meshes == NULL) {
+          // y es la primera malla, la llamamos first
+          name = strdup("first");
+        } else {
+          // y es otra malla, nos quejamos
+          feenox_push_error_message("when defining multiples MESHes, a NAME is mandatory");
+          return FEENOX_ERROR;
+        }
+      }
+
+      if (file == NULL && structured == 0) {
+        feenox_push_error_message("either FILE, FILE_PATH or STRUCTURED should be given to MESH");
+        return FEENOX_ERROR;
+      }
+      
+      if ((mesh = feenox_define_mesh(name, file, dimensions, dimensions, degrees, integration, structured, scale_factor, offset, ncells, lengths, deltas)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      
+      if (node_datas != NULL) {
+        mesh->node_datas = node_datas;
+      }
+      
+      if (re_read != 0) {
+        mesh->re_read = 1;
+      }
+      
+      if (mesh->format == mesh_format_fromextension && mesh->file != NULL) {
+        char *ext = strrchr(mesh->file->format, '.');
+        
+        if (ext == NULL) {
+          feenox_push_error_message("no extension and no FORMAT given", ext);
+          return FEENOX_ERROR;
+        }
+        
+               if (strncasecmp(ext, ".msh", 4) == 0 ||
+                   strncasecmp(ext, ".msh2", 5) == 0 ||
+                   strncasecmp(ext, ".msh4", 5) == 0) {
+          mesh->format = mesh_format_gmsh;
+        } else if (strcasecmp(ext, ".vtk") == 0) {
+          mesh->format = mesh_format_vtk;
+        } else if (strcasecmp(ext, ".frd") == 0) {
+          mesh->format = mesh_format_frd;
+        } else {
+          feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
+          return FEENOX_ERROR;
+        }
+      }
+      
+      if (feenox_define_instruction(feenox_instruction_mesh, mesh) == NULL) {
+        return FEENOX_ERROR;
+      }
+      free(name);
+  
+  
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_parse_write_mesh(void) {
+  
+  
   return FEENOX_OK;
 }

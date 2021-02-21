@@ -1,16 +1,56 @@
+# Things to TODO
+
+## Wasora keywords
+
+ * SEMAPHORE
+ * READ / WRITE
+ * PRINT_VECTOR
+ * SOLVE
+ * M4
+ * SHELL
+ * HISTORY
+ * PARAMETRIC
+ * FIT
+ * MINIMIZE
+ 
+## Wasora stuff
+
+ * pointwise functions
+ * vector & matrix assignements & DAEs
+
+## API
+
+ * Python?
+ * Julia?
+ 
+
+## Nice to have
+
  * logaritmic ranges for PRINT_FUNCTION
  * default separator after TEXT is space, after numerical is tab
- * unify all codes
- * definitions and instructions in an API-friendly way
-    * the parser detects a "=" and then calls a function to define an assignment or a function definition passing the left and right hand side strings
+ * BLAS
+   - BLAS a * b = s   # scalar dot
+   - BLAS a x b = c   # vector cross
+   - BLAS A * b = c   # matrix-vector
+   - BLAS a + b = c   # vector
+   - BLAS A + B = C   # matrix
+   - BLAS a - b = c
+   - BLAS A - B = C
+   
  
- * m4 as a library?
- * gmsh as a library?
+## Command-line arguments
 
  * see if we need argv_orig
  * list symbols with "-l" (is there any clash with petsc?)
- * -info clashes with PETSc
+ * $1 = ${1}
+ 
+## Error handling 
+ 
  * gsl error handling
  * feenox_nan_error()
  * feenox_gsl_handler()
- * $1 = ${1}
+
+## Extensions
+ 
+ * m4 as a library?
+ * gmsh as a library?

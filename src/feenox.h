@@ -202,7 +202,34 @@ typedef struct phase_object_t phase_object_t;
 typedef struct dae_t dae_t;
 
 typedef struct mesh_t mesh_t;
+typedef struct physical_entity_t physical_entity_t;
+typedef struct geometrical_entity_t geometrical_entity_t;
+typedef struct physical_name_t physical_name_t;
+typedef struct physical_property_t physical_property_t;
+typedef struct property_data_t property_data_t;
+typedef struct material_t material_t;
+typedef struct material_list_item_t material_list_item_t;
 
+typedef struct node_t node_t;
+typedef struct node_relative_t node_relative_t;
+typedef struct element_t element_t;
+typedef struct element_list_item_t element_list_item_t;
+typedef struct element_type_t element_type_t;
+typedef struct cell_t cell_t;
+typedef struct neighbor_t neighbor_t;
+typedef struct gauss_t gauss_t;
+
+typedef struct elementary_entity_t elementary_entity_t;
+typedef struct bc_t bc_t;
+typedef struct node_data_t node_data_t;
+
+/*
+typedef struct mesh_post_t mesh_post_t;
+typedef struct mesh_post_dist_t mesh_post_dist_t;
+typedef struct mesh_fill_vector_t mesh_fill_vector_t;
+typedef struct mesh_find_minmax_t mesh_find_minmax_t;
+typedef struct mesh_integrate_t mesh_integrate_t;
+*/
 
 // individual factor of an algebraic expression
 struct expr_item_t {
@@ -717,6 +744,113 @@ struct dae_t {
   dae_t *next;
 };
 
+
+
+// mesh-realted structs -----------------------------
+// node
+struct node_t {
+  size_t tag;               // number assigned by Gmsh
+  size_t index_mesh;        // index within the node array
+
+  double x[3];              // spatial coordinates of the node
+  size_t *index_dof;        // index within the solution vector for each DOF
+  
+  double *phi;              // values of the solution functions at the node
+  gsl_matrix *dphidx;       // derivative of the m-th DOF with respect to coordinate g
+                            // (this is a gsl_matrix to avoid having to do double mallocs and forgetting about row/col-major
+  gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
+  double *f;                // holder of arbitrary functions evaluated at the node (sigmas and taus)
+  
+  element_list_item_t *associated_elements;
+};
+
+
+struct node_data_t {
+  char *name_in_mesh;
+  function_t *function;
+  
+  node_data_t *next;
+};
+
+
+// unstructured mesh
+struct mesh_t {
+  char *name;
+  unsigned int initialized;
+  
+  file_t *file;
+  enum  {
+    mesh_format_fromextension,
+    mesh_format_gmsh,
+    mesh_format_vtk,
+    mesh_format_frd,
+  } format;
+  
+  unsigned int dimension_spatial;
+  unsigned int dimension_topological;
+
+  unsigned int n_nodes;
+  unsigned int n_elements;
+  unsigned int n_cells; // a cell is an element with the topological dimension of the mesh
+
+//  int degrees_of_freedom;        // per unknown
+  unsigned int order;
+
+  physical_entity_t *physical_entities;              // hash table
+  physical_entity_t *physical_entities_by_tag[4];    // 4 hash tables por tag
+  unsigned int physical_tag_max;   // the higher tag of the entities
+  
+  // number of geometric entities of each dimension
+  unsigned points, curves, surfaces, volumes;
+  geometrical_entity_t *geometrical_entities[4];     // 4 hash tables, one for each dimension
+
+  unsigned int sparse;         // flag that indicates if the nodes are sparse
+  unsigned int *tag2index;     // array to map tags to indexes
+  
+  enum {
+    data_type_element,
+    data_type_node,
+  } data_type;
+  
+  enum {
+    integration_full,
+    integration_reduced
+  } integration;
+  
+  unsigned int update_each_step;
+  
+  expr_t scale_factor;           // factor de escala al leer la posicion de los nodos
+  expr_t offset_x;               // offset en nodos
+  expr_t offset_y;               // offset en nodos
+  expr_t offset_z;               // offset en nodos
+    
+  double **nodes_argument;
+  double **cells_argument;
+
+  node_data_t *node_datas;
+  
+  unsigned int n_physical_names;
+  node_t *node;
+  element_t *element;
+  cell_t *cell;
+  
+  node_t bounding_box_max;
+  node_t bounding_box_min;
+  
+  unsigned int max_nodes_per_element;
+  unsigned int max_faces_per_element;
+  unsigned int max_first_neighbor_nodes;  // to estimate matrix bandwith
+
+  // kd-trees to make efficient searches
+  void *kd_nodes;
+  void *kd_cells;
+
+  element_t *last_chosen_element;     // interpolation cache
+  
+  UT_hash_handle hh;
+
+};
+
 // global FeenoX singleton structure
 struct feenox_t {
   int argc;
@@ -825,6 +959,57 @@ struct feenox_t {
     file_t *stdout_;
 //    file_t *stderr_;
   } special_files;  
+
+  struct {
+
+    int initialized;
+    int need_cells;
+
+    mesh_t *meshes;
+    mesh_t *mesh_main;
+
+    // flag que el codigo partcular rellena (preferentemente en init_before_parser)
+    // para indicar si el default es trabajar sobre celdas (FVM) o sobre nodos (FEM)
+//    centering_t default_centering;
+
+    // estas tres variables estan reallocadas para apuntar a vec_x
+    struct {
+      var_t *x;
+      var_t *y;
+      var_t *z;
+      var_t *arr_x[3];   // x, y y z en un array de tamanio 3
+      vector_t *vec_x;
+
+      var_t *nx;
+      var_t *ny;
+      var_t *nz;
+      var_t *arr_n[3];
+      vector_t *vec_n;
+
+      var_t *eps;
+
+      var_t *nodes;
+      var_t *cells;
+      var_t *elements;
+
+      vector_t *bbox_min;
+      vector_t *bbox_max;
+
+      var_t *mesh_failed_interpolation_factor;
+    } vars;
+
+    element_type_t *element_type;
+
+    material_t *materials;
+    physical_property_t *physical_properties;
+    
+/*    
+    mesh_write_t *writes;
+    fill_mesh_vector_t *fill_vectors;
+    find_extremum_t *find_minmaxs;
+    integrate_t *integrates;
+*/
+  } mesh;  
   
   struct {
     int dimension;
@@ -854,7 +1039,7 @@ struct feenox_t {
     SUNLinearSolver LS;
 #endif
   } dae;
-
+  
 };
 
 
