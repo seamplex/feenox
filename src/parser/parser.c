@@ -3005,152 +3005,134 @@ int feenox_parse_read_mesh(void) {
 ///kw+MESH_READ+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
 ///kw+MESH_READ+detail how many arguments these functions take. 
 ///kw+MESH_READ+usage [ DIMENSIONS <num_expr> ]@
-        } else if (strcasecmp(token, "DIMENSIONS") == 0) {
-          double xi;
-          feenox_call(feenox_parser_expression_in_string(&xi));
-          if (xi < 1 || xi > 3) {
-            feenox_push_error_message("mesh dimensions have to be either 1, 2 or 3, not '%g'", xi);
-            return FEENOX_ERROR;
-          }
-          mesh->dimension_spatial = (int)(round(xi));
+    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+      double xi;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      mesh->dim = (int)(round(xi));
+      if (mesh->dim < 1 || mesh->dim > 3) {
+        feenox_push_error_message("mesh dimensions have to be either 1, 2 or 3, not '%g'", xi);
+        return FEENOX_ERROR;
+      }
 
 ///kw+MESH_READ+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
 ///kw+MESH_READ+usage [ SCALE <expr> ]
-        } else if (strcasecmp(token, "SCALE") == 0) {
-          feenox_call(feenox_parser_expression(&mesh->scale_factor));
+    } else if (strcasecmp(token, "SCALE") == 0) {
+      feenox_call(feenox_parser_expression(&mesh->scale_factor));
 
 ///kw+MESH_READ+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
-        } else if (strcasecmp(token, "OFFSET") == 0) {
-          feenox_call(feenox_parser_expression(&mesh->offset_x));
-          feenox_call(feenox_parser_expression(&mesh->offset_y));
-          feenox_call(feenox_parser_expression(&mesh->offset_z));
+    } else if (strcasecmp(token, "OFFSET") == 0) {
+      feenox_call(feenox_parser_expression(&mesh->offset_x));
+      feenox_call(feenox_parser_expression(&mesh->offset_y));
+      feenox_call(feenox_parser_expression(&mesh->offset_z));
 
 ///kw+MESH_READ+usage [ INTEGRATION { full | reduced } ]
-        } else if (strcasecmp(token, "INTEGRATION") == 0) {
-          char *keywords[] = {"full", "reduced", ""};
-          int values[] = {integration_full, integration_reduced, 0};
-          feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
+    } else if (strcasecmp(token, "INTEGRATION") == 0) {
+      char *keywords[] = {"full", "reduced", ""};
+      int values[] = {integration_full, integration_reduced, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
 
-///kw+MESH_READ+usage [ RE_READ ]@
-        } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
-          mesh->update_each_step = 1;
-          
+///kw+MESH_READ+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
+///kw+MESH_READ+detail each time step. Default is to read the mesh once.          
+///kw+MESH_READ+usage [ UPDATE_EACH_STEP ]@
+    } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
+      mesh->update_each_step = 1;
 
-///kw+MESH_READ+detail For each `READ_SCALAR` keyword, a point-wise defined function of space named `<function_name>` is
-///kw+MESH_READ+detail defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
-///kw+MESH_READ+usage [ READ_SCALAR <name_in_mesh> AS <function_name> ] [...]@
-        } else if (strcasecmp(token, "READ_DATA") == 0 || strcasecmp(token, "READ_SCALAR") == 0) {
-          char *name_in_mesh;
-          char *function_name;
-          node_data_t *node_data;
+///kw+MESH_READ+detail When defining several meshes and solving a PDE problem, the mesh used
+///kw+MESH_READ+detail as the PDE domain is the one marked with `MAIN`.
+///kw+MESH_READ+detail If none of the meshes is explicitly marked as main, the first one is used.
+///kw+MESH_READ+usage [ MAIN ]@
+    } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
+      mesh->update_each_step = 1;
 
-          if (mesh->dimension_spatial == 0) {
-            feenox_push_error_message("MESH READ_DATA needs DIMENSIONS to be set", token);
-            return FEENOX_ERROR;
-          }
-          
-          feenox_call(feenox_parser_string(&name_in_mesh));
-          // el "AS"
-          feenox_call(feenox_parser_string(&token));
-          if (strcasecmp(token, "AS") != 0) {
-            feenox_push_error_message("expected AS instead of '%s'", token);
-            return FEENOX_ERROR;
-          }
-          free(token); // valgrind told me that token was definitely lost
-          feenox_call(feenox_parser_string(&function_name));
-          
-          node_data = calloc(1, sizeof(node_data_t));
-          node_data->name_in_mesh = strdup(name_in_mesh);
-          node_data->function = feenox_define_function(function_name, dimensions);
-          LL_APPEND(node_datas, node_data);
-          free(name_in_mesh);
-          free(function_name);
-
-
+///kw+MESH_READ+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+///kw+MESH_READ+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
+///kw+MESH_READ+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
 ///kw+MESH_READ+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
-///kw+MESH_READ+usage [ READ_FUNCTION <function_name> ] [...]
-        } else if (strcasecmp(token, "READ_FUNCTION") == 0 ) {
-          // TODO: que funcione con cell-centered
-          char *function_name;
-          node_data_t *node_data;
+///kw+MESH_READ+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
+    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION")) {
 
-          if (dimensions == 0) {
-            feenox_push_error_message("MESH READ_FUNCTION needs DIMENSIONS to be set", token);
-            return FEENOX_ERROR;
-          }
-          
-          feenox_call(feenox_parser_string(&function_name));
-          
-          node_data = calloc(1, sizeof(node_data_t));
-          node_data->name_in_mesh = strdup(function_name);
-          node_data->function = feenox_define_function(function_name, dimensions);
-          LL_APPEND(node_datas, node_data);
-          free(function_name);
-          
-        } else {
-          feenox_push_error_message("unknown keyword '%s'", token);
-          return FEENOX_ERROR;
-        }
-      }
+      int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
 
-///kw+MESH_READ+detail If no `NAME` is given, the first mesh to be defined is called `first`.
-      // si no tenemos nombre 
-      if (name == NULL) {
-        if (feenox_mesh.meshes == NULL) {
-          // y es la primera malla, la llamamos first
-          name = strdup("first");
-        } else {
-          // y es otra malla, nos quejamos
-          feenox_push_error_message("when defining multiples MESHes, a NAME is mandatory");
-          return FEENOX_ERROR;
-        }
-      }
-
-      if (file == NULL && structured == 0) {
-        feenox_push_error_message("either FILE, FILE_PATH or STRUCTURED should be given to MESH");
+      if (mesh->dim == 0) {
+        feenox_push_error_message("READ_FIELD needs DIMENSIONS to be set", token);
         return FEENOX_ERROR;
       }
-      
-      if ((mesh = feenox_define_mesh(name, file, dimensions, dimensions, degrees, integration, structured, scale_factor, offset, ncells, lengths, deltas)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      
-      if (node_datas != NULL) {
-        mesh->node_datas = node_datas;
-      }
-      
-      if (re_read != 0) {
-        mesh->re_read = 1;
-      }
-      
-      if (mesh->format == mesh_format_fromextension && mesh->file != NULL) {
-        char *ext = strrchr(mesh->file->format, '.');
-        
-        if (ext == NULL) {
-          feenox_push_error_message("no extension and no FORMAT given", ext);
+
+      char *name_in_mesh = NULL;
+      feenox_call(feenox_parser_string(&name_in_mesh));
+
+      char *function_name = NULL;
+      if (custom_name) {
+        // the "AS"
+        feenox_call(feenox_parser_string(&token));
+        if (strcasecmp(token, "AS") != 0) {
+          feenox_push_error_message("expected AS instead of '%s'", token);
           return FEENOX_ERROR;
         }
-        
-               if (strncasecmp(ext, ".msh", 4) == 0 ||
-                   strncasecmp(ext, ".msh2", 5) == 0 ||
-                   strncasecmp(ext, ".msh4", 5) == 0) {
-          mesh->format = mesh_format_gmsh;
-        } else if (strcasecmp(ext, ".vtk") == 0) {
-          mesh->format = mesh_format_vtk;
-        } else if (strcasecmp(ext, ".frd") == 0) {
-          mesh->format = mesh_format_frd;
-        } else {
-          feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
-          return FEENOX_ERROR;
-        }
+        free(token); // valgrind told me that token was definitely lost
+
+        feenox_call(feenox_parser_string(&function_name));
+      } else {
+        function_name = strdup(name_in_mesh);
       }
-      
-      if (feenox_define_instruction(feenox_instruction_mesh, mesh) == NULL) {
-        return FEENOX_ERROR;
-      }
-      free(name);
-  
-  
+
+      node_data_t *node_data = calloc(1, sizeof(node_data_t));
+      node_data->name_in_mesh = strdup(name_in_mesh);
+      node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
+      LL_APPEND(mesh->node_datas, node_data);
+      free(name_in_mesh);
+      free(function_name);
+
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+
+///kw+MESH_READ+detail If no `NAME` is given, the first mesh defined is called `first`.
+  // if we don't have a name 
+  if (mesh->name == NULL) {
+    if (feenox.mesh.meshes == NULL) {
+      // and it's the first mesh we call it 'first'
+      mesh->name = strdup("first");
+    } else {
+      // otherwise we complain
+      feenox_push_error_message("when defining multiples meshes, a NAME is mandatory");
+      return FEENOX_ERROR;
+    }
+  }
+  // TODO: check that the name does not clash
+
+  if (mesh->file == NULL) {
+    feenox_push_error_message("no FILE given for READ_MESH");
+    return FEENOX_ERROR;
+  }
+
+  char *ext = strrchr(mesh->file->format, '.');
+  if (ext == NULL) {
+    feenox_push_error_message("no extension and no FORMAT given", ext);
+    return FEENOX_ERROR;
+  }
+
+  if (strncasecmp(ext, ".msh", 4) == 0 ||
+      strncasecmp(ext, ".msh2", 5) == 0 ||
+      strncasecmp(ext, ".msh4", 5) == 0) {
+    mesh->format = mesh_format_gmsh;
+  } else if (strcasecmp(ext, ".vtk") == 0) {
+    mesh->format = mesh_format_vtk;
+  } else if (strcasecmp(ext, ".frd") == 0) {
+    mesh->format = mesh_format_frd;
+  } else {
+    feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
+    return FEENOX_ERROR;
+  }
+
+  if (feenox.mesh.meshes == NULL) {
+    feenox.mesh.mesh_main == mesh;
+  }
+
+  HASH_ADD_KEYPTR(hh, feenox.mesh.meshes, mesh->name, strlen(mesh->name), mesh);
+  feenox_call(feenox_add_instruction(feenox_instruction_mesh_read, mesh));
   
   return FEENOX_OK;
 }

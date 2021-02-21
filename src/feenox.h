@@ -131,6 +131,29 @@
 #define ZERO          (8.881784197001252323389053344727e-16)  // (1/2)^-50
 #define INFTY         (1125899906842624.0)                    // 2^50
 
+#define MESH_INF 1e22
+#define MESH_TOL 1e-6
+
+// usamos los de gmsh, convertimos a vtk y frd con tablas
+#define ELEMENT_TYPE_UNDEFINED      0
+#define ELEMENT_TYPE_LINE2          1
+#define ELEMENT_TYPE_TRIANGLE3      2
+#define ELEMENT_TYPE_QUADRANGLE4    3
+#define ELEMENT_TYPE_TETRAHEDRON4   4
+#define ELEMENT_TYPE_HEXAHEDRON8    5
+#define ELEMENT_TYPE_PRISM6         6
+#define ELEMENT_TYPE_PYRAMID5       7
+#define ELEMENT_TYPE_LINE3          8
+#define ELEMENT_TYPE_TRIANGLE6      9
+#define ELEMENT_TYPE_QUADRANGLE9    10
+#define ELEMENT_TYPE_TETRAHEDRON10  11
+#define ELEMENT_TYPE_HEXAHEDRON27   12 
+#define ELEMENT_TYPE_POINT1         15
+#define ELEMENT_TYPE_QUADRANGLE8    16
+#define ELEMENT_TYPE_HEXAHEDRON20   17
+#define ELEMENT_TYPE_PRISM15        18
+#define NUMBER_ELEMENT_TYPE         19
+
 #define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
 
 
@@ -202,7 +225,7 @@ typedef struct phase_object_t phase_object_t;
 typedef struct dae_t dae_t;
 
 typedef struct mesh_t mesh_t;
-typedef struct physical_entity_t physical_entity_t;
+typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
 typedef struct physical_name_t physical_name_t;
 typedef struct physical_property_t physical_property_t;
@@ -683,9 +706,9 @@ struct print_function_t {
   // explicit range to print the function
   multidim_range_t range;
   
-  // mesh and physical entity that tells where to print a function
-//  mesh_t *mesh;
-//  physical_entity_t *physical_entity;
+  // mesh and physical group that tells where to print a function
+  mesh_t *mesh;
+  physical_group_t *physical_group;
 
   // flag to add a header explaining what the columns are
   int header;
@@ -773,10 +796,120 @@ struct node_data_t {
 };
 
 
+struct physical_group_t {
+  char *name;
+  int tag;
+  int dimension;
+  
+  material_t *material;    // apuntador
+  bc_t *bcs;               // linked list 
+  // TODO: pointer to bc like material?
+//  bc_t *bc;
+     
+  // volume (or area or length depending on the dim, sometimes called mass)
+  double volume;
+  double cog[3];
+  
+  var_t *var_vol;
+  vector_t *vector_cog;
+  
+  // a linked list seems to be too expensive
+  size_t n_elements;
+  size_t i_element;
+  size_t *element;
+  
+  UT_hash_handle hh;
+  UT_hash_handle hh_tag[4];
+};
+
+
+struct gauss_t {
+  int V;               // number of points (v=1,2,...,V )
+  double *w;           // weights (w[v] is the weight of the v-th point)
+  double **r;          // coordinates (r[v][m] is the coordinate of the v-th point in dimension m)
+  
+  double **h;          // shape functions evaluated at the gauss points h[v][j]
+  gsl_matrix **dhdr;   // derivatives dhdr[v](j,m)
+  
+  gsl_matrix *extrap;  // matrix to extrapolate the values from the gauss points to the nodes
+};
+
+
+// constant structure with the types of elements
+// this includes the pointers to the shape functions
+// the numbering is Gmsh-based
+struct element_type_t {
+  char *name;
+
+  size_t id;              // as of Gmsh
+  size_t dim;
+  size_t order;
+  int nodes;           // total, i.e. 10 for tet10
+  int vertices;        // the corner nodes, i.e 4 for tet10
+  int faces;           // facess == number of neighbors
+  int nodes_per_face;  // (max) number of nodes per face
+
+  double *barycenter_coords;
+  double **node_coords;
+  node_relative_t **node_parents;
+  
+  // shape functions and derivatives in the local coords
+  double (*h)(int i, double *r);
+  double (*dhdr)(int i, int j, double *r);
+  
+  // check if a point x belongs to the element or no
+  int (*point_in_element)(element_t *e, const double *x);
+  double (*element_volume)(element_t *e);
+  
+  gauss_t gauss[2];    // sets of gauss points
+                       // 0 - full integration
+                       // 1 - reduced integration
+};
+
+
+struct element_t {
+  size_t index;
+  size_t tag;
+  
+  double quality;
+  double volume;
+  double weight;   // this weight is used to average the contribution of this element to nodal gradients
+  double *w;       // weights of the gauss points
+  double **x;      // coordinates fo the gauss points 
+  
+  // these matrices are evalauted at the gauss points
+  gsl_matrix **dhdx;
+  gsl_matrix **dxdr;
+  gsl_matrix **drdx;
+  gsl_matrix **H;
+  gsl_matrix **B;
+  
+  // these are the number of gauss points currently being used
+  // if this number changes, everything needs to be re-computed
+  // for instance sub-integration might be used for building matrices
+  // but the canonical set of gauss points might be needed to recover stresses  
+  // we need one size for each of the seven objects above because we need
+  // to change them individually otherwise the first wins and the others loose
+  size_t V_w, V_x, V_H, V_B, V_dxdr, V_drdx, V_dhdx;    
+
+  
+  size_t *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
+
+  
+  gsl_matrix **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
+  gsl_matrix **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
+  double **property_node;
+
+  element_type_t *type;                  // pointer to the element type
+  physical_group_t *physical_group;      // pointer to the physical group this element belongs to
+  node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
+  cell_t *cell;                          // pointer to the associated cell (only for FVM)
+};
+
 // unstructured mesh
 struct mesh_t {
   char *name;
-  unsigned int initialized;
+  int initialized;
   
   file_t *file;
   enum  {
@@ -786,18 +919,18 @@ struct mesh_t {
     mesh_format_frd,
   } format;
   
-  unsigned int dimension_spatial;
-  unsigned int dimension_topological;
+  unsigned int dim;
+  unsigned int dim_topo;
 
-  unsigned int n_nodes;
-  unsigned int n_elements;
-  unsigned int n_cells; // a cell is an element with the topological dimension of the mesh
+  size_t n_nodes;
+  size_t n_elements;
+  size_t n_cells; // a cell is an element with the topological dimension of the mesh
 
 //  int degrees_of_freedom;        // per unknown
   unsigned int order;
 
-  physical_entity_t *physical_entities;              // hash table
-  physical_entity_t *physical_entities_by_tag[4];    // 4 hash tables por tag
+  physical_group_t *physical_groups;              // global hash table
+  physical_group_t *physical_groups_by_tag[4];    // 4 hash tablesm one per tag
   unsigned int physical_tag_max;   // the higher tag of the entities
   
   // number of geometric entities of each dimension
@@ -1140,14 +1273,15 @@ extern int feenox_define_matrix(const char *name, const char *rows, const char *
 extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
 
 extern int feenox_define_function(const char *name, int n_arguments);
+extern function_t *feenox_define_function_get_ptr(const char *name, int n_arguments);
 extern int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name);
 extern int feenox_function_set_expression(const char *name, const char *expression);
 
 extern int feenox_define_file(const char *name, const char *format, int n_args, const char *mode);
 extern int feenox_file_set_path_argument(const char *name, int i, const char *expression);
 
-extern var_t *feenox_get_or_define_variable_ptr(const char *name);
-extern var_t *feenox_define_variable_ptr(const char *name);
+extern var_t *feenox_get_or_define_variable_get_ptr(const char *name);
+extern var_t *feenox_define_variable_get_ptr(const char *name);
 
 extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
 extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
@@ -1204,5 +1338,15 @@ extern int feenox_instruction_endif(void *arg);
 
 // functionals.c
 extern double feenox_gsl_function(double x, void *params);
+
+// mesh.c
+extern int feenox_instruction_mesh_read(void *arg);
+
+extern int feenox_mesh_free(mesh_t *mesh);
+extern int feenox_mesh_read_gmsh(mesh_t *mesh);
+extern int feenox_mesh_read_vtk(mesh_t *mesh);
+extern int feenox_mesh_read_frd(mesh_t *mesh);
+
+
 
 #endif    /* FEENOX_H  */

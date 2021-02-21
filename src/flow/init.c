@@ -155,7 +155,7 @@ int feenox_init_special_objects(void) {
 ///va+done_static+detail It is set to true (i.e. $\neq 0$) by feenox if `step_static` $\ge$ `static_steps`.
 ///va+done_static+detail If the user sets it to true, the current step is marked as the last static step and
 ///va+done_static+detail the static calculation ends after finishing the step.
-  feenox_special_var(done_static) = feenox_get_or_define_variable_ptr("done_static");
+  feenox_special_var(done_static) = feenox_get_or_define_variable_get_ptr("done_static");
   
 
 ///va+done_transient+name done_transient
@@ -163,7 +163,7 @@ int feenox_init_special_objects(void) {
 ///va+done_transient+detail It is set to true (i.e. $\neq 0$) by feenox if `t` $\ge$ `end_time`.
 ///va+done_transient+detail If the user sets it to true, the current step is marked as the last transient step and
 ///va+done_transient+detail the transient calculation ends after finishing the step.
-  feenox_special_var(done_transient) = feenox_get_or_define_variable_ptr("done_transient");
+  feenox_special_var(done_transient) = feenox_get_or_define_variable_get_ptr("done_transient");
 
 
 ///va+done_outer+name done_outer
@@ -173,74 +173,74 @@ int feenox_init_special_objects(void) {
 ///va+done_outer+detail optimization algorithm reached the desired convergence criteria.
 ///va+done_outer+detail If the user sets it to true, the current step is marked as the last outer step and
 ///va+done_outer+detail the transient calculation ends after finishing the step.
-  feenox_special_var(done_outer) = feenox_get_or_define_variable_ptr("done_outer");
+  feenox_special_var(done_outer) = feenox_get_or_define_variable_get_ptr("done_outer");
 
 
 ///va+done+name done
 ///va+done+desc Flag that indicates whether the overall calculation is over.
-  feenox_special_var(done) = feenox_get_or_define_variable_ptr("done");
+  feenox_special_var(done) = feenox_get_or_define_variable_get_ptr("done");
 
   
 
 ///va+step_static+name step_static
 ///va+step_static+desc Indicates the current step number of the iterative static calculation.
-  feenox_special_var(step_static) = feenox_get_or_define_variable_ptr("step_static");
+  feenox_special_var(step_static) = feenox_get_or_define_variable_get_ptr("step_static");
   
 
 ///va+step_transient+name step_transient
 ///va+step_transient+desc Indicates the current step number of the transient static calculation.
-  feenox_special_var(step_transient) = feenox_get_or_define_variable_ptr("step_transient");
+  feenox_special_var(step_transient) = feenox_get_or_define_variable_get_ptr("step_transient");
   
 
 ///va+step_outer+name step_outer
 ///va+step_outer+desc Indicates the current step number of the iterative outer calculation (parametric, optimization or fit).
-  feenox_special_var(step_outer) = feenox_get_or_define_variable_ptr("step_outer");
+  feenox_special_var(step_outer) = feenox_get_or_define_variable_get_ptr("step_outer");
 
 ///va+in_outer_initial+name in_outer_initial
 ///va+in_outer_initial+desc Flag that indicates if the current step is the initial step of an optimization of fit run.
-  feenox_special_var(in_outer_initial) = feenox_get_or_define_variable_ptr("in_outer_initial");
+  feenox_special_var(in_outer_initial) = feenox_get_or_define_variable_get_ptr("in_outer_initial");
   
 
 ///va+in_static+name in_static
 ///va+in_static+desc Flag that indicates if feenox is solving the iterative static calculation.
-  feenox_special_var(in_static) = feenox_get_or_define_variable_ptr("in_static");
+  feenox_special_var(in_static) = feenox_get_or_define_variable_get_ptr("in_static");
 
 
 ///va+in_static_first+name in_static_first
 ///va+in_static_first+desc Flag that indicates if feenox is in the first step of the iterative static calculation.
-  feenox_special_var(in_static_first) = feenox_get_or_define_variable_ptr("in_static_first");
+  feenox_special_var(in_static_first) = feenox_get_or_define_variable_get_ptr("in_static_first");
 
 
 ///va+in_static_last+name in_static_last
 ///va+in_static_last+desc Flag that indicates if feenox is in the last step of the iterative static calculation.
-  feenox_special_var(in_static_last) = feenox_get_or_define_variable_ptr("in_static_last");
+  feenox_special_var(in_static_last) = feenox_get_or_define_variable_get_ptr("in_static_last");
 
 
 ///va+in_transient+name in_transient
 ///va+in_transient+desc Flag that indicates if feenox is solving transient calculation.
-  feenox_special_var(in_transient) = feenox_get_or_define_variable_ptr("in_transient");
+  feenox_special_var(in_transient) = feenox_get_or_define_variable_get_ptr("in_transient");
   
 
 ///va+in_transient_first+name in_transient_first
 ///va+in_transient_first+desc Flag that indicates if feenox is in the first step of the transient calculation.
-  feenox_special_var(in_transient_first) = feenox_get_or_define_variable_ptr("in_transient_first");
+  feenox_special_var(in_transient_first) = feenox_get_or_define_variable_get_ptr("in_transient_first");
   
 
 ///va+in_transient_last+name in_transient_last
 ///va+in_transient_last+desc Flag that indicates if feenox is in the last step of the transient calculation.
-  feenox_special_var(in_transient_last) = feenox_get_or_define_variable_ptr("in_transient_last");
+  feenox_special_var(in_transient_last) = feenox_get_or_define_variable_get_ptr("in_transient_last");
 
 
 ///va+static_steps+name static_steps
 ///va+static_steps+desc Number of steps that ought to be taken during the static calculation, to be set by the user. 
 ///va+static_steps+detail The default value is one, meaning only one static step. 
-  feenox_special_var(static_steps) = feenox_get_or_define_variable_ptr("static_steps");
+  feenox_special_var(static_steps) = feenox_get_or_define_variable_get_ptr("static_steps");
   
 
 ///va+end_time+name end_time
 ///va+end_time+desc Final time of the transient calculation, to be set by the user. 
 ///va+end_time+detail The default value is zero, meaning no transient calculation.
-  feenox_special_var(end_time) = feenox_get_or_define_variable_ptr("end_time");
+  feenox_special_var(end_time) = feenox_get_or_define_variable_get_ptr("end_time");
   
 
 ///va+t+name t
@@ -249,7 +249,7 @@ int feenox_init_special_objects(void) {
 ///va+t+detail the user for example by importing it from another
 ///va+t+detail transient code by means of shared-memory objects.
 ///va+t+detail Care should be taken when solving DAE systems and overwriting `t`.
-  feenox_special_var(t) = feenox_get_or_define_variable_ptr("t");
+  feenox_special_var(t) = feenox_get_or_define_variable_get_ptr("t");
   
 
 ///va+dt+name dt
@@ -259,7 +259,7 @@ int feenox_init_special_objects(void) {
 ///va+dt+detail transient code by means of shared-memory objects. Care should be taken when
 ///va+dt+detail solving DAE systems and overwriting `t`. Default value is DEFAULT_DT, which is
 ///va+dt+detail a power of two and roundoff errors are thus reduced.
-  feenox_special_var(dt) = feenox_get_or_define_variable_ptr("dt");
+  feenox_special_var(dt) = feenox_get_or_define_variable_get_ptr("dt");
   feenox_special_var_value(dt) = DEFAULT_DT;
 
 ///va+rel_error+name rel_error
@@ -267,29 +267,29 @@ int feenox_init_special_objects(void) {
 ///va+rel_error+detail Default value is
 ///va+rel_error+detail is $1 \times 10^{-6}$. If a fine per-variable error control is needed, special vector
 ///va+rel_error+detail `abs_error` should be used.
-  feenox_special_var(rel_error) = feenox_get_or_define_variable_ptr("rel_error");
+  feenox_special_var(rel_error) = feenox_get_or_define_variable_get_ptr("rel_error");
   feenox_special_var_value(rel_error) = DEFAULT_REL_ERROR;
   
 ///va+min_dt+name min_dt
 ///va+min_dt+desc Minimum bound for the time step that feenox should take when solving DAE systems.
-  feenox_special_var(min_dt) = feenox_get_or_define_variable_ptr("min_dt");
+  feenox_special_var(min_dt) = feenox_get_or_define_variable_get_ptr("min_dt");
   
 ///va+max_dt+name max_dt
 ///va+max_dt+desc Maximum bound for the time step that feenox should take when solving DAE systems.
-  feenox_special_var(max_dt) = feenox_get_or_define_variable_ptr("max_dt");
+  feenox_special_var(max_dt) = feenox_get_or_define_variable_get_ptr("max_dt");
   
 ///va+i+name i
 ///va+i+desc Dummy index, used mainly in vector and matrix row subindex expressions.
-  feenox_special_var(i) = feenox_get_or_define_variable_ptr("i");
+  feenox_special_var(i) = feenox_get_or_define_variable_get_ptr("i");
 
 ///va+j+name j
 ///va+j+desc Dummy index, used mainly in matrix column subindex expressions.
-  feenox_special_var(j) = feenox_get_or_define_variable_ptr("j");
+  feenox_special_var(j) = feenox_get_or_define_variable_get_ptr("j");
   
 ///va+pi+name pi
 ///va+pi+desc A double-precision floating point representaion of the number $\pi$
 ///va+pi+detail It is equal to the `M_PI` constant in `math.h` .
-  feenox_special_var(pi) = feenox_get_or_define_variable_ptr("pi");
+  feenox_special_var(pi) = feenox_get_or_define_variable_get_ptr("pi");
   feenox_special_var_value(pi) = M_PI;
 
 ///va+zero+name zero
@@ -298,7 +298,7 @@ int feenox_init_special_objects(void) {
 ///va+zero+detail errors when comparing floating point numbers such as replacing $a \leq a_\text{max}$
 ///va+zero+detail with $a < a_\text{max} +$ `zero`.
 ///va+zero+detail  Default is $(1/2)^{-50} \approx 9\times 10^{-16}$ .
-  feenox_special_var(zero) = feenox_get_or_define_variable_ptr("zero");
+  feenox_special_var(zero) = feenox_get_or_define_variable_get_ptr("zero");
   feenox_special_var_value(zero) = ZERO;
 
 
@@ -307,51 +307,51 @@ int feenox_init_special_objects(void) {
 ///va+infinite+detail It can be used as `end_time = infinite` or
 ///va+infinite+detail to define improper integrals with infinite limits.
 ///va+infinite+detail  Default is $2^{50} \approx 1 \times 10^{15}$.
-  feenox_special_var(infinite) = feenox_get_or_define_variable_ptr("infinite");
+  feenox_special_var(infinite) = feenox_get_or_define_variable_get_ptr("infinite");
   feenox_special_var_value(infinite) = INFTY;
 
 ///va+ncores+name ncores
 ///va+ncores+desc The number of online available cores, as returned by `sysconf(_SC_NPROCESSORS_ONLN)`.
 ///va+ncores+detail This value can be used in the `MAX_DAUGHTERS` expression of the `PARAMETRIC` keyword
 ///va+ncores+detail (i.e `ncores/2`).
-  feenox_special_var(ncores) = feenox_get_or_define_variable_ptr("ncores");
+  feenox_special_var(ncores) = feenox_get_or_define_variable_get_ptr("ncores");
 #ifdef HAVE_SYSCONF  
   feenox_special_var_value(ncores) = (double)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
   
 ///va+pid+name pid
 ///va+pid+desc The UNIX process id of the FeenoX instance.
-  feenox_special_var(pid) = feenox_get_or_define_variable_ptr("pid");
+  feenox_special_var(pid) = feenox_get_or_define_variable_get_ptr("pid");
   feenox_special_var_value(pid) = (double)getpid();
 
   
 ///va+on_nan+name on_nan
 ///va+on_nan+desc This should be set to a mask that indicates how to proceed if Not-A-Number signal (such as a division by zero)
 ///va+on_nan+desc is generated when evaluating any expression within feenox.
-  feenox_special_var(on_nan) = feenox_get_or_define_variable_ptr("on_nan");
+  feenox_special_var(on_nan) = feenox_get_or_define_variable_get_ptr("on_nan");
 
   
 ///va+on_gsl_error+name on_gsl_error
 ///va+on_gsl_error+desc This should be set to a mask that indicates how to proceed if an error ir raised in any
 ///va+on_gsl_error+desc routine of the GNU Scientific Library. 
-  feenox_special_var(on_gsl_error) = feenox_get_or_define_variable_ptr("on_gsl_error");
+  feenox_special_var(on_gsl_error) = feenox_get_or_define_variable_get_ptr("on_gsl_error");
 
 
 ///va+on_ida_error+name on_ida_error
 ///va+on_ida_error+desc This should be set to a mask that indicates how to proceed if an error ir raised in any
 ///va+on_ida_error+desc routine of the SUNDIALS IDA Library. 
-  feenox_special_var(on_ida_error) = feenox_get_or_define_variable_ptr("on_ida_error");
+  feenox_special_var(on_ida_error) = feenox_get_or_define_variable_get_ptr("on_ida_error");
 
-  dummy = feenox_get_or_define_variable_ptr("quit");
+  dummy = feenox_get_or_define_variable_get_ptr("quit");
   feenox_var_value(dummy) = 0;
   
-  dummy = feenox_get_or_define_variable_ptr("report");
+  dummy = feenox_get_or_define_variable_get_ptr("report");
   feenox_var_value(dummy) = 0;
 
-  dummy = feenox_get_or_define_variable_ptr("dont_quit");
+  dummy = feenox_get_or_define_variable_get_ptr("dont_quit");
   feenox_var_value(dummy) = ON_ERROR_NO_QUIT;
   
-  dummy = feenox_get_or_define_variable_ptr("dont_report");
+  dummy = feenox_get_or_define_variable_get_ptr("dont_report");
   feenox_var_value(dummy) = ON_ERROR_NO_REPORT;
 
   
@@ -363,7 +363,7 @@ int feenox_init_special_objects(void) {
 ///va+realtime_scale+detail two, FeenoX time wil advance twice as fast as real time, and so on. If the calculation time is
 ///va+realtime_scale+detail slower than real time modified by the scale, this variable has no effect on the overall behavior
 ///va+realtime_scale+detail and execution will proceed as quick as possible with no delays.
-  feenox_special_var(realtime_scale) = feenox_get_or_define_variable_ptr("realtime_scale");
+  feenox_special_var(realtime_scale) = feenox_get_or_define_variable_get_ptr("realtime_scale");
 
   // files 
 /*  

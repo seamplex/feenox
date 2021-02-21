@@ -251,6 +251,13 @@ int feenox_matrix_attach_data(const char *name, expr_t *datas) {
   return FEENOX_OK;
 }
 
+function_t *feenox_define_function_get_ptr(const char *name, int n_arguments) {
+  if (feenox_define_function(name, n_arguments) != FEENOX_OK) {
+    return NULL;
+  }
+  return feenox_get_function_ptr(name);
+}
+
 int feenox_define_function(const char *name, int n_arguments) {
   
   function_t *function;
@@ -293,7 +300,7 @@ int feenox_function_set_argument_variable(const char *name, int i, const char *v
     return FEENOX_ERROR;
   }
   
-  if ((function->var_argument[i] = feenox_get_or_define_variable_ptr(variable_name)) == NULL) {
+  if ((function->var_argument[i] = feenox_get_or_define_variable_get_ptr(variable_name)) == NULL) {
     return FEENOX_ERROR;
   }
   
@@ -404,7 +411,7 @@ loadable_routine_t *feenox_define_loadable_routine(char *name, void *library) {
 
 */
 
-var_t *feenox_define_variable_ptr(const char *name) {
+var_t *feenox_define_variable_get_ptr(const char *name) {
   if (feenox_define_variable(name) != FEENOX_OK) {
     return NULL;
   }

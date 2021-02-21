@@ -71,7 +71,7 @@ int feenox_phase_space_add_object(const char *string) {
 
   } else {
 
-    if ((variable = feenox_get_or_define_variable_ptr(string)) == NULL) {
+    if ((variable = feenox_get_or_define_variable_get_ptr(string)) == NULL) {
       return FEENOX_ERROR;
     }
 
@@ -80,7 +80,7 @@ int feenox_phase_space_add_object(const char *string) {
 
     buffer = malloc(strlen(variable->name)+8);
     sprintf(buffer, "%s_dot", variable->name);
-    if ((phase_object->variable_dot = feenox_get_or_define_variable_ptr(buffer)) == NULL) {
+    if ((phase_object->variable_dot = feenox_get_or_define_variable_get_ptr(buffer)) == NULL) {
       return FEENOX_ERROR;
     }
     free(buffer);
