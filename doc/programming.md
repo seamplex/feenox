@@ -20,6 +20,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
  * The reference distribution is Debian. All the required dependencies should be available in the Debian repositories.
  * Support for other architectures is encouraged but not required.
 
+ 
 ## Languages
 
  * Stick to plain C.
@@ -28,21 +29,18 @@ The main objective is to comply with the Software Requirements Specification. Wi
    >
    > PETSc FAQs  
    > <https://www.mcs.anl.gov/petsc/documentation/faq.html#why-c>
-    
+   
  * Keep C++ away.
  
    > C++ is a horrible language. It's made more horrible by the fact that a lot of substandard programmers use it, to the point where it's much much easier to generate total and utter crap with it. Quite frankly, even if the choice of C were to do *nothing* but keep the C++ programmers out, that in itself would be a huge reason to use C.
    >
    > Linus Torvalds about why Git is written in C  
    > <http://harmful.cat-v.org/software/c++/linus>
-   
  
    Libraries written in C++ are allowed as long as they provide C wrappers and do not meddle with stuff we do not need.
    
  * Keep Fortran even farther away. It is allowed only for existing libaries dating from ancient well tested and optimized code, but for nothing else.
- 
  * Modern high-level languages like Python or Julia are targets and not sources of FeenoX.
- 
  * For documentation and comments within the code, American English should be used.
 
 ## Makefiles
@@ -56,7 +54,35 @@ The main objective is to comply with the Software Requirements Specification. Wi
  * no tabs
  * two spaces per indent
  * don't worry about long lines, only wrap lines when it makes sense to from a logic point of view not becuase "it looks bad on screen"
+ * Follow the 17 rules of UNIX philosophy
+    1. modularity
+    2. clarity
+    3. composition
+    4. separation
+    5. simplicity
+    6. parsimony
+    7. transparency
+    8. robustness
+    9. representation
+    10. least surprise
+    11. silence
+    12. repair
+    13. economy
+    14. generation
+    15. optimization
+    16. diversity
+    17. extensibility
+ 
+ 
+## Memory management
 
+ * Check all `malloc()` calls for `NULL`.
+ * Use `valgrind` to check for invalid memory access and leaks
+ 
+    > Memory analysis tools such as valgrind can be useful, but don’t complicate a program merely to avoid their false alarms. For example, if memory is used until just before a process exits, don’t free it simply to silence such a tool. 
+
+   Mind that FeenoX might be used in parametric or minimization mode which would re-allocate some stuff so make sure you know which alarms you ignore.
+ 
 ## Naming conventions
 
  * Use snake case such as in `this_is_a_long_name`.
@@ -64,8 +90,14 @@ The main objective is to comply with the Software Requirements Specification. Wi
  
 ## Git workflow
 
+ * Of course, use `git`. This may seem obvious but predecessors of this project have used Subversion, Bazaar and Mercurial in that order. I have myself used CVS (in the past century).
  * Only team members are allowed to commit directly to the main branch.
  * All contributions ought to come from pull/merge requests either from forked repositories and/or non-main branches.
+ * Issues can be opened forked for
+    - bug reporting
+    - feature requests
+    - development discussion
+    - general questions (installation, usage, etc)
  
 ## Standards
 
