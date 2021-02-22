@@ -65,6 +65,7 @@
 
 #include "contrib/uthash.h"
 #include "contrib/utlist.h"
+#include "contrib/kdtree.h"
 
 
 #define FEENOX_OK         0
@@ -904,6 +905,12 @@ struct element_t {
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
+};
+
+
+struct element_list_item_t {
+  element_t *element;
+  element_list_item_t *next;
 };
 
 // unstructured mesh

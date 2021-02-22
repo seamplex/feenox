@@ -32,7 +32,6 @@ int feenox_instruction_mesh_read(void *arg) {
   node_data_t *node_data;
   int i, j, d, v;
   int first_neighbor_nodes;
-  int bulk_dimensions = 0;
   double scale_factor;
   double offset[3];
   double vol;
@@ -87,6 +86,7 @@ int feenox_instruction_mesh_read(void *arg) {
     x_max[d] = -MESH_INF;
   }
   
+  unsigned int dim = 0;
   for (j = 0; j < mesh->n_nodes; j++) {
     for (d = 0; d < 3; d++) {
       if (scale_factor != 0 || offset[d] != 0) {
@@ -94,14 +94,14 @@ int feenox_instruction_mesh_read(void *arg) {
         mesh->node[j].x[d] *= scale_factor;
       }
       
-      if (mesh->dim < 1 && fabs(mesh->node[j].x[0]) > MESH_TOL) {
-        mesh->dim = 1;
+      if (dim < 1 && fabs(mesh->node[j].x[0]) > MESH_TOL) {
+        dim = 1;
       }
-      if (mesh->dim < 2 && fabs(mesh->node[j].x[1]) > MESH_TOL) {
-        mesh->dim = 2;
+      if (dim < 2 && fabs(mesh->node[j].x[1]) > MESH_TOL) {
+        dim = 2;
       }
-      if (mesh->dim < 3 && fabs(mesh->node[j].x[2]) > MESH_TOL) {
-        mesh->dim = 3;
+      if (dim < 3 && fabs(mesh->node[j].x[2]) > MESH_TOL) {
+        dim = 3;
       }
       
       if (mesh->node[j].x[d] < x_min[d]) {
@@ -167,18 +167,18 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
  
-  // verificamos que la malla tenga la dimension esperada
-  if (mesh->bulk_dimensions == 0) {
-    mesh->bulk_dimensions = bulk_dimensions;
-  } else if (mesh->bulk_dimensions != bulk_dimensions) {
-    feenox_push_error_message("mesh '%s' is expected to have %d dimensions but it has %d", mesh->file->path, mesh->bulk_dimensions, bulk_dimensions);
-    return WASORA_RUNTIME_ERROR;
+  // check the dimensions match
+  if (dim == 0) {
+    mesh->dim = dim;
+  } else if (mesh->dim != dim) {
+    feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", mesh->file->path, mesh->dim, dim);
+    return FEENOX_ERROR;
   }
     
-  // rellenamos un array de nodos que pueda ser usado como argumento de funciones
-  // TODO: poner esto en el loop de arriba?
-  mesh->nodes_argument = malloc(mesh->spatial_dimensions * sizeof(double *));
-  for (d = 0; d < mesh->spatial_dimensions; d++) {
+  // fill an array of nodes that can be used as arguments of functions
+  // TODO: put this in another loop?
+  mesh->nodes_argument = malloc(mesh->dim * sizeof(double *));
+  for (d = 0; d < mesh->dim; d++) {
     mesh->nodes_argument[d] = malloc(mesh->n_nodes * sizeof(double));
     for (j = 0; j < mesh->n_nodes; j++) {
       mesh->nodes_argument[d][j] = mesh->node[j].x[d]; 
@@ -186,6 +186,7 @@ int feenox_instruction_mesh_read(void *arg) {
   }
   
   // idem de celdas
+/*  
   if (feenox_mesh.need_cells) {
     feenox_call(mesh_element2cell(mesh));
     mesh->cells_argument = malloc(mesh->spatial_dimensions * sizeof(double *));
@@ -196,23 +197,23 @@ int feenox_instruction_mesh_read(void *arg) {
       }
     }
   }
-
-  if (feenox_mesh.main_mesh == mesh) {
-    feenox_var(feenox_mesh.vars.cells) = (double)mesh->n_cells;
-    feenox_var(feenox_mesh.vars.nodes) = (double)mesh->n_nodes;
-    feenox_var(feenox_mesh.vars.elements) = (double)mesh->n_elements;
+*/
+  if (mesh == feenox.mesh.mesh_main) {
+    feenox_var_value(feenox.mesh.vars.cells) = (double)mesh->n_cells;
+    feenox_var_value(feenox.mesh.vars.nodes) = (double)mesh->n_nodes;
+    feenox_var_value(feenox.mesh.vars.elements) = (double)mesh->n_elements;
   }
   
-  // vemos si nos quedo alguna funcion sin leer
+  // see if there was any un-read function
   LL_FOREACH(mesh->node_datas, node_data) {
     if (node_data->function->mesh == NULL) {
-      feenox_push_error_message("cannot find data for function '%s' for t=0 in mesh '%s'", node_data->name_in_mesh, mesh->name);
-      return WASORA_RUNTIME_ERROR;
+      feenox_push_error_message("cannot find data for function '%s' in mesh '%s'", node_data->name_in_mesh, mesh->name);
+      return FEENOX_ERROR;
     }
-    
   }
   
-  // barremos todas las funciones, si encontramos alguna que tenga una malla la linkeamos a esta
+  // sweep all functions, if there's one with mesh we need to link it to this one
+/*  
   HASH_ITER(hh, feenox.functions, function, tmp_function) {
     if (function->mesh != NULL && function->mesh == mesh) {
 
@@ -231,18 +232,20 @@ int feenox_instruction_mesh_read(void *arg) {
       }
     }
   }
-  
-  // calculamos el volumen (o superficie o longitud) y el centro de masa de las physical entities
-  if (mesh->bulk_dimensions != 0) {
-    for (physical_group = mesh->physical_entities; physical_group != NULL; physical_group = physical_group->hh.next) {
+*/  
+  // compute the volume (or area or length) and center of gravity of the groups
+/*  
+  if (mesh->dim != 0) {
+    for (physical_group = mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
       vol = cog[0] = cog[1] = cog[2] = 0;
       for (i = 0; i < physical_group->n_elements; i++) {
+        // TODO: can' we use reduced integration? or a single gauss point?
         element = &mesh->element[physical_group->element[i]];
         for (v = 0; v < element->type->gauss[mesh->integration].V; v++) {
           mesh_compute_integration_weight_at_gauss(element, v, mesh->integration);
 
           for (j = 0; j < element->type->nodes; j++) {
-            vol += element->w[v] * element->type->gauss[mesh->integration].h[v][j];
+               vol += element->w[v] * element->type->gauss[mesh->integration].h[v][j];
             cog[0] += element->w[v] * element->type->gauss[mesh->integration].h[v][j] * element->node[j]->x[0];
             cog[1] += element->w[v] * element->type->gauss[mesh->integration].h[v][j] * element->node[j]->x[1];
             cog[2] += element->w[v] * element->type->gauss[mesh->integration].h[v][j] * element->node[j]->x[2];
@@ -254,7 +257,7 @@ int feenox_instruction_mesh_read(void *arg) {
       physical_group->cog[1] = cog[1]/vol;
       physical_group->cog[2] = cog[2]/vol;
 
-      // las pasamos a feenox para que esten disponibles en el input
+      // save them to feenox so they are available in the input file
       if (physical_group->var_vol != NULL) {
         feenox_var_value(physical_group->var_vol) = vol;
       }
@@ -269,16 +272,16 @@ int feenox_instruction_mesh_read(void *arg) {
       }
     }
   }
-
+*/
   // create a k-dimensional tree and try to figure out what the maximum number of neighbours each node has
   if (mesh->kd_nodes == NULL) {
-    mesh->kd_nodes = kd_create(mesh->spatial_dimensions);
+    mesh->kd_nodes = kd_create(mesh->dim);
     for (j = 0; j < mesh->n_nodes; j++) {
       kd_insert(mesh->kd_nodes, mesh->node[j].x, &mesh->node[j]);
     
       first_neighbor_nodes = 1;  // el nodo mismo
       LL_FOREACH(mesh->node[j].associated_elements, associated_element) {
-        if (associated_element->element->type->dim == mesh->bulk_dimensions) {
+        if (associated_element->element->type->dim == mesh->dim) {
           if (associated_element->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
               associated_element->element->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
             // los tetrahedros son "buenos" y con esta cuenta nos ahorramos memoria
@@ -313,7 +316,7 @@ node_t *mesh_find_nearest_node(mesh_t *mesh, const double *x) {
 
   return node;
 }
-
+/*
 element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x) {
 
   double x_nearest[3] = {0, 0, 0};
@@ -338,7 +341,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
     }  
     
     LL_FOREACH(nearest_node->associated_elements, associated_element) {
-      if (associated_element->element->type->dim == mesh->bulk_dimensions && associated_element->element->type->point_in_element(associated_element->element, x)) {
+      if (associated_element->element->type->dim == mesh->dim && associated_element->element->type->point_in_element(associated_element->element, x)) {
         element = associated_element->element;
         break;
       }  
@@ -346,7 +349,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
   }
   
 
-  if (element == NULL && feenox_var(feenox_mesh.vars.mesh_failed_interpolation_factor) > 0) {
+  if (element == NULL && feenox_var_value(feenox_mesh.vars.mesh_failed_interpolation_factor) > 0) {
     // if we do not find any then the mesh might be deformed or the point might be outside the domain
     // so we see if we can find another one
 
@@ -386,7 +389,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
           cached_element->id = associated_element->element->tag;
           HASH_ADD_INT(cache, id, cached_element);
         
-          if (associated_element->element->type->dim == mesh->bulk_dimensions && associated_element->element->type->point_in_element(associated_element->element, x)) {
+          if (associated_element->element->type->dim == mesh->dim && associated_element->element->type->point_in_element(associated_element->element, x)) {
             element = associated_element->element;
             break;
           }
@@ -419,7 +422,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
     // just what is close
     if (dist2 < DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) {
       LL_FOREACH(nearest_node->associated_elements, associated_element) {
-        if (associated_element->element->type->dim == mesh->bulk_dimensions) {
+        if (associated_element->element->type->dim == mesh->dim) {
           element = associated_element->element;
           break;
         }
@@ -432,26 +435,28 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
 
   return element;
 }
+*/
 
-// libera lo que allocamos al leerla, pero no lo que
-// esta en el input (dimensiones, grados de libertad, entidades fisicas, etc)
+// free all resources allocated when reading a mesh but not the rest
+// of the things that are in the input files (physical groups, etc)
 int mesh_free(mesh_t *mesh) {
 
   physical_group_t *physical_group;
   element_list_item_t *element_item, *element_tmp;
   int i, j, d, v;
-  
+/*  
   if (mesh->cell != NULL) {
     for (i = 0; i < mesh->n_cells; i++) {
       if (mesh->cell[i].index != NULL) {
         free(mesh->cell[i].index);
       }
       if (mesh->cell[i].neighbor != NULL) {
-	for(int k = 0; k<mesh->cell[i].n_neighbors; k++) {
-	  if(mesh->cell[i].neighbor[k].face_coord != NULL)
-	    free(mesh->cell[i].neighbor[k].face_coord);
-	}
-	free(mesh->cell[i].neighbor);
+	      for(int k = 0; k<mesh->cell[i].n_neighbors; k++) {
+	        if(mesh->cell[i].neighbor[k].face_coord != NULL) {
+	          free(mesh->cell[i].neighbor[k].face_coord);
+          }  
+	      }
+	      free(mesh->cell[i].neighbor);
       }
       if (mesh->cell[i].ifaces != NULL) {
         for (j = 0; j < mesh->cell[i].element->type->faces; j++) {
@@ -471,6 +476,7 @@ int mesh_free(mesh_t *mesh) {
   }
   mesh->cell = NULL;
   mesh->n_cells = 0;
+ */ 
   mesh->max_faces_per_element = 0;
 
   // elements  
@@ -490,8 +496,6 @@ int mesh_free(mesh_t *mesh) {
           if (mesh->element[i].property_node != NULL && mesh->element[i].dphidx_node != NULL) {
             free(mesh->element[i].property_node[j]);
           }
-          
-          
         }
         free(mesh->element[i].node);
         
@@ -502,7 +506,6 @@ int mesh_free(mesh_t *mesh) {
         if (mesh->element[i].property_node != NULL) {
           free(mesh->element[i].property_node);
         }
-        
       }
       
       if (mesh->element[i].type != NULL && mesh->element[i].type->gauss != NULL) {
@@ -573,7 +576,7 @@ int mesh_free(mesh_t *mesh) {
 
   // nodes
   if (mesh->nodes_argument != NULL) {
-    for (d = 0; d < mesh->spatial_dimensions; d++) {
+    for (d = 0; d < mesh->dim; d++) {
       free(mesh->nodes_argument[d]);
     }
     free(mesh->nodes_argument);
@@ -610,7 +613,7 @@ int mesh_free(mesh_t *mesh) {
   mesh->max_first_neighbor_nodes = 1;
   mesh->last_chosen_element = NULL;
 
-  for (physical_group = mesh->physical_entities; physical_group != NULL; physical_group = physical_group->hh.next) {
+  for (physical_group = mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     physical_group->n_elements = 0;
     physical_group->i_element = 0;
     free(physical_group->element);
@@ -618,12 +621,12 @@ int mesh_free(mesh_t *mesh) {
   }
 /*
   for (d = 0; d < 4; d++) {
-    HASH_ITER(hh_tag[d], mesh->physical_entities_by_tag[d], physical_group, physical_group_tmp) {
-      HASH_DELETE(hh_tag[d], mesh->physical_entities_by_tag[d], physical_group);
+    HASH_ITER(hh_tag[d], mesh->physical_groups_by_tag[d], physical_group, physical_group_tmp) {
+      HASH_DELETE(hh_tag[d], mesh->physical_groups_by_tag[d], physical_group);
     }
   }
-  HASH_ITER(hh, mesh->physical_entities, physical_group, physical_group_tmp) {
-    HASH_DEL(mesh->physical_entities, physical_group);
+  HASH_ITER(hh, mesh->physical_groups, physical_group, physical_group_tmp) {
+    HASH_DEL(mesh->physical_groups, physical_group);
     // si hacemos free de la entidad en si entonces perdemos la informacion sobre BCs
     // TODO: pensar!    
     // free(physical_group->name);
@@ -638,9 +641,8 @@ int mesh_free(mesh_t *mesh) {
 }
 
 
-// devuelve la direccion de la estructura de la variable que se llama name
 mesh_t *feenox_get_mesh_ptr(const char *name) {
   mesh_t *mesh;
-  HASH_FIND_STR(feenox_mesh.meshes, name, mesh);
+  HASH_FIND_STR(feenox.mesh.meshes, name, mesh);
   return mesh;
 }

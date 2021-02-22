@@ -418,7 +418,7 @@ var_t *feenox_define_variable_get_ptr(const char *name) {
   return feenox_get_variable_ptr(name);
 }
 
-var_t *feenox_get_or_define_variable_ptr(const char *name) {
+var_t *feenox_get_or_define_variable_get_ptr(const char *name) {
   var_t *var;
 
   if ((var = feenox_get_variable_ptr(name)) == NULL) {
