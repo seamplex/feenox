@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox definition functions
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of feenox.
  *

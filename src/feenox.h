@@ -913,6 +913,41 @@ struct element_list_item_t {
   element_list_item_t *next;
 };
 
+
+
+struct material_t {
+  char *name;
+  mesh_t *mesh;
+  property_data_t *property_datums;
+
+  // este es un apuntador generico que le dejamos a alguien
+  // (plugins) por si necesitan agregar informacion al material
+  void *ext;
+
+  UT_hash_handle hh;
+};
+
+struct material_list_item_t {
+  material_t *material;
+  material_list_item_t *next;
+};
+  
+struct physical_property_t {
+  char *name;
+  property_data_t *property_datums;
+
+  UT_hash_handle hh;
+};
+
+struct property_data_t {
+  physical_property_t *property;
+  material_t *material;
+  expr_t expr;
+
+  UT_hash_handle hh;
+};
+
+
 // unstructured mesh
 struct mesh_t {
   char *name;
@@ -1303,6 +1338,9 @@ extern builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const cha
 extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name);
 
 extern file_t *feenox_get_file_ptr(const char *name);
+material_t *feenox_get_material_ptr(const char *name);
+physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name);
+
 
 // assignment.c
 extern int feenox_add_assignment(char *left_hand, char *right_hand);

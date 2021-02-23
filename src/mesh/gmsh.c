@@ -146,9 +146,9 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
         }
         name = strdup(dummy+1);
        
-        if ((physical_group = feenox_get_physical_group_ptr(name, mesh)) == NULL) {
+        if ((physical_group = feenox_get_physical_group_ptr(mesh, name)) == NULL) {
           // creamos una de prepo
-          if ((physical_group = feenox_define_physical_group(name, mesh, dimension)) == NULL) {
+          if ((physical_group = feenox_define_physical_group(mesh, name, dimension)) == NULL) {
             return FEENOX_ERROR;
           }
           physical_group->tag = tag;

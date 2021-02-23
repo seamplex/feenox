@@ -180,3 +180,30 @@ char *feenox_get_first_dot(const char *s) {
 
 }
 */
+
+
+// get a pointer to a material
+material_t *feenox_get_material_ptr(const char *name) {
+  material_t *material;
+  HASH_FIND_STR(feenox.mesh.materials, name, material);
+  return material;
+}
+
+// get a pointer to a physical group
+physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name) {
+  physical_group_t *physical_group;
+  mesh_t *dummy;
+  mesh_t *tmp;
+  if (this != NULL) {
+    HASH_FIND_STR(this->physical_groups, name, physical_group);
+  } else {
+    // barremos todas las mallas
+    HASH_ITER(hh, feenox.mesh.meshes, dummy, tmp) {
+      HASH_FIND_STR(dummy->physical_groups, name, physical_group);
+      if (physical_group != NULL) {
+        return physical_group;
+      }
+    } 
+  }
+  return physical_group;
+}
