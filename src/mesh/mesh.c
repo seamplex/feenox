@@ -19,23 +19,23 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "feenox.h"
+#include "../feenox.h"
 extern feenox_t feenox;
 
 int feenox_instruction_mesh_read(void *arg) {
 
   mesh_t *mesh = (mesh_t *)arg;
   
-  function_t *function, *tmp_function;
+//  function_t *function, *tmp_function;
   element_list_item_t *associated_element;
-  element_t *element;
+//  element_t *element;
   node_data_t *node_data;
-  int i, j, d, v;
+//  int i, j, d, v;
   int first_neighbor_nodes;
   double scale_factor;
   double offset[3];
-  double vol;
-  double cog[3];
+//  double vol;
+//  double cog[3];
 
   if (mesh->initialized) {
     if (mesh->update_each_step == 0) {
@@ -81,11 +81,13 @@ int feenox_instruction_mesh_read(void *arg) {
 
   double x_min[3];
   double x_max[3];
+  int d;
   for (d = 0; d < 3; d++) {
     x_min[d] = +MESH_INF;
     x_max[d] = -MESH_INF;
   }
-  
+
+  int j;  
   unsigned int dim = 0;
   for (j = 0; j < mesh->n_nodes; j++) {
     for (d = 0; d < 3; d++) {
@@ -138,6 +140,7 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
+  int i;
   for (i = 0; i < mesh->n_elements; i++) {
     
     // check the dimension of the element, the higher is the topological dim of the mes

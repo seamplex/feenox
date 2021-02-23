@@ -134,6 +134,8 @@
 
 #define MESH_INF 1e22
 #define MESH_TOL 1e-6
+#define MESH_FAILED_INTERPOLATION_FACTOR -1
+
 
 // usamos los de gmsh, convertimos a vtk y frd con tablas
 #define ELEMENT_TYPE_UNDEFINED      0
@@ -796,6 +798,11 @@ struct node_data_t {
   node_data_t *next;
 };
 
+struct node_relative_t {
+  int index;
+  node_relative_t *next;
+};
+
 
 struct physical_group_t {
   char *name;
@@ -822,6 +829,24 @@ struct physical_group_t {
   UT_hash_handle hh;
   UT_hash_handle hh_tag[4];
 };
+
+
+struct geometrical_entity_t {
+  int tag;
+  double boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ;
+  int num_physicals;
+  int *physical;
+  int num_bounding;
+  int *bounding;
+
+  UT_hash_handle hh[4];
+};
+
+struct elementary_entity_t {
+  int id;
+  elementary_entity_t *next;
+};
+
 
 
 struct gauss_t {
@@ -968,7 +993,7 @@ struct mesh_t {
   size_t n_elements;
   size_t n_cells; // a cell is an element with the topological dimension of the mesh
 
-//  int degrees_of_freedom;        // per unknown
+  int degrees_of_freedom;        // per unknown
   unsigned int order;
 
   physical_group_t *physical_groups;              // global hash table
@@ -1338,6 +1363,8 @@ extern builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const cha
 extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name);
 
 extern file_t *feenox_get_file_ptr(const char *name);
+
+mesh_t *feenox_get_mesh_ptr(const char *name);
 material_t *feenox_get_material_ptr(const char *name);
 physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name);
 
@@ -1392,6 +1419,11 @@ extern int feenox_mesh_read_gmsh(mesh_t *mesh);
 extern int feenox_mesh_read_vtk(mesh_t *mesh);
 extern int feenox_mesh_read_frd(mesh_t *mesh);
 
+// physical_group.c
+extern physical_group_t *feenox_define_physical_group(mesh_t *mesh, const char *name, int dimension);
+
+// init.c
+int feenox_mesh_element_types_init(void);
 
 
 #endif    /* FEENOX_H  */

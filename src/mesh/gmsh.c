@@ -19,31 +19,30 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include <feenox.h>
+#include "../feenox.h"
 extern feenox_t feenox;
 
 
 int mesh_gmsh_readmesh(mesh_t *mesh) {
 
   char buffer[BUFFER_LINE_SIZE];
-  int *tags = NULL;
+  size_t *tags = NULL;
 
   char *dummy = NULL;
   char *name = NULL;
   physical_group_t *physical_group = NULL;
   geometrical_entity_t *geometrical_entity = NULL;
-  // TODO: usar size_t en lugar de ints
-  int i, j, k, l;
-  int version_maj;
-  int version_min;
-  int blocks, geometrical, tag, dimension, parametric, num;
-  int first, second; // this are buffers because 4.0 and 4.1 swapped tag,dim to dim,tag
-  int type, physical;
-  int node, node_index;
-  int cell_id;
-  int ntags;
-  int tag_min = 0;
-  int tag_max = 0;
+  size_t i, j, k, l;
+  unsigned int version_maj;
+  unsigned int version_min;
+  size_t blocks, geometrical, tag, dimension, parametric, num;
+  size_t first, second; // this are buffers because 4.0 and 4.1 swapped tag,dim to dim,tag
+  size_t type, physical;
+  size_t node, node_index;
+  size_t cell_id;
+  size_t ntags;
+  size_t tag_min = 0;
+  size_t tag_max = 0;
 
   if (mesh->file->pointer == NULL) {
     feenox_call(feenox_instruction_file_open(mesh->file));
@@ -114,7 +113,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
     } else if (strncmp("$PhysicalNames", buffer, 14) == 0) {
 
       // si hay physical names entonces definimos implicitamente physical
-      // entities (si es que no existen ya, si existen chequeamos los ids)
+      // groups (si es que no existen ya, si existen chequeamos los ids)
 
       // la cantidad de cosas
       if (fscanf(mesh->file->pointer, "%d", &mesh->n_physical_names) == 0) {
@@ -123,7 +122,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
  
       for (i = 0; i < mesh->n_physical_names; i++) {
 
-        if (fscanf(mesh->file->pointer, "%d %d", &dimension, &tag) < 2) {
+        if (fscanf(mesh->file->pointer, "%ld %ld", &dimension, &tag) < 2) {
           return FEENOX_ERROR;
         }
         if (dimension < 0 || dimension > 4) {
@@ -175,13 +174,13 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
 
         // agregamos la group a un hash local para despues
         // resolver el apuntador desde cada elemento "mas o menos" facil
-        HASH_ADD(hh_tag[dimension], mesh->physical_entities_by_tag[dimension], tag, sizeof(int), physical_group);
+        HASH_ADD(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], tag, sizeof(int), physical_group);
 
         // si la physical group no tiene material, buscamos uno que se llame igual
         if (physical_group->material == NULL) {
           // si es NULL es porque la physical group es una BC o algo,
           // pero eso no nos molesta, las BCs las vemos despues
-          HASH_FIND_STR(feenox_mesh.materials, name, physical_group->material);
+          HASH_FIND_STR(feenox.mesh.materials, name, physical_group->material);
         }
 
         free(name);
@@ -227,7 +226,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
                      &geometrical_entity->boxMinY,
                      &geometrical_entity->boxMinZ,
                      &geometrical_entity->num_physicals) < 5) {
-            feenox_push_error_message("not enough data in physical entities");
+            feenox_push_error_message("not enough data in physical groups");
             return FEENOX_ERROR;
           }
         } else {
@@ -240,7 +239,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
                      &geometrical_entity->boxMaxY,
                      &geometrical_entity->boxMaxZ,
                      &geometrical_entity->num_physicals) < 8) {
-            feenox_push_error_message("not enough data in physical entities");
+            feenox_push_error_message("not enough data in physical groups");
             return FEENOX_ERROR;
           }
         }        
@@ -254,7 +253,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           }
         }
         
-        // points do not have bounding entities
+        // points do not have bounding groups
         if (dimension != 0) {
           if (fscanf(mesh->file->pointer, "%d", &geometrical_entity->num_bounding) < 1) {
             return FEENOX_ERROR;
@@ -262,7 +261,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           if (geometrical_entity->num_bounding != 0) {
             geometrical_entity->bounding = calloc(geometrical_entity->num_bounding, sizeof(int));
             for (j = 0; j < geometrical_entity->num_bounding; j++) {
-              // some entities can be negative because the tag is multiplied by the orientation
+              // some groups can be negative because the tag is multiplied by the orientation
               if (fscanf(mesh->file->pointer, "%d", &geometrical_entity->bounding[j]) == 0) {
                 return FEENOX_ERROR;
               }
@@ -295,8 +294,8 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
     } else if (strncmp("$Nodes", buffer, 6) == 0) {
 
       if (version_maj == 2) {
-        // la cantidad de nodos
-        if (fscanf(mesh->file->pointer, "%d", &(mesh->n_nodes)) == 0) {
+        // number of nodes
+        if (fscanf(mesh->file->pointer, "%ld", &(mesh->n_nodes)) == 0) {
           return FEENOX_ERROR;
         }
         if (mesh->n_nodes == 0) {
@@ -307,7 +306,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
         mesh->node = calloc(mesh->n_nodes, sizeof(node_t));
 
         for (j = 0; j < mesh->n_nodes; j++) {
-          if (fscanf(mesh->file->pointer, "%d %lf %lf %lf",
+          if (fscanf(mesh->file->pointer, "%ld %lf %lf %lf",
                   &tag,
                   &mesh->node[j].x[0],
                   &mesh->node[j].x[1],
@@ -327,9 +326,11 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           
           // si nos dieron degrees of freedom entonces tenemos que allocar
           // lugar para la solucion phi de alguna PDE
+/*          
           if (mesh->degrees_of_freedom != 0) {
             mesh->node[j].phi = calloc(mesh->degrees_of_freedom, sizeof(double));
           }
+ */
         }
         
         // terminamos de leer los nodos, si los nodos son sparse tenemos que hacer el tag2index
@@ -348,12 +349,12 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
         // la cantidad de bloques y de nodos
         if (version_min == 0) {
           // en 4.0 no tenemos min y max
-          if (fscanf(mesh->file->pointer, "%d %d", &blocks, &mesh->n_nodes) < 2) {
+          if (fscanf(mesh->file->pointer, "%ld %ld", &blocks, &mesh->n_nodes) < 2) {
             feenox_push_error_message("error reading node blocks");
             return FEENOX_ERROR;
           }
         } else {
-          if (fscanf(mesh->file->pointer, "%d %d %d %d", &blocks, &mesh->n_nodes, &tag_min, &tag_max) < 4) {
+          if (fscanf(mesh->file->pointer, "%ld %ld %ld %ld", &blocks, &mesh->n_nodes, &tag_min, &tag_max) < 4) {
             feenox_push_error_message("error reading node blocks");
             return FEENOX_ERROR;
           }
@@ -376,7 +377,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
         
         i = 0;
         for (l = 0; l < blocks; l++) {
-          if (fscanf(mesh->file->pointer, "%d %d %d %d", &first, &second, &parametric, &num) < 4) {
+          if (fscanf(mesh->file->pointer, "%ld %ld %ld %ld", &first, &second, &parametric, &num) < 4) {
             feenox_push_error_message("not enough data in node block");
             return FEENOX_ERROR;
           }
@@ -396,7 +397,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           if (version_min == 0) {
             // aca esta tag y coordenada en una sola linea
             for (k = 0; k < num; k++) {
-              if (fscanf(mesh->file->pointer, "%d %lf %lf %lf",
+              if (fscanf(mesh->file->pointer, "%ld %lf %lf %lf",
                          &mesh->node[i].tag,
                          &mesh->node[i].x[0],
                          &mesh->node[i].x[1],
@@ -414,9 +415,11 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
               
               // si nos dieron degrees of freedom entonces tenemos que allocar
               // lugar para la solucion phi de alguna PDE
+/*              
               if (mesh->degrees_of_freedom != 0) {
                 mesh->node[i].phi = calloc(mesh->degrees_of_freedom, sizeof(double));
               }
+ */
               
               i++;
             }
@@ -424,7 +427,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
 
             // aca primero todos los tags y despues las coordenadas (supuestamente para no mezclar ints y doubles)
             for (k = 0; k < num; k++) {
-              if (fscanf(mesh->file->pointer, "%d", &mesh->node[i+k].tag) < 1) {
+              if (fscanf(mesh->file->pointer, "%ld", &mesh->node[i+k].tag) < 1) {
                 feenox_push_error_message("reading node tag");
                 return FEENOX_ERROR;
               }
@@ -444,9 +447,11 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
               
               // si nos dieron degrees of freedom entonces tenemos que allocar
               // lugar para la solucion phi de alguna PDE
+/*              
               if (mesh->degrees_of_freedom != 0) {
                 mesh->node[i].phi = calloc(mesh->degrees_of_freedom, sizeof(double));
               }
+*/
               
               i++;
             }
@@ -488,7 +493,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
       
       if (version_maj == 2) {
         // la cantidad de elementos
-        if (fscanf(mesh->file->pointer, "%d", &(mesh->n_elements)) == 0) {
+        if (fscanf(mesh->file->pointer, "%ld", &(mesh->n_elements)) == 0) {
           return FEENOX_ERROR;
         }
         if (mesh->n_elements == 0) {
@@ -499,7 +504,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
 
         for (i = 0; i < mesh->n_elements; i++) {
 
-          if (fscanf(mesh->file->pointer, "%d %d %d", &tag, &type, &ntags) < 3) {
+          if (fscanf(mesh->file->pointer, "%ld %ld %ld", &tag, &type, &ntags) < 3) {
             return FEENOX_ERROR;
           }
 
@@ -516,11 +521,11 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
             feenox_push_error_message("elements of type '%d' are not supported in this version :-(", type);
             return FEENOX_ERROR;
           }
-          if (feenox_mesh.element_type[type].nodes == 0) {
+          if (feenox.mesh.element_type[type].nodes == 0) {
             feenox_push_error_message("elements of type '%s' are not supported in this version :-(", mesh->element[i].type->name);
             return FEENOX_ERROR;
           }
-          mesh->element[i].type = &(feenox_mesh.element_type[type]);
+          mesh->element[i].type = &(feenox.mesh.element_type[type]);
 
           // format v2.2
           // cada elemento tiene un tag que es un array de enteros
@@ -530,7 +535,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           if (ntags > 0) {
             tags = malloc(ntags * sizeof(int));
             for (k = 0; k < ntags; k++) {
-              if (fscanf(mesh->file->pointer, "%d", &tags[k]) == 0) {
+              if (fscanf(mesh->file->pointer, "%ld", &tags[k]) == 0) {
                 return FEENOX_ERROR;
               }
             }
@@ -538,15 +543,15 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
             
             if (ntags > 1) {
               dimension = mesh->element[i].type->dim;
-              HASH_FIND(hh_tag[dimension], mesh->physical_entities_by_tag[dimension], &tags[0], sizeof(int), physical_group);
+              HASH_FIND(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], &tags[0], sizeof(int), physical_group);
               if ((mesh->element[i].physical_group = physical_group) == NULL) {
                 // si no encontramos ninguna, hay que crear una
-                snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%d_%d", mesh->name, dimension, tags[0]);
-                if ((mesh->element[i].physical_group = feenox_define_physical_group(buffer, mesh, mesh->element[i].type->dim)) == NULL) {
+                snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", mesh->name, dimension, tags[0]);
+                if ((mesh->element[i].physical_group = feenox_define_physical_group(mesh, buffer, mesh->element[i].type->dim)) == NULL) {
                   return FEENOX_ERROR;
                 }
                 mesh->element[i].physical_group->tag = tags[0];
-                HASH_ADD(hh_tag[dimension], mesh->physical_entities_by_tag[dimension], tag, sizeof(int), mesh->element[i].physical_group);
+                HASH_ADD(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], tag, sizeof(int), mesh->element[i].physical_group);
               }
               mesh->element[i].physical_group->n_elements++;
             }
@@ -555,7 +560,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           
           mesh->element[i].node = calloc(mesh->element[i].type->nodes, sizeof(node_t *));
           for (j = 0; j < mesh->element[i].type->nodes; j++) {
-            if (fscanf(mesh->file->pointer, "%d", &node) < 1) {
+            if (fscanf(mesh->file->pointer, "%ld", &node) < 1) {
               return FEENOX_ERROR;
             }
             if (mesh->sparse == 0 && (node < 1 || node > mesh->n_nodes)) {
@@ -578,12 +583,12 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           // en 4.0 no tenemos min y max
           tag_min = 0;
           tag_max = 0;
-          if (fscanf(mesh->file->pointer, "%d %d", &blocks, &mesh->n_elements) < 2) {
+          if (fscanf(mesh->file->pointer, "%ld %ld", &blocks, &mesh->n_elements) < 2) {
             feenox_push_error_message("error reading element blocks");
             return FEENOX_ERROR;
           }
         } else {
-          if (fscanf(mesh->file->pointer, "%d %d %d %d", &blocks, &mesh->n_elements, &tag_min, &tag_max) < 4) {
+          if (fscanf(mesh->file->pointer, "%ld %ld %ld %ld", &blocks, &mesh->n_elements, &tag_min, &tag_max) < 4) {
             feenox_push_error_message("error reading node blocks");
             return FEENOX_ERROR;
           }
@@ -622,14 +627,14 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           if (geometrical_entity->num_physicals > 0) {
             // que hacemos si hay mas de una? la primera? la ultima?
             physical = geometrical_entity->physical[0];
-            HASH_FIND(hh_tag[dimension], mesh->physical_entities_by_tag[dimension], &physical, sizeof(int), physical_group);
+            HASH_FIND(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
             if ((mesh->element[i].physical_group = physical_group) == NULL) {
               snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%d_%d", mesh->name, dimension, physical);
               if ((mesh->element[i].physical_group = feenox_define_physical_group(buffer, mesh, feenox_mesh.element_type[type].dim)) == NULL) {
                 return FEENOX_ERROR;
               }
               mesh->element[i].physical_group->tag = physical;
-              HASH_ADD(hh_tag[dimension], mesh->physical_entities_by_tag[dimension], tag, sizeof(int), mesh->element[i].physical_group);
+              HASH_ADD(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], tag, sizeof(int), mesh->element[i].physical_group);
             }
           } else {
             physical_group = NULL;
@@ -910,7 +915,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
   
   // limpiar hashes
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
 
 
@@ -919,7 +924,7 @@ int mesh_gmsh_write_header(FILE *file) {
   fprintf(file, "2.2 0 8\n");
   fprintf(file, "$EndMeshFormat\n");
 
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
 
 int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
@@ -928,13 +933,13 @@ int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
   physical_group_t *physical_group;
 
   if (no_physical_names == 0) {
-    n = HASH_COUNT(mesh->physical_entities);
+    n = HASH_COUNT(mesh->physical_groups);
     if (n != 0) {
       fprintf(file, "$PhysicalNames\n");
       fprintf(file, "%d\n", n);
   
       // y despues barrerlas
-      for (physical_group = mesh->physical_entities; physical_group != NULL; physical_group = physical_group->hh.next) {
+      for (physical_group = mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
         fprintf(file, "%d %d \"%s\"\n", physical_group->dimension, physical_group->tag, physical_group->name);
       }
       fprintf(file, "$EndPhysicalNames\n");
@@ -955,7 +960,7 @@ int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
     fprintf(file, "%d ", mesh->element[i].tag);
     fprintf(file, "%d ", mesh->element[i].type->id);
 
-    // in principle we shuold write the detailed information about entities and parititons
+    // in principle we shuold write the detailed information about groups and parititons
 //    fprintf(file, "%d ", mesh->element[i].ntags);
     
     // but for now only two tags are enough:
@@ -974,7 +979,7 @@ int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
   }
   fprintf(file, "$EndElements\n");
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }
 
@@ -1055,7 +1060,7 @@ int mesh_gmsh_write_scalar(mesh_post_t *mesh_post, function_t *function, centeri
   fflush(mesh_post->file->pointer);
   
 
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 
 }
 
@@ -1138,7 +1143,7 @@ int mesh_gmsh_write_vector(mesh_post_t *mesh_post, function_t **function, center
   fflush(mesh_post->file->pointer);
   
 
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 
 }
 
@@ -1286,6 +1291,6 @@ int mesh_gmsh_update_function(function_t *function, double t, double dt) {
     free(new_data);
   }
  
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }

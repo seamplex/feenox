@@ -19,12 +19,14 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include <feenox.h>
-#include <thirdparty/kdtree.h>
+#include "../feenox.h"
+extern feenox_t feenox;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// #include <thirdparty/kdtree.h>
+
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
 
 /*
      _________________________________________________________________
@@ -595,5 +597,5 @@ int mesh_frd_readmesh(mesh_t *mesh) {
   mesh->spatial_dimensions = spatial_dimensions;
   mesh->order = order;  
 
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }

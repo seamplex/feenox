@@ -3128,8 +3128,15 @@ int feenox_parse_read_mesh(void) {
   }
 
   if (feenox.mesh.meshes == NULL) {
-    feenox.mesh.mesh_main == mesh;
+    feenox.mesh.mesh_main = mesh;
   }
+  
+  // TODO: API?
+  if (feenox_get_mesh_ptr(mesh->name) != NULL) {
+    feenox_push_error_message("there already exists a mesh named '%s'", mesh->name);
+    return FEENOX_ERROR;
+  }
+  
 
   HASH_ADD_KEYPTR(hh, feenox.mesh.meshes, mesh->name, strlen(mesh->name), mesh);
   feenox_call(feenox_add_instruction(feenox_instruction_mesh_read, mesh));

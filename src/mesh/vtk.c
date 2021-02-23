@@ -19,12 +19,13 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include <feenox.h>
+#include "../feenox.h"
+extern feenox_t feenox;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
+// #include <assert.h>
 
 // conversion de gmsh a vtk
 //Sacado de https://github.com/Kitware/VTK/blob/master/Common/DataModel/vtkCellType.h
@@ -67,7 +68,7 @@ int mesh_vtk_write_header(FILE *file) {
   fprintf(file, "feenox vtk output\n");
   fprintf(file, "ASCII\n");
 
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
 
 
@@ -79,7 +80,7 @@ int mesh_vtk_write_mesh(mesh_t *mesh, int dummy, FILE *file) {
     feenox_call(mesh_vtk_write_unstructured_mesh(mesh, file));
   }
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
 
 int mesh_vtk_write_structured_mesh(mesh_t *mesh, FILE *file) {
@@ -113,7 +114,7 @@ int mesh_vtk_write_structured_mesh(mesh_t *mesh, FILE *file) {
   }
   fprintf(file, "\n");
   
-  return WASORA_RUNTIME_OK;  
+  return FEENOX_OK;  
 }
 
 int mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file) {
@@ -133,7 +134,7 @@ int mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file) {
         feenox_push_error_message("VTK output needs sorted nodes");
       }
       if (!(on_error & ON_ERROR_NO_QUIT)) {
-        return WASORA_RUNTIME_OK;
+        return FEENOX_OK;
       } else {
         return WASORA_RUNTIME_ERROR;
       }  
@@ -228,7 +229,7 @@ int mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file) {
     }
   }
   
-  return WASORA_RUNTIME_OK;  
+  return FEENOX_OK;  
 }
 
 
@@ -293,7 +294,7 @@ int mesh_vtk_write_scalar(mesh_post_t *mesh_post, function_t *function, centerin
 
   fflush(mesh_post->file->pointer);
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }
 
@@ -360,7 +361,7 @@ int mesh_vtk_write_vector(mesh_post_t *mesh_post, function_t **function, centeri
      
   fflush(mesh_post->file->pointer);
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }
 
@@ -761,5 +762,5 @@ int mesh_vtk_readmesh(mesh_t *mesh) {
   
   
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
 }
