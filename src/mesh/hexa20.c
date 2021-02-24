@@ -1,31 +1,29 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  wasora's mesh-related hexahedron element routines
+ *  feenox's mesh-related hexahedron element routines
  *
  *  Copyright (C) 2014--2017 C.P. Camusso.
  *  Copyright (C) 2017--2020 jeremy theler
  *
- *  This file is part of wasora.
+ *  This file is part of feenox.
  *
- *  wasora is free software: you can redistribute it and/or modify
+ *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  wasora is distributed in the hope that it will be useful,
+ *  feenox is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with wasora.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
-// #include <gsl/gsl_linalg.h>
-
+#include "element.h"
 
 // --------------------------------------------------------------
 // hexahedro de 20 nodos
@@ -36,7 +34,7 @@ int mesh_hexa20_init(void) {
   element_type_t *element_type;
   int j, v;
 
-  element_type = &wasora_mesh.element_type[ELEMENT_TYPE_HEXAHEDRON20];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON20];
   element_type->name = strdup("hexa20");
   element_type->id = ELEMENT_TYPE_HEXAHEDRON20;
   element_type->dim = 3;
@@ -47,7 +45,7 @@ int mesh_hexa20_init(void) {
   element_type->h = mesh_hexa20_h;
   element_type->dhdr = mesh_hexa20_dhdr;
   element_type->point_in_element = mesh_point_in_hexahedron;
-  element_type->element_volume = mesh_hexahedron_vol;
+  element_type->element_volume = mesh_hex_vol;
 
   // node coordinates
 /*
@@ -72,93 +70,93 @@ int mesh_hexa20_init(void) {
   }
 
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[0][0] = -1;
   element_type->node_coords[0][1] = -1;
   element_type->node_coords[0][2] = -1;
 
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[1][0] = +1;  
   element_type->node_coords[1][1] = -1;
   element_type->node_coords[1][2] = -1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = +1;  
   element_type->node_coords[2][1] = +1;
   element_type->node_coords[2][2] = -1;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[3][0] = -1;
   element_type->node_coords[3][1] = +1;
   element_type->node_coords[3][2] = -1;
  
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[4][0] = -1;
   element_type->node_coords[4][1] = -1;
   element_type->node_coords[4][2] = +1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[5][0] = +1;  
   element_type->node_coords[5][1] = -1;
   element_type->node_coords[5][2] = +1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[6][0] = +1;  
   element_type->node_coords[6][1] = +1;
   element_type->node_coords[6][2] = +1;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[7][0] = -1;
   element_type->node_coords[7][1] = +1;
   element_type->node_coords[7][2] = +1;
   
-  wasora_mesh_add_node_parent(&element_type->node_parents[8], 0);
-  wasora_mesh_add_node_parent(&element_type->node_parents[8], 1);
-  wasora_mesh_compute_coords_from_parent(element_type, 8);
+  feenox_mesh_add_node_parent(&element_type->node_parents[8], 0);
+  feenox_mesh_add_node_parent(&element_type->node_parents[8], 1);
+  feenox_mesh_compute_coords_from_parent(element_type, 8);
   
-  wasora_mesh_add_node_parent(&element_type->node_parents[9], 0);
-  wasora_mesh_add_node_parent(&element_type->node_parents[9], 3);
-  wasora_mesh_compute_coords_from_parent(element_type, 9); 
+  feenox_mesh_add_node_parent(&element_type->node_parents[9], 0);
+  feenox_mesh_add_node_parent(&element_type->node_parents[9], 3);
+  feenox_mesh_compute_coords_from_parent(element_type, 9); 
  
-  wasora_mesh_add_node_parent(&element_type->node_parents[10], 0);
-  wasora_mesh_add_node_parent(&element_type->node_parents[10], 4);
-  wasora_mesh_compute_coords_from_parent(element_type, 10);   
+  feenox_mesh_add_node_parent(&element_type->node_parents[10], 0);
+  feenox_mesh_add_node_parent(&element_type->node_parents[10], 4);
+  feenox_mesh_compute_coords_from_parent(element_type, 10);   
  
-  wasora_mesh_add_node_parent(&element_type->node_parents[11], 1);
-  wasora_mesh_add_node_parent(&element_type->node_parents[11], 2);
-  wasora_mesh_compute_coords_from_parent(element_type, 11);
+  feenox_mesh_add_node_parent(&element_type->node_parents[11], 1);
+  feenox_mesh_add_node_parent(&element_type->node_parents[11], 2);
+  feenox_mesh_compute_coords_from_parent(element_type, 11);
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[12], 1);
-  wasora_mesh_add_node_parent(&element_type->node_parents[12], 5);
-  wasora_mesh_compute_coords_from_parent(element_type, 12);
+  feenox_mesh_add_node_parent(&element_type->node_parents[12], 1);
+  feenox_mesh_add_node_parent(&element_type->node_parents[12], 5);
+  feenox_mesh_compute_coords_from_parent(element_type, 12);
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[13], 2);
-  wasora_mesh_add_node_parent(&element_type->node_parents[13], 3);
-  wasora_mesh_compute_coords_from_parent(element_type, 13);  
+  feenox_mesh_add_node_parent(&element_type->node_parents[13], 2);
+  feenox_mesh_add_node_parent(&element_type->node_parents[13], 3);
+  feenox_mesh_compute_coords_from_parent(element_type, 13);  
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[14], 2);
-  wasora_mesh_add_node_parent(&element_type->node_parents[14], 6);
-  wasora_mesh_compute_coords_from_parent(element_type, 14);   
+  feenox_mesh_add_node_parent(&element_type->node_parents[14], 2);
+  feenox_mesh_add_node_parent(&element_type->node_parents[14], 6);
+  feenox_mesh_compute_coords_from_parent(element_type, 14);   
  
-  wasora_mesh_add_node_parent(&element_type->node_parents[15], 3);
-  wasora_mesh_add_node_parent(&element_type->node_parents[15], 7);
-  wasora_mesh_compute_coords_from_parent(element_type, 15);
+  feenox_mesh_add_node_parent(&element_type->node_parents[15], 3);
+  feenox_mesh_add_node_parent(&element_type->node_parents[15], 7);
+  feenox_mesh_compute_coords_from_parent(element_type, 15);
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[16], 4);
-  wasora_mesh_add_node_parent(&element_type->node_parents[16], 5);
-  wasora_mesh_compute_coords_from_parent(element_type, 16);
+  feenox_mesh_add_node_parent(&element_type->node_parents[16], 4);
+  feenox_mesh_add_node_parent(&element_type->node_parents[16], 5);
+  feenox_mesh_compute_coords_from_parent(element_type, 16);
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[17], 4);
-  wasora_mesh_add_node_parent(&element_type->node_parents[17], 7);
-  wasora_mesh_compute_coords_from_parent(element_type, 17);    
+  feenox_mesh_add_node_parent(&element_type->node_parents[17], 4);
+  feenox_mesh_add_node_parent(&element_type->node_parents[17], 7);
+  feenox_mesh_compute_coords_from_parent(element_type, 17);    
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[18], 5);
-  wasora_mesh_add_node_parent(&element_type->node_parents[18], 6);
-  wasora_mesh_compute_coords_from_parent(element_type, 18);
+  feenox_mesh_add_node_parent(&element_type->node_parents[18], 5);
+  feenox_mesh_add_node_parent(&element_type->node_parents[18], 6);
+  feenox_mesh_compute_coords_from_parent(element_type, 18);
 
-  wasora_mesh_add_node_parent(&element_type->node_parents[19], 6);
-  wasora_mesh_add_node_parent(&element_type->node_parents[19], 7);
-  wasora_mesh_compute_coords_from_parent(element_type, 19);    
+  feenox_mesh_add_node_parent(&element_type->node_parents[19], 6);
+  feenox_mesh_add_node_parent(&element_type->node_parents[19], 7);
+  feenox_mesh_compute_coords_from_parent(element_type, 19);    
 
   // full integration: 3x3x3
   mesh_gauss_init_hexa27(element_type, &element_type->gauss[integration_full]);

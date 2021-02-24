@@ -22,7 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-//#include <math.h>
+#include "element.h"
 
 int mesh_triang6_init(void) {
 
@@ -30,7 +30,7 @@ int mesh_triang6_init(void) {
   element_type_t *element_type;
   int j;
   
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_TRIANGLE6];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE6];
   element_type->name = strdup("triang6");
   element_type->id = ELEMENT_TYPE_TRIANGLE6;
   element_type->dim = 2;
@@ -61,15 +61,15 @@ Triangle6:
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[0][0] = 0;
   element_type->node_coords[0][1] = 0;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[1][0] = 1;  
   element_type->node_coords[1][1] = 0;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = 0;  
   element_type->node_coords[2][1] = 1;
 
@@ -93,7 +93,7 @@ Triangle6:
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3);
 
   // reduced integration: 1 point
-  mesh_gauss_init_quad1(element_type, &element_type->gauss[integration_reduced]);
+  mesh_gauss_init_triang1(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
   
   // the two extrapolation matrices

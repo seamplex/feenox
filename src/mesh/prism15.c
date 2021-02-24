@@ -22,8 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
-// #include <gsl/gsl_linalg.h>
+#include "element.h"
 
 
 // --------------------------------------------------------------
@@ -35,7 +34,7 @@ int mesh_prism15_init(void) {
   element_type_t *element_type;
   int j;
 
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_PRISM15];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM15];
   element_type->name = strdup("prism15");
   element_type->id = ELEMENT_TYPE_PRISM15;
   element_type->dim = 3;
@@ -78,32 +77,32 @@ u   |    ,/ `\    |    v    |    ,/ `\    |
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[0][0] = 0;
   element_type->node_coords[0][1] = 0;
   element_type->node_coords[0][2] = -1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[1][0] = 1;
   element_type->node_coords[1][1] = 0;
   element_type->node_coords[1][2] = -1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[2][0] = 0;
   element_type->node_coords[2][1] = 1;
   element_type->node_coords[2][2] = -1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[3][0] = 0;
   element_type->node_coords[3][1] = 0;
   element_type->node_coords[3][2] = 1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[4][0] = 1;
   element_type->node_coords[4][1] = 0;
   element_type->node_coords[4][2] = 1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[5][0] = 0;
   element_type->node_coords[5][1] = 1;
   element_type->node_coords[5][2] = 1;

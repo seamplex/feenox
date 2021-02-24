@@ -22,7 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <gsl/gsl_linalg.h>
+#include "element.h"
 
 // ---------------------------------------------------------------------
 // tetrahedro isoparametrico de cuatro nodos sobre el triangulo unitario
@@ -35,7 +35,7 @@ int mesh_tet10_init(void) {
   double a, b, c, d;
   int j, v;
   
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_TETRAHEDRON10];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON10];
   element_type->name = strdup("tet10");
   element_type->id = ELEMENT_TYPE_TETRAHEDRON10;
   element_type->dim = 3;
@@ -46,7 +46,7 @@ int mesh_tet10_init(void) {
   element_type->h = mesh_tet10_h;
   element_type->dhdr = mesh_tet10_dhdr;
   element_type->point_in_element = mesh_point_in_tetrahedron;
-  element_type->element_volume = mesh_tetrahedron_vol;
+  element_type->element_volume = mesh_tet_vol;
 
   // coordenadas de los nodos
 /*
@@ -78,22 +78,22 @@ Tetrahedron10:
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[0][0] = 0;
   element_type->node_coords[0][1] = 0;
   element_type->node_coords[0][2] = 0;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[1][0] = 1;  
   element_type->node_coords[1][1] = 0;
   element_type->node_coords[1][2] = 0;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = 0;  
   element_type->node_coords[2][1] = 1;
   element_type->node_coords[2][2] = 0;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[3][0] = 0;  
   element_type->node_coords[3][1] = 0;
   element_type->node_coords[3][2] = 1;
@@ -222,22 +222,6 @@ double mesh_tet10_h(int j, double *vec_r) {
   double s = vec_r[1];
   double t = vec_r[2];
 
-  // bathe page 375 re-numerado para gmsh, hay que swapear 8 y 10
-/*  
-  h[8-1] = 4*t*(1-r-s-t);
-  h[9-1] = 4*s*t;
-  h[10-1] = 4*r*t;
-  h[7-1] = 4*s*(1-r-s-t);
-  h[6-1] = 4*r*s;
-  h[5-1] = 4*r*(1-r-s-t);
-  
-  h[4-1] = t - 0.5*(h[8-1] + h[9-1] + h[10-1]);
-  h[3-1] = s - 0.5*(h[6-1] + h[7-1] + h[9-1]);
-  h[2-1] = r - 0.5*(h[5-1] + h[6-1] + h[10-1]);
-  h[1-1] = (1-r-s-t) - 0.5*(h[5-1] + h[7-1] + h[8-1]);
-  
-  return h[j];
-*/  
   switch (j) {
     case 0:
       return (1-r-s-t)*(2*(1-r-s-t)-1);

@@ -23,7 +23,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
+#include "element.h"
 
 // --------------------------------------------------------------
 // cuadrangulo de cuatro nodos
@@ -34,7 +34,7 @@ int mesh_quad8_init(void) {
   element_type_t *element_type;
   int j, v;
   
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_QUADRANGLE8];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_QUADRANGLE8];
   element_type->name = strdup("quad8");
   element_type->id = ELEMENT_TYPE_QUADRANGLE8;
   element_type->dim = 2;
@@ -65,19 +65,19 @@ int mesh_quad8_init(void) {
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[0][0] = -1;
   element_type->node_coords[0][1] = -1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[1][0] = +1;  
   element_type->node_coords[1][1] = -1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = +1;  
   element_type->node_coords[2][1] = +1;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[3][0] = -1;
   element_type->node_coords[3][1] = +1;
 

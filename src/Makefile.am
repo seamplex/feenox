@@ -41,6 +41,8 @@ feenox_SOURCES = \
 ./math/function.c \
 ./math/vector.c \
 ./mesh/init.c \
+./mesh/geometry.c \
+./mesh/neighbors.c \
 ./mesh/element.c \
 ./mesh/line2.c \
 ./mesh/line3.c \
@@ -60,7 +62,7 @@ feenox_SOURCES = \
 ./mesh/mesh.c \
 ./mesh/gmsh.c \
 ./mesh/calculix.c \
-./mesh/vtk0.c \
+./mesh/vtk.c \
 ./contrib/kdtree.c \
 ./contrib/kdtree.h \
 ./contrib/utlist.h \

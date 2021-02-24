@@ -22,6 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
+#include "element.h"
 
 // -------------------------------------
 // iso-parametric four-noded tetrahedron
@@ -34,7 +35,7 @@ int mesh_tet4_init(void) {
   double a, b, c, d;
   int j, v;
   
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_TETRAHEDRON4];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON4];
   element_type->name = strdup("tet4");
   element_type->id = ELEMENT_TYPE_TETRAHEDRON4;
   element_type->dim = 3;
@@ -45,7 +46,7 @@ int mesh_tet4_init(void) {
   element_type->h = mesh_tet4_h;
   element_type->dhdr = mesh_tet4_dhdr;
   element_type->point_in_element = mesh_point_in_tetrahedron;
-  element_type->element_volume = mesh_tetrahedron_vol;
+  element_type->element_volume = mesh_tet_vol;
 
 
   // node coordinates (from Gmsh doc)
@@ -78,22 +79,22 @@ Tetrahedron:
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[0][0] = 0;
   element_type->node_coords[0][1] = 0;
   element_type->node_coords[0][2] = 0;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[1][0] = 1;  
   element_type->node_coords[1][1] = 0;
   element_type->node_coords[1][2] = 0;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = 0;  
   element_type->node_coords[2][1] = 1;
   element_type->node_coords[2][2] = 0;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[3][0] = 0;  
   element_type->node_coords[3][1] = 0;
   element_type->node_coords[3][2] = 1;
@@ -400,8 +401,8 @@ int mesh_point_in_tetrahedron(element_t *element, const double *x) {
     }
   }
  
-  zero = -feenox_var(wasora_mesh.vars.eps);
-  one = 1+feenox_var(wasora_mesh.vars.eps);
+  zero = -feenox_var_value(feenox.mesh.vars.eps);
+  one = 1+feenox_var_value(feenox.mesh.vars.eps);
   lambda4 = 1 - lambda[0] - lambda[1] - lambda[2];
   
   
@@ -414,19 +415,19 @@ int mesh_point_in_tetrahedron(element_t *element, const double *x) {
 }
 
 
-double mesh_tetrahedron_vol(element_t *element) {
+double mesh_tet_vol(element_t *this) {
 
-  if (element->volume == 0) {
+  if (this->volume == 0) {
     double a[3], b[3], c[3];
     
-    mesh_subtract(element->node[0]->x, element->node[1]->x, a);
-    mesh_subtract(element->node[0]->x, element->node[2]->x, b);
-    mesh_subtract(element->node[0]->x, element->node[3]->x, c);
+    mesh_subtract(this->node[0]->x, this->node[1]->x, a);
+    mesh_subtract(this->node[0]->x, this->node[2]->x, b);
+    mesh_subtract(this->node[0]->x, this->node[3]->x, c);
   
-    element->volume = 1.0/(1.0*2.0*3.0) * fabs(mesh_cross_dot(c, a, b));
+    this->volume = 1.0/(1.0*2.0*3.0) * fabs(mesh_cross_dot(c, a, b));
   }  
   
-  return element->volume;
+  return this->volume;
 
 // AFEM.Ch09.pdf
 // 6V = J = x 21 (y 23 z 34 − y34 z 23 ) + x32 (y34 z 12 − y12 z34 ) + x 43 (y12 z23 − y23 z 12),

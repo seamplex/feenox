@@ -22,7 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
+#include "element.h"
 
 // --------------------
 // four-node quadrangle
@@ -33,7 +33,7 @@ int mesh_quad4_init(void) {
   element_type_t *element_type;
   int j, v;
   
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_QUADRANGLE4];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_QUADRANGLE4];
   element_type->name = strdup("quad4");
   element_type->id = ELEMENT_TYPE_QUADRANGLE4;
   element_type->dim = 2;
@@ -65,19 +65,19 @@ int mesh_quad4_init(void) {
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[0][0] = -1;
   element_type->node_coords[0][1] = -1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[1][0] = +1;  
   element_type->node_coords[1][1] = -1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = +1;  
   element_type->node_coords[2][1] = +1;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[3][0] = -1;
   element_type->node_coords[3][1] = +1;
 
@@ -301,8 +301,7 @@ int mesh_point_in_quadrangle(element_t *element, const double *x) {
   int i, j;
 
   element_t triang;
-
-  triang.type = &feenox_mesh.element_type[ELEMENT_TYPE_TRIANGLE3];
+  triang.type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
   triang.node = calloc(triang.type->nodes, sizeof(node_t *));
 
   for (i = 0; i < element->type->faces; i++) {
@@ -320,15 +319,15 @@ int mesh_point_in_quadrangle(element_t *element, const double *x) {
   return 0;
 }
 
-double mesh_quad_vol(element_t *element) {
+double mesh_quad_vol(element_t *this) {
 
-  if (element->volume == 0) {
-    element->volume = fabs(0.5*
-                           ((element->node[2]->x[0]-element->node[0]->x[0])*(element->node[3]->x[1]-element->node[1]->x[1])
-                           +(element->node[1]->x[0]-element->node[3]->x[0])*(element->node[2]->x[1]-element->node[0]->x[1]))
+  if (this->volume == 0) {
+    this->volume = fabs(0.5*
+                           ((this->node[2]->x[0]-this->node[0]->x[0])*(this->node[3]->x[1]-this->node[1]->x[1])
+                           +(this->node[1]->x[0]-this->node[3]->x[0])*(this->node[2]->x[1]-this->node[0]->x[1]))
                           );
   }  
   
-  return element->volume;
+  return this->volume;
 }
 

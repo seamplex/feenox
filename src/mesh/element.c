@@ -139,10 +139,10 @@ int feenox_mesh_element_types_init(void) {
   int i, j, d;
   element_type_t *element_type;
   
-  feenox.mesh.element_type = calloc(NUMBER_ELEMENT_TYPE, sizeof(element_type_t));
+  feenox.mesh.element_types = calloc(NUMBER_ELEMENT_TYPE, sizeof(element_type_t));
 
   // undefined  ----------------------------------------------------------------
-  element_type = &feenox.mesh.element_type[ELEMENT_TYPE_UNDEFINED];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_UNDEFINED];
   element_type->name = strdup("undefined");
   element_type->id = ELEMENT_TYPE_UNDEFINED;
   element_type->dim = 0;
@@ -181,14 +181,14 @@ int feenox_mesh_element_types_init(void) {
   mesh_prism15_init();
 
   // not supported  
-  element_type = &feenox.mesh.element_type[ELEMENT_TYPE_PYRAMID5];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PYRAMID5];
   element_type->dim = 3;
   element_type->name = strdup("pyramid5");
   element_type->id = ELEMENT_TYPE_PYRAMID5;
   element_type->nodes = 0;
 
-  feenox.mesh.element_type[13].name = strdup("prism18");
-  feenox.mesh.element_type[14].name = strdup("pyramid14");
+  feenox.mesh.element_types[13].name = strdup("prism18");
+  feenox.mesh.element_types[14].name = strdup("pyramid14");
 
   
   // point
@@ -196,15 +196,15 @@ int feenox_mesh_element_types_init(void) {
   
   // compute the barycenter of each element type in the r-space
   for (i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
-    if (feenox.mesh.element_type[i].node_coords != NULL) {
-      feenox.mesh.element_type[i].barycenter_coords = calloc(feenox.mesh.element_type[i].dim, sizeof(double));
-      for (j = 0; j < feenox.mesh.element_type[i].nodes; j++) {
-        for (d = 0; d < feenox.mesh.element_type[i].dim; d++) {
-          feenox.mesh.element_type[i].barycenter_coords[d] += feenox.mesh.element_type[i].node_coords[j][d];
+    if (feenox.mesh.element_types[i].node_coords != NULL) {
+      feenox.mesh.element_types[i].barycenter_coords = calloc(feenox.mesh.element_types[i].dim, sizeof(double));
+      for (j = 0; j < feenox.mesh.element_types[i].nodes; j++) {
+        for (d = 0; d < feenox.mesh.element_types[i].dim; d++) {
+          feenox.mesh.element_types[i].barycenter_coords[d] += feenox.mesh.element_types[i].node_coords[j][d];
         }
       }
-      for (d = 0; d < feenox.mesh.element_type[i].dim; d++) {
-        feenox.mesh.element_type[i].barycenter_coords[d] /= feenox.mesh.element_type[i].nodes;
+      for (d = 0; d < feenox.mesh.element_types[i].dim; d++) {
+        feenox.mesh.element_types[i].barycenter_coords[d] /= feenox.mesh.element_types[i].nodes;
       }
     }
   }
@@ -259,7 +259,7 @@ int mesh_create_element(element_t *element, int index, int tag, int type, physic
  
   element->index = index;
   element->tag = tag;
-  element->type = &(feenox.mesh.element_type[type]);
+  element->type = &(feenox.mesh.element_types[type]);
   element->node  = calloc(element->type->nodes, sizeof(node_t *));
   element->physical_group = physical_group;
   
@@ -295,19 +295,19 @@ int mesh_add_material_to_list(material_list_item_t **list, material_t *material)
   
 }
 
-int mesh_compute_element_barycenter(element_t *element, double barycenter[]) {
+int mesh_compute_element_barycenter(element_t *this, double barycenter[]) {
   
   int j;
   
   barycenter[0] = barycenter[1] = barycenter[2] = 0;
-  for (j = 0; j < element->type->nodes; j++) {
-    barycenter[0] += element->node[j]->x[0];
-    barycenter[1] += element->node[j]->x[1];
-    barycenter[2] += element->node[j]->x[2];
+  for (j = 0; j < this->type->nodes; j++) {
+    barycenter[0] += this->node[j]->x[0];
+    barycenter[1] += this->node[j]->x[1];
+    barycenter[2] += this->node[j]->x[2];
   }
-  barycenter[0] /= element->type->nodes; 
-  barycenter[1] /= element->type->nodes; 
-  barycenter[2] /= element->type->nodes; 
+  barycenter[0] /= this->type->nodes; 
+  barycenter[1] /= this->type->nodes; 
+  barycenter[2] /= this->type->nodes; 
   
   return FEENOX_OK;
 }

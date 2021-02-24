@@ -150,6 +150,7 @@ int frdfromgmsh_types[] = {
 
 int mesh_frd_readmesh(mesh_t *mesh) {
 
+/*
   char buffer[BUFFER_SIZE];
   char tmp[BUFFER_SIZE];
   double offset[3];
@@ -338,7 +339,7 @@ int mesh_frd_readmesh(mesh_t *mesh) {
         if (fscanf(mesh->file->pointer, "%d %d", &tags[0], &tags[1]) < 2) {
           return WASORA_RUNTIME_ERROR;
         }
-        
+*/
         // agregamos uno a la cantidad de elementos asociados a la entidad fisica
 /*        
         if (mesh == feenox_mesh.main_mesh) {
@@ -354,7 +355,7 @@ int mesh_frd_readmesh(mesh_t *mesh) {
           }
         }
 */      
-
+/*
         // vemos la dimension del elemento -> la mayor es la de la malla
         if (mesh->element[i].type->dim > bulk_dimensions) {
           bulk_dimensions = mesh->element[i].type->dim;
@@ -419,12 +420,13 @@ int mesh_frd_readmesh(mesh_t *mesh) {
           mesh->element[i].node[j_gmsh] = &mesh->node[node_index];
           mesh_add_element_to_list(&mesh->element[i].node[j_gmsh]->associated_elements, &mesh->element[i]);
             
-          
+*/          
 /*          
           if (mesh->element[id].physical_entity != NULL && mesh->element[id].physical_entity->material != NULL) {
             mesh_add_material_to_list(&mesh->element[id].node[j]->materials_list, mesh->element[id].physical_entity->material);
           }
  */
+/*
         }
       }
 
@@ -596,6 +598,6 @@ int mesh_frd_readmesh(mesh_t *mesh) {
   
   mesh->spatial_dimensions = spatial_dimensions;
   mesh->order = order;  
-
+*/
   return FEENOX_OK;
 }

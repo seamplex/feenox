@@ -22,8 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-
-// #include <math.h>
+#include "element.h"
 
 // --------------------------------------------------------------
 // punto de un nodo
@@ -32,7 +31,7 @@ int mesh_one_node_point_init(void) {
   
   element_type_t *element_type;
   
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_POINT1];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_POINT1];
   element_type->name = strdup("point");
   element_type->id = ELEMENT_TYPE_POINT1;
   element_type->dim = 0;
@@ -67,6 +66,6 @@ double mesh_one_node_point_dhdr(int i, int j, double *vec_r) {
   return 0;
 }
 
-double mesh_point_vol(element_t *element) {
+double mesh_point_vol(element_t *this) {
   return 0;
 }

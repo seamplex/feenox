@@ -22,9 +22,7 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
-// #include <gsl/gsl_linalg.h>
-
+#include "element.h"
 
 // --------------------------------------------------------------
 // prisma de seis nodos
@@ -35,7 +33,7 @@ int mesh_prism6_init(void) {
   element_type_t *element_type;
   int j;
 
-  element_type = &feenox_mesh.element_type[ELEMENT_TYPE_PRISM6];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM6];
   element_type->name = strdup("prism6");
   element_type->id = ELEMENT_TYPE_PRISM6;
   element_type->dim = 3;
@@ -78,32 +76,32 @@ u   |    ,/ `\    |    v
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[0][0] = 0;
   element_type->node_coords[0][1] = 0;
   element_type->node_coords[0][2] = -1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[1][0] = 1;
   element_type->node_coords[1][1] = 0;
   element_type->node_coords[1][2] = -1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[2][0] = 0;
   element_type->node_coords[2][1] = 1;
   element_type->node_coords[2][2] = -1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[3][0] = 0;
   element_type->node_coords[3][1] = 0;
   element_type->node_coords[3][2] = 1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[4][0] = 1;
   element_type->node_coords[4][1] = 0;
   element_type->node_coords[4][2] = 1;
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[5][0] = 0;
   element_type->node_coords[5][1] = 1;
   element_type->node_coords[5][2] = 1;
@@ -171,6 +169,7 @@ void mesh_prism_gauss6_init(element_type_t *element_type) {
   
   return;
 }
+
 double mesh_prism6_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
@@ -312,8 +311,8 @@ int mesh_point_in_prism(element_t *element, const double *x) {
 //  lambda2 = ((y3-y1)*(x[0]-x3) + (x1-x3)*(x[1]-y3))/((y2-y3)*(x1-x3) + (x3-x2)*(y1-y3));
 //  lambda3 = 1 - lambda1 - lambda2;
 //  
-//  zero = -feenox_var(wasora_mesh.vars.eps);
-//  one = 1+feenox_var(wasora_mesh.vars.eps);
+//  zero = -feenox_var(feenox_mesh.vars.eps);
+//  one = 1+feenox_var(feenox_mesh.vars.eps);
 //  
 //  return (lambda1 > zero && lambda1 < one &&
 //          lambda2 > zero && lambda2 < one &&
@@ -343,8 +342,8 @@ int mesh_point_in_prism(element_t *element, const double *x) {
   gsl_linalg_LU_decomp (T, p, &s);
   gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-  zero = -feenox_var(wasora_mesh.vars.eps);
-  one = 1+feenox_var(wasora_mesh.vars.eps);
+  zero = -feenox_var_value(feenox.mesh.vars.eps);
+  one = 1+feenox_var_value(feenox.mesh.vars.eps);
   lambda1 = gsl_vector_get(lambda, 0);
   lambda2 = gsl_vector_get(lambda, 1);
   lambda3 = gsl_vector_get(lambda, 2);
@@ -371,8 +370,8 @@ int mesh_point_in_prism(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -feenox_var(wasora_mesh.vars.eps);
-      one = 1+feenox_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -401,8 +400,8 @@ int mesh_point_in_prism(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -feenox_var(wasora_mesh.vars.eps);
-      one = 1+feenox_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -425,33 +424,33 @@ int mesh_point_in_prism(element_t *element, const double *x) {
 }
     
 // TODO: generalizar a prismas no paralelos
-double mesh_prism_vol(element_t *element) {
+double mesh_prism_vol(element_t *this) {
 
 //  return 0.5 * fabs(element->node[0]->x[2]-element->node[3]->x[2])* fabs(mesh_subtract_cross_2d(element->node[0]->x, element->node[1]->x, element->node[2]->x));
 
-  if (element->volume == 0) {
+  if (this->volume == 0) {
   
     double a[3], b[3], c[3];
     double v1, v2, v3;
   
-    mesh_subtract(element->node[0]->x, element->node[1]->x, a);
-    mesh_subtract(element->node[0]->x, element->node[2]->x, b);
-    mesh_subtract(element->node[0]->x, element->node[3]->x, c);
+    mesh_subtract(this->node[0]->x, this->node[1]->x, a);
+    mesh_subtract(this->node[0]->x, this->node[2]->x, b);
+    mesh_subtract(this->node[0]->x, this->node[3]->x, c);
     v1 = fabs(mesh_cross_dot(a, b, c));
   
-    mesh_subtract(element->node[4]->x, element->node[3]->x, a);
-    mesh_subtract(element->node[4]->x, element->node[5]->x, b);
-    mesh_subtract(element->node[4]->x, element->node[1]->x, c);
+    mesh_subtract(this->node[4]->x, this->node[3]->x, a);
+    mesh_subtract(this->node[4]->x, this->node[5]->x, b);
+    mesh_subtract(this->node[4]->x, this->node[1]->x, c);
     v2 = fabs(mesh_cross_dot(a, b, c));
   
-    mesh_subtract(element->node[2]->x, element->node[3]->x, a);
-    mesh_subtract(element->node[2]->x, element->node[5]->x, b);
-    mesh_subtract(element->node[2]->x, element->node[1]->x, c);
+    mesh_subtract(this->node[2]->x, this->node[3]->x, a);
+    mesh_subtract(this->node[2]->x, this->node[5]->x, b);
+    mesh_subtract(this->node[2]->x, this->node[1]->x, c);
     v3 = fabs(mesh_cross_dot(a, b, c));
 
-    element->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3);
+    this->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3);
   }
   
-  return element->volume;
+  return this->volume;
 
 }

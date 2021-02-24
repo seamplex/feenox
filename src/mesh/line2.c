@@ -35,7 +35,7 @@ int mesh_line2_init(void) {
   element_type_t *element_type;
   int j, v;
   
-  element_type = &feenox.mesh.element_type[ELEMENT_TYPE_LINE2];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE2];
   element_type->name = strdup("line2");
   element_type->id = ELEMENT_TYPE_LINE2;
   element_type->dim = 1;

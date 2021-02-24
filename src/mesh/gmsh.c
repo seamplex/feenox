@@ -39,7 +39,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
   size_t first, second; // this are buffers because 4.0 and 4.1 swapped tag,dim to dim,tag
   size_t type, physical;
   size_t node, node_index;
-  size_t cell_id;
+//  size_t cell_id;
   size_t ntags;
   size_t tag_min = 0;
   size_t tag_max = 0;
@@ -521,11 +521,11 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
             feenox_push_error_message("elements of type '%d' are not supported in this version :-(", type);
             return FEENOX_ERROR;
           }
-          if (feenox.mesh.element_type[type].nodes == 0) {
+          if (feenox.mesh.element_types[type].nodes == 0) {
             feenox_push_error_message("elements of type '%s' are not supported in this version :-(", mesh->element[i].type->name);
             return FEENOX_ERROR;
           }
-          mesh->element[i].type = &(feenox.mesh.element_type[type]);
+          mesh->element[i].type = &(feenox.mesh.element_types[type]);
 
           // format v2.2
           // cada elemento tiene un tag que es un array de enteros
@@ -602,7 +602,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
 
         i = 0;
         for (l = 0; l < blocks; l++) {
-          if (fscanf(mesh->file->pointer, "%d %d %d %d", &first, &second, &type, &num) < 4) {
+          if (fscanf(mesh->file->pointer, "%ld %ld %ld %ld", &first, &second, &type, &num) < 4) {
             return FEENOX_ERROR;
           }
           if (version_min == 0) {
@@ -614,11 +614,11 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           }
           
           if (type >= NUMBER_ELEMENT_TYPE) {
-            feenox_push_error_message("elements of type '%d' are not supported in this version :-(", type);
+            feenox_push_error_message("elements of type '%d' are not supported in this version", type);
             return FEENOX_ERROR;
           }
-          if (feenox_mesh.element_type[type].nodes == 0) {
-            feenox_push_error_message("elements of type '%s' are not supported in this version :-(", feenox_mesh.element_type[type].name);
+          if (feenox.mesh.element_types[type].nodes == 0) {
+            feenox_push_error_message("elements of type '%s' are not supported in this version", feenox.mesh.element_types[type].name);
             return FEENOX_ERROR;
           }
           
@@ -629,8 +629,8 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
             physical = geometrical_entity->physical[0];
             HASH_FIND(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
             if ((mesh->element[i].physical_group = physical_group) == NULL) {
-              snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%d_%d", mesh->name, dimension, physical);
-              if ((mesh->element[i].physical_group = feenox_define_physical_group(buffer, mesh, feenox_mesh.element_type[type].dim)) == NULL) {
+              snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", mesh->name, dimension, physical);
+              if ((mesh->element[i].physical_group = feenox_define_physical_group(mesh, buffer, feenox.mesh.element_types[type].dim)) == NULL) {
                 return FEENOX_ERROR;
               }
               mesh->element[i].physical_group->tag = physical;
@@ -641,13 +641,13 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
           }
                     
           for (k = 0; k < num; k++) {
-            if (fscanf(mesh->file->pointer, "%d", &tag) == 0) {
+            if (fscanf(mesh->file->pointer, "%ld", &tag) == 0) {
               return FEENOX_ERROR;
             }
             
             mesh->element[i].tag = tag;
             mesh->element[i].index = i;
-            mesh->element[i].type = &(feenox_mesh.element_type[type]);
+            mesh->element[i].type = &(feenox.mesh.element_types[type]);
             
             if ((mesh->element[i].physical_group = physical_group) != NULL) {
               mesh->element[i].physical_group->n_elements++;
@@ -655,7 +655,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
             
             mesh->element[i].node = calloc(mesh->element[i].type->nodes, sizeof(node_t *));
             for (j = 0; j < mesh->element[i].type->nodes; j++) {
-              if (fscanf(mesh->file->pointer, "%d", &node) == 0) {
+              if (fscanf(mesh->file->pointer, "%ld", &node) == 0) {
                 return FEENOX_ERROR;
               }
               // ojo al piojo en msh4, hay que usar el maneje del tag2index
@@ -781,7 +781,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
       
       // if we made it this far, we have a function!
       if (function->data_size != nodes) {
-        function->type = type_pointwise_mesh_node;
+        function->type = function_type_pointwise_mesh_node;
         function->mesh = mesh;
         function->data_argument = mesh->nodes_argument;
         function->data_size = nodes;
@@ -792,7 +792,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
       }  
       
       for (j = 0; j < nodes; j++) {
-        if (fscanf(mesh->file->pointer, "%d %lf", &node, &value) == 0) {
+        if (fscanf(mesh->file->pointer, "%ld %lf", &node, &value) == 0) {
           feenox_push_error_message("error reading file");
           return FEENOX_ERROR;
         }
@@ -822,12 +822,13 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
   
     // ------------------------------------------------------      
     // extension nuestra!
+/*      
     } else if (strncmp("$Neighbors", buffer, 10) == 0 || strncmp("$Neighbours", buffer, 11) == 0) {
 
       int element_id;
       
       // la cantidad de celdas
-      if (fscanf(mesh->file->pointer, "%d", &(mesh->n_cells)) == 0) {
+      if (fscanf(mesh->file->pointer, "%ld", &(mesh->n_cells)) == 0) {
         return FEENOX_ERROR;
       }
       if (mesh->n_cells == 0) {
@@ -895,7 +896,7 @@ int mesh_gmsh_readmesh(mesh_t *mesh) {
         return -2;
       }
       
-      
+*/
     // ------------------------------------------------------      
     } else {
         
@@ -948,17 +949,17 @@ int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
   
   
   fprintf(file, "$Nodes\n");
-  fprintf(file, "%d\n", mesh->n_nodes);
+  fprintf(file, "%ld\n", mesh->n_nodes);
   for (i = 0; i < mesh->n_nodes; i++) {
-    fprintf(file, "%d %g %g %g\n", mesh->node[i].tag, mesh->node[i].x[0], mesh->node[i].x[1], mesh->node[i].x[2]);
+    fprintf(file, "%ld %g %g %g\n", mesh->node[i].tag, mesh->node[i].x[0], mesh->node[i].x[1], mesh->node[i].x[2]);
   }
   fprintf(file, "$EndNodes\n");
 
   fprintf(file, "$Elements\n");
-  fprintf(file, "%d\n", mesh->n_elements);
+  fprintf(file, "%ld\n", mesh->n_elements);
   for (i = 0; i < mesh->n_elements; i++) {
-    fprintf(file, "%d ", mesh->element[i].tag);
-    fprintf(file, "%d ", mesh->element[i].type->id);
+    fprintf(file, "%ld ", mesh->element[i].tag);
+    fprintf(file, "%ld ", mesh->element[i].type->id);
 
     // in principle we shuold write the detailed information about groups and parititons
 //    fprintf(file, "%d ", mesh->element[i].ntags);
@@ -973,7 +974,7 @@ int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
     }
     // los nodos
     for (j = 0; j < mesh->element[i].type->nodes; j++) {
-      fprintf(file, " %d", mesh->element[i].node[j]->tag);
+      fprintf(file, " %ld", mesh->element[i].node[j]->tag);
     }
     fprintf(file, "\n");
   }
@@ -983,7 +984,7 @@ int mesh_gmsh_write_mesh(mesh_t *mesh, int no_physical_names, FILE *file) {
   
 }
 
-
+/*
 int mesh_gmsh_write_scalar(mesh_post_t *mesh_post, function_t *function, centering_t centering) {
 
   int i;
@@ -1146,7 +1147,7 @@ int mesh_gmsh_write_vector(mesh_post_t *mesh_post, function_t **function, center
   return FEENOX_OK;
 
 }
-
+*/
 
 // read the next available time step and interpolate
 int mesh_gmsh_update_function(function_t *function, double t, double dt) {
@@ -1159,9 +1160,7 @@ int mesh_gmsh_update_function(function_t *function, double t, double dt) {
   int done = 0;
 
   if (mesh->file->pointer == NULL) {
-    feenox_call(feenox_instruction_open_file(mesh->file));
-//  } else {
-//    rewind(mesh->file->pointer);
+    feenox_call(feenox_instruction_file_open(mesh->file));
   }
 
    while (done == 0 && fgets(buffer, BUFFER_LINE_SIZE-1, mesh->file->pointer) != NULL) {

@@ -870,10 +870,10 @@ struct element_type_t {
   size_t id;              // as of Gmsh
   size_t dim;
   size_t order;
-  int nodes;           // total, i.e. 10 for tet10
-  int vertices;        // the corner nodes, i.e 4 for tet10
-  int faces;           // facess == number of neighbors
-  int nodes_per_face;  // (max) number of nodes per face
+  unsigned int nodes;           // total, i.e. 10 for tet10
+  unsigned int vertices;        // the corner nodes, i.e 4 for tet10
+  unsigned int faces;           // facess == number of neighbors
+  unsigned int nodes_per_face;  // (max) number of nodes per face
 
   double *barycenter_coords;
   double **node_coords;
@@ -882,8 +882,8 @@ struct element_type_t {
   // shape functions and derivatives in the local coords
   double (*h)(int i, double *r);
   double (*dhdr)(int i, int j, double *r);
-  
-  // check if a point x belongs to the element or no
+
+  // virtual (sic) methods!
   int (*point_in_element)(element_t *e, const double *x);
   double (*element_volume)(element_t *e);
   
@@ -1198,7 +1198,7 @@ struct feenox_t {
       var_t *mesh_failed_interpolation_factor;
     } vars;
 
-    element_type_t *element_type;
+    element_type_t *element_types;
 
     material_t *materials;
     physical_property_t *physical_properties;
@@ -1425,5 +1425,28 @@ extern physical_group_t *feenox_define_physical_group(mesh_t *mesh, const char *
 // init.c
 int feenox_mesh_element_types_init(void);
 
+// geom.c
+// TODO: rename mesh_* -> feenox_mesh_*
+extern void mesh_subtract(const double *a, const double *b, double *c);
+extern void mesh_cross(const double *a, const double *b, double *c);
+extern void mesh_normalized_cross(const double *a, const double *b, double *c);
+extern double mesh_cross_dot(const double *a, const double *b, const double *c);
+extern double mesh_subtract_cross_2d(const double *a, const double *b, const double *c);
+extern double mesh_dot(const double *a, const double *b);
+extern double mesh_subtract_dot(const double *b, const double *a, const double *c);
+extern double mesh_subtract_module(const double *b, const double *a);
+extern double mesh_subtract_squared_module(const  double *b, const  double *a);
+extern double mesh_subtract_squared_module2d(const  double *b, const  double *a);
+extern int mesh_compute_outward_normal(element_t *element, double *n);
+
+// element.c
+extern int mesh_add_element_to_list(element_list_item_t **list, element_t *element);
+extern int mesh_compute_element_barycenter(element_t *this, double barycenter[]);
+
+// vtk.c
+extern int mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
+
+// neighbors.c
+extern element_t *mesh_find_element_volumetric_neighbor(element_t *this);
 
 #endif    /* FEENOX_H  */

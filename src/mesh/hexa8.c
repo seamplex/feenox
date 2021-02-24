@@ -1,28 +1,28 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  wasora's mesh-related hexahedron element routines
+ *  feenox's mesh-related hexahedron element routines
  *
  *  Copyright (C) 2014--2020 jeremy theler
  *
- *  This file is part of wasora.
+ *  This file is part of feenox.
  *
- *  wasora is free software: you can redistribute it and/or modify
+ *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  wasora is distributed in the hope that it will be useful,
+ *  feenox is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with wasora.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <math.h>
+#include "element.h"
 
 
 // --------------------------------------------------------------
@@ -35,7 +35,7 @@ int mesh_hexa8_init(void) {
   element_type_t *element_type;
   int j, v;
 
-  element_type = &wasora_mesh.element_type[ELEMENT_TYPE_HEXAHEDRON8];
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON8];
   element_type->name = strdup("hexa8");
   element_type->id = ELEMENT_TYPE_HEXAHEDRON8;
   element_type->dim = 3;
@@ -46,7 +46,7 @@ int mesh_hexa8_init(void) {
   element_type->h = mesh_hexa8_h;
   element_type->dhdr = mesh_hexa8_dhdr;
   element_type->point_in_element = mesh_point_in_hexahedron;
-  element_type->element_volume = mesh_hexahedron_vol;
+  element_type->element_volume = mesh_hex_vol;
 
   // coordenadas de los nodos
 /*
@@ -72,42 +72,42 @@ Hexahedron:
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
   
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[0][0] = -1;
   element_type->node_coords[0][1] = -1;
   element_type->node_coords[0][2] = -1;
 
-  element_type->first_order_nodes++;  
+  element_type->vertices++;  
   element_type->node_coords[1][0] = +1;  
   element_type->node_coords[1][1] = -1;
   element_type->node_coords[1][2] = -1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[2][0] = +1;  
   element_type->node_coords[2][1] = +1;
   element_type->node_coords[2][2] = -1;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[3][0] = -1;
   element_type->node_coords[3][1] = +1;
   element_type->node_coords[3][2] = -1;
  
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[4][0] = -1;
   element_type->node_coords[4][1] = -1;
   element_type->node_coords[4][2] = +1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[5][0] = +1;  
   element_type->node_coords[5][1] = -1;
   element_type->node_coords[5][2] = +1;
   
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[6][0] = +1;  
   element_type->node_coords[6][1] = +1;
   element_type->node_coords[6][2] = +1;
 
-  element_type->first_order_nodes++;
+  element_type->vertices++;
   element_type->node_coords[7][0] = -1;
   element_type->node_coords[7][1] = +1;
   element_type->node_coords[7][2] = +1;
@@ -544,8 +544,9 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
   gsl_linalg_LU_decomp (T, p, &s);
   gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-  zero = -wasora_var(wasora_mesh.vars.eps);
-  one = 1+wasora_var(wasora_mesh.vars.eps);
+  // TODO: make a function and call it 6 times
+  zero = -feenox_var_value(feenox.mesh.vars.eps);
+  one = 1+feenox_var_value(feenox.mesh.vars.eps);
   lambda1 = gsl_vector_get(lambda, 0);
   lambda2 = gsl_vector_get(lambda, 1);
   lambda3 = gsl_vector_get(lambda, 2);
@@ -572,8 +573,8 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -wasora_var(wasora_mesh.vars.eps);
-      one = 1+wasora_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -602,8 +603,8 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -wasora_var(wasora_mesh.vars.eps);
-      one = 1+wasora_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -632,8 +633,8 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -wasora_var(wasora_mesh.vars.eps);
-      one = 1+wasora_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -662,8 +663,8 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -wasora_var(wasora_mesh.vars.eps);
-      one = 1+wasora_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -692,8 +693,8 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
       gsl_linalg_LU_decomp (T, p, &s);
       gsl_linalg_LU_solve (T, p, xx4, lambda);
 
-      zero = -wasora_var(wasora_mesh.vars.eps);
-      one = 1+wasora_var(wasora_mesh.vars.eps);
+      zero = -feenox_var_value(feenox.mesh.vars.eps);
+      one = 1+feenox_var_value(feenox.mesh.vars.eps);
       lambda1 = gsl_vector_get(lambda, 0);
       lambda2 = gsl_vector_get(lambda, 1);
       lambda3 = gsl_vector_get(lambda, 2);
@@ -720,7 +721,7 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
 
 }
 
-double mesh_hexahedron_vol(element_t *element) {
+double mesh_hex_vol(element_t *element) {
 
 
  if (element->volume == 0) {
