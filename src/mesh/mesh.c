@@ -37,6 +37,8 @@ int feenox_instruction_mesh_read(void *arg) {
 //  double vol;
 //  double cog[3];
 
+  feenox_call(feenox_mesh_element_types_init());
+  
   if (this->initialized) {
     if (this->update_each_step == 0) {
       // we are not supposed to read the mesh all over again
@@ -157,7 +159,7 @@ int feenox_instruction_mesh_read(void *arg) {
   }
  
   // check the dimensions match
-  if (dim == 0) {
+  if (this->dim == 0) {
     this->dim = dim;
   } else if (this->dim != dim) {
     feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", this->file->path, this->dim, dim);

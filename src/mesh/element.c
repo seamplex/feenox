@@ -1,22 +1,22 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's mesh-related element routines
+ *  FeenoX's mesh-related element routines
  *
  *  Copyright (C) 2015--2021 jeremy theler
  *
- *  This file is part of feenox.
+ *  This file is part of FeenoX.
  *
- *  feenox is free software: you can redistribute it and/or modify
+ *  FeenoX is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
@@ -136,10 +136,12 @@ Pyramid:                     Pyramid13:                   Pyramid14:
 
 int feenox_mesh_element_types_init(void) {
 
-  int i, j, d;
-  element_type_t *element_type;
+  if (feenox.mesh.element_types != NULL) {
+    return FEENOX_OK;
+  }
   
   feenox.mesh.element_types = calloc(NUMBER_ELEMENT_TYPE, sizeof(element_type_t));
+  element_type_t *element_type = NULL;
 
   // undefined  ----------------------------------------------------------------
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_UNDEFINED];
@@ -195,6 +197,7 @@ int feenox_mesh_element_types_init(void) {
   mesh_one_node_point_init();
   
   // compute the barycenter of each element type in the r-space
+  unsigned i, j, d;
   for (i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
     if (feenox.mesh.element_types[i].node_coords != NULL) {
       feenox.mesh.element_types[i].barycenter_coords = calloc(feenox.mesh.element_types[i].dim, sizeof(double));

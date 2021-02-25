@@ -1190,7 +1190,7 @@ struct feenox_t {
 
   struct {
 
-    int initialized;
+    //int initialized;
     int need_cells;
 
     mesh_t *meshes;
@@ -1285,6 +1285,8 @@ extern int feenox_init_special_objects(void);
 extern int feenox_init_after_parser(void);
 extern int feenox_init_before_run(void);
 
+// mesh's init.c
+extern int feenox_mesh_init_special_objects(void);
 
 // version.c
 extern void feenox_show_help(const char *progname);

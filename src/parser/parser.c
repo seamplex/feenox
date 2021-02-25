@@ -2968,6 +2968,9 @@ int feenox_parse_phase_space(void) {
 
 int feenox_parse_read_mesh(void) {
   
+  // we have at least one mesh so we need to define the whole set of special vars
+  feenox_call(feenox_mesh_init_special_objects());
+  
   // TODO: api?
   mesh_t *mesh = calloc(1, sizeof(mesh_t));
 

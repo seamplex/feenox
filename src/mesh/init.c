@@ -23,16 +23,16 @@
 extern feenox_t feenox;
 
 
-int feenox_mesh_init_objects(void) {
+int feenox_mesh_init_special_objects(void) {
   
-  if (feenox.mesh.initialized) {
+  if (feenox.mesh.vars.x != NULL) {
     return FEENOX_OK;
   }
   
   // vector con las coordenadas globales
-//  feenox.mesh.vars.vec_x = feenox_define_vector("x_global", 3, NULL, NULL);
+  feenox.mesh.vars.vec_x = feenox_define_vector_get_ptr("x_global", 3);
   // como ahora hacemos alias de a los elementos del vector x_global lo inicializamos
-//  feenox_call(feenox_vector_init(feenox.mesh.vars.vec_x));
+  feenox_call(feenox_vector_init(feenox.mesh.vars.vec_x));
   
 //va+x+name x
 //va+x+desc Holder variable for spatial dependance of functions, such spatial distribution
@@ -122,9 +122,7 @@ int feenox_mesh_init_objects(void) {
   
 // initialize the static data of the elements
   feenox_call(feenox_mesh_element_types_init());
-  
-  feenox.mesh.initialized = 1;
-  
+     
   return FEENOX_OK;
 }
 
