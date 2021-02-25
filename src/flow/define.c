@@ -366,6 +366,18 @@ int feenox_define_file(const char *name, const char *format, int n_format_args, 
   return FEENOX_OK;
 }
 
+file_t *feenox_get_or_define_file(const char *name) {
+  file_t *file;
+  if ((file = feenox_get_file_ptr(name)) == NULL) {
+    feenox_call(feenox_define_file(name, name, 0, ""));
+    if ((file = feenox_get_file_ptr(name)) == NULL) {
+      return NULL;
+    }
+  }
+  return file;
+}
+
+
 
 int feenox_file_set_path_argument(const char *name, int i, const char *expression) {
   

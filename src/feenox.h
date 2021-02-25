@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX common framework header
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2021 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -1318,7 +1318,7 @@ extern int feenox_parse_main_input_file(const char *filepath);
 extern char *feenox_ends_in_init(const char *name);
 extern char *feenox_ends_in_zero(const char *name);
 extern int feenox_count_arguments(char *string, size_t *);
-extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
+extern int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, size_t *n_chars);
 
 
 // file.c
@@ -1371,13 +1371,14 @@ extern int feenox_vector_attach_data(const char *name, expr_t *datas);
 extern int feenox_define_matrix(const char *name, const char *rows, const char *cols);
 extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
 
-extern int feenox_define_function(const char *name, int n_arguments);
-extern function_t *feenox_define_function_get_ptr(const char *name, int n_arguments);
-extern int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name);
+extern int feenox_define_function(const char *name, unsigned int n_arguments);
+extern function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments);
+extern int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name);
 extern int feenox_function_set_expression(const char *name, const char *expression);
 
-extern int feenox_define_file(const char *name, const char *format, int n_args, const char *mode);
-extern int feenox_file_set_path_argument(const char *name, int i, const char *expression);
+extern int feenox_define_file(const char *name, const char *format, unsigned int n_args, const char *mode);
+extern int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression);
+externr file_t *feenox_get_or_define_file_get_ptr(const char *name);
 
 extern var_t *feenox_get_or_define_variable_get_ptr(const char *name);
 extern var_t *feenox_define_variable_get_ptr(const char *name);
