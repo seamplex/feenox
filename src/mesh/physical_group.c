@@ -19,12 +19,13 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#define _GNU_SOURCE  // for asprintf
 #include "../feenox.h"
 extern feenox_t feenox;
 
 
 
-physical_group_t *feenox_define_physical_group(const char *name, mesh_t *new_mesh, int dimension) {
+physical_group_t *feenox_define_physical_group(mesh_t *new_mesh, const char *name, int dimension) {
   char *dummy_aux = NULL;
   physical_group_t *physical_group;
   mesh_t *mesh; 
@@ -35,17 +36,17 @@ physical_group_t *feenox_define_physical_group(const char *name, mesh_t *new_mes
     return NULL;
   }
   if ((mesh = new_mesh) == NULL) {
-    if ((mesh = feenox_mesh.main_mesh) == NULL) {
+    if ((mesh = feenox.mesh.mesh_main) == NULL) {
       feenox_push_error_message("no mesh for defining physical group '%s'", name);
       return NULL;  
     }
   }
   
-  if ((physical_group = feenox_get_physical_group_ptr(name, mesh)) == NULL) {
+  if ((physical_group = feenox_get_physical_group_ptr(mesh, name)) == NULL) {
     already_exists = 0; // esto lo usamos para definir las variables especiales abajo
     physical_group = calloc(1, sizeof(physical_group_t));
     physical_group->name = strdup(name);
-    HASH_ADD_KEYPTR(hh, mesh->physical_entities, physical_group->name, strlen(name), physical_group);
+    HASH_ADD_KEYPTR(hh, mesh->physical_groups, physical_group->name, strlen(name), physical_group);
   } else {
     already_exists = 1;
   }
@@ -67,15 +68,15 @@ physical_group_t *feenox_define_physical_group(const char *name, mesh_t *new_mes
   
   // -----------------------------  
   if (already_exists == 0) {
-    if (feenox_check_name(name) == WASORA_PARSER_OK) {
+    if (feenox_check_name(name) == FEENOX_OK) {
       // volumen (o area o longitud)
       if (asprintf(&dummy_aux, "%s_vol", physical_group->name) == -1) {
         feenox_push_error_message("memory allocation error");
         return NULL;
       }
       // volvemos a chequear por si acaso hay duplicados en mallas 
-      if (feenox_check_name(dummy_aux) == WASORA_PARSER_OK) {
-        if ((physical_group->var_vol = feenox_define_variable(dummy_aux)) == NULL) {
+      if (feenox_check_name(dummy_aux) == FEENOX_OK) {
+        if ((physical_group->var_vol = feenox_define_variable_get_ptr(dummy_aux)) == NULL) {
           return NULL;
         }
       } else {
@@ -91,8 +92,8 @@ physical_group_t *feenox_define_physical_group(const char *name, mesh_t *new_mes
       feenox_push_error_message("memory allocation error");
       return NULL;
     }
-    if (feenox_check_name(dummy_aux) == WASORA_PARSER_OK) {
-      if ((physical_group->vector_cog = feenox_define_vector(dummy_aux, 3, NULL, NULL)) == NULL) {
+    if (feenox_check_name(dummy_aux) == FEENOX_OK) {
+      if ((physical_group->vector_cog = feenox_define_vector_get_ptr(dummy_aux, 3)) == NULL) {
         return NULL;
       }
     } else {

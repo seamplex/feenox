@@ -93,14 +93,14 @@ int mesh_find_neighbors(mesh_t *this) {
   for (i = 0; i < this->n_cells; i++) {
   
     n = 0;
-    this->cell[i].ifaces = calloc(mesh->cell[i].element->type->faces, sizeof(int *));
+    this->cell[i].ifaces = calloc(this->cell[i].element->type->faces, sizeof(int *));
     
     for (j = 0; j < this->cell[i].element->type->nodes; j++) {
       LL_FOREACH(this->cell[i].element->node[j]->associated_elements, associated_element) {
 
         memset(nodes, 0, sizeof(nodes));
         if ((l = associated_element->element->index) != this->cell[i].element->index) {
-          if (mesh_count_common_nodes(mesh->cell[i].element, &this->element[l], nodes) >= this->cell[i].element->type->dim) {
+          if (mesh_count_common_nodes(this->cell[i].element, &this->element[l], nodes) >= this->cell[i].element->type->dim) {
 
             flag = 1;
             for (m = 0; m < n; m++) {
@@ -111,12 +111,12 @@ int mesh_find_neighbors(mesh_t *this) {
           
             if (flag) {
               if (n == this->cell[i].element->type->faces) {
-                feenox_push_error_message("mesh inconsistency, element %d has at least one more neighbor than faces (%d)", mesh->cell[i].element->type, n);
+                feenox_push_error_message("mesh inconsistency, element %d has at least one more neighbor than faces (%d)", this->cell[i].element->type, n);
                 return FEENOX_ERROR;
               }
 
-              this->cell[i].ifaces[n] = calloc(mesh->cell[i].element->type->nodes_per_face, sizeof(int));
-              memcpy(mesh->cell[i].ifaces[n], nodes, sizeof(int)*mesh->cell[i].element->type->nodes_per_face);
+              this->cell[i].ifaces[n] = calloc(this->cell[i].element->type->nodes_per_face, sizeof(int));
+              memcpy(this->cell[i].ifaces[n], nodes, sizeof(int)*this->cell[i].element->type->nodes_per_face);
               this->cell[i].ineighbor[n] = l;
           
               n++;
@@ -126,15 +126,15 @@ int mesh_find_neighbors(mesh_t *this) {
       }
     }
     
-    if ((mesh->cell[i].n_neighbors = n) != mesh->cell[i].element->type->faces) {
-      feenox_push_error_message("mesh inconsistency, element %d has less neighbors (%d) than faces (%d)", mesh->cell[i].element->tag, n, mesh->cell[i].element->type->faces);
+    if ((this->cell[i].n_neighbors = n) != this->cell[i].element->type->faces) {
+      feenox_push_error_message("mesh inconsistency, element %d has less neighbors (%d) than faces (%d)", this->cell[i].element->tag, n, this->cell[i].element->type->faces);
       return FEENOX_ERROR;
     }
 
   }
 
     
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
 }
 
@@ -171,7 +171,7 @@ int mesh_fill_neighbors(mesh_t *mesh) {
       mesh->cell[i].neighbor[j].x_ij[1] /= (double)mesh->cell[i].element->type->nodes_per_face;
       mesh->cell[i].neighbor[j].x_ij[2] /= (double)mesh->cell[i].element->type->nodes_per_face;
       
-      switch (mesh->bulk_dimensions) {
+      switch (mesh->dim_topo) {
         case 1:
           if (mesh->cell[i].neighbor[j].face_coord[0][0] > mesh->cell[i].x[0]) {
             mesh->cell[i].neighbor[j].n_ij[0] = 1;
@@ -241,7 +241,7 @@ int mesh_fill_neighbors(mesh_t *mesh) {
     }
   }
   
-  return WASORA_RUNTIME_OK;
+  return FEENOX_OK;
   
   
 }

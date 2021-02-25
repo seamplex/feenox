@@ -19,6 +19,7 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#define _GNU_SOURCE  // for asprintf
 #include "feenox.h"
 extern feenox_t feenox;
 extern builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS];
@@ -188,6 +189,20 @@ int feenox_define_vector(const char *name, const char *size) {
   return FEENOX_OK;
 
 }
+
+vector_t *feenox_define_vector_get_ptr(const char *name, size_t size) {
+  // this function is called from the code, that alredy knows what the vector size is
+  // the function below is called from the API that allows a string
+  // this is ugly but we don't need too much performance
+  char *size_string;
+  asprintf(&size_string, "%ld", size);
+  if (feenox_define_vector(name, size_string) != FEENOX_OK) {
+    return NULL;
+  }
+  free(size_string);
+  return feenox_get_vector_ptr(name);
+}
+
 
 // API
 int feenox_vector_attach_function(const char *name, const char *function_data) {

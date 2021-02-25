@@ -23,7 +23,7 @@
 extern feenox_t feenox;
 
 
-int mesh_gmsh_readmesh(mesh_t *mesh) {
+int feenox_mesh_read_gmsh(mesh_t *mesh) {
 
   char buffer[BUFFER_LINE_SIZE];
   size_t *tags = NULL;

@@ -325,7 +325,7 @@ int mesh_vtk_write_vector(mesh_post_t *mesh_post, function_t **function, centeri
 */
 
 
-int mesh_vtk_read_mesh(mesh_t *mesh) {
+int feenox_mesh_read_vtk(mesh_t *this) {
 
 /*  
   char buffer[BUFFER_SIZE];

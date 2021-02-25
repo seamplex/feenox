@@ -22,12 +22,6 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-// #include <thirdparty/kdtree.h>
-
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-
 /*
      _________________________________________________________________
     |                               |                                 |
@@ -148,7 +142,7 @@ int frdfromgmsh_types[] = {
  ELEMENT_TYPE_POINT1         // 13
 };
 
-int mesh_frd_readmesh(mesh_t *mesh) {
+int feenox_mesh_read_frd(mesh_t *this) {
 
 /*
   char buffer[BUFFER_SIZE];

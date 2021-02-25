@@ -938,7 +938,39 @@ struct element_list_item_t {
   element_list_item_t *next;
 };
 
+struct cell_t {
+  size_t id;
+  
+  element_t *element;
+  
+  unsigned int n_neighbors;
+  size_t *ineighbor;      // array with ids of neighboring elements
+  size_t **ifaces;        // array of arrays of ids making up the faces
+  
+  neighbor_t *neighbor;   // array of neighbors
 
+  double x[3];            // coordenadas espaciales del baricentro de la celda
+  size_t *index;          // indice del vector incognita para cada uno de los grados de libertad
+
+  double volume;
+
+};
+
+struct neighbor_t {
+  cell_t *cell;
+  element_t *element;
+ 
+  double **face_coord;
+  double x_ij[3];
+  double n_ij[3];
+  double S_ij;
+  
+  // distancia entre los centro de la cara y el centro de la celda
+  // (cache para mallas estructuradas)
+//  double di;     // celda principal
+//  double dj;     // celda vecina  
+  
+};
 
 struct material_t {
   char *name;
@@ -1349,6 +1381,8 @@ extern int feenox_file_set_path_argument(const char *name, int i, const char *ex
 
 extern var_t *feenox_get_or_define_variable_get_ptr(const char *name);
 extern var_t *feenox_define_variable_get_ptr(const char *name);
+
+extern vector_t *feenox_define_vector_get_ptr(const char *name, size_t size);
 
 extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
 extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);

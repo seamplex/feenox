@@ -442,7 +442,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
 
 // free all resources allocated when reading a mesh but not the rest
 // of the things that are in the input files (physical groups, etc)
-int mesh_free(mesh_t *mesh) {
+int feenox_mesh_free(mesh_t *mesh) {
 
   physical_group_t *physical_group;
   element_list_item_t *element_item, *element_tmp;

@@ -40,6 +40,8 @@ AC_CHECK_FUNCS([sysconf],[],[])
 # check for clock_gettime() for unix time
 AC_CHECK_FUNCS([clock_gettime],[],[])
 
+# check for asprintf
+AC_CHECK_FUNCS([asprintf],[],[])
 
 
 
