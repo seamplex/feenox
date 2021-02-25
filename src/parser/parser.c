@@ -2968,12 +2968,10 @@ int feenox_parse_phase_space(void) {
 
 int feenox_parse_read_mesh(void) {
   
-  char *token = NULL;
-  mesh_t *mesh;
-
   // TODO: api?
-  mesh = calloc(1, sizeof(mesh_t));
-  
+  mesh_t *mesh = calloc(1, sizeof(mesh_t));
+
+  char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
 ///kw+MESH_READ+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
@@ -2989,12 +2987,15 @@ int feenox_parse_read_mesh(void) {
 ///kw+MESH_READ+usage FILE { <file_path> | <file_id> }
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
       feenox_call(feenox_parser_file(&mesh->file));
+      if (mesh->file->mode == NULL) {
+        mesh->file->mode = strdup("r");
+      }
     
 ///kw+MESH_READ+usage [ NAME <name> ]
 ///kw+MESH_READ+detail If there will be only one mesh in the input file, the `NAME` is optional. 
 ///kw+MESH_READ+detail Yet it might be needed in cases where there are many meshes and one needs to refer to a particular mesh,
 ///kw+MESH_READ+detail such as in `MESH_WRITE` or `INTEGRATE`.
-    } if (strcasecmp(token, "NAME") == 0) {
+    } else if (strcasecmp(token, "NAME") == 0) {
       feenox_call(feenox_parser_string(&mesh->name));
           
 ///kw+MESH_READ+detail The spatial dimensions cab be given with `DIMENSION`.
@@ -3025,31 +3026,32 @@ int feenox_parse_read_mesh(void) {
       feenox_call(feenox_parser_expression(&mesh->offset_y));
       feenox_call(feenox_parser_expression(&mesh->offset_z));
 
-///kw+MESH_READ+usage [ INTEGRATION { full | reduced } ]
+///kw+MESH_READ+usage [ INTEGRATION { full | reduced } ]@
     } else if (strcasecmp(token, "INTEGRATION") == 0) {
       char *keywords[] = {"full", "reduced", ""};
       int values[] = {integration_full, integration_reduced, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
 
+///kw+MESH_READ+detail When defining several meshes and solving a PDE problem, the mesh used
+///kw+MESH_READ+detail as the PDE domain is the one marked with `MAIN`.
+///kw+MESH_READ+detail If none of the meshes is explicitly marked as main, the first one is used.
+///kw+MESH_READ+usage [ MAIN ]
+    } else if (strcasecmp(token, "MAIN") == 0) {
+      feenox.mesh.mesh_main = mesh;
+
 ///kw+MESH_READ+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
-///kw+MESH_READ+detail each time step. Default is to read the mesh once.          
+///kw+MESH_READ+detail each time step. Default is to read the mesh once, except if the file path changes with time.
 ///kw+MESH_READ+usage [ UPDATE_EACH_STEP ]@
     } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
       mesh->update_each_step = 1;
 
-///kw+MESH_READ+detail When defining several meshes and solving a PDE problem, the mesh used
-///kw+MESH_READ+detail as the PDE domain is the one marked with `MAIN`.
-///kw+MESH_READ+detail If none of the meshes is explicitly marked as main, the first one is used.
-///kw+MESH_READ+usage [ MAIN ]@
-    } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
-      mesh->update_each_step = 1;
 
 ///kw+MESH_READ+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
 ///kw+MESH_READ+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
 ///kw+MESH_READ+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
 ///kw+MESH_READ+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
 ///kw+MESH_READ+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
-    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION")) {
+    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0) {
 
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
 
@@ -3101,8 +3103,11 @@ int feenox_parse_read_mesh(void) {
       return FEENOX_ERROR;
     }
   }
-  // TODO: check that the name does not clash
-
+///kw+MESH_READ+detail If no mesh is marked as `MAIN`, the first one is the main one.
+  if (feenox.mesh.meshes == NULL) {
+    feenox.mesh.mesh_main = mesh;
+  }
+  
   if (mesh->file == NULL) {
     feenox_push_error_message("no FILE given for READ_MESH");
     return FEENOX_ERROR;
@@ -3110,34 +3115,29 @@ int feenox_parse_read_mesh(void) {
 
   char *ext = strrchr(mesh->file->format, '.');
   if (ext == NULL) {
-    feenox_push_error_message("no extension and no FORMAT given", ext);
+    feenox_push_error_message("no file extension given", ext);
     return FEENOX_ERROR;
   }
 
+  // TODO: pointer to reader function
   if (strncasecmp(ext, ".msh", 4) == 0 ||
       strncasecmp(ext, ".msh2", 5) == 0 ||
       strncasecmp(ext, ".msh4", 5) == 0) {
-    mesh->format = mesh_format_gmsh;
+    mesh->reader = feenox_mesh_read_gmsh;
   } else if (strcasecmp(ext, ".vtk") == 0) {
-    mesh->format = mesh_format_vtk;
+    mesh->reader = feenox_mesh_read_vtk;
   } else if (strcasecmp(ext, ".frd") == 0) {
-    mesh->format = mesh_format_frd;
+    mesh->reader = feenox_mesh_read_frd;
   } else {
-    feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
+    feenox_push_error_message("unknown extension '%s'", ext);
     return FEENOX_ERROR;
   }
 
-  if (feenox.mesh.meshes == NULL) {
-    feenox.mesh.mesh_main = mesh;
-  }
-  
   // TODO: API?
   if (feenox_get_mesh_ptr(mesh->name) != NULL) {
     feenox_push_error_message("there already exists a mesh named '%s'", mesh->name);
     return FEENOX_ERROR;
   }
-  
-
   HASH_ADD_KEYPTR(hh, feenox.mesh.meshes, mesh->name, strlen(mesh->name), mesh);
   feenox_call(feenox_add_instruction(feenox_instruction_mesh_read, mesh));
   

@@ -1,1 +1,1 @@
-READ_MESH FILE mesh2d.msh
+READ_MESH FILE square.msh

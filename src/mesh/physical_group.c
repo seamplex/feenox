@@ -24,7 +24,7 @@
 extern feenox_t feenox;
 
 
-
+// TODO: return int here and make another one _get_ptr
 physical_group_t *feenox_define_physical_group(mesh_t *new_mesh, const char *name, int dimension) {
   char *dummy_aux = NULL;
   physical_group_t *physical_group;

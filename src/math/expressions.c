@@ -102,7 +102,7 @@ int feenox_count_arguments(char *string, size_t *n_chars) {
 }
 
 
-int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars) {
+int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, size_t *n_chars) {
 
   if (strchr(string, '(') == NULL) {
     feenox_push_error_message("arguments must start with a parenthesis");

@@ -1011,13 +1011,6 @@ struct mesh_t {
   int initialized;
   
   file_t *file;
-  enum  {
-    mesh_format_fromextension,
-    mesh_format_gmsh,
-    mesh_format_vtk,
-    mesh_format_frd,
-  } format;
-  
   unsigned int dim;
   unsigned int dim_topo;
 
@@ -1078,6 +1071,9 @@ struct mesh_t {
   void *kd_cells;
 
   element_t *last_chosen_element;     // interpolation cache
+
+  // "virtual method" for format-dependet reader
+  int (*reader)(mesh_t *this);
   
   UT_hash_handle hh;
 
@@ -1378,7 +1374,7 @@ extern int feenox_function_set_expression(const char *name, const char *expressi
 
 extern int feenox_define_file(const char *name, const char *format, unsigned int n_args, const char *mode);
 extern int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression);
-externr file_t *feenox_get_or_define_file_get_ptr(const char *name);
+extern file_t *feenox_get_or_define_file_get_ptr(const char *name);
 
 extern var_t *feenox_get_or_define_variable_get_ptr(const char *name);
 extern var_t *feenox_define_variable_get_ptr(const char *name);

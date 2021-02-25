@@ -39,7 +39,6 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
   size_t first, second; // this are buffers because 4.0 and 4.1 swapped tag,dim to dim,tag
   size_t type, physical;
   size_t node, node_index;
-//  size_t cell_id;
   size_t ntags;
   size_t tag_min = 0;
   size_t tag_max = 0;
@@ -56,7 +55,7 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
     // ------------------------------------------------------  
     } else if (strncmp("$MeshFormat", buffer, 11) == 0) {
   
-      // la version
+      // version
       if (fscanf(mesh->file->pointer, "%s", buffer) == 0) {
         return FEENOX_ERROR;
       }
@@ -74,7 +73,7 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
         return FEENOX_ERROR;
       }
   
-      // el tipo (0 = ASCII)
+      // type (ASCII int; 0 for ASCII mode, 1 for binary mode)
       if (fscanf(mesh->file->pointer, "%s", buffer) == 0) {
         return FEENOX_ERROR;
       }
@@ -83,23 +82,19 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
         return FEENOX_ERROR;
       }
   
-      // el tamano de un double es irrelevante en ASCII
+      // the size of the floating-point numbers are irrelevant in ASCII mode
+      // (ASCII int; sizeof(size_t))
       if (fscanf(mesh->file->pointer, "%s", buffer) == 0) {
         return FEENOX_ERROR;
       }
-/*      
-      if (strcmp("8", buffer) != 0) {
-        feenox_push_error_message("mesh '%s' has an incompatible data size '%s', only 8-byte files are supported", mesh->file->path, buffer);
-        return FEENOX_ERROR;
-      }
-*/
-      // el newline
+      
+      // newline
       if (fgets(buffer, BUFFER_LINE_SIZE-1, mesh->file->pointer) == NULL) {
         feenox_push_error_message("corrupted mesh '%s'", mesh->file->path);
         return FEENOX_ERROR;
       } 
       
-      // la linea $EndMeshFormat
+      // line $EndMeshFormat
       if (fgets(buffer, BUFFER_LINE_SIZE-1, mesh->file->pointer) == NULL) {
         feenox_push_error_message("corrupted mesh '%s'", mesh->file->path);
         return FEENOX_ERROR;
@@ -112,10 +107,10 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
     // ------------------------------------------------------      
     } else if (strncmp("$PhysicalNames", buffer, 14) == 0) {
 
-      // si hay physical names entonces definimos implicitamente physical
-      // groups (si es que no existen ya, si existen chequeamos los ids)
+      // if there are physical names then we define implicitly each group
+      // if they already exist we check the ids
 
-      // la cantidad de cosas
+      // number of names
       if (fscanf(mesh->file->pointer, "%d", &mesh->n_physical_names) == 0) {
         return FEENOX_ERROR;
       }
@@ -146,21 +141,22 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
         name = strdup(dummy+1);
        
         if ((physical_group = feenox_get_physical_group_ptr(mesh, name)) == NULL) {
-          // creamos una de prepo
+          // create new physical group
           if ((physical_group = feenox_define_physical_group(mesh, name, dimension)) == NULL) {
             return FEENOX_ERROR;
           }
+          // TODO: api, set tag
           physical_group->tag = tag;
         } else {
-          // verificamos que no tenga id numerica
+          // there already exists a physical group created with PHYSICAL_GROUP
+          // check that either it does not have a tag or the tags coincide
           if (physical_group->tag == 0) {
             physical_group->tag = tag;
           } else if (physical_group->tag != tag) {
-            // o que tenga la correcta
             feenox_push_error_message("physical group '%s' has tag %d in input and %d in mesh '%s'", name, physical_group->tag, tag, mesh->name);
             return FEENOX_ERROR;
           }
-          // y la dimension correcta
+          // same for the dimension
           if (physical_group->dimension <= 0) {
             // si tiene 0 le ponemos la que acabamos de leer
             physical_group->dimension = dimension;
@@ -172,16 +168,15 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
           
         }
 
-        // agregamos la group a un hash local para despues
-        // resolver el apuntador desde cada elemento "mas o menos" facil
+        // add the group to a local hash so we can solve the pointer
+        // "more or less" easy
         HASH_ADD(hh_tag[dimension], mesh->physical_groups_by_tag[dimension], tag, sizeof(int), physical_group);
 
-        // si la physical group no tiene material, buscamos uno que se llame igual
+        // if the physical group does not have a material, look for one with the same name
         if (physical_group->material == NULL) {
-          // si es NULL es porque la physical group es una BC o algo,
-          // pero eso no nos molesta, las BCs las vemos despues
           HASH_FIND_STR(feenox.mesh.materials, name, physical_group->material);
         }
+        // TODO: same for BCs
 
         free(name);
 

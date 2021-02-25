@@ -266,14 +266,14 @@ int feenox_matrix_attach_data(const char *name, expr_t *datas) {
   return FEENOX_OK;
 }
 
-function_t *feenox_define_function_get_ptr(const char *name, int n_arguments) {
+function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments) {
   if (feenox_define_function(name, n_arguments) != FEENOX_OK) {
     return NULL;
   }
   return feenox_get_function_ptr(name);
 }
 
-int feenox_define_function(const char *name, int n_arguments) {
+int feenox_define_function(const char *name, unsigned int n_arguments) {
   
   function_t *function;
 
@@ -298,7 +298,7 @@ int feenox_define_function(const char *name, int n_arguments) {
   return FEENOX_OK;
 }
 
-int feenox_function_set_argument_variable(const char *name, int i, const char *variable_name) {
+int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name) {
   
   function_t *function;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
@@ -342,7 +342,7 @@ int feenox_function_set_expression(const char *name, const char *expression) {
 
 
 
-int feenox_define_file(const char *name, const char *format, int n_format_args, const char *mode) {
+int feenox_define_file(const char *name, const char *format, unsigned int n_format_args, const char *mode) {
 
   file_t *file;
 
@@ -357,7 +357,7 @@ int feenox_define_file(const char *name, const char *format, int n_format_args, 
   file->format = strdup(format);
   file->n_format_args = n_format_args;
   file->arg = calloc(file->n_format_args, sizeof(expr_t *));
-  if (mode != NULL) {
+  if (mode != NULL && strcmp(mode, "") == 0) {
     file->mode = strdup(mode);
   }
 
@@ -366,10 +366,12 @@ int feenox_define_file(const char *name, const char *format, int n_format_args, 
   return FEENOX_OK;
 }
 
-file_t *feenox_get_or_define_file(const char *name) {
+file_t *feenox_get_or_define_file_get_ptr(const char *name) {
   file_t *file;
   if ((file = feenox_get_file_ptr(name)) == NULL) {
-    feenox_call(feenox_define_file(name, name, 0, ""));
+    if (feenox_define_file(name, name, 0, "") != FEENOX_OK) {
+      return NULL;
+    }
     if ((file = feenox_get_file_ptr(name)) == NULL) {
       return NULL;
     }
@@ -379,7 +381,7 @@ file_t *feenox_get_or_define_file(const char *name) {
 
 
 
-int feenox_file_set_path_argument(const char *name, int i, const char *expression) {
+int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression) {
   
   file_t *file;
   if ((file = feenox_get_file_ptr(name)) == NULL) {

@@ -305,31 +305,15 @@ int feenox_parser_file(file_t **file) {
   }
 
   if ((*file = feenox_get_file_ptr(token)) == NULL) {
-    feenox_push_error_message("undefined file identifier '%s'", token);
-    return FEENOX_ERROR;
+    feenox_call(feenox_define_file(token, token, 0, NULL));
+    if ((*file = feenox_get_file_ptr(token)) == NULL) {
+      return FEENOX_ERROR;
+    }
   }
-  
-  // XXXXX
-  
   return FEENOX_OK;
 }
 
 /*
-int feenox_parser_file_path(file_t **file, char *mode) {
-  
-  char *token;
-  if (feenox_parser_string(&token) != FEENOX_OK) {
-    return FEENOX_ERROR;
-  };
-  
-  if ((*file = feenox_define_file(token, token, 0, NULL, mode, 0)) == NULL) {
-    return WASORA_RUNTIME_ERROR;
-  }
-  free(token);
-  
-  return FEENOX_OK;
-}
-
 int feenox_parser_function(function_t **function) {
   
   char *token;
