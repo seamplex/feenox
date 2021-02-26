@@ -36,7 +36,7 @@
 
 
 char wasora_debug_help[] = "\
-wasora's debug mode available commands:\n\
+feenox's debug mode available commands:\n\
 step | {empty line}             advance a single step\n\
 continue                        continue with the execution\n\
 help                            print this help\n\

@@ -55,8 +55,8 @@ int feenox_instruction_mesh_read(void *arg) {
   
   // sweep nodes ande define the bounding box
   // TODO: see if this can go inside one of the kd loops
-  this->bounding_box_min.index_mesh = -1;
-  this->bounding_box_max.index_mesh = -1;
+  this->bounding_box_min.index_mesh = SIZE_MAX;
+  this->bounding_box_max.index_mesh = SIZE_MAX;
   this->bounding_box_min.index_dof = NULL;
   this->bounding_box_max.index_dof = NULL;
   this->bounding_box_min.associated_elements = NULL;
@@ -120,7 +120,7 @@ int feenox_instruction_mesh_read(void *arg) {
   physical_group_t *physical_group;
   for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->n_elements != 0) {
-      physical_group->element = malloc(physical_group->n_elements * sizeof(int));
+      feenox_check_alloc(physical_group->element = malloc(physical_group->n_elements * sizeof(size_t)));
     }
     // check out what the highest tag is to allocate temporary arrays
     if (physical_group->tag > this->physical_tag_max) {
@@ -168,9 +168,9 @@ int feenox_instruction_mesh_read(void *arg) {
     
   // fill an array of nodes that can be used as arguments of functions
   // TODO: put this in another loop?
-  this->nodes_argument = malloc(this->dim * sizeof(double *));
+  feenox_check_alloc(this->nodes_argument = malloc(this->dim * sizeof(double *)));
   for (d = 0; d < this->dim; d++) {
-    this->nodes_argument[d] = malloc(this->n_nodes * sizeof(double));
+    feenox_check_alloc(this->nodes_argument[d] = malloc(this->n_nodes * sizeof(double)));
     for (j = 0; j < this->n_nodes; j++) {
       this->nodes_argument[d][j] = this->node[j].x[d]; 
     }

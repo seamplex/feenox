@@ -172,6 +172,10 @@ enum version_type {
 #define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
 #endif
 
+// macro to check malloc() for NULL (ass means assignement, you ass!)
+#define feenox_check_alloc(ass)      if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
+#define feenox_check_alloc_null(ass) if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return NULL; }
+
 // macro to access internal special variables
 #define feenox_special_var(var) (feenox.special_vars.var)
 
@@ -183,9 +187,6 @@ enum version_type {
 
 // pointer to the content of an object
 #define feenox_value_ptr(obj)  (obj->value)
-
-// check return value of alloc/calloc
-#define feenox_check_alloc(a,b)  if ((a) == NULL) { feenox_push_error_message("memory allocation error"); return b; }
 
 
 
@@ -799,15 +800,15 @@ struct node_data_t {
 };
 
 struct node_relative_t {
-  int index;
+  size_t index;
   node_relative_t *next;
 };
 
 
 struct physical_group_t {
   char *name;
-  int tag;
-  int dimension;
+  size_t tag;
+  unsigned int dimension;
   
   material_t *material;    // apuntador
   bc_t *bcs;               // linked list 
@@ -832,18 +833,19 @@ struct physical_group_t {
 
 
 struct geometrical_entity_t {
-  int tag;
+  size_t tag;
   double boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ;
-  int num_physicals;
-  int *physical;
-  int num_bounding;
-  int *bounding;
+  
+  size_t num_physicals;
+  size_t *physical;
+  size_t num_bounding;
+  size_t *bounding;
 
   UT_hash_handle hh[4];
 };
 
 struct elementary_entity_t {
-  int id;
+  size_t id;
   elementary_entity_t *next;
 };
 
@@ -1029,8 +1031,8 @@ struct mesh_t {
   unsigned points, curves, surfaces, volumes;
   geometrical_entity_t *geometrical_entities[4];     // 4 hash tables, one for each dimension
 
-  unsigned int sparse;         // flag that indicates if the nodes are sparse
-  unsigned int *tag2index;     // array to map tags to indexes
+  int sparse;                     // flag that indicates if the nodes are sparse
+  size_t *tag2index;     // array to map tags to indexes (we need a -1)
   
   enum {
     data_type_element,

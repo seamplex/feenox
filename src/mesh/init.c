@@ -57,11 +57,9 @@ int feenox_mesh_init_special_objects(void) {
   
   
   // idem para la normal
-/*  
-  feenox.mesh.vars.vec_n = feenox_define_vector("n_global", 3, NULL, NULL);
+  feenox.mesh.vars.vec_n = feenox_define_vector_get_ptr("n_global", 3);
   // como ahora hacemos alias de a los elementos del vector n_global lo inicializamos
   feenox_call(feenox_vector_init(feenox.mesh.vars.vec_n));
-*/
   
 //va+x+name nx
 //va+x+desc Holder variable for the local outward normal in surfaces.

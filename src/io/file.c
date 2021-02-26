@@ -19,30 +19,25 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#define _GNU_SOURCE
 #include "feenox.h"
 extern feenox_t feenox;
-
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-
-
 
 
 FILE *feenox_fopen(const char *filepath, const char *mode) {
   
   FILE *handle;
-  char *newtry;
-  
-  if ((handle = fopen(filepath, mode)) != NULL) {
-    return handle;
+  if ((handle = fopen(filepath, mode)) == NULL) {
+    // try harder! if the name does not start with a slash, prepend 
+    // the input file's directory to find files in the same directory 
+    if (filepath[0] != '/') {
+      char *last_attempt;
+      asprintf(&last_attempt, "%s/%s", feenox.main_input_dirname, filepath);
+      handle = fopen(last_attempt, mode);
+      free(last_attempt);
+    }
   }
   
-  newtry = malloc(strlen(feenox.main_input_dirname) + 1 + strlen(filepath) + 1);
-  snprintf(newtry, strlen(feenox.main_input_dirname) + 1 + strlen(filepath) + 1, "%s/%s", feenox.main_input_dirname, filepath);
-  
-  handle = fopen(newtry, mode);
-  free(newtry);
   return handle;
   
 }
@@ -143,14 +138,14 @@ int feenox_instruction_file_open(void *arg) {
       fclose(file->pointer);
       file->pointer = NULL;
     }
-    if (file->mode == NULL) {
+    if (file->mode == NULL || strcmp(file->mode, "") == 0) {
       feenox_push_error_message("unknown open mode for file '%s' ('%s')", file->name, file->path);
       return FEENOX_ERROR;
     }
     if ((file->pointer = feenox_fopen(file->path, file->mode)) == NULL) {
       feenox_push_error_message("'%s' when opening file '%s' with mode '%s'", strerror(errno), file->path, file->mode);
       return FEENOX_ERROR;
-    }
+    }  
   }
   
   free(newfilepath);

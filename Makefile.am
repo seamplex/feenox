@@ -13,6 +13,7 @@ TESTS = tests/abort.sh \
         tests/exp.sh \
         tests/expr.sh \
         tests/expressions_functions.sh \
+        tests/mesh2d.sh \
         tests/trig.sh
 
 all-local:

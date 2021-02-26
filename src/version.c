@@ -30,7 +30,6 @@ extern feenox_t feenox;
   -h, --help         display usage and commmand-line help and exit\n\
   -v, --version      display brief version information and exit\n\
   -V, --versions     display detailed version information\n\
-  -d, --debug.       start in debug mode\n\
   -s, --sumarize     list all symbols in the input file and exit\n\
 \n\
 Instructions will be read from standard input if “-” is passed as\n\

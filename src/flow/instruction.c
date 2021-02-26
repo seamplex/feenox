@@ -15,7 +15,7 @@ instruction_t *feenox_add_instruction_and_get_ptr(int (*routine)(void *), void *
     return NULL;
   }
   
-  feenox_check_alloc(instruction = calloc(1, sizeof(instruction_t)), NULL);
+  feenox_check_alloc_null(instruction = calloc(1, sizeof(instruction_t)));
       
   instruction->routine = routine;
   instruction->argument = argument;
