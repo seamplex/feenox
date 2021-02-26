@@ -1398,10 +1398,9 @@ extern builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const cha
 extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name);
 
 extern file_t *feenox_get_file_ptr(const char *name);
-
-mesh_t *feenox_get_mesh_ptr(const char *name);
-material_t *feenox_get_material_ptr(const char *name);
-physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name);
+extern mesh_t *feenox_get_mesh_ptr(const char *name);
+extern material_t *feenox_get_material_ptr(const char *name);
+extern physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name);
 
 
 // assignment.c
@@ -1449,10 +1448,10 @@ extern double feenox_gsl_function(double x, void *params);
 // mesh.c
 extern int feenox_instruction_mesh_read(void *arg);
 
-extern int feenox_mesh_free(mesh_t *mesh);
-extern int feenox_mesh_read_gmsh(mesh_t *mesh);
-extern int feenox_mesh_read_vtk(mesh_t *mesh);
-extern int feenox_mesh_read_frd(mesh_t *mesh);
+extern int feenox_mesh_free(mesh_t *this);
+extern int feenox_mesh_read_gmsh(mesh_t *this);
+extern int feenox_mesh_read_vtk(mesh_t *this);
+extern int feenox_mesh_read_frd(mesh_t *this);
 
 // physical_group.c
 extern physical_group_t *feenox_define_physical_group(mesh_t *mesh, const char *name, int dimension);
@@ -1462,26 +1461,27 @@ int feenox_mesh_element_types_init(void);
 
 // geom.c
 // TODO: rename mesh_* -> feenox_mesh_*
-extern void mesh_subtract(const double *a, const double *b, double *c);
-extern void mesh_cross(const double *a, const double *b, double *c);
-extern void mesh_normalized_cross(const double *a, const double *b, double *c);
-extern double mesh_cross_dot(const double *a, const double *b, const double *c);
-extern double mesh_subtract_cross_2d(const double *a, const double *b, const double *c);
-extern double mesh_dot(const double *a, const double *b);
-extern double mesh_subtract_dot(const double *b, const double *a, const double *c);
-extern double mesh_subtract_module(const double *b, const double *a);
-extern double mesh_subtract_squared_module(const  double *b, const  double *a);
-extern double mesh_subtract_squared_module2d(const  double *b, const  double *a);
-extern int mesh_compute_outward_normal(element_t *element, double *n);
+extern void feenox_mesh_subtract(const double *a, const double *b, double *c);
+extern void feenox_mesh_cross(const double *a, const double *b, double *c);
+extern void feenox_mesh_normalized_cross(const double *a, const double *b, double *c);
+extern double feenox_mesh_cross_dot(const double *a, const double *b, const double *c);
+extern double feenox_mesh_subtract_cross_2d(const double *a, const double *b, const double *c);
+extern double feenox_mesh_dot(const double *a, const double *b);
+extern double feenox_mesh_subtract_dot(const double *b, const double *a, const double *c);
+extern double feenox_mesh_subtract_module(const double *b, const double *a);
+extern double feenox_mesh_subtract_squared_module(const  double *b, const  double *a);
+extern double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a);
+
+extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
 
 // element.c
-extern int mesh_add_element_to_list(element_list_item_t **list, element_t *element);
-extern int mesh_compute_element_barycenter(element_t *this, double barycenter[]);
+extern int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *element);
+extern int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]);
 
 // vtk.c
-extern int mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
+extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
 
 // neighbors.c
-extern element_t *mesh_find_element_volumetric_neighbor(element_t *this);
+extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
 
 #endif    /* FEENOX_H  */

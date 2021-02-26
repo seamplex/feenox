@@ -127,7 +127,7 @@ int feenox_initialize(int argc, char **argv) {
   feenox.main_input_filepath = feenox.argv[feenox.optind];
   
   // remember the base directory of the input file so we can try harder to find files
-  feenox.main_input_dirname = dirname(strdup(argv[feenox.optind]));
+  feenox.main_input_dirname = strdup(dirname(argv[feenox.optind]));
   
   
   // turn of GSL error handler
@@ -398,18 +398,6 @@ int feenox_init_after_parser(void) {
   // autocompletion
   rl_attempted_completion_function = feenox_rl_completion;
 #endif
-  
-  // inicializamos plugins
-  for (i = 0; i < feenox.i_plugin; i++) {
-    if (feenox.plugin[i].init_after_parser() != 0) {
-      feenox_push_error_message("%s:", feenox.plugin[i].name_string);
-      return WASORA_RUNTIME_ERROR;
-    }
-  }
-  
-  // algunas cosas (por ejempo inteprolacion de funciones) se inicializan bajo
-  // demanda, i.e. la primera vez que se necesita evaluar una funcion interpolada
-  // se hace el init en tiempo de ejecucion
   
   return WASORA_RUNTIME_OK;
 }

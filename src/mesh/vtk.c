@@ -72,7 +72,7 @@ int mesh_vtk_write_header(FILE *file) {
 
 int mesh_vtk_write_mesh(mesh_t *mesh, int dummy, FILE *file) {
   
-  feenox_call(mesh_vtk_write_unstructured_mesh(mesh, file));
+  feenox_call(feenox_mesh_vtk_write_unstructured_mesh(mesh, file));
   
   return FEENOX_OK;
 }

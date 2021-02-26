@@ -22,11 +22,8 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-
-//#include <gsl/gsl_math.h>
-
 // c = b - a
-void mesh_subtract(const double *a, const double *b, double *c) {
+void feenox_mesh_subtract(const double *a, const double *b, double *c) {
   c[0] = b[0] - a[0];
   c[1] = b[1] - a[1];
   c[2] = b[2] - a[2];
@@ -34,7 +31,7 @@ void mesh_subtract(const double *a, const double *b, double *c) {
 }
 
 // c = a \times b
-void mesh_cross(const double *a, const double *b, double *c) {
+void feenox_mesh_cross(const double *a, const double *b, double *c) {
   c[0] = a[1]*b[2] - a[2]*b[1];
   c[1] = a[2]*b[0] - a[0]*b[2];
   c[2] = a[0]*b[1] - a[1]*b[0];
@@ -42,7 +39,7 @@ void mesh_cross(const double *a, const double *b, double *c) {
 }
 
 // c = a \times b / | a \times b |
-void mesh_normalized_cross(const double *a, const double *b, double *c) {
+void feenox_mesh_normalized_cross(const double *a, const double *b, double *c) {
   double norm;
   c[0] = a[1]*b[2] - a[2]*b[1];
   c[1] = a[2]*b[0] - a[0]*b[2];
@@ -57,45 +54,48 @@ void mesh_normalized_cross(const double *a, const double *b, double *c) {
   return;
 }
 
-// devuelve ( (a \times b) \cdot c ) en tres dimensiones
-double mesh_cross_dot(const double *a, const double *b, const double *c) {
+// ( (a \times b) \cdot c ) in 3D
+double feenox_mesh_cross_dot(const double *a, const double *b, const double *c) {
   return c[0]*(a[1]*b[2] - a[2]*b[1]) + c[1]*(a[2]*b[0] - a[0]*b[2]) + c[2]*(a[0]*b[1] - a[1]*b[0]);
 }
 
 
-// devuelve ( (b-a) \times (c-a)) ) en dos dimensiones
-double mesh_subtract_cross_2d(const double *a, const double *b, const double *c) {
+// ( (b-a) \times (c-a)) ) in 2d
+double feenox_mesh_subtract_cross_2d(const double *a, const double *b, const double *c) {
   return a[0]*(b[1]-c[1]) + b[0]*(c[1]-a[1]) + c[0]*(a[1]-b[1]);
 }
 
-// devuelve el producto escalar entre a y b
-double mesh_dot(const double *a, const double *b) {
+// scalar product between a and b
+double feenox_mesh_dot(const double *a, const double *b) {
   return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 }
 
-// devuelve el producto escalar entre (b-a) y c
-double mesh_subtract_dot(const double *b, const double *a, const double *c) {
+// scalar product between (b-a) y c
+double feenox_mesh_subtract_dot(const double *b, const double *a, const double *c) {
   return (b[0]-a[0])*c[0] + (b[1]-a[1])*c[1] + (b[2]-a[2])*c[2];
 }
 
-// devuelve el modulo de (b-a)
-double mesh_subtract_module(const double *b, const double *a) {
+// module of (b-a)
+double feenox_mesh_subtract_module(const double *b, const double *a) {
   return gsl_hypot3(b[0]-a[0], b[1]-a[1], b[2]-a[2]);
 }
 
-// devuelve el modulo al cuadrado de (b-a)
-double mesh_subtract_squared_module(const  double *b, const  double *a) {
-  return (b[0]-a[0])*(b[0]-a[0]) + (b[1]-a[1])*(b[1]-a[1]) + (b[2]-a[2])*(b[2]-a[2]);
+// squared module al cuadrado de (b-a)
+double feenox_mesh_subtract_squared_module(const  double *b, const  double *a) {
+  double dx = (b[0]-a[0]);
+  double dy = (b[1]-a[1]);
+  double dz = (b[2]-a[2]);
+  return dx*dx + dy*dy + dz*dz;
 }
 
-// devuelve el modulo al cuadrado de (b-a)
-double mesh_subtract_squared_module2d(const  double *b, const  double *a) {
+// squared module of (b-a)
+double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a) {
   return (b[0]-a[0])*(b[0]-a[0]) + (b[1]-a[1])*(b[1]-a[1]);
 }
 
 
 // TODO: make a faster one assuming the elements are already oriented
-int mesh_compute_outward_normal(element_t *element, double *n) {
+int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   
   double a[3], b[3], surface_center[3], volumetric_neighbor_center[3];
   element_t *volumetric_neighbor;
@@ -106,7 +106,7 @@ int mesh_compute_outward_normal(element_t *element, double *n) {
   } else if (element->type->dim == 1) {
 
     // OJO que no camina con lineas que no estan en el plano xy!!
-    double module = mesh_subtract_module(element->node[1]->x, element->node[0]->x);
+    double module = feenox_mesh_subtract_module(element->node[1]->x, element->node[0]->x);
     n[0] = -(element->node[1]->x[1] - element->node[0]->x[1])/module;
     n[1] = +(element->node[1]->x[0] - element->node[0]->x[0])/module;
     n[2] = 0;
@@ -114,9 +114,9 @@ int mesh_compute_outward_normal(element_t *element, double *n) {
   } else if (element->type->dim == 2) {
     
     // este algoritmo viene de sn_elements_compute_outward_normal
-    mesh_subtract(element->node[0]->x, element->node[1]->x, a);
-    mesh_subtract(element->node[0]->x, element->node[2]->x, b);
-    mesh_normalized_cross(a, b, n);
+    feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
+    feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
+    feenox_mesh_normalized_cross(a, b, n);
 
   } else if (element->type->dim == 3) {
     feenox_push_error_message("trying to compute the outward normal of a volume (element %d)", element->tag);
@@ -126,20 +126,20 @@ int mesh_compute_outward_normal(element_t *element, double *n) {
   
   // ahora tenemos que ver si la normal que elegimos es efectivamente la outward
   // para eso primero calculamos el centro del elemento de superficie
-  feenox_call(mesh_compute_element_barycenter(element, surface_center));
+  feenox_call(feenox_mesh_compute_element_barycenter(element, surface_center));
 
   // y despues el centro del elemento de volumen
-  if ((volumetric_neighbor = mesh_find_element_volumetric_neighbor(element)) == NULL) {
+  if ((volumetric_neighbor = feenox_mesh_find_element_volumetric_neighbor(element)) == NULL) {
     feenox_push_error_message("cannot find any volumetric neighbor for surface element %d", element->tag);
     return FEENOX_ERROR;
   }
     
-  volumetric_neighbor = mesh_find_element_volumetric_neighbor(element);
-  feenox_call(mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
+  volumetric_neighbor = feenox_mesh_find_element_volumetric_neighbor(element);
+  feenox_call(feenox_mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
 
   // calculamos el producto entre la normal propuesta y la resta de estos dos vectores
   // si elegimos la otra direccion, la damos tavuel
-  if (mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
+  if (feenox_mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
     n[0] = -n[0];
     n[1] = -n[1];
     n[2] = -n[2];

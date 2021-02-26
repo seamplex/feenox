@@ -216,7 +216,7 @@ int feenox_mesh_element_types_init(void) {
   
 };
 
-int mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V) {
+int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V) {
 
   int v;
   int dim = (element_type->dim != 0) ? element_type->dim : 1;
@@ -238,7 +238,7 @@ int mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V) {
   
 }
 
-int mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type) {
+int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type) {
   
   int v, j, m;
   
@@ -258,7 +258,7 @@ int mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type) {
 
 
 // esta no rellena los nodos!
-int mesh_create_element(element_t *element, int index, int tag, int type, physical_group_t *physical_group) {
+int feenox_mesh_create_element(element_t *element, int index, int tag, int type, physical_group_t *physical_group) {
  
   element->index = index;
   element->tag = tag;
@@ -269,7 +269,7 @@ int mesh_create_element(element_t *element, int index, int tag, int type, physic
   return FEENOX_OK;
 }
 
-int mesh_add_element_to_list(element_list_item_t **list, element_t *element) {
+int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *element) {
   
   element_list_item_t *item = calloc(1, sizeof(element_list_item_t));
   item->element = element;
@@ -279,7 +279,7 @@ int mesh_add_element_to_list(element_list_item_t **list, element_t *element) {
   
 }
 
-int mesh_add_material_to_list(material_list_item_t **list, material_t *material) {
+int feenox_mesh_add_material_to_list(material_list_item_t **list, material_t *material) {
   
   material_list_item_t *item;
   
@@ -298,7 +298,7 @@ int mesh_add_material_to_list(material_list_item_t **list, material_t *material)
   
 }
 
-int mesh_compute_element_barycenter(element_t *this, double barycenter[]) {
+int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]) {
   
   int j;
   

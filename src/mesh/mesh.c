@@ -26,17 +26,6 @@ int feenox_instruction_mesh_read(void *arg) {
 
   mesh_t *this = (mesh_t *)arg;
   
-//  function_t *function, *tmp_function;
-  element_list_item_t *associated_element;
-//  element_t *element;
-  node_data_t *node_data;
-//  int i, j, d, v;
-  int first_neighbor_nodes;
-  double scale_factor;
-  double offset[3];
-//  double vol;
-//  double cog[3];
-
   feenox_call(feenox_mesh_element_types_init());
   
   if (this->initialized) {
@@ -62,26 +51,25 @@ int feenox_instruction_mesh_read(void *arg) {
   this->bounding_box_min.associated_elements = NULL;
   this->bounding_box_max.associated_elements = NULL;
   
-  scale_factor = feenox_expression_eval(&this->scale_factor);
+  double scale_factor = feenox_expression_eval(&this->scale_factor);
+  double offset[3];
   offset[0] = feenox_expression_eval(&this->offset_x);
   offset[1] = feenox_expression_eval(&this->offset_y);
   offset[2] = feenox_expression_eval(&this->offset_z);
 
   double x_min[3];
   double x_max[3];
-  int d;
-  for (d = 0; d < 3; d++) {
-    x_min[d] = +MESH_INF;
-    x_max[d] = -MESH_INF;
+  for (unsigned int m = 0; m < 3; m++) {
+    x_min[m] = +MESH_INF;
+    x_max[m] = -MESH_INF;
   }
 
-  int j;  
   unsigned int dim = 0;
-  for (j = 0; j < this->n_nodes; j++) {
-    for (d = 0; d < 3; d++) {
-      if (scale_factor != 0 || offset[d] != 0) {
-        this->node[j].x[d] -= offset[d];
-        this->node[j].x[d] *= scale_factor;
+  for (size_t j = 0; j < this->n_nodes; j++) {
+    for (unsigned int m = 0; m < 3; m++) {
+      if (scale_factor != 0 || offset[m] != 0) {
+        this->node[j].x[m] -= offset[m];
+        this->node[j].x[m] *= scale_factor;
       }
       
       if (dim < 1 && fabs(this->node[j].x[0]) > MESH_TOL) {
@@ -94,11 +82,11 @@ int feenox_instruction_mesh_read(void *arg) {
         dim = 3;
       }
       
-      if (this->node[j].x[d] < x_min[d]) {
-        x_min[d] = this->bounding_box_min.x[d] = this->node[j].x[d];
+      if (this->node[j].x[m] < x_min[m]) {
+        x_min[m] = this->bounding_box_min.x[m] = this->node[j].x[m];
       }
-      if (this->node[j].x[d] > x_max[d]) {
-        x_max[d] = this->bounding_box_max.x[d] = this->node[j].x[d];
+      if (this->node[j].x[m] > x_max[m]) {
+        x_max[m] = this->bounding_box_max.x[m] = this->node[j].x[m];
       }
     }
   }
@@ -169,10 +157,10 @@ int feenox_instruction_mesh_read(void *arg) {
   // fill an array of nodes that can be used as arguments of functions
   // TODO: put this in another loop?
   feenox_check_alloc(this->nodes_argument = malloc(this->dim * sizeof(double *)));
-  for (d = 0; d < this->dim; d++) {
-    feenox_check_alloc(this->nodes_argument[d] = malloc(this->n_nodes * sizeof(double)));
-    for (j = 0; j < this->n_nodes; j++) {
-      this->nodes_argument[d][j] = this->node[j].x[d]; 
+  for (unsigned int m = 0; m < this->dim; m++) {
+    feenox_check_alloc(this->nodes_argument[m] = malloc(this->n_nodes * sizeof(double)));
+    for (size_t j = 0; j < this->n_nodes; j++) {
+      this->nodes_argument[m][j] = this->node[j].x[m]; 
     }
   }
   
@@ -196,6 +184,7 @@ int feenox_instruction_mesh_read(void *arg) {
   }
   
   // see if there was any un-read function
+  node_data_t *node_data;
   LL_FOREACH(this->node_datas, node_data) {
     if (node_data->function->mesh == NULL) {
       feenox_push_error_message("cannot find data for function '%s' in mesh '%s'", node_data->name_in_mesh, this->name);
@@ -267,10 +256,11 @@ int feenox_instruction_mesh_read(void *arg) {
   // create a k-dimensional tree and try to figure out what the maximum number of neighbours each node has
   if (this->kd_nodes == NULL) {
     this->kd_nodes = kd_create(this->dim);
-    for (j = 0; j < this->n_nodes; j++) {
+    for (size_t j = 0; j < this->n_nodes; j++) {
       kd_insert(this->kd_nodes, this->node[j].x, &this->node[j]);
     
-      first_neighbor_nodes = 1;  // el nodo mismo
+      size_t first_neighbor_nodes = 1;  // el nodo mismo
+      element_list_item_t *associated_element;
       LL_FOREACH(this->node[j].associated_elements, associated_element) {
         if (associated_element->element->type->dim == this->dim) {
           if (associated_element->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
@@ -289,7 +279,6 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }  
   
-  // esto es todo amigos!
   this->initialized = 1;
 
   return FEENOX_OK;

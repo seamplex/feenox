@@ -254,7 +254,7 @@ int mesh_point_in_triangle(element_t *element, const double *x) {
 
 double mesh_triang_vol(element_t *this) {
   if (this->volume == 0) {
-    this->volume = 0.5 * fabs(mesh_subtract_cross_2d(this->node[0]->x, this->node[1]->x, this->node[2]->x));
+    this->volume = 0.5 * fabs(feenox_mesh_subtract_cross_2d(this->node[0]->x, this->node[1]->x, this->node[2]->x));
   }  
   return this->volume;
 }

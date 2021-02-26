@@ -433,20 +433,20 @@ double mesh_prism_vol(element_t *this) {
     double a[3], b[3], c[3];
     double v1, v2, v3;
   
-    mesh_subtract(this->node[0]->x, this->node[1]->x, a);
-    mesh_subtract(this->node[0]->x, this->node[2]->x, b);
-    mesh_subtract(this->node[0]->x, this->node[3]->x, c);
-    v1 = fabs(mesh_cross_dot(a, b, c));
+    feenox_mesh_subtract(this->node[0]->x, this->node[1]->x, a);
+    feenox_mesh_subtract(this->node[0]->x, this->node[2]->x, b);
+    feenox_mesh_subtract(this->node[0]->x, this->node[3]->x, c);
+    v1 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-    mesh_subtract(this->node[4]->x, this->node[3]->x, a);
-    mesh_subtract(this->node[4]->x, this->node[5]->x, b);
-    mesh_subtract(this->node[4]->x, this->node[1]->x, c);
-    v2 = fabs(mesh_cross_dot(a, b, c));
+    feenox_mesh_subtract(this->node[4]->x, this->node[3]->x, a);
+    feenox_mesh_subtract(this->node[4]->x, this->node[5]->x, b);
+    feenox_mesh_subtract(this->node[4]->x, this->node[1]->x, c);
+    v2 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-    mesh_subtract(this->node[2]->x, this->node[3]->x, a);
-    mesh_subtract(this->node[2]->x, this->node[5]->x, b);
-    mesh_subtract(this->node[2]->x, this->node[1]->x, c);
-    v3 = fabs(mesh_cross_dot(a, b, c));
+    feenox_mesh_subtract(this->node[2]->x, this->node[3]->x, a);
+    feenox_mesh_subtract(this->node[2]->x, this->node[5]->x, b);
+    feenox_mesh_subtract(this->node[2]->x, this->node[1]->x, c);
+    v3 = fabs(feenox_mesh_cross_dot(a, b, c));
 
     this->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3);
   }

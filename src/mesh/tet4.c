@@ -420,11 +420,11 @@ double mesh_tet_vol(element_t *this) {
   if (this->volume == 0) {
     double a[3], b[3], c[3];
     
-    mesh_subtract(this->node[0]->x, this->node[1]->x, a);
-    mesh_subtract(this->node[0]->x, this->node[2]->x, b);
-    mesh_subtract(this->node[0]->x, this->node[3]->x, c);
+    feenox_mesh_subtract(this->node[0]->x, this->node[1]->x, a);
+    feenox_mesh_subtract(this->node[0]->x, this->node[2]->x, b);
+    feenox_mesh_subtract(this->node[0]->x, this->node[3]->x, c);
   
-    this->volume = 1.0/(1.0*2.0*3.0) * fabs(mesh_cross_dot(c, a, b));
+    this->volume = 1.0/(1.0*2.0*3.0) * fabs(feenox_mesh_cross_dot(c, a, b));
   }  
   
   return this->volume;

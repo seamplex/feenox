@@ -729,35 +729,35 @@ double mesh_hex_vol(element_t *element) {
    double a[3], b[3], c[3];
    double v1, v2, v3, v4, v5, v6;
    
-   mesh_subtract(element->node[0]->x, element->node[1]->x, a);
-   mesh_subtract(element->node[0]->x, element->node[3]->x, b);
-   mesh_subtract(element->node[0]->x, element->node[4]->x, c);
-   v1 = fabs(mesh_cross_dot(a, b, c));
+   feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
+   feenox_mesh_subtract(element->node[0]->x, element->node[3]->x, b);
+   feenox_mesh_subtract(element->node[0]->x, element->node[4]->x, c);
+   v1 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-   mesh_subtract(element->node[5]->x, element->node[4]->x, a);
-   mesh_subtract(element->node[5]->x, element->node[7]->x, b);
-   mesh_subtract(element->node[5]->x, element->node[1]->x, c);
-   v2 = fabs(mesh_cross_dot(a, b, c));
+   feenox_mesh_subtract(element->node[5]->x, element->node[4]->x, a);
+   feenox_mesh_subtract(element->node[5]->x, element->node[7]->x, b);
+   feenox_mesh_subtract(element->node[5]->x, element->node[1]->x, c);
+   v2 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-   mesh_subtract(element->node[3]->x, element->node[4]->x, a);
-   mesh_subtract(element->node[3]->x, element->node[7]->x, b);
-   mesh_subtract(element->node[3]->x, element->node[1]->x, c);
-   v3 = fabs(mesh_cross_dot(a, b, c));
+   feenox_mesh_subtract(element->node[3]->x, element->node[4]->x, a);
+   feenox_mesh_subtract(element->node[3]->x, element->node[7]->x, b);
+   feenox_mesh_subtract(element->node[3]->x, element->node[1]->x, c);
+   v3 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-   mesh_subtract(element->node[3]->x, element->node[1]->x, a);
-   mesh_subtract(element->node[3]->x, element->node[2]->x, b);
-   mesh_subtract(element->node[3]->x, element->node[7]->x, c);
-   v4 = fabs(mesh_cross_dot(a, b, c));
+   feenox_mesh_subtract(element->node[3]->x, element->node[1]->x, a);
+   feenox_mesh_subtract(element->node[3]->x, element->node[2]->x, b);
+   feenox_mesh_subtract(element->node[3]->x, element->node[7]->x, c);
+   v4 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-   mesh_subtract(element->node[5]->x, element->node[7]->x, a);
-   mesh_subtract(element->node[5]->x, element->node[6]->x, b);
-   mesh_subtract(element->node[5]->x, element->node[1]->x, c);
-   v5 = fabs(mesh_cross_dot(a, b, c));
+   feenox_mesh_subtract(element->node[5]->x, element->node[7]->x, a);
+   feenox_mesh_subtract(element->node[5]->x, element->node[6]->x, b);
+   feenox_mesh_subtract(element->node[5]->x, element->node[1]->x, c);
+   v5 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-   mesh_subtract(element->node[2]->x, element->node[7]->x, a);
-   mesh_subtract(element->node[2]->x, element->node[6]->x, b);
-   mesh_subtract(element->node[2]->x, element->node[1]->x, c);
-   v6 = fabs(mesh_cross_dot(a, b, c));
+   feenox_mesh_subtract(element->node[2]->x, element->node[7]->x, a);
+   feenox_mesh_subtract(element->node[2]->x, element->node[6]->x, b);
+   feenox_mesh_subtract(element->node[2]->x, element->node[1]->x, c);
+   v6 = fabs(feenox_mesh_cross_dot(a, b, c));
   
    element->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3+v4+v5+v6);
  }  

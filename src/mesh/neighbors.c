@@ -43,7 +43,7 @@ int mesh_count_common_nodes(element_t *e1, element_t *e2, int *nodes) {
   
 }
 
-element_t *mesh_find_element_volumetric_neighbor(element_t *this) {
+element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
   int j;
   int target;
   element_list_item_t *associated_element;
@@ -138,7 +138,8 @@ int mesh_find_neighbors(mesh_t *this) {
   
 }
 
-int mesh_fill_neighbors(mesh_t *mesh) {
+/*
+int feenox_mesh_fill_neighbors(mesh_t *mesh) {
   int i, j, k;
   double a[3], b[3], xi[3];
   double module;
@@ -186,7 +187,7 @@ int mesh_fill_neighbors(mesh_t *mesh) {
         case 2:
           // OJO! esto funciona solo en el plano x-y
           // esta es la longitud de la cara
-          module = mesh_subtract_module(mesh->cell[i].neighbor[j].face_coord[1], mesh->cell[i].neighbor[j].face_coord[0]);
+          module = feenox_mesh_subtract_module(mesh->cell[i].neighbor[j].face_coord[1], mesh->cell[i].neighbor[j].face_coord[0]);
         
           // proponemos uno de los dos vectores normales
           mesh->cell[i].neighbor[j].n_ij[0] = -(mesh->cell[i].neighbor[j].face_coord[1][1]-mesh->cell[i].neighbor[j].face_coord[0][1])/module;
@@ -195,7 +196,7 @@ int mesh_fill_neighbors(mesh_t *mesh) {
           
           // y vemos si el producto interno con el centro de la celda es positivo
           // si lo es, elegimos mal el vector normal y lo damos vuelta
-          if (mesh_subtract_dot(mesh->cell[i].x, mesh->cell[i].neighbor[j].x_ij, mesh->cell[i].neighbor[j].n_ij) > 0) {
+          if (feenox_mesh_subtract_dot(mesh->cell[i].x, mesh->cell[i].neighbor[j].x_ij, mesh->cell[i].neighbor[j].n_ij) > 0) {
             mesh->cell[i].neighbor[j].n_ij[0] = -mesh->cell[i].neighbor[j].n_ij[0];
             mesh->cell[i].neighbor[j].n_ij[1] = -mesh->cell[i].neighbor[j].n_ij[1];
           }
@@ -213,11 +214,11 @@ int mesh_fill_neighbors(mesh_t *mesh) {
           b[0] = mesh->cell[i].neighbor[j].face_coord[2][0] - mesh->cell[i].neighbor[j].face_coord[0][0];
           b[1] = mesh->cell[i].neighbor[j].face_coord[2][1] - mesh->cell[i].neighbor[j].face_coord[0][1];
           b[2] = mesh->cell[i].neighbor[j].face_coord[2][2] - mesh->cell[i].neighbor[j].face_coord[0][2];
-          mesh_normalized_cross(a, b, mesh->cell[i].neighbor[j].n_ij);
+          feenox_mesh_normalized_cross(a, b, mesh->cell[i].neighbor[j].n_ij);
           
           // y vemos si el producto interno con el centro de la celda es positivo
           // si lo es, elegimos mal el vector normal y lo damos vuelta
-          if (mesh_subtract_dot(mesh->cell[i].x, mesh->cell[i].neighbor[j].x_ij, mesh->cell[i].neighbor[j].n_ij) > 0) {
+          if (feenox_mesh_subtract_dot(mesh->cell[i].x, mesh->cell[i].neighbor[j].x_ij, mesh->cell[i].neighbor[j].n_ij) > 0) {
             mesh->cell[i].neighbor[j].n_ij[0] = -mesh->cell[i].neighbor[j].n_ij[0];
             mesh->cell[i].neighbor[j].n_ij[1] = -mesh->cell[i].neighbor[j].n_ij[1];
             mesh->cell[i].neighbor[j].n_ij[2] = -mesh->cell[i].neighbor[j].n_ij[2];
@@ -225,7 +226,7 @@ int mesh_fill_neighbors(mesh_t *mesh) {
           
           // el area de la cara
           // los vectores a y b ya los tenemos
-          mesh_cross(a, b, xi);
+          feenox_mesh_cross(a, b, xi);
           mesh->cell[i].neighbor[j].S_ij = 0.5 * gsl_hypot3(xi[0], xi[1], xi[2]);
           
           if (mesh->cell[i].element->type->nodes_per_face == 4) {
@@ -233,7 +234,7 @@ int mesh_fill_neighbors(mesh_t *mesh) {
             a[0] = mesh->cell[i].neighbor[j].face_coord[3][0] - mesh->cell[i].neighbor[j].face_coord[0][0];
             a[1] = mesh->cell[i].neighbor[j].face_coord[3][1] - mesh->cell[i].neighbor[j].face_coord[0][1];
             a[2] = mesh->cell[i].neighbor[j].face_coord[3][2] - mesh->cell[i].neighbor[j].face_coord[0][2];
-            mesh_cross(a, b, xi);
+            feenox_mesh_cross(a, b, xi);
             mesh->cell[i].neighbor[j].S_ij += 0.5 * gsl_hypot3(xi[0], xi[1], xi[2]);
           }
         break;
@@ -245,3 +246,4 @@ int mesh_fill_neighbors(mesh_t *mesh) {
   
   
 }
+*/
