@@ -76,7 +76,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
  
 ## Memory management
 
- * Check all `malloc()` calls for `NULL`.
+ * Check all `malloc()` calls for `NULL`. You can use the `feenox_check_alloc()/feenox_check_alloc_null()` macros.
  * Use `valgrind` to check for invalid memory access and leaks
  
     > Memory analysis tools such as valgrind can be useful, but don’t complicate a program merely to avoid their false alarms. For example, if memory is used until just before a process exits, don’t free it simply to silence such a tool. 

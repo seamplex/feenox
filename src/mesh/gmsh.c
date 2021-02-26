@@ -537,7 +537,7 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
           // el segundo es el id de la entidad geometrica (no nos interesa)
           // despues siguen cosas opcionales como particiones, padres, dominios, etc
           if (ntags > 0) {
-            tags = malloc(ntags * sizeof(int));
+            feenox_check_alloc(tags = malloc(ntags * sizeof(size_t)));
             for (size_t k = 0; k < ntags; k++) {
               if (fscanf(mesh->file->pointer, "%ld", &tags[k]) == 0) {
                 return FEENOX_ERROR;
