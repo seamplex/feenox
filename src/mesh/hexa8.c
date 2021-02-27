@@ -29,7 +29,7 @@ extern feenox_t feenox;
 // hexahedro de ocho nodos
 // --------------------------------------------------------------
 
-int mesh_hexa8_init(void) {
+int feenox_mesh_hexa8_init(void) {
   
   double r[3];
   element_type_t *element_type;
@@ -43,10 +43,10 @@ int mesh_hexa8_init(void) {
   element_type->nodes = 8;
   element_type->faces = 6;
   element_type->nodes_per_face = 4;
-  element_type->h = mesh_hexa8_h;
-  element_type->dhdr = mesh_hexa8_dhdr;
-  element_type->point_in_element = mesh_point_in_hexahedron;
-  element_type->element_volume = mesh_hex_vol;
+  element_type->h = feenox_mesh_hexa8_h;
+  element_type->dhdr = feenox_mesh_hexa8_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_hexahedron;
+  element_type->element_volume = feenox_mesh_hex_vol;
 
   // coordenadas de los nodos
 /*
@@ -116,7 +116,7 @@ Hexahedron:
   // gauss points and extrapolation matrices
   
   // full integration: 2x2x2
-  mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 8);
 
   for (j = 0; j < element_type->nodes; j++) {
@@ -125,12 +125,12 @@ Hexahedron:
     r[2] = M_SQRT3 * element_type->node_coords[j][2];
     
     for (v = 0; v < 8; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, mesh_hexa8_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa8_h(v, r));
     }
   }
   
   // reduced integration: 1
-  mesh_gauss_init_hexa1(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_hexa1(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
 
   for (j = 0; j < element_type->nodes; j++) {
@@ -141,26 +141,26 @@ Hexahedron:
 }
 
 
-void mesh_gauss_init_hexa1(element_type_t *element_type, gauss_t *gauss) {
+void feenox_mesh_gauss_init_hexa1(element_type_t *element_type, gauss_t *gauss) {
 
   // ---- one Gauss point  ----  
-  mesh_alloc_gauss(gauss, element_type, 1);
+  feenox_mesh_alloc_gauss(gauss, element_type, 1);
   
   gauss->w[0] = 8 * 1.0;
   gauss->r[0][0] = 0.0;
   gauss->r[0][1] = 0.0;
   gauss->r[0][2] = 0.0;
   
-  mesh_init_shape_at_gauss(gauss, element_type);  
+  feenox_mesh_init_shape_at_gauss(gauss, element_type);  
     
   return;
 }
 
 
-void mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss) {
+void feenox_mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss) {
 
   // ---- eight Gauss points  ----  
-  mesh_alloc_gauss(gauss, element_type, 8);
+  feenox_mesh_alloc_gauss(gauss, element_type, 8);
 
   gauss->w[0] = 8 * 1.0/8.0;
   gauss->r[0][0] = -1.0/M_SQRT3;
@@ -202,20 +202,20 @@ void mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss) {
   gauss->r[7][1] = +1.0/M_SQRT3;
   gauss->r[7][2] = +1.0/M_SQRT3;
   
-  mesh_init_shape_at_gauss(gauss, element_type);
+  feenox_mesh_init_shape_at_gauss(gauss, element_type);
   
   return;
 }
 
 
 
-void mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss) {
+void feenox_mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss) {
 
   double const w1 = 5.0/9.0;
   double const w2 = 8.0/9.0;
   
   // ---- one Gauss point  ----  
-  mesh_alloc_gauss(gauss, element_type, 27);
+  feenox_mesh_alloc_gauss(gauss, element_type, 27);
 
   
   //Reference https://www.code-aster.org/V2/doc/v11/en/man_r/r3/r3.01.01.pdf
@@ -357,14 +357,14 @@ void mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss) {
   gauss->r[26][2] =  0.0;
 
 
-  mesh_init_shape_at_gauss(gauss, element_type);
+  feenox_mesh_init_shape_at_gauss(gauss, element_type);
 
   return;
 }  
   
 
 
-double mesh_hexa8_h(int j, double *vec_r) {
+double feenox_mesh_hexa8_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -400,7 +400,7 @@ double mesh_hexa8_h(int j, double *vec_r) {
 
 }
 
-double mesh_hexa8_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_hexa8_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -518,7 +518,7 @@ double mesh_hexa8_dhdr(int j, int m, double *vec_r) {
 }
 
 
-int mesh_point_in_hexahedron(element_t *element, const double *x) {
+int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   
   double zero, one, lambda1, lambda2, lambda3, lambda4;
   gsl_vector *tetra_aux_index = gsl_vector_alloc(4);
@@ -721,7 +721,7 @@ int mesh_point_in_hexahedron(element_t *element, const double *x) {
 
 }
 
-double mesh_hex_vol(element_t *element) {
+double feenox_mesh_hex_vol(element_t *element) {
 
 
  if (element->volume == 0) {

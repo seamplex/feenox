@@ -31,7 +31,7 @@ extern feenox_t feenox;
 // --------------------------------------------------------------
 
 
-int mesh_line3_init(void) {
+int feenox_mesh_line3_init(void) {
 
   double r[1];
   element_type_t *element_type;
@@ -45,10 +45,10 @@ int mesh_line3_init(void) {
   element_type->nodes = 3;
   element_type->faces = 2;
   element_type->nodes_per_face = 1;
-  element_type->h = mesh_line3_h;
-  element_type->dhdr = mesh_line3_dhdr;
-  element_type->point_in_element = mesh_point_in_line;
-  element_type->element_volume = mesh_line_vol;
+  element_type->h = feenox_mesh_line3_h;
+  element_type->dhdr = feenox_mesh_line3_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_line;
+  element_type->element_volume = feenox_mesh_line_vol;
 
   // coordenadas de los nodos
 /*
@@ -76,26 +76,26 @@ Line3:
   // gauss points and extrapolation matrices
   
   // full integration: three points
-  mesh_gauss_init_line3(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_line3(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3);
   
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
     
     for (v = 0; v < 3; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, mesh_line3_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_line3_h(v, r));
     }
   }
   
   // reduced integration: two points
-  mesh_gauss_init_line2(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_line2(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 2);
   
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT3 * element_type->node_coords[j][0];
     
     for (v = 0; v < 2; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, mesh_line2_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_line2_h(v, r));
     }
   }
   
@@ -103,7 +103,7 @@ Line3:
   return FEENOX_OK;
 }
 
-double mesh_line3_h(int k, double *vec_r) {
+double feenox_mesh_line3_h(int k, double *vec_r) {
   double r = vec_r[0];
 
   // Gmsh ordering
@@ -123,7 +123,7 @@ double mesh_line3_h(int k, double *vec_r) {
 
 }
 
-double mesh_line3_dhdr(int k, int m, double *vec_r) {
+double feenox_mesh_line3_dhdr(int k, int m, double *vec_r) {
   double r = vec_r[0];
 
   switch(k) {

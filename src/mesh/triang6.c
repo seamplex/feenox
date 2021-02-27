@@ -24,7 +24,7 @@ extern feenox_t feenox;
 
 #include "element.h"
 
-int mesh_triang6_init(void) {
+int feenox_mesh_triang6_init(void) {
 
   double r[2];
   element_type_t *element_type;
@@ -38,10 +38,10 @@ int mesh_triang6_init(void) {
   element_type->nodes = 6;
   element_type->faces = 3;
   element_type->nodes_per_face = 3;
-  element_type->h = mesh_triang6_h;
-  element_type->dhdr = mesh_triang6_dhdr;
-  element_type->point_in_element = mesh_point_in_triangle;
-  element_type->element_volume = mesh_triang_vol;
+  element_type->h = feenox_mesh_triang6_h;
+  element_type->dhdr = feenox_mesh_triang6_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_triangle;
+  element_type->element_volume = feenox_mesh_triang_vol;
 
   // coordenadas de los nodos
 /*
@@ -89,11 +89,11 @@ Triangle6:
   // gauss points and extrapolation matrices
   
   // full integration: 3 points
-  mesh_gauss_init_triang3(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_triang3(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3);
 
   // reduced integration: 1 point
-  mesh_gauss_init_triang1(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_triang1(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
   
   // the two extrapolation matrices
@@ -101,37 +101,37 @@ Triangle6:
   r[0] = -1.0/3.0;
   r[1] = -1.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, j, mesh_triang3_h(j, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, j, feenox_mesh_triang3_h(j, r));
   }  
   
   r[0] = +5.0/3.0;
   r[1] = -1.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, j, mesh_triang3_h(j, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = -1.0/3.0;
   r[1] = +5.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, j, mesh_triang3_h(j, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = +2.0/3.0;
   r[1] = -1.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, j, mesh_triang3_h(j, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = +2.0/3.0;
   r[1] = +2.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 4, j, mesh_triang3_h(j, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 4, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = -1.0/3.0;
   r[1] = +2.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 5, j, mesh_triang3_h(j, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 5, j, feenox_mesh_triang3_h(j, r));
   }  
   
   // the reduced one is a vector of ones
@@ -143,7 +143,7 @@ Triangle6:
   return FEENOX_OK;    
 }
 
-double mesh_triang6_h(int j, double *vec_r) {
+double feenox_mesh_triang6_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
 
@@ -173,7 +173,7 @@ double mesh_triang6_h(int j, double *vec_r) {
 
 }
 
-double mesh_triang6_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_triang6_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
 

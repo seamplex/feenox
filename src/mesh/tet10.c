@@ -28,7 +28,7 @@ extern feenox_t feenox;
 // tetrahedro isoparametrico de cuatro nodos sobre el triangulo unitario
 // ---------------------------------------------------------------------
 
-int mesh_tet10_init(void) {
+int feenox_mesh_tet10_init(void) {
   
   element_type_t *element_type;
   double r[3];
@@ -43,10 +43,10 @@ int mesh_tet10_init(void) {
   element_type->nodes = 10;
   element_type->faces = 4;
   element_type->nodes_per_face = 6;
-  element_type->h = mesh_tet10_h;
-  element_type->dhdr = mesh_tet10_dhdr;
-  element_type->point_in_element = mesh_point_in_tetrahedron;
-  element_type->element_volume = mesh_tet_vol;
+  element_type->h = feenox_mesh_tet10_h;
+  element_type->dhdr = feenox_mesh_tet10_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_tetrahedron;
+  element_type->element_volume = feenox_mesh_tet_vol;
 
   // coordenadas de los nodos
 /*
@@ -126,11 +126,11 @@ Tetrahedron10:
   // gauss points and extrapolation matrices
   
   // full integration: 4 points
-  mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 4);
 
   // reduced integration: 1 point
-  mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
   
   // the two extrapolation matrices
@@ -143,70 +143,70 @@ Tetrahedron10:
   r[1] = c;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = d;
   r[1] = c;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = c;
   r[1] = d;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = c;
   r[1] = c;
   r[2] = d;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = 0.5*(c+d);
   r[1] = 0.5*(c+c);
   r[2] = 0.5*(c+c);
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 4, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 4, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = 0.5*(d+c);
   r[1] = 0.5*(c+d);
   r[2] = 0.5*(c+c);
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 5, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 5, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = 0.5*(c+c);
   r[1] = 0.5*(c+d);
   r[2] = 0.5*(c+c);
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 6, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 6, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = 0.5*(c+c);
   r[1] = 0.5*(c+c);
   r[2] = 0.5*(c+d);
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 7, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 7, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = 0.5*(c+c);
   r[1] = 0.5*(d+c);
   r[2] = 0.5*(c+d);
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 8, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 8, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = 0.5*(d+c);
   r[1] = 0.5*(c+c);
   r[2] = 0.5*(c+d);
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 9, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 9, v, feenox_mesh_tet4_h(v, r));
   }
   
   // reduced
@@ -217,7 +217,7 @@ Tetrahedron10:
   return FEENOX_OK;
 }
 
-double mesh_tet10_h(int j, double *vec_r) {
+double feenox_mesh_tet10_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -261,7 +261,7 @@ double mesh_tet10_h(int j, double *vec_r) {
 
 }
 
-double mesh_tet10_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_tet10_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];

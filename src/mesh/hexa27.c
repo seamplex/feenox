@@ -29,7 +29,7 @@ extern feenox_t feenox;
 // --------------------------------------------------------------
 // hexahedro de 27 nodos
 // --------------------------------------------------------------
-int mesh_hexa27_init(void) {
+int feenox_mesh_hexa27_init(void) {
   
   double r[3];
   element_type_t *element_type;
@@ -43,10 +43,10 @@ int mesh_hexa27_init(void) {
   element_type->nodes = 27;
   element_type->faces = 6;
   element_type->nodes_per_face = 9;
-  element_type->h = mesh_hexa27_h;
-  element_type->dhdr = mesh_hexa27_dhdr;
-  element_type->point_in_element = mesh_point_in_hexahedron;
-  element_type->element_volume = mesh_hex_vol;
+  element_type->h = feenox_mesh_hexa27_h;
+  element_type->dhdr = feenox_mesh_hexa27_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_hexahedron;
+  element_type->element_volume = feenox_mesh_hex_vol;
 
 /*
  
@@ -207,7 +207,7 @@ int mesh_hexa27_init(void) {
   feenox_mesh_compute_coords_from_parent(element_type, 26);    
 
   // full integration: 3x3x3
-  mesh_gauss_init_hexa27(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_hexa27(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 27);
 
   for (j = 0; j < element_type->nodes; j++) {
@@ -216,12 +216,12 @@ int mesh_hexa27_init(void) {
     r[2] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][2];
     
     for (v = 0; v < 27; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, mesh_hexa27_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa27_h(v, r));
     }
   }
   
   // reduced integration: 2x2x2
-  mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 8);
   
   // the two extrapolation matrices
@@ -231,7 +231,7 @@ int mesh_hexa27_init(void) {
     r[2] = M_SQRT3 * element_type->node_coords[j][2];
 
     for (v = 0; v < 8; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, mesh_hexa8_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_hexa8_h(v, r));
     }
   }
   
@@ -274,7 +274,7 @@ Node here(gmsh)       Node reference        r        s        t
 25                      26                  0        0        1
 26                      27                  0        0        0
 */
-double mesh_hexa27_h(int j, double *vec_r) {
+double feenox_mesh_hexa27_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -367,7 +367,7 @@ double mesh_hexa27_h(int j, double *vec_r) {
 
 }
 
-double mesh_hexa27_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_hexa27_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];

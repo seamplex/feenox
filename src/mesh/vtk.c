@@ -61,7 +61,7 @@ int hexa27fromgmsh[27] = {
  10 , 12 , 14 , 15 , 22 , 23 , 21 , 24 ,
  20 , 25 , 26} ;
 
-int mesh_vtk_write_header(FILE *file) {
+int feenox_mesh_vtk_write_header(FILE *file) {
   fprintf(file, "# vtk DataFile Version 2.0\n");
   fprintf(file, "feenox vtk output\n");
   fprintf(file, "ASCII\n");
@@ -70,15 +70,8 @@ int mesh_vtk_write_header(FILE *file) {
 }
 
 
-int mesh_vtk_write_mesh(mesh_t *mesh, int dummy, FILE *file) {
-  
-  feenox_call(feenox_mesh_vtk_write_unstructured_mesh(mesh, file));
-  
-  return FEENOX_OK;
-}
-
-int mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file) {
-  
+int feenox_mesh_vtk_write_mesh(mesh_t *mesh, int dummy, FILE *file) {
+    
   int i, j;
   size_t size, volumelements;
   

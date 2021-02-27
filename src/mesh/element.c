@@ -157,30 +157,30 @@ int feenox_mesh_element_types_init(void) {
   element_type->element_volume = NULL;
   
   // line ----------------------------------------------------------------------
-  mesh_line2_init();
-  mesh_line3_init();
+  feenox_mesh_line2_init();
+  feenox_mesh_line3_init();
 
   // triangles -----------------------------------------------------------------
-  mesh_triang3_init();
-  mesh_triang6_init();
+  feenox_mesh_triang3_init();
+  feenox_mesh_triang6_init();
   
   // quadrangles ----------------------------------------------------------------
-  mesh_quad4_init();
-  mesh_quad8_init();
-  mesh_quad9_init();
+  feenox_mesh_quad4_init();
+  feenox_mesh_quad8_init();
+  feenox_mesh_quad9_init();
   
   // tetrahedra  ---------------------------------------------------------------
-  mesh_tet4_init();
-  mesh_tet10_init();
+  feenox_mesh_tet4_init();
+  feenox_mesh_tet10_init();
   
   // hexahedra ---------------------------------------------------------------- 
-  mesh_hexa8_init();
-  mesh_hexa20_init();
-  mesh_hexa27_init();
+  feenox_mesh_hexa8_init();
+  feenox_mesh_hexa20_init();
+  feenox_mesh_hexa27_init();
     
   // prism ---------------------------------------------------------------------
-  mesh_prism6_init();
-  mesh_prism15_init();
+  feenox_mesh_prism6_init();
+  feenox_mesh_prism15_init();
 
   // not supported  
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PYRAMID5];
@@ -194,7 +194,7 @@ int feenox_mesh_element_types_init(void) {
 
   
   // point
-  mesh_one_node_point_init();
+  feenox_mesh_one_node_point_init();
   
   // compute the barycenter of each element type in the r-space
   unsigned i, j, d;
@@ -316,7 +316,7 @@ int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[])
 }
 
 
-int mesh_node_indexes(mesh_t *this, int dofs) {
+int feenox_mesh_node_indexes(mesh_t *this, int dofs) {
   int j, g;
   
   this->degrees_of_freedom = dofs;
@@ -347,7 +347,7 @@ int mesh_node_indexes(mesh_t *this, int dofs) {
 }
 
 
-int mesh_compute_local_node_index(element_t *element, int global_index) {
+int feenox_mesh_compute_local_node_index(element_t *element, int global_index) {
   int j;
   int local_index = -1;
   

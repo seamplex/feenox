@@ -28,7 +28,7 @@ extern feenox_t feenox;
 // iso-parametric four-noded tetrahedron
 // -------------------------------------
 
-int mesh_tet4_init(void) {
+int feenox_mesh_tet4_init(void) {
   
   element_type_t *element_type;
   double r[3];
@@ -43,10 +43,10 @@ int mesh_tet4_init(void) {
   element_type->nodes = 4;
   element_type->faces = 4;
   element_type->nodes_per_face = 3;
-  element_type->h = mesh_tet4_h;
-  element_type->dhdr = mesh_tet4_dhdr;
-  element_type->point_in_element = mesh_point_in_tetrahedron;
-  element_type->element_volume = mesh_tet_vol;
+  element_type->h = feenox_mesh_tet4_h;
+  element_type->dhdr = feenox_mesh_tet4_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_tetrahedron;
+  element_type->element_volume = feenox_mesh_tet_vol;
 
 
   // node coordinates (from Gmsh doc)
@@ -103,11 +103,11 @@ Tetrahedron:
   // gauss points and extrapolation matrices
   
   // full integration: 4 points
-  mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 4);
 
   // reduced integration: 1 point
-  mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
   
   // the two extrapolation matrices
@@ -120,28 +120,28 @@ Tetrahedron:
   r[1] = c;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = d;
   r[1] = c;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = c;
   r[1] = d;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = c;
   r[1] = c;
   r[2] = d;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, v, mesh_tet4_h(v, r));
+    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, v, feenox_mesh_tet4_h(v, r));
   }
   
   // reduced
@@ -153,28 +153,28 @@ Tetrahedron:
 }
 
 
-void mesh_gauss_init_tet1(element_type_t *element_type, gauss_t *gauss) {
+void feenox_mesh_gauss_init_tet1(element_type_t *element_type, gauss_t *gauss) {
  
   // ---- one Gauss point ----  
-  mesh_alloc_gauss(gauss, element_type, 4);
+  feenox_mesh_alloc_gauss(gauss, element_type, 4);
     
   gauss->w[0] = 1.0/6.0 * 1.0;
   gauss->r[0][0] = 1.0/4.0;
   gauss->r[0][1] = 1.0/4.0;
   gauss->r[0][2] = 1.0/4.0;
 
-  mesh_init_shape_at_gauss(gauss, element_type);  
+  feenox_mesh_init_shape_at_gauss(gauss, element_type);  
     
   return;
 }
 
-void mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss) {
+void feenox_mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss) {
 
   double a = (5.0-M_SQRT5)/20.0;
   double b = (5.0+3.0*M_SQRT5)/20.0;
 
   // ---- two Gauss points ----  
-  mesh_alloc_gauss(gauss, element_type, 4);
+  feenox_mesh_alloc_gauss(gauss, element_type, 4);
     
   gauss->w[0] = 1.0/6.0 * 1.0/4.0;
   gauss->r[0][0] = a;
@@ -196,13 +196,13 @@ void mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss) {
   gauss->r[3][1] = a;
   gauss->r[3][2] = b;
 
-  mesh_init_shape_at_gauss(gauss, element_type);  
+  feenox_mesh_init_shape_at_gauss(gauss, element_type);  
   
 }
 
 
 
-double mesh_tet4_h(int j, double *vec_r) {
+double feenox_mesh_tet4_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -227,7 +227,7 @@ double mesh_tet4_h(int j, double *vec_r) {
 }
 
 
-double mesh_tet4_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_tet4_dhdr(int j, int m, double *vec_r) {
   
   switch (j) {
     case 0:
@@ -341,7 +341,7 @@ int mesh_point_in_tetrahedron(element_t *element, const double *x) {
 */
 
 
-int mesh_point_in_tetrahedron(element_t *element, const double *x) {
+int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
 
 // http://en.wikipedia.org/wiki/Barycentric_coordinate_system  
   double zero, one, lambda4;
@@ -415,7 +415,7 @@ int mesh_point_in_tetrahedron(element_t *element, const double *x) {
 }
 
 
-double mesh_tet_vol(element_t *this) {
+double feenox_mesh_tet_vol(element_t *this) {
 
   if (this->volume == 0) {
     double a[3], b[3], c[3];

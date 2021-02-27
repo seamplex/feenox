@@ -28,7 +28,7 @@ extern feenox_t feenox;
 // --------------------------------------------------------------
 // cuadrangulo de cuatro nodos
 // --------------------------------------------------------------
-int mesh_quad8_init(void) {
+int feenox_mesh_quad8_init(void) {
   
   double r[2];
   element_type_t *element_type;
@@ -42,10 +42,10 @@ int mesh_quad8_init(void) {
   element_type->nodes = 8;
   element_type->faces = 4;
   element_type->nodes_per_face = 3;
-  element_type->h = mesh_quad8_h;
-  element_type->dhdr = mesh_quad8_dhdr;
-  element_type->point_in_element = mesh_point_in_quadrangle;
-  element_type->element_volume = mesh_quad_vol;
+  element_type->h = feenox_mesh_quad8_h;
+  element_type->dhdr = feenox_mesh_quad8_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_quadrangle;
+  element_type->element_volume = feenox_mesh_quad_vol;
 
   // node coordinates
 /*
@@ -102,7 +102,7 @@ int mesh_quad8_init(void) {
   // gauss points and extrapolation matrices
   
   // full integration: 3x3
-  mesh_gauss_init_quad9(element_type, &element_type->gauss[integration_full]);
+  feenox_mesh_gauss_init_quad9(element_type, &element_type->gauss[integration_full]);
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 9);
 
   for (j = 0; j < element_type->nodes; j++) {
@@ -110,12 +110,12 @@ int mesh_quad8_init(void) {
     r[1] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][1];
     
     for (v = 0; v < 9; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, mesh_quad9_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_quad9_h(v, r));
     }
   }
   
   // reduced integration: 2x2
-  mesh_gauss_init_quad4(element_type, &element_type->gauss[integration_reduced]);
+  feenox_mesh_gauss_init_quad4(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 4);
   
   for (j = 0; j < element_type->nodes; j++) {
@@ -123,7 +123,7 @@ int mesh_quad8_init(void) {
     r[1] = M_SQRT3 * element_type->node_coords[j][1];
     
     for (v = 0; v < 4; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, mesh_quad4_h(v, r));
+      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_quad4_h(v, r));
     }
   }
   
@@ -133,7 +133,7 @@ int mesh_quad8_init(void) {
 
 //Taken from https://www.code-aster.org/V2/doc/default/fr/man_r/r3/r3.01.01.pdf
 //The aster node ordering of aster and gmsh are equal.
-double mesh_quad8_h(int j, double *vec_r) {
+double feenox_mesh_quad8_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
 
@@ -168,7 +168,7 @@ double mesh_quad8_h(int j, double *vec_r) {
 
 }
 
-double mesh_quad8_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_quad8_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
 

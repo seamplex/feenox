@@ -28,7 +28,7 @@ extern feenox_t feenox;
 // prisma de seis nodos
 // --------------------------------------------------------------
 
-int mesh_prism6_init(void) {
+int feenox_mesh_prism6_init(void) {
 
   element_type_t *element_type;
   int j;
@@ -41,10 +41,10 @@ int mesh_prism6_init(void) {
   element_type->nodes = 6;
   element_type->faces = 5;
   element_type->nodes_per_face = 4;   // Ojo aca que en nodos por cara pusimos el maximo valor (4) ya que depende de la cara
-  element_type->h = mesh_prism6_h;
-  element_type->dhdr = mesh_prism6_dhdr;
-  element_type->point_in_element = mesh_point_in_prism;
-  element_type->element_volume = mesh_prism_vol;
+  element_type->h = feenox_mesh_prism6_h;
+  element_type->dhdr = feenox_mesh_prism6_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_prism;
+  element_type->element_volume = feenox_mesh_prism_vol;
 
     // coordenadas de los nodos
 /*  
@@ -106,13 +106,13 @@ u   |    ,/ `\    |    v
   element_type->node_coords[5][1] = 1;
   element_type->node_coords[5][2] = 1;
 
-  mesh_prism_gauss6_init(element_type);
+  feenox_mesh_prism_gauss6_init(element_type);
 
   return FEENOX_OK;
 }
 
 
-void mesh_prism_gauss6_init(element_type_t *element_type) {
+void feenox_mesh_prism_gauss6_init(element_type_t *element_type) {
 
   gauss_t *gauss;
   
@@ -122,7 +122,7 @@ void mesh_prism_gauss6_init(element_type_t *element_type) {
   // ---- seis puntos de Gauss sobre el elemento unitario ----  
     gauss = &element_type->gauss[integration_full];
     gauss->V = 6;
-    mesh_alloc_gauss(gauss, element_type, gauss->V = 6);
+    feenox_mesh_alloc_gauss(gauss, element_type, gauss->V = 6);
    
     gauss->w[0] = 1.0/6.0;
     gauss->r[0][0] = 1.0/6.0;
@@ -154,23 +154,23 @@ void mesh_prism_gauss6_init(element_type_t *element_type) {
     gauss->r[5][1] = 2.0/3.0;
     gauss->r[5][2] = +1/M_SQRT3;
     
-    mesh_init_shape_at_gauss(gauss, element_type);
+    feenox_mesh_init_shape_at_gauss(gauss, element_type);
     
   // ---- un punto de Gauss sobre el elemento unitario ----  
     gauss = &element_type->gauss[integration_reduced];
     gauss->V = 1;
-    mesh_alloc_gauss(gauss, element_type, gauss->V);
+    feenox_mesh_alloc_gauss(gauss, element_type, gauss->V);
   
     gauss->w[0] = 0.5 * 1.0;
     gauss->r[0][0] = 0;
     gauss->r[0][1] = 0;
 
-    mesh_init_shape_at_gauss(gauss, element_type);    
+    feenox_mesh_init_shape_at_gauss(gauss, element_type);    
   
   return;
 }
 
-double mesh_prism6_h(int j, double *vec_r) {
+double feenox_mesh_prism6_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -200,7 +200,7 @@ double mesh_prism6_h(int j, double *vec_r) {
 
 }
 
-double mesh_prism6_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_prism6_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -293,7 +293,7 @@ double mesh_prism6_dhdr(int j, int m, double *vec_r) {
 
 
 // TODO: generalizar a prismas no paralelos
-int mesh_point_in_prism(element_t *element, const double *x) {
+int feenox_mesh_point_in_prism(element_t *element, const double *x) {
 // // metodo de coordenadas baricentricas
 ////  http://en.wikipedia.org/wiki/Barycentric_coordinate_system  
 //  double lambda1, lambda2, lambda3;
@@ -424,9 +424,9 @@ int mesh_point_in_prism(element_t *element, const double *x) {
 }
     
 // TODO: generalizar a prismas no paralelos
-double mesh_prism_vol(element_t *this) {
+double feenox_mesh_prism_vol(element_t *this) {
 
-//  return 0.5 * fabs(element->node[0]->x[2]-element->node[3]->x[2])* fabs(mesh_subtract_cross_2d(element->node[0]->x, element->node[1]->x, element->node[2]->x));
+//  return 0.5 * fabs(element->node[0]->x[2]-element->node[3]->x[2])* fabs(feenox_mesh_subtract_cross_2d(element->node[0]->x, element->node[1]->x, element->node[2]->x));
 
   if (this->volume == 0) {
   

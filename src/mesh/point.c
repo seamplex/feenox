@@ -27,7 +27,7 @@ extern feenox_t feenox;
 // --------------------------------------------------------------
 // punto de un nodo
 // --------------------------------------------------------------
-int mesh_one_node_point_init(void) {
+int feenox_mesh_one_node_point_init(void) {
   
   element_type_t *element_type;
   
@@ -39,33 +39,33 @@ int mesh_one_node_point_init(void) {
   element_type->nodes = 1;
   element_type->faces = 0;
   element_type->nodes_per_face = 0;
-  element_type->h = mesh_one_node_point_h;
-  element_type->dhdr = mesh_one_node_point_dhdr;
-  element_type->element_volume = mesh_point_vol;
+  element_type->h = feenox_mesh_one_node_point_h;
+  element_type->dhdr = feenox_mesh_one_node_point_dhdr;
+  element_type->element_volume = feenox_mesh_point_vol;
   element_type->point_in_element = NULL;
   
   // ------------
   // gauss points and extrapolation matrices
 
   // el primero es el default
-  mesh_alloc_gauss(&element_type->gauss[integration_full], element_type, 1);
+  feenox_mesh_alloc_gauss(&element_type->gauss[integration_full], element_type, 1);
   element_type->gauss[integration_full].w[0] = 1.0;
-  mesh_init_shape_at_gauss(&element_type->gauss[integration_full], element_type);
+  feenox_mesh_init_shape_at_gauss(&element_type->gauss[integration_full], element_type);
   
-  mesh_alloc_gauss(&element_type->gauss[integration_reduced], element_type, 1);
+  feenox_mesh_alloc_gauss(&element_type->gauss[integration_reduced], element_type, 1);
   element_type->gauss[integration_reduced].w[0] = 1.0;
-  mesh_init_shape_at_gauss(&element_type->gauss[integration_reduced], element_type);
+  feenox_mesh_init_shape_at_gauss(&element_type->gauss[integration_reduced], element_type);
   
   return FEENOX_OK;
 }
-double mesh_one_node_point_h(int i, double *vec_r) {
+double feenox_mesh_one_node_point_h(int i, double *vec_r) {
   return 1;
 }
 
-double mesh_one_node_point_dhdr(int i, int j, double *vec_r) {
+double feenox_mesh_one_node_point_dhdr(int i, int j, double *vec_r) {
   return 0;
 }
 
-double mesh_point_vol(element_t *this) {
+double feenox_mesh_point_vol(element_t *this) {
   return 0;
 }

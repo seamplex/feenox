@@ -26,7 +26,7 @@ int feenox_instruction_mesh_read(void *arg) {
 
   mesh_t *this = (mesh_t *)arg;
   
-  feenox_call(feenox_mesh_element_types_init());
+//  feenox_call(feenox_mesh_element_types_init());
   
   if (this->initialized) {
     if (this->update_each_step == 0) {

@@ -29,7 +29,7 @@ extern feenox_t feenox;
 // prisma de seis nodos
 // --------------------------------------------------------------
 
-int mesh_prism15_init(void) {
+int feenox_mesh_prism15_init(void) {
 
   element_type_t *element_type;
   int j;
@@ -42,10 +42,10 @@ int mesh_prism15_init(void) {
   element_type->nodes = 15;
   element_type->faces = 5;
   element_type->nodes_per_face = 8;   // Ojo aca que en nodos por cara pusimos el maximo valor (8) ya que depende de la cara
-  element_type->h = mesh_prism15_h;
-  element_type->dhdr = mesh_prism15_dhdr;
-  element_type->point_in_element = mesh_point_in_prism;
-  element_type->element_volume = mesh_prism_vol;
+  element_type->h = feenox_mesh_prism15_h;
+  element_type->dhdr = feenox_mesh_prism15_dhdr;
+  element_type->point_in_element = feenox_mesh_point_in_prism;
+  element_type->element_volume = feenox_mesh_prism_vol;
 
     // coordenadas de los nodos
 /*  
@@ -107,14 +107,14 @@ u   |    ,/ `\    |    v    |    ,/ `\    |
   element_type->node_coords[5][1] = 1;
   element_type->node_coords[5][2] = 1;
 
-  mesh_prism_gauss6_init(element_type);
+  feenox_mesh_prism_gauss6_init(element_type);
 
   return FEENOX_OK;
 }
 
 
 
-double mesh_prism15_h(int j, double *vec_r) {
+double feenox_mesh_prism15_h(int j, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
@@ -171,7 +171,7 @@ double mesh_prism15_h(int j, double *vec_r) {
 
 }
 
-double mesh_prism15_dhdr(int j, int m, double *vec_r) {
+double feenox_mesh_prism15_dhdr(int j, int m, double *vec_r) {
   double r = vec_r[0];
   double s = vec_r[1];
   double t = vec_r[2];
