@@ -17,3 +17,6 @@ exitifwrong $?
 
 answer1 mesh2d.fee 41 "12"
 exitifwrong $?
+
+answer mesh3d.fee "50"
+exitifwrong $?
