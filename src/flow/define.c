@@ -354,9 +354,11 @@ int feenox_define_file(const char *name, const char *format, unsigned int n_form
   }
 
   feenox_check_alloc(file = calloc(1, sizeof(file_t)));
+  feenox_check_alloc(file->name = strdup(name));
   feenox_check_alloc(file->format = strdup(format));
-  file->n_format_args = n_format_args;
-  feenox_check_alloc(file->arg = calloc(file->n_format_args, sizeof(expr_t *)));
+  if ((file->n_format_args = n_format_args) > 0) {
+    feenox_check_alloc(file->arg = calloc(file->n_format_args, sizeof(expr_t *)));
+  }  
   if (mode != NULL && strcmp(mode, "") == 0) {
     feenox_check_alloc(file->mode = strdup(mode));
   }
