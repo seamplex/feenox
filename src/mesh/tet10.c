@@ -36,7 +36,7 @@ int feenox_mesh_tet10_init(void) {
   int j, v;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON10];
-  element_type->name = strdup("tet10");
+  feenox_check_alloc(element_type->name = strdup("tet10"));
   element_type->id = ELEMENT_TYPE_TETRAHEDRON10;
   element_type->dim = 3;
   element_type->order = 2;

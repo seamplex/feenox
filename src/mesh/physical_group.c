@@ -45,7 +45,7 @@ physical_group_t *feenox_define_physical_group(mesh_t *new_mesh, const char *nam
   if ((physical_group = feenox_get_physical_group_ptr(mesh, name)) == NULL) {
     already_exists = 0; // esto lo usamos para definir las variables especiales abajo
     physical_group = calloc(1, sizeof(physical_group_t));
-    physical_group->name = strdup(name);
+    feenox_check_alloc_null(physical_group->name = strdup(name));
     HASH_ADD_KEYPTR(hh, mesh->physical_groups, physical_group->name, strlen(name), physical_group);
   } else {
     already_exists = 1;

@@ -140,12 +140,12 @@ int feenox_mesh_element_types_init(void) {
     return FEENOX_OK;
   }
   
-  feenox.mesh.element_types = calloc(NUMBER_ELEMENT_TYPE, sizeof(element_type_t));
+  feenox_check_alloc(feenox.mesh.element_types = calloc(NUMBER_ELEMENT_TYPE, sizeof(element_type_t)));
   element_type_t *element_type = NULL;
 
   // undefined  ----------------------------------------------------------------
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_UNDEFINED];
-  element_type->name = strdup("undefined");
+  feenox_check_alloc((element_type->name = strdup("undefined")));
   element_type->id = ELEMENT_TYPE_UNDEFINED;
   element_type->dim = 0;
   element_type->nodes = 0;
@@ -157,44 +157,44 @@ int feenox_mesh_element_types_init(void) {
   element_type->element_volume = NULL;
   
   // line ----------------------------------------------------------------------
-  feenox_mesh_line2_init();
-  feenox_mesh_line3_init();
+  feenox_call(feenox_mesh_line2_init());
+  feenox_call(feenox_mesh_line3_init());
 
   // triangles -----------------------------------------------------------------
-  feenox_mesh_triang3_init();
-  feenox_mesh_triang6_init();
+  feenox_call(feenox_mesh_triang3_init());
+  feenox_call(feenox_mesh_triang6_init());
   
   // quadrangles ----------------------------------------------------------------
-  feenox_mesh_quad4_init();
-  feenox_mesh_quad8_init();
-  feenox_mesh_quad9_init();
+  feenox_call(feenox_mesh_quad4_init());
+  feenox_call(feenox_mesh_quad8_init());
+  feenox_call(feenox_mesh_quad9_init());
   
   // tetrahedra  ---------------------------------------------------------------
-  feenox_mesh_tet4_init();
-  feenox_mesh_tet10_init();
+  feenox_call(feenox_mesh_tet4_init());
+  feenox_call(feenox_mesh_tet10_init());
   
   // hexahedra ---------------------------------------------------------------- 
-  feenox_mesh_hexa8_init();
-  feenox_mesh_hexa20_init();
-  feenox_mesh_hexa27_init();
+  feenox_call(feenox_mesh_hexa8_init());
+  feenox_call(feenox_mesh_hexa20_init());
+  feenox_call(feenox_mesh_hexa27_init());
     
   // prism ---------------------------------------------------------------------
-  feenox_mesh_prism6_init();
-  feenox_mesh_prism15_init();
+  feenox_call(feenox_mesh_prism6_init());
+  feenox_call(feenox_mesh_prism15_init());
 
   // not supported  
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PYRAMID5];
   element_type->dim = 3;
-  element_type->name = strdup("pyramid5");
+  feenox_check_alloc(element_type->name = strdup("pyramid5"));
   element_type->id = ELEMENT_TYPE_PYRAMID5;
   element_type->nodes = 0;
 
-  feenox.mesh.element_types[13].name = strdup("prism18");
-  feenox.mesh.element_types[14].name = strdup("pyramid14");
+  feenox_check_alloc(feenox.mesh.element_types[13].name = strdup("prism18"));
+  feenox_check_alloc(feenox.mesh.element_types[14].name = strdup("pyramid14"));
 
   
   // point
-  feenox_mesh_one_node_point_init();
+  feenox_call(feenox_mesh_one_node_point_init());
   
   // compute the barycenter of each element type in the r-space
   unsigned i, j, d;

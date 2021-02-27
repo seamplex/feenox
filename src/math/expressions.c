@@ -145,7 +145,7 @@ int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, s
     char_backup = *dummy;
     *dummy = '\0';
     // in argument we have the i-th argument
-    (*arg)[i] = strdup(argument);
+    feenox_check_alloc((*arg)[i] = strdup(argument));
     *dummy = char_backup;
   }
   
@@ -166,10 +166,11 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   }
 
   // let's make a copy so the parser can break it up as it wants
-  char *string_copy = strdup(orig_string);
+  char *string_copy;
+  feenox_check_alloc(string_copy = strdup(orig_string));
 
   // the expr structure contains another copy of the original string for debugging purposes
-  this->string = strdup(string_copy);
+  feenox_check_alloc(this->string = strdup(string_copy));
   
   char *string = string_copy;
   char *oper = NULL;
@@ -253,7 +254,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
   // number of characters read, we put this into the allocated item at the end of this routine
   size_t n = 0;
   int n_int = 0; // sscanf can only return ints, not size_t
-  char *backup = strdup(string);
+  char *backup ;
+  feenox_check_alloc_null(backup = strdup(string));
   expr_item_t *item = calloc(1, sizeof(expr_item_t));
   item->sign = 1.0; // assume the sign is positive
 
@@ -354,7 +356,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         (builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL) {
 
       // copy into argument whatever is after the nam
-      char *argument = strdup(string+strlen(token) + (item->sign < 0));
+      char *argument;
+      feenox_check_alloc_null(argument = strdup(string+strlen(token) + (item->sign < 0)));
 
       // arguments have to be in parenthesis
       if (*argument != '(') {

@@ -35,7 +35,7 @@ int feenox_mesh_quad9_init(void) {
   int j, v;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_QUADRANGLE9];
-  element_type->name = strdup("quad9");
+  feenox_check_alloc(element_type->name = strdup("quad9"));
   element_type->id = ELEMENT_TYPE_QUADRANGLE9;
   element_type->dim = 2;
   element_type->order = 2;

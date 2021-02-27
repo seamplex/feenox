@@ -257,7 +257,7 @@ int feenox_parser_string(char **string) {
     return FEENOX_ERROR;
   }
   
-  *string = strdup(token);
+  feenox_check_alloc(*string = strdup(token));
   
   return FEENOX_OK;
 }
@@ -273,7 +273,7 @@ int feenox_parser_string_format(char **string, int *n_args) {
     feenox_push_error_message("expected a string with optional printf format data");
     return FEENOX_ERROR;
   }
-  *string = strdup(token);
+  feenox_check_alloc(*string = strdup(token));
       
   dummy = *string;
   while (*dummy != '\0') {
@@ -605,12 +605,12 @@ int feenox_read_data_line(FILE *file_ptr, char *buffer) {
 */
 
 // strips the blanks of a string (it modifies the argument string)
-void feenox_strip_blanks(char *string) {
+int feenox_strip_blanks(char *string) {
   int i = 0;
   int j = 0;
   char *buff;
 
-  buff = strdup(string);
+  feenox_check_alloc(buff = strdup(string));
 
   for (i = 0; i < strlen(string); i++) {
     if (!isspace((int)buff[i])) {
@@ -621,7 +621,7 @@ void feenox_strip_blanks(char *string) {
   string[j] = '\0';
   free(buff);
 
-  return;
+  return FEENOX_OK;
 
 }
 
@@ -636,12 +636,13 @@ int feenox_add_function_from_string(const char *string, char **name) {
     return FEENOX_ERROR;
   }
   *dummy_openpar = '\0';
-  *name = strdup(string);
+  feenox_check_alloc(*name = strdup(string));
   *dummy_openpar = '(';
-  feenox_strip_blanks(*name);
+  feenox_call(feenox_strip_blanks(*name));
 
-  char *arguments = strdup(dummy_openpar);
-  feenox_strip_blanks(arguments);
+  char *arguments;
+  feenox_check_alloc(arguments = strdup(dummy_openpar));
+  feenox_call(feenox_strip_blanks(arguments));
 
   size_t n_arguments;
   if ((n_arguments = feenox_count_arguments(arguments, NULL)) <= 0) {

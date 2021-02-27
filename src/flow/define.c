@@ -123,8 +123,8 @@ int feenox_define_variable(const char *name) {
     }
   }
 
-  var = calloc(1, sizeof(var_t));
-  var->name = strdup(name);
+  feenox_check_alloc(var = calloc(1, sizeof(var_t)));
+  feenox_check_alloc(var->name = strdup(name));
   var->value = calloc(1, sizeof(double));
   var->initial_transient = calloc(1, sizeof(double));
   var->initial_static = calloc(1, sizeof(double));
@@ -180,8 +180,8 @@ int feenox_define_vector(const char *name, const char *size) {
 
   feenox_call(feenox_check_name(name));
 
-  vector = calloc(1, sizeof(vector_t));
-  vector->name = strdup(name);
+  feenox_check_alloc(vector = calloc(1, sizeof(vector_t)));
+  feenox_check_alloc(vector->name = strdup(name));
   feenox_call(feenox_expression_parse(&vector->size_expr, size));
 
   HASH_ADD_KEYPTR(hh, feenox.vectors, vector->name, strlen(vector->name), vector);
@@ -242,8 +242,9 @@ int feenox_define_matrix(const char *name, const char *rows, const char *cols) {
 
   feenox_call(feenox_check_name(name));
 
-  matrix_t *matrix = calloc(1, sizeof(matrix_t));
-  matrix->name = strdup(name);
+  matrix_t *matrix;
+  feenox_check_alloc(matrix = calloc(1, sizeof(matrix_t)));
+  feenox_check_alloc(matrix->name = strdup(name));
   feenox_call(feenox_expression_parse(&matrix->rows_expr, rows));
   feenox_call(feenox_expression_parse(&matrix->cols_expr, cols));
 
@@ -279,13 +280,13 @@ int feenox_define_function(const char *name, unsigned int n_arguments) {
 
   feenox_call(feenox_check_name(name));
 
-  function = calloc(1, sizeof(function_t));
-  function->name = strdup(name);
+  feenox_check_alloc(function = calloc(1, sizeof(function_t)));
+  feenox_check_alloc(function->name = strdup(name));
   function->n_arguments = n_arguments;
   
-  function->var_argument = calloc(n_arguments, sizeof(var_t *));
+  feenox_check_alloc(function->var_argument = calloc(n_arguments, sizeof(var_t *)));
   function->var_argument_allocated = 1;
-  function->column = calloc((n_arguments+1), sizeof(int));
+  feenox_check_alloc(function->column = calloc((n_arguments+1), sizeof(int)));
   
   // default columns
   int i;
@@ -352,13 +353,12 @@ int feenox_define_file(const char *name, const char *format, unsigned int n_form
     return FEENOX_ERROR;
   }
 
-  file = calloc(1, sizeof(file_t));
-  file->name = strdup(name);
-  file->format = strdup(format);
+  feenox_check_alloc(file = calloc(1, sizeof(file_t)));
+  feenox_check_alloc(file->format = strdup(format));
   file->n_format_args = n_format_args;
-  file->arg = calloc(file->n_format_args, sizeof(expr_t *));
+  feenox_check_alloc(file->arg = calloc(file->n_format_args, sizeof(expr_t *)));
   if (mode != NULL && strcmp(mode, "") == 0) {
-    file->mode = strdup(mode);
+    feenox_check_alloc(file->mode = strdup(mode));
   }
 
   HASH_ADD_KEYPTR(hh, feenox.files, file->name, strlen(file->name), file);

@@ -171,10 +171,11 @@ int feenox_add_dae(const char *lhs, const char *rhs) {
 
 char *feenox_find_first_dot(const char *s) {
 
-  char *line = strdup(s);
-  char *token;
-  char *dummy;
-  char *wanted;
+  char *line;
+  feenox_check_alloc_null(line = strdup(s));
+  char *token = NULL;
+  char *dummy = NULL;
+  char *wanted = NULL;
 
   token = strtok(line, factorseparators);
   while (token != NULL) {

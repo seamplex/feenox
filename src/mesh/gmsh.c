@@ -138,7 +138,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_push_error_message("beginning quote not found in physical name %d in '%s'", tag, this->file->path);
           return FEENOX_ERROR;
         }
-        name = strdup(dummy+1);
+        feenox_check_alloc(name = strdup(dummy+1));
        
         if ((physical_group = feenox_get_physical_group_ptr(this, name)) == NULL) {
           // create new physical group
@@ -732,7 +732,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       LL_FOREACH(this->node_datas, node_data) {
         if (strcmp(string_tag, node_data->name_in_mesh) == 0) {
           function = node_data->function;
-          function->name_in_mesh = strdup(node_data->name_in_mesh);
+          feenox_check_alloc(function->name_in_mesh = strdup(node_data->name_in_mesh));
         }
       }
       

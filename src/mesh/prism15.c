@@ -35,7 +35,7 @@ int feenox_mesh_prism15_init(void) {
   int j;
 
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM15];
-  element_type->name = strdup("prism15");
+  feenox_check_alloc(element_type->name = strdup("prism15"));
   element_type->id = ELEMENT_TYPE_PRISM15;
   element_type->dim = 3;
   element_type->order = 2;

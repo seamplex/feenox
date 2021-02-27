@@ -95,7 +95,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       
       // the line is broken by strtok inside parse_line() and we need
       // the original for assignements and equations
-      feenox_parser.full_line = strdup(feenox_parser.line);
+      feenox_check_alloc(feenox_parser.full_line = strdup(feenox_parser.line));
       if (feenox_parse_line() != FEENOX_OK) {
         free(feenox_parser.full_line);
         feenox_push_error_message("%s: %d:", filepath, line_num);
@@ -550,7 +550,7 @@ int feenox_parse_line(void) {
 
       // llenamos defaults
       if (print_vector->format == NULL) {
-        print_vector->format = strdup(DEFAULT_PRINT_FORMAT);
+        feenox_check_alloc(print_vector->format = strdup(DEFAULT_PRINT_FORMAT));
       }
 
       if (print_vector->separator == NULL) {
@@ -725,7 +725,7 @@ int feenox_parse_line(void) {
           LL_APPEND(m4->macros, macro);
           
           feenox_call(feenox_parser_string(&macro->name));
-          macro->print_token.format = strdup(DEFAULT_M4_FORMAT);
+          feenox_check_alloc(macro->print_token.format = strdup(DEFAULT_M4_FORMAT));
           if (feenox_parse_expression(macro->name, &macro->print_token.expression) != FEENOX_OK) {
             feenox_push_error_message("m4 expansion of '%s' failed", macro->name);
             return FEENOX_ERROR;
@@ -745,7 +745,7 @@ int feenox_parse_line(void) {
           }
 
           if (token[0] == '%') {
-            macro->print_token.format = strdup(token);
+            feenox_check_alloc(macro->print_token.format = strdup(token));
             if ((token = feenox_get_next_token(NULL)) == NULL) {
               feenox_push_error_message("expected macro definition");
               return FEENOX_ERROR;
@@ -754,13 +754,13 @@ int feenox_parse_line(void) {
               macro->print_token.format[0] = 'g';
             }
           } else {
-            macro->print_token.format = strdup(DEFAULT_M4_FORMAT);
+            feenox_check_alloc(macro->print_token.format = strdup(DEFAULT_M4_FORMAT));
           }
 
           // si el formato es %s o la expresion no evalua, lo tomamos como string
           if (strcasecmp(macro->print_token.format, "%s") == 0 ||
               feenox_parse_expression(token, &macro->print_token.expression) != FEENOX_OK) {
-            macro->print_token.text = strdup(token);
+            feenox_check_alloc(macro->print_token.text = strdup(token));
           }
           
         } else {
@@ -828,8 +828,8 @@ int feenox_parse_line(void) {
         return FEENOX_ERROR;
       }
       // proposed by rvignolo
-//      history->function->arg_name = malloc(1 * sizeof(char *));
-//      history->function->arg_name[0] = strdup(feenox.special_vars.t->name);
+//      feenox_check_alloc(history->function->arg_name = malloc(1 * sizeof(char *)));
+//      feenox_check_alloc(history->function->arg_name[0] = strdup(feenox.special_vars.t->name));
 
       if (feenox_define_instruction(feenox_instruction_history, history) == NULL) {
         return FEENOX_ERROR;
@@ -1432,7 +1432,7 @@ char *feenox_get_nth_token(char *string, int n) {
   char *desired_token;
   int i;
 
-  backup = strdup(string);
+  feenox_check_alloc_null(backup = strdup(string));
 
   if ((token = strtok(backup, UNQUOTED_DELIM)) == NULL) {
     free(backup);
@@ -1448,7 +1448,7 @@ char *feenox_get_nth_token(char *string, int n) {
     i++;
   }
 
-  desired_token = strdup(token);
+  feenox_check_alloc_null(desired_token = strdup(token));
   free(backup);
 
   return desired_token;
@@ -1549,7 +1549,7 @@ int feenox_parse_default_argument_value(void) {
       return FEENOX_ERROR;
     }
     feenox.argc = feenox.optind+n + 1;
-    feenox.argv[feenox.optind+n] = strdup(token);
+    feenox_check_alloc(feenox.argv[feenox.optind+n] = strdup(token));
   }
   
   return FEENOX_OK;
@@ -2448,9 +2448,9 @@ int feenox_parse_file(char *mode) {
     } else if (strcasecmp(token, "MODE") == 0) {
       feenox_call(feenox_parser_string(&custom_mode));
     } else if (strcasecmp(token, "INPUT") == 0) {
-      custom_mode = strdup("r");
+      feenox_check_alloc(custom_mode = strdup("r"));
     } else if (strcasecmp(token, "OUTPUT") == 0) {
-      custom_mode = strdup("w");
+      feenox_check_alloc(custom_mode = strdup("w"));
 
 ///kw+FILE+detail This keyword justs defines the `FILE`, it does not open it.
 ///kw+FILE+detail The file will be actually openened (and eventually closed) automatically.
@@ -2581,7 +2581,7 @@ int feenox_parse_print(void) {
       // and we do not expect the PRINT instruction to be used from the API
       // so we directly access the internals of the structure
       if (print->file->mode == NULL) {
-        print->file->mode = strdup("w");
+        feenox_check_alloc(print->file->mode = strdup("w"));
       }
  
 ///kw+PRINT+usage [ HEADER ]
@@ -2634,7 +2634,7 @@ int feenox_parse_print(void) {
       LL_APPEND(print->tokens, print_token);
 
       if (token[0] == '%') {
-        print_token->format = strdup(token);
+        feenox_check_alloc(print_token->format = strdup(token));
 
       } else if (strcasecmp(token, "STRING") == 0 || strcasecmp(token, "TEXT") == 0) {
         if (feenox_parser_string(&print_token->text) != FEENOX_OK) {
@@ -2642,7 +2642,7 @@ int feenox_parse_print(void) {
         }
 
       } else if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
-        print_token->text = strdup(token);   // nos quedamos con el texto para el header
+        feenox_check_alloc(print_token->text = strdup(token));   // nos quedamos con el texto para el header
         print_token->matrix = dummy_matrix;
 
       } else if ((dummy_vector = feenox_get_vector_ptr(token)) != NULL) {
@@ -2659,11 +2659,11 @@ int feenox_parse_print(void) {
             return FEENOX_ERROR;
           } else {
             print_token->expression.items = NULL;
-            print_token->text = strdup(token);
+            feenox_check_alloc(print_token->text = strdup(token));
             feenox_pop_error_message();
           }
         } else {
-          print_token->text = strdup(token);   // nos quedamos con el texto para el header
+          feenox_check_alloc(print_token->text = strdup(token));   // text for the header
         }
       }
     }
@@ -2671,7 +2671,7 @@ int feenox_parse_print(void) {
 
   // default separator
   if (print->separator == NULL) {
-    print->separator = strdup(DEFAULT_PRINT_SEPARATOR);
+    feenox_check_alloc(print->separator = strdup(DEFAULT_PRINT_SEPARATOR));
   }
   
   // default file is stdout
@@ -2717,7 +2717,7 @@ int feenox_parse_print_function(void) {
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
       feenox_call(feenox_parser_file(&print_function->file));
       if (print_function->file->mode == NULL) {
-        print_function->file->mode = strdup("w");
+        feenox_check_alloc(print_function->file->mode = strdup("w"));
       }
       
 ///kw+PRINT_FUNCTION+usage [ HEADER ]
@@ -2812,7 +2812,7 @@ int feenox_parse_print_function(void) {
       print_token_t *print_token = calloc(1, sizeof(print_token_t));
       LL_APPEND(print_function->tokens, print_token);
 
-      print_token->text = strdup(token);   // nos quedamos con el texto para el header
+      feenox_check_alloc(print_token->text = strdup(token));   // text for the header
           
       if ((dummy_function = feenox_get_function_ptr(token)) != NULL) {
         print_token->function = dummy_function;
@@ -2852,11 +2852,11 @@ int feenox_parse_print_function(void) {
   }
       
   if (print_function->separator == NULL) {
-    print_function->separator = strdup(DEFAULT_PRINT_SEPARATOR);
+    feenox_check_alloc(print_function->separator = strdup(DEFAULT_PRINT_SEPARATOR));
   }
 
   if (print_function->format == NULL) {
-    print_function->format = strdup(DEFAULT_PRINT_FORMAT);
+    feenox_check_alloc(print_function->format = strdup(DEFAULT_PRINT_FORMAT));
   }
 
   if (print_function->file == NULL) {
@@ -2991,7 +2991,7 @@ int feenox_parse_read_mesh(void) {
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
       feenox_call(feenox_parser_file(&mesh->file));
       if (mesh->file->mode == NULL) {
-        mesh->file->mode = strdup("r");
+        feenox_check_alloc(mesh->file->mode = strdup("r"));
       }
     
 ///kw+MESH_READ+usage [ NAME <name> ]
@@ -3078,11 +3078,11 @@ int feenox_parse_read_mesh(void) {
 
         feenox_call(feenox_parser_string(&function_name));
       } else {
-        function_name = strdup(name_in_mesh);
+        feenox_check_alloc(function_name = strdup(name_in_mesh));
       }
 
       node_data_t *node_data = calloc(1, sizeof(node_data_t));
-      node_data->name_in_mesh = strdup(name_in_mesh);
+      feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
       node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
       LL_APPEND(mesh->node_datas, node_data);
       free(name_in_mesh);
@@ -3099,7 +3099,7 @@ int feenox_parse_read_mesh(void) {
   if (mesh->name == NULL) {
     if (feenox.mesh.meshes == NULL) {
       // and it's the first mesh we call it 'first'
-      mesh->name = strdup("first");
+      feenox_check_alloc(mesh->name = strdup("first"));
     } else {
       // otherwise we complain
       feenox_push_error_message("when defining multiples meshes, a NAME is mandatory");

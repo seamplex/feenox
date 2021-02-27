@@ -119,7 +119,7 @@ int feenox_initialize(int argc, char **argv) {
   feenox.argc = argc;
   feenox.argv = malloc((argc+1) * sizeof(char *));
   for (i = 0; i < argc; i++) {
-    feenox.argv[i] = strdup(argv[i]);
+    feenox_check_alloc(feenox.argv[i] = strdup(argv[i]));
   }
   feenox.argv[i] = NULL;
   
@@ -127,7 +127,7 @@ int feenox_initialize(int argc, char **argv) {
   feenox.main_input_filepath = feenox.argv[feenox.optind];
   
   // remember the base directory of the input file so we can try harder to find files
-  feenox.main_input_dirname = strdup(dirname(argv[feenox.optind]));
+  feenox_check_alloc(feenox.main_input_dirname = strdup(dirname(argv[feenox.optind])));
   
   
   // turn of GSL error handler

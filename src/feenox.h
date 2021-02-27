@@ -1411,7 +1411,7 @@ extern int feenox_instruction_assignment_vector(void *arg);
 extern int feenox_instruction_assignment_matrix(void *arg);
 
 // auxiliary.c
-extern void feenox_strip_blanks(char *string);
+extern int feenox_strip_blanks(char *string);
 
 // alias.c
 extern int feenox_instruction_alias(void *arg);

@@ -64,7 +64,7 @@ int wasora_instruction_m4(void *arg) {
   // alocamos
   args_for_m4 = calloc(n_args_for_m4, sizeof(char *));
   i = 0;
-  args_for_m4[i++] = strdup("m4");
+  feenox_check_alloc(args_for_m4[i++] = strdup("m4"));
   // y loopeamos
   LL_FOREACH(m4->macros, macro) {  
     if (macro->print_token.text != NULL) {

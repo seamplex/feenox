@@ -58,8 +58,9 @@ int feenox_add_assignment(char *left_hand, char *right_hand) {
     assignment->initial_transient = 1;
   }
   
-  char *sanitized_lhs = strdup(left_hand);
-  feenox_strip_blanks(sanitized_lhs);
+  char *sanitized_lhs;
+  feenox_check_alloc(sanitized_lhs = strdup(left_hand));
+  feenox_call(feenox_strip_blanks(sanitized_lhs));
   if ((assignment->matrix = feenox_get_matrix_ptr(sanitized_lhs)) == NULL &&
       (assignment->vector = feenox_get_vector_ptr(sanitized_lhs)) == NULL) {
     

@@ -32,7 +32,7 @@ int feenox_mesh_one_node_point_init(void) {
   element_type_t *element_type;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_POINT1];
-  element_type->name = strdup("point");
+  feenox_check_alloc(element_type->name = strdup("point"));
   element_type->id = ELEMENT_TYPE_POINT1;
   element_type->dim = 0;
   element_type->order = 0;

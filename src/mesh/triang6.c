@@ -31,7 +31,7 @@ int feenox_mesh_triang6_init(void) {
   int j;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE6];
-  element_type->name = strdup("triang6");
+  feenox_check_alloc(element_type->name = strdup("triang6"));
   element_type->id = ELEMENT_TYPE_TRIANGLE6;
   element_type->dim = 2;
   element_type->order = 2;

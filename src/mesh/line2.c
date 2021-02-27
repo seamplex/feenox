@@ -36,7 +36,7 @@ int feenox_mesh_line2_init(void) {
   int j, v;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE2];
-  element_type->name = strdup("line2");
+  feenox_check_alloc(element_type->name = strdup("line2"));
   element_type->id = ELEMENT_TYPE_LINE2;
   element_type->dim = 1;
   element_type->order = 1;
