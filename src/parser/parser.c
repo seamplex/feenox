@@ -2974,9 +2974,7 @@ int feenox_parse_read_mesh(void) {
   // TODO: api?
   mesh_t *mesh = calloc(1, sizeof(mesh_t));
 
-  char *token = NULL;
-  while ((token = feenox_get_next_token(NULL)) != NULL) {
-
+///kw+MESH_READ+usage { <file_path> | <file_id> }
 ///kw+MESH_READ+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
 ///kw+MESH_READ+detail The format is read from the extension, which should be either
 ///kw+MESH_READ+detail @
@@ -2986,21 +2984,17 @@ int feenox_parse_read_mesh(void) {
 ///kw+MESH_READ+detail @
 ///kw+MESH_READ+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides information about physical groups.
 ///kw+MESH_READ+detail The other formats are primarily supported to read function data contained in the file.
+///kw+MESH_READ+detail The file path or file id can be used to refer to a particular mesh when reading more than one,
+///kw+MESH_READ+detail for instance in a `MESH_WRITE` or `MESH_INTEGRATE` keyword.
+///kw+MESH_READ+detail If a file path is given such as `cool_mesh.msh`, it can be referred to as either
+///kw+MESH_READ+detail `cool_mesh.msh` or just `cool_mesh`.  
+  feenox_call(feenox_parser_file(&mesh->file));
+  if (mesh->file->mode == NULL) {
+    feenox_check_alloc(mesh->file->mode = strdup("r"));
+  }
     
-///kw+MESH_READ+usage FILE { <file_path> | <file_id> }
-    if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
-      feenox_call(feenox_parser_file(&mesh->file));
-      if (mesh->file->mode == NULL) {
-        feenox_check_alloc(mesh->file->mode = strdup("r"));
-      }
-    
-///kw+MESH_READ+usage [ NAME <name> ]
-///kw+MESH_READ+detail If there will be only one mesh in the input file, the `NAME` is optional. 
-///kw+MESH_READ+detail Yet it might be needed in cases where there are many meshes and one needs to refer to a particular mesh,
-///kw+MESH_READ+detail such as in `MESH_WRITE` or `INTEGRATE`.
-    } else if (strcasecmp(token, "NAME") == 0) {
-      feenox_call(feenox_parser_string(&mesh->name));
-          
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {          
 ///kw+MESH_READ+detail The spatial dimensions cab be given with `DIMENSION`.
 ///kw+MESH_READ+detail If material properties are uniform and given with variables,
 ///kw+MESH_READ+detail the number of dimensions are not needed and will be read from the file at runtime.
@@ -3009,7 +3003,7 @@ int feenox_parse_read_mesh(void) {
 ///kw+MESH_READ+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
 ///kw+MESH_READ+detail how many arguments these functions take. 
 ///kw+MESH_READ+usage [ DIMENSIONS <num_expr> ]@
-    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+    if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
       mesh->dim = (int)(round(xi));
@@ -3094,18 +3088,6 @@ int feenox_parse_read_mesh(void) {
     }
   }
 
-///kw+MESH_READ+detail If no `NAME` is given, the first mesh defined is called `first`.
-  // if we don't have a name 
-  if (mesh->name == NULL) {
-    if (feenox.mesh.meshes == NULL) {
-      // and it's the first mesh we call it 'first'
-      feenox_check_alloc(mesh->name = strdup("first"));
-    } else {
-      // otherwise we complain
-      feenox_push_error_message("when defining multiples meshes, a NAME is mandatory");
-      return FEENOX_ERROR;
-    }
-  }
 ///kw+MESH_READ+detail If no mesh is marked as `MAIN`, the first one is the main one.
   if (feenox.mesh.meshes == NULL) {
     feenox.mesh.mesh_main = mesh;
@@ -3137,11 +3119,11 @@ int feenox_parse_read_mesh(void) {
   }
 
   // TODO: API?
-  if (feenox_get_mesh_ptr(mesh->name) != NULL) {
-    feenox_push_error_message("there already exists a mesh named '%s'", mesh->name);
+  if (feenox_get_mesh_ptr(mesh->file->name) != NULL) {
+    feenox_push_error_message("there already exists a mesh named '%s'", mesh->file->name);
     return FEENOX_ERROR;
   }
-  HASH_ADD_KEYPTR(hh, feenox.mesh.meshes, mesh->name, strlen(mesh->name), mesh);
+  HASH_ADD_KEYPTR(hh, feenox.mesh.meshes, mesh->file->name, strlen(mesh->file->name), mesh);
   feenox_call(feenox_add_instruction(feenox_instruction_mesh_read, mesh));
   
   return FEENOX_OK;

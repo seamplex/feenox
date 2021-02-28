@@ -1,2 +1,2 @@
-READ_MESH FILE cylinder.msh
+READ_MESH cylinder.msh
 PRINT elements

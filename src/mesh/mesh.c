@@ -185,7 +185,7 @@ int feenox_instruction_mesh_read(void *arg) {
   node_data_t *node_data;
   LL_FOREACH(this->node_datas, node_data) {
     if (node_data->function->mesh == NULL) {
-      feenox_push_error_message("cannot find data for function '%s' in mesh '%s'", node_data->name_in_mesh, this->name);
+      feenox_push_error_message("cannot find data for function '%s' in mesh '%s'", node_data->name_in_mesh, this->file->name);
       return FEENOX_ERROR;
     }
   }

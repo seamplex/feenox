@@ -1009,9 +1009,6 @@ struct property_data_t {
 
 // unstructured mesh
 struct mesh_t {
-  char *name;
-  int initialized;
-  
   file_t *file;
   unsigned int dim;
   unsigned int dim_topo;
@@ -1076,7 +1073,9 @@ struct mesh_t {
 
   // "virtual method" for format-dependet reader
   int (*reader)(mesh_t *this);
-  
+
+  int initialized;
+
   UT_hash_handle hh;
 
 };

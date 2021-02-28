@@ -153,7 +153,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           if (physical_group->tag == 0) {
             physical_group->tag = tag;
           } else if (physical_group->tag != tag) {
-            feenox_push_error_message("physical group '%s' has tag %d in input and %d in mesh '%s'", name, physical_group->tag, tag, this->name);
+            feenox_push_error_message("physical group '%s' has tag %d in input and %d in mesh '%s'", name, physical_group->tag, tag, this->file->name);
             return FEENOX_ERROR;
           }
           // same for the dimension
@@ -162,7 +162,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             physical_group->dimension = dimension;
           } else if (physical_group->dimension != dimension) {
             // si no coincide nos quejamos
-            feenox_push_error_message("physical group '%s' has dimension %d in input and %d in mesh '%s'", name, physical_group->dimension, dimension, this->name);
+            feenox_push_error_message("physical group '%s' has dimension %d in input and %d in mesh '%s'", name, physical_group->dimension, dimension, this->file->name);
             return FEENOX_ERROR;
           }
           
@@ -550,7 +550,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &tags[0], sizeof(int), physical_group);
               if ((this->element[i].physical_group = physical_group) == NULL) {
                 // si no encontramos ninguna, hay que crear una
-                snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->name, dimension, tags[0]);
+                snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, tags[0]);
                 if ((this->element[i].physical_group = feenox_define_physical_group(this, buffer, this->element[i].type->dim)) == NULL) {
                   return FEENOX_ERROR;
                 }
@@ -633,7 +633,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             physical = geometrical_entity->physical[0];
             HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
             if ((this->element[i].physical_group = physical_group) == NULL) {
-              snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->name, dimension, physical);
+              snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, physical);
               if ((this->element[i].physical_group = feenox_define_physical_group(this, buffer, feenox.mesh.element_types[type].dim)) == NULL) {
                 return FEENOX_ERROR;
               }
