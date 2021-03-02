@@ -9,7 +9,8 @@ dnl ----------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 010-introduction.md)
 
 
-Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called FOSS.
+Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called FOSS. This condition leaves all of the well-known non-free finite-element solvers in the market out of the tender.
+
 FeenoX is licensed under the terms of the GNU General Public License version\ 3 or, at the user convenience, any later version. This means that users get the four essential freedoms:
 
  0. The freedom to _run_ the program as they wish, for _any_ purpose.
@@ -17,7 +18,7 @@ FeenoX is licensed under the terms of the GNU General Public License version\ 3 
  2. The freedom to _redistribute_ copies so they can help others.
  3. The freedom to _distribute_ copies of their _modified_ versions to others.
 
-There are some examples of pieces of computational software which are described as “open source” in which even the first of the four freedoms is denied. In the nuclear industry, it is the case of a Monte Carlo particle-transport program that requests users to sign an agreement about the objective of its usage before allowing its execution. The software itself might be open source but it is not free at all.
+There are some examples of pieces of computational software which are described as “open source” in which even the first of the four freedoms is denied. In the nuclear industry, it is the case of a Monte Carlo particle-transport program that requests users to sign an agreement about the objective of its usage before allowing its execution. The software itself might be open source because the source code is provided after signing the agreement, but it is not free at all.
  
 Licensing FeenoX as GPLv3+ also implies that the source code and all the scripts and makefiles needed to compile and run it are available for anyone that requires it. Anyone wanting to modify the program either to fix bugs, improve it or add new features is free to do so. And if they do not know how to program, the have the freedom to hire a programmer to do it without needing to ask permission to the original authors. 
 
@@ -51,7 +52,7 @@ rule of separation
 separate mesher - unix 
 
 dnl --------------------------------------------------------------------------------
-esyscmd(awk -f quote.awk 040-archiecture.md)
+esyscmd(awk -f quote.awk 040-architecture.md)
 
 C, quote petsc, flat memory address space -> that's what virtual servers have!
 

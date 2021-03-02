@@ -11,7 +11,7 @@ include(020-objective.md)
 
 include(030-scope.md)
 
-include(040-archiecture.md)
+include(040-architecture.md)
 
 include(050-deployment.md)
 
