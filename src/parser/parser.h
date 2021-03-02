@@ -100,5 +100,6 @@ extern int feenox_parse_phase_space(void);
 
 extern int feenox_parse_read_mesh(void);
 extern int feenox_parse_write_mesh(void);
+extern int feenox_parse_physical_group(void);
 
 #endif  

@@ -270,6 +270,13 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "WRITE_MESH") == 0) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
+
+///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
+///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+      feenox_call(feenox_parse_physical_group());
+      return FEENOX_OK;
       
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -3133,5 +3140,114 @@ int feenox_parse_read_mesh(void) {
 int feenox_parse_write_mesh(void) {
   
   
+  return FEENOX_OK;
+}
+
+
+int feenox_parse_physical_group(void) {
+/*  
+      char *name = NULL;
+      double xi = 0;
+      mesh_t *mesh = NULL;
+      int dimension = 0;
+      material_t *material = NULL;
+      bc_t *bcs = NULL;
+      bc_t *bc = NULL;
+      expr_t *pos = NULL;
+      physical_entity_t *physical_entity = NULL;
+*/
+///kw+PHYSICAL_GROUP+usage <name>
+///kw+PHYSICAL_GROUP+detail A name is mandatory for each physical group defined within the input file.
+///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction makes no effect.
+  char *name = NULL;
+  feenox_call(feenox_parser_string(&name));
+
+  char *token = NULL;
+  char *mesh = NULL;
+  char *material = NULL;
+  char *bc = NULL;
+  unsigned int dimension = 0;
+  unsigned int id = 0;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {          
+///kw+PHYSICAL_GROUP+usage [ MESH <name> ]
+///kw+PHYSICAL_GROUP+detail If there are many meshes, an explicit mesh can be given with `MESH`.
+///kw+PHYSICAL_GROUP+detail Otherwise, the physical group is defined on the main mesh.
+    if (strcasecmp(token, "MESH") == 0) {
+      feenox_call(feenox_parser_string(&mesh));
+
+///kw+PHYSICAL_GROUP+usage [ DIMENSION <expr> ]
+///kw+PHYSICAL_GROUP+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
+    } else if (strcasecmp(token, "DIMENSION") == 0 || strcasecmp(token, "DIM") == 0) {
+      double xi;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      dimension = (unsigned int)(round(xi));
+
+///kw+PHYSICAL_GROUP+usage [ ID <expr> ]@
+///kw+PHYSICAL_GROUP+detail An explicit id can be given with `ID`.
+///kw+PHYSICAL_GROUP+detail Both dimension and id should match the values in the mesh.
+    } else if (strcasecmp(token, "ID") == 0 || strcasecmp(token, "DIM") == 0) {
+      double xi;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      id = (unsigned int)(round(xi));
+      
+///kw+PHYSICAL_GROUP+usage [ MATERIAL <name> |
+///kw+PHYSICAL_GROUP+detail For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
+///kw+PHYSICAL_GROUP+detail Note that if a material is created with the same name as a physical group in the mesh,
+///kw+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+///kw+PHYSICAL_GROUP+detail The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
+///kw+PHYSICAL_GROUP+detail in a mesh file and a material in the feenox input file with different names.
+///kw+PHYSICAL_GROUP+detail 
+    } else if (strcasecmp(token, "MATERIAL") == 0) {
+      feenox_call(feenox_parser_string(&material));
+  
+///kw+PHYSICAL_GROUP+usage | BC <name> [ BC ... ] ]@
+    } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
+///kw+PHYSICAL_GROUP+detail Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
+///kw+PHYSICAL_GROUP+detail As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
+///kw+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+///kw+PHYSICAL_GROUP+detail The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
+///kw+PHYSICAL_GROUP+detail in a mesh file and a boundary condition in the feenox input file with different names.
+///kw+PHYSICAL_GROUP+detail Note that while there can be only one `MATERIAL` associated to a physical group,
+///kw+PHYSICAL_GROUP+detail there can be many `BC`s associated to a physical group.
+      feenox_call(feenox_parser_string(&bc));
+
+    } else {
+      feenox_push_error_message("undefined keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+  
+  // TODO: feenox_define_physical_group(name, mesh, dimension, id);
+  // feenox_physical_group_set_material()
+  // feenox_physical_group_add_bc()
+/*
+  if (mesh == NULL && (mesh = feenox_mesh.main_mesh) == NULL) {
+    feenox_push_error_message("unknown mesh for physical group '%s'", name);
+    return FEENOX_ERROR;
+  }
+      
+  if (name == NULL) {
+    feenox_push_error_message("NAME is mandatory for PHYSICAL_GROUP");
+    return FEENOX_ERROR;
+  }
+  if ((physical_entity = feenox_get_physical_entity_ptr(name, mesh)) == NULL) {
+    if ((physical_entity = feenox_define_physical_entity(name, mesh, dimension)) == NULL) {
+      return FEENOX_ERROR;
+    }
+  }
+
+  if (material != NULL) {
+    physical_entity->material = material;
+  }
+      
+  if (bcs != NULL) {
+    physical_entity->bcs = bcs;
+  }
+      
+  free(name);
+ free(mesh);
+ * free(material);
+ * free(bc);
+*/
   return FEENOX_OK;
 }
