@@ -190,12 +190,12 @@ material_t *feenox_get_material_ptr(const char *name) {
 }
 
 // get a pointer to a physical group
-physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name) {
+physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {
   physical_group_t *physical_group;
   mesh_t *dummy;
   mesh_t *tmp;
-  if (this != NULL) {
-    HASH_FIND_STR(this->physical_groups, name, physical_group);
+  if (mesh != NULL) {
+    HASH_FIND_STR(mesh->physical_groups, name, physical_group);
   } else {
     // barremos todas las mallas
     HASH_ITER(hh, feenox.mesh.meshes, dummy, tmp) {

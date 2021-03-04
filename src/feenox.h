@@ -1399,7 +1399,7 @@ extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name)
 extern file_t *feenox_get_file_ptr(const char *name);
 extern mesh_t *feenox_get_mesh_ptr(const char *name);
 extern material_t *feenox_get_material_ptr(const char *name);
-extern physical_group_t *feenox_get_physical_group_ptr(mesh_t *this, const char *name);
+extern physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh);
 
 
 // assignment.c
