@@ -271,6 +271,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
+///kw+MATERIAL+desc Define a material its and properties.
+///kw+MATERIAL+usage MATERIAL
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "MATERIAL") == 0) {
+      feenox_call(feenox_parse_material());
+      return FEENOX_OK;
+
 ///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
 ///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
       // -----  -----------------------------------------------------------
@@ -3145,17 +3152,6 @@ int feenox_parse_write_mesh(void) {
 
 
 int feenox_parse_physical_group(void) {
-/*  
-      char *name = NULL;
-      double xi = 0;
-      mesh_t *mesh = NULL;
-      int dimension = 0;
-      material_t *material = NULL;
-      bc_t *bcs = NULL;
-      bc_t *bc = NULL;
-      expr_t *pos = NULL;
-      physical_entity_t *physical_entity = NULL;
-*/
 ///kw+PHYSICAL_GROUP+usage <name>
 ///kw+PHYSICAL_GROUP+detail A name is mandatory for each physical group defined within the input file.
 ///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction makes no effect.
@@ -3249,5 +3245,76 @@ int feenox_parse_physical_group(void) {
  * free(material);
  * free(bc);
 */
+  return FEENOX_OK;
+}
+
+
+int feenox_parse_material(void) {
+
+//  material_t *material;
+//  physical_entity_t *physical_entity = NULL;
+//  char *name;
+//  char *material_name;
+      
+///kw+MATERIAL+usage <name>
+  material_t *material = NULL;
+  char *material_name = NULL;
+  feenox_call(feenox_parser_string(&material_name));
+
+  // if there already exists one, add stuff to that one
+  if ((material = feenox_get_material_ptr(material_name)) == NULL) {
+    material = feenox_define_material(material_name);
+  }
+      
+  // TODO: this goes in define_material
+  if ((material->mesh = feenox.mesh.mesh_main) == NULL) {
+    feenox_push_error_message("MATERIAL before MESH");
+    return FEENOX_ERROR;
+  }      
+      
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+    char *expr_string = NULL;
+
+///kw+MATERIAL+usage [ MESH <name> ]
+    if (strcasecmp(token, "MESH") == 0) {
+      char *mesh_name; 
+      feenox_call(feenox_parser_string(&mesh_name));
+      if ((material->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("undefined mesh '%s'" , mesh_name);
+        return FEENOX_ERROR;
+      }
+      free(mesh_name);
+          
+///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+      char *physical_group_name;
+      feenox_call(feenox_parser_string(&physical_group_name));  
+
+      physical_group_t *physical_group = NULL;
+      if ((physical_group = feenox_get_physical_group_ptr(physical_group_name, material->mesh)) == NULL) {
+        if ((physical_group = feenox_define_physical_group(material->mesh, physical_group_name, material->mesh->dim_topo)) == NULL) {
+          return FEENOX_ERROR;
+        }
+      }
+          
+      // TODO: api
+      physical_group->material = material;
+      free(physical_group_name);
+        
+    } else {
+      name = strdup(token);
+///kw+MATERIAL+usage [ <property_name_1> <expr_1> [ <property_name_2> <expr_2> [ ... ] ] ]
+      feenox_call(feenox_parser_string(&expr_string));
+      if (feenox_define_property_data(material_name, name, expr_string) == NULL) {
+        return FEENOX_ERROR;
+      }
+      free(expr_string);
+      free(name);
+    }
+  }
+  free(material_name);
+      
   return FEENOX_OK;
 }
