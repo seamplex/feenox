@@ -140,13 +140,11 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         }
         feenox_check_alloc(name = strdup(dummy+1));
        
-        if ((physical_group = feenox_get_physical_group_ptr(this, name)) == NULL) {
+        if ((physical_group = feenox_get_physical_group_ptr(name, this)) == NULL) {
           // create new physical group
-          if ((physical_group = feenox_define_physical_group(this, name, dimension)) == NULL) {
+          if ((physical_group = feenox_define_physical_group_get_ptr(name, this, dimension, tag)) == NULL) {
             return FEENOX_ERROR;
           }
-          // TODO: api, set tag
-          physical_group->tag = tag;
         } else {
           // there already exists a physical group created with PHYSICAL_GROUP
           // check that either it does not have a tag or the tags coincide
@@ -532,10 +530,10 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           this->element[i].type = &(feenox.mesh.element_types[type]);
 
           // format v2.2
-          // cada elemento tiene un tag que es un array de enteros
-          // el primero es el id de la entidad fisica
-          // el segundo es el id de la entidad geometrica (no nos interesa)
-          // despues siguen cosas opcionales como particiones, padres, dominios, etc
+          // each element has a tag which is an array of ints
+          // first one is the ide of the physical entity
+          // second one is the id of the geometrical entity (not interested)
+          // then other optional stuff like partitions, domains, etc
           if (ntags > 0) {
             feenox_check_alloc(tags = malloc(ntags * sizeof(size_t)));
             for (size_t k = 0; k < ntags; k++) {
@@ -549,12 +547,11 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               dimension = this->element[i].type->dim;
               HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &tags[0], sizeof(int), physical_group);
               if ((this->element[i].physical_group = physical_group) == NULL) {
-                // si no encontramos ninguna, hay que crear una
+                // if we did not find anything, create one
                 snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, tags[0]);
-                if ((this->element[i].physical_group = feenox_define_physical_group(this, buffer, this->element[i].type->dim)) == NULL) {
+                if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, this->element[i].type->dim, tags[0])) == NULL) {
                   return FEENOX_ERROR;
                 }
-                this->element[i].physical_group->tag = tags[0];
                 HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), this->element[i].physical_group);
               }
               this->element[i].physical_group->n_elements++;
@@ -626,7 +623,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             return FEENOX_ERROR;
           }
           
-          // todo el bloque tiene la misma entidad fisica, la encontramos una vez y ya
+          // the whole block has the same physical group, find it once and that's it
           HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
           if (geometrical_entity->num_physicals > 0) {
             // que hacemos si hay mas de una? la primera? la ultima?
@@ -634,7 +631,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
             if ((this->element[i].physical_group = physical_group) == NULL) {
               snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, physical);
-              if ((this->element[i].physical_group = feenox_define_physical_group(this, buffer, feenox.mesh.element_types[type].dim)) == NULL) {
+              if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, feenox.mesh.element_types[type].dim, physical)) == NULL) {
                 return FEENOX_ERROR;
               }
               this->element[i].physical_group->tag = physical;

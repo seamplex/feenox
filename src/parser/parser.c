@@ -3159,9 +3159,9 @@ int feenox_parse_physical_group(void) {
   feenox_call(feenox_parser_string(&name));
 
   char *token = NULL;
-  char *mesh = NULL;
-  char *material = NULL;
-  char *bc = NULL;
+  char *mesh_name = NULL;
+  char *material_name = NULL;
+  char *bc_name = NULL;
   unsigned int dimension = 0;
   unsigned int id = 0;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
@@ -3169,7 +3169,7 @@ int feenox_parse_physical_group(void) {
 ///kw+PHYSICAL_GROUP+detail If there are many meshes, an explicit mesh can be given with `MESH`.
 ///kw+PHYSICAL_GROUP+detail Otherwise, the physical group is defined on the main mesh.
     if (strcasecmp(token, "MESH") == 0) {
-      feenox_call(feenox_parser_string(&mesh));
+      feenox_call(feenox_parser_string(&mesh_name));
 
 ///kw+PHYSICAL_GROUP+usage [ DIMENSION <expr> ]
 ///kw+PHYSICAL_GROUP+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
@@ -3194,7 +3194,7 @@ int feenox_parse_physical_group(void) {
 ///kw+PHYSICAL_GROUP+detail in a mesh file and a material in the feenox input file with different names.
 ///kw+PHYSICAL_GROUP+detail 
     } else if (strcasecmp(token, "MATERIAL") == 0) {
-      feenox_call(feenox_parser_string(&material));
+      feenox_call(feenox_parser_string(&material_name));
   
 ///kw+PHYSICAL_GROUP+usage | BC <name> [ BC ... ] ]@
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
@@ -3205,7 +3205,7 @@ int feenox_parse_physical_group(void) {
 ///kw+PHYSICAL_GROUP+detail in a mesh file and a boundary condition in the feenox input file with different names.
 ///kw+PHYSICAL_GROUP+detail Note that while there can be only one `MATERIAL` associated to a physical group,
 ///kw+PHYSICAL_GROUP+detail there can be many `BC`s associated to a physical group.
-      feenox_call(feenox_parser_string(&bc));
+      feenox_call(feenox_parser_string(&bc_name));
 
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
@@ -3213,49 +3213,22 @@ int feenox_parse_physical_group(void) {
     }
   }
   
-  // TODO: feenox_define_physical_group(name, mesh, dimension, id);
+  feenox_call(feenox_define_physical_group(name, mesh_name, dimension, id));
   // feenox_physical_group_set_material()
   // feenox_physical_group_add_bc()
-/*
-  if (mesh == NULL && (mesh = feenox_mesh.main_mesh) == NULL) {
-    feenox_push_error_message("unknown mesh for physical group '%s'", name);
-    return FEENOX_ERROR;
-  }
+  
       
-  if (name == NULL) {
-    feenox_push_error_message("NAME is mandatory for PHYSICAL_GROUP");
-    return FEENOX_ERROR;
-  }
-  if ((physical_entity = feenox_get_physical_entity_ptr(name, mesh)) == NULL) {
-    if ((physical_entity = feenox_define_physical_entity(name, mesh, dimension)) == NULL) {
-      return FEENOX_ERROR;
-    }
-  }
-
-  if (material != NULL) {
-    physical_entity->material = material;
-  }
-      
-  if (bcs != NULL) {
-    physical_entity->bcs = bcs;
-  }
-      
+  free(bc_name);
+  free(material_name);
+  free(mesh_name);
   free(name);
- free(mesh);
- * free(material);
- * free(bc);
-*/
+  
   return FEENOX_OK;
 }
 
 
 int feenox_parse_material(void) {
 
-//  material_t *material;
-//  physical_entity_t *physical_entity = NULL;
-//  char *name;
-//  char *material_name;
-      
 ///kw+MATERIAL+usage <name>
   material_t *material = NULL;
   char *material_name = NULL;
@@ -3263,7 +3236,7 @@ int feenox_parse_material(void) {
 
   // if there already exists one, add stuff to that one
   if ((material = feenox_get_material_ptr(material_name)) == NULL) {
-    material = feenox_define_material(material_name);
+    material = feenox_define_material_get_ptr(material_name);
   }
       
   // TODO: this goes in define_material
@@ -3294,7 +3267,7 @@ int feenox_parse_material(void) {
 
       physical_group_t *physical_group = NULL;
       if ((physical_group = feenox_get_physical_group_ptr(physical_group_name, material->mesh)) == NULL) {
-        if ((physical_group = feenox_define_physical_group(material->mesh, physical_group_name, material->mesh->dim_topo)) == NULL) {
+        if ((physical_group = feenox_define_physical_group_get_ptr(physical_group_name, material->mesh, material->mesh->dim_topo, 0)) == NULL) {
           return FEENOX_ERROR;
         }
       }
@@ -3304,12 +3277,10 @@ int feenox_parse_material(void) {
       free(physical_group_name);
         
     } else {
-      name = strdup(token);
+      char *name = strdup(token);
 ///kw+MATERIAL+usage [ <property_name_1> <expr_1> [ <property_name_2> <expr_2> [ ... ] ] ]
       feenox_call(feenox_parser_string(&expr_string));
-      if (feenox_define_property_data(material_name, name, expr_string) == NULL) {
-        return FEENOX_ERROR;
-      }
+      feenox_call(feenox_define_property_data(material_name, name, expr_string));
       free(expr_string);
       free(name);
     }

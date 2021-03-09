@@ -173,8 +173,9 @@ enum version_type {
 #endif
 
 // macro to check malloc() for NULL (ass means assignement, you ass!)
-#define feenox_check_alloc(ass)      if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
-#define feenox_check_alloc_null(ass) if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return NULL; }
+#define feenox_check_alloc(ass)         if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
+#define feenox_check_alloc_null(ass)    if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return NULL; }
+#define feenox_check_minusone_null(ass) if ((ass) == -1) { feenox_push_error_message("cannot allocate memory"); return NULL; }
 
 // macro to access internal special variables
 #define feenox_special_var(var) (feenox.special_vars.var)
@@ -1453,7 +1454,17 @@ extern int feenox_mesh_read_vtk(mesh_t *this);
 extern int feenox_mesh_read_frd(mesh_t *this);
 
 // physical_group.c
-extern physical_group_t *feenox_define_physical_group(mesh_t *mesh, const char *name, int dimension);
+extern int feenox_define_physical_group(const char *name, const char *mesh_name, unsigned int dimension, size_t tag);
+extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, unsigned int dimension, size_t tag);
+
+extern material_t *feenox_define_material_get_ptr(const char *name);
+
+extern int feenox_define_property_data(const char *material_name, const char *property_name, const char *expr_string);
+extern property_data_t *feenox_define_property_data_get_ptr(const char *material_name, const char *property_name, const char *expr_string);
+
+extern int feenox_define_physical_property(const char *name, const char *mesh_name);
+extern physical_property_t *feenox_define_physical_property_get_ptr(const char *name, mesh_t *mesh);
+
 
 // init.c
 int feenox_mesh_element_types_init(void);
