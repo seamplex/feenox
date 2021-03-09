@@ -88,6 +88,10 @@ The main objective is to comply with the Software Requirements Specification. Wi
  * Use snake case such as in `this_is_a_long_name`.
  * All functions ought to start with `feenox_`. This is the small price we need to pay in order to keep a magnificent beast like C++ away from our lives (those who can). The name should go from general to particular such as `feenox_expression_parse()` and `feenox_expression_eval()` (and not `feenox_parse_expression()`/`feenox_eval_expression()`) so all function related with expressions can be easily found. There are exceptions, like functions which do similar tasks such as `feenox_add_assignemnt()` and `feenox_add_instructions()`. Here the `add` part is the common one.
  
+## Comments
+
+ * Use single-line comments for commenting the code `//` so we can use multiline comments `/*`-`*/` to _comment out_ certain parts of code while developing new features.
+ 
 ## Git workflow
 
  * Of course, use `git`. This may seem obvious but predecessors of this project have used Subversion, Bazaar and Mercurial in that order. I have myself used CVS (in the past century).

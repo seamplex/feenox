@@ -1,4 +1,4 @@
 divert(-1)
-changequote([x,x])
-changecom([x/*x], [x*/x])
+changequote([[,]])
+changecom([[/*]], [[*/]])
 divert(0)dnl

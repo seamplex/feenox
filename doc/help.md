@@ -13,11 +13,6 @@
 :    display detailed version information
 
 
-`-d`, `--debug`.
-
-:    start in debug mode
-
-
 `-s`, `--sumarize`
 
 :    list all symbols in the input file and exit

@@ -7,6 +7,22 @@ for i in touch m4 sed pandoc; do
  fi
 done
 
+if [ ! -e design ]; then
+  echo "error: execute from doc directory"
+  exit 1
+fi
+
+echo "creating SRS and SDS markdown"
+cd design
+m4 ../header.m4 srs.m4 > ../srs.md
+# pandoc srs.md --number-sections --filter pandoc-crossref -o srs.pdf
+m4 ../header.m4 sds.m4 > ../sds.md
+# pandoc srs.md --number-sections --filter pandoc-crossref -o srs.pdf
+cd ..
+
+
+# exit
+
 
 echo "creating the reference markdown from the commented sources"
 echo " - keywords"
