@@ -172,10 +172,10 @@ void feenox_longversion(void) {
 #if HAVE_IDA
   char *sundials_version = malloc(BUFFER_TOKEN_SIZE);
   SUNDIALSGetVersion(sundials_version, BUFFER_TOKEN_SIZE);
-  printf("SUNDIALs version   : %s\n", sundials_version);
 #else
-  printf("SUNDIALs version   : N/A\n", sundials_version);
+  char *sundials_version = "N/A";
 #endif
+  printf("SUNDIALs version   : %s\n", sundials_version);
   
   printf("Readline version   : %s\n", 
 #if HAVE_READLINE
@@ -196,16 +196,17 @@ void feenox_longversion(void) {
   printf("PETSc arch         : %s\n", petscarch);
   printf("PETSc options      : %s\n", petscconfigureoptions);
 #else
-  printf("PETSc version      : N/A\n", petscversion);
+  printf("PETSc version      : N/A\n");
 #endif      
   
 #ifdef HAVE_SLEPC
   char slepcversion[BUFFER_TOKEN_SIZE];
   SlepcGetVersion(slepcversion, BUFFER_TOKEN_SIZE);  
-  printf("SLEPc version      : %s\n", slepcversion);
 #else
+  char *slepcversion = "N/A";
   printf("SLEPc version      : N/A\n");
 #endif
+  printf("SLEPc version      : %s\n", slepcversion);
 
   return;
 }
