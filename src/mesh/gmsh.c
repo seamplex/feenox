@@ -168,7 +168,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 
         // add the group to a local hash so we can solve the pointer
         // "more or less" easy
-        HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), physical_group);
+        HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(size_t), physical_group);
 
         // if the physical group does not have a material, look for one with the same name
         if (physical_group->material == NULL) {
@@ -265,7 +265,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         }
         
         // agregamos la group al hash de la dimension que corresponda
-        HASH_ADD(hh[dimension], this->geometrical_entities[dimension], tag, sizeof(int), geometrical_entity);
+        HASH_ADD(hh[dimension], this->geometrical_entities[dimension], tag, sizeof(size_t), geometrical_entity);
         
       }
 
@@ -542,17 +542,16 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               }
             }
             
-            
             if (ntags > 1) {
               dimension = this->element[i].type->dim;
-              HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &tags[0], sizeof(int), physical_group);
+              HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &tags[0], sizeof(size_t), physical_group);
               if ((this->element[i].physical_group = physical_group) == NULL) {
                 // if we did not find anything, create one
                 snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, tags[0]);
                 if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, this->element[i].type->dim, tags[0])) == NULL) {
                   return FEENOX_ERROR;
                 }
-                HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), this->element[i].physical_group);
+                HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(size_t), this->element[i].physical_group);
               }
               this->element[i].physical_group->n_elements++;
             }
@@ -624,18 +623,18 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           }
           
           // the whole block has the same physical group, find it once and that's it
-          HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
+          HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(size_t), geometrical_entity);
           if (geometrical_entity->num_physicals > 0) {
             // que hacemos si hay mas de una? la primera? la ultima?
             physical = geometrical_entity->physical[0];
-            HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
+            HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(size_t), physical_group);
             if ((this->element[i].physical_group = physical_group) == NULL) {
               snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, physical);
               if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, feenox.mesh.element_types[type].dim, physical)) == NULL) {
                 return FEENOX_ERROR;
               }
               this->element[i].physical_group->tag = physical;
-              HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), this->element[i].physical_group);
+              HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(size_t), this->element[i].physical_group);
             }
           } else {
             physical_group = NULL;
