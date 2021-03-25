@@ -808,8 +808,8 @@ struct node_relative_t {
 
 struct physical_group_t {
   char *name;
-  size_t tag;
-  unsigned int dimension;
+  int tag;
+  int dimension;
   
   material_t *material;    // apuntador
   bc_t *bcs;               // linked list 
@@ -834,13 +834,18 @@ struct physical_group_t {
 
 
 struct geometrical_entity_t {
-  size_t tag;
+  int tag;
+  int parent_dim;
+  int parent_tag;
   double boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ;
+
+  size_t num_partitions;
+  int *partition;
   
   size_t num_physicals;
-  size_t *physical;
+  int *physical;
   size_t num_bounding;
-  size_t *bounding;
+  int *bounding;
 
   UT_hash_handle hh[4];
 };
@@ -1023,13 +1028,19 @@ struct mesh_t {
 
   physical_group_t *physical_groups;              // global hash table
   physical_group_t *physical_groups_by_tag[4];    // 4 hash tablesm one per tag
-  unsigned int physical_tag_max;   // the higher tag of the entities
+  int physical_tag_max;   // the higher tag of the entities
   
   // number of geometric entities of each dimension
-  unsigned points, curves, surfaces, volumes;
+  size_t points, curves, surfaces, volumes;
   geometrical_entity_t *geometrical_entities[4];     // 4 hash tables, one for each dimension
+  
+  // partition data
+  size_t num_partitions;
+  size_t num_ghost_entitites;
+  size_t partitioned_points, partitioned_curves, partitioned_surfaces, partitioned_volumes;
+  
 
-  int sparse;                     // flag that indicates if the nodes are sparse
+  int sparse;            // flag that indicates if the nodes are sparse
   size_t *tag2index;     // array to map tags to indexes (we need a -1)
   
   enum {
@@ -1042,7 +1053,7 @@ struct mesh_t {
     integration_reduced
   } integration;
   
-  unsigned int update_each_step;
+  int update_each_step;
   
   expr_t scale_factor;           // factor de escala al leer la posicion de los nodos
   expr_t offset_x;               // offset en nodos
@@ -1054,7 +1065,7 @@ struct mesh_t {
 
   node_data_t *node_datas;
   
-  unsigned int n_physical_names;
+  int n_physical_names;
   node_t *node;
   element_t *element;
   cell_t *cell;

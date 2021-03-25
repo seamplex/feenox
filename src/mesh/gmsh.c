@@ -112,12 +112,12 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         return FEENOX_ERROR;
       }
  
-      unsigned int i;
+      int i;
       for (i = 0; i < this->n_physical_names; i++) {
 
-        size_t dimension;
-        size_t tag;
-        if (fscanf(this->file->pointer, "%ld %ld", &dimension, &tag) < 2) {
+        int dimension;
+        int tag;
+        if (fscanf(this->file->pointer, "%d %d", &dimension, &tag) < 2) {
           return FEENOX_ERROR;
         }
         if (dimension < 0 || dimension > 4) {
@@ -194,8 +194,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
     // ------------------------------------------------------      
     } else if (strncmp("$Entities", buffer, 9) == 0) {
  
-      // la cantidad de cosas
-      if (fscanf(this->file->pointer, "%d %d %d %d", &this->points, &this->curves, &this->surfaces, &this->volumes) < 4) {
+      // number of entities per dimension
+      if (fscanf(this->file->pointer, "%ld %ld %ld %ld", &this->points, &this->curves, &this->surfaces, &this->volumes) < 4) {
         return FEENOX_ERROR;
       }
       size_t i;
@@ -214,17 +214,17 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         feenox_check_alloc(geometrical_entity = calloc(1, sizeof(geometrical_entity_t)));
         // a partir de 4.1 los puntos tienen solo 3 valores, no 6 de bounding box
         if (dimension == 0 && version_maj == 4 && version_min >= 1) {
-          if (fscanf(this->file->pointer, "%ld %lf %lf %lf %ld",
+          if (fscanf(this->file->pointer, "%d %lf %lf %lf %ld",
                      &geometrical_entity->tag,
                      &geometrical_entity->boxMinX,
                      &geometrical_entity->boxMinY,
                      &geometrical_entity->boxMinZ,
                      &geometrical_entity->num_physicals) < 5) {
-            feenox_push_error_message("not enough data in physical groups");
+            feenox_push_error_message("not enough data in entities");
             return FEENOX_ERROR;
           }
         } else {
-          if (fscanf(this->file->pointer, "%ld %lf %lf %lf %lf %lf %lf %ld",
+          if (fscanf(this->file->pointer, "%d %lf %lf %lf %lf %lf %lf %ld",
                      &geometrical_entity->tag,
                      &geometrical_entity->boxMinX,
                      &geometrical_entity->boxMinY,
@@ -233,16 +233,16 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
                      &geometrical_entity->boxMaxY,
                      &geometrical_entity->boxMaxZ,
                      &geometrical_entity->num_physicals) < 8) {
-            feenox_push_error_message("not enough data in physical groups");
+            feenox_push_error_message("not enough data in entities");
             return FEENOX_ERROR;
           }
         }        
         
         if (geometrical_entity->num_physicals != 0) {
-          feenox_check_alloc(geometrical_entity->physical = calloc(geometrical_entity->num_physicals, sizeof(size_t)));
+          feenox_check_alloc(geometrical_entity->physical = calloc(geometrical_entity->num_physicals, sizeof(int)));
           size_t j;
           for (j = 0; j < geometrical_entity->num_physicals; j++) {
-            if (fscanf(this->file->pointer, "%ld", &geometrical_entity->physical[j]) == 0) {
+            if (fscanf(this->file->pointer, "%d", &geometrical_entity->physical[j]) == 0) {
               return FEENOX_ERROR;
             }
           }
@@ -254,10 +254,10 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             return FEENOX_ERROR;
           }          
           if (geometrical_entity->num_bounding != 0) {
-            feenox_check_alloc(geometrical_entity->bounding = calloc(geometrical_entity->num_bounding, sizeof(size_t)));
+            feenox_check_alloc(geometrical_entity->bounding = calloc(geometrical_entity->num_bounding, sizeof(int)));
             for (size_t j = 0; j < geometrical_entity->num_bounding; j++) {
               // some groups can be negative because the tag is multiplied by the orientation
-              if (fscanf(this->file->pointer, "%ld", &geometrical_entity->bounding[j]) == 0) {
+              if (fscanf(this->file->pointer, "%d", &geometrical_entity->bounding[j]) == 0) {
                 return FEENOX_ERROR;
               }
             }
@@ -269,7 +269,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         
       }
 
-      // queda un blanco y un newline
       if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL) {
         feenox_push_error_message("corrupted mesh file '%s'", this->file->path);
         return -3;
@@ -285,6 +284,128 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         return -2;
       }
       
+    // ------------------------------------------------------      
+    } else if (strncmp("$PartitionedEntities", buffer, 20) == 0) {
+      
+      // number of partitions and ghost entitites
+      if (fscanf(this->file->pointer, "%ld %ld", &this->num_partitions, &this->num_ghost_entitites) < 2) {
+        return FEENOX_ERROR;
+      }
+      
+      if (this->num_ghost_entitites != 0) {
+        feenox_push_error_message("ghost entitites not yet handled");
+        return FEENOX_ERROR;
+      }
+      
+      // number of entities per dimension
+      if (fscanf(this->file->pointer, "%ld %ld %ld %ld", &this->partitioned_points, &this->partitioned_curves, &this->partitioned_surfaces, &this->partitioned_volumes) < 4) {
+        return FEENOX_ERROR;
+      }
+      
+      size_t i;
+      for (i = 0; i < this->partitioned_points+this->partitioned_curves+this->partitioned_surfaces+this->partitioned_volumes; i++) {
+        size_t dimension;
+        if (i < this->partitioned_points) {
+          dimension = 0;
+        } else if (i < this->partitioned_points+this->partitioned_curves) {
+          dimension = 1;          
+        } else if (i < this->partitioned_points+this->partitioned_curves+this->partitioned_surfaces) {
+          dimension = 2;          
+        } else {
+          dimension = 3;
+        }
+        
+        feenox_check_alloc(geometrical_entity = calloc(1, sizeof(geometrical_entity_t)));
+        if (fscanf(this->file->pointer, "%d %d %d %ld",
+                   &geometrical_entity->tag,
+                   &geometrical_entity->parent_dim,
+                   &geometrical_entity->parent_tag,
+                   &geometrical_entity->num_partitions) < 4) {
+            feenox_push_error_message("not enough data in partitioned entities");
+            return FEENOX_ERROR;
+        }
+
+        if (geometrical_entity->num_partitions != 0) {
+          feenox_check_alloc(geometrical_entity->partition = calloc(geometrical_entity->num_partitions, sizeof(int)));
+          size_t j;
+          for (j = 0; j < geometrical_entity->num_partitions; j++) {
+            if (fscanf(this->file->pointer, "%d", &geometrical_entity->partition[j]) == 0) {
+              return FEENOX_ERROR;
+            }
+          }
+        }  
+        
+        if (dimension == 0 && version_maj == 4 && version_min >= 1) {
+          if (fscanf(this->file->pointer, "%lf %lf %lf %ld",
+                     &geometrical_entity->boxMinX,
+                     &geometrical_entity->boxMinY,
+                     &geometrical_entity->boxMinZ,
+                     &geometrical_entity->num_physicals) < 4) {
+            feenox_push_error_message("not enough data in partitioned entities");
+            return FEENOX_ERROR;
+          }
+        } else {
+          if (fscanf(this->file->pointer, "%lf %lf %lf %lf %lf %lf %ld",
+                     &geometrical_entity->boxMinX,
+                     &geometrical_entity->boxMinY,
+                     &geometrical_entity->boxMinZ,
+                     &geometrical_entity->boxMaxX,
+                     &geometrical_entity->boxMaxY,
+                     &geometrical_entity->boxMaxZ,
+                     &geometrical_entity->num_physicals) < 7) {
+            feenox_push_error_message("not enough data in partitioned entities");
+            return FEENOX_ERROR;
+          }
+        }
+
+        if (geometrical_entity->num_physicals != 0) {
+          feenox_check_alloc(geometrical_entity->physical = calloc(geometrical_entity->num_physicals, sizeof(int)));
+          size_t j;
+          for (j = 0; j < geometrical_entity->num_physicals; j++) {
+            if (fscanf(this->file->pointer, "%d", &geometrical_entity->physical[j]) == 0) {
+              return FEENOX_ERROR;
+            }
+          }
+        }
+        
+        // points do not have bounding groups
+        if (dimension != 0) {
+          if (fscanf(this->file->pointer, "%ld", &geometrical_entity->num_bounding) < 1) {
+            return FEENOX_ERROR;
+          }          
+          if (geometrical_entity->num_bounding != 0) {
+            feenox_check_alloc(geometrical_entity->bounding = calloc(geometrical_entity->num_bounding, sizeof(int)));
+            for (size_t j = 0; j < geometrical_entity->num_bounding; j++) {
+              // some groups can be negative because the tag is multiplied by the orientation
+              if (fscanf(this->file->pointer, "%d", &geometrical_entity->bounding[j]) == 0) {
+                return FEENOX_ERROR;
+              }
+            }
+          }
+        }
+        
+        // add the entity to the hashed map of its dimensions
+        HASH_ADD(hh[dimension], this->geometrical_entities[dimension], tag, sizeof(int), geometrical_entity);
+        
+      }
+
+      if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL) {
+        feenox_push_error_message("corrupted mesh file '%s'", this->file->path);
+        return -3;
+      } 
+
+      // the line $EndPartitionedEntities
+      if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL) {
+        feenox_push_error_message("corrupted mesh file '%s'", this->file->path);
+        return -3;
+      } 
+      if (strncmp("$EndPartitionedEntities", buffer, 23) != 0) {
+        feenox_push_error_message("$EndPartitionedEntities not found in mesh file '%s'", this->file->path);
+        return -2;
+      }
+      
+      
+          
     // ------------------------------------------------------      
     } else if (strncmp("$Nodes", buffer, 6) == 0) {
 
@@ -551,14 +672,14 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             
             if (ntags > 1) {
               size_t dimension = this->element[i].type->dim;
-              HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &tags[0], sizeof(size_t), physical_group);
+              HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &tags[0], sizeof(int), physical_group);
               if ((this->element[i].physical_group = physical_group) == NULL) {
                 // if we did not find anything, create one
                 snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%ld_%ld", this->file->name, dimension, tags[0]);
                 if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, this->element[i].type->dim, tags[0])) == NULL) {
                   return FEENOX_ERROR;
                 }
-                HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(size_t), this->element[i].physical_group);
+                HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), this->element[i].physical_group);
               }
               this->element[i].physical_group->n_elements++;
             }
@@ -633,7 +754,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           }
           
           // the whole block has the same physical group, find it once and that's it
-          HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(size_t), geometrical_entity);
+          HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
           if (geometrical_entity == NULL) {
             feenox_push_error_message("geometrical entity '%d' of dimension '%d' does not exist", geometrical, dimension);
             return FEENOX_ERROR;
@@ -954,7 +1075,7 @@ int mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file) {
   
       // y despues barrerlas
       for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-        fprintf(file, "%d %ld \"%s\"\n", physical_group->dimension, physical_group->tag, physical_group->name);
+        fprintf(file, "%d %d \"%s\"\n", physical_group->dimension, physical_group->tag, physical_group->name);
       }
       fprintf(file, "$EndPhysicalNames\n");
     }
@@ -981,7 +1102,7 @@ int mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file) {
     // the first one is the physical group and the second one ought to be the geometrical group
     // if there is no such information, then we just duplicate the physical group tag
     if (this->element[i].physical_group != NULL) {
-      fprintf(file, "2 %ld %ld", this->element[i].physical_group->tag, this->element[i].physical_group->tag);
+      fprintf(file, "2 %d %d", this->element[i].physical_group->tag, this->element[i].physical_group->tag);
     } else {
       fprintf(file, "2 0 0");
     }
