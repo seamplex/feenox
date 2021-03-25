@@ -1036,7 +1036,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
     } else {
         
       do {
-        if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL || buffer == NULL) {
+        if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL) {
           feenox_push_error_message("corrupted mesh file '%s'", this->file->path);
           return -3;
         }

@@ -3230,21 +3230,9 @@ int feenox_parse_physical_group(void) {
 int feenox_parse_material(void) {
 
 ///kw+MATERIAL+usage <name>
-  material_t *material = NULL;
   char *material_name = NULL;
   feenox_call(feenox_parser_string(&material_name));
-
-  // if there already exists one, add stuff to that one
-  if ((material = feenox_get_material_ptr(material_name)) == NULL) {
-    material = feenox_define_material_get_ptr(material_name);
-  }
-      
-  // TODO: this goes in define_material
-  if ((material->mesh = feenox.mesh.mesh_main) == NULL) {
-    feenox_push_error_message("MATERIAL before MESH");
-    return FEENOX_ERROR;
-  }      
-      
+  material_t *material = feenox_define_material_get_ptr(material_name, NULL);
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
@@ -3277,15 +3265,78 @@ int feenox_parse_material(void) {
       free(physical_group_name);
         
     } else {
-      char *name = strdup(token);
+      char *property_name = strdup(token);
+      // TODO: E=expr1 nu=expr2
 ///kw+MATERIAL+usage [ <property_name_1> <expr_1> [ <property_name_2> <expr_2> [ ... ] ] ]
       feenox_call(feenox_parser_string(&expr_string));
-      feenox_call(feenox_define_property_data(material_name, name, expr_string));
+      feenox_call(feenox_define_property_data(property_name, material_name, expr_string));
       free(expr_string);
-      free(name);
+      free(property_name);
     }
   }
   free(material_name);
+      
+  return FEENOX_OK;
+}
+
+
+
+int feenox_parse_bc(void) {
+
+///kw+BC+usage <name>
+  bc_t *bc = NULL;
+  char *bc_name = NULL;
+  feenox_call(feenox_parser_string(&bc_name));
+
+  // if there already exists one, add stuff to that one
+  if ((bc = feenox_get_bc_ptr(bc_name)) == NULL) {
+    bc = feenox_define_bc_get_ptr(bc_name);
+  }
+      
+  // TODO: this should go in define_bc
+  if ((bc->mesh = feenox.mesh.mesh_main) == NULL) {
+    feenox_push_error_message("MATERIAL before MESH");
+    return FEENOX_ERROR;
+  }      
+      
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+MATERIAL+usage [ MESH <name> ]
+    if (strcasecmp(token, "MESH") == 0) {
+      char *mesh_name; 
+      feenox_call(feenox_parser_string(&mesh_name));
+      if ((bc->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("undefined mesh '%s'" , mesh_name);
+        return FEENOX_ERROR;
+      }
+      free(mesh_name);
+          
+///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+      char *physical_group_name;
+      feenox_call(feenox_parser_string(&physical_group_name));  
+
+      physical_group_t *physical_group = NULL;
+      if ((physical_group = feenox_get_physical_group_ptr(physical_group_name, bc->mesh)) == NULL) {
+        if ((physical_group = feenox_define_physical_group_get_ptr(physical_group_name, bc->mesh, bc->mesh->dim_topo, 0)) == NULL) {
+          return FEENOX_ERROR;
+        }
+      }
+          
+      // TODO: api
+      LL_APPEND(physical_group->bcs, bc);
+      free(physical_group_name);
+        
+    } else {
+///kw+MATERIAL+usage [ <bc_data1> [ <bc_data2> [ ... ] ] ]
+      
+      if (feenox_add_bc_data_get_ptr(bc, token) == NULL) {
+        return FEENOX_ERROR;
+      }
+    }
+  }
+  free(bc_name);
       
   return FEENOX_OK;
 }

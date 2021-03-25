@@ -486,7 +486,7 @@ int feenox_mesh_free(mesh_t *mesh) {
         }
       }
       
-      if (mesh->element[i].type != NULL && mesh->element[i].type->gauss != NULL) {
+      if (mesh->element[i].type != NULL) {
         for (v = 0; v < mesh->element[i].type->gauss[mesh->integration].V; v++) {
 
           if (mesh->element[i].x != NULL && mesh->element[i].x[v] != NULL) {

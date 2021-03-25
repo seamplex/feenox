@@ -43,7 +43,9 @@ feenox_SOURCES = \
 ./mesh/init.c \
 ./mesh/geometry.c \
 ./mesh/neighbors.c \
+./mesh/boundary_condition.c \
 ./mesh/physical_group.c \
+./mesh/material.c \
 ./mesh/element.c \
 ./mesh/line2.c \
 ./mesh/line3.c \

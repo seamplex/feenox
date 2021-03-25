@@ -182,12 +182,14 @@ char *feenox_get_first_dot(const char *s) {
 */
 
 
-// get a pointer to a material
-material_t *feenox_get_material_ptr(const char *name) {
-  material_t *material;
-  HASH_FIND_STR(feenox.mesh.materials, name, material);
-  return material;
+
+// get a pointer to a bc
+bc_t *feenox_get_bc_ptr(const char *name) {
+  bc_t *bc;
+  HASH_FIND_STR(feenox.mesh.bcs, name, bc);
+  return bc;
 }
+
 
 // get a pointer to a physical group
 physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {

@@ -22,6 +22,81 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
+function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments) {
+  if (feenox_define_function(name, n_arguments) != FEENOX_OK) {
+    return NULL;
+  }
+  return feenox_get_function_ptr(name);
+}
+
+int feenox_define_function(const char *name, unsigned int n_arguments) {
+  
+  function_t *function;
+
+  feenox_call(feenox_check_name(name));
+
+  feenox_check_alloc(function = calloc(1, sizeof(function_t)));
+  feenox_check_alloc(function->name = strdup(name));
+  function->n_arguments = n_arguments;
+  
+  feenox_check_alloc(function->var_argument = calloc(n_arguments, sizeof(var_t *)));
+  function->var_argument_allocated = 1;
+  feenox_check_alloc(function->column = calloc((n_arguments+1), sizeof(int)));
+  
+  // default columns
+  int i;
+  for (i = 0; i < n_arguments+1; i++) {
+    function->column[i] = i+1;
+  }
+  
+  HASH_ADD_KEYPTR(hh, feenox.functions, function->name, strlen(function->name), function);
+
+  return FEENOX_OK;
+}
+
+int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name) {
+  
+  function_t *function;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  if (i < 0) {
+    feenox_push_error_message("negative argument number '%d'", i);
+    return FEENOX_ERROR;
+  }
+  if (i >= function->n_arguments) {
+    feenox_push_error_message("argument number '%d' greater or equal than the number of arguments '%d' (they start from zero)", i, function->n_arguments);
+    return FEENOX_ERROR;
+  }
+  
+  if ((function->var_argument[i] = feenox_get_or_define_variable_get_ptr(variable_name)) == NULL) {
+    return FEENOX_ERROR;
+  }
+  
+  // mark that we received an argument to see if we got them all when initializing
+  function->n_arguments_given++;
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_function_set_expression(const char *name, const char *expression) {
+  
+  function_t *function;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  function->type = function_type_algebraic;
+  feenox_call(feenox_expression_parse(&function->algebraic_expression, expression));  
+  
+  return FEENOX_OK;
+}
+
+
 // set the variables that are a function's argument equal to the vector x
 void feenox_set_function_args(function_t *this, double *x) {
   int i;

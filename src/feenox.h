@@ -233,10 +233,12 @@ typedef struct mesh_t mesh_t;
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
 typedef struct physical_name_t physical_name_t;
-typedef struct physical_property_t physical_property_t;
+typedef struct property_t property_t;
 typedef struct property_data_t property_data_t;
 typedef struct material_t material_t;
 typedef struct material_list_item_t material_list_item_t;
+typedef struct bc_t bc_t;
+typedef struct bc_data_t bc_data_t;
 
 typedef struct node_t node_t;
 typedef struct node_relative_t node_relative_t;
@@ -248,7 +250,6 @@ typedef struct neighbor_t neighbor_t;
 typedef struct gauss_t gauss_t;
 
 typedef struct elementary_entity_t elementary_entity_t;
-typedef struct bc_t bc_t;
 typedef struct node_data_t node_data_t;
 
 /*
@@ -813,8 +814,6 @@ struct physical_group_t {
   
   material_t *material;    // apuntador
   bc_t *bcs;               // linked list 
-  // TODO: pointer to bc like material?
-//  bc_t *bc;
      
   // volume (or area or length depending on the dim, sometimes called mass)
   double volume;
@@ -985,10 +984,6 @@ struct material_t {
   mesh_t *mesh;
   property_data_t *property_datums;
 
-  // este es un apuntador generico que le dejamos a alguien
-  // (plugins) por si necesitan agregar informacion al material
-  void *ext;
-
   UT_hash_handle hh;
 };
 
@@ -997,7 +992,7 @@ struct material_list_item_t {
   material_list_item_t *next;
 };
   
-struct physical_property_t {
+struct property_t {
   char *name;
   property_data_t *property_datums;
 
@@ -1005,11 +1000,26 @@ struct physical_property_t {
 };
 
 struct property_data_t {
-  physical_property_t *property;
+  property_t *property;
   material_t *material;
   expr_t expr;
 
   UT_hash_handle hh;
+};
+
+
+struct bc_t {
+  char *name;
+  mesh_t *mesh;
+  bc_data_t *bc_datums;
+
+  UT_hash_handle hh;  // for the hashed list mesh.bcs
+  bc_t *next;         // for the linked list in each physical group
+};
+
+struct bc_data_t {
+  char *string;
+  bc_data_t *next;
 };
 
 
@@ -1242,7 +1252,9 @@ struct feenox_t {
     element_type_t *element_types;
 
     material_t *materials;
-    physical_property_t *physical_properties;
+    property_t *properties;
+
+    bc_t *bcs;
     
 /*    
     mesh_write_t *writes;
@@ -1410,7 +1422,6 @@ extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name)
 
 extern file_t *feenox_get_file_ptr(const char *name);
 extern mesh_t *feenox_get_mesh_ptr(const char *name);
-extern material_t *feenox_get_material_ptr(const char *name);
 extern physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh);
 
 
@@ -1468,13 +1479,28 @@ extern int feenox_mesh_read_frd(mesh_t *this);
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
 extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
 
-extern material_t *feenox_define_material_get_ptr(const char *name);
+// material.c
+extern material_t *feenox_get_material_ptr(const char *name);
 
-extern int feenox_define_property_data(const char *material_name, const char *property_name, const char *expr_string);
-extern property_data_t *feenox_define_property_data_get_ptr(const char *material_name, const char *property_name, const char *expr_string);
+extern int feenox_define_material(const char *material_name, const char *mesh_name);
+extern material_t *feenox_define_material_get_ptr(const char *name, mesh_t *mesh);
 
-extern int feenox_define_physical_property(const char *name, const char *mesh_name);
-extern physical_property_t *feenox_define_physical_property_get_ptr(const char *name, mesh_t *mesh);
+extern int feenox_define_property(const char *name, const char *mesh_name);
+extern property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh);
+
+extern int feenox_define_property_data(const char *property_name, const char *material_name, const char *expr_string);
+extern property_data_t *feenox_define_property_data_get_ptr(property_t *property, material_t *material, const char *expr_string);
+
+
+
+// boundary_condition.c
+extern bc_t *feenox_get_bc_ptr(const char *name);
+
+extern int feenox_define_bc(const char *name);
+extern bc_t *feenox_define_bc_get_ptr(const char *name);
+
+extern int feenox_add_bc_data(const char *bc_name, const char *string);
+extern bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string);
 
 
 // init.c

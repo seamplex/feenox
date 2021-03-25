@@ -48,19 +48,28 @@ Indeed, FeenoX is designed to work very much like a transfer function between tw
 
 ![FeenoX working as a transfer function between input and output files](transfer.svg){#fig:transfer width=50%}
 
+In some particular cases, FeenoX can also provide an API for high-level interpreted languages such as Python or Julia such that a problem can be completely defined in a script, increasing also flexiblity.
+
+
 As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the rule of _separation_ that essentially implies to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 
 From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user. Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based immersive augmented-reality application) without needing the modify the backend. Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
 
-In the very same sense, FeenoX does not discretize continuous domains for PDE problems itself but relies on one or more separate tools for this end. Fortunately, there already exists one meshing tool which is FOSS (GPLv2) and shares most (if not all) of the design basis principles with FeenoX: the three-dimensional finite element mesh generator Gmsh.
-Strictly speaking, FeenoX does not need to be used along with Gmsh but with any other mesher able to write meshes in Gmsh's format `.msh`. But since Gmsh is free and open source, works also in a transfer-function-like fashion, it runs natively on GNU/Linux, it provides suitable domain decomposition techniques for scaling up large problems, it has a similar (but more comprehensive) API for Python/Julia, etc. it is a perfect math for 
+In the very same sense, FeenoX does not discretize continuous domains for PDE problems itself, but relies on separate tools for this end. Fortunately, there already exists one meshing tool which is FOSS (GPLv2) and shares most (if not all) of the design basis principles with FeenoX: the three-dimensional finite element mesh generator Gmsh.
+Strictly speaking, FeenoX does not need to be used along with Gmsh but with any other mesher able to write meshes in Gmsh's format `.msh`. But since Gmsh also
 
-separate mesher - unix 
+ * is free and open source,
+ * works also in a transfer-function-like fashion,
+ * runs natively on GNU/Linux,
+ * has a similar (but more comprehensive) API for Python/Julia,
+ * etc
+ 
+\noindent it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as Metis) for scaling up large problems,
+
 
 ejemplo de input - alguno de NAFEMS
 
 
-In some particular cases, FeenoX can also provide an API for high-level interpreted languages such as Python or Julia such that a problem can be completely defined in a script, increasing also flexiblity.
 
 
 dnl --------------------------------------------------------------------------------
