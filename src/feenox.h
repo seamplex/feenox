@@ -875,9 +875,9 @@ struct gauss_t {
 struct element_type_t {
   char *name;
 
-  size_t id;              // as of Gmsh
-  size_t dim;
-  size_t order;
+  unsigned int id;              // as of Gmsh
+  unsigned int dim;
+  unsigned int order;
   unsigned int nodes;           // total, i.e. 10 for tet10
   unsigned int vertices;        // the corner nodes, i.e 4 for tet10
   unsigned int faces;           // facess == number of neighbors
@@ -1465,8 +1465,8 @@ extern int feenox_mesh_read_vtk(mesh_t *this);
 extern int feenox_mesh_read_frd(mesh_t *this);
 
 // physical_group.c
-extern int feenox_define_physical_group(const char *name, const char *mesh_name, unsigned int dimension, size_t tag);
-extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, unsigned int dimension, size_t tag);
+extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
+extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
 
 extern material_t *feenox_define_material_get_ptr(const char *name);
 

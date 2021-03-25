@@ -24,12 +24,12 @@
 extern feenox_t feenox;
 
 
-int feenox_define_physical_group(const char *name, const char *mesh_name, unsigned int dimension, size_t tag) {
+int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag) {
   return (feenox_define_physical_group_get_ptr(name, feenox_get_mesh_ptr(mesh_name), dimension, tag) != NULL) ? FEENOX_OK : FEENOX_ERROR;
 }
 
 
-physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, unsigned int dimension, size_t tag) {
+physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag) {
   char *dummy_aux = NULL;
   physical_group_t *physical_group;
   mesh_t *actual_mesh; 
@@ -48,26 +48,30 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
   int already_exists = 0;
   if ((physical_group = feenox_get_physical_group_ptr(name, actual_mesh)) == NULL) {
     already_exists = 0; // this is used to define special variables below
-    physical_group = calloc(1, sizeof(physical_group_t));
+    feenox_check_alloc_null(physical_group = calloc(1, sizeof(physical_group_t)));
     feenox_check_alloc_null(physical_group->name = strdup(name));
     HASH_ADD_KEYPTR(hh, mesh->physical_groups, physical_group->name, strlen(name), physical_group);
   } else {
     already_exists = 1;
   }
   
-  if (physical_group->tag != 0 && tag != 0) {
-    if (physical_group->tag != tag) {
-      feenox_push_error_message("physical group '%s' has been previously defined using id '%d' and now id '%d' is required", name, physical_group->tag, tag);
-      return NULL;
+  if (tag != 0) {
+    if (physical_group->tag != 0) {
+      if (physical_group->tag != tag) {
+        feenox_push_error_message("physical group '%s' had been previously defined using id '%d' and now id '%d' is required", name, physical_group->tag, tag);
+        return NULL;
+      }
     }
     physical_group->tag = tag;
   }
 
-  if (physical_group->dimension != 0 && dimension != 0) {
-    if (physical_group->dimension != dimension) {
-      feenox_push_error_message("physical group '%s' has been previously defined as dimension '%d' and now dimension '%d' is required", name, physical_group->dimension, dimension);
-      return NULL;
-    }
+  if (dimension != 0) {
+    if (physical_group->dimension != 0) {
+      if (physical_group->dimension != dimension) {
+        feenox_push_error_message("physical group '%s' had been previously defined as dimension '%d' and now dimension '%d' is required", name, physical_group->dimension, dimension);
+        return NULL;
+      }
+    }  
     physical_group->dimension = dimension;
   }
   
@@ -89,7 +93,7 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
     }
     free(dummy_aux);
 
-    // centro de gravedad
+    // center of gravity
     if (asprintf(&dummy_aux, "%s_cog", physical_group->name) == -1) {
       feenox_push_error_message("memory allocation error");
       return NULL;
