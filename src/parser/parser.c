@@ -1895,20 +1895,14 @@ int feenox_parse_matrix(void) {
 
 int feenox_parse_function(void) {
 
-  // TODO: RAII
-  char *token = NULL;
-  
-//  char **arg_name = NULL;
-//  int n_arguments;
-//  int i;
-
 ///kw+FUNCTION+usage <function_name>(<var_1>[,var2,...,var_n])
 ///kw+FUNCTION+detail The number of variables $n$ is given by the number of arguments given between parenthesis after the function name.
 ///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined explictly as scalar variables.
+  char *token = NULL;
   feenox_call(feenox_parser_string(&token));
   
-    char *dummy_openpar;
-    if ((dummy_openpar = strchr(token, '(')) == NULL) {
+  char *dummy_openpar = NULL;
+  if ((dummy_openpar = strchr(token, '(')) == NULL) {
     feenox_push_error_message("expected opening parenthesis '(' after function name '%s' (no spaces allowed)", token);
     return FEENOX_ERROR;
   }
@@ -3232,16 +3226,17 @@ int feenox_parse_material(void) {
 ///kw+MATERIAL+usage <name>
   char *material_name = NULL;
   feenox_call(feenox_parser_string(&material_name));
+  // we first create the material with a null pointer for the mesh
+  // and the add it if MESH is given, in the api the mesh should be given at creation time
   material_t *material = feenox_define_material_get_ptr(material_name, NULL);
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-    char *expr_string = NULL;
 
 ///kw+MATERIAL+usage [ MESH <name> ]
     if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name; 
       feenox_call(feenox_parser_string(&mesh_name));
+      // we can directly change the mesh here, in the API the mesh would be passed when creating the material
       if ((material->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
         feenox_push_error_message("undefined mesh '%s'" , mesh_name);
         return FEENOX_ERROR;
@@ -3265,10 +3260,21 @@ int feenox_parse_material(void) {
       free(physical_group_name);
         
     } else {
-      char *property_name = strdup(token);
-      // TODO: E=expr1 nu=expr2
-///kw+MATERIAL+usage [ <property_name_1> <expr_1> [ <property_name_2> <expr_2> [ ... ] ] ]
-      feenox_call(feenox_parser_string(&expr_string));
+///kw+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
+      
+      char *property_name = NULL;
+      char *expr_string = NULL;
+      
+      // now token has something like E=2.1e3 or nu=1/3
+      char *equal_sign = strchr(token, '=');
+      if (equal_sign == NULL) {
+        feenox_push_error_message("expecting an equal sign in material data '%s' such as 'E=2.1e11'", token);
+        return FEENOX_ERROR;
+      }
+      
+      *equal_sign = '\0';
+      feenox_check_alloc(property_name = strdup(token));
+      feenox_check_alloc(expr_string = strdup(equal_sign+1));
       feenox_call(feenox_define_property_data(property_name, material_name, expr_string));
       free(expr_string);
       free(property_name);

@@ -136,6 +136,11 @@
 #define MESH_TOL 1e-6
 #define MESH_FAILED_INTERPOLATION_FACTOR -1
 
+#define DEFAULT_INTERPOLATION              (*gsl_interp_linear)
+#define DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD   9.5367431640625e-07 // (1/2)^-20
+#define DEFAULT_SHEPARD_RADIUS                     1.0
+#define DEFAULT_SHEPARD_EXPONENT                   2
+
 
 // usamos los de gmsh, convertimos a vtk y frd con tablas
 #define ELEMENT_TYPE_UNDEFINED      0
@@ -189,6 +194,8 @@ enum version_type {
 // pointer to the content of an object
 #define feenox_value_ptr(obj)  (obj->value)
 
+// GSL's equivalent to PETSc's ADD_VALUES
+#define gsl_matrix_add_to_element(matrix,i,j,x)  gsl_matrix_set((matrix),(i),(j),gsl_matrix_get((matrix),(i),(j))+(x))
 
 
 // number of internal functions, functional adn vector functions
@@ -420,13 +427,12 @@ struct function_t {
   } type;
   
   // number of arguments the function takes
-  int n_arguments;
-  int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
+  unsigned int n_arguments;
+  unsigned int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
 
   // array of pointers to already-existing variables for the arguments
   var_t **var_argument;
   int var_argument_allocated;
-
 
   // expression for algebraic functions
   expr_t algebraic_expression;
@@ -440,7 +446,7 @@ struct function_t {
   double *data_value;
   
   // this is in case there is a derivative of a mesh-based function and
-  // we want to interoplate with the shape functions
+  // we want to interpolate with the shape functions
   // warning! we need to put data on the original function and not on the derivatives
   function_t *spatial_derivative_of;
   int spatial_derivative_with_respect_to;
@@ -485,14 +491,14 @@ struct function_t {
   expr_t expr_shepard_exponent;
   double shepard_exponent;
 
-  // propiedad
-  void *property;
+  // material property like E, nu, k, etc.
+  property_t *property;
 
-  // malla no-estructurada sobre la que esta definida la funcion
+  // mesh over which the function is defined 
   mesh_t *mesh;
-  double mesh_time;
+  double mesh_time;  // for time-dependent functions read from .msh
   
-  // apuntador a un arbol k-dimensional para nearest neighbors 
+  // pointer to a k-dimensional tree to speed up stuff
   void *kd;
   
   // ----- ------- -----------   --        -       - 
@@ -1455,6 +1461,9 @@ extern void feenox_set_function_args(function_t *this, double *x);
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
 
+extern int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny);
+extern int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz);
+
 // print.c
 extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_print_function(void *arg);
@@ -1471,9 +1480,32 @@ extern double feenox_gsl_function(double x, void *params);
 extern int feenox_instruction_mesh_read(void *arg);
 
 extern int feenox_mesh_free(mesh_t *this);
-extern int feenox_mesh_read_gmsh(mesh_t *this);
 extern int feenox_mesh_read_vtk(mesh_t *this);
 extern int feenox_mesh_read_frd(mesh_t *this);
+
+extern node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x);
+extern element_t *feenox_mesh_find_element(mesh_t *this, node_t *nearest_node, const double *x);
+
+// interpolate.c
+extern double feenox_function_property_eval(struct function_t *function, const double *x);
+extern int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) ;
+extern int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector *residual);
+extern int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J);
+extern int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_vector *residual, gsl_matrix * J);
+
+extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, double *r);
+
+// fem.c
+extern double feenox_mesh_determinant(gsl_matrix *this);
+extern void feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
+extern void feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
+extern void feenox_mesh_compute_drdx_at_gauss(element_t *this, int v, int integration);
+extern void feenox_mesh_compute_dxdr_at_gauss(element_t *this, int v, int integration);
+extern void feenox_mesh_compute_x_at_gauss(element_t *this, int v, int integration);
+
+// gmsh.c
+extern int feenox_mesh_read_gmsh(mesh_t *this);
+extern int mesh_gmsh_update_function(function_t *function, double t, double dt);
 
 // physical_group.c
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);

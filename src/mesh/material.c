@@ -52,12 +52,22 @@ material_t *feenox_define_material_get_ptr(const char *name, mesh_t *mesh) {
 
   material_t *material = NULL;
   if ((material = feenox_get_material_ptr(name)) == NULL) {
+    
+    // create a new material
     feenox_check_alloc_null(material = calloc(1, sizeof(material_t)));
     feenox_check_alloc_null(material->name = strdup(name));
-    material->mesh = mesh;
+    
+    if ((material->mesh = mesh) == NULL) {
+      if ((material->mesh = feenox.mesh.mesh_main) == NULL) {
+        feenox_push_error_message("physical properties can be given only after at least giving one mesh");
+        return NULL;  
+      }
+    }
+    
     HASH_ADD_KEYPTR(hh, feenox.mesh.materials, material->name, strlen(material->name), material);
+    
   } else {
-    if (material->mesh != mesh) {
+    if (mesh != NULL && material->mesh != mesh) {
       feenox_push_error_message("material '%s' already defined over mesh '%s' and re-defined over '%s'", material->name, material->mesh->file->name, mesh->file->name);
       return NULL;
     }
@@ -73,10 +83,7 @@ int feenox_define_property(const char *name, const char *mesh_name) {
 
 property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh) {
 
-  property_t *property;
-  function_t *function;
   mesh_t *actual_mesh;
-    
   if ((actual_mesh = mesh) == NULL) {
     if ((actual_mesh = feenox.mesh.mesh_main) == NULL) {
       feenox_push_error_message("physical properties can be given only after at least giving one mesh");
@@ -84,6 +91,7 @@ property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh) {
     }
   }
 
+  property_t *property = NULL;
   HASH_FIND_STR(feenox.mesh.properties, name, property);
   if (property == NULL) {
     feenox_check_alloc_null(property = calloc(1, sizeof(property_t)));
@@ -93,14 +101,32 @@ property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh) {
   
   // besides the property, we define a function with the property's name
   // that depends on x,y,z (or the dimension of the mesh)
-  // TODO: don't fail if the function already exists
-  if ((function = feenox_define_function_get_ptr(name, actual_mesh->dim)) == NULL) {
-    return NULL;
+  function_t *function = feenox_get_function_ptr(name);
+  if (function != NULL) {
+    if (function->n_arguments != actual_mesh->dim) {
+      feenox_push_error_message("there already exists a function named '%s' and it has %d arguments instead of %d", name, function->n_arguments, actual_mesh->dim);
+      return NULL;  
+    }
+    if (function->type != function_type_pointwise_mesh_property) {
+      feenox_push_error_message("there already exists a function named '%s' and it is not related to a property");
+      return NULL;  
+    }
+    if (function->mesh != actual_mesh) {
+      feenox_push_error_message("there already exists a function named '%s' and it is not over the mesh '%s'", actual_mesh->file->name);
+      return NULL;  
+    }
+  } else {
+    if ((function = feenox_define_function_get_ptr(name, actual_mesh->dim)) == NULL) {
+      return NULL;
+    }  
+    
+    // here the mesh is that of the first property... is that right?
+    function->mesh = actual_mesh;
+    function->type = function_type_pointwise_mesh_property;
+    function->property = property;
+    
   }  
 
-  function->mesh = mesh;
-  function->type = function_type_pointwise_mesh_property;
-  function->property = property;
 
   return property;
 }
@@ -108,10 +134,17 @@ property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh) {
 int feenox_define_property_data(const char *property_name, const char *material_name, const char *expr_string) {
 
   material_t *material = NULL;
+  // sometimes it is no ok to re-define and re-use materials (here it is)
   if ((material = feenox_get_material_ptr(material_name)) == NULL) {
-    material = feenox_define_material_get_ptr(material_name, NULL);
+    if ((material = feenox_define_material_get_ptr(material_name, NULL)) == NULL) {
+      return FEENOX_ERROR;
+    }
   }
-  property_t *property = feenox_define_property_get_ptr(property_name, material->mesh);
+  // it is ok to re-define and re-use properties
+  property_t *property = NULL;
+  if ((property = feenox_define_property_get_ptr(property_name, material->mesh)) == NULL) {
+    return FEENOX_ERROR;
+  }
   return (feenox_define_property_data_get_ptr(property, material, expr_string) != NULL) ? FEENOX_OK : FEENOX_ERROR; 
 }
 
@@ -119,6 +152,10 @@ property_data_t *feenox_define_property_data_get_ptr(property_t *property, mater
   // there's a function called material_property with the algebraic
   // expression that depends on x,y,z
   // if we need to fail, fail befor allocating
+  if (property == NULL || material == NULL || material->mesh == NULL) {
+    feenox_push_error_message("something is null when calling feenox_define_property_data_get_ptr()");
+    return NULL;
+  }
   if (material->mesh->dim == 0) {
     feenox_push_error_message("mesh '%s' has zero dimensions when defining property '%s', keyword DIMENSIONS is needed for MESH definition", material->mesh->file->format, property->name);
     return NULL;

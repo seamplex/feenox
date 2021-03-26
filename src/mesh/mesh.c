@@ -283,19 +283,20 @@ int feenox_instruction_mesh_read(void *arg) {
 
 }
 
-node_t *mesh_find_nearest_node(mesh_t *mesh, const double *x) {
+node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x) {
   
   node_t *node;
   void *res_item;  
   
-  res_item = kd_nearest(mesh->kd_nodes, x);
+  // TODO: if kd_nodes is null, initialize it here
+  res_item = kd_nearest(this->kd_nodes, x);
   node = (node_t *)(kd_res_item(res_item, NULL));
   kd_res_free(res_item);    
 
   return node;
 }
-/*
-element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x) {
+
+element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x) {
 
   double x_nearest[3] = {0, 0, 0};
   double dist2;
@@ -327,19 +328,19 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
   }
   
 
-  if (element == NULL && feenox_var_value(feenox_mesh.vars.mesh_failed_interpolation_factor) > 0) {
+  if (element == NULL && feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor) > 0) {
     // if we do not find any then the mesh might be deformed or the point might be outside the domain
     // so we see if we can find another one
 
-    switch (mesh->spatial_dimensions) {
+    switch (mesh->dim) {
       case 1:
         dist2 = gsl_pow_2(fabs(x[0] - x_nearest[0]));
       break;
       case 2:
-        dist2 = mesh_subtract_squared_module2d(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module2d(x, x_nearest);
       break;
       case 3:
-        dist2 = mesh_subtract_squared_module(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module(x, x_nearest);
       break;
     }
     
@@ -354,7 +355,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
     struct cached_element *cached_element = NULL;
 
     // we ask for the nodes which are within a radius mesh_failed_interpolation_factor times the last one
-    struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var(feenox_mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
+    struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
       
     while(element == NULL && kd_res_end(presults) == 0) {
       second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
@@ -385,15 +386,15 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
   
   if (element == NULL) {
     // if still we did not find anything, 
-    switch (mesh->spatial_dimensions) {
+    switch (mesh->dim) {
       case 1:
         dist2 = gsl_pow_2(fabs(x[0] - x_nearest[0]));
       break;
       case 2:
-        dist2 = mesh_subtract_squared_module2d(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module2d(x, x_nearest);
       break;
       case 3:
-        dist2 = mesh_subtract_squared_module(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module(x, x_nearest);
       break;
     }
 
@@ -413,7 +414,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
 
   return element;
 }
-*/
+
 
 // free all resources allocated when reading a mesh but not the rest
 // of the things that are in the input files (physical groups, etc)

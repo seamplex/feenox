@@ -14,6 +14,7 @@ TESTS = tests/abort.sh \
         tests/expr.sh \
         tests/expressions_functions.sh \
         tests/mesh.sh \
+        tests/materials.sh \
         tests/trig.sh
 
 all-local:

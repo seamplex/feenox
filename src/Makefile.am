@@ -45,8 +45,10 @@ feenox_SOURCES = \
 ./mesh/neighbors.c \
 ./mesh/boundary_condition.c \
 ./mesh/physical_group.c \
+./mesh/interpolate.c \
 ./mesh/material.c \
 ./mesh/element.c \
+./mesh/fem.c \
 ./mesh/line2.c \
 ./mesh/line3.c \
 ./mesh/triang3.c \
