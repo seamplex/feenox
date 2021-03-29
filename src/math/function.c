@@ -163,7 +163,8 @@ int feenox_function_init(function_t *this) {
     return 0;
   }
   
-  // TODO: virtual
+  // TODO: arrange into smaller functions
+  // TODO: initialize mesh-based functions
   if (this->type == function_type_algebraic && this->n_arguments_given != this->n_arguments) {
     feenox_push_error_message("algebraic function '%s' needs %d arguments and %d were given", this->name, this->n_arguments, this->n_arguments_given);
     return FEENOX_ERROR;

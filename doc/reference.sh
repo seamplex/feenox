@@ -83,6 +83,8 @@ for kw in ${kws}; do
         minytics=$(echo ${range}  | awk '{printf $7}')
         maxytics=$(echo ${range}  | awk '{printf $8}')
         stepytics=$(echo ${range} | awk '{printf $9}')
+        mxtics=$(echo ${range} | awk '{printf $10}')
+        mytics=$(echo ${range} | awk '{printf $11}')
         cat << EOF > ${kw}.fee
 FUNCTION f(x) = ${kw}(x)
 PRINT_FUNCTION f MIN ${min} MAX ${max} STEP ${step}
@@ -95,24 +97,32 @@ set size ratio 0.35
 set axis x arrow nomirrored
 set axis y arrow nomirrored
 set grid
-# set nomytics
-# set nomxtics
 set nokey
 EOF
-        if [ ! -z "$minxtics" ]; then
+        if [ ! -z "${minxtics}" ]; then
           echo "set xtics ${minxtics},${stepxtics},${maxxtics}" >> ${kw}.ppl
         fi
-        if [ ! -z "$maxytics" ]; then
+        if [ ! -z "${maxytics}" ]; then
           echo "set ytics ${minytics},${stepytics},${maxytics}" >> ${kw}.ppl
+        fi
+        if [ ! -z "${mxtics}" ]; then
+          echo "set mxtics ${mxtics}" >> ${kw}.ppl
+        fi
+        if [ ! -z "${mytics}" ]; then
+          echo "set mytics ${mytics}" >> ${kw}.ppl
         fi
 
         cat << EOF >> ${kw}.ppl
+#set mytics
+#set mxtics
 set xrange [${min}:${max}]
 set xlabel "\$x\$"
 set ylabel "${escapedkw}\$(x)\$"
 set terminal pdf
 set output "${kw}.pdf"
 plot "${kw}.dat" w l lw 3 color blue
+set output "${kw}.png"
+set terminal png
 replot
 EOF
         pyxplot ${kw}.ppl

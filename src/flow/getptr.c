@@ -180,32 +180,3 @@ char *feenox_get_first_dot(const char *s) {
 
 }
 */
-
-
-
-// get a pointer to a bc
-bc_t *feenox_get_bc_ptr(const char *name) {
-  bc_t *bc;
-  HASH_FIND_STR(feenox.mesh.bcs, name, bc);
-  return bc;
-}
-
-
-// get a pointer to a physical group
-physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {
-  physical_group_t *physical_group;
-  mesh_t *dummy;
-  mesh_t *tmp;
-  if (mesh != NULL) {
-    HASH_FIND_STR(mesh->physical_groups, name, physical_group);
-  } else {
-    // barremos todas las mallas
-    HASH_ITER(hh, feenox.mesh.meshes, dummy, tmp) {
-      HASH_FIND_STR(dummy->physical_groups, name, physical_group);
-      if (physical_group != NULL) {
-        return physical_group;
-      }
-    } 
-  }
-  return physical_group;
-}

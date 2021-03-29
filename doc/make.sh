@@ -26,9 +26,11 @@ cd ..
 
 echo "creating the reference markdown from the commented sources"
 echo " - keywords"
-./reference.sh ../src/parser/parser.c kw > reference-kw.md
+./reference.sh ../src/parser/parser.c              kw > reference-kw.md
 echo " - variables"
-./reference.sh ../src/flow/init.c     va > reference-va.md
+./reference.sh ../src/flow/init.c                  va > reference-va.md
+echo " - functions"
+./reference.sh ../src/math/builtin_functions.c     fn > reference-fn.md
 
 echo "help as markdown definition list"
 ./help-md.sh > help.md

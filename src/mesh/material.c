@@ -64,7 +64,7 @@ material_t *feenox_define_material_get_ptr(const char *name, mesh_t *mesh) {
       }
     }
     
-    HASH_ADD_KEYPTR(hh, feenox.mesh.materials, material->name, strlen(material->name), material);
+    HASH_ADD_STR(feenox.mesh.materials, name, material);
     
   } else {
     if (mesh != NULL && material->mesh != mesh) {

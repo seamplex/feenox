@@ -31,6 +31,18 @@ extern feenox_t feenox;
  #include <mach/mach.h>
 #endif
 
+// plotx reference
+//  1. min
+//  2. max
+//  3. step
+//  4. minxtics
+//  5. maxxtics
+//  6. stepxtics
+//  7. minytics
+//  8. maxytics
+//  9. stepytics
+
+
 double feenox_builtin_abs(struct expr_item_t *);
 double feenox_builtin_asin(struct expr_item_t *);
 double feenox_builtin_acos(struct expr_item_t *);
@@ -427,7 +439,7 @@ double feenox_builtin_sin(expr_item_t *f) {
 ///fn+asin+math y = \arcsin(x)
 ///fn+asin+desc Computes arc in radians whose sine is equal to the argument $x$.
 ///fn+asin+desc A NaN error is raised if $|x|>1$.
-///fn+asin+plotx -1 1 1/100 -1 1 0.5 -1 1 1
+///fn+asin+plotx -1 1 1/100 -1 1 0.5 -1.5 1.5 1
 double feenox_builtin_asin(expr_item_t *f) {
   double x[1];
   x[0] = feenox_expression_eval(&f->arg[0]);
@@ -447,7 +459,7 @@ double feenox_builtin_asin(expr_item_t *f) {
 ///fn+acos+math y = \arccos(x)
 ///fn+acos+desc Computes arc in radians whose cosine is equal to the argument $x$.
 ///fn+acos+desc A NaN error is raised if $|x|>1$.
-///fn+acos+plotx -1 1 1/100 -1 1 0.5 0 2.8 1
+///fn+acos+plotx -1 1 1/100 -1 1 0.5 0 3 1
 double feenox_builtin_acos(expr_item_t *f) {
   double x[1];
   x[0] = feenox_expression_eval(&f->arg[0]);
@@ -541,7 +553,7 @@ double feenox_builtin_tanh(expr_item_t *f) {
 ///fn+atan+usage atan(x)
 ///fn+atan+math \arctan(x)
 ///fn+atan+desc Computes, in radians, the arc tangent of the argument $x$.
-///fn+atan+plotx -pi pi pi/100
+///fn+atan+plotx -3 3 pi/100 -3 3 1 -1.5 1.5 1 0.5 0.25
 ///fn+atan2+example atan.was
 double feenox_builtin_atan(expr_item_t *f) {
   double x[1];
@@ -552,7 +564,7 @@ double feenox_builtin_atan(expr_item_t *f) {
 
 ///fn+atan2+name atan2
 ///fn+atan2+usage atan(y,x)
-///fn+atan2+math \arctan(y/x) \in [-\pi,\pi]
+///fn+atan2+math \arctan(y/x)
 ///fn+atan2+desc Computes, in radians, the arc tangent of quotient $y/x$, using the signs of the two arguments
 ///fn+atan2+desc to determine the quadrant of the result, which is in the range $[-\pi,\pi]$.
 ///fn+atan2+example atan2.was

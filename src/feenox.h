@@ -1528,8 +1528,8 @@ extern property_data_t *feenox_define_property_data_get_ptr(property_t *property
 // boundary_condition.c
 extern bc_t *feenox_get_bc_ptr(const char *name);
 
-extern int feenox_define_bc(const char *name);
-extern bc_t *feenox_define_bc_get_ptr(const char *name);
+extern int feenox_define_bc(const char *bc_name, const char *mesh_name);
+extern bc_t *feenox_define_bc_get_ptr(const char *name, mesh_t *mesh);
 
 extern int feenox_add_bc_data(const char *bc_name, const char *string);
 extern bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string);

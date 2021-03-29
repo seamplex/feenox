@@ -271,18 +271,25 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
-///kw+MATERIAL+desc Define a material its and properties.
+///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
+///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+      feenox_call(feenox_parse_physical_group());
+      return FEENOX_OK;
+
+///kw+MATERIAL+desc Define a material its and properties to be used in volumes.
 ///kw+MATERIAL+usage MATERIAL
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "MATERIAL") == 0) {
       feenox_call(feenox_parse_material());
       return FEENOX_OK;
 
-///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
-///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
+///kw+MATERIAL+desc Define a boundary condition to be applied to faces, edges and/or vertices.
+///kw+MATERIAL+usage BC
       // -----  -----------------------------------------------------------
-    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
-      feenox_call(feenox_parse_physical_group());
+    } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
+      feenox_call(feenox_parse_bc());
       return FEENOX_OK;
       
 // this should come last because there is no actual keyword apart from the equal sign
@@ -3146,9 +3153,12 @@ int feenox_parse_write_mesh(void) {
 
 
 int feenox_parse_physical_group(void) {
+///kw+PHYSICAL_GROUP+detail This keyword should seldom be needed. Most of the times,
+///kw+PHYSICAL_GROUP+detail  a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
+  
 ///kw+PHYSICAL_GROUP+usage <name>
-///kw+PHYSICAL_GROUP+detail A name is mandatory for each physical group defined within the input file.
-///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction makes no effect.
+///kw+PHYSICAL_GROUP+detail The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
+///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction has no effect.
   char *name = NULL;
   feenox_call(feenox_parser_string(&name));
 
@@ -3224,15 +3234,20 @@ int feenox_parse_physical_group(void) {
 int feenox_parse_material(void) {
 
 ///kw+MATERIAL+usage <name>
+///kw+MATERIAL+detail If the name of the material matches a physical group in the mesh, it is automatically linked to that physical group.
+  
   char *material_name = NULL;
   feenox_call(feenox_parser_string(&material_name));
+  
   // we first create the material with a null pointer for the mesh
-  // and the add it if MESH is given, in the api the mesh should be given at creation time
+  // and then add it if MESH is given, in the api the mesh should be given at creation time
   material_t *material = feenox_define_material_get_ptr(material_name, NULL);
+  
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
 ///kw+MATERIAL+usage [ MESH <name> ]
+///kw+MATERIAL+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name; 
       feenox_call(feenox_parser_string(&mesh_name));
@@ -3244,6 +3259,8 @@ int feenox_parse_material(void) {
       free(mesh_name);
           
 ///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+///kw+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
+///kw+MATERIAL+detail added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
@@ -3290,35 +3307,32 @@ int feenox_parse_material(void) {
 int feenox_parse_bc(void) {
 
 ///kw+BC+usage <name>
-  bc_t *bc = NULL;
+///kw+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
   char *bc_name = NULL;
   feenox_call(feenox_parser_string(&bc_name));
 
-  // if there already exists one, add stuff to that one
-  if ((bc = feenox_get_bc_ptr(bc_name)) == NULL) {
-    bc = feenox_define_bc_get_ptr(bc_name);
-  }
-      
-  // TODO: this should go in define_bc
-  if ((bc->mesh = feenox.mesh.mesh_main) == NULL) {
-    feenox_push_error_message("MATERIAL before MESH");
-    return FEENOX_ERROR;
-  }      
-      
+  // as in material above, we first create the bc with a null pointer for the mesh
+  // and then add it if MESH is given, in the api the mesh should be given at creation time
+  bc_t *bc = feenox_define_bc_get_ptr(bc_name, NULL);
+  
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
-///kw+MATERIAL+usage [ MESH <name> ]
+///kw+BC+usage [ MESH <name> ]
+///kw+BC+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name; 
       feenox_call(feenox_parser_string(&mesh_name));
+      // we can directly change the mesh here, in the API the mesh would be passed when creating the material
       if ((bc->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
         feenox_push_error_message("undefined mesh '%s'" , mesh_name);
         return FEENOX_ERROR;
       }
       free(mesh_name);
-          
-///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+    
+///kw+BC+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh, they can be
+///kw+BC+detail added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
@@ -3343,6 +3357,8 @@ int feenox_parse_bc(void) {
     }
   }
   free(bc_name);
+  
+  // TODO: apply the bc to the group named name if it exists
       
   return FEENOX_OK;
 }

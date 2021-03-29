@@ -24,6 +24,25 @@
 extern feenox_t feenox;
 
 
+// get a pointer to a physical group
+physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {
+  physical_group_t *physical_group;
+  mesh_t *dummy;
+  mesh_t *tmp;
+  if (mesh != NULL) {
+    HASH_FIND_STR(mesh->physical_groups, name, physical_group);
+  } else {
+    // barremos todas las mallas
+    HASH_ITER(hh, feenox.mesh.meshes, dummy, tmp) {
+      HASH_FIND_STR(dummy->physical_groups, name, physical_group);
+      if (physical_group != NULL) {
+        return physical_group;
+      }
+    } 
+  }
+  return physical_group;
+}
+
 int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag) {
   return (feenox_define_physical_group_get_ptr(name, feenox_get_mesh_ptr(mesh_name), dimension, tag) != NULL) ? FEENOX_OK : FEENOX_ERROR;
 }

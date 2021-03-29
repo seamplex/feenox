@@ -22,25 +22,69 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-int feenox_define_bc(const char *name) {
-  return (feenox_define_bc_get_ptr(name) != NULL) ? FEENOX_OK : FEENOX_ERROR;
-}
-
-bc_t *feenox_define_bc_get_ptr(const char *name) {
-
+// get a pointer to a bc
+bc_t *feenox_get_bc_ptr(const char *name) {
   bc_t *bc = NULL;
   HASH_FIND_STR(feenox.mesh.bcs, name, bc);
-  if (bc == NULL) {
-    bc = calloc(1, sizeof(bc_t));
-    bc->name = strdup(name);
-    HASH_ADD_KEYPTR(hh, feenox.mesh.bcs, bc->name, strlen(bc->name), bc);
+  return bc;
+}
+
+int feenox_define_bc(const char *bc_name, const char *mesh_name) {
+  
+  mesh_t *mesh = NULL;
+  if (mesh_name == NULL || strcmp(mesh_name, "") == 0) {
+    if ((mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+      return FEENOX_ERROR;
+    }  
+  } else {
+    if (feenox.mesh.mesh_main == NULL) {
+      feenox_push_error_message("define at least one mesh before a BC");
+      return FEENOX_ERROR;
+    }  
+  }      
+  
+  return (feenox_define_bc_get_ptr(bc_name, mesh) != NULL) ? FEENOX_OK : FEENOX_ERROR;
+}
+
+bc_t *feenox_define_bc_get_ptr(const char *name, mesh_t *mesh) {
+
+  bc_t *bc = NULL;
+  if ((bc = feenox_get_bc_ptr(name)) == NULL) {
+    
+    // create a new bc
+    feenox_check_alloc_null(bc = calloc(1, sizeof(material_t)));
+    feenox_check_alloc_null(bc->name = strdup(name));
+    
+    if ((bc->mesh = mesh) == NULL) {
+      if ((bc->mesh = feenox.mesh.mesh_main) == NULL) {
+        feenox_push_error_message("boundary conditions can be given only after at least giving one mesh");
+        return NULL;  
+      }
+    }
+    
+    HASH_ADD_STR(feenox.mesh.bcs, name, bc);
+    
+  } else {
+    if (mesh != NULL && bc->mesh != mesh) {
+      feenox_push_error_message("BC '%s' already defined over mesh '%s' and re-defined over '%s'", bc->name, bc->mesh->file->name, mesh->file->name);
+      return NULL;
+    }
   }
 
   return bc;
 }
 
+
 int feenox_add_bc_data(const char *bc_name, const char *string) {
-  return (feenox_add_bc_data_get_ptr(feenox_define_bc_get_ptr(bc_name), string) != NULL) ? FEENOX_OK : FEENOX_ERROR; 
+  
+  bc_t *bc = NULL;
+  if ((bc = feenox_get_bc_ptr(bc_name)) == NULL) {
+    if ((bc = feenox_define_bc_get_ptr(bc_name, NULL)) == NULL) {
+      return FEENOX_ERROR;
+    }
+  }
+  
+  return (feenox_add_bc_data_get_ptr(bc, string) != NULL) ? FEENOX_OK : FEENOX_ERROR; 
 }
 
 bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
@@ -49,7 +93,7 @@ bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
   feenox_check_alloc_null(bc_data = calloc(1, sizeof(bc_data_t)));
   feenox_check_alloc_null(bc_data->string = strdup(string));
   
-  // TODO: do something with the string
+  // TODO: should we do something with the string right now?
   LL_APPEND(bc->bc_datums, bc_data);
 
   return bc_data;
