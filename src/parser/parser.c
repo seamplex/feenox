@@ -285,12 +285,24 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_material());
       return FEENOX_OK;
 
-///kw+MATERIAL+desc Define a boundary condition to be applied to faces, edges and/or vertices.
-///kw+MATERIAL+usage BC
+///kw+BC+desc Define a boundary condition to be applied to faces, edges and/or vertices.
+///kw+BC+usage BC
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
       feenox_call(feenox_parse_bc());
       return FEENOX_OK;
+      
+///kw+PROBLEM+desc Sets the problem type that FeenoX has to solve.      
+///kw+PROBLEM+usage PROBLEM
+    } else if (strcasecmp(token, "PROBLEM") == 0) {
+#ifdef HAVE_PETSC      
+      feenox_call(feenox_parse_problem());
+      return FEENOX_OK;
+#else
+      feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
+      return FEENOX_ERROR;
+#endif      
+      
       
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -3361,4 +3373,213 @@ int feenox_parse_bc(void) {
   // TODO: apply the bc to the group named name if it exists
       
   return FEENOX_OK;
+}
+
+int feenox_parse_problem(void) {
+
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+PROBLEM+usage [
+        
+///kw+PROBLEM+usage mechanical
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
+    if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
+      feenox.pde.type = type_mechanical;
+      // TODO: provide a virtual method pde_parser_initialize()
+          
+///kw+PROBLEM+usage thermal
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
+    } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
+      feenox.pde.type = type_thermal;
+
+///kw+PROBLEM+usage modal
+///kw+PROBLEM+usage ]@
+///kw+PROBLEM+detail  * `modal` computes the natural frequencies and oscillation modes.        
+    } else if (strcasecmp(token, "modal") == 0) {
+#ifndef HAVE_SLEPC
+      feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
+      return FEENOX_ERROR;
+#endif
+      feenox.pde.type = type_modal;
+      if (feenox.pde.nev == 0) {
+        feenox.pde.nev = DEFAULT_NMODES;
+      }
+          
+
+///kw+PROBLEM+usage [
+///kw+PROBLEM+usage AXISYMMETRIC
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail @
+///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimensional in the $x$-$y$ plane
+///kw+PROBLEM+detail and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$). 
+    } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
+      feenox.pde.variant = variant_axisymmetric;
+      if (feenox.pde.symmetry_axis == symmetry_axis_none) {
+        feenox.pde.symmetry_axis = symmetry_axis_y;
+      }
+
+///kw+PROBLEM+usage PLANE_STRESS
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
+///kw+PROBLEM+detail axisymmetry is given, either `PLANE_STRESS` and `PLAIN_STRAIN` can be provided (default is plane stress). 
+    } else if (strcasecmp(token, "PLANE_STRESS") == 0) {
+      feenox.pde.variant = variant_plane_stress;
+
+///kw+PROBLEM+usage PLANE_STRAIN
+///kw+PROBLEM+usage ]
+    } else if (strcasecmp(token, "PLANE_STRAIN") == 0) {
+      feenox.pde.variant = variant_plane_strain;
+
+///kw+PROBLEM+usage [ SYMMETRY_AXIS { x | y } ]
+    } else if (strcasecmp(token, "SYMMETRY_AXIS") == 0) {
+      char *keywords[] = { "x", "y" };
+      int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
+
+///kw+PROBLEM+usage [ LINEAR
+    } else if (strcasecmp(token, "LINEAR") == 0) {
+      feenox.pde.math_type = math_type_linear;
+
+///kw+PROBLEM+usage | NON_LINEAR ]@
+    } else if (strcasecmp(token, "NON_LINEAR") == 0) {
+      feenox.pde.math_type = math_type_nonlinear;
+
+///kw+PROBLEM+usage [ QUASISTATIC
+    } else if (strcasecmp(token, "QUASISTATIC") == 0) {
+      feenox.pde.transient_type = transient_type_quasistatic;
+
+///kw+PROBLEM+usage | TRANSIENT ]@
+    } else if (strcasecmp(token, "TRANSIENT") == 0) {
+      feenox.pde.transient_type = transient_type_transient;
+
+///kw+PROBLEM+detail By default Fino tries to detect wheter the computation should be linear or non-linear.
+///kw+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+
+///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
+///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
+///kw+PROBLEM+detail or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
+    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+      double xi = 0;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      feenox.pde.dim = (unsigned int)(xi);
+      if (feenox.pde.dim < 1 || feenox.pde.dim > 3)  {
+        feenox_push_error_message("either one, two or three dimensions should be selected instead of '%d'", feenox.pde.dim);
+        return FEENOX_ERROR;
+      }
+
+
+///kw+PROBLEM+usage [ MESH <identifier> ] @
+///kw+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
+///kw+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
+///kw+PROBLEM+detail defined in the input file is the one over which the problem is solved.
+    } else if (strcasecmp(token, "MESH") == 0) {
+      char *mesh_name;
+
+      feenox_call(feenox_parser_string(&mesh_name));
+      if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("unknown mesh '%s'", mesh_name);
+        free(mesh_name);
+        return FEENOX_ERROR;
+      }
+      free(mesh_name);
+
+///kw+PROBLEM+usage [ N_MODES <expr> ] @
+///kw+PROBLEM+detail The number of modes to be computed in the modal problem. The default is DEFAULT_NMODES.
+    } else if (strcasecmp(token, "N_MODES") == 0 || strcasecmp(token, "N_EIGEN") == 0) {
+      double xi = 0;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      feenox.pde.nev = (int)(xi);
+      if (feenox.pde.nev < 1)  {
+        feenox_push_error_message("a positive number of modes should be given instead of '%d'", feenox.pde.nev);
+        return FEENOX_ERROR;
+      }
+    } else {
+      feenox_push_error_message("undefined keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  } 
+
+  // if there is no explicit mesh, the main one
+  if (feenox.pde.mesh == NULL && (feenox.pde.mesh = feenox.mesh.mesh_main) == NULL) {
+    feenox_push_error_message("unknown mesh (no READ_MESH keyword before PROBLEM)", token);
+    return FEENOX_ERROR;
+  }
+
+  // check if the dimensions match
+  if (feenox.pde.dim != 0 && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {
+    feenox_push_error_message("dimension mismatch, in PROBLEM %d != in READ_MESH %d", feenox.pde.dim, feenox.pde.mesh->dim);
+    return FEENOX_ERROR;
+  }
+  
+  // if we don't have dimensions here, use the dimensions from the provided mesh
+  if (feenox.pde.dim == 0 && feenox.pde.mesh->dim != 0) {
+    feenox.pde.dim = feenox.pde.mesh->dim;
+  }
+  // conversely, if we got them there, put it on the mesh
+  if (feenox.pde.mesh != NULL && feenox.pde.mesh->dim == 0 && feenox.pde.dim != 0) {
+    feenox.pde.mesh->dim = feenox.pde.dim;
+  }
+
+  if (feenox.pde.dim == 0) {
+    feenox_push_error_message("could not determine the dimension of the problem, give them using DIMENSIONS in either READ_MESH or PROBLEM");
+    return FEENOX_ERROR;
+  }
+
+  // TODO: virtual setup() methods
+  if (feenox.pde.type == type_mechanical || feenox.pde.type == type_modal) {
+
+    if (feenox.pde.variant == variant_axisymmetric ||
+        feenox.pde.variant == variant_plane_stress ||
+        feenox.pde.variant == variant_plane_strain) {
+
+      if (feenox.pde.dim != 0) {
+        if (feenox.pde.dim != 2) {
+          feenox_push_error_message("dimension inconsistency, expected DIMENSION 2");
+          return FEENOX_ERROR;
+        }
+      } else {
+        feenox.pde.dim = 2;
+      }
+
+      if (feenox.pde.dofs_per_node != 0) {
+        if (feenox.pde.dofs_per_node != 2) {
+          feenox_push_error_message("DOF inconsistency");
+          return FEENOX_ERROR;
+        }
+      } else {
+        feenox.pde.dofs_per_node = 2;
+      }
+    } else {
+      feenox.pde.dofs_per_node = feenox.pde.dim;
+    }
+
+    if (feenox.pde.type == type_modal) {
+      feenox.pde.math_type = math_type_eigen;
+    }
+
+    // TODO: custom names
+    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs_per_node, sizeof(char *)));
+    feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
+    if (feenox.pde.dofs_per_node > 1) {
+      feenox_check_alloc(feenox.pde.unknown_name[1] = strdup("v"));
+      if (feenox.pde.dofs_per_node > 2) {
+        feenox_check_alloc(feenox.pde.unknown_name[2] = strdup("w"));
+      }  
+    }
+
+  } else if (feenox.pde.type == type_thermal) {
+
+    feenox.pde.dofs_per_node = 1;
+    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs_per_node, sizeof(char *)));
+    feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
+
+  }
+
+//      feenox_call(fino_define_functions());
+      
+  return FEENOX_OK;
+  
 }

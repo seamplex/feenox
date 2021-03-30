@@ -31,7 +31,7 @@ extern feenox_parser_t feenox_parser;
 
 
 
-const char operators[]        = "&|=!<>+-*/^()";
+const char operators[]        = "&|=!<>+-*/^ ()";
 const char factorseparators[] = "&|=!<>+-*/^(), \t\n";
 
 

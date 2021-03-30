@@ -62,6 +62,17 @@
  #include <sunlinsol/sunlinsol_dense.h>
 #endif
 
+#ifdef HAVE_PETSC
+ #include <petscsys.h>
+ #include <petscpc.h>
+ #include <petscsnes.h>
+ #include <petscts.h>
+ #include <petsctime.h>
+ #ifdef HAVE_SLEPC
+  #include <slepceps.h>
+ #endif // HAVE_SLEPC
+#endif  // HAVE_PETSC
+
 
 #include "contrib/uthash.h"
 #include "contrib/utlist.h"
@@ -126,6 +137,9 @@
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
 
 #define MINMAX_ARGS       10
+
+// TODO: somewhere lese
+#define DEFAULT_NMODES        10
 
 
 // zero & infinite
@@ -1298,6 +1312,295 @@ struct feenox_t {
     SUNLinearSolver LS;
 #endif
   } dae;
+  
+  struct {
+    
+    enum {
+      type_none,
+      type_thermal,
+      type_mechanical,
+      type_modal,
+      type_neutron_diffusion,
+      type_neutron_transport,
+    } type;
+
+    enum {
+      variant_full,
+      variant_axisymmetric,
+      variant_plane_stress,
+      variant_plane_strain
+    } variant;
+  
+    enum {
+      symmetry_axis_none,
+      symmetry_axis_x,
+      symmetry_axis_y
+    } symmetry_axis;
+
+    // these can be read from the input but also we can figure them out
+    enum {
+      transient_type_undefined,
+      transient_type_transient,
+      transient_type_quasistatic
+    } transient_type;
+    
+    enum {
+      math_type_undefined,
+      math_type_linear,
+      math_type_nonlinear,
+      math_type_eigen,
+    } math_type;
+
+
+    enum {
+      material_type_linear_isotropic,
+      material_type_linear_orthotropic
+    } material_type;
+  
+    unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
+    unsigned int dofs_per_node;    // DoFs per node
+    size_t spatial_unknowns;       // number of spatial unknowns (= nodes)
+    size_t global_size;            // total number of DoFs
+    
+    int rough;               // keep each element's contribution to the gradient?
+    int roughish;            // average only on the same physical group?
+  
+    mesh_t *mesh;
+    mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
+  
+/*    
+    fino_reaction_t *reactions;
+    fino_linearize_t *linearizes;
+    fino_debug_t *debugs;  // deprecated
+ */
+
+/*    
+    PetscClassId petsc_classid;
+
+    PetscLogStage petsc_stage_build;
+    PetscLogStage petsc_stage_solve;
+    PetscLogStage petsc_stage_stress;
+  
+    PetscLogEvent petsc_event_build;
+    PetscLogEvent petsc_event_solve;
+    PetscLogEvent petsc_event_stress;
+  
+    PetscLogDouble petsc_flops_build;
+    PetscLogDouble petsc_flops_solve;
+    PetscLogDouble petsc_flops_stress;
+
+    fino_times_t wall;
+    fino_times_t cpu;
+    fino_times_t petsc;
+*/
+    
+    struct {
+      var_t *abstol;
+      var_t *reltol;
+      var_t *divtol;
+      var_t *max_iterations;
+      var_t *gamg_threshold;
+      var_t *iterations;
+      var_t *residual_norm;
+    
+      var_t *penalty_weight;
+      var_t *nodes_rough;
+      var_t *unknowns;
+    
+      // TODO: take to per-problem headers
+      var_t *U[3];
+
+      var_t *strain_energy;
+    
+      var_t *displ_max;
+      var_t *displ_max_x;
+      var_t *displ_max_y;
+      var_t *displ_max_z;
+
+      var_t *u_at_displ_max;
+      var_t *v_at_displ_max;
+      var_t *w_at_displ_max;
+
+    
+      var_t *sigma_max;
+      var_t *sigma_max_x;
+      var_t *sigma_max_y;
+      var_t *sigma_max_z;
+      var_t *delta_sigma_max;
+
+      var_t *u_at_sigma_max;
+      var_t *v_at_sigma_max;
+      var_t *w_at_sigma_max;
+
+      var_t *T_max;
+      var_t *T_min;
+    
+      var_t *lambda;
+
+      var_t *time_wall_build;
+      var_t *time_wall_solve;
+      var_t *time_wall_stress;
+      var_t *time_wall_total;
+
+      var_t *time_cpu_build;
+      var_t *time_cpu_solve;
+      var_t *time_cpu_stress;
+      var_t *time_cpu_total;
+
+      var_t *time_petsc_build;
+      var_t *time_petsc_solve;
+      var_t *time_petsc_stress;
+      var_t *time_petsc_total;
+
+      var_t *flops_petsc;
+    
+      var_t *memory_available;
+      var_t *memory;
+      var_t *memory_petsc;
+    
+      var_t *M_T;
+    } vars;
+
+    // vectors
+    struct {
+      vector_t *f;
+      vector_t *omega;
+      vector_t *m;
+      vector_t *L;
+      vector_t *Gamma;
+      vector_t *mu;
+      vector_t *Mu;
+    
+      vector_t **phi;
+    } vectors;
+
+    // reusable number of dirichlet rows to know how much memory to allocate
+    size_t n_dirichlet_rows;
+    
+    // nombres custom 
+    char **unknown_name;          // uno para cada grado de libertad
+  
+    // las funciones con la solucion (una para cada grado de libertad)
+    function_t **solution;
+    // las derivadas de la solucion con respecto al espacio;
+    function_t ***gradient;
+    // la incerteza (i.e la desviacion estandar de la contribucion de cada elemento)
+    function_t ***delta_gradient;  
+    // los modos de vibracion
+    function_t ***mode;
+  
+    // soluciones anteriores (por ejemplos desplazamientos)
+    function_t **base_solution;
+  
+    enum {
+      gradient_gauss_extrapolated,
+      gradient_at_nodes,
+      gradient_none
+    } gradient_evaluation;
+
+    enum {
+      gradient_weight_volume,
+      gradient_weight_quality,
+      gradient_weight_volume_times_quality,
+      gradient_weight_flat,
+    } gradient_element_weight;
+
+    enum {
+      gradient_average,
+      gradient_actual
+    } gradient_highorder_nodes;
+  
+    // TODO: somewhere else
+    double hourglass_epsilon;
+  
+    // tensor de tensiones
+    function_t *sigmax;
+    function_t *sigmay;
+    function_t *sigmaz;
+    function_t *tauxy;
+    function_t *tauyz;
+    function_t *tauzx;
+
+    function_t *sigma1;      // principal stresses
+    function_t *sigma2;
+    function_t *sigma3;
+    function_t *sigma;       // von mises
+    function_t *delta_sigma; // uncertainty
+    function_t *tresca;
+    
+#ifdef HAVE_PETSC    
+    PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
+    PetscBool petscinit_called;    // flag
+    PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
+    PetscBool already_built;       // avoids building twice in the first step of SNES
+
+    // stuff for mpi parallelization
+    PetscInt nodes_local, size_local;
+    PetscInt first_row, last_row;
+    PetscInt first_node, last_node;
+    PetscInt first_element, last_element;
+
+    // global objects
+    Vec phi;       // the unknown (solution) vector
+    Vec b;         // the right-hand side vector
+    Vec b_nobc;
+    // yo haria al reves, pondria K_bc y dejaria K como no bc
+    Mat K;     // stiffness matrix (i.e E for elasticity and k for heat)
+    Mat K_bc;  // without bcs
+    Mat M;     // la matriz de masa (con rho para elastico y rho*cp para calor)
+    Mat J;     // jacobiano multiuso
+    PetscScalar lambda; // el autovalor
+  
+    PetscScalar *eigenvalue;    // los autovalores
+    Vec *eigenvector;           // los autovectores
+
+    // auxiliary arrays for dirichlet conditions
+    PetscInt        *dirichlet_indexes;
+    PetscScalar     *dirichlet_values;
+  
+    // PETSc's solvers
+    TS ts;
+    SNES snes;
+    KSP ksp;
+  
+    // strings con tipos
+    KSPType ksp_type;
+    PCType pc_type;
+    TSType ts_type;
+    SNESType snes_type;
+
+    PetscBool progress_ascii;
+    double progress_r0;
+    double progress_last;
+
+    expr_t eps_ncv;
+    expr_t st_shift;
+    expr_t st_anti_shift;  
+
+    // para la memoria  
+//    struct rusage resource_usage;
+  
+    // objectos locales
+    size_t n_local_nodes;            // cantidad de nodos locales actual
+    unsigned int elemental_size;           // tamanio actual del elemento
+    gsl_matrix *Ki;               // la matriz de rigidez elemental
+    gsl_matrix *Mi;               // la matriz de masa elemental
+    gsl_vector *bi;               // el vector del miembro derecho elemental
+    gsl_vector *Nb;               // para las BCs de neumann
+
+#endif  // HAVE_PETSC    
+    // cosas del eigensolver
+    // las pongo al final por si acaso (mezcla de plugins compilados con difentes libs, no se)
+    int nev;      // el numero del autovalor pedido
+#ifdef HAVE_SLEPC
+    EPSType eps_type;
+    STType st_type;
+  
+    EPS eps;      // contexto eigensolver (SLEPc)
+    EPSWhich eigen_spectrum;
+#endif
+    
+  } pde;
   
 };
 

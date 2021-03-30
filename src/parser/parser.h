@@ -103,5 +103,6 @@ extern int feenox_parse_write_mesh(void);
 extern int feenox_parse_physical_group(void);
 extern int feenox_parse_material(void);
 extern int feenox_parse_bc(void);
+extern int feenox_parse_problem(void);
 
 #endif  
