@@ -83,8 +83,8 @@ for kw in ${kws}; do
         minytics=$(echo ${range}  | awk '{printf $7}')
         maxytics=$(echo ${range}  | awk '{printf $8}')
         stepytics=$(echo ${range} | awk '{printf $9}')
-        mxtics=$(echo ${range} | awk '{printf $10}')
-        mytics=$(echo ${range} | awk '{printf $11}')
+        mxtics=$(echo ${range}    | awk '{printf $10}')
+        mytics=$(echo ${range}    | awk '{printf $11}')
         cat << EOF > ${kw}.fee
 FUNCTION f(x) = ${kw}(x)
 PRINT_FUNCTION f MIN ${min} MAX ${max} STEP ${step}
@@ -92,8 +92,8 @@ EOF
         feenox ${kw}.fee > ${kw}.dat
         cat << EOF > ${kw}.ppl
 set preamble "\usepackage{amsmath} \usepackage{amssymb}"
-set width 10*unit(cm)
-set size ratio 0.35
+set width 12*unit(cm)
+set size ratio 0.375
 set axis x arrow nomirrored
 set axis y arrow nomirrored
 set grid
@@ -106,18 +106,16 @@ EOF
           echo "set ytics ${minytics},${stepytics},${maxytics}" >> ${kw}.ppl
         fi
         if [ ! -z "${mxtics}" ]; then
-          echo "set mxtics ${mxtics}" >> ${kw}.ppl
+          echo "set mxtics ${minxtics},${mxtics},${maxxtics}" >> ${kw}.ppl
         fi
         if [ ! -z "${mytics}" ]; then
-          echo "set mytics ${mytics}" >> ${kw}.ppl
+          echo "set mytics ${minytics},${mytics},${maxytics}" >> ${kw}.ppl
         fi
 
         cat << EOF >> ${kw}.ppl
-#set mytics
-#set mxtics
 set xrange [${min}:${max}]
 set xlabel "\$x\$"
-set ylabel "${escapedkw}\$(x)\$"
+set ylabel "\\texttt{${escapedkw}}\$(x)\$"
 set terminal pdf
 set output "${kw}.pdf"
 plot "${kw}.dat" w l lw 3 color blue

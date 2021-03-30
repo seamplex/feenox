@@ -43,7 +43,7 @@ int feenox_parse_main_input_file(const char *filepath) {
 #endif
   feenox_parser.actual_buffer_size = feenox_parser.page_size-64;
   
-  feenox_parser.line = malloc(feenox_parser.actual_buffer_size);
+  feenox_check_alloc(feenox_parser.line = malloc(feenox_parser.actual_buffer_size));
   feenox_call(feenox_parse_input_file(filepath, 0, 0));
   free(feenox_parser.line);
 
@@ -119,9 +119,9 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
 // feenox line parser
 int feenox_parse_line(void) {
 
-  char *token = NULL;
   char *equal_sign = NULL;
-
+  char *token = NULL;
+  
   if ((token = feenox_get_next_token(feenox_parser.line)) != NULL) {
     
 ///kw+INCLUDE+usage INCLUDE

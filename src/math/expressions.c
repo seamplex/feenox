@@ -485,6 +485,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
           }
         } else if (item->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
           // if it is a functional the second argument is a variable
+          feenox_strip_blanks(arg[i]);
           if ((item->functional_var_arg = feenox_get_variable_ptr(arg[i])) == NULL) {
             return NULL;
           }

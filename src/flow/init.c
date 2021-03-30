@@ -117,7 +117,7 @@ int feenox_initialize(int argc, char **argv) {
   // after getopt() the arguments are re-ordered as needed to further
   // process the input file and the replacement arguments
   feenox.argc = argc;
-  feenox.argv = malloc((argc+1) * sizeof(char *));
+  feenox_check_alloc(feenox.argv = malloc((argc+1) * sizeof(char *)));
   for (i = 0; i < argc; i++) {
     feenox_check_alloc(feenox.argv[i] = strdup(argv[i]));
   }
