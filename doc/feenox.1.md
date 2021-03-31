@@ -109,7 +109,7 @@ TBD.
 
 # BUILT-IN FUNCTIONS
 
-TBD.
+include(reference-fn.md)
 
 # BUILT-IN FUNCTIONALS
 
