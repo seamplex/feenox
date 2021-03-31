@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in grep awk sort uniq; do
+for i in grep awk sort uniq gcc; do
  if [ -z "$(which $i)" ]; then
   echo "error: ${i} not installed"
   exit 1
@@ -18,11 +18,11 @@ fi
 
 # get the defines in feenox.h to get the defaults
 dir=$(dirname ${src})
-if [ -e ${dir}/feenox.h ]; then
+if [ -e "${dir}/feenox.h" ]; then
   grep '#define' ${dir}/feenox.h > defs.h
-elif [ -e ../${dir}/feenox.h ]; then
+elif [ -e "../${dir}/feenox.h" ]; then
   grep '#define' ../${dir}/feenox.h > defs.h
-elif [ -e ../../${dir}/feenox.h ]; then
+elif [ -e "../../${dir}/feenox.h" ]; then
   grep '#define' ../../${dir}/feenox.h > defs.h
 else
   touch defs.h
@@ -72,7 +72,7 @@ for kw in ${kws}; do
 
   range=$(grep "///${tag}+${kw}+plotx" ${src} | cut -d" " -f2-)
   if [[ -n "${range}" &&  -n "$(which pyxplot)" && -n "$(which feenox)" && -n "$(which pdf2svg)" ]]; then
-    if [ ! -e figures/${kw}.svg ]; then
+    if [ ! -e "figures/${kw}.svg" ]; then
       mkdir -p figures
       cd figures
       min=$(echo ${range}       | awk '{printf $1}')
@@ -133,7 +133,7 @@ EOF
     fi  
 
     echo
-    echo "![${kw}](figures/${kw}.svg)"
+    echo "![${kw}](figures/${kw}.svg){width=90%}\ "
     echo 
   fi
 
@@ -152,7 +152,7 @@ EOF
   i=0
   for ex in ${exs}; do
   
-    if [ ! -e examples/${ex} ]; then
+    if [ ! -e "examples/${ex}" ]; then
       echo "example ${ex} does not exist" > /dev/stderr
       exit 1
     fi
@@ -169,13 +169,14 @@ EOF
     cd examples
     echo
     echo "~~~{.terminal style=terminal}"
-    if [ -e ${ex}.sh ]; then
+    sh="$(basename ${ex} .fee).sh"
+    if [ -e "${sh}" ]; then
       k=1
       rm -f ${ex}.term
-      n=$(wc -l < ${ex}.sh)
+      n=$(wc -l < ${sh})
       while [ ${k} -le ${n} ]; do
        echo -n "\$ " >> ${ex}.term
-       cat $ex.sh | head -n ${k} | tail -n1 > tmp
+       head -n ${k} ${sh} | tail -n1 > tmp
        chmod +x tmp
        cat tmp >> ${ex}.term
        script -aq -c ./tmp ${ex}.term 2>&1 | grep error: > errors
@@ -188,8 +189,15 @@ EOF
        k=$((${k} + 1))
       done
       
-
-      cat ${ex}.term | grep -v Script | sed s/^\\.\$/\$/
+      cat ${ex}.term | grep -v Script | sed s/^\\.\$/\$/ | sed /^$/d
+      echo \$ 
+      
+      # figure
+      ppl="$(basename ${ex} .fee).ppl"
+      if [[ -e "${ppl}" &&  -n "$(which pyxplot)" && -n "$(which feenox)" && -n "$(which pdf2svg)" ]]; then
+        pyxplot ${ppl}
+        pdf2svg $(basename ${ex} .fee).pdf $(basename ${ex} .fee).svg 
+      fi
       
     else
       echo "$ feenox ${ex}"
@@ -201,9 +209,10 @@ EOF
     cd ..
     
 
-    # figure
-    if [ -e examples/${ex}.fig ]; then
-      echo "![${ex}](examples/$(cat examples/${ex}.fig))"
+    # example figure
+    svg="examples/$(basename ${ex} .fee).svg"
+    if [ -e ${svg} ]; then
+      echo "![${ex}](${svg}){width=90%}\ "
     fi
 
 

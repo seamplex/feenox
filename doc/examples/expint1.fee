@@ -1,6 +1,2 @@
-VAR u 
-
-E1(x) := expint1(x)
-Def(x) := integral(exp(-x*u)/u,u,1,99)
-
-PRINT_FUNCTION E1 Def MIN 1e-2 MAX 2.0 STEP 1e-2 HEADER
+Def(x) := integral(exp(-x*t)/t,t,1,99)
+PRINT_FUNCTION Def expint1(x) MIN 1e-2 MAX 2.0 STEP 1e-2 HEADER

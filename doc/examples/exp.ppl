@@ -1,0 +1,31 @@
+set preamble "\usepackage{amsmath} \usepackage{amssymb}"
+set width 12*unit(cm)
+set size ratio 0.375
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+set grid
+set key above
+
+#set xtics ${minxtics},${stepxtics},${maxxtics}
+#set ytics ${minytics},${stepytics},${maxytics}
+#set mxtics ${minxtics},${mxtics},${maxxtics}
+#set mytics ${minytics},${mytics},${maxytics}
+# set xrange [${min}:${max}]
+set yrange [0:1.5]
+set y2range [-5e-6:+5e-6]
+
+set xlabel " $t$"
+set ylabel " $x$ \& $y$"
+set y2label "$y-x$"
+set y2tics -6e-6,2e-6,+6e-6 
+#set axis x2 atzero
+
+set terminal pdf
+set output "exp.pdf"
+
+plot "exp.dat" u 1:2 w l  color black           ti "",\
+     "exp.dat" u 1:2 w p  color black every 5   ti "$x(t)$",\
+     "exp.dat" u 1:3 w l  color green           ti "",\
+     "exp.dat" u 1:3 w p  color green every 7   ti "$y(t)$",\
+     "exp.dat" axes x1y2 u 1:4 w l  color red             ti "",\
+     "exp.dat" axes x1y2 u 1:4 w p  color red   every 6  ti "$y(t)-x(t)$"
