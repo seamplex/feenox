@@ -1,0 +1,8 @@
+end_time = 5
+dt = 1/10
+t0 = 0.5
+r = heaviside(t-t0)
+
+PRINT t r lag(r,1) d_dt(lag(r,1)) r*exp(-(t-t0)) HEADER
+
+# exercise: plot output for different values of dt

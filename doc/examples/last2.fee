@@ -1,0 +1,8 @@
+end_time = 1
+dt = 0.1
+
+y = y + 1
+z  = last(z,1) + 1
+z' = last(z')  + 1
+
+PRINT t %g y z z'

@@ -1,0 +1,6 @@
+E2(x) := expint2(x)
+guesswho(x) := exp(-x) - x * expint1(x)
+
+PRINT_FUNCTION E2 guesswho MIN 1e-2 MAX 2.0 STEP 1e-2 HEADER
+
+# exercise: which is the limit of guesswho(x) as x approaches to zero?

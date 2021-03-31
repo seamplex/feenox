@@ -1,0 +1,7 @@
+VAR t'
+x(t) := derivative(log(1+t'), t', t)
+y(t) := 1/(1+t)
+
+PRINT_FUNCTION x y y(t)-x(t) MIN 0 MAX 1 NSTEPS 50
+
+# exercise: why does this example give a smaller error than the exp.fee example?

@@ -1,0 +1,8 @@
+n = 4
+
+En(x) := expintn(n,x)
+guesswho(x) := (1/(n-1)) * (exp(-x) - x * expintn(n-1,x))
+
+PRINT_FUNCTION En guesswho MIN 0.01 MAX 2.0 STEP 1e-2 HEADER
+
+# Try this for different values of n > 1.

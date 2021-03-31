@@ -1,0 +1,7 @@
+end_time = 10
+dt = 1e-2
+
+r = 2*sawtooth_wave(0.2*t + 0.5) - 1
+y = lag(r, 0.5)
+
+PRINT t r y

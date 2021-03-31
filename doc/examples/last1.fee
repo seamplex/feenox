@@ -1,0 +1,10 @@
+static_steps = 5
+end_time = 1
+dt = 0.1
+
+IF in_static
+  PRINT step_static last(step_static) last(last(step_static))
+ENDIF
+IF done_static
+  PRINT t last(t) last(last(1-t))
+ENDIF  

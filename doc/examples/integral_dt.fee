@@ -1,0 +1,9 @@
+end_time = 2*pi
+dt = end_time/100
+
+y = sin(t) + random_gauss(0,0.05)
+
+PRINT t y integral_dt(y)
+
+# exercise: compute also  the instantaneous 
+# mean value of the signal y(t)
