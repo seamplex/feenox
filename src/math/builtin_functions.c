@@ -583,7 +583,6 @@ double feenox_builtin_expint1(expr_item_t *f) {
 ///fn+expint2+usage expint2(x)
 ///fn+expint2+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]
 ///fn+expint2+plotx 0.0 2.0 1e-2
-///fn+expint2+example expint2.fee
 double feenox_builtin_expint2(expr_item_t *f) {
   return gsl_sf_expint_E2(feenox_expression_eval(&f->arg[0]));
 }
@@ -602,7 +601,6 @@ double feenox_builtin_expint3(expr_item_t *f) {
 ///fn+expintn+desc If\ $n$ is zero or one and\ $x$ is zero, a NaN error is issued.
 ///fn+expintn+usage expintn(n,x)
 ///fn+expintn+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]
-///fn+expintn+example expintn.fee
 double feenox_builtin_expintn(expr_item_t *f) {
   int n;
   n = ((int)(round(feenox_expression_eval(&f->arg[0]))));
@@ -650,7 +648,7 @@ double feenox_builtin_abs(expr_item_t *f) {
 ///fn+sqrt+desc Computes the positive square root of the argument\ $x$.
 ///fn+sqrt+desc If\ $x$ is negative, a NaN error is issued.
 ///fn+sqrt+usage sqrt(x)
-///fn+sqrt+math \sqrt{x}
+///fn+sqrt+math +\sqrt{x}
 ///fn+sqrt+plotx 0 5 1e-2    0 6 1    0 2.5 0.5    0.5  0.25
 double feenox_builtin_sqrt(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
@@ -1017,7 +1015,7 @@ double feenox_builtin_lead_bilinear(algebraic_token_t *expr) {
 ///fn+equal+desc given by the third optional argument $\epsilon$. If either $|a|>1$ or $|b|>1$,
 ///fn+equal+desc the arguments are compared using GSL's `gsl_fcmp`, otherwise the
 ///fn+equal+desc absolute value of their difference is compared against $\epsilon$. This function
-///fn+equal+desc returns \textsl{exactly} zero if the arguments are not equal and one otherwise.
+///fn+equal+desc returns zero if the arguments are not equal and one otherwise.
 ///fn+equal+desc Default value for $\epsilon = 10^{-9}$.
 ///fn+equal+usage equal(a, b, [eps])
 ///fn+equal+math \begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}
@@ -1207,7 +1205,7 @@ double feenox_builtin_limit_dt(expr_item_t *f) {
 ///fn+if+desc Even though `if` is a logical operation, all the arguments and the returned value
 ///fn+if+desc are double-precision floating point numbers.
 ///fn+if+usage if(a, [b], [c], [eps])
-///fn+if+math \begin{cases} b & \text{if $a \neq 0$} \\ c & \text{if $a = b$} \end{cases}
+///fn+if+math \begin{cases} b & \text{if $|a|<\epsilon$} \\ c & \text{otherwise} \end{cases}
 
 double feenox_builtin_if(expr_item_t *f) {
   double eps = 1e-9;

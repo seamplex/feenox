@@ -303,6 +303,17 @@ int feenox_parse_line(void) {
       return FEENOX_ERROR;
 #endif      
       
+///kw+SOLVE_PROBLEM+desc Explicitly solve the PDE problem.
+///kw+SOLVE_PROBLEM+usage SOLVE_PROBLEM
+    } else if (strcasecmp(token, "SOLVE_PROBLEM") == 0) {
+#ifdef HAVE_PETSC      
+      feenox_call(feenox_parse_solve_problem());
+      return FEENOX_OK;
+#else
+      feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
+      return FEENOX_ERROR;
+#endif      
+
       
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -602,7 +613,8 @@ int feenox_parse_line(void) {
       
 // --- SOLVE -----------------------------------------------------
 ///kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
-///kw+SOLVE+example solve1.was solve2.was
+//TODO: example
+//kw+SOLVE+example solve1.was solve2.was
 ///kw+SOLVE+usage SOLVE
       
     } else if (strcasecmp(token, "SOLVE") == 0) {
@@ -1609,7 +1621,8 @@ int feenox_parse_implicit(void) {
 ///kw+IMPLICIT+detail declaration of variables can be forced by giving `IMPLICIT NONE`.
 ///kw+IMPLICIT+detail Whether implicit declaration is allowed or explicit declaration is required
 ///kw+IMPLICIT+detail depends on the last `IMPLICIT` keyword given, which by default is `ALLOWED`.
-///kw+IMPLICIT+example implicit.was
+//TODO: example
+//kw+IMPLICIT+example implicit.was
 
 ///kw+IMPLICIT+usage { NONE | ALLOWED }
   char *keywords[] = {"NONE", "ALLOWED", ""};
@@ -3582,4 +3595,18 @@ int feenox_parse_problem(void) {
       
   return FEENOX_OK;
   
+}
+
+int feenox_parse_solve_problem(void) {
+ 
+///kw+SOLVE_PROBLEM+detail Whenever the instruction `SOLVE_PROBLEM` is executed,
+///kw+SOLVE_PROBLEM+detail FeenoX solves the PDE problem.
+///kw+SOLVE_PROBLEM+detail For static problems, that means solving the equations
+///kw+SOLVE_PROBLEM+detail and filling in the result functions.
+///kw+SOLVE_PROBLEM+detail For transient or quasisstatic problems, that means
+///kw+SOLVE_PROBLEM+detail advancing one time step.
+  
+  feenox_call(feenox_add_instruction(feenox_instruction_solve_problem, NULL));
+  
+  return FEENOX_OK;
 }

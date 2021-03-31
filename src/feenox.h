@@ -1866,4 +1866,9 @@ extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
 
+
+// solve.c
+extern int feenox_instruction_solve_problem(void *arg);
+
+
 #endif    /* FEENOX_H  */

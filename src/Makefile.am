@@ -68,6 +68,7 @@ feenox_SOURCES = \
 ./mesh/gmsh.c \
 ./mesh/calculix.c \
 ./mesh/vtk.c \
+./problems/solve.c \
 ./contrib/kdtree.c \
 ./contrib/kdtree.h \
 ./contrib/utlist.h \

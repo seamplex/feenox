@@ -174,7 +174,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ~~~{.terminal style=terminal}
 $ feenox clock.fee
 doing something in between
-difference	0.000151128	[seconds]
+difference	7.5526e-05	[seconds]
 $
 ~~~
 
