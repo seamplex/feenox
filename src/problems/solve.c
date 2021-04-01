@@ -1,6 +1,227 @@
 #include "feenox.h"
+feenox_t feenox;
 
 int feenox_instruction_solve_problem(void *arg) {
-  printf("solving PDEs\n");
+  
+
+  //---------------------------------
+  // initialize only if we did not initialize before
+  // TODO: how to handle changes in the mesh within steps?
+  //---------------------------------
+  if (feenox.pde.spatial_unknowns == 0) {
+    feenox_call(feenox_problem_init());
+  }
+
+  // TODO: put in thermal init
+  // check if we were given an initial solution
+  if ((feenox.pde.initial_condition = feenox_get_function_ptr("T_0")) != NULL) {
+    if (feenox.pde.initial_condition->n_arguments != feenox.pde.dim) {
+      feenox_push_error_message("initial condition function T_0 ought to have %d arguments instead of %d", feenox.pde.dim, feenox.pde.initial_condition->n_arguments);
+      return FEENOX_OK;
+    }
+  }
+  // TODO: either use the setting or figure out the dependence of properties & BCs with T
+  feenox.pde.solve_petsc = feenox_solve_petsc_linear;
+  
+  if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_condition != NULL) {
+
+    size_t j = 0;
+    for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
+      petsc_call(VecSetValue(feenox.pde.phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(feenox.pde.initial_condition, feenox.pde.mesh->node[j].x), INSERT_VALUES));
+    }
+
+    // TODO: assembly routine
+    petsc_call(VecAssemblyBegin(feenox.pde.phi));
+    petsc_call(VecAssemblyEnd(feenox.pde.phi));
+  }  
+  
+  if (feenox_var_value(feenox_special_var(in_static)) || feenox.pde.transient_type == transient_type_quasistatic) {
+    
+    // now, if the problem is steady-state or we do not have an initial condition then we just solve it
+    // if the problem is static and an initial condition was given, it's used as a guess (without Dirichlet BCs)
+    if (feenox_special_var(end_time) == 0 || feenox.pde.initial_condition == NULL) {
+      feenox.pde.solve_petsc();
+    }
+  
+    // TODO: how to do this in parallel?
+//    feenox_call(feenox_phi_to_solution(feenox.pde.phi, 1));
+    
+  } else {
+    
+   
+  }
+
+/*  
+  feenox_var(feenox.pde.vars.time_petsc_build) += feenox.pde.petsc.build_end - feenox.pde.petsc.build_begin;
+  feenox_var(feenox.pde.vars.time_wall_build)  += feenox.pde.wall.build_end  - feenox.pde.wall.build_begin;
+  feenox_var(feenox.pde.vars.time_cpu_build)   += feenox.pde.cpu.build_end   - feenox.pde.cpu.build_begin;
+  
+  feenox_var(feenox.pde.vars.time_petsc_solve) += feenox.pde.petsc.solve_end - feenox.pde.petsc.solve_begin;
+  feenox_var(feenox.pde.vars.time_wall_solve)  += feenox.pde.wall.solve_end  - feenox.pde.wall.solve_begin;
+  feenox_var(feenox.pde.vars.time_cpu_solve)   += feenox.pde.cpu.solve_end   - feenox.pde.cpu.solve_begin;
+
+  feenox_var(feenox.pde.vars.time_petsc_stress) += feenox.pde.petsc.stress_end - feenox.pde.petsc.stress_begin;
+  feenox_var(feenox.pde.vars.time_wall_stress)  += feenox.pde.wall.stress_end  - feenox.pde.wall.stress_begin;
+  feenox_var(feenox.pde.vars.time_cpu_stress)   += feenox.pde.cpu.stress_end   - feenox.pde.cpu.stress_begin;
+  
+  feenox_var(feenox.pde.vars.time_petsc_total) += feenox_var(feenox.pde.vars.time_petsc_build) + feenox_var(feenox.pde.vars.time_petsc_solve) + feenox_var(feenox.pde.vars.time_petsc_stress);
+  feenox_var(feenox.pde.vars.time_wall_total)  += feenox_var(feenox.pde.vars.time_wall_build)  + feenox_var(feenox.pde.vars.time_wall_solve)  + feenox_var(feenox.pde.vars.time_wall_stress);
+  feenox_var(feenox.pde.vars.time_cpu_total)   += feenox_var(feenox.pde.vars.time_cpu_build)   + feenox_var(feenox.pde.vars.time_cpu_solve)   + feenox_var(feenox.pde.vars.time_cpu_stress);
+
+  getrusage(RUSAGE_SELF, &feenox.pde.resource_usage);
+  feenox_value(feenox.pde.vars.memory) = (double)(1024.0*feenox.pde.resource_usage.ru_maxrss);
+*/
+  
+  return FEENOX_OK;
+}
+
+
+
+
+
+int feenox_assembly(void) {
+  // which is better?
+/*  
+  petsc_call(MatAssemblyBegin(feenox.K, MAT_FINAL_ASSEMBLY));
+  petsc_call(MatAssemblyEnd(feenox.K, MAT_FINAL_ASSEMBLY));
+
+  petsc_call(VecAssemblyBegin(feenox.phi));
+  petsc_call(VecAssemblyEnd(feenox.phi));
+  
+  if (feenox.M != NULL) {
+    petsc_call(MatAssemblyBegin(feenox.M, MAT_FINAL_ASSEMBLY));
+    petsc_call(MatAssemblyEnd(feenox.M, MAT_FINAL_ASSEMBLY));
+  }
+  if (feenox.J != NULL) {
+    petsc_call(VecAssemblyBegin(feenox.b));
+    petsc_call(VecAssemblyEnd(feenox.b));
+  }
+*/
+  
+  petsc_call(VecAssemblyBegin(feenox.pde.phi));
+  if (feenox.pde.b != NULL) {
+    petsc_call(VecAssemblyBegin(feenox.pde.b));
+  }  
+  petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+  if (feenox.pde.M != NULL) {
+    petsc_call(MatAssemblyBegin(feenox.pde.M, MAT_FINAL_ASSEMBLY));
+  }  
+
+
+  petsc_call(VecAssemblyEnd(feenox.pde.phi));
+  if (feenox.pde.b != NULL) {
+    petsc_call(VecAssemblyEnd(feenox.pde.b));
+  }  
+  petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+  if (feenox.pde.M != NULL) {
+    petsc_call(MatAssemblyEnd(feenox.pde.M, MAT_FINAL_ASSEMBLY));
+  }
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_phi_to_solution(Vec phi, int compute_gradients) {
+
+  VecScatter         vscat;
+  Vec                phi_full;
+  PetscScalar        *phi_full_array;
+  PetscInt           nlocal;
+
+  // TODO: if nprocs == 1 then we already have the full vector
+  petsc_call(VecScatterCreateToAll(phi, &vscat, &phi_full));
+  petsc_call(VecScatterBegin(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD););
+  petsc_call(VecScatterEnd(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD););
+
+  petsc_call(VecGetLocalSize(phi_full, &nlocal));
+  if (nlocal != feenox.pde.global_size) {
+    feenox_push_error_message("internal check of problem size with scatter failed, %d != %d\n", nlocal, feenox.pde.global_size);
+    return FEENOX_OK;
+  }
+  petsc_call(VecGetArray(phi_full, &phi_full_array));
+  
+  // make up G functions with the solution
+  size_t j = 0;
+  for (j = 0; j < feenox.pde.spatial_unknowns; j++) {
+    unsigned int g = 0;
+    for (g = 0; g < feenox.pde.dofs; g++) {
+      feenox.pde.mesh->node[j].phi[g] = phi_full_array[feenox.pde.mesh->node[j].index_dof[g]];
+
+      // if there is a base solution
+      if (feenox.pde.base_solution != NULL && feenox.pde.base_solution[g] != NULL) {
+        if (feenox.pde.base_solution[g]->mesh == feenox.pde.mesh) {
+          feenox.pde.mesh->node[j].phi[g] += feenox.pde.base_solution[g]->data_value[j];
+        } else {
+          feenox.pde.mesh->node[j].phi[g] += feenox_function_eval(feenox.pde.base_solution[g], feenox.pde.mesh->node[j].x);
+        }
+      }
+
+      // if we are not in rough mode we fill the solution here
+      // because it is easy, in rough mode we need to iterate over the elements
+      if (feenox.pde.rough == 0) {
+        feenox.pde.solution[g]->data_value[j] = feenox.pde.mesh->node[j].phi[g];
+      }
+
+      if (feenox.pde.nev > 1) {
+        double xi = 0;
+        unsigned int i = 0;
+        for (i = 0; i < feenox.pde.nev; i++) {
+          // the values already have the excitation factor
+          PetscInt index = feenox.pde.mesh->node[j].index_dof[g];
+          petsc_call(VecGetValues(feenox.pde.eigenvector[i], 1, &index, &xi));
+          feenox.pde.mode[g][i]->data_value[j] = xi;
+          feenox_vector_set(feenox.pde.vectors.phi[i], j, xi);
+        }
+      }
+    }
+  }
+
+  petsc_call(VecRestoreArray(phi_full, &phi_full_array));
+  petsc_call(VecDestroy(&phi_full));
+  petsc_call(VecScatterDestroy(&vscat));
+    
+    
+  if (feenox.pde.rough) {
+    node_t *node;  
+    // in rough mode we need to iterate over the elements first and then over the nodes
+    // TODO: see if the order of the loops is the optimal one
+    unsigned int g = 0;
+    size_t i = 0;
+    size_t j = 0;
+    for (g = 0; g < feenox.pde.dofs; g++) {
+      for (i = 0; i < feenox.pde.mesh_rough->n_elements; i++) {
+        for (j = 0; j < feenox.pde.mesh_rough->element[i].type->nodes; j++) {
+          node = feenox.pde.mesh_rough->element[i].node[j];  
+          feenox.pde.solution[g]->data_value[node->index_mesh] = node->phi[g];  
+        }
+      }
+    }
+  }
+
+/*  
+  if (compute_gradients) {
+    // TODO: function pointers
+    if (feenox.pde.problem_family == problem_family_mechanical) {
+  
+      time_checkpoint(stress_begin);
+      feenox_call(feenox_compute_strain_energy());
+      if (feenox.pde.gradient_evaluation != gradient_none) {
+        feenox_call(feenox_break_compute_stresses());
+      }  
+      time_checkpoint(stress_end);
+      
+    } else if (feenox.pde.problem_family == problem_family_thermal) {
+       
+      feenox_call(feenox_thermal_compute_fluxes());
+    }  
+  }
+*/    
+  
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_problem_init_default(void) {
   return FEENOX_OK;
 }

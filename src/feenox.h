@@ -127,6 +127,11 @@
 #define DEFAULT_PRINT_FORMAT               "%g"
 #define DEFAULT_PRINT_SEPARATOR            "\t"
 
+#define CHAR_PROGRESS_BUILD                "."
+#define CHAR_PROGRESS_SOLVE                "-"
+#define CHAR_PROGRESS_GRADIENT             "="
+
+
 #define DEFAULT_ROOT_MAX_TER               1024
 #define DEFAULT_ROOT_TOLERANCE             (9.765625e-4)         // (1/2)^-10
 
@@ -188,7 +193,12 @@ enum version_type {
 // macro to check error returns in function calls
 #define feenox_call(function)   if ((function) != FEENOX_OK) return FEENOX_ERROR
 #ifdef HAVE_IDA
-#define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
+ #define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
+#endif
+
+#ifdef HAVE_PETSC
+ PetscErrorCode petsc_err;
+ #define petsc_call(s) {petsc_err = s; CHKERRQ(petsc_err);}
 #endif
 
 // macro to check malloc() for NULL (ass means assignement, you ass!)
@@ -1358,8 +1368,8 @@ struct feenox_t {
     } material_type;
   
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
-    unsigned int dofs_per_node;    // DoFs per node
-    size_t spatial_unknowns;       // number of spatial unknowns (= nodes)
+    unsigned int dofs;             // DoFs per node/cell
+    size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t global_size;            // total number of DoFs
     
     int rough;               // keep each element's contribution to the gradient?
@@ -1394,6 +1404,13 @@ struct feenox_t {
     fino_times_t petsc;
 */
     
+    // virtual methods
+    int (*init_parser)(void);
+    int (*init_problem)(void);
+    int (*solve_petsc)(void);
+    
+    function_t *initial_condition;
+
     struct {
       var_t *abstol;
       var_t *reltol;
@@ -1756,7 +1773,7 @@ extern int feenox_instruction_sort_vector(void *arg);
 extern double feenox_vector_get(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_static(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i);
-
+extern int feenox_vector_set(vector_t *this, const size_t i, double value);
 
 // function.c
 extern int feenox_function_init(function_t *this);
@@ -1869,6 +1886,39 @@ extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
 
 // solve.c
 extern int feenox_instruction_solve_problem(void *arg);
+extern int feenox_phi_to_solution(Vec phi, int compute_gradients);
+
+// init.c
+extern int feenox_problem_init(void);
+
+// bulk.c
+extern int feenox_build(void);
+
+#ifdef HAVE_PETSC
+// petsc_ksp.c
+extern int feenox_solve_petsc_linear(void);
+extern PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
+extern int feenox_set_pc(PC pc);
+extern int feenox_set_ksp(KSP ksp);
+  
+// petsc_ts.c
+extern PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
+extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
+
+// dirichlet.c
+extern int feenox_dirichlet_eval(Mat K, Vec b);
+extern int feenox_dirichlet_set_K(Mat K, Vec b);
+extern int feenox_dirichlet_set_r(Vec r, Vec phi);
+extern int feenox_dirichlet_set_J(Mat J);
+extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
+
+
+
+#endif
+
+// thermal/init.c
+extern int feenox_problem_init_thermal(void);
+
 
 
 #endif    /* FEENOX_H  */

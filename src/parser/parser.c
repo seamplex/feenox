@@ -3400,6 +3400,7 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox.pde.type = type_mechanical;
+      feenox.pde.init_parser = feenox_problem_init_thermal;
       // TODO: provide a virtual method pde_parser_initialize()
           
 ///kw+PROBLEM+usage thermal
@@ -3557,16 +3558,16 @@ int feenox_parse_problem(void) {
         feenox.pde.dim = 2;
       }
 
-      if (feenox.pde.dofs_per_node != 0) {
-        if (feenox.pde.dofs_per_node != 2) {
+      if (feenox.pde.dofs != 0) {
+        if (feenox.pde.dofs != 2) {
           feenox_push_error_message("DOF inconsistency");
           return FEENOX_ERROR;
         }
       } else {
-        feenox.pde.dofs_per_node = 2;
+        feenox.pde.dofs = 2;
       }
     } else {
-      feenox.pde.dofs_per_node = feenox.pde.dim;
+      feenox.pde.dofs = feenox.pde.dim;
     }
 
     if (feenox.pde.type == type_modal) {
@@ -3574,19 +3575,19 @@ int feenox_parse_problem(void) {
     }
 
     // TODO: custom names
-    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs_per_node, sizeof(char *)));
+    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
     feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
-    if (feenox.pde.dofs_per_node > 1) {
+    if (feenox.pde.dofs > 1) {
       feenox_check_alloc(feenox.pde.unknown_name[1] = strdup("v"));
-      if (feenox.pde.dofs_per_node > 2) {
+      if (feenox.pde.dofs > 2) {
         feenox_check_alloc(feenox.pde.unknown_name[2] = strdup("w"));
       }  
     }
 
   } else if (feenox.pde.type == type_thermal) {
 
-    feenox.pde.dofs_per_node = 1;
-    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs_per_node, sizeof(char *)));
+    feenox.pde.dofs = 1;
+    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
     feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
 
   }
