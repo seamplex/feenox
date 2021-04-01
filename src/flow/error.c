@@ -50,7 +50,7 @@ void feenox_push_error_message(const char *fmt, ...) {
 void feenox_pop_error_message(void) {
   
   if (feenox.error_level > 0) {
-    free(feenox.error[feenox.error_level-1]);
+    feenox_free(feenox.error[feenox.error_level-1]);
     feenox.error_level--;
   }
   

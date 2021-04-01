@@ -124,13 +124,13 @@ vector_t *feenox_get_first_vector(const char *s) {
   factor = strtok(line, factorseparators);
   while (factor != NULL) {
     if ((wanted = feenox_get_vector_ptr(factor)) != NULL) {
-      free(line);
+      feenox_free(line);
       return wanted;
     }
     factor = strtok(NULL, factorseparators);
   }
   
-  free(line);
+  feenox_free(line);
   return NULL;
   
 }
@@ -144,13 +144,13 @@ matrix_t *feenox_get_first_matrix(const char *s) {
   factor = strtok(line, factorseparators);
   while (factor != NULL) {
     if ((wanted = feenox_get_matrix_ptr(factor)) != NULL) {
-      free(line);
+      feenox_free(line);
       return wanted;
     }
     factor = strtok(NULL, factorseparators);
   }
   
-  free(line);
+  feenox_free(line);
   return NULL;
   
 }
@@ -168,14 +168,14 @@ char *feenox_get_first_dot(const char *s) {
     if ((dummy = strstr(token, "_dot")) != NULL) {
       *dummy = '\0';
       wanted = strdup(token);
-      free(line);
+      feenox_free(line);
       return wanted;
     }
 
     token = strtok(NULL, factorseparators);
   }
 
-  free(line);
+  feenox_free(line);
   return NULL;
 
 }

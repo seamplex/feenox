@@ -474,11 +474,11 @@ int feenox_init_before_run(void) {
     history->position = 0;
 
     if (history->function->data_value != NULL) {
-      free(history->function->data_value);
+      feenox_free(history->function->data_value);
     }
     if (history->function->data_argument != NULL) {
-      free(history->function->data_argument[0]);
-      free(history->function->data_argument);
+      feenox_free(history->function->data_argument[0]);
+      feenox_free(history->function->data_argument);
     }
   }  
 */

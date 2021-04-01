@@ -41,7 +41,7 @@ void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents)
   
   // si el puntero es de feenox, lo liberamos
   if (this->reallocated == 0) {
-    free(feenox_value_ptr(this));
+    feenox_free(feenox_value_ptr(this));
   }
   
   this->reallocated = 1;
@@ -75,7 +75,7 @@ void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents
       feenox_runtime_error();
     }
 
-    free(oldptr);
+    feenox_free(oldptr);
   }
   
   this->reallocated = 1;
@@ -96,7 +96,7 @@ void feenox_realloc_matrix_ptr(matrix_t *matrix, double *newptr, int copy_conten
   
   // si el puntero es de feenox, lo liberamos
   if (matrix->realloced == 0) {
-    free(oldptr);
+    feenox_free(oldptr);
   }
   
   matrix->realloced = 1;
@@ -195,11 +195,11 @@ vector_t *feenox_define_vector_get_ptr(const char *name, size_t size) {
   // the function below is called from the API that allows a string
   // this is ugly but we don't need too much performance
   char *size_string;
-  asprintf(&size_string, "%ld", size);
+  feenox_check_minusone_null(asprintf(&size_string, "%ld", size));
   if (feenox_define_vector(name, size_string) != FEENOX_OK) {
     return NULL;
   }
-  free(size_string);
+  feenox_free(size_string);
   return feenox_get_vector_ptr(name);
 }
 

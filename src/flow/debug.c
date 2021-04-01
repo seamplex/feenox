@@ -191,7 +191,7 @@ void wasora_debug(void) {
   if (wasora.mode == mode_debug || wasora.mode == mode_single_step) {
     do {
       if (debugcommand != NULL) {
-        free(debugcommand);
+        feenox_free(debugcommand);
       }
       debugcommand = readline("#) ");
       if (debugcommand != NULL && debugcommand[0] != '\0') {
@@ -286,7 +286,7 @@ void wasora_debug(void) {
         wasora_destroy_expression(&assignment->j_max);
         wasora_destroy_expression(&assignment->col);
         wasora_destroy_expression(&assignment->row);
-        free(assignment);
+        feenox_free(assignment);
         
         wasora.mode = mode_debug;
         

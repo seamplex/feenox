@@ -201,9 +201,12 @@ enum version_type {
  #define petsc_call(s) {petsc_err = s; CHKERRQ(petsc_err);}
 #endif
 
+#define feenox_free(p)                  free(p); p = NULL;
+ 
 // macro to check malloc() for NULL (ass means assignement, you ass!)
 #define feenox_check_alloc(ass)         if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
 #define feenox_check_alloc_null(ass)    if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return NULL; }
+#define feenox_check_minusone(ass)      if ((ass) == -1) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
 #define feenox_check_minusone_null(ass) if ((ass) == -1) { feenox_push_error_message("cannot allocate memory"); return NULL; }
 
 // macro to access internal special variables
@@ -1243,7 +1246,6 @@ struct feenox_t {
 
   struct {
 
-    //int initialized;
     int need_cells;
 
     mesh_t *meshes;
@@ -1405,8 +1407,8 @@ struct feenox_t {
 */
     
     // virtual methods
-    int (*init_parser)(void);
-    int (*init_problem)(void);
+    int (*init_parser_particular)(void);
+    int (*init_solve)(void);
     int (*solve_petsc)(void);
     
     function_t *initial_condition;
@@ -1507,7 +1509,7 @@ struct feenox_t {
     function_t ***mode;
   
     // soluciones anteriores (por ejemplos desplazamientos)
-    function_t **base_solution;
+//    function_t **base_solution;
   
     enum {
       gradient_gauss_extrapolated,
@@ -1889,7 +1891,12 @@ extern int feenox_instruction_solve_problem(void *arg);
 extern int feenox_phi_to_solution(Vec phi, int compute_gradients);
 
 // init.c
+extern int feenox_problem_init_parser_general(void);
 extern int feenox_problem_init(void);
+extern int feenox_problem_define_solutions(void);
+extern int feenox_problem_define_solution_function(const char *name, function_t **function);
+extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
+
 
 // bulk.c
 extern int feenox_build(void);

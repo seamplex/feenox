@@ -175,7 +175,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         }
         // TODO: same for BCs
 
-        free(name);
+        feenox_free(name);
 
       }
       
@@ -684,7 +684,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               }
               this->element[i].physical_group->n_elements++;
             }
-            free(tags22);
+            feenox_free(tags22);
           }
           
           this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *));
@@ -921,7 +921,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         function->data_argument = this->nodes_argument;
         function->data_size = nodes;
         if (function->data_value != NULL) {
-          free(function->data_value);
+          feenox_free(function->data_value);
         }
         function->data_value = calloc(nodes, sizeof(double));
       }  
@@ -1422,7 +1422,7 @@ int mesh_gmsh_update_function(function_t *function, double t, double dt) {
         function->data_value[j] += alpha * (new_data[j] - function->data_value[j]);
       }
     }
-    free(new_data);
+    feenox_free(new_data);
   }
  
   return FEENOX_OK;

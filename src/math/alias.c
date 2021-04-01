@@ -46,9 +46,9 @@ int feenox_instruction_alias(void *arg) {
       
 
       feenox_realloc_variable_ptr(alias->new_variable, gsl_matrix_ptr(feenox_value_ptr(alias->matrix), row, col), 0);
-      free(alias->new_variable->initial_static);
+      feenox_free(alias->new_variable->initial_static);
       alias->new_variable->initial_static = gsl_matrix_ptr(alias->matrix->initial_static, row, col);
-      free(alias->new_variable->initial_transient);
+      feenox_free(alias->new_variable->initial_transient);
       alias->new_variable->initial_transient = gsl_matrix_ptr(alias->matrix->initial_transient, row, col);
       
     } else if (alias->vector != NULL) {
@@ -61,17 +61,17 @@ int feenox_instruction_alias(void *arg) {
       }
       
       feenox_realloc_variable_ptr(alias->new_variable, gsl_vector_ptr(feenox_value_ptr(alias->vector), row), 0);
-      free(alias->new_variable->initial_static);
+      feenox_free(alias->new_variable->initial_static);
       alias->new_variable->initial_static = gsl_vector_ptr(alias->vector->initial_static, row);
-      free(alias->new_variable->initial_transient);
+      feenox_free(alias->new_variable->initial_transient);
       alias->new_variable->initial_transient = gsl_vector_ptr(alias->vector->initial_transient, row);
       
     } else if (alias->variable != NULL) {
       
       feenox_realloc_variable_ptr(alias->new_variable, feenox_value_ptr(alias->variable), 0);
-      free(alias->new_variable->initial_static);
+      feenox_free(alias->new_variable->initial_static);
       alias->new_variable->initial_static = alias->variable->initial_static;
-      free(alias->new_variable->initial_transient);
+      feenox_free(alias->new_variable->initial_transient);
       alias->new_variable->initial_transient = alias->variable->initial_transient;
       
     }

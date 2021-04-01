@@ -147,15 +147,6 @@ int feenox_phi_to_solution(Vec phi, int compute_gradients) {
     for (g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.mesh->node[j].phi[g] = phi_full_array[feenox.pde.mesh->node[j].index_dof[g]];
 
-      // if there is a base solution
-      if (feenox.pde.base_solution != NULL && feenox.pde.base_solution[g] != NULL) {
-        if (feenox.pde.base_solution[g]->mesh == feenox.pde.mesh) {
-          feenox.pde.mesh->node[j].phi[g] += feenox.pde.base_solution[g]->data_value[j];
-        } else {
-          feenox.pde.mesh->node[j].phi[g] += feenox_function_eval(feenox.pde.base_solution[g], feenox.pde.mesh->node[j].x);
-        }
-      }
-
       // if we are not in rough mode we fill the solution here
       // because it is easy, in rough mode we need to iterate over the elements
       if (feenox.pde.rough == 0) {

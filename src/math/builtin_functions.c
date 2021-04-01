@@ -238,8 +238,7 @@ double feenox_builtin_last(expr_item_t *f) {
   }
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -286,8 +285,7 @@ double feenox_builtin_d_dt(expr_item_t *f) {
   y = (x - f->aux[0])/feenox_special_var_value(dt);
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -329,8 +327,7 @@ double feenox_builtin_integral_dt(expr_item_t *f) {
   y = f->aux[2];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -363,8 +360,7 @@ double feenox_builtin_integral_euler_dt(expr_item_t *f) {
   y = f->aux[0];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -846,16 +842,14 @@ double feenox_builtin_lag(expr_item_t *f) {
   // a arrcancar, empiece todo como si nada
   if (feenox_special_var_value(done)) {
     double dummy = f->aux[1];
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
     return dummy;
   }
 
   y = f->aux[1];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -900,8 +894,7 @@ double feenox_builtin_lag_euler(expr_item_t *f) {
   y = f->aux[3];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -946,8 +939,7 @@ double feenox_builtin_lag_bilinear(expr_item_t *f) {
   y = f->aux[3];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -980,8 +972,7 @@ double feenox_builtin_lead(expr_factor_t *expr) {
   y = f->aux[1];
 
   if (feenox_special_var_value(done))) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -1188,8 +1179,7 @@ double feenox_builtin_limit_dt(expr_item_t *f) {
   }
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }
@@ -1273,8 +1263,7 @@ double feenox_builtin_threshold_max(expr_item_t *f) {
   y = f->aux[0];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 
@@ -1311,8 +1300,7 @@ double feenox_builtin_threshold_min(expr_item_t *f) {
   y = f->aux[0];
 
   if (feenox_special_var_value(done)) {
-    free(f->aux);
-    f->aux = NULL;
+    feenox_free(f->aux);
   }
   return y;
 }

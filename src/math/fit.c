@@ -182,11 +182,11 @@ int wasora_fit_compute_f(gsl_vector *f) {
   }
 
   if (range_min != NULL) {
-    free(range_min);
-    free(range_max);
+    feenox_free(range_min);
+    feenox_free(range_max);
   }
     
-  free(x);
+  feenox_free(x);
 
   return WASORA_RUNTIME_OK;
 }
@@ -322,13 +322,13 @@ int wasora_fit_compute_numerical_df(gsl_matrix *J) {
   }
 
   if (range_min != NULL) {
-    free(range_min);
-    free(range_max);
+    feenox_free(range_min);
+    feenox_free(range_max);
   }
   
-  free(x);
-  free(y_minus);
-  free(y_plus);
+  feenox_free(x);
+  feenox_free(y_minus);
+  feenox_free(y_plus);
 
   return WASORA_RUNTIME_OK;
 }

@@ -309,12 +309,12 @@ int feenox_mesh_point_in_quadrangle(element_t *element, const double *x) {
       triang.node[j] = element->node[(i+j) % element->type->faces];
     }
     if (feenox_mesh_point_in_triangle(&triang, x)) {
-      free(triang.node);
+      feenox_free(triang.node);
       return 1;
     }
   }
 
-  free(triang.node);
+  feenox_free(triang.node);
 
   return 0;
 }

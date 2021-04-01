@@ -45,7 +45,7 @@ int feenox_parse_main_input_file(const char *filepath) {
   
   feenox_check_alloc(feenox_parser.line = malloc(feenox_parser.actual_buffer_size));
   feenox_call(feenox_parse_input_file(filepath, 0, 0));
-  free(feenox_parser.line);
+  feenox_free(feenox_parser.line);
 
   if (feenox_parser.active_conditional_block != NULL) {
     feenox_push_error_message("conditional block not closed");
@@ -97,11 +97,11 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       // the original for assignements and equations
       feenox_check_alloc(feenox_parser.full_line = strdup(feenox_parser.line));
       if (feenox_parse_line() != FEENOX_OK) {
-        free(feenox_parser.full_line);
+        feenox_free(feenox_parser.full_line);
         feenox_push_error_message("%s: %d:", filepath, line_num);
         return FEENOX_ERROR;
       }
-      free(feenox_parser.full_line);
+      feenox_free(feenox_parser.full_line);
     }
   }
 
@@ -358,7 +358,7 @@ int feenox_parse_line(void) {
             char *name;
             feenox_add_function_from_string(lhs, &name);
             feenox_call(feenox_function_set_expression(name, rhs));
-            free(name);
+            feenox_free(name);
           }  
           break;  
           case parser_dae:
@@ -1026,7 +1026,7 @@ int feenox_parse_line(void) {
       }
       LL_FOREACH_SAFE(varlist, varitem, tmp) {
         LL_DELETE(varlist, varitem);
-        free(varitem);
+        feenox_free(varitem);
       }
       return FEENOX_OK;
 
@@ -1227,7 +1227,7 @@ int feenox_parse_line(void) {
         if ((feenox.fit.sigma[i] = feenox_define_variable(sigma_name)) == NULL) {
           return FEENOX_ERROR;
         }
-        free(sigma_name);
+        feenox_free(sigma_name);
         
         if ((varitem = varitem->next) == NULL && i != feenox.fit.p-1) {
           feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
@@ -1480,21 +1480,21 @@ char *feenox_get_nth_token(char *string, int n) {
   feenox_check_alloc_null(backup = strdup(string));
 
   if ((token = strtok(backup, UNQUOTED_DELIM)) == NULL) {
-    free(backup);
+    feenox_free(backup);
     return NULL;
   }
   i = 1;
 
   while (i < n) {
     if ((token = strtok(NULL, UNQUOTED_DELIM)) == NULL) {
-      free(backup);
+      feenox_free(backup);
       return NULL;
     }
     i++;
   }
 
   feenox_check_alloc_null(desired_token = strdup(token));
-  free(backup);
+  feenox_free(backup);
 
   return desired_token;
 
@@ -1758,9 +1758,9 @@ int feenox_parse_alias(void) {
   
   feenox_call(feenox_define_alias(new_name, existing_object, row, col));
   
-  free(left);
-  free(keyword);
-  free(right);
+  feenox_free(left);
+  feenox_free(keyword);
+  feenox_free(right);
       
   return FEENOX_OK;
 }
@@ -1834,11 +1834,11 @@ int feenox_parse_vector(void) {
     feenox_call(feenox_vector_attach_data(name, datas));
   }
 
-  free(name);
+  feenox_free(name);
   if (dummy_openpar == NULL) {
-    free(size);
+    feenox_free(size);
   }
-  free(function_data);
+  feenox_free(function_data);
     
   return FEENOX_OK;
       
@@ -1914,10 +1914,10 @@ int feenox_parse_matrix(void) {
     feenox_call(feenox_matrix_attach_data(name, datas));
   }
 
-  free(name);
+  feenox_free(name);
   if (dummy_openpar == NULL) {
-    free(rows);
-    free(cols);
+    feenox_free(rows);
+    feenox_free(cols);
   }
     
   return FEENOX_OK;
@@ -2273,7 +2273,7 @@ int feenox_parse_function(void) {
               return FEENOX_ERROR;
             }
             sscanf(token, "%lf", &function->data_argument[i][j]);
-            free(token);
+            feenox_free(token);
 
             //  para poder meter steps o numeros repetidos
             if (nargs == 1 && j > 0 && gsl_fcmp(function->data_argument[i][j], function->data_argument[i][j-1], 1e-12) == 0) {
@@ -2293,7 +2293,7 @@ int feenox_parse_function(void) {
             return FEENOX_ERROR;
           }
           sscanf(token, "%lf", &function->data_value[j]);
-          free(token);
+          feenox_free(token);
 
           j++;
         }
@@ -2362,8 +2362,8 @@ int feenox_parse_function(void) {
         function->data_value[i] = feenox_evaluate_expression_in_string(token);
       }
 
-      free(backup2);
-      free(backup1);
+      feenox_free(backup2);
+      feenox_free(backup1);
     }
 
 
@@ -2396,13 +2396,13 @@ int feenox_parse_function(void) {
         feenox_value(dummy_var) = (double)function->data_size;
       }
 
-      free(dummy_aux);
+      feenox_free(dummy_aux);
     }
 
   }
 */
 
-  free(name);
+  feenox_free(name);
   
   return FEENOX_OK;
   
@@ -2514,9 +2514,9 @@ int feenox_parse_file(char *mode) {
     feenox_call(feenox_file_set_path_argument(name, i, arg[i]));
   }
 
-  free(format);
-  free(custom_mode);
-  free(name);
+  feenox_free(format);
+  feenox_free(custom_mode);
+  feenox_free(name);
   
   return FEENOX_OK;
 }
@@ -2842,7 +2842,7 @@ int feenox_parse_print_function(void) {
       feenox_call(feenox_parser_string(&name));
       if ((print_function->physical_entity = feenox_get_physical_entity_ptr(name, NULL)) == NULL) {
         feenox_push_error_message("unknown physical entity '%s'", name);
-        free(name);
+        feenox_free(name);
         return FEENOX_ERROR;
       }
 */
@@ -3108,7 +3108,7 @@ int feenox_parse_read_mesh(void) {
           feenox_push_error_message("expected AS instead of '%s'", token);
           return FEENOX_ERROR;
         }
-        free(token); // valgrind told me that token was definitely lost
+        feenox_free(token); // valgrind told me that token was definitely lost
 
         feenox_call(feenox_parser_string(&function_name));
       } else {
@@ -3119,8 +3119,8 @@ int feenox_parse_read_mesh(void) {
       feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
       node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
       LL_APPEND(mesh->node_datas, node_data);
-      free(name_in_mesh);
-      free(function_name);
+      feenox_free(name_in_mesh);
+      feenox_free(function_name);
 
     } else {
       feenox_push_error_message("unknown keyword '%s'", token);
@@ -3247,10 +3247,10 @@ int feenox_parse_physical_group(void) {
   // feenox_physical_group_add_bc()
   
       
-  free(bc_name);
-  free(material_name);
-  free(mesh_name);
-  free(name);
+  feenox_free(bc_name);
+  feenox_free(material_name);
+  feenox_free(mesh_name);
+  feenox_free(name);
   
   return FEENOX_OK;
 }
@@ -3281,7 +3281,7 @@ int feenox_parse_material(void) {
         feenox_push_error_message("undefined mesh '%s'" , mesh_name);
         return FEENOX_ERROR;
       }
-      free(mesh_name);
+      feenox_free(mesh_name);
           
 ///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
 ///kw+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
@@ -3299,7 +3299,7 @@ int feenox_parse_material(void) {
           
       // TODO: api
       physical_group->material = material;
-      free(physical_group_name);
+      feenox_free(physical_group_name);
         
     } else {
 ///kw+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
@@ -3318,11 +3318,11 @@ int feenox_parse_material(void) {
       feenox_check_alloc(property_name = strdup(token));
       feenox_check_alloc(expr_string = strdup(equal_sign+1));
       feenox_call(feenox_define_property_data(property_name, material_name, expr_string));
-      free(expr_string);
-      free(property_name);
+      feenox_free(expr_string);
+      feenox_free(property_name);
     }
   }
-  free(material_name);
+  feenox_free(material_name);
       
   return FEENOX_OK;
 }
@@ -3353,7 +3353,7 @@ int feenox_parse_bc(void) {
         feenox_push_error_message("undefined mesh '%s'" , mesh_name);
         return FEENOX_ERROR;
       }
-      free(mesh_name);
+      feenox_free(mesh_name);
     
 ///kw+BC+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
 ///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh, they can be
@@ -3371,7 +3371,7 @@ int feenox_parse_bc(void) {
           
       // TODO: api
       LL_APPEND(physical_group->bcs, bc);
-      free(physical_group_name);
+      feenox_free(physical_group_name);
         
     } else {
 ///kw+MATERIAL+usage [ <bc_data1> [ <bc_data2> [ ... ] ] ]
@@ -3381,7 +3381,7 @@ int feenox_parse_bc(void) {
       }
     }
   }
-  free(bc_name);
+  feenox_free(bc_name);
   
   // TODO: apply the bc to the group named name if it exists
       
@@ -3400,7 +3400,7 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox.pde.type = type_mechanical;
-      feenox.pde.init_parser = feenox_problem_init_thermal;
+      feenox.pde.init_parser_particular = feenox_problem_init_thermal;
       // TODO: provide a virtual method pde_parser_initialize()
           
 ///kw+PROBLEM+usage thermal
@@ -3453,24 +3453,28 @@ int feenox_parse_problem(void) {
       int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
 
+///kw+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static problem---although
+///kw+PROBLEM+detail the variable `static_steps` is still honored.
+///kw+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
+///kw+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
+///kw+PROBLEM+usage [ TRANSIENT |
+    } else if (strcasecmp(token, "TRANSIENT") == 0) {
+      feenox.pde.transient_type = transient_type_transient;
+///kw+PROBLEM+usage QUASISTATIC]@
+    } else if (strcasecmp(token, "QUASISTATIC") == 0) {
+      feenox.pde.transient_type = transient_type_quasistatic;
+
+
+///kw+PROBLEM+detail By default FeenoX tries to detect wheter the computation should be linear or non-linear.
+///kw+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
 ///kw+PROBLEM+usage [ LINEAR
     } else if (strcasecmp(token, "LINEAR") == 0) {
       feenox.pde.math_type = math_type_linear;
 
-///kw+PROBLEM+usage | NON_LINEAR ]@
+///kw+PROBLEM+usage | NON_LINEAR ]
     } else if (strcasecmp(token, "NON_LINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
-///kw+PROBLEM+usage [ QUASISTATIC
-    } else if (strcasecmp(token, "QUASISTATIC") == 0) {
-      feenox.pde.transient_type = transient_type_quasistatic;
-
-///kw+PROBLEM+usage | TRANSIENT ]@
-    } else if (strcasecmp(token, "TRANSIENT") == 0) {
-      feenox.pde.transient_type = transient_type_transient;
-
-///kw+PROBLEM+detail By default Fino tries to detect wheter the computation should be linear or non-linear.
-///kw+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
 
 ///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
 ///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
@@ -3495,10 +3499,10 @@ int feenox_parse_problem(void) {
       feenox_call(feenox_parser_string(&mesh_name));
       if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
         feenox_push_error_message("unknown mesh '%s'", mesh_name);
-        free(mesh_name);
+        feenox_free(mesh_name);
         return FEENOX_ERROR;
       }
-      free(mesh_name);
+      feenox_free(mesh_name);
 
 ///kw+PROBLEM+usage [ N_MODES <expr> ] @
 ///kw+PROBLEM+detail The number of modes to be computed in the modal problem. The default is DEFAULT_NMODES.
@@ -3541,6 +3545,8 @@ int feenox_parse_problem(void) {
     feenox_push_error_message("could not determine the dimension of the problem, give them using DIMENSIONS in either READ_MESH or PROBLEM");
     return FEENOX_ERROR;
   }
+  
+  feenox_call(feenox_problem_init_parser_general());
 
   // TODO: virtual setup() methods
   if (feenox.pde.type == type_mechanical || feenox.pde.type == type_modal) {

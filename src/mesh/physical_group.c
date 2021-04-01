@@ -110,13 +110,10 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
     } else {
       feenox_pop_error_message();
     }
-    free(dummy_aux);
+    feenox_free(dummy_aux);
 
     // center of gravity
-    if (asprintf(&dummy_aux, "%s_cog", physical_group->name) == -1) {
-      feenox_push_error_message("memory allocation error");
-      return NULL;
-    }
+    feenox_check_minusone_null(asprintf(&dummy_aux, "%s_cog", physical_group->name));
     if (feenox_check_name(dummy_aux) == FEENOX_OK) {
       if ((physical_group->vector_cog = feenox_define_vector_get_ptr(dummy_aux, 3)) == NULL) {
         return NULL;
@@ -124,7 +121,7 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
     } else {
       feenox_pop_error_message();
     }  
-    free(dummy_aux);
+    feenox_free(dummy_aux);
 
   } 
   return physical_group;

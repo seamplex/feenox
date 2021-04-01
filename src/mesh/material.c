@@ -182,7 +182,7 @@ property_data_t *feenox_define_property_data_get_ptr(property_t *property, mater
   function->type = function_type_algebraic;
   function->var_argument = feenox.mesh.vars.arr_x;
   function->algebraic_expression = property_data->expr;
-  free(name);
+  feenox_free(name);
   
   HASH_ADD_KEYPTR(hh, material->property_datums, property->name, strlen(property->name), property_data);
 //  HASH_ADD_KEYPTR(hh, property->property_datums, material->name, strlen(material->name), property_data);

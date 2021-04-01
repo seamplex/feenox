@@ -52,7 +52,7 @@ void feenox_free_shm(void) {
     }
     
     if (io->shm_name != NULL) {
-      free(io->shm_name);
+      feenox_free(io->shm_name);
     }
   }
   
@@ -71,17 +71,17 @@ void feenox_free_files(void) {
     if (file->pointer != stdin && file->pointer != stdout) {
       feenox_instruction_close_file(file);
     }
-    free(file->name);
-    free(file->format);
-    free(file->path);
-    free(file->mode);
+    feenox_free(file->name);
+    feenox_free(file->format);
+    feenox_free(file->path);
+    feenox_free(file->mode);
     for (i = 0; i < file->n_args; i++) {
       feenox_destroy_expression(&file->arg[i]);  
     }
-    free(file->arg);
+    feenox_free(file->arg);
     
     HASH_DEL(feenox.files, file);
-    free(file);
+    feenox_free(file);
   }
   
   return;
@@ -118,37 +118,37 @@ void feenox_free_function(function_t *function) {
   
   if (function->data_argument_alloced) {
     for (i = 0; i < function->n_arguments; i++) {
-      free(function->data_argument[i]);
+      feenox_free(function->data_argument[i]);
       function->data_argument[i] = NULL;
     }
-    free(function->data_argument);
+    feenox_free(function->data_argument);
     function->data_argument = NULL;
   }
   
   if (function->data_value != NULL) {
-    free(function->data_value);
+    feenox_free(function->data_value);
     function->data_value = NULL;
   }
   
-  free(function->name_in_mesh);
-  free(function->data_file);
-  free(function->column);
+  feenox_free(function->name_in_mesh);
+  feenox_free(function->data_file);
+  feenox_free(function->column);
   
 // este free es problematico
   if (function->var_argument_alloced) {
-    free(function->var_argument);
+    feenox_free(function->var_argument);
   }
   
   if (function->interp != NULL) {
-    gsl_interp_free(function->interp);
+    gsl_interp_feenox_free(function->interp);
   }
   if (function->interp_accel != NULL) {
-    gsl_interp_accel_free(function->interp_accel);    
+    gsl_interp_accel_feenox_free(function->interp_accel);    
   }
-  free(function->name);
+  feenox_free(function->name);
   
   HASH_DEL(feenox.functions, function);
-  free(function);
+  feenox_free(function);
  
   return;
 }
@@ -168,15 +168,15 @@ void feenox_free_var(var_t *var) {
   
   if (is_alias == 0) {
     if (var->realloced == 0) {
-      free(feenox_value_ptr(var));
+      feenox_free(feenox_value_ptr(var));
     }
-    free(var->initial_transient);
-    free(var->initial_static);
-    free(var->name);
+    feenox_free(var->initial_transient);
+    feenox_free(var->initial_static);
+    feenox_free(var->name);
   }
 
   HASH_DEL(feenox.vars, var);
-  free(var);
+  feenox_free(var);
 
   return;
 }
@@ -194,19 +194,19 @@ void feenox_free_vars(void) {
 void feenox_free_vector(vector_t *vector) {
   
   if (vector->realloced == 0 && vector->initialized) {
-    if (feenox_value_ptr(vector) != NULL) gsl_vector_free(feenox_value_ptr(vector));
-    if (vector->initial_static != NULL) gsl_vector_free(vector->initial_static);
-    if (vector->initial_transient != NULL) gsl_vector_free(vector->initial_transient);
+    if (feenox_value_ptr(vector) != NULL) gsl_vector_feenox_free(feenox_value_ptr(vector));
+    if (vector->initial_static != NULL) gsl_vector_feenox_free(vector->initial_static);
+    if (vector->initial_transient != NULL) gsl_vector_feenox_free(vector->initial_transient);
   }
   
   if (vector->size_expr != NULL) {
     feenox_destroy_expression(vector->size_expr);  
   }
-  free(vector->size_expr);
+  feenox_free(vector->size_expr);
   vector->size_expr = NULL;
-  free(vector->name);
+  feenox_free(vector->name);
   HASH_DEL(feenox.vectors, vector);
-  free(vector);
+  feenox_free(vector);
   
   return;
 }
@@ -224,14 +224,14 @@ void feenox_free_matrices(void) {
 
 void feenox_free_matrix(matrix_t *matrix) {
   
-  free(matrix->name);
+  feenox_free(matrix->name);
   if (matrix->realloced == 0) {
-    gsl_matrix_free(feenox_value_ptr(matrix));
-    gsl_matrix_free(matrix->initial_static);
-    gsl_matrix_free(matrix->initial_transient);
+    gsl_matrix_feenox_free(feenox_value_ptr(matrix));
+    gsl_matrix_feenox_free(matrix->initial_static);
+    gsl_matrix_feenox_free(matrix->initial_transient);
   }
   HASH_DEL(feenox.matrices, matrix);
-  free(matrix);
+  feenox_free(matrix);
   
   return;
 }
@@ -251,16 +251,16 @@ void feenox_free_print_vectors(void) {
   print_token_t *print_token, *tmp2;
 
   LL_FOREACH_SAFE(feenox.print_vectors, print_vector, tmp) {
-    free(print_vector->format);
-    free(print_vector->separator);
+    feenox_free(print_vector->format);
+    feenox_free(print_vector->separator);
     LL_FOREACH_SAFE(print_vector->tokens, print_token, tmp2) {
       feenox_destroy_expression(&print_vector->tokens->expression);
       LL_DELETE(print_vector->tokens, print_token);
-      free(print_token);
+      feenox_free(print_token);
     }
 
     LL_DELETE(feenox.print_vectors, print_vector);
-    free(print_vector);
+    feenox_free(print_vector);
   }
   
   return;
@@ -272,8 +272,8 @@ void feenox_free_print_functions(void) {
   int i;
 
   LL_FOREACH_SAFE(feenox.print_functions, print_function, tmp) {
-    free(print_function->format);
-    free(print_function->separator);
+    feenox_free(print_function->format);
+    feenox_free(print_function->separator);
     if (print_function->first_function != NULL) {
       for (i = 0; i < print_function->first_function->n_arguments; i++) {
         if (print_function->range.min != NULL) {
@@ -292,13 +292,13 @@ void feenox_free_print_functions(void) {
     }
     LL_FOREACH_SAFE(print_function->tokens, print_token, tmp2) {
       feenox_destroy_expression(&print_token->expression);
-      free(print_token->text);
+      feenox_free(print_token->text);
       LL_DELETE(print_function->tokens, print_token);
-      free(print_token);
+      feenox_free(print_token);
     }
 
     LL_DELETE(feenox.print_functions, print_function);
-    free(print_function);
+    feenox_free(print_function);
   }
   
   return;
@@ -310,17 +310,17 @@ void feenox_free_prints(void) {
   print_token_t *print_token, *tmp2;
 
   LL_FOREACH_SAFE(feenox.prints, print, tmp) {
-    free(print->separator);
+    feenox_free(print->separator);
     LL_FOREACH_SAFE(print->tokens, print_token, tmp2) {
 			feenox_destroy_expression(&print_token->expression);
-			free(print_token->text);
-			free(print_token->format);
+			feenox_free(print_token->text);
+			feenox_free(print_token->format);
       LL_DELETE(print->tokens, print_token);
-      free(print_token);
+      feenox_free(print_token);
     }
 
     LL_DELETE(feenox.prints, print);
-    free(print);
+    feenox_free(print);
   }
   
   return;
@@ -331,26 +331,26 @@ void feenox_free_solves(void) {
   int i;
 
   LL_FOREACH_SAFE(feenox.solves, solve, tmp) {
-    free(solve->unknown);
+    feenox_free(solve->unknown);
     if (solve->residual != NULL) {
       for (i = 0; i < solve->n; i++) {
         feenox_destroy_expression(&solve->residual[i]);
       }
-      free(solve->residual);
+      feenox_free(solve->residual);
     }
     
     if (solve->guess != NULL) {
       for (i = 0; i < solve->n; i++) {
         feenox_destroy_expression(&solve->guess[i]);
       }
-      free(solve->guess);
+      feenox_free(solve->guess);
     }
     
     feenox_destroy_expression(&solve->epsabs);
     feenox_destroy_expression(&solve->epsrel);
 
     LL_DELETE(feenox.solves, solve);
-    free(solve);
+    feenox_free(solve);
   }
   
   return;
@@ -362,15 +362,15 @@ void feenox_free_m4(void) {
 
   LL_FOREACH_SAFE(feenox.m4s, m4, tmp) {
     LL_FOREACH_SAFE(m4->macros, m4_macro, tmp2) {
-      free(m4_macro->name);
-      free(m4_macro->print_token.format);
+      feenox_free(m4_macro->name);
+      feenox_free(m4_macro->print_token.format);
       feenox_destroy_expression(&m4_macro->print_token.expression);
       LL_DELETE(m4->macros, m4_macro);
-      free(m4_macro);
+      feenox_free(m4_macro);
     }
     
     LL_DELETE(feenox.m4s, m4);
-    free(m4);
+    feenox_free(m4);
   }
   
   return;
@@ -388,7 +388,7 @@ void feenox_free_dae(void) {
       feenox_destroy_expression(&dae->expr_j_min);
       feenox_destroy_expression(&dae->expr_j_max);
       LL_DELETE(feenox_dae.daes, dae);
-      free(dae);
+      feenox_free(dae);
     }
   }
 
@@ -429,7 +429,7 @@ void feenox_free_assignments(void) {
     feenox_destroy_expression(&assignment->row);
     
     LL_DELETE(feenox.assignments, assignment);
-    free(assignment);
+    feenox_free(assignment);
   }
   
   return;
@@ -441,9 +441,9 @@ void feenox_free_instructions(void) {
   LL_FOREACH_SAFE(feenox.instructions, instruction, tmp) {
     LL_DELETE(feenox.instructions, instruction);
     if (instruction->argument_alloced) {
-      free(instruction->argument);
+      feenox_free(instruction->argument);
     }
-    free(instruction);
+    feenox_free(instruction);
   }
   
   return;
@@ -486,22 +486,22 @@ void feenox_destroy_expression(expr_t *expr) {
       for (j = nallocs-1; j >= 0; j--) {
         feenox_destroy_expression(&expr->token[i].arg[j]);
       }
-      free(expr->token[i].arg);
+      feenox_free(expr->token[i].arg);
     }
     if (expr->token[i].vector != NULL || expr->token[i].builtin_vectorfunction != NULL) {
-      free(expr->token[i].vector_arg);
+      feenox_free(expr->token[i].vector_arg);
     }
     if (expr->token[i].aux != NULL) {
-      free(expr->token[i].aux);
+      feenox_free(expr->token[i].aux);
     }
   }
   
   if (expr->n_tokens != 0) {
-    free(expr->token);
+    feenox_free(expr->token);
   }
   
   if (expr->string != NULL) {
-    free(expr->string);
+    feenox_free(expr->string);
     expr->string = NULL;
   }
   expr = NULL;  
@@ -521,19 +521,19 @@ void feenox_finalize(void) {
       for (j = feenox.min.n-1; j >= 0; j--) {
         feenox_destroy_expression(&feenox.min.guess[j]);
       }
-      free(feenox.min.guess);
+      feenox_free(feenox.min.guess);
     }
     if (feenox.min.gradient != NULL) {
       for (j = feenox.min.n-1; j >= 0; j--) {
         feenox_destroy_expression(&feenox.min.gradient[j]);
       }
-      free(feenox.min.gradient);
+      feenox_free(feenox.min.gradient);
     }
     
     feenox_destroy_expression(&feenox.min.gradtol);
     feenox_destroy_expression(&feenox.min.tol);
     
-    free(feenox.min.x);
+    feenox_free(feenox.min.x);
   }
   
   if (feenox.fit.p != 0) {
@@ -541,14 +541,14 @@ void feenox_finalize(void) {
       for (j = feenox.fit.p-1; j >= 0; j--) {
         feenox_destroy_expression(&feenox.fit.guess[j]);
       }
-      free(feenox.fit.guess);
+      feenox_free(feenox.fit.guess);
     }
 
     feenox_destroy_expression(&feenox.fit.deltaepsabs);
     feenox_destroy_expression(&feenox.fit.deltaepsrel);
 
-    free(feenox.fit.param);
-    free(feenox.fit.sigma);
+    feenox_free(feenox.fit.param);
+    feenox_free(feenox.fit.sigma);
   }
 
   
@@ -568,17 +568,17 @@ void feenox_finalize(void) {
 
   feenox_free_m4();
   
-  free(feenox.error);
-  free(feenox.line);
+  feenox_free(feenox.error);
+  feenox_free(feenox.line);
 */
 
 /*  
   for (i = 0; i < feenox.argc_orig; i++) {
-    free(feenox.argv_orig[i]);
+    feenox_free(feenox.argv_orig[i]);
   }  
-  free(feenox.argv_orig);
+  feenox_free(feenox.argv_orig);
 */
-//  free(feenox.main_input_filepath);
+//  feenox_free(feenox.main_input_filepath);
   
   return;
 

@@ -57,7 +57,7 @@ int feenox_phase_space_add_object(const char *string) {
     buffer = malloc(strlen(vector->name)+8);
     sprintf(buffer, "%s_dot", vector->name);
     feenox_call(feenox_define_vector(buffer, vector->size_expr.string));
-    free(buffer);
+    feenox_free(buffer);
 
   } else if ((matrix = feenox_get_matrix_ptr(string)) != NULL) {
 
@@ -67,7 +67,7 @@ int feenox_phase_space_add_object(const char *string) {
     buffer = malloc(strlen(matrix->name)+8);
     sprintf(buffer, "%s_dot", matrix->name);
     feenox_call(feenox_define_matrix(buffer, matrix->rows_expr.string, matrix->cols_expr.string));
-    free(buffer);
+    feenox_free(buffer);
 
   } else {
 
@@ -83,7 +83,7 @@ int feenox_phase_space_add_object(const char *string) {
     if ((phase_object->variable_dot = feenox_get_or_define_variable_get_ptr(buffer)) == NULL) {
       return FEENOX_ERROR;
     }
-    free(buffer);
+    feenox_free(buffer);
 
   }
   
@@ -140,7 +140,7 @@ int feenox_add_dae(const char *lhs, const char *rhs) {
         found = 1;
       }
     }
-    free(dummy);
+    feenox_free(dummy);
     if (found == 0) {
       feenox_push_error_message("requested derivative of object '%s' but it is not in the phase space", dummy);
       return FEENOX_ERROR;
@@ -162,7 +162,7 @@ int feenox_add_dae(const char *lhs, const char *rhs) {
     feenox.dae.reading_daes = 0;
   }
     
-  free(residual);
+  feenox_free(residual);
 
   LL_APPEND(feenox.dae.daes, dae);
   return FEENOX_OK;
@@ -183,14 +183,14 @@ char *feenox_find_first_dot(const char *s) {
     if ((dummy = strstr(token, "_dot")) != NULL) {
       *dummy = '\0';
       wanted = strdup(token);
-      free(line);
+      feenox_free(line);
       return wanted;
     }
 
     token = strtok(NULL, factorseparators);
   }
 
-  free(line);
+  feenox_free(line);
   return NULL;
 
 }

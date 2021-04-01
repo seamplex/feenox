@@ -36,7 +36,7 @@ int wasora_instruction_shell(void *arg) {
   if (!status) {
     ; // hacemos algo?
   }
-  free(command);
+  feenox_free(command);
   
   return WASORA_RUNTIME_OK;
 }

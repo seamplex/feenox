@@ -562,7 +562,7 @@ void feenox_strip_comments(char *line) {
 
   line[j] = '\0';
 
-  free(buff);
+  feenox_free(buff);
 
   return;
 }
@@ -619,7 +619,7 @@ int feenox_strip_blanks(char *string) {
   }
 
   string[j] = '\0';
-  free(buff);
+  feenox_free(buff);
 
   return FEENOX_OK;
 
@@ -650,7 +650,7 @@ int feenox_add_function_from_string(const char *string, char **name) {
   }
   char **arg_name = NULL;
   feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
-  free(arguments);
+  feenox_free(arguments);
 
   *dummy_openpar = '\0';
   feenox_call(feenox_define_function(*name, n_arguments));
@@ -662,9 +662,9 @@ int feenox_add_function_from_string(const char *string, char **name) {
   // clean up this (partial) mess
   if (arg_name != NULL) {
     for (i = 0; i < n_arguments; i++) {
-      free(arg_name[i]);
+      feenox_free(arg_name[i]);
     }
-    free(arg_name);
+    feenox_free(arg_name);
   }
   
   return FEENOX_OK;

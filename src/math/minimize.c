@@ -177,7 +177,7 @@ int wasora_min_compute_numerical_df(const double *x, gsl_vector *g) {
       
   }
   
-  free(x_pert);
+  feenox_free(x_pert);
 
   return WASORA_RUNTIME_OK;
 }

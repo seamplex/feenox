@@ -144,7 +144,7 @@ int wasora_create_lock(char *name, int sem) {
     return dangling_pid;
   }
 
-  free(lock_file_name);
+  feenox_free(lock_file_name);
 
   return 0;
 
@@ -173,7 +173,7 @@ void wasora_remove_lock(char *name, int sem) {
     unlink(lock_file_name);
   }
 
-  free(lock_file_name);
+  feenox_free(lock_file_name);
 
   return;
 }

@@ -137,11 +137,11 @@ int wasora_instruction_m4(void *arg) {
   }
   
   for (i = 0; i < n_args_for_m4; i++) {
-    free(args_for_m4[i]);
+    feenox_free(args_for_m4[i]);
   }
-  free(args_for_m4);
-  free(input_file_path);
-  free(output_file_path);
+  feenox_free(args_for_m4);
+  feenox_free(input_file_path);
+  feenox_free(output_file_path);
   
   return WASORA_RUNTIME_OK;
   

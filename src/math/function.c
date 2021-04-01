@@ -142,7 +142,7 @@ double feenox_factor_function_eval(expr_item_t *this) {
 
     y = feenox_function_eval(this->function, x);
 
-    free(x);
+    feenox_free(x);
     
   }
 
@@ -222,7 +222,7 @@ int feenox_function_init(function_t *this) {
       if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
         return FEENOX_ERROR;
       }
-      free(dummy_aux);
+      feenox_free(dummy_aux);
       feenox_var_value(dummy_var) = (double)this->data_size;
     }
 
@@ -399,7 +399,7 @@ int feenox_function_init(function_t *this) {
           kd_insert(this->kd, point, &this->data_value[j]);
         }
 
-        free(point);
+        feenox_free(point);
       }
     }
   }
@@ -577,7 +577,7 @@ double feenox_function_eval(function_t *this, const double *x) {
         }
         y = num/den;
       }
-      free(x_i);
+      feenox_free(x_i);
     
     } else if (this->multidim_interp == bilinear && this->rectangular_mesh_size != NULL) {
 
@@ -655,14 +655,14 @@ double feenox_function_eval(function_t *this, const double *x) {
         }
         
         y *= 1.0/(1<<this->n_arguments);
-        free(ctilde);
+        feenox_free(ctilde);
         
       }
 
-      free(r);
-      free(c);
-      free(b);
-      free(a);
+      feenox_free(r);
+      feenox_free(c);
+      feenox_free(b);
+      feenox_free(a);
 
 
 
@@ -718,8 +718,8 @@ double feenox_function_eval(function_t *this, const double *x) {
           // si dist[n] es muy chiquito, nos pidieron justo un punto de los
           // de la tabla asi que devolvemos ese y a comerla
           if (dist[n] < this->multidim_threshold) {
-            free(dist);
-            free(index);
+            feenox_free(dist);
+            feenox_free(index);
             return this->data_value[i];
           }
 
@@ -853,10 +853,10 @@ double feenox_function_eval(function_t *this, const double *x) {
       gsl_vector_free(coeff);
       gsl_matrix_free(A);
 
-      free(closest);
+      feenox_free(closest);
 
-      free(dist);
-      free(index);
+      feenox_free(dist);
+      feenox_free(index);
 
     }
 */
