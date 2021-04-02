@@ -316,32 +316,17 @@ int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[])
 }
 
 
-int feenox_mesh_node_indexes(mesh_t *this, int dofs) {
+int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs) {
   int j, g;
   
   this->degrees_of_freedom = dofs;
 
-//  switch (mesh->ordering) {
-//    case ordering_node_major:
-      for (j = 0; j < this->n_nodes; j++) {
-        this->node[j].index_dof = malloc(this->degrees_of_freedom*sizeof(int));
-        for (g = 0; g < this->degrees_of_freedom; g++) {
-          this->node[j].index_dof[g] = this->degrees_of_freedom*j + g;
-        }
-      }  
-/*  
-    break;    
-    
-    case ordering_dof_major:
-      for (j = 0; j < mesh->n_nodes; j++) {
-        mesh->node[j].index_dof = malloc(mesh->degrees_of_freedom*sizeof(int));
-        for (g = 0; g < mesh->degrees_of_freedom; g++) {
-          mesh->node[j].index_dof[g] = mesh->n_nodes*g + j;
-        }
-      }  
-    break;
-  }
-*/
+  for (j = 0; j < this->n_nodes; j++) {
+    this->node[j].index_dof = malloc(this->degrees_of_freedom*sizeof(int));
+    for (g = 0; g < this->degrees_of_freedom; g++) {
+      this->node[j].index_dof[g] = this->degrees_of_freedom*j + g;
+    }
+  }  
   
   return FEENOX_OK;
 }

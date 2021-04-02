@@ -3390,6 +3390,8 @@ int feenox_parse_bc(void) {
 
 int feenox_parse_problem(void) {
 
+  int (*feenox_problem_init_parser_particular)(void);
+
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
@@ -3400,14 +3402,16 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox.pde.type = type_mechanical;
-      feenox.pde.init_parser_particular = feenox_problem_init_thermal;
-      // TODO: provide a virtual method pde_parser_initialize()
-          
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
+      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
+      
 ///kw+PROBLEM+usage thermal
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
     } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
       feenox.pde.type = type_thermal;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
+      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
 
 ///kw+PROBLEM+usage modal
 ///kw+PROBLEM+usage ]@
@@ -3418,6 +3422,8 @@ int feenox_parse_problem(void) {
       return FEENOX_ERROR;
 #endif
       feenox.pde.type = type_modal;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
+      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
       if (feenox.pde.nev == 0) {
         feenox.pde.nev = DEFAULT_NMODES;
       }
@@ -3547,58 +3553,7 @@ int feenox_parse_problem(void) {
   }
   
   feenox_call(feenox_problem_init_parser_general());
-
-  // TODO: virtual setup() methods
-  if (feenox.pde.type == type_mechanical || feenox.pde.type == type_modal) {
-
-    if (feenox.pde.variant == variant_axisymmetric ||
-        feenox.pde.variant == variant_plane_stress ||
-        feenox.pde.variant == variant_plane_strain) {
-
-      if (feenox.pde.dim != 0) {
-        if (feenox.pde.dim != 2) {
-          feenox_push_error_message("dimension inconsistency, expected DIMENSION 2");
-          return FEENOX_ERROR;
-        }
-      } else {
-        feenox.pde.dim = 2;
-      }
-
-      if (feenox.pde.dofs != 0) {
-        if (feenox.pde.dofs != 2) {
-          feenox_push_error_message("DOF inconsistency");
-          return FEENOX_ERROR;
-        }
-      } else {
-        feenox.pde.dofs = 2;
-      }
-    } else {
-      feenox.pde.dofs = feenox.pde.dim;
-    }
-
-    if (feenox.pde.type == type_modal) {
-      feenox.pde.math_type = math_type_eigen;
-    }
-
-    // TODO: custom names
-    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-    feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
-    if (feenox.pde.dofs > 1) {
-      feenox_check_alloc(feenox.pde.unknown_name[1] = strdup("v"));
-      if (feenox.pde.dofs > 2) {
-        feenox_check_alloc(feenox.pde.unknown_name[2] = strdup("w"));
-      }  
-    }
-
-  } else if (feenox.pde.type == type_thermal) {
-
-    feenox.pde.dofs = 1;
-    feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-    feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
-
-  }
-
-//      feenox_call(fino_define_functions());
+  feenox_call(feenox_problem_init_parser_particular());
       
   return FEENOX_OK;
   

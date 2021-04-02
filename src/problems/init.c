@@ -102,6 +102,7 @@ int feenox_problem_init_parser_general(void) {
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.nprocs));
   petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.rank));
 
+  // TODO
   // install out error handler for PETSc
 //  petsc_call(PetscPushErrorHandler(&feenox_handler, NULL));
 
@@ -123,34 +124,34 @@ int feenox_problem_init_parser_general(void) {
 ///va+feenox_abstol+name feenox_abstol
 ///va+feenox_abstol+detail Absolute tolerance of the linear solver, as passed to PETSc’s
 ///va+feenox_abstol+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html)
-  feenox.pde.vars.abstol = feenox_define_variable_get_ptr("petsc_abstol");
+  feenox.pde.vars.ksp_atol = feenox_define_variable_get_ptr("ksp_atol");
   // TODO: poner el default automaticamente with PETSC_DEFAULT
 ///va+feenox_abstol+detail Default `1e-50`.
-  feenox_var_value(feenox.pde.vars.abstol) = 1e-50;   // igual al de PETSc
+  feenox_var_value(feenox.pde.vars.ksp_atol) = 1e-50;   // igual al de PETSc
  
 ///va+feenox_reltol+name feenox_reltol
 ///va+feenox_reltol+detail Relative tolerance of the linear solver,
 ///va+feenox_reltol+detail as passed to PETSc’s
 ///va+feenox_reltol+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
-feenox.pde.vars.reltol = feenox_define_variable_get_ptr("pde_reltol");
+feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 ///va+feenox_reltol+detail Default `1e-6`.
-  feenox_var_value(feenox.pde.vars.reltol) = 1e-6;    // el de PETSc es 1e-5
+  feenox_var_value(feenox.pde.vars.ksp_rtol) = 1e-6;    // el de PETSc es 1e-5
   
 ///va+feenox_divtol+name feenox_divtol
 ///va+feenox_divtol+detail Divergence tolerance,
 ///va+feenox_divtol+detail as passed to PETSc’s
 ///va+feenox_divtol+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
-  feenox.pde.vars.divtol = feenox_define_variable_get_ptr("pde_divtol");
+  feenox.pde.vars.ksp_divtol = feenox_define_variable_get_ptr("ksp_divtol");
 ///va+feenox_divtol+detail Default `1e+4`.  
-  feenox_var_value(feenox.pde.vars.divtol) = 1e+4;  // igual al de PETSc
+  feenox_var_value(feenox.pde.vars.ksp_divtol) = 1e+4;  // igual al de PETSc
   
 ///va+feenox_max_iterations+name feenox_max_iterations
 ///va+feenox_max_iterations+detail Number of maximum iterations before diverging,
 ///va+feenox_max_iterations+detail as passed to PETSc’s
 ///va+feenox_max_iterations+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
-  feenox.pde.vars.max_iterations = feenox_define_variable_get_ptr("pde_max_iterations");
+  feenox.pde.vars.ksp_max_it = feenox_define_variable_get_ptr("ksp_max_it");
 ///va+feenox_max_iterations+detail Default `10000`.
-  feenox_var_value(feenox.pde.vars.max_iterations) = 10000;   // igual al de PETSc
+  feenox_var_value(feenox.pde.vars.ksp_max_it) = 10000;   // igual al de PETSc
 
 ///va+feenox_gamg_threshold+name feenox_gamg_threshold
 ///va+feenox_gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph for the
@@ -158,7 +159,7 @@ feenox.pde.vars.reltol = feenox_define_variable_get_ptr("pde_reltol");
 ///va+feenox_gamg_threshold+detail as passed to PETSc’s
 ///va+feenox_gamg_threshold+detail [`PCGAMGSetThreshold`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMGSetThreshold.html).
 ///va+feenox_gamg_threshold+detail A value of 0.0 means keep all nonzero entries in the graph; negative means keep even zero entries in the graph.
-  feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("pde_gamg_threshold");
+  feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("gamg_threshold");
 ///va+feenox_gamg_threshold+detail Default `0.01`.  
   feenox_var_value(feenox.pde.vars.gamg_threshold) = 0.01;
   
@@ -166,7 +167,7 @@ feenox.pde.vars.reltol = feenox_define_variable_get_ptr("pde_reltol");
 ///va+feenox_penalty_weight+detail The weight $w$ used when setting multi-freedom boundary conditions.
 ///va+feenox_penalty_weight+detail Higher values mean better precision in the constrain but distort
 ///va+feenox_penalty_weight+detail the matrix condition number. 
-  feenox.pde.vars.penalty_weight = feenox_define_variable_get_ptr("pde_penalty_weight");
+  feenox.pde.vars.penalty_weight = feenox_define_variable_get_ptr("penalty_weight");
 ///va+feenox_penalty_weight+detail Default is `1e8`.
   feenox_var_value(feenox.pde.vars.penalty_weight) = 1e8;  
   
@@ -178,96 +179,13 @@ feenox.pde.vars.reltol = feenox_define_variable_get_ptr("pde_reltol");
 ///va+feenox_residual_norm+name feenox_residual_norm
 ///va+feenox_residual_norm+detail This variable contains the residual obtained
 ///va+feenox_residual_norm+detail by the solver. It is set after `FINO_STEP`.
-  feenox.pde.vars.residual_norm= feenox_define_variable_get_ptr("pde_residual_norm");
+  feenox.pde.vars.residual_norm= feenox_define_variable_get_ptr("residual_norm");
 
 ///va+nodes_rough+name nodes_rough
 ///va+nodes_rough+detail The number of nodes of the mesh in `ROUGH` mode.
   feenox.pde.vars.nodes_rough = feenox_define_variable_get_ptr("nodes_rough");
 
-// TODO: move to particular
   
-// these are for the algebraic expressions in the  which are implicitly-defined BCs
-// i.e. 0=u*nx+v*ny
-// here they are defined as uppercase because there already exist functions named u, v and w
-// but the parser changes their case when an implicit BC is read
-  feenox.pde.vars.U[0]= feenox_define_variable_get_ptr("U");
-  feenox.pde.vars.U[1]= feenox_define_variable_get_ptr("V");
-  feenox.pde.vars.U[2]= feenox_define_variable_get_ptr("W");
-
-///va+strain_energy+name strain_energy
-///va+strain_energy+detail The strain energy stored in the solid, computed as
-///va+strain_energy+detail $1/2 \cdot \vec{u}^T  K \vec{u}$
-///va+strain_energy+detail where $\vec{u}$ is the displacements vector and $K$ is the stiffness matrix.
-  feenox.pde.vars.strain_energy = feenox_define_variable_get_ptr("strain_energy");
-
-  ///va+displ_max+name displ_max
-///va+displ_max+detail The module of the maximum displacement of the elastic problem.
-  feenox.pde.vars.displ_max = feenox_define_variable_get_ptr("displ_max");
-
-///va+displ_max_x+name displ_max_x
-///va+displ_max_x+detail The\ $x$ coordinate of the maximum displacement of the elastic problem.
-  feenox.pde.vars.displ_max_x = feenox_define_variable_get_ptr("displ_max_x");
-///va+displ_max_y+name displ_max_y
-///va+displ_max_y+detail The\ $y$ coordinate of the maximum displacement of the elastic problem.
-  feenox.pde.vars.displ_max_y = feenox_define_variable_get_ptr("displ_max_y");
-///va+displ_max_z+name displ_max_z
-///va+displ_max_z+detail The\ $z$ coordinate of the maximum displacement of the elastic problem.
-  feenox.pde.vars.displ_max_z = feenox_define_variable_get_ptr("displ_max_z");
-
-///va+u_at_displ_max+name u_at_displ_max
-///va+u_at_displ_max+detail The\ $x$ component\ $u$ of the maximum displacement of the elastic problem.
-  feenox.pde.vars.u_at_displ_max = feenox_define_variable_get_ptr("u_at_displ_max");
-///va+v_at_displ_max+name v_at_displ_max
-///va+v_at_displ_max+detail The\ $y$ component\ $v$ of the maximum displacement of the elastic problem.
-  feenox.pde.vars.v_at_displ_max = feenox_define_variable_get_ptr("v_at_displ_max");
-///va+w_at_displ_max+name w_at_displ_max
-///va+w_at_displ_max+detail The\ $z$ component\ $w$ of the maximum displacement of the elastic problem.
-  feenox.pde.vars.w_at_displ_max = feenox_define_variable_get_ptr("w_at_displ_max");
-  
-///va+sigma_max+name sigma_max
-///va+sigma_max+detail The maximum von Mises stress\ $\sigma$ of the elastic problem.
-  feenox.pde.vars.sigma_max = feenox_define_variable_get_ptr("sigma_max");
-
-///va+delta_sigma_max+name delta_sigma_max
-///va+delta_sigma_max+detail The uncertainty of the maximum Von Mises stress\ $\sigma$ of the elastic problem.
-///va+delta_sigma_max+detail Not to be confused with the maximum uncertainty of the Von Mises stress.
-  feenox.pde.vars.delta_sigma_max = feenox_define_variable_get_ptr("delta_sigma_max");
-  
-///va+sigma_max_x+name sigma_max_x
-///va+sigma_max_x+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
-  feenox.pde.vars.sigma_max_x = feenox_define_variable_get_ptr("sigma_max_x");
-///va+sigma_max_y+name sigma_max_y
-///va+sigma_max_y+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
-  feenox.pde.vars.sigma_max_y = feenox_define_variable_get_ptr("sigma_max_y");
-///va+sigma_max_z+name sigma_max_z
-///va+sigma_max_z+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
-  feenox.pde.vars.sigma_max_z = feenox_define_variable_get_ptr("sigma_max_z");
-  
-///va+u_at_sigma_max+name u_at_sigma_max
-///va+u_at_sigma_max+detail The\ $x$ component\ $u$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
-  feenox.pde.vars.u_at_sigma_max = feenox_define_variable_get_ptr("u_at_sigma_max");
-///va+v_at_sigma_max+name v_at_sigma_max
-///va+v_at_sigma_max+detail The\ $y$ component\ $v$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
-  feenox.pde.vars.v_at_sigma_max = feenox_define_variable_get_ptr("v_at_sigma_max");
-///va+w_at_sigma_max+name w_at_sigma_max
-///va+w_at_sigma_max+detail The\ $z$ component\ $w$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
-  feenox.pde.vars.w_at_sigma_max = feenox_define_variable_get_ptr("w_at_sigma_max");
-  
-
-///va+T_max+name T_max
-///va+T_max+detail The maximum temperature\ $T_\text{max}$ of the thermal problem.
-  feenox.pde.vars.T_max = feenox_define_variable_get_ptr("T_max");
-
-///va+T_min+name T_min
-///va+T_min+detail The minimum temperature\ $T_\text{min}$ of the thermal problem.
-  feenox.pde.vars.T_min = feenox_define_variable_get_ptr("T_min");
-
-///va+lambda+name lambda
-///va+lambda+detail 
-///va+lambda+detail Requested eigenvalue. It is equal to 1.0 until
-///va+lambda+detail `FINO_STEP` is executed.  
-  feenox.pde.vars.lambda = feenox_define_variable_get_ptr("lambda");
-  feenox_var_value(feenox.pde.vars.lambda) = 1.0;
   
 ///va+time_wall_build+name time_wall_build
 ///va+time_wall_build+detail Wall time insumed to build the problem matrices, in seconds.
@@ -350,11 +268,6 @@ feenox.pde.vars.reltol = feenox_define_variable_get_ptr("pde_reltol");
 
 int feenox_problem_define_solutions(void) {
   
-//  char *name = NULL;
-//  char *gradname = NULL;
-//  char *modename = NULL;
-  
-  // las definimos solo si ya sabemos cuantas dimensiones tiene el problema
   if (feenox.pde.dim == 0 || feenox.pde.dofs == 0) {
     feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either FINO_PROBLEM or MESH");
     return FEENOX_ERROR;
@@ -431,111 +344,6 @@ int feenox_problem_define_solutions(void) {
     feenox_free(name);
   }
 
-  
-  // TODO: particular
-  if (feenox.pde.type == type_mechanical) {
-
-    // TODO: describir las funciones para reference
-    feenox_call(feenox_problem_define_solution_function("sigmax", &feenox.pde.sigmax));
-    feenox_call(feenox_problem_define_solution_function("sigmay", &feenox.pde.sigmay));
-    feenox_call(feenox_problem_define_solution_function("tauxy", &feenox.pde.tauxy));
-
-    if (feenox.pde.dim == 3) {
-      feenox_call(feenox_problem_define_solution_function("sigmaz", &feenox.pde.sigmaz));
-      feenox_call(feenox_problem_define_solution_function("tauyz", &feenox.pde.tauyz));
-      feenox_call(feenox_problem_define_solution_function("tauzx", &feenox.pde.tauzx));
-    }
-    
-    feenox_call(feenox_problem_define_solution_function("sigma1", &feenox.pde.sigma1));
-    feenox_call(feenox_problem_define_solution_function("sigma2", &feenox.pde.sigma2));
-    feenox_call(feenox_problem_define_solution_function("sigma3", &feenox.pde.sigma3));
-    feenox_call(feenox_problem_define_solution_function("sigma", &feenox.pde.sigma));
-    feenox_call(feenox_problem_define_solution_function("delta_sigma", &feenox.pde.delta_sigma));
-    feenox_call(feenox_problem_define_solution_function("tresca", &feenox.pde.tresca));
-        
-  }
-    
-  if (feenox.pde.nev > 0) {
-///va+M_T+name M_T
-///va+M_T+desc Total mass\ $m$ computed from the mass matrix\ $M$ as
-///va+M_T+desc 
-///va+M_T+desc \[ M_T = \frac{1}{n_\text{DOFs}} \cdot \vec{1}^T \cdot M \cdot \vec{1} \]
-///va+M_T+desc 
-///va+M_T+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node.
-///va+M_T+desc Note that this is only approximately equal to the actual mass, i.e. the integral of the density $\rho(x,y,z)$ over the problem domain.
-    feenox.pde.vars.M_T = feenox_define_variable_get_ptr("M_T");
-    
-///ve+f+name f
-///ve+f+desc _Size:_ number of requested eigen-pairs.
-///ve+f+desc _Elements:_ The frequency $f_i$ of the $i$-th mode, in cycles per unit of time.
-    feenox.pde.vectors.f = feenox_define_vector_get_ptr("f", feenox.pde.nev);
-
-///ve+omega+name omega
-///ve+omega+desc _Size:_ number of requested eigen-pairs.
-///ve+omega+desc _Elements:_ The angular frequency $\omega_i$ of the $i$-th mode, in radians per unit of time.
-    feenox.pde.vectors.omega = feenox_define_vector_get_ptr("omega", feenox.pde.nev);
-
-    
-///ve+m+name m
-///ve+m+desc _Size:_ number of requested eigen-pairs.
-///ve+m+desc _Elements:_ The generalized modal mass $M_i$ of the $i$-th mode computed as
-///ve+m+desc
-///ve+m+desc \[ \text{m}_i = \frac{1}{n_\text{DOFs}} \vec{\phi}_i^T \cdot M \cdot \vec{\phi}_i \]
-///va+m+desc 
-///va+m+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node, $M$ is the mass matrix
-///va+m+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
-
-    feenox.pde.vectors.m = feenox_define_vector_get_ptr("m", feenox.pde.nev);
-
-///ve+L+name L
-///ve+L+desc _Size:_ number of requested eigen-pairs.
-///ve+L+desc _Elements:_ The excitation factor $L_i$ of the $i$-th mode computed as
-///ve+L+desc
-///ve+L+desc \[ L_i = \frac{1}{n_\text{DOFs}} \cdot \vec{\phi}_i^T \cdot M \cdot \vec{1} \]
-///va+L+desc 
-///va+L+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node, $M$ is the mass matrix
-///va+L+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
-    feenox.pde.vectors.L = feenox_define_vector_get_ptr("L", feenox.pde.nev);
-
-///ve+Gamma+name Gamma
-///ve+Gamma+desc _Size:_ number of requested eigen-pairs.
-///ve+Gamma+desc _Elements:_ The participation factor $\Gamma_i$ of the $i$-th mode computed as
-///ve+Gamma+desc
-///ve+Gamma+desc \[ \Gamma_i = \frac{ \vec{\phi}_i^T \cdot M \cdot \vec{1} }{ \vec{\phi}_i^T \cdot M \cdot \vec{\phi}} \]
-    feenox.pde.vectors.Gamma = feenox_define_vector_get_ptr("Gamma", feenox.pde.nev);
-    
-///ve+mu+name mu
-///ve+mu+desc _Size:_ number of requested eigen-pairs.
-///ve+mu+desc _Elements:_ The relatve effective modal mass $\mu_i$ of the $i$-th mode computed as
-///ve+mu+desc
-///ve+mu+desc \[ \mu_i = \frac{L_i^2}{M_t \cdot n_\text{DOFs} \cdot m_i} \]
-///ve+mu+desc
-///ve+mu+desc Note that $\sum_{i=1}^N m_i = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
-    feenox.pde.vectors.mu = feenox_define_vector_get_ptr("mu", feenox.pde.nev);
-    
-///ve+Mu+name Mu
-///ve+Mu+desc _Size:_ number of requested eigen-pairs.
-///ve+Mu+desc _Elements:_ The accumulated relative effective modal mass $\Mu_i$ up to the $i$-th mode computed as
-///ve+Mu+desc
-///ve+Mu+desc \[ \Mu_i = \sum_{j=1}^i \mu_i \]
-///ve+Mu+desc
-///ve+Mu+desc Note that $\Mu_N = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
-    feenox.pde.vectors.Mu = feenox_define_vector_get_ptr("Mu", feenox.pde.nev);
-    
-    feenox_check_alloc(feenox.pde.vectors.phi = calloc(feenox.pde.nev, sizeof(vector_t *)));;
-    unsigned int i = 0;
-    
-    for (i = 0; i < feenox.pde.nev; i++) {
-      char *modename = NULL;
-      feenox_check_minusone(asprintf(&modename, "phi%d", i+1));
-      feenox_check_alloc(feenox.pde.vectors.phi[i] = feenox_define_vector_get_ptr(modename, 0));
-      feenox_free(modename);
-    }
-    
-  }
-  
-  // TODO: heat flux
-  
   return FEENOX_OK;
 }
 
@@ -610,29 +418,16 @@ int plugin_finalize(void) {
   return FEENOX_OK;
 }
 
-int feenox_problem_init(void) {
+int feenox_problem_init_runtime_general(void) {
 
-//  int i, g;
-//  int width;
-  
-//  physical_groupt_t *physical_group;
-
-//---------------------------------
-// read command-line arguments that take precedence over the options in the input file
-//---------------------------------
-  
+  // command-line arguments that take precedence over the options in the input file
   // check for further commandline options
   // see if the user asked for mumps in the command line
-  PetscBool flag;
+  PetscBool flag = PETSC_FALSE;
   petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "--mumps", &flag));
   if (flag == PETSC_TRUE) {
-#ifdef PETSC_HAVE_MUMPS    
     feenox.pde.ksp_type = strdup("mumps");
     feenox.pde.pc_type = strdup("mumps");
-#else
-    feenox_push_error_message("PETSc was not compiled with MUMPS. Reconfigure with --download-mumps.");
-    return FEENOX_ERROR;
-#endif
   }
 
   // see if the user asked for progress in the command line
@@ -655,10 +450,7 @@ int feenox_problem_init(void) {
   }
   
   
-//---------------------------------
-// initialize parameters
-//---------------------------------
-
+  // do some check
   if (feenox.pde.mesh == NULL) {
     feenox_push_error_message("no mesh defined");
     return FEENOX_ERROR;
@@ -680,17 +472,7 @@ int feenox_problem_init(void) {
   }
 
 
-  // TODO: particular virtual init methods should set this
-  // set this explicitly, we are FEM not FVM
-  feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.mesh->data_type = data_type_node;
-  feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
-  
-
-//---------------------------------
-// allocate global objects
-//---------------------------------
-
+  // allocate global petsc objects
   int width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
 
   // ask how many local nodes we own
@@ -724,16 +506,14 @@ int feenox_problem_init(void) {
   petsc_call(VecSet(feenox.pde.phi, 0));
 
 
-  // TODO: virtual?
-  if (feenox.pde.math_type != math_type_eigen) {
+  if (feenox.pde.has_rhs) {
     // the right-hand-side vector
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &feenox.pde.b));
     petsc_call(PetscObjectSetName((PetscObject)feenox.pde.b, "b"));
     petsc_call(VecSetFromOptions(feenox.pde.b));
   }
   
-  if (feenox.pde.type == type_modal ||
-      (feenox.pde.type == type_thermal && feenox_var_value(feenox_special_var(end_time)) != 0)) {
+  if (feenox.pde.has_mass) {
     // the mass matrix for modal or heat transient
     petsc_call(MatCreate(PETSC_COMM_WORLD, &feenox.pde.M));
     petsc_call(PetscObjectSetName((PetscObject)feenox.pde.M, "M"));
@@ -745,6 +525,9 @@ int feenox_problem_init(void) {
     if (feenox.pde.dofs > 1) {
       petsc_call(MatSetBlockSize(feenox.pde.M, feenox.pde.dofs));
     }
+    if (feenox.pde.allow_new_nonzeros) {
+      petsc_call(MatSetOption(feenox.pde.M, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
+    }  
   }
   
   
@@ -753,7 +536,7 @@ int feenox_problem_init(void) {
   feenox.pde.first_node = feenox.pde.first_row / feenox.pde.dofs;
   feenox.pde.last_node = feenox.pde.last_row / feenox.pde.dofs;
   
-  // TODO: partition mesh
+  // TODO: honor mesh partitions
   // https://lists.mcs.anl.gov/pipermail/petsc-users/2014-April/021433.html
   feenox.pde.first_element = (feenox.pde.mesh->n_elements / feenox.nprocs) * feenox.rank;
   if (feenox.pde.mesh->n_elements % feenox.nprocs > feenox.rank) {
@@ -768,6 +551,10 @@ int feenox_problem_init(void) {
   
   if (feenox.pde.rough == 0) {
     unsigned int g = 0;
+    if (feenox.pde.solution == NULL) {
+      feenox_push_error_message("inconsistent internal state, solution funcions not allocated", physical_group->name);
+      return FEENOX_ERROR;
+    }
     for (g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.solution[g]->mesh = feenox.pde.mesh;
       feenox.pde.solution[g]->data_size = feenox.pde.spatial_unknowns;
@@ -807,8 +594,7 @@ int feenox_problem_init(void) {
 */
   }
 
-  // TODO
-//  feenox_call(mesh_node_indexes(feenox.pde.mesh, feenox.pde.degrees));
+  feenox_call(feenox_mesh_init_nodal_indexes(feenox.pde.mesh, feenox.pde.dofs));
   
   return FEENOX_OK;
 }

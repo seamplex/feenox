@@ -50,10 +50,10 @@ int feenox_solve_petsc_linear(void) {
   }
   
   petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K, feenox.pde.K));
-  petsc_call(KSPSetTolerances(feenox.pde.ksp, feenox_var_value(feenox.pde.vars.reltol),
-                                              feenox_var_value(feenox.pde.vars.abstol),
-                                              feenox_var_value(feenox.pde.vars.divtol),
-                                              (PetscInt)feenox_var_value(feenox.pde.vars.max_iterations)));
+  petsc_call(KSPSetTolerances(feenox.pde.ksp, feenox_var_value(feenox.pde.vars.ksp_rtol),
+                                              feenox_var_value(feenox.pde.vars.ksp_atol),
+                                              feenox_var_value(feenox.pde.vars.ksp_divtol),
+                                              (PetscInt)feenox_var_value(feenox.pde.vars.ksp_max_it)));
   
   // TODO: this call sets up the nearnullspace, shouldn't that be in another place?
   petsc_call(KSPGetPC(feenox.pde.ksp, &pc));
@@ -122,7 +122,7 @@ PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *du
     if (rnorm < 1e-20) {
       current_progress = 1;
     } else {
-      current_progress = log((rnorm/feenox.pde.progress_r0))/log(feenox_var_value(feenox.pde.vars.reltol));
+      current_progress = log((rnorm/feenox.pde.progress_r0))/log(feenox_var_value(feenox.pde.vars.ksp_rtol));
       if (current_progress > 1) {
         current_progress = 1;
       }

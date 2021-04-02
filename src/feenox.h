@@ -1407,18 +1407,21 @@ struct feenox_t {
 */
     
     // virtual methods
-    int (*init_parser_particular)(void);
-    int (*init_solve)(void);
+    int (*problem_init_runtime_particular)(void);
     int (*solve_petsc)(void);
-    
+
+    PetscBool has_rhs;
+    PetscBool has_mass;
     function_t *initial_condition;
 
     struct {
-      var_t *abstol;
-      var_t *reltol;
-      var_t *divtol;
-      var_t *max_iterations;
+      var_t *ksp_atol;
+      var_t *ksp_rtol;
+      var_t *ksp_divtol;
+      var_t *ksp_max_it;
+      
       var_t *gamg_threshold;
+      
       var_t *iterations;
       var_t *residual_norm;
     
@@ -1878,6 +1881,8 @@ extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
 // element.c
 extern int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *element);
 extern int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]);
+extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
+
 
 // vtk.c
 extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
@@ -1888,11 +1893,11 @@ extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
 
 // solve.c
 extern int feenox_instruction_solve_problem(void *arg);
-extern int feenox_phi_to_solution(Vec phi, int compute_gradients);
+extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
 
 // init.c
 extern int feenox_problem_init_parser_general(void);
-extern int feenox_problem_init(void);
+extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function);
 extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
@@ -1924,8 +1929,16 @@ extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
 #endif
 
 // thermal/init.c
-extern int feenox_problem_init_thermal(void);
+extern int feenox_problem_init_parser_thermal(void);
+extern int feenox_problem_init_runtime_thermal(void);
 
+// mechanical/init.c
+extern int feenox_problem_init_parser_mechanical(void);
+extern int feenox_problem_init_runtime_mechanical(void);
+
+// modal/init.c
+extern int feenox_problem_init_parser_modal(void);
+extern int feenox_problem_init_runtime_modal(void);
 
 
 #endif    /* FEENOX_H  */

@@ -9,48 +9,32 @@ int feenox_instruction_solve_problem(void *arg) {
   // TODO: how to handle changes in the mesh within steps?
   //---------------------------------
   if (feenox.pde.spatial_unknowns == 0) {
-    feenox_call(feenox_problem_init());
+    feenox_call(feenox.pde.problem_init_runtime_particular());
+    feenox_call(feenox_problem_init_runtime_general());
   }
-
-  // TODO: put in thermal init
-  // check if we were given an initial solution
-  if ((feenox.pde.initial_condition = feenox_get_function_ptr("T_0")) != NULL) {
-    if (feenox.pde.initial_condition->n_arguments != feenox.pde.dim) {
-      feenox_push_error_message("initial condition function T_0 ought to have %d arguments instead of %d", feenox.pde.dim, feenox.pde.initial_condition->n_arguments);
-      return FEENOX_OK;
-    }
-  }
-  // TODO: either use the setting or figure out the dependence of properties & BCs with T
-  feenox.pde.solve_petsc = feenox_solve_petsc_linear;
   
-  if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_condition != NULL) {
+  if (feenox.pde.solve_petsc == NULL) {
+    feenox_push_error_message("pistola");
+    return FEENOX_ERROR;
+  }
 
+  if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_condition != NULL) {
+    
+    // fill the petsc vector with the data from the initial condition function of space
     size_t j = 0;
     for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
       petsc_call(VecSetValue(feenox.pde.phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(feenox.pde.initial_condition, feenox.pde.mesh->node[j].x), INSERT_VALUES));
     }
-
-    // TODO: assembly routine
     petsc_call(VecAssemblyBegin(feenox.pde.phi));
     petsc_call(VecAssemblyEnd(feenox.pde.phi));
-  }  
+    
+  } 
   
-  if (feenox_var_value(feenox_special_var(in_static)) || feenox.pde.transient_type == transient_type_quasistatic) {
-    
-    // now, if the problem is steady-state or we do not have an initial condition then we just solve it
-    // if the problem is static and an initial condition was given, it's used as a guess (without Dirichlet BCs)
-    if (feenox_special_var(end_time) == 0 || feenox.pde.initial_condition == NULL) {
-      feenox.pde.solve_petsc();
-    }
-  
-    // TODO: how to do this in parallel?
-//    feenox_call(feenox_phi_to_solution(feenox.pde.phi, 1));
-    
-  } else {
-    
-   
-  }
+  feenox.pde.solve_petsc();  
+  // TODO: how to do this in parallel?
+  feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));
 
+  
 /*  
   feenox_var(feenox.pde.vars.time_petsc_build) += feenox.pde.petsc.build_end - feenox.pde.petsc.build_begin;
   feenox_var(feenox.pde.vars.time_wall_build)  += feenox.pde.wall.build_end  - feenox.pde.wall.build_begin;
@@ -121,7 +105,7 @@ int feenox_assembly(void) {
 }
 
 
-int feenox_phi_to_solution(Vec phi, int compute_gradients) {
+int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
 
   VecScatter         vscat;
   Vec                phi_full;
