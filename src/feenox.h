@@ -890,7 +890,7 @@ struct elementary_entity_t {
 
 
 struct gauss_t {
-  int V;               // number of points (v=1,2,...,V )
+  unsigned int V;      // number of points (v=1,2,...,V )
   double *w;           // weights (w[v] is the weight of the v-th point)
   double **r;          // coordinates (r[v][m] is the coordinate of the v-th point in dimension m)
   
@@ -958,10 +958,6 @@ struct element_t {
   // to change them individually otherwise the first wins and the others loose
   size_t V_w, V_x, V_H, V_B, V_dxdr, V_drdx, V_dhdx;    
 
-  
-  size_t *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
-
-  
   gsl_matrix **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
   gsl_matrix **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
   double **property_node;
@@ -970,6 +966,11 @@ struct element_t {
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
+
+#ifdef HAVE_PETSC
+  PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
+#endif
+  
 };
 
 
@@ -1052,6 +1053,21 @@ struct bc_t {
 
 struct bc_data_t {
   char *string;
+
+  enum {
+    bc_type_math_undefined,
+    bc_type_math_dirichlet,
+    bc_type_math_neumann,
+    bc_type_math_robin,
+  } type_math;
+  
+//  int type_phys;  
+//  int dof;   // this can have high values with meanings (i.e. dof=213 can be Mx)
+
+  expr_t condition;  // if it is not null the BC only applies if it is != 0
+  expr_t *expr;      // an array of stuff
+//  physical_entity_t *slave;  // TODO: change to non-racist name
+  
   bc_data_t *next;
 };
 
@@ -1822,11 +1838,12 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, d
 
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *this);
-extern void feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
-extern void feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
-extern void feenox_mesh_compute_drdx_at_gauss(element_t *this, int v, int integration);
-extern void feenox_mesh_compute_dxdr_at_gauss(element_t *this, int v, int integration);
-extern void feenox_mesh_compute_x_at_gauss(element_t *this, int v, int integration);
+extern int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
+extern int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
+extern int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_x_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
 
 // gmsh.c
 extern int feenox_mesh_read_gmsh(mesh_t *this);
@@ -1932,6 +1949,10 @@ extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 
+// thermal/bulk.c
+extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int v);
+
+
 // mechanical/init.c
 extern int feenox_problem_init_parser_mechanical(void);
 extern int feenox_problem_init_runtime_mechanical(void);
@@ -1940,5 +1961,12 @@ extern int feenox_problem_init_runtime_mechanical(void);
 extern int feenox_problem_init_parser_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
 
+// build.c
+extern int feenox_build(void);
+extern int feenox_build_element_volumetric(element_t *this);
+extern int feenox_allocate_elemental_objects(element_t *this);
+extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
+extern int feenox_elemental_objects_allocate(element_t *this);
+extern int feenox_elemental_objects_free(void);
 
 #endif    /* FEENOX_H  */
