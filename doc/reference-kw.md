@@ -34,17 +34,6 @@ Define a boundary condition to be applied to faces, edges and/or vertices.
 [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
 [ <bc_data1> [ <bc_data2> [ ... ] ] ]`
 
-The names of the properties in principle can be arbitrary, but each problem type
-needs a minimum set of properties defined with particular names.
-For example, steady-state thermal problems need at least the conductivity which
-should be named\ `k`. If the problem is transient, it will also need
-heat capacity\ `rhocp` or diffusivity\ `alpha`.
-Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
-Modal also needs density\ `rho`. Check the particular documentation for each problem type.
-Besides these mandatory properties, any other one can be defined.
-For instance, if one mandatory property dependend on the concentration of boron in the material,
-a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
-be used in the expression that defines the mandatory property.
 If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
 If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
 If the boundary condition applies to more than one physical group in the mesh,
@@ -348,6 +337,17 @@ If the name of the material matches a physical group in the mesh, it is automati
 If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
 If the material applies to more than one physical group in the mesh, they can be
 added using as many `PHYSICAL_GROUP` keywords as needed.
+The names of the properties in principle can be arbitrary, but each problem type
+needs a minimum set of properties defined with particular names.
+For example, steady-state thermal problems need at least the conductivity which
+should be named\ `k`. If the problem is transient, it will also need
+heat capacity\ `rhocp` or diffusivity\ `alpha`.
+Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
+Modal also needs density\ `rho`. Check the particular documentation for each problem type.
+Besides these mandatory properties, any other one can be defined.
+For instance, if one mandatory property dependend on the concentration of boron in the material,
+a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
+be used in the expression that defines the mandatory property.
 
 ##  MATRIX
 

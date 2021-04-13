@@ -3303,17 +3303,17 @@ int feenox_parse_material(void) {
         
     } else {
 ///kw+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
-///kw+BC+detail The names of the properties in principle can be arbitrary, but each problem type
-///kw+BC+detail needs a minimum set of properties defined with particular names.
-///kw+BC+detail For example, steady-state thermal problems need at least the conductivity which 
-///kw+BC+detail should be named\ `k`. If the problem is transient, it will also need
-///kw+BC+detail heat capacity\ `rhocp` or diffusivity\ `alpha`. 
-///kw+BC+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
-///kw+BC+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
-///kw+BC+detail Besides these mandatory properties, any other one can be defined.
-///kw+BC+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
-///kw+BC+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
-///kw+BC+detail be used in the expression that defines the mandatory property.
+///kw+MATERIAL+detail The names of the properties in principle can be arbitrary, but each problem type
+///kw+MATERIAL+detail needs a minimum set of properties defined with particular names.
+///kw+MATERIAL+detail For example, steady-state thermal problems need at least the conductivity which 
+///kw+MATERIAL+detail should be named\ `k`. If the problem is transient, it will also need
+///kw+MATERIAL+detail heat capacity\ `rhocp` or diffusivity\ `alpha`. 
+///kw+MATERIAL+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
+///kw+MATERIAL+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
+///kw+MATERIAL+detail Besides these mandatory properties, any other one can be defined.
+///kw+MATERIAL+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
+///kw+MATERIAL+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
+///kw+MATERIAL+detail be used in the expression that defines the mandatory property.
       
       char *property_name = NULL;
       char *expr_string = NULL;
