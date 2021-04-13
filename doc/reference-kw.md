@@ -31,12 +31,30 @@ Define a boundary condition to be applied to faces, edges and/or vertices.
 `BC
 <name>
 [ MESH <name> ]
-[ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]`
+[ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+[ <bc_data1> [ <bc_data2> [ ... ] ] ]`
 
+The names of the properties in principle can be arbitrary, but each problem type
+needs a minimum set of properties defined with particular names.
+For example, steady-state thermal problems need at least the conductivity which
+should be named\ `k`. If the problem is transient, it will also need
+heat capacity\ `rhocp` or diffusivity\ `alpha`.
+Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
+Modal also needs density\ `rho`. Check the particular documentation for each problem type.
+Besides these mandatory properties, any other one can be defined.
+For instance, if one mandatory property dependend on the concentration of boron in the material,
+a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
+be used in the expression that defines the mandatory property.
 If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
 If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
-If the boundary condition applies to more than one physical group in the mesh, they can be
-added using as many `PHYSICAL_GROUP` keywords as needed.
+If the boundary condition applies to more than one physical group in the mesh,
+they can be added using as many `PHYSICAL_GROUP` keywords as needed.
+Each `<bc_data>` argument is a string whose meaning depends on the type
+of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
+temperature to depend on space as the provided expression in a
+thermal problem and `fixed` fixes the displacements in all the directions
+in a mechanical or modal problem.
+See the particular section on boundary conditions for further details.
 
 ##  CLOSE
 
@@ -324,8 +342,7 @@ Define a material its and properties to be used in volumes.
 <name>
 [ MESH <name> ]
 [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
-[ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
-[ <bc_data1> [ <bc_data2> [ ... ] ] ]`
+[ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]`
 
 If the name of the material matches a physical group in the mesh, it is automatically linked to that physical group.
 If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
@@ -637,10 +654,10 @@ PLANE_STRESS
 PLANE_STRAIN
 ]
 [ SYMMETRY_AXIS { x | y } ]
+[ TRANSIENT |
+QUASISTATIC]@
 [ LINEAR
-| NON_LINEAR ]@
-[ QUASISTATIC
-| TRANSIENT ]@
+| NON_LINEAR ]
 [ DIMENSIONS <expr> ]
 [ MESH <identifier> ] @
 [ N_MODES <expr> ] @`
@@ -653,7 +670,11 @@ If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimension
 and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$).
 If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
 axisymmetry is given, either `PLANE_STRESS` and `PLAIN_STRAIN` can be provided (default is plane stress).
-By default Fino tries to detect wheter the computation should be linear or non-linear.
+If the special variable `end_time` is zero, FeenoX solves a static problem---although
+the variable `static_steps` is still honored.
+If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
+This can be controlled by `TRANSIENT` or `QUASISTATIC`.
+By default FeenoX tries to detect wheter the computation should be linear or non-linear.
 An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
 The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
 or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.

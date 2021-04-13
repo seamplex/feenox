@@ -67,17 +67,30 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
 \noindent it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as Metis) for scaling up large problems,
 
 
-ejemplo de input - alguno de NAFEMS
+**ejemplo de input - NAMFES LE11**
 
+**ejemplo Python**
 
 
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 040-architecture.md)
 
-C, quote petsc, flat memory address space -> that's what virtual servers have!
+FeenoX’ main development architecture is Debian GNU/Linux running over 64-bits Intel-compatible processors. Compatibility with other operating systems and architectures is encouraged although not required. All the required dependencies are free and/or open source and already available in Debian’s official repositories and the POSIX standard is followed whenever possible. 
 
-posix
+FeenoX is written in plain\ C, which is a standard, mature and widely supported language with compilers for a wide variety of architectures. 
+For solving ODEs/DAEs, FeenoX relies on Lawrence Livermore’s SUNDIALS library. For PDEs, FeenoX uses Argonne’s PETSc library. Both of them are
+
+ * written in plain C,
+ * free and open source,
+ * mature,
+ * actively developed,
+ * parallel scalable through the MPI standard,
+ * very well known in the industry and academia.
+
+Programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. There have been reports that people have been able to compile them under macOS and Windows apart from the main architecture based on GNU/Linux. Due to the way that FeenoX is designed and the policy separated from the mechanism, it is possible to control a running instance remotely from a separate client which can eventually run on a mobile device.
+
+
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 050-deployment.md)

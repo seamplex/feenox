@@ -17,8 +17,8 @@ The main objective is to comply with the Software Requirements Specification. Wi
 ## Operating systems
 
  * The main target operating system is GNU/Linux, particularly `linux-amd64`.
- * The reference distribution is Debian. All the required dependencies should be available in the Debian repositories.
- * Support for other architectures is encouraged but not required.
+ * The reference distribution is Debian stable. All the required dependencies should be available in any decently-modern Debian repositories.
+ * Support for other architectures (mainly the other two non-server end-user mainstream OSes which are non-free and we do not want to mention explicitly) is encouraged but not required.
 
  
 ## Languages
@@ -43,18 +43,33 @@ The main objective is to comply with the Software Requirements Specification. Wi
  * Modern high-level languages like Python or Julia are targets and not sources of FeenoX.
  * For documentation and comments within the code, American English should be used.
 
+## Virtual methods
+
+Even though we use C, we can still have some “virtual methods” by using function pointers. So in a FEM formulation, the routines that build the stiffness matrix are mostly independent of the problem type (for the same family, say elliptic problems) but in the integrands. So a good practice is to have a common set of routines that loop over elements and over gauss points and then at the inner loop a virtual method is called which depends on the particular problem (thermal, mechanical, etc). This is accomplished by using function pointers so all problems have to provide more or less the same sets of routines: initialization, integrands, BCs, etc. See the basic problems to see how this idea works.
+
+Reading and writing mesh/post-processing files work the same way. Each format has to provide a virtual reader/writer method.
+ 
 ## Makefiles
 
  * Use autotools and friends and comply with the GNU requirements.
- * CMake is allowed as being part of other libraries but not for any sources directly related to FeenoX.
+ * CMake is allowed as being part of other libraries but not for any sources directly related to FeenoX (at least for now).
 
 ## Coding style
 
- * K&R
- * no tabs
- * two spaces per indent
- * don't worry about long lines, only wrap lines when it makes sense to from a logic point of view not becuase "it looks bad on screen"
- * Follow the 17 rules of UNIX philosophy
+ * K&R 1TBS with no tabs and two spaces per indent <https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)>
+   
+   ```c
+   void checknegative(x) {
+     if (x < 0) {
+       puts("Negative");
+     } else {
+       nonnegative(x);
+     }
+   }
+   ```
+ 
+ * Do not worry about long lines. Only wrap lines when it makes sense to from a logic point of view not becuase "it looks bad on screen" because “screen” can be anything from a mobile phone to a desktop with many 24" LED monitors.
+ * Make sure you understand and follow the 17 rules of UNIX philosophy <https://en.wikipedia.org/wiki/Unix_philosophy>
     1. modularity
     2. clarity
     3. composition
@@ -77,20 +92,51 @@ The main objective is to comply with the Software Requirements Specification. Wi
 ## Memory management
 
  * Check all `malloc()` calls for `NULL`. You can use the `feenox_check_alloc()/feenox_check_alloc_null()` macros.
+ * Use the macro `feenox_free()` instead of plain `free()`. The former explictly makes the pointer equal to `NULL` after freeing it, which is handy.
  * Use `valgrind` to check for invalid memory access and leaks
  
     > Memory analysis tools such as valgrind can be useful, but don’t complicate a program merely to avoid their false alarms. For example, if memory is used until just before a process exits, don’t free it simply to silence such a tool. 
+    >
+    > GNU Coding Standars  
+    > <https://www.gnu.org/prep/standards/html_node/Memory-Usage.html>
 
    Mind that FeenoX might be used in parametric or minimization mode which would re-allocate some stuff so make sure you know which alarms you ignore.
  
 ## Naming conventions
 
  * Use snake case such as in `this_is_a_long_name`.
- * All functions ought to start with `feenox_`. This is the small price we need to pay in order to keep a magnificent beast like C++ away from our lives (those who can). The name should go from general to particular such as `feenox_expression_parse()` and `feenox_expression_eval()` (and not `feenox_parse_expression()`/`feenox_eval_expression()`) so all function related with expressions can be easily found. There are exceptions, like functions which do similar tasks such as `feenox_add_assignemnt()` and `feenox_add_instructions()`. Here the `add` part is the common one.
+ * All functions ought to start with `feenox_`. This is the small price we need to pay in order to keep a magnificent beast like C++ away from our lives (those who can). The names of functions should go from general to particular such as `feenox_expression_parse()` and `feenox_expression_eval()` (and not `feenox_parse_expression()`/`feenox_eval_expression()`) so all function related with expressions can be easily found. There are exceptions, like functions which do similar tasks such as `feenox_add_assignemnt()` and `feenox_add_instructions()`. Here the `add` part is the common one.
+ * In a similar way, “virtual” methods should add the particularity at the end, like 
+ 
+    - `feenox_build_element_volumetric_gauss_point()`---the function pointer which is invoked in the code
+    - `feenox_build_element_volumetric_gauss_point_thermal()`---the particular function the pointer will point to and which is actually called
  
 ## Comments
 
- * Use single-line comments for commenting the code `//` so we can use multiline comments `/*`-`*/` to _comment out_ certain parts of code while developing new features.
+ * Use single-line comments `//` to add comments to the code so we can easily _comment out_ certain parts of code using multiline comments `/*`---`*/` while developing new features.
+ * Explain any non-trivial block or flag that needs to be set. Example
+ 
+   ```c
+     switch (c = fgetc(file_ptr)) {
+       case '"':
+         // if there's an escaped quote, we take away the escape char 
+         // and put a magic marker 0x1e, afterwards in get_next_token() 
+         // we change back the 0x1e with the unescaped quote
+         feenox_parser.line[i++] = 0x1e;
+   ```
+ 
+ * Focus on the why and not on the how, except for very complex loops.
+ * All nice-to-have things that are welcome to be done should be written as
+ 
+   ```c
+   // TODO: allow refreshing file data before each transiet step
+   ```
+ * Features that might or might not be added should be written as questions
+ 
+   ```c
+   // TODO: should we allow unquoted names in the $PhysicalNames section?
+   ```
+ 
  
 ## Git workflow
 
@@ -114,6 +160,10 @@ The main objective is to comply with the Software Requirements Specification. Wi
 ## Documentation
 
  * See the README in the `doc` directory.
+ * TLDR;
+    1. Use Pandoc-flavored Markdown as the main source.
+    2. Knock yourself out with LaTeX maths.
+    3. Bitmaps are off the table for figures.
 
  
 # What we program in FeenoX
