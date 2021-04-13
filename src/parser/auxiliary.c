@@ -87,8 +87,8 @@ int feenox_read_line(FILE *file_ptr) {
         }
         while (feenox.argv[feenox.optind+n][j] != 0) {
           // watch out!
-          // no se puede meter en una linea porque me puede llegar a meter
-          // el \0 en line[] antes de evaluar la condicion para salir del while
+          // this cannot be put in a single line because the '\0' might come
+          // in line[] before evaluating the condition to get out of the while
           feenox_parser.line[i++] = feenox.argv[feenox.optind+n][j++];
         }
 
@@ -98,7 +98,7 @@ int feenox_read_line(FILE *file_ptr) {
           case '"':
             // if there's an escaped quote, we take away the escape char and put
             // a magic marker 0x1e, afterwards in get_next_token() we change back
-            // te 0x1e with the unescaped quote
+            // the 0x1e with the unescaped quote
             feenox_parser.line[i++] = 0x1e;
           break;
             // escape sequences
@@ -146,15 +146,11 @@ int feenox_read_line(FILE *file_ptr) {
     // check if we need to reallocate the input buffer
     if (i >= feenox_parser.actual_buffer_size-16) {
       feenox_parser.actual_buffer_size += feenox_parser.page_size;
-      if ((feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size)) == NULL) {
-        feenox_push_error_message("out of memory");
-        return FEENOX_ERROR;
-      }
+      feenox_check_alloc(feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size));
     }
 
     // pedimos lo que viene en futbol de primera
     // contamos las lineas aca porque si nos toca \n nos vamos sin comerla ni beberla
-
     if ((c = fgetc(file_ptr)) == '\n') {
       lines++;
     }

@@ -191,7 +191,8 @@ enum version_type {
 };
 
 // macro to check error returns in function calls
-#define feenox_call(function)   if ((function) != FEENOX_OK) return FEENOX_ERROR
+#define feenox_call(function)        if ((function) != FEENOX_OK) return FEENOX_ERROR
+#define feenox_call_null(function)   if ((function) != FEENOX_OK) return NULL
 #ifdef HAVE_IDA
  #define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
 #endif
@@ -842,10 +843,11 @@ struct node_relative_t {
 
 struct physical_group_t {
   char *name;
+  // these are ints because that's what we read from a .msh
   int tag;
   int dimension;
   
-  material_t *material;    // apuntador
+  material_t *material;    // pointer to single material
   bc_t *bcs;               // linked list 
      
   // volume (or area or length depending on the dim, sometimes called mass)
@@ -1061,12 +1063,11 @@ struct bc_data_t {
     bc_type_math_robin,
   } type_math;
   
-//  int type_phys;  
-//  int dof;   // this can have high values with meanings (i.e. dof=213 can be Mx)
+  int type_phys;     // problem-based flag that tells which type of BC this is
+  unsigned int dof;
 
-  expr_t condition;  // if it is not null the BC only applies if it is != 0
+  expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
   expr_t *expr;      // an array of stuff
-//  physical_entity_t *slave;  // TODO: change to non-racist name
   
   bc_data_t *next;
 };
@@ -1592,7 +1593,7 @@ struct feenox_t {
     PetscScalar *eigenvalue;    // los autovalores
     Vec *eigenvector;           // los autovectores
 
-    // auxiliary arrays for dirichlet conditions
+    // internal storage of evaluated dirichlet conditions
     PetscInt        *dirichlet_indexes;
     PetscScalar     *dirichlet_values;
   
@@ -1838,6 +1839,9 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, d
 
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *this);
+extern int feenox_mesh_compute_w_at_gauss(element_t *this, int v, int integration);
+extern int feenox_mesh_compute_H_at_gauss(element_t *this, unsigned int v, unsigned int dofs, int integration);
+extern int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned int dofs, int integration);
 extern int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
 extern int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
 extern int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integration);
@@ -1935,7 +1939,7 @@ extern PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot,
 extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
 
 // dirichlet.c
-extern int feenox_dirichlet_eval(Mat K, Vec b);
+extern int feenox_dirichlet_eval(void);
 extern int feenox_dirichlet_set_K(Mat K, Vec b);
 extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_J(Mat J);
@@ -1948,6 +1952,10 @@ extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
 // thermal/init.c
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
+
+// thermal/bc.c
+int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
+int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t k);
 
 // thermal/bulk.c
 extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int v);
@@ -1968,5 +1976,6 @@ extern int feenox_allocate_elemental_objects(element_t *this);
 extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
 extern int feenox_elemental_objects_allocate(element_t *this);
 extern int feenox_elemental_objects_free(void);
+extern int feenox_build_assembly(void);
 
 #endif    /* FEENOX_H  */

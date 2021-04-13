@@ -76,6 +76,7 @@ feenox_SOURCES = \
 ./problems/petsc_ts.c \
 ./problems/thermal/init.c \
 ./problems/thermal/bulk.c \
+./problems/thermal/bc.c \
 ./problems/mechanical/init.c \
 ./problems/modal/init.c \
 ./contrib/kdtree.c \

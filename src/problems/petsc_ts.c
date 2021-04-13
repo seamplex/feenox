@@ -75,7 +75,7 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
     // (in case only natural BCs change with time)
     feenox_call(feenox_phi_to_solution(phi, 1));
     feenox_call(feenox_build());
-    feenox_call(feenox_dirichlet_eval(feenox.pde.K, feenox.pde.b));
+    feenox_call(feenox_dirichlet_eval());
 //  }  
     
   // compute the residual R(t,phi,phi_dot) = K*phi + M*phi_dot - b

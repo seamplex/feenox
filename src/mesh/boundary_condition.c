@@ -93,7 +93,30 @@ bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
   feenox_check_alloc_null(bc_data = calloc(1, sizeof(bc_data_t)));
   feenox_check_alloc_null(bc_data->string = strdup(string));
   
-  // TODO: should we do something with the string right now?
+  
+  // see if there is a "=>" that implies that the BC has a condition
+  char *lhs = NULL;
+  if ((lhs = strstr(bc_data->string, "=>")) != NULL) {
+    *lhs = '\0';
+    lhs += 2;
+    feenox_call_null(feenox_expression_parse(&bc_data->condition, bc_data->string));
+  } else {
+    lhs = bc_data->string;
+  }
+      
+  // if there is an equal sign there is an expression, otherwise not
+  char *rhs = NULL;
+  char *equal_sign = NULL;
+  if ((equal_sign = strchr(lhs, '=')) != NULL) {
+    *equal_sign = '\0';
+    rhs = equal_sign+1;
+  }
+  
+  // we now call the problem-specific function that understands
+  // what the string means and fill in the other bc_data fields
+  // TODO: virtual
+  feenox_call_null(feenox_problem_bc_parse_thermal(bc_data, lhs, rhs));
+  
   LL_APPEND(bc->bc_datums, bc_data);
 
   return bc_data;

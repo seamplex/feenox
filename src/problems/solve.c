@@ -60,51 +60,6 @@ int feenox_instruction_solve_problem(void *arg) {
 }
 
 
-
-
-
-int feenox_assembly(void) {
-  // which is better?
-/*  
-  petsc_call(MatAssemblyBegin(feenox.K, MAT_FINAL_ASSEMBLY));
-  petsc_call(MatAssemblyEnd(feenox.K, MAT_FINAL_ASSEMBLY));
-
-  petsc_call(VecAssemblyBegin(feenox.phi));
-  petsc_call(VecAssemblyEnd(feenox.phi));
-  
-  if (feenox.M != NULL) {
-    petsc_call(MatAssemblyBegin(feenox.M, MAT_FINAL_ASSEMBLY));
-    petsc_call(MatAssemblyEnd(feenox.M, MAT_FINAL_ASSEMBLY));
-  }
-  if (feenox.J != NULL) {
-    petsc_call(VecAssemblyBegin(feenox.b));
-    petsc_call(VecAssemblyEnd(feenox.b));
-  }
-*/
-  
-  petsc_call(VecAssemblyBegin(feenox.pde.phi));
-  if (feenox.pde.b != NULL) {
-    petsc_call(VecAssemblyBegin(feenox.pde.b));
-  }  
-  petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
-  if (feenox.pde.M != NULL) {
-    petsc_call(MatAssemblyBegin(feenox.pde.M, MAT_FINAL_ASSEMBLY));
-  }  
-
-
-  petsc_call(VecAssemblyEnd(feenox.pde.phi));
-  if (feenox.pde.b != NULL) {
-    petsc_call(VecAssemblyEnd(feenox.pde.b));
-  }  
-  petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
-  if (feenox.pde.M != NULL) {
-    petsc_call(MatAssemblyEnd(feenox.pde.M, MAT_FINAL_ASSEMBLY));
-  }
-  
-  return FEENOX_OK;
-}
-
-
 int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
 
   VecScatter         vscat;
@@ -127,12 +82,18 @@ int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
   // make up G functions with the solution
   size_t j = 0;
   for (j = 0; j < feenox.pde.spatial_unknowns; j++) {
+    
+    if (feenox.pde.mesh->node[j].phi == NULL) {
+      feenox_check_alloc(feenox.pde.mesh->node[j].phi = calloc(feenox.pde.dofs, sizeof(double)));
+    }
+    
     unsigned int g = 0;
     for (g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.mesh->node[j].phi[g] = phi_full_array[feenox.pde.mesh->node[j].index_dof[g]];
 
       // if we are not in rough mode we fill the solution here
-      // because it is easy, in rough mode we need to iterate over the elements
+      // because it is easier, in rough mode we need to
+      // iterate over the elements instead of over the nodes
       if (feenox.pde.rough == 0) {
         feenox.pde.solution[g]->data_value[j] = feenox.pde.mesh->node[j].phi[g];
       }

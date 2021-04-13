@@ -334,14 +334,14 @@ double mesh_integration_weight(mesh_t *mesh, element_t *element, int v) {
 }
 */
 
-void feenox_mesh_compute_integration_weight_at_gauss(element_t *this, int v, int integration) {
+int feenox_mesh_compute_w_at_gauss(element_t *this, int v, int integration) {
   
   if (this->w == NULL) {
-    this->w = calloc(this->type->gauss[integration].V, sizeof(double));
+    feenox_check_alloc(this->w = calloc(this->type->gauss[integration].V, sizeof(double)));
   }
   
   if (this->dxdr == NULL || this->dxdr[v] == NULL) {
-    feenox_mesh_compute_dxdr_at_gauss(this, v, integration);
+    feenox_call(feenox_mesh_compute_dxdr_at_gauss(this, v, integration));
   }
   
   if (this->w[v] == 0) {
@@ -351,7 +351,7 @@ void feenox_mesh_compute_integration_weight_at_gauss(element_t *this, int v, int
   printf("w(%d,%d) = %g\n", this->index, v, this->w[v]);
 #endif
 
-  return;
+  return FEENOX_OK;
 }
 
 

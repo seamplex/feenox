@@ -155,10 +155,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           }
           // same for the dimension
           if (physical_group->dimension <= 0) {
-            // si tiene 0 le ponemos la que acabamos de leer
             physical_group->dimension = dimension;
           } else if (physical_group->dimension != dimension) {
-            // si no coincide nos quejamos
             feenox_push_error_message("physical group '%s' has dimension %d in input and %d in mesh '%s'", name, physical_group->dimension, dimension, this->file->name);
             return FEENOX_ERROR;
           }
@@ -169,11 +167,21 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         // "more or less" easy
         HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), physical_group);
 
-        // if the physical group does not have a material, look for one with the same name
+        // try to autoatically link materials and BCs
+        // actually it should be either one (material) or the other (bc) or none
+        
+        // if the physical group does not already have a material, look for one with the same name
         if (physical_group->material == NULL) {
+          // this returns NULL if not found, which is ok
           HASH_FIND_STR(feenox.mesh.materials, name, physical_group->material);
         }
-        // TODO: same for BCs
+        
+        // same for BCs, although slightly different because there can be many
+        bc_t *bc = NULL;
+        HASH_FIND_STR(feenox.mesh.bcs, name, bc);
+        if (bc != NULL) {
+          LL_APPEND(physical_group->bcs, bc);
+        }
 
         feenox_free(name);
 
@@ -440,13 +448,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           }
           this->node[j].index_mesh = j;
           
-          // si nos dieron degrees of freedom entonces tenemos que allocar
-          // lugar para la solucion phi de alguna PDE
-/*          
-          if (this->degrees_of_freedom != 0) {
-            feenox_check_alloc(this->node[j].phi = calloc(this->degrees_of_freedom, sizeof(double)));
-          }
- */
         }
         
         // terminamos de leer los nodos, si los nodos son sparse tenemos que hacer el tag2index
@@ -541,14 +542,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               // en msh4 los tags son los indices de la malla global
               this->node[i].index_mesh = i;
               
-              // si nos dieron degrees of freedom entonces tenemos que allocar
-              // lugar para la solucion phi de alguna PDE
-/*              
-              if (this->degrees_of_freedom != 0) {
-                this->node[i].phi = calloc(this->degrees_of_freedom, sizeof(double));
-              }
- */
-              
               i++;
             }
           } else {
@@ -572,15 +565,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               
               this->node[i].index_mesh = i;
               this->tag2index[this->node[i].tag] = i;
-              
-              // si nos dieron degrees of freedom entonces tenemos que allocar
-              // lugar para la solucion phi de alguna PDE
-/*              
-              if (this->degrees_of_freedom != 0) {
-                this->node[i].phi = calloc(this->degrees_of_freedom, sizeof(double));
-              }
-*/
-              
               i++;
             }
           }
@@ -953,85 +937,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         feenox_push_error_message("$EndNodeData not found in mesh file '%s'", this->file->path);
         return -2;
       }
-
-  
-    // ------------------------------------------------------      
-    // extension nuestra!
-/*      
-    } else if (strncmp("$Neighbors", buffer, 10) == 0 || strncmp("$Neighbours", buffer, 11) == 0) {
-
-      int element_id;
       
-      // la cantidad de celdas
-      if (fscanf(this->file->pointer, "%ld", &(this->n_cells)) == 0) {
-        return FEENOX_ERROR;
-      }
-      if (this->n_cells == 0) {
-        feenox_push_error_message("no cells found in mesh file '%s'", this->file->path);
-        return -2;
-      }
-      this->cell = calloc(this->n_cells, sizeof(cell_t));
-
-      for (i = 0; i < this->n_cells; i++) {
-    
-        if (fscanf(this->file->pointer, "%d", &cell_id) == 0) {
-          return FEENOX_ERROR;
-        }
-        if (cell_id != i+1) {
-          feenox_push_error_message("cells in mesh file '%s' are not sorted", this->file->path);
-          return -2;
-        }
-        this->cell[i].id = cell_id;
-        
-        if (fscanf(this->file->pointer, "%d", &element_id) == 0) {
-          return FEENOX_ERROR;
-        }
-        this->cell[i].element = &this->element[element_id - 1];
-        
-        if (fscanf(this->file->pointer, "%d", &this->cell[i].n_neighbors) == 0) {
-          return FEENOX_ERROR;
-        }
-        if (fscanf(this->file->pointer, "%d", &j) == 0) {
-          return FEENOX_ERROR;
-        }
-        if (j != this->cell[i].element->type->nodes_per_face) {
-          feenox_push_error_message("mesh file '%s' has inconsistencies in the neighbors section", this->file->path);
-          return -2;
-        }
-
-        this->cell[i].ineighbor = malloc(this->cell[i].n_neighbors * sizeof(int));
-        this->cell[i].ifaces = malloc(this->cell[i].n_neighbors * sizeof(int *));
-        for (j = 0; j < this->cell[i].n_neighbors; j++) {
-          if (fscanf(this->file->pointer, "%d", &this->cell[i].ineighbor[j]) == 0) {
-            return FEENOX_ERROR;
-          }
-          this->cell[i].ifaces[j] = malloc(this->cell[i].element->type->nodes_per_face);
-          for (k = 0; k < this->cell[i].element->type->nodes_per_face; k++) {
-            if (fscanf(this->file->pointer, "%d", &this->cell[i].ifaces[j][k]) == 0) {
-              return FEENOX_ERROR;
-            }
-          }
-        }
-      }
-        
-      
-      // the newline
-      if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL) {
-        feenox_push_error_message("corrupted mesh file '%s'", this->file->path);
-        return -3;
-      } 
-
-      // the line $EndNeighbors
-      if (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) == NULL) {
-        feenox_push_error_message("corrupted mesh file '%s'", this->file->path);
-        return -3;
-      } 
-      if (strncmp("$EndNeighbors", buffer, 13) != 0 && strncmp("$EndNeighbours", buffer, 14) != 0) {
-        feenox_push_error_message("$EndNeighbors not found in mesh file '%s'", this->file->path);
-        return -2;
-      }
-      
-*/
     // ------------------------------------------------------      
     } else {
         

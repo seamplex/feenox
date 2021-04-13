@@ -56,7 +56,7 @@ int feenox_build(void) {
     }
   }
 
-//  feenox_call(fino_assembly());
+  feenox_call(feenox_build_assembly());
 
   
   return FEENOX_OK;
@@ -212,3 +212,52 @@ inline double fino_compute_r_for_axisymmetric(element_t *element, int v) {
 }
 
 */
+
+
+int feenox_build_assembly(void) {
+  // TODOD: which is better?
+/*  
+  petsc_call(MatAssemblyBegin(feenox.K, MAT_FINAL_ASSEMBLY));
+  petsc_call(MatAssemblyEnd(feenox.K, MAT_FINAL_ASSEMBLY));
+
+  petsc_call(VecAssemblyBegin(feenox.phi));
+  petsc_call(VecAssemblyEnd(feenox.phi));
+  
+  if (feenox.M != NULL) {
+    petsc_call(MatAssemblyBegin(feenox.M, MAT_FINAL_ASSEMBLY));
+    petsc_call(MatAssemblyEnd(feenox.M, MAT_FINAL_ASSEMBLY));
+  }
+  if (feenox.J != NULL) {
+    petsc_call(VecAssemblyBegin(feenox.b));
+    petsc_call(VecAssemblyEnd(feenox.b));
+  }
+*/
+  if (feenox.pde.phi != NULL) {
+    petsc_call(VecAssemblyBegin(feenox.pde.phi));
+  }  
+  if (feenox.pde.b != NULL) {
+    petsc_call(VecAssemblyBegin(feenox.pde.b));
+  }
+  if (feenox.pde.K != NULL) {
+    petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+  }  
+  if (feenox.pde.M != NULL) {
+    petsc_call(MatAssemblyBegin(feenox.pde.M, MAT_FINAL_ASSEMBLY));
+  }  
+
+
+  if (feenox.pde.phi != NULL) {
+    petsc_call(VecAssemblyEnd(feenox.pde.phi));
+  }  
+  if (feenox.pde.b != NULL) {
+    petsc_call(VecAssemblyEnd(feenox.pde.b));
+  }  
+  if (feenox.pde.K != NULL) {
+    petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+  }  
+  if (feenox.pde.M != NULL) {
+    petsc_call(MatAssemblyEnd(feenox.pde.M, MAT_FINAL_ASSEMBLY));
+  }
+  
+  return FEENOX_OK;
+}

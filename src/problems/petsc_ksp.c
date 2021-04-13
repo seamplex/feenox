@@ -30,8 +30,7 @@ int feenox_solve_petsc_linear(void) {
   
 //  time_checkpoint(build_begin);
   feenox_call(feenox_build());
-  // the arguments to eval() are needed only for multi-point constrains
-  feenox_call(feenox_dirichlet_eval(feenox.pde.K, feenox.pde.b));
+  feenox_call(feenox_dirichlet_eval());
   feenox_call(feenox_dirichlet_set_K(feenox.pde.K, feenox.pde.b));
 //  time_checkpoint(build_end);
 

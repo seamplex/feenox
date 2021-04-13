@@ -37,10 +37,10 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
     material = element->physical_group->material;
   }
   
-  feenox_mesh_compute_integration_weight_at_gauss(element, v, feenox.pde.mesh->integration);
-  feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration);
-  feenox_mesh_compute_B_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration);
-  feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration);
+  feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_B_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(element, v);
   double r_for_axisymmetric = 1;
   

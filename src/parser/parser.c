@@ -3303,6 +3303,17 @@ int feenox_parse_material(void) {
         
     } else {
 ///kw+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
+///kw+BC+detail The names of the properties in principle can be arbitrary, but each problem type
+///kw+BC+detail needs a minimum set of properties defined with particular names.
+///kw+BC+detail For example, steady-state thermal problems need at least the conductivity which 
+///kw+BC+detail should be named\ `k`. If the problem is transient, it will also need
+///kw+BC+detail heat capacity\ `rhocp` or diffusivity\ `alpha`. 
+///kw+BC+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
+///kw+BC+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
+///kw+BC+detail Besides these mandatory properties, any other one can be defined.
+///kw+BC+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
+///kw+BC+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
+///kw+BC+detail be used in the expression that defines the mandatory property.
       
       char *property_name = NULL;
       char *expr_string = NULL;
@@ -3333,6 +3344,12 @@ int feenox_parse_bc(void) {
 
 ///kw+BC+usage <name>
 ///kw+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
+  
+  if (feenox.pde.type == type_none) {
+    feenox_push_error_message("BC before setting the PROBLEM type");
+    return FEENOX_ERROR;
+  }
+  
   char *bc_name = NULL;
   feenox_call(feenox_parser_string(&bc_name));
 
@@ -3356,8 +3373,8 @@ int feenox_parse_bc(void) {
       feenox_free(mesh_name);
     
 ///kw+BC+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
-///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh, they can be
-///kw+BC+detail added using as many `PHYSICAL_GROUP` keywords as needed. 
+///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh,
+///kw+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
@@ -3374,7 +3391,13 @@ int feenox_parse_bc(void) {
       feenox_free(physical_group_name);
         
     } else {
-///kw+MATERIAL+usage [ <bc_data1> [ <bc_data2> [ ... ] ] ]
+///kw+BC+usage [ <bc_data1> [ <bc_data2> [ ... ] ] ]
+///kw+BC+detail Each `<bc_data>` argument is a string whose meaning depends on the type
+///kw+BC+detail of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
+///kw+BC+detail temperature to depend on space as the provided expression in a
+///kw+BC+detail thermal problem and `fixed` fixes the displacements in all the directions
+///kw+BC+detail in a mechanical or modal problem. 
+///kw+BC+detail See the particular section on boundary conditions for further details.
       
       if (feenox_add_bc_data_get_ptr(bc, token) == NULL) {
         return FEENOX_ERROR;
@@ -3383,8 +3406,6 @@ int feenox_parse_bc(void) {
   }
   feenox_free(bc_name);
   
-  // TODO: apply the bc to the group named name if it exists
-      
   return FEENOX_OK;
 }
 
