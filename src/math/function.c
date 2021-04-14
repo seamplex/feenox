@@ -22,6 +22,80 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
+int feenox_define_function(const char *name, unsigned int n_arguments) {
+  return (feenox_define_function_get_ptr(name, n_arguments) != NULL) ? FEENOX_OK : FEENOX_ERROR;
+}
+
+  
+function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments) {
+
+  if (feenox_check_name(name) != FEENOX_OK) {
+    return NULL;
+  }
+
+  function_t *function = NULL;
+  feenox_check_alloc_null(function = calloc(1, sizeof(function_t)));
+  feenox_check_alloc_null(function->name = strdup(name));
+  function->n_arguments = n_arguments;
+  
+  feenox_check_alloc_null(function->var_argument = calloc(n_arguments, sizeof(var_t *)));
+  function->var_argument_allocated = 1;
+  
+  // default columns
+  feenox_check_alloc_null(function->column = calloc((n_arguments+1), sizeof(int)));
+  int i;
+  for (i = 0; i < n_arguments+1; i++) {
+    function->column[i] = i+1;
+  }
+  
+  HASH_ADD_KEYPTR(hh, feenox.functions, function->name, strlen(function->name), function);
+
+  return function;
+}
+
+int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name) {
+  
+  function_t *function;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  if (i < 0) {
+    feenox_push_error_message("negative argument number '%d'", i);
+    return FEENOX_ERROR;
+  }
+  if (i >= function->n_arguments) {
+    feenox_push_error_message("argument number '%d' greater or equal than the number of arguments '%d' (they start from zero)", i, function->n_arguments);
+    return FEENOX_ERROR;
+  }
+  
+  if ((function->var_argument[i] = feenox_get_or_define_variable_get_ptr(variable_name)) == NULL) {
+    return FEENOX_ERROR;
+  }
+  
+  // mark that we received an argument to see if we got them all when initializing
+  function->n_arguments_given++;
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_function_set_expression(const char *name, const char *expression) {
+  
+  function_t *function;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  function->type = function_type_algebraic;
+  feenox_call(feenox_expression_parse(&function->algebraic_expression, expression));  
+  
+  return FEENOX_OK;
+}
+
+
 // set the variables that are a function's argument equal to the vector x
 void feenox_set_function_args(function_t *this, double *x) {
   int i;
@@ -42,41 +116,33 @@ void feenox_set_function_args(function_t *this, double *x) {
 // the arguments are inside the structure
 double feenox_factor_function_eval(expr_item_t *this) {
 
-  int i;
-  double *x;
-  double x0;
-  double y;
+  double y = 0;
 
-
-//   feenox_push_error_message("when computing function %s", token->function->name);
-
+  // in order to avoid having to allocate and free too much,
+  // one-dimensional functions are treated differently
   if (this->function->n_arguments == 1) {
-
-    // para no tener que hacer malloc y frees todo el tiempo, para un solo argumento lo
-    // hacemos diferente
-    x0 = feenox_expression_eval(&this->arg[0]);
+    
+    double x0 = feenox_expression_eval(&this->arg[0]);
     y = feenox_function_eval(this->function, &x0);
 
   } else {
 
-    // muchos argumentos necesitan vectores
-    x = malloc(this->function->n_arguments*sizeof(double));
+    double *x = NULL;
+    feenox_check_alloc(x = malloc(this->function->n_arguments*sizeof(double)));
 
+    unsigned int i;
     for (i = 0; i < this->function->n_arguments; i++) {
       x[i] = feenox_expression_eval(&this->arg[i]);
     }
 
     y = feenox_function_eval(this->function, x);
-
-    free(x);
+    feenox_free(x);
     
   }
 
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();
   }
-
-//   feenox_pop_error_message();  
 
   return y;
 
@@ -85,267 +151,261 @@ double feenox_factor_function_eval(expr_item_t *this) {
 
 int feenox_function_init(function_t *this) {
 
-/*  
-  int i, j, k;
-  int nx, ny, nz;
-*/
   if (this->initialized) {
     return 0;
   }
   
-  if (this->n_arguments_given != this->n_arguments) {
-    feenox_push_error_message("function '%s' needs %d arguments and %d were given", this->name, this->n_arguments, this->n_arguments_given);
+  // TODO: arrange into smaller functions
+  // TODO: initialize mesh-based functions
+  if (this->type == function_type_algebraic && this->n_arguments_given != this->n_arguments) {
+    feenox_push_error_message("algebraic function '%s' needs %d arguments and %d were given", this->name, this->n_arguments, this->n_arguments_given);
+    return FEENOX_ERROR;
   }
   
-  this->initialized = 1;
-
-/*  
-  if (function->type == type_pointwise_vector) {
-    for (i = 0; i < function->n_arguments; i++) {
+  if (this->type == function_type_pointwise_vector) {
+    unsigned int i = 0;
+    for (i = 0; i < this->n_arguments; i++) {
       
-      if (!function->vector_argument[i]->initialized) {
-        feenox_call(feenox_vector_init(function->vector_argument[i]));
+      if (!this->vector_argument[i]->initialized) {
+        feenox_call(feenox_vector_init(this->vector_argument[i]));
       }
       
-      if (function->data_size == 0) {
-        function->data_size = function->vector_argument[i]->size;
+      if (this->data_size == 0) {
+        this->data_size = this->vector_argument[i]->size;
       } else {
-        if (function->vector_argument[i]->size != function->data_size) {
-          feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", function->data_size, function->vector_argument[i]->size, function->name);
-          return WASORA_RUNTIME_ERROR;
+        if (this->vector_argument[i]->size != this->data_size) {
+          feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", this->data_size, this->vector_argument[i]->size, this->name);
+          return FEENOX_ERROR;
         }
       }
 
-      function->data_argument[i] = gsl_vector_ptr(feenox_var_value_ptr(function->vector_argument[i]), 0);
+      this->data_argument[i] = gsl_vector_ptr(&feenox_var_value(this->vector_argument[i]), 0);
     }
   }
   
-  if (function->vector_value != NULL) {
+  if (this->vector_value != NULL) {
 
-    if (!function->vector_value->initialized) {
-      feenox_call(feenox_vector_init(function->vector_value));
+    if (!this->vector_value->initialized) {
+      feenox_call(feenox_vector_init(this->vector_value));
     }
-    if (function->vector_value->size != function->data_size) {
-      feenox_push_error_message("vector sizes do not match (%d and %d)", function->data_size, function->vector_value->size);
-      return WASORA_PARSER_ERROR;
+    if (this->vector_value->size != this->data_size) {
+      feenox_push_error_message("vector sizes do not match (%d and %d)", this->data_size, this->vector_value->size);
+      return FEENOX_ERROR;
     }
     
     // rellenamos las variables f_a f_b y f_c
-    if (function->n_arguments == 1) {
+    if (this->n_arguments == 1) {
       var_t *dummy_var;
-      char *dummy_aux = malloc(strlen(function->name) + 4);
       
-      sprintf(dummy_aux, "%s_a", function->name);
-      if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
-        return WASORA_PARSER_ERROR;
-      }
-      feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
+      // TODO: asprintf
+      char *dummy_aux = malloc(strlen(this->name) + 4);
       
-      sprintf(dummy_aux, "%s_b", function->name);
+      sprintf(dummy_aux, "%s_a", this->name);
       if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
-        return WASORA_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
-      feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
+      feenox_realloc_variable_ptr(dummy_var, &this->data_argument[0][0], 0);
       
-      sprintf(dummy_aux, "%s_n", function->name);
+      sprintf(dummy_aux, "%s_b", this->name);
       if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
-        return WASORA_PARSER_ERROR;
+        return FEENOX_ERROR;
       }
-      free(dummy_aux);
-      feenox_var_value(dummy_var) = (double)function->data_size;
+      feenox_realloc_variable_ptr(dummy_var, &this->data_argument[0][this->data_size-1], 0);
+      
+      sprintf(dummy_aux, "%s_n", this->name);
+      if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      feenox_free(dummy_aux);
+      feenox_var_value(dummy_var) = (double)this->data_size;
     }
 
-    function->data_value = gsl_vector_ptr(feenox_var_value_ptr(function->vector_value), 0);
+    this->data_value = gsl_vector_ptr(&feenox_var_value(this->vector_value), 0);
 
   }
   
-  if (function->data_size != 0) {
-    if (function->expr_multidim_threshold.n_tokens != 0) {
-      function->multidim_threshold = feenox_expression_eval(&function->expr_multidim_threshold);
-    } else {
-      function->multidim_threshold = DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
-    }
-    if (function->mesh == NULL) {
-      if (function->n_arguments == 1) {
+  if (this->data_size != 0) {
+    this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
+    if (this->mesh == NULL) {
+      if (this->n_arguments == 1) {
 
-        if (function->interp_type.name == NULL) {
+        if (this->interp_type.name == NULL) {
           // interpolacion 1D por default 
-          function->interp_type = DEFAULT_INTERPOLATION;      
+          this->interp_type = DEFAULT_INTERPOLATION;      
         }
 
-        if ((function->interp = gsl_interp_alloc(&function->interp_type, function->data_size)) == NULL) {
-          feenox_push_error_message("interpolation method for function '%s' needs more points", function->name);
-          return WASORA_PARSER_ERROR;
+        if ((this->interp = gsl_interp_alloc(&this->interp_type, this->data_size)) == NULL) {
+          feenox_push_error_message("interpolation method for function '%s' needs more points", this->name);
+          return FEENOX_ERROR;
         }
 
-        function->interp_accel = gsl_interp_accel_alloc();
+        this->interp_accel = gsl_interp_accel_alloc();
 
         // si no es de tipo vector, inicializamos el interpolador (los datos quedan fijos) 
         // porque si es vector y los vectores tienen fruta, el interpolador se queja 
-        if (function->type != type_pointwise_vector) {
-          feenox_push_error_message("in function %s", function->name);
-          gsl_interp_init(function->interp, function->data_argument[0], function->data_value, function->data_size);
+        if (this->type != function_type_pointwise_vector) {
+          feenox_push_error_message("in function %s", this->name);
+          gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size);
           feenox_pop_error_message();
         }
 
       } else {
 
-        if (function->expr_shepard_radius.n_tokens != 0) {
-          function->shepard_radius = feenox_expression_eval(&function->expr_shepard_radius);
-        } else {
-          function->shepard_radius = DEFAULT_SHEPARD_RADIUS;
-        }
-        if (function->expr_shepard_exponent.n_tokens != 0) {
-          function->shepard_exponent = feenox_expression_eval(&function->expr_shepard_exponent);
-        } else {
-          function->shepard_exponent = DEFAULT_SHEPARD_EXPONENT;
-        }
+        this->shepard_radius = (this->expr_shepard_radius.items != NULL) ? feenox_expression_eval(&this->expr_shepard_radius) : DEFAULT_SHEPARD_RADIUS;
+        this->shepard_exponent = (this->expr_shepard_exponent.items != NULL) ? feenox_expression_eval(&this->expr_shepard_exponent) : DEFAULT_SHEPARD_EXPONENT;
 
-        if (function->n_arguments == 2) {
+        if (this->n_arguments == 2) {
 
           // miramos si tiene una malla regular en 2d
-          if (feenox_is_structured_grid_2d(function->data_argument[0], function->data_argument[1], function->data_size, &nx, &ny)) {
-            function->rectangular_mesh = 1;
-            function->x_increases_first = 1;
-          } else if (feenox_is_structured_grid_2d(function->data_argument[1], function->data_argument[0], function->data_size, &ny, &nx)) {
-            function->rectangular_mesh = 1;
-            function->x_increases_first = 0;
+          int nx, ny;
+          if (feenox_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
+            this->rectangular_mesh = 1;
+            this->x_increases_first = 1;
+          } else if (feenox_is_structured_grid_2d(this->data_argument[1], this->data_argument[0], this->data_size, &ny, &nx)) {
+            this->rectangular_mesh = 1;
+            this->x_increases_first = 0;
           } else {
-            function->rectangular_mesh = 0;
+            this->rectangular_mesh = 0;
           }
 
-          if (function->rectangular_mesh) {
-            function->rectangular_mesh_size = malloc(2*sizeof(int));
-            function->rectangular_mesh_size[0] = nx;
-            function->rectangular_mesh_size[1] = ny;
+          if (this->rectangular_mesh) {
+            this->rectangular_mesh_size = malloc(2*sizeof(int));
+            this->rectangular_mesh_size[0] = nx;
+            this->rectangular_mesh_size[1] = ny;
           }
 
-        } else if (function->n_arguments == 3) {
+        } else if (this->n_arguments == 3) {
 
           // miramos si tiene una malla regular en 3d
-          if (feenox_is_structured_grid_3d(function->data_argument[0], function->data_argument[1], function->data_argument[2], function->data_size, &nx, &ny, &nz)) {
-            function->rectangular_mesh = 1;
-            function->x_increases_first = 1;
-          } else if (feenox_is_structured_grid_3d(function->data_argument[2], function->data_argument[1], function->data_argument[0], function->data_size, &nz, &ny, &nx)) {
-            function->rectangular_mesh = 1;
-            function->x_increases_first = 0;
+          int nx, ny, nz;
+          if (feenox_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
+            this->rectangular_mesh = 1;
+            this->x_increases_first = 1;
+          } else if (feenox_is_structured_grid_3d(this->data_argument[2], this->data_argument[1], this->data_argument[0], this->data_size, &nz, &ny, &nx)) {
+            this->rectangular_mesh = 1;
+            this->x_increases_first = 0;
           } else {
-            function->rectangular_mesh = 0;
+            this->rectangular_mesh = 0;
           }
 
-          if (function->rectangular_mesh) {
-            function->rectangular_mesh_size = malloc(3*sizeof(int));
-            function->rectangular_mesh_size[0] = nx;
-            function->rectangular_mesh_size[1] = ny;
-            function->rectangular_mesh_size[2] = nz;
+          if (this->rectangular_mesh) {
+            this->rectangular_mesh_size = malloc(3*sizeof(int));
+            this->rectangular_mesh_size[0] = nx;
+            this->rectangular_mesh_size[1] = ny;
+            this->rectangular_mesh_size[2] = nz;
           }
 
         } else {
 
           // estamos en el caso de mayor dimension que 3
           // confiamos de una que es rectangular
-          function->rectangular_mesh = 1;
+          this->rectangular_mesh = 1;
 
-          if (function->expr_x_increases_first.n_tokens != 0) {
-            function->x_increases_first = feenox_expression_eval(&function->expr_x_increases_first);
+          if (this->expr_x_increases_first.items != NULL) {
+            this->x_increases_first = feenox_expression_eval(&this->expr_x_increases_first);
           } else {
             feenox_push_error_message("missing expression for X_INCREASES_FIRST keyword");
-            return WASORA_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
 
-          function->rectangular_mesh_size = malloc(function->n_arguments*sizeof(int));
+          this->rectangular_mesh_size = malloc(this->n_arguments*sizeof(int));
 
-          if (function->expr_rectangular_mesh_size != NULL) {
-            for (i = 0; i < function->n_arguments; i++) {
-              if (function->expr_rectangular_mesh_size[i].n_tokens != 0) {
-                function->rectangular_mesh_size[i] = round(feenox_expression_eval(&function->expr_rectangular_mesh_size[i]));
-                if (function->rectangular_mesh_size[i] < 2) {
-                  feenox_push_error_message("size %d for argument number %d in function '%s' cannot be less than two", function->rectangular_mesh_size[i], i+1, function->name);
-                  return WASORA_RUNTIME_ERROR;
+          if (this->expr_rectangular_mesh_size != NULL) {
+            unsigned int i = 0;
+            for (i = 0; i < this->n_arguments; i++) {
+              if (this->expr_rectangular_mesh_size[i].items != NULL) {
+                this->rectangular_mesh_size[i] = round(feenox_expression_eval(&this->expr_rectangular_mesh_size[i]));
+                if (this->rectangular_mesh_size[i] < 2) {
+                  feenox_push_error_message("size %d for argument number %d in function '%s' cannot be less than two", this->rectangular_mesh_size[i], i+1, this->name);
+                  return FEENOX_ERROR;
                 }
               }
             }
           } else {
             feenox_push_error_message("missing expressions for SIZES keyword");
-            return WASORA_PARSER_ERROR;
+            return FEENOX_ERROR;
           }
         }
 
-        if (function->rectangular_mesh) {
+        if (this->rectangular_mesh) {
 
           int step;
 
           // checkeamos solo el size (porq el usuario pudo meter fruta para dimension mayor a 3)
-          j = 1;
-          for (i = 0; i < function->n_arguments; i++) {
-            j *= function->rectangular_mesh_size[i];
+          unsigned int i = 0;
+          unsigned int j = 1;
+          for (i = 0; i < this->n_arguments; i++) {
+            j *= this->rectangular_mesh_size[i];
           }
-          if (function->data_size != j) {
-            feenox_push_error_message("data size of function %s do not match with the amount of given values", function->name);
-            return WASORA_RUNTIME_ERROR;
-          }
-
-          function->rectangular_mesh_point = malloc(function->n_arguments*sizeof(double *));
-          for (i = 0; i < function->n_arguments; i++) {
-            function->rectangular_mesh_point[i] = malloc(function->rectangular_mesh_size[i]*sizeof(double));
+          if (this->data_size != j) {
+            feenox_push_error_message("data size of function %s do not match with the amount of given values", this->name);
+            return FEENOX_ERROR;
           }
 
-          if (function->x_increases_first) {
+          this->rectangular_mesh_point = malloc(this->n_arguments*sizeof(double *));
+          for (i = 0; i < this->n_arguments; i++) {
+            this->rectangular_mesh_point[i] = malloc(this->rectangular_mesh_size[i]*sizeof(double));
+          }
+
+          if (this->x_increases_first) {
             step = 1;
-            for (i = 0; i < function->n_arguments; i++) {
-              for (j = 0; j < function->rectangular_mesh_size[i]; j++) {
-                function->rectangular_mesh_point[i][j] = function->data_argument[i][step*j];
+            for (i = 0; i < this->n_arguments; i++) {
+              for (j = 0; j < this->rectangular_mesh_size[i]; j++) {
+                this->rectangular_mesh_point[i][j] = this->data_argument[i][step*j];
               }
-              step *= function->rectangular_mesh_size[i];
+              step *= this->rectangular_mesh_size[i];
             }
           } else {
-            step = function->data_size;
-            for (i = 0; i < function->n_arguments; i++) {
-              step /= function->rectangular_mesh_size[i];
-              for (j = 0; j < function->rectangular_mesh_size[i]; j++) {
-                function->rectangular_mesh_point[i][j] = function->data_argument[i][step*j];
+            step = this->data_size;
+            for (i = 0; i < this->n_arguments; i++) {
+              step /= this->rectangular_mesh_size[i];
+              for (j = 0; j < this->rectangular_mesh_size[i]; j++) {
+                this->rectangular_mesh_point[i][j] = this->data_argument[i][step*j];
               }
             }
           }
         }
       }
     
-      if (function->rectangular_mesh == 0 && function->multidim_interp == bilinear) {
-        feenox_push_error_message("rectangular interpolation of function '%s' needs a rectangular mesh", function->name);
-        return WASORA_RUNTIME_ERROR;
+      if (this->rectangular_mesh == 0 && this->multidim_interp == interp_bilinear) {
+        feenox_push_error_message("rectangular interpolation of this '%s' needs a rectangular mesh", this->name);
+        return FEENOX_ERROR;
       }
 
-//      if (function->n_arguments > 3 && function->multidim_interp == rectangle) {
-//        feenox_push_error_message("rectangular interpolation does not work for dimensions higher than three (function '%s' has %d arguments)", function->name, function->n_arguments);
-//        return WASORA_RUNTIME_ERROR;
+//      if (this->n_arguments > 3 && this->multidim_interp == rectangle) {
+//        feenox_push_error_message("rectangular interpolation does not work for dimensions higher than three (function '%s' has %d arguments)", this->name, this->n_arguments);
+//        return FEENOX_ERROR;
 //      }
 
-      if (function->n_arguments > 1 && (function->multidim_interp == nearest || function->multidim_interp == shepard_kd)) {
+      if (this->n_arguments > 1 && (this->multidim_interp == interp_nearest || this->multidim_interp == interp_shepard_kd)) {
 
         double *point;
 
-        point = malloc(function->n_arguments*sizeof(double));
-        function->kd = kd_create(function->n_arguments);
+        point = malloc(this->n_arguments*sizeof(double));
+        this->kd = kd_create(this->n_arguments);
 
-        for (j = 0; j < function->data_size; j++) {
-          for (k = 0; k < function->n_arguments; k++) {
-            point[k] = function->data_argument[k][j];
+        size_t j = 0;
+        unsigned int k = 0;
+        for (j = 0; j < this->data_size; j++) {
+          for (k = 0; k < this->n_arguments; k++) {
+            point[k] = this->data_argument[k][j];
           }
-          kd_insert(function->kd, point, &function->data_value[j]);
+          kd_insert(this->kd, point, &this->data_value[j]);
         }
 
-        free(point);
+        feenox_free(point);
       }
     }
   }
-*/
+  
+  this->initialized = 1;
+
   return FEENOX_OK;  
 }
 
 // evaluate a function
 double feenox_function_eval(function_t *this, const double *x) {
 
-  int i;
   double y = 0;
   
   // check if we need to initialize
@@ -356,86 +416,65 @@ double feenox_function_eval(function_t *this, const double *x) {
   }
   
   // if the function is mesh, check if the time is the correct one
-/*  
-  if (this->mesh != NULL && this->name_in_mesh != NULL && this->mesh->format == mesh_format_gmsh
+  if (this->mesh != NULL && this->name_in_mesh != NULL && this->mesh->reader == feenox_mesh_read_gmsh
       && this->mesh_time < feenox_special_var_value(t)-0.001*feenox_special_var_value(dt)) {
-    feenox_call(mesh_gmsh_update_function(function, feenox_special_var_value(t), feenox_special_var_value(dt)));
+    feenox_call(mesh_gmsh_update_function(this, feenox_special_var_value(t), feenox_special_var_value(dt)));
     this->mesh_time = feenox_special_var_value(t);
   }
     
-
-  if (this->type == type_pointwise_mesh_node) {
-    return mesh_interpolate_function_node(function, x);
+  // TODO: virtual methods
+  if (this->type == function_type_pointwise_mesh_node) {
+    return feenox_mesh_interpolate_function_node(this, x);
     
-  } else if (this->type == type_pointwise_mesh_cell) {
-    return mesh_interpolate_function_cell(function, x);
+  } else if (this->type == function_type_pointwise_mesh_cell) {
+//    return mesh_interpolate_function_cell(this, x);
+    y = 0;
     
-  } else if (this->type == type_pointwise_mesh_property) {
-    return mesh_interpolate_function_property(function, x);
+  } else if (this->type == function_type_pointwise_mesh_property) {
+    y = feenox_function_property_eval(this, x);
     
-  } else if (this->type == type_routine) {
+  } else if (this->type == function_type_routine) {
     y = this->routine(x);
     
-  } else if (this->type == type_routine_internal) {
-    y = this->routine_internal(x, function);
+  } else if (this->type == function_type_routine_internal) {
+    y = this->routine_internal(x, this);
     
-  } else if (this->algebraic_expression.n_tokens != 0 && this->n_arguments == 1) {
-*/
-  
-  if (this->algebraic_expression.items != NULL) {
+  } else if (this->algebraic_expression.items != NULL) {
+
     if (this->n_arguments == 1) {
       
-      // TODO: should we keep this or leave the arguments as they are?
-//      double x_old = feenox_var_value(this->var_argument[0]);
       feenox_var_value(this->var_argument[0]) = x[0];
       y = feenox_expression_eval(&this->algebraic_expression);
-//      feenox_var_value(this->var_argument[0]) = x_old;
       
     } else {
 
-//      double *vecx_old = malloc(this->n_arguments*sizeof(double));
+      unsigned int i = 0;
       for (i = 0; i < this->n_arguments; i++) {
-//        vecx_old[i] = feenox_var_value(this->var_argument[i]);
         feenox_var_value(this->var_argument[i]) = x[i];
       }
 
       y = feenox_expression_eval(&this->algebraic_expression);
 
-//      for (i = 0; i < this->n_arguments; i++) {
-//        feenox_var_value(this->var_argument[i]) = vecx_old[i];
-//      }
-
-//      free(vecx_old);
-
     }
     
-  } else if (this->data_size != 0 && this->n_arguments == 1) {
+  } else if (this->data_size != 0) {
+    
+    if (this->n_arguments == 1) {
 
-    // funcion definida por puntos unidimensional
-    // OJO! la GSL 1.15 no extrapola, devuelve nan y a comerla, asi que ante
-    // de que nos devuelva porquerias miramos que onda
-    // TODO: see if we need to keep this
-    if (x[0] < this->data_argument[0][0]) {
-      y = this->data_value[0] - (this->data_value[1]-this->data_value[0])/(this->data_argument[0][1]-this->data_argument[0][0]) * (this->data_argument[0][0] - x[0]);
-    } else if (x[0] > this->data_argument[0][this->data_size-1]) {
-      y = this->data_value[this->data_size-1] + (this->data_value[this->data_size-1]-this->data_value[this->data_size-2])/(this->data_argument[0][this->data_size-1]-this->data_argument[0][this->data_size-2]) * (x[0] - this->data_argument[0][this->data_size-1]);
-    } else {
+      // one-dimensional pointwise-defined functions are handled by GSL
       if (this->type == function_type_pointwise_vector) {
         if (gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size) != GSL_SUCCESS) {
           feenox_runtime_error();
         }
       }
-      if (this->interp != NULL) {
-        y = gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel);
-      } else {
-        // esto puede ser por la evaluacion a tiempo de parseo
-        y = 0;
-      }
-    }
+    
+      y = (this->interp != NULL) ? gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel) : 0;
 
-  } else if (this->data_size != 0 && this->n_arguments > 1) {
+    } else {
+      
 
-    // multi-dimensional pointwise-defined function
+      // multi-dimensional pointwise-defined function are not handled by GSL
+      y = 0;
 /*    
     int j;
  
@@ -531,7 +570,7 @@ double feenox_function_eval(function_t *this, const double *x) {
         }
         y = num/den;
       }
-      free(x_i);
+      feenox_free(x_i);
     
     } else if (this->multidim_interp == bilinear && this->rectangular_mesh_size != NULL) {
 
@@ -609,14 +648,14 @@ double feenox_function_eval(function_t *this, const double *x) {
         }
         
         y *= 1.0/(1<<this->n_arguments);
-        free(ctilde);
+        feenox_free(ctilde);
         
       }
 
-      free(r);
-      free(c);
-      free(b);
-      free(a);
+      feenox_free(r);
+      feenox_free(c);
+      feenox_free(b);
+      feenox_free(a);
 
 
 
@@ -672,8 +711,8 @@ double feenox_function_eval(function_t *this, const double *x) {
           // si dist[n] es muy chiquito, nos pidieron justo un punto de los
           // de la tabla asi que devolvemos ese y a comerla
           if (dist[n] < this->multidim_threshold) {
-            free(dist);
-            free(index);
+            feenox_free(dist);
+            feenox_free(index);
             return this->data_value[i];
           }
 
@@ -807,13 +846,14 @@ double feenox_function_eval(function_t *this, const double *x) {
       gsl_vector_free(coeff);
       gsl_matrix_free(A);
 
-      free(closest);
+      feenox_free(closest);
 
-      free(dist);
-      free(index);
+      feenox_free(dist);
+      feenox_free(index);
 
     }
 */
+    }
   }
 
 
@@ -852,3 +892,121 @@ int feenox_structured_scalar_index(int n_dims, int *size, int *index, int x_incr
   
 }
 */
+
+
+// mira si los n puntos en x[] y en y[] forman una grilla estruturada
+int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny) {
+
+  int i, j;
+    
+  // hacemos una primera pasada sobre x hasta encontrar de nuevo el primer valor
+  i = 0;
+  do {
+    if (++i == n) {   
+      // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
+      return 0;
+    }
+  } while (gsl_fcmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
+  
+  // si i es uno entonces a comerla
+  if (i == 1) {
+    return 0;
+  }
+    
+  // asumimos que la cantidad de datos en x es i
+  *nx = i;
+  // y entonces ny tiene que ser la cantidad de datos totales dividido data_size
+  if (n % (*nx) != 0) {
+    // si esto no es entero, no puede ser rectangular
+    return 0;
+  }
+  *ny = n/(*nx);
+
+  // si x[j] != x[j-nx] entonces no es una grilla estructurada
+  for (i = *nx; i < n; i++) {
+    if (gsl_fcmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
+      return 0;
+    }
+  }
+  
+  // ahora miramos el conjunto y, tienen que ser nx valores igualitos consecutivos
+  for (i = 0; i < *ny; i++) {
+    for (j = 0; j < (*nx)-1; j++) {
+      if (gsl_fcmp(y[i*(*nx) + j], y[i*(*nx) + j + 1], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(y[n-1]-y[0])) != 0) {
+        return 0;
+      }
+    }
+  }
+  
+
+  // si llegamos hasta aca, es una grilla bidimensional estructurada!
+  return 1;
+    
+}
+
+
+// mira si los n puntos en x[], y[] y z[] forman una grilla estruturada
+int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz) {
+
+  int i;
+  
+  // hacemos una pasada sobre x hasta encontrar de nuevo el primer valor
+  i = 0;
+  do {
+    i += 1;
+    if (i == n) {   
+      // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
+      return 0;
+    }
+  } while (gsl_fcmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
+
+  // si i es uno entonces a comerla
+  if (i == 1) {
+    return 0;
+  }
+    
+  // asumimos que la cantidad de datos en x es i
+  *nx = i;
+
+  // hacemos una pasada sobre y hasta encontrar de nuevo el primer valor
+  // pero con step nx
+  i = 0;
+  do {
+    i += *nx;
+    if (i >= n) {   
+      // si recorrimos todo el set y nunca aparecio otra vez el y[0] a comerla
+      return 0;
+    }
+  } while (gsl_fcmp(y[i], y[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
+  
+  // si i es uno entonces a comerla
+  if (i == *nx || i % ((*nx)) != 0) {
+    return 0;
+  }
+
+  // asumimos que la cantidad de datos en x es i
+  *ny = i/(*nx);
+  
+  
+  // y entonces nz tiene que ser la cantidad de datos totales dividido data_size
+  if (n % ((*ny)*(*nx)) != 0) {
+    // si esto no es entero, no puede ser rectangular
+    return 0;
+  }
+  *nz = n/((*ny)*(*nx));
+
+
+  for (i = *nx; i < n; i++) {
+    if (gsl_fcmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
+      return 0;
+    }
+  }
+  for (i = (*nx)*(*ny); i < n; i++) {
+    if (gsl_fcmp(y[i], y[i-(*nx)*(*ny)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
+      return 0;
+    }
+  }
+  
+  
+  return 1;    
+}

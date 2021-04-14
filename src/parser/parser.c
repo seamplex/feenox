@@ -43,9 +43,9 @@ int feenox_parse_main_input_file(const char *filepath) {
 #endif
   feenox_parser.actual_buffer_size = feenox_parser.page_size-64;
   
-  feenox_parser.line = malloc(feenox_parser.actual_buffer_size);
+  feenox_check_alloc(feenox_parser.line = malloc(feenox_parser.actual_buffer_size));
   feenox_call(feenox_parse_input_file(filepath, 0, 0));
-  free(feenox_parser.line);
+  feenox_free(feenox_parser.line);
 
   if (feenox_parser.active_conditional_block != NULL) {
     feenox_push_error_message("conditional block not closed");
@@ -97,11 +97,11 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       // the original for assignements and equations
       feenox_check_alloc(feenox_parser.full_line = strdup(feenox_parser.line));
       if (feenox_parse_line() != FEENOX_OK) {
-        free(feenox_parser.full_line);
+        feenox_free(feenox_parser.full_line);
         feenox_push_error_message("%s: %d:", filepath, line_num);
         return FEENOX_ERROR;
       }
-      free(feenox_parser.full_line);
+      feenox_free(feenox_parser.full_line);
     }
   }
 
@@ -119,9 +119,9 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
 // feenox line parser
 int feenox_parse_line(void) {
 
-  char *token = NULL;
   char *equal_sign = NULL;
-
+  char *token = NULL;
+  
   if ((token = feenox_get_next_token(feenox_parser.line)) != NULL) {
     
 ///kw+INCLUDE+usage INCLUDE
@@ -271,19 +271,49 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
-///kw+MATERIAL+desc Define a material its and properties.
-///kw+MATERIAL+usage MATERIAL
-      // -----  -----------------------------------------------------------
-    } else if (strcasecmp(token, "MATERIAL") == 0) {
-      feenox_call(feenox_parse_material());
-      return FEENOX_OK;
-
 ///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
 ///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       feenox_call(feenox_parse_physical_group());
       return FEENOX_OK;
+
+///kw+MATERIAL+desc Define a material its and properties to be used in volumes.
+///kw+MATERIAL+usage MATERIAL
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "MATERIAL") == 0) {
+      feenox_call(feenox_parse_material());
+      return FEENOX_OK;
+
+///kw+BC+desc Define a boundary condition to be applied to faces, edges and/or vertices.
+///kw+BC+usage BC
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
+      feenox_call(feenox_parse_bc());
+      return FEENOX_OK;
+      
+///kw+PROBLEM+desc Sets the problem type that FeenoX has to solve.      
+///kw+PROBLEM+usage PROBLEM
+    } else if (strcasecmp(token, "PROBLEM") == 0) {
+#ifdef HAVE_PETSC      
+      feenox_call(feenox_parse_problem());
+      return FEENOX_OK;
+#else
+      feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
+      return FEENOX_ERROR;
+#endif      
+      
+///kw+SOLVE_PROBLEM+desc Explicitly solve the PDE problem.
+///kw+SOLVE_PROBLEM+usage SOLVE_PROBLEM
+    } else if (strcasecmp(token, "SOLVE_PROBLEM") == 0) {
+#ifdef HAVE_PETSC      
+      feenox_call(feenox_parse_solve_problem());
+      return FEENOX_OK;
+#else
+      feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
+      return FEENOX_ERROR;
+#endif      
+
       
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -328,7 +358,7 @@ int feenox_parse_line(void) {
             char *name;
             feenox_add_function_from_string(lhs, &name);
             feenox_call(feenox_function_set_expression(name, rhs));
-            free(name);
+            feenox_free(name);
           }  
           break;  
           case parser_dae:
@@ -583,7 +613,8 @@ int feenox_parse_line(void) {
       
 // --- SOLVE -----------------------------------------------------
 ///kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
-///kw+SOLVE+example solve1.was solve2.was
+//TODO: example
+//kw+SOLVE+example solve1.was solve2.was
 ///kw+SOLVE+usage SOLVE
       
     } else if (strcasecmp(token, "SOLVE") == 0) {
@@ -995,7 +1026,7 @@ int feenox_parse_line(void) {
       }
       LL_FOREACH_SAFE(varlist, varitem, tmp) {
         LL_DELETE(varlist, varitem);
-        free(varitem);
+        feenox_free(varitem);
       }
       return FEENOX_OK;
 
@@ -1196,7 +1227,7 @@ int feenox_parse_line(void) {
         if ((feenox.fit.sigma[i] = feenox_define_variable(sigma_name)) == NULL) {
           return FEENOX_ERROR;
         }
-        free(sigma_name);
+        feenox_free(sigma_name);
         
         if ((varitem = varitem->next) == NULL && i != feenox.fit.p-1) {
           feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
@@ -1449,21 +1480,21 @@ char *feenox_get_nth_token(char *string, int n) {
   feenox_check_alloc_null(backup = strdup(string));
 
   if ((token = strtok(backup, UNQUOTED_DELIM)) == NULL) {
-    free(backup);
+    feenox_free(backup);
     return NULL;
   }
   i = 1;
 
   while (i < n) {
     if ((token = strtok(NULL, UNQUOTED_DELIM)) == NULL) {
-      free(backup);
+      feenox_free(backup);
       return NULL;
     }
     i++;
   }
 
   feenox_check_alloc_null(desired_token = strdup(token));
-  free(backup);
+  feenox_free(backup);
 
   return desired_token;
 
@@ -1590,7 +1621,8 @@ int feenox_parse_implicit(void) {
 ///kw+IMPLICIT+detail declaration of variables can be forced by giving `IMPLICIT NONE`.
 ///kw+IMPLICIT+detail Whether implicit declaration is allowed or explicit declaration is required
 ///kw+IMPLICIT+detail depends on the last `IMPLICIT` keyword given, which by default is `ALLOWED`.
-///kw+IMPLICIT+example implicit.was
+//TODO: example
+//kw+IMPLICIT+example implicit.was
 
 ///kw+IMPLICIT+usage { NONE | ALLOWED }
   char *keywords[] = {"NONE", "ALLOWED", ""};
@@ -1726,9 +1758,9 @@ int feenox_parse_alias(void) {
   
   feenox_call(feenox_define_alias(new_name, existing_object, row, col));
   
-  free(left);
-  free(keyword);
-  free(right);
+  feenox_free(left);
+  feenox_free(keyword);
+  feenox_free(right);
       
   return FEENOX_OK;
 }
@@ -1802,11 +1834,11 @@ int feenox_parse_vector(void) {
     feenox_call(feenox_vector_attach_data(name, datas));
   }
 
-  free(name);
+  feenox_free(name);
   if (dummy_openpar == NULL) {
-    free(size);
+    feenox_free(size);
   }
-  free(function_data);
+  feenox_free(function_data);
     
   return FEENOX_OK;
       
@@ -1882,10 +1914,10 @@ int feenox_parse_matrix(void) {
     feenox_call(feenox_matrix_attach_data(name, datas));
   }
 
-  free(name);
+  feenox_free(name);
   if (dummy_openpar == NULL) {
-    free(rows);
-    free(cols);
+    feenox_free(rows);
+    feenox_free(cols);
   }
     
   return FEENOX_OK;
@@ -1895,20 +1927,14 @@ int feenox_parse_matrix(void) {
 
 int feenox_parse_function(void) {
 
-  // TODO: RAII
-  char *token = NULL;
-  
-//  char **arg_name = NULL;
-//  int n_arguments;
-//  int i;
-
 ///kw+FUNCTION+usage <function_name>(<var_1>[,var2,...,var_n])
 ///kw+FUNCTION+detail The number of variables $n$ is given by the number of arguments given between parenthesis after the function name.
 ///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined explictly as scalar variables.
+  char *token = NULL;
   feenox_call(feenox_parser_string(&token));
   
-    char *dummy_openpar;
-    if ((dummy_openpar = strchr(token, '(')) == NULL) {
+  char *dummy_openpar = NULL;
+  if ((dummy_openpar = strchr(token, '(')) == NULL) {
     feenox_push_error_message("expected opening parenthesis '(' after function name '%s' (no spaces allowed)", token);
     return FEENOX_ERROR;
   }
@@ -2247,7 +2273,7 @@ int feenox_parse_function(void) {
               return FEENOX_ERROR;
             }
             sscanf(token, "%lf", &function->data_argument[i][j]);
-            free(token);
+            feenox_free(token);
 
             //  para poder meter steps o numeros repetidos
             if (nargs == 1 && j > 0 && gsl_fcmp(function->data_argument[i][j], function->data_argument[i][j-1], 1e-12) == 0) {
@@ -2267,7 +2293,7 @@ int feenox_parse_function(void) {
             return FEENOX_ERROR;
           }
           sscanf(token, "%lf", &function->data_value[j]);
-          free(token);
+          feenox_free(token);
 
           j++;
         }
@@ -2336,8 +2362,8 @@ int feenox_parse_function(void) {
         function->data_value[i] = feenox_evaluate_expression_in_string(token);
       }
 
-      free(backup2);
-      free(backup1);
+      feenox_free(backup2);
+      feenox_free(backup1);
     }
 
 
@@ -2370,13 +2396,13 @@ int feenox_parse_function(void) {
         feenox_value(dummy_var) = (double)function->data_size;
       }
 
-      free(dummy_aux);
+      feenox_free(dummy_aux);
     }
 
   }
 */
 
-  free(name);
+  feenox_free(name);
   
   return FEENOX_OK;
   
@@ -2488,9 +2514,9 @@ int feenox_parse_file(char *mode) {
     feenox_call(feenox_file_set_path_argument(name, i, arg[i]));
   }
 
-  free(format);
-  free(custom_mode);
-  free(name);
+  feenox_free(format);
+  feenox_free(custom_mode);
+  feenox_free(name);
   
   return FEENOX_OK;
 }
@@ -2816,7 +2842,7 @@ int feenox_parse_print_function(void) {
       feenox_call(feenox_parser_string(&name));
       if ((print_function->physical_entity = feenox_get_physical_entity_ptr(name, NULL)) == NULL) {
         feenox_push_error_message("unknown physical entity '%s'", name);
-        free(name);
+        feenox_free(name);
         return FEENOX_ERROR;
       }
 */
@@ -3082,7 +3108,7 @@ int feenox_parse_read_mesh(void) {
           feenox_push_error_message("expected AS instead of '%s'", token);
           return FEENOX_ERROR;
         }
-        free(token); // valgrind told me that token was definitely lost
+        feenox_free(token); // valgrind told me that token was definitely lost
 
         feenox_call(feenox_parser_string(&function_name));
       } else {
@@ -3093,8 +3119,8 @@ int feenox_parse_read_mesh(void) {
       feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
       node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
       LL_APPEND(mesh->node_datas, node_data);
-      free(name_in_mesh);
-      free(function_name);
+      feenox_free(name_in_mesh);
+      feenox_free(function_name);
 
     } else {
       feenox_push_error_message("unknown keyword '%s'", token);
@@ -3152,9 +3178,12 @@ int feenox_parse_write_mesh(void) {
 
 
 int feenox_parse_physical_group(void) {
+///kw+PHYSICAL_GROUP+detail This keyword should seldom be needed. Most of the times,
+///kw+PHYSICAL_GROUP+detail  a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
+  
 ///kw+PHYSICAL_GROUP+usage <name>
-///kw+PHYSICAL_GROUP+detail A name is mandatory for each physical group defined within the input file.
-///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction makes no effect.
+///kw+PHYSICAL_GROUP+detail The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
+///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction has no effect.
   char *name = NULL;
   feenox_call(feenox_parser_string(&name));
 
@@ -3218,10 +3247,10 @@ int feenox_parse_physical_group(void) {
   // feenox_physical_group_add_bc()
   
       
-  free(bc_name);
-  free(material_name);
-  free(mesh_name);
-  free(name);
+  feenox_free(bc_name);
+  feenox_free(material_name);
+  feenox_free(mesh_name);
+  feenox_free(name);
   
   return FEENOX_OK;
 }
@@ -3230,37 +3259,33 @@ int feenox_parse_physical_group(void) {
 int feenox_parse_material(void) {
 
 ///kw+MATERIAL+usage <name>
-  material_t *material = NULL;
+///kw+MATERIAL+detail If the name of the material matches a physical group in the mesh, it is automatically linked to that physical group.
+  
   char *material_name = NULL;
   feenox_call(feenox_parser_string(&material_name));
-
-  // if there already exists one, add stuff to that one
-  if ((material = feenox_get_material_ptr(material_name)) == NULL) {
-    material = feenox_define_material_get_ptr(material_name);
-  }
-      
-  // TODO: this goes in define_material
-  if ((material->mesh = feenox.mesh.mesh_main) == NULL) {
-    feenox_push_error_message("MATERIAL before MESH");
-    return FEENOX_ERROR;
-  }      
-      
+  
+  // we first create the material with a null pointer for the mesh
+  // and then add it if MESH is given, in the api the mesh should be given at creation time
+  material_t *material = feenox_define_material_get_ptr(material_name, NULL);
+  
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
-    char *expr_string = NULL;
-
 ///kw+MATERIAL+usage [ MESH <name> ]
+///kw+MATERIAL+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name; 
       feenox_call(feenox_parser_string(&mesh_name));
+      // we can directly change the mesh here, in the API the mesh would be passed when creating the material
       if ((material->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
         feenox_push_error_message("undefined mesh '%s'" , mesh_name);
         return FEENOX_ERROR;
       }
-      free(mesh_name);
+      feenox_free(mesh_name);
           
 ///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+///kw+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
+///kw+MATERIAL+detail added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
@@ -3274,18 +3299,297 @@ int feenox_parse_material(void) {
           
       // TODO: api
       physical_group->material = material;
-      free(physical_group_name);
+      feenox_free(physical_group_name);
         
     } else {
-      char *name = strdup(token);
-///kw+MATERIAL+usage [ <property_name_1> <expr_1> [ <property_name_2> <expr_2> [ ... ] ] ]
-      feenox_call(feenox_parser_string(&expr_string));
-      feenox_call(feenox_define_property_data(material_name, name, expr_string));
-      free(expr_string);
-      free(name);
+///kw+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
+///kw+MATERIAL+detail The names of the properties in principle can be arbitrary, but each problem type
+///kw+MATERIAL+detail needs a minimum set of properties defined with particular names.
+///kw+MATERIAL+detail For example, steady-state thermal problems need at least the conductivity which 
+///kw+MATERIAL+detail should be named\ `k`. If the problem is transient, it will also need
+///kw+MATERIAL+detail heat capacity\ `rhocp` or diffusivity\ `alpha`. 
+///kw+MATERIAL+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
+///kw+MATERIAL+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
+///kw+MATERIAL+detail Besides these mandatory properties, any other one can be defined.
+///kw+MATERIAL+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
+///kw+MATERIAL+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
+///kw+MATERIAL+detail be used in the expression that defines the mandatory property.
+      
+      char *property_name = NULL;
+      char *expr_string = NULL;
+      
+      // now token has something like E=2.1e3 or nu=1/3
+      char *equal_sign = strchr(token, '=');
+      if (equal_sign == NULL) {
+        feenox_push_error_message("expecting an equal sign in material data '%s' such as 'E=2.1e11'", token);
+        return FEENOX_ERROR;
+      }
+      
+      *equal_sign = '\0';
+      feenox_check_alloc(property_name = strdup(token));
+      feenox_check_alloc(expr_string = strdup(equal_sign+1));
+      feenox_call(feenox_define_property_data(property_name, material_name, expr_string));
+      feenox_free(expr_string);
+      feenox_free(property_name);
     }
   }
-  free(material_name);
+  feenox_free(material_name);
       
+  return FEENOX_OK;
+}
+
+
+
+int feenox_parse_bc(void) {
+
+///kw+BC+usage <name>
+///kw+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
+  
+  if (feenox.pde.type == type_none) {
+    feenox_push_error_message("BC before setting the PROBLEM type");
+    return FEENOX_ERROR;
+  }
+  
+  char *bc_name = NULL;
+  feenox_call(feenox_parser_string(&bc_name));
+
+  // as in material above, we first create the bc with a null pointer for the mesh
+  // and then add it if MESH is given, in the api the mesh should be given at creation time
+  bc_t *bc = feenox_define_bc_get_ptr(bc_name, NULL);
+  
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+BC+usage [ MESH <name> ]
+///kw+BC+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
+    if (strcasecmp(token, "MESH") == 0) {
+      char *mesh_name; 
+      feenox_call(feenox_parser_string(&mesh_name));
+      // we can directly change the mesh here, in the API the mesh would be passed when creating the material
+      if ((bc->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("undefined mesh '%s'" , mesh_name);
+        return FEENOX_ERROR;
+      }
+      feenox_free(mesh_name);
+    
+///kw+BC+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh,
+///kw+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
+    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+      char *physical_group_name;
+      feenox_call(feenox_parser_string(&physical_group_name));  
+
+      physical_group_t *physical_group = NULL;
+      if ((physical_group = feenox_get_physical_group_ptr(physical_group_name, bc->mesh)) == NULL) {
+        if ((physical_group = feenox_define_physical_group_get_ptr(physical_group_name, bc->mesh, bc->mesh->dim_topo, 0)) == NULL) {
+          return FEENOX_ERROR;
+        }
+      }
+          
+      // TODO: api
+      LL_APPEND(physical_group->bcs, bc);
+      feenox_free(physical_group_name);
+        
+    } else {
+///kw+BC+usage [ <bc_data1> [ <bc_data2> [ ... ] ] ]
+///kw+BC+detail Each `<bc_data>` argument is a string whose meaning depends on the type
+///kw+BC+detail of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
+///kw+BC+detail temperature to depend on space as the provided expression in a
+///kw+BC+detail thermal problem and `fixed` fixes the displacements in all the directions
+///kw+BC+detail in a mechanical or modal problem. 
+///kw+BC+detail See the particular section on boundary conditions for further details.
+      
+      if (feenox_add_bc_data_get_ptr(bc, token) == NULL) {
+        return FEENOX_ERROR;
+      }
+    }
+  }
+  feenox_free(bc_name);
+  
+  return FEENOX_OK;
+}
+
+int feenox_parse_problem(void) {
+
+  int (*feenox_problem_init_parser_particular)(void);
+
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw+PROBLEM+usage [
+        
+///kw+PROBLEM+usage mechanical
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
+    if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
+      feenox.pde.type = type_mechanical;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
+      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
+      
+///kw+PROBLEM+usage thermal
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
+    } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
+      feenox.pde.type = type_thermal;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
+      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
+
+///kw+PROBLEM+usage modal
+///kw+PROBLEM+usage ]@
+///kw+PROBLEM+detail  * `modal` computes the natural frequencies and oscillation modes.        
+    } else if (strcasecmp(token, "modal") == 0) {
+#ifndef HAVE_SLEPC
+      feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
+      return FEENOX_ERROR;
+#endif
+      feenox.pde.type = type_modal;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
+      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
+      if (feenox.pde.nev == 0) {
+        feenox.pde.nev = DEFAULT_NMODES;
+      }
+          
+
+///kw+PROBLEM+usage [
+///kw+PROBLEM+usage AXISYMMETRIC
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail @
+///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimensional in the $x$-$y$ plane
+///kw+PROBLEM+detail and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$). 
+    } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
+      feenox.pde.variant = variant_axisymmetric;
+      if (feenox.pde.symmetry_axis == symmetry_axis_none) {
+        feenox.pde.symmetry_axis = symmetry_axis_y;
+      }
+
+///kw+PROBLEM+usage PLANE_STRESS
+///kw+PROBLEM+usage |
+///kw+PROBLEM+detail If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
+///kw+PROBLEM+detail axisymmetry is given, either `PLANE_STRESS` and `PLAIN_STRAIN` can be provided (default is plane stress). 
+    } else if (strcasecmp(token, "PLANE_STRESS") == 0) {
+      feenox.pde.variant = variant_plane_stress;
+
+///kw+PROBLEM+usage PLANE_STRAIN
+///kw+PROBLEM+usage ]
+    } else if (strcasecmp(token, "PLANE_STRAIN") == 0) {
+      feenox.pde.variant = variant_plane_strain;
+
+///kw+PROBLEM+usage [ SYMMETRY_AXIS { x | y } ]
+    } else if (strcasecmp(token, "SYMMETRY_AXIS") == 0) {
+      char *keywords[] = { "x", "y" };
+      int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
+
+///kw+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static problem---although
+///kw+PROBLEM+detail the variable `static_steps` is still honored.
+///kw+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
+///kw+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
+///kw+PROBLEM+usage [ TRANSIENT |
+    } else if (strcasecmp(token, "TRANSIENT") == 0) {
+      feenox.pde.transient_type = transient_type_transient;
+///kw+PROBLEM+usage QUASISTATIC]@
+    } else if (strcasecmp(token, "QUASISTATIC") == 0) {
+      feenox.pde.transient_type = transient_type_quasistatic;
+
+
+///kw+PROBLEM+detail By default FeenoX tries to detect wheter the computation should be linear or non-linear.
+///kw+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+///kw+PROBLEM+usage [ LINEAR
+    } else if (strcasecmp(token, "LINEAR") == 0) {
+      feenox.pde.math_type = math_type_linear;
+
+///kw+PROBLEM+usage | NON_LINEAR ]
+    } else if (strcasecmp(token, "NON_LINEAR") == 0) {
+      feenox.pde.math_type = math_type_nonlinear;
+
+
+///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
+///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
+///kw+PROBLEM+detail or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
+    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+      double xi = 0;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      feenox.pde.dim = (unsigned int)(xi);
+      if (feenox.pde.dim < 1 || feenox.pde.dim > 3)  {
+        feenox_push_error_message("either one, two or three dimensions should be selected instead of '%d'", feenox.pde.dim);
+        return FEENOX_ERROR;
+      }
+
+
+///kw+PROBLEM+usage [ MESH <identifier> ] @
+///kw+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
+///kw+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
+///kw+PROBLEM+detail defined in the input file is the one over which the problem is solved.
+    } else if (strcasecmp(token, "MESH") == 0) {
+      char *mesh_name;
+
+      feenox_call(feenox_parser_string(&mesh_name));
+      if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("unknown mesh '%s'", mesh_name);
+        feenox_free(mesh_name);
+        return FEENOX_ERROR;
+      }
+      feenox_free(mesh_name);
+
+///kw+PROBLEM+usage [ N_MODES <expr> ] @
+///kw+PROBLEM+detail The number of modes to be computed in the modal problem. The default is DEFAULT_NMODES.
+    } else if (strcasecmp(token, "N_MODES") == 0 || strcasecmp(token, "N_EIGEN") == 0) {
+      double xi = 0;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      feenox.pde.nev = (int)(xi);
+      if (feenox.pde.nev < 1)  {
+        feenox_push_error_message("a positive number of modes should be given instead of '%d'", feenox.pde.nev);
+        return FEENOX_ERROR;
+      }
+    } else {
+      feenox_push_error_message("undefined keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  } 
+
+  // if there is no explicit mesh, the main one
+  if (feenox.pde.mesh == NULL && (feenox.pde.mesh = feenox.mesh.mesh_main) == NULL) {
+    feenox_push_error_message("unknown mesh (no READ_MESH keyword before PROBLEM)", token);
+    return FEENOX_ERROR;
+  }
+
+  // check if the dimensions match
+  if (feenox.pde.dim != 0 && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {
+    feenox_push_error_message("dimension mismatch, in PROBLEM %d != in READ_MESH %d", feenox.pde.dim, feenox.pde.mesh->dim);
+    return FEENOX_ERROR;
+  }
+  
+  // if we don't have dimensions here, use the dimensions from the provided mesh
+  if (feenox.pde.dim == 0 && feenox.pde.mesh->dim != 0) {
+    feenox.pde.dim = feenox.pde.mesh->dim;
+  }
+  // conversely, if we got them there, put it on the mesh
+  if (feenox.pde.mesh != NULL && feenox.pde.mesh->dim == 0 && feenox.pde.dim != 0) {
+    feenox.pde.mesh->dim = feenox.pde.dim;
+  }
+
+  if (feenox.pde.dim == 0) {
+    feenox_push_error_message("could not determine the dimension of the problem, give them using DIMENSIONS in either READ_MESH or PROBLEM");
+    return FEENOX_ERROR;
+  }
+  
+  feenox_call(feenox_problem_init_parser_general());
+  feenox_call(feenox_problem_init_parser_particular());
+      
+  return FEENOX_OK;
+  
+}
+
+int feenox_parse_solve_problem(void) {
+ 
+///kw+SOLVE_PROBLEM+detail Whenever the instruction `SOLVE_PROBLEM` is executed,
+///kw+SOLVE_PROBLEM+detail FeenoX solves the PDE problem.
+///kw+SOLVE_PROBLEM+detail For static problems, that means solving the equations
+///kw+SOLVE_PROBLEM+detail and filling in the result functions.
+///kw+SOLVE_PROBLEM+detail For transient or quasisstatic problems, that means
+///kw+SOLVE_PROBLEM+detail advancing one time step.
+  
+  feenox_call(feenox_add_instruction(feenox_instruction_solve_problem, NULL));
+  
   return FEENOX_OK;
 }

@@ -1,0 +1,2 @@
+PRINT sin(1)
+PRINT sqrt(1-cos(1)^2)

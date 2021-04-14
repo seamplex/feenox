@@ -1,0 +1,22 @@
+set preamble "\usepackage{amsmath} \usepackage{amssymb}"
+set width 12*unit(cm)
+set size ratio 0.375
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+set grid
+set key above
+
+#set xtics ${minxtics},${stepxtics},${maxxtics}
+#set ytics ${minytics},${stepytics},${maxytics}
+#set mxtics ${minxtics},${mxtics},${maxxtics}
+#set mytics ${minytics},${mytics},${maxytics}
+# set xrange [${min}:${max}]
+# set yrange [0:1.5]
+
+set xlabel " $t$"
+#set ylabel " $x$ \& $y$"
+
+set terminal pdf
+set output "heaviside.pdf"
+
+plot "heaviside.dat" u 1:2 w lp lw 3  color black           ti "\texttt{heaviside(t-0.5,0.25)}"

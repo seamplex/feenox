@@ -1,0 +1,9 @@
+end_time = 1
+dt = 1/50
+
+x = d_dt(log(1+t))
+y = 1/(1+t)
+
+PRINT t x y y-x 
+
+# exercise: why does this example give a bigger error than the exp.fee example?

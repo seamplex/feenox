@@ -578,7 +578,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
   mesh->file->pointer = NULL;
 
   if (tag2index != NULL) {
-    free(tag2index);
+    feenox_free(tag2index);
   }  
 
   

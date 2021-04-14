@@ -1,0 +1,1 @@
+PRINT atan2(1,-2) mod(atan(-0.5),2*pi)-pi

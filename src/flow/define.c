@@ -41,7 +41,7 @@ void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents)
   
   // si el puntero es de feenox, lo liberamos
   if (this->reallocated == 0) {
-    free(feenox_value_ptr(this));
+    feenox_free(feenox_value_ptr(this));
   }
   
   this->reallocated = 1;
@@ -75,7 +75,7 @@ void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents
       feenox_runtime_error();
     }
 
-    free(oldptr);
+    feenox_free(oldptr);
   }
   
   this->reallocated = 1;
@@ -96,7 +96,7 @@ void feenox_realloc_matrix_ptr(matrix_t *matrix, double *newptr, int copy_conten
   
   // si el puntero es de feenox, lo liberamos
   if (matrix->realloced == 0) {
-    free(oldptr);
+    feenox_free(oldptr);
   }
   
   matrix->realloced = 1;
@@ -195,11 +195,11 @@ vector_t *feenox_define_vector_get_ptr(const char *name, size_t size) {
   // the function below is called from the API that allows a string
   // this is ugly but we don't need too much performance
   char *size_string;
-  asprintf(&size_string, "%ld", size);
+  feenox_check_minusone_null(asprintf(&size_string, "%ld", size));
   if (feenox_define_vector(name, size_string) != FEENOX_OK) {
     return NULL;
   }
-  free(size_string);
+  feenox_free(size_string);
   return feenox_get_vector_ptr(name);
 }
 
@@ -266,81 +266,6 @@ int feenox_matrix_attach_data(const char *name, expr_t *datas) {
 
   return FEENOX_OK;
 }
-
-function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments) {
-  if (feenox_define_function(name, n_arguments) != FEENOX_OK) {
-    return NULL;
-  }
-  return feenox_get_function_ptr(name);
-}
-
-int feenox_define_function(const char *name, unsigned int n_arguments) {
-  
-  function_t *function;
-
-  feenox_call(feenox_check_name(name));
-
-  feenox_check_alloc(function = calloc(1, sizeof(function_t)));
-  feenox_check_alloc(function->name = strdup(name));
-  function->n_arguments = n_arguments;
-  
-  feenox_check_alloc(function->var_argument = calloc(n_arguments, sizeof(var_t *)));
-  function->var_argument_allocated = 1;
-  feenox_check_alloc(function->column = calloc((n_arguments+1), sizeof(int)));
-  
-  // default columns
-  int i;
-  for (i = 0; i < n_arguments+1; i++) {
-    function->column[i] = i+1;
-  }
-  
-  HASH_ADD_KEYPTR(hh, feenox.functions, function->name, strlen(function->name), function);
-
-  return FEENOX_OK;
-}
-
-int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name) {
-  
-  function_t *function;
-  if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
-    return FEENOX_ERROR;
-  }
-  
-  if (i < 0) {
-    feenox_push_error_message("negative argument number '%d'", i);
-    return FEENOX_ERROR;
-  }
-  if (i >= function->n_arguments) {
-    feenox_push_error_message("argument number '%d' greater or equal than the number of arguments '%d' (they start from zero)", i, function->n_arguments);
-    return FEENOX_ERROR;
-  }
-  
-  if ((function->var_argument[i] = feenox_get_or_define_variable_get_ptr(variable_name)) == NULL) {
-    return FEENOX_ERROR;
-  }
-  
-  // mark that we received an argument to see if we got them all when initializing
-  function->n_arguments_given++;
-  
-  return FEENOX_OK;
-}
-
-
-int feenox_function_set_expression(const char *name, const char *expression) {
-  
-  function_t *function;
-  if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
-    return FEENOX_ERROR;
-  }
-  
-  function->type = function_type_algebraic;
-  feenox_call(feenox_expression_parse(&function->algebraic_expression, expression));  
-  
-  return FEENOX_OK;
-}
-
 
 
 int feenox_define_file(const char *name, const char *format, unsigned int n_format_args, const char *mode) {
@@ -512,7 +437,7 @@ int feenox_check_name(const char *name) {
 
   int i;
   for (i = 0; i < N_BUILTIN_FUNCTIONS; i++) {
-    if (builtin_function[i].name != NULL && strcmp(name, builtin_function[i].name) == 0) {
+    if (strcmp(name, builtin_function[i].name) == 0) {
       feenox_push_error_message("there already exists a built-in function named '%s'", name);
       return FEENOX_ERROR;
     }

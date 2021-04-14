@@ -1,0 +1,5 @@
+end_time = 1
+
+PRINT t heaviside(t-0.5,0.25)
+
+# exercise: what happens if the second argument is negative?

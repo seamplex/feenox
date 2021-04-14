@@ -1,0 +1,30 @@
+set preamble "\usepackage{amsmath} \usepackage{amssymb}"
+set width 12*unit(cm)
+set size ratio 0.375
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+set grid
+set key above
+
+#set xtics ${minxtics},${stepxtics},${maxxtics}
+#set ytics ${minytics},${stepytics},${maxytics}
+#set mxtics ${minxtics},${mxtics},${maxxtics}
+#set mytics ${minytics},${mytics},${maxytics}
+# set xrange [${min}:${max}]
+#set yrange [0:1.5]
+set y2range [-1e-2:+1e-2]
+
+set xlabel " $t$"
+set ylabel " $x$ \& $y$"
+set y2label "$y-x$"
+set y2tics -1e-2,5e-3,+1e-2 
+
+set terminal pdf
+set output "log1.pdf"
+
+plot "log1.dat" u 1:2 w l  color black           ti "",\
+     "log1.dat" u 1:2 w p  color black every 5   ti "$x(t)=$\texttt{d\_dt(log(1+t))}",\
+     "log1.dat" u 1:3 w l  color green           ti "",\
+     "log1.dat" u 1:3 w p  color green every 7   ti "$y(t)=$\texttt{1/(1+t)}",\
+     "log1.dat" axes x1y2 u 1:4 w l  color red             ti "",\
+     "log1.dat" axes x1y2 u 1:4 w p  color red   every 6  ti "$y(t)-x(t)$"

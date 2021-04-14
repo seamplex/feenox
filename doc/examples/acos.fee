@@ -1,0 +1,3 @@
+PRINT acos(0)
+PRINT acos(1)
+PRINT cos(acos(0.5))  acos(cos(0.5))

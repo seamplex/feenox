@@ -54,12 +54,17 @@ Nevertheless, since the original authors are the copyright holders, they still c
 > Afterward, the set of supported problem types, models, equations and features of the tool should grow to include other models as well, as required in\ [@sec:extensibility].
 
 
-FeenoX arranca con un subset de eso más neutrónica.
-En algún lugar hay que poner un límite para arrancar. Release plans.
+The choice of the initial supported features is based on the types of problem that the FeenoX' precursor codes (namely wasora, Fino and milonga) already have been supporting since more than ten years now. It is also a first choice so work can be bounded and a subsequent road map and release plans can be designed. FeenoX' first version includes a subset of the required functionality, namely
 
-FeenoX está diseñado desde cero para correr en GNU/Linux, que constituye la arquitectura ampliamente mayoritaria de "la nube."
-Usa MPI que es un estándar para cosas en paralelo sore muchos hosts.
-También se puede ejecutar en una PC o laptop, aunque la performance y escalabilidad están limitadas por el tipo y número de CPUs, la memoria RAM disponible y los métodos de refrigeración.
+ * dynamical systems
+ * plant control dynamics
+ * mechanical elasticity
+ * heat conduction
+ * structural modal analysis
+ 
+FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture og more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy ([@sec:unix]) regarding its computational implementation code. Besides POSIX, FeenoX also uses MPI which is a well-known industry standard for massive parallel executions of processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
+
+The requirement to run in the cloud and scale up as needed rules out some of the FOSS solvers available online, such as CalculiX.
 
 
 ## Scope {#sec:scope}
@@ -80,17 +85,34 @@ También se puede ejecutar en una PC o laptop, aunque la performance y escalabil
 > Any GUI, pre-processor, post-processor or other related graphical tool used to provide a graphical interface for the user should integrate in the workflow described in the preceding paragraph: a pre-processor should create  the input files needed for the tool and a post-processor should read the output files created by the tool.
 
 
+Indeed, FeenoX is designed to work very much like a transfer function between two (or more) files---usually the FeenoX input file and the problem mesh file---and zero or more output files---usually the terminal output and a VTK post-processing file---as illustrated in [@fig:transfer].
 
-Transfer function
+![FeenoX working as a transfer function between input and output files](transfer.svg){#fig:transfer width=50%}
 
-![The tool working as a transfer function between input and output files](transfer.svg){#fig:transfer width=50%}
+In some particular cases, FeenoX can also provide an API for high-level interpreted languages such as Python or Julia such that a problem can be completely defined in a script, increasing also flexiblity.
 
 
-UNIX rules as appendix
+As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the rule of _separation_ that essentially implies to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 
-rule of separation
+From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user. Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based immersive augmented-reality application) without needing the modify the backend. Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
 
-separate mesher - unix 
+In the very same sense, FeenoX does not discretize continuous domains for PDE problems itself, but relies on separate tools for this end. Fortunately, there already exists one meshing tool which is FOSS (GPLv2) and shares most (if not all) of the design basis principles with FeenoX: the three-dimensional finite element mesh generator Gmsh.
+Strictly speaking, FeenoX does not need to be used along with Gmsh but with any other mesher able to write meshes in Gmsh's format `.msh`. But since Gmsh also
+
+ * is free and open source,
+ * works also in a transfer-function-like fashion,
+ * runs natively on GNU/Linux,
+ * has a similar (but more comprehensive) API for Python/Julia,
+ * etc
+ 
+\noindent it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as Metis) for scaling up large problems,
+
+
+**ejemplo de input - NAMFES LE11**
+
+**ejemplo Python**
+
+
 
 # Architecture {#sec:architecture}
 
@@ -104,9 +126,21 @@ separate mesher - unix
 > Mobile platforms such as tablets and phones are not suitable to run engineering simulations due to their lack of proper electronic cooling mechanisms. They are suggested to be used to control one (or more) instances of the tool running on the cloud, and even to pre and post process results through mobile and/or web interfaces.
 
 
-C, quote petsc, flat memory address space -> that's what virtual servers have!
+FeenoX’ main development architecture is Debian GNU/Linux running over 64-bits Intel-compatible processors. Compatibility with other operating systems and architectures is encouraged although not required. All the required dependencies are free and/or open source and already available in Debian’s official repositories and the POSIX standard is followed whenever possible. 
 
-posix
+FeenoX is written in plain\ C, which is a standard, mature and widely supported language with compilers for a wide variety of architectures. 
+For solving ODEs/DAEs, FeenoX relies on Lawrence Livermore’s SUNDIALS library. For PDEs, FeenoX uses Argonne’s PETSc library. Both of them are
+
+ * written in plain C,
+ * free and open source,
+ * mature,
+ * actively developed,
+ * parallel scalable through the MPI standard,
+ * very well known in the industry and academia.
+
+Programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. There have been reports that people have been able to compile them under macOS and Windows apart from the main architecture based on GNU/Linux. Due to the way that FeenoX is designed and the policy separated from the mechanism, it is possible to control a running instance remotely from a separate client which can eventually run on a mobile device.
+
+
 
 ## Deployment {#sec:deployment}
 
@@ -318,3 +352,73 @@ Compactness is the property that a design can fit inside a human being's head. A
 unix man page
 markdown + pandoc = html, pdf, texinfo
  
+
+# Appendix: Rules of UNIX philosophy {#sec:unix}
+
+Rule of Modularity
+
+:    Developers should build a program out of simple parts connected by well defined interfaces, so problems are local, and parts of the program can be replaced in future versions to support new features. This rule aims to save time on debugging code that is complex, long, and unreadable.
+
+Rule of Clarity
+
+:    Developers should write programs as if the most important communication is to the developer who will read and maintain the program, rather than the computer. This rule aims to make code as readable and comprehensible as possible for whoever works on the code in the future.
+
+Rule of Composition
+
+:    Developers should write programs that can communicate easily with other programs. This rule aims to allow developers to break down projects into small, simple programs rather than overly complex monolithic programs.
+
+Rule of Separation
+
+:    Developers should separate the mechanisms of the programs from the policies of the programs; one method is to divide a program into a front-end interface and a back-end engine with which that interface communicates. This rule aims to prevent bug introduction by allowing policies to be changed with minimum likelihood of destabilizing operational mechanisms.
+
+Rule of Simplicity
+
+:    Developers should design for simplicity by looking for ways to break up program systems into small, straightforward cooperating pieces. This rule aims to discourage developers’ affection for writing “intricate and beautiful complexities” that are in reality bug prone programs.
+
+Rule of Parsimony
+
+:    Developers should avoid writing big programs. This rule aims to prevent overinvestment of development time in failed or suboptimal approaches caused by the owners of the program’s reluctance to throw away visibly large pieces of work. Smaller programs are not only easier to write, optimize, and maintain; they are easier to delete when deprecated.
+
+Rule of Transparency
+
+:    Developers should design for visibility and discoverability by writing in a way that their thought process can lucidly be seen by future developers working on the project and using input and output formats that make it easy to identify valid input and correct output. This rule aims to reduce debugging time and extend the lifespan of programs.
+
+Rule of Robustness
+
+:    Developers should design robust programs by designing for transparency and discoverability, because code that is easy to understand is easier to stress test for unexpected conditions that may not be foreseeable in complex programs. This rule aims to help developers build robust, reliable products.
+
+Rule of Representation
+
+:    Developers should choose to make data more complicated rather than the procedural logic of the program when faced with the choice, because it is easier for humans to understand complex data compared with complex logic. This rule aims to make programs more readable for any developer working on the project, which allows the program to be maintained.
+
+Rule of Least Surprise
+
+:    Developers should design programs that build on top of the potential users' expected knowledge; for example, ‘+’ in a calculator program should always mean 'addition'. This rule aims to encourage developers to build intuitive products that are easy to use.
+
+Rule of Silence
+
+:    Developers should design programs so that they do not print unnecessary output. This rule aims to allow other programs and developers to pick out the information they need from a program's output without having to parse verbosity.
+
+Rule of Repair
+
+:    Developers should design programs that fail in a manner that is easy to localize and diagnose or in other words “fail noisily”. This rule aims to prevent incorrect output from a program from becoming an input and corrupting the output of other code undetected.
+
+Rule of Economy
+
+:    Developers should value developer time over machine time, because machine cycles today are relatively inexpensive compared to prices in the 1970s. This rule aims to reduce development costs of projects.
+
+Rule of Generation
+
+:    Developers should avoid writing code by hand and instead write abstract high-level programs that generate code. This rule aims to reduce human errors and save time.
+
+Rule of Optimization
+
+:    Developers should prototype software before polishing it. This rule aims to prevent developers from spending too much time for marginal gains.
+
+Rule of Diversity
+
+:    Developers should design their programs to be flexible and open. This rule aims to make programs flexible, allowing them to be used in ways other than those their developers intended.
+
+Rule of Extensibility
+
+:    Developers should design for the future by making their protocols extensible, allowing for easy plugins without modification to the program's architecture by other developers, noting the version of the program, and more. This rule aims to extend the lifespan and enhance the utility of the code the developer writes.

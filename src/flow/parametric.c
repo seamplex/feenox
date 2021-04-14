@@ -290,9 +290,9 @@ int wasora_parametric_run(void) {
   if (q != NULL) {
     gsl_qrng_free(q);
   }
-  free(local_step);
-  free(wasora.parametric.nsteps);
-  free(v);
+  feenox_free(local_step);
+  feenox_free(wasora.parametric.nsteps);
+  feenox_free(v);
 
   return WASORA_RUNTIME_OK;
   

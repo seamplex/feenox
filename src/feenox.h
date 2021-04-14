@@ -62,6 +62,17 @@
  #include <sunlinsol/sunlinsol_dense.h>
 #endif
 
+#ifdef HAVE_PETSC
+ #include <petscsys.h>
+ #include <petscpc.h>
+ #include <petscsnes.h>
+ #include <petscts.h>
+ #include <petsctime.h>
+ #ifdef HAVE_SLEPC
+  #include <slepceps.h>
+ #endif // HAVE_SLEPC
+#endif  // HAVE_PETSC
+
 
 #include "contrib/uthash.h"
 #include "contrib/utlist.h"
@@ -116,6 +127,11 @@
 #define DEFAULT_PRINT_FORMAT               "%g"
 #define DEFAULT_PRINT_SEPARATOR            "\t"
 
+#define CHAR_PROGRESS_BUILD                "."
+#define CHAR_PROGRESS_SOLVE                "-"
+#define CHAR_PROGRESS_GRADIENT             "="
+
+
 #define DEFAULT_ROOT_MAX_TER               1024
 #define DEFAULT_ROOT_TOLERANCE             (9.765625e-4)         // (1/2)^-10
 
@@ -127,6 +143,9 @@
 
 #define MINMAX_ARGS       10
 
+// TODO: somewhere lese
+#define DEFAULT_NMODES        10
+
 
 // zero & infinite
 #define ZERO          (8.881784197001252323389053344727e-16)  // (1/2)^-50
@@ -135,6 +154,11 @@
 #define MESH_INF 1e22
 #define MESH_TOL 1e-6
 #define MESH_FAILED_INTERPOLATION_FACTOR -1
+
+#define DEFAULT_INTERPOLATION              (*gsl_interp_linear)
+#define DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD   9.5367431640625e-07 // (1/2)^-20
+#define DEFAULT_SHEPARD_RADIUS                     1.0
+#define DEFAULT_SHEPARD_EXPONENT                   2
 
 
 // usamos los de gmsh, convertimos a vtk y frd con tablas
@@ -167,14 +191,23 @@ enum version_type {
 };
 
 // macro to check error returns in function calls
-#define feenox_call(function)   if ((function) != FEENOX_OK) return FEENOX_ERROR
+#define feenox_call(function)        if ((function) != FEENOX_OK) return FEENOX_ERROR
+#define feenox_call_null(function)   if ((function) != FEENOX_OK) return NULL
 #ifdef HAVE_IDA
-#define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
+ #define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
 #endif
 
+#ifdef HAVE_PETSC
+ PetscErrorCode petsc_err;
+ #define petsc_call(s) {petsc_err = s; CHKERRQ(petsc_err);}
+#endif
+
+#define feenox_free(p)                  free(p); p = NULL;
+ 
 // macro to check malloc() for NULL (ass means assignement, you ass!)
 #define feenox_check_alloc(ass)         if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
 #define feenox_check_alloc_null(ass)    if ((ass) == NULL) { feenox_push_error_message("cannot allocate memory"); return NULL; }
+#define feenox_check_minusone(ass)      if ((ass) == -1) { feenox_push_error_message("cannot allocate memory"); return FEENOX_ERROR; }
 #define feenox_check_minusone_null(ass) if ((ass) == -1) { feenox_push_error_message("cannot allocate memory"); return NULL; }
 
 // macro to access internal special variables
@@ -189,6 +222,8 @@ enum version_type {
 // pointer to the content of an object
 #define feenox_value_ptr(obj)  (obj->value)
 
+// GSL's equivalent to PETSc's ADD_VALUES
+#define gsl_matrix_add_to_element(matrix,i,j,x)  gsl_matrix_set((matrix),(i),(j),gsl_matrix_get((matrix),(i),(j))+(x))
 
 
 // number of internal functions, functional adn vector functions
@@ -233,10 +268,12 @@ typedef struct mesh_t mesh_t;
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
 typedef struct physical_name_t physical_name_t;
-typedef struct physical_property_t physical_property_t;
+typedef struct property_t property_t;
 typedef struct property_data_t property_data_t;
 typedef struct material_t material_t;
 typedef struct material_list_item_t material_list_item_t;
+typedef struct bc_t bc_t;
+typedef struct bc_data_t bc_data_t;
 
 typedef struct node_t node_t;
 typedef struct node_relative_t node_relative_t;
@@ -248,7 +285,6 @@ typedef struct neighbor_t neighbor_t;
 typedef struct gauss_t gauss_t;
 
 typedef struct elementary_entity_t elementary_entity_t;
-typedef struct bc_t bc_t;
 typedef struct node_data_t node_data_t;
 
 /*
@@ -419,13 +455,12 @@ struct function_t {
   } type;
   
   // number of arguments the function takes
-  int n_arguments;
-  int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
+  unsigned int n_arguments;
+  unsigned int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
 
   // array of pointers to already-existing variables for the arguments
   var_t **var_argument;
   int var_argument_allocated;
-
 
   // expression for algebraic functions
   expr_t algebraic_expression;
@@ -439,7 +474,7 @@ struct function_t {
   double *data_value;
   
   // this is in case there is a derivative of a mesh-based function and
-  // we want to interoplate with the shape functions
+  // we want to interpolate with the shape functions
   // warning! we need to put data on the original function and not on the derivatives
   function_t *spatial_derivative_of;
   int spatial_derivative_with_respect_to;
@@ -484,14 +519,14 @@ struct function_t {
   expr_t expr_shepard_exponent;
   double shepard_exponent;
 
-  // propiedad
-  void *property;
+  // material property like E, nu, k, etc.
+  property_t *property;
 
-  // malla no-estructurada sobre la que esta definida la funcion
+  // mesh over which the function is defined 
   mesh_t *mesh;
-  double mesh_time;
+  double mesh_time;  // for time-dependent functions read from .msh
   
-  // apuntador a un arbol k-dimensional para nearest neighbors 
+  // pointer to a k-dimensional tree to speed up stuff
   void *kd;
   
   // ----- ------- -----------   --        -       - 
@@ -808,13 +843,12 @@ struct node_relative_t {
 
 struct physical_group_t {
   char *name;
-  size_t tag;
-  unsigned int dimension;
+  // these are ints because that's what we read from a .msh
+  int tag;
+  int dimension;
   
-  material_t *material;    // apuntador
+  material_t *material;    // pointer to single material
   bc_t *bcs;               // linked list 
-  // TODO: pointer to bc like material?
-//  bc_t *bc;
      
   // volume (or area or length depending on the dim, sometimes called mass)
   double volume;
@@ -834,13 +868,18 @@ struct physical_group_t {
 
 
 struct geometrical_entity_t {
-  size_t tag;
+  int tag;
+  int parent_dim;
+  int parent_tag;
   double boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ;
+
+  size_t num_partitions;
+  int *partition;
   
   size_t num_physicals;
-  size_t *physical;
+  int *physical;
   size_t num_bounding;
-  size_t *bounding;
+  int *bounding;
 
   UT_hash_handle hh[4];
 };
@@ -853,7 +892,7 @@ struct elementary_entity_t {
 
 
 struct gauss_t {
-  int V;               // number of points (v=1,2,...,V )
+  unsigned int V;      // number of points (v=1,2,...,V )
   double *w;           // weights (w[v] is the weight of the v-th point)
   double **r;          // coordinates (r[v][m] is the coordinate of the v-th point in dimension m)
   
@@ -870,9 +909,9 @@ struct gauss_t {
 struct element_type_t {
   char *name;
 
-  size_t id;              // as of Gmsh
-  size_t dim;
-  size_t order;
+  unsigned int id;              // as of Gmsh
+  unsigned int dim;
+  unsigned int order;
   unsigned int nodes;           // total, i.e. 10 for tet10
   unsigned int vertices;        // the corner nodes, i.e 4 for tet10
   unsigned int faces;           // facess == number of neighbors
@@ -921,10 +960,6 @@ struct element_t {
   // to change them individually otherwise the first wins and the others loose
   size_t V_w, V_x, V_H, V_B, V_dxdr, V_drdx, V_dhdx;    
 
-  
-  size_t *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
-
-  
   gsl_matrix **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
   gsl_matrix **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
   double **property_node;
@@ -933,6 +968,11 @@ struct element_t {
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
+
+#ifdef HAVE_PETSC
+  PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
+#endif
+  
 };
 
 
@@ -980,10 +1020,6 @@ struct material_t {
   mesh_t *mesh;
   property_data_t *property_datums;
 
-  // este es un apuntador generico que le dejamos a alguien
-  // (plugins) por si necesitan agregar informacion al material
-  void *ext;
-
   UT_hash_handle hh;
 };
 
@@ -992,7 +1028,7 @@ struct material_list_item_t {
   material_list_item_t *next;
 };
   
-struct physical_property_t {
+struct property_t {
   char *name;
   property_data_t *property_datums;
 
@@ -1000,11 +1036,40 @@ struct physical_property_t {
 };
 
 struct property_data_t {
-  physical_property_t *property;
+  property_t *property;
   material_t *material;
   expr_t expr;
 
   UT_hash_handle hh;
+};
+
+
+struct bc_t {
+  char *name;
+  mesh_t *mesh;
+  bc_data_t *bc_datums;
+
+  UT_hash_handle hh;  // for the hashed list mesh.bcs
+  bc_t *next;         // for the linked list in each physical group
+};
+
+struct bc_data_t {
+  char *string;
+
+  enum {
+    bc_type_math_undefined,
+    bc_type_math_dirichlet,
+    bc_type_math_neumann,
+    bc_type_math_robin,
+  } type_math;
+  
+  int type_phys;     // problem-based flag that tells which type of BC this is
+  unsigned int dof;
+
+  expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
+  expr_t *expr;      // an array of stuff
+  
+  bc_data_t *next;
 };
 
 
@@ -1023,13 +1088,19 @@ struct mesh_t {
 
   physical_group_t *physical_groups;              // global hash table
   physical_group_t *physical_groups_by_tag[4];    // 4 hash tablesm one per tag
-  unsigned int physical_tag_max;   // the higher tag of the entities
+  int physical_tag_max;   // the higher tag of the entities
   
   // number of geometric entities of each dimension
-  unsigned points, curves, surfaces, volumes;
+  size_t points, curves, surfaces, volumes;
   geometrical_entity_t *geometrical_entities[4];     // 4 hash tables, one for each dimension
+  
+  // partition data
+  size_t num_partitions;
+  size_t num_ghost_entitites;
+  size_t partitioned_points, partitioned_curves, partitioned_surfaces, partitioned_volumes;
+  
 
-  int sparse;                     // flag that indicates if the nodes are sparse
+  int sparse;            // flag that indicates if the nodes are sparse
   size_t *tag2index;     // array to map tags to indexes (we need a -1)
   
   enum {
@@ -1042,7 +1113,7 @@ struct mesh_t {
     integration_reduced
   } integration;
   
-  unsigned int update_each_step;
+  int update_each_step;
   
   expr_t scale_factor;           // factor de escala al leer la posicion de los nodos
   expr_t offset_x;               // offset en nodos
@@ -1054,7 +1125,7 @@ struct mesh_t {
 
   node_data_t *node_datas;
   
-  unsigned int n_physical_names;
+  int n_physical_names;
   node_t *node;
   element_t *element;
   cell_t *cell;
@@ -1192,7 +1263,6 @@ struct feenox_t {
 
   struct {
 
-    //int initialized;
     int need_cells;
 
     mesh_t *meshes;
@@ -1231,7 +1301,9 @@ struct feenox_t {
     element_type_t *element_types;
 
     material_t *materials;
-    physical_property_t *physical_properties;
+    property_t *properties;
+
+    bc_t *bcs;
     
 /*    
     mesh_write_t *writes;
@@ -1269,6 +1341,305 @@ struct feenox_t {
     SUNLinearSolver LS;
 #endif
   } dae;
+  
+  struct {
+    
+    enum {
+      type_none,
+      type_thermal,
+      type_mechanical,
+      type_modal,
+      type_neutron_diffusion,
+      type_neutron_transport,
+    } type;
+
+    enum {
+      variant_full,
+      variant_axisymmetric,
+      variant_plane_stress,
+      variant_plane_strain
+    } variant;
+  
+    enum {
+      symmetry_axis_none,
+      symmetry_axis_x,
+      symmetry_axis_y
+    } symmetry_axis;
+
+    // these can be read from the input but also we can figure them out
+    enum {
+      transient_type_undefined,
+      transient_type_transient,
+      transient_type_quasistatic
+    } transient_type;
+    
+    enum {
+      math_type_undefined,
+      math_type_linear,
+      math_type_nonlinear,
+      math_type_eigen,
+    } math_type;
+
+
+    enum {
+      material_type_linear_isotropic,
+      material_type_linear_orthotropic
+    } material_type;
+  
+    unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
+    unsigned int dofs;             // DoFs per node/cell
+    size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
+    size_t global_size;            // total number of DoFs
+    
+    int rough;               // keep each element's contribution to the gradient?
+    int roughish;            // average only on the same physical group?
+  
+    mesh_t *mesh;
+    mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
+  
+/*    
+    fino_reaction_t *reactions;
+    fino_linearize_t *linearizes;
+    fino_debug_t *debugs;  // deprecated
+ */
+
+/*    
+    PetscClassId petsc_classid;
+
+    PetscLogStage petsc_stage_build;
+    PetscLogStage petsc_stage_solve;
+    PetscLogStage petsc_stage_stress;
+  
+    PetscLogEvent petsc_event_build;
+    PetscLogEvent petsc_event_solve;
+    PetscLogEvent petsc_event_stress;
+  
+    PetscLogDouble petsc_flops_build;
+    PetscLogDouble petsc_flops_solve;
+    PetscLogDouble petsc_flops_stress;
+
+    fino_times_t wall;
+    fino_times_t cpu;
+    fino_times_t petsc;
+*/
+    
+    // virtual methods
+    int (*problem_init_runtime_particular)(void);
+    int (*solve_petsc)(void);
+
+    PetscBool has_rhs;
+    PetscBool has_mass;
+    function_t *initial_condition;
+
+    struct {
+      var_t *ksp_atol;
+      var_t *ksp_rtol;
+      var_t *ksp_divtol;
+      var_t *ksp_max_it;
+      
+      var_t *gamg_threshold;
+      
+      var_t *iterations;
+      var_t *residual_norm;
+    
+      var_t *penalty_weight;
+      var_t *nodes_rough;
+      var_t *unknowns;
+    
+      // TODO: take to per-problem headers
+      var_t *U[3];
+
+      var_t *strain_energy;
+    
+      var_t *displ_max;
+      var_t *displ_max_x;
+      var_t *displ_max_y;
+      var_t *displ_max_z;
+
+      var_t *u_at_displ_max;
+      var_t *v_at_displ_max;
+      var_t *w_at_displ_max;
+
+    
+      var_t *sigma_max;
+      var_t *sigma_max_x;
+      var_t *sigma_max_y;
+      var_t *sigma_max_z;
+      var_t *delta_sigma_max;
+
+      var_t *u_at_sigma_max;
+      var_t *v_at_sigma_max;
+      var_t *w_at_sigma_max;
+
+      var_t *T_max;
+      var_t *T_min;
+    
+      var_t *lambda;
+
+      var_t *time_wall_build;
+      var_t *time_wall_solve;
+      var_t *time_wall_stress;
+      var_t *time_wall_total;
+
+      var_t *time_cpu_build;
+      var_t *time_cpu_solve;
+      var_t *time_cpu_stress;
+      var_t *time_cpu_total;
+
+      var_t *time_petsc_build;
+      var_t *time_petsc_solve;
+      var_t *time_petsc_stress;
+      var_t *time_petsc_total;
+
+      var_t *flops_petsc;
+    
+      var_t *memory_available;
+      var_t *memory;
+      var_t *memory_petsc;
+    
+      var_t *M_T;
+    } vars;
+
+    // vectors
+    struct {
+      vector_t *f;
+      vector_t *omega;
+      vector_t *m;
+      vector_t *L;
+      vector_t *Gamma;
+      vector_t *mu;
+      vector_t *Mu;
+    
+      vector_t **phi;
+    } vectors;
+
+    // reusable number of dirichlet rows to know how much memory to allocate
+    size_t n_dirichlet_rows;
+    
+    // nombres custom 
+    char **unknown_name;          // uno para cada grado de libertad
+  
+    // las funciones con la solucion (una para cada grado de libertad)
+    function_t **solution;
+    // las derivadas de la solucion con respecto al espacio;
+    function_t ***gradient;
+    // la incerteza (i.e la desviacion estandar de la contribucion de cada elemento)
+    function_t ***delta_gradient;  
+    // los modos de vibracion
+    function_t ***mode;
+  
+    // soluciones anteriores (por ejemplos desplazamientos)
+//    function_t **base_solution;
+  
+    enum {
+      gradient_gauss_extrapolated,
+      gradient_at_nodes,
+      gradient_none
+    } gradient_evaluation;
+
+    enum {
+      gradient_weight_volume,
+      gradient_weight_quality,
+      gradient_weight_volume_times_quality,
+      gradient_weight_flat,
+    } gradient_element_weight;
+
+    enum {
+      gradient_average,
+      gradient_actual
+    } gradient_highorder_nodes;
+  
+    // TODO: somewhere else
+    double hourglass_epsilon;
+  
+    // tensor de tensiones
+    function_t *sigmax;
+    function_t *sigmay;
+    function_t *sigmaz;
+    function_t *tauxy;
+    function_t *tauyz;
+    function_t *tauzx;
+
+    function_t *sigma1;      // principal stresses
+    function_t *sigma2;
+    function_t *sigma3;
+    function_t *sigma;       // von mises
+    function_t *delta_sigma; // uncertainty
+    function_t *tresca;
+    
+#ifdef HAVE_PETSC    
+    PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
+    PetscBool petscinit_called;    // flag
+    PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
+    PetscBool already_built;       // avoids building twice in the first step of SNES
+
+    // stuff for mpi parallelization
+    PetscInt nodes_local, size_local;
+    PetscInt first_row, last_row;
+    PetscInt first_node, last_node;
+    PetscInt first_element, last_element;
+
+    // global objects
+    Vec phi;       // the unknown (solution) vector
+    Vec b;         // the right-hand side vector
+    Vec b_nobc;
+    // yo haria al reves, pondria K_bc y dejaria K como no bc
+    Mat K;     // stiffness matrix (i.e E for elasticity and k for heat)
+    Mat K_bc;  // without bcs
+    Mat M;     // la matriz de masa (con rho para elastico y rho*cp para calor)
+    Mat J;     // jacobiano multiuso
+    PetscScalar lambda; // el autovalor
+  
+    PetscScalar *eigenvalue;    // los autovalores
+    Vec *eigenvector;           // los autovectores
+
+    // internal storage of evaluated dirichlet conditions
+    PetscInt        *dirichlet_indexes;
+    PetscScalar     *dirichlet_values;
+  
+    // PETSc's solvers
+    TS ts;
+    SNES snes;
+    KSP ksp;
+  
+    // strings con tipos
+    KSPType ksp_type;
+    PCType pc_type;
+    TSType ts_type;
+    SNESType snes_type;
+
+    PetscBool progress_ascii;
+    double progress_r0;
+    double progress_last;
+
+    expr_t eps_ncv;
+    expr_t st_shift;
+    expr_t st_anti_shift;  
+
+    // para la memoria  
+//    struct rusage resource_usage;
+  
+    // objectos locales
+    size_t n_local_nodes;            // cantidad de nodos locales actual
+    unsigned int elemental_size;           // tamanio actual del elemento
+    gsl_matrix *Ki;               // la matriz de rigidez elemental
+    gsl_matrix *Mi;               // la matriz de masa elemental
+    gsl_vector *bi;               // el vector del miembro derecho elemental
+    gsl_vector *Nb;               // para las BCs de neumann
+
+#endif  // HAVE_PETSC    
+    // cosas del eigensolver
+    // las pongo al final por si acaso (mezcla de plugins compilados con difentes libs, no se)
+    int nev;      // el numero del autovalor pedido
+#ifdef HAVE_SLEPC
+    EPSType eps_type;
+    STType st_type;
+  
+    EPS eps;      // contexto eigensolver (SLEPc)
+    EPSWhich eigen_spectrum;
+#endif
+    
+  } pde;
   
 };
 
@@ -1399,7 +1770,6 @@ extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name)
 
 extern file_t *feenox_get_file_ptr(const char *name);
 extern mesh_t *feenox_get_mesh_ptr(const char *name);
-extern material_t *feenox_get_material_ptr(const char *name);
 extern physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh);
 
 
@@ -1425,13 +1795,16 @@ extern int feenox_instruction_sort_vector(void *arg);
 extern double feenox_vector_get(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_static(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i);
-
+extern int feenox_vector_set(vector_t *this, const size_t i, double value);
 
 // function.c
 extern int feenox_function_init(function_t *this);
 extern void feenox_set_function_args(function_t *this, double *x);
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
+
+extern int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny);
+extern int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz);
 
 // print.c
 extern int feenox_instruction_print(void *arg);
@@ -1449,21 +1822,64 @@ extern double feenox_gsl_function(double x, void *params);
 extern int feenox_instruction_mesh_read(void *arg);
 
 extern int feenox_mesh_free(mesh_t *this);
-extern int feenox_mesh_read_gmsh(mesh_t *this);
 extern int feenox_mesh_read_vtk(mesh_t *this);
 extern int feenox_mesh_read_frd(mesh_t *this);
 
+extern node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x);
+extern element_t *feenox_mesh_find_element(mesh_t *this, node_t *nearest_node, const double *x);
+
+// interpolate.c
+extern double feenox_function_property_eval(struct function_t *function, const double *x);
+extern int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) ;
+extern int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector *residual);
+extern int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J);
+extern int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_vector *residual, gsl_matrix * J);
+
+extern double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x);
+extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, double *r);
+
+// fem.c
+extern double feenox_mesh_determinant(gsl_matrix *this);
+extern int feenox_mesh_compute_w_at_gauss(element_t *this, int v, int integration);
+extern int feenox_mesh_compute_H_at_gauss(element_t *this, unsigned int v, unsigned int dofs, int integration);
+extern int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned int dofs, int integration);
+extern int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
+extern int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
+extern int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_x_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
+
+// gmsh.c
+extern int feenox_mesh_read_gmsh(mesh_t *this);
+extern int mesh_gmsh_update_function(function_t *function, double t, double dt);
+
 // physical_group.c
-extern int feenox_define_physical_group(const char *name, const char *mesh_name, unsigned int dimension, size_t tag);
-extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, unsigned int dimension, size_t tag);
+extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
+extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
 
-extern material_t *feenox_define_material_get_ptr(const char *name);
+// material.c
+extern material_t *feenox_get_material_ptr(const char *name);
 
-extern int feenox_define_property_data(const char *material_name, const char *property_name, const char *expr_string);
-extern property_data_t *feenox_define_property_data_get_ptr(const char *material_name, const char *property_name, const char *expr_string);
+extern int feenox_define_material(const char *material_name, const char *mesh_name);
+extern material_t *feenox_define_material_get_ptr(const char *name, mesh_t *mesh);
 
-extern int feenox_define_physical_property(const char *name, const char *mesh_name);
-extern physical_property_t *feenox_define_physical_property_get_ptr(const char *name, mesh_t *mesh);
+extern int feenox_define_property(const char *name, const char *mesh_name);
+extern property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh);
+
+extern int feenox_define_property_data(const char *property_name, const char *material_name, const char *expr_string);
+extern property_data_t *feenox_define_property_data_get_ptr(property_t *property, material_t *material, const char *expr_string);
+
+
+
+// boundary_condition.c
+extern bc_t *feenox_get_bc_ptr(const char *name);
+
+extern int feenox_define_bc(const char *bc_name, const char *mesh_name);
+extern bc_t *feenox_define_bc_get_ptr(const char *name, mesh_t *mesh);
+
+extern int feenox_add_bc_data(const char *bc_name, const char *string);
+extern bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string);
 
 
 // init.c
@@ -1487,11 +1903,80 @@ extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
 // element.c
 extern int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *element);
 extern int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]);
+extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
+
 
 // vtk.c
 extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
 
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
+
+
+// solve.c
+extern int feenox_instruction_solve_problem(void *arg);
+extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
+
+// init.c
+extern int feenox_problem_init_parser_general(void);
+extern int feenox_problem_init_runtime_general(void);
+extern int feenox_problem_define_solutions(void);
+extern int feenox_problem_define_solution_function(const char *name, function_t **function);
+extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
+
+
+// bulk.c
+extern int feenox_build(void);
+
+#ifdef HAVE_PETSC
+// petsc_ksp.c
+extern int feenox_solve_petsc_linear(void);
+extern PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
+extern int feenox_set_pc(PC pc);
+extern int feenox_set_ksp(KSP ksp);
+  
+// petsc_ts.c
+extern PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
+extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
+
+// dirichlet.c
+extern int feenox_dirichlet_eval(void);
+extern int feenox_dirichlet_set_K(Mat K, Vec b);
+extern int feenox_dirichlet_set_r(Vec r, Vec phi);
+extern int feenox_dirichlet_set_J(Mat J);
+extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
+
+
+
+#endif
+
+// thermal/init.c
+extern int feenox_problem_init_parser_thermal(void);
+extern int feenox_problem_init_runtime_thermal(void);
+
+// thermal/bc.c
+int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
+int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t k);
+
+// thermal/bulk.c
+extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int v);
+
+
+// mechanical/init.c
+extern int feenox_problem_init_parser_mechanical(void);
+extern int feenox_problem_init_runtime_mechanical(void);
+
+// modal/init.c
+extern int feenox_problem_init_parser_modal(void);
+extern int feenox_problem_init_runtime_modal(void);
+
+// build.c
+extern int feenox_build(void);
+extern int feenox_build_element_volumetric(element_t *this);
+extern int feenox_allocate_elemental_objects(element_t *this);
+extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
+extern int feenox_elemental_objects_allocate(element_t *this);
+extern int feenox_elemental_objects_free(void);
+extern int feenox_build_assembly(void);
 
 #endif    /* FEENOX_H  */

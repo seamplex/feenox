@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for i in grep awk sort uniq; do
+for i in grep awk sort uniq gcc; do
  if [ -z "$(which $i)" ]; then
-  echo "error: $i not installed"
+  echo "error: ${i} not installed"
   exit 1
  fi
 done
@@ -18,11 +18,11 @@ fi
 
 # get the defines in feenox.h to get the defaults
 dir=$(dirname ${src})
-if [ -e ${dir}/feenox.h ]; then
+if [ -e "${dir}/feenox.h" ]; then
   grep '#define' ${dir}/feenox.h > defs.h
-elif [ -e ../${dir}/feenox.h ]; then
+elif [ -e "../${dir}/feenox.h" ]; then
   grep '#define' ../${dir}/feenox.h > defs.h
-elif [ -e ../../${dir}/feenox.h ]; then
+elif [ -e "../../${dir}/feenox.h" ]; then
   grep '#define' ../../${dir}/feenox.h > defs.h
 else
   touch defs.h
@@ -35,6 +35,7 @@ for kw in ${kws}; do
   escapedkw=$(echo ${kw} | sed 's/_/\\_/g')
 
 #   echo $kw > /dev/stderr
+
   # keyword
   echo "##  ${kw}"
   echo
@@ -46,89 +47,95 @@ for kw in ${kws}; do
   # usage
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
   if [ -n "${usage}" ]; then
-    echo "::: {.usage}"
-    echo "~~~{.feenox style=feenox}"
-    grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs | tr @ \\n
-    echo "~~~"
-    echo ":::"
-    echo
+    echo -n "\`${usage}\`"
+#     echo "::: {.usage}"
+#     echo "~~~{.feenox style=feenox}"
+#     grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs | tr @ \\n
+#     echo "~~~"
+#     echo ":::"
+#     echo
   fi
 
   # math+figure
   math=$(grep "///${tag}+${kw}+math" ${src} | cut -d" " -f2-)
   if [ -n "${math}" ]; then
+    echo " \$= \displaystyle ${math}\$"
 
-    echo
-    echo "::: {.math}"
-    echo "\$\$"
-    echo ${math}
-    echo "\$\$"
-    echo ":::"
-    echo
+#     echo
+#     echo "::: {.math}"
+#     echo "\$\$"
+#     echo ${math}
+#     echo "\$\$"
+#     echo ":::"
+#     echo
+  fi
+  echo
 
-    range=$(grep "///${tag}+${kw}+plotx" ${src} | cut -d" " -f2-)
-#     echo hola ${range} $(which pyxplot) $(which feenox) $(which svg2pdf) > /dev/stderr
-    if [[ -n "${range}" &&  -n "$(which pyxplot)" && -n "$(which feenox)" && -n "$(which pdf2svg)" ]]; then
-#       echo pepe > /dev/stderr
-      if [ ! -e figures/${kw}.svg ]; then
-#         echo xxx > /dev/stderr
-        mkdir -p figures
-        cd figures
-        min=$(echo ${range}       | awk '{printf $1}')
-        max=$(echo ${range}       | awk '{printf $2}')
-        step=$(echo ${range}      | awk '{printf $3}')
-        minxtics=$(echo ${range}  | awk '{printf $4}')
-        maxxtics=$(echo ${range}  | awk '{printf $5}')
-        stepxtics=$(echo ${range} | awk '{printf $6}')
-        minytics=$(echo ${range}  | awk '{printf $7}')
-        maxytics=$(echo ${range}  | awk '{printf $8}')
-        stepytics=$(echo ${range} | awk '{printf $9}')
-        cat << EOF > ${kw}.fee
-FUNCTION f(x) = ${kw}(x)
+  range=$(grep "///${tag}+${kw}+plotx" ${src} | cut -d" " -f2-)
+  if [[ -n "${range}" &&  -n "$(which pyxplot)" && -n "$(which feenox)" && -n "$(which pdf2svg)" ]]; then
+    if [ ! -e "figures/${kw}.svg" ]; then
+      mkdir -p figures
+      cd figures
+      min=$(echo ${range}       | awk '{printf $1}')
+      max=$(echo ${range}       | awk '{printf $2}')
+      step=$(echo ${range}      | awk '{printf $3}')
+      minxtics=$(echo ${range}  | awk '{printf $4}')
+      maxxtics=$(echo ${range}  | awk '{printf $5}')
+      stepxtics=$(echo ${range} | awk '{printf $6}')
+      minytics=$(echo ${range}  | awk '{printf $7}')
+      maxytics=$(echo ${range}  | awk '{printf $8}')
+      stepytics=$(echo ${range} | awk '{printf $9}')
+      mxtics=$(echo ${range}    | awk '{printf $10}')
+      mytics=$(echo ${range}    | awk '{printf $11}')
+      cat << EOF > ${kw}.fee
+f(x) := ${kw}(x)
 PRINT_FUNCTION f MIN ${min} MAX ${max} STEP ${step}
 EOF
-        feenox ${kw}.fee > ${kw}.dat
-        cat << EOF > ${kw}.ppl
+      feenox ${kw}.fee > ${kw}.dat
+      cat << EOF > ${kw}.ppl
 set preamble "\usepackage{amsmath} \usepackage{amssymb}"
-set width 10*unit(cm)
-set size ratio 0.35
+set width 12*unit(cm)
+set size ratio 0.375
 set axis x arrow nomirrored
 set axis y arrow nomirrored
 set grid
-# set nomytics
-# set nomxtics
 set nokey
 EOF
-        if [ ! -z "$minxtics" ]; then
-          echo "set xtics ${minxtics},${stepxtics},${maxxtics}" >> ${kw}.ppl
-        fi
-        if [ ! -z "$maxytics" ]; then
-          echo "set ytics ${minytics},${stepytics},${maxytics}" >> ${kw}.ppl
-        fi
+      if [ ! -z "${minxtics}" ]; then
+        echo "set xtics ${minxtics},${stepxtics},${maxxtics}" >> ${kw}.ppl
+      fi
+      if [ ! -z "${maxytics}" ]; then
+        echo "set ytics ${minytics},${stepytics},${maxytics}" >> ${kw}.ppl
+      fi
+      if [ ! -z "${mxtics}" ]; then
+        echo "set mxtics ${minxtics},${mxtics},${maxxtics}" >> ${kw}.ppl
+      fi
+      if [ ! -z "${mytics}" ]; then
+        echo "set mytics ${minytics},${mytics},${maxytics}" >> ${kw}.ppl
+      fi
 
-        cat << EOF >> ${kw}.ppl
+      cat << EOF >> ${kw}.ppl
 set xrange [${min}:${max}]
 set xlabel "\$x\$"
-set ylabel "${escapedkw}\$(x)\$"
+set ylabel "\\texttt{${escapedkw}}\$(x)\$"
 set terminal pdf
 set output "${kw}.pdf"
 plot "${kw}.dat" w l lw 3 color blue
+set output "${kw}.png"
+set terminal png
 replot
 EOF
-        pyxplot ${kw}.ppl
-        pdf2svg ${kw}.pdf ${kw}.svg
-        rm -f ${kw}.fee
-        rm -f ${kw}.ppl
-        rm -f ${kw}.dat
-        cd ..
-      fi  
+      pyxplot ${kw}.ppl
+      pdf2svg ${kw}.pdf ${kw}.svg
+      rm -f ${kw}.fee
+      rm -f ${kw}.ppl
+      rm -f ${kw}.dat
+      cd ..
+    fi  
 
-      cat << EOF
-
-![${kw}](figures/${kw}.svg)
-
-EOF
-    fi
+    echo
+    echo "![${kw}](figures/${kw}.svg){width=90%}\ "
+    echo 
   fi
 
   # detailed description
@@ -141,56 +148,72 @@ EOF
   echo  
 
   # examples
-#   exs=`grep ///${tag}+${kw}+example ${dir}/${src} | cut -d" " -f2-` 
-  exs=""
-  n=0
+  exs=$(grep ///${tag}+${kw}+example ${src} | cut -d" " -f2-)
+#  exs=""
+  i=0
   for ex in ${exs}; do
-    n=$((${n} + 1))
-    cat << EOF
-### Example #$n, $ex
-~~~wasora
-EOF
-      cat examples/$ex
-      cat << EOF
-~~~
+  
+    if [ ! -e "examples/${ex}" ]; then
+      echo "example ${ex} does not exist" > /dev/stderr
+      exit 1
+    fi
+  
+    i=$((${i} + 1))
+    
+    echo "### Example #${i}, ${ex}"
+    echo
+    echo "~~~{.feenox style=feenox}"
+    cat examples/${ex}
+    echo "~~~"
 
-EOF
-
-  # terminal
-    if [ -e examples/$ex.sh ]; then
-      cat << EOF
-~~~
-EOF
+    # terminal
+    cd examples
+    echo
+    echo "~~~{.terminal style=terminal}"
+    sh="$(basename ${ex} .fee).sh"
+    if [ -e "${sh}" ]; then
       k=1
-      cd examples
-      rm -f $ex.term
-      n=`wc -l < $ex.sh`
-      while [ $k -le $n ]; do
-       cat $ex.sh | head -n $k | tail -n1 > tmp
-       echo -n "\$ " >> ../${src}.$ext
-       cat tmp >> ../${src}.$ext
+      rm -f ${ex}.term
+      n=$(wc -l < ${sh})
+      while [ ${k} -le ${n} ]; do
+       echo -n "\$ " >> ${ex}.term
+       head -n ${k} ${sh} | tail -n1 > tmp
        chmod +x tmp
-       script -aq -c ./tmp $ex.term 2>&1 | grep error: > errors
-       if [ ! -z "`cat errors`" ]; then
+       cat tmp >> ${ex}.term
+       script -aq -c ./tmp ${ex}.term 2>&1 | grep error: > errors
+       if [ ! -z "$(cat errors)" ]; then
          echo "error: something happened on the way to heaven"
-         cat ./tmp
-         cat errors
+         cat ./tmp > /dev/error
+         cat errors > /dev/error
          exit 1
        fi
        k=$((${k} + 1))
       done
-      cat $ex.term | grep -v Script | sed s/^\\.\$/\$/ >> ../${src}.$ext
-      cd ..
-      cat << EOF
-$
-~~~
-
-EOF
+      
+      cat ${ex}.term | grep -v Script | sed s/^\\.\$/\$/ | sed /^$/d
+      echo \$ 
+      
+      # figure
+      ppl="$(basename ${ex} .fee).ppl"
+      if [[ -e "${ppl}" &&  -n "$(which pyxplot)" && -n "$(which feenox)" && -n "$(which pdf2svg)" ]]; then
+        pyxplot ${ppl}
+        pdf2svg $(basename ${ex} .fee).pdf $(basename ${ex} .fee).svg 
+      fi
+      
+    else
+      echo "$ feenox ${ex}"
+      feenox ${ex}
+      echo "$"
     fi
+    echo "~~~"
+    echo
+    cd ..
+    
 
-    # figure
-    if [ -e examples/$ex.fig ]; then
-      echo "![$ex](examples/`cat examples/$ex.fig`)"
+    # example figure
+    svg="examples/$(basename ${ex} .fee).svg"
+    if [ -e ${svg} ]; then
+      echo "![${ex}](${svg}){width=90%}\ "
     fi
 
 

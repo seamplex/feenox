@@ -1,0 +1,4 @@
+VAR nu
+nu0 = root(j0(nu), nu, 0, 3)
+PRINT "J0's first zero is" nu0 SEP " "
+PRINT "Indeed, J0(nu0) is equal to" j0(nu0) SEP " "

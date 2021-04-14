@@ -117,7 +117,7 @@ int feenox_initialize(int argc, char **argv) {
   // after getopt() the arguments are re-ordered as needed to further
   // process the input file and the replacement arguments
   feenox.argc = argc;
-  feenox.argv = malloc((argc+1) * sizeof(char *));
+  feenox_check_alloc(feenox.argv = malloc((argc+1) * sizeof(char *)));
   for (i = 0; i < argc; i++) {
     feenox_check_alloc(feenox.argv[i] = strdup(argv[i]));
   }
@@ -474,11 +474,11 @@ int feenox_init_before_run(void) {
     history->position = 0;
 
     if (history->function->data_value != NULL) {
-      free(history->function->data_value);
+      feenox_free(history->function->data_value);
     }
     if (history->function->data_argument != NULL) {
-      free(history->function->data_argument[0]);
-      free(history->function->data_argument);
+      feenox_free(history->function->data_argument[0]);
+      feenox_free(history->function->data_argument);
     }
   }  
 */
@@ -506,123 +506,3 @@ int feenox_init_before_run(void) {
 
   return FEENOX_OK;
 }
-
-
-/*
-// mira si los n puntos en x[] y en y[] forman una grilla estruturada
-int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny) {
-
-  int i, j;
-    
-  // hacemos una primera pasada sobre x hasta encontrar de nuevo el primer valor
-  i = 0;
-  do {
-    if (++i == n) {   
-      // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
-      return 0;
-    }
-  } while (gsl_fcmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
-  
-  // si i es uno entonces a comerla
-  if (i == 1) {
-    return 0;
-  }
-    
-  // asumimos que la cantidad de datos en x es i
-  *nx = i;
-  // y entonces ny tiene que ser la cantidad de datos totales dividido data_size
-  if (n % (*nx) != 0) {
-    // si esto no es entero, no puede ser rectangular
-    return 0;
-  }
-  *ny = n/(*nx);
-
-  // si x[j] != x[j-nx] entonces no es una grilla estructurada
-  for (i = *nx; i < n; i++) {
-    if (gsl_fcmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
-      return 0;
-    }
-  }
-  
-  // ahora miramos el conjunto y, tienen que ser nx valores igualitos consecutivos
-  for (i = 0; i < *ny; i++) {
-    for (j = 0; j < (*nx)-1; j++) {
-      if (gsl_fcmp(y[i*(*nx) + j], y[i*(*nx) + j + 1], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(y[n-1]-y[0])) != 0) {
-        return 0;
-      }
-    }
-  }
-  
-
-  // si llegamos hasta aca, es una grilla bidimensional estructurada!
-  return 1;
-    
-}
-
-
-// mira si los n puntos en x[], y[] y z[] forman una grilla estruturada
-int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz) {
-
-  int i;
-  
-  // hacemos una pasada sobre x hasta encontrar de nuevo el primer valor
-  i = 0;
-  do {
-    i += 1;
-    if (i == n) {   
-      // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
-      return 0;
-    }
-  } while (gsl_fcmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
-
-  // si i es uno entonces a comerla
-  if (i == 1) {
-    return 0;
-  }
-    
-  // asumimos que la cantidad de datos en x es i
-  *nx = i;
-
-  // hacemos una pasada sobre y hasta encontrar de nuevo el primer valor
-  // pero con step nx
-  i = 0;
-  do {
-    i += *nx;
-    if (i >= n) {   
-      // si recorrimos todo el set y nunca aparecio otra vez el y[0] a comerla
-      return 0;
-    }
-  } while (gsl_fcmp(y[i], y[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
-  
-  // si i es uno entonces a comerla
-  if (i == *nx || i % ((*nx)) != 0) {
-    return 0;
-  }
-
-  // asumimos que la cantidad de datos en x es i
-  *ny = i/(*nx);
-  
-  
-  // y entonces nz tiene que ser la cantidad de datos totales dividido data_size
-  if (n % ((*ny)*(*nx)) != 0) {
-    // si esto no es entero, no puede ser rectangular
-    return 0;
-  }
-  *nz = n/((*ny)*(*nx));
-
-
-  for (i = *nx; i < n; i++) {
-    if (gsl_fcmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
-      return 0;
-    }
-  }
-  for (i = (*nx)*(*ny); i < n; i++) {
-    if (gsl_fcmp(y[i], y[i-(*nx)*(*ny)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
-      return 0;
-    }
-  }
-  
-  
-  return 1;    
-}
-*/

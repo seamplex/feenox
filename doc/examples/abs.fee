@@ -1,0 +1,3 @@
+PRINT sqrt(abs(-2))
+
+# exercise: remove the absolute value from the sqrt argument

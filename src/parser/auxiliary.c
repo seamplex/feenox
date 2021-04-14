@@ -31,7 +31,7 @@ extern feenox_parser_t feenox_parser;
 
 
 
-const char operators[]        = "&|=!<>+-*/^()";
+const char operators[]        = "&|=!<>+-*/^ ()";
 const char factorseparators[] = "&|=!<>+-*/^(), \t\n";
 
 
@@ -87,8 +87,8 @@ int feenox_read_line(FILE *file_ptr) {
         }
         while (feenox.argv[feenox.optind+n][j] != 0) {
           // watch out!
-          // no se puede meter en una linea porque me puede llegar a meter
-          // el \0 en line[] antes de evaluar la condicion para salir del while
+          // this cannot be put in a single line because the '\0' might come
+          // in line[] before evaluating the condition to get out of the while
           feenox_parser.line[i++] = feenox.argv[feenox.optind+n][j++];
         }
 
@@ -98,7 +98,7 @@ int feenox_read_line(FILE *file_ptr) {
           case '"':
             // if there's an escaped quote, we take away the escape char and put
             // a magic marker 0x1e, afterwards in get_next_token() we change back
-            // te 0x1e with the unescaped quote
+            // the 0x1e with the unescaped quote
             feenox_parser.line[i++] = 0x1e;
           break;
             // escape sequences
@@ -146,15 +146,11 @@ int feenox_read_line(FILE *file_ptr) {
     // check if we need to reallocate the input buffer
     if (i >= feenox_parser.actual_buffer_size-16) {
       feenox_parser.actual_buffer_size += feenox_parser.page_size;
-      if ((feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size)) == NULL) {
-        feenox_push_error_message("out of memory");
-        return FEENOX_ERROR;
-      }
+      feenox_check_alloc(feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size));
     }
 
     // pedimos lo que viene en futbol de primera
     // contamos las lineas aca porque si nos toca \n nos vamos sin comerla ni beberla
-
     if ((c = fgetc(file_ptr)) == '\n') {
       lines++;
     }
@@ -562,7 +558,7 @@ void feenox_strip_comments(char *line) {
 
   line[j] = '\0';
 
-  free(buff);
+  feenox_free(buff);
 
   return;
 }
@@ -619,7 +615,7 @@ int feenox_strip_blanks(char *string) {
   }
 
   string[j] = '\0';
-  free(buff);
+  feenox_free(buff);
 
   return FEENOX_OK;
 
@@ -650,7 +646,7 @@ int feenox_add_function_from_string(const char *string, char **name) {
   }
   char **arg_name = NULL;
   feenox_call(feenox_read_arguments(arguments, n_arguments, &arg_name, NULL));
-  free(arguments);
+  feenox_free(arguments);
 
   *dummy_openpar = '\0';
   feenox_call(feenox_define_function(*name, n_arguments));
@@ -662,9 +658,9 @@ int feenox_add_function_from_string(const char *string, char **name) {
   // clean up this (partial) mess
   if (arg_name != NULL) {
     for (i = 0; i < n_arguments; i++) {
-      free(arg_name[i]);
+      feenox_free(arg_name[i]);
     }
-    free(arg_name);
+    feenox_free(arg_name);
   }
   
   return FEENOX_OK;

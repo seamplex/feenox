@@ -14,7 +14,9 @@ TESTS = tests/abort.sh \
         tests/expr.sh \
         tests/expressions_functions.sh \
         tests/mesh.sh \
-        tests/trig.sh
+        tests/materials.sh \
+        tests/trig.sh \
+        tests/thermal.sh
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .

@@ -283,19 +283,20 @@ int feenox_instruction_mesh_read(void *arg) {
 
 }
 
-node_t *mesh_find_nearest_node(mesh_t *mesh, const double *x) {
+node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x) {
   
   node_t *node;
   void *res_item;  
   
-  res_item = kd_nearest(mesh->kd_nodes, x);
+  // TODO: if kd_nodes is null, initialize it here
+  res_item = kd_nearest(this->kd_nodes, x);
   node = (node_t *)(kd_res_item(res_item, NULL));
   kd_res_free(res_item);    
 
   return node;
 }
-/*
-element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x) {
+
+element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x) {
 
   double x_nearest[3] = {0, 0, 0};
   double dist2;
@@ -327,19 +328,19 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
   }
   
 
-  if (element == NULL && feenox_var_value(feenox_mesh.vars.mesh_failed_interpolation_factor) > 0) {
+  if (element == NULL && feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor) > 0) {
     // if we do not find any then the mesh might be deformed or the point might be outside the domain
     // so we see if we can find another one
 
-    switch (mesh->spatial_dimensions) {
+    switch (mesh->dim) {
       case 1:
         dist2 = gsl_pow_2(fabs(x[0] - x_nearest[0]));
       break;
       case 2:
-        dist2 = mesh_subtract_squared_module2d(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module2d(x, x_nearest);
       break;
       case 3:
-        dist2 = mesh_subtract_squared_module(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module(x, x_nearest);
       break;
     }
     
@@ -354,7 +355,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
     struct cached_element *cached_element = NULL;
 
     // we ask for the nodes which are within a radius mesh_failed_interpolation_factor times the last one
-    struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var(feenox_mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
+    struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
       
     while(element == NULL && kd_res_end(presults) == 0) {
       second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
@@ -379,21 +380,21 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
 
     HASH_ITER(hh, cache, cached_element, tmp) {
       HASH_DEL(cache, cached_element);
-      free(cached_element);
+      feenox_free(cached_element);
     }  
   }  
   
   if (element == NULL) {
     // if still we did not find anything, 
-    switch (mesh->spatial_dimensions) {
+    switch (mesh->dim) {
       case 1:
         dist2 = gsl_pow_2(fabs(x[0] - x_nearest[0]));
       break;
       case 2:
-        dist2 = mesh_subtract_squared_module2d(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module2d(x, x_nearest);
       break;
       case 3:
-        dist2 = mesh_subtract_squared_module(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module(x, x_nearest);
       break;
     }
 
@@ -413,7 +414,7 @@ element_t *mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x
 
   return element;
 }
-*/
+
 
 // free all resources allocated when reading a mesh but not the rest
 // of the things that are in the input files (physical groups, etc)
@@ -426,31 +427,31 @@ int feenox_mesh_free(mesh_t *mesh) {
   if (mesh->cell != NULL) {
     for (i = 0; i < mesh->n_cells; i++) {
       if (mesh->cell[i].index != NULL) {
-        free(mesh->cell[i].index);
+        feenox_free(mesh->cell[i].index);
       }
       if (mesh->cell[i].neighbor != NULL) {
 	      for(int k = 0; k<mesh->cell[i].n_neighbors; k++) {
 	        if(mesh->cell[i].neighbor[k].face_coord != NULL) {
-	          free(mesh->cell[i].neighbor[k].face_coord);
+	          feenox_free(mesh->cell[i].neighbor[k].face_coord);
           }  
 	      }
-	      free(mesh->cell[i].neighbor);
+	      feenox_free(mesh->cell[i].neighbor);
       }
       if (mesh->cell[i].ifaces != NULL) {
         for (j = 0; j < mesh->cell[i].element->type->faces; j++) {
-          free(mesh->cell[i].ifaces[j]);
+          feenox_free(mesh->cell[i].ifaces[j]);
         }
-        free(mesh->cell[i].ifaces);
+        feenox_free(mesh->cell[i].ifaces);
       }
       if (mesh->cell[i].ineighbor != NULL) {
-        free(mesh->cell[i].ineighbor);
+        feenox_free(mesh->cell[i].ineighbor);
       }
     }
     for (d = 0; d < mesh->spatial_dimensions; d++) {
-      free(mesh->cells_argument[d]);
+      feenox_free(mesh->cells_argument[d]);
     }
-    free(mesh->cells_argument);
-    free(mesh->cell);
+    feenox_free(mesh->cells_argument);
+    feenox_free(mesh->cell);
   }
   mesh->cell = NULL;
   mesh->n_cells = 0;
@@ -464,7 +465,7 @@ int feenox_mesh_free(mesh_t *mesh) {
         for (j = 0; j < mesh->element[i].type->nodes; j++) {
           LL_FOREACH_SAFE(mesh->element[i].node[j]->associated_elements, element_item, element_tmp) {
             LL_DELETE(mesh->element[i].node[j]->associated_elements, element_item);
-            free(element_item);
+            feenox_free(element_item);
           }
           
           if (mesh->element[i].dphidx_node != NULL && mesh->element[i].dphidx_node[j] != NULL) {
@@ -472,25 +473,25 @@ int feenox_mesh_free(mesh_t *mesh) {
           }
           
           if (mesh->element[i].property_node != NULL && mesh->element[i].dphidx_node != NULL) {
-            free(mesh->element[i].property_node[j]);
+            feenox_free(mesh->element[i].property_node[j]);
           }
         }
-        free(mesh->element[i].node);
+        feenox_free(mesh->element[i].node);
         
         if (mesh->element[i].dphidx_node != NULL) {
-          free(mesh->element[i].dphidx_node);
+          feenox_free(mesh->element[i].dphidx_node);
         }
         
         if (mesh->element[i].property_node != NULL) {
-          free(mesh->element[i].property_node);
+          feenox_free(mesh->element[i].property_node);
         }
       }
       
-      if (mesh->element[i].type != NULL && mesh->element[i].type->gauss != NULL) {
+      if (mesh->element[i].type != NULL) {
         for (v = 0; v < mesh->element[i].type->gauss[mesh->integration].V; v++) {
 
           if (mesh->element[i].x != NULL && mesh->element[i].x[v] != NULL) {
-            free(mesh->element[i].x[v]);
+            feenox_free(mesh->element[i].x[v]);
           }
           if (mesh->element[i].H != NULL && mesh->element[i].H[v] != NULL) {
             gsl_matrix_free(mesh->element[i].H[v]);
@@ -514,34 +515,34 @@ int feenox_mesh_free(mesh_t *mesh) {
       }  
       
       if (mesh->element[i].w != NULL) {
-        free(mesh->element[i].w);
+        feenox_free(mesh->element[i].w);
       }  
       if (mesh->element[i].x != NULL) {
-        free(mesh->element[i].x);
+        feenox_free(mesh->element[i].x);
       }  
       if (mesh->element[i].H != NULL) {
-        free(mesh->element[i].H);
+        feenox_free(mesh->element[i].H);
       }  
       if (mesh->element[i].B != NULL) {
-        free(mesh->element[i].B);
+        feenox_free(mesh->element[i].B);
       }  
       if (mesh->element[i].dxdr != NULL) {
-        free(mesh->element[i].dxdr);
+        feenox_free(mesh->element[i].dxdr);
       }  
       if (mesh->element[i].drdx != NULL) {
-        free(mesh->element[i].drdx);
+        feenox_free(mesh->element[i].drdx);
       }  
       if (mesh->element[i].dhdx != NULL) {
-        free(mesh->element[i].dhdx);
+        feenox_free(mesh->element[i].dhdx);
       }  
       if (mesh->element[i].dphidx_gauss != NULL) {
-        free(mesh->element[i].dphidx_gauss);
+        feenox_free(mesh->element[i].dphidx_gauss);
       }  
       if (mesh->element[i].l != NULL) {
-        free(mesh->element[i].l);
+        feenox_free(mesh->element[i].l);
       }  
     }
-    free(mesh->element);
+    feenox_free(mesh->element);
   }
   mesh->element = NULL;
   mesh->n_elements = 0;
@@ -555,15 +556,13 @@ int feenox_mesh_free(mesh_t *mesh) {
   // nodes
   if (mesh->nodes_argument != NULL) {
     for (d = 0; d < mesh->dim; d++) {
-      free(mesh->nodes_argument[d]);
+      feenox_free(mesh->nodes_argument[d]);
     }
-    free(mesh->nodes_argument);
-    mesh->nodes_argument = NULL;
+    feenox_free(mesh->nodes_argument);
   }
   
   if (mesh->tag2index != NULL) {
     free(mesh->tag2index);
-    mesh->tag2index = NULL;
   }
   
   if (mesh->node != NULL) {
@@ -572,7 +571,7 @@ int feenox_mesh_free(mesh_t *mesh) {
         free (mesh->node[j].index_dof);
       }
       if (mesh->node[j].phi != NULL) {
-        free(mesh->node[j].phi);
+        feenox_free(mesh->node[j].phi);
       }
       if (mesh->node[j].dphidx != NULL) {
         gsl_matrix_free(mesh->node[j].dphidx);
@@ -581,10 +580,10 @@ int feenox_mesh_free(mesh_t *mesh) {
         gsl_matrix_free(mesh->node[j].delta_dphidx);
       }
       if (mesh->node[j].f != NULL) {
-        free(mesh->node[j].f);
+        feenox_free(mesh->node[j].f);
       }
     }
-    free(mesh->node);
+    feenox_free(mesh->node);
   }
   mesh->node = NULL;
   mesh->n_nodes = 0;
@@ -594,8 +593,7 @@ int feenox_mesh_free(mesh_t *mesh) {
   for (physical_group = mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     physical_group->n_elements = 0;
     physical_group->i_element = 0;
-    free(physical_group->element);
-    physical_group->element = NULL;
+    feenox_free(physical_group->element);
   }
 /*
   for (d = 0; d < 4; d++) {
@@ -607,9 +605,9 @@ int feenox_mesh_free(mesh_t *mesh) {
     HASH_DEL(mesh->physical_groups, physical_group);
     // si hacemos free de la entidad en si entonces perdemos la informacion sobre BCs
     // TODO: pensar!    
-    // free(physical_group->name);
-    // free(physical_group->element);
-    // free(physical_group);
+    // feenox_free(physical_group->name);
+    // feenox_free(physical_group->element);
+    // feenox_free(physical_group);
   }
 */    
   

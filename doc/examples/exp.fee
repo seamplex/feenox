@@ -1,0 +1,9 @@
+PHASE_SPACE x
+end_time = 1
+alpha = 1.8
+x_0 = 1.2
+y(t) := x_0 * exp(-alpha*t)
+
+x_dot .= -alpha*x
+
+PRINT t x y(t) y(t)-x 

@@ -9,6 +9,6 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-
+checkida
 answer exp.fee "1"
 exitifwrong $?

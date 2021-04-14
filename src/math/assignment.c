@@ -70,7 +70,7 @@ int feenox_add_assignment(char *left_hand, char *right_hand) {
     assignment->plain = 0;
     assignment->scalar = 1;
   }
-  free(sanitized_lhs);
+  feenox_free(sanitized_lhs);
     
     // we are looking for a variable
     // TODO: honor IMPLICIT

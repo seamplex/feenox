@@ -293,10 +293,10 @@ int feenox_instruction_print_function(void *arg) {
       }
     }
 
-    free(x);
-    free(x_min);
-    free(x_max);
-    free(x_step);
+    feenox_free(x);
+    feenox_free(x_min);
+    feenox_free(x_max);
+    feenox_free(x_step);
 
   } else if (print_function->first_function != NULL && print_function->first_function->data_size > 0) {
 
@@ -380,7 +380,7 @@ int feenox_instruction_print_function(void *arg) {
 
     }
 
-    free(x);
+    feenox_free(x);
 
   } else {
     feenox_push_error_message("mandatory range needed for PRINT_FUNCTION instruction (function %s is not point-wise defined)", print_function->first_function->name);

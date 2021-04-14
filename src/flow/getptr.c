@@ -124,13 +124,13 @@ vector_t *feenox_get_first_vector(const char *s) {
   factor = strtok(line, factorseparators);
   while (factor != NULL) {
     if ((wanted = feenox_get_vector_ptr(factor)) != NULL) {
-      free(line);
+      feenox_free(line);
       return wanted;
     }
     factor = strtok(NULL, factorseparators);
   }
   
-  free(line);
+  feenox_free(line);
   return NULL;
   
 }
@@ -144,13 +144,13 @@ matrix_t *feenox_get_first_matrix(const char *s) {
   factor = strtok(line, factorseparators);
   while (factor != NULL) {
     if ((wanted = feenox_get_matrix_ptr(factor)) != NULL) {
-      free(line);
+      feenox_free(line);
       return wanted;
     }
     factor = strtok(NULL, factorseparators);
   }
   
-  free(line);
+  feenox_free(line);
   return NULL;
   
 }
@@ -168,42 +168,15 @@ char *feenox_get_first_dot(const char *s) {
     if ((dummy = strstr(token, "_dot")) != NULL) {
       *dummy = '\0';
       wanted = strdup(token);
-      free(line);
+      feenox_free(line);
       return wanted;
     }
 
     token = strtok(NULL, factorseparators);
   }
 
-  free(line);
+  feenox_free(line);
   return NULL;
 
 }
 */
-
-
-// get a pointer to a material
-material_t *feenox_get_material_ptr(const char *name) {
-  material_t *material;
-  HASH_FIND_STR(feenox.mesh.materials, name, material);
-  return material;
-}
-
-// get a pointer to a physical group
-physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {
-  physical_group_t *physical_group;
-  mesh_t *dummy;
-  mesh_t *tmp;
-  if (mesh != NULL) {
-    HASH_FIND_STR(mesh->physical_groups, name, physical_group);
-  } else {
-    // barremos todas las mallas
-    HASH_ITER(hh, feenox.mesh.meshes, dummy, tmp) {
-      HASH_FIND_STR(dummy->physical_groups, name, physical_group);
-      if (physical_group != NULL) {
-        return physical_group;
-      }
-    } 
-  }
-  return physical_group;
-}

@@ -19,7 +19,7 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#define _GNU_SOURCE
+#define _GNU_SOURCE  // for asprintf
 #include "feenox.h"
 extern feenox_t feenox;
 
@@ -32,9 +32,10 @@ FILE *feenox_fopen(const char *filepath, const char *mode) {
     // the input file's directory to find files in the same directory 
     if (filepath[0] != '/') {
       char *last_attempt;
-      asprintf(&last_attempt, "%s/%s", feenox.main_input_dirname, filepath);
+      // TODO: check return
+      feenox_check_minusone_null(asprintf(&last_attempt, "%s/%s", feenox.main_input_dirname, filepath));
       handle = fopen(last_attempt, mode);
-      free(last_attempt);
+      feenox_free(last_attempt);
     }
   }
   
@@ -148,7 +149,7 @@ int feenox_instruction_file_open(void *arg) {
     }  
   }
   
-  free(newfilepath);
+  feenox_free(newfilepath);
   return FEENOX_OK;
   
 }
