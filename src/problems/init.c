@@ -21,7 +21,7 @@
  */
 #define _GNU_SOURCE  // for asprintf
 #include "feenox.h"
-feenox_t feenox;
+extern feenox_t feenox;
 
 #include <signal.h>   // for signal
 #include <unistd.h>   // for sysconf

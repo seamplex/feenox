@@ -1,6 +1,6 @@
 #define _GNU_SOURCE  // for asprintf
 #include "feenox.h"
-feenox_t feenox;
+extern feenox_t feenox;
 
 int feenox_problem_init_parser_modal(void) {
   

@@ -1,5 +1,5 @@
 #include "feenox.h"
-feenox_t feenox;
+extern feenox_t feenox;
 
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_dirichlet_eval(void) {

@@ -1,5 +1,5 @@
 #include "feenox.h"
-feenox_t feenox;
+extern feenox_t feenox;
 
 int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int v) {
   

@@ -1,5 +1,5 @@
 #include "feenox.h"
-feenox_t feenox;
+extern feenox_t feenox;
 
 int feenox_problem_init_parser_mechanical(void) {
   
