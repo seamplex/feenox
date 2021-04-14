@@ -29,7 +29,7 @@ struct mesh_interp_params {
 };
 
 
-double mesh_interpolate_function_node(struct function_t *function, const double *x) {
+double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x) {
   
   double r[3] = {0, 0, 0};    // vector with the local coordinates within the element
   double y, dist2;

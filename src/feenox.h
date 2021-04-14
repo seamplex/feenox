@@ -1835,6 +1835,7 @@ extern int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl
 extern int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J);
 extern int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_vector *residual, gsl_matrix * J);
 
+extern double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x);
 extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, double *r);
 
 // fem.c

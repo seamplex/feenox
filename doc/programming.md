@@ -136,7 +136,26 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
    ```c
    // TODO: should we allow unquoted names in the $PhysicalNames section?
    ```
- 
+
+## Indices in PDEs
+
+-------------------------------------------------------------
+   Index    Loop over...
+----------- -------------------------------------------------
+   `i`      elements or cells
+   
+   `j`      nodes, either global or local. If there are loops
+            which need both, use `j_local` and `j_global`.
+            
+   `k`      dummy index         
+
+   `m`      dimensions
+   
+   `d`      degree of freedoms
+   
+   `v`      Gauss points
+-------------------------------------------------------------
+
  
 ## Git workflow
 

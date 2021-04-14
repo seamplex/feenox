@@ -116,32 +116,26 @@ void feenox_set_function_args(function_t *this, double *x) {
 // the arguments are inside the structure
 double feenox_factor_function_eval(expr_item_t *this) {
 
-  int i;
-  double *x;
-  double x0;
-  double y;
+  double y = 0;
 
-
-//   feenox_push_error_message("when computing function %s", token->function->name);
-
+  // in order to avoid having to allocate and free too much,
+  // one-dimensional functions are treated differently
   if (this->function->n_arguments == 1) {
-
-    // para no tener que hacer malloc y frees todo el tiempo, para un solo argumento lo
-    // hacemos diferente
-    x0 = feenox_expression_eval(&this->arg[0]);
+    
+    double x0 = feenox_expression_eval(&this->arg[0]);
     y = feenox_function_eval(this->function, &x0);
 
   } else {
 
-    // muchos argumentos necesitan vectores
-    x = malloc(this->function->n_arguments*sizeof(double));
+    double *x = NULL;
+    feenox_check_alloc(x = malloc(this->function->n_arguments*sizeof(double)));
 
+    unsigned int i;
     for (i = 0; i < this->function->n_arguments; i++) {
       x[i] = feenox_expression_eval(&this->arg[i]);
     }
 
     y = feenox_function_eval(this->function, x);
-
     feenox_free(x);
     
   }
@@ -149,8 +143,6 @@ double feenox_factor_function_eval(expr_item_t *this) {
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();
   }
-
-//   feenox_pop_error_message();  
 
   return y;
 
@@ -204,6 +196,8 @@ int feenox_function_init(function_t *this) {
     // rellenamos las variables f_a f_b y f_c
     if (this->n_arguments == 1) {
       var_t *dummy_var;
+      
+      // TODO: asprintf
       char *dummy_aux = malloc(strlen(this->name) + 4);
       
       sprintf(dummy_aux, "%s_a", this->name);
@@ -430,8 +424,7 @@ double feenox_function_eval(function_t *this, const double *x) {
     
   // TODO: virtual methods
   if (this->type == function_type_pointwise_mesh_node) {
-//    return mesh_interpolate_function_node(this, x);
-    y = 0;
+    return feenox_mesh_interpolate_function_node(this, x);
     
   } else if (this->type == function_type_pointwise_mesh_cell) {
 //    return mesh_interpolate_function_cell(this, x);

@@ -79,6 +79,7 @@ int feenox_dirichlet_set_K(Mat K, Vec b) {
 /*  
   // sometimes there are hanging nodes with no associated volumes
   // this can trigger zeros on the diagonal and MatZeroRowsColumns complains
+  // TODO: execute this block only if a special flag is set, i.e. PROBLEM HANDLE_HANGING_NODES
   // TODO: change to MatGetDiagonal
   PetscScalar diag = 0;
   PetscInt k = 0;

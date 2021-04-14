@@ -13,6 +13,8 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
     feenox_call(feenox_expression_parse(bc_data->expr, rhs));
     
   } else {
+    // TODO: for weak bcs, check if the value depends on T so the problem can be marked non-linear automatically
+    //       mind the fact that if q=f(x,y,z) then f(x,y,z) can depend on T(x,y,z) itself
     feenox_push_error_message("Uknown thermal boundary condition '%s'", lhs);
     return FEENOX_ERROR;
   }

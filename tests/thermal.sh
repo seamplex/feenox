@@ -9,5 +9,5 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer thermal-slab-uniform-nosource.fee "0.5"
+answer thermal-slab-uniform-nosource.fee "0.123457"
 exitifwrong $?
