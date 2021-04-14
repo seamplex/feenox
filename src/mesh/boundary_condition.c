@@ -52,7 +52,7 @@ bc_t *feenox_define_bc_get_ptr(const char *name, mesh_t *mesh) {
   if ((bc = feenox_get_bc_ptr(name)) == NULL) {
     
     // create a new bc
-    feenox_check_alloc_null(bc = calloc(1, sizeof(material_t)));
+    feenox_check_alloc_null(bc = calloc(1, sizeof(bc_t)));
     feenox_check_alloc_null(bc->name = strdup(name));
     
     if ((bc->mesh = mesh) == NULL) {

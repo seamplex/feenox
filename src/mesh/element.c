@@ -317,12 +317,13 @@ int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[])
 
 
 int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs) {
-  int j, g;
+  size_t j;
+  unsigned int g;
   
   this->degrees_of_freedom = dofs;
 
   for (j = 0; j < this->n_nodes; j++) {
-    this->node[j].index_dof = malloc(this->degrees_of_freedom*sizeof(int));
+    feenox_check_alloc(this->node[j].index_dof = malloc(this->degrees_of_freedom*sizeof(size_t)));
     for (g = 0; g < this->degrees_of_freedom; g++) {
       this->node[j].index_dof[g] = this->degrees_of_freedom*j + g;
     }
