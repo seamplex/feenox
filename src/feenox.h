@@ -198,8 +198,7 @@ enum version_type {
 #endif
 
 #ifdef HAVE_PETSC
- PetscErrorCode petsc_err;
- #define petsc_call(s) {petsc_err = s; CHKERRQ(petsc_err);}
+ #define petsc_call(s) {PetscErrorCode petsc_err = s; CHKERRQ(petsc_err);}
 #endif
 
 #define feenox_free(p)                  free(p); p = NULL;
@@ -1041,6 +1040,13 @@ struct property_data_t {
   expr_t expr;
 
   UT_hash_handle hh;
+};
+
+struct distribution_t  {
+  int defined;
+  var_t *variable;
+  function_t *function;
+  property_t *property;
 };
 
 
