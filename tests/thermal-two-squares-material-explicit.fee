@@ -1,0 +1,12 @@
+READ_MESH two-squares.msh DIMENSIONS 2
+PROBLEM thermal
+
+MATERIAL soft k=1
+MATERIAL hard k=2
+
+BC left  T=0
+BC right T=1
+
+SOLVE_PROBLEM
+
+PRINT T(1,0.5)

@@ -56,6 +56,11 @@ int feenox_problem_init_runtime_thermal(void) {
     feenox_push_error_message("undefined thermal conductivity 'k'");
     return FEENOX_ERROR;
   }
+  if (thermal.k.full == 0) {
+    // TODO: tell which are the missing volumes
+    feenox_push_error_message("thermal conductivity 'k' is not defined over all volumes");
+    return FEENOX_ERROR;
+  }
   
   feenox_call(feenox_distribution_init(&thermal.q, "q'''"));
   if (thermal.q.defined == 0) {
@@ -76,9 +81,17 @@ int feenox_problem_init_runtime_thermal(void) {
           feenox_push_error_message("either 'kappa', 'rhocp' or both 'rho' and 'cp' are needed for transient");
           return FEENOX_ERROR;
         }
-        
+        if (thermal.rhocp.full == 0 || thermal.cp.full == 0) {
+          feenox_push_error_message("either 'rho' or 'cp' is not defined over all volumes");
+          return FEENOX_ERROR;
+        }
+      } else if (thermal.rhocp.full == 0) {
+        feenox_push_error_message("product 'rhocp' is not defined over all volumes");
+        return FEENOX_ERROR;
       }
-      
+    } else if (thermal.kappa.full == 0) {
+      feenox_push_error_message("thermal diffusivity 'kappa' is not defined over all volumes");
+      return FEENOX_ERROR;
     }
   }
   

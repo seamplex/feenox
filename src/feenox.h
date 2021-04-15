@@ -1046,10 +1046,19 @@ struct property_data_t {
 };
 
 struct distribution_t  {
-  int defined;
-  var_t *variable;
-  function_t *function;
+  char *name;
+  
+  int defined;             // true or false if is defined
+  int full;                // true if all the groups have the property
+  
+  var_t *variable_single;
+  var_t *variable_last;
+  
+  function_t *function_single;
+  function_t *function_last;
+  
   property_t *property;
+  material_t *last_material;
 };
 
 

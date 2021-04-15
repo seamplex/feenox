@@ -405,8 +405,7 @@ int feenox_init_after_parser(void) {
   
 // before each run we need to reset time, clear histories, etc
 int feenox_init_before_run(void) {
-  int i;
-  print_t *print;
+//  int i;
 //  history_t *history;
 //  file_t *file;
   
@@ -482,6 +481,7 @@ int feenox_init_before_run(void) {
     }
   }  
 */
+  print_t *print;
   LL_FOREACH(feenox.prints, print) {
     print->last_static_step = 0;
     print->last_step = 0;

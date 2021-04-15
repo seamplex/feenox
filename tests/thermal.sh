@@ -10,5 +10,12 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkpetsc
+
 answer thermal-slab-uniform-nosource.fee "0.123457"
+exitifwrong $?
+
+answer thermal-two-squares-material-explicit.fee "0.666667"
+exitifwrong $?
+
+answer thermal-two-squares-material-implicit.fee "0.666667"
 exitifwrong $?
