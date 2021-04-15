@@ -3,7 +3,9 @@ extern feenox_t feenox;
 
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_dirichlet_eval(void) {
-  
+
+#ifdef HAVE_PETSC
+
   size_t n_bcs = 0;
   if (feenox.pde.n_dirichlet_rows == 0) {
     // on the first iteration, assume that all the nodes need a dirichlet BC
@@ -67,11 +69,13 @@ int feenox_dirichlet_eval(void) {
     feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.n_dirichlet_rows * sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
   }
-  
+
+#endif
   return FEENOX_OK;
 }
 
 
+#ifdef HAVE_PETSC
 // K - stiffness matrix: needs a one in the diagonal and the value in b and keep symmetry
 // b - RHS: needs to be updated when modifying K
 int feenox_dirichlet_set_K(Mat K, Vec b) {
@@ -160,3 +164,4 @@ int feenox_dirichlet_set_r(Vec r, Vec phi) {
 
   return FEENOX_OK;
 }
+#endif

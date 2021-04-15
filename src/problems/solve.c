@@ -3,11 +3,9 @@ extern feenox_t feenox;
 
 int feenox_instruction_solve_problem(void *arg) {
   
+#ifdef HAVE_PETSC
 
-  //---------------------------------
   // initialize only if we did not initialize before
-  // TODO: how to handle changes in the mesh within steps?
-  //---------------------------------
   if (feenox.pde.spatial_unknowns == 0) {
     feenox_call(feenox.pde.problem_init_runtime_particular());
     feenox_call(feenox_problem_init_runtime_general());
@@ -55,11 +53,11 @@ int feenox_instruction_solve_problem(void *arg) {
   getrusage(RUSAGE_SELF, &feenox.pde.resource_usage);
   feenox_value(feenox.pde.vars.memory) = (double)(1024.0*feenox.pde.resource_usage.ru_maxrss);
 */
-  
+#endif  
   return FEENOX_OK;
 }
 
-
+#ifdef HAVE_PETSC
 int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
 
   VecScatter         vscat;
@@ -156,7 +154,7 @@ int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
   
   return FEENOX_OK;
 }
-
+#endif
 
 int feenox_problem_init_default(void) {
   return FEENOX_OK;

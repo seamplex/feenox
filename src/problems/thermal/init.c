@@ -1,5 +1,7 @@
 #include "feenox.h"
+#include "thermal.h"
 extern feenox_t feenox;
+thermal_t thermal;
 
 int feenox_problem_init_parser_thermal(void) {
   
@@ -17,11 +19,12 @@ int feenox_problem_init_parser_thermal(void) {
 ///va+T_min+detail The minimum temperature\ $T_\text{min}$ of the thermal problem.
   feenox.pde.vars.T_min = feenox_define_variable_get_ptr("T_min");
   
-  
   return FEENOX_OK;
 }
 
 int feenox_problem_init_runtime_thermal(void) {
+  
+#ifdef HAVE_PETSC
   
   // check if we were given an initial solution
   if ((feenox.pde.initial_condition = feenox_get_function_ptr("T_0")) != NULL) {
@@ -43,5 +46,42 @@ int feenox_problem_init_runtime_thermal(void) {
   feenox.pde.has_rhs = PETSC_TRUE;
   feenox.pde.solve_petsc = feenox_solve_petsc_linear;
 
+
+  // initialize distributions
+  // TODO: document distributions
+  // here we just initialize everything, during build we know which
+  // of them are mandatory and which are optional
+  feenox_call(feenox_distribution_init(&thermal.k, "k"));
+  if (thermal.k.defined == 0) {
+    feenox_push_error_message("undefined thermal conductivity 'k'");
+    return FEENOX_ERROR;
+  }
+  
+  feenox_call(feenox_distribution_init(&thermal.q, "q'''"));
+  if (thermal.q.defined == 0) {
+    feenox_call(feenox_distribution_init(&thermal.q, "q"));
+  }
+  // TODO: check that this does not depend on space
+  feenox_call(feenox_distribution_init(&thermal.Q, "Q"));
+  
+  if (feenox.pde.has_mass) {
+    feenox_call(feenox_distribution_init(&thermal.kappa, "kappa"));
+    if (thermal.kappa.defined == 0) {
+      feenox_call(feenox_distribution_init(&thermal.rhocp, "rhocp"));
+      if (thermal.rhocp.defined == 0) {
+        feenox_call(feenox_distribution_init(&thermal.rho, "rho"));
+        feenox_call(feenox_distribution_init(&thermal.cp, "cp"));
+
+        if (thermal.rhocp.defined == 0 || thermal.cp.defined == 0) {
+          feenox_push_error_message("either 'kappa', 'rhocp' or both 'rho' and 'cp' are needed for transient");
+          return FEENOX_ERROR;
+        }
+        
+      }
+      
+    }
+  }
+  
+#endif  
   return FEENOX_OK;
 }

@@ -2,6 +2,8 @@
 extern feenox_t feenox;
 
 int feenox_solve_petsc_transient(void) {
+
+#ifdef HAVE_PETSC
   
  PetscInt ts_steps;
 
@@ -59,13 +61,15 @@ int feenox_solve_petsc_transient(void) {
 
   petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_steps));
   petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
+
+#endif
   
   return FEENOX_OK;
   
 }
 
 
-
+#ifdef HAVE_PETSC
 PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx) {
   
   feenox_var_value(feenox_special_var(t)) = t;
@@ -105,3 +109,4 @@ PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal 
   
   return FEENOX_OK;
 }
+#endif

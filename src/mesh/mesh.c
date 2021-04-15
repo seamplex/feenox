@@ -538,9 +538,11 @@ int feenox_mesh_free(mesh_t *mesh) {
       if (mesh->element[i].dphidx_gauss != NULL) {
         feenox_free(mesh->element[i].dphidx_gauss);
       }  
+#ifdef HAVE_PETSC      
       if (mesh->element[i].l != NULL) {
         feenox_free(mesh->element[i].l);
       }  
+#endif 
     }
     feenox_free(mesh->element);
   }

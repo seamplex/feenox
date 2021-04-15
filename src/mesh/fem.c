@@ -587,6 +587,7 @@ int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned 
   return FEENOX_OK;
 }
 
+#ifdef HAVE_PETSC
 int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh) {
   
   if (this->l == NULL) {
@@ -607,6 +608,7 @@ int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh) {
   return FEENOX_OK;
   
 }
+#endif
 
 /*
 inline int mesh_update_coord_vars(double *x) {

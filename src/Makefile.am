@@ -72,6 +72,7 @@ feenox_SOURCES = \
 ./problems/init.c \
 ./problems/build.c \
 ./problems/dirichlet.c \
+./problems/distribution.c \
 ./problems/petsc_ksp.c \
 ./problems/petsc_ts.c \
 ./problems/thermal/init.c \

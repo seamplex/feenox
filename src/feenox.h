@@ -222,6 +222,7 @@ enum version_type {
 #define feenox_value_ptr(obj)  (obj->value)
 
 // GSL's equivalent to PETSc's ADD_VALUES
+#define gsl_vector_add_to_element(vector,i,x)    gsl_vector_set((vector),(i),gsl_vector_get((vector),(i))+(x))
 #define gsl_matrix_add_to_element(matrix,i,j,x)  gsl_matrix_set((matrix),(i),(j),gsl_matrix_get((matrix),(i),(j))+(x))
 
 
@@ -271,6 +272,8 @@ typedef struct property_t property_t;
 typedef struct property_data_t property_data_t;
 typedef struct material_t material_t;
 typedef struct material_list_item_t material_list_item_t;
+typedef struct distribution_t distribution_t;
+
 typedef struct bc_t bc_t;
 typedef struct bc_data_t bc_data_t;
 
@@ -1380,7 +1383,7 @@ struct feenox_t {
     } transient_type;
     
     enum {
-      math_type_undefined,
+      math_type_automatic,
       math_type_linear,
       math_type_nonlinear,
       math_type_eigen,
@@ -1433,8 +1436,6 @@ struct feenox_t {
     int (*problem_init_runtime_particular)(void);
     int (*solve_petsc)(void);
 
-    PetscBool has_rhs;
-    PetscBool has_mass;
     function_t *initial_condition;
 
     struct {
@@ -1574,6 +1575,9 @@ struct feenox_t {
     function_t *tresca;
     
 #ifdef HAVE_PETSC    
+    PetscBool has_rhs;
+    PetscBool has_mass;
+    
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
     PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
@@ -1919,10 +1923,6 @@ extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
 
 
-// solve.c
-extern int feenox_instruction_solve_problem(void *arg);
-extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
-
 // init.c
 extern int feenox_problem_init_parser_general(void);
 extern int feenox_problem_init_runtime_general(void);
@@ -1934,7 +1934,13 @@ extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
 // bulk.c
 extern int feenox_build(void);
 
+// solve.c
+extern int feenox_instruction_solve_problem(void *arg);
+
 #ifdef HAVE_PETSC
+// solve.c
+extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
+
 // petsc_ksp.c
 extern int feenox_solve_petsc_linear(void);
 extern PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
@@ -1951,10 +1957,11 @@ extern int feenox_dirichlet_set_K(Mat K, Vec b);
 extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_J(Mat J);
 extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
-
-
-
 #endif
+
+// distribution.c
+extern int feenox_distribution_init(distribution_t *this, const char *name);
+extern double feenox_distribution_eval(distribution_t *this, const double *x, material_t *material);
 
 // thermal/init.c
 extern int feenox_problem_init_parser_thermal(void);

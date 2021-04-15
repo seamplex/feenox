@@ -24,6 +24,8 @@ extern feenox_t feenox;
 
 int feenox_solve_petsc_linear(void) {
 
+#ifdef HAVE_PETSC
+  
   KSPConvergedReason reason;
   PetscInt iterations;
   PC pc;
@@ -101,10 +103,12 @@ int feenox_solve_petsc_linear(void) {
   petsc_call(KSPGetResidualNorm(feenox.pde.ksp, feenox_value_ptr(feenox.pde.vars.residual_norm)));
 //  time_checkpoint(solve_end);
 
-
+#endif
   return FEENOX_OK;
 
 }
+
+#ifdef HAVE_PETSC
 
 PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy) {
 //  feenox_value(feenox.pde.vars.iterations) = (double)n;
@@ -299,3 +303,5 @@ int feenox_set_pc(PC pc) {
 */  
   return FEENOX_OK;
 }
+
+#endif

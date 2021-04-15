@@ -3,6 +3,7 @@ extern feenox_t feenox;
 
 int feenox_build(void) {
   
+#ifdef HAVE_PETSC  
   size_t step = ceil((double)feenox.pde.mesh->n_elements/100.0);
   if (step < 1) {
     step = 1;
@@ -58,6 +59,7 @@ int feenox_build(void) {
 
   feenox_call(feenox_build_assembly());
 
+#endif
   
   return FEENOX_OK;
 }
@@ -66,6 +68,8 @@ int feenox_build(void) {
 
 int feenox_elemental_objects_allocate(element_t *this) {
 
+#ifdef HAVE_PETSC
+  
   feenox_call(feenox_elemental_objects_free());
       
   feenox.pde.n_local_nodes = this->type->nodes;
@@ -75,6 +79,8 @@ int feenox_elemental_objects_allocate(element_t *this) {
   feenox_check_alloc(feenox.pde.Mi = gsl_matrix_calloc(feenox.pde.elemental_size, feenox.pde.elemental_size));
   feenox_check_alloc(feenox.pde.bi = gsl_vector_calloc(feenox.pde.elemental_size));
   
+#endif  
+  
   return FEENOX_OK;
 
 }
@@ -82,6 +88,8 @@ int feenox_elemental_objects_allocate(element_t *this) {
 
 int feenox_elemental_objects_free(void) {
 
+#ifdef HAVE_PETSC
+  
   if (feenox.pde.n_local_nodes != 0 && feenox.pde.elemental_size != 0) {
     gsl_matrix_free(feenox.pde.Ki);
     gsl_matrix_free(feenox.pde.Mi);
@@ -91,7 +99,7 @@ int feenox_elemental_objects_free(void) {
   feenox.pde.n_local_nodes = 0;
   feenox.pde.elemental_size = 0;
   
-  
+#endif  
   return FEENOX_OK;
 
 }
@@ -99,6 +107,8 @@ int feenox_elemental_objects_free(void) {
 
 int feenox_build_element_volumetric(element_t *this) {
 
+#ifdef HAVE_PETSC
+  
   if (this->physical_group == NULL) {
     feenox_push_error_message("volumetric element %d does not have an associated physical group", this->tag);
     return FEENOX_ERROR;
@@ -142,6 +152,8 @@ int feenox_build_element_volumetric(element_t *this) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
   }
 
+#endif  
+  
   return FEENOX_OK;
 }
 
@@ -215,6 +227,9 @@ inline double fino_compute_r_for_axisymmetric(element_t *element, int v) {
 
 
 int feenox_build_assembly(void) {
+  
+#ifdef HAVE_PETSC
+
   // TODOD: which is better?
 /*  
   petsc_call(MatAssemblyBegin(feenox.K, MAT_FINAL_ASSEMBLY));
@@ -258,6 +273,7 @@ int feenox_build_assembly(void) {
   if (feenox.pde.M != NULL) {
     petsc_call(MatAssemblyEnd(feenox.pde.M, MAT_FINAL_ASSEMBLY));
   }
-  
+
+#endif  
   return FEENOX_OK;
 }

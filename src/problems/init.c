@@ -27,24 +27,26 @@ extern feenox_t feenox;
 #include <unistd.h>   // for sysconf
 
 
+#ifdef HAVE_PETSC
 // this is a wrapper because PetscOptionsHasName changed its arguments after 3.7.0
 #if PETSC_VERSION_LT(3,7,0)
  #define PetscOptionsHasNameWrapper(a, b, c) PetscOptionsHasName(a, b, c)
 #else
  #define PetscOptionsHasNameWrapper(a, b, c) PetscOptionsHasName(PETSC_NULL, a, b, c)
 #endif
+#endif
 
-
-// #define NAME_SIZE 32
 
 int feenox_problem_init_parser_general(void) {
 
+#ifdef HAVE_PETSC
   if (sizeof(PetscReal) != sizeof(double)) {
     feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d != PetscReal = %d", sizeof(double), sizeof(PetscReal));
     return FEENOX_ERROR;
   }
-  
   // TODO: check versions from the header and from the library
+#endif  
+  
   
   // we process the original command line (beucase the one that remains after getopt might have a different order)
   // for instance, "-log_summary" is trapped by feenox's getoopt as "-l"
@@ -86,6 +88,7 @@ int feenox_problem_init_parser_general(void) {
   }
 */
 
+#ifdef HAVE_PETSC
 #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc)
   petsc_call(SlepcInitialize(&feenox.argc, &feenox.argv, (char*)0, PETSC_NULL));
@@ -95,13 +98,14 @@ int feenox_problem_init_parser_general(void) {
 #endif
   feenox.pde.petscinit_called = PETSC_TRUE;
   
-  // segfaults are segfaults, try to leave PETSC out of them
-  signal(SIGSEGV, SIG_DFL);
 
   // get the number of processes and the rank
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.nprocs));
   petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.rank));
 
+  // segfaults are segfaults, try to leave PETSC out of them
+  signal(SIGSEGV, SIG_DFL);
+  
   // TODO
   // install out error handler for PETSc
 //  petsc_call(PetscPushErrorHandler(&feenox_handler, NULL));
@@ -261,6 +265,8 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
   // empezamos con un valor muy negativo, si nadie lo toca ni calculamos la calidad
 //  feenox.pde.gradient_quality_threshold = DEFAULT_GRADIENT_JACOBIAN_THRESHOLD;
 
+#endif  
+  
   return FEENOX_OK;
 }
 
@@ -393,9 +399,11 @@ int plugin_init_before_run(void) {
 
   feenox.pde.global_size = 0;
   feenox.pde.spatial_unknowns = 0;
+#ifdef HAVE_PETSC  
   feenox.pde.progress_r0 = 0;
   feenox.pde.already_built = PETSC_FALSE;
   feenox.pde.first_build = PETSC_TRUE;
+#endif  
 
 //  feenox_call(feenox_problem_free());
   
@@ -406,7 +414,7 @@ int plugin_init_before_run(void) {
 int plugin_finalize(void) {
 
 //  feenox_call(feenox_problem_free());
-
+#ifdef HAVE_PETSC
   if (feenox.pde.petscinit_called) {
 #ifdef HAVE_SLEPC  
     petsc_call(SlepcFinalize());
@@ -414,12 +422,14 @@ int plugin_finalize(void) {
     petsc_call(PetscFinalize());
 #endif
   }
+#endif  
   
   return FEENOX_OK;
 }
 
 int feenox_problem_init_runtime_general(void) {
 
+#ifdef HAVE_PETSC
   // command-line arguments that take precedence over the options in the input file
   // check for further commandline options
   // see if the user asked for mumps in the command line
@@ -595,6 +605,7 @@ int feenox_problem_init_runtime_general(void) {
   }
 
   feenox_call(feenox_mesh_init_nodal_indexes(feenox.pde.mesh, feenox.pde.dofs));
+#endif
   
   return FEENOX_OK;
 }

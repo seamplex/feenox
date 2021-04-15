@@ -1,4 +1,5 @@
 #include "feenox.h"
+#include "thermal.h"
 extern feenox_t feenox;
 
 int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs) {
@@ -25,7 +26,9 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
 
 
 int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t k) {
+#ifdef HAVE_PETSC
   feenox.pde.dirichlet_indexes[k] = feenox.pde.mesh->node[j].index_dof[bc_data->dof];
   feenox.pde.dirichlet_values[k] = feenox_expression_eval(&bc_data->expr[0]);
+#endif
   return FEENOX_OK;
 }

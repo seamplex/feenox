@@ -38,6 +38,14 @@ checkida() {
  fi
 }
 
+# checks if feenox is compiled with ida and skips the test if necessary
+checkpetsc() {
+ if [ $(${feenox} --versions | grep 'PETSc' | grep -v 'N/A'| wc -l) = 0 ]; then
+  echo "FeenoX was not compiled with PETSc, skipping test"
+  exit 77
+ fi
+}
+
 
 answer() {
   echo -n "${1}... "
