@@ -47,13 +47,13 @@ for kw in ${kws}; do
   # usage
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
   if [ -n "${usage}" ]; then
-    echo -n "\`${usage}\`"
-#     echo "::: {.usage}"
-#     echo "~~~{.feenox style=feenox}"
-#     grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs | tr @ \\n
-#     echo "~~~"
-#     echo ":::"
-#     echo
+#     echo -n "\`${usage}\`"
+    echo "::: {.usage}"
+    echo "~~~{.feenox style=feenox}"
+    grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs | tr @ \\n
+    echo "~~~"
+    echo ":::"
+    echo
   fi
 
   # math+figure
@@ -183,8 +183,8 @@ EOF
        script -aq -c ./tmp ${ex}.term 2>&1 | grep error: > errors
        if [ ! -z "$(cat errors)" ]; then
          echo "error: something happened on the way to heaven"
-         cat ./tmp > /dev/error
-         cat errors > /dev/error
+         cat ./tmp > /dev/stderr
+         cat errors > /dev/stderr
          exit 1
        fi
        k=$((${k} + 1))
