@@ -1,4 +1,3 @@
-#define _GNU_SOURCE  // for asprintf
 #include "feenox.h"
 extern feenox_t feenox;
 

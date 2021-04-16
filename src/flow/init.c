@@ -442,6 +442,7 @@ int feenox_init_before_run(void) {
   // si el usuario da explicitamente los valores de las derivas, es lo mismo
   // que las condiciones iniciales asi que todo manzana
   if (feenox.dae.phase_derivative != NULL) {
+    unsigned int i = 0;
     for (i = 0; i < feenox.dae.dimension; i++) {
       *(feenox.dae.phase_value[i]) = 0;
       *(feenox.dae.phase_derivative[i]) = 0;

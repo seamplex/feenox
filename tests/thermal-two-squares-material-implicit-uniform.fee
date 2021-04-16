@@ -2,7 +2,7 @@ READ_MESH two-squares.msh DIMENSIONS 2
 PROBLEM thermal
 
 k_soft = 1
-k_hard = 2
+k_hard = 3
 
 BC left  T=0
 BC right T=1

@@ -198,12 +198,10 @@ char *feenox_find_first_dot(const char *s) {
 int feenox_dae_init(void) {
   
 #ifdef HAVE_IDA
-  int i, k, l;
-  phase_object_t *phase_object;
-  dae_t *dae;
   
   // primero calculamos el tamanio del phase space
   feenox.dae.dimension = 0;
+  phase_object_t *phase_object = NULL;
   LL_FOREACH(feenox.dae.phase_objects, phase_object) {
     
     if (phase_object->variable != NULL) {
@@ -248,7 +246,7 @@ int feenox_dae_init(void) {
   feenox.dae.phase_value = malloc(feenox.dae.dimension * sizeof(double *));
   feenox.dae.phase_derivative = malloc(feenox.dae.dimension * sizeof(double *));
   
-  i = 0;  
+  sunindextype i = 0;  
   LL_FOREACH(feenox.dae.phase_objects, phase_object) {
 
     if (phase_object->variable != NULL) {
@@ -260,6 +258,7 @@ int feenox_dae_init(void) {
     } else if (phase_object->vector != NULL) {
 
       phase_object->offset = i;
+      sunindextype k = 0;
       for (k = 0; k < phase_object->vector->size; k++) {
         feenox.dae.phase_value[i] = gsl_vector_ptr(feenox_value_ptr(phase_object->vector), k);
         feenox.dae.phase_derivative[i] = gsl_vector_ptr(feenox_value_ptr(phase_object->vector_dot), k);
@@ -269,7 +268,9 @@ int feenox_dae_init(void) {
     } else if (phase_object->matrix != NULL) {
 
       phase_object->offset = i;
-    for (k = 0; k < phase_object->matrix->rows; k++) {
+      int k = 0;
+      int l = 0;
+      for (k = 0; k < phase_object->matrix->rows; k++) {
         for (l = 0; l < phase_object->matrix->cols; l++) {
           feenox.dae.phase_value[i] = gsl_matrix_ptr(feenox_value_ptr(phase_object->matrix), k, l);
           feenox.dae.phase_derivative[i] = gsl_matrix_ptr(feenox_value_ptr(phase_object->matrix_dot), k, l);
@@ -281,6 +282,7 @@ int feenox_dae_init(void) {
 
   // process the DAEs
   i = 0;
+  dae_t *dae = NULL;
   LL_FOREACH(feenox.dae.daes, dae) {
     
     if (dae->matrix != NULL) {
@@ -331,9 +333,6 @@ int feenox_dae_init(void) {
     return FEENOX_ERROR;
   }
   
-  
-  
-  // TODO: make sure that dimension is of type sundindex
   feenox.dae.x = N_VNew_Serial(feenox.dae.dimension);
   feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension);
   feenox.dae.id = N_VNew_Serial(feenox.dae.dimension);
@@ -349,7 +348,7 @@ int feenox_dae_init(void) {
     NV_DATA_S(feenox.dae.id)[i] = DAE_ALGEBRAIC; 
   }
   // initialize IDA
-  int err;
+  int err; // this is used inside the ida_call() macro
   ida_call(IDAInit(feenox.dae.system, feenox_ida_dae, feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt));
 
   // seteo de tolerancias 

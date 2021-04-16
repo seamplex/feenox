@@ -14,8 +14,16 @@ checkpetsc
 answer thermal-slab-uniform-nosource.fee "0.123457"
 exitifwrong $?
 
-answer thermal-two-squares-material-explicit.fee "0.666667"
+answer thermal-two-squares-material-explicit-uniform.fee "0.75"
 exitifwrong $?
 
-answer thermal-two-squares-material-implicit.fee "0.666667"
+answer thermal-two-squares-material-implicit-uniform.fee "0.75"
 exitifwrong $?
+
+answer thermal-two-squares-material-explicit-space.fee "0.71773"
+exitifwrong $?
+
+answer thermal-two-squares-material-implicit-space.fee "0.71773"
+exitifwrong $?
+
+

@@ -19,8 +19,7 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#define _GNU_SOURCE  // for asprintf
-#include "../feenox.h"
+#include "feenox.h"
 extern feenox_t feenox;
 
 

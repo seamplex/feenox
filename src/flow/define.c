@@ -19,7 +19,6 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#define _GNU_SOURCE  // for asprintf
 #include "feenox.h"
 extern feenox_t feenox;
 extern builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS];

@@ -27,6 +27,12 @@ OF SUCH DAMAGE.
 #ifndef _KDTREE_H_
 #define _KDTREE_H_
 
+// This header is needed to comply with C99. From alloca(3)
+// > Normally, gcc(1) translates calls to alloca() with inlined code.
+// > This is not done when either the -ansi, -std=c89, -std=c99 or the
+// > -std=c11 option is given and the header <alloca.h> is not included. 
+#include <alloca.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

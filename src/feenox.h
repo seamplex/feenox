@@ -23,6 +23,8 @@
 #ifndef FEENOX_H
 #define FEENOX_H
 
+#define _GNU_SOURCE   // for POSIX in C99
+
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
 
@@ -1051,14 +1053,16 @@ struct distribution_t  {
   int defined;             // true or false if is defined
   int full;                // true if all the groups have the property
   
-  var_t *variable_single;
-  var_t *variable_last;
-  
-  function_t *function_single;
-  function_t *function_last;
-  
   property_t *property;
+  function_t *function;
+  var_t *variable;
+  
+  // caches
   material_t *last_material;
+  property_data_t *last_property_data;
+  
+  // virtual method to evaluate at a point
+  double (*eval)(distribution_t *this, const double *x, material_t *material);  
 };
 
 
@@ -1332,25 +1336,18 @@ struct feenox_t {
   } mesh;  
   
   struct {
-    int dimension;
     int reading_daes;
     double **phase_value;
     double **phase_derivative;
     phase_object_t *phase_objects;
-  
-    dae_t *daes;
-    void *system;
-    
-
     enum {
       initial_conditions_as_provided,
       initial_conditions_from_variables,
       initial_conditions_from_derivatives,
     } initial_conditions_mode;
 
-    instruction_t *instruction;
-    
 #if HAVE_IDA
+    sunindextype dimension;
     N_Vector x;
     N_Vector dxdt;
     N_Vector id;
@@ -1358,6 +1355,11 @@ struct feenox_t {
     SUNMatrix A;
     SUNLinearSolver LS;
 #endif
+
+    dae_t *daes;
+    void *system;
+    instruction_t *instruction;
+    
   } dae;
   
   struct {
@@ -1971,6 +1973,12 @@ extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
 // distribution.c
 extern int feenox_distribution_init(distribution_t *this, const char *name);
 extern double feenox_distribution_eval(distribution_t *this, const double *x, material_t *material);
+extern double feenox_distribution_eval_property(distribution_t *this, const double *x, material_t *material);
+extern double feenox_distribution_eval_function_global(distribution_t *this, const double *x, material_t *material);
+extern double feenox_distribution_eval_function_local(distribution_t *this, const double *x, material_t *material);
+extern double feenox_distribution_eval_variable_global(distribution_t *this, const double *x, material_t *material);
+extern double feenox_distribution_eval_variable_local(distribution_t *this, const double *x, material_t *material);
+
 
 // thermal/init.c
 extern int feenox_problem_init_parser_thermal(void);
