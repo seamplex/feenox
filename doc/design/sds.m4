@@ -67,6 +67,8 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
 \noindent it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)) for scaling up large problems,
 
 
+**ejemplo de input: MWE termico**
+
 **ejemplo de input - NAMFES LE11**
 
 **ejemplo Python**
@@ -79,13 +81,14 @@ esyscmd(awk -f quote.awk 040-architecture.md)
 FeenoX’ main development architecture is Debian GNU/Linux running over 64-bits Intel-compatible processors. Compatibility with other operating systems and architectures is encouraged although not required. All the required dependencies are free and/or open source and already available in Debian’s official repositories and the POSIX standard is followed whenever possible. 
 
 FeenoX is written in plain\ C conforming to the ISO\ C99 specification (plus POSIX extensions), which is a standard, mature and widely supported language with compilers for a wide variety of architectures. 
-For solving ODEs/DAEs, FeenoX relies on [Lawrence Livermore’s SUNDIALS library](https://computing.llnl.gov/projects/sundials/ida). For PDEs, FeenoX uses [Argonne’s PETSc library](https://www.mcs.anl.gov/petsc/). Both of them are
+For its basic mathematical capabilities, FeenoX uses the [GNU Scientifc Library](https://www.gnu.org/software/gsl/).
+For solving ODEs/DAEs, FeenoX relies on [Lawrence Livermore’s SUNDIALS library](https://computing.llnl.gov/projects/sundials/ida). For PDEs, FeenoX uses [Argonne’s PETSc library](https://www.mcs.anl.gov/petsc/). All three of them are
 
  * free and open source,
  * written in C (neither Fortran nor C++),
- * mature,
- * actively developed,
- * parallel scalable through the [MPI standard](https://www.mcs.anl.gov/research/projects/mpi/standard.html),
+ * mature and stable,
+ * actively developed and updated,
+dnl * scalable through the [MPI standard](https://www.mcs.anl.gov/research/projects/mpi/standard.html),
  * very well known in the industry and academia.
 
 Programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. There are people that have been able to compile them under macOS and Windows apart from the main architecture based on GNU/Linux. Due to the way that FeenoX is designed and the policy separated from the mechanism, it is possible to control a running instance remotely from a separate client which can eventually run on a mobile device.
@@ -95,18 +98,35 @@ Programs using both these libraries can run on either large high-performance sup
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 050-deployment.md)
 
-autoconf vs. cmake, rule of diversity 
+FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too.
 
-gcc, clang
+The configuration and compilation is based on GNU Autotools that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of UNIX variants. It can use the any C99-compatible C compiler (it has been tested with GNU C compiler and LLVM’s Clang compiler). 
 
-blas, lapack, atlas
+FeenoX relies on a few open source libraries---most of them optional. The only mandatory library is the GNU Scientific Library which is part of the GNU/Linux operating system and as such is readily available in all distributions as `libgsl-dev`. The sources of the rest of the optional libraries are also widely available in most common GNU/Linux distributions:
 
-binaries freely available at seamplex.com
+ * [GNU Readline](https://tiswww.case.edu/php/chet/readline/rltop.html): `libreadline-dev`
+ * [SUNDIALS IDA](https://computing.llnl.gov/projects/sundials/ida): `libsundials-dev`
+ * [PETSc](https://www.mcs.anl.gov/petsc/): `petsc-dev`
+ * [SLEPc](https://slepc.upv.es/): `slepc-dev`
 
-Linux, mac, windows 
+Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executables that do not need any other shared libraries to be present on the target host, but their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweights the limited functionality and scalability of the tool.
+
+dnl autoconf vs. cmake, rule of diversity 
+
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 060-execution.md)
+
+
+>It is mandatory to be able to execute the tool remotely, either with a direct action from the user or from a high-level workflow which could be triggered by a human or by an automated script. The calling party should be able to monitor the status during run time and get the returned error level after finishing the execution.
+
+As FeenoX is designed to run as a file filter (i.e. as a transfer function) and explicitly avoids having a graphical interface, the program can be executed on a remote server through a SSH session or be part of a docker provisioning script. FeenoX does provide mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
+
+>The tool shall provide a mean to perform parametric computations by varying one or more problem parameters in a certain prescribed way such that it can be used as an inner solver for an outer-loop optimization tool. In this regard, it is desirable if the tool could compute scalar values such that the figure of merit being optimized (maximum temperature, total weight, total heat flux, minimum natural frequency, maximum displacement, maximum von\ Mises stress, etc.) is already available without needing further post-processing.
+
+parametric, example of arguments, loop
+
+
 
 command line args for paramteric runs from a shell script
 

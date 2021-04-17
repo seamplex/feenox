@@ -10,7 +10,6 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
   
   // TODO
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(element, v);
@@ -23,6 +22,8 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
   }
 
   // thermal stiffness matrix
+  // TODO: see if we need to compute x or not
+  feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
   double k = thermal.k.eval(&thermal.k, element->x[v], material);
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, element->B[v], element->B[v], 1.0, feenox.pde.Ki);
 

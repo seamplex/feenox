@@ -1,0 +1,7 @@
+READ_MESH test-$1.msh DIMENSIONS 2
+PROBLEM thermal
+k(x,y) := 1+T(x,y)
+BC left  T=0
+BC right T=$2
+SOLVE_PROBLEM
+PRINT TEXT $1 TEXT "Tright=$2" T(1,0.5)
