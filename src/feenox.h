@@ -1336,6 +1336,8 @@ struct feenox_t {
   } mesh;  
   
   struct {
+    unsigned int dimension;
+
     int reading_daes;
     double **phase_value;
     double **phase_derivative;
@@ -1347,7 +1349,6 @@ struct feenox_t {
     } initial_conditions_mode;
 
 #if HAVE_IDA
-    sunindextype dimension;
     N_Vector x;
     N_Vector dxdt;
     N_Vector id;
