@@ -1178,6 +1178,7 @@ struct mesh_t {
 struct feenox_t {
   int argc;
   char **argv;
+  char **argv_orig;
   int optind;
 
   char *main_input_filepath;
@@ -1954,6 +1955,7 @@ extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
 
 // petsc_ksp.c
 extern int feenox_solve_petsc_linear(void);
+extern int feenox_solve_petsc_nonlinear(void);
 extern PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
 extern int feenox_set_pc(PC pc);
 extern int feenox_set_ksp(KSP ksp);
@@ -1968,6 +1970,8 @@ extern int feenox_dirichlet_set_K(Mat K, Vec b);
 extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_J(Mat J);
 extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
+extern int feenox_dirichlet_set_phi(Vec phi);
+
 #endif
 
 // distribution.c

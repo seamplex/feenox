@@ -74,6 +74,7 @@ feenox_SOURCES = \
 ./problems/dirichlet.c \
 ./problems/distribution.c \
 ./problems/petsc_ksp.c \
+./problems/petsc_snes.c \
 ./problems/petsc_ts.c \
 ./problems/thermal/init.c \
 ./problems/thermal/bulk.c \

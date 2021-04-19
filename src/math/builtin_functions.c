@@ -1019,7 +1019,7 @@ double feenox_builtin_equal(expr_item_t *f) {
     eps = feenox_expression_eval(&f->arg[2]);
   }
 
-  if (fabs(a < 1) || fabs(b < 1)) {
+  if (fabs(a) < 1 || fabs(b) < 1) {
     return (fabs(a-b) < eps)?1:0;
   } else {
     return (gsl_fcmp(a, b, eps) == 0) ? 1 : 0;

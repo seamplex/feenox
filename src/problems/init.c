@@ -52,9 +52,10 @@ int feenox_problem_init_parser_general(void) {
   // so that needs to be rewritten as "--petsc_opt log_summary"
   // if the option has an argument it has to be put as "--slepc_opt pc_type=sor"
 /*  
-  for (i = 0; i < feenox.argc_orig; i++) {
+  unsigned int i = 0;
+  for (i = 0; i < feenox.argc; i++) {
     if (strcmp(feenox.argv_orig[i], "--petsc") == 0) {
-      if (i >= (feenox.argc_orig-1)) {
+      if (i >= (feenox.argc-1)) {
         feenox_push_error_message("commandline option --petsc needs an argument");
         return FEENOX_ERROR;
       } else if (feenox.argv_orig[i+1][0] == '-') {
@@ -62,6 +63,7 @@ int feenox_problem_init_parser_general(void) {
         return FEENOX_ERROR;
       }
       
+      char *dummy = NULL;
       if ((dummy = strchr(feenox.argv_orig[i+1], '=')) != NULL)  {
         char *tmp1, *tmp2;
         *dummy = '\0';
@@ -85,15 +87,26 @@ int feenox_problem_init_parser_general(void) {
       i++;
     }
   }
-*/
+*/  
+  // we already have processed basic options, now we loop over the original argv and convert
+  // double-dash options to single-dash so --snes_view transforsm to -snes_view
+  unsigned int i = 0;
+  for (i = 0; i < feenox.argc; i++) {
+    if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
+      char *tmp;
+      feenox_check_alloc(tmp = strdup(feenox.argv_orig[i]+1));
+      feenox_free(feenox.argv_orig[i]);
+      feenox.argv_orig[i] = tmp;
+    }
+  }
 
 #ifdef HAVE_PETSC
 #ifdef HAVE_SLEPC  
-  // initialize SLEPc (which in turn initalizes PETSc)
-  petsc_call(SlepcInitialize(&feenox.argc, &feenox.argv, (char*)0, PETSC_NULL));
+  // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
+  petsc_call(SlepcInitialize(&feenox.argc, &feenox.argv_orig, (char*)0, PETSC_NULL));
 #else
   // initialize PETSc
-  petsc_call(PetscInitialize(&feenox.argc, &feenox.argv, (char*)0, PETSC_NULL));
+  petsc_call(PetscInitialize(&feenox.argc, &feenox.argv_orig, (char*)0, PETSC_NULL));
 #endif
   feenox.pde.petscinit_called = PETSC_TRUE;
   

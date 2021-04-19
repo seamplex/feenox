@@ -73,6 +73,14 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc 4
 ///help+extra+desc ```
   
+  
+  // make a copy before calling getopt so we can re-use argv & argc for PETSc
+  feenox_check_alloc(feenox.argv_orig = malloc((argc+1) * sizeof(char *)));
+  for (i = 0; i < argc; i++) {
+    feenox_check_alloc(feenox.argv_orig[i] = strdup(argv[i]));
+  }
+  feenox.argv_orig[i] = NULL;
+  
   opterr = 0;   // don't complain about unknown options, they can be for PETSc/SLEPc
   while ((optc = getopt_long_only(argc, argv, "hvVs", longopts, &option_index)) != -1) {
     switch (optc) {
@@ -98,6 +106,7 @@ int feenox_initialize(int argc, char **argv) {
     }
   }
   
+  // we need to know this so we can handle expansion arguments
   feenox.optind = optind;
   
   if (show_help) {

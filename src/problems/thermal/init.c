@@ -40,12 +40,10 @@ int feenox_problem_init_runtime_thermal(void) {
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   
   
-  // TODO: either use the setting or figure out the dependence of properties & BCs with T
   // TODO: check end_time and quasistatic
-  feenox.pde.has_mass = PETSC_FALSE;
   feenox.pde.has_rhs = PETSC_TRUE;
-  feenox.pde.solve_petsc = feenox_solve_petsc_linear;
-
+  // TODO: depends on end_time
+  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) ? PETSC_TRUE : PETSC_FALSE;
 
   // initialize distributions
   // TODO: document distributions
@@ -93,6 +91,13 @@ int feenox_problem_init_runtime_thermal(void) {
       feenox_push_error_message("thermal diffusivity 'kappa' is not defined over all volumes");
       return FEENOX_ERROR;
     }
+  }
+
+  // TODO: automatic
+  if (feenox.pde.math_type == math_type_nonlinear) {
+    feenox.pde.solve_petsc = feenox_solve_petsc_nonlinear;
+  } else {
+    feenox.pde.solve_petsc = feenox_solve_petsc_linear;
   }
   
 #endif  
