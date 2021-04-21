@@ -35,6 +35,8 @@ int feenox_build(void) {
     if (feenox.pde.mesh->element[i].type->dim == feenox.pde.dim) {
       
       // volumetric elements need volumetric builds
+      // TODO: process only elements that are local, its the partition number
+      //       matches the local rank (not necessarily one to one)
       // TODO: check if we can skip re-building in linear transient
       feenox_call(feenox_build_element_volumetric(&feenox.pde.mesh->element[i]));
       
@@ -45,7 +47,7 @@ int feenox_build(void) {
       LL_FOREACH(feenox.pde.mesh->element[i].physical_group->bcs, bc) {
         bc_data_t *bc_data;
         LL_FOREACH(bc->bc_datums, bc_data) {
-          // we only handle weak BCs here
+          // we only handle weak BCs here, strong BCs are handled in feenox_dirichlet_*()
           if (bc_data->type_math != bc_type_math_dirichlet) {
             // and only apply them if the condition holds true (or if there's no condition at all)
             if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {

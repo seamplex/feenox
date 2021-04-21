@@ -245,9 +245,11 @@ typedef struct expr_t expr_t;
 typedef struct expr_item_t expr_item_t;
 
 typedef struct var_t var_t;
+typedef struct var_ll_t var_ll_t;
 typedef struct vector_t vector_t;
 typedef struct matrix_t matrix_t;
 typedef struct function_t function_t;
+typedef struct function_ll_t function_ll_t;
 
 typedef struct alias_t alias_t;
 
@@ -273,7 +275,7 @@ typedef struct physical_name_t physical_name_t;
 typedef struct property_t property_t;
 typedef struct property_data_t property_data_t;
 typedef struct material_t material_t;
-typedef struct material_list_item_t material_list_item_t;
+typedef struct material_ll_t material_ll_t;
 typedef struct distribution_t distribution_t;
 
 typedef struct bc_t bc_t;
@@ -282,7 +284,7 @@ typedef struct bc_data_t bc_data_t;
 typedef struct node_t node_t;
 typedef struct node_relative_t node_relative_t;
 typedef struct element_t element_t;
-typedef struct element_list_item_t element_list_item_t;
+typedef struct element_ll_t element_ll_t;
 typedef struct element_type_t element_type_t;
 typedef struct cell_t cell_t;
 typedef struct neighbor_t neighbor_t;
@@ -314,7 +316,7 @@ struct expr_item_t {
   
 // vector with (optional) auxiliary stuff (last value, integral accumulator, rng, etc)
   double *aux;
-
+  
   builtin_function_t *builtin_function;
   builtin_vectorfunction_t *builtin_vectorfunction;
   builtin_functional_t *builtin_functional;
@@ -330,6 +332,11 @@ struct expr_item_t {
 
   // algebraic expression of the arguments of the function
   expr_t *arg;
+  
+  // lists of which variables and functions this item (and its daughters)
+  var_ll_t *variables;
+  function_ll_t *functions;
+  
 
   expr_item_t *next;
 };
@@ -340,6 +347,11 @@ struct expr_t {
   expr_item_t *items;
   double value;
   char *string;     // just in case we keep the original string
+  
+  // lists of which variables and functions this expression depends on
+  var_ll_t *variables;
+  function_ll_t *functions;
+  
   expr_t *next;
 };
 
@@ -359,6 +371,11 @@ struct var_t {
   double *initial_transient;
 
   UT_hash_handle hh;
+};
+
+struct var_ll_t {
+  var_t *var;
+  var_ll_t *next;
 };
 
 
@@ -828,7 +845,7 @@ struct node_t {
   gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
   double *f;                // holder of arbitrary functions evaluated at the node (sigmas and taus)
   
-  element_list_item_t *associated_elements;
+  element_ll_t *associated_elements;
 };
 
 
@@ -980,9 +997,9 @@ struct element_t {
 };
 
 
-struct element_list_item_t {
+struct element_ll_t {
   element_t *element;
-  element_list_item_t *next;
+  element_ll_t *next;
 };
 
 struct cell_t {
@@ -1027,9 +1044,9 @@ struct material_t {
   UT_hash_handle hh;
 };
 
-struct material_list_item_t {
+struct material_ll_t {
   material_t *material;
-  material_list_item_t *next;
+  material_ll_t *next;
 };
   
 struct property_t {
@@ -1060,6 +1077,10 @@ struct distribution_t  {
   // caches
   material_t *last_material;
   property_data_t *last_property_data;
+  
+  // dependencies
+  var_ll_t *dependency_variables;
+  function_ll_t *dependency_functions;
   
   // virtual method to evaluate at a point
   double (*eval)(distribution_t *this, const double *x, material_t *material);  
@@ -1732,6 +1753,8 @@ extern int feenox_parse_range(char *string, const char left_delim, const char mi
 extern double feenox_expression_eval(expr_t *this);
 extern double feenox_expression_evaluate_in_string(const char *string);
 
+extern int feenox_pull_dependencies_variables(var_ll_t **to, var_ll_t *from);
+
 // dae.c
 extern int feenox_add_time_path(const char *token);
 extern int feenox_phase_space_add_object(const char *token);
@@ -1923,7 +1946,7 @@ extern double feenox_mesh_subtract_squared_module2d(const  double *b, const  dou
 extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
 
 // element.c
-extern int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *element);
+extern int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *element);
 extern int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]);
 extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
 
@@ -1983,6 +2006,8 @@ extern double feenox_distribution_eval_function_local(distribution_t *this, cons
 extern double feenox_distribution_eval_variable_global(distribution_t *this, const double *x, material_t *material);
 extern double feenox_distribution_eval_variable_local(distribution_t *this, const double *x, material_t *material);
 
+extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function);
+extern int feenox_expression_depends_on_space(var_ll_t *variables);
 
 // thermal/init.c
 extern int feenox_problem_init_parser_thermal(void);

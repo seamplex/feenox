@@ -13,6 +13,8 @@ struct thermal_t {
   distribution_t rho;   // density
   distribution_t cp;    // heat capacity
   distribution_t rhocp; // density times heat capacity
+  
+  int volumetric_space_dependent;
 };  
 
 

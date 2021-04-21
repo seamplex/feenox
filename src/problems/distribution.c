@@ -24,7 +24,7 @@ extern feenox_t feenox;
 
 int feenox_distribution_init(distribution_t *this, const char *name) {
 
-  this->name = strdup(name);
+  feenox_check_alloc(this->name = strdup(name));
   
   // first try a property, if this is the case then we have it easy
   HASH_FIND_STR(feenox.mesh.properties, name, this->property);
@@ -38,7 +38,9 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         if (physical_group->material != NULL) {
           property_data_t *property_data = NULL;
           HASH_FIND_STR(physical_group->material->property_datums, this->property->name, property_data);
-          if (property_data == NULL) {
+          if (property_data != NULL) {
+            feenox_pull_dependencies_variables(&this->dependency_variables, property_data->expr.variables);
+          } else  {
             full = 0;
           }  
         } else {
@@ -50,6 +52,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = full;
     this->eval = feenox_distribution_eval_property;
+    
     return FEENOX_OK;
   }
 
@@ -61,21 +64,23 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *function_name = NULL;
       asprintf(&function_name, "%s_%s", name, physical_group->name);
-      function_t *dummy = NULL;
-      if ((dummy = feenox_get_function_ptr(function_name)) != NULL) {
-        if (dummy->n_arguments != feenox.pde.dim) {
-          feenox_push_error_message("function '%s' should have %d arguments instead of %d to be used as a distribution", dummy->name, feenox.pde.dim, dummy->n_arguments);
+      function_t *function = NULL;
+      if ((function = feenox_get_function_ptr(function_name)) != NULL) {
+        if (function->n_arguments != feenox.pde.dim) {
+          feenox_push_error_message("function '%s' should have %d arguments instead of %d to be used as a distribution", function->name, feenox.pde.dim, function->n_arguments);
           return FEENOX_ERROR;
         }
         
         if (this->function == NULL) {
-          this->function = dummy;
+          this->function = function;
         }
         
         // if there's no explicit material we create one
         if (physical_group->material == NULL) {
           physical_group->material = feenox_define_material_get_ptr(physical_group->name, feenox.pde.mesh);
         }  
+        
+        feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, function));
 
       } else {
         full = 0;
@@ -102,6 +107,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_function_global;
+    feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, this->function));
+    
     return FEENOX_OK;
   }
   
@@ -113,10 +120,10 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *var_name = NULL;
       asprintf(&var_name, "%s_%s", name, physical_group->name);
-      var_t *dummy = NULL;
-      if ((dummy = feenox_get_variable_ptr(var_name)) != NULL) {
+      var_t *variable = NULL;
+      if ((variable = feenox_get_variable_ptr(var_name)) != NULL) {
         if (this->variable == NULL) {
-          this->variable = dummy;
+          this->variable = variable;
         }
         
         // if there's no explicit material we create one
@@ -241,3 +248,33 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
   
 }  
 
+
+
+int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function) {
+
+  if (function->algebraic_expression.items != NULL) {
+    feenox_pull_dependencies_variables(to, function->algebraic_expression.variables);
+  } else {
+    // we have to assume it depends on x,y & z
+    var_ll_t *x;
+    feenox_check_alloc(x = calloc(1, sizeof(var_ll_t)));
+    x->var = feenox.mesh.vars.x;
+    LL_APPEND(*to, x);
+
+    if (function->n_arguments > 1) {
+      var_ll_t *y;
+      feenox_check_alloc(y = calloc(1, sizeof(var_ll_t)));
+      y->var = feenox.mesh.vars.y;
+      LL_APPEND(*to, y);
+      
+      if (function->n_arguments > 2) {
+        var_ll_t *z;
+        feenox_check_alloc(z = calloc(1, sizeof(var_ll_t)));
+        z->var = feenox.mesh.vars.z;
+        LL_APPEND(*to, z);
+      }
+    }
+  }  
+  
+  return FEENOX_OK;
+}

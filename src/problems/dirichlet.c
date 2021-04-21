@@ -25,7 +25,7 @@ int feenox_dirichlet_eval(void) {
   bc_t *bc = NULL;
   bc_data_t *bc_data = NULL;
   element_t *element = NULL;
-  element_list_item_t *element_list = NULL;
+  element_ll_t *element_list = NULL;
   size_t j = 0;
   size_t k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {

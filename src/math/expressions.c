@@ -109,10 +109,7 @@ int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, s
     return FEENOX_ERROR;
   }
   
-  if (((*arg) = calloc(n_arguments, sizeof(char *))) == NULL) {
-    feenox_push_error_message("calloc() failed");
-    return FEENOX_ERROR;
-  }
+  feenox_check_alloc((*arg) = calloc(n_arguments, sizeof(char *)));
 
   int i;
   size_t n = 0;
@@ -166,7 +163,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   }
 
   // let's make a copy so the parser can break it up as it wants
-  char *string_copy;
+  char *string_copy = NULL;
   feenox_check_alloc(string_copy = strdup(orig_string));
 
   // the expr structure contains another copy of the original string for debugging purposes
@@ -204,12 +201,15 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
             LL_APPEND(this->items, item);
             string += item->n_chars;
             last_was_an_op = 0;
+            
+            feenox_pull_dependencies_variables(&this->variables, item->variables);
+            
           } else {
             feenox_push_error_message("two adjacent operators");
             return FEENOX_ERROR;
           }
         } else { 
-          item = calloc(1, sizeof(expr_item_t));
+          feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
           item->type = EXPR_OPERATOR;
           item->oper = oper-operators+1;
           // precedence two by two from left to right
@@ -231,6 +231,8 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       }
       string += item->n_chars;
       last_was_an_op = 0;
+      
+      feenox_pull_dependencies_variables(&this->variables, item->variables);
     }
   }
 
@@ -256,7 +258,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
   int n_int = 0; // sscanf can only return ints, not size_t
   char *backup ;
   feenox_check_alloc_null(backup = strdup(string));
-  expr_item_t *item = calloc(1, sizeof(expr_item_t));
+  expr_item_t *item = NULL;
+  feenox_check_alloc_null(item = calloc(1, sizeof(expr_item_t)));
   item->sign = 1.0; // assume the sign is positive
 
   // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
@@ -331,6 +334,12 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       }
       item->type = EXPR_VARIABLE;
       item->variable = var;
+      
+      // mark that this item depends on var
+      var_ll_t *var_item = NULL;
+      feenox_check_alloc_null(var_item = calloc(1, sizeof(var_ll_t)));
+      var_item->var = var;
+      LL_APPEND(item->variables, var_item);
     }
 
     if (matrix != NULL || vector != NULL || var != NULL) {
@@ -470,9 +479,9 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       }
 
       if (item->type != EXPR_BUILTIN_VECTORFUNCTION) {
-        item->arg = calloc(n_arguments_max, sizeof(expr_t));
+        feenox_check_alloc_null(item->arg = calloc(n_arguments_max, sizeof(expr_t)));
       } else {
-        item->vector_arg = calloc(n_arguments_max, sizeof(vector_t *));
+        feenox_check_alloc_null(item->vector_arg = calloc(n_arguments_max, sizeof(vector_t *)));
       }
 
 
@@ -493,6 +502,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
           if (feenox_expression_parse(&item->arg[i], arg[i]) != FEENOX_OK) {
             return NULL;
           }
+          
+          feenox_pull_dependencies_variables(&item->variables, item->arg[i].variables);
         }
       }
       
@@ -773,49 +784,27 @@ int feenox_parse_range(char *string, const char left_delim, const char middle_de
 }
 
 
-
-
-/*
-
-int feenox_count_divisions(expr_t *expr) {
-  
-  int i, j;
-  int n = 0;
-  int m = 0;
-  
-  for (i = 0; i < expr->n_tokens; i++) {
-    
-    if (expr->token[i].type == EXPR_OPERATOR && operators[expr->token[i].oper-1] == '/') {
-      m++;
-    }
-    
-    if (expr->token[i].arg != NULL) {
-      switch (expr->token[i].type) {
-        case EXPR_BUILTIN_FUNCTION:
-          n = expr->token[i].builtin_function->max_arguments;
-        break;
-        case EXPR_BUILTIN_FUNCTIONAL: 
-          n = expr->token[i].builtin_functional->max_arguments;
-        break;
-        case EXPR_FUNCTION:
-          n = expr->token[i].function->n_arguments;
-          if (expr->token[i].function->type == type_algebraic) {
-            m += feenox_count_divisions(&expr->token[i].function->algebraic_expression);
-          }
-        break;
-        case EXPR_BUILTIN_VECTORFUNCTION:
-          n = expr->token[i].builtin_vectorfunction->max_arguments;
-        break;
-      }
-      for (j = 0; j < n; j++) {
-        m += feenox_count_divisions(&expr->token[i].arg[j]);
-      }
-    }
-    
-    
+int feenox_pull_dependencies_variables(var_ll_t **to, var_ll_t *from) {
+  // pull down all the dependencies of the arguments
+  var_ll_t *var_item_old = NULL;
+  var_ll_t *var_item_new = NULL;
+  LL_FOREACH(from, var_item_old) {
+    feenox_check_alloc(var_item_new = calloc(1, sizeof(var_ll_t)));
+    var_item_new->var = var_item_old->var;
+    LL_APPEND((*to), var_item_new);
   }
-  
-  return m;
+  return FEENOX_OK;
+}
+
+int feenox_expression_depends_on_space(var_ll_t *variables) {
+  int depends = 0;
+  var_ll_t *item = NULL;
+  LL_FOREACH(variables, item) {
+    if (item->var != NULL) {
+      depends |= (item->var == feenox.mesh.vars.x) || (item->var == feenox.mesh.vars.y) || (item->var == feenox.mesh.vars.z);
+    }  
+  }
+      
+  return depends;
   
 }
-*/

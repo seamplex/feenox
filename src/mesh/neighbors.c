@@ -46,17 +46,17 @@ int mesh_count_common_nodes(element_t *e1, element_t *e2, int *nodes) {
 element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
   int j;
   int target;
-  element_list_item_t *associated_element;
+  element_ll_t *element_item;
 
   // en mallas de primer orden esto sirve para mezclar elementos raros
   // en segundo hay que hacerlo completo
   target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
 
   for (j = 0; j < this->type->nodes; j++) {
-    LL_FOREACH(this->node[j]->associated_elements, associated_element) {
-      if (this->type->dim == (associated_element->element->type->dim-1)) {  // los vecinos volumetricos
-        if (mesh_count_common_nodes(this, associated_element->element, NULL) >= target) {
-          return associated_element->element;
+    LL_FOREACH(this->node[j]->associated_elements, element_item) {
+      if (this->type->dim == (element_item->element->type->dim-1)) {  // los vecinos volumetricos
+        if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
+          return element_item->element;
         }
       }
     }
@@ -67,13 +67,13 @@ element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
 
 element_t *mesh_find_node_neighbor_of_dim(node_t *node, int dim) {
   int j;
-  element_list_item_t *associated_element;
+  element_ll_t *element_item;
   
-  LL_FOREACH(node->associated_elements, associated_element) {
-    if (dim == associated_element->element->type->dim) {
-      for (j = 0; j < associated_element->element->type->nodes; j++) {
-        if (node->tag == associated_element->element->node[j]->tag) {
-          return associated_element->element;
+  LL_FOREACH(node->associated_elements, element_item) {
+    if (dim == element_item->element->type->dim) {
+      for (j = 0; j < element_item->element->type->nodes; j++) {
+        if (node->tag == element_item->element->node[j]->tag) {
+          return element_item->element;
         }
       }
     }
@@ -88,7 +88,7 @@ int mesh_find_neighbors(mesh_t *this) {
   int i, j, l, m, n;
   int flag;
   int nodes[32]; // habra algun elemento que tenga mas de 32 nodos?
-  element_list_item_t *associated_element;
+  element_ll_t *element_item;
 
   for (i = 0; i < this->n_cells; i++) {
   
@@ -96,10 +96,10 @@ int mesh_find_neighbors(mesh_t *this) {
     this->cell[i].ifaces = calloc(this->cell[i].element->type->faces, sizeof(int *));
     
     for (j = 0; j < this->cell[i].element->type->nodes; j++) {
-      LL_FOREACH(this->cell[i].element->node[j]->associated_elements, associated_element) {
+      LL_FOREACH(this->cell[i].element->node[j]->associated_elements, element_item) {
 
         memset(nodes, 0, sizeof(nodes));
-        if ((l = associated_element->element->index) != this->cell[i].element->index) {
+        if ((l = element_item->element->index) != this->cell[i].element->index) {
           if (mesh_count_common_nodes(this->cell[i].element, &this->element[l], nodes) >= this->cell[i].element->type->dim) {
 
             flag = 1;

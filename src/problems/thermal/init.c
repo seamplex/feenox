@@ -93,6 +93,15 @@ int feenox_problem_init_runtime_thermal(void) {
     }
   }
 
+  
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.k.dependency_variables);
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.q.dependency_variables);
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.Q.dependency_variables);
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.kappa.dependency_variables);
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.rho.dependency_variables);
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.cp.dependency_variables);
+  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
+  
   // TODO: automatic
   if (feenox.pde.math_type == math_type_nonlinear) {
     feenox.pde.solve_petsc = feenox_solve_petsc_nonlinear;

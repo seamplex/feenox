@@ -10,8 +10,14 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  double zero[3] = {0, 0, 0};
+  double *x = zero;
+  if (thermal.volumetric_space_dependent) {
+    feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
+    x = element->x[v];
+  }
   
-  // TODO
+  // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(element, v);
   double r_for_axisymmetric = 1;
   double w = element->w[v] * r_for_axisymmetric;
@@ -21,15 +27,13 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
     material = element->physical_group->material;
   }
 
-  // thermal stiffness matrix
-  // TODO: see if we need to compute x or not
-  feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
-  double k = thermal.k.eval(&thermal.k, element->x[v], material);
+  // thermal stiffness matrix Bt*k*B
+  double k = thermal.k.eval(&thermal.k, x, material);
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, element->B[v], element->B[v], 1.0, feenox.pde.Ki);
 
+  // volumetric heat source term Ht*q
   // TODO: total source Q
   if (thermal.q.defined) {
-    // the volumetric heat source term
     double q = thermal.q.eval(&thermal.q, element->x[v], material);
     unsigned int j = 0;
     for (j = 0; j < element->type->nodes; j++) {
@@ -37,8 +41,8 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
     }
   }
   
+  // mass matrix Ht*rho*cp*H
   if (feenox.pde.M != NULL) {
-    // compute the mass matrix Ht*rho*cp*H
     double rhocp = 0;
     if (thermal.rhocp.defined) {
       rhocp = thermal.rhocp.eval(&thermal.rhocp, element->x[v], material);
@@ -47,11 +51,11 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
     } else if (thermal.rho.defined && thermal.cp.defined) {
       rhocp = thermal.rho.eval(&thermal.rho, element->x[v], material) * thermal.cp.eval(&thermal.cp, element->x[v], material);
     } else {
-      // this should have been already check
+      // this should have been already checked
       feenox_push_error_message("no heat capacity found");
       return FEENOX_ERROR;
     }
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rhocp, element->H[v], element->H[v], 1.0, feenox.pde.Mi);
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rhocp, element->H[v], element->H[v], 1.0, feenox.pde.Mi));
   } 
 
 #endif

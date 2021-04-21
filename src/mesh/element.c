@@ -269,9 +269,10 @@ int feenox_mesh_create_element(element_t *element, int index, int tag, int type,
   return FEENOX_OK;
 }
 
-int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *element) {
+int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *element) {
   
-  element_list_item_t *item = calloc(1, sizeof(element_list_item_t));
+  element_ll_t *item = NULL;
+  feenox_check_alloc(item = calloc(1, sizeof(element_ll_t)));
   item->element = element;
   LL_APPEND(*list, item);
   
@@ -279,18 +280,18 @@ int feenox_mesh_add_element_to_list(element_list_item_t **list, element_t *eleme
   
 }
 
-int feenox_mesh_add_material_to_list(material_list_item_t **list, material_t *material) {
+int feenox_mesh_add_material_to_list(material_ll_t **list, material_t *material) {
   
-  material_list_item_t *item;
   
   // solo agregamos el material si es que no esta en la lista
+  material_ll_t *item = NULL;
   LL_FOREACH(*list, item) {
     if (item->material == material) {
       return FEENOX_OK;
     }
   }
   
-  item = calloc(1, sizeof(material_list_item_t));
+  feenox_check_alloc(item = calloc(1, sizeof(material_ll_t)));
   item->material = material;
   LL_APPEND(*list, item);
   

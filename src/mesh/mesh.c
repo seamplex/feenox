@@ -258,16 +258,16 @@ int feenox_instruction_mesh_read(void *arg) {
       kd_insert(this->kd_nodes, this->node[j].x, &this->node[j]);
     
       size_t first_neighbor_nodes = 1;  // el nodo mismo
-      element_list_item_t *associated_element;
-      LL_FOREACH(this->node[j].associated_elements, associated_element) {
-        if (associated_element->element->type->dim == this->dim) {
-          if (associated_element->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
-              associated_element->element->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
+      element_ll_t *element_item;
+      LL_FOREACH(this->node[j].associated_elements, element_item) {
+        if (element_item->element->type->dim == this->dim) {
+          if (element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
+              element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
             // los tetrahedros son "buenos" y con esta cuenta nos ahorramos memoria
-            first_neighbor_nodes += (associated_element->element->type->nodes) - (associated_element->element->type->nodes_per_face);
+            first_neighbor_nodes += (element_item->element->type->nodes) - (element_item->element->type->nodes_per_face);
           } else {
             // si tenemos elementos generales, hay que allocar mas memoria
-            first_neighbor_nodes += (associated_element->element->type->nodes) - 1;
+            first_neighbor_nodes += (element_item->element->type->nodes) - 1;
           }
         }
       }
@@ -301,7 +301,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
   double x_nearest[3] = {0, 0, 0};
   double dist2;
   element_t *element = NULL;
-  element_list_item_t *associated_element;
+  element_ll_t *element_item;
   node_t *second_nearest_node;
   void *res_item;   
 
@@ -319,9 +319,9 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       kd_res_free(res_item);    
     }  
     
-    LL_FOREACH(nearest_node->associated_elements, associated_element) {
-      if (associated_element->element->type->dim == mesh->dim && associated_element->element->type->point_in_element(associated_element->element, x)) {
-        element = associated_element->element;
+    LL_FOREACH(nearest_node->associated_elements, element_item) {
+      if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
+        element = element_item->element;
         break;
       }  
     }
@@ -359,17 +359,17 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       
     while(element == NULL && kd_res_end(presults) == 0) {
       second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
-      LL_FOREACH(second_nearest_node->associated_elements, associated_element) {
+      LL_FOREACH(second_nearest_node->associated_elements, element_item) {
           
         cached_element = NULL;
-        HASH_FIND_INT(cache, &associated_element->element->tag, cached_element);
+        HASH_FIND_INT(cache, &element_item->element->tag, cached_element);
         if (cached_element == NULL) {
           struct cached_element *cached_element = malloc(sizeof(struct cached_element));
-          cached_element->id = associated_element->element->tag;
+          cached_element->id = element_item->element->tag;
           HASH_ADD_INT(cache, id, cached_element);
         
-          if (associated_element->element->type->dim == mesh->dim && associated_element->element->type->point_in_element(associated_element->element, x)) {
-            element = associated_element->element;
+          if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
+            element = element_item->element;
             break;
           }
         }  
@@ -400,9 +400,9 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
 
     // just what is close
     if (dist2 < DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) {
-      LL_FOREACH(nearest_node->associated_elements, associated_element) {
-        if (associated_element->element->type->dim == mesh->dim) {
-          element = associated_element->element;
+      LL_FOREACH(nearest_node->associated_elements, element_item) {
+        if (element_item->element->type->dim == mesh->dim) {
+          element = element_item->element;
           break;
         }
       }
@@ -421,7 +421,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
 int feenox_mesh_free(mesh_t *mesh) {
 
   physical_group_t *physical_group;
-  element_list_item_t *element_item, *element_tmp;
+  element_ll_t *element_item, *element_tmp;
   int i, j, d, v;
 /*  
   if (mesh->cell != NULL) {
