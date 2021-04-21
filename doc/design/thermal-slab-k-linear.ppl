@@ -1,0 +1,47 @@
+set preamble "\usepackage{amsmath}"
+
+set width 12*unit(cm)
+set size ratio 1
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set terminal pdf
+
+set xlabel "non-dimensional spatial coordinate $x$"
+set xrange [0:1]
+set xtics 0.25
+set mxtics 0.05
+set key above
+
+set title "Thermal conductivity $k\big(T(x)\big) = 1 + a \cdot T(x)$"
+set ylabel "non-dimensional temperature $T(x)$"
+set yrange [0:1]
+set ytics 0.25
+set mytics 0.05
+set output "thermal-slab-k-linear.pdf"
+
+T(x) = x
+
+a1 = 1
+T1(x) = (1/a1*(sqrt(1+(2+a1)*a1*x)-1))
+
+a2 = 0.5
+T2(x) = (1/a2*(sqrt(1+(2+a2)*a2*x)-1))
+
+a3 = 2
+T3(x) = (1/a3*(sqrt(1+(2+a3)*a3*x)-1))
+
+a4 = -1
+T4(x) = (1/a4*(sqrt(1+(2+a4)*a4*x)-1))
+
+
+plot \
+T(x)  w l lt 1  lw 4 color grey  ti "$a = 0$",\
+T1(x) w l lt 2  lw 3 color red   ti "$a = 1$",\
+T2(x) w l lt 3  lw 2 color green ti "$a = 0.5$",\
+T3(x) w l lt 4  lw 1 color blue  ti "$a = 2$",\
+T4(x) w l lt 5  lw 1 color orange  ti "$a = -1$"
+
+set output "thermal-slab-k-linear.pdf"
+replot
