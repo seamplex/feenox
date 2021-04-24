@@ -274,7 +274,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     n += n_int;
     item->type = EXPR_CONSTANT;
     item->constant = constant;
-    
+/*    
   } else if (*string == '-' || *string == '+') {
     if (string[1] == '(') {
       feenox_push_error_message("you got me");
@@ -283,7 +283,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       feenox_push_error_message("wrong closing parenthesis");
       return NULL;
     }
-
+*/
   } else {
     // we got letters
     // if there's a negative sign, meaning something like (-x) or (-f(x)) then we take the sign into account
@@ -484,7 +484,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         }
 
         n_arguments_max = item->function->n_arguments;
-        
+
         // mark that this item depends on function
         function_ll_t *function_item = NULL;
         feenox_check_alloc_null(function_item = calloc(1, sizeof(function_ll_t)));
