@@ -14,7 +14,8 @@ struct thermal_t {
   distribution_t cp;    // heat capacity
   distribution_t rhocp; // density times heat capacity
   
-  int volumetric_space_dependent;
+  int volumetric_dependent_space;
+  int volumetric_dependent_temperature;
 };  
 
 

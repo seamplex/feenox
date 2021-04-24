@@ -203,6 +203,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
             last_was_an_op = 0;
             
             feenox_pull_dependencies_variables(&this->variables, item->variables);
+            feenox_pull_dependencies_functions(&this->functions, item->functions);
             
           } else {
             feenox_push_error_message("two adjacent operators");
@@ -233,6 +234,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       last_was_an_op = 0;
       
       feenox_pull_dependencies_variables(&this->variables, item->variables);
+      feenox_pull_dependencies_functions(&this->functions, item->functions);
     }
   }
 
@@ -272,6 +274,15 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     n += n_int;
     item->type = EXPR_CONSTANT;
     item->constant = constant;
+    
+  } else if (*string == '-' || *string == '+') {
+    if (string[1] == '(') {
+      feenox_push_error_message("you got me");
+      return NULL;
+    } else if (string[1] == ')') {
+      feenox_push_error_message("wrong closing parenthesis");
+      return NULL;
+    }
 
   } else {
     // we got letters
@@ -428,7 +439,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         }
 
         n_arguments_max = item->builtin_function->max_arguments;
-
+        
       } else if (builtin_vectorfunction != NULL) {
 
         // tenemos una funcion sobre vectores interna
@@ -473,6 +484,17 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         }
 
         n_arguments_max = item->function->n_arguments;
+        
+        // mark that this item depends on function
+        function_ll_t *function_item = NULL;
+        feenox_check_alloc_null(function_item = calloc(1, sizeof(function_ll_t)));
+        function_item->function = function;
+        LL_APPEND(item->functions, function_item);
+        
+        if (function->algebraic_expression.items != NULL) {
+          feenox_pull_dependencies_variables(&item->variables, function->algebraic_expression.variables);
+          feenox_pull_dependencies_functions(&item->functions, function->algebraic_expression.functions);
+        }  
 
       } else {
         return NULL;
@@ -504,6 +526,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
           }
           
           feenox_pull_dependencies_variables(&item->variables, item->arg[i].variables);
+          feenox_pull_dependencies_functions(&item->functions, item->arg[i].functions);
         }
       }
       
@@ -796,15 +819,40 @@ int feenox_pull_dependencies_variables(var_ll_t **to, var_ll_t *from) {
   return FEENOX_OK;
 }
 
+int feenox_pull_dependencies_functions(function_ll_t **to, function_ll_t *from) {
+  // pull down all the dependencies of the arguments
+  function_ll_t *function_item_old = NULL;
+  function_ll_t *function_item_new = NULL;
+  LL_FOREACH(from, function_item_old) {
+    feenox_check_alloc(function_item_new = calloc(1, sizeof(function_ll_t)));
+    function_item_new->function = function_item_old->function;
+    LL_APPEND((*to), function_item_new);
+  }
+  return FEENOX_OK;
+}
+
 int feenox_expression_depends_on_space(var_ll_t *variables) {
   int depends = 0;
   var_ll_t *item = NULL;
   LL_FOREACH(variables, item) {
     if (item->var != NULL) {
-      depends |= (item->var == feenox.mesh.vars.x) || (item->var == feenox.mesh.vars.y) || (item->var == feenox.mesh.vars.z);
+      depends |= (item->var == feenox.mesh.vars.x) ||
+                 (item->var == feenox.mesh.vars.y) ||
+                 (item->var == feenox.mesh.vars.z);
     }  
   }
       
   return depends;
-  
+}
+
+int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function) {
+  int depends = 0;
+  function_ll_t *item = NULL;
+  LL_FOREACH(functions, item) {
+    if (item->function != NULL) {
+      depends |= (item->function == function);
+    }  
+  }
+      
+  return depends;
 }

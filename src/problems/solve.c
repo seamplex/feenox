@@ -12,7 +12,7 @@ int feenox_instruction_solve_problem(void *arg) {
   }
   
   if (feenox.pde.solve_petsc == NULL) {
-    feenox_push_error_message("pistola");
+    feenox_push_error_message("internal error, undefined solver");
     return FEENOX_ERROR;
   }
 

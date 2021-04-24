@@ -1,1 +1,1 @@
-PRINT %f abs(($1)-($2))
+PRINT %.3f abs(($1)-($2))

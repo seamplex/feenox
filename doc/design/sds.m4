@@ -136,6 +136,8 @@ script friendly
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 070-efficienciy.md)
 
+> The computational resources (i.e. costs measured in CPU/GPU time, random-access memory, long-term storage, etc.) needed to solve a problem should be comparable to other similar state-of-the-art finite-element tools.
+
 cloud, rent don't buy
 benchmark and comparisons
 

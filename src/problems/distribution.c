@@ -40,6 +40,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
           HASH_FIND_STR(physical_group->material->property_datums, this->property->name, property_data);
           if (property_data != NULL) {
             feenox_pull_dependencies_variables(&this->dependency_variables, property_data->expr.variables);
+            feenox_pull_dependencies_functions(&this->dependency_functions, property_data->expr.functions);
           } else  {
             full = 0;
           }  
@@ -81,6 +82,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         }  
         
         feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, function));
+        feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, function));
 
       } else {
         full = 0;
@@ -108,6 +110,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->full = 1;
     this->eval = feenox_distribution_eval_function_global;
     feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, this->function));
+    feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, this->function));
     
     return FEENOX_OK;
   }
@@ -274,6 +277,15 @@ int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *funct
         LL_APPEND(*to, z);
       }
     }
+  }  
+  
+  return FEENOX_OK;
+}
+
+int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function) {
+
+  if (function->algebraic_expression.items != NULL) {
+    feenox_pull_dependencies_functions(to, function->algebraic_expression.functions);
   }  
   
   return FEENOX_OK;

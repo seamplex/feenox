@@ -11,7 +11,13 @@ fi
 
 checkpetsc
 
-answer thermal-slab-uniform-nosource.fee "0.123457"
+answerfloat thermal-slab-uniform-nosource.fee "0"
+exitifwrong $?
+
+answerfloat thermal-slab-space-nosource.fee "0"
+exitifwrong $?
+
+answerfloat thermal-slab-temperature-nosource.fee "0"
 exitifwrong $?
 
 answer thermal-two-squares-material-explicit-uniform.fee "0.75"
@@ -25,5 +31,12 @@ exitifwrong $?
 
 answer thermal-two-squares-material-implicit-space.fee "0.71773"
 exitifwrong $?
+
+answer thermal-two-squares-material-explicit-temperature.fee "0.599703"
+exitifwrong $?
+
+answer thermal-two-squares-material-implicit-temperature.fee "0.599703"
+exitifwrong $?
+
 
 

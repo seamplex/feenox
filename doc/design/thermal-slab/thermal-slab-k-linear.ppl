@@ -45,3 +45,7 @@ T4(x) w l lt 5  lw 1 color orange  ti "$a = -1$"
 
 set output "thermal-slab-k-linear.pdf"
 replot
+
+set terminal png
+set output "thermal-slab-k-linear.png"
+replot

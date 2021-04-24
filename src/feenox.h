@@ -378,6 +378,10 @@ struct var_ll_t {
   var_ll_t *next;
 };
 
+struct function_ll_t {
+  function_t *function;
+  function_ll_t *next;
+};
 
 // vector
 struct vector_t {
@@ -1755,6 +1759,7 @@ extern double feenox_expression_eval(expr_t *this);
 extern double feenox_expression_evaluate_in_string(const char *string);
 
 extern int feenox_pull_dependencies_variables(var_ll_t **to, var_ll_t *from);
+extern int feenox_pull_dependencies_functions(function_ll_t **to, function_ll_t *from);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
@@ -2008,7 +2013,10 @@ extern double feenox_distribution_eval_variable_global(distribution_t *this, con
 extern double feenox_distribution_eval_variable_local(distribution_t *this, const double *x, material_t *material);
 
 extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function);
+extern int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function);
+
 extern int feenox_expression_depends_on_space(var_ll_t *variables);
+extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
 
 // thermal/init.c
 extern int feenox_problem_init_parser_thermal(void);

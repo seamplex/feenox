@@ -93,21 +93,22 @@ int feenox_problem_init_runtime_thermal(void) {
     }
   }
 
+  thermal.volumetric_dependent_temperature = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);
   
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.k.dependency_variables);
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.q.dependency_variables);
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.Q.dependency_variables);
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.kappa.dependency_variables);
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.rho.dependency_variables);
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.cp.dependency_variables);
-  thermal.volumetric_space_dependent |= feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
+  thermal.volumetric_dependent_space = feenox_expression_depends_on_space(thermal.k.dependency_variables) ||
+                                       feenox_expression_depends_on_space(thermal.q.dependency_variables) ||
+                                       feenox_expression_depends_on_space(thermal.Q.dependency_variables) ||
+                                       feenox_expression_depends_on_space(thermal.kappa.dependency_variables) ||
+                                       feenox_expression_depends_on_space(thermal.rho.dependency_variables) ||
+                                       feenox_expression_depends_on_space(thermal.cp.dependency_variables) ||
+                                       feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
   
-  // TODO: automatic
-  if (feenox.pde.math_type == math_type_nonlinear) {
-    feenox.pde.solve_petsc = feenox_solve_petsc_nonlinear;
-  } else {
-    feenox.pde.solve_petsc = feenox_solve_petsc_linear;
+  // TODO: check BCs for nonlinearity
+  if (feenox.pde.math_type == math_type_automatic) {
+    feenox.pde.math_type = (thermal.volumetric_dependent_temperature == 0) ? math_type_linear : math_type_nonlinear;
   }
+  
+  feenox.pde.solve_petsc = (feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear : feenox_solve_petsc_nonlinear;
   
 #endif  
   return FEENOX_OK;

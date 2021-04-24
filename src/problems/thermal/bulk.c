@@ -12,7 +12,7 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int 
   feenox_call(feenox_mesh_compute_B_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double zero[3] = {0, 0, 0};
   double *x = zero;
-  if (thermal.volumetric_space_dependent) {
+  if (thermal.volumetric_dependent_space) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
     x = element->x[v];
   }
