@@ -1,0 +1,12 @@
+READ_MESH two-squares-$2.msh DIMENSIONS 2
+PROBLEM thermal
+
+# per-material conductivity
+k_soft(x,y) := 1+T(x,y)
+k_hard(x,y) := 1-0.1*T(x,y)
+
+BC left  T=0
+BC right T=$1
+
+SOLVE_PROBLEM
+PRINT TEXT $1 TEXT "Tright=$1" T(1,0.5)
