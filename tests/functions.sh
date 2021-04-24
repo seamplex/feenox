@@ -66,7 +66,7 @@ answer() {
 answerfloat() {
   echo -n "${1}... "
   answer=$(${feenox} ${dir}/${1})
-  
+
   if [ "$(${feenox} ${dir}/cmp.fee "(${answer})" "${2}")" = "0.000" ]; then
     echo "ok"
     level=0
@@ -97,7 +97,7 @@ answer1float() {
   echo -n "${1} ${2}... "
   answer=$(${feenox} ${dir}/${1} ${2})
   
-  if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${3}")" = "0.000000" ]; then
+  if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${3}")" = "0.000" ]; then
     echo "ok"
     level=0
   else

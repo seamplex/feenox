@@ -796,8 +796,8 @@ struct sort_vector_t {
 
 
 struct phase_object_t {
-  int offset;
-  int size;
+  unsigned int offset;
+  unsigned int size;
   int differential;
   char *name;
 

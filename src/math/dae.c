@@ -198,6 +198,10 @@ char *feenox_find_first_dot(const char *s) {
 int feenox_dae_init(void) {
   
 #ifdef HAVE_IDA
+  if (sizeof(realtype) != sizeof(double)) {
+    feenox_push_error_message("SUNDIALS's realtype is not double");
+    return FEENOX_ERROR;
+  }
   
   // primero calculamos el tamanio del phase space
   feenox.dae.dimension = 0;
@@ -243,8 +247,8 @@ int feenox_dae_init(void) {
   }
 
   // alocamos
-  feenox.dae.phase_value = malloc(feenox.dae.dimension * sizeof(double *));
-  feenox.dae.phase_derivative = malloc(feenox.dae.dimension * sizeof(double *));
+  feenox_check_alloc(feenox.dae.phase_value = calloc(feenox.dae.dimension, sizeof(double *)));
+  feenox_check_alloc(feenox.dae.phase_derivative = calloc(feenox.dae.dimension, sizeof(double *)));
   
   sunindextype i = 0;  
   LL_FOREACH(feenox.dae.phase_objects, phase_object) {
@@ -337,7 +341,10 @@ int feenox_dae_init(void) {
   feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension);
   feenox.dae.id = N_VNew_Serial(feenox.dae.dimension);
 
-  feenox.dae.system = IDACreate();
+  if ((feenox.dae.system = IDACreate()) == NULL)  {
+    feenox_push_error_message("failed to create IDA object");
+    return FEENOX_ERROR;
+  }
   
   // llenamos el vector de ida con las variables del usuario 
   for (i = 0; i < feenox.dae.dimension; i++) {
@@ -345,10 +352,11 @@ int feenox_dae_init(void) {
     NV_DATA_S(feenox.dae.dxdt)[i] = *(feenox.dae.phase_derivative[i]);
     // suponemos que son algebraicas, despues marcamos las diferenciales
     // pero hay que inicializar el vector id!
+    // TODO: user IDA's header
     NV_DATA_S(feenox.dae.id)[i] = DAE_ALGEBRAIC; 
   }
   // initialize IDA
-  int err; // this is used inside the ida_call() macro
+  int err = 0; // this is used inside the ida_call() macro
   ida_call(IDAInit(feenox.dae.system, feenox_ida_dae, feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt));
 
   // seteo de tolerancias 
