@@ -49,6 +49,7 @@ feenox_SOURCES = \
 ./mesh/material.c \
 ./mesh/element.c \
 ./mesh/fem.c \
+./mesh/write.c \
 ./mesh/line2.c \
 ./mesh/line3.c \
 ./mesh/triang3.c \

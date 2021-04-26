@@ -269,6 +269,9 @@ typedef struct phase_object_t phase_object_t;
 typedef struct dae_t dae_t;
 
 typedef struct mesh_t mesh_t;
+typedef struct mesh_write_t mesh_write_t;
+typedef struct mesh_write_dist_t mesh_write_dist_t;
+
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
 typedef struct physical_name_t physical_name_t;
@@ -294,8 +297,8 @@ typedef struct elementary_entity_t elementary_entity_t;
 typedef struct node_data_t node_data_t;
 
 /*
-typedef struct mesh_post_t mesh_post_t;
-typedef struct mesh_post_dist_t mesh_post_dist_t;
+typedef struct mesh_write_t mesh_write_t;
+typedef struct mesh_write_dist_t mesh_write_dist_t;
 typedef struct mesh_fill_vector_t mesh_fill_vector_t;
 typedef struct mesh_find_minmax_t mesh_find_minmax_t;
 typedef struct mesh_integrate_t mesh_integrate_t;
@@ -1199,6 +1202,53 @@ struct mesh_t {
 
 };
 
+typedef enum {
+  centering_default,
+  centering_nodes,
+  centering_cells
+} centering_t;
+
+struct mesh_write_dist_t {
+  centering_t centering;
+  
+  function_t *scalar;
+  function_t **vector;
+  function_t ***tensor;
+  
+  mesh_write_dist_t *next;
+};
+
+struct mesh_write_t {
+  mesh_t *mesh;
+  file_t *file;
+  int no_mesh;
+  
+  enum  {
+    post_format_fromextension,
+    post_format_gmsh,
+    post_format_vtk,
+  } format;
+
+  int no_physical_names;
+  centering_t centering;
+  
+  int (*write_header)(FILE *);
+  int (*write_mesh)(mesh_t *, int, FILE *);
+  int (*write_scalar)(mesh_write_t *, function_t *, centering_t);
+  int (*write_vector)(mesh_write_t *, function_t **, centering_t);
+  
+  // estos dos son para saber si tenemos que cambiar de tipo en VTK
+  int point_init;
+  int cell_init;
+  
+  mesh_write_dist_t *mesh_write_dists;
+  
+  // flags genericos para codigos particulares
+  int flags;
+  
+  mesh_write_t *next;
+};
+
 // global FeenoX singleton structure
 struct feenox_t {
   int argc;
@@ -1315,6 +1365,7 @@ struct feenox_t {
 
     mesh_t *meshes;
     mesh_t *mesh_main;
+    mesh_write_t *mesh_writes;
 
     // flag que el codigo partcular rellena (preferentemente en init_before_parser)
     // para indicar si el default es trabajar sobre celdas (FVM) o sobre nodos (FEM)
@@ -1903,7 +1954,15 @@ extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
 
 // gmsh.c
 extern int feenox_mesh_read_gmsh(mesh_t *this);
-extern int mesh_gmsh_update_function(function_t *function, double t, double dt);
+extern int feenox_mesh_gmsh_update_function(function_t *function, double t, double dt);
+extern int feenox_mesh_gmsh_write_header(FILE *file);
+extern int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file);
+extern int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_post, function_t *function, centering_t centering);
+extern int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_post, function_t **function, centering_t centering);
+
+// write.c
+extern int feenox_instruction_mesh_write(void *arg);
+
 
 // physical_group.c
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);

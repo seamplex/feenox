@@ -50,6 +50,10 @@ int feenox_dirichlet_eval(void) {
                 }
                 
                 // TODO: per-problem virtual methods
+                // TODO: detect dependency
+                feenox_var_value(feenox.mesh.vars.x) = feenox.pde.mesh->node[j].x[0];
+                feenox_var_value(feenox.mesh.vars.y) = feenox.pde.mesh->node[j].x[1];
+                feenox_var_value(feenox.mesh.vars.z) = feenox.pde.mesh->node[j].x[2];
                 feenox_call(feenox_problem_bc_set_dirichlet_thermal(bc_data, j, k));
                 k++;
                 

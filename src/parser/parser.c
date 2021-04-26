@@ -3012,7 +3012,8 @@ int feenox_parse_read_mesh(void) {
   feenox_call(feenox_mesh_init_special_objects());
   
   // TODO: api?
-  mesh_t *mesh = calloc(1, sizeof(mesh_t));
+  mesh_t *mesh = NULL;
+  feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
 
 ///kw+MESH_READ+usage { <file_path> | <file_id> }
 ///kw+MESH_READ+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
@@ -3022,11 +3023,14 @@ int feenox_parse_read_mesh(void) {
 ///kw+MESH_READ+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
 ///kw+MESH_READ+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
 ///kw+MESH_READ+detail @
-///kw+MESH_READ+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides information about physical groups.
-///kw+MESH_READ+detail The other formats are primarily supported to read function data contained in the file.
+///kw+MESH_READ+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
+///kw+MESH_READ+detail physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
+///kw+MESH_READ+detail The other formats are primarily supported to read function data contained in the file
+///kw+MESH_READ+detail and eventually, to operate over these functions (i.e. take differences with other functions contained
+///kw+MESH_READ+detail in other files to compare results).
 ///kw+MESH_READ+detail The file path or file id can be used to refer to a particular mesh when reading more than one,
 ///kw+MESH_READ+detail for instance in a `MESH_WRITE` or `MESH_INTEGRATE` keyword.
-///kw+MESH_READ+detail If a file path is given such as `cool_mesh.msh`, it can be referred to as either
+///kw+MESH_READ+detail If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
 ///kw+MESH_READ+detail `cool_mesh.msh` or just `cool_mesh`.  
   feenox_call(feenox_parser_file(&mesh->file));
   if (mesh->file->mode == NULL) {
@@ -3172,6 +3176,154 @@ int feenox_parse_read_mesh(void) {
 
 int feenox_parse_write_mesh(void) {
   
+  mesh_write_t *mesh_write = NULL;
+  feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
+
+///kw+MESH_WRITE+usage { <file_path> | <file_id> }
+///kw+MESH_WRITE+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+///kw+MESH_WRITE+detail The format is automatically detected from the extension. Otherwise, the keyword `FORMAT` can
+///kw+MESH_WRITE+detail be use to give the format explicitly.
+
+  feenox_call(feenox_parser_file(&mesh_write->file));
+  if (mesh_write->file->mode == NULL) {
+    feenox_check_alloc(mesh_write->file->mode = strdup("w"));
+  }
+  
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {          
+///kw+MESH_WRITE+usage [ MESH <mesh_identifier> ]
+///kw+MESH_WRITE+detail If there are several meshes defined then which one should be used has to be
+///kw+MESH_WRITE+detail given explicitly with `MESH`.
+    if (strcasecmp(token, "MESH") == 0) {
+      
+      char *mesh_name = NULL;
+      feenox_call(feenox_parser_string(&mesh_name));
+      if ((mesh_write->mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("unknown mesh '%s'", mesh_name);
+        feenox_free(mesh_name);
+        return FEENOX_ERROR;
+      }
+      feenox_free(mesh_name);
+          
+///kw+MESH_POST+usage [ NO_MESH ]
+    } else if (strcasecmp(token, "NOMESH") == 0 || strcasecmp(token, "NO_MESH") == 0) {
+      mesh_write->no_mesh = 1;
+
+///kw+MESH_POST+usage [ FORMAT { gmsh | vtk } ]
+    } else if (strcasecmp(token, "FORMAT") == 0) {
+      char *keywords[] = {"gmsh", "vtk", ""};
+      int values[] = {post_format_gmsh, post_format_vtk, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->format));
+
+/*      
+///kw+MESH_POST+usage [ CELLS | ]
+    } else if (strcasecmp(token, "CELLS") == 0) {
+      mesh_write->centering = centering_cells;
+      feenox.mesh.need_cells = 1;
+
+///kw+MESH_POST+usage  NODES ]
+    } else if (strcasecmp(token, "NODES") == 0) {
+      mesh_write->centering = centering_nodes;
+*/
+///kw+MESH_POST+usage [ NO_PHYSICAL_NAMES ]
+    } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
+      mesh_write->no_physical_names = 1;
+          
+///kw+MESH_POST+usage [ VECTOR <function1_x> <function1_y> <function1_z> ] [...]
+    } else if (strcasecmp(token, "VECTOR") == 0) {
+      
+      mesh_write_dist_t *mesh_write_dist = NULL;
+      feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
+      feenox_check_alloc(mesh_write_dist->vector = calloc(3, sizeof(function_t *)));
+          
+      unsigned int i = 0;
+      for (i = 0; i < 3; i++) {
+            
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected function name");
+          return FEENOX_ERROR;
+        }
+            
+        if ((mesh_write_dist->vector[i] = feenox_get_function_ptr(token)) == NULL) {
+          feenox_check_alloc(mesh_write_dist->vector[i] = calloc(1, sizeof(function_t)));
+          feenox_check_alloc(mesh_write_dist->vector[i]->name = strdup(token));
+          mesh_write_dist->vector[i]->type = function_type_algebraic;
+          mesh_write_dist->vector[i]->n_arguments = 3;
+          mesh_write_dist->vector[i]->var_argument = feenox.mesh.vars.arr_x;
+          feenox_call(feenox_expression_parse(&mesh_write_dist->vector[i]->algebraic_expression, token)); 
+        }
+        // TODO: como tenemos una funcion podemos ver si es node o cell
+        mesh_write_dist->centering = mesh_write->centering;
+      }
+          
+      LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
+          
+          
+    } else {
+          
+///kw+MESH_POST+usage [ <scalar_function_1> ] [ <scalar_function_2> ] ...
+      mesh_write_dist_t *mesh_write_dist;
+      feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
+          
+      if ((mesh_write_dist->scalar = feenox_get_function_ptr(token)) == NULL) {
+        feenox_check_alloc(mesh_write_dist->scalar = calloc(1, sizeof(function_t)));
+        feenox_check_alloc(mesh_write_dist->scalar->name = strdup(token));
+        mesh_write_dist->scalar->type = function_type_algebraic;
+        mesh_write_dist->scalar->n_arguments = 3;   // por generalidad
+        mesh_write_dist->scalar->var_argument = feenox.mesh.vars.arr_x;
+        feenox_call(feenox_expression_parse(&mesh_write_dist->scalar->algebraic_expression, token)); 
+      }
+      mesh_write_dist->centering = mesh_write->centering;
+      LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
+    }
+  }
+
+  // if there's only one mesh, use that one, otherwise ask which one 
+  if (mesh_write->mesh == NULL) {
+    if (feenox.mesh.mesh_main == feenox.mesh.meshes) {
+      mesh_write->mesh = feenox.mesh.mesh_main;
+    } else {
+      feenox_push_error_message("do not know what mesh should the post-processing be applied to");
+      return FEENOX_ERROR;
+    }
+  }
+
+  if (mesh_write->format == post_format_fromextension) {
+    char *ext = mesh_write->file->format + strlen(mesh_write->file->format) - 4;
+
+           if (strcasecmp(ext, ".pos") == 0 || strcasecmp(ext, ".msh") == 0) {
+      mesh_write->format = post_format_gmsh;
+    } else if (strcasecmp(ext, ".vtk") == 0) {
+      mesh_write->format = post_format_vtk;
+    } else {
+      feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
+      return FEENOX_ERROR;
+    }
+  }
+
+/*  
+  switch (mesh_write->format) {
+    case post_format_gmsh:
+ */
+      mesh_write->write_header = feenox_mesh_gmsh_write_header;
+      mesh_write->write_mesh = feenox_mesh_gmsh_write_mesh;
+      mesh_write->write_scalar = feenox_mesh_gmsh_write_scalar;
+      mesh_write->write_vector = feenox_mesh_gmsh_write_vector;
+/*      
+    break;
+    case post_format_vtk:
+      mesh_write->write_header = feenox_mesh_vtk_write_header;
+      mesh_write->write_mesh = feenox_mesh_vtk_write_mesh;
+      mesh_write->write_scalar = feenox_mesh_vtk_write_scalar;
+      mesh_write->write_vector = feenox_mesh_vtk_write_vector;
+    break;
+    default:
+      return FEENOX_ERROR;
+    break;
+  }
+*/
+  LL_APPEND(feenox.mesh.mesh_writes, mesh_write);
+  feenox_call(feenox_add_instruction(feenox_instruction_mesh_write, mesh_write));
   
   return FEENOX_OK;
 }

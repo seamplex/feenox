@@ -29,6 +29,7 @@ int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t
 #ifdef HAVE_PETSC
   feenox.pde.dirichlet_indexes[k] = feenox.pde.mesh->node[j].index_dof[bc_data->dof];
   feenox.pde.dirichlet_values[k] = feenox_expression_eval(&bc_data->expr[0]);
+  printf("%d %g\n", feenox.pde.dirichlet_indexes[k], feenox.pde.dirichlet_values[k]);
 #endif
   return FEENOX_OK;
 }
