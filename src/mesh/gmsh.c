@@ -1026,7 +1026,7 @@ int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file)
 }
 
 
-int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function, centering_t centering) {
+int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function, field_location_t field_location) {
 
   int i;
   mesh_t *mesh;
@@ -1041,16 +1041,14 @@ int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function
   }
 
   // TODO
-/*  
-  if (centering == centering_cells) {
+  if (field_location == field_location_cells) {
     fprintf(mesh_write->file->pointer, "$ElementData\n");
     if (mesh->n_cells == 0) {
-      feenox_call(mesh_element2cell(mesh));
+      feenox_call(feenox_mesh_element2cell(mesh));
     }
   } else {
- */
     fprintf(mesh_write->file->pointer, "$NodeData\n");
-//  }
+  }
 
   // one string tag
   fprintf(mesh_write->file->pointer, "1\n");
@@ -1070,7 +1068,7 @@ int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function
   // number of data per node: uno (scalar)
   fprintf(mesh_write->file->pointer, "%d\n", 1);
 
-  if (centering == centering_cells) {
+  if (field_location == field_location_cells) {
     // number of data
     fprintf(mesh_write->file->pointer, "%ld\n", mesh->n_cells);
 
@@ -1109,7 +1107,7 @@ int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function
 
 }
 
-int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **function, centering_t centering) {
+int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **function, field_location_t field_location) {
 
   int i, j;
   mesh_t *mesh;
@@ -1121,16 +1119,15 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
   } else {
     return FEENOX_ERROR;
   }
-/*
-  if (centering == centering_cells) {
+
+  if (field_location == field_location_cells) {
     fprintf(mesh_write->file->pointer, "$ElementData\n");
     if (mesh->n_cells == 0) {
-      feenox_call(mesh_element2cell(mesh));
+      feenox_call(feenox_mesh_element2cell(mesh));
     }
   } else {
- */ 
     fprintf(mesh_write->file->pointer, "$NodeData\n");
-//  }
+  }
 
   // un tag de string  
   fprintf(mesh_write->file->pointer, "1\n");
@@ -1150,7 +1147,7 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
   // cantidad de datos por punto: 3 (un vector)
   fprintf(mesh_write->file->pointer, "%d\n", 3);
 
-  if (centering == centering_cells) {
+  if (field_location == field_location_cells) {
     for (i = 0; i < mesh->n_cells; i++) {
       fprintf(mesh_write->file->pointer, "%ld %g %g %g\n", mesh->cell[i].element->index,
                                                          feenox_function_eval(function[0], mesh->cell[i].x),

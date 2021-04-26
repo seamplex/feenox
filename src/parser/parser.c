@@ -3181,7 +3181,7 @@ int feenox_parse_write_mesh(void) {
 
 ///kw+MESH_WRITE+usage { <file_path> | <file_id> }
 ///kw+MESH_WRITE+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-///kw+MESH_WRITE+detail The format is automatically detected from the extension. Otherwise, the keyword `FORMAT` can
+///kw+MESH_WRITE+detail The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
 ///kw+MESH_WRITE+detail be use to give the format explicitly.
 
   feenox_call(feenox_parser_file(&mesh_write->file));
@@ -3205,31 +3205,53 @@ int feenox_parse_write_mesh(void) {
       }
       feenox_free(mesh_name);
           
-///kw+MESH_POST+usage [ NO_MESH ]
+///kw+MESH_WRITE+usage [ NO_MESH ]
+///kw+MESH_WRITE+detail If the `NO_MESH` keyword is given, only the results are written into the output file.
+///kw+MESH_WRITE+detail Depending on the output format, this can be used to avoid repeating data and/or
+///kw+MESH_WRITE+detail creating partial output files which can the be latter assembled by post-processing scripts.
     } else if (strcasecmp(token, "NOMESH") == 0 || strcasecmp(token, "NO_MESH") == 0) {
       mesh_write->no_mesh = 1;
 
-///kw+MESH_POST+usage [ FORMAT { gmsh | vtk } ]
-    } else if (strcasecmp(token, "FORMAT") == 0) {
+///kw+MESH_WRITE+usage [ FILE_FORMAT { gmsh | vtk } ]
+    } else if (strcasecmp(token, "FILE_FORMAT") == 0) {
       char *keywords[] = {"gmsh", "vtk", ""};
       int values[] = {post_format_gmsh, post_format_vtk, 0};
-      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->format));
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
 
-/*      
-///kw+MESH_POST+usage [ CELLS | ]
-    } else if (strcasecmp(token, "CELLS") == 0) {
-      mesh_write->centering = centering_cells;
-      feenox.mesh.need_cells = 1;
-
-///kw+MESH_POST+usage  NODES ]
-    } else if (strcasecmp(token, "NODES") == 0) {
-      mesh_write->centering = centering_nodes;
-*/
-///kw+MESH_POST+usage [ NO_PHYSICAL_NAMES ]
+///kw+MESH_WRITE+usage [ NO_PHYSICAL_NAMES ]
+///kw+MESH_WRITE+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+///kw+MESH_WRITE+detail section that sets the actual names of the physical entities is not written.      
+///kw+MESH_WRITE+detail This can be needed to avoid name clashes when reading multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
       mesh_write->no_physical_names = 1;
-          
-///kw+MESH_POST+usage [ VECTOR <function1_x> <function1_y> <function1_z> ] [...]
+      
+///kw+MESH_WRITE+usage  [ NODE |
+///kw+MESH_WRITE+detail The output is node-based by default. This can be controlled with both the
+///kw+MESH_WRITE+detail `NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
+///kw+MESH_WRITE+detail will be written at the node (cells). These keywords can be used several times
+///kw+MESH_WRITE+detail and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
+///kw+MESH_WRITE+detail write the conductivity and the expression $1+z$ as cell-based and the temperature
+///kw+MESH_WRITE+detail $T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
+    } else if (strcasecmp(token, "NODE") == 0 || strcasecmp(token, "NODES") == 0) {
+      mesh_write->field_location = field_location_nodes;
+
+///kw+MESH_WRITE+usage CELL ]
+    } else if (strcasecmp(token, "CELL") == 0 || strcasecmp(token, "CELLS") == 0) {
+      mesh_write->field_location = field_location_cells;
+      feenox.mesh.need_cells = 1;
+
+///kw+MESH_WRITE+detail Also, the `FORMAT` keyword can be used to define the precision of the ASCII
+///kw+MESH_WRITE+detail representation of the fields that follow. Default is `%g`.
+///kw+MESH_WRITE+usage [ FORMAT <printf_specification>]
+    } else if (strcasecmp(token, "FORMAT") == 0) {
+      feenox_call(feenox_parser_string(&mesh_write->printf_format));
+      
+///kw+MESH_WRITE+detail The data to be written has to be given as a list of fields,
+///kw+MESH_WRITE+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
+///kw+MESH_WRITE+detail and/or expressions (such as `x^2+y^2+z^2`).
+///kw+MESH_WRITE+detail Each field is written as a scalar, unless the keyword `VECTOR` is given.
+///kw+MESH_WRITE+detail In this case, there should be exactly three fields following `VECTOR`.
+///kw+MESH_WRITE+usage [ VECTOR <field_x> <field_y> <field_z> ] [...]
     } else if (strcasecmp(token, "VECTOR") == 0) {
       
       mesh_write_dist_t *mesh_write_dist = NULL;
@@ -3249,11 +3271,12 @@ int feenox_parse_write_mesh(void) {
           feenox_check_alloc(mesh_write_dist->vector[i]->name = strdup(token));
           mesh_write_dist->vector[i]->type = function_type_algebraic;
           mesh_write_dist->vector[i]->n_arguments = 3;
+          mesh_write_dist->vector[i]->n_arguments_given = 3;
           mesh_write_dist->vector[i]->var_argument = feenox.mesh.vars.arr_x;
           feenox_call(feenox_expression_parse(&mesh_write_dist->vector[i]->algebraic_expression, token)); 
         }
         // TODO: como tenemos una funcion podemos ver si es node o cell
-        mesh_write_dist->centering = mesh_write->centering;
+        mesh_write_dist->field_location = mesh_write->field_location;
       }
           
       LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
@@ -3261,19 +3284,20 @@ int feenox_parse_write_mesh(void) {
           
     } else {
           
-///kw+MESH_POST+usage [ <scalar_function_1> ] [ <scalar_function_2> ] ...
-      mesh_write_dist_t *mesh_write_dist;
+///kw+MESH_WRITE+usage [ <field_1> ] [ <field_2> ] ...
+      mesh_write_dist_t *mesh_write_dist = NULL;
       feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
           
       if ((mesh_write_dist->scalar = feenox_get_function_ptr(token)) == NULL) {
         feenox_check_alloc(mesh_write_dist->scalar = calloc(1, sizeof(function_t)));
         feenox_check_alloc(mesh_write_dist->scalar->name = strdup(token));
         mesh_write_dist->scalar->type = function_type_algebraic;
-        mesh_write_dist->scalar->n_arguments = 3;   // por generalidad
+        mesh_write_dist->scalar->n_arguments = 3;
+        mesh_write_dist->scalar->n_arguments_given = 3;
         mesh_write_dist->scalar->var_argument = feenox.mesh.vars.arr_x;
         feenox_call(feenox_expression_parse(&mesh_write_dist->scalar->algebraic_expression, token)); 
       }
-      mesh_write_dist->centering = mesh_write->centering;
+      mesh_write_dist->field_location = mesh_write->field_location;
       LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
     }
   }
@@ -3288,13 +3312,13 @@ int feenox_parse_write_mesh(void) {
     }
   }
 
-  if (mesh_write->format == post_format_fromextension) {
+  if (mesh_write->post_format == post_format_fromextension) {
     char *ext = mesh_write->file->format + strlen(mesh_write->file->format) - 4;
 
            if (strcasecmp(ext, ".pos") == 0 || strcasecmp(ext, ".msh") == 0) {
-      mesh_write->format = post_format_gmsh;
+      mesh_write->post_format = post_format_gmsh;
     } else if (strcasecmp(ext, ".vtk") == 0) {
-      mesh_write->format = post_format_vtk;
+      mesh_write->post_format = post_format_vtk;
     } else {
       feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
       return FEENOX_ERROR;

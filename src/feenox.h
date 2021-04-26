@@ -1203,13 +1203,13 @@ struct mesh_t {
 };
 
 typedef enum {
-  centering_default,
-  centering_nodes,
-  centering_cells
-} centering_t;
+  field_location_default,
+  field_location_nodes,
+  field_location_cells
+} field_location_t;
 
 struct mesh_write_dist_t {
-  centering_t centering;
+  field_location_t field_location;
   
   function_t *scalar;
   function_t **vector;
@@ -1227,15 +1227,16 @@ struct mesh_write_t {
     post_format_fromextension,
     post_format_gmsh,
     post_format_vtk,
-  } format;
+  } post_format;
 
   int no_physical_names;
-  centering_t centering;
+  field_location_t field_location;
+  char *printf_format;
   
   int (*write_header)(FILE *);
   int (*write_mesh)(mesh_t *, int, FILE *);
-  int (*write_scalar)(mesh_write_t *, function_t *, centering_t);
-  int (*write_vector)(mesh_write_t *, function_t **, centering_t);
+  int (*write_scalar)(mesh_write_t *, function_t *, field_location_t);
+  int (*write_vector)(mesh_write_t *, function_t **, field_location_t);
   
   // estos dos son para saber si tenemos que cambiar de tipo en VTK
   int point_init;
@@ -1367,9 +1368,7 @@ struct feenox_t {
     mesh_t *mesh_main;
     mesh_write_t *mesh_writes;
 
-    // flag que el codigo partcular rellena (preferentemente en init_before_parser)
-    // para indicar si el default es trabajar sobre celdas (FVM) o sobre nodos (FEM)
-//    centering_t default_centering;
+    field_location_t default_field_location;
 
     // estas tres variables estan reallocadas para apuntar a vec_x
     struct {
@@ -1957,8 +1956,8 @@ extern int feenox_mesh_read_gmsh(mesh_t *this);
 extern int feenox_mesh_gmsh_update_function(function_t *function, double t, double dt);
 extern int feenox_mesh_gmsh_write_header(FILE *file);
 extern int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file);
-extern int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_post, function_t *function, centering_t centering);
-extern int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_post, function_t **function, centering_t centering);
+extern int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_post, function_t *function, field_location_t field_location);
+extern int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_post, function_t **function, field_location_t field_location);
 
 // write.c
 extern int feenox_instruction_mesh_write(void *arg);
@@ -2015,6 +2014,8 @@ extern int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *eleme
 extern int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]);
 extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
 
+// cell.c
+extern int feenox_mesh_element2cell(mesh_t *this);
 
 // vtk.c
 extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);

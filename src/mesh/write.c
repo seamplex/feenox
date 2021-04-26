@@ -54,25 +54,23 @@ int feenox_instruction_mesh_write(void *arg) {
   }
 
   LL_FOREACH(mesh_write->mesh_write_dists, mesh_write_dist) {
-    // TODO
-/*    
-    if (mesh_write_dist->centering == centering_cells && mesh_write->mesh->n_cells == 0) {
-      feenox_call(mesh_element2cell(mesh_write->mesh));
+    if (mesh_write_dist->field_location == field_location_cells && mesh_write->mesh->n_cells == 0) {
+      feenox_call(feenox_mesh_element2cell(mesh_write->mesh));
     }
-*/    
+
     if (mesh_write_dist->scalar != NULL) {
       if (mesh_write_dist->scalar->initialized == 0) {
         feenox_call(feenox_function_init(mesh_write_dist->scalar));
       }
-      feenox_call(mesh_write->write_scalar(mesh_write, mesh_write_dist->scalar, mesh_write_dist->centering));
+      feenox_call(mesh_write->write_scalar(mesh_write, mesh_write_dist->scalar, mesh_write_dist->field_location));
     } else {
-      feenox_call(mesh_write->write_vector(mesh_write, mesh_write_dist->vector, mesh_write_dist->centering));
+      feenox_call(mesh_write->write_vector(mesh_write, mesh_write_dist->vector, mesh_write_dist->field_location));
     }
-    // TODO: tensores
+    // TODO: tensors
   }
   
   // as vtk does not support multiple time steps, it is better to close the file now
-  if (mesh_write->format == post_format_vtk) {
+  if (mesh_write->post_format == post_format_vtk) {
     feenox_call(feenox_instruction_file_close(mesh_write->file));
   }
   // for .msh we leave that to the user, to use CLOSE or whatever explicitly
