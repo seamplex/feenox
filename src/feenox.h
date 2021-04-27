@@ -1114,6 +1114,8 @@ struct bc_data_t {
   } type_math;
   
   int type_phys;     // problem-based flag that tells which type of BC this is
+  int space_dependent;
+  int nonlinear;
   unsigned int dof;
 
   expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
@@ -2082,12 +2084,14 @@ extern int feenox_expression_depends_on_function(function_ll_t *functions, funct
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 
-// thermal/bc.c
-int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
-int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t k);
-
 // thermal/bulk.c
-extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, int v);
+extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, unsigned int v);
+
+// thermal/bc.c
+extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
+extern int feenox_problem_bc_set_thermal_dirichlet(bc_data_t *bc_data, size_t j, size_t k);
+extern int feenox_problem_bc_set_thermal_heatflux(element_t *this, bc_data_t *bc_data, unsigned int v);
+
 
 
 // mechanical/init.c
@@ -2101,6 +2105,7 @@ extern int feenox_problem_init_runtime_modal(void);
 // build.c
 extern int feenox_build(void);
 extern int feenox_build_element_volumetric(element_t *this);
+extern int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data);
 extern int feenox_allocate_elemental_objects(element_t *this);
 extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
 extern int feenox_elemental_objects_allocate(element_t *this);

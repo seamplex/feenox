@@ -9,6 +9,7 @@ int feenox_build(void) {
     step = 1;
   }
   
+  // TODO: may we don't need to always empty stuff 
   // empty global objects
   if (feenox.pde.K != NULL) {
     petsc_call(MatZeroEntries(feenox.pde.K));
@@ -37,7 +38,8 @@ int feenox_build(void) {
       // volumetric elements need volumetric builds
       // TODO: process only elements that are local, its the partition number
       //       matches the local rank (not necessarily one to one)
-      // TODO: check if we can skip re-building in linear transient
+      // TODO: check if we can skip re-building in linear transient and/or
+      //       nonlinear BCs only
       feenox_call(feenox_build_element_volumetric(&feenox.pde.mesh->element[i]));
       
     } else if (feenox.pde.mesh->element[i].physical_group != NULL) {
@@ -51,7 +53,7 @@ int feenox_build(void) {
           if (bc_data->type_math != bc_type_math_dirichlet) {
             // and only apply them if the condition holds true (or if there's no condition at all)
             if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
-//               feenox_call(fino_build_element_bc(bc_data, &feenox.pde.mesh->element[i]));
+              feenox_call(feenox_build_element_weakbc(&feenox.pde.mesh->element[i], bc_data));
             }  
           }  
         }
@@ -116,7 +118,6 @@ int feenox_build_element_volumetric(element_t *this) {
     return FEENOX_ERROR;
   }
   
-
   // total number of gauss points
   unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
     
@@ -124,12 +125,6 @@ int feenox_build_element_volumetric(element_t *this) {
     feenox_call(feenox_elemental_objects_allocate(this));
   }
     
-  // TODO: see if this is actually needed
-/*  
-  if (this->B == NULL) {
-    feenox_check_alloc(this->B = calloc(V, sizeof(gsl_matrix *)));
-  }
-*/    
   // initialize to zero the elemental objects
   gsl_matrix_set_zero(feenox.pde.Ki);
   gsl_matrix_set_zero(feenox.pde.Mi);
@@ -159,47 +154,37 @@ int feenox_build_element_volumetric(element_t *this) {
   return FEENOX_OK;
 }
 
-/*
-int fino_build_element_bc(element_t *element, bc_t *bc) {
+int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
 
-  if (fino.n_local_nodes != element->type->nodes) {
-    feenox_call(fino_allocate_elemental_objects(element));
-  }
-  
-  if (fino.Nb == NULL) {
-    fino.Nb = gsl_vector_calloc(fino.degrees);
-  }
-  gsl_vector_set_zero(fino.Nb);
-  gsl_vector_set_zero(fino.bi);
+  // total number of gauss points
+  unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
 
-  if (fino.problem_family == problem_family_mechanical) {
-    
-    // TODO: poner un flag si se necesita
-    if (element->type->dim == 1 || element->type->dim == 2) {
-      feenox_call(mesh_compute_normal(element));
-    }  
-    
-    feenox_call(fino_break_set_neumann(element, bc));
-    
-  } else if (fino.problem_family == problem_family_thermal) {
-    
-    if (bc->type_phys == bc_phys_heat_flux || bc->type_phys == bc_phys_heat_total) {
-      if (strcmp(bc->expr[0].string, "0") != 0) { // para no tener que hacer cuentas si es adiabatico
-        feenox_call(fino_thermal_set_heat_flux(element, bc));
-      }
-    } else if (bc->type_phys == bc_phys_convection) {
-      feenox_call(fino_thermal_set_convection(element, bc));
-    }
-    
+  if (feenox.pde.n_local_nodes != this->type->nodes) {
+    feenox_call(feenox_elemental_objects_allocate(this));
   }
   
-  mesh_compute_l(fino.mesh, element);
-  petsc_call(VecSetValues(fino.b, fino.elemental_size, element->l, gsl_vector_ptr(fino.bi, 0), ADD_VALUES));
+  if (feenox.pde.Nb == NULL) {
+    feenox_check_alloc(feenox.pde.Nb = gsl_vector_calloc(feenox.pde.dofs));
+  }
+  gsl_vector_set_zero(feenox.pde.Nb);
+  gsl_vector_set_zero(feenox.pde.bi);
+
+  unsigned int v = 0;
+  for (v = 0; v < V; v++) {
+    // TODO: virtual
+    feenox_call(feenox_problem_bc_set_thermal_heatflux(this, bc_data, v));
+  }
   
-  return WASORA_RUNTIME_OK;
+  feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
+  if (feenox.pde.b != NULL) {
+    petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
+  }  
+  
+  return FEENOX_OK;
   
 }
 
+/*
 inline double fino_compute_r_for_axisymmetric(element_t *element, int v) {
 
   double r_for_axisymmetric = 1.0;
