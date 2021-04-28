@@ -59,12 +59,9 @@ int feenox_instruction_mesh_write(void *arg) {
     }
 
     if (mesh_write_dist->scalar != NULL) {
-      if (mesh_write_dist->scalar->initialized == 0) {
-        feenox_call(feenox_function_init(mesh_write_dist->scalar));
-      }
-      feenox_call(mesh_write->write_scalar(mesh_write, mesh_write_dist->scalar, mesh_write_dist->field_location));
+      feenox_call(mesh_write->write_scalar(mesh_write, mesh_write_dist->scalar, mesh_write_dist->field_location, mesh_write_dist->printf_format));
     } else {
-      feenox_call(mesh_write->write_vector(mesh_write, mesh_write_dist->vector, mesh_write_dist->field_location));
+      feenox_call(mesh_write->write_vector(mesh_write, mesh_write_dist->vector, mesh_write_dist->field_location, mesh_write_dist->printf_format));
     }
     // TODO: tensors
   }

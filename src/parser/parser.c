@@ -3240,10 +3240,10 @@ int feenox_parse_write_mesh(void) {
       mesh_write->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;
 
-///kw+MESH_WRITE+detail Also, the `FORMAT` keyword can be used to define the precision of the ASCII
+///kw+MESH_WRITE+detail Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
 ///kw+MESH_WRITE+detail representation of the fields that follow. Default is `%g`.
-///kw+MESH_WRITE+usage [ FORMAT <printf_specification>]
-    } else if (strcasecmp(token, "FORMAT") == 0) {
+///kw+MESH_WRITE+usage [ SCALAR_FORMAT <printf_specification>]
+    } else if (strcasecmp(token, "SCALAR_FORMAT") == 0) {
       feenox_call(feenox_parser_string(&mesh_write->printf_format));
       
 ///kw+MESH_WRITE+detail The data to be written has to be given as a list of fields,
@@ -3275,8 +3275,10 @@ int feenox_parse_write_mesh(void) {
           mesh_write_dist->vector[i]->var_argument = feenox.mesh.vars.arr_x;
           feenox_call(feenox_expression_parse(&mesh_write_dist->vector[i]->algebraic_expression, token)); 
         }
-        // TODO: como tenemos una funcion podemos ver si es node o cell
         mesh_write_dist->field_location = mesh_write->field_location;
+        if (mesh_write->printf_format != NULL) {
+          feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
+        }  
       }
           
       LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
@@ -3298,6 +3300,10 @@ int feenox_parse_write_mesh(void) {
         feenox_call(feenox_expression_parse(&mesh_write_dist->scalar->algebraic_expression, token)); 
       }
       mesh_write_dist->field_location = mesh_write->field_location;
+      if (mesh_write->printf_format != NULL) {
+        feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
+      }  
+      
       LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
     }
   }

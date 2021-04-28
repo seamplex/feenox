@@ -1212,6 +1212,7 @@ typedef enum {
 
 struct mesh_write_dist_t {
   field_location_t field_location;
+  char *printf_format;
   
   function_t *scalar;
   function_t **vector;
@@ -1237,8 +1238,8 @@ struct mesh_write_t {
   
   int (*write_header)(FILE *);
   int (*write_mesh)(mesh_t *, int, FILE *);
-  int (*write_scalar)(mesh_write_t *, function_t *, field_location_t);
-  int (*write_vector)(mesh_write_t *, function_t **, field_location_t);
+  int (*write_scalar)(mesh_write_t *, function_t *, field_location_t, char *);
+  int (*write_vector)(mesh_write_t *, function_t **, field_location_t, char *);
   
   // estos dos son para saber si tenemos que cambiar de tipo en VTK
   int point_init;
@@ -1958,8 +1959,8 @@ extern int feenox_mesh_read_gmsh(mesh_t *this);
 extern int feenox_mesh_gmsh_update_function(function_t *function, double t, double dt);
 extern int feenox_mesh_gmsh_write_header(FILE *file);
 extern int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file);
-extern int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_post, function_t *function, field_location_t field_location);
-extern int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_post, function_t **function, field_location_t field_location);
+extern int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_post, function_t *function, field_location_t field_location, char *printf_format);
+extern int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_post, function_t **function, field_location_t field_location, char *printf_format);
 
 // write.c
 extern int feenox_instruction_mesh_write(void *arg);
