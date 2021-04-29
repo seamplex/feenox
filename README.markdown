@@ -19,10 +19,6 @@
 > web-based front end with FeenoX running in the cloud directly from
 > your browser see [CAEplex][] at <https://www.caeplex.com>.
 
-<div class="embed-responsive embed-responsive-16by9 mb-3">
- <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kD3tQdq17ZE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div> 
-
 </div>
 
   [What is FeenoX?]: #what-is-feenox
