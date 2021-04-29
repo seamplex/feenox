@@ -29,9 +29,13 @@ version=$(git describe --tags | sed 's/-/./')
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
 if test ! -z "$(which pandoc)"; then
- pandoc README.md  -t plain -o README
-else
- fmt -s README.md > README
+ pandoc README.markdown -t gfm   -o README.md  --reference-links --reference-location=section
+ pandoc README.md       -t plain -o README
+ pandoc TODO.md         -t plain -o TODO
+# else
+#  cp README.markdown README.md
+#  fmt -s README.md > README
+#  fmt -s TODO.md   > README
 fi
 
 echo "calling autoreconf... "

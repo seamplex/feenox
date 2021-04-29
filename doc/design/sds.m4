@@ -112,6 +112,10 @@ FeenoX relies on a few open source libraries---most of them optional. The only m
 
 Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executables that do not need any other shared libraries to be present on the target host, but their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweights the limited functionality and scalability of the tool.
 
+**show how to download and run from binary**
+
+**show how to clone, compile and run tests**
+
 dnl autoconf vs. cmake, rule of diversity 
 
 

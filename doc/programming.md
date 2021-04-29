@@ -43,12 +43,20 @@ The main objective is to comply with the Software Requirements Specification. Wi
  * Modern high-level languages like Python or Julia are targets and not sources of FeenoX.
  * For documentation and comments within the code, American English should be used.
 
-## Virtual methods
+## Programming IDEs
 
-Even though we use C, we can still have some “virtual methods” by using function pointers. So in a FEM formulation, the routines that build the stiffness matrix are mostly independent of the problem type (for the same family, say elliptic problems) but in the integrands. So a good practice is to have a common set of routines that loop over elements and over gauss points and then at the inner loop a virtual method is called which depends on the particular problem (thermal, mechanical, etc). This is accomplished by using function pointers so all problems have to provide more or less the same sets of routines: initialization, integrands, BCs, etc. See the basic problems to see how this idea works.
+### Netbeans
 
-Reading and writing mesh/post-processing files work the same way. Each format has to provide a virtual reader/writer method.
- 
+To work on FeenoX using [NetBeans](https://netbeans.apache.org/), first make sure you have the C/C++ module working. If you don't, do this:
+
+> In Netbeans go to Tools->Plugins->Settings.
+> Entry NetBeans 8.2 Plugin Portal is already present.
+> Click the checkbox next to this entry.
+> Switch to Available Plugins tab, click Check for Newest.
+> C/C++ is now on the list. 
+
+Then create a new C/C++ project File->New Project... choose C/C++ Project with Existing Sources click Next, browse to find the root directory of your local FeenoX sources. It is important to have the `configure` script already created there, so make sure you have run `./autogen.sh`. Make sure the configuration mode is set to Automatic and that NetBeans detected the configure script by adding “using configure” next to “Automatic.” Click to create the project. This will create a directory `nbproject` which will be ignored by `.gitignore`.
+
 ## Makefiles
 
  * Use autotools and friends and comply with the GNU requirements.
@@ -87,7 +95,12 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
     15. optimization
     16. diversity
     17. extensibility
- 
+
+## Virtual methods
+
+Even though we use C, we can still have some “virtual methods” by using function pointers. So in a FEM formulation, the routines that build the stiffness matrix are mostly independent of the problem type (for the same family, say elliptic problems) but in the integrands. So a good practice is to have a common set of routines that loop over elements and over gauss points and then at the inner loop a virtual method is called which depends on the particular problem (thermal, mechanical, etc). This is accomplished by using function pointers so all problems have to provide more or less the same sets of routines: initialization, integrands, BCs, etc. See the basic problems to see how this idea works.
+
+Reading and writing mesh/post-processing files work the same way. Each format has to provide a virtual reader/writer method.
  
 ## Memory management
 
@@ -188,6 +201,19 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
 # What we program in FeenoX
 
  * The features described in the SRS.
+
+# Code of coduct
+
+Copied from [NumFOCUS Code of Conduct---THE SHORT VERSION](https://numfocus.org/code-of-conduct) and piped through `sed s/NumFOCUS/FeenoX`:
+ 
+> Be kind to others. Do not insult or put down others. Behave professionally. Remember that harassment and sexist, racist, or exclusionary jokes are not appropriate for FeenoX.
+> 
+> All communication should be appropriate for a professional audience including people of many different backgrounds. Sexual language and imagery is not appropriate.
+> 
+> FeenoX is dedicated to providing a harassment-free community for everyone, regardless of gender, sexual orientation, gender identity and expression, disability, physical appearance, body size, race, or religion. We do not tolerate harassment of community members in any form.
+>
+> Thank you for helping make this a welcoming, friendly community for all.
+
  
 # Release plans
 
