@@ -37,7 +37,7 @@ int feenox_dirichlet_eval(void) {
       element = element_list->element;
       if (element != NULL && element->type->dim < feenox.pde.dim && element->physical_group != NULL) {
         LL_FOREACH(element->physical_group->bcs, bc) {
-          LL_FOREACH(bc->bc_datums, bc_data) {
+          DL_FOREACH(bc->bc_datums, bc_data) {
             if (bc_data->type_math == bc_type_math_dirichlet) {
 
               // if there is a condition we evaluate it now

@@ -1,0 +1,11 @@
+READ_MESH slab.msh
+PROBLEM heat DIMENSIONS 1
+
+BC left  T=0
+BC right q=1*(1-T(x))
+
+k = 1
+
+SOLVE_PROBLEM
+
+PRINT T(0.5)-1/4

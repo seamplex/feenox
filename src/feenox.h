@@ -143,9 +143,9 @@
 
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
 
-#define MINMAX_ARGS       10
+#define MINMAX_ARGS           10
 
-// TODO: somewhere lese
+// TODO: somewhere else
 #define DEFAULT_NMODES        10
 
 
@@ -195,6 +195,7 @@ enum version_type {
 // macro to check error returns in function calls
 #define feenox_call(function)        if ((function) != FEENOX_OK) return FEENOX_ERROR
 #define feenox_call_null(function)   if ((function) != FEENOX_OK) return NULL
+#define feenox_check_null(function)  if ((function) == NULL) return FEENOX_ERROR
 #ifdef HAVE_IDA
  #define ida_call(function)      if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
 #endif
@@ -1116,12 +1117,16 @@ struct bc_data_t {
   int type_phys;     // problem-based flag that tells which type of BC this is
   int space_dependent;
   int nonlinear;
+  int disabled;
+  int fills_matrix;
   unsigned int dof;
 
   expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
-  expr_t *expr;      // an array of stuff
+  expr_t expr;
   
-  bc_data_t *next;
+  int (*set)(bc_data_t *this, element_t *element, unsigned int v);
+  
+  bc_data_t *prev, *next;   // doubly-linked list in ech bc_t
 };
 
 
@@ -1403,11 +1408,9 @@ struct feenox_t {
 
     material_t *materials;
     property_t *properties;
-
     bc_t *bcs;
-    
+
 /*    
-    mesh_write_t *writes;
     fill_mesh_vector_t *fill_vectors;
     find_extremum_t *find_minmaxs;
     integrate_t *integrates;
@@ -1525,6 +1528,7 @@ struct feenox_t {
     
     // virtual methods
     int (*problem_init_runtime_particular)(void);
+    int (*bc_parse)(bc_data_t *, const char *, const char *);
     int (*solve_petsc)(void);
 
     function_t *initial_condition;
@@ -2091,7 +2095,8 @@ extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *elemen
 // thermal/bc.c
 extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
 extern int feenox_problem_bc_set_thermal_dirichlet(bc_data_t *bc_data, size_t j, size_t k);
-extern int feenox_problem_bc_set_thermal_heatflux(element_t *this, bc_data_t *bc_data, unsigned int v);
+extern int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *element, unsigned int v);
+extern int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *element, unsigned int v);
 
 
 

@@ -3554,7 +3554,7 @@ int feenox_parse_bc(void) {
       }
       feenox_free(mesh_name);
     
-///kw+BC+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+///kw+BC+usage [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ]
 ///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh,
 ///kw+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
@@ -3573,8 +3573,8 @@ int feenox_parse_bc(void) {
       feenox_free(physical_group_name);
         
     } else {
-///kw+BC+usage [ <bc_data1> [ <bc_data2> [ ... ] ] ]
-///kw+BC+detail Each `<bc_data>` argument is a string whose meaning depends on the type
+///kw+BC+usage [ <bc_data1> <bc_data2> ... ]
+///kw+BC+detail Each `<bc_data>` argument is a single string whose meaning depends on the type
 ///kw+BC+detail of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
 ///kw+BC+detail temperature to depend on space as the provided expression in a
 ///kw+BC+detail thermal problem and `fixed` fixes the displacements in all the directions
@@ -3607,6 +3607,8 @@ int feenox_parse_problem(void) {
       feenox.pde.type = type_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
       feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
+      // TODO!
+//      feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
       
 ///kw+PROBLEM+usage thermal
 ///kw+PROBLEM+usage |
@@ -3615,6 +3617,7 @@ int feenox_parse_problem(void) {
       feenox.pde.type = type_thermal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
       feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
+      feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
 
 ///kw+PROBLEM+usage modal
 ///kw+PROBLEM+usage ]@
@@ -3627,6 +3630,8 @@ int feenox_parse_problem(void) {
       feenox.pde.type = type_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
+      // TODO!
+//      feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
       if (feenox.pde.nev == 0) {
         feenox.pde.nev = DEFAULT_NMODES;
       }

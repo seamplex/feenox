@@ -9,7 +9,7 @@ int feenox_build(void) {
     step = 1;
   }
   
-  // TODO: may we don't need to always empty stuff 
+  // TODO: may we don't need to always empty stuff, i.e. if we decide to re-use the matrices
   // empty global objects
   if (feenox.pde.K != NULL) {
     petsc_call(MatZeroEntries(feenox.pde.K));
@@ -36,7 +36,7 @@ int feenox_build(void) {
     if (feenox.pde.mesh->element[i].type->dim == feenox.pde.dim) {
       
       // volumetric elements need volumetric builds
-      // TODO: process only elements that are local, its the partition number
+      // TODO: process only elements that are local, i.e. the partition number
       //       matches the local rank (not necessarily one to one)
       // TODO: check if we can skip re-building in linear transient and/or
       //       nonlinear BCs only
@@ -44,13 +44,13 @@ int feenox_build(void) {
       
     } else if (feenox.pde.mesh->element[i].physical_group != NULL) {
       
-      // lower-dimensional elements might (or not) have BCs
+      // lower-dimensional elements might have BCs (or not)
       bc_t *bc = NULL;
       LL_FOREACH(feenox.pde.mesh->element[i].physical_group->bcs, bc) {
-        bc_data_t *bc_data;
-        LL_FOREACH(bc->bc_datums, bc_data) {
+        bc_data_t *bc_data = NULL;
+        DL_FOREACH(bc->bc_datums, bc_data) {
           // we only handle weak BCs here, strong BCs are handled in feenox_dirichlet_*()
-          if (bc_data->type_math != bc_type_math_dirichlet) {
+          if (bc_data->type_math != bc_type_math_dirichlet && bc_data->disabled == 0) {
             // and only apply them if the condition holds true (or if there's no condition at all)
             if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
               feenox_call(feenox_build_element_weakbc(&feenox.pde.mesh->element[i], bc_data));
@@ -171,15 +171,21 @@ int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
 
   unsigned int v = 0;
   for (v = 0; v < V; v++) {
-    // TODO: virtual
-    feenox_call(feenox_problem_bc_set_thermal_heatflux(this, bc_data, v));
+    feenox_call(bc_data->set(bc_data, this, v));
   }
   
+  // TODO: fix this!
+  if (bc_data->fills_matrix == 0 || (bc_data->fills_matrix && bc_data->next != NULL)) {
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
   if (feenox.pde.b != NULL) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
   }  
-  
+  if (bc_data->fills_matrix) {
+    petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, this->l,
+                                          feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Ki, 0, 0), ADD_VALUES));
+  }
+  }
+
   return FEENOX_OK;
   
 }

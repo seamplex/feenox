@@ -1,2 +1,3 @@
-phi = (1+sqrt(5))/2
-PRINT integral(1/(sqrt(x^2+1)),x,0,1/2)-log(phi)
+# check that $\log \phi = \integral_0^{1/2} \frac{dx}{\sqrt{x^2+1}}$
+VAR x
+PRINT 2*exp(integral(1/sqrt(x^2+1),x,0,1/2))-sqrt(5)

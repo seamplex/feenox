@@ -114,10 +114,16 @@ bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
   
   // we now call the problem-specific function that understands
   // what the string means and fill in the other bc_data fields
-  // TODO: virtual
-  feenox_call_null(feenox_problem_bc_parse_thermal(bc_data, lhs, rhs));
+  feenox_call_null(feenox.pde.bc_parse(bc_data, lhs, rhs));
   
-  LL_APPEND(bc->bc_datums, bc_data);
+  // restore the equal sign so we can keep the original string just in case
+  if (equal_sign != NULL) {
+    *equal_sign = '=';
+  }
+  
+  // bc_datums is a doubly-linked list because the data can be related to
+  // each other, like h and Tref in a convection BC
+  DL_APPEND(bc->bc_datums, bc_data);
 
   return bc_data;
 }
