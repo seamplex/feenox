@@ -170,14 +170,13 @@ int feenox_problem_init_runtime_thermal(void) {
     }
   }
   
-  // TODO: check BCs for nonlinearity
   if (feenox.pde.math_type == math_type_automatic) {
     feenox.pde.math_type = (thermal.properties_depend_temperature == 0 &&
                                thermal.sources_depend_temperature == 0 &&
                                    thermal.bcs_depend_temperature == 0) ? math_type_linear : math_type_nonlinear;
   }
   
-  feenox.pde.solve_petsc = (feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear : feenox_solve_petsc_nonlinear;
+  feenox.pde.solve = (feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear : feenox_solve_petsc_nonlinear;
   
 #endif  
   return FEENOX_OK;

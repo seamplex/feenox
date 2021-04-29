@@ -1529,7 +1529,7 @@ struct feenox_t {
     // virtual methods
     int (*problem_init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
-    int (*solve_petsc)(void);
+    int (*solve)(void);
 
     function_t *initial_condition;
 

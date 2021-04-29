@@ -11,7 +11,7 @@ int feenox_instruction_solve_problem(void *arg) {
     feenox_call(feenox_problem_init_runtime_general());
   }
   
-  if (feenox.pde.solve_petsc == NULL) {
+  if (feenox.pde.solve == NULL) {
     feenox_push_error_message("internal error, undefined solver");
     return FEENOX_ERROR;
   }
@@ -28,7 +28,7 @@ int feenox_instruction_solve_problem(void *arg) {
     
   } 
   
-  feenox.pde.solve_petsc();  
+  feenox.pde.solve();  
   // TODO: how to do this in parallel?
   feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));
 
