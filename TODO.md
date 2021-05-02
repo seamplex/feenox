@@ -11,12 +11,16 @@
  * READ / WRITE
  * PRINT_VECTOR
  * SOLVE
- * M4
+ * M4 (MUSTACHE? MACRO?)
  * SHELL
  * HISTORY
  * PARAMETRIC
  * FIT
  * MINIMIZE
+ 
+ * explain that 
+   - nouns -> definitions
+   - verbs -> instructions
  
 ## Wasora stuff
 
@@ -49,6 +53,13 @@
 
  * list symbols with "-l" (is there any clash with petsc?)
  * $1 = ${1}
+ * explain PETSc's options, use double-dashes
+    - --ksp_view
+    - --ksp_monitor
+    - --pc_type lu
+    - --pc_type ilu
+    - --pc_type jacobi
+ * MUMPS
  
 ## Error handling 
  
@@ -61,10 +72,15 @@
  * symmetric & full tensors
  * vtu format
  * frd? (to be able to use ccx's post processor... is it worth it?)
+ * problem-aware WRITE_POST 
+   - FULL | DISPLACEMENTS | STRESS | STRAIN | VON_MISES | TRESCA | PRINCIPAL
+   - FULL | TEMPERATURE | HEAT_FLUX
+   - FULL | MODES
+   - FULL | FLUX(ES) | CURRENT(S)
  
 ## Extensions
  
- * mustache
+ * mustache instead of m4
  * gmsh as a library?
 
 # PDEs
@@ -74,13 +90,15 @@
  
 ## Heat
 
- * convection (with a separate matrix?)
+ * convection with a separate matrix? think!
+ * jacobians for non-linear problems
+ * explain that radiation is better off as an expression
+ * same for total heat sources/bcs
  * reactions (i.e. total power through faces)
  * heat flux as secondary field
  * orthotropic conductivity
  * total power sources and BCs (can't we get away with the volumes/areas as variables?)
  * transient
- * non-linear jacobians
  
 ## Mechanical
 
