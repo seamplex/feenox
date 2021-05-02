@@ -553,6 +553,7 @@ int feenox_problem_init_runtime_general(void) {
     petsc_call(VecSetFromOptions(feenox.pde.b));
   }
   
+  // TODO: use MatDuplicate()?
   if (feenox.pde.has_mass) {
     // the mass matrix for modal or heat transient
     petsc_call(MatCreate(PETSC_COMM_WORLD, &feenox.pde.M));
@@ -570,6 +571,22 @@ int feenox_problem_init_runtime_general(void) {
     }  
   }
   
+  // matdup?
+  if (feenox.pde.has_jacobian) {
+    petsc_call(MatCreate(PETSC_COMM_WORLD, &feenox.pde.J));
+    petsc_call(PetscObjectSetName((PetscObject)feenox.pde.J, "J"));
+    petsc_call(MatSetSizes(feenox.pde.J, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
+    petsc_call(MatSetFromOptions(feenox.pde.J));
+    petsc_call(MatMPIAIJSetPreallocation(feenox.pde.J, width, PETSC_NULL, width, PETSC_NULL));
+    petsc_call(MatSeqAIJSetPreallocation(feenox.pde.J, width, PETSC_NULL));
+    petsc_call(MatSetOption(feenox.pde.J, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
+    if (feenox.pde.dofs > 1) {
+      petsc_call(MatSetBlockSize(feenox.pde.M, feenox.pde.dofs));
+    }
+    if (feenox.pde.allow_new_nonzeros) {
+      petsc_call(MatSetOption(feenox.pde.M, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
+    }  
+  }
   
   // ask for the local ownership range
   petsc_call(MatGetOwnershipRange(feenox.pde.K, &feenox.pde.first_row, &feenox.pde.last_row));

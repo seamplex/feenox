@@ -71,14 +71,14 @@ int feenox_problem_bc_set_thermal_dirichlet(bc_data_t *bc_data, size_t j, size_t
 }
 
 // this virtual method builds the surface elemental matrix
-int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *element, unsigned int v) {
+int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v) {
   
 #ifdef HAVE_PETSC
 
   // TODO: remove duplicate, use a macro
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  if (this->space_dependent) {
+  if (bc_data->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
     feenox_var_value(feenox.mesh.vars.x) = element->x[v][0];
     feenox_var_value(feenox.mesh.vars.y) = element->x[v][1];
@@ -89,10 +89,16 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *element, 
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
   double r_for_axisymmetric = 1;
   double w = element->w[v] * r_for_axisymmetric;
-  double q = feenox_expression_eval(&this->expr);
+  // TODO: cache if neither space nor temperature dependent
+  double q = feenox_expression_eval(&bc_data->expr);
     
   gsl_vector_set(feenox.pde.Nb, 0, q);
-  gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi); 
+  gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
+  if (feenox.pde.has_jacobian) {
+    double dqdT = 0;
+    // mind the negative sign!
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, -w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Ji);
+  }
   
 #endif
   
@@ -100,19 +106,19 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *element, 
 }
 
 // this virtual method builds the surface elemental matrix
-int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *element, unsigned int v) {
+int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_data, unsigned int v) {
   
 #ifdef HAVE_PETSC
 
   // convection needs something in the next bc_data, if there is nothing then we are done
-  if (this->next == NULL) {
+  if (bc_data->next == NULL) {
     return FEENOX_OK;
   }
 
   // TODO: remove duplicate, use a macro
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  if (this->space_dependent) {
+  if (bc_data->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
     feenox_var_value(feenox.mesh.vars.x) = element->x[v][0];
     feenox_var_value(feenox.mesh.vars.y) = element->x[v][1];
@@ -127,12 +133,12 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *element
   double h = 0;
   double Tref = 0;
   
-  if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
-    h = feenox_expression_eval(&this->expr);
-    Tref = feenox_expression_eval(&this->next->expr);
-  } else if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
-    Tref = feenox_expression_eval(&this->expr);
-    h = feenox_expression_eval(&this->next->expr);
+  if (bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && bc_data->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
+    h = feenox_expression_eval(&bc_data->expr);
+    Tref = feenox_expression_eval(&bc_data->next->expr);
+  } else if (bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && bc_data->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
+    Tref = feenox_expression_eval(&bc_data->expr);
+    h = feenox_expression_eval(&bc_data->next->expr);
   } else {
     feenox_push_error_message("convection condition needs h and Tref");
     return FEENOX_ERROR;
@@ -141,7 +147,7 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *element
   gsl_vector_set(feenox.pde.Nb, 0, h*Tref);
   
   // TODO: this is a scalar! no need to have a matrix
-  gsl_matrix * Na = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs);
+  gsl_matrix *Na = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs);
   gsl_matrix_set(Na, 0, 0, h);
 
   gsl_matrix *NaH = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.n_local_nodes);

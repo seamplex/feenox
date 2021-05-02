@@ -30,7 +30,7 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
   // thermal stiffness matrix Bt*k*B
   double k = thermal.k.eval(&thermal.k, x, material);
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, this->B[v], this->B[v], 1.0, feenox.pde.Ki);
-
+  
   // volumetric heat source term Ht*q
   // TODO: total source Q
   if (thermal.q.defined) {
@@ -41,8 +41,19 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
     }
   }
   
+  if (feenox.pde.has_jacobian) {
+    // TODO: how on earth should we compute these two babies?
+    //       maybe we need to do something like a wrapper around
+    //       the traditional eval() so as to replace T(x,y,z) with
+    //       a given value?
+    double dkdT = 0;
+    double dqdT = 0;
+    double T = 1;
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + (dkdT + dqdT)*T), this->B[v], this->B[v], 1.0, feenox.pde.Ji);
+  }
+
   // mass matrix Ht*rho*cp*H
-  if (feenox.pde.M != NULL) {
+  if (feenox.pde.has_mass) {
     double rhocp = 0;
     if (thermal.rhocp.defined) {
       rhocp = thermal.rhocp.eval(&thermal.rhocp, this->x[v], material);
@@ -56,7 +67,8 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
       return FEENOX_ERROR;
     }
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rhocp, this->H[v], this->H[v], 1.0, feenox.pde.Mi));
-  } 
+  }
+  
 
 #endif
   

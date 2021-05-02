@@ -48,7 +48,7 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
 PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx) {
   
   // this should be J = K + K'*phi - b'
-  petsc_call(MatCopy(feenox.pde.K, J, SAME_NONZERO_PATTERN));
+  petsc_call(MatCopy(feenox.pde.J, J, SAME_NONZERO_PATTERN));
   feenox_call(feenox_dirichlet_set_J(J));
   petsc_call(MatCopy(J, P, SAME_NONZERO_PATTERN));
   

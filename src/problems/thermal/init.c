@@ -177,6 +177,7 @@ int feenox_problem_init_runtime_thermal(void) {
   }
   
   feenox.pde.solve = (feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear : feenox_solve_petsc_nonlinear;
+  feenox.pde.has_jacobian = (feenox.pde.math_type == math_type_nonlinear) ? PETSC_TRUE : PETSC_FALSE;
   
 #endif  
   return FEENOX_OK;

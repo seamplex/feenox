@@ -33,7 +33,8 @@ int feenox_solve_petsc_linear(void) {
 //  time_checkpoint(build_begin);
   feenox_call(feenox_build());
   feenox_call(feenox_dirichlet_eval());
-  feenox_call(feenox_dirichlet_set_K(feenox.pde.K, feenox.pde.b));
+//  feenox_call(feenox_dirichlet_set_K(feenox.pde.K, feenox.pde.b));
+  feenox_call(feenox_dirichlet_set_K());  
 //  time_checkpoint(build_end);
 
 //  time_checkpoint(solve_begin);

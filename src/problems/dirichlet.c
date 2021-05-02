@@ -83,7 +83,8 @@ int feenox_dirichlet_eval(void) {
 #ifdef HAVE_PETSC
 // K - stiffness matrix: needs a one in the diagonal and the value in b and keep symmetry
 // b - RHS: needs to be updated when modifying K
-int feenox_dirichlet_set_K(Mat K, Vec b) {
+//int feenox_dirichlet_set_K(Mat K, Vec b) {
+int feenox_dirichlet_set_K(void) {
   
 /*  
   // sometimes there are hanging nodes with no associated volumes
@@ -109,7 +110,7 @@ int feenox_dirichlet_set_K(Mat K, Vec b) {
   petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   // TODO: scale up the diagonal!
   // see alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
-  petsc_call(MatZeroRowsColumns(K, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, b));
+  petsc_call(MatZeroRowsColumns(feenox.pde.K, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b));
   petsc_call(VecDestroy(&rhs));
   
   return FEENOX_OK;
@@ -117,10 +118,11 @@ int feenox_dirichlet_set_K(Mat K, Vec b) {
   
 
 // M - mass matrix: needs a zero in the diagonal and the same symmetry scheme that K
-int feenox_dirichlet_set_M(Mat M) {
+//int feenox_dirichlet_set_M(Mat M) {
+int feenox_dirichlet_set_M(void) {
 
   // the mass matrix is like the stiffness one but with zero instead of one
-  petsc_call(MatZeroRowsColumns(M, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+  petsc_call(MatZeroRowsColumns(feenox.pde.M, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
 
   return FEENOX_OK;
 }

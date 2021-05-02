@@ -25,6 +25,8 @@
 
 #define _GNU_SOURCE   // for POSIX in C99
 
+// maybe we can conditionally define these two depending on wheter
+// debug flags are on or off?
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
 
@@ -1124,7 +1126,7 @@ struct bc_data_t {
   expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
   expr_t expr;
   
-  int (*set)(bc_data_t *this, element_t *element, unsigned int v);
+  int (*set)(element_t *element, bc_data_t *bc_data, unsigned int v);
   
   bc_data_t *prev, *next;   // doubly-linked list in ech bc_t
 };
@@ -1672,7 +1674,8 @@ struct feenox_t {
 #ifdef HAVE_PETSC    
     PetscBool has_rhs;
     PetscBool has_mass;
-    
+    PetscBool has_jacobian;
+
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
     PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
@@ -1686,17 +1689,18 @@ struct feenox_t {
 
     // global objects
     Vec phi;       // the unknown (solution) vector
-    Vec b;         // the right-hand side vector
-    Vec b_nobc;
-    // yo haria al reves, pondria K_bc y dejaria K como no bc
-    Mat K;     // stiffness matrix (i.e E for elasticity and k for heat)
-    Mat K_bc;  // without bcs
-    Mat M;     // la matriz de masa (con rho para elastico y rho*cp para calor)
-    Mat J;     // jacobiano multiuso
-    PetscScalar lambda; // el autovalor
+    Vec b;         // the right-hand side vector with dirichlet BCs
+//    Vec b_nobc;    // idem without dirichlet BCs
+    
+    Mat K;     // stiffness matrix (with dirichlet BCs)
+//    Mat K_nobc;  // idem without bcs
+    Mat M;     // mass matrix with dirichlet BCs (just rho for elastic, rho*cp for heat)
+//    Mat M_nobc;  // idem without bcs
+    Mat J;     // jacobian
+//    PetscScalar lambda; // individual eigen value 
   
-    PetscScalar *eigenvalue;    // los autovalores
-    Vec *eigenvector;           // los autovectores
+    PetscScalar *eigenvalue;    // eigenvalue vector
+    Vec *eigenvector;           // eivenvectors vector
 
     // internal storage of evaluated dirichlet conditions
     PetscInt        *dirichlet_indexes;
@@ -1706,12 +1710,22 @@ struct feenox_t {
     TS ts;
     SNES snes;
     KSP ksp;
-  
+#ifdef HAVE_SLEPC
+    EPS eps;
+#endif
+
+    
     // strings con tipos
     KSPType ksp_type;
     PCType pc_type;
     TSType ts_type;
     SNESType snes_type;
+#ifdef HAVE_SLEPC
+    PetscInt nev;                      // number of requested modes
+    EPSType eps_type;
+    STType st_type;
+    EPSWhich eigen_spectrum;
+#endif
 
     PetscBool progress_ascii;
     double progress_r0;
@@ -1721,28 +1735,19 @@ struct feenox_t {
     expr_t st_shift;
     expr_t st_anti_shift;  
 
-    // para la memoria  
 //    struct rusage resource_usage;
   
-    // objectos locales
-    size_t n_local_nodes;            // cantidad de nodos locales actual
-    unsigned int elemental_size;           // tamanio actual del elemento
-    gsl_matrix *Ki;               // la matriz de rigidez elemental
-    gsl_matrix *Mi;               // la matriz de masa elemental
-    gsl_vector *bi;               // el vector del miembro derecho elemental
-    gsl_vector *Nb;               // para las BCs de neumann
+    // elemental (local) objects
+    size_t n_local_nodes;
+    unsigned int elemental_size;  // current size of objects = n_local_nodes * dofs
+    gsl_matrix *Ki;               // elementary stiffness matrix
+    gsl_matrix *Mi;               // elementary mass matrix
+    gsl_matrix *Ji;               // elementary jacobian matrix
+    gsl_vector *bi;               // elementary right-hand side vector
+    // TODO: shouldn't this be Hb?
+    gsl_vector *Nb;               // teporary vector for weak BCs
 
 #endif  // HAVE_PETSC    
-    // cosas del eigensolver
-    // las pongo al final por si acaso (mezcla de plugins compilados con difentes libs, no se)
-    int nev;      // el numero del autovalor pedido
-#ifdef HAVE_SLEPC
-    EPSType eps_type;
-    STType st_type;
-  
-    EPS eps;      // contexto eigensolver (SLEPc)
-    EPSWhich eigen_spectrum;
-#endif
     
   } pde;
   
@@ -2062,7 +2067,8 @@ extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, Pet
 
 // dirichlet.c
 extern int feenox_dirichlet_eval(void);
-extern int feenox_dirichlet_set_K(Mat K, Vec b);
+//extern int feenox_dirichlet_set_K(Mat K, Vec b);
+extern int feenox_dirichlet_set_K(void);
 extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_J(Mat J);
 extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
@@ -2095,8 +2101,8 @@ extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *elemen
 // thermal/bc.c
 extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
 extern int feenox_problem_bc_set_thermal_dirichlet(bc_data_t *bc_data, size_t j, size_t k);
-extern int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *element, unsigned int v);
-extern int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *element, unsigned int v);
+extern int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v);
+extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 
 
