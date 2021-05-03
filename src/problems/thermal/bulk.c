@@ -42,20 +42,22 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
   }
   
   if (feenox.pde.has_jacobian) {
-    // TODO: how on earth should we compute these two babies?
-    //       maybe we need to do something like a wrapper around
-    //       the traditional eval() so as to replace T(x,y,z) with
-    //       a given value?
+
+    // TODO: this term does not work well    
     double dkdT = 0;
-    double dqdT = 0;
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     if (thermal.k.non_linear) {
-      // TODO: get a pointer to the expression
-      dkdT = feenox_expression_derivative_wrt_function(&thermal.k.function->algebraic_expression, feenox.pde.solution[0], T);
+      // TODO: this might now work if the distribution is not given as an
+      //       algebraic expression but as a pointwise function of T
+      //       (but it works if using a property!)
+      dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
     }
+    
+    double dqdT = 0;
     if (thermal.q.non_linear) {
-      dqdT = feenox_expression_derivative_wrt_function(&thermal.q.function->algebraic_expression, feenox.pde.solution[0], T);
+      dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
     }
+    
     gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + dkdT*T), this->B[v], this->B[v], 1.0, feenox.pde.Ji);
     // mind the negative sign!
     gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(-dqdT), this->H[v], this->H[v], 1.0, feenox.pde.Ji);

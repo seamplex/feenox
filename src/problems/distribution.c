@@ -111,6 +111,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_function_global;
+    this->expr = &this->function->algebraic_expression;
     feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, this->function));
     feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, this->function));
     
@@ -215,13 +216,14 @@ double feenox_distribution_eval_function_local(distribution_t *this, const doubl
       feenox_runtime_error();
     }
     this->last_material = material;
+    this->expr = &this->function->algebraic_expression;
     feenox_free(function_name);
   }
   
   return feenox_function_eval(this->function, x);      
 }
 
-
+  
 double feenox_distribution_eval_property(distribution_t *this, const double *x, material_t *material) {
 
   if (material == NULL) {
@@ -234,6 +236,7 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
     if (property_data != NULL) {
       this->last_material = material;
       this->last_property_data = property_data;
+      this->expr = &property_data->expr;
     }
   }
   
@@ -250,11 +253,11 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
   }
   
   return 0;
+
+}
   
-}  
-
-
-
+  
+ 
 int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function) {
 
   if (function->algebraic_expression.items != NULL) {

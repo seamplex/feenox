@@ -1094,6 +1094,7 @@ struct distribution_t  {
   // caches
   material_t *last_material;
   property_data_t *last_property_data;
+  expr_t *expr;
   
   // dependencies
   var_ll_t *dependency_variables;
@@ -1105,7 +1106,7 @@ struct distribution_t  {
   int non_linear; 
   
   // virtual method to evaluate at a point
-  double (*eval)(distribution_t *this, const double *x, material_t *material);  
+  double (*eval)(distribution_t *this, const double *x, material_t *material);
 };
 
 
