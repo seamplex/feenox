@@ -78,11 +78,14 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
   // TODO: remove duplicate, use a macro
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  double zero[3] = {0, 0, 0};
+  double *x = zero;
   if (bc_data->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
     feenox_var_value(feenox.mesh.vars.x) = element->x[v][0];
     feenox_var_value(feenox.mesh.vars.y) = element->x[v][1];
     feenox_var_value(feenox.mesh.vars.z) = element->x[v][2];
+    x = element->x[v];
   }
   
   // TODO: axisymmetric
@@ -94,8 +97,9 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
     
   gsl_vector_set(feenox.pde.Nb, 0, q);
   gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
-  if (feenox.pde.has_jacobian) {
-    double dqdT = 0;
+  if (feenox.pde.has_jacobian && bc_data->nonlinear) {
+    double T = feenox_function_eval(feenox.pde.solution[0], x);
+    double dqdT = feenox_expression_derivative_wrt_function(&bc_data->expr, feenox.pde.solution[0], T);
     // mind the negative sign!
     gsl_blas_dgemm(CblasTrans, CblasNoTrans, -w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Ji);
   }

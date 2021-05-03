@@ -12,7 +12,7 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double zero[3] = {0, 0, 0};
   double *x = zero;
-  if (thermal.properties_depend_space || thermal.sources_depend_space) {
+  if (thermal.properties_depend_space || thermal.q.space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];
   }
@@ -48,8 +48,17 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
     //       a given value?
     double dkdT = 0;
     double dqdT = 0;
-    double T = 1;
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + (dkdT + dqdT)*T), this->B[v], this->B[v], 1.0, feenox.pde.Ji);
+    double T = feenox_function_eval(feenox.pde.solution[0], x);
+    if (thermal.k.non_linear) {
+      // TODO: get a pointer to the expression
+      dkdT = feenox_expression_derivative_wrt_function(&thermal.k.function->algebraic_expression, feenox.pde.solution[0], T);
+    }
+    if (thermal.q.non_linear) {
+      dqdT = feenox_expression_derivative_wrt_function(&thermal.q.function->algebraic_expression, feenox.pde.solution[0], T);
+    }
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + dkdT*T), this->B[v], this->B[v], 1.0, feenox.pde.Ji);
+    // mind the negative sign!
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(-dqdT), this->H[v], this->H[v], 1.0, feenox.pde.Ji);
   }
 
   // mass matrix Ht*rho*cp*H

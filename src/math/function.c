@@ -415,6 +415,11 @@ double feenox_function_eval(function_t *this, const double *x) {
     }
   }
   
+  // check if the function is a dummy to take derivatives against
+  if (this->dummy_for_derivatives) {
+    return this->dummy_for_derivatives_value;
+  }
+  
   // if the function is mesh, check if the time is the correct one
   if (this->mesh != NULL && this->name_in_mesh != NULL && this->mesh->reader == feenox_mesh_read_gmsh
       && this->mesh_time < feenox_special_var_value(t)-0.001*feenox_special_var_value(dt)) {
@@ -432,13 +437,15 @@ double feenox_function_eval(function_t *this, const double *x) {
     
   } else if (this->type == function_type_pointwise_mesh_property) {
     y = feenox_function_property_eval(this, x);
-    
+
+  // TODO
+/*    
   } else if (this->type == function_type_routine) {
     y = this->routine(x);
     
   } else if (this->type == function_type_routine_internal) {
     y = this->routine_internal(x, this);
-    
+*/
   } else if (this->algebraic_expression.items != NULL) {
 
     if (this->n_arguments == 1) {

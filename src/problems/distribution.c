@@ -22,6 +22,8 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
+// this method updates the linked list of variables and functions the distribution
+// depends on, but it does not set the non_linear nor space_dependent flags
 int feenox_distribution_init(distribution_t *this, const char *name) {
 
   feenox_check_alloc(this->name = strdup(name));

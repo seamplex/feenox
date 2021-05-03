@@ -562,16 +562,23 @@ struct function_t {
   
   // ----- ------- -----------   --        -       - 
   // funcion que hay que llamar para funciones tipo usercall 
-  double (*routine)(const double *);
+//  double (*routine)(const double *);
   
   // ----- ------- -----------   --        -       - 
   // funcion que hay que llamar para funciones internas
-  double (*routine_internal)(const double *, function_t *);
-  void *params;
+//  double (*routine_internal)(const double *, function_t *);
+//  void *params;
+  
+  int dummy_for_derivatives;
+  double dummy_for_derivatives_value;
 
   UT_hash_handle hh;
 };
 
+struct feenox_expression_derivative_wrt_function_params {
+  expr_t *expr;
+  function_t *function;
+};
 
 // internal function (this is initialized directly into the data space from builtin_functions.h)
 struct builtin_function_t {
@@ -1091,6 +1098,11 @@ struct distribution_t  {
   // dependencies
   var_ll_t *dependency_variables;
   function_ll_t *dependency_functions;
+  
+  // does this distribution depend on space?
+  int space_dependent;
+  // does this distribution depend on the solution itself?
+  int non_linear; 
   
   // virtual method to evaluate at a point
   double (*eval)(distribution_t *this, const double *x, material_t *material);  
@@ -1822,6 +1834,9 @@ extern double feenox_expression_evaluate_in_string(const char *string);
 
 extern int feenox_pull_dependencies_variables(var_ll_t **to, var_ll_t *from);
 extern int feenox_pull_dependencies_functions(function_ll_t **to, function_ll_t *from);
+
+double feenox_expression_derivative_wrt_function_gsl_function(double x, void *params);
+double feenox_expression_derivative_wrt_function(expr_t *expr, function_t *function, double x);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);

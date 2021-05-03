@@ -60,13 +60,15 @@ int feenox_problem_init_runtime_thermal(void) {
     feenox_push_error_message("thermal conductivity 'k' is not defined over all volumes");
     return FEENOX_ERROR;
   }
+  thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
+  thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  
   
   feenox_call(feenox_distribution_init(&thermal.q, "q'''"));
   if (thermal.q.defined == 0) {
     feenox_call(feenox_distribution_init(&thermal.q, "q"));
   }
-  // TODO: check that this does not depend on space
-  feenox_call(feenox_distribution_init(&thermal.Q, "Q"));
+  thermal.q.space_dependent = feenox_expression_depends_on_space(thermal.q.dependency_variables);
+  thermal.q.non_linear = feenox_expression_depends_on_function(thermal.q.dependency_functions, feenox.pde.solution[0]);  
   
   if (feenox.pde.has_mass) {
     feenox_call(feenox_distribution_init(&thermal.kappa, "kappa"));
@@ -94,24 +96,27 @@ int feenox_problem_init_runtime_thermal(void) {
     }
   }
 
-  thermal.properties_depend_space = feenox_expression_depends_on_space(thermal.k.dependency_variables)     ||
-                                    feenox_expression_depends_on_space(thermal.kappa.dependency_variables) ||
-                                    feenox_expression_depends_on_space(thermal.rho.dependency_variables)   ||
-                                    feenox_expression_depends_on_space(thermal.cp.dependency_variables)    ||
-                                    feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
+  thermal.kappa.space_dependent = feenox_expression_depends_on_space(thermal.kappa.dependency_variables);
+  thermal.rho.space_dependent   = feenox_expression_depends_on_space(thermal.rho.dependency_variables);
+  thermal.cp.space_dependent    = feenox_expression_depends_on_space(thermal.cp.dependency_variables);
+  thermal.rhocp.space_dependent = feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
 
+  thermal.kappa.non_linear      = feenox_expression_depends_on_function(thermal.kappa.dependency_functions,  feenox.pde.solution[0]);
+  thermal.rho.non_linear        = feenox_expression_depends_on_function(thermal.rho.dependency_functions,    feenox.pde.solution[0]);
+  thermal.cp.non_linear         = feenox_expression_depends_on_function(thermal.cp.dependency_functions,     feenox.pde.solution[0]);
+  thermal.rhocp.non_linear      = feenox_expression_depends_on_function(thermal.rhocp.dependency_functions,  feenox.pde.solution[0]);
+  
+  thermal.properties_depend_space = thermal.k.space_dependent     ||
+                                    thermal.kappa.space_dependent ||
+                                    thermal.rho.space_dependent   ||
+                                    thermal.cp.space_dependent    ||
+                                    thermal.rhocp.space_dependent;
+  
   thermal.properties_depend_temperature = feenox_expression_depends_on_function(thermal.k.dependency_functions,     feenox.pde.solution[0]) ||
                                           feenox_expression_depends_on_function(thermal.kappa.dependency_functions, feenox.pde.solution[0]) ||
                                           feenox_expression_depends_on_function(thermal.rho.dependency_functions,   feenox.pde.solution[0]) ||
                                           feenox_expression_depends_on_function(thermal.cp.dependency_functions,    feenox.pde.solution[0]) ||
                                           feenox_expression_depends_on_function(thermal.rhocp.dependency_functions, feenox.pde.solution[0]);
-  
-  thermal.sources_depend_space =  feenox_expression_depends_on_space(thermal.q.dependency_variables) ||
-                                  feenox_expression_depends_on_space(thermal.Q.dependency_variables);
-  
-  thermal.sources_depend_temperature = feenox_expression_depends_on_function(thermal.k.dependency_functions,     feenox.pde.solution[0]) ||
-                                       feenox_expression_depends_on_function(thermal.kappa.dependency_functions, feenox.pde.solution[0]);
-  
   
   // check BCs are consistent
   bc_t *bc = NULL;
@@ -172,7 +177,7 @@ int feenox_problem_init_runtime_thermal(void) {
   
   if (feenox.pde.math_type == math_type_automatic) {
     feenox.pde.math_type = (thermal.properties_depend_temperature == 0 &&
-                               thermal.sources_depend_temperature == 0 &&
+                                              thermal.q.non_linear == 0 &&
                                    thermal.bcs_depend_temperature == 0) ? math_type_linear : math_type_nonlinear;
   }
   

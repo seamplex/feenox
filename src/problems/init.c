@@ -581,10 +581,10 @@ int feenox_problem_init_runtime_general(void) {
     petsc_call(MatSeqAIJSetPreallocation(feenox.pde.J, width, PETSC_NULL));
     petsc_call(MatSetOption(feenox.pde.J, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
     if (feenox.pde.dofs > 1) {
-      petsc_call(MatSetBlockSize(feenox.pde.M, feenox.pde.dofs));
+      petsc_call(MatSetBlockSize(feenox.pde.J, feenox.pde.dofs));
     }
     if (feenox.pde.allow_new_nonzeros) {
-      petsc_call(MatSetOption(feenox.pde.M, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
+      petsc_call(MatSetOption(feenox.pde.J, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
     }  
   }
   
