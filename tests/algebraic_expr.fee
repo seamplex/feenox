@@ -12,4 +12,5 @@ PRINT %g a b c
 
 # when an expression appears as an argument of a keyword and
 # contains spaces it should be written within double quotes
+# so the parser can tell it is a single expression
 PRINT %g 1 -1 "1 -1"

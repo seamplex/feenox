@@ -1,0 +1,31 @@
+x = -1
+y = -(-1)
+z = -(-(-1))
+
+a = -(-exp(-x))
+b = -(+exp(+(-y)))
+c = -(+exp(-(+z)))
+
+k = -(-(-x))-(-(-(x)))
+l = -(-(-y))-(-(-(y)))
+m = -(-(-z))-(-(-(z)))
+
+o = -(-(-x))+(+(-(x)))
+p = -(-(-y))+(-(+(y)))
+q = -(+(-z))+(-(-(z)))
+
+PRINT x 
+PRINT y
+PRINT z
+
+PRINT a
+PRINT b
+PRINT c
+
+PRINT k
+PRINT l
+PRINT m
+
+PRINT o
+PRINT p
+PRINT q

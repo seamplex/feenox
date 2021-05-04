@@ -31,8 +31,8 @@ extern feenox_parser_t feenox_parser;
 
 
 
-const char operators[]        = "&|=!<>+-*/^ ()";
-const char factorseparators[] = "&|=!<>+-*/^(), \t\n";
+const char operators[]        = "&|=!<>+-*/^,()";
+const char factorseparators[] = "&|=!<>+-*/^,() \t\n";
 
 
 // reads a line from the input file and returns it "nicely-formatted" 

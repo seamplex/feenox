@@ -75,7 +75,7 @@ int feenox_count_arguments(char *string, size_t *n_chars) {
   // count how many arguments are there (take into account nested parenthesis)
   char *s = string+1;
   size_t n = 1;
-  int level = 1;
+  size_t level = 1;
   int n_arguments = 1;
   while (level != 0) {
     if (*s == '(') {
@@ -116,7 +116,7 @@ int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, s
   char *dummy = string;
   char char_backup;
   for (i = 0; i < n_arguments; i++) {
-    int level = 1;
+    size_t level = 1;
     dummy++;
     n++;
     char *argument = dummy;
@@ -171,7 +171,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   
   char *string = string_copy;
   char *oper = NULL;
-  int last_was_an_op = 0;
+  char last_op = '(';  // initially it is like we start with an opening parenthesis
   size_t level = 1;
   expr_item_t *item;
   size_t delta_level = strlen(operators);
@@ -184,41 +184,66 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
     } else if ((oper = strchr(operators, *string)) != NULL) {
       // handle one of the operatos
       if (*string == '(') {
+        
         level += delta_level;
+        last_op = '(';
         string++;
-        last_was_an_op = 1;
+        
       } else if (*string == ')') {
+        
         level -= delta_level;
+        last_op = ')';
         string++;
-        last_was_an_op = 0;
-      } else {       // +-*/^.
-        if (last_was_an_op == 1) {
-          if ((*oper == '+' || *oper == '-')) {
-            if ((item = feenox_expression_parse_item(string)) == NULL) {
-              return FEENOX_ERROR;
-            }
-            item->level = level;
-            LL_APPEND(this->items, item);
-            string += item->n_chars;
-            last_was_an_op = 0;
-            
-            feenox_pull_dependencies_variables(&this->variables, item->variables);
-            feenox_pull_dependencies_functions(&this->functions, item->functions);
-            
-          } else {
-            feenox_push_error_message("two adjacent operators");
-            return FEENOX_ERROR;
-          }
-        } else { 
-          feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
-          item->type = EXPR_OPERATOR;
-          item->oper = oper-operators+1;
-          // precedence two by two from left to right
-          item->level = level+(oper-operators)/2*2; 
-          LL_APPEND(this->items, item);
-          string++;
-          last_was_an_op = 1;
+
+      // TODO: to avoid problems with spaces a get_next_char() method is needed
+      } else if (last_op == '(' && (string[0] == '-' || string[0] == '+') && (isalpha(string[1]) || string[1] == '(')) {
+        
+        // having "(-xxx..." is like having "(0-xxx..."
+        feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
+        item->type = EXPR_CONSTANT;
+        item->constant = 0;
+        item->level = level; 
+        LL_APPEND(this->items, item);
+          
+        feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
+        item->type = EXPR_OPERATOR;
+        if (string[0] == '+') {
+          item->oper = 7; // hard-coded location of '+'/'-' within operators
+        } else {
+          item->oper = 8;
         }
+        item->level = level+((item->oper-1)/2)*2; ; 
+        LL_APPEND(this->items, item);
+        string++;
+        
+      } else if ((last_op != '\0' && last_op != ')') && (*oper == '+' || *oper == '-')) {
+        
+        if ((item = feenox_expression_parse_item(string)) == NULL) {
+          return FEENOX_ERROR;
+        }
+        item->level = level;
+        LL_APPEND(this->items, item);
+        string += item->n_chars;
+        last_op = '\0';
+        oper = NULL;  // reset the operator because it was not an actual operator
+            
+        feenox_pull_dependencies_variables(&this->variables, item->variables);
+        feenox_pull_dependencies_functions(&this->functions, item->functions);
+            
+      } else if (last_op == '\0' || last_op == ')') {
+        
+        feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
+        item->type = EXPR_OPERATOR;
+        item->oper = oper-operators+1;
+        // precedence two by two from left to right
+        item->level = level+((oper-operators)/2)*2; 
+        LL_APPEND(this->items, item);
+        string++;
+        last_op = *oper;
+        
+      } else {
+        feenox_push_error_message("two adjacent operators");
+        return FEENOX_ERROR;
       }
     } else {
       // a constant, variable or function
@@ -231,7 +256,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
         return FEENOX_ERROR;
       }
       string += item->n_chars;
-      last_was_an_op = 0;
+      last_op = '\0';
       
       feenox_pull_dependencies_variables(&this->variables, item->variables);
       feenox_pull_dependencies_functions(&this->functions, item->functions);
@@ -262,7 +287,6 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
   feenox_check_alloc_null(backup = strdup(string));
   expr_item_t *item = NULL;
   feenox_check_alloc_null(item = calloc(1, sizeof(expr_item_t)));
-  item->sign = 1.0; // assume the sign is positive
 
   // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
   if (isdigit((int)(*string)) || ((*string == '-' || *string == '+' || *string == '.') && isdigit((int)string[1]))) {
@@ -274,23 +298,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     n += n_int;
     item->type = EXPR_CONSTANT;
     item->constant = constant;
-/*    
-  } else if (*string == '-' || *string == '+') {
-    if (string[1] == '(') {
-      feenox_push_error_message("you got me");
-      return NULL;
-    } else if (string[1] == ')') {
-      feenox_push_error_message("wrong closing parenthesis");
-      return NULL;
-    }
-*/
   } else {
     // we got letters
-    // if there's a negative sign, meaning something like (-x) or (-f(x)) then we take the sign into account
-    if (*string == '-') {
-      item->sign =  -1.0;
-      n++; // TODO: what happen if there are blanks? while?
-    }
     char *token = strtok(backup, factorseparators);
     if (token == NULL || strlen(token) == 0) {
       return NULL;
@@ -377,7 +386,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
       // copy into argument whatever is after the nam
       char *argument;
-      feenox_check_alloc_null(argument = strdup(string+strlen(token) + (item->sign < 0)));
+      feenox_check_alloc_null(argument = strdup(string+strlen(token)));
 
       // arguments have to be in parenthesis
       if (*argument != '(') {
@@ -551,129 +560,156 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
 double feenox_expression_eval(expr_t *this) {
 
-  size_t i, j;
-  int level;
-  char tmp_operator;
-  expr_item_t *factor;
-  expr_item_t *E,*P;
-
   if (this == NULL || this->items == NULL) {
     return 0;
   }
+
+  size_t i = 0;
+  size_t j = 0;
+  expr_item_t *item = NULL;
   
-  LL_FOREACH(this->items, factor) {
-    factor->tmp_level = factor->level;
+//#define DEBUG
+#ifdef DEBUG
+  printf("\n------ %s -----------\n", this->string);
+#endif  
+  LL_FOREACH(this->items, item) {
+#ifdef DEBUG
+    printf("factor level %ld\n", item->level);
+#endif  
+    item->tmp_level = item->level;
 
     // TODO: replace the switch by pointer to functions (i.e. virtual methods in C++ slang)?
-    switch(factor->type & EXPR_BASICTYPE_MASK) {
+    switch(item->type & EXPR_BASICTYPE_MASK) {
       case EXPR_CONSTANT:
-        factor->value = factor->constant;
+        item->value = item->constant;
+#ifdef DEBUG
+        printf("constant = %g\n", item->value);
+#endif  
       break;
         
       case EXPR_VARIABLE:
-        switch (factor->type) {
+        switch (item->type) {
           case EXPR_VARIABLE | EXPR_CURRENT:
-            factor->value = feenox_var_value(factor->variable);
+            item->value = feenox_var_value(item->variable);
           break;
           case EXPR_VARIABLE | EXPR_INITIAL_TRANSIENT:
-            factor->value = *(factor->variable->initial_transient);
+            item->value = *(item->variable->initial_transient);
           break;
           case EXPR_VARIABLE | EXPR_INITIAL_STATIC:
-            factor->value = *(factor->variable->initial_static);
+            item->value = *(item->variable->initial_static);
           break;
         }
+#ifdef DEBUG
+        printf("variable %s = %g\n", item->variable->name, item->value);
+#endif  
+
       break;
       case EXPR_VECTOR:
         
         // we need to initialize here so we have the size for the check that follows
-        if (factor->vector->initialized == 0) {
-          if (feenox_vector_init(factor->vector) != FEENOX_OK) {
-            feenox_push_error_message("initialization of vector '%s' failed", factor->vector->name);
+        if (item->vector->initialized == 0) {
+          if (feenox_vector_init(item->vector) != FEENOX_OK) {
+            feenox_push_error_message("initialization of vector '%s' failed", item->vector->name);
             feenox_runtime_error();
           }
         }
     
-        i = lrint(feenox_expression_eval(&(factor->arg[0])));
-        if (i <= 0 || i > factor->vector->size) {
-          feenox_push_error_message("subindex %d out of range for vector %s", i, factor->vector->name);
+        i = lrint(feenox_expression_eval(&(item->arg[0])));
+        if (i <= 0 || i > item->vector->size) {
+          feenox_push_error_message("subindex %d out of range for vector %s", i, item->vector->name);
           feenox_runtime_error();
           return 0;
         }
 
-        switch (factor->type) {
+        switch (item->type) {
           case EXPR_VECTOR | EXPR_CURRENT:
-            factor->value = gsl_vector_get(factor->vector->value, i-1);
+            item->value = gsl_vector_get(item->vector->value, i-1);
           break;
           case EXPR_VECTOR | EXPR_INITIAL_TRANSIENT:
-            factor->value = gsl_vector_get(factor->vector->initial_transient, i-1);
+            item->value = gsl_vector_get(item->vector->initial_transient, i-1);
           break;
           case EXPR_VECTOR | EXPR_INITIAL_STATIC:
-            factor->value = gsl_vector_get(factor->vector->initial_static, i-1);
+            item->value = gsl_vector_get(item->vector->initial_static, i-1);
           break;
         }
       break;
       
       case EXPR_MATRIX:
         
-        if (factor->matrix->initialized == 0) {
-          if (feenox_matrix_init(factor->matrix) != FEENOX_OK) {
-            feenox_push_error_message("initialization of vector '%s' failed", factor->vector->name);
+        if (item->matrix->initialized == 0) {
+          if (feenox_matrix_init(item->matrix) != FEENOX_OK) {
+            feenox_push_error_message("initialization of vector '%s' failed", item->vector->name);
             feenox_runtime_error();
           }
         }
         
-        i = lrint(feenox_expression_eval(&(factor->arg[0])));
-        if (i <= 0 || i > factor->matrix->rows) {
-          feenox_push_error_message("row subindex %d out of range for matrix %s", i, factor->matrix->name);
+        i = lrint(feenox_expression_eval(&(item->arg[0])));
+        if (i <= 0 || i > item->matrix->rows) {
+          feenox_push_error_message("row subindex %d out of range for matrix %s", i, item->matrix->name);
           feenox_runtime_error();
           return 0;
         }
-        j = lrint(feenox_expression_eval(&(factor->arg[1])));
-        if (j <= 0 || j > factor->matrix->cols) {
-          feenox_push_error_message("column subindex %d out of range for matrix %s", j, factor->matrix->name);
+        j = lrint(feenox_expression_eval(&(item->arg[1])));
+        if (j <= 0 || j > item->matrix->cols) {
+          feenox_push_error_message("column subindex %d out of range for matrix %s", j, item->matrix->name);
           feenox_runtime_error();
           return 0;
         }
 
-        switch (factor->type) {
+        switch (item->type) {
           case EXPR_MATRIX | EXPR_CURRENT:
-            factor->value = gsl_matrix_get(factor->matrix->value, i-1, j-1);
+            item->value = gsl_matrix_get(item->matrix->value, i-1, j-1);
           break;
           case EXPR_MATRIX | EXPR_INITIAL_TRANSIENT:
-            factor->value = gsl_matrix_get(factor->matrix->initial_transient, i-1, j-1);
+            item->value = gsl_matrix_get(item->matrix->initial_transient, i-1, j-1);
           break;
           case EXPR_MATRIX | EXPR_INITIAL_STATIC:
-            factor->value = gsl_matrix_get(factor->matrix->initial_static, i-1, j-1);
+            item->value = gsl_matrix_get(item->matrix->initial_static, i-1, j-1);
           break;
         }
       break;
 
       case EXPR_BUILTIN_FUNCTION:
-        factor->value = factor->builtin_function->routine(factor);
+        item->value = item->builtin_function->routine(item);
+#ifdef DEBUG
+        printf("builtin function %s = %g\n", item->builtin_function->name, item->value);
+#endif  
       break;
       case EXPR_BUILTIN_VECTORFUNCTION:
-        factor->value = factor->builtin_vectorfunction->routine(factor->vector_arg);
+        item->value = item->builtin_vectorfunction->routine(item->vector_arg);
       break;
       case EXPR_BUILTIN_FUNCTIONAL:
-        factor->value = factor->builtin_functional->routine(factor, factor->functional_var_arg);
+        item->value = item->builtin_functional->routine(item, item->functional_var_arg);
       break;
       case EXPR_FUNCTION:
-        factor->value = feenox_factor_function_eval(factor);
+        item->value = feenox_factor_function_eval(item);
+#ifdef DEBUG
+        printf("user function %s = %g\n", item->function->name, item->value);
+#endif  
       break;
  
+#ifdef DEBUG
+      default:
+        printf("operator %ld\n", item->oper);
+#endif  
     }
-    // have (-x) or (-f(x)) into account
-    factor->value *= factor->sign;
+#ifdef DEBUG
+    printf("\n");
+#endif  
   }
 
+  // get the highest level
+  size_t level = 0;
+  LL_FOREACH(this->items, item) {
+    if (item->level > level) {
+      level = item->level;
+    }
+  }
+
+  char tmp_operator = 0;
+  expr_item_t *E = NULL;
+  expr_item_t *P = NULL;
   
-  level = 0;
-  LL_FOREACH(this->items, factor) {
-    if (factor->level > level) {
-      level = factor->level;
-    }
-  }
-
   while (level > 0) {
 
     for (E = P = this->items; E != NULL; E->tmp_level != 0 && !E->oper ? P=E : NULL, E = E->next) {
@@ -709,19 +745,19 @@ double feenox_expression_eval(expr_t *this) {
             P->value = P->value > E->value;
           break;
           case '+':
-            P->value = P->value + E->value;
+            P->value += E->value;
           break;
           case '-':
-            P->value = P->value - E->value;
+            P->value -= E->value;
           break;
           case '*':
-            P->value = P->value * E->value;
+            P->value *= E->value;
           break;
           case '/':
             if (E->value == 0) {
               feenox_nan_error();
             }
-            P->value = P->value / E->value;
+            P->value /= E->value;
           break;
           case '^':
             if (P->value == 0 && E->value == 0) {

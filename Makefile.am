@@ -8,10 +8,12 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
 EXTRA_DIST = examples tests locateruntest.sh
 
 TESTS = tests/abort.sh \
+        tests/algebraic_expr.sh \
         tests/builtin.sh \
         tests/default_argument_value.sh \
+        tests/expressions_constants.sh \
+        tests/expressions_variables.sh \
         tests/expressions_functions.sh \
-        tests/expr.sh \
         tests/exp.sh \
         tests/function_algebraic.sh \
         tests/integral.sh \

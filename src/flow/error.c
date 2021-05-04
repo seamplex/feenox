@@ -33,13 +33,21 @@ extern feenox_t feenox;
 
 void feenox_push_error_message(const char *fmt, ...) {
   
+  if (feenox.error_level > 100) {
+    fprintf(stderr, "too many errors\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  if ((feenox.error = realloc(feenox.error, (++feenox.error_level)*sizeof(char *))) == NULL) {
+    fprintf(stderr, "cannot allocate memory to report error\n");
+    exit(EXIT_FAILURE);
+  }
+  if ((feenox.error[feenox.error_level-1] = malloc(BUFFER_LINE_SIZE)) == NULL) {
+    fprintf(stderr, "cannot allocate memory to report error\n");
+    exit(EXIT_FAILURE);
+  }
+  
   va_list ap;
-  
-  assert(feenox.error_level < 100);
-  
-  feenox.error = realloc(feenox.error, (++feenox.error_level)*sizeof(char *));
-  feenox.error[feenox.error_level-1] = malloc(BUFFER_LINE_SIZE);
-  
   va_start(ap, fmt);
   vsnprintf(feenox.error[feenox.error_level-1], BUFFER_LINE_SIZE, fmt, ap);
   va_end(ap);

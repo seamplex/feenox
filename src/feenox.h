@@ -307,18 +307,17 @@ typedef struct mesh_find_minmax_t mesh_find_minmax_t;
 typedef struct mesh_integrate_t mesh_integrate_t;
 */
 
-// individual factor of an algebraic expression
+// individual item (factor) of an algebraic expression
 struct expr_item_t {
   size_t n_chars;
-  int type;        // defines #EXPR_ because we need to operate with masks
+  int type;           // defines #EXPR_ because we need to operate with masks
   
   size_t level;       // hierarchical level
   size_t tmp_level;   // for partial sums
 
   size_t oper;        // number of the operator if applicable
-  double sign;
-  double constant; // value of the numerical constant if applicable
-  double value;    // current value
+  double constant;    // value of the numerical constant if applicable
+  double value;       // current value
   
 // vector with (optional) auxiliary stuff (last value, integral accumulator, rng, etc)
   double *aux;
