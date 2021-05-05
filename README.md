@@ -38,9 +38,11 @@ FeenoX can be seen as
 
 For example, the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system)---the one of the butterfly---whose differential equations are
 
-$$ \dot{x} = \sigma ~ (y - x) $$
-$$ \dot{y} = x ~ (r - z) - y  $$
-$$ \dot{z} = xy - bz          $$
+$$\dot{x} = \sigma \cdot (y - x)$$
+
+$$\dot{y} = x \cdot (r - z) - y$$
+
+$$\dot{z} = x \cdot y - b \cdot z$$
 
 where $\sigma=10$, $b=8/3$ and $r=28$ are the classical parameters that generate the butterfly as presented by Edward Lorenz back in his seminal 1963 paper [Deterministic non-periodic flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2), can be solved with FeenoX by writing the equations in the input file as naturally as possible, as illustrated in the input file that follows:
 
@@ -56,7 +58,7 @@ x_0 = -11             # initial conditions
 y_0 = -16
 z_0 = 22.5
 
-# the dynamical system's equations written as naturally as possbile
+# the dynamical system's equations written as naturally as possible
 x_dot .= sigma*(y - x)
 y_dot .= x*(r - z) - y
 z_dot .= x*y - b*z

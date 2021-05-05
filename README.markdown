@@ -34,9 +34,11 @@ FeenoX can be seen as
 For example, the famous chaotic [Lorenz’ dynamical system][]—the one of
 the butterfly—whose differential equations are
 
-*ẋ* = *σ* (*y* − *x*)
-*ẏ* = *x* (*r* − *z*) − *y*
-*ż* = *x**y* − *b**z*
+*ẋ* = *σ* ⋅ (*y* − *x*)
+
+*ẏ* = *x* ⋅ (*r* − *z*) − *y*
+
+*ż* = *x* ⋅ *y* − *b* ⋅ *z*
 
 where *σ* = 10, *b* = 8/3 and *r* = 28 are the classical parameters that
 generate the butterfly as presented by Edward Lorenz back in his seminal
@@ -56,7 +58,7 @@ x_0 = -11             # initial conditions
 y_0 = -16
 z_0 = 22.5
 
-# the dynamical system's equations written as naturally as possbile
+# the dynamical system's equations written as naturally as possible
 x_dot .= sigma*(y - x)
 y_dot .= x*(r - z) - y
 z_dot .= x*y - b*z
