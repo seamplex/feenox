@@ -30,11 +30,6 @@ extern feenox_parser_t feenox_parser;
 #include <ctype.h>
 
 
-
-const char operators[]        = "&|=!<>+-*/^,()";
-const char factorseparators[] = "&|=!<>+-*/^,() \t\n";
-
-
 // reads a line from the input file and returns it "nicely-formatted" 
 int feenox_read_line(FILE *file_ptr) {
 

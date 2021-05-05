@@ -26,8 +26,11 @@ extern feenox_t feenox;
 #include <ctype.h>
 #include <string.h>
 
-extern const char operators[];
-extern const char factorseparators[];
+const char operators[]        = "&|=!<>+-*/^,()";
+const char factorseparators[] = "&|=!<>+-*/^,() \t\n";
+
+//extern const char operators[];
+//extern const char factorseparators[];
 
 char *feenox_ends_in_zero(const char *name) {
 
@@ -155,7 +158,7 @@ int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, s
 }
 
 
-//  parse a string with an algebraic expression and fills in the struct expr
+//  parse a string with an algebraic expression and fill in the struct expr
 int feenox_expression_parse(expr_t *this, const char *orig_string) {
 
   if (orig_string == NULL || strcmp(orig_string, "") == 0) {
@@ -174,6 +177,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   char last_op = '(';  // initially it is like we start with an opening parenthesis
   size_t level = 1;
   expr_item_t *item;
+  // TODO: maybe we can get away wih half delta_level?
   size_t delta_level = strlen(operators);
 
   while (*string != '\0') {
@@ -207,13 +211,10 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
           
         feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
         item->type = EXPR_OPERATOR;
-        if (string[0] == '+') {
-          item->oper = 7; // hard-coded location of '+'/'-' within operators
-        } else {
-          item->oper = 8;
-        }
-        item->level = level+((item->oper-1)/2)*2; ; 
+        item->oper = (string[0] == '+') ? 7 : 8; // hard-coded location of '+'/'-' within operators
+        item->level = level+((item->oper-1)/2)*2;
         LL_APPEND(this->items, item);
+        
         string++;
         
       } else if ((last_op != '\0' && last_op != ')') && (*oper == '+' || *oper == '-')) {
@@ -223,6 +224,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
         }
         item->level = level;
         LL_APPEND(this->items, item);
+        
         string += item->n_chars;
         last_op = '\0';
         oper = NULL;  // reset the operator because it was not an actual operator
@@ -234,16 +236,21 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
         
         feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
         item->type = EXPR_OPERATOR;
-        item->oper = oper-operators+1;
         // precedence two by two from left to right
-        item->level = level+((oper-operators)/2)*2; 
+        size_t delta = oper - operators;
+        size_t incr = (delta - (delta % 2));
+        item->oper = delta + 1;
+        item->level = level + incr;
         LL_APPEND(this->items, item);
+        
         string++;
         last_op = *oper;
         
       } else {
-        feenox_push_error_message("two adjacent operators");
+        
+        feenox_push_error_message("two adjacent operators '%c' and '%c'", last_op, *string);
         return FEENOX_ERROR;
+        
       }
     } else {
       // a constant, variable or function
