@@ -6,12 +6,6 @@
 -   [Licensing][]
 -   [Further information][]
 
-<div class="not-in-format plain">
-
-![][1]
-
-</div>
-
 <div class="alert alert-warning">
 
 > Please note that FeenoX is a [back end][] aimed at advanced users. It
@@ -26,7 +20,6 @@
   [Git repository]: #git-repository
   [Licensing]: #licensing
   [Further information]: #further-information
-  [1]: doc/logo.svg
   [back end]: https://en.wikipedia.org/wiki/Front_and_back_ends
   [CAEplex]: https://www.caeplex.com
 
@@ -38,18 +31,141 @@ FeenoX can be seen as
     engineering-related mathematical problems, and/or
 -   a finite-element tool with a particular design basis
 
-In other words, it is a computational tool to solve
+For example, the famous chaotic [Lorenz’ dynamical system][]—the one of
+the butterfly—whose differential equations are
+
+*ẋ* = *σ* (*y* − *x*)
+*ẏ* = *x* (*r* − *z*) − *y*
+*ż* = *x**y* − *b**z*
+
+where *σ* = 10, *b* = 8/3 and *r* = 28 are the classical parameters that
+generate the butterfly as presented by Edward Lorenz back in his seminal
+1963 paper [Deterministic non-periodic flow][], can be solved with
+FeenoX by writing the equations in the input file as naturally as
+possible, as illustrated in the input file that follows:
+
+``` feenox
+PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
+end_time = 40         # we go from t=0 to 40 non-dimensional units
+
+sigma = 10            # the original parameters from the 1963 paper
+r = 28
+b = 8/3
+
+x_0 = -11             # initial conditions
+y_0 = -16
+z_0 = 22.5
+
+# the dynamical system's equations written as naturally as possbile
+x_dot .= sigma*(y - x)
+y_dot .= x*(r - z) - y
+z_dot .= x*y - b*z
+
+PRINT t x y z        # four-column plain-ASCII output
+```
+
+Another example would be to solve the [NAFEMS LE11][] “Solid
+cylinder/Taper/Sphere-Temperature” benchmark like
+
+``` feenox
+READ_MESH nafems-le11.msh DIMENSIONS 3
+PROBLEM mechanical
+
+# linear temperature gradient in the radial and axial direction
+T(x,y,z) := sqrt(x^2 + y^2) + z
+
+# Boundary conditions
+BC xz     v=0
+BC yz     u=0
+BC xy     w=0
+BC HIH'I' w=0
+
+# material properties (isotropic & uniform so we can use scalar constants)
+E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
+nu = 0.3
+alpha = 2.3e-4      # in 1/ºC as in the problem
+
+SOLVE_PROBLEM
+WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
+PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
+```
+
+Please note the following two points about both cases above:
+
+1.  the input files are very similar to the statements of each problem
+    in plain English words as in the [UNIX rule of clarity][].
+2.  100% of FeenoX’ output is controlled by the user. Had there not been
+    any `PRINT` or `WRITE_MESH` instructions, the output would have been
+    empty, following the [UNIX rule of silence][UNIX rule of clarity].
+
+In other words, FeenoX is a computational tool to solve
 
 -   dynamical systems written as sets of ODEs/DAEs, or
--   steady or quasistatic thermo-mechanical problems, or
+-   steady or quasi-static thermo-mechanical problems, or
 -   steady or transient heat conduction problems, or
 -   modal analysis problems,
--   neutron diffussion or transport problems.
+-   neutron diffusion or transport problems
 
-Since it is free and open source, contributions to add features (and to
-fix bugs) are welcome. See the [documentation][] for details about how
-to contribute.
+in such a way that the input is a near-English text file that defines
+the problem to be solved. Some basic rules are
 
+-   FeenoX is just a *solver* working as a transfer function between
+    input and output files. Following the [UNIX rule of
+    separation][UNIX rule of clarity], **there is no embedded graphical
+    interface** but means of using generic pre and post processing
+    tools—in particular, [Gmsh][] and [Paraview][] respectively. See
+    also [CAEplex][1].
+
+-   The input files should be [syntactically sugared][] so as to be as
+    self-describing as possible.
+
+-   Simple problems ought to need simple input files. Here is the input
+    for solving thermal conduction on a simple dimensionless
+    one-dimensional slab with a temperature-dependent conductivity given
+    by an algebraic expression:
+
+    ``` feenox
+    READ_MESH slab.msh
+    PROBLEM heat DIMENSIONS 1
+    k(x) := 1+T(x)  # temperature-dependent conductivity
+    BC left  T=0    # Dirichlet conditions at both ends
+    BC right T=1
+    SOLVE_PROBLEM
+    # difference between FEM and analytical solution, should be zero
+    PRINT T(0.5)-(sqrt(1+(3*0.5))-1)  
+    ```
+
+-   Whenever a number is expected, an algebraic expression can be
+    entered as well. Variables, vectors, matrices and functions are
+    supported. Here is how to replace the boundary condition on the
+    right side of the slab above with a radiation condition:
+
+    ``` feenox
+    sigma = 1       # non-dimensional stefan-boltzmann constant
+    e = 0.8         # emissivity 
+    Tinf=1          # non-dimensional reference temperature
+    BC right q=sigma*e*(Tinf^4-T(x)^4)
+    ```
+
+-   FeenoX should run natively in the cloud and be able to massively
+    scale in parallel. See the [Software Requirements Specification][]
+    and the [Software Development
+    Specification][Software Requirements Specification] for details.
+
+Since it is free ([as in freedom][]) and open source, contributions to
+add features (and to fix bugs) are welcome. See the [documentation][]
+for details about how to contribute.
+
+  [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
+  [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
+  [NAFEMS LE11]: https://www.nafems.org/publications/resource_center/p18/
+  [UNIX rule of clarity]: http://catb.org/~esr/writings/taoup/html/ch01s06.html
+  [Gmsh]: http://gmsh.info/
+  [Paraview]: https://www.paraview.org/
+  [1]: www.caeplex.com
+  [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
+  [Software Requirements Specification]: doc/sds.md
+  [as in freedom]: https://www.gnu.org/philosophy/free-sw.en.html
   [documentation]: doc
 
 # Download
@@ -71,11 +187,11 @@ below][] for details.
 If the statically-linked binaries above do not fit your needs, the
 recommended way of getting FeenoX is to compile from source.
 
-1.  Install mandatory dependences
+1.  Install mandatory dependencies
 
         sudo apt-get install git gcc make automake autoconf libgsl-dev
 
-2.  Install optional dependences (of course these are *optional* but
+2.  Install optional dependencies (of course these are *optional* but
     recommended)
 
         sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
@@ -159,7 +275,7 @@ FeenoX is copyright ©2009-2021 [Seamplex][]
 FeenoX is licensed under [GNU GPL version 3][] or (at your option) any
 later version.  
 FeenoX is free software: you are free to change and redistribute it.  
-There is NO WARRANTY, to the extent permitted by law.  
+There is **NO WARRANTY**, to the extent permitted by law.  
 See the [copying conditions][].
 
   [Twitter]: https://twitter.com/seamplex/
