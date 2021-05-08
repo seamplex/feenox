@@ -12,6 +12,13 @@ if [ ! -e design ]; then
   exit 1
 fi
 
+cd ..
+ m4 doc/header.m4 README.m4 > README.md
+ pandoc README.md  -t gfm   -o README.markdown --standalone --toc --reference-links --reference-location=section --lua-filter doc/not-in-format.lua 
+ pandoc README.md  -t plain -o README          --standalone --toc --reference-links --reference-location=section --lua-filter doc/not-in-format.lua
+ pandoc TODO.md    -t plain -o TODO
+cd doc
+
 echo "creating SRS and SDS markdown"
 cd design
 m4 ../header.m4 srs.m4 > ../srs.md

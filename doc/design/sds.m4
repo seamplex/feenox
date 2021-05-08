@@ -67,6 +67,7 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
  
 \noindent it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)) for scaling up large problems,
 
+include(lorenz-le11.md)
 
 **ejemplo de input: MWE termico**
 
