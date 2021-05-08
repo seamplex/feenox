@@ -28,15 +28,12 @@ touch src/variables.mak
 version=$(git describe --tags | sed 's/-/./')
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
-if test ! -z "$(which pandoc)"; then
- pandoc README.md  -t gfm   -o README.markdown --standalone --toc --reference-links --reference-location=section --lua-filter doc/not-in-format.lua 
- pandoc README.md  -t plain -o README          --standalone --toc --reference-links --reference-location=section --lua-filter doc/not-in-format.lua
- pandoc TODO.md    -t plain -o TODO
-# else
-#  cp README.pd       README.md
-#  fmt -s README.md > README
-#  fmt -s TODO.md   > README
-fi
+# if [ ! -e README ]; then
+#  touch README
+# fi
+# if [ ! -e TODO ]; then
+#  touch TODO
+# fi
 
 echo "calling autoreconf... "
 autoreconf -i
