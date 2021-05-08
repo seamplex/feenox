@@ -41,7 +41,7 @@ Define a boundary condition to be applied to faces, edges and/or vertices.
 
 ::: {.usage}
 ~~~{.feenox style=feenox}
-BC <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1> [ PHYSICAL_GROUP <name_2> [ ... ] ] ] [ <bc_data1> [ <bc_data2> [ ... ] ] ]
+BC <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1> PHYSICAL_GROUP <name_2> ... ] [ <bc_data1> <bc_data2> ... ]
 ~~~
 :::
 
@@ -51,7 +51,7 @@ If the name of the boundary condition matches a physical group in the mesh, it i
 If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
 If the boundary condition applies to more than one physical group in the mesh,
 they can be added using as many `PHYSICAL_GROUP` keywords as needed.
-Each `<bc_data>` argument is a string whose meaning depends on the type
+Each `<bc_data>` argument is a single string whose meaning depends on the type
 of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
 temperature to depend on space as the provided expression in a
 thermal problem and `fixed` fixes the displacements in all the directions
@@ -421,11 +421,14 @@ The format is read from the extension, which should be either
  * `.vtk` [ASCII legacy VTK](https:\//lorensen.github.io/VTKExamples/site/VTKFileFormats/)
  * `.frd` [CalculiX’s FRD ASCII output](https:\//web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
 
-Note than only MSH is suitable for defining PDE domains, as it is the only one that provides information about physical groups.
-The other formats are primarily supported to read function data contained in the file.
+Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
+physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
+The other formats are primarily supported to read function data contained in the file
+and eventually, to operate over these functions (i.e. take differences with other functions contained
+in other files to compare results).
 The file path or file id can be used to refer to a particular mesh when reading more than one,
 for instance in a `MESH_WRITE` or `MESH_INTEGRATE` keyword.
-If a file path is given such as `cool_mesh.msh`, it can be referred to as either
+If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
 `cool_mesh.msh` or just `cool_mesh`.
 The spatial dimensions cab be given with `DIMENSION`.
 If material properties are uniform and given with variables,
@@ -444,6 +447,43 @@ For each `READ_FIELD` keyword, a point-wise defined function of space named `<fu
 is defined and filled with the scalar data named `<name_in_mesh>` contained in the mesh file.
 The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
 If no mesh is marked as `MAIN`, the first one is the main one.
+
+##  MESH_WRITE
+
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+{ <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ] [ NODE | CELL ] [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...
+~~~
+:::
+
+
+
+Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
+be use to give the format explicitly.
+If there are several meshes defined then which one should be used has to be
+given explicitly with `MESH`.
+If the `NO_MESH` keyword is given, only the results are written into the output file.
+Depending on the output format, this can be used to avoid repeating data and/or
+creating partial output files which can the be latter assembled by post-processing scripts.
+When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+section that sets the actual names of the physical entities is not written.
+This can be needed to avoid name clashes when reading multiple `.msh` files.
+The output is node-based by default. This can be controlled with both the
+`NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
+will be written at the node (cells). These keywords can be used several times
+and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
+write the conductivity and the expression $1+z$ as cell-based and the temperature
+$T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
+Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
+representation of the fields that follow. Default is `%g`.
+The data to be written has to be given as a list of fields,
+i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
+and/or expressions (such as `x^2+y^2+z^2`).
+Each field is written as a scalar, unless the keyword `VECTOR` is given.
+In this case, there should be exactly three fields following `VECTOR`.
 
 ##  MINIMIZE
 
@@ -668,9 +708,15 @@ Sets the problem type that FeenoX has to solve.
 ::: {.usage}
 ~~~{.feenox style=feenox}
 PROBLEM [ mechanical | thermal | modal ]
- [ AXISYMMETRIC | PLANE_STRESS | PLANE_STRAIN ] [ SYMMETRY_AXIS { x | y } ] [ TRANSIENT | QUASISTATIC]
- [ LINEAR | NON_LINEAR ] [ DIMENSIONS <expr> ] [ MESH <identifier> ] 
+ [ DIMENSIONS <expr> ] 
+ [ AXISYMMETRIC | PLANE_STRESS | PLANE_STRAIN ] [ SYMMETRY_AXIS { x | y } ] [ PROGRESS ]
+ [ TRANSIENT | QUASISTATIC]
+ [ LINEAR | NON_LINEAR ] [ MESH <identifier> ] 
  [ N_MODES <expr> ] 
+ [ PC { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
+ [ KSP { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]
+ [ SNES_TYPE { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]
+ [ TS { bdf | beuler | arkimex | rosw | glle | ... } ]
 
 ~~~
 :::
@@ -680,23 +726,34 @@ PROBLEM [ mechanical | thermal | modal ]
  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
  * `thermal` (or `heat` ) solves the heat conduction problem.
  * `modal` computes the natural frequencies and oscillation modes.
-
+The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
+or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
 If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimensional in the $x$-$y$ plane
 and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$).
 If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
 axisymmetry is given, either `PLANE_STRESS` and `PLAIN_STRAIN` can be provided (default is plane stress).
-If the special variable `end_time` is zero, FeenoX solves a static problem---although
-the variable `static_steps` is still honored.
+If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
+progress of the ensamble of the stiffness matrix (or matrices),
+the solution of the system of equations
+and the computation of gradients (stresses).
+If the special variable `end_time` is zero, FeenoX solves a static
+ problem---although the variable `static_steps` is still honored.
 If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
 This can be controlled by `TRANSIENT` or `QUASISTATIC`.
 By default FeenoX tries to detect wheter the computation should be linear or non-linear.
 An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
-The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
-or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
 If there are more than one `MESH`es define, the one over which the problem is to be solved
 can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
 defined in the input file is the one over which the problem is solved.
 The number of modes to be computed in the modal problem. The default is DEFAULT_NMODES.
+The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
+solver types be any of those available in PETSc (first option is the default):
+
+ * List of `PC`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
+ * List of `KSP`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
+ * List of `SNES`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
+
+ * List of `TS`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
 
 ##  READ
 
