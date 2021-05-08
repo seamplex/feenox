@@ -69,12 +69,6 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
 
 include(lorenz-le11.md)
 
-**ejemplo de input: MWE termico**
-
-**ejemplo de input - NAMFES LE11**
-
-**ejemplo Python**
-
 
 
 dnl --------------------------------------------------------------------------------
@@ -115,9 +109,12 @@ Even though compiling FeenoX from sources is the recommended way to obtain the t
 
 **show how to download and run from binary**
 
-**show how to clone, compile and run tests**
+Here are the steps to get FeenoX' source repository, compile it and run the tests suite. Even though they are slightly more complex, they are still pretty standard and straightforward:
 
-dnl autoconf vs. cmake, rule of diversity 
+include(doc/design/git.md)
+
+
+
 
 
 dnl --------------------------------------------------------------------------------
@@ -126,7 +123,13 @@ esyscmd(awk -f quote.awk 060-execution.md)
 
 >It is mandatory to be able to execute the tool remotely, either with a direct action from the user or from a high-level workflow which could be triggered by a human or by an automated script. The calling party should be able to monitor the status during run time and get the returned error level after finishing the execution.
 
-As FeenoX is designed to run as a file filter (i.e. as a transfer function) and explicitly avoids having a graphical interface, the program can be executed on a remote server through a SSH session or be part of a docker provisioning script. FeenoX does provide mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
+As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the program can be executed remotely
+
+ 1. on a server through a SSH session
+ 2. in a container as part of a provisioning script
+ 
+ 
+FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
 
 >The tool shall provide a mean to perform parametric computations by varying one or more problem parameters in a certain prescribed way such that it can be used as an inner solver for an outer-loop optimization tool. In this regard, it is desirable if the tool could compute scalar values such that the figure of merit being optimized (maximum temperature, total weight, total heat flux, minimum natural frequency, maximum displacement, maximum von\ Mises stress, etc.) is already available without needing further post-processing.
 
