@@ -81,7 +81,7 @@ answerfloat() {
   echo -n "${1}... "
   answer=$(${feenox} ${dir}/${1})
 
-  if [ "$(${feenox} ${dir}/cmp.fee "(${answer})" "${2}")" = "0.000" ]; then
+  if [ "$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${2}" "${3}")" = "1" ]; then
     echo "ok"
     level=0
   else
@@ -91,6 +91,27 @@ answerfloat() {
 
   return ${level}
 }
+
+answerzero() {
+  echo -n "${1}... "
+  answer=$(${feenox} ${dir}/${1})
+
+  if [ -z "${2}" ]; then
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")
+  else  
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" "${2}")
+  fi  
+  if [ "${result}" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected zero and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
 
 answer1() {
   echo -n "${1} ${2}... "
@@ -107,20 +128,21 @@ answer1() {
   return ${level}
 }
 
-answer1float() {
-  echo -n "${1} ${2}... "
-  answer=$(${feenox} ${dir}/${1} ${2})
-  
-  if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${3}")" = "0.000" ]; then
-    echo "ok"
-    level=0
-  else
-    echo "wrong, expected '${3}' and got '${answer}'"
-    level=1
-  fi
 
-  return ${level}
-}
+# answer1float() {
+#   echo -n "${1} ${2}... "
+#   answer=$(${feenox} ${dir}/${1} ${2})
+#   
+#   if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${3}")" = "0.000" ]; then
+#     echo "ok"
+#     level=0
+#   else
+#     echo "wrong, expected '${3}' and got '${answer}'"
+#     level=1
+#   fi
+# 
+#   return ${level}
+# }
 
 
 answer2sorthead1() {

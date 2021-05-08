@@ -1,0 +1,22 @@
+# NAFEMS-T2 benchmark: 1d steady-state heat conduction with radiation
+READ_MESH slab-3d-0.1m.msh DIMENSIONS 3
+PROBLEM heat
+
+l = 0.1      # slab length in meters (used in the mesh)
+
+k = 55.6                # W/(m K)
+# sigma = 5.67e-8       # W m^2 / K^4 as in the problem
+sigma = 5.670374419e-8  # as in wikipedia
+e = 0.98
+T0 = 1000     # K
+Tinf = 300    # K
+
+BC left  T=T0
+BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
+
+SOLVE_PROBLEM
+
+VAR T'
+T_analytical = root((T'-T0)*k/l + sigma*e*(T'^4-Tinf^4), T', 0, 2000, 1e-12)
+
+PRINT T(0.1,0,0)-T_analytical

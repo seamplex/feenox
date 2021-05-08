@@ -11,20 +11,20 @@ fi
 
 checkpetsc
 
-answerfloat thermal-slab-uniform-nosource.fee "0"
+answerzero thermal-slab-uniform-nosource.fee
 exitifwrong $?
 
-answerfloat thermal-slab-space-nosource.fee "0"
+answerzero thermal-slab-space-nosource.fee
 exitifwrong $?
 
-answerfloat thermal-slab-temperature-nosource.fee "0"
+answerzero thermal-slab-temperature-nosource.fee
 exitifwrong $?
 
-answerfloat thermal-slab-heat-nosource.fee "0"
+answerzero thermal-slab-heat-nosource.fee
 exitifwrong $?
 
-answerfloat thermal-slab-convection-nosource.fee "0"
+answerzero thermal-slab-convection-nosource.fee
 exitifwrong $?
 
-answerfloat thermal-slab-convection-as-heat-nosource.fee "0"
+answerzero thermal-slab-convection-as-heat-nosource.fee
 exitifwrong $?

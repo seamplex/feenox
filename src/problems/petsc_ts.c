@@ -113,38 +113,39 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
     feenox_call(feenox_dirichlet_eval());
 //  }  
 
-  printf("t = %g\n", t);
-  printf("phi\n");
-  VecView(phi, PETSC_VIEWER_STDOUT_WORLD);
-  printf("phi_dot\n");
-  VecView(phi_dot, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("t = %g\n", t);
+//  printf("phi\n");
+//  VecView(phi, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("phi_dot\n");
+//  VecView(phi_dot, PETSC_VIEWER_STDOUT_WORLD);
     
-  printf("M\n");
-  MatView(feenox.pde.M, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("M\n");
+//  MatView(feenox.pde.M, PETSC_VIEWER_STDOUT_WORLD);
   
   // compute the residual R(t,phi,phi_dot) = K*phi + M*phi_dot - b
 //  VecSet(r, 0.0);
   petsc_call(MatMult(feenox.pde.M, phi_dot, r));
 
-  printf("K\n");
-  MatView(feenox.pde.K, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("K\n");
+//  MatView(feenox.pde.K, PETSC_VIEWER_STDOUT_WORLD);
   
-  printf("M phi_dot\n");
-  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("M phi_dot\n");
+//  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
   
   petsc_call(MatMultAdd(feenox.pde.K, phi, r, r));
-  printf("M phi_dot + K phi\n");
-  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("M phi_dot + K phi\n");
+//  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
   
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
-  printf("M phi_dot + K phi - b\n");
-  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("M phi_dot + K phi - b\n");
+//  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
 
   // set dirichlet bcs  
   feenox_call(feenox_dirichlet_set_r(r, phi));
-  printf("M phi_dot + K phi - b with Dirichlet BCs\n");
-  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+//  printf("M phi_dot + K phi - b with Dirichlet BCs\n");
+//  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
   
+/*  
     PetscViewer viewer;
     PetscViewerASCIIOpen(PETSC_COMM_WORLD, "feenox-K.m", &viewer);
     PetscViewerSetType(viewer, PETSCVIEWERASCII);
@@ -159,7 +160,7 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
     PetscViewerDestroy(&viewer);
     
   exit(0);
-  
+*/  
   return FEENOX_OK;
 }
 

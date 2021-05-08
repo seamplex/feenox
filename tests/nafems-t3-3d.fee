@@ -1,0 +1,25 @@
+# NAFEMS-T3 benchmark: 1d transient heat conduction with dirichlet
+READ_MESH slab-3d-0.1m.msh DIMENSIONS 3
+PROBLEM heat
+
+# transient up to 32 seconds
+dt_0 = 5e-3
+end_time = 32
+
+# uniform properties
+k = 35             # W/(m K)
+cp = 440.5         # J/(kg K)
+rho = 7200         # kg/m^3
+
+# boundary conditions
+BC left  T=0
+BC right T=100*sin(pi*t/40)
+
+# initial condition
+T_0(x,y,z) := 0
+
+SOLVE_PROBLEM
+
+IF done
+  PRINT T(0.08,0,0) 
+ENDIF  
