@@ -38,56 +38,6 @@ extern feenox_t feenox;
 
 int feenox_problem_init_parser_general(void) {
 
-#ifdef HAVE_PETSC
-  if (sizeof(PetscReal) != sizeof(double)) {
-    feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d != PetscReal = %d", sizeof(double), sizeof(PetscReal));
-    return FEENOX_ERROR;
-  }
-  // TODO: check versions from the header and from the library
-#endif  
-  
-  
-  // we process the original command line (beucase the one that remains after getopt might have a different order)
-  // for instance, "-log_summary" is trapped by feenox's getoopt as "-l"
-  // so that needs to be rewritten as "--petsc_opt log_summary"
-  // if the option has an argument it has to be put as "--slepc_opt pc_type=sor"
-/*  
-  unsigned int i = 0;
-  for (i = 0; i < feenox.argc; i++) {
-    if (strcmp(feenox.argv_orig[i], "--petsc") == 0) {
-      if (i >= (feenox.argc-1)) {
-        feenox_push_error_message("commandline option --petsc needs an argument");
-        return FEENOX_ERROR;
-      } else if (feenox.argv_orig[i+1][0] == '-') {
-        feenox_push_error_message("the argument of commandline option --petsc should not start with a dash (it is added automatically)");
-        return FEENOX_ERROR;
-      }
-      
-      char *dummy = NULL;
-      if ((dummy = strchr(feenox.argv_orig[i+1], '=')) != NULL)  {
-        char *tmp1, *tmp2;
-        *dummy = '\0';
-        tmp1 = strdup(feenox.argv_orig[i+1]);
-        tmp2 = strdup(dummy+1);
-        feenox.argv_orig[i]   = realloc(feenox.argv_orig[i],   strlen(feenox.argv_orig[i+1])+6);
-        feenox.argv_orig[i+1] = realloc(feenox.argv_orig[i+1], strlen(dummy+1)+6);
-        snprintf(feenox.argv_orig[i], strlen(feenox.argv_orig[i+1])+4, "-%s", tmp1);
-        snprintf(feenox.argv_orig[i+1], strlen(dummy+1)+4, "%s", tmp2);
-        feenox_free(tmp1);
-        feenox_free(tmp2);
-        
-      } else {
-        char *tmp1;
-        tmp1 = strdup(feenox.argv_orig[i+1]);
-        feenox.argv_orig[i+1] = realloc(feenox.argv_orig[i+1], strlen(tmp1)+6);
-        feenox.argv_orig[i][0] = '\0';
-        snprintf(feenox.argv_orig[i+1], strlen(tmp1)+4, "-%s", tmp1);
-        feenox_free(tmp1);
-      }
-      i++;
-    }
-  }
-*/  
   // we already have processed basic options, now we loop over the original argv and convert
   // double-dash options to single-dash so --snes_view transforsm to -snes_view
   unsigned int i = 0;
@@ -101,6 +51,11 @@ int feenox_problem_init_parser_general(void) {
   }
 
 #ifdef HAVE_PETSC
+  if (sizeof(PetscReal) != sizeof(double)) {
+    feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d != PetscReal = %d", sizeof(double), sizeof(PetscReal));
+    return FEENOX_ERROR;
+  }
+  
   PetscInt major, minor, subminor;
   
  #ifdef HAVE_SLEPC  
@@ -128,7 +83,40 @@ int feenox_problem_init_parser_general(void) {
   
   feenox.pde.petscinit_called = PETSC_TRUE;
   
+  // check for further commandline options
+  // see if the user asked for mumps in the command line
+  PetscBool flag = PETSC_FALSE;
+  // recall that we already dumped one dash above!
+  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-mumps", &flag));
+  if (flag == PETSC_TRUE) {
+#ifdef PETSC_HAVE_MUMPS    
+    feenox.pde.ksp_type = strdup("mumps");
+    feenox.pde.pc_type = strdup("mumps");
+#else
+    feenox_push_error_message("PETSc was not compiled with MUMPS. Reconfigure with --download-mumps.");
+    return FEENOX_RUNTIME_ERROR;
+#endif
+  }
 
+  // see if the user asked for progress in the command line
+  if (feenox.pde.progress_ascii == PETSC_FALSE) {
+    petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-progress", &feenox.pde.progress_ascii));
+  }  
+
+  // see if the user asked for a forced problem type
+  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-linear", &flag));
+  if (flag == PETSC_TRUE) {
+    feenox.pde.math_type = math_type_linear;
+  }
+  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-non-linear", &flag));
+  if (flag == PETSC_TRUE) {
+    feenox.pde.math_type = math_type_nonlinear;
+  }
+  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-nonlinear", &flag));
+  if (flag == PETSC_TRUE) {
+    feenox.pde.math_type = math_type_nonlinear;
+  }
+  
   // get the number of processes and the rank
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.nprocs));
   petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.rank));
@@ -515,6 +503,11 @@ int feenox_problem_init_runtime_general(void) {
   // allocate global petsc objects
   int width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
 
+  if (feenox.pde.global_size == 0) {
+    feenox_push_error_message("internal error, problem init did not set global size");
+    return FEENOX_ERROR;
+  }
+  
   // ask how many local nodes we own
   feenox.pde.nodes_local = PETSC_DECIDE;
   PetscInt n_nodes = feenox.pde.mesh->n_nodes;

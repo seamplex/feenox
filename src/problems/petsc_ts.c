@@ -4,9 +4,10 @@ extern feenox_t feenox;
 int feenox_solve_petsc_transient(void) {
 
 #ifdef HAVE_PETSC
-  
- PetscInt ts_steps;
 
+  // TODO: handle initial steady state
+  // these might have been needed for computing the initial steady-state?
+/*  
   if (feenox.pde.ksp != NULL) {
     petsc_call(KSPDestroy(&feenox.pde.ksp));
     feenox.pde.ksp = NULL;
@@ -14,53 +15,45 @@ int feenox_solve_petsc_transient(void) {
     petsc_call(SNESDestroy(&feenox.pde.snes));
     feenox.pde.snes = NULL;
   }
-
-   if (feenox.pde.ts == NULL) {
+*/
+  if (feenox.pde.ts == NULL) {
+    // put these lines in a separate function
     petsc_call(TSCreate(PETSC_COMM_WORLD, &feenox.pde.ts));
-    petsc_call(TSSetProblemType(feenox.pde.ts, TS_NONLINEAR));
 
     petsc_call(TSSetIFunction(feenox.pde.ts, NULL, fino_ts_residual, NULL));
+    // TODO: check this
+    // if we were given an initial condition then K does not exist
+    // this fails in parallel because J has to be assembled
+//    if (feenox.pde.initial_condition != NULL) {      
+//      feenox_call(feenox_build());
+//    }  
 
-    // si nos dieron una condicion inicial entonces feenox.pde.K no existe
-    // en paralelo esto falla porque feenox.pde.J tiene que estar ensamblada y toda la milonga
-    if (feenox.pde.initial_condition != NULL) {      
-      feenox_call(feenox_build());
-    }  
-    // check if we have a jacobian or not
-//    petsc_call(MatDuplicate(feenox.pde.K, MAT_DO_NOT_COPY_VALUES, &feenox.pde.J));
-//    petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J, feenox.pde.J, fino_ts_jacobian, NULL));
+    Mat J = (feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.J;
+    petsc_call(TSSetIJacobian(feenox.pde.ts, J, J, fino_ts_jacobian, NULL));
 
+    // TODO: we already know which problem type we have
+//    petsc_call(TSSetProblemType(feenox.pde.ts, TS_NONLINEAR));
+    petsc_call(TSSetProblemType(feenox.pde.ts, TS_LINEAR));    
     petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_var_value(feenox_special_var(dt))));
 
     // if BCs depend on time we need DAEs
     petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_IMPLICIT));      
 //      petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_DAE_IMPLICIT_INDEX1));
 //      petsc_call(TSARKIMEXSetFullyImplicit(feenox.pde.ts, PETSC_TRUE)); 
+    
+    // TODO: TSAdapt
+    
+    feenox_call(feenox_setup_ts(feenox.pde.ts));
 
-    // TODO: the default depends on the problem type
-    if (feenox.pde.ts_type != NULL) {
-      petsc_call(TSSetType(feenox.pde.ts, feenox.pde.ts_type));
-    } else {
-      petsc_call(TSSetType(feenox.pde.ts, TSBDF));
-//        petsc_call(TSSetType(feenox.pde.ts, TSARKIMEX));
-    }
-
-    // TODO: choose
-    petsc_call(TSSetMaxStepRejections(feenox.pde.ts, 10000));
-    petsc_call(TSSetMaxSNESFailures(feenox.pde.ts, 1000));
-    petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_STEPOVER));
-
-    // options overwrite
-    petsc_call(TSSetFromOptions(feenox.pde.ts));    
   }
 
+  PetscInt ts_steps = 0;
   petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_steps));
   petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_steps+1));
 
   petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
-  petsc_call(feenox_phi_to_solution(feenox.pde.phi, 1));
 
-  petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_steps));
+  // this is the "new" dt
   petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
 
 #endif
@@ -71,25 +64,101 @@ int feenox_solve_petsc_transient(void) {
 
 
 #ifdef HAVE_PETSC
+
+int feenox_setup_ts(TS ts) {
+  
+  // TODO: the default depends on the physics type
+  if (feenox.pde.ts_type != NULL) {
+    petsc_call(TSSetType(ts, feenox.pde.ts_type));
+  } else {
+    petsc_call(TSSetType(ts, TSBDF));
+//      petsc_call(TSSetType(feenox.pde.ts, TSARKIMEX));
+  }
+
+  // TODO: choose
+//  petsc_call(TSSetMaxStepRejections(feenox.pde.ts, 10000));
+//  petsc_call(TSSetMaxSNESFailures(feenox.pde.ts, 1000));
+//  petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_STEPOVER));
+
+  // options overwrite
+  petsc_call(TSSetFromOptions(ts));    
+  // TODO: this guy complains about DM (?)
+//  petsc_call(TSSetUp(ts));    
+  
+  SNES snes;
+  petsc_call(TSGetSNES(ts, &snes));
+  if (snes != NULL) {
+    feenox_call(feenox_setup_snes(snes));
+  } else {
+    KSP ksp;
+    petsc_call(TSGetKSP(ts, &ksp));
+    if (ksp != NULL) {
+      feenox_call(feenox_setup_ksp(ksp));
+    }
+  }  
+
+
+
+  return FEENOX_OK;
+}
+
 PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx) {
   
   feenox_var_value(feenox_special_var(t)) = t;
 
 //  if (fino.math_type == math_type_nonlinear) {
-    // TODO: separate volumetric from surface elements
-    // (in case only natural BCs change with time)
+    // TODO: know when to recompute the matrix or not
     feenox_call(feenox_phi_to_solution(phi, 1));
     feenox_call(feenox_build());
     feenox_call(feenox_dirichlet_eval());
 //  }  
+
+  printf("t = %g\n", t);
+  printf("phi\n");
+  VecView(phi, PETSC_VIEWER_STDOUT_WORLD);
+  printf("phi_dot\n");
+  VecView(phi_dot, PETSC_VIEWER_STDOUT_WORLD);
     
+  printf("M\n");
+  MatView(feenox.pde.M, PETSC_VIEWER_STDOUT_WORLD);
+  
   // compute the residual R(t,phi,phi_dot) = K*phi + M*phi_dot - b
-  petsc_call(MatMult(feenox.pde.K, phi, r));
-  petsc_call(MatMultAdd(feenox.pde.M, phi_dot, r, r));
+//  VecSet(r, 0.0);
+  petsc_call(MatMult(feenox.pde.M, phi_dot, r));
+
+  printf("K\n");
+  MatView(feenox.pde.K, PETSC_VIEWER_STDOUT_WORLD);
+  
+  printf("M phi_dot\n");
+  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+  
+  petsc_call(MatMultAdd(feenox.pde.K, phi, r, r));
+  printf("M phi_dot + K phi\n");
+  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+  
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
+  printf("M phi_dot + K phi - b\n");
+  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
 
   // set dirichlet bcs  
   feenox_call(feenox_dirichlet_set_r(r, phi));
+  printf("M phi_dot + K phi - b with Dirichlet BCs\n");
+  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
+  
+    PetscViewer viewer;
+    PetscViewerASCIIOpen(PETSC_COMM_WORLD, "feenox-K.m", &viewer);
+    PetscViewerSetType(viewer, PETSCVIEWERASCII);
+    PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+    MatView(feenox.pde.K, viewer);
+    PetscViewerDestroy(&viewer);
+
+    PetscViewerASCIIOpen(PETSC_COMM_WORLD, "feenox-M.m", &viewer);
+    PetscViewerSetType(viewer, PETSCVIEWERASCII);
+    PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+    MatView(feenox.pde.M, viewer);
+    PetscViewerDestroy(&viewer);
+    
+  exit(0);
   
   return FEENOX_OK;
 }

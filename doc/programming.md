@@ -59,9 +59,19 @@ Then create a new C/C++ project File->New Project... choose C/C++ Project with E
 
 ## Makefiles
 
- * Use autotools and friends and comply with the GNU requirements.
- * CMake is allowed as being part of other libraries but not for any sources directly related to FeenoX (at least for now).
+ * FeenoX uses the [GNU Autools](https://en.wikipedia.org/wiki/GNU_Autotools) (i.e. [Autoconf](https://www.gnu.org/software/autoconf/) and [Automake](https://www.gnu.org/software/automake/)).
+ * If you really feel that you have to use [CMake](https://cmake.org/) for your contributions, feel free to do so (UNIX rule of diversity) but make sure that at the end of the day `./configure && make` still works.
 
+## Test suite
+
+ * The directory `tests` contains the test suite with shell scripts that return appropriate errorlevels according to [Automake’s generic test scripts](https://www.gnu.org/software/automake/manual/html_node/Scripts_002dbased-Testsuites.html). In a nutshell:
+ 
+   > When no test protocol is in use, an exit status of 0 from a test script will denote a success, an exit status of 77 a skipped test, an exit status of 99 a hard error, and any other exit status will denote a failure. 
+   
+ * If you add a new feature please also write a test script not just to check your feature works but to prevent further changes by other people (or even by yourself) from breaking the feature.
+ * Try to make the check results meaningful and not just check for random results. Try to create tests cases with analytical solution or use benchmarks with known results.
+ * We will eventually add some code coverage tools to have as most lines covered by at least one test.
+ 
 ## Coding style
 
  * K&R 1TBS with no tabs and two spaces per indent <https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)>

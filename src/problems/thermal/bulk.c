@@ -67,11 +67,11 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
   if (feenox.pde.has_mass) {
     double rhocp = 0;
     if (thermal.rhocp.defined) {
-      rhocp = thermal.rhocp.eval(&thermal.rhocp, this->x[v], material);
+      rhocp = thermal.rhocp.eval(&thermal.rhocp, x, material);
     } else if (thermal.kappa.defined) {
-      rhocp = k / thermal.kappa.eval(&thermal.kappa, this->x[v], material);
+      rhocp = k / thermal.kappa.eval(&thermal.kappa, x, material);
     } else if (thermal.rho.defined && thermal.cp.defined) {
-      rhocp = thermal.rho.eval(&thermal.rho, this->x[v], material) * thermal.cp.eval(&thermal.cp, this->x[v], material);
+      rhocp = thermal.rho.eval(&thermal.rho, x, material) * thermal.cp.eval(&thermal.cp, x, material);
     } else {
       // this should have been already checked
       feenox_push_error_message("no heat capacity found");

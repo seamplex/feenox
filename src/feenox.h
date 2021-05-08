@@ -1684,9 +1684,12 @@ struct feenox_t {
     function_t *tresca;
     
 #ifdef HAVE_PETSC    
-    PetscBool has_rhs;
+    PetscBool has_stiffness;
     PetscBool has_mass;
+    PetscBool has_rhs;
     PetscBool has_jacobian;
+    PetscBool K_is_symmetric;
+    PetscBool M_is_symmetric;
 
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
@@ -2071,12 +2074,20 @@ extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
 
 // petsc_ksp.c
 extern int feenox_solve_petsc_linear(void);
-extern int feenox_solve_petsc_nonlinear(void);
 extern PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
-extern int feenox_set_pc(PC pc);
-extern int feenox_set_ksp(KSP ksp);
-  
+extern int feenox_setup_ksp(KSP ksp);
+extern int feenox_setup_pc(PC pc);
+
+// petsc_snes.c
+extern int feenox_solve_petsc_nonlinear(void);
+extern int feenox_setup_snes(SNES snes);
+extern PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx);
+extern PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx);
+extern PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy);
+
 // petsc_ts.c
+extern int feenox_solve_petsc_transient(void);
+extern int feenox_setup_ts(TS ts);
 extern PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
 extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
 

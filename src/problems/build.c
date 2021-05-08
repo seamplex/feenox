@@ -11,16 +11,17 @@ int feenox_build(void) {
   
   // TODO: may we don't need to always empty stuff, i.e. if we decide to re-use the matrices
   // empty global objects
-  if (feenox.pde.K != NULL) {
+  if (feenox.pde.has_stiffness == PETSC_TRUE) {
     petsc_call(MatZeroEntries(feenox.pde.K));
-  }
-  if (feenox.pde.M != NULL) {
+  }  
+  
+  if (feenox.pde.has_mass == PETSC_TRUE) {
     petsc_call(MatZeroEntries(feenox.pde.M));
   }
-  if (feenox.pde.J != NULL) {
+  if (feenox.pde.has_jacobian == PETSC_TRUE) {
     petsc_call(MatZeroEntries(feenox.pde.J));
   }
-  if (feenox.pde.b != NULL) {
+  if (feenox.pde.has_rhs == PETSC_TRUE) {
     petsc_call(VecZeroEntries(feenox.pde.b));
   }  
   
@@ -82,7 +83,9 @@ int feenox_elemental_objects_allocate(element_t *this) {
   feenox.pde.n_local_nodes = this->type->nodes;
   feenox.pde.elemental_size = this->type->nodes * feenox.pde.dofs;
   
-  feenox_check_alloc(feenox.pde.Ki = gsl_matrix_calloc(feenox.pde.elemental_size, feenox.pde.elemental_size));
+  if (feenox.pde.has_stiffness) {
+    feenox_check_alloc(feenox.pde.Ki = gsl_matrix_calloc(feenox.pde.elemental_size, feenox.pde.elemental_size));
+  }  
   if (feenox.pde.has_mass) {
     feenox_check_alloc(feenox.pde.Mi = gsl_matrix_calloc(feenox.pde.elemental_size, feenox.pde.elemental_size));
   }
@@ -136,7 +139,9 @@ int feenox_build_element_volumetric(element_t *this) {
   }
     
   // initialize to zero the elemental objects
-  gsl_matrix_set_zero(feenox.pde.Ki);
+  if (feenox.pde.has_stiffness) {
+    gsl_matrix_set_zero(feenox.pde.Ki);
+  }  
   if (feenox.pde.has_mass) {
     gsl_matrix_set_zero(feenox.pde.Mi);
   }
@@ -156,16 +161,16 @@ int feenox_build_element_volumetric(element_t *this) {
   // compute the indices of the DOFs to ensamble
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
 
-  if (feenox.pde.K != NULL)  {
+  if (feenox.pde.has_stiffness == PETSC_TRUE)  {
     petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Ki, 0, 0), ADD_VALUES));
-  }
-  if (feenox.pde.M != NULL)  {
+  }  
+  if (feenox.pde.has_mass == PETSC_TRUE)  {
     petsc_call(MatSetValues(feenox.pde.M, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Mi, 0, 0), ADD_VALUES));
   }
-  if (feenox.pde.J != NULL) {
+  if (feenox.pde.has_jacobian == PETSC_TRUE) {
     petsc_call(MatSetValues(feenox.pde.J, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Ji, 0, 0), ADD_VALUES));
   }
-  if (feenox.pde.b != NULL) {
+  if (feenox.pde.has_rhs == PETSC_TRUE) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
   }
 
@@ -188,6 +193,9 @@ int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
   }
   gsl_vector_set_zero(feenox.pde.Nb);
   gsl_vector_set_zero(feenox.pde.bi);
+  if (bc_data->fills_matrix) {
+    gsl_matrix_set_zero(feenox.pde.Ki);
+  } 
 
   unsigned int v = 0;
   for (v = 0; v < V; v++) {
@@ -195,7 +203,7 @@ int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
   }
   
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
-  if (feenox.pde.b != NULL) {
+  if (feenox.pde.has_rhs == PETSC_TRUE) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
   }
   if (bc_data->fills_matrix) {

@@ -57,9 +57,7 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx) 
 
 int feenox_solve_petsc_nonlinear(void) {
 
-  KSP ksp;
-  PC pc;
-  Mat J;
+//  Mat J;
   Vec r;
   SNESConvergedReason reason;
   PetscInt       its;
@@ -67,13 +65,9 @@ int feenox_solve_petsc_nonlinear(void) {
 //  time_checkpoint(build_begin);
   
   if (feenox.pde.snes == NULL) {
+    // TODO: move to a separate function
     petsc_call(SNESCreate(PETSC_COMM_WORLD, &feenox.pde.snes));
 
-    if (feenox.pde.snes_type != NULL) {
-      // if we have an explicit type, we set it
-      petsc_call(SNESSetType(feenox.pde.snes, feenox.pde.snes_type));
-    }
-    
     // we build the matrices here and put a flag that it is already built
     // so we do not build it again in the first step of the SNES
     feenox_call(feenox_build());
@@ -84,31 +78,23 @@ int feenox_solve_petsc_nonlinear(void) {
     // monitor
 //    petsc_call(SNESMonitorSet(feenox.pde.snes, feenox.pde.snes_monitor, NULL, 0));
 
-    // options
-    petsc_call(SNESSetFromOptions(feenox.pde.snes));
-  }  
+    petsc_call(VecDuplicate(feenox.pde.phi, &r));
+    petsc_call(SNESSetFunction(feenox.pde.snes, r, feenox_snes_residual, NULL));
     
-  petsc_call(VecDuplicate(feenox.pde.phi, &r));
-  petsc_call(MatDuplicate(feenox.pde.K, MAT_COPY_VALUES, &J));
-  
-  petsc_call(SNESSetFunction(feenox.pde.snes, r, feenox_snes_residual, NULL));
-  petsc_call(SNESSetJacobian(feenox.pde.snes, J, J, feenox_snes_jacobian, NULL));
-
+//    petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_TRUE) ? feenox.pde.J : feenox.pde.K, MAT_COPY_VALUES, &J));
+//    petsc_call(SNESSetJacobian(feenox.pde.snes, J, J, feenox_snes_jacobian, NULL));
+    petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J, feenox.pde.K, feenox_snes_jacobian, NULL));    
+    
   // TODO
 /*  
-  petsc_call(SNESSetTolerances(feenox.pde.snes, feenox_var_value(feenox.pde.vars.snes_atol),
-                                                feenox_var_value(feenox.pde.vars.snes_rtol),
-                                                PETSC_DEFAULT,
-                                                (PetscInt)feenox_var_value(feenox.pde.vars.snes_max_it),
-                                                PETSC_DEFAULT));
+    petsc_call(SNESSetTolerances(feenox.pde.snes, feenox_var_value(feenox.pde.vars.snes_atol),
+                                                  feenox_var_value(feenox.pde.vars.snes_rtol),
+                                                  PETSC_DEFAULT,
+                                                  (PetscInt)feenox_var_value(feenox.pde.vars.snes_max_it),
+                                                  PETSC_DEFAULT));
  */
-
-  // customize ksp and pc (this needs to come after setting the jacobian)
-  petsc_call(SNESGetKSP(feenox.pde.snes, &ksp));
-  feenox_call(feenox_set_ksp(ksp));
-
-  petsc_call(KSPGetPC(ksp, &pc));
-  feenox_call(feenox_set_pc(pc));
+    feenox_call(feenox_setup_snes(feenox.pde.snes));
+  }  
   
   // initial guess
   feenox_call(feenox_dirichlet_set_phi(feenox.pde.phi));
@@ -145,6 +131,28 @@ int feenox_solve_petsc_nonlinear(void) {
   return FEENOX_OK;
 
 }
+
+int feenox_setup_snes(SNES snes) {
+  
+  // TODO: have an explicit default
+  // TODO: set the line search
+  if (feenox.pde.snes_type != NULL) {
+    // if we have an explicit type, we set it
+    petsc_call(SNESSetType(snes, feenox.pde.snes_type));
+  }
+  
+  petsc_call(SNESSetFromOptions(snes));
+  // TODO: this one also complains 
+//  petsc_call(SNESSetUp(snes));
+  
+  // customize ksp (and pc)---this needs to come after setting the jacobian
+  KSP ksp;
+  petsc_call(SNESGetKSP(snes, &ksp));
+  feenox_call(feenox_setup_ksp(ksp));
+    
+  return FEENOX_OK;
+}  
+
 
 PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy) {
   int i;

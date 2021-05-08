@@ -40,6 +40,8 @@ int feenox_dirichlet_eval(void) {
           DL_FOREACH(bc->bc_datums, bc_data) {
             if (bc_data->type_math == bc_type_math_dirichlet) {
 
+//              printf("BC t = %g\n", feenox_special_var_value(t));
+              
               // if there is a condition we evaluate it now
               if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
 

@@ -65,6 +65,7 @@ int feenox_problem_bc_set_thermal_dirichlet(bc_data_t *bc_data, size_t j, size_t
   
   feenox.pde.dirichlet_indexes[k] = feenox.pde.mesh->node[j].index_dof[bc_data->dof];
   feenox.pde.dirichlet_values[k] = feenox_expression_eval(&bc_data->expr);
+//  printf("index %ld = %g\n", j, feenox.pde.dirichlet_values[k]);
   
 #endif
   return FEENOX_OK;

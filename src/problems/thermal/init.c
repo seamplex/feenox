@@ -7,6 +7,7 @@ int feenox_problem_init_parser_thermal(void) {
   
   feenox.pde.dofs = 1;
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
+  // TODO: choose uknown name
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
   feenox.mesh.default_field_location = field_location_nodes;
   
@@ -34,7 +35,7 @@ int feenox_problem_init_runtime_thermal(void) {
   if ((feenox.pde.initial_condition = feenox_get_function_ptr("T_0")) != NULL) {
     if (feenox.pde.initial_condition->n_arguments != feenox.pde.dim) {
       feenox_push_error_message("initial condition function T_0 ought to have %d arguments instead of %d", feenox.pde.dim, feenox.pde.initial_condition->n_arguments);
-      return FEENOX_OK;
+      return FEENOX_ERROR;
     }
   }
 
@@ -43,9 +44,6 @@ int feenox_problem_init_runtime_thermal(void) {
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   
-  feenox.pde.has_rhs = PETSC_TRUE;
-  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) ? PETSC_TRUE : PETSC_FALSE;
-
   // initialize distributions
   // TODO: document distributions with triple comments
   // here we just initialize everything, during build we know which
@@ -70,6 +68,7 @@ int feenox_problem_init_runtime_thermal(void) {
   thermal.q.space_dependent = feenox_expression_depends_on_space(thermal.q.dependency_variables);
   thermal.q.non_linear = feenox_expression_depends_on_function(thermal.q.dependency_functions, feenox.pde.solution[0]);  
   
+  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) ? PETSC_TRUE : PETSC_FALSE;
   if (feenox.pde.has_mass) {
     feenox_call(feenox_distribution_init(&thermal.kappa, "kappa"));
     if (thermal.kappa.defined == 0) {
@@ -78,11 +77,11 @@ int feenox_problem_init_runtime_thermal(void) {
         feenox_call(feenox_distribution_init(&thermal.rho, "rho"));
         feenox_call(feenox_distribution_init(&thermal.cp, "cp"));
 
-        if (thermal.rhocp.defined == 0 || thermal.cp.defined == 0) {
+        if (thermal.rho.defined == 0 || thermal.cp.defined == 0) {
           feenox_push_error_message("either 'kappa', 'rhocp' or both 'rho' and 'cp' are needed for transient");
           return FEENOX_ERROR;
         }
-        if (thermal.rhocp.full == 0 || thermal.cp.full == 0) {
+        if (thermal.rho.full == 0 || thermal.cp.full == 0) {
           feenox_push_error_message("either 'rho' or 'cp' is not defined over all volumes");
           return FEENOX_ERROR;
         }
@@ -181,8 +180,16 @@ int feenox_problem_init_runtime_thermal(void) {
                                    thermal.bcs_depend_temperature == 0) ? math_type_linear : math_type_nonlinear;
   }
   
-  feenox.pde.solve = (feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear : feenox_solve_petsc_nonlinear;
+  // TODO: check for transient_type
+  feenox.pde.solve = (feenox_special_var_value(end_time) > 0) ? feenox_solve_petsc_transient :
+                         ((feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear :
+                                                                       feenox_solve_petsc_nonlinear);
+  
+  feenox.pde.has_stiffness = PETSC_TRUE;
+  feenox.pde.has_rhs = PETSC_TRUE;
   feenox.pde.has_jacobian = (feenox.pde.math_type == math_type_nonlinear) ? PETSC_TRUE : PETSC_FALSE;
+  feenox.pde.K_is_symmetric = PETSC_TRUE;
+  feenox.pde.M_is_symmetric = PETSC_TRUE;
   
 #endif  
   return FEENOX_OK;

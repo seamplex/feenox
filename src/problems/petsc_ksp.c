@@ -28,46 +28,34 @@ int feenox_solve_petsc_linear(void) {
   
   KSPConvergedReason reason;
   PetscInt iterations;
-  PC pc;
   
-//  time_checkpoint(build_begin);
-  feenox_call(feenox_build());
-  feenox_call(feenox_dirichlet_eval());
-//  feenox_call(feenox_dirichlet_set_K(feenox.pde.K, feenox.pde.b));
-  feenox_call(feenox_dirichlet_set_K());  
-//  time_checkpoint(build_end);
-
 //  time_checkpoint(solve_begin);
   // create a KSP object if needed
   if (feenox.pde.ksp == NULL) {
     petsc_call(KSPCreate(PETSC_COMM_WORLD, &feenox.pde.ksp));
+    petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K, feenox.pde.K));
     
     // set the monitor for the ascii progress
     if (feenox.pde.progress_ascii == PETSC_TRUE) {  
       petsc_call(KSPMonitorSet(feenox.pde.ksp, feenox_ksp_monitor, NULL, 0));
     }
     
-    // K is symmetric. Set symmetric flag to enable ICC/Cholesky preconditioner
-    petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
+    // TODO: this call sets up the nearnullspace, that should be in another place
+    //       because it is problem-dependent
+    feenox_call(feenox_setup_ksp(feenox.pde.ksp));
   }
-  
-  petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K, feenox.pde.K));
-  petsc_call(KSPSetTolerances(feenox.pde.ksp, feenox_var_value(feenox.pde.vars.ksp_rtol),
-                                              feenox_var_value(feenox.pde.vars.ksp_atol),
-                                              feenox_var_value(feenox.pde.vars.ksp_divtol),
-                                              (PetscInt)feenox_var_value(feenox.pde.vars.ksp_max_it)));
-  
-  // TODO: this call sets up the nearnullspace, shouldn't that be in another place?
-  petsc_call(KSPGetPC(feenox.pde.ksp, &pc));
-  feenox_call(feenox_set_pc(pc));
-  feenox_call(feenox_set_ksp(feenox.pde.ksp));
 
+//  time_checkpoint(build_begin);
+  feenox_call(feenox_build());
+  feenox_call(feenox_dirichlet_eval());
+  feenox_call(feenox_dirichlet_set_K());  
+//  time_checkpoint(build_end);
   
   // try to use the solution as the initial guess (it already has Dirichlet BCs
   // but in quasi-static it has the previous solution which should be similar)
+  // mumps cannot be used with a non-zero guess  
   if ((feenox.pde.ksp_type == NULL || strcasecmp(feenox.pde.ksp_type, "mumps") != 0) &&
       (feenox.pde.pc_type  == NULL || strcasecmp(feenox.pde.pc_type,  "mumps") != 0)) {
-    // mumps cannot be used with a non-zero guess  
     petsc_call(KSPSetInitialGuessNonzero(feenox.pde.ksp, PETSC_TRUE));
   } 
   feenox.pde.progress_last = 0;
@@ -150,31 +138,56 @@ PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *du
 
 
 
-int feenox_set_ksp(KSP ksp) {
+int feenox_setup_ksp(KSP ksp) {
 
 // the KSP type
 #ifdef PETSC_HAVE_MUMPS
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
-  // mumps is a particular case, see feenox_set_pc
-  KSPSetType(ksp, KSPPREONLY);
+    // mumps is a particular case, see feenox_set_pc
+    KSPSetType(ksp, KSPPREONLY);
   } else if (feenox.pde.ksp_type != NULL) {
 #else
   if (feenox.pde.ksp_type != NULL) {
 #endif
     petsc_call(KSPSetType(ksp, feenox.pde.ksp_type));
-} else {
-  // by default use whatever PETSc/SLEPc like
-  petsc_call(KSPSetType(ksp, KSPGMRES));
-}  
+  } else {
+    // by default use whatever PETSc/SLEPc like
+    petsc_call(KSPSetType(ksp, KSPGMRES));
+  }
 
+  
+  if (feenox.pde.K_is_symmetric == PETSC_TRUE) {
+    // K is symmetric. Set symmetric flag to enable ICC/Cholesky preconditioner
+    // TODO: this is K for ksp but J for snes
+    if (feenox.pde.has_stiffness) {
+      petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
+    }  
+    if (feenox.pde.has_jacobian) {
+      petsc_call(MatSetOption(feenox.pde.J, MAT_SYMMETRIC, PETSC_TRUE));  
+    }  
+  }  
+  
+  petsc_call(KSPSetTolerances(ksp, feenox_var_value(feenox.pde.vars.ksp_rtol),
+                                   feenox_var_value(feenox.pde.vars.ksp_atol),
+                                   feenox_var_value(feenox.pde.vars.ksp_divtol),
+                                   (PetscInt)feenox_var_value(feenox.pde.vars.ksp_max_it)));
+  
+//  petsc_call(KSPSetUp(ksp));
+//  SNESSetUp(feenox.pde.snes);
+  
+  PC pc;
+  petsc_call(KSPGetPC(ksp, &pc));
+  feenox_call(feenox_setup_pc(pc));
+//  petsc_call(PCSetUp(pc));
+  
   // read command-line options
   petsc_call(KSPSetFromOptions(ksp));
 
   return FEENOX_OK;
 }
 
-int feenox_set_pc(PC pc) {
+int feenox_setup_pc(PC pc) {
 
 //  PetscInt i, j;
   PCType pc_type;
@@ -190,16 +203,20 @@ int feenox_set_pc(PC pc) {
   // and MatSolverType to mumps
 #ifdef PETSC_HAVE_MUMPS  
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
-       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
+      (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
 #if PETSC_VERSION_GT(3,9,0)
     petsc_call(MatSetOption(feenox.pde.K, MAT_SPD, PETSC_TRUE)); /* set MUMPS id%SYM=1 */
     petsc_call(PCSetType(pc, PCCHOLESKY));
 
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-    petsc_call(PCFactorSetUpMatSolverType(pc)); /* call MatGetFactor() to create F */
+
+// if we want to set further options for mumps we need to retrieve the matrix
+// and then call MatMumpsSetIcntl()
+//  petsc_call(PCFactorSetUpMatSolverType(pc)); /* call MatGetFactor() to create F */
 //  petsc_call(PCFactorGetMatrix(pc, &F));    
+    
 #else
-    feenox_push_error_message("solver MUMPS needs at least PETSc 3.9.x");
+    feenox_push_error_message("MUMPS solver needs at least PETSc 3.9");
     return FEENOX_ERROR;
 #endif
   } else {

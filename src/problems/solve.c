@@ -8,14 +8,14 @@ int feenox_instruction_solve_problem(void *arg) {
   // initialize only if we did not initialize before
   if (feenox.pde.spatial_unknowns == 0) {
     feenox_call(feenox.pde.problem_init_runtime_particular());
+    if (feenox.pde.solve == NULL) {
+      feenox_push_error_message("internal error, undefined solver");
+      return FEENOX_ERROR;
+    }
     feenox_call(feenox_problem_init_runtime_general());
   }
-  
-  if (feenox.pde.solve == NULL) {
-    feenox_push_error_message("internal error, undefined solver");
-    return FEENOX_ERROR;
-  }
 
+  // TODO: shouldn't we solve for steady-state if we are in static but no initial condition was given?
   if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_condition != NULL) {
     
     // fill the petsc vector with the data from the initial condition function of space
@@ -28,7 +28,7 @@ int feenox_instruction_solve_problem(void *arg) {
     
   } 
   
-  feenox.pde.solve();  
+  feenox_call(feenox.pde.solve());  
   // TODO: how to do this in parallel?
   feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));
 

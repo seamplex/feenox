@@ -3636,11 +3636,22 @@ int feenox_parse_problem(void) {
         feenox.pde.nev = DEFAULT_NMODES;
       }
           
+///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
+///kw+PROBLEM+usage @
+///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
+///kw+PROBLEM+detail or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
+    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+      double xi = 0;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      feenox.pde.dim = (unsigned int)(xi);
+      if (feenox.pde.dim < 1 || feenox.pde.dim > 3)  {
+        feenox_push_error_message("either one, two or three dimensions should be selected instead of '%d'", feenox.pde.dim);
+        return FEENOX_ERROR;
+      }
 
 ///kw+PROBLEM+usage [
 ///kw+PROBLEM+usage AXISYMMETRIC
 ///kw+PROBLEM+usage |
-///kw+PROBLEM+detail @
 ///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimensional in the $x$-$y$ plane
 ///kw+PROBLEM+detail and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$). 
     } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
@@ -3649,6 +3660,7 @@ int feenox_parse_problem(void) {
         feenox.pde.symmetry_axis = symmetry_axis_y;
       }
 
+      
 ///kw+PROBLEM+usage PLANE_STRESS
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
@@ -3667,8 +3679,16 @@ int feenox_parse_problem(void) {
       int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
 
-///kw+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static problem---although
-///kw+PROBLEM+detail the variable `static_steps` is still honored.
+///kw+PROBLEM+usage [ PROGRESS ]@
+///kw+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
+///kw+PROBLEM+detail progress of the ensamble of the stiffness matrix (or matrices),
+///kw+PROBLEM+detail the solution of the system of equations
+///kw+PROBLEM+detail and the computation of gradients (stresses).
+    } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
+      feenox.pde.progress_ascii = PETSC_TRUE;
+      
+///kw+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
+///kw+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
 ///kw+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
 ///kw+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
 ///kw+PROBLEM+usage [ TRANSIENT |
@@ -3688,19 +3708,6 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+usage | NON_LINEAR ]
     } else if (strcasecmp(token, "NON_LINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
-
-
-///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
-///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
-///kw+PROBLEM+detail or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
-    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
-      double xi = 0;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      feenox.pde.dim = (unsigned int)(xi);
-      if (feenox.pde.dim < 1 || feenox.pde.dim > 3)  {
-        feenox_push_error_message("either one, two or three dimensions should be selected instead of '%d'", feenox.pde.dim);
-        return FEENOX_ERROR;
-      }
 
 
 ///kw+PROBLEM+usage [ MESH <identifier> ] @
@@ -3728,6 +3735,31 @@ int feenox_parse_problem(void) {
         feenox_push_error_message("a positive number of modes should be given instead of '%d'", feenox.pde.nev);
         return FEENOX_ERROR;
       }
+      
+///kw+PROBLEM+usage [ PC { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]@
+///kw+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
+///kw+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
+///kw+PROBLEM+detail @          
+///kw+PROBLEM+detail  * List of `PC`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
+    } else if (strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
+      feenox_call(feenox_parser_string((char **)&feenox.pde.pc_type));
+
+///kw+PROBLEM+usage [ KSP { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
+///kw+PROBLEM+detail  * List of `KSP`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
+    } else if (strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
+      feenox_call(feenox_parser_string((char **)&feenox.pde.ksp_type));
+          
+///kw+PROBLEM+usage [ SNES_TYPE { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
+///kw+PROBLEM+detail  * List of `SNES`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
+///kw+PROBLEM+detail @
+        } else if (strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
+          feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
+
+///kw+PROBLEM+usage [ TS { bdf | beuler | arkimex | rosw | glle | ... } ]@
+///kw+PROBLEM+detail  * List of `TS`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
+    } else if (strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {
+      feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
+          
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
