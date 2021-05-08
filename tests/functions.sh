@@ -77,6 +77,7 @@ answerdiff() {
   
   return ${level}
 }
+
 answerfloat() {
   echo -n "${1}... "
   answer=$(${feenox} ${dir}/${1})
@@ -129,20 +130,62 @@ answer1() {
 }
 
 
-# answer1float() {
-#   echo -n "${1} ${2}... "
-#   answer=$(${feenox} ${dir}/${1} ${2})
-#   
-#   if [ "$(${feenox} ${dir}/cmp.fee "${answer}" "${3}")" = "0.000" ]; then
-#     echo "ok"
-#     level=0
-#   else
-#     echo "wrong, expected '${3}' and got '${answer}'"
-#     level=1
-#   fi
-# 
-#   return ${level}
-# }
+answerfloat() {
+  echo -n "${1}... "
+  answer=$(${feenox} ${dir}/${1})
+
+  if [ "$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${2}" "${3}")" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected '${2}' and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
+
+answer1float() {
+  echo -n "${1} ${2}... "
+  answer=$(${feenox} ${dir}/${1} ${2})
+  
+  if [ -z "${4}" ]; then
+    result=$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${3}")
+  else  
+    result=$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${3}" "${4}")
+  fi  
+  
+  if [ "${result}" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected '${3}' and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
+answer1zero() {
+  echo -n "${1} ${2}... "
+  answer=$(${feenox} ${dir}/${1} ${2})
+
+  if [ -z "${3}" ]; then
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")
+  else  
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" "${3}")
+  fi  
+  if [ "${result}" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected zero and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
 
 
 answer2sorthead1() {

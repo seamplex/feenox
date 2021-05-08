@@ -19,6 +19,7 @@ TESTS = tests/abort.sh \
         tests/integral.sh \
         tests/materials.sh \
         tests/mesh.sh \
+        tests/nafems-tx.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
         tests/trig.sh
