@@ -169,12 +169,6 @@ Please note the following two points about both cases above:
  2. 100% of FeenoX’ output is controlled by the user. Had there not been any `PRINT` or `WRITE_MESH` instructions, the output would have been empty, following the [UNIX rule of silence](http://catb.org/~esr/writings/taoup/html/ch01s06.html).
 
 
-**ejemplo de input: MWE termico**
-
-**ejemplo de input - NAMFES LE11**
-
-**ejemplo Python**
-
 
 
 # Architecture {#sec:architecture}
@@ -232,7 +226,49 @@ Even though compiling FeenoX from sources is the recommended way to obtain the t
 
 **show how to download and run from binary**
 
-**show how to clone, compile and run tests**
+Here are the steps to get FeenoX' source repository, compile it and run the tests suite. Even though they are slightly more complex, they are still pretty standard and straightforward:
+
+ 1. Install mandatory dependencies
+
+    ```
+    sudo apt-get install git gcc make automake autoconf libgsl-dev
+    ```
+
+ 2. Install optional dependencies (of course these are _optional_ but recommended)
+ 
+    ```
+    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
+    ```
+
+ 3. Clone Github repository
+ 
+    ```
+    git clone https://github.com/seamplex/feenox
+    ```
+
+ 4. Boostrap, configure, compile & make
+ 
+    ```
+    cd feenox
+    ./autogen.sh
+    ./configure
+    make
+    ```
+
+ 5. Run test suite (optional, this might take some time)
+ 
+    ``` 
+    make check
+    ```
+
+ 6. Install the binary system wide (optional)
+ 
+    ```
+    sudo make install
+    ```
+
+
+
 
 
 
@@ -247,17 +283,107 @@ Even though compiling FeenoX from sources is the recommended way to obtain the t
 
 >It is mandatory to be able to execute the tool remotely, either with a direct action from the user or from a high-level workflow which could be triggered by a human or by an automated script. The calling party should be able to monitor the status during run time and get the returned error level after finishing the execution.
 
-As FeenoX is designed to run as a file filter (i.e. as a transfer function) and explicitly avoids having a graphical interface, the program can be executed on a remote server through a SSH session or be part of a docker provisioning script. FeenoX does provide mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
+As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
+
+```{.terminal stye=terminal}
+FeenoX v0.169-g01928dc-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: feenox [options] inputfile [replacement arguments]
+
+  -h, --help         display usage and commmand-line help and exit
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+  -s, --sumarize     list all symbols in the input file and exit
+
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+    $ echo "PRINT 2+2" | feenox -
+    4
+
+Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
+Feenox home page: https://www.seamplex.com/feenox/
+
+```
+
+Of course the program can be executed remotely
+
+ 1. on a server through a SSH session
+ 2. in a container as part of a provisioning script
+
+ 
+FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
 
 >The tool shall provide a mean to perform parametric computations by varying one or more problem parameters in a certain prescribed way such that it can be used as an inner solver for an outer-loop optimization tool. In this regard, it is desirable if the tool could compute scalar values such that the figure of merit being optimized (maximum temperature, total weight, total heat flux, minimum natural frequency, maximum displacement, maximum von\ Mises stress, etc.) is already available without needing further post-processing.
 
-parametric, example of arguments, loop
+There are two ways of performing parametric runs in FeenoX. The first one is through the expansion of command line arguments as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `expansion.fee` is
 
+```{.feenox style=feenox}
+PRINT "Hello $1!"
 
+```
 
-command line args for paramteric runs from a shell script
+\noindent then it can be used as a custom greeting tool:
 
-script friendly
+```{.terminal style=terminal}
+$ feenox World
+Hello World!
+$ feenox Universe
+Hello Universe!
+```
+
+When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary. Consider the input file
+
+![Triangles](design/parametric/two-squares-triang.png)
+
+![Quadrangles](design/parametric/two-squares-quad.png)
+
+```{.feenox style=feenox}
+READ_MESH two-squares-$2.msh DIMENSIONS 2
+PROBLEM thermal
+
+# per-material conductivity
+k_soft(x,y) := 1+T(x,y)
+k_hard(x,y) := 1-0.1*T(x,y)
+
+BC left  T=0
+BC right T=$1
+
+SOLVE_PROBLEM
+PRINT TEXT $1 TEXT "Tright=$1" T(1,0.5)
+
+```
+
+\noindent and the shell script
+
+```{.bash style=bash.sh}
+for temp in $(seq 1 3); do
+ for shape in triang quad; do
+   feenox parametric.fee ${temp} ${shape}
+ done
+done
+
+```
+
+Then it is possible to run the six combinations at once, obtaining
+
+```
+$ ./two-squares-thermal.sh
+1       Tright=1        0.432843
+1       Tright=1        0.432965
+2       Tright=2        0.767466
+2       Tright=2        0.767729
+3       Tright=3        1.03429
+3       Tright=3        1.03464
+```
+
+This way of performing parametric studies is very flexible since the varied arguments can be either strings or numbers. Both the actual input itself and the external driver script can be tracked using version control systems, allowing for an efficient and flexible traceability scheme. This is a design feature of FeenoX, inspired by the UNIX rules of generation and of economy. 
+
+The second way of running parametric studies is by using the internal keyword `PARAMETRIC` that allows sweeping a numerical range of one or more FeenoX variables. 
+
+**TODO**
+
 
 ## Efficiency {#sec:efficiency}
 

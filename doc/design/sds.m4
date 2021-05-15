@@ -111,7 +111,7 @@ Even though compiling FeenoX from sources is the recommended way to obtain the t
 
 Here are the steps to get FeenoX' source repository, compile it and run the tests suite. Even though they are slightly more complex, they are still pretty standard and straightforward:
 
-include(doc/design/git.md)
+include(git.md)
 
 
 
@@ -123,23 +123,71 @@ esyscmd(awk -f quote.awk 060-execution.md)
 
 >It is mandatory to be able to execute the tool remotely, either with a direct action from the user or from a high-level workflow which could be triggered by a human or by an automated script. The calling party should be able to monitor the status during run time and get the returned error level after finishing the execution.
 
-As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the program can be executed remotely
+As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
+
+```{.terminal stye=terminal}
+esyscmd(feenox)
+```
+
+Of course the program can be executed remotely
 
  1. on a server through a SSH session
  2. in a container as part of a provisioning script
- 
+
  
 FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
 
 >The tool shall provide a mean to perform parametric computations by varying one or more problem parameters in a certain prescribed way such that it can be used as an inner solver for an outer-loop optimization tool. In this regard, it is desirable if the tool could compute scalar values such that the figure of merit being optimized (maximum temperature, total weight, total heat flux, minimum natural frequency, maximum displacement, maximum von\ Mises stress, etc.) is already available without needing further post-processing.
 
-parametric, example of arguments, loop
+There are two ways of performing parametric runs in FeenoX. The first one is through the expansion of command line arguments as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `expansion.fee` is
 
+```{.feenox style=feenox}
+include(parametric/hello.fee)
+```
 
+\noindent then it can be used as a custom greeting tool:
 
-command line args for paramteric runs from a shell script
+```{.terminal style=terminal}
+$ feenox World
+Hello World!
+$ feenox Universe
+Hello Universe!
+```
 
-script friendly
+When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary. Consider the input file
+
+![Triangles](design/parametric/two-squares-triang.png)
+
+![Quadrangles](design/parametric/two-squares-quad.png)
+
+```{.feenox style=feenox}
+include(parametric/two-squares-thermal.fee)
+```
+
+\noindent and the shell script
+
+```{.bash style=bash.sh}
+include(parametric/two-squares-thermal.sh)
+```
+
+Then it is possible to run the six combinations at once, obtaining
+
+```
+$ ./two-squares-thermal.sh
+1       Tright=1        0.432843
+1       Tright=1        0.432965
+2       Tright=2        0.767466
+2       Tright=2        0.767729
+3       Tright=3        1.03429
+3       Tright=3        1.03464
+```
+
+This way of performing parametric studies is very flexible since the varied arguments can be either strings or numbers. Both the actual input itself and the external driver script can be tracked using version control systems, allowing for an efficient and flexible traceability scheme. This is a design feature of FeenoX, inspired by the UNIX rules of generation and of economy. 
+
+The second way of running parametric studies is by using the internal keyword `PARAMETRIC` that allows sweeping a numerical range of one or more FeenoX variables. 
+
+**TODO**
+
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 070-efficienciy.md)
