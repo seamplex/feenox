@@ -23,41 +23,8 @@
 extern feenox_t feenox;
 
 
-PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
-
-
-  // this check is only to avoid building the first time because we already
-  // built K in order to create the SNES, but the rest of the step we need
-  // to re-build always because we are sure the problem is non-linear
-  if (feenox.pde.already_built == PETSC_FALSE) {
-    // pass phi to the solution becuase K (and the BCs) might depend on phi (and its spatial derivatives)
-    feenox_call(feenox_phi_to_solution(phi, 1));
-    feenox_call(feenox_build());
-    feenox_call(feenox_dirichlet_eval());
-  }  
-  
-  petsc_call(MatMult(feenox.pde.K, phi, r));
-  petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
-  feenox_call(feenox_dirichlet_set_r(r, phi));
-  
-  feenox.pde.already_built = PETSC_FALSE;
-  
-  return 0;
-}
-
-PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx) {
-  
-  // this should be J = K + K'*phi - b'
-  petsc_call(MatCopy(feenox.pde.J, J, SAME_NONZERO_PATTERN));
-  feenox_call(feenox_dirichlet_set_J(J));
-  petsc_call(MatCopy(J, P, SAME_NONZERO_PATTERN));
-  
-  return 0;
-}
-
 int feenox_solve_petsc_nonlinear(void) {
 
-//  Mat J;
   Vec r;
   SNESConvergedReason reason;
   PetscInt       its;
@@ -72,6 +39,7 @@ int feenox_solve_petsc_nonlinear(void) {
     // so we do not build it again in the first step of the SNES
     feenox_call(feenox_build());
     feenox_call(feenox_dirichlet_eval());
+    feenox_call(feenox_dirichlet_set_J(feenox.pde.J));
     feenox.pde.already_built = PETSC_TRUE;
 //    time_checkpoint(build_end);
     
@@ -80,10 +48,7 @@ int feenox_solve_petsc_nonlinear(void) {
 
     petsc_call(VecDuplicate(feenox.pde.phi, &r));
     petsc_call(SNESSetFunction(feenox.pde.snes, r, feenox_snes_residual, NULL));
-    
-//    petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_TRUE) ? feenox.pde.J : feenox.pde.K, MAT_COPY_VALUES, &J));
-//    petsc_call(SNESSetJacobian(feenox.pde.snes, J, J, feenox_snes_jacobian, NULL));
-    petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J, feenox.pde.K, feenox_snes_jacobian, NULL));    
+    petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J, feenox.pde.J, feenox_snes_jacobian, NULL));    
     
   // TODO
 /*  
@@ -153,6 +118,47 @@ int feenox_setup_snes(SNES snes) {
   return FEENOX_OK;
 }  
 
+PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
+
+
+  // this check is only to avoid building the first time because we already
+  // built K in order to create the SNES, but the rest of the step we need
+  // to re-build always because we are sure the problem is non-linear
+  if (feenox.pde.already_built == PETSC_FALSE) {
+    // pass phi to the solution becuase K (and the BCs) might depend on phi (and its spatial derivatives)
+    feenox_call(feenox_phi_to_solution(phi, 1));
+    feenox_call(feenox_build());
+    feenox_call(feenox_dirichlet_eval());
+    // this won't be needed if the matrices are built only when needed
+    feenox_call(feenox_dirichlet_set_J(feenox.pde.J));
+  }  
+  
+  Vec tmp;
+  VecDuplicate(phi, &tmp);
+
+  // set dirichlet BCs on the solution and multiply by K
+  VecCopy(phi, tmp);
+  feenox_call(feenox_dirichlet_set_phi(tmp));
+  petsc_call(MatMult(feenox.pde.K, tmp, r));
+  VecDestroy(&tmp);
+  
+  petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
+  
+  // set dirichlet BCs on the residual
+  feenox_call(feenox_dirichlet_set_r(r, phi));
+  
+  feenox.pde.already_built = PETSC_FALSE;
+  
+  return FEENOX_OK;
+}
+
+PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx) {
+  
+  // this should be J = K + K'*phi - b'
+  // it should (is?) already in feenox.pde.J which is the same as J
+  feenox_call(feenox_dirichlet_set_J(J));
+  return FEENOX_OK;
+}
 
 PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy) {
   int i;

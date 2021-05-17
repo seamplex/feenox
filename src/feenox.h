@@ -25,8 +25,6 @@
 
 #define _GNU_SOURCE   // for POSIX in C99
 
-// maybe we can conditionally define these two depending on wheter
-// debug flags are on or off?
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
 
@@ -1711,7 +1709,8 @@ struct feenox_t {
 //    Mat K_nobc;  // idem without bcs
     Mat M;     // mass matrix with dirichlet BCs (just rho for elastic, rho*cp for heat)
 //    Mat M_nobc;  // idem without bcs
-    Mat J;     // jacobian
+    Mat J;       // jacobian for SNES
+    Mat J_tran;  // jacobian for TS
 //    PetscScalar lambda; // individual eigen value 
   
     PetscScalar *eigenvalue;    // eigenvalue vector
@@ -2093,12 +2092,11 @@ extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, Pet
 
 // dirichlet.c
 extern int feenox_dirichlet_eval(void);
-//extern int feenox_dirichlet_set_K(Mat K, Vec b);
 extern int feenox_dirichlet_set_K(void);
-extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_J(Mat J);
-extern int feenox_dirichlet_set_dRdphi_dot(Mat M);
+extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_phi(Vec phi);
+extern int feenox_dirichlet_set_phi_dot(Vec phi_dot);
 
 #endif
 

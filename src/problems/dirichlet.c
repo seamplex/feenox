@@ -118,51 +118,58 @@ int feenox_dirichlet_set_K(void) {
   return FEENOX_OK;
 }
   
-
-// M - mass matrix: needs a zero in the diagonal and the same symmetry scheme that K
-//int feenox_dirichlet_set_M(Mat M) {
-int feenox_dirichlet_set_M(void) {
-
-  // the mass matrix is like the stiffness one but with zero instead of one
-  petsc_call(MatZeroRowsColumns(feenox.pde.M, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
-
-  return FEENOX_OK;
-}
-
-// J - Jacobian matrix: needs a one in the diagonal but does not need to keep the symmetry
+// J - Jacobian matrix: same as K but without the RHS vector
 int feenox_dirichlet_set_J(Mat J) {
 
   // the jacobian is exactly one for the dirichlet values and zero otherwise without keeping symmetry
-  petsc_call(MatZeroRows(J, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, NULL, NULL));
+  petsc_call(MatZeroRowsColumns(J, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, NULL, NULL));
 
   return FEENOX_OK;
 }
-
-// JM - Jacobian of the time-derivative matrix (the part of sigma*d(R)/d(phi_dot)): needs a zero in the diagonal but does not need to keep the symmetry
-int feenox_dirichlet_set_dRdphi_dot(Mat M) {
-
-  // the jacobian is exactly zero for the dirichlet values and zero otherwise without keeping symmetry
-  petsc_call(MatZeroRows(M, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
-
-  return FEENOX_OK;
-}
-
 
 // phi - solution: the BC values are set directly in order to be used as a initial condition or guess
 int feenox_dirichlet_set_phi(Vec phi) {
-
-  // this should be used only to set initial conditions and guesses
+  
   petsc_call(VecSetValues(phi, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
+  return FEENOX_OK;
+  
+}
+
+// phi - solution: the values at the BC DOFs are zeroed
+int feenox_dirichlet_set_phi_dot(Vec phi_dot) {
+
+  // TODO: put this array somewhere and avoid allocating/freeing each time
+  PetscScalar *zero;
+  feenox_check_alloc(zero = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
+  petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, zero, INSERT_VALUES));
+  feenox_free(zero);
+
+/*  
+//  printf("before\n");
+//  VecView(phi_dot, 	PETSC_VIEWER_STDOUT_WORLD);
+  
+  PetscScalar *derivative;
+  feenox_check_alloc(derivative = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
+  derivative[0] = 100;
+  derivative[1] = 0;  
+  petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, derivative, INSERT_VALUES));
+  feenox_free(derivative);
+  
+//  printf("after\n");
+//  VecView(phi_dot, 	PETSC_VIEWER_STDOUT_WORLD);
+*/
 
   return FEENOX_OK;
 }
 
-// r - residual: the BC values are set to the difference between the value and the solution
+// r - residual: the BC indexes are set to the difference between the value and the solution
 int feenox_dirichlet_set_r(Vec r, Vec phi) {
 
-  int k;
+  size_t k;
   
-  PetscScalar *diff = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar));
+  // TODO: put this array somewhere and avoid allocing/freeing each time
+  PetscScalar *diff;
+  feenox_check_alloc(diff = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
   petsc_call(VecGetValues(phi, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, diff));
   for (k = 0; k < feenox.pde.n_dirichlet_rows; k++) {
     diff[k] -= feenox.pde.dirichlet_values[k];
