@@ -94,7 +94,7 @@ int feenox_problem_init_parser_general(void) {
     feenox.pde.pc_type = strdup("mumps");
 #else
     feenox_push_error_message("PETSc was not compiled with MUMPS. Reconfigure with --download-mumps.");
-    return FEENOX_RUNTIME_ERROR;
+    return FEENOX_ERROR;
 #endif
   }
 

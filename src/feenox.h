@@ -1730,8 +1730,9 @@ struct feenox_t {
     SNESType snes_type;
     TSType ts_type;
     TSAdaptType ts_adapt_type;
-#ifdef HAVE_SLEPC
+
     PetscInt nev;                      // number of requested modes
+#ifdef HAVE_SLEPC
     EPSType eps_type;
     STType st_type;
     EPSWhich eigen_spectrum;
