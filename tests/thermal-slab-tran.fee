@@ -6,8 +6,7 @@
 READ_MESH slab-1d-0.1m.msh DIMENSIONS 1
 PROBLEM thermal
 
-end_time = 0.1
-dt = 1e-5
+end_time = 2
 
 # unitary non-dimensional properties
 k = 1
@@ -21,10 +20,10 @@ T_0(x) := 0
 A = 1.23456789
 L = 0.1
 N = 100
-T_a(x,t) := A*t*(1-x/L) + 2*A*L^2/(pi^3*alpha^2) * sum((exp(-alpha^2*(i*pi/L)^2*t)-1)/i^3 * sin(i*pi*x/L), i, 1, N) 
+T_a(x,t) := A*(t-1)*(1-x/L) + 2*A*L^2/(pi^3*alpha^2) * sum((exp(-alpha^2*(i*pi/L)^2*(t-1))-1)/i^3 * sin(i*pi*x/L), i, 1, N) 
 
 # boundary conditions
-BC left  T=A*t
+BC left  T=if(t>1,A*(t-1),0)
 BC right T=0
 
 SOLVE_PROBLEM
