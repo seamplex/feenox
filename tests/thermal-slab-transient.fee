@@ -1,6 +1,7 @@
 # example of a 1D heat transient problem
 # from https://www.math.ubc.ca/~peirce/M257_316_2012_Lecture_20.pdf
-# T(0,t) = A*t
+# T(0,t) = 0       for t < 1
+#          A*(t-1) for t > 1  
 # T(L,t) = 0
 # T(x,0) = 0
 READ_MESH slab-1d-0.1m.msh DIMENSIONS 1
