@@ -5,56 +5,61 @@ int feenox_solve_petsc_transient(void) {
 
 #ifdef HAVE_PETSC
 
-  // TODO: handle initial steady state
-  // these might have been needed for computing the initial steady-state?
-/*  
-  if (feenox.pde.ksp != NULL) {
-    petsc_call(KSPDestroy(&feenox.pde.ksp));
-    feenox.pde.ksp = NULL;
-  } else if (feenox.pde.snes != NULL) {
-    petsc_call(SNESDestroy(&feenox.pde.snes));
-    feenox.pde.snes = NULL;
-  }
-*/
-  if (feenox.pde.ts == NULL) {
-    // put these lines in a separate function
+  if (feenox_var_value(feenox_special_var(in_static))) {
+    // if we are in the static step and no initial condition was given, we solve a steady state
+    if (feenox.pde.initial_condition == NULL) {
+      if (feenox.pde.math_type == math_type_linear) {
+        feenox_call(feenox_solve_petsc_linear());
+        petsc_call(KSPDestroy(&feenox.pde.ksp));
+        feenox.pde.ksp = NULL;
+      
+      } else if (feenox.pde.math_type == math_type_nonlinear) {
+        feenox_call(feenox_solve_petsc_nonlinear());
+        petsc_call(SNESDestroy(&feenox.pde.snes));
+        feenox.pde.snes = NULL;
+      }
+    }
+    
     petsc_call(TSCreate(PETSC_COMM_WORLD, &feenox.pde.ts));
-
     petsc_call(TSSetIFunction(feenox.pde.ts, NULL, fino_ts_residual, NULL));
-    // TODO: check this
-    // if we were given an initial condition then K does not exist
-//    if (feenox.pde.initial_condition != NULL) {      
+    
+    // if we have an initial condition then matrices do not exist yet
+    if (feenox.pde.initial_condition != NULL) {
       feenox_call(feenox_build());
-//    }  
-
+    }  
     petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.J, MAT_COPY_VALUES, &feenox.pde.J_tran));
     petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_tran, feenox.pde.J_tran, fino_ts_jacobian, NULL));
 
-    // TODO: we already know which problem type we have
-    petsc_call(TSSetProblemType(feenox.pde.ts, TS_NONLINEAR));
-//    petsc_call(TSSetProblemType(feenox.pde.ts, TS_LINEAR));
-    petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_var_value(feenox_special_var(dt))));
+    petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
+    petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_var_value(feenox_special_var(end_time))));
+    petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_MATCHSTEP));
 
     // if BCs depend on time we need DAEs
     petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_IMPLICIT));      
 //      petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_DAE_IMPLICIT_INDEX1));
 //      petsc_call(TSARKIMEXSetFullyImplicit(feenox.pde.ts, PETSC_TRUE)); 
     
-    // TODO: TSAdapt
-    
     feenox_call(feenox_setup_ts(feenox.pde.ts));
-
+    
   }
 
   PetscInt ts_steps = 0;
   petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_steps));
   petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_steps+1));
 
+  petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
+/*  
+  double t, dt;
+  petsc_call(TSGetTime(feenox.pde.ts, &t));  
+  petsc_call(TSGetTimeStep(feenox.pde.ts, &dt));  
+//  printf("before t=%g dt=%g\n", t, dt);
+*/  
   petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
-
-  // this is the "new" dt
+  petsc_call(TSGetTime(feenox.pde.ts, feenox_value_ptr(feenox_special_var(t))));  
   petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
 
+//  printf("after t=%g dt=%g\n", feenox_special_var_value(t), feenox_special_var_value(dt));
+  
 #endif
   
   return FEENOX_OK;
@@ -67,24 +72,18 @@ int feenox_solve_petsc_transient(void) {
 int feenox_setup_ts(TS ts) {
   
   // TODO: the default depends on the physics type
-  if (feenox.pde.ts_type != NULL) {
-    petsc_call(TSSetType(ts, feenox.pde.ts_type));
-  } else {
-    petsc_call(TSSetType(ts, TSBDF));
-//      petsc_call(TSSetType(feenox.pde.ts, TSARKIMEX));
-  }
+  petsc_call(TSSetType(ts, (feenox.pde.ts_type != NULL) ? feenox.pde.ts_type : TSBDF));
 
-  // TODO: choose
   TSAdapt adapt;
   petsc_call(TSGetAdapt(ts, &adapt));
-  petsc_call(TSAdaptSetType(adapt, TSADAPTBASIC));
-
-//  petsc_call(TSAdaptSetStepLimits(adapt, min_dt, max_dt));
+  petsc_call(TSAdaptSetType(adapt, (feenox.pde.ts_adapt_type != NULL) ? feenox.pde.ts_adapt_type : TSADAPTBASIC));
+  // the factors are so we can pass min_dt = max_dt
+  petsc_call(TSAdaptSetStepLimits(adapt, (feenox_special_var_value(min_dt) > 0) ? (1-1e-8)*feenox_special_var_value(min_dt) : PETSC_DEFAULT,
+                                         (feenox_special_var_value(max_dt) > 0) ? (1+1e-8)*feenox_special_var_value(max_dt) : PETSC_DEFAULT));
   
   // TODO: choose
 //  petsc_call(TSSetMaxStepRejections(feenox.pde.ts, 10000));
 //  petsc_call(TSSetMaxSNESFailures(feenox.pde.ts, 1000));
-//  petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_STEPOVER));
 
   // options overwrite
   petsc_call(TSSetFromOptions(ts));    
@@ -121,6 +120,8 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
 //    feenox_call(feenox_dirichlet_set_J(feenox.pde.J));
 //  }  
 
+//  VecView(phi, PETSC_VIEWER_STDOUT_WORLD);
+    
   // compute the residual R(t,phi,phi_dot) = M*(phi_dot)_dirichlet + K*(phi)_dirichlet - b
   
   // TODO: store in a global temporary vector
@@ -143,7 +144,7 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
 
   // set dirichlet bcs on the residual
   feenox_call(feenox_dirichlet_set_r(r, phi));
-
+  
   return FEENOX_OK;
 }
 

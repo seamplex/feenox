@@ -3736,30 +3736,35 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
       
-///kw+PROBLEM+usage [ PC { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]@
+///kw+PROBLEM+usage [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]@
 ///kw+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
 ///kw+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
 ///kw+PROBLEM+detail @          
-///kw+PROBLEM+detail  * List of `PC`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
-    } else if (strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
+///kw+PROBLEM+detail  * List of `PRECONDITIONER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
+    } else if (strcasecmp(token, "PRECONDITIONER") == 0 || strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.pc_type));
 
-///kw+PROBLEM+usage [ KSP { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
-///kw+PROBLEM+detail  * List of `KSP`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
-    } else if (strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
+///kw+PROBLEM+usage [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
+///kw+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
+    } else if (strcasecmp(token, "LINEAR_SOLVER") == 0 || strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ksp_type));
           
-///kw+PROBLEM+usage [ SNES_TYPE { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
-///kw+PROBLEM+detail  * List of `SNES`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
+///kw+PROBLEM+usage [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
+///kw+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
 ///kw+PROBLEM+detail @
-        } else if (strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
+        } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
-///kw+PROBLEM+usage [ TS { bdf | beuler | arkimex | rosw | glle | ... } ]@
-///kw+PROBLEM+detail  * List of `TS`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
-    } else if (strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {
+///kw+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
+///kw+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
+    } else if (strcasecmp(token, "TRANSIENT_SOLVER") == 0 || strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
-          
+
+///kw+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
+///kw+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSAdaptType.html>.
+    } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
+      feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
+      
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
@@ -3792,8 +3797,10 @@ int feenox_parse_problem(void) {
     return FEENOX_ERROR;
   }
   
-  feenox_call(feenox_problem_init_parser_general());
-  feenox_call(feenox_problem_init_parser_particular());
+  if (feenox.pde.petscinit_called == 0) {
+    feenox_call(feenox_problem_init_parser_general());
+    feenox_call(feenox_problem_init_parser_particular());
+  }  
       
   return FEENOX_OK;
   
@@ -3808,7 +3815,12 @@ int feenox_parse_solve_problem(void) {
 ///kw+SOLVE_PROBLEM+detail For transient or quasisstatic problems, that means
 ///kw+SOLVE_PROBLEM+detail advancing one time step.
   
-  feenox_call(feenox_add_instruction(feenox_instruction_solve_problem, NULL));
+  if (feenox.pde.instruction != NULL) {
+    feenox_push_error_message("there was already one SOLVE_PROBLEM instruction");
+    return FEENOX_ERROR;
+  }
+  
+  feenox_check_null(feenox.pde.instruction = feenox_add_instruction_and_get_ptr(&feenox_instruction_solve_problem, NULL));
   
   return FEENOX_OK;
 }

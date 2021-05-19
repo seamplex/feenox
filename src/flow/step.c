@@ -22,8 +22,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_step(int whence) {
-  instruction_t *ip, *first, *last;
+int feenox_step(instruction_t *first, instruction_t *last) {
 
   // set the special variable done to true if we are done so it's available during the step
   if ((int)(feenox_special_var_value(in_static))) {
@@ -37,23 +36,8 @@ int feenox_step(int whence) {
     feenox_special_var_value(done) = 1;
   }  
   
-  switch (whence) {
-    case STEP_BEFORE_DAE:
-      first = feenox.instructions;
-      last = feenox.dae.instruction;
-    break;
-    case STEP_AFTER_DAE:
-      first = feenox.dae.instruction;
-      last = NULL;
-    break;
-    default:
-      first = feenox.instructions;
-      last = NULL;
-    break;
-  }
-
   // sweep the first & last range but minding the conditional blocks
-  ip = first;
+  instruction_t *ip = first;
   while (ip != last) {
     feenox_call(ip->routine(ip->argument));
 

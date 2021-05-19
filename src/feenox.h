@@ -115,12 +115,6 @@
 #define DAE_ALGEBRAIC                      0.0
 #define DAE_DIFFERENTIAL                   1.0
 
-
-#define STEP_ALL                           0
-#define STEP_BEFORE_DAE                    1
-#define STEP_AFTER_DAE                     3
-
-
 // reasonable defaults
 #define DEFAULT_DT                         1.0/16.0
 #define DEFAULT_REL_ERROR                  1e-6
@@ -1304,7 +1298,6 @@ struct feenox_t {
   
   expr_t *time_paths;
   expr_t *time_path_current;
-  double next_time;
 
   
   instruction_t *instructions;
@@ -1543,6 +1536,8 @@ struct feenox_t {
     int (*bc_parse)(bc_data_t *, const char *, const char *);
     int (*solve)(void);
 
+    // instruction pointer to know before/after transient PDE
+    instruction_t *instruction;
     function_t *initial_condition;
 
     struct {
@@ -1730,10 +1725,11 @@ struct feenox_t {
 
     
     // strings con tipos
-    KSPType ksp_type;
     PCType pc_type;
-    TSType ts_type;
+    KSPType ksp_type;
     SNESType snes_type;
+    TSType ts_type;
+    TSAdaptType ts_adapt_type;
 #ifdef HAVE_SLEPC
     PetscInt nev;                      // number of requested modes
     EPSType eps_type;
@@ -1771,10 +1767,11 @@ struct feenox_t {
 // function declarations
 
 // run_standard.c
-int feenox_run_standard(void);
+extern int feenox_run_standard(void);
+extern void feenox_limit_time_step(void);
 
 // step.c
-int feenox_step(int whence);
+extern int feenox_step(instruction_t *first, instruction_t *last);
 
 // init.c
 extern int feenox_initialize(int argc, char **argv);

@@ -135,29 +135,32 @@ int feenox_dirichlet_set_phi(Vec phi) {
   
 }
 
+#define USEZERO
+
 // phi - solution: the values at the BC DOFs are zeroed
 int feenox_dirichlet_set_phi_dot(Vec phi_dot) {
 
+#ifdef USEZERO
   // TODO: put this array somewhere and avoid allocating/freeing each time
   PetscScalar *zero;
   feenox_check_alloc(zero = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
   petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, zero, INSERT_VALUES));
   feenox_free(zero);
-
-/*  
+#else
+  
 //  printf("before\n");
 //  VecView(phi_dot, 	PETSC_VIEWER_STDOUT_WORLD);
   
   PetscScalar *derivative;
   feenox_check_alloc(derivative = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
-  derivative[0] = 100;
-  derivative[1] = 0;  
+  derivative[0] = (feenox_special_var_value(t)<1.0)?0:1234;
+  derivative[1] = 0;
   petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, derivative, INSERT_VALUES));
   feenox_free(derivative);
   
 //  printf("after\n");
 //  VecView(phi_dot, 	PETSC_VIEWER_STDOUT_WORLD);
-*/
+#endif
 
   return FEENOX_OK;
 }

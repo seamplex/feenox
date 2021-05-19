@@ -15,9 +15,7 @@ int feenox_instruction_solve_problem(void *arg) {
     feenox_call(feenox_problem_init_runtime_general());
   }
 
-  // TODO: shouldn't we solve for steady-state if we are in static but no initial condition was given?
   if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_condition != NULL) {
-    
     // fill the petsc vector with the data from the initial condition function of space
     size_t j = 0;
     for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
@@ -25,7 +23,6 @@ int feenox_instruction_solve_problem(void *arg) {
     }
     petsc_call(VecAssemblyBegin(feenox.pde.phi));
     petsc_call(VecAssemblyEnd(feenox.pde.phi));
-    
   } 
   
   feenox_call(feenox.pde.solve());  
