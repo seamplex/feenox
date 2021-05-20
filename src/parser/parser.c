@@ -3618,6 +3618,7 @@ int feenox_parse_problem(void) {
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
       feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
       feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
+      feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_dirichlet;
 
 ///kw+PROBLEM+usage modal
 ///kw+PROBLEM+usage ]@
