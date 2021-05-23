@@ -32,8 +32,9 @@ int feenox_solve_petsc_linear(void) {
 //  time_checkpoint(solve_begin);
   // create a KSP object if needed
   if (feenox.pde.ksp == NULL) {
+//    feenox_check_alloc(feenox.pde.K_bc = feenox_create_matrix("K_bc"));
+//    petsc_call(MatDuplicate(feenox.pde.K, MAT_SHARE_NONZERO_PATTERN, &feenox.pde.K_bc))
     petsc_call(KSPCreate(PETSC_COMM_WORLD, &feenox.pde.ksp));
-    petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K, feenox.pde.K));
     
     // set the monitor for the ascii progress
     if (feenox.pde.progress_ascii == PETSC_TRUE) {  
@@ -50,6 +51,7 @@ int feenox_solve_petsc_linear(void) {
   feenox_call(feenox_dirichlet_eval());
   feenox_call(feenox_dirichlet_set_K());  
 //  time_checkpoint(build_end);
+  petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K_bc, feenox.pde.K_bc));
   
   // try to use the solution as the initial guess (it already has Dirichlet BCs
   // but in quasi-static it has the previous solution which should be similar)
@@ -62,7 +64,7 @@ int feenox_solve_petsc_linear(void) {
   
   
   // do the work!
-  petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b, feenox.pde.phi));
+  petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
   
   // check for convergence
   petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));

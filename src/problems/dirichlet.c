@@ -85,7 +85,8 @@ int feenox_dirichlet_eval(void) {
 #ifdef HAVE_PETSC
 // K - stiffness matrix: needs a one in the diagonal and the value in b and keep symmetry
 // b - RHS: needs to be updated when modifying K
-//int feenox_dirichlet_set_K(Mat K, Vec b) {
+// this is called only when solving an explicit KSP so it takes
+// K and b and writes K_bc and b_bc
 int feenox_dirichlet_set_K(void) {
   
 /*  
@@ -104,15 +105,28 @@ int feenox_dirichlet_set_K(void) {
       feenox_call(feenox_assembly());
     }  
   }
-*/    
+*/
+  
+  if (feenox.pde.K_bc == NULL) {
+    petsc_call(MatDuplicate(feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.K_bc));
+  } else {
+    petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
+  }
+  
+  if (feenox.pde.b_bc == NULL) {
+    petsc_call(VecDuplicate(feenox.pde.b, &feenox.pde.b_bc));
+  }
+  petsc_call(VecCopy(feenox.pde.b, feenox.pde.b_bc));
+  
   // this vector holds the dirichlet values and is used to re-write
   // the actual rhs vector b in order to keep the symmetry of K
   Vec rhs;
   petsc_call(MatCreateVecs(feenox.pde.K, NULL, &rhs));
   petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
+  
   // TODO: scale up the diagonal!
   // see alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
-  petsc_call(MatZeroRowsColumns(feenox.pde.K, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b));
+  petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b_bc));
   petsc_call(VecDestroy(&rhs));
   
   return FEENOX_OK;

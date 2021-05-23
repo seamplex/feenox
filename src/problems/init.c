@@ -516,7 +516,7 @@ int feenox_problem_init_runtime_general(void) {
   feenox.pde.size_local = feenox.pde.dofs * feenox.pde.nodes_local;
   
   // the global stiffnes matrix
-  feenox.pde.K = feenox_create_matrix("K");
+  feenox_check_alloc(feenox.pde.K = feenox_create_matrix("K"));
   
   // the solution (unknown) vector
   feenox.pde.phi = feenox_create_vector("phi");
@@ -530,11 +530,11 @@ int feenox_problem_init_runtime_general(void) {
   
   // the mass matrix for modal or heat transient
   if (feenox.pde.has_mass) {
-    feenox.pde.M = feenox_create_matrix("M");
+    feenox_check_alloc(feenox.pde.M = feenox_create_matrix("M"));
   }
   
   if (feenox.pde.has_jacobian) {
-    feenox.pde.J = feenox_create_matrix("J");
+    feenox_check_alloc(feenox.pde.J = feenox_create_matrix("J"));
   }
   
   // ask for the local ownership range
