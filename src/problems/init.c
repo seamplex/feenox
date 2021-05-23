@@ -501,12 +501,13 @@ int feenox_problem_init_runtime_general(void) {
 
 
   // allocate global petsc objects
-  int width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
-
   if (feenox.pde.global_size == 0) {
     feenox_push_error_message("internal error, problem init did not set global size");
     return FEENOX_ERROR;
   }
+  
+  // TODO: choose width from input
+  feenox.pde.width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
   
   // ask how many local nodes we own
   feenox.pde.nodes_local = PETSC_DECIDE;
@@ -515,70 +516,25 @@ int feenox_problem_init_runtime_general(void) {
   feenox.pde.size_local = feenox.pde.dofs * feenox.pde.nodes_local;
   
   // the global stiffnes matrix
-  petsc_call(MatCreate(PETSC_COMM_WORLD, &feenox.pde.K));
-  petsc_call(PetscObjectSetName((PetscObject)feenox.pde.K, "K"));
-  petsc_call(MatSetSizes(feenox.pde.K, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
-  petsc_call(MatSetFromOptions(feenox.pde.K));
-  petsc_call(MatMPIAIJSetPreallocation(feenox.pde.K, width, PETSC_NULL, width, PETSC_NULL));
-  petsc_call(MatSeqAIJSetPreallocation(feenox.pde.K, width, PETSC_NULL));
-  petsc_call(MatSetOption(feenox.pde.K, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
-
-  if (feenox.pde.allow_new_nonzeros) {
-    petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
-  }  
+  feenox.pde.K = feenox_create_matrix("K");
   
-  if (feenox.pde.dofs > 1) {
-    petsc_call(MatSetBlockSize(feenox.pde.K, feenox.pde.dofs));
-  }
-
   // the solution (unknown) vector
-  petsc_call(MatCreateVecs(feenox.pde.K, &feenox.pde.phi, NULL));
-  petsc_call(PetscObjectSetName((PetscObject)feenox.pde.phi, "phi"));
-  petsc_call(VecSetFromOptions(feenox.pde.phi));
+  feenox.pde.phi = feenox_create_vector("phi");
   // explicit initial value
   petsc_call(VecSet(feenox.pde.phi, 0));
 
-
+  // the right-hand-side vector
   if (feenox.pde.has_rhs) {
-    // the right-hand-side vector
-    petsc_call(MatCreateVecs(feenox.pde.K, NULL, &feenox.pde.b));
-    petsc_call(PetscObjectSetName((PetscObject)feenox.pde.b, "b"));
-    petsc_call(VecSetFromOptions(feenox.pde.b));
+    feenox.pde.b = feenox_create_vector("b");
   }
   
-  // TODO: use MatDuplicate()?
+  // the mass matrix for modal or heat transient
   if (feenox.pde.has_mass) {
-    // the mass matrix for modal or heat transient
-    petsc_call(MatCreate(PETSC_COMM_WORLD, &feenox.pde.M));
-    petsc_call(PetscObjectSetName((PetscObject)feenox.pde.M, "M"));
-    petsc_call(MatSetSizes(feenox.pde.M, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
-    petsc_call(MatSetFromOptions(feenox.pde.M));
-    petsc_call(MatMPIAIJSetPreallocation(feenox.pde.M, width, PETSC_NULL, width, PETSC_NULL));
-    petsc_call(MatSeqAIJSetPreallocation(feenox.pde.M, width, PETSC_NULL));
-    petsc_call(MatSetOption(feenox.pde.M, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
-    if (feenox.pde.dofs > 1) {
-      petsc_call(MatSetBlockSize(feenox.pde.M, feenox.pde.dofs));
-    }
-    if (feenox.pde.allow_new_nonzeros) {
-      petsc_call(MatSetOption(feenox.pde.M, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
-    }  
+    feenox.pde.M = feenox_create_matrix("M");
   }
   
-  // matdup?
   if (feenox.pde.has_jacobian) {
-    petsc_call(MatCreate(PETSC_COMM_WORLD, &feenox.pde.J));
-    petsc_call(PetscObjectSetName((PetscObject)feenox.pde.J, "J"));
-    petsc_call(MatSetSizes(feenox.pde.J, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
-    petsc_call(MatSetFromOptions(feenox.pde.J));
-    petsc_call(MatMPIAIJSetPreallocation(feenox.pde.J, width, PETSC_NULL, width, PETSC_NULL));
-    petsc_call(MatSeqAIJSetPreallocation(feenox.pde.J, width, PETSC_NULL));
-    petsc_call(MatSetOption(feenox.pde.J, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
-    if (feenox.pde.dofs > 1) {
-      petsc_call(MatSetBlockSize(feenox.pde.J, feenox.pde.dofs));
-    }
-    if (feenox.pde.allow_new_nonzeros) {
-      petsc_call(MatSetOption(feenox.pde.J, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
-    }  
+    feenox.pde.J = feenox_create_matrix("J");
   }
   
   // ask for the local ownership range
@@ -648,6 +604,52 @@ int feenox_problem_init_runtime_general(void) {
 #endif
   
   return FEENOX_OK;
+}
+
+
+Mat feenox_create_matrix(const char *name) {
+  
+  Mat A;
+  petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
+  petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
+  petsc_call_null(MatSetFromOptions(A));
+  petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL, feenox.pde.width, PETSC_NULL));
+  petsc_call_null(MatSeqAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL));
+
+  // this flag needs the matrix type to be set, and we had just set it with setfromoptions   
+  petsc_call_null(MatSetOption(A, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
+
+  if (name != NULL) {
+    petsc_call_null(PetscObjectSetName((PetscObject)(A), name));
+  }
+  
+  if (feenox.pde.allow_new_nonzeros) {
+    petsc_call_null(MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
+  }  
+  
+  if (feenox.pde.dofs > 1) {
+    petsc_call_null(MatSetBlockSize(A, feenox.pde.dofs));
+  }  
+
+  return A;  
+}
+
+Vec feenox_create_vector(const char *name) {
+  
+  if (feenox.pde.K == NULL) {
+    feenox_push_error_message("stiffness matrix is not created yet");
+    return NULL;
+  }
+  
+  Vec v;
+  petsc_call_null(MatCreateVecs(feenox.pde.K, &v, NULL));
+  petsc_call_null(VecSetFromOptions(v));
+
+  if (name != NULL) {
+    petsc_call_null(PetscObjectSetName((PetscObject)(v), name));
+  }
+  
+  return v;  
 }
 
 /*  

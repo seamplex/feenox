@@ -196,6 +196,7 @@ enum version_type {
 
 #ifdef HAVE_PETSC
  #define petsc_call(s) {PetscErrorCode petsc_err = s; CHKERRQ(petsc_err);}
+ #define petsc_call_null(s) {PetscErrorCode petsc_err = s; if (petsc_err != 0) {return NULL;};}
 #endif
 
 #define feenox_free(p)                  free(p); p = NULL;
@@ -1252,7 +1253,7 @@ struct mesh_write_t {
   int (*write_scalar)(mesh_write_t *, function_t *, field_location_t, char *);
   int (*write_vector)(mesh_write_t *, function_t **, field_location_t, char *);
   
-  // estos dos son para saber si tenemos que cambiar de tipo en VTK
+  // thee two are to know if we have to change the type in VTK
   int point_init;
   int cell_init;
   
@@ -1496,6 +1497,7 @@ struct feenox_t {
   
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
     unsigned int dofs;             // DoFs per node/cell
+    size_t width;                  // number of expected non-zeros per row
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t global_size;            // total number of DoFs
     
@@ -1697,15 +1699,15 @@ struct feenox_t {
 
     // global objects
     Vec phi;       // the unknown (solution) vector
-    Vec b;         // the right-hand side vector with dirichlet BCs
-//    Vec b_nobc;    // idem without dirichlet BCs
+    Vec b;         // the right-hand side vector without dirichlet BCs
+    Vec b_bc;      // idem with dirichlet BCs (for KSP)
     
-    Mat K;     // stiffness matrix (with dirichlet BCs)
-//    Mat K_nobc;  // idem without bcs
-    Mat M;     // mass matrix with dirichlet BCs (just rho for elastic, rho*cp for heat)
-//    Mat M_nobc;  // idem without bcs
+    Mat K;       // stiffness matrix without dirichlet BCs
+    Mat K_bc;    // stiffness matrix with dirichlet BCs (for KSP)
+    Mat M;       // mass matrix (rho for elastic, rho*cp for heat)
     Mat J;       // jacobian for SNES
     Mat J_tran;  // jacobian for TS
+    Mat b_prime; // jacobian of RHS
 //    PetscScalar lambda; // individual eigen value 
   
     PetscScalar *eigenvalue;    // eigenvalue vector
@@ -2057,6 +2059,8 @@ extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function);
 extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
+extern Mat feenox_create_matrix(const char *name);
+extern Vec feenox_create_vector(const char *name); 
 
 
 // bulk.c
