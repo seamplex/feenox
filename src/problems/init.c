@@ -534,7 +534,8 @@ int feenox_problem_init_runtime_general(void) {
   }
   
   if (feenox.pde.has_jacobian) {
-    feenox_check_alloc(feenox.pde.J = feenox_create_matrix("J"));
+    feenox_check_alloc(feenox.pde.JK = feenox_create_matrix("JK"));
+    feenox_check_alloc(feenox.pde.Jb = feenox_create_matrix("Jb"));
   }
   
   // ask for the local ownership range

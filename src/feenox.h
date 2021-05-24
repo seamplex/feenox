@@ -1705,9 +1705,9 @@ struct feenox_t {
     Mat K;       // stiffness matrix without dirichlet BCs
     Mat K_bc;    // stiffness matrix with dirichlet BCs (for KSP)
     Mat M;       // mass matrix (rho for elastic, rho*cp for heat)
-    Mat J;       // jacobian for SNES
+    Mat JK;      // jacobian for stiffness SNES
+    Mat Jb;      // jacobian for rhs SNES
     Mat J_tran;  // jacobian for TS
-    Mat b_prime; // jacobian of RHS
 //    PetscScalar lambda; // individual eigen value 
   
     PetscScalar *eigenvalue;    // eigenvalue vector
@@ -1755,7 +1755,8 @@ struct feenox_t {
     unsigned int elemental_size;  // current size of objects = n_local_nodes * dofs
     gsl_matrix *Ki;               // elementary stiffness matrix
     gsl_matrix *Mi;               // elementary mass matrix
-    gsl_matrix *Ji;               // elementary jacobian matrix
+    gsl_matrix *JKi;              // elementary jacobian for stiffness matrix
+    gsl_matrix *Jbi;              // elementary jacobian for RHS vector
     gsl_vector *bi;               // elementary right-hand side vector
     // TODO: shouldn't this be Hb?
     gsl_vector *Nb;               // teporary vector for weak BCs

@@ -58,9 +58,9 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
       dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
     }
     
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + dkdT*T), this->B[v], this->B[v], 1.0, feenox.pde.Ji);
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + dkdT*T), this->B[v], this->B[v], 1.0, feenox.pde.JKi);
     // mind the negative sign!
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(-dqdT), this->H[v], this->H[v], 1.0, feenox.pde.Ji);
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(-dqdT), this->H[v], this->H[v], 1.0, feenox.pde.Jbi);
   }
 
   // mass matrix Ht*rho*cp*H

@@ -102,7 +102,7 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     double dqdT = feenox_expression_derivative_wrt_function(&bc_data->expr, feenox.pde.solution[0], T);
     // mind the negative sign!
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, -w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Ji);
+    gsl_blas_dgemm(CblasTrans, CblasNoTrans, -w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Jbi);
   }
   
 #endif
