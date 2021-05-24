@@ -1074,10 +1074,9 @@ int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function
     feenox_check_alloc(format = strdup("%ld %g\n"));
   } else {
     if (printf_format[0] == '%') {
-      // TODO: check alloc
-      asprintf(&format, "%%ld %s\n", printf_format);
+      feenox_check_minusone(asprintf(&format, "%%ld %s\n", printf_format));
     } else {
-      asprintf(&format, "%%ld %%%s\n", printf_format);
+      feenox_check_minusone(asprintf(&format, "%%ld %%%s\n", printf_format));
     }  
   }
   
@@ -1171,10 +1170,9 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
       feenox_check_alloc(format = strdup("%ld %g %g %g\n"));
     } else {
       if (printf_format[0] == '%') {
-        // TODO: check alloc
-        asprintf(&format, "%%ld %s %s %s\n", printf_format, printf_format, printf_format);
+        feenox_check_minusone(asprintf(&format, "%%ld %s %s %s\n", printf_format, printf_format, printf_format));
       } else {
-        asprintf(&format, "%%ld %%%s %%%s %%%s\n", printf_format, printf_format, printf_format);
+        feenox_check_minusone(asprintf(&format, "%%ld %%%s %%%s %%%s\n", printf_format, printf_format, printf_format));
       }  
     }
     
@@ -1200,9 +1198,9 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
     } else {
       if (printf_format[0] == '%') {
         // TODO: check alloc
-        asprintf(&format, "%s ", printf_format);
+        feenox_check_minusone(asprintf(&format, "%s ", printf_format));
       } else {
-        asprintf(&format, "%%%s ", printf_format);
+        feenox_check_minusone(asprintf(&format, "%%%s ", printf_format));
       }  
     }
   

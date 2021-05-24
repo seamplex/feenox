@@ -66,7 +66,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *function_name = NULL;
-      asprintf(&function_name, "%s_%s", name, physical_group->name);
+      feenox_check_minusone(asprintf(&function_name, "%s_%s", name, physical_group->name));
       function_t *function = NULL;
       if ((function = feenox_get_function_ptr(function_name)) != NULL) {
         if (function->n_arguments != feenox.pde.dim) {
@@ -125,7 +125,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *var_name = NULL;
-      asprintf(&var_name, "%s_%s", name, physical_group->name);
+      feenox_check_minusone(asprintf(&var_name, "%s_%s", name, physical_group->name));
       var_t *variable = NULL;
       if ((variable = feenox_get_variable_ptr(var_name)) != NULL) {
         if (this->variable == NULL) {
@@ -189,7 +189,7 @@ double feenox_distribution_eval_variable_local(distribution_t *this, const doubl
   
   if (material != this->last_material) {
     char *var_name = NULL;
-    asprintf(&var_name, "%s_%s", this->name, material->name);
+    feenox_check_minusone(asprintf(&var_name, "%s_%s", this->name, material->name));
     if ((this->variable = feenox_get_variable_ptr(var_name)) == NULL) {
       feenox_push_error_message("cannot find variable '%s'", var_name);
       feenox_runtime_error();
@@ -210,7 +210,7 @@ double feenox_distribution_eval_function_local(distribution_t *this, const doubl
   
   if (material != this->last_material) {
     char *function_name = NULL;
-    asprintf(&function_name, "%s_%s", this->name, material->name);
+    feenox_check_minusone(asprintf(&function_name, "%s_%s", this->name, material->name));
     if ((this->function = feenox_get_function_ptr(function_name)) == NULL) {
       feenox_push_error_message("cannot find function '%s'", function_name);
       feenox_runtime_error();
