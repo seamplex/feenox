@@ -812,10 +812,13 @@ double feenox_expression_evaluate_in_string(const char *string) {
 
 // this is a wrapper to compute the derivative of an expression with respect to a function
 double feenox_expression_derivative_wrt_function_gsl_function(double x, void *params) {
-  struct feenox_expression_derivative_wrt_function_params *p = (struct feenox_expression_derivative_wrt_function_params *)params;
+  struct feenox_expression_derivative_params *p = (struct feenox_expression_derivative_params *)params;
+  
   p->function->dummy_for_derivatives = 1;
   p->function->dummy_for_derivatives_value = x;
+  
   double y = feenox_expression_eval(p->expr);
+  
   p->function->dummy_for_derivatives_value = 0;
   p->function->dummy_for_derivatives = 0;
   
@@ -824,7 +827,7 @@ double feenox_expression_derivative_wrt_function_gsl_function(double x, void *pa
 
 double feenox_expression_derivative_wrt_function(expr_t *expr, function_t *function, double x) {
   gsl_function F;
-  struct feenox_expression_derivative_wrt_function_params p;
+  struct feenox_expression_derivative_params p;
   F.function = &feenox_expression_derivative_wrt_function_gsl_function;
   p.expr = expr;
   p.function = function;
@@ -836,6 +839,35 @@ double feenox_expression_derivative_wrt_function(expr_t *expr, function_t *funct
   return result;
 }
 
+// this is a wrapper to compute the derivative of an expression with respect to a function
+double feenox_expression_derivative_wrt_variable_gsl_function(double x, void *params) {
+  struct feenox_expression_derivative_params *p = (struct feenox_expression_derivative_params *)params;
+  
+  // we need to restore the previous value otherwise
+  // if this is time we screw everything up
+  double x_old = feenox_var_value(p->variable);
+  feenox_var_value(p->variable) = x;
+  
+  double y = feenox_expression_eval(p->expr);
+  
+  feenox_var_value(p->variable) = x_old;
+  
+  return y;
+}
+
+double feenox_expression_derivative_wrt_variable(expr_t *expr, var_t *variable, double x) {
+  gsl_function F;
+  struct feenox_expression_derivative_params p;
+  F.function = &feenox_expression_derivative_wrt_variable_gsl_function;
+  p.expr = expr;
+  p.variable = variable;
+  F.params = &p;
+  
+  double result, abserr;
+  gsl_deriv_central(&F, x, DEFAULT_DERIVATIVE_STEP, &result, &abserr); 
+  
+  return result;
+}
 
 // parsea el rango de indices 
 int feenox_parse_range(char *string, const char left_delim, const char middle_delim, const char right_delim, expr_t *a, expr_t *b) {

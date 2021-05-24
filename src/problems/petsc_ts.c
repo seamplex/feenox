@@ -31,8 +31,6 @@ int feenox_solve_petsc_transient(void) {
     petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_tran, feenox.pde.J_tran, fino_ts_jacobian, NULL));
 
     petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
-    petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_var_value(feenox_special_var(end_time))));
-    petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_MATCHSTEP));
 
     // if BCs depend on time we need DAEs
     petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_IMPLICIT));      
@@ -40,25 +38,28 @@ int feenox_solve_petsc_transient(void) {
 //      petsc_call(TSARKIMEXSetFullyImplicit(feenox.pde.ts, PETSC_TRUE)); 
     
     feenox_call(feenox_setup_ts(feenox.pde.ts));
+
+    petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
+    petsc_call(TSSetMaxTime(feenox.pde.ts, 0.0));
+    petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
+    
+    petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_var_value(feenox_special_var(end_time))));
+    petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_MATCHSTEP));
+    
+    return FEENOX_OK;
     
   }
+  
 
   PetscInt ts_steps = 0;
   petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_steps));
   petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_steps+1));
 
   petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
-/*  
-  double t, dt;
-  petsc_call(TSGetTime(feenox.pde.ts, &t));  
-  petsc_call(TSGetTimeStep(feenox.pde.ts, &dt));  
-//  printf("before t=%g dt=%g\n", t, dt);
-*/  
-  petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
+  petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));  
+//  petsc_call(TSStep(feenox.pde.ts));
   petsc_call(TSGetTime(feenox.pde.ts, feenox_value_ptr(feenox_special_var(t))));  
   petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
-
-//  printf("after t=%g dt=%g\n", feenox_special_var_value(t), feenox_special_var_value(dt));
   
 #endif
   
@@ -112,16 +113,14 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
 //  static int count = 0;
   feenox_var_value(feenox_special_var(t)) = t;
 
-//  if (fino.math_type == math_type_nonlinear) {
+  if (feenox.pde.math_type == math_type_nonlinear) {
     // TODO: know when to recompute the matrix or not
     feenox_call(feenox_phi_to_solution(phi, 1));
     feenox_call(feenox_build());
-    feenox_call(feenox_dirichlet_eval());
-//    feenox_call(feenox_dirichlet_set_J(feenox.pde.J));
-//  }  
+  }  
+  // TODO: be smart about this too
+  feenox_call(feenox_dirichlet_eval());
 
-//  VecView(phi, PETSC_VIEWER_STDOUT_WORLD);
-    
   // compute the residual R(t,phi,phi_dot) = M*(phi_dot)_dirichlet + K*(phi)_dirichlet - b
   
   // TODO: store in a global temporary vector
@@ -132,12 +131,12 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
   VecCopy(phi_dot, tmp);
   feenox_call(feenox_dirichlet_set_phi_dot(tmp));
   petsc_call(MatMult(feenox.pde.M, tmp, r));
-
+  
   // set dirichlet BCs on the solution and multiply by K
   VecCopy(phi, tmp);
   feenox_call(feenox_dirichlet_set_phi(tmp));
+
   petsc_call(MatMultAdd(feenox.pde.K, tmp, r, r));
-  
   VecDestroy(&tmp);
   
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));

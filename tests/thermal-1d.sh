@@ -29,5 +29,5 @@ exitifwrong $?
 answerzero thermal-slab-convection-as-heat-nosource.fee
 exitifwrong $?
 
-answerzero thermal-slab-tran.fee 1e-4
+answerzero thermal-slab-transient.fee 1e-4
 exitifwrong $?

@@ -567,8 +567,9 @@ struct function_t {
   UT_hash_handle hh;
 };
 
-struct feenox_expression_derivative_wrt_function_params {
+struct feenox_expression_derivative_params {
   expr_t *expr;
+  var_t *variable;
   function_t *function;
 };
 
@@ -1536,6 +1537,7 @@ struct feenox_t {
     // virtual methods
     int (*problem_init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
+    int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t j, size_t k);
     int (*solve)(void);
 
     // instruction pointer to know before/after transient PDE
@@ -1716,6 +1718,7 @@ struct feenox_t {
     // internal storage of evaluated dirichlet conditions
     PetscInt        *dirichlet_indexes;
     PetscScalar     *dirichlet_values;
+    PetscScalar     *dirichlet_derivatives;
   
     // PETSc's solvers
     TS ts;
@@ -1840,6 +1843,9 @@ extern int feenox_pull_dependencies_functions(function_ll_t **to, function_ll_t 
 
 double feenox_expression_derivative_wrt_function_gsl_function(double x, void *params);
 double feenox_expression_derivative_wrt_function(expr_t *expr, function_t *function, double x);
+
+double feenox_expression_derivative_wrt_variable_gsl_function(double x, void *params);
+double feenox_expression_derivative_wrt_variable(expr_t *expr, var_t *variable, double x);
 
 // dae.c
 extern int feenox_add_time_path(const char *token);

@@ -15,6 +15,7 @@ int feenox_dirichlet_eval(void) {
 
     feenox_check_alloc(feenox.pde.dirichlet_indexes = calloc(n_bcs, sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = calloc(n_bcs, sizeof(PetscScalar)));
+    feenox_check_alloc(feenox.pde.dirichlet_derivatives = calloc(n_bcs, sizeof(PetscScalar)));
   } else {
     // if we are here then we know more or less the number of BCs we need
     n_bcs = feenox.pde.n_dirichlet_rows;
@@ -40,8 +41,6 @@ int feenox_dirichlet_eval(void) {
           DL_FOREACH(bc->bc_datums, bc_data) {
             if (bc_data->type_math == bc_type_math_dirichlet) {
 
-//              printf("BC t = %g\n", feenox_special_var_value(t));
-              
               // if there is a condition we evaluate it now
               if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
 
@@ -49,6 +48,7 @@ int feenox_dirichlet_eval(void) {
                   current_size += n_bcs;
                   feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, current_size * sizeof(PetscInt)));
                   feenox_check_alloc(feenox.pde.dirichlet_values  = realloc(feenox.pde.dirichlet_values,  current_size * sizeof(PetscScalar)));
+                  feenox_check_alloc(feenox.pde.dirichlet_derivatives  = realloc(feenox.pde.dirichlet_derivatives,  current_size * sizeof(PetscScalar)));
                 }
                 
                 // TODO: per-problem virtual methods
@@ -57,7 +57,7 @@ int feenox_dirichlet_eval(void) {
                   feenox_var_value(feenox.mesh.vars.y) = feenox.pde.mesh->node[j].x[1];
                   feenox_var_value(feenox.mesh.vars.z) = feenox.pde.mesh->node[j].x[2];
                 }  
-                feenox_call(feenox_problem_bc_set_thermal_dirichlet(bc_data, j, k));
+                feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j, k));
                 k++;
                 
               }  
@@ -75,6 +75,7 @@ int feenox_dirichlet_eval(void) {
     // if k == 0 this like freeing
     feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.n_dirichlet_rows * sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
+    feenox_check_alloc(feenox.pde.dirichlet_derivatives = realloc(feenox.pde.dirichlet_derivatives, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
   }
 
 #endif
@@ -149,33 +150,12 @@ int feenox_dirichlet_set_phi(Vec phi) {
   
 }
 
-#define USEZERO
+//#define USEZERO
 
 // phi - solution: the values at the BC DOFs are zeroed
 int feenox_dirichlet_set_phi_dot(Vec phi_dot) {
 
-#ifdef USEZERO
-  // TODO: put this array somewhere and avoid allocating/freeing each time
-  PetscScalar *zero;
-  feenox_check_alloc(zero = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
-  petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, zero, INSERT_VALUES));
-  feenox_free(zero);
-#else
-  
-//  printf("before\n");
-//  VecView(phi_dot, 	PETSC_VIEWER_STDOUT_WORLD);
-  
-  PetscScalar *derivative;
-  feenox_check_alloc(derivative = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
-  derivative[0] = (feenox_special_var_value(t)<1.0)?0:1234;
-  derivative[1] = 0;
-  petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, derivative, INSERT_VALUES));
-  feenox_free(derivative);
-  
-//  printf("after\n");
-//  VecView(phi_dot, 	PETSC_VIEWER_STDOUT_WORLD);
-#endif
-
+  petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_derivatives, INSERT_VALUES));
   return FEENOX_OK;
 }
 
