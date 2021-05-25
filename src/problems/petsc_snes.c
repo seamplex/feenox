@@ -166,9 +166,15 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
   MatAssemblyBegin(J_snes, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(J_snes, MAT_FINAL_ASSEMBLY);
   petsc_call(MatCopy(feenox.pde.K, J_snes, DIFFERENT_NONZERO_PATTERN));
+  
+  if (feenox.pde.has_jacobian_K) {
+    petsc_call(MatAXPY(J_snes, +1.0, feenox.pde.JK, DIFFERENT_NONZERO_PATTERN));
+  }  
+  
   if (feenox.pde.has_jacobian_b) {
     petsc_call(MatAXPY(J_snes, -1.0, feenox.pde.Jb, DIFFERENT_NONZERO_PATTERN));
-  }  
+  }
+  
   feenox_call(feenox_dirichlet_set_J(J_snes));
   return FEENOX_OK;
 }
