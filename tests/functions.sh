@@ -50,6 +50,12 @@ checkpetsc() {
 answer() {
   echo -n "${1}... "
   answer=$(${feenox} ${dir}/${1})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
   
   if [ "${answer}" = "${2}" ]; then
     echo "ok"
@@ -66,6 +72,8 @@ answerdiff() {
   echo -n "${1}..."
   base=$(basename ${1} .fee)
   ${feenox} ${dir}/${1} > ${base}.last
+  error=$?
+  
   difference=$(diff -w ${base}.ref ${base}.last)
   if [ -z "${difference}" ]; then
     echo "ok"
@@ -96,6 +104,11 @@ answerfloat() {
 answerzero() {
   echo -n "${1}... "
   answer=$(${feenox} ${dir}/${1})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    return 2
+  fi
 
   if [ -z "${2}" ]; then
     result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")

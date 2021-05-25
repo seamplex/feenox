@@ -16,7 +16,7 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with feenox.  If not, see <https://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
@@ -142,44 +142,77 @@ int feenox_problem_init_parser_general(void) {
 */
   
   
-  // Fino's special variables
-///va+feenox_abstol+name feenox_abstol
-///va+feenox_abstol+detail Absolute tolerance of the linear solver, as passed to PETSc’s
-///va+feenox_abstol+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html)
+///va+ksp_atol+name ksp_atol
+///va+ksp_atol+detail Absolute tolerance of the linear solver, as passed to PETSc’s
+///va+ksp_atol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html)
   feenox.pde.vars.ksp_atol = feenox_define_variable_get_ptr("ksp_atol");
-  // TODO: poner el default automaticamente with PETSC_DEFAULT
-///va+feenox_abstol+detail Default `1e-50`.
-  feenox_var_value(feenox.pde.vars.ksp_atol) = 1e-50;   // igual al de PETSc
+  // TODO: set to PETSC_DEFAULT?
+///va+ksp_atol+detail Default `1e-50`.
+  feenox_var_value(feenox.pde.vars.ksp_atol) = 1e-50;   // same as PETSc
  
-///va+feenox_reltol+name feenox_reltol
-///va+feenox_reltol+detail Relative tolerance of the linear solver,
-///va+feenox_reltol+detail as passed to PETSc’s
-///va+feenox_reltol+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
+///va+ksp_rtol+name ksp_rtol
+///va+ksp_rtol+detail Relative tolerance of the linear solver,
+///va+ksp_rtol+detail as passed to PETSc’s
+///va+ksp_rtol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
 feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
-///va+feenox_reltol+detail Default `1e-6`.
-  feenox_var_value(feenox.pde.vars.ksp_rtol) = 1e-6;    // el de PETSc es 1e-5
+///va+ksp_rtol+detail Default `1e-6`.
+  feenox_var_value(feenox.pde.vars.ksp_rtol) = 1e-6;    // PETSc is 1e-5
   
-///va+feenox_divtol+name feenox_divtol
-///va+feenox_divtol+detail Divergence tolerance,
-///va+feenox_divtol+detail as passed to PETSc’s
-///va+feenox_divtol+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
+///va+ksp_divtol+name ksp_divtol
+///va+ksp_divtol+detail Divergence tolerance,
+///va+ksp_divtol+detail as passed to PETSc’s
+///va+ksp_divtol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
   feenox.pde.vars.ksp_divtol = feenox_define_variable_get_ptr("ksp_divtol");
-///va+feenox_divtol+detail Default `1e+4`.  
-  feenox_var_value(feenox.pde.vars.ksp_divtol) = 1e+4;  // igual al de PETSc
+///va+ksp_divtol+detail Default `1e+4`.  
+  feenox_var_value(feenox.pde.vars.ksp_divtol) = 1e+4;  // same as PETSc
   
-///va+feenox_max_iterations+name feenox_max_iterations
-///va+feenox_max_iterations+detail Number of maximum iterations before diverging,
-///va+feenox_max_iterations+detail as passed to PETSc’s
-///va+feenox_max_iterations+detail [`KSPSetTolerances`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
+///va+ksp_max_it+name ksp_max_it
+///va+ksp_max_it+detail Number of maximum iterations before diverging,
+///va+ksp_max_it+detail as passed to PETSc’s
+///va+ksp_max_it+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
   feenox.pde.vars.ksp_max_it = feenox_define_variable_get_ptr("ksp_max_it");
-///va+feenox_max_iterations+detail Default `10000`.
-  feenox_var_value(feenox.pde.vars.ksp_max_it) = 10000;   // igual al de PETSc
+///va+ksp_max_it+detail Default `10,000`.
+  feenox_var_value(feenox.pde.vars.ksp_max_it) = 10000;   // same as PETSc
 
+
+///va+snes_atol+name snes_atol
+///va+snes_atol+detail Absolute tolerance of the non-linear solver, as passed to PETSc’s
+///va+snes_atol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html)
+  feenox.pde.vars.snes_atol = feenox_define_variable_get_ptr("snes_atol");
+///va+snes_atol+detail Default `1e-50`.
+  feenox_var_value(feenox.pde.vars.snes_atol) = 1e-50;   // same as PETSc
+ 
+///va+snes_rtol+name snes_rtol
+///va+snes_rtol+detail Relative tolerance of the linear solver,
+///va+snes_rtol+detail as passed to PETSc’s
+///va+snes_rtol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
+feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
+///va+feenox_snes_rtol+detail Default `1e-8`.
+  feenox_var_value(feenox.pde.vars.snes_rtol) = 1e-8;    // same as PETSc
+  
+///va+snes_stol+name snes_stol
+///va+snes_stol+detail Convergence tolerance in terms of the norm of the change in the solution between steps,
+///va+snes_stol+detail as passed to PETSc’s
+///va+snes_stol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
+  feenox.pde.vars.snes_stol = feenox_define_variable_get_ptr("snes_stol");
+///va+snes_stol+detail Default `1e-8`.  
+  feenox_var_value(feenox.pde.vars.snes_stol) = 1e-8;  // same as PETSc
+  
+///va+snes_max_it+name snes_max_it
+///va+snes_max_itdetail Number of maximum iterations before diverging,
+///va+snes_max_it+detail as passed to PETSc’s
+///va+snes_max_it+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
+  feenox.pde.vars.snes_max_it = feenox_define_variable_get_ptr("snes_max_it");
+///va+snes_max_it+detail Default `50`.
+  feenox_var_value(feenox.pde.vars.snes_max_it) = 50;   // same as PETSc
+  
+  
+  
 ///va+feenox_gamg_threshold+name feenox_gamg_threshold
 ///va+feenox_gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph for the
-///va+feenox_gamg_threshold+detail [Geometric Algebraic Multigrid Preconditioner](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMG.html)
+///va+feenox_gamg_threshold+detail [Geometric Algebraic Multigrid Preconditioner](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMG.html)
 ///va+feenox_gamg_threshold+detail as passed to PETSc’s
-///va+feenox_gamg_threshold+detail [`PCGAMGSetThreshold`](http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMGSetThreshold.html).
+///va+feenox_gamg_threshold+detail [`PCGAMGSetThreshold`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMGSetThreshold.html).
 ///va+feenox_gamg_threshold+detail A value of 0.0 means keep all nonzero entries in the graph; negative means keep even zero entries in the graph.
   feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("gamg_threshold");
 ///va+feenox_gamg_threshold+detail Default `0.01`.  
@@ -419,8 +452,8 @@ int plugin_init_before_run(void) {
   feenox.pde.spatial_unknowns = 0;
 #ifdef HAVE_PETSC  
   feenox.pde.progress_r0 = 0;
-  feenox.pde.already_built = PETSC_FALSE;
-  feenox.pde.first_build = PETSC_TRUE;
+//  feenox.pde.already_built = PETSC_FALSE;
+//  feenox.pde.first_build = PETSC_TRUE;
 #endif  
 
 //  feenox_call(feenox_problem_free());
@@ -533,8 +566,10 @@ int feenox_problem_init_runtime_general(void) {
     feenox_check_alloc(feenox.pde.M = feenox_create_matrix("M"));
   }
   
-  if (feenox.pde.has_jacobian) {
+  if (feenox.pde.has_jacobian_K) {
     feenox_check_alloc(feenox.pde.JK = feenox_create_matrix("JK"));
+  }
+  if (feenox.pde.has_jacobian_b) {
     feenox_check_alloc(feenox.pde.Jb = feenox_create_matrix("Jb"));
   }
   

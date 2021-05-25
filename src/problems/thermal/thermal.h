@@ -18,12 +18,21 @@ struct thermal_t {
   distribution_t rho;   // density
   distribution_t cp;    // heat capacity
   distribution_t rhocp; // density times heat capacity
+
+#ifdef HAVE_PETSC  
+  PetscBool space_k;
+  PetscBool temperature_k;
   
-  int properties_depend_space;
-  int properties_depend_temperature;
+  PetscBool space_m;
+  PetscBool temperature_m;
   
-  int bcs_depend_space;
-  int bcs_depend_temperature;
+  PetscBool space_q;
+  PetscBool temperature_q;
+
+  PetscBool space_bc;
+  PetscBool temperature_bc;
+#endif
+  
 };  
 
 

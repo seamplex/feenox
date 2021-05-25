@@ -12,7 +12,7 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double zero[3] = {0, 0, 0};
   double *x = zero;
-  if (thermal.properties_depend_space || thermal.q.space_dependent) {
+  if (thermal.space_k || thermal.space_q || thermal.space_m) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];
   }
@@ -42,27 +42,23 @@ int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigne
   }
   
   if (feenox.pde.has_jacobian) {
-
-    // TODO: this term does not work well    
-    double dkdT = 0;
     double T = feenox_function_eval(feenox.pde.solution[0], x);
-    if (thermal.k.non_linear) {
+    
+    if (thermal.temperature_k) {
       // TODO: this might now work if the distribution is not given as an
       //       algebraic expression but as a pointwise function of T
       //       (but it works if using a property!)
-      dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
+      double dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dkdT*T, this->B[v], this->B[v], 1.0, feenox.pde.JKi);
     }
-    
-    double dqdT = 0;
-    if (thermal.q.non_linear) {
-      dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
-    }
-    
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(k + dkdT*T), this->B[v], this->B[v], 1.0, feenox.pde.JKi);
-    // mind the negative sign!
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*(-dqdT), this->H[v], this->H[v], 1.0, feenox.pde.Jbi);
-  }
 
+    if (thermal.temperature_q) {
+      double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
+      // mind the positive sign!
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, this->H[v], this->H[v], 1.0, feenox.pde.Jbi);
+    }  
+  }
+    
   // mass matrix Ht*rho*cp*H
   if (feenox.pde.has_mass) {
     double rhocp = 0;

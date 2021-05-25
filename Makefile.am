@@ -24,5 +24,7 @@ TESTS = tests/abort.sh \
         tests/thermal-2d.sh \
         tests/trig.sh
 
+XFAIL_TESTS = tests/abort.sh         
+
 all-local:
 	cp -r src/feenox$(EXEEXT) .

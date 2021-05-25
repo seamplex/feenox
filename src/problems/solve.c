@@ -9,7 +9,7 @@ int feenox_instruction_solve_problem(void *arg) {
   if (feenox.pde.spatial_unknowns == 0) {
     feenox_call(feenox.pde.problem_init_runtime_particular());
     if (feenox.pde.solve == NULL) {
-      feenox_push_error_message("internal error, undefined solver");
+      feenox_push_error_message("internal mismatch, undefined solver");
       return FEENOX_ERROR;
     }
     feenox_call(feenox_problem_init_runtime_general());
@@ -21,10 +21,13 @@ int feenox_instruction_solve_problem(void *arg) {
     for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
       petsc_call(VecSetValue(feenox.pde.phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(feenox.pde.initial_condition, feenox.pde.mesh->node[j].x), INSERT_VALUES));
     }
+    // TODO: add prefixes to allow -vec_view
     petsc_call(VecAssemblyBegin(feenox.pde.phi));
     petsc_call(VecAssemblyEnd(feenox.pde.phi));
   } 
   
+  // solve the problem with this per-mathematics virtual method
+  // (which in turn calls a per-physics matrix & vector builds)
   feenox_call(feenox.pde.solve());  
   // TODO: how to do this in parallel?
   feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));

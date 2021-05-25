@@ -105,17 +105,18 @@ int feenox_problem_init_runtime_thermal(void) {
   thermal.cp.non_linear         = feenox_expression_depends_on_function(thermal.cp.dependency_functions,     feenox.pde.solution[0]);
   thermal.rhocp.non_linear      = feenox_expression_depends_on_function(thermal.rhocp.dependency_functions,  feenox.pde.solution[0]);
   
-  thermal.properties_depend_space = thermal.k.space_dependent     ||
-                                    thermal.kappa.space_dependent ||
-                                    thermal.rho.space_dependent   ||
-                                    thermal.cp.space_dependent    ||
-                                    thermal.rhocp.space_dependent;
+  thermal.space_k = thermal.k.space_dependent;
+  thermal.space_q = thermal.q.space_dependent;
+  thermal.space_m = thermal.kappa.space_dependent ||
+                    thermal.rho.space_dependent   ||
+                    thermal.cp.space_dependent    ||
+                    thermal.rhocp.space_dependent;
   
-  thermal.properties_depend_temperature = feenox_expression_depends_on_function(thermal.k.dependency_functions,     feenox.pde.solution[0]) ||
-                                          feenox_expression_depends_on_function(thermal.kappa.dependency_functions, feenox.pde.solution[0]) ||
-                                          feenox_expression_depends_on_function(thermal.rho.dependency_functions,   feenox.pde.solution[0]) ||
-                                          feenox_expression_depends_on_function(thermal.cp.dependency_functions,    feenox.pde.solution[0]) ||
-                                          feenox_expression_depends_on_function(thermal.rhocp.dependency_functions, feenox.pde.solution[0]);
+  thermal.temperature_k = feenox_expression_depends_on_function(thermal.k.dependency_functions,     feenox.pde.solution[0]);
+  thermal.temperature_m = feenox_expression_depends_on_function(thermal.kappa.dependency_functions, feenox.pde.solution[0]) ||
+                          feenox_expression_depends_on_function(thermal.rho.dependency_functions,   feenox.pde.solution[0]) ||
+                          feenox_expression_depends_on_function(thermal.cp.dependency_functions,    feenox.pde.solution[0]) ||
+                          feenox_expression_depends_on_function(thermal.rhocp.dependency_functions, feenox.pde.solution[0]);
   
   // check BCs are consistent
   bc_t *bc = NULL;
@@ -166,18 +167,19 @@ int feenox_problem_init_runtime_thermal(void) {
       }
       
       bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
-      thermal.bcs_depend_space |= bc_data->space_dependent;
+      thermal.space_bc |= bc_data->space_dependent;
       
       bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
-      thermal.bcs_depend_temperature |= bc_data->nonlinear;
+      thermal.temperature_bc |= bc_data->nonlinear;
       
     }
   }
   
   if (feenox.pde.math_type == math_type_automatic) {
-    feenox.pde.math_type = (thermal.properties_depend_temperature == 0 &&
-                                              thermal.q.non_linear == 0 &&
-                                   thermal.bcs_depend_temperature == 0) ? math_type_linear : math_type_nonlinear;
+    feenox.pde.math_type = (thermal.temperature_k == 0 &&
+                            thermal.temperature_m == 0 &&
+                            thermal.temperature_q == 0 &&
+                           thermal.temperature_bc == 0) ? math_type_linear : math_type_nonlinear;
   }
   
   // TODO: check for transient_type
@@ -187,9 +189,15 @@ int feenox_problem_init_runtime_thermal(void) {
   
   feenox.pde.has_stiffness = PETSC_TRUE;
   feenox.pde.has_rhs = PETSC_TRUE;
-  feenox.pde.has_jacobian = (feenox.pde.math_type == math_type_nonlinear) ? PETSC_TRUE : PETSC_FALSE;
-  feenox.pde.K_is_symmetric = PETSC_TRUE;
-  feenox.pde.M_is_symmetric = PETSC_TRUE;
+  // has_mass is above
+  
+  feenox.pde.has_jacobian_K = thermal.temperature_k;
+  feenox.pde.has_jacobian_M = thermal.temperature_m;
+  feenox.pde.has_jacobian_b = (thermal.temperature_q || thermal.temperature_bc);
+  feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
+  
+  feenox.pde.symmetric_K = PETSC_TRUE;
+  feenox.pde.symmetric_M = PETSC_TRUE;
   
 #endif  
   return FEENOX_OK;

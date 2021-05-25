@@ -1093,10 +1093,12 @@ struct distribution_t  {
   var_ll_t *dependency_variables;
   function_ll_t *dependency_functions;
   
+#ifdef HAVE_PETSC  
   // does this distribution depend on space?
-  int space_dependent;
+  PetscBool space_dependent;
   // does this distribution depend on the solution itself?
-  int non_linear; 
+  PetscBool non_linear; 
+#endif
   
   // virtual method to evaluate at a point
   double (*eval)(distribution_t *this, const double *x, material_t *material);
@@ -1549,6 +1551,11 @@ struct feenox_t {
       var_t *ksp_rtol;
       var_t *ksp_divtol;
       var_t *ksp_max_it;
+
+      var_t *snes_atol;
+      var_t *snes_rtol;
+      var_t *snes_stol;
+      var_t *snes_max_it;
       
       var_t *gamg_threshold;
       
@@ -1685,13 +1692,16 @@ struct feenox_t {
     PetscBool has_mass;
     PetscBool has_rhs;
     PetscBool has_jacobian;
-    PetscBool K_is_symmetric;
-    PetscBool M_is_symmetric;
+    PetscBool has_jacobian_K;
+    PetscBool has_jacobian_M;
+    PetscBool has_jacobian_b;
+    PetscBool symmetric_K;
+    PetscBool symmetric_M;
 
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
-    PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
-    PetscBool already_built;       // avoids building twice in the first step of SNES
+//    PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
+//    PetscBool already_built;       // avoids building twice in the first step of SNES
 
     // stuff for mpi parallelization
     PetscInt nodes_local, size_local;
@@ -1701,14 +1711,18 @@ struct feenox_t {
 
     // global objects
     Vec phi;       // the unknown (solution) vector
+    Vec phi_bc;    // the unknown (solution) vector with dirichlet BCs
     Vec b;         // the right-hand side vector without dirichlet BCs
     Vec b_bc;      // idem with dirichlet BCs (for KSP)
+    Vec r;         // residual vector for SNES and TS
     
     Mat K;       // stiffness matrix without dirichlet BCs
     Mat K_bc;    // stiffness matrix with dirichlet BCs (for KSP)
     Mat M;       // mass matrix (rho for elastic, rho*cp for heat)
-    Mat JK;      // jacobian for stiffness SNES
-    Mat Jb;      // jacobian for rhs SNES
+    Mat JK;      // jacobian for stiffness matrix = K'*phi
+    Mat JM;      // jacobian for mass matrix = M'*phi_dot
+    Mat Jb;      // jacobian for rhs vector = dq/dT for both volumetric and BCs
+    Mat J_snes;  // jacobian for SNES
     Mat J_tran;  // jacobian for TS
 //    PetscScalar lambda; // individual eigen value 
   

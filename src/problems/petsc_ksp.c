@@ -159,14 +159,17 @@ int feenox_setup_ksp(KSP ksp) {
   }
 
   
-  if (feenox.pde.K_is_symmetric == PETSC_TRUE) {
+  if (feenox.pde.symmetric_K == PETSC_TRUE) {
     // K is symmetric. Set symmetric flag to enable ICC/Cholesky preconditioner
     // TODO: this is K for ksp but J for snes
     if (feenox.pde.has_stiffness) {
       petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
     }  
-    if (feenox.pde.has_jacobian) {
-      petsc_call(MatSetOption(feenox.pde.J, MAT_SYMMETRIC, PETSC_TRUE));  
+    if (feenox.pde.has_jacobian_K) {
+      petsc_call(MatSetOption(feenox.pde.JK, MAT_SYMMETRIC, PETSC_TRUE));  
+    }
+    if (feenox.pde.has_jacobian_b) {
+      petsc_call(MatSetOption(feenox.pde.Jb, MAT_SYMMETRIC, PETSC_TRUE));  
     }  
   }  
   

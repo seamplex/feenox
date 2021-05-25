@@ -27,7 +27,7 @@ int feenox_solve_petsc_transient(void) {
     if (feenox.pde.initial_condition != NULL) {
       feenox_call(feenox_build());
     }  
-    petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.J, MAT_COPY_VALUES, &feenox.pde.J_tran));
+    petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.JK, MAT_COPY_VALUES, &feenox.pde.J_tran));
     petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_tran, feenox.pde.J_tran, fino_ts_jacobian, NULL));
 
     petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
