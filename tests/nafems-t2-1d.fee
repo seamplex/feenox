@@ -2,12 +2,12 @@
 READ_MESH slab-1d-0.1m.msh DIMENSIONS 1
 PROBLEM heat
 
-l = 0.1      # slab length in meters (used in the mesh)
+l = 0.1       # slab length in meters (comes from the mesh)
 
 k = 55.6                # W/(m K)
 # sigma = 5.67e-8       # W m^2 / K^4 as in the problem
-sigma = 5.670374419e-8  # as in wikipedia
-e = 0.98
+sigma = 5.670374419e-8  # W m^2 / K^4 as in wikipedia
+e = 0.98      # non-dimensional
 T0 = 1000     # K
 Tinf = 300    # K
 

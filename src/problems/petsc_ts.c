@@ -51,9 +51,9 @@ int feenox_solve_petsc_transient(void) {
   }
   
 
-  PetscInt ts_steps = 0;
-  petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_steps));
-  petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_steps+1));
+  PetscInt ts_step = 0;
+  petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_step));
+  petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_step+1));
 
   petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
   petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));  

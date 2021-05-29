@@ -67,8 +67,8 @@ int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
 
   // TODO: if nprocs == 1 then we already have the full vector
   petsc_call(VecScatterCreateToAll(phi, &vscat, &phi_full));
-  petsc_call(VecScatterBegin(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD););
-  petsc_call(VecScatterEnd(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD););
+  petsc_call(VecScatterBegin(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD));
+  petsc_call(VecScatterEnd(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD));
 
   petsc_call(VecGetLocalSize(phi_full, &nlocal));
   if (nlocal != feenox.pde.global_size) {

@@ -90,7 +90,7 @@ int feenox_dirichlet_eval(void) {
 // K and b and writes K_bc and b_bc
 int feenox_dirichlet_set_K(void) {
   
-/*  
+/*
   // sometimes there are hanging nodes with no associated volumes
   // this can trigger zeros on the diagonal and MatZeroRowsColumns complains
   // TODO: execute this block only if a special flag is set, i.e. PROBLEM HANDLE_HANGING_NODES
@@ -98,12 +98,13 @@ int feenox_dirichlet_set_K(void) {
   PetscScalar diag = 0;
   PetscInt k = 0;
   for (k = feenox.pde.first_row; k < feenox.pde.last_row; k++) {
-    petsc_call(MatGetValues(K, 1, &k, 1, &k, &diag));
+    petsc_call(MatGetValues(feenox.pde.K, 1, &k, 1, &k, &diag));
     if (diag == 0) {
-      petsc_call(MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
-      petsc_call(MatSetValue(K, k, k, 1.0, INSERT_VALUES));
-      petsc_call(MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
-      feenox_call(feenox_assembly());
+      printf("hola pianola!");
+      petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
+      petsc_call(MatSetValue(feenox.pde.K, k, k, 1.0, INSERT_VALUES));
+      petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
+      feenox_call(feenox_build_assembly());
     }  
   }
 */

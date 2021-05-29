@@ -87,6 +87,7 @@
 
  * check when the matrices do not need to be rebuilt
  * keep K_original and K_with_bc or whatever?
+ * support CGNS formats
  
 ## Heat
 

@@ -48,7 +48,7 @@ checkpetsc() {
 
 
 answer() {
-  echo -n "${1}... "
+  echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})
   error=$?
   
@@ -69,7 +69,7 @@ answer() {
 }
 
 answerdiff() {
-  echo -n "${1}..."
+  echo -n "${1} ... "
   base=$(basename ${1} .fee)
   ${feenox} ${dir}/${1} > ${base}.last
   error=$?
@@ -87,7 +87,7 @@ answerdiff() {
 }
 
 answerfloat() {
-  echo -n "${1}... "
+  echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})
 
   if [ "$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${2}" "${3}")" = "1" ]; then
@@ -102,7 +102,7 @@ answerfloat() {
 }
 
 answerzero() {
-  echo -n "${1}... "
+  echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})
   error=$?
   
@@ -128,7 +128,7 @@ answerzero() {
 
 
 answer1() {
-  echo -n "${1} ${2}... "
+  echo -n "${1} ${2} ... "
   answer=$(${feenox} ${dir}/${1} ${2})
   
   if [ "${answer}" = "${3}" ]; then
@@ -144,7 +144,7 @@ answer1() {
 
 
 answerfloat() {
-  echo -n "${1}... "
+  echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})
 
   if [ "$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${2}" "${3}")" = "1" ]; then
@@ -160,7 +160,7 @@ answerfloat() {
 
 
 answer1float() {
-  echo -n "${1} ${2}... "
+  echo -n "${1} ${2} ... "
   answer=$(${feenox} ${dir}/${1} ${2})
   
   if [ -z "${4}" ]; then
@@ -181,7 +181,7 @@ answer1float() {
 }
 
 answer1zero() {
-  echo -n "${1} ${2}... "
+  echo -n "${1} ${2} ... "
   answer=$(${feenox} ${dir}/${1} ${2})
 
   if [ -z "${3}" ]; then
