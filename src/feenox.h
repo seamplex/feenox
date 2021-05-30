@@ -1952,7 +1952,7 @@ extern int feenox_vector_set(vector_t *this, const size_t i, double value);
 
 // function.c
 extern int feenox_function_init(function_t *this);
-extern void feenox_set_function_args(function_t *this, double *x);
+extern void feenox_function_set_args(function_t *this, double *x);
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
 

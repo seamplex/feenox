@@ -261,7 +261,7 @@ int feenox_instruction_print_function(void *arg) {
           fprintf(print_function->file->pointer, print_function->format, feenox_function_eval(print_token->function, x));
           
         } else if (print_token->expression.items != NULL) {
-          feenox_set_function_args(print_function->first_function, x);
+          feenox_function_set_args(print_function->first_function, x);
           fprintf(print_function->file->pointer, print_function->format, feenox_expression_eval(&print_token->expression));
           
         }
@@ -350,7 +350,7 @@ int feenox_instruction_print_function(void *arg) {
             }
 
           } else if (print_token->expression.items != NULL) {
-            feenox_set_function_args(print_function->first_function, x);
+            feenox_function_set_args(print_function->first_function, x);
             fprintf(print_function->file->pointer, print_function->format, feenox_expression_eval(&print_token->expression));
 
           }

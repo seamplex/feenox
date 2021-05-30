@@ -83,7 +83,7 @@ int feenox_function_set_argument_variable(const char *name, unsigned int i, cons
 
 int feenox_function_set_expression(const char *name, const char *expression) {
   
-  function_t *function;
+  function_t *function = NULL;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
     feenox_push_error_message("unkown function '%s'", name);
     return FEENOX_ERROR;
@@ -97,7 +97,7 @@ int feenox_function_set_expression(const char *name, const char *expression) {
 
 
 // set the variables that are a function's argument equal to the vector x
-void feenox_set_function_args(function_t *this, double *x) {
+void feenox_function_set_args(function_t *this, double *x) {
   int i;
   
   if (this->var_argument != NULL) {

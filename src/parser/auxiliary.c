@@ -130,6 +130,8 @@ int feenox_read_line(FILE *file_ptr) {
         }
       } else if (!in_comment && c != '\n' && c != '\r' && c != EOF) {
         feenox_parser.line[i++] = c;
+      } else if (in_brackets && c == '\n') {
+        feenox_parser.line[i++] = ' ';
       }
     }
 

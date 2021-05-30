@@ -1941,16 +1941,30 @@ int feenox_parse_function(void) {
 
   char *name = NULL;
   feenox_call(feenox_add_function_from_string(token, &name));
+  function_t *function = NULL;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }      
   
-  while ((token = feenox_get_next_token(NULL)) != NULL && strcasecmp(token, "DATA") != 0) {
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
 ///kw+FUNCTION+usage {
-///kw+FUNCTION+usage [ = <expr> |
+///kw+FUNCTION+usage = <expr> |
 ///kw+FUNCTION+detail If the function is given as an algebraic expression, the short-hand operator `:=` can be used.
 ///kw+FUNCTION+detail That is to say, `FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`.
 
     if (strcasecmp(token, "=") == 0 || strcasecmp(token, ":=") == 0) {
       feenox_call(feenox_function_set_expression(name, token + ((token[0] == ':')? 3 : 2)));
       break;    // we are done with the while() over the line
+      
+///kw+FUNCTION+usage DATA <num_1> <num_2> ... <num_N> }
+///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`.
+///kw+FUNCTION+detail This should be the last keyword of the line, followed by $N=k\cdot (n+1)$ expresions
+///kw+FUNCTION+detail giving\ $k$ definition points: $n$ arguments and the value of the function.
+///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization.
+    } else if (strcasecmp(token, "DATA") == 0) {
+      
+      feenox_call(feenox_parse_function_data(function));
     }
   }
 
@@ -2214,15 +2228,16 @@ int feenox_parse_function(void) {
       return FEENOX_ERROR;
     }
   }
+*/
 
-
+/*  
   // si no nos dieron expresion algebraica, hay que leer e interpolar datos
   if (function->algebraic_expression.n_tokens == 0) {
     if (function->type == type_pointwise_file) {
 
       // si nos dieron un archivo, leemos de ahi
       FILE *data_file;
-      char data_line[BUFFER_SIZE*BUFFER_SIZE];
+      char data_line[BUFFER_LINE_SIZE];
       int n_columns;
 
       if ((data_file = feenox_fopen(function->data_file, "r")) == NULL) {
@@ -2302,106 +2317,8 @@ int feenox_parse_function(void) {
       fclose(data_file);
 
 
-///kw+FUNCTION+usage [ DATA <num_1> <num_2> ... <num_N> ]
-///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`. This should be the last keyword of the line, followed by $N=k\cdot (n+1)$ expresions giving $k$ definition points: $n$ arguments and the value of the function.
-///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization. See the examples.
-    } else if (token != NULL && strcasecmp(token, "DATA") == 0) {
-      // leemos del mismo archivo de entrada
-      dummy = token + strlen(token)+1;
-
-      // nos dieron los datos hard en el feenox_input
-      backup1 = malloc(strlen(dummy)+8);
-      snprintf(backup1, strlen(dummy)+8, "dummy %s", dummy);
-      backup2 = malloc(strlen(dummy)+8);
-      snprintf(backup2, strlen(dummy)+8, "dummy %s", dummy);
-
-      // contamos cuanta informacion hay
-      function->data_size = 0;
-      if ((token = feenox_get_next_token(backup1)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        function->data_size++;
-      }
-      if (function->data_size % (nargs+1) != 0) {
-        feenox_push_error_message("data mismatch for function '%s'", function->name);
-        return FEENOX_ERROR;
-      }
-      function->data_size /= (nargs+1);
-
-      function->data_argument = calloc(nargs, sizeof(double *));
-      function->data_argument_alloced = 1;
-      for (i = 0; i < nargs; i++) {
-        function->data_argument[i] = calloc(function->data_size, sizeof(double));
-      }
-
-      function->data_value = calloc(function->data_size, sizeof(double));
-
-      // leemos la informacion
-      if ((token = feenox_get_next_token(backup2)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      for (i = 0; i < function->data_size; i++) {
-        // argumentos
-        for (j = 0; j < nargs; j++) {
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            return FEENOX_ERROR;
-          }
-          function->data_argument[j][i] = feenox_evaluate_expression_in_string(token);
-
-          //  para poder meter steps
-          if (nargs == 1 && i >= 2 && function->data_argument[j][i] == function->data_argument[j][i-1]) {
-              function->data_argument[j][i] += 0.005*(function->data_argument[j][i-1]-function->data_argument[j][i-2]);
-            }
-          }
-
-        // valor
-        if ((token = feenox_get_next_token(NULL)) == NULL) {
-          return FEENOX_ERROR;
-        }
-        function->data_value[i] = feenox_evaluate_expression_in_string(token);
-      }
-
-      feenox_free(backup2);
-      feenox_free(backup1);
-    }
-
-
-    // creamos tres variables (constantes) extra: func_a, func_b y func_n
-    if (nargs == 1) {
-      var_t *dummy_var;
-      char *dummy_aux = malloc(strlen(function->name) + 4);
-
-      snprintf(dummy_aux, strlen(function->name) + 4, "%s_a", function->name);
-      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      if (function->data_size != 0) {
-        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
-      }
-
-      snprintf(dummy_aux, strlen(function->name) + 4, "%s_b", function->name);
-      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      if (function->data_size != 0) {
-        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
-      }
-
-      snprintf(dummy_aux, strlen(function->name) + 4, "%s_n", function->name);
-      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      if (function->data_size != 0) {
-        feenox_value(dummy_var) = (double)function->data_size;
-      }
-
-      feenox_free(dummy_aux);
-    }
-
-  }
-*/
-
+ */
+  
   feenox_free(name);
   
   return FEENOX_OK;
@@ -3825,3 +3742,127 @@ int feenox_parse_solve_problem(void) {
   
   return FEENOX_OK;
 }
+
+
+int feenox_parse_function_data(function_t *function) {
+
+  size_t size0 = 4096/sizeof(double);
+  size_t size = size0;
+  double *buffer = NULL;
+  feenox_check_alloc(buffer = malloc(size * sizeof(double)));
+  
+  
+  char *token = NULL;
+  size_t n = 0;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    if (n == size) {
+      size += size0;
+      feenox_check_alloc(buffer = realloc(buffer, size*sizeof(double)));
+    }
+    
+    expr_t *expr = NULL;
+    feenox_check_alloc(expr = calloc(1, sizeof(expr)));
+    feenox_call(feenox_expression_parse(expr, token));
+    buffer[n++] = feenox_expression_eval(expr);
+    feenox_free(expr);
+  }
+
+  if ((n % (function->n_arguments+1)) != 0) {
+    feenox_push_error_message("data size %d is not multiple of %d (number of arguments plus one)", n, function->n_arguments+1);
+    return FEENOX_ERROR;
+  }
+  function->data_size = n / (function->n_arguments+1);
+    
+  int i;
+  for (i = 0; i < n; i++) {
+    printf("%d %g\n", i, buffer[i]);
+  }
+  
+  feenox_free(buffer);
+  
+  return FEENOX_OK;
+}
+  
+/*  
+  if (function->data_size % (nargs+1) != 0) {
+    feenox_push_error_message("data mismatch for function '%s'", function->name);
+    return FEENOX_ERROR;
+  }
+  function->data_size /= (nargs+1);
+
+  function->data_argument = calloc(nargs, sizeof(double *));
+  function->data_argument_alloced = 1;
+  for (i = 0; i < nargs; i++) {
+    function->data_argument[i] = calloc(function->data_size, sizeof(double));
+  }
+
+  function->data_value = calloc(function->data_size, sizeof(double));
+
+  // leemos la informacion
+  if ((token = feenox_get_next_token(backup2)) == NULL) {
+    return FEENOX_ERROR;
+  }
+  for (i = 0; i < function->data_size; i++) {
+    // argumentos
+    for (j = 0; j < nargs; j++) {
+     if ((token = feenox_get_next_token(NULL)) == NULL) {
+       return FEENOX_ERROR;
+     }
+     function->data_argument[j][i] = feenox_evaluate_expression_in_string(token);
+
+     //  para poder meter steps
+      if (nargs == 1 && i >= 2 && function->data_argument[j][i] == function->data_argument[j][i-1]) {
+          function->data_argument[j][i] += 0.005*(function->data_argument[j][i-1]-function->data_argument[j][i-2]);
+        }
+      }
+
+    // valor
+    if ((token = feenox_get_next_token(NULL)) == NULL) {
+      return FEENOX_ERROR;
+    }
+        function->data_value[i] = feenox_evaluate_expression_in_string(token);
+  }
+
+  feenox_free(backup2);
+  feenox_free(backup1);
+  
+  return FEENOX_OK;
+}
+
+
+
+
+    // creamos tres variables (constantes) extra: func_a, func_b y func_n
+    if (nargs == 1) {
+      var_t *dummy_var;
+      char *dummy_aux = malloc(strlen(function->name) + 4);
+
+      snprintf(dummy_aux, strlen(function->name) + 4, "%s_a", function->name);
+      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (function->data_size != 0) {
+        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
+      }
+
+      snprintf(dummy_aux, strlen(function->name) + 4, "%s_b", function->name);
+      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (function->data_size != 0) {
+        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
+      }
+
+      snprintf(dummy_aux, strlen(function->name) + 4, "%s_n", function->name);
+      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (function->data_size != 0) {
+        feenox_value(dummy_var) = (double)function->data_size;
+      }
+
+      feenox_free(dummy_aux);
+    }
+
+  }
+*/
