@@ -1826,10 +1826,12 @@ int feenox_parse_vector(void) {
   }
   
   feenox_call(feenox_define_vector(name, size));
-  
+
+/*  
   if (function_data != NULL) {
     feenox_call(feenox_vector_attach_function(name, function_data));
   }
+*/
   if (datas != NULL) {
     feenox_call(feenox_vector_attach_data(name, datas));
   }
@@ -3771,66 +3773,53 @@ int feenox_parse_function_data(function_t *function) {
     feenox_push_error_message("data size %d is not multiple of %d (number of arguments plus one)", n, function->n_arguments+1);
     return FEENOX_ERROR;
   }
+  
   function->data_size = n / (function->n_arguments+1);
-    
-  int i;
-  for (i = 0; i < n; i++) {
-    printf("%d %g\n", i, buffer[i]);
+
+  // the independent values
+  char *name = NULL;
+  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
+  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
+  feenox_call(feenox_vector_init(function->vector_value, 1));
+  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
+  feenox_free(name);
+
+  // the arguments
+  function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *));
+  function->data_argument = calloc(function->n_arguments, sizeof(double *));
+  unsigned int i = 0;
+  for (i = 0; i < function->n_arguments; i++) {
+    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
+    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
+    feenox_call(feenox_vector_init(function->vector_argument[i], 1));
+    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
+    feenox_free(name);
   }
   
+  n = 0;
+  size_t j = 0;
+  for (j = 0; j < function->data_size; j++) {
+    for (i = 0; i < function->n_arguments; i++) {
+      gsl_vector_set(function->vector_argument[i]->value, j, buffer[n++]);
+    }
+    gsl_vector_set(function->vector_value->value, j, buffer[n++]);
+    
+    // TODO: check for monotonicity in 1D
+    
+    // to allow for steps
+    if (function->n_arguments == 1 && j > 1 && (function->data_argument[0][j] == function->data_argument[0][j-1])) {
+      function->data_argument[i][j] += 1e-6*(function->data_argument[0][j-1] - function->data_argument[0][j-2]);
+    }
+    
+  }
   feenox_free(buffer);
   
   return FEENOX_OK;
 }
   
-/*  
-  if (function->data_size % (nargs+1) != 0) {
-    feenox_push_error_message("data mismatch for function '%s'", function->name);
-    return FEENOX_ERROR;
-  }
-  function->data_size /= (nargs+1);
-
-  function->data_argument = calloc(nargs, sizeof(double *));
-  function->data_argument_alloced = 1;
-  for (i = 0; i < nargs; i++) {
-    function->data_argument[i] = calloc(function->data_size, sizeof(double));
-  }
-
-  function->data_value = calloc(function->data_size, sizeof(double));
-
-  // leemos la informacion
-  if ((token = feenox_get_next_token(backup2)) == NULL) {
-    return FEENOX_ERROR;
-  }
-  for (i = 0; i < function->data_size; i++) {
-    // argumentos
-    for (j = 0; j < nargs; j++) {
-     if ((token = feenox_get_next_token(NULL)) == NULL) {
-       return FEENOX_ERROR;
-     }
-     function->data_argument[j][i] = feenox_evaluate_expression_in_string(token);
-
-     //  para poder meter steps
-      if (nargs == 1 && i >= 2 && function->data_argument[j][i] == function->data_argument[j][i-1]) {
-          function->data_argument[j][i] += 0.005*(function->data_argument[j][i-1]-function->data_argument[j][i-2]);
-        }
-      }
-
-    // valor
-    if ((token = feenox_get_next_token(NULL)) == NULL) {
-      return FEENOX_ERROR;
-    }
-        function->data_value[i] = feenox_evaluate_expression_in_string(token);
-  }
-
-  feenox_free(backup2);
-  feenox_free(backup1);
-  
-  return FEENOX_OK;
-}
 
 
-
+/*
 
     // creamos tres variables (constantes) extra: func_a, func_b y func_n
     if (nargs == 1) {

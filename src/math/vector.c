@@ -26,7 +26,7 @@ extern feenox_t feenox;
 double feenox_vector_get(vector_t *this, const size_t i) {
 
   if (this->initialized == 0) {
-    if (feenox_vector_init(this) != FEENOX_OK) {
+    if (feenox_vector_init(this, 0) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -38,7 +38,7 @@ double feenox_vector_get(vector_t *this, const size_t i) {
 double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this) != FEENOX_OK) {
+    if (feenox_vector_init(this, 0) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -50,7 +50,7 @@ double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
 double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this) != FEENOX_OK) {
+    if (feenox_vector_init(this, 0) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -62,7 +62,7 @@ double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
 int feenox_vector_set(vector_t *this, const size_t i, double value) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this) != FEENOX_OK) {
+    if (feenox_vector_init(this, 0) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -73,8 +73,7 @@ int feenox_vector_set(vector_t *this, const size_t i, double value) {
   return 0;
 }
 
-
-int feenox_vector_init(vector_t *this) {
+int feenox_vector_init(vector_t *this, int no_initial) {
 
   int size;
   int i;
@@ -84,6 +83,7 @@ int feenox_vector_init(vector_t *this) {
     return FEENOX_OK;
   }
 
+/*  
   if (this->function != NULL) {
     
     if (!this->function->initialized) {
@@ -95,8 +95,8 @@ int feenox_vector_init(vector_t *this) {
       feenox_push_error_message("vector '%s' has size mismatch, SIZE = %d and FUNCTION = %d", this->name, size, this->function->data_size);
       return FEENOX_ERROR;
     }
-    
-  } else if ((size = this->size) == 0 && (size = (int)(round(feenox_expression_eval(&this->size_expr)))) == 0) {
+*/    
+  if ((size = this->size) == 0 && (size = (int)(round(feenox_expression_eval(&this->size_expr)))) == 0) {
     feenox_push_error_message("vector '%s' has zero size", this->name);
     return FEENOX_ERROR;
   } else if (size < 0) {
@@ -106,8 +106,10 @@ int feenox_vector_init(vector_t *this) {
   
   this->size = size;
   feenox_value_ptr(this) = gsl_vector_calloc(size);
-  this->initial_static = gsl_vector_calloc(size);
-  this->initial_transient = gsl_vector_calloc(size);
+  if (no_initial == 0) {
+    this->initial_static = gsl_vector_calloc(size);
+    this->initial_transient = gsl_vector_calloc(size);
+  }  
 
   if (this->datas != NULL) {
     i = 0;
@@ -115,11 +117,12 @@ int feenox_vector_init(vector_t *this) {
       gsl_vector_set(feenox_value_ptr(this), i++, feenox_expression_eval(data));
     }
   }
-  
+
+/*  
   if (this->function != NULL) {
     feenox_realloc_vector_ptr(this, this->function->data_value, 0);
   }
-  
+*/  
   this->initialized = 1;
   
   return FEENOX_OK;

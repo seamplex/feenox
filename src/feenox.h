@@ -400,7 +400,7 @@ struct vector_t {
   int reallocated;
   
   // pointer to a function where we should get the data from
-  function_t *function;
+//  function_t *function;
   
   // linked list with the expressions of the initial elements
   expr_t *datas;
@@ -490,13 +490,17 @@ struct function_t {
   // expression for algebraic functions
   expr_t algebraic_expression;
 
-  // number of pairs of x-y data for pointwise functions
+  // number of tuples (independent, dependent) data for pointwise functions
   size_t data_size;
 
-  // arrays with the adata 
+  // arrays with the data 
+  vector_t **vector_argument;
+  vector_t *vector_value;
+
   double **data_argument;
-  int data_argument_allocated;
   double *data_value;
+  int data_argument_allocated;
+
   
   // this is in case there is a derivative of a mesh-based function and
   // we want to interpolate with the shape functions
@@ -513,15 +517,15 @@ struct function_t {
   double **rectangular_mesh_point;
 
   // file with the point-wise data
-  char *data_file_path;
+//  char *data_file_path;
 
   // columns where the data is within the file
   // size = n_arguments+1 (n independent variables + 1 dependent variable) 
   int *column;
 
   // vectors with the point-wise data already read
-  vector_t **vector_argument;
-  vector_t *vector_value;
+//  vector_t **vector_argument;
+//  vector_t *vector_value;
   
   // helpers to interpolate 1D with GSL
   gsl_interp *interp;
@@ -538,10 +542,11 @@ struct function_t {
 
   
   expr_t expr_multidim_threshold;
-  double multidim_threshold;
   expr_t expr_shepard_radius;
-  double shepard_radius;
   expr_t expr_shepard_exponent;
+
+  double multidim_threshold;
+  double shepard_radius;
   double shepard_exponent;
 
   // material property like E, nu, k, etc.
@@ -1889,7 +1894,7 @@ extern int feenox_define_variable(const char *name);
 extern int feenox_define_alias(const char *new_name, const char *existing_object, const char *row, const char *col);
 
 extern int feenox_define_vector(const char *name, const char *size);
-extern int feenox_vector_attach_function(const char *name, const char *function_data);
+//extern int feenox_vector_attach_function(const char *name, const char *function_data);
 extern int feenox_vector_attach_data(const char *name, expr_t *datas);
 
 extern int feenox_define_matrix(const char *name, const char *rows, const char *cols);
@@ -1943,7 +1948,7 @@ extern int feenox_instruction_alias(void *arg);
 extern int feenox_matrix_init(matrix_t *this);
 
 // vector.c
-extern int feenox_vector_init(vector_t *this);
+extern int feenox_vector_init(vector_t *this, int no_initial);
 extern int feenox_instruction_sort_vector(void *arg);
 extern double feenox_vector_get(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_static(vector_t *this, const size_t i);

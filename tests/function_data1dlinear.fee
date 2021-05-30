@@ -1,0 +1,11 @@
+FUNCTION f(x) INTERPOLATION steffen DATA {
+0 0
+1 1
+2 4
+3 9
+}
+
+f_a = vecmin(vec_f_x)
+f_b = vecmax(vec_f_x)
+
+PRINT f(0.5*(f_a+f_b))

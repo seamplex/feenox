@@ -30,9 +30,9 @@ int feenox_mesh_init_special_objects(void) {
   }
   
   // vector con las coordenadas globales
-  feenox.mesh.vars.vec_x = feenox_define_vector_get_ptr("x_global", 3);
+  feenox_check_alloc(feenox.mesh.vars.vec_x = feenox_define_vector_get_ptr("x_global", 3));
   // como ahora hacemos alias de a los elementos del vector x_global lo inicializamos
-  feenox_call(feenox_vector_init(feenox.mesh.vars.vec_x));
+  feenox_call(feenox_vector_init(feenox.mesh.vars.vec_x, 0));
   
 //va+x+name x
 //va+x+desc Holder variable for spatial dependance of functions, such spatial distribution
@@ -59,7 +59,7 @@ int feenox_mesh_init_special_objects(void) {
   // idem para la normal
   feenox_check_null(feenox.mesh.vars.vec_n = feenox_define_vector_get_ptr("n_global", 3));
   // como ahora hacemos alias de a los elementos del vector n_global lo inicializamos
-  feenox_call(feenox_vector_init(feenox.mesh.vars.vec_n));
+  feenox_call(feenox_vector_init(feenox.mesh.vars.vec_n, 0));
   
 //va+x+name nx
 //va+x+desc Holder variable for the local outward normal in surfaces.

@@ -162,6 +162,7 @@ int feenox_function_init(function_t *this) {
     return FEENOX_ERROR;
   }
   
+/*  
   if (this->type == function_type_pointwise_vector) {
     unsigned int i = 0;
     for (i = 0; i < this->n_arguments; i++) {
@@ -223,6 +224,7 @@ int feenox_function_init(function_t *this) {
     this->data_value = gsl_vector_ptr(&feenox_var_value(this->vector_value), 0);
 
   }
+*/
   
   if (this->data_size != 0) {
     this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;

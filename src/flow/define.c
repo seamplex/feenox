@@ -190,7 +190,7 @@ int feenox_define_vector(const char *name, const char *size) {
 }
 
 vector_t *feenox_define_vector_get_ptr(const char *name, size_t size) {
-  // this function is called from the code, that alredy knows what the vector size is
+  // this function is called from the code, that already knows what the vector size is
   // the function below is called from the API that allows a string
   // this is ugly but we don't need too much performance
   char *size_string;
@@ -204,6 +204,7 @@ vector_t *feenox_define_vector_get_ptr(const char *name, size_t size) {
 
 
 // API
+/*
 int feenox_vector_attach_function(const char *name, const char *function_data) {
   
   vector_t *vector;
@@ -221,7 +222,7 @@ int feenox_vector_attach_function(const char *name, const char *function_data) {
   
   return FEENOX_OK;
 }
-
+*/
 int feenox_vector_attach_data(const char *name, expr_t *datas) {
 
   vector_t *vector;

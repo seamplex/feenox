@@ -398,7 +398,7 @@ int feenox_assign_single(assignment_t *assignment, int row, int col) {
   } else if (assignment->vector != NULL) {
     
     if (!assignment->vector->initialized) {
-      feenox_vector_init(assignment->vector);
+      feenox_vector_init(assignment->vector, 0);
     }
     
 //    constant = assignment->vector->constant;

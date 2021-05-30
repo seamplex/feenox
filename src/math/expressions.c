@@ -615,7 +615,7 @@ double feenox_expression_eval(expr_t *this) {
         
         // we need to initialize here so we have the size for the check that follows
         if (item->vector->initialized == 0) {
-          if (feenox_vector_init(item->vector) != FEENOX_OK) {
+          if (feenox_vector_init(item->vector, 0) != FEENOX_OK) {
             feenox_push_error_message("initialization of vector '%s' failed", item->vector->name);
             feenox_runtime_error();
           }

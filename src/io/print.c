@@ -111,7 +111,7 @@ int feenox_instruction_print(void *arg) {
       
     } else if (print_token->vector != NULL) {
       if (!print_token->vector->initialized) {
-        feenox_call(feenox_vector_init(print_token->vector));
+        feenox_call(feenox_vector_init(print_token->vector, 0));
       }
       for (i = 0; i < print_token->vector->size; i++) {
         fprintf(print->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), i));

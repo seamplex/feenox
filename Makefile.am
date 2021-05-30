@@ -16,6 +16,7 @@ TESTS = tests/abort.sh \
         tests/expressions_functions.sh \
         tests/exp.sh \
         tests/function_algebraic.sh \
+        tests/function_data.sh \
         tests/integral.sh \
         tests/materials.sh \
         tests/mesh.sh \
