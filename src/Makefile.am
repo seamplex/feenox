@@ -78,6 +78,7 @@ feenox_SOURCES = \
 ./problems/petsc_ksp.c \
 ./problems/petsc_snes.c \
 ./problems/petsc_ts.c \
+./problems/thermal/thermal.h \
 ./problems/thermal/init.c \
 ./problems/thermal/bulk.c \
 ./problems/thermal/bc.c \

@@ -71,10 +71,12 @@ answer() {
 answerdiff() {
   echo -n "${1} ... "
   base=$(basename ${1} .fee)
-  ${feenox} ${dir}/${1} > ${base}.last
+  ${feenox} ${dir}/${1} > ${dir}/${base}.last
   error=$?
   
-  difference=$(diff -w ${base}.ref ${base}.last)
+  echo "hola pianola"
+  
+  difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
   if [ -z "${difference}" ]; then
     echo "ok"
     level=0
