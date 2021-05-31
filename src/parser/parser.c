@@ -1965,8 +1965,50 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+detail giving\ $k$ definition points: $n$ arguments and the value of the function.
 ///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization.
     } else if (strcasecmp(token, "DATA") == 0) {
-      
       feenox_call(feenox_parse_function_data(function));
+
+///kw+FUNCTION+usage [ INTERPOLATION
+///kw+FUNCTION+detail Interpolation schemes can be given for either one or multi-dimensional functions with `INTERPOLATION`.
+///kw+FUNCTION+detail Available schemes for $n=1$ are:
+///kw+FUNCTION+detail @
+///kw+FUNCTION+usage {
+///kw+FUNCTION+usage linear |
+///kw+FUNCTION+detail  * linear
+///kw+FUNCTION+usage polynomial |
+///kw+FUNCTION+detail  * polynomial, the grade is equal to the number of data minus one
+///kw+FUNCTION+usage spline |
+///kw+FUNCTION+detail  * spline, cubic (needs at least 3 points)
+///kw+FUNCTION+usage spline_periodic |
+///kw+FUNCTION+detail  * spline_periodic 
+///kw+FUNCTION+usage akima |
+///kw+FUNCTION+detail  * akima (needs at least 5 points)
+///kw+FUNCTION+usage akima_periodic |
+///kw+FUNCTION+detail  * akima_periodic (needs at least 5 points)
+///kw+FUNCTION+usage steffen |
+///kw+FUNCTION+detail  * steffen, always-monotonic splines-like (available only with GSL >= 2.0)
+///kw+FUNCTION+detail @ 
+///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
+///kw+FUNCTION+detail @ 
+///kw+FUNCTION+detail Available schemes for $n>1$ are:
+///kw+FUNCTION+detail @
+///kw+FUNCTION+usage nearest |
+///kw+FUNCTION+detail  * nearest, $f(\vec{x})$ is equal to the value of the closest definition point
+///kw+FUNCTION+usage shepard |
+///kw+FUNCTION+detail  * shepard, [inverse distance weighted average definition points](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting) (might lead to inefficient evaluation)
+///kw+FUNCTION+usage shepard_kd |
+///kw+FUNCTION+detail  * shepard_kd, [average of definition points within a kd-tree](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
+///kw+FUNCTION+usage bilinear
+///kw+FUNCTION+detail  * bilinear, only available if the definition points configure an structured hypercube-like grid. If $n>3$, `SIZES` should be given.
+///kw+FUNCTION+usage } ]
+///kw+FUNCTION+detail @
+      
+    } else if (strcasecmp(token, "INTERPOLATION") == 0) {
+      token = feenox_get_next_token(NULL);
+      feenox_call(feenox_function_set_interpolation(name, token));
+      
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
     }
   }
 
@@ -2114,79 +2156,7 @@ int feenox_parse_function(void) {
 
       }
 
-///kw+FUNCTION+usage [ INTERPOLATION
-///kw+FUNCTION+detail Interpolation schemes can be given for either one or multi-dimensional functions with `INTERPOLATION`.
-    } else if (strcasecmp(token, "INTERPOLATION") == 0) {
 
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected interpolation method");
-        return FEENOX_ERROR;
-      }
-
-///kw+FUNCTION+detail Available schemes for $n=1$ are:
-///kw+FUNCTION+detail @
-///kw+FUNCTION+usage {
-///kw+FUNCTION+usage linear |
-///kw+FUNCTION+detail  * linear
-      if (strcasecmp(token, "linear") == 0) {
-        function->interp_type = *gsl_interp_linear;
-///kw+FUNCTION+usage polynomial |
-///kw+FUNCTION+detail  * polynomial, the grade is equal to the number of data minus one
-      } else if (strcasecmp(token, "polynomial") == 0) {
-        function->interp_type = *gsl_interp_polynomial;
-///kw+FUNCTION+usage spline |
-///kw+FUNCTION+detail  * spline, cubic (needs at least 3 points)
-      } else if (strcasecmp(token, "spline") == 0 || strcasecmp(token, "cspline") == 0 || strcasecmp(token, "splines") == 0) {
-        function->interp_type = *gsl_interp_cspline;
-///kw+FUNCTION+usage spline_periodic |
-///kw+FUNCTION+detail  * spline_periodic 
-      } else if (strcasecmp(token, "spline_periodic") == 0 || strcasecmp(token, "cspline_periodic") == 0 || strcasecmp(token, "splines_periodic") == 0) {
-        function->interp_type = *gsl_interp_cspline_periodic;
-///kw+FUNCTION+usage akima |
-///kw+FUNCTION+detail  * akima (needs at least 5 points)
-      } else if (strcasecmp(token, "akima") == 0) {
-        function->interp_type = *gsl_interp_akima;
-///kw+FUNCTION+usage akima_periodic |
-///kw+FUNCTION+detail  * akima_periodic (needs at least 5 points)
-      } else if (strcasecmp(token, "akima_periodic") == 0) {
-        function->interp_type = *gsl_interp_akima_periodic;
-
-///kw+FUNCTION+usage steffen |
-///kw+FUNCTION+detail  * steffen, always-monotonic splines-like (available only with GSL >= 2.0)
-      } else if (strcasecmp(token, "steffen") == 0) {
-#if (GSL_MAJOR_VERSION < 2)  
-//            feenox_push_error_message("inerpolation steffen is available only for GSL >= 2.0, you have version %s", GSL_VERSION);
-        function->interp_type = *gsl_interp_linear;
-#else
-        function->interp_type = *gsl_interp_steffen;
-#endif
-///kw+FUNCTION+detail @ 
-///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
-///kw+FUNCTION+detail @ 
-///kw+FUNCTION+detail Available schemes for $n>1$ are:
-///kw+FUNCTION+detail @
-///kw+FUNCTION+usage nearest |
-///kw+FUNCTION+detail  * nearest, $f(\vec{x})$ is equal to the value of the closest definition point
-      } else if (strcasecmp(token, "nearest") == 0) {
-        function->multidim_interp = nearest;
-///kw+FUNCTION+usage shepard |
-///kw+FUNCTION+detail  * shepard, [inverse distance weighted average definition points](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting) (might lead to inefficient evaluation)
-      } else if (strcasecmp(token, "shepard") == 0) {
-        function->multidim_interp = shepard;
-///kw+FUNCTION+usage shepard_kd |
-///kw+FUNCTION+detail  * shepard_kd, [average of definition points within a kd-tree](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
-      } else if (strcasecmp(token, "shepard_kd") == 0 || strcasecmp(token, "modified_shepard") == 0) {
-        function->multidim_interp = shepard_kd;
-///kw+FUNCTION+usage bilinear
-///kw+FUNCTION+detail  * bilinear, only available if the definition points configure an structured hypercube-like grid. If $n>3$, `SIZES` should be given.
-      } else if (strcasecmp(token, "bilinear") == 0 || strcasecmp(token, "rectangle") == 0 || strcasecmp(token, "rectangular") == 0) {
-        function->multidim_interp = bilinear;
-///kw+FUNCTION+usage } ]
-      } else {
-        feenox_push_error_message("undefined interpolation method '%s'", token);
-        return FEENOX_ERROR;
-      }
-///kw+FUNCTION+detail @
 
 ///kw+FUNCTION+usage [ INTERPOLATION_THRESHOLD <expr> ]
 ///kw+FUNCTION+detail For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.

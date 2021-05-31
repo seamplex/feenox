@@ -95,6 +95,44 @@ int feenox_function_set_expression(const char *name, const char *expression) {
   return FEENOX_OK;
 }
 
+int feenox_function_set_interpolation(const char *name, const char *type) {
+
+  function_t *function = NULL;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+  
+  if (strcasecmp(type, "linear") == 0) {
+    function->interp_type = *gsl_interp_linear;
+  } else if (strcasecmp(type, "polynomial") == 0) {
+    function->interp_type = *gsl_interp_polynomial;
+  } else if (strcasecmp(type, "spline") == 0 || strcasecmp(type, "cspline") == 0 || strcasecmp(type, "splines") == 0) {
+    function->interp_type = *gsl_interp_cspline;
+  } else if (strcasecmp(type, "spline_periodic") == 0 || strcasecmp(type, "cspline_periodic") == 0 || strcasecmp(type, "splines_periodic") == 0) {
+    function->interp_type = *gsl_interp_cspline_periodic;
+  } else if (strcasecmp(type, "akima") == 0) {
+    function->interp_type = *gsl_interp_akima;
+  } else if (strcasecmp(type, "akima_periodic") == 0) {
+    function->interp_type = *gsl_interp_akima_periodic;
+  } else if (strcasecmp(type, "steffen") == 0) {
+    function->interp_type = *gsl_interp_steffen;
+  } else if (strcasecmp(type, "nearest") == 0) {
+    function->multidim_interp = interp_nearest;
+  } else if (strcasecmp(type, "shepard") == 0) {
+    function->multidim_interp = interp_shepard;
+  } else if (strcasecmp(type, "shepard_kd") == 0 || strcasecmp(type, "modified_shepard") == 0) {
+    function->multidim_interp = interp_shepard_kd;
+  } else if (strcasecmp(type, "bilinear") == 0 || strcasecmp(type, "rectangle") == 0 || strcasecmp(type, "rectangular") == 0) {
+    function->multidim_interp = interp_bilinear;
+  } else {
+    feenox_push_error_message("undefined interpolation method '%s'", type);
+    return FEENOX_ERROR;
+  }
+  
+  return FEENOX_OK;
+  
+}
 
 // set the variables that are a function's argument equal to the vector x
 void feenox_function_set_args(function_t *this, double *x) {

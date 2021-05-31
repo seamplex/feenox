@@ -1,0 +1,14 @@
+FUNCTION f(x) INTERPOLATION $1 DATA {
+0 0
+1 1
+2 4
+3 3
+4 2
+}
+
+f_a = vecmin(vec_f_x)
+f_b = vecmax(vec_f_x)
+
+PRINT f(1/3*(f_a+f_b))
+#PRINT_FUNCTION f MIN f_a MAX f_b NSTEPS 20
+

@@ -130,6 +130,11 @@ answerzero() {
 answer1() {
   echo -n "${1} ${2} ... "
   answer=$(${feenox} ${dir}/${1} ${2})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    return 2
+  fi
   
   if [ "${answer}" = "${3}" ]; then
     echo "ok"

@@ -1904,6 +1904,7 @@ extern int feenox_define_function(const char *name, unsigned int n_arguments);
 extern function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments);
 extern int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name);
 extern int feenox_function_set_expression(const char *name, const char *expression);
+extern int feenox_function_set_interpolation(const char *name, const char *type);
 
 extern int feenox_define_file(const char *name, const char *format, unsigned int n_args, const char *mode);
 extern int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression);
