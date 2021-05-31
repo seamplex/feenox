@@ -1743,7 +1743,7 @@ int feenox_parse_alias(void) {
   // if there are parenthesis they are sub-indexes
   if ((dummy_openpar = strchr(existing_object, '(')) != NULL) {
     dummy_comma = strchr(existing_object, ',');
-    if ((dummy_closepar = strchr(existing_object, ')')) == NULL) {
+    if ((dummy_closepar = strrchr(existing_object, ')')) == NULL) {
       feenox_push_error_message("expecting closing parenthesis in expression '%s'", existing_object);
     }
     
@@ -1782,7 +1782,7 @@ int feenox_parse_vector(void) {
   
   // if there are parenthesis, the size is between them
   if ((dummy_openpar = strchr(name, '(')) != NULL) {
-    if ((dummy_closepar = strchr(name, ')')) == NULL) {
+    if ((dummy_closepar = strrchr(name, ')')) == NULL) {
       feenox_push_error_message("expecting closing parenthesis in expression '%s'", name);
     }
     *dummy_openpar = '\0';
@@ -1867,7 +1867,7 @@ int feenox_parse_matrix(void) {
     if ((dummy_comma = strchr(name, ',')) == NULL) {
       feenox_push_error_message("expecting comma in expression '%s'", name);
     }
-    if ((dummy_closepar = strchr(name, ')')) == NULL) {
+    if ((dummy_closepar = strrchr(name, ')')) == NULL) {
       feenox_push_error_message("expecting closing parenthesis in expression '%s'", name);
     }
     *dummy_openpar = '\0';
@@ -1958,6 +1958,13 @@ int feenox_parse_function(void) {
     if (strcasecmp(token, "=") == 0 || strcasecmp(token, ":=") == 0) {
       feenox_call(feenox_function_set_expression(name, token + ((token[0] == ':')? 3 : 2)));
       break;    // we are done with the while() over the line
+
+///kw+FUNCTION+usage [ VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> ]
+///kw+FUNCTION+usage }
+///kw+FUNCTION+detail If `VECTORS` is given, a set of $n+1$ vectors of the same size is expected.
+///kw+FUNCTION+detail The first $n$ correspond to the arguments and the last one to the function values.
+    } else if (strcasecmp(token, "VECTORS") == 0) {
+      feenox_call(feenox_parse_function_vectors(function));
       
 ///kw+FUNCTION+usage DATA <num_1> <num_2> ... <num_N> }
 ///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`.
@@ -2764,8 +2771,8 @@ int feenox_parse_print_function(void) {
     return FEENOX_ERROR;
   }
       
-  if (print_function->first_function->type == function_type_algebraic ||
-      print_function->first_function->type == function_type_routine) {
+  if (print_function->first_function->type == function_type_algebraic) {
+//      || print_function->first_function->type == function_type_routine) {
     if (print_function->range.min == NULL) {
       feenox_push_error_message("need MIN keyword (function %s is not point-wise defined)", print_function->first_function->name);
       return FEENOX_ERROR;
@@ -3718,11 +3725,12 @@ int feenox_parse_solve_problem(void) {
 
 int feenox_parse_function_data(function_t *function) {
 
+  function->type = function_type_pointwise_data;
+  
   size_t size0 = 4096/sizeof(double);
   size_t size = size0;
   double *buffer = NULL;
   feenox_check_alloc(buffer = malloc(size * sizeof(double)));
-  
   
   char *token = NULL;
   size_t n = 0;
@@ -3733,7 +3741,7 @@ int feenox_parse_function_data(function_t *function) {
     }
     
     expr_t *expr = NULL;
-    feenox_check_alloc(expr = calloc(1, sizeof(expr)));
+    feenox_check_alloc(expr = calloc(1, sizeof(expr_t)));
     feenox_call(feenox_expression_parse(expr, token));
     buffer[n++] = feenox_expression_eval(expr);
     feenox_free(expr);
@@ -3755,8 +3763,8 @@ int feenox_parse_function_data(function_t *function) {
   feenox_free(name);
 
   // the arguments
-  function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *));
-  function->data_argument = calloc(function->n_arguments, sizeof(double *));
+  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
+  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
   unsigned int i = 0;
   for (i = 0; i < function->n_arguments; i++) {
     feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
@@ -3788,40 +3796,18 @@ int feenox_parse_function_data(function_t *function) {
 }
   
 
+int feenox_parse_function_vectors(function_t *function) {
 
-/*
-
-    // creamos tres variables (constantes) extra: func_a, func_b y func_n
-    if (nargs == 1) {
-      var_t *dummy_var;
-      char *dummy_aux = malloc(strlen(function->name) + 4);
-
-      snprintf(dummy_aux, strlen(function->name) + 4, "%s_a", function->name);
-      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      if (function->data_size != 0) {
-        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][0], 0);
-      }
-
-      snprintf(dummy_aux, strlen(function->name) + 4, "%s_b", function->name);
-      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      if (function->data_size != 0) {
-        feenox_realloc_variable_ptr(dummy_var, &function->data_argument[0][function->data_size-1], 0);
-      }
-
-      snprintf(dummy_aux, strlen(function->name) + 4, "%s_n", function->name);
-      if ((dummy_var = feenox_define_variable(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      if (function->data_size != 0) {
-        feenox_value(dummy_var) = (double)function->data_size;
-      }
-
-      feenox_free(dummy_aux);
-    }
-
-  }
-*/
+  function->type = function_type_pointwise_data;
+  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
+  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
+  
+  unsigned int i = 0;
+  for (i = 0; i < function->n_arguments; i++) {
+    feenox_call(feenox_parser_vector(&function->vector_argument[i]));
+  } 
+  feenox_call(feenox_parser_vector(&function->vector_value));
+  
+  return FEENOX_OK;
+  
+}

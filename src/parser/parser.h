@@ -84,6 +84,7 @@ extern int feenox_parse_vector(void);
 extern int feenox_parse_matrix(void);
 extern int feenox_parse_function(void);
 extern int feenox_parse_function_data(function_t *function);
+extern int feenox_parse_function_vectors(function_t *function);
 
 extern int feenox_parse_sort_vector(void);
 

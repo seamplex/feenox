@@ -3,7 +3,7 @@ SUBDIRS = src doc
 dist_doc_DATA = AUTHORS ChangeLog README TODO \
                 doc/feenox.texi doc/logo.svg doc/feenox.xml doc/reference.md
 
-# dist_man_MANS = doc/feenox.1
+dist_man_MANS = doc/feenox.1
 
 EXTRA_DIST = examples tests locateruntest.sh
 
@@ -17,6 +17,7 @@ TESTS = tests/abort.sh \
         tests/exp.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \
+        tests/function_vectors.sh \
         tests/integral.sh \
         tests/materials.sh \
         tests/mesh.sh \

@@ -199,73 +199,44 @@ int feenox_function_init(function_t *this) {
     feenox_push_error_message("algebraic function '%s' needs %d arguments and %d were given", this->name, this->n_arguments, this->n_arguments_given);
     return FEENOX_ERROR;
   }
-  
-/*  
-  if (this->type == function_type_pointwise_vector) {
-    unsigned int i = 0;
-    for (i = 0; i < this->n_arguments; i++) {
-      
-      if (!this->vector_argument[i]->initialized) {
-        feenox_call(feenox_vector_init(this->vector_argument[i]));
-      }
-      
-      if (this->data_size == 0) {
-        this->data_size = this->vector_argument[i]->size;
-      } else {
-        if (this->vector_argument[i]->size != this->data_size) {
-          feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", this->data_size, this->vector_argument[i]->size, this->name);
-          return FEENOX_ERROR;
+   
+  if (this->algebraic_expression.items == NULL) {
+    
+    this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
+
+    if (this->vector_argument != NULL) {
+      unsigned int i = 0;
+      for (i = 0; i < this->n_arguments; i++) {
+        if (this->vector_argument[i]->initialized == 0) {
+          feenox_call(feenox_vector_init(this->vector_argument[i], 1));
         }
+
+        if (this->data_size == 0) {
+          this->data_size = this->vector_argument[i]->size;
+        } else {
+          if (this->vector_argument[i]->size != this->data_size) {
+            feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", this->data_size, this->vector_argument[i]->size, this->name);
+            return FEENOX_ERROR;
+          }
+        }
+
+        if (this->data_argument[i] == NULL) {
+          this->data_argument[i] = gsl_vector_ptr(&feenox_var_value(this->vector_argument[i]), 0);
+        }  
       }
 
-      this->data_argument[i] = gsl_vector_ptr(&feenox_var_value(this->vector_argument[i]), 0);
-    }
-  }
-  
-  if (this->vector_value != NULL) {
-
-    if (!this->vector_value->initialized) {
-      feenox_call(feenox_vector_init(this->vector_value));
-    }
-    if (this->vector_value->size != this->data_size) {
-      feenox_push_error_message("vector sizes do not match (%d and %d)", this->data_size, this->vector_value->size);
-      return FEENOX_ERROR;
+      if (this->vector_value->initialized == 0) {
+        feenox_call(feenox_vector_init(this->vector_argument[i], 1));
+      }
+      if (this->vector_value->size != this->data_size) {
+        feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", this->data_size, this->vector_value->size, this->name);
+        return FEENOX_ERROR;
+      }
+      if (this->data_value == NULL) {
+        this->data_value = gsl_vector_ptr(&feenox_var_value(this->vector_value), 0);
+      }
     }
     
-    // rellenamos las variables f_a f_b y f_c
-    if (this->n_arguments == 1) {
-      var_t *dummy_var;
-      
-      // TODO: asprintf
-      char *dummy_aux = malloc(strlen(this->name) + 4);
-      
-      sprintf(dummy_aux, "%s_a", this->name);
-      if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      feenox_realloc_variable_ptr(dummy_var, &this->data_argument[0][0], 0);
-      
-      sprintf(dummy_aux, "%s_b", this->name);
-      if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      feenox_realloc_variable_ptr(dummy_var, &this->data_argument[0][this->data_size-1], 0);
-      
-      sprintf(dummy_aux, "%s_n", this->name);
-      if ((dummy_var = feenox_get_variable_ptr(dummy_aux)) == NULL) {
-        return FEENOX_ERROR;
-      }
-      feenox_free(dummy_aux);
-      feenox_var_value(dummy_var) = (double)this->data_size;
-    }
-
-    this->data_value = gsl_vector_ptr(&feenox_var_value(this->vector_value), 0);
-
-  }
-*/
-  
-  if (this->data_size != 0) {
-    this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
     if (this->mesh == NULL) {
       if (this->n_arguments == 1) {
 
@@ -281,13 +252,9 @@ int feenox_function_init(function_t *this) {
 
         this->interp_accel = gsl_interp_accel_alloc();
 
-        // si no es de tipo vector, inicializamos el interpolador (los datos quedan fijos) 
-        // porque si es vector y los vectores tienen fruta, el interpolador se queja 
-        if (this->type != function_type_pointwise_vector) {
-          feenox_push_error_message("in function %s", this->name);
-          gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size);
-          feenox_pop_error_message();
-        }
+        feenox_push_error_message("in function %s", this->name);
+        gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size);
+        feenox_pop_error_message();
 
       } else {
 
@@ -508,17 +475,9 @@ double feenox_function_eval(function_t *this, const double *x) {
     
     if (this->n_arguments == 1) {
 
-      // one-dimensional pointwise-defined functions are handled by GSL
-      if (this->type == function_type_pointwise_vector) {
-        if (gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size) != GSL_SUCCESS) {
-          feenox_runtime_error();
-        }
-      }
-    
       y = (this->interp != NULL) ? gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel) : 0;
 
     } else {
-      
 
       // multi-dimensional pointwise-defined function are not handled by GSL
       y = 0;

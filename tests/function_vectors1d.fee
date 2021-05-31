@@ -1,0 +1,20 @@
+FUNCTION f(x) DATA {
+0 0
+1 1
+2 4
+3 9
+}
+
+VECTOR b(vecsize(vec_f))
+
+b(1) = 0
+b(2) = 0.5
+b(3) = 2.5
+b(4) = 3
+
+FUNCTION g(x) VECTORS vec_f_x b
+
+f_a = vecmin(vec_f_x)
+f_b = vecmax(vec_f_x)
+
+PRINT_FUNCTION f g MIN f_a MAX f_b NSTEPS 2*vecsize(vec_f)

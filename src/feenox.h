@@ -455,28 +455,26 @@ struct function_t {
   int initialized;
   
   // might be:
-  //   - algebraic
+  //   - algebraic, either globally or on a per-material (physical groups) basis
   //   - pointwise-defined
-  //       + given in the input
-  //       + given in a file
-  //       + given in wasora vectors
+  //       + given in the input with DATA
+  //       + given in FeenoX vectors with VECTORS
+  //       + given in a file with FILE
   //       + in a mesh
-  //          * as another function defined over materials (physical groups)
   //          * data at nodes
   //          * data at cells
-  //  - comptued in a user-provided routine
+  //  - computed in a user-provided routine (used to be supported, not anymore)
   //
   enum  {
     function_type_undefined,
     function_type_algebraic,
     function_type_pointwise_data,
     function_type_pointwise_file,
-    function_type_pointwise_vector,
     function_type_pointwise_mesh_property,
     function_type_pointwise_mesh_node,
     function_type_pointwise_mesh_cell,
-    function_type_routine,
-    function_type_routine_internal,
+//    function_type_routine,
+//    function_type_routine_internal,
   } type;
   
   // number of arguments the function takes
