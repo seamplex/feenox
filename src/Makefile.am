@@ -48,6 +48,7 @@ feenox_SOURCES = \
 ./mesh/interpolate.c \
 ./mesh/material.c \
 ./mesh/element.c \
+./mesh/element.h \
 ./mesh/cell.c \
 ./mesh/fem.c \
 ./mesh/write.c \
