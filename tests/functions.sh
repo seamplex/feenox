@@ -74,8 +74,6 @@ answerdiff() {
   ${feenox} ${dir}/${1} > ${dir}/${base}.last
   error=$?
   
-  echo "hola pianola"
-  
   difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
   if [ -z "${difference}" ]; then
     echo "ok"

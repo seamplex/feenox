@@ -297,6 +297,12 @@ cat << EOF >> src/version.h
 #define FEENOX_COMPILER_CFLAGS   "${CFLAGS}"
 EOF
 
+######################
+# create some links to pass make distcheck
+AC_CONFIG_LINKS([tests/functions.sh:tests/functions.sh])  
+AC_CONFIG_LINKS([tests/algebraic_expr.sh:tests/algebraic_expr.sh])  
+AC_CONFIG_LINKS([tests/algebraic_expr.fee:tests/algebraic_expr.fee])  
+AC_CONFIG_LINKS([tests/algebraic_expr.ref:tests/algebraic_expr.ref])  
   
   
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile]) 

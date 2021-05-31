@@ -1,0 +1,2 @@
+FUNCTION f(x) FILE data1d.dat
+PRINT f(2.5)

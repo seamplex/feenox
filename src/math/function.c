@@ -41,13 +41,6 @@ function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_argu
   feenox_check_alloc_null(function->var_argument = calloc(n_arguments, sizeof(var_t *)));
   function->var_argument_allocated = 1;
   
-  // default columns
-  feenox_check_alloc_null(function->column = calloc((n_arguments+1), sizeof(int)));
-  int i;
-  for (i = 0; i < n_arguments+1; i++) {
-    function->column[i] = i+1;
-  }
-  
   HASH_ADD_KEYPTR(hh, feenox.functions, function->name, strlen(function->name), function);
 
   return function;
@@ -95,6 +88,115 @@ int feenox_function_set_expression(const char *name, const char *expression) {
   return FEENOX_OK;
 }
 
+int feenox_function_set_file(const char *name, file_t *file, unsigned int *columns) {
+  
+  function_t *function = NULL;
+  if ((function = feenox_get_function_ptr(name)) == NULL) {
+    feenox_push_error_message("unkown function '%s'", name);
+    return FEENOX_ERROR;
+  }
+
+  function->type = function_type_pointwise_data;  
+
+  size_t size0 = 4096/sizeof(double);
+  size_t size = size0;
+  double *buffer = NULL;
+  feenox_check_alloc(buffer = malloc(size * sizeof(double)));
+  
+  unsigned int max_column = 0;
+  if (columns != NULL) {
+    unsigned int i = 0;
+    for (i = 0; i < function->n_arguments; i++) {
+      if (columns[i] > max_column) {
+        max_column = columns[i];
+      }
+    }
+  } else {
+    max_column = function->n_arguments+1;
+  }
+  
+  feenox_call(feenox_instruction_file_open(file));
+
+  char line[BUFFER_LINE_SIZE];
+  size_t n = 0;
+  int n_numbers = 0;
+  int n_chars = 0;
+  while (fgets(line, BUFFER_LINE_SIZE-1, file->pointer) != NULL) {
+    feenox_call(feenox_strip_comments(line));
+    if (line[0] != '\0') {
+      char *s = line;
+      unsigned int i = 0;
+      for (i = 0; i < max_column; i++) {
+        if (n == size) {
+          size += size0;
+          feenox_check_alloc(buffer = realloc(buffer, size*sizeof(double)));
+        }
+        
+        if ((n_numbers = sscanf(s, "%lf %n", &buffer[n++], &n_chars)) != 1) {
+          feenox_push_error_message("not enough columns in file '%s'", file->path);
+          return FEENOX_ERROR;
+        }
+        s += n_chars;
+      }
+    }
+  }
+  
+  feenox_call(function_set_buffered_data(function, buffer, n, columns));
+  free(buffer);
+  
+  
+  return FEENOX_OK;
+}
+
+int function_set_buffered_data(function_t *function, double *buffer, size_t n, unsigned int *columns) {
+
+  if ((n % (function->n_arguments+1)) != 0) {
+    feenox_push_error_message("data size %d is not multiple of %d (number of arguments plus one)", n, function->n_arguments+1);
+    return FEENOX_ERROR;
+  }
+  
+  function->data_size = n / (function->n_arguments+1);
+
+  // the independent values
+  char *name = NULL;
+  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
+  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
+  feenox_call(feenox_vector_init(function->vector_value, 1));
+  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
+  feenox_free(name);
+
+  // the arguments
+  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
+  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
+  unsigned int i = 0;
+  for (i = 0; i < function->n_arguments; i++) {
+    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
+    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
+    feenox_call(feenox_vector_init(function->vector_argument[i], 1));
+    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
+    feenox_free(name);
+  }
+  
+  n = 0;
+  size_t j = 0;
+  for (j = 0; j < function->data_size; j++) {
+    for (i = 0; i < function->n_arguments; i++) {
+      gsl_vector_set(function->vector_argument[i]->value, j, buffer[n++]);
+    }
+    gsl_vector_set(function->vector_value->value, j, buffer[n++]);
+    
+    // TODO: check for monotonicity in 1D
+    
+    // to allow for steps
+    if (function->n_arguments == 1 && j > 1 && (function->data_argument[0][j] == function->data_argument[0][j-1])) {
+      function->data_argument[i][j] += 1e-6*(function->data_argument[0][j-1] - function->data_argument[0][j-2]);
+    }
+    
+  }
+  
+  return FEENOX_OK;
+}
+
 int feenox_function_set_interpolation(const char *name, const char *type) {
 
   function_t *function = NULL;
@@ -135,7 +237,7 @@ int feenox_function_set_interpolation(const char *name, const char *type) {
 }
 
 // set the variables that are a function's argument equal to the vector x
-void feenox_function_set_args(function_t *this, double *x) {
+int feenox_function_set_args(function_t *this, double *x) {
   int i;
   
   if (this->var_argument != NULL) {
@@ -146,7 +248,7 @@ void feenox_function_set_args(function_t *this, double *x) {
     }
   }
   
-  return;
+  return FEENOX_OK;
   
 }
 

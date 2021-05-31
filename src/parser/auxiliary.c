@@ -533,19 +533,17 @@ int feenox_parse_range(char *string, const char left_delim, const char middle_de
   return FEENOX_OK;
 }
 
-
+*/
 // saca los comentarios y los espacios en blanco iniciales de una linea
-void feenox_strip_comments(char *line) {
+int feenox_strip_comments(char *line) {
   int i = 0;
   int j = 0;
   char *buff = strdup(line);
 
-  // saca los espacios y tabs iniciales
   while (isspace((int)buff[i])) {
     i++;
   }
 
-//  while ((buff[i] != '#' && buff[i] != '\r' && buff[i] != '\n' && buff[i] != '\0') || (i > 0 && buff[i] == '#' && buff[i-1] == '\\')) {
   while ((buff[i] != '#' && buff[i] != '\0') || (i > 0 && buff[i] == '#' && buff[i-1] == '\\')) {  
     if (i > 0 && buff[i] == '#' && buff[i-1] == '\\') {
       j--;
@@ -557,10 +555,10 @@ void feenox_strip_comments(char *line) {
 
   feenox_free(buff);
 
-  return;
+  return FEENOX_OK;
 }
 
-
+/*
 
 // lee una linea y eventualmente procesa los {}
 int feenox_read_data_line(FILE *file_ptr, char *buffer) {

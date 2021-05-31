@@ -1949,9 +1949,10 @@ int feenox_parse_function(void) {
     return FEENOX_ERROR;
   }      
   
+  unsigned int *columns = NULL;
+  file_t *file = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+FUNCTION+usage {
-///kw+FUNCTION+usage = <expr> |
+///kw+FUNCTION+usage { = <expr> |
 ///kw+FUNCTION+detail If the function is given as an algebraic expression, the short-hand operator `:=` can be used.
 ///kw+FUNCTION+detail That is to say, `FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`.
 
@@ -1959,8 +1960,17 @@ int feenox_parse_function(void) {
       feenox_call(feenox_function_set_expression(name, token + ((token[0] == ':')? 3 : 2)));
       break;    // we are done with the while() over the line
 
-///kw+FUNCTION+usage [ VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> ]
-///kw+FUNCTION+usage }
+///kw+FUNCTION+usage FILE { <file_path> | <file_id> } |
+    } else if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+///kw+FUNCTION+detail If a `FILE` is given, an ASCII file containing at least $n+1$ columns is expected.
+///kw+FUNCTION+detail By default, the first $n$ columns are the values of the arguments and the last column
+///kw+FUNCTION+detail is the value of the function at those points.
+///kw+FUNCTION+detail The order of the columns can be changed with the keyword `COLUMNS`,
+///kw+FUNCTION+detail which expects $n+1$ expressions corresponding to the column numbers.
+      feenox_call(feenox_parser_file(&file));
+      file->mode = "r";
+
+///kw+FUNCTION+usage VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> |
 ///kw+FUNCTION+detail If `VECTORS` is given, a set of $n+1$ vectors of the same size is expected.
 ///kw+FUNCTION+detail The first $n$ correspond to the arguments and the last one to the function values.
     } else if (strcasecmp(token, "VECTORS") == 0) {
@@ -1968,16 +1978,16 @@ int feenox_parse_function(void) {
       
 ///kw+FUNCTION+usage DATA <num_1> <num_2> ... <num_N> }
 ///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`.
-///kw+FUNCTION+detail This should be the last keyword of the line, followed by $N=k\cdot (n+1)$ expresions
+///kw+FUNCTION+detail This should be the last keyword of the line, followed by $N=k \cdot (n+1)$ expresions
 ///kw+FUNCTION+detail giving\ $k$ definition points: $n$ arguments and the value of the function.
 ///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization.
     } else if (strcasecmp(token, "DATA") == 0) {
       feenox_call(feenox_parse_function_data(function));
 
-///kw+FUNCTION+usage [ INTERPOLATION
 ///kw+FUNCTION+detail Interpolation schemes can be given for either one or multi-dimensional functions with `INTERPOLATION`.
 ///kw+FUNCTION+detail Available schemes for $n=1$ are:
 ///kw+FUNCTION+detail @
+///kw+FUNCTION+usage [ INTERPOLATION
 ///kw+FUNCTION+usage {
 ///kw+FUNCTION+usage linear |
 ///kw+FUNCTION+detail  * linear
@@ -1992,7 +2002,7 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+usage akima_periodic |
 ///kw+FUNCTION+detail  * akima_periodic (needs at least 5 points)
 ///kw+FUNCTION+usage steffen |
-///kw+FUNCTION+detail  * steffen, always-monotonic splines-like (available only with GSL >= 2.0)
+///kw+FUNCTION+detail  * steffen, always-monotonic splines-like interpolator
 ///kw+FUNCTION+detail @ 
 ///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
 ///kw+FUNCTION+detail @ 
@@ -2020,15 +2030,6 @@ int feenox_parse_function(void) {
   }
 
 /*      
-///kw+FUNCTION+usage FILE_PATH <file_path> |
-    } else if (strcasecmp(token, "FILE_PATH") == 0) {
-///kw+FUNCTION+detail If a `FILE_PATH` is given, an ASCII file containing at least $n+1$ columns is expected.
-///kw+FUNCTION+detail By default, the first $n$ columns are the values of the arguments and the last column is the value of the function at those points.
-///kw+FUNCTION+detail The order of the columns can be changed with the keyword `COLUMNS`, which expects $n+1$ expressions corresponding to the column numbers.
-
-      // TODO: poder pedir que se refresquen los datos en cada paso
-      function->type = type_pointwise_file;
-      feenox_parser_string(&function->data_file);
 
 ///kw+FUNCTION+usage ROUTINE <name> |
     } else if (strcasecmp(token, "ROUTINE") == 0) {
@@ -2298,6 +2299,10 @@ int feenox_parse_function(void) {
 
  */
   
+  if (file != NULL) {
+    feenox_call(feenox_function_set_file(name, file, columns));
+  }
+  
   feenox_free(name);
   
   return FEENOX_OK;
@@ -2509,7 +2514,7 @@ int feenox_parse_print(void) {
 ///kw+PRINT+usage @
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+PRINT+usage [ FILE < <file_path> | <file_id> > ]
+///kw+PRINT+usage [ FILE { <file_path> | <file_id> } ]
 ///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
       feenox_call(feenox_parser_file(&print->file));
@@ -3747,49 +3752,7 @@ int feenox_parse_function_data(function_t *function) {
     feenox_free(expr);
   }
 
-  if ((n % (function->n_arguments+1)) != 0) {
-    feenox_push_error_message("data size %d is not multiple of %d (number of arguments plus one)", n, function->n_arguments+1);
-    return FEENOX_ERROR;
-  }
-  
-  function->data_size = n / (function->n_arguments+1);
-
-  // the independent values
-  char *name = NULL;
-  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
-  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
-  feenox_call(feenox_vector_init(function->vector_value, 1));
-  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
-  feenox_free(name);
-
-  // the arguments
-  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
-  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
-  unsigned int i = 0;
-  for (i = 0; i < function->n_arguments; i++) {
-    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
-    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
-    feenox_call(feenox_vector_init(function->vector_argument[i], 1));
-    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
-    feenox_free(name);
-  }
-  
-  n = 0;
-  size_t j = 0;
-  for (j = 0; j < function->data_size; j++) {
-    for (i = 0; i < function->n_arguments; i++) {
-      gsl_vector_set(function->vector_argument[i]->value, j, buffer[n++]);
-    }
-    gsl_vector_set(function->vector_value->value, j, buffer[n++]);
-    
-    // TODO: check for monotonicity in 1D
-    
-    // to allow for steps
-    if (function->n_arguments == 1 && j > 1 && (function->data_argument[0][j] == function->data_argument[0][j-1])) {
-      function->data_argument[i][j] += 1e-6*(function->data_argument[0][j-1] - function->data_argument[0][j-2]);
-    }
-    
-  }
+  feenox_call(function_set_buffered_data(function, buffer, n, NULL));
   feenox_free(buffer);
   
   return FEENOX_OK;
@@ -3809,5 +3772,4 @@ int feenox_parse_function_vectors(function_t *function) {
   feenox_call(feenox_parser_vector(&function->vector_value));
   
   return FEENOX_OK;
-  
 }

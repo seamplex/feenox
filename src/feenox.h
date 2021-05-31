@@ -85,8 +85,8 @@
 #define FEENOX_ERROR      1
 #define FEENOX_UNHANDLED  2
 
-#define BUFFER_TOKEN_SIZE        255
-#define BUFFER_LINE_SIZE        4095
+#define BUFFER_TOKEN_SIZE        256
+#define BUFFER_LINE_SIZE        4096
 
 
 // no son enums porque hacemos operaciones con las mascaras de abajo
@@ -514,17 +514,6 @@ struct function_t {
   int *rectangular_mesh_size;
   double **rectangular_mesh_point;
 
-  // file with the point-wise data
-//  char *data_file_path;
-
-  // columns where the data is within the file
-  // size = n_arguments+1 (n independent variables + 1 dependent variable) 
-  int *column;
-
-  // vectors with the point-wise data already read
-//  vector_t **vector_argument;
-//  vector_t *vector_value;
-  
   // helpers to interpolate 1D with GSL
   gsl_interp *interp;
   gsl_interp_accel *interp_accel;
@@ -1900,9 +1889,6 @@ extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
 
 extern int feenox_define_function(const char *name, unsigned int n_arguments);
 extern function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments);
-extern int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name);
-extern int feenox_function_set_expression(const char *name, const char *expression);
-extern int feenox_function_set_interpolation(const char *name, const char *type);
 
 extern int feenox_define_file(const char *name, const char *format, unsigned int n_args, const char *mode);
 extern int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression);
@@ -1939,6 +1925,7 @@ extern int feenox_instruction_assignment_matrix(void *arg);
 
 // auxiliary.c
 extern int feenox_strip_blanks(char *string);
+extern int feenox_strip_comments(char *line);
 
 // alias.c
 extern int feenox_instruction_alias(void *arg);
@@ -1956,7 +1943,13 @@ extern int feenox_vector_set(vector_t *this, const size_t i, double value);
 
 // function.c
 extern int feenox_function_init(function_t *this);
-extern void feenox_function_set_args(function_t *this, double *x);
+extern int feenox_function_set_args(function_t *this, double *x);
+extern int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name);
+extern int feenox_function_set_expression(const char *name, const char *expression);
+extern int feenox_function_set_interpolation(const char *name, const char *type);
+extern int feenox_function_set_file(const char *name, file_t *file, unsigned int *columns);
+extern int function_set_buffered_data(function_t *function, double *buffer, size_t n, unsigned int *columns);
+
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
 

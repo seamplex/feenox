@@ -5,7 +5,7 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
 
 dist_man_MANS = doc/feenox.1
 
-EXTRA_DIST = examples tests locateruntest.sh
+EXTRA_DIST = examples tests locateruntest.sh tests/functions.sh
 
 TESTS = tests/abort.sh \
         tests/algebraic_expr.sh \
