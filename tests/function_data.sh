@@ -12,6 +12,9 @@ fi
 answer function_data1dlinear.fee "2.5"
 exitifwrong $?
 
+answer function_data1dlinearchanged.fee "1"
+exitifwrong $?
+
 answer1 function_data1d.fee linear "2"
 exitifwrong $?
 
