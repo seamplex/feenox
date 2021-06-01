@@ -1,0 +1,44 @@
+# Systems of Differential-Algebraic Equations (DAEs)
+
+## Lorenz’ attractor (the one with the butterfly)
+
+The famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system)
+whose differential equations are
+
+$$\dot{x} = \sigma \cdot (y - x)$$
+
+$$\dot{y} = x \cdot (r - z) - y$$
+
+$$\dot{z} = x \cdot y - b \cdot z$$
+
+where $\sigma=10$, $b=8/3$ and $r=28$ are the classical parameters that generate the
+butterfly as presented by Edward Lorenz back in his seminal 1963 paper
+“Deterministic non-periodic flow” can be solved with FeenoX by writing the equations
+in the input file as naturally as possible.
+
+
+
+```{.feenox style=feenox}
+PHASE_SPACE x y z
+end_time = 40
+
+sigma = 10            # parameters
+r = 28
+b = 8/3
+
+x_0 = -11             # initial conditions
+y_0 = -16
+z_0 = 22.5
+
+# the dynamical system's equations
+x_dot .= sigma*(y - x)
+y_dot .= x*(r - z) - y
+z_dot .= x*y - b*z
+
+PRINT %e t x y z        # four-column plain-ASCII output
+```
+
+![Drawn with gnuplot](lorenz.svg)
+
+![Drawn with matplotlib](lorenz.png)
+

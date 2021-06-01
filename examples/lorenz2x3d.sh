@@ -1,17 +1,14 @@
 #!/bin/bash
-
-
 n=$(cat lorenz.dat | wc -l)
 
 cat << EOF
 <html>
 <head>
- <title>My first X3DOM page</title>
- <script type='text/javascript' src='x3dom.js'> </script>
- <link rel='stylesheet' type='text/css' href='x3dom.css'/>
+ <script type="text/javascript" src="x3dom.js"> </script>
+ <link rel="stylesheet" type="text/css" href="x3dom.css"/>
 </head>
-<body>
-<x3d width="100%" height="100%">
+<body onload="document.getElementById('canvas').runtime.fitAll()">
+<x3d width="100%" height="100%" id="canvas">
 <Scene>
 <Transform>
 <Shape>
