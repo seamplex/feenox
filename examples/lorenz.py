@@ -22,4 +22,4 @@ ax.set_ylabel("y")
 ax.set_zlabel("z")
 
 #plt.show()
-plt.savefig("lorenz.png")
+plt.savefig("lorenz-matplotlib.png")

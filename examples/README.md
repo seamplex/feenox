@@ -38,7 +38,7 @@ z_dot .= x*y - b*z
 PRINT %e t x y z        # four-column plain-ASCII output
 ```
 
-![Drawn with gnuplot](lorenz.svg)
+![Drawn with gnuplot](lorenz-gnuplot.svg)
 
-![Drawn with matplotlib](lorenz.png)
+![Drawn with matplotlib](lorenz-matplotlib.png)
 
