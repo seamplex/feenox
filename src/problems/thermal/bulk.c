@@ -2,15 +2,15 @@
 #include "thermal.h"
 extern feenox_t feenox;
 extern thermal_t thermal;
+double zero[3] = {0, 0, 0};
 
-int feenox_build_element_volumetric_gauss_point_thermal(element_t *this, unsigned int v) {
+int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigned int v) {
 
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  double zero[3] = {0, 0, 0};
   double *x = zero;
   if (thermal.space_k || thermal.space_q || thermal.space_m) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));

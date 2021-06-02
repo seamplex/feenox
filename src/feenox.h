@@ -261,6 +261,7 @@ typedef struct print_t print_t;
 typedef struct print_token_t print_token_t;
 typedef struct print_function_t print_function_t;
 typedef struct multidim_range_t multidim_range_t;
+typedef struct print_vector_t print_vector_t;
 
 typedef struct sort_vector_t sort_vector_t;
 typedef struct phase_object_t phase_object_t;
@@ -786,6 +787,28 @@ struct print_function_t {
 
 };
 
+// instruccion imprimir uno o mas vectores 
+struct print_vector_t {
+  // apuntador al archivo de salida 
+  file_t *file;
+
+  // una linked list con las cosas a imprimir
+  print_token_t *tokens;
+
+  // apuntador a la primera funcion que aparezca (la que tiene la cantidad posta
+  // de argumentos), no es igual a first_token->function porque esa puede ser NULL
+  vector_t *first_vector;
+  
+  // formato de los numeritos "%e" 
+  char *format;
+  // separador de cosas "\t" 
+  char *separator;
+  
+  int horizontal;
+  expr_t elems_per_line;
+
+  print_vector_t *next;
+};
 
 struct sort_vector_t {
   int descending;
@@ -1119,11 +1142,13 @@ struct bc_data_t {
   } type_math;
   
   int type_phys;     // problem-based flag that tells which type of BC this is
+  int dof;           // -1 means "all" dofs
+
+  // boolean flags
   int space_dependent;
   int nonlinear;
   int disabled;
   int fills_matrix;
-  unsigned int dof;
 
   expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
   expr_t expr;
@@ -1314,6 +1339,7 @@ struct feenox_t {
   file_t *files;
   print_t *prints;
   print_function_t *print_functions;
+  print_vector_t *print_vectors;
   
   struct {
     var_t *done;
@@ -1505,9 +1531,8 @@ struct feenox_t {
     mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
   
 /*    
-    fino_reaction_t *reactions;
-    fino_linearize_t *linearizes;
-    fino_debug_t *debugs;  // deprecated
+    reaction_t *reactions;
+    linearize_t *linearizes;
  */
 
 /*    
@@ -1525,16 +1550,18 @@ struct feenox_t {
     PetscLogDouble petsc_flops_solve;
     PetscLogDouble petsc_flops_stress;
 
-    fino_times_t wall;
-    fino_times_t cpu;
-    fino_times_t petsc;
+    times_t wall;
+    times_t cpu;
+    times_t petsc;
 */
     
-    // virtual methods
+    // problem-specific virtual methods
     int (*problem_init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
-    int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t j, size_t k);
+    int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t node, size_t *index);
+    int (*build_element_volumetric_gauss_point)(element_t *this, unsigned int v);
     int (*solve)(void);
+    int (*solve_post)(void);
 
     // instruction pointer to know before/after transient PDE
     instruction_t *instruction;
@@ -1553,14 +1580,11 @@ struct feenox_t {
       
       var_t *gamg_threshold;
       
-      var_t *iterations;
-      var_t *residual_norm;
-    
       var_t *penalty_weight;
       var_t *nodes_rough;
       var_t *unknowns;
     
-      // TODO: take to per-problem headers
+      // TODO: move to per-problem headers
       var_t *U[3];
 
       var_t *strain_energy;
@@ -1639,11 +1663,10 @@ struct feenox_t {
     function_t ***gradient;
     // la incerteza (i.e la desviacion estandar de la contribucion de cada elemento)
     function_t ***delta_gradient;  
+    
+    // TODO: move to per-problem headers
     // los modos de vibracion
     function_t ***mode;
-  
-    // soluciones anteriores (por ejemplos desplazamientos)
-//    function_t **base_solution;
   
     enum {
       gradient_gauss_extrapolated,
@@ -1718,7 +1741,7 @@ struct feenox_t {
     Mat Jb;      // jacobian for rhs vector = dq/dT for both volumetric and BCs
     Mat J_snes;  // jacobian for SNES
     Mat J_tran;  // jacobian for TS
-//    PetscScalar lambda; // individual eigen value 
+    PetscScalar lambda; // individual eigen value 
   
     PetscScalar *eigenvalue;    // eigenvalue vector
     Vec *eigenvector;           // eivenvectors vector
@@ -1940,6 +1963,7 @@ extern double feenox_vector_get(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_static(vector_t *this, const size_t i);
 extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i);
 extern int feenox_vector_set(vector_t *this, const size_t i, double value);
+extern int feenox_vector_set_size(vector_t *this, const size_t size);
 
 // function.c
 extern int feenox_function_init(function_t *this);
@@ -1959,6 +1983,7 @@ extern int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, 
 // print.c
 extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_print_function(void *arg);
+extern int feenox_instruction_print_vector(void *arg);
 
 // conditional.c
 extern int feenox_instruction_if(void *arg);
@@ -2109,12 +2134,16 @@ extern PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm
 // petsc_ts.c
 extern int feenox_solve_petsc_transient(void);
 extern int feenox_setup_ts(TS ts);
-extern PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
-extern PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
+extern PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
+extern PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
+
+// slepc_eps.c
+extern int feenox_solve_slepc_eigen(void);
 
 // dirichlet.c
 extern int feenox_dirichlet_eval(void);
 extern int feenox_dirichlet_set_K(void);
+extern int feenox_dirichlet_set_M(void);
 extern int feenox_dirichlet_set_J(Mat J);
 extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_phi(Vec phi);
@@ -2142,15 +2171,16 @@ extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 
 // thermal/bulk.c
-extern int feenox_build_element_volumetric_gauss_point_thermal(element_t *element, unsigned int v);
+extern int feenox_problem_build_volumetric_gauss_point_thermal(element_t *element, unsigned int v);
 
 // thermal/bc.c
 extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
-extern int feenox_problem_bc_set_thermal_dirichlet(bc_data_t *bc_data, size_t j, size_t k);
+extern int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t node, size_t *index);
 extern int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v);
 extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_data, unsigned int v);
 
-
+// thermal/post.c
+extern int feenox_problem_solve_post_thermal(void);
 
 // mechanical/init.c
 extern int feenox_problem_init_parser_mechanical(void);
@@ -2159,6 +2189,16 @@ extern int feenox_problem_init_runtime_mechanical(void);
 // modal/init.c
 extern int feenox_problem_init_parser_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
+
+// modal/bulk.c
+extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element, unsigned int v);
+
+// modal/bc.c
+extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const char *rhs);
+extern int feenox_problem_bc_set_dirichlet_modal(bc_data_t *bc_data, size_t node, size_t *index);
+
+// modal/post.c
+extern int feenox_problem_solve_post_modal(void);
 
 // build.c
 extern int feenox_build(void);

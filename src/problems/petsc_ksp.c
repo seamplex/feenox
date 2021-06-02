@@ -3,7 +3,7 @@
  *
  *  Copyright (C) 2015--2020 jeremy theler
  *
- *  This file is part of Fino <https://www.seamplex.com/feenox>.
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
  *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,13 +27,10 @@ int feenox_solve_petsc_linear(void) {
 #ifdef HAVE_PETSC
   
   KSPConvergedReason reason;
-  PetscInt iterations;
   
 //  time_checkpoint(solve_begin);
   // create a KSP object if needed
   if (feenox.pde.ksp == NULL) {
-//    feenox_check_alloc(feenox.pde.K_bc = feenox_create_matrix("K_bc"));
-//    petsc_call(MatDuplicate(feenox.pde.K, MAT_SHARE_NONZERO_PATTERN, &feenox.pde.K_bc))
     petsc_call(KSPCreate(PETSC_COMM_WORLD, &feenox.pde.ksp));
     
     // set the monitor for the ascii progress
@@ -87,11 +84,6 @@ int feenox_solve_petsc_linear(void) {
     }  
   }
 
-    
-  petsc_call(KSPGetIterationNumber(feenox.pde.ksp, &iterations));
-  feenox_var_value(feenox.pde.vars.iterations) = (double)iterations;
-  
-  petsc_call(KSPGetResidualNorm(feenox.pde.ksp, feenox_value_ptr(feenox.pde.vars.residual_norm)));
 //  time_checkpoint(solve_end);
 
 #endif

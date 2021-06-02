@@ -5,6 +5,14 @@ thermal_t thermal;
 
 int feenox_problem_init_parser_thermal(void) {
   
+  feenox.pde.type = type_thermal;
+  feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
+  feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
+  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_thermal;
+  feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_thermal;
+  feenox.pde.solve_post = feenox_problem_solve_post_thermal;
+  
+  // thermal is a scalar problem
   feenox.pde.dofs = 1;
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   // TODO: choose uknown name

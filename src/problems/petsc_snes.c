@@ -3,7 +3,7 @@
  *
  *  Copyright (C) 2020 jeremy theler
  *
- *  This file is part of Fino <https://www.seamplex.com/feenox>.
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
  *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ extern feenox_t feenox;
 int feenox_solve_petsc_nonlinear(void) {
 
   SNESConvergedReason reason;
-  PetscInt       its;
   
 //  time_checkpoint(build_begin);
   
@@ -80,9 +79,6 @@ int feenox_solve_petsc_nonlinear(void) {
       fflush(stdout);
     }  
   }
-  
-  petsc_call(SNESGetIterationNumber(feenox.pde.snes, &its));
-  feenox_var_value(feenox.pde.vars.iterations) = (double)its;
   
   return FEENOX_OK;
 

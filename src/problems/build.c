@@ -163,8 +163,7 @@ int feenox_build_element_volumetric(element_t *this) {
 
   unsigned int v = 0;
   for (v = 0; v < V; v++) {
-    // TODO: virtual
-    feenox_call(feenox_build_element_volumetric_gauss_point_thermal(this, v));
+    feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, v));
   }
   
   // compute the indices of the DOFs to ensamble

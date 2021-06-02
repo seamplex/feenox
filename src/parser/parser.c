@@ -209,6 +209,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_print_function());
       return FEENOX_OK;
       
+///kw+PRINT_VECTOR+desc Print the elements of one or more vectors, one element per line.
+///kw+PRINT_VECTOR+usage PRINT_VECTOR
+    } else if (strcasecmp(token, "PRINT_VECTOR") == 0) {
+      feenox_call(feenox_parse_print_vector());
+      return FEENOX_OK;
+      
+      
       
 ///kw+FILE+desc Define a file with a particularly formatted name to be used either as input or as output.
 ///kw+FILE+usage < FILE | OUTPUT_FILE | INPUT_FILE >
@@ -529,87 +536,6 @@ int feenox_parse_line(void) {
 
       return FEENOX_OK;
 
-
-
-
-// --- PRINT_VECTOR -----------------------------------------------------
-///kw+PRINT_VECTOR+desc Print the elements of one or more vectors.
-///kw+PRINT_VECTOR+usage PRINT_VECTOR
-    } else if (strcasecmp(token, "PRINT_VECTOR") == 0) {
-
-      print_vector_t *print_vector;
-
-      print_vector = calloc(1, sizeof(print_vector_t));
-      LL_APPEND(feenox.print_vectors, print_vector);
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-///kw+PRINT_VECTOR+usage [ FILE <file_id> ]
-        if (strcasecmp(token, "FILE") == 0) {
-          feenox_call(feenox_parser_file(&print_vector->file));
-///kw+PRINT_VECTOR+usage FILE_PATH <file_path> ]
-        } else if (strcasecmp(token, "FILE_PATH") == 0) {
-          feenox_call(feenox_parser_file_path(&print_vector->file, "w"));
-
-///kw+PRINT_VECTOR+usage [ { VERTICAL | HORIZONTAL } ]
-  } else if (strcasecmp(token, "VERTICAL") == 0) {
-          print_vector->horizontal = 0;
-
-        } else if (strcasecmp(token, "HORIZONTAL") == 0) {
-          print_vector->horizontal = 1;
-
-///kw+PRINT_VECTOR+usage [ ELEMS_PER_LINE <expr> ]
-        } else if (strcasecmp(token, "ELEMS_PER_LINE") == 0) {
-          print_vector->horizontal = 1;
-          if (feenox_parser_expression(&print_vector->elems_per_line) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-///kw+PRINT_VECTOR+usage [ FORMAT <print_format> ]
-        } else if (strcasecmp(token, "FORMAT") == 0) {
-          if (feenox_parser_string(&print_vector->format) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-        } else {
-
-///kw+PRINT_VECTOR+usage <vector_1> [ vector_2 ... vector_n ]
-          // agregamos un eslabon a la lista de tokens
-          print_token_t *print_token = calloc(1, sizeof(print_token_t));
-          LL_APPEND(print_vector->tokens, print_token);
-
-          if ((print_token->vector = feenox_get_vector_ptr(token)) != NULL) {
-            if (print_vector->first_vector == NULL) {
-              // es el primer vector
-              print_vector->first_vector = print_token->vector;
-            } 
-            
-          } else {
-            feenox_call(feenox_parse_expression(token, &print_token->expression));
-            
-          }
-        }
-      }
-
-
-      // llenamos defaults
-      if (print_vector->format == NULL) {
-        feenox_check_alloc(print_vector->format = strdup(DEFAULT_PRINT_FORMAT));
-      }
-
-      if (print_vector->separator == NULL) {
-        print_vector->separator = strdup(DEFAULT_PRINT_SEPARATOR);
-      }
-
-      if (print_vector->file == NULL) {
-        print_vector->file = feenox.special_files.stdout_;
-      }
-
-      if (feenox_define_instruction(feenox_instruction_print_vector, print_vector) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return FEENOX_OK;
       
 // --- SOLVE -----------------------------------------------------
 ///kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
@@ -2505,9 +2431,11 @@ int feenox_parse_print(void) {
 ///kw+PRINT+detail See the `printf(3)` man page for further details. The default format is `DEFAULT_PRINT_FORMAT`.
 ///kw+PRINT+detail Matrices, vectors, scalar expressions, format modifiers and string literals can be given in any desired order,
 ///kw+PRINT+detail and are processed from left to right.
-///kw+PRINT+detail Vectors are printed element-by-element in a single row. See `PRINT_VECTOR` to print vectors column-wise.
+///kw+PRINT+detail Vectors are printed element-by-element in a single row.
+///kw+PRINT+detail See `PRINT_VECTOR` to print one or more vectors with one element per line (i.e. vertically).
 ///kw+PRINT+detail Matrices are printed element-by-element in a single line using row-major ordering if mixed
-///kw+PRINT+detail with other objects but in the natural row and column fashion if it is the only given object in the `PRINT` instruction.
+///kw+PRINT+detail with other objects but in the natural row and column fashion
+///kw+PRINT+detail if it is the only given object in the `PRINT` instruction.
 
 ///kw+PRINT+usage [ <object_1> <object_2> ... <object_n> ]
 ///kw+PRINT+usage [ TEXT <string_1> ... TEXT <string_n> ]
@@ -2630,11 +2558,8 @@ int feenox_parse_print_function(void) {
 
   char *token;
 
-  print_function_t *print_function;
-  function_t *dummy_function;
-
-  // TODO: api?
-  print_function = calloc(1, sizeof(print_function_t));
+  print_function_t *print_function = NULL;
+  feenox_check_alloc(print_function = calloc(1, sizeof(print_function_t)));
 
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
@@ -2750,11 +2675,12 @@ int feenox_parse_print_function(void) {
     } else {
 
       // add an item to the list of tokens
-      print_token_t *print_token = calloc(1, sizeof(print_token_t));
+      function_t *dummy_function = NULL;
+      print_token_t *print_token = NULL;
+      feenox_check_alloc(print_token = calloc(1, sizeof(print_token_t)));
       LL_APPEND(print_function->tokens, print_token);
 
       feenox_check_alloc(print_token->text = strdup(token));   // text for the header
-          
       if ((dummy_function = feenox_get_function_ptr(token)) != NULL) {
         print_token->function = dummy_function;
         if (print_function->first_function == NULL) {
@@ -2807,6 +2733,79 @@ int feenox_parse_print_function(void) {
   LL_APPEND(feenox.print_functions, print_function);
   feenox_call(feenox_add_instruction(feenox_instruction_print_function, print_function));
   
+  return FEENOX_OK;
+}
+
+int feenox_parse_print_vector(void) {
+
+  print_vector_t *print_vector = NULL;
+  feenox_check_alloc(print_vector = calloc(1, sizeof(print_vector_t)));
+
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+PRINT_FUNCTION+usage <vector_1> [ { vector | expr } ... { vector | expr } ]
+
+///kw+PRINT_VECTOR+detail Each argument should be either a vector or an expression of the integer\ `i`.
+///kw+PRINT_VECTOR+usage @
+///kw+PRINT_VECTOR+usage [ FILE { <file_path> | <file_id> } ]
+///kw+PRINT_VECTOR+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
+    if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+      feenox_call(feenox_parser_file(&print_vector->file));
+      if (print_vector->file->mode == NULL) {
+        feenox_check_alloc(print_vector->file->mode = strdup("w"));
+      }
+      
+///kw+PRINT_VECTOR+usage [ HEADER ]
+///kw+PRINT_VECTOR+detail If `HEADER` is given, the output is prepended with a single line containing the
+///kw+PRINT_VECTOR+detail names of the arguments and the names of the functions, separated by tabs.
+///kw+PRINT_VECTOR+detail The header starts with a hash\ `#` that usually acts as a comment and is ignored
+///kw+PRINT_VECTOR+detail by most plotting tools.
+//    } else if (strcasecmp(token, "HEADER") == 0) {
+//      print_vector->header = 1;
+          
+///kw+PRINT_VECTOR+usage @
+///kw+PRINT_VECTOR+usage [ FORMAT <print_format> ]
+    } else if (strcasecmp(token, "FORMAT") == 0) {
+      // TODO: like in PRINT  
+      if (feenox_parser_string(&print_vector->format) != FEENOX_OK) {
+          return FEENOX_ERROR;
+      }
+
+    } else {
+
+      // agregamos un eslabon a la lista de tokens
+      print_token_t *print_token = calloc(1, sizeof(print_token_t));
+      LL_APPEND(print_vector->tokens, print_token);
+
+      if ((print_token->vector = feenox_get_vector_ptr(token)) != NULL) {
+       if (print_vector->first_vector == NULL) {
+         // es el primer vector
+         print_vector->first_vector = print_token->vector;
+        } 
+            
+      } else {
+        feenox_call(feenox_expression_parse(&print_token->expression, token));
+            
+      }
+    }
+  }
+
+  // llenamos defaults
+  if (print_vector->format == NULL) {
+    feenox_check_alloc(print_vector->format = strdup(DEFAULT_PRINT_FORMAT));
+  }
+
+  if (print_vector->separator == NULL) {
+    print_vector->separator = strdup(DEFAULT_PRINT_SEPARATOR);
+  }
+
+  if (print_vector->file == NULL) {
+    print_vector->file = feenox.special_files.stdout_;
+  }
+
+  LL_APPEND(feenox.print_vectors, print_vector);
+  feenox_call(feenox_add_instruction(feenox_instruction_print_vector, print_vector));
+      
   return FEENOX_OK;
 }
 
@@ -3507,19 +3506,12 @@ int feenox_parse_problem(void) {
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox.pde.type = type_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
-      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
-      // TODO!
-//      feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
       
 ///kw+PROBLEM+usage thermal
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
     } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
-      feenox.pde.type = type_thermal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
-      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
-      feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
-      feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_dirichlet;
 
 ///kw+PROBLEM+usage modal
 ///kw+PROBLEM+usage ]@
@@ -3529,14 +3521,7 @@ int feenox_parse_problem(void) {
       feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
       return FEENOX_ERROR;
 #endif
-      feenox.pde.type = type_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
-      feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
-      // TODO!
-//      feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
-      if (feenox.pde.nev == 0) {
-        feenox.pde.nev = DEFAULT_NMODES;
-      }
           
 ///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
 ///kw+PROBLEM+usage @
@@ -3627,9 +3612,9 @@ int feenox_parse_problem(void) {
       }
       feenox_free(mesh_name);
 
-///kw+PROBLEM+usage [ N_MODES <expr> ] @
-///kw+PROBLEM+detail The number of modes to be computed in the modal problem. The default is DEFAULT_NMODES.
-    } else if (strcasecmp(token, "N_MODES") == 0 || strcasecmp(token, "N_EIGEN") == 0) {
+///kw+PROBLEM+usage [ MODES <expr> ] @
+///kw+PROBLEM+detail The number of modes to be computed in the modal problem is given by `MODES`. The default is DEFAULT_NMODES.
+    } else if (strcasecmp(token, "MODES") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
       feenox.pde.nev = (int)(xi);

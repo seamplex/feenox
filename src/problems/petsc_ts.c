@@ -1,3 +1,24 @@
+/*------------ -------------- -------- --- ----- ---   --       -            -
+ *  feenox's transient solver using PETSc routines
+ *
+ *  Copyright (C) 2021 jeremy theler
+ *
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
+ *
+ *  feenox is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  feenox is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *------------------- ------------  ----    --------  --     -       -         -
+ */
 #include "feenox.h"
 extern feenox_t feenox;
 
@@ -20,31 +41,33 @@ int feenox_solve_petsc_transient(void) {
       }
     }
     
-    petsc_call(TSCreate(PETSC_COMM_WORLD, &feenox.pde.ts));
-    petsc_call(TSSetIFunction(feenox.pde.ts, NULL, fino_ts_residual, NULL));
-    
-    // if we have an initial condition then matrices do not exist yet
-    if (feenox.pde.initial_condition != NULL) {
-      feenox_call(feenox_build());
+    if (feenox.pde.ts == NULL) {
+      petsc_call(TSCreate(PETSC_COMM_WORLD, &feenox.pde.ts));
+      petsc_call(TSSetIFunction(feenox.pde.ts, NULL, feenox_ts_residual, NULL));
+
+      // if we have an initial condition then matrices do not exist yet
+      if (feenox.pde.initial_condition != NULL) {
+        feenox_call(feenox_build());
+      }  
+      petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.JK, MAT_COPY_VALUES, &feenox.pde.J_tran));
+      petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_tran, feenox.pde.J_tran, feenox_ts_jacobian, NULL));
+
+      petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
+
+      // if BCs depend on time we need DAEs
+      petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_IMPLICIT));      
+  //      petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_DAE_IMPLICIT_INDEX1));
+  //      petsc_call(TSARKIMEXSetFullyImplicit(feenox.pde.ts, PETSC_TRUE)); 
+
+      feenox_call(feenox_setup_ts(feenox.pde.ts));
+
+      petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
+      petsc_call(TSSetMaxTime(feenox.pde.ts, 0.0));
+      petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
+
+      petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_var_value(feenox_special_var(end_time))));
+      petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_MATCHSTEP));
     }  
-    petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.JK, MAT_COPY_VALUES, &feenox.pde.J_tran));
-    petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_tran, feenox.pde.J_tran, fino_ts_jacobian, NULL));
-
-    petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
-
-    // if BCs depend on time we need DAEs
-    petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_IMPLICIT));      
-//      petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_DAE_IMPLICIT_INDEX1));
-//      petsc_call(TSARKIMEXSetFullyImplicit(feenox.pde.ts, PETSC_TRUE)); 
-    
-    feenox_call(feenox_setup_ts(feenox.pde.ts));
-
-    petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
-    petsc_call(TSSetMaxTime(feenox.pde.ts, 0.0));
-    petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
-    
-    petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_var_value(feenox_special_var(end_time))));
-    petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_MATCHSTEP));
     
     return FEENOX_OK;
     
@@ -108,7 +131,7 @@ int feenox_setup_ts(TS ts) {
   return FEENOX_OK;
 }
 
-PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx) {
+PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx) {
   
 //  static int count = 0;
   feenox_var_value(feenox_special_var(t)) = t;
@@ -147,7 +170,7 @@ PetscErrorCode fino_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r,
   return FEENOX_OK;
 }
 
-PetscErrorCode fino_ts_jacobian(TS ts, PetscReal t, Vec phi, Vec phi_dot, PetscReal s, Mat J, Mat P, void *ctx) {
+PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec phi, Vec phi_dot, PetscReal s, Mat J, Mat P, void *ctx) {
 
   // return (K + s*M)_dirichlet
   petsc_call(MatCopy(feenox.pde.K, J, SAME_NONZERO_PATTERN));

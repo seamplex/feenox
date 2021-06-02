@@ -3,7 +3,7 @@
  *
  *  Copyright (C) 2015--2021 Seamplex
  *
- *  This file is part of Fino <https://www.seamplex.com/feenox>.
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
  *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -226,16 +226,6 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
 ///va+feenox_penalty_weight+detail Default is `1e8`.
   feenox_var_value(feenox.pde.vars.penalty_weight) = 1e8;  
   
-///va+feenox_iterations+name feenox_iterations
-///va+feenox_iterations+detail This variable contains the actual number of iterations used
-///va+feenox_iterations+detail by the solver. It is set after `FINO_STEP`.
-  feenox.pde.vars.iterations = feenox_define_variable_get_ptr("pde_iterations");
-  
-///va+feenox_residual_norm+name feenox_residual_norm
-///va+feenox_residual_norm+detail This variable contains the residual obtained
-///va+feenox_residual_norm+detail by the solver. It is set after `FINO_STEP`.
-  feenox.pde.vars.residual_norm= feenox_define_variable_get_ptr("residual_norm");
-
 ///va+nodes_rough+name nodes_rough
 ///va+nodes_rough+detail The number of nodes of the mesh in `ROUGH` mode.
   feenox.pde.vars.nodes_rough = feenox_define_variable_get_ptr("nodes_rough");
@@ -312,10 +302,6 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
 ///va+memory_petsc+detail Maximum resident set size (memory used by PETSc), in bytes.
   feenox.pde.vars.memory_petsc = feenox_define_variable_get_ptr("memory_petsc");
   
-  
-  // empezamos con un valor muy negativo, si nadie lo toca ni calculamos la calidad
-//  feenox.pde.gradient_quality_threshold = DEFAULT_GRADIENT_JACOBIAN_THRESHOLD;
-
 #endif  
   
   return FEENOX_OK;
@@ -326,7 +312,7 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
 int feenox_problem_define_solutions(void) {
   
   if (feenox.pde.dim == 0 || feenox.pde.dofs == 0) {
-    feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either FINO_PROBLEM or MESH");
+    feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either PROBLEM or READ_MESH");
     return FEENOX_ERROR;
   }
 
@@ -384,7 +370,8 @@ int feenox_problem_define_solutions(void) {
       }
       
     } else {  
-      // en modal tenemos muchas soluciones
+      
+      // there are many solution functions in modal
       feenox_check_alloc(feenox.pde.mode[g] = calloc(feenox.pde.nev, sizeof(function_t *)));
       unsigned int i;
       for (i = 0; i < feenox.pde.nev; i++) {
@@ -420,7 +407,7 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   return 0;
 }
 
-
+/*
 int fino_function_clean_nodal_data(function_t *function) {
  
   if (function != NULL && function->data_value != NULL) {  
@@ -430,7 +417,7 @@ int fino_function_clean_nodal_data(function_t *function) {
   
   return 0;
 }
-
+*/
 int feenox_problem_define_solution_clean_nodal_arguments(function_t *function) {
  
   if (function->data_argument != NULL) {

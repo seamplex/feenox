@@ -28,7 +28,10 @@ int feenox_instruction_solve_problem(void *arg) {
   
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)
-  feenox_call(feenox.pde.solve());  
+  feenox_call(feenox.pde.solve());
+  if (feenox.pde.solve_post != NULL) {
+    feenox_call(feenox.pde.solve_post());
+  }
   // TODO: how to do this in parallel?
   feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));
 
@@ -97,7 +100,7 @@ int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
       }
 
       if (feenox.pde.nev > 1) {
-        double xi = 0;
+        PetscScalar xi = 0;
         unsigned int i = 0;
         for (i = 0; i < feenox.pde.nev; i++) {
           // the values already have the excitation factor

@@ -64,14 +64,27 @@ int feenox_vector_set(vector_t *this, const size_t i, double value) {
   if (this->initialized == 0) {
     if (feenox_vector_init(this, 0) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
-      feenox_runtime_error();
+      return FEENOX_ERROR;
     }
   }
   
   gsl_vector_set(feenox_value_ptr(this), i, value);
   
-  return 0;
+  return FEENOX_OK;
 }
+
+int feenox_vector_set_size(vector_t *this, size_t size) {
+  if (this->initialized) {
+    feenox_push_error_message("cannot set vector '%s' size, it is already initialized", this->name);
+    return FEENOX_ERROR;
+  }
+  
+  this->size = size;
+  
+  return FEENOX_OK;
+  
+}
+
 
 int feenox_vector_init(vector_t *this, int no_initial) {
 
@@ -83,19 +96,6 @@ int feenox_vector_init(vector_t *this, int no_initial) {
     return FEENOX_OK;
   }
 
-/*  
-  if (this->function != NULL) {
-    
-    if (!this->function->initialized) {
-      feenox_call(feenox_function_init(this->function));
-    }
-    if (this->size_expr.items == NULL) {
-      size = this->function->data_size;
-    } else if ((size = (int)(round(feenox_expression_eval(&this->size_expr)))) != this->function->data_size) {
-      feenox_push_error_message("vector '%s' has size mismatch, SIZE = %d and FUNCTION = %d", this->name, size, this->function->data_size);
-      return FEENOX_ERROR;
-    }
-*/    
   if ((size = this->size) == 0 && (size = (int)(round(feenox_expression_eval(&this->size_expr)))) == 0) {
     feenox_push_error_message("vector '%s' has zero size", this->name);
     return FEENOX_ERROR;

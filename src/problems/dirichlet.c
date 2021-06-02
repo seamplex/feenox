@@ -57,8 +57,8 @@ int feenox_dirichlet_eval(void) {
                   feenox_var_value(feenox.mesh.vars.y) = feenox.pde.mesh->node[j].x[1];
                   feenox_var_value(feenox.mesh.vars.z) = feenox.pde.mesh->node[j].x[2];
                 }  
-                feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j, k));
-                k++;
+                // we pass a pointer to k and this method increments it as needed
+                feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j, &k));
                 
               }  
             }  
@@ -100,7 +100,6 @@ int feenox_dirichlet_set_K(void) {
   for (k = feenox.pde.first_row; k < feenox.pde.last_row; k++) {
     petsc_call(MatGetValues(feenox.pde.K, 1, &k, 1, &k, &diag));
     if (diag == 0) {
-      printf("hola pianola!");
       petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
       petsc_call(MatSetValue(feenox.pde.K, k, k, 1.0, INSERT_VALUES));
       petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
@@ -115,10 +114,12 @@ int feenox_dirichlet_set_K(void) {
     petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
   }
   
-  if (feenox.pde.b_bc == NULL) {
-    petsc_call(VecDuplicate(feenox.pde.b, &feenox.pde.b_bc));
-  }
-  petsc_call(VecCopy(feenox.pde.b, feenox.pde.b_bc));
+  if (feenox.pde.b != NULL) {
+    if (feenox.pde.b_bc == NULL) {
+      petsc_call(VecDuplicate(feenox.pde.b, &feenox.pde.b_bc));
+    }
+    petsc_call(VecCopy(feenox.pde.b, feenox.pde.b_bc));
+  }  
   
   // this vector holds the dirichlet values and is used to re-write
   // the actual rhs vector b in order to keep the symmetry of K
@@ -133,7 +134,18 @@ int feenox_dirichlet_set_K(void) {
   
   return FEENOX_OK;
 }
-  
+
+
+// M - mass matrix: needs a zero in the diagonal and the same symmetry scheme that K
+int feenox_dirichlet_set_M(void) {
+
+  // the mass matrix is like the stiffness one but with zero instead of one
+  petsc_call(MatZeroRowsColumns(feenox.pde.M, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+
+  return FEENOX_OK;
+}
+
+
 // J - Jacobian matrix: same as K but without the RHS vector
 int feenox_dirichlet_set_J(Mat J) {
 

@@ -93,6 +93,7 @@ extern int feenox_parse_open_close(const char *what);
 
 extern int feenox_parse_print(void);
 extern int feenox_parse_print_function(void);
+extern int feenox_parse_print_vector(void);
 
 extern int feenox_parse_if(void);
 extern int feenox_parse_else(void);
