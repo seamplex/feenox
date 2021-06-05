@@ -3651,6 +3651,24 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSAdaptType.html>.
     } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
+
+///kw+PROBLEM+usage [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]@
+///kw+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
+    } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "EPS") == 0 || strcasecmp(token, "EPS_TYPE") == 0) {
+      feenox_call(feenox_parser_string((char **)&feenox.pde.eps_type));
+
+///kw+PROBLEM+usage [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]@
+///kw+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https://slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
+    } else if (strcasecmp(token, "SPECTRAL_TRANSFORMATION") == 0 || strcasecmp(token, "ST") == 0 || strcasecmp(token, "ST_TYPE") == 0) {
+      feenox_call(feenox_parser_string((char **)&feenox.pde.st_type));
+
+///kw+PROBLEM+usage [ EIGEN_FORMULATION { omega | lambda } ]@
+///kw+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$,
+///kw+PROBLEM+detail and $M \phi = \lambda K \phi$$ if it is `lambda`.
+    } else if (strcasecmp(token, "EIGEN_FORMULATION") == 0) {
+      char *keywords[] = {"omega", "lambda", ""};
+      int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.eigen_formulation));
       
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);

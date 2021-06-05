@@ -24,11 +24,11 @@ int feenox_problem_init_parser_thermal(void) {
 // TODO: document special variables
 ///va+T_max+name T_max
 ///va+T_max+detail The maximum temperature\ $T_\text{max}$ of the thermal problem.
-  feenox.pde.vars.T_max = feenox_define_variable_get_ptr("T_max");
+//  feenox.pde.vars.T_max = feenox_define_variable_get_ptr("T_max");
 
 ///va+T_min+name T_min
 ///va+T_min+detail The minimum temperature\ $T_\text{min}$ of the thermal problem.
-  feenox.pde.vars.T_min = feenox_define_variable_get_ptr("T_min");
+//  feenox.pde.vars.T_min = feenox_define_variable_get_ptr("T_min");
   
   // TODO: heat fluxes as seconday fields
   

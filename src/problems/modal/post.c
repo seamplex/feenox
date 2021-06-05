@@ -22,7 +22,7 @@ int feenox_problem_solve_post_modal(void) {
   // total mass (scalar)
   PetscScalar oneMone;
   petsc_call(VecDot(one, Mone, &oneMone));
-  feenox_var_value(feenox.pde.vars.M_T) = oneMone/(PetscScalar)feenox.pde.dofs;
+  feenox_var_value(modal.M_T) = oneMone/(PetscScalar)feenox.pde.dofs;
   
   // accumulator
   PetscScalar Mu = 0;
@@ -31,11 +31,15 @@ int feenox_problem_solve_post_modal(void) {
   PetscScalar omega, norm, mu, phiMphi, phiMone, Gamma;
   unsigned int i;
   for (i = 0; i < feenox.pde.nev; i++) {
-    // the eigenvalue is the inverse of the angular frequency
-    omega = 1.0/sqrt(feenox.pde.eigenvalue[i]);
-    feenox_call(feenox_vector_set(feenox.pde.vectors.omega, i, omega));
+    if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
+      omega = sqrt(feenox.pde.eigenvalue[i]);
+    } else {
+      omega = 1.0/sqrt(feenox.pde.eigenvalue[i]);
+    }
+    
+    feenox_call(feenox_vector_set(modal.omega, i, omega));
     // convert it to cycles per time
-    feenox_call(feenox_vector_set(feenox.pde.vectors.f, i, omega/(2*M_PI)));
+    feenox_call(feenox_vector_set(modal.f, i, omega/(2*M_PI)));
 
     // normalization works like this: first we normalize to max = 1
     // so we can compare the scalar products with the mass matrix
@@ -49,26 +53,27 @@ int feenox_problem_solve_post_modal(void) {
     
     // modal mass
     petsc_call(VecDot(feenox.pde.eigenvector[i], Mphi, &phiMphi));
-    feenox_call(feenox_vector_set(feenox.pde.vectors.m, i, phiMphi));
+    feenox_call(feenox_vector_set(modal.m, i, phiMphi));
 
     // excitation factor
     petsc_call(VecDot(feenox.pde.eigenvector[i], Mone, &phiMone));
-    feenox_call(feenox_vector_set(feenox.pde.vectors.L, i, phiMone));
+    feenox_call(feenox_vector_set(modal.L, i, phiMone));
 
     // participacion factor
     Gamma = phiMone/(feenox.pde.dofs * phiMphi);
-    feenox_call(feenox_vector_set(feenox.pde.vectors.Gamma, i, Gamma));
+    feenox_call(feenox_vector_set(modal.Gamma, i, Gamma));
     
     // effective mass
     mu = gsl_pow_2(phiMone)/(oneMone * phiMphi);
-    feenox_call(feenox_vector_set(feenox.pde.vectors.mu, i, mu));
+    feenox_call(feenox_vector_set(modal.mu, i, mu));
     
     // accumulated effective mass
     Mu += mu;
-    feenox_call(feenox_vector_set(feenox.pde.vectors.Mu, i, Mu));
+    feenox_call(feenox_vector_set(modal.Mu, i, Mu));
     
     // now we have to re-normalize the eigenvector such that the maximum displacement
-    // sqrt(u^2+v^2+w^2) is equal to one and then we multiply by te excitation factor Gamma
+    // sqrt(u^2+v^2+w^2) is equal to one and then we multiply by the excitation factor Gamma
+    // TODO: parallel
     PetscScalar norm = -1;
     PetscScalar chi, xi;
     PetscInt index = 0;

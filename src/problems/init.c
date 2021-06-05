@@ -143,7 +143,7 @@ int feenox_problem_init_parser_general(void) {
   
   
 ///va+ksp_atol+name ksp_atol
-///va+ksp_atol+detail Absolute tolerance of the linear solver, as passed to PETSc’s
+///va+ksp_atol+detail Absolute tolerance of the iterative linear solver, as passed to PETSc’s
 ///va+ksp_atol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html)
   feenox.pde.vars.ksp_atol = feenox_define_variable_get_ptr("ksp_atol");
   // TODO: set to PETSC_DEFAULT?
@@ -151,7 +151,7 @@ int feenox_problem_init_parser_general(void) {
   feenox_var_value(feenox.pde.vars.ksp_atol) = 1e-50;   // same as PETSc
  
 ///va+ksp_rtol+name ksp_rtol
-///va+ksp_rtol+detail Relative tolerance of the linear solver,
+///va+ksp_rtol+detail Relative tolerance of the iterative linear solver,
 ///va+ksp_rtol+detail as passed to PETSc’s
 ///va+ksp_rtol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
 feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
@@ -159,7 +159,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
   feenox_var_value(feenox.pde.vars.ksp_rtol) = 1e-6;    // PETSc is 1e-5
   
 ///va+ksp_divtol+name ksp_divtol
-///va+ksp_divtol+detail Divergence tolerance,
+///va+ksp_divtol+detail Divergence tolerance of the iterative linear solver,
 ///va+ksp_divtol+detail as passed to PETSc’s
 ///va+ksp_divtol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
   feenox.pde.vars.ksp_divtol = feenox_define_variable_get_ptr("ksp_divtol");
@@ -167,7 +167,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
   feenox_var_value(feenox.pde.vars.ksp_divtol) = 1e+4;  // same as PETSc
   
 ///va+ksp_max_it+name ksp_max_it
-///va+ksp_max_it+detail Number of maximum iterations before diverging,
+///va+ksp_max_it+detail Number of maximum iterations of the iterative linear solver before diverging,
 ///va+ksp_max_it+detail as passed to PETSc’s
 ///va+ksp_max_it+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
   feenox.pde.vars.ksp_max_it = feenox_define_variable_get_ptr("ksp_max_it");
@@ -183,7 +183,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
   feenox_var_value(feenox.pde.vars.snes_atol) = 1e-50;   // same as PETSc
  
 ///va+snes_rtol+name snes_rtol
-///va+snes_rtol+detail Relative tolerance of the linear solver,
+///va+snes_rtol+detail Relative tolerance of the non-linear solver,
 ///va+snes_rtol+detail as passed to PETSc’s
 ///va+snes_rtol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
 feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
@@ -191,7 +191,7 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
   feenox_var_value(feenox.pde.vars.snes_rtol) = 1e-8;    // same as PETSc
   
 ///va+snes_stol+name snes_stol
-///va+snes_stol+detail Convergence tolerance in terms of the norm of the change in the solution between steps,
+///va+snes_stol+detail Convergence tolerance of the non-linear solver in terms of the norm of the change in the solution between steps,
 ///va+snes_stol+detail as passed to PETSc’s
 ///va+snes_stol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
   feenox.pde.vars.snes_stol = feenox_define_variable_get_ptr("snes_stol");
@@ -199,21 +199,36 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
   feenox_var_value(feenox.pde.vars.snes_stol) = 1e-8;  // same as PETSc
   
 ///va+snes_max_it+name snes_max_it
-///va+snes_max_itdetail Number of maximum iterations before diverging,
+///va+snes_max_itdetail Number of maximum iterations of the non-linear solver before diverging,
 ///va+snes_max_it+detail as passed to PETSc’s
 ///va+snes_max_it+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
   feenox.pde.vars.snes_max_it = feenox_define_variable_get_ptr("snes_max_it");
 ///va+snes_max_it+detail Default `50`.
   feenox_var_value(feenox.pde.vars.snes_max_it) = 50;   // same as PETSc
   
+///va+eps_tol+name eps_tol
+///va+eps_tol+detail Tolerance (relative to the matrix norms) of the eigen solver,
+///va+ksp_rtol+detail as passed to SLEPc’s
+///va+ksp_rtol+detail [`EPSSetTolerances`](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSSetTolerances.html).
+feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
+///va+ksp_rtol+detail Default `1e-8`.
+  feenox_var_value(feenox.pde.vars.eps_tol) = 1e-8;    // same as SLEPc
   
+///va+eps_max_it+name eps_max_it
+///va+eps_max_it Number of maximum iterations allowed in the eigen solver,
+///va+eps_max_it+detail as passed to SLEPc’s
+///va+ksp_rtol+detail [`EPSSetTolerances`](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSSetTolerances.html).
+  feenox.pde.vars.eps_max_it = feenox_define_variable_get_ptr("eps_max_it");
+///va+snes_max_it+detail Default is a solver-dependent reasonable value`.
+  feenox_var_value(feenox.pde.vars.eps_max_it) = PETSC_DEFAULT;
+
   
-///va+feenox_gamg_threshold+name feenox_gamg_threshold
-///va+feenox_gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph for the
-///va+feenox_gamg_threshold+detail [Geometric Algebraic Multigrid Preconditioner](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMG.html)
-///va+feenox_gamg_threshold+detail as passed to PETSc’s
-///va+feenox_gamg_threshold+detail [`PCGAMGSetThreshold`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMGSetThreshold.html).
-///va+feenox_gamg_threshold+detail A value of 0.0 means keep all nonzero entries in the graph; negative means keep even zero entries in the graph.
+///va+gamg_threshold+name feenox_gamg_threshold
+///va+gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph for the
+///va+gamg_threshold+detail [Geometric Algebraic Multigrid Preconditioner](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMG.html)
+///va+gamg_threshold+detail as passed to PETSc’s
+///va+gamg_threshold+detail [`PCGAMGSetThreshold`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMGSetThreshold.html).
+///va+gamg_threshold+detail A value of 0.0 means keep all nonzero entries in the graph; negative means keep even zero entries in the graph.
   feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("gamg_threshold");
 ///va+feenox_gamg_threshold+detail Default `0.01`.  
   feenox_var_value(feenox.pde.vars.gamg_threshold) = 0.01;
@@ -234,55 +249,55 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
   
 ///va+time_wall_build+name time_wall_build
 ///va+time_wall_build+detail Wall time insumed to build the problem matrices, in seconds.
-  feenox.pde.vars.time_wall_build = feenox_define_variable_get_ptr("time_wall_build");
+//  feenox.pde.vars.time_wall_build = feenox_define_variable_get_ptr("time_wall_build");
 
 ///va+time_wall_solve+name time_wall_solve
 ///va+time_wall_solve+detail Wall time insumed to solve the problem, in seconds.
-  feenox.pde.vars.time_wall_solve = feenox_define_variable_get_ptr("time_wall_solve");
+//  feenox.pde.vars.time_wall_solve = feenox_define_variable_get_ptr("time_wall_solve");
 
 ///va+time_wall_stress+name time_wall_stress
 ///va+time_wall_stress+detail Wall time insumed to compute the stresses, in seconds.
-  feenox.pde.vars.time_wall_stress = feenox_define_variable_get_ptr("time_wall_stress");
+//  feenox.pde.vars.time_wall_stress = feenox_define_variable_get_ptr("time_wall_stress");
 
 ///va+time_wall_total+name time_wall_total
 ///va+time_wall_total+detail Wall time insumed to initialize, build and solve, in seconds.
-  feenox.pde.vars.time_wall_total = feenox_define_variable_get_ptr("time_wall_total");
+//  feenox.pde.vars.time_wall_total = feenox_define_variable_get_ptr("time_wall_total");
   
 ///va+time_cpu_build+name time_cpu_build
 ///va+time_cpu_build+detail CPU time insumed to build the problem matrices, in seconds.
-  feenox.pde.vars.time_cpu_build = feenox_define_variable_get_ptr("time_cpu_build");
+//  feenox.pde.vars.time_cpu_build = feenox_define_variable_get_ptr("time_cpu_build");
 
 ///va+time_cpu_solve+name time_cpu_solve
 ///va+time_cpu_solve+detail CPU time insumed to solve the problem, in seconds.
-  feenox.pde.vars.time_cpu_solve = feenox_define_variable_get_ptr("time_cpu_solve");
+//  feenox.pde.vars.time_cpu_solve = feenox_define_variable_get_ptr("time_cpu_solve");
 
 ///va+time_cpu_stress+name time_cpu_stress
 ///va+time_cpu_stress+detail CPU time insumed to compute the stresses from the displacements, in seconds.
-  feenox.pde.vars.time_cpu_stress = feenox_define_variable_get_ptr("time_cpu_stress");
+//  feenox.pde.vars.time_cpu_stress = feenox_define_variable_get_ptr("time_cpu_stress");
   
 ///va+time_wall_total+name time_cpu_total
 ///va+time_wall_total+detail CPU time insumed to initialize, build and solve, in seconds.
-  feenox.pde.vars.time_cpu_total = feenox_define_variable_get_ptr("time_cpu_total");
+//  feenox.pde.vars.time_cpu_total = feenox_define_variable_get_ptr("time_cpu_total");
   
 ///va+time_petsc_build+name time_petsc_build
 ///va+time_petsc_build+detail CPU time insumed by PETSc to build the problem matrices, in seconds.
-  feenox.pde.vars.time_petsc_build = feenox_define_variable_get_ptr("time_petsc_build");
+//  feenox.pde.vars.time_petsc_build = feenox_define_variable_get_ptr("time_petsc_build");
 
 ///va+time_petsc_solve+name time_petsc_solve
 ///va+time_petsc_solve+detail CPU time insumed by PETSc to solve the eigen-problem, in seconds.
-  feenox.pde.vars.time_petsc_solve = feenox_define_variable_get_ptr("time_petsc_solve");
+//  feenox.pde.vars.time_petsc_solve = feenox_define_variable_get_ptr("time_petsc_solve");
 
 ///va+time_petsc_stress+name time_petsc_solve
 ///va+time_petsc_stress+detail CPU time insumed by PETSc to compute the stresses, in seconds.
-  feenox.pde.vars.time_petsc_stress = feenox_define_variable_get_ptr("time_petsc_stress");
+//  feenox.pde.vars.time_petsc_stress = feenox_define_variable_get_ptr("time_petsc_stress");
   
 ///va+time_wall_total+name time_wall_total
 ///va+time_wall_total+detail CPU time insumed by PETSc to initialize, build and solve, in seconds.
-  feenox.pde.vars.time_petsc_total = feenox_define_variable_get_ptr("time_petsc_total");
+//  feenox.pde.vars.time_petsc_total = feenox_define_variable_get_ptr("time_petsc_total");
 
   ///va+petsc_flops+name petsc_flops
 ///va+petsc_flops+detail Number of floating point operations performed by PETSc/SLEPc.
-  feenox.pde.vars.flops_petsc = feenox_define_variable_get_ptr("flops_petsc");
+//  feenox.pde.vars.flops_petsc = feenox_define_variable_get_ptr("flops_petsc");
          
 ///va+memory_available+name memory_available
 ///va+memory_available+detail Total available memory, in bytes.
@@ -431,8 +446,7 @@ int feenox_problem_define_solution_clean_nodal_arguments(function_t *function) {
   return FEENOX_OK;
 }
 
-
-
+/*
 int plugin_init_before_run(void) {
 
   feenox.pde.global_size = 0;
@@ -464,6 +478,8 @@ int plugin_finalize(void) {
   
   return FEENOX_OK;
 }
+*/
+
 
 int feenox_problem_init_runtime_general(void) {
 

@@ -14,7 +14,6 @@ int feenox_build(void) {
   if (feenox.pde.has_stiffness == PETSC_TRUE) {
     petsc_call(MatZeroEntries(feenox.pde.K));
   }  
-  
   if (feenox.pde.has_mass == PETSC_TRUE) {
     petsc_call(MatZeroEntries(feenox.pde.M));
   }
@@ -139,7 +138,8 @@ int feenox_build_element_volumetric(element_t *this) {
   
   // total number of gauss points
   unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
-    
+  
+  // if the current element's size is not equal to the previous one, re-allocate
   if (feenox.pde.n_local_nodes != this->type->nodes) {
     feenox_call(feenox_elemental_objects_allocate(this));
   }
@@ -161,8 +161,10 @@ int feenox_build_element_volumetric(element_t *this) {
     gsl_vector_set_zero(feenox.pde.bi);
   }
 
+  // loop over gauss points to integrate elemental matrices and vectors
   unsigned int v = 0;
   for (v = 0; v < V; v++) {
+    // this is a virtual method that depends on the problem type
     feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, v));
   }
   

@@ -204,7 +204,6 @@ void feenox_longversion(void) {
   SlepcGetVersion(slepcversion, BUFFER_TOKEN_SIZE);  
 #else
   char *slepcversion = "N/A";
-  printf("SLEPc version      : N/A\n");
 #endif
   printf("SLEPc version      : %s\n", slepcversion);
 

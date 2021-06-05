@@ -156,6 +156,11 @@ int feenox_setup_ksp(KSP ksp) {
     // TODO: this is K for ksp but J for snes
     if (feenox.pde.has_stiffness) {
       petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
+      petsc_call(MatSetOption(feenox.pde.K_bc, MAT_SYMMETRIC, PETSC_TRUE));  
+    }  
+    if (feenox.pde.has_mass) {
+      petsc_call(MatSetOption(feenox.pde.M, MAT_SYMMETRIC, PETSC_TRUE));  
+      petsc_call(MatSetOption(feenox.pde.M_bc, MAT_SYMMETRIC, PETSC_TRUE));  
     }  
     if (feenox.pde.has_jacobian_K) {
       petsc_call(MatSetOption(feenox.pde.JK, MAT_SYMMETRIC, PETSC_TRUE));  
@@ -170,16 +175,14 @@ int feenox_setup_ksp(KSP ksp) {
                                    feenox_var_value(feenox.pde.vars.ksp_divtol),
                                    (PetscInt)feenox_var_value(feenox.pde.vars.ksp_max_it)));
   
-//  petsc_call(KSPSetUp(ksp));
-//  SNESSetUp(feenox.pde.snes);
+  petsc_call(KSPSetUp(ksp));
+  
+  // read command-line options
+  petsc_call(KSPSetFromOptions(ksp));
   
   PC pc;
   petsc_call(KSPGetPC(ksp, &pc));
   feenox_call(feenox_setup_pc(pc));
-//  petsc_call(PCSetUp(pc));
-  
-  // read command-line options
-  petsc_call(KSPSetFromOptions(ksp));
 
   return FEENOX_OK;
 }
@@ -188,13 +191,6 @@ int feenox_setup_pc(PC pc) {
 
 //  PetscInt i, j;
   PCType pc_type;
-
-//  PetscInt nearnulldim = 0;
-//  MatNullSpace nullsp = NULL;
-//  PetscScalar  dots[5];
-//  Vec          *nullvec;  
-//  PetscReal    *coords;
-//  Vec          vec_coords;
 
   // if we were asked for mumps, then either LU o cholesky needs to be used
   // and MatSolverType to mumps
@@ -227,7 +223,6 @@ int feenox_setup_pc(PC pc) {
   }  
 #endif
   
-  
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type != NULL && strcmp(pc_type, PCGAMG) == 0) {
 #if PETSC_VERSION_LT(3,8,0)
@@ -238,84 +233,40 @@ int feenox_setup_pc(PC pc) {
     petsc_call(PCGAMGSetNSmooths(pc, 1));
   }
 
-/*  
-  if (feenox.pde.problem_family == problem_family_mechanical) {
-    // las coordenadas (solo para break)
+  // TODO: this has to go somewhere else
+//  PetscInt nearnulldim = 0;
+//  MatNullSpace nullsp = NULL;
+//  PetscScalar  dots[5];
+//  Vec          *nullvec;  
+  
+//  if (feenox.pde.dofs == 3) {
   // http://computation.llnl.gov/casc/linear_solvers/pubs/Baker-2009-elasticity.pdf
-    // ojo que si estamos en node ordering no podemos usar set_near_nullspace_rigidbody
-    if (feenox.pde.mesh->ordering == ordering_dof_major && feenox.pde.set_near_nullspace == set_near_nullspace_rigidbody) {
-      feenox.pde.set_near_nullspace = set_near_nullspace_feenox;
+
+/*  
+    Vec vec_coords;
+    petsc_call(MatCreateVecs(feenox.pde.K, NULL, &vec_coords));
+    petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dofs));
+    petsc_call(VecSetUp(vec_coords));
+
+    PetscScalar *coords;
+    size_t j = 0;
+    unsigned int m = 0;
+    petsc_call(VecGetArray(vec_coords, &coords));
+    for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {          
+      for (m = 0; m < feenox.pde.dofs; m++) {
+        coords[feenox.pde.mesh->node[j].index_dof[m]-feenox.pde.first_row] = feenox.pde.mesh->node[j].x[m];
+      }
     }
-
-    switch(feenox.pde.set_near_nullspace) {
-
-      case set_near_nullspace_rigidbody:
-        petsc_call(MatCreateVecs(feenox.pde.K, NULL, &vec_coords));
-        petsc_call(VecSetBlockSize(vec_coords, feenox.pde.degrees));
-        petsc_call(VecSetUp(vec_coords));
-        petsc_call(VecGetArray(vec_coords, &coords));
-
-        for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {          
-          for (d = 0; d < feenox.pde.dimensions; d++) {
-            coords[feenox.pde.mesh->node[j].index_dof[d]-feenox.pde.first_row] = feenox.pde.mesh->node[j].x[d];
-          }
-        }
-
-        petsc_call(VecRestoreArray(vec_coords, &coords));
-        petsc_call(MatNullSpaceCreateRigidBody(vec_coords, &nullsp));
-        petsc_call(MatSetNearNullSpace(feenox.pde.K, nullsp));
-        petsc_call(MatNullSpaceDestroy(&nullsp));
-        petsc_call(VecDestroy(&vec_coords));
-      break;
-
-      case set_near_nullspace_feenox:
-        nearnulldim = 6; 
-        petsc_call(PetscMalloc1(nearnulldim, &nullvec));
-        for (i = 0; i < nearnulldim; i++) {
-          petsc_call(MatCreateVecs(feenox.pde.K, &nullvec[i], NULL));
-        }
-        for (j = 0; j < feenox.pde.mesh->n_nodes; j++) {
-          // traslaciones
-          VecSetValue(nullvec[0], feenox.pde.mesh->node[j].index_dof[0], 1.0, INSERT_VALUES);
-          VecSetValue(nullvec[1], feenox.pde.mesh->node[j].index_dof[1], 1.0, INSERT_VALUES);
-          VecSetValue(nullvec[2], feenox.pde.mesh->node[j].index_dof[2], 1.0, INSERT_VALUES);
-
-          // rotaciones
-          VecSetValue(nullvec[3], feenox.pde.mesh->node[j].index_dof[0], +feenox.pde.mesh->node[j].x[1], INSERT_VALUES);
-          VecSetValue(nullvec[3], feenox.pde.mesh->node[j].index_dof[1], -feenox.pde.mesh->node[j].x[0], INSERT_VALUES);
-
-          VecSetValue(nullvec[4], feenox.pde.mesh->node[j].index_dof[1], -feenox.pde.mesh->node[j].x[2], INSERT_VALUES);
-          VecSetValue(nullvec[4], feenox.pde.mesh->node[j].index_dof[2], +feenox.pde.mesh->node[j].x[1], INSERT_VALUES);
-
-          VecSetValue(nullvec[5], feenox.pde.mesh->node[j].index_dof[0], +feenox.pde.mesh->node[j].x[2], INSERT_VALUES);
-          VecSetValue(nullvec[5], feenox.pde.mesh->node[j].index_dof[2], -feenox.pde.mesh->node[j].x[0], INSERT_VALUES);
-        }
-
-        for (i = 0; i < 3; i++) {
-          VecNormalize(nullvec[i], PETSC_NULL);
-        }
-
-        // from MatNullSpaceCreateRigidBody()
-        for (i = 3; i < nearnulldim; i++) {
-          // Orthonormalize vec[i] against vec[0:i-1]
-          VecMDot(nullvec[i], i, nullvec, dots);
-          for (j= 0; j < i; j++) {
-            dots[j] *= -1.;
-          }
-          VecMAXPY(nullvec[i],i,dots,nullvec);
-          VecNormalize(nullvec[i], PETSC_NULL);
-        }
-
-        petsc_call(MatNullSpaceCreate(PETSC_COMM_WORLD, PETSC_FALSE, nearnulldim, nullvec, &nullsp));
-        petsc_call(MatSetNearNullSpace(feenox.pde.K, nullsp));
-      break;  
-
-      case set_near_nullspace_none:
-        ;
-      break;
-    }
-  }
-*/  
+    petsc_call(VecRestoreArray(vec_coords, &coords));
+    
+    petsc_call(MatNullSpaceCreateRigidBody(vec_coords, &feenox.pde.null_space));
+    petsc_call(MatSetNearNullSpace(feenox.pde.K, feenox.pde.null_space));
+    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, feenox.pde.null_space));
+//    petsc_call(MatNullSpaceDestroy(&nullsp));
+    petsc_call(VecDestroy(&vec_coords));
+//  break;
+//  }
+*/
   return FEENOX_OK;
 }
 

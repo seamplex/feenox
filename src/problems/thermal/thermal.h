@@ -33,6 +33,9 @@ struct thermal_t {
   PetscBool temperature_bc;
 #endif
   
+  var_t *T_max;
+  var_t *T_min;
+  
 };  
 
 

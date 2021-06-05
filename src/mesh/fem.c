@@ -25,6 +25,23 @@ extern feenox_t feenox;
 
 
 // inverts a small-size square matrix
+/*
+The inverse of a 2x2 matrix:
+
+| a11 a12 |-1             |  a22 -a12 |
+| a21 a22 |    =  1/DET * | -a21  a11 |
+
+with DET  =  a11a22-a12a21
+
+The inverse of a 3x3 matrix:
+
+| a11 a12 a13 |-1             |   a33a22-a32a23  -(a33a12-a32a13)   a23a12-a22a13  |
+| a21 a22 a23 |    =  1/DET * | -(a33a21-a31a23)   a33a11-a31a13  -(a23a11-a21a13) |
+| a31 a32 a33 |               |   a32a21-a31a22  -(a32a11-a31a12)   a22a11-a21a12  |
+
+with DET  =  a11(a33a22-a32a23)-a21(a33a12-a32a13)+a31(a23a12-a22a13)
+*/
+
 int feenox_mesh_jacobian_invert(gsl_matrix *direct, gsl_matrix *inverse) {
 
   double det = 0;
@@ -32,6 +49,10 @@ int feenox_mesh_jacobian_invert(gsl_matrix *direct, gsl_matrix *inverse) {
 
   switch (direct->size1) {
     case 1:
+      if (gsl_matrix_get(direct, 0, 0) == 0) {
+        feenox_push_error_message("singular 1x1 jacobian");
+        return FEENOX_ERROR;
+      }
     	gsl_matrix_set(inverse, 0, 0, 1.0/gsl_matrix_get(direct, 0, 0));
       break;
     case 2:
@@ -108,26 +129,6 @@ static void matrix_inverse_3x3(PetscScalar A[3][3],PetscScalar B[3][3])
 }
 
 
-// calcula el determinante de una matriz de 2x2 //
-/*
-The inverse of a 2x2 matrix:
-
-| a11 a12 |-1             |  a22 -a12 |
-| a21 a22 |    =  1/DET * | -a21  a11 |
-
-with DET  =  a11a22-a12a21
-
-The inverse of a 3x3 matrix:
-
-| a11 a12 a13 |-1             |   a33a22-a32a23  -(a33a12-a32a13)   a23a12-a22a13  |
-| a21 a22 a23 |    =  1/DET * | -(a33a21-a31a23)   a33a11-a31a13  -(a23a11-a21a13) |
-| a31 a32 a33 |               |   a32a21-a31a22  -(a32a11-a31a12)   a22a11-a21a12  |
-
-with DET  =  a11(a33a22-a32a23)-a21(a33a12-a32a13)+a31(a23a12-a22a13)
-*/
-
-//}
-
 double feenox_mesh_determinant(gsl_matrix *this) {
 
   switch (this->size1) {
@@ -157,9 +158,8 @@ double feenox_mesh_determinant(gsl_matrix *this) {
 // copmpute the gradient of h with respect to x evaluated at r
 int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx) {
 
-  gsl_matrix *dxdr;
-  gsl_matrix *drdx;
-  int j, m, m_prime;
+  gsl_matrix *dxdr = NULL;
+  gsl_matrix *drdx = NULL;
   
   if (drdx_ref != NULL) {
     // si ya nos dieron drdx usamos esa
@@ -176,6 +176,7 @@ int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, g
   
   
   gsl_matrix_set_zero(dhdx);
+  unsigned int j, m, m_prime;
   for (j = 0; j < this->type->nodes; j++) {
     for (m = 0; m < this->type->dim; m++) {
       for (m_prime = 0; m_prime < this->type->dim; m_prime++) {
@@ -196,11 +197,8 @@ int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, g
 // compute the gradient of the shape functions with respect to x evalauted at gauss point v of scheme integration
 int feenox_mesh_compute_dhdx_at_gauss(element_t *this, int v, int integration) {
 
-  int m, m_prime;    // dimensions
-  int j;             // nodes
   int V_changed = 0;
   gsl_matrix *dhdx;
-  
   
   if (this->dhdx == NULL || this->V_dhdx != this->type->gauss[integration].V) {
     int v_prime;
@@ -227,6 +225,7 @@ int feenox_mesh_compute_dhdx_at_gauss(element_t *this, int v, int integration) {
   dhdx = this->dhdx[v];
   
   // TODO: matrix-matrix multiplication with blas?
+  unsigned int j, m, m_prime;
   for (j = 0; j < this->type->nodes; j++) {
     for (m = 0; m < this->type->dim; m++) {
       for (m_prime = 0; m_prime < this->type->dim; m_prime++) {
@@ -273,7 +272,7 @@ int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integ
     V_changed = 1;
   }
   if (this->drdx[v] == NULL) {
-    this->drdx[v] = gsl_matrix_calloc(this->type->dim, this->type->dim);
+    feenox_check_alloc(this->drdx[v] = gsl_matrix_calloc(this->type->dim, this->type->dim));
   } else {
     return FEENOX_OK;
   }
@@ -297,9 +296,8 @@ int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integ
 
 int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr) {
 
-  int m, m_prime, j;
-  
-  // OJO! esto solo camina en elementos volumetricos, ver dxdr_at_gauss
+  // warning! ths only works with volumetric elements, see dxdr_at_gauss()
+  unsigned int m, m_prime, j;
   for (m = 0; m < this->type->dim; m++) {
     for (m_prime = 0; m_prime < this->type->dim; m_prime++) {
       for (j = 0; j < this->type->nodes; j++) {
@@ -314,10 +312,8 @@ int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr) {
 
 void mesh_compute_x(element_t *this, double *r, double *x) {
 
-  int j, m;
-
-  
-  // solo para elementos volumetricos
+  // only for volumetric elements
+  unsigned int m, j;
   for (m = 0; m < 3; m++) {
     x[m] = 0;
     for (j = 0; j < this->type->nodes; j++) {
@@ -327,12 +323,6 @@ void mesh_compute_x(element_t *this, double *r, double *x) {
 
   return;
 }
-
-/*
-double mesh_integration_weight(mesh_t *mesh, element_t *element, int v) {
-  return 0;
-}
-*/
 
 int feenox_mesh_compute_w_at_gauss(element_t *this, int v, int integration) {
   
@@ -372,12 +362,12 @@ int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integ
     feenox_free(this->dxdr);
 
     this->V_dxdr = this->type->gauss[integration].V;
-    this->dxdr = calloc(this->V_dxdr, sizeof(gsl_matrix *));
+    feenox_check_alloc(this->dxdr = calloc(this->V_dxdr, sizeof(gsl_matrix *)));
 //    V_changed = 1;
   }
   
   if (this->dxdr[v] == NULL) {
-    this->dxdr[v] = gsl_matrix_calloc(this->type->dim, this->type->dim);
+    feenox_check_alloc(this->dxdr[v] = gsl_matrix_calloc(this->type->dim, this->type->dim));
   } else {
     return FEENOX_OK;
   }
@@ -563,7 +553,7 @@ int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned 
   int m, d, j;  
   
   if (element->B == NULL) {
-    element->B = calloc(element->type->gauss[integration].V, sizeof(gsl_matrix *));
+    feenox_check_alloc(element->B = calloc(element->type->gauss[integration].V, sizeof(gsl_matrix *)));
   }
   if (element->B[v] == NULL) {
     feenox_check_alloc(element->B[v] = gsl_matrix_calloc(dofs*element->type->dim, dofs*element->type->nodes));
@@ -572,7 +562,7 @@ int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned 
   }
   
   if (element->dhdx == NULL || element->dhdx[v] == NULL) {
-    feenox_mesh_compute_dhdx_at_gauss(element, v, integration);
+    feenox_call(feenox_mesh_compute_dhdx_at_gauss(element, v, integration));
   }
   
   

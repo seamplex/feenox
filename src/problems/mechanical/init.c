@@ -41,6 +41,7 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox_call(feenox_problem_define_solutions());
 
   // TODO: describir las funciones para reference
+/*  
   feenox_call(feenox_problem_define_solution_function("sigmax", &feenox.pde.sigmax));
   feenox_call(feenox_problem_define_solution_function("sigmay", &feenox.pde.sigmay));
   feenox_call(feenox_problem_define_solution_function("tauxy", &feenox.pde.tauxy));
@@ -57,17 +58,20 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox_call(feenox_problem_define_solution_function("sigma", &feenox.pde.sigma));
   feenox_call(feenox_problem_define_solution_function("delta_sigma", &feenox.pde.delta_sigma));
   feenox_call(feenox_problem_define_solution_function("tresca", &feenox.pde.tresca));
-  
+*/  
 
 
 // these are for the algebraic expressions in the  which are implicitly-defined BCs
 // i.e. 0=u*nx+v*ny
 // here they are defined as uppercase because there already exist functions named u, v and w
 // but the parser changes their case when an implicit BC is read
+/*  
   feenox.pde.vars.U[0]= feenox_define_variable_get_ptr("U");
   feenox.pde.vars.U[1]= feenox_define_variable_get_ptr("V");
   feenox.pde.vars.U[2]= feenox_define_variable_get_ptr("W");
+ */
 
+/*  
 ///va+strain_energy+name strain_energy
 ///va+strain_energy+detail The strain energy stored in the solid, computed as
 ///va+strain_energy+detail $1/2 \cdot \vec{u}^T  K \vec{u}$
@@ -126,7 +130,7 @@ int feenox_problem_init_parser_mechanical(void) {
 ///va+w_at_sigma_max+name w_at_sigma_max
 ///va+w_at_sigma_max+detail The\ $z$ component\ $w$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
   feenox.pde.vars.w_at_sigma_max = feenox_define_variable_get_ptr("w_at_sigma_max");
-  
+*/
   return FEENOX_OK;
 }
 
@@ -134,3 +138,37 @@ int feenox_problem_init_parser_mechanical(void) {
 int feenox_problem_init_runtime_mechanical(void) {
   return FEENOX_OK;
 }
+
+
+#ifdef HAVE_PETSC
+int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace) {
+  
+  Vec vec_coords;
+  if (feenox.pde.K != NULL) {
+    petsc_call(MatCreateVecs(feenox.pde.K, NULL, &vec_coords));
+  } else {
+    feenox_check_alloc(vec_coords = feenox_create_vector("coordinates"));
+  }  
+  petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dofs));
+  petsc_call(VecSetUp(vec_coords));
+
+  PetscScalar *coords;
+  size_t j = 0;
+  unsigned int m = 0;
+  petsc_call(VecGetArray(vec_coords, &coords));
+  for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {          
+    for (m = 0; m < feenox.pde.dofs; m++) {
+      coords[feenox.pde.mesh->node[j].index_dof[m] - feenox.pde.first_row] = feenox.pde.mesh->node[j].x[m];
+    }
+  }
+  petsc_call(VecRestoreArray(vec_coords, &coords));
+    
+  petsc_call(MatNullSpaceCreateRigidBody(vec_coords, nullspace));
+//    petsc_call(MatSetNearNullSpace(feenox.pde.K, feenox.pde.null_space));
+//    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, feenox.pde.null_space));
+  petsc_call(VecDestroy(&vec_coords));
+
+  return FEENOX_OK;
+}
+    
+#endif

@@ -54,11 +54,11 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned 
   gsl_matrix_set(C, 5, 5, mu);
   
   unsigned int J = this->type->nodes;
-  gsl_matrix *B = gsl_matrix_alloc(6, feenox.pde.dofs * J);
-  gsl_matrix *CB = gsl_matrix_alloc(6, feenox.pde.dofs * this->type->nodes);
+  gsl_matrix *B = gsl_matrix_calloc(6, feenox.pde.dofs * J);
+  gsl_matrix *CB = gsl_matrix_calloc(6, feenox.pde.dofs * this->type->nodes);
   
   gsl_matrix *dhdx = this->dhdx[v];
-  
+
   unsigned int j = 0;
   for (j = 0; j < J; j++) {
     gsl_matrix_set(B, 0, 3*j+0, gsl_matrix_get(dhdx, j, 0));
@@ -76,7 +76,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned 
     gsl_matrix_set(B, 5, 3*j+0, gsl_matrix_get(dhdx, j, 2));
     gsl_matrix_set(B, 5, 3*j+2, gsl_matrix_get(dhdx, j, 0));
   }
-  
+
   // elemental stiffness B'*C*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0, CB));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, CB, 1.0, feenox.pde.Ki));
@@ -93,3 +93,43 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned 
   return FEENOX_OK;
   
 }
+
+
+
+/*
+int fino_print_gsl_vector(gsl_vector *b, FILE *file) {
+
+  double xi;
+  int i;
+
+  for (i = 0; i < b->size; i++) {
+    xi = gsl_vector_get(b, i);
+    if (xi != 0) {
+      fprintf(file, "% .1e ", xi);
+    } else {
+      fprintf(file, "    0    ");
+    }
+    fprintf(file, "\n");
+  }
+  
+  return FEENOX_OK;
+
+}
+
+int fino_print_gsl_matrix(gsl_matrix *A, FILE *file) {
+
+  double xi;
+  int i, j;
+
+  for (i = 0; i < A->size1; i++) {
+    for (j = 0; j < A->size2; j++) {
+      xi = gsl_matrix_get(A, i, j);
+      fprintf(file, "% g ", (fabs(xi) > 1e-12)?xi:0.0);
+    }
+    fprintf(file, "\n");
+  }
+  
+  return FEENOX_OK;
+
+}
+*/

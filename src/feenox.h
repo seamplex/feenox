@@ -1440,7 +1440,6 @@ struct feenox_t {
     bc_t *bcs;
 
 /*    
-    fill_mesh_vector_t *fill_vectors;
     find_extremum_t *find_minmaxs;
     integrate_t *integrates;
 */
@@ -1512,12 +1511,12 @@ struct feenox_t {
       math_type_eigen,
     } math_type;
 
-
     enum {
-      material_type_linear_isotropic,
-      material_type_linear_orthotropic
-    } material_type;
-  
+      eigen_formulation_undefined,
+      eigen_formulation_omega,
+      eigen_formulation_lambda
+    } eigen_formulation;
+    
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
     unsigned int dofs;             // DoFs per node/cell
     size_t width;                  // number of expected non-zeros per row
@@ -1578,42 +1577,18 @@ struct feenox_t {
       var_t *snes_stol;
       var_t *snes_max_it;
       
+      var_t *eps_tol;
+      var_t *eps_max_it;
+      
       var_t *gamg_threshold;
+      var_t *eps_target;
+      var_t *eps_shift;
       
       var_t *penalty_weight;
       var_t *nodes_rough;
       var_t *unknowns;
     
-      // TODO: move to per-problem headers
-      var_t *U[3];
-
-      var_t *strain_energy;
-    
-      var_t *displ_max;
-      var_t *displ_max_x;
-      var_t *displ_max_y;
-      var_t *displ_max_z;
-
-      var_t *u_at_displ_max;
-      var_t *v_at_displ_max;
-      var_t *w_at_displ_max;
-
-    
-      var_t *sigma_max;
-      var_t *sigma_max_x;
-      var_t *sigma_max_y;
-      var_t *sigma_max_z;
-      var_t *delta_sigma_max;
-
-      var_t *u_at_sigma_max;
-      var_t *v_at_sigma_max;
-      var_t *w_at_sigma_max;
-
-      var_t *T_max;
-      var_t *T_min;
-    
-      var_t *lambda;
-
+/*      
       var_t *time_wall_build;
       var_t *time_wall_solve;
       var_t *time_wall_stress;
@@ -1630,24 +1605,15 @@ struct feenox_t {
       var_t *time_petsc_total;
 
       var_t *flops_petsc;
-    
+*/    
       var_t *memory_available;
       var_t *memory;
       var_t *memory_petsc;
     
-      var_t *M_T;
     } vars;
 
     // vectors
     struct {
-      vector_t *f;
-      vector_t *omega;
-      vector_t *m;
-      vector_t *L;
-      vector_t *Gamma;
-      vector_t *mu;
-      vector_t *Mu;
-    
       vector_t **phi;
     } vectors;
 
@@ -1686,24 +1652,6 @@ struct feenox_t {
       gradient_actual
     } gradient_highorder_nodes;
   
-    // TODO: somewhere else
-    double hourglass_epsilon;
-  
-    // tensor de tensiones
-    function_t *sigmax;
-    function_t *sigmay;
-    function_t *sigmaz;
-    function_t *tauxy;
-    function_t *tauyz;
-    function_t *tauzx;
-
-    function_t *sigma1;      // principal stresses
-    function_t *sigma2;
-    function_t *sigma3;
-    function_t *sigma;       // von mises
-    function_t *delta_sigma; // uncertainty
-    function_t *tresca;
-    
 #ifdef HAVE_PETSC    
     PetscBool has_stiffness;
     PetscBool has_mass;
@@ -1736,13 +1684,13 @@ struct feenox_t {
     Mat K;       // stiffness matrix without dirichlet BCs
     Mat K_bc;    // stiffness matrix with dirichlet BCs (for KSP)
     Mat M;       // mass matrix (rho for elastic, rho*cp for heat)
+    Mat M_bc;    // mass matrix with dirichlet BCs (for EPS)
     Mat JK;      // jacobian for stiffness matrix = K'*phi
     Mat JM;      // jacobian for mass matrix = M'*phi_dot
     Mat Jb;      // jacobian for rhs vector = dq/dT for both volumetric and BCs
     Mat J_snes;  // jacobian for SNES
     Mat J_tran;  // jacobian for TS
-    PetscScalar lambda; // individual eigen value 
-  
+    
     PetscScalar *eigenvalue;    // eigenvalue vector
     Vec *eigenvector;           // eivenvectors vector
 
@@ -1759,8 +1707,7 @@ struct feenox_t {
     EPS eps;
 #endif
 
-    
-    // strings con tipos
+    // strings with types
     PCType pc_type;
     KSPType ksp_type;
     SNESType snes_type;
@@ -1771,7 +1718,6 @@ struct feenox_t {
 #ifdef HAVE_SLEPC
     EPSType eps_type;
     STType st_type;
-    EPSWhich eigen_spectrum;
 #endif
 
     PetscBool progress_ascii;
@@ -2185,10 +2131,14 @@ extern int feenox_problem_solve_post_thermal(void);
 // mechanical/init.c
 extern int feenox_problem_init_parser_mechanical(void);
 extern int feenox_problem_init_runtime_mechanical(void);
-
+extern int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace);
+        
 // modal/init.c
 extern int feenox_problem_init_parser_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
+extern int feenox_problem_setup_pc_modal(void);
+extern int feenox_problem_setup_ksp_modal(void);
+extern int feenox_problem_setup_eps_modal(void);
 
 // modal/bulk.c
 extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element, unsigned int v);

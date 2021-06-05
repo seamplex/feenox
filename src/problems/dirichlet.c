@@ -86,7 +86,7 @@ int feenox_dirichlet_eval(void) {
 #ifdef HAVE_PETSC
 // K - stiffness matrix: needs a one in the diagonal and the value in b and keep symmetry
 // b - RHS: needs to be updated when modifying K
-// this is called only when solving an explicit KSP so it takes
+// this is called only when solving an explicit KSP (or EPS) so it takes
 // K and b and writes K_bc and b_bc
 int feenox_dirichlet_set_K(void) {
   
@@ -137,10 +137,18 @@ int feenox_dirichlet_set_K(void) {
 
 
 // M - mass matrix: needs a zero in the diagonal and the same symmetry scheme that K
+// this is called only when solving an EPS so it takes
+// M and writes M_bc
 int feenox_dirichlet_set_M(void) {
 
+  if (feenox.pde.M_bc == NULL) {
+    petsc_call(MatDuplicate(feenox.pde.M, MAT_COPY_VALUES, &feenox.pde.M_bc));
+  } else {
+    petsc_call(MatCopy(feenox.pde.M, feenox.pde.M_bc, SAME_NONZERO_PATTERN));
+  }
+  
   // the mass matrix is like the stiffness one but with zero instead of one
-  petsc_call(MatZeroRowsColumns(feenox.pde.M, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+  petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
 
   return FEENOX_OK;
 }
