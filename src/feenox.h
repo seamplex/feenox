@@ -139,10 +139,6 @@
 
 #define MINMAX_ARGS           10
 
-// TODO: somewhere else
-#define DEFAULT_NMODES        10
-
-
 // zero & infinite
 #define ZERO          (8.881784197001252323389053344727e-16)  // (1/2)^-50
 #define INFTY         (1125899906842624.0)                    // 2^50
@@ -1474,15 +1470,6 @@ struct feenox_t {
   } dae;
   
   struct {
-    
-    enum {
-      type_none,
-      type_thermal,
-      type_mechanical,
-      type_modal,
-      type_neutron_diffusion,
-      type_neutron_transport,
-    } type;
 
     enum {
       symmetry_axis_none,
@@ -2106,6 +2093,7 @@ extern int feenox_expression_depends_on_space(var_ll_t *variables);
 extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
 
 // thermal/init.c
+extern int feenox_problem_parse_thermal(const char *);
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 
@@ -2122,9 +2110,8 @@ extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_
 extern int feenox_problem_solve_post_thermal(void);
 
 // mechanical/init.c
+extern int feenox_problem_parse_mechanical(const char *);
 extern int feenox_problem_init_parser_mechanical(void);
-extern int feenox_problem_init_parser_mechanical_plane_stress(void);
-extern int feenox_problem_init_parser_mechanical_plane_strain(void);
 extern int feenox_problem_init_runtime_mechanical(void);
 extern int feenox_problem_setup_pc_mechanical(void);
 extern int feenox_problem_setup_ksp_mechanical(void);
@@ -2132,6 +2119,7 @@ extern int feenox_problem_setup_snes_mechanical(void);
 extern int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace);
         
 // modal/init.c
+extern int feenox_problem_parse_modal(const char *);
 extern int feenox_problem_init_parser_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
 extern int feenox_problem_setup_pc_modal(void);

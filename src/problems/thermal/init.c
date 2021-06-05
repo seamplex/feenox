@@ -3,9 +3,20 @@
 extern feenox_t feenox;
 thermal_t thermal;
 
+int feenox_problem_parse_thermal(const char *token) {
+
+  // no need to parse anything;
+  if (token != NULL) {
+    feenox_push_error_message("undefined keyword '%s'", token);
+    return FEENOX_ERROR;
+  }
+ 
+  return FEENOX_OK;
+}
+
+
 int feenox_problem_init_parser_thermal(void) {
-  
-  feenox.pde.type = type_thermal;
+
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_thermal;

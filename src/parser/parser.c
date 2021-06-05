@@ -3427,8 +3427,8 @@ int feenox_parse_bc(void) {
 
 ///kw+BC+usage <name>
 ///kw+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
-  
-  if (feenox.pde.type == type_none) {
+
+  if (feenox.pde.solve == NULL) {
     feenox_push_error_message("BC before setting the PROBLEM type");
     return FEENOX_ERROR;
   }
@@ -3494,6 +3494,7 @@ int feenox_parse_bc(void) {
 
 int feenox_parse_problem(void) {
 
+  int (*feenox_problem_parse_particular)(const char *);
   int (*feenox_problem_init_parser_particular)(void);
 
   char *token = NULL;
@@ -3508,23 +3509,14 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail If the mesh is two-dimensional and not `AXISYMMETRIC`, either
 ///kw+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
-      feenox.pde.type = type_mechanical;
+      feenox_problem_parse_particular = feenox_problem_parse_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
 
-///kw+PROBLEM+detail  * `plane_stress` solves a 2D plane-stress mechanical elastic problem.
-    } else if (strcasecmp(token, "plane_stress") == 0) {
-      feenox.pde.type = type_mechanical;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical_plane_stress;
-
-///kw+PROBLEM+detail  * `plane_strain` solves a 2D plane-strain mechanical elastic problem.
-    } else if (strcasecmp(token, "plane_strain") == 0) {
-      feenox.pde.type = type_mechanical;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical_plane_strain;
-      
 ///kw+PROBLEM+usage thermal
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
     } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
+      feenox_problem_parse_particular = feenox_problem_parse_thermal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
 
 ///kw+PROBLEM+usage modal
@@ -3535,7 +3527,9 @@ int feenox_parse_problem(void) {
       feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
       return FEENOX_ERROR;
 #endif
+      feenox_problem_parse_particular = feenox_problem_parse_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
+      
 ///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
 
 ///kw+PROBLEM+detail @    
@@ -3671,9 +3665,13 @@ int feenox_parse_problem(void) {
       int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.eigen_formulation));
       
+    } else if (feenox_problem_parse_particular != NULL) {
+      feenox_call(feenox_problem_parse_particular(token));
+      
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
+      
     }
   } 
 

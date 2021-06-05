@@ -3,18 +3,61 @@
 extern feenox_t feenox;
 modal_t modal;
 
-int feenox_problem_init_parser_modal(void) {
+int feenox_problem_parse_modal(const char *token) {
   
-  feenox.pde.type = type_modal;
+  if (token != NULL) {
+    if (strcasecmp(token, "plane_stress") == 0) {
+      modal.variant = variant_plane_stress;
+  
+    } else if (strcasecmp(token, "plane_strain") == 0) {
+      modal.variant = variant_plane_strain;
+  
+    } else {
+      feenox_push_error_message("undefined keyword '%s'", token);
+      return FEENOX_ERROR;
+      
+    }
+  } 
+  
+  return FEENOX_OK;
+}  
+
+int feenox_problem_init_parser_modal(void) {
+
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_modal;
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_modal;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_modal;
   feenox.pde.solve_post = feenox_problem_solve_post_modal;
-      
+  
+  if (feenox.pde.symmetry_axis != symmetry_axis_none ||
+      modal.variant == variant_plane_stress ||
+      modal.variant == variant_plane_strain) {
+
+    if (feenox.pde.dim != 0) {
+      if (feenox.pde.dim != 2) {
+        feenox_push_error_message("dimension inconsistency, expected DIMENSION 2");
+        return FEENOX_ERROR;
+      }
+    } else {
+      feenox.pde.dim = 2;
+    }
+
+    if (feenox.pde.dofs != 0) {
+      if (feenox.pde.dofs != 2) {
+        feenox_push_error_message("DOF inconsistency");
+        return FEENOX_ERROR;
+      }
+    } else {
+      feenox.pde.dofs = 2;
+    }
+  } else {
+    feenox.pde.dofs = feenox.pde.dim;
+  }  
+  
   // if there are no explicit number of eigenvalues we set a non-zero value here
   if (feenox.pde.nev == 0) {
-    feenox.pde.nev = DEFAULT_NMODES;
+    feenox.pde.nev = DEFAULT_MODAL_MODES;
   }
 
   // vector problem    

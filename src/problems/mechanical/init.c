@@ -3,28 +3,34 @@
 extern feenox_t feenox;
 mechanical_t mechanical;
 
-
-int feenox_problem_init_parser_mechanical_plane_stress(void) {
-
-  mechanical.variant = variant_plane_stress;
-  feenox_call(feenox_problem_init_parser_mechanical());
+int feenox_problem_parse_mechanical(const char *token) {
+  
+  if (token != NULL) {
+    if (strcasecmp(token, "plane_stress") == 0) {
+      mechanical.variant = variant_plane_stress;
+  
+    } else if (strcasecmp(token, "plane_strain") == 0) {
+      mechanical.variant = variant_plane_strain;
+  
+    } else {
+      feenox_push_error_message("undefined keyword '%s'", token);
+      return FEENOX_ERROR;
+      
+    }
+  } 
   
   return FEENOX_OK;
-  
-}
-
-int feenox_problem_init_parser_mechanical_plane_strain(void) {
-
-  mechanical.variant = variant_plane_strain;
-  feenox_call(feenox_problem_init_parser_mechanical());
-  
-  return FEENOX_OK;
-  
-}
+} 
 
 int feenox_problem_init_parser_mechanical(void) {
+
+  feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
+//  feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
+//  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_mechanical;
+//  feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
+//  feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
   
-  if (mechanical.variant == variant_axisymmetric ||
+  if (feenox.pde.symmetry_axis != symmetry_axis_none ||
       mechanical.variant == variant_plane_stress ||
       mechanical.variant == variant_plane_strain) {
 

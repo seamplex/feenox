@@ -1,9 +1,18 @@
 #ifndef MODAL_H
 #define MODAL_H
 
+#define DEFAULT_MODAL_MODES        10
+
 typedef struct modal_t modal_t;
 
 struct modal_t {
+
+  enum {
+    variant_full,
+    variant_plane_stress,
+    variant_plane_strain
+  } variant;  
+  
   int has_dirichlet_bcs;
   
   distribution_t E;     // Young's modulus
