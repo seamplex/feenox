@@ -3649,13 +3649,23 @@ int feenox_parse_problem(void) {
 
 ///kw+PROBLEM+usage [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]@
 ///kw+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
-    } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "EPS") == 0 || strcasecmp(token, "EPS_TYPE") == 0) {
+    } else if (strcasecmp(token, "EIGEN_SOLVER") == 0 || strcasecmp(token, "EPS") == 0 || strcasecmp(token, "EPS_TYPE") == 0) {
+#ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.eps_type));
-
+#else
+      feenox_push_error_message("EIGEN_SOLVER needs SLEPc");
+      return FEENOX_ERROR;      
+#endif
+      
 ///kw+PROBLEM+usage [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]@
 ///kw+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https://slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
     } else if (strcasecmp(token, "SPECTRAL_TRANSFORMATION") == 0 || strcasecmp(token, "ST") == 0 || strcasecmp(token, "ST_TYPE") == 0) {
+#ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.st_type));
+#else
+      feenox_push_error_message("SPECTRAL_TRANSFORMATION needs SLEPc");
+      return FEENOX_ERROR;      
+#endif
 
 ///kw+PROBLEM+usage [ EIGEN_FORMULATION { omega | lambda } ]@
 ///kw+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$,

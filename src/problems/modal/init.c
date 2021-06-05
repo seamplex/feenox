@@ -240,6 +240,7 @@ int feenox_problem_setup_ksp_modal(void) {
 // these two are not 
 int feenox_problem_setup_eps_modal(void) {
 
+#ifdef HAVE_SLEPC
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
 //    petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_SMALLEST_MAGNITUDE));
     petsc_call(EPSSetTarget(feenox.pde.eps, 0));
@@ -269,6 +270,8 @@ int feenox_problem_setup_eps_modal(void) {
     
     petsc_call(EPSSetDeflationSpace(feenox.pde.eps, n, rigid));
   }   
+  
+#endif
   
   return FEENOX_OK;
 }
