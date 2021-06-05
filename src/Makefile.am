@@ -85,7 +85,11 @@ feenox_SOURCES = \
 ./problems/thermal/bulk.c \
 ./problems/thermal/bc.c \
 ./problems/thermal/post.c \
+./problems/mechanical/mechanical.h \
 ./problems/mechanical/init.c \
+./problems/mechanical/bulk.c \
+./problems/mechanical/bc.c \
+./problems/mechanical/post.c \
 ./problems/modal/modal.h \
 ./problems/modal/init.c \
 ./problems/modal/bulk.c \

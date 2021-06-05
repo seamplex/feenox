@@ -1521,6 +1521,7 @@ int feenox_parse_default_argument_value(void) {
     }
     feenox.argc = feenox.optind+n + 1;
     feenox_check_alloc(feenox.argv[feenox.optind+n] = strdup(token));
+    feenox_check_alloc(feenox.argv_orig[feenox.optind+n] = strdup(token));
   }
   
   return FEENOX_OK;
@@ -3502,10 +3503,23 @@ int feenox_parse_problem(void) {
         
 ///kw+PROBLEM+usage mechanical
 ///kw+PROBLEM+usage |
+///kw+PROBLEM+detail @    
 ///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
+///kw+PROBLEM+detail If the mesh is two-dimensional and not `AXISYMMETRIC`, either
+///kw+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox.pde.type = type_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
+
+///kw+PROBLEM+detail  * `plane_stress` solves a 2D plane-stress mechanical elastic problem.
+    } else if (strcasecmp(token, "plane_stress") == 0) {
+      feenox.pde.type = type_mechanical;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical_plane_stress;
+
+///kw+PROBLEM+detail  * `plane_strain` solves a 2D plane-strain mechanical elastic problem.
+    } else if (strcasecmp(token, "plane_strain") == 0) {
+      feenox.pde.type = type_mechanical;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical_plane_strain;
       
 ///kw+PROBLEM+usage thermal
 ///kw+PROBLEM+usage |
@@ -3515,14 +3529,19 @@ int feenox_parse_problem(void) {
 
 ///kw+PROBLEM+usage modal
 ///kw+PROBLEM+usage ]@
-///kw+PROBLEM+detail  * `modal` computes the natural frequencies and oscillation modes.        
+///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
     } else if (strcasecmp(token, "modal") == 0) {
 #ifndef HAVE_SLEPC
       feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
       return FEENOX_ERROR;
 #endif
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
-          
+///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
+
+///kw+PROBLEM+detail @    
+///kw+PROBLEM+detail If you want to contribute with anothey problem type, you are welcome!
+///kw+PROBLEM+detail Check out FeenoX's repository for licensing, programming guides and code of conduct.
+      
 ///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
 ///kw+PROBLEM+usage @
 ///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
@@ -3537,31 +3556,12 @@ int feenox_parse_problem(void) {
       }
 
 ///kw+PROBLEM+usage [
-///kw+PROBLEM+usage AXISYMMETRIC
+///kw+PROBLEM+usage AXISYMMETRIC { x | y }
 ///kw+PROBLEM+usage |
-///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimensional in the $x$-$y$ plane
-///kw+PROBLEM+detail and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$). 
+///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
+///kw+PROBLEM+detail to be two-dimensional in the $x$-$y$ plane and the problem 
+///kw+PROBLEM+detail is assumed to be axi-symmetric around the given axis. 
     } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
-      feenox.pde.variant = variant_axisymmetric;
-      if (feenox.pde.symmetry_axis == symmetry_axis_none) {
-        feenox.pde.symmetry_axis = symmetry_axis_y;
-      }
-
-      
-///kw+PROBLEM+usage PLANE_STRESS
-///kw+PROBLEM+usage |
-///kw+PROBLEM+detail If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
-///kw+PROBLEM+detail axisymmetry is given, either `PLANE_STRESS` and `PLAIN_STRAIN` can be provided (default is plane stress). 
-    } else if (strcasecmp(token, "PLANE_STRESS") == 0) {
-      feenox.pde.variant = variant_plane_stress;
-
-///kw+PROBLEM+usage PLANE_STRAIN
-///kw+PROBLEM+usage ]
-    } else if (strcasecmp(token, "PLANE_STRAIN") == 0) {
-      feenox.pde.variant = variant_plane_strain;
-
-///kw+PROBLEM+usage [ SYMMETRY_AXIS { x | y } ]
-    } else if (strcasecmp(token, "SYMMETRY_AXIS") == 0) {
       char *keywords[] = { "x", "y" };
       int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
@@ -3613,7 +3613,8 @@ int feenox_parse_problem(void) {
       feenox_free(mesh_name);
 
 ///kw+PROBLEM+usage [ MODES <expr> ] @
-///kw+PROBLEM+detail The number of modes to be computed in the modal problem is given by `MODES`. The default is DEFAULT_NMODES.
+///kw+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
+///kw+PROBLEM+detail The default is DEFAULT_NMODES.
     } else if (strcasecmp(token, "MODES") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));

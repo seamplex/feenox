@@ -150,23 +150,34 @@ int feenox_setup_ksp(KSP ksp) {
     petsc_call(KSPSetType(ksp, KSPGMRES));
   }
 
-  
   if (feenox.pde.symmetric_K == PETSC_TRUE) {
     // K is symmetric. Set symmetric flag to enable ICC/Cholesky preconditioner
     // TODO: this is K for ksp but J for snes
     if (feenox.pde.has_stiffness) {
-      petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
-      petsc_call(MatSetOption(feenox.pde.K_bc, MAT_SYMMETRIC, PETSC_TRUE));  
+      if (feenox.pde.K != NULL) {
+        petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
+      }
+      if (feenox.pde.K_bc != NULL) {
+        petsc_call(MatSetOption(feenox.pde.K_bc, MAT_SYMMETRIC, PETSC_TRUE));  
+      }  
     }  
     if (feenox.pde.has_mass) {
-      petsc_call(MatSetOption(feenox.pde.M, MAT_SYMMETRIC, PETSC_TRUE));  
-      petsc_call(MatSetOption(feenox.pde.M_bc, MAT_SYMMETRIC, PETSC_TRUE));  
+      if (feenox.pde.M != NULL) {
+        petsc_call(MatSetOption(feenox.pde.M, MAT_SYMMETRIC, PETSC_TRUE));  
+      }
+      if (feenox.pde.M_bc != NULL) {
+        petsc_call(MatSetOption(feenox.pde.M_bc, MAT_SYMMETRIC, PETSC_TRUE));  
+      }  
     }  
     if (feenox.pde.has_jacobian_K) {
-      petsc_call(MatSetOption(feenox.pde.JK, MAT_SYMMETRIC, PETSC_TRUE));  
+      if (feenox.pde.JK != NULL) {
+        petsc_call(MatSetOption(feenox.pde.JK, MAT_SYMMETRIC, PETSC_TRUE));  
+      }  
     }
     if (feenox.pde.has_jacobian_b) {
-      petsc_call(MatSetOption(feenox.pde.Jb, MAT_SYMMETRIC, PETSC_TRUE));  
+      if (feenox.pde.Jb != NULL) {
+        petsc_call(MatSetOption(feenox.pde.Jb, MAT_SYMMETRIC, PETSC_TRUE));  
+      }  
     }  
   }  
   
@@ -175,10 +186,9 @@ int feenox_setup_ksp(KSP ksp) {
                                    feenox_var_value(feenox.pde.vars.ksp_divtol),
                                    (PetscInt)feenox_var_value(feenox.pde.vars.ksp_max_it)));
   
-  petsc_call(KSPSetUp(ksp));
-  
   // read command-line options
   petsc_call(KSPSetFromOptions(ksp));
+//  petsc_call(KSPSetUp(ksp));
   
   PC pc;
   petsc_call(KSPGetPC(ksp, &pc));

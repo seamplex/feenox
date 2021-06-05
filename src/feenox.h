@@ -1485,13 +1485,6 @@ struct feenox_t {
     } type;
 
     enum {
-      variant_full,
-      variant_axisymmetric,
-      variant_plane_stress,
-      variant_plane_strain
-    } variant;
-  
-    enum {
       symmetry_axis_none,
       symmetry_axis_x,
       symmetry_axis_y
@@ -2130,7 +2123,12 @@ extern int feenox_problem_solve_post_thermal(void);
 
 // mechanical/init.c
 extern int feenox_problem_init_parser_mechanical(void);
+extern int feenox_problem_init_parser_mechanical_plane_stress(void);
+extern int feenox_problem_init_parser_mechanical_plane_strain(void);
 extern int feenox_problem_init_runtime_mechanical(void);
+extern int feenox_problem_setup_pc_mechanical(void);
+extern int feenox_problem_setup_ksp_mechanical(void);
+extern int feenox_problem_setup_snes_mechanical(void);
 extern int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace);
         
 // modal/init.c

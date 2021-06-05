@@ -4,6 +4,14 @@
 typedef struct mechanical_t mechanical_t;
 
 struct mechanical_t {
+  
+  enum {
+    variant_full,
+    variant_axisymmetric,
+    variant_plane_stress,
+    variant_plane_strain
+  } variant;  
+  
   distribution_t E;     // Young's modulus
   distribution_t nu;    // Poisson's ratio
   distribution_t rho;   // density
@@ -54,7 +62,7 @@ struct mechanical_t {
   function_t *delta_sigma; // uncertainty
   function_t *tresca;
 
-}
+};
 
 #endif /* MECHANICAL_H */
 
