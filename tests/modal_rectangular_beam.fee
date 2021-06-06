@@ -1,0 +1,12 @@
+READ_MESH rectangular_beam.msh
+PROBLEM modal DIMENSIONS 3 MODES 6
+
+E = 2e11
+nu = 0.3
+rho = 7800
+
+BC left u v w
+
+SOLVE_PROBLEM
+
+PRINT_VECTOR f

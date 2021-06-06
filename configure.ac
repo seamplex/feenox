@@ -151,21 +151,21 @@ AS_IF([test "x${with_petsc}" != "xno"], [
   petsc_found=1
 
   AC_MSG_CHECKING([for PETSc dir])
-  AS_IF([test -z "$PETSC_DIR"], [
-    AC_MSG_RESULT([empty, trying /usr/lib/petsc])
+  AS_IF([test -z "${PETSC_DIR}"], [
+    AC_MSG_CHECKING([empty, trying /usr/lib/petsc])
     export PETSC_DIR=/usr/lib/petsc
   ])
-  AS_IF([test ! -d "$PETSC_DIR"], [
+  AS_IF([test ! -d "${PETSC_DIR}"], [
     AC_MSG_RESULT([no])
     petsc_found=0
-  ], [test ! -d "$PETSC_DIR/include"], [
+  ], [test ! -d "${PETSC_DIR}/include"], [
     AC_MSG_RESULT([broken])
     petsc_found=0
-  ], [test ! -f "$PETSC_DIR/include/petscversion.h"], [
+  ], [test ! -f "${PETSC_DIR}/include/petscversion.h"], [
     AC_MSG_RESULT([broken])
     petsc_found=0
   ],[
-    AC_MSG_RESULT([$PETSC_DIR])
+    AC_MSG_RESULT([${PETSC_DIR}])
   ])
 
   AS_IF([test ${petsc_found} -eq 1], [
@@ -176,7 +176,7 @@ AS_IF([test "x${with_petsc}" != "xno"], [
 Do you have a working PETSc > 3.6.0 installation?])
       petsc_found=0
     ],
-      AC_MSG_RESULT([$PETSC_ARCH])
+      AC_MSG_RESULT([${PETSC_ARCH}])
     ) 
   ])
 
@@ -206,24 +206,25 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
   slepc_found=1
 
   AC_MSG_CHECKING([for SLEPc dir])
-  AS_IF([ test -z "$SLEPC_DIR" ], [
-    AC_MSG_RESULT([empty, trying /usr/lib/slepc])
+  AS_IF([ test -z "${SLEPC_DIR}" ], [
+    AC_MSG_CHECKING([empty, trying /usr/lib/slepc])
     export SLEPC_DIR=/usr/lib/slepc
   ])
-  AS_IF([ test ! -d "$SLEPC_DIR" ], [
+  AS_IF([ test ! -d "${SLEPC_DIR}" ], [
     AC_MSG_RESULT([no])
     slepc_found=0
-  ], [test ! -d "$SLEPC_DIR/include"], [
-    AC_MSG_RESULT([broken])
+  ], [test ! -d "${SLEPC_DIR}/include"], [
+    AC_MSG_RESULT([broken1])
     slepc_found=0
-  ], [test ! -f "$SLEPC_DIR/include/slepcversion.h"], [
-    AC_MSG_RESULT([broken])
+  ], [test ! -f "${SLEPC_DIR}/include/slepcversion.h"], [
+    AC_MSG_RESULT([broken2])
     slepc_found=0
-  ], [test ! -f "$SLEPC_DIR/$PETSC_ARCH/lib/slepc/conf/slepcvariables"], [
-    AC_MSG_RESULT([broken])
+  ], [test ! -f "${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables"], [
+    AC_MSG_RESULT(${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables)
+    AC_MSG_RESULT([broken3])
     slepc_found=0
   ],
-    AC_MSG_RESULT([$SLEPC_DIR])
+    AC_MSG_RESULT([${SLEPC_DIR}])
   )
 
   AS_IF([test ${slepc_found} -eq 1],

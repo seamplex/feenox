@@ -38,6 +38,10 @@ extern feenox_t feenox;
 
 int feenox_problem_init_parser_general(void) {
 
+  if (feenox.pde.petscinit_called == PETSC_TRUE) {
+
+  }
+  
   // we already have processed basic options, now we loop over the original argv and convert
   // double-dash options to single-dash so --snes_view transforsm to -snes_view
   unsigned int i = 0;

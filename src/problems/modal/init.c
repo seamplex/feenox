@@ -201,11 +201,11 @@ int feenox_problem_init_runtime_modal(void) {
 
   feenox_call(feenox_distribution_init(&modal.nu, "nu"));
   if (modal.nu.defined == 0) {
-    feenox_push_error_message("undefined elastic modulus 'nu'");
+    feenox_push_error_message("undefined Poisson ratio 'nu'");
     return FEENOX_ERROR;
   }
   if (modal.nu.full == 0) {
-    feenox_push_error_message("elastic modulus 'nu' is not defined over all volumes");
+    feenox_push_error_message("Poisson ratio 'nu' is not defined over all volumes");
     return FEENOX_ERROR;
   }
   modal.nu.space_dependent = feenox_expression_depends_on_space(modal.nu.dependency_variables);
@@ -213,11 +213,11 @@ int feenox_problem_init_runtime_modal(void) {
 
   feenox_call(feenox_distribution_init(&modal.rho, "rho"));
   if (modal.rho.defined == 0) {
-    feenox_push_error_message("undefined elastic modulus 'rho'");
+    feenox_push_error_message("undefined density 'rho'");
     return FEENOX_ERROR;
   }
   if (modal.rho.full == 0) {
-    feenox_push_error_message("elastic modulus 'rho' is not defined over all volumes");
+    feenox_push_error_message("density 'rho' is not defined over all volumes");
     return FEENOX_ERROR;
   }
   modal.rho.space_dependent = feenox_expression_depends_on_space(modal.rho.dependency_variables);

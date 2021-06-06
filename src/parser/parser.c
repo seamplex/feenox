@@ -278,6 +278,17 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
+///kw+PROBLEM+desc Sets the problem type that FeenoX has to solve.      
+///kw+PROBLEM+usage PROBLEM
+    } else if (strcasecmp(token, "PROBLEM") == 0) {
+#ifdef HAVE_PETSC      
+      feenox_call(feenox_parse_problem());
+      return FEENOX_OK;
+#else
+      feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
+      return FEENOX_ERROR;
+#endif      
+      
 ///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
 ///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
       // -----  -----------------------------------------------------------
@@ -298,17 +309,6 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
       feenox_call(feenox_parse_bc());
       return FEENOX_OK;
-      
-///kw+PROBLEM+desc Sets the problem type that FeenoX has to solve.      
-///kw+PROBLEM+usage PROBLEM
-    } else if (strcasecmp(token, "PROBLEM") == 0) {
-#ifdef HAVE_PETSC      
-      feenox_call(feenox_parse_problem());
-      return FEENOX_OK;
-#else
-      feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
-      return FEENOX_ERROR;
-#endif      
       
 ///kw+SOLVE_PROBLEM+desc Explicitly solve the PDE problem.
 ///kw+SOLVE_PROBLEM+usage SOLVE_PROBLEM
@@ -3428,7 +3428,7 @@ int feenox_parse_bc(void) {
 ///kw+BC+usage <name>
 ///kw+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
 
-  if (feenox.pde.solve == NULL) {
+  if (feenox.pde.bc_parse == NULL) {
     feenox_push_error_message("BC before setting the PROBLEM type");
     return FEENOX_ERROR;
   }
@@ -3494,8 +3494,8 @@ int feenox_parse_bc(void) {
 
 int feenox_parse_problem(void) {
 
-  int (*feenox_problem_parse_particular)(const char *);
-  int (*feenox_problem_init_parser_particular)(void);
+  int (*feenox_problem_parse_particular)(const char *) = NULL;
+  int (*feenox_problem_init_parser_particular)(void) = NULL;
 
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
@@ -3710,11 +3710,21 @@ int feenox_parse_problem(void) {
     feenox_push_error_message("could not determine the dimension of the problem, give them using DIMENSIONS in either READ_MESH or PROBLEM");
     return FEENOX_ERROR;
   }
+
+  if (feenox_problem_init_parser_particular == NULL) {
+    feenox_push_error_message("undefined PROBLEM type");
+    return FEENOX_ERROR;     
+  }
   
-  if (feenox.pde.petscinit_called == 0) {
+#ifdef HAVE_PETSC
+  if (feenox.pde.petscinit_called == PETSC_FALSE) {
     feenox_call(feenox_problem_init_parser_general());
     feenox_call(feenox_problem_init_parser_particular());
-  }  
+  } else {
+    feenox_push_error_message("PROBLEM already initialized");
+    return FEENOX_ERROR;    
+  } 
+#endif  
       
   return FEENOX_OK;
   
