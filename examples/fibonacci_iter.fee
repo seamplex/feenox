@@ -13,4 +13,4 @@ ELSE
  f_nminus1 = f_n
 ENDIF
 
-PRINT %g step_static f_n
+PRINT f_n

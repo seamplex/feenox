@@ -31,7 +31,8 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
   char *dummy_init;
   char *dummy_0;
   
-  assignment_t *assignment = calloc(1, sizeof(assignment_t));
+  assignment_t *assignment = NULL;
+  feenox_check_alloc(assignment = calloc(1, sizeof(assignment_t)));
   
   // let us start assuming the assignment is "plain"
   assignment->plain = 1;
@@ -64,6 +65,7 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
   if ((assignment->matrix = feenox_get_matrix_ptr(sanitized_lhs)) == NULL &&
       (assignment->vector = feenox_get_vector_ptr(sanitized_lhs)) == NULL) {
     
+    // TODO: honor IMPLICIT
     if ((assignment->variable = feenox_get_or_define_variable_get_ptr(sanitized_lhs)) == NULL) {
       return FEENOX_ERROR;  
     }
@@ -72,29 +74,6 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
   }
   feenox_free(sanitized_lhs);
     
-    // we are looking for a variable
-    // TODO: honor IMPLICIT
- /*   
-    if ((assignment->variable = feenox_get_variable_ptr(left_hand)) == NULL) {
-      if (feenox.implicit_none) {
-        feenox_push_error_message("undefined symbol '%s' and implicit definition is disabled", left_hand);
-        return FEENOX_ERROR;
-      } else {
-        if ((assignment->variable = feenox_define_variable(left_hand)) == NULL) {
-          return FEENOX_ERROR;
-        } else {
-          // las variables siempre son escalares
-          assignment->plain = 0;
-          assignment->scalar = 1;
-        }
-      }
-    } else {
-      // las variables siempre son escalares
-      assignment->plain = 0;
-      assignment->scalar = 1;
-    }
-  }
-*/  
   // now from lef to right
   // re-build the string
   if (dummy_0 != NULL) {
@@ -133,7 +112,7 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
       *dummy = '\0';
       
       // si aparece la letra "i" entonces no es escalar
-      assignment->scalar = strchr(dummy_par+1, 'i') == NULL;
+      assignment->scalar = (strchr(dummy_par+1, 'i') == NULL);
       
       // si no es "i" entonces no es plain
       if (strcmp("i", dummy_par+1) != 0) {
@@ -190,9 +169,34 @@ int feenox_instruction_assignment_scalar(void *arg) {
 
 int feenox_instruction_assignment_vector(void *arg) {
   assignment_t *assignment = (assignment_t *)arg;
-  // TODO: check for plain, etc
-  unsigned int row = (unsigned int)(feenox_expression_eval(&assignment->row) - 1);
-  feenox_call(feenox_assign_single(assignment, row, 0));
+  
+  if (assignment->scalar) {
+    unsigned int row = (unsigned int)(feenox_expression_eval(&assignment->row) - 1);
+    feenox_call(feenox_assign_single(assignment, row, 0));
+  } else {
+    
+    size_t i_min = 0;
+    size_t i_max = 0;
+    
+    
+    if (assignment->i_min.items != NULL) {
+      // esto es C amigos!
+      i_min = (size_t)(round(feenox_expression_eval(&assignment->i_min))) - 1;
+      i_max = (size_t)(round(feenox_expression_eval(&assignment->i_max)));
+    } else {
+      if (!assignment->vector->initialized) {
+        feenox_call(feenox_vector_init(assignment->vector, 0));
+      }
+      i_max = assignment->vector->size;
+    }
+    
+    size_t row = 0;
+    size_t i = 0;
+    for (i = i_min; i < i_max; i++) {
+      feenox_call(feenox_get_assignment_rowcol(assignment, i, 0, &row, NULL));
+      feenox_call(feenox_assign_single(assignment, row, 0));
+    }
+  }
 
   return FEENOX_OK;  
 }
@@ -226,7 +230,6 @@ int feenox_instruction_assignment(void *arg) {
 }
 */  
 
-/*
 int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min, int *i_max, int *j_min, int *j_max) {
  
   *i_min = 0;
@@ -235,16 +238,16 @@ int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min,
   *j_max = 1;
   
   if (!assignment->scalar) {
-    if (assignment->i_min.n_tokens != 0) {
+    if (assignment->i_min.items != NULL) {
       // esto es C amigos!
-      *i_min = (int)(round(feenox_evaluate_expression(&assignment->i_min)))-1;
-      *i_max = (int)(round(feenox_evaluate_expression(&assignment->i_max)));
+      *i_min = (int)(round(feenox_expression_eval(&assignment->i_min))) - 1;
+      *i_max = (int)(round(feenox_expression_eval(&assignment->i_max)));
     } else {
       
       if (assignment->vector != NULL) {
         
         if (!assignment->vector->initialized) {
-          feenox_call(feenox_vector_init(assignment->vector));
+          feenox_call(feenox_vector_init(assignment->vector, 0));
         }
         
         *i_max = assignment->vector->size;
@@ -258,16 +261,16 @@ int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min,
         if (assignment->expression_only_of_j == 0) {
           *i_max = assignment->matrix->rows;
         } else {
-          *i_min = (int)(round(feenox_evaluate_expression(&assignment->row)))-1;
+          *i_min = (int)(round(feenox_expression_eval(&assignment->row))) - 1;
           *i_max = *i_min + 1;
         }
       }
     }
     
-    if (assignment->j_min.n_tokens != 0) {
+    if (assignment->j_min.items != NULL) {
       // esto es C amigos!
-      *j_min = (int)(round(feenox_evaluate_expression(&assignment->j_min)))-1;
-      *j_max = (int)(round(feenox_evaluate_expression(&assignment->j_max)));
+      *j_min = (int)(round(feenox_expression_eval(&assignment->j_min))) - 1;
+      *j_max = (int)(round(feenox_expression_eval(&assignment->j_max)));
       
     } else {
       if (assignment->matrix != NULL) {
@@ -279,7 +282,7 @@ int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min,
         if (assignment->expression_only_of_i == 0) {
           *j_max = assignment->matrix->cols;
         } else {
-          *j_min = (int)(round(feenox_evaluate_expression(&assignment->col)))-1;
+          *j_min = (int)(round(feenox_expression_eval(&assignment->col))) - 1;
           *j_max = *j_min + 1;
         }
       }
@@ -290,29 +293,34 @@ int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min,
   
 }
 
-int feenox_get_assignment_rowcol(assignment_t *assignment, int i, int j, int *row, int *col) {
-  feenox_var(feenox_special_var(i)) = (double)(i+1);
-  feenox_var(feenox_special_var(j)) = (double)(j+1);
+int feenox_get_assignment_rowcol(assignment_t *assignment, size_t i, size_t j, size_t *row, size_t *col) {
+  feenox_special_var_value(i) = (double)(i+1);
+  feenox_special_var_value(j) = (double)(j+1);
 
-  if (assignment->plain) {
-    *row = i;
-  } else if (assignment->row.n_tokens != 0) {
-    *row = (int)(feenox_evaluate_expression(&assignment->row))-1;
-  } else {
-    *row = 0;
-  }
+  if (row != NULL) {
+    if (assignment->plain) {
+      *row = i;
+    } else if (assignment->row.items != NULL) {
+      *row = (int)(feenox_expression_eval(&assignment->row))-1;
+    } else {
+      *row = 0;
+    }
+  }  
 
-  if (assignment->plain) {
-    *col = j;
-  } else if (assignment->col.n_tokens != 0) {
-    *col = (int)(feenox_evaluate_expression(&assignment->col))-1;
-  } else {
-    *col = 0;
+  if (col != NULL) {
+    if (assignment->plain) {
+      *col = j;
+    } else if (assignment->col.items != NULL) {
+      *col = (int)(feenox_expression_eval(&assignment->col))-1;
+    } else {
+      *col = 0;
+    }  
   }
 
   return FEENOX_OK;  
 }
 
+/*
 // verifica si tenemos que poner los valores iniciales de una variable
 void feenox_check_initial_variable(var_t *var) {
   

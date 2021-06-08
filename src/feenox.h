@@ -1871,6 +1871,7 @@ extern int feenox_assign_single(assignment_t *assignment, unsigned int row, unsi
 extern int feenox_instruction_assignment_scalar(void *arg);
 extern int feenox_instruction_assignment_vector(void *arg);
 extern int feenox_instruction_assignment_matrix(void *arg);
+extern int feenox_get_assignment_rowcol(assignment_t *assignment, size_t i, size_t j, size_t *row, size_t *col);
 
 // auxiliary.c
 extern int feenox_strip_blanks(char *string);
