@@ -24,7 +24,8 @@ TESTS = tests/abort.sh \
         tests/nafems-tx.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
-        tests/trig.sh
+        tests/trig.sh \
+        tests/vector.sh
 
 XFAIL_TESTS = tests/abort.sh         
 

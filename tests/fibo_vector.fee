@@ -4,4 +4,4 @@ VECTOR f SIZE 25
 f(i)<1:2> = 1
 f(i)<3:vecsize(f)> = f(i-2) + f(i-1)
 
-PRINT_VECTOR f FORMAT %g
+PRINT f SEP " "
