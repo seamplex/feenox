@@ -96,8 +96,9 @@ int feenox_solve_slepc_eigen(void) {
     
   }
   
+  // TODO: have a MAT_VIEW / PETSC_VIEW instruction
 //  PetscViewerPushFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
-//  MatView(feenox.pde.M, PETSC_VIEWER_STDOUT_WORLD);
+//  MatView(feenox.pde.K, PETSC_VIEWER_STDOUT_WORLD);
   
   petsc_call(EPSSetInitialSpace(feenox.pde.eps, 1, &feenox.pde.phi));
   petsc_call(EPSSolve(feenox.pde.eps));

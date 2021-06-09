@@ -1911,6 +1911,8 @@ extern int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, 
 extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_print_function(void *arg);
 extern int feenox_instruction_print_vector(void *arg);
+extern int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file);
+extern int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file);
 
 // conditional.c
 extern int feenox_instruction_if(void *arg);

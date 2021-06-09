@@ -1515,12 +1515,11 @@ int feenox_parse_default_argument_value(void) {
   }
 
   if ((feenox.optind+n) >= feenox.argc) {
-    if ((feenox.argv = realloc(feenox.argv, sizeof(char *)*(feenox.optind+n + 1))) == NULL) {
-      feenox_push_error_message("failed to allocate memory for DEFAULT_ARGUMENT_VALUE");
-      return FEENOX_ERROR;
-    }
     feenox.argc = feenox.optind+n + 1;
+    feenox_check_alloc(feenox.argv = realloc(feenox.argv, sizeof(char *)*(feenox.argc + 1)));
     feenox_check_alloc(feenox.argv[feenox.optind+n] = strdup(token));
+    
+    feenox_check_alloc(feenox.argv_orig = realloc(feenox.argv_orig, sizeof(char *)*(feenox.argc + 1)));
     feenox_check_alloc(feenox.argv_orig[feenox.optind+n] = strdup(token));
   }
   
