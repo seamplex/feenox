@@ -1538,6 +1538,13 @@ struct feenox_t {
     int (*problem_init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
     int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t node, size_t *index);
+#ifdef HAVE_PETSC
+    int (*setup_pc)(PC pc);
+    int (*setup_ksp)(KSP ksp);
+#endif
+#ifdef HAVE_SLEPC
+    int (*setup_eps)(EPS eps);
+#endif
     int (*build_element_volumetric_gauss_point)(element_t *this, unsigned int v);
     int (*solve)(void);
     int (*solve_post)(void);
@@ -1557,12 +1564,14 @@ struct feenox_t {
       var_t *snes_stol;
       var_t *snes_max_it;
       
+      // TODO: ts_tolerances
+      
       var_t *eps_tol;
       var_t *eps_max_it;
+      var_t *eps_st_sigma;
+      var_t *eps_st_nu;
       
       var_t *gamg_threshold;
-      var_t *eps_target;
-      var_t *eps_shift;
       
       var_t *penalty_weight;
       var_t *nodes_rough;
@@ -2099,6 +2108,10 @@ extern int feenox_expression_depends_on_function(function_ll_t *functions, funct
 extern int feenox_problem_parse_thermal(const char *);
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
+#ifdef HAVE_PETSC
+extern int feenox_problem_setup_pc_thermal(PC pc);
+extern int feenox_problem_setup_ksp_thermal(KSP ksp);
+#endif
 
 // thermal/bulk.c
 extern int feenox_problem_build_volumetric_gauss_point_thermal(element_t *element, unsigned int v);
@@ -2125,9 +2138,13 @@ extern int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nulls
 extern int feenox_problem_parse_modal(const char *);
 extern int feenox_problem_init_parser_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
-extern int feenox_problem_setup_pc_modal(void);
-extern int feenox_problem_setup_ksp_modal(void);
-extern int feenox_problem_setup_eps_modal(void);
+#ifdef HAVE_PETSC
+extern int feenox_problem_setup_pc_modal(PC pc);
+extern int feenox_problem_setup_ksp_modal(KSP ksp);
+#endif
+#ifdef HAVE_SLEPC
+extern int feenox_problem_setup_eps_modal(EPS eps);
+#endif
 
 // modal/bulk.c
 extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element, unsigned int v);

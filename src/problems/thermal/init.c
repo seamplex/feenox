@@ -19,6 +19,8 @@ int feenox_problem_init_parser_thermal(void) {
 
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
+  feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal;
+  feenox.pde.setup_pc = feenox_problem_setup_pc_thermal;
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_thermal;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_thermal;
   feenox.pde.solve_post = feenox_problem_solve_post_thermal;
@@ -221,3 +223,28 @@ int feenox_problem_init_runtime_thermal(void) {
 #endif  
   return FEENOX_OK;
 }
+
+
+#ifdef HAVE_PETSC
+int feenox_problem_setup_pc_thermal(PC pc) {
+
+  PCType pc_type = NULL;
+  petsc_call(PCGetType(pc, &pc_type));
+  if (pc_type == NULL) {
+    petsc_call(PCSetType(pc, PCGAMG));
+  }
+  
+  return FEENOX_OK;
+}
+
+int feenox_problem_setup_ksp_thermal(KSP ksp ) {
+
+  KSPType ksp_type = NULL;
+  petsc_call(KSPGetType(ksp, &ksp_type));
+  if (ksp_type == NULL) {
+    petsc_call(KSPSetType(ksp, KSPCG));
+  }  
+
+  return FEENOX_OK;
+}
+#endif

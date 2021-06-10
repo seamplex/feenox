@@ -9,8 +9,9 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer vector.fee "196"
+checkslepc
+
+answer modal-beam-cantilever.fee "43.8 61.6 114.7 158.0 211.2 232.0"
 exitifwrong $?
 
-answer fibo_vector.fee "1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025"
-exitifwrong $?
+

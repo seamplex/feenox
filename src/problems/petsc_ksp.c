@@ -145,9 +145,11 @@ int feenox_setup_ksp(KSP ksp) {
   if (feenox.pde.ksp_type != NULL) {
 #endif
     petsc_call(KSPSetType(ksp, feenox.pde.ksp_type));
-  } else {
-    // by default use whatever PETSc/SLEPc like
-    petsc_call(KSPSetType(ksp, KSPGMRES));
+  }
+  
+  // TODO: virtual
+  if (feenox.pde.setup_ksp != NULL) {
+    feenox_call(feenox.pde.setup_ksp(ksp));
   }
 
   if (feenox.pde.symmetric_K == PETSC_TRUE) {
@@ -156,14 +158,18 @@ int feenox_setup_ksp(KSP ksp) {
     if (feenox.pde.has_stiffness) {
       if (feenox.pde.K != NULL) {
         petsc_call(MatSetOption(feenox.pde.K, MAT_SYMMETRIC, PETSC_TRUE));  
+        petsc_call(MatSetOption(feenox.pde.K, MAT_SPD, PETSC_TRUE));
+        
       }
       if (feenox.pde.K_bc != NULL) {
         petsc_call(MatSetOption(feenox.pde.K_bc, MAT_SYMMETRIC, PETSC_TRUE));  
+        petsc_call(MatSetOption(feenox.pde.K_bc, MAT_SPD, PETSC_TRUE));  
       }  
     }  
     if (feenox.pde.has_mass) {
       if (feenox.pde.M != NULL) {
         petsc_call(MatSetOption(feenox.pde.M, MAT_SYMMETRIC, PETSC_TRUE));  
+        petsc_call(MatSetOption(feenox.pde.M, MAT_SPD, PETSC_TRUE));  
       }
       if (feenox.pde.M_bc != NULL) {
         petsc_call(MatSetOption(feenox.pde.M_bc, MAT_SYMMETRIC, PETSC_TRUE));  
@@ -172,11 +178,13 @@ int feenox_setup_ksp(KSP ksp) {
     if (feenox.pde.has_jacobian_K) {
       if (feenox.pde.JK != NULL) {
         petsc_call(MatSetOption(feenox.pde.JK, MAT_SYMMETRIC, PETSC_TRUE));  
+        petsc_call(MatSetOption(feenox.pde.JK, MAT_SPD, PETSC_TRUE));  
       }  
     }
     if (feenox.pde.has_jacobian_b) {
       if (feenox.pde.Jb != NULL) {
         petsc_call(MatSetOption(feenox.pde.Jb, MAT_SYMMETRIC, PETSC_TRUE));  
+        petsc_call(MatSetOption(feenox.pde.Jb, MAT_SPD, PETSC_TRUE));  
       }  
     }  
   }  
@@ -186,21 +194,22 @@ int feenox_setup_ksp(KSP ksp) {
                                    feenox_var_value(feenox.pde.vars.ksp_divtol),
                                    (PetscInt)feenox_var_value(feenox.pde.vars.ksp_max_it)));
   
+  PC pc = NULL;
+  petsc_call(KSPGetPC(ksp, &pc));
+  if (pc == NULL) {
+    feenox_push_error_message("cannot get preconditioner object");
+    return FEENOX_ERROR;
+  }
+  feenox_call(feenox_setup_pc(pc));
+
   // read command-line options
   petsc_call(KSPSetFromOptions(ksp));
 //  petsc_call(KSPSetUp(ksp));
   
-  PC pc;
-  petsc_call(KSPGetPC(ksp, &pc));
-  feenox_call(feenox_setup_pc(pc));
-
   return FEENOX_OK;
 }
 
 int feenox_setup_pc(PC pc) {
-
-//  PetscInt i, j;
-  PCType pc_type;
 
   // if we were asked for mumps, then either LU o cholesky needs to be used
   // and MatSolverType to mumps
@@ -208,9 +217,7 @@ int feenox_setup_pc(PC pc) {
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
 #if PETSC_VERSION_GT(3,9,0)
-    petsc_call(MatSetOption(feenox.pde.K, MAT_SPD, PETSC_TRUE)); /* set MUMPS id%SYM=1 */
     petsc_call(PCSetType(pc, PCCHOLESKY));
-
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 
 // if we want to set further options for mumps we need to retrieve the matrix
@@ -226,13 +233,16 @@ int feenox_setup_pc(PC pc) {
 #endif
     if (feenox.pde.pc_type != NULL) {
       petsc_call(PCSetType(pc, feenox.pde.pc_type));
-    } else {
-      petsc_call(PCSetType(pc, PCGAMG));
     }
 #ifdef PETSC_HAVE_MUMPS  
   }  
 #endif
-  
+
+  if (feenox.pde.setup_pc != NULL) {
+    feenox_call(feenox.pde.setup_pc(pc));
+  }
+    
+  PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type != NULL && strcmp(pc_type, PCGAMG) == 0) {
 #if PETSC_VERSION_LT(3,8,0)
@@ -243,40 +253,6 @@ int feenox_setup_pc(PC pc) {
     petsc_call(PCGAMGSetNSmooths(pc, 1));
   }
 
-  // TODO: this has to go somewhere else
-//  PetscInt nearnulldim = 0;
-//  MatNullSpace nullsp = NULL;
-//  PetscScalar  dots[5];
-//  Vec          *nullvec;  
-  
-//  if (feenox.pde.dofs == 3) {
-  // http://computation.llnl.gov/casc/linear_solvers/pubs/Baker-2009-elasticity.pdf
-
-/*  
-    Vec vec_coords;
-    petsc_call(MatCreateVecs(feenox.pde.K, NULL, &vec_coords));
-    petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dofs));
-    petsc_call(VecSetUp(vec_coords));
-
-    PetscScalar *coords;
-    size_t j = 0;
-    unsigned int m = 0;
-    petsc_call(VecGetArray(vec_coords, &coords));
-    for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {          
-      for (m = 0; m < feenox.pde.dofs; m++) {
-        coords[feenox.pde.mesh->node[j].index_dof[m]-feenox.pde.first_row] = feenox.pde.mesh->node[j].x[m];
-      }
-    }
-    petsc_call(VecRestoreArray(vec_coords, &coords));
-    
-    petsc_call(MatNullSpaceCreateRigidBody(vec_coords, &feenox.pde.null_space));
-    petsc_call(MatSetNearNullSpace(feenox.pde.K, feenox.pde.null_space));
-    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, feenox.pde.null_space));
-//    petsc_call(MatNullSpaceDestroy(&nullsp));
-    petsc_call(VecDestroy(&vec_coords));
-//  break;
-//  }
-*/
   return FEENOX_OK;
 }
 

@@ -15,7 +15,6 @@ int feenox_problem_parse_modal(const char *token) {
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
-      
     }
   } 
   
@@ -26,13 +25,16 @@ int feenox_problem_init_parser_modal(void) {
 
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_modal;
+  feenox.pde.setup_eps = feenox_problem_setup_eps_modal;
+  feenox.pde.setup_ksp = feenox_problem_setup_ksp_modal;
+  feenox.pde.setup_pc = feenox_problem_setup_pc_modal;
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_modal;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_modal;
   feenox.pde.solve_post = feenox_problem_solve_post_modal;
   
   if (feenox.pde.symmetry_axis != symmetry_axis_none ||
-      modal.variant == variant_plane_stress ||
-      modal.variant == variant_plane_strain) {
+                 modal.variant == variant_plane_stress ||
+                 modal.variant == variant_plane_strain) {
 
     if (feenox.pde.dim != 0) {
       if (feenox.pde.dim != 2) {
@@ -72,8 +74,9 @@ int feenox_problem_init_parser_modal(void) {
       feenox_check_alloc(feenox.pde.unknown_name[2] = strdup("w"));
     }  
   }
-  feenox.mesh.default_field_location = field_location_nodes;
   
+  // FEM!
+  feenox.mesh.default_field_location = field_location_nodes;
   feenox_call(feenox_problem_define_solutions());
   
 ///va+M_T+name M_T
@@ -226,28 +229,96 @@ int feenox_problem_init_runtime_modal(void) {
   return FEENOX_OK;
 }
 
+#ifdef HAVE_PETSC
+int feenox_problem_setup_pc_modal(PC pc) {
 
-int feenox_problem_setup_pc_modal(void) {
+  PCType pc_type = NULL;
+  petsc_call(PCGetType(pc, &pc_type));
+  if (pc_type == NULL) {
+#ifdef PETSC_HAVE_MUMPS
+    petsc_call(PCSetType(pc, PCCHOLESKY));
+    petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+#else
+    // TODO: this will complain in parallel
+    petsc_call(PCSetType(pc, PCLU));    
+#endif
+  }
+  
+  petsc_call(PCGetType(pc, &pc_type));
+  if (strcmp(pc_type, PCGAMG) == 0) {
+
+    if (modal.rigid_body_base == NULL) {
+      feenox_problem_mechanical_compute_rigid_nullspace(&modal.rigid_body_base);
+    }  
+    
+    petsc_call(MatSetNearNullSpace(feenox.pde.K, modal.rigid_body_base));
+    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, modal.rigid_body_base));
+    petsc_call(MatSetNearNullSpace(feenox.pde.M, modal.rigid_body_base));
+    petsc_call(MatSetNearNullSpace(feenox.pde.M_bc, modal.rigid_body_base));
+  }
   
   return FEENOX_OK;
 }
 
-int feenox_problem_setup_ksp_modal(void) {
-  
+int feenox_problem_setup_ksp_modal(KSP ksp ) {
+
+  KSPType ksp_type = NULL;
+  petsc_call(KSPGetType(ksp, &ksp_type));
+  if (ksp_type == NULL) {
+    // if the user did not choose anything, we default to preonly + direct solver
+    petsc_call(KSPSetType(ksp, KSPPREONLY));
+  }  
+
   return FEENOX_OK;
 }
-
-// these two are not 
-int feenox_problem_setup_eps_modal(void) {
+#endif
 
 #ifdef HAVE_SLEPC
-  if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-//    petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_SMALLEST_MAGNITUDE));
-    petsc_call(EPSSetTarget(feenox.pde.eps, 0));
-  } else {  
-    petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_LARGEST_MAGNITUDE));
-  }  
+// these two are not 
+int feenox_problem_setup_eps_modal(EPS eps) {
+
+  ST st = NULL;
+  petsc_call(EPSGetST(feenox.pde.eps, &st));
+  if (st == NULL) {
+    feenox_push_error_message("error getting spectral transform object");
+    return FEENOX_ERROR;
+  }
   
+  // the user might have already set a custom ST, se we peek what it is
+  STType st_type = NULL;
+  petsc_call(STGetType(st, &st_type));
+  
+  if (st_type != NULL && feenox.pde.eigen_formulation == eigen_formulation_undefined) {
+    // if there is no formulation but an st_type, choose an appropriate one
+    feenox.pde.eigen_formulation = (strcmp(st_type, STSHIFT) == 0) ? eigen_formulation_lambda : eigen_formulation_omega;
+  }
+  
+  if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
+    if (st_type != NULL) {
+      if (strcmp(st_type, STSINVERT) != 0) {
+        feenox_push_error_message("eigen formulation omega needs shift-and-invert spectral transformation");
+        return FEENOX_ERROR;
+      }  
+    } else {
+      petsc_call(STSetType(st, STSINVERT));
+    }
+    // shift and invert needs a target
+    petsc_call(EPSSetTarget(eps, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
+    
+  } else {
+    // lambda needs shift
+    if (st_type != NULL) {
+      if (strcmp(st_type, STSHIFT) != 0) {
+        feenox_push_error_message("eigen formulation lambda needs shift spectral transformation");
+        return FEENOX_ERROR;
+      }
+    } else {
+      petsc_call(STSetType(st, STSHIFT));
+    }
+    // seek for largest lambda (i.e. smallest omega)
+    petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
+  }  
+
   // to be able to solve free-body vibrations we have to set a deflation space
   if (modal.has_dirichlet_bcs == 0) {
     if (modal.rigid_body_base == NULL) {
@@ -268,10 +339,9 @@ int feenox_problem_setup_eps_modal(void) {
       petsc_call(VecCopy(vecs[k], rigid[k]));
     }
     
-    petsc_call(EPSSetDeflationSpace(feenox.pde.eps, n, rigid));
+    petsc_call(EPSSetDeflationSpace(eps, n, rigid));
   }   
-  
-#endif
   
   return FEENOX_OK;
 }
+#endif

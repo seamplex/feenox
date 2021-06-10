@@ -226,6 +226,21 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 ///va+snes_max_it+detail Default is a solver-dependent reasonable value`.
   feenox_var_value(feenox.pde.vars.eps_max_it) = PETSC_DEFAULT;
 
+///va+eps_st_sigma+name eps_st_sigma
+///va+eps_st_sigma Shift $\sigma$ associated with the spectral transformation. 
+///va+eps_st_sigma+detail as passed to SLEPc’s
+///va+ksp_rtol+detail [`STSetShift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STSetShift.html).
+  feenox.pde.vars.eps_st_sigma = feenox_define_variable_get_ptr("eps_st_sigma");
+///va+snes_max_it+detail Default is zero.
+  feenox_var_value(feenox.pde.vars.eps_st_sigma) = 0;
+  
+///va+eps_st_nu+name eps_st_nu
+///va+eps_st_nu Value $\nu$ of the anti-shift for the Cayley spectral transformation
+///va+eps_st_nu+detail as passed to SLEPc’s
+///va+ksp_rtol+detail [`STCayleySetAntishift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STCayleySetAntishift.html).
+  feenox.pde.vars.eps_st_nu = feenox_define_variable_get_ptr("eps_st_nu");
+///va+snes_max_it+detail Default is zero.
+  feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
   
 ///va+gamg_threshold+name feenox_gamg_threshold
 ///va+gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph for the

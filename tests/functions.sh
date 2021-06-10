@@ -46,6 +46,14 @@ checkpetsc() {
  fi
 }
 
+# checks if feenox is compiled with ida and skips the test if necessary
+checkslepc() {
+ if [ $(${feenox} --versions | grep 'SLEPc' | grep -v 'N/A'| wc -l) = 0 ]; then
+  echo "FeenoX was not compiled with SLEPc, skipping test"
+  exit 77
+ fi
+}
+
 
 answer() {
   echo -n "${1} ... "

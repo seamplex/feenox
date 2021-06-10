@@ -34,42 +34,47 @@ int feenox_solve_slepc_eigen(void) {
   
   if (feenox.pde.eps == NULL) {
     petsc_call(EPSCreate(PETSC_COMM_WORLD, &feenox.pde.eps));
-//    petsc_call(PetscObjectSetName((PetscObject)feenox.pde.eps, "eigenvalue-problem_solver"));
     if (feenox.pde.eps_type != NULL) {
       petsc_call(EPSSetType(feenox.pde.eps, feenox.pde.eps_type));
     }
     
-    // get the associated contexts
-    ST st;
+    // get the associated spectral transformation
+    ST st = NULL;
     petsc_call(EPSGetST(feenox.pde.eps, &st));
+    if (st == NULL) {
+      feenox_push_error_message("cannot retrieve spectral transformation object");
+      return FEENOX_ERROR;
+    }
     if (feenox.pde.st_type != NULL) {
       petsc_call(STSetType(st, feenox.pde.st_type));
-    }
 
+      // shift and invert offsets
+      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
+      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
+    }  
+    
+    if (feenox.pde.setup_eps != NULL) {
+      feenox_call(feenox.pde.setup_eps(feenox.pde.eps));
+    }  
+
+    // tolerances
+    petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
+                                                (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
+    
+    // operators depending on formulation
     if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
       petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.K_bc, feenox.pde.M_bc));
     } else {  
       petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.M_bc, feenox.pde.K_bc));
     }
-
-/*    
-    if (feenox.pde.st_shift.items != NULL) {
-      petsc_call(STSetShift(st, feenox_expression_eval(&feenox.pde.st_shift)));
-    }
-    if (feenox.pde.st_anti_shift.items != NULL) {
-      petsc_call(STCayleySetAntishift(st, feenox_expression_eval(&feenox.pde.st_anti_shift)));
-    }
-*/    
     
-    // tolerances
-    petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
-                                                (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
-    
-    // TODO: make a virtual method
-    feenox_call(feenox_problem_setup_eps_modal());
-    
-    KSP ksp;
+    // setup the linear solver
+    KSP ksp = NULL;
     petsc_call(STGetKSP(st, &ksp));
+    if (ksp == NULL) {
+      feenox_push_error_message("cannot retrieve linear solver object");
+      return FEENOX_ERROR;
+    }
     feenox_call(feenox_setup_ksp(ksp));
 
     // this should be faster but it is not

@@ -420,7 +420,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       }
 
       // n is the number of characters to parse (it will get copied into the output item_t)
-      n += strlen(token) + n_chars_count;
+      // if it is a matrix, vector or variable we already summed the length
+      n += ((matrix == NULL && vector == NULL && var == NULL) ? strlen(token) : 0) + n_chars_count;
       
       int n_arguments_max;
 
