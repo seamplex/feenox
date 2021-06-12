@@ -1,0 +1,7 @@
+# this identity is called Sophomore's dream (in contrast to Freshman's dream)
+#
+# \int_{0}^{1} x^{-x} \, dx = \sum_{n=1}^{\infty} n^{-n}
+#
+VAR x n
+PRINT %.7f integral(x^(-x),x,0,1)
+PRINT %.7f sum(n^(-n),n,1,1000)
