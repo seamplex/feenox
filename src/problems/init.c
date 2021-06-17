@@ -93,7 +93,7 @@ int feenox_problem_init_parser_general(void) {
   // recall that we already dumped one dash above!
   petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-mumps", &flag));
   if (flag == PETSC_TRUE) {
-#ifdef PETSC_HAVE_MUMPS    
+#ifdef PETSC_HAVE_MUMPS
     feenox.pde.ksp_type = strdup("mumps");
     feenox.pde.pc_type = strdup("mumps");
 #else
@@ -122,7 +122,7 @@ int feenox_problem_init_parser_general(void) {
   }
   
   // get the number of processes and the rank
-  petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.nprocs));
+  petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.n_procs));
   petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.rank));
 
   // segfaults are segfaults, try to leave PETSC out of them
@@ -602,13 +602,13 @@ int feenox_problem_init_runtime_general(void) {
   
   // TODO: honor mesh partitions
   // https://lists.mcs.anl.gov/pipermail/petsc-users/2014-April/021433.html
-  feenox.pde.first_element = (feenox.pde.mesh->n_elements / feenox.nprocs) * feenox.rank;
-  if (feenox.pde.mesh->n_elements % feenox.nprocs > feenox.rank) {
+  feenox.pde.first_element = (feenox.pde.mesh->n_elements / feenox.n_procs) * feenox.rank;
+  if (feenox.pde.mesh->n_elements % feenox.n_procs > feenox.rank) {
     feenox.pde.first_element += feenox.rank;
-    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.nprocs) + 1;
+    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.n_procs) + 1;
   } else {  
-    feenox.pde.first_element += feenox.pde.mesh->n_elements % feenox.nprocs;
-    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.nprocs);
+    feenox.pde.first_element += feenox.pde.mesh->n_elements % feenox.n_procs;
+    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.n_procs);
   }  
 
   // fill in the holders of the continuous functions that will hold the solution

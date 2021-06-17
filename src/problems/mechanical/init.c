@@ -25,10 +25,10 @@ int feenox_problem_parse_mechanical(const char *token) {
 int feenox_problem_init_parser_mechanical(void) {
 
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
-//  feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
-//  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_mechanical;
-//  feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
-//  feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
+  feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
+  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_mechanical;
+  feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
+  feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
   
   if (feenox.pde.symmetry_axis != symmetry_axis_none ||
       mechanical.variant == variant_plane_stress ||
@@ -160,6 +160,27 @@ int feenox_problem_init_parser_mechanical(void) {
 
 
 int feenox_problem_init_runtime_mechanical(void) {
+  
+  feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
+  feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
+
+  // TODO: check nonlinearity!
+  feenox.pde.math_type = math_type_linear;
+  feenox.pde.solve = feenox_solve_petsc_linear;
+  
+  feenox.pde.has_stiffness = PETSC_TRUE;
+  // TODO: transient
+  feenox.pde.has_mass = PETSC_FALSE;
+  feenox.pde.has_rhs = PETSC_TRUE;
+  
+  feenox.pde.has_jacobian_K = PETSC_FALSE;
+  feenox.pde.has_jacobian_M = PETSC_FALSE;
+  feenox.pde.has_jacobian_b = PETSC_FALSE;
+  feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
+  
+  feenox.pde.symmetric_K = PETSC_TRUE;
+  feenox.pde.symmetric_M = PETSC_TRUE;
+  
   return FEENOX_OK;
 }
 

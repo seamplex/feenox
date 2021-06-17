@@ -72,7 +72,7 @@ int feenox_solve_petsc_linear(void) {
 
   // finish the progress line
   if (feenox.pde.progress_ascii == PETSC_TRUE) {
-    if (feenox.nprocs == 1) {
+    if (feenox.n_procs == 1) {
       int i = 0;
       for (i = (int)(100*feenox.pde.progress_last); i < 100; i++) {
         printf(CHAR_PROGRESS_SOLVE);

@@ -28,6 +28,10 @@ int feenox_problem_init_parser_thermal(void) {
   // thermal is a scalar problem
   feenox.pde.dofs = 1;
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
+  
+  // we are FEM not FVM
+  feenox.pde.mesh->data_type = data_type_node;
+  
   // TODO: choose uknown name
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
   feenox.mesh.default_field_location = field_location_nodes;
@@ -51,6 +55,9 @@ int feenox_problem_init_parser_thermal(void) {
 int feenox_problem_init_runtime_thermal(void) {
   
 #ifdef HAVE_PETSC
+
+  feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
+  feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   
   // check if we were given an initial solution
   if ((feenox.pde.initial_condition = feenox_get_function_ptr("T_0")) != NULL) {
@@ -60,11 +67,6 @@ int feenox_problem_init_runtime_thermal(void) {
     }
   }
 
-  // we are FEM not FVM
-  feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.mesh->data_type = data_type_node;
-  feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
-  
   // initialize distributions
   // TODO: document distributions with triple comments
   // here we just initialize everything, during build we know which

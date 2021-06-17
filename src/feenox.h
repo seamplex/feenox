@@ -1225,7 +1225,7 @@ struct mesh_t {
 
   element_t *last_chosen_element;     // interpolation cache
 
-  // "virtual method" for format-dependet reader
+  // virtual method for format-dependet reader
   int (*reader)(mesh_t *this);
 
   int initialized;
@@ -1307,7 +1307,7 @@ struct feenox_t {
   int debug;
   
   int rank;            // in serial or without petsc, this is always zero
-  int nprocs;
+  int n_procs;
 
   char **error;
   int error_level;
@@ -2104,58 +2104,6 @@ extern int feenox_pull_dependencies_functions_function(function_ll_t **to, funct
 extern int feenox_expression_depends_on_space(var_ll_t *variables);
 extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
 
-// thermal/init.c
-extern int feenox_problem_parse_thermal(const char *);
-extern int feenox_problem_init_parser_thermal(void);
-extern int feenox_problem_init_runtime_thermal(void);
-#ifdef HAVE_PETSC
-extern int feenox_problem_setup_pc_thermal(PC pc);
-extern int feenox_problem_setup_ksp_thermal(KSP ksp);
-#endif
-
-// thermal/bulk.c
-extern int feenox_problem_build_volumetric_gauss_point_thermal(element_t *element, unsigned int v);
-
-// thermal/bc.c
-extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
-extern int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t node, size_t *index);
-extern int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v);
-extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_data, unsigned int v);
-
-// thermal/post.c
-extern int feenox_problem_solve_post_thermal(void);
-
-// mechanical/init.c
-extern int feenox_problem_parse_mechanical(const char *);
-extern int feenox_problem_init_parser_mechanical(void);
-extern int feenox_problem_init_runtime_mechanical(void);
-extern int feenox_problem_setup_pc_mechanical(void);
-extern int feenox_problem_setup_ksp_mechanical(void);
-extern int feenox_problem_setup_snes_mechanical(void);
-extern int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace);
-        
-// modal/init.c
-extern int feenox_problem_parse_modal(const char *);
-extern int feenox_problem_init_parser_modal(void);
-extern int feenox_problem_init_runtime_modal(void);
-#ifdef HAVE_PETSC
-extern int feenox_problem_setup_pc_modal(PC pc);
-extern int feenox_problem_setup_ksp_modal(KSP ksp);
-#endif
-#ifdef HAVE_SLEPC
-extern int feenox_problem_setup_eps_modal(EPS eps);
-#endif
-
-// modal/bulk.c
-extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element, unsigned int v);
-
-// modal/bc.c
-extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const char *rhs);
-extern int feenox_problem_bc_set_dirichlet_modal(bc_data_t *bc_data, size_t node, size_t *index);
-
-// modal/post.c
-extern int feenox_problem_solve_post_modal(void);
-
 // build.c
 extern int feenox_build(void);
 extern int feenox_build_element_volumetric(element_t *this);
@@ -2165,5 +2113,10 @@ extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned
 extern int feenox_elemental_objects_allocate(element_t *this);
 extern int feenox_elemental_objects_free(void);
 extern int feenox_build_assembly(void);
+
+// problem-dependent virtual methods
+#include "problems/thermal/methods.h"
+#include "problems/mechanical/methods.h"
+#include "problems/modal/methods.h"
 
 #endif    /* FEENOX_H  */

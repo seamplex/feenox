@@ -75,7 +75,9 @@ int feenox_problem_init_parser_modal(void) {
     }  
   }
   
-  // FEM!
+
+  // we are FEM not FVM
+  feenox.pde.mesh->data_type = data_type_node;
   feenox.mesh.default_field_location = field_location_nodes;
   feenox_call(feenox_problem_define_solutions());
   
@@ -156,31 +158,13 @@ int feenox_problem_init_parser_modal(void) {
     feenox_free(modename);
   }
 
-  
-  feenox.pde.math_type = math_type_eigen;
-  feenox.pde.solve = feenox_solve_slepc_eigen;
-  
-  feenox.pde.has_stiffness = PETSC_TRUE;
-  feenox.pde.has_mass = PETSC_TRUE;
-  feenox.pde.has_rhs = PETSC_FALSE;
-  
-  feenox.pde.has_jacobian_K = PETSC_FALSE;
-  feenox.pde.has_jacobian_M = PETSC_FALSE;
-  feenox.pde.has_jacobian_b = PETSC_FALSE;
-  feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
-  
-  feenox.pde.symmetric_K = PETSC_TRUE;
-  feenox.pde.symmetric_M = PETSC_TRUE;
-  
   return FEENOX_OK;
 }
 
 
 int feenox_problem_init_runtime_modal(void) {
   
-  // we are FEM not FVM
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // set the size of the eigenvectors (we did not know their size in init_parser() above
@@ -225,7 +209,22 @@ int feenox_problem_init_runtime_modal(void) {
   }
   modal.rho.space_dependent = feenox_expression_depends_on_space(modal.rho.dependency_variables);
   
+
+  feenox.pde.math_type = math_type_eigen;
+  feenox.pde.solve = feenox_solve_slepc_eigen;
   
+  feenox.pde.has_stiffness = PETSC_TRUE;
+  feenox.pde.has_mass = PETSC_TRUE;
+  feenox.pde.has_rhs = PETSC_FALSE;
+  
+  feenox.pde.has_jacobian_K = PETSC_FALSE;
+  feenox.pde.has_jacobian_M = PETSC_FALSE;
+  feenox.pde.has_jacobian_b = PETSC_FALSE;
+  feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
+  
+  feenox.pde.symmetric_K = PETSC_TRUE;
+  feenox.pde.symmetric_M = PETSC_TRUE;
+
   return FEENOX_OK;
 }
 

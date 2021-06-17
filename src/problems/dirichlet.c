@@ -31,7 +31,7 @@ int feenox_dirichlet_eval(void) {
   size_t k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
 
-    // TODO: high-order nodes end up with a different penalty method!
+    // TODO: high-order nodes end up with a different penalty weight
     // TODO: optimize the way this loop is done to avoid checking
     //       several times for the same group, wasting time and money
     LL_FOREACH(feenox.pde.mesh->node[j].associated_elements, element_list) {
@@ -51,7 +51,6 @@ int feenox_dirichlet_eval(void) {
                   feenox_check_alloc(feenox.pde.dirichlet_derivatives  = realloc(feenox.pde.dirichlet_derivatives,  current_size * sizeof(PetscScalar)));
                 }
                 
-                // TODO: per-problem virtual methods
                 if (bc_data->space_dependent) {
                   feenox_var_value(feenox.mesh.vars.x) = feenox.pde.mesh->node[j].x[0];
                   feenox_var_value(feenox.mesh.vars.y) = feenox.pde.mesh->node[j].x[1];
