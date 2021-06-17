@@ -30,12 +30,6 @@ FeenoX can be seen as
 For example, the famous chaotic Lorenz’ dynamical system—the one of the
 butterfly—whose differential equations are
 
-ẋ = σ ⋅ (y − x)
-
-ẏ = x ⋅ (r − z) − y
-
-ż = x ⋅ y − b ⋅ z
-
 where σ = 10, b = 8/3 and r = 28 are the classical parameters that
 generate the butterfly as presented by Edward Lorenz back in his seminal
 1963 paper Deterministic non-periodic flow, can be solved with FeenoX by

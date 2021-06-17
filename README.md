@@ -38,11 +38,29 @@ FeenoX can be seen as
 
 For example, the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system)---the one of the butterfly---whose differential equations are
 
+```{=plain}
+dx/dt = σ (y-x)  
+dy/dt = x (r-z) - y
+dz/dt = x y - b z
+```
+
+```{=latex}
+\begin{equation*}
+\begin{cases}
+\dot{x} &= \sigma \cdot (y - x)  \\
+\dot{y} &= x \cdot (r - z) - y   \\
+\dot{z} &= x y - b z       \\
+\end{cases}
+\end{equation*}
+```
+
+::: {.not-in-format .plain .latex }
 $$\dot{x} = \sigma \cdot (y - x)$$
 
 $$\dot{y} = x \cdot (r - z) - y$$
 
 $$\dot{z} = x \cdot y - b \cdot z$$
+:::
 
 where $\sigma=10$, $b=8/3$ and $r=28$ are the classical parameters that generate the butterfly as presented by Edward Lorenz back in his seminal 1963 paper [Deterministic non-periodic flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2), can be solved with FeenoX by writing the equations in the input file as naturally as possible, as illustrated in the input file that follows:
 
@@ -150,25 +168,25 @@ If the statically-linked binaries above do not fit your needs, the recommended w
 
  1. Install mandatory dependencies
 
-    ```
+    ```{.terminal style=terminal}
     sudo apt-get install git gcc make automake autoconf libgsl-dev
     ```
 
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
-    ```
+    ```{.terminal style=terminal}
     sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
     ```
 
  3. Clone Github repository
  
-    ```
+    ```{.terminal style=terminal}
     git clone https://github.com/seamplex/feenox
     ```
 
  4. Boostrap, configure, compile & make
  
-    ```
+    ```{.terminal style=terminal}
     cd feenox
     ./autogen.sh
     ./configure
@@ -177,13 +195,13 @@ If the statically-linked binaries above do not fit your needs, the recommended w
 
  5. Run test suite (optional, this might take some time)
  
-    ``` 
+    ```{.terminal style=terminal}
     make check
     ```
 
  6. Install the binary system wide (optional)
  
-    ```
+    ```{.terminal style=terminal}
     sudo make install
     ```
 

@@ -1,0 +1,140 @@
+\input{feenox}
+
+\definecolor{was_keyword1}{rgb}{0.0,0.0,0.4}
+\definecolor{was_keyword2}{rgb}{0.0,0.2,0.0}
+\definecolor{was_variable}{rgb}{0.5,0.2,0.2}
+\definecolor{was_function}{rgb}{0.2,0.5,0.2}
+\definecolor{was_comment}{rgb}{0.5,0.5,0.5}
+
+\definecolor{bash_keyword1}{rgb}{0.2,0.2,0.2}
+\definecolor{bash_keyword2}{rgb}{0.7,0.7,0.7}
+\definecolor{bash_comment}{rgb}{0.5,0.5,0.5}
+
+\definecolor{was_fondo}{rgb}{0.95,0.95,0.90}
+\definecolor{fino_fondo}{rgb}{0.90,0.95,0.90}
+\definecolor{gmsh_fondo}{rgb}{0.90,0.90,0.95}
+\definecolor{terminal_fondo}{rgb}{0.2,0.2,0.2}
+\definecolor{awk_fondo}{rgb}{0.95,0.90,0.95}
+\definecolor{bash_fondo}{rgb}{0.90,0.90,0.90}
+
+\definecolor{terminal_fore}{rgb}{1.0,1.0,1.0}
+
+
+\newcommand{\MyHookSign}{\hbox{\ensuremath{\hookleftarrow}}}
+
+% default
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{bash_fondo},
+  breaklines=true,
+  prebreak={\space\MyHookSign},
+  xleftmargin=0.2cm,
+  xrightmargin=0.2cm,
+  framesep=0.2cm,
+  frame=single,
+}
+
+
+\lstdefinestyle{feenox}{
+  language=wasora,
+  basicstyle=\ttfamily\footnotesize,
+  commentstyle={\color{was_comment}\normalfont\textit},
+  keywordstyle=[1]{\color{was_keyword1}\ttfamily\textbf},
+  keywordstyle=[2]{\color{was_keyword2}\ttfamily\textbf},
+  keywordstyle=[3]{\color{was_variable}\textit},
+  keywordstyle=[4]{\color{was_function}\textbf},
+  backgroundcolor=\color{was_fondo},
+  showstringspaces=true,
+  breaklines=true,
+  breakatwhitespace=true,
+  prebreak={\space\MyHookSign},
+  lineskip=-1pt,
+  captionpos=b,
+%   numbers=left,
+%   stepnumber=5,
+  xleftmargin=0.2cm,
+  xrightmargin=0.4cm,
+  framesep=0.1cm,
+  frame=single,
+}
+
+
+\lstdefinestyle{bash}{
+  language=bash,
+  basicstyle=\ttfamily\footnotesize,
+  commentstyle={\color{bash_comment}\normalfont\textit},
+  keywordstyle=[1]{\color{bash_keyword1}\ttfamily\textbf},
+  keywordstyle=[2]{\color{bash_keyword2}\ttfamily\textbf},
+  backgroundcolor=\color{bash_fondo},
+  showstringspaces=true,
+  breaklines=true,
+  breakatwhitespace=true,
+  prebreak={\space\MyHookSign},
+  lineskip=-1pt,
+  captionpos=b,
+%   numbers=left,
+%   stepnumber=5,
+  xleftmargin=0.2cm,
+  xrightmargin=0.2cm,
+  framesep=0.2cm,
+  frame=single,
+}
+
+
+\lstdefinestyle{terminal}{
+  language=,
+  basicstyle=\ttfamily\footnotesize\color{terminal_fore},
+  backgroundcolor=\color{terminal_fondo},
+  breaklines=true,
+  prebreak={\space\MyHookSign},
+  xleftmargin=0.2cm,
+  xrightmargin=0.2cm,
+  framesep=0.2cm,
+  frame=single,
+}
+
+\lstdefinestyle{c}{
+  language=C,
+  basicstyle=\ttfamily\footnotesize,                                
+  commentstyle={\color{was_comment}\normalfont\textit},     
+  keywordstyle=[1]{\color{was_keyword1}\ttfamily\textbf},   
+  keywordstyle=[2]{\color{was_keyword2}\ttfamily\textbf},   
+  keywordstyle=[3]{\color{was_variable}\textit},            
+  keywordstyle=[4]{\color{was_function}\textbf},            
+  backgroundcolor=\color{gmsh_fondo},                       
+  showstringspaces=true,                                    
+  breaklines=true,                                          
+  breakatwhitespace=true,                                   
+  prebreak={\space\MyHookSign},                             
+  lineskip=-1pt,                                            
+  captionpos=b,
+%   numbers=left,
+%   stepnumber=5,
+  xleftmargin=0.2cm,                                        
+  xrightmargin=0.4cm,                                       
+  framesep=0.1cm,                                           
+  frame=single,                                             
+}
+
+\lstdefinestyle{awk}{
+  language=awk,
+  basicstyle=\ttfamily\footnotesize,                                
+  commentstyle={\color{was_comment}\normalfont\textit},     
+  keywordstyle=[1]{\color{was_keyword1}\ttfamily\textbf},   
+  keywordstyle=[2]{\color{was_keyword2}\ttfamily\textbf},   
+  keywordstyle=[3]{\color{was_variable}\textit},            
+  keywordstyle=[4]{\color{was_function}\textbf},            
+  backgroundcolor=\color{awk_fondo},                       
+  showstringspaces=true,                                    
+  breaklines=true,                                          
+  breakatwhitespace=true,                                   
+  prebreak={\space\MyHookSign},                             
+  lineskip=-1pt,                                            
+  captionpos=b,
+%   numbers=left,
+%   stepnumber=5,
+  xleftmargin=0.2cm,                                        
+  xrightmargin=0.4cm,                                       
+  framesep=0.1cm,                                           
+  frame=single,                                             
+}

@@ -3,6 +3,21 @@ title: FeenoX Software Design Specification
 lang: en-US
 abstract: This design specification addresses the (hypothetical) Software Requirement Specification for developing a piece of free and open source engineering software with certain specifications, defined in an imaginary tender.
 number-sections: true
+
+fontsize: 11pt
+geometry:
+- paper=a4paper
+- left=2.5cm
+- right=2cm
+- bottom=3.5cm
+- foot=2cm
+- top=3.5cm
+- head=2cm
+colorlinks: true
+mathspec: true
+syntax-definition: feenox.xml
+listings: true
+toc: true
 ...
 
 # Introduction {#sec:introduction}
@@ -62,6 +77,7 @@ The choice of the initial supported features is based on the types of problem th
  * heat conduction
  * mechanical elasticity
  * structural modal analysis
+ * multigroup neutron transport and diffusion
  
 FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture og more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy ([@sec:unix]) regarding its computational implementation code. Besides POSIX, FeenoX also uses MPI which is a well-known industry standard for massive parallel executions of processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
 
@@ -110,11 +126,29 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
 
 For example, the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system)---the one of the butterfly---whose differential equations are
 
+```{=plain}
+dx/dt = σ (y-x)  
+dy/dt = x (r-z) - y
+dz/dt = x y - b z
+```
+
+```{=latex}
+\begin{equation*}
+\begin{cases}
+\dot{x} &= \sigma \cdot (y - x)  \\
+\dot{y} &= x \cdot (r - z) - y   \\
+\dot{z} &= x y - b z       \\
+\end{cases}
+\end{equation*}
+```
+
+::: {.not-in-format .plain .latex }
 $$\dot{x} = \sigma \cdot (y - x)$$
 
 $$\dot{y} = x \cdot (r - z) - y$$
 
 $$\dot{z} = x \cdot y - b \cdot z$$
+:::
 
 where $\sigma=10$, $b=8/3$ and $r=28$ are the classical parameters that generate the butterfly as presented by Edward Lorenz back in his seminal 1963 paper [Deterministic non-periodic flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2), can be solved with FeenoX by writing the equations in the input file as naturally as possible, as illustrated in the input file that follows:
 
@@ -211,6 +245,9 @@ Programs using both these libraries can run on either large high-performance sup
 > 
 
 
+**show how to download and run from binary**
+
+
 FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too.
 
 The configuration and compilation is based on GNU Autotools that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of UNIX variants. It can use the any C99-compatible C compiler (it has been tested with GNU C compiler and LLVM’s Clang compiler). 
@@ -224,31 +261,30 @@ FeenoX relies on a few open source libraries---most of them optional. The only m
 
 Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executables that do not need any other shared libraries to be present on the target host, but their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweights the limited functionality and scalability of the tool.
 
-**show how to download and run from binary**
 
 Here are the steps to get FeenoX' source repository, compile it and run the tests suite. Even though they are slightly more complex, they are still pretty standard and straightforward:
 
  1. Install mandatory dependencies
 
-    ```
+    ```{.terminal style=terminal}
     sudo apt-get install git gcc make automake autoconf libgsl-dev
     ```
 
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
-    ```
+    ```{.terminal style=terminal}
     sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
     ```
 
  3. Clone Github repository
  
-    ```
+    ```{.terminal style=terminal}
     git clone https://github.com/seamplex/feenox
     ```
 
  4. Boostrap, configure, compile & make
  
-    ```
+    ```{.terminal style=terminal}
     cd feenox
     ./autogen.sh
     ./configure
@@ -257,13 +293,13 @@ Here are the steps to get FeenoX' source repository, compile it and run the test
 
  5. Run test suite (optional, this might take some time)
  
-    ``` 
+    ```{.terminal style=terminal}
     make check
     ```
 
  6. Install the binary system wide (optional)
  
-    ```
+    ```{.terminal style=terminal}
     sudo make install
     ```
 
@@ -285,8 +321,8 @@ Here are the steps to get FeenoX' source repository, compile it and run the test
 
 As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
 
-```{.terminal stye=terminal}
-FeenoX v0.169-g01928dc-dirty 
+```{.terminal style=terminal}
+FeenoX v0.0.209-gf8c3f0a-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]
@@ -333,11 +369,16 @@ $ feenox Universe
 Hello Universe!
 ```
 
-When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary. Consider the input file
+When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary.
 
-![Triangles](design/parametric/two-squares-triang.png)
+:::{#fig:two-squares}
+![Triangular elements](design/parametric/two-squares-triang.png){#fig:two-squares-triang width=50%}
+![Quadrangular elements](design/parametric/two-squares-quad.png){#fig:two-squares-quad width=50%}
 
-![Quadrangles](design/parametric/two-squares-quad.png)
+Heat conduction on two 2D squares with different temprature-depedent conductivities
+:::
+
+Consider the input file
 
 ```{.feenox style=feenox}
 READ_MESH two-squares-$2.msh DIMENSIONS 2
@@ -357,10 +398,11 @@ PRINT TEXT $1 TEXT "Tright=$1" T(1,0.5)
 
 \noindent and the shell script
 
-```{.bash style=bash.sh}
+```{.bash style=bash}
+#!/bin/bash
 for temp in $(seq 1 3); do
  for shape in triang quad; do
-   feenox parametric.fee ${temp} ${shape}
+   feenox two-squares-thermal.fee ${temp} ${shape}
  done
 done
 
@@ -368,7 +410,7 @@ done
 
 Then it is possible to run the six combinations at once, obtaining
 
-```
+```{.terminal style=terminal}
 $ ./two-squares-thermal.sh
 1       Tright=1        0.432843
 1       Tright=1        0.432965
@@ -391,11 +433,23 @@ The second way of running parametric studies is by using the internal keyword `P
 > The computational resources (i.e. costs measured in CPU/GPU time, random-access memory, long-term storage, etc.) needed to solve a problem should be comparable to other similar state-of-the-art finite-element tools.
 
 
-> The computational resources (i.e. costs measured in CPU/GPU time, random-access memory, long-term storage, etc.) needed to solve a problem should be comparable to other similar state-of-the-art finite-element tools.
+ * auto KSP/SNES
+ * `--log_view`
+ 
 
 cloud, rent don't buy
 benchmark and comparisons
 
+ * thermal
+ * mechanical
+ * modal
+ 
+vs
+
+ * ccx
+ * sparselizard
+ * elmer
+ * code aster
 
 ## Scalability  {#sec:scalability}
 
@@ -403,10 +457,11 @@ benchmark and comparisons
 > The tool ought to be able to start solving small problems first to check the inputs and outputs behave as expected and then allow increasing the problem size up in order to achieve to the desired accuracy of the results. As mentioned in [@sec:architecture], large problem should be split among different computers to be able to solve them using a finite amount of per-host computational power (RAM and CPU).
 
 
-PETSc, MPI
-error handling, rule of repair
-check all malloc() calls
-
+ * OpenMP in PETSc
+ * Gmsh partitions
+ * run something big to see how it fails
+ 
+ * show RAM vs. nodes for mumps & gamg
 
 ## Flexibility
 
@@ -418,6 +473,12 @@ check all malloc() calls
 FeenoX comes from nuclear + experience (what to do and what not to do)
 
 Materials: a material library (perhaps included in a frontend GUI?) can write FeenoX’ material definitions. Flexiblity.
+ 
+ * everything is an expression, show sophomore's identity
+ * 1d & 2d interpolated data for functions
+ * thermal transient valve with k(T) and BCs(x,t)
+ 
+
 
 ## Extensibility {#sec:extensibility}
 
@@ -425,9 +486,9 @@ Materials: a material library (perhaps included in a frontend GUI?) can write Fe
 > It should be possible to add other PDE-casted problem types (such as the Schröedinger equation) to the tool using a reasonable amount of time by one or more skilled programmers. The tool should also allow new models (such as non-linear stress-strain constitutive relationships) to be added as well.
 
 
-user-provided routines
-skel for pdes and annotated models
-
+ * user-provided routines
+ * skel for pdes and annotated models
+ * laplace skel
 
 ## Interoperability {#sec:interoperability}
 
@@ -435,36 +496,40 @@ skel for pdes and annotated models
 > A mean of exchanging data with other computational tools complying to requirements similar to the ones outlined in this document.
 
 
-UNIX
-POSIX
+ * UNIX
+ * POSIX
+ * shmem
+ * mpi
+ * Gmsh
+ * moustache
+ * print -> awk -> latex tables NUREG
 
 
 # Interfaces
 
 > 
 > 
-> The tool should be able to allow remote execution without any user intervention after the tool is launched. The problem should be completely defined in one or more input files and the output should be complete and useful after the tool finishes its execution as in [@fig:transfer].  
-> 
+> The tool should be able to allow remote execution without any user intervention after the tool is launched.
+> To achieve this goal it is that the problem should be completely defined in one or more input files and the output should be complete and useful after the tool finishes its execution, as already required.
 > The tool should be able to report the status of the execution (i.e. progress, errors, etc.) and to make this information available to the user or process that launched the execution, possibly from a remote location.
 
 
 ## Problem input {#sec:input}
 
 > 
-> No GUI. Plain ASCII input file and/or interpreted high-level language API.
-> Mobile & web-friendly.
-> 
-> **Simple problems should need simple inputs.**
-> 
-> **Similar problems should need similar inputs.**
-> 
-> VCS tracking
-> 
+> The problem should be completely defined by one or more input files.
 > These input files might be
 > 
 >  * particularly formatted files to be read by the tool in an _ad-hoc_ way, and/or
 >  * source files for interpreted languages which can call the tool through and API or equivalent method, and/or
->  * any other method that can fulfill the requirement illustrated in\ [@fig:transfer]
+>  * any other method that can fulfill the requirements described so far.
+> 
+> Preferably, these input files should be plain ASCII file in order to be tracked by distributed control version systems such as Git. If the tool provides an API for an interpreted language such as Python, the Python source used to solve a particular problem should be Git-friendly. It is recommended not to track revisions of mesh data files but of the source input files, i.e. to track the mesher’s input and not the mesher’s output. Therefore, it is recommended not to mix the problem definition with the problem mesh data.
+> 
+> It is not mandatory to include a GUI in the main distribution, but the input/output scheme should be such that graphical pre and post-processing tools can create the input files and read the output files so as to allow third parties to develop interfaces.  It is recommended to design the workflow as to make it possible for the interfaces to be accessible from mobile devices and web browsers.
+> 
+> It is acceptable if only basic usage can be achieved through the usage of graphical interfaces to ease basic usage at least. Complex problems involving non-trivial material properties and boundary conditions might 
+> Notwithstanding the suggestion above, it is expected that 
 
 
 dar ejemplos
@@ -472,26 +537,54 @@ comparar con <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-memb
 
 macro-friendly inputs, rule of generation
 
+**Simple problems should need simple inputs.**
+
+English-like input. Nouns are definitions, verbs are instructions.
+
+**Similar problems should need similar inputs.**
+
+thermal slab steady state and transient
+
+1d neutron
+
+VCS tracking, example with hello world.
+
+API in C?
+
+
 ## Results output {#sec:output}
 
 > 
-> Output should not be cluttered up with non-mandatory information. Time of cognizant engineers should be more important than time needed for computation. 
-> JSON/YAML, state of the art open post-processing formats.
-> Mobile & web-friendly.
+> The output ought to contain useful results and should not be cluttered up with non-mandatory information such as ASCII art, notices, explanations or copyright notices.
+> Since the time of cognizant engineers is far more expensive than CPU time, output should be easily interpreted by either a human or, even better, by other programs or interfaces---especially those based in mobile and/or web platforms. Open-source formats and standards should be preferred over privative and ad-hoc formatting to encourage the possibility of using different workflows and/or interfaces.
 > 
-> Common and preferably open-source formats.
+
+
+JSON/YAML, state of the art open post-processing formats.
+Mobile & web-friendly.
+
+Common and preferably open-source formats.
 
 
 100% user-defined output with PRINT, rule of silence
 rule of economy, i.e. no RELAP
 yaml/json friendly outputs
-vtk (vtu), gmsh
+vtk (vtu), gmsh, frd?
+
+90% is serial (vtk), no need to complicate due to 10%
 
 
 # Quality assurance {#sec:qa}
 
 > 
-> Since the results obtained with the tools might be used in verifying existing equipment or in designing new mechanical parts in sensitive industries, a certain level of software quality assurance is needed. Some best-practices for developing generic software as required, such as employment of a version control system, automated unit testing and bug tracking support. But also more particular verification and validation procedures for the particular case of engineering computational software is 
+> Since the results obtained with the tools might be used in verifying existing equipment or in designing new mechanical parts in sensitive industries, a certain level of software quality assurance is needed. Some best-practices for developing generic software are required such as
+> 
+>  * employment of a version control system,
+>  * automated testing suites,
+>  * user-reported bug tracking support.
+>  * etc.
+> 
+> \noindent but since the tool falls in the category of engineering computational software, verification and validation procedures are also mandatory, as discussed below. Design should be such that governance of engineering data including problem definition, results and documentation can be efficiently performed using state-of-the-art methodologies.
 
 
 
@@ -499,26 +592,28 @@ vtk (vtu), gmsh
 ## Reproducibility and traceability 
 
 > 
-> The full source code and the documentation of the tool ought to be maintained under a control version system hosted on a public server accessible worldwide without needing any special credentials to get a copy of the code. 
+> The full source code and the documentation of the tool ought to be maintained under a control version system hosted on a public server accessible worldwide without needing any special credentials to get a copy of the code. If there is an executable binary, it should be able to report which version of the code the executable corresponds to. If there is a library callable through an API, there should be a call which returns the version of the code the library corresponds to.
 > 
+> It is recommended not to mix mesh data like nodes and element definition with  problem data like material properties and boundary conditions so as to ease governance and tracking of computational models.
 > All the information needed to solve a particular problem (i.e. meshes, boundary conditions, spatially-distributed material properties, etc.) should be  generated from a very simple set of files which ought to be susceptible of being tracked with current state-of-the-art version control systems.
 > 
-> simple <-> simple
-> 
-> similar <-> similar
-> 
-> Mesh data should be mixed with the problem data like material properties or boundary conditions.
-> Changes in the mesh should be tracked on the files needed to create the mesh and not on the mesh itself.
 
 
+
+simple <-> simple
+
+similar <-> similar
 
 
 ## Automated testing
 
 > 
-> A mean to automatically test the code for regressions is mandatory. A set of problems with known solutions should be solved with the tool after each modification of the code to make sure these changes still give the right answers for the right questions. Unit software testing practices like continuous integration are recommended.
+> A mean to automatically test the code works as expected is mandatory. A set of problems with known solutions should be solved with the tool after each modification of the code to make sure these changes still give the right answers for the right questions and no regressions are introduced. Unit software testing practices like continuous integration and test coverage are recommended.
 
 
+make check
+
+regressions, example of the change of a sign
 
 ## Bug reporting and tracking
 
@@ -527,6 +622,9 @@ vtk (vtu), gmsh
 > 
 
 
+github
+
+mailing listings
 
 ## Verification {#sec:verification}
 
@@ -534,6 +632,9 @@ vtk (vtu), gmsh
 > The source code should be available for verification by independent third parties.
 > Changes in the source code should be controllable, traceable and well documented.
 > Stable releases ought to be digitally signed by a responsible engineer.
+> 
+> Whenever a verification task is performed and documented, at least one test should be added to the test suite. These tests should check that the verified features are kept by future changes and no regressions that break the verification are introduced. Verifications that the tool fails when it is expected to fail are encouraged as much as positive verifications that results are the expected ones.
+> 
 
 
 
@@ -545,8 +646,27 @@ Git + gitlab, github, bitbucket
 ## Validation
 
 > 
-> The tool should be verified against known analytical results and other already-validated tools according to existing industry standards such as ASME or IAEA.
+> For each industrial application of the tool there should be a documented procedure to perform a set of validation tests. This procedure should be based on existing industry standards regarding verification and validation such as ASME or IAEA. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
+> 
+>  * geometry,
+>  * mesh type,
+>  * material model,
+>  * boundary condition,
+>  * data interpolation scheme
+>  
+> \noindent or any other particular application-dependent feature is needed.
+> 
+> A report following the V&V procedure defined above should be prepared and signed by a responsible engineer in a case-by-case basis for each particular field of application of the tool. Verification can be performed against
+> 
+>  * known analytical results, and/or
+>  * other already-validated tools following the same standards, and/or
+>  * experimental results.
+> 
 
+
+already done for Fino
+
+hip implant, 120+ pages, ASME, cases of increasing complexity
 
 
 ## Documentation {#sec:documentation}

@@ -34,11 +34,15 @@ FeenoX can be seen as
 For example, the famous chaotic [Lorenz’ dynamical system][]—the one of
 the butterfly—whose differential equations are
 
+<div class="not-in-format plain latex">
+
 *ẋ* = *σ* ⋅ (*y* − *x*)
 
 *ẏ* = *x* ⋅ (*r* − *z*) − *y*
 
 *ż* = *x* ⋅ *y* − *b* ⋅ *z*
+
+</div>
 
 where *σ* = 10, *b* = 8/3 and *r* = 28 are the classical parameters that
 generate the butterfly as presented by Edward Lorenz back in his seminal
@@ -191,31 +195,43 @@ recommended way of getting FeenoX is to compile from source.
 
 1.  Install mandatory dependencies
 
-        sudo apt-get install git gcc make automake autoconf libgsl-dev
+    ``` terminal
+    sudo apt-get install git gcc make automake autoconf libgsl-dev
+    ```
 
 2.  Install optional dependencies (of course these are *optional* but
     recommended)
 
-        sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
+    ``` terminal
+    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
+    ```
 
 3.  Clone Github repository
 
-        git clone https://github.com/seamplex/feenox
+    ``` terminal
+    git clone https://github.com/seamplex/feenox
+    ```
 
 4.  Boostrap, configure, compile & make
 
-        cd feenox
-        ./autogen.sh
-        ./configure
-        make
+    ``` terminal
+    cd feenox
+    ./autogen.sh
+    ./configure
+    make
+    ```
 
 5.  Run test suite (optional, this might take some time)
 
-        make check
+    ``` terminal
+    make check
+    ```
 
 6.  Install the binary system wide (optional)
 
-        sudo make install
+    ``` terminal
+    sudo make install
+    ```
 
 # Licensing
 

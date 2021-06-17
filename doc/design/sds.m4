@@ -3,11 +3,27 @@ title: FeenoX Software Design Specification
 lang: en-US
 abstract: This design specification addresses the (hypothetical) Software Requirement Specification for developing a piece of free and open source engineering software with certain specifications, defined in an imaginary tender.
 number-sections: true
+
+fontsize: 11pt
+geometry:
+- paper=a4paper
+- left=2.5cm
+- right=2cm
+- bottom=3.5cm
+- foot=2cm
+- top=3.5cm
+- head=2cm
+colorlinks: true
+mathspec: true
+syntax-definition: feenox.xml
+listings: true
+toc: true
 ...
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 010-introduction.md)
 
+dnl \begin{answer}Hola\end{answer}
 
 Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). This condition leaves all of the well-known non-free finite-element solvers in the market out of the tender.
 
@@ -36,6 +52,7 @@ The choice of the initial supported features is based on the types of problem th
  * heat conduction
  * mechanical elasticity
  * structural modal analysis
+ * multigroup neutron transport and diffusion
  
 FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture og more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy ([@sec:unix]) regarding its computational implementation code. Besides POSIX, FeenoX also uses MPI which is a well-known industry standard for massive parallel executions of processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
 
@@ -94,6 +111,9 @@ Programs using both these libraries can run on either large high-performance sup
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 050-deployment.md)
 
+**show how to download and run from binary**
+
+
 FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too.
 
 The configuration and compilation is based on GNU Autotools that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of UNIX variants. It can use the any C99-compatible C compiler (it has been tested with GNU C compiler and LLVM’s Clang compiler). 
@@ -107,7 +127,6 @@ FeenoX relies on a few open source libraries---most of them optional. The only m
 
 Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executables that do not need any other shared libraries to be present on the target host, but their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweights the limited functionality and scalability of the tool.
 
-**show how to download and run from binary**
 
 Here are the steps to get FeenoX' source repository, compile it and run the tests suite. Even though they are slightly more complex, they are still pretty standard and straightforward:
 
@@ -125,7 +144,7 @@ esyscmd(awk -f quote.awk 060-execution.md)
 
 As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
 
-```{.terminal stye=terminal}
+```{.terminal style=terminal}
 esyscmd(feenox)
 ```
 
@@ -154,11 +173,16 @@ $ feenox Universe
 Hello Universe!
 ```
 
-When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary. Consider the input file
+When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary.
 
-![Triangles](design/parametric/two-squares-triang.png)
+:::{#fig:two-squares}
+![Triangular elements](design/parametric/two-squares-triang.png){#fig:two-squares-triang width=50%}
+![Quadrangular elements](design/parametric/two-squares-quad.png){#fig:two-squares-quad width=50%}
 
-![Quadrangles](design/parametric/two-squares-quad.png)
+Heat conduction on two 2D squares with different temprature-depedent conductivities
+:::
+
+Consider the input file
 
 ```{.feenox style=feenox}
 include(parametric/two-squares-thermal.fee)
@@ -166,13 +190,13 @@ include(parametric/two-squares-thermal.fee)
 
 \noindent and the shell script
 
-```{.bash style=bash.sh}
+```{.bash style=bash}
 include(parametric/two-squares-thermal.sh)
 ```
 
 Then it is possible to run the six combinations at once, obtaining
 
-```
+```{.terminal style=terminal}
 $ ./two-squares-thermal.sh
 1       Tright=1        0.432843
 1       Tright=1        0.432965
@@ -192,19 +216,32 @@ The second way of running parametric studies is by using the internal keyword `P
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 070-efficienciy.md)
 
-> The computational resources (i.e. costs measured in CPU/GPU time, random-access memory, long-term storage, etc.) needed to solve a problem should be comparable to other similar state-of-the-art finite-element tools.
+ * auto KSP/SNES
+ * `--log_view`
+ 
 
 cloud, rent don't buy
 benchmark and comparisons
 
+ * thermal
+ * mechanical
+ * modal
+ 
+vs
+
+ * ccx
+ * sparselizard
+ * elmer
+ * code aster
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 080-scalability.md)
 
-PETSc, MPI
-error handling, rule of repair
-check all malloc() calls
-
+ * OpenMP in PETSc
+ * Gmsh partitions
+ * run something big to see how it fails
+ 
+ * show RAM vs. nodes for mumps & gamg
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 090-flexibility.md)
@@ -212,19 +249,30 @@ esyscmd(awk -f quote.awk 090-flexibility.md)
 FeenoX comes from nuclear + experience (what to do and what not to do)
 
 Materials: a material library (perhaps included in a frontend GUI?) can write FeenoX’ material definitions. Flexiblity.
+ 
+ * everything is an expression, show sophomore's identity
+ * 1d & 2d interpolated data for functions
+ * thermal transient valve with k(T) and BCs(x,t)
+ 
+
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 100-extensibility.md)
 
-user-provided routines
-skel for pdes and annotated models
-
+ * user-provided routines
+ * skel for pdes and annotated models
+ * laplace skel
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 110-interoperability.md)
 
-UNIX
-POSIX
+ * UNIX
+ * POSIX
+ * shmem
+ * mpi
+ * Gmsh
+ * moustache
+ * print -> awk -> latex tables NUREG
 
 
 dnl --------------------------------------------------------------------------------
@@ -238,13 +286,36 @@ comparar con <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-memb
 
 macro-friendly inputs, rule of generation
 
+**Simple problems should need simple inputs.**
+
+English-like input. Nouns are definitions, verbs are instructions.
+
+**Similar problems should need similar inputs.**
+
+thermal slab steady state and transient
+
+1d neutron
+
+VCS tracking, example with hello world.
+
+API in C?
+
+
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 140-output.md)
+
+JSON/YAML, state of the art open post-processing formats.
+Mobile & web-friendly.
+
+Common and preferably open-source formats.
+
 
 100% user-defined output with PRINT, rule of silence
 rule of economy, i.e. no RELAP
 yaml/json friendly outputs
-vtk (vtu), gmsh
+vtk (vtu), gmsh, frd?
+
+90% is serial (vtk), no need to complicate due to 10%
 
 
 dnl --------------------------------------------------------------------------------
@@ -256,14 +327,24 @@ dnl ----------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 160-reproducibility.md)
 
 
+simple <-> simple
+
+similar <-> similar
+
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 170-testing.md)
 
+make check
+
+regressions, example of the change of a sign
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 180-bugs.md)
 
+github
+
+mailing listings
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 190-verification.md)
@@ -276,6 +357,10 @@ Git + gitlab, github, bitbucket
 
 dnl --------------------------------------------------------------------------------
 esyscmd(awk -f quote.awk 200-validation.md)
+
+already done for Fino
+
+hip implant, 120+ pages, ASME, cases of increasing complexity
 
 
 dnl --------------------------------------------------------------------------------

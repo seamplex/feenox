@@ -12,6 +12,8 @@ if [ ! -e design ]; then
   exit 1
 fi
 
+# main README
+echo "creating main README for Github"
 cd ..
  m4 doc/header.m4 README.m4 > README.md
  pandoc README.md  -t gfm   -o README.markdown --standalone --toc --reference-links --reference-location=section --lua-filter doc/not-in-format.lua 
@@ -19,17 +21,19 @@ cd ..
  pandoc TODO.md    -t plain -o TODO
 cd doc
 
+# srs & sds
+echo "creating doc's README"
+pandoc README.md  -t gfm   -o README.markdown --standalone --toc
+
+# srs & sds
 echo "creating SRS and SDS markdown"
 cd design
 m4 ../header.m4 srs.m4 > ../srs.md
-# pandoc srs.md --number-sections --filter pandoc-crossref -o srs.pdf
 m4 ../header.m4 sds.m4 > ../sds.md
-# pandoc srs.md --number-sections --filter pandoc-crossref -o srs.pdf
 cd ..
-
-
-# exit
-
+echo "creating SRS and SDS PDFs"
+./pdf.sh srs
+./pdf.sh sds
 
 echo "creating the reference markdown from the commented sources"
 echo " - keywords"
@@ -65,6 +69,3 @@ m4 header.m4 date.m4 feenox.1.md | pandoc -s -t man -o feenox.1
 # sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox.texi
 # sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox.texi         
 # 
-
-# srs
-pandoc srs.md --number-sections --filter pandoc-crossref  -o srs.pdf

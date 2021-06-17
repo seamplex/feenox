@@ -175,7 +175,7 @@ Define a function of one or more variables.
 
 ::: {.usage}
 ~~~{.feenox style=feenox}
-FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { [ = <expr> | FILE_PATH <file_path> | ROUTINE <name> | | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } | [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ] } [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ] [ SIZES <expr_1> <expr_2> ... <expr_n> ] [ X_INCREASES_FIRST <expr> ] [ DATA <num_1> <num_2> ... <num_N> ]
+FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] ROUTINE <name> | | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } | [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ] } [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ] [ SIZES <expr_1> <expr_2> ... <expr_n> ] [ X_INCREASES_FIRST <expr> ]
 ~~~
 :::
 
@@ -185,18 +185,17 @@ The number of variables $n$ is given by the number of arguments given between pa
 The arguments are defined as new variables if they had not been already defined explictly as scalar variables.
 If the function is given as an algebraic expression, the short-hand operator `:=` can be used.
 That is to say, `FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`.
-If a `FILE_PATH` is given, an ASCII file containing at least $n+1$ columns is expected.
-By default, the first $n$ columns are the values of the arguments and the last column is the value of the function at those points.
-The order of the columns can be changed with the keyword `COLUMNS`, which expects $n+1$ expressions corresponding to the column numbers.
-A function of type `ROUTINE` calls an already-defined user-provided routine using the `CALL` keyword and passes the values of the variables in each required evaluation as a `double *` argument.
-If `MESH` is given, the definition points are the nodes or the cells of the mesh.
-The function arguments should be $(x)$, $(x,y)$ or $(x,y,z)$ matching the dimension the mesh.
-If the keyword `DATA` is used, a new empty vector of the appropriate size is defined.
-The elements of this new vector can be assigned to the values of the function at the $i$-th node or cell.
-If the keyword `VECTOR` is used, the values of the dependent variable are taken to be the values of the already-existing vector.
-Note that this vector should have the size of the number of nodes or cells the mesh has, depending on whether `NODES` or `CELLS` is given.
-If `VECTOR_DATA` is given, a set of $n+1$ vectors of the same size is expected.
-The first $n+1$ correspond to the arguments and the last one is the function value.
+If a `FILE` is given, an ASCII file containing at least $n+1$ columns is expected.
+By default, the first $n$ columns are the values of the arguments and the last column
+is the value of the function at those points.
+The order of the columns can be changed with the keyword `COLUMNS`,
+which expects $n+1$ expressions corresponding to the column numbers.
+If `VECTORS` is given, a set of $n+1$ vectors of the same size is expected.
+The first $n$ correspond to the arguments and the last one to the function values.
+The function can be pointwise-defined inline in the input using `DATA`.
+This should be the last keyword of the line, followed by $N=k \cdot (n+1)$ expresions
+giving\ $k$ definition points: $n$ arguments and the value of the function.
+Multiline continuation using brackets `{` and `}` can be used for a clean data organization.
 Interpolation schemes can be given for either one or multi-dimensional functions with `INTERPOLATION`.
 Available schemes for $n=1$ are:
 
@@ -206,7 +205,7 @@ Available schemes for $n=1$ are:
  * spline_periodic
  * akima (needs at least 5 points)
  * akima_periodic (needs at least 5 points)
- * steffen, always-monotonic splines-like (available only with GSL >= 2.0)
+ * steffen, always-monotonic splines-like interpolator
 
 Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
 
@@ -217,6 +216,15 @@ Available schemes for $n>1$ are:
  * shepard_kd, [average of definition points within a kd-tree](https://en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
  * bilinear, only available if the definition points configure an structured hypercube-like grid. If $n>3$, `SIZES` should be given.
 
+A function of type `ROUTINE` calls an already-defined user-provided routine using the `CALL` keyword and passes the values of the variables in each required evaluation as a `double *` argument.
+If `MESH` is given, the definition points are the nodes or the cells of the mesh.
+The function arguments should be $(x)$, $(x,y)$ or $(x,y,z)$ matching the dimension the mesh.
+If the keyword `DATA` is used, a new empty vector of the appropriate size is defined.
+The elements of this new vector can be assigned to the values of the function at the $i$-th node or cell.
+If the keyword `VECTOR` is used, the values of the dependent variable are taken to be the values of the already-existing vector.
+Note that this vector should have the size of the number of nodes or cells the mesh has, depending on whether `NODES` or `CELLS` is given.
+If `VECTOR_DATA` is given, a set of $n+1$ vectors of the same size is expected.
+The first $n+1$ correspond to the arguments and the last one is the function value.
 For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.
 Default value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`.
 The initial radius of points to take into account in `shepard_kd` is given by `SHEPARD_RADIUS`. If no points are found, the radius is double until at least one definition point is found.
@@ -226,8 +234,6 @@ The exponent of the `shepard` method is given by `SHEPARD_EXPONENT`.
 Default is `DEFAULT_SHEPARD_EXPONENT`.
 When requesting `bilinear` interpolation for $n>3$, the number of definition points for each argument variable has to be given with `SIZES`,
 and wether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
-The function can be pointwise-defined inline in the input using `DATA`. This should be the last keyword of the line, followed by $N=k\cdot (n+1)$ expresions giving $k$ definition points: $n$ arguments and the value of the function.
-Multiline continuation using brackets `{` and `}` can be used for a clean data organization. See the examples.
 
 ##  HISTORY
 
@@ -598,7 +604,7 @@ Write plain-text and/or formatted data to the standard output or into an output 
 ::: {.usage}
 ~~~{.feenox style=feenox}
 PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
- [ FILE < <file_path> | <file_id> > ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
  [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
 
 ~~~
@@ -621,9 +627,11 @@ The objects are treated as double-precision floating point numbers, so only floa
 See the `printf(3)` man page for further details. The default format is `DEFAULT_PRINT_FORMAT`.
 Matrices, vectors, scalar expressions, format modifiers and string literals can be given in any desired order,
 and are processed from left to right.
-Vectors are printed element-by-element in a single row. See `PRINT_VECTOR` to print vectors column-wise.
+Vectors are printed element-by-element in a single row.
+See `PRINT_VECTOR` to print one or more vectors with one element per line (i.e. vertically).
 Matrices are printed element-by-element in a single line using row-major ordering if mixed
-with other objects but in the natural row and column fashion if it is the only given object in the `PRINT` instruction.
+with other objects but in the natural row and column fashion
+if it is the only given object in the `PRINT` instruction.
 If the `FILE` keyword is not provided, default is to write to `stdout`.
 If the `HEADER` keyword is given, a single line containing the literal text
 given for each object is printed at the very first time the `PRINT` instruction is
@@ -655,7 +663,7 @@ PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ]
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
  [ MIN <expr_1> <expr_2> ... <expr_k> ] [ MAX <expr_1> <expr_2> ... <expr_k> ] 
  [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
- [ FORMAT <print_format> ] [ PHYSICAL_ENTITY <name> ]
+ [ FORMAT <print_format> ] [ PHYSICAL_ENTITY <name> ] <vector_1> [ { vector | expr } ... { vector | expr } ]
 ~~~
 :::
 
@@ -688,17 +696,25 @@ If the first function is not point-wise defined, the ranges are mandatory.
 
 ##  PRINT_VECTOR
 
-Print the elements of one or more vectors.
+Print the elements of one or more vectors, one element per line.
 
 
 ::: {.usage}
 ~~~{.feenox style=feenox}
-PRINT_VECTOR [ FILE <file_id> ] FILE_PATH <file_path> ] [ { VERTICAL | HORIZONTAL } ] [ ELEMS_PER_LINE <expr> ] [ FORMAT <print_format> ] <vector_1> [ vector_2 ... vector_n ]
+PRINT_VECTOR 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
+ [ FORMAT <print_format> ]
 ~~~
 :::
 
 
 
+Each argument should be either a vector or an expression of the integer\ `i`.
+If the `FILE` keyword is not provided, default is to write to `stdout`.
+If `HEADER` is given, the output is prepended with a single line containing the
+names of the arguments and the names of the functions, separated by tabs.
+The header starts with a hash\ `#` that usually acts as a comment and is ignored
+by most plotting tools.
 
 ##  PROBLEM
 
@@ -709,29 +725,39 @@ Sets the problem type that FeenoX has to solve.
 ~~~{.feenox style=feenox}
 PROBLEM [ mechanical | thermal | modal ]
  [ DIMENSIONS <expr> ] 
- [ AXISYMMETRIC | PLANE_STRESS | PLANE_STRAIN ] [ SYMMETRY_AXIS { x | y } ] [ PROGRESS ]
+ [ AXISYMMETRIC { x | y } | [ PROGRESS ]
  [ TRANSIENT | QUASISTATIC]
  [ LINEAR | NON_LINEAR ] [ MESH <identifier> ] 
- [ N_MODES <expr> ] 
- [ PC { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
- [ KSP { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]
- [ SNES_TYPE { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]
- [ TS { bdf | beuler | arkimex | rosw | glle | ... } ]
+ [ MODES <expr> ] 
+ [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
+ [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]
+ [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]
+ [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]
+ [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]
+ [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]
+ [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]
+ [ EIGEN_FORMULATION { omega | lambda } ]
 
 ~~~
 :::
 
 
 
+
  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
+If the mesh is two-dimensional and not `AXISYMMETRIC`, either
+`plane_stress` or `plane_strain` has to be set instead.
  * `thermal` (or `heat` ) solves the heat conduction problem.
- * `modal` computes the natural frequencies and oscillation modes.
+ * `modal` computes the natural mechanical frequencies and oscillation modes.
+ * `modal` computes the natural mechanical frequencies and oscillation modes.
+
+If you want to contribute with anothey problem type, you are welcome!
+Check out FeenoX's repository for licensing, programming guides and code of conduct.
 The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
 or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
-If the `AXISYMMETRIC` keyword is given, the mesh is expected to be two-dimensional in the $x$-$y$ plane
-and the problem is assumed to be axi-symmetric around the axis given by `SYMMETRY_AXIS` (default is $y$).
-If the problem type is mechanical and the mesh is two-dimensional on the $x$-$y$ plane and no
-axisymmetry is given, either `PLANE_STRESS` and `PLAIN_STRAIN` can be provided (default is plane stress).
+If the `AXISYMMETRIC` keyword is given, the mesh is expected
+to be two-dimensional in the $x$-$y$ plane and the problem
+is assumed to be axi-symmetric around the given axis.
 If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
 progress of the ensamble of the stiffness matrix (or matrices),
 the solution of the system of equations
@@ -745,15 +771,21 @@ An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
 If there are more than one `MESH`es define, the one over which the problem is to be solved
 can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
 defined in the input file is the one over which the problem is solved.
-The number of modes to be computed in the modal problem. The default is DEFAULT_NMODES.
+The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
+The default is DEFAULT_NMODES.
 The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
 solver types be any of those available in PETSc (first option is the default):
 
- * List of `PC`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
- * List of `KSP`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
- * List of `SNES`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
+ * List of `PRECONDITIONER`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
+ * List of `LINEAR_SOLVER`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
+ * List of `NONLINEAR_SOLVER`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
 
- * List of `TS`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
+ * List of `TRANSIENT_SOLVER`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
+ * List of `TIME_ADAPTATION`s <http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSAdaptType.html>.
+ * List of `EIGEN_SOLVER`s <https:
+ * List of `SPECTRAL_TRANSFORMATION`s <https:
+If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$,
+and $M \phi = \lambda K \phi$$ if it is `lambda`.
 
 ##  READ
 

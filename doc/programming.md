@@ -222,7 +222,7 @@ Copied from [NumFOCUS Code of Conduct---THE SHORT VERSION](https://numfocus.org/
 > 
 > FeenoX is dedicated to providing a harassment-free community for everyone, regardless of gender, sexual orientation, gender identity and expression, disability, physical appearance, body size, race, or religion. We do not tolerate harassment of community members in any form.
 >
-> Thank you for helping make this a welcoming, friendly community for all.
+> Help to make this a welcoming, friendly community for all.
 
  
 # Release plans

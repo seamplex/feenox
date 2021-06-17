@@ -110,60 +110,59 @@ A mean of exchanging data with other computational tools complying to requiremen
 # Interfaces
 
 
-The tool should be able to allow remote execution without any user intervention after the tool is launched. The problem should be completely defined in one or more input files and the output should be complete and useful after the tool finishes its execution as in [@fig:transfer].  
-
+The tool should be able to allow remote execution without any user intervention after the tool is launched.
+To achieve this goal it is that the problem should be completely defined in one or more input files and the output should be complete and useful after the tool finishes its execution, as already required.
 The tool should be able to report the status of the execution (i.e. progress, errors, etc.) and to make this information available to the user or process that launched the execution, possibly from a remote location.
 
 
 ## Problem input {#sec:input}
 
-No GUI. Plain ASCII input file and/or interpreted high-level language API.
-Mobile & web-friendly.
-
-**Simple problems should need simple inputs.**
-
-**Similar problems should need similar inputs.**
-
-VCS tracking
-
+The problem should be completely defined by one or more input files.
 These input files might be
 
  * particularly formatted files to be read by the tool in an _ad-hoc_ way, and/or
  * source files for interpreted languages which can call the tool through and API or equivalent method, and/or
- * any other method that can fulfill the requirement illustrated in\ [@fig:transfer]
+ * any other method that can fulfill the requirements described so far.
+
+Preferably, these input files should be plain ASCII file in order to be tracked by distributed control version systems such as Git. If the tool provides an API for an interpreted language such as Python, the Python source used to solve a particular problem should be Git-friendly. It is recommended not to track revisions of mesh data files but of the source input files, i.e. to track the mesher’s input and not the mesher’s output. Therefore, it is recommended not to mix the problem definition with the problem mesh data.
+
+It is not mandatory to include a GUI in the main distribution, but the input/output scheme should be such that graphical pre and post-processing tools can create the input files and read the output files so as to allow third parties to develop interfaces.  It is recommended to design the workflow as to make it possible for the interfaces to be accessible from mobile devices and web browsers.
+
+It is acceptable if only basic usage can be achieved through the usage of graphical interfaces to ease basic usage at least. Complex problems involving non-trivial material properties and boundary conditions might 
+Notwithstanding the suggestion above, it is expected that 
 
 
 ## Results output {#sec:output}
 
-Output should not be cluttered up with non-mandatory information. Time of cognizant engineers should be more important than time needed for computation. 
-JSON/YAML, state of the art open post-processing formats.
-Mobile & web-friendly.
+The output ought to contain useful results and should not be cluttered up with non-mandatory information such as ASCII art, notices, explanations or copyright notices.
+Since the time of cognizant engineers is far more expensive than CPU time, output should be easily interpreted by either a human or, even better, by other programs or interfaces---especially those based in mobile and/or web platforms. Open-source formats and standards should be preferred over privative and ad-hoc formatting to encourage the possibility of using different workflows and/or interfaces.
 
-Common and preferably open-source formats.
 
 
 # Quality assurance {#sec:qa}
 
-Since the results obtained with the tools might be used in verifying existing equipment or in designing new mechanical parts in sensitive industries, a certain level of software quality assurance is needed. Some best-practices for developing generic software as required, such as employment of a version control system, automated unit testing and bug tracking support. But also more particular verification and validation procedures for the particular case of engineering computational software is 
+Since the results obtained with the tools might be used in verifying existing equipment or in designing new mechanical parts in sensitive industries, a certain level of software quality assurance is needed. Some best-practices for developing generic software are required such as
+
+ * employment of a version control system,
+ * automated testing suites,
+ * user-reported bug tracking support.
+ * etc.
+
+\noindent but since the tool falls in the category of engineering computational software, verification and validation procedures are also mandatory, as discussed below. Design should be such that governance of engineering data including problem definition, results and documentation can be efficiently performed using state-of-the-art methodologies.
 
 
 ## Reproducibility and traceability 
 
-The full source code and the documentation of the tool ought to be maintained under a control version system hosted on a public server accessible worldwide without needing any special credentials to get a copy of the code. 
+The full source code and the documentation of the tool ought to be maintained under a control version system hosted on a public server accessible worldwide without needing any special credentials to get a copy of the code. If there is an executable binary, it should be able to report which version of the code the executable corresponds to. If there is a library callable through an API, there should be a call which returns the version of the code the library corresponds to.
 
+It is recommended not to mix mesh data like nodes and element definition with  problem data like material properties and boundary conditions so as to ease governance and tracking of computational models.
 All the information needed to solve a particular problem (i.e. meshes, boundary conditions, spatially-distributed material properties, etc.) should be  generated from a very simple set of files which ought to be susceptible of being tracked with current state-of-the-art version control systems.
 
-simple <-> simple
-
-similar <-> similar
-
-Mesh data should be mixed with the problem data like material properties or boundary conditions.
-Changes in the mesh should be tracked on the files needed to create the mesh and not on the mesh itself.
 
 
 ## Automated testing
 
-A mean to automatically test the code for regressions is mandatory. A set of problems with known solutions should be solved with the tool after each modification of the code to make sure these changes still give the right answers for the right questions. Unit software testing practices like continuous integration are recommended.
+A mean to automatically test the code works as expected is mandatory. A set of problems with known solutions should be solved with the tool after each modification of the code to make sure these changes still give the right answers for the right questions and no regressions are introduced. Unit software testing practices like continuous integration and test coverage are recommended.
 
 
 ## Bug reporting and tracking
@@ -178,10 +177,28 @@ The source code should be available for verification by independent third partie
 Changes in the source code should be controllable, traceable and well documented.
 Stable releases ought to be digitally signed by a responsible engineer.
 
+Whenever a verification task is performed and documented, at least one test should be added to the test suite. These tests should check that the verified features are kept by future changes and no regressions that break the verification are introduced. Verifications that the tool fails when it is expected to fail are encouraged as much as positive verifications that results are the expected ones.
+
+
 
 ## Validation
 
-The tool should be verified against known analytical results and other already-validated tools according to existing industry standards such as ASME or IAEA.
+For each industrial application of the tool there should be a documented procedure to perform a set of validation tests. This procedure should be based on existing industry standards regarding verification and validation such as ASME or IAEA. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
+
+ * geometry,
+ * mesh type,
+ * material model,
+ * boundary condition,
+ * data interpolation scheme
+ 
+\noindent or any other particular application-dependent feature is needed.
+
+A report following the V&V procedure defined above should be prepared and signed by a responsible engineer in a case-by-case basis for each particular field of application of the tool. Verification can be performed against
+
+ * known analytical results, and/or
+ * other already-validated tools following the same standards, and/or
+ * experimental results.
+
 
 
 ## Documentation {#sec:documentation}
