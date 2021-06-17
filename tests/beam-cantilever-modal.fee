@@ -1,0 +1,15 @@
+# https://autofem.com/examples/determining_natural_frequencie.html
+#   67.307     67.0
+#  418.736    420.2
+# 1157.75    1176.7
+
+READ_MESH beam-cantilever-$1.msh
+PROBLEM modal DIMENSIONS 3 MODES 6
+
+nu = 0.28
+rho = 7800
+E = 2.1e11
+
+BC left fixed
+SOLVE_PROBLEM
+PRINT %.1f SEP " " f

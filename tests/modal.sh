@@ -11,7 +11,17 @@ fi
 
 checkslepc
 
-answer modal-beam-cantilever.fee "43.8 61.6 114.7 158.0 211.2 232.0"
+answer1 beam-cantilever-modal.fee tet4 "249.7 341.2 1506.1 1962.4 2639.7 4050.7"
 exitifwrong $?
 
+answer1 beam-cantilever-modal.fee tet10 "69.8 170.6 466.4 1060.6 1154.5 1487.1"
+exitifwrong $?
 
+answer1 beam-cantilever-modal.fee hex8 "147.9 213.7 937.0 1122.0 1307.2 2623.5"
+exitifwrong $?
+
+answer1 beam-cantilever-modal.fee hex20 "69.3 169.6 456.3 1040.7 1101.3 1411.5"
+exitifwrong $?
+
+answer1 beam-cantilever-modal.fee hex27 "68.5 169.2 450.2 1037.6 1098.9 1384.2"
+exitifwrong $?
