@@ -174,41 +174,11 @@ int feenox_problem_init_runtime_modal(void) {
   }
   
   // initialize distributions
-  feenox_call(feenox_distribution_init(&modal.E, "E"));
-  if (modal.E.defined == 0) {
-    feenox_push_error_message("undefined elastic modulus 'E'");
-    return FEENOX_ERROR;
-  }
-  if (modal.E.full == 0) {
-    feenox_push_error_message("elastic modulus 'E' is not defined over all volumes");
-    return FEENOX_ERROR;
-  }
-  modal.E.space_dependent = feenox_expression_depends_on_space(modal.E.dependency_variables);
-  
+  feenox_define_distribution_mandatory(modal, E, "E", "elastic modulus");
+  feenox_define_distribution_mandatory(modal, nu, "nu", "Poisson’s ratio");
+  feenox_define_distribution_mandatory(modal, rho, "rho", "density");
 
-  feenox_call(feenox_distribution_init(&modal.nu, "nu"));
-  if (modal.nu.defined == 0) {
-    feenox_push_error_message("undefined Poisson ratio 'nu'");
-    return FEENOX_ERROR;
-  }
-  if (modal.nu.full == 0) {
-    feenox_push_error_message("Poisson ratio 'nu' is not defined over all volumes");
-    return FEENOX_ERROR;
-  }
-  modal.nu.space_dependent = feenox_expression_depends_on_space(modal.nu.dependency_variables);
-
-
-  feenox_call(feenox_distribution_init(&modal.rho, "rho"));
-  if (modal.rho.defined == 0) {
-    feenox_push_error_message("undefined density 'rho'");
-    return FEENOX_ERROR;
-  }
-  if (modal.rho.full == 0) {
-    feenox_push_error_message("density 'rho' is not defined over all volumes");
-    return FEENOX_ERROR;
-  }
   modal.rho.space_dependent = feenox_expression_depends_on_space(modal.rho.dependency_variables);
-  
 
   feenox.pde.math_type = math_type_eigen;
   feenox.pde.solve = feenox_solve_slepc_eigen;

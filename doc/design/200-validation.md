@@ -1,6 +1,6 @@
 ## Validation
 
-For each industrial application of the tool there should be a documented procedure to perform a set of validation tests. This procedure should be based on existing industry standards regarding verification and validation such as ASME or IAEA. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
+As with verification, for each industrial application of the tool there should be a documented procedure to perform a set of validation tests, a.k.a. checking that the right equations are being solved by the tool. This procedure should be based on existing industry standards regarding verification and validation such as ASME, AIAA, IAEA, etc. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
 
  * geometry,
  * mesh type,

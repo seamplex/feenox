@@ -26,8 +26,6 @@ int feenox_solve_petsc_linear(void) {
 
 #ifdef HAVE_PETSC
   
-  KSPConvergedReason reason;
-  
 //  time_checkpoint(solve_begin);
   // create a KSP object if needed
   if (feenox.pde.ksp == NULL) {
@@ -38,8 +36,6 @@ int feenox_solve_petsc_linear(void) {
       petsc_call(KSPMonitorSet(feenox.pde.ksp, feenox_ksp_monitor, NULL, 0));
     }
     
-    // TODO: this call sets up the nearnullspace, that should be in another place
-    //       because it is problem-dependent
     feenox_call(feenox_setup_ksp(feenox.pde.ksp));
   }
 
@@ -64,6 +60,7 @@ int feenox_solve_petsc_linear(void) {
   petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
   
   // check for convergence
+  KSPConvergedReason reason;
   petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));
   if (reason < 0) {
     feenox_push_error_message("PETSc's linear solver did not converge with reason '%s' (%d)", KSPConvergedReasons[reason], reason);
@@ -147,7 +144,6 @@ int feenox_setup_ksp(KSP ksp) {
     petsc_call(KSPSetType(ksp, feenox.pde.ksp_type));
   }
   
-  // TODO: virtual
   if (feenox.pde.setup_ksp != NULL) {
     feenox_call(feenox.pde.setup_ksp(ksp));
   }
@@ -204,6 +200,7 @@ int feenox_setup_ksp(KSP ksp) {
 
   // read command-line options
   petsc_call(KSPSetFromOptions(ksp));
+  // TODO: why does this call fail?
 //  petsc_call(KSPSetUp(ksp));
   
   return FEENOX_OK;

@@ -1,6 +1,9 @@
 #ifndef MECHANICAL_H
 #define MECHANICAL_H
 
+#define BC_TYPE_MECHANICAL_UNDEFINED            0
+#define BC_TYPE_MECHANICAL_DISPLACEMENT         1
+
 typedef struct mechanical_t mechanical_t;
 
 struct mechanical_t {

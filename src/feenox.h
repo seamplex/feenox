@@ -175,6 +175,10 @@
 
 #define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
 
+#define feenox_define_distribution_mandatory(type, name, quoted_name, description) { feenox_call(feenox_distribution_init(&(type.name), quoted_name)); \
+  if (type.name.defined == 0) { feenox_push_error_message("undefined %s '%s'", description, quoted_name);  return FEENOX_ERROR; } \
+  if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } \
+  type.name.space_dependent = feenox_expression_depends_on_space(type.name.dependency_variables); }
 
 enum version_type {
   version_compact,
@@ -1138,16 +1142,16 @@ struct bc_data_t {
   } type_math;
   
   int type_phys;     // problem-based flag that tells which type of BC this is
-  int dof;           // -1 means "all" dofs
-
+  
   // boolean flags
   int space_dependent;
   int nonlinear;
   int disabled;
   int fills_matrix;
-
-  expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
+  
+  unsigned int dof;  // -1 means "all" dofs
   expr_t expr;
+  expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
   
   int (*set)(element_t *element, bc_data_t *bc_data, unsigned int v);
   

@@ -164,6 +164,10 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
+  // initialize distributions
+  feenox_define_distribution_mandatory(mechanical, E, "E", "elastic modulus");
+  feenox_define_distribution_mandatory(mechanical, nu, "nu", "Poisson’s ratio");
+  
   // TODO: check nonlinearity!
   feenox.pde.math_type = math_type_linear;
   feenox.pde.solve = feenox_solve_petsc_linear;

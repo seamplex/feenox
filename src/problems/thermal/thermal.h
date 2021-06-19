@@ -1,8 +1,6 @@
 #ifndef THERMAL_H
 #define THERMAL_H
 
-#include "feenox.h"
-
 #define BC_TYPE_THERMAL_UNDEFINED               0
 #define BC_TYPE_THERMAL_TEMPERATURE             1
 #define BC_TYPE_THERMAL_HEATFLUX                2

@@ -1,5 +1,7 @@
 # General things to TODO
 
+ * https://joss.theoj.org/
+
 ## Binaries
 
  * automate the generation of binary tarballs
