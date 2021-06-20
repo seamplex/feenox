@@ -1271,7 +1271,7 @@ struct mesh_write_t {
   char *printf_format;
   
   int (*write_header)(FILE *);
-  int (*write_mesh)(mesh_t *, int, FILE *);
+  int (*write_mesh)(mesh_t *, FILE *, int);
   int (*write_scalar)(mesh_write_t *, function_t *, field_location_t, char *);
   int (*write_vector)(mesh_write_t *, function_t **, field_location_t, char *);
   
@@ -1971,7 +1971,7 @@ extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
 extern int feenox_mesh_read_gmsh(mesh_t *this);
 extern int feenox_mesh_gmsh_update_function(function_t *function, double t, double dt);
 extern int feenox_mesh_gmsh_write_header(FILE *file);
-extern int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file);
+extern int feenox_mesh_gmsh_write_mesh(mesh_t *this, FILE *file, int no_physical_names);
 extern int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_post, function_t *function, field_location_t field_location, char *printf_format);
 extern int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_post, function_t **function, field_location_t field_location, char *printf_format);
 
@@ -2034,7 +2034,13 @@ extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
 extern int feenox_mesh_element2cell(mesh_t *this);
 
 // vtk.c
+// TODO: rename feenox_mesh_write_mesh_vtk
 extern int feenox_mesh_vtk_write_unstructured_mesh(mesh_t *mesh, FILE *file);
+extern int feenox_mesh_vtk_write_header(FILE *file);
+extern int feenox_mesh_vtk_write_mesh(mesh_t *this, FILE *file, int dummy);
+extern int feenox_mesh_vtk_write_scalar(mesh_write_t *mesh_post, function_t *function, field_location_t field_location, char *printf_format);
+extern int feenox_mesh_vtk_write_vector(mesh_write_t *mesh_post, function_t **function, field_location_t field_location, char *printf_format);
+
 
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);

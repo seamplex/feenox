@@ -969,7 +969,7 @@ int feenox_mesh_gmsh_write_header(FILE *file) {
   return FEENOX_OK;
 }
 
-int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file) {
+int feenox_mesh_gmsh_write_mesh(mesh_t *this, FILE *file, int no_physical_names) {
   
   physical_group_t *physical_group;
 
@@ -1002,7 +1002,7 @@ int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file)
     fprintf(file, "%ld ", this->element[i].tag);
     fprintf(file, "%d ", this->element[i].type->id);
 
-    // in principle we should write the detailed information about groups and parititons
+    // in principle we should write the detailed information about groups and partitons
 //    fprintf(file, "%d ", this->element[i].ntags);
     
     // but for now only two tags are enough:
@@ -1013,7 +1013,7 @@ int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file)
     } else {
       fprintf(file, "2 0 0");
     }
-    // los nodos
+    // the nodes
     unsigned int j = 0;
     for (j = 0; j < this->element[i].type->nodes; j++) {
       fprintf(file, " %ld", this->element[i].node[j]->tag);
@@ -1029,7 +1029,7 @@ int feenox_mesh_gmsh_write_mesh(mesh_t *this, int no_physical_names, FILE *file)
 
 int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function, field_location_t field_location, char *printf_format) {
 
-  mesh_t *mesh;
+  mesh_t *mesh = NULL;
   
   if (mesh_write->mesh != NULL) {
     mesh = mesh_write->mesh;
@@ -1194,10 +1194,9 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
     // custom format
     char *format = NULL;
     if (printf_format == NULL) {
-      feenox_check_alloc(format = strdup("%ld %g %g %g\n"));
+      feenox_check_alloc(format = strdup("%g "));
     } else {
       if (printf_format[0] == '%') {
-        // TODO: check alloc
         feenox_check_minusone(asprintf(&format, "%s ", printf_format));
       } else {
         feenox_check_minusone(asprintf(&format, "%%%s ", printf_format));
@@ -1209,21 +1208,21 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
       fprintf(mesh_write->file->pointer, "%ld ", mesh->node[j].tag);
       
       if (function[0]->type == function_type_pointwise_mesh_node && function[0]->data_size == mesh_write->mesh->n_nodes) {
-        fprintf(mesh_write->file->pointer, printf_format, function[0]->data_value[j]);
+        fprintf(mesh_write->file->pointer, format, function[0]->data_value[j]);
       } else {
-        fprintf(mesh_write->file->pointer, printf_format, feenox_function_eval(function[0], mesh->node[j].x));
+        fprintf(mesh_write->file->pointer, format, feenox_function_eval(function[0], mesh->node[j].x));
       }
 
       if (function[1]->type == function_type_pointwise_mesh_node && function[1]->data_size == mesh_write->mesh->n_nodes) {
-        fprintf(mesh_write->file->pointer, printf_format, function[1]->data_value[j]);
+        fprintf(mesh_write->file->pointer, format, function[1]->data_value[j]);
       } else {
-        fprintf(mesh_write->file->pointer, printf_format, feenox_function_eval(function[1], mesh->node[j].x));
+        fprintf(mesh_write->file->pointer, format, feenox_function_eval(function[1], mesh->node[j].x));
       }
 
       if (function[2]->type == function_type_pointwise_mesh_node && function[2]->data_size == mesh_write->mesh->n_nodes) {
-        fprintf(mesh_write->file->pointer, printf_format, function[2]->data_value[j]);
+        fprintf(mesh_write->file->pointer, format, function[2]->data_value[j]);
       } else {
-        fprintf(mesh_write->file->pointer, printf_format, feenox_function_eval(function[2], mesh->node[j].x));
+        fprintf(mesh_write->file->pointer, format, feenox_function_eval(function[2], mesh->node[j].x));
       }
       fprintf(mesh_write->file->pointer, "\n");
     }
