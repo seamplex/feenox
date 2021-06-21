@@ -3233,27 +3233,24 @@ int feenox_parse_write_mesh(void) {
 
   
   // TODO
-/*  
-  switch (mesh_write->format) {
+  switch (mesh_write->post_format) {
     case post_format_gmsh:
- */
-      mesh_write->write_header = feenox_mesh_gmsh_write_header;
-      mesh_write->write_mesh = feenox_mesh_gmsh_write_mesh;
-      mesh_write->write_scalar = feenox_mesh_gmsh_write_scalar;
-      mesh_write->write_vector = feenox_mesh_gmsh_write_vector;
-/*      
+      mesh_write->write_header = feenox_mesh_write_header_gmsh;
+      mesh_write->write_mesh   = feenox_mesh_write_mesh_gmsh;
+      mesh_write->write_scalar = feenox_mesh_write_scalar_gmsh;
+      mesh_write->write_vector = feenox_mesh_write_vector_gmsh;
     break;
     case post_format_vtk:
-      mesh_write->write_header = feenox_mesh_vtk_write_header;
-      mesh_write->write_mesh = feenox_mesh_vtk_write_mesh;
-      mesh_write->write_scalar = feenox_mesh_vtk_write_scalar;
-      mesh_write->write_vector = feenox_mesh_vtk_write_vector;
+      mesh_write->write_header = feenox_mesh_write_header_vtk;
+      mesh_write->write_mesh   = feenox_mesh_write_mesh_vtk;
+      mesh_write->write_scalar = feenox_mesh_write_scalar_vtk;
+      mesh_write->write_vector = feenox_mesh_write_vector_vtk;
     break;
     default:
       return FEENOX_ERROR;
     break;
   }
-*/
+
   LL_APPEND(feenox.mesh.mesh_writes, mesh_write);
   feenox_call(feenox_add_instruction(feenox_instruction_mesh_write, mesh_write));
   

@@ -63,7 +63,7 @@ int hexa27fromgmsh[27] = {
  10 , 12 , 14 , 15 , 22 , 23 , 21 , 24 ,
  20 , 25 , 26} ;
 
-int feenox_mesh_vtk_write_header(FILE *file) {
+int feenox_mesh_write_header_vtk(FILE *file) {
   fprintf(file, "# vtk DataFile Version 2.0\n");
   fprintf(file, "FeenoX VTK output\n");
   fprintf(file, "ASCII\n");
@@ -72,7 +72,7 @@ int feenox_mesh_vtk_write_header(FILE *file) {
 }
 
 
-int feenox_mesh_vtk_write_mesh(mesh_t *mesh, FILE *file, int dummy) {
+int feenox_mesh_write_mesh_vtk(mesh_t *mesh, FILE *file, int dummy) {
     
   int i, j;
   size_t size, volumelements;
@@ -175,7 +175,7 @@ int feenox_mesh_vtk_write_mesh(mesh_t *mesh, FILE *file, int dummy) {
   return FEENOX_OK;  
 }
 
-int mesh_vtk_write_scalar(mesh_write_t *mesh_write, function_t *function, field_location_t field_location, char *printf_format) {
+int feenox_mesh_write_scalar_vtk(mesh_write_t *mesh_write, function_t *function, field_location_t field_location, char *printf_format) {
 
   mesh_t *mesh = NULL;
   
@@ -249,7 +249,7 @@ int mesh_vtk_write_scalar(mesh_write_t *mesh_write, function_t *function, field_
 }
 
 
-int mesh_vtk_write_vector(mesh_write_t *mesh_write, function_t **function, centering_t centering) {
+int feenox_mesh_write_vector_vtk(mesh_write_t *mesh_write, function_t **function, field_location_t field_location, char *printf_format) {  
 
   int i, j;
   mesh_t *mesh;
@@ -259,25 +259,26 @@ int mesh_vtk_write_vector(mesh_write_t *mesh_write, function_t **function, cente
   } else if (function[0] != NULL) {
     mesh = function[0]->mesh;
   } else {
+    feenox_push_error_message("do not know which mesh to apply to post-process function '%s'", function[0]->name);
     return FEENOX_ERROR;
   }
   
-  if (centering == centering_cells) {
+  if (field_location == field_location_cells) {
     if (mesh_write->cell_init == 0) {
-      fprintf(mesh_write->file->pointer, "CELL_DATA %d\n", mesh->n_cells);
+      fprintf(mesh_write->file->pointer, "CELL_DATA %ld\n", mesh->n_cells);
       mesh_write->cell_init = 1;
     }
       
     fprintf(mesh_write->file->pointer, "VECTORS %s_%s_%s double\n", function[0]->name, function[1]->name, function[1]->name);
       
     for (i = 0; i < mesh->n_cells; i++) {
-      fprintf(mesh_write->file->pointer, "%g %g %g\n", feenox_evaluate_function(function[0], mesh->cell[i].x),
-                                                      feenox_evaluate_function(function[1], mesh->cell[i].x),
-                                                      feenox_evaluate_function(function[2], mesh->cell[i].x));
+      fprintf(mesh_write->file->pointer, "%g %g %g\n", feenox_function_eval(function[0], mesh->cell[i].x),
+                                                       feenox_function_eval(function[1], mesh->cell[i].x),
+                                                       feenox_function_eval(function[2], mesh->cell[i].x));
     }
   } else {
     if (mesh_write->point_init == 0) {
-      fprintf(mesh_write->file->pointer, "POINT_DATA %d\n", mesh->n_nodes);
+      fprintf(mesh_write->file->pointer, "POINT_DATA %ld\n", mesh->n_nodes);
       mesh_write->point_init = 1;
     }
 
@@ -288,22 +289,22 @@ int mesh_vtk_write_vector(mesh_write_t *mesh_write, function_t **function, cente
     fprintf(mesh_write->file->pointer, "VECTORS %s_%s_%s double\n", function[0]->name, function[1]->name, function[2]->name);
       
     for (j = 0; j < mesh->n_nodes; j++) {
-      if (function[0]->type == type_pointwise_mesh_node && function[0]->data_size == mesh_write->mesh->n_nodes) {
+      if (function[0]->type == function_type_pointwise_mesh_node && function[0]->data_size == mesh_write->mesh->n_nodes) {
         fprintf(mesh_write->file->pointer, "%g ", (function[0]->data_value != NULL)?function[0]->data_value[j]:0);
       } else {
-        fprintf(mesh_write->file->pointer, "%g ", feenox_evaluate_function(function[0], mesh->node[j].x));
+        fprintf(mesh_write->file->pointer, "%g ", feenox_function_eval(function[0], mesh->node[j].x));
       }
 
-      if (function[1]->type == type_pointwise_mesh_node && function[1]->data_size == mesh_write->mesh->n_nodes) {
+      if (function[1]->type == function_type_pointwise_mesh_node && function[1]->data_size == mesh_write->mesh->n_nodes) {
         fprintf(mesh_write->file->pointer, "%g ", (function[1]->data_value != NULL)?function[1]->data_value[j]:0);
       } else {
-        fprintf(mesh_write->file->pointer, "%g ", feenox_evaluate_function(function[1], mesh->node[j].x));
+        fprintf(mesh_write->file->pointer, "%g ", feenox_function_eval(function[1], mesh->node[j].x));
       }
 
-      if (function[2]->type == type_pointwise_mesh_node && function[2]->data_size == mesh_write->mesh->n_nodes) {
+      if (function[2]->type == function_type_pointwise_mesh_node && function[2]->data_size == mesh_write->mesh->n_nodes) {
         fprintf(mesh_write->file->pointer, "%g\n", (function[2]->data_value != NULL)?function[2]->data_value[j]:0);
       } else {
-        fprintf(mesh_write->file->pointer, "%g\n", feenox_evaluate_function(function[2], mesh->node[j].x));
+        fprintf(mesh_write->file->pointer, "%g\n", feenox_function_eval(function[2], mesh->node[j].x));
       }
     }
   }
@@ -314,7 +315,7 @@ int mesh_vtk_write_vector(mesh_write_t *mesh_write, function_t **function, cente
   return FEENOX_OK;
   
 }
-*/
+
 
 
 int feenox_mesh_read_vtk(mesh_t *this) {

@@ -48,7 +48,7 @@ int feenox_instruction_mesh_write(void *arg) {
   if (ftell(mesh_write->file->pointer) == 0) {
     feenox_call(mesh_write->write_header(mesh_write->file->pointer));
     if (mesh_write->no_mesh == 0) {
-      feenox_call(mesh_write->write_mesh(mesh_write->mesh, mesh_write->no_physical_names, mesh_write->file->pointer));
+      feenox_call(mesh_write->write_mesh(mesh_write->mesh, mesh_write->file->pointer, mesh_write->no_physical_names));
     }
     mesh_write->point_init = 0;
   }

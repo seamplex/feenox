@@ -532,7 +532,7 @@ double feenox_function_eval(function_t *this, const double *x) {
   // if the function is mesh, check if the time is the correct one
   if (this->mesh != NULL && this->name_in_mesh != NULL && this->mesh->reader == feenox_mesh_read_gmsh
       && this->mesh_time < feenox_special_var_value(t)-0.001*feenox_special_var_value(dt)) {
-    feenox_call(feenox_mesh_gmsh_update_function(this, feenox_special_var_value(t), feenox_special_var_value(dt)));
+    feenox_call(feenox_mesh_update_function_gmsh(this, feenox_special_var_value(t), feenox_special_var_value(dt)));
     this->mesh_time = feenox_special_var_value(t);
   }
     

@@ -961,7 +961,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 }
 
 
-int feenox_mesh_gmsh_write_header(FILE *file) {
+int feenox_mesh_write_header_gmsh(FILE *file) {
   fprintf(file, "$MeshFormat\n");
   fprintf(file, "2.2 0 8\n");
   fprintf(file, "$EndMeshFormat\n");
@@ -969,7 +969,7 @@ int feenox_mesh_gmsh_write_header(FILE *file) {
   return FEENOX_OK;
 }
 
-int feenox_mesh_gmsh_write_mesh(mesh_t *this, FILE *file, int no_physical_names) {
+int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names) {
   
   physical_group_t *physical_group;
 
@@ -1027,7 +1027,7 @@ int feenox_mesh_gmsh_write_mesh(mesh_t *this, FILE *file, int no_physical_names)
 }
 
 
-int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function, field_location_t field_location, char *printf_format) {
+int feenox_mesh_write_scalar_gmsh(mesh_write_t *mesh_write, function_t *function, field_location_t field_location, char *printf_format) {
 
   mesh_t *mesh = NULL;
   
@@ -1120,7 +1120,7 @@ int feenox_mesh_gmsh_write_scalar(mesh_write_t *mesh_write, function_t *function
 
 }
 
-int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **function, field_location_t field_location, char *printf_format) {
+int feenox_mesh_write_vector_gmsh(mesh_write_t *mesh_write, function_t **function, field_location_t field_location, char *printf_format) {
 
   mesh_t *mesh = NULL;
   if (mesh_write->mesh != NULL) {
@@ -1238,7 +1238,7 @@ int feenox_mesh_gmsh_write_vector(mesh_write_t *mesh_write, function_t **functio
 
 
 // read the next available time step and interpolate
-int feenox_mesh_gmsh_update_function(function_t *function, double t, double dt) {
+int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) {
  
   char buffer[BUFFER_LINE_SIZE];
   double time, alpha;
