@@ -22,6 +22,8 @@ struct mechanical_t {
   PetscBool space_E;
   PetscBool space_nu;
   PetscBool space_rho;
+  
+  MatNullSpace rigid_body_base;
 #endif
   
   double hourglass_epsilon;

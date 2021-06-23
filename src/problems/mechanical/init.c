@@ -26,6 +26,10 @@ int feenox_problem_init_parser_mechanical(void) {
 
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
   feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
+  feenox.pde.setup_ksp = feenox_problem_setup_ksp_mechanical;
+  feenox.pde.setup_pc = feenox_problem_setup_pc_mechanical;
+//  feenox.pde.setup_snes = feenox_problem_setup_snes_mechanical;
+  
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_mechanical;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
   feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
@@ -190,7 +194,7 @@ int feenox_problem_init_runtime_mechanical(void) {
 
 
 #ifdef HAVE_PETSC
-int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace) {
+int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace) {
   
   Vec vec_coords;
   if (feenox.pde.K != NULL) {
@@ -213,11 +217,48 @@ int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace) {
   petsc_call(VecRestoreArray(vec_coords, &coords));
     
   petsc_call(MatNullSpaceCreateRigidBody(vec_coords, nullspace));
-//    petsc_call(MatSetNearNullSpace(feenox.pde.K, feenox.pde.null_space));
-//    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, feenox.pde.null_space));
   petsc_call(VecDestroy(&vec_coords));
 
   return FEENOX_OK;
 }
+
+int feenox_problem_setup_pc_mechanical(PC pc) {
+
+  PCType pc_type = NULL;
+  petsc_call(PCGetType(pc, &pc_type));
+  if (pc_type == NULL) {
+    // TODO: should we use mumps by default if available?
+    petsc_call(PCSetType(pc, PCGAMG));
+  }
+  
+  petsc_call(PCGetType(pc, &pc_type));
+  if (strcmp(pc_type, PCGAMG) == 0) {
+
+    if (mechanical.rigid_body_base == NULL) {
+      feenox_problem_compute_rigid_nullspace(&mechanical.rigid_body_base);
+    }  
     
+    if (feenox.pde.has_stiffness) {
+      petsc_call(MatSetNearNullSpace(feenox.pde.K, mechanical.rigid_body_base));
+    }
+    if (feenox.pde.has_mass) {
+      petsc_call(MatSetNearNullSpace(feenox.pde.M, mechanical.rigid_body_base));
+    }  
+  }
+  
+  return FEENOX_OK;
+}
+
+int feenox_problem_setup_ksp_mechanical(KSP ksp) {
+
+  KSPType ksp_type = NULL;
+  petsc_call(KSPGetType(ksp, &ksp_type));
+  if (ksp_type == NULL) {
+    // if the user did not choose anything, we default to CG or GMRES
+    petsc_call(KSPSetType(ksp, (feenox.pde.symmetric_K == PETSC_TRUE && feenox.pde.symmetric_M == PETSC_TRUE) ? KSPCG : KSPGMRES));
+  }  
+
+  return FEENOX_OK;
+}
+
 #endif

@@ -270,6 +270,8 @@ typedef struct dae_t dae_t;
 typedef struct mesh_t mesh_t;
 typedef struct mesh_write_t mesh_write_t;
 typedef struct mesh_write_dist_t mesh_write_dist_t;
+typedef struct mesh_integrate_t mesh_integrate_t;
+typedef struct mesh_find_extrema_t mesh_find_extrema_t;
 
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
@@ -295,13 +297,6 @@ typedef struct gauss_t gauss_t;
 typedef struct elementary_entity_t elementary_entity_t;
 typedef struct node_data_t node_data_t;
 
-/*
-typedef struct mesh_write_t mesh_write_t;
-typedef struct mesh_write_dist_t mesh_write_dist_t;
-typedef struct mesh_fill_vector_t mesh_fill_vector_t;
-typedef struct mesh_find_minmax_t mesh_find_minmax_t;
-typedef struct mesh_integrate_t mesh_integrate_t;
-*/
 
 // individual item (factor) of an algebraic expression
 struct expr_item_t {
@@ -1287,6 +1282,42 @@ struct mesh_write_t {
   mesh_write_t *next;
 };
 
+struct mesh_integrate_t {
+  mesh_t *mesh;
+  function_t *function;
+  expr_t expr;
+  physical_group_t *physical_group;
+  field_location_t field_location;
+  unsigned int gauss_points;
+
+  var_t *result;
+
+  mesh_integrate_t *next;
+};
+
+struct mesh_find_extrema_t {
+  mesh_t *mesh;
+  physical_group_t *physical_group;
+  function_t *function;
+  expr_t expr;
+  field_location_t field_location;
+  
+  var_t *min;
+  var_t *i_min;
+  var_t *x_min;
+  var_t *y_min;
+  var_t *z_min;
+
+  var_t *max;
+  var_t *i_max;
+  var_t *x_max;
+  var_t *y_max;
+  var_t *z_max;
+      
+  mesh_find_extrema_t *next;
+};
+
+
 // global FeenoX singleton structure
 struct feenox_t {
   int argc;
@@ -1403,9 +1434,17 @@ struct feenox_t {
 
     mesh_t *meshes;
     mesh_t *mesh_main;
+    
+    material_t *materials;
+    property_t *properties;
+    bc_t *bcs;
+    
     mesh_write_t *mesh_writes;
+    mesh_integrate_t *integrates;
+    mesh_find_extrema_t *find_extremas;
 
     field_location_t default_field_location;
+    element_type_t *element_types;
 
     // estas tres variables estan reallocadas para apuntar a vec_x
     struct {
@@ -1433,16 +1472,6 @@ struct feenox_t {
       var_t *mesh_failed_interpolation_factor;
     } vars;
 
-    element_type_t *element_types;
-
-    material_t *materials;
-    property_t *properties;
-    bc_t *bcs;
-
-/*    
-    find_extremum_t *find_minmaxs;
-    integrate_t *integrates;
-*/
   } mesh;  
   
   struct {
@@ -1957,7 +1986,7 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, d
 
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *this);
-extern int feenox_mesh_compute_w_at_gauss(element_t *this, int v, int integration);
+extern int feenox_mesh_compute_w_at_gauss(element_t *this, unsigned int v, int integration);
 extern int feenox_mesh_compute_H_at_gauss(element_t *this, unsigned int v, unsigned int dofs, int integration);
 extern int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned int dofs, int integration);
 extern int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
@@ -1966,6 +1995,12 @@ extern int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, in
 extern int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integration);
 extern int feenox_mesh_compute_x_at_gauss(element_t *this, unsigned int v, int integration);
 extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
+
+#define feenox_mesh_update_coord_vars(val) {\
+  feenox_var_value(feenox.mesh.vars.x) = val[0];\
+  feenox_var_value(feenox.mesh.vars.y) = val[1];\
+  feenox_var_value(feenox.mesh.vars.z) = val[2];\
+}
 
 // gmsh.c
 extern int feenox_mesh_read_gmsh(mesh_t *this);
@@ -1978,6 +2013,11 @@ extern int feenox_mesh_write_vector_gmsh(mesh_write_t *mesh_post, function_t **f
 // write.c
 extern int feenox_instruction_mesh_write(void *arg);
 
+// integrate.c
+extern int feenox_instruction_mesh_integrate(void *arg);
+
+// extrema.c
+extern int feenox_instruction_mesh_find_extrema(void *arg);
 
 // physical_group.c
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);

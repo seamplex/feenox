@@ -72,7 +72,7 @@ typedef struct {
 ///fu+derivative+desc whether a backward ($p < 0$), centered ($p = 0$) or forward ($p > 0$)
 ///fu+derivative+desc stencil is to be used.
 ///fu+derivative+desc This functional calls the GSL functions
-///fu+derivative+desc`gsl_deriv_backward`, `gsl_deriv_central` or `gsl_deriv_forward`
+///fu+derivative+desc `gsl_deriv_backward`, `gsl_deriv_central` or `gsl_deriv_forward`
 ///fu+derivative+desc according to the indicated flag $p$.
 ///fu+derivative+desc Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 ///fu+derivative+math \left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} 

@@ -620,7 +620,9 @@ int feenox_mesh_free(mesh_t *mesh) {
 
 
 mesh_t *feenox_get_mesh_ptr(const char *name) {
-  mesh_t *mesh;
-  HASH_FIND_STR(feenox.mesh.meshes, name, mesh);
+  mesh_t *mesh = NULL;
+  if (name != NULL) {
+    HASH_FIND_STR(feenox.mesh.meshes, name, mesh);
+  }  
   return mesh;
 }

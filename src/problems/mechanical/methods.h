@@ -5,10 +5,12 @@
 extern int feenox_problem_parse_mechanical(const char *);
 extern int feenox_problem_init_parser_mechanical(void);
 extern int feenox_problem_init_runtime_mechanical(void);
-extern int feenox_problem_setup_pc_mechanical(void);
-extern int feenox_problem_setup_ksp_mechanical(void);
-extern int feenox_problem_setup_snes_mechanical(void);
-extern int feenox_problem_mechanical_compute_rigid_nullspace(MatNullSpace *nullspace);
+#ifdef HAVE_PETSC
+extern int feenox_problem_setup_pc_mechanical(PC pc);
+extern int feenox_problem_setup_ksp_mechanical(KSP ksp);
+extern int feenox_problem_setup_snes_mechanical(SNES snes);
+extern int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace);
+#endif
         
 // mechanical/bc.c
 extern int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, const char *rhs);

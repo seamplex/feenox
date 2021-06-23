@@ -22,8 +22,6 @@
 #include "../feenox.h"
 extern feenox_t feenox;
 
-
-
 // inverts a small-size square matrix
 /*
 The inverse of a 2x2 matrix:
@@ -324,7 +322,7 @@ void mesh_compute_x(element_t *this, double *r, double *x) {
   return;
 }
 
-int feenox_mesh_compute_w_at_gauss(element_t *this, int v, int integration) {
+int feenox_mesh_compute_w_at_gauss(element_t *this, unsigned int v, int integration) {
   
   if (this->w == NULL) {
     feenox_check_alloc(this->w = calloc(this->type->gauss[integration].V, sizeof(double)));
@@ -601,10 +599,10 @@ int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh) {
 #endif
 
 /*
-inline int mesh_update_coord_vars(double *x) {
-  feenox_var(feenox_mesh.vars.x) = x[0];
-  feenox_var(feenox_mesh.vars.y) = x[1];
-  feenox_var(feenox_mesh.vars.z) = x[2];    
+inline int feenox_mesh_update_coord_vars(double *x) {
+  feenox_var_value(feenox.mesh.vars.x) = x[0];
+  feenox_var_value(feenox.mesh.vars.y) = x[1];
+  feenox_var_value(feenox.mesh.vars.z) = x[2];    
   return FEENOX_OK;
 }
 */

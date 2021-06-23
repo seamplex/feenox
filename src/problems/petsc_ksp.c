@@ -44,6 +44,15 @@ int feenox_solve_petsc_linear(void) {
   feenox_call(feenox_dirichlet_eval());
   feenox_call(feenox_dirichlet_set_K());  
 //  time_checkpoint(build_end);
+  
+  // check if the stiffness matrix K has a near nullspace 
+  // and pass it on to K_bc
+  MatNullSpace near_null_space = NULL;
+  petsc_call(MatGetNearNullSpace(feenox.pde.K, &near_null_space));
+  if (near_null_space != NULL) {
+    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, near_null_space));
+  }
+  
   petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K_bc, feenox.pde.K_bc));
   
   // try to use the solution as the initial guess (it already has Dirichlet BCs

@@ -1,6 +1,11 @@
 ## Verification {#sec:verification}
 
-Verification, a.k.a. checking if the tool is solving right the equations, should be performed before applying the code to solve any industrial problem. Depending on the nature and regulation of the industry, the verification guidelines and requirements may vary. Since it is expected that code verification tasks could be performed by arbitrary individuals or organizations, the tool’s source code should be available to independent third parties. In this regard, changes in the source code should be controllable, traceable and well documented.
+Verification, defined as
+
+>  The process of determining that a model implementation accurately represents the developer’s conceptual description of the model and the solution to the model.
+
+\noindent
+a.k.a. checking if the tool is solving right the equations, should be performed before applying the code to solve any industrial problem. Depending on the nature and regulation of the industry, the verification guidelines and requirements may vary. Since it is expected that code verification tasks could be performed by arbitrary individuals or organizations, the tool’s source code should be available to independent third parties. In this regard, changes in the source code should be controllable, traceable and well documented.
 Stable releases ought to be digitally signed by a responsible engineer.
 
 Even though the verification requirements may vary among problem types, industries and particular applications, a common method to verify the code is to compare solutions obtained with the tool with known exact solutions or benchmarks. It is thus mandatory to be able to compare the results with analytical solutions, either internally in the tool or through external libraries or tools.  Another possibility is to follow the Method of Manufactured Solutions, which is highly encouraged to be supported by the tool.

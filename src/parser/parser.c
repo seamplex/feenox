@@ -321,6 +321,19 @@ int feenox_parse_line(void) {
       return FEENOX_ERROR;
 #endif      
 
+///kw+INTEGRATE+desc Spatially integrate a function or expression over a mesh (or a subset of it).
+///kw+INTEGRATE+usage INTEGRATE
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "INTEGRATE") == 0) {
+      feenox_call(feenox_parse_integrate());
+      return FEENOX_OK;
+
+///kw+FIND_EXTREMA+desc Find and/or compute the absolute extrema of a function or expression over a mesh (or a subset of it).
+///kw+FIND_EXTREMA+usage FIND_EXTREMA
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "FIND_EXTREMA") == 0) {
+      feenox_call(feenox_parse_find_extrema());
+      return FEENOX_OK;
       
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -2915,23 +2928,23 @@ int feenox_parse_read_mesh(void) {
   mesh_t *mesh = NULL;
   feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
 
-///kw+MESH_READ+usage { <file_path> | <file_id> }
-///kw+MESH_READ+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-///kw+MESH_READ+detail The format is read from the extension, which should be either
-///kw+MESH_READ+detail @
-///kw+MESH_READ+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\/\/gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
-///kw+MESH_READ+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
-///kw+MESH_READ+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
-///kw+MESH_READ+detail @
-///kw+MESH_READ+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
-///kw+MESH_READ+detail physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
-///kw+MESH_READ+detail The other formats are primarily supported to read function data contained in the file
-///kw+MESH_READ+detail and eventually, to operate over these functions (i.e. take differences with other functions contained
-///kw+MESH_READ+detail in other files to compare results).
-///kw+MESH_READ+detail The file path or file id can be used to refer to a particular mesh when reading more than one,
-///kw+MESH_READ+detail for instance in a `MESH_WRITE` or `MESH_INTEGRATE` keyword.
-///kw+MESH_READ+detail If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
-///kw+MESH_READ+detail `cool_mesh.msh` or just `cool_mesh`.  
+///kw+READ_MESH+usage { <file_path> | <file_id> }
+///kw+READ_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+///kw+READ_MESH+detail The format is read from the extension, which should be either
+///kw+READ_MESH+detail @
+///kw+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\/\/gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
+///kw+READ_MESH+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
+///kw+READ_MESH+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
+///kw+READ_MESH+detail @
+///kw+READ_MESH+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
+///kw+READ_MESH+detail physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
+///kw+READ_MESH+detail The other formats are primarily supported to read function data contained in the file
+///kw+READ_MESH+detail and eventually, to operate over these functions (i.e. take differences with other functions contained
+///kw+READ_MESH+detail in other files to compare results).
+///kw+READ_MESH+detail The file path or file id can be used to refer to a particular mesh when reading more than one,
+///kw+READ_MESH+detail for instance in a `WRITE_MESH` or `INTEGRATE` keyword.
+///kw+READ_MESH+detail If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
+///kw+READ_MESH+detail `cool_mesh.msh` or just `cool_mesh`.  
   feenox_call(feenox_parser_file(&mesh->file));
   if (mesh->file->mode == NULL) {
     feenox_check_alloc(mesh->file->mode = strdup("r"));
@@ -2939,14 +2952,14 @@ int feenox_parse_read_mesh(void) {
     
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+MESH_READ+detail The spatial dimensions cab be given with `DIMENSION`.
-///kw+MESH_READ+detail If material properties are uniform and given with variables,
-///kw+MESH_READ+detail the number of dimensions are not needed and will be read from the file at runtime.
-///kw+MESH_READ+detail But if either properties are given by spatial functions or if functions
-///kw+MESH_READ+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
-///kw+MESH_READ+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
-///kw+MESH_READ+detail how many arguments these functions take. 
-///kw+MESH_READ+usage [ DIMENSIONS <num_expr> ]@
+///kw+READ_MESH+detail The spatial dimensions cab be given with `DIMENSION`.
+///kw+READ_MESH+detail If material properties are uniform and given with variables,
+///kw+READ_MESH+detail the number of dimensions are not needed and will be read from the file at runtime.
+///kw+READ_MESH+detail But if either properties are given by spatial functions or if functions
+///kw+READ_MESH+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
+///kw+READ_MESH+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
+///kw+READ_MESH+detail how many arguments these functions take. 
+///kw+READ_MESH+usage [ DIMENSIONS <num_expr> ]@
     if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -2956,42 +2969,42 @@ int feenox_parse_read_mesh(void) {
         return FEENOX_ERROR;
       }
 
-///kw+MESH_READ+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
-///kw+MESH_READ+usage [ SCALE <expr> ]
+///kw+READ_MESH+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
+///kw+READ_MESH+usage [ SCALE <expr> ]
     } else if (strcasecmp(token, "SCALE") == 0) {
       feenox_call(feenox_parser_expression(&mesh->scale_factor));
 
-///kw+MESH_READ+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
+///kw+READ_MESH+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
     } else if (strcasecmp(token, "OFFSET") == 0) {
       feenox_call(feenox_parser_expression(&mesh->offset_x));
       feenox_call(feenox_parser_expression(&mesh->offset_y));
       feenox_call(feenox_parser_expression(&mesh->offset_z));
 
-///kw+MESH_READ+usage [ INTEGRATION { full | reduced } ]@
+///kw+READ_MESH+usage [ INTEGRATION { full | reduced } ]@
     } else if (strcasecmp(token, "INTEGRATION") == 0) {
       char *keywords[] = {"full", "reduced", ""};
       int values[] = {integration_full, integration_reduced, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
 
-///kw+MESH_READ+detail When defining several meshes and solving a PDE problem, the mesh used
-///kw+MESH_READ+detail as the PDE domain is the one marked with `MAIN`.
-///kw+MESH_READ+detail If none of the meshes is explicitly marked as main, the first one is used.
-///kw+MESH_READ+usage [ MAIN ]
+///kw+READ_MESH+detail When defining several meshes and solving a PDE problem, the mesh used
+///kw+READ_MESH+detail as the PDE domain is the one marked with `MAIN`.
+///kw+READ_MESH+detail If none of the meshes is explicitly marked as main, the first one is used.
+///kw+READ_MESH+usage [ MAIN ]
     } else if (strcasecmp(token, "MAIN") == 0) {
       feenox.mesh.mesh_main = mesh;
 
-///kw+MESH_READ+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
-///kw+MESH_READ+detail each time step. Default is to read the mesh once, except if the file path changes with time.
-///kw+MESH_READ+usage [ UPDATE_EACH_STEP ]@
+///kw+READ_MESH+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
+///kw+READ_MESH+detail each time step. Default is to read the mesh once, except if the file path changes with time.
+///kw+READ_MESH+usage [ UPDATE_EACH_STEP ]@
     } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
       mesh->update_each_step = 1;
 
 
-///kw+MESH_READ+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
-///kw+MESH_READ+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
-///kw+MESH_READ+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
-///kw+MESH_READ+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
-///kw+MESH_READ+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
+///kw+READ_MESH+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+///kw+READ_MESH+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
+///kw+READ_MESH+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
+///kw+READ_MESH+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
+///kw+READ_MESH+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
     } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0) {
 
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
@@ -3032,7 +3045,7 @@ int feenox_parse_read_mesh(void) {
     }
   }
 
-///kw+MESH_READ+detail If no mesh is marked as `MAIN`, the first one is the main one.
+///kw+READ_MESH+detail If no mesh is marked as `MAIN`, the first one is the main one.
   if (feenox.mesh.meshes == NULL) {
     feenox.mesh.mesh_main = mesh;
   }
@@ -3596,6 +3609,7 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name;
 
+      // TODO: function parse_mesh() or something of the like
       feenox_call(feenox_parser_string(&mesh_name));
       if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
         feenox_push_error_message("unknown mesh '%s'", mesh_name);
@@ -3744,6 +3758,264 @@ int feenox_parse_solve_problem(void) {
   
   feenox_check_null(feenox.pde.instruction = feenox_add_instruction_and_get_ptr(&feenox_instruction_solve_problem, NULL));
   
+  return FEENOX_OK;
+}
+
+int feenox_parse_integrate(void) {
+  
+  mesh_integrate_t *mesh_integrate = NULL;
+  feenox_check_alloc(mesh_integrate = calloc(1, sizeof(mesh_integrate_t)));
+  
+///kw+INTEGRATE+usage { <expression> | <function> }
+///kw+INTEGRATE+detail Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
+///kw+INTEGRATE+detail If the integrand is a function, do not include the arguments, i.e. instead of `f(x,y,z)` just write `f`.
+///kw+INTEGRATE+detail The results should be the same but efficiency will be different (faster for pure functions).
+  char *token = feenox_get_next_token(NULL);
+  if ((mesh_integrate->function = feenox_get_function_ptr(token)) == NULL) {
+    feenox_call(feenox_expression_parse(&mesh_integrate->expr, token));
+  }
+  
+  char *name_mesh = NULL;
+  char *name_physical_group = NULL;
+  char *name_result = NULL;
+  
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+INTEGRATE+usage [ OVER <physical_group> ]
+///kw+INTEGRATE+detail By default the integration is performed over the highest-dimensional elements of the mesh,
+///kw+INTEGRATE+detail i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
+///kw+INTEGRATE+detail If the integration is to be carried out over just a physical group, it has to be given in `OVER`.
+
+    if (strcasecmp(token, "OVER") == 0) {
+      feenox_call(feenox_parser_string(&name_physical_group));
+          
+///kw+INTEGRATE+usage [ MESH <mesh_identifier> ]
+///kw+INTEGRATE+detail If there are more than one mesh defined, an explicit one has to be given with `MESH`.
+    } else if (strcasecmp(token, "MESH") == 0) {
+      feenox_call(feenox_parser_string(&name_mesh));
+      
+///kw+INTEGRATE+detail Either `NODES` or `CELLS` define how the integration is to be performed.
+///kw+INTEGRATE+usage [ NODES
+///kw+INTEGRATE+detail With `NODES` the integration is performed using the Gauss points
+///kw+INTEGRATE+detail and weights associated to each element type.
+    } else if (strcasecmp(token, "NODES") == 0) {
+      mesh_integrate->field_location = field_location_nodes;
+            
+///kw+INTEGRATE+usage | CELLS ]@
+///kw+INTEGRATE+detail With `CELLS` the integral is computed as the sum of the product of the
+///kw+INTEGRATE+detail integrand at the center of each cell (element) and the cell’s volume.
+///kw+INTEGRATE+detail Do expect differences in the results and efficiency between these two approaches
+///kw+INTEGRATE+detail depending on the nature of the integrand.
+    } else if (strcasecmp(token, "CELLS") == 0) {
+      mesh_integrate->field_location = field_location_cells;
+      feenox.mesh.need_cells = 1;
+          
+///kw+INTEGRATE+usage RESULT <variable>@
+///kw+INTEGRATE+detail The scalar result of the integration is stored in the variable given by
+///kw+INTEGRATE+detail the mandatory keyword `RESULT`.
+///kw+INTEGRATE+detail If the variable does not exist, it is created.
+    } else if (strcasecmp(token, "RESULT") == 0) {
+      feenox_call(feenox_parser_string(&name_result));
+            
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+
+  if (name_mesh != NULL) {
+    if ((mesh_integrate->mesh = feenox_get_mesh_ptr(name_mesh)) == NULL) {
+      feenox_push_error_message("undefined mesh '%s'" , name_mesh);
+      return FEENOX_ERROR;
+    }
+    feenox_free(name_mesh);
+  } else if ((mesh_integrate->mesh = feenox.mesh.mesh_main) == NULL) {
+    feenox_push_error_message("no mesh defined for INTEGRATE");
+    return FEENOX_ERROR;
+  }
+    
+  if (name_physical_group != NULL) {
+    if ((mesh_integrate->physical_group = feenox_get_physical_group_ptr(name_physical_group, mesh_integrate->mesh)) == NULL) {
+      if ((mesh_integrate->physical_group = feenox_define_physical_group_get_ptr(name_physical_group, mesh_integrate->mesh, 0, 0)) == NULL) {
+        return FEENOX_ERROR;
+      }
+    }
+    feenox_free(name_physical_group);
+  }
+  
+  if (name_result != NULL) {
+    mesh_integrate->result = feenox_get_or_define_variable_get_ptr(name_result);
+  } else {
+    feenox_push_error_message("RESULT is mandatory for INTEGRATE");
+    return FEENOX_ERROR;
+  }
+
+  LL_APPEND(feenox.mesh.integrates, mesh_integrate);
+  feenox_call(feenox_add_instruction(feenox_instruction_mesh_integrate, mesh_integrate));
+  return FEENOX_OK;
+}
+
+
+int feenox_parse_find_extrema(void) {
+  
+  mesh_find_extrema_t *mesh_find_extrema = NULL;
+  feenox_check_alloc(mesh_find_extrema = calloc(1, sizeof(mesh_find_extrema_t)));
+  
+///kw+FIND_EXTREMA+usage { <expression> | <function> }
+///kw+FIND_EXTREMA+detail Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
+  char *token = feenox_get_next_token(NULL);
+  if ((mesh_find_extrema->function = feenox_get_function_ptr(token)) == NULL) {
+    feenox_call(feenox_expression_parse(&mesh_find_extrema->expr, token));
+  }
+  
+  char *name_mesh = NULL;
+  char *name_physical_group = NULL;
+  char *name_min = NULL;
+  char *name_max = NULL;
+  char *name_x_min = NULL;
+  char *name_x_max = NULL;
+  char *name_y_min = NULL;
+  char *name_y_max = NULL;
+  char *name_z_min = NULL;
+  char *name_z_max = NULL;
+  char *name_i_min = NULL;
+  char *name_i_max = NULL;
+  
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+FIND_EXTREMA+usage [ OVER <physical_group> ]
+///kw+FIND_EXTREMA+detail By default the search is performed over the highest-dimensional elements of the mesh,
+///kw+FIND_EXTREMA+detail i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
+///kw+FIND_EXTREMA+detail If the search is to be carried out over just a physical group, it has to be given in `OVER`.
+
+    if (strcasecmp(token, "OVER") == 0) {
+      feenox_call(feenox_parser_string(&name_physical_group));
+          
+///kw+FIND_EXTREMA+usage [ MESH <mesh_identifier> ]
+///kw+FIND_EXTREMA+detail If there are more than one mesh defined, an explicit one has to be given with `MESH`.
+    } else if (strcasecmp(token, "MESH") == 0) {
+      feenox_call(feenox_parser_string(&name_mesh));
+      
+///kw+FIND_EXTREMA+detail Either `NODES` or `CELLS` define how the integration is to be performed.
+///kw+FIND_EXTREMA+usage [ NODES
+///kw+FIND_EXTREMA+detail With `NODES` the integration is performed using the Gauss points
+///kw+FIND_EXTREMA+detail and weights associated to each element type.
+    } else if (strcasecmp(token, "NODES") == 0) {
+      mesh_find_extrema->field_location = field_location_nodes;
+            
+///kw+FIND_EXTREMA+usage | CELLS ]@
+///kw+FIND_EXTREMA+detail With `CELLS` the integral is computed as the sum of the product of the
+///kw+FIND_EXTREMA+detail integrand at the center of each cell (element) and the cell’s volume.
+///kw+FIND_EXTREMA+detail Do expect differences in the results and efficiency between these two approaches
+///kw+FIND_EXTREMA+detail depending on the nature of the integrand.
+    } else if (strcasecmp(token, "CELLS") == 0) {
+      mesh_find_extrema->field_location = field_location_cells;
+      feenox.mesh.need_cells = 1;
+          
+///kw+FIND_EXTREMA+usage [ MIN <variable> ]
+///kw+FIND_EXTREMA+detail The value of the absolute minimum (maximum) is stored in the variable indicated by `MIN` (`MAX`).
+///kw+FIND_EXTREMA+detail If the variable does not exist, it is created.
+    } else if (strcasecmp(token, "MIN") == 0) {
+      feenox_call(feenox_parser_string(&name_min));
+
+///kw+FIND_EXTREMA+usage [ MAX <variable> ]
+    } else if (strcasecmp(token, "MAX") == 0) {
+      feenox_call(feenox_parser_string(&name_max));
+
+///kw+FIND_EXTREMA+usage [ X_MIN <variable> ]
+///kw+FIND_EXTREMA+detail The value of the $x$-$y$-$z$\ coordinate of the absolute minimum (maximum)
+///kw+FIND_EXTREMA+detail is stored in the variable indicated by `X_MIN`-`Y_MIN`-`Z_MIN` (`X_MAX`-`Y_MAX`-`Z_MAX`).
+///kw+FIND_EXTREMA+detail If the variable does not exist, it is created.
+    } else if (strcasecmp(token, "X_MIN") == 0) {
+      feenox_call(feenox_parser_string(&name_x_min));
+
+///kw+FIND_EXTREMA+usage [ X_MAX <variable> ]
+    } else if (strcasecmp(token, "X_MAX") == 0) {
+      feenox_call(feenox_parser_string(&name_x_max));
+
+///kw+FIND_EXTREMA+usage [ Y_MIN <variable> ]
+    } else if (strcasecmp(token, "Y_MIN") == 0) {
+      feenox_call(feenox_parser_string(&name_y_min));
+
+///kw+FIND_EXTREMA+usage [ Y_MAX <variable> ]
+    } else if (strcasecmp(token, "Y_MAX") == 0) {
+      feenox_call(feenox_parser_string(&name_y_max));
+      
+///kw+FIND_EXTREMA+usage [ Z_MIN <variable> ]
+    } else if (strcasecmp(token, "Z_MIN") == 0) {
+      feenox_call(feenox_parser_string(&name_z_min));
+
+///kw+FIND_EXTREMA+usage [ Z_MAX <variable> ]
+    } else if (strcasecmp(token, "Z_MAX") == 0) {
+      feenox_call(feenox_parser_string(&name_z_max));
+
+///kw+FIND_EXTREMA+usage [ I_MIN <variable> ]
+///kw+FIND_EXTREMA+detail The index (either node or cell) where the absolute minimum (maximum) is found
+///kw+FIND_EXTREMA+detail is stored in the variable indicated by `I_MIN` (`I_MAX`).
+    } else if (strcasecmp(token, "I_MIN") == 0) {
+      feenox_call(feenox_parser_string(&name_i_min));
+///kw+FIND_EXTREMA+usage [ I_MAX <variable> ]
+    } else if (strcasecmp(token, "I_MAX") == 0) {
+      feenox_call(feenox_parser_string(&name_i_max));
+      
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+
+  if (name_mesh != NULL) {
+    if ((mesh_find_extrema->mesh = feenox_get_mesh_ptr(name_mesh)) == NULL) {
+      feenox_push_error_message("undefined mesh '%s'" , name_mesh);
+      return FEENOX_ERROR;
+    }
+    feenox_free(name_mesh);
+  } else if ((mesh_find_extrema->mesh = feenox.mesh.mesh_main) == NULL) {
+    feenox_push_error_message("no mesh defined for FIND_EXTREMA");
+    return FEENOX_ERROR;
+  }
+    
+  if (name_physical_group != NULL) {
+    if ((mesh_find_extrema->physical_group = feenox_get_physical_group_ptr(name_physical_group, mesh_find_extrema->mesh)) == NULL) {
+      if ((mesh_find_extrema->physical_group = feenox_define_physical_group_get_ptr(name_physical_group, mesh_find_extrema->mesh, 0, 0)) == NULL) {
+        return FEENOX_ERROR;
+      }
+    }
+    feenox_free(name_physical_group);
+  }
+  
+  if (name_min != NULL) {
+    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_min);
+  }
+  if (name_max != NULL) {
+    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_max);
+  }
+  if (name_x_min != NULL) {
+    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_x_min);
+  }
+  if (name_x_max != NULL) {
+    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_x_max);
+  }
+  if (name_y_min != NULL) {
+    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_y_min);
+  }
+  if (name_y_max != NULL) {
+    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_y_max);
+  }
+  if (name_z_min != NULL) {
+    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_z_min);
+  }
+  if (name_z_max != NULL) {
+    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_z_max);
+  }
+  if (name_i_min != NULL) {
+    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_i_min);
+  }
+  if (name_i_max != NULL) {
+    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_i_max);
+  }
+  
+
+  LL_APPEND(feenox.mesh.find_extremas, mesh_find_extrema);
+  feenox_call(feenox_add_instruction(feenox_instruction_mesh_find_extrema, mesh_find_extrema));
   return FEENOX_OK;
 }
 

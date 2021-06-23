@@ -322,7 +322,7 @@ Here are the steps to get FeenoX' source repository, compile it and run the test
 As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
 
 ```{.terminal style=terminal}
-FeenoX v0.0.209-gf8c3f0a-dirty 
+FeenoX v0.0.214-ge9c56bd-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]
@@ -585,6 +585,8 @@ vtk (vtu), gmsh, frd?
 >  * etc.
 > 
 > \noindent but since the tool falls in the category of engineering computational software, verification and validation procedures are also mandatory, as discussed below. Design should be such that governance of engineering data including problem definition, results and documentation can be efficiently performed using state-of-the-art methodologies.
+> 
+> **valgrind**
 
 
 
@@ -609,6 +611,10 @@ similar <-> similar
 
 > 
 > A mean to automatically test the code works as expected is mandatory. A set of problems with known solutions should be solved with the tool after each modification of the code to make sure these changes still give the right answers for the right questions and no regressions are introduced. Unit software testing practices like continuous integration and test coverage are recommended.
+> 
+> **static = compiler flags**
+> 
+> **dynamic = valgrind**
 
 
 make check
@@ -620,6 +626,9 @@ regressions, example of the change of a sign
 > 
 > A system to allow developers and users to report errors, bugs and improvements should be provided. If applicable, these reports should be tracked,  addressed and documented.
 > 
+> **mistake != errors**
+> 
+> mistake = bug = blunders
 
 
 github
@@ -629,9 +638,16 @@ mailing listings
 ## Verification {#sec:verification}
 
 > 
-> The source code should be available for verification by independent third parties.
-> Changes in the source code should be controllable, traceable and well documented.
+> Verification, defined as
+> 
+> >  The process of determining that a model implementation accurately represents the developer’s conceptual description of the model and the solution to the model.
+> 
+> \noindent
+> a.k.a. checking if the tool is solving right the equations, should be performed before applying the code to solve any industrial problem. Depending on the nature and regulation of the industry, the verification guidelines and requirements may vary. Since it is expected that code verification tasks could be performed by arbitrary individuals or organizations, the tool’s source code should be available to independent third parties. In this regard, changes in the source code should be controllable, traceable and well documented.
 > Stable releases ought to be digitally signed by a responsible engineer.
+> 
+> Even though the verification requirements may vary among problem types, industries and particular applications, a common method to verify the code is to compare solutions obtained with the tool with known exact solutions or benchmarks. It is thus mandatory to be able to compare the results with analytical solutions, either internally in the tool or through external libraries or tools.  Another possibility is to follow the Method of Manufactured Solutions, which is highly encouraged to be supported by the tool.
+> 
 > 
 > Whenever a verification task is performed and documented, at least one test should be added to the test suite. These tests should check that the verified features are kept by future changes and no regressions that break the verification are introduced. Verifications that the tool fails when it is expected to fail are encouraged as much as positive verifications that results are the expected ones.
 > 
@@ -646,7 +662,12 @@ Git + gitlab, github, bitbucket
 ## Validation
 
 > 
-> For each industrial application of the tool there should be a documented procedure to perform a set of validation tests. This procedure should be based on existing industry standards regarding verification and validation such as ASME or IAEA. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
+> As with verification, for each industrial application of the tool there should be a documented procedure to perform a set of validation tests, defined as
+> 
+> > The process of determining the degree to which a model is an accurate representation of the real world from the perspective of the intended uses of the model.
+> 
+> \noindent
+> a.k.a. checking that the right equations are being solved by the tool. This procedure should be based on existing industry standards regarding verification and validation such as ASME, AIAA, IAEA, etc. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
 > 
 >  * geometry,
 >  * mesh type,

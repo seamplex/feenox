@@ -108,5 +108,7 @@ extern int feenox_parse_material(void);
 extern int feenox_parse_bc(void);
 extern int feenox_parse_problem(void);
 extern int feenox_parse_solve_problem(void);
+extern int feenox_parse_integrate(void);
+extern int feenox_parse_find_extrema(void);
 
 #endif  

@@ -52,6 +52,8 @@ feenox_SOURCES = \
 ./mesh/cell.c \
 ./mesh/fem.c \
 ./mesh/write.c \
+./mesh/integrate.c \
+./mesh/extrema.c \
 ./mesh/line2.c \
 ./mesh/line3.c \
 ./mesh/triang3.c \

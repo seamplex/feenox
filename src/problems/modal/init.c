@@ -23,6 +23,7 @@ int feenox_problem_parse_modal(const char *token) {
 
 int feenox_problem_init_parser_modal(void) {
 
+#ifdef HAVE_SLEPC  
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_modal;
   feenox.pde.setup_eps = feenox_problem_setup_eps_modal;
@@ -158,6 +159,8 @@ int feenox_problem_init_parser_modal(void) {
     feenox_free(modename);
   }
 
+#endif
+  
   return FEENOX_OK;
 }
 
@@ -217,13 +220,11 @@ int feenox_problem_setup_pc_modal(PC pc) {
   if (strcmp(pc_type, PCGAMG) == 0) {
 
     if (modal.rigid_body_base == NULL) {
-      feenox_problem_mechanical_compute_rigid_nullspace(&modal.rigid_body_base);
+      feenox_problem_compute_rigid_nullspace(&modal.rigid_body_base);
     }  
     
     petsc_call(MatSetNearNullSpace(feenox.pde.K, modal.rigid_body_base));
-    petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, modal.rigid_body_base));
     petsc_call(MatSetNearNullSpace(feenox.pde.M, modal.rigid_body_base));
-    petsc_call(MatSetNearNullSpace(feenox.pde.M_bc, modal.rigid_body_base));
   }
   
   return FEENOX_OK;
@@ -291,7 +292,7 @@ int feenox_problem_setup_eps_modal(EPS eps) {
   // to be able to solve free-body vibrations we have to set a deflation space
   if (modal.has_dirichlet_bcs == 0) {
     if (modal.rigid_body_base == NULL) {
-      feenox_problem_mechanical_compute_rigid_nullspace(&modal.rigid_body_base);
+      feenox_problem_compute_rigid_nullspace(&modal.rigid_body_base);
     }  
   
     // getvecs below needs a const vec pointer

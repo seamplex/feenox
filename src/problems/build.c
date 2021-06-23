@@ -69,6 +69,18 @@ int feenox_build(void) {
 
   feenox_call(feenox_build_assembly());
 
+  // TODO: put 100 as a define or as a variable
+  if (feenox.pde.progress_ascii == PETSC_TRUE) {  
+    if (feenox.n_procs == 1) {
+      while (ascii_progress_chars++ < 100) {
+        printf(CHAR_PROGRESS_BUILD);
+      }
+    }
+    if (feenox.rank == 0) {
+      printf("\n");  
+      fflush(stdout);
+    }  
+  }  
 #endif
   
   return FEENOX_OK;

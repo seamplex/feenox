@@ -72,12 +72,6 @@ int feenox_problem_init_runtime_thermal(void) {
   // here we just initialize everything, during build we know which
   // of them are mandatory and which are optional
   
-#define feenox_define_distribution(type, name, description) { feenox_call(feenox_distribution_init(&(type.name), "name")); \
-  if (type.name.defined == 0) { feenox_push_error_message("undefined %s 'E'", description);  return FEENOX_ERROR; } \
-  if (type.name.full == 0) { feenox_push_error_message("%s 'E' is not defined over all volumes", description); return FEENOX_ERROR; } \
-  type.name.space_dependent = feenox_expression_depends_on_space(type.name.dependency_variables); }
-  
-
   feenox_define_distribution_mandatory(thermal, k, "k", "thermal conductivity");
   thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
   thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  

@@ -44,7 +44,7 @@ int feenox_dirichlet_eval(void) {
               // if there is a condition we evaluate it now
               if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
 
-                if (k >= (current_size-16)) {            
+                if (k >= (current_size-4)) {            
                   current_size += n_bcs;
                   feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, current_size * sizeof(PetscInt)));
                   feenox_check_alloc(feenox.pde.dirichlet_values  = realloc(feenox.pde.dirichlet_values,  current_size * sizeof(PetscScalar)));
