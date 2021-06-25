@@ -148,7 +148,7 @@ int feenox_instruction_mesh_read(void *arg) {
   if (this->dim == 0) {
     this->dim = dim;
   } else if (this->dim != dim) {
-    feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", this->file->path, this->dim, dim);
+    feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", this->file->name, this->dim, dim);
     return FEENOX_ERROR;
   }
     

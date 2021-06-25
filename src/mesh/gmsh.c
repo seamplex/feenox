@@ -738,26 +738,28 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             return FEENOX_ERROR;
           }
           
-          // the whole block has the same physical group, find it once and that's it
-          HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
-          if (geometrical_entity == NULL) {
-            feenox_push_error_message("geometrical entity '%d' of dimension '%d' does not exist", geometrical, dimension);
-            return FEENOX_ERROR;
-          }
-          if (geometrical_entity->num_physicals > 0) {
-            // que hacemos si hay mas de una? la primera? la ultima?
-            int physical = geometrical_entity->physical[0];
-            HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
-            if ((this->element[i].physical_group = physical_group) == NULL) {
-              snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%d_%d", this->file->name, dimension, physical);
-              if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, feenox.mesh.element_types[type].dim, physical)) == NULL) {
-                return FEENOX_ERROR;
-              }
-              this->element[i].physical_group->tag = physical;
-              HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), this->element[i].physical_group);
+          physical_group = NULL;
+          if (geometrical != 0) {
+            // the whole block has the same physical group, find it once and that's it
+            HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
+            if (geometrical_entity == NULL) {
+              feenox_push_error_message("geometrical entity '%d' of dimension '%d' does not exist", geometrical, dimension);
+              return FEENOX_ERROR;
             }
-          } else {
-            physical_group = NULL;
+            if (geometrical_entity->num_physicals > 0) {
+              // que hacemos si hay mas de una? la primera? la ultima?
+              // TODO: todos! hacer un linked list
+              int physical = geometrical_entity->physical[0];
+              HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
+              if ((this->element[i].physical_group = physical_group) == NULL) {
+                snprintf(buffer, BUFFER_LINE_SIZE-1, "%s_%d_%d", this->file->name, dimension, physical);
+                if ((this->element[i].physical_group = feenox_define_physical_group_get_ptr(buffer, this, feenox.mesh.element_types[type].dim, physical)) == NULL) {
+                  return FEENOX_ERROR;
+                }
+                this->element[i].physical_group->tag = physical;
+                HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), this->element[i].physical_group);
+              }
+            }  
           }
                     
           for (size_t k = 0; k < num; k++) {
