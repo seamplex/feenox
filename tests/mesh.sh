@@ -9,14 +9,24 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer1 mesh2d.fee 22 "12"
+answer1 read_mesh2d.fee 22 "12"
 exitifwrong $?
 
-answer1 mesh2d.fee 40 "12"
+answer1 read_mesh2d.fee 40 "12"
 exitifwrong $?
 
-answer1 mesh2d.fee 41 "12"
+answer1 read_mesh2d.fee 41 "12"
 exitifwrong $?
+
+answer1 write_mesh2d.fee msh "0.531905"
+exitifwrong $?
+
+answer1 integrate2d.fee msh "0.530983 0.313011"
+exitifwrong $? 
+
+# TODO
+# answer1 write_mesh2d.fee vtk "0.531905"
+# exitifwrong $?
 
 answer mesh3d.fee "50"
 exitifwrong $?

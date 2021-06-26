@@ -450,7 +450,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           
         }
         
-        // terminamos de leer los nodos, si los nodos son sparse tenemos que hacer el tag2index
+        // finished reading the node data, check if they are sparse
+        // if they are, build tag2index
         if (this->sparse) {
           if (tag_max < this->n_nodes) {
             feenox_push_error_message("maximum node tag %d is less that number of nodes %d", tag_max, this->n_nodes);
@@ -466,7 +467,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 
         
       } else if (version_maj == 4) {
-        // la cantidad de bloques y de nodos
+        // number of blocks and nodes
         size_t blocks;
         if (version_min == 0) {
           // en 4.0 no tenemos min y max
@@ -539,7 +540,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
                 tag_max = this->node[i].tag;
               }
               
-              // en msh4 los tags son los indices de la malla global
+              // in msh4 the tags are the incides of the global mesh
               this->node[i].index_mesh = i;
               
               i++;
@@ -819,15 +820,9 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 
     // ------------------------------------------------------      
     } else if (strncmp("$NodeData", buffer, 9) == 0) {
-      
-      node_data_t *node_data;
-      function_t *function = NULL;
-      double time, value;
-      int j, timestep, dofs, nodes;
-      int n_string_tags, n_real_tags, n_integer_tags;
-      char *string_tag = NULL;
-      
+
       // string-tags
+      int n_string_tags = 0;
       if (fscanf(this->file->pointer, "%d", &n_string_tags) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
@@ -844,8 +839,19 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
-      string_tag = strtok(buffer, "\"");
       
+      if ((dummy = strrchr(buffer, '\"')) != NULL) {
+        *dummy = '\0';
+      }
+      char *string_tag = NULL;
+      if ((dummy = strchr(buffer, '\"')) != NULL) {
+        feenox_check_alloc(string_tag = strdup(dummy+1));
+      } else {
+        feenox_check_alloc(string_tag = strdup(dummy));
+      }
+      
+      function_t *function = NULL;
+      node_data_t *node_data = NULL;
       LL_FOREACH(this->node_datas, node_data) {
         if (strcmp(string_tag, node_data->name_in_mesh) == 0) {
           function = node_data->function;
@@ -853,44 +859,53 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         }
       }
       
-      // si no tenemos funcion seguimos de largo e inogramos todo el bloque
+      // if this function was not requested then we can ignore the block
       if (function == NULL) {
         continue;
       }
       
       // real-tags
+      int n_real_tags = 0;
       if (fscanf(this->file->pointer, "%d", &n_real_tags) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
       if (n_real_tags != 1) {
-        continue;
+        feenox_push_error_message("expected only one real tag for '%s'", string_tag);
+        return FEENOX_ERROR;
       }
+      double time = 0;
       if (fscanf(this->file->pointer, "%lf", &time) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
+      // TODO: what to do here?
       // we read only data for t = 0
       if (time != 0) {
         continue;
       }
       
       // integer-tags
+      int n_integer_tags = 0;
       if (fscanf(this->file->pointer, "%d", &n_integer_tags) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
       if (n_integer_tags != 3) {
-        continue;
+        feenox_push_error_message("expected three integer tags for '%s'", string_tag);
+        return FEENOX_ERROR;
       }
+      int timestep = 0;
       if (fscanf(this->file->pointer, "%d", &timestep) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
+      int dofs = 0;
       if (fscanf(this->file->pointer, "%d", &dofs) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
+      int nodes = 0;
       if (fscanf(this->file->pointer, "%d", &nodes) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
@@ -901,6 +916,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       }
       
       // if we made it this far, we have a function!
+      // TODO: use vectors?
       if (function->data_size != nodes) {
         function->type = function_type_pointwise_mesh_node;
         function->mesh = this;
@@ -912,6 +928,9 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         function->data_value = calloc(nodes, sizeof(double));
       }  
       
+      size_t j = 0;
+      size_t node = 0;
+      double value = 0;
       for (j = 0; j < nodes; j++) {
         if (fscanf(this->file->pointer, "%ld %lf", &node, &value) == 0) {
           feenox_push_error_message("error reading file");
@@ -1061,13 +1080,13 @@ int feenox_mesh_write_scalar_gmsh(mesh_write_t *mesh_write, function_t *function
   // one real tag (only one)
   fprintf(mesh_write->file->pointer, "1\n");                          
   // time
-  fprintf(mesh_write->file->pointer, "%g\n", (feenox_special_var_value(end_time) > 0) ? feenox_special_var_value(t) : feenox_special_var_value(step_static));
+  fprintf(mesh_write->file->pointer, "%g\n", feenox_special_var_value(t));
 
   // thre integer tags
   fprintf(mesh_write->file->pointer, "3\n");
   // timestep
   fprintf(mesh_write->file->pointer, "%d\n", (feenox_special_var_value(end_time) > 0) ? (unsigned int)(feenox_special_var_value(step_transient)) : (unsigned int)(feenox_special_var_value(step_static)));
-  // number of data per node: uno (scalar)
+  // number of data per node: one (scalar)
   fprintf(mesh_write->file->pointer, "%d\n", 1);
 
   // custom format

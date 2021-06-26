@@ -162,9 +162,10 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
+  // TODO:
   // idem de celdas
-/*  
-  if (feenox_mesh.need_cells) {
+  if (feenox.mesh.need_cells) {
+/*    
     feenox_call(mesh_element2cell(mesh));
     this->cells_argument = malloc(this->spatial_dimensions * sizeof(double *));
     for (d = 0; d < this->spatial_dimensions; d++) {
@@ -173,8 +174,9 @@ int feenox_instruction_mesh_read(void *arg) {
         this->cells_argument[d][i] = this->cell[i].x[d]; 
       }
     }
+ */
   }
-*/
+
   if (this == feenox.mesh.mesh_main) {
     feenox_var_value(feenox.mesh.vars.cells) = (double)this->n_cells;
     feenox_var_value(feenox.mesh.vars.nodes) = (double)this->n_nodes;

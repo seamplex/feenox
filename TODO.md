@@ -35,7 +35,7 @@
 
  * Python?
  * Julia?
- 
+ * come up with an example in C
 
 ## Nice to have
 
@@ -55,13 +55,6 @@
 
  * list symbols with "-l" (is there any clash with petsc?)
  * $1 = ${1}
- * explain PETSc's options, use double-dashes
-    - --ksp_view
-    - --ksp_monitor
-    - --pc_type lu
-    - --pc_type ilu
-    - --pc_type jacobi
- * MUMPS
  
 ## Error handling 
  
@@ -74,6 +67,8 @@
  * symmetric & full tensors
  * vtu format
  * frd? (to be able to use ccx's post processor... is it worth it?)
+ * binary msh and vtk
+ * support CGNS formats
  * problem-aware WRITE_POST 
    - FULL | DISPLACEMENTS | STRESS | STRAIN | VON_MISES | TRESCA | PRINCIPAL
    - FULL | TEMPERATURE | HEAT_FLUX
@@ -85,14 +80,16 @@
  * mustache instead of m4
  * gmsh as a library?
 
+ 
 # PDEs
 
  * check when the matrices do not need to be rebuilt
- * keep K_original and K_with_bc or whatever?
- * support CGNS formats
+ * DUMP_OBJECT / DUMP_MATRIX / DUMP_VECTOR
+ * per-problem 
  
 ## Heat
 
+ * parallel runs
  * convection with a separate matrix? think!
  * jacobians for non-linear problems
  * explain that radiation is better off as an expression
@@ -101,7 +98,6 @@
  * heat flux as secondary field
  * orthotropic conductivity
  * total power sources and BCs (can't we get away with the volumes/areas as variables?)
- * transient
  
 ## Mechanical
 
@@ -110,8 +106,7 @@
 
 ## Modal
 
- * everything
- * deflate null space without BCs
+ * partially-unconstrained DOFs
  
 ## Neutron
 

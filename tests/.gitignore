@@ -2,4 +2,5 @@
 *.log
 *.trs
 *.last
+tmp.*
 nafems
