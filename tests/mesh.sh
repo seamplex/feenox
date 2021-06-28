@@ -9,13 +9,13 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer1 read_mesh2d.fee 22 "12"
+answer1 read_mesh2d.fee 22 "12 22 14"
 exitifwrong $?
 
-answer1 read_mesh2d.fee 40 "12"
+answer1 read_mesh2d.fee 40 "12 22 14"
 exitifwrong $?
 
-answer1 read_mesh2d.fee 41 "12"
+answer1 read_mesh2d.fee 41 "12 22 14"
 exitifwrong $?
 
 answer1 write_mesh2d.fee msh "0.531905"

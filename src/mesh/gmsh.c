@@ -25,7 +25,9 @@ extern feenox_t feenox;
 
 int feenox_mesh_read_gmsh(mesh_t *this) {
 
-  char buffer[BUFFER_LINE_SIZE];
+  if (this->file->pointer == NULL) {
+    feenox_call(feenox_instruction_file_open(this->file));
+  }
 
   char *dummy = NULL;
   char *name = NULL;
@@ -33,14 +35,12 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
   geometrical_entity_t *geometrical_entity = NULL;
   unsigned int version_maj = 0;
   unsigned int version_min = 0;
-  size_t node, node_index;
+  size_t node = 0;
+  size_t node_index = 0;
   size_t tag_min = 0;
   size_t tag_max = 0;
-
-  if (this->file->pointer == NULL) {
-    feenox_call(feenox_instruction_file_open(this->file));
-  }
   
+  char buffer[BUFFER_LINE_SIZE];
   while (fgets(buffer, BUFFER_LINE_SIZE-1, this->file->pointer) != NULL) {
 
     if (strncmp("\n", buffer, 1) == 0) {
@@ -613,13 +613,14 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_push_error_message("no elements found in mesh file '%s'", this->file->path);
           return -2;
         }
-        this->element = calloc(this->n_elements, sizeof(element_t));
+        feenox_check_alloc(this->element = calloc(this->n_elements, sizeof(element_t)));
 
-        for (size_t i = 0; i < this->n_elements; i++) {
+        size_t i = 0;
+        for (i = 0; i < this->n_elements; i++) {
 
-          size_t tag;
-          int ntags22;
-          int type;
+          size_t tag = 0;
+          int ntags22 = 0;
+          int type = 0;
           if (fscanf(this->file->pointer, "%ld %d %d", &tag, &type, &ntags22) < 3) {
             return FEENOX_ERROR;
           }
@@ -641,15 +642,16 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             return FEENOX_ERROR;
           }
           this->element[i].type = &(feenox.mesh.element_types[type]);
+          this->n_elements_per_dim[this->element[i].type->dim]++;
 
           // format v2.2
           // each element has a tag which is an array of ints
           // first one is the ide of the physical entity
           // second one is the id of the geometrical entity (not interested)
           // then other optional stuff like partitions, domains, etc
-          int *tags22;
+          int *tags22 = NULL;
           if (ntags22 > 0) {
-            feenox_check_alloc(tags22 = malloc(ntags22 * sizeof(int)));
+            feenox_check_alloc(tags22 = calloc(ntags22, sizeof(int)));
             for (size_t k = 0; k < ntags22; k++) {
               if (fscanf(this->file->pointer, "%d", &tags22[k]) == 0) {
                 return FEENOX_ERROR;
@@ -672,8 +674,9 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             feenox_free(tags22);
           }
           
-          this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *));
-          for (size_t j = 0; j < this->element[i].type->nodes; j++) {
+          feenox_check_alloc(this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *)));
+          size_t j = 0;
+          for (j = 0; j < this->element[i].type->nodes; j++) {
             if (fscanf(this->file->pointer, "%ld", &node) < 1) {
               return FEENOX_ERROR;
             }
@@ -712,14 +715,14 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_push_error_message("no elements found in mesh file '%s'", this->file->path);
           return FEENOX_ERROR;
         }
-        this->element = calloc(this->n_elements, sizeof(element_t));
+        feenox_check_alloc(this->element = calloc(this->n_elements, sizeof(element_t)));
 
         size_t i = 0;
         for (size_t l = 0; l < blocks; l++) {
-          int geometrical;
-          int dimension;
-          int type;
-          size_t num;
+          int geometrical = 0;
+          int dimension = 0;
+          int type = 0;
+          size_t num = 0;
           if (version_min == 0) {
             if (fscanf(this->file->pointer, "%d %d %d %ld", &geometrical, &dimension, &type, &num) < 4) {
               return FEENOX_ERROR;
@@ -738,7 +741,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             feenox_push_error_message("elements of type '%s' are not supported in this version", feenox.mesh.element_types[type].name);
             return FEENOX_ERROR;
           }
-          
+
           physical_group = NULL;
           if (geometrical != 0) {
             // the whole block has the same physical group, find it once and that's it
@@ -748,8 +751,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               return FEENOX_ERROR;
             }
             if (geometrical_entity->num_physicals > 0) {
-              // que hacemos si hay mas de una? la primera? la ultima?
-              // TODO: todos! hacer un linked list
+              // what to do if there is more than one? the first? the last one?
+              // TODO: all of them! make a linked list
               int physical = geometrical_entity->physical[0];
               HASH_FIND(hh_tag[dimension], this->physical_groups_by_tag[dimension], &physical, sizeof(int), physical_group);
               if ((this->element[i].physical_group = physical_group) == NULL) {
@@ -762,20 +765,22 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               }
             }  
           }
-                    
-          for (size_t k = 0; k < num; k++) {
+                   
+          size_t k = 0;
+          for (k = 0; k < num; k++) {
             if (fscanf(this->file->pointer, "%ld", &this->element[i].tag) == 0) {
               return FEENOX_ERROR;
             }
             
             this->element[i].index = i;
             this->element[i].type = &(feenox.mesh.element_types[type]);
+            this->n_elements_per_dim[this->element[i].type->dim]++;
             
             if ((this->element[i].physical_group = physical_group) != NULL) {
               this->element[i].physical_group->n_elements++;
             }
             
-            this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *));
+            feenox_check_alloc(this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *)));
             for (size_t j = 0; j < this->element[i].type->nodes; j++) {
               if (fscanf(this->file->pointer, "%ld", &node) == 0) {
                 return FEENOX_ERROR;

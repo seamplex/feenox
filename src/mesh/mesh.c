@@ -177,6 +177,10 @@ int feenox_instruction_mesh_read(void *arg) {
  */
   }
 
+  if (this->n_cells == 0) {
+    this->n_cells = this->n_elements_per_dim[this->dim];
+  }
+  
   if (this == feenox.mesh.mesh_main) {
     feenox_var_value(feenox.mesh.vars.cells) = (double)this->n_cells;
     feenox_var_value(feenox.mesh.vars.nodes) = (double)this->n_nodes;

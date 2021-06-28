@@ -1162,6 +1162,7 @@ struct mesh_t {
 
   size_t n_nodes;
   size_t n_elements;
+  size_t n_elements_per_dim[4];
   size_t n_cells; // a cell is an element with the topological dimension of the mesh
 
   int degrees_of_freedom;        // per unknown
