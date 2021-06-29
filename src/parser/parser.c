@@ -334,6 +334,13 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "FIND_EXTREMA") == 0) {
       feenox_call(feenox_parse_find_extrema());
       return FEENOX_OK;
+
+///kw+FIT+desc Find parameters to fit an analytical function to a pointwise-defined function.
+///kw+FIT+usage FIT
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "FIT") == 0) {
+      feenox_call(feenox_parse_fit());
+      return FEENOX_OK;
       
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -969,219 +976,6 @@ int feenox_parse_line(void) {
       }
       return FEENOX_OK;
 
-    // ----- FIT  -----------------------------------------------------------------
-    } else if ((strcasecmp(token, "FIT") == 0)) {
-
-///kw+FIT+desc Fit a function of one or more arguments to a set of pointwise-defined data.
-///kw+FIT+detail The function with the data has to be point-wise defined
-///kw+FIT+detail (i.e. a `FUNCTION` read from a file with inline `DATA`).
-///kw+FIT+detail The function to be fitted has to be parametrized with at least one of
-///kw+FIT+detail the variables provided after the `VIA` keyword.
-///kw+FIT+detail Only the names of the functions have to be given, not the arguments.
-///kw+FIT+detail Both functions have to have the same number of arguments.
-      
-///kw+FIT+usage FIT
-      char *sigma_name;
-      varlist_t *varlist = NULL;
-      varlist_t *varitem;
-
-      feenox.fit_mode = 1;
-
-///kw+FIT+usage <function_to_be_fitted> 
-      // la funcion cuyos parametros vamos a ajustar
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected function name");
-        return FEENOX_ERROR;
-      }
-
-      if ((feenox.fit.function = feenox_get_function_ptr(token)) == NULL) {
-        if (strchr(token, '(') != NULL) {
-          feenox_push_error_message("function '%s' undefined (only the function name is to be provided, do not include its arguments)", token);
-        } else {
-          feenox_push_error_message("function '%s' undefined", token);
-        }
-        return FEENOX_ERROR;
-      }
-
-///kw+FIT+usage TO <function_with_data>
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected function name");
-        return FEENOX_ERROR;
-      }
-      if (strcasecmp(token, "TO") != 0) {
-        feenox_push_error_message("expected keyword 'TO' instead of '%s'", token);
-      }
-
-// la funcion con los datos experimentales
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected function name");
-        return FEENOX_ERROR;
-      }
-      if ((feenox.fit.data = feenox_get_function_ptr(token)) == NULL) {
-        if (strchr(token, '(') != NULL) {
-          feenox_push_error_message("function '%s' undefined (only the function name is to be provided, do not include its arguments)", token);
-        } else {
-          feenox_push_error_message("function '%s' undefined", token);
-        }
-        return FEENOX_ERROR;
-      }
-
-      if (feenox.fit.function->n_arguments != feenox.fit.data->n_arguments) {
-        feenox_push_error_message("function '%s' has %d arguments and '%s' has %d", feenox.fit.function->name, feenox.fit.function->n_arguments, feenox.fit.data->name, feenox.fit.data->n_arguments);
-        return FEENOX_ERROR;
-      }
-
-      if ((feenox.fit.n = feenox.fit.data->data_size) == 0) {
-        feenox_push_error_message("function '%s' has to be point-wise defined", feenox.fit.data->name);
-        return FEENOX_ERROR;
-      }
-
-///kw+FIT+usage VIA
-///kw+FIT+detail The initial guess of the solution is given by the initial value of the variables listed in the `VIA` keyword.
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected function name");
-        return FEENOX_ERROR;
-      }
-      if (strcasecmp(token, "VIA") != 0) {
-        feenox_push_error_message("expected keyword 'VIA' instead of '%s'", token);
-        return FEENOX_ERROR;
-      }
-
-///kw+FIT+usage <var_1> <var_2> ... <var_n>@
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-        // TODO: convergencia por gradiente, incertezas, covarianza, incrementos para gradiente automatico
-///kw+FIT+usage [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]@
-///kw+FIT+detail Analytical expressions for the gradient of the function to be fitted with respect
-///kw+FIT+detail to the parameters to be fitted can be optionally given with the `GRADIENT` keyword.
-///kw+FIT+detail If none is provided, the gradient will be computed numerically using finite differences.
-        if (strcasecmp(token, "GRADIENT") == 0) {
- 
-          if (feenox.fit.p == 0) {
-            feenox_push_error_message("GRADIENT keyword before parameters");
-            return FEENOX_ERROR;
-          }
-          
-          feenox.fit.gradient = malloc(feenox.fit.p * sizeof(expr_t));
-          for (i = 0; i < feenox.fit.p; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected an expression");
-              return FEENOX_ERROR;
-            }
-
-            feenox_call(feenox_parse_expression(token, &feenox.fit.gradient[i]));
-          }
-
-///kw+FIT+usage [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]@
-///kw+FIT+detail A range over which the residuals are to be minimized can be given with `RANGE_MIN` and `RANGE_MAX`.
-///kw+FIT+detail The expressions give the range of the arguments of the functions, not of the parameters.
-///kw+FIT+detail For multidimensional fits, the range is an hypercube.
-///kw+FIT+detail If no range is given, all the definition points of the function with the data are used for the fit.
-        } else if (strcasecmp(token, "RANGE_MIN") == 0) {
-
-          if (feenox.fit.data->n_arguments == 0) {
-            feenox_push_error_message("RANGE_MIN before target function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          feenox_call(feenox_parser_expressions(&feenox.fit.range.min, feenox.fit.data->n_arguments));
-
-///kw+FIT+usage [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]@
-        } else if (strcasecmp(token, "RANGE_MAX") == 0) {
-
-          if (feenox.fit.data->n_arguments == 0) {
-            feenox_push_error_message("RANGE_MAX before target function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          feenox_call(feenox_parser_expressions(&feenox.fit.range.max, feenox.fit.data->n_arguments));
-          
-///kw+FIT+usage [ DELTAEPSREL <expr> ]
-///kw+FIT+detail Convergence can be controlled by giving the relative and absolute tolreances with
-///kw+FIT+detail `DELTAEPSREL` (default `DEFAULT_NLIN_FIT_EPSREL`) and `DELTAEPSABS` (default `DEFAULT_NLIN_FIT_EPSABS`),
-///kw+FIT+detail and with the maximum number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER).
-          
-        } else if (strcasecmp(token, "DELTAEPSREL") == 0) {
-
-          feenox_call(feenox_parser_expression(&feenox.fit.deltaepsrel));
-
-///kw+FIT+usage [ DELTAEPSABS <expr> ]
-        } else if (strcasecmp(token, "DELTAEPSABS") == 0) {
-
-          feenox_call(feenox_parser_expression(&feenox.fit.deltaepsabs));
-
-///kw+FIT+usage [ MAX_ITER <expr> ]@
-        } else if (strcasecmp(token, "MAX_ITER") == 0) {
-
-          double xi;
-          
-          feenox_call(feenox_parser_expression_in_string(&xi));
-          if ((feenox.fit.max_iter = (int)xi) < 0) {
-            feenox_push_error_message("expected a positive integer for MAX_ITER");
-            return FEENOX_ERROR;
-          }
-
-///kw+FIT+usage [ VERBOSE ]
-        } else if (strcasecmp(token, "VERBOSE") == 0) {
-///kw+FIT+detail If the optional keyword `VERBOSE` is given, some data of the intermediate steps is written in the standard output.
-
-          feenox.fit.verbose = 1;
-
-///kw+FIT+usage [ RERUN | DO_NOT_RERUN ]@
-        } else if (strcasecmp(token, "DO_NOT_RERUN") == 0 || strcasecmp(token, "NORERUN") == 0) {
-
-          feenox.fit.norerun = 1;
-
-        } else if (strcasecmp(token, "RERUN") == 0) {
-
-          feenox.fit.norerun = 0;
-
-        } else {
-
-          varitem = calloc(1, sizeof(varlist_t));
-          if ((varitem->var = feenox_get_variable_ptr(token)) == NULL) {
-            feenox_push_error_message("unknown variable '%s'", token);
-            return FEENOX_ERROR;
-          } 
-          
-          LL_APPEND(varlist, varitem);
-          feenox.fit.p++;
-
-        }
-      }
-
-      if (feenox.fit.p == 0) {
-        feenox_push_error_message("no fit parameters given");
-        return FEENOX_ERROR;
-      }
-
-      feenox.fit.param = malloc(feenox.fit.p * sizeof(var_t *));
-      feenox.fit.sigma = malloc(feenox.fit.p * sizeof(var_t *));
-      varitem = varlist;
-      for (i = 0; i < feenox.fit.p; i++) {
-        feenox.fit.param[i] = varitem->var;
-        
-        sigma_name = malloc(strlen(varitem->var->name)+strlen("sigma_")+8);
-        snprintf(sigma_name, strlen(varitem->var->name)+strlen("sigma_")+8, "sigma_%s", varitem->var->name);
-        if ((feenox.fit.sigma[i] = feenox_define_variable(sigma_name)) == NULL) {
-          return FEENOX_ERROR;
-        }
-        feenox_free(sigma_name);
-        
-        if ((varitem = varitem->next) == NULL && i != feenox.fit.p-1) {
-          feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
-          return FEENOX_ERROR;
-        }
-      }
-
-      if (feenox.fit.algorithm == NULL) {
-        feenox.fit.algorithm = DEFAULT_NLIN_FIT_METHOD;
-      }
-      if (feenox.fit.max_iter == 0) {
-        feenox.fit.max_iter = DEFAULT_NLIN_FIT_MAX_ITER;
-      }
-
-      return FEENOX_OK;
 
     // ----- MINIMIZE  -----------------------------------------------------------------
 ///kw+MINIMIZE+usage MINIMIZE
@@ -2248,6 +2042,52 @@ int feenox_parse_function(void) {
   
 }
 
+int feenox_parse_function_data(function_t *function) {
+
+  function->type = function_type_pointwise_data;
+  
+  size_t size0 = 4096/sizeof(double);
+  size_t size = size0;
+  double *buffer = NULL;
+  feenox_check_alloc(buffer = malloc(size * sizeof(double)));
+  
+  char *token = NULL;
+  size_t n = 0;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    if (n == size) {
+      size += size0;
+      feenox_check_alloc(buffer = realloc(buffer, size*sizeof(double)));
+    }
+    
+    expr_t *expr = NULL;
+    feenox_check_alloc(expr = calloc(1, sizeof(expr_t)));
+    feenox_call(feenox_expression_parse(expr, token));
+    buffer[n++] = feenox_expression_eval(expr);
+    feenox_free(expr);
+  }
+
+  feenox_call(function_set_buffered_data(function, buffer, n, NULL));
+  feenox_free(buffer);
+  
+  return FEENOX_OK;
+}
+  
+
+int feenox_parse_function_vectors(function_t *function) {
+
+  function->type = function_type_pointwise_data;
+  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
+  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
+  
+  unsigned int i = 0;
+  for (i = 0; i < function->n_arguments; i++) {
+    feenox_call(feenox_parser_vector(&function->vector_argument[i]));
+  } 
+  feenox_call(feenox_parser_vector(&function->vector_value));
+  
+  return FEENOX_OK;
+}
+
 int feenox_parse_sort_vector(void) {
       
   char *token;
@@ -3020,19 +2860,21 @@ int feenox_parse_read_mesh(void) {
       char *function_name = NULL;
       if (custom_name) {
         // the "AS"
-        feenox_call(feenox_parser_string(&token));
-        if (strcasecmp(token, "AS") != 0) {
-          feenox_push_error_message("expected AS instead of '%s'", token);
+        char *as = NULL;
+        feenox_call(feenox_parser_string(&as));
+        if (strcasecmp(as, "AS") != 0) {
+          feenox_push_error_message("expected AS instead of '%s'", as);
           return FEENOX_ERROR;
         }
-        feenox_free(token); // valgrind told me that token was definitely lost
+        feenox_free(as);
 
         feenox_call(feenox_parser_string(&function_name));
       } else {
         feenox_check_alloc(function_name = strdup(name_in_mesh));
       }
 
-      node_data_t *node_data = calloc(1, sizeof(node_data_t));
+      node_data_t *node_data = NULL;
+      feenox_check_alloc(node_data = calloc(1, sizeof(node_data_t)));
       feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
       node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
       LL_APPEND(mesh->node_datas, node_data);
@@ -4013,55 +3855,207 @@ int feenox_parse_find_extrema(void) {
     mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_i_max);
   }
   
-
   LL_APPEND(feenox.mesh.find_extremas, mesh_find_extrema);
   feenox_call(feenox_add_instruction(feenox_instruction_mesh_find_extrema, mesh_find_extrema));
+  
   return FEENOX_OK;
 }
 
+int feenox_parse_fit(void) {
 
-int feenox_parse_function_data(function_t *function) {
+///kw+FIT+detail The function with the data has to be point-wise defined
+///kw+FIT+detail (i.e. a `FUNCTION` read from a file, with inline `DATA` or defined over a mesh).
+///kw+FIT+detail The function to be fitted has to be parametrized with at least one of
+///kw+FIT+detail the variables provided after the `USING` keyword.
+///kw+FIT+detail For example to fit\ $f(x,y)=a x^2 + b sqrt(y)$ to a pointwise-defined
+///kw+FIT+detail function\ $g(x,y)$ one gives `FIT f TO g VIA a b`.
+///kw+FIT+detail Only the names of the functions have to be given, not the arguments.
+///kw+FIT+detail Both functions have to have the same number of arguments.
+  
+  fit_t *fit = NULL;
+  feenox_check_alloc(fit = calloc(1, sizeof(fit_t)));
+  
+///kw+FIT+usage <function_to_be_fitted> 
+  // the function whose parameters we are going to fit, i.e. f(x,y) above
+  char *name_function = NULL;
+  feenox_call(feenox_parser_string(&name_function));
+  
+///kw+FIT+usage TO
+  char *dummy = NULL;
+  feenox_call(feenox_parser_string(&dummy));
+  if (strcasecmp(dummy, "TO") != 0) {
+    feenox_push_error_message("expected keyword 'TO' instead of '%s'", dummy);
+  }
+  feenox_free(dummy);
+  
+///kw+FIT+usage <function_with_data>
+  char *name_data = NULL;
+  feenox_call(feenox_parser_string(&name_data));
 
-  function->type = function_type_pointwise_data;
-  
-  size_t size0 = 4096/sizeof(double);
-  size_t size = size0;
-  double *buffer = NULL;
-  feenox_check_alloc(buffer = malloc(size * sizeof(double)));
-  
-  char *token = NULL;
-  size_t n = 0;
-  while ((token = feenox_get_next_token(NULL)) != NULL) {
-    if (n == size) {
-      size += size0;
-      feenox_check_alloc(buffer = realloc(buffer, size*sizeof(double)));
+  if ((fit->function = feenox_get_function_ptr(name_function)) == NULL) {
+    if (strchr(name_function, '(') != NULL) {
+      feenox_push_error_message("function '%s' undefined (only the function name is to be provided, do not include its arguments)", name_function);
+    } else {
+      feenox_push_error_message("function '%s' undefined", name_function);
     }
-    
-    expr_t *expr = NULL;
-    feenox_check_alloc(expr = calloc(1, sizeof(expr_t)));
-    feenox_call(feenox_expression_parse(expr, token));
-    buffer[n++] = feenox_expression_eval(expr);
-    feenox_free(expr);
+    return FEENOX_ERROR;
+  }
+  if (fit->function->algebraic_expression.items == NULL) {
+    feenox_push_error_message("function '%s' has to be algebraically defined", fit->function->name);
+    return FEENOX_ERROR;
   }
 
-  feenox_call(function_set_buffered_data(function, buffer, n, NULL));
-  feenox_free(buffer);
-  
-  return FEENOX_OK;
-}
-  
+  if ((fit->data = feenox_get_function_ptr(name_data)) == NULL) {
+    if (strchr(name_data, '(') != NULL) {
+      feenox_push_error_message("function '%s' undefined (only the function name is to be provided, do not include its arguments)", name_data);
+    } else {
+      feenox_push_error_message("function '%s' undefined", name_data);
+    }
+    return FEENOX_ERROR;
+  }
 
-int feenox_parse_function_vectors(function_t *function) {
+  if (fit->function->n_arguments != fit->data->n_arguments) {
+    feenox_push_error_message("function '%s' has %d arguments and '%s' has %d", fit->function->name, fit->function->n_arguments, fit->data->name, fit->data->n_arguments);
+    return FEENOX_ERROR;
+  }
 
-  function->type = function_type_pointwise_data;
-  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
-  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
+  if ((fit->n_data = fit->data->data_size) == 0) {
+    if (fit->data->algebraic_expression.items != NULL) {
+      feenox_push_error_message("function '%s' has to be point-wise defined", fit->data->name);
+      return FEENOX_ERROR;
+    }  
+  }
+
+///kw+FIT+usage VIA
+///kw+FIT+detail The initial guess of the solution is given by the initial value of the variables after the `VIA` keyword.
+  var_ll_t *var_list = NULL; 
+  feenox_call(feenox_parser_string(&dummy));
+  if (strcasecmp(dummy, "VIA") != 0) {
+    feenox_push_error_message("expected keyword 'VIA' instead of '%s'", dummy);
+  }
+  feenox_free(dummy);
   
+///kw+FIT+usage <var_1> <var_2> ... <var_n>@
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+    // TODO: convergencia por gradiente, incertezas, covarianza, incrementos para gradiente automatico
+///kw+FIT+usage [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]@
+///kw+FIT+detail Analytical expressions for the gradient of the function to be fitted with respect
+///kw+FIT+detail to the parameters to be fitted can be optionally given with the `GRADIENT` keyword.
+///kw+FIT+detail If none is provided, the gradient will be computed numerically using finite differences.
+    if (strcasecmp(token, "GRADIENT") == 0) {
+ 
+      if (fit->n_via == 0) {
+        feenox_push_error_message("GRADIENT keyword before parameters");
+        return FEENOX_ERROR;
+      }
+          
+      feenox_check_alloc(fit->gradient = calloc(fit->n_via, sizeof(expr_t)));
+      unsigned int i = 0;
+      for (i = 0; i < fit->n_via; i++) {
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected an expression");
+          return FEENOX_ERROR;
+        }
+
+        feenox_call(feenox_expression_parse(&fit->gradient[i], token));
+      }
+
+///kw+FIT+usage [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]@
+///kw+FIT+detail A range over which the residuals are to be minimized can be given with `RANGE_MIN` and `RANGE_MAX`.
+///kw+FIT+detail The expressions give the range of the arguments of the functions, not of the parameters.
+///kw+FIT+detail For multidimensional fits, the range is an hypercube.
+///kw+FIT+detail If no range is given, all the definition points of the function with the data are used for the fit.
+    } else if (strcasecmp(token, "RANGE_MIN") == 0) {
+     feenox_call(feenox_parser_expressions(&fit->range.min, fit->data->n_arguments));
+
+///kw+FIT+usage [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]@
+    } else if (strcasecmp(token, "RANGE_MAX") == 0) {
+     feenox_call(feenox_parser_expressions(&fit->range.max, fit->data->n_arguments));
+          
+///kw+FIT+usage [ TOL_REL <expr> ]
+///kw+FIT+detail Convergence can be controlled by giving the relative and absolute tolreances with
+///kw+FIT+detail `TOL_REL` (default `DEFAULT_NLIN_FIT_EPSREL`) and `TOL_ABS` (default `DEFAULT_NLIN_FIT_EPSABS`),
+///kw+FIT+detail and with the maximum number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER).
+    } else if (strcasecmp(token, "TOL_REL") == 0) {
+      feenox_call(feenox_parser_expression(&fit->tol_rel));
+
+///kw+FIT+usage [ TOL_ABS <expr> ]
+    } else if (strcasecmp(token, "TOL_ABS") == 0) {
+      feenox_call(feenox_parser_expression(&fit->tol_abs));
+
+///kw+FIT+usage [ MAX_ITER <expr> ]@
+    } else if (strcasecmp(token, "MAX_ITER") == 0) {
+      double xi = 0;
+      feenox_call(feenox_parser_expression_in_string(&xi));
+      if ((fit->max_iter = (int)xi) < 0) {
+        feenox_push_error_message("expected a positive integer for MAX_ITER");
+        return FEENOX_ERROR;
+      }
+
+///kw+FIT+usage [ VERBOSE ]
+    } else if (strcasecmp(token, "VERBOSE") == 0) {
+///kw+FIT+detail If the optional keyword `VERBOSE` is given, some data of the intermediate steps is written in the standard output.
+      fit->verbose = 1;
+
+    } else {
+
+      var_ll_t *var_item =  NULL;
+      feenox_check_alloc(var_item = calloc(1, sizeof(var_ll_t)));
+      if ((var_item->var = feenox_get_variable_ptr(token)) == NULL) {
+        feenox_push_error_message("unknown variable '%s'", token);
+        return FEENOX_ERROR;
+      } 
+          
+      LL_APPEND(var_list, var_item);
+      fit->n_via++;
+
+    }
+  }
+
+  if (fit->n_via == 0) {
+    feenox_push_error_message("no fit parameters given");
+    return FEENOX_ERROR;
+  }
+
+  feenox_check_alloc(fit->via = calloc(fit->n_via,  sizeof(var_t *)));
+//  feenox_check_alloc(fit->sigma = calloc(fit->n_via, sizeof(var_t *)));
+  var_ll_t *var_item = var_list;
   unsigned int i = 0;
-  for (i = 0; i < function->n_arguments; i++) {
-    feenox_call(feenox_parser_vector(&function->vector_argument[i]));
-  } 
-  feenox_call(feenox_parser_vector(&function->vector_value));
+  for (i = 0; i < fit->n_via; i++) {
+    fit->via[i] = var_item->var;
+
+    // TODO
+/*    
+    sigma_name = malloc(strlen(varitem->var->name)+strlen("sigma_")+8);
+    snprintf(sigma_name, strlen(varitem->var->name)+strlen("sigma_")+8, "sigma_%s", varitem->var->name);
+    if ((fit->sigma[i] = feenox_define_variable(sigma_name)) == NULL) {
+      return FEENOX_ERROR;
+    }
+    feenox_free(sigma_name);
+ */
+        
+    if ((var_item = var_item->next) == NULL && i != (fit->n_via-1)) {
+      feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
+      return FEENOX_ERROR;
+    }
+  }
+
+  // TODO: choose
+  if (fit->algorithm == NULL) {
+    fit->algorithm = DEFAULT_FIT_METHOD;
+  }
+  if (fit->max_iter == 0) {
+    fit->max_iter = DEFAULT_FIT_MAX_ITER;
+  }
+  
+  // TODO: cleanup var_list
+  // TODO: add instruction
+
+  LL_APPEND(feenox.fits, fit);
+  feenox_call(feenox_add_instruction(feenox_instruction_fit, fit));
   
   return FEENOX_OK;
 }
+

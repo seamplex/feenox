@@ -3,4 +3,5 @@
 *.trs
 *.last
 tmp.*
+mesh2d.msh
 nafems

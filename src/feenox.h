@@ -137,6 +137,13 @@
 
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
 
+#define DEFAULT_FIT_METHOD            gsl_multifit_fdfsolver_lmsder
+#define DEFAULT_FIT_MAX_ITER          100
+#define DEFAULT_FIT_EPSREL            1e-4
+#define DEFAULT_FIT_EPSABS            1e-6
+#define DEFAULT_FIT_GRAD_H            1e-2
+
+
 #define MINMAX_ARGS           10
 
 // zero & infinite
@@ -272,6 +279,8 @@ typedef struct mesh_write_t mesh_write_t;
 typedef struct mesh_write_dist_t mesh_write_dist_t;
 typedef struct mesh_integrate_t mesh_integrate_t;
 typedef struct mesh_find_extrema_t mesh_find_extrema_t;
+
+typedef struct fit_t fit_t;
 
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
@@ -1319,6 +1328,54 @@ struct mesh_find_extrema_t {
 };
 
 
+// fit an algebraic function to a pointwise-defined function
+struct fit_t {
+  
+  const gsl_multifit_fdfsolver_type *algorithm;
+  unsigned int max_iter;
+  int verbose;
+  
+  // cantidad de parametros (i.e. a y b -> 2)
+  unsigned int n_via;
+  // cantidad de datos experimentales a ajustar (i.e. del orden de 1000)
+  size_t n_data;
+  
+  // apuntador a la funcion cuyos parametros hay que ajustar
+  function_t *function;
+  // apuntador a la funcion point-wise que tiene los datos experimentales
+  function_t *data;
+  
+  // arreglo de apuntadores a las variables que funcionan como parametros
+  // y a sus incertezas estadisticas resultantes
+  var_t **via;
+//  var_t **sigma;
+
+  // arreglo de tamanio n_params con las expresiones de la derivada de 
+  // la funcion function con respecto a los parametros
+  // si es NULL hay que calcularlo a manopla numericamente
+  expr_t *gradient;  
+  
+  // lo mismo pero para el guess inicial
+  expr_t *guess;
+  
+  // rango donde debe evaluarse la funcion a ajustar
+  multidim_range_t range;
+  
+  expr_t tol_abs;
+  expr_t tol_rel;
+  
+  // working pointers
+  double *x;
+  double *range_min;
+  double *range_max;
+  double *y_plus;
+  double *y_minus;
+  
+  fit_t *next;
+  
+};
+
+
 // global FeenoX singleton structure
 struct feenox_t {
   int argc;
@@ -1372,6 +1429,7 @@ struct feenox_t {
   print_t *prints;
   print_function_t *print_functions;
   print_vector_t *print_vectors;
+  fit_t *fits;
   
   struct {
     var_t *done;
@@ -1443,7 +1501,7 @@ struct feenox_t {
     mesh_write_t *mesh_writes;
     mesh_integrate_t *integrates;
     mesh_find_extrema_t *find_extremas;
-
+    
     field_location_t default_field_location;
     element_type_t *element_types;
 
@@ -1654,7 +1712,6 @@ struct feenox_t {
     function_t ***delta_gradient;  
     
     // TODO: move to per-problem headers
-    // los modos de vibracion
     function_t ***mode;
   
     enum {
@@ -1922,6 +1979,20 @@ extern int feenox_strip_comments(char *line);
 
 // alias.c
 extern int feenox_instruction_alias(void *arg);
+
+// fit.c
+extern int feenox_instruction_fit(void *arg);
+extern int feenox_gsl_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
+extern int feenox_gsl_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
+extern int feenox_gsl_fit_fdf(const gsl_vector *via, void *arg, gsl_vector *f, gsl_matrix *J);
+
+extern int feenox_fit_compute_f(fit_t *fit, gsl_vector *f);
+extern int feenox_fit_compute_df(fit_t *fit, gsl_matrix *J);
+extern int feenox_fit_in_range(fit_t *this);
+extern void feenox_fit_update_x(fit_t *this, size_t j);
+extern void feenox_fit_update_vias(fit_t *this, const gsl_vector *via);
+extern void feenox_fit_print_state(fit_t *this, unsigned int iter, int gsl_status, gsl_multifit_fdfsolver *s);
+
 
 // matrix.c
 extern int feenox_matrix_init(matrix_t *this);

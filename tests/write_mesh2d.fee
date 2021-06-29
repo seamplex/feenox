@@ -1,5 +1,5 @@
 READ_MESH square41.msh
 f(x,y) := exp(-x)*cos(y)
-WRITE_MESH tmp.$1 f
+WRITE_MESH mesh2d.$1 f
 INTEGRATE f RESULT I
 PRINT I

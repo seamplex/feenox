@@ -17,6 +17,8 @@ AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE
 AC_PROG_CC
 
+# TODO:investigate
+#AX_CODE_COVERAGE
 
 ######################
 # optimization flags

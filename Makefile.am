@@ -7,6 +7,7 @@ dist_man_MANS = doc/feenox.1
 
 EXTRA_DIST = examples tests locateruntest.sh tests/functions.sh
 
+# include $(top_srcdir)/aminclude_static.am
 TESTS = tests/abort.sh \
         tests/algebraic_expr.sh \
         tests/builtin.sh \
@@ -15,6 +16,7 @@ TESTS = tests/abort.sh \
         tests/expressions_variables.sh \
         tests/expressions_functions.sh \
         tests/exp.sh \
+        tests/fit.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \
         tests/function_vectors.sh \
@@ -32,3 +34,6 @@ XFAIL_TESTS = tests/abort.sh
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
+
+# clean-local: code-coverage-clean
+# distclean-local: code-coverage-dist-clean

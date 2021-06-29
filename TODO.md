@@ -1,7 +1,15 @@
 # General things to TODO
 
  * https://joss.theoj.org/
+ * FIT to mesh-based functions
+ * extended integration (as in reduced, full, extended)
+ * binary .msh and .vtk
 
+## Tests
+ 
+ * cell-based mesh writes and integrations
+ * FIT ranges
+ 
 ## Binaries
 
  * automate the generation of binary tarballs

@@ -1,6 +1,7 @@
 include variables.mak
 undefine DESTDIR  # this variable is set by petsc somewhere and we need it empty to make install
 
+# include $(top_srcdir)/aminclude_static.am
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 
@@ -8,6 +9,7 @@ bin_PROGRAMS = feenox
 
 feenox_CFLAGS = $(SLEPC_CC_INCLUDES) $(PETSC_CC_INCLUDES) $(CC_INCLUDES) $(all_includes)
 feenox_LDADD = $(SLEPC_LIB) $(PETSC_LIB) $(all_libraries)
+#feenox_LIBS = $(CODE_COVERAGE_LIBS)
 # feenox_LDFLAGS = -rdynamic
 
 feenox_SOURCES = \
@@ -37,6 +39,7 @@ feenox_SOURCES = \
 ./math/builtin_vectorfunctions.c \
 ./math/dae.c \
 ./math/expressions.c \
+./math/fit.c \
 ./math/matrix.c \
 ./math/function.c \
 ./math/vector.c \

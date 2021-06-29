@@ -930,7 +930,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         if (function->data_value != NULL) {
           feenox_free(function->data_value);
         }
-        function->data_value = calloc(nodes, sizeof(double));
+        feenox_check_alloc(function->data_value = calloc(nodes, sizeof(double)));
       }  
       
       size_t j = 0;

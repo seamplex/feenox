@@ -1,0 +1,5 @@
+READ_MESH mesh2d.msh DIMENSIONS 2 READ_FUNCTION f
+VAR a b c
+g(x,y) := a*exp(-b*x)*cos(c*y)
+FIT g TO f VIA a b c
+PRINT a b c SEP " "
