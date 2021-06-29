@@ -2013,7 +2013,7 @@ extern int feenox_function_set_argument_variable(const char *name, unsigned int 
 extern int feenox_function_set_expression(const char *name, const char *expression);
 extern int feenox_function_set_interpolation(const char *name, const char *type);
 extern int feenox_function_set_file(const char *name, file_t *file, unsigned int *columns);
-extern int function_set_buffered_data(function_t *function, double *buffer, size_t n, unsigned int *columns);
+extern int function_set_buffered_data(function_t *function, double *buffer, size_t n_data, unsigned int n_columns, unsigned int *columns);
 
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);

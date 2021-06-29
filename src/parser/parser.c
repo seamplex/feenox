@@ -1756,12 +1756,6 @@ int feenox_parse_function(void) {
       token = feenox_get_next_token(NULL);
       feenox_call(feenox_function_set_interpolation(name, token));
       
-    } else {
-      feenox_push_error_message("unknown keyword '%s'", token);
-      return FEENOX_ERROR;
-    }
-  }
-
 /*      
 
 ///kw+FUNCTION+usage ROUTINE <name> |
@@ -1878,26 +1872,31 @@ int feenox_parse_function(void) {
       if (feenox_parser_vector(&function->vector_value) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
-
+*/
 
 ///kw+FUNCTION+usage [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ]
     } else if (strcasecmp(token, "COLUMNS") == 0) {
 
-      if (nargs == 0) {
+      if (function->n_arguments == 0) {
         feenox_push_error_message("number of arguments is equal to zero");
         return FEENOX_ERROR;
       }
 
-      for (i = 0; i < nargs+1; i++) {
-        if ((token = feenox_get_next_token(NULL)) == NULL) {
-          feenox_push_error_message("expected %d columns specifications", nargs);
-          return FEENOX_ERROR;
-        }
-        function->column[i] = (int)(feenox_evaluate_expression_in_string(token));
-
+      feenox_check_alloc(columns = calloc(function->n_arguments+1, sizeof(int)));
+      unsigned int i = 0;
+      double xi = 0;
+      for (i = 0; i < function->n_arguments+1; i++) {
+        feenox_call(feenox_parser_expression_in_string(&xi));
+        columns[i] = (unsigned int)(xi);
       }
 
-
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+      
+/*
 
 ///kw+FUNCTION+usage [ INTERPOLATION_THRESHOLD <expr> ]
 ///kw+FUNCTION+detail For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.
@@ -2036,6 +2035,7 @@ int feenox_parse_function(void) {
     feenox_call(feenox_function_set_file(name, file, columns));
   }
   
+  feenox_free(columns);
   feenox_free(name);
   
   return FEENOX_OK;
@@ -2066,7 +2066,7 @@ int feenox_parse_function_data(function_t *function) {
     feenox_free(expr);
   }
 
-  feenox_call(function_set_buffered_data(function, buffer, n, NULL));
+  feenox_call(function_set_buffered_data(function, buffer, n, function->n_arguments+1, NULL));
   feenox_free(buffer);
   
   return FEENOX_OK;

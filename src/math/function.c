@@ -106,7 +106,7 @@ int feenox_function_set_file(const char *name, file_t *file, unsigned int *colum
   unsigned int max_column = 0;
   if (columns != NULL) {
     unsigned int i = 0;
-    for (i = 0; i < function->n_arguments; i++) {
+    for (i = 0; i < function->n_arguments+1; i++) {
       if (columns[i] > max_column) {
         max_column = columns[i];
       }
@@ -140,22 +140,23 @@ int feenox_function_set_file(const char *name, file_t *file, unsigned int *colum
       }
     }
   }
+  feenox_call(feenox_instruction_file_close(file));
   
-  feenox_call(function_set_buffered_data(function, buffer, n, columns));
+  feenox_call(function_set_buffered_data(function, buffer, n, max_column, columns));
   free(buffer);
   
   
   return FEENOX_OK;
 }
 
-int function_set_buffered_data(function_t *function, double *buffer, size_t n, unsigned int *columns) {
+int function_set_buffered_data(function_t *function, double *buffer, size_t n_data, unsigned int n_columns, unsigned int *columns) {
 
-  if ((n % (function->n_arguments+1)) != 0) {
-    feenox_push_error_message("data size %d is not multiple of %d (number of arguments plus one)", n, function->n_arguments+1);
+  if ((n_data % n_columns) != 0) {
+    feenox_push_error_message("data size %d is not multiple of %d", n_data, n_columns);
     return FEENOX_ERROR;
   }
   
-  function->data_size = n / (function->n_arguments+1);
+  function->data_size = n_data / n_columns;
 
   // the independent values
   char *name = NULL;
@@ -177,16 +178,15 @@ int function_set_buffered_data(function_t *function, double *buffer, size_t n, u
     feenox_free(name);
   }
   
-  n = 0;
   size_t j = 0;
   for (j = 0; j < function->data_size; j++) {
     for (i = 0; i < function->n_arguments; i++) {
-      gsl_vector_set(function->vector_argument[i]->value, j, buffer[n++]);
+      gsl_vector_set(function->vector_argument[i]->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     }
-    gsl_vector_set(function->vector_value->value, j, buffer[n++]);
+    // remember than since 1971 now i has n_arguments+1
+    gsl_vector_set(function->vector_value->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     
     // TODO: check for monotonicity in 1D
-    
     // to allow for steps
     if (function->n_arguments == 1 && j > 1 && (function->data_argument[0][j] == function->data_argument[0][j-1])) {
       function->data_argument[i][j] += 1e-6*(function->data_argument[0][j-1] - function->data_argument[0][j-2]);
