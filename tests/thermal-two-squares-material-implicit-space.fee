@@ -1,4 +1,5 @@
-READ_MESH two-squares.msh DIMENSIONS 2
+# this mesh was exported as binary from Gmsh
+READ_MESH two-squares-bin-gmsh.msh DIMENSIONS 2
 PROBLEM thermal
 
 k_soft(x,y) := 0.5+x

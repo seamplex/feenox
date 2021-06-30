@@ -1,4 +1,5 @@
-READ_MESH two-squares.msh DIMENSIONS 2
+# this binary was converted from the ASCII with meshio-convert
+READ_MESH two-squares-bin-meshio.msh DIMENSIONS 2
 PROBLEM thermal
 
 MATERIAL soft k=0.5+x

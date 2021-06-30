@@ -18,6 +18,9 @@ exitifwrong $?
 answer1 read_mesh2d.fee 41 "12 22 14"
 exitifwrong $?
 
+answer1 read_mesh2d.fee 41bin "12 22 14"
+exitifwrong $?
+
 answer1 write_mesh2d.fee msh "0.531905"
 exitifwrong $?
 

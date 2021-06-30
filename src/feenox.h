@@ -2075,6 +2075,10 @@ extern int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical
 extern int feenox_mesh_write_scalar_gmsh(mesh_write_t *mesh_post, function_t *function, field_location_t field_location, char *printf_format);
 extern int feenox_mesh_write_vector_gmsh(mesh_write_t *mesh_post, function_t **function, field_location_t field_location, char *printf_format);
 
+extern int feenox_gmsh_read_data_int(mesh_t *this, size_t n, int *data, int binary);
+extern int feenox_gmsh_read_data_size_t(mesh_t *this, size_t n, size_t *data, int binary);
+extern int feenox_gmsh_read_data_double(mesh_t *this, size_t n, double *data, int binary);
+
 // write.c
 extern int feenox_instruction_mesh_write(void *arg);
 
