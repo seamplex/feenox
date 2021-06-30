@@ -3978,13 +3978,15 @@ int feenox_parse_fit(void) {
 ///kw+FIT+detail Convergence can be controlled by giving the relative and absolute tolreances with
 ///kw+FIT+detail `TOL_REL` (default `DEFAULT_NLIN_FIT_EPSREL`) and `TOL_ABS` (default `DEFAULT_NLIN_FIT_EPSABS`),
 ///kw+FIT+detail and with the maximum number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER).
+/*     
     } else if (strcasecmp(token, "TOL_REL") == 0) {
       feenox_call(feenox_parser_expression(&fit->tol_rel));
-
+*/
 ///kw+FIT+usage [ TOL_ABS <expr> ]
+/*     
     } else if (strcasecmp(token, "TOL_ABS") == 0) {
       feenox_call(feenox_parser_expression(&fit->tol_abs));
-
+*/
 ///kw+FIT+usage [ MAX_ITER <expr> ]@
     } else if (strcasecmp(token, "MAX_ITER") == 0) {
       double xi = 0;
@@ -4020,21 +4022,15 @@ int feenox_parse_fit(void) {
   }
 
   feenox_check_alloc(fit->via = calloc(fit->n_via,  sizeof(var_t *)));
-//  feenox_check_alloc(fit->sigma = calloc(fit->n_via, sizeof(var_t *)));
+  feenox_check_alloc(fit->sigma = calloc(fit->n_via, sizeof(var_t *)));
   var_ll_t *var_item = var_list;
   unsigned int i = 0;
   for (i = 0; i < fit->n_via; i++) {
     fit->via[i] = var_item->var;
 
-    // TODO
-/*    
-    sigma_name = malloc(strlen(varitem->var->name)+strlen("sigma_")+8);
-    snprintf(sigma_name, strlen(varitem->var->name)+strlen("sigma_")+8, "sigma_%s", varitem->var->name);
-    if ((fit->sigma[i] = feenox_define_variable(sigma_name)) == NULL) {
-      return FEENOX_ERROR;
-    }
-    feenox_free(sigma_name);
- */
+    char *name = NULL;
+    feenox_check_minusone(asprintf(&name, "sigma_%s", var_item->var->name));
+    feenox_check_alloc(fit->sigma[i] = feenox_define_variable_get_ptr(name));
         
     if ((var_item = var_item->next) == NULL && i != (fit->n_via-1)) {
       feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
@@ -4043,9 +4039,6 @@ int feenox_parse_fit(void) {
   }
 
   // TODO: choose
-  if (fit->algorithm == NULL) {
-    fit->algorithm = DEFAULT_FIT_METHOD;
-  }
   if (fit->max_iter == 0) {
     fit->max_iter = DEFAULT_FIT_MAX_ITER;
   }

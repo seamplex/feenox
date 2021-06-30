@@ -25,27 +25,31 @@ extern feenox_t feenox;
 int feenox_instruction_fit(void *arg) {
   fit_t *fit = (fit_t *)arg;
   
-  gsl_multifit_function_fdf f;
-  f.f = &feenox_gsl_fit_f;
-  f.df = &feenox_gsl_fit_df;
-  f.fdf = &feenox_gsl_fit_fdf;
-  
   if (fit->n_data == 0) {
     feenox_call(feenox_function_init(fit->data));
     fit->n_data = fit->data->data_size;
   }
-  f.n = fit->n_data;
-  f.p = fit->n_via;
-  f.params = fit;
+  if (fit->n_data < fit->n_via) {
+    feenox_push_error_message("less data points than free paramters for the fit");
+    return FEENOX_ERROR;
+  }
+  
+  gsl_multifit_nlinear_fdf fdf;
+  fdf.f = feenox_fit_f;
+  fdf.df = feenox_fit_df;
+  fdf.fvv = NULL;        // not using geodesic acceleration
+  fdf.n = fit->n_data;
+  fdf.p = fit->n_via;
+  fdf.params = fit;
 
   // initial guess
   gsl_vector *via = NULL;
-  feenox_check_alloc(via = gsl_vector_alloc(fit->n_via));
+  feenox_check_alloc(via = gsl_vector_calloc(fit->n_via));
   unsigned int i = 0;
   for (i = 0; i < fit->n_via; i++) {
     gsl_vector_set(via, i, feenox_var_value(fit->via[i]));
   }
-  
+
   feenox_check_alloc(fit->x = calloc(fit->data->n_arguments, sizeof(double)));
   
   if (fit->range.min != NULL && fit->range.max != NULL) {
@@ -58,77 +62,67 @@ int feenox_instruction_fit(void *arg) {
     }
   }
   
+  // initialization
+  const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
+  gsl_multifit_nlinear_parameters fdf_params = gsl_multifit_nlinear_default_parameters();
+  gsl_multifit_nlinear_workspace *w = NULL;
+  feenox_check_alloc(w = gsl_multifit_nlinear_alloc(T, &fdf_params, fit->n_data, fit->n_via));
+  gsl_multifit_nlinear_winit(via, NULL, &fdf, w);
 
-  gsl_multifit_fdfsolver *s = NULL;
-  feenox_check_alloc(s = gsl_multifit_fdfsolver_alloc(fit->algorithm, fit->n_data, fit->n_via));
-  feenox_call(gsl_multifit_fdfsolver_set(s, &f, via));
+  // compute initial cost function
+  gsl_vector *f = gsl_multifit_nlinear_residual(w);
+  double chisq0 = 0;
+  gsl_blas_ddot(f, f, &chisq0);
 
-  unsigned int iter = 0;
+  // solve the system
+  int info = 0;
   int gsl_status = GSL_SUCCESS;
-  if (fit->verbose) {
-    feenox_fit_print_state (fit, iter, gsl_status, s);
-  }
-
-  double tol_abs = 0;
-  double tol_rel = 0;
-  do {
-    gsl_status = gsl_multifit_fdfsolver_iterate(s);
-
-    if (fit->verbose) {
-      feenox_fit_print_state(fit, iter, gsl_status, s);
-    }
-
-    if (gsl_status)
-      break;
-
-    // TODO: check convergence due to gradient
-    tol_abs = (fit->tol_rel.items != NULL) ? feenox_expression_eval(&fit->tol_rel) : DEFAULT_FIT_EPSREL;
-    tol_rel = (fit->tol_abs.items != NULL) ? feenox_expression_eval(&fit->tol_rel) : DEFAULT_FIT_EPSABS;
-    gsl_status = gsl_multifit_test_delta(s->dx, s->x, tol_abs, tol_rel);
-    
-  } while (gsl_status == GSL_CONTINUE && iter < fit->max_iter);  
-
-
-  gsl_matrix *covar = NULL;
-  feenox_check_alloc(covar = gsl_matrix_alloc (fit->n_via, fit->n_via));
-  gsl_matrix *J = NULL;
-  feenox_check_alloc(J = gsl_matrix_alloc(fit->n_data, fit->n_via)); 
+  gsl_status = gsl_multifit_nlinear_driver(fit->max_iter, DEFAULT_FIT_XTOL, DEFAULT_FIT_GTOL, DEFAULT_FIT_FTOL, feenox_fit_print_state, fit, &info, w);
   
-// TODO: estudiar y entender que son estos errores
-#if (GSL_MAJOR_VERSION < 2)  
-  gsl_multifit_covar (s->J, 0.0, covar);
-#else
-  gsl_multifit_fdfsolver_jac(s, J);
-  gsl_multifit_covar(J, 0.0, covar);
-#endif
+  // compute covariance of best fit parameters
+  gsl_matrix *J = gsl_multifit_nlinear_jac(w);
+  gsl_matrix *covar = gsl_matrix_alloc(fit->n_via, fit->n_via);
+  gsl_multifit_nlinear_covar(J, 0.0, covar);
+
+  // compute final cost
+  double chisq = 0;
+  gsl_blas_ddot(f, f, &chisq);
+  
+  double dof = fit->n_data - fit->n_via;
+//  double c = GSL_MAX_DBL(1, sqrt(chisq / dof));
+  double c = (dof > 0) ? sqrt(chisq / dof) : 0;
   
   // got it, fill the variables with the results
-//  c = GSL_MAX_DBL(1, gsl_blas_dnrm2(s->f) / sqrt((double)(fit->n - fit->n_via))); 
   for (i = 0; i < fit->n_via; i++) {
-    feenox_var_value(fit->via[i]) = gsl_vector_get(s->x, i);
-//    feenox_var_value(fit->sigma[i]) = c*sqrt(gsl_matrix_get(covar, i, i));
+    feenox_var_value(fit->via[i]) = gsl_vector_get(w->x, i);
+    feenox_var_value(fit->sigma[i]) = c*sqrt(gsl_matrix_get(covar, i, i));
   }
   
   if (fit->verbose && feenox.rank == 0) {
-    double chi = gsl_blas_dnrm2(s->f);
     double dof = fit->n_data - fit->n_via;
-    printf("# chisq/dof = %g\n",  chi*chi / dof);
+    printf("# status = %s\n", gsl_strerror (gsl_status));  
+    printf("# summary from method '%s/%s'\n", gsl_multifit_nlinear_name(w), gsl_multifit_nlinear_trs_name(w));
+    printf("# number of iterations: %zu\n", gsl_multifit_nlinear_niter(w));
+    printf("# reason for stopping: %s\n", (info == 1) ? "small step size" : "small gradient");
+    printf("# variance of residuals  chisq/dof = %g\n",  chisq / dof);
+    printf("# initial |f(x)| = %f\n", sqrt(chisq0));
+    printf("# final   |f(x)| = %f\n", sqrt(chisq));
 
     for (i = 0; i < fit->n_via; i++) {
-//      printf ("# %s\t= %.5g # +/- %.5g\n", fit->via[i]->name, feenox_var_value(fit->via[i]),  feenox_var_value(fit->sigma[i]));
-      printf ("# %s\t= %+e # +/- 0\n", fit->via[i]->name, feenox_var_value(fit->via[i]));
+      printf ("# %s\t= %.5g # +/- %.5g\n", fit->via[i]->name, feenox_var_value(fit->via[i]), feenox_var_value(fit->sigma[i]));
     }
   }
 
   gsl_matrix_free(covar);
-  gsl_matrix_free(J);
-  gsl_multifit_fdfsolver_free(s);
+  gsl_multifit_nlinear_free(w);
+  
   if (fit->range_max == NULL) {
     feenox_free(fit->range_max)
   }      
   if (fit->range_min == NULL) {
     feenox_free(fit->range_min)
   }      
+
   feenox_free(fit->x)
   gsl_vector_free(via);
   
@@ -154,34 +148,6 @@ void feenox_fit_update_vias(fit_t *this, const gsl_vector *via) {
   return;
 }
 
-int feenox_fit_compute_f(fit_t *this, gsl_vector *f) {
-
-  size_t j = 0;
-  for (j = 0; j < this->n_data; j++) {
-    feenox_fit_update_x(this, j);
-    gsl_vector_set(f, j, feenox_fit_in_range(this) ? (feenox_function_eval(this->function, this->x) - this->data->data_value[j]) : 0);
-  }
-
-  return FEENOX_OK;
-}
-
-int feenox_fit_compute_df(fit_t *this, gsl_matrix *J) {
-
-  unsigned int i = 0;
-  size_t j = 0;  
-  int in_range = 0;
-  for (j = 0; j < this->n_data; j++) {
-    feenox_fit_update_x(this, j);
-    in_range = feenox_fit_in_range(this);
-    
-    for (i = 0; i < this->n_via; i++) {
-      gsl_matrix_set (J, j, i, (in_range) ? ((this->gradient != NULL) ? feenox_expression_eval(&this->gradient[i]) : feenox_expression_derivative_wrt_variable(&this->function->algebraic_expression, this->via[i], feenox_var_value(this->via[i]))) : 0); 
-    }      
-  }
-  
-  return FEENOX_OK;
-}
-
 int feenox_fit_in_range(fit_t *this) {
 
   if (this->range_min == NULL || this->range_max == NULL) {
@@ -198,46 +164,57 @@ int feenox_fit_in_range(fit_t *this) {
 }
 
 
-int feenox_gsl_fit_f(const gsl_vector *via, void *arg, gsl_vector *f) {
+int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f) {
   fit_t *this = (fit_t *)arg;
   
   feenox_fit_update_vias(this, via);  
-  feenox_fit_compute_f(this, f);
+  
+  size_t j = 0;
+  for (j = 0; j < this->n_data; j++) {
+    feenox_fit_update_x(this, j);
+    gsl_vector_set(f, j, feenox_fit_in_range(this) ? (feenox_function_eval(this->function, this->x) - this->data->data_value[j]) : 0);
+  }
 //  feenox_debug_print_gsl_vector(f, stdout);
 
   return GSL_SUCCESS;
 }
 
 
-int feenox_gsl_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J) {
+int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J) {
   fit_t *this = (fit_t *)arg;
 
   feenox_fit_update_vias(this, via);  
-  feenox_call(feenox_fit_compute_df(this, J));
+  
+  unsigned int i = 0;
+  size_t j = 0;  
+  int in_range = 0;
+  for (j = 0; j < this->n_data; j++) {
+    feenox_fit_update_x(this, j);
+    in_range = feenox_fit_in_range(this);
+    
+    for (i = 0; i < this->n_via; i++) {
+      gsl_matrix_set (J, j, i, (in_range) ? ((this->gradient != NULL) ? feenox_expression_eval(&this->gradient[i]) : feenox_expression_derivative_wrt_variable(&this->function->algebraic_expression, this->via[i], feenox_var_value(this->via[i]))) : 0); 
+    }      
+  }
 //  feenox_debug_print_gsl_matrix(J, stdout);
   
   return GSL_SUCCESS;
 }
 
-
-int feenox_gsl_fit_fdf(const gsl_vector *param, void *arg, gsl_vector *f, gsl_matrix *J) {
+void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w) {
   fit_t *this = (fit_t *)arg;
 
-  feenox_fit_update_vias(this, param);  
-  feenox_fit_compute_f(this, f);
-  feenox_call(feenox_fit_compute_df(this, J));
-  
-  return GSL_SUCCESS;
-}
+  if (this->verbose) {
+    gsl_vector *via = gsl_multifit_nlinear_position(w);
+    gsl_vector *f = gsl_multifit_nlinear_residual(w);
 
-
-void feenox_fit_print_state(fit_t *this, unsigned int iter, int gsl_status, gsl_multifit_fdfsolver *s) {
-  printf ("ititeration: %d\t", iter);
-  unsigned int i = 0;
-  for (i = 0; i < this->n_via; i++) {
-    printf("%+e ", gsl_vector_get(s->x, i));
-  }
-  printf("\tstatus = %s\t|r|^2 = %g\n",  gsl_strerror(gsl_status), gsl_blas_dnrm2 (s->f));
+    printf ("# iter %2zu\t", iter);
+    unsigned int i = 0;
+    for (i = 0; i < this->n_via; i++) {
+      printf("%+e ", gsl_vector_get(via, i));
+    }
+    printf("\tres = %.4g\n", gsl_blas_dnrm2(f));
+  }  
   
   return;
 }

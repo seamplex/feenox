@@ -39,7 +39,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_min.h>
-#include <gsl/gsl_multifit_nlin.h>
+#include <gsl/gsl_multifit_nlinear.h>
 #include <gsl/gsl_multimin.h>
 #include <gsl/gsl_multiroots.h>
 #include <gsl/gsl_qrng.h>
@@ -137,12 +137,10 @@
 
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
 
-#define DEFAULT_FIT_METHOD            gsl_multifit_fdfsolver_lmsder
 #define DEFAULT_FIT_MAX_ITER          100
-#define DEFAULT_FIT_EPSREL            1e-4
-#define DEFAULT_FIT_EPSABS            1e-6
-#define DEFAULT_FIT_GRAD_H            1e-2
-
+#define DEFAULT_FIT_XTOL              1e-8
+#define DEFAULT_FIT_GTOL              1e-8
+#define DEFAULT_FIT_FTOL              0.0
 
 #define MINMAX_ARGS           10
 
@@ -1331,7 +1329,6 @@ struct mesh_find_extrema_t {
 // fit an algebraic function to a pointwise-defined function
 struct fit_t {
   
-  const gsl_multifit_fdfsolver_type *algorithm;
   unsigned int max_iter;
   int verbose;
   
@@ -1348,7 +1345,7 @@ struct fit_t {
   // arreglo de apuntadores a las variables que funcionan como parametros
   // y a sus incertezas estadisticas resultantes
   var_t **via;
-//  var_t **sigma;
+  var_t **sigma;
 
   // arreglo de tamanio n_params con las expresiones de la derivada de 
   // la funcion function con respecto a los parametros
@@ -1361,8 +1358,8 @@ struct fit_t {
   // rango donde debe evaluarse la funcion a ajustar
   multidim_range_t range;
   
-  expr_t tol_abs;
-  expr_t tol_rel;
+  //expr_t tol_abs;
+  //expr_t tol_rel;
   
   // working pointers
   double *x;
@@ -1982,16 +1979,12 @@ extern int feenox_instruction_alias(void *arg);
 
 // fit.c
 extern int feenox_instruction_fit(void *arg);
-extern int feenox_gsl_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
-extern int feenox_gsl_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
-extern int feenox_gsl_fit_fdf(const gsl_vector *via, void *arg, gsl_vector *f, gsl_matrix *J);
-
-extern int feenox_fit_compute_f(fit_t *fit, gsl_vector *f);
-extern int feenox_fit_compute_df(fit_t *fit, gsl_matrix *J);
+extern int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
+extern int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
 extern int feenox_fit_in_range(fit_t *this);
 extern void feenox_fit_update_x(fit_t *this, size_t j);
 extern void feenox_fit_update_vias(fit_t *this, const gsl_vector *via);
-extern void feenox_fit_print_state(fit_t *this, unsigned int iter, int gsl_status, gsl_multifit_fdfsolver *s);
+extern void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w);
 
 
 // matrix.c

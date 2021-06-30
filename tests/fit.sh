@@ -14,3 +14,6 @@ exitifwrong $?
 
 answerdiff fit1d_gradient.fee
 exitifwrong $?
+
+answer fit1d_sigma.fee "0.158114"
+exitifwrong $?

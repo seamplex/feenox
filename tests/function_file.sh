@@ -11,3 +11,6 @@ fi
 
 answer function_file1d.fee "6.5"
 exitifwrong $?
+
+answer function_file1d_columns.fee "6.5"
+exitifwrong $?
