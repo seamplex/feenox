@@ -1,0 +1,2 @@
+FUNCTION f(x) FILE data1d_columns.dat COLUMNS 1 3
+PRINT f(2.5)

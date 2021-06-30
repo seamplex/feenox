@@ -19,6 +19,7 @@ TESTS = tests/abort.sh \
         tests/fit.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \
+        tests/function_file.sh \
         tests/function_vectors.sh \
         tests/integral.sh \
         tests/materials.sh \
