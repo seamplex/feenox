@@ -886,6 +886,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         }
         feenox_check_alloc(function->data_value = calloc(num_nodes, sizeof(double)));
       }  
+
+      feenox_mesh_gmsh_readnewline();
       
       size_t j = 0;
       int node = 0;
