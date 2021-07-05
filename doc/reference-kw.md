@@ -125,9 +125,43 @@ The file will be actually openened (and eventually closed) automatically.
 In the rare case where the automated opening and closing does not fit the expected workflow,
 the file can be explicitly opened or closed with the instructions `FILE_OPEN` and `FILE_CLOSE`.
 
+##  FIND_EXTREMA
+
+Find and/or compute the absolute extrema of a function or expression over a mesh (or a subset of it).
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+FIND_EXTREMA { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
+ [ MIN <variable> ] [ MAX <variable> ] [ X_MIN <variable> ] [ X_MAX <variable> ] [ Y_MIN <variable> ] [ Y_MAX <variable> ] [ Z_MIN <variable> ] [ Z_MAX <variable> ] [ I_MIN <variable> ] [ I_MAX <variable> ]
+~~~
+:::
+
+
+
+Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
+By default the search is performed over the highest-dimensional elements of the mesh,
+i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
+If the search is to be carried out over just a physical group, it has to be given in `OVER`.
+If there are more than one mesh defined, an explicit one has to be given with `MESH`.
+Either `NODES` or `CELLS` define how the integration is to be performed.
+With `NODES` the integration is performed using the Gauss points
+and weights associated to each element type.
+With `CELLS` the integral is computed as the sum of the product of the
+integrand at the center of each cell (element) and the cell’s volume.
+Do expect differences in the results and efficiency between these two approaches
+depending on the nature of the integrand.
+The value of the absolute minimum (maximum) is stored in the variable indicated by `MIN` (`MAX`).
+If the variable does not exist, it is created.
+The value of the $x$-$y$-$z$\ coordinate of the absolute minimum (maximum)
+is stored in the variable indicated by `X_MIN`-`Y_MIN`-`Z_MIN` (`X_MAX`-`Y_MAX`-`Z_MAX`).
+If the variable does not exist, it is created.
+The index (either node or cell) where the absolute minimum (maximum) is found
+is stored in the variable indicated by `I_MIN` (`I_MAX`).
+
 ##  FIT
 
-Fit a function of one or more arguments to a set of pointwise-defined data.
+Find parameters to fit an analytical function to a pointwise-defined function.
 
 
 ::: {.usage}
@@ -136,21 +170,27 @@ FIT <function_to_be_fitted> TO <function_with_data> VIA <var_1> <var_2> ... <var
  [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
  [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]
  [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]
- [ DELTAEPSREL <expr> ] [ DELTAEPSABS <expr> ] [ MAX_ITER <expr> ]
- [ VERBOSE ] [ RERUN | DO_NOT_RERUN ]
-
+ [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
+ [ VERBOSE ]
 ~~~
 :::
 
 
 
+The combination of arguments that minimize the function are computed and stored in the variables.
+So if `f(x,y)` is to be minimized, after a `MINIMIZE f` both `x` and `y` would have the appropriate values.
+The details of the method used can be found in [GSL’s documentation](https:\//www.gnu.org/software/gsl/doc/html/multimin.html).
+Some of them use derivatives and some of them do not.
+Default method is `DEFAULT_MINIMIZER_METHOD`, which does not need derivatives.
 The function with the data has to be point-wise defined
-(i.e. a `FUNCTION` read from a file with inline `DATA`).
+(i.e. a `FUNCTION` read from a file, with inline `DATA` or defined over a mesh).
 The function to be fitted has to be parametrized with at least one of
-the variables provided after the `VIA` keyword.
+the variables provided after the `USING` keyword.
+For example to fit\ $f(x,y)=a x^2 + b sqrt(y)$ to a pointwise-defined
+function\ $g(x,y)$ one gives `FIT f TO g VIA a b`.
 Only the names of the functions have to be given, not the arguments.
 Both functions have to have the same number of arguments.
-The initial guess of the solution is given by the initial value of the variables listed in the `VIA` keyword.
+The initial guess of the solution is given by the initial value of the variables after the `VIA` keyword.
 Analytical expressions for the gradient of the function to be fitted with respect
 to the parameters to be fitted can be optionally given with the `GRADIENT` keyword.
 If none is provided, the gradient will be computed numerically using finite differences.
@@ -159,14 +199,9 @@ The expressions give the range of the arguments of the functions, not of the par
 For multidimensional fits, the range is an hypercube.
 If no range is given, all the definition points of the function with the data are used for the fit.
 Convergence can be controlled by giving the relative and absolute tolreances with
-`DELTAEPSREL` (default `DEFAULT_NLIN_FIT_EPSREL`) and `DELTAEPSABS` (default `DEFAULT_NLIN_FIT_EPSABS`),
+`TOL_REL` (default `DEFAULT_NLIN_FIT_EPSREL`) and `TOL_ABS` (default `DEFAULT_NLIN_FIT_EPSABS`),
 and with the maximum number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER).
 If the optional keyword `VERBOSE` is given, some data of the intermediate steps is written in the standard output.
-The combination of arguments that minimize the function are computed and stored in the variables.
-So if `f(x,y)` is to be minimized, after a `MINIMIZE f` both `x` and `y` would have the appropriate values.
-The details of the method used can be found in [GSL’s documentation](https:\//www.gnu.org/software/gsl/doc/html/multimin.html).
-Some of them use derivatives and some of them do not.
-Default method is `DEFAULT_MINIMIZER_METHOD`, which does not need derivatives.
 
 ##  FUNCTION
 
@@ -338,6 +373,39 @@ Wasora should be able to automatically detect which variables in phase-space are
 which are purely algebraic. However, the [`DIFFERENTIAL`] keyword may be used to explicitly define them.
 See the (SUNDIALS documentation)[https://computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
 
+##  INTEGRATE
+
+Spatially integrate a function or expression over a mesh (or a subset of it).
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+INTEGRATE { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
+ RESULT <variable>
+
+~~~
+:::
+
+
+
+Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
+If the integrand is a function, do not include the arguments, i.e. instead of `f(x,y,z)` just write `f`.
+The results should be the same but efficiency will be different (faster for pure functions).
+By default the integration is performed over the highest-dimensional elements of the mesh,
+i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
+If the integration is to be carried out over just a physical group, it has to be given in `OVER`.
+If there are more than one mesh defined, an explicit one has to be given with `MESH`.
+Either `NODES` or `CELLS` define how the integration is to be performed.
+With `NODES` the integration is performed using the Gauss points
+and weights associated to each element type.
+With `CELLS` the integral is computed as the sum of the product of the
+integrand at the center of each cell (element) and the cell’s volume.
+Do expect differences in the results and efficiency between these two approaches
+depending on the nature of the integrand.
+The scalar result of the integration is stored in the variable given by
+the mandatory keyword `RESULT`.
+If the variable does not exist, it is created.
+
 ##  M4
 
 Call the `m4` macro processor with definitions from feenox variables or expressions.
@@ -401,58 +469,6 @@ in which case the expressions will be evaluated the very first time the matrix i
 and row-major-assigned to each of the elements.
 If there are less elements than the matrix size, the remaining values will be zero.
 If there are more elements than the matrix size, the values will be ignored.
-
-##  MESH_READ
-
-
-
-::: {.usage}
-~~~{.feenox style=feenox}
-{ <file_path> | <file_id> } [ DIMENSIONS <num_expr> ]
- [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
- [ INTEGRATION { full | reduced } ]
- [ MAIN ] [ UPDATE_EACH_STEP ]
- [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
- [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
-
-~~~
-:::
-
-
-
-Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-The format is read from the extension, which should be either
-
- * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\//gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
- * `.vtk` [ASCII legacy VTK](https:\//lorensen.github.io/VTKExamples/site/VTKFileFormats/)
- * `.frd` [CalculiX’s FRD ASCII output](https:\//web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
-
-Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
-physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
-The other formats are primarily supported to read function data contained in the file
-and eventually, to operate over these functions (i.e. take differences with other functions contained
-in other files to compare results).
-The file path or file id can be used to refer to a particular mesh when reading more than one,
-for instance in a `MESH_WRITE` or `MESH_INTEGRATE` keyword.
-If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
-`cool_mesh.msh` or just `cool_mesh`.
-The spatial dimensions cab be given with `DIMENSION`.
-If material properties are uniform and given with variables,
-the number of dimensions are not needed and will be read from the file at runtime.
-But if either properties are given by spatial functions or if functions
-are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
-the number of dimensions ought to be given explicitly because FeenoX needs to know
-how many arguments these functions take.
-If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
-When defining several meshes and solving a PDE problem, the mesh used
-as the PDE domain is the one marked with `MAIN`.
-If none of the meshes is explicitly marked as main, the first one is used.
-If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
-each time step. Default is to read the mesh once, except if the file path changes with time.
-For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
-is defined and filled with the scalar data named `<name_in_mesh>` contained in the mesh file.
-The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
-If no mesh is marked as `MAIN`, the first one is the main one.
 
 ##  MESH_WRITE
 
@@ -808,12 +824,51 @@ Read an unstructured mesh and (optionally) functions of space-time from a file.
 
 ::: {.usage}
 ~~~{.feenox style=feenox}
-READ_MESH
+READ_MESH { <file_path> | <file_id> } [ DIMENSIONS <num_expr> ]
+ [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
+ [ INTEGRATION { full | reduced } ]
+ [ MAIN ] [ UPDATE_EACH_STEP ]
+ [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
+ [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
+
 ~~~
 :::
 
 
 
+Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+The format is read from the extension, which should be either
+
+ * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\//gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
+ * `.vtk` [ASCII legacy VTK](https:\//lorensen.github.io/VTKExamples/site/VTKFileFormats/)
+ * `.frd` [CalculiX’s FRD ASCII output](https:\//web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
+
+Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
+physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
+The other formats are primarily supported to read function data contained in the file
+and eventually, to operate over these functions (i.e. take differences with other functions contained
+in other files to compare results).
+The file path or file id can be used to refer to a particular mesh when reading more than one,
+for instance in a `WRITE_MESH` or `INTEGRATE` keyword.
+If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
+`cool_mesh.msh` or just `cool_mesh`.
+The spatial dimensions cab be given with `DIMENSION`.
+If material properties are uniform and given with variables,
+the number of dimensions are not needed and will be read from the file at runtime.
+But if either properties are given by spatial functions or if functions
+are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
+the number of dimensions ought to be given explicitly because FeenoX needs to know
+how many arguments these functions take.
+If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
+When defining several meshes and solving a PDE problem, the mesh used
+as the PDE domain is the one marked with `MAIN`.
+If none of the meshes is explicitly marked as main, the first one is used.
+If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
+each time step. Default is to read the mesh once, except if the file path changes with time.
+For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+is defined and filled with the scalar data named `<name_in_mesh>` contained in the mesh file.
+The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
+If no mesh is marked as `MAIN`, the first one is the main one.
 
 ##  SEMAPHORE
 

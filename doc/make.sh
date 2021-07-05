@@ -20,6 +20,7 @@ cd ..
  pandoc README.md  -t plain -o README          --standalone --toc --reference-links --reference-location=section --lua-filter doc/not-in-format.lua
  pandoc TODO.md    -t plain -o TODO
 cd doc
+./pdf.sh ../README
 
 # srs & sds
 echo "creating doc's README"

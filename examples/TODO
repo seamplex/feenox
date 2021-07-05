@@ -1,0 +1,8 @@
+ * solving a maze with plane stress
+ * parallelepiped with $E=1000/800-T$
+ * notched and holed plates, comparison with Peterson's book
+ * 3 elastic perfectly-plastic bars in parallel, hysteresis
+ * Mmax/Mmin = 3/2 
+ * plane + rocket
+ * NAFEMS cases solved as in the case, link to detailed mesh convergence in case
+ 

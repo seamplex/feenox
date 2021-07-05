@@ -103,6 +103,7 @@ EOF
 pandoc -s ${stuff}.md \
   --filter pandoc-crossref \
   --lua-filter not-in-format.lua \
+  --lua-filter code-style.lua \
   --template=single.tex \
   --pdf-engine=xelatex \
   --listings --number-sections \

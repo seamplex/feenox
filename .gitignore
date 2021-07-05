@@ -16,6 +16,8 @@ test-driver
 test-suite.log
 version.m4
 
+README.pdf
+
 feenox
 *.tar.gz
 

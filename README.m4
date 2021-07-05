@@ -4,6 +4,23 @@ subtitle: a free no-fee no-X uniX-like finite-element(ish) computational enginee
 titleblock: |
  FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
  =======================================================================================
+
+lang: en-US
+number-sections: true
+fontsize: 11pt
+geometry:
+- paper=a4paper
+- left=2.5cm
+- right=2cm
+- bottom=3.5cm
+- foot=2cm
+- top=3.5cm
+- head=2cm
+colorlinks: true
+mathspec: true
+syntax-definition: feenox.xml
+listings: true
+toc: false
 ...
 
 ::: {.not-in-format .plain .markdown .gfm .plain .latex }
@@ -20,6 +37,7 @@ titleblock: |
 :::{.alert .alert-warning}
 > Please note that FeenoX is a [back end](https://en.wikipedia.org/wiki/Front_and_back_ends) aimed at advanced users.
 > It **does not include a graphical interface**. For an easy-to-use web-based front end with FeenoX running in the cloud directly from your browser see [CAEplex](https://www.caeplex.com) at <https://www.caeplex.com>.
+> Any contribution to make dekstop GUIs such as [PrePoMax](https://prepomax.fs.um.si/) or [FreeCAD](http://https://www.freecadweb.org) to work with FeenoX are welcome.
 
 :::::: {.not-in-format .plain .markdown .gfm .plain .latex }
 <div class="embed-responsive embed-responsive-16by9 mb-3">
@@ -34,8 +52,11 @@ titleblock: |
 FeenoX can be seen as
 
  * a syntactically-sweetened way of asking the computer to solve engineering-related mathematical problems, and/or
- * a finite-element tool with a particular design basis
+ * a finite-element(ish) tool with a particular design basis
 
+Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
+
+include(doc/design/thermal1d.md)
 include(doc/design/lorenz-le11.md)
  
 In other words, FeenoX is a computational tool to solve
@@ -45,34 +66,29 @@ In other words, FeenoX is a computational tool to solve
  * steady or transient heat conduction problems, or
  * modal analysis problems,
  * neutron diffusion or transport problems
+ * community-contributed problems
 
 in such a way that the input is a near-English text file that defines the problem to be solved. Some basic rules are
 
- * FeenoX is just a _solver_ working as a transfer function between input and output files. Following the [UNIX rule of separation](http://catb.org/~esr/writings/taoup/html/ch01s06.html), **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
+ * FeenoX is just a **solver** working as a _transfer function_ between input and output files. Following the _rules of separation_, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
+ 
+dnl show the same output (NAFEMS LE1?) with Gmsh and Paraview, quads struct/tri unstruct.
+ 
  * The input files should be [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) so as to be as self-describing as possible.
- * Simple problems ought to need simple input files. Here is the input for solving thermal conduction on a simple dimensionless one-dimensional slab with a temperature-dependent conductivity given by an algebraic expression:
+ * Simple problems ought to need simple input files.
+ * Similar problems ought to need similar input files.
+ * Everything is an expression. Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
  
-   ```{.feenox style=feenox}
-   READ_MESH slab.msh
-   PROBLEM heat DIMENSIONS 1
-   k(x) := 1+T(x)  # temperature-dependent conductivity
-   BC left  T=0    # Dirichlet conditions at both ends
-   BC right T=1
-   SOLVE_PROBLEM
-   # difference between FEM and analytical solution, should be zero
-   PRINT T(0.5)-(sqrt(1+(3*0.5))-1)  
-   ```
- * Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
- 
-   ```{.feenox style=feenox}
+   ```feenox
    sigma = 1       # non-dimensional stefan-boltzmann constant
    e = 0.8         # emissivity 
    Tinf=1          # non-dimensional reference temperature
    BC right q=sigma*e*(Tinf^4-T(x)^4)
    ```
+   
  * FeenoX should run natively in the cloud and be able to massively scale in parallel. See the [Software Requirements Specification](doc/sds.md) and the [Software Development Specification](doc/sds.md) for details.
  
-Since it is free ([as in freedom](https://www.gnu.org/philosophy/free-sw.en.html)) and open source, contributions to add features (and to fix bugs) are welcome. See the [documentation](doc) for details about how to contribute.
+Since it is free ([as in freedom](https://www.gnu.org/philosophy/free-sw.en.html)) and open source, contributions to add features (and to fix bugs) are welcome. In particular, each kind of problem supported by FeenoX (thermal, mechanical, modal, etc.) has a subdirectory of source files which can be used as a template to add new problems, as implied in the “community-contributed problems” bullet above (_rules of modularity and extensibility_). See the [documentation](doc) for details about how to contribute.
 
 
  
@@ -113,7 +129,9 @@ Home page: <https://www.seamplex.com/feenox>
 Repository: <https://github.com/seamplex/feenox.git>  
 Mailing list and bug reports: <wasora@seamplex.com>  (you need to subscribe first at <wasora+subscribe@seamplex.com>)  
 Web interface for mailing list: <https://www.seamplex.com/lists.html>  
-Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA) [LinkedIn](https://www.linkedin.com/company/seamplex/) [Github](https://github.com/seamplex)
+Follow us: [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA)
+           [LinkedIn](https://www.linkedin.com/company/seamplex/)
+           [Github](https://github.com/seamplex)
 
 ---------------------------
 

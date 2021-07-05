@@ -4,6 +4,23 @@ subtitle: a free no-fee no-X uniX-like finite-element(ish) computational enginee
 titleblock: |
  FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
  =======================================================================================
+
+lang: en-US
+number-sections: true
+fontsize: 11pt
+geometry:
+- paper=a4paper
+- left=2.5cm
+- right=2cm
+- bottom=3.5cm
+- foot=2cm
+- top=3.5cm
+- head=2cm
+colorlinks: true
+mathspec: true
+syntax-definition: feenox.xml
+listings: true
+toc: false
 ...
 
 ::: {.not-in-format .plain .markdown .gfm .plain .latex }
@@ -20,6 +37,7 @@ titleblock: |
 :::{.alert .alert-warning}
 > Please note that FeenoX is a [back end](https://en.wikipedia.org/wiki/Front_and_back_ends) aimed at advanced users.
 > It **does not include a graphical interface**. For an easy-to-use web-based front end with FeenoX running in the cloud directly from your browser see [CAEplex](https://www.caeplex.com) at <https://www.caeplex.com>.
+> Any contribution to make dekstop GUIs such as [PrePoMax](https://prepomax.fs.um.si/) or [FreeCAD](http://https://www.freecadweb.org) to work with FeenoX are welcome.
 
 :::::: {.not-in-format .plain .markdown .gfm .plain .latex }
 <div class="embed-responsive embed-responsive-16by9 mb-3">
@@ -34,9 +52,94 @@ titleblock: |
 FeenoX can be seen as
 
  * a syntactically-sweetened way of asking the computer to solve engineering-related mathematical problems, and/or
- * a finite-element tool with a particular design basis
+ * a finite-element(ish) tool with a particular design basis
 
-For example, the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system)---the one of the butterfly---whose differential equations are
+Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
+
+One of the main features of this allegedly particular design basis is that **simple problems ought to have simple inputs** (_rule of simplicity_). For instance, to solve one-dimensional heat conduction over the domain $x\in[0,1]$ (which is indeed one of the most simple engineering problems we can find) the following input file is enough:
+
+```feenox
+READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
+PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+k = 1                            # set uniform conductivity
+BC left  T=0                     # set fixed temperatures as BCs
+BC right T=1                     # "left" and "right" are defined in the mesh
+SOLVE_PROBLEM                    # tell FeenoX we are ready to solve the problem
+PRINT T(0.5)                     # ask for the temperature at x=0.5
+```
+
+```terminal
+$ feenox thermal-1d-dirichlet-constant-k.fee 
+0.5
+$ 
+```
+
+The mesh is assumed to have been already created with [Gmsh](http://gmsh.info/) (or any other pre-processing tool and converted to `.msh` format with [Meshio](https://github.com/nschloe/meshio) for example). This assumption follows the _rule of composition_  and prevents the actual input file to be polluted with mesh-dependent data such as node coordinates and/or nodal loads) so as to keep it simple and make it [Git](https://git-scm.com/)-friendly (_rule of generation_). The only link between the mesh and the FeenoX input file is through physical groups (in the case above `left` and `right`) used to set boundary conditions and/or material properties.
+
+Another design-basis decision is that **similar problems ought to have similar inputs** (_rule of least surprise_). So in order to have a space-dependent conductivity, we only have to replace one line in the input above: instead of defining a scalar $k$ we define a function of $x$ (we also update the output to show the analytical solution as well):
+
+```feenox
+READ_MESH slab.msh
+PROBLEM thermal DIMENSIONS 1
+k(x) := 1+x                      # space-dependent conductivity
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(1/2) log(1+1/2)/log(2)   # print numerical and analytical solutions
+```
+
+We now expect a difference between the numerical and analytical solutions due the the discretization:
+
+```terminal
+$ feenox thermal-1d-dirichlet-space-k.fee 
+0.584959	0.584963
+$
+```
+
+FeenoX has an **everything is an expression** design principle, meaning that any numerical input can be an algebraic expression (e.g. `T(1/2)` is the same as `T(0.5)`). If we want to have a temperature-dependent conductivity (which turns the problem non-linear) we can take advantage of the fact that $T(x)$ is available not only as an argument to `PRINT` but also for the definition of algebraic functions:
+
+```feenox
+READ_MESH slab.msh
+PROBLEM thermal DIMENSIONS 1
+k(x) := 1+T(x)                   # temperature-dependent conductivity
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(1/2) sqrt(1+(3*0.5))-1   # print numerical and analytical solutions
+```
+
+```terminal
+$ feenox thermal-1d-dirichlet-temperature-k.fee 
+0.581139	0.581139
+$
+```
+
+For example, we would be to solve the [NAFEMS\ LE11](https://www.nafems.org/publications/resource_center/p18/) “Solid cylinder/Taper/Sphere-Temperature” benchmark like
+
+```{.feenox style=feenox}
+READ_MESH nafems-le11.msh DIMENSIONS 3
+PROBLEM mechanical
+
+# linear temperature gradient in the radial and axial direction
+T(x,y,z) := sqrt(x^2 + y^2) + z
+
+# Boundary conditions
+BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
+BC yz     symmetry  # ide with u=0
+BC xy     w=0
+BC HIH'I' w=0
+
+# material properties (isotropic & uniform so we can use scalar constants)
+E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
+nu = 0.3            # dimensionless
+alpha = 2.3e-4      # in 1/ºC as in the problem
+
+SOLVE_PROBLEM
+WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
+PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
+```
+
+Another example would be the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system)---the one of the butterfly---whose differential equations are
 
 ```{=plain}
 dx/dt = σ (y-x)  
@@ -56,9 +159,7 @@ dz/dt = x y - b z
 
 ::: {.not-in-format .plain .latex }
 $$\dot{x} = \sigma \cdot (y - x)$$
-
 $$\dot{y} = x \cdot (r - z) - y$$
-
 $$\dot{z} = x \cdot y - b \cdot z$$
 :::
 
@@ -84,35 +185,11 @@ z_dot .= x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
-Another example would be to solve the [NAFEMS\ LE11](https://www.nafems.org/publications/resource_center/p18/) “Solid cylinder/Taper/Sphere-Temperature” benchmark like
-
-```{.feenox style=feenox}
-READ_MESH nafems-le11.msh DIMENSIONS 3
-PROBLEM mechanical
-
-# linear temperature gradient in the radial and axial direction
-T(x,y,z) := sqrt(x^2 + y^2) + z
-
-# Boundary conditions
-BC xz     v=0
-BC yz     u=0
-BC xy     w=0
-BC HIH'I' w=0
-
-# material properties (isotropic & uniform so we can use scalar constants)
-E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
-nu = 0.3
-alpha = 2.3e-4      # in 1/ºC as in the problem
-
-SOLVE_PROBLEM
-WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
-PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
-```
 
 Please note the following two points about both cases above:
 
- 1. the input files are very similar to the statements of each problem in plain English words as in the [UNIX rule of clarity](http://catb.org/~esr/writings/taoup/html/ch01s06.html).
- 2. 100% of FeenoX’ output is controlled by the user. Had there not been any `PRINT` or `WRITE_MESH` instructions, the output would have been empty, following the [UNIX rule of silence](http://catb.org/~esr/writings/taoup/html/ch01s06.html).
+ 1. The input files are very similar to the statements of each problem in plain English words as in the _rule of clarity_. Take some time to read the [problem statement of the NAFEMS\ LE11 benchmark](doc/design/nafems-le11/nafems-le11.png) and the FeenoX input to see how well the latter matches the former.
+ 2. By design, 100% of FeenoX’ output is controlled by the user. Had there not been any `PRINT` or `WRITE_MESH` instructions, the output would have been empty, following the _rule of silence_. This is a significant change with respect to engineering codes that date back from times when a CPU hour was worth dozens (or even hundreds) of engineering hours. At that time, cognizant engineers had to dig into thousands of lines of data to search for a particular individual result when it is actually far easier to ask the code to write only what is needed in the particular format that suits the user following the _rule of economy_.
 
  
 In other words, FeenoX is a computational tool to solve
@@ -122,34 +199,28 @@ In other words, FeenoX is a computational tool to solve
  * steady or transient heat conduction problems, or
  * modal analysis problems,
  * neutron diffusion or transport problems
+ * community-contributed problems
 
 in such a way that the input is a near-English text file that defines the problem to be solved. Some basic rules are
 
- * FeenoX is just a _solver_ working as a transfer function between input and output files. Following the [UNIX rule of separation](http://catb.org/~esr/writings/taoup/html/ch01s06.html), **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
+ * FeenoX is just a **solver** working as a _transfer function_ between input and output files. Following the _rules of separation_, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
+ 
+ 
  * The input files should be [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) so as to be as self-describing as possible.
- * Simple problems ought to need simple input files. Here is the input for solving thermal conduction on a simple dimensionless one-dimensional slab with a temperature-dependent conductivity given by an algebraic expression:
+ * Simple problems ought to need simple input files.
+ * Similar problems ought to need similar input files.
+ * Everything is an expression. Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
  
-   ```{.feenox style=feenox}
-   READ_MESH slab.msh
-   PROBLEM heat DIMENSIONS 1
-   k(x) := 1+T(x)  # temperature-dependent conductivity
-   BC left  T=0    # Dirichlet conditions at both ends
-   BC right T=1
-   SOLVE_PROBLEM
-   # difference between FEM and analytical solution, should be zero
-   PRINT T(0.5)-(sqrt(1+(3*0.5))-1)  
-   ```
- * Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
- 
-   ```{.feenox style=feenox}
+   ```feenox
    sigma = 1       # non-dimensional stefan-boltzmann constant
    e = 0.8         # emissivity 
    Tinf=1          # non-dimensional reference temperature
    BC right q=sigma*e*(Tinf^4-T(x)^4)
    ```
+   
  * FeenoX should run natively in the cloud and be able to massively scale in parallel. See the [Software Requirements Specification](doc/sds.md) and the [Software Development Specification](doc/sds.md) for details.
  
-Since it is free ([as in freedom](https://www.gnu.org/philosophy/free-sw.en.html)) and open source, contributions to add features (and to fix bugs) are welcome. See the [documentation](doc) for details about how to contribute.
+Since it is free ([as in freedom](https://www.gnu.org/philosophy/free-sw.en.html)) and open source, contributions to add features (and to fix bugs) are welcome. In particular, each kind of problem supported by FeenoX (thermal, mechanical, modal, etc.) has a subdirectory of source files which can be used as a template to add new problems, as implied in the “community-contributed problems” bullet above (_rules of modularity and extensibility_). See the [documentation](doc) for details about how to contribute.
 
 
  
@@ -168,25 +239,25 @@ If the statically-linked binaries above do not fit your needs, the recommended w
 
  1. Install mandatory dependencies
 
-    ```{.terminal style=terminal}
+    ```terminal
     sudo apt-get install git gcc make automake autoconf libgsl-dev
     ```
 
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
-    ```{.terminal style=terminal}
+    ```terminal
     sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
     ```
 
  3. Clone Github repository
  
-    ```{.terminal style=terminal}
+    ```terminal
     git clone https://github.com/seamplex/feenox
     ```
 
  4. Boostrap, configure, compile & make
  
-    ```{.terminal style=terminal}
+    ```terminal
     cd feenox
     ./autogen.sh
     ./configure
@@ -195,13 +266,13 @@ If the statically-linked binaries above do not fit your needs, the recommended w
 
  5. Run test suite (optional, this might take some time)
  
-    ```{.terminal style=terminal}
+    ```terminal
     make check
     ```
 
  6. Install the binary system wide (optional)
  
-    ```{.terminal style=terminal}
+    ```terminal
     sudo make install
     ```
 
@@ -228,7 +299,9 @@ Home page: <https://www.seamplex.com/feenox>
 Repository: <https://github.com/seamplex/feenox.git>  
 Mailing list and bug reports: <wasora@seamplex.com>  (you need to subscribe first at <wasora+subscribe@seamplex.com>)  
 Web interface for mailing list: <https://www.seamplex.com/lists.html>  
-Follow us: [Twitter](https://twitter.com/seamplex/) [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA) [LinkedIn](https://www.linkedin.com/company/seamplex/) [Github](https://github.com/seamplex)
+Follow us: [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA)
+           [LinkedIn](https://www.linkedin.com/company/seamplex/)
+           [Github](https://github.com/seamplex)
 
 ---------------------------
 

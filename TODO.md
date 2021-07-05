@@ -2,8 +2,8 @@
 
  * https://joss.theoj.org/
  * FIT to mesh-based functions
+ * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
- * binary .msh and .vtk
 
 ## Tests
  
