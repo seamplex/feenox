@@ -60,11 +60,11 @@ The mesh is assumed to have been already created with [Gmsh][] (or any
 other pre-processing tool and converted to `.msh` format with [Meshio][]
 for example). This assumption follows the *rule of composition* and
 prevents the actual input file to be polluted with mesh-dependent data
-such as node coordinates and/or nodal loads) so as to keep it simple and
-make it [Git][]-friendly (*rule of generation*). The only link between
-the mesh and the FeenoX input file is through physical groups (in the
-case above `left` and `right`) used to set boundary conditions and/or
-material properties.
+(such as node coordinates and/or nodal loads) so as to keep it simple
+and make it [Git][]-friendly (*rule of generation*). The only link
+between the mesh and the FeenoX input file is through physical groups
+(in the case above `left` and `right`) used to set boundary conditions
+and/or material properties.
 
 Another design-basis decision is that **similar problems ought to have
 similar inputs** (*rule of least surprise*). So in order to have a
@@ -82,9 +82,6 @@ SOLVE_PROBLEM
 PRINT T(1/2) log(1+1/2)/log(2)   # print numerical and analytical solutions
 ```
 
-We now expect a difference between the numerical and analytical
-solutions due the the discretization:
-
 ``` terminal
 $ feenox thermal-1d-dirichlet-space-k.fee 
 0.584959    0.584963
@@ -94,9 +91,9 @@ $
 FeenoX has an **everything is an expression** design principle, meaning
 that any numerical input can be an algebraic expression (e.g. `T(1/2)`
 is the same as `T(0.5)`). If we want to have a temperature-dependent
-conductivity (which turns the problem non-linear) we can take advantage
-of the fact that *T*(*x*) is available not only as an argument to
-`PRINT` but also for the definition of algebraic functions:
+conductivity (which renders the problem non-linear) we can take
+advantage of the fact that *T*(*x*) is available not only as an argument
+to `PRINT` but also for the definition of algebraic functions:
 
 ``` feenox
 READ_MESH slab.msh
@@ -114,7 +111,7 @@ $ feenox thermal-1d-dirichlet-temperature-k.fee
 $
 ```
 
-For example, we would be to solve the [NAFEMS LE11][] “Solid
+For example, we can solve the [NAFEMS LE11][] “Solid
 cylinder/Taper/Sphere-Temperature” benchmark like
 
 ``` feenox
@@ -146,14 +143,16 @@ system][]—the one of the butterfly—whose differential equations are
 <div class="not-in-format plain latex">
 
 *ẋ* = *σ* ⋅ (*y* − *x*)
+  
 *ẏ* = *x* ⋅ (*r* − *z*) − *y*
+  
 *ż* = *x* ⋅ *y* − *b* ⋅ *z*
 
 </div>
 
 where *σ* = 10, *b* = 8/3 and *r* = 28 are the classical parameters that
 generate the butterfly as presented by Edward Lorenz back in his seminal
-1963 paper [Deterministic non-periodic flow][], can be solved with
+1963 paper [Deterministic non-periodic flow][]. We can solve it with
 FeenoX by writing the equations in the input file as naturally as
 possible, as illustrated in the input file that follows:
 
@@ -180,19 +179,22 @@ PRINT t x y z        # four-column plain-ASCII output
 Please note the following two points about both cases above:
 
 1.  The input files are very similar to the statements of each problem
-    in plain English words as in the *rule of clarity*. Take some time
-    to read the [problem statement of the NAFEMS LE11 benchmark][] and
-    the FeenoX input to see how well the latter matches the former.
+    in plain English words (*rule of clarity*). Take some time to read
+    the [problem statement of the NAFEMS LE11 benchmark][] and the
+    FeenoX input to see how well the latter matches the former. Same for
+    the Lorenz’ chaotic system. Those with some experience may want to
+    compare them to the inputs decks (sic) needed for other common FEA
+    programs.
 2.  By design, 100% of FeenoX’ output is controlled by the user. Had
     there not been any `PRINT` or `WRITE_MESH` instructions, the output
     would have been empty, following the *rule of silence*. This is a
-    significant change with respect to engineering codes that date back
-    from times when a CPU hour was worth dozens (or even hundreds) of
-    engineering hours. At that time, cognizant engineers had to dig into
-    thousands of lines of data to search for a particular individual
-    result when it is actually far easier to ask the code to write only
-    what is needed in the particular format that suits the user
-    following the *rule of economy*.
+    significant change with respect to traditional engineering codes
+    that date back from times when one CPU hour was worth dozens (or
+    even hundreds) of engineering hours. At that time, cognizant
+    engineers had to dig into thousands of lines of data to search for a
+    single individual result. Nowadays, following the *rule of economy*,
+    it is actually far easier to ask the code to write only what is
+    needed in the particular format that suits the user.
 
 In other words, FeenoX is a computational tool to solve
 
@@ -207,8 +209,8 @@ in such a way that the input is a near-English text file that defines
 the problem to be solved. Some basic rules are
 
 -   FeenoX is just a **solver** working as a *transfer function* between
-    input and output files. Following the *rules of separation*,
-    parsimony and diversity\_, **there is no embedded graphical
+    input and output files. Following the *rules of separation,
+    parsimony and diversity*, **there is no embedded graphical
     interface** but means of using generic pre and post processing
     tools—in particular, [Gmsh][] and [Paraview][] respectively. See
     also [CAEplex][1].

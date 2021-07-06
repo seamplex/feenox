@@ -70,7 +70,7 @@ In other words, FeenoX is a computational tool to solve
 
 in such a way that the input is a near-English text file that defines the problem to be solved. Some basic rules are
 
- * FeenoX is just a **solver** working as a _transfer function_ between input and output files. Following the _rules of separation_, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
+ * FeenoX is just a **solver** working as a _transfer function_ between input and output files. Following the _rules of separation, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
  
 dnl show the same output (NAFEMS LE1?) with Gmsh and Paraview, quads struct/tri unstruct.
  
@@ -85,6 +85,8 @@ dnl show the same output (NAFEMS LE1?) with Gmsh and Paraview, quads struct/tri 
    Tinf=1          # non-dimensional reference temperature
    BC right q=sigma*e*(Tinf^4-T(x)^4)
    ```
+   
+dnl this also allows a direct application of the MMS for verification (in addition to being open source!)
    
  * FeenoX should run natively in the cloud and be able to massively scale in parallel. See the [Software Requirements Specification](doc/sds.md) and the [Software Development Specification](doc/sds.md) for details.
  
