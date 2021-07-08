@@ -111,5 +111,6 @@ extern int feenox_parse_solve_problem(void);
 extern int feenox_parse_integrate(void);
 extern int feenox_parse_find_extrema(void);
 extern int feenox_parse_fit(void);
+extern int feenox_parse_dump(void);
 
 #endif  

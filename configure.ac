@@ -42,6 +42,9 @@ AC_CHECK_FUNCS([sysconf],[],[])
 # check for clock_gettime() for unix time
 AC_CHECK_FUNCS([clock_gettime],[],[])
 
+# check for getrusage() for memory and cpu time
+AC_CHECK_FUNCS([getrusage],[],[])
+
 # check for asprintf
 AC_CHECK_FUNCS([asprintf],[],[])
 

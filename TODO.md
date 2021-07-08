@@ -4,6 +4,7 @@
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
+ * memory & time (like clock()?)
 
 ## Tests
  

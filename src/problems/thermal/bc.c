@@ -85,10 +85,8 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
   double *x = zero;
   if (bc_data->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
-    feenox_var_value(feenox.mesh.vars.x) = element->x[v][0];
-    feenox_var_value(feenox.mesh.vars.y) = element->x[v][1];
-    feenox_var_value(feenox.mesh.vars.z) = element->x[v][2];
     x = element->x[v];
+    feenox_mesh_update_coord_vars(x);
   }
   
   // TODO: axisymmetric
@@ -97,6 +95,9 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
   double w = element->w[v] * r_for_axisymmetric;
   // TODO: cache if neither space nor temperature dependent
   double q = feenox_expression_eval(&bc_data->expr);
+  
+//  printf("%g\t%g\t%g\t\n", x[0], x[1], q);
+//  feenox_debug_print_gsl_matrix(element->H[v], stdout);
     
   gsl_vector_set(feenox.pde.Nb, 0, q);
   gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
@@ -127,9 +128,7 @@ int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_d
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   if (bc_data->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
-    feenox_var_value(feenox.mesh.vars.x) = element->x[v][0];
-    feenox_var_value(feenox.mesh.vars.y) = element->x[v][1];
-    feenox_var_value(feenox.mesh.vars.z) = element->x[v][2];
+    feenox_mesh_update_coord_vars(element->x[v]);
   }
   
   // TODO: axisymmetric

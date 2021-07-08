@@ -328,14 +328,6 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 #endif
   
 
-///va+memory+name memory
-///va+memory+detail Maximum resident set size (global memory used), in bytes.
-  feenox.pde.vars.memory = feenox_define_variable_get_ptr("memory");
-  
-///va+memory_petsc+name memory_petsc
-///va+memory_petsc+detail Maximum resident set size (memory used by PETSc), in bytes.
-  feenox.pde.vars.memory_petsc = feenox_define_variable_get_ptr("memory_petsc");
-  
 #endif  
   
   return FEENOX_OK;
@@ -667,7 +659,7 @@ int feenox_problem_init_runtime_general(void) {
 
 Mat feenox_create_matrix(const char *name) {
   
-  Mat A;
+  Mat A = NULL;
   petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
   petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
   petsc_call_null(MatSetFromOptions(A));

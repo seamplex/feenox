@@ -16,12 +16,17 @@ struct mechanical_t {
   
   distribution_t E;     // Young's modulus
   distribution_t nu;    // Poisson's ratio
-  distribution_t rho;   // density
+  distribution_t alpha; // (mean) thermal expansion coefficient
+  distribution_t T;     // temperture distribution
+  double T0;            // reference temperature
 
 #ifdef HAVE_PETSC  
+/*  
   PetscBool space_E;
   PetscBool space_nu;
-  PetscBool space_rho;
+  PetscBool space_alpha;
+  PetscBool space_T;
+ */
   
   MatNullSpace rigid_body_base;
 #endif

@@ -31,15 +31,15 @@ do { \
 } while (0)
 
 
-double feenox_builtin_derivative(struct expr_item_t *, struct var_t *);
-double feenox_builtin_integral(struct expr_item_t *, struct var_t *);
-double feenox_builtin_simpson(struct expr_item_t *, struct var_t *);
-double feenox_builtin_gauss_kronrod(struct expr_item_t *, struct var_t *);
-double feenox_builtin_gauss_legendre(struct expr_item_t *, struct var_t *);
-double feenox_builtin_prod(struct expr_item_t *, struct var_t *);
-double feenox_builtin_sum(struct expr_item_t *, struct var_t *);
-double feenox_builtin_root(struct expr_item_t *, struct var_t *);
-double feenox_builtin_func_min(struct expr_item_t *, struct var_t *);
+double feenox_builtin_derivative(expr_item_t *, var_t *);
+double feenox_builtin_integral(expr_item_t *, var_t *);
+double feenox_builtin_simpson(expr_item_t *, var_t *);
+double feenox_builtin_gauss_kronrod(expr_item_t *, var_t *);
+double feenox_builtin_gauss_legendre(expr_item_t *, var_t *);
+double feenox_builtin_prod(expr_item_t *, var_t *);
+double feenox_builtin_sum(expr_item_t *, var_t *);
+double feenox_builtin_root(expr_item_t *, var_t *);
+double feenox_builtin_func_min(expr_item_t *, var_t *);
 
 
 struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {

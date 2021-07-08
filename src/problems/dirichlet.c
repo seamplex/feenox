@@ -52,9 +52,7 @@ int feenox_dirichlet_eval(void) {
                 }
                 
                 if (bc_data->space_dependent) {
-                  feenox_var_value(feenox.mesh.vars.x) = feenox.pde.mesh->node[j].x[0];
-                  feenox_var_value(feenox.mesh.vars.y) = feenox.pde.mesh->node[j].x[1];
-                  feenox_var_value(feenox.mesh.vars.z) = feenox.pde.mesh->node[j].x[2];
+                  feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
                 }  
                 // we pass a pointer to k and this method increments it as needed
                 feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j, &k));
@@ -109,6 +107,7 @@ int feenox_dirichlet_set_K(void) {
   
   if (feenox.pde.K_bc == NULL) {
     petsc_call(MatDuplicate(feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.K_bc));
+    petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.K_bc), "K_bc"));
   } else {
     petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
   }
@@ -116,6 +115,7 @@ int feenox_dirichlet_set_K(void) {
   if (feenox.pde.b != NULL) {
     if (feenox.pde.b_bc == NULL) {
       petsc_call(VecDuplicate(feenox.pde.b, &feenox.pde.b_bc));
+      petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.b_bc), "b_bc"));
     }
     petsc_call(VecCopy(feenox.pde.b, feenox.pde.b_bc));
   }  

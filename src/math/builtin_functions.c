@@ -31,6 +31,11 @@ extern feenox_t feenox;
  #include <mach/mach.h>
 #endif
 
+#ifdef HAVE_GETRUSAGE
+ #include <sys/resource.h>
+#endif
+
+
 // plotx reference
 //  1. min
 //  2. max
@@ -43,59 +48,61 @@ extern feenox_t feenox;
 //  9. stepytics
 
 
-double feenox_builtin_abs(struct expr_item_t *);
-double feenox_builtin_acos(struct expr_item_t *);
-double feenox_builtin_asin(struct expr_item_t *);
-double feenox_builtin_atan(struct expr_item_t *);
-double feenox_builtin_atan2(struct expr_item_t *);
-double feenox_builtin_ceil(struct expr_item_t *);
-double feenox_builtin_clock(struct expr_item_t *);
-double feenox_builtin_cos(struct expr_item_t *);
-double feenox_builtin_cosh(struct expr_item_t *);
-double feenox_builtin_d_dt(struct expr_item_t *);
-double feenox_builtin_deadband(struct expr_item_t *);
-double feenox_builtin_equal(struct expr_item_t *);
-double feenox_builtin_exp(struct expr_item_t *);
-double feenox_builtin_expint1(struct expr_item_t *);
-double feenox_builtin_expint2(struct expr_item_t *);
-double feenox_builtin_expint3(struct expr_item_t *);
-double feenox_builtin_expintn(struct expr_item_t *);
-double feenox_builtin_floor(struct expr_item_t *);
-double feenox_builtin_heaviside(struct expr_item_t *);
-double feenox_builtin_if(struct expr_item_t *);
-double feenox_builtin_is_in_interval(struct expr_item_t *);
-double feenox_builtin_integral_dt(struct expr_item_t *);
-double feenox_builtin_integral_euler_dt(struct expr_item_t *);
-double feenox_builtin_lag(struct expr_item_t *);
-double feenox_builtin_lag_bilinear(struct expr_item_t *);
-double feenox_builtin_lag_euler(struct expr_item_t *);
-double feenox_builtin_last(struct expr_item_t *);
-double feenox_builtin_limit(struct expr_item_t *);
-double feenox_builtin_limit_dt(struct expr_item_t *);
-double feenox_builtin_log(struct expr_item_t *);
-double feenox_builtin_mark_max(struct expr_item_t *);
-double feenox_builtin_mark_min(struct expr_item_t *);
-double feenox_builtin_max(struct expr_item_t *);
-double feenox_builtin_min(struct expr_item_t *);
-double feenox_builtin_mod(struct expr_item_t *);
-double feenox_builtin_not(struct expr_item_t *);
-double feenox_builtin_random(struct expr_item_t *);
-double feenox_builtin_random_gauss(struct expr_item_t *);
-double feenox_builtin_round(struct expr_item_t *);
-double feenox_builtin_sawtooth_wave(struct expr_item_t *);
-double feenox_builtin_sgn(struct expr_item_t *);
-double feenox_builtin_is_even(struct expr_item_t *);
-double feenox_builtin_is_odd(struct expr_item_t *);
-double feenox_builtin_sin(struct expr_item_t *);
-double feenox_builtin_j0(struct expr_item_t *);
-double feenox_builtin_sinh(struct expr_item_t *);
-double feenox_builtin_sqrt(struct expr_item_t *);
-double feenox_builtin_square_wave(struct expr_item_t *);
-double feenox_builtin_tan(struct expr_item_t *);
-double feenox_builtin_tanh(struct expr_item_t *);
-double feenox_builtin_threshold_max(struct expr_item_t *);
-double feenox_builtin_threshold_min(struct expr_item_t *);
-double feenox_builtin_triangular_wave(struct expr_item_t *);
+double feenox_builtin_abs(expr_item_t *);
+double feenox_builtin_acos(expr_item_t *);
+double feenox_builtin_asin(expr_item_t *);
+double feenox_builtin_atan(expr_item_t *);
+double feenox_builtin_atan2(expr_item_t *);
+double feenox_builtin_ceil(expr_item_t *);
+double feenox_builtin_clock(expr_item_t *);
+double feenox_builtin_cos(expr_item_t *);
+double feenox_builtin_cosh(expr_item_t *);
+double feenox_builtin_cpu_time(expr_item_t *);
+double feenox_builtin_d_dt(expr_item_t *);
+double feenox_builtin_deadband(expr_item_t *);
+double feenox_builtin_equal(expr_item_t *);
+double feenox_builtin_exp(expr_item_t *);
+double feenox_builtin_expint1(expr_item_t *);
+double feenox_builtin_expint2(expr_item_t *);
+double feenox_builtin_expint3(expr_item_t *);
+double feenox_builtin_expintn(expr_item_t *);
+double feenox_builtin_floor(expr_item_t *);
+double feenox_builtin_heaviside(expr_item_t *);
+double feenox_builtin_if(expr_item_t *);
+double feenox_builtin_is_in_interval(expr_item_t *);
+double feenox_builtin_integral_dt(expr_item_t *);
+double feenox_builtin_integral_euler_dt(expr_item_t *);
+double feenox_builtin_lag(expr_item_t *);
+double feenox_builtin_lag_bilinear(expr_item_t *);
+double feenox_builtin_lag_euler(expr_item_t *);
+double feenox_builtin_last(expr_item_t *);
+double feenox_builtin_limit(expr_item_t *);
+double feenox_builtin_limit_dt(expr_item_t *);
+double feenox_builtin_log(expr_item_t *);
+double feenox_builtin_mark_max(expr_item_t *);
+double feenox_builtin_mark_min(expr_item_t *);
+double feenox_builtin_max(expr_item_t *);
+double feenox_builtin_memory(expr_item_t *);
+double feenox_builtin_min(expr_item_t *);
+double feenox_builtin_mod(expr_item_t *);
+double feenox_builtin_not(expr_item_t *);
+double feenox_builtin_random(expr_item_t *);
+double feenox_builtin_random_gauss(expr_item_t *);
+double feenox_builtin_round(expr_item_t *);
+double feenox_builtin_sawtooth_wave(expr_item_t *);
+double feenox_builtin_sgn(expr_item_t *);
+double feenox_builtin_is_even(expr_item_t *);
+double feenox_builtin_is_odd(expr_item_t *);
+double feenox_builtin_sin(expr_item_t *);
+double feenox_builtin_j0(expr_item_t *);
+double feenox_builtin_sinh(expr_item_t *);
+double feenox_builtin_sqrt(expr_item_t *);
+double feenox_builtin_square_wave(expr_item_t *);
+double feenox_builtin_tan(expr_item_t *);
+double feenox_builtin_tanh(expr_item_t *);
+double feenox_builtin_threshold_max(expr_item_t *);
+double feenox_builtin_threshold_min(expr_item_t *);
+double feenox_builtin_triangular_wave(expr_item_t *);
 
 struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"abs",                 1, 1, &feenox_builtin_abs},
@@ -107,6 +114,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"clock",               0, 1, &feenox_builtin_clock},
     {"cos",                 1, 1, &feenox_builtin_cos},
     {"cosh",                1, 1, &feenox_builtin_cosh},
+    {"cpu_time",            0, 1, &feenox_builtin_cpu_time},
     {"d_dt",                1, 1, &feenox_builtin_d_dt},
     {"deadband",            2, 2, &feenox_builtin_deadband},
     {"equal",               2, 3, &feenox_builtin_equal},
@@ -133,6 +141,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"mark_max",            2, MINMAX_ARGS, &feenox_builtin_mark_max},
     {"mark_min",            2, MINMAX_ARGS, &feenox_builtin_mark_min},
     {"max",                 2, MINMAX_ARGS, &feenox_builtin_max},
+    {"memory",              0, 1, &feenox_builtin_memory},
     {"min",                 2, MINMAX_ARGS, &feenox_builtin_min},
     {"mod",                 2, 2, &feenox_builtin_mod},
     {"not",                 1, 2, &feenox_builtin_not},
@@ -186,8 +195,56 @@ double feenox_builtin_clock(expr_item_t *f) {
 
 #endif //  HAVE_CLOCK_GETTIME
   
-  return (double)tp.tv_sec + ((double)tp.tv_nsec * 1e-9);
+  return (double)tp.tv_sec + (1e-9 * (double)tp.tv_nsec);
 
+}
+
+///fn+memory+name memory
+///fn+memory+usage memory()
+///fn+memory+desc Returns the maximum memory (resident set size) used by FeenoX, in Gigabytes.
+double feenox_builtin_memory(expr_item_t *f) {
+
+  double memory_gb = 0;
+#ifdef HAVE_GETRUSAGE
+  struct rusage usage;
+  getrusage(RUSAGE_SELF, &usage);
+  memory_gb = (double)(usage.ru_maxrss/(1024.0*1024.0));
+#endif //  HAVE_GETRUSAGE
+  
+  return memory_gb;
+}
+
+///fn+cpu_time+name cpu_time
+///fn+cpu_time+usage cpu_time([f])
+///fn+cpu_time+desc Returns the CPU time used by FeenoX, in seconds.
+///fn+cpu_time+desc If the optional argument `f` is not provided  or it is zero (default),
+///fn+cpu_time+desc the sum of times for both user-space and kernel-space usage is returned.
+///fn+cpu_time+desc For `f=1` only user time is returned.
+///fn+cpu_time+desc For `f=2` only system time is returned.
+
+double feenox_builtin_cpu_time(expr_item_t *f) {
+
+  double cpu_time_seconds = 0;
+#ifdef HAVE_GETRUSAGE
+  struct rusage usage;
+  getrusage(RUSAGE_SELF, &usage);
+  double user   = (double)usage.ru_utime.tv_sec + 1e-6 * (double)usage.ru_utime.tv_usec;
+  double kernel = (double)usage.ru_stime.tv_sec + 1e-6 * (double)usage.ru_stime.tv_usec;
+
+  switch ((f->arg[0].items != NULL) ? (int)feenox_expression_eval(&f->arg[0]) : 0) {
+    case 0:
+      cpu_time_seconds = user + kernel;
+    break;
+    case 1:
+      cpu_time_seconds = user;
+    break;
+    case 2:
+      cpu_time_seconds = kernel;
+    break;
+  }
+#endif //  HAVE_GETRUSAGE
+  
+  return cpu_time_seconds;
 }
 
 ///fn+last+name last

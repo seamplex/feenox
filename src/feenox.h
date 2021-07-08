@@ -23,7 +23,8 @@
 #ifndef FEENOX_H
 #define FEENOX_H
 
-#define _GNU_SOURCE   // for POSIX in C99
+// for POSIX in C99
+#define _GNU_SOURCE   
 
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
@@ -232,7 +233,7 @@ enum version_type {
 
 
 // number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         53
+#define N_BUILTIN_FUNCTIONS         55
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
 
@@ -279,6 +280,7 @@ typedef struct mesh_integrate_t mesh_integrate_t;
 typedef struct mesh_find_extrema_t mesh_find_extrema_t;
 
 typedef struct fit_t fit_t;
+typedef struct dump_t dump_t;
 
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
@@ -1372,6 +1374,24 @@ struct fit_t {
   
 };
 
+struct dump_t {
+  
+  enum {
+    dump_format_default,
+    dump_format_binary,
+    dump_format_ascii,
+    dump_format_octave,
+  } format;  
+  
+  int K;
+  int K_bc;
+  int b;
+  int b_bc;
+  int M;
+  int M_bc;
+  
+  dump_t *next;
+};
 
 // global FeenoX singleton structure
 struct feenox_t {
@@ -1427,6 +1447,7 @@ struct feenox_t {
   print_function_t *print_functions;
   print_vector_t *print_vectors;
   fit_t *fits;
+  dump_t *dumps;
   
   struct {
     var_t *done;
@@ -1666,27 +1687,7 @@ struct feenox_t {
       var_t *nodes_rough;
       var_t *unknowns;
     
-/*      
-      var_t *time_wall_build;
-      var_t *time_wall_solve;
-      var_t *time_wall_stress;
-      var_t *time_wall_total;
-
-      var_t *time_cpu_build;
-      var_t *time_cpu_solve;
-      var_t *time_cpu_stress;
-      var_t *time_cpu_total;
-
-      var_t *time_petsc_build;
-      var_t *time_petsc_solve;
-      var_t *time_petsc_stress;
-      var_t *time_petsc_total;
-
-      var_t *flops_petsc;
-*/    
       var_t *memory_available;
-      var_t *memory;
-      var_t *memory_petsc;
     
     } vars;
 
@@ -1986,6 +1987,9 @@ extern void feenox_fit_update_x(fit_t *this, size_t j);
 extern void feenox_fit_update_vias(fit_t *this, const gsl_vector *via);
 extern void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w);
 
+// dump.c
+extern int feenox_instruction_dump(void *arg);
+extern int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer);
 
 // matrix.c
 extern int feenox_matrix_init(matrix_t *this);

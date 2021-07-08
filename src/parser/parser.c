@@ -6,7 +6,7 @@
  *  This file is part of FeenoX.
  *
  *  FeenoX is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
+ *  it under the terms "of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
@@ -342,6 +342,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_fit());
       return FEENOX_OK;
       
+///kw+DUMP+desc Dump raw PETSc objects used to solve PDEs into files.
+///kw+DUMP+usage DUMP
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "DUMP") == 0) {
+      feenox_call(feenox_parse_dump());
+      return FEENOX_OK;
+      
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these
@@ -383,7 +390,7 @@ int feenox_parse_line(void) {
           case parser_function:
           {
             char *name;
-            feenox_add_function_from_string(lhs, &name);
+            feenox_call(feenox_add_function_from_string(lhs, &name));
             feenox_call(feenox_function_set_expression(name, rhs));
             feenox_free(name);
           }  
@@ -1250,17 +1257,14 @@ int feenox_parse_include(void) {
 ///kw+INCLUDE+detail commandline replacement argument such as `$1` so `INCLUDE $1.fee` will include the
 ///kw+INCLUDE+detail file specified after the main input file in the command line.
 
-  char *token;
-  char *filepath;
-  double xi;
-  int from = 0;
-  int to = 0;
+  char *token = NULL;
+  char *filepath = NULL;
+  double xi = 0;
+  unsigned int from = 0;
+  unsigned int to = 0;
     
 ///kw+INCLUDE+usage <file_path>
-  if ((filepath = feenox_get_next_token(NULL)) == NULL) {
-    feenox_push_error_message("expected file path");
-    return FEENOX_ERROR;
-  }
+  feenox_call(feenox_parser_string(&filepath));
 
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 ///kw+INCLUDE+usage [ FROM <num_expr> ]
@@ -1282,6 +1286,7 @@ int feenox_parse_include(void) {
   }
 
   feenox_call(feenox_parse_input_file(filepath, from, to));
+  feenox_free(filepath);
 
   return FEENOX_OK;
 }
@@ -4052,3 +4057,45 @@ int feenox_parse_fit(void) {
   return FEENOX_OK;
 }
 
+int feenox_parse_dump(void) {
+
+  dump_t *dump = NULL;
+  feenox_check_alloc(dump = calloc(1, sizeof(dump_t)));
+  
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+DUMP+usage [ FORMAT { binary | ascii | octave } ]
+    if (strcasecmp(token, "FORMAT") == 0) {
+      char *keywords[] = {           "default",           "binary",           "ascii",           "octave", ""};
+      int values[] =     {dump_format_default, dump_format_binary, dump_format_ascii, dump_format_octave, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&dump->format)));
+      
+///kw+DUMP+usage [ K |
+    } if (strcasecmp(token, "K") == 0) {
+      dump->K = 1;
+///kw+DUMP+usage   K_bc |
+    } else if (strcasecmp(token, "K_bc") == 0) {
+      dump->K_bc = 1;
+///kw+DUMP+usage   b |
+    } else if (strcasecmp(token, "b") == 0) {
+      dump->b = 1;
+///kw+DUMP+usage   b_bc |
+    } else if (strcasecmp(token, "b_bc") == 0) {
+      dump->b_bc = 1;
+///kw+DUMP+usage   M |
+    } else if (strcasecmp(token, "M") == 0) {
+      dump->M = 1;
+///kw+DUMP+usage   M_bc |
+    } else if (strcasecmp(token, "M_bc") == 0) {
+      dump->M_bc = 1;
+    }
+
+  }
+  
+  LL_APPEND(feenox.dumps, dump);
+  feenox_call(feenox_add_instruction(feenox_instruction_dump, dump));
+  
+  
+  
+  return FEENOX_OK;
+}

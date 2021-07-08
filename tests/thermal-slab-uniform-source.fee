@@ -1,0 +1,12 @@
+READ_MESH slab.msh
+PROBLEM heat DIMENSIONS 1
+
+BC left  T=0
+BC right T=0
+
+k = 1
+q = 1
+
+SOLVE_PROBLEM
+DUMP K K_bc b b_bc FORMAT octave 
+PRINT T(0.5)-1/8

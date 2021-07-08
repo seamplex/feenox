@@ -33,6 +33,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
   
   // volumetric heat source term Ht*q
   // TODO: total source Q
+  // TODO: there should be a way to use BLAS instead of a for loop
   if (thermal.q.defined) {
     double q = thermal.q.eval(&thermal.q, x, material);
     unsigned int j = 0;

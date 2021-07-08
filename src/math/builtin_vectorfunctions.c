@@ -23,14 +23,14 @@
 extern feenox_t feenox;
 
 
-double feenox_builtin_vecdot(struct vector_t **);
-double feenox_builtin_vecnorm(struct vector_t **);
-double feenox_builtin_vecmin(struct vector_t **);
-double feenox_builtin_vecmax(struct vector_t **);
-double feenox_builtin_vecminindex(struct vector_t **);
-double feenox_builtin_vecmaxindex(struct vector_t **);
-double feenox_builtin_vecsum(struct vector_t **);
-double feenox_builtin_vecsize(struct vector_t **);
+double feenox_builtin_vecdot(vector_t **);
+double feenox_builtin_vecnorm(vector_t **);
+double feenox_builtin_vecmin(vector_t **);
+double feenox_builtin_vecmax(vector_t **);
+double feenox_builtin_vecminindex(vector_t **);
+double feenox_builtin_vecmaxindex(vector_t **);
+double feenox_builtin_vecsum(vector_t **);
+double feenox_builtin_vecsize(vector_t **);
 
 
 struct builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTIONS] = {

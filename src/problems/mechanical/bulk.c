@@ -13,7 +13,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   
   double *x = zero;
-  if (mechanical.space_E || mechanical.space_nu || mechanical.space_rho) {
+  // TODO: compute once
+  if (mechanical.E.space_dependent || mechanical.nu.space_dependent || mechanical.alpha.space_dependent || mechanical.T.space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];
   }
@@ -28,6 +29,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
     material = this->physical_group->material;
   }
 
+  // TODO: static
   gsl_matrix *C = gsl_matrix_calloc(6, 6);
   double E = mechanical.E.eval(&mechanical.E, x, material);
   double nu = mechanical.nu.eval(&mechanical.nu, x, material);
@@ -80,6 +82,35 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0, CB));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, CB, 1.0, feenox.pde.Ki));
 
+  // thermal expansion vector
+  if (mechanical.alpha.defined) {
+    gsl_vector *et = NULL;
+    feenox_check_alloc(et = gsl_vector_calloc(6));
+    
+    gsl_vector *Cet;
+    feenox_check_alloc(Cet = gsl_vector_calloc(6));
+    
+    
+    double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
+    if (alpha != 0) {
+      
+      double alpha_delta_T = alpha * (mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0);
+      gsl_vector_set(et, 0, alpha_delta_T);
+      if (feenox.pde.dim > 1) {
+        gsl_vector_set(et, 1, alpha_delta_T);
+        if (feenox.pde.dim > 2) {
+          gsl_vector_set(et, 2, alpha_delta_T);
+        }  
+      }  
+      // feenox_call()
+      gsl_blas_dgemv(CblasTrans, 1.0, C, et, 0, Cet);
+      gsl_blas_dgemv(CblasTrans, w, B, Cet, 1.0, feenox.pde.bi);
+    }  
+    
+    gsl_vector_free(et);
+    gsl_vector_free(Cet);
+  }  
+  
   // TODO: rhs with volumetric sources
   
   gsl_matrix_free(B);

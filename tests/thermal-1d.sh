@@ -31,3 +31,16 @@ exitifwrong $?
 
 answerzero thermal-slab-transient.fee 1e-4
 exitifwrong $?
+
+answerzero thermal-slab-uniform-source.fee
+exitifwrong $?
+
+if [ ! -z "$(which octave)" ]; then
+  base="thermal-slab-uniform-source-octave"
+  echo "K_bc; b_bc; K_bc\\\\b_bc" | octave > ${base}.last
+  difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
+  if [ ! -z "${difference}" ]; then
+    echo "Octave check on DUMP failed"
+    exitifwrong 1
+  fi
+fi

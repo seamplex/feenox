@@ -172,6 +172,14 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_define_distribution_mandatory(mechanical, E, "E", "elastic modulus");
   feenox_define_distribution_mandatory(mechanical, nu, "nu", "Poisson’s ratio");
   
+  feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
+  mechanical.alpha.space_dependent = feenox_expression_depends_on_space(mechanical.alpha.dependency_variables);
+
+  feenox_call(feenox_distribution_init(&mechanical.T, "T"));
+  mechanical.T.space_dependent = feenox_expression_depends_on_space(mechanical.T.dependency_variables);
+  
+  // TODO: read T0
+  
   // TODO: check nonlinearity!
   feenox.pde.math_type = math_type_linear;
   feenox.pde.solve = feenox_solve_petsc_linear;
