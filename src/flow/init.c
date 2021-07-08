@@ -28,8 +28,12 @@ extern feenox_t feenox;
 #include <signal.h>
 #include <libgen.h>
 
+#ifdef HAVE_CLOCK_GETTIME
+ #include <time.h>
+#endif
+
 #ifdef HAVE_READLINE
-#include <readline/readline.h>
+ #include <readline/readline.h>
 #endif
 
 int feenox_initialize(int argc, char **argv) {
@@ -155,7 +159,13 @@ int feenox_initialize(int argc, char **argv) {
 
 int feenox_init_special_objects(void) {
 
-  var_t *dummy;
+#ifdef HAVE_CLOCK_GETTIME
+  if (clock_gettime(CLOCK_MONOTONIC, &feenox.tp0) < 0) {
+    feenox_runtime_error();
+  }
+#endif //  HAVE_CLOCK_GETTIME
+  
+  var_t *dummy = NULL;
 
 ///va+done_static+name done_static
 ///va+done_static+desc Flag that indicates whether the static calculation is over or not.

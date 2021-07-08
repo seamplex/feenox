@@ -103,6 +103,7 @@ double feenox_builtin_tanh(expr_item_t *);
 double feenox_builtin_threshold_max(expr_item_t *);
 double feenox_builtin_threshold_min(expr_item_t *);
 double feenox_builtin_triangular_wave(expr_item_t *);
+double feenox_builtin_wall_time(expr_item_t *);
 
 struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"abs",                 1, 1, &feenox_builtin_abs},
@@ -160,6 +161,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"threshold_max",       2, 3, &feenox_builtin_threshold_max},
     {"threshold_min",       2, 3, &feenox_builtin_threshold_min},
     {"triangular_wave",     1, 1, &feenox_builtin_triangular_wave},
+    {"wall_time",           0, 1, &feenox_builtin_cpu_time},
 };
 
 
@@ -176,7 +178,7 @@ double feenox_builtin_clock(expr_item_t *f) {
   struct timespec tp;
 
 #ifdef HAVE_CLOCK_GETTIME
-  clockid_t clk_id = (f->arg[0].items != NULL) ? (int)feenox_expression_eval(&f->arg[0]) : CLOCK_MONOTONIC;
+  clockid_t clk_id = (f->arg[0].items != NULL) ? (clockid_t)feenox_expression_eval(&f->arg[0]) : CLOCK_MONOTONIC;
 
   if (clock_gettime(clk_id, &tp) < 0) {
     feenox_runtime_error();
@@ -195,9 +197,27 @@ double feenox_builtin_clock(expr_item_t *f) {
 
 #endif //  HAVE_CLOCK_GETTIME
   
-  return (double)tp.tv_sec + (1e-9 * (double)tp.tv_nsec);
+  return (double)tp.tv_sec + 1e-9 * (double)tp.tv_nsec;
 
 }
+
+///fn+wall_time+name wall_time
+///fn+wall_time+usage wall_time()
+///fn+wall_time+desc Returns the time ellapsed since the invocation of FeenoX, in seconds.
+double feenox_builtin_wall_time(expr_item_t *f) {
+
+  struct timespec tp;
+
+#ifdef HAVE_CLOCK_GETTIME
+  if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
+    feenox_runtime_error();
+  }
+#endif //  HAVE_CLOCK_GETTIME
+  
+  return (double)(tp.tv_sec - feenox.tp0.tv_sec) + 1e-9 * (double)(tp.tv_nsec - feenox.tp0.tv_sec);
+
+}
+
 
 ///fn+memory+name memory
 ///fn+memory+usage memory()

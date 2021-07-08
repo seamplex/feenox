@@ -233,7 +233,7 @@ enum version_type {
 
 
 // number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         55
+#define N_BUILTIN_FUNCTIONS         56
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
 
@@ -1402,6 +1402,8 @@ struct feenox_t {
 
   char *main_input_filepath;
   char *main_input_dirname;
+
+  struct timespec tp0;  
   
   enum {
     mode_normal,
