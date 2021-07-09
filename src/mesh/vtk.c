@@ -202,7 +202,7 @@ int feenox_mesh_write_scalar_vtk(mesh_write_t *mesh_write, function_t *function,
     // TODO: custom printf format
     
     size_t i = 0;
-    if (function->type == function_type_pointwise_mesh_cell) {
+    if (function->type == function_type_pointwise_mesh_cell && function->mesh == mesh) {
       feenox_call(feenox_function_init(function));
       for (i = 0; i < function->data_size; i++) {
         fprintf(mesh_write->file->pointer, "%g\n", function->data_value[i]);
@@ -224,7 +224,7 @@ int feenox_mesh_write_scalar_vtk(mesh_write_t *mesh_write, function_t *function,
     fprintf(mesh_write->file->pointer, "LOOKUP_TABLE default\n");
   
     size_t j = 0;
-    if (function->type == function_type_pointwise_mesh_node && function->data_size == mesh_write->mesh->n_nodes) {
+    if (function->type == function_type_pointwise_mesh_node && function->mesh == mesh) {
       feenox_function_init(function);
       if (function->data_value != NULL) {
         for (j = 0; j < function->data_size; j++) {

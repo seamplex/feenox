@@ -954,7 +954,6 @@ int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names)
       fprintf(file, "$PhysicalNames\n");
       fprintf(file, "%d\n", n);
   
-      // y despues barrerlas
       for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
         fprintf(file, "%d %d \"%s\"\n", physical_group->dimension, physical_group->tag, physical_group->name);
       }
