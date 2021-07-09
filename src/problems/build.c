@@ -27,6 +27,7 @@ int feenox_build(void) {
     petsc_call(VecZeroEntries(feenox.pde.b));
   }  
   
+  size_t volumetric_elements = 0;
   unsigned int ascii_progress_chars = 0;  
   size_t i = 0;
   for (i = feenox.pde.first_element; i < feenox.pde.last_element; i++) {
@@ -47,6 +48,7 @@ int feenox_build(void) {
       // TODO: check if we can skip re-building in linear transient and/or
       //       nonlinear BCs only
       feenox_call(feenox_build_element_volumetric(&feenox.pde.mesh->element[i]));
+      volumetric_elements++;
       
     } else if (feenox.pde.mesh->element[i].physical_group != NULL) {
       
@@ -65,6 +67,11 @@ int feenox_build(void) {
         }
       }
     }
+  }
+  
+  if (volumetric_elements == 0) {
+    feenox_push_error_message("no volumetric elements found in '%s'", feenox.pde.mesh->file->name);
+    return FEENOX_ERROR;
   }
 
   feenox_call(feenox_build_assembly());
