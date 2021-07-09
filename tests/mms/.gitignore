@@ -1,0 +1,7 @@
+old
+*.msh
+*.dat
+*.txt
+*.vtk
+thermal-*.pdf
+thermal*-fits.ppl
