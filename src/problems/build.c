@@ -213,6 +213,7 @@ int feenox_build_element_volumetric(element_t *this) {
 
 int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
 
+#ifdef HAVE_PETSC
   // total number of gauss points
   unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
 
@@ -254,6 +255,7 @@ int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
     petsc_call(MatSetValues(feenox.pde.Jb, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Jbi, 0, 0), ADD_VALUES));
   }
 
+#endif
   return FEENOX_OK;
   
 }

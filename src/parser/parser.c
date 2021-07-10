@@ -3352,6 +3352,7 @@ int feenox_parse_bc(void) {
 
 int feenox_parse_problem(void) {
 
+#ifdef HAVE_PETSC
   int (*feenox_problem_parse_particular)(const char *) = NULL;
   int (*feenox_problem_init_parser_particular)(void) = NULL;
 
@@ -3575,7 +3576,6 @@ int feenox_parse_problem(void) {
     return FEENOX_ERROR;     
   }
   
-#ifdef HAVE_PETSC
   if (feenox.pde.petscinit_called == PETSC_FALSE) {
     feenox_call(feenox_problem_init_parser_general());
     feenox_call(feenox_problem_init_parser_particular());

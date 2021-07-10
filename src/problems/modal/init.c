@@ -166,7 +166,7 @@ int feenox_problem_init_parser_modal(void) {
 
 
 int feenox_problem_init_runtime_modal(void) {
-  
+#ifdef HAVE_PETSC  
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
@@ -197,7 +197,7 @@ int feenox_problem_init_runtime_modal(void) {
   
   feenox.pde.symmetric_K = PETSC_TRUE;
   feenox.pde.symmetric_M = PETSC_TRUE;
-
+#endif
   return FEENOX_OK;
 }
 

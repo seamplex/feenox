@@ -23,8 +23,9 @@
 extern feenox_t feenox;
 
 int feenox_instruction_dump(void *arg) {
+
+#ifdef HAVE_PETSC
   dump_t *dump = (dump_t *)arg;
-  
   PetscViewer viewer = NULL;
 
   if (dump->K) {
@@ -58,9 +59,11 @@ int feenox_instruction_dump(void *arg) {
     petsc_call(PetscViewerDestroy(&viewer));
   }
   
-  
+#endif
   return FEENOX_OK;
 }
+
+#ifdef HAVE_PETSC
 
 int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer) {
 
@@ -91,3 +94,5 @@ int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer)
   
   return FEENOX_OK;
 }
+
+#endif

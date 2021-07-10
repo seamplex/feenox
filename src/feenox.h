@@ -1991,7 +1991,9 @@ extern void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multi
 
 // dump.c
 extern int feenox_instruction_dump(void *arg);
+#ifdef HAVE_PETSC
 extern int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer);
+#endif
 
 // matrix.c
 extern int feenox_matrix_init(matrix_t *this);
@@ -2167,9 +2169,10 @@ extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function);
 extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
+#ifdef HAVE_PETSC
 extern Mat feenox_create_matrix(const char *name);
 extern Vec feenox_create_vector(const char *name); 
-
+#endif
 
 // bulk.c
 extern int feenox_build(void);

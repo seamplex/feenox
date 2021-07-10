@@ -78,9 +78,11 @@ int feenox_run_standard(void) {
 //    feenox_debug();
     
     feenox_special_var_value(step_transient)++;
-
+#ifdef HAVE_PETSC
     if (feenox.dae.dimension == 0 && feenox.pde.ts == NULL) {
-
+#else
+    if (feenox.dae.dimension == 0) {
+#endif	    
       feenox_limit_time_step();
       double next_time = feenox_special_var_value(t) + feenox_special_var_value(dt);
       double next_time_path = 0;

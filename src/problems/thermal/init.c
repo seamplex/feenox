@@ -17,6 +17,7 @@ int feenox_problem_parse_thermal(const char *token) {
 
 int feenox_problem_init_parser_thermal(void) {
 
+#ifdef HAVE_PETSC
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal;
@@ -48,7 +49,7 @@ int feenox_problem_init_parser_thermal(void) {
 //  feenox.pde.vars.T_min = feenox_define_variable_get_ptr("T_min");
   
   // TODO: heat fluxes as seconday fields
-  
+#endif
   return FEENOX_OK;
 }
 

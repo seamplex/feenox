@@ -87,9 +87,9 @@ int feenox_solve_petsc_nonlinear(void) {
   
 }
 
+#ifdef HAVE_PETSC
 int feenox_setup_snes(SNES snes) {
   
-#ifdef HAVE_PETSC
   
   // TODO: have an explicit default
   // TODO: set the line search
@@ -113,13 +113,11 @@ int feenox_setup_snes(SNES snes) {
   petsc_call(SNESGetKSP(snes, &ksp));
   feenox_call(feenox_setup_ksp(ksp));
 
-#endif  
   return FEENOX_OK;
 }  
 
 PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
 
-#ifdef HAVE_PETSC
 
   // this check is only to avoid building the first time because we already
   // built K in order to create the SNES, but the rest of the step we need
@@ -157,14 +155,11 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
  */
 //  feenox.pde.already_built = PETSC_FALSE;
 
-#endif
-  
   return FEENOX_OK;
 }
 
 PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *ctx) {
   
-#ifdef HAVE_PETSC
   
   // J_snes = (K + JK*phi - Jb)_bc
   // TODO: we want SAME_NONZERO_PATTERN!
@@ -184,12 +179,10 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
   
   feenox_call(feenox_dirichlet_set_J(J_snes));
   
-#endif
   
   return FEENOX_OK;
 }
 
-#ifdef HAVE_PETSC
 
 PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy) {
   

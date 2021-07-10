@@ -18,12 +18,11 @@ int feenox_problem_parse_mechanical(const char *token) {
       
     }
   } 
-  
   return FEENOX_OK;
 } 
 
 int feenox_problem_init_parser_mechanical(void) {
-
+#ifdef HAVE_PETSC
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_mechanical;
   feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_mechanical;
@@ -158,13 +157,13 @@ int feenox_problem_init_parser_mechanical(void) {
 ///va+w_at_sigma_max+name w_at_sigma_max
 ///va+w_at_sigma_max+detail The\ $z$ component\ $w$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
   mechanical.w_at_sigma_max = feenox_define_variable_get_ptr("w_at_sigma_max");
-  
+#endif  
   return FEENOX_OK;
 }
 
 
 int feenox_problem_init_runtime_mechanical(void) {
-  
+#ifdef HAVE_PETSC 
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
@@ -198,6 +197,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.symmetric_M = PETSC_TRUE;
   
   return FEENOX_OK;
+#endif
 }
 
 

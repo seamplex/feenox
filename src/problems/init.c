@@ -38,8 +38,9 @@ extern feenox_t feenox;
 
 int feenox_problem_init_parser_general(void) {
 
+#ifdef HAVE_PETSC
   if (feenox.pde.petscinit_called == PETSC_TRUE) {
-
+    return FEENOX_OK;
   }
   
   // we already have processed basic options, now we loop over the original argv and convert
@@ -329,7 +330,7 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   
 
 #endif  
-  
+#endif  
   return FEENOX_OK;
 }
 
@@ -337,6 +338,7 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 
 int feenox_problem_define_solutions(void) {
   
+#ifdef HAVE_PETSC	
   if (feenox.pde.dim == 0 || feenox.pde.dofs == 0) {
     feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either PROBLEM or READ_MESH");
     return FEENOX_ERROR;
@@ -413,7 +415,7 @@ int feenox_problem_define_solutions(void) {
     }
     feenox_free(name);
   }
-
+#endif
   return FEENOX_OK;
 }
 
@@ -656,7 +658,7 @@ int feenox_problem_init_runtime_general(void) {
   return FEENOX_OK;
 }
 
-
+#ifdef HAVE_PETSC
 Mat feenox_create_matrix(const char *name) {
   
   Mat A = NULL;
@@ -701,6 +703,7 @@ Vec feenox_create_vector(const char *name) {
   
   return v;  
 }
+#endif
 
 /*  
 int feenox_init_rough_mesh(void) {
