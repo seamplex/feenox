@@ -54,26 +54,27 @@ AC_CHECK_FUNCS([asprintf],[],[])
 # check for Readline (optional)
 # the default is read from the macro argument, but the help string
 # does not expand variables so it always states that it is "check"
-AC_ARG_WITH(
-  [readline],
-  AS_HELP_STRING([--with-readline], [support interactive debug mode @<:@default=check@:>@]),
-  [],
-  [with_readline=check]
-)
 
-have_readline="no"
-AS_IF([test "x${with_readline}" != "xno"] , [
-  AC_CHECK_HEADER([readline/readline.h],
-    [],
-    AS_IF([test "x${with_readline}" != "xcheck"], AC_MSG_FAILURE([--with-readline was given, but test for readline headers failed]))
-  )
-  AC_CHECK_LIB([readline], [readline],
-    [],
-    AS_IF([test "x${with_readline}" != "xcheck"],
-      AC_MSG_FAILURE([--with-readline was given, but test for readline libray failed])
-    )
-  )  
-])
+#AC_ARG_WITH(
+  #[readline],
+  #AS_HELP_STRING([--with-readline], [support interactive debug mode @<:@default=check@:>@]),
+  #[],
+  #[with_readline=check]
+#)
+
+#have_readline="no"
+#AS_IF([test "x${with_readline}" != "xno"] , [
+  #AC_CHECK_HEADER([readline/readline.h],
+    #[],
+    #AS_IF([test "x${with_readline}" != "xcheck"], AC_MSG_FAILURE([--with-readline was given, but test for readline headers failed]))
+  #)
+  #AC_CHECK_LIB([readline], [readline],
+    #[],
+    #AS_IF([test "x${with_readline}" != "xcheck"],
+      #AC_MSG_FAILURE([--with-readline was given, but test for readline libray failed])
+    #)
+  #)  
+#])
 
 # check if we have everything
 AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
@@ -253,15 +254,70 @@ AS_IF([test "x${have_slepc}" = "xyes"],
 )
 
 
-######################
-# check for GSL & CBLAS (required)
-AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR([GNU Scientific library headers libgsl-dev not found]))
 
-# if we found PETSc, we use whatever BLAS it has, otherwise we use GSL's CBLAS
-AS_IF([test "x${have_petsc}" != "xyes"],
+######################
+# see if we have --enable-download-gsl
+gslver=2.7
+gsldist=gsl-${gslver}
+gslmirror=http://ftpmirror.gnu.org/gsl/${gsldist}.tar.gz
+
+AC_ARG_ENABLE([download-gsl],
+ [AS_HELP_STRING([--enable-download-gsl], [try to automatically download and compile GSL @<:@default=no@:>@])],
+ [download_gsl=yes],
+ [download_gsl=no])
+
+# if gsl directory does not exist, see if we have to uncompress and/or download
+AS_IF([test ! -e ${gsldist}],[
+ AS_IF([test ! -e ${gsldist}.tar.gz],[
+  AS_IF([test "x$download_gsl" = "xyes"],[
+   AS_IF([test "x`which wget`" != "x"],[
+    AC_MSG_NOTICE([downloading ${gslmirror}])
+    wget -c ${gslmirror}
+   ],[
+    AC_MSG_ERROR([file ${gsldist}.tar.gz not found and wget not installed])
+   ])
+  ])
+ ])
+ 
+ AS_IF([test ! -e ${gsldist}.tar.gz],[
+    AC_MSG_ERROR([file ${gsldist}.tar.gz not found, copy it manually and re-try.])
+ ],[
+  AC_MSG_NOTICE([uncompressing ${gsldist}.tar.gz])
+  tar xzf ${gsldist}.tar.gz
+ ])
+])
+
+# if gsl directory exists, see if we have to compile it
+AS_IF([test -e ${gsldist}],[
+ AS_IF([test -e ${gsldist}/.libs/libgsl.a],[
+  AC_MSG_NOTICE([using already-compiled GSL library ${gsldist}/.libs/libgsl.a])
+ ],[
+  AC_MSG_NOTICE([configuring ${gsldist}])
+  cd ${gsldist} 
+  ./configure --prefix=${prefix} --host=${host}
+  AC_MSG_NOTICE([compiling ${gsldist}])
+  make
+  cd ..
+ ])
+ 
+ AC_SUBST([DOWNLOADED_GSL_LIBS], ["../${gsldist}/.libs/libgsl.a ../${gsldist}/cblas/.libs/libgslcblas.a"])
+ AC_SUBST([DOWNLOADED_GSL_INCLUDES], ["-I ../${gsldist} -I ../../${gsldist}"])
+ gsl_version="${gslver} (downloaded and statically linked)"
+],[ 
+ # traditional test for GSL
+ # check for GSL & CBLAS (required)
+ AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR([GNU Scientific library headers libgsl-dev not found.
+Either install them with your package manager or configure with --enable-download-gsl]))
+
+ # if we found PETSc, we use whatever BLAS it has, otherwise we use GSL's CBLAS
+ AS_IF([test "x${have_petsc}" != "xyes"],
   AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR([GNU Scientific library CBLAS libgsl-dev not found]))
-)
-AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library libgsl-dev not found]))
+ )
+ AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library libgsl-dev not found]))
+ gsl_version="from system"
+])
+
+
 
 
 ######################
@@ -313,15 +369,16 @@ AC_CONFIG_LINKS([tests/algebraic_expr.ref:tests/algebraic_expr.ref])
   
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile]) 
 
-AS_BOX([Summary of optional dependencies])
-AS_ECHO(  ["  Readline       ${have_readline}"])
-AS_ECHO(  ["  SUNDIALS IDA   ${have_ida}"])
-AS_ECHO_N(["  PETSc          ${have_petsc}"])
+AS_BOX([Summary of dependencies])
+AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
+#AS_ECHO(  ["  Readline                ${have_readline}"])
+AS_ECHO(  ["  SUNDIALS IDA            ${have_ida}"])
+AS_ECHO_N(["  PETSc                   ${have_petsc}"])
 AS_IF([test "x${have_petsc}" = "xyes"],
  AS_ECHO([" ${PETSC_DIR} ${PETSC_ARCH}"]),
  AS_ECHO
 )
-AS_ECHO_N(["  SLEPc          ${have_slepc}"])
+AS_ECHO_N(["  SLEPc                   ${have_slepc}"])
 AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO([" ${SLEPC_DIR}"]),
  AS_ECHO

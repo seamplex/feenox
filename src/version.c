@@ -177,13 +177,13 @@ void feenox_longversion(void) {
 #endif
   printf("SUNDIALs version   : %s\n", sundials_version);
   
-  printf("Readline version   : %s\n", 
-#if HAVE_READLINE
-         rl_library_version
-#else
-         "N/A"
-#endif
-  );
+//   printf("Readline version   : %s\n", 
+// #if HAVE_READLINE
+//          rl_library_version
+// #else
+//          "N/A"
+// #endif
+//   );
 
 
 #if HAVE_PETSC

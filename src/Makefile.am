@@ -7,8 +7,8 @@ ACLOCAL_AMFLAGS = $(ACLOCAL_FLAGS)
 
 bin_PROGRAMS = feenox
 
-feenox_CFLAGS = $(SLEPC_CC_INCLUDES) $(PETSC_CC_INCLUDES) $(CC_INCLUDES) $(all_includes)
-feenox_LDADD = $(SLEPC_LIB) $(PETSC_LIB) $(all_libraries)
+feenox_CFLAGS = $(SLEPC_CC_INCLUDES) $(PETSC_CC_INCLUDES) $(CC_INCLUDES) $(DOWNLOADED_GSL_INCLUDES) $(all_includes)
+feenox_LDADD = $(SLEPC_LIB) $(PETSC_LIB) $(DOWNLOADED_GSL_LIBS) $(all_libraries)
 #feenox_LIBS = $(CODE_COVERAGE_LIBS)
 # feenox_LDFLAGS = -rdynamic
 
