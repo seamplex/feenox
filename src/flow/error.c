@@ -34,7 +34,8 @@ extern feenox_t feenox;
 void feenox_push_error_message(const char *fmt, ...) {
   
   if (feenox.error_level > 100) {
-    fprintf(stderr, "too many errors\n");
+    feenox_pop_errors();
+    fprintf(stderr, "error: too many errors\n");
     exit(EXIT_FAILURE);
   }
   

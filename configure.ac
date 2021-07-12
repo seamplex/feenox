@@ -276,12 +276,13 @@ AS_IF([test ! -e ${gsldist}],[
    ],[
     AC_MSG_ERROR([file ${gsldist}.tar.gz not found and wget not installed])
    ])
+   AS_IF([test ! -e ${gsldist}.tar.gz],[
+    AC_MSG_ERROR([file ${gsldist}.tar.gz could not be downloaded, copy it manually and re-try.])
+   ])
   ])
  ])
  
- AS_IF([test ! -e ${gsldist}.tar.gz],[
-    AC_MSG_ERROR([file ${gsldist}.tar.gz not found, copy it manually and re-try.])
- ],[
+ AS_IF([test -e ${gsldist}.tar.gz],[
   AC_MSG_NOTICE([uncompressing ${gsldist}.tar.gz])
   tar xzf ${gsldist}.tar.gz
  ])
