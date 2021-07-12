@@ -1,13 +1,14 @@
 FUNCTION g(x) DATA {
 0   1
-1   1e1
-2   1e2
-3   1e3
-4   1e4
+1   2^1
+2   2^2
+3   2^3
+4   2^4
 }
+
 a = 0.5
 b = 0.5
 f(x) := a*exp(b*x) 
 
-FIT f TO g VIA a b GRADIENT exp(b*x) a*x*exp(b*x)
+FIT f TO g VIA a b GRADIENT exp(b*x) a*x*exp(b*x) #VERBOSE
 PRINT_FUNCTION g f
