@@ -37,4 +37,5 @@ echo "define(feenoxversion, ${version})dnl" > version.m4
 
 echo "calling autoreconf... "
 autoreconf -i
+automake --add-missing
 echo "done"
