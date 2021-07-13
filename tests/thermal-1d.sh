@@ -44,3 +44,8 @@ if [ ! -z "$(which octave)" ]; then
     exitifwrong 1
   fi
 fi
+
+# clean up if we are not in tests
+if [ ! -e ./functions.sh ]; then
+  rm -f b_bc.m  b.m  K_bc.m  K.m ${base}.last
+fi
