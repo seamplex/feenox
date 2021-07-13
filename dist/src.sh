@@ -5,28 +5,19 @@ if [ ! -e ../src ]; then
   exit 0
 fi
 
-package=feenox
-
-. clone.sh
 . versions.sh
+
+if [ "x${name}" != "xLinux" ]; then
+  echo "source tarballs should be created only in GNU/Linux"
+  exit 0
+fi
 
 # -----------------------------------------------------------
 #   source
 # -----------------------------------------------------------
 cd ${package}
- ./autogen.sh
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
  automake --add-missing
- echo ${version}
-
- # cd doc
- #  make pdf
- # cd ..
- #  make
-
- # rm -f petscslepc.mak
- # touch petscslepc.mak
-
  make dist
 cd ..
 
@@ -35,13 +26,9 @@ if [ ! -e src ]; then
   mkdir src
 fi
 
-echo ${package}/${package}-${version}.tar.gz
-
 if [ -e ${package}/${package}-${version}.tar.gz ]; then
  mv ${package}/${package}-${version}.tar.gz src
 else
  echo "cannot create source tarball, quitting"
  exit 1
 fi
-
-exit 0

@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ ! -e ../src ]; then
+  echo "run from dist directory"
+  exit 0
+fi
 
 . versions.sh
 
@@ -17,8 +21,8 @@ fi
 cd petsc-${petsc_ver}
 export PETSC_DIR=$(pwd)
 ./configure PETSC_DIR=${PETSC_DIR} \
-	    PETSC_ARCH=${PETSC_ARCH} \
-	    --with-mpi=0 \
+            PETSC_ARCH=${PETSC_ARCH} \
+            --with-mpi=0 \
             --with-fc=0 \
             --with-cxx=0 \
             --with-fortran-bindings=0 \

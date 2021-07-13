@@ -1,13 +1,37 @@
+#!/bin/false
+
+package=feenox
 petsc_ver=3.15.2
 slepc_ver=3.15.1
 
+if [ -z "$(which git)" ]; then
+  echo "git is not installed"
+fi
+
+if [ ! -e ${package} ]; then
+  git clone .. ${package}
+else 
+  cd ${package}
+    git pull
+  cd ..
+fi
+
+cd ${package}
+  ./autogen.sh
+  if [ ! -e version.m4 ]; then
+    echo "error: version.m4 does not exist"
+    exit 1
+  fi
+  version=$(echo ${package}version | m4 version.m4 -)
+cd ..
+
 name=$(uname)
 if [ "x${name}" == "xLinux" ]; then
-  PETSC_ARCH=arch-linux-serial-static
+  PETSC_ARCH=linux-serial-static
   target=linux-amd64
 elif [ "x${name}" == "xCYGWIN_NT-10.0" ]; then
-  PETSC_ARCH=arch-cygwin-serial-static
-  target=windows-amd64
+  PETSC_ARCH=cygwin-serial-static
+  target=windows64
 else
   echo "unknown uname '${name}'"
   exit 1
