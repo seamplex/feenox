@@ -7,7 +7,7 @@ fi
 
 package=feenox
 
-. clone.sh
+. clone-pull-autogen.sh
 . versions.sh
 
 if [ ! -e petsc-${petsc_ver} ]; then

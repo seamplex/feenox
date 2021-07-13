@@ -15,8 +15,10 @@ if [ ! -e petsc-${petsc_ver} ]; then
 fi 
 
 cd petsc-${petsc_ver}
-PETSC_DIR=$(pwd)
-./configure --with-mpi=0 \
+export PETSC_DIR=$(pwd)
+./configure PETSC_DIR=${PETSC_DIR} \
+	    PETSC_ARCH=${PETSC_ARCH} \
+	    --with-mpi=0 \
             --with-fc=0 \
             --with-cxx=0 \
             --with-fortran-bindings=0 \
@@ -48,9 +50,11 @@ if [ ! -e slepc-${slepc_ver} ]; then
 fi
 
 cd slepc-${slepc_ver}
-SLEPC_DIR=$(pwd)
-./configure
-make
+export SLEPC_DIR=$(pwd)
+export PETSC_DIR=${PETSC_DIR}
+export PETSC_ARCH=${PETSC_ARCH}
+./configure 
+make 
 make check
 cd ..
 
