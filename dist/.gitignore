@@ -1,0 +1,10 @@
+compile
+config.guess
+config.sub
+depcomp
+test-driver
+
+feenox
+linux-*
+petsc-*
+slepc-*

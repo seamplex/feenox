@@ -19,6 +19,7 @@ version.m4
 README.pdf
 
 feenox
+gsl-*
 *.tar.gz
 
 nbproject
