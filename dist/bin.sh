@@ -56,6 +56,7 @@ cd ${package}-${version}-${target}
   elif [ "x${target}" = "xwindows64" ]; then   
   
     cp ../${package}/${package}.exe bin
+    cp /bin/cygwin1.dll bin
     
     unix2dos -n ../${package}/AUTHORS   AUTHORS.txt
     unix2dos -n ../${package}/ChangeLog ChangeLog.txt
