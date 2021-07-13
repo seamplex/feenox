@@ -26,10 +26,12 @@ cd ${package}
  ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
              --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static"
             
- cd doc
-  make pdf
-  make info
- cd ..
+ if [ "x${target}" = "xlinux-amd64" ]; then
+  cd doc
+   make pdf
+   make info
+  cd ..
+ fi 
  make
 cd ..
 
