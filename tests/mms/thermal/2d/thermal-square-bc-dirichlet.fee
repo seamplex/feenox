@@ -1,0 +1,4 @@
+BC left   T=T_mms(x,y)
+BC right  T=T_mms(x,y)
+BC bottom T=T_mms(x,y)
+BC top    T=T_mms(x,y)

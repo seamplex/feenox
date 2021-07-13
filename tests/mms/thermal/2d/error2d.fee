@@ -1,0 +1,13 @@
+READ_MESH $1.msh DIMENSIONS 2 READ_FUNCTION T
+
+INTEGRATE 1 RESULT area
+h = sqrt(area/cells)
+
+T_mms(x,y) := $2
+
+INTEGRATE (T(x,y)-T_mms(x,y))^2 RESULT e_2
+error_2 = sqrt(e_2)
+
+FIND_EXTREMA abs(T(x,y)-T_mms(x,y)) MAX error_inf
+
+PRINT %e h error_inf error_2 log(h) log(error_inf) log(error_2) %g $3 cells nodes area

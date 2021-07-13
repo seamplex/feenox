@@ -1,4 +1,8 @@
+thermal-square-q.fee
 thermal-square_*.ppl
 thermal-square_*.dat
+thermal-square-fits.ppl
+thermal-square-einf.ppl
+thermal-square-e2.ppl
 *.vtk
 *.msh
