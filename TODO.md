@@ -4,17 +4,13 @@
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
- * memory & time (like clock()?)
+ * check typos in BC names
 
+ 
 ## Tests
  
  * cell-based mesh writes and integrations
  * FIT ranges
- 
-## Binaries
-
- * automate the generation of binary tarballs
-    - --with-fc=0 --with-cxx=0 --with-c2html=0
 
 ## Wasora keywords
 
@@ -92,9 +88,7 @@
  
 # PDEs
 
- * check when the matrices do not need to be rebuilt
- * DUMP_OBJECT / DUMP_MATRIX / DUMP_VECTOR
- * per-problem 
+ * check when the matrices do not need to be rebuilts
  
 ## Heat
 
@@ -110,7 +104,8 @@
  
 ## Mechanical
 
- * everything
+ * orthotropic linear
+ * non-linear
  * stresses
 
 ## Modal

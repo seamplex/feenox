@@ -135,15 +135,16 @@ int feenox_problem_bc_set_mechanical_pressure(element_t *element, bc_data_t *bc_
   // outward normal
   double n[3];
   feenox_call(feenox_mesh_compute_outward_normal(element, n));
+//   printf("%g\t%g\t$g\n", n
   
   // TODO: cache if not space dependent
   // remember that here p > 0 means compression
   double p = -feenox_expression_eval(&bc_data->expr);
   
   gsl_vector_set(feenox.pde.Nb, 0, p*n[0]);
-  gsl_vector_set(feenox.pde.Nb, 0, p*n[1]);
+  gsl_vector_set(feenox.pde.Nb, 1, p*n[1]);
   if (feenox.pde.dim > 2) {
-    gsl_vector_set(feenox.pde.Nb, 0, p*n[2]);
+    gsl_vector_set(feenox.pde.Nb, 2, p*n[2]);
   }  
   
   gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
