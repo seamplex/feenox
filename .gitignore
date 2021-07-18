@@ -23,3 +23,5 @@ gsl-*
 *.tar.gz
 
 nbproject
+
+mesh2d.msh

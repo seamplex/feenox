@@ -49,7 +49,7 @@ int feenox_mesh_tet4_init(void) {
   element_type->element_volume = feenox_mesh_tet_vol;
 
 
-  // node coordinates (from Gmsh doc)
+  // from Gmsh’ doc
 /*
 Tetrahedron:                     
 

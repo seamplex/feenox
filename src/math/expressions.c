@@ -783,7 +783,7 @@ double feenox_expression_eval(expr_t *this) {
   }
 
   if (gsl_isnan(this->items->value) || gsl_isinf(this->items->value)) {
-    feenox_push_error_message("in '%s'", this->string);
+//    feenox_push_error_message("in '%s'", this->string);
     feenox_nan_error();
   }
 

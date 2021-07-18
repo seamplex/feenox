@@ -43,7 +43,7 @@ int feenox_mesh_triang6_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_triangle;
   element_type->element_volume = feenox_mesh_triang_vol;
 
-  // coordenadas de los nodos
+  // from Gmsh’ doc
 /*
 Triangle6:    
     

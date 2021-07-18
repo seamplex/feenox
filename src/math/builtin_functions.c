@@ -161,7 +161,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"threshold_max",       2, 3, &feenox_builtin_threshold_max},
     {"threshold_min",       2, 3, &feenox_builtin_threshold_min},
     {"triangular_wave",     1, 1, &feenox_builtin_triangular_wave},
-    {"wall_time",           0, 1, &feenox_builtin_cpu_time},
+    {"wall_time",           0, 1, &feenox_builtin_wall_time},
 };
 
 

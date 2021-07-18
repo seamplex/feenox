@@ -48,7 +48,7 @@ int feenox_mesh_tet10_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_tetrahedron;
   element_type->element_volume = feenox_mesh_tet_vol;
 
-  // coordenadas de los nodos
+  // from Gmsh’ doc
 /*
 Tetrahedron10:
 

@@ -97,6 +97,20 @@ character-by-character where the `$n` construction is.
 Whether the resulting expression is to be interpreted as a string or as a
 numerical expression will depend on the context.
 
+##  DUMP
+
+Dump raw PETSc objects used to solve PDEs into files.
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+DUMP [ FORMAT { binary | ascii | octave } ] [ K | K_bc | b | b_bc | M | M_bc |
+~~~
+:::
+
+
+
+
 ##  FILE
 
 Define a file with a particularly formatted name to be used either as input or as output.

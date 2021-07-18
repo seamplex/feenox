@@ -47,7 +47,7 @@ int feenox_mesh_quad8_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_quadrangle;
   element_type->element_volume = feenox_mesh_quad_vol;
 
-  // node coordinates
+  // from Gmsh’ doc
 /*
  Quadrangle8:   
 

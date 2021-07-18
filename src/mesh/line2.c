@@ -48,7 +48,7 @@ int feenox_mesh_line2_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_line;
   element_type->element_volume = feenox_mesh_line_vol;
 
-  // node coordinates
+  // from Gmsh’ doc
 /*
 Line:              
                    

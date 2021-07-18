@@ -19,6 +19,7 @@ geometry:
 colorlinks: true
 mathspec: true
 syntax-definition: feenox.xml
+header-includes: \include{syntax.tex}
 listings: true
 toc: false
 ...
@@ -222,15 +223,46 @@ in such a way that the input is a near-English text file that defines the proble
 Since it is free ([as in freedom](https://www.gnu.org/philosophy/free-sw.en.html)) and open source, contributions to add features (and to fix bugs) are welcome. In particular, each kind of problem supported by FeenoX (thermal, mechanical, modal, etc.) has a subdirectory of source files which can be used as a template to add new problems, as implied in the “community-contributed problems” bullet above (_rules of modularity and extensibility_). See the [documentation](doc) for details about how to contribute.
 
 
- 
+## Why?
+
+The world is already full of finite-element programs and every day a grad student creates a new one from scratch.
+However, almost every piece of FEA software falls in either one of these two categories:
+
+ a. Powerful, flexible and complex advanced numerical solvers of general non-linear partial differential equations written by academics (for academics) distributed under the form of 
+     i. libraries, which the user has to compile and link to their own codes, or
+     ii. interpreted languages (i.e. Python) wrappers, which the user has to call from their own scripts, or
+     iii. input-file reading binaries, which the user needs to fill in with the weak form of the equation they need to solve.
+     
+    **Examples:** [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/), [Sparselizard](http://sparselizard.org/), [GetDP](http://getdp.info/), [FEnICS](https://fenicsproject.org/), [MOOSE](https://mooseframework.org/), [FreeFEM](https://freefem.org/), ...  
+     
+ b. Commercial, non-free (well some of them are free but coded in FORTRAN 77 so the source is unintelligible) and complex GUI-based programs that are
+     i. closed-source, so nobody can know what the actual equations are nor how they are solved, and/or
+     ii. complicated, so the only way to use them is through their embedded mouse-based GUI, and/or
+     iii. expensive and out of the league of many companies and professionals.
+     
+    **Examples:** [CalculiX](http://calculix.de/), [CodeAster](https://www.code-aster.org), [NASTRAN](https://github.com/nasa/NASTRAN-95)^[We list just the open-source ones because we [at Seamplex do not want to encourage the usage of non-free software](https://www.seamplex.com/mission.html#principles), but---with some exceptions---any of the commercial packages out there would also apply.] 
+     
+Hence, Fino tries to fill in the gap between these two worlds with a different design basis.
+
+
 # Download
 
 FeenoX is distributed under the terms of the [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.en.html) or (at your option) any later version. See [licensing below](#licensing) for details.
 
-|                   |                                                       |
-|-------------------|-------------------------------------------------------|
-|  Binaries         | <https://www.seamplex.com/feenox/dist/bin>            |
-|  Source tarballs  | <https://www.seamplex.com/feenox/dist/src>            |
+|                             |                                                       |
+|-----------------------------|-------------------------------------------------------|
+|  GNU/Linux binaries         | <https://www.seamplex.com/feenox/dist/linux>          |
+|  Windows binaries           | <https://www.seamplex.com/feenox/dist/windows>        |
+|  Source tarballs            | <https://www.seamplex.com/feenox/dist/src>            |
+
+
+ * Binaries are provided as statically-linked executables for convenience.
+ * They do not support MUMPS nor MPI and have only basic optimization flags. Please compile from source for high-end applications.
+ * Try to avoid Windows as much as you can. The binaries are provided as transitional packages for people that for some reason still use such an outdated, anachronous, awful and invasive operating system. They are compiled with Cygwin and have no support whatsoever. Really, really, get rid of Windows ASAP.
+ 
+   > “It is really worth any amount of time and effort to get away from Windows if you are doing computational science.”
+   >
+   > [<https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>]
 
 ## Git repository
 

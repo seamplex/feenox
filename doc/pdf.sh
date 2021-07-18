@@ -99,12 +99,22 @@ date: ${date}
 ...
 EOF
 
+dir=""
+for i in . .. doc; do
+  if [ -e ${i}/code-style.lua ]; then
+    dir=${i}
+  fi
+done
+if [ -z "${dir}" ]; then
+ echo "cannot find directory with TeX template and Lua filters"
+fi
 
-pandoc -s ${stuff}.md \
+
+pandoc -s hash.yaml ${stuff}.md \
   --filter pandoc-crossref \
-  --lua-filter not-in-format.lua \
-  --lua-filter code-style.lua \
-  --template=single.tex \
+  --lua-filter ${dir}/not-in-format.lua \
+  --lua-filter ${dir}/code-style.lua \
+  --template=${dir}/single.tex \
   --pdf-engine=xelatex \
   --listings --number-sections \
   -o ${stuff}.pdf

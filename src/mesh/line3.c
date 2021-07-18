@@ -50,7 +50,7 @@ int feenox_mesh_line3_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_line;
   element_type->element_volume = feenox_mesh_line_vol;
 
-  // coordenadas de los nodos
+  // from Gmsh’ doc
 /*
 Line3:      
             

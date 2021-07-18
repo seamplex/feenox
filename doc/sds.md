@@ -15,6 +15,7 @@ geometry:
 - head=2cm
 colorlinks: true
 mathspec: true
+header-includes: \include{syntax.tex}
 syntax-definition: feenox.xml
 listings: true
 toc: true
@@ -321,7 +322,7 @@ Here are the steps to get FeenoX' source repository, compile it and run the test
 As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
 
 ```{.terminal style=terminal}
-FeenoX v0.0.228-gec118b4-dirty 
+FeenoX v0.0.253-gcc1cf64-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]

@@ -342,10 +342,11 @@ AS_IF([test -e .git -a ! -z "$(which git)"],[
 EOF
 ])
 
+compiler_command="${CC}"
 AS_IF([test "x${have_slepc}" = "xyes"],[
-  compiler_command="mpicc"
-],[
-  compiler_command="${CC}"
+  AS_IF([test ! -z "$(which mpicc)"],[
+    compiler_command="mpicc"
+  ])
 ])
 
 

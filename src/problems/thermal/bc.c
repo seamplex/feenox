@@ -42,10 +42,7 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
   feenox_call(feenox_expression_parse(&bc_data->expr, rhs));
   
   bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
-//  thermal.bcs_depend_space |= bc_data->space_dependent;
-    
   bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
-//  thermal.bcs_depend_temperature |= bc_data->nonlinear;
 
   
   if (bc_data->nonlinear && bc_data->type_phys == BC_TYPE_THERMAL_TEMPERATURE) {
@@ -96,9 +93,6 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
   // TODO: cache if neither space nor temperature dependent
   double q = feenox_expression_eval(&bc_data->expr);
   
-//  printf("%g\t%g\t%g\t\n", x[0], x[1], q);
-//  feenox_debug_print_gsl_matrix(element->H[v], stdout);
-    
   gsl_vector_set(feenox.pde.Nb, 0, q);
   gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
   if (bc_data->nonlinear) {

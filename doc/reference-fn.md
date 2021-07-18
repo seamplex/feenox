@@ -201,7 +201,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ~~~{.terminal style=terminal}
 $ feenox clock.fee
 doing something in between
-difference	2.8844e-05	[seconds]
+difference	3.2329e-05	[seconds]
 $
 ~~~
 
@@ -237,6 +237,24 @@ cosh(x)
 :::
 
  $= \displaystyle \cosh(x)$
+
+
+
+##  cpu_time
+
+Returns the CPU time used by FeenoX, in seconds.
+If the optional argument `f` is not provided  or it is zero (default),
+the sum of times for both user-space and kernel-space usage is returned.
+For `f=1` only user time is returned.
+For `f=2` only system time is returned.
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+cpu_time([f])
+~~~
+:::
+
 
 
 
@@ -938,6 +956,20 @@ max(x1, x2, [...], [x10])
 
 
 
+##  memory
+
+Returns the maximum memory (resident set size) used by FeenoX, in Gigabytes.
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+memory()
+~~~
+:::
+
+
+
+
 ##  min
 
 Returns the minimum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be given.
@@ -1284,6 +1316,20 @@ triangular_wave(x)
 :::
 
  $= \displaystyle \begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}$
+
+
+
+##  wall_time
+
+Returns the time ellapsed since the invocation of FeenoX, in seconds.
+
+
+::: {.usage}
+~~~{.feenox style=feenox}
+wall_time()
+~~~
+:::
+
 
 
 

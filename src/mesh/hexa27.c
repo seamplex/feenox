@@ -48,6 +48,7 @@ int feenox_mesh_hexa27_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_hexahedron;
   element_type->element_volume = feenox_mesh_hex_vol;
 
+  // from Gmsh’ doc
 /*
  
   Hexahedron27:

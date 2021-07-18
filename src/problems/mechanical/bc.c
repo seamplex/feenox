@@ -33,9 +33,20 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
       feenox_push_error_message("cannot set w (displacement in z) with DOFs < 3");
       return FEENOX_ERROR;
     }
+
+  } else if (strcmp(lhs, "p") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION;
+    bc_data->type_math = bc_type_math_neumann;
+    bc_data->set = feenox_problem_bc_set_mechanical_pressure;
     
+    
+  } else if (strcmp(lhs, "normal_tension") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_TRACTION;
+    bc_data->type_math = bc_type_math_neumann;
+
+
   } else {
-    feenox_push_error_message("unknown modal boundary condition '%s'", lhs);
+    feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
     return FEENOX_ERROR;
   }
   
@@ -85,6 +96,57 @@ int feenox_problem_bc_set_dirichlet_mechanical(bc_data_t *bc_data, size_t j, siz
     }
     
   }  
+  
+#endif
+  
+  
+  return FEENOX_OK;
+}
+
+// this virtual method builds the surface elemental matrix
+// here "pressure" is taken positive as compression and negative as tension
+int feenox_problem_bc_set_mechanical_pressure(element_t *element, bc_data_t *bc_data, unsigned int v) {
+
+  // maybe this check can be made on the dimension of the physical entity at parse time
+  if ((feenox.pde.dim - element->type->dim) != 1) {
+    feenox_push_error_message("pressure BCs can only be applied to surfaces");
+    return FEENOX_ERROR;
+  }
+  
+#ifdef HAVE_PETSC
+
+  // TODO: make a generic neumann BC
+  // TODO: remove duplicate, use a macro
+  feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  double zero[3] = {0, 0, 0};
+  double *x = zero;
+  if (bc_data->space_dependent) {
+    feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
+    x = element->x[v];
+    feenox_mesh_update_coord_vars(x);
+  }
+  
+  // TODO: axisymmetric
+//  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
+  double r_for_axisymmetric = 1;
+  double w = element->w[v] * r_for_axisymmetric;
+
+  // outward normal
+  double n[3];
+  feenox_call(feenox_mesh_compute_outward_normal(element, n));
+  
+  // TODO: cache if not space dependent
+  // remember that here p > 0 means compression
+  double p = -feenox_expression_eval(&bc_data->expr);
+  
+  gsl_vector_set(feenox.pde.Nb, 0, p*n[0]);
+  gsl_vector_set(feenox.pde.Nb, 0, p*n[1]);
+  if (feenox.pde.dim > 2) {
+    gsl_vector_set(feenox.pde.Nb, 0, p*n[2]);
+  }  
+  
+  gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
   
 #endif
   
