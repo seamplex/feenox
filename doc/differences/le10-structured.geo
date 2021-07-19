@@ -12,7 +12,7 @@ Coherence;
 Physical Surface("upper") = {9};
 Physical Surface("DCD'C'") = {7, 1};
 Physical Surface("ABA'B'") = {11, 6};
-Physical Surface("BCB'C") = {10, 5};
+Physical Surface("BCB'C'") = {10, 5};
 Physical Curve("midplane") = {10};
 Physical Volume("bulk") = {2, 1};
 
