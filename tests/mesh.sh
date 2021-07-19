@@ -24,7 +24,7 @@ exitifwrong $?
 answer1 write_mesh2d.fee msh "0.531905"
 exitifwrong $?
 
-answer1 integrate2d.fee msh "0.530983 0.313011"
+answer1 integrate2d.fee msh "0.530983 0.530983 0.313011 0.310173"
 exitifwrong $? 
 
 # TODO

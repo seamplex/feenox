@@ -51,7 +51,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           }
         }
       } else {
-        // function is cell-defined but location is not cell, not so cool...
+        // location is cell but function is not cell
         size_t i = 0;
         for (i = 0; i < mesh->n_cells; i++) {
           element = mesh->cell[i].element;
@@ -122,9 +122,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
         if ((physical_group == NULL && element->type->dim == mesh->dim) ||
             (physical_group != NULL && element->physical_group == physical_group)) {
           // TODO: inlined function
-          feenox_var_value(feenox.mesh.vars.x) = mesh->cell[i].x[0];
-          feenox_var_value(feenox.mesh.vars.y) = mesh->cell[i].x[1];
-          feenox_var_value(feenox.mesh.vars.z) = mesh->cell[i].x[2];
+          feenox_mesh_update_coord_vars(mesh->cell[i].x);
           integral += feenox_expression_eval(expr) * mesh->cell[i].element->type->element_volume(mesh->cell[i].element);
         }
       }
@@ -140,10 +138,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
             feenox_mesh_compute_w_at_gauss(element, v, mesh->integration);
             // TODO: check is the integrand depends on space
             feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
-            // TODO: make a function (inlined?)
-            feenox_var_value(feenox.mesh.vars.x) = element->x[v][0];
-            feenox_var_value(feenox.mesh.vars.y) = element->x[v][1];
-            feenox_var_value(feenox.mesh.vars.z) = element->x[v][2];
+            feenox_mesh_update_coord_vars(element->x[v]);
             // si el elemento es de linea o de superficie calculamos la normal para tenerla en nx, ny y nz
             // TODO: nx
 /*            
@@ -151,7 +146,8 @@ int feenox_instruction_mesh_integrate(void *arg) {
               feenox_call(mesh_compute_normal(element));
             }  
  */
-            integral += element->w[v] * feenox_expression_eval(expr);
+            double xi = feenox_expression_eval(expr);
+            integral += element->w[v] * xi;
           }
         }
       }        
@@ -159,7 +155,6 @@ int feenox_instruction_mesh_integrate(void *arg) {
   }  
   
   feenox_var_value(result) = integral;
-  
 
   return FEENOX_OK;
 }

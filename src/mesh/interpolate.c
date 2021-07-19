@@ -79,7 +79,7 @@ double feenox_mesh_interpolate_function_node(struct function_t *function, const 
   if (function->spatial_derivative_of == NULL) {
     
     for (j = 0; j < element->type->nodes; j++) {
-      y += element->type->h(j, r) * function->data_value[element->node[j]->index_mesh];    
+      y += element->type->h(j, r) * function->data_value[element->node[j]->index_mesh];
     }
     
   } else {

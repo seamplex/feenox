@@ -165,16 +165,15 @@ int feenox_instruction_mesh_read(void *arg) {
   // TODO:
   // idem de celdas
   if (feenox.mesh.need_cells) {
-/*    
-    feenox_call(mesh_element2cell(mesh));
-    this->cells_argument = malloc(this->spatial_dimensions * sizeof(double *));
-    for (d = 0; d < this->spatial_dimensions; d++) {
-      this->cells_argument[d] = malloc(this->n_cells * sizeof(double));
+    feenox_call(feenox_mesh_element2cell(this));
+    feenox_check_alloc(this->cells_argument = calloc(this->dim, sizeof(double *)));
+    unsigned int m = 0;
+    for (m = 0; m < this->dim; m++) {
+      feenox_check_alloc(this->cells_argument[m] = calloc(this->n_cells, sizeof(double)));
       for (i = 0; i < this->n_cells; i++) {
-        this->cells_argument[d][i] = this->cell[i].x[d]; 
+        this->cells_argument[m][i] = this->cell[i].x[m]; 
       }
     }
- */
   }
 
   if (this->n_cells == 0) {
