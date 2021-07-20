@@ -3741,22 +3741,24 @@ int feenox_parse_find_extrema(void) {
     } else if (strcasecmp(token, "MESH") == 0) {
       feenox_call(feenox_parser_string(&name_mesh));
       
-///kw+FIND_EXTREMA+detail Either `NODES` or `CELLS` define how the integration is to be performed.
+///kw+FIND_EXTREMA+detail If neither `NODES`, `CELLS` or `GAUSS` is given then the search is
+///kw+FIND_EXTREMA+detail performed over the three of them.
 ///kw+FIND_EXTREMA+usage [ NODES
-///kw+FIND_EXTREMA+detail With `NODES` the integration is performed using the Gauss points
-///kw+FIND_EXTREMA+detail and weights associated to each element type.
+///kw+FIND_EXTREMA+detail With `NODES` only the function or expression is evalauted at the mesh nodes.
     } else if (strcasecmp(token, "NODES") == 0) {
       mesh_find_extrema->field_location = field_location_nodes;
             
-///kw+FIND_EXTREMA+usage | CELLS ]@
-///kw+FIND_EXTREMA+detail With `CELLS` the integral is computed as the sum of the product of the
-///kw+FIND_EXTREMA+detail integrand at the center of each cell (element) and the cell’s volume.
-///kw+FIND_EXTREMA+detail Do expect differences in the results and efficiency between these two approaches
-///kw+FIND_EXTREMA+detail depending on the nature of the integrand.
+///kw+FIND_EXTREMA+usage | CELLS
+///kw+FIND_EXTREMA+detail With `CELLS` only the function or expression is evalauted at the element centers.
     } else if (strcasecmp(token, "CELLS") == 0) {
       mesh_find_extrema->field_location = field_location_cells;
-      feenox.mesh.need_cells = 1;
-          
+//      feenox.mesh.need_cells = 1;
+
+///kw+FIND_EXTREMA+usage | GAUSS ]@
+///kw+FIND_EXTREMA+detail With `GAUSS` only the function or expression is evalauted at the Gauss points.
+    } else if (strcasecmp(token, "GAUSS") == 0) {
+      mesh_find_extrema->field_location = field_location_gauss;
+      
 ///kw+FIND_EXTREMA+usage [ MIN <variable> ]
 ///kw+FIND_EXTREMA+detail The value of the absolute minimum (maximum) is stored in the variable indicated by `MIN` (`MAX`).
 ///kw+FIND_EXTREMA+detail If the variable does not exist, it is created.

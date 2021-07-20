@@ -496,10 +496,10 @@ int feenox_mesh_compute_x_at_gauss(element_t *this, unsigned int v, int integrat
   int j, m;
   
   if (this->x == NULL) {
-    this->x = calloc(this->type->gauss[integration].V, sizeof(double *));
+    feenox_check_alloc(this->x = calloc(this->type->gauss[integration].V, sizeof(double *)));
   }
   if (this->x[v] == NULL) {
-    this->x[v] = calloc(3, sizeof(double));
+    feenox_check_alloc(this->x[v] = calloc(3, sizeof(double)));
   } else {
     return FEENOX_OK;
   }

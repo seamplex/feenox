@@ -153,17 +153,11 @@ int feenox_instruction_mesh_read(void *arg) {
   }
     
   // fill an array of nodes that can be used as arguments of functions
-  // TODO: put this in another loop?
-  feenox_check_alloc(this->nodes_argument = malloc(this->dim * sizeof(double *)));
-  for (unsigned int m = 0; m < this->dim; m++) {
-    feenox_check_alloc(this->nodes_argument[m] = malloc(this->n_nodes * sizeof(double)));
-    for (size_t j = 0; j < this->n_nodes; j++) {
-      this->nodes_argument[m][j] = this->node[j].x[m]; 
-    }
+  if (this->nodes_argument == NULL) {
+    feenox_call(feenox_mesh_create_nodes_argument(this));
   }
   
-  // TODO:
-  // idem de celdas
+  // see if we need to create cells and allocate space for arguments
   if (feenox.mesh.need_cells) {
     feenox_call(feenox_mesh_element2cell(this));
     feenox_check_alloc(this->cells_argument = calloc(this->dim, sizeof(double *)));
@@ -630,4 +624,20 @@ mesh_t *feenox_get_mesh_ptr(const char *name) {
     HASH_FIND_STR(feenox.mesh.meshes, name, mesh);
   }  
   return mesh;
+}
+
+
+int feenox_mesh_create_nodes_argument(mesh_t *this) {
+  
+  feenox_check_alloc(this->nodes_argument = calloc(this->dim, sizeof(double *)));
+  size_t j = 0;
+  unsigned int m = 0;
+  for (m = 0; m < this->dim; m++) {
+    feenox_check_alloc(this->nodes_argument[m] = calloc(this->n_nodes, sizeof(double)));
+    for (j = 0; j < this->n_nodes; j++) {
+      this->nodes_argument[m][j] = this->node[j].x[m]; 
+    }  
+  }
+  
+  return FEENOX_OK;
 }

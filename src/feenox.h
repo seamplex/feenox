@@ -1246,7 +1246,8 @@ struct mesh_t {
 typedef enum {
   field_location_default,
   field_location_nodes,
-  field_location_cells
+  field_location_cells,
+  field_location_gauss
 } field_location_t;
 
 struct mesh_write_dist_t {
@@ -2039,8 +2040,9 @@ extern double feenox_gsl_function(double x, void *params);
 
 // mesh.c
 extern int feenox_instruction_mesh_read(void *arg);
-
+extern int feenox_mesh_create_nodes_argument(mesh_t *this);
 extern int feenox_mesh_free(mesh_t *this);
+
 extern int feenox_mesh_read_vtk(mesh_t *this);
 extern int feenox_mesh_read_frd(mesh_t *this);
 

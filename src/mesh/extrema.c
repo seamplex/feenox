@@ -22,20 +22,31 @@
 #include <feenox.h>
 extern feenox_t feenox;
 
+#define MIN 0
+#define MAX 1
+
+#define feenox_store_extrema_function(minmax, ind, val) \
+  value[minmax] = val;  \
+  index[minmax] = ind;  \
+  x[minmax] = function->data_argument[0][ind];  \
+  y[minmax] = (function->n_arguments > 1)?function->data_argument[1][ind] : 0;  \
+  z[minmax] = (function->n_arguments > 2)?function->data_argument[2][ind] : 0;
+
+#define feenox_store_extrema_mesh(minmax, ind, val, where) \
+  value[minmax] = val;  \
+  index[minmax] = ind;  \
+  x[minmax] = where[0];  \
+  y[minmax] = where[1]; \
+  z[minmax] = where[2];
+
+
 int feenox_instruction_mesh_find_extrema(void *arg) {
 
-  double min = +INFTY;
-  double x_min = 0;
-  double y_min = 0;
-  double z_min = 0;
-  
-  double max = -INFTY;
-  double x_max = 0;
-  double y_max = 0;
-  double z_max = 0;
-
-  size_t i_max = 0;
-  size_t i_min = 0;
+  double value[2] = {+INFTY, -INFTY};
+  double x[2] = {0, 0};
+  double y[2] = {0, 0};
+  double z[2] = {0, 0};
+  size_t index[2] = {0, 0};
   
   mesh_find_extrema_t *mesh_find_extrema = (mesh_find_extrema_t *)arg;
   mesh_t *mesh = mesh_find_extrema->mesh;
@@ -44,136 +55,141 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
   expr_t *expr = &mesh_find_extrema->expr;
   element_t *element = NULL;
   
-  // TODO: is this the best way to go?
-  double y = 0;
+  double val = 0;
   if (physical_group == NULL) {
     if (function != NULL) {
-      if (mesh_find_extrema->field_location == field_location_cells) {
-        if (function->type == function_type_pointwise_mesh_cell && function->mesh == mesh) {
-          size_t i = 0;
-          for (i = 0; i < function->data_size; i++) {
-            y = function->data_value[i];
-            if (y > max) {
-              // TODO: SPOT!
-              max = y;
-              i_max = i;
-              x_max = function->data_argument[0][i];
-              y_max = (function->n_arguments > 1)?function->data_argument[1][i] : 0;
-              z_max = (function->n_arguments > 2)?function->data_argument[2][i] : 0;
-            }
-            if (y < min) {
-              // TODO: SPOT!
-              min = y;
-              i_min = i;
-              x_min = function->data_argument[0][i];
-              y_min = (function->n_arguments > 1)?function->data_argument[1][i] : 0;
-              z_min = (function->n_arguments > 2)?function->data_argument[2][i] : 0;
-            }
+      if (function->mesh == mesh && ((mesh_find_extrema->field_location == field_location_cells && function->type == function_type_pointwise_mesh_cell) ||
+                                     (mesh_find_extrema->field_location == field_location_nodes && function->type == function_type_pointwise_mesh_node))) {
+        size_t i = 0;
+        for (i = 0; i < function->data_size; i++) {
+          val = function->data_value[i];
+          if (val > value[MAX]) {
+            feenox_store_extrema_function(MAX, i, val);
           }
-        } else {
-          size_t i = 0;
-          for (i = 0; i < mesh->n_cells; i++) {
-            y = feenox_function_eval(function, mesh->cell[i].x);
-            if (y > max) {
-              max = y;
-              i_max = i;
-              x_max = mesh->cell[i].x[0];
-              y_max = mesh->cell[i].x[1];
-              z_max = mesh->cell[i].x[2];
-            }
-            if (y < min) {
-              min = y;
-              i_min = i;
-              x_min = mesh->cell[i].x[0];
-              y_min = mesh->cell[i].x[1];
-              z_min = mesh->cell[i].x[2];
-            }
+          if (val < value[MIN]) {
+            feenox_store_extrema_function(MIN, i, val);
           }
         }
       } else {
-        if (function->type == function_type_pointwise_mesh_node && function->mesh == mesh) {
-          size_t i = 0;
-          for (i = 0; i < function->data_size; i++) {
-            y = function->data_value[i];
-            if (y > max) {
-              max = y;
-              i_max = i;
-              x_max = function->data_argument[0][i];
-              y_max = (function->n_arguments > 1)?function->data_argument[1][i] : 0;
-              z_max = (function->n_arguments > 2)?function->data_argument[2][i] : 0;
-            }
-            if (y < min) {
-              min = y;
-              i_min = i;
-              x_min = function->data_argument[0][i];
-              y_min = (function->n_arguments > 1)?function->data_argument[1][i] : 0;
-              z_min = (function->n_arguments > 2)?function->data_argument[2][i] : 0;
-            }
+        
+        // unless explcitily asked, check for all nodes, cells and gauss
+        if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_cells) {
+          
+          if (mesh->cell == NULL) {
+            feenox_call(feenox_mesh_element2cell(mesh));
           }
-        } else {
+          
+          size_t i = 0;
+          for (i = 0; i < mesh->n_cells; i++) {
+            val = feenox_function_eval(function, mesh->cell[i].x);
+            if (val > value[MAX]) {
+              feenox_store_extrema_mesh(MAX, i, val, mesh->cell[i].x);
+            }
+            if (val < value[MIN]) {
+              feenox_store_extrema_mesh(MIN, i, val, mesh->cell[i].x);
+            }  
+          }
+          
+        }
+        
+        if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_nodes) {
+          
           size_t i = 0;
           for (i = 0; i < mesh->n_nodes; i++) {
-            y = feenox_function_eval(function, mesh->node[i].x);
-            if (y > max) {
-              max = y;
-              i_max = i;
-              x_max = mesh->node[i].x[0];
-              y_max = mesh->node[i].x[1];
-              z_max = mesh->node[i].x[2];
+            val = feenox_function_eval(function, mesh->node[i].x);
+            if (val > value[MAX]) {
+              feenox_store_extrema_mesh(MAX, i, val, mesh->node[i].x);
             }
-            if (y < min) {
-              min = y;
-              i_min = i;
-              x_min = mesh->node[i].x[0];
-              y_min = mesh->node[i].x[1];
-              z_min = mesh->node[i].x[2];
+            if (val < value[MIN]) {
+              feenox_store_extrema_mesh(MIN, i, val, mesh->node[i].x);
             }
           }
+          
         }
+
+        if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_gauss) {
+          
+          unsigned int v = 0;
+          size_t i = 0;
+          for (i = 0; i < mesh->n_elements; i++) {
+            element = &mesh->element[i];
+            for (v = 0; v < element->type->gauss[mesh->integration].V; v++) {
+              feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
+              
+              val = feenox_function_eval(function, element->x[v]);
+              if (val > value[MAX]) {
+                feenox_store_extrema_mesh(MAX, i, val, element->x[v]);
+              }
+              if (val < value[MIN]) {
+                feenox_store_extrema_mesh(MIN, i, val, element->x[v]);
+              }
+            }  
+          }
+          
+        }
+        
       }
+      
     } else {
-      if (mesh_find_extrema->field_location == field_location_cells) {
+      
+      // if we are here we are trying to find the extrema of an expression
+      // we cannot know whether they are going to be
+      if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_cells) {
+        if (mesh->cell == NULL) {
+          feenox_call(feenox_mesh_element2cell(mesh));
+        }
+
         size_t i = 0;
         for (i = 0; i < mesh->n_cells; i++) {
           feenox_mesh_update_coord_vars(mesh->cell[i].x);
-          y = feenox_expression_eval(expr);
-          if (y > max) {
-            max = y;
-            i_max = i;
-            x_max = mesh->cell[i].x[0];
-            y_max = mesh->cell[i].x[1];
-            z_max = mesh->cell[i].x[2];
+          val = feenox_expression_eval(expr);
+          
+          if (val > value[MAX]) {
+            feenox_store_extrema_mesh(MAX, i, val, mesh->cell[i].x);
           }
-          if (y < min) {
-            min = y;
-            i_min = i;
-            x_min = mesh->cell[i].x[0];
-            y_min = mesh->cell[i].x[1];
-            z_min = mesh->cell[i].x[2];
-          }
-        }
-      } else {
-        size_t i = 0;
-        for (i = 0; i < mesh->n_nodes; i++) {
-          feenox_mesh_update_coord_vars(mesh->node[i].x);
-          y = feenox_expression_eval(expr);
-          if (y > max) {
-            max = y;
-            i_max = i;
-            x_max = mesh->node[i].x[0];
-            y_max = mesh->node[i].x[1];
-            z_max = mesh->node[i].x[2];
-          }
-          if (y < min) {
-            min = y;
-            i_min = i;
-            x_min = mesh->node[i].x[0];
-            y_min = mesh->node[i].x[1];
-            z_min = mesh->node[i].x[2];
+          if (val < value[MIN]) {
+            feenox_store_extrema_mesh(MIN, i, val, mesh->cell[i].x);
           }
         }
       }
+      
+      if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_nodes) {
+        size_t i = 0;
+        for (i = 0; i < mesh->n_nodes; i++) {
+          feenox_mesh_update_coord_vars(mesh->node[i].x);
+          val = feenox_expression_eval(expr);
+          
+          if (val > value[MAX]) {
+            feenox_store_extrema_mesh(MAX, i, val, mesh->node[i].x);
+          }
+          if (val < value[MIN]) {
+            feenox_store_extrema_mesh(MIN, i, val, mesh->node[i].x);
+          }
+        }
+      }
+      
+      if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_gauss) {
+        unsigned int v = 0;
+        size_t i = 0;
+        for (i = 0; i < mesh->n_elements; i++) {
+          element = &mesh->element[i];
+          for (v = 0; v < element->type->gauss[mesh->integration].V; v++) {
+            feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
+            feenox_mesh_update_coord_vars(element->x[v]);
+            val = feenox_expression_eval(expr);
+            
+            if (val > value[MAX]) {
+              feenox_store_extrema_mesh(MAX, i, val, element->x[v]);
+            }
+            if (val < value[MIN]) {
+              feenox_store_extrema_mesh(MIN, i, val, element->x[v]);
+            }
+          }  
+        }
+      }
+      
     }
+    
   } else {
     
     if (function != NULL) {
@@ -207,20 +223,12 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           for (j = 0; j < element->type->nodes; j++) {
           
             feenox_mesh_update_coord_vars(mesh->node[j].x);
-            y = feenox_expression_eval(expr);
-            if (y > max) {
-              max = y;
-              i_max = element->node[j]->index_mesh;
-              x_max = element->node[j]->x[0];
-              y_max = element->node[j]->x[1];
-              z_max = element->node[j]->x[2];
+            val = feenox_expression_eval(expr);
+            if (val > value[MAX]) {
+              feenox_store_extrema_mesh(MAX, element->node[j]->index_mesh, val, mesh->node[j].x);
             }
-            if (y < min) {
-              min = y;
-              i_min = element->node[j]->index_mesh;
-              x_min = element->node[j]->x[0];
-              y_min = element->node[j]->x[1];
-              z_min = element->node[j]->x[2];
+            if (val < value[MIN]) {
+              feenox_store_extrema_mesh(MIN, element->node[j]->index_mesh, val, mesh->node[j].x);
             }
         
           }
@@ -230,35 +238,35 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
   }  
 
   if (mesh_find_extrema->min != NULL) {
-    feenox_var_value(mesh_find_extrema->min) = min;
+    feenox_var_value(mesh_find_extrema->min) = value[MIN];
   }
   if (mesh_find_extrema->i_min != NULL) {
-    feenox_var_value(mesh_find_extrema->i_min) = (double)i_min;
+    feenox_var_value(mesh_find_extrema->i_min) = (double)index[MIN];
   }
   if (mesh_find_extrema->x_min != NULL) {
-    feenox_var_value(mesh_find_extrema->x_min) = x_min;
+    feenox_var_value(mesh_find_extrema->x_min) = x[MIN];
   }
   if (mesh_find_extrema->y_min != NULL) {
-    feenox_var_value(mesh_find_extrema->y_min) = y_min;
+    feenox_var_value(mesh_find_extrema->y_min) = y[MIN];
   }
   if (mesh_find_extrema->z_min != NULL) {
-    feenox_var_value(mesh_find_extrema->z_min) = z_min;
+    feenox_var_value(mesh_find_extrema->z_min) = z[MIN];
   }
   
   if (mesh_find_extrema->max != NULL) {
-    feenox_var_value(mesh_find_extrema->max) = max;
+    feenox_var_value(mesh_find_extrema->max) = value[MAX];
   }
   if (mesh_find_extrema->i_max != NULL) {
-    feenox_var_value(mesh_find_extrema->i_max) = (double)i_max;
+    feenox_var_value(mesh_find_extrema->i_max) = (double)index[MAX];
   }
   if (mesh_find_extrema->x_max != NULL) {
-    feenox_var_value(mesh_find_extrema->x_max) = x_max;
+    feenox_var_value(mesh_find_extrema->x_max) = x[MAX];
   }
   if (mesh_find_extrema->y_max != NULL) {
-    feenox_var_value(mesh_find_extrema->y_max) = y_max;
+    feenox_var_value(mesh_find_extrema->y_max) = y[MAX];
   }
   if (mesh_find_extrema->z_max != NULL) {
-    feenox_var_value(mesh_find_extrema->z_max) = z_max;
+    feenox_var_value(mesh_find_extrema->z_max) = z[MAX];
   }
   
   return FEENOX_OK;

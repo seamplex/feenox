@@ -94,6 +94,25 @@ answerdiff() {
   return ${level}
 }
 
+answer1diff() {
+  echo -n "${1} ... "
+  base=$(basename ${1} .fee)
+  ${feenox} ${dir}/${1} ${2} > ${dir}/${base}.last
+  error=$?
+  
+  difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
+  if [ -z "${difference}" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, see ${base}.ref and ${base}.last"
+    level=1
+  fi
+  
+  return ${level}
+}
+
+
 answerfloat() {
   echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})

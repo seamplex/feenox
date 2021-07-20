@@ -1,0 +1,17 @@
+READ_MESH mesh2d.$1 DIMENSIONS 2 READ_FUNCTION f
+
+FIND_EXTREMA f                          MAX M1   MIN m1
+FIND_EXTREMA f                    NODES MAX M1n  MIN m1n
+FIND_EXTREMA f                    CELLS MAX M1c  MIN m1c
+FIND_EXTREMA f                    GAUSS MAX M1g  MIN m1g
+
+FIND_EXTREMA f(x,y)-cos(10*x)*sin(10*y)       MAX M2   MIN m2
+FIND_EXTREMA f(x,y)-cos(10*x)*sin(10*y) NODES MAX M2n  MIN m2n
+FIND_EXTREMA f(x,y)-cos(10*x)*sin(10*y) CELLS MAX M2c  MIN m2c
+FIND_EXTREMA f(x,y)-cos(10*x)*sin(10*y) GAUSS MAX M2g  MIN m2g
+
+PRINT %.3f M1 M1n M1c M1g 
+PRINT %.3f m1 m1n m1c m1g
+PRINT
+PRINT %.3f M2 M2n M2c M2g
+PRINT %.3f m2 m2n m2c m2g

@@ -27,6 +27,9 @@ exitifwrong $?
 answer1 integrate2d.fee msh "0.530983 0.530983 0.313011 0.310173"
 exitifwrong $? 
 
+answer1diff find_extrema2d.fee msh
+exitifwrong $? 
+
 # TODO
 # answer1 write_mesh2d.fee vtk "0.531905"
 # exitifwrong $?

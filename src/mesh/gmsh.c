@@ -879,6 +879,9 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       if (function->data_size != num_nodes) {
         function->type = function_type_pointwise_mesh_node;
         function->mesh = this;
+        if (this->nodes_argument == NULL) {
+          feenox_call(feenox_mesh_create_nodes_argument(this));
+        }
         function->data_argument = this->nodes_argument;
         function->data_size = num_nodes;
         if (function->data_value != NULL) {
