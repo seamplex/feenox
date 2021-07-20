@@ -29,7 +29,7 @@ int feenox_problem_init_parser_modal(void) {
   feenox.pde.setup_eps = feenox_problem_setup_eps_modal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_modal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_modal;
-  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_modal;
+  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_modal_displacement;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_modal;
   feenox.pde.solve_post = feenox_problem_solve_post_modal;
   

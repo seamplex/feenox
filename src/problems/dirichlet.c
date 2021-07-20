@@ -1,6 +1,16 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
+int feenox_dirichlet_add(size_t index, double value) {
+  
+  feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index;
+  feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = value;
+  feenox.pde.dirichlet_k++;
+  
+  return FEENOX_OK;
+}
+
+
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_dirichlet_eval(void) {
 
@@ -28,7 +38,7 @@ int feenox_dirichlet_eval(void) {
   element_t *element = NULL;
   element_ll_t *element_list = NULL;
   size_t j = 0;
-  size_t k = 0;
+  feenox.pde.dirichlet_k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
 
     // TODO: high-order nodes end up with a different penalty weight
@@ -44,7 +54,7 @@ int feenox_dirichlet_eval(void) {
               // if there is a condition we evaluate it now
               if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
 
-                if (k >= (current_size-4)) {            
+                if (feenox.pde.dirichlet_k >= (current_size-4)) {            
                   current_size += n_bcs;
                   feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, current_size * sizeof(PetscInt)));
                   feenox_check_alloc(feenox.pde.dirichlet_values  = realloc(feenox.pde.dirichlet_values,  current_size * sizeof(PetscScalar)));
@@ -55,7 +65,7 @@ int feenox_dirichlet_eval(void) {
                   feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
                 }  
                 // we pass a pointer to k and this method increments it as needed
-                feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j, &k));
+                feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j));
                 
               }  
             }  
@@ -66,8 +76,8 @@ int feenox_dirichlet_eval(void) {
   }
 
   // now we know how many rows we need to change
-  if (feenox.pde.n_dirichlet_rows != k) {
-    feenox.pde.n_dirichlet_rows = k;
+  if (feenox.pde.n_dirichlet_rows != feenox.pde.dirichlet_k) {
+    feenox.pde.n_dirichlet_rows = feenox.pde.dirichlet_k;
     
     // if k == 0 this like freeing
     feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.n_dirichlet_rows * sizeof(PetscInt)));

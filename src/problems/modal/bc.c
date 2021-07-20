@@ -49,28 +49,11 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const cha
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_dirichlet_modal(bc_data_t *bc_data, size_t j, size_t *k) {
-  
+int feenox_problem_bc_set_modal_displacement(bc_data_t *bc_data, size_t node_index) {
+
 #ifdef HAVE_PETSC
-  
-  if (bc_data->dof != -1) {
-    feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[bc_data->dof];
-    (*k) += 1; 
-  } else {
-    
-    feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[0];
-    (*k) += 1; 
-    if (feenox.pde.dofs > 1) {
-      feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[1];
-      (*k) += 1; 
-      if (feenox.pde.dofs > 2) {
-        feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[2];
-        (*k) += 1; 
-      }
-    }
-    
-  }  
-  
+  feenox_call(feenox_problem_bc_set_mechanical_displacement(bc_data, node_index));  
 #endif
+  
   return FEENOX_OK;
 }

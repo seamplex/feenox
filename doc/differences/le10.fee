@@ -18,7 +18,7 @@ nu = 0.3    # Poisson’s ratio
 
 SOLVE_PROBLEM   # solve!
 
-WRITE_MESH le10.vtk VECTOR u v w sigmay    # write post-processing view in VTK
+WRITE_MESH le10.vtk VECTOR u v w           # write post-processing view in VTK
 
 # write some (optional) information into the screen/terminal
 PRINT "number of elements = " %'.0f elements
@@ -26,5 +26,5 @@ PRINT "   number of nodes = " %'.0f nodes
 PRINT "         wall time = " %.1f wall_time() " secs"
 PRINT "          CPU time = " %.1f cpu_time() " secs"
 PRINT "[u,v,w] @ D = [" %.4f u(2000,0,300) v(2000,0,300) w(2000,0,300) "] mm"   SEP " "
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"                            SEP " "
+# PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"                            SEP " "
 # PRINT "  error @ D = " %.2f 100*abs(sigmay(2000,0,600)+5.38)/5.38 TEXT "%" SEP " "

@@ -18,7 +18,7 @@ extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element,
 
 // modal/bc.c
 extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const char *rhs);
-extern int feenox_problem_bc_set_dirichlet_modal(bc_data_t *bc_data, size_t node, size_t *index);
+extern int feenox_problem_bc_set_modal_displacement(bc_data_t *bc_data, size_t node_index);
 
 // modal/post.c
 extern int feenox_problem_solve_post_modal(void);

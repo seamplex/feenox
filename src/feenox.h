@@ -1650,7 +1650,7 @@ struct feenox_t {
     // problem-specific virtual methods
     int (*problem_init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
-    int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t node, size_t *index);
+    int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t node_index);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
@@ -1779,6 +1779,7 @@ struct feenox_t {
     PetscInt        *dirichlet_indexes;
     PetscScalar     *dirichlet_values;
     PetscScalar     *dirichlet_derivatives;
+    size_t          dirichlet_k;
   
     // PETSc's solvers
     TS ts;
@@ -2209,6 +2210,7 @@ extern PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, P
 extern int feenox_solve_slepc_eigen(void);
 
 // dirichlet.c
+extern int feenox_dirichlet_add(size_t index, double value);
 extern int feenox_dirichlet_eval(void);
 extern int feenox_dirichlet_set_K(void);
 extern int feenox_dirichlet_set_M(void);
@@ -2216,6 +2218,11 @@ extern int feenox_dirichlet_set_J(Mat J);
 extern int feenox_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_dirichlet_set_phi(Vec phi);
 extern int feenox_dirichlet_set_phi_dot(Vec phi_dot);
+
+// neumann.c
+extern int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *value);
+extern double feenox_problem_bc_natural_weight(element_t *element, unsigned int v);
+extern double *feenox_problem_bc_natural_x(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 #endif
 

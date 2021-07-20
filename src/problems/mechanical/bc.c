@@ -11,12 +11,12 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = -1;
     
-  } else if (strcmp(lhs, "u") == 0) {
+  } else if (strcmp(lhs, "u") == 0 || strcmp(lhs, "u_x") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = 0;
     
-  } else if (strcmp(lhs, "v") == 0) {
+  } else if (strcmp(lhs, "v") == 0 || strcmp(lhs, "u_y") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = 1;
@@ -25,7 +25,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
       return FEENOX_ERROR;
     }
 
-  } else if (strcmp(lhs, "w") == 0) {
+  } else if (strcmp(lhs, "w") == 0 || strcmp(lhs, "u_z") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = 2;
@@ -34,7 +34,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
       return FEENOX_ERROR;
     }
 
-  } else if (strcmp(lhs, "p") == 0) {
+  } else if (strcmp(lhs, "p") == 0 || strcmp(lhs, "pressure") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set = feenox_problem_bc_set_mechanical_pressure;
@@ -71,27 +71,23 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
   return FEENOX_OK;
 }
 
-int feenox_problem_bc_set_dirichlet_mechanical(bc_data_t *bc_data, size_t j, size_t *k) {
+int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t node_index) {
   
 #ifdef HAVE_PETSC
   
   if (bc_data->dof != -1) {
     
-    feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[bc_data->dof];
-    feenox.pde.dirichlet_values[*k] = feenox_expression_eval(&bc_data->expr);
-    (*k) += 1; 
+    // only one dof
+    feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[bc_data->dof], feenox_expression_eval(&bc_data->expr)));
     
   } else {
     
     // fixed means homogeneous dirichlet bc
-    feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[0];
-    (*k) += 1; 
+    feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], 0));
     if (feenox.pde.dofs > 1) {
-      feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[1];
-      (*k) += 1; 
+      feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[1], 0));
       if (feenox.pde.dofs > 2) {
-        feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[2];
-        (*k) += 1; 
+        feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[2], 0));
       }
     }
     
@@ -115,39 +111,25 @@ int feenox_problem_bc_set_mechanical_pressure(element_t *element, bc_data_t *bc_
   
 #ifdef HAVE_PETSC
 
-  // TODO: make a generic neumann BC
-  // TODO: remove duplicate, use a macro
-  feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  double zero[3] = {0, 0, 0};
-  double *x = zero;
-  if (bc_data->space_dependent) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
-    x = element->x[v];
-    feenox_mesh_update_coord_vars(x);
-  }
-  
-  // TODO: axisymmetric
-//  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
-  double r_for_axisymmetric = 1;
-  double w = element->w[v] * r_for_axisymmetric;
 
   // outward normal
   double n[3];
   feenox_call(feenox_mesh_compute_outward_normal(element, n));
-//   printf("%g\t%g\t$g\n", n
-  
+
   // TODO: cache if not space dependent
+  if (bc_data->space_dependent) {
+    feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration);
+    feenox_mesh_update_coord_vars(element->x[v]);
+  }
+  double p = feenox_expression_eval(&bc_data->expr);
+  
   // remember that here p > 0 means compression
-  double p = -feenox_expression_eval(&bc_data->expr);
+  double t[3];
+  for (unsigned int g = 0; g < feenox.pde.dim; g++) {
+    t[g] = -p * n[g];
+  }
   
-  gsl_vector_set(feenox.pde.Nb, 0, p*n[0]);
-  gsl_vector_set(feenox.pde.Nb, 1, p*n[1]);
-  if (feenox.pde.dim > 2) {
-    gsl_vector_set(feenox.pde.Nb, 2, p*n[2]);
-  }  
-  
-  gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
+  feenox_call(feenox_problem_bc_natural_set(element, v, t));
   
 #endif
   

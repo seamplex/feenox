@@ -104,11 +104,37 @@ Note that there is no need to define a density.
 
 ## CalculiX
 
-[CalculiX](http://www.calculix.de/) reads an input file like FeenoX, but by design it was decided that these files had to be “compatible” with Abaqus’ `.inp` format. The result is that the input files are clotted up with mesh data because the loads have to be given node-wise, so
-  1. a particular pre-processor (such as ccg, PrePoMax or FreeCAD) is needed, and
-  2. the input files cannot be Git-tracked
-  3. simple problems still need complex inputs
+<https://cofea.readthedocs.io/en/latest/benchmarks/001-thick-plate/tested-codes.html>
 
+
+### Diferences with FeenoX
+
+[CalculiX](http://www.calculix.de/) reads an input file like FeenoX, but by design it was decided that these files had to be “compatible” with Abaqus’ `.inp` format. The result is that the input files are clotted up with mesh data because the loads have to be given node-wise, so
+
+  1. A particular pre-processor (such as ccg, PrePoMax or FreeCAD) is needed to compute the nodal contributions of the external laods.
+  2. If the pressure changes from 1 to 2 then the pre-processor has to be re-run.
+  3. The input files cannot be Git-tracked.
+  4. Simple problems still need complex inputs.
+
+In FeenoX, if the pressure changes from 1 to 2 then all that is needed is to change
+
+```feenox
+BC upper    p=1
+```
+
+to
+
+```feenox
+BC upper    p=2
+```
+
+Then do `git commit -a -m "changed p from 1 to 2"` and re-run FeenoX. And if it changed from 2 to $\sqrt(x^2+y^2)$ then write
+
+```feenox
+BC upper    p=sqrt(x^2+y^2)
+```
+
+  
 Even though...
 
  1. in theory CalculiX is released under the terms of the GPLv3+, but it...
@@ -118,7 +144,6 @@ Even though...
  3. CalculiX can run on a cloud server, but it was not designed for that end.
  
 
-<https://cofea.readthedocs.io/en/latest/benchmarks/001-thick-plate/tested-codes.html>
 
 ## Code Aster
 

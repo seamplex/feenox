@@ -81,6 +81,7 @@ feenox_SOURCES = \
 ./problems/distribution.c \
 ./problems/dump.c \
 ./problems/init.c \
+./problems/neumann.c \
 ./problems/petsc_ksp.c \
 ./problems/petsc_snes.c \
 ./problems/petsc_ts.c \

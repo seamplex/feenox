@@ -22,7 +22,7 @@ int feenox_problem_init_parser_thermal(void) {
   feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_thermal;
-  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_dirichlet_thermal;
+  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_temperature;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_thermal;
   feenox.pde.solve_post = feenox_problem_solve_post_thermal;
   

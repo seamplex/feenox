@@ -56,15 +56,13 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t *k) {
+int feenox_problem_bc_set_thermal_temperature(bc_data_t *bc_data, size_t node_index) {
   
 #ifdef HAVE_PETSC
   
-  feenox.pde.dirichlet_indexes[*k] = feenox.pde.mesh->node[j].index_dof[bc_data->dof];
-  feenox.pde.dirichlet_values[*k] = feenox_expression_eval(&bc_data->expr);
+  feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));  
   // TODO: only in transient
 //  feenox.pde.dirichlet_derivatives[*k] = feenox_expression_derivative_wrt_variable(&bc_data->expr, feenox_special_var(t), feenox_special_var_value(t));
-  (*k) += 1;
   
 #endif
   return FEENOX_OK;
@@ -74,30 +72,17 @@ int feenox_problem_bc_set_dirichlet_thermal(bc_data_t *bc_data, size_t j, size_t
 int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v) {
   
 #ifdef HAVE_PETSC
-
-  // TODO: remove duplicate, use a macro
-  feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  double zero[3] = {0, 0, 0};
-  double *x = zero;
-  if (bc_data->space_dependent) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
-    x = element->x[v];
-    feenox_mesh_update_coord_vars(x);
-  }
   
-  // TODO: axisymmetric
-//  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
-  double r_for_axisymmetric = 1;
-  double w = element->w[v] * r_for_axisymmetric;
   // TODO: cache if neither space nor temperature dependent
+  double *x =feenox_problem_bc_natural_x(element, bc_data, v);
   double q = feenox_expression_eval(&bc_data->expr);
+  feenox_call(feenox_problem_bc_natural_set(element, v, &q));
   
-  gsl_vector_set(feenox.pde.Nb, 0, q);
-  gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi);
   if (bc_data->nonlinear) {
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     double dqdT = feenox_expression_derivative_wrt_function(&bc_data->expr, feenox.pde.solution[0], T);
+    // TODO: axisymmetric
+    double w = element->w[v];
     // mind the positive sign!
     gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Jbi);
   }
