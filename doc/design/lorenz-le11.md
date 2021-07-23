@@ -5,7 +5,7 @@ READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
 
 # linear temperature gradient in the radial and axial direction
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
 BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
@@ -62,9 +62,9 @@ y_0 = -16
 z_0 = 22.5
 
 # the dynamical system's equations written as naturally as possible
-x_dot .= sigma*(y - x)
-y_dot .= x*(r - z) - y
-z_dot .= x*y - b*z
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
 
 PRINT t x y z        # four-column plain-ASCII output
 ```

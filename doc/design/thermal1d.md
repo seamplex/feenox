@@ -23,7 +23,7 @@ Another design-basis decision is that **similar problems ought to have similar i
 ```feenox
 READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
-k(x) := 1+x                      # space-dependent conductivity
+k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
 BC right T=1
 SOLVE_PROBLEM
@@ -41,7 +41,7 @@ FeenoX has an **everything is an expression** design principle, meaning that any
 ```feenox
 READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
-k(x) := 1+T(x)                   # temperature-dependent conductivity
+k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
 BC right T=1
 SOLVE_PROBLEM
