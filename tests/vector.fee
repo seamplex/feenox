@@ -1,4 +1,4 @@
 VECTOR x SIZE 3 DATA 1^1 2+2 3*3
-VECTOR y(3)
-y(i) = i^2
-PRINT (x(1)+x(2)+x(3))*(y(1)+y(2)+y(3))
+VECTOR y[3]
+y[i] = i^2
+PRINT (x[1]+x[2]+x[3])*(y[1]+y[2]+y[3])

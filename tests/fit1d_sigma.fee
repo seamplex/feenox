@@ -7,7 +7,7 @@ FUNCTION g(t) DATA {
 }
 
 k = 0
-f(t) := k
+f(t) = k
 
 FIT f TO g VIA k
 PRINT sigma_k

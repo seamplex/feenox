@@ -26,8 +26,8 @@ extern feenox_t feenox;
 #include <ctype.h>
 #include <string.h>
 
-const char operators[]        = "&|=!<>+-*/^,()";
-const char factorseparators[] = "&|=!<>+-*/^,() \t\n";
+const char operators[]        = "&|=!<>+-*/^,()[]";
+const char factorseparators[] = "&|=!<>+-*/^,()[] \t\n";
 
 //extern const char operators[];
 //extern const char factorseparators[];
@@ -69,9 +69,9 @@ char *feenox_ends_in_dot(const char *name) {
 
 int feenox_count_arguments(char *string, size_t *n_chars) {
 
-  // arguments have to be inside parenthesis
-  if (string[0] != '(') {
-    feenox_push_error_message("argument list needs to start with ')'");
+  // arguments have to be inside parenthesis or brackets
+  if (string[0] != '(' && string[0] != '[') {
+    feenox_push_error_message("argument list needs to start with a parenthesis");
     return -1;
   }
 
@@ -81,9 +81,9 @@ int feenox_count_arguments(char *string, size_t *n_chars) {
   size_t level = 1;
   int n_arguments = 1;
   while (level != 0) {
-    if (*s == '(') {
+    if (*s == '(' || *s == '[') {
       level++;
-    } else if (*s == ')') {
+    } else if (*s == ')' || *s == ']') {
       level--;
     } else if (*s == '\0') {
       feenox_push_error_message("argument list needs to be closed with ')'");
@@ -107,7 +107,7 @@ int feenox_count_arguments(char *string, size_t *n_chars) {
 
 int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, size_t *n_chars) {
 
-  if (strchr(string, '(') == NULL) {
+  if (string[0] != '(' && string[0] != '[') {
     feenox_push_error_message("arguments must start with a parenthesis");
     return FEENOX_ERROR;
   }
@@ -125,13 +125,13 @@ int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, s
     char *argument = dummy;
     while (1) {
       // if level is 1 and next char is ',' or ')' and we are on the last argument, we are done
-      if (level == 1 && ((i != n_arguments-1 && *dummy == ',') || (i == n_arguments-1 && *dummy == ')'))) {
+      if (level == 1 && ((i != n_arguments-1 && *dummy == ',') || (i == n_arguments-1 && (*dummy == ')' || *dummy == ']')))) {
         break;
       }
           
-      if (*dummy == '(') {
+      if (*dummy == '(' || *dummy == '[') {
         level++;
-      } else if (*dummy == ')') {
+      } else if (*dummy == ')' || *dummy == ']') {
         level--;
       } else if (*dummy == '\0') {
         feenox_push_error_message("when parsing arguments");
@@ -355,7 +355,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       item->vector = vector;
     } else if ((var = feenox_get_variable_ptr(token)) != NULL) {
       // check that variables don't need arguments
-      if (string[strlen(token)] == '(') {
+      if (string[strlen(token)] == '(' || string[strlen(token)] == '[') {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
         return NULL;
       }
@@ -395,8 +395,9 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       char *argument;
       feenox_check_alloc_null(argument = strdup(string+strlen(token)));
 
+      // TODO: differentiate between functions and vectors/matrices
       // arguments have to be in parenthesis
-      if (*argument != '(') {
+      if (*argument != '[' && *argument != '(') {
         feenox_push_error_message("expected parenthesis after '%s'", token);
         return NULL;
       }

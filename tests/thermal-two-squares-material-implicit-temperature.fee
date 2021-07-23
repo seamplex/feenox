@@ -1,8 +1,8 @@
 READ_MESH two-squares.msh DIMENSIONS 2
 PROBLEM thermal
 
-k_soft(x,y) := 0.5+T(x,y)
-k_hard(x,y) := 2.0-T(x,y)
+k_soft(x,y) = 0.5+T(x,y)
+k_hard(x,y) = 2.0-T(x,y)
 
 BC left  T=0
 BC right T=1

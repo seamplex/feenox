@@ -5,7 +5,7 @@ FUNCTION f(x) INTERPOLATION linear DATA {
 3 9
 }
 
-vec_f(3) = 1
+vec_f[3] = 1
 f_a = vecmin(vec_f_x)
 f_b = vecmax(vec_f_x)
 

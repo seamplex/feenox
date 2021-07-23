@@ -16,7 +16,7 @@ BC left  T=0
 BC right T=100*sin(pi*t/40)
 
 # initial condition
-T_0(x) := 0
+T_0(x) = 0
 
 SOLVE_PROBLEM
 

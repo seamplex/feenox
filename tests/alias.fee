@@ -2,9 +2,9 @@ VAR x'
 ALIAS x' AS xi
 # xi = 1
 
-VECTOR v(2) DATA 2 3
-ALIAS v1 IS v(1)
-ALIAS v(2) AS v2
+VECTOR v[2] DATA 2 3
+ALIAS v1 IS v[1]
+ALIAS v[2] AS v2
 
 PRINT x' v1 v2
 

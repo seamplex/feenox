@@ -1,7 +1,7 @@
 # the fibonacci sequence as a vector
 VECTOR f SIZE 25
 
-f(i)<1:2> = 1
-f(i)<3:vecsize(f)> = f(i-2) + f(i-1)
+f[i]<1:2> = 1
+f[i]<3:vecsize(f)> = f[i-2] + f[i-1]
 
 PRINT f SEP " "

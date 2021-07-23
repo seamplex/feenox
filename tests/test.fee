@@ -3,6 +3,6 @@
 
 VAR x
 # x = 1
-f(x) := x
-g(x) := (-f(x))
+f(x) = x
+g(x) = (-f(x))
 # PRINT -x (-x) -f(x) 

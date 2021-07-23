@@ -361,8 +361,9 @@ int feenox_parse_line(void) {
                (equal_sign = strstr(feenox_parser.full_line, ".=")) != NULL ||
                (equal_sign = strchr(feenox_parser.full_line, '=')) != NULL) {
         
-        enum { parser_dae, parser_function, parser_assignment } type;
+        enum { parser_assignment, parser_dae, parser_function } type;
         
+        // first see if there is an explicit sign
         switch (*equal_sign) {
           case '=':
             type = parser_assignment;
@@ -378,10 +379,44 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           break;  
         }     
-                
+
         *equal_sign = '\0';
         char *lhs = feenox_parser.full_line;
         char *rhs = equal_sign + 1 + (equal_sign[1] == '=');
+        
+        // try to figure out if it is a DAE or a function automatically
+        if (type == parser_assignment) {
+
+          char *lhs_tmp = NULL;
+          feenox_check_alloc(lhs_tmp = strdup(lhs));
+          char *lhs_object = NULL;
+          lhs_object = strtok(lhs_tmp, factorseparators);
+          
+          // check if it is a function
+          int length_full = strlen(lhs);
+          int length_object = strlen(lhs_object);
+          if (length_full > length_object && lhs[length_object] == '(') {
+            type = parser_function;
+          } else {
+            
+            // check if the object belongs to the phase space
+            phase_object_t *phase_object = NULL;
+            LL_FOREACH(feenox.dae.phase_objects, phase_object) {
+              
+              if ((phase_object->variable != NULL      && strcmp(lhs_object, phase_object->variable->name) == 0) ||
+                  (phase_object->variable_dot != NULL  && strcmp(lhs_object, phase_object->variable_dot->name) == 0) ||
+                  (phase_object->vector != NULL        && strcmp(lhs_object, phase_object->vector->name) == 0) ||
+                  (phase_object->vector_dot != NULL    && strcmp(lhs_object, phase_object->vector_dot->name) == 0) ||
+                  (phase_object->matrix != NULL        && strcmp(lhs_object, phase_object->matrix->name) == 0) ||
+                  (phase_object->matrix_dot != NULL    && strcmp(lhs_object, phase_object->matrix_dot->name) == 0)) {
+                type = parser_dae;
+              }
+              
+            }
+          }
+          feenox_free(lhs_tmp);
+        }
+        
         
         switch (type) {
           case parser_assignment:
@@ -1518,10 +1553,11 @@ int feenox_parse_vector(void) {
 ///kw+VECTOR+usage <name>
   feenox_call(feenox_parser_string(&name));
   
-  // if there are parenthesis, the size is between them
-  if ((dummy_openpar = strchr(name, '(')) != NULL) {
-    if ((dummy_closepar = strrchr(name, ')')) == NULL) {
+  // if there are brackets or parenthesis, the size is between them
+  if ((dummy_openpar = strchr(name, '[')) != NULL || (dummy_openpar = strchr(name, '(')) != NULL) {
+    if ((dummy_closepar = strrchr(name, ']')) == NULL && (dummy_closepar = strrchr(name, ')')) == NULL) {
       feenox_push_error_message("expecting closing parenthesis in expression '%s'", name);
+      return FEENOX_ERROR;
     }
     *dummy_openpar = '\0';
     *dummy_closepar = '\0';

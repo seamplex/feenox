@@ -7,10 +7,10 @@ FUNCTION f(x) DATA {
 
 VECTOR b(vecsize(vec_f))
 
-b(1) = 0
-b(2) = 0.5
-b(3) = 2.5
-b(4) = 3
+b[1] = 0
+b[2] = 0.5
+b[3] = 2.5
+b[4] = 3
 
 FUNCTION g(x) VECTORS vec_f_x b
 

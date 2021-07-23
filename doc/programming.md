@@ -23,6 +23,12 @@ The main objective is to comply with the Software Requirements Specification. Wi
  
 ## Languages
 
+C++ is a great language with used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not rubust, not easy to debug (especially with templates). The cons are far more than the pros.
+
+Fortran is a terrible language. Period.
+
+Go & Rust, I think still nobody knows. But Rust's automatic memory handling is not a point strong enough for CAE/DAE/FEA software.
+
  * Stick to plain C.
  
    > C enables us to build data structures for storing sparse matrices, solver information, etc. in ways that Fortran simply does not allow. ANSI C is a complete standard that all modern C compilers support. The language is identical on all machines. C++ is still evolving and compilers on different machines are not identical. Using C function pointers to provide data encapsulation and polymorphism allows us to get many of the advantages of C++ without using such a large and more complicated language.
@@ -37,11 +43,12 @@ The main objective is to comply with the Software Requirements Specification. Wi
    > Linus Torvalds about why Git is written in C  
    > <http://harmful.cat-v.org/software/c++/linus>
  
-   Libraries written in C++ are allowed as long as they provide C wrappers and do not meddle with stuff we do not need.
+   Libraries written in C++ are allowed as long as they provide C wrappers and do not meddle with stuff we do not need nor want.
    
- * Keep Fortran even farther away. It is allowed only for existing libaries dating from ancient well tested and optimized code, but for nothing else.
+ * Keep Fortran even farther away. It is allowed only for existing libaries dating from ancient well-tested and optimized code, but for nothing else.
  * Modern high-level languages like Python or Julia are targets and not sources of FeenoX.
  * For documentation and comments within the code, American English should be used.
+
 
 ## Programming IDEs
 
@@ -214,15 +221,7 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
 
 # Code of coduct
 
-Copied from [NumFOCUS Code of Conduct---THE SHORT VERSION](https://numfocus.org/code-of-conduct) and piped through `sed s/NumFOCUS/FeenoX`:
- 
-> Be kind to others. Do not insult or put down others. Behave professionally. Remember that harassment and sexist, racist, or exclusionary jokes are not appropriate for FeenoX.
-> 
-> All communication should be appropriate for a professional audience including people of many different backgrounds. Sexual language and imagery is not appropriate.
-> 
-> FeenoX is dedicated to providing a harassment-free community for everyone, regardless of gender, sexual orientation, gender identity and expression, disability, physical appearance, body size, race, or religion. We do not tolerate harassment of community members in any form.
->
-> Help to make this a welcoming, friendly community for all.
+ * See the (code of conduct)[CODE_OF_COUNDUCT.md] for participating in the commnity.
 
  
 # Release plans

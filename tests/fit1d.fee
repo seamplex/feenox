@@ -6,7 +6,7 @@ FUNCTION g(x) DATA {
 4   17
 }
 VAR a b c
-f(x) := a*x^2 + b*x + c
+f(x) = a*x^2 + b*x + c
 
 FIT f TO g VIA a b c
 PRINT SEP " " %g a (b>1e-9) c

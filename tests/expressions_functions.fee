@@ -1,4 +1,4 @@
-f(x) := x
+f(x) = x
 x = 1
 a = (-f(x))-(-x)
 PRINT a

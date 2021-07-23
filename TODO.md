@@ -21,9 +21,9 @@
  * M4 (MUSTACHE? MACRO?)
  * SHELL
  * HISTORY
- * PARAMETRIC
- * FIT
- * MINIMIZE
+ * PARAMETRIC? - "do one thing well and move these guys to an outer-level shell"
+ * MINIMIZE?
+ * FIT? maybe we can keep this for fitting DAEs
  
  * explain that 
    - nouns -> definitions
@@ -35,6 +35,7 @@
    - derivative of a column with respect to another one as a UNIX filter
  * vector & matrix assignements & DAEs
  * debug mode, line-by-line
+ * trap signit & sigterm
 
 ## API
 
@@ -83,12 +84,14 @@
 ## Extensions
  
  * mustache instead of m4
- * gmsh as a library?
+ * gmsh as a library? maybe not, just import both gmsh and feenox in Python and use them together
 
  
 # PDEs
 
- * check when the matrices do not need to be rebuilts
+ * check when the matrices do not need to be rebuilt
+ * Laplace/Poisson/Helmholtz as a template (fem or fem+fvm?)
+ 
  
 ## Heat
 
@@ -106,7 +109,8 @@
 
  * orthotropic linear
  * non-linear
- * stresses
+ * stresses: count negative jacobians and worst jacobians
+ * stress linearization (do we need a per-problem parser?)
 
 ## Modal
 
@@ -114,6 +118,6 @@
  
 ## Neutron
 
- * diffusion
- * transport
+ * diffusion/transport
+ * FEM/FVM
 

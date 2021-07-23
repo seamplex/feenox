@@ -19,7 +19,13 @@ FeenoX is a free and open source tool released under the terms of the GPLv3+ tha
 <!-- ![Updates, examples, V&V cases and full reference: <https://www.seamplex.com/feenox>](feenox-logo) -->
 
 
+# Background
+
+The content of the README?
+
 # Running `feenox`
+
+Download, compilation, instalaltion.
 
 ## Invocation
 
@@ -35,22 +41,28 @@ The `feenox` executable supports the following options:
 TBD
 
 
-## Example input files
+# Tutorial
 
-### Minimum working example
+# Verification and validation
 
-TBD
+## MMS
 
-### Extended annotated example
+## Benchmarks
 
-TBD
+## Comparison with other programs
 
-
-# Test case
-
-TBD
-
+# Code description
 
 # Reference
 
 TBD
+
+\appendix
+
+# Software design specifications
+
+# FeenoX & UNIX
+
+# Contributing 
+
+# History

@@ -56,7 +56,7 @@ int feenox_problem_init_parser_general(void) {
   }
 
 #ifdef HAVE_PETSC
-  if (sizeof(PetscReal) != sizeof(double)) {
+  if ((sizeof(PetscReal) != sizeof(double)) || (sizeof(PetscScalar) != sizeof(double))) {
     feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d != PetscReal = %d", sizeof(double), sizeof(PetscReal));
     return FEENOX_ERROR;
   }

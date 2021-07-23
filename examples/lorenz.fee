@@ -30,9 +30,9 @@ y_0 = -16
 z_0 = 22.5
 
 # the dynamical system's equations
-x_dot .= sigma*(y - x)
-y_dot .= x*(r - z) - y
-z_dot .= x*y - b*z
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
 
 PRINT %e t x y z        # four-column plain-ASCII output
 #> ![Drawn with gnuplot](lorenz-gnuplot.svg)

@@ -4,7 +4,7 @@ PROBLEM heat DIMENSIONS 1
 BC left  T=0
 BC right T=1
 
-k(x) := 1+T(x)
+k(x) = 1+T(x)
 
 SOLVE_PROBLEM
 

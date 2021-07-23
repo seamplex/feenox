@@ -209,7 +209,14 @@ $ ./two-squares-thermal.sh
 
 This way of performing parametric studies is very flexible since the varied arguments can be either strings or numbers. Both the actual input itself and the external driver script can be tracked using version control systems, allowing for an efficient and flexible traceability scheme. This is a design feature of FeenoX, inspired by the UNIX rules of generation and of economy. 
 
-**Cantilever beam with tet4, tet10, hex8, hex20 & hex27**
+**Cantilever beam with tet4/tet10/hex8/hex20/hex27 struct/delaunay/etc**
+
+Max. deflection vs. element size
+                vs. total DOFs
+                vs. CPU  (run several times and take average and standard deviation)
+                vs. memory
+                
+MUMPS/GAMG, local, aws, contabo
 
 The second way of running parametric studies is by using the internal keyword `PARAMETRIC` that allows sweeping a numerical range of one or more FeenoX variables. 
 
@@ -222,6 +229,8 @@ esyscmd(awk -f quote.awk 070-efficienciy.md)
 Solve LE10 with FeenoX & ccx, show results, CPU & memory
 
 Include time to pre-process ccx!
+
+SPOOLES (ccx) vs. MUMPS (feenox)
 
  * auto KSP/SNES
  * `--log_view`

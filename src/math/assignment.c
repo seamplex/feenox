@@ -43,8 +43,8 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
     *dummy_index_range = '\0';
   }
   
-  // subindexes between parenthesis if it is a vector or matrix
-  if ((dummy_par = strchr(left_hand, '(')) != NULL) {
+  // subindexes between brackets if it is a vector or matrix
+  if ((dummy_par = strchr(left_hand, '[')) != NULL) {
     *dummy_par = '\0';
   }
   
@@ -89,7 +89,7 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
       feenox_push_error_message("'%s' is neither a vector nor a matrix, functions are defined using ':=' instead of '='", left_hand);
       return FEENOX_ERROR;      
     }
-    *dummy_par = '(';
+    *dummy_par = '[';
     
     // TODO: check for dependence on i and j by looking at the list of items
     if (assignment->matrix != NULL) {
@@ -103,10 +103,10 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
       if (strcmp("(i,j)", dummy_par) != 0) {
         assignment->plain = 0;
       }
-      feenox_call(feenox_parse_range(dummy_par, '(', ',', ')', &assignment->row, &assignment->col));
+      feenox_call(feenox_parse_range(dummy_par, '[', ',', ']', &assignment->row, &assignment->col));
     } else if (assignment->vector != NULL) {
-      if ((dummy = strrchr(dummy_par, ')')) == NULL) {
-        feenox_push_error_message("unmatched parenthesis for '%s'", left_hand);
+      if ((dummy = strrchr(dummy_par, ']')) == NULL) {
+        feenox_push_error_message("unmatched bracket for '%s'", left_hand);
         return FEENOX_ERROR;
       }
       *dummy = '\0';
