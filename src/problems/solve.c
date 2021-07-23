@@ -34,28 +34,7 @@ int feenox_instruction_solve_problem(void *arg) {
   }
   // TODO: how to do this in parallel?
   feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));
-
   
-/*  
-  feenox_var(feenox.pde.vars.time_petsc_build) += feenox.pde.petsc.build_end - feenox.pde.petsc.build_begin;
-  feenox_var(feenox.pde.vars.time_wall_build)  += feenox.pde.wall.build_end  - feenox.pde.wall.build_begin;
-  feenox_var(feenox.pde.vars.time_cpu_build)   += feenox.pde.cpu.build_end   - feenox.pde.cpu.build_begin;
-  
-  feenox_var(feenox.pde.vars.time_petsc_solve) += feenox.pde.petsc.solve_end - feenox.pde.petsc.solve_begin;
-  feenox_var(feenox.pde.vars.time_wall_solve)  += feenox.pde.wall.solve_end  - feenox.pde.wall.solve_begin;
-  feenox_var(feenox.pde.vars.time_cpu_solve)   += feenox.pde.cpu.solve_end   - feenox.pde.cpu.solve_begin;
-
-  feenox_var(feenox.pde.vars.time_petsc_stress) += feenox.pde.petsc.stress_end - feenox.pde.petsc.stress_begin;
-  feenox_var(feenox.pde.vars.time_wall_stress)  += feenox.pde.wall.stress_end  - feenox.pde.wall.stress_begin;
-  feenox_var(feenox.pde.vars.time_cpu_stress)   += feenox.pde.cpu.stress_end   - feenox.pde.cpu.stress_begin;
-  
-  feenox_var(feenox.pde.vars.time_petsc_total) += feenox_var(feenox.pde.vars.time_petsc_build) + feenox_var(feenox.pde.vars.time_petsc_solve) + feenox_var(feenox.pde.vars.time_petsc_stress);
-  feenox_var(feenox.pde.vars.time_wall_total)  += feenox_var(feenox.pde.vars.time_wall_build)  + feenox_var(feenox.pde.vars.time_wall_solve)  + feenox_var(feenox.pde.vars.time_wall_stress);
-  feenox_var(feenox.pde.vars.time_cpu_total)   += feenox_var(feenox.pde.vars.time_cpu_build)   + feenox_var(feenox.pde.vars.time_cpu_solve)   + feenox_var(feenox.pde.vars.time_cpu_stress);
-
-  getrusage(RUSAGE_SELF, &feenox.pde.resource_usage);
-  feenox_value(feenox.pde.vars.memory) = (double)(1024.0*feenox.pde.resource_usage.ru_maxrss);
-*/
 #endif  
   return FEENOX_OK;
 }
@@ -135,25 +114,24 @@ int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
     }
   }
 
-/*  
   if (compute_gradients) {
     // TODO: function pointers
+/*    
     if (feenox.pde.problem_family == problem_family_mechanical) {
   
-      time_checkpoint(stress_begin);
       feenox_call(feenox_compute_strain_energy());
       if (feenox.pde.gradient_evaluation != gradient_none) {
         feenox_call(feenox_break_compute_stresses());
       }  
-      time_checkpoint(stress_end);
       
     } else if (feenox.pde.problem_family == problem_family_thermal) {
        
       feenox_call(feenox_thermal_compute_fluxes());
     }  
+ */
   }
-*/    
   
+  feenox_call(feenox_gradient_compute());
   
   return FEENOX_OK;
 }

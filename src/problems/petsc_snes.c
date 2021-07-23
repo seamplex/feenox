@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's non-linear solver using PETSc routines
  *
- *  Copyright (C) 2020 jeremy theler
+ *  Copyright (C) 2020--2021 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -29,8 +29,6 @@ int feenox_solve_petsc_nonlinear(void) {
   
   SNESConvergedReason reason;
   
-//  time_checkpoint(build_begin);
-  
   if (feenox.pde.snes == NULL) {
     // TODO: move to a separate function
     petsc_call(SNESCreate(PETSC_COMM_WORLD, &feenox.pde.snes));
@@ -41,7 +39,6 @@ int feenox_solve_petsc_nonlinear(void) {
 //    feenox_call(feenox_dirichlet_eval());
 //    feenox_call(feenox_dirichlet_set_J(feenox.pde.J));
 //    feenox.pde.already_built = PETSC_TRUE;
-//    time_checkpoint(build_end);
     
     // monitor
 //    petsc_call(SNESMonitorSet(feenox.pde.snes, feenox.pde.snes_monitor, NULL, 0));

@@ -993,7 +993,7 @@ struct element_t {
   
   double quality;
   double volume;
-  double weight;   // this weight is used to average the contribution of this element to nodal gradients
+  double gradient_weight;   // this weight is used to average the contribution of this element to nodal gradients
   double *w;       // weights of the gauss points
   double **x;      // coordinates fo the gauss points 
   
@@ -2069,6 +2069,7 @@ extern int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx
 extern int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
 extern int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integration);
 extern int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integration);
+extern int feenox_mesh_compute_dhdx_at_gauss(element_t *this, int v, int integration);
 extern int feenox_mesh_compute_x_at_gauss(element_t *this, unsigned int v, int integration);
 extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
 
@@ -2250,6 +2251,10 @@ extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned
 extern int feenox_elemental_objects_allocate(element_t *this);
 extern int feenox_elemental_objects_free(void);
 extern int feenox_build_assembly(void);
+
+// gradient.c
+extern int feenox_gradient_compute(void);
+extern int feenox_gradient_compute_at_nodes(element_t *this, mesh_t *mesh);
 
 // problem-dependent virtual methods
 #include "problems/thermal/methods.h"
