@@ -34,16 +34,16 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
       return FEENOX_ERROR;
     }
 
-  } else if (strcmp(lhs, "p") == 0 || strcmp(lhs, "pressure") == 0) {
+  } else if (strcmp(lhs, "p") == 0 || strcmp(lhs, "compression  ") == 0 || strcmp(lhs, "pressure") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION;
     bc_data->type_math = bc_type_math_neumann;
-    bc_data->set = feenox_problem_bc_set_mechanical_pressure;
+    bc_data->set = feenox_problem_bc_set_mechanical_compression;
     
     
-  } else if (strcmp(lhs, "normal_tension") == 0) {
-    bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_TRACTION;
+  } else if (strcmp(lhs, "t") == 0 || strcmp(lhs, "tension") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_TENSION;
     bc_data->type_math = bc_type_math_neumann;
-
+    bc_data->set = feenox_problem_bc_set_mechanical_tension;
 
   } else {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
@@ -64,7 +64,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
   }
 
   if (bc_data->nonlinear && bc_data->type_phys == BC_TYPE_MECHANICAL_DISPLACEMENT) {
-    feenox_push_error_message("strong boundary condition '%s' cannot depend on temperature", rhs);
+    feenox_push_error_message("essential boundary condition '%s' cannot depend on temperature", rhs);
     return FEENOX_ERROR;
   }
   
@@ -99,9 +99,18 @@ int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t nod
   return FEENOX_OK;
 }
 
+int feenox_problem_bc_set_mechanical_tension(element_t *element, bc_data_t *bc_data, unsigned int v) {
+  feenox_call(feenox_problem_bc_set_mechanical_normal_stress(element, bc_data, v, +1));
+  return FEENOX_OK;
+}
+
+int feenox_problem_bc_set_mechanical_compression(element_t *element, bc_data_t *bc_data, unsigned int v) {
+  feenox_call(feenox_problem_bc_set_mechanical_normal_stress(element, bc_data, v, -1));
+  return FEENOX_OK;
+}
+
 // this virtual method builds the surface elemental matrix
-// here "pressure" is taken positive as compression and negative as tension
-int feenox_problem_bc_set_mechanical_pressure(element_t *element, bc_data_t *bc_data, unsigned int v) {
+int feenox_problem_bc_set_mechanical_normal_stress(element_t *element, bc_data_t *bc_data, unsigned int v, signed int sign) {
 
   // maybe this check can be made on the dimension of the physical entity at parse time
   if ((feenox.pde.dim - element->type->dim) != 1) {
@@ -126,7 +135,7 @@ int feenox_problem_bc_set_mechanical_pressure(element_t *element, bc_data_t *bc_
   // remember that here p > 0 means compression
   double t[3];
   for (unsigned int g = 0; g < feenox.pde.dim; g++) {
-    t[g] = -p * n[g];
+    t[g] = sign * p * n[g];
   }
   
   feenox_call(feenox_problem_bc_natural_set(element, v, t));

@@ -3,8 +3,8 @@
 
 #define BC_TYPE_MECHANICAL_UNDEFINED            0
 #define BC_TYPE_MECHANICAL_DISPLACEMENT         1
+#define BC_TYPE_MECHANICAL_PRESSURE_TENSION     2
 #define BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION 3
-#define BC_TYPE_MECHANICAL_PRESSURE_TRACTION    2
 
 typedef struct mechanical_t mechanical_t;
 

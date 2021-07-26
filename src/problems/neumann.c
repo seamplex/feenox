@@ -4,7 +4,7 @@ extern feenox_t feenox;
 int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *value) {
 
   for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-    gsl_vector_set(feenox.pde.Nb, 0, value[g]);
+    gsl_vector_set(feenox.pde.Nb, g, value[g]);
   }  
   double w = feenox_problem_bc_natural_weight(element, v);
   feenox_call(gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi));

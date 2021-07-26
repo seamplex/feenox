@@ -80,6 +80,7 @@ int feenox_gradient_compute(void) {
       ascii_progress_chars++;
     }
 
+    // TODO: make a separate routine as feenox_gradient_compute_at_nodes()
     node_t *node = &mesh->node[j_global];
     
     if (feenox.pde.rough == 0) {
@@ -122,12 +123,12 @@ int feenox_gradient_compute(void) {
               // derivative and uncertainties according to weldford
               for (g = 0; g < feenox.pde.dofs; g++) {
                 for (m = 0; m < feenox.pde.dim; m++) {
-                  mean = gsl_matrix_ptr(node->dphidx, 0, m);
-                  current = gsl_matrix_ptr(element->dphidx_node[j], 0, m);
+                  mean = gsl_matrix_ptr(node->dphidx, g, m);
+                  current = gsl_matrix_ptr(element->dphidx_node[j], g, m);
                   delta = *current - *mean;
                   *mean += rel_weight * delta;
-                  gsl_matrix_add_to_element(m2, 0, m, element->gradient_weight * delta * ((*current)-(*mean)));
-                  gsl_matrix_set(node->delta_dphidx, 0, m, sqrt(gsl_matrix_get(m2, 0, m)/sum_weight));
+                  gsl_matrix_add_to_element(m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
+                  gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(m2, g, m)/sum_weight));
                 }
               }
 
@@ -148,8 +149,20 @@ int feenox_gradient_compute(void) {
         feenox.pde.delta_gradient[g][m]->data_value[j_global] = gsl_matrix_get(node->delta_dphidx, g, m);
       }
     }
+  }
+  
+  // TODO: put 100 as a define or as a variable
+  if (feenox.pde.progress_ascii == PETSC_TRUE) {  
+    if (feenox.n_procs == 1) {
+      while (ascii_progress_chars++ < 100) {
+        printf(CHAR_PROGRESS_GRADIENT);
+      }
+    }
+    if (feenox.rank == 0) {
+      printf("\n");  
+      fflush(stdout);
+    }  
   }  
-
   
   
   return FEENOX_OK;
