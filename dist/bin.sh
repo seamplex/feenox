@@ -24,15 +24,15 @@ export PETSC_DIR=$(pwd)/petsc-${petsc_ver}
 export SLEPC_DIR=$(pwd)/slepc-${slepc_ver}
 cd ${package}
  ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
-             --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static"
+             --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static" || exit 1
             
  if [ "x${target}" = "xlinux-amd64" ]; then
   cd doc
-   make pdf
-   make info
+   make pdf || exit 1
+   make info || exit 1
   cd ..
  fi 
- make
+ make || exit 1
 cd ..
 
 mkdir -p ${package}-${version}-${target}

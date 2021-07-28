@@ -91,7 +91,7 @@
 
  * check when the matrices do not need to be rebuilt
  * Laplace/Poisson/Helmholtz as a template (fem or fem+fvm?)
- 
+ * see if the gradients are used in the input to see if we need to compute them, how? add a flag in the function structured "used" and fill it in in the algebraic parser, then each problem sweeps over all the derivatives and sees if the gradients are needed or not
  
 ## Heat
 
@@ -111,6 +111,8 @@
  * non-linear
  * stresses: count negative jacobians and worst jacobians
  * stress linearization (do we need a per-problem parser?)
+ * reactions
+ * strain energy
 
 ## Modal
 

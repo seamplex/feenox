@@ -9,15 +9,15 @@ if [ -z "$(which git)" ]; then
 fi
 
 if [ ! -e ${package} ]; then
-  git clone .. ${package}
+  git clone .. ${package} || exit 1
 else 
   cd ${package}
-    git pull
+    git pull || exit 1
   cd ..
 fi
 
 cd ${package}
-  ./autogen.sh
+  ./autogen.sh || exit 1
   if [ ! -e version.m4 ]; then
     echo "error: version.m4 does not exist"
     exit 1
