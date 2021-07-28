@@ -22,7 +22,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_solve_petsc_transient(void) {
+int feenox_problem_solve_petsc_transient(void) {
 
 #ifdef HAVE_PETSC
 
@@ -30,12 +30,12 @@ int feenox_solve_petsc_transient(void) {
     // if we are in the static step and no initial condition was given, we solve a steady state
     if (feenox.pde.initial_condition == NULL) {
       if (feenox.pde.math_type == math_type_linear) {
-        feenox_call(feenox_solve_petsc_linear());
+        feenox_call(feenox_problem_solve_petsc_linear());
         petsc_call(KSPDestroy(&feenox.pde.ksp));
         feenox.pde.ksp = NULL;
       
       } else if (feenox.pde.math_type == math_type_nonlinear) {
-        feenox_call(feenox_solve_petsc_nonlinear());
+        feenox_call(feenox_problem_solve_petsc_nonlinear());
         petsc_call(SNESDestroy(&feenox.pde.snes));
         feenox.pde.snes = NULL;
       }
@@ -47,7 +47,7 @@ int feenox_solve_petsc_transient(void) {
 
       // if we have an initial condition then matrices do not exist yet
       if (feenox.pde.initial_condition != NULL) {
-        feenox_call(feenox_build());
+        feenox_call(feenox_problem_build());
       }  
       petsc_call(MatDuplicate((feenox.pde.has_jacobian == PETSC_FALSE) ? feenox.pde.K : feenox.pde.JK, MAT_COPY_VALUES, &feenox.pde.J_tran));
       petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_tran, feenox.pde.J_tran, feenox_ts_jacobian, NULL));
@@ -59,7 +59,7 @@ int feenox_solve_petsc_transient(void) {
   //      petsc_call(TSSetEquationType(feenox.pde.ts, TS_EQ_DAE_IMPLICIT_INDEX1));
   //      petsc_call(TSARKIMEXSetFullyImplicit(feenox.pde.ts, PETSC_TRUE)); 
 
-      feenox_call(feenox_setup_ts(feenox.pde.ts));
+      feenox_call(feenox_problem_setup_ts(feenox.pde.ts));
 
       petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
       petsc_call(TSSetMaxTime(feenox.pde.ts, 0.0));
@@ -93,7 +93,7 @@ int feenox_solve_petsc_transient(void) {
 
 #ifdef HAVE_PETSC
 
-int feenox_setup_ts(TS ts) {
+int feenox_problem_setup_ts(TS ts) {
   
   // TODO: the default depends on the physics type
   petsc_call(TSSetType(ts, (feenox.pde.ts_type != NULL) ? feenox.pde.ts_type : TSBDF));
@@ -117,12 +117,12 @@ int feenox_setup_ts(TS ts) {
   SNES snes;
   petsc_call(TSGetSNES(ts, &snes));
   if (snes != NULL) {
-    feenox_call(feenox_setup_snes(snes));
+    feenox_call(feenox_problem_setup_snes(snes));
   } else {
     KSP ksp;
     petsc_call(TSGetKSP(ts, &ksp));
     if (ksp != NULL) {
-      feenox_call(feenox_setup_ksp(ksp));
+      feenox_call(feenox_problem_setup_ksp(ksp));
     }
   }  
 
@@ -137,12 +137,12 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
   feenox_var_value(feenox_special_var(t)) = t;
 
   if (feenox.pde.math_type == math_type_nonlinear) {
-    // TODO: know when to recompute the matrix or not
-    feenox_call(feenox_phi_to_solution(phi, 1));
-    feenox_call(feenox_build());
+    // TODO: know when to recompute the matrix or not and when to recompute the gradients or not
+    feenox_call(feenox_problem_phi_to_solution(phi));
+    feenox_call(feenox_problem_build());
   }  
   // TODO: be smart about this too
-  feenox_call(feenox_dirichlet_eval());
+  feenox_call(feenox_problem_dirichlet_eval());
 
   // compute the residual R(t,phi,phi_dot) = M*(phi_dot)_dirichlet + K*(phi)_dirichlet - b
   
@@ -152,12 +152,12 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
 
   // set dirichlet BCs on the time derivative and multiply by M
   VecCopy(phi_dot, tmp);
-  feenox_call(feenox_dirichlet_set_phi_dot(tmp));
+  feenox_call(feenox_problem_dirichlet_set_phi_dot(tmp));
   petsc_call(MatMult(feenox.pde.M, tmp, r));
   
   // set dirichlet BCs on the solution and multiply by K
   VecCopy(phi, tmp);
-  feenox_call(feenox_dirichlet_set_phi(tmp));
+  feenox_call(feenox_problem_dirichlet_set_phi(tmp));
 
   petsc_call(MatMultAdd(feenox.pde.K, tmp, r, r));
   VecDestroy(&tmp);
@@ -165,7 +165,7 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
 
   // set dirichlet bcs on the residual
-  feenox_call(feenox_dirichlet_set_r(r, phi));
+  feenox_call(feenox_problem_dirichlet_set_r(r, phi));
   
   return FEENOX_OK;
 }
@@ -175,7 +175,7 @@ PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec phi, Vec phi_dot, Pets
   // return (K + s*M)_dirichlet
   petsc_call(MatCopy(feenox.pde.K, J, SAME_NONZERO_PATTERN));
   petsc_call(MatAXPY(J, s, feenox.pde.M, SAME_NONZERO_PATTERN));
-  feenox_call(feenox_dirichlet_set_J(J));
+  feenox_call(feenox_problem_dirichlet_set_J(J));
   
   return FEENOX_OK;
 }

@@ -565,28 +565,28 @@ int feenox_problem_init_runtime_general(void) {
   feenox.pde.size_local = feenox.pde.dofs * feenox.pde.nodes_local;
   
   // the global stiffnes matrix
-  feenox_check_alloc(feenox.pde.K = feenox_create_matrix("K"));
+  feenox_check_alloc(feenox.pde.K = feenox_problem_create_matrix("K"));
   
   // the solution (unknown) vector
-  feenox.pde.phi = feenox_create_vector("phi");
+  feenox.pde.phi = feenox_problem_create_vector("phi");
   // explicit initial value
   petsc_call(VecSet(feenox.pde.phi, 0));
 
   // the right-hand-side vector
   if (feenox.pde.has_rhs) {
-    feenox.pde.b = feenox_create_vector("b");
+    feenox.pde.b = feenox_problem_create_vector("b");
   }
   
   // the mass matrix for modal or heat transient
   if (feenox.pde.has_mass) {
-    feenox_check_alloc(feenox.pde.M = feenox_create_matrix("M"));
+    feenox_check_alloc(feenox.pde.M = feenox_problem_create_matrix("M"));
   }
   
   if (feenox.pde.has_jacobian_K) {
-    feenox_check_alloc(feenox.pde.JK = feenox_create_matrix("JK"));
+    feenox_check_alloc(feenox.pde.JK = feenox_problem_create_matrix("JK"));
   }
   if (feenox.pde.has_jacobian_b) {
-    feenox_check_alloc(feenox.pde.Jb = feenox_create_matrix("Jb"));
+    feenox_check_alloc(feenox.pde.Jb = feenox_problem_create_matrix("Jb"));
   }
   
   // ask for the local ownership range
@@ -659,7 +659,7 @@ int feenox_problem_init_runtime_general(void) {
 }
 
 #ifdef HAVE_PETSC
-Mat feenox_create_matrix(const char *name) {
+Mat feenox_problem_create_matrix(const char *name) {
   
   Mat A = NULL;
   petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
@@ -686,7 +686,7 @@ Mat feenox_create_matrix(const char *name) {
   return A;  
 }
 
-Vec feenox_create_vector(const char *name) {
+Vec feenox_problem_create_vector(const char *name) {
   
   if (feenox.pde.K == NULL) {
     feenox_push_error_message("stiffness matrix is not created yet");

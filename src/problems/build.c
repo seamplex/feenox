@@ -1,7 +1,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_build(void) {
+int feenox_problem_build(void) {
   
 #ifdef HAVE_PETSC  
   size_t step = ceil((double)feenox.pde.mesh->n_elements/100.0);
@@ -47,7 +47,7 @@ int feenox_build(void) {
       //       matches the local rank (not necessarily one to one)
       // TODO: check if we can skip re-building in linear transient and/or
       //       nonlinear BCs only
-      feenox_call(feenox_build_element_volumetric(&feenox.pde.mesh->element[i]));
+      feenox_call(feenox_problem_build_element_volumetric(&feenox.pde.mesh->element[i]));
       volumetric_elements++;
       
     } else if (feenox.pde.mesh->element[i].physical_group != NULL) {
@@ -61,7 +61,7 @@ int feenox_build(void) {
           if (bc_data->set != NULL && bc_data->type_math != bc_type_math_dirichlet && bc_data->disabled == 0) {
             // and only apply them if the condition holds true (or if there's no condition at all)
             if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
-              feenox_call(feenox_build_element_weakbc(&feenox.pde.mesh->element[i], bc_data));
+              feenox_call(feenox_problem_build_element_weakbc(&feenox.pde.mesh->element[i], bc_data));
             }  
           }  
         }
@@ -74,7 +74,7 @@ int feenox_build(void) {
     return FEENOX_ERROR;
   }
 
-  feenox_call(feenox_build_assembly());
+  feenox_call(feenox_problem_build_assembly());
 
   // TODO: put 100 as a define or as a variable
   if (feenox.pde.progress_ascii == PETSC_TRUE) {  
@@ -95,11 +95,11 @@ int feenox_build(void) {
 
 
 
-int feenox_elemental_objects_allocate(element_t *this) {
+int feenox_problem_build_elemental_objects_allocate(element_t *this) {
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_elemental_objects_free());
+  feenox_call(feenox_problem_build_elemental_objects_free());
       
   feenox.pde.n_local_nodes = this->type->nodes;
   feenox.pde.elemental_size = this->type->nodes * feenox.pde.dofs;
@@ -127,7 +127,7 @@ int feenox_elemental_objects_allocate(element_t *this) {
 }
 
 
-int feenox_elemental_objects_free(void) {
+int feenox_problem_build_elemental_objects_free(void) {
 
 #ifdef HAVE_PETSC
   
@@ -146,7 +146,7 @@ int feenox_elemental_objects_free(void) {
 }
 
 
-int feenox_build_element_volumetric(element_t *this) {
+int feenox_problem_build_element_volumetric(element_t *this) {
 
 #ifdef HAVE_PETSC
   
@@ -160,7 +160,7 @@ int feenox_build_element_volumetric(element_t *this) {
   
   // if the current element's size is not equal to the previous one, re-allocate
   if (feenox.pde.n_local_nodes != this->type->nodes) {
-    feenox_call(feenox_elemental_objects_allocate(this));
+    feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }
     
   // initialize to zero the elemental objects
@@ -211,14 +211,14 @@ int feenox_build_element_volumetric(element_t *this) {
   return FEENOX_OK;
 }
 
-int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
+int feenox_problem_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
 
 #ifdef HAVE_PETSC
   // total number of gauss points
   unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
 
   if (feenox.pde.n_local_nodes != this->type->nodes) {
-    feenox_call(feenox_elemental_objects_allocate(this));
+    feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }
   
   if (feenox.pde.Nb == NULL) {
@@ -289,7 +289,7 @@ inline double fino_compute_r_for_axisymmetric(element_t *element, int v) {
 */
 
 
-int feenox_build_assembly(void) {
+int feenox_problem_build_assembly(void) {
   
 #ifdef HAVE_PETSC
 

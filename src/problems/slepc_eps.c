@@ -22,15 +22,15 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_solve_slepc_eigen(void) {
+int feenox_problem_solve_slepc_eigen(void) {
 
 #ifdef HAVE_SLEPC
 
   // we need the matrices to set the operators
-  feenox_call(feenox_build());
-  feenox_call(feenox_dirichlet_eval());
-  feenox_call(feenox_dirichlet_set_K());  
-  feenox_call(feenox_dirichlet_set_M());
+  feenox_call(feenox_problem_build());
+  feenox_call(feenox_problem_dirichlet_eval());
+  feenox_call(feenox_problem_dirichlet_set_K());  
+  feenox_call(feenox_problem_dirichlet_set_M());
   
   if (feenox.pde.eps == NULL) {
     petsc_call(EPSCreate(PETSC_COMM_WORLD, &feenox.pde.eps));
@@ -75,7 +75,7 @@ int feenox_solve_slepc_eigen(void) {
       feenox_push_error_message("cannot retrieve linear solver object");
       return FEENOX_ERROR;
     }
-    feenox_call(feenox_setup_ksp(ksp));
+    feenox_call(feenox_problem_setup_ksp(ksp));
 
     // this should be faster but it is not
 /*    

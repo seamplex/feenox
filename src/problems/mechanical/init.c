@@ -168,8 +168,8 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // initialize distributions
-  feenox_define_distribution_mandatory(mechanical, E, "E", "elastic modulus");
-  feenox_define_distribution_mandatory(mechanical, nu, "nu", "Poisson’s ratio");
+  feenox_distribution_define_mandatory(mechanical, E, "E", "elastic modulus");
+  feenox_distribution_define_mandatory(mechanical, nu, "nu", "Poisson’s ratio");
   
   feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
   mechanical.alpha.space_dependent = feenox_expression_depends_on_space(mechanical.alpha.dependency_variables);
@@ -181,7 +181,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   
   // TODO: check nonlinearity!
   feenox.pde.math_type = math_type_linear;
-  feenox.pde.solve = feenox_solve_petsc_linear;
+  feenox.pde.solve = feenox_problem_solve_petsc_linear;
   
   feenox.pde.has_stiffness = PETSC_TRUE;
   // TODO: transient
@@ -208,7 +208,7 @@ int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace) {
   if (feenox.pde.K != NULL) {
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &vec_coords));
   } else {
-    feenox_check_alloc(vec_coords = feenox_create_vector("coordinates"));
+    feenox_check_alloc(vec_coords = feenox_problem_create_vector("coordinates"));
   }  
   petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dofs));
   petsc_call(VecSetUp(vec_coords));

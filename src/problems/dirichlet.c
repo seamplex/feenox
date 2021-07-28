@@ -1,7 +1,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_dirichlet_add(size_t index, double value) {
+int feenox_problem_dirichlet_add(size_t index, double value) {
   
   feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index;
   feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = value;
@@ -12,7 +12,7 @@ int feenox_dirichlet_add(size_t index, double value) {
 
 
 // evaluates the dirichlet BCs and stores them in the internal representation
-int feenox_dirichlet_eval(void) {
+int feenox_problem_dirichlet_eval(void) {
 
 #ifdef HAVE_PETSC
 
@@ -95,7 +95,7 @@ int feenox_dirichlet_eval(void) {
 // b - RHS: needs to be updated when modifying K
 // this is called only when solving an explicit KSP (or EPS) so it takes
 // K and b and writes K_bc and b_bc
-int feenox_dirichlet_set_K(void) {
+int feenox_problem_dirichlet_set_K(void) {
   
 /*
   // sometimes there are hanging nodes with no associated volumes
@@ -148,7 +148,7 @@ int feenox_dirichlet_set_K(void) {
 // M - mass matrix: needs a zero in the diagonal and the same symmetry scheme that K
 // this is called only when solving an EPS so it takes
 // M and writes M_bc
-int feenox_dirichlet_set_M(void) {
+int feenox_problem_dirichlet_set_M(void) {
 
   if (feenox.pde.M_bc == NULL) {
     petsc_call(MatDuplicate(feenox.pde.M, MAT_COPY_VALUES, &feenox.pde.M_bc));
@@ -164,7 +164,7 @@ int feenox_dirichlet_set_M(void) {
 
 
 // J - Jacobian matrix: same as K but without the RHS vector
-int feenox_dirichlet_set_J(Mat J) {
+int feenox_problem_dirichlet_set_J(Mat J) {
 
   // the jacobian is exactly one for the dirichlet values and zero otherwise without keeping symmetry
   petsc_call(MatZeroRowsColumns(J, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, NULL, NULL));
@@ -173,7 +173,7 @@ int feenox_dirichlet_set_J(Mat J) {
 }
 
 // phi - solution: the BC values are set directly in order to be used as a initial condition or guess
-int feenox_dirichlet_set_phi(Vec phi) {
+int feenox_problem_dirichlet_set_phi(Vec phi) {
   
   petsc_call(VecSetValues(phi, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   return FEENOX_OK;
@@ -183,14 +183,14 @@ int feenox_dirichlet_set_phi(Vec phi) {
 //#define USEZERO
 
 // phi - solution: the values at the BC DOFs are zeroed
-int feenox_dirichlet_set_phi_dot(Vec phi_dot) {
+int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot) {
 
   petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_derivatives, INSERT_VALUES));
   return FEENOX_OK;
 }
 
 // r - residual: the BC indexes are set to the difference between the value and the solution
-int feenox_dirichlet_set_r(Vec r, Vec phi) {
+int feenox_problem_dirichlet_set_r(Vec r, Vec phi) {
 
   size_t k;
   

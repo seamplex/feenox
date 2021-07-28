@@ -33,14 +33,14 @@ int feenox_instruction_solve_problem(void *arg) {
     feenox_call(feenox.pde.solve_post());
   }
   // TODO: how to do this in parallel?
-  feenox_call(feenox_phi_to_solution(feenox.pde.phi, PETSC_FALSE));
+  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi));
   
 #endif  
   return FEENOX_OK;
 }
 
 #ifdef HAVE_PETSC
-int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
+int feenox_problem_phi_to_solution(Vec phi) {
 
   VecScatter         vscat;
   Vec                phi_full;
@@ -114,24 +114,7 @@ int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients) {
     }
   }
 
-  if (compute_gradients) {
-    // TODO: function pointers
-/*    
-    if (feenox.pde.problem_family == problem_family_mechanical) {
-  
-      feenox_call(feenox_compute_strain_energy());
-      if (feenox.pde.gradient_evaluation != gradient_none) {
-        feenox_call(feenox_break_compute_stresses());
-      }  
-      
-    } else if (feenox.pde.problem_family == problem_family_thermal) {
-       
-      feenox_call(feenox_thermal_compute_fluxes());
-    }  
- */
-  }
-  
-  feenox_call(feenox_gradient_compute());
+  feenox_call(feenox_problem_gradient_compute());
   
   return FEENOX_OK;
 }

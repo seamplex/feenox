@@ -23,7 +23,7 @@
 extern feenox_t feenox;
 
 
-int feenox_solve_petsc_nonlinear(void) {
+int feenox_problem_solve_petsc_nonlinear(void) {
 
 #ifdef HAVE_PETSC
   
@@ -44,13 +44,13 @@ int feenox_solve_petsc_nonlinear(void) {
 //    petsc_call(SNESMonitorSet(feenox.pde.snes, feenox.pde.snes_monitor, NULL, 0));
 
 //    petsc_call(VecDuplicate(feenox.pde.phi, &feenox.pde.r));
-    feenox_check_alloc(feenox.pde.r = feenox_create_vector("r"));
+    feenox_check_alloc(feenox.pde.r = feenox_problem_create_vector("r"));
     petsc_call(SNESSetFunction(feenox.pde.snes, feenox.pde.r, feenox_snes_residual, NULL));
-    feenox_check_alloc(feenox.pde.J_snes = feenox_create_matrix("J_snes"));
+    feenox_check_alloc(feenox.pde.J_snes = feenox_problem_create_matrix("J_snes"));
     petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J_snes, feenox.pde.J_snes, feenox_snes_jacobian, NULL));    
     
   // TODO
-    feenox_call(feenox_setup_snes(feenox.pde.snes));
+    feenox_call(feenox_problem_setup_snes(feenox.pde.snes));
   }  
   
   // solve
@@ -85,7 +85,7 @@ int feenox_solve_petsc_nonlinear(void) {
 }
 
 #ifdef HAVE_PETSC
-int feenox_setup_snes(SNES snes) {
+int feenox_problem_setup_snes(SNES snes) {
   
   
   // TODO: have an explicit default
@@ -108,37 +108,31 @@ int feenox_setup_snes(SNES snes) {
   // customize ksp (and pc)---this needs to come after setting the jacobian
   KSP ksp;
   petsc_call(SNESGetKSP(snes, &ksp));
-  feenox_call(feenox_setup_ksp(ksp));
+  feenox_call(feenox_problem_setup_ksp(ksp));
 
   return FEENOX_OK;
 }  
 
 PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
 
-
-  // this check is only to avoid building the first time because we already
-  // built K in order to create the SNES, but the rest of the step we need
-  // to re-build always because we are sure the problem is non-linear
-//  if (feenox.pde.already_built == PETSC_FALSE) {
-    feenox_call(feenox_phi_to_solution(phi, 1));
-    feenox_call(feenox_build());
-    feenox_call(feenox_dirichlet_eval());
-//  }  
+  feenox_call(feenox_problem_phi_to_solution(phi));
+  feenox_call(feenox_problem_build());
+  feenox_call(feenox_problem_dirichlet_eval());
   
   if (feenox.pde.phi_bc == NULL) {
-    feenox_check_alloc(feenox.pde.phi_bc = feenox_create_vector("phi_bc"));
+    feenox_check_alloc(feenox.pde.phi_bc = feenox_problem_create_vector("phi_bc"));
   }
     
   // set dirichlet BCs on the solution and multiply by K
   feenox_call(VecCopy(phi, feenox.pde.phi_bc));
-  feenox_call(feenox_dirichlet_set_phi(feenox.pde.phi_bc));
+  feenox_call(feenox_problem_dirichlet_set_phi(feenox.pde.phi_bc));
   petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
   
   // subtract b
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
   
   // set dirichlet BCs on the residual
-  feenox_call(feenox_dirichlet_set_r(r, phi));
+  feenox_call(feenox_problem_dirichlet_set_r(r, phi));
 
 /*  
   printf("solution\n");
@@ -174,7 +168,7 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
     petsc_call(MatAXPY(J_snes, -1.0, feenox.pde.Jb, DIFFERENT_NONZERO_PATTERN));
   }
   
-  feenox_call(feenox_dirichlet_set_J(J_snes));
+  feenox_call(feenox_problem_dirichlet_set_J(J_snes));
   
   
   return FEENOX_OK;

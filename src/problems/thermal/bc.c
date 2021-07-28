@@ -60,7 +60,7 @@ int feenox_problem_bc_set_thermal_temperature(bc_data_t *bc_data, size_t node_in
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));  
+  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));  
   // TODO: only in transient
 //  feenox.pde.dirichlet_derivatives[*k] = feenox_expression_derivative_wrt_variable(&bc_data->expr, feenox_special_var(t), feenox_special_var_value(t));
   

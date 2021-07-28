@@ -177,14 +177,14 @@ int feenox_problem_init_runtime_modal(void) {
   }
   
   // initialize distributions
-  feenox_define_distribution_mandatory(modal, E, "E", "elastic modulus");
-  feenox_define_distribution_mandatory(modal, nu, "nu", "Poisson’s ratio");
-  feenox_define_distribution_mandatory(modal, rho, "rho", "density");
+  feenox_distribution_define_mandatory(modal, E, "E", "elastic modulus");
+  feenox_distribution_define_mandatory(modal, nu, "nu", "Poisson’s ratio");
+  feenox_distribution_define_mandatory(modal, rho, "rho", "density");
 
   modal.rho.space_dependent = feenox_expression_depends_on_space(modal.rho.dependency_variables);
 
   feenox.pde.math_type = math_type_eigen;
-  feenox.pde.solve = feenox_solve_slepc_eigen;
+  feenox.pde.solve = feenox_problem_solve_slepc_eigen;
   
   feenox.pde.has_stiffness = PETSC_TRUE;
   feenox.pde.has_mass = PETSC_TRUE;

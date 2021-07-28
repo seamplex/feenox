@@ -22,7 +22,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_solve_petsc_linear(void) {
+int feenox_problem_solve_petsc_linear(void) {
 
 #ifdef HAVE_PETSC
   
@@ -32,15 +32,15 @@ int feenox_solve_petsc_linear(void) {
     
     // set the monitor for the ascii progress
     if (feenox.pde.progress_ascii == PETSC_TRUE) {  
-      petsc_call(KSPMonitorSet(feenox.pde.ksp, feenox_ksp_monitor, NULL, 0));
+      petsc_call(KSPMonitorSet(feenox.pde.ksp, feenox_problem_ksp_monitor, NULL, 0));
     }
     
-    feenox_call(feenox_setup_ksp(feenox.pde.ksp));
+    feenox_call(feenox_problem_setup_ksp(feenox.pde.ksp));
   }
 
-  feenox_call(feenox_build());
-  feenox_call(feenox_dirichlet_eval());
-  feenox_call(feenox_dirichlet_set_K());  
+  feenox_call(feenox_problem_build());
+  feenox_call(feenox_problem_dirichlet_eval());
+  feenox_call(feenox_problem_dirichlet_set_K());  
   
   // check if the stiffness matrix K has a near nullspace 
   // and pass it on to K_bc
@@ -94,7 +94,7 @@ int feenox_solve_petsc_linear(void) {
 
 #ifdef HAVE_PETSC
 
-PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy) {
+PetscErrorCode feenox_problem_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy) {
 //  feenox_value(feenox.pde.vars.iterations) = (double)n;
 //  feenox_var_value(feenox.pde.vars.residual_norm) = rnorm;
   int i;
@@ -133,7 +133,7 @@ PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *du
 
 
 
-int feenox_setup_ksp(KSP ksp) {
+int feenox_problem_setup_ksp(KSP ksp) {
 
 // the KSP type
 #ifdef PETSC_HAVE_MUMPS
@@ -200,7 +200,7 @@ int feenox_setup_ksp(KSP ksp) {
     feenox_push_error_message("cannot get preconditioner object");
     return FEENOX_ERROR;
   }
-  feenox_call(feenox_setup_pc(pc));
+  feenox_call(feenox_problem_setup_pc(pc));
 
   // read command-line options
   petsc_call(KSPSetFromOptions(ksp));
@@ -210,7 +210,7 @@ int feenox_setup_ksp(KSP ksp) {
   return FEENOX_OK;
 }
 
-int feenox_setup_pc(PC pc) {
+int feenox_problem_setup_pc(PC pc) {
 
   // if we were asked for mumps, then either LU o cholesky needs to be used
   // and MatSolverType to mumps

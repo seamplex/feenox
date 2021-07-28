@@ -78,16 +78,16 @@ int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t nod
   if (bc_data->dof != -1) {
     
     // only one dof
-    feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[bc_data->dof], feenox_expression_eval(&bc_data->expr)));
+    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[bc_data->dof], feenox_expression_eval(&bc_data->expr)));
     
   } else {
     
     // fixed means homogeneous dirichlet bc
-    feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], 0));
+    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], 0));
     if (feenox.pde.dofs > 1) {
-      feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[1], 0));
+      feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[1], 0));
       if (feenox.pde.dofs > 2) {
-        feenox_call(feenox_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[2], 0));
+        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[2], 0));
       }
     }
     

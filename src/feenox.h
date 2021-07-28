@@ -181,10 +181,17 @@
 
 #define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
 
-#define feenox_define_distribution_mandatory(type, name, quoted_name, description) { feenox_call(feenox_distribution_init(&(type.name), quoted_name)); \
+#define feenox_distribution_define_mandatory(type, name, quoted_name, description) {\
+  feenox_call(feenox_distribution_init(&(type.name), quoted_name)); \
   if (type.name.defined == 0) { feenox_push_error_message("undefined %s '%s'", description, quoted_name);  return FEENOX_ERROR; } \
   if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } \
   type.name.space_dependent = feenox_expression_depends_on_space(type.name.dependency_variables); }
+
+#define feenox_gradient_fill(location, fun_nam) {\
+  location.fun_nam->mesh = feenox.pde.rough==0?feenox.pde.mesh:feenox.pde.mesh_rough; \
+  location.fun_nam->data_argument = location.fun_nam->mesh->nodes_argument;   \
+  location.fun_nam->data_size = location.fun_nam->mesh->n_nodes; \
+  feenox_check_alloc(location.fun_nam->data_value = calloc(location.fun_nam->mesh->n_nodes, sizeof(double))); }
 
 enum version_type {
   version_compact,
@@ -2174,51 +2181,51 @@ extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function);
 extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
 #ifdef HAVE_PETSC
-extern Mat feenox_create_matrix(const char *name);
-extern Vec feenox_create_vector(const char *name); 
+extern Mat feenox_problem_create_matrix(const char *name);
+extern Vec feenox_problem_create_vector(const char *name); 
 #endif
 
 // bulk.c
-extern int feenox_build(void);
+extern int feenox_problem_build(void);
 
 // solve.c
 extern int feenox_instruction_solve_problem(void *arg);
 
 #ifdef HAVE_PETSC
 // solve.c
-extern int feenox_phi_to_solution(Vec phi, PetscBool compute_gradients);
+extern int feenox_problem_phi_to_solution(Vec phi);
 
 // petsc_ksp.c
-extern int feenox_solve_petsc_linear(void);
-extern PetscErrorCode feenox_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
-extern int feenox_setup_ksp(KSP ksp);
-extern int feenox_setup_pc(PC pc);
+extern int feenox_problem_solve_petsc_linear(void);
+extern PetscErrorCode feenox_problem_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, void *dummy);
+extern int feenox_problem_setup_ksp(KSP ksp);
+extern int feenox_problem_setup_pc(PC pc);
 
 // petsc_snes.c
-extern int feenox_solve_petsc_nonlinear(void);
-extern int feenox_setup_snes(SNES snes);
+extern int feenox_problem_solve_petsc_nonlinear(void);
+extern int feenox_problem_setup_snes(SNES snes);
 extern PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx);
 extern PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx);
 extern PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy);
 
 // petsc_ts.c
-extern int feenox_solve_petsc_transient(void);
-extern int feenox_setup_ts(TS ts);
+extern int feenox_problem_solve_petsc_transient(void);
+extern int feenox_problem_setup_ts(TS ts);
 extern PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
 extern PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
 
 // slepc_eps.c
-extern int feenox_solve_slepc_eigen(void);
+extern int feenox_problem_solve_slepc_eigen(void);
 
 // dirichlet.c
-extern int feenox_dirichlet_add(size_t index, double value);
-extern int feenox_dirichlet_eval(void);
-extern int feenox_dirichlet_set_K(void);
-extern int feenox_dirichlet_set_M(void);
-extern int feenox_dirichlet_set_J(Mat J);
-extern int feenox_dirichlet_set_r(Vec r, Vec phi);
-extern int feenox_dirichlet_set_phi(Vec phi);
-extern int feenox_dirichlet_set_phi_dot(Vec phi_dot);
+extern int feenox_problem_dirichlet_add(size_t index, double value);
+extern int feenox_problem_dirichlet_eval(void);
+extern int feenox_problem_dirichlet_set_K(void);
+extern int feenox_problem_dirichlet_set_M(void);
+extern int feenox_problem_dirichlet_set_J(Mat J);
+extern int feenox_problem_dirichlet_set_r(Vec r, Vec phi);
+extern int feenox_problem_dirichlet_set_phi(Vec phi);
+extern int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot);
 
 // neumann.c
 extern int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *value);
@@ -2243,18 +2250,18 @@ extern int feenox_expression_depends_on_space(var_ll_t *variables);
 extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
 
 // build.c
-extern int feenox_build(void);
-extern int feenox_build_element_volumetric(element_t *this);
-extern int feenox_build_element_weakbc(element_t *this, bc_data_t *bc_data);
-extern int feenox_allocate_elemental_objects(element_t *this);
-extern int feenox_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
-extern int feenox_elemental_objects_allocate(element_t *this);
-extern int feenox_elemental_objects_free(void);
-extern int feenox_build_assembly(void);
+extern int feenox_problem_build(void);
+extern int feenox_problem_build_element_volumetric(element_t *this);
+extern int feenox_problem_build_element_weakbc(element_t *this, bc_data_t *bc_data);
+extern int feenox_problem_build_allocate_elemental_objects(element_t *this);
+extern int feenox_problem_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
+extern int feenox_problem_build_elemental_objects_allocate(element_t *this);
+extern int feenox_problem_build_elemental_objects_free(void);
+extern int feenox_problem_build_assembly(void);
 
 // gradient.c
-extern int feenox_gradient_compute(void);
-extern int feenox_gradient_compute_at_nodes(element_t *this, mesh_t *mesh);
+extern int feenox_problem_gradient_compute(void);
+extern int feenox_problem_gradient_compute_at_nodes(element_t *this, mesh_t *mesh);
 
 // problem-dependent virtual methods
 #include "problems/thermal/methods.h"

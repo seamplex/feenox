@@ -73,7 +73,7 @@ int feenox_problem_init_runtime_thermal(void) {
   // here we just initialize everything, during build we know which
   // of them are mandatory and which are optional
   
-  feenox_define_distribution_mandatory(thermal, k, "k", "thermal conductivity");
+  feenox_distribution_define_mandatory(thermal, k, "k", "thermal conductivity");
   thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
   thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  
   
@@ -199,9 +199,9 @@ int feenox_problem_init_runtime_thermal(void) {
   }
   
   // TODO: check for transient_type
-  feenox.pde.solve = (feenox_special_var_value(end_time) > 0) ? feenox_solve_petsc_transient :
-                         ((feenox.pde.math_type == math_type_linear) ? feenox_solve_petsc_linear :
-                                                                       feenox_solve_petsc_nonlinear);
+  feenox.pde.solve = (feenox_special_var_value(end_time) > 0) ? feenox_problem_solve_petsc_transient :
+                         ((feenox.pde.math_type == math_type_linear) ? feenox_problem_solve_petsc_linear :
+                                                                       feenox_problem_solve_petsc_nonlinear);
   
   feenox.pde.has_stiffness = PETSC_TRUE;
   feenox.pde.has_rhs = PETSC_TRUE;

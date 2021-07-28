@@ -22,14 +22,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-#define feenox_gradient_fill(fun_nam) {\
-        feenox.pde.fun_nam->mesh = feenox.pde.rough==0?feenox.pde.mesh:feenox.pde.mesh_rough; \
-        feenox.pde.fun_nam->data_argument = feenox.pde.fun_nam->mesh->nodes_argument;   \
-        feenox.pde.fun_nam->data_size = feenox.pde.fun_nam->mesh->n_nodes; \
-        feenox_check_alloc(feenox.pde.fun_nam->data_value = calloc(feenox.pde.fun_nam->mesh->n_nodes, sizeof(double)));}
-
-
-int feenox_gradient_compute(void) {
+int feenox_problem_gradient_compute(void) {
   
   // the mesh for "rough" mode is different
   mesh_t *mesh = (feenox.pde.rough == 0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
@@ -47,12 +40,13 @@ int feenox_gradient_compute(void) {
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
         // derivative of the degree of freedom g with respect to dimension m
-        feenox_gradient_fill(gradient[g][m]);
-        feenox_gradient_fill(delta_gradient[g][m]);
+        feenox_gradient_fill(feenox.pde, gradient[g][m]);
+        feenox_gradient_fill(feenox.pde, delta_gradient[g][m]);
       }
     }
-    
-    // TODO: per-problem, i.e. sigma, etc
+        
+    // TODO: per problem
+    feenox_call(feenox_problem_gradient_fill_thermal());
   }
   
   // step 1. sweep elements and compute tensors at each node of each element
@@ -67,8 +61,12 @@ int feenox_gradient_compute(void) {
     }
     
     if (mesh->element[i].type->dim == feenox.pde.dim) {
-      feenox_call(feenox_gradient_compute_at_nodes(&mesh->element[i], mesh));
+      feenox_call(feenox_problem_gradient_compute_at_nodes(&mesh->element[i], mesh));
     }
+    
+    // TODO: per problem
+    feenox_call(feenox_problem_gradient_compute_at_nodes_thermal());
+
   }
   
   // step 2. sweep nodes of the output mesh (same as input in smooth, rough in rough)
@@ -170,7 +168,7 @@ int feenox_gradient_compute(void) {
 
 
 
-int feenox_gradient_compute_at_nodes(element_t *this, mesh_t *mesh) {
+int feenox_problem_gradient_compute_at_nodes(element_t *this, mesh_t *mesh) {
   
   unsigned int V = this->type->gauss[mesh->integration].V;
   unsigned int J = this->type->nodes;

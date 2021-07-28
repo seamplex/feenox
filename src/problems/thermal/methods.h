@@ -21,6 +21,9 @@ extern int feenox_problem_bc_set_thermal_temperature(bc_data_t *bc_data, size_t 
 extern int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v);
 extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_data, unsigned int v);
 
+// thermal/heatflux.c
+extern int feenox_problem_gradient_fill_thermal(void);
+
 // thermal/post.c
 extern int feenox_problem_solve_post_thermal(void);
 

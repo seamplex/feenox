@@ -31,6 +31,12 @@ struct thermal_t {
   PetscBool temperature_bc;
 #endif
   
+  // heat fluxes
+  function_t *qx;
+  function_t *qy;
+  function_t *qz;
+  
+  // extrema
   var_t *T_max;
   var_t *T_min;
   
