@@ -76,10 +76,11 @@
  * binary msh and vtk
  * support CGNS formats
  * problem-aware WRITE_POST 
-   - FULL | DISPLACEMENTS | STRESS | STRAIN | VON_MISES | TRESCA | PRINCIPAL
-   - FULL | TEMPERATURE | HEAT_FLUX
-   - FULL | MODES
-   - FULL | FLUX(ES) | CURRENT(S)
+   - full | displacements | stresses | strains | von_mises | tresca | principal
+   - full | temperature | heat_flux
+   - full | mode_1 | mode_n1 | modes
+   - full | flue_1 | fluxes | currents
+   - automatic call to SOLVE_PROBLEM?
  
 ## Extensions
  
@@ -92,6 +93,17 @@
  * check when the matrices do not need to be rebuilt
  * Laplace/Poisson/Helmholtz as a template (fem or fem+fvm?)
  * see if the gradients are used in the input to see if we need to compute them, how? add a flag in the function structured "used" and fill it in in the algebraic parser, then each problem sweeps over all the derivatives and sees if the gradients are needed or not
+ 
+## Laplace/Poisson/Helmholtz
+
+ * like heat with different BCs and gradients
+ 
+  alpha * dphi_dt + div (k grad phi) + eta * phi = f(x,t)
+  
+ * laplace k = 1 by default, eta = 0, f = 0
+ * poisson k = 1, f = 1, eta = 0
+ * helmholtz k = 1, f = 1, eta = 1
+ * see 2D example in Gmsh list
  
 ## Heat
 

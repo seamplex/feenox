@@ -23,12 +23,32 @@ The main objective is to comply with the Software Requirements Specification. Wi
  
 ## Languages
 
-C++ is a great language with used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not rubust, not easy to debug (especially with templates). The cons are far more than the pros.
+> Rule of Simplicity: Design for simplicity; add complexity only where you must.
 
-Fortran is a terrible language. Period.
+C++ is a great language with used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not rubust and hard to debug (especially when using templates and this nightmare called smart pointers). The cons are far more than the pros. There is no need to add complexity.
 
-Go & Rust, I think still nobody knows. But Rust's automatic memory handling is not a point strong enough for CAE/DAE/FEA software.
+Fortran is a terrible language. Fortran90+ is a patched FORTRAN\ 77. The assumptions that the language had over the kind of computers it has to run on worked in the early days but are now widely outdated. That's it.
 
+Go & Rust, I think still nobody knows for sure right now. But Rust's automatic memory handling is not a point strong enough for CAE/DAE/FEA software.
+
+C is the best language for FeenoX. Its assumptions still hold, especially in
+
+ i. bare-metal servers,
+ ii. virtualized machines, and
+ iii. dockerized containers.
+
+> In the late 1990s, Gerrit Blaauw and Fred Brooks observed in Computer Architecture: Concepts and Evolution [BlaauwBrooks] that the architectures in every generation of computers, from early mainframes through minicomputers through workstations through PCs, had tended to converge. The later a design was in its technology generation, the more closely it approximated what Blaauw & Brooks called the “classical architecture”: binary representation, flat address space, a distinction between memory and working store (registers), general-purpose registers, address resolution to fixed-length bytes, two-address instructions, big-endianness,[46] and data types a consistent set with sizes a multiple of either 4 or 6 bits (the 6-bit families are now extinct).
+>
+> Thompson and Ritchie designed C to be a sort of structured assembler for an idealized processor and memory architecture that they expected could be efficiently modeled on most conventional computers. By happy accident, their model for the idealized processor was the PDP-11, a particularly mature and elegant minicomputer design that closely approximated Blaauw & Brooks's classical architecture. By good judgment, Thompson and Ritchie declined to wire into their language most of the few traits (such as little-endian byte order) where the PDP-11 didn't match it.[47]
+>
+> The PDP-11 became an important model for the following generations of microprocessor architectures. The basic abstractions of C turned out to capture the classical architecture rather neatly. Thus, C started out as a good fit for microprocessors and, rather than becoming irrelevant as its assumptions fell out of date, actually became a better fit as hardware converged more closely on the classical architecture. One notable example of this convergence was when Intel's 386, with its large flat memory-address space, replaced the 286's awkward segmented-memory addressing after 1985; pure C was actually a better fit for the 386 than it had been for the 286.
+>
+> It is not a coincidence that the experimental era in computer architectures ended in the mid-1980s at the same time that C (and its close descendant C++) were sweeping all before them as general-purpose programming languages. C, designed as a thin but flexible layer over the classical architecture, looks with two decades' additional perspective like almost the best possible design for the structured-assembler niche it was intended to fill. In addition to compactness, orthogonality, and detachment (from the machine architecture on which it was originally designed), it also has the important quality of transparency that we will discuss in Chapter 6. The few language designs since that are arguably better have needed to make large changes (like introducing garbage collection) in order to get enough functional distance from C not to be swamped by it.
+>
+>This history is worth recalling and understanding because C shows us how powerful a clean, minimalist design can be. If Thompson and Ritchie had been less wise, they would have designed a language that did much more, relied on stronger assumptions, never ported satisfactorily off its original hardware platform, and withered away as the world changed out from under it. Instead, C has flourished — and the example Thompson and Ritchie set has influenced the style of Unix development ever since. As the writer, adventurer, artist, and aeronautical engineer Antoine de Saint-Exupéry once put it, writing about the design of airplanes: «La perfection est atteinte non quand il ne reste rien à ajouter, mais quand il ne reste rien à enlever». (“Perfection is attained not when there is nothing more to add, but when there is nothing more to remove”.) 
+ 
+Therefore:
+ 
  * Stick to plain C.
  
    > C enables us to build data structures for storing sparse matrices, solver information, etc. in ways that Fortran simply does not allow. ANSI C is a complete standard that all modern C compilers support. The language is identical on all machines. C++ is still evolving and compilers on different machines are not identical. Using C function pointers to provide data encapsulation and polymorphism allows us to get many of the advantages of C++ without using such a large and more complicated language.

@@ -423,7 +423,7 @@ Rule of Simplicity
 
 :    Developers should design for simplicity by looking for ways to break up program systems into small, straightforward cooperating pieces. This rule aims to discourage developers’ affection for writing “intricate and beautiful complexities” that are in reality bug prone programs.
 
-:    *In FeenoX:* we attempt to do that, not sure if we nail it...
+:    *In FeenoX:* only way that we reflect this is the choice of C over C++ and over Fortran. In the former, the extra complexity is not needed. In the latter, we must add the complexity of C over Fortran.
 
 
 Rule of Parsimony

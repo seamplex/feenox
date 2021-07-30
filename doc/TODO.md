@@ -1,3 +1,27 @@
+ * Documention should be like code: if paragraph appear more than once, then a separate file should be created and included in the needed locations.
+ 
+ * FeenoX focuses on:
+ 
+    a. material properties: everything is an expression
+    b. parametric runs: script-friendly through command-line arguments and ASCII files
+    c. cloud-friendly: it can run unattended
+
+ * NAFEMS LE10: remove `differences` and move to `cases`
+   
+   ```
+   READ_MESH le10-$1.msh
+   ...
+   PRINT "sigma_y @ D = " ... "for $1"
+   ```
+   
+   Do a parametric run with a shell script: tet-unstructured-c, hex-structured-c
+   
+   ```
+   ndofs sigma_y strain energy wall memory 
+   ```
+   
+   Use GAMG & MUMPS. To compare to CalculiX, link to CoFEA.
+    
  * FeenoX and the UNIX philosophy
  
  * FeenoX & CalculiX: blog post? (or Why I don't like CalculIX)
@@ -23,7 +47,7 @@
  * documentation analogy: ccx is like word, most people use it but the results are ugly and it is inflexible
    libraries are like latex (or even raw tex), very powerful but quite cumbersome
    CAEplex is like google docs
-   FeenoX is like markdown, quick and easy but eventually flexible and powerful when combined with pandoc. Maybe it has a stiff learning curve but it is very natural once you think it through
+   FeenoX is like markdown, quick and easy but eventually flexible and powerful when combined with pandoc. Maybe it has a stiff learning curve but it is very natural once you think it through.
  
  * "use first-order elements because it takes too long with second-order elements"
  
