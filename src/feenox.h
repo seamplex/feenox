@@ -466,7 +466,7 @@ struct function_t {
   char *name_in_mesh;
   int initialized;
   
-  // might be:
+  // may be:
   //   - algebraic, either globally or on a per-material (physical groups) basis
   //   - pointwise-defined
   //       + given in the input with DATA
@@ -567,6 +567,9 @@ struct function_t {
 //  double (*routine_internal)(const double *, function_t *);
 //  void *params;
   
+  // if this is true and the parser sees this function,
+  // then pde.compute_gradients is set to true
+  int is_gradient;   
   int dummy_for_derivatives;
   double dummy_for_derivatives_value;
 
@@ -1021,7 +1024,7 @@ struct element_t {
 
   gsl_matrix **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
   gsl_matrix **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
-  double **property_node;
+  double **property_at_node;  // 2d array [j][N] of property N evaluated at node j
 
   element_type_t *type;                  // pointer to the element type
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
@@ -1623,37 +1626,14 @@ struct feenox_t {
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t global_size;            // total number of DoFs
     
+    int compute_gradients;   // do we need to compute gradients?
+    
     int rough;               // keep each element's contribution to the gradient?
     int roughish;            // average only on the same physical group?
   
     mesh_t *mesh;
     mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
   
-/*    
-    reaction_t *reactions;
-    linearize_t *linearizes;
- */
-
-/*    
-    PetscClassId petsc_classid;
-
-    PetscLogStage petsc_stage_build;
-    PetscLogStage petsc_stage_solve;
-    PetscLogStage petsc_stage_stress;
-  
-    PetscLogEvent petsc_event_build;
-    PetscLogEvent petsc_event_solve;
-    PetscLogEvent petsc_event_stress;
-  
-    PetscLogDouble petsc_flops_build;
-    PetscLogDouble petsc_flops_solve;
-    PetscLogDouble petsc_flops_stress;
-
-    times_t wall;
-    times_t cpu;
-    times_t petsc;
-*/
-    
     // problem-specific virtual methods
     int (*problem_init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
@@ -1709,17 +1689,16 @@ struct feenox_t {
     // reusable number of dirichlet rows to know how much memory to allocate
     size_t n_dirichlet_rows;
     
-    // nombres custom 
-    char **unknown_name;          // uno para cada grado de libertad
+    char **unknown_name;          // one for each DOF
   
-    // las funciones con la solucion (una para cada grado de libertad)
+    // the functions with the solutions (one for each DOF)
     function_t **solution;
-    // las derivadas de la solucion con respecto al espacio;
+    // derivatives of solutions with respect to space (DOFs x dims)
     function_t ***gradient;
-    // la incerteza (i.e la desviacion estandar de la contribucion de cada elemento)
+    // uncertainty (i.e standard deviation of the contribution of each element)
     function_t ***delta_gradient;  
     
-    // TODO: move to per-problem headers
+    // solutions for eigenproblems
     function_t ***mode;
   
     enum {
@@ -1817,8 +1796,6 @@ struct feenox_t {
     expr_t st_shift;
     expr_t st_anti_shift;  
 
-//    struct rusage resource_usage;
-  
     // elemental (local) objects
     size_t n_local_nodes;
     unsigned int elemental_size;  // current size of objects = n_local_nodes * dofs
@@ -2028,8 +2005,8 @@ extern int function_set_buffered_data(function_t *function, double *buffer, size
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
 
-extern int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny);
-extern int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz);
+extern int feenox_function_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny);
+extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz);
 
 // print.c
 extern int feenox_instruction_print(void *arg);
@@ -2178,7 +2155,7 @@ extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
 extern int feenox_problem_init_parser_general(void);
 extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
-extern int feenox_problem_define_solution_function(const char *name, function_t **function);
+extern int feenox_problem_define_solution_function(const char *name, function_t **function, int is_gradient);
 extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
 #ifdef HAVE_PETSC
 extern Mat feenox_problem_create_matrix(const char *name);
@@ -2261,7 +2238,8 @@ extern int feenox_problem_build_assembly(void);
 
 // gradient.c
 extern int feenox_problem_gradient_compute(void);
-extern int feenox_problem_gradient_compute_at_nodes(element_t *this, mesh_t *mesh);
+extern int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh);
+extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 
 // problem-dependent virtual methods
 #include "problems/thermal/methods.h"

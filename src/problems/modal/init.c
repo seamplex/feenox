@@ -3,7 +3,7 @@
 extern feenox_t feenox;
 modal_t modal;
 
-int feenox_problem_parse_modal(const char *token) {
+int feenox_problem_parse_problem_modal(const char *token) {
   
   if (token != NULL) {
     if (strcasecmp(token, "plane_stress") == 0) {

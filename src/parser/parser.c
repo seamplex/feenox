@@ -2569,21 +2569,24 @@ int feenox_parse_print_function(void) {
     } else {
 
       // add an item to the list of tokens
-      function_t *dummy_function = NULL;
       print_token_t *print_token = NULL;
       feenox_check_alloc(print_token = calloc(1, sizeof(print_token_t)));
       LL_APPEND(print_function->tokens, print_token);
 
       feenox_check_alloc(print_token->text = strdup(token));   // text for the header
-      if ((dummy_function = feenox_get_function_ptr(token)) != NULL) {
-        print_token->function = dummy_function;
+      function_t *function = NULL;
+      if ((function = feenox_get_function_ptr(token)) != NULL) {
+        print_token->function = function;
         if (print_function->first_function == NULL) {
           // the first function
-          print_function->first_function = dummy_function;
-        } else if (dummy_function->n_arguments !=  print_function->first_function->n_arguments) {
+          print_function->first_function = function;
+        } else if (function->n_arguments !=  print_function->first_function->n_arguments) {
           feenox_push_error_message("functions do not have the same number of arguments");
           return FEENOX_ERROR;
         }
+        
+        // if it is a gradient of something, tell the PDE that it has to compute them
+        feenox.pde.compute_gradients |= function->is_gradient;
 
       } else {
         feenox_call(feenox_expression_parse(&print_token->expression, token));
@@ -2623,7 +2626,7 @@ int feenox_parse_print_function(void) {
   if (print_function->file == NULL) {
     print_function->file = feenox.special_files.stdout_;
   }
-
+  
   LL_APPEND(feenox.print_functions, print_function);
   feenox_call(feenox_add_instruction(feenox_instruction_print_function, print_function));
   
@@ -3071,6 +3074,10 @@ int feenox_parse_write_mesh(void) {
           mesh_write_dist->vector[i]->var_argument = feenox.mesh.vars.arr_x;
           feenox_call(feenox_expression_parse(&mesh_write_dist->vector[i]->algebraic_expression, token)); 
         }
+        
+        // if it is a gradient of something, tell the PDE that it has to compute them
+        feenox.pde.compute_gradients |= mesh_write_dist->vector[i]->is_gradient;
+
         mesh_write_dist->field_location = mesh_write->field_location;
         if (mesh_write->printf_format != NULL) {
           feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
@@ -3095,6 +3102,10 @@ int feenox_parse_write_mesh(void) {
         mesh_write_dist->scalar->var_argument = feenox.mesh.vars.arr_x;
         feenox_call(feenox_expression_parse(&mesh_write_dist->scalar->algebraic_expression, token)); 
       }
+      
+      // if it is a gradient of something, tell the PDE that it has to compute them
+      feenox.pde.compute_gradients |= mesh_write_dist->scalar->is_gradient;
+      
       mesh_write_dist->field_location = mesh_write->field_location;
       if (mesh_write->printf_format != NULL) {
         feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
@@ -3404,14 +3415,14 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail If the mesh is two-dimensional and not `AXISYMMETRIC`, either
 ///kw+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
     if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_mechanical;
+      feenox_problem_parse_particular = feenox_problem_parse_problem_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
 
 ///kw+PROBLEM+usage thermal
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
     } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_thermal;
+      feenox_problem_parse_particular = feenox_problem_parse_problem_thermal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
 
 ///kw+PROBLEM+usage modal
@@ -3422,7 +3433,7 @@ int feenox_parse_problem(void) {
       feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
       return FEENOX_ERROR;
 #endif
-      feenox_problem_parse_particular = feenox_problem_parse_modal;
+      feenox_problem_parse_particular = feenox_problem_parse_problem_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       
 ///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        

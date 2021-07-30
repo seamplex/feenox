@@ -61,90 +61,32 @@ int feenox_problem_gradient_compute(void) {
     }
     
     if (mesh->element[i].type->dim == feenox.pde.dim) {
-      feenox_call(feenox_problem_gradient_compute_at_nodes(&mesh->element[i], mesh));
+      feenox_call(feenox_problem_gradient_compute_at_element(&mesh->element[i], mesh));
+      // TODO: per problem
+      feenox_call(feenox_problem_gradient_compute_at_element_thermal(&mesh->element[i], mesh));
     }
     
-    // TODO: per problem
-    feenox_call(feenox_problem_gradient_compute_at_nodes_thermal());
 
   }
   
   // step 2. sweep nodes of the output mesh (same as input in smooth, rough in rough)
-  size_t j_global = 0;
-  for (j_global = 0; j_global < mesh->n_nodes; j_global++) {
+  size_t j = 0;
+  for (j = 0; j < mesh->n_nodes; j++) {
     if ((feenox.pde.progress_ascii == PETSC_TRUE) && (progress++ % step) == 0) {
       printf(CHAR_PROGRESS_GRADIENT);  
       fflush(stdout);
       ascii_progress_chars++;
     }
 
-    // TODO: make a separate routine as feenox_gradient_compute_at_nodes()
-    node_t *node = &mesh->node[j_global];
-    
-    if (feenox.pde.rough == 0) {
-      double *mean = NULL;
-      double *current = NULL;
-      double delta = 0;
-      double sum_weight = 0;
-      double rel_weight = 0;
-      gsl_matrix *m2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim);
-      int found = 0;
-      
-      // en iterative si no hacemos esto estamos leakando
-      if (node->dphidx == NULL) {
-        feenox_check_alloc(node->dphidx = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
-      } else {
-        gsl_matrix_set_zero(node->dphidx);
-      }  
-      if (node->delta_dphidx == NULL) {
-        node->delta_dphidx = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim);
-      } else {
-        gsl_matrix_set_zero(node->delta_dphidx);
-      }
-      
-      size_t j = 0;
-      unsigned int n = 0;
-      element_t *element = NULL;
-      element_ll_t *associated_element = NULL;
-      LL_FOREACH(feenox.pde.mesh->node[j_global].associated_elements, associated_element) {
-        element = associated_element->element;
-        if (element->dphidx_node != NULL) {
-          found = 0;
-          for (j = 0; !found && j < element->type->nodes; j++) {
-            if (element->node[j]->index_mesh == j_global) {
-
-              n++;
-              found = 1;
-              sum_weight += element->gradient_weight;
-              rel_weight = element->gradient_weight / sum_weight;
-              
-              // derivative and uncertainties according to weldford
-              for (g = 0; g < feenox.pde.dofs; g++) {
-                for (m = 0; m < feenox.pde.dim; m++) {
-                  mean = gsl_matrix_ptr(node->dphidx, g, m);
-                  current = gsl_matrix_ptr(element->dphidx_node[j], g, m);
-                  delta = *current - *mean;
-                  *mean += rel_weight * delta;
-                  gsl_matrix_add_to_element(m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
-                  gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(m2, g, m)/sum_weight));
-                }
-              }
-
-              // TODO: per-problem stuff
-            }
-          }
-        }
-      }
-      
-      gsl_matrix_free(m2);
-      
-    }
+    if (feenox.pde.rough == 0) {    
+      feenox_call(feenox_problem_gradient_smooth_at_node(&mesh->node[j]));
+    }  
     
     // we now have the averages, now fill in the functions
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
-        feenox.pde.gradient[g][m]->data_value[j_global] = gsl_matrix_get(node->dphidx, g, m);
-        feenox.pde.delta_gradient[g][m]->data_value[j_global] = gsl_matrix_get(node->delta_dphidx, g, m);
+        feenox.pde.gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].dphidx, g, m);
+        feenox.pde.delta_gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].delta_dphidx, g, m);
       }
     }
   }
@@ -168,7 +110,7 @@ int feenox_problem_gradient_compute(void) {
 
 
 
-int feenox_problem_gradient_compute_at_nodes(element_t *this, mesh_t *mesh) {
+int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
   
   unsigned int V = this->type->gauss[mesh->integration].V;
   unsigned int J = this->type->nodes;
@@ -307,4 +249,69 @@ int feenox_problem_gradient_compute_at_nodes(element_t *this, mesh_t *mesh) {
   
   return FEENOX_OK;
   
+}
+
+
+
+int feenox_problem_gradient_smooth_at_node(node_t *node) {
+  
+  double *mean = NULL;
+  double *current = NULL;
+  double delta = 0;
+  double sum_weight = 0;
+  double rel_weight = 0;
+  gsl_matrix *m2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim);
+  int found = 0;
+      
+  if (node->dphidx == NULL) {
+    feenox_check_alloc(node->dphidx = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
+  } else {
+    gsl_matrix_set_zero(node->dphidx);
+  }  
+  if (node->delta_dphidx == NULL) {
+    node->delta_dphidx = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim);
+  } else {
+    gsl_matrix_set_zero(node->delta_dphidx);
+  }
+      
+  size_t j = 0;
+  unsigned int g = 0;
+  unsigned int m = 0;
+  unsigned int n = 0;
+  element_t *element = NULL;
+  element_ll_t *associated_element = NULL;
+  LL_FOREACH(node->associated_elements, associated_element) {
+    element = associated_element->element;
+    if (element->dphidx_node != NULL) {
+      found = 0;
+      for (j = 0; !found && j < element->type->nodes; j++) {
+        if (element->node[j] == node) {
+
+          n++;
+          found = 1;
+          sum_weight += element->gradient_weight;
+          rel_weight = element->gradient_weight / sum_weight;
+              
+          // derivative and uncertainties according to weldford
+          for (g = 0; g < feenox.pde.dofs; g++) {
+            for (m = 0; m < feenox.pde.dim; m++) {
+              mean = gsl_matrix_ptr(node->dphidx, g, m);
+              current = gsl_matrix_ptr(element->dphidx_node[j], g, m);
+              delta = *current - *mean;
+              *mean += rel_weight * delta;
+              gsl_matrix_add_to_element(m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
+              gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(m2, g, m)/sum_weight));
+            }
+          }
+
+          // TODO: per-problem stuff
+        }
+      }
+    }
+  }
+      
+  gsl_matrix_free(m2);
+  
+  return FEENOX_OK;
+      
 }

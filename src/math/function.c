@@ -367,10 +367,10 @@ int feenox_function_init(function_t *this) {
 
           // miramos si tiene una malla regular en 2d
           int nx, ny;
-          if (feenox_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
+          if (feenox_function_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
             this->rectangular_mesh = 1;
             this->x_increases_first = 1;
-          } else if (feenox_is_structured_grid_2d(this->data_argument[1], this->data_argument[0], this->data_size, &ny, &nx)) {
+          } else if (feenox_function_is_structured_grid_2d(this->data_argument[1], this->data_argument[0], this->data_size, &ny, &nx)) {
             this->rectangular_mesh = 1;
             this->x_increases_first = 0;
           } else {
@@ -387,10 +387,10 @@ int feenox_function_init(function_t *this) {
 
           // miramos si tiene una malla regular en 3d
           int nx, ny, nz;
-          if (feenox_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
+          if (feenox_function_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
             this->rectangular_mesh = 1;
             this->x_increases_first = 1;
-          } else if (feenox_is_structured_grid_3d(this->data_argument[2], this->data_argument[1], this->data_argument[0], this->data_size, &nz, &ny, &nx)) {
+          } else if (feenox_function_is_structured_grid_3d(this->data_argument[2], this->data_argument[1], this->data_argument[0], this->data_size, &nz, &ny, &nx)) {
             this->rectangular_mesh = 1;
             this->x_increases_first = 0;
           } else {
@@ -1003,7 +1003,7 @@ int feenox_structured_scalar_index(int n_dims, int *size, int *index, int x_incr
 
 
 // mira si los n puntos en x[] y en y[] forman una grilla estruturada
-int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny) {
+int feenox_function_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny) {
 
   int i, j;
     
@@ -1054,7 +1054,7 @@ int feenox_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny) 
 
 
 // mira si los n puntos en x[], y[] y z[] forman una grilla estruturada
-int feenox_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz) {
+int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz) {
 
   int i;
   

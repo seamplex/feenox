@@ -114,7 +114,9 @@ int feenox_problem_phi_to_solution(Vec phi) {
     }
   }
 
-  feenox_call(feenox_problem_gradient_compute());
+  if (feenox.pde.compute_gradients) {
+    feenox_call(feenox_problem_gradient_compute());
+  }  
   
   return FEENOX_OK;
 }

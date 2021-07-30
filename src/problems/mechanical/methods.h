@@ -2,7 +2,7 @@
 #define MECHANICAL_METHODS_H
 
 // mechanical/init.c
-extern int feenox_problem_parse_mechanical(const char *);
+extern int feenox_problem_parse_problem_mechanical(const char *);
 extern int feenox_problem_init_parser_mechanical(void);
 extern int feenox_problem_init_runtime_mechanical(void);
 #ifdef HAVE_PETSC

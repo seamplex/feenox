@@ -513,6 +513,9 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
           feenox_pull_dependencies_variables(&item->variables, function->algebraic_expression.variables);
           feenox_pull_dependencies_functions(&item->functions, function->algebraic_expression.functions);
         }  
+        
+        // if it is a gradient of something, tell the PDE that it has to compute them
+        feenox.pde.compute_gradients |= function->is_gradient;
 
       } else {
         return NULL;

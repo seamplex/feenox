@@ -3,7 +3,7 @@
 extern feenox_t feenox;
 mechanical_t mechanical;
 
-int feenox_problem_parse_mechanical(const char *token) {
+int feenox_problem_parse_problem_mechanical(const char *token) {
   
   if (token != NULL) {
     if (strcasecmp(token, "plane_stress") == 0) {
@@ -71,22 +71,22 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox_call(feenox_problem_define_solutions());
 
   // TODO: describir las funciones para reference
-  feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax));
-  feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay));
-  feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy));
+  feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, 1));
+  feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, 1));
+  feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, 1));
 
   if (feenox.pde.dofs == 3) {
-    feenox_call(feenox_problem_define_solution_function("sigmaz", &mechanical.sigmaz));
-    feenox_call(feenox_problem_define_solution_function("tauyz", &mechanical.tauyz));
-    feenox_call(feenox_problem_define_solution_function("tauzx", &mechanical.tauzx));
+    feenox_call(feenox_problem_define_solution_function("sigmaz", &mechanical.sigmaz, 1));
+    feenox_call(feenox_problem_define_solution_function("tauyz", &mechanical.tauyz, 1));
+    feenox_call(feenox_problem_define_solution_function("tauzx", &mechanical.tauzx, 1));
   }
 
-  feenox_call(feenox_problem_define_solution_function("sigma1", &mechanical.sigma1));
-  feenox_call(feenox_problem_define_solution_function("sigma2", &mechanical.sigma2));
-  feenox_call(feenox_problem_define_solution_function("sigma3", &mechanical.sigma3));
-  feenox_call(feenox_problem_define_solution_function("sigma", &mechanical.sigma));
-  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma));
-  feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca));
+  feenox_call(feenox_problem_define_solution_function("sigma1", &mechanical.sigma1, 1));
+  feenox_call(feenox_problem_define_solution_function("sigma2", &mechanical.sigma2, 1));
+  feenox_call(feenox_problem_define_solution_function("sigma3", &mechanical.sigma3, 1));
+  feenox_call(feenox_problem_define_solution_function("sigma", &mechanical.sigma, 1));
+  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, 1));
+  feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, 1));
 
 
 // these are for the algebraic expressions in the  which are implicitly-defined BCs
@@ -105,7 +105,7 @@ int feenox_problem_init_parser_mechanical(void) {
 ///va+strain_energy+detail where $\vec{u}$ is the displacements vector and $K$ is the stiffness matrix.
   mechanical.strain_energy = feenox_define_variable_get_ptr("strain_energy");
 
-  ///va+displ_max+name displ_max
+///va+displ_max+name displ_max
 ///va+displ_max+detail The module of the maximum displacement of the elastic problem.
   mechanical.displ_max = feenox_define_variable_get_ptr("displ_max");
 

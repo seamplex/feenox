@@ -2,7 +2,7 @@
 #define THERMAL_METHODS_H
 
 // thermal/init.c
-extern int feenox_problem_parse_thermal(const char *);
+extern int feenox_problem_parse_problem_thermal(const char *);
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 #ifdef HAVE_PETSC
@@ -23,6 +23,8 @@ extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_
 
 // thermal/heatflux.c
 extern int feenox_problem_gradient_fill_thermal(void);
+extern int feenox_problem_gradient_compute_at_element_thermal(element_t *element, mesh_t *mesh);
+extern int feenox_problem_gradient_smooth_at_node_thermal(node_t *node);
 
 // thermal/post.c
 extern int feenox_problem_solve_post_thermal(void);

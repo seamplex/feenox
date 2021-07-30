@@ -18,8 +18,13 @@ int feenox_problem_gradient_fill_thermal(void) {
 }
 
 
-int feenox_problem_gradient_compute_at_nodes_thermal(void) {
+int feenox_problem_gradient_compute_at_element_thermal(element_t *element, mesh_t *mesh) {
   
+  
+  return FEENOX_OK;
+}
+
+int feenox_problem_gradient_smooth_at_node_thermal(node_t *node) {
   
   return FEENOX_OK;
 }

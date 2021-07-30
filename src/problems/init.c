@@ -385,9 +385,12 @@ int feenox_problem_define_solutions(void) {
         feenox.pde.gradient[g][m]->var_argument = feenox.pde.solution[g]->var_argument;
         feenox.pde.gradient[g][m]->type = function_type_pointwise_mesh_node;
         feenox.pde.gradient[g][m]->spatial_derivative_of = feenox.pde.solution[g];
+        // this flag is used when interpolating
         feenox.pde.gradient[g][m]->spatial_derivative_with_respect_to = m;
+        // this flag is used to know if gradients have to be computed
+        feenox.pde.gradient[g][m]->is_gradient = 1;
         
-        // lo mismo para la incerteza
+        // same for uncertainty
         feenox_check_minusone(asprintf(&gradname, "delta_d%sd%s", name, feenox.mesh.vars.arr_x[m]->name));
         feenox_check_alloc(feenox.pde.delta_gradient[g][m] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
         feenox_free(gradname);
@@ -395,6 +398,7 @@ int feenox_problem_define_solutions(void) {
         feenox.pde.delta_gradient[g][m]->mesh = feenox.pde.solution[g]->mesh;
         feenox.pde.delta_gradient[g][m]->var_argument = feenox.pde.solution[g]->var_argument;
         feenox.pde.delta_gradient[g][m]->type = function_type_pointwise_mesh_node;
+        feenox.pde.delta_gradient[g][m]->is_gradient = 1;
       }
       
     } else {  
@@ -405,7 +409,7 @@ int feenox_problem_define_solutions(void) {
       for (i = 0; i < feenox.pde.nev; i++) {
         char *modename = NULL;
         feenox_check_minusone(asprintf(&modename, "%s%d", name, i+1));
-        feenox_call(feenox_problem_define_solution_function(modename, &feenox.pde.mode[g][i]));
+        feenox_call(feenox_problem_define_solution_function(modename, &feenox.pde.mode[g][i], 0));
         feenox_free(modename);
         
         feenox.pde.mode[g][i]->mesh = feenox.pde.solution[g]->mesh;
@@ -420,7 +424,7 @@ int feenox_problem_define_solutions(void) {
 }
 
 
-int feenox_problem_define_solution_function(const char *name, function_t **function) {
+int feenox_problem_define_solution_function(const char *name, function_t **function, int is_gradient) {
 
   // aca la definimos para que este disponible en tiempo de parseo  
   if ((*function = feenox_define_function_get_ptr(name, feenox.pde.dim)) == NULL) {
@@ -431,6 +435,7 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   feenox_problem_define_solution_clean_nodal_arguments(*function);
   (*function)->var_argument = feenox.pde.solution[0]->var_argument;
   (*function)->type = function_type_pointwise_mesh_node;
+  (*function)->is_gradient = is_gradient;
 
   return 0;
 }
