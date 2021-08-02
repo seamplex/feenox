@@ -650,10 +650,6 @@ struct  assignment_t {
   vector_t *vector;
   matrix_t *matrix;
   
-  // expresiones que indican el rango de tiempo
-  expr_t t_min;
-  expr_t t_max;
-
   // expresiones que indican el rango de indices para asignaciones vectoriales/matriciales
   expr_t i_min;
   expr_t i_max;
@@ -884,7 +880,7 @@ struct node_t {
   gsl_matrix *dphidx;       // derivative of the m-th DOF with respect to coordinate g
                             // (this is a gsl_matrix to avoid having to do double mallocs and forgetting about row/col-major
   gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
-  double *f;                // holder of arbitrary functions evaluated at the node (sigmas and taus)
+  double *flux;             // holder of arbitrary functions evaluated at the node (sigmas and taus)
   
   element_ll_t *associated_elements;
 };

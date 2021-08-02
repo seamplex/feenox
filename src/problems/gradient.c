@@ -63,7 +63,8 @@ int feenox_problem_gradient_compute(void) {
     if (mesh->element[i].type->dim == feenox.pde.dim) {
       feenox_call(feenox_problem_gradient_compute_at_element(&mesh->element[i], mesh));
       // TODO: per problem
-      feenox_call(feenox_problem_gradient_compute_at_element_thermal(&mesh->element[i], mesh));
+      // TODO: this is only needed in rough
+//      feenox_call(feenox_problem_gradient_properties_at_element_nodes_thermal(&mesh->element[i], mesh));
     }
     
 
@@ -89,6 +90,8 @@ int feenox_problem_gradient_compute(void) {
         feenox.pde.delta_gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].delta_dphidx, g, m);
       }
     }
+    
+    feenox_call(feenox_problem_fill_fluxes(mesh, j));
   }
   
   // TODO: put 100 as a define or as a variable
@@ -273,6 +276,8 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   } else {
     gsl_matrix_set_zero(node->delta_dphidx);
   }
+  // TODO: per-problem
+  feenox_call(feenox_problem_gradient_fluxes_at_node_alloc_thermal(node));
       
   size_t j = 0;
   unsigned int g = 0;
@@ -305,6 +310,7 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
           }
 
           // TODO: per-problem stuff
+          feenox_call(feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node, element, j, rel_weight));
         }
       }
     }

@@ -55,6 +55,14 @@ checkslepc() {
 }
 
 
+# checks if gmsh executable is available in the path
+checkgmsh() {
+ if [ -z "$(which gmsh)" ]; then
+  echo "Gmsh not found, skipping test"
+  exit 77
+ fi
+}
+
 answer() {
   echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})

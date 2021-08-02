@@ -580,8 +580,8 @@ int feenox_mesh_free(mesh_t *mesh) {
       if (mesh->node[j].delta_dphidx != NULL) {
         gsl_matrix_free(mesh->node[j].delta_dphidx);
       }
-      if (mesh->node[j].f != NULL) {
-        feenox_free(mesh->node[j].f);
+      if (mesh->node[j].flux != NULL) {
+        feenox_free(mesh->node[j].flux);
       }
     }
     feenox_free(mesh->node);

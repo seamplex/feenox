@@ -23,8 +23,10 @@ extern int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_
 
 // thermal/heatflux.c
 extern int feenox_problem_gradient_fill_thermal(void);
-extern int feenox_problem_gradient_compute_at_element_thermal(element_t *element, mesh_t *mesh);
-extern int feenox_problem_gradient_smooth_at_node_thermal(node_t *node);
+extern int feenox_problem_gradient_properties_at_element_nodes_thermal(element_t *element, mesh_t *mesh);
+extern int feenox_problem_gradient_fluxes_at_node_alloc_thermal(node_t *node);
+extern int feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node_t *node, element_t *element, unsigned int j, double rel_weight);
+extern int feenox_problem_fill_fluxes(mesh_t *mesh, size_t j);
 
 // thermal/post.c
 extern int feenox_problem_solve_post_thermal(void);

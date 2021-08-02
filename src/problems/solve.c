@@ -29,11 +29,13 @@ int feenox_instruction_solve_problem(void *arg) {
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)
   feenox_call(feenox.pde.solve());
+  
+  // TODO: how to do this in parallel?
+  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi));
+  
   if (feenox.pde.solve_post != NULL) {
     feenox_call(feenox.pde.solve_post());
   }
-  // TODO: how to do this in parallel?
-  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi));
   
 #endif  
   return FEENOX_OK;

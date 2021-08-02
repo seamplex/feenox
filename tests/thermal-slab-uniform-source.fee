@@ -9,4 +9,4 @@ q = 1
 
 SOLVE_PROBLEM
 DUMP K K_bc b b_bc FORMAT octave 
-PRINT T(0.5)-1/8
+PRINT T_max-1/8

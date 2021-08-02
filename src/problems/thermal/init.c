@@ -58,7 +58,6 @@ int feenox_problem_init_parser_thermal(void) {
 ///va+T_min+detail The minimum temperature\ $T_\text{min}$.
   feenox_check_null(thermal.T_min = feenox_define_variable_get_ptr("T_min"));
   
-  // TODO: heat fluxes as seconday fields
 #endif
   return FEENOX_OK;
 }
