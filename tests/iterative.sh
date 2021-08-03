@@ -9,8 +9,5 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer vector.fee "196"
-exitifwrong $?
-
-answerdiff fibo_vector.fee
+answerdiff fibo_iterative.fee
 exitifwrong $?

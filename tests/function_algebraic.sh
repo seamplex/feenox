@@ -11,3 +11,6 @@ fi
 
 answer function_algebraic.fee "4	37"
 exitifwrong $?
+
+answerdiff fibo_formula.fee
+exitifwrong $?
