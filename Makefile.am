@@ -16,12 +16,14 @@ TESTS = tests/abort.sh \
         tests/expressions_variables.sh \
         tests/expressions_functions.sh \
         tests/exp.sh \
+        tests/iterative.sh \
         tests/fit.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \
         tests/function_file.sh \
         tests/function_vectors.sh \
         tests/integral.sh \
+        tests/laplace2d.sh \
         tests/materials.sh \
         tests/mesh.sh \
         tests/modal.sh \
