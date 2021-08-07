@@ -33,6 +33,14 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
   feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
   
+/*  
+  feenox.pde.feenox_problem_gradient_fill = feenox_problem_gradient_fill_thermal;
+  feenox.pde.feenox_problem_gradient_properties_at_element_nodes = feenox_problem_gradient_properties_at_element_nodes_thermal;
+  feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc = feenox_problem_gradient_fluxes_at_node_alloc_thermal;
+  feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node = feenox_problem_gradient_add_elemental_contribution_to_node_thermal;
+  feenox.pde.feenox_problem_fill_fluxes = feenox_problem_gradient_fill_fluxes_thermal;
+*/
+  
   if (feenox.pde.symmetry_axis != symmetry_axis_none ||
       mechanical.variant == variant_plane_stress ||
       mechanical.variant == variant_plane_strain) {

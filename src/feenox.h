@@ -188,7 +188,7 @@
   type.name.space_dependent = feenox_expression_depends_on_space(type.name.dependency_variables); }
 
 #define feenox_gradient_fill(location, fun_nam) {\
-  location.fun_nam->mesh = feenox.pde.rough==0?feenox.pde.mesh:feenox.pde.mesh_rough; \
+  location.fun_nam->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough; \
   location.fun_nam->data_argument = location.fun_nam->mesh->nodes_argument;   \
   location.fun_nam->data_size = location.fun_nam->mesh->n_nodes; \
   feenox_check_alloc(location.fun_nam->data_value = calloc(location.fun_nam->mesh->n_nodes, sizeof(double))); }
@@ -1644,6 +1644,13 @@ struct feenox_t {
     int (*build_element_volumetric_gauss_point)(element_t *this, unsigned int v);
     int (*solve)(void);
     int (*solve_post)(void);
+    
+    int (*feenox_problem_gradient_fill)(void);
+    int (*feenox_problem_gradient_properties_at_element_nodes)(element_t *element, mesh_t *mesh);
+    int (*feenox_problem_gradient_fluxes_at_node_alloc)(node_t *node);
+    int (*feenox_problem_gradient_add_elemental_contribution_to_node)(node_t *node, element_t *element, unsigned int j, double rel_weight);
+    int (*feenox_problem_gradient_fill_fluxes)(mesh_t *mesh, size_t j);
+
 
     // instruction pointer to know before/after transient PDE
     instruction_t *instruction;
@@ -2238,6 +2245,7 @@ extern int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *m
 extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 
 // problem-dependent virtual methods
+#include "problems/laplace/methods.h"
 #include "problems/thermal/methods.h"
 #include "problems/mechanical/methods.h"
 #include "problems/modal/methods.h"

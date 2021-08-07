@@ -88,6 +88,11 @@ feenox_SOURCES = \
 ./problems/petsc_ts.c \
 ./problems/slepc_eps.c \
 ./problems/solve.c \
+./problems/laplace/laplace.h \
+./problems/laplace/methods.h \
+./problems/laplace/init.c \
+./problems/laplace/bulk.c \
+./problems/laplace/bc.c \
 ./problems/thermal/thermal.h \
 ./problems/thermal/methods.h \
 ./problems/thermal/init.c \

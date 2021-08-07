@@ -46,7 +46,7 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
 
   
   if (bc_data->nonlinear && bc_data->type_phys == BC_TYPE_THERMAL_TEMPERATURE) {
-    feenox_push_error_message("strong boundary condition '%s' cannot depend on temperature", rhs);
+    feenox_push_error_message("essential boundary condition '%s' cannot depend on temperature", rhs);
     return FEENOX_ERROR;
   }
   // TODO: check that a single BC does not mix T and Tref

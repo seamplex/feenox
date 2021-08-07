@@ -45,8 +45,9 @@ int feenox_problem_gradient_compute(void) {
       }
     }
         
-    // TODO: per problem
-    feenox_call(feenox_problem_gradient_fill_thermal());
+    if (feenox.pde.feenox_problem_gradient_fill != NULL) {
+      feenox_call(feenox.pde.feenox_problem_gradient_fill());
+    }  
   }
   
   // step 1. sweep elements and compute tensors at each node of each element
@@ -62,12 +63,7 @@ int feenox_problem_gradient_compute(void) {
     
     if (mesh->element[i].type->dim == feenox.pde.dim) {
       feenox_call(feenox_problem_gradient_compute_at_element(&mesh->element[i], mesh));
-      // TODO: per problem
-      // TODO: this is only needed in rough
-//      feenox_call(feenox_problem_gradient_properties_at_element_nodes_thermal(&mesh->element[i], mesh));
     }
-    
-
   }
   
   // step 2. sweep nodes of the output mesh (same as input in smooth, rough in rough)
@@ -91,7 +87,9 @@ int feenox_problem_gradient_compute(void) {
       }
     }
     
-    feenox_call(feenox_problem_fill_fluxes(mesh, j));
+    if (feenox.pde.feenox_problem_gradient_fill_fluxes != NULL) {
+      feenox_call(feenox.pde.feenox_problem_gradient_fill_fluxes(mesh, j));
+    }  
   }
   
   // TODO: put 100 as a define or as a variable
@@ -276,8 +274,10 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   } else {
     gsl_matrix_set_zero(node->delta_dphidx);
   }
-  // TODO: per-problem
-  feenox_call(feenox_problem_gradient_fluxes_at_node_alloc_thermal(node));
+  
+  if (feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc != NULL) {
+    feenox_call(feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc(node));
+  }  
       
   size_t j = 0;
   unsigned int g = 0;
@@ -309,8 +309,9 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
             }
           }
 
-          // TODO: per-problem stuff
-          feenox_call(feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node, element, j, rel_weight));
+          if (feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node != NULL) {
+            feenox_call(feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node(node, element, j, rel_weight));
+          }  
         }
       }
     }

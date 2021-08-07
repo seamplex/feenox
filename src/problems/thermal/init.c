@@ -25,6 +25,11 @@ int feenox_problem_init_parser_thermal(void) {
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_temperature;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_thermal;
   feenox.pde.solve_post = feenox_problem_solve_post_thermal;
+  feenox.pde.feenox_problem_gradient_fill = feenox_problem_gradient_fill_thermal;
+  feenox.pde.feenox_problem_gradient_properties_at_element_nodes = feenox_problem_gradient_properties_at_element_nodes_thermal;
+  feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc = feenox_problem_gradient_fluxes_at_node_alloc_thermal;
+  feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node = feenox_problem_gradient_add_elemental_contribution_to_node_thermal;
+  feenox.pde.feenox_problem_gradient_fill_fluxes = feenox_problem_gradient_fill_fluxes_thermal;
   
   // thermal is a scalar problem
   feenox.pde.dofs = 1;

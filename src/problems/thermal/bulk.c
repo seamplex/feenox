@@ -2,7 +2,7 @@
 #include "thermal.h"
 extern feenox_t feenox;
 extern thermal_t thermal;
-double zero[3] = {0, 0, 0};
+extern double zero[3];
 
 int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigned int v) {
 

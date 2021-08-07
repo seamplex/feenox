@@ -51,7 +51,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node_t *n
   return FEENOX_OK;
 }
 
-int feenox_problem_fill_fluxes(mesh_t *mesh, size_t j) {
+int feenox_problem_gradient_fill_fluxes_thermal(mesh_t *mesh, size_t j) {
   
   thermal.qx->data_value[j] = mesh->node[j].flux[0];
   if (feenox.pde.dim > 1) {
