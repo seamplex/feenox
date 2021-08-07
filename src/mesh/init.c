@@ -96,11 +96,11 @@ int feenox_mesh_init_special_objects(void) {
 
 ///va+bbox_min+name bbox_min
 ///va+bbox_min+desc Minimum values of the mesh’s bounding box (vector of size 3)
-//  feenox.mesh.vars.bbox_min = feenox_define_vector("bbox_min", 3, NULL, NULL);
+  feenox.mesh.vars.bbox_min = feenox_define_vector_get_ptr("bbox_min", 3);
 
 ///va+bbox_min+name bbox_min
 ///va+bbox_min+desc Maximum values of the mesh’s bounding box (vector of size 3)
-//  feenox.mesh.vars.bbox_max = feenox_define_vector("bbox_max", 3, NULL, NULL);
+  feenox.mesh.vars.bbox_max = feenox_define_vector_get_ptr("bbox_max", 3);
   
 //va+eps+name eps
 //va+eps+desc Small value. Default is $10^{-6}$.

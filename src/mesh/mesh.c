@@ -55,12 +55,8 @@ int feenox_instruction_mesh_read(void *arg) {
   offset[1] = feenox_expression_eval(&this->offset_y);
   offset[2] = feenox_expression_eval(&this->offset_z);
 
-  double x_min[3];
-  double x_max[3];
-  for (unsigned int m = 0; m < 3; m++) {
-    x_min[m] = +MESH_INF;
-    x_max[m] = -MESH_INF;
-  }
+  double x_max[3] = {-MESH_INF, -MESH_INF, -MESH_INF};
+  double x_min[3] = {+MESH_INF, +MESH_INF, +MESH_INF};
 
   unsigned int dim = 0;
   for (size_t j = 0; j < this->n_nodes; j++) {
@@ -89,24 +85,22 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
-  // TODO: what was this?
-//  feenox_call(feenox_vector_init(feenox_mesh.vars.bbox_min));
-//  feenox_call(feenox_vector_init(feenox_mesh.vars.bbox_max));
-/*  
-  gsl_vector_set(feenox_mesh.vars.bbox_min->value, 0, x_min[0]);
-  gsl_vector_set(feenox_mesh.vars.bbox_min->value, 1, x_min[1]);
-  gsl_vector_set(feenox_mesh.vars.bbox_min->value, 2, x_min[2]);
-  gsl_vector_set(feenox_mesh.vars.bbox_max->value, 0, x_max[0]);
-  gsl_vector_set(feenox_mesh.vars.bbox_max->value, 1, x_max[1]);
-  gsl_vector_set(feenox_mesh.vars.bbox_max->value, 2, x_max[2]);
-*/  
+  feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_min, 1));
+  gsl_vector_set(feenox.mesh.vars.bbox_min->value, 0, x_min[0]);
+  gsl_vector_set(feenox.mesh.vars.bbox_min->value, 1, x_min[1]);
+  gsl_vector_set(feenox.mesh.vars.bbox_min->value, 2, x_min[2]);
+
+  feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_max, 1));
+  gsl_vector_set(feenox.mesh.vars.bbox_max->value, 0, x_max[0]);
+  gsl_vector_set(feenox.mesh.vars.bbox_max->value, 1, x_max[1]);
+  gsl_vector_set(feenox.mesh.vars.bbox_max->value, 2, x_max[2]);
   
   // allocate arrays for the elements that belong to a physical group
   // (arrays are more efficient than a linked list)
   physical_group_t *physical_group;
   for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->n_elements != 0) {
-      feenox_check_alloc(physical_group->element = malloc(physical_group->n_elements * sizeof(size_t)));
+      feenox_check_alloc(physical_group->element = calloc(physical_group->n_elements, sizeof(size_t)));
     }
     // check out what the highest tag is to allocate temporary arrays
     if (physical_group->tag > this->physical_tag_max) {
