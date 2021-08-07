@@ -171,7 +171,10 @@ int feenox_problem_init_parser_mechanical(void) {
 
 
 int feenox_problem_init_runtime_mechanical(void) {
+
 #ifdef HAVE_PETSC 
+  // we are FEM not FVM
+  feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 

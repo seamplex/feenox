@@ -34,16 +34,11 @@ int feenox_problem_init_parser_thermal(void) {
   // thermal is a scalar problem
   feenox.pde.dofs = 1;
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-  
-  // we are FEM not FVM
-  feenox.pde.mesh->data_type = data_type_node;
-  
-  // TODO: be able to choose unknown name
+    
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
-  feenox.mesh.default_field_location = field_location_nodes;
-  
   feenox_call(feenox_problem_define_solutions());
-  
+  feenox.mesh.default_field_location = field_location_nodes;
+    
   // heat fluxes
   feenox_call(feenox_problem_define_solution_function("qx", &thermal.qx, 1));
   if (feenox.pde.dim > 1) {
@@ -70,7 +65,8 @@ int feenox_problem_init_parser_thermal(void) {
 int feenox_problem_init_runtime_thermal(void) {
   
 #ifdef HAVE_PETSC
-
+  // we are FEM not FVM
+  feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   

@@ -66,7 +66,6 @@ int feenox_problem_init_parser_modal(void) {
   // vector problem    
   feenox.pde.dofs = feenox.pde.mesh->dim;
   
-  // TODO: custom names
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
   if (feenox.pde.dofs > 1) {
@@ -76,11 +75,8 @@ int feenox_problem_init_parser_modal(void) {
     }  
   }
   
-
-  // we are FEM not FVM
-  feenox.pde.mesh->data_type = data_type_node;
-  feenox.mesh.default_field_location = field_location_nodes;
   feenox_call(feenox_problem_define_solutions());
+  feenox.mesh.default_field_location = field_location_nodes;
   
 ///va+M_T+name M_T
 ///va+M_T+desc A scalar with the total mass\ $m$ computed from the mass matrix\ $M$ as
@@ -166,7 +162,10 @@ int feenox_problem_init_parser_modal(void) {
 
 
 int feenox_problem_init_runtime_modal(void) {
+
 #ifdef HAVE_PETSC  
+  // we are FEM not FVM
+  feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
