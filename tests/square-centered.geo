@@ -1,7 +1,7 @@
 SetFactory("OpenCASCADE");
 Rectangle(1) = {-1, -1, 0, 2, 2, 0};
 
-Transfinite Curve "*" = 20+1;
+Transfinite Curve "*" = 32+1;
 Transfinite Surface "*";
 Mesh.RecombineAll = 1;
 

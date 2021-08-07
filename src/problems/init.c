@@ -268,6 +268,8 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 
 int feenox_problem_define_solutions(void) {
   
+  char dimension_name[3][2] = {"x", "y", "z"};
+  
 #ifdef HAVE_PETSC
   if (feenox.pde.dim == 0) {
     feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either PROBLEM or READ_MESH");
@@ -295,11 +297,6 @@ int feenox_problem_define_solutions(void) {
     }
     feenox_check_alloc(feenox.pde.solution[g] = feenox_define_function_get_ptr(name, feenox.pde.dim));
     
-    feenox.pde.solution[g]->mesh = (feenox.pde.rough==0)?feenox.pde.mesh:feenox.pde.mesh_rough;
-    feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dim, sizeof(var_t *)));
-    feenox.pde.solution[g]->var_argument_allocated = 1;
-    feenox.pde.solution[g]->type = function_type_pointwise_mesh_node;
-
     if (feenox.pde.nev == 0) {
       // las derivadas de las soluciones con respecto al espacio solo si no es modal
       feenox_check_alloc(feenox.pde.gradient[g] = calloc(feenox.pde.dim, sizeof(function_t *)));
@@ -310,7 +307,7 @@ int feenox_problem_define_solutions(void) {
         feenox.pde.solution[g]->var_argument[m] = feenox.mesh.vars.arr_x[m];
       
         char *gradname = NULL;
-        feenox_check_minusone(asprintf(&gradname, "d%sd%s", name, feenox.mesh.vars.arr_x[m]->name));
+        feenox_check_minusone(asprintf(&gradname, "d%sd%s", name, dimension_name[m]));
         feenox_check_alloc(feenox.pde.gradient[g][m] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
         feenox_free(gradname);
         
@@ -324,7 +321,7 @@ int feenox_problem_define_solutions(void) {
         feenox.pde.gradient[g][m]->is_gradient = 1;
         
         // same for uncertainty
-        feenox_check_minusone(asprintf(&gradname, "delta_d%sd%s", name, feenox.mesh.vars.arr_x[m]->name));
+        feenox_check_minusone(asprintf(&gradname, "delta_d%sd%s", name, dimension_name[m]));
         feenox_check_alloc(feenox.pde.delta_gradient[g][m] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
         feenox_free(gradname);
         
@@ -431,7 +428,7 @@ int feenox_problem_init_runtime_general(void) {
   }
   
   // check if the dimensions match
-  if (feenox.pde.dim != 0 && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {
+  if (feenox.pde.dim != 0 && feenox.pde.mesh != NULL && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {
     feenox_push_error_message("dimension mismatch, in PROBLEM %d != in READ_MESH %d", feenox.pde.dim, feenox.pde.mesh->dim);
     return FEENOX_ERROR;
   }
@@ -446,6 +443,19 @@ int feenox_problem_init_runtime_general(void) {
     return FEENOX_ERROR;
   }
   
+  // link the solution functions with the mesh
+  unsigned int m = 0;
+  unsigned int g = 0;
+  for (g = 0; g < feenox.pde.dofs; g++) {
+    for (m = 0; m < feenox.pde.dim; m++) {
+      feenox.pde.solution[g]->var_argument[m] = feenox.mesh.vars.arr_x[m];
+    }
+    feenox.pde.solution[g]->mesh = (feenox.pde.rough==0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
+    feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dim, sizeof(var_t *)));
+    feenox.pde.solution[g]->var_argument_allocated = 1;
+    feenox.pde.solution[g]->type = function_type_pointwise_mesh_node;
+  }  
+
 
   physical_group_t *physical_group;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {

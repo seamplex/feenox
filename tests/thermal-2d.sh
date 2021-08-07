@@ -23,10 +23,10 @@ exitifwrong $?
 answer thermal-two-squares-material-implicit-space.fee "0.71773"
 exitifwrong $?
 
-answer thermal-two-squares-material-explicit-temperature.fee "0.599703"
+answer thermal-two-squares-material-explicit-temperature.fee "0.599969"
 exitifwrong $?
 
-answer thermal-two-squares-material-implicit-temperature.fee "0.599703"
+answer thermal-two-squares-material-implicit-temperature.fee "0.599969"
 exitifwrong $?
 
 

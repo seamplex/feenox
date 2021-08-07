@@ -3441,18 +3441,16 @@ int feenox_parse_problem(void) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       
-///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
 
 ///kw+PROBLEM+detail @    
-///kw+PROBLEM+detail If you are a programmer and want to contribute with another problem type,
-///kw+PROBLEM+detail please do!
-///kw+PROBLEM+detail Check out FeenoX's repository for licensing information, programming guides and code of conduct.
+///kw+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
+///kw+PROBLEM+detail Check out [FeenoX's repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)
+///kw+PROBLEM+detail for licensing information, programming guides and code of conduct.
 
 ///kw+PROBLEM+usage @
 ///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
 ///kw+PROBLEM+detail as `1d`, `2d`, `3d` or with the keyword `DIMENSIONS`.
-///kw+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword
-///kw+PROBLEM+detail before `PROBLEM`.
+///kw+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
 ///kw+PROBLEM+usage [ 1D |
     } else if (strcasecmp(token, "1d") == 0) {
       feenox.pde.dim = 1;
@@ -3472,8 +3470,24 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
 
+///kw+PROBLEM+usage [ MESH <identifier> ] @
+///kw+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
+///kw+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
+///kw+PROBLEM+detail defined in the input file is the one over which the problem is solved.
+    } else if (strcasecmp(token, "MESH") == 0) {
+      char *mesh_name;
+
+      // TODO: function parse_mesh() or something of the like
+      feenox_call(feenox_parser_string(&mesh_name));
+      if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+        feenox_push_error_message("unknown mesh '%s'", mesh_name);
+        feenox_free(mesh_name);
+        return FEENOX_ERROR;
+      }
+      feenox_free(mesh_name);
+      
       // TODO: shouldn't this go in the MESH keyword?
-///kw+PROBLEM+usage [
+///kw+PROBLEM+usage @[
 ///kw+PROBLEM+usage AXISYMMETRIC { x | y }
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
@@ -3514,22 +3528,6 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "NON_LINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
-
-///kw+PROBLEM+usage [ MESH <identifier> ] @
-///kw+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
-///kw+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
-///kw+PROBLEM+detail defined in the input file is the one over which the problem is solved.
-    } else if (strcasecmp(token, "MESH") == 0) {
-      char *mesh_name;
-
-      // TODO: function parse_mesh() or something of the like
-      feenox_call(feenox_parser_string(&mesh_name));
-      if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
-        feenox_push_error_message("unknown mesh '%s'", mesh_name);
-        feenox_free(mesh_name);
-        return FEENOX_ERROR;
-      }
-      feenox_free(mesh_name);
 
 ///kw+PROBLEM+usage [ MODES <expr> ] @
 ///kw+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
@@ -3610,6 +3608,15 @@ int feenox_parse_problem(void) {
     }
   } 
 
+  // if there is already a mesh, use it
+  if (feenox.pde.mesh == NULL && feenox.mesh.mesh_main != NULL) {
+    feenox.pde.mesh = feenox.mesh.mesh_main;
+  }
+  
+  if (feenox.pde.dim == 0 && feenox.pde.mesh != 0) {
+    feenox.pde.dim = feenox.pde.mesh->dim;
+  }
+  
   if (feenox_problem_init_parser_particular == NULL) {
     feenox_push_error_message("undefined PROBLEM type");
     return FEENOX_ERROR;     

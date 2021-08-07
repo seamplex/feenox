@@ -2,6 +2,9 @@
 *.log
 *.trs
 *.last
+nafems
 tmp.*
 mesh2d.msh
-nafems
+square-centered.msh
+laplace-square.msh
+t4.msh

@@ -64,7 +64,7 @@ int feenox_problem_init_parser_modal(void) {
   }
 
   // vector problem    
-  feenox.pde.dofs = feenox.pde.mesh->dim;
+  feenox.pde.dofs = feenox.pde.dim;
   
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
@@ -74,8 +74,9 @@ int feenox_problem_init_parser_modal(void) {
       feenox_check_alloc(feenox.pde.unknown_name[2] = strdup("w"));
     }  
   }
-  
   feenox_call(feenox_problem_define_solutions());
+  
+  // we'd rather ser nodes than cells 
   feenox.mesh.default_field_location = field_location_nodes;
   
 ///va+M_T+name M_T
