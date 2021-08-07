@@ -1,5 +1,5 @@
-READ_MESH rectangular_beam.msh
 PROBLEM modal DIMENSIONS 3 MODES 6
+READ_MESH rectangular_beam.msh
 
 E = 2e11
 nu = 0.3

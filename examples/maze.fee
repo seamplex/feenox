@@ -1,0 +1,10 @@
+PROBLEM laplace 2d
+READ_MESH maze.msh
+
+BC in  phi=0
+BC out phi=1
+
+SOLVE_PROBLEM
+
+WRITE_MESH maze-solved.msh VECTOR dphidx dphidy 0 abs(dphidx(x,y))+abs(dphidy(x,y))
+WRITE_MESH maze-solved.vtk abs(dphidx(x,y))+abs(dphidy(x,y))

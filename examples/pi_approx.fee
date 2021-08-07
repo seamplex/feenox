@@ -1,0 +1,2 @@
+VAR x
+PRINT 22/7-integral(x^4*(1-x)^4/(1+x^2),x,0,1)

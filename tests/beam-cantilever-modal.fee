@@ -3,8 +3,8 @@
 #  418.736    420.2
 # 1157.75    1176.7
 
+PROBLEM modal 3D MODES 6
 READ_MESH beam-cantilever-$1.msh
-PROBLEM modal DIMENSIONS 3 MODES 6
 
 nu = 0.28
 rho = 7800
