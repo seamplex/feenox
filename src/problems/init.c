@@ -27,6 +27,7 @@ extern feenox_t feenox;
 
 
 #ifdef HAVE_PETSC
+// TODO: deprecate petsc < 3.7.0
 // this is a wrapper because PetscOptionsHasName changed its arguments after 3.7.0
 #if PETSC_VERSION_LT(3,7,0)
  #define PetscOptionsHasNameWrapper(a, b, c) PetscOptionsHasName(a, b, c)
@@ -55,7 +56,6 @@ int feenox_problem_init_parser_general(void) {
     }
   }
 
-#ifdef HAVE_PETSC
   if ((sizeof(PetscReal) != sizeof(double)) || (sizeof(PetscScalar) != sizeof(double))) {
     feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d != PetscReal = %d", sizeof(double), sizeof(PetscReal));
     return FEENOX_ERROR;
@@ -133,20 +133,6 @@ int feenox_problem_init_parser_general(void) {
   // install out error handler for PETSc
 //  petsc_call(PetscPushErrorHandler(&feenox_handler, NULL));
 
-  // register events
-/*  
-  petsc_call(PetscClassIdRegister("Fino", &feenox.pde.petsc_classid));
-
-  petsc_call(PetscLogStageRegister("Assembly", &feenox.pde.petsc_stage_build));
-  petsc_call(PetscLogStageRegister("Solution", &feenox.pde.petsc_stage_solve));
-  petsc_call(PetscLogStageRegister("Stress", &feenox.pde.petsc_stage_solve));
-  
-  petsc_call(PetscLogEventRegister("feenox_build", feenox.pde.petsc_classid, &feenox.pde.petsc_event_build));
-  petsc_call(PetscLogEventRegister("feenox_solve", feenox.pde.petsc_classid, &feenox.pde.petsc_event_solve));
-  petsc_call(PetscLogEventRegister("feenox_stress", feenox.pde.petsc_classid, &feenox.pde.petsc_event_solve));
-*/
-  
-  
 ///va+ksp_atol+name ksp_atol
 ///va+ksp_atol+detail Absolute tolerance of the iterative linear solver, as passed to PETSc’s
 ///va+ksp_atol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html)
@@ -265,60 +251,6 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 ///va+nodes_rough+detail The number of nodes of the mesh in `ROUGH` mode.
   feenox.pde.vars.nodes_rough = feenox_define_variable_get_ptr("nodes_rough");
 
-  
-  
-///va+time_wall_build+name time_wall_build
-///va+time_wall_build+detail Wall time insumed to build the problem matrices, in seconds.
-//  feenox.pde.vars.time_wall_build = feenox_define_variable_get_ptr("time_wall_build");
-
-///va+time_wall_solve+name time_wall_solve
-///va+time_wall_solve+detail Wall time insumed to solve the problem, in seconds.
-//  feenox.pde.vars.time_wall_solve = feenox_define_variable_get_ptr("time_wall_solve");
-
-///va+time_wall_stress+name time_wall_stress
-///va+time_wall_stress+detail Wall time insumed to compute the stresses, in seconds.
-//  feenox.pde.vars.time_wall_stress = feenox_define_variable_get_ptr("time_wall_stress");
-
-///va+time_wall_total+name time_wall_total
-///va+time_wall_total+detail Wall time insumed to initialize, build and solve, in seconds.
-//  feenox.pde.vars.time_wall_total = feenox_define_variable_get_ptr("time_wall_total");
-  
-///va+time_cpu_build+name time_cpu_build
-///va+time_cpu_build+detail CPU time insumed to build the problem matrices, in seconds.
-//  feenox.pde.vars.time_cpu_build = feenox_define_variable_get_ptr("time_cpu_build");
-
-///va+time_cpu_solve+name time_cpu_solve
-///va+time_cpu_solve+detail CPU time insumed to solve the problem, in seconds.
-//  feenox.pde.vars.time_cpu_solve = feenox_define_variable_get_ptr("time_cpu_solve");
-
-///va+time_cpu_stress+name time_cpu_stress
-///va+time_cpu_stress+detail CPU time insumed to compute the stresses from the displacements, in seconds.
-//  feenox.pde.vars.time_cpu_stress = feenox_define_variable_get_ptr("time_cpu_stress");
-  
-///va+time_wall_total+name time_cpu_total
-///va+time_wall_total+detail CPU time insumed to initialize, build and solve, in seconds.
-//  feenox.pde.vars.time_cpu_total = feenox_define_variable_get_ptr("time_cpu_total");
-  
-///va+time_petsc_build+name time_petsc_build
-///va+time_petsc_build+detail CPU time insumed by PETSc to build the problem matrices, in seconds.
-//  feenox.pde.vars.time_petsc_build = feenox_define_variable_get_ptr("time_petsc_build");
-
-///va+time_petsc_solve+name time_petsc_solve
-///va+time_petsc_solve+detail CPU time insumed by PETSc to solve the eigen-problem, in seconds.
-//  feenox.pde.vars.time_petsc_solve = feenox_define_variable_get_ptr("time_petsc_solve");
-
-///va+time_petsc_stress+name time_petsc_solve
-///va+time_petsc_stress+detail CPU time insumed by PETSc to compute the stresses, in seconds.
-//  feenox.pde.vars.time_petsc_stress = feenox_define_variable_get_ptr("time_petsc_stress");
-  
-///va+time_wall_total+name time_wall_total
-///va+time_wall_total+detail CPU time insumed by PETSc to initialize, build and solve, in seconds.
-//  feenox.pde.vars.time_petsc_total = feenox_define_variable_get_ptr("time_petsc_total");
-
-  ///va+petsc_flops+name petsc_flops
-///va+petsc_flops+detail Number of floating point operations performed by PETSc/SLEPc.
-//  feenox.pde.vars.flops_petsc = feenox_define_variable_get_ptr("flops_petsc");
-         
 ///va+memory_available+name memory_available
 ///va+memory_available+detail Total available memory, in bytes.
   feenox.pde.vars.memory_available = feenox_define_variable_get_ptr("memory_available");
@@ -328,8 +260,6 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox_var_value(feenox.pde.vars.memory_available) = -1;
 #endif
   
-
-#endif  
 #endif  
   return FEENOX_OK;
 }
@@ -338,9 +268,13 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 
 int feenox_problem_define_solutions(void) {
   
-#ifdef HAVE_PETSC	
-  if (feenox.pde.dim == 0 || feenox.pde.dofs == 0) {
+#ifdef HAVE_PETSC
+  if (feenox.pde.dim == 0) {
     feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either PROBLEM or READ_MESH");
+    return FEENOX_ERROR;
+  }
+  if (feenox.pde.dofs == 0) {
+    feenox_push_error_message("do not know how many degrees of freedom this problem has");
     return FEENOX_ERROR;
   }
 
@@ -361,7 +295,6 @@ int feenox_problem_define_solutions(void) {
     }
     feenox_check_alloc(feenox.pde.solution[g] = feenox_define_function_get_ptr(name, feenox.pde.dim));
     
-    // esto lo ponemos aca por si alguien quiere hacer un PRINT o algo sin pasar por el STEP
     feenox.pde.solution[g]->mesh = (feenox.pde.rough==0)?feenox.pde.mesh:feenox.pde.mesh_rough;
     feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dim, sizeof(var_t *)));
     feenox.pde.solution[g]->var_argument_allocated = 1;
@@ -464,40 +397,6 @@ int feenox_problem_define_solution_clean_nodal_arguments(function_t *function) {
   return FEENOX_OK;
 }
 
-/*
-int plugin_init_before_run(void) {
-
-  feenox.pde.global_size = 0;
-  feenox.pde.spatial_unknowns = 0;
-#ifdef HAVE_PETSC  
-  feenox.pde.progress_r0 = 0;
-//  feenox.pde.already_built = PETSC_FALSE;
-//  feenox.pde.first_build = PETSC_TRUE;
-#endif  
-
-//  feenox_call(feenox_problem_free());
-  
-  return FEENOX_OK;
-}
-
-
-int plugin_finalize(void) {
-
-//  feenox_call(feenox_problem_free());
-#ifdef HAVE_PETSC
-  if (feenox.pde.petscinit_called) {
-#ifdef HAVE_SLEPC  
-    petsc_call(SlepcFinalize());
-#else
-    petsc_call(PetscFinalize());
-#endif
-  }
-#endif  
-  
-  return FEENOX_OK;
-}
-*/
-
 
 int feenox_problem_init_runtime_general(void) {
 
@@ -531,12 +430,22 @@ int feenox_problem_init_runtime_general(void) {
     feenox.pde.math_type = math_type_nonlinear;
   }
   
-  
-  // do some check
-  if (feenox.pde.mesh == NULL) {
-    feenox_push_error_message("no mesh defined");
+  // check if the dimensions match
+  if (feenox.pde.dim != 0 && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {
+    feenox_push_error_message("dimension mismatch, in PROBLEM %d != in READ_MESH %d", feenox.pde.dim, feenox.pde.mesh->dim);
     return FEENOX_ERROR;
   }
+  
+  // conversely, if we got them there, put it on the mesh
+  if (feenox.pde.mesh != NULL && feenox.pde.mesh->dim == 0 && feenox.pde.dim != 0) {
+    feenox.pde.mesh->dim = feenox.pde.dim;
+  }
+
+  if (feenox.pde.dim == 0) {
+    feenox_push_error_message("could not determine the dimension of the problem, give them using DIMENSIONS in either READ_MESH or PROBLEM");
+    return FEENOX_ERROR;
+  }
+  
 
   physical_group_t *physical_group;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {

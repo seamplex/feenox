@@ -1,0 +1,7 @@
+READ_MESH square-centered.msh
+PROBLEM laplace 2d
+BC left  phi=+y
+BC right phi=-y
+SOLVE_PROBLEM
+WRITE_MESH laplace-square.msh phi VECTOR dphidx dphidy 0
+

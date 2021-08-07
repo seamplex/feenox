@@ -7,6 +7,12 @@ int feenox_instruction_solve_problem(void *arg) {
 
   // initialize only if we did not initialize before
   if (feenox.pde.spatial_unknowns == 0) {
+    // if there is no explicit mesh, the main one
+    if (feenox.pde.mesh == NULL && (feenox.pde.mesh = feenox.mesh.mesh_main) == NULL) {
+      feenox_push_error_message("unknown mesh (no READ_MESH keyword)");
+      return FEENOX_ERROR;
+    }
+
     feenox_call(feenox.pde.problem_init_runtime_particular());
     if (feenox.pde.solve == NULL) {
       feenox_push_error_message("internal mismatch, undefined solver");

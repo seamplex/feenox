@@ -3411,10 +3411,15 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+usage mechanical
 ///kw+PROBLEM+usage |
 ///kw+PROBLEM+detail @    
+///kw+PROBLEM+detail  * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
+    if (strcasecmp(token, "laplace") == 0 || strcasecmp(token, "poisson") == 0) {
+      feenox_problem_parse_particular = feenox_problem_parse_problem_laplace;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_laplace;
+    
 ///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
-///kw+PROBLEM+detail If the mesh is two-dimensional and not `AXISYMMETRIC`, either
+///kw+PROBLEM+detail If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
 ///kw+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
-    if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
+    } else if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
 
@@ -3439,13 +3444,25 @@ int feenox_parse_problem(void) {
 ///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
 
 ///kw+PROBLEM+detail @    
-///kw+PROBLEM+detail If you want to contribute with anothey problem type, you are welcome!
-///kw+PROBLEM+detail Check out FeenoX's repository for licensing, programming guides and code of conduct.
-      
-///kw+PROBLEM+usage [ DIMENSIONS <expr> ]
+///kw+PROBLEM+detail If you are a programmer and want to contribute with another problem type,
+///kw+PROBLEM+detail please do!
+///kw+PROBLEM+detail Check out FeenoX's repository for licensing information, programming guides and code of conduct.
+
 ///kw+PROBLEM+usage @
-///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
-///kw+PROBLEM+detail or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
+///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
+///kw+PROBLEM+detail as `1d`, `2d`, `3d` or with the keyword `DIMENSIONS`.
+///kw+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword
+///kw+PROBLEM+detail before `PROBLEM`.
+///kw+PROBLEM+usage [ 1D |
+    } else if (strcasecmp(token, "1d") == 0) {
+      feenox.pde.dim = 1;
+///kw+PROBLEM+usage   2D |
+    } else if (strcasecmp(token, "2d") == 0) {
+      feenox.pde.dim = 2;
+///kw+PROBLEM+usage   3D |
+    } else if (strcasecmp(token, "3d") == 0) {
+      feenox.pde.dim = 3;
+///kw+PROBLEM+usage   DIMENSIONS <expr> ]
     } else if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -3455,6 +3472,7 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
 
+      // TODO: shouldn't this go in the MESH keyword?
 ///kw+PROBLEM+usage [
 ///kw+PROBLEM+usage AXISYMMETRIC { x | y }
 ///kw+PROBLEM+usage |
@@ -3515,7 +3533,7 @@ int feenox_parse_problem(void) {
 
 ///kw+PROBLEM+usage [ MODES <expr> ] @
 ///kw+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
-///kw+PROBLEM+detail The default is DEFAULT_NMODES.
+///kw+PROBLEM+detail The default value is problem dependent.
     } else if (strcasecmp(token, "MODES") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -3591,32 +3609,6 @@ int feenox_parse_problem(void) {
       
     }
   } 
-
-  // if there is no explicit mesh, the main one
-  if (feenox.pde.mesh == NULL && (feenox.pde.mesh = feenox.mesh.mesh_main) == NULL) {
-    feenox_push_error_message("unknown mesh (no READ_MESH keyword before PROBLEM)", token);
-    return FEENOX_ERROR;
-  }
-
-  // check if the dimensions match
-  if (feenox.pde.dim != 0 && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {
-    feenox_push_error_message("dimension mismatch, in PROBLEM %d != in READ_MESH %d", feenox.pde.dim, feenox.pde.mesh->dim);
-    return FEENOX_ERROR;
-  }
-  
-  // if we don't have dimensions here, use the dimensions from the provided mesh
-  if (feenox.pde.dim == 0 && feenox.pde.mesh->dim != 0) {
-    feenox.pde.dim = feenox.pde.mesh->dim;
-  }
-  // conversely, if we got them there, put it on the mesh
-  if (feenox.pde.mesh != NULL && feenox.pde.mesh->dim == 0 && feenox.pde.dim != 0) {
-    feenox.pde.mesh->dim = feenox.pde.dim;
-  }
-
-  if (feenox.pde.dim == 0) {
-    feenox_push_error_message("could not determine the dimension of the problem, give them using DIMENSIONS in either READ_MESH or PROBLEM");
-    return FEENOX_ERROR;
-  }
 
   if (feenox_problem_init_parser_particular == NULL) {
     feenox_push_error_message("undefined PROBLEM type");

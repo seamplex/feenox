@@ -48,16 +48,13 @@ int feenox_problem_init_parser_laplace(void) {
   
   // laplace is a scalar problem
   feenox.pde.dofs = 1;
-  feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-  
-  // we are FEM not FVM
-  feenox.pde.mesh->data_type = data_type_node;
-  
+  feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));    
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("phi"));
-  feenox.mesh.default_field_location = field_location_nodes;
-  
   feenox_call(feenox_problem_define_solutions());
-  
+
+  // we'd rather ser nodes than cells  
+  feenox.mesh.default_field_location = field_location_nodes;
+    
 #endif
   return FEENOX_OK;
 }
@@ -66,6 +63,9 @@ int feenox_problem_init_runtime_laplace(void) {
   
 #ifdef HAVE_PETSC
 
+  // we are FEM not FVM
+  feenox.pde.mesh->data_type = data_type_node;
+  
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   
