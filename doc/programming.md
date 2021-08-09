@@ -25,7 +25,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
 > Rule of Simplicity: Design for simplicity; add complexity only where you must.
 
-C++ is a great language with used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not rubust and hard to debug (especially when using templates and this nightmare called smart pointers). The cons are far more than the pros. There is no need to add complexity.
+C++ is a great language when used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not rubust and hard to debug (especially when using templates and this nightmare called smart pointers). The cons are far more than the pros. There is no need to add complexity.
 
 Fortran is a terrible language. Fortran90+ is a patched FORTRAN\ 77. The assumptions that the language had over the kind of computers it has to run on worked in the early days but are now widely outdated. That's it.
 
