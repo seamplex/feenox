@@ -16,7 +16,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
 ## Operating systems
 
- * The main target operating system is GNU/Linux, particularly `linux-amd64`.
+ * The main target operating system is GNU/Linux, particularly `linux-x86_64`.
  * The reference distribution is Debian stable. All the required dependencies should be available in any decently-modern Debian repositories.
  * Support for other architectures (mainly the other two non-server end-user mainstream OSes which are non-free and we do not want to mention explicitly) is encouraged but not required.
 
