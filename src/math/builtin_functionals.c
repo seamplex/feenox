@@ -55,7 +55,7 @@ struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
 
 
 typedef struct {
-  expr_item_t *function;
+  expr_t *expression;
   var_t *variable;
 } gsl_function_arguments_t;
 
@@ -96,7 +96,7 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
     h = DEFAULT_DERIVATIVE_STEP;
   }
 
-  function_arguments.function = a;
+  function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
   function_to_derive.function = feenox_gsl_function;
@@ -192,8 +192,7 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
     intervals = DEFAULT_INTEGRATION_INTERVALS;
   }
   
-  
-  function_arguments.function = a;
+  function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
   function_to_integrate.function = feenox_gsl_function;
@@ -267,7 +266,7 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
     epsrel = DEFAULT_INTEGRATION_TOLERANCE;
   }
 
-  function_arguments.function = a;
+  function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
   function_to_integrate.function = feenox_gsl_function;
@@ -300,7 +299,6 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
 ///fu+gauss_legendre+examples integral3.was
 double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
 
-#ifdef HAVE_GLFIXED_TABLE
   double x_old;
   double x_lower;
   double x_upper;
@@ -322,7 +320,7 @@ double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
     n = 12;
   }
 
-  function_arguments.function = a;
+  function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
   function_to_integrate.function = feenox_gsl_function;
@@ -338,15 +336,6 @@ double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
 
   return result;
   
-#else
-
-  feenox_push_error_message("the GSL version used to compile feenox does not have gsl_integration_glfixed_table");
-  feenox_runtime_error();
-  
-  return 0;
-  
-#endif
-
 }
 
 
@@ -503,7 +492,7 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
   nocomplain = feenox_expression_eval(&a->arg[6]);
 
 
-  function_arguments.function = a;
+  function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
   function_to_solve.function = feenox_gsl_function;
@@ -641,7 +630,7 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   nocomplain = feenox_expression_eval(&a->arg[6]);  
 
 
-  function_arguments.function = a;
+  function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
   function_to_solve.function = feenox_gsl_function;
@@ -694,10 +683,10 @@ double feenox_gsl_function(double x, void *params) {
 
   double y;
 
-  gsl_function_arguments_t *dummy = (gsl_function_arguments_t *)params;
-  feenox_var_value(dummy->variable) = x;
+  gsl_function_arguments_t *arguments = (gsl_function_arguments_t *)params;
+  feenox_var_value(arguments->variable) = x;
 
-  y = feenox_expression_eval(&dummy->function->arg[0]);
+  y = feenox_expression_eval(arguments->expression);
 
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();

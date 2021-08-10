@@ -1,0 +1,24 @@
+INCLUDE parameters.fee
+PHASE_SPACE phi c rho
+
+end_time = 100
+rel_error = 1e-7
+
+rho_0 = 0
+phi_0 = 1
+c_0[i] = phi_0 * beta(i)/(Lambda*lambda(i))
+
+FUNCTION react(t) DATA {   0    0   # in pcm
+                           5    0
+                           10  10
+                           30  10
+                           35   0
+                           100   0   }
+
+rho = 1e-5*react(t)
+phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+
+IF done
+  PRINT phi-1.03171
+ENDIF

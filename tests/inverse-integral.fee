@@ -1,0 +1,16 @@
+INCLUDE parameters.fee    # kinetic parameters
+FUNCTION flux(t) FILE_PATH flux.dat
+
+VAR t'   # dummy integration variable
+
+# define a flux function that allos for negative times
+flux_a = vec_flux_t[1]
+flux_b = vec_flux_t[vecsize(vec_flux)]
+phi(t) := if(t<flux_a, flux(flux_a), flux(t))
+
+# compute the reactivity with the integral formula
+rho(t) := { Lambda * derivative(log(phi(t')),t',t) +
+  Beta * ( 1 - 1/phi(t) *
+   integral(phi(t-t') * sum((lambda[i]*beta[i]/Beta)*exp(-lambda[i]*t'), i, 1, nprec), t', 0, 1e4) ) }
+
+PRINT rho(10)-0.000100021

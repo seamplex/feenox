@@ -1,0 +1,21 @@
+nprec = 6    # six precursor groups
+VECTOR c[nprec]
+VECTOR lambda[nprec]
+VECTOR beta[nprec]
+
+beta[1] = 0.000215
+beta[2] = 0.001424
+beta[3] = 0.001274
+beta[4] = 0.002568
+beta[5] = 0.000748
+beta[6] = 0.000273
+Beta = vecsum(beta)
+
+lambda[1] = 0.0124
+lambda[2] = 0.0305
+lambda[3] = 0.111
+lambda[4] = 0.301
+lambda[5] = 1.14
+lambda[6] = 3.01
+
+Lambda = 40e-6

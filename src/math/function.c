@@ -559,18 +559,34 @@ double feenox_function_eval(function_t *this, const double *x) {
 
     if (this->n_arguments == 1) {
       
+      // we need to keep the old value of the argument otherwise
+      // for example if the argument is an expression of time 
+      // everything gets screwed up
+      double x_old = feenox_var_value(this->var_argument[0]);
       feenox_var_value(this->var_argument[0]) = x[0];
       y = feenox_expression_eval(&this->algebraic_expression);
+      feenox_var_value(this->var_argument[0]) = x_old;
       
     } else {
 
+      double *vecx_old = NULL;
+      feenox_check_alloc(vecx_old = calloc(this->n_arguments, sizeof(double)));
+      
       unsigned int i = 0;
       for (i = 0; i < this->n_arguments; i++) {
+        // keep old values
+        vecx_old[i] = feenox_var_value(this->var_argument[i]);
         feenox_var_value(this->var_argument[i]) = x[i];
       }
 
       y = feenox_expression_eval(&this->algebraic_expression);
-
+      
+      for (i = 0; i < this->n_arguments; i++) {
+        // put old values back
+        feenox_var_value(this->var_argument[i]) = vecx_old[i];
+      }
+      
+      feenox_free(vecx_old);
     }
     
   } else if (this->data_size != 0) {

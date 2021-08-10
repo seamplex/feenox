@@ -1,0 +1,19 @@
+INCLUDE parameters.fee
+PHASE_SPACE phi c rho
+
+end_time = 10
+rel_error = 1e-7
+
+rho_0 = 0
+phi_0 = 1
+c_0[i] = phi_0 * beta(i)/(Lambda*lambda(i))
+
+FUNCTION flux(t) FILE flux.dat
+
+phi = flux(t)
+phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+
+IF done
+  PRINT rho-0.000100022
+ENDIF  

@@ -114,14 +114,13 @@ builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name) {
 
 }
 
-/*
 vector_t *feenox_get_first_vector(const char *s) {
   
-  char *line = strdup(s);
-  char *factor;
-  vector_t *wanted;
+  char *line = NULL;
+  feenox_check_alloc_null(line = strdup(s));
+  vector_t *wanted = NULL;
   
-  factor = strtok(line, factorseparators);
+  char *factor = strtok(line, factorseparators);
   while (factor != NULL) {
     if ((wanted = feenox_get_vector_ptr(factor)) != NULL) {
       feenox_free(line);
@@ -135,6 +134,7 @@ vector_t *feenox_get_first_vector(const char *s) {
   
 }
 
+/*
 matrix_t *feenox_get_first_matrix(const char *s) {
   
   char *line = strdup(s);

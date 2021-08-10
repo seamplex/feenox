@@ -1895,8 +1895,7 @@ double feenox_expression_derivative_wrt_variable(expr_t *expr, var_t *variable, 
 
 // dae.c
 extern int feenox_add_time_path(const char *token);
-extern int feenox_phase_space_add_object(const char *token);
-extern int feenox_phase_space_mark_diff(const char *string);
+extern int feenox_phase_space_add_object(const char *token, int differential);
 extern char *feenox_find_first_dot(const char *s);
 extern int feenox_add_dae(const char *lhs, const char *rhs);
 extern int feenox_dae_init(void);
@@ -1948,6 +1947,8 @@ extern function_t *feenox_get_function_ptr(const char *name);
 extern builtin_function_t *feenox_get_builtin_function_ptr(const char *name);
 extern builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const char *name);
 extern builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name);
+
+extern vector_t *feenox_get_first_vector(const char *s);
 
 extern file_t *feenox_get_file_ptr(const char *name);
 extern mesh_t *feenox_get_mesh_ptr(const char *name);

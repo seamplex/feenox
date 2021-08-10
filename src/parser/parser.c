@@ -2787,16 +2787,15 @@ int feenox_parse_phase_space(void) {
   }
 #endif
 
-//     i = 0;
   int differential = 0;
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
     if (strcmp(token, "DIFFERENTIAL") == 0) {
       differential = 1;
-    } else if (differential == 0) {  
-      feenox_call(feenox_phase_space_add_object(token));
+    } else if (strcmp(token, "ALGEBRAIC") == 0) {
+      differential = 0;
     } else {
-      feenox_call(feenox_phase_space_mark_diff(token));
+      feenox_call(feenox_phase_space_add_object(token, differential));
     }
   }
 

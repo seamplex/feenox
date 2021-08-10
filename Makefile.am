@@ -29,6 +29,7 @@ TESTS = tests/abort.sh \
         tests/modal.sh \
         tests/nafems-tx.sh \
         tests/nafems-t4.sh \
+        tests/point-kinetics.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
         tests/trig.sh \

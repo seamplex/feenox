@@ -528,16 +528,17 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       }
 
 
-      int i;
+      unsigned int i = 0;
       for (i = 0; i < n_arguments; i++) {
         if (item->type == EXPR_BUILTIN_VECTORFUNCTION) {
+          feenox_call_null(feenox_strip_blanks(arg[i]));
           if ((item->vector_arg[i] = feenox_get_vector_ptr(arg[i])) == NULL) {
             feenox_push_error_message("undefined vector '%s'", arg[i]);
             return NULL;
           }
         } else if (item->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
           // if it is a functional the second argument is a variable
-          feenox_strip_blanks(arg[i]);
+          feenox_call_null(feenox_strip_blanks(arg[i]));
           if ((item->functional_var_arg = feenox_get_variable_ptr(arg[i])) == NULL) {
             return NULL;
           }

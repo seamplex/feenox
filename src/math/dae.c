@@ -40,32 +40,47 @@ int feenox_add_time_path(const char *string) {
 }
 
 // API
-int feenox_phase_space_add_object(const char *string) {
+int feenox_phase_space_add_object(const char *string, int differential) {
 
   var_t *variable = NULL;
   vector_t *vector = NULL;
   matrix_t *matrix = NULL;
   char *buffer = NULL;
   
-  phase_object_t *phase_object = calloc(1, sizeof(phase_object_t));
+  phase_object_t *phase_object = NULL;
+  feenox_check_alloc(phase_object = calloc(1, sizeof(phase_object_t)));
   if ((vector = feenox_get_vector_ptr(string)) != NULL) {
 
     phase_object->vector = vector;
     phase_object->name = vector->name;
 
     feenox_check_minusone(asprintf(&buffer, "%s_dot", vector->name));
-    feenox_call(feenox_define_vector(buffer, vector->size_expr.string));
+    feenox_check_null(phase_object->vector_dot = feenox_define_vector_get_ptr(buffer, 0));
     feenox_free(buffer);
 
   } else if ((matrix = feenox_get_matrix_ptr(string)) != NULL) {
 
+    feenox_push_error_message("matrix in phase space to be done");
+    return FEENOX_ERROR;
+    
+/*    
     phase_object->matrix = matrix;
     phase_object->name = matrix->name;
 
+    unsigned int cols = feenox_expression_eval(&matrix->cols_expr);
+    if (cols == 0) {
+      feenox_push_error_message("matrix '%s' cols evaluates to zero", string);
+      return FEENOX_ERROR;
+    }
+    unsigned int rows = feenox_expression_eval(&matrix->rows_expr);
+    if (rows == 0) {
+      feenox_push_error_message("matrix '%s' rows evaluates to zero", string);
+      return FEENOX_ERROR;
+    }
     feenox_check_minusone(asprintf(&buffer, "%s_dot", matrix->name));
-    feenox_call(feenox_define_matrix(buffer, matrix->rows_expr.string, matrix->cols_expr.string));
+    feenox_check_null(phase_object->matrix_dot = feenox_define_matrix_get_ptr(buffer, rows, cols));
     feenox_free(buffer);
-
+*/
   } else {
 
     if ((variable = feenox_get_or_define_variable_get_ptr(string)) == NULL) {
@@ -83,34 +98,20 @@ int feenox_phase_space_add_object(const char *string) {
 
   }
   
+  if (differential) {
+    phase_object->differential = 1;
+  }
+  
   LL_APPEND(feenox.dae.phase_objects, phase_object);
   return FEENOX_OK;
 }
-
-// API
-int feenox_phase_space_mark_diff(const char *string) {
-
-  phase_object_t *phase_object = NULL;  
-    
-  LL_FOREACH(feenox.dae.phase_objects, phase_object) {
-    if ((phase_object->variable != NULL && strcmp(string, phase_object->variable->name) == 0) ||
-        (phase_object->vector   != NULL && strcmp(string, phase_object->vector->name) == 0) ||
-        (phase_object->matrix   != NULL && strcmp(string, phase_object->matrix->name) == 0) ) {
-         phase_object->differential = 1;
-         return FEENOX_OK;
-    }
-  }
-  
-  feenox_push_error_message("object '%s' is not in the phase space", string);
-  return FEENOX_ERROR;
-}  
-
 
 int feenox_add_dae(const char *lhs, const char *rhs) {
   char *dummy;
   phase_object_t *phase_object;
       
-  dae_t *dae = calloc(1, sizeof(dae_t));
+  dae_t *dae = NULL;
+  feenox_check_alloc(dae = calloc(1, sizeof(dae_t)));
       
   if (feenox.dae.daes == NULL) {
     // if this is the first DAE we define a instruction
@@ -123,8 +124,13 @@ int feenox_add_dae(const char *lhs, const char *rhs) {
     feenox.dae.reading_daes = 1;
   }
 
+  // TODO: parse ranges
+  dae->vector = feenox_get_first_vector(lhs);
+
+  // TODO: asprintf
   size_t n = strlen(rhs)+strlen(lhs)+8;
-  char *residual = malloc(n);
+  char *residual = NULL;
+  feenox_check_alloc(residual = malloc(n));
   snprintf(residual, n, "(%s)-(%s)", rhs, lhs);
 
   // check if the equation is differential or algebraic
@@ -214,6 +220,7 @@ int feenox_dae_init(void) {
         feenox_call(feenox_vector_init(phase_object->vector, 0));
       }
       if (!phase_object->vector_dot->initialized) {
+        phase_object->vector_dot->size = phase_object->vector->size;
         feenox_call(feenox_vector_init(phase_object->vector_dot, 0));
       }
       
@@ -242,7 +249,6 @@ int feenox_dae_init(void) {
     return FEENOX_ERROR;
   }
 
-  // alocamos
   feenox_check_alloc(feenox.dae.phase_value = calloc(feenox.dae.dimension, sizeof(double *)));
   feenox_check_alloc(feenox.dae.phase_derivative = calloc(feenox.dae.dimension, sizeof(double *)));
   
@@ -279,6 +285,12 @@ int feenox_dae_init(void) {
       }
     }
   }
+  
+  if (i != feenox.dae.dimension) {
+    feenox_push_error_message("internal mismatch of phase space entities, %d vs %d", feenox.dae.dimension, i);
+    return FEENOX_ERROR;
+  }
+  
 
   // process the DAEs
   i = 0;
@@ -326,10 +338,10 @@ int feenox_dae_init(void) {
   }
   
   if (i > feenox.dae.dimension) {
-    feenox_push_error_message("more DAE equations than phase space dimension %d", feenox.dae.dimension);
+    feenox_push_error_message("more DAE equations %d than phase space dimension %d", i, feenox.dae.dimension);
     return FEENOX_ERROR;
   } else if (i < feenox.dae.dimension) {
-    feenox_push_error_message("less DAE equations than phase space dimension %d", feenox.dae.dimension);
+    feenox_push_error_message("less DAE equations %d than phase space dimension %d", i, feenox.dae.dimension);
     return FEENOX_ERROR;
   }
   
