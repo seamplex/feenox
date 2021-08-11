@@ -56,8 +56,12 @@ int feenox_problem_init_parser_general(void) {
     }
   }
 
-  if ((sizeof(PetscReal) != sizeof(double)) || (sizeof(PetscScalar) != sizeof(double))) {
-    feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d != PetscReal = %d", sizeof(double), sizeof(PetscReal));
+  if (sizeof(PetscReal) != sizeof(PetscScalar)) {
+    feenox_push_error_message("PETSc should be compiled with real scalar types and we have PetscReal = %d and PetscScalar = %d", sizeof(PetscReal), sizeof(PetscScalar));
+    return FEENOX_ERROR;
+  }  
+  if (sizeof(PetscScalar) != sizeof(double)) {
+    feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d and PetscScalar = %d", sizeof(double), sizeof(PetscReal));
     return FEENOX_ERROR;
   }
   
