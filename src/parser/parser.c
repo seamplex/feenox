@@ -3448,8 +3448,9 @@ int feenox_parse_problem(void) {
 
 ///kw+PROBLEM+detail @    
 ///kw+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
-///kw+PROBLEM+detail Check out [FeenoX's repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)
+///kw+PROBLEM+detail Check out [FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)
 ///kw+PROBLEM+detail for licensing information, programming guides and code of conduct.
+///kw+PROBLEM+detail @    
 
 ///kw+PROBLEM+usage @
 ///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either

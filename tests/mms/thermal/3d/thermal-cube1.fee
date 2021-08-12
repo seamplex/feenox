@@ -12,7 +12,7 @@ T_mms(x,y,z) := 1 + sin(2*x)^2 * cos(3*y)^2 * sin(4*z)
 k_mms(x,y,z) := 1
 
 # read the results of the symbolic derivatives
-INCLUDE thermal-cube-q.fee
+INCLUDE thermal-cube1-q.fee
 
 # set the PDE coefficients and BCs
 k(x,y,z) := k_mms(x,y,z)
@@ -26,7 +26,7 @@ SOLVE_PROBLEM   # this line should be self-explanatory
 # output
 IF $5
 
-  WRITE_MESH thermal-cube_$1-$2-$3-$4.vtk T T_mms T(x,y,z)-T_mms(x,y,z)
+  WRITE_MESH thermal-cube1_$1-$2-$3-$4.vtk T T_mms T(x,y,z)-T_mms(x,y,z)
 
 ELSE
 
