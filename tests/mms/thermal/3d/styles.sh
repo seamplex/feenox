@@ -13,9 +13,9 @@ lw['hex20']=1
 lw['hex27']=1
 
 declare -A lt
-lt['hxt']=4
-lt['delaunay']=3
-lt['struct']=2
+lt['hxt']=3
+lt['delaunay']=2
+lt['struct']=1
 
 declare -A co
 co['dirichletstruct']="plum"

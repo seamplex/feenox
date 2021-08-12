@@ -2,7 +2,7 @@ BC left   T=T_mms(x,y,z)
 BC top    T=T_mms(x,y,z)
 BC back   T=T_mms(x,y,z)
 
-BC bottom q=-qy_mms(x,y,z)
 BC right  q=+qx_mms(x,y,z)
+BC bottom q=-qy_mms(x,y,z)
 BC front  q=-qz_mms(x,y,z)
 

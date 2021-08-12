@@ -6,7 +6,5 @@ old
 thermal-*.pdf
 thermal*-fits.ppl
 
-thermal-cube-e2.ppl
-thermal-cube-einf.ppl
-thermal-cube-q-symbolic.fee
-thermal-cube-q.fee
+thermal-cube*-e2.ppl
+thermal-cube*-einf.ppl

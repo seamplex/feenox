@@ -32,7 +32,7 @@ IF $5
 ELSE
 
   INTEGRATE 1 RESULT volume
-  h = sqrt(volume/cells)
+  h = (volume/cells)^(1/3)
 
   INTEGRATE (T(x,y,z)-T_mms(x,y,z))^2 RESULT e_2
   error_2 = sqrt(e_2)

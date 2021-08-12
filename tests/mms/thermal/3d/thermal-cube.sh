@@ -4,7 +4,7 @@ bcs="dirichlet neumann"
 elems="tet4 tet10 hex8 hex20 hex27"
 algos="struct delaunay hxt"
 # cs="4 8 12 16 20 24 32 36 42 48"
-cs="12 16 20 24 28 32 36"
+cs="16 24 32"
 
 # if this flag is true then the error is computed by first writing
 # T(x,y,z) into a vtk, converting it to .msh with meshio and
