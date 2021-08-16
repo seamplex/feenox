@@ -34,17 +34,28 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
       return FEENOX_ERROR;
     }
 
-  } else if (strcmp(lhs, "p") == 0 || strcmp(lhs, "compression  ") == 0 || strcmp(lhs, "pressure") == 0) {
+  } else if (strcmp(lhs, "p") == 0 || strcmp(lhs, "compression") == 0 || strcmp(lhs, "pressure") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set = feenox_problem_bc_set_mechanical_compression;
-    
-    
+
   } else if (strcmp(lhs, "t") == 0 || strcmp(lhs, "tension") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_TENSION;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set = feenox_problem_bc_set_mechanical_tension;
 
+  } else if (strcmp(lhs, "tx") == 0 || strcmp(lhs, "ty") == 0 || strcmp(lhs, "tz") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_TRACTION;
+    bc_data->type_math = bc_type_math_neumann;
+    bc_data->set = feenox_problem_bc_set_mechanical_traction;
+    if (strcmp(lhs, "tx") == 0) {
+      bc_data->dof = 0;
+    } else if (strcmp(lhs, "ty") == 0) {
+      bc_data->dof = 1;
+    } else if (strcmp(lhs, "tz") == 0) {
+      bc_data->dof = 2;
+    }
+    
   } else {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
     return FEENOX_ERROR;
@@ -138,6 +149,26 @@ int feenox_problem_bc_set_mechanical_normal_stress(element_t *element, bc_data_t
     t[g] = sign * p * n[g];
   }
   
+  feenox_call(feenox_problem_bc_natural_set(element, v, t));
+  
+#endif
+  
+  return FEENOX_OK;
+}
+
+
+
+int feenox_problem_bc_set_mechanical_traction(element_t *element, bc_data_t *bc_data, unsigned int v) {
+
+#ifdef HAVE_PETSC
+  // TODO: cache if not space dependent
+  if (bc_data->space_dependent) {
+    feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration);
+    feenox_mesh_update_coord_vars(element->x[v]);
+  }
+  // TODO: set all the DOFs at the same time
+  double t[3] = {0,0,0};
+  t[bc_data->dof] = feenox_expression_eval(&bc_data->expr);
   feenox_call(feenox_problem_bc_natural_set(element, v, t));
   
 #endif

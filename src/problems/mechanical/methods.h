@@ -20,7 +20,7 @@ extern int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, siz
 extern int feenox_problem_bc_set_mechanical_compression(element_t *element, bc_data_t *bc_data, unsigned int v);
 extern int feenox_problem_bc_set_mechanical_tension(element_t *element, bc_data_t *bc_data, unsigned int v);
 extern int feenox_problem_bc_set_mechanical_normal_stress(element_t *element, bc_data_t *bc_data, unsigned int v, signed int sign);
-  
+extern int feenox_problem_bc_set_mechanical_traction(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 // mechanical/bulk.c
 extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsigned int v);
