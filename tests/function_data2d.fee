@@ -1,0 +1,2 @@
+FUNCTION f(x,y) FILE data2d.dat INTERPOLATION $1
+PRINT f(1.25,1.75)

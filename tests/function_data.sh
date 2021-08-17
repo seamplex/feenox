@@ -35,3 +35,15 @@ exitifwrong $?
 
 answer1 function_data1d.fee steffen "2.07407"
 exitifwrong $?
+
+answer1 function_data2d.fee bilinear "3"
+exitifwrong $?
+
+answer1 function_data2d.fee nearest "3"
+exitifwrong $?
+
+answer1 function_data2d.fee shepard "3.03106"
+exitifwrong $?
+
+answer1 function_data2d.fee shepard_kd "3"
+exitifwrong $?

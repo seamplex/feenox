@@ -523,7 +523,7 @@ struct function_t {
   expr_t expr_x_increases_first;
   int x_increases_first;
   expr_t *expr_rectangular_mesh_size;
-  int *rectangular_mesh_size;
+  size_t *rectangular_mesh_size;
   double **rectangular_mesh_point;
 
   // helpers to interpolate 1D with GSL
@@ -533,6 +533,7 @@ struct function_t {
 
   // multidimensional interpolation type
   enum {
+    interp_undefined,
     interp_nearest,
     interp_shepard,
     interp_shepard_kd,
@@ -2005,12 +2006,13 @@ extern int feenox_function_set_expression(const char *name, const char *expressi
 extern int feenox_function_set_interpolation(const char *name, const char *type);
 extern int feenox_function_set_file(const char *name, file_t *file, unsigned int *columns);
 extern int function_set_buffered_data(function_t *function, double *buffer, size_t n_data, unsigned int n_columns, unsigned int *columns);
+size_t feenox_structured_scalar_index(unsigned int n_dims, size_t *size, size_t *index, int x_increases_first);
 
 extern double feenox_function_eval(function_t *this, const double *x);
 extern double feenox_factor_function_eval(expr_item_t *this);
 
-extern int feenox_function_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny);
-extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz);
+extern int feenox_function_is_structured_grid_2d(double *x, double *y, size_t n, size_t *nx, size_t *ny);
+extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, size_t n, size_t *nx, size_t *ny, size_t *nz);
 
 // print.c
 extern int feenox_instruction_print(void *arg);

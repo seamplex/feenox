@@ -360,13 +360,11 @@ int feenox_function_init(function_t *this) {
 
       } else {
 
-        this->shepard_radius = (this->expr_shepard_radius.items != NULL) ? feenox_expression_eval(&this->expr_shepard_radius) : DEFAULT_SHEPARD_RADIUS;
-        this->shepard_exponent = (this->expr_shepard_exponent.items != NULL) ? feenox_expression_eval(&this->expr_shepard_exponent) : DEFAULT_SHEPARD_EXPONENT;
-
         if (this->n_arguments == 2) {
 
-          // miramos si tiene una malla regular en 2d
-          int nx, ny;
+          // does it have a regular mesh in 2d?
+          size_t nx = 0;
+          size_t ny = 0;
           if (feenox_function_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
             this->rectangular_mesh = 1;
             this->x_increases_first = 1;
@@ -378,7 +376,7 @@ int feenox_function_init(function_t *this) {
           }
 
           if (this->rectangular_mesh) {
-            this->rectangular_mesh_size = malloc(2*sizeof(int));
+            feenox_check_alloc(this->rectangular_mesh_size = calloc(2, sizeof(size_t)));
             this->rectangular_mesh_size[0] = nx;
             this->rectangular_mesh_size[1] = ny;
           }
@@ -386,7 +384,9 @@ int feenox_function_init(function_t *this) {
         } else if (this->n_arguments == 3) {
 
           // miramos si tiene una malla regular en 3d
-          int nx, ny, nz;
+          size_t nx = 0;
+          size_t ny = 0;
+          size_t nz = 0;
           if (feenox_function_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
             this->rectangular_mesh = 1;
             this->x_increases_first = 1;
@@ -398,7 +398,7 @@ int feenox_function_init(function_t *this) {
           }
 
           if (this->rectangular_mesh) {
-            this->rectangular_mesh_size = malloc(3*sizeof(int));
+            feenox_check_alloc(this->rectangular_mesh_size = calloc(3, sizeof(size_t)));
             this->rectangular_mesh_size[0] = nx;
             this->rectangular_mesh_size[1] = ny;
             this->rectangular_mesh_size[2] = nz;
@@ -417,7 +417,7 @@ int feenox_function_init(function_t *this) {
             return FEENOX_ERROR;
           }
 
-          this->rectangular_mesh_size = malloc(this->n_arguments*sizeof(int));
+          feenox_check_alloc(this->rectangular_mesh_size = calloc(this->n_arguments, sizeof(size_t)));
 
           if (this->expr_rectangular_mesh_size != NULL) {
             unsigned int i = 0;
@@ -441,8 +441,8 @@ int feenox_function_init(function_t *this) {
           int step;
 
           // checkeamos solo el size (porq el usuario pudo meter fruta para dimension mayor a 3)
-          unsigned int i = 0;
-          unsigned int j = 1;
+          size_t i = 0;
+          size_t j = 1;
           for (i = 0; i < this->n_arguments; i++) {
             j *= this->rectangular_mesh_size[i];
           }
@@ -451,9 +451,9 @@ int feenox_function_init(function_t *this) {
             return FEENOX_ERROR;
           }
 
-          this->rectangular_mesh_point = malloc(this->n_arguments*sizeof(double *));
+          feenox_check_alloc(this->rectangular_mesh_point = calloc(this->n_arguments, sizeof(double *)));
           for (i = 0; i < this->n_arguments; i++) {
-            this->rectangular_mesh_point[i] = malloc(this->rectangular_mesh_size[i]*sizeof(double));
+            feenox_check_alloc(this->rectangular_mesh_point[i] = calloc(this->rectangular_mesh_size[i], sizeof(double)));
           }
 
           if (this->x_increases_first) {
@@ -480,17 +480,21 @@ int feenox_function_init(function_t *this) {
         feenox_push_error_message("rectangular interpolation of this '%s' needs a rectangular mesh", this->name);
         return FEENOX_ERROR;
       }
+      
+      if (this->rectangular_mesh != 0) {
+        if (this->multidim_interp == interp_undefined) {
+          this->multidim_interp = interp_bilinear;
+        }
+      }
+      if (this->multidim_interp == interp_shepard || this->multidim_interp == interp_shepard_kd) {
+        this->shepard_radius = (this->expr_shepard_radius.items != NULL) ? feenox_expression_eval(&this->expr_shepard_radius) : DEFAULT_SHEPARD_RADIUS;
+        this->shepard_exponent = (this->expr_shepard_exponent.items != NULL) ? feenox_expression_eval(&this->expr_shepard_exponent) : DEFAULT_SHEPARD_EXPONENT;
+      }  
+      
+      if (this->multidim_interp == interp_nearest || this->multidim_interp == interp_shepard_kd) {
 
-//      if (this->n_arguments > 3 && this->multidim_interp == rectangle) {
-//        feenox_push_error_message("rectangular interpolation does not work for dimensions higher than three (function '%s' has %d arguments)", this->name, this->n_arguments);
-//        return FEENOX_ERROR;
-//      }
-
-      if (this->n_arguments > 1 && (this->multidim_interp == interp_nearest || this->multidim_interp == interp_shepard_kd)) {
-
-        double *point;
-
-        point = malloc(this->n_arguments*sizeof(double));
+        double *point = NULL;
+        feenox_check_alloc(point = calloc(this->n_arguments, sizeof(double)));
         this->kd = kd_create(this->n_arguments);
 
         size_t j = 0;
@@ -598,68 +602,29 @@ double feenox_function_eval(function_t *this, const double *x) {
     } else {
 
       // multi-dimensional pointwise-defined function are not handled by GSL
-      y = 0;
-/*    
-    int j;
+      // we need to do the interpolation
+      size_t j = 0;
  
-    if (this->multidim_interp == nearest) {
-      // vecino mas cercano en un k-dimensional tree
-      y = *((double *)kd_res_item_data(kd_nearest(this->kd, x)));
+      if (this->multidim_interp == interp_nearest) {
+        // nearest neighbor in the k-dimensional tree
+        if (this->kd != NULL) {
+          y = *((double *)kd_res_item_data(kd_nearest(this->kd, x)));
+        }   
       
-    } else if (this->multidim_interp == shepard) {
-      int flag = 0;  // suponemos que NO nos pidieron un punto del problema
-      double num = 0;
-      double den = 0;
-      double w_i, y_i, dist2, diff;
+      } else if (this->multidim_interp == interp_shepard) {
+        int flag = 0;  // suponemos que NO nos pidieron un punto del problema
+        double num = 0;
+        double den = 0;
+        double w_i, y_i, dist2, diff;
       
-      for (i = 0; i < this->data_size; i++) {
+        size_t i = 0;
+        for (i = 0; i < this->data_size; i++) {
         
-        y_i = this->data_value[i];
-        
-        dist2 = 0;
-        for (j = 0; j < this->n_arguments; j++) {
-          diff = (x[j]-this->data_argument[j][i]);
-          dist2 += diff*diff;
-        }
-        if (dist2 < this->multidim_threshold) {
-          y = y_i;
-          flag = 1;   // nos pidieron un punto de la definicion
-          break;
-        } else {
-          w_i = (this->shepard_exponent == 2)? 1.0/dist2 : 1.0/pow(dist2, 0.5*this->shepard_exponent);
-          num += w_i * y_i;
-          den += w_i;
-        }
-      }
- 
-      if (flag == 0) {
-        if (den == 0) {
-          feenox_push_error_message("denominator equal to zero");
-          feenox_runtime_error();
-        }
-        y = num/den;
-      }
+          y_i = this->data_value[i];
       
-      
-    } else if (this->multidim_interp == shepard_kd) {
-      struct kdres *presults;
-      int flag = 0;  // suponemos que NO nos pidieron un punto del problema
-      int n = 0;
-      double num = 0;
-      double den = 0;
-      double w_i, y_i, dist2, diff;
-      double dist;
-      double *x_i = malloc(this->n_arguments*sizeof(double));
-      
-      do {
-        presults = kd_nearest_range(this->kd, x, this->shepard_radius);
-        while (kd_res_end(presults) == 0) {
-          n++;
-          y_i = *((double *)kd_res_item(presults, x_i));
-        
           dist2 = 0;
           for (j = 0; j < this->n_arguments; j++) {
-            diff = (x[j]-x_i[j]);
+            diff = (x[j]-this->data_argument[j][i]);
             dist2 += diff*diff;
           }
           if (dist2 < this->multidim_threshold) {
@@ -667,124 +632,161 @@ double feenox_function_eval(function_t *this, const double *x) {
             flag = 1;   // nos pidieron un punto de la definicion
             break;
           } else {
-//            w_i = (this->shepard_exponent == 2)? 1.0/dist2 : 1.0/pow(dist2, 0.5*this->shepard_exponent);
-            dist = sqrt(dist2);
-            w_i = pow((this->shepard_radius-dist)/(this->shepard_radius*dist), this->shepard_exponent);
+            w_i = (this->shepard_exponent == 2)? 1.0/dist2 : 1.0/pow(dist2, 0.5*this->shepard_exponent);
             num += w_i * y_i;
             den += w_i;
           }
-          kd_res_next(presults);
         }
-        kd_res_free(presults);
+ 
+        if (flag == 0) {
+          if (den == 0) {
+            feenox_push_error_message("denominator equal to zero");
+            feenox_runtime_error();
+          }
+          y = num/den;
+        }
+      
+      
+      } else if (this->multidim_interp == interp_shepard_kd) {
+        struct kdres *presults;
+        int flag = 0;  // suponemos que NO nos pidieron un punto del problema
+        int n = 0;
+        double num = 0;
+        double den = 0;
+        double w_i, y_i, dist2, diff;
+        double dist;
+        double *x_i = malloc(this->n_arguments*sizeof(double));
+      
+        do {
+          presults = kd_nearest_range(this->kd, x, this->shepard_radius);
+          while (kd_res_end(presults) == 0) {
+            n++;
+            y_i = *((double *)kd_res_item(presults, x_i));
         
-        // si no encontramos ningun punto, duplicamos el radio
-        if (n == 0) {
-          this->shepard_radius *= 2;
-        }
-      } while (n == 0);
+            dist2 = 0;
+            for (j = 0; j < this->n_arguments; j++) {
+              diff = (x[j]-x_i[j]);
+              dist2 += diff*diff;
+            }
+            if (dist2 < this->multidim_threshold) {
+              y = y_i;
+              flag = 1;   // nos pidieron un punto de la definicion
+              break;
+            } else {
+//              w_i = (this->shepard_exponent == 2)? 1.0/dist2 : 1.0/pow(dist2, 0.5*this->shepard_exponent);
+              dist = sqrt(dist2);
+              w_i = pow((this->shepard_radius-dist)/(this->shepard_radius*dist), this->shepard_exponent);
+              num += w_i * y_i;
+              den += w_i;
+            }
+            kd_res_next(presults);
+          }
+          kd_res_free(presults);
+        
+          // si no encontramos ningun punto, duplicamos el radio
+          if (n == 0) {
+            this->shepard_radius *= 2;
+          }
+        } while (n == 0);
 
       
-      if (flag == 0) {
-        if (den == 0) {
-          if (this->n_arguments == 3) {
-            feenox_push_error_message("no definition point found in a range %g around point (%g,%g,%g), try a larger SHEPARD_RADIUS", this->shepard_radius, x[0], x[1], x[2]);
-          } else {
-            feenox_push_error_message("no definition point found in a range %g around point, try a larger SHEPARD_RADIUS", this->shepard_radius);
+        if (flag == 0) {
+          if (den == 0) {
+            if (this->n_arguments == 3) {
+              feenox_push_error_message("no definition point found in a range %g around point (%g,%g,%g), try a larger SHEPARD_RADIUS", this->shepard_radius, x[0], x[1], x[2]);
+            } else {
+              feenox_push_error_message("no definition point found in a range %g around point, try a larger SHEPARD_RADIUS", this->shepard_radius);
+            }
           }
+          y = num/den;
         }
-        y = num/den;
-      }
-      feenox_free(x_i);
+        feenox_free(x_i);
     
-    } else if (this->multidim_interp == bilinear && this->rectangular_mesh_size != NULL) {
+      } else if (this->multidim_interp == interp_bilinear && this->rectangular_mesh_size != NULL) {
 
-      // flag que indica si nos pidieron un punto de la definicion
-      int flag;
-      int *ctilde;
-      double shape;
-      
-      // indices para la biseccion
-      int *a;
-      int *b;
-      int *c;
-      // coordenadas normalizadas a [-1:1]
-      double *r;
+        // flag que indica si nos pidieron un punto de la definicion
+//        int flag = 0;
+//        double shape = 0;
+        
+        // indices for bisection
+        size_t *a = NULL;
+        feenox_check_alloc(a = calloc(this->n_arguments, sizeof(size_t)));
+        size_t *b = NULL;
+        feenox_check_alloc(b = calloc(this->n_arguments, sizeof(size_t)));
+        size_t *c = NULL;
+        feenox_check_alloc(c = calloc(this->n_arguments, sizeof(size_t)));
+        size_t *ctilde = NULL;
+        feenox_check_alloc(ctilde = calloc(this->n_arguments, sizeof(size_t)));
+        
+        // normalized coordinates [-1:1]
+        double *r = NULL;
+        feenox_check_alloc(r = calloc(this->n_arguments, sizeof(double)));
 
-      a = malloc(this->n_arguments*sizeof(int));
-      b = malloc(this->n_arguments*sizeof(int));
-      c = malloc(this->n_arguments*sizeof(int));
-      r = malloc(this->n_arguments*sizeof(double));
-
-      flag = 1;  // suponemos que nos pidieron un punto del problema
-      for (i = 0; i < this->n_arguments; i++) {
-
-        a[i] = 0;
-        b[i] = this->rectangular_mesh_size[i];
-
-        while ((b[i]-a[i]) > 1) {
-          c[i] = floor(0.5*(a[i]+b[i]));
-
-          if (this->rectangular_mesh_point[i][c[i]] > x[i]) {
-            b[i] = c[i];
-          } else {
-            a[i] = c[i];
-          }
-        }
-
-        c[i] = floor(0.5*(a[i]+b[i]));
-        if (gsl_fcmp(this->rectangular_mesh_point[i][c[i]], x[i], this->multidim_threshold) != 0) {
-          flag = 0;
-        }
-
-      }
-
-      if (flag) {
-        // nos pidieron un punto de la definicion
-        y = this->data_value[feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, c, this->x_increases_first)];
-      } else {
-        // tenemos que interpolar
+        int flag = 1;  // asume we've been asked a point of the grid
+        unsigned int i = 0;
         for (i = 0; i < this->n_arguments; i++) {
-          // calculamos las coordenadas normalizadas en [-1:1], teniendo en cuenta
-          // que capaz nos pidieron extrapolar
-          if (x[i] < this->rectangular_mesh_point[i][0]) {
-            r[i] = -1;
-          } else if (c[i] == this->rectangular_mesh_size[i]-1) {
-            c[i]--;
-            r[i] = 1;
-          } else {
-            r[i] = -1 + 2*(x[i] - this->rectangular_mesh_point[i][c[i]])/(this->rectangular_mesh_point[i][c[i]+1] - this->rectangular_mesh_point[i][c[i]]);
-          } 
-         
-        }
 
-        y = 0;
-        ctilde = malloc(this->n_arguments * sizeof(int));
-        for (i = 0; i < (1<<this->n_arguments); i++)  {
-          shape = 1;
-          for (j = 0; j < this->n_arguments; j++) {
-            // el desarrollo binario de i nos dice si hay que sumar uno o no al indice
-            ctilde[j] = c[j] + ((i & (1<<j)) != 0);
-            // y tambien como es el termino correspondiente a la funcion de forma
-            shape *= ((i & (1<<j)) == 0) ? (1.0-r[j]) : (1.0+r[j]);
+          a[i] = 0;
+          b[i] = this->rectangular_mesh_size[i];
+
+          while ((b[i]-a[i]) > 1) {
+            c[i] = floor(0.5*(a[i]+b[i]));
+
+            if (this->rectangular_mesh_point[i][c[i]] > x[i]) {
+              b[i] = c[i];
+            } else {
+              a[i] = c[i];
+            }
           }
-          index = feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, ctilde, this->x_increases_first);
-          y += shape * this->data_value[index];
+
+          c[i] = floor(0.5*(a[i]+b[i]));
+          if (gsl_fcmp(this->rectangular_mesh_point[i][c[i]], x[i], this->multidim_threshold) != 0) {
+            flag = 0;
+          }
         }
+
+        if (flag) {
+          // we've been asked a point of the definition
+          y = this->data_value[feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, c, this->x_increases_first)];
+        } else {
+          // we need to interpolate
+          for (i = 0; i < this->n_arguments; i++) {
+            // compute coorindates in [-1:1] maybe we need to extrapolate!
+            if (x[i] < this->rectangular_mesh_point[i][0]) {
+              r[i] = -1;
+            } else if (c[i] == this->rectangular_mesh_size[i]-1) {
+              c[i]--;
+              r[i] = 1;
+            } else {
+              r[i] = -1 + 2*(x[i] - this->rectangular_mesh_point[i][c[i]])/(this->rectangular_mesh_point[i][c[i]+1] - this->rectangular_mesh_point[i][c[i]]);
+            } 
+          }
+
+          y = 0;
+          double shape = 0;
+          for (i = 0; i < (1<<this->n_arguments); i++)  {
+            shape = 1;
+            for (j = 0; j < this->n_arguments; j++) {
+              // el desarrollo binario de i nos dice si hay que sumar uno o no al indice
+              ctilde[j] = c[j] + ((i & (1<<j)) != 0);
+              // y tambien como es el termino correspondiente a la funcion de forma
+              shape *= ((i & (1<<j)) == 0) ? (1.0-r[j]) : (1.0+r[j]);
+            }
+            y += shape * this->data_value[feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, ctilde, this->x_increases_first)];
+          }
         
-        y *= 1.0/(1<<this->n_arguments);
+          y *= 1.0/(1<<this->n_arguments);
+        }
+
         feenox_free(ctilde);
-        
-      }
+        feenox_free(r);
+        feenox_free(c);
+        feenox_free(b);
+        feenox_free(a);
 
-      feenox_free(r);
-      feenox_free(c);
-      feenox_free(b);
-      feenox_free(a);
-
-
-
-    } else if (this->multidim_interp == triangle) {
-
+/*
+      } else if (this->multidim_interp == interp_triangle) {
+        y = 0;
       double *dist;
       int *index;
       int far_away;
@@ -974,9 +976,8 @@ double feenox_function_eval(function_t *this, const double *x) {
 
       feenox_free(dist);
       feenox_free(index);
-
-    }
 */
+      }
     }
   }
 
@@ -988,43 +989,43 @@ double feenox_function_eval(function_t *this, const double *x) {
   return y;
 
 }
-/*
-int feenox_structured_scalar_index(int n_dims, int *size, int *index, int x_increases_first) {
-  int i, j;
-  int k;
-  int scalar_index = 0;
+
+size_t feenox_structured_scalar_index(unsigned int n, size_t *size, size_t *index, int x_increases_first) {
   
+  size_t scalar_index = 0;
+  size_t k = 0;
+  // can't be unsigned because they can be negative
+  int m = 0;
+  int j = 0;
   if (x_increases_first) {
-    for (i = 0; i < n_dims; i++) {
+    for (m = 0; m < n; m++) {
       k = 1;
-      for (j = i-1; j >= 0; j--) {
+      for (j = m-1; j >= 0; j--) {
         k *= size[j];
       }
-      scalar_index += k*index[i];  
+      scalar_index += k*index[m];  
     }
   } else {
-    for (i = n_dims-1; i >= 0; i--) {
+    for (m = n-1; m >= 0; m--) {
       k = 1;
-      for (j = i+1; j < n_dims; j++) {
+      for (j = m+1; j < n; j++) {
         k *= size[j];
       }
-      scalar_index += k*index[i];  
+      scalar_index += k*index[m];  
     }
   }
   
   return scalar_index;
   
 }
-*/
 
 
 // mira si los n puntos en x[] y en y[] forman una grilla estruturada
-int feenox_function_is_structured_grid_2d(double *x, double *y, int n, int *nx, int *ny) {
+int feenox_function_is_structured_grid_2d(double *x, double *y, size_t n, size_t *nx, size_t *ny) {
 
-  int i, j;
-    
   // hacemos una primera pasada sobre x hasta encontrar de nuevo el primer valor
-  i = 0;
+  size_t i = 0;
+  size_t j = 0;
   do {
     if (++i == n) {   
       // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
@@ -1070,9 +1071,9 @@ int feenox_function_is_structured_grid_2d(double *x, double *y, int n, int *nx, 
 
 
 // mira si los n puntos en x[], y[] y z[] forman una grilla estruturada
-int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, int n, int *nx, int *ny, int *nz) {
+int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, size_t n, size_t *nx, size_t *ny, size_t *nz) {
 
-  int i;
+  size_t i = 0;
   
   // hacemos una pasada sobre x hasta encontrar de nuevo el primer valor
   i = 0;
