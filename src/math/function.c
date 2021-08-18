@@ -481,11 +481,10 @@ int feenox_function_init(function_t *this) {
         return FEENOX_ERROR;
       }
       
-      if (this->rectangular_mesh != 0) {
-        if (this->multidim_interp == interp_undefined) {
-          this->multidim_interp = interp_bilinear;
-        }
+      if (this->multidim_interp == interp_undefined) {
+        this->multidim_interp = this->rectangular_mesh ? interp_bilinear : interp_shepard_kd;
       }
+      
       if (this->multidim_interp == interp_shepard || this->multidim_interp == interp_shepard_kd) {
         this->shepard_radius = (this->expr_shepard_radius.items != NULL) ? feenox_expression_eval(&this->expr_shepard_radius) : DEFAULT_SHEPARD_RADIUS;
         this->shepard_exponent = (this->expr_shepard_exponent.items != NULL) ? feenox_expression_eval(&this->expr_shepard_exponent) : DEFAULT_SHEPARD_EXPONENT;

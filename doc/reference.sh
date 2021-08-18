@@ -39,17 +39,18 @@ for kw in ${kws}; do
   # keyword
   echo "##  ${kw}"
   echo
+  
 #   echo -n '> '
   grep "///${tag}+${kw}+desc" ${src} | cut -d" " -f2-
   echo  
   echo  
-
+  
   # usage
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
   if [ -n "${usage}" ]; then
 #     echo -n "\`${usage}\`"
     echo "::: {.usage}"
-    echo "~~~{.feenox style=feenox}"
+    echo "~~~.feenox"
     grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs | tr @ \\n
     echo "~~~"
     echo ":::"
@@ -59,15 +60,11 @@ for kw in ${kws}; do
   # math+figure
   math=$(grep "///${tag}+${kw}+math" ${src} | cut -d" " -f2-)
   if [ -n "${math}" ]; then
-    echo " \$= \displaystyle ${math}\$"
+    echo "::: {.not-in-format .man }"
+#     echo "\$= \displaystyle ${math}\$"
+    echo "\$\$${math}\$\$"
+    echo ":::"
 
-#     echo
-#     echo "::: {.math}"
-#     echo "\$\$"
-#     echo ${math}
-#     echo "\$\$"
-#     echo ":::"
-#     echo
   fi
   echo
 
@@ -145,7 +142,7 @@ EOF
   # el primer sed transforma una arroba seguida de un newline en un newline
   # el segundo se es para poder poner links como https:/\/ (sin la barra del medio gcc piensa que es un comentario)
   grep "///${tag}+${kw}+detail" ${src} | cut -d" " -f2- | gcc -E -P -include defs.h - | sed 's/@$//' | sed 's_/\\/_//_'
-  echo  
+  echo
 
   # examples
   exs=$(grep ///${tag}+${kw}+example ${src} | cut -d" " -f2-)
@@ -162,14 +159,14 @@ EOF
     
     echo "### Example #${i}, ${ex}"
     echo
-    echo "~~~{.feenox style=feenox}"
+    echo "~~~feenox"
     cat examples/${ex}
     echo "~~~"
 
     # terminal
     cd examples
     echo
-    echo "~~~{.terminal style=terminal}"
+    echo "~~~terminal"
     sh="$(basename ${ex} .fee).sh"
     if [ -e "${sh}" ]; then
       k=1

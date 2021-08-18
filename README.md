@@ -82,7 +82,7 @@ Another design-basis decision is that **similar problems ought to have similar i
 ```feenox
 READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
-k(x) := 1+x                      # space-dependent conductivity
+k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
 BC right T=1
 SOLVE_PROBLEM
@@ -100,7 +100,7 @@ FeenoX has an **everything is an expression** design principle, meaning that any
 ```feenox
 READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
-k(x) := 1+T(x)                   # temperature-dependent conductivity
+k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
 BC right T=1
 SOLVE_PROBLEM
@@ -120,7 +120,7 @@ READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
 
 # linear temperature gradient in the radial and axial direction
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
 BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
@@ -177,9 +177,9 @@ y_0 = -16
 z_0 = 22.5
 
 # the dynamical system's equations written as naturally as possible
-x_dot .= sigma*(y - x)
-y_dot .= x*(r - z) - y
-z_dot .= x*y - b*z
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
 
 PRINT t x y z        # four-column plain-ASCII output
 ```

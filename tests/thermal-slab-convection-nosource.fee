@@ -1,5 +1,5 @@
+PROBLEM heat 1D
 READ_MESH slab.msh
-PROBLEM heat DIMENSIONS 1
 
 BC left  T=0
 BC right h=1 Tref=1

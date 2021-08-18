@@ -6,7 +6,7 @@
 . ./keywords.sh
 
 # primary keywords
-echo "\lstdefinelanguage{wasora}{"
+echo "\lstdefinelanguage{feenox}{"
 echo "morekeywords={"
 for kw in $UPPER; do
   echo "      $kw,"

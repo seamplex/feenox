@@ -1,5 +1,5 @@
-READ_MESH two-squares.msh DIMENSIONS 2
-PROBLEM thermal
+PROBLEM thermal DIMENSIONS 2
+READ_MESH two-squares.msh
 
 k_soft = 1
 k_hard = 3

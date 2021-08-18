@@ -71,6 +71,17 @@ Dummy index, used mainly in vector and matrix row subindex expressions.
 
 
 
+##  infinite
+
+A very big positive number.
+
+
+
+
+It can be used as `end_time = infinite` or
+to define improper integrals with infinite limits.
+ Default is $2^{50} \approx 1 \times 10^{15}$.
+
 ##  in_outer_initial
 
 Flag that indicates if the current step is the initial step of an optimization of fit run.
@@ -126,17 +137,6 @@ Flag that indicates if feenox is in the last step of the transient calculation.
 
 
 
-
-##  infinite
-
-A very big positive number.
-
-
-
-
-It can be used as `end_time = infinite` or
-to define improper integrals with infinite limits.
- Default is $2^{50} \approx 1 \times 10^{15}$.
 
 ##  j
 

@@ -4,24 +4,29 @@ Returns the absolute value of the argument\ $x$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 abs(x)
 ~~~
 :::
 
- $= \displaystyle |x|$
+::: {.not-in-format .man }
+$$|x|$$
+:::
+
+
+![abs](figures/abs.svg){width=90%}\ 
 
 
 
 ### Example #1, abs.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PRINT sqrt(abs(-2))
 
 # exercise: remove the absolute value from the sqrt argument
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox abs.fee
 1.41421
 $
@@ -36,24 +41,29 @@ A NaN error is raised if\ $|x|>1$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 acos(x)
 ~~~
 :::
 
- $= \displaystyle \arccos(x)$
+::: {.not-in-format .man }
+$$\arccos(x)$$
+:::
+
+
+![acos](figures/acos.svg){width=90%}\ 
 
 
 
 ### Example #1, acos.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PRINT acos(0)
 PRINT acos(1)
 PRINT cos(acos(0.5))  acos(cos(0.5))
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox acos.fee
 1.5708
 0
@@ -70,24 +80,29 @@ A NaN error is raised if\ $|x|>1$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 asin(x)
 ~~~
 :::
 
- $= \displaystyle \arcsin(x)$
+::: {.not-in-format .man }
+$$\arcsin(x)$$
+:::
+
+
+![asin](figures/asin.svg){width=90%}\ 
 
 
 
 ### Example #1, asin.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PRINT asin(0)
 PRINT asin(1)
 PRINT sin(asin(0.5))  asin(sin(0.5))
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox asin.fee
 0
 1.5708
@@ -103,12 +118,17 @@ Computes, in radians, the arc tangent of the argument\ $x$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 atan(x)
 ~~~
 :::
 
- $= \displaystyle \arctan(x)$
+::: {.not-in-format .man }
+$$\arctan(x)$$
+:::
+
+
+![atan](figures/atan.svg){width=90%}\ 
 
 
 
@@ -119,22 +139,24 @@ to determine the quadrant of the result, which is in the range $[-\pi,\pi]$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 atan2(y,x)
 ~~~
 :::
 
- $= \displaystyle \arctan(y/x)$
+::: {.not-in-format .man }
+$$\arctan(y/x)$$
+:::
 
 
 
 ### Example #1, atan.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PRINT atan(-0.5)  mod(atan(-0.5),2*pi)-pi
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox atan.fee
 -0.463648	2.67795
 $
@@ -144,11 +166,11 @@ $
 
 ### Example #2, atan2.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PRINT atan2(1,-2) mod(atan(-0.5),2*pi)-pi
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox atan2.fee
 2.67795	2.67795
 $
@@ -162,12 +184,17 @@ Returns the smallest integral value not less than the argument\ $x$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 ceil(x)
 ~~~
 :::
 
- $= \displaystyle \lceil x \rceil$
+::: {.not-in-format .man }
+$$\lceil x \rceil$$
+:::
+
+
+![ceil](figures/ceil.svg){width=90%}\ 
 
 
 
@@ -181,7 +208,7 @@ in the `clock_gettime (2)` system call manual page.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 clock([f])
 ~~~
 :::
@@ -191,17 +218,17 @@ clock([f])
 
 ### Example #1, clock.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 t1 = clock()
 PRINT "doing something in between"
 t2 = clock()
 PRINT "difference" t2-t1 "[seconds]"
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox clock.fee
 doing something in between
-difference	3.2329e-05	[seconds]
+difference	7.4489e-05	[seconds]
 $
 ~~~
 
@@ -216,12 +243,17 @@ the frequency of the wave and $\phi$ controls its phase.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 cos(x)
 ~~~
 :::
 
- $= \displaystyle \cos(x)$
+::: {.not-in-format .man }
+$$\cos(x)$$
+:::
+
+
+![cos](figures/cos.svg){width=90%}\ 
 
 
 
@@ -231,12 +263,17 @@ Computes the hyperbolic cosine of the argument\ $x$, where\ $x$ is in radians.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 cosh(x)
 ~~~
 :::
 
- $= \displaystyle \cosh(x)$
+::: {.not-in-format .man }
+$$\cosh(x)$$
+:::
+
+
+![cosh](figures/cosh.svg){width=90%}\ 
 
 
 
@@ -250,7 +287,7 @@ For `f=2` only system time is returned.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 cpu_time([f])
 ~~~
 :::
@@ -273,18 +310,20 @@ read from a shared-memory object at each time step.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 d_dt(x)
 ~~~
 :::
 
- $= \displaystyle \frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)$
+::: {.not-in-format .man }
+$$\frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)$$
+:::
 
 
 
 ### Example #1, d_dt.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 5
 dt = 1/10
 t0 = 0.5
@@ -295,7 +334,7 @@ PRINT t r lag(r,1) d_dt(lag(r,1)) r*exp(-(t-t0)) HEADER
 # exercise: plot output for different values of dt
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox d_dt.fee > d_dt.dat
 $
 ~~~
@@ -310,12 +349,14 @@ given by the second argument $a$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 deadband(x, a)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}$$
+:::
 
 
 
@@ -330,12 +371,14 @@ Default value for $\epsilon = 10^{-9}$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 equal(a, b, [eps])
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}$$
+:::
 
 
 
@@ -346,18 +389,23 @@ natural logarithm\ $e$ raised to the\ $x$-th power.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 exp(x)
 ~~~
 :::
 
- $= \displaystyle e^x$
+::: {.not-in-format .man }
+$$e^x$$
+:::
+
+
+![exp](figures/exp.svg){width=90%}\ 
 
 
 
 ### Example #1, exp.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PHASE_SPACE x
 end_time = 1
 alpha = 1.8
@@ -369,7 +417,7 @@ x_dot .= -alpha*x
 PRINT t x y(t) y(t)-x 
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox exp.fee > exp.dat
 $
 ~~~
@@ -384,23 +432,28 @@ If\ $x$ is zero, a NaN error is issued.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 expint1(x)
 ~~~
 :::
 
- $= \displaystyle \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]$
+::: {.not-in-format .man }
+$$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]$$
+:::
+
+
+![expint1](figures/expint1.svg){width=90%}\ 
 
 
 
 ### Example #1, expint1.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 Def(x) := integral(exp(-x*t)/t,t,1,99)
 PRINT_FUNCTION Def expint1(x) MIN 1e-2 MAX 2.0 STEP 1e-2 HEADER
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox expint1.fee > expint1.dat
 $
 ~~~
@@ -414,12 +467,17 @@ Computes the second exponential integral function of the argument\ $x$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 expint2(x)
 ~~~
 :::
 
- $= \displaystyle \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$
+::: {.not-in-format .man }
+$$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$$
+:::
+
+
+![expint2](figures/expint2.svg){width=90%}\ 
 
 
 
@@ -429,12 +487,17 @@ Computes the third exponential integral function of the argument\ $x$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 expint3(x)
 ~~~
 :::
 
- $= \displaystyle \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]$
+::: {.not-in-format .man }
+$$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]$$
+:::
+
+
+![expint3](figures/expint3.svg){width=90%}\ 
 
 
 
@@ -445,12 +508,14 @@ If\ $n$ is zero or one and\ $x$ is zero, a NaN error is issued.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 expintn(n,x)
 ~~~
 :::
 
- $= \displaystyle \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$
+::: {.not-in-format .man }
+$$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$$
+:::
 
 
 
@@ -460,12 +525,17 @@ Returns the largest integral value not greater than the argument\ $x$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 floor(x)
 ~~~
 :::
 
- $= \displaystyle \lfloor x \rfloor$
+::: {.not-in-format .man }
+$$\lfloor x \rfloor$$
+:::
+
+
+![floor](figures/floor.svg){width=90%}\ 
 
 
 
@@ -477,18 +547,23 @@ step at\ $x=0$ is replaced by a ramp starting at\ $x=0$ and finishing at\ $x=\de
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 heaviside(x, [delta])
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}$$
+:::
+
+
+![heaviside](figures/heaviside.svg){width=90%}\ 
 
 
 
 ### Example #1, heaviside.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 1
 
 PRINT t heaviside(t-0.5,0.25)
@@ -496,7 +571,7 @@ PRINT t heaviside(t-0.5,0.25)
 # exercise: what happens if the second argument is negative?
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox heaviside.fee > heaviside.dat
 $
 ~~~
@@ -518,12 +593,14 @@ are double-precision floating point numbers.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 if(a, [b], [c], [eps])
 ~~~
 :::
 
- $= \displaystyle \begin{cases} b & \text{if $|a|<\epsilon$} \\ c & \text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} b & \text{if $|a|<\epsilon$} \\ c & \text{otherwise} \end{cases}$$
+:::
 
 
 
@@ -539,18 +616,20 @@ read from a shared-memory object at each time step.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 integral_dt(x)
 ~~~
 :::
 
- $= \displaystyle z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'$
+::: {.not-in-format .man }
+$$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
+:::
 
 
 
 ### Example #1, integral_dt.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 2*pi
 dt = end_time/100
 
@@ -562,7 +641,7 @@ PRINT t y integral_dt(y)
 # mean value of the signal y(t)
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox integral_dt.fee > integral_dt.dat
 $
 ~~~
@@ -580,12 +659,14 @@ In general, it is recommended to use `integral_dt`.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 integral_euler_dt(x)
 ~~~
 :::
 
- $= \displaystyle z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'$
+::: {.not-in-format .man }
+$$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
+:::
 
 
 
@@ -595,12 +676,14 @@ Returns one if the argument\ $x$ rounded to the nearest integer is even.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 is_even(x)
 ~~~
 :::
 
- $= \displaystyle  \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}$
+::: {.not-in-format .man }
+$$ \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}$$
+:::
 
 
 
@@ -611,12 +694,14 @@ i.e. including\ $a$ but excluding\ $b$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 is_in_interval(x, a, b)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}$$
+:::
 
 
 
@@ -626,12 +711,14 @@ Returns one if the argument\ $x$ rounded to the nearest integer is odd.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 is_odd(x)
 ~~~
 :::
 
- $= \displaystyle  \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$
+::: {.not-in-format .man }
+$$ \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$$
+:::
 
 
 
@@ -641,25 +728,30 @@ Computes the regular cylindrical Bessel function of zeroth order evaluated at th
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 j0(x)
 ~~~
 :::
 
- $= \displaystyle J_0(x)$
+::: {.not-in-format .man }
+$$J_0(x)$$
+:::
+
+
+![j0](figures/j0.svg){width=90%}\ 
 
 
 
 ### Example #1, j0.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 VAR nu
 nu0 = root(j0(nu), nu, 0, 3)
 PRINT "J0's first zero is" nu0 SEP " "
 PRINT "Indeed, J0(nu0) is equal to" j0(nu0) SEP " "
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox j0.fee
 J0's first zero is 2.40483
 Indeed, J0(nu0) is equal to 2.32985e-10
@@ -682,12 +774,14 @@ interval\ $[t-\Delta t,t]$ and using the analytical solution of the differential
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 lag(x, tau)
 ~~~
 :::
 
- $= \displaystyle x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)$
+::: {.not-in-format .man }
+$$x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)$$
+:::
 
 
 
@@ -702,12 +796,14 @@ to the time-dependent signal\ $x(t)$ by using the bilinear transformation formul
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 lag_bilinear(x, tau)
 ~~~
 :::
 
- $= \displaystyle x(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}$
+::: {.not-in-format .man }
+$$x(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}$$
+:::
 
 
 
@@ -722,12 +818,14 @@ to the time-dependent signal\ $x(t)$ by using the Euler forward rule.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 lag_euler(x, tau)
 ~~~
 :::
 
- $= \displaystyle x(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}$
+::: {.not-in-format .man }
+$$x(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}$$
+:::
 
 
 
@@ -742,18 +840,20 @@ expression\ $x$ such as `x = last(x)`. See example number 2.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 last(x,[p])
 ~~~
 :::
 
- $= \displaystyle z^{-1}\left[ x \right] = x(t-\Delta t)$
+::: {.not-in-format .man }
+$$z^{-1}\left[ x \right] = x(t-\Delta t)$$
+:::
 
 
 
 ### Example #1, last1.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 static_steps = 5
 end_time = 1
 dt = 0.1
@@ -766,7 +866,7 @@ IF done_static
 ENDIF  
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox last1.fee
 1	1	1
 2	1	1
@@ -791,7 +891,7 @@ $
 
 ### Example #2, last2.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 1
 dt = 0.1
 
@@ -802,7 +902,7 @@ z' = last(z')  + 1
 PRINT t %g y z z'
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox last2.fee
 0	1	1	1
 0.1	2	2	1
@@ -827,12 +927,14 @@ be less than the third argument $b$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 limit(x, a, b)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}$$
+:::
 
 
 
@@ -844,12 +946,14 @@ be less than the third argument $b$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 limit_dt(x, a, b)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}$$
+:::
 
 
 
@@ -860,18 +964,23 @@ a NaN error is issued.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 log(x)
 ~~~
 :::
 
- $= \displaystyle \ln(x)$
+::: {.not-in-format .man }
+$$\ln(x)$$
+:::
+
+
+![log](figures/log.svg){width=90%}\ 
 
 
 
 ### Example #1, log1.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 1
 dt = 1/50
 
@@ -883,7 +992,7 @@ PRINT t x y y-x
 # exercise: why does this example give a bigger error than the exp.fee example?
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox log1.fee > log1.dat
 $
 ~~~
@@ -893,7 +1002,7 @@ $
 
 ### Example #2, log2.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 VAR t'
 x(t) := derivative(log(1+t'), t', t)
 y(t) := 1/(1+t)
@@ -903,7 +1012,7 @@ PRINT_FUNCTION x y y(t)-x(t) MIN 0 MAX 1 NSTEPS 50
 # exercise: why does this example give a smaller error than the exp.fee example?
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox log2.fee > log2.dat
 $
 ~~~
@@ -917,12 +1026,14 @@ Returns the integer index $i$ of the maximum of the arguments\ $x_i$ provided. C
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 mark_max(x1, x2, [...], [x10])
 ~~~
 :::
 
- $= \displaystyle  i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$
+::: {.not-in-format .man }
+$$ i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
+:::
 
 
 
@@ -932,12 +1043,14 @@ Returns the integer index $i$ of the minimum of the arguments\ $x_i$ provided. C
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 mark_max(x1, x2, [...], [x10])
 ~~~
 :::
 
- $= \displaystyle  i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$
+::: {.not-in-format .man }
+$$ i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
+:::
 
 
 
@@ -947,12 +1060,14 @@ Returns the maximum of the arguments\ $x_i$ provided. Currently only maximum of 
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 max(x1, x2, [...], [x10])
 ~~~
 :::
 
- $= \displaystyle  \max \Big (x_1, x_2, \dots, x_{10} \Big)$
+::: {.not-in-format .man }
+$$ \max \Big (x_1, x_2, \dots, x_{10} \Big)$$
+:::
 
 
 
@@ -962,7 +1077,7 @@ Returns the maximum memory (resident set size) used by FeenoX, in Gigabytes.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 memory()
 ~~~
 :::
@@ -976,12 +1091,14 @@ Returns the minimum of the arguments\ $x_i$ provided. Currently only maximum of 
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 min(x1, x2, [...], [x10])
 ~~~
 :::
 
- $= \displaystyle  \min \Big (x_1, x_2, \dots, x_{10} \Big)$
+::: {.not-in-format .man }
+$$ \min \Big (x_1, x_2, \dots, x_{10} \Big)$$
+:::
 
 
 
@@ -992,12 +1109,14 @@ second one\ $b$. Both arguments may be non-integral.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 mod(a, b)
 ~~~
 :::
 
- $= \displaystyle a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b$
+::: {.not-in-format .man }
+$$a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b$$
+:::
 
 
 
@@ -1009,12 +1128,14 @@ The second optional argument $\epsilon$ gives the precision of the
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 not(x, [eps])
 ~~~
 :::
 
- $= \displaystyle  \begin{cases}1 &\text{if $|x| < \epsilon$} \\ 0 &\text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$ \begin{cases}1 &\text{if $|x| < \epsilon$} \\ 0 &\text{otherwise} \end{cases}$$
+:::
 
 
 
@@ -1031,12 +1152,14 @@ Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 random(x1, x2, [s])
 ~~~
 :::
 
- $= \displaystyle  x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1$
+::: {.not-in-format .man }
+$$ x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1$$
+:::
 
 
 
@@ -1053,7 +1176,7 @@ Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 random_gauss(x1, x2, [s])
 ~~~
 :::
@@ -1067,12 +1190,17 @@ Rounds the argument\ $x$ to the nearest integer. Halfway cases are rounded away 
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 round(x)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}$$
+:::
+
+
+![round](figures/round.svg){width=90%}\ 
 
 
 
@@ -1085,18 +1213,23 @@ the frequency of the wave and $\phi$ controls its phase.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 sawtooth_wave(x)
 ~~~
 :::
 
- $= \displaystyle x - \lfloor x \rfloor$
+::: {.not-in-format .man }
+$$x - \lfloor x \rfloor$$
+:::
+
+
+![sawtooth_wave](figures/sawtooth_wave.svg){width=90%}\ 
 
 
 
 ### Example #1, sawtooth_wave.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 10
 dt = 1e-2
 
@@ -1106,7 +1239,7 @@ y = lag(r, 0.5)
 PRINT t r y
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox sawtooth_wave.fee > sawtooth_wave.dat
 $
 ~~~
@@ -1122,12 +1255,17 @@ evaluation. If not given, default is $\epsilon = 10^{-9}$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 sgn(x, [eps])
 ~~~
 :::
 
- $= \displaystyle  \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}$
+::: {.not-in-format .man }
+$$ \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}$$
+:::
+
+
+![sgn](figures/sgn.svg){width=90%}\ 
 
 
 
@@ -1140,23 +1278,28 @@ and\ $\phi$ controls its phase.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 sin(x)
 ~~~
 :::
 
- $= \displaystyle \sin(x)$
+::: {.not-in-format .man }
+$$\sin(x)$$
+:::
+
+
+![sin](figures/sin.svg){width=90%}\ 
 
 
 
 ### Example #1, sin.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 PRINT sin(1)
 PRINT sqrt(1-cos(1)^2)
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox sin.fee
 0.841471
 0.841471
@@ -1171,12 +1314,17 @@ Computes the hyperbolic sine of the argument\ $x$, where\ $x$ is in radians.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 sinh(x)
 ~~~
 :::
 
- $= \displaystyle \sinh(x)$
+::: {.not-in-format .man }
+$$\sinh(x)$$
+:::
+
+
+![sinh](figures/sinh.svg){width=90%}\ 
 
 
 
@@ -1187,12 +1335,17 @@ If\ $x$ is negative, a NaN error is issued.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 sqrt(x)
 ~~~
 :::
 
- $= \displaystyle +\sqrt{x}$
+::: {.not-in-format .man }
+$$+\sqrt{x}$$
+:::
+
+
+![sqrt](figures/sqrt.svg){width=90%}\ 
 
 
 
@@ -1206,18 +1359,23 @@ controls the frequency of the wave and\ $\phi$ controls its phase.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 square_wave(x)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}$$
+:::
+
+
+![square_wave](figures/square_wave.svg){width=90%}\ 
 
 
 
 ### Example #1, square_wave.fee
 
-~~~{.feenox style=feenox}
+~~~feenox
 end_time = 10
 dt = 1e-2
 
@@ -1227,7 +1385,7 @@ y = lag(r, 0.5)
 PRINT t r y
 ~~~
 
-~~~{.terminal style=terminal}
+~~~terminal
 $ feenox square_wave.fee > square_wave.dat
 $
 ~~~
@@ -1241,12 +1399,17 @@ Computes the tangent of the argument\ $x$, where\ $x$ is in radians.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 tan(x)
 ~~~
 :::
 
- $= \displaystyle  \tan(x)$
+::: {.not-in-format .man }
+$$ \tan(x)$$
+:::
+
+
+![tan](figures/tan.svg){width=90%}\ 
 
 
 
@@ -1256,12 +1419,17 @@ Computes the hyperbolic tangent of the argument\ $x$, where\ $x$ is in radians.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 tanh(x)
 ~~~
 :::
 
- $= \displaystyle \tanh(x)$
+::: {.not-in-format .man }
+$$\tanh(x)$$
+:::
+
+
+![tanh](figures/tanh.svg){width=90%}\ 
 
 
 
@@ -1274,12 +1442,14 @@ to reset the function value. Default is no hysteresis, i.e. $b=0$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 threshold_max(x, a, [b])
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
+:::
 
 
 
@@ -1292,12 +1462,14 @@ to reset the function value. Default is no hysteresis, i.e. $b=0$.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 threshold_min(x, a, [b])
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
+:::
 
 
 
@@ -1310,12 +1482,17 @@ controls the frequency of the wave and\ $\phi$ controls its phase.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 triangular_wave(x)
 ~~~
 :::
 
- $= \displaystyle \begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}$
+::: {.not-in-format .man }
+$$\begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}$$
+:::
+
+
+![triangular_wave](figures/triangular_wave.svg){width=90%}\ 
 
 
 
@@ -1325,7 +1502,7 @@ Returns the time ellapsed since the invocation of FeenoX, in seconds.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 wall_time()
 ~~~
 :::

@@ -1,3 +1,4 @@
+# autoconf stuff
 .dirstamp
 Makefile
 Makefile.in
@@ -16,12 +17,18 @@ test-driver
 test-suite.log
 version.m4
 
+# doc
 README.pdf
 
+# binaries, tarballs and libraries
 feenox
+feenox.exe
 gsl-*
 *.tar.gz
 
+# netbeans IDE project
 nbproject
 
+# outputs of "make check"
 mesh2d.msh
+laplace-square.msh

@@ -1,0 +1,7 @@
+READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
+PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+k = 1                            # set uniform conductivity
+BC left  T=0                     # set fixed temperatures as BCs
+BC right T=1                     # "left" and "right" are defined in the mesh
+SOLVE_PROBLEM                    # tell FeenoX we are ready to solve the problem
+PRINT T(0.5)                     # ask for the temperature at x=0.5

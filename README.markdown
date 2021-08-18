@@ -38,7 +38,7 @@ finite-element(ish) tool.
 One of the main features of this allegedly particular design basis is
 that **simple problems ought to have simple inputs** (*rule of
 simplicity*). For instance, to solve one-dimensional heat conduction
-over the domain *x* ∈ \[0, 1\] (which is indeed one of the most simple
+over the domain *x* ∈ \[0,1\] (which is indeed one of the most simple
 engineering problems we can find) the following input file is enough:
 
 ``` feenox
@@ -76,7 +76,7 @@ input above: instead of defining a scalar *k* we define a function of
 ``` feenox
 READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
-k(x) := 1+x                      # space-dependent conductivity
+k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
 BC right T=1
 SOLVE_PROBLEM
@@ -99,7 +99,7 @@ to `PRINT` but also for the definition of algebraic functions:
 ``` feenox
 READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
-k(x) := 1+T(x)                   # temperature-dependent conductivity
+k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
 BC right T=1
 SOLVE_PROBLEM
@@ -120,7 +120,7 @@ READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
 
 # linear temperature gradient in the radial and axial direction
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
 BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
@@ -143,9 +143,9 @@ system][]—the one of the butterfly—whose differential equations are
 
 <div class="not-in-format plain latex">
 
-*ẋ* = *σ* ⋅ (*y* − *x*)
+*ẋ* = *σ* ⋅ (*y*−*x*)
   
-*ẏ* = *x* ⋅ (*r* − *z*) − *y*
+*ẏ* = *x* ⋅ (*r*−*z*) − *y*
   
 *ż* = *x* ⋅ *y* − *b* ⋅ *z*
 
@@ -170,9 +170,9 @@ y_0 = -16
 z_0 = 22.5
 
 # the dynamical system's equations written as naturally as possible
-x_dot .= sigma*(y - x)
-y_dot .= x*(r - z) - y
-z_dot .= x*y - b*z
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
 
 PRINT t x y z        # four-column plain-ASCII output
 ```

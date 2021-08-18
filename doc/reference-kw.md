@@ -4,7 +4,7 @@ Catastrophically abort the execution and quit FeenoX.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 ABORT
 ~~~
 :::
@@ -22,7 +22,7 @@ Define a scalar alias of an already-defined indentifier.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }
 ~~~
 :::
@@ -40,7 +40,7 @@ Define a boundary condition to be applied to faces, edges and/or vertices.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 BC <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1> PHYSICAL_GROUP <name_2> ... ] [ <bc_data1> <bc_data2> ... ]
 ~~~
 :::
@@ -64,7 +64,7 @@ Explicitly close a file after input/output.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 CLOSE <name>
 ~~~
 :::
@@ -79,7 +79,7 @@ Give a default value for an optional commandline argument.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 DEFAULT_ARGUMENT_VALUE <constant> <string>
 ~~~
 :::
@@ -103,7 +103,7 @@ Dump raw PETSc objects used to solve PDEs into files.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 DUMP [ FORMAT { binary | ascii | octave } ] [ K | K_bc | b | b_bc | M | M_bc |
 ~~~
 :::
@@ -117,7 +117,7 @@ Define a file with a particularly formatted name to be used either as input or a
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 < FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]
 ~~~
 :::
@@ -145,8 +145,8 @@ Find and/or compute the absolute extrema of a function or expression over a mesh
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
-FIND_EXTREMA { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
+~~~.feenox
+FIND_EXTREMA { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS | GAUSS ]
  [ MIN <variable> ] [ MAX <variable> ] [ X_MIN <variable> ] [ X_MAX <variable> ] [ Y_MIN <variable> ] [ Y_MAX <variable> ] [ Z_MIN <variable> ] [ Z_MAX <variable> ] [ I_MIN <variable> ] [ I_MAX <variable> ]
 ~~~
 :::
@@ -158,13 +158,11 @@ By default the search is performed over the highest-dimensional elements of the 
 i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
 If the search is to be carried out over just a physical group, it has to be given in `OVER`.
 If there are more than one mesh defined, an explicit one has to be given with `MESH`.
-Either `NODES` or `CELLS` define how the integration is to be performed.
-With `NODES` the integration is performed using the Gauss points
-and weights associated to each element type.
-With `CELLS` the integral is computed as the sum of the product of the
-integrand at the center of each cell (element) and the cell’s volume.
-Do expect differences in the results and efficiency between these two approaches
-depending on the nature of the integrand.
+If neither `NODES`, `CELLS` or `GAUSS` is given then the search is
+performed over the three of them.
+With `NODES` only the function or expression is evalauted at the mesh nodes.
+With `CELLS` only the function or expression is evalauted at the element centers.
+With `GAUSS` only the function or expression is evalauted at the Gauss points.
 The value of the absolute minimum (maximum) is stored in the variable indicated by `MIN` (`MAX`).
 If the variable does not exist, it is created.
 The value of the $x$-$y$-$z$\ coordinate of the absolute minimum (maximum)
@@ -179,7 +177,7 @@ Find parameters to fit an analytical function to a pointwise-defined function.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 FIT <function_to_be_fitted> TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
  [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
  [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]
@@ -223,7 +221,7 @@ Define a function of one or more variables.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] ROUTINE <name> | | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } | [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ] } [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ] [ SIZES <expr_1> <expr_2> ... <expr_n> ] [ X_INCREASES_FIRST <expr> ]
 ~~~
 :::
@@ -290,7 +288,7 @@ Record the time history of a variable as a function of time.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 HISTORY <variable> <function>
 ~~~
 :::
@@ -304,7 +302,7 @@ Execute a set of instructions if a condition is met.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 IF expr 
  <block_of_instructions_if_expr_is_true> 
  [ ELSE 
@@ -322,7 +320,7 @@ Define whether implicit definition of variables is allowed or not.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 IMPLICIT { NONE | ALLOWED }
 ~~~
 :::
@@ -341,7 +339,7 @@ Include another FeenoX input file.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]
 ~~~
 :::
@@ -366,7 +364,7 @@ Define how initial conditions of DAE problems are computed.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 INITIAL_CONDITIONS { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
 ~~~
 :::
@@ -393,7 +391,7 @@ Spatially integrate a function or expression over a mesh (or a subset of it).
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 INTEGRATE { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
  RESULT <variable>
 
@@ -426,7 +424,7 @@ Call the `m4` macro processor with definitions from feenox variables or expressi
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 M4 { INPUT_FILE <file_id> | FILE_PATH <file_path> } { OUTPUT_FILE <file_id> | OUTPUT_FILE_PATH <file_path> } [ EXPAND <name> ] ... } [ MACRO <name> [ <format> ] <definition> ] ... }
 ~~~
 :::
@@ -440,7 +438,7 @@ Define a material its and properties to be used in volumes.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 MATERIAL <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1> [ PHYSICAL_GROUP <name_2> [ ... ] ] ] [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
 ~~~
 :::
@@ -469,7 +467,7 @@ Define a matrix.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |
 ~~~
 :::
@@ -489,7 +487,7 @@ If there are more elements than the matrix size, the values will be ignored.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ] [ NODE | CELL ] [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...
 ~~~
 :::
@@ -527,7 +525,7 @@ Find the combination of arguments that give a (relative) minimum of a function.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 MINIMIZE <function>
  [ METHOD { nmsimplex2 | nmsimplex | nmsimplex2rand | conjugate_fr | conjugate_pr | vector_bfgs2 | vector_bfgs | steepest_descent}
  [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
@@ -550,7 +548,7 @@ Explicitly open a file for input/output.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 OPEN <name> [ MODE <fopen_mode> ]
 ~~~
 :::
@@ -567,7 +565,7 @@ Systematically sweep a zone of the parameter space, i.e. perform a parametric ru
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PARAMETRIC <var_1> [ ... <var_n> ] [ TYPE { linear | logarithmic | random | gaussianrandom | sobol | niederreiter | halton | reversehalton } ] [ MIN <num_expr_1> ... <num_expr_n> ] [ MAX <num_expr_1> ... <num_expr_n> ] [ STEP <num_expr_1> ... <num_expr_n> ] [ NSTEPS <num_expr_1> ... <num_expr_n> ] [ OUTER_STEPS <num_expr> ] [ MAX_DAUGHTERS <num_expr> ] [ OFFSET <num_expr> ] [ ADIABATIC ]
 ~~~
 :::
@@ -581,7 +579,7 @@ Define the variables, vectors and/or matrices that span the phase space of the D
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PHASE_SPACE PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }
 ~~~
 :::
@@ -595,7 +593,7 @@ Explicitly defines a physical group of elements on a mesh.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PHYSICAL_GROUP <name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
  [ MATERIAL <name> | | BC <name> [ BC ... ] ]
 
@@ -632,7 +630,7 @@ Write plain-text and/or formatted data to the standard output or into an output 
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
  [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
@@ -688,7 +686,7 @@ Print one or more functions as a table of values of dependent and independent va
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
  [ MIN <expr_1> <expr_2> ... <expr_k> ] [ MAX <expr_1> <expr_2> ... <expr_k> ] 
@@ -730,7 +728,7 @@ Print the elements of one or more vectors, one element per line.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PRINT_VECTOR 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
  [ FORMAT <print_format> ]
@@ -752,13 +750,14 @@ Sets the problem type that FeenoX has to solve.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 PROBLEM [ mechanical | thermal | modal ]
- [ DIMENSIONS <expr> ] 
- [ AXISYMMETRIC { x | y } | [ PROGRESS ]
+ 
+ [ 1D | 2D | 3D | DIMENSIONS <expr> ] [ MESH <identifier> ] 
+ 
+[ AXISYMMETRIC { x | y } | [ PROGRESS ]
  [ TRANSIENT | QUASISTATIC]
- [ LINEAR | NON_LINEAR ] [ MESH <identifier> ] 
- [ MODES <expr> ] 
+ [ LINEAR | NON_LINEAR ] [ MODES <expr> ] 
  [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
  [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]
  [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]
@@ -774,17 +773,23 @@ PROBLEM [ mechanical | thermal | modal ]
 
 
 
+ * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
-If the mesh is two-dimensional and not `AXISYMMETRIC`, either
+If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
 `plane_stress` or `plane_strain` has to be set instead.
  * `thermal` (or `heat` ) solves the heat conduction problem.
  * `modal` computes the natural mechanical frequencies and oscillation modes.
- * `modal` computes the natural mechanical frequencies and oscillation modes.
 
-If you want to contribute with anothey problem type, you are welcome!
-Check out FeenoX's repository for licensing, programming guides and code of conduct.
-The number of spatial dimensions of the problem needs to be given either with the keyword `DIMENSIONS`
-or by defining a `MESH` (with an explicit `DIMENSIONS` keyword) before `PROBLEM`.
+If you are a programmer and want to contribute with another problem type, please do so!
+Check out [FeenoX repository](https:
+for licensing information, programming guides and code of conduct.
+
+The number of spatial dimensions of the problem needs to be given either
+as `1d`, `2d`, `3d` or with the keyword `DIMENSIONS`.
+Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
+If there are more than one `MESH`es define, the one over which the problem is to be solved
+can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
+defined in the input file is the one over which the problem is solved.
 If the `AXISYMMETRIC` keyword is given, the mesh is expected
 to be two-dimensional in the $x$-$y$ plane and the problem
 is assumed to be axi-symmetric around the given axis.
@@ -798,11 +803,8 @@ If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
 This can be controlled by `TRANSIENT` or `QUASISTATIC`.
 By default FeenoX tries to detect wheter the computation should be linear or non-linear.
 An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
-If there are more than one `MESH`es define, the one over which the problem is to be solved
-can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
-defined in the input file is the one over which the problem is solved.
 The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
-The default is DEFAULT_NMODES.
+The default value is problem dependent.
 The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
 solver types be any of those available in PETSc (first option is the default):
 
@@ -823,7 +825,7 @@ Read data (variables, vectors o matrices) from files or shared-memory segments.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 [ READ | WRITE ] [ SHM <name> ] [ { ASCII_FILE_PATH | BINARY_FILE_PATH } <file_path> ] [ { ASCII_FILE | BINARY_FILE } <identifier> ] [ IGNORE_NULL ] [ object_1 object_2 ... object_n ]
 ~~~
 :::
@@ -837,7 +839,7 @@ Read an unstructured mesh and (optionally) functions of space-time from a file.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 READ_MESH { <file_path> | <file_id> } [ DIMENSIONS <num_expr> ]
  [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
  [ INTEGRATION { full | reduced } ]
@@ -890,7 +892,7 @@ Perform either a wait or a post operation on a named shared semaphore.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 [ SEMAPHORE | SEM ] <name> { WAIT | POST }
 ~~~
 :::
@@ -904,7 +906,7 @@ Execute a shell command.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 SHELL <print_format> [ expr_1 expr_2 ... expr_n ]
 ~~~
 :::
@@ -918,7 +920,7 @@ Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 SOLVE <n> UNKNOWNS <var_1> <var_2> ... <var_n> RESIDUALS <expr_1> <expr_2> ... <expr_n> ] GUESS <expr_1> <expr_2> ... <expr_n> ] [ METHOD { dnewton | hybrid | hybrids | broyden } ] [ EPSABS <expr> ] [ EPSREL <expr> ] [ MAX_ITER <expr> ] [ VERBOSE ]
 ~~~
 :::
@@ -932,7 +934,7 @@ Explicitly solve the PDE problem.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 SOLVE_PROBLEM
 ~~~
 :::
@@ -952,7 +954,7 @@ Sort the elements of a vector, optionally making the same rearrangement in anoth
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]
 ~~~
 :::
@@ -969,7 +971,7 @@ Force time-dependent problems to pass through specific instants of time.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 TIME_PATH <expr_1> [ <expr_2> [ ... <expr_n> ] ]
 ~~~
 :::
@@ -987,7 +989,7 @@ Explicitly define one or more scalar variables.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 VAR <name_1> [ <name_2> ] ... [ <name_n> ]
 ~~~
 :::
@@ -1007,7 +1009,7 @@ Define a vector.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |
 ~~~
 :::
@@ -1040,7 +1042,7 @@ Write a mesh and functions of space-time to a file for post-processing.
 
 
 ::: {.usage}
-~~~{.feenox style=feenox}
+~~~.feenox
 WRITE_MESH
 ~~~
 :::

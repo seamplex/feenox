@@ -1,3 +1,10 @@
+# other sources
+# https://pubs.acs.org/doi/10.1021/ja9076793
+# https://charming-etn.eu/2020/10/23/aid-of-nature-to-solve-a-maze/+
+# https://3.ly/aaT1K
+# https://www.researchgate.net/publication/256565922_The_boundary_and_shell_element_method
+# https://www.cs.cmu.edu/~kmcrane/Projects/HeatMethod
+
 PROBLEM laplace 2d
 READ_MESH maze.msh
 

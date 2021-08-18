@@ -1,5 +1,5 @@
-READ_MESH two-squares.msh DIMENSIONS 2
-PROBLEM thermal
+PROBLEM thermal 2D
+READ_MESH two-squares.msh
 
 MATERIAL soft k=0.5+T(x,y)
 MATERIAL hard k=2.0-T(x,y)

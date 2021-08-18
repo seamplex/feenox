@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# check for needed tools
+for i in git autoconf m4 make makeinfo texi2dvi; do
+ if [ -z "$(which $i)" ]; then
+  echo "error: $i not installed"
+  exit 1
+ fi
+done
+
+
 if [ ! -e ../src ]; then
   echo "run from dist directory"
   exit 0

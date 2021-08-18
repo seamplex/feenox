@@ -21,4 +21,7 @@ function Note(el)
     return {}
 end
 
--- TODO: remove inline math?
+-- remove images
+function Image(el)
+    return {}
+end

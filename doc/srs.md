@@ -1,8 +1,9 @@
 ---
-title: Software Requirements Specification for a computational tool
+title: Software Requirements Specification for an Engineering Computational Tool
 lang: en-US
-abstract: An hypothetical situation (a thought experiment if you will) where a certain company or agency asks for vendors to develop a piece of free and open source engineering software with certain specifications, defined in this imaginary tender.
+abstract: An hypothetical (a thought experiment if you will) Request for Quotation asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. This (imaginary but plausible) Software Requirements Specification document describes the mandatory features this tool ought to have and lists some features which would be nice the tool had, following current state-of-the-art methods and techonologies.
 number-sections: true
+toc: true
 ---
 
 # Introduction {#sec:introduction}
@@ -11,7 +12,7 @@ A cloud-based computational tool (herein after referred to as _the tool_) is req
 This (imaginary but plausible) Software Requirements Specification document describes the mandatory features this tool ought to have and lists some features which would be nice the tool had.
 Also it contains requirements and guidelines about architecture, execution and interfaces in order to fulfill the needs of cognizant engineers as of 2021 (and the years to come) are defined. 
 
-On the one hand, the tool should be applicable to solving industrial problems under stringent efficiency ([@sec:efficiency]) and quality ([@sec:qa]) requirements. It is therefore mandatory to be able to assess the source code for potential performance and verification revision by qualified third parties from all around the world. On the other hand, the initial version of the tool is expected to be a basic framework which might be extended ([@sec:objective] and [@sec:extensibility]) by academic researchers and programmers. It thus should also be free.^[Free as in “free speech,” not as in “free beer.”]
+On the one hand, the tool should be applicable to solving industrial problems under stringent efficiency ([@sec:efficiency]) and quality ([@sec:qa]) requirements. It is therefore mandatory to be able to assess the source code for potential performance and verification revision by qualified third parties from all around the world, so it has to be _open source_. On the other hand, the initial version of the tool is expected to be a basic framework which might be extended ([@sec:objective] and [@sec:extensibility]) by academic researchers and programmers. It thus should also be _free_---in the sense of freedom, not in the sense of price. There is no requirement on the pricing scheme.
 The detailed licensing terms are left to the offer but it should allow users to solve their problems the way they need and, eventually, to modify and improve the tool to suit their needs. If they cannot program themselves, they should have the freedom to hire somebody to do it for them.
 
 
@@ -19,16 +20,17 @@ The detailed licensing terms are left to the offer but it should allow users to 
 
 The main objective of the tool is to be able to solve engineering problems which are usually casted as differential-algebraic equations (DAEs) or partial differential equations (PDEs), such as
 
- * dynamical systems
- * plant control dynamics
- * mechanical elasticity
  * heat conduction
+ * mechanical elasticity
  * structural modal analysis
+ * frequency studies
  * electromagnetism
  * chemical diffusion
+ * process control dynamics
  * computational fluid dynamics
  * ...
 
+\noindent
 on one or more manistream cloud servers, i.e. computers with an architecture (i.e. hardware and operating systems, futher discussed in [@sec:architecture]) that allows them to be available online and accessed remotely either interactively or automatically by other computers as well. Other architectures such as high-end desktop personal computers or even low-end laptops might be supported but they should not the main target. 
  
 The initial version of the tool must be able to handle a subset of the above list of problem types.
@@ -37,7 +39,7 @@ Afterward, the set of supported problem types, models, equations and features of
 
 ## Scope {#sec:scope}
 
-The tool should allow advanced users to define the problem to be solved programmatically, using one or more files either...
+The tool should allow advanced users to define the problem to be solved programmatically. That is to say, the problem should be completely defined using one or more files either...
  
  a. specifically formatted for the tool to read such as JSON or a particular input format (historically called input decks in punched-card days), and/or 
  b. written in an high-level interpreted language such as Python or Julia.
@@ -45,7 +47,7 @@ The tool should allow advanced users to define the problem to be solved programm
 It should be noted that a graphical user interface is not required. The tool may include one, but it should be able to run without needing any user intervention rather than the preparation of a set of input files.
 Nevertheless, there tool might _allow_ a GUI to be used. For example, for a basic usage involving simple cases, a user interface engine should be able to create these problem-definition files in order to give access to less advanced users to the tool using a desktop, mobile and/or web-based interface in order to run the actual tool without further intervention.
 
-However, for general usage, users should be able to completely define the problem (or set of problems, i.e. a parametric study) they want to solve in one or more input files and to obtain one or more output files containing the desired results, either a set of scalar outputs (such as maximum stresses or mean temperatures), and/or a time and/or spatial distribution. If needed, a discretization of the domain may to be taken as a know input, i.e. the tool is not required to create the mesh as long as a suitable mesher can be employed using a similar workflow specified in this\ SRS.
+However, for general usage, users should be able to completely define the problem (or set of problems, i.e. a parametric study) they want to solve in one or more input files and to obtain one or more output files containing the desired results, either a set of scalar outputs (such as maximum stresses or mean temperatures), and/or a time and/or spatial distribution. If needed, a discretization of the domain may to be taken as a known input, i.e. the tool is not required to create the mesh as long as a suitable mesher can be employed using a similar workflow specified in this\ SRS.
 
 
 The tool should define and document ([@sec:documentation]) the way the input files for a solving particular problem are to be prepared ([@sec:input]) and how the results are to be written ([@sec:output]).
@@ -54,11 +56,11 @@ Any GUI, pre-processor, post-processor or other related graphical tool used to p
 
 # Architecture {#sec:architecture}
 
-The tool must be aimed at being executed unattended on remote cloud servers which are expected to have a mainstream^[as of 2021] architecture regarding operating system (GNU/Linux variants and other UNIX-like OSes) and hardware stack (a few intel-compatible CPUs per host, a few levels of memory caches, a few gigabyes of random-access memory, several gigabytes of disk storage, etc.). It should successfully run on virtual and/or containerized servers using standard compilers, dependencies and libraries already available in the repositories of most current operating systems distributions.
+The tool must be aimed at being executed unattended on remote cloud servers which are expected to have a mainstream^[as of 2021] architecture regarding operating system (GNU/Linux variants and other UNIX-like OSes) and hardware stack (a few intel-compatible CPUs per host, a few levels of memory caches, a few gigabyes of random-access memory, several gigabytes of disk storage, etc.). It should successfully run on bare-metal, virtual and/or containerized servers using standard compilers, dependencies and libraries already available in the repositories of most current operating systems distributions.
 
 Preference should be given to open source compilers, dependencies and libraries. Small problems might be executed in a single host but large problems ought to be split through several server instances depending on the processing and memory requirements. The computational implementation should adhere to open and well-established standards.
 
-Ability to run on local desktop personal computers and/laptops is not required but suggested as a mean of giving the opportunity to users to test and debug small coarse computational models before launching the large computation on the cloud. Support for non-GNU/Linux operating systems is not required but also suggested.
+Ability to run on local desktop personal computers and/laptops is not required but suggested as a mean of giving the opportunity to users to test and debug small coarse computational models before launching the large computation on a HPC cluster or on a set of scalable cloud instances. Support for non-GNU/Linux operating systems is not required but also suggested.
 
 Mobile platforms such as tablets and phones are not suitable to run engineering simulations due to their lack of proper electronic cooling mechanisms. They are suggested to be used to control one (or more) instances of the tool running on the cloud, and even to pre and post process results through mobile and/or web interfaces.
 
@@ -190,10 +192,17 @@ Verification, defined as
 a.k.a. checking if the tool is solving right the equations, should be performed before applying the code to solve any industrial problem. Depending on the nature and regulation of the industry, the verification guidelines and requirements may vary. Since it is expected that code verification tasks could be performed by arbitrary individuals or organizations, the tool’s source code should be available to independent third parties. In this regard, changes in the source code should be controllable, traceable and well documented.
 Stable releases ought to be digitally signed by a responsible engineer.
 
-Even though the verification requirements may vary among problem types, industries and particular applications, a common method to verify the code is to compare solutions obtained with the tool with known exact solutions or benchmarks. It is thus mandatory to be able to compare the results with analytical solutions, either internally in the tool or through external libraries or tools.  Another possibility is to follow the Method of Manufactured Solutions, which is highly encouraged to be supported by the tool.
+Even though the verification requirements may vary among problem types, industries and particular applications, a common method to verify the code is to compare solutions obtained with the tool with known exact solutions or benchmarks. It is thus mandatory to be able to compare the results with analytical solutions, either internally in the tool or through external libraries or tools. This approach is called the Method of Exact solutions and it is the most widespread scheme for verifying computational software, although it does not provide a comprehensive method to verify the whole spectrum of features. Another possibility is to follow the Method of Manufactured Solutions, which does. It is highly encouraged that the tool allows the application of MMS for software verification. Indeed, this method needs a full explanation of the equations solved by the tool, up to the point that [@sandia-mms] says that
+
+> Difficulties in determination of the governing equations arises frequently with
+> commercial software, where some information is regarded as proprietary.
+> If the governing equations cannot be determined, we would question the validity of using the code.
+
+To enforce the availability of the governing equations, the tool has to be open source as required in @sec:introduction and well documented as required in @sec:documentation.
 
 
-Whenever a verification task is performed and documented, at least one test should be added to the test suite. These tests should check that the verified features are kept by future changes and no regressions that break the verification are introduced. Verifications that the tool fails when it is expected to fail are encouraged as much as positive verifications that results are the expected ones.
+
+Whenever a verification task is performed and documented, at least one test should be added to the test suite. For MES or MMS, only one mesh refinement is enough, there is no need to add to whole test for different mesh sizes. The tests in the tests suite should check that the verified features are kept by future changes and no regressions that break the verification are introduced. Verifications that the tool fails when it is expected to fail are encouraged as much as positive verifications that results are the expected ones.
 
 
 
@@ -224,10 +233,9 @@ A report following the V&V procedure defined above should be prepared and signed
 
 ## Documentation {#sec:documentation}
 
-Documentation should be complete and cover both the user and the developer point of view. It should contain a user manual adequate for both reference and tutorial purposes. Other forms of simplified documentation such as quick reference cards or video tutorials are not mandatory but highly recommended. Since the tool should be extendable ([@sec:extensibility]), there should be a separate development manual covering the programming design and implementation and how to extend and add new features.
-Also, as non-trivial mathematics which should be verified ([@sec:verification]) are expected, an explanation what equations are taken into account and how they are solved is required.
+Documentation should be complete and cover both the user and the developer point of view. It should contain a user manual adequate for both reference and tutorial purposes. Other forms of simplified documentation such as quick reference cards or video tutorials are not mandatory but highly recommended. Since the tool should be extendable ([@sec:extensibility]), there should be a separate development manual covering the programming design and implementation, explaining how to extend the code and how to add new features.
+Also, as non-trivial mathematics which should be verified ([@sec:verification]) are expected, a thorough explanation of what equations are taken into account and how they are solved is required.
 
-It should be possible to make the full documentation available online in a way that it can be both printed in hard copy and accessed easily from a mobile device. Users modifying the tool to suit their own needs should be able to modify the associated documentation as well.
-
+It should be possible to make the full documentation available online in a way that it can be both printed in hard copy and accessed easily from a mobile device. Users modifying the tool to suit their own needs should be able to modify the associated documentation as well, so a clear notice about the licensing terms of the documentation itself (which might be different from the licensing terms of the source code itself) is mandatory.
 
 

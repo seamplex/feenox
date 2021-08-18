@@ -1,8 +1,9 @@
 ---
-title: Software Requirements Specification for a computational tool
+title: Software Requirements Specification for an Engineering Computational Tool
 lang: en-US
-abstract: An hypothetical situation (a thought experiment if you will) where a certain company or agency asks for vendors to develop a piece of free and open source engineering software with certain specifications, defined in this imaginary tender.
+abstract: An hypothetical (a thought experiment if you will) Request for Quotation asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. This (imaginary but plausible) Software Requirements Specification document describes the mandatory features this tool ought to have and lists some features which would be nice the tool had, following current state-of-the-art methods and techonologies.
 number-sections: true
+toc: true
 ---
 
 include(010-introduction.md)
