@@ -26,13 +26,8 @@ extern const char factorseparators[];
 
 // API
 int feenox_add_time_path(const char *string) {
-  expr_t *expr;
-  
-  if ((expr = calloc(1, sizeof(expr))) == NULL) {
-    feenox_push_error_message("memory allocation failed for expression in feenox_add_time_path()");
-    return FEENOX_ERROR;
-  }
-  
+  expr_t *expr = NULL;
+  feenox_check_alloc(expr = calloc(1, sizeof(expr_t)));
   feenox_call(feenox_expression_parse(expr, string));
   LL_APPEND(feenox.time_paths, expr);
   
