@@ -1,0 +1,9 @@
+PROBLEM modal 3D MODES 6
+READ_MESH beam-cantilever-$1.msh
+
+nu = 0.28
+rho = 7800
+E = 2.1e11
+
+SOLVE_PROBLEM
+PRINT %.1f SEP " " f
