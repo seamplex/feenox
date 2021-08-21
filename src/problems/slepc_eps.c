@@ -78,11 +78,8 @@ int feenox_problem_solve_slepc_eigen(void) {
     feenox_call(feenox_problem_setup_ksp(ksp));
 
     // this should be faster but it is not
-/*    
-    if (feenox.pde.symmetric_K && feenox.pde.symmetric_M) {
-      petsc_call(EPSSetProblemType(feenox.pde.eps, EPS_GHEP));
-    }  
- */
+    // TODO: let the user choose
+//    petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
     
     // convergence with respect to the matrix norm
 //    petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_NORM));
@@ -109,7 +106,10 @@ int feenox_problem_solve_slepc_eigen(void) {
   petsc_call(EPSSolve(feenox.pde.eps));
   PetscInt nconv = 0;
   petsc_call(EPSGetConverged(feenox.pde.eps, &nconv));
-  if (nconv < feenox.pde.nev) {
+  if (nconv == 0) {
+    feenox_push_error_message("no converged eigen-pairs found (%d requested)", feenox.pde.nev);
+    return FEENOX_ERROR;
+  } else if (nconv < feenox.pde.nev) {
     feenox_push_error_message("eigen-solver obtained only %d converged eigen-pairs (%d requested)", nconv, feenox.pde.nev);
     return FEENOX_ERROR;
   }

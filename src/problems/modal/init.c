@@ -262,6 +262,16 @@ int feenox_problem_setup_eps_modal(EPS eps) {
     // if there is no formulation but an st_type, choose an appropriate one
     feenox.pde.eigen_formulation = (strcmp(st_type, STSHIFT) == 0) ? eigen_formulation_lambda : eigen_formulation_omega;
   }
+
+  // for free-free vibrations we need the omega formulation
+  if (modal.has_dirichlet_bcs == 0) {
+    if (feenox.pde.eigen_formulation == eigen_formulation_lambda) {
+      feenox_push_error_message("free-free vibrations do not work with the lambda formulation");
+      return FEENOX_ERROR;
+    }
+    feenox.pde.eigen_formulation = eigen_formulation_omega;
+  }
+
   
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     if (st_type != NULL) {
