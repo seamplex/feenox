@@ -362,47 +362,51 @@ int feenox_function_init(function_t *this) {
 
         if (this->n_arguments == 2) {
 
-          // does it have a regular mesh in 2d?
-          size_t nx = 0;
-          size_t ny = 0;
-          if (feenox_function_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
-            this->rectangular_mesh = 1;
-            this->x_increases_first = 1;
-          } else if (feenox_function_is_structured_grid_2d(this->data_argument[1], this->data_argument[0], this->data_size, &ny, &nx)) {
-            this->rectangular_mesh = 1;
-            this->x_increases_first = 0;
-          } else {
-            this->rectangular_mesh = 0;
-          }
+          if (this->data_argument != NULL) {
+            // does it have a regular mesh in 2d?
+            size_t nx = 0;
+            size_t ny = 0;
+            if (feenox_function_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
+              this->rectangular_mesh = 1;
+              this->x_increases_first = 1;
+            } else if (feenox_function_is_structured_grid_2d(this->data_argument[1], this->data_argument[0], this->data_size, &ny, &nx)) {
+              this->rectangular_mesh = 1;
+              this->x_increases_first = 0;
+            } else {
+              this->rectangular_mesh = 0;
+            }
 
-          if (this->rectangular_mesh) {
-            feenox_check_alloc(this->rectangular_mesh_size = calloc(2, sizeof(size_t)));
-            this->rectangular_mesh_size[0] = nx;
-            this->rectangular_mesh_size[1] = ny;
-          }
+            if (this->rectangular_mesh) {
+              feenox_check_alloc(this->rectangular_mesh_size = calloc(2, sizeof(size_t)));
+              this->rectangular_mesh_size[0] = nx;
+              this->rectangular_mesh_size[1] = ny;
+            }
+          }  
 
         } else if (this->n_arguments == 3) {
 
-          // miramos si tiene una malla regular en 3d
-          size_t nx = 0;
-          size_t ny = 0;
-          size_t nz = 0;
-          if (feenox_function_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
-            this->rectangular_mesh = 1;
-            this->x_increases_first = 1;
-          } else if (feenox_function_is_structured_grid_3d(this->data_argument[2], this->data_argument[1], this->data_argument[0], this->data_size, &nz, &ny, &nx)) {
-            this->rectangular_mesh = 1;
-            this->x_increases_first = 0;
-          } else {
-            this->rectangular_mesh = 0;
-          }
+          if (this->data_argument != NULL) {
+            // miramos si tiene una malla regular en 3d
+            size_t nx = 0;
+            size_t ny = 0;
+            size_t nz = 0;
+            if (feenox_function_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
+              this->rectangular_mesh = 1;
+              this->x_increases_first = 1;
+            } else if (feenox_function_is_structured_grid_3d(this->data_argument[2], this->data_argument[1], this->data_argument[0], this->data_size, &nz, &ny, &nx)) {
+              this->rectangular_mesh = 1;
+              this->x_increases_first = 0;
+            } else {
+              this->rectangular_mesh = 0;
+            }
 
-          if (this->rectangular_mesh) {
-            feenox_check_alloc(this->rectangular_mesh_size = calloc(3, sizeof(size_t)));
-            this->rectangular_mesh_size[0] = nx;
-            this->rectangular_mesh_size[1] = ny;
-            this->rectangular_mesh_size[2] = nz;
-          }
+            if (this->rectangular_mesh) {
+              feenox_check_alloc(this->rectangular_mesh_size = calloc(3, sizeof(size_t)));
+              this->rectangular_mesh_size[0] = nx;
+              this->rectangular_mesh_size[1] = ny;
+              this->rectangular_mesh_size[2] = nz;
+            }
+          }  
 
         } else {
 

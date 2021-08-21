@@ -105,6 +105,7 @@ feenox_SOURCES = \
 ./problems/mechanical/init.c \
 ./problems/mechanical/bulk.c \
 ./problems/mechanical/bc.c \
+./problems/mechanical/stress.c \
 ./problems/mechanical/post.c \
 ./problems/modal/modal.h \
 ./problems/modal/methods.h \

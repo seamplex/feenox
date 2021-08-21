@@ -28,4 +28,12 @@ extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *thi
 // mechanical/post.c
 extern int feenox_problem_solve_post_mechanical(void);
 
+// mechanical/stress.c
+extern int feenox_problem_gradient_fill_mechanical(void);
+extern int feenox_problem_gradient_properties_at_element_nodes_mechanical(element_t *element, mesh_t *mesh);
+extern int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node);
+extern int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight);
+extern int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j);
+
+
 #endif
