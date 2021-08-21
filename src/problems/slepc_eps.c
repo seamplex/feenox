@@ -79,7 +79,7 @@ int feenox_problem_solve_slepc_eigen(void) {
 
     // this should be faster but it is not
     // TODO: let the user choose
-//    petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
+   petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
     
     // convergence with respect to the matrix norm
 //    petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_NORM));
