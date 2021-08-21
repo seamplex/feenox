@@ -1931,18 +1931,10 @@ int feenox_parse_function(void) {
         columns[i] = (unsigned int)(xi);
       }
 
-    } else {
-      feenox_push_error_message("unknown keyword '%s'", token);
-      return FEENOX_ERROR;
-    }
-  }
-      
-/*
-
 ///kw+FUNCTION+usage [ INTERPOLATION_THRESHOLD <expr> ]
 ///kw+FUNCTION+detail For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.
 ///kw+FUNCTION+detail Default value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`.
-    } else if (strcasecmp(token, "INTERPOLATION_THRESHOLD") == 0) {
+      } else if (strcasecmp(token, "INTERPOLATION_THRESHOLD") == 0) {
 
        feenox_parser_expression(&function->expr_multidim_threshold);
 
@@ -1950,16 +1942,23 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+detail The initial radius of points to take into account in `shepard_kd` is given by `SHEPARD_RADIUS`. If no points are found, the radius is double until at least one definition point is found.
 ///kw+FUNCTION+detail The radius is doubled until at least one point is found.
 ///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_RADIUS`.
-    } else if (strcasecmp(token, "SHEPARD_RADIUS") == 0) {
+      } else if (strcasecmp(token, "SHEPARD_RADIUS") == 0) {
 
        feenox_parser_expression(&function->expr_shepard_radius);
 
 ///kw+FUNCTION+usage [ SHEPARD_EXPONENT <expr> ]
 ///kw+FUNCTION+detail The exponent of the `shepard` method is given by `SHEPARD_EXPONENT`.
 ///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_EXPONENT`.
-    } else if (strcasecmp(token, "SHEPARD_EXPONENT") == 0) {
+      } else if (strcasecmp(token, "SHEPARD_EXPONENT") == 0) {
        feenox_parser_expression(&function->expr_shepard_exponent);
-
+       
+    } else {
+      feenox_push_error_message("unknown keyword '%s'", token);
+      return FEENOX_ERROR;
+    }
+  }
+       
+/*
 ///kw+FUNCTION+usage [ SIZES <expr_1> <expr_2> ... <expr_n> ]
 ///kw+FUNCTION+detail When requesting `bilinear` interpolation for $n>3$, the number of definition points for each argument variable has to be given with `SIZES`,
     } else if (strcasecmp(token, "SIZES") == 0) {
