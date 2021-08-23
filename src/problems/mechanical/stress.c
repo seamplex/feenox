@@ -57,6 +57,20 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   double sigmay = lambda * (ex+ey+ez) + 2*mu * ey;
   double sigmaz = lambda * (ex+ey+ez) + 2*mu * ez;
   
+  // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
+  
+  if (mechanical.alpha.defined) {
+    double alpha = mechanical.alpha.eval(&mechanical.alpha, node->x, element->physical_group->material);
+    if (alpha != 0) {
+      double DT = mechanical.T.eval(&mechanical.T, node->x, element->physical_group->material) - mechanical.T0;
+      double xi = E/(1-2*nu) * alpha * DT;
+    
+      sigmax -= xi;
+      sigmay -= xi;
+      sigmaz -= xi;
+    }  
+  }  
+  
   node->flux[0] += rel_weight * (sigmax - node->flux[0]);
   node->flux[1] += rel_weight * (sigmay - node->flux[1]);
   node->flux[2] += rel_weight * (sigmaz - node->flux[2]);
