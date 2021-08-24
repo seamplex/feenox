@@ -1,30 +1,16 @@
 # FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-<div class="alert alert-warning">
-
-> Please note that FeenoX is a [back end][] aimed at advanced users. It
-> **does not include a graphical interface**. For an easy-to-use
-> web-based front end with FeenoX running in the cloud directly from
-> your browser see [CAEplex][] at <https://www.caeplex.com>. Any
-> contribution to make dekstop GUIs such as [PrePoMax][] or [FreeCAD][]
-> to work with FeenoX are welcome.
-
-</div>
-
   [What is FeenoX?]: #what-is-feenox
   [Why?]: #why
   [Download]: #download
   [Git repository]: #git-repository
   [Licensing]: #licensing
   [Further information]: #further-information
-  [back end]: https://en.wikipedia.org/wiki/Front_and_back_ends
-  [CAEplex]: https://www.caeplex.com
-  [PrePoMax]: https://prepomax.fs.um.si/
-  [FreeCAD]: http://https://www.freecadweb.org
 
 # What is FeenoX?
 
-FeenoX can be seen as
+[FeenoX][] is to finite-element software and libraries what Markdown is
+to word processors and typesetting systems. It can be seen as
 
 -   a syntactically-sweetened way of asking the computer to solve
     engineering-related mathematical problems, and/or
@@ -34,6 +20,10 @@ Note that some of the problems solved with FeenoX might not actually
 rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
+
+> -   FeenoX Overview Presentation, August 2021
+>     -   [Slides in PDF][]
+>     -   [Markdown examples sources][]
 
 One of the main features of this allegedly particular design basis is
 that **simple problems ought to have simple inputs** (*rule of
@@ -214,7 +204,7 @@ the problem to be solved. Some basic rules are
     parsimony and diversity*, **there is no embedded graphical
     interface** but means of using generic pre and post processing
     tools—in particular, [Gmsh][] and [Paraview][] respectively. See
-    also [CAEplex][1].
+    also [CAEplex][].
 
 -   The input files should be [syntactically sugared][] so as to be as
     self-describing as possible.
@@ -249,6 +239,9 @@ problems, as implied in the “community-contributed problems” bullet
 above (*rules of modularity and extensibility*). See the
 [documentation][] for details about how to contribute.
 
+  [FeenoX]: https://www.seamplex.com/feenox
+  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
+  [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
@@ -257,7 +250,7 @@ above (*rules of modularity and extensibility*). See the
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
   [problem statement of the NAFEMS LE11 benchmark]: doc/design/nafems-le11/nafems-le11.png
   [Paraview]: https://www.paraview.org/
-  [1]: www.caeplex.com
+  [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
   [Software Requirements Specification]: doc/sds.md
   [as in freedom]: https://www.gnu.org/philosophy/free-sw.en.html

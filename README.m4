@@ -1,6 +1,6 @@
 ---
 title: FeenoX
-subtitle: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+subtitle: A free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 titleblock: |
  FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
  =======================================================================================
@@ -24,38 +24,19 @@ listings: true
 toc: false
 ...
 
-::: {.not-in-format .plain .markdown .gfm .plain .latex }
-
-![](doc/logo.svg)
-
-:::::: {.text-center}
-[Downloads](doc/install){.btn .btn-primary}
-[Documentation](doc){.btn .btn-secondary}
-[Licensing](#licensing){.btn .btn-info}
-::::::
-:::
-
-:::{.alert .alert-warning}
-> Please note that FeenoX is a [back end](https://en.wikipedia.org/wiki/Front_and_back_ends) aimed at advanced users.
-> It **does not include a graphical interface**. For an easy-to-use web-based front end with FeenoX running in the cloud directly from your browser see [CAEplex](https://www.caeplex.com) at <https://www.caeplex.com>.
-> Any contribution to make dekstop GUIs such as [PrePoMax](https://prepomax.fs.um.si/) or [FreeCAD](http://https://www.freecadweb.org) to work with FeenoX are welcome.
-
-:::::: {.not-in-format .plain .markdown .gfm .plain .latex }
-<div class="embed-responsive embed-responsive-16by9 mb-3">
- <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kD3tQdq17ZE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div> 
-::::::
-:::
-
-
 # What is FeenoX?
 
-FeenoX can be seen as
+[FeenoX](https://www.seamplex.com/feenox) is to finite-element software and libraries what Markdown is to word processors and typesetting systems. It can be seen as
 
  * a syntactically-sweetened way of asking the computer to solve engineering-related mathematical problems, and/or
  * a finite-element(ish) tool with a particular design basis
 
 Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
+
+> * FeenoX Overview Presentation, August 2021
+>   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
+>   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
+
 
 include(doc/design/thermal1d.md)
 include(doc/design/lorenz-le11.md)
