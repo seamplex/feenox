@@ -16,13 +16,10 @@
 
  * SEMAPHORE
  * READ / WRITE
- * PRINT_VECTOR
  * SOLVE
  * M4 (MUSTACHE? MACRO?)
  * SHELL
  * HISTORY
- * PARAMETRIC? - "do one thing well and move these guys to an outer-level shell"
- * MINIMIZE?
  * FIT? maybe we can keep this for fitting DAEs
  
  * explain that 
@@ -31,8 +28,7 @@
  
 ## Wasora stuff
 
- * non-topology pointwise functions
-   - derivative of a column with respect to another one as a UNIX filter
+ * derivative of a column with respect to another one as a UNIX filter
  * vector & matrix assignements & DAEs
  * debug mode, line-by-line
  * trap signit & sigterm
@@ -91,18 +87,13 @@
 # PDEs
 
  * check when the matrices do not need to be rebuilt
- * Laplace/Poisson/Helmholtz as a template (fem or fem+fvm?)
  * see if the gradients are used in the input to see if we need to compute them, how? add a flag in the function structured "used" and fill it in in the algebraic parser, then each problem sweeps over all the derivatives and sees if the gradients are needed or not
  
 ## Laplace/Poisson/Helmholtz
 
  * like heat with different BCs and gradients
- 
-  alpha * dphi_dt + div (k grad phi) + eta * phi = f(x,t)
-  
- * laplace k = 1 by default, eta = 0, f = 0
- * poisson k = 1, f = 1, eta = 0
- * helmholtz k = 1, f = 1, eta = 1
+ * poisson f = 1, eta = 0
+ * helmholtz f = 1, eta = 1
  * see 2D example in Gmsh list
  
 ## Heat

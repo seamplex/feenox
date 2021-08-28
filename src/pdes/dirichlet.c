@@ -2,10 +2,12 @@
 extern feenox_t feenox;
 
 int feenox_problem_dirichlet_add(size_t index, double value) {
-  
+
+#ifdef HAVE_PETSC
   feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index;
   feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = value;
   feenox.pde.dirichlet_k++;
+#endif
   
   return FEENOX_OK;
 }

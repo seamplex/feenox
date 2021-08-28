@@ -24,6 +24,7 @@ extern feenox_t feenox;
 
 int feenox_problem_gradient_compute(void) {
   
+#ifdef HAVE_PETSC
   // the mesh for "rough" mode is different
   mesh_t *mesh = (feenox.pde.rough == 0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
   
@@ -105,7 +106,8 @@ int feenox_problem_gradient_compute(void) {
     }  
   }  
   
-  
+#endif
+
   return FEENOX_OK;
 }
 

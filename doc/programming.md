@@ -1,6 +1,9 @@
 ---
 title: FeenoX programming guide
 language: en-US
+titleblock: |
+ FeenoX programming guide
+ ========================
 ---
 
 # Why we program FeenoX
@@ -13,29 +16,10 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
 # Compiling and debuging
 
-## Adding debug symbols
+See the [compile.md](compilation instructions).
 
-By default the C flags are `-O3`, without debugging. To add the `-g` flag, just use `CFLAGS` when configuring:
-
-```
-./configure CFLAGS="-g -O0"
-```
-
-
-## Using a different compiler
-
-Without PETSc, FeenoX uses the `CC` environment variable to set the compiler. So configure like
-
-```
-./configure CC=clang
-```
-
-When PETSc is detected, FeenoX uses `MPICC`. But this variable cannot be set directly. Depending if you are using MPICh or OpenMPI, you should set `MPICH_CC` or `OMPI_CC`:
-
-```
-./configure MPICH_CC=icc CC=icc
-```
-
+include(compile-debug.md)
+include(compile-other-compiler.md)
  
 # How we program FeenoX
 
