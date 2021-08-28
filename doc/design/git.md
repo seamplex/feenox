@@ -1,7 +1,7 @@
  1. Install mandatory dependencies
 
     ```terminal
-    sudo apt-get install git gcc make automake autoconf libgsl-dev
+    sudo apt-get install gcc make git automake autoconf libgsl-dev
     ```
 
     If you cannot install `libgsl-dev` but still have `git` and the build toolchain, you can have the `configure` script to download and compile it for you. See point\ 4 below.
@@ -9,7 +9,7 @@
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
     ```terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
+    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
     ```
 
  3. Clone Github repository
