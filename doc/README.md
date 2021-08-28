@@ -7,8 +7,9 @@ titleblock: |
 ...
 
 
-There is a brief and general description in the main [README](..).
-
+ * There is a brief introduction on the main [README](..).
+ * See [this presentation](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
+ * There's a [recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
 
 # Hands on
 
@@ -30,7 +31,7 @@ Detailed solutions of benchmarks, V&V cases and/or problems with industrial inte
 
 ## UNIX manpage
 
-See [the Markdown source](./feenox.1.md) of the actual [UNIX manpage](./feenox.1). It should be accessible with `man feenox` after installation.
+See [the Markdown source](./feenox.1.md) of the actual [UNIX manpage](./feenox.1.html). It should be accessible with `man feenox` after installation.
 
 ## FeenoX manual
 
@@ -38,7 +39,7 @@ The full FeenoX manual is available as a Texinfo PDF, compiled from an M4-prepro
 
 ## Reference sheet
 
- * Keywords
+ * [Keywords](reference-kw.md)
  * Variables
  * Distributions
  * Boundary conditions
@@ -77,44 +78,65 @@ These are two most basic ways of contributing to an open source project, so do n
 
  1. Install mandatory dependencies
 
-    ```
+    ```terminal
     sudo apt-get install git gcc make automake autoconf libgsl-dev
     ```
 
+    If you cannot install `libgsl-dev` but still have `git` and the build toolchain, you can have the `configure` script to download and compile it for you. See below.
+    
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
-    ```
+    ```terminal
     sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
     ```
 
  3. Clone Github repository
  
-    ```
+    ```terminal
     git clone https://github.com/seamplex/feenox
     ```
 
  4. Boostrap, configure, compile & make
  
-    ```
+    ```terminal
     cd feenox
     ./autogen.sh
     ./configure
     make
     ```
-
- 5. Run test suite (optional, this might take some time)
- 
+    
+    If you cannot (or do not want) to use `libgsl-dev` from a package repository, call `configure` with `--enable-download-gsl`:
+    
+    ```terminal
+    configure --enable-download-gsl
     ```
+    
+    If you do not have Internet access, get the tarball manually, store it in the same directory as `configure` and run again.
+
+ 5. Run test suite (optional)
+ 
+    ```terminal
     make check
     ```
 
  6. Install the binary system wide (optional)
  
-    ```
+    ```terminal
     sudo make install
     ```
 
+See the [programming guide](./programming.md) for more details about
+
+ * custom flags,
+ * different compilers,
+ * compiling with debugging information,
+ * configuring and compiling dependencies from sources,
+ * etc.
+    
 ## Contributing guidelines
+
+Any contribution is welcome, especially new types of PDEs and new formulations of existing PDEs.
+For elliptic operators feel free to use the Laplace equation as a template.
 
  1. Read the [programming guide](./programming.md)
  2. Join the [mailing list](https://www.seamplex.com/lists.html)

@@ -16,8 +16,9 @@ fi
 #   source
 # -----------------------------------------------------------
 cd ${package}
+ autoreconf -i
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
- automake --add-missing
+ automake --add-missing --force-missing
  make dist
 cd ..
 

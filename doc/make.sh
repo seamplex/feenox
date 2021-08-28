@@ -65,6 +65,9 @@ echo "help as a raw txt (which is used in feenox -v)"
 
 echo "unix man page"
 m4 header.m4 date.m4 feenox.1.md | pandoc -s -t man --lua-filter=not-in-format.lua --lua-filter=include-code-files.lua --lua-filter=manfilter.lua -o feenox.1
+echo "unix man page in html"
+pandoc -s -t html feenox.1 -o feenox.1.html
+
 
 # # manual
 # m4 header.m4 feenox.md | \
