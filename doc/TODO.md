@@ -1,3 +1,7 @@
+ * .m4 to .md + lua
+ 
+ * 
+
  * Documention should be like code: if paragraph appear more than once, then a separate file should be created and included in the needed locations.
  
  * FeenoX focuses on:
@@ -6,7 +10,7 @@
     b. parametric runs: script-friendly through command-line arguments and ASCII files
     c. cloud-friendly: it can run unattended
 
- * NAFEMS LE10: remove `differences` and move to `cases`
+ * NAFEMS LE10 & LE11: keep a single case in `differences` and create a new one in `cases` with a full parametric run
    
    ```
    READ_MESH le10-$1.msh
@@ -20,8 +24,11 @@
    ndofs sigma_y strain energy wall memory 
    ```
    
-   Use GAMG & MUMPS. To compare to CalculiX, link to CoFEA.
-    
+   Use GAMG & MUMPS
+   
+   Compare both cases (or one and one) to CalculiX & CodeAster. Link to CoFEA.
+   
+   
  * FeenoX and the UNIX philosophy
  
  * FeenoX & CalculiX: blog post? (or Why I don't like CalculIX)

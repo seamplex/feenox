@@ -47,6 +47,14 @@ echo " - functions"
 echo " - functionals"
 ./reference.sh ../src/math/builtin_functionals.c   fu > reference-fu.md
 
+for i in laplace; do
+  echo " - ${i}"
+  ./reference.sh ../src/pdes/${i}/init.c           po_${i} > reference-${i}-po.md
+  ./reference.sh ../src/pdes/${i}/init.c           re_${i} > reference-${i}-re.md
+  ./reference.sh ../src/pdes/${i}/init.c           pr_${i} > reference-${i}-pr.md
+  ./reference.sh ../src/pdes/${i}/bc.c             bc_${i} > reference-${i}-bc.md
+done
+
 echo "help as markdown definition list"
 ./help-md.sh > help.md
 
