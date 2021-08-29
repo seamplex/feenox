@@ -92,7 +92,7 @@ AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
 # the default is read from the macro argument, but the help string
 # does not expand variables so it always states that it is "check"
 AC_ARG_WITH(
-  [sudials],
+  [sundials],
   AS_HELP_STRING([--with-sundials], [use SUNDIALS to solve DAEs @<:@default=check@:>@]),
   [],
   [with_sundials=check]

@@ -199,16 +199,16 @@ $ ./configure
 [...]  
 ```
 
-If for some reason one of the optional dependencies is available but FeenoX should not use it, then pass `--without-sudials`, `--without-petsc` and/or `--without-slepc` as arguments. For example
+If for some reason one of the optional dependencies is available but FeenoX should not use it, then pass `--without-sundials`, `--without-petsc` and/or `--without-slepc` as arguments. For example
 
 ```terminal
-$ ./configure --without-sudials --without-petsc
+$ ./configure --without-sundials --without-petsc
 [...]
 ## ----------------------- ##
 ## Summary of dependencies ##
 ## ----------------------- ##
   GNU Scientific Library  from system
-  SUNDIALS                yes
+  SUNDIALS                no
   PETSc                   no
   SLEPc                   no
 [...]  
