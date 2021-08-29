@@ -182,7 +182,7 @@ To create a proper `Makefile` for the particular architecture, dependencies and 
 ./configure
 ```
 
-Without any particular options, `configure` will check if the mandatory [GNU Scientific Library](https://www.gnu.org/software/gsl/) is available (both its headers and run-time library). If it is not, then the option `--enable-download-gsl` can be used. This option will try to use `wget` (which should be installed) to download a source tarball, uncompress is, configure and compile it. If these steps are sucessfull, this GSL will be statically linked into the resulting FeenoX executable. If there is no internet connection, the `configure` script will say that the download failed. In that case, get the indicated tarball file manually , copy it into the current directory and re-run `./configure`.
+Without any particular options, `configure` will check if the mandatory [GNU Scientific Library](https://www.gnu.org/software/gsl/) is available (both its headers and run-time library). If it is not, then the option `--enable-download-gsl` can be used. This option will try to use `wget` (which should be installed) to download a source tarball, uncompress is, configure and compile it. If these steps are successful, this GSL will be statically linked into the resulting FeenoX executable. If there is no internet connection, the `configure` script will say that the download failed. In that case, get the indicated tarball file manually , copy it into the current directory and re-run `./configure`.
 
 The script will also check for the availability of optional dependencies. At the end of the execution, a summary of what was found (or not) is printed in the standard output:
 
@@ -226,7 +226,84 @@ To see all the available options run
 
 ## Compilation
 
+
+After the successful execution of `configure`, a `Makefile` is created. To compile FeenoX, just execute 
+
+```terminal
+make
+```
+
+Compilation should take a dozen of seconds. It can be even sped up by using the `-j` option
+
+```terminal
+make -j8
+```
+
+The binary executable will be located in the `src` directory but a copy will be made in the base directory as well. Test it by running without any arguments
+
+```terminal
+$ ./feenox
+FeenoX v0.1.24-g6cfe063 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: ./feenox [options] inputfile [replacement arguments]
+
+  -h, --help         display usage and commmand-line help and exit
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+  -s, --sumarize     list all symbols in the input file and exit
+
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+    $ echo "PRINT 2+2" | feenox -
+    4
+
+Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
+Feenox home page: https://www.seamplex.com/feenox/
+$
+```
+
+The `-v` (or `--version`) option shows the version and a copyright notice:
+
+```terminal
+$ ./feenox -v
+FeenoX v0.1.24-g6cfe063
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Copyright (C) 2009--2021 jeremy theler
+GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
+FeenoX is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+$
+```
+
+The `-V` (or `--versions`) option shows the dates of the last commits, the compiler options and the versions of the linked libraries:
+
+```terminal
+$ ./feenox -V
+FeenoX v0.1.24-g6cfe063
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Sun Aug 29 11:34:04 2021 -0300
+Build date         : Sun Aug 29 11:44:50 2021 -0300
+Build architecture : linux-gnu x86_64
+Compiler           : gcc (Ubuntu 10.3.0-1ubuntu1) 10.3.0
+Compiler flags     : -O3
+Builder            : gtheler@chalmers
+GSL version        : 2.6
+SUNDIALS version   : 4.1.0
+PETSc version      : Petsc Release Version 3.14.5, Mar 03, 2021 
+PETSc arch         : 
+PETSc options      : --build=x86_64-linux-gnu --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --with-option-checking=0 --with-silent-rules=0 --libdir=${prefix}/lib/x86_64-linux-gnu --runstatedir=/run --with-maintainer-mode=0 --with-dependency-tracking=0 --with-debugging=0 --shared-library-extension=_real --with-shared-libraries --with-pic=1 --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-cxx-dialect=C++11 --with-opencl=1 --with-blas-lib=-lblas --with-lapack-lib=-llapack --with-scalapack=1 --with-scalapack-lib=-lscalapack-openmpi --with-ptscotch=1 --with-ptscotch-include=/usr/include/scotch --with-ptscotch-lib="-lptesmumps -lptscotch -lptscotcherr" --with-fftw=1 --with-fftw-include="[]" --with-fftw-lib="-lfftw3 -lfftw3_mpi" --with-superlu_dist=1 --with-superlu_dist-include=/usr/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-hdf5-include=/usr/include/hdf5/openmpi --with-hdf5-lib="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lhdf5 -lmpi" --CXX_LINKER_FLAGS=-Wl,--no-as-needed --with-hypre=1 --with-hypre-include=/usr/include/hypre --with-hypre-lib=-lHYPRE_core --with-mumps=1 --with-mumps-include="[]" --with-mumps-lib="-ldmumps -lzmumps -lsmumps -lcmumps -lmumps_common -lpord" --with-suitesparse=1 --with-suitesparse-include=/usr/include/suitesparse --with-suitesparse-lib="-lumfpack -lamd -lcholmod -lklu" --with-superlu=1 --with-superlu-include=/usr/include/superlu --with-superlu-lib=-lsuperlu --prefix=/usr/lib/petscdir/petsc3.14/x86_64-linux-gnu-real --PETSC_ARCH=x86_64-linux-gnu-real CFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC" CXXFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC" FCFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fPIC -ffree-line-length-0" FFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fPIC -ffree-line-length-0" CPPFLAGS="-Wdate-time -D_FORTIFY_SOURCE=2" LDFLAGS="-Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -fPIC" MAKEFLAGS=w
+SLEPc version      : SLEPc Release Version 3.14.2, Feb 01, 2021
+$
+```
+
+
 ## Test suite
+
+After t
 
 ## Install
 
