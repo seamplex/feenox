@@ -354,10 +354,10 @@ int feenox_init_special_objects(void) {
   feenox_special_var(on_gsl_error) = feenox_get_or_define_variable_get_ptr("on_gsl_error");
 
 
-///va+on_ida_error+name on_ida_error
+///va+on_ida_error+name on_sundials_error
 ///va+on_ida_error+desc This should be set to a mask that indicates how to proceed if an error ir raised in any
-///va+on_ida_error+desc routine of the SUNDIALS IDA Library. 
-  feenox_special_var(on_ida_error) = feenox_get_or_define_variable_get_ptr("on_ida_error");
+///va+on_ida_error+desc routine of the SUNDIALS Library. 
+  feenox_special_var(on_ida_error) = feenox_get_or_define_variable_get_ptr("on_sundials_error");
 
   dummy = feenox_get_or_define_variable_get_ptr("quit");
   feenox_var_value(dummy) = 0;
@@ -452,7 +452,7 @@ int feenox_init_before_run(void) {
   feenox.time_path_current = feenox.time_paths;
   
   
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
   // el cuento es asi: cuando hacemos estudios parametricos, las condiciones
   // iniciales se vuelven a calcular porque ponemos t = 0
   // pero las derivadas valen lo ultimo que valian al terminar el paso anterior

@@ -377,7 +377,7 @@ void feenox_free_m4(void) {
 }
 void feenox_free_dae(void) {
 
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
   dae_t *dae, *tmp;
   
   if (feenox_dae.daes != NULL) {

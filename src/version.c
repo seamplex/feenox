@@ -46,7 +46,7 @@ inputfile, i.e.\n\
 #include <readline/readline.h>
 #endif
 
-#if HAVE_IDA
+#if HAVE_SUNDIALS
 #include <sundials/sundials_version.h>
 #endif
 
@@ -169,13 +169,13 @@ void feenox_longversion(void) {
   
   printf("GSL version        : %s\n", gsl_version);
   
-#if HAVE_IDA
+#if HAVE_SUNDIALS
   char *sundials_version = malloc(BUFFER_TOKEN_SIZE);
   SUNDIALSGetVersion(sundials_version, BUFFER_TOKEN_SIZE);
 #else
   char *sundials_version = "N/A";
 #endif
-  printf("SUNDIALs version   : %s\n", sundials_version);
+  printf("SUNDIALS version   : %s\n", sundials_version);
   
 //   printf("Readline version   : %s\n", 
 // #if HAVE_READLINE

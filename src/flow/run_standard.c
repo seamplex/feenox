@@ -63,7 +63,7 @@ int feenox_run_standard(void) {
   feenox_special_var_value(step_static) = 0;
 
   
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
   double ida_step_dt = INFTY;
 #endif
   double t_old = 0;
@@ -157,8 +157,7 @@ int feenox_run_standard(void) {
       
     } else if (feenox.dae.dimension != 0) {
       
-#ifdef HAVE_IDA
-        
+#ifdef HAVE_SUNDIALS
       feenox_call(feenox_step(feenox.instructions, feenox.dae.instruction));
       // integration step
       // remember what the time was so we can then compute dt

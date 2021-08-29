@@ -88,39 +88,39 @@ AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
 
 
 ######################
-# check for SUNDIALS IDA (optional)
+# check for SUNDIALS (optional)
 # the default is read from the macro argument, but the help string
 # does not expand variables so it always states that it is "check"
 AC_ARG_WITH(
-  [ida],
-  AS_HELP_STRING([--with-ida], [use SUNDIALS IDA to solve DAEs @<:@default=check@:>@]),
+  [sudials],
+  AS_HELP_STRING([--with-sundials], [use SUNDIALS to solve DAEs @<:@default=check@:>@]),
   [],
-  [with_ida=check]
+  [with_sundials=check]
 )
 
  
-have_ida="no"
-AS_IF([test "x${with_ida}" != "xno"] , [
+have_sundials="no"
+AS_IF([test "x${with_sundials}" != "xno"] , [
   AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
     [],
-    AS_IF([test "x${with_ida}" != "xcheck"], AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev headers failed]))
+    AS_IF([test "x${with_sundials}" != "xcheck"], AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev headers failed]))
   )
   AC_CHECK_LIB([sundials_ida], [IDAInit],
     [],
-    AS_IF([test "x${with_ida}" != "xcheck"],
-      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev libray failed])
+    AS_IF([test "x${with_sundials}" != "xcheck"],
+      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
     )
   )  
   AC_CHECK_HEADER([nvector/nvector_serial.h],
     [],
-    AS_IF([test "x${with_ida}" != "xcheck"],
-      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev libray failed])
+    AS_IF([test "x${with_sundials}" != "xcheck"],
+      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
     )
   )
   AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
     [],
-    AS_IF([test "x${with_ida}" != "xcheck"],
-      AC_MSG_FAILURE([--with-ida was given, but test for libsundials-dev libray failed])
+    AS_IF([test "x${with_sundials}" != "xcheck"],
+      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
     )  
   )
 ])
@@ -131,8 +131,8 @@ AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
             "x${ac_cv_lib_sundials_nvecserial_N_VNew_Serial}" = "xyes" -a \
             "x${ac_cv_header_nvector_nvector_serial_h}" = "xyes"],
   [
-    AC_DEFINE(HAVE_IDA)
-    have_ida="yes"
+    AC_DEFINE(HAVE_SUNDIALS)
+    have_sundials="yes"
   ]
 )
   
@@ -374,7 +374,7 @@ AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AS_BOX([Summary of dependencies])
 AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
 #AS_ECHO(  ["  Readline                ${have_readline}"])
-AS_ECHO(  ["  SUNDIALS IDA            ${have_ida}"])
+AS_ECHO(  ["  SUNDIALS                ${have_sundials}"])
 AS_ECHO_N(["  PETSc                   ${have_petsc}"])
 AS_IF([test "x${have_petsc}" = "xyes"],
  AS_ECHO([" ${PETSC_DIR} ${PETSC_ARCH}"]),

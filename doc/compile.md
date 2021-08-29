@@ -7,6 +7,8 @@ titleblock: |
 ...
 
 
+These detailed compilation instructions are aimed at `amd64` Debian-based GNU/Linux distributions. The compilation procedure follows POSIX, so it should work in other operating systems and architectures as well. Distributions not using `apt` for packages (i.e. `yum`) should change the package installation commands (and possibly the package names). The instructions should also work for in MacOS, although the `apt-get` commands should be replaced by `brew` or similar. Same for Windows under [Cygwin](https://www.cygwin.com/), the packages should be installed through the Cygwin installer. WSL was not tested, but should work as well.
+
 # Quickstart
 
 Note that the quickest way to get started is to get an already-compiled statically-linked binary executable. Follow these instructions if that option is not suitable for your workflow.
@@ -140,17 +142,91 @@ There are two ways of getting FeenoX' source code:
  
 ### Git repository
 
-The main Git repository is hosted on GitHub at <https://github.com/seamplex/feenox. It is public so it can be cloned either through HTTPS or SSH without needing any particular credentials. It can also be forked freely. See the  [Programming Guide](programming.md) for details about pull requests and/or write access to the main repository.
+The main Git repository is hosted on GitHub at <https://github.com/seamplex/feenox>. It is public so it can be cloned either through HTTPS or SSH without needing any particular credentials. It can also be forked freely. See the  [Programming Guide](programming.md) for details about pull requests and/or write access to the main repository.
+
+Ideally, the `main` branch should have a usable snapshot. All other branches might contain code that might not compile or might not run or might not be tested. If you find a commit in the main branch that does not pass the tests, please report it in the issue tracker ASAP.
+
+After cloning the repository
+
+```
+git clone https://github.com/seamplex/feenox
+```
+
+\noindent
+the `autogen.sh` script has to be called to bootstrap the working tree, since the `configure` script is not stored in the repository but created from `configure.ac` (which is in the repository) by `autogen`. 
+
+Similarly, after updating the working tree with
+
+```
+git pull
+```
+
+\noindent
+it is recommended to re-run the `autogen.sh` script. It will do a `make clean` and re-compute the version string.
+
 
 
 
 ### Source tarballs
 
- 
+When downloading a source tarball, there is no need to run `autogen.sh` since the `configure` script is already included in the tarball. This method cannot update the working tree. For each new FeenoX release, the whole tarball has to be downloaded again.
 
-## Configuration and compilation
 
-## Run the test suite
+
+## Configuration
+
+To create a proper `Makefile` for the particular architecture, dependencies and compilation options, the script `configure` has to be executed. This procedure follows the [GNU Coding Standards](https://www.gnu.org/prep/standards/). 
+
+
+```terminal
+./configure
+```
+
+Without any particular options, `configure` will check if the mandatory [GNU Scientific Library](https://www.gnu.org/software/gsl/) is available (both its headers and run-time library). If it is not, then the option `--enable-download-gsl` can be used. This option will try to use `wget` (which should be installed) to download a source tarball, uncompress is, configure and compile it. If these steps are sucessfull, this GSL will be statically linked into the resulting FeenoX executable. If there is no internet connection, the `configure` script will say that the download failed. In that case, get the indicated tarball file manually , copy it into the current directory and re-run `./configure`.
+
+The script will also check for the availability of optional dependencies. At the end of the execution, a summary of what was found (or not) is printed in the standard output:
+
+```terminal
+$ ./configure
+[...]
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS IDA            yes
+  PETSc                   yes /usr/lib/petsc 
+  SLEPc                   no
+[...]  
+```
+
+If for some reason one of the optional dependencies is available but FeenoX should not use it, then pass `--without-sudials`, `--without-petsc` and/or `--without-slepc` as arguments. For example
+
+```terminal
+$ ./configure --without-sudials --without-petsc
+[...]
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   no
+  SLEPc                   no
+[...]  
+```
+
+If configure complains about contradicting values from the cached ones, run `autogen.sh` again before `configure` or uncompress the source tarball in a fresh location.
+
+To see all the available options run 
+
+```terminal
+./configure --help
+```
+
+
+
+## Compilation
+
+## Test suite
 
 ## Install
 

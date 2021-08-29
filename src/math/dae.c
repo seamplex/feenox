@@ -194,7 +194,7 @@ char *feenox_find_first_dot(const char *s) {
 
 int feenox_dae_init(void) {
   
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
   if (sizeof(realtype) != sizeof(double)) {
     feenox_push_error_message("SUNDIALS's realtype is not double");
     return FEENOX_ERROR;
@@ -432,7 +432,7 @@ int feenox_dae_init(void) {
 
 int feenox_dae_ic(void) {
   
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
   int err;
 
   if (feenox.dae.initial_conditions_mode == initial_conditions_from_variables) {
@@ -452,7 +452,7 @@ int feenox_dae_ic(void) {
 }
 
 
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
 int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params) {
 
   int i, j, k;

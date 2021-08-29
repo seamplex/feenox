@@ -9,7 +9,8 @@ int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *va
   }  
   double w = feenox_problem_bc_natural_weight(element, v);
   feenox_call(gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi));
-#endif HAVE_PETSC
+#endif
+  
   return FEENOX_OK;
   
 }

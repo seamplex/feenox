@@ -2779,7 +2779,7 @@ int feenox_parse_phase_space(void) {
     feenox_push_error_message("PHASE_SPACE keyword already given");
     return FEENOX_ERROR;
   }
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
   if (sizeof(realtype) != sizeof(double)) {
     feenox_push_error_message("\nSUNDIALS was compiled using a different word size than FeenoX, please recompile with double precision floating point arithmetic.");
     return FEENOX_ERROR;

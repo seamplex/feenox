@@ -55,7 +55,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_version.h>
 
-#if HAVE_IDA
+#if HAVE_SUNDIALS
  #include <ida/ida.h>
  #include <ida/ida_direct.h>
  #include <nvector/nvector_serial.h>
@@ -203,7 +203,7 @@ enum version_type {
 #define feenox_call(function)        if ((function) != FEENOX_OK) return FEENOX_ERROR
 #define feenox_call_null(function)   if ((function) != FEENOX_OK) return NULL
 #define feenox_check_null(function)  if ((function) == NULL) return FEENOX_ERROR
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
  #define ida_call(function)          if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
 #endif
 
@@ -1574,7 +1574,7 @@ struct feenox_t {
       initial_conditions_from_derivatives,
     } initial_conditions_mode;
 
-#if HAVE_IDA
+#if HAVE_SUNDIALS
     N_Vector x;
     N_Vector dxdt;
     N_Vector id;
@@ -1901,7 +1901,7 @@ extern char *feenox_find_first_dot(const char *s);
 extern int feenox_add_dae(const char *lhs, const char *rhs);
 extern int feenox_dae_init(void);
 extern int feenox_dae_ic(void);
-#ifdef HAVE_IDA
+#ifdef HAVE_SUNDIALS
 extern int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params);
 #else
 extern int feenox_ida_dae(void);
