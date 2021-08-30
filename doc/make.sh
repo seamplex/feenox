@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in touch m4 sed pandoc; do
+for i in touch sed pandoc; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -15,26 +15,41 @@ fi
 # main README
 echo "creating main README for Github"
 cd ..
- # TODO: use include as lua and get rid of m4
- m4 doc/header.m4 README.m4 > README.md
- pandoc README.md  -t gfm   -o README.markdown --standalone --toc --reference-links --reference-location=section --lua-filter=doc/not-in-format.lua --lua-filter=doc/include-code-files.lua
- pandoc README.md  -t plain -o README          --standalone --toc --reference-links --reference-location=section --lua-filter=doc/not-in-format.lua --lua-filter=doc/include-code-files.lua
- pandoc TODO.md    -t plain -o TODO
+ pandoc README.md  -t gfm   -o README.markdown  \
+   --standalone --toc --reference-links --reference-location=section \
+   --lua-filter=doc/not-in-format.lua \
+   --lua-filter=doc/include-code-files.lua \
+   --lua-filter=doc/include--files.lua
+   
+ pandoc README.md  -t plain -o README \
+   --standalone --toc --reference-links --reference-location=section \
+   --lua-filter=doc/not-in-format.lua \
+   --lua-filter=doc/include-code-files.lua \
+   --lua-filter=doc/include--files.lua
+   
+  pandoc TODO.md    -t plain -o TODO
 cd doc
 ./pdf.sh ../README
 
 # srs & sds
 echo "creating doc's README"
-pandoc README.md  -t gfm   -o README.markdown --lua-filter=not-in-format.lua --lua-filter=include-code-files.lua --standalone --toc
+pandoc README.md  -t gfm   -o README.markdown \
+  --standalone --toc --reference-links --reference-location=section \
+  --lua-filter=doc/not-in-format.lua \
+  --lua-filter=doc/include-code-files.lua \
+  --lua-filter=doc/include--files.lua
 
 # srs & sds
 echo "creating SRS and SDS markdown"
 cd design
-m4 ../header.m4 srs.m4 > ../srs.md
-m4 ../header.m4 sds.m4 > ../sds.md
+ m4 ../header.m4 srs.m4 > ../srs.md
+ m4 ../header.m4 sds.m4 > ../sds.md
 cd ..
 echo "creating SRS and SDS PDFs"
-pandoc -s srs.md --filter pandoc-crossref --lua-filter=not-in-format.lua --lua-filter=include-code-files.lua --pdf-engine=xelatex --number-sections -o srs.pdf
+pandoc -s srs.md --filter pandoc-crossref --pdf-engine=xelatex --number-sections -o srs.pdf \
+  --lua-filter=doc/not-in-format.lua \
+  --lua-filter=doc/include-code-files.lua \
+  --lua-filter=doc/include--files.lua
 ./pdf.sh sds
 
 echo "creating the reference markdown from the commented sources"
