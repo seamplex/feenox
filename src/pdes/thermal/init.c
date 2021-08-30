@@ -1,8 +1,30 @@
+/*------------ -------------- -------- --- ----- ---   --       -            -
+ *  feenox's routines for the heat equation: initialization
+ *
+ *  Copyright (C) 2021 jeremy theler
+ *
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
+ *
+ *  feenox is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  feenox is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *------------------- ------------  ----    --------  --     -       -         -
+ */
 #include "feenox.h"
 #include "thermal.h"
 extern feenox_t feenox;
 thermal_t thermal;
 
+///pb_thermal+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.
 int feenox_problem_parse_problem_thermal(const char *token) {
 
   // no need to parse anything;
@@ -33,13 +55,18 @@ int feenox_problem_init_parser_thermal(void) {
   
   // thermal is a scalar problem
   feenox.pde.dofs = 1;
+///re_thermal+T+description The temperature field\ $T(\vec{x})$. This is the primary unknown of the problem.  
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-    
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
   feenox_call(feenox_problem_define_solutions());
   feenox.mesh.default_field_location = field_location_nodes;
     
   // heat fluxes
+///re_thermal+qx+description The heat flux field\ $q_x(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial x}$ in the\ $x$ direction. This is a secondary unknown of the problem.  
+///re_thermal+qy+description The heat flux field\ $q_y(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial y}$ in the\ $x$ direction. This is a secondary unknown of the problem.
+///re_thermal+qy+description Only available for two and three-dimensional problems.  
+///re_thermal+qz+description The heat flux field\ $q_z(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial z}$ in the\ $x$ direction. This is a secondary unknown of the problem.  
+///re_thermal+qz+description Only available for three-dimensional problems.
   feenox_call(feenox_problem_define_solution_function("qx", &thermal.qx, 1));
   if (feenox.pde.dim > 1) {
     feenox_call(feenox_problem_define_solution_function("qy", &thermal.qy, 1));
@@ -49,13 +76,12 @@ int feenox_problem_init_parser_thermal(void) {
   }
   
   
-// TODO: document special variables
-///va+T_max+name T_max
-///va+T_max+detail The maximum temperature\ $T_\text{max}$.
+///va_thermal+T_max+name T_max
+///va_thermal+T_max+detail The maximum temperature\ $T_\text{max}$.
   feenox_check_null(thermal.T_max = feenox_define_variable_get_ptr("T_max"));
 
-///va+T_min+name T_min
-///va+T_min+detail The minimum temperature\ $T_\text{min}$.
+///va_thermal+T_min+name T_min
+///va_thermal+T_min+detail The minimum temperature\ $T_\text{min}$.
   feenox_check_null(thermal.T_min = feenox_define_variable_get_ptr("T_min"));
   
 #endif
@@ -79,16 +105,26 @@ int feenox_problem_init_runtime_thermal(void) {
   }
 
   // initialize distributions
-  // TODO: document distributions with triple comments
   // here we just initialize everything, during build we know which
   // of them are mandatory and which are optional
-  
+
+///pr_thermal+k+usage k
+///pr_thermal+k+name k
+///pr_thermal+k+description The thermal conductivity in units of power per length per degree of temperature.
   feenox_distribution_define_mandatory(thermal, k, "k", "thermal conductivity");
   thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
   thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  
   
+///pr_thermal+q'''+usage q'''
+///pr_thermal+q'''+name q'''
+///pr_thermal+q'''+description The volumetric power dissipated in the material in units of power per unit of volume.
+///pr_thermal+q'''+description Default is zero (i.e. no power).
+  
   feenox_call(feenox_distribution_init(&thermal.q, "q'''"));
   if (thermal.q.defined == 0) {
+///pr_thermal+q+usage q
+///pr_thermal+q+name q
+///pr_thermal+q+description Alias for `q'''`
     feenox_call(feenox_distribution_init(&thermal.q, "q"));
   }
   thermal.q.space_dependent = feenox_expression_depends_on_space(thermal.q.dependency_variables);

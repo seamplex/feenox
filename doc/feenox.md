@@ -1,6 +1,6 @@
 ---
 title: FeenoX
-subtitle: a free finite-element thermo-mechanical solver
+subtitle: A free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 desc: a completely free-as-in-freedom finite-element thermo-mechancial solver desinged and implemented following the UNIX principles
 author: Jeremy Theler
 infoname: feenox
@@ -10,22 +10,10 @@ lang: en-US
 # Overview
 
 
-FeenoX is a free and open source tool released under the terms of the GPLv3+ that uses the finite-element method to solve
+Intro from README.
 
- * steady or quasistatic thermo-mechanical problems, or
- * steady or transient heat conduction problems, or
- * modal analysis problems.
-
-<!-- ![Updates, examples, V&V cases and full reference: <https://www.seamplex.com/feenox>](feenox-logo) -->
-
-
-# Background
-
-The content of the README?
 
 # Running `feenox`
-
-Download, compilation, instalaltion.
 
 ## Invocation
 
@@ -40,29 +28,62 @@ The `feenox` executable supports the following options:
 
 TBD
 
+## Compilation
+
 
 # Tutorial
 
-# Verification and validation
+# Examples
 
-## MMS
+# Description
 
-## Benchmarks
+Nouns are definitions.
+Verbs are instructions.
 
-## Comparison with other programs
+The equal sign can be both depending on what's on the left hand side.
 
-# Code description
+Variables. Vectors. Matrices.
+
 
 # Reference
 
-TBD
+## Algebraic expressions
+
+## Special global variables
+
+## Functions
+
+## Functionals
+
+## Vector functions
+
+## General keywords
+
+## Differential-Algebraic Equations
+
+### Keywords
+
+### Variables
+
+
+## Laplace equation
+
+### Keywords
+
+### Variables
+
+### Properties
+
+### Boundary Conditions
+
+### Results
+
 
 \appendix
 
-# Software design specifications
-
-# FeenoX & UNIX
-
-# Contributing 
+# FeenoX & the UNIX Philospohy
 
 # History
+
+history.md
+

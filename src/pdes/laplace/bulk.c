@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's routines for Laplace equation: bulk elements
+ *  feenox's routines for Laplace's equation: bulk elements
  *
  *  Copyright (C) 2021 jeremy theler
  *
