@@ -44,7 +44,6 @@ struct builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTION
     {"vecsum",              1, 1, &feenox_builtin_vecsum},
 };
 
-///fv+vecsize+name vecsize
 ///fv+vecsize+usage vecsize(b)
 ///fv+vecsize+desc Returns the size of vector $\vec{b}$.
 ///fv+vecsize+example vecsize.was
@@ -55,7 +54,6 @@ double feenox_builtin_vecsize(vector_t **arg) {
   return (double)arg[0]->size;
 }
 
-///fv+vecsum+name vecsum
 ///fv+vecsum+usage vecsum(b)
 ///fv+vecsum+math \sum_{i=1}^{\text{vecsize}(\vec{b})} b_i
 ///fv+vecsum+desc Computes the sum of all the components of vector $\vec{b}$.
@@ -78,7 +76,6 @@ double feenox_builtin_vecsum(vector_t **arg) {
 }
 
 
-///fv+vecnorm+name vecnorm
 ///fv+vecnorm+usage vecnorm(b)
 ///fv+vecnorm+math \sqrt{\sum_{i=1}^{\text{vecsize}(\vec{b})} b^2_i}
 ///fv+vecnorm+desc Computes euclidean norm of vector $\vec{b}$. Other norms can be computed explicitly
@@ -101,7 +98,6 @@ double feenox_builtin_vecnorm(vector_t **arg) {
   return sqrt(s);
 }
 
-///fv+vecmin+name vecmin
 ///fv+vecmin+usage vecmin(b)
 ///fv+vecmin+math \min_i b_i
 ///fv+vecmin+desc Returns the smallest element of vector $\vec{b}$, taking into account its sign
@@ -119,7 +115,6 @@ double feenox_builtin_vecmin(vector_t **arg) {
   return y;
 }
 
-///fv+vecmax+name vecmax
 ///fv+vecmax+usage vecmax(b)
 ///fv+vecmax+math \max_i b_i
 ///fv+vecmax+desc Returns the biggest element of vector $\vec{b}$, taking into account its sign
@@ -137,7 +132,6 @@ double feenox_builtin_vecmax(vector_t **arg) {
   return y;
 }
 
-///fv+vecminindex+name vecminindex
 ///fv+vecminindex+usage vecminindex(b)
 ///fv+vecminindex+math i / b_i = \min_i b_i
 ///fv+vecminindex+desc Returns the index of the smallest element of vector $\vec{b}$, taking into account its sign
@@ -155,7 +149,6 @@ double feenox_builtin_vecminindex(vector_t **arg) {
   return y;
 }
 
-///fv+vecmaxindex+name vecmaxindex
 ///fv+vecmaxindex+usage vecmaxindex(b)
 ///fv+vecmaxindex+math i / b_i = \max_i b_i
 ///fv+vecmaxindex+desc Returns the index of the biggest element of vector $\vec{b}$, taking into account its sign
@@ -173,7 +166,6 @@ double feenox_builtin_vecmaxindex(vector_t **arg) {
   return y;
 }
 
-///fv+vecdot+name vecdot
 ///fv+vecdot+usage vecdot(a,b)
 ///fv+vecdot+math \vec{a} \cdot \vec{b} = \sum_{i=1}^{\text{vecsize}(\vec{a})} a_i \cdot b_i
 ///fv+vecdot+desc Computes the dot product between vectors $\vec{a}$ and $\vec{b}$, which should

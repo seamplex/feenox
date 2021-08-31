@@ -37,7 +37,7 @@ for kw in ${kws}; do
 #   echo $kw > /dev/stderr
 
   # keyword
-  echo "##  ${kw}"
+  echo "#  \`${kw}\`"
   echo
   
 #   echo -n '> '
@@ -50,8 +50,9 @@ for kw in ${kws}; do
   if [ -n "${usage}" ]; then
 #     echo -n "\`${usage}\`"
     echo "::: {.usage}"
-    echo "~~~.feenox"
-    grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs | tr @ \\n
+    echo "~~~feenox"
+    grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs -0 | tr \\n " " | tr @ \\n
+    echo
     echo "~~~"
     echo ":::"
     echo
@@ -60,7 +61,7 @@ for kw in ${kws}; do
   # math+figure
   math=$(grep "///${tag}+${kw}+math" ${src} | cut -d" " -f2-)
   if [ -n "${math}" ]; then
-    echo "::: {.not-in-format .man }"
+    echo "::: {.not-in-format .man}"
 #     echo "\$= \displaystyle ${math}\$"
     echo "\$\$${math}\$\$"
     echo ":::"
@@ -157,7 +158,7 @@ EOF
   
     i=$((${i} + 1))
     
-    echo "### Example #${i}, ${ex}"
+    echo "## Example #${i}, ${ex}"
     echo
     echo "~~~feenox"
     cat examples/${ex}
@@ -198,9 +199,9 @@ EOF
       fi
       
     else
-      echo "$ feenox ${ex}"
+      echo "\$ feenox ${ex}"
       feenox ${ex}
-      echo "$"
+      echo "\$"
     fi
     echo "~~~"
     echo

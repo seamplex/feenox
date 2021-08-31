@@ -75,7 +75,7 @@ PRINT T(1/2) log(1+1/2)/log(2)   # print numerical and analytical solutions
 
 ``` terminal
 $ feenox thermal-1d-dirichlet-space-k.fee 
-0.584959    0.584963
+0.584959	0.584963
 $
 ```
 
@@ -98,7 +98,7 @@ PRINT T(1/2) sqrt(1+(3*0.5))-1   # print numerical and analytical solutions
 
 ``` terminal
 $ feenox thermal-1d-dirichlet-temperature-k.fee 
-0.581139    0.581139
+0.581139	0.581139
 $
 ```
 
@@ -206,6 +206,8 @@ the problem to be solved. Some basic rules are
     tools—in particular, [Gmsh][] and [Paraview][] respectively. See
     also [CAEplex][].
 
+<!-- show the same output (NAFEMS LE1?) with Gmsh and Paraview, quads struct/tri unstruct. -->
+
 -   The input files should be [syntactically sugared][] so as to be as
     self-describing as possible.
 
@@ -225,6 +227,8 @@ the problem to be solved. Some basic rules are
     Tinf=1          # non-dimensional reference temperature
     BC right q=sigma*e*(Tinf^4-T(x)^4)
     ```
+
+<!-- dnl this also allows a direct application of the MMS for verification (in addition to being open source!) -->
 
 -   FeenoX should run natively in the cloud and be able to massively
     scale in parallel. See the [Software Requirements Specification][]
@@ -348,14 +352,18 @@ recommended way of getting FeenoX is to compile from source.
 1.  Install mandatory dependencies
 
     ``` terminal
-    sudo apt-get install git gcc make automake autoconf libgsl-dev
+    sudo apt-get install gcc make git automake autoconf libgsl-dev
     ```
+
+    If you cannot install `libgsl-dev` but still have `git` and the
+    build toolchain, you can have the `configure` script to download and
+    compile it for you. See point 4 below.
 
 2.  Install optional dependencies (of course these are *optional* but
     recommended)
 
     ``` terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev libreadline-dev
+    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
     ```
 
 3.  Clone Github repository
@@ -373,7 +381,17 @@ recommended way of getting FeenoX is to compile from source.
     make
     ```
 
-5.  Run test suite (optional, this might take some time)
+    If you cannot (or do not want) to use `libgsl-dev` from a package
+    repository, call `configure` with `--enable-download-gsl`:
+
+    ``` terminal
+    configure --enable-download-gsl
+    ```
+
+    If you do not have Internet access, get the tarball manually, copy
+    it to the same directory as `configure` and run again.
+
+5.  Run test suite (optional)
 
     ``` terminal
     make check

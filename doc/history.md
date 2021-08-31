@@ -35,12 +35,14 @@ Here's a dialog between myself and the teacher, Dr.\ E. at the computer lab as I
 > --- (Me) What's this?   
 > --- (Prof.) The point reactor equations.  
 > --- (Me) It's not. These are the point reactor equations:
+>
 > $$
 > \begin{cases}
 > \dot{\phi}(t) = \displaystyle \frac{\rho(t) - \beta}{\Lambda} \cdot \phi(t) + \sum_{i=1}^{N} \lambda_i \cdot c_i \\
 > \dot{c}_i(t)  = \displaystyle \frac{\beta_i}{\Lambda} \cdot \phi(t) - \lambda_i \cdot c_i
 > \end{cases}
 > $$
+>
 > --- (Me) And in any case, I'd write them like this in a computer:
 >
 > ```

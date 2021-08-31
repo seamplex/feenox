@@ -1,4 +1,4 @@
-##  derivative
+#  `derivative`
 
 Computes the derivative of the expression $f(x)$ 
 given in the first argument with respect to the variable $x$
@@ -16,12 +16,12 @@ Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 
 
 ::: {.usage}
-~~~.feenox
-derivative(f(x), x, a, [h], [p])
+~~~feenox
+derivative(f(x), x, a, [h], [p])  
 ~~~
 :::
 
-::: {.not-in-format .man }
+::: {.not-in-format .man}
 $$\left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} $$
 :::
 

@@ -148,14 +148,14 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_implicit());
       return FEENOX_OK;
       
-///kw+TIME_PATH+usage TIME_PATH
-///kw+TIME_PATH+desc Force time-dependent problems to pass through specific instants of time.
+///kw_dae+TIME_PATH+usage TIME_PATH
+///kw_dae+TIME_PATH+desc Force time-dependent problems to pass through specific instants of time.
     } else if (strcasecmp(token, "TIME_PATH") == 0) {
       feenox_call(feenox_parse_time_path());
       return FEENOX_OK;
       
-///kw+INITIAL_CONDITIONS+usage INITIAL_CONDITIONS
-///kw+INITIAL_CONDITIONS+desc Define how initial conditions of DAE problems are computed.
+///kw_dae+INITIAL_CONDITIONS+usage INITIAL_CONDITIONS
+///kw_dae+INITIAL_CONDITIONS+desc Define how initial conditions of DAE problems are computed.
     } else if (strcasecmp(token, "INITIAL_CONDITIONS") == 0 || strcasecmp(token, "INITIAL_CONDITIONS_MODE") == 0) {
       feenox_call(feenox_parse_initial_conditions());
       return FEENOX_OK;
@@ -257,29 +257,29 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_endif());
       return FEENOX_OK;
 
-///kw+PHASE_SPACE+desc Define the variables, vectors and/or matrices that span the phase space of the DAE system of equations.
-///kw+PHASE_SPACE+usage PHASE_SPACE
+///kw_dae+PHASE_SPACE+desc Asks FeenoX to solve a set of algebraic-differntial equations and define the variables, vectors and/or matrices that span the phase space.
+///kw_dae+PHASE_SPACE+usage PHASE_SPACE
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "PHASE_SPACE") == 0) {
       feenox_call(feenox_parse_phase_space());
       return FEENOX_OK;
 
-///kw+READ_MESH+desc Read an unstructured mesh and (optionally) functions of space-time from a file.
-///kw+READ_MESH+usage READ_MESH
+///kw_pde+READ_MESH+desc Read an unstructured mesh and (optionally) functions of space-time from a file.
+///kw_pde+READ_MESH+usage READ_MESH
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "READ_MESH") == 0) {
       feenox_call(feenox_parse_read_mesh());
       return FEENOX_OK;
 
-///kw+WRITE_MESH+desc Write a mesh and functions of space-time to a file for post-processing.
-///kw+WRITE_MESH+usage WRITE_MESH
+///kw_pde+WRITE_MESH+desc Write a mesh and functions of space-time to a file for post-processing.
+///kw_pde+WRITE_MESH+usage WRITE_MESH
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "WRITE_MESH") == 0) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
-///kw+PROBLEM+desc Sets the problem type that FeenoX has to solve.      
-///kw+PROBLEM+usage PROBLEM
+///kw_pde+PROBLEM+desc Ask FeenoX to solve a partial-differential equation problem.
+///kw_pde+PROBLEM+usage PROBLEM
     } else if (strcasecmp(token, "PROBLEM") == 0) {
 #ifdef HAVE_PETSC      
       feenox_call(feenox_parse_problem());
@@ -289,29 +289,29 @@ int feenox_parse_line(void) {
       return FEENOX_ERROR;
 #endif      
       
-///kw+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
-///kw+PHYSICAL_GROUP+usage PHYSICAL_GROUP
+///kw_pde+PHYSICAL_GROUP_pde+desc Explicitly defines a physical group of elements on a mesh.
+///kw_pde+PHYSICAL_GROUP_pde+usage PHYSICAL_GROUP
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       feenox_call(feenox_parse_physical_group());
       return FEENOX_OK;
 
-///kw+MATERIAL+desc Define a material its and properties to be used in volumes.
-///kw+MATERIAL+usage MATERIAL
+///kw_pde+MATERIAL+desc Define a material its and properties to be used in volumes.
+///kw_pde+MATERIAL+usage MATERIAL
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "MATERIAL") == 0) {
       feenox_call(feenox_parse_material());
       return FEENOX_OK;
 
-///kw+BC+desc Define a boundary condition to be applied to faces, edges and/or vertices.
-///kw+BC+usage BC
+///kw_pde+BC+desc Define a boundary condition to be applied to faces, edges and/or vertices.
+///kw_pde+BC+usage BC
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
       feenox_call(feenox_parse_bc());
       return FEENOX_OK;
       
-///kw+SOLVE_PROBLEM+desc Explicitly solve the PDE problem.
-///kw+SOLVE_PROBLEM+usage SOLVE_PROBLEM
+///kw_pde+SOLVE_PROBLEM+desc Explicitly solve the PDE problem.
+///kw_pde+SOLVE_PROBLEM+usage SOLVE_PROBLEM
     } else if (strcasecmp(token, "SOLVE_PROBLEM") == 0) {
 #ifdef HAVE_PETSC      
       feenox_call(feenox_parse_solve_problem());
@@ -321,15 +321,15 @@ int feenox_parse_line(void) {
       return FEENOX_ERROR;
 #endif      
 
-///kw+INTEGRATE+desc Spatially integrate a function or expression over a mesh (or a subset of it).
-///kw+INTEGRATE+usage INTEGRATE
+///kw_pde+INTEGRATE+desc Spatially integrate a function or expression over a mesh (or a subset of it).
+///kw_pde+INTEGRATE+usage INTEGRATE
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "INTEGRATE") == 0) {
       feenox_call(feenox_parse_integrate());
       return FEENOX_OK;
 
-///kw+FIND_EXTREMA+desc Find and/or compute the absolute extrema of a function or expression over a mesh (or a subset of it).
-///kw+FIND_EXTREMA+usage FIND_EXTREMA
+///kw_pde+FIND_EXTREMA+desc Find and/or compute the absolute extrema of a function or expression over a mesh (or a subset of it).
+///kw_pde+FIND_EXTREMA+usage FIND_EXTREMA
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "FIND_EXTREMA") == 0) {
       feenox_call(feenox_parse_find_extrema());
@@ -342,8 +342,8 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_fit());
       return FEENOX_OK;
       
-///kw+DUMP+desc Dump raw PETSc objects used to solve PDEs into files.
-///kw+DUMP+usage DUMP
+///kw_pde+DUMP+desc Dump raw PETSc objects used to solve PDEs into files.
+///kw_pde+DUMP+usage DUMP
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "DUMP") == 0) {
       feenox_call(feenox_parse_dump());
@@ -446,20 +446,20 @@ int feenox_parse_line(void) {
 /*
 
 // ---- SEMAPHORE ----------------------------------------------------
-///kw+SEMAPHORE+desc Perform either a wait or a post operation on a named shared semaphore.
-///kw+SEMAPHORE+usage [ SEMAPHORE | SEM ]
+//kw+SEMAPHORE+desc Perform either a wait or a post operation on a named shared semaphore.
+//kw+SEMAPHORE+usage [ SEMAPHORE | SEM ]
     } else if ((strcasecmp(token, "SEMAPHORE") == 0) || (strcasecmp(token, "SEM") == 0)) {
 
       struct semaphore_t *semaphore;
       semaphore = calloc(1, sizeof(struct semaphore_t));
       LL_APPEND(feenox.semaphores, semaphore);
 
-///kw+SEMAPHORE+usage <name>
+//kw+SEMAPHORE+usage <name>
       if (feenox_parser_string(&semaphore->name) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
 
-///kw+SEMAPHORE+usage { WAIT | POST }
+//kw+SEMAPHORE+usage { WAIT | POST }
       char *keywords[] = {"WAIT", "POST", ""};
       int values[] = {feenox_sem_wait, feenox_sem_post, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&semaphore->operation));
@@ -471,10 +471,10 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
 // ---- READ / WRITE  ----------------------------------------------------
-///kw+READ+desc Read data (variables, vectors o matrices) from files or shared-memory segments.
-///kw+WRITE+desc Write data (variables, vectors o matrices) to files or shared-memory segments.
-///kw+WRITE+desc See the `READ` keyword for usage details.
-///kw+READ+usage [ READ | WRITE ]
+//kw+READ+desc Read data (variables, vectors o matrices) from files or shared-memory segments.
+//kw+WRITE+desc Write data (variables, vectors o matrices) to files or shared-memory segments.
+//kw+WRITE+desc See the `READ` keyword for usage details.
+//kw+READ+usage [ READ | WRITE ]
     } else if ((strcasecmp(token, "READ") == 0) || (strcasecmp(token, "WRITE") == 0)) {
 
       io_t *io = calloc(1, sizeof(io_t));
@@ -488,7 +488,7 @@ int feenox_parse_line(void) {
 
       while ((token = feenox_get_next_token(NULL)) != NULL) {
         // ---- SHM_OBJECT ---------------------------------------------------------
-///kw+READ+usage [ SHM <name> ]
+//kw+READ+usage [ SHM <name> ]
         if (strcasecmp(token, "SHM") == 0 || strcasecmp(token, "SHM_OBJECT") == 0) {
 
           io->type = io_shm;
@@ -498,7 +498,7 @@ int feenox_parse_line(void) {
           }
 
         // ---- FILE_PATH ----------------------------------------------------
-///kw+READ+usage [ { ASCII_FILE_PATH | BINARY_FILE_PATH } <file_path> ]
+//kw+READ+usage [ { ASCII_FILE_PATH | BINARY_FILE_PATH } <file_path> ]
         } else if (strcasecmp(token, "ASCII_FILE_PATH") == 0 || strcasecmp(token, "BINARY_FILE_PATH") == 0) {
 
           char mode[2];
@@ -517,7 +517,7 @@ int feenox_parse_line(void) {
           feenox_call(feenox_parser_file_path(&io->file, mode));
 
         // ---- FILE ----------------------------------------------------
-///kw+READ+usage [ { ASCII_FILE | BINARY_FILE } <identifier> ]
+//kw+READ+usage [ { ASCII_FILE | BINARY_FILE } <identifier> ]
         } else if (strcasecmp(token, "ASCII_FILE") == 0 || strcasecmp(token, "BINARY_FILE") == 0) {
 
           if (strcasecmp(token, "ASCII_FILE") == 0) {
@@ -531,13 +531,13 @@ int feenox_parse_line(void) {
           }
 
           // ---- FILE ----------------------------------------------------
-///kw+READ+usage [ IGNORE_NULL ]
+//kw+READ+usage [ IGNORE_NULL ]
           } else if (strcasecmp(token, "IGNORE_NULL") == 0) {
 
             io->ignorenull = 1;
 
           } else  {
-///kw+READ+usage [ object_1 object_2 ... object_n ]
+//kw+READ+usage [ object_1 object_2 ... object_n ]
 
           // cosas
           io->n_things++;
@@ -600,10 +600,10 @@ int feenox_parse_line(void) {
 
       
 // --- SOLVE -----------------------------------------------------
-///kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
+//kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
 //TODO: example
 //kw+SOLVE+example solve1.was solve2.was
-///kw+SOLVE+usage SOLVE
+//kw+SOLVE+usage SOLVE
       
     } else if (strcasecmp(token, "SOLVE") == 0) {
 
@@ -613,7 +613,7 @@ int feenox_parse_line(void) {
       solve = calloc(1, sizeof(solve_t));
       LL_APPEND(feenox.solves, solve);
 
-///kw+SOLVE+usage <n> 
+//kw+SOLVE+usage <n> 
       feenox_call(feenox_parser_expression_in_string(&xi));
       if ((solve->n = (int)(xi)) <= 0) {
         feenox_push_error_message("expected a positive number of unknowns instead of %d", solve->n);
@@ -625,7 +625,7 @@ int feenox_parse_line(void) {
       solve->guess = calloc(solve->n, sizeof(expr_t));
 
       while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+SOLVE+usage UNKNOWNS <var_1> <var_2> ... <var_n>
+//kw+SOLVE+usage UNKNOWNS <var_1> <var_2> ... <var_n>
         if (strcasecmp(token, "UNKNOWNS") == 0) {
           for (i = 0; i < solve->n; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
@@ -636,7 +636,7 @@ int feenox_parse_line(void) {
             }
           }
           
-///kw+SOLVE+usage RESIDUALS <expr_1> <expr_2> ... <expr_n> ]
+//kw+SOLVE+usage RESIDUALS <expr_1> <expr_2> ... <expr_n> ]
         } else if (strcasecmp(token, "RESIDUALS") == 0) {
           for (i = 0; i < solve->n; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
@@ -645,7 +645,7 @@ int feenox_parse_line(void) {
             feenox_call(feenox_parse_expression(token, &solve->residual[i]));
           }
       
-///kw+SOLVE+usage GUESS <expr_1> <expr_2> ... <expr_n> ]
+//kw+SOLVE+usage GUESS <expr_1> <expr_2> ... <expr_n> ]
         } else if (strcasecmp(token, "GUESS") == 0) {
           for (i = 0; i < solve->n; i++) {
             if ((token = feenox_get_next_token(NULL)) == NULL) {
@@ -654,7 +654,7 @@ int feenox_parse_line(void) {
             feenox_call(feenox_parse_expression(token, &solve->guess[i]));
           }
       
-///kw+SOLVE+usage [ METHOD
+//kw+SOLVE+usage [ METHOD
         } else if (strcasecmp(token, "METHOD") == 0) {
 
           if ((token = feenox_get_next_token(NULL)) == NULL) {
@@ -662,33 +662,33 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-///kw+SOLVE+usage {
-///kw+SOLVE+usage dnewton |
+//kw+SOLVE+usage {
+//kw+SOLVE+usage dnewton |
           if (strcasecmp(token, "dnewton") == 0) {
             solve->type = gsl_multiroot_fsolver_dnewton;
-///kw+SOLVE+usage hybrid |
+//kw+SOLVE+usage hybrid |
           } else if (strcasecmp(token, "hybrid") == 0) {
             solve->type = gsl_multiroot_fsolver_hybrid;
-///kw+SOLVE+usage hybrids |
+//kw+SOLVE+usage hybrids |
           } else if (strcasecmp(token, "hybrids") == 0) {
             solve->type = gsl_multiroot_fsolver_hybrids;
-///kw+SOLVE+usage broyden }
+//kw+SOLVE+usage broyden }
           } else if (strcasecmp(token, "broyden") == 0) {
             solve->type = gsl_multiroot_fsolver_hybrid;
           }
-///kw+SOLVE+usage ]
+//kw+SOLVE+usage ]
           
-///kw+SOLVE+usage [ EPSABS <expr> ]
+//kw+SOLVE+usage [ EPSABS <expr> ]
         } else if (strcasecmp(token, "EPSABS") == 0) {
 
           feenox_call(feenox_parser_expression(&solve->epsabs));
 
-///kw+SOLVE+usage [ EPSREL <expr> ]
+//kw+SOLVE+usage [ EPSREL <expr> ]
         } else if (strcasecmp(token, "EPSREL") == 0) {
 
           feenox_call(feenox_parser_expression(&solve->epsrel));
 
-///kw+SOLVE+usage [ MAX_ITER <expr> ]
+//kw+SOLVE+usage [ MAX_ITER <expr> ]
         } else if (strcasecmp(token, "MAX_ITER") == 0) {
 
           feenox_call(feenox_parser_expression_in_string(&xi));
@@ -697,7 +697,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-///kw+SOLVE+usage [ VERBOSE ]
+//kw+SOLVE+usage [ VERBOSE ]
         } else if (strcasecmp(token, "VERBOSE") == 0) {
 
           solve->verbose = 1;          
@@ -725,8 +725,8 @@ int feenox_parse_line(void) {
       return FEENOX_OK;      
 
 // --- M4 -----------------------------------------------------
-///kw+M4+desc Call the `m4` macro processor with definitions from feenox variables or expressions.
-///kw+M4+usage M4
+//kw+M4+desc Call the `m4` macro processor with definitions from feenox variables or expressions.
+//kw+M4+usage M4
     } else if (strcasecmp(token, "M4") == 0) {
 
       m4_t *m4;
@@ -735,23 +735,23 @@ int feenox_parse_line(void) {
 
       while ((token = feenox_get_next_token(NULL)) != NULL) {
         
-///kw+M4+usage { INPUT_FILE <file_id> |
+//kw+M4+usage { INPUT_FILE <file_id> |
         if (strcasecmp(token, "INPUT_FILE") == 0) {
           feenox_call(feenox_parser_file(&m4->input_file));
           
-///kw+M4+usage FILE_PATH <file_path> }
+//kw+M4+usage FILE_PATH <file_path> }
         } else if (strcasecmp(token, "INPUT_FILE_PATH") == 0) {
           feenox_call(feenox_parser_file_path(&m4->input_file, "r"));
 
-///kw+M4+usage { OUTPUT_FILE <file_id> |
+//kw+M4+usage { OUTPUT_FILE <file_id> |
         } else if (strcasecmp(token, "OUTPUT_FILE") == 0) {
           feenox_call(feenox_parser_file(&m4->output_file));
           
-///kw+M4+usage OUTPUT_FILE_PATH <file_path> }
+//kw+M4+usage OUTPUT_FILE_PATH <file_path> }
         } else if (strcasecmp(token, "OUTPUT_FILE_PATH") == 0) {
           feenox_call(feenox_parser_file_path(&m4->output_file, "w"));
 
-///kw+M4+usage [ EXPAND <name> ] ... }
+//kw+M4+usage [ EXPAND <name> ] ... }
         } else if (strcasecmp(token, "EXPAND") == 0) {
           
           m4_macro_t *macro = calloc(1, sizeof(m4_macro_t));
@@ -764,7 +764,7 @@ int feenox_parse_line(void) {
             return FEENOX_ERROR;
           }
 
-///kw+M4+usage [ MACRO <name> [ <format> ] <definition> ] ... }
+//kw+M4+usage [ MACRO <name> [ <format> ] <definition> ] ... }
         } else if (strcasecmp(token, "MACRO") == 0) {
           
           m4_macro_t *macro = calloc(1, sizeof(m4_macro_t));
@@ -809,15 +809,15 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
 // --- SHELL -----------------------------------------------------
-///kw+SHELL+desc Execute a shell command.
-///kw+SHELL+usage SHELL
+//kw+SHELL+desc Execute a shell command.
+//kw+SHELL+usage SHELL
     } else if (strcasecmp(token, "SHELL") == 0) {
 
       shell_t *shell;
       shell = calloc(1, sizeof(shell_t));
       LL_APPEND(feenox.shells, shell);
 
-///kw+SHELL+usage <print_format> [ expr_1 expr_2 ... expr_n ]
+//kw+SHELL+usage <print_format> [ expr_1 expr_2 ... expr_n ]
       if (feenox_parser_string_format(&shell->format, &shell->n_args) != FEENOX_OK) {
         return FEENOX_ERROR;
       }
@@ -836,21 +836,21 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
 // ----- HISTORY  -----------------------------------------------------------------
-///kw+HISTORY+desc Record the time history of a variable as a function of time.
-///kw+HISTORY+usage HISTORY
+//kw+HISTORY+desc Record the time history of a variable as a function of time.
+//kw+HISTORY+usage HISTORY
     } else if ((strcasecmp(token, "HISTORY") == 0)) {
 
       history_t *history;
       history = calloc(1, sizeof(history_t));
       LL_APPEND(feenox.histories, history);
 
-///kw+HISTORY+usage <variable>
+//kw+HISTORY+usage <variable>
       // el nombre de la variable
       if (feenox_parser_variable(&history->variable)) {
         return FEENOX_ERROR;
       }
 
-///kw+HISTORY+usage <function>
+//kw+HISTORY+usage <function>
       // el nombre de la funcion
       if ((token = feenox_get_next_token(NULL)) == NULL) {
         feenox_push_error_message("expected function name");
@@ -869,373 +869,7 @@ int feenox_parse_line(void) {
       }
 
       return FEENOX_OK;
-
-    // ----- PARAMETRIC  -----------------------------------------------------------------
-///kw+PARAMETRIC+desc Systematically sweep a zone of the parameter space, i.e. perform a parametric run.
-    } else if ((strcasecmp(token, "PARAMETRIC") == 0)) {
-
-      varlist_t *varlist = NULL;
-      varlist_t *varitem, *tmp;
-      
-      double xi;
-      // suponemos que type = linear
-      feenox.parametric.type = parametric_linear;
-      feenox.parametric_mode = 1;
-
-///kw+PARAMETRIC+usage PARAMETRIC
-///kw+PARAMETRIC+usage <var_1> [ ... <var_n> ]
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        
-        if (strcasecmp(token, "TYPE") == 0) {
-///kw+PARAMETRIC+usage [ TYPE { linear  | logarithmic  | random  | gaussianrandom  | sobol  | niederreiter  | halton  | reversehalton } ]
-          char *keywords[] = {"linear", "logarithmic", "random", "gaussianrandom", "sobol", "niederreiter", "halton", "reversehalton", ""};
-          int values[] = {parametric_linear,
-                          parametric_logarithmic,
-                          parametric_random,
-                          parametric_gaussianrandom,
-                          parametric_sobol,
-                          parametric_niederreiter,
-                          parametric_halton,
-                          parametric_reversehalton,
-                          0};
-          
-          feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.parametric.type));
-          
-///kw+PARAMETRIC+usage [ MIN <num_expr_1> ... <num_expr_n> ]
-        } else if (strcasecmp(token, "MIN") == 0) {
-
-          if (feenox.parametric.dimensions == 0) {
-            feenox_push_error_message("MIN before variables, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          feenox_call(feenox_parser_expressions(&feenox.parametric.range.min, feenox.parametric.dimensions));
-
-///kw+PARAMETRIC+usage [ MAX <num_expr_1> ... <num_expr_n> ]
-        } else if (strcasecmp(token, "MAX") == 0) {
-
-          if (feenox.parametric.dimensions == 0) {
-            feenox_push_error_message("MAX before variables, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          feenox_call(feenox_parser_expressions(&feenox.parametric.range.max, feenox.parametric.dimensions));
-          
-///kw+PARAMETRIC+usage [ STEP <num_expr_1> ... <num_expr_n> ]
-        } else if (strcasecmp(token, "STEP") == 0) {
-
-          if (feenox.parametric.dimensions == 0) {
-            feenox_push_error_message("STEP before variables, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          feenox_call(feenox_parser_expressions(&feenox.parametric.range.step, feenox.parametric.dimensions));
-
-///kw+PARAMETRIC+usage [ NSTEPS <num_expr_1> ... <num_expr_n> ]
-        } else if (strcasecmp(token, "NSTEPS") == 0) {
-
-          if (feenox.parametric.dimensions == 0) {
-            feenox_push_error_message("NSTEPS before variables, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          feenox_call(feenox_parser_expressions(&feenox.parametric.range.nsteps, feenox.parametric.dimensions));
-
-///kw+PARAMETRIC+usage [ OUTER_STEPS <num_expr> ]
-        } else if (strcasecmp(token, "OUTER_STEPS") == 0) {
-
-          feenox_call(feenox_parser_expression_in_string(&xi));
-          if ((feenox.parametric.outer_steps = (int)xi) <= 0) {
-            feenox_push_error_message("OUTER_STEPS has to be positive");
-            return FEENOX_ERROR;
-          }
-
-///kw+PARAMETRIC+usage [ MAX_DAUGHTERS <num_expr>  ]
-        } else if (strcasecmp(token, "MAX_DAUGHTERS") == 0) {
-
-          feenox_call(feenox_parser_expression_in_string(&xi));
-          feenox.parametric.max_daughters = (int)(ceil(xi));
-
-///kw+PARAMETRIC+usage [ OFFSET <num_expr> ]
-        } else if (strcasecmp(token, "OFFSET") == 0) {
-          feenox_call(feenox_parser_expression_in_string(&xi));
-          if ((feenox.parametric.offset = (int)(round(xi))) < 0) {
-            feenox_push_error_message("expected a non-negative offset");
-            return FEENOX_ERROR;
-          }
-
-///kw+PARAMETRIC+usage [ ADIABATIC ]
-        } else if (strcasecmp(token, "ADIABATIC") == 0) {
-            feenox.parametric.adiabatic = 1;
-
-        } else {
-
-          if (feenox.parametric.range.min != NULL ||
-              feenox.parametric.range.max != NULL ||
-              feenox.parametric.range.step != NULL  ||
-              feenox.parametric.range.nsteps != NULL) {
-
-            feenox_push_error_message("already given MIN, MAX, STEP or NSTEPS, cannot add variable '%s' to the parametric list", token);
-            return FEENOX_ERROR;
-          }
-          
-          
-          varitem = calloc(1, sizeof(varlist_t));
-          if ((varitem->var = feenox_get_variable_ptr(token)) == NULL) {
-            if ((varitem->var = feenox_define_variable(token)) == NULL) {
-              return FEENOX_ERROR;
-            }
-          } 
-          
-          LL_APPEND(varlist, varitem);
-          feenox.parametric.dimensions++;
-
-        }
-      }
-
-      if (feenox.parametric.dimensions == 0) {
-        feenox_push_error_message("no parametric variables given");
-        return FEENOX_ERROR;
-      }
-      
-      feenox.parametric.variable = calloc(feenox.parametric.dimensions, sizeof(var_t *));
-          
-      varitem = varlist;
-      for (i = 0; i < feenox.parametric.dimensions; i++) {
-        feenox.parametric.variable[i] = varitem->var;
-        if ((varitem = varitem->next) == NULL && i != feenox.parametric.dimensions-1) {
-          feenox_push_error_message("internal mismatch in number of fit parameter %d", i);
-          return FEENOX_ERROR;
-        }
-      }
-      
-      if (feenox_define_instruction(feenox_instruction_parametric, NULL) == NULL) {
-        return FEENOX_ERROR;
-      }
-      LL_FOREACH_SAFE(varlist, varitem, tmp) {
-        LL_DELETE(varlist, varitem);
-        feenox_free(varitem);
-      }
-      return FEENOX_OK;
-
-
-    // ----- MINIMIZE  -----------------------------------------------------------------
-///kw+MINIMIZE+usage MINIMIZE
-///kw+MINIMIZE+desc Find the combination of arguments that give a (relative) minimum of a function.
-    } else if (strcasecmp(token, "MINIMIZE") == 0 || strcasecmp(token, "OPTIMIZE") == 0) {
-
-      // ponemos esto en true porque normalmente no queremos que imprima todo el chorizo
-      feenox.min_mode = 1;
-
-///kw+MINIMIZE+usage <function>@
-///kw+FIT+detail The combination of arguments that minimize the function are computed and stored in the variables.
-///kw+FIT+detail So if `f(x,y)` is to be minimized, after a `MINIMIZE f` both `x` and `y` would have the appropriate values.
-      if ((token = feenox_get_next_token(NULL)) == NULL) {
-        feenox_push_error_message("expected a function");
-        return FEENOX_ERROR;
-      }
-      if ((feenox.min.function = feenox_get_function_ptr(token)) == NULL) {
-        if (strchr(token, '(') != NULL) {
-          feenox_push_error_message("function '%s' undefined (only the function name should be provided, do not include its arguments)", token);
-        } else {
-          feenox_push_error_message("function '%s' undefined", token);
-        }
-        return FEENOX_ERROR;
-      }
-
-      feenox.min.n = feenox.min.function->n_arguments;
-      feenox.min.x = calloc(feenox.min.n, sizeof(var_t *));
-      for (i = 0; i < feenox.min.n; i++) {
-        feenox.min.x[i] = feenox.min.function->var_argument[i];
-      }
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+MINIMIZE+usage [ METHOD {
-///kw+FIT+detail The details of the method used can be found in [GSL’s documentation](https:\/\/www.gnu.org/software/gsl/doc/html/multimin.html).
-///kw+FIT+detail Some of them use derivatives and some of them do not.
-///kw+FIT+detail Default method is `DEFAULT_MINIMIZER_METHOD`, which does not need derivatives.
-        if (strcasecmp(token, "METHOD") == 0 || strcasecmp(token, "ALGORITHM") == 0) {
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected algorithm name");
-            return FEENOX_ERROR;
-          }
-
-///kw+MINIMIZE+usage nmsimplex2 |
-          } else if (strcasecmp(token, "nmsimplex2") == 0) {
-            feenox.min.f_type = gsl_multimin_fminimizer_nmsimplex2;
-///kw+MINIMIZE+usage nmsimplex |
-          } else if (strcasecmp(token, "nmsimplex") == 0) {
-            feenox.min.f_type = gsl_multimin_fminimizer_nmsimplex;
-///kw+MINIMIZE+usage nmsimplex2rand |
-          } else if (strcasecmp(token, "nmsimplex2rand") == 0) {
-            feenox.min.f_type = gsl_multimin_fminimizer_nmsimplex2rand;
-///kw+MINIMIZE+usage conjugate_fr |
-          if (strcasecmp(token, "conjugate_fr") == 0) {
-            feenox.min.fdf_type = gsl_multimin_fdfminimizer_conjugate_fr;
-///kw+MINIMIZE+usage conjugate_pr |
-          } else if (strcasecmp(token, "conjugate_pr") == 0) {
-            feenox.min.fdf_type = gsl_multimin_fdfminimizer_conjugate_pr;
-///kw+MINIMIZE+usage vector_bfgs2 |
-          } else if (strcasecmp(token, "vector_bfgs2") == 0) {
-            feenox.min.fdf_type = gsl_multimin_fdfminimizer_vector_bfgs2;
-///kw+MINIMIZE+usage vector_bfgs |
-          } else if (strcasecmp(token, "vector_bfgs") == 0) {
-            feenox.min.fdf_type = gsl_multimin_fdfminimizer_vector_bfgs;
-///kw+MINIMIZE+usage steepest_descent}@
-          } else if (strcasecmp(token, "steepest_descent") == 0) {
-            feenox.min.fdf_type = gsl_multimin_fdfminimizer_steepest_descent;
-          } else {
-            feenox_push_error_message("unknown minimization method '%s'", token);
-            return FEENOX_ERROR;
-          }
-
-///kw+MINIMIZE+usage [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]@
-        } else if (strcasecmp(token, "GRADIENT") == 0) {
-
-          feenox.min.gradient = malloc(feenox.min.n * sizeof(expr_t));
-          for (i = 0; i < feenox.min.n; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected an expression");
-              return FEENOX_ERROR;
-            }
-
-            feenox_call(feenox_parse_expression(token, &feenox.min.gradient[i]));
-          }
-
-///kw+MINIMIZE+usage [ GUESS <expr_1> <expr_2> ... <expr_n> ]@
-        } else if (strcasecmp(token, "GUESS") == 0) {
-
-          feenox.min.guess = malloc(feenox.min.n * sizeof(expr_t));
-          for (i = 0; i < feenox.min.n; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected an expression");
-              return FEENOX_ERROR;
-            }
-
-            feenox_call(feenox_parse_expression(token, &feenox.min.guess[i]));
-          }
-
-///kw+MINIMIZE+usage [ MIN <expr_1> <expr_2> ... <expr_n> ]@
-        } else if (strcasecmp(token, "MIN") == 0) {
-
-          if (feenox.min.n == 0) {
-            feenox_push_error_message("MIN before target function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          if (feenox_parser_expressions(&feenox.min.range.min, feenox.min.n) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-///kw+MINIMIZE+usage [ MAX <expr_1> <expr_2> ... <expr_n> ]@
-        } else if (strcasecmp(token, "MAX") == 0) {
-
-          if (feenox.min.n == 0) {
-            feenox_push_error_message("MAX before target function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-
-          if (feenox_parser_expressions(&feenox.min.range.max, feenox.min.n) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-
-///kw+MINIMIZE+usage [ STEP <expr_1> <expr_2> ... <expr_n> ]@
-        } else if (strcasecmp(token, "STEP") == 0) {
-
-          if (feenox.min.n == 0) {
-            feenox_push_error_message("STEP before target function, cannot determine number of arguments");
-            return FEENOX_ERROR;
-          }
-          
-          // los algoritmos con derivadas necesitan un solo step
-          // los sin derivadas necesitan n steps
-          // si fdf_type no es null, entonces estamos con derivadas
-          // igual despues chequeamos que no se mezclen
-          feenox.min.n_steps = (feenox.min.f_type != NULL) ? feenox.min.n : 1;
-          feenox.min.range.step = malloc(feenox.min.n_steps * sizeof(expr_t));
-
-          if (feenox_parser_expressions(&feenox.min.range.step, feenox.min.n_steps) != FEENOX_OK) {
-            return FEENOX_ERROR;
-          }
-        } else if (strcasecmp(token, "VERBOSE") == 0) {
-          feenox.min.verbose = 1;
-
-        } else if (strcasecmp(token, "NORERUN") == 0) {
-          feenox.min.norerun = 1;
-
-        } else {
-
-///kw+MINIMIZE+usage [ MAX_ITER <expr> ]
-///kw+MINIMIZE+usage [ TOL <expr> ]
-///kw+MINIMIZE+usage [ GRADTOL <expr> ]@
-///kw+MINIMIZE+usage [ VERBOSE ]
-///kw+MINIMIZE+usage [ NORERUN ]@
-          // en una sola linea para el generador del lexer de pygments
-          char *keywords[] = {"MAX_ITER", "TOL", "GRADTOL", ""};
-          //, "POPULATION", "GA_STEPS"};
-          expr_t *expressions[] = {
-            &feenox.min.max_iter,
-            &feenox.min.tol,
-            &feenox.min.gradtol,
-//            &feenox.min.population,
-//            &feenox.min.ga_steps
-            NULL,
-          };
-
-          if (feenox_parser_match_keyword_expression(token, keywords, expressions, sizeof(expressions)/sizeof(expr_t *)) == WASORA_PARSER_UNHANDLED) {
-            feenox_push_error_message("unknown keyword '%s'", token);
-            return FEENOX_ERROR;
-          }
-        }
-      }
-
-
-      if (feenox.min.function == NULL && feenox.min.siman_Efunc == NULL) {
-        feenox_push_error_message("nothing to optimize!");
-        return FEENOX_ERROR;
-      }
-
-      if (feenox.min.genetic != 0) {
-        if (feenox.min.range.min == NULL) {
-          feenox_push_error_message("need a MIN keyword for genetic algorithms");
-          return FEENOX_ERROR;
-        }
-
-        if (feenox.min.range.max == NULL) {
-          feenox_push_error_message("need a MAX keyword for genetic algorithms");
-          return FEENOX_ERROR;
-        }
-      }
-
-      if (feenox.min.fdf_type == NULL && feenox.min.f_type == NULL
-       && feenox.min.siman_type == NULL && feenox.min.genetic == 0) {
-        feenox.min.f_type = DEFAULT_MINIMIZER_METHOD;
-      }
-
-      if (feenox.min.siman_Efunc != NULL) {
-        if (feenox.min.siman_init == NULL) {
-          feenox_push_error_message("a siman init routine has to be provided");
-          return FEENOX_ERROR;
-        }
-        if (feenox.min.siman_step == NULL) {
-          feenox_push_error_message("a siman step routine has to be provided");
-          return FEENOX_ERROR;
-        }
-        if (feenox.min.siman_copy == NULL) {
-          feenox_push_error_message("a siman copy routine has to be provided");
-          return FEENOX_ERROR;
-        }
-        if (feenox.min.siman_copy_construct == NULL) {
-          feenox_push_error_message("a siman copy_construct routine has to be provided");
-          return FEENOX_ERROR;
-        }
-        if (feenox.min.siman_destroy == NULL) {
-          feenox_push_error_message("a siman destroy routine has to be provided");
-          return FEENOX_ERROR;
-        }
-      }
-
-      return FEENOX_OK;
+  }
 */
       
 
@@ -1408,14 +1042,14 @@ int feenox_parse_implicit(void) {
 
 int feenox_parse_time_path(void) {
   
-///kw+TIME_PATH+detail The time step `dt` will be reduced whenever the distance between
-///kw+TIME_PATH+detail the current time `t` and the next expression in the list is greater
-///kw+TIME_PATH+detail than `dt` so as to force `t` to coincide with the expressions given.
-///kw+TIME_PATH+detail The list of expresssions should evaluate to a sorted list of values for all times.          
+///kw_dae+TIME_PATH+detail The time step `dt` will be reduced whenever the distance between
+///kw_dae+TIME_PATH+detail the current time `t` and the next expression in the list is greater
+///kw_dae+TIME_PATH+detail than `dt` so as to force `t` to coincide with the expressions given.
+///kw_dae+TIME_PATH+detail The list of expresssions should evaluate to a sorted list of values for all times.          
 
   char *token;
   
-///kw+TIME_PATH+usage <expr_1> [ <expr_2>  [ ... <expr_n> ] ]
+///kw_pde+TIME_PATH+usage <expr_1> [ <expr_2>  [ ... <expr_n> ] ]
   while ((token = feenox_get_next_token(NULL)) != NULL) {
     feenox_call(feenox_add_time_path(token));
   }
@@ -1428,21 +1062,21 @@ int feenox_parse_time_path(void) {
 
 int feenox_parse_initial_conditions(void) {
  
-///kw+INITIAL_CONDITIONS+detail In DAE problems, initial conditions may be either:
-///kw+INITIAL_CONDITIONS+detail @
-///kw+INITIAL_CONDITIONS+detail  * equal to the provided expressions (`AS_PROVIDED`)@
-///kw+INITIAL_CONDITIONS+detail  * the derivatives computed from the provided phase-space variables (`FROM_VARIABLES`)@
-///kw+INITIAL_CONDITIONS+detail  * the phase-space variables computed from the provided derivatives (`FROM_DERIVATIVES`)@
-///kw+INITIAL_CONDITIONS+detail @
-///kw+INITIAL_CONDITIONS+detail In the first case, it is up to the user to fulfill the DAE system at\ $t = 0$.
-///kw+INITIAL_CONDITIONS+detail If the residuals are not small enough, a convergence error will occur.
-///kw+INITIAL_CONDITIONS+detail The `FROM_VARIABLES` option means calling IDA’s `IDACalcIC` routine with the parameter `IDA_YA_YDP_INIT`. 
-///kw+INITIAL_CONDITIONS+detail The `FROM_DERIVATIVES` option means calling IDA’s `IDACalcIC` routine with the parameter IDA_Y_INIT.
-///kw+INITIAL_CONDITIONS+detail Wasora should be able to automatically detect which variables in phase-space are differential and
-///kw+INITIAL_CONDITIONS+detail which are purely algebraic. However, the [`DIFFERENTIAL`] keyword may be used to explicitly define them.
-///kw+INITIAL_CONDITIONS+detail See the (SUNDIALS documentation)[https:/\/computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
+///kw_dae+INITIAL_CONDITIONS+detail In DAE problems, initial conditions may be either:
+///kw_dae+INITIAL_CONDITIONS+detail @
+///kw_dae+INITIAL_CONDITIONS+detail  * equal to the provided expressions (`AS_PROVIDED`)@
+///kw_dae+INITIAL_CONDITIONS+detail  * the derivatives computed from the provided phase-space variables (`FROM_VARIABLES`)@
+///kw_dae+INITIAL_CONDITIONS+detail  * the phase-space variables computed from the provided derivatives (`FROM_DERIVATIVES`)@
+///kw_dae+INITIAL_CONDITIONS+detail @
+///kw_dae+INITIAL_CONDITIONS+detail In the first case, it is up to the user to fulfill the DAE system at\ $t = 0$.
+///kw_dae+INITIAL_CONDITIONS+detail If the residuals are not small enough, a convergence error will occur.
+///kw_dae+INITIAL_CONDITIONS+detail The `FROM_VARIABLES` option means calling IDA’s `IDACalcIC` routine with the parameter `IDA_YA_YDP_INIT`. 
+///kw_dae+INITIAL_CONDITIONS+detail The `FROM_DERIVATIVES` option means calling IDA’s `IDACalcIC` routine with the parameter IDA_Y_INIT.
+///kw_dae+INITIAL_CONDITIONS+detail Wasora should be able to automatically detect which variables in phase-space are differential and
+///kw_dae+INITIAL_CONDITIONS+detail which are purely algebraic. However, the [`DIFFERENTIAL`] keyword may be used to explicitly define them.
+///kw_dae+INITIAL_CONDITIONS+detail See the (SUNDIALS documentation)[https:/\/computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
   
-///kw+INITIAL_CONDITIONS+usage { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
+///kw_dae+INITIAL_CONDITIONS+usage { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
   char *keywords[] = {"AS_PROVIDED",
                       "FROM_VARIABLES",
                       "FROM_DERIVATIVES", ""};
@@ -1799,9 +1433,9 @@ int feenox_parse_function(void) {
       
 /*      
 
-///kw+FUNCTION+usage ROUTINE <name> |
+//kw+FUNCTION+usage ROUTINE <name> |
     } else if (strcasecmp(token, "ROUTINE") == 0) {
-///kw+FUNCTION+detail A function of type `ROUTINE` calls an already-defined user-provided routine using the `CALL` keyword and passes the values of the variables in each required evaluation as a `double *` argument.
+//kw+FUNCTION+detail A function of type `ROUTINE` calls an already-defined user-provided routine using the `CALL` keyword and passes the values of the variables in each required evaluation as a `double *` argument.
 
       function->type = type_routine;
 
@@ -1815,13 +1449,13 @@ int feenox_parse_function(void) {
         return FEENOX_ERROR;
       }
 
-///kw+FUNCTION+usage | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } |
-///kw+FUNCTION+detail If `MESH` is given, the definition points are the nodes or the cells of the mesh.
-///kw+FUNCTION+detail The function arguments should be $(x)$, $(x,y)$ or $(x,y,z)$ matching the dimension the mesh.
-///kw+FUNCTION+detail If the keyword `DATA` is used, a new empty vector of the appropriate size is defined.
-///kw+FUNCTION+detail The elements of this new vector can be assigned to the values of the function at the $i$-th node or cell.
-///kw+FUNCTION+detail If the keyword `VECTOR` is used, the values of the dependent variable are taken to be the values of the already-existing vector.
-///kw+FUNCTION+detail Note that this vector should have the size of the number of nodes or cells the mesh has, depending on whether `NODES` or `CELLS` is given.
+//kw+FUNCTION+usage | MESH <name> { DATA <new_vector_name> | VECTOR <existing_vector_name> } { NODES | CELLS } |
+//kw+FUNCTION+detail If `MESH` is given, the definition points are the nodes or the cells of the mesh.
+//kw+FUNCTION+detail The function arguments should be $(x)$, $(x,y)$ or $(x,y,z)$ matching the dimension the mesh.
+//kw+FUNCTION+detail If the keyword `DATA` is used, a new empty vector of the appropriate size is defined.
+//kw+FUNCTION+detail The elements of this new vector can be assigned to the values of the function at the $i$-th node or cell.
+//kw+FUNCTION+detail If the keyword `VECTOR` is used, the values of the dependent variable are taken to be the values of the already-existing vector.
+//kw+FUNCTION+detail Note that this vector should have the size of the number of nodes or cells the mesh has, depending on whether `NODES` or `CELLS` is given.
 
     } else if (strcasecmp(token, "MESH") == 0) {
 
@@ -1892,10 +1526,10 @@ int feenox_parse_function(void) {
         return FEENOX_ERROR;
       }
 
-///kw+FUNCTION+usage [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ]
-///kw+FUNCTION+usage }
-///kw+FUNCTION+detail If `VECTOR_DATA` is given, a set of $n+1$ vectors of the same size is expected.
-///kw+FUNCTION+detail The first $n+1$ correspond to the arguments and the last one is the function value.
+//kw+FUNCTION+usage [ VECTOR_DATA <vector_1> <vector_2> ... <vector_n> <vector_n+1> ]
+//kw+FUNCTION+usage }
+//kw+FUNCTION+detail If `VECTOR_DATA` is given, a set of $n+1$ vectors of the same size is expected.
+//kw+FUNCTION+detail The first $n+1$ correspond to the arguments and the last one is the function value.
 
     } else if (strcasecmp(token, "VECTOR_DATA") == 0 || strcasecmp(token, "VECTORS") == 0) {
 
@@ -1959,8 +1593,8 @@ int feenox_parse_function(void) {
   }
        
 /*
-///kw+FUNCTION+usage [ SIZES <expr_1> <expr_2> ... <expr_n> ]
-///kw+FUNCTION+detail When requesting `bilinear` interpolation for $n>3$, the number of definition points for each argument variable has to be given with `SIZES`,
+//kw+FUNCTION+usage [ SIZES <expr_1> <expr_2> ... <expr_n> ]
+//kw+FUNCTION+detail When requesting `bilinear` interpolation for $n>3$, the number of definition points for each argument variable has to be given with `SIZES`,
     } else if (strcasecmp(token, "SIZES") == 0) {
 
       function->expr_rectangular_mesh_size = calloc(function->n_arguments, sizeof(expr_t));
@@ -1969,8 +1603,8 @@ int feenox_parse_function(void) {
         feenox_call(feenox_parser_expression(&function->expr_rectangular_mesh_size[i]));
       }
 
-///kw+FUNCTION+usage [ X_INCREASES_FIRST <expr> ]
-///kw+FUNCTION+detail and wether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
+//kw+FUNCTION+usage [ X_INCREASES_FIRST <expr> ]
+//kw+FUNCTION+detail and wether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
     } else if (strcasecmp(token,"X_INCREASES_FIRST") == 0) {
 
       feenox_call(feenox_parser_expression(&function->expr_x_increases_first));
@@ -1981,95 +1615,6 @@ int feenox_parse_function(void) {
     }
   }
 */
-
-/*  
-  // si no nos dieron expresion algebraica, hay que leer e interpolar datos
-  if (function->algebraic_expression.n_tokens == 0) {
-    if (function->type == type_pointwise_file) {
-
-      // si nos dieron un archivo, leemos de ahi
-      FILE *data_file;
-      char data_line[BUFFER_LINE_SIZE];
-      int n_columns;
-
-      if ((data_file = feenox_fopen(function->data_file, "r")) == NULL) {
-        feenox_push_error_message("\"%s\" opening file '%s'", strerror(errno), function->data_file);
-        return FEENOX_ERROR;
-      }
-
-      // contamos cuantas lineas no vacias hay -> ese es el tamanio del size
-      function->data_size = 0;
-      while (feenox_read_data_line(data_file, data_line) != 0) {
-        if (data_line[0] != '\0') {
-          // en la primera vuelta miramos cuantas columnas hay
-          if (function->data_size == 0) {
-            n_columns = 0;
-            token = strtok(data_line, " \t");
-            while (token != NULL) {
-              n_columns++;
-              token = strtok(NULL, " \t");
-            }
-
-            if (n_columns < (nargs+1)) {
-              feenox_push_error_message("at least %d columns expected but %d were given in  file '%s'", nargs+1, n_columns, function->data_file);
-              return FEENOX_ERROR;
-            }
-
-          }
-          function->data_size++;
-        }
-      }
-
-      function->data_argument = calloc(nargs, sizeof(double *));
-      function->data_argument_alloced = 1;
-      for (i = 0; i < nargs; i++) {
-        function->data_argument[i] = calloc(function->data_size, sizeof(double));
-      }
-      function->data_value = calloc(function->data_size, sizeof(double));
-
-      rewind(data_file);
-
-      // ahora leemos los datos
-      j = 0;
-      while (feenox_read_data_line(data_file, data_line) != 0) {
-
-        if (data_line[0] != '\0') {
-          for (i = 0; i < nargs; i++) {
-            if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
-              feenox_push_error_message("wrong-formatted file '%s' at line %d", function->data_file, j+1);
-              return FEENOX_ERROR;
-            }
-            sscanf(token, "%lf", &function->data_argument[i][j]);
-            feenox_free(token);
-
-            //  para poder meter steps o numeros repetidos
-            if (nargs == 1 && j > 0 && gsl_fcmp(function->data_argument[i][j], function->data_argument[i][j-1], 1e-12) == 0) {
-              if (j >= 2) {
-                // si es un step tratamos de manejarlo
-                function->data_argument[i][j] += 0.005*(function->data_argument[i][j-1]-function->data_argument[i][j-2]);
-              } else {
-                // si es el primer punto, lo tiramos
-                function->data_size--;
-                j--;
-              }
-            }
-
-          }
-          if ((token = feenox_get_nth_token(data_line, function->column[i])) == NULL) {
-            feenox_push_error_message("not enough columns in file '%s' at line %d", function->data_file, j+1);
-            return FEENOX_ERROR;
-          }
-          sscanf(token, "%lf", &function->data_value[j]);
-          feenox_free(token);
-
-          j++;
-        }
-      }
-
-      fclose(data_file);
-
-
- */
   
   if (file != NULL) {
     feenox_call(feenox_function_set_file(name, file, columns));
@@ -2554,7 +2099,7 @@ int feenox_parse_print_function(void) {
       }
           
 // TODO: mesh & physical group
-///kw+PRINT_FUNCTION+usage [ PHYSICAL_ENTITY <name> ]
+//kw+PRINT_FUNCTION+usage [ PHYSICAL_ENTITY <name> ]
 /*
     } else if (strcasecmp(token, "PHYSICAL_ENTITY") == 0) {
       char *name;
@@ -2773,7 +2318,7 @@ int feenox_parse_endif(void) {
 
 int feenox_parse_phase_space(void) {
     
-///kw+PHASE_SPACE+usage PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }
+///kw_pde+PHASE_SPACE+usage PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }
 
   if (feenox.dae.dimension != 0) {
     feenox_push_error_message("PHASE_SPACE keyword already given");
@@ -2810,23 +2355,23 @@ int feenox_parse_read_mesh(void) {
   mesh_t *mesh = NULL;
   feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
 
-///kw+READ_MESH+usage { <file_path> | <file_id> }
-///kw+READ_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-///kw+READ_MESH+detail The format is read from the extension, which should be either
-///kw+READ_MESH+detail @
-///kw+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\/\/gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
-///kw+READ_MESH+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
-///kw+READ_MESH+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
-///kw+READ_MESH+detail @
-///kw+READ_MESH+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
-///kw+READ_MESH+detail physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
-///kw+READ_MESH+detail The other formats are primarily supported to read function data contained in the file
-///kw+READ_MESH+detail and eventually, to operate over these functions (i.e. take differences with other functions contained
-///kw+READ_MESH+detail in other files to compare results).
-///kw+READ_MESH+detail The file path or file id can be used to refer to a particular mesh when reading more than one,
-///kw+READ_MESH+detail for instance in a `WRITE_MESH` or `INTEGRATE` keyword.
-///kw+READ_MESH+detail If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
-///kw+READ_MESH+detail `cool_mesh.msh` or just `cool_mesh`.  
+///kw_pde+READ_MESH+usage { <file_path> | <file_id> }
+///kw_pde+READ_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+///kw_pde+READ_MESH+detail The format is read from the extension, which should be either
+///kw_pde+READ_MESH+detail @
+///kw_pde+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\/\/gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
+///kw_pde+READ_MESH+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
+///kw_pde+READ_MESH+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
+///kw_pde+READ_MESH+detail @
+///kw_pde+READ_MESH+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
+///kw_pde+READ_MESH+detail physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
+///kw_pde+READ_MESH+detail The other formats are primarily supported to read function data contained in the file
+///kw_pde+READ_MESH+detail and eventually, to operate over these functions (i.e. take differences with other functions contained
+///kw_pde+READ_MESH+detail in other files to compare results).
+///kw_pde+READ_MESH+detail The file path or file id can be used to refer to a particular mesh when reading more than one,
+///kw_pde+READ_MESH+detail for instance in a `WRITE_MESH` or `INTEGRATE` keyword.
+///kw_pde+READ_MESH+detail If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
+///kw_pde+READ_MESH+detail `cool_mesh.msh` or just `cool_mesh`.  
   feenox_call(feenox_parser_file(&mesh->file));
   if (mesh->file->mode == NULL) {
     feenox_check_alloc(mesh->file->mode = strdup("r"));
@@ -2834,14 +2379,14 @@ int feenox_parse_read_mesh(void) {
     
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+READ_MESH+detail The spatial dimensions cab be given with `DIMENSION`.
-///kw+READ_MESH+detail If material properties are uniform and given with variables,
-///kw+READ_MESH+detail the number of dimensions are not needed and will be read from the file at runtime.
-///kw+READ_MESH+detail But if either properties are given by spatial functions or if functions
-///kw+READ_MESH+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
-///kw+READ_MESH+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
-///kw+READ_MESH+detail how many arguments these functions take. 
-///kw+READ_MESH+usage [ DIMENSIONS <num_expr> ]@
+///kw+READ_MESH_pde+detail The spatial dimensions cab be given with `DIMENSION`.
+///kw+READ_MESH_pde+detail If material properties are uniform and given with variables,
+///kw+READ_MESH_pde+detail the number of dimensions are not needed and will be read from the file at runtime.
+///kw+READ_MESH_pde+detail But if either properties are given by spatial functions or if functions
+///kw+READ_MESH_pde+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
+///kw+READ_MESH_pde+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
+///kw+READ_MESH_pde+detail how many arguments these functions take. 
+///kw+READ_MESH_pde+usage [ DIMENSIONS <num_expr> ]@
     if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -2851,42 +2396,42 @@ int feenox_parse_read_mesh(void) {
         return FEENOX_ERROR;
       }
 
-///kw+READ_MESH+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
-///kw+READ_MESH+usage [ SCALE <expr> ]
+///kw+READ_MESH_pde+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
+///kw+READ_MESH_pde+usage [ SCALE <expr> ]
     } else if (strcasecmp(token, "SCALE") == 0) {
       feenox_call(feenox_parser_expression(&mesh->scale_factor));
 
-///kw+READ_MESH+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
+///kw+READ_MESH_pde+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
     } else if (strcasecmp(token, "OFFSET") == 0) {
       feenox_call(feenox_parser_expression(&mesh->offset_x));
       feenox_call(feenox_parser_expression(&mesh->offset_y));
       feenox_call(feenox_parser_expression(&mesh->offset_z));
 
-///kw+READ_MESH+usage [ INTEGRATION { full | reduced } ]@
+///kw+READ_MESH_pde+usage [ INTEGRATION { full | reduced } ]@
     } else if (strcasecmp(token, "INTEGRATION") == 0) {
       char *keywords[] = {"full", "reduced", ""};
       int values[] = {integration_full, integration_reduced, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
 
-///kw+READ_MESH+detail When defining several meshes and solving a PDE problem, the mesh used
-///kw+READ_MESH+detail as the PDE domain is the one marked with `MAIN`.
-///kw+READ_MESH+detail If none of the meshes is explicitly marked as main, the first one is used.
-///kw+READ_MESH+usage [ MAIN ]
+///kw+READ_MESH_pde+detail When defining several meshes and solving a PDE problem, the mesh used
+///kw+READ_MESH_pde+detail as the PDE domain is the one marked with `MAIN`.
+///kw+READ_MESH_pde+detail If none of the meshes is explicitly marked as main, the first one is used.
+///kw+READ_MESH_pde+usage [ MAIN ]
     } else if (strcasecmp(token, "MAIN") == 0) {
       feenox.mesh.mesh_main = mesh;
 
-///kw+READ_MESH+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
-///kw+READ_MESH+detail each time step. Default is to read the mesh once, except if the file path changes with time.
-///kw+READ_MESH+usage [ UPDATE_EACH_STEP ]@
+///kw+READ_MESH_pde+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
+///kw+READ_MESH_pde+detail each time step. Default is to read the mesh once, except if the file path changes with time.
+///kw+READ_MESH_pde+usage [ UPDATE_EACH_STEP ]@
     } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
       mesh->update_each_step = 1;
 
 
-///kw+READ_MESH+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
-///kw+READ_MESH+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
-///kw+READ_MESH+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
-///kw+READ_MESH+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
-///kw+READ_MESH+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
+///kw+READ_MESH_pde+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+///kw+READ_MESH_pde+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
+///kw+READ_MESH_pde+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
+///kw+READ_MESH_pde+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
+///kw+READ_MESH_pde+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
     } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0) {
 
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
@@ -2929,7 +2474,7 @@ int feenox_parse_read_mesh(void) {
     }
   }
 
-///kw+READ_MESH+detail If no mesh is marked as `MAIN`, the first one is the main one.
+///kw+READ_MESH_pde+detail If no mesh is marked as `MAIN`, the first one is the main one.
   if (feenox.mesh.meshes == NULL) {
     feenox.mesh.mesh_main = mesh;
   }
@@ -2981,10 +2526,10 @@ int feenox_parse_write_mesh(void) {
   mesh_write_t *mesh_write = NULL;
   feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
 
-///kw+MESH_WRITE+usage { <file_path> | <file_id> }
-///kw+MESH_WRITE+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-///kw+MESH_WRITE+detail The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
-///kw+MESH_WRITE+detail be use to give the format explicitly.
+///kw+WRITE_MESH_pde+usage { <file_path> | <file_id> }
+///kw+WRITE_MESH_pde+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+///kw+WRITE_MESH_pde+detail The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
+///kw+WRITE_MESH_pde+detail be use to give the format explicitly.
 
   feenox_call(feenox_parser_file(&mesh_write->file));
   if (mesh_write->file->mode == NULL) {
@@ -2993,9 +2538,9 @@ int feenox_parse_write_mesh(void) {
   
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+MESH_WRITE+usage [ MESH <mesh_identifier> ]
-///kw+MESH_WRITE+detail If there are several meshes defined then which one should be used has to be
-///kw+MESH_WRITE+detail given explicitly with `MESH`.
+///kw+WRITE_MESH_pde+usage [ MESH <mesh_identifier> ]
+///kw+WRITE_MESH_pde+detail If there are several meshes defined then which one should be used has to be
+///kw+WRITE_MESH_pde+detail given explicitly with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       
       char *mesh_name = NULL;
@@ -3007,53 +2552,53 @@ int feenox_parse_write_mesh(void) {
       }
       feenox_free(mesh_name);
           
-///kw+MESH_WRITE+usage [ NO_MESH ]
-///kw+MESH_WRITE+detail If the `NO_MESH` keyword is given, only the results are written into the output file.
-///kw+MESH_WRITE+detail Depending on the output format, this can be used to avoid repeating data and/or
-///kw+MESH_WRITE+detail creating partial output files which can the be latter assembled by post-processing scripts.
+///kw+WRITE_MESH_pde+usage [ NO_MESH ]
+///kw+WRITE_MESH_pde+detail If the `NO_MESH` keyword is given, only the results are written into the output file.
+///kw+WRITE_MESH_pde+detail Depending on the output format, this can be used to avoid repeating data and/or
+///kw+WRITE_MESH_pde+detail creating partial output files which can the be latter assembled by post-processing scripts.
     } else if (strcasecmp(token, "NOMESH") == 0 || strcasecmp(token, "NO_MESH") == 0) {
       mesh_write->no_mesh = 1;
 
-///kw+MESH_WRITE+usage [ FILE_FORMAT { gmsh | vtk } ]
+///kw+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]
     } else if (strcasecmp(token, "FILE_FORMAT") == 0) {
       char *keywords[] = {"gmsh", "vtk", ""};
       int values[] = {post_format_gmsh, post_format_vtk, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
 
-///kw+MESH_WRITE+usage [ NO_PHYSICAL_NAMES ]
-///kw+MESH_WRITE+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
-///kw+MESH_WRITE+detail section that sets the actual names of the physical entities is not written.      
-///kw+MESH_WRITE+detail This can be needed to avoid name clashes when reading multiple `.msh` files.
+///kw+WRITE_MESH_pde+usage [ NO_PHYSICAL_NAMES ]
+///kw+WRITE_MESH_pde+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+///kw+WRITE_MESH_pde+detail section that sets the actual names of the physical entities is not written.      
+///kw+WRITE_MESH_pde+detail This can be needed to avoid name clashes when reading multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
       mesh_write->no_physical_names = 1;
       
-///kw+MESH_WRITE+usage  [ NODE |
-///kw+MESH_WRITE+detail The output is node-based by default. This can be controlled with both the
-///kw+MESH_WRITE+detail `NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
-///kw+MESH_WRITE+detail will be written at the node (cells). These keywords can be used several times
-///kw+MESH_WRITE+detail and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
-///kw+MESH_WRITE+detail write the conductivity and the expression $1+z$ as cell-based and the temperature
-///kw+MESH_WRITE+detail $T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
+///kw+WRITE_MESH_pde+usage  [ NODE |
+///kw+WRITE_MESH_pde+detail The output is node-based by default. This can be controlled with both the
+///kw+WRITE_MESH_pde+detail `NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
+///kw+WRITE_MESH_pde+detail will be written at the node (cells). These keywords can be used several times
+///kw+WRITE_MESH_pde+detail and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
+///kw+WRITE_MESH_pde+detail write the conductivity and the expression $1+z$ as cell-based and the temperature
+///kw+WRITE_MESH_pde+detail $T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
     } else if (strcasecmp(token, "NODE") == 0 || strcasecmp(token, "NODES") == 0) {
       mesh_write->field_location = field_location_nodes;
 
-///kw+MESH_WRITE+usage CELL ]
+///kw+WRITE_MESH+usage CELL ]
     } else if (strcasecmp(token, "CELL") == 0 || strcasecmp(token, "CELLS") == 0) {
       mesh_write->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;
 
-///kw+MESH_WRITE+detail Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
-///kw+MESH_WRITE+detail representation of the fields that follow. Default is `%g`.
-///kw+MESH_WRITE+usage [ SCALAR_FORMAT <printf_specification>]
+///kw+WRITE_MESH_pde+detail Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
+///kw+WRITE_MESH_pde+detail representation of the fields that follow. Default is `%g`.
+///kw+WRITE_MESH_pde+usage [ SCALAR_FORMAT <printf_specification>]
     } else if (strcasecmp(token, "SCALAR_FORMAT") == 0) {
       feenox_call(feenox_parser_string(&mesh_write->printf_format));
       
-///kw+MESH_WRITE+detail The data to be written has to be given as a list of fields,
-///kw+MESH_WRITE+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
-///kw+MESH_WRITE+detail and/or expressions (such as `x^2+y^2+z^2`).
-///kw+MESH_WRITE+detail Each field is written as a scalar, unless the keyword `VECTOR` is given.
-///kw+MESH_WRITE+detail In this case, there should be exactly three fields following `VECTOR`.
-///kw+MESH_WRITE+usage [ VECTOR <field_x> <field_y> <field_z> ] [...]
+///kw+WRITE_MESH_pde+detail The data to be written has to be given as a list of fields,
+///kw+WRITE_MESH_pde+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
+///kw+WRITE_MESH_pde+detail and/or expressions (such as `x^2+y^2+z^2`).
+///kw+WRITE_MESH_pde+detail Each field is written as a scalar, unless the keyword `VECTOR` is given.
+///kw+WRITE_MESH_pde+detail In this case, there should be exactly three fields following `VECTOR`.
+///kw+WRITE_MESH_pde+usage [ VECTOR <field_x> <field_y> <field_z> ] [...]
     } else if (strcasecmp(token, "VECTOR") == 0) {
       
       mesh_write_dist_t *mesh_write_dist = NULL;
@@ -3092,7 +2637,7 @@ int feenox_parse_write_mesh(void) {
           
     } else {
           
-///kw+MESH_WRITE+usage [ <field_1> ] [ <field_2> ] ...
+///kw+WRITE_MESH_pde+usage [ <field_1> ] [ <field_2> ] ...
       mesh_write_dist_t *mesh_write_dist = NULL;
       feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
           
@@ -3169,12 +2714,12 @@ int feenox_parse_write_mesh(void) {
 
 
 int feenox_parse_physical_group(void) {
-///kw+PHYSICAL_GROUP+detail This keyword should seldom be needed. Most of the times,
-///kw+PHYSICAL_GROUP+detail  a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
+///kw+PHYSICAL_GROUP_pde+detail This keyword should seldom be needed. Most of the times,
+///kw+PHYSICAL_GROUP_pde+detail  a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
   
-///kw+PHYSICAL_GROUP+usage <name>
-///kw+PHYSICAL_GROUP+detail The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
-///kw+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction has no effect.
+///kw+PHYSICAL_GROUP_pde+usage <name>
+///kw+PHYSICAL_GROUP_pde+detail The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
+///kw+PHYSICAL_GROUP_pde+detail If there is no physical group with the provided name in the mesh, this instruction has no effect.
   char *name = NULL;
   feenox_call(feenox_parser_string(&name));
 
@@ -3185,46 +2730,46 @@ int feenox_parse_physical_group(void) {
   unsigned int dimension = 0;
   unsigned int id = 0;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+PHYSICAL_GROUP+usage [ MESH <name> ]
-///kw+PHYSICAL_GROUP+detail If there are many meshes, an explicit mesh can be given with `MESH`.
-///kw+PHYSICAL_GROUP+detail Otherwise, the physical group is defined on the main mesh.
+///kw+PHYSICAL_GROUP_pde+usage [ MESH <name> ]
+///kw+PHYSICAL_GROUP_pde+detail If there are many meshes, an explicit mesh can be given with `MESH`.
+///kw+PHYSICAL_GROUP_pde+detail Otherwise, the physical group is defined on the main mesh.
     if (strcasecmp(token, "MESH") == 0) {
       feenox_call(feenox_parser_string(&mesh_name));
 
-///kw+PHYSICAL_GROUP+usage [ DIMENSION <expr> ]
-///kw+PHYSICAL_GROUP+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
+///kw+PHYSICAL_GROUP_pde+usage [ DIMENSION <expr> ]
+///kw+PHYSICAL_GROUP_pde+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
     } else if (strcasecmp(token, "DIMENSION") == 0 || strcasecmp(token, "DIM") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
       dimension = (unsigned int)(round(xi));
 
-///kw+PHYSICAL_GROUP+usage [ ID <expr> ]@
-///kw+PHYSICAL_GROUP+detail An explicit id can be given with `ID`.
-///kw+PHYSICAL_GROUP+detail Both dimension and id should match the values in the mesh.
+///kw+PHYSICAL_GROUP_pde+usage [ ID <expr> ]@
+///kw+PHYSICAL_GROUP_pde+detail An explicit id can be given with `ID`.
+///kw+PHYSICAL_GROUP_pde+detail Both dimension and id should match the values in the mesh.
     } else if (strcasecmp(token, "ID") == 0 || strcasecmp(token, "DIM") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
       id = (unsigned int)(round(xi));
       
-///kw+PHYSICAL_GROUP+usage [ MATERIAL <name> |
-///kw+PHYSICAL_GROUP+detail For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
-///kw+PHYSICAL_GROUP+detail Note that if a material is created with the same name as a physical group in the mesh,
-///kw+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
-///kw+PHYSICAL_GROUP+detail The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
-///kw+PHYSICAL_GROUP+detail in a mesh file and a material in the feenox input file with different names.
-///kw+PHYSICAL_GROUP+detail 
+///kw+PHYSICAL_GROUP_pde+usage [ MATERIAL <name> |
+///kw+PHYSICAL_GROUP_pde+detail For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
+///kw+PHYSICAL_GROUP_pde+detail Note that if a material is created with the same name as a physical group in the mesh,
+///kw+PHYSICAL_GROUP_pde+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+///kw+PHYSICAL_GROUP_pde+detail The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
+///kw+PHYSICAL_GROUP_pde+detail in a mesh file and a material in the feenox input file with different names.
+///kw+PHYSICAL_GROUP_pde+detail 
     } else if (strcasecmp(token, "MATERIAL") == 0) {
       feenox_call(feenox_parser_string(&material_name));
   
-///kw+PHYSICAL_GROUP+usage | BC <name> [ BC ... ] ]@
+///kw+PHYSICAL_GROUP_pde+usage | BC <name> [ BC ... ] ]@
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
-///kw+PHYSICAL_GROUP+detail Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
-///kw+PHYSICAL_GROUP+detail As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
-///kw+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
-///kw+PHYSICAL_GROUP+detail The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
-///kw+PHYSICAL_GROUP+detail in a mesh file and a boundary condition in the feenox input file with different names.
-///kw+PHYSICAL_GROUP+detail Note that while there can be only one `MATERIAL` associated to a physical group,
-///kw+PHYSICAL_GROUP+detail there can be many `BC`s associated to a physical group.
+///kw+PHYSICAL_GROUP_pde+detail Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
+///kw+PHYSICAL_GROUP_pde+detail As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
+///kw+PHYSICAL_GROUP_pde+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+///kw+PHYSICAL_GROUP_pde+detail The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
+///kw+PHYSICAL_GROUP_pde+detail in a mesh file and a boundary condition in the feenox input file with different names.
+///kw+PHYSICAL_GROUP_pde+detail Note that while there can be only one `MATERIAL` associated to a physical group,
+///kw+PHYSICAL_GROUP_pde+detail there can be many `BC`s associated to a physical group.
       feenox_call(feenox_parser_string(&bc_name));
 
     } else {
@@ -3249,8 +2794,8 @@ int feenox_parse_physical_group(void) {
 
 int feenox_parse_material(void) {
 
-///kw+MATERIAL+usage <name>
-///kw+MATERIAL+detail If the name of the material matches a physical group in the mesh, it is automatically linked to that physical group.
+///kw_pde+MATERIAL+usage <name>
+///kw_pde+MATERIAL+detail If the name of the material matches a physical group in the mesh, it is automatically linked to that physical group.
   
   char *material_name = NULL;
   feenox_call(feenox_parser_string(&material_name));
@@ -3262,8 +2807,8 @@ int feenox_parse_material(void) {
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
-///kw+MATERIAL+usage [ MESH <name> ]
-///kw+MATERIAL+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
+///kw_pde+MATERIAL+usage [ MESH <name> ]
+///kw_pde+MATERIAL+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name; 
       feenox_call(feenox_parser_string(&mesh_name));
@@ -3274,9 +2819,9 @@ int feenox_parse_material(void) {
       }
       feenox_free(mesh_name);
           
-///kw+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
-///kw+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
-///kw+MATERIAL+detail added using as many `PHYSICAL_GROUP` keywords as needed. 
+///kw_pde+MATERIAL+usage [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ]
+///kw_pde+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
+///kw_pde+MATERIAL+detail added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
@@ -3293,18 +2838,18 @@ int feenox_parse_material(void) {
       feenox_free(physical_group_name);
         
     } else {
-///kw+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
-///kw+MATERIAL+detail The names of the properties in principle can be arbitrary, but each problem type
-///kw+MATERIAL+detail needs a minimum set of properties defined with particular names.
-///kw+MATERIAL+detail For example, steady-state thermal problems need at least the conductivity which 
-///kw+MATERIAL+detail should be named\ `k`. If the problem is transient, it will also need
-///kw+MATERIAL+detail heat capacity\ `rhocp` or diffusivity\ `alpha`. 
-///kw+MATERIAL+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
-///kw+MATERIAL+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
-///kw+MATERIAL+detail Besides these mandatory properties, any other one can be defined.
-///kw+MATERIAL+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
-///kw+MATERIAL+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
-///kw+MATERIAL+detail be used in the expression that defines the mandatory property.
+///kw_pde+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
+///kw_pde+MATERIAL+detail The names of the properties in principle can be arbitrary, but each problem type
+///kw_pde+MATERIAL+detail needs a minimum set of properties defined with particular names.
+///kw_pde+MATERIAL+detail For example, steady-state thermal problems need at least the conductivity which 
+///kw_pde+MATERIAL+detail should be named\ `k`. If the problem is transient, it will also need
+///kw_pde+MATERIAL+detail heat capacity\ `rhocp` or diffusivity\ `alpha`. 
+///kw_pde+MATERIAL+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
+///kw_pde+MATERIAL+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
+///kw_pde+MATERIAL+detail Besides these mandatory properties, any other one can be defined.
+///kw_pde+MATERIAL+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
+///kw_pde+MATERIAL+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
+///kw_pde+MATERIAL+detail be used in the expression that defines the mandatory property.
       
       char *property_name = NULL;
       char *expr_string = NULL;
@@ -3333,8 +2878,8 @@ int feenox_parse_material(void) {
 
 int feenox_parse_bc(void) {
 
-///kw+BC+usage <name>
-///kw+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
+///kw_pde+BC+usage <name>
+///kw_pde+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
 
   if (feenox.pde.bc_parse == NULL) {
     feenox_push_error_message("BC before setting the PROBLEM type");
@@ -3351,8 +2896,8 @@ int feenox_parse_bc(void) {
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
-///kw+BC+usage [ MESH <name> ]
-///kw+BC+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
+///kw_pde+BC+usage [ MESH <name> ]
+///kw_pde+BC+detail If there are many meshes, the mesh this keyword refers to has to be given with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name; 
       feenox_call(feenox_parser_string(&mesh_name));
@@ -3363,9 +2908,9 @@ int feenox_parse_bc(void) {
       }
       feenox_free(mesh_name);
     
-///kw+BC+usage [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ]
-///kw+BC+detail If the boundary condition applies to more than one physical group in the mesh,
-///kw+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
+///kw_pde+BC+usage [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ]
+///kw_pde+BC+detail If the boundary condition applies to more than one physical group in the mesh,
+///kw_pde+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
@@ -3382,13 +2927,13 @@ int feenox_parse_bc(void) {
       feenox_free(physical_group_name);
         
     } else {
-///kw+BC+usage [ <bc_data1> <bc_data2> ... ]
-///kw+BC+detail Each `<bc_data>` argument is a single string whose meaning depends on the type
-///kw+BC+detail of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
-///kw+BC+detail temperature to depend on space as the provided expression in a
-///kw+BC+detail thermal problem and `fixed` fixes the displacements in all the directions
-///kw+BC+detail in a mechanical or modal problem. 
-///kw+BC+detail See the particular section on boundary conditions for further details.
+///kw_pde+BC+usage [ <bc_data1> <bc_data2> ... ]
+///kw_pde+BC+detail Each `<bc_data>` argument is a single string whose meaning depends on the type
+///kw_pde+BC+detail of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
+///kw_pde+BC+detail temperature to depend on space as the provided expression in a
+///kw_pde+BC+detail thermal problem and `fixed` fixes the displacements in all the directions
+///kw_pde+BC+detail in a mechanical or modal problem. 
+///kw_pde+BC+detail See the particular section on boundary conditions for further details.
       
       if (feenox_add_bc_data_get_ptr(bc, token) == NULL) {
         return FEENOX_ERROR;
@@ -3409,33 +2954,33 @@ int feenox_parse_problem(void) {
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
-///kw+PROBLEM+usage [
+///kw_pde+PROBLEM+usage [
         
-///kw+PROBLEM+usage mechanical
-///kw+PROBLEM+usage |
-///kw+PROBLEM+detail @    
-///kw+PROBLEM+detail  * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
+///kw_pde+PROBLEM+usage mechanical
+///kw_pde+PROBLEM+usage |
+///kw_pde+PROBLEM+detail @    
+///kw_pde+PROBLEM+detail  * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
     if (strcasecmp(token, "laplace") == 0 || strcasecmp(token, "poisson") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_laplace;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_laplace;
     
-///kw+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
-///kw+PROBLEM+detail If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
-///kw+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
+///kw_pde+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
+///kw_pde+PROBLEM+detail If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
+///kw_pde+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
     } else if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
 
-///kw+PROBLEM+usage thermal
-///kw+PROBLEM+usage |
-///kw+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
+///kw_pde+PROBLEM+usage thermal
+///kw_pde+PROBLEM+usage |
+///kw_pde+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
     } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_thermal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
 
-///kw+PROBLEM+usage modal
-///kw+PROBLEM+usage ]@
-///kw+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
+///kw_pde+PROBLEM+usage modal
+///kw_pde+PROBLEM+usage ]@
+///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
     } else if (strcasecmp(token, "modal") == 0) {
 #ifndef HAVE_SLEPC
       feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
@@ -3445,26 +2990,26 @@ int feenox_parse_problem(void) {
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       
 
-///kw+PROBLEM+detail @    
-///kw+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
-///kw+PROBLEM+detail Check out [FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)
-///kw+PROBLEM+detail for licensing information, programming guides and code of conduct.
-///kw+PROBLEM+detail @    
+///kw_pde+PROBLEM+detail @    
+///kw_pde+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
+///kw_pde+PROBLEM+detail Check out [FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)
+///kw_pde+PROBLEM+detail for licensing information, programming guides and code of conduct.
+///kw_pde+PROBLEM+detail @    
 
-///kw+PROBLEM+usage @
-///kw+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
-///kw+PROBLEM+detail as `1d`, `2d`, `3d` or with the keyword `DIMENSIONS`.
-///kw+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
-///kw+PROBLEM+usage [ 1D |
+///kw_pde+PROBLEM+usage @
+///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
+///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or with the keyword `DIMENSIONS`.
+///kw_pde+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
+///kw_pde+PROBLEM+usage [ 1D |
     } else if (strcasecmp(token, "1d") == 0) {
       feenox.pde.dim = 1;
-///kw+PROBLEM+usage   2D |
+///kw_pde+PROBLEM+usage   2D |
     } else if (strcasecmp(token, "2d") == 0) {
       feenox.pde.dim = 2;
-///kw+PROBLEM+usage   3D |
+///kw_pde+PROBLEM+usage   3D |
     } else if (strcasecmp(token, "3d") == 0) {
       feenox.pde.dim = 3;
-///kw+PROBLEM+usage   DIMENSIONS <expr> ]
+///kw_pde+PROBLEM+usage   DIMENSIONS <expr> ]
     } else if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -3474,10 +3019,10 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
 
-///kw+PROBLEM+usage [ MESH <identifier> ] @
-///kw+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
-///kw+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
-///kw+PROBLEM+detail defined in the input file is the one over which the problem is solved.
+///kw_pde+PROBLEM+usage [ MESH <identifier> ] @
+///kw_pde+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
+///kw_pde+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
+///kw_pde+PROBLEM+detail defined in the input file is the one over which the problem is solved.
     } else if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name;
 
@@ -3491,51 +3036,51 @@ int feenox_parse_problem(void) {
       feenox_free(mesh_name);
       
       // TODO: shouldn't this go in the MESH keyword?
-///kw+PROBLEM+usage @[
-///kw+PROBLEM+usage AXISYMMETRIC { x | y }
-///kw+PROBLEM+usage |
-///kw+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
-///kw+PROBLEM+detail to be two-dimensional in the $x$-$y$ plane and the problem 
-///kw+PROBLEM+detail is assumed to be axi-symmetric around the given axis. 
+///kw_pde+PROBLEM+usage @[
+///kw_pde+PROBLEM+usage AXISYMMETRIC { x | y }
+///kw_pde+PROBLEM+usage |
+///kw_pde+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
+///kw_pde+PROBLEM+detail to be two-dimensional in the $x$-$y$ plane and the problem 
+///kw_pde+PROBLEM+detail is assumed to be axi-symmetric around the given axis. 
     } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
       char *keywords[] = { "x", "y" };
       int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
 
-///kw+PROBLEM+usage [ PROGRESS ]@
-///kw+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
-///kw+PROBLEM+detail progress of the ensamble of the stiffness matrix (or matrices),
-///kw+PROBLEM+detail the solution of the system of equations
-///kw+PROBLEM+detail and the computation of gradients (stresses).
+///kw_pde+PROBLEM+usage [ PROGRESS ]@
+///kw_pde+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
+///kw_pde+PROBLEM+detail progress of the ensamble of the stiffness matrix (or matrices),
+///kw_pde+PROBLEM+detail the solution of the system of equations
+///kw_pde+PROBLEM+detail and the computation of gradients (stresses).
     } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
       feenox.pde.progress_ascii = PETSC_TRUE;
       
-///kw+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
-///kw+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
-///kw+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
-///kw+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
-///kw+PROBLEM+usage [ TRANSIENT |
+///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
+///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
+///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
+///kw_pde+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
+///kw_pde+PROBLEM+usage [ TRANSIENT |
     } else if (strcasecmp(token, "TRANSIENT") == 0) {
       feenox.pde.transient_type = transient_type_transient;
-///kw+PROBLEM+usage QUASISTATIC]@
+///kw_pde+PROBLEM+usage QUASISTATIC]@
     } else if (strcasecmp(token, "QUASISTATIC") == 0) {
       feenox.pde.transient_type = transient_type_quasistatic;
 
 
-///kw+PROBLEM+detail By default FeenoX tries to detect wheter the computation should be linear or non-linear.
-///kw+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
-///kw+PROBLEM+usage [ LINEAR
+///kw_pde+PROBLEM+detail By default FeenoX tries to detect wheter the computation should be linear or non-linear.
+///kw_pde+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+///kw_pde+PROBLEM+usage [ LINEAR
     } else if (strcasecmp(token, "LINEAR") == 0) {
       feenox.pde.math_type = math_type_linear;
 
-///kw+PROBLEM+usage | NON_LINEAR ]
+///kw_pde+PROBLEM+usage | NON_LINEAR ]
     } else if (strcasecmp(token, "NON_LINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
 
-///kw+PROBLEM+usage [ MODES <expr> ] @
-///kw+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
-///kw+PROBLEM+detail The default value is problem dependent.
+///kw_pde+PROBLEM+usage [ MODES <expr> ] @
+///kw_pde+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
+///kw_pde+PROBLEM+detail The default value is problem dependent.
     } else if (strcasecmp(token, "MODES") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -3545,37 +3090,37 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
       
-///kw+PROBLEM+usage [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]@
-///kw+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
-///kw+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
-///kw+PROBLEM+detail @          
-///kw+PROBLEM+detail  * List of `PRECONDITIONER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
+///kw_pde+PROBLEM+usage [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]@
+///kw_pde+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
+///kw_pde+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
+///kw_pde+PROBLEM+detail @          
+///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
     } else if (strcasecmp(token, "PRECONDITIONER") == 0 || strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.pc_type));
 
-///kw+PROBLEM+usage [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
-///kw+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
+///kw_pde+PROBLEM+usage [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
     } else if (strcasecmp(token, "LINEAR_SOLVER") == 0 || strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ksp_type));
           
-///kw+PROBLEM+usage [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
-///kw+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
-///kw+PROBLEM+detail @
+///kw_pde+PROBLEM+usage [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
+///kw_pde+PROBLEM+detail @
         } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
-///kw+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
-///kw+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
+///kw_pde+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
     } else if (strcasecmp(token, "TRANSIENT_SOLVER") == 0 || strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
 
-///kw+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
-///kw+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSAdaptType.html>.
+///kw_pde+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSAdaptType.html>.
     } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
 
-///kw+PROBLEM+usage [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]@
-///kw+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
+///kw_pde+PROBLEM+usage [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
     } else if (strcasecmp(token, "EIGEN_SOLVER") == 0 || strcasecmp(token, "EPS") == 0 || strcasecmp(token, "EPS_TYPE") == 0) {
 #ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.eps_type));
@@ -3584,8 +3129,8 @@ int feenox_parse_problem(void) {
       return FEENOX_ERROR;      
 #endif
       
-///kw+PROBLEM+usage [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]@
-///kw+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https://slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
+///kw_pde+PROBLEM+usage [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https://slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
     } else if (strcasecmp(token, "SPECTRAL_TRANSFORMATION") == 0 || strcasecmp(token, "ST") == 0 || strcasecmp(token, "ST_TYPE") == 0) {
 #ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.st_type));
@@ -3594,9 +3139,9 @@ int feenox_parse_problem(void) {
       return FEENOX_ERROR;      
 #endif
 
-///kw+PROBLEM+usage [ EIGEN_FORMULATION { omega | lambda } ]@
-///kw+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$,
-///kw+PROBLEM+detail and $M \phi = \lambda K \phi$$ if it is `lambda`.
+///kw_pde+PROBLEM+usage [ EIGEN_FORMULATION { omega | lambda } ]@
+///kw_pde+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$,
+///kw_pde+PROBLEM+detail and $M \phi = \lambda K \phi$$ if it is `lambda`.
     } else if (strcasecmp(token, "EIGEN_FORMULATION") == 0) {
       char *keywords[] = {"omega", "lambda", ""};
       int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
@@ -3641,12 +3186,12 @@ int feenox_parse_problem(void) {
 
 int feenox_parse_solve_problem(void) {
  
-///kw+SOLVE_PROBLEM+detail Whenever the instruction `SOLVE_PROBLEM` is executed,
-///kw+SOLVE_PROBLEM+detail FeenoX solves the PDE problem.
-///kw+SOLVE_PROBLEM+detail For static problems, that means solving the equations
-///kw+SOLVE_PROBLEM+detail and filling in the result functions.
-///kw+SOLVE_PROBLEM+detail For transient or quasisstatic problems, that means
-///kw+SOLVE_PROBLEM+detail advancing one time step.
+///kw_pde+SOLVE_PROBLEM+detail Whenever the instruction `SOLVE_PROBLEM` is executed,
+///kw_pde+SOLVE_PROBLEM+detail FeenoX solves the PDE problem.
+///kw_pde+SOLVE_PROBLEM+detail For static problems, that means solving the equations
+///kw_pde+SOLVE_PROBLEM+detail and filling in the result functions.
+///kw_pde+SOLVE_PROBLEM+detail For transient or quasisstatic problems, that means
+///kw_pde+SOLVE_PROBLEM+detail advancing one time step.
   
   if (feenox.pde.instruction != NULL) {
     feenox_push_error_message("there was already one SOLVE_PROBLEM instruction");
@@ -3663,10 +3208,10 @@ int feenox_parse_integrate(void) {
   mesh_integrate_t *mesh_integrate = NULL;
   feenox_check_alloc(mesh_integrate = calloc(1, sizeof(mesh_integrate_t)));
   
-///kw+INTEGRATE+usage { <expression> | <function> }
-///kw+INTEGRATE+detail Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
-///kw+INTEGRATE+detail If the integrand is a function, do not include the arguments, i.e. instead of `f(x,y,z)` just write `f`.
-///kw+INTEGRATE+detail The results should be the same but efficiency will be different (faster for pure functions).
+///kw_pde+INTEGRATE+usage { <expression> | <function> }
+///kw_pde+INTEGRATE+detail Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
+///kw_pde+INTEGRATE+detail If the integrand is a function, do not include the arguments, i.e. instead of `f(x,y,z)` just write `f`.
+///kw_pde+INTEGRATE+detail The results should be the same but efficiency will be different (faster for pure functions).
   char *token = feenox_get_next_token(NULL);
   if ((mesh_integrate->function = feenox_get_function_ptr(token)) == NULL) {
     feenox_call(feenox_expression_parse(&mesh_integrate->expr, token));
@@ -3677,39 +3222,39 @@ int feenox_parse_integrate(void) {
   char *name_result = NULL;
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+INTEGRATE+usage [ OVER <physical_group> ]
-///kw+INTEGRATE+detail By default the integration is performed over the highest-dimensional elements of the mesh,
-///kw+INTEGRATE+detail i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
-///kw+INTEGRATE+detail If the integration is to be carried out over just a physical group, it has to be given in `OVER`.
+///kw_pde+INTEGRATE+usage [ OVER <physical_group> ]
+///kw_pde+INTEGRATE+detail By default the integration is performed over the highest-dimensional elements of the mesh,
+///kw_pde+INTEGRATE+detail i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
+///kw_pde+INTEGRATE+detail If the integration is to be carried out over just a physical group, it has to be given in `OVER`.
 
     if (strcasecmp(token, "OVER") == 0) {
       feenox_call(feenox_parser_string(&name_physical_group));
           
-///kw+INTEGRATE+usage [ MESH <mesh_identifier> ]
-///kw+INTEGRATE+detail If there are more than one mesh defined, an explicit one has to be given with `MESH`.
+///kw_pde+INTEGRATE+usage [ MESH <mesh_identifier> ]
+///kw_pde+INTEGRATE+detail If there are more than one mesh defined, an explicit one has to be given with `MESH`.
     } else if (strcasecmp(token, "MESH") == 0) {
       feenox_call(feenox_parser_string(&name_mesh));
       
-///kw+INTEGRATE+detail Either `NODES` or `CELLS` define how the integration is to be performed.
-///kw+INTEGRATE+usage [ NODES
-///kw+INTEGRATE+detail With `NODES` the integration is performed using the Gauss points
-///kw+INTEGRATE+detail and weights associated to each element type.
+///kw_pde+INTEGRATE+detail Either `NODES` or `CELLS` define how the integration is to be performed.
+///kw_pde+INTEGRATE+usage [ NODES
+///kw_pde+INTEGRATE+detail With `NODES` the integration is performed using the Gauss points
+///kw_pde+INTEGRATE+detail and weights associated to each element type.
     } else if (strcasecmp(token, "NODES") == 0) {
       mesh_integrate->field_location = field_location_nodes;
             
-///kw+INTEGRATE+usage | CELLS ]@
-///kw+INTEGRATE+detail With `CELLS` the integral is computed as the sum of the product of the
-///kw+INTEGRATE+detail integrand at the center of each cell (element) and the cell’s volume.
-///kw+INTEGRATE+detail Do expect differences in the results and efficiency between these two approaches
-///kw+INTEGRATE+detail depending on the nature of the integrand.
+///kw_pde+INTEGRATE+usage | CELLS ]@
+///kw_pde+INTEGRATE+detail With `CELLS` the integral is computed as the sum of the product of the
+///kw_pde+INTEGRATE+detail integrand at the center of each cell (element) and the cell’s volume.
+///kw_pde+INTEGRATE+detail Do expect differences in the results and efficiency between these two approaches
+///kw_pde+INTEGRATE+detail depending on the nature of the integrand.
     } else if (strcasecmp(token, "CELLS") == 0) {
       mesh_integrate->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;
           
-///kw+INTEGRATE+usage RESULT <variable>@
-///kw+INTEGRATE+detail The scalar result of the integration is stored in the variable given by
-///kw+INTEGRATE+detail the mandatory keyword `RESULT`.
-///kw+INTEGRATE+detail If the variable does not exist, it is created.
+///kw_pde+INTEGRATE+usage RESULT <variable>@
+///kw_pde+INTEGRATE+detail The scalar result of the integration is stored in the variable given by
+///kw_pde+INTEGRATE+detail the mandatory keyword `RESULT`.
+///kw_pde+INTEGRATE+detail If the variable does not exist, it is created.
     } else if (strcasecmp(token, "RESULT") == 0) {
       feenox_call(feenox_parser_string(&name_result));
             
@@ -3757,8 +3302,8 @@ int feenox_parse_find_extrema(void) {
   mesh_find_extrema_t *mesh_find_extrema = NULL;
   feenox_check_alloc(mesh_find_extrema = calloc(1, sizeof(mesh_find_extrema_t)));
   
-///kw+FIND_EXTREMA+usage { <expression> | <function> }
-///kw+FIND_EXTREMA+detail Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
+///kw_pde+FIND_EXTREMA+usage { <expression> | <function> }
+///kw_pde+FIND_EXTREMA+detail Either an expression or a function of space $x$, $y$ and/or $z$ should be given.
   char *token = feenox_get_next_token(NULL);
   if ((mesh_find_extrema->function = feenox_get_function_ptr(token)) == NULL) {
     feenox_call(feenox_expression_parse(&mesh_find_extrema->expr, token));
@@ -3778,80 +3323,80 @@ int feenox_parse_find_extrema(void) {
   char *name_i_max = NULL;
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+FIND_EXTREMA+usage [ OVER <physical_group> ]
-///kw+FIND_EXTREMA+detail By default the search is performed over the highest-dimensional elements of the mesh,
-///kw+FIND_EXTREMA+detail i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
-///kw+FIND_EXTREMA+detail If the search is to be carried out over just a physical group, it has to be given in `OVER`.
+///kw_pde+FIND_EXTREMA+usage [ OVER <physical_group> ]
+///kw_pde+FIND_EXTREMA+detail By default the search is performed over the highest-dimensional elements of the mesh,
+///kw_pde+FIND_EXTREMA+detail i.e. over the whole volume, area or length for three, two and one-dimensional meshes, respectively.
+///kw_pde+FIND_EXTREMA+detail If the search is to be carried out over just a physical group, it has to be given in `OVER`.
 
     if (strcasecmp(token, "OVER") == 0) {
       feenox_call(feenox_parser_string(&name_physical_group));
           
-///kw+FIND_EXTREMA+usage [ MESH <mesh_identifier> ]
-///kw+FIND_EXTREMA+detail If there are more than one mesh defined, an explicit one has to be given with `MESH`.
+///kw_pde+FIND_EXTREMA+usage [ MESH <mesh_identifier> ]
+///kw_pde+FIND_EXTREMA+detail If there are more than one mesh defined, an explicit one has to be given with `MESH`.
     } else if (strcasecmp(token, "MESH") == 0) {
       feenox_call(feenox_parser_string(&name_mesh));
       
-///kw+FIND_EXTREMA+detail If neither `NODES`, `CELLS` or `GAUSS` is given then the search is
-///kw+FIND_EXTREMA+detail performed over the three of them.
-///kw+FIND_EXTREMA+usage [ NODES
-///kw+FIND_EXTREMA+detail With `NODES` only the function or expression is evalauted at the mesh nodes.
+///kw_pde+FIND_EXTREMA+detail If neither `NODES`, `CELLS` or `GAUSS` is given then the search is
+///kw_pde+FIND_EXTREMA+detail performed over the three of them.
+///kw_pde+FIND_EXTREMA+usage [ NODES
+///kw_pde+FIND_EXTREMA+detail With `NODES` only the function or expression is evalauted at the mesh nodes.
     } else if (strcasecmp(token, "NODES") == 0) {
       mesh_find_extrema->field_location = field_location_nodes;
             
-///kw+FIND_EXTREMA+usage | CELLS
-///kw+FIND_EXTREMA+detail With `CELLS` only the function or expression is evalauted at the element centers.
+///kw_pde+FIND_EXTREMA+usage | CELLS
+///kw_pde+FIND_EXTREMA+detail With `CELLS` only the function or expression is evalauted at the element centers.
     } else if (strcasecmp(token, "CELLS") == 0) {
       mesh_find_extrema->field_location = field_location_cells;
 //      feenox.mesh.need_cells = 1;
 
-///kw+FIND_EXTREMA+usage | GAUSS ]@
-///kw+FIND_EXTREMA+detail With `GAUSS` only the function or expression is evalauted at the Gauss points.
+///kw_pde+FIND_EXTREMA+usage | GAUSS ]@
+///kw_pde+FIND_EXTREMA+detail With `GAUSS` only the function or expression is evalauted at the Gauss points.
     } else if (strcasecmp(token, "GAUSS") == 0) {
       mesh_find_extrema->field_location = field_location_gauss;
       
-///kw+FIND_EXTREMA+usage [ MIN <variable> ]
-///kw+FIND_EXTREMA+detail The value of the absolute minimum (maximum) is stored in the variable indicated by `MIN` (`MAX`).
-///kw+FIND_EXTREMA+detail If the variable does not exist, it is created.
+///kw_pde+FIND_EXTREMA+usage [ MIN <variable> ]
+///kw_pde+FIND_EXTREMA+detail The value of the absolute minimum (maximum) is stored in the variable indicated by `MIN` (`MAX`).
+///kw_pde+FIND_EXTREMA+detail If the variable does not exist, it is created.
     } else if (strcasecmp(token, "MIN") == 0) {
       feenox_call(feenox_parser_string(&name_min));
 
-///kw+FIND_EXTREMA+usage [ MAX <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ MAX <variable> ]
     } else if (strcasecmp(token, "MAX") == 0) {
       feenox_call(feenox_parser_string(&name_max));
 
-///kw+FIND_EXTREMA+usage [ X_MIN <variable> ]
-///kw+FIND_EXTREMA+detail The value of the $x$-$y$-$z$\ coordinate of the absolute minimum (maximum)
-///kw+FIND_EXTREMA+detail is stored in the variable indicated by `X_MIN`-`Y_MIN`-`Z_MIN` (`X_MAX`-`Y_MAX`-`Z_MAX`).
-///kw+FIND_EXTREMA+detail If the variable does not exist, it is created.
+///kw_pde+FIND_EXTREMA+usage [ X_MIN <variable> ]
+///kw_pde+FIND_EXTREMA+detail The value of the $x$-$y$-$z$\ coordinate of the absolute minimum (maximum)
+///kw_pde+FIND_EXTREMA+detail is stored in the variable indicated by `X_MIN`-`Y_MIN`-`Z_MIN` (`X_MAX`-`Y_MAX`-`Z_MAX`).
+///kw_pde+FIND_EXTREMA+detail If the variable does not exist, it is created.
     } else if (strcasecmp(token, "X_MIN") == 0) {
       feenox_call(feenox_parser_string(&name_x_min));
 
-///kw+FIND_EXTREMA+usage [ X_MAX <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ X_MAX <variable> ]
     } else if (strcasecmp(token, "X_MAX") == 0) {
       feenox_call(feenox_parser_string(&name_x_max));
 
-///kw+FIND_EXTREMA+usage [ Y_MIN <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ Y_MIN <variable> ]
     } else if (strcasecmp(token, "Y_MIN") == 0) {
       feenox_call(feenox_parser_string(&name_y_min));
 
-///kw+FIND_EXTREMA+usage [ Y_MAX <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ Y_MAX <variable> ]
     } else if (strcasecmp(token, "Y_MAX") == 0) {
       feenox_call(feenox_parser_string(&name_y_max));
       
-///kw+FIND_EXTREMA+usage [ Z_MIN <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ Z_MIN <variable> ]
     } else if (strcasecmp(token, "Z_MIN") == 0) {
       feenox_call(feenox_parser_string(&name_z_min));
 
-///kw+FIND_EXTREMA+usage [ Z_MAX <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ Z_MAX <variable> ]
     } else if (strcasecmp(token, "Z_MAX") == 0) {
       feenox_call(feenox_parser_string(&name_z_max));
 
-///kw+FIND_EXTREMA+usage [ I_MIN <variable> ]
-///kw+FIND_EXTREMA+detail The index (either node or cell) where the absolute minimum (maximum) is found
-///kw+FIND_EXTREMA+detail is stored in the variable indicated by `I_MIN` (`I_MAX`).
+///kw_pde+FIND_EXTREMA+usage [ I_MIN <variable> ]
+///kw_pde+FIND_EXTREMA+detail The index (either node or cell) where the absolute minimum (maximum) is found
+///kw_pde+FIND_EXTREMA+detail is stored in the variable indicated by `I_MIN` (`I_MAX`).
     } else if (strcasecmp(token, "I_MIN") == 0) {
       feenox_call(feenox_parser_string(&name_i_min));
-///kw+FIND_EXTREMA+usage [ I_MAX <variable> ]
+///kw_pde+FIND_EXTREMA+usage [ I_MAX <variable> ]
     } else if (strcasecmp(token, "I_MAX") == 0) {
       feenox_call(feenox_parser_string(&name_i_max));
       
@@ -4116,28 +3661,28 @@ int feenox_parse_dump(void) {
   
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+DUMP+usage [ FORMAT { binary | ascii | octave } ]
+///kw_pde+DUMP+usage [ FORMAT { binary | ascii | octave } ]
     if (strcasecmp(token, "FORMAT") == 0) {
       char *keywords[] = {           "default",           "binary",           "ascii",           "octave", ""};
       int values[] =     {dump_format_default, dump_format_binary, dump_format_ascii, dump_format_octave, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&dump->format)));
       
-///kw+DUMP+usage [ K |
+///kw_pde+DUMP+usage [ K |
     } if (strcasecmp(token, "K") == 0) {
       dump->K = 1;
-///kw+DUMP+usage   K_bc |
+///kw_pde+DUMP+usage   K_bc |
     } else if (strcasecmp(token, "K_bc") == 0) {
       dump->K_bc = 1;
-///kw+DUMP+usage   b |
+///kw_pde+DUMP+usage   b |
     } else if (strcasecmp(token, "b") == 0) {
       dump->b = 1;
-///kw+DUMP+usage   b_bc |
+///kw_pde+DUMP+usage   b_bc |
     } else if (strcasecmp(token, "b_bc") == 0) {
       dump->b_bc = 1;
-///kw+DUMP+usage   M |
+///kw_pde+DUMP+usage   M |
     } else if (strcasecmp(token, "M") == 0) {
       dump->M = 1;
-///kw+DUMP+usage   M_bc |
+///kw_pde+DUMP+usage   M_bc |
     } else if (strcasecmp(token, "M_bc") == 0) {
       dump->M_bc = 1;
     }

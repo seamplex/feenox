@@ -9,8 +9,15 @@ lang: en-US
 
 # Overview
 
+```{.include}
+overview.md
+```
 
-Intro from README.
+# Introduction
+
+```{.include}
+introduction.md
+```
 
 
 # Running `feenox`
@@ -20,27 +27,34 @@ Intro from README.
 The format for running the `feenox` program is:
 
 ```
-feenox [options] inputfile [optional_extra_arguments]...
+feenox [options] inputfile [optional_extra_arguments] ...
 ```
 
 The `feenox` executable supports the following options:
 
-
-TBD
+```{.include}
+help.md
+```
 
 ## Compilation
 
-
-# Tutorial
+```{.include shift-heading-level-by=2}
+compilation.md
+```
 
 # Examples
 
+To be done.
+
+# Tutorial
+
+To be done.
+
 # Description
 
-Nouns are definitions.
-Verbs are instructions.
-
-The equal sign can be both depending on what's on the left hand side.
+ * Nouns are definitions.
+ * Verbs are instructions.
+ * The equal sign can be both depending on what's on the left hand side.
 
 Variables. Vectors. Matrices.
 
@@ -49,41 +63,128 @@ Variables. Vectors. Matrices.
 
 ## Algebraic expressions
 
+ * Everything is an expression.
+ 
+To be done.
+
 ## Special global variables
 
-## Functions
-
-## Functionals
-
-## Vector functions
+```{.include shift-heading-level-by=2}
+reference-va.md
+```
 
 ## General keywords
 
+```{.include shift-heading-level-by=2}
+reference-kw.md
+```
+
 ## Differential-Algebraic Equations
 
-### Keywords
-
-### Variables
-
-
-## Laplace equation
+```{.include shift-heading-level-by=2}
+reference-dae-po.md
+```
 
 ### Keywords
 
+```{.include shift-heading-level-by=3}
+reference-dae-kw.md
+```
+
 ### Variables
 
-### Properties
+```{.include shift-heading-level-by=3}
+reference-dae-va.md
+```
 
-### Boundary Conditions
 
-### Results
+## Partial Differential Equations
+
+```{.include shift-heading-level-by=2}
+reference-pde-po.md
+```
+
+### Keywords
+
+```{.include shift-heading-level-by=3}
+reference-pde-kw.md
+```
+
+### Variables
+
+```{.include shift-heading-level-by=3}
+reference-pde-va.md
+```
+
+
+### Laplace equation
+
+```{.include shift-heading-level-by=3}
+reference-laplace-po.md
+```
+
+#### Keywords
+
+```{.include shift-heading-level-by=4}
+reference-laplace-kw.md
+```
+
+#### Variables
+
+```{.include shift-heading-level-by=4}
+reference-laplace-va.md
+```
+
+#### Properties
+
+```{.include shift-heading-level-by=4}
+reference-laplace-pr.md
+```
+
+
+#### Boundary Conditions
+
+```{.include shift-heading-level-by=4}
+reference-laplace-bc.md
+```
+
+
+#### Results
+
+```{.include shift-heading-level-by=4}
+reference-laplace-re.md
+```
+
+
+## Functions
+
+```{.include shift-heading-level-by=2}
+reference-fn.md
+```
+
+## Functionals
+
+```{.include shift-heading-level-by=2}
+reference-fu.md
+```
+
+## Vector functions
+
+To be done.
 
 
 \appendix
 
 # FeenoX & the UNIX Philospohy
 
+```{.include shift-heading-level-by=1}
+unix.md
+```
+
+
 # History
 
+```{.include shift-heading-level-by=1}
 history.md
+```
 

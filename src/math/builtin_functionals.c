@@ -60,7 +60,6 @@ typedef struct {
 } gsl_function_arguments_t;
 
 
-///fu+derivative+name derivative
 ///fu+derivative+usage derivative(f(x), x, a, [h], [p])
 ///fu+derivative+desc Computes the derivative of the expression $f(x)$ 
 ///fu+derivative+desc given in the first argument with respect to the variable $x$
@@ -119,7 +118,6 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
   return result;
 }
 
-///fu+integral+name integral
 ///fu+integral+usage integral(f(x), x, a, b, [eps], [k], [max_subdivisions])
 ///fu+integral+desc Computes the integral of the expression $f(x)$
 ///fu+integral+desc given in the first argument with respect to variable $x$
@@ -220,7 +218,6 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
   return result;
 }
 
-///fu+gauss_kronrod+name gauss_kronrod
 ///fu+gauss_kronrod+usage gauss_kronrod(f(x), x, a, b, [eps])
 ///fu+gauss_kronrod+desc Computes the integral of the expression $f(x)$
 ///fu+gauss_kronrod+desc given in the first argument with respect to variable $x$
@@ -281,7 +278,6 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
   return result;
 }
 
-///fu+gauss_legendre+name gauss_legendre
 ///fu+gauss_legendre+usage gauss_legendre(f(x), x, a, b, [n])
 ///fu+gauss_legendre+desc Computes the integral of the expression $f(x)$
 ///fu+gauss_legendre+desc given in the first argument with respect to variable $x$
@@ -341,7 +337,6 @@ double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
 
 // TODO: doble adaptivo
 
-///fu+prod+name prod
 ///fu+prod+usage prod(f(i), i, a, b)
 ///fu+prod+desc Computes product of the $N=b-a$ expressions $f(i)$
 ///fu+prod+desc given in the first argument by varying the variable~$i$
@@ -375,7 +370,6 @@ double feenox_builtin_prod(expr_item_t *a, var_t *var_x) {
   
 }
 
-///fu+sum+name sum
 ///fu+sum+usage sum(f_i, i, a, b)
 ///fu+sum+desc Computes sum of the $N=b-a$ expressions $f_i$
 ///fu+sum+desc given in the first argument by varying the variable $i$

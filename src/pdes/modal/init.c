@@ -79,7 +79,6 @@ int feenox_problem_init_parser_modal(void) {
   // we'd rather ser nodes than cells 
   feenox.mesh.default_field_location = field_location_nodes;
   
-///va+M_T+name M_T
 ///va+M_T+desc A scalar with the total mass\ $m$ computed from the mass matrix\ $M$ as
 ///va+M_T+desc 
 ///va+M_T+desc \[ M_T = \frac{1}{n_\text{DOFs}} \cdot \vec{1}^T \cdot M \cdot \vec{1} \]
@@ -89,18 +88,15 @@ int feenox_problem_init_parser_modal(void) {
 ///va+M_T+desc the integral of the density $\rho(x,y,z)$ over the problem domain.
   modal.M_T = feenox_define_variable_get_ptr("M_T");
 
-///ve+f+name f
 ///ve+f+desc _Size:_ number of requested modes.
 ///ve+f+desc _Elements:_ The frequency $f_i$ of the $i$-th mode, in cycles per unit of time.
   modal.f = feenox_define_vector_get_ptr("f", feenox.pde.nev);
 
-///ve+omega+name omega
 ///ve+omega+desc _Size:_ number of requested modes.
 ///ve+omega+desc _Elements:_ The angular frequency $\omega_i$ of the $i$-th mode, in radians per unit of time.
   modal.omega = feenox_define_vector_get_ptr("omega", feenox.pde.nev);
 
 
-///ve+m+name m
 ///ve+m+desc _Size:_ number of requested modes.
 ///ve+m+desc _Elements:_ The generalized modal mass $M_i$ of the $i$-th mode computed as
 ///ve+m+desc
@@ -111,7 +107,6 @@ int feenox_problem_init_parser_modal(void) {
 
   modal.m = feenox_define_vector_get_ptr("m", feenox.pde.nev);
 
-///ve+L+name L
 ///ve+L+desc _Size:_ number of requested modes.
 ///ve+L+desc _Elements:_ The excitation factor $L_i$ of the $i$-th mode computed as
 ///ve+L+desc
@@ -121,14 +116,12 @@ int feenox_problem_init_parser_modal(void) {
 ///va+L+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
   modal.L = feenox_define_vector_get_ptr("L", feenox.pde.nev);
 
-///ve+Gamma+name Gamma
 ///ve+Gamma+desc _Size:_ number of requested modes.
 ///ve+Gamma+desc _Elements:_ The participation factor $\Gamma_i$ of the $i$-th mode computed as
 ///ve+Gamma+desc
 ///ve+Gamma+desc \[ \Gamma_i = \frac{ \vec{\phi}_i^T \cdot M \cdot \vec{1} }{ \vec{\phi}_i^T \cdot M \cdot \vec{\phi}} \]
   modal.Gamma = feenox_define_vector_get_ptr("Gamma", feenox.pde.nev);
 
-///ve+mu+name mu
 ///ve+mu+desc _Size:_ number of requested modes.
 ///ve+mu+desc _Elements:_ The relatve effective modal mass $\mu_i$ of the $i$-th mode computed as
 ///ve+mu+desc
@@ -137,7 +130,6 @@ int feenox_problem_init_parser_modal(void) {
 ///ve+mu+desc Note that $\sum_{i=1}^N m_i = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
   modal.mu = feenox_define_vector_get_ptr("mu", feenox.pde.nev);
 
-///ve+Mu+name Mu
 ///ve+Mu+desc _Size:_ number of requested modes.
 ///ve+Mu+desc _Elements:_ The accumulated relative effective modal mass $\Mu_i$ up to the $i$-th mode computed as
 ///ve+Mu+desc

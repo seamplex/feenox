@@ -76,11 +76,9 @@ int feenox_problem_init_parser_thermal(void) {
   }
   
   
-///va_thermal+T_max+name T_max
 ///va_thermal+T_max+detail The maximum temperature\ $T_\text{max}$.
   feenox_check_null(thermal.T_max = feenox_define_variable_get_ptr("T_max"));
 
-///va_thermal+T_min+name T_min
 ///va_thermal+T_min+detail The minimum temperature\ $T_\text{min}$.
   feenox_check_null(thermal.T_min = feenox_define_variable_get_ptr("T_min"));
   
@@ -109,21 +107,18 @@ int feenox_problem_init_runtime_thermal(void) {
   // of them are mandatory and which are optional
 
 ///pr_thermal+k+usage k
-///pr_thermal+k+name k
 ///pr_thermal+k+description The thermal conductivity in units of power per length per degree of temperature.
   feenox_distribution_define_mandatory(thermal, k, "k", "thermal conductivity");
   thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
   thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  
   
 ///pr_thermal+q'''+usage q'''
-///pr_thermal+q'''+name q'''
 ///pr_thermal+q'''+description The volumetric power dissipated in the material in units of power per unit of volume.
 ///pr_thermal+q'''+description Default is zero (i.e. no power).
   
   feenox_call(feenox_distribution_init(&thermal.q, "q'''"));
   if (thermal.q.defined == 0) {
 ///pr_thermal+q+usage q
-///pr_thermal+q+name q
 ///pr_thermal+q+description Alias for `q'''`
     feenox_call(feenox_distribution_init(&thermal.q, "q"));
   }

@@ -75,14 +75,18 @@ These are two most basic ways of contributing to an open source project, so do n
 
 > If these instructions make no sense to you, read the [FAQs](FAQ.md).
 
-include(design/git.md)
+```{.include}
+design/git.md
+```
 
+See the [compilation guide](./compile.md) for a full explanation and of the steps above.
 See the [programming guide](./programming.md) for more details about
 
- * custom flags,
- * different compilers,
+ * setting custom flags,
+ * using different compilers (e.g. `gcc`, `clang`, `icc`, etc),
  * compiling with debugging information,
  * configuring and compiling dependencies from sources,
+ * setting up an IDE for development,
  * etc.
     
 ## Contributing guidelines

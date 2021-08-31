@@ -311,5 +311,5 @@ After t
 
 ```{.include}
 compile-debug.md
-compile-other-compiler.md
+compile-other-compilers.md
 ```

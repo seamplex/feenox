@@ -165,7 +165,6 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
 };
 
 
-///fn+clock+name clock
 ///fn+clock+usage clock([f])
 ///fn+clock+desc Returns the value of a certain clock in seconds measured from a certain (but specific) milestone.
 ///fn+clock+desc The kind of clock and the initial milestone depend on the optional integer argument\ $f$.
@@ -201,7 +200,6 @@ double feenox_builtin_clock(expr_item_t *f) {
 
 }
 
-///fn+wall_time+name wall_time
 ///fn+wall_time+usage wall_time()
 ///fn+wall_time+desc Returns the time ellapsed since the invocation of FeenoX, in seconds.
 double feenox_builtin_wall_time(expr_item_t *f) {
@@ -219,7 +217,6 @@ double feenox_builtin_wall_time(expr_item_t *f) {
 }
 
 
-///fn+memory+name memory
 ///fn+memory+usage memory()
 ///fn+memory+desc Returns the maximum memory (resident set size) used by FeenoX, in Gigabytes.
 double feenox_builtin_memory(expr_item_t *f) {
@@ -234,7 +231,6 @@ double feenox_builtin_memory(expr_item_t *f) {
   return memory_gb;
 }
 
-///fn+cpu_time+name cpu_time
 ///fn+cpu_time+usage cpu_time([f])
 ///fn+cpu_time+desc Returns the CPU time used by FeenoX, in seconds.
 ///fn+cpu_time+desc If the optional argument `f` is not provided  or it is zero (default),
@@ -267,7 +263,6 @@ double feenox_builtin_cpu_time(expr_item_t *f) {
   return cpu_time_seconds;
 }
 
-///fn+last+name last
 ///fn+last+usage last(x,[p])
 ///fn+last+math z^{-1}\left[ x \right] = x(t-\Delta t)
 ///fn+last+desc Returns the value the variable\ $x$ had in the previous time step.
@@ -320,7 +315,6 @@ double feenox_builtin_last(expr_item_t *f) {
   return y;
 }
 
-///fn+d_dt+name d_dt
 ///fn+d_dt+usage d_dt(x)
 ///fn+d_dt+math \frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)
 ///fn+d_dt+desc Computes the time derivative of the expression given in the argument\ $x$
@@ -367,7 +361,6 @@ double feenox_builtin_d_dt(expr_item_t *f) {
   return y;
 }
 
-///fn+integral_dt+name integral_dt
 ///fn+integral_dt+usage integral_dt(x)
 ///fn+integral_dt+math z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'
 ///fn+integral_dt+desc Computes the time integral of the expression given in the argument\ $x$
@@ -409,7 +402,6 @@ double feenox_builtin_integral_dt(expr_item_t *f) {
   return y;
 }
 
-///fn+integral_euler_dt+name integral_euler_dt
 ///fn+integral_euler_dt+math z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'
 ///fn+integral_euler_dt+usage integral_euler_dt(x)
 ///fn+integral_euler_dt+desc Idem as `integral_dt` but uses the backward Euler rule to update the instantaenous integral value.
@@ -442,7 +434,6 @@ double feenox_builtin_integral_euler_dt(expr_item_t *f) {
   return y;
 }
 
-///fn+square_wave+name square_wave
 ///fn+square_wave+usage square_wave(x)
 ///fn+square_wave+desc Computes a square function between zero and one with a period equal to one.
 ///fn+square_wave+desc The output is one for $0 < x < 1/2$ and zero for $1/2 \leq x < 1$.
@@ -457,7 +448,6 @@ double feenox_builtin_square_wave(expr_item_t *f) {
   return ((x - floor(x)) < 0.5);
 }
 
-///fn+triangular_wave+name triangular_wave
 ///fn+triangular_wave+usage triangular_wave(x)
 ///fn+triangular_wave+math \begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}
 ///fn+triangular_wave+desc Computes a triangular wave between zero and one with a period equal to one.
@@ -475,7 +465,6 @@ double feenox_builtin_triangular_wave(expr_item_t *f) {
   }
 }
 
-///fn+sawtooth_wave+name sawtooth_wave
 ///fn+sawtooth_wave+usage sawtooth_wave(x)
 ///fn+sawtooth_wave+math x - \lfloor x \rfloor
 ///fn+sawtooth_wave+desc Computes a sawtooth wave between zero and one with a period equal to one.
@@ -489,7 +478,6 @@ double feenox_builtin_sawtooth_wave(expr_item_t *f) {
   return x - floor(x);
 }
 
-///fn+sin+name sin
 ///fn+sin+usage sin(x)
 ///fn+sin+math \sin(x)
 ///fn+sin+desc Computes the sine of the argument\ $x$, where\ $x$ is in radians.
@@ -502,7 +490,6 @@ double feenox_builtin_sin(expr_item_t *f) {
   return sin(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+asin+name asin
 ///fn+asin+usage asin(x)
 ///fn+asin+math \arcsin(x)
 ///fn+asin+desc Computes the arc in radians whose sine is equal to the argument\ $x$.
@@ -522,7 +509,6 @@ double feenox_builtin_asin(expr_item_t *f) {
 }
 
 
-///fn+acos+name acos
 ///fn+acos+usage acos(x)
 ///fn+acos+math \arccos(x)
 ///fn+acos+desc Computes the arc in radians whose cosine is equal to the argument\ $x$.
@@ -541,7 +527,6 @@ double feenox_builtin_acos(expr_item_t *f) {
   return acos(x);
 }
 
-///fn+j0+name j0
 ///fn+j0+usage j0(x)
 ///fn+j0+math J_0(x)
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument\ $x$.
@@ -551,7 +536,6 @@ double feenox_builtin_j0(expr_item_t *f) {
   return gsl_sf_bessel_J0(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+cos+name cos
 ///fn+cos+usage cos(x)
 ///fn+cos+math \cos(x)
 ///fn+cos+desc Computes the cosine of the argument\ $x$, where\ $x$ is in radians.
@@ -563,7 +547,6 @@ double feenox_builtin_cos(expr_item_t *f) {
   return cos(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+tan+name tan
 ///fn+tan+usage tan(x)
 ///fn+tan+math  \tan(x)
 ///fn+tan+desc Computes the tangent of the argument\ $x$, where\ $x$ is in radians.
@@ -572,7 +555,6 @@ double feenox_builtin_tan(expr_item_t *f) {
   return tan(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+sinh+name sinh
 ///fn+sinh+usage sinh(x)
 ///fn+sinh+math \sinh(x)
 ///fn+sinh+desc Computes the hyperbolic sine of the argument\ $x$, where\ $x$ is in radians.
@@ -581,7 +563,6 @@ double feenox_builtin_sinh(expr_item_t *f) {
   return sinh(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+cosh+name cosh
 ///fn+cosh+usage cosh(x)
 ///fn+cosh+math \cosh(x)
 ///fn+cosh+desc Computes the hyperbolic cosine of the argument\ $x$, where\ $x$ is in radians.
@@ -590,7 +571,6 @@ double feenox_builtin_cosh(expr_item_t *f) {
   return cosh(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+tanh+name tanh
 ///fn+tanh+usage tanh(x)
 ///fn+tanh+math \tanh(x)
 ///fn+tanh+desc Computes the hyperbolic tangent of the argument\ $x$, where\ $x$ is in radians.
@@ -600,7 +580,6 @@ double feenox_builtin_tanh(expr_item_t *f) {
 }
 
 
-///fn+atan+name atan
 ///fn+atan+usage atan(x)
 ///fn+atan+math \arctan(x)
 ///fn+atan+desc Computes, in radians, the arc tangent of the argument\ $x$.
@@ -610,7 +589,6 @@ double feenox_builtin_atan(expr_item_t *f) {
   return atan(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+atan2+name atan2
 ///fn+atan2+usage atan2(y,x)
 ///fn+atan2+math \arctan(y/x)
 ///fn+atan2+desc Computes, in radians, the arc tangent of quotient\ $y/x$, using the signs of the two arguments
@@ -620,7 +598,6 @@ double feenox_builtin_atan2(expr_item_t *f) {
   return atan2(feenox_expression_eval(&f->arg[0]), feenox_expression_eval(&f->arg[1]));
 }
 
-///fn+exp+name exp
 ///fn+exp+desc Computes the exponential function the argument\ $x$, i.e. the base of the
 ///fn+exp+desc natural logarithm\ $e$ raised to the\ $x$-th power.
 ///fn+exp+usage exp(x)
@@ -633,7 +610,6 @@ double feenox_builtin_exp(expr_item_t *f) {
   return (x < GSL_LOG_DBL_MIN) ? 0 : gsl_sf_exp(x);
 }
 
-///fn+expint1+name expint1
 ///fn+expint1+desc Computes the first exponential integral function of the argument\ $x$.
 ///fn+expint1+desc If\ $x$ is zero, a NaN error is issued.
 ///fn+expint1+usage expint1(x)
@@ -651,7 +627,6 @@ double feenox_builtin_expint1(expr_item_t *f) {
   return gsl_sf_expint_E1(x);
 }
 
-///fn+expint2+name expint2
 ///fn+expint2+desc Computes the second exponential integral function of the argument\ $x$.
 ///fn+expint2+usage expint2(x)
 ///fn+expint2+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]
@@ -660,7 +635,6 @@ double feenox_builtin_expint2(expr_item_t *f) {
   return gsl_sf_expint_E2(feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+expint3+name expint3
 ///fn+expint3+desc Computes the third exponential integral function of the argument\ $x$.
 ///fn+expint3+usage expint3(x)
 ///fn+expint3+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]
@@ -669,7 +643,6 @@ double feenox_builtin_expint3(expr_item_t *f) {
   return gsl_sf_expint_En(3, feenox_expression_eval(&f->arg[0]));
 }
 
-///fn+expintn+name expintn
 ///fn+expintn+desc Computes the $n$-th exponential integral function of the argument\ $x$.
 ///fn+expintn+desc If\ $n$ is zero or one and\ $x$ is zero, a NaN error is issued.
 ///fn+expintn+usage expintn(n,x)
@@ -687,7 +660,6 @@ double feenox_builtin_expintn(expr_item_t *f) {
   return gsl_sf_expint_En(n, x);
 }
 
-///fn+log+name log
 ///fn+log+desc Computes the natural logarithm of the argument\ $x$. If\ $x$ is zero or negative,
 ///fn+log+desc a NaN error is issued.
 ///fn+log+usage log(x)
@@ -706,7 +678,6 @@ double feenox_builtin_log(expr_item_t *f) {
 }
 
 
-///fn+abs+name abs
 ///fn+abs+desc Returns the absolute value of the argument\ $x$.
 ///fn+abs+usage abs(x)
 ///fn+abs+math |x|
@@ -717,7 +688,6 @@ double feenox_builtin_abs(expr_item_t *f) {
 }
 
 
-///fn+sqrt+name sqrt
 ///fn+sqrt+desc Computes the positive square root of the argument\ $x$.
 ///fn+sqrt+desc If\ $x$ is negative, a NaN error is issued.
 ///fn+sqrt+usage sqrt(x)
@@ -734,7 +704,6 @@ double feenox_builtin_sqrt(expr_item_t *f) {
 }
 
 
-///fn+is_even+name is_even
 ///fn+is_even+desc Returns one if the argument\ $x$ rounded to the nearest integer is even.
 ///fn+is_even+usage is_even(x)
 ///fn+is_even+math  \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}
@@ -742,7 +711,6 @@ double feenox_builtin_is_even(expr_item_t *f) {
   return GSL_IS_EVEN((int)(round(feenox_expression_eval(&f->arg[0]))));
 }
 
-///fn+is_odd+name is_odd
 ///fn+is_odd+desc Returns one if the argument\ $x$ rounded to the nearest integer is odd.
 ///fn+is_odd+usage is_odd(x)
 ///fn+is_odd+math  \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}
@@ -751,7 +719,6 @@ double feenox_builtin_is_odd(expr_item_t *f) {
 }
 
 
-///fn+heaviside+name heaviside
 ///fn+heaviside+desc Computes the zero-centered Heaviside step function of the argument\ $x$.
 ///fn+heaviside+desc If the optional second argument $\delta$ is provided, the discontinuous
 ///fn+heaviside+desc step at\ $x=0$ is replaced by a ramp starting at\ $x=0$ and finishing at\ $x=\delta$.
@@ -773,7 +740,6 @@ double feenox_builtin_heaviside(expr_item_t *f) {
 }
 
 
-///fn+sgn+name sgn
 ///fn+sgn+desc Returns minus one, zero or plus one depending on the sign of the first argument\ $x$.
 ///fn+sgn+desc The second optional argument $\epsilon$ gives the precision of the "zero"
 ///fn+sgn+desc evaluation. If not given, default is $\epsilon = 10^{-9}$.
@@ -796,7 +762,6 @@ double feenox_builtin_sgn(expr_item_t *f) {
 }
 
 
-///fn+not+name not
 ///fn+not+desc Returns one if the first argument\ $x$ is zero and zero otherwise.
 ///fn+not+desc The second optional argument $\epsilon$ gives the precision of the 
 ///fn+not+desc "zero" evaluation. If not given, default is $\epsilon = 10^{-9}$.
@@ -812,7 +777,6 @@ double feenox_builtin_not(expr_item_t *f) {
   return (fabs(x) < eps);
 }
 
-///fn+mod+name mod
 ///fn+mod+desc Returns the remainder of the division between the first argument\ $a$ and the
 ///fn+mod+desc second one\ $b$. Both arguments may be non-integral.
 ///fn+mod+usage mod(a, b)
@@ -829,7 +793,6 @@ double feenox_builtin_mod(expr_item_t *f) {
 }
 
 
-///fn+floor+name floor
 ///fn+floor+desc Returns the largest integral value not greater than the argument\ $x$.
 ///fn+floor+usage floor(x)
 ///fn+floor+math \lfloor x \rfloor
@@ -840,7 +803,6 @@ double feenox_builtin_floor(expr_item_t *f) {
 }
 
 
-///fn+ceil+name ceil
 ///fn+ceil+desc Returns the smallest integral value not less than the argument\ $x$.
 ///fn+ceil+usage ceil(x)
 ///fn+ceil+math \lceil x \rceil
@@ -850,7 +812,6 @@ double feenox_builtin_ceil(expr_item_t *f) {
 }
 
 
-///fn+round+name round
 ///fn+round+desc Rounds the argument\ $x$ to the nearest integer. Halfway cases are rounded away from zero.
 ///fn+round+usage round(x)
 ///fn+round+math \begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}
@@ -860,7 +821,6 @@ double feenox_builtin_round(expr_item_t *f) {
 }
 
 
-///fn+deadband+name deadband
 ///fn+deadband+desc Filters the first argument\ $x$ with a deadband centered at zero with an amplitude
 ///fn+deadband+desc given by the second argument $a$.
 ///fn+deadband+usage deadband(x, a)
@@ -873,12 +833,8 @@ double feenox_builtin_deadband(expr_item_t *f) {
   return (fabs(x[0])<x[1])?0:(x[0]+((x[0]>0)?(-1):1)*x[1]);
 }
 
-///fn+lag+name lag
 ///fn+lag+desc Filters the first argument\ $x(t)$ with a first-order lag of characteristic time $\tau$,
-///fn+lag+desc i.e. this function applies the transfer function
-///fn+lag+desc 
-///fn+lag+desc $$ G(s) = \frac{1}{1 + s\tau} $$
-///fn+lag+desc 
+///fn+lag+desc i.e. this function applies the transfer function\ $G(s) = \frac{1}{1 + s\tau}$
 ///fn+lag+desc to the time-dependent signal\ $x(t)$ to obtain a filtered signal\ $y(t)$, 
 ///fn+lag+desc by assuming that it is constant during the time 
 ///fn+lag+desc interval\ $[t-\Delta t,t]$ and using the analytical solution of the differential equation
@@ -931,12 +887,7 @@ double feenox_builtin_lag(expr_item_t *f) {
   return y;
 }
 
-///fn+lag_euler+name lag_euler
-///fn+lag_euler+desc Filters the first argument\ $x(t)$ with a first-order lag of characteristic time $\tau$,
-///fn+lag_euler+desc i.e. this function applies the transfer function
-///fn+lag_euler+desc 
-///fn+lag_euler+desc $$ G(s) = \frac{1}{1 + s\tau} $$
-///fn+lag_euler+desc 
+///fn+lag_euler+desc Filters the first argument\ $x(t)$ with a first-order lag of characteristic time $\tau$
 ///fn+lag_euler+desc to the time-dependent signal\ $x(t)$ by using the Euler forward rule.
 ///fn+lag_euler+usage lag_euler(x, tau)
 ///fn+lag_euler+math x(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}
@@ -976,12 +927,7 @@ double feenox_builtin_lag_euler(expr_item_t *f) {
   return y;
 }
 
-///fn+lag_bilinear+name lag_bilinear
-///fn+lag_bilinear+desc Filters the first argument\ $x(t)$ with a first-order lag of characteristic time $\tau$,
-///fn+lag_bilinear+desc i.e. this function applies the transfer function
-///fn+lag_bilinear+desc 
-///fn+lag_bilinear+desc $$ G(s) = \frac{1}{1 + s\tau} $$
-///fn+lag_bilinear+desc 
+///fn+lag_bilinear+desc Filters the first argument\ $x(t)$ with a first-order lag of characteristic time $\tau$
 ///fn+lag_bilinear+desc to the time-dependent signal\ $x(t)$ by using the bilinear transformation formula.
 ///fn+lag_bilinear+usage lag_bilinear(x, tau)
 ///fn+lag_bilinear+math x(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}
@@ -1078,7 +1024,6 @@ double feenox_builtin_lead_bilinear(algebraic_token_t *expr) {
 }
 */
 
-///fn+equal+name equal
 ///fn+equal+desc Checks if the two first expressions $a$ and $b$ are equal, up to the tolerance
 ///fn+equal+desc given by the third optional argument $\epsilon$. If either $|a|>1$ or $|b|>1$,
 ///fn+equal+desc the arguments are compared using GSL's `gsl_fcmp`, otherwise the
@@ -1107,7 +1052,6 @@ double feenox_builtin_equal(expr_item_t *f) {
 
 
 
-///fn+random+name random
 ///fn+random+desc Returns a random real number uniformly distributed between the first
 ///fn+random+desc real argument\ $x_1$ and the second one\ $x_2$.
 ///fn+random+desc If the third integer argument $s$ is given, it is used as the seed and thus
@@ -1150,7 +1094,6 @@ double feenox_builtin_random(expr_item_t *f) {
 }
 
 
-///fn+random_gauss+name random_gauss
 ///fn+random_gauss+desc Returns a random real number with a Gaussian distribution with a mean
 ///fn+random_gauss+desc equal to the first argument\ $x_1$ and a standard deviation equatl to the second one\ $x_2$.
 ///fn+random_gauss+desc If the third integer argument $s$ is given, it is used as the seed and thus
@@ -1185,7 +1128,6 @@ double feenox_builtin_random_gauss(expr_item_t *f) {
 
 }
 
-///fn+limit+name limit
 ///fn+limit+desc Limits the first argument\ $x$ to the interval $[a,b]$. The second argument $a$ should
 ///fn+limit+desc be less than the third argument $b$.
 ///fn+limit+usage limit(x, a, b)
@@ -1205,7 +1147,6 @@ double feenox_builtin_limit(expr_item_t *f) {
   return x[0];
 }
 
-///fn+limit_dt+name limit_dt
 ///fn+limit_dt+desc Limits the value of the first argument\ $x(t)$ so to that its time derivative
 ///fn+limit_dt+desc is bounded to the interval $[a,b]$. The second argument $a$ should
 ///fn+limit_dt+desc be less than the third argument $b$.
@@ -1261,7 +1202,6 @@ double feenox_builtin_limit_dt(expr_item_t *f) {
   return y;
 }
 
-///fn+if+name if
 ///fn+if+desc Performs a conditional testing of the first argument $a$, and returns either the
 ///fn+if+desc second optional argument $b$ if $a$ is different from zero or the third optional argument $c$
 ///fn+if+desc if $a$ evaluates to zero. The comparison of the condition $a$ with zero is performed
@@ -1291,7 +1231,6 @@ double feenox_builtin_if(expr_item_t *f) {
 }
 
 
-///fn+is_in_interval+name is_in_interval
 ///fn+is_in_interval+desc Returns true if the argument\ $x$ is in the interval\ $[a,b)$, 
 ///fn+is_in_interval+desc i.e. including\ $a$ but excluding\ $b$.
 ///fn+is_in_interval+usage is_in_interval(x, a, b)
@@ -1311,7 +1250,6 @@ double feenox_builtin_is_in_interval(expr_item_t *f) {
 
 
 
-///fn+threshold_max+name threshold_max
 ///fn+threshold_max+desc Returns one if the first argument\ $x$ is greater than the threshold given by
 ///fn+threshold_max+desc the second argument $a$, and \textit{exactly} zero otherwise. If the optional
 ///fn+threshold_max+desc third argument $b$ is provided, an hysteresis of width $b$ is needed in order
@@ -1347,7 +1285,6 @@ double feenox_builtin_threshold_max(expr_item_t *f) {
 }
 
 
-///fn+threshold_min+name threshold_min
 ///fn+threshold_min+desc Returns one if the first argument\ $x$ is less than the threshold given by
 ///fn+threshold_min+desc the second argument $a$, and \textit{exactly} zero otherwise. If the optional
 ///fn+threshold_min+desc third argument $b$ is provided, an hysteresis of width $b$ is needed in order
@@ -1383,7 +1320,6 @@ double feenox_builtin_threshold_min(expr_item_t *f) {
 }
 
 
-///fn+min+name min
 ///fn+min+desc Returns the minimum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be given.
 ///fn+min+usage min(x1, x2, [...], [x10])
 ///fn+min+math  \min \Big (x_1, x_2, \dots, x_{10} \Big)
@@ -1400,7 +1336,6 @@ double feenox_builtin_min(expr_item_t *f) {
   return min;
 }
 
-///fn+max+name max
 ///fn+max+desc Returns the maximum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be given.
 ///fn+max+usage max(x1, x2, [...], [x10])
 ///fn+max+math  \max \Big (x_1, x_2, \dots, x_{10} \Big)
@@ -1419,7 +1354,6 @@ double feenox_builtin_max(expr_item_t *f) {
 }
 
 
-///fn+mark_min+name mark_min
 ///fn+mark_min+desc Returns the integer index $i$ of the minimum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be provided.
 ///fn+mark_min+usage mark_max(x1, x2, [...], [x10])
 ///fn+mark_min+math  i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i
@@ -1438,7 +1372,6 @@ double feenox_builtin_mark_min(expr_item_t *f) {
   return i_min+1;
 }
 
-///fn+mark_max+name mark_max
 ///fn+mark_max+desc Returns the integer index $i$ of the maximum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be provided.
 ///fn+mark_max+usage mark_max(x1, x2, [...], [x10])
 ///fn+mark_max+math  i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i

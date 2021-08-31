@@ -2,9 +2,15 @@
 
 kws=$(grep "///op+" ../src/flow/init.c | awk '{print $1}' | awk -F+ '{print $2}' | uniq)
 
+# echo "~~~terminal"
+# grep "///help+usage+desc" ../src/flow/init.c | cut -d" " -f2- | sed 's/@$//' | sed 's_/\\/_//_'
+# echo "~~~"
+# echo
+
+
 for kw in ${kws}; do
 
-  # option como definition list
+  # option as definition list
   grep "///op+${kw}+option" ../src/flow/init.c | cut -d" " -f2-
   echo  
 
