@@ -7,4 +7,5 @@ tmp.*
 mesh2d.msh
 square-centered.msh
 laplace-square.msh
-t4.msh
+nafems-t4.msh
+nafems-le10.msh

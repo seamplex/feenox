@@ -593,6 +593,7 @@ Mat feenox_problem_create_matrix(const char *name) {
   petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
   petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
   petsc_call_null(MatSetFromOptions(A));
+  // TODO:  MatXAIJSetPreallocation
   petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL, feenox.pde.width, PETSC_NULL));
   petsc_call_null(MatSeqAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL));
 

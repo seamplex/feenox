@@ -28,6 +28,7 @@ TESTS = tests/abort.sh \
         tests/materials.sh \
         tests/mesh.sh \
         tests/modal.sh \
+        tests/nafems-lex.sh \
         tests/nafems-tx.sh \
         tests/nafems-t4.sh \
         tests/point-kinetics.sh \

@@ -9,10 +9,9 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-# this t4 is separated from t1 & t2 because it needs gmsh
 checkpetsc
 checkgmsh
 
-gmsh -2 ${dir}/nafems-t4.geo
-answer nafems-t4.fee 18.3
+gmsh -3 ${dir}/nafems-le10.geo
+answerdiff nafems-le10.fee
 exitifwrong $?

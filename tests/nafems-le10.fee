@@ -1,0 +1,19 @@
+PROBLEM mechanical 3D
+READ_MESH nafems-le10.msh
+
+BC upper    p=1
+BC DCD'C'   v=0
+BC ABA'B'   u=0
+BC BCB'C'   u=0 v=0
+BC midplane w=0
+
+E = 210e3
+nu = 0.3
+
+SOLVE_PROBLEM 
+
+MATRIX stress ROWS 3 COLS 3 DATA \
+    sigmax(2000,0,300)  tauxy(2000,0,300)  tauzx(2000,0,300) \
+    tauxy(2000,0,300) sigmay(2000,0,300)  tauyz(2000,0,300) \
+    tauzx(2000,0,300)  tauyz(2000,0,300) sigmaz(2000,0,300)
+PRINT %+.2f stress

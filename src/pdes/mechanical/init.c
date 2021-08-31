@@ -76,7 +76,6 @@ int feenox_problem_init_parser_mechanical(void) {
   
   feenox_call(feenox_problem_define_solutions());
 
-  // TODO: describir las funciones para reference
   feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, 1));
   feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, 1));
   feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, 1));
