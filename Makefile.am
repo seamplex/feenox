@@ -1,4 +1,5 @@
-SUBDIRS = src doc
+#SUBDIRS = src doc
+SUBDIRS = src
 
 dist_doc_DATA = AUTHORS ChangeLog README TODO \
                 doc/feenox.texi doc/logo.svg doc/feenox.xml doc/reference.md
