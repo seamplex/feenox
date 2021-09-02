@@ -310,10 +310,13 @@ AS_IF([test -e ${gsldist}],[
  AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR([GNU Scientific library headers libgsl-dev not found.
 Either install them with your package manager or configure with --enable-download-gsl]))
 
+ # TODO: the original idea is that
  # if we found PETSc, we use whatever BLAS it has, otherwise we use GSL's CBLAS
- AS_IF([test "x${have_petsc}" != "xyes"],
+ # but this does not work in Fedora since even though the library flexiblas
+ # that is used by PETSc does contain cblas_dgemm, it is not found by the linker
+ #AS_IF([test "x${have_petsc}" != "xyes"],
   AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR([GNU Scientific library CBLAS libgsl-dev not found]))
- )
+ #)
  AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library libgsl-dev not found]))
  gsl_version="from system"
 ])
