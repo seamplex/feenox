@@ -37,7 +37,7 @@ int feenox_instruction_solve_problem(void *arg) {
   feenox_call(feenox.pde.solve());
   
   // TODO: how to do this in parallel?
-  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi));
+  feenox_call(feenox_problem_phi_to_solution((feenox.pde.nev == 0) ? feenox.pde.phi : feenox.pde.eigenvector[0]));
   
   if (feenox.pde.solve_post != NULL) {
     feenox_call(feenox.pde.solve_post());
@@ -85,7 +85,7 @@ int feenox_problem_phi_to_solution(Vec phi) {
       if (feenox.pde.rough == 0) {
         feenox.pde.solution[g]->data_value[j] = feenox.pde.mesh->node[j].phi[g];
       }
-
+        
       if (feenox.pde.nev > 1) {
         PetscScalar xi = 0;
         unsigned int i = 0;
