@@ -58,6 +58,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
   if (thermal.q.defined) {
     double q = thermal.q.eval(&thermal.q, x, material);
     unsigned int j = 0;
+    // TODO: H*q
     for (j = 0; j < this->type->nodes; j++) {
       gsl_vector_add_to_element(feenox.pde.bi, j, w * this->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
     }

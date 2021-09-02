@@ -99,9 +99,9 @@ FeenoX is distributed under the terms of the [GNU General Public License](http:/
 # Further information
 
 Home page: <https://www.seamplex.com/feenox>  
-Repository: <https://github.com/seamplex/feenox.git>  
-Mailing list and bug reports: <wasora@seamplex.com>  (you need to subscribe first at <wasora+subscribe@seamplex.com>)  
-Web interface for mailing list: <https://www.seamplex.com/lists.html>  
+Repository: <https://github.com/seamplex/feenox>  
+Bug reporting: <https://github.com/seamplex/feenox/issues>  
+Discussions: <https://github.com/seamplex/feenox/discussions>  
 Follow us: [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA)
            [LinkedIn](https://www.linkedin.com/company/seamplex/)
            [Github](https://github.com/seamplex)

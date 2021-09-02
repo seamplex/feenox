@@ -377,27 +377,6 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
   double value = feenox_expression_eval(&assignment->rhs);
 
   if (assignment->variable != NULL) {
-    // si es un assignment sobre una variable parametrica, a comerla 
-/*      
-    for (i = 0; i < feenox.parametric.dimensions; i++) {
-      if (assignment->variable == feenox.parametric.variable[i]) {
-        return FEENOX_OK;
-      }
-    }
-    // idem sobre un parametro a optimizar, aunque dejamos que en la primera vuelta entre
-    if ((int)(feenox_var(feenox_special_var(in_outer_initial))) == 0) {
-      for (i = 0; i < feenox.fit.p; i++) {
-        if (assignment->variable == feenox.fit.param[i]) {
-          return FEENOX_OK;
-        }
-      }
-      for (i = 0; i < feenox.min.n; i++) {
-        if (assignment->variable == feenox.min.x[i]) {
-          return FEENOX_OK;
-        }
-      }
-    }
-*/    
 //    constant = assignment->variable->constant;
     current = feenox_value_ptr(assignment->variable);
     initial_static = assignment->variable->initial_static;

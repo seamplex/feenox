@@ -17,6 +17,10 @@ feenox_SOURCES = \
 ./feenox.h \
 ./version.c \
 ./version.h \
+./contrib/kdtree.c \
+./contrib/kdtree.h \
+./contrib/utlist.h \
+./contrib/uthash.h \
 ./flow/init.c \
 ./flow/abort.c \
 ./flow/conditional.c \
@@ -113,8 +117,11 @@ feenox_SOURCES = \
 ./pdes/modal/bulk.c \
 ./pdes/modal/bc.c \
 ./pdes/modal/post.c \
-./contrib/kdtree.c \
-./contrib/kdtree.h \
-./contrib/utlist.h \
-./contrib/uthash.h
+./pdes/neutron_diffusion_fem/modal.h \
+./pdes/neutron_diffusion_fem/methods.h \
+./pdes/neutron_diffusion_fem/init.c \
+./pdes/neutron_diffusion_fem/bulk.c \
+./pdes/neutron_diffusion_fem/bc.c \
+./pdes/neutron_diffusion_fem/post.c \
+./pdes/neutron_diffusion_fem/parser.c
 

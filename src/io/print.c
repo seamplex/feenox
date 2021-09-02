@@ -72,7 +72,7 @@ int feenox_instruction_print(void *arg) {
   print->last_time = feenox_special_var_value(t);
   print->last_static_step = (int)(feenox_special_var_value(step_static));
 
-  if (print->header && (feenox.mode != mode_parametric || (int)feenox_special_var_value(step_outer) == 1)) {
+  if (print->header) {
     if (print->skip_header_step.items != NULL && print->header_already_printed == 0) {
       have_to_header = 1;
     } else if (((int)(feenox_special_var_value(step_transient)) - print->last_header_step) < feenox_expression_eval(&print->skip_header_step)) {
@@ -193,10 +193,8 @@ int feenox_instruction_print_function(void *arg) {
     feenox_call(feenox_function_init(print_function->first_function));
   }
   
-  // vemos si hay que escribir un header
+  // check if we have to write a header
   if (print_function->header) {
-//  && (feenox.parametric_mode == 0 ||
-//       (int)feenox_special_var_value(step_outer) == 1)) {
     fprintf(print_function->file->pointer, "# ");
     
     // primero los argumentos de la primera funcion

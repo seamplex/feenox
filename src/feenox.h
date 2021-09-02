@@ -1415,13 +1415,11 @@ struct feenox_t {
   
   enum {
     mode_normal,
-    mode_parametric,
-    mode_optimize,
     mode_fit,
     mode_list_vars
   } mode;
   
-  // pointer to the run function (normal, parametric, optimize, fit, etc)
+  // pointer to the run function (normal, fit, etc)
   int (*run)(void);
   
   int debug;
@@ -1463,13 +1461,10 @@ struct feenox_t {
     var_t *done;
     var_t *done_static;
     var_t *done_transient;
-    var_t *done_outer;
   
-    var_t *step_outer;
     var_t *step_static;
     var_t *step_transient;
 
-    var_t *in_outer_initial;
     var_t *in_static;
     var_t *in_static_first;
     var_t *in_static_last;
@@ -2252,5 +2247,6 @@ extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 #include "pdes/thermal/methods.h"
 #include "pdes/mechanical/methods.h"
 #include "pdes/modal/methods.h"
+#include "pdes/neutron_diffusion_fem/methods.h"
 
 #endif    /* FEENOX_H  */

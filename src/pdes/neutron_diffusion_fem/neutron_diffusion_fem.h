@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's routines for modal analysis: global header
+ *  feenox's routines for neutron diffusion FEM: global header
  *
  *  Copyright (C) 2021 jeremy theler
  *
@@ -19,46 +19,35 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#ifndef MODAL_H
-#define MODAL_H
+#ifndef NEUTRON_DIFFUSION_FEM_H
+#define NEUTRON_DIFFUSION_FEM_H
 
-#define DEFAULT_MODAL_MODES        10
+#define DEFAULT_NEUTRON_DIFFUSION_FEM_MODES        10
 
-typedef struct modal_t modal_t;
+typedef struct neutron_diffusion_fem_t neutron_diffusion_fem_t;
 
-struct modal_t {
+struct neutron_diffusion_fem_t {
 
-  enum {
-    variant_full,
-    variant_plane_stress,
-    variant_plane_strain
-  } variant;  
+  unsigned int groups;  
   
-  int has_dirichlet_bcs;
-  
-  distribution_t E;     // Young's modulus
-  distribution_t nu;    // Poisson's ratio
-  distribution_t rho;   // density
+  distribution_t *D;
+  distribution_t *sigma_t;
+  distribution_t *sigma_a;
+  distribution_t *nu_sigma_f;
+  distribution_t **sigma_s;
+  distribution_t *source;
 
 #ifdef HAVE_PETSC  
-  PetscBool space_E;
-  PetscBool space_nu;
-  PetscBool space_rho;
-  
-  MatNullSpace rigid_body_base;
-  
+//  PetscBool has_dirichlet_bcs;
+  PetscBool has_sources;
+  PetscBool has_fission;
+  PetscBool space_XS;
 #endif
+
+  var_t *keff;
   
-  var_t *M_T;
-  vector_t *f;
-  vector_t *omega;
-  vector_t *m;
-  vector_t *L;
-  vector_t *Gamma;
-  vector_t *mu;
-  vector_t *Mu;
 };  
 
 
-#endif /* MODAL_H */
+#endif /* NEUTRON_DIFFUSION_FEM_H */
 

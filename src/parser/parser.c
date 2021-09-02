@@ -2979,7 +2979,7 @@ int feenox_parse_problem(void) {
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
 
 ///kw_pde+PROBLEM+usage modal
-///kw_pde+PROBLEM+usage ]@
+///kw_pde+PROBLEM+usage |
 ///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
     } else if (strcasecmp(token, "modal") == 0) {
 #ifndef HAVE_SLEPC
@@ -2989,7 +2989,14 @@ int feenox_parse_problem(void) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       
+///kw_pde+PROBLEM+usage neutron_diffusion_fem
+///kw_pde+PROBLEM+usage ]@
+///kw_pde+PROBLEM+detail  * `neutron_diffusion_fem` multi-group core-level neutron diffusion with a FEM formulation 
+    } else if (strcasecmp(token, "neutron_diffusion_fem") == 0) {
+      feenox_problem_parse_particular = feenox_problem_parse_problem_neutron_diffusion_fem;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_neutron_diffusion_fem;
 
+      
 ///kw_pde+PROBLEM+detail @    
 ///kw_pde+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
 ///kw_pde+PROBLEM+detail Check out [FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)

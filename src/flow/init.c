@@ -190,6 +190,7 @@ int feenox_init_special_objects(void) {
 ///va+done_static+detail It is set to true (i.e. $\neq 0$) by feenox if `step_static` $\ge$ `static_steps`.
 ///va+done_static+detail If the user sets it to true, the current step is marked as the last static step and
 ///va+done_static+detail the static calculation ends after finishing the step.
+///va+done_static+detail It can be used in `IF` blocks to check if the static step is finished or not.
   feenox_special_var(done_static) = feenox_get_or_define_variable_get_ptr("done_static");
   
 
@@ -197,39 +198,33 @@ int feenox_init_special_objects(void) {
 ///va+done_transient+detail It is set to true (i.e. $\neq 0$) by feenox if `t` $\ge$ `end_time`.
 ///va+done_transient+detail If the user sets it to true, the current step is marked as the last transient step and
 ///va+done_transient+detail the transient calculation ends after finishing the step.
+///va+done_transient+detail It can be used in `IF` blocks to check if the transient steps are finished or not.
   feenox_special_var(done_transient) = feenox_get_or_define_variable_get_ptr("done_transient");
 
 
-///va+done_outer+desc Flag that indicates whether the parametric, optimization of fit calculation is over or not.
-///va+done_outer+detail It is set to true (i.e. $\neq 0$) by feenox whenever the outer calculation is considered to be finished,
-///va+done_outer+detail which can be that the parametric calculation swept the desired parameter space or that the
-///va+done_outer+detail optimization algorithm reached the desired convergence criteria.
-///va+done_outer+detail If the user sets it to true, the current step is marked as the last outer step and
-///va+done_outer+detail the transient calculation ends after finishing the step.
-  feenox_special_var(done_outer) = feenox_get_or_define_variable_get_ptr("done_outer");
-
-
 ///va+done+desc Flag that indicates whether the overall calculation is over.
+///va+done+detail This variable is set to true by FeenoX when the computation finished so it can
+///va+done+detail be checked in an `IF` block to do something only in the last step.
+///va+done+detail But this variable can also be set to true from the input file, indicating that
+///va+done+detail the current step should also be the last one. For example, one can set `end_time = infinite`
+///va+done+detail and then finish the computation at $t=10$ by setting `done = t > 10`.
+///va+done+detail This `done` variable can also come from (and sent to) other sources, like
+///va+done+detail a shared memory object for coupled calculations.
   feenox_special_var(done) = feenox_get_or_define_variable_get_ptr("done");
 
   
 
 ///va+step_static+desc Indicates the current step number of the iterative static calculation.
+///va+step_static+detail This is a read-only variable that contains the current step of the static calculation.
   feenox_special_var(step_static) = feenox_get_or_define_variable_get_ptr("step_static");
   
 
 ///va+step_transient+desc Indicates the current step number of the transient static calculation.
+///va+step_transient+detail This is a read-only variable that contains the current step of the transient calculation.
   feenox_special_var(step_transient) = feenox_get_or_define_variable_get_ptr("step_transient");
   
-
-///va+step_outer+desc Indicates the current step number of the iterative outer calculation (parametric, optimization or fit).
-  feenox_special_var(step_outer) = feenox_get_or_define_variable_get_ptr("step_outer");
-
-///va+in_outer_initial+desc Flag that indicates if the current step is the initial step of an optimization of fit run.
-  feenox_special_var(in_outer_initial) = feenox_get_or_define_variable_get_ptr("in_outer_initial");
-  
-
-///va+in_static+desc Flag that indicates if feenox is solving the iterative static calculation.
+///va+in_static+desc Flag that indicates if FeenoX is solving the iterative static calculation.
+///va+in_static+detail This is a read-only variable that is non zero if the static calculation.
   feenox_special_var(in_static) = feenox_get_or_define_variable_get_ptr("in_static");
 
 

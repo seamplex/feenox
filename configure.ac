@@ -270,7 +270,7 @@ AC_ARG_ENABLE([download-gsl],
 AS_IF([test ! -e ${gsldist}],[
  AS_IF([test ! -e ${gsldist}.tar.gz],[
   AS_IF([test "x$download_gsl" = "xyes"],[
-   AS_IF([test "x`which wget`" != "x"],[
+   AS_IF([test "x$(which wget)" != "x"],[
     AC_MSG_NOTICE([downloading ${gslmirror}])
     wget -c ${gslmirror}
    ],[
