@@ -289,8 +289,8 @@ int feenox_parse_line(void) {
       return FEENOX_ERROR;
 #endif      
       
-///kw_pde+PHYSICAL_GROUP_pde+desc Explicitly defines a physical group of elements on a mesh.
-///kw_pde+PHYSICAL_GROUP_pde+usage PHYSICAL_GROUP
+///kw_pde+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
+///kw_pde+PHYSICAL_GROUP+usage PHYSICAL_GROUP
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       feenox_call(feenox_parse_physical_group());
@@ -724,116 +724,7 @@ int feenox_parse_line(void) {
 
       return FEENOX_OK;      
 
-// --- M4 -----------------------------------------------------
-//kw+M4+desc Call the `m4` macro processor with definitions from feenox variables or expressions.
-//kw+M4+usage M4
-    } else if (strcasecmp(token, "M4") == 0) {
 
-      m4_t *m4;
-      m4 = calloc(1, sizeof(m4_t));
-      LL_APPEND(feenox.m4s, m4);
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-        
-//kw+M4+usage { INPUT_FILE <file_id> |
-        if (strcasecmp(token, "INPUT_FILE") == 0) {
-          feenox_call(feenox_parser_file(&m4->input_file));
-          
-//kw+M4+usage FILE_PATH <file_path> }
-        } else if (strcasecmp(token, "INPUT_FILE_PATH") == 0) {
-          feenox_call(feenox_parser_file_path(&m4->input_file, "r"));
-
-//kw+M4+usage { OUTPUT_FILE <file_id> |
-        } else if (strcasecmp(token, "OUTPUT_FILE") == 0) {
-          feenox_call(feenox_parser_file(&m4->output_file));
-          
-//kw+M4+usage OUTPUT_FILE_PATH <file_path> }
-        } else if (strcasecmp(token, "OUTPUT_FILE_PATH") == 0) {
-          feenox_call(feenox_parser_file_path(&m4->output_file, "w"));
-
-//kw+M4+usage [ EXPAND <name> ] ... }
-        } else if (strcasecmp(token, "EXPAND") == 0) {
-          
-          m4_macro_t *macro = calloc(1, sizeof(m4_macro_t));
-          LL_APPEND(m4->macros, macro);
-          
-          feenox_call(feenox_parser_string(&macro->name));
-          feenox_check_alloc(macro->print_token.format = strdup(DEFAULT_M4_FORMAT));
-          if (feenox_parse_expression(macro->name, &macro->print_token.expression) != FEENOX_OK) {
-            feenox_push_error_message("m4 expansion of '%s' failed", macro->name);
-            return FEENOX_ERROR;
-          }
-
-//kw+M4+usage [ MACRO <name> [ <format> ] <definition> ] ... }
-        } else if (strcasecmp(token, "MACRO") == 0) {
-          
-          m4_macro_t *macro = calloc(1, sizeof(m4_macro_t));
-          LL_APPEND(m4->macros, macro);
-          
-          feenox_call(feenox_parser_string(&macro->name));
-          
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected either macro format or definition");
-            return FEENOX_ERROR;
-          }
-
-          if (token[0] == '%') {
-            feenox_check_alloc(macro->print_token.format = strdup(token));
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected macro definition");
-              return FEENOX_ERROR;
-            }
-            if (macro->print_token.format[0] == 'd') {
-              macro->print_token.format[0] = 'g';
-            }
-          } else {
-            feenox_check_alloc(macro->print_token.format = strdup(DEFAULT_M4_FORMAT));
-          }
-
-          // si el formato es %s o la expresion no evalua, lo tomamos como string
-          if (strcasecmp(macro->print_token.format, "%s") == 0 ||
-              feenox_parse_expression(token, &macro->print_token.expression) != FEENOX_OK) {
-            feenox_check_alloc(macro->print_token.text = strdup(token));
-          }
-          
-        } else {
-          feenox_push_error_message("unkown keyword '%s'", token);
-          return FEENOX_ERROR;
-        }
-      }
-
-      if (feenox_define_instruction(feenox_instruction_m4, m4) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return FEENOX_OK;
-
-// --- SHELL -----------------------------------------------------
-//kw+SHELL+desc Execute a shell command.
-//kw+SHELL+usage SHELL
-    } else if (strcasecmp(token, "SHELL") == 0) {
-
-      shell_t *shell;
-      shell = calloc(1, sizeof(shell_t));
-      LL_APPEND(feenox.shells, shell);
-
-//kw+SHELL+usage <print_format> [ expr_1 expr_2 ... expr_n ]
-      if (feenox_parser_string_format(&shell->format, &shell->n_args) != FEENOX_OK) {
-        return FEENOX_ERROR;
-      }
-
-      shell->arg = calloc(shell->n_args, sizeof(expr_t));
-      for (i = 0; i < shell->n_args; i++) {
-        if (feenox_parser_expression(&shell->arg[i]) != FEENOX_OK) {
-          return FEENOX_ERROR;
-        }
-      }
-
-      if (feenox_define_instruction(feenox_instruction_shell, shell) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return FEENOX_OK;
 
 // ----- HISTORY  -----------------------------------------------------------------
 //kw+HISTORY+desc Record the time history of a variable as a function of time.
@@ -1049,7 +940,7 @@ int feenox_parse_time_path(void) {
 
   char *token;
   
-///kw_pde+TIME_PATH+usage <expr_1> [ <expr_2>  [ ... <expr_n> ] ]
+///kw_dae+TIME_PATH+usage <expr_1> [ <expr_2>  [ ... <expr_n> ] ]
   while ((token = feenox_get_next_token(NULL)) != NULL) {
     feenox_call(feenox_add_time_path(token));
   }
@@ -2318,7 +2209,7 @@ int feenox_parse_endif(void) {
 
 int feenox_parse_phase_space(void) {
     
-///kw_pde+PHASE_SPACE+usage PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }
+///kw_pde+PHASE_SPACE+usage PHASE_SPACE <vars> ... <vectors> ... <matrices> ... 
 
   if (feenox.dae.dimension != 0) {
     feenox_push_error_message("PHASE_SPACE keyword already given");
@@ -2379,14 +2270,14 @@ int feenox_parse_read_mesh(void) {
     
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+READ_MESH_pde+detail The spatial dimensions cab be given with `DIMENSION`.
-///kw+READ_MESH_pde+detail If material properties are uniform and given with variables,
-///kw+READ_MESH_pde+detail the number of dimensions are not needed and will be read from the file at runtime.
-///kw+READ_MESH_pde+detail But if either properties are given by spatial functions or if functions
-///kw+READ_MESH_pde+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
-///kw+READ_MESH_pde+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
-///kw+READ_MESH_pde+detail how many arguments these functions take. 
-///kw+READ_MESH_pde+usage [ DIMENSIONS <num_expr> ]@
+///kw_pde+READ_MESH+detail The spatial dimensions cab be given with `DIMENSION`.
+///kw_pde+READ_MESH+detail If material properties are uniform and given with variables,
+///kw_pde+READ_MESH+detail the number of dimensions are not needed and will be read from the file at runtime.
+///kw_pde+READ_MESH+detail But if either properties are given by spatial functions or if functions
+///kw_pde+READ_MESH+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
+///kw_pde+READ_MESH+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
+///kw_pde+READ_MESH+detail how many arguments these functions take. 
+///kw_pde+READ_MESH+usage [ DIMENSIONS <num_expr> ]@
     if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -2396,42 +2287,42 @@ int feenox_parse_read_mesh(void) {
         return FEENOX_ERROR;
       }
 
-///kw+READ_MESH_pde+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
-///kw+READ_MESH_pde+usage [ SCALE <expr> ]
+///kw_pde+READ_MESH+detail If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
+///kw_pde+READ_MESH+usage [ SCALE <expr> ]
     } else if (strcasecmp(token, "SCALE") == 0) {
       feenox_call(feenox_parser_expression(&mesh->scale_factor));
 
-///kw+READ_MESH_pde+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
+///kw_pde+READ_MESH+usage [ OFFSET <expr_x> <expr_y> <expr_z> ]@
     } else if (strcasecmp(token, "OFFSET") == 0) {
       feenox_call(feenox_parser_expression(&mesh->offset_x));
       feenox_call(feenox_parser_expression(&mesh->offset_y));
       feenox_call(feenox_parser_expression(&mesh->offset_z));
 
-///kw+READ_MESH_pde+usage [ INTEGRATION { full | reduced } ]@
+///kw_pde+READ_MESH+usage [ INTEGRATION { full | reduced } ]@
     } else if (strcasecmp(token, "INTEGRATION") == 0) {
       char *keywords[] = {"full", "reduced", ""};
       int values[] = {integration_full, integration_reduced, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)(&mesh->integration)));
 
-///kw+READ_MESH_pde+detail When defining several meshes and solving a PDE problem, the mesh used
-///kw+READ_MESH_pde+detail as the PDE domain is the one marked with `MAIN`.
-///kw+READ_MESH_pde+detail If none of the meshes is explicitly marked as main, the first one is used.
-///kw+READ_MESH_pde+usage [ MAIN ]
+///kw_pde+READ_MESH+detail When defining several meshes and solving a PDE problem, the mesh used
+///kw_pde+READ_MESH+detail as the PDE domain is the one marked with `MAIN`.
+///kw_pde+READ_MESH+detail If none of the meshes is explicitly marked as main, the first one is used.
+///kw_pde+READ_MESH+usage [ MAIN ]
     } else if (strcasecmp(token, "MAIN") == 0) {
       feenox.mesh.mesh_main = mesh;
 
-///kw+READ_MESH_pde+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
-///kw+READ_MESH_pde+detail each time step. Default is to read the mesh once, except if the file path changes with time.
-///kw+READ_MESH_pde+usage [ UPDATE_EACH_STEP ]@
+///kw_pde+READ_MESH+detail If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
+///kw_pde+READ_MESH+detail each time step. Default is to read the mesh once, except if the file path changes with time.
+///kw_pde+READ_MESH+usage [ UPDATE_EACH_STEP ]@
     } else if (strcasecmp(token, "UPDATE_EACH_STEP") == 0 || strcasecmp(token, "RE_READ") == 0) {
       mesh->update_each_step = 1;
 
 
-///kw+READ_MESH_pde+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
-///kw+READ_MESH_pde+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
-///kw+READ_MESH_pde+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
-///kw+READ_MESH_pde+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
-///kw+READ_MESH_pde+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
+///kw_pde+READ_MESH+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+///kw_pde+READ_MESH+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
+///kw_pde+READ_MESH+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
+///kw_pde+READ_MESH+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
+///kw_pde+READ_MESH+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
     } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0) {
 
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
@@ -2474,7 +2365,7 @@ int feenox_parse_read_mesh(void) {
     }
   }
 
-///kw+READ_MESH_pde+detail If no mesh is marked as `MAIN`, the first one is the main one.
+///kw_pde+READ_MESH+detail If no mesh is marked as `MAIN`, the first one is the main one.
   if (feenox.mesh.meshes == NULL) {
     feenox.mesh.mesh_main = mesh;
   }
@@ -2526,10 +2417,10 @@ int feenox_parse_write_mesh(void) {
   mesh_write_t *mesh_write = NULL;
   feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
 
-///kw+WRITE_MESH_pde+usage { <file_path> | <file_id> }
-///kw+WRITE_MESH_pde+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-///kw+WRITE_MESH_pde+detail The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
-///kw+WRITE_MESH_pde+detail be use to give the format explicitly.
+///kw_pde+WRITE_MESH+usage { <file_path> | <file_id> }
+///kw_pde+WRITE_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+///kw_pde+WRITE_MESH+detail The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
+///kw_pde+WRITE_MESH+detail be use to give the format explicitly.
 
   feenox_call(feenox_parser_file(&mesh_write->file));
   if (mesh_write->file->mode == NULL) {
@@ -2538,9 +2429,9 @@ int feenox_parse_write_mesh(void) {
   
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+WRITE_MESH_pde+usage [ MESH <mesh_identifier> ]
-///kw+WRITE_MESH_pde+detail If there are several meshes defined then which one should be used has to be
-///kw+WRITE_MESH_pde+detail given explicitly with `MESH`.
+///kw_pde+WRITE_MESH+usage [ MESH <mesh_identifier> ]
+///kw_pde+WRITE_MESH+detail If there are several meshes defined then which one should be used has to be
+///kw_pde+WRITE_MESH+detail given explicitly with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       
       char *mesh_name = NULL;
@@ -2552,33 +2443,33 @@ int feenox_parse_write_mesh(void) {
       }
       feenox_free(mesh_name);
           
-///kw+WRITE_MESH_pde+usage [ NO_MESH ]
-///kw+WRITE_MESH_pde+detail If the `NO_MESH` keyword is given, only the results are written into the output file.
-///kw+WRITE_MESH_pde+detail Depending on the output format, this can be used to avoid repeating data and/or
-///kw+WRITE_MESH_pde+detail creating partial output files which can the be latter assembled by post-processing scripts.
+///kw_pde+WRITE_MESH+usage [ NO_MESH ]
+///kw_pde+WRITE_MESH+detail If the `NO_MESH` keyword is given, only the results are written into the output file.
+///kw_pde+WRITE_MESH+detail Depending on the output format, this can be used to avoid repeating data and/or
+///kw_pde+WRITE_MESH+detail creating partial output files which can the be latter assembled by post-processing scripts.
     } else if (strcasecmp(token, "NOMESH") == 0 || strcasecmp(token, "NO_MESH") == 0) {
       mesh_write->no_mesh = 1;
 
-///kw+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]
+///kw_pde+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]
     } else if (strcasecmp(token, "FILE_FORMAT") == 0) {
       char *keywords[] = {"gmsh", "vtk", ""};
       int values[] = {post_format_gmsh, post_format_vtk, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
 
-///kw+WRITE_MESH_pde+usage [ NO_PHYSICAL_NAMES ]
-///kw+WRITE_MESH_pde+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
-///kw+WRITE_MESH_pde+detail section that sets the actual names of the physical entities is not written.      
-///kw+WRITE_MESH_pde+detail This can be needed to avoid name clashes when reading multiple `.msh` files.
+///kw_pde+WRITE_MESH+usage [ NO_PHYSICAL_NAMES ]
+///kw_pde+WRITE_MESH+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+///kw_pde+WRITE_MESH+detail section that sets the actual names of the physical entities is not written.      
+///kw_pde+WRITE_MESH+detail This can be needed to avoid name clashes when reading multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
       mesh_write->no_physical_names = 1;
       
-///kw+WRITE_MESH_pde+usage  [ NODE |
-///kw+WRITE_MESH_pde+detail The output is node-based by default. This can be controlled with both the
-///kw+WRITE_MESH_pde+detail `NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
-///kw+WRITE_MESH_pde+detail will be written at the node (cells). These keywords can be used several times
-///kw+WRITE_MESH_pde+detail and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
-///kw+WRITE_MESH_pde+detail write the conductivity and the expression $1+z$ as cell-based and the temperature
-///kw+WRITE_MESH_pde+detail $T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
+///kw_pde+WRITE_MESH+usage  [ NODE |
+///kw_pde+WRITE_MESH+detail The output is node-based by default. This can be controlled with both the
+///kw_pde+WRITE_MESH+detail `NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
+///kw_pde+WRITE_MESH+detail will be written at the node (cells). These keywords can be used several times
+///kw_pde+WRITE_MESH+detail and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
+///kw_pde+WRITE_MESH+detail write the conductivity and the expression $1+z$ as cell-based and the temperature
+///kw_pde+WRITE_MESH+detail $T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
     } else if (strcasecmp(token, "NODE") == 0 || strcasecmp(token, "NODES") == 0) {
       mesh_write->field_location = field_location_nodes;
 
@@ -2587,18 +2478,18 @@ int feenox_parse_write_mesh(void) {
       mesh_write->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;
 
-///kw+WRITE_MESH_pde+detail Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
-///kw+WRITE_MESH_pde+detail representation of the fields that follow. Default is `%g`.
-///kw+WRITE_MESH_pde+usage [ SCALAR_FORMAT <printf_specification>]
+///kw_pde+WRITE_MESH+detail Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
+///kw_pde+WRITE_MESH+detail representation of the fields that follow. Default is `%g`.
+///kw_pde+WRITE_MESH+usage [ SCALAR_FORMAT <printf_specification>]
     } else if (strcasecmp(token, "SCALAR_FORMAT") == 0) {
       feenox_call(feenox_parser_string(&mesh_write->printf_format));
       
-///kw+WRITE_MESH_pde+detail The data to be written has to be given as a list of fields,
-///kw+WRITE_MESH_pde+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
-///kw+WRITE_MESH_pde+detail and/or expressions (such as `x^2+y^2+z^2`).
-///kw+WRITE_MESH_pde+detail Each field is written as a scalar, unless the keyword `VECTOR` is given.
-///kw+WRITE_MESH_pde+detail In this case, there should be exactly three fields following `VECTOR`.
-///kw+WRITE_MESH_pde+usage [ VECTOR <field_x> <field_y> <field_z> ] [...]
+///kw_pde+WRITE_MESH+detail The data to be written has to be given as a list of fields,
+///kw_pde+WRITE_MESH+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
+///kw_pde+WRITE_MESH+detail and/or expressions (such as `x^2+y^2+z^2`).
+///kw_pde+WRITE_MESH+detail Each field is written as a scalar, unless the keyword `VECTOR` is given.
+///kw_pde+WRITE_MESH+detail In this case, there should be exactly three fields following `VECTOR`.
+///kw_pde+WRITE_MESH+usage [ VECTOR <field_x> <field_y> <field_z> ] [...]
     } else if (strcasecmp(token, "VECTOR") == 0) {
       
       mesh_write_dist_t *mesh_write_dist = NULL;
@@ -2637,7 +2528,7 @@ int feenox_parse_write_mesh(void) {
           
     } else {
           
-///kw+WRITE_MESH_pde+usage [ <field_1> ] [ <field_2> ] ...
+///kw_pde+WRITE_MESH+usage [ <field_1> ] [ <field_2> ] ...
       mesh_write_dist_t *mesh_write_dist = NULL;
       feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
           
@@ -2714,12 +2605,12 @@ int feenox_parse_write_mesh(void) {
 
 
 int feenox_parse_physical_group(void) {
-///kw+PHYSICAL_GROUP_pde+detail This keyword should seldom be needed. Most of the times,
-///kw+PHYSICAL_GROUP_pde+detail  a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
+///kw_pde+PHYSICAL_GROUP+detail This keyword should seldom be needed. Most of the times,
+///kw_pde+PHYSICAL_GROUP+detail  a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
   
-///kw+PHYSICAL_GROUP_pde+usage <name>
-///kw+PHYSICAL_GROUP_pde+detail The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
-///kw+PHYSICAL_GROUP_pde+detail If there is no physical group with the provided name in the mesh, this instruction has no effect.
+///kw_pde+PHYSICAL_GROUP+usage <name>
+///kw_pde+PHYSICAL_GROUP+detail The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
+///kw_pde+PHYSICAL_GROUP+detail If there is no physical group with the provided name in the mesh, this instruction has no effect.
   char *name = NULL;
   feenox_call(feenox_parser_string(&name));
 
@@ -2730,46 +2621,46 @@ int feenox_parse_physical_group(void) {
   unsigned int dimension = 0;
   unsigned int id = 0;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw+PHYSICAL_GROUP_pde+usage [ MESH <name> ]
-///kw+PHYSICAL_GROUP_pde+detail If there are many meshes, an explicit mesh can be given with `MESH`.
-///kw+PHYSICAL_GROUP_pde+detail Otherwise, the physical group is defined on the main mesh.
+///kw_pde+PHYSICAL_GROUP+usage [ MESH <name> ]
+///kw_pde+PHYSICAL_GROUP+detail If there are many meshes, an explicit mesh can be given with `MESH`.
+///kw_pde+PHYSICAL_GROUP+detail Otherwise, the physical group is defined on the main mesh.
     if (strcasecmp(token, "MESH") == 0) {
       feenox_call(feenox_parser_string(&mesh_name));
 
-///kw+PHYSICAL_GROUP_pde+usage [ DIMENSION <expr> ]
-///kw+PHYSICAL_GROUP_pde+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
+///kw_pde+PHYSICAL_GROUP+usage [ DIMENSION <expr> ]
+///kw_pde+PHYSICAL_GROUP+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
     } else if (strcasecmp(token, "DIMENSION") == 0 || strcasecmp(token, "DIM") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
       dimension = (unsigned int)(round(xi));
 
-///kw+PHYSICAL_GROUP_pde+usage [ ID <expr> ]@
-///kw+PHYSICAL_GROUP_pde+detail An explicit id can be given with `ID`.
-///kw+PHYSICAL_GROUP_pde+detail Both dimension and id should match the values in the mesh.
+///kw_pde+PHYSICAL_GROUP+usage [ ID <expr> ]@
+///kw_pde+PHYSICAL_GROUP+detail An explicit id can be given with `ID`.
+///kw_pde+PHYSICAL_GROUP+detail Both dimension and id should match the values in the mesh.
     } else if (strcasecmp(token, "ID") == 0 || strcasecmp(token, "DIM") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
       id = (unsigned int)(round(xi));
       
-///kw+PHYSICAL_GROUP_pde+usage [ MATERIAL <name> |
-///kw+PHYSICAL_GROUP_pde+detail For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
-///kw+PHYSICAL_GROUP_pde+detail Note that if a material is created with the same name as a physical group in the mesh,
-///kw+PHYSICAL_GROUP_pde+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
-///kw+PHYSICAL_GROUP_pde+detail The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
-///kw+PHYSICAL_GROUP_pde+detail in a mesh file and a material in the feenox input file with different names.
-///kw+PHYSICAL_GROUP_pde+detail 
+///kw_pde+PHYSICAL_GROUP+usage [ MATERIAL <name> |
+///kw_pde+PHYSICAL_GROUP+detail For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
+///kw_pde+PHYSICAL_GROUP+detail Note that if a material is created with the same name as a physical group in the mesh,
+///kw_pde+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+///kw_pde+PHYSICAL_GROUP+detail The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
+///kw_pde+PHYSICAL_GROUP+detail in a mesh file and a material in the feenox input file with different names.
+///kw_pde+PHYSICAL_GROUP+detail 
     } else if (strcasecmp(token, "MATERIAL") == 0) {
       feenox_call(feenox_parser_string(&material_name));
   
-///kw+PHYSICAL_GROUP_pde+usage | BC <name> [ BC ... ] ]@
+///kw_pde+PHYSICAL_GROUP+usage | BC <name> [ BC ... ] ]@
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
-///kw+PHYSICAL_GROUP_pde+detail Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
-///kw+PHYSICAL_GROUP_pde+detail As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
-///kw+PHYSICAL_GROUP_pde+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
-///kw+PHYSICAL_GROUP_pde+detail The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
-///kw+PHYSICAL_GROUP_pde+detail in a mesh file and a boundary condition in the feenox input file with different names.
-///kw+PHYSICAL_GROUP_pde+detail Note that while there can be only one `MATERIAL` associated to a physical group,
-///kw+PHYSICAL_GROUP_pde+detail there can be many `BC`s associated to a physical group.
+///kw_pde+PHYSICAL_GROUP+detail Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
+///kw_pde+PHYSICAL_GROUP+detail As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
+///kw_pde+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+///kw_pde+PHYSICAL_GROUP+detail The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
+///kw_pde+PHYSICAL_GROUP+detail in a mesh file and a boundary condition in the feenox input file with different names.
+///kw_pde+PHYSICAL_GROUP+detail Note that while there can be only one `MATERIAL` associated to a physical group,
+///kw_pde+PHYSICAL_GROUP+detail there can be many `BC`s associated to a physical group.
       feenox_call(feenox_parser_string(&bc_name));
 
     } else {
