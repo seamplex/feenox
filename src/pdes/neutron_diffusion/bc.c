@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's routines for neutron diffusion FEM: post
+ *  feenox's routines for neutron diffusion FEM: boundary conditions
  *
  *  Copyright (C) 2021 jeremy theler
  *
@@ -20,11 +20,34 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "neutron_diffusion_fem.h"
+#include "neutron_diffusion.h"
 extern feenox_t feenox;
-extern neutron_diffusion_fem_t neutron_diffusion_fem;
+extern neutron_diffusion_t neutron_diffusion;
 
-int feenox_problem_solve_post_neutron_diffusion_fem(void) {
+int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, const char *rhs) {
 
+  if (strcmp(lhs, "null") == 0) {
+    bc_data->type_math = bc_type_math_dirichlet;
+    bc_data->dof = -1;
+    
+  } else {
+    feenox_push_error_message("unknown neutron_diffusion boundary condition '%s'", lhs);
+    return FEENOX_ERROR;
+  }
+
+  return FEENOX_OK;
+}
+
+
+// this virtual method fills in the dirichlet indexes and values with bc_data
+int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *bc_data, size_t node_index) {
+
+#ifdef HAVE_PETSC
+  unsigned int g = 0;
+  for (g = 0; g < feenox.pde.dofs; g++) {
+    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[g], 0));
+  }
+#endif
+  
   return FEENOX_OK;
 }

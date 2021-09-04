@@ -2247,6 +2247,6 @@ extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 #include "pdes/thermal/methods.h"
 #include "pdes/mechanical/methods.h"
 #include "pdes/modal/methods.h"
-#include "pdes/neutron_diffusion_fem/methods.h"
+#include "pdes/neutron_diffusion/methods.h"
 
 #endif    /* FEENOX_H  */

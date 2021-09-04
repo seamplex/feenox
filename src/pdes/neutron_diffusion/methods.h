@@ -22,25 +22,25 @@
 #ifndef NEUTRON_DIFFUSION_FEM_METHODS_H
 #define NEUTRON_DIFFUSION_FEM_METHODS_H
 
-// neutron_diffusion_fem/init.c
-extern int feenox_problem_parse_problem_neutron_diffusion_fem(const char *);
-extern int feenox_problem_init_parser_neutron_diffusion_fem(void);
-extern int feenox_problem_init_runtime_neutron_diffusion_fem(void);
+// neutron_diffusion/init.c
+extern int feenox_problem_parse_problem_neutron_diffusion(const char *);
+extern int feenox_problem_init_parser_neutron_diffusion(void);
+extern int feenox_problem_init_runtime_neutron_diffusion(void);
 #ifdef HAVE_PETSC
-extern int feenox_problem_setup_pc_neutron_diffusion_fem(PC pc);
-extern int feenox_problem_setup_ksp_neutron_diffusion_fem(KSP ksp);
+extern int feenox_problem_setup_pc_neutron_diffusion(PC pc);
+extern int feenox_problem_setup_ksp_neutron_diffusion(KSP ksp);
 #endif
 #ifdef HAVE_SLEPC
-extern int feenox_problem_setup_eps_neutron_diffusion_fem(EPS eps);
+extern int feenox_problem_setup_eps_neutron_diffusion(EPS eps);
 #endif
 
-// neutron_diffusion_fem/bulk.c
-extern int feenox_problem_build_volumetric_gauss_point_neutron_diffusion_fem(element_t *element, unsigned int v);
+// neutron_diffusion/bulk.c
+extern int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *element, unsigned int v);
 
-// neutron_diffusion_fem/bc.c
-extern int feenox_problem_bc_parse_neutron_diffusion_fem(bc_data_t *bc_data, const char *lhs, const char *rhs);
-extern int feenox_problem_bc_set_neutron_diffusion_fem_null(bc_data_t *bc_data, size_t node_index);
+// neutron_diffusion/bc.c
+extern int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, const char *rhs);
+extern int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *bc_data, size_t node_index);
 
-// neutron_diffusion_fem/post.c
-extern int feenox_problem_solve_post_neutron_diffusion_fem(void);
+// neutron_diffusion/post.c
+extern int feenox_problem_solve_post_neutron_diffusion(void);
 #endif  // NEUTRON_DIFFUSION_FEM

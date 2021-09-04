@@ -117,11 +117,11 @@ feenox_SOURCES = \
 ./pdes/modal/bulk.c \
 ./pdes/modal/bc.c \
 ./pdes/modal/post.c \
-./pdes/neutron_diffusion_fem/modal.h \
-./pdes/neutron_diffusion_fem/methods.h \
-./pdes/neutron_diffusion_fem/init.c \
-./pdes/neutron_diffusion_fem/bulk.c \
-./pdes/neutron_diffusion_fem/bc.c \
-./pdes/neutron_diffusion_fem/post.c \
-./pdes/neutron_diffusion_fem/parser.c
+./pdes/neutron_diffusion/modal.h \
+./pdes/neutron_diffusion/methods.h \
+./pdes/neutron_diffusion/init.c \
+./pdes/neutron_diffusion/bulk.c \
+./pdes/neutron_diffusion/bc.c \
+./pdes/neutron_diffusion/post.c \
+./pdes/neutron_diffusion/parser.c
 

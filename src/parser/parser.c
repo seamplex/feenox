@@ -2989,12 +2989,12 @@ int feenox_parse_problem(void) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       
-///kw_pde+PROBLEM+usage neutron_diffusion_fem
+///kw_pde+PROBLEM+usage neutron_diffusion
 ///kw_pde+PROBLEM+usage ]@
-///kw_pde+PROBLEM+detail  * `neutron_diffusion_fem` multi-group core-level neutron diffusion with a FEM formulation 
-    } else if (strcasecmp(token, "neutron_diffusion_fem") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_problem_neutron_diffusion_fem;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_neutron_diffusion_fem;
+///kw_pde+PROBLEM+detail  * `neutron_diffusion` multi-group core-level neutron diffusion with a FEM formulation 
+    } else if (strcasecmp(token, "neutron_diffusion") == 0) {
+      feenox_problem_parse_particular = feenox_problem_parse_problem_neutron_diffusion;
+      feenox_problem_init_parser_particular = feenox_problem_init_parser_neutron_diffusion;
 
       
 ///kw_pde+PROBLEM+detail @    

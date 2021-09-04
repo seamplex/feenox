@@ -19,14 +19,12 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#ifndef NEUTRON_DIFFUSION_FEM_H
-#define NEUTRON_DIFFUSION_FEM_H
+#ifndef NEUTRON_DIFFUSION_H
+#define NEUTRON_DIFFUSION_H
 
-#define DEFAULT_NEUTRON_DIFFUSION_FEM_MODES        10
+typedef struct neutron_diffusion_t neutron_diffusion_t;
 
-typedef struct neutron_diffusion_fem_t neutron_diffusion_fem_t;
-
-struct neutron_diffusion_fem_t {
+struct neutron_diffusion_t {
 
   unsigned int groups;  
   
