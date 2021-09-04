@@ -16,13 +16,15 @@ fi
 echo "creating main README for Github"
 cd ..
  pandoc README.md  -t gfm   -o README.markdown  \
-   --standalone --toc --reference-links --reference-location=section \
+   --standalone --toc --number-sections \
+   --reference-links --reference-location=section \
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
    --lua-filter=doc/not-in-format.lua
    
  pandoc README.md  -t plain -o README \
-   --standalone --toc --reference-links --reference-location=section \
+   --standalone --toc --number-sections \
+   --reference-links --reference-location=section \
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
    --lua-filter=doc/not-in-format.lua

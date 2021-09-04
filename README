@@ -1,11 +1,11 @@
 FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-  [What is FeenoX?]: #what-is-feenox
-  [Why?]: #why
-  [Download]: #download
-  [Git repository]: #git-repository
-  [Licensing]: #licensing
-  [Further information]: #further-information
+  [1 What is FeenoX?]: #what-is-feenox
+  [1.1 Why?]: #why
+  [2 Download]: #download
+  [2.1 Git repository]: #git-repository
+  [3 Licensing]: #licensing
+  [4 Further information]: #further-information
 
 What is FeenoX?
 
@@ -22,6 +22,7 @@ and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
   -   FeenoX Overview Presentation, August 2021
+      -   Recording (audio in Spanish, slides in English)
       -   Slides in PDF
       -   Markdown examples sources
 
@@ -208,6 +209,7 @@ above (rules of modularity and extensibility). See the documentation for
 details about how to contribute.
 
   [FeenoX]: https://www.seamplex.com/feenox
+  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
@@ -323,7 +325,7 @@ recommended way of getting FeenoX is to compile from source.
 2.  Install optional dependencies (of course these are optional but
     recommended)
 
-        sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+        sudo apt-get install libsundials-dev petsc-dev slepc-dev
 
 3.  Clone Github repository
 
@@ -396,10 +398,9 @@ gives:
 Further information
 
 Home page: https://www.seamplex.com/feenox
-Repository: https://github.com/seamplex/feenox.git
-Mailing list and bug reports: wasora@seamplex.com (you need to subscribe
-first at wasora+subscribe@seamplex.com)
-Web interface for mailing list: https://www.seamplex.com/lists.html
+Repository: https://github.com/seamplex/feenox
+Bug reporting: https://github.com/seamplex/feenox/issues
+Discussions: https://github.com/seamplex/feenox/discussions
 Follow us: YouTube LinkedIn Github
 
 ------------------------------------------------------------------------

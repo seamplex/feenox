@@ -3,11 +3,9 @@
 Catastrophically abort the execution and quit FeenoX.
 
 
-::: {.usage}
 ~~~feenox
 ABORT  
 ~~~
-:::
 
 
 
@@ -21,11 +19,9 @@ by using only parts of them or to conditionally abort the execution using `IF` c
 Define a scalar alias of an already-defined indentifier.
 
 
-::: {.usage}
 ~~~feenox
 ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
 ~~~
-:::
 
 
 
@@ -39,11 +35,9 @@ In the third case, to alias second element (2,3) of matrix `M` to the new name `
 Explicitly close a file after input/output.
 
 
-::: {.usage}
 ~~~feenox
 CLOSE <name>  
 ~~~
-:::
 
 
 
@@ -54,11 +48,9 @@ The given `<name>` can be either a fixed-string path or an already-defined `FILE
 Give a default value for an optional commandline argument.
 
 
-::: {.usage}
 ~~~feenox
 DEFAULT_ARGUMENT_VALUE <constant> <string>  
 ~~~
-:::
 
 
 
@@ -78,11 +70,9 @@ numerical expression will depend on the context.
 Define a file with a particularly formatted name to be used either as input or as output.
 
 
-::: {.usage}
 ~~~feenox
 < FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
 ~~~
-:::
 
 
 
@@ -106,7 +96,6 @@ the file can be explicitly opened or closed with the instructions `FILE_OPEN` an
 Find parameters to fit an analytical function to a pointwise-defined function.
 
 
-::: {.usage}
 ~~~feenox
 FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
  [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
@@ -115,7 +104,6 @@ FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <va
  [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
  [ VERBOSE ]  
 ~~~
-:::
 
 
 
@@ -145,11 +133,9 @@ If the optional keyword `VERBOSE` is given, some data of the intermediate steps 
 Define a function of one or more variables.
 
 
-::: {.usage}
 ~~~feenox
 FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
 ~~~
-:::
 
 
 
@@ -201,7 +187,6 @@ Default is `DEFAULT_SHEPARD_EXPONENT`.
 Execute a set of instructions if a condition is met.
 
 
-::: {.usage}
 ~~~feenox
 IF expr 
   <block_of_instructions_if_expr_is_true> 
@@ -209,7 +194,6 @@ IF expr
   <block_of_instructions_if_expr_is_false> ] 
  ENDIF  
 ~~~
-:::
 
 
 
@@ -219,11 +203,9 @@ IF expr
 Define whether implicit definition of variables is allowed or not.
 
 
-::: {.usage}
 ~~~feenox
 IMPLICIT { NONE | ALLOWED }  
 ~~~
-:::
 
 
 
@@ -238,11 +220,9 @@ depends on the last `IMPLICIT` keyword given, which by default is `ALLOWED`.
 Include another FeenoX input file.
 
 
-::: {.usage}
 ~~~feenox
 INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]  
 ~~~
-:::
 
 
 
@@ -263,11 +243,9 @@ The optional `FROM` and `TO` keywords can be used to include only portions of a 
 Define a matrix.
 
 
-::: {.usage}
 ~~~feenox
 MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |  
 ~~~
-:::
 
 
 
@@ -284,11 +262,9 @@ If there are more elements than the matrix size, the values will be ignored.
 Explicitly open a file for input/output.
 
 
-::: {.usage}
 ~~~feenox
 OPEN <name> [ MODE <fopen_mode> ]  
 ~~~
-:::
 
 
 
@@ -296,55 +272,17 @@ The given `<name>` can be either a fixed-string path or an already-defined `FILE
 The mode is only taken into account if the file is not already defined.
 Default is write `w`.
 
-#  `PHYSICAL_GROUP_pde`
-
-
-
-::: {.usage}
-~~~feenox
-<name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
- [ MATERIAL <name> | | BC <name> [ BC ... ] ]
-  
-~~~
-:::
-
-
-
-This keyword should seldom be needed. Most of the times,
- a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
-The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
-If there is no physical group with the provided name in the mesh, this instruction has no effect.
-If there are many meshes, an explicit mesh can be given with `MESH`.
-Otherwise, the physical group is defined on the main mesh.
-An explicit dimension of the physical group can be provided with `DIMENSION`.
-An explicit id can be given with `ID`.
-Both dimension and id should match the values in the mesh.
-For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
-Note that if a material is created with the same name as a physical group in the mesh,
-they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
-The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
-in a mesh file and a material in the feenox input file with different names.
-Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
-As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
-they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
-The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
-in a mesh file and a boundary condition in the feenox input file with different names.
-Note that while there can be only one `MATERIAL` associated to a physical group,
-there can be many `BC`s associated to a physical group.
-
 #  `PRINT`
 
 Write plain-text and/or formatted data to the standard output or into an output file.
 
 
-::: {.usage}
 ~~~feenox
 PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
  [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
   
 ~~~
-:::
 
 
 
@@ -393,7 +331,6 @@ to choose how to skip printing and may be useful for non-constant time-step prob
 Print one or more functions as a table of values of dependent and independent variables.
 
 
-::: {.usage}
 ~~~feenox
 PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
@@ -401,7 +338,6 @@ PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ]
  [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
  [ FORMAT <print_format> ] <vector_1> [ { vector | expr } ... { vector | expr } ]  
 ~~~
-:::
 
 
 
@@ -435,13 +371,11 @@ If the first function is not point-wise defined, the ranges are mandatory.
 Print the elements of one or more vectors, one element per line.
 
 
-::: {.usage}
 ~~~feenox
 PRINT_VECTOR 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
  [ FORMAT <print_format> ]  
 ~~~
-:::
 
 
 
@@ -452,52 +386,14 @@ names of the arguments and the names of the functions, separated by tabs.
 The header starts with a hash\ `#` that usually acts as a comment and is ignored
 by most plotting tools.
 
-#  `READ_MESH_pde`
-
-
-
-::: {.usage}
-~~~feenox
-[ DIMENSIONS <num_expr> ]
- [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
- [ INTEGRATION { full | reduced } ]
- [ MAIN ] [ UPDATE_EACH_STEP ]
- [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
- [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
-  
-~~~
-:::
-
-
-
-The spatial dimensions cab be given with `DIMENSION`.
-If material properties are uniform and given with variables,
-the number of dimensions are not needed and will be read from the file at runtime.
-But if either properties are given by spatial functions or if functions
-are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
-the number of dimensions ought to be given explicitly because FeenoX needs to know
-how many arguments these functions take.
-If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
-When defining several meshes and solving a PDE problem, the mesh used
-as the PDE domain is the one marked with `MAIN`.
-If none of the meshes is explicitly marked as main, the first one is used.
-If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
-each time step. Default is to read the mesh once, except if the file path changes with time.
-For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
-is defined and filled with the scalar data named `<name_in_mesh>` contained in the mesh file.
-The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
-If no mesh is marked as `MAIN`, the first one is the main one.
-
 #  `SORT_VECTOR`
 
 Sort the elements of a vector, optionally making the same rearrangement in another vector.
 
 
-::: {.usage}
 ~~~feenox
 SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]  
 ~~~
-:::
 
 
 
@@ -510,11 +406,9 @@ Default is ascending order.
 Explicitly define one or more scalar variables.
 
 
-::: {.usage}
 ~~~feenox
 VAR <name_1> [ <name_2> ] ... [ <name_n> ]  
 ~~~
-:::
 
 
 
@@ -530,11 +424,9 @@ the variable `x'` needs to be explicitly defined as `VAR x'` before the integral
 Define a vector.
 
 
-::: {.usage}
 ~~~feenox
 VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |  
 ~~~
-:::
 
 
 
@@ -553,50 +445,11 @@ If there are more elements than the vector size, the values will be ignored.
 
 
 
-::: {.usage}
 ~~~feenox
-[ FILE_FORMAT { gmsh | vtk } ] CELL ]  
+CELL ]  
 ~~~
-:::
 
 
 
-
-#  `WRITE_MESH_pde`
-
-
-
-::: {.usage}
-~~~feenox
-{ <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
-~~~
-:::
-
-
-
-Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
-be use to give the format explicitly.
-If there are several meshes defined then which one should be used has to be
-given explicitly with `MESH`.
-If the `NO_MESH` keyword is given, only the results are written into the output file.
-Depending on the output format, this can be used to avoid repeating data and/or
-creating partial output files which can the be latter assembled by post-processing scripts.
-When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
-section that sets the actual names of the physical entities is not written.
-This can be needed to avoid name clashes when reading multiple `.msh` files.
-The output is node-based by default. This can be controlled with both the
-`NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
-will be written at the node (cells). These keywords can be used several times
-and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
-write the conductivity and the expression $1+z$ as cell-based and the temperature
-$T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
-Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
-representation of the fields that follow. Default is `%g`.
-The data to be written has to be given as a list of fields,
-i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
-and/or expressions (such as `x^2+y^2+z^2`).
-Each field is written as a scalar, unless the keyword `VECTOR` is given.
-In this case, there should be exactly three fields following `VECTOR`.
 
 

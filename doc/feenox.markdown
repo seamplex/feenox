@@ -24,14 +24,12 @@ title: FeenoX
     -   [Algebraic expressions]
     -   [Special global variables]
         -   [`done`]
-        -   [`done_outer`]
         -   [`done_static`]
         -   [`done_transient`]
         -   [`dt`]
         -   [`end_time`]
         -   [`i`]
         -   [`infinite`]
-        -   [`in_outer_initial`]
         -   [`in_static`]
         -   [`in_static_first`]
         -   [`in_static_last`]
@@ -50,7 +48,6 @@ title: FeenoX
         -   [`realtime_scale`]
         -   [`rel_error`]
         -   [`static_steps`]
-        -   [`step_outer`]
         -   [`step_static`]
         -   [`step_transient`]
         -   [`t`]
@@ -68,16 +65,13 @@ title: FeenoX
         -   [`INCLUDE`]
         -   [`MATRIX`]
         -   [`OPEN`]
-        -   [`PHYSICAL_GROUP_pde`]
         -   [`PRINT`]
         -   [`PRINT_FUNCTION`]
         -   [`PRINT_VECTOR`]
-        -   [`READ_MESH_pde`]
         -   [`SORT_VECTOR`]
         -   [`VAR`]
         -   [`VECTOR`]
         -   [`WRITE_MESH`]
-        -   [`WRITE_MESH_pde`]
     -   [Differential-Algebraic Equations]
         -   [Keywords]
         -   [Variables]
@@ -180,14 +174,12 @@ title: FeenoX
   [Algebraic expressions]: #algebraic-expressions
   [Special global variables]: #special-global-variables
   [`done`]: #done
-  [`done_outer`]: #done_outer
   [`done_static`]: #done_static
   [`done_transient`]: #done_transient
   [`dt`]: #dt
   [`end_time`]: #end_time
   [`i`]: #i
   [`infinite`]: #infinite
-  [`in_outer_initial`]: #in_outer_initial
   [`in_static`]: #in_static
   [`in_static_first`]: #in_static_first
   [`in_static_last`]: #in_static_last
@@ -206,7 +198,6 @@ title: FeenoX
   [`realtime_scale`]: #realtime_scale
   [`rel_error`]: #rel_error
   [`static_steps`]: #static_steps
-  [`step_outer`]: #step_outer
   [`step_static`]: #step_static
   [`step_transient`]: #step_transient
   [`t`]: #t
@@ -224,16 +215,13 @@ title: FeenoX
   [`INCLUDE`]: #include
   [`MATRIX`]: #matrix
   [`OPEN`]: #open
-  [`PHYSICAL_GROUP_pde`]: #physical_group_pde
   [`PRINT`]: #print
   [`PRINT_FUNCTION`]: #print_function
   [`PRINT_VECTOR`]: #print_vector
-  [`READ_MESH_pde`]: #read_mesh_pde
   [`SORT_VECTOR`]: #sort_vector
   [`VAR`]: #var
   [`VECTOR`]: #vector
   [`WRITE_MESH`]: #write_mesh
-  [`WRITE_MESH_pde`]: #write_mesh_pde
   [Differential-Algebraic Equations]: #differential-algebraic-equations
   [Keywords]: #keywords
   [Variables]: #variables
@@ -375,6 +363,7 @@ and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
 > -   FeenoX Overview Presentation, August 2021
+>     -   [Recording (audio in Spanish, slides in English)]
 >     -   [Slides in PDF]
 >     -   [Markdown examples sources]
 
@@ -458,7 +447,7 @@ $
 For example, we can solve the [NAFEMS LE11] "Solid
 cylinder/Taper/Sphere-Temperature" benchmark like
 
-``` {.feenox style="feenox"}
+``` feenox
 READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
 
@@ -499,8 +488,7 @@ dz/dt = x y - b z
 \end{equation*}
 ```
 ::: {.not-in-format .plain .latex}
-$$\dot{x} = \sigma \cdot (y - x)$$\
-$$\dot{y} = x \cdot (r - z) - y$$\
+$$\dot{x} = \sigma \cdot (y - x)$$ $$\dot{y} = x \cdot (r - z) - y$$
 $$\dot{z} = x \cdot y - b \cdot z$$
 :::
 
@@ -510,7 +498,7 @@ generate the butterfly as presented by Edward Lorenz back in his seminal
 FeenoX by writing the equations in the input file as naturally as
 possible, as illustrated in the input file that follows:
 
-``` {.feenox style="feenox"}
+``` .feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -609,6 +597,7 @@ above (*rules of modularity and extensibility*). See the [documentation]
 for details about how to contribute.
 
   [FeenoX]: https://www.seamplex.com/feenox
+  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
@@ -711,7 +700,7 @@ See next section for detailed explanations.
     recommended)
 
     ``` terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+    sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
 3.  Clone Github repository
@@ -872,7 +861,7 @@ with the keyword \`PHASE_SPACE, like the Lorenz system.
 Install either by doing
 
 ``` terminal
-sudo apt-get install lib-sundials-dev
+sudo apt-get install libsundials-dev
 ```
 
 `\noindent `{=tex} or by following the instructions in the
@@ -1210,6 +1199,8 @@ To be done.
 
 # Description
 
+To be done.
+
 -   Nouns are definitions.
 -   Verbs are instructions.
 -   The equal sign can be both depending on what's on the left hand
@@ -1221,9 +1212,9 @@ Variables. Vectors. Matrices.
 
 ## Algebraic expressions
 
--   Everything is an expression.
-
 To be done.
+
+-   Everything is an expression.
 
 ## Special global variables
 
@@ -1231,17 +1222,14 @@ To be done.
 
 Flag that indicates whether the overall calculation is over.
 
-### `done_outer`
-
-Flag that indicates whether the parametric, optimization of fit
-calculation is over or not.
-
-It is set to true (i.e. $\neq 0$) by feenox whenever the outer
-calculation is considered to be finished, which can be that the
-parametric calculation swept the desired parameter space or that the
-optimization algorithm reached the desired convergence criteria. If the
-user sets it to true, the current step is marked as the last outer step
-and the transient calculation ends after finishing the step.
+This variable is set to true by FeenoX when the computation finished so
+it can be checked in an `IF` block to do something only in the last
+step. But this variable can also be set to true from the input file,
+indicating that the current step should also be the last one. For
+example, one can set `end_time = infinite` and then finish the
+computation at $t=10$ by setting `done = t > 10`. This `done` variable
+can also come from (and sent to) other sources, like a shared memory
+object for coupled calculations.
 
 ### `done_static`
 
@@ -1250,7 +1238,8 @@ Flag that indicates whether the static calculation is over or not.
 It is set to true (i.e. $\neq 0$) by feenox if `step_static` $\ge$
 `static_steps`. If the user sets it to true, the current step is marked
 as the last static step and the static calculation ends after finishing
-the step.
+the step. It can be used in `IF` blocks to check if the static step is
+finished or not.
 
 ### `done_transient`
 
@@ -1259,7 +1248,8 @@ Flag that indicates whether the transient calculation is over or not.
 It is set to true (i.e. $\neq 0$) by feenox if `t` $\ge$ `end_time`. If
 the user sets it to true, the current step is marked as the last
 transient step and the transient calculation ends after finishing the
-step.
+step. It can be used in `IF` blocks to check if the transient steps are
+finished or not.
 
 ### `dt`
 
@@ -1288,15 +1278,12 @@ A very big positive number.
 It can be used as `end_time = infinite` or to define improper integrals
 with infinite limits. Default is $2^{50} \approx 1 \times 10^{15}$.
 
-### `in_outer_initial`
-
-Flag that indicates if the current step is the initial step of an
-optimization of fit run.
-
 ### `in_static`
 
-Flag that indicates if feenox is solving the iterative static
+Flag that indicates if FeenoX is solving the iterative static
 calculation.
+
+This is a read-only variable that is non zero if the static calculation.
 
 ### `in_static_first`
 
@@ -1396,18 +1383,19 @@ be set by the user.
 
 The default value is one, meaning only one static step.
 
-### `step_outer`
-
-Indicates the current step number of the iterative outer calculation
-(parametric, optimization or fit).
-
 ### `step_static`
 
 Indicates the current step number of the iterative static calculation.
 
+This is a read-only variable that contains the current step of the
+static calculation.
+
 ### `step_transient`
 
 Indicates the current step number of the transient static calculation.
+
+This is a read-only variable that contains the current step of the
+transient calculation.
 
 ### `t`
 
@@ -1433,11 +1421,9 @@ $(1/2)^{-50} \approx 9\times 10^{-16}$ .
 
 Catastrophically abort the execution and quit FeenoX.
 
-::: usage
 ``` feenox
 ABORT  
 ```
-:::
 
 Whenever the instruction `ABORT` is executed, FeenoX quits with a
 non-zero error leve. It does not close files nor unlock shared memory
@@ -1449,11 +1435,9 @@ execution using `IF` clauses.
 
 Define a scalar alias of an already-defined indentifier.
 
-::: usage
 ``` feenox
 ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
 ```
-:::
 
 The existing object can be a variable, a vector element or a matrix
 element. In the first case, the name of the variable should be given as
@@ -1466,11 +1450,9 @@ to the new name `new`, `M(2,3)` should be given as the existing object.
 
 Explicitly close a file after input/output.
 
-::: usage
 ``` feenox
 CLOSE <name>  
 ```
-:::
 
 The given `<name>` can be either a fixed-string path or an
 already-defined `FILE`.
@@ -1479,11 +1461,9 @@ already-defined `FILE`.
 
 Give a default value for an optional commandline argument.
 
-::: usage
 ``` feenox
 DEFAULT_ARGUMENT_VALUE <constant> <string>  
 ```
-:::
 
 If a `$n` construction is found in the input file but the commandline
 argument was not given, the default behavior is to fail complaining that
@@ -1500,11 +1480,9 @@ the context.
 Define a file with a particularly formatted name to be used either as
 input or as output.
 
-::: usage
 ``` feenox
 < FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
 ```
-:::
 
 For reading or writing into files with a fixed path, this instruction is
 usually not needed as the `FILE` keyword of other instructions (such as
@@ -1531,7 +1509,6 @@ instructions `FILE_OPEN` and `FILE_CLOSE`.
 Find parameters to fit an analytical function to a pointwise-defined
 function.
 
-::: usage
 ``` feenox
 FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
  [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
@@ -1540,7 +1517,6 @@ FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <va
  [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
  [ VERBOSE ]  
 ```
-:::
 
 The function with the data has to be point-wise defined (i.e. a
 `FUNCTION` read from a file, with inline `DATA` or defined over a mesh).
@@ -1570,11 +1546,9 @@ steps is written in the standard output.
 
 Define a function of one or more variables.
 
-::: usage
 ``` feenox
 FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
 ```
-:::
 
 The number of variables $n$ is given by the number of arguments given
 between parenthesis after the function name. The arguments are defined
@@ -1638,7 +1612,6 @@ is `DEFAULT_SHEPARD_EXPONENT`.
 
 Execute a set of instructions if a condition is met.
 
-::: usage
 ``` feenox
 IF expr 
   <block_of_instructions_if_expr_is_true> 
@@ -1646,17 +1619,14 @@ IF expr
   <block_of_instructions_if_expr_is_false> ] 
  ENDIF  
 ```
-:::
 
 ### `IMPLICIT`
 
 Define whether implicit definition of variables is allowed or not.
 
-::: usage
 ``` feenox
 IMPLICIT { NONE | ALLOWED }  
 ```
-:::
 
 By default, FeenoX allows variables (but not vectors nor matrices) to be
 implicitly declared. To avoid introducing errors due to typos, explicit
@@ -1669,11 +1639,9 @@ is `ALLOWED`.
 
 Include another FeenoX input file.
 
-::: usage
 ``` feenox
 INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]  
 ```
-:::
 
 Includes the input file located in the string `file_path` at the current
 location. The effect is the same as copying and pasting the contents of
@@ -1693,11 +1661,9 @@ portions of a file.
 
 Define a matrix.
 
-::: usage
 ``` feenox
 MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |  
 ```
-:::
 
 A new matrix of the prescribed size is defined. The number of rows and
 columns can be an expression which will be evaluated the very first time
@@ -1713,64 +1679,25 @@ the matrix size, the values will be ignored.
 
 Explicitly open a file for input/output.
 
-::: usage
 ``` feenox
 OPEN <name> [ MODE <fopen_mode> ]  
 ```
-:::
 
 The given `<name>` can be either a fixed-string path or an
 already-defined `FILE`. The mode is only taken into account if the file
 is not already defined. Default is write `w`.
-
-### `PHYSICAL_GROUP_pde`
-
-::: usage
-``` feenox
-<name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
- [ MATERIAL <name> | | BC <name> [ BC ... ] ]
-  
-```
-:::
-
-This keyword should seldom be needed. Most of the times, a combination
-of `MATERIAL` and `BC` ought to be enough for most purposes. The name of
-the `PHYSICAL_GROUP` keyword should match the name of the physical group
-defined within the input file. If there is no physical group with the
-provided name in the mesh, this instruction has no effect. If there are
-many meshes, an explicit mesh can be given with `MESH`. Otherwise, the
-physical group is defined on the main mesh. An explicit dimension of the
-physical group can be provided with `DIMENSION`. An explicit id can be
-given with `ID`. Both dimension and id should match the values in the
-mesh. For volumetric elements, physical groups can be linked to
-materials using `MATERIAL`. Note that if a material is created with the
-same name as a physical group in the mesh, they will be linked
-automatically, so there is no need to use `PHYSCAL_GROUP` for this. The
-`MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
-in a mesh file and a material in the feenox input file with different
-names. Likewise, for non-volumetric elements, physical groups can be
-linked to boundary using `BC`. As in the preceeding case, if a boundary
-condition is created with the same name as a physical group in the mesh,
-they will be linked automatically, so there is no need to use
-`PHYSCAL_GROUP` for this. The `BC` keyword in `PHYSICAL_GROUP` is used
-to link a physical group in a mesh file and a boundary condition in the
-feenox input file with different names. Note that while there can be
-only one `MATERIAL` associated to a physical group, there can be many
-`BC`s associated to a physical group.
 
 ### `PRINT`
 
 Write plain-text and/or formatted data to the standard output or into an
 output file.
 
-::: usage
 ``` feenox
 PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
  [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
   
 ```
-:::
 
 Each argument `object` which is not a keyword of the `PRINT` instruction
 will be part of the output. Objects can be either a matrix, a vector or
@@ -1825,7 +1752,6 @@ and may be useful for non-constant time-step problems.
 Print one or more functions as a table of values of dependent and
 independent variables.
 
-::: usage
 ``` feenox
 PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
@@ -1833,7 +1759,6 @@ PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ]
  [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
  [ FORMAT <print_format> ] <vector_1> [ { vector | expr } ... { vector | expr } ]  
 ```
-:::
 
 Each argument should be either a function or an expression. The output
 of this instruction consists of $n+k$ columns, where $n$ is the number
@@ -1863,13 +1788,11 @@ mandatory.
 
 Print the elements of one or more vectors, one element per line.
 
-::: usage
 ``` feenox
 PRINT_VECTOR 
  [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
  [ FORMAT <print_format> ]  
 ```
-:::
 
 Each argument should be either a vector or an expression of the
 integer `i`. If the `FILE` keyword is not provided, default is to write
@@ -1878,50 +1801,14 @@ line containing the names of the arguments and the names of the
 functions, separated by tabs. The header starts with a hash `#` that
 usually acts as a comment and is ignored by most plotting tools.
 
-### `READ_MESH_pde`
-
-::: usage
-``` feenox
-[ DIMENSIONS <num_expr> ]
- [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
- [ INTEGRATION { full | reduced } ]
- [ MAIN ] [ UPDATE_EACH_STEP ]
- [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
- [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
-  
-```
-:::
-
-The spatial dimensions cab be given with `DIMENSION`. If material
-properties are uniform and given with variables, the number of
-dimensions are not needed and will be read from the file at runtime. But
-if either properties are given by spatial functions or if functions are
-to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then the
-number of dimensions ought to be given explicitly because FeenoX needs
-to know how many arguments these functions take. If either `OFFSET`
-and/or `SCALE` are given, the node locations are first shifted and then
-scaled by the provided values. When defining several meshes and solving
-a PDE problem, the mesh used as the PDE domain is the one marked with
-`MAIN`. If none of the meshes is explicitly marked as main, the first
-one is used. If `UPDATE_EACH_STEP` is given, then the mesh data is
-re-read from the file at each time step. Default is to read the mesh
-once, except if the file path changes with time. For each `READ_FIELD`
-keyword, a point-wise defined function of space named `<function_name>`
-is defined and filled with the scalar data named `<name_in_mesh>`
-contained in the mesh file. The `READ_FUNCTION` keyword is a shortcut
-when the scalar name and the to-be-defined function are the same. If no
-mesh is marked as `MAIN`, the first one is the main one.
-
 ### `SORT_VECTOR`
 
 Sort the elements of a vector, optionally making the same rearrangement
 in another vector.
 
-::: usage
 ``` feenox
 SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]  
 ```
-:::
 
 This instruction sorts the elements of `<vector>` into either ascending
 or descending numerical order. If `<other_vector>` is given, the same
@@ -1931,11 +1818,9 @@ rearrangement is made on it. Default is ascending order.
 
 Explicitly define one or more scalar variables.
 
-::: usage
 ``` feenox
 VAR <name_1> [ <name_2> ] ... [ <name_n> ]  
 ```
-:::
 
 When implicit definition is allowed (see [`IMPLICIT`]), scalar variables
 need not to be defined before being used if from the context FeenoX can
@@ -1951,11 +1836,9 @@ explicitly defined as `VAR x'` before the integral.
 
 Define a vector.
 
-::: usage
 ``` feenox
 VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |  
 ```
-:::
 
 A new vector of the prescribed size is defined. The size can be an
 expression which will be evaluated the very first time the vector is
@@ -1972,46 +1855,9 @@ elements than the vector size, the values will be ignored.
 
 ### `WRITE_MESH`
 
-::: usage
 ``` feenox
-[ FILE_FORMAT { gmsh | vtk } ] CELL ]  
+CELL ]  
 ```
-:::
-
-### `WRITE_MESH_pde`
-
-::: usage
-``` feenox
-{ <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
-```
-:::
-
-Either a file identifier (defined previously with a `FILE` keyword) or a
-file path should be given. The format is automatically detected from the
-extension. Otherwise, the keyword `FILE_FORMAT` can be use to give the
-format explicitly. If there are several meshes defined then which one
-should be used has to be given explicitly with `MESH`. If the `NO_MESH`
-keyword is given, only the results are written into the output file.
-Depending on the output format, this can be used to avoid repeating data
-and/or creating partial output files which can the be latter assembled
-by post-processing scripts. When targetting the `.msh` output format, if
-`NO_PHYSICAL_NAMES` is given then the section that sets the actual names
-of the physical entities is not written. This can be needed to avoid
-name clashes when reading multiple `.msh` files. The output is
-node-based by default. This can be controlled with both the `NODE` and
-`CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
-will be written at the node (cells). These keywords can be used several
-times and mixed with fields. For example
-`CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will write the
-conductivity and the expression $1+z$ as cell-based and the temperature
-$T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
-Also, the `SCALAR_FORMAT` keyword can be used to define the precision of
-the ASCII representation of the fields that follow. Default is `%g`. The
-data to be written has to be given as a list of fields,
-i.e. distributions (such as `k` or `E`), functions of space (such as
-`T`) and/or expressions (such as `x^2+y^2+z^2`). Each field is written
-as a scalar, unless the keyword `VECTOR` is given. In this case, there
-should be exactly three fields following `VECTOR`.
 
 ## Differential-Algebraic Equations
 
@@ -2021,11 +1867,9 @@ should be exactly three fields following `VECTOR`.
 
 Define how initial conditions of DAE problems are computed.
 
-::: usage
 ``` feenox
 INITIAL_CONDITIONS { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }  
 ```
-:::
 
 In DAE problems, initial conditions may be either:
 
@@ -2052,21 +1896,17 @@ for further information.
 Asks FeenoX to solve a set of algebraic-differntial equations and define
 the variables, vectors and/or matrices that span the phase space.
 
-::: usage
 ``` feenox
 PHASE_SPACE  
 ```
-:::
 
 #### `TIME_PATH`
 
 Force time-dependent problems to pass through specific instants of time.
 
-::: usage
 ``` feenox
-TIME_PATH  
+TIME_PATH <expr_1> [ <expr_2>  [ ... <expr_n> ] ]  
 ```
-:::
 
 The time step `dt` will be reduced whenever the distance between the
 current time `t` and the next expression in the list is greater than
@@ -2085,11 +1925,9 @@ times.
 Define a boundary condition to be applied to faces, edges and/or
 vertices.
 
-::: usage
 ``` feenox
 BC <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ] [ <bc_data1> <bc_data2> ... ]  
 ```
-:::
 
 If the name of the boundary condition matches a physical group in the
 mesh, it is automatically linked to that physical group. If there are
@@ -2107,23 +1945,19 @@ See the particular section on boundary conditions for further details.
 
 Dump raw PETSc objects used to solve PDEs into files.
 
-::: usage
 ``` feenox
 DUMP [ FORMAT { binary | ascii | octave } ] [ K |   K_bc |   b |   b_bc |   M |   M_bc |  
 ```
-:::
 
 #### `FIND_EXTREMA`
 
 Find and/or compute the absolute extrema of a function or expression
 over a mesh (or a subset of it).
 
-::: usage
 ``` feenox
 FIND_EXTREMA { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS | GAUSS ]
  [ MIN <variable> ] [ MAX <variable> ] [ X_MIN <variable> ] [ X_MAX <variable> ] [ Y_MIN <variable> ] [ Y_MAX <variable> ] [ Z_MIN <variable> ] [ Z_MAX <variable> ] [ I_MIN <variable> ] [ I_MAX <variable> ]  
 ```
-:::
 
 Either an expression or a function of space $x$, $y$ and/or $z$ should
 be given. By default the search is performed over the
@@ -2150,13 +1984,11 @@ by `I_MIN` (`I_MAX`).
 Spatially integrate a function or expression over a mesh (or a subset of
 it).
 
-::: usage
 ``` feenox
 INTEGRATE { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
  RESULT <variable>
   
 ```
-:::
 
 Either an expression or a function of space $x$, $y$ and/or $z$ should
 be given. If the integrand is a function, do not include the arguments,
@@ -2182,11 +2014,9 @@ created.
 
 Define a material its and properties to be used in volumes.
 
-::: usage
 ``` feenox
 MATERIAL <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ] [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]  
 ```
-:::
 
 If the name of the material matches a physical group in the mesh, it is
 automatically linked to that physical group. If there are many meshes,
@@ -2208,29 +2038,51 @@ expression that defines the mandatory property.
 
 #### `PHASE_SPACE` {#phase_space}
 
-::: usage
 ``` feenox
-PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }  
+PHASE_SPACE <vars> ... <vectors> ... <matrices> ...   
 ```
-:::
 
-#### `PHYSICAL_GROUP_pde` {#physical_group_pde}
+#### `PHYSICAL_GROUP`
 
 Explicitly defines a physical group of elements on a mesh.
 
-::: usage
 ``` feenox
-PHYSICAL_GROUP  
+PHYSICAL_GROUP <name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
+ [ MATERIAL <name> | | BC <name> [ BC ... ] ]
+  
 ```
-:::
+
+This keyword should seldom be needed. Most of the times, a combination
+of `MATERIAL` and `BC` ought to be enough for most purposes. The name of
+the `PHYSICAL_GROUP` keyword should match the name of the physical group
+defined within the input file. If there is no physical group with the
+provided name in the mesh, this instruction has no effect. If there are
+many meshes, an explicit mesh can be given with `MESH`. Otherwise, the
+physical group is defined on the main mesh. An explicit dimension of the
+physical group can be provided with `DIMENSION`. An explicit id can be
+given with `ID`. Both dimension and id should match the values in the
+mesh. For volumetric elements, physical groups can be linked to
+materials using `MATERIAL`. Note that if a material is created with the
+same name as a physical group in the mesh, they will be linked
+automatically, so there is no need to use `PHYSCAL_GROUP` for this. The
+`MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
+in a mesh file and a material in the feenox input file with different
+names. Likewise, for non-volumetric elements, physical groups can be
+linked to boundary using `BC`. As in the preceeding case, if a boundary
+condition is created with the same name as a physical group in the mesh,
+they will be linked automatically, so there is no need to use
+`PHYSCAL_GROUP` for this. The `BC` keyword in `PHYSICAL_GROUP` is used
+to link a physical group in a mesh file and a boundary condition in the
+feenox input file with different names. Note that while there can be
+only one `MATERIAL` associated to a physical group, there can be many
+`BC`s associated to a physical group.
 
 #### `PROBLEM`
 
 Ask FeenoX to solve a partial-differential equation problem.
 
-::: usage
 ``` feenox
-PROBLEM [ mechanical | thermal | modal ]
+PROBLEM [ mechanical | thermal | modal | neutron_diffusion ]
  
  [ 1D |   2D |   3D |   DIMENSIONS <expr> ] [ MESH <identifier> ] 
  
@@ -2247,7 +2099,6 @@ PROBLEM [ mechanical | thermal | modal ]
  [ EIGEN_FORMULATION { omega | lambda } ]
   
 ```
-:::
 
 -   `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
 -   `mechanical` (or `elastic`) solves the mechanical elastic problem.
@@ -2256,6 +2107,8 @@ PROBLEM [ mechanical | thermal | modal ]
 -   `thermal` (or `heat` ) solves the heat conduction problem.
 -   `modal` computes the natural mechanical frequencies and oscillation
     modes.
+-   `neutron_diffusion` multi-group core-level neutron diffusion with a
+    FEM formulation
 
 If you are a programmer and want to contribute with another problem
 type, please do so! Check out \[FeenoX repository\](https: for licensing
@@ -2311,11 +2164,15 @@ of those available in PETSc (first option is the default):
 Read an unstructured mesh and (optionally) functions of space-time from
 a file.
 
-::: usage
 ``` feenox
-READ_MESH { <file_path> | <file_id> }  
+READ_MESH { <file_path> | <file_id> } [ DIMENSIONS <num_expr> ]
+ [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
+ [ INTEGRATION { full | reduced } ]
+ [ MAIN ] [ UPDATE_EACH_STEP ]
+ [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
+ [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
+  
 ```
-:::
 
 Either a file identifier (defined previously with a `FILE` keyword) or a
 file path should be given. The format is read from the extension, which
@@ -2335,7 +2192,26 @@ other functions contained in other files to compare results). The file
 path or file id can be used to refer to a particular mesh when reading
 more than one, for instance in a `WRITE_MESH` or `INTEGRATE` keyword. If
 a file path is given such as `cool_mesh.msh`, it can be later referred
-to as either `cool_mesh.msh` or just `cool_mesh`.
+to as either `cool_mesh.msh` or just `cool_mesh`. The spatial dimensions
+cab be given with `DIMENSION`. If material properties are uniform and
+given with variables, the number of dimensions are not needed and will
+be read from the file at runtime. But if either properties are given by
+spatial functions or if functions are to be read from the mesh with
+`READ_DATA` or `READ_FUNCTION`, then the number of dimensions ought to
+be given explicitly because FeenoX needs to know how many arguments
+these functions take. If either `OFFSET` and/or `SCALE` are given, the
+node locations are first shifted and then scaled by the provided values.
+When defining several meshes and solving a PDE problem, the mesh used as
+the PDE domain is the one marked with `MAIN`. If none of the meshes is
+explicitly marked as main, the first one is used. If `UPDATE_EACH_STEP`
+is given, then the mesh data is re-read from the file at each time step.
+Default is to read the mesh once, except if the file path changes with
+time. For each `READ_FIELD` keyword, a point-wise defined function of
+space named `<function_name>` is defined and filled with the scalar data
+named `<name_in_mesh>` contained in the mesh file. The `READ_FUNCTION`
+keyword is a shortcut when the scalar name and the to-be-defined
+function are the same. If no mesh is marked as `MAIN`, the first one is
+the main one.
 
   [Gmsh ASCII format]: http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format
   [ASCII legacy VTK]: https://lorensen.github.io/VTKExamples/site/VTKFileFormats/
@@ -2345,40 +2221,53 @@ to as either `cool_mesh.msh` or just `cool_mesh`.
 
 Explicitly solve the PDE problem.
 
-::: usage
 ``` feenox
 SOLVE_PROBLEM  
 ```
-:::
 
 Whenever the instruction `SOLVE_PROBLEM` is executed, FeenoX solves the
 PDE problem. For static problems, that means solving the equations and
 filling in the result functions. For transient or quasisstatic problems,
 that means advancing one time step.
 
-#### `TIME_PATH` {#time_path}
-
-::: usage
-``` feenox
-<expr_1> [ <expr_2>  [ ... <expr_n> ] ]  
-```
-:::
-
 #### `WRITE_MESH` {#write_mesh}
 
 Write a mesh and functions of space-time to a file for post-processing.
 
-::: usage
 ``` feenox
-WRITE_MESH  
+WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
 ```
-:::
+
+Either a file identifier (defined previously with a `FILE` keyword) or a
+file path should be given. The format is automatically detected from the
+extension. Otherwise, the keyword `FILE_FORMAT` can be use to give the
+format explicitly. If there are several meshes defined then which one
+should be used has to be given explicitly with `MESH`. If the `NO_MESH`
+keyword is given, only the results are written into the output file.
+Depending on the output format, this can be used to avoid repeating data
+and/or creating partial output files which can the be latter assembled
+by post-processing scripts. When targetting the `.msh` output format, if
+`NO_PHYSICAL_NAMES` is given then the section that sets the actual names
+of the physical entities is not written. This can be needed to avoid
+name clashes when reading multiple `.msh` files. The output is
+node-based by default. This can be controlled with both the `NODE` and
+`CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
+will be written at the node (cells). These keywords can be used several
+times and mixed with fields. For example
+`CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will write the
+conductivity and the expression $1+z$ as cell-based and the temperature
+$T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
+Also, the `SCALAR_FORMAT` keyword can be used to define the precision of
+the ASCII representation of the fields that follow. Default is `%g`. The
+data to be written has to be given as a list of fields,
+i.e. distributions (such as `k` or `E`), functions of space (such as
+`T`) and/or expressions (such as `x^2+y^2+z^2`). Each field is written
+as a scalar, unless the keyword `VECTOR` is given. In this case, there
+should be exactly three fields following `VECTOR`.
 
 ### Variables
 
 ### Laplace equation
-
-##### NONE
 
 Laplace's equation does not need any extra keyword to `PROBLEM`.
 
@@ -2394,22 +2283,10 @@ The coefficient of the temporal derivative for the transient equation
  $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
 If not given, default is one.
 
-::: usage
-``` feenox
-alpha  
-```
-:::
-
 ##### `f`
 
 The right hand side of the equation $\nabla^2 \phi=f(\vec{x})$. If not
 given, default is zero (i.e. Laplace).
-
-::: usage
-``` feenox
-f  
-```
-:::
 
 #### Boundary Conditions
 
@@ -2417,33 +2294,27 @@ f
 
 Alias for `phi'`.
 
-::: usage
 ``` feenox
-dphidn  
+dphidn=<expr>  
 ```
-:::
 
 ##### `phi`
 
 Dirichlet essential boundary condition in which the value of $\phi$ is
 prescribed.
 
-::: usage
 ``` feenox
-phi  
+phi=<expr>  
 ```
-:::
 
 ##### `phi'`
 
 Neumann natural boundary condition in which the value of the normal
 outward derivative $\frac{\partial \phi}{\partial n}$ is prescribed.
 
-::: usage
 ``` feenox
-phi'  
+phi'=<expr>  
 ```
-:::
 
 #### Results
 
@@ -2458,11 +2329,9 @@ to $f(\vec{x})$.
 
 Returns the absolute value of the argument $x$.
 
-::: usage
 ``` feenox
 abs(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$|x|$$
@@ -2491,11 +2360,9 @@ $
 Computes the arc in radians whose cosine is equal to the argument $x$. A
 NaN error is raised if $|x|>1$.
 
-::: usage
 ``` feenox
 acos(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\arccos(x)$$
@@ -2526,11 +2393,9 @@ $
 Computes the arc in radians whose sine is equal to the argument $x$. A
 NaN error is raised if $|x|>1$.
 
-::: usage
 ``` feenox
 asin(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\arcsin(x)$$
@@ -2560,11 +2425,9 @@ $
 
 Computes, in radians, the arc tangent of the argument $x$.
 
-::: usage
 ``` feenox
 atan(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\arctan(x)$$
@@ -2580,11 +2443,9 @@ Computes, in radians, the arc tangent of quotient $y/x$, using the signs
 of the two arguments to determine the quadrant of the result, which is
 in the range $[-\pi,\pi]$.
 
-::: usage
 ``` feenox
 atan2(y,x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\arctan(y/x)$$
@@ -2618,11 +2479,9 @@ $
 
 Returns the smallest integral value not less than the argument $x$.
 
-::: usage
 ``` feenox
 ceil(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\lceil x \rceil$$
@@ -2641,11 +2500,9 @@ depend on the optional integer argument $f$. It defaults to one, meaning
 values for $f$ can be checked in the `clock_gettime (2)` system call
 manual page.
 
-::: usage
 ``` feenox
 clock([f])  
 ```
-:::
 
 #### Example #1, clock.fee
 
@@ -2659,7 +2516,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ``` terminal
 $ feenox clock.fee
 doing something in between
-difference	4.2936e-05	[seconds]
+difference	5.3888e-05	[seconds]
 $
 ```
 
@@ -2670,11 +2527,9 @@ cosine wave can be generated by passing as the argument $x$ a linear
 function of time such as $\omega t+\phi$, where $\omega$ controls the
 frequency of the wave and $\phi$ controls its phase.
 
-::: usage
 ``` feenox
 cos(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\cos(x)$$
@@ -2689,11 +2544,9 @@ $$\cos(x)$$
 Computes the hyperbolic cosine of the argument $x$, where $x$ is in
 radians.
 
-::: usage
 ``` feenox
 cosh(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\cosh(x)$$
@@ -2710,11 +2563,9 @@ argument `f` is not provided or it is zero (default), the sum of times
 for both user-space and kernel-space usage is returned. For `f=1` only
 user time is returned. For `f=2` only system time is returned.
 
-::: usage
 ``` feenox
 cpu_time([f])  
 ```
-:::
 
 ### `d_dt`
 
@@ -2728,11 +2579,9 @@ functional `derivative`, the full dependence of these variables with
 time does not need to be known beforehand, i.e. the expression `x` might
 involve variables read from a shared-memory object at each time step.
 
-::: usage
 ``` feenox
 d_dt(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)$$
@@ -2765,11 +2614,9 @@ $
 Filters the first argument $x$ with a deadband centered at zero with an
 amplitude given by the second argument $a$.
 
-::: usage
 ``` feenox
 deadband(x, a)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}$$
@@ -2784,11 +2631,9 @@ otherwise the absolute value of their difference is compared against
 $\epsilon$. This function returns zero if the arguments are not equal
 and one otherwise. Default value for $\epsilon = 10^{-9}$.
 
-::: usage
 ``` feenox
 equal(a, b, [eps])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}$$
@@ -2799,11 +2644,9 @@ $$\begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}$$
 Computes the exponential function the argument $x$, i.e. the base of the
 natural logarithm $e$ raised to the $x$-th power.
 
-::: usage
 ``` feenox
 exp(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$e^x$$
@@ -2841,11 +2684,9 @@ $
 Computes the first exponential integral function of the argument $x$.
 If $x$ is zero, a NaN error is issued.
 
-::: usage
 ``` feenox
 expint1(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]$$
@@ -2875,11 +2716,9 @@ $
 
 Computes the second exponential integral function of the argument $x$.
 
-::: usage
 ``` feenox
 expint2(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$$
@@ -2893,11 +2732,9 @@ $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$$
 
 Computes the third exponential integral function of the argument $x$.
 
-::: usage
 ``` feenox
 expint3(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]$$
@@ -2912,11 +2749,9 @@ $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]$$
 Computes the $n$-th exponential integral function of the argument $x$.
 If $n$ is zero or one and $x$ is zero, a NaN error is issued.
 
-::: usage
 ``` feenox
 expintn(n,x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$$
@@ -2926,11 +2761,9 @@ $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$$
 
 Returns the largest integral value not greater than the argument $x$.
 
-::: usage
 ``` feenox
 floor(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\lfloor x \rfloor$$
@@ -2947,11 +2780,9 @@ If the optional second argument $\delta$ is provided, the discontinuous
 step at $x=0$ is replaced by a ramp starting at $x=0$ and finishing
 at $x=\delta$.
 
-::: usage
 ``` feenox
 heaviside(x, [delta])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}$$
@@ -2993,11 +2824,9 @@ The default precision is $\epsilon = 10^{-9}$. Even though `if` is a
 logical operation, all the arguments and the returned value are
 double-precision floating point numbers.
 
-::: usage
 ``` feenox
 if(a, [b], [c], [eps])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} b & \text{if $|a|<\epsilon$} \\ c & \text{otherwise} \end{cases}$$
@@ -3013,11 +2842,9 @@ the full dependence of these variables with time does not need to be
 known beforehand, i.e. the expression `x` might involve variables read
 from a shared-memory object at each time step.
 
-::: usage
 ``` feenox
 integral_dt(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
@@ -3054,11 +2881,9 @@ particular way of approximating time integrals is needed, for instance
 to compare FeenoX solutions with other computer codes. In general, it is
 recommended to use `integral_dt`.
 
-::: usage
 ``` feenox
 integral_euler_dt(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
@@ -3068,11 +2893,9 @@ $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \ap
 
 Returns one if the argument $x$ rounded to the nearest integer is even.
 
-::: usage
 ``` feenox
 is_even(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}$$
@@ -3083,11 +2906,9 @@ $$ \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}$
 Returns true if the argument $x$ is in the interval $[a,b)$,
 i.e. including $a$ but excluding $b$.
 
-::: usage
 ``` feenox
 is_in_interval(x, a, b)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}$$
@@ -3097,11 +2918,9 @@ $$\begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}
 
 Returns one if the argument $x$ rounded to the nearest integer is odd.
 
-::: usage
 ``` feenox
 is_odd(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$$
@@ -3112,11 +2931,9 @@ $$ \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$
 Computes the regular cylindrical Bessel function of zeroth order
 evaluated at the argument $x$.
 
-::: usage
 ``` feenox
 j0(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$J_0(x)$$
@@ -3152,11 +2969,9 @@ constant during the time interval $[t-\Delta t,t]$ and using the
 analytical solution of the differential equation for that case
 at $t = \Delta t$ with the initial condition $y(0) = y(t-\Delta t)$.
 
-::: usage
 ``` feenox
 lag(x, tau)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)$$
@@ -3168,11 +2983,9 @@ Filters the first argument $x(t)$ with a first-order lag of
 characteristic time $\tau$ to the time-dependent signal $x(t)$ by using
 the bilinear transformation formula.
 
-::: usage
 ``` feenox
 lag_bilinear(x, tau)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$x(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}$$
@@ -3184,11 +2997,9 @@ Filters the first argument $x(t)$ with a first-order lag of
 characteristic time $\tau$ to the time-dependent signal $x(t)$ by using
 the Euler forward rule.
 
-::: usage
 ``` feenox
 lag_euler(x, tau)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$x(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}$$
@@ -3204,11 +3015,9 @@ reference to `last` is done in an assignment over a variable that
 already appears inside expression $x$ such as `x = last(x)`. See example
 number 2.
 
-::: usage
 ``` feenox
 last(x,[p])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$z^{-1}\left[ x \right] = x(t-\Delta t)$$
@@ -3284,11 +3093,9 @@ $
 Limits the first argument $x$ to the interval $[a,b]$. The second
 argument $a$ should be less than the third argument $b$.
 
-::: usage
 ``` feenox
 limit(x, a, b)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}$$
@@ -3300,11 +3107,9 @@ Limits the value of the first argument $x(t)$ so to that its time
 derivative is bounded to the interval $[a,b]$. The second argument $a$
 should be less than the third argument $b$.
 
-::: usage
 ``` feenox
 limit_dt(x, a, b)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}$$
@@ -3315,11 +3120,9 @@ $$\begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdo
 Computes the natural logarithm of the argument $x$. If $x$ is zero or
 negative, a NaN error is issued.
 
-::: usage
 ``` feenox
 log(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\ln(x)$$
@@ -3378,11 +3181,9 @@ $
 Returns the integer index $i$ of the maximum of the arguments $x_i$
 provided. Currently only maximum of ten arguments can be provided.
 
-::: usage
 ``` feenox
 mark_max(x1, x2, [...], [x10])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
@@ -3393,11 +3194,9 @@ $$ i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
 Returns the integer index $i$ of the minimum of the arguments $x_i$
 provided. Currently only maximum of ten arguments can be provided.
 
-::: usage
 ``` feenox
 mark_max(x1, x2, [...], [x10])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
@@ -3408,11 +3207,9 @@ $$ i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
 Returns the maximum of the arguments $x_i$ provided. Currently only
 maximum of ten arguments can be given.
 
-::: usage
 ``` feenox
 max(x1, x2, [...], [x10])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \max \Big (x_1, x_2, \dots, x_{10} \Big)$$
@@ -3423,22 +3220,18 @@ $$ \max \Big (x_1, x_2, \dots, x_{10} \Big)$$
 Returns the maximum memory (resident set size) used by FeenoX, in
 Gigabytes.
 
-::: usage
 ``` feenox
 memory()  
 ```
-:::
 
 ### `min`
 
 Returns the minimum of the arguments $x_i$ provided. Currently only
 maximum of ten arguments can be given.
 
-::: usage
 ``` feenox
 min(x1, x2, [...], [x10])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \min \Big (x_1, x_2, \dots, x_{10} \Big)$$
@@ -3449,11 +3242,9 @@ $$ \min \Big (x_1, x_2, \dots, x_{10} \Big)$$
 Returns the remainder of the division between the first argument $a$ and
 the second one $b$. Both arguments may be non-integral.
 
-::: usage
 ``` feenox
 mod(a, b)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b$$
@@ -3465,11 +3256,9 @@ Returns one if the first argument $x$ is zero and zero otherwise. The
 second optional argument $\epsilon$ gives the precision of the "zero"
 evaluation. If not given, default is $\epsilon = 10^{-9}$.
 
-::: usage
 ``` feenox
 not(x, [eps])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}1 &\text{if $|x| < \epsilon$} \\ 0 &\text{otherwise} \end{cases}$$
@@ -3487,11 +3276,9 @@ give the same result. This function uses a second-order multiple
 recursive generator described by Knuth in Seminumerical Algorithms, 3rd
 Ed., Section 3.6.
 
-::: usage
 ``` feenox
 random(x1, x2, [s])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1$$
@@ -3509,22 +3296,18 @@ without seed (hopefully) do not give the same result. This function uses
 a second-order multiple recursive generator described by Knuth in
 Seminumerical Algorithms, 3rd Ed., Section 3.6.
 
-::: usage
 ``` feenox
 random_gauss(x1, x2, [s])  
 ```
-:::
 
 ### `round`
 
 Rounds the argument $x$ to the nearest integer. Halfway cases are
 rounded away from zero.
 
-::: usage
 ``` feenox
 round(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}$$
@@ -3542,11 +3325,9 @@ as the argument $x$ a linear function of time such as $\omega t+\phi$,
 where $\omega$ controls the frequency of the wave and $\phi$ controls
 its phase.
 
-::: usage
 ``` feenox
 sawtooth_wave(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$x - \lfloor x \rfloor$$
@@ -3584,11 +3365,9 @@ argument $x$. The second optional argument $\epsilon$ gives the
 precision of the "zero" evaluation. If not given, default is
 $\epsilon = 10^{-9}$.
 
-::: usage
 ``` feenox
 sgn(x, [eps])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}$$
@@ -3605,11 +3384,9 @@ wave can be generated by passing as the argument $x$ a linear function
 of time such as $\omega t+\phi$, where $\omega$ controls the frequency
 of the wave and $\phi$ controls its phase.
 
-::: usage
 ``` feenox
 sin(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\sin(x)$$
@@ -3638,11 +3415,9 @@ $
 Computes the hyperbolic sine of the argument $x$, where $x$ is in
 radians.
 
-::: usage
 ``` feenox
 sinh(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\sinh(x)$$
@@ -3657,11 +3432,9 @@ $$\sinh(x)$$
 Computes the positive square root of the argument $x$. If $x$ is
 negative, a NaN error is issued.
 
-::: usage
 ``` feenox
 sqrt(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$+\sqrt{x}$$
@@ -3680,11 +3453,9 @@ argument $x$ a linear function of time such as $\omega t+\phi$,
 where $\omega$ controls the frequency of the wave and $\phi$ controls
 its phase.
 
-::: usage
 ``` feenox
 square_wave(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}$$
@@ -3719,11 +3490,9 @@ $
 
 Computes the tangent of the argument $x$, where $x$ is in radians.
 
-::: usage
 ``` feenox
 tan(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$ \tan(x)$$
@@ -3738,11 +3507,9 @@ $$ \tan(x)$$
 Computes the hyperbolic tangent of the argument $x$, where $x$ is in
 radians.
 
-::: usage
 ``` feenox
 tanh(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\tanh(x)$$
@@ -3760,11 +3527,9 @@ otherwise. If the optional third argument $b$ is provided, an hysteresis
 of width $b$ is needed in order to reset the function value. Default is
 no hysteresis, i.e. $b=0$.
 
-::: usage
 ``` feenox
 threshold_max(x, a, [b])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
@@ -3778,11 +3543,9 @@ If the optional third argument $b$ is provided, an hysteresis of width
 $b$ is needed in order to reset the function value. Default is no
 hysteresis, i.e. $b=0$.
 
-::: usage
 ``` feenox
 threshold_min(x, a, [b])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
@@ -3796,11 +3559,9 @@ passing as the argument $x$ a linear function of time such
 as $\omega t+\phi$, where $\omega$ controls the frequency of the wave
 and $\phi$ controls its phase.
 
-::: usage
 ``` feenox
 triangular_wave(x)  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}$$
@@ -3814,11 +3575,9 @@ $$\begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.
 
 Returns the time ellapsed since the invocation of FeenoX, in seconds.
 
-::: usage
 ``` feenox
 wall_time()  
 ```
-:::
 
 ## Functionals
 
@@ -3835,11 +3594,9 @@ calls the GSL functions `gsl_deriv_backward`, `gsl_deriv_central` or
 `gsl_deriv_forward` according to the indicated flag $p$. Defaults are
 $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 
-::: usage
 ``` feenox
 derivative(f(x), x, a, [h], [p])  
 ```
-:::
 
 ::: {.not-in-format .man}
 $$\left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} $$

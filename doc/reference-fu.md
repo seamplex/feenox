@@ -15,11 +15,9 @@ according to the indicated flag $p$.
 Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 
 
-::: {.usage}
 ~~~feenox
 derivative(f(x), x, a, [h], [p])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} $$

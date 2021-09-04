@@ -1,11 +1,11 @@
 # FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-  [What is FeenoX?]: #what-is-feenox
-  [Why?]: #why
-  [Download]: #download
-  [Git repository]: #git-repository
-  [Licensing]: #licensing
-  [Further information]: #further-information
+  [<span class="toc-section-number">1</span> What is FeenoX?]: #what-is-feenox
+  [<span class="toc-section-number">1.1</span> Why?]: #why
+  [<span class="toc-section-number">2</span> Download]: #download
+  [<span class="toc-section-number">2.1</span> Git repository]: #git-repository
+  [<span class="toc-section-number">3</span> Licensing]: #licensing
+  [<span class="toc-section-number">4</span> Further information]: #further-information
 
 # What is FeenoX?
 
@@ -22,6 +22,7 @@ and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
 > -   FeenoX Overview Presentation, August 2021
+>     -   [Recording (audio in Spanish, slides in English)][]
 >     -   [Slides in PDF][]
 >     -   [Markdown examples sources][]
 
@@ -134,9 +135,7 @@ system][]—the one of the butterfly—whose differential equations are
 <div class="not-in-format plain latex">
 
 *ẋ* = *σ* ⋅ (*y*−*x*)
-  
 *ẏ* = *x* ⋅ (*r*−*z*) − *y*
-  
 *ż* = *x* ⋅ *y* − *b* ⋅ *z*
 
 </div>
@@ -147,7 +146,7 @@ generate the butterfly as presented by Edward Lorenz back in his seminal
 FeenoX by writing the equations in the input file as naturally as
 possible, as illustrated in the input file that follows:
 
-``` feenox
+``` .feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -244,6 +243,7 @@ above (*rules of modularity and extensibility*). See the
 [documentation][] for details about how to contribute.
 
   [FeenoX]: https://www.seamplex.com/feenox
+  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
@@ -363,7 +363,7 @@ recommended way of getting FeenoX is to compile from source.
     recommended)
 
     ``` terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+    sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
 3.  Clone Github repository
@@ -451,10 +451,9 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 # Further information
 
 Home page: <https://www.seamplex.com/feenox>  
-Repository: <https://github.com/seamplex/feenox.git>  
-Mailing list and bug reports: <wasora@seamplex.com> (you need to
-subscribe first at <wasora+subscribe@seamplex.com>)  
-Web interface for mailing list: <https://www.seamplex.com/lists.html>  
+Repository: <https://github.com/seamplex/feenox>  
+Bug reporting: <https://github.com/seamplex/feenox/issues>  
+Discussions: <https://github.com/seamplex/feenox/discussions>  
 Follow us: [YouTube][] [LinkedIn][] [Github][]
 
 ------------------------------------------------------------------------

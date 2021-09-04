@@ -6,9 +6,9 @@
 Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
 
 > * FeenoX Overview Presentation, August 2021
+>   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
 >   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
-
 
 ```{.include}
 design/thermal1d.md

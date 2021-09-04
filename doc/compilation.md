@@ -86,7 +86,7 @@ These optional dependencies have to be installed separately. There is no option 
 Install either by doing
 
 ```terminal
-sudo apt-get install lib-sundials-dev
+sudo apt-get install libsundials-dev
 ```
 
 \noindent 

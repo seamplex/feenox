@@ -130,6 +130,9 @@ finite-element(ish) tool.
 FeenoX Overview Presentation, August 2021
 @itemize
 @item
+@uref{https://youtu.be/-RJ5qn7E9uE,Recording (audio in Spanish, slides
+in English)}
+@item
 @uref{https://www.seamplex.com/feenox/doc/2021-feenox.pdf,Slides in PDF}
 @item
 @uref{https://github.com/gtheler/2021-presentation,Markdown examples
@@ -274,8 +277,8 @@ system}---the one of the butterfly---whose differential equations are
 \end{cases}
 \end{equation*}
 @end tex
-@math{\dot{x} = \sigma \cdot (y - x)}@*
-@math{\dot{y} = x \cdot (r - z) - y}@*
+@math{\dot{x} = \sigma \cdot (y - x)}
+@math{\dot{y} = x \cdot (r - z) - y}
 @math{\dot{z} = x \cdot y - b \cdot z}
 where @math{\sigma=10}, @math{b=8/3} and @math{r=28} are the classical
 parameters that generate the butterfly as presented by Edward Lorenz
@@ -529,7 +532,7 @@ recommended)
 
 @smallformat
 @verbatim
-sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+sudo apt-get install libsundials-dev petsc-dev slepc-dev
 @end verbatim
 @end smallformat
 
@@ -735,7 +738,7 @@ Install either by doing
 
 @smallformat
 @verbatim
-sudo apt-get install lib-sundials-dev
+sudo apt-get install libsundials-dev
 @end verbatim
 @end smallformat
 
@@ -1144,6 +1147,8 @@ To be done.
 @node Description
 @chapter Description
 @anchor{#description}
+To be done.
+
 @itemize
 @item
 Nouns are definitions.
@@ -1173,12 +1178,12 @@ Variables. Vectors. Matrices.
 @node Algebraic expressions
 @section Algebraic expressions
 @anchor{#algebraic-expressions}
+To be done.
+
 @itemize
 @item
 Everything is an expression.
 @end itemize
-
-To be done.
 
 @node Special global variables
 @section Special global variables
@@ -1186,14 +1191,12 @@ To be done.
 
 @menu
 * done::
-* done_outer::
 * done_static::
 * done_transient::
 * dt::
 * end_time::
 * i::
 * infinite::
-* in_outer_initial::
 * in_static::
 * in_static_first::
 * in_static_last::
@@ -1212,7 +1215,6 @@ To be done.
 * realtime_scale::
 * rel_error::
 * static_steps::
-* step_outer::
 * step_static::
 * step_transient::
 * t::
@@ -1224,18 +1226,14 @@ To be done.
 @anchor{#done}
 Flag that indicates whether the overall calculation is over.
 
-@node done_outer
-@subsection @code{done_outer}
-@anchor{#done_outer}
-Flag that indicates whether the parametric, optimization of fit
-calculation is over or not.
-
-It is set to true (i.e.@ @math{\neq 0}) by feenox whenever the outer
-calculation is considered to be finished, which can be that the
-parametric calculation swept the desired parameter space or that the
-optimization algorithm reached the desired convergence criteria. If the
-user sets it to true, the current step is marked as the last outer step
-and the transient calculation ends after finishing the step.
+This variable is set to true by FeenoX when the computation finished so
+it can be checked in an @code{IF} block to do something only in the last
+step. But this variable can also be set to true from the input file,
+indicating that the current step should also be the last one. For
+example, one can set @code{end_time = infinite} and then finish the
+computation at @math{t=10} by setting @code{done = t > 10}. This
+@code{done} variable can also come from (and sent to) other sources,
+like a shared memory object for coupled calculations.
 
 @node done_static
 @subsection @code{done_static}
@@ -1245,7 +1243,8 @@ Flag that indicates whether the static calculation is over or not.
 It is set to true (i.e.@ @math{\neq 0}) by feenox if @code{step_static}
 @math{\ge} @code{static_steps}. If the user sets it to true, the current
 step is marked as the last static step and the static calculation ends
-after finishing the step.
+after finishing the step. It can be used in @code{IF} blocks to check if
+the static step is finished or not.
 
 @node done_transient
 @subsection @code{done_transient}
@@ -1255,7 +1254,8 @@ Flag that indicates whether the transient calculation is over or not.
 It is set to true (i.e.@ @math{\neq 0}) by feenox if @code{t} @math{\ge}
 @code{end_time}. If the user sets it to true, the current step is marked
 as the last transient step and the transient calculation ends after
-finishing the step.
+finishing the step. It can be used in @code{IF} blocks to check if the
+transient steps are finished or not.
 
 @node dt
 @subsection @code{dt}
@@ -1290,17 +1290,13 @@ It can be used as @code{end_time = infinite} or to define improper
 integrals with infinite limits. Default is
 @math{2^{50} \approx 1 \times 10^{15}}.
 
-@node in_outer_initial
-@subsection @code{in_outer_initial}
-@anchor{#in_outer_initial}
-Flag that indicates if the current step is the initial step of an
-optimization of fit run.
-
 @node in_static
 @subsection @code{in_static}
 @anchor{#in_static}
-Flag that indicates if feenox is solving the iterative static
+Flag that indicates if FeenoX is solving the iterative static
 calculation.
+
+This is a read-only variable that is non zero if the static calculation.
 
 @node in_static_first
 @subsection @code{in_static_first}
@@ -1417,21 +1413,21 @@ be set by the user.
 
 The default value is one, meaning only one static step.
 
-@node step_outer
-@subsection @code{step_outer}
-@anchor{#step_outer}
-Indicates the current step number of the iterative outer calculation
-(parametric, optimization or fit).
-
 @node step_static
 @subsection @code{step_static}
 @anchor{#step_static}
 Indicates the current step number of the iterative static calculation.
 
+This is a read-only variable that contains the current step of the
+static calculation.
+
 @node step_transient
 @subsection @code{step_transient}
 @anchor{#step_transient}
 Indicates the current step number of the transient static calculation.
+
+This is a read-only variable that contains the current step of the
+transient calculation.
 
 @node t
 @subsection @code{t}
@@ -1470,16 +1466,13 @@ numbers such as replacing @math{a \leq a_\text{max}} with
 * INCLUDE::
 * MATRIX::
 * OPEN::
-* PHYSICAL_GROUP_pde::
 * PRINT::
 * PRINT_FUNCTION::
 * PRINT_VECTOR::
-* READ_MESH_pde::
 * SORT_VECTOR::
 * VAR::
 * VECTOR::
 * WRITE_MESH::
-* WRITE_MESH_pde::
 @end menu
 
 @node ABORT
@@ -1813,45 +1806,6 @@ The given @code{<name>} can be either a fixed-string path or an
 already-defined @code{FILE}. The mode is only taken into account if the
 file is not already defined. Default is write @code{w}.
 
-@node PHYSICAL_GROUP_pde
-@subsection @code{PHYSICAL_GROUP_pde}
-@anchor{#physical_group_pde}
-
-@smallformat
-@verbatim
-<name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
- [ MATERIAL <name> | | BC <name> [ BC ... ] ]
-  
-@end verbatim
-@end smallformat
-
-This keyword should seldom be needed. Most of the times, a combination
-of @code{MATERIAL} and @code{BC} ought to be enough for most purposes.
-The name of the @code{PHYSICAL_GROUP} keyword should match the name of
-the physical group defined within the input file. If there is no
-physical group with the provided name in the mesh, this instruction has
-no effect. If there are many meshes, an explicit mesh can be given with
-@code{MESH}. Otherwise, the physical group is defined on the main mesh.
-An explicit dimension of the physical group can be provided with
-@code{DIMENSION}. An explicit id can be given with @code{ID}. Both
-dimension and id should match the values in the mesh. For volumetric
-elements, physical groups can be linked to materials using
-@code{MATERIAL}. Note that if a material is created with the same name
-as a physical group in the mesh, they will be linked automatically, so
-there is no need to use @code{PHYSCAL_GROUP} for this. The
-@code{MATERIAL} keyword in @code{PHYSICAL_GROUP} is used to link a
-physical group in a mesh file and a material in the feenox input file
-with different names. Likewise, for non-volumetric elements, physical
-groups can be linked to boundary using @code{BC}. As in the preceeding
-case, if a boundary condition is created with the same name as a
-physical group in the mesh, they will be linked automatically, so there
-is no need to use @code{PHYSCAL_GROUP} for this. The @code{BC} keyword
-in @code{PHYSICAL_GROUP} is used to link a physical group in a mesh file
-and a boundary condition in the feenox input file with different names.
-Note that while there can be only one @code{MATERIAL} associated to a
-physical group, there can be many @code{BC}s associated to a physical
-group.
-
 @node PRINT
 @subsection @code{PRINT}
 @anchor{#print}
@@ -1982,44 +1936,6 @@ the names of the functions, separated by tabs. The header starts with a
 hash@ @code{#} that usually acts as a comment and is ignored by most
 plotting tools.
 
-@node READ_MESH_pde
-@subsection @code{READ_MESH_pde}
-@anchor{#read_mesh_pde}
-
-@smallformat
-@verbatim
-[ DIMENSIONS <num_expr> ]
- [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
- [ INTEGRATION { full | reduced } ]
- [ MAIN ] [ UPDATE_EACH_STEP ]
- [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
- [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
-  
-@end verbatim
-@end smallformat
-
-The spatial dimensions cab be given with @code{DIMENSION}. If material
-properties are uniform and given with variables, the number of
-dimensions are not needed and will be read from the file at runtime. But
-if either properties are given by spatial functions or if functions are
-to be read from the mesh with @code{READ_DATA} or @code{READ_FUNCTION},
-then the number of dimensions ought to be given explicitly because
-FeenoX needs to know how many arguments these functions take. If either
-@code{OFFSET} and/or @code{SCALE} are given, the node locations are
-first shifted and then scaled by the provided values. When defining
-several meshes and solving a PDE problem, the mesh used as the PDE
-domain is the one marked with @code{MAIN}. If none of the meshes is
-explicitly marked as main, the first one is used. If
-@code{UPDATE_EACH_STEP} is given, then the mesh data is re-read from the
-file at each time step. Default is to read the mesh once, except if the
-file path changes with time. For each @code{READ_FIELD} keyword, a
-point-wise defined function of space named @code{<function_name>} is
-defined and filled with the scalar data named @code{<name_in_mesh>}
-contained in the mesh file. The @code{READ_FUNCTION} keyword is a
-shortcut when the scalar name and the to-be-defined function are the
-same. If no mesh is marked as @code{MAIN}, the first one is the main
-one.
-
 @node SORT_VECTOR
 @subsection @code{SORT_VECTOR}
 @anchor{#sort_vector}
@@ -2087,48 +2003,9 @@ ignored.
 
 @smallformat
 @verbatim
-[ FILE_FORMAT { gmsh | vtk } ] CELL ]  
+CELL ]  
 @end verbatim
 @end smallformat
-
-@node WRITE_MESH_pde
-@subsection @code{WRITE_MESH_pde}
-@anchor{#write_mesh_pde}
-
-@smallformat
-@verbatim
-{ <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
-@end verbatim
-@end smallformat
-
-Either a file identifier (defined previously with a @code{FILE} keyword)
-or a file path should be given. The format is automatically detected
-from the extension. Otherwise, the keyword @code{FILE_FORMAT} can be use
-to give the format explicitly. If there are several meshes defined then
-which one should be used has to be given explicitly with @code{MESH}. If
-the @code{NO_MESH} keyword is given, only the results are written into
-the output file. Depending on the output format, this can be used to
-avoid repeating data and/or creating partial output files which can the
-be latter assembled by post-processing scripts. When targetting the
-@code{.msh} output format, if @code{NO_PHYSICAL_NAMES} is given then the
-section that sets the actual names of the physical entities is not
-written. This can be needed to avoid name clashes when reading multiple
-@code{.msh} files. The output is node-based by default. This can be
-controlled with both the @code{NODE} and @code{CELL} keywords. All
-fields that come after a @code{NODE} (@code{CELL}) keyword will be
-written at the node (cells). These keywords can be used several times
-and mixed with fields. For example
-@code{CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z} will write the
-conductivity and the expression @math{1+z} as cell-based and the
-temperature @math{T(x,y,z)} and the expression @math{\sqrt{x^2+y^2}} as
-a node-based fields. Also, the @code{SCALAR_FORMAT} keyword can be used
-to define the precision of the ASCII representation of the fields that
-follow. Default is @code{%g}. The data to be written has to be given as
-a list of fields, i.e.@ distributions (such as @code{k} or @code{E}),
-functions of space (such as @code{T}) and/or expressions (such as
-@code{x^2+y^2+z^2}). Each field is written as a scalar, unless the
-keyword @code{VECTOR} is given. In this case, there should be exactly
-three fields following @code{VECTOR}.
 
 @node Differential-Algebraic Equations
 @section Differential-Algebraic Equations
@@ -2204,7 +2081,7 @@ Force time-dependent problems to pass through specific instants of time.
 
 @smallformat
 @verbatim
-TIME_PATH  
+TIME_PATH <expr_1> [ <expr_2>  [ ... <expr_n> ] ]  
 @end verbatim
 @end smallformat
 
@@ -2239,11 +2116,10 @@ values for all times.
 * INTEGRATE::
 * MATERIAL::
 * PHASE_SPACE::
-* PHYSICAL_GROUP_pde::
+* PHYSICAL_GROUP::
 * PROBLEM::
 * READ_MESH::
 * SOLVE_PROBLEM::
-* TIME_PATH::
 * WRITE_MESH::
 @end menu
 
@@ -2387,20 +2263,49 @@ the expression that defines the mandatory property.
 
 @smallformat
 @verbatim
-PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }  
+PHASE_SPACE <vars> ... <vectors> ... <matrices> ...   
 @end verbatim
 @end smallformat
 
-@node PHYSICAL_GROUP_pde
-@subsubsection @code{PHYSICAL_GROUP_pde}
-@anchor{#physical_group_pde}
+@node PHYSICAL_GROUP
+@subsubsection @code{PHYSICAL_GROUP}
+@anchor{#physical_group}
 Explicitly defines a physical group of elements on a mesh.
 
 @smallformat
 @verbatim
-PHYSICAL_GROUP  
+PHYSICAL_GROUP <name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
+ [ MATERIAL <name> | | BC <name> [ BC ... ] ]
+  
 @end verbatim
 @end smallformat
+
+This keyword should seldom be needed. Most of the times, a combination
+of @code{MATERIAL} and @code{BC} ought to be enough for most purposes.
+The name of the @code{PHYSICAL_GROUP} keyword should match the name of
+the physical group defined within the input file. If there is no
+physical group with the provided name in the mesh, this instruction has
+no effect. If there are many meshes, an explicit mesh can be given with
+@code{MESH}. Otherwise, the physical group is defined on the main mesh.
+An explicit dimension of the physical group can be provided with
+@code{DIMENSION}. An explicit id can be given with @code{ID}. Both
+dimension and id should match the values in the mesh. For volumetric
+elements, physical groups can be linked to materials using
+@code{MATERIAL}. Note that if a material is created with the same name
+as a physical group in the mesh, they will be linked automatically, so
+there is no need to use @code{PHYSCAL_GROUP} for this. The
+@code{MATERIAL} keyword in @code{PHYSICAL_GROUP} is used to link a
+physical group in a mesh file and a material in the feenox input file
+with different names. Likewise, for non-volumetric elements, physical
+groups can be linked to boundary using @code{BC}. As in the preceeding
+case, if a boundary condition is created with the same name as a
+physical group in the mesh, they will be linked automatically, so there
+is no need to use @code{PHYSCAL_GROUP} for this. The @code{BC} keyword
+in @code{PHYSICAL_GROUP} is used to link a physical group in a mesh file
+and a boundary condition in the feenox input file with different names.
+Note that while there can be only one @code{MATERIAL} associated to a
+physical group, there can be many @code{BC}s associated to a physical
+group.
 
 @node PROBLEM
 @subsubsection @code{PROBLEM}
@@ -2409,7 +2314,7 @@ Ask FeenoX to solve a partial-differential equation problem.
 
 @smallformat
 @verbatim
-PROBLEM [ mechanical | thermal | modal ]
+PROBLEM [ mechanical | thermal | modal | neutron_diffusion ]
  
  [ 1D |   2D |   3D |   DIMENSIONS <expr> ] [ MESH <identifier> ] 
  
@@ -2441,6 +2346,9 @@ either @code{plane_stress} or @code{plane_strain} has to be set instead.
 @item
 @code{modal} computes the natural mechanical frequencies and oscillation
 modes.
+@item
+@code{neutron_diffusion} multi-group core-level neutron diffusion with a
+FEM formulation
 @end itemize
 
 If you are a programmer and want to contribute with another problem
@@ -2514,7 +2422,13 @@ a file.
 
 @smallformat
 @verbatim
-READ_MESH { <file_path> | <file_id> }  
+READ_MESH { <file_path> | <file_id> } [ DIMENSIONS <num_expr> ]
+ [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
+ [ INTEGRATION { full | reduced } ]
+ [ MAIN ] [ UPDATE_EACH_STEP ]
+ [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
+ [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
+  
 @end verbatim
 @end smallformat
 
@@ -2547,7 +2461,27 @@ path or file id can be used to refer to a particular mesh when reading
 more than one, for instance in a @code{WRITE_MESH} or @code{INTEGRATE}
 keyword. If a file path is given such as @code{cool_mesh.msh}, it can be
 later referred to as either @code{cool_mesh.msh} or just
-@code{cool_mesh}.
+@code{cool_mesh}. The spatial dimensions cab be given with
+@code{DIMENSION}. If material properties are uniform and given with
+variables, the number of dimensions are not needed and will be read from
+the file at runtime. But if either properties are given by spatial
+functions or if functions are to be read from the mesh with
+@code{READ_DATA} or @code{READ_FUNCTION}, then the number of dimensions
+ought to be given explicitly because FeenoX needs to know how many
+arguments these functions take. If either @code{OFFSET} and/or
+@code{SCALE} are given, the node locations are first shifted and then
+scaled by the provided values. When defining several meshes and solving
+a PDE problem, the mesh used as the PDE domain is the one marked with
+@code{MAIN}. If none of the meshes is explicitly marked as main, the
+first one is used. If @code{UPDATE_EACH_STEP} is given, then the mesh
+data is re-read from the file at each time step. Default is to read the
+mesh once, except if the file path changes with time. For each
+@code{READ_FIELD} keyword, a point-wise defined function of space named
+@code{<function_name>} is defined and filled with the scalar data named
+@code{<name_in_mesh>} contained in the mesh file. The
+@code{READ_FUNCTION} keyword is a shortcut when the scalar name and the
+to-be-defined function are the same. If no mesh is marked as
+@code{MAIN}, the first one is the main one.
 
 @node SOLVE_PROBLEM
 @subsubsection @code{SOLVE_PROBLEM}
@@ -2565,16 +2499,6 @@ the PDE problem. For static problems, that means solving the equations
 and filling in the result functions. For transient or quasisstatic
 problems, that means advancing one time step.
 
-@node TIME_PATH
-@subsubsection @code{TIME_PATH}
-@anchor{#time_path}
-
-@smallformat
-@verbatim
-<expr_1> [ <expr_2>  [ ... <expr_n> ] ]  
-@end verbatim
-@end smallformat
-
 @node WRITE_MESH
 @subsubsection @code{WRITE_MESH}
 @anchor{#write_mesh}
@@ -2582,9 +2506,38 @@ Write a mesh and functions of space-time to a file for post-processing.
 
 @smallformat
 @verbatim
-WRITE_MESH  
+WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
 @end verbatim
 @end smallformat
+
+Either a file identifier (defined previously with a @code{FILE} keyword)
+or a file path should be given. The format is automatically detected
+from the extension. Otherwise, the keyword @code{FILE_FORMAT} can be use
+to give the format explicitly. If there are several meshes defined then
+which one should be used has to be given explicitly with @code{MESH}. If
+the @code{NO_MESH} keyword is given, only the results are written into
+the output file. Depending on the output format, this can be used to
+avoid repeating data and/or creating partial output files which can the
+be latter assembled by post-processing scripts. When targetting the
+@code{.msh} output format, if @code{NO_PHYSICAL_NAMES} is given then the
+section that sets the actual names of the physical entities is not
+written. This can be needed to avoid name clashes when reading multiple
+@code{.msh} files. The output is node-based by default. This can be
+controlled with both the @code{NODE} and @code{CELL} keywords. All
+fields that come after a @code{NODE} (@code{CELL}) keyword will be
+written at the node (cells). These keywords can be used several times
+and mixed with fields. For example
+@code{CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z} will write the
+conductivity and the expression @math{1+z} as cell-based and the
+temperature @math{T(x,y,z)} and the expression @math{\sqrt{x^2+y^2}} as
+a node-based fields. Also, the @code{SCALAR_FORMAT} keyword can be used
+to define the precision of the ASCII representation of the fields that
+follow. Default is @code{%g}. The data to be written has to be given as
+a list of fields, i.e.@ distributions (such as @code{k} or @code{E}),
+functions of space (such as @code{T}) and/or expressions (such as
+@code{x^2+y^2+z^2}). Each field is written as a scalar, unless the
+keyword @code{VECTOR} is given. In this case, there should be exactly
+three fields following @code{VECTOR}.
 
 @node Variables
 @subsection Variables
@@ -2593,6 +2546,7 @@ WRITE_MESH
 @node Laplace equation
 @subsection Laplace equation
 @anchor{#laplace-equation}
+Laplace's equation does not need any extra keyword to @code{PROBLEM}.
 
 @menu
 * Keywords::
@@ -2601,8 +2555,6 @@ WRITE_MESH
 * Boundary Conditions::
 * Results::
 @end menu
-NONE
-Laplace's equation does not need any extra keyword to @code{PROBLEM}.
 
 @node Keywords
 @subsubsection Keywords
@@ -2619,22 +2571,9 @@ Laplace's equation does not need any extra keyword to @code{PROBLEM}.
 The coefficient of the temporal derivative for the transient equation
 @ @math{\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})}.
 If not given, default is one.
-
-@smallformat
-@verbatim
-alpha  
-@end verbatim
-@end smallformat
-
 @code{f}
 The right hand side of the equation@ @math{\nabla^2 \phi=f(\vec{x})}. If
 not given, default is zero (i.e.@ Laplace).
-
-@smallformat
-@verbatim
-f  
-@end verbatim
-@end smallformat
 
 @node Boundary Conditions
 @subsubsection Boundary Conditions
@@ -2644,7 +2583,7 @@ Alias for @code{phi'}.
 
 @smallformat
 @verbatim
-dphidn  
+dphidn=<expr>  
 @end verbatim
 @end smallformat
 
@@ -2654,7 +2593,7 @@ of@ @math{\phi} is prescribed.
 
 @smallformat
 @verbatim
-phi  
+phi=<expr>  
 @end verbatim
 @end smallformat
 
@@ -2665,7 +2604,7 @@ prescribed.
 
 @smallformat
 @verbatim
-phi'  
+phi'=<expr>  
 @end verbatim
 @end smallformat
 
@@ -2981,7 +2920,7 @@ PRINT "difference" t2-t1 "[seconds]"
 @verbatim
 $ feenox clock.fee
 doing something in between
-difference	4.2936e-05	[seconds]
+difference	5.3888e-05	[seconds]
 $
 @end verbatim
 @end smallformat

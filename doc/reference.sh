@@ -49,12 +49,12 @@ for kw in ${kws}; do
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
   if [ -n "${usage}" ]; then
 #     echo -n "\`${usage}\`"
-    echo "::: {.usage}"
+#     echo "::: {.usage}"
     echo "~~~feenox"
     grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs -0 | tr \\n " " | tr @ \\n
     echo
     echo "~~~"
-    echo ":::"
+#     echo ":::"
     echo
   fi
 

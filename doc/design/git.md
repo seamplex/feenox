@@ -9,7 +9,7 @@
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
     ```terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+    sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
  3. Clone Github repository

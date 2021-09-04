@@ -3,11 +3,9 @@
 Alias for `phi'`.     
 
 
-::: {.usage}
 ~~~feenox
-dphidn  
+dphidn=<expr>  
 ~~~
-:::
 
 
 
@@ -17,11 +15,9 @@ dphidn
 Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.   
 
 
-::: {.usage}
 ~~~feenox
-phi  
+phi=<expr>  
 ~~~
-:::
 
 
 
@@ -31,11 +27,9 @@ phi
 Neumann natural boundary condition in which the value of the normal outward derivative\ $\frac{\partial \phi}{\partial n}$ is prescribed.     
 
 
-::: {.usage}
 ~~~feenox
-phi'  
+phi'=<expr>  
 ~~~
-:::
 
 
 

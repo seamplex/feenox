@@ -158,7 +158,7 @@ report bugs in our [Github issue tracker][].
     recommended)
 
     ``` terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+    sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
 3.  Clone Github repository

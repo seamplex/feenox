@@ -5,19 +5,13 @@ Flag that indicates whether the overall calculation is over.
 
 
 
-
-#  `done_outer`
-
-Flag that indicates whether the parametric, optimization of fit calculation is over or not.
-
-
-
-
-It is set to true (i.e. $\neq 0$) by feenox whenever the outer calculation is considered to be finished,
-which can be that the parametric calculation swept the desired parameter space or that the
-optimization algorithm reached the desired convergence criteria.
-If the user sets it to true, the current step is marked as the last outer step and
-the transient calculation ends after finishing the step.
+This variable is set to true by FeenoX when the computation finished so it can
+be checked in an `IF` block to do something only in the last step.
+But this variable can also be set to true from the input file, indicating that
+the current step should also be the last one. For example, one can set `end_time = infinite`
+and then finish the computation at $t=10$ by setting `done = t > 10`.
+This `done` variable can also come from (and sent to) other sources, like
+a shared memory object for coupled calculations.
 
 #  `done_static`
 
@@ -29,6 +23,7 @@ Flag that indicates whether the static calculation is over or not.
 It is set to true (i.e. $\neq 0$) by feenox if `step_static` $\ge$ `static_steps`.
 If the user sets it to true, the current step is marked as the last static step and
 the static calculation ends after finishing the step.
+It can be used in `IF` blocks to check if the static step is finished or not.
 
 #  `done_transient`
 
@@ -40,6 +35,7 @@ Flag that indicates whether the transient calculation is over or not.
 It is set to true (i.e. $\neq 0$) by feenox if `t` $\ge$ `end_time`.
 If the user sets it to true, the current step is marked as the last transient step and
 the transient calculation ends after finishing the step.
+It can be used in `IF` blocks to check if the transient steps are finished or not.
 
 #  `dt`
 
@@ -82,21 +78,14 @@ It can be used as `end_time = infinite` or
 to define improper integrals with infinite limits.
  Default is $2^{50} \approx 1 \times 10^{15}$.
 
-#  `in_outer_initial`
-
-Flag that indicates if the current step is the initial step of an optimization of fit run.
-
-
-
-
-
 #  `in_static`
 
-Flag that indicates if feenox is solving the iterative static calculation.
+Flag that indicates if FeenoX is solving the iterative static calculation.
 
 
 
 
+This is a read-only variable that is non zero if the static calculation.
 
 #  `in_static_first`
 
@@ -250,14 +239,6 @@ Number of steps that ought to be taken during the static calculation, to be set 
 
 The default value is one, meaning only one static step.
 
-#  `step_outer`
-
-Indicates the current step number of the iterative outer calculation (parametric, optimization or fit).
-
-
-
-
-
 #  `step_static`
 
 Indicates the current step number of the iterative static calculation.
@@ -265,6 +246,7 @@ Indicates the current step number of the iterative static calculation.
 
 
 
+This is a read-only variable that contains the current step of the static calculation.
 
 #  `step_transient`
 
@@ -273,6 +255,7 @@ Indicates the current step number of the transient static calculation.
 
 
 
+This is a read-only variable that contains the current step of the transient calculation.
 
 #  `t`
 

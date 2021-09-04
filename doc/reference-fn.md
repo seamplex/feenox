@@ -3,11 +3,9 @@
 Returns the absolute value of the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 abs(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$|x|$$
@@ -40,11 +38,9 @@ Computes the arc in radians whose cosine is equal to the argument\ $x$.
 A NaN error is raised if\ $|x|>1$.
 
 
-::: {.usage}
 ~~~feenox
 acos(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\arccos(x)$$
@@ -79,11 +75,9 @@ Computes the arc in radians whose sine is equal to the argument\ $x$.
 A NaN error is raised if\ $|x|>1$.
 
 
-::: {.usage}
 ~~~feenox
 asin(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\arcsin(x)$$
@@ -117,11 +111,9 @@ $
 Computes, in radians, the arc tangent of the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 atan(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\arctan(x)$$
@@ -138,11 +130,9 @@ Computes, in radians, the arc tangent of quotient\ $y/x$, using the signs of the
 to determine the quadrant of the result, which is in the range $[-\pi,\pi]$.
 
 
-::: {.usage}
 ~~~feenox
 atan2(y,x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\arctan(y/x)$$
@@ -183,11 +173,9 @@ $
 Returns the smallest integral value not less than the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 ceil(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\lceil x \rceil$$
@@ -207,11 +195,9 @@ The list and the meanings of the other available values for\ $f$ can be checked
 in the `clock_gettime (2)` system call manual page.
 
 
-::: {.usage}
 ~~~feenox
 clock([f])  
 ~~~
-:::
 
 
 
@@ -228,7 +214,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ~~~terminal
 $ feenox clock.fee
 doing something in between
-difference	4.2936e-05	[seconds]
+difference	5.3888e-05	[seconds]
 $
 ~~~
 
@@ -242,11 +228,9 @@ a linear function of time such as\ $\omega t+\phi$, where $\omega$ controls
 the frequency of the wave and $\phi$ controls its phase.
 
 
-::: {.usage}
 ~~~feenox
 cos(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\cos(x)$$
@@ -262,11 +246,9 @@ $$\cos(x)$$
 Computes the hyperbolic cosine of the argument\ $x$, where\ $x$ is in radians.
 
 
-::: {.usage}
 ~~~feenox
 cosh(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\cosh(x)$$
@@ -286,11 +268,9 @@ For `f=1` only user time is returned.
 For `f=2` only system time is returned.
 
 
-::: {.usage}
 ~~~feenox
 cpu_time([f])  
 ~~~
-:::
 
 
 
@@ -309,11 +289,9 @@ does not need to be known beforehand, i.e. the expression `x` might involve vari
 read from a shared-memory object at each time step.
 
 
-::: {.usage}
 ~~~feenox
 d_dt(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)$$
@@ -348,11 +326,9 @@ Filters the first argument\ $x$ with a deadband centered at zero with an amplitu
 given by the second argument $a$.
 
 
-::: {.usage}
 ~~~feenox
 deadband(x, a)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}$$
@@ -370,11 +346,9 @@ returns zero if the arguments are not equal and one otherwise.
 Default value for $\epsilon = 10^{-9}$.
 
 
-::: {.usage}
 ~~~feenox
 equal(a, b, [eps])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}$$
@@ -388,11 +362,9 @@ Computes the exponential function the argument\ $x$, i.e. the base of the
 natural logarithm\ $e$ raised to the\ $x$-th power.
 
 
-::: {.usage}
 ~~~feenox
 exp(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$e^x$$
@@ -431,11 +403,9 @@ Computes the first exponential integral function of the argument\ $x$.
 If\ $x$ is zero, a NaN error is issued.
 
 
-::: {.usage}
 ~~~feenox
 expint1(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]$$
@@ -466,11 +436,9 @@ $
 Computes the second exponential integral function of the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 expint2(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$$
@@ -486,11 +454,9 @@ $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$$
 Computes the third exponential integral function of the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 expint3(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]$$
@@ -507,11 +473,9 @@ Computes the $n$-th exponential integral function of the argument\ $x$.
 If\ $n$ is zero or one and\ $x$ is zero, a NaN error is issued.
 
 
-::: {.usage}
 ~~~feenox
 expintn(n,x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$$
@@ -524,11 +488,9 @@ $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$$
 Returns the largest integral value not greater than the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 floor(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\lfloor x \rfloor$$
@@ -546,11 +508,9 @@ If the optional second argument $\delta$ is provided, the discontinuous
 step at\ $x=0$ is replaced by a ramp starting at\ $x=0$ and finishing at\ $x=\delta$.
 
 
-::: {.usage}
 ~~~feenox
 heaviside(x, [delta])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}$$
@@ -592,11 +552,9 @@ Even though `if` is a logical operation, all the arguments and the returned valu
 are double-precision floating point numbers.
 
 
-::: {.usage}
 ~~~feenox
 if(a, [b], [c], [eps])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} b & \text{if $|a|<\epsilon$} \\ c & \text{otherwise} \end{cases}$$
@@ -615,11 +573,9 @@ does not need to be known beforehand, i.e. the expression `x` might involve vari
 read from a shared-memory object at each time step.
 
 
-::: {.usage}
 ~~~feenox
 integral_dt(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
@@ -658,11 +614,9 @@ for instance to compare FeenoX solutions with other computer codes.
 In general, it is recommended to use `integral_dt`.
 
 
-::: {.usage}
 ~~~feenox
 integral_euler_dt(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
@@ -675,11 +629,9 @@ $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \ap
 Returns one if the argument\ $x$ rounded to the nearest integer is even.
 
 
-::: {.usage}
 ~~~feenox
 is_even(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}$$
@@ -693,11 +645,9 @@ Returns true if the argument\ $x$ is in the interval\ $[a,b)$,
 i.e. including\ $a$ but excluding\ $b$.
 
 
-::: {.usage}
 ~~~feenox
 is_in_interval(x, a, b)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}$$
@@ -710,11 +660,9 @@ $$\begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}
 Returns one if the argument\ $x$ rounded to the nearest integer is odd.
 
 
-::: {.usage}
 ~~~feenox
 is_odd(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$$
@@ -727,11 +675,9 @@ $$ \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$
 Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument\ $x$.
 
 
-::: {.usage}
 ~~~feenox
 j0(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$J_0(x)$$
@@ -770,11 +716,9 @@ interval\ $[t-\Delta t,t]$ and using the analytical solution of the differential
  for that case at\ $t = \Delta t$ with the initial condition\ $y(0) = y(t-\Delta t)$.
 
 
-::: {.usage}
 ~~~feenox
 lag(x, tau)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)$$
@@ -788,11 +732,9 @@ Filters the first argument\ $x(t)$ with a first-order lag of characteristic time
 to the time-dependent signal\ $x(t)$ by using the bilinear transformation formula.
 
 
-::: {.usage}
 ~~~feenox
 lag_bilinear(x, tau)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$x(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}$$
@@ -806,11 +748,9 @@ Filters the first argument\ $x(t)$ with a first-order lag of characteristic time
 to the time-dependent signal\ $x(t)$ by using the Euler forward rule.
 
 
-::: {.usage}
 ~~~feenox
 lag_euler(x, tau)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$x(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}$$
@@ -828,11 +768,9 @@ is done in an assignment over a variable that already appears inside
 expression\ $x$ such as `x = last(x)`. See example number 2.
 
 
-::: {.usage}
 ~~~feenox
 last(x,[p])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$z^{-1}\left[ x \right] = x(t-\Delta t)$$
@@ -915,11 +853,9 @@ Limits the first argument\ $x$ to the interval $[a,b]$. The second argument $a$ 
 be less than the third argument $b$.
 
 
-::: {.usage}
 ~~~feenox
 limit(x, a, b)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}$$
@@ -934,11 +870,9 @@ is bounded to the interval $[a,b]$. The second argument $a$ should
 be less than the third argument $b$.
 
 
-::: {.usage}
 ~~~feenox
 limit_dt(x, a, b)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}$$
@@ -952,11 +886,9 @@ Computes the natural logarithm of the argument\ $x$. If\ $x$ is zero or negative
 a NaN error is issued.
 
 
-::: {.usage}
 ~~~feenox
 log(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\ln(x)$$
@@ -1014,11 +946,9 @@ $
 Returns the integer index $i$ of the maximum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be provided.
 
 
-::: {.usage}
 ~~~feenox
 mark_max(x1, x2, [...], [x10])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
@@ -1031,11 +961,9 @@ $$ i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
 Returns the integer index $i$ of the minimum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be provided.
 
 
-::: {.usage}
 ~~~feenox
 mark_max(x1, x2, [...], [x10])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
@@ -1048,11 +976,9 @@ $$ i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
 Returns the maximum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be given.
 
 
-::: {.usage}
 ~~~feenox
 max(x1, x2, [...], [x10])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \max \Big (x_1, x_2, \dots, x_{10} \Big)$$
@@ -1065,11 +991,9 @@ $$ \max \Big (x_1, x_2, \dots, x_{10} \Big)$$
 Returns the maximum memory (resident set size) used by FeenoX, in Gigabytes.
 
 
-::: {.usage}
 ~~~feenox
 memory()  
 ~~~
-:::
 
 
 
@@ -1079,11 +1003,9 @@ memory()
 Returns the minimum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be given.
 
 
-::: {.usage}
 ~~~feenox
 min(x1, x2, [...], [x10])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \min \Big (x_1, x_2, \dots, x_{10} \Big)$$
@@ -1097,11 +1019,9 @@ Returns the remainder of the division between the first argument\ $a$ and the
 second one\ $b$. Both arguments may be non-integral.
 
 
-::: {.usage}
 ~~~feenox
 mod(a, b)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b$$
@@ -1116,11 +1036,9 @@ The second optional argument $\epsilon$ gives the precision of the
 "zero" evaluation. If not given, default is $\epsilon = 10^{-9}$.
 
 
-::: {.usage}
 ~~~feenox
 not(x, [eps])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}1 &\text{if $|x| < \epsilon$} \\ 0 &\text{otherwise} \end{cases}$$
@@ -1140,11 +1058,9 @@ This function uses a second-order multiple recursive generator described by
 Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 
 
-::: {.usage}
 ~~~feenox
 random(x1, x2, [s])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1$$
@@ -1164,11 +1080,9 @@ This function uses a second-order multiple recursive generator described by
 Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 
 
-::: {.usage}
 ~~~feenox
 random_gauss(x1, x2, [s])  
 ~~~
-:::
 
 
 
@@ -1178,11 +1092,9 @@ random_gauss(x1, x2, [s])
 Rounds the argument\ $x$ to the nearest integer. Halfway cases are rounded away from zero.
 
 
-::: {.usage}
 ~~~feenox
 round(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}$$
@@ -1201,11 +1113,9 @@ a linear function of time such as\ $\omega t+\phi$, where\ $\omega$ controls
 the frequency of the wave and $\phi$ controls its phase.
 
 
-::: {.usage}
 ~~~feenox
 sawtooth_wave(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$x - \lfloor x \rfloor$$
@@ -1243,11 +1153,9 @@ The second optional argument $\epsilon$ gives the precision of the "zero"
 evaluation. If not given, default is $\epsilon = 10^{-9}$.
 
 
-::: {.usage}
 ~~~feenox
 sgn(x, [eps])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}$$
@@ -1266,11 +1174,9 @@ a linear function of time such as\ $\omega t+\phi$, where\ $\omega$ controls the
 and\ $\phi$ controls its phase.
 
 
-::: {.usage}
 ~~~feenox
 sin(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\sin(x)$$
@@ -1302,11 +1208,9 @@ $
 Computes the hyperbolic sine of the argument\ $x$, where\ $x$ is in radians.
 
 
-::: {.usage}
 ~~~feenox
 sinh(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\sinh(x)$$
@@ -1323,11 +1227,9 @@ Computes the positive square root of the argument\ $x$.
 If\ $x$ is negative, a NaN error is issued.
 
 
-::: {.usage}
 ~~~feenox
 sqrt(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$+\sqrt{x}$$
@@ -1347,11 +1249,9 @@ a linear function of time such as\ $\omega t+\phi$, where\ $\omega$
 controls the frequency of the wave and\ $\phi$ controls its phase.
 
 
-::: {.usage}
 ~~~feenox
 square_wave(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}$$
@@ -1387,11 +1287,9 @@ $
 Computes the tangent of the argument\ $x$, where\ $x$ is in radians.
 
 
-::: {.usage}
 ~~~feenox
 tan(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$ \tan(x)$$
@@ -1407,11 +1305,9 @@ $$ \tan(x)$$
 Computes the hyperbolic tangent of the argument\ $x$, where\ $x$ is in radians.
 
 
-::: {.usage}
 ~~~feenox
 tanh(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\tanh(x)$$
@@ -1430,11 +1326,9 @@ third argument $b$ is provided, an hysteresis of width $b$ is needed in order
 to reset the function value. Default is no hysteresis, i.e. $b=0$.
 
 
-::: {.usage}
 ~~~feenox
 threshold_max(x, a, [b])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
@@ -1450,11 +1344,9 @@ third argument $b$ is provided, an hysteresis of width $b$ is needed in order
 to reset the function value. Default is no hysteresis, i.e. $b=0$.
 
 
-::: {.usage}
 ~~~feenox
 threshold_min(x, a, [b])  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
@@ -1470,11 +1362,9 @@ a linear function of time such as\ $\omega t+\phi$, where\ $\omega$
 controls the frequency of the wave and\ $\phi$ controls its phase.
 
 
-::: {.usage}
 ~~~feenox
 triangular_wave(x)  
 ~~~
-:::
 
 ::: {.not-in-format .man}
 $$\begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}$$
@@ -1490,11 +1380,9 @@ $$\begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.
 Returns the time ellapsed since the invocation of FeenoX, in seconds.
 
 
-::: {.usage}
 ~~~feenox
 wall_time()  
 ~~~
-:::
 
 
 

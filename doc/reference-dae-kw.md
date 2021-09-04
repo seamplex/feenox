@@ -3,11 +3,9 @@
 Define how initial conditions of DAE problems are computed.
 
 
-::: {.usage}
 ~~~feenox
 INITIAL_CONDITIONS { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }  
 ~~~
-:::
 
 
 
@@ -30,11 +28,9 @@ See the (SUNDIALS documentation)[https://computation.llnl.gov/casc/sundials/docu
 Asks FeenoX to solve a set of algebraic-differntial equations and define the variables, vectors and/or matrices that span the phase space.
 
 
-::: {.usage}
 ~~~feenox
 PHASE_SPACE  
 ~~~
-:::
 
 
 
@@ -44,11 +40,9 @@ PHASE_SPACE
 Force time-dependent problems to pass through specific instants of time.
 
 
-::: {.usage}
 ~~~feenox
-TIME_PATH  
+TIME_PATH <expr_1> [ <expr_2>  [ ... <expr_n> ] ]  
 ~~~
-:::
 
 
 

@@ -52,6 +52,8 @@ To be done.
 
 # Description
 
+To be done.
+
  * Nouns are definitions.
  * Verbs are instructions.
  * The equal sign can be both depending on what's on the left hand side.
@@ -63,10 +65,10 @@ Variables. Vectors. Matrices.
 
 ## Algebraic expressions
 
- * Everything is an expression.
- 
 To be done.
 
+ * Everything is an expression.
+ 
 ## Special global variables
 
 ```{.include shift-heading-level-by=2}
@@ -119,9 +121,7 @@ reference-pde-va.md
 
 ### Laplace equation
 
-```{.include shift-heading-level-by=3}
-reference-laplace-po.md
-```
+Laplace's equation does not need any extra keyword to `PROBLEM`.
 
 #### Keywords
 

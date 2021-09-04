@@ -3,11 +3,9 @@
 Define a boundary condition to be applied to faces, edges and/or vertices.
 
 
-::: {.usage}
 ~~~feenox
 BC <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ] [ <bc_data1> <bc_data2> ... ]  
 ~~~
-:::
 
 
 
@@ -27,11 +25,9 @@ See the particular section on boundary conditions for further details.
 Dump raw PETSc objects used to solve PDEs into files.
 
 
-::: {.usage}
 ~~~feenox
 DUMP [ FORMAT { binary | ascii | octave } ] [ K |   K_bc |   b |   b_bc |   M |   M_bc |  
 ~~~
-:::
 
 
 
@@ -41,12 +37,10 @@ DUMP [ FORMAT { binary | ascii | octave } ] [ K |   K_bc |   b |   b_bc |   M | 
 Find and/or compute the absolute extrema of a function or expression over a mesh (or a subset of it).
 
 
-::: {.usage}
 ~~~feenox
 FIND_EXTREMA { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS | GAUSS ]
  [ MIN <variable> ] [ MAX <variable> ] [ X_MIN <variable> ] [ X_MAX <variable> ] [ Y_MIN <variable> ] [ Y_MAX <variable> ] [ Z_MIN <variable> ] [ Z_MAX <variable> ] [ I_MIN <variable> ] [ I_MAX <variable> ]  
 ~~~
-:::
 
 
 
@@ -73,13 +67,11 @@ is stored in the variable indicated by `I_MIN` (`I_MAX`).
 Spatially integrate a function or expression over a mesh (or a subset of it).
 
 
-::: {.usage}
 ~~~feenox
 INTEGRATE { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
  RESULT <variable>
   
 ~~~
-:::
 
 
 
@@ -106,11 +98,9 @@ If the variable does not exist, it is created.
 Define a material its and properties to be used in volumes.
 
 
-::: {.usage}
 ~~~feenox
 MATERIAL <name> [ MESH <name> ] [ PHYSICAL_GROUP <name_1>  [ PHYSICAL_GROUP <name_2> [ ... ] ] ] [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]  
 ~~~
-:::
 
 
 
@@ -134,37 +124,55 @@ be used in the expression that defines the mandatory property.
 
 
 
-::: {.usage}
 ~~~feenox
-PHASE_SPACE { <vars> ... | <vectors> ... | <matrices> ... }  
+PHASE_SPACE <vars> ... <vectors> ... <matrices> ...   
 ~~~
-:::
 
 
 
 
-#  `PHYSICAL_GROUP_pde`
+#  `PHYSICAL_GROUP`
 
 Explicitly defines a physical group of elements on a mesh.
 
 
-::: {.usage}
 ~~~feenox
-PHYSICAL_GROUP  
+PHYSICAL_GROUP <name> [ MESH <name> ] [ DIMENSION <expr> ] [ ID <expr> ]
+ [ MATERIAL <name> | | BC <name> [ BC ... ] ]
+  
 ~~~
-:::
 
 
 
+This keyword should seldom be needed. Most of the times,
+ a combination of `MATERIAL` and `BC` ought to be enough for most purposes.
+The name of the `PHYSICAL_GROUP` keyword should match the name of the physical group defined within the input file.
+If there is no physical group with the provided name in the mesh, this instruction has no effect.
+If there are many meshes, an explicit mesh can be given with `MESH`.
+Otherwise, the physical group is defined on the main mesh.
+An explicit dimension of the physical group can be provided with `DIMENSION`.
+An explicit id can be given with `ID`.
+Both dimension and id should match the values in the mesh.
+For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
+Note that if a material is created with the same name as a physical group in the mesh,
+they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+The `MATERIAL` keyword in `PHYSICAL_GROUP` is used to link a physical group
+in a mesh file and a material in the feenox input file with different names.
+Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
+As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
+they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
+The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
+in a mesh file and a boundary condition in the feenox input file with different names.
+Note that while there can be only one `MATERIAL` associated to a physical group,
+there can be many `BC`s associated to a physical group.
 
 #  `PROBLEM`
 
 Ask FeenoX to solve a partial-differential equation problem.
 
 
-::: {.usage}
 ~~~feenox
-PROBLEM [ mechanical | thermal | modal ]
+PROBLEM [ mechanical | thermal | modal | neutron_diffusion ]
  
  [ 1D |   2D |   3D |   DIMENSIONS <expr> ] [ MESH <identifier> ] 
  
@@ -181,7 +189,6 @@ PROBLEM [ mechanical | thermal | modal ]
  [ EIGEN_FORMULATION { omega | lambda } ]
   
 ~~~
-:::
 
 
 
@@ -192,6 +199,7 @@ If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
 `plane_stress` or `plane_strain` has to be set instead.
  * `thermal` (or `heat` ) solves the heat conduction problem.
  * `modal` computes the natural mechanical frequencies and oscillation modes.
+ * `neutron_diffusion` multi-group core-level neutron diffusion with a FEM formulation
 
 If you are a programmer and want to contribute with another problem type, please do so!
 Check out [FeenoX repository](https:
@@ -237,11 +245,15 @@ and $M \phi = \lambda K \phi$$ if it is `lambda`.
 Read an unstructured mesh and (optionally) functions of space-time from a file.
 
 
-::: {.usage}
 ~~~feenox
-READ_MESH { <file_path> | <file_id> }  
+READ_MESH { <file_path> | <file_id> } [ DIMENSIONS <num_expr> ]
+ [ SCALE <expr> ] [ OFFSET <expr_x> <expr_y> <expr_z> ]
+ [ INTEGRATION { full | reduced } ]
+ [ MAIN ] [ UPDATE_EACH_STEP ]
+ [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] 
+ [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] 
+  
 ~~~
-:::
 
 
 
@@ -261,17 +273,32 @@ The file path or file id can be used to refer to a particular mesh when reading 
 for instance in a `WRITE_MESH` or `INTEGRATE` keyword.
 If a file path is given such as `cool_mesh.msh`, it can be later referred to as either
 `cool_mesh.msh` or just `cool_mesh`.
+The spatial dimensions cab be given with `DIMENSION`.
+If material properties are uniform and given with variables,
+the number of dimensions are not needed and will be read from the file at runtime.
+But if either properties are given by spatial functions or if functions
+are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
+the number of dimensions ought to be given explicitly because FeenoX needs to know
+how many arguments these functions take.
+If either `OFFSET` and/or `SCALE` are given, the node locations are first shifted and then scaled by the provided values.
+When defining several meshes and solving a PDE problem, the mesh used
+as the PDE domain is the one marked with `MAIN`.
+If none of the meshes is explicitly marked as main, the first one is used.
+If `UPDATE_EACH_STEP` is given, then the mesh data is re-read from the file at
+each time step. Default is to read the mesh once, except if the file path changes with time.
+For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+is defined and filled with the scalar data named `<name_in_mesh>` contained in the mesh file.
+The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
+If no mesh is marked as `MAIN`, the first one is the main one.
 
 #  `SOLVE_PROBLEM`
 
 Explicitly solve the PDE problem.
 
 
-::: {.usage}
 ~~~feenox
 SOLVE_PROBLEM  
 ~~~
-:::
 
 
 
@@ -282,31 +309,40 @@ and filling in the result functions.
 For transient or quasisstatic problems, that means
 advancing one time step.
 
-#  `TIME_PATH`
-
-
-
-::: {.usage}
-~~~feenox
-<expr_1> [ <expr_2>  [ ... <expr_n> ] ]  
-~~~
-:::
-
-
-
-
 #  `WRITE_MESH`
 
 Write a mesh and functions of space-time to a file for post-processing.
 
 
-::: {.usage}
 ~~~feenox
-WRITE_MESH  
+WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
 ~~~
-:::
 
 
 
+Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
+The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
+be use to give the format explicitly.
+If there are several meshes defined then which one should be used has to be
+given explicitly with `MESH`.
+If the `NO_MESH` keyword is given, only the results are written into the output file.
+Depending on the output format, this can be used to avoid repeating data and/or
+creating partial output files which can the be latter assembled by post-processing scripts.
+When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+section that sets the actual names of the physical entities is not written.
+This can be needed to avoid name clashes when reading multiple `.msh` files.
+The output is node-based by default. This can be controlled with both the
+`NODE` and `CELL` keywords. All fields that come after a `NODE` (`CELL`) keyword
+will be written at the node (cells). These keywords can be used several times
+and mixed with fields. For example `CELL k(x,y,z) NODE T sqrt(x^2+y^2) CELL 1+z` will
+write the conductivity and the expression $1+z$ as cell-based and the temperature
+$T(x,y,z)$ and the expression $\sqrt{x^2+y^2}$ as a node-based fields.
+Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
+representation of the fields that follow. Default is `%g`.
+The data to be written has to be given as a list of fields,
+i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
+and/or expressions (such as `x^2+y^2+z^2`).
+Each field is written as a scalar, unless the keyword `VECTOR` is given.
+In this case, there should be exactly three fields following `VECTOR`.
 
 

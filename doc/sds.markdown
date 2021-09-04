@@ -386,7 +386,7 @@ third-party libraries such as [Metis]) for scaling up large problems,
 For example, we can solve the [NAFEMS LE11] "Solid
 cylinder/Taper/Sphere-Temperature" benchmark like
 
-``` {.feenox style="feenox"}
+``` feenox
 READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
 
@@ -427,8 +427,7 @@ dz/dt = x y - b z
 \end{equation*}
 ```
 ::: {.not-in-format .plain .latex}
-$$\dot{x} = \sigma \cdot (y - x)$$\
-$$\dot{y} = x \cdot (r - z) - y$$\
+$$\dot{x} = \sigma \cdot (y - x)$$ $$\dot{y} = x \cdot (r - z) - y$$
 $$\dot{z} = x \cdot y - b \cdot z$$
 :::
 
@@ -438,7 +437,7 @@ generate the butterfly as presented by Edward Lorenz back in his seminal
 FeenoX by writing the equations in the input file as naturally as
 possible, as illustrated in the input file that follows:
 
-``` {.feenox style="feenox"}
+``` .feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -624,7 +623,7 @@ still pretty standard and straightforward:
     recommended)
 
     ``` terminal
-    sudo apt-get install lib-sundials-dev petsc-dev slepc-dev
+    sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
 3.  Clone Github repository
@@ -699,7 +698,7 @@ terminal command. When invoked without arguments, it prints its version,
 one-line description and the usage options:
 
 ``` {.terminal style="terminal"}
-FeenoX v0.1.29-g839c90d-dirty 
+FeenoX v0.1.38-gd477abf-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]
