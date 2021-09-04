@@ -110,9 +110,12 @@ if [ -z "${dir}" ]; then
 fi
 
 
-pandoc -s hash.yaml ${stuff}.md \
+pandoc hash.yaml ${stuff}.md \
+  --standalone --toc \
   --filter pandoc-crossref \
-  --lua-filter ${dir}/not-in-format.lua \
+  --lua-filter=${dir}/include-files.lua \
+  --lua-filter=${dir}/include-code-files.lua \
+  --lua-filter=${dir}/not-in-format.lua \
   --lua-filter ${dir}/code-style.lua \
   --template=${dir}/single.tex \
   --pdf-engine=xelatex \
