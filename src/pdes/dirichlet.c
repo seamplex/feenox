@@ -32,7 +32,7 @@ int feenox_problem_dirichlet_eval(void) {
     // if we are here then we know more or less the number of BCs we need
     n_bcs = feenox.pde.n_dirichlet_rows;
   }  
-  size_t current_size = n_bcs;
+//  size_t current_size = n_bcs;
 
   
   bc_t *bc = NULL;
@@ -56,12 +56,14 @@ int feenox_problem_dirichlet_eval(void) {
               // if there is a condition we evaluate it now
               if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
 
+/*                
                 if (feenox.pde.dirichlet_k >= (current_size-4)) {            
                   current_size += n_bcs;
                   feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, current_size * sizeof(PetscInt)));
                   feenox_check_alloc(feenox.pde.dirichlet_values  = realloc(feenox.pde.dirichlet_values,  current_size * sizeof(PetscScalar)));
                   feenox_check_alloc(feenox.pde.dirichlet_derivatives  = realloc(feenox.pde.dirichlet_derivatives,  current_size * sizeof(PetscScalar)));
                 }
+ */
                 
                 if (bc_data->space_dependent) {
                   feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
@@ -124,19 +126,18 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
   }
   
+  // this vector holds the dirichlet values and is used to re-write
+  // the actual rhs vector b in order to keep the symmetry of K
+  Vec rhs = NULL;
   if (feenox.pde.b != NULL) {
     if (feenox.pde.b_bc == NULL) {
       petsc_call(VecDuplicate(feenox.pde.b, &feenox.pde.b_bc));
       petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.b_bc), "b_bc"));
     }
     petsc_call(VecCopy(feenox.pde.b, feenox.pde.b_bc));
+    petsc_call(MatCreateVecs(feenox.pde.K, NULL, &rhs));
+    petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   }  
-  
-  // this vector holds the dirichlet values and is used to re-write
-  // the actual rhs vector b in order to keep the symmetry of K
-  Vec rhs;
-  petsc_call(MatCreateVecs(feenox.pde.K, NULL, &rhs));
-  petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   
   // TODO: scale up the diagonal!
   // see alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
@@ -154,6 +155,7 @@ int feenox_problem_dirichlet_set_M(void) {
 
   if (feenox.pde.M_bc == NULL) {
     petsc_call(MatDuplicate(feenox.pde.M, MAT_COPY_VALUES, &feenox.pde.M_bc));
+    petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.M_bc), "M_bc"));
   } else {
     petsc_call(MatCopy(feenox.pde.M, feenox.pde.M_bc, SAME_NONZERO_PATTERN));
   }

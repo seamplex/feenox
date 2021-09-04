@@ -24,7 +24,6 @@
 extern feenox_t feenox;
 laplace_t laplace;
 
-///po_laplace+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.
 int feenox_problem_parse_problem_laplace(const char *token) {
 
   // no need to parse anything;
@@ -80,14 +79,12 @@ int feenox_problem_init_runtime_laplace(void) {
   }
 
   // initialize distributions
-///pr_laplace+f+usage f
 ///pr_laplace+f+description The right hand side of the equation\ $\nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+f+description If not given, default is zero (i.e. Laplace).
   feenox_call(feenox_distribution_init(&laplace.f, "f"));
   laplace.f.space_dependent = feenox_expression_depends_on_space(laplace.f.dependency_variables);
   laplace.f.non_linear = feenox_expression_depends_on_function(laplace.f.dependency_functions, feenox.pde.solution[0]);  
   
-///pr_laplace+alpha+usage alpha
 ///pr_laplace+alpha+description The coefficient of the temporal derivative for the transient
 ///pr_laplace+alpha+description equation \ $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+alpha+description If not given, default is one.

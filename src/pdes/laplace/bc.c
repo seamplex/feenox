@@ -26,16 +26,16 @@ extern laplace_t laplace;
 
 int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, const char *rhs) {
 
-///bc_laplace+phi+usage phi
+///bc_laplace+phi+usage phi=<expr>
 ///bc_laplace+phi+description Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.   
   if (strcmp(lhs, "phi") == 0) {
     bc_data->type_phys = BC_TYPE_LAPLACE_DIRICHLET;
     bc_data->type_math = bc_type_math_dirichlet;
 
 
-///bc_laplace+phi'+usage phi'
+///bc_laplace+phi'+usage phi'=<expr>
 ///bc_laplace+phi'+description Neumann natural boundary condition in which the value of the normal outward derivative\ $\frac{\partial \phi}{\partial n}$ is prescribed.     
-///bc_laplace+dphidn+usage dphidn
+///bc_laplace+dphidn+usage dphidn=<expr>
 ///bc_laplace+dphidn+description Alias for `phi'`.     
   } else if (strcmp(lhs, "phi'") == 0 || strcmp(lhs, "dphidn") == 0) {
     bc_data->type_phys = BC_TYPE_LAPLACE_NEUMANN;

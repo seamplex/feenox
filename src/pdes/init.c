@@ -300,7 +300,7 @@ int feenox_problem_define_solutions(void) {
       feenox_check_minusone(asprintf(&name, "%s", feenox.pde.unknown_name[g]));
     }
     feenox_check_alloc(feenox.pde.solution[g] = feenox_define_function_get_ptr(name, feenox.pde.dim));
-    
+
     if (feenox.pde.nev == 0) {
       // las derivadas de las soluciones con respecto al espacio solo si no es modal
       feenox_check_alloc(feenox.pde.gradient[g] = calloc(feenox.pde.dim, sizeof(function_t *)));
@@ -456,6 +456,14 @@ int feenox_problem_init_runtime_general(void) {
     }
     feenox.pde.solution[g]->mesh = (feenox.pde.rough==0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
     feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dim, sizeof(var_t *)));
+    feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dofs, sizeof(var_t *)));
+    feenox.pde.solution[g]->var_argument[0] = feenox.mesh.vars.x;
+    if (feenox.pde.dim > 1) {
+      feenox.pde.solution[g]->var_argument[1] = feenox.mesh.vars.y;
+      if (feenox.pde.dim > 2) {
+        feenox.pde.solution[g]->var_argument[2] = feenox.mesh.vars.z;
+      }
+    }
     feenox.pde.solution[g]->var_argument_allocated = 1;
     feenox.pde.solution[g]->type = function_type_pointwise_mesh_node;
   }  

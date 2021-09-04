@@ -211,12 +211,17 @@ int feenox_problem_setup_ksp_neutron_diffusion(KSP ksp ) {
 #ifdef HAVE_SLEPC
 int feenox_problem_setup_eps_neutron_diffusion(EPS eps) {
 
+  // generalized non-hermitian problem
+  petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
+  
+/*  
   ST st = NULL;
   petsc_call(EPSGetST(feenox.pde.eps, &st));
   if (st == NULL) {
     feenox_push_error_message("error getting spectral transform object");
     return FEENOX_ERROR;
   }
+ */
 /*  
   // the user might have already set a custom ST, se we peek what it is
   STType st_type = NULL;
@@ -255,14 +260,13 @@ int feenox_problem_setup_eps_neutron_diffusion(EPS eps) {
 */
 
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-    petsc_call(STSetType(st, STSINVERT));
-//     petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
-    petsc_call(EPSSetTarget(eps, 1e6));
+//    petsc_call(STSetType(st, STSINVERT));
+     petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
+//    petsc_call(EPSSetTarget(eps, 1e6));
     
   } else {
-    petsc_call(STSetType(st, STSHIFT));
-    petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));
-    printf("pistola\n");
+//    petsc_call(STSetType(st, STSHIFT));
+    petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
   }
   
 
