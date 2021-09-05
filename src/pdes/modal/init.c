@@ -60,7 +60,7 @@ int feenox_problem_init_parser_modal(void) {
 
     if (feenox.pde.dim != 0) {
       if (feenox.pde.dim != 2) {
-        feenox_push_error_message("dimension inconsistency, expected DIMENSION 2");
+        feenox_push_error_message("dimension inconsistency, expected 2 dimensions not %d", feenox.pde.dim);
         return FEENOX_ERROR;
       }
     } else {

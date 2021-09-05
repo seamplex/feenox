@@ -158,3 +158,27 @@ int feenox_instruction_mesh_integrate(void *arg) {
 
   return FEENOX_OK;
 }
+
+
+
+double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function_t *function) {
+
+  double integral = 0;
+  double xi = 0;
+
+  unsigned int v = 0;
+  unsigned int j = 0;
+  for (v = 0; v < this->type->gauss[mesh->integration].V; v++) {
+    feenox_mesh_compute_w_at_gauss(this, v, mesh->integration);
+ 
+    xi = 0;
+    for (j = 0; j < this->type->nodes; j++) {
+      xi += this->type->gauss[mesh->integration].h[v][j] * function->data_value[this->node[j]->index_mesh];
+    }
+
+    integral += this->w[v] * xi;
+  }
+
+  return integral;
+
+}

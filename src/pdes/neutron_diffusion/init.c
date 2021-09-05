@@ -55,7 +55,6 @@ int feenox_problem_init_parser_neutron_diffusion(void) {
   
   // TODO: for one group make an alias between phi1 and phi
   
-  
   // we'd rather ser nodes than cells 
   feenox.mesh.default_field_location = field_location_nodes;
   
@@ -214,58 +213,9 @@ int feenox_problem_setup_eps_neutron_diffusion(EPS eps) {
   // generalized non-hermitian problem
   petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
   
-/*  
-  ST st = NULL;
-  petsc_call(EPSGetST(feenox.pde.eps, &st));
-  if (st == NULL) {
-    feenox_push_error_message("error getting spectral transform object");
-    return FEENOX_ERROR;
-  }
- */
-/*  
-  // the user might have already set a custom ST, se we peek what it is
-  STType st_type = NULL;
-  petsc_call(STGetType(st, &st_type));
-  
-  if (st_type != NULL && feenox.pde.eigen_formulation == eigen_formulation_undefined) {
-    // if there is no formulation but an st_type, choose an appropriate one
-    feenox.pde.eigen_formulation = (strcmp(st_type, STSHIFT) == 0) ? eigen_formulation_lambda : eigen_formulation_omega;
-  }
-
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-    if (st_type != NULL) {
-      if (strcmp(st_type, STSINVERT) != 0) {
-        feenox_push_error_message("eigen formulation omega needs shift-and-invert spectral transformation");
-        return FEENOX_ERROR;
-      }  
-    } else {
-      petsc_call(STSetType(st, STSINVERT));
-    }
-    // shift and invert needs a target
-    petsc_call(EPSSetTarget(eps, feenox_var_value(1e6)));
-    
-  } else {
-    // lambda needs shift
-    if (st_type != NULL) {
-      if (strcmp(st_type, STSHIFT) != 0) {
-        feenox_push_error_message("eigen formulation lambda needs shift spectral transformation");
-        return FEENOX_ERROR;
-      }
-    } else {
-      petsc_call(STSetType(st, STSHIFT));
-    }
-    // seek for largest lambda (i.e. smallest omega)
     petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));
-  }  
-*/
-
-  if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-//    petsc_call(STSetType(st, STSINVERT));
-     petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
-//    petsc_call(EPSSetTarget(eps, 1e6));
-    
   } else {
-//    petsc_call(STSetType(st, STSHIFT));
     petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
   }
   

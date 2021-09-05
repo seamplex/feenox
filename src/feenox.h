@@ -2082,7 +2082,8 @@ extern int feenox_instruction_mesh_write(void *arg);
 
 // integrate.c
 extern int feenox_instruction_mesh_integrate(void *arg);
-
+extern double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function_t *function);
+    
 // extrema.c
 extern int feenox_instruction_mesh_find_extrema(void *arg);
 
