@@ -22,63 +22,27 @@ title: FeenoX
 -   [Description]
 -   [Reference]
     -   [Algebraic expressions]
-    -   [Special global variables]
-        -   [`done`]
-        -   [`done_static`]
-        -   [`done_transient`]
-        -   [`dt`]
-        -   [`end_time`]
-        -   [`i`]
-        -   [`infinite`]
-        -   [`in_static`]
-        -   [`in_static_first`]
-        -   [`in_static_last`]
-        -   [`in_transient`]
-        -   [`in_transient_first`]
-        -   [`in_transient_last`]
-        -   [`j`]
-        -   [`max_dt`]
-        -   [`min_dt`]
-        -   [`ncores`]
-        -   [`on_gsl_error`]
-        -   [`on_ida_error`]
-        -   [`on_nan`]
-        -   [`pi`]
-        -   [`pid`]
-        -   [`realtime_scale`]
-        -   [`rel_error`]
-        -   [`static_steps`]
-        -   [`step_static`]
-        -   [`step_transient`]
-        -   [`t`]
-        -   [`zero`]
-    -   [General keywords]
-        -   [`ABORT`]
-        -   [`ALIAS`]
-        -   [`CLOSE`]
-        -   [`DEFAULT_ARGUMENT_VALUE`]
-        -   [`FILE`]
-        -   [`FIT`]
-        -   [`FUNCTION`]
-        -   [`IF`]
-        -   [`IMPLICIT`]
-        -   [`INCLUDE`]
-        -   [`MATRIX`]
-        -   [`OPEN`]
-        -   [`PRINT`]
-        -   [`PRINT_FUNCTION`]
-        -   [`PRINT_VECTOR`]
-        -   [`SORT_VECTOR`]
-        -   [`VAR`]
-        -   [`VECTOR`]
-        -   [`WRITE_MESH`]
-    -   [Differential-Algebraic Equations]
+    -   [Differential-Algebraic Equations subsystem]
         -   [Keywords]
         -   [Variables]
-    -   [Partial Differential Equations]
+    -   [Partial Differential Equations subsytem]
         -   [Keywords][1]
         -   [Variables][2]
-        -   [Laplace equation]
+    -   [Laplace's equation]
+        -   [Results]
+        -   [Properties]
+        -   [Boundary Conditions]
+        -   [Keywords][3]
+        -   [Variables][4]
+    -   [The heat conduction equation]
+        -   [Results][5]
+        -   [Properties][6]
+        -   [Boundary Conditions][7]
+        -   [Keywords][8]
+        -   [Variables][9]
+    -   [General & "standalone" mathematics]
+        -   [Keywords][10]
+        -   [Variables][11]
     -   [Functions]
         -   [`abs`]
         -   [`acos`]
@@ -139,6 +103,7 @@ title: FeenoX
     -   [Functionals]
         -   [`derivative`]
     -   [Vector functions]
+        -   [`derivative`]
 -   [FeenoX & the UNIX Philospohy]
     -   [Rule of Modularity]
     -   [Rule of Clarity]
@@ -172,63 +137,27 @@ title: FeenoX
   [Description]: #description
   [Reference]: #reference
   [Algebraic expressions]: #algebraic-expressions
-  [Special global variables]: #special-global-variables
-  [`done`]: #done
-  [`done_static`]: #done_static
-  [`done_transient`]: #done_transient
-  [`dt`]: #dt
-  [`end_time`]: #end_time
-  [`i`]: #i
-  [`infinite`]: #infinite
-  [`in_static`]: #in_static
-  [`in_static_first`]: #in_static_first
-  [`in_static_last`]: #in_static_last
-  [`in_transient`]: #in_transient
-  [`in_transient_first`]: #in_transient_first
-  [`in_transient_last`]: #in_transient_last
-  [`j`]: #j
-  [`max_dt`]: #max_dt
-  [`min_dt`]: #min_dt
-  [`ncores`]: #ncores
-  [`on_gsl_error`]: #on_gsl_error
-  [`on_ida_error`]: #on_ida_error
-  [`on_nan`]: #on_nan
-  [`pi`]: #pi
-  [`pid`]: #pid
-  [`realtime_scale`]: #realtime_scale
-  [`rel_error`]: #rel_error
-  [`static_steps`]: #static_steps
-  [`step_static`]: #step_static
-  [`step_transient`]: #step_transient
-  [`t`]: #t
-  [`zero`]: #zero
-  [General keywords]: #general-keywords
-  [`ABORT`]: #abort
-  [`ALIAS`]: #alias
-  [`CLOSE`]: #close
-  [`DEFAULT_ARGUMENT_VALUE`]: #default_argument_value
-  [`FILE`]: #file
-  [`FIT`]: #fit
-  [`FUNCTION`]: #function
-  [`IF`]: #if
-  [`IMPLICIT`]: #implicit
-  [`INCLUDE`]: #include
-  [`MATRIX`]: #matrix
-  [`OPEN`]: #open
-  [`PRINT`]: #print
-  [`PRINT_FUNCTION`]: #print_function
-  [`PRINT_VECTOR`]: #print_vector
-  [`SORT_VECTOR`]: #sort_vector
-  [`VAR`]: #var
-  [`VECTOR`]: #vector
-  [`WRITE_MESH`]: #write_mesh
-  [Differential-Algebraic Equations]: #differential-algebraic-equations
+  [Differential-Algebraic Equations subsystem]: #differential-algebraic-equations-subsystem
   [Keywords]: #keywords
   [Variables]: #variables
-  [Partial Differential Equations]: #partial-differential-equations
+  [Partial Differential Equations subsytem]: #partial-differential-equations-subsytem
   [1]: #keywords-1
   [2]: #variables-1
-  [Laplace equation]: #laplace-equation
+  [Laplace's equation]: #laplaces-equation
+  [Results]: #results
+  [Properties]: #properties
+  [Boundary Conditions]: #boundary-conditions
+  [3]: #keywords-2
+  [4]: #variables-2
+  [The heat conduction equation]: #the-heat-conduction-equation
+  [5]: #results-1
+  [6]: #properties-1
+  [7]: #boundary-conditions-1
+  [8]: #keywords-3
+  [9]: #variables-3
+  [General & "standalone" mathematics]: #general-standalone-mathematics
+  [10]: #keywords-4
+  [11]: #variables-4
   [Functions]: #functions
   [`abs`]: #abs
   [`acos`]: #acos
@@ -250,6 +179,7 @@ title: FeenoX
   [`expintn`]: #expintn
   [`floor`]: #floor
   [`heaviside`]: #heaviside
+  [`if`]: #if
   [`integral_dt`]: #integral_dt
   [`integral_euler_dt`]: #integral_euler_dt
   [`is_even`]: #is_even
@@ -487,10 +417,12 @@ dz/dt = x y - b z
 \end{cases}
 \end{equation*}
 ```
-::: {.not-in-format .plain .latex}
+<div class="not-in-format plain latex">
+
 $$\dot{x} = \sigma \cdot (y - x)$$ $$\dot{y} = x \cdot (r - z) - y$$
 $$\dot{z} = x \cdot y - b \cdot z$$
-:::
+
+</div>
 
 where $\sigma=10$, $b=8/3$ and $r=28$ are the classical parameters that
 generate the butterfly as presented by Edward Lorenz back in his seminal
@@ -890,7 +822,7 @@ Note that
 
 -   Configuring and compiling PETSc from scratch might be difficult the
     first time. It has a lot of dependencies and options. Read the
-    official [documentation][3] for a detailed explanation.
+    official [documentation][12] for a detailed explanation.
 -   There is a huge difference in efficiency between using PETSc
     compiled with debugging symbols and with optimization flags. Make
     sure to configure `--with-debugging=0` for FeenoX production runs
@@ -905,7 +837,7 @@ Note that
     `petsc-dev` package).
 
   [PETSc]: https://petsc.org/
-  [3]: https://petsc.org/release/install/
+  [12]: https://petsc.org/release/install/
 
 ##### SLEPc
 
@@ -1199,14 +1131,176 @@ To be done.
 
 # Description
 
-To be done.
+FeenoX solves a problem defined in an plain-text input file and writes
+user-defined outputs to the standard output and/or files, either also
+plain-text or with a particular format for further post-processing. The
+syntax of this input file is designed to be as self-describing as
+possible, using English keywords that explains FeenoX what problem it
+has to solve in a way is understandable by both humans and computers.
+Keywords can work either as
 
--   Nouns are definitions.
--   Verbs are instructions.
--   The equal sign can be both depending on what's on the left hand
-    side.
+1.  Definitions, for instance "define function $f(x)$ and read its data
+    from file `f.dat`"), or as
+2.  Instructions, such as "write the stress at point $D$ into the
+    standard output".
 
-Variables. Vectors. Matrices.
+A person can tell if a keyword is a definition or an instruction because
+the former are nouns (`FUNCTION`) and the latter verbs (`PRINT`). The
+equal sign `=` is a special keyword that is neither a verb nor a noun,
+and its meaning changes depending on what is on the left hand side of
+the assignment.
+
+a.  If there is a function, then it is a definition: define an algebraic
+    function to be equal to the expression on the right-hand side, e.g.:
+
+    ``` feenox
+    f(x,y) = exp(-x^2)*cos(pi*y)
+    ```
+
+b.  If there is a variable, vector or matrix, it is an instruction:
+    evaluate the expression on the right-hand side and assign it to the
+    varible or vector (or matrix) element indicated in the left-hand
+    side. Strictly speaking, if the variable has not already been
+    defined (and implicit declaration is allowed), then the variable is
+    also defined as well, e.g:
+
+    ``` feenox
+    VAR a
+    VECTOR b[3]
+    a = sqrt(2)
+    b[i] = a*i^2
+    ```
+
+    There is no need to explicitly define the scalar variable `a` with
+    `VAR` since the first assigment also defines it implicitly (if this
+    is allowed by the keyword `IMPLICIT`).
+
+An input file can define its own variables as needed, such as `my_var`
+or `flag`. But there are some reserved names that are special in the
+sense that they either
+
+1.  can be set to modify the behavior of FeenoX, such as `max_dt` or
+    `dae_tol`
+2.  can be read to get the internal status or results back from FeenoX,
+    such as `nodes` or `keff`
+3.  can be either set or read, such as `dt` or `done`
+
+The problem being solved can be static or transient, depending on
+whether the special variable `end_time` is zero (default) or not. If it
+is zero and `static_steps` is equal to one (default), the instructions
+in the input file are executed once and then FeenoX quits. For example
+
+``` feenox
+VAR x
+PRINT %.7f func_min(cos(x)+1,x,0,6)
+```
+
+If `static_steps` is larger than one, the special variable `step_static`
+is increased and they are repeated the number of time indicated by
+`static_steps`:
+
+``` feenox
+static_steps = 10
+f(n) = n^2 - n + 41
+PRINT f(step_static^2-1)
+```
+
+If the special variable `end_time` is set to a non-zero value, after
+computing the static part a transient problem is solved. There are three
+kinds of transient problems:
+
+1.  Plain "standalone" transients
+2.  Differential-Algebraic equations (DAE) transients
+3.  Partial Differential equations (PDE) transients
+
+In the first case, after all the instruction in the input file were
+executed, the special variable `t` is increased by the value of `dt` and
+then the instructions are executed all over again, until `t` reaches
+`end_time`:
+
+``` feenox
+end_time = 2*pi
+dt = 1/10
+
+y = lag(heaviside(t-1), 1)
+z = random_gauss(0, sqrt(2)/10)
+
+PRINT t sin(t) cos(t) y z HEADER
+```
+
+In the second case, the keyword `PHASE_SPACE` sets up DAE system. Then,
+one initial condition and one differential-algebraic equation has to be
+given for each element in the phase space. The instructions before the
+DAE block executed, then the DAE timestep is advanced and finally the
+instructions after DAE block are executed (there cannot be any
+instruction between the first and the last DAE):
+
+``` feenox
+PHASE_SPACE x
+end_time = 1
+x_0 = 1
+x_dot = -x
+PRINT t x exp(-t) HEADER
+```
+
+The timestep is chosen by the SUNDIALS library in order to keep an
+estimate of the residual error below `dae_tol` (default is $10^{-6}$),
+although `min_dt` and `max_dt` can be used to control it. See the
+section of the [Differential-Algebraic Equations subsystem] for more
+information.
+
+In the third cae, the type of PDE being solved is given by the keyword
+`PROBLEM`. Some types of PDEs do support transient problems (such as
+`thermal`) but some others do not (such as `modal`). See the detailed
+explanation of each problem type for details. Now the transient problem
+is handled by the TS framework of the PETSc library. In general
+transient PDEs involve a mesh, material properties, inital conditions,
+transient boundary conditions, etc. And they create a lot of data since
+results mean spatial and temporal distributions of one or more scalar
+fields:
+
+``` feenox
+# example of a 1D heat transient problem
+# from https://www.mcs.anl.gov/petsc/petsc-current/src/ts/tutorials/ex3.c.html
+# a non-dimensional slab 0 < x < 1 is kept at T(0) = T(1) = 0
+# there is an initial non-trivial T(x)
+# the steady-state is T(x) = 0
+PROBLEM thermal 1d
+READ_MESH slab60.msh
+
+end_time = 1e-1
+
+# initial condition
+T_0(x) := sin(6*pi*x) + 3*sin(2*pi*x)
+# analytical solution
+T_a(x,t) := exp(-36*pi^2*t)*sin(6*pi*x) + 3*exp(-4*pi^2*t)*sin(2*pi*x)
+
+# unitary non-dimensional properties
+k = 1
+rho = 1
+cp = 1
+
+# boundary conditions
+BC left  T=0
+BC right T=0
+
+SOLVE_PROBLEM
+
+PRINT %e t dt T(0.1) T_a(0.1,t) T(0.7) T_a(0.7,t)
+WRITE_MESH temp-slab.msh T
+
+IF done
+ PRINT "\# open temp-anim-slab.geo in Gmsh to see the result!"
+ENDIF
+```
+
+PETSc's TS also honors the `min_dt` and `max_dt` variables, but the time
+step is controled by the allowed relative error with the special
+variable `ts_rtol`. Again, see the section of the [Partial Differential
+Equations subsytem] for more information.
+
+  [Differential-Algebraic Equations subsystem]: #differential-algebraic-equations-subsystem
+  [Partial Differential Equations subsytem]: #partial-differential-equations-subsytem
 
 # Reference
 
@@ -1216,650 +1310,7 @@ To be done.
 
 -   Everything is an expression.
 
-## Special global variables
-
-### `done`
-
-Flag that indicates whether the overall calculation is over.
-
-This variable is set to true by FeenoX when the computation finished so
-it can be checked in an `IF` block to do something only in the last
-step. But this variable can also be set to true from the input file,
-indicating that the current step should also be the last one. For
-example, one can set `end_time = infinite` and then finish the
-computation at $t=10$ by setting `done = t > 10`. This `done` variable
-can also come from (and sent to) other sources, like a shared memory
-object for coupled calculations.
-
-### `done_static`
-
-Flag that indicates whether the static calculation is over or not.
-
-It is set to true (i.e. $\neq 0$) by feenox if `step_static` $\ge$
-`static_steps`. If the user sets it to true, the current step is marked
-as the last static step and the static calculation ends after finishing
-the step. It can be used in `IF` blocks to check if the static step is
-finished or not.
-
-### `done_transient`
-
-Flag that indicates whether the transient calculation is over or not.
-
-It is set to true (i.e. $\neq 0$) by feenox if `t` $\ge$ `end_time`. If
-the user sets it to true, the current step is marked as the last
-transient step and the transient calculation ends after finishing the
-step. It can be used in `IF` blocks to check if the transient steps are
-finished or not.
-
-### `dt`
-
-Actual value of the time step for transient calculations.
-
-When solving DAE systems, this variable is set by feenox. It can be
-written by the user for example by importing it from another transient
-code by means of shared-memory objects. Care should be taken when
-solving DAE systems and overwriting `t`. Default value is DEFAULT_DT,
-which is a power of two and roundoff errors are thus reduced.
-
-### `end_time`
-
-Final time of the transient calculation, to be set by the user.
-
-The default value is zero, meaning no transient calculation.
-
-### `i`
-
-Dummy index, used mainly in vector and matrix row subindex expressions.
-
-### `infinite`
-
-A very big positive number.
-
-It can be used as `end_time = infinite` or to define improper integrals
-with infinite limits. Default is $2^{50} \approx 1 \times 10^{15}$.
-
-### `in_static`
-
-Flag that indicates if FeenoX is solving the iterative static
-calculation.
-
-This is a read-only variable that is non zero if the static calculation.
-
-### `in_static_first`
-
-Flag that indicates if feenox is in the first step of the iterative
-static calculation.
-
-### `in_static_last`
-
-Flag that indicates if feenox is in the last step of the iterative
-static calculation.
-
-### `in_transient`
-
-Flag that indicates if feenox is solving transient calculation.
-
-### `in_transient_first`
-
-Flag that indicates if feenox is in the first step of the transient
-calculation.
-
-### `in_transient_last`
-
-Flag that indicates if feenox is in the last step of the transient
-calculation.
-
-### `j`
-
-Dummy index, used mainly in matrix column subindex expressions.
-
-### `max_dt`
-
-Maximum bound for the time step that feenox should take when solving DAE
-systems.
-
-### `min_dt`
-
-Minimum bound for the time step that feenox should take when solving DAE
-systems.
-
-### `ncores`
-
-The number of online available cores, as returned by
-`sysconf(_SC_NPROCESSORS_ONLN)`.
-
-This value can be used in the `MAX_DAUGHTERS` expression of the
-`PARAMETRIC` keyword (i.e `ncores/2`).
-
-### `on_gsl_error`
-
-This should be set to a mask that indicates how to proceed if an error
-ir raised in any routine of the GNU Scientific Library.
-
-### `on_ida_error`
-
-This should be set to a mask that indicates how to proceed if an error
-ir raised in any routine of the SUNDIALS Library.
-
-### `on_nan`
-
-This should be set to a mask that indicates how to proceed if
-Not-A-Number signal (such as a division by zero) is generated when
-evaluating any expression within feenox.
-
-### `pi`
-
-A double-precision floating point representaion of the number $\pi$
-
-It is equal to the `M_PI` constant in `math.h` .
-
-### `pid`
-
-The UNIX process id of the FeenoX instance.
-
-### `realtime_scale`
-
-If this variable is not zero, then the transient problem is run trying
-to syncrhonize the problem time with realtime, up to a scale given.
-
-For example, if the scale is set to one, then FeenoX will advance the
-problem time at the same pace that the real wall time advances. If set
-to two, FeenoX time wil advance twice as fast as real time, and so on.
-If the calculation time is slower than real time modified by the scale,
-this variable has no effect on the overall behavior and execution will
-proceed as quick as possible with no delays.
-
-### `rel_error`
-
-Maximum allowed relative error for the solution of DAE systems.
-
-Default value is is $1 \times 10^{-6}$. If a fine per-variable error
-control is needed, special vector `abs_error` should be used.
-
-### `static_steps`
-
-Number of steps that ought to be taken during the static calculation, to
-be set by the user.
-
-The default value is one, meaning only one static step.
-
-### `step_static`
-
-Indicates the current step number of the iterative static calculation.
-
-This is a read-only variable that contains the current step of the
-static calculation.
-
-### `step_transient`
-
-Indicates the current step number of the transient static calculation.
-
-This is a read-only variable that contains the current step of the
-transient calculation.
-
-### `t`
-
-Actual value of the time for transient calculations.
-
-This variable is set by FeenoX, but can be written by the user for
-example by importing it from another transient code by means of
-shared-memory objects. Care should be taken when solving DAE systems and
-overwriting `t`.
-
-### `zero`
-
-A very small positive number.
-
-It is taken to avoid roundoff errors when comparing floating point
-numbers such as replacing $a \leq a_\text{max}$ with
-$a < a_\text{max} +$ `zero`. Default is
-$(1/2)^{-50} \approx 9\times 10^{-16}$ .
-
-## General keywords
-
-### `ABORT`
-
-Catastrophically abort the execution and quit FeenoX.
-
-``` feenox
-ABORT  
-```
-
-Whenever the instruction `ABORT` is executed, FeenoX quits with a
-non-zero error leve. It does not close files nor unlock shared memory
-objects. The objective of this instruction is to either debug complex
-input files by using only parts of them or to conditionally abort the
-execution using `IF` clauses.
-
-### `ALIAS`
-
-Define a scalar alias of an already-defined indentifier.
-
-``` feenox
-ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
-```
-
-The existing object can be a variable, a vector element or a matrix
-element. In the first case, the name of the variable should be given as
-the existing object. In the second case, to alias the second element of
-vector `v` to the new name `new`, `v(2)` should be given as the existing
-object. In the third case, to alias second element (2,3) of matrix `M`
-to the new name `new`, `M(2,3)` should be given as the existing object.
-
-### `CLOSE`
-
-Explicitly close a file after input/output.
-
-``` feenox
-CLOSE <name>  
-```
-
-The given `<name>` can be either a fixed-string path or an
-already-defined `FILE`.
-
-### `DEFAULT_ARGUMENT_VALUE`
-
-Give a default value for an optional commandline argument.
-
-``` feenox
-DEFAULT_ARGUMENT_VALUE <constant> <string>  
-```
-
-If a `$n` construction is found in the input file but the commandline
-argument was not given, the default behavior is to fail complaining that
-an extra argument has to be given in the commandline. With this keyword,
-a default value can be assigned if no argument is given, thus avoiding
-the failure and making the argument optional. The `<constant>` should be
-1, 2, 3, etc. and `<string>` will be expanded character-by-character
-where the `$n` construction is. Whether the resulting expression is to
-be interpreted as a string or as a numerical expression will depend on
-the context.
-
-### `FILE`
-
-Define a file with a particularly formatted name to be used either as
-input or as output.
-
-``` feenox
-< FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
-```
-
-For reading or writing into files with a fixed path, this instruction is
-usually not needed as the `FILE` keyword of other instructions (such as
-`PRINT` or `MESH`) can take a fixed-string path as an argument. However,
-if the file name changes as the execution progresses (say because one
-file for each step is needed), then an explicit `FILE` needs to be
-defined with this keyword and later referenced by the given name. The
-path should be given as a `printf`-like format string followed by the
-expressions which shuold be evaluated in order to obtain the actual file
-path. The expressions will always be floating-point expressions, but the
-particular integer specifier `%d` is allowed and internally transformed
-to `%.0f`. The file can be explicitly defined and `INPUT`, `OUTPUT` or a
-certain `fopen()` mode can be given (i.e. "a"). If not explicitly given,
-the nature of the file will be taken from context, i.e. `FILE`s in
-`PRINT` will be `OUTPUT` and `FILE`s in `FUNCTION` will be `INPUT`. This
-keyword justs defines the `FILE`, it does not open it. The file will be
-actually openened (and eventually closed) automatically. In the rare
-case where the automated opening and closing does not fit the expected
-workflow, the file can be explicitly opened or closed with the
-instructions `FILE_OPEN` and `FILE_CLOSE`.
-
-### `FIT`
-
-Find parameters to fit an analytical function to a pointwise-defined
-function.
-
-``` feenox
-FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
- [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
- [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]
- [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]
- [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
- [ VERBOSE ]  
-```
-
-The function with the data has to be point-wise defined (i.e. a
-`FUNCTION` read from a file, with inline `DATA` or defined over a mesh).
-The function to be fitted has to be parametrized with at least one of
-the variables provided after the `USING` keyword. For example to
-fit $f(x,y)=a x^2 + b sqrt(y)$ to a pointwise-defined function $g(x,y)$
-one gives `FIT f TO g VIA a b`. Only the names of the functions have to
-be given, not the arguments. Both functions have to have the same number
-of arguments. The initial guess of the solution is given by the initial
-value of the variables after the `VIA` keyword. Analytical expressions
-for the gradient of the function to be fitted with respect to the
-parameters to be fitted can be optionally given with the `GRADIENT`
-keyword. If none is provided, the gradient will be computed numerically
-using finite differences. A range over which the residuals are to be
-minimized can be given with `RANGE_MIN` and `RANGE_MAX`. The expressions
-give the range of the arguments of the functions, not of the parameters.
-For multidimensional fits, the range is an hypercube. If no range is
-given, all the definition points of the function with the data are used
-for the fit. Convergence can be controlled by giving the relative and
-absolute tolreances with `TOL_REL` (default `DEFAULT_NLIN_FIT_EPSREL`)
-and `TOL_ABS` (default `DEFAULT_NLIN_FIT_EPSABS`), and with the maximum
-number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER). If
-the optional keyword `VERBOSE` is given, some data of the intermediate
-steps is written in the standard output.
-
-### `FUNCTION`
-
-Define a function of one or more variables.
-
-``` feenox
-FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
-```
-
-The number of variables $n$ is given by the number of arguments given
-between parenthesis after the function name. The arguments are defined
-as new variables if they had not been already defined explictly as
-scalar variables. If the function is given as an algebraic expression,
-the short-hand operator `:=` can be used. That is to say,
-`FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`. If a `FILE` is
-given, an ASCII file containing at least $n+1$ columns is expected. By
-default, the first $n$ columns are the values of the arguments and the
-last column is the value of the function at those points. The order of
-the columns can be changed with the keyword `COLUMNS`, which expects
-$n+1$ expressions corresponding to the column numbers. If `VECTORS` is
-given, a set of $n+1$ vectors of the same size is expected. The first
-$n$ correspond to the arguments and the last one to the function values.
-The function can be pointwise-defined inline in the input using `DATA`.
-This should be the last keyword of the line, followed by
-$N=k \cdot (n+1)$ expresions giving $k$ definition points: $n$ arguments
-and the value of the function. Multiline continuation using brackets `{`
-and `}` can be used for a clean data organization. Interpolation schemes
-can be given for either one or multi-dimensional functions with
-`INTERPOLATION`. Available schemes for $n=1$ are:
-
--   linear
--   polynomial, the grade is equal to the number of data minus one
--   spline, cubic (needs at least 3 points)
--   spline_periodic
--   akima (needs at least 5 points)
--   akima_periodic (needs at least 5 points)
--   steffen, always-monotonic splines-like interpolator
-
-Default interpolation scheme for one-dimensional functions is
-`DEFAULT_INTERPOLATION`.
-
-Available schemes for $n>1$ are:
-
--   nearest, $f(\vec{x})$ is equal to the value of the closest
-    definition point
--   shepard, [inverse distance weighted average definition points]
-    (might lead to inefficient evaluation)
--   shepard_kd, [average of definition points within a kd-tree] (more
-    efficient evaluation provided `SHEPARD_RADIUS` is set to a proper
-    value)
--   bilinear, only available if the definition points configure an
-    structured hypercube-like grid. If $n>3$, `SIZES` should be given.
-
-For $n>1$, if the euclidean distance between the arguments and the
-definition points is smaller than `INTERPOLATION_THRESHOLD`, the
-definition point is returned and no interpolation is performed. Default
-value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`. The
-initial radius of points to take into account in `shepard_kd` is given
-by `SHEPARD_RADIUS`. If no points are found, the radius is double until
-at least one definition point is found. The radius is doubled until at
-least one point is found. Default is `DEFAULT_SHEPARD_RADIUS`. The
-exponent of the `shepard` method is given by `SHEPARD_EXPONENT`. Default
-is `DEFAULT_SHEPARD_EXPONENT`.
-
-  [inverse distance weighted average definition points]: https://en.wikipedia.org/wiki/Inverse_distance_weighting
-  [average of definition points within a kd-tree]: https://en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard's_method
-
-### `IF`
-
-Execute a set of instructions if a condition is met.
-
-``` feenox
-IF expr 
-  <block_of_instructions_if_expr_is_true> 
- [ ELSE  
-  <block_of_instructions_if_expr_is_false> ] 
- ENDIF  
-```
-
-### `IMPLICIT`
-
-Define whether implicit definition of variables is allowed or not.
-
-``` feenox
-IMPLICIT { NONE | ALLOWED }  
-```
-
-By default, FeenoX allows variables (but not vectors nor matrices) to be
-implicitly declared. To avoid introducing errors due to typos, explicit
-declaration of variables can be forced by giving `IMPLICIT NONE`.
-Whether implicit declaration is allowed or explicit declaration is
-required depends on the last `IMPLICIT` keyword given, which by default
-is `ALLOWED`.
-
-### `INCLUDE`
-
-Include another FeenoX input file.
-
-``` feenox
-INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]  
-```
-
-Includes the input file located in the string `file_path` at the current
-location. The effect is the same as copying and pasting the contents of
-the included file at the location of the `INCLUDE` keyword. The path can
-be relative or absolute. Note, however, that when including files inside
-`IF` blocks that instructions are conditionally-executed but all
-definitions (such as function definitions) are processed at parse-time
-independently from the evaluation of the conditional. The included file
-has to be an actual file path (i.e. it cannot be a FeenoX `FILE`)
-because it needs to be resolved at parse time. Yet, the name can contain
-a commandline replacement argument such as `$1` so `INCLUDE $1.fee` will
-include the file specified after the main input file in the command
-line. The optional `FROM` and `TO` keywords can be used to include only
-portions of a file.
-
-### `MATRIX`
-
-Define a matrix.
-
-``` feenox
-MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |  
-```
-
-A new matrix of the prescribed size is defined. The number of rows and
-columns can be an expression which will be evaluated the very first time
-the matrix is used and then kept at those constant values. All elements
-will be initialized to zero unless `DATA` is given (which should be the
-last keyword of the line), in which case the expressions will be
-evaluated the very first time the matrix is used and row-major-assigned
-to each of the elements. If there are less elements than the matrix
-size, the remaining values will be zero. If there are more elements than
-the matrix size, the values will be ignored.
-
-### `OPEN`
-
-Explicitly open a file for input/output.
-
-``` feenox
-OPEN <name> [ MODE <fopen_mode> ]  
-```
-
-The given `<name>` can be either a fixed-string path or an
-already-defined `FILE`. The mode is only taken into account if the file
-is not already defined. Default is write `w`.
-
-### `PRINT`
-
-Write plain-text and/or formatted data to the standard output or into an
-output file.
-
-``` feenox
-PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
- [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
- [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
-  
-```
-
-Each argument `object` which is not a keyword of the `PRINT` instruction
-will be part of the output. Objects can be either a matrix, a vector or
-any valid scalar algebraic expression. If the given object cannot be
-solved into a valid matrix, vector or expression, it is treated as a
-string literal if `IMPLICIT` is `ALLOWED`, otherwise a parser error is
-raised. To explicitly interpret an object as a literal string even if it
-resolves to a valid numerical expression, it should be prefixed with the
-`TEXT` keyword such as `PRINT TEXT 1+1` that would print `1+1` instead
-of `2`. Objects and string literals can be mixed and given in any order.
-Hashes `#` appearing literal in text strings have to be quoted to
-prevent the parser to treat them as comments within the FeenoX input
-file and thus ignoring the rest of the line, like
-`PRINT "\# this is a printed comment"`. Whenever an argument starts with
-a porcentage sign `%`, it is treated as a C `printf`-compatible format
-specifier and all the objects that follow it are printed using the given
-format until a new format definition is found. The objects are treated
-as double-precision floating point numbers, so only floating point
-formats should be given. See the `printf(3)` man page for further
-details. The default format is `DEFAULT_PRINT_FORMAT`. Matrices,
-vectors, scalar expressions, format modifiers and string literals can be
-given in any desired order, and are processed from left to right.
-Vectors are printed element-by-element in a single row. See
-`PRINT_VECTOR` to print one or more vectors with one element per line
-(i.e. vertically). Matrices are printed element-by-element in a single
-line using row-major ordering if mixed with other objects but in the
-natural row and column fashion if it is the only given object in the
-`PRINT` instruction. If the `FILE` keyword is not provided, default is
-to write to `stdout`. If the `HEADER` keyword is given, a single line
-containing the literal text given for each object is printed at the very
-first time the `PRINT` instruction is processed, starting with a hash
-`#` character. If the `NONEWLINE` keyword is not provided, default is to
-write a newline `\n` character after all the objects are processed.
-Otherwise, if the last token to be printed is a numerical value, a
-separator string will be printed but not the newline `\n` character. If
-the last token is a string, neither the separator nor the newline will
-be printed. The `SEP` keyword expects a string used to separate printed
-objects. To print objects without any separation in between give an
-empty string like `SEP ""`. The default is a tabulator character
-'DEFAULT_PRINT_SEPARATOR' character. To print an empty line write
-`PRINT` without arguments. By default the `PRINT` instruction is
-evaluated every step. If the `SKIP_STEP` (`SKIP_STATIC_STEP`) keyword is
-given, the instruction is processed only every the number of transient
-(static) steps that results in evaluating the expression, which may not
-be constant. The `SKIP_HEADER_STEP` keyword works similarly for the
-optional `HEADER` but by default it is only printed once. The
-`SKIP_TIME` keyword use time advancements to choose how to skip printing
-and may be useful for non-constant time-step problems.
-
-### `PRINT_FUNCTION`
-
-Print one or more functions as a table of values of dependent and
-independent variables.
-
-``` feenox
-PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
- [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
- [ MIN <expr_1> <expr_2> ... <expr_k> ] [ MAX <expr_1> <expr_2> ... <expr_k> ] 
- [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
- [ FORMAT <print_format> ] <vector_1> [ { vector | expr } ... { vector | expr } ]  
-```
-
-Each argument should be either a function or an expression. The output
-of this instruction consists of $n+k$ columns, where $n$ is the number
-of arguments of the first function of the list and $k$ is the number of
-functions and expressions given. The first $n$ columns are the arguments
-(independent variables) and the last $k$ one has the evaluated functions
-and expressions. The columns are separated by a tabulator, which is the
-format that most plotting tools understand. Only function names without
-arguments are expected. All functions should have the same number of
-arguments. Expressions can involve the arguments of the first function.
-If the `FILE` keyword is not provided, default is to write to `stdout`.
-If `HEADER` is given, the output is prepended with a single line
-containing the names of the arguments and the names of the functions,
-separated by tabs. The header starts with a hash `#` that usually acts
-as a comment and is ignored by most plotting tools. If there is no
-explicit range where to evaluate the functions and the first function is
-point-wise defined, they are evalauted at the points of definition of
-the first one. The range can be explicitly given as a product of $n$
-ranges $[x_{i,\min},x_{i,\max}]$ for $i=1,\dots,n$. The values
-$x_{i,\min}$ and $x_{i,\max}$ are given with the `MIN` *and* `MAX`
-keywords. The discretization steps of the ranges are given by either
-`STEP` that gives $\delta x$ *or* `NSTEPS` that gives the number of
-steps. If the first function is not point-wise defined, the ranges are
-mandatory.
-
-### `PRINT_VECTOR`
-
-Print the elements of one or more vectors, one element per line.
-
-``` feenox
-PRINT_VECTOR 
- [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
- [ FORMAT <print_format> ]  
-```
-
-Each argument should be either a vector or an expression of the
-integer `i`. If the `FILE` keyword is not provided, default is to write
-to `stdout`. If `HEADER` is given, the output is prepended with a single
-line containing the names of the arguments and the names of the
-functions, separated by tabs. The header starts with a hash `#` that
-usually acts as a comment and is ignored by most plotting tools.
-
-### `SORT_VECTOR`
-
-Sort the elements of a vector, optionally making the same rearrangement
-in another vector.
-
-``` feenox
-SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]  
-```
-
-This instruction sorts the elements of `<vector>` into either ascending
-or descending numerical order. If `<other_vector>` is given, the same
-rearrangement is made on it. Default is ascending order.
-
-### `VAR`
-
-Explicitly define one or more scalar variables.
-
-``` feenox
-VAR <name_1> [ <name_2> ] ... [ <name_n> ]  
-```
-
-When implicit definition is allowed (see [`IMPLICIT`]), scalar variables
-need not to be defined before being used if from the context FeenoX can
-tell that an scalar variable is needed. For instance, when defining a
-function like `f(x) = x^2` it is not needed to declare `x` explictly as
-a scalar variable. But if one wants to define a function like
-`g(x) = integral(f(x'), x', 0, x)` then the variable `x'` needs to be
-explicitly defined as `VAR x'` before the integral.
-
-  [`IMPLICIT`]: #implicit
-
-### `VECTOR`
-
-Define a vector.
-
-``` feenox
-VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |  
-```
-
-A new vector of the prescribed size is defined. The size can be an
-expression which will be evaluated the very first time the vector is
-used and then kept at that constant value. If the keyword
-`FUNCTION_DATA` is given, the elements of the vector will be
-synchronized with the inpedendent values of the function, which should
-be point-wise defined. The sizes of both the function and the vector
-should match. All elements will be initialized to zero unless `DATA` is
-given (which should be the last keyword of the line), in which case the
-expressions will be evaluated the very first time the vector is used and
-assigned to each of the elements. If there are less elements than the
-vector size, the remaining values will be zero. If there are more
-elements than the vector size, the values will be ignored.
-
-### `WRITE_MESH`
-
-``` feenox
-CELL ]  
-```
-
-## Differential-Algebraic Equations
+## Differential-Algebraic Equations subsystem
 
 ### Keywords
 
@@ -1916,7 +1367,14 @@ times.
 
 ### Variables
 
-## Partial Differential Equations
+#### `dae_rtol`
+
+Maximum allowed relative error for the solution of DAE systems.
+
+Default value is is $1 \times 10^{-6}$. If a fine per-variable error
+control is needed, special vector `abs_error` should be used.
+
+## Partial Differential Equations subsytem
 
 ### Keywords
 
@@ -2230,12 +1688,12 @@ PDE problem. For static problems, that means solving the equations and
 filling in the result functions. For transient or quasisstatic problems,
 that means advancing one time step.
 
-#### `WRITE_MESH` {#write_mesh}
+#### `WRITE_MESH`
 
 Write a mesh and functions of space-time to a file for post-processing.
 
 ``` feenox
-WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
+WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | CELL ] [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
 ```
 
 Either a file identifier (defined previously with a `FILE` keyword) or a
@@ -2267,30 +1725,39 @@ should be exactly three fields following `VECTOR`.
 
 ### Variables
 
-### Laplace equation
+## Laplace's equation
 
-Laplace's equation does not need any extra keyword to `PROBLEM`.
+Set `PROBLEM` to `laplace` to solve Laplace's equation
 
-#### Keywords
+$$\nabla^2 \phi = 0$$
 
-#### Variables
+If `end_time` is set, then the transient problem is solved
 
-#### Properties
+$$\alpha\vec{x, \phi} \frac{\partial \phi}{\partial t} + \nabla^2 \phi = 0$$
 
-##### `alpha`
+### Results
+
+#### `phi`
+
+The scalar field $\phi(\vec{x})$ whose Laplacian is equal to zero or
+to $f(\vec{x})$.
+
+### Properties
+
+#### `alpha`
 
 The coefficient of the temporal derivative for the transient equation
  $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
 If not given, default is one.
 
-##### `f`
+#### `f`
 
 The right hand side of the equation $\nabla^2 \phi=f(\vec{x})$. If not
 given, default is zero (i.e. Laplace).
 
-#### Boundary Conditions
+### Boundary Conditions
 
-##### `dphidn`
+#### `dphidn`
 
 Alias for `phi'`.
 
@@ -2298,7 +1765,7 @@ Alias for `phi'`.
 dphidn=<expr>  
 ```
 
-##### `phi`
+#### `phi` {#phi}
 
 Dirichlet essential boundary condition in which the value of $\phi$ is
 prescribed.
@@ -2307,7 +1774,7 @@ prescribed.
 phi=<expr>  
 ```
 
-##### `phi'`
+#### `phi'` {#phi-1}
 
 Neumann natural boundary condition in which the value of the normal
 outward derivative $\frac{\partial \phi}{\partial n}$ is prescribed.
@@ -2316,12 +1783,720 @@ outward derivative $\frac{\partial \phi}{\partial n}$ is prescribed.
 phi'=<expr>  
 ```
 
-#### Results
+### Keywords
 
-##### `phi` {#phi}
+### Variables
 
-The scalar field $\phi(\vec{x})$ whose Laplacian is equal to zero or
-to $f(\vec{x})$.
+## The heat conduction equation
+
+Set `PROBLEM` to `thermal` (or `heat`) to solve thermal conduction.
+
+$$\rho \c_p \frac{\partial T}{\partial t} + \div\left[ k(\vec{x, T} \cdot \grad{T} \right] = q'''(\vec{x}, T)$$
+
+If `end_time` is zero, only the steady-state problem is solved. If $k$,
+$q'''$ or any Neumann boundary condition depends on $T$, the problem is
+set to non-linear automatically.
+
+### Results
+
+#### `qx`
+
+The heat flux
+field $q_x(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial x}$
+in the $x$ direction. This is a secondary unknown of the problem.
+
+#### `qy`
+
+The heat flux
+field $q_y(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial y}$
+in the $x$ direction. This is a secondary unknown of the problem. Only
+available for two and three-dimensional problems.
+
+#### `qz`
+
+The heat flux
+field $q_z(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial z}$
+in the $x$ direction. This is a secondary unknown of the problem.\
+Only available for three-dimensional problems.
+
+#### `T`
+
+The temperature field $T(\vec{x})$. This is the primary unknown of the
+problem.
+
+### Properties
+
+#### `k`
+
+The thermal conductivity in units of power per length per degree of
+temperature.
+
+``` feenox
+k  
+```
+
+#### `q`
+
+Alias for `q'''`
+
+``` feenox
+q  
+```
+
+#### `q'''`
+
+The volumetric power dissipated in the material in units of power per
+unit of volume. Default is zero (i.e. no power).
+
+``` feenox
+q'''  
+```
+
+### Boundary Conditions
+
+### Keywords
+
+### Variables
+
+#### `T_max`
+
+The maximum temperature $T_\text{max}$.
+
+#### `T_min`
+
+The minimum temperature $T_\text{min}$.
+
+## General & "standalone" mathematics
+
+### Keywords
+
+#### `ABORT`
+
+Catastrophically abort the execution and quit FeenoX.
+
+``` feenox
+ABORT  
+```
+
+Whenever the instruction `ABORT` is executed, FeenoX quits with a
+non-zero error leve. It does not close files nor unlock shared memory
+objects. The objective of this instruction is to either debug complex
+input files by using only parts of them or to conditionally abort the
+execution using `IF` clauses.
+
+#### `ALIAS`
+
+Define a scalar alias of an already-defined indentifier.
+
+``` feenox
+ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
+```
+
+The existing object can be a variable, a vector element or a matrix
+element. In the first case, the name of the variable should be given as
+the existing object. In the second case, to alias the second element of
+vector `v` to the new name `new`, `v(2)` should be given as the existing
+object. In the third case, to alias second element (2,3) of matrix `M`
+to the new name `new`, `M(2,3)` should be given as the existing object.
+
+#### `CLOSE`
+
+Explicitly close a file after input/output.
+
+``` feenox
+CLOSE <name>  
+```
+
+The given `<name>` can be either a fixed-string path or an
+already-defined `FILE`.
+
+#### `DEFAULT_ARGUMENT_VALUE`
+
+Give a default value for an optional commandline argument.
+
+``` feenox
+DEFAULT_ARGUMENT_VALUE <constant> <string>  
+```
+
+If a `$n` construction is found in the input file but the commandline
+argument was not given, the default behavior is to fail complaining that
+an extra argument has to be given in the commandline. With this keyword,
+a default value can be assigned if no argument is given, thus avoiding
+the failure and making the argument optional. The `<constant>` should be
+1, 2, 3, etc. and `<string>` will be expanded character-by-character
+where the `$n` construction is. Whether the resulting expression is to
+be interpreted as a string or as a numerical expression will depend on
+the context.
+
+#### `FILE`
+
+Define a file with a particularly formatted name to be used either as
+input or as output.
+
+``` feenox
+< FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
+```
+
+For reading or writing into files with a fixed path, this instruction is
+usually not needed as the `FILE` keyword of other instructions (such as
+`PRINT` or `MESH`) can take a fixed-string path as an argument. However,
+if the file name changes as the execution progresses (say because one
+file for each step is needed), then an explicit `FILE` needs to be
+defined with this keyword and later referenced by the given name. The
+path should be given as a `printf`-like format string followed by the
+expressions which shuold be evaluated in order to obtain the actual file
+path. The expressions will always be floating-point expressions, but the
+particular integer specifier `%d` is allowed and internally transformed
+to `%.0f`. The file can be explicitly defined and `INPUT`, `OUTPUT` or a
+certain `fopen()` mode can be given (i.e. "a"). If not explicitly given,
+the nature of the file will be taken from context, i.e. `FILE`s in
+`PRINT` will be `OUTPUT` and `FILE`s in `FUNCTION` will be `INPUT`. This
+keyword justs defines the `FILE`, it does not open it. The file will be
+actually openened (and eventually closed) automatically. In the rare
+case where the automated opening and closing does not fit the expected
+workflow, the file can be explicitly opened or closed with the
+instructions `FILE_OPEN` and `FILE_CLOSE`.
+
+#### `FIT`
+
+Find parameters to fit an analytical function to a pointwise-defined
+function.
+
+``` feenox
+FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
+ [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
+ [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]
+ [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]
+ [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
+ [ VERBOSE ]  
+```
+
+The function with the data has to be point-wise defined (i.e. a
+`FUNCTION` read from a file, with inline `DATA` or defined over a mesh).
+The function to be fitted has to be parametrized with at least one of
+the variables provided after the `USING` keyword. For example to
+fit $f(x,y)=a x^2 + b sqrt(y)$ to a pointwise-defined function $g(x,y)$
+one gives `FIT f TO g VIA a b`. Only the names of the functions have to
+be given, not the arguments. Both functions have to have the same number
+of arguments. The initial guess of the solution is given by the initial
+value of the variables after the `VIA` keyword. Analytical expressions
+for the gradient of the function to be fitted with respect to the
+parameters to be fitted can be optionally given with the `GRADIENT`
+keyword. If none is provided, the gradient will be computed numerically
+using finite differences. A range over which the residuals are to be
+minimized can be given with `RANGE_MIN` and `RANGE_MAX`. The expressions
+give the range of the arguments of the functions, not of the parameters.
+For multidimensional fits, the range is an hypercube. If no range is
+given, all the definition points of the function with the data are used
+for the fit. Convergence can be controlled by giving the relative and
+absolute tolreances with `TOL_REL` (default `DEFAULT_NLIN_FIT_EPSREL`)
+and `TOL_ABS` (default `DEFAULT_NLIN_FIT_EPSABS`), and with the maximum
+number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER). If
+the optional keyword `VERBOSE` is given, some data of the intermediate
+steps is written in the standard output.
+
+#### `FUNCTION`
+
+Define a function of one or more variables.
+
+``` feenox
+FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
+```
+
+The number of variables $n$ is given by the number of arguments given
+between parenthesis after the function name. The arguments are defined
+as new variables if they had not been already defined explictly as
+scalar variables. If the function is given as an algebraic expression,
+the short-hand operator `:=` can be used. That is to say,
+`FUNCTION f(x) = x^2` is equivalent to `f(x) := x^2`. If a `FILE` is
+given, an ASCII file containing at least $n+1$ columns is expected. By
+default, the first $n$ columns are the values of the arguments and the
+last column is the value of the function at those points. The order of
+the columns can be changed with the keyword `COLUMNS`, which expects
+$n+1$ expressions corresponding to the column numbers. If `VECTORS` is
+given, a set of $n+1$ vectors of the same size is expected. The first
+$n$ correspond to the arguments and the last one to the function values.
+The function can be pointwise-defined inline in the input using `DATA`.
+This should be the last keyword of the line, followed by
+$N=k \cdot (n+1)$ expresions giving $k$ definition points: $n$ arguments
+and the value of the function. Multiline continuation using brackets `{`
+and `}` can be used for a clean data organization. Interpolation schemes
+can be given for either one or multi-dimensional functions with
+`INTERPOLATION`. Available schemes for $n=1$ are:
+
+-   linear
+-   polynomial, the grade is equal to the number of data minus one
+-   spline, cubic (needs at least 3 points)
+-   spline_periodic
+-   akima (needs at least 5 points)
+-   akima_periodic (needs at least 5 points)
+-   steffen, always-monotonic splines-like interpolator
+
+Default interpolation scheme for one-dimensional functions is
+`DEFAULT_INTERPOLATION`.
+
+Available schemes for $n>1$ are:
+
+-   nearest, $f(\vec{x})$ is equal to the value of the closest
+    definition point
+-   shepard, [inverse distance weighted average definition points]
+    (might lead to inefficient evaluation)
+-   shepard_kd, [average of definition points within a kd-tree] (more
+    efficient evaluation provided `SHEPARD_RADIUS` is set to a proper
+    value)
+-   bilinear, only available if the definition points configure an
+    structured hypercube-like grid. If $n>3$, `SIZES` should be given.
+
+For $n>1$, if the euclidean distance between the arguments and the
+definition points is smaller than `INTERPOLATION_THRESHOLD`, the
+definition point is returned and no interpolation is performed. Default
+value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`. The
+initial radius of points to take into account in `shepard_kd` is given
+by `SHEPARD_RADIUS`. If no points are found, the radius is double until
+at least one definition point is found. The radius is doubled until at
+least one point is found. Default is `DEFAULT_SHEPARD_RADIUS`. The
+exponent of the `shepard` method is given by `SHEPARD_EXPONENT`. Default
+is `DEFAULT_SHEPARD_EXPONENT`.
+
+  [inverse distance weighted average definition points]: https://en.wikipedia.org/wiki/Inverse_distance_weighting
+  [average of definition points within a kd-tree]: https://en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard's_method
+
+#### `IF`
+
+Execute a set of instructions if a condition is met.
+
+``` feenox
+IF expr 
+  <block_of_instructions_if_expr_is_true> 
+ [ ELSE  
+  <block_of_instructions_if_expr_is_false> ] 
+ ENDIF  
+```
+
+#### `IMPLICIT`
+
+Define whether implicit definition of variables is allowed or not.
+
+``` feenox
+IMPLICIT { NONE | ALLOWED }  
+```
+
+By default, FeenoX allows variables (but not vectors nor matrices) to be
+implicitly declared. To avoid introducing errors due to typos, explicit
+declaration of variables can be forced by giving `IMPLICIT NONE`.
+Whether implicit declaration is allowed or explicit declaration is
+required depends on the last `IMPLICIT` keyword given, which by default
+is `ALLOWED`.
+
+#### `INCLUDE`
+
+Include another FeenoX input file.
+
+``` feenox
+INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]  
+```
+
+Includes the input file located in the string `file_path` at the current
+location. The effect is the same as copying and pasting the contents of
+the included file at the location of the `INCLUDE` keyword. The path can
+be relative or absolute. Note, however, that when including files inside
+`IF` blocks that instructions are conditionally-executed but all
+definitions (such as function definitions) are processed at parse-time
+independently from the evaluation of the conditional. The included file
+has to be an actual file path (i.e. it cannot be a FeenoX `FILE`)
+because it needs to be resolved at parse time. Yet, the name can contain
+a commandline replacement argument such as `$1` so `INCLUDE $1.fee` will
+include the file specified after the main input file in the command
+line. The optional `FROM` and `TO` keywords can be used to include only
+portions of a file.
+
+#### `MATRIX`
+
+Define a matrix.
+
+``` feenox
+MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |  
+```
+
+A new matrix of the prescribed size is defined. The number of rows and
+columns can be an expression which will be evaluated the very first time
+the matrix is used and then kept at those constant values. All elements
+will be initialized to zero unless `DATA` is given (which should be the
+last keyword of the line), in which case the expressions will be
+evaluated the very first time the matrix is used and row-major-assigned
+to each of the elements. If there are less elements than the matrix
+size, the remaining values will be zero. If there are more elements than
+the matrix size, the values will be ignored.
+
+#### `OPEN`
+
+Explicitly open a file for input/output.
+
+``` feenox
+OPEN <name> [ MODE <fopen_mode> ]  
+```
+
+The given `<name>` can be either a fixed-string path or an
+already-defined `FILE`. The mode is only taken into account if the file
+is not already defined. Default is write `w`.
+
+#### `PRINT`
+
+Write plain-text and/or formatted data to the standard output or into an
+output file.
+
+``` feenox
+PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
+ [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
+  
+```
+
+Each argument `object` which is not a keyword of the `PRINT` instruction
+will be part of the output. Objects can be either a matrix, a vector or
+any valid scalar algebraic expression. If the given object cannot be
+solved into a valid matrix, vector or expression, it is treated as a
+string literal if `IMPLICIT` is `ALLOWED`, otherwise a parser error is
+raised. To explicitly interpret an object as a literal string even if it
+resolves to a valid numerical expression, it should be prefixed with the
+`TEXT` keyword such as `PRINT TEXT 1+1` that would print `1+1` instead
+of `2`. Objects and string literals can be mixed and given in any order.
+Hashes `#` appearing literal in text strings have to be quoted to
+prevent the parser to treat them as comments within the FeenoX input
+file and thus ignoring the rest of the line, like
+`PRINT "\# this is a printed comment"`. Whenever an argument starts with
+a porcentage sign `%`, it is treated as a C `printf`-compatible format
+specifier and all the objects that follow it are printed using the given
+format until a new format definition is found. The objects are treated
+as double-precision floating point numbers, so only floating point
+formats should be given. See the `printf(3)` man page for further
+details. The default format is `DEFAULT_PRINT_FORMAT`. Matrices,
+vectors, scalar expressions, format modifiers and string literals can be
+given in any desired order, and are processed from left to right.
+Vectors are printed element-by-element in a single row. See
+`PRINT_VECTOR` to print one or more vectors with one element per line
+(i.e. vertically). Matrices are printed element-by-element in a single
+line using row-major ordering if mixed with other objects but in the
+natural row and column fashion if it is the only given object in the
+`PRINT` instruction. If the `FILE` keyword is not provided, default is
+to write to `stdout`. If the `HEADER` keyword is given, a single line
+containing the literal text given for each object is printed at the very
+first time the `PRINT` instruction is processed, starting with a hash
+`#` character. If the `NONEWLINE` keyword is not provided, default is to
+write a newline `\n` character after all the objects are processed.
+Otherwise, if the last token to be printed is a numerical value, a
+separator string will be printed but not the newline `\n` character. If
+the last token is a string, neither the separator nor the newline will
+be printed. The `SEP` keyword expects a string used to separate printed
+objects. To print objects without any separation in between give an
+empty string like `SEP ""`. The default is a tabulator character
+'DEFAULT_PRINT_SEPARATOR' character. To print an empty line write
+`PRINT` without arguments. By default the `PRINT` instruction is
+evaluated every step. If the `SKIP_STEP` (`SKIP_STATIC_STEP`) keyword is
+given, the instruction is processed only every the number of transient
+(static) steps that results in evaluating the expression, which may not
+be constant. The `SKIP_HEADER_STEP` keyword works similarly for the
+optional `HEADER` but by default it is only printed once. The
+`SKIP_TIME` keyword use time advancements to choose how to skip printing
+and may be useful for non-constant time-step problems.
+
+#### `PRINT_FUNCTION`
+
+Print one or more functions as a table of values of dependent and
+independent variables.
+
+``` feenox
+PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
+ [ MIN <expr_1> <expr_2> ... <expr_k> ] [ MAX <expr_1> <expr_2> ... <expr_k> ] 
+ [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
+ [ FORMAT <print_format> ] <vector_1> [ { vector | expr } ... { vector | expr } ]  
+```
+
+Each argument should be either a function or an expression. The output
+of this instruction consists of $n+k$ columns, where $n$ is the number
+of arguments of the first function of the list and $k$ is the number of
+functions and expressions given. The first $n$ columns are the arguments
+(independent variables) and the last $k$ one has the evaluated functions
+and expressions. The columns are separated by a tabulator, which is the
+format that most plotting tools understand. Only function names without
+arguments are expected. All functions should have the same number of
+arguments. Expressions can involve the arguments of the first function.
+If the `FILE` keyword is not provided, default is to write to `stdout`.
+If `HEADER` is given, the output is prepended with a single line
+containing the names of the arguments and the names of the functions,
+separated by tabs. The header starts with a hash `#` that usually acts
+as a comment and is ignored by most plotting tools. If there is no
+explicit range where to evaluate the functions and the first function is
+point-wise defined, they are evalauted at the points of definition of
+the first one. The range can be explicitly given as a product of $n$
+ranges $[x_{i,\min},x_{i,\max}]$ for $i=1,\dots,n$. The values
+$x_{i,\min}$ and $x_{i,\max}$ are given with the `MIN` *and* `MAX`
+keywords. The discretization steps of the ranges are given by either
+`STEP` that gives $\delta x$ *or* `NSTEPS` that gives the number of
+steps. If the first function is not point-wise defined, the ranges are
+mandatory.
+
+#### `PRINT_VECTOR`
+
+Print the elements of one or more vectors, one element per line.
+
+``` feenox
+PRINT_VECTOR 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
+ [ FORMAT <print_format> ]  
+```
+
+Each argument should be either a vector or an expression of the
+integer `i`. If the `FILE` keyword is not provided, default is to write
+to `stdout`. If `HEADER` is given, the output is prepended with a single
+line containing the names of the arguments and the names of the
+functions, separated by tabs. The header starts with a hash `#` that
+usually acts as a comment and is ignored by most plotting tools.
+
+#### `SORT_VECTOR`
+
+Sort the elements of a vector, optionally making the same rearrangement
+in another vector.
+
+``` feenox
+SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]  
+```
+
+This instruction sorts the elements of `<vector>` into either ascending
+or descending numerical order. If `<other_vector>` is given, the same
+rearrangement is made on it. Default is ascending order.
+
+#### `VAR`
+
+Explicitly define one or more scalar variables.
+
+``` feenox
+VAR <name_1> [ <name_2> ] ... [ <name_n> ]  
+```
+
+When implicit definition is allowed (see [`IMPLICIT`]), scalar variables
+need not to be defined before being used if from the context FeenoX can
+tell that an scalar variable is needed. For instance, when defining a
+function like `f(x) = x^2` it is not needed to declare `x` explictly as
+a scalar variable. But if one wants to define a function like
+`g(x) = integral(f(x'), x', 0, x)` then the variable `x'` needs to be
+explicitly defined as `VAR x'` before the integral.
+
+  [`IMPLICIT`]: #implicit
+
+#### `VECTOR`
+
+Define a vector.
+
+``` feenox
+VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |  
+```
+
+A new vector of the prescribed size is defined. The size can be an
+expression which will be evaluated the very first time the vector is
+used and then kept at that constant value. If the keyword
+`FUNCTION_DATA` is given, the elements of the vector will be
+synchronized with the inpedendent values of the function, which should
+be point-wise defined. The sizes of both the function and the vector
+should match. All elements will be initialized to zero unless `DATA` is
+given (which should be the last keyword of the line), in which case the
+expressions will be evaluated the very first time the vector is used and
+assigned to each of the elements. If there are less elements than the
+vector size, the remaining values will be zero. If there are more
+elements than the vector size, the values will be ignored.
+
+### Variables
+
+#### `done`
+
+Flag that indicates whether the overall calculation is over.
+
+This variable is set to true by FeenoX when the computation finished so
+it can be checked in an `IF` block to do something only in the last
+step. But this variable can also be set to true from the input file,
+indicating that the current step should also be the last one. For
+example, one can set `end_time = infinite` and then finish the
+computation at $t=10$ by setting `done = t > 10`. This `done` variable
+can also come from (and sent to) other sources, like a shared memory
+object for coupled calculations.
+
+#### `done_static`
+
+Flag that indicates whether the static calculation is over or not.
+
+It is set to true (i.e. $\neq 0$) by feenox if `step_static` $\ge$
+`static_steps`. If the user sets it to true, the current step is marked
+as the last static step and the static calculation ends after finishing
+the step. It can be used in `IF` blocks to check if the static step is
+finished or not.
+
+#### `done_transient`
+
+Flag that indicates whether the transient calculation is over or not.
+
+It is set to true (i.e. $\neq 0$) by feenox if `t` $\ge$ `end_time`. If
+the user sets it to true, the current step is marked as the last
+transient step and the transient calculation ends after finishing the
+step. It can be used in `IF` blocks to check if the transient steps are
+finished or not.
+
+#### `dt`
+
+Actual value of the time step for transient calculations.
+
+When solving DAE systems, this variable is set by feenox. It can be
+written by the user for example by importing it from another transient
+code by means of shared-memory objects. Care should be taken when
+solving DAE systems and overwriting `t`. Default value is DEFAULT_DT,
+which is a power of two and roundoff errors are thus reduced.
+
+#### `end_time`
+
+Final time of the transient calculation, to be set by the user.
+
+The default value is zero, meaning no transient calculation.
+
+#### `i`
+
+Dummy index, used mainly in vector and matrix row subindex expressions.
+
+#### `infinite`
+
+A very big positive number.
+
+It can be used as `end_time = infinite` or to define improper integrals
+with infinite limits. Default is $2^{50} \approx 1 \times 10^{15}$.
+
+#### `in_static`
+
+Flag that indicates if FeenoX is solving the iterative static
+calculation.
+
+This is a read-only variable that is non zero if the static calculation.
+
+#### `in_static_first`
+
+Flag that indicates if feenox is in the first step of the iterative
+static calculation.
+
+#### `in_static_last`
+
+Flag that indicates if feenox is in the last step of the iterative
+static calculation.
+
+#### `in_transient`
+
+Flag that indicates if feenox is solving transient calculation.
+
+#### `in_transient_first`
+
+Flag that indicates if feenox is in the first step of the transient
+calculation.
+
+#### `in_transient_last`
+
+Flag that indicates if feenox is in the last step of the transient
+calculation.
+
+#### `j`
+
+Dummy index, used mainly in matrix column subindex expressions.
+
+#### `max_dt`
+
+Maximum bound for the time step that feenox should take when solving DAE
+systems.
+
+#### `min_dt`
+
+Minimum bound for the time step that feenox should take when solving DAE
+systems.
+
+#### `ncores`
+
+The number of online available cores, as returned by
+`sysconf(_SC_NPROCESSORS_ONLN)`.
+
+This value can be used in the `MAX_DAUGHTERS` expression of the
+`PARAMETRIC` keyword (i.e `ncores/2`).
+
+#### `on_gsl_error`
+
+This should be set to a mask that indicates how to proceed if an error
+ir raised in any routine of the GNU Scientific Library.
+
+#### `on_ida_error`
+
+This should be set to a mask that indicates how to proceed if an error
+ir raised in any routine of the SUNDIALS Library.
+
+#### `on_nan`
+
+This should be set to a mask that indicates how to proceed if
+Not-A-Number signal (such as a division by zero) is generated when
+evaluating any expression within feenox.
+
+#### `pi`
+
+A double-precision floating point representaion of the number $\pi$
+
+It is equal to the `M_PI` constant in `math.h` .
+
+#### `pid`
+
+The UNIX process id of the FeenoX instance.
+
+#### `realtime_scale`
+
+If this variable is not zero, then the transient problem is run trying
+to syncrhonize the problem time with realtime, up to a scale given.
+
+For example, if the scale is set to one, then FeenoX will advance the
+problem time at the same pace that the real wall time advances. If set
+to two, FeenoX time wil advance twice as fast as real time, and so on.
+If the calculation time is slower than real time modified by the scale,
+this variable has no effect on the overall behavior and execution will
+proceed as quick as possible with no delays.
+
+#### `static_steps`
+
+Number of steps that ought to be taken during the static calculation, to
+be set by the user.
+
+The default value is one, meaning only one static step.
+
+#### `step_static`
+
+Indicates the current step number of the iterative static calculation.
+
+This is a read-only variable that contains the current step of the
+static calculation.
+
+#### `step_transient`
+
+Indicates the current step number of the transient static calculation.
+
+This is a read-only variable that contains the current step of the
+transient calculation.
+
+#### `t` {#t}
+
+Actual value of the time for transient calculations.
+
+This variable is set by FeenoX, but can be written by the user for
+example by importing it from another transient code by means of
+shared-memory objects. Care should be taken when solving DAE systems and
+overwriting `t`.
+
+#### `zero`
+
+A very small positive number.
+
+It is taken to avoid roundoff errors when comparing floating point
+numbers such as replacing $a \leq a_\text{max}$ with
+$a < a_\text{max} +$ `zero`. Default is
+$(1/2)^{-50} \approx 9\times 10^{-16}$ .
 
 ## Functions
 
@@ -2333,9 +2508,11 @@ Returns the absolute value of the argument $x$.
 abs(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$|x|$$
-:::
+
+</div>
 
 ![abs] 
 
@@ -2364,9 +2541,11 @@ NaN error is raised if $|x|>1$.
 acos(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\arccos(x)$$
-:::
+
+</div>
 
 ![acos] 
 
@@ -2397,9 +2576,11 @@ NaN error is raised if $|x|>1$.
 asin(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\arcsin(x)$$
-:::
+
+</div>
 
 ![asin] 
 
@@ -2429,9 +2610,11 @@ Computes, in radians, the arc tangent of the argument $x$.
 atan(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\arctan(x)$$
-:::
+
+</div>
 
 ![atan] 
 
@@ -2447,9 +2630,11 @@ in the range $[-\pi,\pi]$.
 atan2(y,x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\arctan(y/x)$$
-:::
+
+</div>
 
 #### Example #1, atan.fee
 
@@ -2483,9 +2668,11 @@ Returns the smallest integral value not less than the argument $x$.
 ceil(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\lceil x \rceil$$
-:::
+
+</div>
 
 ![ceil] 
 
@@ -2516,7 +2703,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ``` terminal
 $ feenox clock.fee
 doing something in between
-difference	5.3888e-05	[seconds]
+difference	6.826e-05	[seconds]
 $
 ```
 
@@ -2531,9 +2718,11 @@ frequency of the wave and $\phi$ controls its phase.
 cos(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\cos(x)$$
-:::
+
+</div>
 
 ![cos] 
 
@@ -2548,9 +2737,11 @@ radians.
 cosh(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\cosh(x)$$
-:::
+
+</div>
 
 ![cosh] 
 
@@ -2583,9 +2774,11 @@ involve variables read from a shared-memory object at each time step.
 d_dt(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\frac{x(t) - x(t-\Delta t)}{\Delta t} \approx \frac{d}{dt} \Big( x (t) \Big)$$
-:::
+
+</div>
 
 #### Example #1, d_dt.fee
 
@@ -2618,9 +2811,11 @@ amplitude given by the second argument $a$.
 deadband(x, a)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 0 & \text{if $| x | \leq a$} \\ x + a & \text{if $x < a$} \\ x - a & \text{if $x > a$} \end{cases}$$
-:::
+
+</div>
 
 ### `equal`
 
@@ -2635,9 +2830,11 @@ and one otherwise. Default value for $\epsilon = 10^{-9}$.
 equal(a, b, [eps])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 1 & \text{if $a = b$} \\ 0 & \text{if $a \neq b$} \end{cases}$$
-:::
+
+</div>
 
 ### `exp`
 
@@ -2648,9 +2845,11 @@ natural logarithm $e$ raised to the $x$-th power.
 exp(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$e^x$$
-:::
+
+</div>
 
 ![exp] 
 
@@ -2688,9 +2887,11 @@ If $x$ is zero, a NaN error is issued.
 expint1(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]$$
-:::
+
+</div>
 
 ![expint1] 
 
@@ -2720,9 +2921,11 @@ Computes the second exponential integral function of the argument $x$.
 expint2(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]$$
-:::
+
+</div>
 
 ![expint2] 
 
@@ -2736,9 +2939,11 @@ Computes the third exponential integral function of the argument $x$.
 expint3(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]$$
-:::
+
+</div>
 
 ![expint3] 
 
@@ -2753,9 +2958,11 @@ If $n$ is zero or one and $x$ is zero, a NaN error is issued.
 expintn(n,x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]$$
-:::
+
+</div>
 
 ### `floor`
 
@@ -2765,9 +2972,11 @@ Returns the largest integral value not greater than the argument $x$.
 floor(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\lfloor x \rfloor$$
-:::
+
+</div>
 
 ![floor] 
 
@@ -2784,9 +2993,11 @@ at $x=\delta$.
 heaviside(x, [delta])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}$$
-:::
+
+</div>
 
 ![heaviside] 
 
@@ -2828,9 +3039,11 @@ double-precision floating point numbers.
 if(a, [b], [c], [eps])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} b & \text{if $|a|<\epsilon$} \\ c & \text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ### `integral_dt`
 
@@ -2846,9 +3059,11 @@ from a shared-memory object at each time step.
 integral_dt(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +  \frac{x(t) + x(t-\Delta t)}{2} \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
-:::
+
+</div>
 
 #### Example #1, integral_dt.fee
 
@@ -2885,9 +3100,11 @@ recommended to use `integral_dt`.
 integral_euler_dt(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$z^{-1}\left[ \int_0^{t-\Delta t} x(t') \, dt' \right] +   x(t) \, \Delta t \approx \int_0^{t} x(t') \, dt'$$
-:::
+
+</div>
 
 ### `is_even`
 
@@ -2897,9 +3114,11 @@ Returns one if the argument $x$ rounded to the nearest integer is even.
 is_even(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}$$
-:::
+
+</div>
 
 ### `is_in_interval`
 
@@ -2910,9 +3129,11 @@ i.e. including $a$ but excluding $b$.
 is_in_interval(x, a, b)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 1 & \text{if $a \leq x < b$} \\ 0 & \text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ### `is_odd`
 
@@ -2922,9 +3143,11 @@ Returns one if the argument $x$ rounded to the nearest integer is odd.
 is_odd(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}$$
-:::
+
+</div>
 
 ### `j0`
 
@@ -2935,9 +3158,11 @@ evaluated at the argument $x$.
 j0(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$J_0(x)$$
-:::
+
+</div>
 
 ![j0] 
 
@@ -2973,9 +3198,11 @@ at $t = \Delta t$ with the initial condition $y(0) = y(t-\Delta t)$.
 lag(x, tau)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$x(t) - \Big[ x(t) - y(t-\Delta t) \Big] \cdot \exp\left(-\frac{\Delta t}{\tau}\right)$$
-:::
+
+</div>
 
 ### `lag_bilinear`
 
@@ -2987,9 +3214,11 @@ the bilinear transformation formula.
 lag_bilinear(x, tau)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$x(t-\Delta t) \cdot \left[ 1 - \frac{\Delta t}{2\tau} \right] + \left[ \frac{x(t) + x(t - \Delta t)}{1 + \frac{\Delta t}{2\tau}}\right] \cdot \frac{\Delta t}{2\tau}$$
-:::
+
+</div>
 
 ### `lag_euler`
 
@@ -3001,9 +3230,11 @@ the Euler forward rule.
 lag_euler(x, tau)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$x(t-\Delta t) + \Big[ x(t) - x(t - \Delta t) \Big] \cdot \frac{\Delta t}{\tau}$$
-:::
+
+</div>
 
 ### `last`
 
@@ -3019,9 +3250,11 @@ number 2.
 last(x,[p])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$z^{-1}\left[ x \right] = x(t-\Delta t)$$
-:::
+
+</div>
 
 #### Example #1, last1.fee
 
@@ -3097,9 +3330,11 @@ argument $a$ should be less than the third argument $b$.
 limit(x, a, b)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} a & \text{if $x < a$} \\ x & \text{if $a \leq x \leq b$} \\ b & \text{if $x > b$} \end{cases}$$
-:::
+
+</div>
 
 ### `limit_dt`
 
@@ -3111,9 +3346,11 @@ should be less than the third argument $b$.
 limit_dt(x, a, b)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} x(t) & \text{if $a \leq dx/dt \leq b$} \\ x(t-\Delta t) + a \cdot \Delta t & \text{if $dx/dt < a$} \\ x(t-\Delta t) + b \cdot \Delta t & \text{if $dx/dt > b$} \end{cases}$$
-:::
+
+</div>
 
 ### `log`
 
@@ -3124,9 +3361,11 @@ negative, a NaN error is issued.
 log(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\ln(x)$$
-:::
+
+</div>
 
 ![log] 
 
@@ -3185,9 +3424,11 @@ provided. Currently only maximum of ten arguments can be provided.
 mark_max(x1, x2, [...], [x10])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ i / \max \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
-:::
+
+</div>
 
 ### `mark_min`
 
@@ -3198,9 +3439,11 @@ provided. Currently only maximum of ten arguments can be provided.
 mark_max(x1, x2, [...], [x10])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i$$
-:::
+
+</div>
 
 ### `max`
 
@@ -3211,9 +3454,11 @@ maximum of ten arguments can be given.
 max(x1, x2, [...], [x10])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \max \Big (x_1, x_2, \dots, x_{10} \Big)$$
-:::
+
+</div>
 
 ### `memory`
 
@@ -3233,9 +3478,11 @@ maximum of ten arguments can be given.
 min(x1, x2, [...], [x10])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \min \Big (x_1, x_2, \dots, x_{10} \Big)$$
-:::
+
+</div>
 
 ### `mod`
 
@@ -3246,9 +3493,11 @@ the second one $b$. Both arguments may be non-integral.
 mod(a, b)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$a - \left\lfloor \frac{a}{b} \right\rfloor \cdot b$$
-:::
+
+</div>
 
 ### `not`
 
@@ -3260,9 +3509,11 @@ evaluation. If not given, default is $\epsilon = 10^{-9}$.
 not(x, [eps])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \begin{cases}1 &\text{if $|x| < \epsilon$} \\ 0 &\text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ### `random`
 
@@ -3280,9 +3531,11 @@ Ed., Section 3.6.
 random(x1, x2, [s])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1$$
-:::
+
+</div>
 
 ### `random_gauss`
 
@@ -3309,9 +3562,11 @@ rounded away from zero.
 round(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} \lceil x \rceil & \text{if $\lceil x \rceil - x < 0.5$} \\ \lceil x \rceil & \text{if $\lceil x \rceil - x = 0.5 \wedge x > 0$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor < 0.5$} \\ \lfloor x \rfloor & \text{if $x-\lfloor x \rfloor = 0.5 \wedge x < 0$} \end{cases}$$
-:::
+
+</div>
 
 ![round] 
 
@@ -3329,9 +3584,11 @@ its phase.
 sawtooth_wave(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$x - \lfloor x \rfloor$$
-:::
+
+</div>
 
 ![sawtooth_wave] 
 
@@ -3369,9 +3626,11 @@ $\epsilon = 10^{-9}$.
 sgn(x, [eps])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \begin{cases}-1 &\text{if $x \le -\epsilon$} \\ 0 &\text{if $|x| < \epsilon$} \\ +1 &\text{if $x \ge +\epsilon$} \end{cases}$$
-:::
+
+</div>
 
 ![sgn] 
 
@@ -3388,9 +3647,11 @@ of the wave and $\phi$ controls its phase.
 sin(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\sin(x)$$
-:::
+
+</div>
 
 ![sin] 
 
@@ -3419,9 +3680,11 @@ radians.
 sinh(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\sinh(x)$$
-:::
+
+</div>
 
 ![sinh] 
 
@@ -3436,9 +3699,11 @@ negative, a NaN error is issued.
 sqrt(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$+\sqrt{x}$$
-:::
+
+</div>
 
 ![sqrt] 
 
@@ -3457,9 +3722,11 @@ its phase.
 square_wave(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ![square_wave] 
 
@@ -3494,9 +3761,11 @@ Computes the tangent of the argument $x$, where $x$ is in radians.
 tan(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$ \tan(x)$$
-:::
+
+</div>
 
 ![tan] 
 
@@ -3511,9 +3780,11 @@ radians.
 tanh(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\tanh(x)$$
-:::
+
+</div>
 
 ![tanh] 
 
@@ -3531,9 +3802,11 @@ no hysteresis, i.e. $b=0$.
 threshold_max(x, a, [b])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 1 & \text{if $x > a$} \\ 0 & \text{if $x < a-b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ### `threshold_min`
 
@@ -3547,9 +3820,11 @@ hysteresis, i.e. $b=0$.
 threshold_min(x, a, [b])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 1 & \text{if $x < a$} \\ 0 & \text{if $x > a+b$} \\ \text{last value of $y$} & \text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ### `triangular_wave`
 
@@ -3563,9 +3838,11 @@ and $\phi$ controls its phase.
 triangular_wave(x)  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\begin{cases} 2 (x - \lfloor x \rfloor) & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 2 [1-(x - \lfloor x \rfloor)] & \text{otherwise} \end{cases}$$
-:::
+
+</div>
 
 ![triangular_wave] 
 
@@ -3598,13 +3875,36 @@ $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 derivative(f(x), x, a, [h], [p])  
 ```
 
-::: {.not-in-format .man}
+<div class="not-in-format man">
+
 $$\left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} $$
-:::
+
+</div>
 
 ## Vector functions
 
-To be done.
+### `derivative` {#derivative}
+
+Computes the derivative of the expression $f(x)$ given in the first
+argument with respect to the variable $x$ given in the second argument
+at the point $x=a$ given in the third argument using an adaptive scheme.
+The fourth optional argument $h$ is the initial width of the range the
+adaptive derivation method starts with. The fifth optional argument $p$
+is a flag that indicates whether a backward ($p < 0$), centered
+($p = 0$) or forward ($p > 0$) stencil is to be used. This functional
+calls the GSL functions `gsl_deriv_backward`, `gsl_deriv_central` or
+`gsl_deriv_forward` according to the indicated flag $p$. Defaults are
+$h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
+
+``` feenox
+derivative(f(x), x, a, [h], [p])  
+```
+
+<div class="not-in-format man">
+
+$$\left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} $$
+
+</div>
 
 ```{=tex}
 \appendix

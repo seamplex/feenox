@@ -1,6 +1,6 @@
 # NAFEMS Benchmark #10: thick plate pressure
 # Reference solution: -5.38 MPa
-READ_MESH le10.msh
+READ_MESH le10-structured.msh
 PROBLEM mechanical DIMENSIONS 3
 
 # loading
@@ -10,7 +10,7 @@ BC upper    p=1     # uniform compressive pressure of 1 MPa on the upper surface
 BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
 BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
 BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
-BC midplane w=0      #  z displacements fixed along mid-plane
+BC midplane w=0      #  z displacemenrs fixed along mid-plane
 
 # uniform material properties 
 E = 210e3   # Young modulus in MPa
@@ -18,7 +18,7 @@ nu = 0.3    # Poisson’s ratio
 
 SOLVE_PROBLEM   # solve!
 
-WRITE_MESH le10.vtk VECTOR u v w   sigmay       # write post-processing view in VTK
+WRITE_MESH le10-structured.vtk VECTOR u v w sigmay  # write post-processing view in VTK
 
 # write some (optional) information into the screen/terminal
 PRINT "number of elements = " %'.0f elements
@@ -26,5 +26,5 @@ PRINT "   number of nodes = " %'.0f nodes
 PRINT "         wall time = " %.1f wall_time() " secs"
 PRINT "          CPU time = " %.1f cpu_time() " secs"
 PRINT "[u,v,w] @ D = [" %.4f u(2000,0,300) v(2000,0,300) w(2000,0,300) "] mm"   SEP " "
-PRINT "sigma_y @ D = " sigma_y(2000,0,300) "MPa"                            SEP " "
+PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"                            SEP " "
 PRINT "  error @ D = " %.2f 100*abs(sigmay(2000,0,600)+5.38)/5.38 TEXT "%" SEP " "

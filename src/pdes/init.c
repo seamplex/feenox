@@ -192,7 +192,7 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
   feenox.pde.vars.snes_stol = feenox_define_variable_get_ptr("snes_stol");
 ///va+snes_stol+detail Default `1e-8`.  
   feenox_var_value(feenox.pde.vars.snes_stol) = 1e-8;  // same as PETSc
-  
+
 ///va+snes_max_it+name snes_max_it
 ///va+snes_max_itdetail Number of maximum iterations of the non-linear solver before diverging,
 ///va+snes_max_it+detail as passed to PETSc’s
@@ -200,6 +200,22 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
   feenox.pde.vars.snes_max_it = feenox_define_variable_get_ptr("snes_max_it");
 ///va+snes_max_it+detail Default `50`.
   feenox_var_value(feenox.pde.vars.snes_max_it) = 50;   // same as PETSc
+
+
+  
+///va+ts_atol+name ts_atol
+///va+ts_atol+detail Absolute tolerance of the transient solver, as passed to PETSc’s
+///va+ts_atol+detail [`TSSetTolerances`](https://petsc.org/release/docs/manualpages/TS/TSSetTolerances.html)
+  feenox.pde.vars.ts_atol = feenox_define_variable_get_ptr("ts_atol");
+///va+ts_rtol+detail Default `1e-4`.
+  feenox_var_value(feenox.pde.vars.ts_atol) = 1e-4;   // same as PETSc
+ 
+///va+ts_rtol+name ts_rtol
+///va+ts_rtol+detail Relative tolerance of the transient solver, as passed to PETSc’s
+///va+ts_rtol+detail [`TSSetTolerances`](https://petsc.org/release/docs/manualpages/TS/TSSetTolerances.html).
+feenox.pde.vars.ts_rtol = feenox_define_variable_get_ptr("ts_rtol");
+///va+ts_rtol+detail Default `1e-4`.
+  feenox_var_value(feenox.pde.vars.ts_rtol) = 1e-4;    // same as PETSc
   
 ///va+eps_tol+name eps_tol
 ///va+eps_tol+detail Tolerance (relative to the matrix norms) of the eigen solver,

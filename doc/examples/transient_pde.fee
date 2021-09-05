@@ -1,0 +1,32 @@
+# example of a 1D heat transient problem
+# from https://www.mcs.anl.gov/petsc/petsc-current/src/ts/tutorials/ex3.c.html
+# a non-dimensional slab 0 < x < 1 is kept at T(0) = T(1) = 0
+# there is an initial non-trivial T(x)
+# the steady-state is T(x) = 0
+PROBLEM thermal 1d
+READ_MESH slab60.msh
+
+end_time = 1e-1
+
+# initial condition
+T_0(x) := sin(6*pi*x) + 3*sin(2*pi*x)
+# analytical solution
+T_a(x,t) := exp(-36*pi^2*t)*sin(6*pi*x) + 3*exp(-4*pi^2*t)*sin(2*pi*x)
+
+# unitary non-dimensional properties
+k = 1
+rho = 1
+cp = 1
+
+# boundary conditions
+BC left  T=0
+BC right T=0
+
+SOLVE_PROBLEM
+
+PRINT %e t dt T(0.1) T_a(0.1,t) T(0.7) T_a(0.7,t)
+WRITE_MESH temp-slab.msh T
+
+IF done
+ PRINT "\# open temp-anim-slab.geo in Gmsh to see the result!"
+ENDIF

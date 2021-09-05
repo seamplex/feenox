@@ -1147,18 +1147,208 @@ To be done.
 @node Description
 @chapter Description
 @anchor{#description}
-To be done.
+FeenoX solves a problem defined in an plain-text input file and writes
+user-defined outputs to the standard output and/or files, either also
+plain-text or with a particular format for further post-processing. The
+syntax of this input file is designed to be as self-describing as
+possible, using English keywords that explains FeenoX what problem it
+has to solve in a way is understandable by both humans and computers.
+Keywords can work either as
 
-@itemize
+@enumerate 
 @item
-Nouns are definitions.
+Definitions, for instance ”define function@ @math{f(x)} and read its
+data from file @code{f.dat}”), or as
 @item
-Verbs are instructions.
-@item
-The equal sign can be both depending on what's on the left hand side.
-@end itemize
+Instructions, such as ``write the stress at point @math{D} into the
+standard output''.
+@end enumerate
 
-Variables. Vectors. Matrices.
+A person can tell if a keyword is a definition or an instruction because
+the former are nouns (@code{FUNCTION}) and the latter verbs
+(@code{PRINT}). The equal sign @code{=} is a special keyword that is
+neither a verb nor a noun, and its meaning changes depending on what is
+on the left hand side of the assignment.
+
+@enumerate a
+@item
+If there is a function, then it is a definition: define an algebraic
+function to be equal to the expression on the right-hand side, e.g.:
+
+@smallformat
+@verbatim
+f(x,y) = exp(-x^2)*cos(pi*y)
+@end verbatim
+@end smallformat
+
+@item
+If there is a variable, vector or matrix, it is an instruction: evaluate
+the expression on the right-hand side and assign it to the varible or
+vector (or matrix) element indicated in the left-hand side. Strictly
+speaking, if the variable has not already been defined (and implicit
+declaration is allowed), then the variable is also defined as well, e.g:
+
+@smallformat
+@verbatim
+VAR a
+VECTOR b[3]
+a = sqrt(2)
+b[i] = a*i^2
+@end verbatim
+@end smallformat
+
+There is no need to explicitly define the scalar variable @code{a} with
+@code{VAR} since the first assigment also defines it implicitly (if this
+is allowed by the keyword @code{IMPLICIT}).
+
+@end enumerate
+
+An input file can define its own variables as needed, such as
+@code{my_var} or @code{flag}. But there are some reserved names that are
+special in the sense that they either
+
+@enumerate 
+@item
+can be set to modify the behavior of FeenoX, such as @code{max_dt} or
+@code{dae_tol}
+@item
+can be read to get the internal status or results back from FeenoX, such
+as @code{nodes} or @code{keff}
+@item
+can be either set or read, such as @code{dt} or @code{done}
+@end enumerate
+
+The problem being solved can be static or transient, depending on
+whether the special variable @code{end_time} is zero (default) or not.
+If it is zero and @code{static_steps} is equal to one (default), the
+instructions in the input file are executed once and then FeenoX quits.
+For example
+
+@smallformat
+@verbatim
+VAR x
+PRINT %.7f func_min(cos(x)+1,x,0,6)
+@end verbatim
+@end smallformat
+
+If @code{static_steps} is larger than one, the special variable
+@code{step_static} is increased and they are repeated the number of time
+indicated by @code{static_steps}:
+
+@smallformat
+@verbatim
+static_steps = 10
+f(n) = n^2 - n + 41
+PRINT f(step_static^2-1)
+@end verbatim
+@end smallformat
+
+If the special variable @code{end_time} is set to a non-zero value,
+after computing the static part a transient problem is solved. There are
+three kinds of transient problems:
+
+@enumerate 
+@item
+Plain ``standalone'' transients
+@item
+Differential-Algebraic equations (DAE) transients
+@item
+Partial Differential equations (PDE) transients
+@end enumerate
+
+In the first case, after all the instruction in the input file were
+executed, the special variable @code{t} is increased by the value of
+@code{dt} and then the instructions are executed all over again, until
+@code{t} reaches @code{end_time}:
+
+@smallformat
+@verbatim
+end_time = 2*pi
+dt = 1/10
+
+y = lag(heaviside(t-1), 1)
+z = random_gauss(0, sqrt(2)/10)
+
+PRINT t sin(t) cos(t) y z HEADER
+@end verbatim
+@end smallformat
+
+In the second case, the keyword @code{PHASE_SPACE} sets up DAE system.
+Then, one initial condition and one differential-algebraic equation has
+to be given for each element in the phase space. The instructions before
+the DAE block executed, then the DAE timestep is advanced and finally
+the instructions after DAE block are executed (there cannot be any
+instruction between the first and the last DAE):
+
+@smallformat
+@verbatim
+PHASE_SPACE x
+end_time = 1
+x_0 = 1
+x_dot = -x
+PRINT t x exp(-t) HEADER
+@end verbatim
+@end smallformat
+
+The timestep is chosen by the SUNDIALS library in order to keep an
+estimate of the residual error below @code{dae_tol} (default is
+@math{10^{-6}}), although @code{min_dt} and @code{max_dt} can be used to
+control it. See the section of the
+@ref{#differential-algebraic-equations-subsystem,Differential-Algebraic
+Equations subsystem} for more information.
+
+In the third cae, the type of PDE being solved is given by the keyword
+@code{PROBLEM}. Some types of PDEs do support transient problems (such
+as @code{thermal}) but some others do not (such as @code{modal}). See
+the detailed explanation of each problem type for details. Now the
+transient problem is handled by the TS framework of the PETSc library.
+In general transient PDEs involve a mesh, material properties, inital
+conditions, transient boundary conditions, etc. And they create a lot of
+data since results mean spatial and temporal distributions of one or
+more scalar fields:
+
+@smallformat
+@verbatim
+# example of a 1D heat transient problem
+# from https://www.mcs.anl.gov/petsc/petsc-current/src/ts/tutorials/ex3.c.html
+# a non-dimensional slab 0 < x < 1 is kept at T(0) = T(1) = 0
+# there is an initial non-trivial T(x)
+# the steady-state is T(x) = 0
+PROBLEM thermal 1d
+READ_MESH slab60.msh
+
+end_time = 1e-1
+
+# initial condition
+T_0(x) := sin(6*pi*x) + 3*sin(2*pi*x)
+# analytical solution
+T_a(x,t) := exp(-36*pi^2*t)*sin(6*pi*x) + 3*exp(-4*pi^2*t)*sin(2*pi*x)
+
+# unitary non-dimensional properties
+k = 1
+rho = 1
+cp = 1
+
+# boundary conditions
+BC left  T=0
+BC right T=0
+
+SOLVE_PROBLEM
+
+PRINT %e t dt T(0.1) T_a(0.1,t) T(0.7) T_a(0.7,t)
+WRITE_MESH temp-slab.msh T
+
+IF done
+ PRINT "\# open temp-anim-slab.geo in Gmsh to see the result!"
+ENDIF
+@end verbatim
+@end smallformat
+
+PETSc's TS also honors the @code{min_dt} and @code{max_dt} variables,
+but the time step is controled by the allowed relative error with the
+special variable @code{ts_rtol}. Again, see the section of the
+@ref{#partial-differential-equations-subsytem,Partial Differential
+Equations subsytem} for more information.
 
 @node Reference
 @chapter Reference
@@ -1166,10 +1356,11 @@ Variables. Vectors. Matrices.
 
 @menu
 * Algebraic expressions::
-* Special global variables::
-* General keywords::
-* Differential-Algebraic Equations::
-* Partial Differential Equations::
+* Differential-Algebraic Equations subsystem::
+* Partial Differential Equations subsytem::
+* Laplace's equation::
+* The heat conduction equation::
+* General & “standalone” mathematics::
 * Functions::
 * Functionals::
 * Vector functions::
@@ -1185,831 +1376,9 @@ To be done.
 Everything is an expression.
 @end itemize
 
-@node Special global variables
-@section Special global variables
-@anchor{#special-global-variables}
-
-@menu
-* done::
-* done_static::
-* done_transient::
-* dt::
-* end_time::
-* i::
-* infinite::
-* in_static::
-* in_static_first::
-* in_static_last::
-* in_transient::
-* in_transient_first::
-* in_transient_last::
-* j::
-* max_dt::
-* min_dt::
-* ncores::
-* on_gsl_error::
-* on_ida_error::
-* on_nan::
-* pi::
-* pid::
-* realtime_scale::
-* rel_error::
-* static_steps::
-* step_static::
-* step_transient::
-* t::
-* zero::
-@end menu
-
-@node done
-@subsection @code{done}
-@anchor{#done}
-Flag that indicates whether the overall calculation is over.
-
-This variable is set to true by FeenoX when the computation finished so
-it can be checked in an @code{IF} block to do something only in the last
-step. But this variable can also be set to true from the input file,
-indicating that the current step should also be the last one. For
-example, one can set @code{end_time = infinite} and then finish the
-computation at @math{t=10} by setting @code{done = t > 10}. This
-@code{done} variable can also come from (and sent to) other sources,
-like a shared memory object for coupled calculations.
-
-@node done_static
-@subsection @code{done_static}
-@anchor{#done_static}
-Flag that indicates whether the static calculation is over or not.
-
-It is set to true (i.e.@ @math{\neq 0}) by feenox if @code{step_static}
-@math{\ge} @code{static_steps}. If the user sets it to true, the current
-step is marked as the last static step and the static calculation ends
-after finishing the step. It can be used in @code{IF} blocks to check if
-the static step is finished or not.
-
-@node done_transient
-@subsection @code{done_transient}
-@anchor{#done_transient}
-Flag that indicates whether the transient calculation is over or not.
-
-It is set to true (i.e.@ @math{\neq 0}) by feenox if @code{t} @math{\ge}
-@code{end_time}. If the user sets it to true, the current step is marked
-as the last transient step and the transient calculation ends after
-finishing the step. It can be used in @code{IF} blocks to check if the
-transient steps are finished or not.
-
-@node dt
-@subsection @code{dt}
-@anchor{#dt}
-Actual value of the time step for transient calculations.
-
-When solving DAE systems, this variable is set by feenox. It can be
-written by the user for example by importing it from another transient
-code by means of shared-memory objects. Care should be taken when
-solving DAE systems and overwriting @code{t}. Default value is
-DEFAULT_DT, which is a power of two and roundoff errors are thus
-reduced.
-
-@node end_time
-@subsection @code{end_time}
-@anchor{#end_time}
-Final time of the transient calculation, to be set by the user.
-
-The default value is zero, meaning no transient calculation.
-
-@node i
-@subsection @code{i}
-@anchor{#i}
-Dummy index, used mainly in vector and matrix row subindex expressions.
-
-@node infinite
-@subsection @code{infinite}
-@anchor{#infinite}
-A very big positive number.
-
-It can be used as @code{end_time = infinite} or to define improper
-integrals with infinite limits. Default is
-@math{2^{50} \approx 1 \times 10^{15}}.
-
-@node in_static
-@subsection @code{in_static}
-@anchor{#in_static}
-Flag that indicates if FeenoX is solving the iterative static
-calculation.
-
-This is a read-only variable that is non zero if the static calculation.
-
-@node in_static_first
-@subsection @code{in_static_first}
-@anchor{#in_static_first}
-Flag that indicates if feenox is in the first step of the iterative
-static calculation.
-
-@node in_static_last
-@subsection @code{in_static_last}
-@anchor{#in_static_last}
-Flag that indicates if feenox is in the last step of the iterative
-static calculation.
-
-@node in_transient
-@subsection @code{in_transient}
-@anchor{#in_transient}
-Flag that indicates if feenox is solving transient calculation.
-
-@node in_transient_first
-@subsection @code{in_transient_first}
-@anchor{#in_transient_first}
-Flag that indicates if feenox is in the first step of the transient
-calculation.
-
-@node in_transient_last
-@subsection @code{in_transient_last}
-@anchor{#in_transient_last}
-Flag that indicates if feenox is in the last step of the transient
-calculation.
-
-@node j
-@subsection @code{j}
-@anchor{#j}
-Dummy index, used mainly in matrix column subindex expressions.
-
-@node max_dt
-@subsection @code{max_dt}
-@anchor{#max_dt}
-Maximum bound for the time step that feenox should take when solving DAE
-systems.
-
-@node min_dt
-@subsection @code{min_dt}
-@anchor{#min_dt}
-Minimum bound for the time step that feenox should take when solving DAE
-systems.
-
-@node ncores
-@subsection @code{ncores}
-@anchor{#ncores}
-The number of online available cores, as returned by
-@code{sysconf(_SC_NPROCESSORS_ONLN)}.
-
-This value can be used in the @code{MAX_DAUGHTERS} expression of the
-@code{PARAMETRIC} keyword (i.e @code{ncores/2}).
-
-@node on_gsl_error
-@subsection @code{on_gsl_error}
-@anchor{#on_gsl_error}
-This should be set to a mask that indicates how to proceed if an error
-ir raised in any routine of the GNU Scientific Library.
-
-@node on_ida_error
-@subsection @code{on_ida_error}
-@anchor{#on_ida_error}
-This should be set to a mask that indicates how to proceed if an error
-ir raised in any routine of the SUNDIALS Library.
-
-@node on_nan
-@subsection @code{on_nan}
-@anchor{#on_nan}
-This should be set to a mask that indicates how to proceed if
-Not-A-Number signal (such as a division by zero) is generated when
-evaluating any expression within feenox.
-
-@node pi
-@subsection @code{pi}
-@anchor{#pi}
-A double-precision floating point representaion of the number @math{\pi}
-
-It is equal to the @code{M_PI} constant in @code{math.h} .
-
-@node pid
-@subsection @code{pid}
-@anchor{#pid}
-The UNIX process id of the FeenoX instance.
-
-@node realtime_scale
-@subsection @code{realtime_scale}
-@anchor{#realtime_scale}
-If this variable is not zero, then the transient problem is run trying
-to syncrhonize the problem time with realtime, up to a scale given.
-
-For example, if the scale is set to one, then FeenoX will advance the
-problem time at the same pace that the real wall time advances. If set
-to two, FeenoX time wil advance twice as fast as real time, and so on.
-If the calculation time is slower than real time modified by the scale,
-this variable has no effect on the overall behavior and execution will
-proceed as quick as possible with no delays.
-
-@node rel_error
-@subsection @code{rel_error}
-@anchor{#rel_error}
-Maximum allowed relative error for the solution of DAE systems.
-
-Default value is is @math{1 \times 10^{-6}}. If a fine per-variable
-error control is needed, special vector @code{abs_error} should be used.
-
-@node static_steps
-@subsection @code{static_steps}
-@anchor{#static_steps}
-Number of steps that ought to be taken during the static calculation, to
-be set by the user.
-
-The default value is one, meaning only one static step.
-
-@node step_static
-@subsection @code{step_static}
-@anchor{#step_static}
-Indicates the current step number of the iterative static calculation.
-
-This is a read-only variable that contains the current step of the
-static calculation.
-
-@node step_transient
-@subsection @code{step_transient}
-@anchor{#step_transient}
-Indicates the current step number of the transient static calculation.
-
-This is a read-only variable that contains the current step of the
-transient calculation.
-
-@node t
-@subsection @code{t}
-@anchor{#t}
-Actual value of the time for transient calculations.
-
-This variable is set by FeenoX, but can be written by the user for
-example by importing it from another transient code by means of
-shared-memory objects. Care should be taken when solving DAE systems and
-overwriting @code{t}.
-
-@node zero
-@subsection @code{zero}
-@anchor{#zero}
-A very small positive number.
-
-It is taken to avoid roundoff errors when comparing floating point
-numbers such as replacing @math{a \leq a_\text{max}} with
-@math{a < a_\text{max} +} @code{zero}. Default is
-@math{(1/2)^{-50} \approx 9\times 10^{-16}} .
-
-@node General keywords
-@section General keywords
-@anchor{#general-keywords}
-
-@menu
-* ABORT::
-* ALIAS::
-* CLOSE::
-* DEFAULT_ARGUMENT_VALUE::
-* FILE::
-* FIT::
-* FUNCTION::
-* IF::
-* IMPLICIT::
-* INCLUDE::
-* MATRIX::
-* OPEN::
-* PRINT::
-* PRINT_FUNCTION::
-* PRINT_VECTOR::
-* SORT_VECTOR::
-* VAR::
-* VECTOR::
-* WRITE_MESH::
-@end menu
-
-@node ABORT
-@subsection @code{ABORT}
-@anchor{#abort}
-Catastrophically abort the execution and quit FeenoX.
-
-@smallformat
-@verbatim
-ABORT  
-@end verbatim
-@end smallformat
-
-Whenever the instruction @code{ABORT} is executed, FeenoX quits with a
-non-zero error leve. It does not close files nor unlock shared memory
-objects. The objective of this instruction is to either debug complex
-input files by using only parts of them or to conditionally abort the
-execution using @code{IF} clauses.
-
-@node ALIAS
-@subsection @code{ALIAS}
-@anchor{#alias}
-Define a scalar alias of an already-defined indentifier.
-
-@smallformat
-@verbatim
-ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
-@end verbatim
-@end smallformat
-
-The existing object can be a variable, a vector element or a matrix
-element. In the first case, the name of the variable should be given as
-the existing object. In the second case, to alias the second element of
-vector @code{v} to the new name @code{new}, @code{v(2)} should be given
-as the existing object. In the third case, to alias second element (2,3)
-of matrix @code{M} to the new name @code{new}, @code{M(2,3)} should be
-given as the existing object.
-
-@node CLOSE
-@subsection @code{CLOSE}
-@anchor{#close}
-Explicitly close a file after input/output.
-
-@smallformat
-@verbatim
-CLOSE <name>  
-@end verbatim
-@end smallformat
-
-The given @code{<name>} can be either a fixed-string path or an
-already-defined @code{FILE}.
-
-@node DEFAULT_ARGUMENT_VALUE
-@subsection @code{DEFAULT_ARGUMENT_VALUE}
-@anchor{#default_argument_value}
-Give a default value for an optional commandline argument.
-
-@smallformat
-@verbatim
-DEFAULT_ARGUMENT_VALUE <constant> <string>  
-@end verbatim
-@end smallformat
-
-If a @code{$n} construction is found in the input file but the
-commandline argument was not given, the default behavior is to fail
-complaining that an extra argument has to be given in the commandline.
-With this keyword, a default value can be assigned if no argument is
-given, thus avoiding the failure and making the argument optional. The
-@code{<constant>} should be 1, 2, 3, etc. and @code{<string>} will be
-expanded character-by-character where the @code{$n} construction is.
-Whether the resulting expression is to be interpreted as a string or as
-a numerical expression will depend on the context.
-
-@node FILE
-@subsection @code{FILE}
-@anchor{#file}
-Define a file with a particularly formatted name to be used either as
-input or as output.
-
-@smallformat
-@verbatim
-< FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
-@end verbatim
-@end smallformat
-
-For reading or writing into files with a fixed path, this instruction is
-usually not needed as the @code{FILE} keyword of other instructions
-(such as @code{PRINT} or @code{MESH}) can take a fixed-string path as an
-argument. However, if the file name changes as the execution progresses
-(say because one file for each step is needed), then an explicit
-@code{FILE} needs to be defined with this keyword and later referenced
-by the given name. The path should be given as a @code{printf}-like
-format string followed by the expressions which shuold be evaluated in
-order to obtain the actual file path. The expressions will always be
-floating-point expressions, but the particular integer specifier
-@code{%d} is allowed and internally transformed to @code{%.0f}. The file
-can be explicitly defined and @code{INPUT}, @code{OUTPUT} or a certain
-@code{fopen()} mode can be given (i.e.@ ``a''). If not explicitly given,
-the nature of the file will be taken from context, i.e.@ @code{FILE}s in
-@code{PRINT} will be @code{OUTPUT} and @code{FILE}s in @code{FUNCTION}
-will be @code{INPUT}. This keyword justs defines the @code{FILE}, it
-does not open it. The file will be actually openened (and eventually
-closed) automatically. In the rare case where the automated opening and
-closing does not fit the expected workflow, the file can be explicitly
-opened or closed with the instructions @code{FILE_OPEN} and
-@code{FILE_CLOSE}.
-
-@node FIT
-@subsection @code{FIT}
-@anchor{#fit}
-Find parameters to fit an analytical function to a pointwise-defined
-function.
-
-@smallformat
-@verbatim
-FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
- [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
- [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]
- [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]
- [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
- [ VERBOSE ]  
-@end verbatim
-@end smallformat
-
-The function with the data has to be point-wise defined (i.e.@ a
-@code{FUNCTION} read from a file, with inline @code{DATA} or defined
-over a mesh). The function to be fitted has to be parametrized with at
-least one of the variables provided after the @code{USING} keyword. For
-example to fit@ @math{f(x,y)=a x^2 + b sqrt(y)} to a pointwise-defined
-function@ @math{g(x,y)} one gives @code{FIT f TO g VIA a b}. Only the
-names of the functions have to be given, not the arguments. Both
-functions have to have the same number of arguments. The initial guess
-of the solution is given by the initial value of the variables after the
-@code{VIA} keyword. Analytical expressions for the gradient of the
-function to be fitted with respect to the parameters to be fitted can be
-optionally given with the @code{GRADIENT} keyword. If none is provided,
-the gradient will be computed numerically using finite differences. A
-range over which the residuals are to be minimized can be given with
-@code{RANGE_MIN} and @code{RANGE_MAX}. The expressions give the range of
-the arguments of the functions, not of the parameters. For
-multidimensional fits, the range is an hypercube. If no range is given,
-all the definition points of the function with the data are used for the
-fit. Convergence can be controlled by giving the relative and absolute
-tolreances with @code{TOL_REL} (default @code{DEFAULT_NLIN_FIT_EPSREL})
-and @code{TOL_ABS} (default @code{DEFAULT_NLIN_FIT_EPSABS}), and with
-the maximum number of iterations @code{MAX_ITER} (default
-DEFAULT_NLIN_FIT_MAX_ITER). If the optional keyword @code{VERBOSE} is
-given, some data of the intermediate steps is written in the standard
-output.
-
-@node FUNCTION
-@subsection @code{FUNCTION}
-@anchor{#function}
-Define a function of one or more variables.
-
-@smallformat
-@verbatim
-FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
-@end verbatim
-@end smallformat
-
-The number of variables @math{n} is given by the number of arguments
-given between parenthesis after the function name. The arguments are
-defined as new variables if they had not been already defined explictly
-as scalar variables. If the function is given as an algebraic
-expression, the short-hand operator @code{:=} can be used. That is to
-say, @code{FUNCTION f(x) = x^2} is equivalent to @code{f(x) := x^2}. If
-a @code{FILE} is given, an ASCII file containing at least @math{n+1}
-columns is expected. By default, the first @math{n} columns are the
-values of the arguments and the last column is the value of the function
-at those points. The order of the columns can be changed with the
-keyword @code{COLUMNS}, which expects @math{n+1} expressions
-corresponding to the column numbers. If @code{VECTORS} is given, a set
-of @math{n+1} vectors of the same size is expected. The first @math{n}
-correspond to the arguments and the last one to the function values. The
-function can be pointwise-defined inline in the input using @code{DATA}.
-This should be the last keyword of the line, followed by
-@math{N=k \cdot (n+1)} expresions giving@ @math{k} definition points:
-@math{n} arguments and the value of the function. Multiline continuation
-using brackets @code{@{} and @code{@}} can be used for a clean data
-organization. Interpolation schemes can be given for either one or
-multi-dimensional functions with @code{INTERPOLATION}. Available schemes
-for @math{n=1} are:
-
-@itemize
-@item
-linear
-@item
-polynomial, the grade is equal to the number of data minus one
-@item
-spline, cubic (needs at least 3 points)
-@item
-spline_periodic
-@item
-akima (needs at least 5 points)
-@item
-akima_periodic (needs at least 5 points)
-@item
-steffen, always-monotonic splines-like interpolator
-@end itemize
-
-Default interpolation scheme for one-dimensional functions is
-@code{DEFAULT_INTERPOLATION}.
-
-Available schemes for @math{n>1} are:
-
-@itemize
-@item
-nearest, @math{f(\vec{x})} is equal to the value of the closest
-definition point
-@item
-shepard,
-@uref{https://en.wikipedia.org/wiki/Inverse_distance_weighting,inverse
-distance weighted average definition points} (might lead to inefficient
-evaluation)
-@item
-shepard_kd,
-@uref{https://en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard's_method,average
-of definition points within a kd-tree} (more efficient evaluation
-provided @code{SHEPARD_RADIUS} is set to a proper value)
-@item
-bilinear, only available if the definition points configure an
-structured hypercube-like grid. If @math{n>3}, @code{SIZES} should be
-given.
-@end itemize
-
-For @math{n>1}, if the euclidean distance between the arguments and the
-definition points is smaller than @code{INTERPOLATION_THRESHOLD}, the
-definition point is returned and no interpolation is performed. Default
-value is square root of @code{DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD}.
-The initial radius of points to take into account in @code{shepard_kd}
-is given by @code{SHEPARD_RADIUS}. If no points are found, the radius is
-double until at least one definition point is found. The radius is
-doubled until at least one point is found. Default is
-@code{DEFAULT_SHEPARD_RADIUS}. The exponent of the @code{shepard} method
-is given by @code{SHEPARD_EXPONENT}. Default is
-@code{DEFAULT_SHEPARD_EXPONENT}.
-
-@node IF
-@subsection @code{IF}
-@anchor{#if}
-Execute a set of instructions if a condition is met.
-
-@smallformat
-@verbatim
-IF expr 
-  <block_of_instructions_if_expr_is_true> 
- [ ELSE  
-  <block_of_instructions_if_expr_is_false> ] 
- ENDIF  
-@end verbatim
-@end smallformat
-
-@node IMPLICIT
-@subsection @code{IMPLICIT}
-@anchor{#implicit}
-Define whether implicit definition of variables is allowed or not.
-
-@smallformat
-@verbatim
-IMPLICIT { NONE | ALLOWED }  
-@end verbatim
-@end smallformat
-
-By default, FeenoX allows variables (but not vectors nor matrices) to be
-implicitly declared. To avoid introducing errors due to typos, explicit
-declaration of variables can be forced by giving @code{IMPLICIT NONE}.
-Whether implicit declaration is allowed or explicit declaration is
-required depends on the last @code{IMPLICIT} keyword given, which by
-default is @code{ALLOWED}.
-
-@node INCLUDE
-@subsection @code{INCLUDE}
-@anchor{#include}
-Include another FeenoX input file.
-
-@smallformat
-@verbatim
-INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]  
-@end verbatim
-@end smallformat
-
-Includes the input file located in the string @code{file_path} at the
-current location. The effect is the same as copying and pasting the
-contents of the included file at the location of the @code{INCLUDE}
-keyword. The path can be relative or absolute. Note, however, that when
-including files inside @code{IF} blocks that instructions are
-conditionally-executed but all definitions (such as function
-definitions) are processed at parse-time independently from the
-evaluation of the conditional. The included file has to be an actual
-file path (i.e.@ it cannot be a FeenoX @code{FILE}) because it needs to
-be resolved at parse time. Yet, the name can contain a commandline
-replacement argument such as @code{$1} so @code{INCLUDE $1.fee} will
-include the file specified after the main input file in the command
-line. The optional @code{FROM} and @code{TO} keywords can be used to
-include only portions of a file.
-
-@node MATRIX
-@subsection @code{MATRIX}
-@anchor{#matrix}
-Define a matrix.
-
-@smallformat
-@verbatim
-MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |  
-@end verbatim
-@end smallformat
-
-A new matrix of the prescribed size is defined. The number of rows and
-columns can be an expression which will be evaluated the very first time
-the matrix is used and then kept at those constant values. All elements
-will be initialized to zero unless @code{DATA} is given (which should be
-the last keyword of the line), in which case the expressions will be
-evaluated the very first time the matrix is used and row-major-assigned
-to each of the elements. If there are less elements than the matrix
-size, the remaining values will be zero. If there are more elements than
-the matrix size, the values will be ignored.
-
-@node OPEN
-@subsection @code{OPEN}
-@anchor{#open}
-Explicitly open a file for input/output.
-
-@smallformat
-@verbatim
-OPEN <name> [ MODE <fopen_mode> ]  
-@end verbatim
-@end smallformat
-
-The given @code{<name>} can be either a fixed-string path or an
-already-defined @code{FILE}. The mode is only taken into account if the
-file is not already defined. Default is write @code{w}.
-
-@node PRINT
-@subsection @code{PRINT}
-@anchor{#print}
-Write plain-text and/or formatted data to the standard output or into an
-output file.
-
-@smallformat
-@verbatim
-PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
- [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
- [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
-  
-@end verbatim
-@end smallformat
-
-Each argument @code{object} which is not a keyword of the @code{PRINT}
-instruction will be part of the output. Objects can be either a matrix,
-a vector or any valid scalar algebraic expression. If the given object
-cannot be solved into a valid matrix, vector or expression, it is
-treated as a string literal if @code{IMPLICIT} is @code{ALLOWED},
-otherwise a parser error is raised. To explicitly interpret an object as
-a literal string even if it resolves to a valid numerical expression, it
-should be prefixed with the @code{TEXT} keyword such as
-@code{PRINT TEXT 1+1} that would print @code{1+1} instead of @code{2}.
-Objects and string literals can be mixed and given in any order. Hashes
-@code{#} appearing literal in text strings have to be quoted to prevent
-the parser to treat them as comments within the FeenoX input file and
-thus ignoring the rest of the line, like
-@code{PRINT "\# this is a printed comment"}. Whenever an argument starts
-with a porcentage sign @code{%}, it is treated as a C
-@code{printf}-compatible format specifier and all the objects that
-follow it are printed using the given format until a new format
-definition is found. The objects are treated as double-precision
-floating point numbers, so only floating point formats should be given.
-See the @code{printf(3)} man page for further details. The default
-format is @code{DEFAULT_PRINT_FORMAT}. Matrices, vectors, scalar
-expressions, format modifiers and string literals can be given in any
-desired order, and are processed from left to right. Vectors are printed
-element-by-element in a single row. See @code{PRINT_VECTOR} to print one
-or more vectors with one element per line (i.e.@ vertically). Matrices
-are printed element-by-element in a single line using row-major ordering
-if mixed with other objects but in the natural row and column fashion if
-it is the only given object in the @code{PRINT} instruction. If the
-@code{FILE} keyword is not provided, default is to write to
-@code{stdout}. If the @code{HEADER} keyword is given, a single line
-containing the literal text given for each object is printed at the very
-first time the @code{PRINT} instruction is processed, starting with a
-hash @code{#} character. If the @code{NONEWLINE} keyword is not
-provided, default is to write a newline @code{\n} character after all
-the objects are processed. Otherwise, if the last token to be printed is
-a numerical value, a separator string will be printed but not the
-newline @code{\n} character. If the last token is a string, neither the
-separator nor the newline will be printed. The @code{SEP} keyword
-expects a string used to separate printed objects. To print objects
-without any separation in between give an empty string like
-@code{SEP ""}. The default is a tabulator character
-`DEFAULT_PRINT_SEPARATOR' character. To print an empty line write
-@code{PRINT} without arguments. By default the @code{PRINT} instruction
-is evaluated every step. If the @code{SKIP_STEP}
-(@code{SKIP_STATIC_STEP}) keyword is given, the instruction is processed
-only every the number of transient (static) steps that results in
-evaluating the expression, which may not be constant. The
-@code{SKIP_HEADER_STEP} keyword works similarly for the optional
-@code{HEADER} but by default it is only printed once. The
-@code{SKIP_TIME} keyword use time advancements to choose how to skip
-printing and may be useful for non-constant time-step problems.
-
-@node PRINT_FUNCTION
-@subsection @code{PRINT_FUNCTION}
-@anchor{#print_function}
-Print one or more functions as a table of values of dependent and
-independent variables.
-
-@smallformat
-@verbatim
-PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
- [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
- [ MIN <expr_1> <expr_2> ... <expr_k> ] [ MAX <expr_1> <expr_2> ... <expr_k> ] 
- [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
- [ FORMAT <print_format> ] <vector_1> [ { vector | expr } ... { vector | expr } ]  
-@end verbatim
-@end smallformat
-
-Each argument should be either a function or an expression. The output
-of this instruction consists of@ @math{n+k} columns, where@ @math{n} is
-the number of arguments of the first function of the list and@ @math{k}
-is the number of functions and expressions given. The first@ @math{n}
-columns are the arguments (independent variables) and the last@ @math{k}
-one has the evaluated functions and expressions. The columns are
-separated by a tabulator, which is the format that most plotting tools
-understand. Only function names without arguments are expected. All
-functions should have the same number of arguments. Expressions can
-involve the arguments of the first function. If the @code{FILE} keyword
-is not provided, default is to write to @code{stdout}. If @code{HEADER}
-is given, the output is prepended with a single line containing the
-names of the arguments and the names of the functions, separated by
-tabs. The header starts with a hash@ @code{#} that usually acts as a
-comment and is ignored by most plotting tools. If there is no explicit
-range where to evaluate the functions and the first function is
-point-wise defined, they are evalauted at the points of definition of
-the first one. The range can be explicitly given as a product
-of@ @math{n} ranges@ @math{[x_{i,\min},x_{i,\max}]} for
-@math{i=1,\dots,n}. The values @math{x_{i,\min}} and @math{x_{i,\max}}
-are given with the @code{MIN} @emph{and} @code{MAX} keywords. The
-discretization steps of the ranges are given by either @code{STEP} that
-gives@ @math{\delta x} @emph{or} @code{NSTEPS} that gives the number of
-steps. If the first function is not point-wise defined, the ranges are
-mandatory.
-
-@node PRINT_VECTOR
-@subsection @code{PRINT_VECTOR}
-@anchor{#print_vector}
-Print the elements of one or more vectors, one element per line.
-
-@smallformat
-@verbatim
-PRINT_VECTOR 
- [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
- [ FORMAT <print_format> ]  
-@end verbatim
-@end smallformat
-
-Each argument should be either a vector or an expression of the
-integer@ @code{i}. If the @code{FILE} keyword is not provided, default
-is to write to @code{stdout}. If @code{HEADER} is given, the output is
-prepended with a single line containing the names of the arguments and
-the names of the functions, separated by tabs. The header starts with a
-hash@ @code{#} that usually acts as a comment and is ignored by most
-plotting tools.
-
-@node SORT_VECTOR
-@subsection @code{SORT_VECTOR}
-@anchor{#sort_vector}
-Sort the elements of a vector, optionally making the same rearrangement
-in another vector.
-
-@smallformat
-@verbatim
-SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]  
-@end verbatim
-@end smallformat
-
-This instruction sorts the elements of @code{<vector>} into either
-ascending or descending numerical order. If @code{<other_vector>} is
-given, the same rearrangement is made on it. Default is ascending order.
-
-@node VAR
-@subsection @code{VAR}
-@anchor{#var}
-Explicitly define one or more scalar variables.
-
-@smallformat
-@verbatim
-VAR <name_1> [ <name_2> ] ... [ <name_n> ]  
-@end verbatim
-@end smallformat
-
-When implicit definition is allowed (see
-@ref{#implicit,@code{IMPLICIT}}), scalar variables need not to be
-defined before being used if from the context FeenoX can tell that an
-scalar variable is needed. For instance, when defining a function like
-@code{f(x) = x^2} it is not needed to declare @code{x} explictly as a
-scalar variable. But if one wants to define a function like
-@code{g(x) = integral(f(x'), x', 0, x)} then the variable @code{x'}
-needs to be explicitly defined as @code{VAR x'} before the integral.
-
-@node VECTOR
-@subsection @code{VECTOR}
-@anchor{#vector}
-Define a vector.
-
-@smallformat
-@verbatim
-VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |  
-@end verbatim
-@end smallformat
-
-A new vector of the prescribed size is defined. The size can be an
-expression which will be evaluated the very first time the vector is
-used and then kept at that constant value. If the keyword
-@code{FUNCTION_DATA} is given, the elements of the vector will be
-synchronized with the inpedendent values of the function, which should
-be point-wise defined. The sizes of both the function and the vector
-should match. All elements will be initialized to zero unless
-@code{DATA} is given (which should be the last keyword of the line), in
-which case the expressions will be evaluated the very first time the
-vector is used and assigned to each of the elements. If there are less
-elements than the vector size, the remaining values will be zero. If
-there are more elements than the vector size, the values will be
-ignored.
-
-@node WRITE_MESH
-@subsection @code{WRITE_MESH}
-@anchor{#write_mesh}
-
-@smallformat
-@verbatim
-CELL ]  
-@end verbatim
-@end smallformat
-
-@node Differential-Algebraic Equations
-@section Differential-Algebraic Equations
-@anchor{#differential-algebraic-equations}
+@node Differential-Algebraic Equations subsystem
+@section Differential-Algebraic Equations subsystem
+@anchor{#differential-algebraic-equations-subsystem}
 
 @menu
 * Keywords::
@@ -2095,14 +1464,25 @@ values for all times.
 @subsection Variables
 @anchor{#variables}
 
-@node Partial Differential Equations
-@section Partial Differential Equations
-@anchor{#partial-differential-equations}
+@menu
+* dae_rtol::
+@end menu
+
+@node dae_rtol
+@subsubsection @code{dae_rtol}
+@anchor{#dae_rtol}
+Maximum allowed relative error for the solution of DAE systems.
+
+Default value is is @math{1 \times 10^{-6}}. If a fine per-variable
+error control is needed, special vector @code{abs_error} should be used.
+
+@node Partial Differential Equations subsytem
+@section Partial Differential Equations subsytem
+@anchor{#partial-differential-equations-subsytem}
 
 @menu
 * Keywords::
 * Variables::
-* Laplace equation::
 @end menu
 
 @node Keywords
@@ -2506,7 +1886,7 @@ Write a mesh and functions of space-time to a file for post-processing.
 
 @smallformat
 @verbatim
-WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
+WRITE_MESH { <file_path> | <file_id> } [ MESH <mesh_identifier> ] [ NO_MESH ] [ FILE_FORMAT { gmsh | vtk } ] [ NO_PHYSICAL_NAMES ]  [ NODE | CELL ] [ SCALAR_FORMAT <printf_specification>] [ VECTOR <field_x> <field_y> <field_z> ] [...] [ <field_1> ] [ <field_2> ] ...  
 @end verbatim
 @end smallformat
 
@@ -2543,42 +1923,74 @@ three fields following @code{VECTOR}.
 @subsection Variables
 @anchor{#variables-1}
 
-@node Laplace equation
-@subsection Laplace equation
-@anchor{#laplace-equation}
-Laplace's equation does not need any extra keyword to @code{PROBLEM}.
+@node Laplace's equation
+@section Laplace's equation
+@anchor{#laplaces-equation}
+Set @code{PROBLEM} to @code{laplace} to solve Laplace's equation
+
+@math{\nabla^2 \phi = 0}
+
+If @code{end_time} is set, then the transient problem is solved
+
+@math{\alpha\vec{x, \phi} \frac{\partial \phi}{\partial t} + \nabla^2 \phi = 0}
 
 @menu
-* Keywords::
-* Variables::
+* Results::
 * Properties::
 * Boundary Conditions::
-* Results::
+* Keywords::
+* Variables::
 @end menu
 
-@node Keywords
-@subsubsection Keywords
-@anchor{#keywords-2}
+@node Results
+@subsection Results
+@anchor{#results}
 
-@node Variables
-@subsubsection Variables
-@anchor{#variables-2}
+@menu
+* phi::
+@end menu
+
+@node phi
+@subsubsection @code{phi}
+@anchor{#phi}
+The scalar field@ @math{\phi(\vec{x})} whose Laplacian is equal to zero
+or to@ @math{f(\vec{x})}.
 
 @node Properties
-@subsubsection Properties
+@subsection Properties
 @anchor{#properties}
-@code{alpha}
+
+@menu
+* alpha::
+* f::
+@end menu
+
+@node alpha
+@subsubsection @code{alpha}
+@anchor{#alpha}
 The coefficient of the temporal derivative for the transient equation
 @ @math{\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})}.
 If not given, default is one.
-@code{f}
+
+@node f
+@subsubsection @code{f}
+@anchor{#f}
 The right hand side of the equation@ @math{\nabla^2 \phi=f(\vec{x})}. If
 not given, default is zero (i.e.@ Laplace).
 
 @node Boundary Conditions
-@subsubsection Boundary Conditions
+@subsection Boundary Conditions
 @anchor{#boundary-conditions}
-@code{dphidn}
+
+@menu
+* dphidn::
+* phi::
+* phi'::
+@end menu
+
+@node dphidn
+@subsubsection @code{dphidn}
+@anchor{#dphidn}
 Alias for @code{phi'}.
 
 @smallformat
@@ -2587,7 +1999,9 @@ dphidn=<expr>
 @end verbatim
 @end smallformat
 
-@code{phi}
+@node phi
+@subsubsection @code{phi}
+@anchor{#phi}
 Dirichlet essential boundary condition in which the value
 of@ @math{\phi} is prescribed.
 
@@ -2597,7 +2011,9 @@ phi=<expr>
 @end verbatim
 @end smallformat
 
-@code{phi'}
+@node phi'
+@subsubsection @code{phi'}
+@anchor{#phi-1}
 Neumann natural boundary condition in which the value of the normal
 outward derivative@ @math{\frac{\partial \phi}{\partial n}} is
 prescribed.
@@ -2608,12 +2024,957 @@ phi'=<expr>
 @end verbatim
 @end smallformat
 
+@node Keywords
+@subsection Keywords
+@anchor{#keywords-2}
+
+@node Variables
+@subsection Variables
+@anchor{#variables-2}
+
+@node The heat conduction equation
+@section The heat conduction equation
+@anchor{#the-heat-conduction-equation}
+Set @code{PROBLEM} to @code{thermal} (or @code{heat}) to solve thermal
+conduction.
+
+@math{\rho \c_p \frac{\partial T}{\partial t} + \div\left[ k(\vec{x, T} \cdot \grad{T} \right] = q'''(\vec{x}, T)}
+
+If @code{end_time} is zero, only the steady-state problem is solved. If
+@math{k}, @math{q'''} or any Neumann boundary condition depends
+on@ @math{T}, the problem is set to non-linear automatically.
+
+@menu
+* Results::
+* Properties::
+* Boundary Conditions::
+* Keywords::
+* Variables::
+@end menu
+
 @node Results
-@subsubsection Results
-@anchor{#results}
-@code{phi}
-The scalar field@ @math{\phi(\vec{x})} whose Laplacian is equal to zero
-or to@ @math{f(\vec{x})}.
+@subsection Results
+@anchor{#results-1}
+
+@menu
+* qx::
+* qy::
+* qz::
+* T::
+@end menu
+
+@node qx
+@subsubsection @code{qx}
+@anchor{#qx}
+The heat flux
+field@ @math{q_x(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial x}}
+in the@ @math{x} direction. This is a secondary unknown of the problem.
+
+@node qy
+@subsubsection @code{qy}
+@anchor{#qy}
+The heat flux
+field@ @math{q_y(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial y}}
+in the@ @math{x} direction. This is a secondary unknown of the problem.
+Only available for two and three-dimensional problems.
+
+@node qz
+@subsubsection @code{qz}
+@anchor{#qz}
+The heat flux
+field@ @math{q_z(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial z}}
+in the@ @math{x} direction. This is a secondary unknown of the
+problem.@*
+Only available for three-dimensional problems.
+
+@node T
+@subsubsection @code{T}
+@anchor{#t}
+The temperature field@ @math{T(\vec{x})}. This is the primary unknown of
+the problem.
+
+@node Properties
+@subsection Properties
+@anchor{#properties-1}
+
+@menu
+* k::
+* q::
+* q'''::
+@end menu
+
+@node k
+@subsubsection @code{k}
+@anchor{#k}
+The thermal conductivity in units of power per length per degree of
+temperature.
+
+@smallformat
+@verbatim
+k  
+@end verbatim
+@end smallformat
+
+@node q
+@subsubsection @code{q}
+@anchor{#q}
+Alias for @code{q'''}
+
+@smallformat
+@verbatim
+q  
+@end verbatim
+@end smallformat
+
+@node q'''
+@subsubsection @code{q'''}
+@anchor{#q-1}
+The volumetric power dissipated in the material in units of power per
+unit of volume. Default is zero (i.e.@ no power).
+
+@smallformat
+@verbatim
+q'''  
+@end verbatim
+@end smallformat
+
+@node Boundary Conditions
+@subsection Boundary Conditions
+@anchor{#boundary-conditions-1}
+
+@node Keywords
+@subsection Keywords
+@anchor{#keywords-3}
+
+@node Variables
+@subsection Variables
+@anchor{#variables-3}
+
+@menu
+* T_max::
+* T_min::
+@end menu
+
+@node T_max
+@subsubsection @code{T_max}
+@anchor{#t_max}
+The maximum temperature@ @math{T_\text{max}}.
+
+@node T_min
+@subsubsection @code{T_min}
+@anchor{#t_min}
+The minimum temperature@ @math{T_\text{min}}.
+
+@node General & “standalone” mathematics
+@section General & ``standalone'' mathematics
+@anchor{#general-standalone-mathematics}
+
+@menu
+* Keywords::
+* Variables::
+@end menu
+
+@node Keywords
+@subsection Keywords
+@anchor{#keywords-4}
+
+@menu
+* ABORT::
+* ALIAS::
+* CLOSE::
+* DEFAULT_ARGUMENT_VALUE::
+* FILE::
+* FIT::
+* FUNCTION::
+* IF::
+* IMPLICIT::
+* INCLUDE::
+* MATRIX::
+* OPEN::
+* PRINT::
+* PRINT_FUNCTION::
+* PRINT_VECTOR::
+* SORT_VECTOR::
+* VAR::
+* VECTOR::
+@end menu
+
+@node ABORT
+@subsubsection @code{ABORT}
+@anchor{#abort}
+Catastrophically abort the execution and quit FeenoX.
+
+@smallformat
+@verbatim
+ABORT  
+@end verbatim
+@end smallformat
+
+Whenever the instruction @code{ABORT} is executed, FeenoX quits with a
+non-zero error leve. It does not close files nor unlock shared memory
+objects. The objective of this instruction is to either debug complex
+input files by using only parts of them or to conditionally abort the
+execution using @code{IF} clauses.
+
+@node ALIAS
+@subsubsection @code{ALIAS}
+@anchor{#alias}
+Define a scalar alias of an already-defined indentifier.
+
+@smallformat
+@verbatim
+ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
+@end verbatim
+@end smallformat
+
+The existing object can be a variable, a vector element or a matrix
+element. In the first case, the name of the variable should be given as
+the existing object. In the second case, to alias the second element of
+vector @code{v} to the new name @code{new}, @code{v(2)} should be given
+as the existing object. In the third case, to alias second element (2,3)
+of matrix @code{M} to the new name @code{new}, @code{M(2,3)} should be
+given as the existing object.
+
+@node CLOSE
+@subsubsection @code{CLOSE}
+@anchor{#close}
+Explicitly close a file after input/output.
+
+@smallformat
+@verbatim
+CLOSE <name>  
+@end verbatim
+@end smallformat
+
+The given @code{<name>} can be either a fixed-string path or an
+already-defined @code{FILE}.
+
+@node DEFAULT_ARGUMENT_VALUE
+@subsubsection @code{DEFAULT_ARGUMENT_VALUE}
+@anchor{#default_argument_value}
+Give a default value for an optional commandline argument.
+
+@smallformat
+@verbatim
+DEFAULT_ARGUMENT_VALUE <constant> <string>  
+@end verbatim
+@end smallformat
+
+If a @code{$n} construction is found in the input file but the
+commandline argument was not given, the default behavior is to fail
+complaining that an extra argument has to be given in the commandline.
+With this keyword, a default value can be assigned if no argument is
+given, thus avoiding the failure and making the argument optional. The
+@code{<constant>} should be 1, 2, 3, etc. and @code{<string>} will be
+expanded character-by-character where the @code{$n} construction is.
+Whether the resulting expression is to be interpreted as a string or as
+a numerical expression will depend on the context.
+
+@node FILE
+@subsubsection @code{FILE}
+@anchor{#file}
+Define a file with a particularly formatted name to be used either as
+input or as output.
+
+@smallformat
+@verbatim
+< FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
+@end verbatim
+@end smallformat
+
+For reading or writing into files with a fixed path, this instruction is
+usually not needed as the @code{FILE} keyword of other instructions
+(such as @code{PRINT} or @code{MESH}) can take a fixed-string path as an
+argument. However, if the file name changes as the execution progresses
+(say because one file for each step is needed), then an explicit
+@code{FILE} needs to be defined with this keyword and later referenced
+by the given name. The path should be given as a @code{printf}-like
+format string followed by the expressions which shuold be evaluated in
+order to obtain the actual file path. The expressions will always be
+floating-point expressions, but the particular integer specifier
+@code{%d} is allowed and internally transformed to @code{%.0f}. The file
+can be explicitly defined and @code{INPUT}, @code{OUTPUT} or a certain
+@code{fopen()} mode can be given (i.e.@ ``a''). If not explicitly given,
+the nature of the file will be taken from context, i.e.@ @code{FILE}s in
+@code{PRINT} will be @code{OUTPUT} and @code{FILE}s in @code{FUNCTION}
+will be @code{INPUT}. This keyword justs defines the @code{FILE}, it
+does not open it. The file will be actually openened (and eventually
+closed) automatically. In the rare case where the automated opening and
+closing does not fit the expected workflow, the file can be explicitly
+opened or closed with the instructions @code{FILE_OPEN} and
+@code{FILE_CLOSE}.
+
+@node FIT
+@subsubsection @code{FIT}
+@anchor{#fit}
+Find parameters to fit an analytical function to a pointwise-defined
+function.
+
+@smallformat
+@verbatim
+FIT <function_to_be_fitted>  TO <function_with_data> VIA <var_1> <var_2> ... <var_n>
+ [ GRADIENT <expr_1> <expr_2> ... <expr_n> ]
+ [ RANGE_MIN <expr_1> <expr_2> ... <expr_j> ]
+ [ RANGE_MAX <expr_1> <expr_2> ... <expr_n> ]
+ [ TOL_REL <expr> ] [ TOL_ABS <expr> ] [ MAX_ITER <expr> ]
+ [ VERBOSE ]  
+@end verbatim
+@end smallformat
+
+The function with the data has to be point-wise defined (i.e.@ a
+@code{FUNCTION} read from a file, with inline @code{DATA} or defined
+over a mesh). The function to be fitted has to be parametrized with at
+least one of the variables provided after the @code{USING} keyword. For
+example to fit@ @math{f(x,y)=a x^2 + b sqrt(y)} to a pointwise-defined
+function@ @math{g(x,y)} one gives @code{FIT f TO g VIA a b}. Only the
+names of the functions have to be given, not the arguments. Both
+functions have to have the same number of arguments. The initial guess
+of the solution is given by the initial value of the variables after the
+@code{VIA} keyword. Analytical expressions for the gradient of the
+function to be fitted with respect to the parameters to be fitted can be
+optionally given with the @code{GRADIENT} keyword. If none is provided,
+the gradient will be computed numerically using finite differences. A
+range over which the residuals are to be minimized can be given with
+@code{RANGE_MIN} and @code{RANGE_MAX}. The expressions give the range of
+the arguments of the functions, not of the parameters. For
+multidimensional fits, the range is an hypercube. If no range is given,
+all the definition points of the function with the data are used for the
+fit. Convergence can be controlled by giving the relative and absolute
+tolreances with @code{TOL_REL} (default @code{DEFAULT_NLIN_FIT_EPSREL})
+and @code{TOL_ABS} (default @code{DEFAULT_NLIN_FIT_EPSABS}), and with
+the maximum number of iterations @code{MAX_ITER} (default
+DEFAULT_NLIN_FIT_MAX_ITER). If the optional keyword @code{VERBOSE} is
+given, some data of the intermediate steps is written in the standard
+output.
+
+@node FUNCTION
+@subsubsection @code{FUNCTION}
+@anchor{#function}
+Define a function of one or more variables.
+
+@smallformat
+@verbatim
+FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
+@end verbatim
+@end smallformat
+
+The number of variables @math{n} is given by the number of arguments
+given between parenthesis after the function name. The arguments are
+defined as new variables if they had not been already defined explictly
+as scalar variables. If the function is given as an algebraic
+expression, the short-hand operator @code{:=} can be used. That is to
+say, @code{FUNCTION f(x) = x^2} is equivalent to @code{f(x) := x^2}. If
+a @code{FILE} is given, an ASCII file containing at least @math{n+1}
+columns is expected. By default, the first @math{n} columns are the
+values of the arguments and the last column is the value of the function
+at those points. The order of the columns can be changed with the
+keyword @code{COLUMNS}, which expects @math{n+1} expressions
+corresponding to the column numbers. If @code{VECTORS} is given, a set
+of @math{n+1} vectors of the same size is expected. The first @math{n}
+correspond to the arguments and the last one to the function values. The
+function can be pointwise-defined inline in the input using @code{DATA}.
+This should be the last keyword of the line, followed by
+@math{N=k \cdot (n+1)} expresions giving@ @math{k} definition points:
+@math{n} arguments and the value of the function. Multiline continuation
+using brackets @code{@{} and @code{@}} can be used for a clean data
+organization. Interpolation schemes can be given for either one or
+multi-dimensional functions with @code{INTERPOLATION}. Available schemes
+for @math{n=1} are:
+
+@itemize
+@item
+linear
+@item
+polynomial, the grade is equal to the number of data minus one
+@item
+spline, cubic (needs at least 3 points)
+@item
+spline_periodic
+@item
+akima (needs at least 5 points)
+@item
+akima_periodic (needs at least 5 points)
+@item
+steffen, always-monotonic splines-like interpolator
+@end itemize
+
+Default interpolation scheme for one-dimensional functions is
+@code{DEFAULT_INTERPOLATION}.
+
+Available schemes for @math{n>1} are:
+
+@itemize
+@item
+nearest, @math{f(\vec{x})} is equal to the value of the closest
+definition point
+@item
+shepard,
+@uref{https://en.wikipedia.org/wiki/Inverse_distance_weighting,inverse
+distance weighted average definition points} (might lead to inefficient
+evaluation)
+@item
+shepard_kd,
+@uref{https://en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard's_method,average
+of definition points within a kd-tree} (more efficient evaluation
+provided @code{SHEPARD_RADIUS} is set to a proper value)
+@item
+bilinear, only available if the definition points configure an
+structured hypercube-like grid. If @math{n>3}, @code{SIZES} should be
+given.
+@end itemize
+
+For @math{n>1}, if the euclidean distance between the arguments and the
+definition points is smaller than @code{INTERPOLATION_THRESHOLD}, the
+definition point is returned and no interpolation is performed. Default
+value is square root of @code{DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD}.
+The initial radius of points to take into account in @code{shepard_kd}
+is given by @code{SHEPARD_RADIUS}. If no points are found, the radius is
+double until at least one definition point is found. The radius is
+doubled until at least one point is found. Default is
+@code{DEFAULT_SHEPARD_RADIUS}. The exponent of the @code{shepard} method
+is given by @code{SHEPARD_EXPONENT}. Default is
+@code{DEFAULT_SHEPARD_EXPONENT}.
+
+@node IF
+@subsubsection @code{IF}
+@anchor{#if}
+Execute a set of instructions if a condition is met.
+
+@smallformat
+@verbatim
+IF expr 
+  <block_of_instructions_if_expr_is_true> 
+ [ ELSE  
+  <block_of_instructions_if_expr_is_false> ] 
+ ENDIF  
+@end verbatim
+@end smallformat
+
+@node IMPLICIT
+@subsubsection @code{IMPLICIT}
+@anchor{#implicit}
+Define whether implicit definition of variables is allowed or not.
+
+@smallformat
+@verbatim
+IMPLICIT { NONE | ALLOWED }  
+@end verbatim
+@end smallformat
+
+By default, FeenoX allows variables (but not vectors nor matrices) to be
+implicitly declared. To avoid introducing errors due to typos, explicit
+declaration of variables can be forced by giving @code{IMPLICIT NONE}.
+Whether implicit declaration is allowed or explicit declaration is
+required depends on the last @code{IMPLICIT} keyword given, which by
+default is @code{ALLOWED}.
+
+@node INCLUDE
+@subsubsection @code{INCLUDE}
+@anchor{#include}
+Include another FeenoX input file.
+
+@smallformat
+@verbatim
+INCLUDE <file_path> [ FROM <num_expr> ] [ TO <num_expr> ]  
+@end verbatim
+@end smallformat
+
+Includes the input file located in the string @code{file_path} at the
+current location. The effect is the same as copying and pasting the
+contents of the included file at the location of the @code{INCLUDE}
+keyword. The path can be relative or absolute. Note, however, that when
+including files inside @code{IF} blocks that instructions are
+conditionally-executed but all definitions (such as function
+definitions) are processed at parse-time independently from the
+evaluation of the conditional. The included file has to be an actual
+file path (i.e.@ it cannot be a FeenoX @code{FILE}) because it needs to
+be resolved at parse time. Yet, the name can contain a commandline
+replacement argument such as @code{$1} so @code{INCLUDE $1.fee} will
+include the file specified after the main input file in the command
+line. The optional @code{FROM} and @code{TO} keywords can be used to
+include only portions of a file.
+
+@node MATRIX
+@subsubsection @code{MATRIX}
+@anchor{#matrix}
+Define a matrix.
+
+@smallformat
+@verbatim
+MATRIX <name> ROWS <expr> COLS <expr> [ DATA <expr_1> <expr_2> ... <expr_n> |  
+@end verbatim
+@end smallformat
+
+A new matrix of the prescribed size is defined. The number of rows and
+columns can be an expression which will be evaluated the very first time
+the matrix is used and then kept at those constant values. All elements
+will be initialized to zero unless @code{DATA} is given (which should be
+the last keyword of the line), in which case the expressions will be
+evaluated the very first time the matrix is used and row-major-assigned
+to each of the elements. If there are less elements than the matrix
+size, the remaining values will be zero. If there are more elements than
+the matrix size, the values will be ignored.
+
+@node OPEN
+@subsubsection @code{OPEN}
+@anchor{#open}
+Explicitly open a file for input/output.
+
+@smallformat
+@verbatim
+OPEN <name> [ MODE <fopen_mode> ]  
+@end verbatim
+@end smallformat
+
+The given @code{<name>} can be either a fixed-string path or an
+already-defined @code{FILE}. The mode is only taken into account if the
+file is not already defined. Default is write @code{w}.
+
+@node PRINT
+@subsubsection @code{PRINT}
+@anchor{#print}
+Write plain-text and/or formatted data to the standard output or into an
+output file.
+
+@smallformat
+@verbatim
+PRINT [ <object_1> <object_2> ... <object_n> ] [ TEXT <string_1> ... TEXT <string_n> ] 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] [ NONEWLINE ] [ SEP <string> ] 
+ [ SKIP_STEP <expr> ] [ SKIP_STATIC_STEP <expr> ] [ SKIP_TIME <expr> ] [ SKIP_HEADER_STEP <expr> ] 
+  
+@end verbatim
+@end smallformat
+
+Each argument @code{object} which is not a keyword of the @code{PRINT}
+instruction will be part of the output. Objects can be either a matrix,
+a vector or any valid scalar algebraic expression. If the given object
+cannot be solved into a valid matrix, vector or expression, it is
+treated as a string literal if @code{IMPLICIT} is @code{ALLOWED},
+otherwise a parser error is raised. To explicitly interpret an object as
+a literal string even if it resolves to a valid numerical expression, it
+should be prefixed with the @code{TEXT} keyword such as
+@code{PRINT TEXT 1+1} that would print @code{1+1} instead of @code{2}.
+Objects and string literals can be mixed and given in any order. Hashes
+@code{#} appearing literal in text strings have to be quoted to prevent
+the parser to treat them as comments within the FeenoX input file and
+thus ignoring the rest of the line, like
+@code{PRINT "\# this is a printed comment"}. Whenever an argument starts
+with a porcentage sign @code{%}, it is treated as a C
+@code{printf}-compatible format specifier and all the objects that
+follow it are printed using the given format until a new format
+definition is found. The objects are treated as double-precision
+floating point numbers, so only floating point formats should be given.
+See the @code{printf(3)} man page for further details. The default
+format is @code{DEFAULT_PRINT_FORMAT}. Matrices, vectors, scalar
+expressions, format modifiers and string literals can be given in any
+desired order, and are processed from left to right. Vectors are printed
+element-by-element in a single row. See @code{PRINT_VECTOR} to print one
+or more vectors with one element per line (i.e.@ vertically). Matrices
+are printed element-by-element in a single line using row-major ordering
+if mixed with other objects but in the natural row and column fashion if
+it is the only given object in the @code{PRINT} instruction. If the
+@code{FILE} keyword is not provided, default is to write to
+@code{stdout}. If the @code{HEADER} keyword is given, a single line
+containing the literal text given for each object is printed at the very
+first time the @code{PRINT} instruction is processed, starting with a
+hash @code{#} character. If the @code{NONEWLINE} keyword is not
+provided, default is to write a newline @code{\n} character after all
+the objects are processed. Otherwise, if the last token to be printed is
+a numerical value, a separator string will be printed but not the
+newline @code{\n} character. If the last token is a string, neither the
+separator nor the newline will be printed. The @code{SEP} keyword
+expects a string used to separate printed objects. To print objects
+without any separation in between give an empty string like
+@code{SEP ""}. The default is a tabulator character
+`DEFAULT_PRINT_SEPARATOR' character. To print an empty line write
+@code{PRINT} without arguments. By default the @code{PRINT} instruction
+is evaluated every step. If the @code{SKIP_STEP}
+(@code{SKIP_STATIC_STEP}) keyword is given, the instruction is processed
+only every the number of transient (static) steps that results in
+evaluating the expression, which may not be constant. The
+@code{SKIP_HEADER_STEP} keyword works similarly for the optional
+@code{HEADER} but by default it is only printed once. The
+@code{SKIP_TIME} keyword use time advancements to choose how to skip
+printing and may be useful for non-constant time-step problems.
+
+@node PRINT_FUNCTION
+@subsubsection @code{PRINT_FUNCTION}
+@anchor{#print_function}
+Print one or more functions as a table of values of dependent and
+independent variables.
+
+@smallformat
+@verbatim
+PRINT_FUNCTION <function_1> [ { function | expr } ... { function | expr } ] 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
+ [ MIN <expr_1> <expr_2> ... <expr_k> ] [ MAX <expr_1> <expr_2> ... <expr_k> ] 
+ [ STEP <expr_1> <expr_2> ... <expr_k> ] [ NSTEPs <expr_1> <expr_2> ... <expr_k> ] 
+ [ FORMAT <print_format> ] <vector_1> [ { vector | expr } ... { vector | expr } ]  
+@end verbatim
+@end smallformat
+
+Each argument should be either a function or an expression. The output
+of this instruction consists of@ @math{n+k} columns, where@ @math{n} is
+the number of arguments of the first function of the list and@ @math{k}
+is the number of functions and expressions given. The first@ @math{n}
+columns are the arguments (independent variables) and the last@ @math{k}
+one has the evaluated functions and expressions. The columns are
+separated by a tabulator, which is the format that most plotting tools
+understand. Only function names without arguments are expected. All
+functions should have the same number of arguments. Expressions can
+involve the arguments of the first function. If the @code{FILE} keyword
+is not provided, default is to write to @code{stdout}. If @code{HEADER}
+is given, the output is prepended with a single line containing the
+names of the arguments and the names of the functions, separated by
+tabs. The header starts with a hash@ @code{#} that usually acts as a
+comment and is ignored by most plotting tools. If there is no explicit
+range where to evaluate the functions and the first function is
+point-wise defined, they are evalauted at the points of definition of
+the first one. The range can be explicitly given as a product
+of@ @math{n} ranges@ @math{[x_{i,\min},x_{i,\max}]} for
+@math{i=1,\dots,n}. The values @math{x_{i,\min}} and @math{x_{i,\max}}
+are given with the @code{MIN} @emph{and} @code{MAX} keywords. The
+discretization steps of the ranges are given by either @code{STEP} that
+gives@ @math{\delta x} @emph{or} @code{NSTEPS} that gives the number of
+steps. If the first function is not point-wise defined, the ranges are
+mandatory.
+
+@node PRINT_VECTOR
+@subsubsection @code{PRINT_VECTOR}
+@anchor{#print_vector}
+Print the elements of one or more vectors, one element per line.
+
+@smallformat
+@verbatim
+PRINT_VECTOR 
+ [ FILE { <file_path> | <file_id> } ] [ HEADER ] 
+ [ FORMAT <print_format> ]  
+@end verbatim
+@end smallformat
+
+Each argument should be either a vector or an expression of the
+integer@ @code{i}. If the @code{FILE} keyword is not provided, default
+is to write to @code{stdout}. If @code{HEADER} is given, the output is
+prepended with a single line containing the names of the arguments and
+the names of the functions, separated by tabs. The header starts with a
+hash@ @code{#} that usually acts as a comment and is ignored by most
+plotting tools.
+
+@node SORT_VECTOR
+@subsubsection @code{SORT_VECTOR}
+@anchor{#sort_vector}
+Sort the elements of a vector, optionally making the same rearrangement
+in another vector.
+
+@smallformat
+@verbatim
+SORT_VECTOR <vector> [ ASCENDING | DESCENDING ] [ <other_vector> ]  
+@end verbatim
+@end smallformat
+
+This instruction sorts the elements of @code{<vector>} into either
+ascending or descending numerical order. If @code{<other_vector>} is
+given, the same rearrangement is made on it. Default is ascending order.
+
+@node VAR
+@subsubsection @code{VAR}
+@anchor{#var}
+Explicitly define one or more scalar variables.
+
+@smallformat
+@verbatim
+VAR <name_1> [ <name_2> ] ... [ <name_n> ]  
+@end verbatim
+@end smallformat
+
+When implicit definition is allowed (see
+@ref{#implicit,@code{IMPLICIT}}), scalar variables need not to be
+defined before being used if from the context FeenoX can tell that an
+scalar variable is needed. For instance, when defining a function like
+@code{f(x) = x^2} it is not needed to declare @code{x} explictly as a
+scalar variable. But if one wants to define a function like
+@code{g(x) = integral(f(x'), x', 0, x)} then the variable @code{x'}
+needs to be explicitly defined as @code{VAR x'} before the integral.
+
+@node VECTOR
+@subsubsection @code{VECTOR}
+@anchor{#vector}
+Define a vector.
+
+@smallformat
+@verbatim
+VECTOR <name> SIZE <expr> [ FUNCTION_DATA <function> ] [ DATA <expr_1> <expr_2> ... <expr_n> |  
+@end verbatim
+@end smallformat
+
+A new vector of the prescribed size is defined. The size can be an
+expression which will be evaluated the very first time the vector is
+used and then kept at that constant value. If the keyword
+@code{FUNCTION_DATA} is given, the elements of the vector will be
+synchronized with the inpedendent values of the function, which should
+be point-wise defined. The sizes of both the function and the vector
+should match. All elements will be initialized to zero unless
+@code{DATA} is given (which should be the last keyword of the line), in
+which case the expressions will be evaluated the very first time the
+vector is used and assigned to each of the elements. If there are less
+elements than the vector size, the remaining values will be zero. If
+there are more elements than the vector size, the values will be
+ignored.
+
+@node Variables
+@subsection Variables
+@anchor{#variables-4}
+
+@menu
+* done::
+* done_static::
+* done_transient::
+* dt::
+* end_time::
+* i::
+* infinite::
+* in_static::
+* in_static_first::
+* in_static_last::
+* in_transient::
+* in_transient_first::
+* in_transient_last::
+* j::
+* max_dt::
+* min_dt::
+* ncores::
+* on_gsl_error::
+* on_ida_error::
+* on_nan::
+* pi::
+* pid::
+* realtime_scale::
+* static_steps::
+* step_static::
+* step_transient::
+* t::
+* zero::
+@end menu
+
+@node done
+@subsubsection @code{done}
+@anchor{#done}
+Flag that indicates whether the overall calculation is over.
+
+This variable is set to true by FeenoX when the computation finished so
+it can be checked in an @code{IF} block to do something only in the last
+step. But this variable can also be set to true from the input file,
+indicating that the current step should also be the last one. For
+example, one can set @code{end_time = infinite} and then finish the
+computation at @math{t=10} by setting @code{done = t > 10}. This
+@code{done} variable can also come from (and sent to) other sources,
+like a shared memory object for coupled calculations.
+
+@node done_static
+@subsubsection @code{done_static}
+@anchor{#done_static}
+Flag that indicates whether the static calculation is over or not.
+
+It is set to true (i.e.@ @math{\neq 0}) by feenox if @code{step_static}
+@math{\ge} @code{static_steps}. If the user sets it to true, the current
+step is marked as the last static step and the static calculation ends
+after finishing the step. It can be used in @code{IF} blocks to check if
+the static step is finished or not.
+
+@node done_transient
+@subsubsection @code{done_transient}
+@anchor{#done_transient}
+Flag that indicates whether the transient calculation is over or not.
+
+It is set to true (i.e.@ @math{\neq 0}) by feenox if @code{t} @math{\ge}
+@code{end_time}. If the user sets it to true, the current step is marked
+as the last transient step and the transient calculation ends after
+finishing the step. It can be used in @code{IF} blocks to check if the
+transient steps are finished or not.
+
+@node dt
+@subsubsection @code{dt}
+@anchor{#dt}
+Actual value of the time step for transient calculations.
+
+When solving DAE systems, this variable is set by feenox. It can be
+written by the user for example by importing it from another transient
+code by means of shared-memory objects. Care should be taken when
+solving DAE systems and overwriting @code{t}. Default value is
+DEFAULT_DT, which is a power of two and roundoff errors are thus
+reduced.
+
+@node end_time
+@subsubsection @code{end_time}
+@anchor{#end_time}
+Final time of the transient calculation, to be set by the user.
+
+The default value is zero, meaning no transient calculation.
+
+@node i
+@subsubsection @code{i}
+@anchor{#i}
+Dummy index, used mainly in vector and matrix row subindex expressions.
+
+@node infinite
+@subsubsection @code{infinite}
+@anchor{#infinite}
+A very big positive number.
+
+It can be used as @code{end_time = infinite} or to define improper
+integrals with infinite limits. Default is
+@math{2^{50} \approx 1 \times 10^{15}}.
+
+@node in_static
+@subsubsection @code{in_static}
+@anchor{#in_static}
+Flag that indicates if FeenoX is solving the iterative static
+calculation.
+
+This is a read-only variable that is non zero if the static calculation.
+
+@node in_static_first
+@subsubsection @code{in_static_first}
+@anchor{#in_static_first}
+Flag that indicates if feenox is in the first step of the iterative
+static calculation.
+
+@node in_static_last
+@subsubsection @code{in_static_last}
+@anchor{#in_static_last}
+Flag that indicates if feenox is in the last step of the iterative
+static calculation.
+
+@node in_transient
+@subsubsection @code{in_transient}
+@anchor{#in_transient}
+Flag that indicates if feenox is solving transient calculation.
+
+@node in_transient_first
+@subsubsection @code{in_transient_first}
+@anchor{#in_transient_first}
+Flag that indicates if feenox is in the first step of the transient
+calculation.
+
+@node in_transient_last
+@subsubsection @code{in_transient_last}
+@anchor{#in_transient_last}
+Flag that indicates if feenox is in the last step of the transient
+calculation.
+
+@node j
+@subsubsection @code{j}
+@anchor{#j}
+Dummy index, used mainly in matrix column subindex expressions.
+
+@node max_dt
+@subsubsection @code{max_dt}
+@anchor{#max_dt}
+Maximum bound for the time step that feenox should take when solving DAE
+systems.
+
+@node min_dt
+@subsubsection @code{min_dt}
+@anchor{#min_dt}
+Minimum bound for the time step that feenox should take when solving DAE
+systems.
+
+@node ncores
+@subsubsection @code{ncores}
+@anchor{#ncores}
+The number of online available cores, as returned by
+@code{sysconf(_SC_NPROCESSORS_ONLN)}.
+
+This value can be used in the @code{MAX_DAUGHTERS} expression of the
+@code{PARAMETRIC} keyword (i.e @code{ncores/2}).
+
+@node on_gsl_error
+@subsubsection @code{on_gsl_error}
+@anchor{#on_gsl_error}
+This should be set to a mask that indicates how to proceed if an error
+ir raised in any routine of the GNU Scientific Library.
+
+@node on_ida_error
+@subsubsection @code{on_ida_error}
+@anchor{#on_ida_error}
+This should be set to a mask that indicates how to proceed if an error
+ir raised in any routine of the SUNDIALS Library.
+
+@node on_nan
+@subsubsection @code{on_nan}
+@anchor{#on_nan}
+This should be set to a mask that indicates how to proceed if
+Not-A-Number signal (such as a division by zero) is generated when
+evaluating any expression within feenox.
+
+@node pi
+@subsubsection @code{pi}
+@anchor{#pi}
+A double-precision floating point representaion of the number @math{\pi}
+
+It is equal to the @code{M_PI} constant in @code{math.h} .
+
+@node pid
+@subsubsection @code{pid}
+@anchor{#pid}
+The UNIX process id of the FeenoX instance.
+
+@node realtime_scale
+@subsubsection @code{realtime_scale}
+@anchor{#realtime_scale}
+If this variable is not zero, then the transient problem is run trying
+to syncrhonize the problem time with realtime, up to a scale given.
+
+For example, if the scale is set to one, then FeenoX will advance the
+problem time at the same pace that the real wall time advances. If set
+to two, FeenoX time wil advance twice as fast as real time, and so on.
+If the calculation time is slower than real time modified by the scale,
+this variable has no effect on the overall behavior and execution will
+proceed as quick as possible with no delays.
+
+@node static_steps
+@subsubsection @code{static_steps}
+@anchor{#static_steps}
+Number of steps that ought to be taken during the static calculation, to
+be set by the user.
+
+The default value is one, meaning only one static step.
+
+@node step_static
+@subsubsection @code{step_static}
+@anchor{#step_static}
+Indicates the current step number of the iterative static calculation.
+
+This is a read-only variable that contains the current step of the
+static calculation.
+
+@node step_transient
+@subsubsection @code{step_transient}
+@anchor{#step_transient}
+Indicates the current step number of the transient static calculation.
+
+This is a read-only variable that contains the current step of the
+transient calculation.
+
+@node t
+@subsubsection @code{t}
+@anchor{#t}
+Actual value of the time for transient calculations.
+
+This variable is set by FeenoX, but can be written by the user for
+example by importing it from another transient code by means of
+shared-memory objects. Care should be taken when solving DAE systems and
+overwriting @code{t}.
+
+@node zero
+@subsubsection @code{zero}
+@anchor{#zero}
+A very small positive number.
+
+It is taken to avoid roundoff errors when comparing floating point
+numbers such as replacing @math{a \leq a_\text{max}} with
+@math{a < a_\text{max} +} @code{zero}. Default is
+@math{(1/2)^{-50} \approx 9\times 10^{-16}} .
 
 @node Functions
 @section Functions
@@ -2920,7 +3281,7 @@ PRINT "difference" t2-t1 "[seconds]"
 @verbatim
 $ feenox clock.fee
 doing something in between
-difference	5.3888e-05	[seconds]
+difference	6.826e-05	[seconds]
 $
 @end verbatim
 @end smallformat
@@ -4143,8 +4504,34 @@ derivative(f(x), x, a, [h], [p])
 @node Vector functions
 @section Vector functions
 @anchor{#vector-functions}
-To be done.
 
+@menu
+* derivative::
+@end menu
+
+@node derivative
+@subsection @code{derivative}
+@anchor{#derivative}
+Computes the derivative of the expression @math{f(x)} given in the first
+argument with respect to the variable @math{x} given in the second
+argument at the point @math{x=a} given in the third argument using an
+adaptive scheme. The fourth optional argument @math{h} is the initial
+width of the range the adaptive derivation method starts with. The fifth
+optional argument @math{p} is a flag that indicates whether a backward
+(@math{p < 0}), centered (@math{p = 0}) or forward (@math{p > 0})
+stencil is to be used. This functional calls the GSL functions
+@code{gsl_deriv_backward}, @code{gsl_deriv_central} or
+@code{gsl_deriv_forward} according to the indicated flag @math{p}.
+Defaults are @math{h = (1/2)^{-10} \approx 9.8 \times 10^{-4}} and
+@math{p = 0}.
+
+@smallformat
+@verbatim
+derivative(f(x), x, a, [h], [p])  
+@end verbatim
+@end smallformat
+
+@math{\left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} }
 @tex
 \appendix
 @end tex

@@ -698,7 +698,7 @@ terminal command. When invoked without arguments, it prints its version,
 one-line description and the usage options:
 
 ``` {.terminal style="terminal"}
-FeenoX v0.1.38-gd477abf-dirty 
+FeenoX v0.1.42-g50e0f33-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]

@@ -1,0 +1,4 @@
+VAR a
+VECTOR b[3]
+a = sqrt(2)
+b[i] = a*i^2

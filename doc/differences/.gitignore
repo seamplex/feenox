@@ -1,4 +1,6 @@
 *.msh
 *.vtk
 README.pdf
-
+calculix
+code_aster
+*.png

@@ -1,0 +1,3 @@
+static_steps = 10
+f(n) = n^2 - n + 41
+PRINT f(step_static^2-1)

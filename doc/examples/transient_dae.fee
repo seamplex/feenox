@@ -1,0 +1,5 @@
+PHASE_SPACE x
+end_time = 1
+x_0 = 1
+x_dot = -x
+PRINT t x exp(-t) HEADER

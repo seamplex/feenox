@@ -1,0 +1,7 @@
+end_time = 2*pi
+dt = 1/10
+
+y = lag(heaviside(t-1), 1)
+z = random_gauss(0, sqrt(2)/10)
+
+PRINT t sin(t) cos(t) y z HEADER

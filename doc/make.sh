@@ -64,22 +64,22 @@ cd ..
 # ./pdf.sh sds
 
 echo "creating the reference markdown from the commented sources"
-./reference.sh ../src/parser/parser.c              po_dae > reference-dae-po.md
-./reference.sh ../src/parser/parser.c              po_pde > reference-pde-po.md
 echo " - keywords"
-./reference.sh ../src/parser/parser.c              kw     > reference-kw.md
-./reference.sh ../src/parser/parser.c              kw_dae > reference-dae-kw.md
-./reference.sh ../src/parser/parser.c              kw_pde > reference-pde-kw.md
+./reference.sh ../src/parser/parser.c                kw     > reference-kw.md
+./reference.sh ../src/parser/parser.c                kw_dae > reference-dae-kw.md
+./reference.sh ../src/parser/parser.c                kw_pde > reference-pde-kw.md
 echo " - variables"
-./reference.sh ../src/flow/init.c                  va     > reference-va.md
-./reference.sh ../src/flow/init.c                  va_dae > reference-dae-va.md
-./reference.sh ../src/flow/init.c                  va_pde > reference-pde-va.md
+./reference.sh ../src/flow/init.c                    va     > reference-va.md
+./reference.sh ../src/flow/init.c                    va_dae > reference-dae-va.md
+./reference.sh ../src/flow/init.c                    va_pde > reference-pde-va.md
 echo " - functions"
-./reference.sh ../src/math/builtin_functions.c     fn > reference-fn.md
+./reference.sh ../src/math/builtin_functions.c       fn > reference-fn.md
 echo " - functionals"
-./reference.sh ../src/math/builtin_functionals.c   fu > reference-fu.md
+./reference.sh ../src/math/builtin_functionals.c     fu > reference-fu.md
+echo " - vector functions"
+./reference.sh ../src/math/builtin_vectorfunctions.c fv > reference-fv.md
 
-for i in laplace; do
+for i in laplace thermal; do
   echo " - ${i}"
   ./reference.sh ../src/pdes/${i}/init.c           pb_${i} > reference-${i}-pb.md
   ./reference.sh ../src/pdes/${i}/init.c           kw_${i} > reference-${i}-kw.md
@@ -111,7 +111,7 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
 
 # manual (to markdown and not gfm because of the heavy math)
 echo "full manual in markdown & texi"
-pandoc feenox.md -t markdown -o feenox.markdown \
+pandoc feenox.md -t markdown-fenced_divs -o feenox.markdown \
   --standalone --toc --reference-links --reference-location=section \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \

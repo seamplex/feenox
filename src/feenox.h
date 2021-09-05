@@ -118,7 +118,7 @@
 
 // reasonable defaults
 #define DEFAULT_DT                         1.0/16.0
-#define DEFAULT_REL_ERROR                  1e-6
+#define DEFAULT_DAE_RTOL                   1e-6
 #define DEFAULT_RANDOM_METHOD              gsl_rng_mt19937
 
 #define DEFAULT_PRINT_FORMAT               "%g"
@@ -1478,7 +1478,7 @@ struct feenox_t {
     var_t *t;
     var_t *dt;
 
-    var_t *rel_error;
+    var_t *dae_rtol;
     var_t *min_dt;
     var_t *max_dt;
   
@@ -1663,7 +1663,8 @@ struct feenox_t {
       var_t *snes_stol;
       var_t *snes_max_it;
       
-      // TODO: ts_tolerances
+      var_t *ts_atol;
+      var_t *ts_rtol;
       
       var_t *eps_tol;
       var_t *eps_max_it;

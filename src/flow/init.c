@@ -275,12 +275,12 @@ int feenox_init_special_objects(void) {
   feenox_special_var(dt) = feenox_get_or_define_variable_get_ptr("dt");
   feenox_special_var_value(dt) = DEFAULT_DT;
 
-///va+rel_error+desc Maximum allowed relative error for the solution of DAE systems.
-///va+rel_error+detail Default value is
-///va+rel_error+detail is $1 \times 10^{-6}$. If a fine per-variable error control is needed, special vector
-///va+rel_error+detail `abs_error` should be used.
-  feenox_special_var(rel_error) = feenox_get_or_define_variable_get_ptr("rel_error");
-  feenox_special_var_value(rel_error) = DEFAULT_REL_ERROR;
+///va_dae+dae_rtol+desc Maximum allowed relative error for the solution of DAE systems.
+///va_dae+dae_rtol+detail Default value is
+///va_dae+dae_rtol+detail is $1 \times 10^{-6}$. If a fine per-variable error control is needed, special vector
+///va_dae+dae_rtol+detail `abs_error` should be used.
+  feenox_special_var(dae_rtol) = feenox_get_or_define_variable_get_ptr("dae_rtol");
+  feenox_special_var_value(dae_rtol) = DEFAULT_DAE_RTOL;
   
 ///va+min_dt+desc Minimum bound for the time step that feenox should take when solving DAE systems.
   feenox_special_var(min_dt) = feenox_get_or_define_variable_get_ptr("min_dt");
@@ -415,7 +415,7 @@ int feenox_init_before_run(void) {
   feenox_special_var_value(static_steps) = 1;
   feenox_special_var_value(t) = 0;
   feenox_special_var_value(dt) = DEFAULT_DT;
-  feenox_special_var_value(rel_error) = DEFAULT_REL_ERROR;
+  feenox_special_var_value(dae_rtol) = DEFAULT_DAE_RTOL;
   
   
   feenox_special_var_value(done_static) = 0;

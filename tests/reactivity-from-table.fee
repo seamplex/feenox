@@ -2,7 +2,7 @@ INCLUDE parameters.fee
 PHASE_SPACE phi c rho
 
 end_time = 100
-rel_error = 1e-7
+dae_rtol = 1e-7
 
 rho_0 = 0
 phi_0 = 1

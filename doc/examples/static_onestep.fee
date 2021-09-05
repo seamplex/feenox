@@ -1,0 +1,2 @@
+VAR x
+PRINT %.7f func_min(cos(x)+1,x,0,6)

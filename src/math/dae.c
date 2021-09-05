@@ -377,14 +377,14 @@ int feenox_dae_init(void) {
       if (gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i) > 0) {
         NV_DATA_S(feenox.dae.abs_error)[i] = gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i);
       } else {
-        NV_DATA_S(feenox.dae.abs_error)[i] = feenox_special_var_value(rel_error);
+        NV_DATA_S(feenox.dae.abs_error)[i] = feenox_special_var_value(dae_rtol);
       }
     }
 
-    ida_call(IDASVtolerances(feenox.dae.system, feenox_special_var_value(rel_error), feenox.dae.abs_error));
+    ida_call(IDASVtolerances(feenox.dae.system, feenox_special_var_value(dae_rtol), feenox.dae.abs_error));
   } else {
     // si no nos dieron vector de absolutas, ponemos absolutas igual a relativas 
-    ida_call(IDASStolerances(feenox.dae.system, feenox_special_var_value(rel_error), feenox_special_var_value(rel_error)));
+    ida_call(IDASStolerances(feenox.dae.system, feenox_special_var_value(dae_rtol), feenox_special_var_value(dae_rtol)));
   }
 
   //  estas tienen que venir despues de IDAInit

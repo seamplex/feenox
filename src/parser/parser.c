@@ -2473,7 +2473,7 @@ int feenox_parse_write_mesh(void) {
     } else if (strcasecmp(token, "NODE") == 0 || strcasecmp(token, "NODES") == 0) {
       mesh_write->field_location = field_location_nodes;
 
-///kw+WRITE_MESH+usage CELL ]
+///kw_pde+WRITE_MESH+usage CELL ]
     } else if (strcasecmp(token, "CELL") == 0 || strcasecmp(token, "CELLS") == 0) {
       mesh_write->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;

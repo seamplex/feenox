@@ -1,0 +1,1 @@
+f(x,y) = exp(-x^2)*cos(pi*y)

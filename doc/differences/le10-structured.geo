@@ -19,9 +19,9 @@ Physical Volume("bulk") = {2, 1};
 // meshing settings, read Gmsh' manual for further reference
 Mesh.RecombineAll = 1;          // create quads instead of triangs
 Mesh.ElementOrder = 2;          // use second-order hexahedra
-Mesh.SecondOrderIncomplete = 1; // create hex20 instead of hex27
+Mesh.SecondOrderIncomplete = 0; // create hex20 instead of hex27
 
-Mesh.MeshSizeFactor = 0.25;
+Mesh.MeshSizeFactor = 0.5;
 Transfinite Curve {-1, 3, -14, 6, 11, 18} = 4/Mesh.MeshSizeFactor+1 Using Progression 1.1;
 Transfinite Curve {5, 17, 7, 10, 19} = 6/Mesh.MeshSizeFactor+1 Using Progression 1.1;
 Transfinite Curve {-9} = 6/Mesh.MeshSizeFactor+1 Using Progression 1.08125;
