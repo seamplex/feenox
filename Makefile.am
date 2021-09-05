@@ -31,6 +31,7 @@ TESTS = tests/abort.sh \
         tests/nafems-lex.sh \
         tests/nafems-tx.sh \
         tests/nafems-t4.sh \
+        tests/neutron_diffusion.sh \
         tests/point-kinetics.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
