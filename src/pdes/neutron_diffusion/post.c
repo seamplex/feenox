@@ -27,6 +27,7 @@ extern neutron_diffusion_t neutron_diffusion;
 
 int feenox_problem_solve_post_neutron_diffusion(void) {
     
+#ifdef HAVE_SLEPC
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     feenox_var_value(neutron_diffusion.keff) = 1.0/feenox.pde.eigenvalue[0];
   } else {
@@ -57,6 +58,8 @@ int feenox_problem_solve_post_neutron_diffusion(void) {
       feenox.pde.solution[g]->data_value[j] *= factor;
     }
   }  
-    
+
+#endif
+
   return FEENOX_OK;
 }
