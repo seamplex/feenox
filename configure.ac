@@ -345,10 +345,13 @@ AS_IF([test -e .git -a ! -z "$(which git)"],[
 EOF
 ])
 
+# give some information about the compiler in the summary
 compiler_command="${CC}"
-AS_IF([test "x${have_slepc}" = "xyes"],[
+compiler_show="${compiler_command}"
+AS_IF([test "x${have_petsc}" = "xyes"],[
   AS_IF([test ! -z "$(which mpicc)"],[
     compiler_command="mpicc"
+    compiler_show="$(${compiler_command} -show)"
   ])
 ])
 
@@ -359,10 +362,13 @@ cat << EOF >> src/version.h
 #define FEENOX_COMPILATION_USERNAME "$(whoami | sed s/\\\\\\\\//)"
 #define FEENOX_COMPILATION_HOSTNAME "$(hostname)"
 
+#define FEENOX_COMPILER_COMMAND   "${compiler_command}"
 #define FEENOX_COMPILER_ARCH     "${host_os} ${host_cpu}"
 #define FEENOX_COMPILER_VERSION  "$(${compiler_command} --version | head -n1)"
 #define FEENOX_COMPILER_CFLAGS   "${CFLAGS}"
+#define FEENOX_COMPILER_SHOW     "${compiler_show}"
 EOF
+
 
 ######################
 # create some links to pass make distcheck
@@ -388,5 +394,6 @@ AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO([" ${SLEPC_DIR}"]),
  AS_ECHO
 )
+AS_ECHO(  ["  Compiler                ${compiler_show}"])
 
 AC_OUTPUT

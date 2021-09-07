@@ -303,13 +303,95 @@ $
 
 ## Test suite
 
-After t
+To be explained.
 
 ## Install
 
+
+To be explained.
+
 # Advanced settings
 
-```{.include}
-compile-debug.md
-compile-other-compilers.md
+
+
+## Compiling with debug symbols
+
+By default the C flags are `-O3`, without debugging. To add the `-g` flag, just use `CFLAGS` when configuring:
+
+```terminal
+./configure CFLAGS="-g -O0"
 ```
+
+## Using a different compiler
+
+Without PETSc, FeenoX uses the `CC` environment variable to set the compiler. So configure like
+
+```terminal
+./configure CC=clang
+```
+
+When PETSc is detected FeenoX uses the `mpicc` executable, which is a wrapper to an actual C compiler with extra flags needed to find the headers and the MPI library. To change the wrapped compiler, you should set `MPICH_CC` or `OMPI_CC`, depending if you are using MPICH or OpenMPI. For example, to force MPICH to use `clang` do
+
+```terminal
+./configure MPICH_CC=clang CC=clang
+```
+
+
+To know which is the default MPI implementation, just run `configure` without arguments and pay attention to the "Compiler" line in the "Summary of dependencies" section. For example, for OpenMPI a typical summary would be
+
+```terminal
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /usr/lib/petsc 
+  SLEPc                   yes /usr/lib/slepc
+  Compiler                gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include -pthread -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
+```
+
+For MPICH:
+
+```terminal
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /home/gtheler/libs/petsc-3.15.0 arch-linux2-c-debug
+  SLEPc                   yes /home/gtheler/libs/slepc-3.15.1
+  Compiler                gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
+```
+
+Other non-free implementations like Intel\ MPI might work but were not tested. However, it should be noted that the MPI implementation used to compile FeenoX has to match the one used to compile PETSc. Therefore, if you compiled PETSc on your own, it is up to you to ensure MPI compatibility. If you are using PETSc as provided by your distribution's repositories, you will have to find out which one was used (it is usually OpenMPI) and use the same one when compiling FeenoX.
+
+The FeenoX executable will show the configured compiler and flags when invoked with the `--versions` option:
+
+```
+$ feenox --versions
+FeenoX v0.1.47-g868dbb7-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Mon Sep 6 16:39:53 2021 -0300
+Build date         : Tue Sep 07 14:29:42 2021 -0300
+Build architecture : linux-gnu x86_64
+Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler flags     : -O3
+Builder            : gtheler@tom
+GSL version        : 2.6
+SUNDIALS version   : 5.7.0
+PETSc version      : Petsc Release Version 3.15.0, Mar 30, 2021 
+PETSc arch         : arch-linux2-c-debug
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --with-x=0
+SLEPc version      : SLEPc Release Version 3.15.1, May 28, 2021
+$
+```
+
+Note that the reported values are the ones used in `configure` and not in `make`.
+Thus, the recommended way to set flags is in `configure` and not in `make`.
+
+
+## Compiling PETSc
+
+To be explained.
+

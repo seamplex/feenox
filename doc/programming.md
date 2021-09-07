@@ -18,10 +18,6 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
 See the [compile.md](compilation instructions).
 
-```{.include}
-compile-debug.md
-compile-other-compilers.md
-```
  
 # How we program FeenoX
 

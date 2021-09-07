@@ -28,13 +28,6 @@ touch src/variables.mak
 version=$(git describe --tags | sed 's/-/./')
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
-# if [ ! -e README ]; then
-#  touch README
-# fi
-# if [ ! -e TODO ]; then
-#  touch TODO
-# fi
-
 echo "calling autoreconf... "
 autoreconf -i
 # automake --add-missing
