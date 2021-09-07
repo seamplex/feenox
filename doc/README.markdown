@@ -7,7 +7,6 @@
 -   [Manual and reference][]
     -   [UNIX manpage][]
     -   [FeenoX manual][]
-    -   [Reference sheet][]
 -   [Background and generalities][]
     -   [Software requirements specifications][]
     -   [Software design specifications][]
@@ -23,6 +22,8 @@
 -   See [this presentation][] (August 2021).
 -   There’s a [recording of the presentation][] (Slides are in English
     but audio is in Spanish).
+-   Browse the repository with the sources of the examples in the
+    presentation [here][]
 
   [Hands on]: #hands-on
   [Quick examples]: #quick-examples
@@ -31,7 +32,6 @@
   [Manual and reference]: #manual-and-reference
   [UNIX manpage]: #unix-manpage
   [FeenoX manual]: #feenox-manual
-  [Reference sheet]: #reference-sheet
   [Background and generalities]: #background-and-generalities
   [Software requirements specifications]: #software-requirements-specifications
   [Software design specifications]: #software-design-specifications
@@ -45,6 +45,7 @@
   [README]: ..
   [this presentation]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [recording of the presentation]: https://youtu.be/-RJ5qn7E9uE
+  [here]: https://github.com/gtheler/2021-presentation
 
 # Hands on
 
@@ -73,50 +74,52 @@ convergence, comparisons with analytical or other programs, efficiency
 measurements, etc. Since these cases involve other tools, figures, data
 files, etc. they have a separate repository.
 
+**TO BE DONE**
+
 # Manual and reference
 
 ## UNIX manpage
 
-See [the Markdown source][] of the actual [UNIX manpage][2]. It should
-be accessible with `man feenox` after installation.
+See [UNIX manpage converted to HTML][]). It should be accessible with
+`man feenox` after installation and its sources are available in the Git
+repository.
 
-  [the Markdown source]: ./feenox.1.md
-  [2]: ./feenox.1.html
+  [UNIX manpage converted to HTML]: https://www.seamplex.com/feenox/doc/feenox.1.html
 
 ## FeenoX manual
 
-The full FeenoX manual is available as a Texinfo PDF, compiled from an
-M4-preprocessed [Markdown source][] converted to `texi` by Pandoc.
+As per the [GNU Coding Standards][], “a manual should serve both as
+tutorial and reference.”
 
-  [Markdown source]: ./feenox.md
+-   [HTML][]
+-   [PDF][]
+-   [Texinfo][]
 
-## Reference sheet
+The source is in [Pandoc][]-flavored Markdown.
 
--   [Keywords][]
--   Variables
--   Distributions
--   Boundary conditions
--   Functions
-
-  [Keywords]: reference-kw.md
+  [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
+  [HTML]: https://www.seamplex.com/feenox/doc/feenox.html
+  [PDF]: https://www.seamplex.com/feenox/doc/feenox.pdf
+  [Texinfo]: https://www.seamplex.com/feenox/doc/feenox.texi
+  [Pandoc]: https://pandoc.org/
 
 # Background and generalities
 
 ## Software requirements specifications
 
 The FeenoX project starts as an offer to an imaginary “request for
-quotations” that defines [software requirements specifications][3] for a
+quotations” that defines [software requirements specifications][2] for a
 computational tool.
 
-  [3]: srs.md
+  [2]: srs.md
 
 ## Software design specifications
 
 The “quotation” to the above tender is given in a [software design
-specifications][4] document that explains the design decisions and
+specifications][3] document that explains the design decisions and
 features included in FeenoX.
 
-  [4]: sds.md
+  [3]: sds.md
 
 ## FAQ
 
@@ -127,22 +130,23 @@ been answered.
 
 ## History
 
-To be done.
+See the [FeenoX history][].
+
+  [FeenoX history]: history.md
 
 # Programming and contributing
 
 ## Asking questions & reporting bugs
 
-These are two most basic ways of contributing to an open source project,
-so do not hesitate to ask questions in our [mailing list][] and to
-report bugs in our [Github issue tracker][].
+-   Use [Github discussions][] to ask for help,
+-   Use the [Github issue tracker][] to report bugs.
 
-  [mailing list]: https://www.seamplex.com/lists.html
+  [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Github issue tracker]: https://github.com/seamplex/feenox/issues
 
 ## Compiling from source
 
-> If these instructions make no sense to you, read the [FAQs][].
+> If the following instructions make no sense to you, read the [FAQs][].
 
 1.  Install mandatory dependencies
 
@@ -180,7 +184,7 @@ report bugs in our [Github issue tracker][].
     repository, call `configure` with `--enable-download-gsl`:
 
     ``` terminal
-    configure --enable-download-gsl
+    ./configure --enable-download-gsl
     ```
 
     If you do not have Internet access, get the tarball manually, copy
@@ -198,19 +202,13 @@ report bugs in our [Github issue tracker][].
     sudo make install
     ```
 
-See the [compilation guide][] for a full explanation and of the steps
-above. See the [programming guide][] for more details about
-
--   setting custom flags,
--   using different compilers (e.g. `gcc`, `clang`, `icc`, etc),
--   compiling with debugging information,
--   configuring and compiling dependencies from sources,
--   setting up an IDE for development,
--   etc.
+-   See the [Compilation guide][] for a full explanation and of the
+    steps above.
+-   See the [Programming guide][] for more details.
 
   [FAQs]: FAQ.md
-  [compilation guide]: ./compile.md
-  [programming guide]: ./programming.md
+  [Compilation guide]: ./compile.md
+  [Programming guide]: ./programming.md
 
 ## Contributing guidelines
 
@@ -219,31 +217,16 @@ formulations of existing PDEs. For elliptic operators feel free to use
 the Laplace equation as a template.
 
 1.  Read the [programming guide][]
-2.  Join the [mailing list][]
+2.  Browse [Github discussions][]
 3.  Fork the [Github repository][]
 4.  Create a pull request
 
-It is mandatory to observe the following code of conduct:
-
-> Be kind to others. Do not insult or put down others. Behave
-> professionally. Remember that harassment and sexist, racist, or
-> exclusionary jokes are not appropriate for FeenoX.
->
-> All communication should be appropriate for a professional audience
-> including people of many different backgrounds. Sexual language and
-> imagery is not appropriate.
->
-> FeenoX is dedicated to providing a harassment-free community for
-> everyone, regardless of gender, sexual orientation, gender identity
-> and expression, disability, physical appearance, body size, race, or
-> religion. We do not tolerate harassment of community members in any
-> form.
->
-> Help to make this a welcoming, friendly community for all.
+It is mandatory to observe the [Code of Conduct][].
 
   [programming guide]: ./programming.md
-  [mailing list]: https://www.seamplex.com/lists.html
+  [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Github repository]: https://github.com/seamplex/feenox/
+  [Code of Conduct]: CODE_OF_CONDUCT.md
 
 ## How FeenoX documentation system works
 

@@ -1,15 +1,17 @@
 ---
 title: FeenoX documentation index
-lang: en-US
 titleblock: |
  FeenoX documentation index
  ==========================
+lang: en-US
+toc: true 
 ...
 
 
  * There is a brief introduction on the main [README](..).
  * See [this presentation](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
  * There's a [recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
+ * Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
 
 # Hands on
 
@@ -27,23 +29,24 @@ Step-by-step instructions and explanations to solve increasingly-complex problem
 
 Detailed solutions of benchmarks, V&V cases and/or problems with industrial interest. These cases include parametric studies for mesh convergence, comparisons with analytical or other programs, efficiency measurements,  etc. Since these cases involve other tools, figures, data files, etc. they have a separate repository.
 
+**TO BE DONE**
+
 # Manual and reference
 
 ## UNIX manpage
 
-See [the Markdown source](./feenox.1.md) of the actual [UNIX manpage](./feenox.1.html). It should be accessible with `man feenox` after installation.
+See [UNIX manpage converted to HTML](https://www.seamplex.com/feenox/doc/feenox.1.html)).
+It should be accessible with `man feenox` after installation and its sources are available in the Git repository.
 
 ## FeenoX manual
 
-The full FeenoX manual is available as a Texinfo PDF, compiled from an M4-preprocessed [Markdown source](./feenox.md) converted to `texi` by Pandoc.
+As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html#GNU-Manuals), "a manual should serve both as tutorial and reference."
 
-## Reference sheet
+ * [HTML](https://www.seamplex.com/feenox/doc/feenox.html)
+ * [PDF](https://www.seamplex.com/feenox/doc/feenox.pdf)
+ * [Texinfo](https://www.seamplex.com/feenox/doc/feenox.texi)
 
- * [Keywords](reference-kw.md)
- * Variables
- * Distributions
- * Boundary conditions
- * Functions
+The source is in [Pandoc](https://pandoc.org/)-flavored Markdown.
  
 
 # Background and generalities
@@ -62,32 +65,27 @@ Read the [Frequently Asked Questions](FAQ.md) before asking what has already bee
 
 ## History
 
-To be done.
+See the [FeenoX history](history.md).
 
 
 # Programming and contributing
 
 ## Asking questions & reporting bugs
 
-These are two most basic ways of contributing to an open source project, so do not hesitate to ask questions in our [mailing list](https://www.seamplex.com/lists.html) and to report bugs in our [Github issue tracker](https://github.com/seamplex/feenox/issues). 
+ * Use [Github discussions](https://github.com/seamplex/feenox/discussions) to ask for help,
+ * Use the [Github issue tracker](https://github.com/seamplex/feenox/issues) to report bugs.
 
 ## Compiling from source
 
-> If these instructions make no sense to you, read the [FAQs](FAQ.md).
+> If the following instructions make no sense to you, read the [FAQs](FAQ.md).
 
 ```{.include}
-design/git.md
+git.md
 ```
 
-See the [compilation guide](./compile.md) for a full explanation and of the steps above.
-See the [programming guide](./programming.md) for more details about
+ * See the [Compilation guide](./compile.md) for a full explanation and of the steps above.
+ * See the [Programming guide](./programming.md) for more details.
 
- * setting custom flags,
- * using different compilers (e.g. `gcc`, `clang`, `icc`, etc),
- * compiling with debugging information,
- * configuring and compiling dependencies from sources,
- * setting up an IDE for development,
- * etc.
     
 ## Contributing guidelines
 
@@ -95,19 +93,11 @@ Any contribution is welcome, especially new types of PDEs and new formulations o
 For elliptic operators feel free to use the Laplace equation as a template.
 
  1. Read the [programming guide](./programming.md)
- 2. Join the [mailing list](https://www.seamplex.com/lists.html)
+ 2. Browse [Github discussions](https://github.com/seamplex/feenox/discussions)
  3. Fork the [Github repository](https://github.com/seamplex/feenox/)
  4. Create a pull request
  
-It is mandatory to observe the following code of conduct:
-
-> Be kind to others. Do not insult or put down others. Behave professionally. Remember that harassment and sexist, racist, or exclusionary jokes are not appropriate for FeenoX.
-> 
-> All communication should be appropriate for a professional audience including people of many different backgrounds. Sexual language and imagery is not appropriate.
-> 
-> FeenoX is dedicated to providing a harassment-free community for everyone, regardless of gender, sexual orientation, gender identity and expression, disability, physical appearance, body size, race, or religion. We do not tolerate harassment of community members in any form.
->
-> Help to make this a welcoming, friendly community for all.
+It is mandatory to observe the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 
 

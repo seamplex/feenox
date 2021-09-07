@@ -22,8 +22,8 @@
 #include <feenox.h>
 extern feenox_t feenox;
 
-#define MIN 0
-#define MAX 1
+#define FEENOX_EXTREMA_MIN 0
+#define FEENOX_EXTREMA_MAX 1
 
 #define feenox_store_extrema_function(minmax, ind, val) \
   value[minmax] = val;  \
@@ -63,11 +63,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         size_t i = 0;
         for (i = 0; i < function->data_size; i++) {
           val = function->data_value[i];
-          if (val > value[MAX]) {
-            feenox_store_extrema_function(MAX, i, val);
+          if (val > value[FEENOX_EXTREMA_MAX]) {
+            feenox_store_extrema_function(FEENOX_EXTREMA_MAX, i, val);
           }
-          if (val < value[MIN]) {
-            feenox_store_extrema_function(MIN, i, val);
+          if (val < value[FEENOX_EXTREMA_MIN]) {
+            feenox_store_extrema_function(FEENOX_EXTREMA_MIN, i, val);
           }
         }
       } else {
@@ -82,11 +82,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           size_t i = 0;
           for (i = 0; i < mesh->n_cells; i++) {
             val = feenox_function_eval(function, mesh->cell[i].x);
-            if (val > value[MAX]) {
-              feenox_store_extrema_mesh(MAX, i, val, mesh->cell[i].x);
+            if (val > value[FEENOX_EXTREMA_MAX]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, mesh->cell[i].x);
             }
-            if (val < value[MIN]) {
-              feenox_store_extrema_mesh(MIN, i, val, mesh->cell[i].x);
+            if (val < value[FEENOX_EXTREMA_MIN]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, mesh->cell[i].x);
             }  
           }
           
@@ -97,11 +97,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           size_t i = 0;
           for (i = 0; i < mesh->n_nodes; i++) {
             val = feenox_function_eval(function, mesh->node[i].x);
-            if (val > value[MAX]) {
-              feenox_store_extrema_mesh(MAX, i, val, mesh->node[i].x);
+            if (val > value[FEENOX_EXTREMA_MAX]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, mesh->node[i].x);
             }
-            if (val < value[MIN]) {
-              feenox_store_extrema_mesh(MIN, i, val, mesh->node[i].x);
+            if (val < value[FEENOX_EXTREMA_MIN]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, mesh->node[i].x);
             }
           }
           
@@ -117,11 +117,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
               feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
               
               val = feenox_function_eval(function, element->x[v]);
-              if (val > value[MAX]) {
-                feenox_store_extrema_mesh(MAX, i, val, element->x[v]);
+              if (val > value[FEENOX_EXTREMA_MAX]) {
+                feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, element->x[v]);
               }
-              if (val < value[MIN]) {
-                feenox_store_extrema_mesh(MIN, i, val, element->x[v]);
+              if (val < value[FEENOX_EXTREMA_MIN]) {
+                feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, element->x[v]);
               }
             }  
           }
@@ -144,11 +144,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           feenox_mesh_update_coord_vars(mesh->cell[i].x);
           val = feenox_expression_eval(expr);
           
-          if (val > value[MAX]) {
-            feenox_store_extrema_mesh(MAX, i, val, mesh->cell[i].x);
+          if (val > value[FEENOX_EXTREMA_MAX]) {
+            feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, mesh->cell[i].x);
           }
-          if (val < value[MIN]) {
-            feenox_store_extrema_mesh(MIN, i, val, mesh->cell[i].x);
+          if (val < value[FEENOX_EXTREMA_MIN]) {
+            feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, mesh->cell[i].x);
           }
         }
       }
@@ -159,11 +159,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           feenox_mesh_update_coord_vars(mesh->node[i].x);
           val = feenox_expression_eval(expr);
           
-          if (val > value[MAX]) {
-            feenox_store_extrema_mesh(MAX, i, val, mesh->node[i].x);
+          if (val > value[FEENOX_EXTREMA_MAX]) {
+            feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, mesh->node[i].x);
           }
-          if (val < value[MIN]) {
-            feenox_store_extrema_mesh(MIN, i, val, mesh->node[i].x);
+          if (val < value[FEENOX_EXTREMA_MIN]) {
+            feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, mesh->node[i].x);
           }
         }
       }
@@ -178,11 +178,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
             feenox_mesh_update_coord_vars(element->x[v]);
             val = feenox_expression_eval(expr);
             
-            if (val > value[MAX]) {
-              feenox_store_extrema_mesh(MAX, i, val, element->x[v]);
+            if (val > value[FEENOX_EXTREMA_MAX]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, element->x[v]);
             }
-            if (val < value[MIN]) {
-              feenox_store_extrema_mesh(MIN, i, val, element->x[v]);
+            if (val < value[FEENOX_EXTREMA_MIN]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, element->x[v]);
             }
           }  
         }
@@ -224,11 +224,11 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           
             feenox_mesh_update_coord_vars(mesh->node[j].x);
             val = feenox_expression_eval(expr);
-            if (val > value[MAX]) {
-              feenox_store_extrema_mesh(MAX, element->node[j]->index_mesh, val, mesh->node[j].x);
+            if (val > value[FEENOX_EXTREMA_MAX]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, element->node[j]->index_mesh, val, mesh->node[j].x);
             }
-            if (val < value[MIN]) {
-              feenox_store_extrema_mesh(MIN, element->node[j]->index_mesh, val, mesh->node[j].x);
+            if (val < value[FEENOX_EXTREMA_MIN]) {
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, element->node[j]->index_mesh, val, mesh->node[j].x);
             }
         
           }
@@ -238,35 +238,35 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
   }  
 
   if (mesh_find_extrema->min != NULL) {
-    feenox_var_value(mesh_find_extrema->min) = value[MIN];
+    feenox_var_value(mesh_find_extrema->min) = value[FEENOX_EXTREMA_MIN];
   }
   if (mesh_find_extrema->i_min != NULL) {
-    feenox_var_value(mesh_find_extrema->i_min) = (double)index[MIN];
+    feenox_var_value(mesh_find_extrema->i_min) = (double)index[FEENOX_EXTREMA_MIN];
   }
   if (mesh_find_extrema->x_min != NULL) {
-    feenox_var_value(mesh_find_extrema->x_min) = x[MIN];
+    feenox_var_value(mesh_find_extrema->x_min) = x[FEENOX_EXTREMA_MIN];
   }
   if (mesh_find_extrema->y_min != NULL) {
-    feenox_var_value(mesh_find_extrema->y_min) = y[MIN];
+    feenox_var_value(mesh_find_extrema->y_min) = y[FEENOX_EXTREMA_MIN];
   }
   if (mesh_find_extrema->z_min != NULL) {
-    feenox_var_value(mesh_find_extrema->z_min) = z[MIN];
+    feenox_var_value(mesh_find_extrema->z_min) = z[FEENOX_EXTREMA_MIN];
   }
   
   if (mesh_find_extrema->max != NULL) {
-    feenox_var_value(mesh_find_extrema->max) = value[MAX];
+    feenox_var_value(mesh_find_extrema->max) = value[FEENOX_EXTREMA_MAX];
   }
   if (mesh_find_extrema->i_max != NULL) {
-    feenox_var_value(mesh_find_extrema->i_max) = (double)index[MAX];
+    feenox_var_value(mesh_find_extrema->i_max) = (double)index[FEENOX_EXTREMA_MAX];
   }
   if (mesh_find_extrema->x_max != NULL) {
-    feenox_var_value(mesh_find_extrema->x_max) = x[MAX];
+    feenox_var_value(mesh_find_extrema->x_max) = x[FEENOX_EXTREMA_MAX];
   }
   if (mesh_find_extrema->y_max != NULL) {
-    feenox_var_value(mesh_find_extrema->y_max) = y[MAX];
+    feenox_var_value(mesh_find_extrema->y_max) = y[FEENOX_EXTREMA_MAX];
   }
   if (mesh_find_extrema->z_max != NULL) {
-    feenox_var_value(mesh_find_extrema->z_max) = z[MAX];
+    feenox_var_value(mesh_find_extrema->z_max) = z[FEENOX_EXTREMA_MAX];
   }
   
   return FEENOX_OK;

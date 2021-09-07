@@ -1,5 +1,12 @@
 FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
+-   1 What is FeenoX?
+    -   1.1 Why?
+-   2 Download
+    -   2.1 Git repository
+-   3 Licensing
+-   4 Further information
+
   [1 What is FeenoX?]: #what-is-feenox
   [1.1 Why?]: #why
   [2 Download]: #download
@@ -341,7 +348,7 @@ recommended way of getting FeenoX is to compile from source.
     If you cannot (or do not want) to use libgsl-dev from a package
     repository, call configure with --enable-download-gsl:
 
-        configure --enable-download-gsl
+        ./configure --enable-download-gsl
 
     If you do not have Internet access, get the tarball manually, copy
     it to the same directory as configure and run again.

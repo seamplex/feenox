@@ -14,7 +14,6 @@ geometry:
 colorlinks: true
 mathspec: true
 syntax-definition: ../feenox.xml
-header-includes: \include{syntax.tex}
 listings: true
 toc: true
 ...

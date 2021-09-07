@@ -1,5 +1,4 @@
-\input texinfo @c -*-texinfo-*-
-@c %**start of header
+\input texinfo
 @documentencoding UTF-8
 
 @setfilename feenox.info
@@ -13,7 +12,7 @@ which is a completely free-as-in-freedom finite-element
 thermo-mechancial solver desinged and implemented following the UNIX
 principles.
 
-Copyright @copyright{} 2016-2020 Jeremy Theler.
+Copyright @copyright{} 2016-2021 Jeremy Theler.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -29,7 +28,7 @@ Texts.  A copy of the license is included in the section entitled
 @paragraphindent 0
 @end ifnottex
 @titlepage
-@title FeenoX
+@title FeenoX manual
 @subtitle A free no-fee no-X uniX-like finite-element(ish) computational
 engineering tool, 
 @author Jeremy Theler
@@ -38,7 +37,7 @@ engineering tool,
 @contents
 
 @node Top
-@top FeenoX
+@top FeenoX manual
 
 @menu
 * Overview::
@@ -57,7 +56,9 @@ engineering tool,
 @anchor{#overview}
 FeenoX is a computational tool that can solve engineering problems which
 are usually casted as differential-algebraic equations (DAEs) or partial
-differential equations (PDEs). In particular, it can solve
+differential equations (PDEs). It is to finite elements programs and
+libraries what Markdown is to Word and TeX, respectively. In particular,
+it can solve
 
 @itemize
 @item
@@ -77,11 +78,11 @@ neutron transport
 
 FeenoX reads a plain-text input file which contains the problem
 definition and writes 100%-user defined results in ASCII (through
-@emph{PRINT} or other user-defined output instructions within the input
+@code{PRINT} or other user-defined output instructions within the input
 file). For PDE problems, it needs a reference to at least one
-@strong{gmsh}@code{(1)} mesh file for the discretization of the domain.
-It can write post-processing views in either @emph{.msh} or @emph{.vtk}
-formats.
+@uref{http://gmsh.info/,Gmsh} mesh file for the discretization of the
+domain. It can write post-processing views in either @code{.msh} or
+@code{.vtk} formats.
 
 Keep in mind that FeenoX is just a back end reading a set of input files
 and writing a set of output files following the design philosophy of
@@ -268,15 +269,6 @@ Another example would be the famous chaotic
 @uref{http://en.wikipedia.org/wiki/Lorenz_system,Lorenz' dynamical
 system}---the one of the butterfly---whose differential equations are
 
-@tex
-\begin{equation*}
-\begin{cases}
-\dot{x} &= \sigma \cdot (y - x)  \\
-\dot{y} &= x \cdot (r - z) - y   \\
-\dot{z} &= x y - b z       \\
-\end{cases}
-\end{equation*}
-@end tex
 @math{\dot{x} = \sigma \cdot (y - x)}
 @math{\dot{y} = x \cdot (r - z) - y}
 @math{\dot{z} = x \cdot y - b \cdot z}
@@ -562,7 +554,7 @@ repository, call @code{configure} with @code{--enable-download-gsl}:
 
 @smallformat
 @verbatim
-configure --enable-download-gsl
+./configure --enable-download-gsl
 @end verbatim
 @end smallformat
 
@@ -1056,25 +1048,26 @@ $
 @node Test suite
 @subsubsection Test suite
 @anchor{#test-suite}
-After t
+To be explained.
 
 @node Install
 @subsubsection Install
 @anchor{#install}
+To be explained.
 
 @node Advanced settings
 @subsection Advanced settings
 @anchor{#advanced-settings}
 
 @menu
-* Adding debug symbols::
+* Compiling with debug symbols::
 * Using a different compiler::
-* Using a different compiler::
+* Compiling PETSc::
 @end menu
 
-@node Adding debug symbols
-@subsubsection Adding debug symbols
-@anchor{#adding-debug-symbols}
+@node Compiling with debug symbols
+@subsubsection Compiling with debug symbols
+@anchor{#compiling-with-debug-symbols}
 By default the C flags are @code{-O3}, without debugging. To add the
 @code{-g} flag, just use @code{CFLAGS} when configuring:
 
@@ -1096,43 +1089,92 @@ compiler. So configure like
 @end verbatim
 @end smallformat
 
-When PETSc is detected, FeenoX uses @code{MPICC}. But this variable
-cannot be set directly. Depending if you are using MPICh or OpenMPI, you
-should set @code{MPICH_CC} or @code{OMPI_CC}:
+When PETSc is detected FeenoX uses the @code{mpicc} executable, which is
+a wrapper to an actual C compiler with extra flags needed to find the
+headers and the MPI library. To change the wrapped compiler, you should
+set @code{MPICH_CC} or @code{OMPI_CC}, depending if you are using MPICH
+or OpenMPI. For example, to force MPICH to use @code{clang} do
 
 @smallformat
 @verbatim
-./configure MPICH_CC=icc CC=icc
+./configure MPICH_CC=clang CC=clang
 @end verbatim
 @end smallformat
 
-@node Using a different compiler
-@subsubsection Using a different compiler
-@anchor{#using-a-different-compiler}
-Without PETSc, FeenoX uses the @code{CC} environment variable to set the
-compiler. So configure like
+To know which is the default MPI implementation, just run
+@code{configure} without arguments and pay attention to the ``Compiler''
+line in the ``Summary of dependencies'' section. For example, for
+OpenMPI a typical summary would be
 
 @smallformat
 @verbatim
-./configure CC=clang
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /usr/lib/petsc 
+  SLEPc                   yes /usr/lib/slepc
+  Compiler                gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include -pthread -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
 @end verbatim
 @end smallformat
 
-When PETSc is detected, FeenoX uses @code{MPICC}. But this variable
-cannot be set directly. Depending if you are using MPICh or OpenMPI, you
-should set @code{MPICH_CC} or @code{OMPI_CC}:
+For MPICH:
 
 @smallformat
 @verbatim
-./configure MPICH_CC=icc CC=icc
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /home/gtheler/libs/petsc-3.15.0 arch-linux2-c-debug
+  SLEPc                   yes /home/gtheler/libs/slepc-3.15.1
+  Compiler                gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
 @end verbatim
 @end smallformat
 
-The FeenoX executable will give the configured compiler and flags when
-invoked with the @code{--versions} option. Note that the reported values
-are the ones used in @code{configure} and not in @code{make}. So the
-recommended way to set flags is in @code{configure} and not in
-@code{make}.
+Other non-free implementations like Intel@ MPI might work but were not
+tested. However, it should be noted that the MPI implementation used to
+compile FeenoX has to match the one used to compile PETSc. Therefore, if
+you compiled PETSc on your own, it is up to you to ensure MPI
+compatibility. If you are using PETSc as provided by your distribution's
+repositories, you will have to find out which one was used (it is
+usually OpenMPI) and use the same one when compiling FeenoX.
+
+The FeenoX executable will show the configured compiler and flags when
+invoked with the @code{--versions} option:
+
+@smallformat
+@verbatim
+$ feenox --versions
+FeenoX v0.1.47-g868dbb7-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Mon Sep 6 16:39:53 2021 -0300
+Build date         : Tue Sep 07 14:29:42 2021 -0300
+Build architecture : linux-gnu x86_64
+Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler flags     : -O3
+Builder            : gtheler@tom
+GSL version        : 2.6
+SUNDIALS version   : 5.7.0
+PETSc version      : Petsc Release Version 3.15.0, Mar 30, 2021 
+PETSc arch         : arch-linux2-c-debug
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --with-x=0
+SLEPc version      : SLEPc Release Version 3.15.1, May 28, 2021
+$
+@end verbatim
+@end smallformat
+
+Note that the reported values are the ones used in @code{configure} and
+not in @code{make}. Thus, the recommended way to set flags is in
+@code{configure} and not in @code{make}.
+
+@node Compiling PETSc
+@subsubsection Compiling PETSc
+@anchor{#compiling-petsc}
+To be explained.
 
 @node Examples
 @chapter Examples
@@ -1350,20 +1392,10 @@ special variable @code{ts_rtol}. Again, see the section of the
 @ref{#partial-differential-equations-subsytem,Partial Differential
 Equations subsytem} for more information.
 
-@node Reference
-@chapter Reference
-@anchor{#reference}
-
 @menu
 * Algebraic expressions::
-* Differential-Algebraic Equations subsystem::
-* Partial Differential Equations subsytem::
-* Laplace's equation::
-* The heat conduction equation::
-* General & “standalone” mathematics::
-* Functions::
-* Functionals::
-* Vector functions::
+* Initial conditions::
+* Expansions of command line arguments::
 @end menu
 
 @node Algebraic expressions
@@ -1375,6 +1407,34 @@ To be done.
 @item
 Everything is an expression.
 @end itemize
+
+@node Initial conditions
+@section Initial conditions
+@anchor{#initial-conditions}
+
+@node Expansions of command line arguments
+@section Expansions of command line arguments
+@anchor{#expansions-of-command-line-arguments}
+
+@node Reference
+@chapter Reference
+@anchor{#reference}
+This chapter contains a detailed reference of keywords, variables,
+functions and functionals available in FeenoX. These are used
+essentially to define the problem that FeenoX needs to solve and to
+define what the output should be. It should be noted that this chapter
+is to be used, indeed, as a @emph{reference} and not as a tutorial.
+
+@menu
+* Differential-Algebraic Equations subsystem::
+* Partial Differential Equations subsytem::
+* Laplace's equation::
+* The heat conduction equation::
+* General & “standalone” mathematics::
+* Functions::
+* Functionals::
+* Vector functions::
+@end menu
 
 @node Differential-Algebraic Equations subsystem
 @section Differential-Algebraic Equations subsystem
@@ -2036,9 +2096,9 @@ phi'=<expr>
 @section The heat conduction equation
 @anchor{#the-heat-conduction-equation}
 Set @code{PROBLEM} to @code{thermal} (or @code{heat}) to solve thermal
-conduction.
+conduction:
 
-@math{\rho \c_p \frac{\partial T}{\partial t} + \div\left[ k(\vec{x, T} \cdot \grad{T} \right] = q'''(\vec{x}, T)}
+@math{\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)}
 
 If @code{end_time} is zero, only the steady-state problem is solved. If
 @math{k}, @math{q'''} or any Neumann boundary condition depends
@@ -3281,7 +3341,7 @@ PRINT "difference" t2-t1 "[seconds]"
 @verbatim
 $ feenox clock.fee
 doing something in between
-difference	6.826e-05	[seconds]
+difference	0.000149072	[seconds]
 $
 @end verbatim
 @end smallformat
@@ -4921,13 +4981,12 @@ I most disliked about this way of working, but I could nevertheless live
 with it.
 
 Regardless of this situation, during my last year of Nuclear
-Engineering, the tipping point came along. Here's a dialog between
-myself and the teacher, Dr.@ E. at the computer lab as I remember it:
+Engineering, the tipping point came along. Here's a
+slightly-fictionalized of a dialog between myself and the teacher at the
+computer lab, as it might have happened (or not):
 
 @quotation
-@tex
-\noindent
-@end tex --- (Prof.) Open MATLAB.™@*
+--- (Prof.) Open MATLAB.™@*
 --- (Me) It's not installed here. I type @code{mathlab} and it does not
 work.@*
 --- (Prof.) It's spelled @code{matlab}.@*

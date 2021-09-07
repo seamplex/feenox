@@ -30,7 +30,7 @@
     If you cannot (or do not want) to use `libgsl-dev` from a package repository, call `configure` with `--enable-download-gsl`:
     
     ```terminal
-    configure --enable-download-gsl
+    ./configure --enable-download-gsl
     ```
     
     If you do not have Internet access, get the tarball manually, copy it to the same directory as `configure` and run again.

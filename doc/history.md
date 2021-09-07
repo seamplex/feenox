@@ -25,9 +25,9 @@ During my years of undergraduate student (circa 2004--2007), whenever I had to s
 Of course, each option had its pros and its cons. But none provided the combination of advantages I was looking for, namely flexibility (option one), efficiency (option two) and reduced input work (partially given by option three). Back in those days I ended up wandering between options one and two, depending on the type of problem I had to solve. However, even though one can, with some effort, make the code read some parameters from a text file, any other drastic change usually requires a modification in the source code---some times involving a substantial amount of work---and a further recompilation of the code. This was what I most disliked about this way of working, but I could nevertheless live with it.
 
 Regardless of this situation, during my last year of Nuclear Engineering, the tipping point came along.
-Here's a dialog between myself and the teacher, Dr.\ E. at the computer lab as I remember it:
+Here's a slightly-fictionalized of a dialog between myself and the teacher at the computer lab, as it might have happened (or not):
 
-> \noindent
+>   
 > --- (Prof.) Open MATLAB.™  
 > --- (Me) It's not installed here. I type `mathlab` and it does not work.  
 > --- (Prof.) It's spelled `matlab`.  
@@ -51,4 +51,5 @@ Here's a dialog between myself and the teacher, Dr.\ E. at the computer lab as I
 > ```
    
 This conversation forced me to re-think the ODE-solving issue.
-I could not (and still cannot) understand why somebody would prefer to solve a very simple set of differential equations by drawing blocks and connecting them with a mouse with no mathematical sense whatsoever. Fast forward fifteen years, and what I wrote above is essentially how one would solve the point kinetics equations with FeenoX.
+I could not (and still cannot) understand why somebody would prefer to solve a very simple set of differential equations by drawing blocks and connecting them with a mouse with no mathematical sense whatsoever.
+Fast forward fifteen years, and what I wrote above is essentially how one would solve the point kinetics equations with FeenoX.

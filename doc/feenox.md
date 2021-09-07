@@ -1,11 +1,12 @@
 ---
-title: FeenoX
+title: FeenoX manual
 subtitle: A free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 desc: a completely free-as-in-freedom finite-element thermo-mechancial solver desinged and implemented following the UNIX principles
 author: Jeremy Theler
 infoname: feenox
 lang: en-US
----
+documentclass: book
+...
 
 # Overview
 
@@ -116,17 +117,22 @@ In general transient PDEs involve a mesh, material properties, inital conditions
 PETSc’s TS also honors the `min_dt` and `max_dt` variables, but the time step is controled by the allowed relative error with the special variable `ts_rtol`. Again, see the section of the [Partial Differential Equations subsytem] for more information. 
 
 
-
-# Reference
-
 ## Algebraic expressions
 
 To be done.
 
  * Everything is an expression.
- 
+
+## Initial conditions
+
+## Expansions of command line arguments
+
+# Reference
+
+This chapter contains a detailed reference of keywords, variables, functions and functionals available in FeenoX. These are used essentially to define the problem that FeenoX needs to solve and to define what the output should be. It should be noted that this chapter is to be used, indeed, as a _reference_ and not as a tutorial. 
 
 ## Differential-Algebraic Equations subsystem
+
 
 ### Keywords
 
@@ -203,9 +209,9 @@ reference-laplace-va.md
 
 ## The heat conduction equation
 
-Set `PROBLEM` to `thermal` (or `heat`) to solve thermal conduction.
+Set `PROBLEM` to `thermal` (or `heat`) to solve thermal conduction:
 
-$$\rho \c_p \frac{\partial T}{\partial t} + \div\left[ k(\vec{x, T} \cdot \grad{T} \right] = q'''(\vec{x}, T)$$
+$$\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)$$
 
 If `end_time` is zero, only the steady-state problem is solved.
 If $k$, $q'''$ or any Neumann boundary condition depends on\ $T$, the problem is set to non-linear automatically.

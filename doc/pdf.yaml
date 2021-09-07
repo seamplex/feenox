@@ -1,0 +1,13 @@
+---
+fontsize: 11pt
+geometry:
+- left=2.5cm
+- right=2cm
+- bottom=3.5cm
+- foot=2cm
+- top=3.5cm
+- head=2cm
+colorlinks: true
+mathspec: true
+listings: true
+...

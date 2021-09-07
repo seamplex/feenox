@@ -1,5 +1,4 @@
-\input texinfo @c -*-texinfo-*-
-@c %**start of header
+\input texinfo
 @documentencoding UTF-8
 $for(header-includes)$
 $header-includes$
@@ -14,7 +13,7 @@ $endfor$
 This manual is for $infoname$ (version @value{VERSION}, @value{UPDATED}),
 which is $desc$.
 
-Copyright @copyright{} 2016-2020 Jeremy Theler.
+Copyright @copyright{} 2016-2021 Jeremy Theler.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -30,6 +29,7 @@ $if(strikeout)$
 @macro textstrikeout{text}
 ~~\text\~~
 @end macro
+
 $endif$
 @ifnottex
 @paragraphindent 0
@@ -52,6 +52,7 @@ $endif$
 $endif$
 $for(include-before)$
 $include-before$
+
 $endfor$
 $if(toc)$
 @contents
@@ -59,6 +60,7 @@ $if(toc)$
 $endif$
 $body$
 $for(include-after)$
+
 $include-after$
 $endfor$
 

@@ -31,6 +31,7 @@ dy/dt = x (r-z) - y
 dz/dt = x y - b z
 ```
 
+::: {.not-in-format .texi }
 ```{=latex}
 \begin{equation*}
 \begin{cases}
@@ -40,6 +41,7 @@ dz/dt = x y - b z
 \end{cases}
 \end{equation*}
 ```
+:::
 
 ::: {.not-in-format .plain .latex }
 $$\dot{x} = \sigma \cdot (y - x)$$
@@ -49,7 +51,7 @@ $$\dot{z} = x \cdot y - b \cdot z$$
 
 where $\sigma=10$, $b=8/3$ and $r=28$ are the classical parameters that generate the butterfly as presented by Edward Lorenz back in his seminal 1963 paper [Deterministic non-periodic flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2). We can solve it with FeenoX by writing the equations in the input file as naturally as possible, as illustrated in the input file that follows:
 
-```.feenox
+```feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 

@@ -15,7 +15,6 @@ geometry:
 - head=2cm
 colorlinks: true
 mathspec: true
-header-includes: \include{syntax.tex}
 syntax-definition: feenox.xml
 listings: true
 toc: true

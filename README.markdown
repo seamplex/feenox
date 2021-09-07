@@ -1,5 +1,12 @@
 # FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
+-   [<span class="toc-section-number">1</span> What is FeenoX?][]
+    -   [<span class="toc-section-number">1.1</span> Why?][]
+-   [<span class="toc-section-number">2</span> Download][]
+    -   [<span class="toc-section-number">2.1</span> Git repository][]
+-   [<span class="toc-section-number">3</span> Licensing][]
+-   [<span class="toc-section-number">4</span> Further information][]
+
   [<span class="toc-section-number">1</span> What is FeenoX?]: #what-is-feenox
   [<span class="toc-section-number">1.1</span> Why?]: #why
   [<span class="toc-section-number">2</span> Download]: #download
@@ -132,6 +139,10 @@ PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
 Another example would be the famous chaotic [Lorenz’ dynamical
 system][]—the one of the butterfly—whose differential equations are
 
+<div class="not-in-format texi">
+
+</div>
+
 <div class="not-in-format plain latex">
 
 *ẋ* = *σ* ⋅ (*y*−*x*)
@@ -146,7 +157,7 @@ generate the butterfly as presented by Edward Lorenz back in his seminal
 FeenoX by writing the equations in the input file as naturally as
 possible, as illustrated in the input file that follows:
 
-``` .feenox
+``` feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -385,7 +396,7 @@ recommended way of getting FeenoX is to compile from source.
     repository, call `configure` with `--enable-download-gsl`:
 
     ``` terminal
-    configure --enable-download-gsl
+    ./configure --enable-download-gsl
     ```
 
     If you do not have Internet access, get the tarball manually, copy

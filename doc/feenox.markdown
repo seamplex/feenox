@@ -2,11 +2,12 @@
 author: Jeremy Theler
 desc: a completely free-as-in-freedom finite-element thermo-mechancial
   solver desinged and implemented following the UNIX principles
+documentclass: book
 infoname: feenox
 lang: en-US
 subtitle: A free no-fee no-X uniX-like finite-element(ish) computational
   engineering tool
-title: FeenoX
+title: FeenoX manual
 ---
 
 -   [Overview]
@@ -20,8 +21,10 @@ title: FeenoX
 -   [Examples]
 -   [Tutorial]
 -   [Description]
--   [Reference]
     -   [Algebraic expressions]
+    -   [Initial conditions]
+    -   [Expansions of command line arguments]
+-   [Reference]
     -   [Differential-Algebraic Equations subsystem]
         -   [Keywords]
         -   [Variables]
@@ -135,8 +138,10 @@ title: FeenoX
   [Examples]: #examples
   [Tutorial]: #tutorial
   [Description]: #description
-  [Reference]: #reference
   [Algebraic expressions]: #algebraic-expressions
+  [Initial conditions]: #initial-conditions
+  [Expansions of command line arguments]: #expansions-of-command-line-arguments
+  [Reference]: #reference
   [Differential-Algebraic Equations subsystem]: #differential-algebraic-equations-subsystem
   [Keywords]: #keywords
   [Variables]: #variables
@@ -242,7 +247,9 @@ title: FeenoX
 
 FeenoX is a computational tool that can solve engineering problems which
 are usually casted as differential-algebraic equations (DAEs) or partial
-differential equations (PDEs). In particular, it can solve
+differential equations (PDEs). It is to finite elements programs and
+libraries what Markdown is to Word and TeX, respectively. In particular,
+it can solve
 
 -   dynamical systems defined by a set of user-provided DAEs (such as
     plant control dynamics for example)
@@ -254,10 +261,10 @@ differential equations (PDEs). In particular, it can solve
 
 FeenoX reads a plain-text input file which contains the problem
 definition and writes 100%-user defined results in ASCII (through
-*PRINT* or other user-defined output instructions within the input
-file). For PDE problems, it needs a reference to at least one
-**gmsh**`(1)` mesh file for the discretization of the domain. It can
-write post-processing views in either *.msh* or *.vtk* formats.
+`PRINT` or other user-defined output instructions within the input
+file). For PDE problems, it needs a reference to at least one [Gmsh]
+mesh file for the discretization of the domain. It can write
+post-processing views in either `.msh` or `.vtk` formats.
 
 Keep in mind that FeenoX is just a back end reading a set of input files
 and writing a set of output files following the design philosophy of
@@ -265,18 +272,18 @@ UNIX (separation, composition, representation, economy, extensibility,
 etc). Think of it as a transfer function between input files and output
 files:
 
-``` terminal
-                             +------------+
- mesh (*.msh)  }             |            |             { terminal
- data (*.dat)  } input ----> |   FeenoX   |----> output { data files
- input (*.fee) }             |            |             { post (vtk/msh)
-                             +------------+
-```
+                                 +------------+
+     mesh (*.msh)  }             |            |             { terminal
+     data (*.dat)  } input ----> |   FeenoX   |----> output { data files
+     input (*.fee) }             |            |             { post (vtk/msh)
+                                 +------------+
 
 Following the UNIX programming philosophy, there are no graphical
 interfaces attached to the FeenoX core, although a wide variety of pre
 and post-processors can be used with FeenoX. See for example
 <https://www.caeplex.com> for a web-based interface.
+
+  [Gmsh]: http://gmsh.info/
 
 # Introduction
 
@@ -408,6 +415,8 @@ dx/dt = σ (y-x)
 dy/dt = x (r-z) - y
 dz/dt = x y - b z
 ```
+<div class="not-in-format texi">
+
 ```{=latex}
 \begin{equation*}
 \begin{cases}
@@ -417,6 +426,9 @@ dz/dt = x y - b z
 \end{cases}
 \end{equation*}
 ```
+
+</div>
+
 <div class="not-in-format plain latex">
 
 $$\dot{x} = \sigma \cdot (y - x)$$ $$\dot{y} = x \cdot (r - z) - y$$
@@ -430,7 +442,7 @@ generate the butterfly as presented by Edward Lorenz back in his seminal
 FeenoX by writing the equations in the input file as naturally as
 possible, as illustrated in the input file that follows:
 
-``` .feenox
+``` feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -654,7 +666,7 @@ See next section for detailed explanations.
     repository, call `configure` with `--enable-download-gsl`:
 
     ``` terminal
-    configure --enable-download-gsl
+    ./configure --enable-download-gsl
     ```
 
     If you do not have Internet access, get the tarball manually, copy
@@ -1067,18 +1079,20 @@ $
 
 #### Test suite
 
-After t
+To be explained.
 
 #### Install
 
+To be explained.
+
 ### Advanced settings
 
-#### Adding debug symbols
+#### Compiling with debug symbols
 
 By default the C flags are `-O3`, without debugging. To add the `-g`
 flag, just use `CFLAGS` when configuring:
 
-``` termina
+``` terminal
 ./configure CFLAGS="-g -O0"
 ```
 
@@ -1091,35 +1105,81 @@ compiler. So configure like
 ./configure CC=clang
 ```
 
-When PETSc is detected, FeenoX uses `MPICC`. But this variable cannot be
-set directly. Depending if you are using MPICh or OpenMPI, you should
-set `MPICH_CC` or `OMPI_CC`:
+When PETSc is detected FeenoX uses the `mpicc` executable, which is a
+wrapper to an actual C compiler with extra flags needed to find the
+headers and the MPI library. To change the wrapped compiler, you should
+set `MPICH_CC` or `OMPI_CC`, depending if you are using MPICH or
+OpenMPI. For example, to force MPICH to use `clang` do
 
 ``` terminal
-./configure MPICH_CC=icc CC=icc
+./configure MPICH_CC=clang CC=clang
 ```
 
-#### Using a different compiler {#using-a-different-compiler}
-
-Without PETSc, FeenoX uses the `CC` environment variable to set the
-compiler. So configure like
+To know which is the default MPI implementation, just run `configure`
+without arguments and pay attention to the "Compiler" line in the
+"Summary of dependencies" section. For example, for OpenMPI a typical
+summary would be
 
 ``` terminal
-./configure CC=clang
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /usr/lib/petsc 
+  SLEPc                   yes /usr/lib/slepc
+  Compiler                gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include -pthread -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
 ```
 
-When PETSc is detected, FeenoX uses `MPICC`. But this variable cannot be
-set directly. Depending if you are using MPICh or OpenMPI, you should
-set `MPICH_CC` or `OMPI_CC`:
+For MPICH:
 
 ``` terminal
-./configure MPICH_CC=icc CC=icc
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /home/gtheler/libs/petsc-3.15.0 arch-linux2-c-debug
+  SLEPc                   yes /home/gtheler/libs/slepc-3.15.1
+  Compiler                gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
 ```
 
-The FeenoX executable will give the configured compiler and flags when
-invoked with the `--versions` option. Note that the reported values are
-the ones used in `configure` and not in `make`. So the recommended way
-to set flags is in `configure` and not in `make`.
+Other non-free implementations like Intel MPI might work but were not
+tested. However, it should be noted that the MPI implementation used to
+compile FeenoX has to match the one used to compile PETSc. Therefore, if
+you compiled PETSc on your own, it is up to you to ensure MPI
+compatibility. If you are using PETSc as provided by your distribution's
+repositories, you will have to find out which one was used (it is
+usually OpenMPI) and use the same one when compiling FeenoX.
+
+The FeenoX executable will show the configured compiler and flags when
+invoked with the `--versions` option:
+
+    $ feenox --versions
+    FeenoX v0.1.47-g868dbb7-dirty 
+    a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+    Last commit date   : Mon Sep 6 16:39:53 2021 -0300
+    Build date         : Tue Sep 07 14:29:42 2021 -0300
+    Build architecture : linux-gnu x86_64
+    Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
+    Compiler flags     : -O3
+    Builder            : gtheler@tom
+    GSL version        : 2.6
+    SUNDIALS version   : 5.7.0
+    PETSc version      : Petsc Release Version 3.15.0, Mar 30, 2021 
+    PETSc arch         : arch-linux2-c-debug
+    PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --with-x=0
+    SLEPc version      : SLEPc Release Version 3.15.1, May 28, 2021
+    $
+
+Note that the reported values are the ones used in `configure` and not
+in `make`. Thus, the recommended way to set flags is in `configure` and
+not in `make`.
+
+#### Compiling PETSc
+
+To be explained.
 
 # Examples
 
@@ -1302,13 +1362,23 @@ Equations subsytem] for more information.
   [Differential-Algebraic Equations subsystem]: #differential-algebraic-equations-subsystem
   [Partial Differential Equations subsytem]: #partial-differential-equations-subsytem
 
-# Reference
-
 ## Algebraic expressions
 
 To be done.
 
 -   Everything is an expression.
+
+## Initial conditions
+
+## Expansions of command line arguments
+
+# Reference
+
+This chapter contains a detailed reference of keywords, variables,
+functions and functionals available in FeenoX. These are used
+essentially to define the problem that FeenoX needs to solve and to
+define what the output should be. It should be noted that this chapter
+is to be used, indeed, as a *reference* and not as a tutorial.
 
 ## Differential-Algebraic Equations subsystem
 
@@ -1789,9 +1859,9 @@ phi'=<expr>
 
 ## The heat conduction equation
 
-Set `PROBLEM` to `thermal` (or `heat`) to solve thermal conduction.
+Set `PROBLEM` to `thermal` (or `heat`) to solve thermal conduction:
 
-$$\rho \c_p \frac{\partial T}{\partial t} + \div\left[ k(\vec{x, T} \cdot \grad{T} \right] = q'''(\vec{x}, T)$$
+$$\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)$$
 
 If `end_time` is zero, only the steady-state problem is solved. If $k$,
 $q'''$ or any Neumann boundary condition depends on $T$, the problem is
@@ -2703,7 +2773,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ``` terminal
 $ feenox clock.fee
 doing something in between
-difference	6.826e-05	[seconds]
+difference	0.000149072	[seconds]
 $
 ```
 
@@ -4177,10 +4247,11 @@ I most disliked about this way of working, but I could nevertheless live
 with it.
 
 Regardless of this situation, during my last year of Nuclear
-Engineering, the tipping point came along. Here's a dialog between
-myself and the teacher, Dr. E. at the computer lab as I remember it:
+Engineering, the tipping point came along. Here's a
+slightly-fictionalized of a dialog between myself and the teacher at the
+computer lab, as it might have happened (or not):
 
-> `\noindent`{=tex} --- (Prof.) Open MATLAB.™\
+> --- (Prof.) Open MATLAB.™\
 > --- (Me) It's not installed here. I type `mathlab` and it does not
 > work.\
 > --- (Prof.) It's spelled `matlab`.\

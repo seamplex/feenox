@@ -16,7 +16,7 @@ Note that the quickest way to get started is to get an already-compiled statical
 On a GNU/Linux box (preferably Debian-based), follow these quick steps. See next section for detailed explanations.
 
 ```{.include}
-design/git.md
+git.md
 ```
 
 # Detailed configuration and compilation

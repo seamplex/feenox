@@ -4,24 +4,9 @@ subtitle: A free no-fee no-X uniX-like finite-element(ish) computational enginee
 titleblock: |
  FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
  =======================================================================================
-
 lang: en-US
 number-sections: true
-fontsize: 11pt
-geometry:
-- paper=a4paper
-- left=2.5cm
-- right=2cm
-- bottom=3.5cm
-- foot=2cm
-- top=3.5cm
-- head=2cm
-colorlinks: true
-mathspec: true
-syntax-definition: feenox.xml
-header-includes: \include{syntax.tex}
-listings: true
-toc: false
+toc: true
 ...
 
 # What is FeenoX?
@@ -77,7 +62,7 @@ FeenoX is distributed under the terms of the [GNU General Public License version
 If the statically-linked binaries above do not fit your needs, the recommended way of getting FeenoX is to compile from source.
 
 ```{.include}
-doc/design/git.md
+doc/git.md
 ```
 
 # Licensing
