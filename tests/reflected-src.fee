@@ -1,0 +1,35 @@
+READ_MESH reflected.msh DIMENSIONS 1
+PROBLEM neutron_diffusion GROUPS 2 
+
+MATERIAL fuel {
+  D1=1.5
+  D2=0.4
+  Sigma_s1.2=0.02
+  Sigma_a1=0.01
+  Sigma_a2=0.08
+  S1=0.05
+}
+
+MATERIAL left_refl {
+  D1=2.0
+  D2=0.3
+  Sigma_s1.2=0.04
+  Sigma_a1=0.00
+  Sigma_a2=0.01
+}
+
+MATERIAL right_refl {
+  D1=2.0
+  D2=0.3
+  Sigma_s1.2=0.05
+  Sigma_a1=0.00
+  Sigma_a2=0.005
+}
+
+BC left null
+BC right null
+
+SOLVE_PROBLEM 
+
+PRINT %.4f phi1(100) phi2(100) SEP " "
+

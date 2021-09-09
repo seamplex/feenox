@@ -9,10 +9,10 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkslepc
+checkpetsc
 
-answerzero ud20-1-0-sl.fee
+answer ud20-1-0-sl-src.fee "0.474 0.495"
 exitifwrong $?
 
-answer reflected.fee "1.0902 0.5053 0.5313"
+answer reflected-src.fee "0.6688 0.7116"
 exitifwrong $?
