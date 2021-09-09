@@ -231,13 +231,18 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
   }
   
   if (material != this->last_material) {
+    this->last_material = material;
+    
     property_data_t *property_data = NULL;
     HASH_FIND_STR(material->property_datums, this->property->name, property_data);
+    this->last_property_data = property_data;
+    
     if (property_data != NULL) {
-      this->last_material = material;
-      this->last_property_data = property_data;
       this->expr = &property_data->expr;
-    }
+    } else {
+      this->expr = NULL;
+      return 0;
+    }  
   }
   
   if (this->last_property_data != NULL) {

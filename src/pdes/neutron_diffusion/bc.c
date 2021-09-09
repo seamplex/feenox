@@ -29,6 +29,15 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
   if (strcmp(lhs, "null") == 0) {
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = -1;
+
+  } else if (strcmp(lhs, "symmetry") == 0) {
+    bc_data->type_math = bc_type_math_neumann;
+    bc_data->dof = -1;
+
+  } else if (strcmp(lhs, "vacuum") == 0) {
+    // TODO: read coefficient
+    bc_data->type_math = bc_type_math_robin;
+    bc_data->dof = -1;
     
   } else {
     feenox_push_error_message("unknown neutron_diffusion boundary condition '%s'", lhs);

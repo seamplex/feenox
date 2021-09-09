@@ -68,12 +68,14 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
     
     // scattering and fission
     for (g_prime = 0; g_prime < feenox.pde.dofs; g_prime++) {
-      gsl_matrix_set(A, g, g_prime, -neutron_diffusion.sigma_s[g][g_prime].eval(&neutron_diffusion.sigma_s[g][g_prime], x, material));
+      gsl_matrix_set(A, g, g_prime, -neutron_diffusion.sigma_s[g_prime][g].eval(&neutron_diffusion.sigma_s[g_prime][g], x, material));
     
       if (neutron_diffusion.has_fission == PETSC_TRUE) {
         gsl_matrix_set(X, g, g_prime, chi[g]*neutron_diffusion.nu_sigma_f[g_prime].eval(&neutron_diffusion.nu_sigma_f[g_prime], x, material));
       }  
     }
+    
+//    feenox_debug_print_gsl_matrix(A, stdout);
     
     // absorption
     double xi = gsl_matrix_get(A, g, g);
@@ -86,6 +88,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
       }
     }
     gsl_matrix_set(A, g, g, xi);
+//    feenox_debug_print_gsl_matrix(A, stdout);
     
     // leaks
     unsigned int m = 0;
@@ -114,12 +117,17 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
   gsl_matrix *DB = gsl_matrix_calloc(feenox.pde.dofs * feenox.pde.dim, feenox.pde.dofs * J);
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, D, this->B[v], 0.0, DB));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, this->B[v], DB, 1.0, Ki));
+//   printf("Ki\n");
+//   feenox_debug_print_gsl_matrix(Ki, stdout);
 
   // elemental scattering H'*A*H
   // TODO: can we mix Ai and Ki?
+ 
   gsl_matrix *AH = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs * J);
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, A, this->H[v], 0.0, AH));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, this->H[v], AH, 1.0, Ai));
+//   printf("Ai\n");
+//   feenox_debug_print_gsl_matrix(Ai, stdout);
   
   // elemental fission matrix
   gsl_matrix *XH = NULL;
@@ -128,6 +136,9 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
     feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, X, this->H[v], 0, XH));
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, this->H[v], XH, 1.0, Xi));
   }
+//   printf("Xi\n");
+//   feenox_debug_print_gsl_matrix(Xi, stdout);
+  
   
   if (neutron_diffusion.has_sources == PETSC_TRUE) {
     feenox_call(gsl_blas_dgemv(CblasTrans, w, this->H[v], S, 1.0, feenox.pde.bi));

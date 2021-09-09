@@ -318,7 +318,7 @@ int feenox_problem_define_solutions(void) {
     feenox_check_alloc(feenox.pde.solution[g] = feenox_define_function_get_ptr(name, feenox.pde.dim));
 
     if (feenox.pde.nev == 0) {
-      // las derivadas de las soluciones con respecto al espacio solo si no es modal
+      // the derivatives of the solutions with respect to space
       feenox_check_alloc(feenox.pde.gradient[g] = calloc(feenox.pde.dim, sizeof(function_t *)));
       feenox_check_alloc(feenox.pde.delta_gradient[g] = calloc(feenox.pde.dim, sizeof(function_t *)));
       
@@ -571,7 +571,10 @@ int feenox_problem_init_runtime_general(void) {
       feenox.pde.solution[g]->data_argument = feenox.pde.mesh->nodes_argument;
       feenox_check_alloc(feenox.pde.solution[g]->data_value = calloc(feenox.pde.spatial_unknowns, sizeof(double)));
     
-      if (feenox.pde.nev > 0) {
+      // in some cases (e.g. neutron) we do not know if we have to solve
+      // a KSP or an EPS until we read the material data, which is far too late
+      // in that case, we usually do not care about all the modes so feenox.pde.mode is null
+      if (feenox.pde.nev > 0 && feenox.pde.mode != NULL) {
         unsigned int i = 0;
         for (i = 0; i < feenox.pde.nev; i++) {
           feenox.pde.mode[g][i]->mesh = feenox.pde.mesh;

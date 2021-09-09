@@ -26,19 +26,18 @@ extern neutron_diffusion_t neutron_diffusion;
 
 int feenox_problem_init_parser_neutron_diffusion(void) {
 
-#ifdef HAVE_SLEPC  
+#ifdef HAVE_PETSC
   feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_neutron_diffusion;
   feenox.pde.bc_parse = feenox_problem_bc_parse_neutron_diffusion;
+#ifdef HAVE_SLEPC
   feenox.pde.setup_eps = feenox_problem_setup_eps_neutron_diffusion;
-//  feenox.pde.setup_ksp = feenox_problem_setup_ksp_neutron_diffusion;
-//  feenox.pde.setup_pc = feenox_problem_setup_pc_neutron_diffusion;
+#endif
+  feenox.pde.setup_ksp = feenox_problem_setup_ksp_neutron_diffusion;
+  feenox.pde.setup_pc = feenox_problem_setup_pc_neutron_diffusion;
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_neutron_diffusion_null;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_neutron_diffusion;
   feenox.pde.solve_post = feenox_problem_solve_post_neutron_diffusion;
   
-  // TODO: higher harmonics?
-  feenox.pde.nev = 1;
-
   // default is 1 group
   if (neutron_diffusion.groups == 0) {
     neutron_diffusion.groups = 1;
@@ -58,17 +57,8 @@ int feenox_problem_init_parser_neutron_diffusion(void) {
   // we'd rather ser nodes than cells 
   feenox.mesh.default_field_location = field_location_nodes;
   
-///va+keff+desc The effective multiplication factor\ $k_\text{eff}$.
+///va_neutron_diffusion+keff+desc The effective multiplication factor\ $k_\text{eff}$.
   neutron_diffusion.keff = feenox_define_variable_get_ptr("keff");
-
-  // define eigenvectors (we don't know its size yet)
-  feenox_check_alloc(feenox.pde.vectors.phi = calloc(feenox.pde.nev, sizeof(vector_t *)));
-  for (g = 0; g < feenox.pde.nev; g++) {
-    char *modename = NULL;
-    feenox_check_minusone(asprintf(&modename, "eig%d", g+1));
-    feenox_check_alloc(feenox.pde.vectors.phi[g] = feenox_define_vector_get_ptr(modename, 0));
-    feenox_free(modename);
-  }
 
 #endif
   
@@ -98,7 +88,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   feenox_check_alloc(neutron_diffusion.source = calloc(feenox.pde.dofs, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.sigma_s = calloc(feenox.pde.dofs, sizeof(distribution_t *)));
   unsigned int g = 0;
-  for (g = 0; g < feenox.pde.nev; g++) {
+  for (g = 0; g < feenox.pde.dofs; g++) {
     char *name = NULL;
 
     feenox_check_minusone(asprintf(&name, "D%d", g+1));
@@ -155,6 +145,26 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_push_error_message("neither fission nor sources found");
     return FEENOX_ERROR;
   }
+  
+  if (neutron_diffusion.has_sources == PETSC_FALSE) {
+#ifdef HAVE_SLEPC    
+    // TODO: higher harmonics?
+    feenox.pde.nev = 1;
+    
+    // define eigenvectors (we don't know its size yet)
+    feenox_check_alloc(feenox.pde.vectors.phi = calloc(feenox.pde.nev, sizeof(vector_t *)));
+    for (g = 0; g < feenox.pde.nev; g++) {
+      char *modename = NULL;
+      feenox_check_minusone(asprintf(&modename, "eig%d", g+1));
+      feenox_check_alloc(feenox.pde.vectors.phi[g] = feenox_define_vector_get_ptr(modename, 0));
+      feenox_free(modename);
+    }
+#else
+    feenox_push_error_message("criticality problems cannot be solved without SLEPc");
+    return FEENOX_ERROR;
+#endif
+  }
+  
 
   feenox.pde.math_type = (neutron_diffusion.has_sources == PETSC_TRUE) ? math_type_linear :  math_type_eigen;
   feenox.pde.solve     = (neutron_diffusion.has_sources == PETSC_TRUE) ? feenox_problem_solve_petsc_linear : feenox_problem_solve_slepc_eigen;
@@ -180,16 +190,20 @@ int feenox_problem_setup_pc_neutron_diffusion(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
+    if (neutron_diffusion.has_sources == PETSC_FALSE) {
+      // PC for EPS
 #ifdef PETSC_HAVE_MUMPS
-    petsc_call(PCSetType(pc, PCCHOLESKY));
-    petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+      petsc_call(PCSetType(pc, PCCHOLESKY));
+      petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #else
-    // TODO: this will complain in parallel
-    petsc_call(PCSetType(pc, PCLU));    
+      // TODO: this will complain in parallel
+      petsc_call(PCSetType(pc, PCLU));    
 #endif
+    } else {
+      // plain PC
+      // defaults
+    }
   }
-  
-  petsc_call(PCGetType(pc, &pc_type));
   
   return FEENOX_OK;
 }
@@ -199,8 +213,13 @@ int feenox_problem_setup_ksp_neutron_diffusion(KSP ksp ) {
   KSPType ksp_type = NULL;
   petsc_call(KSPGetType(ksp, &ksp_type));
   if (ksp_type == NULL) {
-    // if the user did not choose anything, we default to preonly + direct solver
-    petsc_call(KSPSetType(ksp, KSPPREONLY));
+    if (neutron_diffusion.has_sources == PETSC_FALSE) {
+      // KSP for EPS
+      // defaults
+    } else {
+      // plain KSP
+      // defaults
+    }
   }  
 
   return FEENOX_OK;
@@ -211,7 +230,7 @@ int feenox_problem_setup_ksp_neutron_diffusion(KSP ksp ) {
 int feenox_problem_setup_eps_neutron_diffusion(EPS eps) {
 
   // generalized non-hermitian problem
-  petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
+//  petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
   
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));

@@ -553,7 +553,14 @@ int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file) {
   for (i = 0; i < A->size1; i++) {
     for (j = 0; j < A->size2; j++) {
       xi = gsl_matrix_get(A, i, j);
-      fprintf(file, "% g ", (fabs(xi) > 1e-12)?xi:0.0);
+/*      
+    if (xi != 0) {
+      fprintf(file, "% .1e ", xi);
+    } else {
+      fprintf(file, "    0    ");
+    }      
+ */
+     fprintf(file, "% .1e ", (fabs(xi) > 1e-12)?xi:0.0);
     }
     fprintf(file, "\n");
   }

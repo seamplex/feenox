@@ -33,7 +33,7 @@ exitifwrong() {
 # checks if feenox is compiled with ida and skips the test if necessary
 checkida() {
  if [ $(${feenox} --versions | grep 'SUNDIAL' | grep -v 'N/A'| wc -l) = 0 ]; then
-  echo "FeenoX was not compiled with IDA, skipping test"
+  echo "FeenoX was not compiled with SUNDIALS, skipping test"
   exit 77
  fi
 }

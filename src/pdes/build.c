@@ -164,22 +164,25 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
     
   // initialize to zero the elemental objects
-  if (feenox.pde.has_stiffness) {
+  if (feenox.pde.has_stiffness == PETSC_TRUE) {
     gsl_matrix_set_zero(feenox.pde.Ki);
   }  
-  if (feenox.pde.has_mass) {
+  if (feenox.pde.has_mass == PETSC_TRUE) {
     gsl_matrix_set_zero(feenox.pde.Mi);
   }
-  if (feenox.pde.has_jacobian_K) {
+  if (feenox.pde.has_jacobian_K == PETSC_TRUE) {
     gsl_matrix_set_zero(feenox.pde.JKi);
   }
-  if (feenox.pde.has_jacobian_b) {
+  if (feenox.pde.has_jacobian_b == PETSC_TRUE) {
     gsl_matrix_set_zero(feenox.pde.Jbi);
   }
-  if (feenox.pde.has_rhs) {
+  if (feenox.pde.has_rhs == PETSC_TRUE) {
     gsl_vector_set_zero(feenox.pde.bi);
   }
 
+//  printf("Xi=\n");
+//  feenox_debug_print_gsl_matrix(feenox.pde.Mi, stdout);
+  
   // loop over gauss points to integrate elemental matrices and vectors
   unsigned int v = 0;
   for (v = 0; v < V; v++) {
@@ -187,6 +190,11 @@ int feenox_problem_build_element_volumetric(element_t *this) {
     feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, v));
   }
   
+//  printf("Ki=\n");
+//  feenox_debug_print_gsl_matrix(feenox.pde.Ki, stdout);
+//  printf("Xi=\n");
+//  feenox_debug_print_gsl_matrix(feenox.pde.Mi, stdout);
+ 
   // compute the indices of the DOFs to ensamble
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
 

@@ -141,7 +141,11 @@ int feenox_problem_dirichlet_set_K(void) {
   
   // TODO: scale up the diagonal!
   // see alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
-  petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b_bc));
+  if (feenox.pde.symmetric_K == PETSC_TRUE) {
+    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b_bc));
+  } else {  
+    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b_bc));
+  }  
   petsc_call(VecDestroy(&rhs));
   
   return FEENOX_OK;
@@ -161,7 +165,11 @@ int feenox_problem_dirichlet_set_M(void) {
   }
   
   // the mass matrix is like the stiffness one but with zero instead of one
-  petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+  if (feenox.pde.symmetric_M == PETSC_TRUE) {
+    petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+  } else {  
+    petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  
+  }  
 
   return FEENOX_OK;
 }

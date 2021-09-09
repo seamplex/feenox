@@ -79,11 +79,11 @@ int feenox_problem_solve_slepc_eigen(void) {
 
     // this should be faster but it is not
     // TODO: let the user choose
-   petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
+    petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
     
     // convergence with respect to the matrix norm
 //    petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_NORM));
-    
+  
     // specify how many eigenvalues (and eigenvectors) to compute.
     if (feenox.pde.eps_ncv.items != NULL) {
       petsc_call(EPSSetDimensions(feenox.pde.eps, feenox.pde.nev, (PetscInt)(feenox_expression_eval(&feenox.pde.eps_ncv)), PETSC_DEFAULT));
@@ -97,15 +97,12 @@ int feenox_problem_solve_slepc_eigen(void) {
     petsc_call(EPSSetFromOptions(feenox.pde.eps));
     
   }
-  
-  // TODO: have a MAT_VIEW / PETSC_VIEW instruction
-//  PetscViewerPushFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
-//  MatView(feenox.pde.K, PETSC_VIEWER_STDOUT_WORLD);
-  
+
   petsc_call(EPSSetInitialSpace(feenox.pde.eps, 1, &feenox.pde.phi));
   petsc_call(EPSSolve(feenox.pde.eps));
   PetscInt nconv = 0;
   petsc_call(EPSGetConverged(feenox.pde.eps, &nconv));
+
   if (nconv == 0) {
     feenox_push_error_message("no converged eigen-pairs found (%d requested)", feenox.pde.nev);
     return FEENOX_ERROR;
@@ -113,16 +110,19 @@ int feenox_problem_solve_slepc_eigen(void) {
     feenox_push_error_message("eigen-solver obtained only %d converged eigen-pairs (%d requested)", nconv, feenox.pde.nev);
     return FEENOX_ERROR;
   }
-  
+
   PetscScalar imag = 0;
   unsigned int i = 0;
   for (i = 0; i < feenox.pde.nev; i++) {
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &feenox.pde.eigenvector[i]));
     petsc_call(EPSGetEigenpair(feenox.pde.eps, i, &feenox.pde.eigenvalue[i], &imag, feenox.pde.eigenvector[i], PETSC_NULL));
+
+    // TODO: should we allow complex eigenvalues?
     if (fabs(imag) > feenox_var_value(feenox.pde.vars.eps_tol)) {
       feenox_push_error_message("the eigenvalue %d is complex (%g + i %g)", i+1, feenox.pde.eigenvalue[i], imag);
       return FEENOX_ERROR;
     }
+
   }
   
 #endif
