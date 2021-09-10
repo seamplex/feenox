@@ -14,5 +14,8 @@ checkpetsc
 answer ud20-1-0-sl-src.fee "0.474 0.495"
 exitifwrong $?
 
+answer ud20-1-0-sl-src-vacuum.fee "0.503 0.517"
+exitifwrong $?
+
 answer reflected-src.fee "0.6688 0.7116"
 exitifwrong $?

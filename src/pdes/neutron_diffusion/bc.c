@@ -30,13 +30,15 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = -1;
 
-  } else if (strcmp(lhs, "symmetry") == 0) {
+  } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "mirror") == 0) {
     bc_data->type_math = bc_type_math_neumann;
     bc_data->dof = -1;
 
   } else if (strcmp(lhs, "vacuum") == 0) {
-    // TODO: read coefficient
     bc_data->type_math = bc_type_math_robin;
+    
+    bc_data->set = feenox_problem_bc_set_neutron_diffusion_vacuum;
+    bc_data->fills_matrix = 1;
     bc_data->dof = -1;
     
   } else {
@@ -44,6 +46,10 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     return FEENOX_ERROR;
   }
 
+  feenox_call(feenox_expression_parse(&bc_data->expr, rhs));
+
+  // TODO: check consistency, non-linearities, etc.
+  
   return FEENOX_OK;
 }
 
@@ -56,6 +62,28 @@ int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *bc_data, size_t node
   for (g = 0; g < feenox.pde.dofs; g++) {
     feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[g], 0));
   }
+#endif
+  
+  return FEENOX_OK;
+}
+
+
+// this virtual method builds the surface elemental matrix
+int feenox_problem_bc_set_neutron_diffusion_vacuum(element_t *element, bc_data_t *bc_data, unsigned int v) {
+  
+#ifdef HAVE_PETSC
+
+  // TODO: remove duplicate, use a macro
+  feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  if (bc_data->space_dependent) {
+    feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
+    feenox_mesh_update_coord_vars(element->x[v]);
+  }
+  
+  double coeff = (bc_data->expr.items != NULL) ? feenox_expression_eval(&bc_data->expr) : 0.5;
+  gsl_blas_dgemm(CblasTrans, CblasNoTrans, element->w[v] * coeff, element->H[v], element->H[v], 1.0, feenox.pde.Ki);
+  
 #endif
   
   return FEENOX_OK;

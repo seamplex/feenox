@@ -40,6 +40,7 @@ extern int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element
 // neutron_diffusion/bc.c
 extern int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, const char *rhs);
 extern int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *bc_data, size_t node_index);
+extern int feenox_problem_bc_set_neutron_diffusion_vacuum(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 // neutron_diffusion/post.c
 extern int feenox_problem_solve_post_neutron_diffusion(void);

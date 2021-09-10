@@ -29,7 +29,6 @@ int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, const c
 ///bc_laplace+phi+usage phi=<expr>
 ///bc_laplace+phi+description Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.   
   if (strcmp(lhs, "phi") == 0) {
-    bc_data->type_phys = BC_TYPE_LAPLACE_DIRICHLET;
     bc_data->type_math = bc_type_math_dirichlet;
 
 
@@ -38,7 +37,6 @@ int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, const c
 ///bc_laplace+dphidn+usage dphidn=<expr>
 ///bc_laplace+dphidn+description Alias for `phi'`.     
   } else if (strcmp(lhs, "phi'") == 0 || strcmp(lhs, "dphidn") == 0) {
-    bc_data->type_phys = BC_TYPE_LAPLACE_NEUMANN;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set = feenox_problem_bc_set_laplace_derivative;
 
@@ -52,8 +50,8 @@ int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, const c
   bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
   bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
 
-  if (bc_data->nonlinear && bc_data->type_phys == BC_TYPE_LAPLACE_NEUMANN) {
-    feenox_push_error_message("essential boundary condition '%s' cannot depend on temperature", rhs);
+  if (bc_data->nonlinear && bc_data->type_math == bc_type_math_dirichlet) {
+    feenox_push_error_message("essential boundary condition '%s' cannot depend on phi", rhs);
     return FEENOX_ERROR;
   }
   

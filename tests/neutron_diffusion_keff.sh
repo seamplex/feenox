@@ -14,5 +14,8 @@ checkslepc
 answerzero ud20-1-0-sl.fee
 exitifwrong $?
 
+answer ud20-1-0-sl-vacuum.fee "0.996595"
+exitifwrong $?
+
 answer reflected.fee "1.0902 0.5053 0.5313"
 exitifwrong $?

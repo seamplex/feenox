@@ -1805,7 +1805,7 @@ struct feenox_t {
     gsl_matrix *Jbi;              // elementary jacobian for RHS vector
     gsl_vector *bi;               // elementary right-hand side vector
     // TODO: shouldn't this be Hb?
-    gsl_vector *Nb;               // teporary vector for weak BCs
+    gsl_vector *Nb;               // teporary vector for natural BCs
 
 #endif  // HAVE_PETSC    
     
@@ -2232,7 +2232,7 @@ extern int feenox_expression_depends_on_function(function_ll_t *functions, funct
 // build.c
 extern int feenox_problem_build(void);
 extern int feenox_problem_build_element_volumetric(element_t *this);
-extern int feenox_problem_build_element_weakbc(element_t *this, bc_data_t *bc_data);
+extern int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data);
 extern int feenox_problem_build_allocate_elemental_objects(element_t *this);
 extern int feenox_problem_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
 extern int feenox_problem_build_elemental_objects_allocate(element_t *this);

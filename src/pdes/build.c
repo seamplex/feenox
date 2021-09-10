@@ -61,7 +61,7 @@ int feenox_problem_build(void) {
           if (bc_data->set != NULL && bc_data->type_math != bc_type_math_dirichlet && bc_data->disabled == 0) {
             // and only apply them if the condition holds true (or if there's no condition at all)
             if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
-              feenox_call(feenox_problem_build_element_weakbc(&feenox.pde.mesh->element[i], bc_data));
+              feenox_call(feenox_problem_build_element_natural_bc(&feenox.pde.mesh->element[i], bc_data));
             }  
           }  
         }
@@ -219,7 +219,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   return FEENOX_OK;
 }
 
-int feenox_problem_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
+int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data) {
 
 #ifdef HAVE_PETSC
   // total number of gauss points
@@ -231,9 +231,13 @@ int feenox_problem_build_element_weakbc(element_t *this, bc_data_t *bc_data) {
   
   if (feenox.pde.Nb == NULL) {
     feenox_check_alloc(feenox.pde.Nb = gsl_vector_calloc(feenox.pde.dofs));
+  } else {
+    gsl_vector_set_zero(feenox.pde.Nb);
   }
-  gsl_vector_set_zero(feenox.pde.Nb);
-  gsl_vector_set_zero(feenox.pde.bi);
+
+  if (feenox.pde.has_rhs)   {
+    gsl_vector_set_zero(feenox.pde.bi);
+  }  
   if (bc_data->fills_matrix) {
     gsl_matrix_set_zero(feenox.pde.Ki);
   }
