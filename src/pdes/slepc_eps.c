@@ -31,6 +31,17 @@ int feenox_problem_solve_slepc_eigen(void) {
   feenox_call(feenox_problem_dirichlet_eval());
   feenox_call(feenox_problem_dirichlet_set_K());  
   feenox_call(feenox_problem_dirichlet_set_M());
+
+  // TODO: to help debug stuff, allow to execute DUMPs after building but before crashing  
+/*  
+  dump_t *dump = calloc(1, sizeof(dump));
+  dump->K = 1;
+  dump->K_bc = 1;
+  dump->M = 1;
+  dump->M_bc = 1;
+  dump->format = dump_format_octave;
+  feenox_instruction_dump(dump);
+*/
   
   if (feenox.pde.eps == NULL) {
     petsc_call(EPSCreate(PETSC_COMM_WORLD, &feenox.pde.eps));

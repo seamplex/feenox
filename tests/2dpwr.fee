@@ -1,0 +1,57 @@
+#                       BENCHMARK PROBLEM
+#          
+# Identification: 11-A2          Source Situation ID.11
+# Date Submitted: June 1976      By: R. R. Lee (CE)
+#                                    D. A. Menely (Ontario Hydro)
+#                                    B. Micheelsen (Riso-Denmark)
+#                                    D. R. Vondy (ORNL)
+#                                    M. R. Wagner (KWU)
+#                                    W. Werner (GRS-Munich)
+#
+# Date Accepted:  June 1977      By: H. L. Dodds, Jr. (U. of Tenn.)
+#                                    M. V. Gregory (SRL)
+#
+# Descriptive Title: Two-dimensional LWR Problem,
+#                    also 2D IAEA Benchmark Problem
+#
+# Reduction of Source Situation
+#           1. Two-groupo diffusion theory
+#           2. Two-dimensional (x,y)-geometry
+#
+PROBLEM neutron_diffusion 2D GROUPS 2
+DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eigth
+READ_MESH 2dpwr-$1.msh
+
+# define materials and cross sections according to the two-group constants
+# each material corresponds to a physical entity in the geometry file
+Bg2 = 0.8e-4  # axial geometric buckling in the z direction
+MATERIAL fuel1 {
+  D1=1.5    Sigma_a1=0.010+D1(x,y)*Bg2    Sigma_s1.2=0.02
+  D2=0.4    Sigma_a2=0.080+D2(x,y)*Bg2    nuSigma_f2=0.135   }#eSigmaF_2 nuSigmaF_2(x,y) }
+
+MATERIAL fuel2 {
+  D1=1.5    Sigma_a1=0.010+D1(x,y)*Bg2    Sigma_s1.2=0.02
+  D2=0.4    Sigma_a2=0.085+D2(x,y)*Bg2    nuSigma_f2=0.135   }#eSigmaF_2 nuSigmaF_2(x,y) }
+
+MATERIAL fuel2rod {
+  D1=1.5    Sigma_a1=0.010+D1(x,y)*Bg2    Sigma_s1.2=0.02
+  D2=0.4    Sigma_a2=0.130+D2(x,y)*Bg2    nuSigma_f2=0.135   }#eSigmaF_2 nuSigmaF_2(x,y) }
+
+MATERIAL reflector {
+  D1=2.0    Sigma_a1=0.000+D1(x,y)*Bg2    Sigma_s1.2=0.04
+  D2=0.3    Sigma_a2=0.010+D2(x,y)*Bg2 }
+
+  
+# define boundary conditions as requested by the problem
+BC external vacuum=0.4692  # "external" is the name of the entity in the .geo
+BC mirror   mirror         # the first mirror is the name, the second is the BC type
+
+# # set the power setpoint equal to the volume of the core
+# # (and set eSigmaF_2 = nuSigmaF_2 as above)
+# power = 17700
+
+SOLVE_PROBLEM   # solve!
+PRINT %.5f keff
+
+
+

@@ -18,6 +18,7 @@ TESTS = tests/abort.sh \
         tests/expressions_functions.sh \
         tests/exp.sh \
         tests/iterative.sh \
+        tests/iaea-pwr.sh \
         tests/fit.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \

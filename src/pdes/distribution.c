@@ -227,7 +227,19 @@ double feenox_distribution_eval_function_local(distribution_t *this, const doubl
 double feenox_distribution_eval_property(distribution_t *this, const double *x, material_t *material) {
 
   if (material == NULL) {
-    return 0;
+    // these can be zeroes if the properties do not depend on space
+    switch (feenox.pde.dim) {
+      case 1:
+        feenox_push_error_message("cannot find a material for point x=%g", x[0]);
+        break;
+      case 2:
+        feenox_push_error_message("cannot find a material for point x=%g, y=%g", x[0], x[1]);
+        break;
+      case 3:
+        feenox_push_error_message("cannot find a material for point x=%g, y=%g, z=%g", x[0], x[1], x[2]);
+        break;
+    }
+    feenox_runtime_error();
   }
   
   if (material != this->last_material) {
