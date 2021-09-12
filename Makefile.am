@@ -2,7 +2,13 @@
 SUBDIRS = src
 
 dist_doc_DATA = AUTHORS ChangeLog README TODO \
-                doc/feenox.texi doc/logo.svg doc/feenox.xml
+                doc/feenox.pdf \
+                doc/CODE_OF_CONDUCT.md \
+                doc/feenox.xml \
+                doc/programming.md \
+                doc/FAQ.md \
+                doc/syntax-kate.sh \
+                doc/syntax-tex.sh
 
 dist_man_MANS = doc/feenox.1
 

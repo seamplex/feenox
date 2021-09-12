@@ -1,5 +1,6 @@
 ---
 author: Jeremy Theler
+classoption: oneside
 desc: a completely free-as-in-freedom finite-element thermo-mechancial
   solver desinged and implemented following the UNIX principles
 documentclass: book
@@ -7,6 +8,7 @@ infoname: feenox
 lang: en-US
 subtitle: A free no-fee no-X uniX-like finite-element(ish) computational
   engineering tool
+template: manual.tex
 title: FeenoX manual
 ---
 
@@ -2773,7 +2775,7 @@ PRINT "difference" t2-t1 "[seconds]"
 ``` terminal
 $ feenox clock.fee
 doing something in between
-difference	0.000149072	[seconds]
+difference	4.6329e-05	[seconds]
 $
 ```
 

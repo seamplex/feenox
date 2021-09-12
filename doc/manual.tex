@@ -301,7 +301,7 @@ $else$
 \makesavenoteenv{longtable}
 $endif$
 $endif$
-
+$if(graphics)$
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -315,43 +315,14 @@ $endif$
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+$endif$
 
-% headers y footers a medida
-\usepackage{lastpage}
+% show the hash in the footer
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\fancyhf{} % clear all header and footer fields
-$if(title)$
-\lhead{$title$}
-$endif$
-\lfoot{\scriptsize{$if(date)$ $date$ $endif$ / $if(hash)$ \texttt{$hash$} $endif$}}
-\rfoot{\thepage/\pageref{LastPage}}
-\rhead{\includegraphics[height=10pt]{logo}}
-\renewcommand{\headrulewidth}{0.0pt}
-\renewcommand{\footrulewidth}{0.4pt}
-
-\fancypagestyle{plain}{%
-\fancyhf{} % clear all header and footer fields
 $if(hash)$
-\cfoot{\scriptsize{$if(date)$ $date$ $endif$ / $if(hash)$ \texttt{$hash$} $endif$}}
+\lfoot{\scriptsize{$if(date)$ $date$ $endif$ / $if(hash)$ \texttt{$hash$} $endif$}}
 $endif$
-\renewcommand{\headrulewidth}{0pt}
-\renewcommand{\footrulewidth}{0pt}}
-
-% quotes with a bar in the left (like bootstrap)
-% \usepackage{framed}
-% \renewenvironment{quote}%
-% {\begin{leftbar}\begin{quotation}}%
-% {\end{quotation}\end{leftbar}}
-
-\usepackage{mdframed}
-\global\mdfdefinestyle{exampledefault}{linecolor=gray,linewidth=2pt,leftmargin=0.5cm,rightmargin=0.5cm,topline=false,bottomline=false,rightline=false}
-
-\renewenvironment{quote}%
-{\begin{mdframed}[style=exampledefault]}%
-{\end{mdframed}}
-
-
 $if(links-as-notes)$
 % Make links footnotes instead of hotlinks:
 \DeclareRobustCommand{\href}[2]{#2\footnote{\url{#1}}}
@@ -466,10 +437,7 @@ $if(csquotes)$
 \usepackage{csquotes}
 $endif$
 \usepackage{subfig}
-% SIunits
-\usepackage{siunitx}
 
-% fuente para los captions de figuras
 \usepackage{caption}
 \renewcommand{\captionfont}{\sf\small}
 % \renewcommand{\captionlabelfont}{\bf\sf}
@@ -485,12 +453,6 @@ $else$
 \providecommand{\subtitle}[1]{% add subtitle to \maketitle
   \apptocmd{\@title}{\par {\large #1 \par}}{}{}
 }
-\renewcommand*{\maketitle}{%
-\thispagestyle{plain}
-\begin{center}\huge\bfseries\@title\unskip\strut\par\end{center}
-}
-
-
 \makeatother
 $endif$
 \subtitle{$subtitle$}
@@ -513,10 +475,6 @@ $endif$
 $if(has-frontmatter)$
 \frontmatter
 $endif$
-% \thispagestyle{empty}
-% \thispagestyle{plain}
-% \thispagestyle{fancy}
-
 $if(title)$
 $if(beamer)$
 \frame{\titlepage}
@@ -552,17 +510,11 @@ $if(colorlinks)$
 $endif$
 \setcounter{tocdepth}{$toc-depth$}
 \tableofcontents
-\pagebreak
 }
 $endif$
 $endif$
-$if(lot)$
-\listoftables
-\pagebreak
-$endif$
 $if(lof)$
 \listoffigures
-\pagebreak
 $endif$
 $if(lot)$
 \listoftables

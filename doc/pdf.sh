@@ -109,6 +109,10 @@ if [ -z "${dir}" ]; then
  echo "cannot find directory with TeX template and Lua filters"
 fi
 
+template=$(grep template feenox.md | cut -d' ' -f2)
+if [ -z "${template}" ]; then
+  template=single.tex
+fi
 
 pandoc ${dir}/hash.yaml ${dir}/pdf.yaml ${stuff}.md \
   --standalone --toc \
@@ -118,6 +122,6 @@ pandoc ${dir}/hash.yaml ${dir}/pdf.yaml ${stuff}.md \
   --lua-filter=${dir}/not-in-format.lua \
   --lua-filter ${dir}/code-style.lua \
   --listings --number-sections \
-  --template=${dir}/single.tex \
+  --template=${dir}/${template} \
   --pdf-engine=xelatex \
   -o ${stuff}.pdf

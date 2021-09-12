@@ -35,12 +35,12 @@ cd ${package}
  ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
              --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static" || exit 1
             
- if [ "x${target}" = "xlinux-amd64" ]; then
-  cd doc
-   make pdf || exit 1
-   make info || exit 1
-  cd ..
- fi 
+#  if [ "x${target}" = "xlinux-amd64" ]; then
+#   cd doc
+#    make pdf || exit 1
+#    make info || exit 1
+#   cd ..
+#  fi 
  make || exit 1
 cd ..
 
@@ -75,14 +75,14 @@ cd ${package}-${version}-${target}
     
   fi
 
-  # cp ../${package}/doc/${package}.svg      share/doc
   cp ../${package}/doc/${package}.xml      share/doc
-  # cp ../${package}/doc/reference.txt share/doc
   cp ../${package}/doc/${package}.pdf      share/doc
-  cp ../${package}/doc/${package}.texi     share/doc
-  cp ../${package}/doc/${package}.info     share/doc
+  cp ../${package}/doc/syntax-kate.sh      share/doc
+  cp ../${package}/doc/syntax-tex.sh       share/doc
+#   cp ../${package}/doc/${package}.texi     share/doc
+#   cp ../${package}/doc/${package}.info     share/doc
 
-  cp -r ../${package}/examples/*       share/doc/examples
+#   cp -r ../${package}/examples/*       share/doc/examples
   cp -r ../${package}/tests/*          share/doc/tests
   
   cp ../${package}/doc/${package}.1 share/man/man1

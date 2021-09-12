@@ -5,7 +5,9 @@ desc: a completely free-as-in-freedom finite-element thermo-mechancial solver de
 author: Jeremy Theler
 infoname: feenox
 lang: en-US
+template: manual.tex
 documentclass: book
+classoption: oneside
 ...
 
 # Overview

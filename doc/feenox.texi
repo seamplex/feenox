@@ -3341,7 +3341,7 @@ PRINT "difference" t2-t1 "[seconds]"
 @verbatim
 $ feenox clock.fee
 doing something in between
-difference	0.000149072	[seconds]
+difference	4.6329e-05	[seconds]
 $
 @end verbatim
 @end smallformat
