@@ -76,7 +76,7 @@ cd ${package}-${version}-${target}
   fi
 
   cp ../${package}/doc/${package}.xml      share/doc
-  cp ../${package}/doc/${package}.pdf      share/doc
+#   cp ../${package}/doc/${package}.pdf      share/doc
   cp ../${package}/doc/syntax-kate.sh      share/doc
   cp ../${package}/doc/syntax-tex.sh       share/doc
 #   cp ../${package}/doc/${package}.texi     share/doc

@@ -2,7 +2,6 @@
 SUBDIRS = src
 
 dist_doc_DATA = AUTHORS ChangeLog README TODO \
-                doc/feenox.pdf \
                 doc/CODE_OF_CONDUCT.md \
                 doc/feenox.xml \
                 doc/programming.md \
