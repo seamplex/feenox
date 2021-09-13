@@ -28,6 +28,11 @@ touch src/variables.mak
 version=$(git describe --tags | sed 's/-/./')
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
+rm -f config_links.m4
+for i in tests/*.sh tests/*.fee; do
+ echo "AC_CONFIG_LINKS([${i}:${i}])" >> config_links.m4
+done
+
 echo "calling autoreconf... "
 autoreconf -i
 # automake --add-missing
