@@ -9,3 +9,7 @@ fi
 rm -f *~ .*~ src/*~
 rm -f src/variables.mak
 cat .gitignore | grep -v nbproject | grep -v gsl | sed '/^#.*/ d' | sed '/^\s*$/ d' | sed 's/^/rm -rf /' | bash
+cd tests
+cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$/ d' | sed 's/^/rm -rf /' | bash
+cd ..
+

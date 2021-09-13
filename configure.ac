@@ -328,16 +328,16 @@ Either install them with your package manager or configure with --enable-downloa
 ######################
 # create version.h
 AC_MSG_NOTICE([creating version.h])
-rm -f src/version.h
+rm -f ${srcdir}/src/version.h
 
 feenox_version=feenoxversion
-cat << EOF >> src/version.h
+cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_VERSION       "${feenox_version}"
 
 EOF
 
 AS_IF([test -e .git -a ! -z "$(which git)"],[
-  cat << EOF >> src/version.h
+  cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_GIT_VERSION   "$(git describe --tags | sed 's/-/./')"
 #define FEENOX_GIT_BRANCH    "$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')"
 #define FEENOX_GIT_DATE      "$(git log --pretty=format:"%ad" | head -n1)"
@@ -357,7 +357,7 @@ AS_IF([test "x${have_petsc}" = "xyes"],[
 ])
 
 
-cat << EOF >> src/version.h
+cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_COMPILATION_DATE     "$(date +'%a %b %d %H:%M:%S %Y %z')"
 
 #define FEENOX_COMPILATION_USERNAME "$(whoami | sed s/\\\\\\\\//)"
@@ -515,8 +515,6 @@ AC_CONFIG_LINKS([tests/square.geo:tests/square.geo])
 AC_CONFIG_LINKS([tests/two-squares-quad.geo:tests/two-squares-quad.geo])
 AC_CONFIG_LINKS([tests/two-squares.geo:tests/two-squares.geo])
 AC_CONFIG_LINKS([tests/ud20-1-0-sl.geo:tests/ud20-1-0-sl.geo])
-AC_CONFIG_LINKS([tests/2dpwr-eighth.msh:tests/2dpwr-eighth.msh])
-AC_CONFIG_LINKS([tests/2dpwr-quarter.msh:tests/2dpwr-quarter.msh])
 AC_CONFIG_LINKS([tests/beam-cantilever-hex20.msh:tests/beam-cantilever-hex20.msh])
 AC_CONFIG_LINKS([tests/beam-cantilever-hex27.msh:tests/beam-cantilever-hex27.msh])
 AC_CONFIG_LINKS([tests/beam-cantilever-hex8.msh:tests/beam-cantilever-hex8.msh])
@@ -524,13 +522,10 @@ AC_CONFIG_LINKS([tests/beam-cantilever-tet10.msh:tests/beam-cantilever-tet10.msh
 AC_CONFIG_LINKS([tests/beam-cantilever-tet4.msh:tests/beam-cantilever-tet4.msh])
 AC_CONFIG_LINKS([tests/cylinder.msh:tests/cylinder.msh])
 AC_CONFIG_LINKS([tests/mesh2d-bin.msh:tests/mesh2d-bin.msh])
-AC_CONFIG_LINKS([tests/nafems-le10.msh:tests/nafems-le10.msh])
-AC_CONFIG_LINKS([tests/nafems-t4.msh:tests/nafems-t4.msh])
 AC_CONFIG_LINKS([tests/reflected.msh:tests/reflected.msh])
 AC_CONFIG_LINKS([tests/slab-1d-0.1m.msh:tests/slab-1d-0.1m.msh])
 AC_CONFIG_LINKS([tests/slab-3d-0.1m.msh:tests/slab-3d-0.1m.msh])
 AC_CONFIG_LINKS([tests/slab.msh:tests/slab.msh])
-AC_CONFIG_LINKS([tests/square-centered.msh:tests/square-centered.msh])
 AC_CONFIG_LINKS([tests/square.msh:tests/square.msh])
 AC_CONFIG_LINKS([tests/square22.msh:tests/square22.msh])
 AC_CONFIG_LINKS([tests/square40.msh:tests/square40.msh])
@@ -544,6 +539,16 @@ AC_CONFIG_LINKS([tests/data1d.dat:tests/data1d.dat])
 AC_CONFIG_LINKS([tests/data1d_columns.dat:tests/data1d_columns.dat])
 AC_CONFIG_LINKS([tests/data2d.dat:tests/data2d.dat])
 AC_CONFIG_LINKS([tests/flux.dat:tests/flux.dat])
+AC_CONFIG_LINKS([tests/algebraic_expr.ref:tests/algebraic_expr.ref])
+AC_CONFIG_LINKS([tests/expressions_variables.ref:tests/expressions_variables.ref])
+AC_CONFIG_LINKS([tests/fibo_formula.ref:tests/fibo_formula.ref])
+AC_CONFIG_LINKS([tests/fibo_iterative.ref:tests/fibo_iterative.ref])
+AC_CONFIG_LINKS([tests/fibo_vector.ref:tests/fibo_vector.ref])
+AC_CONFIG_LINKS([tests/find_extrema2d.ref:tests/find_extrema2d.ref])
+AC_CONFIG_LINKS([tests/fit1d_gradient.ref:tests/fit1d_gradient.ref])
+AC_CONFIG_LINKS([tests/function_vectors1d.ref:tests/function_vectors1d.ref])
+AC_CONFIG_LINKS([tests/nafems-le10.ref:tests/nafems-le10.ref])
+AC_CONFIG_LINKS([tests/thermal-slab-uniform-source-octave.ref:tests/thermal-slab-uniform-source-octave.ref])
 
 
 
