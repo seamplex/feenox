@@ -48,6 +48,13 @@ TESTS = \
 XFAIL_TESTS = tests/abort.sh         
 
 DISTCLEANFILES = \
+                 config.guess \
+                 compile \
+                 depcomp \
+                 install-sh \
+                 config.sub \
+                 test-driver \
+                 missing \
                  feenox \
                  tests/function_vectors1d.last \
                  tests/nafems-le10.msh \

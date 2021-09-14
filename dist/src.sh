@@ -15,13 +15,17 @@ fi
 # -----------------------------------------------------------
 #   source
 # -----------------------------------------------------------
-cd ${package}
-#  autoreconf -i
- ./autogen.sh
- automake --add-missing --force-missing
- ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
-#  make dist
- make distcheck
+if [ ! -e ${package}-src ]; then
+  git clone .. ${package}-src
+else
+  cd ${package}-src; git pull || exit 1; cd ..
+fi
+
+cd ${package}-src
+ ./autogen.sh || exit 1
+ ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH="" || exit 1
+ automake --add-missing --force-missing || exit 1
+ make distcheck || exit 1
 cd ..
 
 if [ ! -e src ]; then
@@ -29,8 +33,8 @@ if [ ! -e src ]; then
   mkdir src
 fi
 
-if [ -e ${package}/${package}-${version}.tar.gz ]; then
- mv ${package}/${package}-${version}.tar.gz src
+if [ -e ${package}-src/${package}-${version}.tar.gz ]; then
+ mv ${package}-src/${package}-${version}.tar.gz src
 else
  echo "cannot create source tarball, quitting"
  exit 1
