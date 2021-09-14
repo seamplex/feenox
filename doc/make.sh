@@ -109,20 +109,20 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
 # pandoc -s -t html feenox.1 -o feenox.1.html
 
 
-# manual (to markdown and not gfm because of the heavy math)
-echo "full manual in markdown & texi"
-pandoc feenox.md -t markdown-fenced_divs -o feenox.markdown \
-  --standalone --toc --reference-links --reference-location=section \
-  --lua-filter=include-files.lua \
-  --lua-filter=include-code-files.lua \
-  --lua-filter=not-in-format.lua
+# # manual (to markdown and not gfm because of the heavy math)
+# echo "full manual in markdown & texi"
+# pandoc feenox-manual.md -t markdown-fenced_divs -o feenox-manual.markdown \
+#   --standalone --toc --reference-links --reference-location=section \
+#   --lua-filter=include-files.lua \
+#   --lua-filter=include-code-files.lua \
+#   --lua-filter=not-in-format.lua
 
-pandoc feenox.md --template template.texi -o feenox.texi \
+pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua
-sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox.texi
-sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox.texi         
+sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
+sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 
 

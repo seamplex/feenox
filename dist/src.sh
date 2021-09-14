@@ -16,10 +16,12 @@ fi
 #   source
 # -----------------------------------------------------------
 cd ${package}
- autoreconf -i
- ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
+#  autoreconf -i
+ ./autogen.sh
  automake --add-missing --force-missing
- make dist
+ ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
+#  make dist
+ make distcheck
 cd ..
 
 if [ ! -e src ]; then

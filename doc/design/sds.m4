@@ -83,7 +83,8 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
  * has a similar (but more comprehensive) API for Python/Julia,
  * etc.
  
-\noindent it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)) for scaling up large problems,
+`\noindent`{=latex}
+it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)) for scaling up large problems,
 
 include(lorenz-le11.md)
 
@@ -165,7 +166,8 @@ There are two ways of performing parametric runs in FeenoX. The first one is thr
 include(parametric/hello.fee)
 ```
 
-\noindent then it can be used as a custom greeting tool:
+`\noindent`{=latex}
+then it can be used as a custom greeting tool:
 
 ```{.terminal style=terminal}
 $ feenox World
@@ -189,7 +191,8 @@ Consider the input file
 include(parametric/two-squares-thermal.fee)
 ```
 
-\noindent and the shell script
+`\noindent`{=latex}
+and the shell script
 
 ```{.bash style=bash}
 include(parametric/two-squares-thermal.sh)

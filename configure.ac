@@ -327,7 +327,7 @@ Either install them with your package manager or configure with --enable-downloa
 
 ######################
 # create version.h
-AC_MSG_NOTICE([creating version.h])
+AC_MSG_NOTICE([creating ${srcdir}/src/version.h])
 rm -f ${srcdir}/src/version.h
 
 feenox_version=feenoxversion

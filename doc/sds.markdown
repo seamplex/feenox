@@ -239,7 +239,7 @@ licensing scheme.
 > -   computational fluid dynamics
 > -   ...
 >
-> `\noindent`{=tex} on one or more manistream cloud servers,
+> `\noindent`{=latex} on one or more manistream cloud servers,
 > i.e. computers with an architecture (i.e. hardware and operating
 > systems, futher discussed in sec. 2) that allows them to be available
 > online and accessed remotely either interactively or automatically by
@@ -371,7 +371,7 @@ Gmsh also
 -   has a similar (but more comprehensive) API for Python/Julia,
 -   etc.
 
-`\noindent `{=tex}it is a perfect match for FeenoX. Even more, it
+`\noindent`{=latex} it is a perfect match for FeenoX. Even more, it
 provides suitable domain decomposition methods (through other FOSS
 third-party libraries such as [Metis]) for scaling up large problems,
 
@@ -693,7 +693,7 @@ terminal command. When invoked without arguments, it prints its version,
 one-line description and the usage options:
 
 ``` {.terminal style="terminal"}
-FeenoX v0.1.57-g9ceb349-dirty 
+FeenoX v0.1.62-g26f2a14-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]
@@ -740,7 +740,7 @@ literals `$1`, `$2`, etc. appearing in the input file. For example, if
 PRINT "Hello $1!"
 ```
 
-`\noindent `{=tex}then it can be used as a custom greeting tool:
+`\noindent`{=latex} then it can be used as a custom greeting tool:
 
 ``` {.terminal style="terminal"}
 $ feenox World
@@ -781,7 +781,7 @@ SOLVE_PROBLEM
 PRINT TEXT $1 TEXT "Tright=$1" T(1,0.5)
 ```
 
-`\noindent `{=tex}and the shell script
+`\noindent`{=latex} and the shell script
 
 ``` {.bash style="bash"}
 #!/bin/bash
@@ -1016,7 +1016,7 @@ i.e. no RELAP yaml/json friendly outputs vtk (vtu), gmsh, frd?
 > -   user-reported bug tracking support.
 > -   etc.
 >
-> `\noindent `{=tex}but since the tool falls in the category of
+> `\noindent`{=latex} but since the tool falls in the category of
 > engineering computational software, verification and validation
 > procedures are also mandatory, as discussed below. Design should be
 > such that governance of engineering data including problem definition,
@@ -1087,7 +1087,7 @@ mailing listings
 > > represents the developer's conceptual description of the model and
 > > the solution to the model.
 >
-> `\noindent`{=tex} a.k.a. checking if the tool is solving right the
+> `\noindent`{=latex} a.k.a. checking if the tool is solving right the
 > equations, should be performed before applying the code to solve any
 > industrial problem. Depending on the nature and regulation of the
 > industry, the verification guidelines and requirements may vary. Since
@@ -1157,7 +1157,7 @@ gitlab, github, bitbucket
 > -   boundary condition,
 > -   data interpolation scheme
 >
-> `\noindent `{=tex}or any other particular application-dependent
+> `\noindent`{=latex} or any other particular application-dependent
 > feature is needed.
 >
 > A report following the V&V procedure defined above should be prepared

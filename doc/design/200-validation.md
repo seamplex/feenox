@@ -12,8 +12,9 @@ a.k.a. checking that the right equations are being solved by the tool. This proc
  * material model,
  * boundary condition,
  * data interpolation scheme
- 
-\noindent or any other particular application-dependent feature is needed.
+
+`\noindent`{=latex}
+or any other particular application-dependent feature is needed.
 
 A report following the V&V procedure defined above should be prepared and signed by a responsible engineer in a case-by-case basis for each particular field of application of the tool. Verification can be performed against
 

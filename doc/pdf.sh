@@ -109,7 +109,7 @@ if [ -z "${dir}" ]; then
  echo "cannot find directory with TeX template and Lua filters"
 fi
 
-template=$(grep template feenox.md | cut -d' ' -f2)
+template=$(grep template ${stuff}.md | cut -d' ' -f2)
 if [ -z "${template}" ]; then
   template=single.tex
 fi

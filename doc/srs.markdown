@@ -168,7 +168,7 @@ problems which are usually casted as differential-algebraic equations
 -   computational fluid dynamics
 -   ...
 
-`\noindent`{=tex} on one or more manistream cloud servers,
+`\noindent`{=latex} on one or more manistream cloud servers,
 i.e. computers with an architecture (i.e. hardware and operating
 systems, futher discussed in sec. 2) that allows them to be available
 online and accessed remotely either interactively or automatically by
@@ -390,7 +390,7 @@ Some best-practices for developing generic software are required such as
 -   user-reported bug tracking support.
 -   etc.
 
-`\noindent `{=tex}but since the tool falls in the category of
+`\noindent`{=latex} but since the tool falls in the category of
 engineering computational software, verification and validation
 procedures are also mandatory, as discussed below. Design should be such
 that governance of engineering data including problem definition,
@@ -448,7 +448,7 @@ Verification, defined as
 > represents the developer's conceptual description of the model and the
 > solution to the model.
 
-`\noindent`{=tex} a.k.a. checking if the tool is solving right the
+`\noindent`{=latex} a.k.a. checking if the tool is solving right the
 equations, should be performed before applying the code to solve any
 industrial problem. Depending on the nature and regulation of the
 industry, the verification guidelines and requirements may vary. Since
@@ -514,8 +514,8 @@ problem type when a new
 -   boundary condition,
 -   data interpolation scheme
 
-`\noindent `{=tex}or any other particular application-dependent feature
-is needed.
+`\noindent`{=latex} or any other particular application-dependent
+feature is needed.
 
 A report following the V&V procedure defined above should be prepared
 and signed by a responsible engineer in a case-by-case basis for each

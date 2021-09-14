@@ -2209,7 +2209,7 @@ int feenox_parse_endif(void) {
 
 int feenox_parse_phase_space(void) {
     
-///kw_pde+PHASE_SPACE+usage PHASE_SPACE <vars> ... <vectors> ... <matrices> ... 
+///kw_dae+PHASE_SPACE+usage PHASE_SPACE <vars> ... <vectors> ... <matrices> ... 
 
   if (feenox.dae.dimension != 0) {
     feenox_push_error_message("PHASE_SPACE keyword already given");

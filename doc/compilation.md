@@ -81,7 +81,7 @@ These optional dependencies have to be installed separately. There is no option 
  
 ### SUNDIALS
 
-[SUNDIALS](https://computing.llnl.gov/projects/sundials) is a SUite of Nonlinear and DIfferential/ALgebraic equation Solvers. It is used by FeenoX to solve dynamical systems casted as DAEs with the keyword `PHASE_SPACE, like the Lorenz system.
+[SUNDIALS](https://computing.llnl.gov/projects/sundials) is a SUite of Nonlinear and DIfferential/ALgebraic equation Solvers. It is used by FeenoX to solve dynamical systems casted as DAEs with the keyword `PHASE_SPACE`, like the Lorenz system.
 
 Install either by doing
 
@@ -89,7 +89,6 @@ Install either by doing
 sudo apt-get install libsundials-dev
 ```
 
-\noindent 
 or by following the instructions in the documentation.
 
 
@@ -104,7 +103,6 @@ Install either by doing
 sudo apt-get install petsc-dev
 ```
 
-\noindent 
 or by following the instructions in the documentation.
 
 Note that
@@ -124,7 +122,6 @@ Install either by doing
 sudo apt-get install slepc-dev
 ```
 
-\noindent 
 or by following the instructions in the documentation.
 
 Note that
@@ -152,7 +149,6 @@ After cloning the repository
 git clone https://github.com/seamplex/feenox
 ```
 
-\noindent
 the `autogen.sh` script has to be called to bootstrap the working tree, since the `configure` script is not stored in the repository but created from `configure.ac` (which is in the repository) by `autogen`. 
 
 Similarly, after updating the working tree with
@@ -161,7 +157,6 @@ Similarly, after updating the working tree with
 git pull
 ```
 
-\noindent
 it is recommended to re-run the `autogen.sh` script. It will do a `make clean` and re-compute the version string.
 
 
@@ -224,7 +219,7 @@ To see all the available options run
 
 
 
-## Compilation
+## Source code compilation
 
 
 After the successful execution of `configure`, a `Makefile` is created. To compile FeenoX, just execute 
@@ -305,7 +300,7 @@ $
 
 To be explained.
 
-## Install
+## Installation
 
 
 To be explained.

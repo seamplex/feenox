@@ -4,7 +4,7 @@ Verification, defined as
 
 >  The process of determining that a model implementation accurately represents the developer’s conceptual description of the model and the solution to the model.
 
-\noindent
+`\noindent`{=latex}
 a.k.a. checking if the tool is solving right the equations, should be performed before applying the code to solve any industrial problem. Depending on the nature and regulation of the industry, the verification guidelines and requirements may vary. Since it is expected that code verification tasks could be performed by arbitrary individuals or organizations, the tool’s source code should be available to independent third parties. In this regard, changes in the source code should be controllable, traceable and well documented.
 Stable releases ought to be digitally signed by a responsible engineer.
 

@@ -1,5 +1,4 @@
-#SUBDIRS = src doc
-SUBDIRS = src
+SUBDIRS = src doc
 
 dist_doc_DATA = AUTHORS ChangeLog README TODO \
                 doc/CODE_OF_CONDUCT.md \
@@ -11,10 +10,11 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
 
 dist_man_MANS = doc/feenox.1
 
-EXTRA_DIST = examples tests locateruntest.sh tests/functions.sh
+# EXTRA_DIST = examples
 
 # include $(top_srcdir)/aminclude_static.am
-TESTS = tests/abort.sh \
+TESTS = \
+        tests/abort.sh \
         tests/algebraic_expr.sh \
         tests/builtin.sh \
         tests/default_argument_value.sh \
@@ -46,6 +46,26 @@ TESTS = tests/abort.sh \
         tests/vector.sh
 
 XFAIL_TESTS = tests/abort.sh         
+
+DISTCLEANFILES = \
+                 feenox \
+                 tests/function_vectors1d.last \
+                 tests/nafems-le10.msh \
+                 tests/fit1d_gradient.last \
+                 tests/fibo_vector.last \
+                 tests/fibo_formula.last \
+                 tests/expressions_variables.last \
+                 tests/nafems-le10.last \
+                 tests/square-centered.msh \
+                 tests/2dpwr-eighth.msh \
+                 tests/nafems-t4.msh \
+                 tests/find_extrema2d.last \
+                 tests/algebraic_expr.last \
+                 tests/2dpwr-quarter.msh \
+                 tests/fibo_iterative.last \
+                 mesh2d.msh \
+                 laplace-square.msh
+
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
