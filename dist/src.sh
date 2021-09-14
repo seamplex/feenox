@@ -15,27 +15,21 @@ fi
 # -----------------------------------------------------------
 #   source
 # -----------------------------------------------------------
-if [ ! -e ${package}-src ]; then
-  git clone .. ${package}-src
-else
-  cd ${package}-src; git pull || exit 1; cd ..
-fi
+tmp_dir=$(mktemp -d -t ${package}-XXXXXXXXXX)
+git clone .. ${tmp_dir}
+current_dir=$(pwd)
 
-cd ${package}-src
+cd ${tmp_dir}
  ./autogen.sh || exit 1
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH="" || exit 1
- automake --add-missing --force-missing || exit 1
  make distcheck || exit 1
-cd ..
+cd ${current_dir}
 
-if [ ! -e src ]; then
-  echo "creating src directory"
-  mkdir src
-fi
-
-if [ -e ${package}-src/${package}-${version}.tar.gz ]; then
- mv ${package}-src/${package}-${version}.tar.gz src
+if [ -e ${tmp_dir}/${package}-${version}.tar.gz ]; then
+ mkdir -p src
+ mv ${tmp_dir}/${package}-${version}.tar.gz src
+ echo "temporary dir ${tmp_dir} not removed"
 else
- echo "cannot create source tarball, quitting"
+ echo "could not create source tarball, quitting"
  exit 1
 fi
