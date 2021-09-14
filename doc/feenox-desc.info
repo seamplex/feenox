@@ -1,0 +1,1501 @@
+This is feenox-desc.info, produced by makeinfo version 6.7 from
+feenox-desc.texi.
+
+This manual is for feenox-desc (version , ), which is .
+
+Copyright © 2016-2021 Jeremy Theler.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included in
+     the section entitled “GNU Free Documentation License”.
+
+
+File: feenox-desc.info,  Node: Top,  Next: Overview,  Up: (dir)
+
+FeenoX description
+******************
+
+* Menu:
+
+* Overview::
+* Introduction::
+* Running feenox::
+* Examples::
+* Tutorial::
+* Description::
+* FeenoX & the UNIX Philospohy::
+
+
+File: feenox-desc.info,  Node: Overview,  Next: Introduction,  Prev: Top,  Up: Top
+
+1 Overview
+**********
+
+FeenoX is a computational tool that can solve engineering problems which
+are usually casted as differential-algebraic equations (DAEs) or partial
+differential equations (PDEs).  It is to finite elements programs and
+libraries what Markdown is to Word and TeX, respectively.  In
+particular, it can solve
+
+   • dynamical systems defined by a set of user-provided DAEs (such as
+     plant control dynamics for example)
+   • mechanical elasticity
+   • heat conduction
+   • structural modal analysis
+   • neutron diffusion
+   • neutron transport
+
+FeenoX reads a plain-text input file which contains the problem
+definition and writes 100%-user defined results in ASCII (through
+‘PRINT’ or other user-defined output instructions within the input
+file).  For PDE problems, it needs a reference to at least one Gmsh
+(http://gmsh.info/) mesh file for the discretization of the domain.  It
+can write post-processing views in either ‘.msh’ or ‘.vtk’ formats.
+
+Keep in mind that FeenoX is just a back end reading a set of input files
+and writing a set of output files following the design philosophy of
+UNIX (separation, composition, representation, economy, extensibility,
+etc).  Think of it as a transfer function between input files and output
+files:
+
+                             +------------+
+ mesh (*.msh)  }             |            |             { terminal
+ data (*.dat)  } input ----> |   FeenoX   |----> output { data files
+ input (*.fee) }             |            |             { post (vtk/msh)
+                             +------------+
+
+Following the UNIX programming philosophy, there are no graphical
+interfaces attached to the FeenoX core, although a wide variety of pre
+and post-processors can be used with FeenoX. See for example
+<https://www.caeplex.com> for a web-based interface.
+
+
+File: feenox-desc.info,  Node: Introduction,  Next: Running feenox,  Prev: Overview,  Up: Top
+
+2 Introduction
+**************
+
+FeenoX (https://www.seamplex.com/feenox) is to finite-element software
+and libraries what Markdown is to word processors and typesetting
+systems.  It can be seen as
+
+   • a syntactically-sweetened way of asking the computer to solve
+     engineering-related mathematical problems, and/or
+   • a finite-element(ish) tool with a particular design basis
+
+Note that some of the problems solved with FeenoX might not actually
+rely on the finite element method, but on general mathematical models
+and even on the finite volumes method.  That is why we say it is a
+finite-element(ish) tool.
+
+        • FeenoX Overview Presentation, August 2021
+             • slides in English)
+             • Slides in PDF
+               (https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
+             • Markdown examples sources
+               (https://github.com/gtheler/2021-presentation)
+
+One of the main features of this allegedly particular design basis is
+that *simple problems ought to have simple inputs* (_rule of
+simplicity_).  For instance, to solve one-dimensional heat conduction
+over the domain x\in[0,1] (which is indeed one of the most simple
+engineering problems we can find) the following input file is enough:
+
+READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
+PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+k = 1                            # set uniform conductivity
+BC left  T=0                     # set fixed temperatures as BCs
+BC right T=1                     # "left" and "right" are defined in the mesh
+SOLVE_PROBLEM                    # tell FeenoX we are ready to solve the problem
+PRINT T(0.5)                     # ask for the temperature at x=0.5
+
+$ feenox thermal-1d-dirichlet-constant-k.fee 
+0.5
+$ 
+
+The mesh is assumed to have been already created with Gmsh
+(http://gmsh.info/) (or any other pre-processing tool and converted to
+‘.msh’ format with Meshio (https://github.com/nschloe/meshio) for
+example).  This assumption follows the _rule of composition_ and
+prevents the actual input file to be polluted with mesh-dependent data
+(such as node coordinates and/or nodal loads) so as to keep it simple
+and make it Git (https://git-scm.com/)-friendly (_rule of generation_).
+The only link between the mesh and the FeenoX input file is through
+physical groups (in the case above ‘left’ and ‘right’) used to set
+boundary conditions and/or material properties.
+
+Another design-basis decision is that *similar problems ought to have
+similar inputs* (_rule of least surprise_).  So in order to have a
+space-dependent conductivity, we only have to replace one line in the
+input above: instead of defining a scalar k we define a function of x
+(we also update the output to show the analytical solution as well):
+
+READ_MESH slab.msh
+PROBLEM thermal DIMENSIONS 1
+k(x) = 1+x                       # space-dependent conductivity
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(1/2) log(1+1/2)/log(2)   # print numerical and analytical solutions
+
+$ feenox thermal-1d-dirichlet-space-k.fee 
+0.584959	0.584963
+$
+
+FeenoX has an *everything is an expression* design principle, meaning
+that any numerical input can be an algebraic expression (e.g. ‘T(1/2)’
+is the same as ‘T(0.5)’).  If we want to have a temperature-dependent
+conductivity (which renders the problem non-linear) we can take
+advantage of the fact that T(x) is available not only as an argument to
+‘PRINT’ but also for the definition of algebraic functions:
+
+READ_MESH slab.msh
+PROBLEM thermal DIMENSIONS 1
+k(x) = 1+T(x)                    # temperature-dependent conductivity
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(1/2) sqrt(1+(3*0.5))-1   # print numerical and analytical solutions
+
+$ feenox thermal-1d-dirichlet-temperature-k.fee 
+0.581139	0.581139
+$
+
+For example, we can solve the NAFEMS LE11
+(https://www.nafems.org/publications/resource_center/p18/) “Solid
+cylinder/Taper/Sphere-Temperature” benchmark like
+
+READ_MESH nafems-le11.msh DIMENSIONS 3
+PROBLEM mechanical
+
+# linear temperature gradient in the radial and axial direction
+T(x,y,z) = sqrt(x^2 + y^2) + z
+
+# Boundary conditions
+BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
+BC yz     symmetry  # ide with u=0
+BC xy     w=0
+BC HIH'I' w=0
+
+# material properties (isotropic & uniform so we can use scalar constants)
+E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
+nu = 0.3            # dimensionless
+alpha = 2.3e-4      # in 1/ºC as in the problem
+
+SOLVE_PROBLEM
+WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
+PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
+
+Another example would be the famous chaotic Lorenz’ dynamical system
+(http://en.wikipedia.org/wiki/Lorenz_system)—the one of the
+butterfly—whose differential equations are
+
+\dot{x} = \sigma \cdot (y - x) \dot{y} = x \cdot (r - z) - y \dot{z} = x
+\cdot y - b \cdot z where \sigma=10, b=8/3 and r=28 are the classical
+parameters that generate the butterfly as presented by Edward Lorenz
+back in his seminal 1963 paper Deterministic non-periodic flow
+(http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
+We can solve it with FeenoX by writing the equations in the input file
+as naturally as possible, as illustrated in the input file that follows:
+
+PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
+end_time = 40         # we go from t=0 to 40 non-dimensional units
+
+sigma = 10            # the original parameters from the 1963 paper
+r = 28
+b = 8/3
+
+x_0 = -11             # initial conditions
+y_0 = -16
+z_0 = 22.5
+
+# the dynamical system's equations written as naturally as possible
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
+
+PRINT t x y z        # four-column plain-ASCII output
+
+Please note the following two points about both cases above:
+
+  1. The input files are very similar to the statements of each problem
+     in plain English words (_rule of clarity_).  Take some time to read
+     the problem statement of the NAFEMS LE11 benchmark
+     (doc/design/nafems-le11/nafems-le11.png) and the FeenoX input to
+     see how well the latter matches the former.  Same for the Lorenz’
+     chaotic system.  Those with some experience may want to compare
+     them to the inputs decks (sic) needed for other common FEA
+     programs.
+  2. By design, 100% of FeenoX’ output is controlled by the user.  Had
+     there not been any ‘PRINT’ or ‘WRITE_MESH’ instructions, the output
+     would have been empty, following the _rule of silence_.  This is a
+     significant change with respect to traditional engineering codes
+     that date back from times when one CPU hour was worth dozens (or
+     even hundreds) of engineering hours.  At that time, cognizant
+     engineers had to dig into thousands of lines of data to search for
+     a single individual result.  Nowadays, following the _rule of
+     economy_, it is actually far easier to ask the code to write only
+     what is needed in the particular format that suits the user.
+
+In other words, FeenoX is a computational tool to solve
+
+   • dynamical systems written as sets of ODEs/DAEs, or
+   • steady or quasi-static thermo-mechanical problems, or
+   • steady or transient heat conduction problems, or
+   • modal analysis problems,
+   • neutron diffusion or transport problems
+   • community-contributed problems
+
+in such a way that the input is a near-English text file that defines
+the problem to be solved.  Some basic rules are
+
+   • FeenoX is just a *solver* working as a _transfer function_ between
+     input and output files.  Following the _rules of separation,
+     parsimony and diversity_, *there is no embedded graphical
+     interface* but means of using generic pre and post processing
+     tools—in particular, Gmsh (http://gmsh.info/) and Paraview
+     (https://www.paraview.org/) respectively.  See also CAEplex
+     (www.caeplex.com).
+
+   • The input files should be syntactically sugared
+     (https://en.wikipedia.org/wiki/Syntactic_sugar) so as to be as
+     self-describing as possible.
+
+   • Simple problems ought to need simple input files.
+
+   • Similar problems ought to need similar input files.
+
+   • Everything is an expression.  Whenever a number is expected, an
+     algebraic expression can be entered as well.  Variables, vectors,
+     matrices and functions are supported.  Here is how to replace the
+     boundary condition on the right side of the slab above with a
+     radiation condition:
+
+     sigma = 1       # non-dimensional stefan-boltzmann constant
+     e = 0.8         # emissivity 
+     Tinf=1          # non-dimensional reference temperature
+     BC right q=sigma*e*(Tinf^4-T(x)^4)
+
+   • FeenoX should run natively in the cloud and be able to massively
+     scale in parallel.  See the Software Requirements Specification
+     (doc/sds.md) and the Software Development Specification
+     (doc/sds.md) for details.
+
+Since it is free (as in freedom
+(https://www.gnu.org/philosophy/free-sw.en.html)) and open source,
+contributions to add features (and to fix bugs) are welcome.  In
+particular, each kind of problem supported by FeenoX (thermal,
+mechanical, modal, etc.)  has a subdirectory of source files which can
+be used as a template to add new problems, as implied in the
+“community-contributed problems” bullet above (_rules of modularity and
+extensibility_).  See the documentation (doc) for details about how to
+contribute.
+
+
+File: feenox-desc.info,  Node: Running feenox,  Next: Examples,  Prev: Introduction,  Up: Top
+
+3 Running ‘feenox’
+******************
+
+* Menu:
+
+* Invocation::
+* Compilation::
+
+
+File: feenox-desc.info,  Node: Invocation,  Next: Compilation,  Up: Running feenox
+
+3.1 Invocation
+==============
+
+The format for running the ‘feenox’ program is:
+
+feenox [options] inputfile [optional_extra_arguments] ...
+
+The ‘feenox’ executable supports the following options:
+
+‘-h’, ‘--help’
+
+     display usage and commmand-line help and exit
+
+‘-v’, ‘--version’
+
+     display brief version information and exit
+
+‘-V’, ‘--versions’
+
+     display detailed version information
+
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+$ echo 'PRINT 2+2' | feenox -
+4
+
+PETSc and SLEPc options can be passed in ‘[options]’ as well, with the
+difference that two hyphens have to be used instead of only once.  For
+example, to pass the PETSc option ‘-ksp_view’ the actual FeenoX
+invocation should be
+
+$ feenox --ksp_view input.fee
+
+The optional ‘[replacement arguments]’ part of the command line mean
+that each argument after the input file that does not start with an
+hyphen will be expanded verbatim in the input file in each occurrence of
+‘$1’, ‘$2’, etc.  For example
+
+$ echo 'PRINT $1+$2' | feenox - 3 4
+7
+
+
+File: feenox-desc.info,  Node: Compilation,  Prev: Invocation,  Up: Running feenox
+
+3.2 Compilation
+===============
+
+These detailed compilation instructions are aimed at ‘amd64’
+Debian-based GNU/Linux distributions.  The compilation procedure follows
+POSIX, so it should work in other operating systems and architectures as
+well.  Distributions not using ‘apt’ for packages (i.e. ‘yum’) should
+change the package installation commands (and possibly the package
+names).  The instructions should also work for in MacOS, although the
+‘apt-get’ commands should be replaced by ‘brew’ or similar.  Same for
+Windows under Cygwin (https://www.cygwin.com/), the packages should be
+installed through the Cygwin installer.  WSL was not tested, but should
+work as well.
+
+* Menu:
+
+* Quickstart::
+* Detailed configuration and compilation::
+* Advanced settings::
+
+
+File: feenox-desc.info,  Node: Quickstart,  Next: Detailed configuration and compilation,  Up: Compilation
+
+3.2.1 Quickstart
+----------------
+
+Note that the quickest way to get started is to get an already-compiled
+statically-linked binary executable.  Follow these instructions if that
+option is not suitable for your workflow.
+
+On a GNU/Linux box (preferably Debian-based), follow these quick steps.
+See next section for detailed explanations.
+
+  1. Install mandatory dependencies
+
+     sudo apt-get install gcc make git automake autoconf libgsl-dev
+
+     If you cannot install ‘libgsl-dev’ but still have ‘git’ and the
+     build toolchain, you can have the ‘configure’ script to download
+     and compile it for you.  See point 4 below.
+
+  2. Install optional dependencies (of course these are _optional_ but
+     recommended)
+
+     sudo apt-get install libsundials-dev petsc-dev slepc-dev
+
+  3. Clone Github repository
+
+     git clone https://github.com/seamplex/feenox
+
+  4. Boostrap, configure, compile & make
+
+     cd feenox
+     ./autogen.sh
+     ./configure
+     make
+
+     If you cannot (or do not want) to use ‘libgsl-dev’ from a package
+     repository, call ‘configure’ with ‘--enable-download-gsl’:
+
+     ./configure --enable-download-gsl
+
+     If you do not have Internet access, get the tarball manually, copy
+     it to the same directory as ‘configure’ and run again.
+
+  5. Run test suite (optional)
+
+     make check
+
+  6. Install the binary system wide (optional)
+
+     sudo make install
+
+
+File: feenox-desc.info,  Node: Detailed configuration and compilation,  Next: Advanced settings,  Prev: Quickstart,  Up: Compilation
+
+3.2.2 Detailed configuration and compilation
+--------------------------------------------
+
+The main target and development environment is Debian GNU/Linux,
+although it should be possible to compile FeenoX in any free GNU/Linux
+variant (and even the in non-free MacOS and Windows).  As per the SRS
+(SRS.md), all dependencies have to be available on mainstream GNU/Linux
+distributions.  But they can also be compiled from source in case the
+package repositories are not available or customized compilation flags
+are needed (i.e. optimization or debugging settings).
+
+All the dependencies are free and open source software.  PETSc/SLEPc
+also depend on other mathematical libraries to perform particular
+operations such as linear algebra.  These extra dependencies can be
+either free (such as LAPACK) or non-free (such as MKL), but there is
+always at least one combination of a working setup that involves only
+free and open source software which is compatible with FeenoX licensing
+terms (GPLv3+).  See the documentation of each package for licensing
+details.
+
+* Menu:
+
+* Mandatory dependencies::
+* Optional dependencies::
+* FeenoX source code::
+* Configuration::
+* Source code compilation::
+* Test suite::
+* Installation::
+
+
+File: feenox-desc.info,  Node: Mandatory dependencies,  Next: Optional dependencies,  Up: Detailed configuration and compilation
+
+3.2.2.1 Mandatory dependencies
+..............................
+
+FeenoX has one mandatory dependency for run-time execution and the
+standard build toolchain for compilation.  It is written in C99 so only
+a C compiler is needed, although ‘make’ is also required.  Free and open
+source compilers are favored.  The usual C compiler is ‘gcc’ but ‘clang’
+can also be used.  Nevertheless, the non-free ‘icc’ has also been
+tested.
+
+Note that there is no need to have a Fortran nor a C++ compiler to build
+FeenoX. They might be needed to build other dependencies (such as
+PETSc), but not to compile FeenoX with all the dependencies installed
+from package repositories.  In case the build toolchain is not already
+installed, do so with
+
+sudo apt-get install gcc make
+
+If the source is to be fetched from the Git repository then of course
+‘git’ is needed but also ‘autoconf’ and ‘automake’ since the ‘configure’
+script is not stored in the Git repository but the ‘autogen.sh’ script
+that bootstraps the tree and creates it.  So if instead of compiling a
+source tarball one wants to clone from GitHub, these packages are also
+mandatory:
+
+sudo apt-get install git automake autoconf
+
+Again, chances are that any existing GNU/Linux box has all these tools
+already installed.  The GNU Scientific Library The only run-time
+dependency is GNU GSL (https://www.gnu.org/software/gsl/) (not to be
+confused with Microsoft GSL (https://github.com/microsoft/GSL)). It can
+be installed with
+
+sudo apt-get install libgsl-dev
+
+In case this package is not available or you do not have enough
+permissions to install system-wide packages, there are two options.
+
+  1. Pass the option ‘--enable-download-gsl’ to the ‘configure’ script
+     below.
+  2. Manually download, compile and install GNU GSL
+     (https://www.gnu.org/software/gsl/)
+
+If the ‘configure’ script cannot find both the headers and the actual
+library, it will refuse to proceed.  Note that the FeenoX binaries
+already contain a static version of the GSL so it is not needed to have
+it installed in order to run the statically-linked binaries.
+
+
+File: feenox-desc.info,  Node: Optional dependencies,  Next: FeenoX source code,  Prev: Mandatory dependencies,  Up: Detailed configuration and compilation
+
+3.2.2.2 Optional dependencies
+.............................
+
+FeenoX has three optional run-time dependencies.  It can be compiled
+without any of these but functionality will be reduced:
+
+   • SUNDIALS (https://computing.llnl.gov/projects/sundials) provides
+     support for solving systems of ordinary differential equations
+     (ODEs) or differential-algebraic equations (DAEs).  This dependency
+     is needed when running inputs with the ‘PHASE_SPACE’ keyword.
+
+   • PETSc (https://petsc.org/) provides support for solving partial
+     differential equations (PDEs).  This dependency is needed when
+     running inputs with the ‘PROBLEM’ keyword.
+
+   • SLEPc (https://slepc.upv.es/) provides support for solving
+     eigen-value problems in partial differential equations (PDEs).
+     This dependency is needed for inputs with ‘PROBLEM’ types with
+     eigen-value formulations such as ‘modal’ and ‘neutron_transport’.
+
+In absence of all these, FeenoX can still be used to
+
+   • solve general mathematical problems such as the ones to compute the
+     Fibonacci sequence,
+   • operate on functions, either algebraically or point-wise
+     interpolated,
+   • read, operate over and write meshes,
+   • etc.
+
+These optional dependencies have to be installed separately.  There is
+no option to have ‘configure’ to download them as with
+‘--enable-download-gsl’.  SUNDIALS SUNDIALS
+(https://computing.llnl.gov/projects/sundials) is a SUite of Nonlinear
+and DIfferential/ALgebraic equation Solvers.  It is used by FeenoX to
+solve dynamical systems casted as DAEs with the keyword ‘PHASE_SPACE’,
+like the Lorenz system.
+
+Install either by doing
+
+sudo apt-get install libsundials-dev
+
+or by following the instructions in the documentation.  PETSc PETSc
+(https://petsc.org/), the Portable, Extensible Toolkit for Scientific
+Computation, pronounced PET-see (/ˈpɛt-siː/), is a suite of data
+structures and routines for the scalable (parallel) solution of
+scientific applications modeled by partial differential equations.  It
+is used by FeenoX to solve PDEs with the keyword ‘PROBLEM’, like thermal
+conduction on a slab.
+
+Install either by doing
+
+sudo apt-get install petsc-dev
+
+or by following the instructions in the documentation.
+
+Note that
+
+   • Configuring and compiling PETSc from scratch might be difficult the
+     first time.  It has a lot of dependencies and options.  Read the
+     official documentation (https://petsc.org/release/install/) for a
+     detailed explanation.
+   • There is a huge difference in efficiency between using PETSc
+     compiled with debugging symbols and with optimization flags.  Make
+     sure to configure ‘--with-debugging=0’ for FeenoX production runs
+     and leave the debugging symbols (which is the default) for
+     development only.
+   • FeenoX needs PETSc to be configured with real double-precision
+     scalars.  It will compile but will complain at run-time when using
+     complex and/or single or quad-precision scalars.
+   • FeenoX honors the ‘PETSC_DIR’ and ‘PETSC_ARCH’ environment
+     variables when executing ‘configure’.  If these two do not exist or
+     are empty, it will try to use the default system-wide locations
+     (i.e. the ‘petsc-dev’ package).
+
+SLEPc SLEPc (https://slepc.upv.es/), the Scalable Library for Eigenvalue
+Problem Computations, is a software library for the solution of large
+scale sparse eigenvalue problems on parallel computers.  It is used by
+FeenoX to solve PDEs with the keyword ‘PROBLEM’ that need eigen-value
+computations, such as modal analysis of a cantilevered beam.
+
+Install either by doing
+
+sudo apt-get install slepc-dev
+
+or by following the instructions in the documentation.
+
+Note that
+
+   • SLEPc is an extension of PETSc so the latter has to be already
+     installed and configured.
+   • FeenoX honors the ‘SLEPC_DIR’ environment variable when executing
+     ‘configure’.  If it does not exist or is empty it will try to use
+     the default system-wide locations (i.e. the ‘slepc-dev’ package).
+   • If PETSc was configured with ‘--download-slepc’ then the
+     ‘SLEPC_DIR’ variable has to be set to the directory inside
+     ‘PETSC_DIR’ where SLEPc was cloned and compiled.
+
+
+File: feenox-desc.info,  Node: FeenoX source code,  Next: Configuration,  Prev: Optional dependencies,  Up: Detailed configuration and compilation
+
+3.2.2.3 FeenoX source code
+..........................
+
+There are two ways of getting FeenoX’ source code:
+
+  1. Cloning the GitHub repository at
+     <https://github.com/seamplex/feenox>
+  2. Downloading a source tarball from
+     <https://seamplex.com/feenox/dist/src/>
+
+Git repository The main Git repository is hosted on GitHub at
+<https://github.com/seamplex/feenox>.  It is public so it can be cloned
+either through HTTPS or SSH without needing any particular credentials.
+It can also be forked freely.  See the Programming Guide
+(programming.md) for details about pull requests and/or write access to
+the main repository.
+
+Ideally, the ‘main’ branch should have a usable snapshot.  All other
+branches might contain code that might not compile or might not run or
+might not be tested.  If you find a commit in the main branch that does
+not pass the tests, please report it in the issue tracker ASAP.
+
+After cloning the repository
+
+git clone https://github.com/seamplex/feenox
+
+the ‘autogen.sh’ script has to be called to bootstrap the working tree,
+since the ‘configure’ script is not stored in the repository but created
+from ‘configure.ac’ (which is in the repository) by ‘autogen’.
+
+Similarly, after updating the working tree with
+
+git pull
+
+it is recommended to re-run the ‘autogen.sh’ script.  It will do a ‘make
+clean’ and re-compute the version string.  Source tarballs When
+downloading a source tarball, there is no need to run ‘autogen.sh’ since
+the ‘configure’ script is already included in the tarball.  This method
+cannot update the working tree.  For each new FeenoX release, the whole
+tarball has to be downloaded again.
+
+
+File: feenox-desc.info,  Node: Configuration,  Next: Source code compilation,  Prev: FeenoX source code,  Up: Detailed configuration and compilation
+
+3.2.2.4 Configuration
+.....................
+
+To create a proper ‘Makefile’ for the particular architecture,
+dependencies and compilation options, the script ‘configure’ has to be
+executed.  This procedure follows the GNU Coding Standards
+(https://www.gnu.org/prep/standards/).
+
+./configure
+
+Without any particular options, ‘configure’ will check if the mandatory
+GNU Scientific Library (https://www.gnu.org/software/gsl/) is available
+(both its headers and run-time library).  If it is not, then the option
+‘--enable-download-gsl’ can be used.  This option will try to use ‘wget’
+(which should be installed) to download a source tarball, uncompress is,
+configure and compile it.  If these steps are successful, this GSL will
+be statically linked into the resulting FeenoX executable.  If there is
+no internet connection, the ‘configure’ script will say that the
+download failed.  In that case, get the indicated tarball file manually
+, copy it into the current directory and re-run ‘./configure’.
+
+The script will also check for the availability of optional
+dependencies.  At the end of the execution, a summary of what was found
+(or not) is printed in the standard output:
+
+$ ./configure
+[...]
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS IDA            yes
+  PETSc                   yes /usr/lib/petsc 
+  SLEPc                   no
+[...]  
+
+If for some reason one of the optional dependencies is available but
+FeenoX should not use it, then pass ‘--without-sundials’,
+‘--without-petsc’ and/or ‘--without-slepc’ as arguments.  For example
+
+$ ./configure --without-sundials --without-petsc
+[...]
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                no
+  PETSc                   no
+  SLEPc                   no
+[...]  
+
+If configure complains about contradicting values from the cached ones,
+run ‘autogen.sh’ again before ‘configure’ or uncompress the source
+tarball in a fresh location.
+
+To see all the available options run
+
+./configure --help
+
+
+File: feenox-desc.info,  Node: Source code compilation,  Next: Test suite,  Prev: Configuration,  Up: Detailed configuration and compilation
+
+3.2.2.5 Source code compilation
+...............................
+
+After the successful execution of ‘configure’, a ‘Makefile’ is created.
+To compile FeenoX, just execute
+
+make
+
+Compilation should take a dozen of seconds.  It can be even sped up by
+using the ‘-j’ option
+
+make -j8
+
+The binary executable will be located in the ‘src’ directory but a copy
+will be made in the base directory as well.  Test it by running without
+any arguments
+
+$ ./feenox
+FeenoX v0.1.24-g6cfe063 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: ./feenox [options] inputfile [replacement arguments]
+
+  -h, --help         display usage and commmand-line help and exit
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+  -s, --sumarize     list all symbols in the input file and exit
+
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+    $ echo "PRINT 2+2" | feenox -
+    4
+
+Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
+Feenox home page: https://www.seamplex.com/feenox/
+$
+
+The ‘-v’ (or ‘--version’) option shows the version and a copyright
+notice:
+
+$ ./feenox -v
+FeenoX v0.1.24-g6cfe063
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Copyright (C) 2009--2021 jeremy theler
+GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
+FeenoX is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+$
+
+The ‘-V’ (or ‘--versions’) option shows the dates of the last commits,
+the compiler options and the versions of the linked libraries:
+
+$ ./feenox -V
+FeenoX v0.1.24-g6cfe063
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Sun Aug 29 11:34:04 2021 -0300
+Build date         : Sun Aug 29 11:44:50 2021 -0300
+Build architecture : linux-gnu x86_64
+Compiler           : gcc (Ubuntu 10.3.0-1ubuntu1) 10.3.0
+Compiler flags     : -O3
+Builder            : gtheler@chalmers
+GSL version        : 2.6
+SUNDIALS version   : 4.1.0
+PETSc version      : Petsc Release Version 3.14.5, Mar 03, 2021 
+PETSc arch         : 
+PETSc options      : --build=x86_64-linux-gnu --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --with-option-checking=0 --with-silent-rules=0 --libdir=${prefix}/lib/x86_64-linux-gnu --runstatedir=/run --with-maintainer-mode=0 --with-dependency-tracking=0 --with-debugging=0 --shared-library-extension=_real --with-shared-libraries --with-pic=1 --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-cxx-dialect=C++11 --with-opencl=1 --with-blas-lib=-lblas --with-lapack-lib=-llapack --with-scalapack=1 --with-scalapack-lib=-lscalapack-openmpi --with-ptscotch=1 --with-ptscotch-include=/usr/include/scotch --with-ptscotch-lib="-lptesmumps -lptscotch -lptscotcherr" --with-fftw=1 --with-fftw-include="[]" --with-fftw-lib="-lfftw3 -lfftw3_mpi" --with-superlu_dist=1 --with-superlu_dist-include=/usr/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-hdf5-include=/usr/include/hdf5/openmpi --with-hdf5-lib="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lhdf5 -lmpi" --CXX_LINKER_FLAGS=-Wl,--no-as-needed --with-hypre=1 --with-hypre-include=/usr/include/hypre --with-hypre-lib=-lHYPRE_core --with-mumps=1 --with-mumps-include="[]" --with-mumps-lib="-ldmumps -lzmumps -lsmumps -lcmumps -lmumps_common -lpord" --with-suitesparse=1 --with-suitesparse-include=/usr/include/suitesparse --with-suitesparse-lib="-lumfpack -lamd -lcholmod -lklu" --with-superlu=1 --with-superlu-include=/usr/include/superlu --with-superlu-lib=-lsuperlu --prefix=/usr/lib/petscdir/petsc3.14/x86_64-linux-gnu-real --PETSC_ARCH=x86_64-linux-gnu-real CFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC" CXXFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC" FCFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fPIC -ffree-line-length-0" FFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fPIC -ffree-line-length-0" CPPFLAGS="-Wdate-time -D_FORTIFY_SOURCE=2" LDFLAGS="-Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -fPIC" MAKEFLAGS=w
+SLEPc version      : SLEPc Release Version 3.14.2, Feb 01, 2021
+$
+
+
+File: feenox-desc.info,  Node: Test suite,  Next: Installation,  Prev: Source code compilation,  Up: Detailed configuration and compilation
+
+3.2.2.6 Test suite
+..................
+
+To be explained.
+
+
+File: feenox-desc.info,  Node: Installation,  Prev: Test suite,  Up: Detailed configuration and compilation
+
+3.2.2.7 Installation
+....................
+
+To be explained.
+
+
+File: feenox-desc.info,  Node: Advanced settings,  Prev: Detailed configuration and compilation,  Up: Compilation
+
+3.2.3 Advanced settings
+-----------------------
+
+* Menu:
+
+* Compiling with debug symbols::
+* Using a different compiler::
+* Compiling PETSc::
+
+
+File: feenox-desc.info,  Node: Compiling with debug symbols,  Next: Using a different compiler,  Up: Advanced settings
+
+3.2.3.1 Compiling with debug symbols
+....................................
+
+By default the C flags are ‘-O3’, without debugging.  To add the ‘-g’
+flag, just use ‘CFLAGS’ when configuring:
+
+./configure CFLAGS="-g -O0"
+
+
+File: feenox-desc.info,  Node: Using a different compiler,  Next: Compiling PETSc,  Prev: Compiling with debug symbols,  Up: Advanced settings
+
+3.2.3.2 Using a different compiler
+..................................
+
+Without PETSc, FeenoX uses the ‘CC’ environment variable to set the
+compiler.  So configure like
+
+./configure CC=clang
+
+When PETSc is detected FeenoX uses the ‘mpicc’ executable, which is a
+wrapper to an actual C compiler with extra flags needed to find the
+headers and the MPI library.  To change the wrapped compiler, you should
+set ‘MPICH_CC’ or ‘OMPI_CC’, depending if you are using MPICH or
+OpenMPI. For example, to force MPICH to use ‘clang’ do
+
+./configure MPICH_CC=clang CC=clang
+
+To know which is the default MPI implementation, just run ‘configure’
+without arguments and pay attention to the “Compiler” line in the
+“Summary of dependencies” section.  For example, for OpenMPI a typical
+summary would be
+
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /usr/lib/petsc 
+  SLEPc                   yes /usr/lib/slepc
+  Compiler                gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include -pthread -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
+
+For MPICH:
+
+## ----------------------- ##
+## Summary of dependencies ##
+## ----------------------- ##
+  GNU Scientific Library  from system
+  SUNDIALS                yes
+  PETSc                   yes /home/gtheler/libs/petsc-3.15.0 arch-linux2-c-debug
+  SLEPc                   yes /home/gtheler/libs/slepc-3.15.1
+  Compiler                gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
+
+Other non-free implementations like Intel MPI might work but were not
+tested.  However, it should be noted that the MPI implementation used to
+compile FeenoX has to match the one used to compile PETSc.  Therefore,
+if you compiled PETSc on your own, it is up to you to ensure MPI
+compatibility.  If you are using PETSc as provided by your
+distribution’s repositories, you will have to find out which one was
+used (it is usually OpenMPI) and use the same one when compiling FeenoX.
+
+The FeenoX executable will show the configured compiler and flags when
+invoked with the ‘--versions’ option:
+
+$ feenox --versions
+FeenoX v0.1.47-g868dbb7-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Mon Sep 6 16:39:53 2021 -0300
+Build date         : Tue Sep 07 14:29:42 2021 -0300
+Build architecture : linux-gnu x86_64
+Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler flags     : -O3
+Builder            : gtheler@tom
+GSL version        : 2.6
+SUNDIALS version   : 5.7.0
+PETSc version      : Petsc Release Version 3.15.0, Mar 30, 2021 
+PETSc arch         : arch-linux2-c-debug
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --with-x=0
+SLEPc version      : SLEPc Release Version 3.15.1, May 28, 2021
+$
+
+Note that the reported values are the ones used in ‘configure’ and not
+in ‘make’.  Thus, the recommended way to set flags is in ‘configure’ and
+not in ‘make’.
+
+
+File: feenox-desc.info,  Node: Compiling PETSc,  Prev: Using a different compiler,  Up: Advanced settings
+
+3.2.3.3 Compiling PETSc
+.......................
+
+To be explained.
+
+
+File: feenox-desc.info,  Node: Examples,  Next: Tutorial,  Prev: Running feenox,  Up: Top
+
+4 Examples
+**********
+
+See <https://www.seamplex.com/feenox/examples>
+
+
+File: feenox-desc.info,  Node: Tutorial,  Next: Description,  Prev: Examples,  Up: Top
+
+5 Tutorial
+**********
+
+See <https://www.seamplex.com/feenox/tutorials>
+
+
+File: feenox-desc.info,  Node: Description,  Next: FeenoX & the UNIX Philospohy,  Prev: Tutorial,  Up: Top
+
+6 Description
+*************
+
+FeenoX solves a problem defined in an plain-text input file and writes
+user-defined outputs to the standard output and/or files, either also
+plain-text or with a particular format for further post-processing.  The
+syntax of this input file is designed to be as self-describing as
+possible, using English keywords that explains FeenoX what problem it
+has to solve in a way is understandable by both humans and computers.
+Keywords can work either as
+
+  1. Definitions, for instance ”define function f(x) and read its data
+     from file ‘f.dat’”), or as
+  2. Instructions, such as “write the stress at point D into the
+     standard output”.
+
+A person can tell if a keyword is a definition or an instruction because
+the former are nouns (‘FUNCTION’) and the latter verbs (‘PRINT’).  The
+equal sign ‘=’ is a special keyword that is neither a verb nor a noun,
+and its meaning changes depending on what is on the left hand side of
+the assignment.
+
+  a. If there is a function, then it is a definition: define an
+     algebraic function to be equal to the expression on the right-hand
+     side, e.g.:
+
+     f(x,y) = exp(-x^2)*cos(pi*y)
+
+  b. If there is a variable, vector or matrix, it is an instruction:
+     evaluate the expression on the right-hand side and assign it to the
+     varible or vector (or matrix) element indicated in the left-hand
+     side.  Strictly speaking, if the variable has not already been
+     defined (and implicit declaration is allowed), then the variable is
+     also defined as well, e.g:
+
+     VAR a
+     VECTOR b[3]
+     a = sqrt(2)
+     b[i] = a*i^2
+
+     There is no need to explicitly define the scalar variable ‘a’ with
+     ‘VAR’ since the first assigment also defines it implicitly (if this
+     is allowed by the keyword ‘IMPLICIT’).
+
+An input file can define its own variables as needed, such as ‘my_var’
+or ‘flag’.  But there are some reserved names that are special in the
+sense that they either
+
+  1. can be set to modify the behavior of FeenoX, such as ‘max_dt’ or
+     ‘dae_tol’
+  2. can be read to get the internal status or results back from FeenoX,
+     such as ‘nodes’ or ‘keff’
+  3. can be either set or read, such as ‘dt’ or ‘done’
+
+The problem being solved can be static or transient, depending on
+whether the special variable ‘end_time’ is zero (default) or not.  If it
+is zero and ‘static_steps’ is equal to one (default), the instructions
+in the input file are executed once and then FeenoX quits.  For example
+
+VAR x
+PRINT %.7f func_min(cos(x)+1,x,0,6)
+
+If ‘static_steps’ is larger than one, the special variable ‘step_static’
+is increased and they are repeated the number of time indicated by
+‘static_steps’:
+
+static_steps = 10
+f(n) = n^2 - n + 41
+PRINT f(step_static^2-1)
+
+If the special variable ‘end_time’ is set to a non-zero value, after
+computing the static part a transient problem is solved.  There are
+three kinds of transient problems:
+
+  1. Plain “standalone” transients
+  2. Differential-Algebraic equations (DAE) transients
+  3. Partial Differential equations (PDE) transients
+
+In the first case, after all the instruction in the input file were
+executed, the special variable ‘t’ is increased by the value of ‘dt’ and
+then the instructions are executed all over again, until ‘t’ reaches
+‘end_time’:
+
+end_time = 2*pi
+dt = 1/10
+
+y = lag(heaviside(t-1), 1)
+z = random_gauss(0, sqrt(2)/10)
+
+PRINT t sin(t) cos(t) y z HEADER
+
+In the second case, the keyword ‘PHASE_SPACE’ sets up DAE system.  Then,
+one initial condition and one differential-algebraic equation has to be
+given for each element in the phase space.  The instructions before the
+DAE block executed, then the DAE timestep is advanced and finally the
+instructions after DAE block are executed (there cannot be any
+instruction between the first and the last DAE):
+
+PHASE_SPACE x
+end_time = 1
+x_0 = 1
+x_dot = -x
+PRINT t x exp(-t) HEADER
+
+The timestep is chosen by the SUNDIALS library in order to keep an
+estimate of the residual error below ‘dae_tol’ (default is 10^{-6}),
+although ‘min_dt’ and ‘max_dt’ can be used to control it.  See the
+section of the [Differential-Algebraic Equations subsystem] for more
+information.
+
+In the third cae, the type of PDE being solved is given by the keyword
+‘PROBLEM’.  Some types of PDEs do support transient problems (such as
+‘thermal’) but some others do not (such as ‘modal’).  See the detailed
+explanation of each problem type for details.  Now the transient problem
+is handled by the TS framework of the PETSc library.  In general
+transient PDEs involve a mesh, material properties, inital conditions,
+transient boundary conditions, etc.  And they create a lot of data since
+results mean spatial and temporal distributions of one or more scalar
+fields:
+
+# example of a 1D heat transient problem
+# from https://www.mcs.anl.gov/petsc/petsc-current/src/ts/tutorials/ex3.c.html
+# a non-dimensional slab 0 < x < 1 is kept at T(0) = T(1) = 0
+# there is an initial non-trivial T(x)
+# the steady-state is T(x) = 0
+PROBLEM thermal 1d
+READ_MESH slab60.msh
+
+end_time = 1e-1
+
+# initial condition
+T_0(x) := sin(6*pi*x) + 3*sin(2*pi*x)
+# analytical solution
+T_a(x,t) := exp(-36*pi^2*t)*sin(6*pi*x) + 3*exp(-4*pi^2*t)*sin(2*pi*x)
+
+# unitary non-dimensional properties
+k = 1
+rho = 1
+cp = 1
+
+# boundary conditions
+BC left  T=0
+BC right T=0
+
+SOLVE_PROBLEM
+
+PRINT %e t dt T(0.1) T_a(0.1,t) T(0.7) T_a(0.7,t)
+WRITE_MESH temp-slab.msh T
+
+IF done
+ PRINT "\# open temp-anim-slab.geo in Gmsh to see the result!"
+ENDIF
+
+PETSc’s TS also honors the ‘min_dt’ and ‘max_dt’ variables, but the time
+step is controled by the allowed relative error with the special
+variable ‘ts_rtol’.  Again, see the section of the [Partial Differential
+Equations subsystem] for more information.
+
+* Menu:
+
+* Algebraic expressions::
+* Initial conditions::
+* Expansions of command line arguments::
+
+
+File: feenox-desc.info,  Node: Algebraic expressions,  Next: Initial conditions,  Up: Description
+
+6.1 Algebraic expressions
+=========================
+
+To be done.
+
+   • Everything is an expression.
+
+
+File: feenox-desc.info,  Node: Initial conditions,  Next: Expansions of command line arguments,  Prev: Algebraic expressions,  Up: Description
+
+6.2 Initial conditions
+======================
+
+
+File: feenox-desc.info,  Node: Expansions of command line arguments,  Prev: Initial conditions,  Up: Description
+
+6.3 Expansions of command line arguments
+========================================
+
+
+File: feenox-desc.info,  Node: FeenoX & the UNIX Philospohy,  Prev: Description,  Up: Top
+
+7 FeenoX & the UNIX Philospohy
+******************************
+
+* Menu:
+
+* Rule of Modularity::
+* Rule of Clarity::
+* Rule of Composition::
+* Rule of Separation::
+* Rule of Simplicity::
+* Rule of Parsimony::
+* Rule of Transparency::
+* Rule of Robustness::
+* Rule of Representation::
+* Rule of Least Surprise::
+* Rule of Silence::
+* Rule of Repair::
+* Rule of Economy::
+* Rule of Generation::
+* Rule of Optimization::
+* Rule of Diversity::
+* Rule of Extensibility::
+
+
+File: feenox-desc.info,  Node: Rule of Modularity,  Next: Rule of Clarity,  Up: FeenoX & the UNIX Philospohy
+
+7.1 Rule of Modularity
+======================
+
+     Developers should build a program out of simple parts connected by
+     well defined interfaces, so problems are local, and parts of the
+     program can be replaced in future versions to support new features.
+     This rule aims to save time on debugging code that is complex,
+     long, and unreadable.
+   • FeenoX uses third-party high-quality libraries
+        • GNU Scientific Library
+        • SUNDIALS
+        • PETSc
+        • SLEPc
+
+
+File: feenox-desc.info,  Node: Rule of Clarity,  Next: Rule of Composition,  Prev: Rule of Modularity,  Up: FeenoX & the UNIX Philospohy
+
+7.2 Rule of Clarity
+===================
+
+     Developers should write programs as if the most important
+     communication is to the developer who will read and maintain the
+     program, rather than the computer.  This rule aims to make code as
+     readable and comprehensible as possible for whoever works on the
+     code in the future.
+   • Example two squares in thermal contact.
+   • LE10 & LE11: a one-to-one correspondence between the problem text
+     and the FeenoX input.
+
+
+File: feenox-desc.info,  Node: Rule of Composition,  Next: Rule of Separation,  Prev: Rule of Clarity,  Up: FeenoX & the UNIX Philospohy
+
+7.3 Rule of Composition
+=======================
+
+     Developers should write programs that can communicate easily with
+     other programs.  This rule aims to allow developers to break down
+     projects into small, simple programs rather than overly complex
+     monolithic programs.
+   • FeenoX uses meshes created by a separate mesher (i.e. Gmsh).
+   • FeenoX writes data that has to be plotted or post-processed by
+     other tools (Gnuplot, Gmsh, Paraview, etc.).
+   • ASCII output is 100% controlled by the user so it can be tailored
+     to suit any other programs’ input needs such as AWK filters to
+     create LaTeX tables.
+
+
+File: feenox-desc.info,  Node: Rule of Separation,  Next: Rule of Simplicity,  Prev: Rule of Composition,  Up: FeenoX & the UNIX Philospohy
+
+7.4 Rule of Separation
+======================
+
+     Developers should separate the mechanisms of the programs from the
+     policies of the programs; one method is to divide a program into a
+     front-end interface and a back-end engine with which that interface
+     communicates.  This rule aims to prevent bug introduction by
+     allowing policies to be changed with minimum likelihood of
+     destabilizing operational mechanisms.
+   • FeenoX does not include a GUI, but it is GUI-friendly.
+
+
+File: feenox-desc.info,  Node: Rule of Simplicity,  Next: Rule of Parsimony,  Prev: Rule of Separation,  Up: FeenoX & the UNIX Philospohy
+
+7.5 Rule of Simplicity
+======================
+
+     Developers should design for simplicity by looking for ways to
+     break up program systems into small, straightforward cooperating
+     pieces.  This rule aims to discourage developers’ affection for
+     writing “intricate and beautiful complexities” that are in reality
+     bug prone programs.
+   • Simple problems need simple input.
+   • Similar problems need similar inputs.
+   • English-like self-evident input files matching as close as possible
+     the problem text.
+   • If there is a single material there is no need to link volumes to
+     properties.
+
+
+File: feenox-desc.info,  Node: Rule of Parsimony,  Next: Rule of Transparency,  Prev: Rule of Simplicity,  Up: FeenoX & the UNIX Philospohy
+
+7.6 Rule of Parsimony
+=====================
+
+     Developers should avoid writing big programs.  This rule aims to
+     prevent overinvestment of development time in failed or suboptimal
+     approaches caused by the owners of the program’s reluctance to
+     throw away visibly large pieces of work.  Smaller programs are not
+     only easier to write, optimize, and maintain; they are easier to
+     delete when deprecated.
+   • Parametric and/or optimization runs have to be driven from an outer
+     script (Bash, Python, etc.)
+
+
+File: feenox-desc.info,  Node: Rule of Transparency,  Next: Rule of Robustness,  Prev: Rule of Parsimony,  Up: FeenoX & the UNIX Philospohy
+
+7.7 Rule of Transparency
+========================
+
+     Developers should design for visibility and discoverability by
+     writing in a way that their thought process can lucidly be seen by
+     future developers working on the project and using input and output
+     formats that make it easy to identify valid input and correct
+     output.  This rule aims to reduce debugging time and extend the
+     lifespan of programs.
+   • Written in C99
+
+
+File: feenox-desc.info,  Node: Rule of Robustness,  Next: Rule of Representation,  Prev: Rule of Transparency,  Up: FeenoX & the UNIX Philospohy
+
+7.8 Rule of Robustness
+======================
+
+     Developers should design robust programs by designing for
+     transparency and discoverability, because code that is easy to
+     understand is easier to stress test for unexpected conditions that
+     may not be foreseeable in complex programs.  This rule aims to help
+     developers build robust, reliable products.
+
+
+File: feenox-desc.info,  Node: Rule of Representation,  Next: Rule of Least Surprise,  Prev: Rule of Robustness,  Up: FeenoX & the UNIX Philospohy
+
+7.9 Rule of Representation
+==========================
+
+     Developers should choose to make data more complicated rather than
+     the procedural logic of the program when faced with the choice,
+     because it is easier for humans to understand complex data compared
+     with complex logic.  This rule aims to make programs more readable
+     for any developer working on the project, which allows the program
+     to be maintained.
+
+
+File: feenox-desc.info,  Node: Rule of Least Surprise,  Next: Rule of Silence,  Prev: Rule of Representation,  Up: FeenoX & the UNIX Philospohy
+
+7.10 Rule of Least Surprise
+===========================
+
+     Developers should design programs that build on top of the
+     potential users’ expected knowledge; for example, ‘+’ in a
+     calculator program should always mean ‘addition’.  This rule aims
+     to encourage developers to build intuitive products that are easy
+     to use.
+   • If one needs a problem where the conductivity depends on x as
+     k(x)=1+x then the input is
+
+     k(x) = 1+x
+
+   • If a problem needs a temperature distribution given by an algebraic
+     expression T(x,y,z)=\sqrt{x^2+y^2}+z then do
+
+     T(x,y,z) = sqrt(x^2+y^2) + z
+
+
+File: feenox-desc.info,  Node: Rule of Silence,  Next: Rule of Repair,  Prev: Rule of Least Surprise,  Up: FeenoX & the UNIX Philospohy
+
+7.11 Rule of Silence
+====================
+
+     Developers should design programs so that they do not print
+     unnecessary output.  This rule aims to allow other programs and
+     developers to pick out the information they need from a program’s
+     output without having to parse verbosity.
+   • No ‘PRINT’ no output.
+
+
+File: feenox-desc.info,  Node: Rule of Repair,  Next: Rule of Economy,  Prev: Rule of Silence,  Up: FeenoX & the UNIX Philospohy
+
+7.12 Rule of Repair
+===================
+
+     Developers should design programs that fail in a manner that is
+     easy to localize and diagnose or in other words “fail noisily”.
+     This rule aims to prevent incorrect output from a program from
+     becoming an input and corrupting the output of other code
+     undetected.
+Input errors are detected before the computation is started and run-time
+errors (i.e. a division by zero) con be user controled, they can be
+fatal or ignored.
+
+
+File: feenox-desc.info,  Node: Rule of Economy,  Next: Rule of Generation,  Prev: Rule of Repair,  Up: FeenoX & the UNIX Philospohy
+
+7.13 Rule of Economy
+====================
+
+     Developers should value developer time over machine time, because
+     machine cycles today are relatively inexpensive compared to prices
+     in the 1970s.  This rule aims to reduce development costs of
+     projects.
+   • Output is 100% user-defined so the desired results is directly
+     obtained instead of needing further digging into tons of undesired
+     data.The approach of “compute and write everything you can in one
+     single run” made sense in 1970 where CPU time was more expensive
+     than human time, but not anymore.
+   • Example: LE10 & LE11.
+
+
+File: feenox-desc.info,  Node: Rule of Generation,  Next: Rule of Optimization,  Prev: Rule of Economy,  Up: FeenoX & the UNIX Philospohy
+
+7.14 Rule of Generation
+=======================
+
+     Developers should avoid writing code by hand and instead write
+     abstract high-level programs that generate code.  This rule aims to
+     reduce human errors and save time.
+   • Inputs are M4-friendly.
+   • Parametric runs can be done from scripts through command line
+     arguments expansion.
+   • Documentation is created out of simple Markdown sources and
+     assembled as needed.
+
+
+File: feenox-desc.info,  Node: Rule of Optimization,  Next: Rule of Diversity,  Prev: Rule of Generation,  Up: FeenoX & the UNIX Philospohy
+
+7.15 Rule of Optimization
+=========================
+
+     Developers should prototype software before polishing it.  This
+     rule aims to prevent developers from spending too much time for
+     marginal gains.
+   • Premature optimization is the root of all evil
+   • We are still building.  We will optimize later.
+        • Code optimization: TODO
+        • Parallelization: TODO
+        • Comparison with other tools: TODO
+
+
+File: feenox-desc.info,  Node: Rule of Diversity,  Next: Rule of Extensibility,  Prev: Rule of Optimization,  Up: FeenoX & the UNIX Philospohy
+
+7.16 Rule of Diversity
+======================
+
+     Developers should design their programs to be flexible and open.
+     This rule aims to make programs flexible, allowing them to be used
+     in ways other than those their developers intended.
+   • Either Gmsh or Paraview can be used to post-process results.
+   • Other formats can be added.
+
+
+File: feenox-desc.info,  Node: Rule of Extensibility,  Prev: Rule of Diversity,  Up: FeenoX & the UNIX Philospohy
+
+7.17 Rule of Extensibility
+==========================
+
+     Developers should design for the future by making their protocols
+     extensible, allowing for easy plugins without modification to the
+     program’s architecture by other developers, noting the version of
+     the program, and more.  This rule aims to extend the lifespan and
+     enhance the utility of the code the developer writes.
+   • FeenoX is GPLv3+.  The ‘+’ is for the future.
+   • Each PDE has a separate source directory.  Any of them can be used
+     as a template for new PDEs, especially ‘laplace’ for elliptic
+     operators.
+
+
+
+Tag Table:
+Node: Top593
+Node: Overview833
+Ref: #overview942
+Node: Introduction2758
+Ref: #introduction2886
+Node: Running feenox12386
+Ref: #running-feenox12526
+Node: Invocation12567
+Ref: #invocation12684
+Node: Compilation13759
+Ref: #compilation13878
+Node: Quickstart14630
+Ref: #quickstart14775
+Node: Detailed configuration and compilation16169
+Ref: #detailed-configuration-and-compilation16396
+Node: Mandatory dependencies17527
+Ref: #mandatory-dependencies17722
+Node: Optional dependencies19786
+Ref: #optional-dependencies20006
+Node: FeenoX source code24236
+Ref: #feenox-source-code24441
+Node: Configuration26065
+Ref: #configuration26262
+Node: Source code compilation28406
+Ref: #source-code-compilation28615
+Node: Test suite33304
+Ref: #test-suite33486
+Node: Installation33504
+Ref: #installation33658
+Node: Advanced settings33676
+Ref: #advanced-settings33842
+Node: Compiling with debug symbols33936
+Ref: #compiling-with-debug-symbols34133
+Node: Using a different compiler34287
+Ref: #using-a-different-compiler34504
+Node: Compiling PETSc37679
+Ref: #compiling-petsc37837
+Node: Examples37855
+Ref: #examples37971
+Node: Tutorial38019
+Ref: #tutorial38132
+Node: Description38181
+Ref: #description38320
+Node: Algebraic expressions44291
+Ref: #algebraic-expressions44445
+Node: Initial conditions44495
+Ref: #initial-conditions44688
+Node: Expansions of command line arguments44688
+Ref: #expansions-of-command-line-arguments44887
+Node: FeenoX & the UNIX Philospohy44887
+Ref: #feenox-the-unix-philospohy45043
+Node: Rule of Modularity45445
+Ref: #rule-of-modularity45604
+Node: Rule of Clarity46061
+Ref: #rule-of-clarity46242
+Node: Rule of Composition46690
+Ref: #rule-of-composition46879
+Node: Rule of Separation47474
+Ref: #rule-of-separation47664
+Node: Rule of Simplicity48117
+Ref: #rule-of-simplicity48305
+Node: Rule of Parsimony48891
+Ref: #rule-of-parsimony49079
+Node: Rule of Transparency49571
+Ref: #rule-of-transparency49765
+Node: Rule of Robustness50164
+Ref: #rule-of-robustness50359
+Node: Rule of Representation50685
+Ref: #rule-of-representation50890
+Node: Rule of Least Surprise51272
+Ref: #rule-of-least-surprise51476
+Node: Rule of Silence52049
+Ref: #rule-of-silence52231
+Node: Rule of Repair52519
+Ref: #rule-of-repair52692
+Node: Rule of Economy53142
+Ref: #rule-of-economy53320
+Node: Rule of Generation53900
+Ref: #rule-of-generation54090
+Node: Rule of Optimization54491
+Ref: #rule-of-optimization54687
+Node: Rule of Diversity55072
+Ref: #rule-of-diversity55265
+Node: Rule of Extensibility55568
+Ref: #rule-of-extensibility55740
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:
