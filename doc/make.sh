@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in touch sed m4 pandoc pandoc-crossref xelatex; do
+for i in touch sed m4 pandoc pandoc-crossref xelatex makeinfo texi2pdf; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -125,4 +125,5 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 
-
+makeinfo feenox-desc.texi > /dev/null
+texi2pdf feenox-desc.texi > /dev/null

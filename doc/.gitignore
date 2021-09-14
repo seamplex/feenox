@@ -9,5 +9,7 @@ defs.h
 hash.yaml
 date.yaml
 *.log
+*.aux
+*.toc
 reference-*.md
 repository-open-graph.png
