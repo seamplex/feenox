@@ -1,0 +1,20 @@
+PROBLEM mechanical
+READ_MESH nafems-le11.msh DIMENSIONS 3
+
+# linear temperature gradient in the radial and axial direction
+T(x,y,z) = sqrt(x^2 + y^2) + z
+
+# Boundary conditions
+BC xz     v=0
+BC yz     u=0
+BC xy     w=0
+BC HIH'I' w=0
+
+# material properties (isotropic & uniform so we can use scalar constants)
+E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
+nu = 0.3            # dimensionless
+alpha = 2.3e-4      # in 1/ºC as in the problem
+
+SOLVE_PROBLEM
+WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
+PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"

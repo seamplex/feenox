@@ -1,12 +1,14 @@
 # FeenoX documentation index
 
+-   [FeenoX manual][]
+    -   [2021 Presentation][]
 -   [Hands on][]
     -   [Quick examples][]
     -   [Tutorials][]
     -   [Case files][]
 -   [Manual and reference][]
     -   [UNIX manpage][]
-    -   [FeenoX manual][]
+    -   [FeenoX description][]
 -   [Background and generalities][]
     -   [Software requirements specifications][]
     -   [Software design specifications][]
@@ -18,20 +20,15 @@
     -   [Contributing guidelines][]
     -   [How FeenoX documentation system works][]
 
--   There is a brief introduction on the main [README][].
--   See [this presentation][] (August 2021).
--   There’s a [recording of the presentation][] (Slides are in English
-    but audio is in Spanish).
--   Browse the repository with the sources of the examples in the
-    presentation [here][]
-
+  [FeenoX manual]: #feenox-manual
+  [2021 Presentation]: #presentation
   [Hands on]: #hands-on
   [Quick examples]: #quick-examples
   [Tutorials]: #tutorials
   [Case files]: #case-files
   [Manual and reference]: #manual-and-reference
   [UNIX manpage]: #unix-manpage
-  [FeenoX manual]: #feenox-manual
+  [FeenoX description]: #feenox-description
   [Background and generalities]: #background-and-generalities
   [Software requirements specifications]: #software-requirements-specifications
   [Software design specifications]: #software-design-specifications
@@ -42,9 +39,25 @@
   [Compiling from source]: #compiling-from-source
   [Contributing guidelines]: #contributing-guidelines
   [How FeenoX documentation system works]: #how-feenox-documentation-system-works
-  [README]: ..
-  [this presentation]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
-  [recording of the presentation]: https://youtu.be/-RJ5qn7E9uE
+
+# FeenoX manual
+
+-   [HTML][]
+-   [PDF][]
+
+  [HTML]: https://www.seamplex.com/feenox/doc/feenox-manual.html
+  [PDF]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
+
+## 2021 Presentation
+
+-   [Slides in PDF][] (August 2021).
+-   [Video recording of the presentation][] (Slides are in English but
+    audio is in Spanish).
+-   Browse the repository with the sources of the examples in the
+    presentation [here][]
+
+  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
+  [Video recording of the presentation]: https://youtu.be/-RJ5qn7E9uE
   [here]: https://github.com/gtheler/2021-presentation
 
 # Hands on
@@ -86,21 +99,27 @@ repository.
 
   [UNIX manpage converted to HTML]: https://www.seamplex.com/feenox/doc/feenox.1.html
 
-## FeenoX manual
+## FeenoX description
 
 As per the [GNU Coding Standards][], “a manual should serve both as
 tutorial and reference.”
 
--   [HTML][]
--   [PDF][]
--   [Texinfo][]
+-   [HTML manual][]
+-   [PDF manual][]
+-   [Texinfo description][]
+-   [HTML description][]
+-   [PDF description][]
 
-The source is in [Pandoc][]-flavored Markdown.
+The sources are in the [doc][] directory of the Git repository. They are
+in [Pandoc][]-flavored Markdown.
 
   [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
-  [HTML]: https://www.seamplex.com/feenox/doc/feenox.html
-  [PDF]: https://www.seamplex.com/feenox/doc/feenox.pdf
-  [Texinfo]: https://www.seamplex.com/feenox/doc/feenox.texi
+  [HTML manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
+  [PDF manual]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
+  [Texinfo description]: https://www.seamplex.com/feenox/doc/feenox-desc.texi
+  [HTML description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [PDF description]: https://www.seamplex.com/feenox/doc/feenox-desc.pdf
+  [doc]: https://github.com/seamplex/feenox/tree/main/doc
   [Pandoc]: https://pandoc.org/
 
 # Background and generalities
@@ -148,6 +167,10 @@ See the [FeenoX history][].
 
 > If the following instructions make no sense to you, read the [FAQs][].
 
+To compile the Git repository, proceed as follows. This procedure does
+need `git` and `autoconf` but new versions can be pulled and recompiled
+easily.
+
 1.  Install mandatory dependencies
 
     ``` terminal
@@ -177,7 +200,7 @@ See the [FeenoX history][].
     cd feenox
     ./autogen.sh
     ./configure
-    make
+    make -j4
     ```
 
     If you cannot (or do not want) to use `libgsl-dev` from a package
@@ -201,6 +224,15 @@ See the [FeenoX history][].
     ``` terminal
     sudo make install
     ```
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+``` terminal
+git pull
+./autogen.sh; ./configure; make -j4
+sudo make install
+```
 
 -   See the [Compilation guide][] for a full explanation and of the
     steps above.

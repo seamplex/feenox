@@ -8,9 +8,15 @@ toc: true
 ...
 
 
- * There is a brief introduction on the main [README](..).
- * See [this presentation](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
- * There's a [recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
+# FeenoX manual
+
+ * [HTML](https://www.seamplex.com/feenox/doc/feenox-manual.html)
+ * [PDF](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
+
+## 2021 Presentation  
+ 
+ * [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
+ * [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
  * Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
 
 # Hands on
@@ -38,15 +44,17 @@ Detailed solutions of benchmarks, V&V cases and/or problems with industrial inte
 See [UNIX manpage converted to HTML](https://www.seamplex.com/feenox/doc/feenox.1.html)).
 It should be accessible with `man feenox` after installation and its sources are available in the Git repository.
 
-## FeenoX manual
+## FeenoX description
 
 As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html#GNU-Manuals), "a manual should serve both as tutorial and reference."
 
- * [HTML](https://www.seamplex.com/feenox/doc/feenox.html)
- * [PDF](https://www.seamplex.com/feenox/doc/feenox.pdf)
- * [Texinfo](https://www.seamplex.com/feenox/doc/feenox.texi)
+ * [HTML manual](https://www.seamplex.com/feenox/doc/feenox-manual.html)
+ * [PDF manual](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
+ * [Texinfo description](https://www.seamplex.com/feenox/doc/feenox-desc.texi)
+ * [HTML description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
+ * [PDF description](https://www.seamplex.com/feenox/doc/feenox-desc.pdf)
 
-The source is in [Pandoc](https://pandoc.org/)-flavored Markdown.
+The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) directory of the Git repository. They are in [Pandoc](https://pandoc.org/)-flavored Markdown.
  
 
 # Background and generalities

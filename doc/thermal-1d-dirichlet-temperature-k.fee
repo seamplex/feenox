@@ -1,0 +1,7 @@
+PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
+k(x) = 1+T(x)                    # temperature-dependent conductivity
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(1/2) sqrt(1+(3*0.5))-1   # print numerical and analytical solutions

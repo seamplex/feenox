@@ -1,12 +1,12 @@
-To compile the Git repository, proceed as follows. This procedure does need `git` and `autoconf` but new versions can be pulled and recompiled easily.
+To compile the source tarball, proceed as follows. This procedure does not need `git` nor `autoconf` but a new tarball has to be downloaded each time there is a new FeenoX version.
 
  1. Install mandatory dependencies
 
     ```terminal
-    sudo apt-get install gcc make git automake autoconf libgsl-dev
+    sudo apt-get install gcc make libgsl-dev
     ```
 
-    If you cannot install `libgsl-dev` but still have `git` and the build toolchain, you can have the `configure` script to download and compile it for you. See point\ 4 below.
+    If you cannot install `libgsl-dev`, you can have the `configure` script to download and compile it for you. See point\ 4 below.
     
  2. Install optional dependencies (of course these are _optional_ but recommended)
  
@@ -14,17 +14,18 @@ To compile the Git repository, proceed as follows. This procedure does need `git
     sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
- 3. Clone Github repository
+ 3. Download and uncompress FeenoX source tarball. Browse to <https://www.seamplex.com/feenox/dist/src/> and pick the latest version:
+ 
  
     ```terminal
-    git clone https://github.com/seamplex/feenox
+    wget https://www.seamplex.com/feenox/dist/src/feenox-v0.1.66-g1c4b17b.tar.gz
+    tar xvzf feenox-v0.1.66-g1c4b17b.tar.gz
     ```
-
- 4. Boostrap, configure, compile & make
+ 
+ 4. Configure, compile & make
  
     ```terminal
-    cd feenox
-    ./autogen.sh
+    cd feenox-v0.1.66-g1c4b17b
     ./configure
     make -j4
     ```
@@ -48,11 +49,4 @@ To compile the Git repository, proceed as follows. This procedure does need `git
     ```terminal
     sudo make install
     ```
- 
-To stay up to date, pull and then autogen, configure and make (and optionally install):
-
-```terminal
-git pull
-./autogen.sh; ./configure; make -j4
-sudo make install
-```
+    

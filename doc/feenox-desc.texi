@@ -104,15 +104,18 @@ and post-processors can be used with FeenoX. See for example
 @chapter Introduction
 @anchor{#introduction}
 @uref{https://www.seamplex.com/feenox,FeenoX} is to finite-element
-software and libraries what Markdown is to word processors and
-typesetting systems. It can be seen as
+software (like Code Aster) and libraries (like MoFEM) what Markdown is
+to word processors (like Word) and typesetting systems (like TeX),
+respectively.
+
+It can be seen either as
 
 @itemize
 @item
 a syntactically-sweetened way of asking the computer to solve
 engineering-related mathematical problems, and/or
 @item
-a finite-element(ish) tool with a particular design basis
+a finite-element(ish) tool with a particular design basis.
 @end itemize
 
 Note that some of the problems solved with FeenoX might not actually
@@ -146,8 +149,8 @@ engineering problems we can find) the following input file is enough:
 
 @smallformat
 @verbatim
-READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 k = 1                            # set uniform conductivity
 BC left  T=0                     # set fixed temperatures as BCs
 BC right T=1                     # "left" and "right" are defined in the mesh
@@ -179,14 +182,14 @@ set boundary conditions and/or material properties.
 Another design-basis decision is that @strong{similar problems ought to
 have similar inputs} (@emph{rule of least surprise}). So in order to
 have a space-dependent conductivity, we only have to replace one line in
-the input above: instead of defining a scalar @math{k} we define a
-function of @math{x} (we also update the output to show the analytical
+the input above: instead of defining a scalar@ @math{k} we define a
+function of@ @math{x} (we also update the output to show the analytical
 solution as well):
 
 @smallformat
 @verbatim
-READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
 k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
 BC right T=1
@@ -213,8 +216,8 @@ definition of algebraic functions:
 
 @smallformat
 @verbatim
-READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
 k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
 BC right T=1
@@ -237,15 +240,15 @@ For example, we can solve the
 
 @smallformat
 @verbatim
-READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
+READ_MESH nafems-le11.msh DIMENSIONS 3
 
 # linear temperature gradient in the radial and axial direction
 T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
-BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
-BC yz     symmetry  # ide with u=0
+BC xz     v=0
+BC yz     u=0
 BC xy     w=0
 BC HIH'I' w=0
 
@@ -264,8 +267,8 @@ Another example would be the famous chaotic
 @uref{http://en.wikipedia.org/wiki/Lorenz_system,Lorenz' dynamical
 system}---the one of the butterfly---whose differential equations are
 
-@math{\dot{x} = \sigma \cdot (y - x)}
-@math{\dot{y} = x \cdot (r - z) - y}
+@math{\dot{x} = \sigma \cdot (y - x)}@*
+@math{\dot{y} = x \cdot (r - z) - y}@*
 @math{\dot{z} = x \cdot y - b \cdot z}
 where @math{\sigma=10}, @math{b=8/3} and @math{r=28} are the classical
 parameters that generate the butterfly as presented by Edward Lorenz
@@ -331,9 +334,9 @@ steady or quasi-static thermo-mechanical problems, or
 @item
 steady or transient heat conduction problems, or
 @item
-modal analysis problems,
+modal analysis problems, or
 @item
-neutron diffusion or transport problems
+neutron diffusion or transport problems, or
 @item
 community-contributed problems
 @end itemize
@@ -350,25 +353,24 @@ interface} but means of using generic pre and post processing tools---in
 particular, @uref{http://gmsh.info/,Gmsh} and
 @uref{https://www.paraview.org/,Paraview} respectively. See also
 @uref{www.caeplex.com,CAEplex}.
-@end itemize
 
-@itemize
 @item
 The input files should be
 @uref{https://en.wikipedia.org/wiki/Syntactic_sugar,syntactically
 sugared} so as to be as self-describing as possible.
 
 @item
-Simple problems ought to need simple input files.
+@strong{Simple} problems ought to need @strong{simple} input files.
 
 @item
 Similar problems ought to need similar input files.
 
 @item
-Everything is an expression. Whenever a number is expected, an algebraic
-expression can be entered as well. Variables, vectors, matrices and
-functions are supported. Here is how to replace the boundary condition
-on the right side of the slab above with a radiation condition:
+@strong{Everything is an expression}. Whenever a number is expected, an
+algebraic expression can be entered as well. Variables, vectors,
+matrices and functions are supported. Here is how to replace the
+boundary condition on the right side of the slab above with a radiation
+condition:
 
 @smallformat
 @verbatim
@@ -499,6 +501,10 @@ option is not suitable for your workflow.
 On a GNU/Linux box (preferably Debian-based), follow these quick steps.
 See next section for detailed explanations.
 
+To compile the Git repository, proceed as follows. This procedure does
+need @code{git} and @code{autoconf} but new versions can be pulled and
+recompiled easily.
+
 @enumerate 
 @item
 Install mandatory dependencies
@@ -540,7 +546,7 @@ Boostrap, configure, compile & make
 cd feenox
 ./autogen.sh
 ./configure
-make
+make -j4
 @end verbatim
 @end smallformat
 
@@ -575,6 +581,17 @@ sudo make install
 @end smallformat
 
 @end enumerate
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+@smallformat
+@verbatim
+git pull
+./autogen.sh; ./configure; make -j4
+sudo make install
+@end verbatim
+@end smallformat
 
 @node Detailed configuration and compilation
 @subsection Detailed configuration and compilation

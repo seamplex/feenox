@@ -16,12 +16,15 @@
 
 # What is FeenoX?
 
-[FeenoX][] is to finite-element software and libraries what Markdown is
-to word processors and typesetting systems. It can be seen as
+[FeenoX][] is to finite-element software (like Code Aster) and libraries
+(like MoFEM) what Markdown is to word processors (like Word) and
+typesetting systems (like TeX), respectively.
+
+It can be seen either as
 
 -   a syntactically-sweetened way of asking the computer to solve
     engineering-related mathematical problems, and/or
--   a finite-element(ish) tool with a particular design basis
+-   a finite-element(ish) tool with a particular design basis.
 
 Note that some of the problems solved with FeenoX might not actually
 rely on the finite element method, but on general mathematical models
@@ -40,8 +43,8 @@ over the domain *x* ∈ \[0,1\] (which is indeed one of the most simple
 engineering problems we can find) the following input file is enough:
 
 ``` feenox
-READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 k = 1                            # set uniform conductivity
 BC left  T=0                     # set fixed temperatures as BCs
 BC right T=1                     # "left" and "right" are defined in the mesh
@@ -68,12 +71,13 @@ and/or material properties.
 Another design-basis decision is that **similar problems ought to have
 similar inputs** (*rule of least surprise*). So in order to have a
 space-dependent conductivity, we only have to replace one line in the
-input above: instead of defining a scalar *k* we define a function of
-*x* (we also update the output to show the analytical solution as well):
+input above: instead of defining a scalar *k* we define a function
+of *x* (we also update the output to show the analytical solution as
+well):
 
 ``` feenox
-READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
 k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
 BC right T=1
@@ -95,8 +99,8 @@ advantage of the fact that *T*(*x*) is available not only as an argument
 to `PRINT` but also for the definition of algebraic functions:
 
 ``` feenox
-READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
 k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
 BC right T=1
@@ -114,15 +118,15 @@ For example, we can solve the [NAFEMS LE11][] “Solid
 cylinder/Taper/Sphere-Temperature” benchmark like
 
 ``` feenox
-READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
+READ_MESH nafems-le11.msh DIMENSIONS 3
 
 # linear temperature gradient in the radial and axial direction
 T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
-BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
-BC yz     symmetry  # ide with u=0
+BC xz     v=0
+BC yz     u=0
 BC xy     w=0
 BC HIH'I' w=0
 
@@ -146,7 +150,9 @@ system][]—the one of the butterfly—whose differential equations are
 <div class="not-in-format plain latex">
 
 *ẋ* = *σ* ⋅ (*y*−*x*)
+  
 *ẏ* = *x* ⋅ (*r*−*z*) − *y*
+  
 *ż* = *x* ⋅ *y* − *b* ⋅ *z*
 
 </div>
@@ -202,8 +208,8 @@ In other words, FeenoX is a computational tool to solve
 -   dynamical systems written as sets of ODEs/DAEs, or
 -   steady or quasi-static thermo-mechanical problems, or
 -   steady or transient heat conduction problems, or
--   modal analysis problems,
--   neutron diffusion or transport problems
+-   modal analysis problems, or
+-   neutron diffusion or transport problems, or
 -   community-contributed problems
 
 in such a way that the input is a near-English text file that defines
@@ -216,16 +222,14 @@ the problem to be solved. Some basic rules are
     tools—in particular, [Gmsh][] and [Paraview][] respectively. See
     also [CAEplex][].
 
-<!-- show the same output (NAFEMS LE1?) with Gmsh and Paraview, quads struct/tri unstruct. -->
-
 -   The input files should be [syntactically sugared][] so as to be as
     self-describing as possible.
 
--   Simple problems ought to need simple input files.
+-   **Simple** problems ought to need **simple** input files.
 
 -   Similar problems ought to need similar input files.
 
--   Everything is an expression. Whenever a number is expected, an
+-   **Everything is an expression**. Whenever a number is expected, an
     algebraic expression can be entered as well. Variables, vectors,
     matrices and functions are supported. Here is how to replace the
     boundary condition on the right side of the slab above with a
@@ -304,7 +308,7 @@ of FEA software falls in either one of these two categories:
 
     **Examples:** [CalculiX][], [CodeAster][], [NASTRAN][][1]
 
-Hence, Fino tries to fill in the gap between these two worlds with a
+Hence, FeenoX tries to fill in the gap between these two worlds with a
 different design basis.
 
 [1] We list just the open-source ones because we [at Seamplex do not
@@ -334,6 +338,7 @@ below][] for details.
 | GNU/Linux binaries | <https://www.seamplex.com/feenox/dist/linux>   |
 | Windows binaries   | <https://www.seamplex.com/feenox/dist/windows> |
 | Source tarballs    | <https://www.seamplex.com/feenox/dist/src>     |
+| Github repository  | <https://github.com/seamplex/feenox/>          |
 
 -   Binaries are provided as statically-linked executables for
     convenience.
@@ -344,21 +349,23 @@ below][] for details.
 -   Try to avoid Windows as much as you can. The binaries are provided
     as transitional packages for people that for some reason still use
     such an outdated, anachronous, awful and invasive operating system.
-    They are compiled with Cygwin and have no support whatsoever.
+    They are compiled with [Cygwin][] and have no support whatsoever.
     Really, really, get rid of Windows ASAP.
 
     > “It is really worth any amount of time and effort to get away from
     > Windows if you are doing computational science.”
     >
-    > \[<https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>\]
+    > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
+  [Cygwin]: http://cygwin.com/
 
 ## Git repository
 
-If the statically-linked binaries above do not fit your needs, the
-recommended way of getting FeenoX is to compile from source.
+To compile the Git repository, proceed as follows. This procedure does
+need `git` and `autoconf` but new versions can be pulled and recompiled
+easily.
 
 1.  Install mandatory dependencies
 
@@ -389,7 +396,7 @@ recommended way of getting FeenoX is to compile from source.
     cd feenox
     ./autogen.sh
     ./configure
-    make
+    make -j4
     ```
 
     If you cannot (or do not want) to use `libgsl-dev` from a package
@@ -413,6 +420,15 @@ recommended way of getting FeenoX is to compile from source.
     ``` terminal
     sudo make install
     ```
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+``` terminal
+git pull
+./autogen.sh; ./configure; make -j4
+sudo make install
+```
 
 # Licensing
 

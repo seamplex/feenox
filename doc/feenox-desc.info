@@ -79,12 +79,14 @@ File: feenox-desc.info,  Node: Introduction,  Next: Running feenox,  Prev: Overv
 **************
 
 FeenoX (https://www.seamplex.com/feenox) is to finite-element software
-and libraries what Markdown is to word processors and typesetting
-systems.  It can be seen as
+(like Code Aster) and libraries (like MoFEM) what Markdown is to word
+processors (like Word) and typesetting systems (like TeX), respectively.
+
+It can be seen either as
 
    • a syntactically-sweetened way of asking the computer to solve
      engineering-related mathematical problems, and/or
-   • a finite-element(ish) tool with a particular design basis
+   • a finite-element(ish) tool with a particular design basis.
 
 Note that some of the problems solved with FeenoX might not actually
 rely on the finite element method, but on general mathematical models
@@ -104,8 +106,8 @@ simplicity_).  For instance, to solve one-dimensional heat conduction
 over the domain x\in[0,1] (which is indeed one of the most simple
 engineering problems we can find) the following input file is enough:
 
-READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 k = 1                            # set uniform conductivity
 BC left  T=0                     # set fixed temperatures as BCs
 BC right T=1                     # "left" and "right" are defined in the mesh
@@ -133,8 +135,8 @@ space-dependent conductivity, we only have to replace one line in the
 input above: instead of defining a scalar k we define a function of x
 (we also update the output to show the analytical solution as well):
 
-READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
 k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
 BC right T=1
@@ -152,8 +154,8 @@ conductivity (which renders the problem non-linear) we can take
 advantage of the fact that T(x) is available not only as an argument to
 ‘PRINT’ but also for the definition of algebraic functions:
 
-READ_MESH slab.msh
 PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
 k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
 BC right T=1
@@ -168,15 +170,15 @@ For example, we can solve the NAFEMS LE11
 (https://www.nafems.org/publications/resource_center/p18/) “Solid
 cylinder/Taper/Sphere-Temperature” benchmark like
 
-READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
+READ_MESH nafems-le11.msh DIMENSIONS 3
 
 # linear temperature gradient in the radial and axial direction
 T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
-BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
-BC yz     symmetry  # ide with u=0
+BC xz     v=0
+BC yz     u=0
 BC xy     w=0
 BC HIH'I' w=0
 
@@ -193,10 +195,11 @@ Another example would be the famous chaotic Lorenz’ dynamical system
 (http://en.wikipedia.org/wiki/Lorenz_system)—the one of the
 butterfly—whose differential equations are
 
-\dot{x} = \sigma \cdot (y - x) \dot{y} = x \cdot (r - z) - y \dot{z} = x
-\cdot y - b \cdot z where \sigma=10, b=8/3 and r=28 are the classical
-parameters that generate the butterfly as presented by Edward Lorenz
-back in his seminal 1963 paper Deterministic non-periodic flow
+\dot{x} = \sigma \cdot (y - x)
+\dot{y} = x \cdot (r - z) - y
+\dot{z} = x \cdot y - b \cdot z where \sigma=10, b=8/3 and r=28 are the
+classical parameters that generate the butterfly as presented by Edward
+Lorenz back in his seminal 1963 paper Deterministic non-periodic flow
 (http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
 We can solve it with FeenoX by writing the equations in the input file
 as naturally as possible, as illustrated in the input file that follows:
@@ -245,8 +248,8 @@ In other words, FeenoX is a computational tool to solve
    • dynamical systems written as sets of ODEs/DAEs, or
    • steady or quasi-static thermo-mechanical problems, or
    • steady or transient heat conduction problems, or
-   • modal analysis problems,
-   • neutron diffusion or transport problems
+   • modal analysis problems, or
+   • neutron diffusion or transport problems, or
    • community-contributed problems
 
 in such a way that the input is a near-English text file that defines
@@ -264,11 +267,11 @@ the problem to be solved.  Some basic rules are
      (https://en.wikipedia.org/wiki/Syntactic_sugar) so as to be as
      self-describing as possible.
 
-   • Simple problems ought to need simple input files.
+   • *Simple* problems ought to need *simple* input files.
 
    • Similar problems ought to need similar input files.
 
-   • Everything is an expression.  Whenever a number is expected, an
+   • *Everything is an expression*.  Whenever a number is expected, an
      algebraic expression can be entered as well.  Variables, vectors,
      matrices and functions are supported.  Here is how to replace the
      boundary condition on the right side of the slab above with a
@@ -386,6 +389,10 @@ option is not suitable for your workflow.
 On a GNU/Linux box (preferably Debian-based), follow these quick steps.
 See next section for detailed explanations.
 
+To compile the Git repository, proceed as follows.  This procedure does
+need ‘git’ and ‘autoconf’ but new versions can be pulled and recompiled
+easily.
+
   1. Install mandatory dependencies
 
      sudo apt-get install gcc make git automake autoconf libgsl-dev
@@ -408,7 +415,7 @@ See next section for detailed explanations.
      cd feenox
      ./autogen.sh
      ./configure
-     make
+     make -j4
 
      If you cannot (or do not want) to use ‘libgsl-dev’ from a package
      repository, call ‘configure’ with ‘--enable-download-gsl’:
@@ -425,6 +432,13 @@ See next section for detailed explanations.
   6. Install the binary system wide (optional)
 
      sudo make install
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+git pull
+./autogen.sh; ./configure; make -j4
+sudo make install
 
 
 File: feenox-desc.info,  Node: Detailed configuration and compilation,  Next: Advanced settings,  Prev: Quickstart,  Up: Compilation
@@ -1412,86 +1426,86 @@ Node: Overview833
 Ref: #overview942
 Node: Introduction2758
 Ref: #introduction2886
-Node: Running feenox12386
-Ref: #running-feenox12526
-Node: Invocation12567
-Ref: #invocation12684
-Node: Compilation13759
-Ref: #compilation13878
-Node: Quickstart14630
-Ref: #quickstart14775
-Node: Detailed configuration and compilation16169
-Ref: #detailed-configuration-and-compilation16396
-Node: Mandatory dependencies17527
-Ref: #mandatory-dependencies17722
-Node: Optional dependencies19786
-Ref: #optional-dependencies20006
-Node: FeenoX source code24236
-Ref: #feenox-source-code24441
-Node: Configuration26065
-Ref: #configuration26262
-Node: Source code compilation28406
-Ref: #source-code-compilation28615
-Node: Test suite33304
-Ref: #test-suite33486
-Node: Installation33504
-Ref: #installation33658
-Node: Advanced settings33676
-Ref: #advanced-settings33842
-Node: Compiling with debug symbols33936
-Ref: #compiling-with-debug-symbols34133
-Node: Using a different compiler34287
-Ref: #using-a-different-compiler34504
-Node: Compiling PETSc37679
-Ref: #compiling-petsc37837
-Node: Examples37855
-Ref: #examples37971
-Node: Tutorial38019
-Ref: #tutorial38132
-Node: Description38181
-Ref: #description38320
-Node: Algebraic expressions44291
-Ref: #algebraic-expressions44445
-Node: Initial conditions44495
-Ref: #initial-conditions44688
-Node: Expansions of command line arguments44688
-Ref: #expansions-of-command-line-arguments44887
-Node: FeenoX & the UNIX Philospohy44887
-Ref: #feenox-the-unix-philospohy45043
-Node: Rule of Modularity45445
-Ref: #rule-of-modularity45604
-Node: Rule of Clarity46061
-Ref: #rule-of-clarity46242
-Node: Rule of Composition46690
-Ref: #rule-of-composition46879
-Node: Rule of Separation47474
-Ref: #rule-of-separation47664
-Node: Rule of Simplicity48117
-Ref: #rule-of-simplicity48305
-Node: Rule of Parsimony48891
-Ref: #rule-of-parsimony49079
-Node: Rule of Transparency49571
-Ref: #rule-of-transparency49765
-Node: Rule of Robustness50164
-Ref: #rule-of-robustness50359
-Node: Rule of Representation50685
-Ref: #rule-of-representation50890
-Node: Rule of Least Surprise51272
-Ref: #rule-of-least-surprise51476
-Node: Rule of Silence52049
-Ref: #rule-of-silence52231
-Node: Rule of Repair52519
-Ref: #rule-of-repair52692
-Node: Rule of Economy53142
-Ref: #rule-of-economy53320
-Node: Rule of Generation53900
-Ref: #rule-of-generation54090
-Node: Rule of Optimization54491
-Ref: #rule-of-optimization54687
-Node: Rule of Diversity55072
-Ref: #rule-of-diversity55265
-Node: Rule of Extensibility55568
-Ref: #rule-of-extensibility55740
+Node: Running feenox12397
+Ref: #running-feenox12537
+Node: Invocation12578
+Ref: #invocation12695
+Node: Compilation13770
+Ref: #compilation13889
+Node: Quickstart14641
+Ref: #quickstart14786
+Node: Detailed configuration and compilation16498
+Ref: #detailed-configuration-and-compilation16725
+Node: Mandatory dependencies17856
+Ref: #mandatory-dependencies18051
+Node: Optional dependencies20115
+Ref: #optional-dependencies20335
+Node: FeenoX source code24565
+Ref: #feenox-source-code24770
+Node: Configuration26394
+Ref: #configuration26591
+Node: Source code compilation28735
+Ref: #source-code-compilation28944
+Node: Test suite33633
+Ref: #test-suite33815
+Node: Installation33833
+Ref: #installation33987
+Node: Advanced settings34005
+Ref: #advanced-settings34171
+Node: Compiling with debug symbols34265
+Ref: #compiling-with-debug-symbols34462
+Node: Using a different compiler34616
+Ref: #using-a-different-compiler34833
+Node: Compiling PETSc38008
+Ref: #compiling-petsc38166
+Node: Examples38184
+Ref: #examples38300
+Node: Tutorial38348
+Ref: #tutorial38461
+Node: Description38510
+Ref: #description38649
+Node: Algebraic expressions44620
+Ref: #algebraic-expressions44774
+Node: Initial conditions44824
+Ref: #initial-conditions45017
+Node: Expansions of command line arguments45017
+Ref: #expansions-of-command-line-arguments45216
+Node: FeenoX & the UNIX Philospohy45216
+Ref: #feenox-the-unix-philospohy45372
+Node: Rule of Modularity45774
+Ref: #rule-of-modularity45933
+Node: Rule of Clarity46390
+Ref: #rule-of-clarity46571
+Node: Rule of Composition47019
+Ref: #rule-of-composition47208
+Node: Rule of Separation47803
+Ref: #rule-of-separation47993
+Node: Rule of Simplicity48446
+Ref: #rule-of-simplicity48634
+Node: Rule of Parsimony49220
+Ref: #rule-of-parsimony49408
+Node: Rule of Transparency49900
+Ref: #rule-of-transparency50094
+Node: Rule of Robustness50493
+Ref: #rule-of-robustness50688
+Node: Rule of Representation51014
+Ref: #rule-of-representation51219
+Node: Rule of Least Surprise51601
+Ref: #rule-of-least-surprise51805
+Node: Rule of Silence52378
+Ref: #rule-of-silence52560
+Node: Rule of Repair52848
+Ref: #rule-of-repair53021
+Node: Rule of Economy53471
+Ref: #rule-of-economy53649
+Node: Rule of Generation54229
+Ref: #rule-of-generation54419
+Node: Rule of Optimization54820
+Ref: #rule-of-optimization55016
+Node: Rule of Diversity55401
+Ref: #rule-of-diversity55594
+Node: Rule of Extensibility55897
+Ref: #rule-of-extensibility56069
 
 End Tag Table
 

@@ -281,11 +281,20 @@ If the optional keyword \f[C]VERBOSE\f[R] is given, some data of the
 intermediate steps is written in the standard output.
 .SH \f[C]FUNCTION\f[R]
 .PP
-Define a function of one or more variables.
+Define a scalar function of one or more variables.
 .IP
 .nf
 \f[C]
-FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { = <expr> | FILE { <file_path> | <file_id> } | VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | DATA <num_1> <num_2> ... <num_N> } [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | nearest | shepard | shepard_kd | bilinear } ] [COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
+FUNCTION <function_name>(<var_1>[,var2,...,var_n]) { 
+   = <expr> | 
+   FILE { <file> } | 
+   VECTORS <vector_1> <vector_2> ... <vector_n> <vector_data> | 
+   DATA <num_1> <num_2> ... <num_N> 
+ } 
+ [ COLUMNS <expr_1> <expr_2> ... <expr_n> <expr_n+1> ] 
+ [ INTERPOLATION { linear | polynomial | spline | spline_periodic | akima | akima_periodic | steffen | 
+ nearest | shepard | shepard_kd | bilinear } ] 
+ [ INTERPOLATION_THRESHOLD <expr> ] [ SHEPARD_RADIUS <expr> ] [ SHEPARD_EXPONENT <expr> ]  
 \f[R]
 .fi
 .PP
@@ -294,9 +303,10 @@ given between parenthesis after the function name.
 The arguments are defined as new variables if they had not been already
 defined explictly as scalar variables.
 If the function is given as an algebraic expression, the short-hand
-operator \f[C]:=\f[R] can be used.
+operator \f[C]=\f[R] (or \f[C]:=\f[R] for compatiblity with Maxima) can
+be used.
 That is to say, \f[C]FUNCTION f(x) = x\[ha]2\f[R] is equivalent to
-\f[C]f(x) := x\[ha]2\f[R].
+\f[C]f(x) = x\[ha]2\f[R] (or \f[C]f(x) := x\[ha]2\f[R]).
 If a \f[C]FILE\f[R] is given, an ASCII file containing at least
 \f[I]n\f[R]\[u2005]+\[u2005]1 columns is expected.
 By default, the first \f[I]n\f[R] columns are the values of the
@@ -360,6 +370,7 @@ arguments and the definition points is smaller than
 no interpolation is performed.
 Default value is square root of
 \f[C]DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD\f[R].
+.PP
 The initial radius of points to take into account in
 \f[C]shepard_kd\f[R] is given by \f[C]SHEPARD_RADIUS\f[R].
 If no points are found, the radius is double until at least one
@@ -1043,7 +1054,7 @@ PRINT \[dq]difference\[dq] t2-t1 \[dq][seconds]\[dq]
 \f[C]
 $ feenox clock.fee
 doing something in between
-difference	3.5934e-05	[seconds]
+difference	7.8715e-05	[seconds]
 $
 \f[R]
 .fi

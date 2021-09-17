@@ -379,15 +379,15 @@ For example, we can solve the [NAFEMS LE11] "Solid
 cylinder/Taper/Sphere-Temperature" benchmark like
 
 ``` feenox
-READ_MESH nafems-le11.msh DIMENSIONS 3
 PROBLEM mechanical
+READ_MESH nafems-le11.msh DIMENSIONS 3
 
 # linear temperature gradient in the radial and axial direction
 T(x,y,z) = sqrt(x^2 + y^2) + z
 
 # Boundary conditions
-BC xz     symmetry  # same as v=0 but "symmetry" follows the statement
-BC yz     symmetry  # ide with u=0
+BC xz     v=0
+BC yz     u=0
 BC xy     w=0
 BC HIH'I' w=0
 
@@ -406,8 +406,8 @@ system]---the one of the butterfly---whose differential equations are
 
 ```{=plain}
 dx/dt = σ (y-x)  
-dy/dt = x (r-z) - y
-dz/dt = x y - b z
+dy/dt = x (r-z) - y  
+dz/dt = x y - b z  
 ```
 ::: {.not-in-format .texi}
 ```{=latex}
@@ -422,7 +422,8 @@ dz/dt = x y - b z
 :::
 
 ::: {.not-in-format .plain .latex}
-$$\dot{x} = \sigma \cdot (y - x)$$ $$\dot{y} = x \cdot (r - z) - y$$
+$$\dot{x} = \sigma \cdot (y - x)$$\
+$$\dot{y} = x \cdot (r - z) - y$$\
 $$\dot{z} = x \cdot y - b \cdot z$$
 :::
 
@@ -604,6 +605,10 @@ Here are the steps to get FeenoX' source repository, compile it and run
 the tests suite. Even though they are slightly more complex, they are
 still pretty standard and straightforward:
 
+To compile the Git repository, proceed as follows. This procedure does
+need `git` and `autoconf` but new versions can be pulled and recompiled
+easily.
+
 1.  Install mandatory dependencies
 
     ``` terminal
@@ -633,7 +638,7 @@ still pretty standard and straightforward:
     cd feenox
     ./autogen.sh
     ./configure
-    make
+    make -j4
     ```
 
     If you cannot (or do not want) to use `libgsl-dev` from a package
@@ -657,6 +662,15 @@ still pretty standard and straightforward:
     ``` terminal
     sudo make install
     ```
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+``` terminal
+git pull
+./autogen.sh; ./configure; make -j4
+sudo make install
+```
 
   [GNU Readline]: https://tiswww.case.edu/php/chet/readline/rltop.html
   [SUNDIALS IDA]: https://computing.llnl.gov/projects/sundials/ida
@@ -693,7 +707,7 @@ terminal command. When invoked without arguments, it prints its version,
 one-line description and the usage options:
 
 ``` {.terminal style="terminal"}
-FeenoX v0.1.63-g1454a68-dirty 
+FeenoX v0.1.67-g8899dfd-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]

@@ -1,0 +1,7 @@
+PROBLEM thermal DIMENSIONS 1
+READ_MESH slab.msh
+k(x) = 1+x                       # space-dependent conductivity
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(1/2) log(1+1/2)/log(2)   # print numerical and analytical solutions

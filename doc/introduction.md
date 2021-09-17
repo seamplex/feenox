@@ -1,7 +1,9 @@
-[FeenoX](https://www.seamplex.com/feenox) is to finite-element software and libraries what Markdown is to word processors and typesetting systems. It can be seen as
+[FeenoX](https://www.seamplex.com/feenox) is to finite-element software (like Code Aster) and libraries (like MoFEM) what Markdown is to word processors (like Word) and typesetting systems (like TeX), respectively.
+
+It can be seen either as
 
  * a syntactically-sweetened way of asking the computer to solve engineering-related mathematical problems, and/or
- * a finite-element(ish) tool with a particular design basis
+ * a finite-element(ish) tool with a particular design basis.
 
 Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
 
@@ -11,8 +13,8 @@ Note that some of the problems solved with FeenoX might not actually rely on the
 >   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
 
 ```{.include}
-design/thermal1d.md
-design/lorenz-le11.md
+thermal1d.md
+lorenz-le11.md
 ```
  
 In other words, FeenoX is a computational tool to solve
@@ -20,20 +22,18 @@ In other words, FeenoX is a computational tool to solve
  * dynamical systems written as sets of ODEs/DAEs, or
  * steady or quasi-static thermo-mechanical problems, or
  * steady or transient heat conduction problems, or
- * modal analysis problems,
- * neutron diffusion or transport problems
+ * modal analysis problems, or
+ * neutron diffusion or transport problems, or
  * community-contributed problems
 
 in such a way that the input is a near-English text file that defines the problem to be solved. Some basic rules are
 
  * FeenoX is just a **solver** working as a _transfer function_ between input and output files. Following the _rules of separation, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
  
-<!-- show the same output (NAFEMS LE1?) with Gmsh and Paraview, quads struct/tri unstruct. -->
- 
  * The input files should be [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) so as to be as self-describing as possible.
- * Simple problems ought to need simple input files.
+ * **Simple** problems ought to need **simple** input files.
  * Similar problems ought to need similar input files.
- * Everything is an expression. Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
+ * **Everything is an expression**. Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
  
    ```feenox
    sigma = 1       # non-dimensional stefan-boltzmann constant

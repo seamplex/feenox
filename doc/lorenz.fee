@@ -1,0 +1,17 @@
+PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
+end_time = 40         # we go from t=0 to 40 non-dimensional units
+
+sigma = 10            # the original parameters from the 1963 paper
+r = 28
+b = 8/3
+
+x_0 = -11             # initial conditions
+y_0 = -16
+z_0 = 22.5
+
+# the dynamical system's equations written as naturally as possible
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
+
+PRINT t x y z        # four-column plain-ASCII output
