@@ -1,0 +1,21 @@
+# NAFEMS Benchmark LE-10: thick plate pressure
+PROBLEM mechanical DIMENSIONS 3
+READ_MESH nafems-le10.msh   # mesh in millimeters
+
+# LOADING: uniform normal pressure on the upper surface
+BC upper    p=1      # 1 Mpa
+
+# BOUNDARY CONDITIONS:
+BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
+BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
+BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+# MATERIAL PROPERTIES: isotropic single-material properties
+E = 210e3   # Young modulus in MPa
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # solve!
+
+# print the direct stress y at D (and nothing more)
+PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
