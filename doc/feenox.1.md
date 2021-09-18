@@ -23,13 +23,13 @@ Besides executing the **feenox** binary, there is an API that allows to use Feen
 
 # DESCRIPTION
 
-```{.include}
+```include
 overview.md
 ```
 
 # OPTIONS
 
-```{.include}
+```include
 help.md
 ```
 
@@ -51,13 +51,13 @@ help.md
 
 # INPUT-FILE KEYWORDS
 
-```{.include}
+```{.include shift-heading-level-by=1}
 reference-kw.md
 ```
 
 # SPECIAL VARIABLES
 
-```{.include}
+```{.include shift-heading-level-by=1}
 reference-va.md
 ```
 
@@ -75,7 +75,7 @@ TBD.
 
 # BUILT-IN FUNCTIONS
 
-```{.include}
+```{.include shift-heading-level-by=1}
 reference-fn.md
 ```
 

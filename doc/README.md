@@ -7,11 +7,20 @@ lang: en-US
 toc: true 
 ...
 
+> FeenoX documentation is released under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html), or any later version.
 
 # FeenoX manual
 
- * [HTML](https://www.seamplex.com/feenox/doc/feenox-manual.html)
- * [PDF](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
+
+As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html#GNU-Manuals), "a manual should serve both as tutorial and reference." Due to the formatting restrictions, the [Texinfo](https://www.gnu.org/software/texinfo/) version contains only the description and not the full reference.
+
+ * [HTML manual](https://www.seamplex.com/feenox/doc/feenox-manual.html)
+ * [PDF manual](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
+ * [Texinfo description](https://www.seamplex.com/feenox/doc/feenox-desc.texi)
+ * [HTML description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
+ * [PDF description](https://www.seamplex.com/feenox/doc/feenox-desc.pdf)
+
+The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) directory of the Git repository. They are in [Pandoc](https://pandoc.org/)-flavored Markdown.
 
 ## 2021 Presentation  
  
@@ -19,6 +28,13 @@ toc: true
  * [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
  * Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
 
+## UNIX manpage
+
+See [UNIX manpage converted to HTML](https://www.seamplex.com/feenox/doc/feenox.1.html).
+It should be accessible with `man feenox` after (global) installation and its sources are available in the Git repository.
+
+ 
+ 
 # Hands on
 
 Go directly to the point and see how to solve problems with FeenoX. Everything (except the case files) is included in the Git repository.
@@ -36,26 +52,6 @@ Step-by-step instructions and explanations to solve increasingly-complex problem
 Detailed solutions of benchmarks, V&V cases and/or problems with industrial interest. These cases include parametric studies for mesh convergence, comparisons with analytical or other programs, efficiency measurements,  etc. Since these cases involve other tools, figures, data files, etc. they have a separate repository.
 
 **TO BE DONE**
-
-# Manual and reference
-
-## UNIX manpage
-
-See [UNIX manpage converted to HTML](https://www.seamplex.com/feenox/doc/feenox.1.html)).
-It should be accessible with `man feenox` after installation and its sources are available in the Git repository.
-
-## FeenoX description
-
-As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html#GNU-Manuals), "a manual should serve both as tutorial and reference."
-
- * [HTML manual](https://www.seamplex.com/feenox/doc/feenox-manual.html)
- * [PDF manual](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
- * [Texinfo description](https://www.seamplex.com/feenox/doc/feenox-desc.texi)
- * [HTML description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
- * [PDF description](https://www.seamplex.com/feenox/doc/feenox-desc.pdf)
-
-The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) directory of the Git repository. They are in [Pandoc](https://pandoc.org/)-flavored Markdown.
- 
 
 # Background and generalities
 
@@ -87,7 +83,7 @@ See the [FeenoX history](history.md).
 
 > If the following instructions make no sense to you, read the [FAQs](FAQ.md).
 
-```{.include}
+```include
 git.md
 ```
 

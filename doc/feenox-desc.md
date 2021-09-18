@@ -8,13 +8,13 @@ infoname: feenox-desc
 
 # Overview
 
-```{.include}
+```include
 overview.md
 ```
 
 # Introduction
 
-```{.include}
+```include
 introduction.md
 ```
 
@@ -31,7 +31,7 @@ feenox [options] inputfile [optional_extra_arguments] ...
 
 The `feenox` executable supports the following options:
 
-```{.include}
+```include
 help.md
 ```
 

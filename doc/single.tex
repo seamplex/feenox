@@ -326,7 +326,9 @@ $if(title)$
 $endif$
 \lfoot{\scriptsize{$if(date)$ $date$ $endif$ / $if(hash)$ \texttt{$hash$} $endif$}}
 \rfoot{\thepage/\pageref{LastPage}}
-\rhead{\includegraphics[height=10pt]{logo}}
+$if(logo)$
+\rhead{\includegraphics[height=10pt]{$logo$}}
+$endif$
 \renewcommand{\headrulewidth}{0.0pt}
 \renewcommand{\footrulewidth}{0.4pt}
 

@@ -12,7 +12,7 @@ Note that some of the problems solved with FeenoX might not actually rely on the
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
 >   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
 
-```{.include}
+```include
 thermal1d.md
 lorenz-le11.md
 ```

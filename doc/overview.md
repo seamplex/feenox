@@ -13,7 +13,7 @@ FeenoX reads a plain-text input file which contains the problem definition and w
 
 Keep in mind that FeenoX is just a back end reading a set of input files and writing a set of output files following the design philosophy of UNIX (separation, composition, representation, economy, extensibility, etc). Think of it as a transfer function between input files and output files:
 
-```{.include}
+```include
 transfer.md
 ```
 

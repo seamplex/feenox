@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in touch sed m4 pandoc pandoc-crossref xelatex makeinfo texi2pdf; do
+for i in touch sed pandoc; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -31,7 +31,6 @@ cd ..
    
   pandoc TODO.md    -t plain -o TODO
 cd doc
-# ./pdf.sh ../README
 
 echo "creating doc's README"
 pandoc README.md  -t gfm   -o README.markdown \
@@ -40,28 +39,7 @@ pandoc README.md  -t gfm   -o README.markdown \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua
 
-# srs & sds
-echo "creating SRS and SDS markdown"
-cd design
- m4 header.m4 srs.m4 | pandoc -t markdown --filter pandoc-crossref -o ../srs.markdown \
-  --standalone --toc --reference-links --reference-location=section \
-  --lua-filter=../include-files.lua \
-  --lua-filter=../include-code-files.lua \
-  --lua-filter=../not-in-format.lua
-  
- m4 header.m4 sds.m4 | pandoc -t markdown --filter pandoc-crossref -o ../sds.markdown \
-  --standalone --toc --reference-links --reference-location=section \
-  --lua-filter=../include-files.lua \
-  --lua-filter=../include-code-files.lua \
-  --lua-filter=../not-in-format.lua
- 
-cd ..
-# echo "creating SRS and SDS PDFs"
-# pandoc -s srs.md --filter pandoc-crossref --pdf-engine=xelatex --number-sections -o srs.pdf \
-#   --lua-filter=include-files.lua \
-#   --lua-filter=include-code-files.lua \
-#   --lua-filter=not-in-format.lua
-# ./pdf.sh sds
+
 
 echo "creating the reference markdown from the commented sources"
 echo " - keywords"
@@ -117,6 +95,31 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
 #   --lua-filter=include-code-files.lua \
 #   --lua-filter=not-in-format.lua
 
+
+# srs & sds
+for i in touch pandoc-crossref; do
+ if [ -z "$(which $i)" ]; then
+  exit 0
+ fi
+done
+
+echo "creating SRS and SDS markdown"
+pandoc sds.md -t markdown --filter pandoc-crossref -o srs.markdown \
+  --standalone --toc --reference-links --reference-location=section \
+  --lua-filter=include-files.lua \
+  --lua-filter=include-code-files.lua \
+  --lua-filter=not-in-format.lua
+  
+pandoc srs.md -t markdown --filter pandoc-crossref -o srs.markdown \
+  --standalone --toc --reference-links --reference-location=section \
+  --lua-filter=include-files.lua \
+  --lua-filter=include-code-files.lua \
+  --lua-filter=not-in-format.lua 
+
+  
+
+ 
+
 pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \
   --lua-filter=include-files.lua \
@@ -124,6 +127,12 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --lua-filter=not-in-format.lua
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
+
+for i in xelatex makeinfo texi2pdf; do
+ if [ -z "$(which $i)" ]; then
+  exit 0
+ fi
+done
 
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null
