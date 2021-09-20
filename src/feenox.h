@@ -1137,6 +1137,7 @@ struct bc_t {
   char *name;
   mesh_t *mesh;
   bc_data_t *bc_datums;
+  int has_explicit_groups;
 
   UT_hash_handle hh;  // for the hashed list mesh.bcs
   bc_t *next;         // for the linked list in each physical group

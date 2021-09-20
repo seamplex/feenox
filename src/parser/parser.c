@@ -2665,6 +2665,11 @@ int feenox_parse_bc(void) {
 ///kw_pde+BC+usage <name>
 ///kw_pde+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
 
+  if (feenox.mesh.mesh_main == NULL) {
+    feenox_push_error_message("BC before giving a MESH");
+    return FEENOX_ERROR;
+  }
+  
   if (feenox.pde.bc_parse == NULL) {
     feenox_push_error_message("BC before setting the PROBLEM type");
     return FEENOX_ERROR;
@@ -2695,7 +2700,12 @@ int feenox_parse_bc(void) {
 ///kw_pde+BC+usage [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ]
 ///kw_pde+BC+detail If the boundary condition applies to more than one physical group in the mesh,
 ///kw_pde+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
+///kw_pde+BC+detail If at least one `PHYSICAL_GROUP` is given explicitly, then the `BC` name
+///kw_pde+BC+detail is not used to try to implicitly link it to a physical group in the mesh.
     } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+      
+      bc->has_explicit_groups = 1;
+      
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
 

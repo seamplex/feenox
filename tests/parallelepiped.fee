@@ -1,0 +1,36 @@
+# references:
+#  - http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf
+#  - https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf
+PROBLEM mechanical 3D
+READ_MESH parallelepiped.msh
+
+T(x,y,z) = 40 - 2*x - 3*y - 4*z
+E(x,y,z) = 1000/(800-T(x,y,z))
+nu = 0.3
+
+BC O fixed
+BC B u=0 w=0
+BC C u=0
+
+# here "load" is a fantasy name
+BC load tension=1 PHYSICAL_GROUP left PHYSICAL_GROUP right
+
+SOLVE_PROBLEM
+
+# analytical solutions
+h = 10
+A = 0.002
+B = 0.003
+C = 0.004
+D = 0.76
+
+# the "e" means exact
+ue(x,y,z) := A/2*(x^2 + nu*(y^2+z^2)) + B*x*y + C*x*z + D*x - nu*A*h/4*(y+z)
+ve(x,y,z) := -nu*(A*x*y + B/2*(y^2-z^2+x^2/nu) + C*y*z + D*y -A*h/4*x - C*h/4*z)
+we(x,y,z) := -nu*(A*x*z + B*y*z + C/2*(z^2-y^2+x^2/nu) + D*z + C*h/4*y - A*h/4*x)
+
+# compute the L-2 norm of the error in the displacement field
+INTEGRATE (u(x,y,z)-ue(x,y,z))^2+(v(x,y,z)-ve(x,y,z))^2+(w(x,y,z)-we(x,y,z))^2 RESULT num
+INTEGRATE 1 RESULT den
+
+PRINT num/den

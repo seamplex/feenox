@@ -485,10 +485,9 @@ int feenox_problem_init_runtime_general(void) {
   }  
 
 
-  physical_group_t *physical_group;
+  physical_group_t *physical_group = NULL;
+  // this is a loop over a hash, not over a linked list
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-
-    // TODO: poner una variable para elegir esto
     if (physical_group->bcs != NULL && physical_group->n_elements == 0) {
       feenox_push_error_message("physical entity '%s' has a BC but no associated elements", physical_group->name);
       return FEENOX_ERROR;
@@ -500,6 +499,23 @@ int feenox_problem_init_runtime_general(void) {
     }
   }
 
+  bc_t *bc = NULL;
+  // this is a loop over a hash, not over a linked list
+  for (bc = feenox.mesh.bcs; bc != NULL; bc = bc->hh.next) {
+    if (bc->has_explicit_groups == 0) {
+      HASH_FIND_STR(feenox.pde.mesh->physical_groups, bc->name, physical_group);
+    
+      if (physical_group == NULL) {
+        feenox_push_error_message("boundary condition '%s' does not have a physical group in mesh file '%s'", bc->name, feenox.pde.mesh->file->path);
+        return FEENOX_ERROR;
+      }
+    
+      if (physical_group->n_elements == 0) {
+        feenox_push_error_message("physical group for boundary condition '%s' does not have any elements", bc->name);
+        return FEENOX_ERROR;
+      }
+    }
+  }
 
   // allocate global petsc objects
   if (feenox.pde.global_size == 0) {

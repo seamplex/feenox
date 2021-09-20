@@ -39,6 +39,7 @@ TESTS = \
         tests/nafems-t4.sh \
         tests/neutron_diffusion_src.sh \
         tests/neutron_diffusion_keff.sh \
+        tests/parallelepiped.sh \
         tests/point-kinetics.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
