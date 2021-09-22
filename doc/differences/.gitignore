@@ -1,6 +1,7 @@
 *.msh
 *.vtk
 README.pdf
+*.png
 calculix
 code_aster
-*.png
+reflex

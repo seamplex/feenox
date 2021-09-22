@@ -102,9 +102,11 @@ finite-element(ish) tool.
 
 One of the main features of this allegedly particular design basis is
 that *simple problems ought to have simple inputs* (_rule of
-simplicity_).  For instance, to solve one-dimensional heat conduction
-over the domain x\in[0,1] (which is indeed one of the most simple
-engineering problems we can find) the following input file is enough:
+simplicity_) or, quoting Alan Kay, “simple things should be simple,
+complex things should be possible.” For instance, to solve
+one-dimensional heat conduction over the domain x\in[0,1] (which is
+indeed one of the most simple engineering problems we can find) the
+following input file is enough:
 
 PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
 READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
@@ -166,43 +168,22 @@ $ feenox thermal-1d-dirichlet-temperature-k.fee
 0.581139	0.581139
 $
 
-For example, we can solve the NAFEMS LE11
-(https://www.nafems.org/publications/resource_center/p18/) “Solid
-cylinder/Taper/Sphere-Temperature” benchmark like
-
-PROBLEM mechanical
-READ_MESH nafems-le11.msh DIMENSIONS 3
-
-# linear temperature gradient in the radial and axial direction
-T(x,y,z) = sqrt(x^2 + y^2) + z
-
-# Boundary conditions
-BC xz     v=0
-BC yz     u=0
-BC xy     w=0
-BC HIH'I' w=0
-
-# material properties (isotropic & uniform so we can use scalar constants)
-E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
-nu = 0.3            # dimensionless
-alpha = 2.3e-4      # in 1/ºC as in the problem
-
-SOLVE_PROBLEM
-WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
-PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
-
-Another example would be the famous chaotic Lorenz’ dynamical system
-(http://en.wikipedia.org/wiki/Lorenz_system)—the one of the
-butterfly—whose differential equations are
+Solve
 
 \dot{x} = \sigma \cdot (y - x)
 \dot{y} = x \cdot (r - z) - y
-\dot{z} = x \cdot y - b \cdot z where \sigma=10, b=8/3 and r=28 are the
-classical parameters that generate the butterfly as presented by Edward
-Lorenz back in his seminal 1963 paper Deterministic non-periodic flow
+\dot{z} = x \cdot y - b \cdot z for 0 < t < 40 with initial conditions
+
+x(0) = -11
+y(0) = -16
+z(0) = 22.5 and \sigma=10, r=28 and b=8/3, which are the classical
+parameters that generate the butterfly as presented by Edward Lorenz
+back in his seminal 1963 paper Deterministic non-periodic flow
 (http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
-We can solve it with FeenoX by writing the equations in the input file
-as naturally as possible, as illustrated in the input file that follows:
+
+The following ASCII input file ressembles the parameters, inital
+conditions and differential equations of the problem as naturally as
+possible:
 
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
@@ -222,16 +203,60 @@ z_dot = x*y - b*z
 
 PRINT t x y z        # four-column plain-ASCII output
 
+Indeed, when executing FeenoX with this input file, we get four ASCII
+columns (t, x, y and z) which we can then redirect to a file and plot it
+with a standard tool such as Gnuplot.  Note the importance of relying on
+plain ASCII text formats both for input and output, as recommended by
+the UNIX philosophy and the _rule of composition_: other programs can
+easily create inputs for FeenoX and other programs can easily understand
+FeenoX’ outputs.  This is essentially how UNIX filters and pipes work.
+
+Let us solve the linear elasticity benchmark problem NAFEMS LE10
+(https://www.nafems.org/publications/resource_center/p18/) “Thick plate
+pressure.” Assuming a proper mesh has already been created in Gmsh, note
+how well the FeenoX input file matches the problem statement:
+
+ [image src="nafems-le10-problem-input.svg" alt="The NAFEMS LE10 problem statement and
+the corresponding FeenoX input" ]
+
+The NAFEMS LE10 problem statement and the corresponding FeenoX input
+
+# NAFEMS Benchmark LE-10: thick plate pressure
+PROBLEM mechanical DIMENSIONS 3
+READ_MESH nafems-le10.msh   # mesh in millimeters
+
+# LOADING: uniform normal pressure on the upper surface
+BC upper    p=1      # 1 Mpa
+
+# BOUNDARY CONDITIONS:
+BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
+BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
+BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+# MATERIAL PROPERTIES: isotropic single-material properties
+E = 210e3   # Young modulus in MPa
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # solve!
+
+# print the direct stress y at D (and nothing more)
+PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+
+The problem asks for the normal stress in the y direction \sigma_y at
+point “D,” which is what FeenoX writes (and nothing else, _rule of
+economy_):
+
+$ feenox nafems-le10.fee 
+sigma_y @ D =   -5.38136        MPa
+$ 
+
 Please note the following two points about both cases above:
 
   1. The input files are very similar to the statements of each problem
-     in plain English words (_rule of clarity_).  Take some time to read
-     the problem statement of the NAFEMS LE11 benchmark
-     (doc/design/nafems-le11/nafems-le11.png) and the FeenoX input to
-     see how well the latter matches the former.  Same for the Lorenz’
-     chaotic system.  Those with some experience may want to compare
-     them to the inputs decks (sic) needed for other common FEA
-     programs.
+     in plain English words (_rule of clarity_).  Those with some
+     experience may want to compare them to the inputs decks (sic)
+     needed for other common FEA programs.
   2. By design, 100% of FeenoX’ output is controlled by the user.  Had
      there not been any ‘PRINT’ or ‘WRITE_MESH’ instructions, the output
      would have been empty, following the _rule of silence_.  This is a
@@ -1426,86 +1451,86 @@ Node: Overview833
 Ref: #overview942
 Node: Introduction2758
 Ref: #introduction2886
-Node: Running feenox12397
-Ref: #running-feenox12537
-Node: Invocation12578
-Ref: #invocation12695
-Node: Compilation13770
-Ref: #compilation13889
-Node: Quickstart14641
-Ref: #quickstart14786
-Node: Detailed configuration and compilation16498
-Ref: #detailed-configuration-and-compilation16725
-Node: Mandatory dependencies17856
-Ref: #mandatory-dependencies18051
-Node: Optional dependencies20115
-Ref: #optional-dependencies20335
-Node: FeenoX source code24565
-Ref: #feenox-source-code24770
-Node: Configuration26394
-Ref: #configuration26591
-Node: Source code compilation28735
-Ref: #source-code-compilation28944
-Node: Test suite33633
-Ref: #test-suite33815
-Node: Installation33833
-Ref: #installation33987
-Node: Advanced settings34005
-Ref: #advanced-settings34171
-Node: Compiling with debug symbols34265
-Ref: #compiling-with-debug-symbols34462
-Node: Using a different compiler34616
-Ref: #using-a-different-compiler34833
-Node: Compiling PETSc38008
-Ref: #compiling-petsc38166
-Node: Examples38184
-Ref: #examples38300
-Node: Tutorial38348
-Ref: #tutorial38461
-Node: Description38510
-Ref: #description38649
-Node: Algebraic expressions44620
-Ref: #algebraic-expressions44774
-Node: Initial conditions44824
-Ref: #initial-conditions45017
-Node: Expansions of command line arguments45017
-Ref: #expansions-of-command-line-arguments45216
-Node: FeenoX & the UNIX Philospohy45216
-Ref: #feenox-the-unix-philospohy45372
-Node: Rule of Modularity45774
-Ref: #rule-of-modularity45933
-Node: Rule of Clarity46390
-Ref: #rule-of-clarity46571
-Node: Rule of Composition47019
-Ref: #rule-of-composition47208
-Node: Rule of Separation47803
-Ref: #rule-of-separation47993
-Node: Rule of Simplicity48446
-Ref: #rule-of-simplicity48634
-Node: Rule of Parsimony49220
-Ref: #rule-of-parsimony49408
-Node: Rule of Transparency49900
-Ref: #rule-of-transparency50094
-Node: Rule of Robustness50493
-Ref: #rule-of-robustness50688
-Node: Rule of Representation51014
-Ref: #rule-of-representation51219
-Node: Rule of Least Surprise51601
-Ref: #rule-of-least-surprise51805
-Node: Rule of Silence52378
-Ref: #rule-of-silence52560
-Node: Rule of Repair52848
-Ref: #rule-of-repair53021
-Node: Rule of Economy53471
-Ref: #rule-of-economy53649
-Node: Rule of Generation54229
-Ref: #rule-of-generation54419
-Node: Rule of Optimization54820
-Ref: #rule-of-optimization55016
-Node: Rule of Diversity55401
-Ref: #rule-of-diversity55594
-Node: Rule of Extensibility55897
-Ref: #rule-of-extensibility56069
+Node: Running feenox13309
+Ref: #running-feenox13449
+Node: Invocation13490
+Ref: #invocation13607
+Node: Compilation14682
+Ref: #compilation14801
+Node: Quickstart15553
+Ref: #quickstart15698
+Node: Detailed configuration and compilation17410
+Ref: #detailed-configuration-and-compilation17637
+Node: Mandatory dependencies18768
+Ref: #mandatory-dependencies18963
+Node: Optional dependencies21027
+Ref: #optional-dependencies21247
+Node: FeenoX source code25477
+Ref: #feenox-source-code25682
+Node: Configuration27306
+Ref: #configuration27503
+Node: Source code compilation29647
+Ref: #source-code-compilation29856
+Node: Test suite34545
+Ref: #test-suite34727
+Node: Installation34745
+Ref: #installation34899
+Node: Advanced settings34917
+Ref: #advanced-settings35083
+Node: Compiling with debug symbols35177
+Ref: #compiling-with-debug-symbols35374
+Node: Using a different compiler35528
+Ref: #using-a-different-compiler35745
+Node: Compiling PETSc38920
+Ref: #compiling-petsc39078
+Node: Examples39096
+Ref: #examples39212
+Node: Tutorial39260
+Ref: #tutorial39373
+Node: Description39422
+Ref: #description39561
+Node: Algebraic expressions45532
+Ref: #algebraic-expressions45686
+Node: Initial conditions45736
+Ref: #initial-conditions45929
+Node: Expansions of command line arguments45929
+Ref: #expansions-of-command-line-arguments46128
+Node: FeenoX & the UNIX Philospohy46128
+Ref: #feenox-the-unix-philospohy46284
+Node: Rule of Modularity46686
+Ref: #rule-of-modularity46845
+Node: Rule of Clarity47302
+Ref: #rule-of-clarity47483
+Node: Rule of Composition47931
+Ref: #rule-of-composition48120
+Node: Rule of Separation48715
+Ref: #rule-of-separation48905
+Node: Rule of Simplicity49358
+Ref: #rule-of-simplicity49546
+Node: Rule of Parsimony50132
+Ref: #rule-of-parsimony50320
+Node: Rule of Transparency50812
+Ref: #rule-of-transparency51006
+Node: Rule of Robustness51405
+Ref: #rule-of-robustness51600
+Node: Rule of Representation51926
+Ref: #rule-of-representation52131
+Node: Rule of Least Surprise52513
+Ref: #rule-of-least-surprise52717
+Node: Rule of Silence53290
+Ref: #rule-of-silence53472
+Node: Rule of Repair53760
+Ref: #rule-of-repair53933
+Node: Rule of Economy54383
+Ref: #rule-of-economy54561
+Node: Rule of Generation55141
+Ref: #rule-of-generation55331
+Node: Rule of Optimization55732
+Ref: #rule-of-optimization55928
+Node: Rule of Diversity56313
+Ref: #rule-of-diversity56506
+Node: Rule of Extensibility56809
+Ref: #rule-of-extensibility56981
 
 End Tag Table
 

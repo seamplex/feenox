@@ -14,7 +14,7 @@ Note that some of the problems solved with FeenoX might not actually rely on the
 
 ```include
 thermal1d.md
-lorenz-le11.md
+lorenz-le10.md
 ```
  
 In other words, FeenoX is a computational tool to solve

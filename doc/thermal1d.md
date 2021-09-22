@@ -1,4 +1,5 @@
-One of the main features of this allegedly particular design basis is that **simple problems ought to have simple inputs** (_rule of simplicity_). For instance, to solve one-dimensional heat conduction over the domain $x\in[0,1]$ (which is indeed one of the most simple engineering problems we can find) the following input file is enough:
+One of the main features of this allegedly particular design basis is that **simple problems ought to have simple inputs** (_rule of simplicity_) or, quoting Alan Kay, “simple things should be simple, complex things should be possible.”
+For instance, to solve one-dimensional heat conduction over the domain $x\in[0,1]$ (which is indeed one of the most simple engineering problems we can find) the following input file is enough:
 
 ```{.feenox include="thermal-1d-dirichlet-constant-k.fee"}
 ```

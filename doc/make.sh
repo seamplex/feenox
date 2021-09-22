@@ -128,11 +128,14 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 
-for i in xelatex makeinfo texi2pdf; do
+for i in xelatex makeinfo texi2pdf inkscape; do
  if [ -z "$(which $i)" ]; then
   exit 0
  fi
 done
 
+for i in logo nafems-le10-problem-input lorenz; do
+  inkscape --export-type=pdf ${i}.svg
+done
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null

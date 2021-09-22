@@ -1,12 +1,10 @@
 ---
 title: FeenoX Software Design Specification
 lang: en-US
-abstract: This design specification addresses the (hypothetical) Software Requirement Specification for developing a piece of free and open source engineering software with certain specifications, defined in an imaginary Software Requirement Specifications tender.
+abstract: This Software Design Specifications (SDS) document applies to a fictitious Software Requirement Specifications (SRS) document. The latter can be seen as a request for quotation and the former as an offer for the tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
 number-sections: true
 toc: true
 ...
-
-This Software Design Specifications (SDS) document applies to a fictitious Software Requirement Specifications (SRS) document. The latter can be seen as a request for quotation and the former as an offer for the tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
 
 > ```include
 > 100-introduction.md
@@ -14,22 +12,9 @@ This Software Design Specifications (SDS) document applies to a fictitious Softw
 
 Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). This condition leaves all of the well-known non-free (i.e. wrongly-called "commercial") finite-element solvers in the market (NASTRAN, Abaqus, ANSYS, Midas, etc.) out of the tender.
 
-FeenoX is licensed under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version. This means that users get the four essential freedoms:^[
-There are some examples of pieces of computational software which are described as “open source” in which even the first of the four freedoms is denied. The most iconic case is that of Android, whose sources are readily available online but there is no straightforward way of updating one’s mobile phone firmware with a customized version, not to mention vendor and hardware lock ins and the possibility of bricking devices if something unexpected happens. In the nuclear industry, it is the case of a Monte Carlo particle-transport program that requests users to sign an agreement about the objective of its usage before allowing its execution. The software itself might be open source because the source code is provided after signing the agreement, but it is not free (as in freedom) at all.]
-
- 0. The freedom to _run_ the program as they wish, for _any_ purpose.
- 1. The freedom to _study_ how the program works, and _change_ it so it does their computing as they wish.
- 2. The freedom to _redistribute_ copies so they can help others.
- 3. The freedom to _distribute_ copies of their _modified_ versions to others.
-
- 
-So a free program has to be open source, but it also has to explicitly provide the four freedoms above both through the written license and through the mechanisms available to get, modify, compile, run and document these modifications. 
-That is why licensing FeenoX as GPLv3+ also implies that the source code and all the scripts and makefiles needed to compile and run it are available for anyone that requires it. Anyone wanting to modify the program either to fix bugs, improve it or add new features is free to do so. And if they do not know how to program, the have the freedom to hire a programmer to do it without needing to ask permission to the original authors.
-
-Nevertheless, since these original authors are the copyright holders, they still can use it to either enforce or prevent further actions from the users that receive FeenoX under the GPLv3+. In particular, the license allows re-distribution of modified versions only if they are clearly marked as different from the original and only under the same terms of the GPLv3+. There are also some other subtle technicalities that need not be discussed here such as what constitutes a modified version (which cannot be redistributed under a different license) and what is an aggregate (in which each part be distributed under different licenses) and about usage over a network and the possibility of using [AGPL](https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License) instead of GPL to further enforce freedom (TLDR; it does not matter for FeenoX), but which are already taken into account in FeenoX licensing scheme.
-
-It should be noted that not only is FeenoX free and open source, but also all of the libraries it depends (and their dependencies) are. It can also be compiled using free and open source build tool chains running over free and open source operating systems. In addition, the FeenoX documentation is licensed under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html) (or any later version).
-
+```include
+licensing.md
+```
 
 > ```include
 > 110-objective.md
@@ -81,9 +66,7 @@ Strictly speaking, FeenoX does not need to be used along with Gmsh but with any 
  * has a similar (but more comprehensive) API for Python/Julia,
  * etc.
  
-it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)) for scaling up large problems,
-
-
+it is a perfect match for FeenoX. Even more, it provides suitable domain decomposition methods (through other FOSS third-party libraries such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)) for scaling up large problems.
 
 ```include
 le10.md

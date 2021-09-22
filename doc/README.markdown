@@ -2,13 +2,11 @@
 
 -   [FeenoX manual][]
     -   [2021 Presentation][]
+    -   [UNIX manpage][]
 -   [Hands on][]
     -   [Quick examples][]
     -   [Tutorials][]
     -   [Case files][]
--   [Manual and reference][]
-    -   [UNIX manpage][]
-    -   [FeenoX description][]
 -   [Background and generalities][]
     -   [Software requirements specifications][]
     -   [Software design specifications][]
@@ -20,15 +18,16 @@
     -   [Contributing guidelines][]
     -   [How FeenoX documentation system works][]
 
+> FeenoX documentation is released under the terms of the [GNU Free
+> Documentation License v1.3][], or any later version.
+
   [FeenoX manual]: #feenox-manual
   [2021 Presentation]: #presentation
+  [UNIX manpage]: #unix-manpage
   [Hands on]: #hands-on
   [Quick examples]: #quick-examples
   [Tutorials]: #tutorials
   [Case files]: #case-files
-  [Manual and reference]: #manual-and-reference
-  [UNIX manpage]: #unix-manpage
-  [FeenoX description]: #feenox-description
   [Background and generalities]: #background-and-generalities
   [Software requirements specifications]: #software-requirements-specifications
   [Software design specifications]: #software-design-specifications
@@ -39,14 +38,33 @@
   [Compiling from source]: #compiling-from-source
   [Contributing guidelines]: #contributing-guidelines
   [How FeenoX documentation system works]: #how-feenox-documentation-system-works
+  [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
 # FeenoX manual
 
--   [HTML][]
--   [PDF][]
+As per the [GNU Coding Standards][], “a manual should serve both as
+tutorial and reference.” Due to the formatting restrictions, the
+[Texinfo][] version contains only the description and not the full
+reference.
 
-  [HTML]: https://www.seamplex.com/feenox/doc/feenox-manual.html
-  [PDF]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
+-   [HTML manual][]
+-   [PDF manual][]
+-   [Texinfo description][]
+-   [HTML description][]
+-   [PDF description][]
+
+The sources are in the [doc][] directory of the Git repository. They are
+in [Pandoc][]-flavored Markdown.
+
+  [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
+  [Texinfo]: https://www.gnu.org/software/texinfo/
+  [HTML manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
+  [PDF manual]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
+  [Texinfo description]: https://www.seamplex.com/feenox/doc/feenox-desc.texi
+  [HTML description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [PDF description]: https://www.seamplex.com/feenox/doc/feenox-desc.pdf
+  [doc]: https://github.com/seamplex/feenox/tree/main/doc
+  [Pandoc]: https://pandoc.org/
 
 ## 2021 Presentation
 
@@ -59,6 +77,14 @@
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Video recording of the presentation]: https://youtu.be/-RJ5qn7E9uE
   [here]: https://github.com/gtheler/2021-presentation
+
+## UNIX manpage
+
+See [UNIX manpage converted to HTML][]. It should be accessible with
+`man feenox` after (global) installation and its sources are available
+in the Git repository.
+
+  [UNIX manpage converted to HTML]: https://www.seamplex.com/feenox/doc/feenox.1.html
 
 # Hands on
 
@@ -88,39 +114,6 @@ measurements, etc. Since these cases involve other tools, figures, data
 files, etc. they have a separate repository.
 
 **TO BE DONE**
-
-# Manual and reference
-
-## UNIX manpage
-
-See [UNIX manpage converted to HTML][]). It should be accessible with
-`man feenox` after installation and its sources are available in the Git
-repository.
-
-  [UNIX manpage converted to HTML]: https://www.seamplex.com/feenox/doc/feenox.1.html
-
-## FeenoX description
-
-As per the [GNU Coding Standards][], “a manual should serve both as
-tutorial and reference.”
-
--   [HTML manual][]
--   [PDF manual][]
--   [Texinfo description][]
--   [HTML description][]
--   [PDF description][]
-
-The sources are in the [doc][] directory of the Git repository. They are
-in [Pandoc][]-flavored Markdown.
-
-  [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
-  [HTML manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
-  [PDF manual]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
-  [Texinfo description]: https://www.seamplex.com/feenox/doc/feenox-desc.texi
-  [HTML description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [PDF description]: https://www.seamplex.com/feenox/doc/feenox-desc.pdf
-  [doc]: https://github.com/seamplex/feenox/tree/main/doc
-  [Pandoc]: https://pandoc.org/
 
 # Background and generalities
 

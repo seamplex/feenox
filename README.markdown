@@ -38,9 +38,11 @@ finite-element(ish) tool.
 
 One of the main features of this allegedly particular design basis is
 that **simple problems ought to have simple inputs** (*rule of
-simplicity*). For instance, to solve one-dimensional heat conduction
-over the domain *x* ∈ \[0,1\] (which is indeed one of the most simple
-engineering problems we can find) the following input file is enough:
+simplicity*) or, quoting Alan Kay, “simple things should be simple,
+complex things should be possible.” For instance, to solve
+one-dimensional heat conduction over the domain *x* ∈ \[0,1\] (which is
+indeed one of the most simple engineering problems we can find) the
+following input file is enough:
 
 ``` feenox
 PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
@@ -114,34 +116,7 @@ $ feenox thermal-1d-dirichlet-temperature-k.fee
 $
 ```
 
-For example, we can solve the [NAFEMS LE11][] “Solid
-cylinder/Taper/Sphere-Temperature” benchmark like
-
-``` feenox
-PROBLEM mechanical
-READ_MESH nafems-le11.msh DIMENSIONS 3
-
-# linear temperature gradient in the radial and axial direction
-T(x,y,z) = sqrt(x^2 + y^2) + z
-
-# Boundary conditions
-BC xz     v=0
-BC yz     u=0
-BC xy     w=0
-BC HIH'I' w=0
-
-# material properties (isotropic & uniform so we can use scalar constants)
-E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
-nu = 0.3            # dimensionless
-alpha = 2.3e-4      # in 1/ºC as in the problem
-
-SOLVE_PROBLEM
-WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
-PRINT "sigma_z(A) = " sigmaz(0,1,0)/1e6 "MPa"
-```
-
-Another example would be the famous chaotic [Lorenz’ dynamical
-system][]—the one of the butterfly—whose differential equations are
+Solve
 
 <div class="not-in-format texi">
 
@@ -157,11 +132,29 @@ system][]—the one of the butterfly—whose differential equations are
 
 </div>
 
-where *σ* = 10, *b* = 8/3 and *r* = 28 are the classical parameters that
-generate the butterfly as presented by Edward Lorenz back in his seminal
-1963 paper [Deterministic non-periodic flow][]. We can solve it with
-FeenoX by writing the equations in the input file as naturally as
-possible, as illustrated in the input file that follows:
+for 0 \< *t* \< 40 with initial conditions
+
+<div class="not-in-format texi">
+
+</div>
+
+<div class="not-in-format plain latex">
+
+*x*(0) =  − 11
+  
+*y*(0) =  − 16
+  
+*z*(0) = 22.5
+
+</div>
+
+and *σ* = 10, *r* = 28 and *b* = 8/3, which are the classical parameters
+that generate the butterfly as presented by Edward Lorenz back in his
+seminal 1963 paper [Deterministic non-periodic flow][].
+
+The following ASCII input file ressembles the parameters, inital
+conditions and differential equations of the problem as naturally as
+possible:
 
 ``` feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
@@ -183,15 +176,64 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
+Indeed, when executing FeenoX with this input file, we get four ASCII
+columns (*t*, *x*, *y* and *z*) which we can then redirect to a file and
+plot it with a standard tool such as Gnuplot. Note the importance of
+relying on plain ASCII text formats both for input and output, as
+recommended by the UNIX philosophy and the *rule of composition*: other
+programs can easily create inputs for FeenoX and other programs can
+easily understand FeenoX’ outputs. This is essentially how UNIX filters
+and pipes work.
+
+Let us solve the linear elasticity benchmark problem [NAFEMS LE10][]
+“Thick plate pressure.” Assuming a proper mesh has already been created
+in Gmsh, note how well the FeenoX input file matches the problem
+statement:
+
+<figure>
+<img src="doc/nafems-le10-problem-input.svg" style="width:100.0%" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
+</figure>
+
+``` feenox
+# NAFEMS Benchmark LE-10: thick plate pressure
+PROBLEM mechanical DIMENSIONS 3
+READ_MESH nafems-le10.msh   # mesh in millimeters
+
+# LOADING: uniform normal pressure on the upper surface
+BC upper    p=1      # 1 Mpa
+
+# BOUNDARY CONDITIONS:
+BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
+BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
+BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+# MATERIAL PROPERTIES: isotropic single-material properties
+E = 210e3   # Young modulus in MPa
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # solve!
+
+# print the direct stress y at D (and nothing more)
+PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+```
+
+The problem asks for the normal stress in the *y* direction
+*σ*<sub>*y*</sub> at point “D,” which is what FeenoX writes (and nothing
+else, *rule of economy*):
+
+``` terminal
+$ feenox nafems-le10.fee 
+sigma_y @ D =   -5.38136        MPa
+$ 
+```
+
 Please note the following two points about both cases above:
 
 1.  The input files are very similar to the statements of each problem
-    in plain English words (*rule of clarity*). Take some time to read
-    the [problem statement of the NAFEMS LE11 benchmark][] and the
-    FeenoX input to see how well the latter matches the former. Same for
-    the Lorenz’ chaotic system. Those with some experience may want to
-    compare them to the inputs decks (sic) needed for other common FEA
-    programs.
+    in plain English words (*rule of clarity*). Those with some
+    experience may want to compare them to the inputs decks (sic) needed
+    for other common FEA programs.
 2.  By design, 100% of FeenoX’ output is controlled by the user. Had
     there not been any `PRINT` or `WRITE_MESH` instructions, the output
     would have been empty, following the *rule of silence*. This is a
@@ -264,10 +306,8 @@ above (*rules of modularity and extensibility*). See the
   [Gmsh]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
-  [NAFEMS LE11]: https://www.nafems.org/publications/resource_center/p18/
-  [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
-  [problem statement of the NAFEMS LE11 benchmark]: doc/design/nafems-le11/nafems-le11.png
+  [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
   [Paraview]: https://www.paraview.org/
   [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
@@ -340,17 +380,20 @@ below][] for details.
 | Source tarballs    | <https://www.seamplex.com/feenox/dist/src>     |
 | Github repository  | <https://github.com/seamplex/feenox/>          |
 
--   Binaries are provided as statically-linked executables for
-    convenience.
+-   Be aware that FeenoX is a backend. It **does not have a GUI**. Read
+    the [documentation][1], especially the [description][] and the
+    [FAQs][]. Ask for help on the [GitHub discussions page][].
 
--   They do not support MUMPS nor MPI and have only basic optimization
-    flags. Please compile from source for high-end applications.
+-   Binaries are provided as statically-linked executables for
+    convenience. They do not support MUMPS nor MPI and have only basic
+    optimization flags. Please compile from source for high-end
+    applications. See [detailed compilatation instructions][].
 
 -   Try to avoid Windows as much as you can. The binaries are provided
     as transitional packages for people that for some reason still use
     such an outdated, anachronous, awful and invasive operating system.
     They are compiled with [Cygwin][] and have no support whatsoever.
-    Really, really, get rid of Windows ASAP.
+    Really, really, **get rid of Windows ASAP**.
 
     > “It is really worth any amount of time and effort to get away from
     > Windows if you are doing computational science.”
@@ -359,6 +402,11 @@ below][] for details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
+  [1]: https://seamplex.com/feenox/doc/
+  [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [FAQs]: https://seamplex.com/feenox/doc/FAQ.html
+  [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
+  [detailed compilatation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
 
 ## Git repository

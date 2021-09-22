@@ -137,20 +137,28 @@ nice the tool had. Also it contains requirements and guidelines about
 architecture, execution and interfaces in order to fulfill the needs of
 cognizant engineers as of 2021 (and the years to come) are defined.
 
-On the one hand, the tool should be applicable to solving industrial
-problems under stringent efficiency (sec. 2.3) and quality (sec. 4)
+On the one hand, the tool should allow to solve industrial problems
+under stringent efficiency ([@sec:efficiency]) and quality ([@sec:qa])
 requirements. It is therefore mandatory to be able to assess the source
-code for potential performance and verification revision by qualified
-third parties from all around the world, so it has to be *open source*.
-On the other hand, the initial version of the tool is expected to be a
-basic framework which might be extended (sec. 1.1 and sec. 2.6) by
-academic researchers and programmers. It thus should also be *free*---in
-the sense of freedom, not in the sense of price. There is no requirement
-on the pricing scheme. The detailed licensing terms are left to the
-offer but it should allow users to solve their problems the way they
-need and, eventually, to modify and improve the tool to suit their
-needs. If they cannot program themselves, they should have the freedom
-to hire somebody to do it for them.
+code for
+
+-   independent verification, and/or
+-   performance profiling, and/or
+-   quality control
+
+by qualified third parties from all around the world, so it has to be
+*open source*.
+
+On the other hand, the initial version of the tool is expected to
+provide a basic functionality which might be extended ([@sec:objective]
+and [@sec:extensibility]) by academic researchers and/or professional
+programmers. It thus should also be *free*---in the sense of freedom,
+not in the sense of price. There is no requirement on the pricing
+scheme. The detailed licensing terms are left to the offer but it should
+allow users to solve their problems the way they need and, eventually,
+to modify and improve the tool to suit their needs. If they cannot
+program themselves, they should have the *freedom* to hire somebody to
+do it for them.
 
 ## Objective {#sec:objective}
 
@@ -168,22 +176,21 @@ problems which are usually casted as differential-algebraic equations
 -   computational fluid dynamics
 -   ...
 
-`\noindent`{=latex} on one or more manistream cloud servers,
-i.e. computers with an architecture (i.e. hardware and operating
-systems, futher discussed in sec. 2) that allows them to be available
-online and accessed remotely either interactively or automatically by
-other computers as well. Other architectures such as high-end desktop
-personal computers or even low-end laptops might be supported but they
-should not the main target.
+on one or more manistream cloud servers, i.e. computers with hardware
+and operating systems (futher discussed in [@sec:architecture]) that
+allows them to be available online and accessed remotely either
+interactively or automatically by other computers as well. Other
+architectures such as high-end desktop personal computers or even
+low-end laptops might be supported but they should not the main target.
 
 The initial version of the tool must be able to handle a subset of the
 above list of problem types. Afterward, the set of supported problem
 types, models, equations and features of the tool should grow to include
-other models as well, as required in sec. 2.6.
+other models as well, as required in [@sec:extensibility].
 
 ## Scope {#sec:scope}
 
-The tool should allow advanced users to define the problem to be solved
+The tool should allow users to define the problem to be solved
 programmatically. That is to say, the problem should be completely
 defined using one or more files either...
 
@@ -193,34 +200,34 @@ a.  specifically formatted for the tool to read such as JSON or a
 b.  written in an high-level interpreted language such as Python or
     Julia.
 
-It should be noted that a graphical user interface is not required. The
-tool may include one, but it should be able to run without needing any
-user intervention rather than the preparation of a set of input files.
-Nevertheless, there tool might *allow* a GUI to be used. For example,
-for a basic usage involving simple cases, a user interface engine should
-be able to create these problem-definition files in order to give access
-to less advanced users to the tool using a desktop, mobile and/or
-web-based interface in order to run the actual tool without further
-intervention.
+It should be noted that an } graphical user interface is *not* required.
+The tool may include one, but it should be able to run without needing
+any interactive user intervention rather than the preparation of a set
+of input files. Nevertheless, the tool might *allow* a GUI to be used.
+For example, for a basic usage involving simple cases, a user interface
+engine should be able to create these problem-definition files in order
+to give access to less advanced users to the tool using a desktop,
+mobile and/or web-based interface in order to run the actual tool
+without needing to manually prepare the actual input files.
 
 However, for general usage, users should be able to completely define
 the problem (or set of problems, i.e. a parametric study) they want to
 solve in one or more input files and to obtain one or more output files
 containing the desired results, either a set of scalar outputs (such as
-maximum stresses or mean temperatures), and/or a time and/or spatial
-distribution. If needed, a discretization of the domain may to be taken
-as a known input, i.e. the tool is not required to create the mesh as
-long as a suitable mesher can be employed using a similar workflow
-specified in this SRS.
+maximum stresses or mean temperatures), and/or a detailed time and/or
+spatial distribution. If needed, a discretization of the domain may to
+be taken as a known input, i.e. the tool is not required to create the
+mesh as long as a suitable mesher can be employed using a similar
+workflow as the one specified in this SRS.
 
-The tool should define and document (sec. 4.6) the way the input files
-for a solving particular problem are to be prepared (sec. 3.1) and how
-the results are to be written (sec. 3.2). Any GUI, pre-processor,
-post-processor or other related graphical tool used to provide a
-graphical interface for the user should integrate in the workflow
-described in the preceding paragraph: a pre-processor should create the
-input files needed for the tool and a post-processor should read the
-output files created by the tool.
+The tool should define and document ([@sec:documentation]) the way the
+input files for a solving particular problem are to be prepared
+([@sec:input]) and how the results are to be written ([@sec:output]).
+Any GUI, pre-processor, post-processor or other related graphical tool
+used to provide a graphical interface for the user should integrate in
+the workflow described in the preceding paragraph: a pre-processor
+should create the input files needed for the tool and a post-processor
+should read the output files created by the tool.
 
 # Architecture {#sec:architecture}
 
@@ -297,9 +304,9 @@ tools.
 The tool ought to be able to start solving small problems first to check
 the inputs and outputs behave as expected and then allow increasing the
 problem size up in order to achieve to the desired accuracy of the
-results. As mentioned in sec. 2, large problem should be split among
-different computers to be able to solve them using a finite amount of
-per-host computational power (RAM and CPU).
+results. As mentioned in [@sec:architecture], large problem should be
+split among different computers to be able to solve them using a finite
+amount of per-host computational power (RAM and CPU).
 
 ## Flexibility
 
@@ -479,8 +486,8 @@ that
 > determined, we would question the validity of using the code.
 
 To enforce the availability of the governing equations, the tool has to
-be open source as required in sec. 1 and well documented as required in
-sec. 4.6.
+be open source as required in @sec:introduction and well documented as
+required in @sec:documentation.
 
 Whenever a verification task is performed and documented, at least one
 test should be added to the test suite. For MES or MMS, only one mesh
@@ -533,12 +540,12 @@ developer point of view. It should contain a user manual adequate for
 both reference and tutorial purposes. Other forms of simplified
 documentation such as quick reference cards or video tutorials are not
 mandatory but highly recommended. Since the tool should be extendable
-(sec. 2.6), there should be a separate development manual covering the
-programming design and implementation, explaining how to extend the code
-and how to add new features. Also, as non-trivial mathematics which
-should be verified (sec. 4.4) are expected, a thorough explanation of
-what equations are taken into account and how they are solved is
-required.
+([@sec:extensibility]), there should be a separate development manual
+covering the programming design and implementation, explaining how to
+extend the code and how to add new features. Also, as non-trivial
+mathematics which should be verified ([@sec:verification]) are expected,
+a thorough explanation of what equations are taken into account and how
+they are solved is required.
 
 It should be possible to make the full documentation available online in
 a way that it can be both printed in hard copy and accessed easily from
