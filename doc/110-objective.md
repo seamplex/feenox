@@ -1,4 +1,3 @@
-## Objective {#sec:objective}
 
 The main objective of the tool is to be able to solve engineering problems which are usually casted as differential-algebraic equations (DAEs) or partial differential equations (PDEs), such as
 

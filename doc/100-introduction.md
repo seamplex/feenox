@@ -1,4 +1,3 @@
-# Introduction {#sec:introduction}
 
 A cloud-based computational tool (herein after referred to as _the tool_) is required in order to solve engineering problems following the current state-of-the-art methods and technologies impacting the high-performance computing world.
 This (imaginary but plausible) Software Requirements Specification document describes the mandatory features this tool ought to have and lists some features which would be nice the tool had.

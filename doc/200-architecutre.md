@@ -1,4 +1,4 @@
-# Architecture {#sec:architecture}
+
 
 The tool must be aimed at being executed unattended on remote cloud servers which are expected to have a mainstream^[as of 2021] architecture regarding operating system (GNU/Linux variants and other UNIX-like OSes) and hardware stack (a few intel-compatible CPUs per host, a few levels of memory caches, a few gigabyes of random-access memory, several gigabytes of disk storage, etc.). It should successfully run on bare-metal, virtual and/or containerized servers using standard compilers, dependencies and libraries already available in the repositories of most current operating systems distributions.
 

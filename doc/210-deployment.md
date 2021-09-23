@@ -1,4 +1,3 @@
-## Deployment {#sec:deployment}
 
 The tool should be easily deployed to production servers. Both
 

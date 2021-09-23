@@ -1,4 +1,4 @@
-## Problem input {#sec:input}
+
 
 The problem should be completely defined by one or more input files.
 These input files might be

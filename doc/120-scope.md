@@ -1,4 +1,3 @@
-## Scope {#sec:scope}
 
 The tool should allow users to define the problem to be solved programmatically. That is to say, the problem should be completely defined using one or more files either...
  

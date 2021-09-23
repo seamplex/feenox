@@ -6,6 +6,8 @@ number-sections: true
 toc: true
 ...
 
+# Introduction {#sec:introduction}
+
 > ```include
 > 100-introduction.md
 > ```
@@ -15,6 +17,8 @@ Besides noting that software being _free_ (regarding freedom, not price) does no
 ```include
 licensing.md
 ```
+
+## Objective {#sec:objective}
 
 > ```include
 > 110-objective.md
@@ -32,6 +36,8 @@ The choice of the initial supported features is based on the types of problem th
 FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture of more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy for the actual computational implementation. Besides POSIX, as explained further below, FeenoX also uses MPI which is a well-known industry standard for massive parallel executions of processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
 
 The requirement to run in the cloud and scale up as needed rules out some of the FOSS solvers available online, such as CalculiX.
+
+## Scope {#sec:scope}
 
 > ```include
 > 120-scope.md
@@ -76,7 +82,7 @@ le10.md
 Even though the initial version of FeenoX does not provide an API for high-level interpreted languages such as Python or Julia, the code is written in such a way that this feature can be added without needing a major refactoring. This will allow to fully define a problem in a procedural way, increasing also flexibility.
 
 
-
+# Architecture {#sec:architecture}
 
 > ```include
 > 200-architecutre.md
@@ -98,6 +104,7 @@ dnl * scalable through the [MPI standard](https://www.mcs.anl.gov/research/proje
 Programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. There are people that have been able to compile them under macOS and Windows apart from the main architecture based on GNU/Linux. Due to the way that FeenoX is designed and the policy separated from the mechanism, it is possible to control a running instance remotely from a separate client which can eventually run on a mobile device.
 
 
+## Deployment {#sec:deployment}
 
 > ```include
 > 210-deployment.md
@@ -131,7 +138,7 @@ git.md
 ```
 
 
-
+## Execution {#sec:execution}
 
 
 > ```include
@@ -216,6 +223,8 @@ The second way of running parametric studies is by using the internal keyword `P
 **TODO**
 
 
+## Efficiency {#sec:efficiency}
+
 > ```include
 > 230-efficiency.md
 > ```
@@ -244,6 +253,9 @@ vs
  * elmer
  * code aster
 
+ 
+## Scalability  {#sec:scalability}
+ 
 > ```include
 > 240-scalability.md
 > ```
@@ -254,6 +266,8 @@ vs
  
  * show RAM vs. nodes for mumps & gamg
 
+## Flexibility
+ 
 > ```include
 > 250-flexibility.md
 > ```
@@ -265,7 +279,8 @@ Materials: a material library (perhaps included in a frontend GUI?) can write Fe
  * everything is an expression, show sophomore's identity
  * 1d & 2d interpolated data for functions
  * thermal transient valve with k(T) and BCs(x,t)
- 
+
+## Extensibility {#sec:extensibility}
 
 
 > ```include
@@ -276,6 +291,8 @@ Materials: a material library (perhaps included in a frontend GUI?) can write Fe
  * skel for pdes and annotated models
  * laplace skel
 
+## Interoperability {#sec:interoperability}
+ 
 > ```include
 > 270-interoperatibility.md
 > ```
@@ -288,9 +305,14 @@ Materials: a material library (perhaps included in a frontend GUI?) can write Fe
  * moustache
  * print -> awk -> latex tables NUREG
 
+# Interfaces
+
+ 
 > ```include
 > 300-interfaces.md
 > ```
+
+## Problem input {#sec:input}
 
 > ```include
 > 310-input.md
@@ -315,6 +337,7 @@ VCS tracking, example with hello world.
 
 API in C?
 
+## Results output {#sec:output}
 
 > ```include
 > 320-output.md
