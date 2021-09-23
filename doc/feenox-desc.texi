@@ -294,7 +294,7 @@ created in Gmsh, note how well the FeenoX input file matches the problem
 statement:
 
 @float
-@image{nafems-le10-problem-input,16cm,,The NAFEMS LE10 problem statement and
+@image{nafems-le10-problem-input,,,The NAFEMS LE10 problem statement and
 the corresponding FeenoX input,svg}
 @caption{The NAFEMS LE10 problem statement and the corresponding FeenoX
 input}

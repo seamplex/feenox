@@ -387,6 +387,8 @@ workflows and/or interfaces.
 
 # Quality assurance {#sec:qa}
 
+**TO BE COMPLETED**
+
 Since the results obtained with the tools might be used in verifying
 existing equipment or in designing new mechanical parts in sensitive
 industries, a certain level of software quality assurance is needed.
@@ -397,12 +399,11 @@ Some best-practices for developing generic software are required such as
 -   user-reported bug tracking support.
 -   etc.
 
-`\noindent`{=latex} but since the tool falls in the category of
-engineering computational software, verification and validation
-procedures are also mandatory, as discussed below. Design should be such
-that governance of engineering data including problem definition,
-results and documentation can be efficiently performed using
-state-of-the-art methodologies.
+but since the tool falls in the category of engineering computational
+software, verification and validation procedures are also mandatory, as
+discussed below. Design should be such that governance of engineering
+data including problem definition, results and documentation can be
+efficiently performed using state-of-the-art methodologies.
 
 **valgrind**
 
@@ -424,6 +425,8 @@ conditions, spatially-distributed material properties, etc.) should be
 generated from a very simple set of files which ought to be susceptible
 of being tracked with current state-of-the-art version control systems.
 
+**TO BE COMPLETED**
+
 ## Automated testing
 
 A mean to automatically test the code works as expected is mandatory. A
@@ -432,6 +435,8 @@ after each modification of the code to make sure these changes still
 give the right answers for the right questions and no regressions are
 introduced. Unit software testing practices like continuous integration
 and test coverage are recommended.
+
+**TO BE COMPLETED**
 
 **static = compiler flags**
 
@@ -447,6 +452,8 @@ tracked, addressed and documented.
 
 mistake = bug = blunders
 
+**TO BE COMPLETED**
+
 ## Verification {#sec:verification}
 
 Verification, defined as
@@ -455,15 +462,15 @@ Verification, defined as
 > represents the developer's conceptual description of the model and the
 > solution to the model.
 
-`\noindent`{=latex} a.k.a. checking if the tool is solving right the
-equations, should be performed before applying the code to solve any
-industrial problem. Depending on the nature and regulation of the
-industry, the verification guidelines and requirements may vary. Since
-it is expected that code verification tasks could be performed by
-arbitrary individuals or organizations, the tool's source code should be
-available to independent third parties. In this regard, changes in the
-source code should be controllable, traceable and well documented.
-Stable releases ought to be digitally signed by a responsible engineer.
+a.k.a. checking if the tool is solving right the equations, should be
+performed before applying the code to solve any industrial problem.
+Depending on the nature and regulation of the industry, the verification
+guidelines and requirements may vary. Since it is expected that code
+verification tasks could be performed by arbitrary individuals or
+organizations, the tool's source code should be available to independent
+third parties. In this regard, changes in the source code should be
+controllable, traceable and well documented. Stable releases ought to be
+digitally signed by a responsible engineer.
 
 Even though the verification requirements may vary among problem types,
 industries and particular applications, a common method to verify the
@@ -498,6 +505,8 @@ break the verification are introduced. Verifications that the tool fails
 when it is expected to fail are encouraged as much as positive
 verifications that results are the expected ones.
 
+**TO BE COMPLETED**
+
 ## Validation
 
 As with verification, for each industrial application of the tool there
@@ -508,12 +517,11 @@ defined as
 > representation of the real world from the perspective of the intended
 > uses of the model.
 
-`\noindent`{=tex} a.k.a. checking that the right equations are being
-solved by the tool. This procedure should be based on existing industry
-standards regarding verification and validation such as ASME, AIAA,
-IAEA, etc. There should be a procedure for each type of physical problem
-(thermal, mechanical, thermomechanical, nuclear, etc.) and for each
-problem type when a new
+a.k.a. checking that the right equations are being solved by the tool.
+This procedure should be based on existing industry standards regarding
+verification and validation such as ASME, AIAA, IAEA, etc. There should
+be a procedure for each type of physical problem (thermal, mechanical,
+thermomechanical, nuclear, etc.) and for each problem type when a new
 
 -   geometry,
 -   mesh type,
@@ -521,8 +529,7 @@ problem type when a new
 -   boundary condition,
 -   data interpolation scheme
 
-`\noindent`{=latex} or any other particular application-dependent
-feature is needed.
+or any other particular application-dependent feature is needed.
 
 A report following the V&V procedure defined above should be prepared
 and signed by a responsible engineer in a case-by-case basis for each
@@ -532,6 +539,8 @@ performed against
 -   known analytical results, and/or
 -   other already-validated tools following the same standards, and/or
 -   experimental results.
+
+**TO BE COMPLETED**
 
 ## Documentation {#sec:documentation}
 
@@ -554,3 +563,5 @@ be able to modify the associated documentation as well, so a clear
 notice about the licensing terms of the documentation itself (which
 might be different from the licensing terms of the source code itself)
 is mandatory.
+
+**TO BE COMPLETED**

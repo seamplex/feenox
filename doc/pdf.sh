@@ -122,6 +122,7 @@ pandoc ${dir}/hash.yaml ${dir}/pdf.yaml ${stuff}.md \
   --lua-filter=${dir}/not-in-format.lua \
   --lua-filter ${dir}/code-style.lua \
   --listings --number-sections \
+  --filter pandoc-crossref \
   --template=${dir}/${template} \
   --pdf-engine=xelatex \
   -o ${stuff}.pdf

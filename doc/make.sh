@@ -135,7 +135,9 @@ for i in xelatex makeinfo texi2pdf inkscape; do
 done
 
 for i in logo nafems-le10-problem-input lorenz; do
-  inkscape --export-type=pdf ${i}.svg
+  if [ ! -e $i.pdf ]; then
+    inkscape --export-type=pdf ${i}.svg
+  fi
 done
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null

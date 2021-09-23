@@ -1,7 +1,8 @@
 # FeenoX documentation index
 
--   [FeenoX manual][]
-    -   [2021 Presentation][]
+-   [FeenoX manual and description][]
+    -   [Design][]
+    -   [Frequently Asked Questions][]
     -   [UNIX manpage][]
 -   [Hands on][]
     -   [Quick examples][]
@@ -10,7 +11,6 @@
 -   [Background and generalities][]
     -   [Software requirements specifications][]
     -   [Software design specifications][]
-    -   [FAQ][]
     -   [History][]
 -   [Programming and contributing][]
     -   [Asking questions & reporting bugs][]
@@ -21,8 +21,9 @@
 > FeenoX documentation is released under the terms of the [GNU Free
 > Documentation License v1.3][], or any later version.
 
-  [FeenoX manual]: #feenox-manual
-  [2021 Presentation]: #presentation
+  [FeenoX manual and description]: #feenox-manual-and-description
+  [Design]: #design
+  [Frequently Asked Questions]: #frequently-asked-questions
   [UNIX manpage]: #unix-manpage
   [Hands on]: #hands-on
   [Quick examples]: #quick-examples
@@ -31,7 +32,6 @@
   [Background and generalities]: #background-and-generalities
   [Software requirements specifications]: #software-requirements-specifications
   [Software design specifications]: #software-design-specifications
-  [FAQ]: #faq
   [History]: #history
   [Programming and contributing]: #programming-and-contributing
   [Asking questions & reporting bugs]: #asking-questions-reporting-bugs
@@ -40,7 +40,7 @@
   [How FeenoX documentation system works]: #how-feenox-documentation-system-works
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
-# FeenoX manual
+# FeenoX manual and description
 
 As per the [GNU Coding Standards][], “a manual should serve both as
 tutorial and reference.” Due to the formatting restrictions, the
@@ -66,17 +66,41 @@ in [Pandoc][]-flavored Markdown.
   [doc]: https://github.com/seamplex/feenox/tree/main/doc
   [Pandoc]: https://pandoc.org/
 
-## 2021 Presentation
+## Design
 
--   [Slides in PDF][] (August 2021).
+The FeenoX project starts as an offer to an imaginary “request for
+quotations” that defines [software requirements specifications][1] for
+an open source computational tool. Then a fictitious “offer” to the
+above tender is given in a [software design specifications][2] document
+that explains the design decisions and features included in FeenoX.
+
+-   [Software Requirements specifications in PDF][] (RFQ)
+-   [Software Design specifications in
+    PDF][Software Requirements specifications in PDF] (FeenoX’ offer)
+-   [Mid-term PhD review presentation slides with the SRS/SDS
+    explanation in PDF][] (August 2021).
 -   [Video recording of the presentation][] (Slides are in English but
     audio is in Spanish).
 -   Browse the repository with the sources of the examples in the
     presentation [here][]
 
-  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
+  [1]: ./srs.md
+  [2]: ./sds.md
+  [Software Requirements specifications in PDF]: https://www.seamplex.com/feenox/doc/srs.pdf
+  [Mid-term PhD review presentation slides with the SRS/SDS explanation in PDF]:
+    https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Video recording of the presentation]: https://youtu.be/-RJ5qn7E9uE
   [here]: https://github.com/gtheler/2021-presentation
+
+## Frequently Asked Questions
+
+-   [Frequently Asked Questions][3]
+-   Ask yours on [GitHub Discussions][]
+-   Check also the [GitHub Issues][]
+
+  [3]: ./FAQ.md
+  [GitHub Discussions]: https://github.com/seamplex/feenox/discussions/
+  [GitHub Issues]: https://github.com/seamplex/feenox/issues
 
 ## UNIX manpage
 
@@ -91,19 +115,25 @@ in the Git repository.
 Go directly to the point and see how to solve problems with FeenoX.
 Everything (except the case files) is included in the Git repository.
 
+**TO BE DONE**
+
 ## Quick examples
 
 Annotated examples can be found in the [examples][] directory. These are
 simple and quick (but varied) cases.
+
+**TO BE DONE**
 
   [examples]: ../examples
 
 ## Tutorials
 
 Step-by-step instructions and explanations to solve increasingly-complex
-problems are given in the [tutorials][1] directory.
+problems are given in the [tutorials][4] directory.
 
-  [1]: ../tutorials
+**TO BE DONE**
+
+  [4]: ../tutorials
 
 ## Case files
 
@@ -120,25 +150,19 @@ files, etc. they have a separate repository.
 ## Software requirements specifications
 
 The FeenoX project starts as an offer to an imaginary “request for
-quotations” that defines [software requirements specifications][2] for a
+quotations” that defines [software requirements
+specifications][software requirements specifications1] for a
 computational tool.
 
-  [2]: srs.md
+  [software requirements specifications1]: ./srs.md
 
 ## Software design specifications
 
 The “quotation” to the above tender is given in a [software design
-specifications][3] document that explains the design decisions and
-features included in FeenoX.
+specifications][software design specifications2] document that explains
+the design decisions and features included in FeenoX.
 
-  [3]: sds.md
-
-## FAQ
-
-Read the [Frequently Asked Questions][] before asking what has already
-been answered.
-
-  [Frequently Asked Questions]: FAQ.md
+  [software design specifications2]: ./sds.md
 
 ## History
 
@@ -150,88 +174,18 @@ See the [FeenoX history][].
 
 ## Asking questions & reporting bugs
 
--   Use [Github discussions][] to ask for help,
+-   Use [Github discussions][5] to ask for help,
 -   Use the [Github issue tracker][] to report bugs.
 
-  [Github discussions]: https://github.com/seamplex/feenox/discussions
+  [5]: https://github.com/seamplex/feenox/discussions
   [Github issue tracker]: https://github.com/seamplex/feenox/issues
 
 ## Compiling from source
-
-> If the following instructions make no sense to you, read the [FAQs][].
-
-To compile the Git repository, proceed as follows. This procedure does
-need `git` and `autoconf` but new versions can be pulled and recompiled
-easily.
-
-1.  Install mandatory dependencies
-
-    ``` terminal
-    sudo apt-get install gcc make git automake autoconf libgsl-dev
-    ```
-
-    If you cannot install `libgsl-dev` but still have `git` and the
-    build toolchain, you can have the `configure` script to download and
-    compile it for you. See point 4 below.
-
-2.  Install optional dependencies (of course these are *optional* but
-    recommended)
-
-    ``` terminal
-    sudo apt-get install libsundials-dev petsc-dev slepc-dev
-    ```
-
-3.  Clone Github repository
-
-    ``` terminal
-    git clone https://github.com/seamplex/feenox
-    ```
-
-4.  Boostrap, configure, compile & make
-
-    ``` terminal
-    cd feenox
-    ./autogen.sh
-    ./configure
-    make -j4
-    ```
-
-    If you cannot (or do not want) to use `libgsl-dev` from a package
-    repository, call `configure` with `--enable-download-gsl`:
-
-    ``` terminal
-    ./configure --enable-download-gsl
-    ```
-
-    If you do not have Internet access, get the tarball manually, copy
-    it to the same directory as `configure` and run again.
-
-5.  Run test suite (optional)
-
-    ``` terminal
-    make check
-    ```
-
-6.  Install the binary system wide (optional)
-
-    ``` terminal
-    sudo make install
-    ```
-
-To stay up to date, pull and then autogen, configure and make (and
-optionally install):
-
-``` terminal
-git pull
-./autogen.sh; ./configure; make -j4
-sudo make install
-```
 
 -   See the [Compilation guide][] for a full explanation and of the
     steps above.
 -   See the [Programming guide][] for more details.
 
-  [FAQs]: FAQ.md
   [Compilation guide]: ./compile.md
   [Programming guide]: ./programming.md
 
@@ -242,17 +196,17 @@ formulations of existing PDEs. For elliptic operators feel free to use
 the Laplace equation as a template.
 
 1.  Read the [programming guide][]
-2.  Browse [Github discussions][]
+2.  Browse [Github discussions][Github discussions5]
 3.  Fork the [Github repository][]
 4.  Create a pull request
 
 It is mandatory to observe the [Code of Conduct][].
 
   [programming guide]: ./programming.md
-  [Github discussions]: https://github.com/seamplex/feenox/discussions
+  [Github discussions5]: https://github.com/seamplex/feenox/discussions
   [Github repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: CODE_OF_CONDUCT.md
 
 ## How FeenoX documentation system works
 
-To be done.
+**TO BE DONE**

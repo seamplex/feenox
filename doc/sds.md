@@ -103,8 +103,6 @@ Programs using both these libraries can run on either large high-performance sup
 > 210-deployment.md
 > ```
 
-**show how to download and run from binary**
-
 
 FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too.
 
@@ -120,9 +118,17 @@ FeenoX relies on a few open source libraries---most of them optional. The only m
 Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executables that do not need any other shared libraries to be present on the target host, but their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweights the limited functionality and scalability of the tool.
 
 
-Here are the steps to get FeenoX' source repository, compile it and run the tests suite. Even though they are slightly more complex, they are still pretty standard and straightforward:
+```include
+binary.md
+```
 
-include(git.md)
+```include
+source.md
+```
+
+```include
+git.md
+```
 
 
 
@@ -152,7 +158,6 @@ There are two ways of performing parametric runs in FeenoX. The first one is thr
 include(parametric/hello.fee)
 ```
 
-`\noindent`{=latex}
 then it can be used as a custom greeting tool:
 
 ```terminal
@@ -177,7 +182,6 @@ Consider the input file
 include(parametric/two-squares-thermal.fee)
 ```
 
-`\noindent`{=latex}
 and the shell script
 
 ```{.bash style=bash}

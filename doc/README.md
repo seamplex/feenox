@@ -9,7 +9,8 @@ toc: true
 
 > FeenoX documentation is released under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html), or any later version.
 
-# FeenoX manual
+
+# FeenoX manual and description
 
 
 As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html#GNU-Manuals), "a manual should serve both as tutorial and reference." Due to the formatting restrictions, the [Texinfo](https://www.gnu.org/software/texinfo/) version contains only the description and not the full reference.
@@ -22,12 +23,22 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 
 The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) directory of the Git repository. They are in [Pandoc](https://pandoc.org/)-flavored Markdown.
 
-## 2021 Presentation  
- 
- * [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
+## Design
+
+The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
+
+ * [Software Requirements specifications in PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (RFQ)
+ * [Software Design specifications in PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (FeenoX' offer)
+ * [Mid-term PhD review presentation slides with the SRS/SDS explanation in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
  * [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
  * Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
 
+## Frequently Asked Questions
+
+ * [Frequently Asked Questions](./FAQ.md)
+ * Ask yours on [GitHub Discussions](https://github.com/seamplex/feenox/discussions/)
+ * Check also the [GitHub Issues](https://github.com/seamplex/feenox/issues)
+ 
 ## UNIX manpage
 
 See [UNIX manpage converted to HTML](https://www.seamplex.com/feenox/doc/feenox.1.html).
@@ -39,13 +50,19 @@ It should be accessible with `man feenox` after (global) installation and its so
 
 Go directly to the point and see how to solve problems with FeenoX. Everything (except the case files) is included in the Git repository.
 
+**TO BE DONE**
+
 ## Quick examples
 
 Annotated examples can be found in the [examples](../examples) directory. These are simple and quick (but varied) cases.
 
+**TO BE DONE**
+
 ## Tutorials
 
 Step-by-step instructions and explanations to solve increasingly-complex problems are given in the [tutorials](../tutorials) directory.
+
+**TO BE DONE**
 
 ## Case files
 
@@ -57,15 +74,11 @@ Detailed solutions of benchmarks, V&V cases and/or problems with industrial inte
 
 ## Software requirements specifications
 
-The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](srs.md) for a computational tool.
+The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for a computational tool.
 
 ## Software design specifications
 
-The “quotation” to the above tender is given in a [software design specifications](sds.md) document that explains the design decisions and features included in FeenoX.
-
-## FAQ
-
-Read the [Frequently Asked Questions](FAQ.md) before asking what has already been answered.
+The “quotation” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
 
 ## History
 
@@ -80,12 +93,6 @@ See the [FeenoX history](history.md).
  * Use the [Github issue tracker](https://github.com/seamplex/feenox/issues) to report bugs.
 
 ## Compiling from source
-
-> If the following instructions make no sense to you, read the [FAQs](FAQ.md).
-
-```include
-git.md
-```
 
  * See the [Compilation guide](./compile.md) for a full explanation and of the steps above.
  * See the [Programming guide](./programming.md) for more details.
@@ -107,5 +114,5 @@ It is mandatory to observe the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## How FeenoX documentation system works
 
-To be done.
+**TO BE DONE**
 

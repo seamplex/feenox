@@ -1,4 +1,4 @@
 t1 = clock()
 PRINT "doing something in between"
 t2 = clock()
-PRINT "difference" t2-t1 "[seconds]"
+# PRINT "difference" t2-t1 "[seconds]"

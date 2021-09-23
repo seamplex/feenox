@@ -5,3 +5,5 @@ A system to allow developers and users to report errors, bugs and improvements s
 **mistake != errors**
 
 mistake = bug = blunders
+
+**TO BE COMPLETED**

@@ -4,3 +4,5 @@ Documentation should be complete and cover both the user and the developer point
 Also, as non-trivial mathematics which should be verified ([@sec:verification]) are expected, a thorough explanation of what equations are taken into account and how they are solved is required.
 
 It should be possible to make the full documentation available online in a way that it can be both printed in hard copy and accessed easily from a mobile device. Users modifying the tool to suit their own needs should be able to modify the associated documentation as well, so a clear notice about the licensing terms of the documentation itself (which might be different from the licensing terms of the source code itself) is mandatory.
+
+**TO BE COMPLETED**

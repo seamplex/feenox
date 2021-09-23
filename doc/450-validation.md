@@ -4,7 +4,6 @@ As with verification, for each industrial application of the tool there should b
 
 > The process of determining the degree to which a model is an accurate representation of the real world from the perspective of the intended uses of the model.
 
-\noindent
 a.k.a. checking that the right equations are being solved by the tool. This procedure should be based on existing industry standards regarding verification and validation such as ASME, AIAA, IAEA, etc. There should be a procedure for each type of physical problem (thermal, mechanical, thermomechanical, nuclear, etc.) and for each problem type when a new
 
  * geometry,
@@ -13,7 +12,6 @@ a.k.a. checking that the right equations are being solved by the tool. This proc
  * boundary condition,
  * data interpolation scheme
 
-`\noindent`{=latex}
 or any other particular application-dependent feature is needed.
 
 A report following the V&V procedure defined above should be prepared and signed by a responsible engineer in a case-by-case basis for each particular field of application of the tool. Verification can be performed against
@@ -22,3 +20,5 @@ A report following the V&V procedure defined above should be prepared and signed
  * other already-validated tools following the same standards, and/or
  * experimental results.
 
+
+ **TO BE COMPLETED**
