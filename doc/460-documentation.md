@@ -1,4 +1,4 @@
-## Documentation {#sec:documentation}
+
 
 Documentation should be complete and cover both the user and the developer point of view. It should contain a user manual adequate for both reference and tutorial purposes. Other forms of simplified documentation such as quick reference cards or video tutorials are not mandatory but highly recommended. Since the tool should be extendable ([@sec:extensibility]), there should be a separate development manual covering the programming design and implementation, explaining how to extend the code and how to add new features.
 Also, as non-trivial mathematics which should be verified ([@sec:verification]) are expected, a thorough explanation of what equations are taken into account and how they are solved is required.

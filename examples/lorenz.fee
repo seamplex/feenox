@@ -2,53 +2,23 @@
 #.
 #. Solve
 #. 
-#. ```{=plain}
-#. dx/dt = σ (y-x)  
-#. dy/dt = x (r-z) - y  
-#. dz/dt = x y - b z  
-#. ```
-#. ::: {.not-in-format .texi}
-#. ```{=latex}
-#. \begin{equation*}
+#. $$
 #. \begin{cases}
 #. \dot{x} &= \sigma \cdot (y - x)  \\
 #. \dot{y} &= x \cdot (r - z) - y   \\
-#. \dot{z} &= x y - b z       \\
+#. \dot{z} &= x y - b z             \\
 #. \end{cases}
-#. \end{equation*}
-#. ```
-#. :::
-#. 
-#. ::: {.not-in-format .plain .latex}
-#. $$\dot{x} = \sigma \cdot (y - x)$$\
-#. $$\dot{y} = x \cdot (r - z) - y$$\
-#. $$\dot{z} = x \cdot y - b \cdot z$$
-#. :::
+#. $$
 #. 
 #. for $0 < t < 40$ with initial conditions
 #. 
-#. ```{=plain}
-#. x(0) = -11  
-#. y(0) = -16  
-#. z(0) = 22.5  
-#. ```
-#. ::: {.not-in-format .texi}
-#. ```{=latex}
-#. \begin{equation*}
+#. $$
 #. \begin{cases}
-#. x(0) = -11\\
-#. y(0) = -16\\
-#. z(0) = 22.5\\
+#. x(0) = -11  \\
+#. y(0) = -16  \\
+#. z(0) = 22.5 \\
 #. \end{cases}
-#. \end{equation*}
-#. ```
-#. :::
-#. 
-#. ::: {.not-in-format .plain .latex}
-#. $$x(0) = -11$$\
-#. $$y(0) = -16$$\
-#. $$z(0) = 22.5$$
-#. :::
+#. $$
 #. 
 #. and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 #. that generate the butterfly as presented by Edward Lorenz back in his
@@ -57,12 +27,7 @@
 #. 
 #. The following ASCII input file ressembles the parameters, inital
 #. conditions and differential equations of the problem as naturally as
-#. possible:
-#.
-#$ feenox lorenz.fee > lorenz.dat
-#$ gnuplot lorenz.gp
-#$ python3 lorenz.py
-#$ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
+#. possible.
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -80,6 +45,10 @@ y_dot = x*(r - z) - y
 z_dot = x*y - b*z
 
 PRINT t x y z        # four-column plain-ASCII output
+#$ $ feenox lorenz.fee > lorenz.dat
+#$ $ gnuplot lorenz.gp
+#$ $ python3 lorenz.py
+#$ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 #> ![Drawn with gnuplot](lorenz-gnuplot.svg)
 #>
 #> ![Drawn with matplotlib](lorenz-matplotlib.png)

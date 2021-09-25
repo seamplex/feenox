@@ -1,3 +1,17 @@
+#. # NAFEMS LE10 “Thick plate pressure” benchmark
+#.
+#. ![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg)
+#.
+#. Assuming the CAD has already been created in [STEP format](nafems-le10.step), create
+#. a tetrahedral locally-refined unstructured grid with Gmsh using the following `.geo` file:
+#.
+#. ```{.c include="nafems-le10.geo"}
+#. ```
+#$ $ gmsh -3 nafems-le10.geo
+#$ [...]
+#$ $ feenox nafems-le10.fee
+#$ sigma_y @ D =   -5.38016        MPa
+#$ $
 # NAFEMS Benchmark LE-10: thick plate pressure
 PROBLEM mechanical DIMENSIONS 3
 READ_MESH nafems-le10.msh   # mesh in millimeters
@@ -19,3 +33,7 @@ SOLVE_PROBLEM   # solve!
 
 # print the direct stress y at D (and nothing more)
 PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+
+# write post-processing data for paraview
+WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
+#> ![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png)

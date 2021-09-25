@@ -82,8 +82,8 @@ domain. It can write post-processing views in either @code{.msh} or
 Keep in mind that FeenoX is just a back end reading a set of input files
 and writing a set of output files following the design philosophy of
 UNIX (separation, composition, representation, economy, extensibility,
-etc). Think of it as a transfer function between input files and output
-files:
+etc). Think of it as a transfer function (or a filter in
+computer-science jargon) between input files and output files:
 
 @smallformat
 @verbatim
@@ -97,8 +97,58 @@ files:
 
 Following the UNIX programming philosophy, there are no graphical
 interfaces attached to the FeenoX core, although a wide variety of pre
-and post-processors can be used with FeenoX. See for example
-@url{https://www.caeplex.com} for a web-based interface.
+and post-processors can be used with FeenoX. To illustrate the
+transfer-function approach, consider the following input file that
+solves Laplace's equation on a square with some space-dependent boundary
+conditions
+
+@math{
+\begin{cases}
+\phi(x,y) = +y & \text{for $x=-1$ (left)} \\
+\phi(x,y) = -y & \text{for $x=+1$ (right)} \\
+\nabla \phi \cdot \hat{\vec{n}} = \sin\left(\frac{\pi}{2} x\right) & \text{for $y=-1$ (bottom)} \\
+\nabla \phi \cdot \hat{\vec{n}} =0 & \text{for $y=+1$ (top)} \\
+\end{cases}
+}
+
+@smallformat
+@verbatim
+PROBLEM laplace 2d
+READ_MESH square-centered.msh # [-1:+1]x[-1:+1]
+
+# boundary conditions
+BC left    phi=+y
+BC right   phi=-y
+BC bottom  dphidn=sin(pi/2*x)
+BC top     dphidn=0
+
+SOLVE_PROBLEM
+
+# same output in .msh and in .vtk formats
+WRITE_MESH laplace-square.msh phi VECTOR dphidx dphidy 0
+WRITE_MESH laplace-square.vtk phi VECTOR dphidx dphidy 0
+@end verbatim
+@end smallformat
+
+The @code{.msh} file can be post-processed with
+@uref{http://gmsh.info/,Gmsh}, and the @code{.vtk} file can be
+post-processed with @uref{https://www.paraview.org/,Paraview}. See
+@url{https://www.caeplex.com} for a mobile-friendly web-based interface
+for solving finite elements in the cloud directly from the browser.
+
+@float
+@image{laplace-square-gmsh,,,Laplace's equation solved with FeenoX and
+post-processed with Gmsh,png}
+@caption{Laplace's equation solved with FeenoX and post-processed with
+Gmsh}
+@end float
+
+@float
+@image{laplace-square-paraview,,,Laplace's equation solved with FeenoX
+and post-processed with Paraview,png}
+@caption{Laplace's equation solved with FeenoX and post-processed with
+Paraview}
+@end float
 
 @node Introduction
 @chapter Introduction
@@ -125,6 +175,9 @@ finite-element(ish) tool.
 
 @quotation
 @itemize
+@item
+@uref{https://www.seamplex.com/feenox/examples,FeenoX annotated
+examples}
 @item
 FeenoX Overview Presentation, August 2021
 @itemize
@@ -236,16 +289,30 @@ $
 @end verbatim
 @end smallformat
 
-Solve
+For example, let us consider the famous chaotic
+@uref{http://en.wikipedia.org/wiki/Lorenz_system,Lorenz' dynamical
+system}. Here is one way of getting an image of the butterfly-shaped
+attractor using FeenoX to compute it and
+@uref{http://www.gnuplot.info/,gnuplot} to draw it. Solve
 
-@math{\dot{x} = \sigma \cdot (y - x)}@*
-@math{\dot{y} = x \cdot (r - z) - y}@*
-@math{\dot{z} = x \cdot y - b \cdot z}
+@math{
+\begin{cases}
+\dot{x} &= \sigma \cdot (y - x)  \\
+\dot{y} &= x \cdot (r - z) - y   \\
+\dot{z} &= x y - b z             \\
+\end{cases}
+}
+
 for @math{0 < t < 40} with initial conditions
 
-@math{x(0) = -11}@*
-@math{y(0) = -16}@*
-@math{z(0) = 22.5}
+@math{
+\begin{cases}
+x(0) = -11  \\
+y(0) = -16  \\
+z(0) = 22.5 \\
+\end{cases}
+}
+
 and @math{\sigma=10}, @math{r=28} and @math{b=8/3}, which are the
 classical parameters that generate the butterfly as presented by Edward
 Lorenz back in his seminal 1963 paper
@@ -278,6 +345,12 @@ PRINT t x y z        # four-column plain-ASCII output
 @end verbatim
 @end smallformat
 
+@float
+@image{lorenz,,,The Lorenz attractor solved with FeenoX and drawn with
+Gnuplot,svg}
+@caption{The Lorenz attractor solved with FeenoX and drawn with Gnuplot}
+@end float
+
 Indeed, when executing FeenoX with this input file, we get four ASCII
 columns (@math{t}, @math{x}, @math{y} and @math{z}) which we can then
 redirect to a file and plot it with a standard tool such as Gnuplot.
@@ -292,13 +365,6 @@ Let us solve the linear elasticity benchmark problem
 ``Thick plate pressure.'' Assuming a proper mesh has already been
 created in Gmsh, note how well the FeenoX input file matches the problem
 statement:
-
-@float
-@image{nafems-le10-problem-input,,,The NAFEMS LE10 problem statement and
-the corresponding FeenoX input,svg}
-@caption{The NAFEMS LE10 problem statement and the corresponding FeenoX
-input}
-@end float
 
 @smallformat
 @verbatim
@@ -333,10 +399,42 @@ nothing else, @emph{rule of economy}):
 @smallformat
 @verbatim
 $ feenox nafems-le10.fee 
-sigma_y @ D =   -5.38136        MPa
+sigma_y @ D =   -5.38016        MPa
 $ 
 @end verbatim
 @end smallformat
+
+@float
+@image{nafems-le10-problem-input,,,The NAFEMS LE10 problem statement and
+the corresponding FeenoX input,svg}
+@caption{The NAFEMS LE10 problem statement and the corresponding FeenoX
+input}
+@end float
+
+@float
+@image{nafems-le10,,,Normal stress @math{\sigma_y} refined around
+point@ @math{D} over 5,000x-warped displacements for LE10 created with
+Paraview,png}
+@caption{Normal stress @math{\sigma_y} refined around point@ @math{D}
+over 5,000x-warped displacements for LE10 created with Paraview}
+@end float
+
+For the sake of visual completeness, post-processing data with the
+scalar distribution of @math{\sigma_y} and the vector field of
+displacements @math{[u,v,w]} can be created by adding one line to the
+input file:
+
+@smallformat
+@verbatim
+WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
+@end verbatim
+@end smallformat
+
+This VTK file can then be post-processed to create interactive 3D views,
+still screenshots, browser and mobile-friendly webGL models, etc. In
+particular, using @uref{https://www.paraview.org,Paraview} one can get a
+colorful bitmapped PNG (the displacements are far more interesting than
+the stresses in this problem).
 
 Please note the following two points about both cases above:
 

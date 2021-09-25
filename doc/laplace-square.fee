@@ -1,0 +1,14 @@
+PROBLEM laplace 2d
+READ_MESH square-centered.msh # [-1:+1]x[-1:+1]
+
+# boundary conditions
+BC left    phi=+y
+BC right   phi=-y
+BC bottom  dphidn=sin(pi/2*x)
+BC top     dphidn=0
+
+SOLVE_PROBLEM
+
+# same output in .msh and in .vtk formats
+WRITE_MESH laplace-square.msh phi VECTOR dphidx dphidy 0
+WRITE_MESH laplace-square.vtk phi VECTOR dphidx dphidy 0

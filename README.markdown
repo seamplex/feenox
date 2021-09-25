@@ -31,6 +31,7 @@ rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
+> -   [FeenoX annotated examples][]
 > -   FeenoX Overview Presentation, August 2021
 >     -   [Recording (audio in Spanish, slides in English)][]
 >     -   [Slides in PDF][]
@@ -116,37 +117,27 @@ $ feenox thermal-1d-dirichlet-temperature-k.fee
 $
 ```
 
-Solve
+For example, let us consider the famous chaotic [Lorenz’ dynamical
+system][]. Here is one way of getting an image of the butterfly-shaped
+attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
 
-<div class="not-in-format texi">
-
-</div>
-
-<div class="not-in-format plain latex">
-
-*ẋ* = *σ* ⋅ (*y*−*x*)
-  
-*ẏ* = *x* ⋅ (*r*−*z*) − *y*
-  
-*ż* = *x* ⋅ *y* − *b* ⋅ *z*
-
-</div>
+$$
+\\begin{cases}
+\\dot{x} &= \\sigma \\cdot (y - x)  \\\\
+\\dot{y} &= x \\cdot (r - z) - y   \\\\
+\\dot{z} &= x y - b z             \\\\
+\\end{cases}
+$$
 
 for 0 \< *t* \< 40 with initial conditions
 
-<div class="not-in-format texi">
-
-</div>
-
-<div class="not-in-format plain latex">
-
-*x*(0) =  − 11
-  
-*y*(0) =  − 16
-  
-*z*(0) = 22.5
-
-</div>
+$$
+\\begin{cases}
+x(0) = -11  \\\\
+y(0) = -16  \\\\
+z(0) = 22.5 \\\\
+\\end{cases}
+$$
 
 and *σ* = 10, *r* = 28 and *b* = 8/3, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
@@ -176,6 +167,8 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
+![The Lorenz attractor solved with FeenoX and drawn with Gnuplot][]
+
 Indeed, when executing FeenoX with this input file, we get four ASCII
 columns (*t*, *x*, *y* and *z*) which we can then redirect to a file and
 plot it with a standard tool such as Gnuplot. Note the importance of
@@ -189,10 +182,6 @@ Let us solve the linear elasticity benchmark problem [NAFEMS LE10][]
 “Thick plate pressure.” Assuming a proper mesh has already been created
 in Gmsh, note how well the FeenoX input file matches the problem
 statement:
-
-<figure>
-<img src="doc/nafems-le10-problem-input.svg" style="width:100.0%" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
-</figure>
 
 ``` feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
@@ -224,9 +213,32 @@ else, *rule of economy*):
 
 ``` terminal
 $ feenox nafems-le10.fee 
-sigma_y @ D =   -5.38136        MPa
+sigma_y @ D =   -5.38016        MPa
 $ 
 ```
+
+<figure>
+<img src="doc/nafems-le10-problem-input.svg" style="width:100.0%" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
+</figure>
+
+<figure>
+<img src="doc/nafems-le10.png" style="width:100.0%" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
+</figure>
+
+For the sake of visual completeness, post-processing data with the
+scalar distribution of *σ*<sub>*y*</sub> and the vector field of
+displacements \[*u*,*v*,*w*\] can be created by adding one line to the
+input file:
+
+``` feenox
+WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
+```
+
+This VTK file can then be post-processed to create interactive 3D views,
+still screenshots, browser and mobile-friendly webGL models, etc. In
+particular, using [Paraview][] one can get a colorful bitmapped PNG (the
+displacements are far more interesting than the stresses in this
+problem).
 
 Please note the following two points about both cases above:
 
@@ -261,7 +273,7 @@ the problem to be solved. Some basic rules are
     input and output files. Following the *rules of separation,
     parsimony and diversity*, **there is no embedded graphical
     interface** but means of using generic pre and post processing
-    tools—in particular, [Gmsh][] and [Paraview][] respectively. See
+    tools—in particular, [Gmsh][] and [Paraview][1] respectively. See
     also [CAEplex][].
 
 -   The input files should be [syntactically sugared][] so as to be as
@@ -300,15 +312,20 @@ above (*rules of modularity and extensibility*). See the
 [documentation][] for details about how to contribute.
 
   [FeenoX]: https://www.seamplex.com/feenox
+  [FeenoX annotated examples]: https://www.seamplex.com/feenox/examples
   [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
+  [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
+  [gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
+  [The Lorenz attractor solved with FeenoX and drawn with Gnuplot]: doc/lorenz.svg
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
-  [Paraview]: https://www.paraview.org/
+  [Paraview]: https://www.paraview.org
+  [1]: https://www.paraview.org/
   [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
   [Software Requirements Specification]: doc/sds.md
@@ -381,7 +398,7 @@ below][] for details.
 | Github repository  | <https://github.com/seamplex/feenox/>          |
 
 -   Be aware that FeenoX is a backend. It **does not have a GUI**. Read
-    the [documentation][1], especially the [description][] and the
+    the [documentation][2], especially the [description][] and the
     [FAQs][]. Ask for help on the [GitHub discussions page][].
 
 -   Binaries are provided as statically-linked executables for
@@ -402,7 +419,7 @@ below][] for details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
-  [1]: https://seamplex.com/feenox/doc/
+  [2]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [FAQs]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
@@ -411,72 +428,13 @@ below][] for details.
 
 ## Git repository
 
-To compile the Git repository, proceed as follows. This procedure does
-need `git` and `autoconf` but new versions can be pulled and recompiled
-easily.
-
-1.  Install mandatory dependencies
-
-    ``` terminal
-    sudo apt-get install gcc make git automake autoconf libgsl-dev
-    ```
-
-    If you cannot install `libgsl-dev` but still have `git` and the
-    build toolchain, you can have the `configure` script to download and
-    compile it for you. See point 4 below.
-
-2.  Install optional dependencies (of course these are *optional* but
-    recommended)
-
-    ``` terminal
-    sudo apt-get install libsundials-dev petsc-dev slepc-dev
-    ```
-
-3.  Clone Github repository
-
-    ``` terminal
-    git clone https://github.com/seamplex/feenox
-    ```
-
-4.  Boostrap, configure, compile & make
-
-    ``` terminal
-    cd feenox
-    ./autogen.sh
-    ./configure
-    make -j4
-    ```
-
-    If you cannot (or do not want) to use `libgsl-dev` from a package
-    repository, call `configure` with `--enable-download-gsl`:
-
-    ``` terminal
-    ./configure --enable-download-gsl
-    ```
-
-    If you do not have Internet access, get the tarball manually, copy
-    it to the same directory as `configure` and run again.
-
-5.  Run test suite (optional)
-
-    ``` terminal
-    make check
-    ```
-
-6.  Install the binary system wide (optional)
-
-    ``` terminal
-    sudo make install
-    ```
-
-To stay up to date, pull and then autogen, configure and make (and
-optionally install):
-
-``` terminal
-git pull
-./autogen.sh; ./configure; make -j4
-sudo make install
+``` .include
+doc/git.md
 ```
+
+See the [detailed compilation instructions][] for further details.
+
+  [detailed compilation instructions]: doc/compilation.md
 
 # Licensing
 
@@ -484,8 +442,6 @@ FeenoX is distributed under the terms of the [GNU General Public
 License][] version 3 or (at your option) any later version. The
 following text was borrowed from the [Gmsh documentation][]. Replacing
 “Gmsh” with “FeenoX” gives:
-
-<div class="alert alert-light">
 
 > FeenoX is “free software”; this means that everyone is free to use it
 > and to redistribute it on a free basis. FeenoX is not in the public
@@ -517,11 +473,68 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 > information about this license is available from the GNU Project
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
-</div>
+FeenoX is licensed under the terms of the [GNU General Public
+License][3] version 3 or, at the user convenience, any later version.
+This means that users get the four essential freedoms:[2]
+
+0.  The freedom to *run* the program as they wish, for *any* purpose.
+1.  The freedom to *study* how the program works, and *change* it so it
+    does their computing as they wish.
+2.  The freedom to *redistribute* copies so they can help others.
+3.  The freedom to *distribute* copies of their *modified* versions to
+    others.
+
+So a free program has to be open source, but it also has to explicitly
+provide the four freedoms above both through the written license and
+through the mechanisms available to get, modify, compile, run and
+document these modifications. That is why licensing FeenoX as GPLv3+
+also implies that the source code and all the scripts and makefiles
+needed to compile and run it are available for anyone that requires it.
+Anyone wanting to modify the program either to fix bugs, improve it or
+add new features is free to do so. And if they do not know how to
+program, the have the freedom to hire a programmer to do it without
+needing to ask permission to the original authors.
+
+Nevertheless, since these original authors are the copyright holders,
+they still can use it to either enforce or prevent further actions from
+the users that receive FeenoX under the GPLv3+. In particular, the
+license allows re-distribution of modified versions only if they are
+clearly marked as different from the original and only under the same
+terms of the GPLv3+. There are also some other subtle technicalities
+that need not be discussed here such as what constitutes a modified
+version (which cannot be redistributed under a different license) and
+what is an aggregate (in which each part be distributed under different
+licenses) and about usage over a network and the possibility of using
+[AGPL][] instead of GPL to further enforce freedom (TL;DR: it does not
+matter for FeenoX), but which are already taken into account in FeenoX
+licensing scheme.
+
+It should be noted that not only is FeenoX free and open source, but
+also all of the libraries it depends (and their dependencies) are. It
+can also be compiled using free and open source build tool chains
+running over free and open source operating systems. In addition, the
+FeenoX documentation is licensed under the terms of the [GNU Free
+Documentation License v1.3][] (or any later version).
+
+[2]  There are some examples of pieces of computational software which
+are described as “open source” in which even the first of the four
+freedoms is denied. The most iconic case is that of Android, whose
+sources are readily available online but there is no straightforward way
+of updating one’s mobile phone firmware with a customized version, not
+to mention vendor and hardware lock ins and the possibility of bricking
+devices if something unexpected happens. In the nuclear industry, it is
+the case of a Monte Carlo particle-transport program that requests users
+to sign an agreement about the objective of its usage before allowing
+its execution. The software itself might be open source because the
+source code is provided after signing the agreement, but it is not free
+(as in freedom) at all.
 
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
+  [3]: https://www.gnu.org/licenses/gpl-3.0
+  [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
+  [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
 # Further information
 

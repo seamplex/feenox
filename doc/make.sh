@@ -103,22 +103,18 @@ for i in touch pandoc-crossref; do
  fi
 done
 
-echo "creating SRS and SDS markdown"
-pandoc sds.md -t markdown --filter pandoc-crossref -o srs.markdown \
-  --standalone --toc --reference-links --reference-location=section \
-  --lua-filter=include-files.lua \
-  --lua-filter=include-code-files.lua \
-  --lua-filter=not-in-format.lua
-  
-pandoc srs.md -t markdown --filter pandoc-crossref -o srs.markdown \
-  --standalone --toc --reference-links --reference-location=section \
-  --lua-filter=include-files.lua \
-  --lua-filter=include-code-files.lua \
-  --lua-filter=not-in-format.lua 
-
-  
-
- 
+# echo "creating SRS and SDS markdown"
+# pandoc sds.md -t markdown --filter pandoc-crossref -o srs.markdown \
+#   --standalone --toc --reference-links --reference-location=section \
+#   --lua-filter=include-files.lua \
+#   --lua-filter=include-code-files.lua \
+#   --lua-filter=not-in-format.lua
+#   
+# pandoc srs.md -t markdown --filter pandoc-crossref -o srs.markdown \
+#   --standalone --toc --reference-links --reference-location=section \
+#   --lua-filter=include-files.lua \
+#   --lua-filter=include-code-files.lua \
+#   --lua-filter=not-in-format.lua 
 
 pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \

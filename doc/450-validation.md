@@ -1,4 +1,4 @@
-## Validation
+
 
 As with verification, for each industrial application of the tool there should be a documented procedure to perform a set of validation tests, defined as
 

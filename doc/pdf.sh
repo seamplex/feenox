@@ -114,9 +114,14 @@ if [ -z "${template}" ]; then
   template=single.tex
 fi
 
-pandoc ${dir}/hash.yaml ${dir}/pdf.yaml ${stuff}.md \
+pdfyaml=$(grep pdfyaml ${stuff}.md | cut -d' ' -f2)
+if [ -z "${pdfyaml}" ]; then
+  pdfyaml=pdf
+fi
+
+
+pandoc ${dir}/hash.yaml ${dir}/${pdfyaml}.yaml ${stuff}.md \
   --standalone --toc \
-  --include-in-header="${dir}/syntax.tex" \
   --lua-filter=${dir}/include-files.lua \
   --lua-filter=${dir}/include-code-files.lua \
   --lua-filter=${dir}/not-in-format.lua \

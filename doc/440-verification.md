@@ -1,4 +1,4 @@
-## Verification {#sec:verification}
+
 
 Verification, defined as
 

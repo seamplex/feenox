@@ -1,24 +1,31 @@
 #!/bin/bash
 
-rm -f README.md
-for i in lorenz; do
+out=examples.md
+rm -f ${out}
+for i in lorenz nafems-le10; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#.//' | sed 's/^[ \t]*//' | \
     pandoc -t markdown   --lua-filter=../doc/include-files.lua \
                          --lua-filter=../doc/include-code-files.lua \
-                         --lua-filter=../doc/not-in-format.lua >> README.md
-  echo >> README.md
+                         --lua-filter=../doc/not-in-format.lua >> ${out}
+  echo >> ${out}
   
-  grep '#\$' ${i}.fee | sed 's/#$//' | sed 's/^[ \t]*//' >> ${i}-post.sh
-  bash ${i}-post.sh
+  echo >> ${out}
+  echo '```feenox' >> ${out}
+  cat ${i}.fee | grep -v '#\.' | grep -v '#\$' | grep -v '#>' >> ${out}
+  echo '```' >> ${out}
+  echo >> ${out}
+
+  
+  echo >> ${out}
+  echo '```terminal' >> ${out}
+  grep '#\$' ${i}.fee | sed 's/#\$//' | sed 's/^[ \t]*//' >> ${out}
+#   bash ${i}-post.sh
 #   rm -f ${i}-post.sh
-
-  echo >> README.md
-  echo '```feenox' >> README.md
-  cat ${i}.fee | grep -v '#\.' | grep -v '#\$' | grep -v '#>' >> README.md
-  echo '```' >> README.md
-  echo >> README.md
-
-  grep '#>' ${i}.fee | sed 's/#>//' | sed 's/^[ \t]*//' >> README.md
-  echo >> README.md
+  echo '```' >> ${out}
+  echo >> ${out}
+  
+  echo >> ${out}
+  grep '#>' ${i}.fee | sed 's/#>//' | sed 's/^[ \t]*//' >> ${out}
+  echo >> ${out}
 done
