@@ -102,7 +102,7 @@ pdfyaml: none
 410-reproducibility.md
 ```
 
-## Automated testing
+## Automated testing {#sec:testing}
 
 
 ```include

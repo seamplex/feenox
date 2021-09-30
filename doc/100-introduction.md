@@ -9,7 +9,6 @@ On the one hand, the tool should allow to solve industrial problems under string
  * performance profiling, and/or
  * quality control
  
-by qualified third parties from all around the world, so it has to be _open source_.
+by qualified third parties from all around the world, so it has to be _open source_ according to the definition of the Open Source Initiative.
 
-On the other hand, the initial version of the tool is expected to provide a basic functionality which might be extended ([@sec:objective] and [@sec:extensibility]) by academic researchers and/or professional programmers. It thus should also be _free_---in the sense of freedom, not in the sense of price. There is no requirement on the pricing scheme.
-The detailed licensing terms are left to the offer but it should allow users to solve their problems the way they need and, eventually, to modify and improve the tool to suit their needs. If they cannot program themselves, they should have the _freedom_ to hire somebody to do it for them.
+On the other hand, the initial version of the tool is expected to provide a basic functionality which might be extended ([@sec:objective] and [@sec:extensibility]) by academic researchers and/or professional programmers. It thus should also be _free_---in the sense of freedom, not in the sense of price---as defined by the Free Software Foundation. There is no requirement on the pricing scheme, which is up to the vendor to define in the offer along with the detailed licensing terms. These should allow users to solve their problems the way they need and, eventually, to modify and improve the tool to suit their needs. If they cannot program themselves, they should have the _freedom_ to hire somebody to do it for them.

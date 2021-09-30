@@ -464,7 +464,7 @@ simple <-> simple
 
 similar <-> Similar
 
-## Automated testing
+## Automated testing {#sec:testing}
 
 
 > ```include
