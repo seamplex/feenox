@@ -151,12 +151,11 @@ $
 
 Say you are Homer Simpson and you want to solve a maze drawn in a
 restaurant's placemat, one where both the start and end are known
-beforehand as show in @fig:maze-homer. In order to avoid falling into
-the alligator's mouth, you can exploit the ellipticity of the Laplacian
-operator to solve any maze (even a hand-drawn one) without needing any
-fancy AI or ML algorithm. Just FeenoX and a bunch of standard open
-source tools to convert a bitmapped picture of the maze into an
-unstructured mesh.
+beforehand. In order to avoid falling into the alligator's mouth, you
+can exploit the ellipticity of the Laplacian operator to solve any maze
+(even a hand-drawn one) without needing any fancy AI or ML algorithm.
+Just FeenoX and a bunch of standard open source tools to convert a
+bitmapped picture of the maze into an unstructured mesh.
 
 ![Bitmapped maze from <https://www.mazegenerator.net> (left) and 2D mesh
 (right)](maze12.png){#fig:maze12}
@@ -189,4 +188,7 @@ $
 
 
 ![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png)
+
+See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+
 

@@ -26,3 +26,4 @@ WRITE_MESH maze-solved.msh \
 #> ![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png)
 #>
 #> See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+#>
