@@ -174,7 +174,11 @@ Due to the way that FeenoX is designed and the policy separated from the mechani
 ![The web-based platform [CAEplex](https://www.caeplex.com) is mobile-friendly. <https://www.youtube.com/watch?v=7KqiMbrSLDc>](caeplex-ipad.jpg){#fig:caeplex-ipad}
 
 
-**TODO: mazes**
+The following example illustrates how well FeenoX works as one of many links in a chain that goes from tracing a bitmap with the problem's geometry down to creating a nice figure with the resuts of a computation:
+
+```include
+mazes.md
+```
 
 ## Deployment {#sec:deployment}
 

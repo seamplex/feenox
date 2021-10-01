@@ -1,17 +1,28 @@
-# other sources
-# https://pubs.acs.org/doi/10.1021/ja9076793
-# https://charming-etn.eu/2020/10/23/aid-of-nature-to-solve-a-maze/+
-# https://3.ly/aaT1K
-# https://www.researchgate.net/publication/256565922_The_boundary_and_shell_element_method
-# https://www.cs.cmu.edu/~kmcrane/Projects/HeatMethod
-
-PROBLEM laplace 2d
+#. # How to solve a maze without AI
+#.
+#. Say you are Homer Simpson and you want to solve a maze drawn in a restaurant's placemat, one where both the start and end are known beforehand. In order to avoid falling into the alligator's mouth, you can exploit the ellipticity of the Laplacian operator to solve any maze (even a hand-drawn one) without needing any fancy AI or ML algorithm. Just FeenoX and a bunch of standard open source tools to convert a bitmapped picture of the maze into an unstructured mesh.
+#.
+#.
+#.![Bitmapped maze from <https://www.mazegenerator.net> (left) and 2D mesh (right)](maze12.png){#fig:maze12}
+#.
+#$ $ gmsh -2 maze.geo
+#$ [...]
+#$ $ feenox maze.fee
+#$ $
+PROBLEM laplace 2D  # pretty self-descriptive, isn't it?
 READ_MESH maze.msh
 
-BC in  phi=0
-BC out phi=1
+# boundary conditions (default is homogeneous Neumann)
+BC start  phi=0 
+BC end    phi=1
 
 SOLVE_PROBLEM
 
-WRITE_MESH maze-solved.msh VECTOR dphidx dphidy 0 abs(dphidx(x,y))+abs(dphidy(x,y))
-WRITE_MESH maze-solved.vtk abs(dphidx(x,y))+abs(dphidy(x,y))
+# write the norm of gradient as a scalar field
+# and the gradient as a 2d vector into a .msh file
+WRITE_MESH maze-solved.msh \
+    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) \
+    VECTOR dphidx dphidy 0 
+#> ![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png)
+#>
+#> See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>

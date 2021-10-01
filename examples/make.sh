@@ -2,7 +2,7 @@
 
 out=examples.md
 rm -f ${out}
-for i in lorenz nafems-le10; do
+for i in lorenz nafems-le10 maze; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#.//' | sed 's/^[ \t]*//' | \
     pandoc -t markdown   --lua-filter=../doc/include-files.lua \

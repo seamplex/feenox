@@ -1,0 +1,14 @@
+PROBLEM laplace 2D  # pretty self-descriptive, isn't it?
+READ_MESH maze.msh
+
+# boundary conditions (default is homogeneous Neumann)
+BC start  phi=0 
+BC end    phi=1
+
+SOLVE_PROBLEM
+
+# write the norm of gradient as a scalar field
+# and the gradient as a 2d vector into a .msh file
+WRITE_MESH maze-solved.msh \
+    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) \
+    VECTOR dphidx dphidy 0 
