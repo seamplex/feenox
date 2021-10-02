@@ -1,0 +1,4 @@
+# the Fibonacci sequence using the closed-form formula as a function
+phi = (1+sqrt(5))/2 
+f(n) = (phi^n - (1-phi)^n)/sqrt(5)
+PRINT_FUNCTION f MIN 1 MAX 20 STEP 1

@@ -7,10 +7,13 @@ lang: en-US
 toc: true 
 ...
 
-> * FeenoX Overview Presentation, August 2021
->   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
->   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
->   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
+All the files needed to run theses examples are available in the [examples](https://github.com/seamplex/feenox/tree/main/examples) directory of the [Git repository](https://github.com/seamplex/feenox) and any of the [tarballs](https://www.seamplex.com/feenox/download.html), both [source](https://www.seamplex.com/feenox/dist/src) and [binary](https://www.seamplex.com/feenox/dist/linux).
+
+For a presentation of these examples, see the "FeenoX Overview Presentation" (August 2021).
+
+ * [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
+ * [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
+ * [Markdown examples sources](https://github.com/gtheler/2021-presentation)
 
 
 ```include

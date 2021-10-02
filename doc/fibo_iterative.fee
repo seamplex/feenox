@@ -1,0 +1,16 @@
+# the fibonacci sequence as an iterative problem
+
+static_steps = 20
+#static_iterations = 1476  # limit of doubles
+
+IF step_static=1|step_static=2
+ f_n = 1
+ f_nminus1 = 1
+ f_nminus2 = 1
+ELSE
+ f_n = f_nminus1 + f_nminus2
+ f_nminus2 = f_nminus1
+ f_nminus1 = f_n
+ENDIF
+
+PRINT step_static f_n

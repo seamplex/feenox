@@ -187,7 +187,7 @@ mazes.md
 > ```
 
 
-FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too.
+FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too according to the requirements in @sec:traceability.
 
 The configuration and compilation is based on GNU Autotools that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of UNIX variants. It has been tested with
 
@@ -196,7 +196,7 @@ The configuration and compilation is based on GNU Autotools that has more than t
  * Intel C compiler
 
  
-FeenoX relies on four open source libraries, with three of then being optional. The only mandatory library is the GNU Scientific Library which is part of the GNU/Linux operating system and as such is readily available in all distributions as `libgsl-dev`. The sources of the rest of the optional libraries are also widely available in most common GNU/Linux distributions. In effect, doing 
+FeenoX depends on four open source libraries, with three of then being optional. The only mandatory library is the GNU Scientific Library which is part of the GNU/Linux operating system and as such is readily available in all distributions as `libgsl-dev`. The sources of the rest of the optional libraries are also widely available in most common GNU/Linux distributions. In effect, doing 
 
 ```terminal
 sudo apt-get install gcc make libgsl-dev libsundials-dev petsc-dev slepc-dev
@@ -239,10 +239,28 @@ git.md
 > 220-execution.md
 > ```
 
-As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version, one-line description and the usage options:
+As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version (a through explanation of the versioning scheme is given in @sec:traceability), a one-line description and the usage options:
 
-```{.terminal style=terminal}
-esyscmd(feenox)
+```terminal
+$ feenox
+FeenoX v0.1.77-g9325958
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: feenox [options] inputfile [replacement arguments]
+
+  -h, --help         display usage and commmand-line help and exit
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+  -s, --sumarize     list all symbols in the input file and exit
+
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+    $ echo "PRINT 2+2" | feenox -
+    4
+
+Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
+Feenox home page: https://www.seamplex.com/feenox/
 ```
 
 Of course the program can be executed remotely
@@ -250,71 +268,127 @@ Of course the program can be executed remotely
  1. on a server through a SSH session
  2. in a container as part of a provisioning script
 
+
  
-FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. This is part of the UNIX philosophy.
+FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. Progress can be as simple as an ASCII bar (triggered with `--progress`) to more complex mechanisms like writing the status in a shared memory segment.
 
-There are two ways of performing parametric runs in FeenoX. The first one is through the expansion of command line arguments as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `expansion.fee` is
+Regarding its execution, there are three ways of solving problems:
 
-```feenox
-include(parametric/hello.fee)
+ 1. Direct execution
+ 2. Parametric runs
+ 3. Optimization loops
+ 
+### Direct execution
+
+When directly executing FeenoX, one gives a single argument to the executable with the path to the main input file. For example, the following input computes the first twenty numbers of the [Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number) using the closed-form formula
+
+$$
+f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}
+$$
+
+where $\varphi=(1+\sqrt{5})/2$ is the [Golden ratio](https://en.wikipedia.org/wiki/Golden_ratio):
+
+```{.feenox include="fibo_formula.fee"}
 ```
 
-then it can be used as a custom greeting tool:
+FeenoX can be directly executed to print the function\ $f(n)$ for $n=1,\dots,20$ both to the standard output and to a file named `one` (because it is the first way of solving Fibonacci with Feenox):
+
+```terminal
+$ feenox fibo_formula.fee | tee one
+1	1
+2	1
+3	2
+4	3
+5	5
+6	8
+7	13
+8	21
+9	34
+10	55
+11	89
+12	144
+13	233
+14	377
+15	610
+16	987
+17	1597
+18	2584
+19	4181
+20	6765
+$
+```
+
+Now, we could also have computed these twenty numbers by using the direct definition of the sequence into a vector $\vec{f}$ of size 20. This time we redirect the output to a file named `two`:
+
+```{.feenox include="fibo_vector.fee"}
+```
+
+```terminal
+$ feenox fibo_vector.fee > two
+$ 
+```
+
+Finally, we print the sequence as an iterative problem and check that the three outputs are the same:
+
+```{.feenox include="fibo_iterative.fee"}
+```
+
+```terminal
+$ feenox fibo_iterative.fee > three
+$ diff one two
+$ diff two three
+$
+```
+
+These three calls were examples of direct execution of FeenoX: a single call with a single argument to solve a single fixed problem.
+
+## Parametric
+
+To use FeenoX in a parametric run, one has to successively call the executable passing the main input file path in the first argument followed by an arbitrary number of parameters. These extra parameters will be expanded as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `hello.fee` is
+
+```{.feenox include="hello.fee"}
+```
+
+then
 
 ```terminal
 $ feenox World
 Hello World!
 $ feenox Universe
 Hello Universe!
+$
 ```
 
-When this feature is used in conjunction with a shell loop, flexible parametric runs are possible. Say there are two meshes of the same domain (two squares made of two different materials): one using triangles and one using quadrangles. Let us say also that it is desired to solve a non-linear thermal problem with different values for the fixed temperature on the right boundary.
+To have an actual parametric run, an external loop has to successively call FeenoX with the parametric arguments. For example, say this file `cantilever.fee` fixes the face called "left" and sets a load in the negative\ $z$ direction of a mesh called `cantilever-$1-$2.msh`. The output is a single line containing the number of nodes of the mesh and the displacement in the vertical direction\ $w(500,0,0)$ at the center of the cantilever's free face:
 
-:::{#fig:two-squares}
-![Triangular elements](design/parametric/two-squares-triang.png){#fig:two-squares-triang width=50%}
-![Quadrangular elements](design/parametric/two-squares-quad.png){#fig:two-squares-quad width=50%}
+```{.feenox include="cantilever.fee"}
+```
 
-Heat conduction on two 2D squares with different temprature-depedent conductivities
+::: {#fig:cantilever-mesh}
+
+![Tetrahedra](cantilever-tet.png){width=45%} 
+![Hexahedra](cantilever-hex.png){width=45%}
+
+Cantilevered beam meshed with structured tetrahedra and hexahedra
 :::
 
-Consider the input file
+Now the following Bash script first calls Gmsh to create the meshes `cantilever-${element}-${c}.msh` where
 
-```{.feenox style=feenox}
-include(parametric/two-squares-thermal.fee)
+ * `${element}`: tet4, tet10, hex8, hex20, hex27
+ * `${c}`: 1,2,\dots,10
+
+It then calls FeenoX with the input above and passes `${element}` and `${c}` as extra arguments, which then are expanded as `$1` and `$2` respectively.
+ 
+```{.bash include="cantilever.sh"}
 ```
 
-and the shell script
+After the execution of the Bash script, one has several files `cantilever-${element}.dat` files. When plotted, these show the shear locking effect of fully-integrated first-order elements as illustrated in @fig:cantilever-displacement. The theoretical Euler-Bernoulli result is just a reference as, among other things, it does not take into account the effect of the material's Poisson's ratio.
 
-```{.bash style=bash}
-include(parametric/two-squares-thermal.sh)
-```
+![Displacement at the free tip of a cantilevered beam vs. number of nodes for different element types](cantilever-displacement.pdf){#fig:cantilever-displacement}
 
-Then it is possible to run the six combinations at once, obtaining
+### Optimization loops
 
-```{.terminal style=terminal}
-$ ./two-squares-thermal.sh
-1       Tright=1        0.432843
-1       Tright=1        0.432965
-2       Tright=2        0.767466
-2       Tright=2        0.767729
-3       Tright=3        1.03429
-3       Tright=3        1.03464
-```
 
-This way of performing parametric studies is very flexible since the varied arguments can be either strings or numbers. Both the actual input itself and the external driver script can be tracked using version control systems, allowing for an efficient and flexible traceability scheme. This is a design feature of FeenoX, inspired by the UNIX rules of generation and of economy. 
-
-**Cantilever beam with tet4/tet10/hex8/hex20/hex27 struct/delaunay/etc**
-
-Max. deflection vs. element size
-                vs. total DOFs
-                vs. CPU  (run several times and take average and standard deviation)
-                vs. memory
-                
-MUMPS/GAMG, local, aws, contabo
-
-The second way of running parametric studies is by using the internal keyword `PARAMETRIC` that allows sweeping a numerical range of one or more FeenoX variables. 
-
-**TODO**
 
 
 ## Efficiency {#sec:efficiency}
@@ -457,7 +531,7 @@ vtk (vtu), gmsh, frd?
 > ```
 
 
-## Reproducibility and traceability 
+## Reproducibility and traceability {#sec:traceability}
 
 > ```include
 > 410-reproducibility.md

@@ -115,16 +115,20 @@ in the Git repository.
 Go directly to the point and see how to solve problems with FeenoX.
 Everything (except the case files) is included in the Git repository.
 
-**TO BE DONE**
-
 ## Quick examples
 
 Annotated examples can be found in the [examples][] directory. These are
-simple and quick (but varied) cases.
+simple and quick (but varied) cases. They are based on the August 2021
+presentation:
 
-**TO BE DONE**
+-   [Recording (audio in Spanish, slides in English)][]
+-   [Slides in PDF][]
+-   [Markdown examples sources][]
 
   [examples]: ../examples
+  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
+  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
+  [Markdown examples sources]: https://github.com/gtheler/2021-presentation
 
 ## Tutorials
 

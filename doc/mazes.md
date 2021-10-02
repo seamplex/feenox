@@ -57,3 +57,16 @@ Say you are Homer Simpson and you want to solve a maze drawn in a restaurant's p
 
 ![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png)
 
+::: {#fig:mazes}
+
+![](maze-sigma.png){width=45%}
+![](maze-delta.png){width=45%}
+
+![](maze-theta.png){width=45%}
+![](maze-big.png){width=45%}
+
+Any arbitrary maze (even hand-drawn) can be solved with FeenoX
+:::
+
+
+
