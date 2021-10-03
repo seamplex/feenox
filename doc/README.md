@@ -95,7 +95,7 @@ See the [FeenoX history](history.md).
 
 ## Compiling from source
 
- * See the [Compilation guide](./compile.md) for a full explanation and of the steps above.
+ * See the [Compilation guide](./compilation.md) for a full explanation and of the steps above.
  * See the [Programming guide](./programming.md) for more details.
 
     

@@ -10,6 +10,8 @@
 \definecolor{bash_keyword2}{rgb}{0.7,0.7,0.7}
 \definecolor{bash_comment}{rgb}{0.5,0.5,0.5}
 
+\definecolor{python_keyword2}{rgb}{0.5,0.2,0.8}
+
 \definecolor{was_fondo}{rgb}{0.95,0.95,0.90}
 \definecolor{fino_fondo}{rgb}{0.90,0.95,0.90}
 \definecolor{gmsh_fondo}{rgb}{0.90,0.90,0.95}
@@ -138,3 +140,25 @@
   framesep=0.1cm,                                           
   frame=single,                                             
 }
+
+\lstdefinestyle{python}{
+  language=python,
+  basicstyle=\ttfamily\footnotesize,
+  commentstyle={\color{bash_comment}\normalfont\textit},
+  keywordstyle=[1]{\color{bash_keyword1}\ttfamily\textbf},
+  keywordstyle=[2]{\color{python_keyword2}\ttfamily\textbf},
+  backgroundcolor=\color{awk_fondo},
+  showstringspaces=true,
+  breaklines=true,
+  breakatwhitespace=true,
+  prebreak={\space\MyHookSign},
+  lineskip=-1pt,
+  captionpos=b,
+%   numbers=left,
+%   stepnumber=5,
+  xleftmargin=0.1cm,
+  xrightmargin=0.1cm,
+  framesep=0.1cm,
+  frame=single,
+}
+

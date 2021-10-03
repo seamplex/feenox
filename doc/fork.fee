@@ -1,0 +1,11 @@
+PROBLEM modal 3D MODES 1  # only one mode needed
+READ_MESH fork.msh  # in [m]
+E = 2.07e11         # in [Pa]
+nu = 0.33
+rho = 7829          # in [kg/m^2]
+
+# no BCs! It is a free-free vibration problem
+SOLVE_PROBLEM
+
+# write back the fundamental frequency to stdout
+PRINT f(1)

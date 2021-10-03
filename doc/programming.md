@@ -16,7 +16,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
 # Compiling and debuging
 
-See the [compile.md](compilation instructions).
+See the [compilation.md](compilation instructions).
 
  
 # How we program FeenoX
