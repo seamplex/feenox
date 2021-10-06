@@ -174,46 +174,35 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
 ///fn+clock+example clock.fee
 double feenox_builtin_clock(expr_item_t *f) {
 
+#ifdef HAVE_CLOCK_GETTIME
   struct timespec tp;
 
-#ifdef HAVE_CLOCK_GETTIME
   clockid_t clk_id = (f->arg[0].items != NULL) ? (clockid_t)feenox_expression_eval(&f->arg[0]) : CLOCK_MONOTONIC;
 
   if (clock_gettime(clk_id, &tp) < 0) {
     feenox_runtime_error();
   }
-#else
-  // OS X does not have clock_gettime, use clock_get_time
-  clockid_t clk_id = (f->arg[0].items != NULL) ? (int)feenox_expression_eval(&f->arg[0]) : SYSTEM_CLOCK;
-  
-  clock_serv_t cclock;
-  mach_timespec_t mts;
-  host_get_clock_service(mach_host_self(), clk_id, &cclock);
-  clock_get_time(cclock, &mts);
-  mach_port_deallocate(mach_task_self(), cclock);
-  tp.tv_sec = mts.tv_sec;
-  tp.tv_nsec = mts.tv_nsec;
-
-#endif //  HAVE_CLOCK_GETTIME
-  
   return (double)tp.tv_sec + 1e-9 * (double)tp.tv_nsec;
-
+#else
+  return 0;
+#endif //  HAVE_CLOCK_GETTIME
 }
 
 ///fn+wall_time+usage wall_time()
 ///fn+wall_time+desc Returns the time ellapsed since the invocation of FeenoX, in seconds.
 double feenox_builtin_wall_time(expr_item_t *f) {
 
+#ifdef HAVE_CLOCK_GETTIME
   struct timespec tp;
 
-#ifdef HAVE_CLOCK_GETTIME
   if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
     feenox_runtime_error();
   }
-#endif //  HAVE_CLOCK_GETTIME
   
   return (double)(tp.tv_sec - feenox.tp0.tv_sec) + 1e-9 * (double)(tp.tv_nsec - feenox.tp0.tv_sec);
-
+#else
+  return 0;
+#endif //  HAVE_CLOCK_GETTIME
 }
 
 

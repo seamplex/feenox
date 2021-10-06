@@ -1412,7 +1412,9 @@ struct feenox_t {
   char *main_input_filepath;
   char *main_input_dirname;
 
+#ifdef HAVE_CLOCK_GETTIME
   struct timespec tp0;  
+#endif
   
   enum {
     mode_normal,
