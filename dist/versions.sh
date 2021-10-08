@@ -1,8 +1,8 @@
 #!/bin/false
 
 package=feenox
-petsc_ver=3.15.2
-slepc_ver=3.15.1
+petsc_ver=3.16.0
+slepc_ver=3.16.0
 
 if [ -z "$(which git)" ]; then
   echo "git is not installed"
