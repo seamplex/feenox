@@ -20,7 +20,7 @@ git clone .. ${tmp_dir}
 current_dir=$(pwd)
 
 cd ${tmp_dir}
- ./autogen.sh || exit 1
+ ./autogen.sh --doc || exit 1
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH="" || exit 1
  make distcheck || exit 1
 cd ${current_dir}

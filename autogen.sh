@@ -33,7 +33,16 @@ for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref;
  echo "AC_CONFIG_LINKS([${i}:${i}])" >> config_links.m4
 done
 
+# do not add doc to src unless they ask for it
+echo -n "creating Makefile.am... "
+if [ "x$1" = "x--doc" ]; then
+  echo "SUBDIRS = src doc" > Makefile.am
+else
+  echo "SUBDIRS = src" > Makefile.am
+fi
+cat Makefile.base >> Makefile.am
+echo "ok"
+
 echo "calling autoreconf... "
 autoreconf -i
-# automake --add-missing
 echo "done"

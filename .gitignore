@@ -2,6 +2,7 @@
 .dirstamp
 Makefile
 Makefile.in
+Makefile.am
 aclocal.m4
 autom4te.cache/
 compile
