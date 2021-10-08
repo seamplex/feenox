@@ -1,6 +1,7 @@
 Makefile
 Makefile.in
 texinfo.tex
+feenox-desc.info
 *.pdf
 example10.1
 gmsh.1
