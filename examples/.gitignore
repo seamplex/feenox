@@ -4,3 +4,6 @@ lorenz.dat
 lorenz.html
 maze.msh
 maze-solved.msh
+*-post.sh
+add
+nafems-le10.msh
