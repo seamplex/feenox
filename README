@@ -195,6 +195,12 @@ economy):
     sigma_y @ D =   -5.38016        MPa
     $ 
 
+Also note that since there is only one material there is no need to do
+an explicit link between material properties and physical volumes in the
+mesh (rule of simplicity). And since the properties are uniform and
+isotropic, a single global scalar for E and a global single scalar for ν
+are enough.
+
 [The NAFEMS LE10 problem statement and the corresponding FeenoX input]
 
 [Normal stress σ_(y) refined around point D over 5,000x-warped

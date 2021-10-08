@@ -217,12 +217,18 @@ sigma_y @ D =   -5.38016        MPa
 $ 
 ```
 
+Also note that since there is only one material there is no need to do
+an explicit link between material properties and physical volumes in the
+mesh (*rule of simplicity*). And since the properties are uniform and
+isotropic, a single global scalar for *E* and a global single scalar
+for *ν* are enough.
+
 <figure>
 <img src="doc/nafems-le10-problem-input.svg" style="width:100.0%" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
 </figure>
 
 <figure>
-<img src="doc/nafems-le10.png" style="width:100.0%" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
+<img src="doc/nafems-le10.png" style="width:75.0%" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
 </figure>
 
 For the sake of visual completeness, post-processing data with the

@@ -190,7 +190,7 @@ See the [FeenoX history][].
     steps above.
 -   See the [Programming guide][] for more details.
 
-  [Compilation guide]: ./compile.md
+  [Compilation guide]: ./compilation.md
   [Programming guide]: ./programming.md
 
 ## Contributing guidelines

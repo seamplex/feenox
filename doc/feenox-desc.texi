@@ -404,6 +404,12 @@ $
 @end verbatim
 @end smallformat
 
+Also note that since there is only one material there is no need to do
+an explicit link between material properties and physical volumes in the
+mesh (@emph{rule of simplicity}). And since the properties are uniform
+and isotropic, a single global scalar for@ @math{E} and a global single
+scalar for@ @math{\nu} are enough.
+
 @float
 @image{nafems-le10-problem-input,,,The NAFEMS LE10 problem statement and
 the corresponding FeenoX input,svg}
