@@ -99,16 +99,17 @@ Following the UNIX programming philosophy, there are no graphical
 interfaces attached to the FeenoX core, although a wide variety of pre
 and post-processors can be used with FeenoX. To illustrate the
 transfer-function approach, consider the following input file that
-solves Laplace's equation on a square with some space-dependent boundary
-conditions
+solves Laplace's equation @math{\nabla^2 \phi = 0} on a square with some
+space-dependent boundary conditions:
 
 @math{
-\begin{cases}
-\phi(x,y) = +y & \text{for $x=-1$ (left)} \\
-\phi(x,y) = -y & \text{for $x=+1$ (right)} \\
-\nabla \phi \cdot \hat{\vec{n}} = \sin\left(\frac{\pi}{2} x\right) & \text{for $y=-1$ (bottom)} \\
-\nabla \phi \cdot \hat{\vec{n}} =0 & \text{for $y=+1$ (top)} \\
-\end{cases}
+\phi(x,y) = +y \quad for x=-1 (left)
+} @math{
+\phi(x,y) = -y \quad for x=+1 (right)
+} @math{
+\nabla \phi \cdot \hat{\vec{n}} = \sin(\pi/2 x) \quad for y=-1 (bottom)
+} @math{
+\nabla \phi \cdot \hat{\vec{n}} =0 \quad for y=+1 (top)
 }
 
 @smallformat
@@ -173,27 +174,6 @@ rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
-@quotation
-@itemize
-@item
-@uref{https://www.seamplex.com/feenox/examples,FeenoX annotated
-examples}
-@item
-FeenoX Overview Presentation, August 2021
-@itemize
-@item
-@uref{https://youtu.be/-RJ5qn7E9uE,Recording (audio in Spanish, slides
-in English)}
-@item
-@uref{https://www.seamplex.com/feenox/doc/2021-feenox.pdf,Slides in PDF}
-@item
-@uref{https://github.com/gtheler/2021-presentation,Markdown examples
-sources}
-@end itemize
-
-@end itemize
-
-@end quotation
 One of the main features of this allegedly particular design basis is
 that @strong{simple problems ought to have simple inputs} (@emph{rule of
 simplicity}) or, quoting Alan Kay, ``simple things should be simple,
@@ -296,23 +276,21 @@ attractor using FeenoX to compute it and
 @uref{http://www.gnuplot.info/,gnuplot} to draw it. Solve
 
 @math{
-\begin{cases}
-\dot{x} &= \sigma \cdot (y - x)  \\
-\dot{y} &= x \cdot (r - z) - y   \\
-\dot{z} &= x y - b z             \\
-\end{cases}
+\dot{x} = \sigma \cdot (y - x)
+} @math{
+\dot{y} = x \cdot (r - z) - y
+} @math{
+\dot{z} = x y - b z
 }
-
 for @math{0 < t < 40} with initial conditions
 
 @math{
-\begin{cases}
-x(0) = -11  \\
-y(0) = -16  \\
-z(0) = 22.5 \\
-\end{cases}
+x(0) = -11
+} @math{
+y(0) = -16
+} @math{
+z(0) = 22.5
 }
-
 and @math{\sigma=10}, @math{r=28} and @math{b=8/3}, which are the
 classical parameters that generate the butterfly as presented by Edward
 Lorenz back in his seminal 1963 paper

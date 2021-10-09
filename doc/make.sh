@@ -20,14 +20,16 @@ cd ..
    --reference-links --reference-location=section \
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
-   --lua-filter=doc/not-in-format.lua
+   --lua-filter=doc/not-in-format.lua \
+   --lua-filter=doc/in-format.lua
    
  pandoc README.md  -t plain -o README \
    --standalone --toc --number-sections \
    --reference-links --reference-location=section \
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
-   --lua-filter=doc/not-in-format.lua
+   --lua-filter=doc/not-in-format.lua \
+   --lua-filter=doc/in-format.lua
    
   pandoc TODO.md    -t plain -o TODO
 cd doc
@@ -37,7 +39,8 @@ pandoc README.md  -t gfm   -o README.markdown \
   --standalone --toc --reference-links --reference-location=section \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
-  --lua-filter=not-in-format.lua
+  --lua-filter=not-in-format.lua \
+  --lua-filter=in-format.lua
 
 
 
@@ -80,6 +83,7 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
+  --lua-filter=in-format.lua \
   --lua-filter=manfilter.lua
 
 # this goes into the make script of the webpage
@@ -120,7 +124,8 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
-  --lua-filter=not-in-format.lua
+  --lua-filter=not-in-format.lua \
+  --lua-filter=in-format.lua
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 

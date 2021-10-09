@@ -7,7 +7,8 @@ for i in lorenz nafems-le10 maze; do
   grep '#\.' ${i}.fee | sed 's/#.//' | sed 's/^[ \t]*//' | \
     pandoc -t markdown   --lua-filter=../doc/include-files.lua \
                          --lua-filter=../doc/include-code-files.lua \
-                         --lua-filter=../doc/not-in-format.lua >> ${out}
+                         --lua-filter=../doc/not-in-format.lua \
+                         --lua-filter=../doc/in-format.lua >> ${out}
   echo >> ${out}
   
   echo >> ${out}

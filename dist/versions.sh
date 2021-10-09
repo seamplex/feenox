@@ -1,5 +1,13 @@
 #!/bin/false
 
+# check for needed tools
+for i in git autoconf m4 make makeinfo texi2dvi pandoc pandoc-crossref makeinfo feenox; do
+  if [ -z "$(which $i)" ]; then
+    echo "error: $i not installed"
+    exit 1
+  fi
+done
+
 package=feenox
 petsc_ver=3.16.0
 slepc_ver=3.16.0

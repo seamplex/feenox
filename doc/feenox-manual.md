@@ -46,13 +46,13 @@ compilation.md
 
 # Examples
 
-To be done.
+```{.include shift-heading-level-by=1}
+../examples/examples.md
+```
 
 # Tutorial
 
 To be done.
-
-# Description
 
 # Description
 

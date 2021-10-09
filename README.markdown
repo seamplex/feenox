@@ -31,11 +31,15 @@ rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
+<div class="not-in-format texinfo latex">
+
 > -   [FeenoX annotated examples][]
 > -   FeenoX Overview Presentation, August 2021
 >     -   [Recording (audio in Spanish, slides in English)][]
 >     -   [Slides in PDF][]
 >     -   [Markdown examples sources][]
+
+</div>
 
 One of the main features of this allegedly particular design basis is
 that **simple problems ought to have simple inputs** (*rule of
@@ -121,23 +125,23 @@ For example, let us consider the famous chaotic [Lorenz’ dynamical
 system][]. Here is one way of getting an image of the butterfly-shaped
 attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
 
-$$
-\\begin{cases}
-\\dot{x} &= \\sigma \\cdot (y - x)  \\\\
-\\dot{y} &= x \\cdot (r - z) - y   \\\\
-\\dot{z} &= x y - b z             \\\\
-\\end{cases}
-$$
+<div class="in-format texi plain gfm">
+
+*ẋ* = *σ* ⋅ (*y*−*x*)
+*ẏ* = *x* ⋅ (*r*−*z*) − *y*
+*ż* = *x**y* − *b**z*
+
+</div>
 
 for 0 \< *t* \< 40 with initial conditions
 
-$$
-\\begin{cases}
-x(0) = -11  \\\\
-y(0) = -16  \\\\
-z(0) = 22.5 \\\\
-\\end{cases}
-$$
+<div class="in-format texi plain gfm">
+
+*x*(0) =  − 11
+*y*(0) =  − 16
+*z*(0) = 22.5
+
+</div>
 
 and *σ* = 10, *r* = 28 and *b* = 8/3, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his

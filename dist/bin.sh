@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# check for needed tools
-for i in git autoconf m4 make makeinfo texi2dvi; do
- if [ -z "$(which $i)" ]; then
-  echo "error: $i not installed"
-  exit 1
- fi
-done
-
-
 if [ ! -e ../src ]; then
   echo "run from dist directory"
   exit 0
@@ -32,16 +23,18 @@ fi
 export PETSC_DIR=$(pwd)/petsc-${petsc_ver}
 export SLEPC_DIR=$(pwd)/slepc-${slepc_ver}
 cd ${package}
- ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
-             --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static" || exit 1
-            
-#  if [ "x${target}" = "xlinux-amd64" ]; then
-#   cd doc
-#    make pdf || exit 1
-#    make info || exit 1
-#   cd ..
-#  fi 
- make || exit 1
+  ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
+              --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static" || exit 1
+
+  cd doc
+    ./make.sh || exit 1
+    if [ "x${target}" = "xlinux-amd64" ]; then
+      make pdf || exit 1
+      make info || exit 1
+      ./pdf feenox-manual
+    fi 
+    make || exit 1
+  cd .. 
 cd ..
 
 mkdir -p ${package}-${version}-${target}
@@ -61,6 +54,10 @@ cd ${package}-${version}-${target}
     cp ../${package}/COPYING   share/doc
     cp ../${package}/README    share/doc
     cp ../${package}/TODO      share/doc
+
+    cp ../${package}/doc/${package}-manual.pdf    share/doc
+    cp ../${package}/doc/${package}-desc.pdf      share/doc
+    cp ../${package}/doc/${package}-desc.info     share/doc
     
   elif [ "x${target}" = "xwindows64" ]; then   
   
@@ -76,13 +73,11 @@ cd ${package}-${version}-${target}
   fi
 
   cp ../${package}/doc/${package}.xml      share/doc
-#   cp ../${package}/doc/${package}.pdf      share/doc
+  cp ../${package}/doc/${package}.texi     share/doc
   cp ../${package}/doc/syntax-kate.sh      share/doc
   cp ../${package}/doc/syntax-tex.sh       share/doc
-#   cp ../${package}/doc/${package}.texi     share/doc
-#   cp ../${package}/doc/${package}.info     share/doc
 
-#   cp -r ../${package}/examples/*       share/doc/examples
+  cp -r ../${package}/examples/*       share/doc/examples
   cp -r ../${package}/tests/*          share/doc/tests
   
   cp ../${package}/doc/${package}.1 share/man/man1
@@ -90,7 +85,7 @@ cd ${package}-${version}-${target}
 cd ..
 
 if [ ! -e ${target} ]; then
- mkdir ${target}
+  mkdir ${target}
 fi
 
 if [ "x${target}" = "xlinux-amd64" ]; then

@@ -2793,7 +2793,7 @@ int feenox_parse_problem(void) {
       
 ///kw_pde+PROBLEM+detail @    
 ///kw_pde+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
-///kw_pde+PROBLEM+detail Check out [FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md)
+///kw_pde+PROBLEM+detail Check out [FeenoX repository](https:\/\/github.com/seamplex/feenox/blob/main/doc/programming.md)
 ///kw_pde+PROBLEM+detail for licensing information, programming guides and code of conduct.
 ///kw_pde+PROBLEM+detail @    
 
@@ -2895,33 +2895,33 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
 ///kw_pde+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
 ///kw_pde+PROBLEM+detail @          
-///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCType.html>.
+///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <http:\/\/petsc.org/release/docs/manualpages/PC/PCType.html>.
     } else if (strcasecmp(token, "PRECONDITIONER") == 0 || strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.pc_type));
 
 ///kw_pde+PROBLEM+usage [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPType.html>.
+///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http:\/\/petsc.org/release/docs/manualpages/KSP/KSPType.html>.
     } else if (strcasecmp(token, "LINEAR_SOLVER") == 0 || strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ksp_type));
           
 ///kw_pde+PROBLEM+usage [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESType.html>.
+///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http:\/\/petsc.org/release/docs/manualpages/SNES/SNESType.html>.
 ///kw_pde+PROBLEM+detail @
         } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
 ///kw_pde+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSType.html>.
+///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http:\/\/petsc.org/release/docs/manualpages/TS/TSType.html>.
     } else if (strcasecmp(token, "TRANSIENT_SOLVER") == 0 || strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
 
 ///kw_pde+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:/\/www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSAdaptType.html>.
+///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:\/\/petsc.org/release/docs/manualpages/TS/TSAdaptType.html>.
     } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
 
 ///kw_pde+PROBLEM+usage [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
+///kw_pde+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https:\/\/slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
     } else if (strcasecmp(token, "EIGEN_SOLVER") == 0 || strcasecmp(token, "EPS") == 0 || strcasecmp(token, "EPS_TYPE") == 0) {
 #ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.eps_type));
@@ -2931,7 +2931,7 @@ int feenox_parse_problem(void) {
 #endif
       
 ///kw_pde+PROBLEM+usage [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https://slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
+///kw_pde+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https:\/\/slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
     } else if (strcasecmp(token, "SPECTRAL_TRANSFORMATION") == 0 || strcasecmp(token, "ST") == 0 || strcasecmp(token, "ST_TYPE") == 0) {
 #ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.st_type));

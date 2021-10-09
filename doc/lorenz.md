@@ -1,6 +1,7 @@
 
 For example, let us consider the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system). Here is one way of getting an image of the butterfly-shaped attractor using FeenoX to compute it and [gnuplot](http://www.gnuplot.info/) to draw it. Solve 
 
+::: {.not-in-format .texi .plain .gfm}
 $$
 \begin{cases}
 \dot{x} &= \sigma \cdot (y - x)  \\
@@ -8,9 +9,23 @@ $$
 \dot{z} &= x y - b z             \\
 \end{cases}
 $$
+:::
+
+::: {.in-format .texi .plain .gfm}
+$$
+\dot{x} = \sigma \cdot (y - x)
+$$
+$$
+\dot{y} = x \cdot (r - z) - y
+$$
+$$
+\dot{z} = x y - b z
+$$
+:::
 
 for $0 < t < 40$ with initial conditions
 
+::: {.not-in-format .texi .plain .gfm}
 $$
 \begin{cases}
 x(0) = -11  \\
@@ -18,6 +33,20 @@ y(0) = -16  \\
 z(0) = 22.5 \\
 \end{cases}
 $$
+:::
+
+::: {.in-format .texi .plain .gfm}
+$$
+x(0) = -11
+$$
+$$
+y(0) = -16
+$$
+$$
+z(0) = 22.5
+$$
+:::
+
 
 and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters that generate the butterfly as presented by Edward Lorenz back in his seminal 1963 paper [Deterministic non-periodic flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
 
