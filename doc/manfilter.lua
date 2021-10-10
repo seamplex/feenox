@@ -21,6 +21,7 @@ function Note(el)
     return {}
 end
 
+-- TODO: convert to ascii art
 -- remove images
 function Image(el)
     return {}

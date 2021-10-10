@@ -1,11 +1,12 @@
 #!/bin/bash
 
-for i in touch sed pandoc; do
+for i in touch sed pandoc xelatex makeinfo texi2pdf inkscape; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
  fi
 done
+
 
 if [ ! -e "design" ]; then
   echo "error: execute from doc directory"
@@ -21,7 +22,8 @@ cd ..
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
    --lua-filter=doc/not-in-format.lua \
-   --lua-filter=doc/in-format.lua
+   --lua-filter=doc/in-format.lua \
+   --lua-filter=doc/img-width.lua
    
  pandoc README.md  -t plain -o README \
    --standalone --toc --number-sections \
@@ -29,7 +31,8 @@ cd ..
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
    --lua-filter=doc/not-in-format.lua \
-   --lua-filter=doc/in-format.lua
+   --lua-filter=doc/in-format.lua \
+   --lua-filter=doc/img-width.lua
    
   pandoc TODO.md    -t plain -o TODO
 cd doc
@@ -40,7 +43,8 @@ pandoc README.md  -t gfm   -o README.markdown \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
-  --lua-filter=in-format.lua
+  --lua-filter=in-format.lua \
+  --lua-filter=img-width.lua
 
 
 
@@ -84,6 +88,7 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
   --lua-filter=in-format.lua \
+  --lua-filter=img-width.lua \
   --lua-filter=manfilter.lua
 
 # this goes into the make script of the webpage
@@ -125,20 +130,23 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
-  --lua-filter=in-format.lua
+  --lua-filter=in-format.lua \
+  --lua-filter=img-width.lua
+
+# TODO: as a lua filter
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 
-for i in xelatex makeinfo texi2pdf inkscape; do
- if [ -z "$(which $i)" ]; then
-  exit 0
- fi
-done
 
-for i in logo nafems-le10-problem-input lorenz; do
+# TODO: as a lua filter
+for i in logo \
+         nafems-le10-problem-input \
+         lorenz \
+         ; do
   if [ ! -e $i.pdf ]; then
     inkscape --export-type=pdf ${i}.svg
   fi
 done
+
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null

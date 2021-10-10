@@ -40,13 +40,13 @@ Hence, FeenoX tries to fill in the gap between these two worlds with a different
 
 # Download
 
-```{.include}
+```include
 doc/download.md
 ```
 
 ## Git repository
 
-```.include
+```include
 doc/git.md
 ```
 

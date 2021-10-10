@@ -126,7 +126,8 @@ pandoc ${dir}/hash.yaml ${dir}/${pdfyaml}.yaml ${stuff}.md \
   --lua-filter=${dir}/include-code-files.lua \
   --lua-filter=${dir}/not-in-format.lua \
   --lua-filter=${dir}/in-format.lua \
-  --lua-filter ${dir}/code-style.lua \
+  --lua-filter=${dir}/code-style.lua \
+  --lua-filter=${dir}/img-width.lua \
   --listings --number-sections \
   --filter pandoc-crossref \
   --template=${dir}/${template} \

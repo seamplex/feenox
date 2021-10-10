@@ -55,7 +55,7 @@ The following ASCII input file ressembles the parameters, inital conditions and 
 ```{.feenox include="lorenz.fee"}
 ```
 
-![The Lorenz attractor solved with FeenoX and drawn with Gnuplot](lorenz.svg)
+![The Lorenz attractor solved with FeenoX and drawn with Gnuplot](lorenz.svg){width_latex=100% width_html=100% width_texinfo=12cm}
 
 Indeed, when executing FeenoX with this input file, we get four ASCII columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and plot it with a standard tool such as Gnuplot. Note the importance of relying on plain ASCII text  formats both for input and output, as recommended by the UNIX philosophy and the _rule of composition_: other programs can easily create inputs for FeenoX and other programs can easily understand FeenoX' outputs. This is essentially how UNIX filters and pipes work.
 

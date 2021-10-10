@@ -19,7 +19,7 @@ transfer.md
 
 Following the UNIX programming philosophy, there are no graphical interfaces attached to the FeenoX core, although a wide variety of pre and post-processors can be used with FeenoX. To illustrate the transfer-function approach, consider the following input file that solves Laplace’s equation $\nabla^2 \phi = 0$ on a square with some space-dependent boundary conditions:
 
-::: {.not-in-format .texi .man}
+::: {.not-in-format .texinfo .man}
 $$
 \begin{cases}
 \phi(x,y) = +y & \text{for $x=-1$ (left)} \\
@@ -30,19 +30,14 @@ $$
 $$
 :::
 
-::: {.in-format .texi .man}
-$$
-\phi(x,y) = +y \quad for x=-1 (left)
-$$
-$$
-\phi(x,y) = -y \quad for x=+1 (right)
-$$
-$$
-\nabla \phi \cdot \hat{\vec{n}} = \sin(\pi/2 x) \quad for y=-1 (bottom)
-$$
-$$
-\nabla \phi \cdot \hat{\vec{n}} =0 \quad for y=+1 (top)
-$$
+::: {.in-format .texinfo .man}
+$\phi(x,y) = +y \quad$ for $x=-1$ (left)
+
+$\phi(x,y) = -y \quad$ for $x=+1$ (right)
+
+$\nabla \phi \cdot \hat{\vec{n}} = \sin(\pi/2 x) \quad$ for $y=-1$ (bottom)
+
+$\nabla \phi \cdot \hat{\vec{n}} =0 \quad$ for $y=+1$ (top)
 :::
 
 
@@ -52,7 +47,7 @@ $$
 The `.msh` file can be post-processed with [Gmsh](http://gmsh.info/), and the `.vtk` file can be post-processed with [Paraview](https://www.paraview.org/).
 See <https://www.caeplex.com> for a mobile-friendly web-based interface for solving finite elements in the cloud directly from the browser.
 
-![Laplace’s equation solved with FeenoX and post-processed with Gmsh](laplace-square-gmsh.png){width=50%}
+![Laplace’s equation solved with FeenoX and post-processed with Gmsh](laplace-square-gmsh.png){width_latex=48% width_texinfo=8cm}
 
-![Laplace’s equation solved with FeenoX and post-processed with Paraview](laplace-square-paraview.png){width=50%}
+![Laplace’s equation solved with FeenoX and post-processed with Paraview](laplace-square-paraview.png){width_latex=48% width_texinfo=8cm}
 

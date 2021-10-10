@@ -3,7 +3,6 @@ Makefile.in
 texinfo.tex
 feenox-desc.info
 feenox.1
-*.pdf
 example10.1
 gmsh.1
 pandoc.1.md
@@ -13,9 +12,7 @@ date.yaml
 *.log
 *.aux
 *.toc
+*.pdf
 reference-*.md
 repository-open-graph.png
 feenox-desc.t2p/
-logo.pdf
-lorenz.pdf
-nafems-le10-problem-input.pdf
