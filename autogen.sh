@@ -41,6 +41,7 @@ else
   echo "SUBDIRS = src" > Makefile.am
 fi
 cat Makefile.base >> Makefile.am
+touch doc/feenox-desc.texi
 echo "ok"
 
 echo "calling autoreconf... "

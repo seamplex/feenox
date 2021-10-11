@@ -24,8 +24,11 @@ cd ${tmp_dir}
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH="" || exit 1
  cd doc
   ./make.sh || exit 1
-  ./pdf.sh feenox-manual
-  make pdf 
+  make info || exit 1
+  make pdf || exit 1
+  ./pdf.sh feenox-manual || exit 1
+  ./pdf.sh srs || exit 1
+  ./pdf.sh sds || exit 1
  cd .. 
  make distcheck || exit 1
 cd ${current_dir}

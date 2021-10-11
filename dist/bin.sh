@@ -26,15 +26,17 @@ cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
               --enable-download-gsl CFLAGS="-Ofast -DLD_STATIC" LDFLAGS="-static" || exit 1
 
-  cd doc
-    ./make.sh || exit 1
-    if [ "x${target}" = "xlinux-amd64" ]; then
-      make pdf || exit 1
+  if [ "x${target}" = "xlinux-amd64" ]; then
+    cd doc
+      ./make.sh || exit 1
       make info || exit 1
-      ./pdf feenox-manual
-    fi 
-    make || exit 1
-  cd .. 
+      make pdf || exit 1
+      ./pdf.sh feenox-manual || exit 1
+      ./pdf.sh srs || exit 1
+      ./pdf.sh sds || exit 1
+    cd .. 
+  fi 
+  make || exit 1
 cd ..
 
 mkdir -p ${package}-${version}-${target}

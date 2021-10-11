@@ -31,12 +31,6 @@ rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
-  -   FeenoX annotated examples
-  -   FeenoX Overview Presentation, August 2021
-      -   Recording (audio in Spanish, slides in English)
-      -   Slides in PDF
-      -   Markdown examples sources
-
 One of the main features of this allegedly particular design basis is
 that simple problems ought to have simple inputs (rule of simplicity)
 or, quoting Alan Kay, “simple things should be simple, complex things
@@ -276,10 +270,6 @@ above (rules of modularity and extensibility). See the documentation for
 details about how to contribute.
 
   [FeenoX]: https://www.seamplex.com/feenox
-  [FeenoX annotated examples]: https://www.seamplex.com/feenox/examples
-  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
-  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
-  [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
@@ -395,7 +385,56 @@ details.
 
 Git repository
 
-    doc/git.md
+To compile the Git repository, proceed as follows. This procedure does
+need git and autoconf but new versions can be pulled and recompiled
+easily.
+
+1.  Install mandatory dependencies
+
+        sudo apt-get install gcc make git automake autoconf libgsl-dev
+
+    If you cannot install libgsl-dev but still have git and the build
+    toolchain, you can have the configure script to download and compile
+    it for you. See point 4 below.
+
+2.  Install optional dependencies (of course these are optional but
+    recommended)
+
+        sudo apt-get install libsundials-dev petsc-dev slepc-dev
+
+3.  Clone Github repository
+
+        git clone https://github.com/seamplex/feenox
+
+4.  Boostrap, configure, compile & make
+
+        cd feenox
+        ./autogen.sh
+        ./configure
+        make -j4
+
+    If you cannot (or do not want) to use libgsl-dev from a package
+    repository, call configure with --enable-download-gsl:
+
+        ./configure --enable-download-gsl
+
+    If you do not have Internet access, get the tarball manually, copy
+    it to the same directory as configure and run again.
+
+5.  Run test suite (optional)
+
+        make check
+
+6.  Install the binary system wide (optional)
+
+        sudo make install
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+    git pull
+    ./autogen.sh; ./configure; make -j4
+    sudo make install
 
 See the detailed compilation instructions for further details.
 

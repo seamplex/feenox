@@ -31,16 +31,6 @@ rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
 
-<div class="not-in-format texinfo latex">
-
-> -   [FeenoX annotated examples][]
-> -   FeenoX Overview Presentation, August 2021
->     -   [Recording (audio in Spanish, slides in English)][]
->     -   [Slides in PDF][]
->     -   [Markdown examples sources][]
-
-</div>
-
 One of the main features of this allegedly particular design basis is
 that **simple problems ought to have simple inputs** (*rule of
 simplicity*) or, quoting Alan Kay, “simple things should be simple,
@@ -125,7 +115,7 @@ For example, let us consider the famous chaotic [Lorenz’ dynamical
 system][]. Here is one way of getting an image of the butterfly-shaped
 attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
 
-<div class="in-format texi plain gfm">
+<div class="only-in-format texi plain gfm">
 
 *ẋ* = *σ* ⋅ (*y*−*x*)
 *ẏ* = *x* ⋅ (*r*−*z*) − *y*
@@ -135,7 +125,7 @@ attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
 
 for 0 \< *t* \< 40 with initial conditions
 
-<div class="in-format texi plain gfm">
+<div class="only-in-format texi plain gfm">
 
 *x*(0) =  − 11
 *y*(0) =  − 16
@@ -171,7 +161,9 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
-![The Lorenz attractor solved with FeenoX and drawn with Gnuplot][]
+<figure>
+<img src="doc/lorenz.svg" data-width_latex="75%" data-width_html="100%" data-width_texinfo="12cm" alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" /><figcaption aria-hidden="true">The Lorenz attractor solved with FeenoX and drawn with Gnuplot</figcaption>
+</figure>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
 columns (*t*, *x*, *y* and *z*) which we can then redirect to a file and
@@ -228,11 +220,11 @@ isotropic, a single global scalar for *E* and a global single scalar
 for *ν* are enough.
 
 <figure>
-<img src="doc/nafems-le10-problem-input.svg" style="width:100.0%" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
+<img src="doc/nafems-le10-problem-input.svg" data-width_html="100%" data-width_latex="100%" data-width_texinfo="15cm" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
 </figure>
 
 <figure>
-<img src="doc/nafems-le10.png" style="width:75.0%" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
+<img src="doc/nafems-le10.png" data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
 </figure>
 
 For the sake of visual completeness, post-processing data with the
@@ -322,17 +314,12 @@ above (*rules of modularity and extensibility*). See the
 [documentation][] for details about how to contribute.
 
   [FeenoX]: https://www.seamplex.com/feenox
-  [FeenoX annotated examples]: https://www.seamplex.com/feenox/examples
-  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
-  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
-  [Markdown examples sources]: https://github.com/gtheler/2021-presentation
   [Gmsh]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
   [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
   [gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
-  [The Lorenz attractor solved with FeenoX and drawn with Gnuplot]: doc/lorenz.svg
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
   [Paraview]: https://www.paraview.org
   [1]: https://www.paraview.org/
@@ -438,8 +425,71 @@ below][] for details.
 
 ## Git repository
 
-``` .include
-doc/git.md
+To compile the Git repository, proceed as follows. This procedure does
+need `git` and `autoconf` but new versions can be pulled and recompiled
+easily.
+
+1.  Install mandatory dependencies
+
+    ``` terminal
+    sudo apt-get install gcc make git automake autoconf libgsl-dev
+    ```
+
+    If you cannot install `libgsl-dev` but still have `git` and the
+    build toolchain, you can have the `configure` script to download and
+    compile it for you. See point 4 below.
+
+2.  Install optional dependencies (of course these are *optional* but
+    recommended)
+
+    ``` terminal
+    sudo apt-get install libsundials-dev petsc-dev slepc-dev
+    ```
+
+3.  Clone Github repository
+
+    ``` terminal
+    git clone https://github.com/seamplex/feenox
+    ```
+
+4.  Boostrap, configure, compile & make
+
+    ``` terminal
+    cd feenox
+    ./autogen.sh
+    ./configure
+    make -j4
+    ```
+
+    If you cannot (or do not want) to use `libgsl-dev` from a package
+    repository, call `configure` with `--enable-download-gsl`:
+
+    ``` terminal
+    ./configure --enable-download-gsl
+    ```
+
+    If you do not have Internet access, get the tarball manually, copy
+    it to the same directory as `configure` and run again.
+
+5.  Run test suite (optional)
+
+    ``` terminal
+    make check
+    ```
+
+6.  Install the binary system wide (optional)
+
+    ``` terminal
+    sudo make install
+    ```
+
+To stay up to date, pull and then autogen, configure and make (and
+optionally install):
+
+``` terminal
+git pull
+./autogen.sh; ./configure; make -j4
+sudo make install
 ```
 
 See the [detailed compilation instructions][] for further details.
