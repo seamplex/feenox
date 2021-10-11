@@ -142,6 +142,9 @@ sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi
 for i in logo \
          nafems-le10-problem-input \
          lorenz \
+         cantilever-displacement \
+         fork \
+         fork-meshed \
          ; do
   if [ ! -e $i.pdf ]; then
     inkscape --export-type=pdf ${i}.svg
