@@ -149,7 +149,20 @@ for i in logo \
   if [ ! -e $i.pdf ]; then
     inkscape --export-type=pdf ${i}.svg
   fi
+  if [ ! -e $i.eps ]; then
+    inkscape --export-type=eps ${i}.svg
+  fi
 done
+
+for i in laplace-square-gmsh \
+         laplace-square-paraview \
+         nafems-le10 \
+         ; do
+  if [ ! -e $i.eps ]; then
+    inkscape --export-type=eps ${i}.png
+  fi
+done
+
 
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null

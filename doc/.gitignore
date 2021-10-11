@@ -13,6 +13,7 @@ date.yaml
 *.aux
 *.toc
 *.pdf
+*.eps
 reference-*.md
 repository-open-graph.png
 feenox-desc.texi
