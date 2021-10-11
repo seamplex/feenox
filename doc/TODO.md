@@ -1,7 +1,3 @@
- * .m4 to .md + lua
- 
- * 
-
  * Documention should be like code: if paragraph appear more than once, then a separate file should be created and included in the needed locations.
  
  * FeenoX focuses on:
@@ -82,3 +78,19 @@
       - challenge quad4
    * Parallellpied whose E depends no temperature
    
+ * aalib for man
+
+# Lua filters
+
+```
+sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
+sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
+```
+   
+```
+for i in logo nafems-le10-problem-input lorenz; do
+  if [ ! -e $i.pdf ]; then
+    inkscape --export-type=pdf ${i}.svg
+  fi
+done
+```

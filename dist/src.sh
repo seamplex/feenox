@@ -15,17 +15,20 @@ fi
 # -----------------------------------------------------------
 #   source
 # -----------------------------------------------------------
-tmp_dir=$(mktemp -d -t ${package}-XXXXXXXXXX)
+# tmp_dir=$(mktemp -d -t ${package}-XXXXXXXXXX)
+tmp_dir=/tmp/feenox
 git clone .. ${tmp_dir}
 current_dir=$(pwd)
+
+exit
 
 cd ${tmp_dir}
  ./autogen.sh --doc || exit 1
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH="" || exit 1
  cd doc
   ./make.sh || exit 1
-  make info || exit 1
-  make pdf || exit 1
+#   make info || exit 1
+#   make pdf || exit 1
   ./pdf.sh feenox-manual || exit 1
   ./pdf.sh srs || exit 1
   ./pdf.sh sds || exit 1
