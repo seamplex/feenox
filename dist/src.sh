@@ -15,12 +15,12 @@ fi
 # -----------------------------------------------------------
 #   source
 # -----------------------------------------------------------
-# tmp_dir=$(mktemp -d -t ${package}-XXXXXXXXXX)
-tmp_dir=/tmp/feenox
+tmp_dir=$(mktemp -d -t ${package}-XXXXXXXXXX)
+# tmp_dir=/tmp/feenox
 git clone .. ${tmp_dir}
 current_dir=$(pwd)
 
-exit
+# exit
 
 cd ${tmp_dir}
  ./autogen.sh --doc || exit 1

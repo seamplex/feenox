@@ -13,7 +13,8 @@ dist_doc_DATA = AUTHORS ChangeLog README TODO \
                 doc/laplace-square-gmsh.eps \
                 doc/laplace-square-paraview.eps \
                 doc/lorenz.eps \
-                doc/nafems-le10-problem-input.eps
+                doc/nafems-le10-problem-input.eps \
+                doc/nafems-le10.eps
 
 dist_man_MANS = doc/feenox.1
 
