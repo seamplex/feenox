@@ -24,10 +24,9 @@
 #. that generate the butterfly as presented by Edward Lorenz back in his
 #. seminal 1963 paper [Deterministic non-periodic
 #. flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
-#. 
-#. The following ASCII input file ressembles the parameters, inital
+#. This example's input file ressembles the parameters, inital
 #. conditions and differential equations of the problem as naturally as
-#. possible.
+#. possible with an ASCII file.
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -49,6 +48,9 @@ PRINT t x y z        # four-column plain-ASCII output
 #$ $ gnuplot lorenz.gp
 #$ $ python3 lorenz.py
 #$ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
-#> ![Drawn with gnuplot](lorenz-gnuplot.svg)
-#>
-#> ![Drawn with matplotlib](lorenz-matplotlib.png)
+#> ::: {#fig:ex_lorenz}
+#> ![Gnuplot](lorenz-gnuplot.svg){width_html=100% width_latex=48%}
+#> ![Matplotlib](lorenz-matplotlib.png){width_html=100% width_latex=48%}
+#> 
+#> The Lorenz attractor computed with FeenoX plotted with two different tools
+#> :::

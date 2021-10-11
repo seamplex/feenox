@@ -94,7 +94,7 @@ or by following the instructions in the documentation.
 
 ### PETSc
 
-[PETSc](https://petsc.org/), the Portable, Extensible Toolkit for Scientific Computation, pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It is used by FeenoX to solve PDEs with the keyword `PROBLEM`, like thermal conduction on a slab.
+The [Portable, Extensible Toolkit for Scientific Computation]((https://petsc.org/)), pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It is used by FeenoX to solve PDEs with the keyword `PROBLEM`, like thermal conduction on a slab.
 
 
 Install either by doing
@@ -114,7 +114,7 @@ Note that
 
 ### SLEPc
 
-[SLEPc](https://slepc.upv.es/), the Scalable Library for Eigenvalue Problem Computations, is a software library for the solution of large scale sparse eigenvalue problems on parallel computers. It is used by FeenoX to solve PDEs with the keyword `PROBLEM` that need eigen-value computations, such as modal analysis of a cantilevered beam.
+The [Scalable Library for Eigenvalue Problem Computations](https://slepc.upv.es/), is a software library for the solution of large scale sparse eigenvalue problems on parallel computers. It is used by FeenoX to solve PDEs with the keyword `PROBLEM` that need eigen-value computations, such as modal analysis of a cantilevered beam.
 
 Install either by doing
 

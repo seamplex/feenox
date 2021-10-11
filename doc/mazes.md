@@ -24,7 +24,7 @@ Say you are Homer Simpson and you want to solve a maze drawn in a restaurant's p
     
  5. Open it with Gmsh 
  
-    ![](gmsh-maze.png){width=50%}\ 
+    ![](gmsh-maze.png){width_html=100% width_latex=40%}\ 
  
     - Add a surface
     - Set physical curves for "start" and "end"
@@ -55,7 +55,7 @@ Say you are Homer Simpson and you want to solve a maze drawn in a restaurant's p
  
  8. Open `maze-solved.msh`, go to start and follow the gradient\ $\nabla \phi$!
 
-![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png)
+![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png){width_html=100% width_latex=50%}
 
 ::: {#fig:mazes}
 

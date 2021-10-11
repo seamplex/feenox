@@ -24,20 +24,20 @@ $$
 \begin{cases}
 \phi(x,y) = +y & \text{for $x=-1$ (left)} \\
 \phi(x,y) = -y & \text{for $x=+1$ (right)} \\
-\nabla \phi \cdot \hat{\vec{n}} = \sin\left(\frac{\pi}{2} x\right) & \text{for $y=-1$ (bottom)} \\
+\nabla \phi \cdot \hat{\vec{n}} = \sin\left(\frac{\pi}{2} \cdot x\right) & \text{for $y=-1$ (bottom)} \\
 \nabla \phi \cdot \hat{\vec{n}} =0 & \text{for $y=+1$ (top)} \\
 \end{cases}
 $$
 :::
 
-::: {.in-format .texinfo .man}
+::: {.only-in-format .texinfo .man}
 $\phi(x,y) = +y \quad$ for $x=-1$ (left)
 
 $\phi(x,y) = -y \quad$ for $x=+1$ (right)
 
-$\nabla \phi \cdot \hat{\vec{n}} = \sin(\pi/2 x) \quad$ for $y=-1$ (bottom)
+$\nabla \phi \cdot \hat{n} = \sin(\pi/2 x) \quad$ for $y=-1$ (bottom)
 
-$\nabla \phi \cdot \hat{\vec{n}} =0 \quad$ for $y=+1$ (top)
+$\nabla \phi \cdot \hat{n} =0 \quad$ for $y=+1$ (top)
 :::
 
 
@@ -47,7 +47,7 @@ $\nabla \phi \cdot \hat{\vec{n}} =0 \quad$ for $y=+1$ (top)
 The `.msh` file can be post-processed with [Gmsh](http://gmsh.info/), and the `.vtk` file can be post-processed with [Paraview](https://www.paraview.org/).
 See <https://www.caeplex.com> for a mobile-friendly web-based interface for solving finite elements in the cloud directly from the browser.
 
-![Laplace’s equation solved with FeenoX and post-processed with Gmsh](laplace-square-gmsh.png){width_latex=48% width_texinfo=8cm}
+![Laplace’s equation solved with FeenoX and post-processed with Gmsh](laplace-square-gmsh.png){width_latex=48% width_texinfo=7cm}
 
-![Laplace’s equation solved with FeenoX and post-processed with Paraview](laplace-square-paraview.png){width_latex=48% width_texinfo=8cm}
+![Laplace’s equation solved with FeenoX and post-processed with Paraview](laplace-square-paraview.png){width_latex=48% width_texinfo=7cm}
 

@@ -11,16 +11,10 @@ $$
 $$
 :::
 
-::: {.in-format .texi .plain .gfm}
-$$
-\dot{x} = \sigma \cdot (y - x)
-$$
-$$
-\dot{y} = x \cdot (r - z) - y
-$$
-$$
-\dot{z} = x y - b z
-$$
+::: {.only-in-format .texi .plain .gfm}
+$$\dot{x} = \sigma \cdot (y - x)$$
+$$\dot{y} = x \cdot (r - z) - y$$
+$$\dot{z} = x y - b z$$
 :::
 
 for $0 < t < 40$ with initial conditions
@@ -35,16 +29,10 @@ z(0) = 22.5 \\
 $$
 :::
 
-::: {.in-format .texi .plain .gfm}
-$$
-x(0) = -11
-$$
-$$
-y(0) = -16
-$$
-$$
-z(0) = 22.5
-$$
+::: {.only-in-format .texi .plain .gfm}
+$$x(0) = -11$$
+$$y(0) = -16$$
+$$z(0) = 22.5$$
 :::
 
 
@@ -55,7 +43,7 @@ The following ASCII input file ressembles the parameters, inital conditions and 
 ```{.feenox include="lorenz.fee"}
 ```
 
-![The Lorenz attractor solved with FeenoX and drawn with Gnuplot](lorenz.svg){width_latex=100% width_html=100% width_texinfo=12cm}
+![The Lorenz attractor solved with FeenoX and drawn with Gnuplot](lorenz.svg){width_latex=75% width_html=100% width_texinfo=12cm}
 
 Indeed, when executing FeenoX with this input file, we get four ASCII columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and plot it with a standard tool such as Gnuplot. Note the importance of relying on plain ASCII text  formats both for input and output, as recommended by the UNIX philosophy and the _rule of composition_: other programs can easily create inputs for FeenoX and other programs can easily understand FeenoX' outputs. This is essentially how UNIX filters and pipes work.
 

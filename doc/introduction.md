@@ -7,7 +7,7 @@ It can be seen either as
 
 Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
 
-::: {.not-in-format .texinfo .latex}
+::: {.only-in-format .html .markdown}
 > * [FeenoX annotated examples](https://www.seamplex.com/feenox/examples)
 > * FeenoX Overview Presentation, August 2021
 >   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)

@@ -24,10 +24,9 @@ and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
 seminal 1963 paper [Deterministic non-periodic
 flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
-
-The following ASCII input file ressembles the parameters, inital
-conditions and differential equations of the problem as naturally as
-possible.
+This example's input file ressembles the parameters, inital conditions
+and differential equations of the problem as naturally as possible with
+an ASCII file.
 
 
 ```feenox
@@ -59,18 +58,23 @@ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 ```
 
 
-![Drawn with gnuplot](lorenz-gnuplot.svg)
+::: {#fig:ex_lorenz}
+![Gnuplot](lorenz-gnuplot.svg){width_html=100% width_latex=48%}
+![Matplotlib](lorenz-matplotlib.png){width_html=100% width_latex=48%}
 
-![Drawn with matplotlib](lorenz-matplotlib.png)
+The Lorenz attractor computed with FeenoX plotted with two different tools
+:::
 
 # NAFEMS LE10 "Thick plate pressure" benchmark
 
 ![The NAFEMS LE10 problem statement and the corresponding FeenoX
-input](nafems-le10-problem-input.svg)
+input](nafems-le10-problem-input.svg){width="100%"}
 
 Assuming the CAD has already been created in [STEP
-format](nafems-le10.step), create a tetrahedral locally-refined
-unstructured grid with Gmsh using the following `.geo` file:
+format](nafems-le10.step) (for instance using Gmsh with [this geo
+file](https://github.com/seamplex/feenox/blob/main/examples/nafems-le10-cad.geo)),
+create a tetrahedral locally-refined unstructured grid with Gmsh using
+the following `.geo` file:
 
 ``` c
 // NAFEMS LE10 benchmark unstructured locally-refined tetrahedral mesh
@@ -106,6 +110,10 @@ Field[2].DistMax = 6 * Mesh.MeshSizeMax;
 Background Field = {2};
 
 ```
+
+and then use this pretty-straightforward input file that has a
+one-to-one correspondence with the original problem formulation from
+1990:
 
 
 ```feenox
@@ -145,7 +153,7 @@ $
 ```
 
 
-![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png)
+![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width_html=100% width_latex=70%}
 
 # How to solve a maze without AI
 
@@ -158,7 +166,7 @@ Just FeenoX and a bunch of standard open source tools to convert a
 bitmapped picture of the maze into an unstructured mesh.
 
 ![Bitmapped maze from <https://www.mazegenerator.net> (left) and 2D mesh
-(right)](maze12.png){#fig:maze12}
+(right)](maze12.png){width="100%"}
 
 
 ```feenox
@@ -187,7 +195,7 @@ $
 ```
 
 
-![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png)
+![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png){width_html=100% width_latex=50%}
 
 See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
 

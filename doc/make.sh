@@ -22,7 +22,7 @@ cd ..
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
    --lua-filter=doc/not-in-format.lua \
-   --lua-filter=doc/in-format.lua \
+   --lua-filter=doc/only-in-format.lua \
    --lua-filter=doc/img-width.lua
    
  pandoc README.md  -t plain -o README \
@@ -31,7 +31,7 @@ cd ..
    --lua-filter=doc/include-files.lua \
    --lua-filter=doc/include-code-files.lua \
    --lua-filter=doc/not-in-format.lua \
-   --lua-filter=doc/in-format.lua \
+   --lua-filter=doc/only-in-format.lua \
    --lua-filter=doc/img-width.lua
    
   pandoc TODO.md    -t plain -o TODO
@@ -43,7 +43,7 @@ pandoc README.md  -t gfm   -o README.markdown \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
-  --lua-filter=in-format.lua \
+  --lua-filter=only-in-format.lua \
   --lua-filter=img-width.lua
 
 
@@ -87,7 +87,7 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
-  --lua-filter=in-format.lua \
+  --lua-filter=only-in-format.lua \
   --lua-filter=img-width.lua \
   --lua-filter=manfilter.lua
 
@@ -130,7 +130,7 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
-  --lua-filter=in-format.lua \
+  --lua-filter=only-in-format.lua \
   --lua-filter=img-width.lua
 
 # TODO: as a lua filter
