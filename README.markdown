@@ -332,54 +332,48 @@ above (*rules of modularity and extensibility*). See the
 ## Why?
 
 The world is already full of finite-element programs and every day a
-grad student creates a new one from scratch. However, almost every piece
-of FEA software falls in either one of these two categories:
+grad student creates a new one from scratch. Let us first think what the
+options to write a technical report, paper or document are:
 
-1.  Powerful, flexible and complex advanced numerical solvers of general
-    non-linear partial differential equations written by academics (for
-    academics) distributed under the form of
+| Feature                           | Microsoft Word | Google Docs | Markdown[1] | (La)TeX |
+|:----------------------------------|:--------------:|:-----------:|:-----------:|:-------:|
+| Aesthetics                        |       ❌        |      ❌      |      ✅      |    ✅    |
+| Convertibility (to other formats) |       –        |      –      |      ✅      |    –    |
+| Traceability                      |       ❌        |      –      |      ✅      |    ✅    |
+| Mobile-friendliness               |       ❌        |      ✅      |      ✅      |    ❌    |
+| Collaborativeness                 |       ❌        |      ✅      |      ✅      |    –    |
+| Licensing/openness                |       ❌        |      ❌      |      ✅      |    ✅    |
+| Non-nerd friendliness             |       ✅        |      ✅      |      –      |    ❌    |
 
-    1.  libraries, which the user has to compile and link to their own
-        codes, or
-    2.  interpreted languages (i.e. Python) wrappers, which the user has
-        to call from their own scripts, or
-    3.  input-file reading binaries, which the user needs to fill in
-        with the weak form of the equation they need to solve.
+After analyzing the pros and cons of each alternative, we can then
+perform a similar analysis for the options available in order to solve
+an engineering problem, say a finite-element analysis:
 
-    **Examples:** [MoFEM][], [Sparselizard][], [GetDP][], [FEnICS][],
-    [MOOSE][], [FreeFEM][], …
+| Feature               | Desktop GUIs | Web frontends | FeenoX[2] | Libraries |
+|:----------------------|:------------:|:-------------:|:---------:|:---------:|
+| Flexibility           |      –       |       ❌       |     ✅     |     ✅     |
+| Scalability           |      ❌       |       –       |     ✅     |     ✅     |
+| Traceability          |      ❌       |       –       |     ✅     |     ✅     |
+| Cloud-friendliness    |      ❌       |       ✅       |     ✅     |     ✅     |
+| Collaborativeness     |      ❌       |       ✅       |     –     |     ❌     |
+| Licensing/openness    |    ✅/–/❌     |       ❌       |     ✅     |     ✅     |
+| Non-nerd friendliness |      ✅       |       ✅       |     –     |     ❌     |
 
-2.  Commercial, non-free (well some of them are free but coded in
-    FORTRAN 77 so the source is unintelligible) and complex GUI-based
-    programs that are
+[1] Here [Markdown][] means ([Pandoc][] + [Git][] + [Github][] /
+[Gitlab][] / [Gitea][])
 
-    1.  closed-source, so nobody can know what the actual equations are
-        nor how they are solved, and/or
-    2.  complicated, so the only way to use them is through their
-        embedded mouse-based GUI, and/or
-    3.  expensive and out of the league of many companies and
-        professionals.
+[2] Here FeenoX means ([FeenoX][2] + [Gmsh][3] + [Paraview][Paraview1] +
+[Git][] + [Github][] / [Gitlab][] / [Gitea][])
 
-    **Examples:** [CalculiX][], [CodeAster][], [NASTRAN][][1]
-
-Hence, FeenoX tries to fill in the gap between these two worlds with a
-different design basis.
-
-[1] We list just the open-source ones because we [at Seamplex do not
-want to encourage the usage of non-free software][], but—with some
-exceptions—any of the commercial packages out there would also apply.
-
-  [MoFEM]: http://mofem.eng.gla.ac.uk/mofem/html/
-  [Sparselizard]: http://sparselizard.org/
-  [GetDP]: http://getdp.info/
-  [FEnICS]: https://fenicsproject.org/
-  [MOOSE]: https://mooseframework.org/
-  [FreeFEM]: https://freefem.org/
-  [CalculiX]: http://calculix.de/
-  [CodeAster]: https://www.code-aster.org
-  [NASTRAN]: https://github.com/nasa/NASTRAN-95
-  [at Seamplex do not want to encourage the usage of non-free software]:
-    https://www.seamplex.com/mission.html#principles
+  [Markdown]: https://en.wikipedia.org/wiki/Markdown
+  [Pandoc]: https://pandoc.org/
+  [Git]: https://git-scm.com/
+  [Github]: https://github.com/
+  [Gitlab]: https://about.gitlab.com/
+  [Gitea]: https://gitea.com/%7D%7BGitea%7D
+  [2]: https://seamplex.com/feenox
+  [3]: http://gmsh.info
+  [Paraview1]: https://www.paraview.org/
 
 # Download
 
@@ -395,7 +389,7 @@ below][] for details.
 | Github repository  | <https://github.com/seamplex/feenox/>          |
 
 -   Be aware that FeenoX is a backend. It **does not have a GUI**. Read
-    the [documentation][2], especially the [description][] and the
+    the [documentation][4], especially the [description][] and the
     [FAQs][]. Ask for help on the [GitHub discussions page][].
 
 -   Binaries are provided as statically-linked executables for
@@ -416,7 +410,7 @@ below][] for details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
-  [2]: https://seamplex.com/feenox/doc/
+  [4]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [FAQs]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
@@ -534,8 +528,8 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][3] version 3 or, at the user convenience, any later version.
-This means that users get the four essential freedoms:[2]
+License][5] version 3 or, at the user convenience, any later version.
+This means that users get the four essential freedoms:[3]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
 1.  The freedom to *study* how the program works, and *change* it so it
@@ -576,7 +570,7 @@ running over free and open source operating systems. In addition, the
 FeenoX documentation is licensed under the terms of the [GNU Free
 Documentation License v1.3][] (or any later version).
 
-[2]  There are some examples of pieces of computational software which
+[3]  There are some examples of pieces of computational software which
 are described as “open source” in which even the first of the four
 freedoms is denied. The most iconic case is that of Android, whose
 sources are readily available online but there is no straightforward way
@@ -592,7 +586,7 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [3]: https://www.gnu.org/licenses/gpl-3.0
+  [5]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
@@ -602,7 +596,7 @@ Home page: <https://www.seamplex.com/feenox>
 Repository: <https://github.com/seamplex/feenox>  
 Bug reporting: <https://github.com/seamplex/feenox/issues>  
 Discussions: <https://github.com/seamplex/feenox/discussions>  
-Follow us: [YouTube][] [LinkedIn][] [Github][]
+Follow us: [YouTube][] [LinkedIn][] [Github][6]
 
 ------------------------------------------------------------------------
 
@@ -615,7 +609,7 @@ See the [copying conditions][].
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
-  [Github]: https://github.com/seamplex
+  [6]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html
   [copying conditions]: COPYING

@@ -1,24 +1,16 @@
-dist_doc_DATA = AUTHORS ChangeLog README TODO \
+dist_doc_DATA = AUTHORS ChangeLog TODO \
+                README README.markdown \
                 doc/CODE_OF_CONDUCT.md \
+                doc/FAQ.md \
                 doc/feenox.xml \
                 doc/README.md \
                 doc/programming.md \
                 doc/compilation.md \
                 doc/documentation.md \
-                doc/feenox-manual.pdf \
-                doc/FAQ.md \
                 doc/syntax-kate.sh \
-                doc/syntax-tex.sh \
-                doc/cantilever-displacement.eps \
-                doc/laplace-square-gmsh.eps \
-                doc/laplace-square-paraview.eps \
-                doc/lorenz.eps \
-                doc/nafems-le10-problem-input.eps \
-                doc/nafems-le10.eps
+                doc/syntax-tex.sh
 
 dist_man_MANS = doc/feenox.1
-
-EXTRA_DIST = examples
 
 TESTS = \
         tests/abort.sh \

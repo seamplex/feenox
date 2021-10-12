@@ -36,9 +36,17 @@ done
 # do not add doc to src unless they ask for it
 echo -n "creating Makefile.am... "
 if [ "x$1" = "x--doc" ]; then
-  echo "SUBDIRS = src doc" > Makefile.am
+  cat << EOF > Makefile.am
+SUBDIRS = src doc
+EXTRA_DIST = examples doc
+EOF
+
 else
-  echo "SUBDIRS = src" > Makefile.am
+  cat << EOF > Makefile.am
+SUBDIRS = src
+EXTRA_DIST = examples
+EOF
+
 fi
 cat Makefile.base >> Makefile.am
 touch doc/feenox-desc.texi

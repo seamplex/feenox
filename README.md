@@ -19,23 +19,34 @@ doc/introduction.md
 ## Why?
 
 The world is already full of finite-element programs and every day a grad student creates a new one from scratch.
-However, almost every piece of FEA software falls in either one of these two categories:
+Let us first think what the options to write a technical report, paper or document are:
 
- a. Powerful, flexible and complex advanced numerical solvers of general non-linear partial differential equations written by academics (for academics) distributed under the form of 
-     i. libraries, which the user has to compile and link to their own codes, or
-     ii. interpreted languages (i.e. Python) wrappers, which the user has to call from their own scripts, or
-     iii. input-file reading binaries, which the user needs to fill in with the weak form of the equation they need to solve.
-     
-    **Examples:** [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/), [Sparselizard](http://sparselizard.org/), [GetDP](http://getdp.info/), [FEnICS](https://fenicsproject.org/), [MOOSE](https://mooseframework.org/), [FreeFEM](https://freefem.org/), ...  
-     
- b. Commercial, non-free (well some of them are free but coded in FORTRAN 77 so the source is unintelligible) and complex GUI-based programs that are
-     i. closed-source, so nobody can know what the actual equations are nor how they are solved, and/or
-     ii. complicated, so the only way to use them is through their embedded mouse-based GUI, and/or
-     iii. expensive and out of the league of many companies and professionals.
-     
-    **Examples:** [CalculiX](http://calculix.de/), [CodeAster](https://www.code-aster.org), [NASTRAN](https://github.com/nasa/NASTRAN-95)^[We list just the open-source ones because we [at Seamplex do not want to encourage the usage of non-free software](https://www.seamplex.com/mission.html#principles), but---with some exceptions---any of the commercial packages out there would also apply.] 
-     
-Hence, FeenoX tries to fill in the gap between these two worlds with a different design basis.
+ Feature                | Microsoft Word |  Google Docs  |  Markdown[^1]    |  (La)TeX
+:-----------------------|:--------------:|:-------------:|:------------:|:----------------:
+ Aesthetics             |       ❌        |       ❌       |      ✅      |  ✅
+ Convertibility (to other formats)         |       --       |       --      |      ✅       |  --
+ Traceability           |       ❌        |       --      |      ✅      |  ✅
+ Mobile-friendliness    |       ❌        |       ✅       |      ✅      |  ❌
+ Collaborativeness      |       ❌        |       ✅       |      ✅      |  --
+ Licensing/openness     |       ❌        |       ❌       |      ✅      |  ✅
+ Non-nerd friendliness  |       ✅        |       ✅      |      --      |  ❌
+
+[^1]: Here [Markdown](https://en.wikipedia.org/wiki/Markdown) means ([Pandoc](https://pandoc.org/) + [Git](https://git-scm.com/) + [Github](https://github.com/) / [Gitlab](https://about.gitlab.com/) / [Gitea](https://gitea.com/}{Gitea}))
+
+ 
+After analyzing the pros and cons of each alternative, we can then perform a similar analysis for the options available in order to solve an engineering problem, say a finite-element analysis:
+
+ Feature                | Desktop GUIs  |   Web frontends  |  FeenoX[^2]  |  Libraries
+:-----------------------|:-------------:|:----------------:|:---------:|:------------:
+ Flexibility            |      --       |         ❌        |     ✅    |      ✅
+ Scalability            |      ❌        |         --       |     ✅    |      ✅
+ Traceability           |      ❌        |         --       |     ✅    |      ✅
+ Cloud-friendliness     |      ❌        |         ✅        |     ✅    |      ✅
+ Collaborativeness      |      ❌        |         ✅        |     --   |      ❌
+ Licensing/openness     |   ✅/--/❌      |         ❌        |     ✅    |      ✅
+ Non-nerd friendliness  |      ✅        |         ✅        |     --   |      ❌
+ 
+[^2]: Here FeenoX means ([FeenoX](https://seamplex.com/feenox) + [Gmsh](http://gmsh.info) + [Paraview](https://www.paraview.org/) + [Git](https://git-scm.com/) + [Github](https://github.com/) / [Gitlab](https://about.gitlab.com/) / [Gitea](https://gitea.com/}{Gitea}))
 
 
 # Download

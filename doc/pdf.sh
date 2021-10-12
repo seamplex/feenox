@@ -59,15 +59,15 @@ headdateedtf=$(LC_ALL=${DATELC} date -d@${headepoch} +%Y-%m-%d)
 tag=$(git tag --sort=-version:refname | head -n1)
 
 if [ -z "${tag}" ]; then
-  revision="DRAFT"
+  version="DRAFT"
   docver=$(git rev-list ${basehash}..HEAD | wc -l)
 else
-  revision=${tag}
+  version=${tag}
   docver=$(git rev-list ${tag}..HEAD | wc -l)
 fi
 
 if [ ${docver} -ne 0 ]; then
-  revision="${revision}${docver}"
+  version="${version}.${docver}"
 fi
 
 hash=$(git rev-parse --short HEAD)
@@ -82,7 +82,7 @@ if [ -z "$(git status --porcelain)" ]; then
   dateedtf=${headdateedtf}
 else
   dochash="${hash}+\$\\epsilon\$"
-  revision="${revision}+"
+  version="${version}+"
   date=${currentdate}
   dateedtf=${currentdateedtf}
 fi
@@ -94,7 +94,7 @@ cat << EOF > hash.yaml
 
 ---
 hash: ${dochash}
-rev: ${revision}
+version: ${version}
 date: ${date}
 ...
 EOF

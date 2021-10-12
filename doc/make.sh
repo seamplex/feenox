@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in touch sed pandoc xelatex makeinfo texi2pdf inkscape; do
+for i in feenox touch sed pandoc xelatex makeinfo texi2pdf inkscape convert pandoc-crossref; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -16,7 +16,8 @@ fi
 # main README
 echo "creating main README for Github"
 cd ..
- pandoc README.md  -t gfm   -o README.markdown  \
+ # TODO: function to call pandoc
+ pandoc README.md -f markdown+emoji -t gfm   -o README.markdown  \
    --standalone --toc --number-sections \
    --reference-links --reference-location=section \
    --lua-filter=doc/include-files.lua \
@@ -25,7 +26,7 @@ cd ..
    --lua-filter=doc/only-in-format.lua \
    --lua-filter=doc/img-width.lua
    
- pandoc README.md  -t plain -o README \
+ pandoc README.md  -f markdown+emoji  -t plain -o README \
    --standalone --toc --number-sections \
    --reference-links --reference-location=section \
    --lua-filter=doc/include-files.lua \
@@ -82,7 +83,6 @@ echo "help as a raw txt (which is used in feenox -v)"
 
 echo "unix man page"
 m4 date.m4 > date.yaml
-# man output cannot represent math so it will complain
 pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
@@ -96,34 +96,37 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
 # pandoc -s -t html feenox.1 -o feenox.1.html
 
 
-# # manual (to markdown and not gfm because of the heavy math)
-# echo "full manual in markdown & texi"
-# pandoc feenox-manual.md -t markdown-fenced_divs -o feenox-manual.markdown \
-#   --standalone --toc --reference-links --reference-location=section \
-#   --lua-filter=include-files.lua \
-#   --lua-filter=include-code-files.lua \
-#   --lua-filter=not-in-format.lua
 
-
-# srs & sds
-for i in touch pandoc-crossref; do
- if [ -z "$(which $i)" ]; then
-  exit 0
- fi
+for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
+ echo $i
+ ./pdf.sh $i
+ 
+  pandoc ${i}.md  -t gfm   -o ${i}.markdown  \
+   --standalone --toc --number-sections \
+   --reference-links --reference-location=section \
+   --lua-filter=include-files.lua \
+   --lua-filter=include-code-files.lua \
+   --lua-filter=not-in-format.lua \
+   --lua-filter=only-in-format.lua \
+   --lua-filter=img-width.lua
+   
+ pandoc ${i}.md  -t plain -o ${i} \
+   --standalone --toc --number-sections \
+   --reference-links --reference-location=section \
+   --lua-filter=include-files.lua \
+   --lua-filter=include-code-files.lua \
+   --lua-filter=not-in-format.lua \
+   --lua-filter=only-in-format.lua \
+   --lua-filter=img-width.lua
 done
 
-# echo "creating SRS and SDS markdown"
-# pandoc sds.md -t markdown --filter pandoc-crossref -o srs.markdown \
-#   --standalone --toc --reference-links --reference-location=section \
-#   --lua-filter=include-files.lua \
-#   --lua-filter=include-code-files.lua \
-#   --lua-filter=not-in-format.lua
-#   
-# pandoc srs.md -t markdown --filter pandoc-crossref -o srs.markdown \
-#   --standalone --toc --reference-links --reference-location=section \
-#   --lua-filter=include-files.lua \
-#   --lua-filter=include-code-files.lua \
-#   --lua-filter=not-in-format.lua 
+for i in sds feenox-manual; do
+ echo $i
+ ./pdf.sh $i
+done
+
+
+
 
 pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \
@@ -136,6 +139,7 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
 # TODO: as a lua filter
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
+
 
 
 # TODO: as a lua filter
@@ -159,16 +163,11 @@ for i in laplace-square-gmsh \
          nafems-le10 \
          ; do
   if [ ! -e $i.eps ]; then
-    inkscape --export-type=eps ${i}.png
+    convert ${i}.png ${i}.eps
   fi
 done
 
 
+echo "feenox-desc"
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null
-
-./pdf.sh programming
-./pdf.sh compilation
-./pdf.sh srs
-./pdf.sh sds
-./pdf.sh feenox-manual
