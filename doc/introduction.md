@@ -1,19 +1,22 @@
-[FeenoX](https://www.seamplex.com/feenox) is to finite-element software (like Code Aster) and libraries (like MoFEM) what Markdown is to word processors (like Word) and typesetting systems (like TeX), respectively.
-
-It can be seen either as
+FeenoX can be seen either as
 
  * a syntactically-sweetened way of asking the computer to solve engineering-related mathematical problems, and/or
  * a finite-element(ish) tool with a particular design basis.
 
 Note that some of the problems solved with FeenoX might not actually rely on the finite element method, but on general mathematical models and even on the finite volumes method. That is why we say it is a finite-element(ish) tool.
 
-::: {.only-in-format .html .markdown}
-> * [FeenoX annotated examples](https://www.seamplex.com/feenox/examples)
-> * FeenoX Overview Presentation, August 2021
->   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
->   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
->   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
-:::
+In other words, FeenoX is a computational tool to solve
+
+ * dynamical systems written as sets of ODEs/DAEs, or
+ * steady or quasi-static thermo-mechanical problems, or
+ * steady or transient heat conduction problems, or
+ * modal analysis problems, or
+ * neutron diffusion or transport problems, or
+ * community-contributed problems
+
+in such a way that the input is a near-English text file that defines the problem to be solved.
+
+
 
 ```include
 thermal1d.md
@@ -33,22 +36,22 @@ Please note the following two points about both cases above:
  2. By design, 100% of FeenoX’ output is controlled by the user. Had there not been any `PRINT` or `WRITE_MESH` instructions, the output would have been empty, following the _rule of silence_. This is a significant change with respect to traditional engineering codes that date back from times when one CPU hour was worth dozens (or even hundreds) of engineering hours. At that time, cognizant engineers had to dig into thousands of lines of data to search for a single individual result. Nowadays, following the _rule of economy_, it is actually far easier to ask the code to write only what is needed in the particular format that suits the user.
 
 
-In other words, FeenoX is a computational tool to solve
+Some basic rules are
 
- * dynamical systems written as sets of ODEs/DAEs, or
- * steady or quasi-static thermo-mechanical problems, or
- * steady or transient heat conduction problems, or
- * modal analysis problems, or
- * neutron diffusion or transport problems, or
- * community-contributed problems
-
-in such a way that the input is a near-English text file that defines the problem to be solved. Some basic rules are
-
- * FeenoX is just a **solver** working as a _transfer function_ between input and output files. Following the _rules of separation, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com).
+ * FeenoX is just a **solver** working as a _transfer function_ between input and output files.
+ 
+   ```include
+   transfer.md
+   ```
+ 
+   Following the _rules of separation, parsimony and diversity_, **there is no embedded graphical interface** but means of using generic pre and post processing tools---in particular, [Gmsh](http://gmsh.info/) and [Paraview](https://www.paraview.org/) respectively. See also [CAEplex](www.caeplex.com) for a web-based interface.
  
  * The input files should be [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) so as to be as self-describing as possible.
+ 
  * **Simple** problems ought to need **simple** input files.
+ 
  * Similar problems ought to need similar input files.
+ 
  * **Everything is an expression**. Whenever a number is expected, an algebraic expression can be entered as well. Variables, vectors, matrices and functions are supported. Here is how to replace the boundary condition on the right side of the slab above with a radiation condition:
  
    ```feenox
@@ -58,7 +61,7 @@ in such a way that the input is a near-English text file that defines the proble
    BC right q=sigma*e*(Tinf^4-T(x)^4)
    ```
    
-<!-- dnl this also allows a direct application of the MMS for verification (in addition to being open source!) -->
+   This "everything is an expression" principle directly allows the application of the Method of Manufactured Solutions for code verification.
    
  * FeenoX should run natively in the cloud and be able to massively scale in parallel. See the [Software Requirements Specification](doc/sds.md) and the [Software Development Specification](doc/sds.md) for details.
  

@@ -1,26 +1,91 @@
 FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
--   1 What is FeenoX?
-    -   1.1 Why?
--   2 Download
-    -   2.1 Git repository
--   3 Licensing
--   4 Further information
+-   1 Why FeenoX?
+-   2 What is FeenoX?
+-   3 Download
+    -   3.1 Git repository
+-   4 Licensing
+-   5 Further information
 
-  [1 What is FeenoX?]: #what-is-feenox
-  [1.1 Why?]: #why
-  [2 Download]: #download
-  [2.1 Git repository]: #git-repository
-  [3 Licensing]: #licensing
-  [4 Further information]: #further-information
+  [1 Why FeenoX?]: #why-feenox
+  [2 What is FeenoX?]: #what-is-feenox
+  [3 Download]: #download
+  [3.1 Git repository]: #git-repository
+  [4 Licensing]: #licensing
+  [5 Further information]: #further-information
+
+Why FeenoX?
+
+The world is already full of finite-element programs and every day a
+grad student creates a new one from scratch. So why adding FeenoX to the
+already-crowded space of FEA tools?
+
+To better illustrate the point, let us first consider what the options
+are when an engineer needs to to write a technical report, paper or
+document:
+
+  Feature                              Microsoft Word   Google Docs   Markdown[1]   (La)TeX
+  ----------------------------------- ---------------- ------------- ------------- ---------
+  Aesthetics                                 ❌               ❌             ✅           ✅
+  Convertibility (to other formats)          –               –             ✅           –
+  Traceability                               ❌               –             ✅           ✅
+  Mobile-friendliness                        ❌               ✅             ✅           ❌
+  Collaborativeness                          ❌               ✅             ✅           –
+  Licensing/openness                         ❌               ❌             ✅           ✅
+  Non-nerd friendliness                      ✅               ✅             –           ❌
+
+After analyzing the pros and cons of each alternative, at some point it
+should be evident that Markdown (plus friends) gives the best trade off.
+We can then perform a similar analysis for the options available in
+order to solve an engineering problem casted as a PDE, say by using a
+finite-element formulation:
+
+  Feature                  Desktop GUIs   Web frontends   FeenoX[2]   Libraries
+  ----------------------- -------------- --------------- ----------- -----------
+  Flexibility                   –               ❌             ✅           ✅
+  Scalability                   ❌               –             ✅           ✅
+  Traceability                  ❌               –             ✅           ✅
+  Cloud-friendliness            ❌               ✅             ✅           ✅
+  Collaborativeness             ❌               ✅             ✅           ❌
+  Licensing/openness          ✅/–/❌             ❌             ✅           ✅
+  Non-nerd friendliness         ✅               ✅             –           ❌
+
+Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
+programs (like Code Aster with Salome or CalculiX with PrePoMax) and
+libraries (like MoFEM or Sparselizard) what Markdown is to Word and
+(La)TeX, respectively and deliberately.
+
+On the other hand, FeenoX meets a fictitious-yet-plausible Software
+Requirement Specifications that no other single tool (that I am aware
+of) meets completely. The FeenoX Software Design Specifications address
+each requirement of the SRS. The first and more important requirement is
+that FeenoX is both free (as in freedom) and open source. See Licensing.
+
+If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
+FAQs.
+
+[1] Here “Markdown” means (Pandoc + Git + Github / Gitlab / Gitea)
+
+[2] Here “FeenoX” means (FeenoX + Gmsh + Paraview + Git + Github /
+Gitlab / Gitea)
+
+  [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
+  [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
+  [Licensing]: #licensing
+  [FAQs]: doc/FAQs.md
+  [Markdown]: https://en.wikipedia.org/wiki/Markdown
+  [Pandoc]: https://pandoc.org/
+  [Git]: https://git-scm.com/
+  [Github]: https://github.com/
+  [Gitlab]: https://about.gitlab.com/
+  [Gitea]: https://gitea.com/%7D%7BGitea%7D
+  [FeenoX]: https://seamplex.com/feenox
+  [Gmsh]: http://gmsh.info
+  [Paraview]: https://www.paraview.org/
 
 What is FeenoX?
 
-FeenoX is to finite-element software (like Code Aster) and libraries
-(like MoFEM) what Markdown is to word processors (like Word) and
-typesetting systems (like TeX), respectively.
-
-It can be seen either as
+FeenoX can be seen either as
 
 -   a syntactically-sweetened way of asking the computer to solve
     engineering-related mathematical problems, and/or
@@ -30,6 +95,18 @@ Note that some of the problems solved with FeenoX might not actually
 rely on the finite element method, but on general mathematical models
 and even on the finite volumes method. That is why we say it is a
 finite-element(ish) tool.
+
+In other words, FeenoX is a computational tool to solve
+
+-   dynamical systems written as sets of ODEs/DAEs, or
+-   steady or quasi-static thermo-mechanical problems, or
+-   steady or transient heat conduction problems, or
+-   modal analysis problems, or
+-   neutron diffusion or transport problems, or
+-   community-contributed problems
+
+in such a way that the input is a near-English text file that defines
+the problem to be solved.
 
 One of the main features of this allegedly particular design basis is
 that simple problems ought to have simple inputs (rule of simplicity)
@@ -221,23 +298,21 @@ Please note the following two points about both cases above:
     it is actually far easier to ask the code to write only what is
     needed in the particular format that suits the user.
 
-In other words, FeenoX is a computational tool to solve
-
--   dynamical systems written as sets of ODEs/DAEs, or
--   steady or quasi-static thermo-mechanical problems, or
--   steady or transient heat conduction problems, or
--   modal analysis problems, or
--   neutron diffusion or transport problems, or
--   community-contributed problems
-
-in such a way that the input is a near-English text file that defines
-the problem to be solved. Some basic rules are
+Some basic rules are
 
 -   FeenoX is just a solver working as a transfer function between input
-    and output files. Following the rules of separation, parsimony and
-    diversity, there is no embedded graphical interface but means of
-    using generic pre and post processing tools—in particular, Gmsh and
-    Paraview respectively. See also CAEplex.
+    and output files.
+
+                                     +------------+
+         mesh (*.msh)  }             |            |             { terminal
+         data (*.dat)  } input ----> |   FeenoX   |----> output { data files
+         input (*.fee) }             |            |             { post (vtk/msh)
+                                     +------------+
+
+    Following the rules of separation, parsimony and diversity, there is
+    no embedded graphical interface but means of using generic pre and
+    post processing tools—in particular, Gmsh and Paraview respectively.
+    See also CAEplex for a web-based interface.
 
 -   The input files should be syntactically sugared so as to be as
     self-describing as possible.
@@ -257,6 +332,10 @@ the problem to be solved. Some basic rules are
         Tinf=1          # non-dimensional reference temperature
         BC right q=sigma*e*(Tinf^4-T(x)^4)
 
+    This “everything is an expression” principle directly allows the
+    application of the Method of Manufactured Solutions for code
+    verification.
+
 -   FeenoX should run natively in the cloud and be able to massively
     scale in parallel. See the Software Requirements Specification and
     the Software Development Specification for details.
@@ -269,8 +348,7 @@ problems, as implied in the “community-contributed problems” bullet
 above (rules of modularity and extensibility). See the documentation for
 details about how to contribute.
 
-  [FeenoX]: https://www.seamplex.com/feenox
-  [Gmsh]: http://gmsh.info/
+  [1]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
   [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
@@ -282,58 +360,13 @@ details about how to contribute.
     doc/nafems-le10-problem-input.svg
   [Normal stress σ_(y) refined around point D over 5,000x-warped displacements for LE10 created with Paraview]:
     doc/nafems-le10.png
-  [Paraview]: https://www.paraview.org
-  [1]: https://www.paraview.org/
+  [2]: https://www.paraview.org
+  [Paraview]: https://www.paraview.org/
   [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
   [Software Requirements Specification]: doc/sds.md
   [as in freedom]: https://www.gnu.org/philosophy/free-sw.en.html
   [documentation]: doc
-
-Why?
-
-The world is already full of finite-element programs and every day a
-grad student creates a new one from scratch. Let us first think what the
-options to write a technical report, paper or document are:
-
-  Feature                              Microsoft Word   Google Docs   Markdown[1]   (La)TeX
-  ----------------------------------- ---------------- ------------- ------------- ---------
-  Aesthetics                                 ❌               ❌             ✅           ✅
-  Convertibility (to other formats)          –               –             ✅           –
-  Traceability                               ❌               –             ✅           ✅
-  Mobile-friendliness                        ❌               ✅             ✅           ❌
-  Collaborativeness                          ❌               ✅             ✅           –
-  Licensing/openness                         ❌               ❌             ✅           ✅
-  Non-nerd friendliness                      ✅               ✅             –           ❌
-
-After analyzing the pros and cons of each alternative, we can then
-perform a similar analysis for the options available in order to solve
-an engineering problem, say a finite-element analysis:
-
-  Feature                  Desktop GUIs   Web frontends   FeenoX[2]   Libraries
-  ----------------------- -------------- --------------- ----------- -----------
-  Flexibility                   –               ❌             ✅           ✅
-  Scalability                   ❌               –             ✅           ✅
-  Traceability                  ❌               –             ✅           ✅
-  Cloud-friendliness            ❌               ✅             ✅           ✅
-  Collaborativeness             ❌               ✅             –           ❌
-  Licensing/openness          ✅/–/❌             ❌             ✅           ✅
-  Non-nerd friendliness         ✅               ✅             –           ❌
-
-[1] Here Markdown means (Pandoc + Git + Github / Gitlab / Gitea)
-
-[2] Here FeenoX means (FeenoX + Gmsh + Paraview + Git + Github / Gitlab
-/ Gitea)
-
-  [Markdown]: https://en.wikipedia.org/wiki/Markdown
-  [Pandoc]: https://pandoc.org/
-  [Git]: https://git-scm.com/
-  [Github]: https://github.com/
-  [Gitlab]: https://about.gitlab.com/
-  [Gitea]: https://gitea.com/%7D%7BGitea%7D
-  [2]: https://seamplex.com/feenox
-  [3]: http://gmsh.info
-  [Paraview1]: https://www.paraview.org/
 
 Download
 
@@ -370,9 +403,9 @@ details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
-  [4]: https://seamplex.com/feenox/doc/
+  [3]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [FAQs]: https://seamplex.com/feenox/doc/FAQ.html
+  [4]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilatation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
