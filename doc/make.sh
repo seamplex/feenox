@@ -166,3 +166,9 @@ done
 
 makeinfo feenox-desc.texi > /dev/null
 texi2pdf feenox-desc.texi > /dev/null
+
+./pdf.sh programming
+./pdf.sh compilation
+./pdf.sh srs
+./pdf.sh sds
+./pdf.sh feenox-manual

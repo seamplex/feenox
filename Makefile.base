@@ -78,6 +78,7 @@ DISTCLEANFILES = \
                  tests/algebraic_expr.last \
                  tests/2dpwr-quarter.msh \
                  tests/fibo_iterative.last \
+                 tests/parallelepiped.msh \
                  mesh2d.msh \
                  laplace-square.msh
 
