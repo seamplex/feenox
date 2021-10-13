@@ -3,11 +3,10 @@ dist_doc_DATA = AUTHORS ChangeLog TODO \
                 doc/feenox-desc.texi \
                 doc/feenox.xml \
                 doc/README.md \
-                doc/CODE_OF_CONDUCT.md doc/CODE_OF_CONDUCT \
-                doc/programming.md doc/programming \
-                doc/compilation.md doc/compilation \
-                doc/compilation.md doc/compilation \
-                doc/FAQ.md doc/FAQ \
+                doc/CODE_OF_CONDUCT \
+                doc/programming \
+                doc/compilation \
+                doc/FAQ \
                 doc/syntax-kate.sh \
                 doc/syntax-tex.sh \
                 doc/nafems-le10-problem-input.eps \
@@ -18,12 +17,6 @@ dist_doc_DATA = AUTHORS ChangeLog TODO \
                 doc/laplace-square-gmsh.eps \
                 doc/laplace-square-paraview.eps \
                 doc/nafems-le10.eps \
-                doc/programming.pdf doc/programming.markdown \
-                doc/compilation.pdf doc/compilation.markdown \
-                doc/FAQ.pdf doc/FAQ.markdown \
-                doc/CODE_OF_CONDUCT.pdf doc/CODE_OF_CONDUCT.markdown \
-                doc/srs.pdf doc/srs.markdown \
-                doc/srs.pdf doc/feenox-manual.pdf
 
 dist_man_MANS = doc/feenox.1
 
