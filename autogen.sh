@@ -38,13 +38,11 @@ echo -n "creating Makefile.am... "
 if [ "x$1" = "x--doc" ]; then
   cat << EOF > Makefile.am
 SUBDIRS = src doc
-EXTRA_DIST = examples doc
 EOF
 
 else
   cat << EOF > Makefile.am
 SUBDIRS = src
-EXTRA_DIST = examples
 EOF
 
 fi

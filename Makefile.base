@@ -1,16 +1,40 @@
 dist_doc_DATA = AUTHORS ChangeLog TODO \
                 README README.markdown \
-                doc/CODE_OF_CONDUCT.md \
-                doc/FAQ.md \
+                doc/feenox-desc.texi \
                 doc/feenox.xml \
                 doc/README.md \
-                doc/programming.md \
-                doc/compilation.md \
-                doc/documentation.md \
+                doc/CODE_OF_CONDUCT.md doc/CODE_OF_CONDUCT \
+                doc/programming.md doc/programming \
+                doc/compilation.md doc/compilation \
+                doc/compilation.md doc/compilation \
+                doc/FAQ.md doc/FAQ \
                 doc/syntax-kate.sh \
-                doc/syntax-tex.sh
+                doc/syntax-tex.sh \
+                doc/nafems-le10-problem-input.eps \
+                doc/lorenz.eps \
+                doc/cantilever-displacement.eps \
+                doc/fork.eps \
+                doc/fork-meshed.eps \
+                doc/laplace-square-gmsh.eps \
+                doc/laplace-square-paraview.eps \
+                doc/nafems-le10.eps \
+                doc/programming.pdf doc/programming.markdown \
+                doc/compilation.pdf doc/compilation.markdown \
+                doc/FAQ.pdf doc/FAQ.markdown \
+                doc/CODE_OF_CONDUCT.pdf doc/CODE_OF_CONDUCT.markdown \
+                doc/srs.pdf doc/srs.markdown \
+                doc/srs.pdf doc/feenox-manual.pdf
 
 dist_man_MANS = doc/feenox.1
+
+EXTRA_DIST = examples \
+             doc/programming.pdf \
+             doc/compilation.pdf \
+             doc/FAQ.pdf \
+             doc/CODE_OF_CONDUCT.pdf \
+             doc/srs.pdf doc/srs.markdown \
+             doc/sds.pdf doc/feenox-manual.pdf
+
 
 TESTS = \
         tests/abort.sh \

@@ -27,12 +27,12 @@ document:
 | Feature                           | Microsoft Word | Google Docs | Markdown[1] | (La)TeX |
 |:----------------------------------|:--------------:|:-----------:|:-----------:|:-------:|
 | Aesthetics                        |       ❌        |      ❌      |      ✅      |    ✅    |
-| Convertibility (to other formats) |       –        |      –      |      ✅      |    –    |
-| Traceability                      |       ❌        |      –      |      ✅      |    ✅    |
+| Convertibility (to other formats) |       😐        |      😐      |      ✅      |    😐    |
+| Traceability                      |       ❌        |      😐      |      ✅      |    ✅    |
 | Mobile-friendliness               |       ❌        |      ✅      |      ✅      |    ❌    |
-| Collaborativeness                 |       ❌        |      ✅      |      ✅      |    –    |
+| Collaborativeness                 |       ❌        |      ✅      |      ✅      |    😐    |
 | Licensing/openness                |       ❌        |      ❌      |      ✅      |    ✅    |
-| Non-nerd friendliness             |       ✅        |      ✅      |      –      |    ❌    |
+| Non-nerd friendliness             |       ✅        |      ✅      |      😐      |    ❌    |
 
 After analyzing the pros and cons of each alternative, at some point it
 should be evident that Markdown (plus friends) gives the best trade off.
@@ -42,13 +42,13 @@ finite-element formulation:
 
 | Feature               | Desktop GUIs | Web frontends | FeenoX[2] | Libraries |
 |:----------------------|:------------:|:-------------:|:---------:|:---------:|
-| Flexibility           |      –       |       ❌       |     ✅     |     ✅     |
-| Scalability           |      ❌       |       –       |     ✅     |     ✅     |
-| Traceability          |      ❌       |       –       |     ✅     |     ✅     |
+| Flexibility           |      😐       |       ❌       |     ✅     |     ✅     |
+| Scalability           |      ❌       |       😐       |     ✅     |     ✅     |
+| Traceability          |      ❌       |       😐       |     ✅     |     ✅     |
 | Cloud-friendliness    |      ❌       |       ✅       |     ✅     |     ✅     |
 | Collaborativeness     |      ❌       |       ✅       |     ✅     |     ❌     |
-| Licensing/openness    |    ✅/–/❌     |       ❌       |     ✅     |     ✅     |
-| Non-nerd friendliness |      ✅       |       ✅       |     –     |     ❌     |
+| Licensing/openness    |    ✅/😐/❌     |       ❌       |     ✅     |     ✅     |
+| Non-nerd friendliness |      ✅       |       ✅       |     😐     |     ❌     |
 
 Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
 programs (like Code Aster with Salome or CalculiX with PrePoMax) and
