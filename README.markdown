@@ -196,8 +196,8 @@ attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
 
 <div class="only-in-format texi plain gfm">
 
-*ẋ* = *σ* ⋅ (*y*−*x*)
-*ẏ* = *x* ⋅ (*r*−*z*) − *y*
+*ẋ* = *σ* ⋅ (*y*−*x*)  
+*ẏ* = *x* ⋅ (*r*−*z*) − *y*  
 *ż* = *x**y* − *b**z*
 
 </div>
@@ -206,8 +206,8 @@ for 0 \< *t* \< 40 with initial conditions
 
 <div class="only-in-format texi plain gfm">
 
-*x*(0) =  − 11
-*y*(0) =  − 16
+*x*(0) =  − 11  
+*y*(0) =  − 16  
 *z*(0) = 22.5
 
 </div>

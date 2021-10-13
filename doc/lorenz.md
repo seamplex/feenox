@@ -12,9 +12,9 @@ $$
 :::
 
 ::: {.only-in-format .texi .plain .gfm}
-$$\dot{x} = \sigma \cdot (y - x)$$
-$$\dot{y} = x \cdot (r - z) - y$$
-$$\dot{z} = x y - b z$$
+$\dot{x} = \sigma \cdot (y - x)$  
+$\dot{y} = x \cdot (r - z) - y$  
+$\dot{z} = x y - b z$  
 :::
 
 for $0 < t < 40$ with initial conditions
@@ -30,9 +30,9 @@ $$
 :::
 
 ::: {.only-in-format .texi .plain .gfm}
-$$x(0) = -11$$
-$$y(0) = -16$$
-$$z(0) = 22.5$$
+$x(0) = -11$  
+$y(0) = -16$  
+$z(0) = 22.5$  
 :::
 
 

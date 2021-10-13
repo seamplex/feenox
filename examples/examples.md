@@ -200,3 +200,113 @@ $
 See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
 
 
+# The Fibonacci sequence
+
+## Using the closed-form formula as a function
+
+When directly executing FeenoX, one gives a single argument to the
+executable with the path to the main input file. For example, the
+following input computes the first twenty numbers of the [Fibonacci
+sequence](https://en.wikipedia.org/wiki/Fibonacci_number) using the
+closed-form formula
+
+$$
+f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}
+$$
+
+where $\varphi=(1+\sqrt{5})/2$ is the [Golden
+ratio](https://en.wikipedia.org/wiki/Golden_ratio).
+
+
+```feenox
+# the fibonacci sequence as function
+phi = (1+sqrt(5))/2 
+f(n) = (phi^n - (1-phi)^n)/sqrt(5)
+PRINT_FUNCTION f MIN 1 MAX 20 STEP 1
+```
+
+
+```terminal
+$ feenox fibo_formula.fee | tee one
+1	1
+2	1
+3	2
+4	3
+5	5
+6	8
+7	13
+8	21
+9	34
+10	55
+11	89
+12	144
+13	233
+14	377
+15	610
+16	987
+17	1597
+18	2584
+19	4181
+20	6765
+$
+```
+
+
+
+## Using a vector
+
+We could also have computed these twenty numbers by using the direct
+definition of the sequence into a vector $\vec{f}$ of size 20.
+
+
+```feenox
+# the fibonacci sequence as a vector
+VECTOR f SIZE 20
+
+f[i]<1:2> = 1
+f[i]<3:vecsize(f)> = f[i-2] + f[i-1]
+
+PRINT_VECTOR i f
+```
+
+
+```terminal
+$ feenox fibo_vector.fee > two
+$
+```
+
+
+
+## Solving an iterative problem
+
+Finally, we print the sequence as an iterative problem and check that
+the three outputs are the same.
+
+
+```feenox
+static_steps = 20
+#static_iterations = 1476  # limit of doubles
+
+IF step_static=1|step_static=2
+ f_n = 1
+ f_nminus1 = 1
+ f_nminus2 = 1
+ELSE
+ f_n = f_nminus1 + f_nminus2
+ f_nminus2 = f_nminus1
+ f_nminus1 = f_n
+ENDIF
+
+PRINT step_static f_n
+```
+
+
+```terminal
+$ feenox fibo_iterative.fee > three
+$ diff one two
+$ diff two three
+$
+```
+
+
+

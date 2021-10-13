@@ -1,0 +1,13 @@
+#. ## Using a vector
+#.
+#. We could also have computed these twenty numbers by using the direct definition
+#. of the sequence into a vector $\vec{f}$ of size 20.
+# the fibonacci sequence as a vector
+VECTOR f SIZE 20
+
+f[i]<1:2> = 1
+f[i]<3:vecsize(f)> = f[i-2] + f[i-1]
+
+PRINT_VECTOR i f
+#$ $ feenox fibo_vector.fee > two
+#$ $
