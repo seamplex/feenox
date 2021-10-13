@@ -1,0 +1,41 @@
+set preamble "\usepackage{amsmath}"
+
+set width 18*unit(cm)
+set size ratio 9.0/16.0
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set terminal pdf
+
+set logscale x
+set xlabel "Number of nodes"
+
+set yrange [-0.00065:0]
+set ylabel "Displacement at tip [m]"
+
+set key right
+
+E = 2.1e11
+nu = 0.3
+L = 0.5
+b = 0.05
+h = 0.02
+tz = -1e5
+
+A = b*h
+F = tz*A
+I = b*h**3/12
+euler = F*L**2*(3*L-L)/(6*E*I)
+
+set output "cantilever-displacement.pdf"
+
+
+
+plot euler w l lt 1 lw 3 color tan ti "Euler-Bernoulli",\
+     "cantilever-tet4.dat"  w lp lt 2 pt 18 color red   ti "Tet4", \
+     "cantilever-hex8.dat"  w lp lt 3 pt 16 color plum  ti "Hex8", \
+     "cantilever-tet10.dat" w lp lt 4 pt 4  color blue  ti "Tet10",\
+     "cantilever-hex20.dat" w lp lt 5 pt 2  color green ti "Hex20", \
+     "cantilever-hex27.dat" w lp lt 6 pt 3  color black ti "Hex27"

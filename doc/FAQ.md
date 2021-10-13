@@ -95,6 +95,12 @@ There is a syntax highlight file for the text Kate that helps the edition of inp
 
 ![The Kate Text Editor can be used to prepare input files with syntax highlighting.](nafems-le10-problem-input.svg)
 
+# Does FeenoX support beam and/or shell elements?
+
+No, currently supports solid elements. Therefore, three-dimensional problems need to have tetrahedra, hexahedra, prisms and/or pyramids; and two-dimensional problems need to have triangles or quadrangles.
+
+It might support non-solid elements for elasticity in future versions, though.
+Contributions are welcome. Check out the [contributing guidelines](https://www.seamplex.com/feenox/doc/#contributing-guidelines).
 
 # What license does FeenoX have?
 

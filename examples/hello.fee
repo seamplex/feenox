@@ -1,0 +1,7 @@
+#. # Hello World (and Universe)!
+PRINT "Hello $1!"
+#$ $ feenox World
+#$ Hello World!
+#$ $ feenox Universe
+#$ Hello Universe!
+#$ $

@@ -1,3 +1,21 @@
+# Hello World (and Universe)!
+
+
+```feenox
+PRINT "Hello $1!"
+```
+
+
+```terminal
+$ feenox World
+Hello World!
+$ feenox Universe
+Hello Universe!
+$
+```
+
+
+
 # Lorenz' attractor (the one with the butterfly)
 
 Solve
@@ -309,4 +327,120 @@ $
 ```
 
 
+
+# Parametric study on a cantilevered beam
+
+If an external loop successively calls FeenoX with extra command-line
+arguments, a parametric run is obtained. This file `cantilever.fee`
+fixes the face called "left" and sets a load in the negative $z$
+direction of a mesh called `cantilever-$1-$2.msh`, where `$1` is the
+first argument after the inpt file and `$2` the second one. The output
+is a single line containing the number of nodes of the mesh and the
+displacement in the vertical direction $w(500,0,0)$ at the center of the
+cantilever's free face.
+
+The following Bash script first calls Gmsh to create the meshes. To do
+so, it first starts with a base [`cantilever.geo`](cantilever.geo) file
+that creates the CAD:
+
+``` c
+// https://autofem.com/examples/determining_natural_frequencie.html
+SetFactory("OpenCASCADE");
+
+L = 0.5;
+b = 0.05;
+h = 0.02;
+
+Box(1) = {0,-b/2,-h/2, L, b, h};
+
+Physical Surface("left") = {1};
+Physical Surface("right") = {2};
+Physical Surface("top") = {4};
+Physical Volume("bulk") = {1};
+
+Transfinite Curve {1, 3, 5, 7} = 1/(Mesh.MeshSizeFactor*Mesh.ElementOrder) + 1;
+Transfinite Curve {2, 4, 6, 8} = 2/(Mesh.MeshSizeFactor*Mesh.ElementOrder) + 1;
+Transfinite Curve {9, 10, 11, 12} = 16/(Mesh.MeshSizeFactor*Mesh.ElementOrder) + 1;
+
+Transfinite Surface "*";
+Transfinite Volume "*";
+```
+
+Then another `.geo` file is merged to build
+`cantilever-${element}-${c}.msh` where
+
+-   `${element}`: [tet4](cantilever-tet4.geo),
+    [tet10](cantilever-tet10.geo), [hex8](cantilever-hex8.geo),
+    [hex20](cantilever-hex20.geo), [hex27](cantilever-hex27.geo)
+-   `${c}`: 1,2,`\dots`{=tex},10
+
+It then calls FeenoX with the input `cantilever.fee` and passes
+`${element}` and `${c}` as extra arguments, which then are expanded as
+`$1` and `$2` respectively.
+
+``` bash
+#!/bin/bash
+
+rm -f *.dat
+for element in tet4 tet10 hex8 hex20 hex27; do
+ for c in $(seq 1 10); do
+ 
+  # create mesh if not alreay cached
+  mesh=cantilever-${element}-${c}
+  if [ ! -e ${mesh}.msh ]; then
+    scale=$(echo "PRINT 1/${c}" | feenox -)
+    gmsh -3 -v 0 cantilever-${element}.geo -clscale ${scale} -o ${mesh}.msh
+  fi
+  
+  # call FeenoX
+  feenox cantilever.fee ${element} ${c} | tee -a cantilever-${element}.dat
+  
+ done
+done
+```
+
+After the execution of the Bash script, thanks to the design decision
+that output is 100% defined by the user (in this case with the `PRINT`
+instruction), one has several files `cantilever-${element}.dat` files.
+When plotted, these show the shear locking effect of fully-integrated
+first-order elements. The theoretical Euler-Bernoulli result is just a
+reference as, among other things, it does not take into account the
+effect of the material's Poisson's ratio. Note that the abscissa shows
+the number of *nodes*, which are proportional to the number of degrees
+of freedom (i.e. the size of the problem matrix) and not the number of
+*elements*, which is irrelevant here and in most problems.
+
+
+```feenox
+PROBLEM elastic 3D
+READ_MESH cantilever-$1-$2.msh   # in meters
+
+E = 2.1e11         # Young modulus in Pascals
+nu = 0.3           # Poisson's ratio
+
+BC left   fixed
+BC right  tz=-1e5  # traction in Pascals, negative z
+ 
+SOLVE_PROBLEM
+
+# z-displacement (components are u,v,w) at the tip vs. number of nodes
+PRINT nodes %e w(500,0,0) "\# $1 $2"
+
+```
+
+
+```terminal
+$ ./cantilever.sh
+102     -7.641572e-05   # tet4 1
+495     -2.047389e-04   # tet4 2
+1372    -3.149658e-04   # tet4 3
+[...]
+19737   -5.916234e-04   # hex27 8
+24795   -5.916724e-04   # hex27 9
+37191   -5.917163e-04   # hex27 10
+$ pyxplot 
+```
+
+
+![Displacement at the free tip of a cantilevered beam vs. number of nodes for different element types](cantilever-displacement.svg){width=100%}
 
