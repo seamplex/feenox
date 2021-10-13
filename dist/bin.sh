@@ -30,10 +30,7 @@ cd ${package}
     cd doc
       ./make.sh || exit 1
       make info || exit 1
-      make pdf || exit 1
-      ./pdf.sh feenox-manual || exit 1
-      ./pdf.sh srs || exit 1
-      ./pdf.sh sds || exit 1
+      make pdf  || exit 1
     cd .. 
   fi 
   make || exit 1
@@ -57,9 +54,13 @@ cd ${package}-${version}-${target}
     cp ../${package}/README    share/doc
     cp ../${package}/TODO      share/doc
 
-    cp ../${package}/doc/${package}-manual.pdf    share/doc
-    cp ../${package}/doc/${package}-desc.pdf      share/doc
-    cp ../${package}/doc/${package}-desc.info     share/doc
+    cp ../${package}/doc/${package}-manual.pdf   share/doc
+    cp ../${package}/doc/${package}-desc.pdf     share/doc
+    cp ../${package}/doc/${package}-desc.info    share/doc
+    cp ../${package}/doc/programming.pdf         share/doc
+    cp ../${package}/doc/compilation.pdf         share/doc
+    cp ../${package}/doc/FAQ.pdf                 share/doc
+    cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc
     
   elif [ "x${target}" = "xwindows64" ]; then   
   
@@ -72,15 +73,19 @@ cd ${package}-${version}-${target}
     unix2dos -n ../${package}/README    README.txt
     unix2dos -n ../${package}/TODO      TODO.txt
     
+    # TODO: put something that says "get away from windows"
+    # add a link to online documentation
+    
   fi
 
-  cp ../${package}/doc/${package}.xml      share/doc
-  cp ../${package}/doc/${package}.texi     share/doc
-  cp ../${package}/doc/syntax-kate.sh      share/doc
-  cp ../${package}/doc/syntax-tex.sh       share/doc
+  cp ../${package}/doc/${package}.xml        share/doc
+  cp ../${package}/doc/${package}-desc.texi  share/doc
+  cp ../${package}/doc/syntax-kate.sh        share/doc
+  cp ../${package}/doc/syntax-tex.sh         share/doc
+  
 
-  cp -r ../${package}/examples/*       share/doc/examples
-  cp -r ../${package}/tests/*          share/doc/tests
+  cp -r ../${package}/examples/*             share/doc/examples
+  cp -r ../${package}/tests/*                share/doc/tests
   
   cp ../${package}/doc/${package}.1 share/man/man1
   gzip -f share/man/man1/${package}.1
@@ -90,6 +95,7 @@ if [ ! -e ${target} ]; then
   mkdir ${target}
 fi
 
+# TODO: mac
 if [ "x${target}" = "xlinux-amd64" ]; then
   tar -zcf ${package}-${version}-${target}.tar.gz ${package}-${version}-${target}
   mv ${package}-${version}-${target}.tar.gz ${target}

@@ -1,4 +1,4 @@
-dist_doc_DATA = AUTHORS ChangeLog TODO \
+dist_doc_DATA = AUTHORS ChangeLog TODO COPYING \
                 README README.markdown \
                 doc/feenox-desc.texi \
                 doc/feenox.xml \
