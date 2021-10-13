@@ -1,5 +1,5 @@
 ---
-title: Frequently asked questions about Feenox
+title: Frequently Asked Questions about FeenoX
 author: Jeremy Theler
 lang: en-US
 ---
@@ -7,11 +7,18 @@ lang: en-US
 # What is FeenoX?
 
 It is "a free no-fee no-X uniX-like finite-element(ish) computational engineering tool."
-Essentially, a finite-element program with a particular design basis: 
-FeenoX is to finite-element software (like Code Aster) and libraries (like MoFEM) what Markdown is to word processors (like Word) and typesetting systems (like TeX), respectively.
+Essentially, a finite-element program with a particular design basis:
 
-The [README](https://www.seamplex.com/feenox/) in the [GitHub repository](https://github.com/seamplex/feenox/) has a brief introduction.
-There is also a [description](https://www.seamplex.com/feenox/doc/feenox-desc.html) in the [documentation](https://seamplex.com/feenox/doc/).
+> FeenoX is to finite-element programs and libraries what Markdown is to word processors (like Word) and typesetting systems (like TeX), respectively.
+
+In increasing order of complexity and comprehensiveness, these resources explain what [FeenoX](https://www.seamplex.com/feenox) is:
+
+ * The [examples](https://www.seamplex.com/feenox/examples) will give a brief overview of what FeenoX can do.
+ * The [README](https://www.seamplex.com/feenox/) in the [GitHub repository](https://github.com/seamplex/feenox/) has a brief introduction (after explaining why).
+ * There is also a [description](https://www.seamplex.com/feenox/doc/feenox-desc.html) in the [documentation](https://seamplex.com/feenox/doc/).
+ * FeenoX is an "offer" to a fictitious "tender" for a computational tool. The RFQ is the [Software Requirements Specification](https://www.seamplex.com/feenox/doc/srs.pdf) and the explanation of how FeenoX addresses each requirement is the [Software Design Specification](https://www.seamplex.com/feenox/doc/srs.pdf).
+ * This [presentation from August 2021]((https://www.seamplex.com/feenox/doc/2021-feenox.pdf)) explains the SRS/SDS pair. The sources and the examples can be found in [this Github repository](https://github.com/gtheler/2021-presentation). There is a [recording of the presentation]((https://youtu.be/-RJ5qn7E9uE)) (audio is in Spanish).
+ * Finally the [manual](https://www.seamplex.com/feenox/doc/feenox-manual.pdf) will be the ultimate guide.
 
 
 
@@ -19,13 +26,13 @@ There is also a [description](https://www.seamplex.com/feenox/doc/feenox-desc.ht
 
 It does not mean anything particular, but
 
- * the last X makes it rhyme with UNIX and Linux
- * noX means that there is no graphical (i.e. _X_) interface
+ * The last X makes it rhyme with UNIX and Linux.
+ * "noX" means that there is no graphical (i.e. _X_) interface
  * Fee-no means that there are no fees involved (free as in "free beer")
  * FeenoX is the successor of the now-superseded FEA program Fino
- * it rhymes with FEniCS
- * with some luck one can read "Finite ElEments NO-X"
- * with mode luck "FrEE" (as in "free speech")
+ * It rhymes with FEniCS
+ * With some luck one can read "Finite ElEments NO-X"
+ * With mode luck, "FrEE" (as in "free speech")
 
 
 # Why nothing happens when I double click on `feenox.exe`?
@@ -93,7 +100,7 @@ There is a syntax highlight file for the text Kate that helps the edition of inp
 
 TL;DR:
 
- * The code is GPLv3+: you can use it, modfify it and re-distribute it freely (as in free speech) as long as you keep the same licensing terms.
+ * The code is GPLv3+: you can use it, modify it and re-distribute it freely (as in free speech) as long as you keep the same licensing terms.
  * The documentation is released under the terms of the GNU Free Documentation License version 1.3 or, at your option, any later version: same thing but with particular considerations for documentation instead of code.
  
 ```include

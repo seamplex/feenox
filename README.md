@@ -61,7 +61,7 @@ On the other hand, FeenoX meets a fictitious-yet-plausible [Software Requirement
 The first and more important requirement is that FeenoX is both free (as in freedom) and open source. See [Licensing].
 
 
-If by "Why FeenoX?" you mean "Why is FeenoX named that way?," read the [FAQs](doc/FAQs.md).
+If by "Why FeenoX?" you mean "Why is FeenoX named that way?," read the [FAQs](doc/FAQ.md).
 
 
 # What is FeenoX?

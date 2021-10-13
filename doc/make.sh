@@ -128,6 +128,7 @@ done
 
 
 
+echo "feenox-desc"
 pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \
   --lua-filter=include-files.lua \
@@ -140,6 +141,8 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 
+makeinfo feenox-desc.texi > /dev/null
+texi2pdf feenox-desc.texi > /dev/null
 
 
 # TODO: as a lua filter
@@ -149,7 +152,7 @@ for i in logo \
          cantilever-displacement \
          fork \
          fork-meshed \
-         ; do
+  ; do
   if [ ! -e $i.pdf ]; then
     inkscape --export-type=pdf ${i}.svg
   fi
@@ -161,13 +164,10 @@ done
 for i in laplace-square-gmsh \
          laplace-square-paraview \
          nafems-le10 \
-         ; do
+  ; do
   if [ ! -e $i.eps ]; then
     convert ${i}.png ${i}.eps
   fi
 done
 
 
-echo "feenox-desc"
-makeinfo feenox-desc.texi > /dev/null
-texi2pdf feenox-desc.texi > /dev/null

@@ -74,7 +74,7 @@ If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
   [Licensing]: #licensing
-  [FAQs]: doc/FAQs.md
+  [FAQs]: doc/FAQ.md
   [Markdown]: https://en.wikipedia.org/wiki/Markdown
   [Pandoc]: https://pandoc.org/
   [Git]: https://git-scm.com/
