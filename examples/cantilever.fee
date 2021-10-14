@@ -7,20 +7,32 @@
 #. vertical direction\ $w(500,0,0)$ at the center of the cantilever's free face.
 #.
 #. The following Bash script first calls Gmsh to create the meshes.
-#. To do so, it first starts with a base [`cantilever.geo`](cantilever.geo) file that creates the CAD:
+#. To do so, it first starts with a base [`cantilever.geo`](https://github.com/seamplex/feenox/blob/main/examples/cantilever.geo) file that creates the CAD:
 #.
 #. ```{.c include="cantilever.geo"}
 #. ```
 #. Then another `.geo` file is merged to build `cantilever-${element}-${c}.msh` where
 #.
-#.  * `${element}`: [tet4](cantilever-tet4.geo), [tet10](cantilever-tet10.geo), [hex8](cantilever-hex8.geo), [hex20](cantilever-hex20.geo), [hex27](cantilever-hex27.geo)
+#.  * `${element}`: [tet4](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet4.geo),
+#.                  [tet10](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet10.geo),
+#.                  [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
+#.                  [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
+#.                  [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
 #.  * `${c}`: 1,2,\dots,10
 #. 
-#. It then calls FeenoX with the input `cantilever.fee` and passes `${element}` and `${c}` as extra arguments, which then are expanded as `$1` and `$2` respectively.
+#. ::: {#fig:cantilever-mesh}
+#. ![Tetrahedra](cantilever-tet.png){width=45%}
+#. ![Hexahedra](cantilever-hex.png){width=45%}
+#.
+#. Cantilevered beam meshed with structured tetrahedra and hexahedra
+#. :::
+#.
+#. It then calls FeenoX with the input [`cantilever.fee`](https://github.com/seamplex/feenox/blob/main/examples/cantilever.fee) and passes `${element}` and `${c}` as extra arguments, which then are expanded as `$1` and `$2` respectively.
 #.
 #.
 #. ```{.bash include="cantilever.sh"}
 #. ```
+#.
 #. After the execution of the Bash script, thanks to the design decision that output is 100% defined by the user
 #. (in this case with the `PRINT` instruction), one has several files `cantilever-${element}.dat` files.
 #. When plotted, these show the shear locking effect of fully-integrated first-order elements.
@@ -49,5 +61,5 @@ PRINT nodes %e w(500,0,0) "\# $1 $2"
 #$ 19737   -5.916234e-04   # hex27 8
 #$ 24795   -5.916724e-04   # hex27 9
 #$ 37191   -5.917163e-04   # hex27 10
-#$ $ pyxplot 
+#$ $ pyxplot cantilever.ppl
 #> ![Displacement at the free tip of a cantilevered beam vs. number of nodes for different element types](cantilever-displacement.svg){width=100%}

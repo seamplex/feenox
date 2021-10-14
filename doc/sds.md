@@ -363,9 +363,9 @@ To use FeenoX in a parametric run, one has to successively call the executable p
 then
 
 ```terminal
-$ feenox World
+$ feenox hello.fee World
 Hello World!
-$ feenox Universe
+$ feenox hello.fee Universe
 Hello Universe!
 $
 ```
@@ -376,9 +376,8 @@ To have an actual parametric run, an external loop has to successively call Feen
 ```
 
 ::: {#fig:cantilever-mesh}
-
-![Tetrahedra](cantilever-tet.png){width=45%} 
-![Hexahedra](cantilever-hex.png){width=45%}
+![Tetrahedra](cantilever-tet.png){width_latex=49%}
+![Hexahedra](cantilever-hex.png){width_latex=49%}
 
 Cantilevered beam meshed with structured tetrahedra and hexahedra
 :::

@@ -49,8 +49,8 @@ PRINT t x y z        # four-column plain-ASCII output
 #$ $ python3 lorenz.py
 #$ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 #> ::: {#fig:ex_lorenz}
-#> ![Gnuplot](lorenz-gnuplot.svg){width_html=100% width_latex=48%}
-#> ![Matplotlib](lorenz-matplotlib.png){width_html=100% width_latex=48%}
+#> ![Gnuplot](lorenz-gnuplot.svg){width=48%}
+#> ![Matplotlib](lorenz-matplotlib.png){width=48%}
 #> 
 #> The Lorenz attractor computed with FeenoX plotted with two different tools
 #> :::

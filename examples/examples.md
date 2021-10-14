@@ -7,9 +7,9 @@ PRINT "Hello $1!"
 
 
 ```terminal
-$ feenox World
+$ feenox hello.fee World
 Hello World!
-$ feenox Universe
+$ feenox hello.fee Universe
 Hello Universe!
 $
 ```
@@ -77,8 +77,8 @@ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 
 
 ::: {#fig:ex_lorenz}
-![Gnuplot](lorenz-gnuplot.svg){width_html=100% width_latex=48%}
-![Matplotlib](lorenz-matplotlib.png){width_html=100% width_latex=48%}
+![Gnuplot](lorenz-gnuplot.svg){width=48%}
+![Matplotlib](lorenz-matplotlib.png){width=48%}
 
 The Lorenz attractor computed with FeenoX plotted with two different tools
 :::
@@ -171,7 +171,7 @@ $
 ```
 
 
-![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width_html=100% width_latex=70%}
+![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width=75%}
 
 # How to solve a maze without AI
 
@@ -340,8 +340,9 @@ displacement in the vertical direction $w(500,0,0)$ at the center of the
 cantilever's free face.
 
 The following Bash script first calls Gmsh to create the meshes. To do
-so, it first starts with a base [`cantilever.geo`](cantilever.geo) file
-that creates the CAD:
+so, it first starts with a base
+[`cantilever.geo`](https://github.com/seamplex/feenox/blob/main/examples/cantilever.geo)
+file that creates the CAD:
 
 ``` c
 // https://autofem.com/examples/determining_natural_frequencie.html
@@ -369,14 +370,25 @@ Transfinite Volume "*";
 Then another `.geo` file is merged to build
 `cantilever-${element}-${c}.msh` where
 
--   `${element}`: [tet4](cantilever-tet4.geo),
-    [tet10](cantilever-tet10.geo), [hex8](cantilever-hex8.geo),
-    [hex20](cantilever-hex20.geo), [hex27](cantilever-hex27.geo)
+-   `${element}`:
+    [tet4](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet4.geo),
+    [tet10](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet10.geo),
+    [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
+    [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
+    [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
 -   `${c}`: 1,2,`\dots`{=tex},10
 
-It then calls FeenoX with the input `cantilever.fee` and passes
-`${element}` and `${c}` as extra arguments, which then are expanded as
-`$1` and `$2` respectively.
+::: {#fig:cantilever-mesh}
+![Tetrahedra](cantilever-tet.png){width="45%"}
+![Hexahedra](cantilever-hex.png){width="45%"}
+
+Cantilevered beam meshed with structured tetrahedra and hexahedra
+:::
+
+It then calls FeenoX with the input
+[`cantilever.fee`](https://github.com/seamplex/feenox/blob/main/examples/cantilever.fee)
+and passes `${element}` and `${c}` as extra arguments, which then are
+expanded as `$1` and `$2` respectively.
 
 ``` bash
 #!/bin/bash
@@ -438,7 +450,7 @@ $ ./cantilever.sh
 19737   -5.916234e-04   # hex27 8
 24795   -5.916724e-04   # hex27 9
 37191   -5.917163e-04   # hex27 10
-$ pyxplot 
+$ pyxplot cantilever.ppl
 ```
 
 

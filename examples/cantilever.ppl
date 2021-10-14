@@ -1,6 +1,6 @@
 set preamble "\usepackage{amsmath}"
 
-set width 18*unit(cm)
+set width 14*unit(cm)
 set size ratio 9.0/16.0
 
 set axis x arrow nomirrored
@@ -12,7 +12,7 @@ set terminal pdf
 set logscale x
 set xlabel "Number of nodes"
 
-set yrange [-0.00065:0]
+set yrange [-6.5e-4:0]
 set ylabel "Displacement at tip [m]"
 
 set key right
