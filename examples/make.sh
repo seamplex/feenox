@@ -10,6 +10,7 @@ for i in hello          \
          fibo_vector    \
          fibo_iterative \
          cantilever     \
+         fork           \
   ; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#.//' | sed 's/^[ \t]*//' | \

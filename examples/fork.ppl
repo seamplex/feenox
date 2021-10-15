@@ -1,0 +1,19 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+#set size ratio 9.0/16.0
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set terminal pdf
+
+set xlabel "Number of nodes"
+set logscale x
+set ylabel "$\ell_1$ [mm]"
+set yrange[66.65:67.15]
+
+set output "fork.pdf"
+
+plot "fork.dat" u 1:(1e3*$2)    w lp lt 1 lw 2 pt 16 color olivegreen ti ""

@@ -9,3 +9,5 @@ add
 nafems-le10.msh
 cantilever*.msh
 cantilever*.dat
+fork*.msh
+fork.dat
