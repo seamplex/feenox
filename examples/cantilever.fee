@@ -18,7 +18,7 @@
 #.                  [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
 #.                  [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
 #.                  [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
-#.  * `${c}`: 1,2,\dots,10
+#.  * `${c}`: 1,2,$\dots$,10
 #. 
 #. ::: {#fig:cantilever-mesh}
 #. ![Tetrahedra](cantilever-tet.png){width=45%}

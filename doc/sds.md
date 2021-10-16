@@ -473,7 +473,18 @@ Note that the approach used here is to use Gmsh Python API to build the mesh and
 > 230-efficiency.md
 > ```
 
-**TO DO**
+**TO DO**: re-solve NAFEMS LE10 for different meshes with
+
+ * FeenoX
+ * Code Aster
+ * Sparselizard
+ * CCX?
+ 
+Measure (with `time`):
+
+ * CPU time
+ * Wall time
+ * Memory
 
 ## Scalability  {#sec:scalability}
  
