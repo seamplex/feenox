@@ -34,7 +34,6 @@ fi
 
 # TODO: --check
 
-# for c in 3 2 1.8 1.4 1.2 1.2 1.1 1.05 1.025 1 0.975 0.95 0.925 0.9 0.89 0.88; do
 for c in 3 2.5 2 1.5 1.25 1.1 1 0.9 0.8 0.75 0.7 0.65 0.6 0.55 0.5; do
 
   if [ ! -e le10-${c}.msh ]; then
@@ -93,7 +92,19 @@ for c in 3 2.5 2 1.5 1.25 1.1 1 0.9 0.8 0.75 0.7 0.65 0.6 0.55 0.5; do
     if [ ! -e le10-${c}.unv ]; then
       gmsh -3 le10-${c}.msh -o le10-${c}.unv || exit 1
     fi
-    echo "aster"
+    if [ ! -e aster-${c}.sigmay ]; then
+      echo "running Aster c = ${c}"
+      cp le10-${c}.unv le10.unv
+      /usr/bin/time -f "%e\t%S\t%U\t%M " -o aster-${c}.time as_run le10.export || exit 1
+      tail -n 2 DD.dat | head -n1 | awk '{print $3}' > aster-${c}.sigmay
+    fi
+    echo -ne "${c}\t" >> aster.dat
+    cat le10-${c}.nodes    | tr "\n" "\t" >> aster.dat
+    cat aster-${c}.sigmay | tr "\n" "\t" >> aster.dat
+    cat aster-${c}.time   | tr "\n" "\t" >> aster.dat
+    echo >> aster.dat
+
+
   fi
 
   # ---- Reflex ----------------------------------
