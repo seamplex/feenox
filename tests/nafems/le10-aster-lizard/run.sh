@@ -74,9 +74,6 @@ for c in 3 2; do
   
   # ---- Sparselizard ----------------------------------
   if [ ! -z "${has_sparselizard}" ]; then
-    if [ ! -e le10-${c}.msh2 ]; then
-      gmsh -3 le10-${c}.msh -o le10-${c}.msh2 || exit 1
-    fi
     if [ ! -e sparselizard-${c}.sigmay ]; then
       echo "Running Sparselizard c = ${c}"
       cd sparselizard
