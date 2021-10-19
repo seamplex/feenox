@@ -15,9 +15,8 @@ int main(int argc, char **argv) {
   double young = 210e3;
   double poisson = 0.3;
   
-//  mesh mymesh("petsc:le10.msh", 0);
   std::string c = (argc > 1) ? argv[1] : "1";
-  mesh mymesh("../le10-"+c+".msh2", 0);
+  mesh mymesh("gmsh:../le10-"+c+".msh", 0);
   field u("h1xyz");
   
   parameter E;
@@ -41,7 +40,7 @@ int main(int argc, char **argv) {
 
   // Transfer the data from the solution vector to the u field:
   u.setdata(bulk, solu);
-  u.write(bulk, "le10-sparselizard-displ.vtk", 2);
+//   u.write(bulk, "le10-sparselizard-displ.vtk", 2);
 
   double lambda = young * poisson/((1+poisson)*(1-2*poisson));
   double mu = 0.5*young/(1+poisson);
@@ -54,7 +53,7 @@ int main(int argc, char **argv) {
                          0,                0,           0,  0,  0, mu});
 
   expression stress = H*strain(u);
-  comp(1, stress).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
+//   comp(1, stress).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
 
   std::cout << comp(1, stress).interpolate(bulk, {2000, 0, 300})[0] << std::endl;
   
