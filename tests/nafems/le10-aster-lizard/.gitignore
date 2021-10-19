@@ -1,0 +1,11 @@
+*.msh
+*.msh2
+*.unv
+*.vtk
+*.nodes
+*.sigmay
+*.time
+*.dat
+sparselizard
+output
+

@@ -2,7 +2,6 @@
 *.log
 *.trs
 *.last
-nafems
 tmp.*
 mesh2d.msh
 square-centered.msh

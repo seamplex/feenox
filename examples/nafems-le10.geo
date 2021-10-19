@@ -11,7 +11,7 @@ Physical Volume("bulk") = {1};
 
 // meshing settings, read Gmsh' manual for further reference
 Mesh.ElementOrder = 2;      // use second-order tetrahedra
-Mesh.Algorithm = 6;         // 2D mesh algorithm:  6: Frontal Delaunayfe  
+Mesh.Algorithm = 6;         // 2D mesh algorithm:  6: Frontal Delaunay
 Mesh.Algorithm3D = 10;      // 3D mesh algorithm: 10: HXT
 Mesh.Optimize = 1;          // Optimize the mesh
 Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimization
@@ -19,7 +19,7 @@ Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimizati
 Mesh.MeshSizeMax = 80;     // main element size 
 Mesh.MeshSizeMin = 20;      // refined element size
 
-// local refinement around the point D (entity 5)
+// local refinement around the point D (entity 4)
 Field[1] = Distance;
 Field[1].NodesList = {4};
 Field[2] = Threshold;

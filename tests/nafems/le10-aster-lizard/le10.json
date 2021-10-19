@@ -1,0 +1,119 @@
+{
+    "mesh_filename": "le10-$c$.msh",
+    "element_order": 2,
+    "materials": [
+        {
+            "name": "Steel",
+            "density": "7750e-3",
+            "mechanical_properties": {
+                "elasticity_type": "IsotropicLinearElastic",
+                "elasticity": {
+                    "youngs_modulus": "210e3",
+                    "poissons_ratio": "0.3"
+                }
+            }
+        }
+    ],
+    "material_mapping": [
+        {
+            "material_name": "Steel",
+            "volume_name": "bulk"
+        }
+    ],
+    "physics": [
+        {
+            "physics_type": "Mechanical",
+            "boundary_conditions": [
+                {
+                    "group_names":[ "upper" ],
+                    "boundary_condition_type": "Neumann",
+                    "value_type": "ConstantValues",
+                    "value": {
+                        "values": [
+                            1
+                        ]
+                    }
+                },
+                {
+                    "group_names":[ "ABAB" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "starting_degree_of_freedom": 0,
+                    "value_type": "ConstantValues",
+                    "value": {
+                        "values": [
+                            0
+                        ]
+                    }
+                },
+                {
+                    "group_names":[ "DCDC" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "starting_degree_of_freedom": 1,
+                    "value_type": "ConstantValues",
+                    "value": {
+                        "values": [
+                            0
+                        ]
+                    }
+                },
+                {
+                    "group_names":[ "BCBC" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "starting_degree_of_freedom": 0,
+                    "value_type": "ConstantValues",
+                    "value": {
+                        "values": [
+                            0
+                        ]
+                    }
+                },
+                {
+                    "group_names":[ "BCBC" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "degrees_of_freedom": [0,1],
+                    "value_type": "ConstantValues",
+                    "value": {
+                        "values": [ 0, 0 ]
+                    }
+                },
+                {
+                    "group_names":[ "midplane" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "starting_degree_of_freedom": 2,
+                    "value_type": "ConstantValues",
+                    "value": {
+                        "values": [
+                            0
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "analysis_type": "StaticAnalysis",
+    "points": [
+        {
+            "point_name": "probe1",
+            "coordinates": [
+                2000,
+                0,
+                300
+            ]
+        }
+    ],
+    "outputs": {
+/*   
+        "field_data": [
+            {
+                "field_name": "Stress"
+            }
+        ],
+*/
+        "kpi_data": [
+            {
+                "group_name": "probe1",
+                "field_name": "Stress"
+            }
+        ],
+    },
+}
