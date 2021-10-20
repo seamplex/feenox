@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # check for needed tools
-for i in gmsh jq /usr/bin/time; do
+for i in grep awk gmsh jq /usr/bin/time; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -94,7 +94,7 @@ for c in 1 0.5 0.3333 0.25 0.2 0.166 0.15 0.125 0.111 0.1; do
       echo "running Aster c = ${c}"
       cp le10-${c}.unv le10.unv
       /usr/bin/time -f "%e\t%S\t%U\t%M " -o aster-${c}.time as_run le10.export || exit 1
-      tail -n 2 DD.dat | head -n1 | awk '{print $3}' > aster-${c}.sigmay
+      grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD.dat | awk '{print $5}' > aster-${c}.sigmay
     fi
     echo -ne "${c}\t" >> aster.dat
     cat le10-${c}.nodes    | tr "\n" "\t" >> aster.dat
