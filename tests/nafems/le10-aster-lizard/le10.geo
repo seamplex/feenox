@@ -42,8 +42,8 @@ Physical Curve("DD", 7) = {6,14};
 
 // meshing settings, read Gmsh' manual for further reference
 Mesh.ElementOrder = 2;      // use second-order tetrahedra
-Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.05;
-Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor+1 Using Progression 1.05;
+Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.02;
+Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor+1 Using Progression 1.02;
 Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 1/Mesh.MeshSizeFactor+1;
 
 Transfinite Surface {1} = {4, 1, 2, 3};
