@@ -14,7 +14,8 @@ nu = 0.3    # Poisson's ratio
 
 SOLVE_PROBLEM   # TODO: implicit
 
-PRINT %.8f sigmay(2000,0,300)
+PRINT total_dofs %.8f sigmay(2000,0,300)
 
 # write post-processing data for paraview
 # WRITE_MESH le10-feenox.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauzx tauyz
+

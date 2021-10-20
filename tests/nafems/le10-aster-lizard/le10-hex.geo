@@ -23,8 +23,8 @@ Coherence;             // merge the points
 
 Curve Loop(1) = {3, 4, 1, -2};
 Plane Surface(1) = {1};
-Extrude {0, 0, h/2} { Surface{1}; }
-Extrude {0, 0, h/2} { Surface{6}; }
+Extrude {0, 0, h/2} { Surface{1}; Recombine; }
+Extrude {0, 0, h/2} { Surface{6}; Recombine; }
 Coherence;
 
 
@@ -41,10 +41,14 @@ Physical Curve("DD", 7) = {6,14};
 // Physical Point("D", 8) = {8};
 
 // meshing settings, read Gmsh' manual for further reference
-Mesh.ElementOrder = 2;      // use second-order tetrahedra
+Mesh.ElementOrder = 1;
+Mesh.RecombineAll = 1;
+Mesh.SecondOrderLinear = 0;
+Mesh.SecondOrderIncomplete = 1;
+
 Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.02;
-Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor+1 Using Progression 1.02;
-Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 1/Mesh.MeshSizeFactor+1;
+Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor +1 Using Progression 1.02;
+Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 1/Mesh.MeshSizeFactor +1;
 
 Transfinite Surface {1} = {4, 1, 2, 3};
 Transfinite Surface {2} = {4, 3, 5, 6};

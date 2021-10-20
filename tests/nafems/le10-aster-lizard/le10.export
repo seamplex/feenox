@@ -1,20 +1,20 @@
 P actions make_etude
 P debug nodebug
 P memjob 2097152
-P memory_limit 2048.0
+P memory_limit 8196.0
 P mode interactif
 P mpi_nbcpu 1
 P mpi_nbnoeud 1
 P ncpus 0
-P rep_trav /tmp/ubuntu-ip-172-31-44-208-interactif_97178
 P time_limit 900.0
 P tpsjob 16
 P version stable
 A memjeveux 256.0
 A tpmax 900.0
-F comm /home/ubuntu/feenox/tests/nafems/le10-aster-lizard/le10.comm D  1
-F libr /home/ubuntu/feenox/tests/nafems/le10-aster-lizard/le10.unv D  20
-F libr /home/ubuntu/feenox/tests/nafems/le10-aster-lizard/le10.rmed R  80
-F mess /home/ubuntu/feenox/tests/nafems/le10-aster-lizard/message R  6
-F resu /home/ubuntu/feenox/tests/nafems/le10-aster-lizard/DD.dat R  17
-R base /home/ubuntu/feenox/tests/nafems/le10-aster-lizard/base-stage1 R  0
+
+F comm le10.comm   D  1
+F libr le10.unv    D  20
+F libr le10.rmed   R  80
+F mess message     R  6
+F resu DD.txt      R  17
+R base base-stage1 R  0

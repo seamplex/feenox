@@ -1678,7 +1678,7 @@ struct feenox_t {
       
       var_t *penalty_weight;
       var_t *nodes_rough;
-      var_t *unknowns;
+      var_t *total_dofs;
     
       var_t *memory_available;
     

@@ -271,6 +271,10 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 ///va+nodes_rough+detail The number of nodes of the mesh in `ROUGH` mode.
   feenox.pde.vars.nodes_rough = feenox_define_variable_get_ptr("nodes_rough");
 
+///va+total_dofs+name total_dofs
+///va+total_dogs+detail The total number of degrees of freedom of the PDE being solved for.
+  feenox.pde.vars.total_dofs = feenox_define_variable_get_ptr("total_dofs");
+  
 ///va+memory_available+name memory_available
 ///va+memory_available+detail Total available memory, in bytes.
   feenox.pde.vars.memory_available = feenox_define_variable_get_ptr("memory_available");
@@ -299,7 +303,7 @@ int feenox_problem_define_solutions(void) {
     feenox_push_error_message("do not know how many degrees of freedom this problem has");
     return FEENOX_ERROR;
   }
-
+  
   feenox_check_alloc(feenox.pde.solution = calloc(feenox.pde.dofs, sizeof(function_t *)));
   feenox_check_alloc(feenox.pde.gradient = calloc(feenox.pde.dofs, sizeof(function_t *)));
   feenox_check_alloc(feenox.pde.delta_gradient = calloc(feenox.pde.dofs, sizeof(function_t *)));
@@ -522,6 +526,9 @@ int feenox_problem_init_runtime_general(void) {
     feenox_push_error_message("internal error, problem init did not set global size");
     return FEENOX_ERROR;
   }
+  
+  
+  feenox_var_value(feenox.pde.vars.total_dofs) = (double)(feenox.pde.global_size);
   
   // TODO: choose width from input
   feenox.pde.width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
