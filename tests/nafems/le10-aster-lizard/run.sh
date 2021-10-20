@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # check for needed tools
-for i in gmsh /usr/bin/time; do
+for i in gmsh jq /usr/bin/time; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1

@@ -21,7 +21,16 @@ reslin = CALC_CHAMP(reuse=reslin,
 
 #IMPR_RESU(RESU=_F(RESULTAT=reslin), UNITE=80)
 
-IMPR_RESU(FORMAT='RESULTAT',
-          RESU=_F(GROUP_MA=('DD', ), NOM_CHAM=('SIGM_NOEU', ), RESULTAT=reslin), UNITE=17)
-
+IMPR_RESU(
+  FORMAT='RESULTAT', 
+  RESU=_F(
+    GROUP_MA=('DD', ), 
+    IMPR_COOR='OUI', 
+    NOM_CHAM=('SIGM_NOEU', ), 
+    NOM_CMP=('SIYY'), 
+    RESULTAT=reslin
+  ), 
+  UNITE=17
+)           
+          
 FIN()
