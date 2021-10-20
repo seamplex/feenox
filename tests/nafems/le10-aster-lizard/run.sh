@@ -25,18 +25,17 @@ fi
 
 if [ ! -z "$(which as_run)" ]; then
   has_aster="yes"
+  rm -f aster.dat
 fi
 
-if [ ! -z "$(which reflex)" ]; then
+if [ ! -z "$(which reflexCLI)" ]; then
   has_reflex="yes"
   rm -f reflex.dat
 fi
 
 # TODO: --check
 
-# for c in 3 2 1.8 1.4 1.2 1.2 1.1 1.05 1.025 1 0.975 0.95 0.925 0.9 0.89 0.88; do
-# for c in 3 2.5 2 1.5 1.25 1.1 1 0.9 0.8 0.75 0.7 0.65 0.6 0.55 0.5; do
-for c in 3 2; do
+for c in 1 0.5 0.3333 0.25 0.2 0.166 0.15 0.125 0.111 0.1; do
 
   if [ ! -e le10-${c}.msh ]; then
     gmsh -3 le10.geo -clscale ${c} -o le10-${c}.msh || exit 1
@@ -110,7 +109,7 @@ for c in 3 2; do
   if [ ! -z "${has_reflex}" ]; then
     if [ ! -e reflex-${c}.sigmay ]; then
       echo "running Reflex c = ${c}"
-      /usr/bin/time -f "%e\t%S\t%U\t%M " -o reflex-${c}.time reflex-develop -i le10.json -s "c=${c}" || exit 1
+      /usr/bin/time -f "%e\t%S\t%U\t%M " -o reflex-${c}.time reflexCLI -i le10.json -s "c=${c}" || exit 1
       jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json > reflex-${c}.sigmay
     fi
     echo -ne "${c}\t" >> reflex.dat

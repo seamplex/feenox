@@ -1,4 +1,4 @@
-// NAFEMS LE10 benchmark unstructured locally-refined tetrahedral mesh
+// NAFEMS LE10 benchmark structured locally-refined tetrahedral mesh
 // copyright (c) 2021 jeremy theler <jeremy@seamplex.com>
 
 // create the NAFEMS LE10 benchmark geometry CAD
@@ -19,46 +19,43 @@ Line(1) = {1, 2};         // lower
 Ellipse (2) = {0,0,-h/2, c, b, 0, Pi/2};
 Line(3) = {3, 4};
 Ellipse (4) = {0,0,-h/2, d, a, 0, Pi/2};
-
 Coherence;             // merge the points 
 
 Curve Loop(1) = {3, 4, 1, -2};
 Plane Surface(1) = {1};
-Extrude {0, 0, h} { Surface{1}; }
-
-Ellipse (13) = {0,0,0, c, b, 0, Pi/2};
-BooleanFragments{ Volume{1}; Surface{5}; Delete; }{ Curve{13}; Delete; }
+Extrude {0, 0, h/2} { Surface{1}; }
+Extrude {0, 0, h/2} { Surface{6}; }
+Coherence;
 
 
 // define physical names from the geometrical entity ids
 // don' use apostrophe to make it string-friendly in aster & lizard (just in case)
 // set an explicit id for sparselizard
-Physical Volume("bulk", 1) = {1};
-Physical Surface("upper", 2) = {7};
-Physical Surface("DCDC", 3) = {3};
-Physical Surface("ABAB", 4) = {5};
-Physical Surface("BCBC", 5) = {1, 2};
-Physical Curve("midplane", 6) = {13};
-Physical Curve("DD", 7) = {20};
+Physical Volume("bulk", 1) = {1,2};
+Physical Surface("upper", 2) = {11};
+Physical Surface("DCDC", 3) = {2,7};
+Physical Surface("ABAB", 4) = {4,9};
+Physical Surface("BCBC", 5) = {5,10};
+Physical Curve("midplane", 6) = {12};
+Physical Curve("DD", 7) = {6,14};
 // Physical Point("D", 8) = {8};
 
 // meshing settings, read Gmsh' manual for further reference
 Mesh.ElementOrder = 2;      // use second-order tetrahedra
-Mesh.Algorithm = 6;         // 2D mesh algorithm:  6: Frontal Delaunay
-Mesh.Algorithm3D = 1;       // 3D mesh algorithm: (1: Delaunay, 3: Initial mesh only, 4: Frontal, 7: MMG3D, 9: R-tree, 10: HXT)
-Mesh.Optimize = 1;          // Optimize the mesh
-Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimization
+Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.05;
+Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor+1 Using Progression 1.05;
+Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 1/Mesh.MeshSizeFactor+1;
 
-Mesh.MeshSizeMax = 80;     // main element size 
-Mesh.MeshSizeMin = 40;     // refined element size
+Transfinite Surface {1} = {4, 1, 2, 3};
+Transfinite Surface {2} = {4, 3, 5, 6};
+Transfinite Surface {3} = {4, 1, 6, 7};
+Transfinite Surface {4} = {1, 2, 7, 8};
+Transfinite Surface {5} = {3, 2, 8, 5};
+Transfinite Surface {6} = {6, 7, 5, 8};
+Transfinite Surface {7} = {6, 5, 9, 10};
+Transfinite Surface {8} = {6, 7, 10, 11};
+Transfinite Surface {9} = {7, 8, 11, 12};
+Transfinite Surface {10} = {5, 8, 12, 9};
+Transfinite Surface {11} = {10, 11, 9, 12};
 
-// local refinement around the point D (entity 8)
-Field[1] = Distance;
-Field[1].NodesList = {8};
-Field[2] = Threshold;
-Field[2].IField = 1;
-Field[2].LcMin = Mesh.MeshSizeMin;
-Field[2].LcMax = Mesh.MeshSizeMax;
-Field[2].DistMin = 2 * Mesh.MeshSizeMax;
-Field[2].DistMax = 6 * Mesh.MeshSizeMax;
-Background Field = {2};
+Transfinite Volume{1,2};
