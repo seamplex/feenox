@@ -117,7 +117,7 @@ for c in 1 0.75 0.5 0.4 0.35 0.3 0.25 0.225 0.2 0.19 0.18 0.17 0.16 0.15 0.145 0
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
     fi
 
-    if [ ! -e aster-${m}-${c}.sigmay ]; then
+    if [ -e aster-${m}-${c}.sigmay ]; then
       echo -ne "${c}\t" >> aster-${m}.dat
       cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
       cat aster-${m}-${c}.time   | tr "\n" "\t" >> aster-${m}.dat
