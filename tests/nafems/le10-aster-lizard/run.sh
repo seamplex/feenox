@@ -106,7 +106,6 @@ for c in 1 0.5; do
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
     fi
     echo -ne "${c}\t" >> aster-${m}.dat
-    cat le10-${m}-${c}.nodes    | tr "\n" "\t" >> aster-${m}.dat
     cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
     cat aster-${m}-${c}.time   | tr "\n" "\t" >> aster-${m}.dat
     echo >> aster-${m}.dat

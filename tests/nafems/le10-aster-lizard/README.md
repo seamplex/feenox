@@ -80,6 +80,7 @@ The tree `sparselizard` should live in `le10-aster-lizard`:
 cd feenox/tests/nafems/le10-aster-lizard
 git clone https://github.com/halbux/sparselizard/
 cd sparselizard/
+ln -s ../le10.cpp main.cpp
 cd install_external_libs/
 ./install_petsc.sh
 ./optional_install_gmsh_api.sh
