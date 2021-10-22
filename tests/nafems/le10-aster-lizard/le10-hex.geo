@@ -43,7 +43,7 @@ Physical Curve("DD", 7) = {6,14};
 // meshing settings, read Gmsh' manual for further reference
 Mesh.ElementOrder = 1;
 Mesh.RecombineAll = 1;
-Mesh.SecondOrderLinear = 0;
+Mesh.SecondOrderLinear = 1;
 Mesh.SecondOrderIncomplete = 1;
 
 Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.02;

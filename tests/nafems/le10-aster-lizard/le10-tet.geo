@@ -43,10 +43,14 @@ Physical Curve("DD", 7) = {20};
 // Physical Point("D", 8) = {8};
 
 // meshing settings, read Gmsh' manual for further reference
-Mesh.ElementOrder = 2;      // use second-order tetrahedra
+Mesh.ElementOrder = 2;      // use second-order
+Mesh.SecondOrderLinear = 0; // curved tetrahedra
+
 Mesh.Algorithm = 6;         // 2D mesh algorithm:  6: Frontal Delaunay
 Mesh.Algorithm3D = 1;       // 3D mesh algorithm: (1: Delaunay, 3: Initial mesh only, 4: Frontal, 7: MMG3D, 9: R-tree, 10: HXT)
+
 Mesh.Optimize = 1;          // Optimize the mesh
+Mesh.OptimizeNetgen = 1;    // Optimize the mesh
 Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimization
 
 Mesh.MeshSizeMax = 1200;     // main element size 
