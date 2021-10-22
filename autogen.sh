@@ -38,6 +38,26 @@ echo -n "creating Makefile.am... "
 if [ "x$1" = "x--doc" ]; then
   cat << EOF > Makefile.am
 SUBDIRS = src doc
+
+dist_doc_DATA = AUTHORS ChangeLog TODO COPYING \\
+                README README.markdown \\
+                doc/feenox-desc.texi \\
+                doc/feenox.xml \\
+                doc/README.md \\
+                doc/CODE_OF_CONDUCT \\
+                doc/programming \\
+                doc/compilation \\
+                doc/FAQ \\
+                doc/syntax-kate.sh \\
+                doc/syntax-tex.sh \\
+                doc/nafems-le10-problem-input.eps \\
+                doc/lorenz.eps \\
+                doc/cantilever-displacement.eps \\
+                doc/fork.eps \\
+                doc/fork-meshed.eps \\
+                doc/laplace-square-gmsh.eps \\
+                doc/laplace-square-paraview.eps \\
+                doc/nafems-le10.eps
 EOF
 
 else
