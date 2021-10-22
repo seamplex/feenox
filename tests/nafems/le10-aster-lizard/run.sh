@@ -187,7 +187,7 @@ for c in 1 0.5; do
       jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_hypre-${m}-${c}.sigmay
     fi
     
-    if [ -e reflex_hypre-${m}-${c}.sigmay-${m}-${c}.sigmay ]; then
+    if [ -e reflex_hypre-${m}-${c}.sigmay ]; then
       grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.sigmay-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> reflex_hypre-${m}.dat
