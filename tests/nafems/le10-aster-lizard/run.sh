@@ -24,7 +24,7 @@ if [ ! -z "$(which feenox)" ]; then
   fi
 fi
 
-# --- Sparselizard ----------------------
+# --- Sparselizard ----------------------gi
 if [ -e "sparselizard/sparselizard" ]; then
   has_sparselizard="yes"
   rm -f sparselizard-*.dat
@@ -188,7 +188,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e reflex_hypre-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.sigmay-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> reflex_hypre-${m}.dat
         cat reflex_hypre-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_hypre-${m}.dat
