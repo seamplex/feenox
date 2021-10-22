@@ -5,6 +5,7 @@
 *.sigmay
 *.time
 *.dat
+*.pdf
 sparselizard
 output
 base-stage1/

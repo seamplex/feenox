@@ -16,7 +16,7 @@ export OMP_NUM_THREADS=1
 # --- FeenoX ----------------------
 if [ ! -z "$(which feenox)" ]; then
   has_feenox="yes"
-  rm -f feenox-*.dat
+  rm -f feenox*.dat
   $(feenox -V | grep mumps > /dev/null)
   if [ $? -eq 0 ]; then
     has_feenox_mumps="yes"
@@ -27,25 +27,25 @@ fi
 # --- Sparselizard ----------------------gi
 if [ -e "sparselizard/sparselizard" ]; then
   has_sparselizard="yes"
-  rm -f sparselizard-*.dat
+  rm -f sparselizard*.dat
 fi
 
 # --- Code Aster ----------------------
 if [ ! -z "$(which as_run)" ]; then
   has_aster="yes"
-  rm -f aster-*.dat
+  rm -f aster*.dat
 fi
 
 # --- Reflex ----------------------
 if [ ! -z "$(which reflexCLI)" ]; then
   has_reflex="yes"
-  rm -f reflex-*.dat
+  rm -f reflex*.dat
 fi
 
 # TODO: --check
 
 for c in 1 0.5; do
-# for c in 1 0.75 0.5 0.4 0.35 0.3 0.25 0.225 0.2 0.19 0.18 0.17 0.16 0.15 0.145 0.14 0.135 0.13 0.1275 0.125 0.1225 0.12 0.118 0.116 0.115 0.114 0.113 0.112 0.11 0.109 0.108 0.107 0.106 0.105 0.104 0.103 0.102 0.101 0.1; do
+# for c in 1 0.75 0.5 0.4 0.35 0.3 0.25 0.225 0.2 0.19 0.18 0.17 0.16 0.15 0.14 0.13 0.125 0.12 0.118 0.116 0.114 0.113 0.112 0.111 0.110 0.109 0.108 0.107 0.106 0.105 0.104 0.103 0.102 0.101 0.1; do
 
  for m in hex tet; do
 

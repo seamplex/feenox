@@ -1,7 +1,7 @@
 P actions make_etude
 P debug nodebug
 P memjob 2097152
-P memory_limit 8196.0
+P memory_limit 65536.0
 P mode interactif
 P mpi_nbcpu 1
 P mpi_nbnoeud 1
