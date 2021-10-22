@@ -58,6 +58,8 @@ dist_doc_DATA = AUTHORS ChangeLog TODO COPYING \\
                 doc/laplace-square-gmsh.eps \\
                 doc/laplace-square-paraview.eps \\
                 doc/nafems-le10.eps
+                
+dist_man_MANS = doc/feenox.1
 EOF
 
 else

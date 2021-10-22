@@ -1,5 +1,3 @@
-dist_man_MANS = doc/feenox.1
-
 EXTRA_DIST = examples \
              doc/programming.pdf \
              doc/compilation.pdf \
