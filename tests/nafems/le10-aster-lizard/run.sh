@@ -100,7 +100,7 @@ for c in 1 0.5; do
     fi
     if [ ! -e aster-${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
-      cp le10-${c}_2nd.unv le102_2nd.unv
+      cp le10-${c}_2nd.unv le10_2nd.unv
       ${time} -o aster-${m}-${c}.time as_run le10.export || exit 1
       grep "degrés de liberté:" message  | awk '{printf("%g\t", $7)}' > aster-${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
