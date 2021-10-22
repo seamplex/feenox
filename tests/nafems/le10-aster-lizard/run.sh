@@ -58,10 +58,13 @@ for c in 1 0.5; do
       echo "running FeenoX GAMG m = ${m} c = ${c}"
       ${time} -o feenox-${m}-${c}.time feenox le10.fee ${m}-${c} > feenox-${m}-${c}.sigmay || exit 1
     fi
-    echo -ne "${c}\t" >> feenox-${m}.dat
-    cat feenox-${m}-${c}.sigmay | tr "\n" "\t" >> feenox-${m}.dat
-    cat feenox-${m}-${c}.time   | tr "\n" "\t" >> feenox-${m}.dat
-    echo >> feenox-${m}.dat
+    
+    if [ -e feenox-${m}-${c}.sigmay ]; then
+      echo -ne "${c}\t" >> feenox-${m}.dat
+      cat feenox-${m}-${c}.sigmay | tr "\n" "\t" >> feenox-${m}.dat
+      cat feenox-${m}-${c}.time   | tr "\n" "\t" >> feenox-${m}.dat
+      echo >> feenox-${m}.dat
+    fi  
   fi
 
   # ---- FeenoX (MUMPS) -----------------------------------------
@@ -70,10 +73,13 @@ for c in 1 0.5; do
       echo "running FeenoX MUMPS c = ${c}"
       ${time} -o feenox_mumps-${m}-${c}.time feenox le10.fee ${m}-${c} --mumps > feenox_mumps-${m}-${c}.sigmay || exit 1
     fi
-    echo -ne "${c}\t" >> feenox_mumps-${m}.dat
-    cat feenox_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> feenox_mumps-${m}.dat
-    cat feenox_mumps-${m}-${c}.time   | tr "\n" "\t" >> feenox_mumps-${m}.dat
-    echo >> feenox_mumps-${m}.dat
+
+    if [ -e feenox_mumps-${m}-${c}.sigmay ]; then
+      echo -ne "${c}\t" >> feenox_mumps-${m}.dat
+      cat feenox_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> feenox_mumps-${m}.dat
+      cat feenox_mumps-${m}-${c}.time   | tr "\n" "\t" >> feenox_mumps-${m}.dat
+      echo >> feenox_mumps-${m}.dat
+    fi  
   fi
   
   # ---- Sparselizard ----------------------------------
@@ -85,10 +91,13 @@ for c in 1 0.5; do
       ${time} -o ../sparselizard-${m}-${c}.time ./run_sparselizard.sh ${m}-${c} > ../sparselizard-${m}-${c}.sigmay || exit 1
       cd ..
     fi
-    echo -ne "${c}\t" >> sparselizard-${m}.dat
-    cat sparselizard-${m}-${c}.sigmay | tr "\n" "\t" >> sparselizard-${m}.dat
-    cat sparselizard-${m}-${c}.time   | tr "\n" "\t" >> sparselizard-${m}.dat
-    echo >> sparselizard-${m}.dat
+    
+    if [ -e sparselizard-${m}-${c}.sigmay ]; then
+      echo -ne "${c}\t" >> sparselizard-${m}.dat
+      cat sparselizard-${m}-${c}.sigmay | tr "\n" "\t" >> sparselizard-${m}.dat
+      cat sparselizard-${m}-${c}.time   | tr "\n" "\t" >> sparselizard-${m}.dat
+      echo >> sparselizard-${m}.dat
+    fi  
   fi
   
 
@@ -105,12 +114,13 @@ for c in 1 0.5; do
       grep "degrés de liberté:" message  | awk '{printf("%g\t", $7)}' > aster-${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
     fi
-    echo -ne "${c}\t" >> aster-${m}.dat
-    cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
-    cat aster-${m}-${c}.time   | tr "\n" "\t" >> aster-${m}.dat
-    echo >> aster-${m}.dat
 
-
+    if [ ! -e aster-${m}-${c}.sigmay ]; then
+      echo -ne "${c}\t" >> aster-${m}.dat
+      cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
+      cat aster-${m}-${c}.time   | tr "\n" "\t" >> aster-${m}.dat
+      echo >> aster-${m}.dat
+    fi
   fi
 
   # ---- Reflex ----------------------------------
