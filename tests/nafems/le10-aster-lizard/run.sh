@@ -62,7 +62,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e feenox-${m}-${c}.sigmay ]; then
-      grep terminated feenox-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' feenox-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> feenox-${m}.dat
         cat feenox-${m}-${c}.sigmay | tr "\n" "\t" >> feenox-${m}.dat
@@ -80,7 +80,7 @@ for c in 1 0.5; do
     fi
 
     if [ -e feenox_mumps-${m}-${c}.sigmay ]; then
-      grep terminated feenox_mumps-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' feenox_mumps-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> feenox_mumps-${m}.dat
         cat feenox_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> feenox_mumps-${m}.dat
@@ -101,7 +101,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e sparselizard-${m}-${c}.sigmay ]; then
-      grep terminated sparselizard-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' sparselizard-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> sparselizard-${m}.dat
         cat sparselizard-${m}-${c}.sigmay | tr "\n" "\t" >> sparselizard-${m}.dat
@@ -128,7 +128,7 @@ for c in 1 0.5; do
     fi
 
     if [ -e aster-${m}-${c}.sigmay ]; then
-      grep terminated aster-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' aster-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> aster-${m}.dat
         cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
@@ -138,26 +138,65 @@ for c in 1 0.5; do
     fi
   fi
 
-  # ---- Reflex ----------------------------------
+  # ---- Reflex MUMPS ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
-    if [ ! -e reflex-${m}-${c}.sigmay ]; then
-      echo "running Reflex c = ${c}"
-      ${time} -o reflex-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}"
-      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex-${m}-${c}.sigmay
-      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex-${m}-${c}.sigmay
+    if [ ! -e reflex_mumps-${m}-${c}.sigmay ]; then
+      echo "running Reflex MUMPS c = ${c}"
+      ${time} -o reflex_mumps-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=mumps"
+      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_mumps-${m}-${c}.sigmay
+      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_mumps-${m}-${c}.sigmay
     fi
     
-    if [ -e aster-${m}-${c}.sigmay ]; then
-      grep terminated aster-${m}-${c}.sigmay
+    if [ -e reflex_mumps-${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' reflex_mumps-${m}-${c}.sigmay
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> reflex-${m}.dat
-        cat reflex-${m}-${c}.sigmay | tr "\n" "\t" >> reflex-${m}.dat
-        cat reflex-${m}-${c}.time   | tr "\n" "\t" >> reflex-${m}.dat
-        echo >> reflex-${m}.dat
+        echo -ne "${c}\t" >> reflex_mumps-${m}.dat
+        cat reflex_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_mumps-${m}.dat
+        cat reflex_mumps-${m}-${c}.time   | tr "\n" "\t" >> reflex_mumps-${m}.dat
+        echo >> reflex_mumps-${m}.dat
       fi
     fi
   fi
   
+  # ---- Reflex GAMG ----------------------------------
+  if [ ! -z "${has_reflex}" ]; then
+    if [ ! -e reflex_gamg-${m}-${c}.sigmay ]; then
+      echo "running Reflex GAMG c = ${c}"
+      ${time} -o reflex_gamg-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=gamg"
+      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_gamg-${m}-${c}.sigmay
+      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_gamg-${m}-${c}.sigmay
+    fi
+    
+    if [ -e reflex_gamg-${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' reflex_gamg-${m}-${c}.sigmay
+      if [ $? -ne 0 ]; then
+        echo -ne "${c}\t" >> reflex_gamg-${m}.dat
+        cat reflex_gamg-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_gamg-${m}.dat
+        cat reflex_gamg-${m}-${c}.time   | tr "\n" "\t" >> reflex_gamg-${m}.dat
+        echo >> reflex_gamg-${m}.dat
+      fi
+    fi
+  fi
+  
+  # ---- Reflex HYPRE ----------------------------------
+  if [ ! -z "${has_reflex}" ]; then
+    if [ ! -e reflex_hypre-${m}-${c}.sigmay ]; then
+      echo "running Reflex HYPRE c = ${c}"
+      ${time} -o reflex_hypre-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=hypre"
+      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_hypre-${m}-${c}.sigmay
+      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_hypre-${m}-${c}.sigmay
+    fi
+    
+    if [ -e reflex_hypre-${m}-${c}.sigmay-${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.sigmay-${m}-${c}.sigmay
+      if [ $? -ne 0 ]; then
+        echo -ne "${c}\t" >> reflex_hypre-${m}.dat
+        cat reflex_hypre-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_hypre-${m}.dat
+        cat reflex_hypre-${m}-${c}.time   | tr "\n" "\t" >> reflex_hypre-${m}.dat
+        echo >> reflex_hypre-${m}.dat
+      fi
+    fi
+  fi
   
  done
 done

@@ -23,6 +23,7 @@
     "physics": [
         {
             "physics_type": "Mechanical",
+            "solver_name": "$x$",
             "boundary_conditions": [
                 {
                     "group_names":[ "upper" ],
@@ -90,7 +91,6 @@
             ]
         }
     ],
-    "analysis_type": "StaticAnalysis",
     "points": [
         {
             "point_name": "probe1",
@@ -116,4 +116,22 @@
             }
         ],
     },
+    "analysis_type": "StaticAnalysis",
+    "solver": [
+        {
+            "solver_name": "mumps",
+            "solver_type": "preonly",
+            "preconditioner_type": "cholesky"
+        },
+        {
+            "solver_name": "gamg",
+            "solver_type": "gmres",
+            "preconditioner_type": "gamg"
+        },
+        {
+            "solver_name": "hypre",
+            "solver_type": "cg",
+            "preconditioner_type": "hypre"
+        }
+    ],
 }
