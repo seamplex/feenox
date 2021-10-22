@@ -63,7 +63,7 @@ for c in 1 0.5; do
     
     if [ -e feenox-${m}-${c}.sigmay ]; then
       grep terminated feenox-${m}-${c}.sigmay
-      if [ $? -e 0 ]; then
+      if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> feenox-${m}.dat
         cat feenox-${m}-${c}.sigmay | tr "\n" "\t" >> feenox-${m}.dat
         cat feenox-${m}-${c}.time   | tr "\n" "\t" >> feenox-${m}.dat
@@ -129,7 +129,7 @@ for c in 1 0.5; do
 
     if [ -e aster-${m}-${c}.sigmay ]; then
       grep terminated aster-${m}-${c}.sigmay
-      if [ $? -e 0 ]; then
+      if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> aster-${m}.dat
         cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
         cat aster-${m}-${c}.time   | tr "\n" "\t" >> aster-${m}.dat
