@@ -111,6 +111,11 @@ $ as_run --getversion
 $
 ```
 
+>  La mémoire consommée actuellement hors JEVEUX est de 2115.24 Mo.
+>  La limite de l'allocation dynamique JEVEUX est fixée à 13384.76 Mo.
+>  Cette valeur limite a été réactualisée lors de la mise en oeuvre d'un processus de libération
+
+
 ## Reflex
 
 TO-DO

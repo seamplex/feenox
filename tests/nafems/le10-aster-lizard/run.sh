@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [[ -z "${1}" ]] || [[ -z "${2}" ]] || [[ -z "${3}" ]]; then 
+  echo "usage: $0 { tet | hex } min_clscale n_steps"
+  exit 0  
+fi
+
+m=${1}
+min=${2}
+steps=${3}
+
 # check for needed tools
 for i in grep awk gmsh jq /usr/bin/time; do
  if [ -z "$(which $i)" ]; then
@@ -44,10 +53,7 @@ fi
 
 # TODO: --check
 
-for c in 1 0.5; do
-# for c in 1 0.75 0.5 0.4 0.35 0.3 0.25 0.2 0.18 0.16 0.14 0.12 0.116 0.114 0.112 0.110 0.108 0.106 0.105 0.104 0.103 0.102 0.101 0.1 0.08 0.07 0.06 0.05; do
-
- for m in hex tet; do
+for c in $(feenox steps.fee ${min} ${steps}); do
 
   if [ ! -e le10-${m}-${c}.msh ]; then
     gmsh -3 le10-${m}.geo -clscale ${c} -o le10-${m}-${c}.msh || exit 1
@@ -121,10 +127,10 @@ for c in 1 0.5; do
     
     if [ ! -e aster-${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
-      ln -sf le10_2nd-${m}-${c}.unv le10_2nd.unv
-      ${time} -o aster-${m}-${c}.time as_run le10.export
+      sed s/_m_/${m}-${c}/ le10.export > le10-${m}-${c}.export
+      ${time} -o aster-${m}-${c}.time as_run le10-${m}-${c}.export
       grep "degrés de liberté:" message  | awk '{printf("%g\t", $7)}' > aster-${m}-${c}.sigmay
-      grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
+      grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-${m}-${c}.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
     fi
 
     if [ -e aster-${m}-${c}.sigmay ]; then
@@ -198,5 +204,4 @@ for c in 1 0.5; do
     fi
   fi
   
- done
 done

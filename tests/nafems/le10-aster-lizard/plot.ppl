@@ -9,183 +9,259 @@ set key above
 
 set xlabel "Total degrees of freedom"
 set ylabel "$\\sigma_y(D)$"
-set output "sigmay-linear.pdf"
+set output "sigmay-tet-linear.pdf"
 
 plot -5.38 w l lw 3 lt 1 color Tan ti "Reference",\
-"feenox-hex.dat"       u 2:3         w l lw 2   lt 2  color Black     ti "",\
-"feenox-hex.dat"       u 2:3 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
 "feenox-tet.dat"       u 2:3         w l lw 2   lt 3  color Grey10    ti "",\
 "feenox-tet.dat"       u 2:3 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
-"feenox_mumps-hex.dat" u 2:3         w l lw 2   lt 4  color Grey20    ti "",\
-"feenox_mumps-hex.dat" u 2:3 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
 "feenox_mumps-tet.dat" u 2:3         w l lw 2   lt 5  color Grey40    ti "",\
 "feenox_mumps-tet.dat" u 2:3 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
-"sparselizard-hex.dat" u 2:3         w l lw 1   lt 6  color Cadetblue ti "",\
-"sparselizard-hex.dat" u 2:3 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
 "sparselizard-tet.dat" u 2:3         w l lw 1   lt 7  color Navyblue  ti "",\
 "sparselizard-tet.dat" u 2:3 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
-"aster-hex.dat"        u 2:3         w l lw 1   lt 8  color Green     ti "",\
-"aster-hex.dat"        u 2:3 every 3 w p pt  1        color Green     ti "Code Aster hex",\
 "aster-tet.dat"        u 2:3         w l lw 1   lt 9  color Limegreen ti "",\
 "aster-tet.dat"        u 2:3 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
-"reflex_gamg-hex.dat"  u 2:3         w l lw 1   lt 10 color Mulberry  ti "",\
-"reflex_gamg-hex.dat"  u 2:3 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
 "reflex_gamg-tet.dat"  u 2:3         w l lw 1   lt 11 color Thistle   ti "",\
 "reflex_gamg-tet.dat"  u 2:3 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
-"reflex_hypre-hex.dat" u 2:3         w l lw 1   lt 12 color Magenta   ti "",\
-"reflex_hypre-hex.dat" u 2:3 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
 "reflex_hypre-tet.dat" u 2:3         w l lw 1   lt 13 color Lavender  ti "",\
 "reflex_hypre-tet.dat" u 2:3 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
-"reflex_mumps-hex.dat" u 2:3         w l lw 1   lt 14 color Salmon    ti "",\
-"reflex_mumps-hex.dat" u 2:3 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex",\
 "reflex_mumps-tet.dat" u 2:3         w l lw 1   lt 15 color Plum      ti "",\
 "reflex_mumps-tet.dat" u 2:3 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
 
 set logscale x
 set yrange [-5.38-0.1:-5.38+0.1]
-set output "sigmay-log.pdf"
+set output "sigmay-tet-log.pdf"
+replot
+
+unset logscale x
+set yrange [*:*]
+set output "sigmay-hex-linear.pdf"
+
+plot -5.38 w l lw 3 lt 1 color Tan ti "Reference",\
+"feenox-hex.dat"       u 2:3         w l lw 2   lt 2  color Black     ti "",\
+"feenox-hex.dat"       u 2:3 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
+"feenox_mumps-hex.dat" u 2:3         w l lw 2   lt 4  color Grey20    ti "",\
+"feenox_mumps-hex.dat" u 2:3 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
+"sparselizard-hex.dat" u 2:3         w l lw 1   lt 6  color Cadetblue ti "",\
+"sparselizard-hex.dat" u 2:3 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
+"aster-hex.dat"        u 2:3         w l lw 1   lt 8  color Green     ti "",\
+"aster-hex.dat"        u 2:3 every 3 w p pt  1        color Green     ti "Code Aster hex",\
+"reflex_gamg-hex.dat"  u 2:3         w l lw 1   lt 10 color Mulberry  ti "",\
+"reflex_gamg-hex.dat"  u 2:3 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
+"reflex_hypre-hex.dat" u 2:3         w l lw 1   lt 12 color Magenta   ti "",\
+"reflex_hypre-hex.dat" u 2:3 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
+"reflex_mumps-hex.dat" u 2:3         w l lw 1   lt 14 color Salmon    ti "",\
+"reflex_mumps-hex.dat" u 2:3 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex"
+
+
+set logscale x
+set yrange [-5.38-0.1:-5.38+0.1]
+set output "sigmay-hex-log.pdf"
 
 replot
 
-
-unset logscale y
-unset logscale x
 set xrange [*:*]
 set yrange [*:*]
 
+unset logscale x
+unset logscale y
 set ylabel "Wall time [seconds]"
-set output "wall.pdf"
+set output "wall-tet-linear.pdf"
 
 plot \
-"feenox-hex.dat"       u 2:4         w l lw 2   lt 2  color Black     ti "",\
-"feenox-hex.dat"       u 2:4 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
 "feenox-tet.dat"       u 2:4         w l lw 2   lt 3  color Grey10    ti "",\
 "feenox-tet.dat"       u 2:4 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
-"feenox_mumps-hex.dat" u 2:4         w l lw 2   lt 4  color Grey20    ti "",\
-"feenox_mumps-hex.dat" u 2:4 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
 "feenox_mumps-tet.dat" u 2:4         w l lw 2   lt 5  color Grey40    ti "",\
 "feenox_mumps-tet.dat" u 2:4 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
-"sparselizard-hex.dat" u 2:4         w l lw 1   lt 6  color Cadetblue ti "",\
-"sparselizard-hex.dat" u 2:4 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
 "sparselizard-tet.dat" u 2:4         w l lw 1   lt 7  color Navyblue  ti "",\
 "sparselizard-tet.dat" u 2:4 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
-"aster-hex.dat"        u 2:4         w l lw 1   lt 8  color Green     ti "",\
-"aster-hex.dat"        u 2:4 every 3 w p pt  1        color Green     ti "Code Aster hex",\
 "aster-tet.dat"        u 2:4         w l lw 1   lt 9  color Limegreen ti "",\
 "aster-tet.dat"        u 2:4 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
-"reflex_gamg-hex.dat"  u 2:4         w l lw 1   lt 10 color Mulberry  ti "",\
-"reflex_gamg-hex.dat"  u 2:4 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
 "reflex_gamg-tet.dat"  u 2:4         w l lw 1   lt 11 color Thistle   ti "",\
 "reflex_gamg-tet.dat"  u 2:4 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
-"reflex_hypre-hex.dat" u 2:4         w l lw 1   lt 12 color Magenta   ti "",\
-"reflex_hypre-hex.dat" u 2:4 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
 "reflex_hypre-tet.dat" u 2:4         w l lw 1   lt 13 color Lavender  ti "",\
 "reflex_hypre-tet.dat" u 2:4 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
-"reflex_mumps-hex.dat" u 2:4         w l lw 1   lt 14 color Salmon    ti "",\
-"reflex_mumps-hex.dat" u 2:4 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex",\
 "reflex_mumps-tet.dat" u 2:4         w l lw 1   lt 15 color Plum      ti "",\
 "reflex_mumps-tet.dat" u 2:4 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
 
+set logscale x
+set logscale y
+set output "wall-tet-log.pdf"
 
+unset logscale x
+unset logscale y
+set output "wall-hex-linear.pdf"
+plot \
+"feenox-hex.dat"       u 2:4         w l lw 2   lt 2  color Black     ti "",\
+"feenox-hex.dat"       u 2:4 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
+"feenox_mumps-hex.dat" u 2:4         w l lw 2   lt 4  color Grey20    ti "",\
+"feenox_mumps-hex.dat" u 2:4 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
+"sparselizard-hex.dat" u 2:4         w l lw 1   lt 6  color Cadetblue ti "",\
+"sparselizard-hex.dat" u 2:4 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
+"aster-hex.dat"        u 2:4         w l lw 1   lt 8  color Green     ti "",\
+"aster-hex.dat"        u 2:4 every 3 w p pt  1        color Green     ti "Code Aster hex",\
+"reflex_gamg-hex.dat"  u 2:4         w l lw 1   lt 10 color Mulberry  ti "",\
+"reflex_gamg-hex.dat"  u 2:4 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
+"reflex_hypre-hex.dat" u 2:4         w l lw 1   lt 12 color Magenta   ti "",\
+"reflex_hypre-hex.dat" u 2:4 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
+"reflex_mumps-hex.dat" u 2:4         w l lw 1   lt 14 color Salmon    ti "",\
+"reflex_mumps-hex.dat" u 2:4 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex"
+
+set logscale x
+set logscale y
+set output "wall-hex-log.pdf"
+replot
+
+unset logscale x
+unset logscale y
 set ylabel "Kernel time [seconds]"
-set output "kernel.pdf"
+set output "kernel-tet-linear.pdf"
+
+plot \
+"feenox-tet.dat"       u 2:5         w l lw 2   lt 3  color Grey10    ti "",\
+"feenox-tet.dat"       u 2:5 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
+"feenox_mumps-tet.dat" u 2:5         w l lw 2   lt 5  color Grey40    ti "",\
+"feenox_mumps-tet.dat" u 2:5 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
+"sparselizard-tet.dat" u 2:5         w l lw 1   lt 7  color Navyblue  ti "",\
+"sparselizard-tet.dat" u 2:5 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
+"aster-tet.dat"        u 2:5         w l lw 1   lt 9  color Limegreen ti "",\
+"aster-tet.dat"        u 2:5 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
+"reflex_gamg-tet.dat"  u 2:5         w l lw 1   lt 11 color Thistle   ti "",\
+"reflex_gamg-tet.dat"  u 2:5 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
+"reflex_hypre-tet.dat" u 2:5         w l lw 1   lt 13 color Lavender  ti "",\
+"reflex_hypre-tet.dat" u 2:5 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
+"reflex_mumps-tet.dat" u 2:5         w l lw 1   lt 15 color Plum      ti "",\
+"reflex_mumps-tet.dat" u 2:5 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
+
+set logscale x
+set logscale y
+set output "kernel-tet-log.pdf"
+replot
+
+unset logscale x
+unset logscale y
+set output "kernel-hex-linear.pdf"
 
 plot \
 "feenox-hex.dat"       u 2:5         w l lw 2   lt 2  color Black     ti "",\
 "feenox-hex.dat"       u 2:5 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
-"feenox-tet.dat"       u 2:5         w l lw 2   lt 3  color Grey10    ti "",\
-"feenox-tet.dat"       u 2:5 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
 "feenox_mumps-hex.dat" u 2:5         w l lw 2   lt 4  color Grey20    ti "",\
 "feenox_mumps-hex.dat" u 2:5 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
-"feenox_mumps-tet.dat" u 2:5         w l lw 2   lt 5  color Grey40    ti "",\
-"feenox_mumps-tet.dat" u 2:5 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
 "sparselizard-hex.dat" u 2:5         w l lw 1   lt 6  color Cadetblue ti "",\
 "sparselizard-hex.dat" u 2:5 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
-"sparselizard-tet.dat" u 2:5         w l lw 1   lt 7  color Navyblue  ti "",\
-"sparselizard-tet.dat" u 2:5 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
 "aster-hex.dat"        u 2:5         w l lw 1   lt 8  color Green     ti "",\
 "aster-hex.dat"        u 2:5 every 3 w p pt  1        color Green     ti "Code Aster hex",\
-"aster-tet.dat"        u 2:5         w l lw 1   lt 9  color Limegreen ti "",\
-"aster-tet.dat"        u 2:5 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
 "reflex_gamg-hex.dat"  u 2:5         w l lw 1   lt 10 color Mulberry  ti "",\
 "reflex_gamg-hex.dat"  u 2:5 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
-"reflex_gamg-tet.dat"  u 2:5         w l lw 1   lt 11 color Thistle   ti "",\
-"reflex_gamg-tet.dat"  u 2:5 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
 "reflex_hypre-hex.dat" u 2:5         w l lw 1   lt 12 color Magenta   ti "",\
 "reflex_hypre-hex.dat" u 2:5 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
-"reflex_hypre-tet.dat" u 2:5         w l lw 1   lt 13 color Lavender  ti "",\
-"reflex_hypre-tet.dat" u 2:5 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
 "reflex_mumps-hex.dat" u 2:5         w l lw 1   lt 14 color Salmon    ti "",\
-"reflex_mumps-hex.dat" u 2:5 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex",\
-"reflex_mumps-tet.dat" u 2:5         w l lw 1   lt 15 color Plum      ti "",\
-"reflex_mumps-tet.dat" u 2:5 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
+"reflex_mumps-hex.dat" u 2:5 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex"
 
 
+set logscale x
+set logscale y
+set output "kernel-hex-linear.pdf"
+replot
 
+unset logscale x
+unset logscale y
 set ylabel "User time [seconds]"
-set output "user.pdf"
+set output "user-tet-linear.pdf"
+
+plot \
+"feenox-tet.dat"       u 2:6         w l lw 2   lt 3  color Grey10    ti "",\
+"feenox-tet.dat"       u 2:6 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
+"feenox_mumps-tet.dat" u 2:6         w l lw 2   lt 5  color Grey40    ti "",\
+"feenox_mumps-tet.dat" u 2:6 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
+"sparselizard-tet.dat" u 2:6         w l lw 1   lt 7  color Navyblue  ti "",\
+"sparselizard-tet.dat" u 2:6 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
+"aster-tet.dat"        u 2:6         w l lw 1   lt 9  color Limegreen ti "",\
+"aster-tet.dat"        u 2:6 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
+"reflex_gamg-tet.dat"  u 2:6         w l lw 1   lt 11 color Thistle   ti "",\
+"reflex_gamg-tet.dat"  u 2:6 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
+"reflex_hypre-tet.dat" u 2:6         w l lw 1   lt 13 color Lavender  ti "",\
+"reflex_hypre-tet.dat" u 2:6 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
+"reflex_mumps-tet.dat" u 2:6         w l lw 1   lt 15 color Plum      ti "",\
+"reflex_mumps-tet.dat" u 2:6 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
+
+set logscale x
+set logscale y
+set output "user-tet-log.pdf"
+replot
+
+unset logscale x
+unset logscale y
+set output "user-hex-linear.pdf"
 
 plot \
 "feenox-hex.dat"       u 2:6         w l lw 2   lt 2  color Black     ti "",\
 "feenox-hex.dat"       u 2:6 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
-"feenox-tet.dat"       u 2:6         w l lw 2   lt 3  color Grey10    ti "",\
-"feenox-tet.dat"       u 2:6 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
 "feenox_mumps-hex.dat" u 2:6         w l lw 2   lt 4  color Grey20    ti "",\
 "feenox_mumps-hex.dat" u 2:6 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
-"feenox_mumps-tet.dat" u 2:6         w l lw 2   lt 5  color Grey40    ti "",\
-"feenox_mumps-tet.dat" u 2:6 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
 "sparselizard-hex.dat" u 2:6         w l lw 1   lt 6  color Cadetblue ti "",\
 "sparselizard-hex.dat" u 2:6 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
-"sparselizard-tet.dat" u 2:6         w l lw 1   lt 7  color Navyblue  ti "",\
-"sparselizard-tet.dat" u 2:6 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
 "aster-hex.dat"        u 2:6         w l lw 1   lt 8  color Green     ti "",\
 "aster-hex.dat"        u 2:6 every 3 w p pt  1        color Green     ti "Code Aster hex",\
-"aster-tet.dat"        u 2:6         w l lw 1   lt 9  color Limegreen ti "",\
-"aster-tet.dat"        u 2:6 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
 "reflex_gamg-hex.dat"  u 2:6         w l lw 1   lt 10 color Mulberry  ti "",\
 "reflex_gamg-hex.dat"  u 2:6 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
-"reflex_gamg-tet.dat"  u 2:6         w l lw 1   lt 11 color Thistle   ti "",\
-"reflex_gamg-tet.dat"  u 2:6 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
 "reflex_hypre-hex.dat" u 2:6         w l lw 1   lt 12 color Magenta   ti "",\
 "reflex_hypre-hex.dat" u 2:6 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
-"reflex_hypre-tet.dat" u 2:6         w l lw 1   lt 13 color Lavender  ti "",\
-"reflex_hypre-tet.dat" u 2:6 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
 "reflex_mumps-hex.dat" u 2:6         w l lw 1   lt 14 color Salmon    ti "",\
-"reflex_mumps-hex.dat" u 2:6 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex",\
-"reflex_mumps-tet.dat" u 2:6         w l lw 1   lt 15 color Plum      ti "",\
-"reflex_mumps-tet.dat" u 2:6 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
+"reflex_mumps-hex.dat" u 2:6 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex"
+
+set logscale x
+set logscale y
+set output "user-hex-log.pdf"
+replot
 
 
-set ylabel "Memory [?]"
-set output "memory.pdf"
+unset logscale x
+unset logscale y
+set ylabel "Memory"
+set output "memory-tet-linear.pdf"
+
+plot \
+"feenox-tet.dat"       u 2:7         w l lw 2   lt 3  color Grey10    ti "",\
+"feenox-tet.dat"       u 2:7 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
+"feenox_mumps-tet.dat" u 2:7         w l lw 2   lt 5  color Grey40    ti "",\
+"feenox_mumps-tet.dat" u 2:7 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
+"sparselizard-tet.dat" u 2:7         w l lw 1   lt 7  color Navyblue  ti "",\
+"sparselizard-tet.dat" u 2:7 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
+"aster-tet.dat"        u 2:7         w l lw 1   lt 9  color Limegreen ti "",\
+"aster-tet.dat"        u 2:7 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
+"reflex_gamg-tet.dat"  u 2:7         w l lw 1   lt 11 color Thistle   ti "",\
+"reflex_gamg-tet.dat"  u 2:7 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
+"reflex_hypre-tet.dat" u 2:7         w l lw 1   lt 13 color Lavender  ti "",\
+"reflex_hypre-tet.dat" u 2:7 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
+"reflex_mumps-tet.dat" u 2:7         w l lw 1   lt 15 color Plum      ti "",\
+"reflex_mumps-tet.dat" u 2:7 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
+
+set logscale x
+set logscale y
+set output "memory-tet-log.pdf"
+replot
+
+unset logscale x
+unset logscale y
+set output "memory-hex.pdf"
 
 plot \
 "feenox-hex.dat"       u 2:7         w l lw 2   lt 2  color Black     ti "",\
 "feenox-hex.dat"       u 2:7 every 3 w p pt 16        color Black     ti "FeenoX GAMG hex",\
-"feenox-tet.dat"       u 2:7         w l lw 2   lt 3  color Grey10    ti "",\
-"feenox-tet.dat"       u 2:7 every 4 w p pt 18        color Grey10    ti "FeenoX GAMG tet",\
 "feenox_mumps-hex.dat" u 2:7         w l lw 2   lt 4  color Grey20    ti "",\
 "feenox_mumps-hex.dat" u 2:7 every 5 w p pt 17        color Grey20    ti "FeenoX MUMPS hex",\
-"feenox_mumps-tet.dat" u 2:7         w l lw 2   lt 5  color Grey40    ti "",\
-"feenox_mumps-tet.dat" u 2:7 every 7 w p pt 22        color Grey40    ti "FeenoX MUMPS tet",\
 "sparselizard-hex.dat" u 2:7         w l lw 1   lt 6  color Cadetblue ti "",\
 "sparselizard-hex.dat" u 2:7 every 3 w p pt 12        color Cadetblue ti "Sparselizard hex",\
-"sparselizard-tet.dat" u 2:7         w l lw 1   lt 7  color Navyblue  ti "",\
-"sparselizard-tet.dat" u 2:7 every 2 w p pt 13        color Navyblue  ti "Sparselizard tet",\
 "aster-hex.dat"        u 2:7         w l lw 1   lt 8  color Green     ti "",\
 "aster-hex.dat"        u 2:7 every 3 w p pt  1        color Green     ti "Code Aster hex",\
-"aster-tet.dat"        u 2:7         w l lw 1   lt 9  color Limegreen ti "",\
-"aster-tet.dat"        u 2:7 every 4 w p pt 15        color Limegreen ti "Code Aster tet",\
 "reflex_gamg-hex.dat"  u 2:7         w l lw 1   lt 10 color Mulberry  ti "",\
 "reflex_gamg-hex.dat"  u 2:7 every 2 w p pt 2         color Mulberry  ti "Reflex GAMG hex",\
-"reflex_gamg-tet.dat"  u 2:7         w l lw 1   lt 11 color Thistle   ti "",\
-"reflex_gamg-tet.dat"  u 2:7 every 7 w p pt 4         color Thistle   ti "Reflex GAMG tet",\
 "reflex_hypre-hex.dat" u 2:7         w l lw 1   lt 12 color Magenta   ti "",\
 "reflex_hypre-hex.dat" u 2:7 every 3 w p pt 6         color Magenta   ti "Reflex HYPRE hex",\
-"reflex_hypre-tet.dat" u 2:7         w l lw 1   lt 13 color Lavender  ti "",\
-"reflex_hypre-tet.dat" u 2:7 every 6 w p pt 8         color Lavender  ti "Reflex HYPRE tet",\
 "reflex_mumps-hex.dat" u 2:7         w l lw 1   lt 14 color Salmon    ti "",\
-"reflex_mumps-hex.dat" u 2:7 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex",\
-"reflex_mumps-tet.dat" u 2:7         w l lw 1   lt 15 color Plum      ti "",\
-"reflex_mumps-tet.dat" u 2:7 every 5 w p pt 10        color Plum      ti "Reflex MUMPS tet"
+"reflex_mumps-hex.dat" u 2:7 every 4 w p pt 7         color Salmon    ti "Reflex MUMPS hex"
 
+set logscale x
+set logscale y
+set output "memory-hex-log.pdf"
+replot

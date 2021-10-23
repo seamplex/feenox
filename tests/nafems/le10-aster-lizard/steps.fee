@@ -1,0 +1,7 @@
+static_steps = max(1,$2-2)
+IF step_static=1
+  PRINT 1
+  PRINT $1
+ENDIF
+
+PRINT quasi_random($1,1)
