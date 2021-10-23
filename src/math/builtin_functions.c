@@ -86,6 +86,7 @@ double feenox_builtin_memory(expr_item_t *);
 double feenox_builtin_min(expr_item_t *);
 double feenox_builtin_mod(expr_item_t *);
 double feenox_builtin_not(expr_item_t *);
+double feenox_builtin_quasi_random(expr_item_t *);
 double feenox_builtin_random(expr_item_t *);
 double feenox_builtin_random_gauss(expr_item_t *);
 double feenox_builtin_round(expr_item_t *);
@@ -146,6 +147,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"min",                 2, MINMAX_ARGS, &feenox_builtin_min},
     {"mod",                 2, 2, &feenox_builtin_mod},
     {"not",                 1, 2, &feenox_builtin_not},
+    {"quasi_random",        2, 2, &feenox_builtin_quasi_random},
     {"random",              2, 3, &feenox_builtin_random},
     {"random_gauss",        2, 3, &feenox_builtin_random_gauss},
     {"round",               1, 1, &feenox_builtin_round},
@@ -1039,6 +1041,30 @@ double feenox_builtin_equal(expr_item_t *f) {
 
 }
 
+double feenox_builtin_quasi_random(expr_item_t *f) {
+
+  double y = 0;
+  double r = 0;
+  double x1 = feenox_expression_eval(&f->arg[0]);
+  double x2 = feenox_expression_eval(&f->arg[1]);
+
+  // si es la primera llamada inicializamos el generador
+  if (f->aux == NULL) {
+    f->aux = (double *)gsl_qrng_alloc(gsl_qrng_sobol, 1);
+  }
+
+  // TODO: memory leaks en fiteo, minimizacion, etc
+  gsl_qrng_get((const gsl_qrng *)f->aux, &r);
+  y = x1 + r*(x2-x1);
+
+  if (feenox_special_var_value(done)) {
+    gsl_qrng_free((gsl_qrng *)f->aux);
+    f->aux = NULL;
+  }
+
+  return y;
+}
+
 
 
 ///fn+random+desc Returns a random real number uniformly distributed between the first
@@ -1077,9 +1103,6 @@ double feenox_builtin_random(expr_item_t *f) {
   }
 
   return y;
-
-  // TODO: no camina con seed y fit al mismo tiempo
-
 }
 
 
