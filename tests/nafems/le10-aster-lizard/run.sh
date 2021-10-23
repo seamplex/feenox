@@ -45,7 +45,7 @@ fi
 # TODO: --check
 
 for c in 1 0.5; do
-# for c in 1 0.75 0.5 0.4 0.35 0.3 0.25 0.225 0.2 0.19 0.18 0.17 0.16 0.15 0.14 0.13 0.125 0.12 0.118 0.116 0.114 0.113 0.112 0.111 0.110 0.109 0.108 0.107 0.106 0.105 0.104 0.103 0.102 0.101 0.1; do
+# for c in 1 0.75 0.5 0.4 0.35 0.3 0.25 0.2 0.18 0.16 0.14 0.12 0.116 0.114 0.113 0.112 0.111 0.110 0.109 0.108 0.107 0.106 0.105 0.104 0.103 0.102 0.101 0.1; do
 
  for m in hex tet; do
 
@@ -62,7 +62,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e feenox-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' feenox-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' feenox-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> feenox-${m}.dat
         cat feenox-${m}-${c}.sigmay | tr "\n" "\t" >> feenox-${m}.dat
@@ -80,7 +80,7 @@ for c in 1 0.5; do
     fi
 
     if [ -e feenox_mumps-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' feenox_mumps-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' feenox_mumps-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> feenox_mumps-${m}.dat
         cat feenox_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> feenox_mumps-${m}.dat
@@ -101,7 +101,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e sparselizard-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' sparselizard-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' sparselizard-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> sparselizard-${m}.dat
         cat sparselizard-${m}-${c}.sigmay | tr "\n" "\t" >> sparselizard-${m}.dat
@@ -128,7 +128,7 @@ for c in 1 0.5; do
     fi
 
     if [ -e aster-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' aster-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' aster-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> aster-${m}.dat
         cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
@@ -148,7 +148,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e reflex_mumps-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_mumps-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' reflex_mumps-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> reflex_mumps-${m}.dat
         cat reflex_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_mumps-${m}.dat
@@ -168,7 +168,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e reflex_gamg-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_gamg-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' reflex_gamg-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> reflex_gamg-${m}.dat
         cat reflex_gamg-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_gamg-${m}.dat
@@ -188,7 +188,7 @@ for c in 1 0.5; do
     fi
     
     if [ -e reflex_hypre-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.sigmay
+      grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.*
       if [ $? -ne 0 ]; then
         echo -ne "${c}\t" >> reflex_hypre-${m}.dat
         cat reflex_hypre-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_hypre-${m}.dat
