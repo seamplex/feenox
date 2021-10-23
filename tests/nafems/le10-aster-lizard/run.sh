@@ -25,7 +25,8 @@ export OMP_NUM_THREADS=1
 # --- FeenoX ----------------------
 if [ ! -z "$(which feenox)" ]; then
   has_feenox="yes"
-  rm -f feenox*.dat
+  rm -f feenox-${m}*.dat
+  rm -f feenox_mumps-${m}*.dat
   $(feenox -V | grep mumps > /dev/null)
   if [ $? -eq 0 ]; then
     has_feenox_mumps="yes"
@@ -36,19 +37,21 @@ fi
 # --- Sparselizard ----------------------gi
 if [ -e "sparselizard/sparselizard" ]; then
   has_sparselizard="yes"
-  rm -f sparselizard*.dat
+  rm -f sparselizard-${m}*.dat
 fi
 
 # --- Code Aster ----------------------
 if [ ! -z "$(which as_run)" ]; then
   has_aster="yes"
-  rm -f aster*.dat
+  rm -f aster-${m}*.dat
 fi
 
 # --- Reflex ----------------------
 if [ ! -z "$(which reflexCLI)" ]; then
   has_reflex="yes"
-  rm -f reflex*.dat
+  rm -f reflex_gamg-${m}*.dat
+  rm -f reflex_mumps-${m}*.dat
+  rm -f reflex_hypre-${m}*.dat
 fi
 
 # TODO: --check
