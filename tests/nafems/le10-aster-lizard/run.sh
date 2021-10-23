@@ -132,7 +132,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
       echo "running Aster c = ${c}"
       sed s/_m_/${m}-${c}/ le10.export > le10-${m}-${c}.export
       ${time} -o aster-${m}-${c}.time as_run le10-${m}-${c}.export
-      grep "degrés de liberté:" message  | awk '{printf("%g\t", $7)}' > aster-${m}-${c}.sigmay
+      grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster-${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-${m}-${c}.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
     fi
 

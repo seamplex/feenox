@@ -8,5 +8,6 @@
 *.pdf
 sparselizard
 output
-base-stage1/
-message
+base-stage1*
+le10-*.export
+message*
