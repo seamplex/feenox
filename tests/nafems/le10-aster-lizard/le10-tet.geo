@@ -54,7 +54,7 @@ Mesh.OptimizeNetgen = 1;    // Optimize the mesh
 Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimization
 
 Mesh.MeshSizeMax = 1200;     // main element size 
-Mesh.MeshSizeMin = 600;     // refined element size
+Mesh.MeshSizeMin = 800;     // refined element size
 
 // local refinement around the point D (entity 8)
 Field[1] = Distance;
@@ -64,5 +64,5 @@ Field[2].IField = 1;
 Field[2].LcMin = Mesh.MeshSizeMin;
 Field[2].LcMax = Mesh.MeshSizeMax;
 Field[2].DistMin = 100;
-Field[2].DistMax = 600;
+Field[2].DistMax = 300;
 Background Field = {2};
