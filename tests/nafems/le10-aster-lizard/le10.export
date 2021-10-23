@@ -13,7 +13,7 @@ A memjeveux 128.0
 A tpmax 9000.0
 
 F comm le10.comm         D  1
-F libr le10-_m__2nd.unv  D  20
+F libr le10_2nd-_m_.unv  D  20
 F libr le10-_m_.rmed     R  80
 F mess message-_m_       R  6
 F resu DD-_m_.txt        R  17
