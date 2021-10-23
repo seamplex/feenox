@@ -12,7 +12,7 @@ P version stable
 A memjeveux 128.0
 A tpmax 9000.0
 
-F comm le10-_m_.comm     D  1
+F comm le10.comm         D  1
 F libr le10-_2nd_m_.unv  D  20
 F libr le10-_m_.rmed     R  80
 F mess message-_m_       R  6
