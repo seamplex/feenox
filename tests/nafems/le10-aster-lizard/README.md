@@ -1,7 +1,61 @@
+# Solving the NAFEMS LE10 with different codes
 
-# Gmsh
+This directory contains a script `run.sh` that parametrically solves the [NAFEMS LE 10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) with a number of different FEA codes over a wide range of mesh refinements. The expected result, namely $\sigma_y$ at point $D$ and the wall time, CPU time and memory are recorded for each run so as to create plots of these results vs. the total number of degrees of freedom being solved from.
 
-Make sure Gmsh is up to date:
+There are two types of meshes, one locally-refined (around point $D$) unstructured curved tetrahedral grid and one straight incomplete (i.e. hex20) fully-structured hexahedral mesh. Gmsh is used to create the geometry and the mesh. It uses the `-clscale` command-line parameter to control the elements' size. This parameter $c$ is swept over a range of $[1:c_\text{min}]$ using a Sobol Quasi-random number sequence using the FeenoX input `steps.fee`. For example, five steps for $c_\text{min} = 0.1$ gives
+
+```terminal
+$ feenox steps.fee 0.1 5 
+1
+0.1
+0.55
+0.775
+0.325
+```
+
+That is to say, the first and second steps are the coarsest and finest meshes respectively. The third one is the middle-range mesh, and the following steps start to "fill" in the blanks. Since the `run.sh` script caches the results it gets, further steps can be performed by reusing the existing data. So if we now want to run ten steps,
+
+```terminal
+$ feenox steps.fee 0.1 10
+1
+0.1
+0.55
+0.775
+0.325
+0.4375
+0.8875
+0.6625
+0.2125
+0.26875
+```
+
+and the first five steps will use cached data instead of re-running all the codes.
+The execution of `run.sh` will give files `*.dat` that will be unsorted on the number of degrees of freedom so they are not suitable for plotting with lines. The script `plot.sh` will sort and plot them appropriately. These files have as columns
+
+ 1. the parameter $c \in [1:c_\text{min}]
+ 2. the total number of degrees of freedom
+ 3. the stress $\sigma_y$ evaluated at point $D$
+ 4. the wall time in seconds
+ 5. the user-mode CPU time in seconds
+ 6. the kernel-mode CPU time in seconds
+ 7. the maximum memory used by the program, in kB
+
+
+
+
+ * The objective of this test is to compare consumption of resources for cloud-based computations. It is therefore suggested to run it on a cloud server and not on a local laptop.
+ * In order to have the most fair comparison possible, event though the codes can measure CPU and memory consumption, all of them are run through the `time` tool (the actual binary tool, not the shell's internal).
+ * This is a serial test so the variable `OMP_NUM_THREADS` is set to one to avoid OpenMP computations.
+ * The hex mesh is created as a first-order mesh and then either converted to a (straight) second-order incomplete (i.e. hex20) mesh or the first-order mesh is fed to the code and it is asked to use second-order elements. Sparselizard needs complete elements so it uses hex27, resulting in a higher degree-of-freedom count.
+ * When the mesh is big, chances are that the code run out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster has a mode in which it can run with less memory than the actual requested, at the expense of larger CPU times (apparently by using a tailor-made disk-swapping procedure). This would explain the discontinuities in the Code Aster's curves.
+
+ 
+
+# Running the tests
+
+## Gmsh
+
+Make sure [Gmsh](http://gmsh.info/) is up to date:
 
 ```terminal
 wget http://gmsh.info/bin/Linux/gmsh-nox-git-Linux64-sdk.tgz
@@ -29,11 +83,20 @@ Issue tracker : https://gitlab.onelab.info/gmsh/gmsh/issues
 $
 ```
 
-# FEA codes
+## FEA codes
 
-## FeenoX
+### FeenoX
 
-Compiled from the Github repository using stack PETSc/SLEPc from Apt (which might be "old"):
+
+An statically-compiled binary can be used for the test. Download, un-compress and copy the binary to a system-wide location:
+
+```
+wget https://seamplex.com/feenox/dist/linux/feenox-v0.1.152-g8329396-linux-amd64.tar.gz
+tar xvzf feenox-v0.1.152-g8329396-linux-amd64.tar.gz
+sudo cp feenox-v0.1.152-g8329396-linux-amd64/bin/feenox /usr/local/bin
+```
+
+Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc/SLEPc from Apt (which might be "old"):
 
 ```terminal
 sudo apt-get install gcc make git automake autoconf libgsl-dev petsc-dev slepc-dev
@@ -46,31 +109,33 @@ make check
 sudo make install
 ```
 
-Check it works globally:
+Either way, check it works globally:
 
 ```terminal
 $ feenox -V
-FeenoX v0.1.113-g83fd5ec-dirty 
+FeenoX v0.1.152-g8329396-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Tue Oct 19 08:29:06 2021 -0300
-Build date         : Tue Oct 19 11:36:12 2021 +0000
+Last commit date   : Sat Oct 23 19:06:18 2021 -0300
+Build date         : Sun Oct 24 20:00:34 2021 -0300
 Build architecture : linux-gnu x86_64
-Compiler           : gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
-Compiler flags     : -O3
-Builder            : ubuntu@ip-172-31-44-208
-GSL version        : 2.5
-SUNDIALS version   : 3.1.2
-PETSc version      : Petsc Release Version 3.12.4, Feb, 04, 2020 
-PETSc arch         : 
-PETSc options      : --build=x86_64-linux-gnu --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --with-silent-rules=0 --libdir=${prefix}/lib/x86_64-linux-gnu --runstatedir=/run --with-maintainer-mode=0 --with-dependency-tracking=0 --with-debugging=0 --shared-library-extension=_real --with-shared-libraries --with-pic=1 --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-cxx-dialect=C++11 --with-opencl=1 --with-blas-lib=-lblas --with-lapack-lib=-llapack --with-scalapack=1 --with-scalapack-lib=-lscalapack-openmpi --with-mumps=1 --with-mumps-include="[]" --with-mumps-lib="-ldmumps -lzmumps -lsmumps -lcmumps -lmumps_common -lpord" --with-suitesparse=1 --with-suitesparse-include=/usr/include/suitesparse --with-suitesparse-lib="-lumfpack -lamd -lcholmod -lklu" --with-ptscotch=1 --with-ptscotch-include=/usr/include/scotch --with-ptscotch-lib="-lptesmumps -lptscotch -lptscotcherr" --with-fftw=1 --with-fftw-include="[]" --with-fftw-lib="-lfftw3 -lfftw3_mpi" --with-superlu=1 --with-superlu-include=/usr/include/superlu --with-superlu-lib=-lsuperlu --with-superlu_dist=1 --with-superlu_dist-include=/usr/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-hdf5-include=/usr/include/hdf5/openmpi --with-hdf5-lib="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi -L/usr/lib/openmpi/lib -lhdf5 -lmpi" --CXX_LINKER_FLAGS=-Wl,--no-as-needed --with-hypre=1 --with-hypre-include=/usr/include/hypre --with-hypre-lib=-lHYPRE_core --prefix=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real --PETSC_ARCH=x86_64-linux-gnu-real CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC" CXXFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC" FCFLAGS="-g -O2 -fstack-protector-strong -fPIC -ffree-line-length-0" FFLAGS="-g -O2 -fstack-protector-strong -fPIC -ffree-line-length-0" CPPFLAGS="-Wdate-time -D_FORTIFY_SOURCE=2" LDFLAGS="-Wl,-Bsymbolic-functions -Wl,-z,relro -fPIC" MAKEFLAGS=w
-SLEPc version      : SLEPc Release Version 3.12.2, Jan 13, 2020
+Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler flags     : -Ofast -DLD_STATIC
+Builder            : gtheler@tom
+GSL version        : 2.7
+SUNDIALS version   : 5.7.0
+PETSc version      : Petsc Release Version 3.16.0, Sep 29, 2021 
+PETSc arch         : linux-serial-static
+PETSc options      : PETSC_DIR=/home/gtheler/codigos/feenox/dist/petsc-3.16.0 PETSC_ARCH=linux-serial-static --with-mpi=0 --with-fc=0 --with-cxx=0 --with-fortran-bindings=0 --with-fc=0 --with-c2html=0 --with-x=0 --with-debugging=0 --with-shared-libraries=0 --download-f2cblaslapack --COPTFLAGS=-Ofast
+SLEPc version      : SLEPc Release Version 3.16.0, Sep 30, 2021
 $
 ```
 
+
+
 ## Sparselizard
 
-Compiled from the Github repository using PETSc/SLEPC from the `./install_petsc.sh` script (which pulls latest main from Gitlab). Also the Gmsh API is needed to read `.msh` v4.
+Compile it from the [Github repository](https://github.com/halbux/sparselizard/) using PETSc/SLEPC from the `./install_petsc.sh` script (which pulls latest main from Gitlab). Also the Gmsh API is needed to read `.msh` v4.
 
 The `main.cpp` is the file `le10.cpp` provided in the `le10-aster-lizard` directory.
 The tree `sparselizard` should live in `le10-aster-lizard`:
@@ -91,7 +156,8 @@ cd ..
 
 ## Code Aster
 
-Code Aster is very tricky to compile (and use!). This works in Ubuntu 20.04:
+Code Aster is very tricky to compile (and use!). Thanks Cyprien Rusu for all the help and explanations.
+This works in Ubuntu 20.04:
 
 ```terminal
 wget https://www.code-aster.org/FICHIERS/aster-full-src-14.6.0-1.noarch.tar.gz
@@ -111,10 +177,9 @@ $ as_run --getversion
 $
 ```
 
->  La mémoire consommée actuellement hors JEVEUX est de 2115.24 Mo.
->  La limite de l'allocation dynamique JEVEUX est fixée à 13384.76 Mo.
->  Cette valeur limite a été réactualisée lors de la mise en oeuvre d'un processus de libération
+## CalculiX
 
+TO-DO. Thanks Sergio Pluchinsky.
 
 ## Reflex
 

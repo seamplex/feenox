@@ -5,6 +5,7 @@
 *.sigmay
 *.time
 *.dat
+*.dats
 *.pdf
 sparselizard
 output
