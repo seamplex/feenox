@@ -1,7 +1,9 @@
 *.msh
 *.unv
 *.vtk
-*.nodes
+*.frd
+*.cvg
+*.sta
 *.sigmay
 *.time
 *.dat
@@ -11,5 +13,9 @@ sparselizard
 output
 base-stage1*
 le10-*.export
+le10-*.inp
+le10_2nd-*.inp
 message*
 DD*.txt
+*.12d
+spooles.out

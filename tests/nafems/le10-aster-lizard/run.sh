@@ -1,8 +1,10 @@
 #!/bin/bash
 
 if [[ -z "${1}" ]] || [[ -z "${2}" ]] || [[ -z "${3}" ]]; then 
-  echo "usage: $0 { tet | hex } min_clscale n_steps"
-  exit 0  
+  if [ "x${1}" != "x--check" ]; then
+    echo "usage: $0 { tet | hex } min_clscale n_steps"
+    exit 0  
+  fi  
 fi
 
 m=${1}
@@ -10,7 +12,7 @@ min=${2}
 steps=${3}
 
 # check for needed tools
-for i in grep awk gmsh jq /usr/bin/time; do
+for i in grep awk gawk gmsh jq /usr/bin/time; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -46,6 +48,13 @@ if [ ! -z "$(which as_run)" ]; then
   rm -f aster-${m}*.dat
 fi
 
+# --- CalculiX ----------------------
+if [ ! -z "$(which ccx)" ]; then
+  has_calculix="yes"
+  rm -f calculix-${m}*.dat
+fi
+
+
 # --- Reflex ----------------------
 if [ ! -z "$(which reflexCLI)" ]; then
   has_reflex="yes"
@@ -54,7 +63,21 @@ if [ ! -z "$(which reflexCLI)" ]; then
   rm -f reflex_hypre-${m}*.dat
 fi
 
+has_feenox=""
+has_feenox_mumps=""
+has_sparselizard=""
+has_reflex=""
+
 # TODO: --check
+if [ "x${1}" == "x--check" ]; then
+  echo "FeenoX GAMG:  ${has_feenox}"
+  echo "FeenoX MUMPS: ${has_feenox_mumps}"
+  echo "Sparselizard: ${has_sparselizard}"
+  echo "Code Aster:   ${has_aster}"
+  echo "CalculiX:     ${has_calculix}"
+  exit 0
+fi
+
 
 for c in $(feenox steps.fee ${min} ${steps}); do
 
@@ -146,6 +169,36 @@ for c in $(feenox steps.fee ${min} ${steps}); do
       fi  
     fi
   fi
+  
+  
+# --- CalculiX ----------------------
+  if [ ! -z "${has_calculix}" ]; then
+    if [ ! -e le10_2nd-gon-${m}-${c}.unv ]; then
+      gmsh-dev -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
+#       gmsh -3 le10-${m}.geo -clscale ${c} -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
+      ./unical1 le10_2nd-gon-${m}-${c}.unv le10_2nd-${m}-${c}.inp
+    fi
+    
+    if [ ! -e calculix-${m}-${c}.sigmay ]; then
+      echo "running CalculiX c = ${c}"
+      sed s/xxx/${m}-${c}/ le10.inp > le10-${m}-${c}.inp
+      ${time} -o calculix-${m}-${c}.time ccx -i le10-${m}-${c} | tee calculix-${m}-${c}.txt
+      grep -C 1 "number of equations" calculix-${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix-${m}-${c}.sigmay
+      gawk -f calculix-stress-at-node.awk le10-${m}-${c}.frd >> calculix-${m}-${c}.sigmay
+    fi 
+    
+    if [ -e calculix-${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' calculix-${m}-${c}.*
+      if [ $? -ne 0 ]; then
+        echo -ne "${c}\t" >> calculix-${m}.dat
+        cat calculix-${m}-${c}.sigmay | tr "\n" "\t" >> calculix-${m}.dat
+        cat calculix-${m}-${c}.time   | tr "\n" "\t" >> calculix-${m}.dat
+        echo >> calculix-${m}.dat
+      fi  
+    fi
+    
+  fi
+  
 
   # ---- Reflex MUMPS ----------------------------------
   if [ ! -z "${has_reflex}" ]; then

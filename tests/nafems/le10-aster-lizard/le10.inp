@@ -1,0 +1,22 @@
+*include, input = le10_2nd-xxx.inp 
+*Material, Name=STEEL
+*Elastic
+200e3, 0.3
+*Solid section, Elset=C3D10, Material=STEEL
+*Step
+*Static
+*Boundary, Fixed
+ABAB, 1, 1
+DCDC, 2, 2
+BCBC, 1, 2
+MIDPLANE, 3, 3
+*Dload
+UPPERF1, P1, 1
+UPPERF2, P2, 1
+UPPERF3, P3, 1
+UPPERF4, P4, 1
+*Node file
+RF, U
+*El file
+S, E
+*End step
