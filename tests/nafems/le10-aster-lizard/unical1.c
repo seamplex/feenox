@@ -633,7 +633,7 @@ for(;;)                                                     {
 sret=fgets(line, maxline, fid);
 exitif(sret==0, "countunv: unexpected end-of-line while reading set 2477 from ", 
 inname);
-ret=sscanf(line, "%d %d %d %d %d %d %d %d %d", &groupnumber,&dummy,
+ret=sscanf(line, "%d %d %d %d %d %d %d %d", &groupnumber,&dummy,
 &dummy,&dummy,&dummy, &dummy,&dummy,&nument);
 exitif(ret==0, "countunv: unexpected error 1 while reading set 2477 from ", 
 inname);
@@ -658,7 +658,7 @@ for(;;)                                                     {
 sret=fgets(line, maxline, fid);
 //printf("prool header of group=%s\n", line);
 exitif(sret==0, "countunv: unexpected end-of-line while reading set 2477 from ", inname);
-ret=sscanf(line, "%d %d %d %d %d %d %d %d %d", &groupnumber,&dummy, &dummy,&dummy,&dummy, &dummy,&dummy,&nument);
+ret=sscanf(line, "%d %d %d %d %d %d %d %d", &groupnumber,&dummy, &dummy,&dummy,&dummy, &dummy,&dummy,&nument);
 exitif(ret==0, "countunv: unexpected error 1 while reading set 2477 from ", inname);
 printf("prool debug countunv: groupnumber=%d, nument=%d\n", groupnumber, nument);
 if(groupnumber==-1) break;
