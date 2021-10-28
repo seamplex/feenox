@@ -11,6 +11,10 @@ The problem was chosen because
  * the reference solution is a single scalar which is easy to compare among different approaches
 
 
+Even though there are some particular comments for each of the code used in this comparison, this directory is not about the differences (and eventually pros and cons) each code has for defining and solving a FEA problem. It is about comparing the consumption of computational resources needed to solve the same problem (or almost). The differences about how to set up the problem and considerations about usage, cloud friendliness and scriptability are addressed in a separate directory regarding benchmark NAFEMS LE11.
+
+
+## Reference solution
 
 
 

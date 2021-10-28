@@ -40,7 +40,7 @@ Physical Surface("ABAB", 4) = {5};
 Physical Surface("BCBC", 5) = {1, 2};
 Physical Curve("midplane", 6) = {13};
 Physical Curve("DD", 7) = {20};
-Physical Point("D", 8) = {8};
+// Physical Point("D", 8) = {8};   // code aster complains about this group
 
 // meshing settings, read Gmsh' manual for further reference
 Mesh.ElementOrder = 2;      // use second-order
