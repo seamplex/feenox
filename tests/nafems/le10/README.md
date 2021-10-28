@@ -16,6 +16,9 @@ Even though there are some particular comments for each of the code used in this
 
 ## Reference solution
 
+The original problem formulation (which can be found in [one of FeenoX' annotated examples](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark)) states that the reference solution is -5.38\ MPa. This can be confirmed with FeenoX using the input `le10-ref.fee`.
+
+
 
 
 ## Scripted parametric execution

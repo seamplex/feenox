@@ -1,0 +1,17 @@
+# NAFEMS Benchmark LE-10: thick plate pressure
+# REFERENCE SOLUTION sigma_y = -5.38 MPa
+PROBLEM mechanical DIMENSIONS 3
+READ_MESH le10-ref.msh
+
+BC upper    p=1      # 1 Mpa
+BC DCDC     v=0      # Face DCD'C' zero y-displacement
+BC ABAB     u=0      # Face ABA'B' zero x-displacement
+BC BCBC     u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+E = 210e3   # Young modulus in MPa (because mesh is in mm)
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # TODO: implicit
+
+PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"

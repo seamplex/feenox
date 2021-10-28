@@ -1,4 +1,4 @@
-// NAFEMS LE10 benchmark structured uniform hexahedral mesh
+// NAFEMS LE10 benchmark unstructured locally-refined tetrahedral mesh
 // copyright (c) 2021 jeremy theler <jeremy@seamplex.com>
 
 // create the NAFEMS LE10 benchmark geometry CAD
@@ -37,18 +37,16 @@ Physical Surface("DCDC", 3) = {2,7};
 Physical Surface("ABAB", 4) = {4,9};
 Physical Surface("BCBC", 5) = {5,10};
 Physical Curve("midplane", 6) = {12};
-Physical Curve("DD", 7) = {6,14};
-// Physical Point("D", 8) = {8};
 
 // meshing settings, read Gmsh' manual for further reference
-Mesh.ElementOrder = 1;
+Mesh.ElementOrder = 2;
 Mesh.RecombineAll = 1;
-Mesh.SecondOrderLinear = 1;
+Mesh.SecondOrderLinear = 0;
 Mesh.SecondOrderIncomplete = 1;
 
-Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.02;
-Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor +1 Using Progression 1.02;
-Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 1/Mesh.MeshSizeFactor +1;
+Transfinite Curve {4, 9, 17, 2, 12, 20} = 60 + 1;
+Transfinite Curve {1, 11, 19, -3, -7, -15} = 40 + 1;
+Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 10 + 1;
 
 Transfinite Surface {1} = {4, 1, 2, 3};
 Transfinite Surface {2} = {4, 3, 5, 6};
