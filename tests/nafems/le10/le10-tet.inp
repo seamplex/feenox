@@ -1,4 +1,4 @@
-*include, input = le10_2nd-xxx.inp 
+*include, input = le10_2nd-tet-xxx.inp 
 *Material, Name=STEEL
 *Elastic
 200e3, 0.3

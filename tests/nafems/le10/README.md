@@ -2,6 +2,20 @@
 
 This directory contains a script `run.sh` that parametrically solves the [NAFEMS LE 10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) with a number of different FEA codes over a wide range of mesh refinements. The expected result, namely $\sigma_y$ at point $D$ and the wall time, CPU time and memory are recorded for each run so as to create plots of these results vs. the total number of degrees of freedom being solved from.
 
+This way of executing FEA programs follows the FeenoX design basis of being both cloud and script friendly. The reasons for requiring these friendlinesses are explained in FeenoX documentation, particularly in the SRS and SDS. It might happen that some of the codes tests seem to need to setup and/or read the results in a unnecessarily complex and/or cumbersome way because they were not designed to be either cloud and/or script friendly. It might also happen that the cumbersomeness comes from my lack of expertise about how to properly use the code.
+
+The problem was chosen because 
+
+ * it is a well-established benchmark since its publication in 1990
+ * it is simple yet has displacement boundary condition on an edge in addition to faces that makes it challenging
+ * the reference solution is a single scalar which is easy to compare among different approaches
+
+
+
+
+
+## Scripted parametric execution
+
 There are two types of meshes, one locally-refined (around point $D$) unstructured curved tetrahedral grid and one straight incomplete (i.e. hex20) fully-structured hexahedral mesh. Gmsh is used to create the geometry and the mesh. It uses the `-clscale` command-line parameter to control the elements' size. This parameter $c$ is swept over a range of $[1:c_\text{min}]$ using a Sobol Quasi-random number sequence using the FeenoX input `steps.fee`. For example, five steps for $c_\text{min} = 0.1$ gives
 
 ```terminal
@@ -41,21 +55,41 @@ The execution of `run.sh` will give files `*.dat` that will be unsorted on the n
  7. the maximum memory used by the program, in kB
 
 
-
+## Caveats and comments
 
  * The objective of this test is to compare consumption of resources for cloud-based computations. It is therefore suggested to run it on a cloud server and not on a local laptop.
  * In order to have the most fair comparison possible, event though the codes can measure CPU and memory consumption, all of them are run through the `time` tool (the actual binary tool, not the shell's internal).
- * This is a serial test so the variable `OMP_NUM_THREADS` is set to one to avoid OpenMP computations.
+ * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid OpenMP computations.
  * The hex mesh is created as a first-order mesh and then either converted to a (straight) second-order incomplete (i.e. hex20) mesh or the first-order mesh is fed to the code and it is asked to use second-order elements. Sparselizard needs complete elements so it uses hex27, resulting in a higher degree-of-freedom count.
  * When the mesh is big, chances are that the code run out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster has a mode in which it can run with less memory than the actual requested, at the expense of larger CPU times (apparently by using a tailor-made disk-swapping procedure). This would explain the discontinuities in the Code Aster's curves.
 
+
+ 
  
 
 # Running the tests
 
+The driving script is called `run.sh`. There are some mandatory dependencies and some optional ones.
+
+
 ## Gmsh
 
-Make sure [Gmsh](http://gmsh.info/) is up to date:
+The meshes are created with [Gmsh](http://gmsh.info/).
+It is better to use latest versions instead of the one distributed in the operating system's package repositories.
+Either the official binaries or a compiled-from-scratch version will do.
+
+To compile from source:
+
+```terminal
+sudo apt-get install libocct-data-exchange-dev libocct-foundation-dev libocct-modeling-data-dev
+git clone https://gitlab.onelab.info/gmsh/gmsh.git
+cd gmsh
+mkdir build && cd build
+make
+sudo make install
+```
+
+To download the no-X binary version:
 
 ```terminal
 wget http://gmsh.info/bin/Linux/gmsh-nox-git-Linux64-sdk.tgz
@@ -83,9 +117,8 @@ Issue tracker : https://gitlab.onelab.info/gmsh/gmsh/issues
 $
 ```
 
-## FEA codes
 
-### FeenoX
+## FeenoX
 
 
 An statically-compiled binary can be used for the test. Download, un-compress and copy the binary to a system-wide location:
@@ -96,7 +129,7 @@ tar xvzf feenox-v0.1.152-g8329396-linux-amd64.tar.gz
 sudo cp feenox-v0.1.152-g8329396-linux-amd64/bin/feenox /usr/local/bin
 ```
 
-Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc/SLEPc from Apt (which might be "old"):
+Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc from `apt` (which might be considered "old"):
 
 ```terminal
 sudo apt-get install gcc make git automake autoconf libgsl-dev petsc-dev slepc-dev
@@ -108,6 +141,8 @@ make
 make check
 sudo make install
 ```
+
+Custom PETSc versions are architectures are supported as well. The default preconditioner+solver pair GAMG+cg is supported with all PETSc configurations. To make the MUMPS direct solver available, PETSc has to be configured and linked properly (i.e. configure with `--download-mumps` or use the PETSc packages from the operating system's repositories).
 
 Either way, check it works globally:
 
@@ -131,11 +166,11 @@ SLEPc version      : SLEPc Release Version 3.16.0, Sep 30, 2021
 $
 ```
 
-
+The `PETSc options` line will tell if MUMPS is available or not.
 
 ## Sparselizard
 
-Compile it from the [Github repository](https://github.com/halbux/sparselizard/) using PETSc/SLEPC from the `./install_petsc.sh` script (which pulls latest main from Gitlab). Also the Gmsh API is needed to read `.msh` v4.
+Compile it from the [Github repository](https://github.com/halbux/sparselizard/) using PETSc/SLEPC from the `./install_petsc.sh` script (which pulls latest main from the Gitlab repository). Also the Gmsh API is needed to read `.msh` v4, so run `optional_install_gmsh_api.sh` as well.
 
 The `main.cpp` is the file `le10.cpp` provided in the `le10-aster-lizard` directory.
 The tree `sparselizard` should live in `le10-aster-lizard`:
@@ -153,6 +188,8 @@ cd ..
 make
 cd ..
 ```
+
+If there is no binary named `sparselizard` in a directory named `sparselizard`, the `run.sh` script will not try to solve the case with Sparselizard.
 
 ## Code Aster
 

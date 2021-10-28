@@ -174,17 +174,19 @@ for c in $(feenox steps.fee ${min} ${steps}); do
 # --- CalculiX ----------------------
   if [ ! -z "${has_calculix}" ]; then
     if [ ! -e le10_2nd-gon-${m}-${c}.unv ]; then
-      gmsh-dev -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
+      gmsh -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
 #       gmsh -3 le10-${m}.geo -clscale ${c} -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
       ./unical1 le10_2nd-gon-${m}-${c}.unv le10_2nd-${m}-${c}.inp
     fi
     
-    if [ ! -e calculix-${m}-${c}.sigmay ]; then
-      echo "running CalculiX c = ${c}"
-      sed s/xxx/${m}-${c}/ le10.inp > le10-${m}-${c}.inp
-      ${time} -o calculix-${m}-${c}.time ccx -i le10-${m}-${c} | tee calculix-${m}-${c}.txt
-      grep -C 1 "number of equations" calculix-${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix-${m}-${c}.sigmay
-      gawk -f calculix-stress-at-node.awk le10-${m}-${c}.frd >> calculix-${m}-${c}.sigmay
+    if [ -e le10-${m}.inp ]; then
+      if [ ! -e calculix-${m}-${c}.sigmay ]; then
+        echo "running CalculiX c = ${c}"
+        sed s/xxx/${c}/ le10-${m}.inp > le10-${m}-${c}.inp
+        ${time} -o calculix-${m}-${c}.time ccx -i le10-${m}-${c} | tee calculix-${m}-${c}.txt
+        grep -C 1 "number of equations" calculix-${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix-${m}-${c}.sigmay
+        gawk -f calculix-stress-at-node.awk le10-${m}-${c}.frd >> calculix-${m}-${c}.sigmay
+      fi  
     fi 
     
     if [ -e calculix-${m}-${c}.sigmay ]; then
