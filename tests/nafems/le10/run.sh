@@ -51,6 +51,7 @@ fi
 # --- CalculiX ----------------------
 if [ ! -z "$(which ccx)" ]; then
   has_calculix="yes"
+  gcc unical1.c -o unical1
   rm -f calculix-${m}*.dat
 fi
 
@@ -173,10 +174,9 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   
 # --- CalculiX ----------------------
   if [ ! -z "${has_calculix}" ]; then
-    if [ ! -e le10_2nd-gon-${m}-${c}.unv ]; then
-      gmsh -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
-#       gmsh -3 le10-${m}.geo -clscale ${c} -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_2nd-gon-${m}-${c}.unv || exit 1
-      ./unical1 le10_2nd-gon-${m}-${c}.unv le10_2nd-${m}-${c}.inp
+    if [ ! -e le10_2nd-${m}-${c}.inp ]; then
+      gmsh -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_calculix-${m}-${c}.unv || exit 1
+      ./unical1 le10_calculix-${m}-${c}.unv le10_2nd-${m}-${c}.inp
     fi
     
     if [ -e le10-${m}.inp ]; then

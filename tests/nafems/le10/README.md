@@ -69,7 +69,20 @@ The execution of `run.sh` will give files `*.dat` that will be unsorted on the n
 
 # Running the tests
 
-The driving script is called `run.sh`. There are some mandatory dependencies and some optional ones.
+The driving script is called `run.sh`.
+Check which of the codes are available with `--check`:
+
+```terminal
+$ ./run.sh --check
+FeenoX GAMG:  yes
+FeenoX MUMPS: yes
+Sparselizard: yes
+Code Aster:   yes
+CalculiX:     yes
+$
+```
+
+Gmsh and FeenoX are mandatory.
 
 
 ## Gmsh
@@ -148,25 +161,31 @@ Either way, check it works globally:
 
 ```terminal
 $ feenox -V
-FeenoX v0.1.152-g8329396-dirty 
+FeenoX v0.1.159-gab7abd8-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Sat Oct 23 19:06:18 2021 -0300
-Build date         : Sun Oct 24 20:00:34 2021 -0300
+Last commit date   : Thu Oct 28 10:43:38 2021 -0300
+Build date         : Thu Oct 28 13:52:11 2021 +0000
 Build architecture : linux-gnu x86_64
-Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
-Compiler flags     : -Ofast -DLD_STATIC
-Builder            : gtheler@tom
-GSL version        : 2.7
-SUNDIALS version   : 5.7.0
-PETSc version      : Petsc Release Version 3.16.0, Sep 29, 2021 
-PETSc arch         : linux-serial-static
-PETSc options      : PETSC_DIR=/home/gtheler/codigos/feenox/dist/petsc-3.16.0 PETSC_ARCH=linux-serial-static --with-mpi=0 --with-fc=0 --with-cxx=0 --with-fortran-bindings=0 --with-fc=0 --with-c2html=0 --with-x=0 --with-debugging=0 --with-shared-libraries=0 --download-f2cblaslapack --COPTFLAGS=-Ofast
-SLEPc version      : SLEPc Release Version 3.16.0, Sep 30, 2021
+Compiler           : gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+Compiler flags     : -O3
+Builder            : ubuntu@ip-172-31-44-208
+GSL version        : 2.5
+SUNDIALS version   : 3.1.2
+PETSc version      : Petsc Release Version 3.12.4, Feb, 04, 2020 
+PETSc arch         : 
+PETSc options      : --build=x86_64-linux-gnu --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --with-silent-rules=0 --libdir=${prefix}/lib/x86_64-linux-gnu --runstatedir=/run --with-maintainer-mode=0 --with-dependency-tracking=0 --with-debugging=0 --shared-library-extension=_real --with-shared-libraries --with-pic=1 --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-cxx-dialect=C++11 --with-opencl=1 --with-blas-lib=-lblas --with-lapack-lib=-llapack --with-scalapack=1 --with-scalapack-lib=-lscalapack-openmpi --with-mumps=1 --with-mumps-include="[]" --with-mumps-lib="-ldmumps -lzmumps -lsmumps -lcmumps -lmumps_common -lpord" --with-suitesparse=1 --with-suitesparse-include=/usr/include/suitesparse --with-suitesparse-lib="-lumfpack -lamd -lcholmod -lklu" --with-ptscotch=1 --with-ptscotch-include=/usr/include/scotch --with-ptscotch-lib="-lptesmumps -lptscotch -lptscotcherr" --with-fftw=1 --with-fftw-include="[]" --with-fftw-lib="-lfftw3 -lfftw3_mpi" --with-superlu=1 --with-superlu-include=/usr/include/superlu --with-superlu-lib=-lsuperlu --with-superlu_dist=1 --with-superlu_dist-include=/usr/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-hdf5-include=/usr/include/hdf5/openmpi --with-hdf5-lib="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi -L/usr/lib/openmpi/lib -lhdf5 -lmpi" --CXX_LINKER_FLAGS=-Wl,--no-as-needed --with-hypre=1 --with-hypre-include=/usr/include/hypre --with-hypre-lib=-lHYPRE_core --prefix=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real --PETSC_ARCH=x86_64-linux-gnu-real CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC" CXXFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC" FCFLAGS="-g -O2 -fstack-protector-strong -fPIC -ffree-line-length-0" FFLAGS="-g -O2 -fstack-protector-strong -fPIC -ffree-line-length-0" CPPFLAGS="-Wdate-time -D_FORTIFY_SOURCE=2" LDFLAGS="-Wl,-Bsymbolic-functions -Wl,-z,relro -fPIC" MAKEFLAGS=w
+SLEPc version      : SLEPc Release Version 3.12.2, Jan 13, 2020
 $
 ```
 
-The `PETSc options` line will tell if MUMPS is available or not.
+The `PETSc options` line will tell if MUMPS is available or not, so grepping will tell:
+
+```
+$ feenox -V | grep -i mumps | wc -l
+1
+$
+```
 
 ## Sparselizard
 
