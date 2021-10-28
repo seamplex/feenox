@@ -63,10 +63,10 @@ if [ ! -z "$(which reflexCLI)" ]; then
   rm -f reflex_hypre-${m}*.dat
 fi
 
-has_feenox=""
-has_feenox_mumps=""
-has_sparselizard=""
-has_reflex=""
+# has_feenox=""
+# has_feenox_mumps=""
+# has_sparselizard=""
+# has_reflex=""
 
 # TODO: --check
 if [ "x${1}" == "x--check" ]; then
