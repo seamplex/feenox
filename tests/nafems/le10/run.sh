@@ -185,7 +185,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
         sed s/xxx/${c}/ le10-${m}.inp > le10-${m}-${c}.inp
         ${time} -o calculix-${m}-${c}.time ccx -i le10-${m}-${c} | tee calculix-${m}-${c}.txt
         grep -C 1 "number of equations" calculix-${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix-${m}-${c}.sigmay
-        gawk -f calculix-stress-at-node.awk le10-${m}-${c}.frd >> calculix-${m}-${c}.sigmay
+        gawk -f frd-stress-at-node.awk le10-${m}-${c}.frd >> calculix-${m}-${c}.sigmay
       fi  
     fi 
     
