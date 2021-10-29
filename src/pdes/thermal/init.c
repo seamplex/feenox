@@ -108,6 +108,7 @@ int feenox_problem_init_runtime_thermal(void) {
 
 ///pr_thermal+k+usage k
 ///pr_thermal+k+description The thermal conductivity in units of power per length per degree of temperature.
+///pr_thermal+k+description This property is mandatory.
   feenox_distribution_define_mandatory(thermal, k, "k", "thermal conductivity");
   thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
   thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  
@@ -127,11 +128,25 @@ int feenox_problem_init_runtime_thermal(void) {
   
   feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) ? PETSC_TRUE : PETSC_FALSE;
   if (feenox.pde.has_mass) {
+///pr_thermal+kappa+usage kappa
+///pr_thermal+kappa+description Thermal diffusivity in units of area per unit of time. 
+///pr_thermal+kappa+description Equal to the thermal conductivity `k` divided by the density `rho` and specific heat capacity `cp`.
+///pr_thermal+kappa+description Either `kappa`, `rhocp` or both `rho` and `cp` are needed for transient
     feenox_call(feenox_distribution_init(&thermal.kappa, "kappa"));
     if (thermal.kappa.defined == 0) {
+///pr_thermal+rhocp+usage rhocp
+///pr_thermal+rhocp+description Product of the density `rho` times the specific heat capacity `cp`,
+///pr_thermal+rhocp+description in units of energy per unit of volume per degree of temperature.
+///pr_thermal+rhocp+description Either `kappa`, `rhocp` or both `rho` and `cp` are needed for transient
       feenox_call(feenox_distribution_init(&thermal.rhocp, "rhocp"));
       if (thermal.rhocp.defined == 0) {
+///pr_thermal+rho+usage rho
+///pr_thermal+rho+description Density in units of mass per unit of volume.
+///pr_thermal+rho+description Either `kappa`, `rhocp` or both `rho` and `cp` are needed for transient
         feenox_call(feenox_distribution_init(&thermal.rho, "rho"));
+///pr_thermal+cp+usage cp
+///pr_thermal+cp+description Specific heat in units of energy per unit of mass per degree of temperature.
+///pr_thermal+cp+description Either `kappa`, `rhocp` or both `rho` and `cp` are needed for transient
         feenox_call(feenox_distribution_init(&thermal.cp, "cp"));
 
         if (thermal.rho.defined == 0 || thermal.cp.defined == 0) {
@@ -261,6 +276,12 @@ int feenox_problem_init_runtime_thermal(void) {
   
   feenox.pde.symmetric_K = PETSC_TRUE;
   feenox.pde.symmetric_M = PETSC_TRUE;
+  
+  
+  // see if we have to compute gradients
+  feenox.pde.compute_gradients |= (thermal.qx != NULL && thermal.qx->used) ||
+                                  (thermal.qy != NULL && thermal.qy->used) ||
+                                  (thermal.qz != NULL && thermal.qz->used);
   
 #endif  
   return FEENOX_OK;

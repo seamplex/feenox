@@ -20,11 +20,7 @@
  * M4 (MUSTACHE? MACRO?)
  * SHELL
  * HISTORY
- * FIT? maybe we can keep this for fitting DAEs
- 
- * explain that 
-   - nouns -> definitions
-   - verbs -> instructions
+ * PRINT_FUNCTION PHYSICAL_ENTITY
  
 ## Wasora stuff
 
@@ -43,6 +39,7 @@
 
  * logaritmic ranges for PRINT_FUNCTION
  * default separator after TEXT is space, after numerical is tab
+ * PRINT_FUNCTION with %f in between arguments
  * BLAS
    - BLAS a * b = s   # scalar dot
    - BLAS a x b = c   # vector cross
@@ -87,7 +84,6 @@
 # PDEs
 
  * check when the matrices do not need to be rebuilt
- * see if the gradients are used in the input to see if we need to compute them, how? add a flag in the function structured "used" and fill it in in the algebraic parser, then each problem sweeps over all the derivatives and sees if the gradients are needed or not
  
 ## Laplace/Poisson/Helmholtz
 
@@ -104,9 +100,7 @@
  * explain that radiation is better off as an expression
  * same for total heat sources/bcs
  * reactions (i.e. total power through faces)
- * heat flux as secondary field
  * orthotropic conductivity
- * total power sources and BCs (can't we get away with the volumes/areas as variables?)
  
 ## Mechanical
 

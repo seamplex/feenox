@@ -28,6 +28,11 @@ extern thermal_t thermal;
 
 int feenox_problem_solve_post_thermal(void) {
 
+  if (thermal.T_max->used == 0 && thermal.T_min->used == 0) {
+    return FEENOX_OK;
+  }
+  
+  
   double T = 0;
   feenox_var_value(thermal.T_max) = -INFTY;
   feenox_var_value(thermal.T_min) = +INFTY;

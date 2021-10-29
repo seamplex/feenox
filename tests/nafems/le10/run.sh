@@ -11,10 +11,11 @@ m=${1}
 min=${2}
 steps=${3}
 
-# check for needed tools
-for i in grep awk gawk gmsh jq /usr/bin/time; do
+# check for needed tools for global usage
+# TODO: check it in a code-basis fashion
+for i in /usr/bin/time gmsh feenox grep cat; do
  if [ -z "$(which $i)" ]; then
-  echo "error: $i not installed"
+  echo "error: ${i} needed for global usage but not installed"
   exit 1
  fi
 done
@@ -44,12 +45,28 @@ fi
 
 # --- Code Aster ----------------------
 if [ ! -z "$(which as_run)" ]; then
+
+  for i in sed awk; do
+    if [ -z "$(which $i)" ]; then
+      echo "error: ${i} needed for Code Aster but not installed"
+      exit 1
+    fi
+  done
+
   has_aster="yes"
   rm -f aster-${m}*.dat
 fi
 
 # --- CalculiX ----------------------
 if [ ! -z "$(which ccx)" ]; then
+
+  for i in gcc gawk; do
+    if [ -z "$(which $i)" ]; then
+      echo "error: ${i} needed for CalculiX but not installed"
+      exit 1
+    fi
+  done
+
   has_calculix="yes"
   gcc unical1.c -o unical1
   rm -f calculix-${m}*.dat
@@ -58,6 +75,14 @@ fi
 
 # --- Reflex ----------------------
 if [ ! -z "$(which reflexCLI)" ]; then
+
+  for i in jq; do
+    if [ -z "$(which $i)" ]; then
+      echo "error: ${i} needed for RefleX but not installed"
+      exit 1
+    fi
+  done
+
   has_reflex="yes"
   rm -f reflex_gamg-${m}*.dat
   rm -f reflex_mumps-${m}*.dat

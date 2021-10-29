@@ -41,9 +41,6 @@ int feenox_problem_gradient_fill_thermal(void) {
 // used only in rough
 int feenox_problem_gradient_properties_at_element_nodes_thermal(element_t *element, mesh_t *mesh) {
 
-  
-  
-  
   return FEENOX_OK;
 }
 

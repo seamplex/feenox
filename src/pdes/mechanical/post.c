@@ -5,6 +5,16 @@ extern mechanical_t mechanical;
 
 int feenox_problem_solve_post_mechanical(void) {
 
+  if (mechanical.displ_max->used == 0 &&
+      mechanical.displ_max_x->used == 0 &&
+      mechanical.displ_max_y->used == 0 &&
+      mechanical.displ_max_z->used == 0 &&
+      mechanical.u_at_displ_max->used == 0 &&
+      mechanical.v_at_displ_max->used == 0 &&
+      mechanical.w_at_displ_max->used == 0) {
+    return FEENOX_OK;
+  }
+  
   double displ2 = 0;
   double max_displ2= 0;
   

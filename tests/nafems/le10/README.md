@@ -16,14 +16,60 @@ Even though there are some particular comments for each of the code used in this
 
 ## Reference solution
 
-The original problem formulation (which can be found in [one of FeenoX' annotated examples](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark)) states that the reference solution is -5.38\ MPa. This can be confirmed with FeenoX using the input `le10-ref.fee`.
+The original problem formulation (which can be found in [one of FeenoX' annotated examples](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark)) states that the reference solution is -5.38\ MPa. This can be confirmed with FeenoX using the input `le10-ref.fee`. 
 
+```terminal
+$ gmsh -3 le10-ref.geo
+[...]
+Info    : Done meshing order 2 (Wall 0.456586s, CPU 0.438907s)
+Info    : 205441 nodes 59892 elements
+Info    : Writing 'le10-ref.msh'...
+Info    : Done writing 'le10-ref.msh'
+Info    : Stopped on Thu Oct 28 12:03:28 2021 (From start: Wall 1.30955s, CPU 1.44333s)
+$ time feenox le10-ref.fee
+σ_y(D) =  -5.3792 MPa
 
+real    1m34.485s
+user    1m30.677s
+sys     0m10.449s
+$
+```
+
+This run can also be used to "calibrate" the timing. Just run the `le10-ref.fee` case and see how long FeenoX needs in your server. Then scale up (or down) the parametric results.
 
 
 ## Scripted parametric execution
 
-There are two types of meshes, one locally-refined (around point $D$) unstructured curved tetrahedral grid and one straight incomplete (i.e. hex20) fully-structured hexahedral mesh. Gmsh is used to create the geometry and the mesh. It uses the `-clscale` command-line parameter to control the elements' size. This parameter $c$ is swept over a range of $[1:c_\text{min}]$ using a Sobol Quasi-random number sequence using the FeenoX input `steps.fee`. For example, five steps for $c_\text{min} = 0.1$ gives
+The driving script is called `run.sh`.
+If one executes the `run.sh` script, one gets
+
+```terminal
+$ ./run.sh 
+usage: ./run.sh { tet | hex } min_clscale n_steps
+$ 
+```
+
+To check of the codes are available run with `--check`:
+
+```terminal
+$ ./run.sh --check
+FeenoX GAMG:  yes
+FeenoX MUMPS: yes
+Sparselizard: yes
+Code Aster:   yes
+CalculiX:     yes
+$
+```
+
+Start with a large `min_clscale` < 1 and a few steps (at least 3, the two ends of the spectrum an the middle point).
+Then increase the number of tests. Everything should be cached so only the extra steps will be actually executed.
+
+There are two types of meshes:
+
+ 1. locally-refined (around point $D$) unstructured curved tetrahedral grid, and
+ 2. straight incomplete (i.e. hex20) fully-structured hexahedral mesh.
+ 
+[Gmsh](http://gmsh.info/) is used to create the geometry and the mesh. It uses the `-clscale` command-line parameter to control the elements' size. This parameter\ $c$ is swept over a range of $[1:c_\text{min}]$ using a Sobol Quasi-random number sequence using the FeenoX input `steps.fee`. For example, five steps for $c_\text{min} = 0.1$ gives
 
 ```terminal
 $ feenox steps.fee 0.1 5 
@@ -51,50 +97,30 @@ $ feenox steps.fee 0.1 10
 ```
 
 and the first five steps will use cached data instead of re-running all the codes.
-The execution of `run.sh` will give files `*.dat` that will be unsorted on the number of degrees of freedom so they are not suitable for plotting with lines. The script `plot.sh` will sort and plot them appropriately. These files have as columns
+
+
+The execution of `run.sh` with the three proper arguments 
+
+ 1. either `tet` or `hex`
+ 2. min scale factor
+ 3. number of steps
+
+will give files `*.dat` that will be unsorted on the refinement factor (and number of degrees of freedom) so they are not suitable for plotting with lines. The script `plot.sh` will sort and plot them appropriately. These files have as columns
 
  1. the parameter $c \in [1:c_\text{min}]
  2. the total number of degrees of freedom
  3. the stress $\sigma_y$ evaluated at point $D$
  4. the wall time in seconds
- 5. the user-mode CPU time in seconds
- 6. the kernel-mode CPU time in seconds
+ 5. the kernel-mode CPU time in seconds
+ 6. the user-mode CPU time in seconds
  7. the maximum memory used by the program, in kB
 
 
-## Caveats and comments
+## Creating the meshes
 
- * The objective of this test is to compare consumption of resources for cloud-based computations. It is therefore suggested to run it on a cloud server and not on a local laptop.
- * In order to have the most fair comparison possible, event though the codes can measure CPU and memory consumption, all of them are run through the `time` tool (the actual binary tool, not the shell's internal).
- * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid OpenMP computations.
- * The hex mesh is created as a first-order mesh and then either converted to a (straight) second-order incomplete (i.e. hex20) mesh or the first-order mesh is fed to the code and it is asked to use second-order elements. Sparselizard needs complete elements so it uses hex27, resulting in a higher degree-of-freedom count.
- * When the mesh is big, chances are that the code run out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster has a mode in which it can run with less memory than the actual requested, at the expense of larger CPU times (apparently by using a tailor-made disk-swapping procedure). This would explain the discontinuities in the Code Aster's curves.
+Both the continuous geometry and the discretized meshes are created with [Gmsh](http://gmsh.info/).
+The `run.sh` script will not run if `gmsh` is not a valid command.
 
-
- 
- 
-
-# Running the tests
-
-The driving script is called `run.sh`.
-Check which of the codes are available with `--check`:
-
-```terminal
-$ ./run.sh --check
-FeenoX GAMG:  yes
-FeenoX MUMPS: yes
-Sparselizard: yes
-Code Aster:   yes
-CalculiX:     yes
-$
-```
-
-Gmsh and FeenoX are mandatory.
-
-
-## Gmsh
-
-The meshes are created with [Gmsh](http://gmsh.info/).
 It is better to use latest versions instead of the one distributed in the operating system's package repositories.
 Either the official binaries or a compiled-from-scratch version will do.
 
@@ -136,12 +162,39 @@ Web site      : https://gmsh.info
 Issue tracker : https://gitlab.onelab.info/gmsh/gmsh/issues
 $
 ```
+ 
+## General comments and caveats
+
+ * The objective of this test is to compare consumption of resources for cloud-based computations. It is therefore suggested to run it on a cloud server and not on a local laptop.
+ 
+ * In order to have the most fair comparison possible, event though the codes can measure CPU and memory consumption, all of them are run through the `time` tool (the actual binary tool at `/usr/bin/time`, not the shell's internal).
+ 
+ * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid spawning OpenMP threads. Parallel tests will come later on.
+ 
+ * The hex mesh is created as a first-order mesh and then either 
+   
+    1. converted to a (straight) second-order incomplete (i.e. hex20) mesh, or
+    2. the first-order mesh is fed to the code and it is asked to use second-order elements.
+   
+   depending on the capabilities of each code.
+   
+ 
+ * The second column of the output is the total number of degrees of freedom. In principle for a simple problem like this one it should be equal to three times the number of nodes. But Code Aster (apparently) sets Dirichlet boundary conditions as Lagrange multipliers, increasing the matrix size. On the contrary, CalculiX removes the degrees of freedom that correspond to nodes with  Dirichlet boundary conditions resulting in a smaller matrix size. Sparselizard needs complete elements so it uses hex27 when reading a hex8 mesh and setting order = 2, resulting in a (much) higher degree-of-freedom count.
+ 
+ * When the mesh is big, chances are that the code runs out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster has a mode in which it can run with less memory than the actual requested, at the expense of larger CPU times (apparently by using a tailor-made disk-swapping procedure). This would explain the discontinuities in the Code Aster's curves.
+
+
+# Particular comments about the codes
+
+> **Disclaimer**: I am the author of FeenoX so all of my comments are likely to be biased.
+If you are reading this and feel like something is not true or way too biased, please contact me and help me to have the fairest comparison possible. There might still be some subjectivity and I apologize in advance for that.
 
 
 ## FeenoX
 
+Not only is [FeenoX](https://www.seamplex.com/feenox) the main code that I want to test, but it also is used to compute the quasi-random sequence of mesh refinements. So it is mandatory to have a working `feenox` command.
 
-An statically-compiled binary can be used for the test. Download, un-compress and copy the binary to a system-wide location:
+The easiest way to set up FeenoX is to download, un-compress and copy a statically-linked binary to a system-wide location:
 
 ```
 wget https://seamplex.com/feenox/dist/linux/feenox-v0.1.152-g8329396-linux-amd64.tar.gz
@@ -149,7 +202,7 @@ tar xvzf feenox-v0.1.152-g8329396-linux-amd64.tar.gz
 sudo cp feenox-v0.1.152-g8329396-linux-amd64/bin/feenox /usr/local/bin
 ```
 
-Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc from `apt` (which might be considered "old"):
+Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc from `apt` (which might be considered "old" in some GNU/Linux distributions). This will also enable the MUMPS solver and will add an extra curve named "FeenoX MUMPS" to the results:
 
 ```terminal
 sudo apt-get install gcc make git automake autoconf libgsl-dev petsc-dev slepc-dev
@@ -162,7 +215,7 @@ make check
 sudo make install
 ```
 
-Custom PETSc versions are architectures are supported as well. The default preconditioner+solver pair GAMG+cg is supported with all PETSc configurations. To make the MUMPS direct solver available, PETSc has to be configured and linked properly (i.e. configure with `--download-mumps` or use the PETSc packages from the operating system's repositories).
+Custom PETSc versions are architectures are supported as well. The default preconditioner+solver pair GAMG+cg is supported with all PETSc configurations. To make the MUMPS direct solver available, PETSc has to be configured and linked properly (i.e. configure with `--download-mumps` or use the PETSc packages from the operating system's repositories). See the [compilation guide](https://www.seamplex.com/feenox/doc/compilation.html) for further details.
 
 Either way, check it works globally:
 
@@ -194,12 +247,40 @@ $ feenox -V | grep -i mumps | wc -l
 $
 ```
 
+
+The `run.sh` script calls `feenox` with the `le10.fee` input file as the first argument and `${m}-${c}` as the second one, resulting in something like `tet-1` or `hex-0.2`. This argument is expanded where the input file contains a `$1`, namely the mesh file name---which should already contain a second-order mesh. It prints the total number of degrees of freedom and the stress\ $\sigma_y$ at point $D$. It does not write any post-processing file (the `WRITE_MESH` keyword is commented out):
+
+```feenox
+# NAFEMS Benchmark LE-10: thick plate pressure
+PROBLEM mechanical DIMENSIONS 3
+DEFAULT_ARGUMENT_VALUE 1 1
+READ_MESH le10_2nd-$1.msh   # FeenoX honors the order of the mesh
+
+BC upper    p=1      # 1 Mpa
+BC DCDC     v=0      # Face DCD'C' zero y-displacement
+BC ABAB     u=0      # Face ABA'B' zero x-displacement
+BC BCBC     u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+E = 210e3   # Young modulus in MPa (because mesh is in mm)
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # TODO: implicit
+
+PRINT total_dofs %.8f sigmay(2000,0,300)
+
+# write post-processing data for paraview
+# WRITE_MESH le10-feenox-${c}.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauzx tauyz
+```
+
+
+
 ## Sparselizard
 
-Compile it from the [Github repository](https://github.com/halbux/sparselizard/) using PETSc/SLEPC from the `./install_petsc.sh` script (which pulls latest main from the Gitlab repository). Also the Gmsh API is needed to read `.msh` v4, so run `optional_install_gmsh_api.sh` as well.
+In order to test [Sparselizard](http://sparselizard.org/), a sub-directory named `sparselizard` should exist in the directory where `run.sh` is, and an executable named `sparselizard` should exist in that sub-directory. 
 
-The `main.cpp` is the file `le10.cpp` provided in the `le10-aster-lizard` directory.
-The tree `sparselizard` should live in `le10-aster-lizard`:
+This can be achieved by cloning and compiling the [Github repository](https://github.com/halbux/sparselizard/). It should use PETSc/SLEPC obtained by executing the `install_external_libs/install_petsc.sh` script (which pulls latest main from the Gitlab repository). Also the Gmsh API is needed to read `.msh` v4, so run `install_external_libsoptional_install_gmsh_api.sh` as well.
+The `main.cpp` is the file `le10.cpp` provided in the `le10-aster-lizard` directory, so a symbolic link has to be added:
 
 
 ```terminal
@@ -215,7 +296,8 @@ make
 cd ..
 ```
 
-If there is no binary named `sparselizard` in a directory named `sparselizard`, the `run.sh` script will not try to solve the case with Sparselizard.
+
+
 
 ## Code Aster
 
@@ -243,6 +325,8 @@ $
 ## CalculiX
 
 TO-DO. Thanks Sergio Pluchinsky.
+
+https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d
 
 ## Reflex
 

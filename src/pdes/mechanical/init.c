@@ -90,7 +90,7 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox_call(feenox_problem_define_solution_function("sigma2", &mechanical.sigma2, 1));
   feenox_call(feenox_problem_define_solution_function("sigma3", &mechanical.sigma3, 1));
   feenox_call(feenox_problem_define_solution_function("sigma", &mechanical.sigma, 1));
-  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, 1));
+//  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, 1));
   feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, 1));
 
 
@@ -187,7 +187,21 @@ int feenox_problem_init_runtime_mechanical(void) {
   
   feenox.pde.symmetric_K = PETSC_TRUE;
   feenox.pde.symmetric_M = PETSC_TRUE;
-  
+
+  // see if we have to compute gradients
+  feenox.pde.compute_gradients |= (mechanical.sigmax != NULL && mechanical.sigmax->used) ||
+                                  (mechanical.sigmay != NULL && mechanical.sigmay->used) ||
+                                  (mechanical.sigmaz != NULL && mechanical.sigmaz->used) ||
+                                  (mechanical.tauxy  != NULL && mechanical.tauxy->used) ||
+                                  (mechanical.tauyz  != NULL && mechanical.tauyz->used) ||
+                                  (mechanical.tauzx  != NULL && mechanical.tauzx->used) ||
+                                  (mechanical.sigma1 != NULL && mechanical.sigma1->used) || 
+                                  (mechanical.sigma2 != NULL && mechanical.sigma2->used) ||
+                                  (mechanical.sigma3 != NULL && mechanical.sigma3->used) ||
+                                  (mechanical.sigma  != NULL && mechanical.sigma->used) || 
+                                  (mechanical.tresca != NULL && mechanical.tresca->used);
+      
+
   return FEENOX_OK;
 #endif
 }

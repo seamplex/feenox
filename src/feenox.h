@@ -374,6 +374,7 @@ struct var_t {
   char *name;
   int initialized;
   int reallocated;
+  int used;
   
   // these are pointers so the actual holder can be anything, from another
   // variable (i.e. an alias), a vector element (another alias) or even
@@ -399,20 +400,16 @@ struct function_ll_t {
 struct vector_t {
   char *name;
   int initialized;
+  int reallocated;
+  int used;
   
   expr_t size_expr;
   int size;
-  int constant;
 
   gsl_vector *value;
   gsl_vector *initial_transient;
   gsl_vector *initial_static;
 
-  // flag to know if the pointer above is owned by us or by anybody else
-  int reallocated;
-  
-  // pointer to a function where we should get the data from
-//  function_t *function;
   
   // linked list with the expressions of the initial elements
   expr_t *datas;
@@ -425,12 +422,14 @@ struct vector_t {
 struct matrix_t {
   char *name;
   int initialized;  
+  int reallocated;
+  int used;
+  
   expr_t cols_expr;
   expr_t rows_expr;
   
   int cols;
   int rows;
-  int constant;
   
   gsl_matrix *value;
   gsl_matrix *initial_transient;
@@ -465,6 +464,7 @@ struct function_t {
   char *name;
   char *name_in_mesh;
   int initialized;
+  int used;
   
   // may be:
   //   - algebraic, either globally or on a per-material (physical groups) basis

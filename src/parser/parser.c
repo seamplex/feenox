@@ -1904,6 +1904,7 @@ int feenox_parse_print_function(void) {
       feenox_check_alloc(print_token->text = strdup(token));   // text for the header
       function_t *function = NULL;
       if ((function = feenox_get_function_ptr(token)) != NULL) {
+        function->used = 1;
         print_token->function = function;
         if (print_function->first_function == NULL) {
           // the first function
@@ -1913,9 +1914,6 @@ int feenox_parse_print_function(void) {
           return FEENOX_ERROR;
         }
         
-        // if it is a gradient of something, tell the PDE that it has to compute them
-        feenox.pde.compute_gradients |= function->is_gradient;
-
       } else {
         feenox_call(feenox_expression_parse(&print_token->expression, token));
       }
@@ -2352,7 +2350,7 @@ int feenox_parse_write_mesh(void) {
 ///kw_pde+WRITE_MESH+usage [ NO_PHYSICAL_NAMES ]
 ///kw_pde+WRITE_MESH+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
 ///kw_pde+WRITE_MESH+detail section that sets the actual names of the physical entities is not written.      
-///kw_pde+WRITE_MESH+detail This can be needed to avoid name clashes when reading multiple `.msh` files.
+///kw_pde+WRITE_MESH+detail This can be needed to avoid name clashes when dealing with multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
       mesh_write->no_physical_names = 1;
       
@@ -2406,10 +2404,8 @@ int feenox_parse_write_mesh(void) {
           mesh_write_dist->vector[i]->var_argument = feenox.mesh.vars.arr_x;
           feenox_call(feenox_expression_parse(&mesh_write_dist->vector[i]->algebraic_expression, token)); 
         }
+        mesh_write_dist->vector[i]->used = 1;
         
-        // if it is a gradient of something, tell the PDE that it has to compute them
-        feenox.pde.compute_gradients |= mesh_write_dist->vector[i]->is_gradient;
-
         mesh_write_dist->field_location = mesh_write->field_location;
         if (mesh_write->printf_format != NULL) {
           feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
@@ -2435,9 +2431,7 @@ int feenox_parse_write_mesh(void) {
         feenox_call(feenox_expression_parse(&mesh_write_dist->scalar->algebraic_expression, token)); 
       }
       
-      // if it is a gradient of something, tell the PDE that it has to compute them
-      feenox.pde.compute_gradients |= mesh_write_dist->scalar->is_gradient;
-      
+      mesh_write_dist->scalar->used = 1;
       mesh_write_dist->field_location = mesh_write->field_location;
       if (mesh_write->printf_format != NULL) {
         feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));

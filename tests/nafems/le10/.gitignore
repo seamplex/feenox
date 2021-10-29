@@ -13,9 +13,11 @@ sparselizard
 output
 base-stage1*
 le10-*.export
-le10-*.inp
+le10-tet-*.inp
+le10-hex-*.inp
 le10_2nd-*.inp
 message*
 DD*.txt
 *.12d
 spooles.out
+unical1

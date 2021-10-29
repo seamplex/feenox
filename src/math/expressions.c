@@ -348,9 +348,11 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     function_t *function = NULL;
     
     if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
+      matrix->used = 1;
       item->type = EXPR_MATRIX;
       item->matrix = matrix;
     } else if ((vector = feenox_get_vector_ptr(token)) != NULL) {
+      vector->used = 1;
       item->type = EXPR_VECTOR;
       item->vector = vector;
     } else if ((var = feenox_get_variable_ptr(token)) != NULL) {
@@ -359,6 +361,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
         return NULL;
       }
+      var->used = 1;
       item->type = EXPR_VARIABLE;
       item->variable = var;
       
@@ -493,6 +496,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
       } else if (function != NULL) {
 
+        function->used = 1;
         item->type = EXPR_FUNCTION;
         item->function = function;
 
@@ -514,9 +518,6 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
           feenox_pull_dependencies_functions(&item->functions, function->algebraic_expression.functions);
         }  
         
-        // if it is a gradient of something, tell the PDE that it has to compute them
-        feenox.pde.compute_gradients |= function->is_gradient;
-
       } else {
         return NULL;
       }
