@@ -17,3 +17,4 @@ MATRIX stress ROWS 3 COLS 3 DATA \
     tauxy(2000,0,300)  sigmay(2000,0,300)  tauyz(2000,0,300) \
     tauzx(2000,0,300)   tauyz(2000,0,300) sigmaz(2000,0,300)
 PRINT %+.2f stress
+PRINT %.2f sigma(2000,0,300)

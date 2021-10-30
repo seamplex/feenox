@@ -35,5 +35,8 @@ extern int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node)
 extern int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight);
 extern int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j);
 
+extern int feenox_principal_stress_compute(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3);
+extern double feenox_vonmises_from_principal(double sigma1, double sigma2, double sigma3);
+extern double feenox_vonmises_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx);
 
 #endif
