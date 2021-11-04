@@ -301,7 +301,9 @@ cd ..
 
 ## Code Aster
 
-Code Aster is very tricky to compile (and use!). Thanks Cyprien Rusu for all the help and explanations.
+Thanks Cyprien Rusu for all the help and explanations.
+
+Code Aster is very tricky to compile (and use!). 
 This works in Ubuntu 20.04:
 
 ```terminal
@@ -324,7 +326,47 @@ $
 
 ## CalculiX
 
-TO-DO. Thanks Sergio Pluchinsky.
+Thanks Sergio Pluchinsky.
+
+CalculiX is available at Debian/Ubuntu repositories, although the versions are not up to date and they only have the Spooles solver.
+
+There are sources which come with an already-working makefile (i.e. the don't need configuration).
+Sadly, the official sources won't compile (and throw millions of warnings) with newer `gcc` (which is known to be more picky than previous versions):
+
+```
+$ wget http://www.dhondt.de/ccx_2.18.src.tar.bz2
+$ tar xf ccx_2.18.src.tar.bz2 
+$ cd CalculiX/ccx_2.18/src/
+$ make
+[...]
+   21 |      &     nodef,idirf,df,cp,r,physcon,numf,set,mi,ider,ttime,time,
+      |                                                             1
+Warning: Unused dummy argument ‘ttime’ at (1) [-Wunused-dummy-argument]
+cross_split.f:101:72:
+
+  101 |      &           *(1.d0-pt2pt1**(1.d0/kdkm1))/r)/dsqrt(Tt1)
+      |                                                                        ^
+Warning: ‘a’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+gfortran -Wall -O2 -c cubic.f
+gfortran -Wall -O2 -c cubtri.f
+cubtri.f:131:18:
+
+  131 |       CALL CUBRUL(F, VEC, W(1,1), IDATA, RDATA)
+      |                  1
+Error: Interface mismatch in dummy procedure ‘f’ at (1): 'f' is not a function
+cubtri.f:170:20:
+
+  170 |         CALL CUBRUL(F, VEC, W(1,J), IDATA, RDATA)
+      |                    1
+Error: Interface mismatch in dummy procedure ‘f’ at (1): 'f' is not a function
+make: *** [Makefile:11: cubtri.o] Error 1
+$  
+```
+
+So we are sticking with the `apt` repository.
+
+
+Regarding the generation of the input, IMHO it is cumbersome to say the least.
 
 https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d
 

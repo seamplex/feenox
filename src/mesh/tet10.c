@@ -24,9 +24,9 @@ extern feenox_t feenox;
 
 #include "element.h"
 
-// ---------------------------------------------------------------------
-// tetrahedro isoparametrico de cuatro nodos sobre el triangulo unitario
-// ---------------------------------------------------------------------
+// -----------------------------------
+// isoparametric ten-noded tetrahedron
+// -----------------------------------
 
 int feenox_mesh_tet10_init(void) {
   
@@ -48,13 +48,9 @@ int feenox_mesh_tet10_init(void) {
   element_type->point_in_element = feenox_mesh_point_in_tetrahedron;
   element_type->element_volume = feenox_mesh_tet_vol;
 
-  // from Gmsh’ doc
 /*
-Tetrahedron10:
-
-
-
-
+   
+Tetrahedron10 (from Gmsh’ doc):
 
            2                  
          ,/|`\                
@@ -68,14 +64,12 @@ Tetrahedron10:
        `7.   '. ,/     
           `\. |/       
              `3        
-
-
-
 */     
-  element_type->node_coords = calloc(element_type->nodes, sizeof(double *));
-  element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *));  
+
+  feenox_check_alloc(element_type->node_coords = calloc(element_type->nodes, sizeof(double *)));
+  feenox_check_alloc(element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *)));
   for (j = 0; j < element_type->nodes; j++) {
-    element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
+    feenox_check_alloc(element_type->node_coords[j] = calloc(element_type->dim, sizeof(double)));  
   }
   
   element_type->vertices++;
@@ -127,11 +121,11 @@ Tetrahedron10:
   
   // full integration: 4 points
   feenox_mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 4);
+  feenox_check_alloc(element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 4));
 
   // reduced integration: 1 point
   feenox_mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]);
-  element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1));
   
   // the two extrapolation matrices
   a = (5.0-M_SQRT5)/20.0;

@@ -1,7 +1,12 @@
 #!/bin/bash
 
+# if you want to disable any particular code, search below for has_feenox=""
+# and uncomment the proper lines
+
+# TODO: use getopt
 if [[ -z "${1}" ]] || [[ -z "${2}" ]] || [[ -z "${3}" ]]; then 
   if [ "x${1}" != "x--check" ]; then
+    echo "usage: $0 --check"
     echo "usage: $0 { tet | hex } min_clscale n_steps"
     exit 0  
   fi  
@@ -12,7 +17,7 @@ min=${2}
 steps=${3}
 
 # check for needed tools for global usage
-# TODO: check it in a code-basis fashion
+# TODO: make sure Gmsh is new enough for calculix
 for i in /usr/bin/time gmsh feenox grep cat; do
  if [ -z "$(which $i)" ]; then
   echo "error: ${i} needed for global usage but not installed"
@@ -28,19 +33,18 @@ export OMP_NUM_THREADS=1
 # --- FeenoX ----------------------
 if [ ! -z "$(which feenox)" ]; then
   has_feenox="yes"
-  rm -f feenox-${m}*.dat
-  rm -f feenox_mumps-${m}*.dat
+  rm -f feenox_gamg_${m}*.dat
   $(feenox -V | grep mumps > /dev/null)
   if [ $? -eq 0 ]; then
     has_feenox_mumps="yes"
-    rm -f feenox_mumps-*.dat
+    rm -f feenox_mumps_${m}*.dat
   fi
 fi
 
 # --- Sparselizard ----------------------gi
 if [ -e "sparselizard/sparselizard" ]; then
   has_sparselizard="yes"
-  rm -f sparselizard-${m}*.dat
+  rm -f sparselizard_mumps_${m}*.dat
 fi
 
 # --- Code Aster ----------------------
@@ -54,13 +58,13 @@ if [ ! -z "$(which as_run)" ]; then
   done
 
   has_aster="yes"
-  rm -f aster-${m}*.dat
+  rm -f aster_default_${m}*.dat
 fi
 
 # --- CalculiX ----------------------
 if [ ! -z "$(which ccx)" ]; then
 
-  for i in gcc gawk; do
+  for i in cc gawk; do
     if [ -z "$(which $i)" ]; then
       echo "error: ${i} needed for CalculiX but not installed"
       exit 1
@@ -68,8 +72,8 @@ if [ ! -z "$(which ccx)" ]; then
   done
 
   has_calculix="yes"
-  gcc unical1.c -o unical1
-  rm -f calculix-${m}*.dat
+  cc unical1.c -o unical1
+  rm -f calculix_${m}*.dat
 fi
 
 
@@ -84,15 +88,19 @@ if [ ! -z "$(which reflexCLI)" ]; then
   done
 
   has_reflex="yes"
-  rm -f reflex_gamg-${m}*.dat
-  rm -f reflex_mumps-${m}*.dat
-  rm -f reflex_hypre-${m}*.dat
+  rm -f reflex_gamg_${m}*.dat
+  rm -f reflex_mumps_${m}*.dat
+  rm -f reflex_hypre_${m}*.dat
 fi
+
+# manually-disabled codes
 
 # has_feenox=""
 # has_feenox_mumps=""
 # has_sparselizard=""
-# has_reflex=""
+# has_aster=""
+# has_calculix=""
+has_reflex=""
 
 # TODO: --check
 if [ "x${1}" == "x--check" ]; then
@@ -114,36 +122,36 @@ for c in $(feenox steps.fee ${min} ${steps}); do
 
   # ---- FeenoX (GAMG) -----------------------------------------
   if [ ! -z "${has_feenox}" ]; then
-    if [ ! -e feenox-${m}-${c}.sigmay ]; then
+    if [ ! -e feenox_gamg_${m}-${c}.sigmay ]; then
       echo "running FeenoX GAMG m = ${m} c = ${c}"
-      ${time} -o feenox-${m}-${c}.time feenox le10.fee ${m}-${c} > feenox-${m}-${c}.sigmay
+      ${time} -o feenox_gamg_${m}-${c}.time feenox le10.fee ${m}-${c} > feenox_gamg_${m}-${c}.sigmay
     fi
     
-    if [ -e feenox-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' feenox-${m}-${c}.*
+    if [ -e feenox_gamg_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' feenox_gamg_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> feenox-${m}.dat
-        cat feenox-${m}-${c}.sigmay | tr "\n" "\t" >> feenox-${m}.dat
-        cat feenox-${m}-${c}.time   | tr "\n" "\t" >> feenox-${m}.dat
-        echo >> feenox-${m}.dat
+        echo -ne "${c}\t" >> feenox_gamg_${m}.dat
+        cat feenox_gamg_${m}-${c}.sigmay | tr "\n" "\t" >> feenox_gamg_${m}.dat
+        cat feenox_gamg_${m}-${c}.time   | tr "\n" "\t" >> feenox_gamg_${m}.dat
+        echo >> feenox_gamg_${m}.dat
       fi  
     fi
   fi  
 
   # ---- FeenoX (MUMPS) -----------------------------------------
   if [ ! -z "${has_feenox_mumps}" ]; then
-    if [ ! -e feenox_mumps-${m}-${c}.sigmay ]; then
+    if [ ! -e feenox_mumps_${m}-${c}.sigmay ]; then
       echo "running FeenoX MUMPS c = ${c}"
-      ${time} -o feenox_mumps-${m}-${c}.time feenox le10.fee ${m}-${c} --mumps > feenox_mumps-${m}-${c}.sigmay
+      ${time} -o feenox_mumps_${m}-${c}.time feenox le10.fee ${m}-${c} --mumps > feenox_mumps_${m}-${c}.sigmay
     fi
 
-    if [ -e feenox_mumps-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' feenox_mumps-${m}-${c}.*
+    if [ -e feenox_mumps_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' feenox_mumps_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> feenox_mumps-${m}.dat
-        cat feenox_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> feenox_mumps-${m}.dat
-        cat feenox_mumps-${m}-${c}.time   | tr "\n" "\t" >> feenox_mumps-${m}.dat
-        echo >> feenox_mumps-${m}.dat
+        echo -ne "${c}\t" >> feenox_mumps_${m}.dat
+        cat feenox_mumps_${m}-${c}.sigmay | tr "\n" "\t" >> feenox_mumps_${m}.dat
+        cat feenox_mumps_${m}-${c}.time   | tr "\n" "\t" >> feenox_mumps_${m}.dat
+        echo >> feenox_mumps_${m}.dat
       fi  
     fi  
   fi
@@ -151,20 +159,20 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # ---- Sparselizard ----------------------------------
   if [ ! -z "${has_sparselizard}" ]; then
   
-    if [ ! -e sparselizard-${m}-${c}.sigmay ]; then
+    if [ ! -e sparselizard_mumps_${m}-${c}.sigmay ]; then
       echo "Running Sparselizard m = ${m} c = ${c}"
       cd sparselizard
-      ${time} -o ../sparselizard-${m}-${c}.time ./run_sparselizard.sh ${m}-${c} > ../sparselizard-${m}-${c}.sigmay
+      ${time} -o ../sparselizard_mumps_${m}-${c}.time ./run_sparselizard.sh ${m}-${c} > ../sparselizard_mumps_${m}-${c}.sigmay
       cd ..
     fi
     
-    if [ -e sparselizard-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' sparselizard-${m}-${c}.*
+    if [ -e sparselizard_mumps_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' sparselizard_mumps_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> sparselizard-${m}.dat
-        cat sparselizard-${m}-${c}.sigmay | tr "\n" "\t" >> sparselizard-${m}.dat
-        cat sparselizard-${m}-${c}.time   | tr "\n" "\t" >> sparselizard-${m}.dat
-        echo >> sparselizard-${m}.dat
+        echo -ne "${c}\t" >> sparselizard_mumps_${m}.dat
+        cat sparselizard_mumps_${m}-${c}.sigmay | tr "\n" "\t" >> sparselizard_mumps_${m}.dat
+        cat sparselizard_mumps_${m}-${c}.time   | tr "\n" "\t" >> sparselizard_mumps_${m}.dat
+        echo >> sparselizard_mumps_${m}.dat
       fi  
     fi  
   fi
@@ -177,50 +185,93 @@ for c in $(feenox steps.fee ${min} ${steps}); do
       gmsh -3 le10_2nd-${m}-${c}.msh -o le10_2nd-${m}-${c}.unv || exit 1
     fi
     
-    if [ ! -e aster-${m}-${c}.sigmay ]; then
+    if [ ! -e aster_default_${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
       sed s/_m_/${m}-${c}/ le10.export > le10-${m}-${c}.export
-      ${time} -o aster-${m}-${c}.time as_run le10-${m}-${c}.export
-      grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster-${m}-${c}.sigmay
-      grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-${m}-${c}.txt | awk '{print $5}' >> aster-${m}-${c}.sigmay
+      ${time} -o aster_default_${m}-${c}.time as_run le10-${m}-${c}.export
+      grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster_default_${m}-${c}.sigmay
+      grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-${m}-${c}.txt | awk '{print $5}' >> aster_default_${m}-${c}.sigmay
     fi
 
-    if [ -e aster-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' aster-${m}-${c}.*
+    if [ -e aster_default_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' aster_default_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> aster-${m}.dat
-        cat aster-${m}-${c}.sigmay | tr "\n" "\t" >> aster-${m}.dat
-        cat aster-${m}-${c}.time   | tr "\n" "\t" >> aster-${m}.dat
-        echo >> aster-${m}.dat
+        echo -ne "${c}\t" >> aster_default_${m}.dat
+        cat aster_default_${m}-${c}.sigmay | tr "\n" "\t" >> aster_default_${m}.dat
+        cat aster_default_${m}-${c}.time   | tr "\n" "\t" >> aster_default_${m}.dat
+        echo >> aster_default_${m}.dat
       fi  
     fi
   fi
   
   
-# --- CalculiX ----------------------
+  # --- CalculiX ----------------------
   if [ ! -z "${has_calculix}" ]; then
-    if [ ! -e le10_2nd-${m}-${c}.inp ]; then
+    if [ ! -e le10_mesh-${m}-${c}.inp ]; then
       gmsh -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_calculix-${m}-${c}.unv || exit 1
-      ./unical1 le10_calculix-${m}-${c}.unv le10_2nd-${m}-${c}.inp
+      ./unical1 le10_calculix-${m}-${c}.unv le10_mesh-${m}-${c}.inp || exit
     fi
     
-    if [ -e le10-${m}.inp ]; then
-      if [ ! -e calculix-${m}-${c}.sigmay ]; then
-        echo "running CalculiX c = ${c}"
-        sed s/xxx/${c}/ le10-${m}.inp > le10-${m}-${c}.inp
-        ${time} -o calculix-${m}-${c}.time ccx -i le10-${m}-${c} | tee calculix-${m}-${c}.txt
-        grep -C 1 "number of equations" calculix-${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix-${m}-${c}.sigmay
-        gawk -f frd-stress-at-node.awk le10-${m}-${c}.frd >> calculix-${m}-${c}.sigmay
+    # Spooles
+    if [[ -e le10-${m}.inp ]] && [[ -e le10_mesh-${m}-${c}.inp ]]; then
+      if [ ! -e calculix_spooles_${m}-${c}.sigmay ]; then
+        echo "running CalculiX c = ${c} Spooles"
+        sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Spooles/*Static, Solver=Spooles/' > le10_spooles_${m}-${c}.inp
+        ${time} -o calculix_spooles_${m}-${c}.time ccx -i le10_spooles_${m}-${c} | tee calculix_spooles_${m}-${c}.txt
+        grep -C 1 "number of equations" calculix_spooles_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_spooles_${m}-${c}.sigmay
+        gawk -f frd-stress-at-node.awk le10_spooles_${m}-${c}.frd >> calculix_spooles_${m}-${c}.sigmay
       fi  
     fi 
     
-    if [ -e calculix-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' calculix-${m}-${c}.*
+    if [ -e calculix_spooles_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' calculix_spooles_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> calculix-${m}.dat
-        cat calculix-${m}-${c}.sigmay | tr "\n" "\t" >> calculix-${m}.dat
-        cat calculix-${m}-${c}.time   | tr "\n" "\t" >> calculix-${m}.dat
-        echo >> calculix-${m}.dat
+        echo -ne "${c}\t" >> calculix_spooles_${m}.dat
+        cat calculix_spooles_${m}-${c}.sigmay | tr "\n" "\t" >> calculix_spooles_${m}.dat
+        cat calculix_spooles_${m}-${c}.time   | tr "\n" "\t" >> calculix_spooles_${m}.dat
+        echo >> calculix_spooles_${m}.dat
+      fi  
+    fi
+    
+    # Iterative diagonal
+    if [[ -e le10-${m}.inp ]] && [[ -e le10_mesh-${m}-${c}.inp ]]; then
+      if [ ! -e calculix_diagonal_${m}-${c}.sigmay ]; then
+        echo "running CalculiX c = ${c} Iterative diagonal"
+        sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Iterative scaling/*Static, Solver=Iterative scaling/' > le10_diagonal_${m}-${c}.inp
+        ${time} -o calculix_diagonal_${m}-${c}.time ccx -i le10_diagonal_${m}-${c} | tee calculix_diagonal_${m}-${c}.txt
+        grep -C 1 "number of equations" calculix_diagonal_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_diagonal_${m}-${c}.sigmay
+        gawk -f frd-stress-at-node.awk le10_diagonal_${m}-${c}.frd >> calculix_diagonal_${m}-${c}.sigmay
+      fi  
+    fi 
+    
+    if [ -e calculix_diagonal_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' calculix_diagonal_${m}-${c}.*
+      if [ $? -ne 0 ]; then
+        echo -ne "${c}\t" >> calculix_diagonal_${m}.dat
+        cat calculix_diagonal_${m}-${c}.sigmay | tr "\n" "\t" >> calculix_diagonal_${m}.dat
+        cat calculix_diagonal_${m}-${c}.time   | tr "\n" "\t" >> calculix_diagonal_${m}.dat
+        echo >> calculix_diagonal_${m}.dat
+      fi  
+    fi
+
+    # Iterative cholesky
+    if [[ -e le10-${m}.inp ]] && [[ -e le10_mesh-${m}-${c}.inp ]]; then
+      if [ ! -e calculix_cholesky_${m}-${c}.sigmay ]; then
+        echo "running CalculiX c = ${c} Iterative cholesky"
+        sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Iterative Cholesky/*Static, Solver=Iterative Cholesky/' > le10_cholesky_${m}-${c}.inp
+        ${time} -o calculix_cholesky_${m}-${c}.time ccx -i le10_cholesky_${m}-${c} | tee calculix_cholesky_${m}-${c}.txt
+        grep -C 1 "number of equations" calculix_cholesky_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_cholesky_${m}-${c}.sigmay
+        gawk -f frd-stress-at-node.awk le10_cholesky_${m}-${c}.frd >> calculix_cholesky_${m}-${c}.sigmay
+      fi  
+    fi 
+    
+    if [ -e calculix_cholesky_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' calculix_cholesky_${m}-${c}.*
+      if [ $? -ne 0 ]; then
+        echo -ne "${c}\t" >> calculix_cholesky_${m}.dat
+        cat calculix_cholesky_${m}-${c}.sigmay | tr "\n" "\t" >> calculix_cholesky_${m}.dat
+        cat calculix_cholesky_${m}-${c}.time   | tr "\n" "\t" >> calculix_cholesky_${m}.dat
+        echo >> calculix_cholesky_${m}.dat
       fi  
     fi
     
@@ -229,60 +280,60 @@ for c in $(feenox steps.fee ${min} ${steps}); do
 
   # ---- Reflex MUMPS ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
-    if [ ! -e reflex_mumps-${m}-${c}.sigmay ]; then
+    if [ ! -e reflex_mumps_${m}-${c}.sigmay ]; then
       echo "running Reflex MUMPS c = ${c}"
-      ${time} -o reflex_mumps-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=mumps"
-      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_mumps-${m}-${c}.sigmay
-      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_mumps-${m}-${c}.sigmay
+      ${time} -o reflex_mumps_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=mumps"
+      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_mumps_${m}-${c}.sigmay
+      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_mumps_${m}-${c}.sigmay
     fi
     
-    if [ -e reflex_mumps-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_mumps-${m}-${c}.*
+    if [ -e reflex_mumps_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' reflex_mumps_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> reflex_mumps-${m}.dat
-        cat reflex_mumps-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_mumps-${m}.dat
-        cat reflex_mumps-${m}-${c}.time   | tr "\n" "\t" >> reflex_mumps-${m}.dat
-        echo >> reflex_mumps-${m}.dat
+        echo -ne "${c}\t" >> reflex_mumps_${m}.dat
+        cat reflex_mumps_${m}-${c}.sigmay | tr "\n" "\t" >> reflex_mumps_${m}.dat
+        cat reflex_mumps_${m}-${c}.time   | tr "\n" "\t" >> reflex_mumps_${m}.dat
+        echo >> reflex_mumps_${m}.dat
       fi
     fi
   fi
   
   # ---- Reflex GAMG ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
-    if [ ! -e reflex_gamg-${m}-${c}.sigmay ]; then
+    if [ ! -e reflex_gamg_${m}-${c}.sigmay ]; then
       echo "running Reflex GAMG c = ${c}"
-      ${time} -o reflex_gamg-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=gamg"
-      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_gamg-${m}-${c}.sigmay
-      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_gamg-${m}-${c}.sigmay
+      ${time} -o reflex_gamg_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=gamg"
+      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_gamg_${m}-${c}.sigmay
+      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_gamg_${m}-${c}.sigmay
     fi
     
-    if [ -e reflex_gamg-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_gamg-${m}-${c}.*
+    if [ -e reflex_gamg_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' reflex_gamg_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> reflex_gamg-${m}.dat
-        cat reflex_gamg-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_gamg-${m}.dat
-        cat reflex_gamg-${m}-${c}.time   | tr "\n" "\t" >> reflex_gamg-${m}.dat
-        echo >> reflex_gamg-${m}.dat
+        echo -ne "${c}\t" >> reflex_gamg_${m}.dat
+        cat reflex_gamg_${m}-${c}.sigmay | tr "\n" "\t" >> reflex_gamg_${m}.dat
+        cat reflex_gamg_${m}-${c}.time   | tr "\n" "\t" >> reflex_gamg_${m}.dat
+        echo >> reflex_gamg_${m}.dat
       fi
     fi
   fi
   
   # ---- Reflex HYPRE ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
-    if [ ! -e reflex_hypre-${m}-${c}.sigmay ]; then
+    if [ ! -e reflex_hypre_${m}-${c}.sigmay ]; then
       echo "running Reflex HYPRE c = ${c}"
-      ${time} -o reflex_hypre-${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=hypre"
-      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_hypre-${m}-${c}.sigmay
-      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_hypre-${m}-${c}.sigmay
+      ${time} -o reflex_hypre_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=hypre"
+      grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_hypre_${m}-${c}.sigmay
+      jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_hypre_${m}-${c}.sigmay
     fi
     
-    if [ -e reflex_hypre-${m}-${c}.sigmay ]; then
-      grep 'terminated\|exited\\nan' reflex_hypre-${m}-${c}.*
+    if [ -e reflex_hypre_${m}-${c}.sigmay ]; then
+      grep 'terminated\|exited\\nan' reflex_hypre_${m}-${c}.*
       if [ $? -ne 0 ]; then
-        echo -ne "${c}\t" >> reflex_hypre-${m}.dat
-        cat reflex_hypre-${m}-${c}.sigmay | tr "\n" "\t" >> reflex_hypre-${m}.dat
-        cat reflex_hypre-${m}-${c}.time   | tr "\n" "\t" >> reflex_hypre-${m}.dat
-        echo >> reflex_hypre-${m}.dat
+        echo -ne "${c}\t" >> reflex_hypre_${m}.dat
+        cat reflex_hypre_${m}-${c}.sigmay | tr "\n" "\t" >> reflex_hypre_${m}.dat
+        cat reflex_hypre_${m}-${c}.time   | tr "\n" "\t" >> reflex_hypre_${m}.dat
+        echo >> reflex_hypre_${m}.dat
       fi
     fi
   fi

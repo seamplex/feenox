@@ -1,10 +1,14 @@
-*include, input = le10_2nd-tet-xxx.inp 
+*include, input = le10_mesh-tet-xxx.inp 
 *Material, Name=STEEL
 *Elastic
 200e3, 0.3
 *Solid section, Elset=C3D10, Material=STEEL
 *Step
-*Static
+**Static, Solver=PaStiX
+**Static, Solver=Pardiso
+**Static, Solver=Spooles
+**Static, Solver=Iterative scaling
+**Static, Solver=Iterative Cholesky
 *Boundary, Fixed
 ABAB, 1, 1
 DCDC, 2, 2

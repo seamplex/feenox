@@ -9,7 +9,7 @@ for i in git autoconf m4 make makeinfo texi2dvi pandoc pandoc-crossref makeinfo 
 done
 
 package=feenox
-petsc_ver=3.16.0
+petsc_ver=3.16.1
 slepc_ver=3.16.0
 
 if [ -z "$(which git)" ]; then
