@@ -22,6 +22,22 @@ int feenox_problem_gradient_fill_mechanical(void) {
     feenox_gradient_fill(mechanical, tauzx);
   }
   
+  if (mechanical.sigma1->used) {
+    feenox_gradient_fill(mechanical, sigma1);
+  }
+  if (mechanical.sigma2->used) {
+    feenox_gradient_fill(mechanical, sigma2);
+  }
+  if (mechanical.sigma3->used) {
+    feenox_gradient_fill(mechanical, sigma3);
+  }
+  if (mechanical.sigma->used) {
+    feenox_gradient_fill(mechanical, sigma);
+  }
+  if (mechanical.tresca->used) {
+    feenox_gradient_fill(mechanical, tresca);
+  }
+  
   return FEENOX_OK;
   
 }
@@ -132,9 +148,88 @@ int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
     mechanical.tauyz->data_value[j] = mesh->node[j].flux[FLUX_TAUYZ];
     mechanical.tauzx->data_value[j] = mesh->node[j].flux[FLUX_TAUZX];
   }
+
+  if ((mechanical.sigma1 != NULL && mechanical.sigma1->used) ||
+      (mechanical.sigma2 != NULL && mechanical.sigma2->used) ||
+      (mechanical.sigma3 != NULL && mechanical.sigma3->used) ||
+      (mechanical.tresca != NULL && mechanical.tresca->used)) {
+    
+    feenox_principal_stress_compute(mesh->node[j].flux[FLUX_SIGMAX],
+                                    mesh->node[j].flux[FLUX_SIGMAY],
+                                    mesh->node[j].flux[FLUX_SIGMAZ],
+                                    mesh->node[j].flux[FLUX_TAUXY],
+                                    mesh->node[j].flux[FLUX_TAUYZ],
+                                    mesh->node[j].flux[FLUX_TAUZX],
+                                    &mechanical.sigma1->data_value[j],
+                                    &mechanical.sigma2->data_value[j],
+                                    &mechanical.sigma3->data_value[j]);
+    
+    if (mechanical.sigma->used) {
+      mechanical.sigma->data_value[j] = feenox_vonmises_from_principal(mechanical.sigma1->data_value[j],
+                                                                       mechanical.sigma2->data_value[j],
+                                                                       mechanical.sigma3->data_value[j]);
+    }
+    if (mechanical.tresca->used) {
+      mechanical.tresca->data_value[j] = mechanical.sigma1->data_value[j] - mechanical.sigma3->data_value[j];
+    }
+  } else if (mechanical.sigma->used) {
+    
+    mechanical.sigma->data_value[j] = feenox_vonmises_from_stress_tensor(mesh->node[j].flux[FLUX_SIGMAX],
+                                                                         mesh->node[j].flux[FLUX_SIGMAY],
+                                                                         mesh->node[j].flux[FLUX_SIGMAZ],
+                                                                         mesh->node[j].flux[FLUX_TAUXY],
+                                                                         mesh->node[j].flux[FLUX_TAUYZ],
+                                                                         mesh->node[j].flux[FLUX_TAUZX]);    
+    
+  }
   
   // TODO: uncertainties
   
   return FEENOX_OK;
+  
+}
+
+
+
+int feenox_principal_stress_compute(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
+  // stress invariants
+  // https://en.wikiversity.org/wiki/Principal_stresses
+  double I1 = sigmax + sigmay + sigmaz;
+  double I2 = sigmax*sigmay + sigmay*sigmaz + sigmaz*sigmax - gsl_pow_2(tauxy) - gsl_pow_2(tauyz) - gsl_pow_2(tauzx);
+  double I3 = sigmax*sigmay*sigmaz - sigmax*gsl_pow_2(tauyz) - sigmay*gsl_pow_2(tauzx) - sigmaz*gsl_pow_2(tauxy) + 2*tauxy*tauyz*tauzx;
+
+  // principal stresses
+  double c1 = sqrt(fabs(gsl_pow_2(I1) - 3*I2));
+  double phi = 1.0/3.0 * acos((2.0*gsl_pow_3(I1) - 9.0*I1*I2 + 27.0*I3)/(2.0*gsl_pow_3(c1)));
+  if (isnan(phi)) {
+    phi = 0;
+  }
+
+  double c2 = I1/3.0;
+  double c3 = 2.0/3.0 * c1;
+  if (sigma1 != NULL) {
+    *sigma1 = c2 + c3 * cos(phi);
+  }
+  if (sigma2 != NULL) {
+    *sigma2 = c2 + c3 * cos(phi - 2.0*M_PI/3.0);
+  }
+  if (sigma3 != NULL) {
+    *sigma3 = c2 + c3 * cos(phi - 4.0*M_PI/3.0);
+  }
+  
+  return FEENOX_OK;
+  
+}
+
+double feenox_vonmises_from_principal(double sigma1, double sigma2, double sigma3) {
+  
+  return sqrt(0.5*(gsl_pow_2(sigma1-sigma2) + gsl_pow_2(sigma2-sigma3) + gsl_pow_2(sigma3-sigma1)));
+  
+}
+
+double feenox_vonmises_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx) {
+  
+  return sqrt(0.5*(gsl_pow_2(sigmax-sigmay) + gsl_pow_2(sigmay-sigmaz) + gsl_pow_2(sigmaz-sigmax) +
+                       6.0 * (gsl_pow_2(tauxy) + gsl_pow_2(tauyz) + gsl_pow_2(tauzx))));
   
 }
