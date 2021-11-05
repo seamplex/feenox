@@ -1,11 +1,11 @@
 #!/bin/bash
 
 declare -A color
-color["feenox"]="grey30"
+color["feenox"]="black"
 color["sparselizard"]="blue"
-color["aster"]="green"
+color["aster"]="dark-green"
 color["calculix"]="red"
-color["reflex"]="salmon"
+color["reflex"]="grey"
 
 declare -A lw
 lw["feenox"]="5"
@@ -21,23 +21,26 @@ lt["spooles"]="3"
 lt["hypre"]="4"
 lt["diagonal"]="5"
 lt["cholesky"]="6"
+lt["default"]="7"
 
 echo -n "plot " > plot.gp
 
 for i in $(ls *.dat | grep -v le10); do
- program=$(echo $(basename ${i} .dat) | cut -d"_" -f 1)
- solver=$(echo $(basename ${i} .dat) | cut -d"_" -f 2)
- shape=$(echo $(basename ${i} .dat) | cut -d"_" -f 3)
- steps=$(cat ${i} | wc -l)
+  program=$(echo $(basename ${i} .dat) | cut -d"_" -f 1)
+  solver=$(echo $(basename ${i} .dat) | cut -d"_" -f 2)
+  shape=$(echo $(basename ${i} .dat) | cut -d"_" -f 3)
  
- echo -n "\"${i}s\"   u 2:c  w l lw ${lw[$program]} dashtype ${lt[$solver]}  lc \"${color[$program]}\"    ti \"\", " >> plot.gp
- echo -n "\"${i}s\"   u 2:c  every $(($RANDOM % ${steps} + 1)) w p           lc \"${color[$program]}\"    ti \"${program} ${solver}\", " >> plot.gp
-
- sort -r -g ${i} | grep -v nan | grep -v exited > ${i}s
+  echo ${program} ${solver}
+  echo -n "\"${i}s\" u cx:cy  w lp  lw ${lw[$program]}  dashtype ${lt[$solver]}  lc \"${color[$program]}\"  ti \"${program} ${solver}\", " >> plot.gp
+  sort -r -g ${i} | grep -v nan | grep -v exited > ${i}s
 done
 
+cat plot.gp | tr -d '\n' > plot-sigmay.gp
+echo "-5.38 w l lw 1 lc \"tan1\" ti \"reference\"" >> plot-sigmay.gp
+
+
 if [ -z "$(which gnuplot)" ]; then
-  echo "gnuplot not installed, not creating the plots"
+  echo "gnuplot not installed, not creating the plots, just the data files *.dats"
 fi
 
 gnuplot figures.gp
