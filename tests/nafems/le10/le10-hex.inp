@@ -1,0 +1,23 @@
+*include, input = le10_mesh-hex-xxx.inp 
+*Material, Name=STEEL
+*Elastic
+200e3, 0.3
+*Solid section, Elset=C3D20, Material=STEEL
+*Step
+**Static, Solver=PaStiX
+**Static, Solver=Pardiso
+**Static, Solver=Spooles
+**Static, Solver=Iterative scaling
+**Static, Solver=Iterative Cholesky
+*Boundary, Fixed
+ABAB, 1, 1
+DCDC, 2, 2
+BCBC, 1, 2
+MIDPLANE, 3, 3
+*Dload
+UPPERF6, P6, 1
+*Node file
+RF, U
+*El file
+S, E
+*End step

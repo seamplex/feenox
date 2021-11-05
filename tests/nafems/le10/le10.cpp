@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
   
   formulation elasticity;
   elasticity += integral(upper, array1x3(0,0,-1)*tf(u));  // p=1 @ upper
-  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -3);  // -3 means use 2nd order gauss poitns
+  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -3 means use 2nd order gauss poitns
   elasticity.generate();
   
   vec solu = solve(elasticity.A(), elasticity.b());
