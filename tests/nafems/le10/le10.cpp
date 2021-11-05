@@ -51,11 +51,15 @@ int main(int argc, char **argv) {
                          0,                0,           0,  0,  mu, 0,
                          0,                0,           0,  0,  0, mu});
 
-  expression stress = H*strain(u);
+  expression sigma = H*strain(u);
 //   u.write(bulk, "le10-sparselizard-displ.vtk", 2);
-//   comp(1, stress).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
+//   comp(1, sigma).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
 
-  std::cout << elasticity.countdofs() << "\t" << comp(1, stress).interpolate(bulk, {2000, 0, 300})[0] << std::endl;
+  field sigmayy("h1");
+  sigmayy.setorder(bulk, 1);
+  sigmayy.setvalue(bulk, comp(1, sigma));  
+  
+  std::cout << elasticity.countdofs() << "\t" << sigmayy.interpolate(bulk, {2000, 0, 300})[0] << std::endl;
   
   return 0;
 }
