@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 //   comp(1, sigma).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
 
   field sigmayy("h1");
-  sigmayy.setorder(bulk, 1);
+  sigmayy.setorder(bulk, 2);
   sigmayy.setvalue(bulk, comp(1, sigma));  
   
   std::cout << elasticity.countdofs() << "\t" << sigmayy.interpolate(bulk, {2000, 0, 300})[0] << std::endl;
