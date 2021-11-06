@@ -61,7 +61,7 @@ EOF
     if [ "x${shape}" = "x${1}" ]; then
       echo ${program} ${solver} ${shape}
       echo -n "\"${i}s\" u cx:cy  w lp lw ${lw[$program]} pt ${lt[$solver]} dashtype ${lt[$solver]}  lc \"${color[$program]}\"  ti \"${program} ${solver}\", " >> plot-${1}.gp
-      sort -r -g ${i} | grep -v nan | grep -v exited | grep -v -w 0 > ${i}s
+      sort -r -g ${i} | grep -v nan | grep -v exited > ${i}s
     fi  
   done
 
