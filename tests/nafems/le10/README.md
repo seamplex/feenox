@@ -410,11 +410,110 @@ I just followed his suggestions without understanding them.
 The way CalculiX input files work will remain unheard of for me.
 I will just explain what `run.sh` does (which is cumbersome IMHO) to make CalculiX work.
 It should be noted before the explanation starts that I had to modify the Gmsh UNV writer to handle both "groups of nodes" and "groups of elements" at the same time: https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d . So make sure the Gmsh version you use is later than that commit.
-Also, there is this `unical.c` conversion tool from UNV to INP that I initially borrowed from <https://github.com/calculix/unical1> but had to modify to make it work.
+Also, there is this `unical.c` conversion tool from UNV to INP that I initially borrowed from <https://github.com/calculix/unical1> but had to modify to make it work and is included in this directory.
 
-TO BE COMPLETED
+The second-order mesh `le10_2nd-${m}-${c}.msh` is converted to UNV but with both options `SaveGroupsOfElements` and `SaveGroupsOfNodes` equal to true. Then, this UNV (which needs a Gmsh version later than commit `a7fef9f6` from November 2021 otherwise the next step will fail if there are an odd number of nodes) is read by the slighlty-modified tool `unica1l` that creates a `.inp` mesh file which can be read by CalculiX:
 
- 
+```bash
+    if [ ! -e le10_mesh-${m}-${c}.inp ]; then
+      gmsh -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_calculix-${m}-${c}.unv || exit 1
+      ./unical1 le10_calculix-${m}-${c}.unv le10_mesh-${m}-${c}.inp || exit
+    fi
+```
+
+The main input is a template that reads the appropiate `.inp` mesh file for $c$ and sets succesively the Spooles solver, the internal with diagonal scaling and the internal with Cholesky preconditioning. But due to some reason I still cannot understand, there has to be one template for `tet` and one for `hex`:
+
+```
+*include, input = le10_mesh-tet-xxx.inp 
+*Material, Name=STEEL
+*Elastic
+200e3, 0.3
+*Solid section, Elset=C3D10, Material=STEEL
+*Step
+**Static, Solver=PaStiX
+**Static, Solver=Pardiso
+**Static, Solver=Spooles
+**Static, Solver=Iterative scaling
+**Static, Solver=Iterative Cholesky
+*Boundary, Fixed
+ABAB, 1, 1
+DCDC, 2, 2
+BCBC, 1, 2
+MIDPLANE, 3, 3
+*Dload
+UPPERF1, P1, 1
+UPPERF2, P2, 1
+UPPERF3, P3, 1
+UPPERF4, P4, 1
+*Node file
+RF, U
+*El file
+S, E
+*End step
+```
+
+```
+*include, input = le10_mesh-hex-xxx.inp 
+*Material, Name=STEEL
+*Elastic
+200e3, 0.3
+*Solid section, Elset=C3D20, Material=STEEL
+*Step
+**Static, Solver=PaStiX
+**Static, Solver=Pardiso
+**Static, Solver=Spooles
+**Static, Solver=Iterative scaling
+**Static, Solver=Iterative Cholesky
+*Boundary, Fixed
+ABAB, 1, 1
+DCDC, 2, 2
+BCBC, 1, 2
+MIDPLANE, 3, 3
+*Dload
+UPPERF6, P6, 1
+*Node file
+RF, U
+*El file
+S, E
+*End step
+```
+
+This template is filtered with `sed` to have a working input file:
+
+```bash
+        sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Spooles/*Static, Solver=Spooles/' > le10_spooles_${m}-${c}.inp
+```
+
+To read the stress at point\ $D$, an `awk` file that parses the output `.frd` file and searches for the nodal values of the stress tensor based on the coordinates of the point\ $D$ had to be written:
+
+```awk
+#!/usr/bin/gawk
+{
+  # this only works for all-positive coordinates, otherwise we would have to use substr()
+  if ($3 == "2.00000E+03" && $4 = "0.00000E+00" && $5 == "3.00000E+02")
+  {
+    node = $2
+  }    
+    
+  
+  if ($1 == -4 && $2 == "STRESS") {
+    stresses = 1
+  }
+    
+  if (node != 0 && stresses == 1 && found == 0) {
+    if (strtonum(substr($0,4,10)) == node) {
+      printf("%e\t", substr($0, 26, 12))
+      found = 1
+    }  
+  }
+}
+```
+
+The total number of degrees of freedom is read from the standard output grepping for "number of equations":
+
+```bash
+        grep -C 1 "number of equations" calculix_spooles_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_spooles_${m}-${c}.sigmay
+```
 
 
 # Setting up the codes
