@@ -9,24 +9,24 @@ declare -A color
 color["feenox"]="black"
 color["sparselizard"]="blue"
 color["aster"]="dark-green"
-color["calculix"]="red"
-color["reflex"]="grey"
+color["calculix"]="orange"
+color["reflex"]="purple"
 
 declare -A lw
-lw["feenox"]="5"
-lw["sparselizard"]="4"
-lw["aster"]="3"
+lw["feenox"]="2"
+lw["sparselizard"]="2"
+lw["aster"]="2"
 lw["calculix"]="2"
-lw["reflex"]="1"
+lw["reflex"]="2"
 
 declare -A lt
 lt["gamg"]="1"
 lt["mumps"]="2"
 lt["spooles"]="3"
-lt["hypre"]="4"
+lt["default"]="4"
 lt["diagonal"]="5"
 lt["cholesky"]="6"
-lt["default"]="7"
+lt["hypre"]="7"
 
 if [ "x$(ls *${1}*.dat | wc -l)" != "x0" ]; then
   echo -n "plot " > plot-${1}.gp
@@ -38,7 +38,7 @@ if [ "x$(ls *${1}*.dat | wc -l)" != "x0" ]; then
   
     if [ "x${shape}" = "x${1}" ]; then
       echo ${program} ${solver} ${shape}
-      echo -n "\"${i}s\" u cx:cy  w lp  lw ${lw[$program]}  dashtype ${lt[$solver]}  lc \"${color[$program]}\"  ti \"${program} ${solver}\", " >> plot-${1}.gp
+      echo -n "\"${i}s\" u cx:cy  w lp lw ${lw[$program]} pt ${lt[$solver]} dashtype ${lt[$solver]}  lc \"${color[$program]}\"  ti \"${program} ${solver}\", " >> plot-${1}.gp
       sort -r -g ${i} | grep -v nan | grep -v exited > ${i}s
     fi  
   done
