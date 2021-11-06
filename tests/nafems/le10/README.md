@@ -104,8 +104,8 @@ $
 Run a single step (i.e. $c=1$, which are the default meshes shown above) for each case to see if everything works.
 
 ```
-$ ./run.sh tet 1 1
-$ ./run.sh hex 1 1
+./run.sh tet 1 1
+./run.sh hex 1 1
 ```
 
 The geometry and the meshes are created with [Gmsh](http://gmsh.info/). The refinements are made by setting the `-clscale` command-line parameter equal to $c$ to control the elements' size. The actual values taken by $c \in [c_\text{min}:1]$ are given by running FeenoX with the input `steps.fee`. This uses a Sobol quasi-random number sequence that starts with $c=1$ and then fills the interval in subsequent steps.
@@ -152,7 +152,7 @@ A successful execution of `run.sh` will give files `*.dat` with the following co
  7. the maximum memory used by the program, in kB
 
 The rows will follow the execution order, so they will be unsorted on the refinement factor (and number of degrees of freedom) so they are not suitable for plotting them directly, at leas using lines to connect consecutive data points.
-Not only does the script `plot.sh` sort  them but it also creates appropriate SVG files using [Gnuplot](http://www.gnuplot.info/).
+Not only does the script `plot.sh` sort them but it also creates appropriate SVG figures using [Gnuplot](http://www.gnuplot.info/) and a markdown report, either `report-tet.md` or `report-hex.md`. The SVG files are interactive so they can be opened with a web browser, zoomed in and out and the individual curves can be turned on and off by clicking on the label.
 
 
 
@@ -166,7 +166,7 @@ If you are reading this and feel like something is not true or is indeed way too
  
  * In order to have the most fair comparison possible, even though the codes can measure CPU and memory consumption themselves, all of them are run through the `time` tool (the actual binary tool at `/usr/bin/time`, not the shell's internal).
  
- * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid spawning OpenMP threads. Parallel tests will come later on.
+ * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid spawning OpenMP threads. Parallel tests will come later on. The wall time should be equal to the sum of kernel-space CPU time plus user-space CPU time plus some latency that depends on the operating system's scheduler.
  
  * The hex mesh is created as a first-order mesh and then either 
    
@@ -177,8 +177,13 @@ If you are reading this and feel like something is not true or is indeed way too
    
  
  * The second column of the output is the total number of degrees of freedom. In principle for a simple three-dimensional problem like this one it should be equal to three times the number of nodes. But Code Aster (apparently) sets Dirichlet boundary conditions as Lagrange multipliers, increasing the matrix size. On the contrary, CalculiX removes the degrees of freedom that correspond to nodes with  Dirichlet boundary conditions resulting in a smaller matrix size. Sparselizard needs complete elements so it uses hex27 when reading a hex8 mesh and setting order = 2, resulting in a (much) higher degree-of-freedom count for the hex case.
+
+ * Most codes allow to choose the actual linear sparse solver at runtime, maybe depending on the availability of particular solving libraries at compilation time. For these codes, there are many curves, one for each supported preconditioner+solver commbination.
  
  * When the mesh is big, chances are that the code runs out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster and CalculiX have out-of-core capabilities in which they can run with less memory than the actual requested, at the expense of larger CPU times by using a tailor-made disk-swapping procedure. The other codes are killed by the operating system when this happens and there is no data point for that particular value of $c$.
+ 
+ * The number of iterations needed to converge iterative solvers depends on the tolerance. In all cases, default tolerances have been used.
+
 
 ## FeenoX
 

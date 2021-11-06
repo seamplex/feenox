@@ -29,6 +29,28 @@ lt["cholesky"]="6"
 lt["hypre"]="7"
 
 if [ "x$(ls *${1}*.dat | wc -l)" != "x0" ]; then
+
+  cat << EOF > report-${1}.md
+---
+title: Report for resource consumption in the NAFEMS LE10 problem
+subtitle: ${1} case
+lang: en-US
+author: Jeremy Theler
+date: ${date}
+...
+
+|         |        
+|---------|------------------------------------------------------------------------------------------------
+| Host    |  $(uname -a) 
+| CPU     |  $(cat /proc/cpuinfo | grep "model name" | head -n1 | cut -d: -f2) 
+| Memory  |  $(cat /proc/meminfo  | head -n1 | cut -d: -f2)
+| Date    |  $(stat *${1}.dat | grep Change | sort | tail -n1 | cut -d" " -f2,3,4)
+  
+
+![Reference ${1} mesh for \$c=1\$](le10-${1}-mesh.png)
+
+EOF
+
   echo -n "plot " > plot-${1}.gp
 
   for i in feenox_*.dat sparselizard_*.dat aster_*.dat calculix_*.dat reflex_*.dat; do
@@ -46,11 +68,17 @@ if [ "x$(ls *${1}*.dat | wc -l)" != "x0" ]; then
   cat plot-${1}.gp | tr -d '\n' > plot-${1}-sigmay.gp
   echo "-5.38 w l lw 1 lc \"tan1\" ti \"reference\"" >> plot-${1}-sigmay.gp
 
-  if [ -z "$(which gnuplot)" ]; then
+  if [ ! -z "$(which gnuplot)" ]; then
+    sed s/xxx/${1}/ figures.gp | gnuplot -  
+  else
     echo "gnuplot not installed, not creating the plots, just the data files *.dats"
   fi
 
-  sed s/xxx/${1}/ figures.gp | gnuplot -
+  for i in sigmay*${1}.svg wall*${1}.svg memory*${1}.svg user*${1}.svg kernel*${1}.svg; do
+    echo "![](${i})\\ " >> report-${1}.md
+    echo >> report-${1}.md
+  done
+  echo >> report-${1}.md
   
 else
 
