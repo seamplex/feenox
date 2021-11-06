@@ -7,7 +7,7 @@
 if [[ -z "${1}" ]] || [[ -z "${2}" ]] || [[ -z "${3}" ]]; then 
   if [ "x${1}" != "x--check" ]; then
     echo "usage: $0 --check"
-    echo "usage: $0 { tet | hex } min_clscale n_steps"
+    echo "usage: $0 { tet | hex } c_min n_steps"
     exit 0  
   fi  
 fi

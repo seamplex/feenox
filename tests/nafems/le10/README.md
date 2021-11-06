@@ -1,17 +1,39 @@
 # Solving the NAFEMS LE10 problem with different codes
 
-This directory contains a script `run.sh` that parametrically solves the [NAFEMS LE 10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) with a number of different FEA codes over a wide range of mesh refinements. The expected result, namely $\sigma_y$ at point $D$ and the wall time, CPU time and memory are recorded for each run so as to create plots of these results vs. the total number of degrees of freedom being solved from.
+The files in this directory parametrically solve the [NAFEMS LE 10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) with a number of different FEA codes, namely
 
-This way of executing FEA programs follows the FeenoX design basis of being both cloud and script friendly. The reasons for requiring these friendlinesses are explained in FeenoX documentation, particularly in the SRS and SDS. It might happen that some of the codes tests seem to need to setup and/or read the results in a unnecessarily complex and/or cumbersome way because they were not designed to be either cloud and/or script friendly. It might also happen that the cumbersomeness comes from my lack of expertise about how to properly use the code.
+ * [FeenoX](https://www.seamplex.com/feenox)
+ * [Sparselizard](http://sparselizard.org/)
+ * [Code Aster](http://https://www.code-aster.org)
+ * [CalculiX](http://www.calculix.de/)
 
-The problem was chosen because 
+using two types of [Gmsh](http://gmsh.info/)-generated second-order grids
+
+ 1. locally-refined (around point $D$) unstructured curved tetrahedral grid, and
+ 2. straight incomplete (i.e. hex20) fully-structured hexahedral mesh.
+
+over a wide range of mesh refinements.
+
+:::
+![Tetrahedral mesh](le10-tet-mesh.png)
+![Hexahedral mesh](le10-hex-mesh.png)
+
+The two types of meshes used in this test
+:::
+
+
+The expected result, namely $\sigma_y$ at point $D$ and the wall time, CPU time and memory are recorded for each run so as to create plots of these results vs. the refinement factor $c \in [0:1]$ and vs. the total number of degrees of freedom being solved for (which can be different in each code even for the same $c$).
+
+This way of executing FEA programs follows the FeenoX design basis of being both cloud and script friendly. The reasons for requiring these friendlinesses are explained in FeenoX documentation, particularly in the [SRS](https://www.seamplex.com/feenox/doc/srs.html) and [SDS](https://www.seamplex.com/feenox/doc/sds.html). It might happen that some of the codes tests seem to need to setup and/or read the results in a unnecessarily complex and/or cumbersome way because they were not designed to be either cloud and/or script friendly. It might also happen that the cumbersomeness comes from my lack of expertise about how to properly use the code.
+
+The NAFEMS\ LE10 problem was chosen because 
 
  * it is a well-established benchmark since its publication in 1990
  * it is simple yet has displacement boundary condition on an edge in addition to faces that makes it challenging
  * the reference solution is a single scalar which is easy to compare among different approaches
 
 
-Even though there are some particular comments for each of the code used in this comparison, this directory is not about the differences (and eventually pros and cons) each code has for defining and solving a FEA problem. It is about comparing the consumption of computational resources needed to solve the same problem (or almost). The differences about how to set up the problem and considerations about usage, cloud friendliness and scriptability are addressed in a separate directory regarding benchmark NAFEMS LE11.
+Even though there are some particular comments for each of the code used in this comparison, this directory is not about the differences (and eventually pros and cons) each code has for defining and solving a FEA problem. It is about comparing the consumption of computational resources needed to solve the same problem (or almost) in the cloud. The differences about how to set up the problem and considerations about usage, cloud friendliness and scriptability are addressed in a separate directory regarding benchmark NAFEMS\ LE11, that involves defining a temperature distribution given by an algebraic expression (under preparation at the time of this writing).
 
 
 ## Reference solution
@@ -35,7 +57,7 @@ sys     0m10.449s
 $
 ```
 
-This run can also be used to "calibrate" the timing. Just run the `le10-ref.fee` case and see how long FeenoX needs in your server. Then scale up (or down) the parametric results.
+This run can also be used to "calibrate" the timing. Just run the `le10-ref.fee` case yourself and see how long FeenoX needs in your server. This figure should help you to scale up (or down) the ordinates of the figures for the parametric results shown here.
 
 
 ## Scripted parametric execution
@@ -45,11 +67,29 @@ If one executes the `run.sh` script, one gets
 
 ```terminal
 $ ./run.sh 
-usage: ./run.sh { tet | hex } min_clscale n_steps
+usage: ./run.sh { tet | hex } c_min n_steps
 $ 
 ```
 
-To check of the codes are available run with `--check`:
+The first argument is either `tet` or `hex`. The second is the lower end of the range for the mesh refinement factor $c \in [c_\text{min}:1]$. In principle there is no problem setting `c_min` to 0 because it will never be reached exactly, although the meshes will be insanely large. The last argument is the number of steps.
+
+Note that the range $[c_\text{min}:1]$ will be swept using a quasi-random number sequence and all the results will be cached until removed by  executing `clean.sh`. So if one first runs 
+
+```terminal
+./run.sh tet 0.1 8
+```
+
+and then
+
+```terminal
+-/run.sh tet 0.1 12
+```
+
+the second execution would only execute four actual steps, reading the cached values for the first eight.
+This will hold as long as `c_min` is the same for all invocations of `run.sh`.
+
+
+To check which of the codes are available in your configuration, run with `--check`:
 
 ```terminal
 $ ./run.sh --check
@@ -61,31 +101,31 @@ CalculiX:     yes
 $
 ```
 
-Start with a large `min_clscale` < 1 and a few steps (at least 3, the two ends of the spectrum an the middle point).
-Then increase the number of tests. Everything should be cached so only the extra steps will be actually executed.
+Run a single step (i.e. $c=1$, which are the default meshes shown above) for each case to see if everything works.
 
-There are two types of meshes:
+```
+$ ./run.sh tet 1 1
+$ ./run.sh hex 1 1
+```
 
- 1. locally-refined (around point $D$) unstructured curved tetrahedral grid, and
- 2. straight incomplete (i.e. hex20) fully-structured hexahedral mesh.
- 
-[Gmsh](http://gmsh.info/) is used to create the geometry and the mesh. It uses the `-clscale` command-line parameter to control the elements' size. This parameter\ $c$ is swept over a range of $[1:c_\text{min}]$ using a Sobol Quasi-random number sequence using the FeenoX input `steps.fee`. For example, five steps for $c_\text{min} = 0.1$ gives
+The geometry and the meshes are created with [Gmsh](http://gmsh.info/). The refinements are made by setting the `-clscale` command-line parameter equal to $c$ to control the elements' size. The actual values taken by $c \in [c_\text{min}:1]$ are given by running FeenoX with the input `steps.fee`. This uses a Sobol quasi-random number sequence that starts with $c=1$ and then fills the interval in subsequent steps.
+For example, five steps for $c_\text{min} = 0.1$ gives
 
 ```terminal
 $ feenox steps.fee 0.1 5 
 1
-0.1
 0.55
 0.775
 0.325
+0.4375
+$
 ```
 
-That is to say, the first and second steps are the coarsest and finest meshes respectively. The third one is the middle-range mesh, and the following steps start to "fill" in the blanks. Since the `run.sh` script caches the results it gets, further steps can be performed by reusing the existing data. So if we now want to run ten steps,
+The first step is the coarsest mesh. The second one is the middle-range mesh, and the following steps start to "fill" in the blanks. Since the `run.sh` script caches the results it gets, further steps can be performed by reusing the existing data. So if we now want to run ten steps,
 
 ```terminal
 $ feenox steps.fee 0.1 10
 1
-0.1
 0.55
 0.775
 0.325
@@ -94,20 +134,16 @@ $ feenox steps.fee 0.1 10
 0.6625
 0.2125
 0.26875
+0.71875
+$
 ```
 
 and the first five steps will use cached data instead of re-running all the codes.
 
 
-The execution of `run.sh` with the three proper arguments 
+A successful execution of `run.sh` will give files `*.dat` with the following columns:
 
- 1. either `tet` or `hex`
- 2. min scale factor
- 3. number of steps
-
-will give files `*.dat` that will be unsorted on the refinement factor (and number of degrees of freedom) so they are not suitable for plotting with lines. The script `plot.sh` will sort and plot them appropriately. These files have as columns
-
- 1. the parameter $c \in [1:c_\text{min}]
+ 1. the parameter $c \in [c_\text{min}:1]
  2. the total number of degrees of freedom
  3. the stress $\sigma_y$ evaluated at point $D$
  4. the wall time in seconds
@@ -115,27 +151,291 @@ will give files `*.dat` that will be unsorted on the refinement factor (and numb
  6. the user-mode CPU time in seconds
  7. the maximum memory used by the program, in kB
 
+The rows will follow the execution order, so they will be unsorted on the refinement factor (and number of degrees of freedom) so they are not suitable for plotting them directly, at leas using lines to connect consecutive data points.
+Not only does the script `plot.sh` sort  them but it also creates appropriate SVG files using [Gnuplot](http://www.gnuplot.info/).
 
-## Creating the meshes
+
+
+# Explanations, comments and caveats
+
+> **Disclaimer**: I am the author of FeenoX so all of my comments are likely to be biased.
+If you are reading this and feel like something is not true or is indeed way too biased, please contact me and help me to have the fairest comparison possible. There might still be some subjectivity and I apologize in advance for that.
+
+
+ * The objective of this test is to compare consumption of resources for cloud-based computations. It is therefore suggested to run it on a cloud server and not on a local laptop.
+ 
+ * In order to have the most fair comparison possible, even though the codes can measure CPU and memory consumption themselves, all of them are run through the `time` tool (the actual binary tool at `/usr/bin/time`, not the shell's internal).
+ 
+ * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid spawning OpenMP threads. Parallel tests will come later on.
+ 
+ * The hex mesh is created as a first-order mesh and then either 
+   
+    1. converted to a (straight) second-order incomplete (i.e. hex20) mesh, or
+    2. the first-order mesh is fed to the code and it is asked to use second-order elements.
+   
+   depending on the capabilities of each code (some codes honor the element type in the mesh but others change the order and number of nodes on the fly).
+   
+ 
+ * The second column of the output is the total number of degrees of freedom. In principle for a simple three-dimensional problem like this one it should be equal to three times the number of nodes. But Code Aster (apparently) sets Dirichlet boundary conditions as Lagrange multipliers, increasing the matrix size. On the contrary, CalculiX removes the degrees of freedom that correspond to nodes with  Dirichlet boundary conditions resulting in a smaller matrix size. Sparselizard needs complete elements so it uses hex27 when reading a hex8 mesh and setting order = 2, resulting in a (much) higher degree-of-freedom count for the hex case.
+ 
+ * When the mesh is big, chances are that the code runs out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster and CalculiX have out-of-core capabilities in which they can run with less memory than the actual requested, at the expense of larger CPU times by using a tailor-made disk-swapping procedure. The other codes are killed by the operating system when this happens and there is no data point for that particular value of $c$.
+
+## FeenoX
+
+The `run.sh` script calls `feenox` with the `le10.fee` input file as the first argument and `${m}-${c}` as the second one, resulting in something like `tet-1` or `hex-0.2`. This argument is expanded where the input file contains a `$1`, namely the mesh file name. It prints the total number of degrees of freedom and the stress\ $\sigma_y$ at point $D$. It does not write any post-processing file (the `WRITE_MESH` keyword is commented out):
+
+```feenox
+# NAFEMS Benchmark LE-10: thick plate pressure
+PROBLEM mechanical DIMENSIONS 3
+DEFAULT_ARGUMENT_VALUE 1 1
+READ_MESH le10_2nd-$1.msh   # FeenoX honors the order of the mesh
+
+BC upper    p=1      # 1 Mpa
+BC DCDC     v=0      # Face DCD'C' zero y-displacement
+BC ABAB     u=0      # Face ABA'B' zero x-displacement
+BC BCBC     u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+E = 210e3   # Young modulus in MPa (because mesh is in mm)
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # TODO: implicit
+
+PRINT total_dofs %.8f sigmay(2000,0,300)
+
+# write post-processing data for paraview
+# WRITE_MESH le10-feenox-${c}.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauzx tauyz
+```
+
+The mesh file should already contain a second-order mesh. The file `le10-tet.geo` already creates tet10 elements, but the `le10-hex.geo` creates hex8 elements that have to be converted to hex20 before FeenoX can use them. This is achieved in the `run.sh` with the block
+
+```bash
+  if [ ! -e le10-${m}-${c}.msh ]; then
+    gmsh -3 le10-${m}.geo -clscale ${c} -o le10-${m}-${c}.msh || exit 1
+    gmsh -3 le10-${m}-${c}.msh -setnumber Mesh.SecondOrderIncomplete 1 -order 2 -o le10_2nd-${m}-${c}.msh || exit 1
+  fi
+```
+
+If the file `le10-${m}-${c}.msh` does not exist (otherwise it would take it as a cached file), Gmsh is first called with either `le10-tet.geo` or `le10-hex.geo` as the input and `-clscale` is set to\ $c$ to create `le10-${m}-${c}.msh`. Then, this mesh file is explicitly converted to a second-order mesh with `-order 2` and any hex8 is converted to hex20 (instead of hex27 with `Mesh.SecondOrderIncomplete=1`) and saved as `le10_2nd-${m}-${c}.msh`. It is this last mesh file the one that FeenoX needs.
+
+
+If the MUMPS solver is available through PETSc, `run.sh` adds the command-line option `--mumps`.
+
+
+
+
+## Sparselizard
+
+The following `main.cpp` is used to solve the NAFEMS LE10 benchmark with Sparselizard:
+
+```cpp
+// NAFEMS LE10 Benchmark solved with Sparselizard
+
+#include "sparselizard.h"
+using namespace sl;
+
+int main(int argc, char **argv) {
+  
+  int bulk = 1;
+  int upper = 2;
+  int DCDC = 3;
+  int ABAB = 4;
+  int BCBC = 5;
+  int midplane = 6;
+  
+  double young = 210e3;
+  double poisson = 0.3;
+  
+  std::string c = (argc > 1) ? argv[1] : "tet-1";
+  mesh mymesh("gmsh:../le10-"+c+".msh", 0);
+  field u("h1xyz");
+  
+  parameter E;
+  E|bulk = young;
+  parameter nu;
+  nu|bulk = poisson;
+
+  u.setorder(bulk, 2);  
+  u.compy().setconstraint(DCDC); // v=0 @ DCDC
+  u.compx().setconstraint(ABAB); // u=0 @ ABAB
+  u.compx().setconstraint(BCBC); // u=0 @ BCBC
+  u.compy().setconstraint(BCBC); // v=0 @ BCBC
+  u.compz().setconstraint(midplane); // w=0 @ midplae
+  
+  formulation elasticity;
+  elasticity += integral(upper, array1x3(0,0,-1)*tf(u));  // p=1 @ upper
+  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -2 means use 2nd order gauss points
+  elasticity.generate();
+  
+  vec solu = solve(elasticity.A(), elasticity.b());
+
+  // Transfer the data from the solution vector to the u field:
+  u.setdata(bulk, solu);
+
+  double lambda = young * poisson/((1+poisson)*(1-2*poisson));
+  double mu = 0.5*young/(1+poisson);
+  
+  expression H(6,6,{lambda+2*mu,      lambda,      lambda,  0,  0,  0,
+                    lambda,      lambda+2*mu,      lambda,  0,  0,  0,
+                    lambda,           lambda, lambda+2*mu,  0,  0,  0,
+                         0,                0,           0, mu,  0,  0,
+                         0,                0,           0,  0,  mu, 0,
+                         0,                0,           0,  0,  0, mu});
+
+  expression sigma = H*strain(u);
+//   u.write(bulk, "le10-sparselizard-displ.vtk", 2);
+//   comp(1, sigma).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
+
+  field sigmayy("h1");
+  sigmayy.setorder(bulk, 2);
+  sigmayy.setvalue(bulk, comp(1, sigma));  
+  
+  std::cout << elasticity.countdofs() << "\t" << sigmayy.interpolate(bulk, {2000, 0, 300})[0] << std::endl;
+  
+  return 0;
+}
+```
+
+The main function takes one argument which should be the same as in FeenoX, i.e. `tet-1`, `hex-0.25`, etc. which is used to read the mesh file as created by Gmsh from the parent directory. The problem order is set to two. The Dirichlet BCs are then set. The Neumann BC is set into the elasticity weak formulation as a surface integral. The volume integral is performed using 2nd-order Gauss points and then the problem is solved for the displacements. The stress tensor field is computed out of the strain using the linear elastic 6x6 matrix in Voigt notation. The stress at point\ $D$ is interpolated from a smoothed field over all the elemental contributions to the node and printed into the standard output, along with the total number of degrees of freedom being solved for.
+
+Note that Sparselizards needs tensor-product elements for the hex case, so the choice of order equal to two triggers the conversion of the hex8 stored in the `.msh` file into hex27 elements. The other codes stick to incomplete hex20 elements, so the total number of degrees of freedom is larger for Sparselizard than for the other codes for the same\ $c$.
+
+
+## Code Aster
+
+Thanks Cyprien Rusu for all the help setting up the code and the input files.
+
+Even though Gmsh can write the mesh in the very efficient MED format which Code Aster can read, since it is a binary file (it is based on HDF5) the version of the MED library which both Gmsh as Aster are linked with should be the same. Since Code Aster is tricky to compile with custom dependencies and Gmsh uses a newer MED library by default, this path was discharged.
+
+It was decided to use the text-based (and archaic format UNV). The second-order mesh `le10_2nd-${m}-${c}.msh` is converted to UNV with Gmsh:
+
+```bash
+    if [ ! -e le10_2nd-${m}-${c}.unv ]; then
+      gmsh -3 le10_2nd-${m}-${c}.msh -o le10_2nd-${m}-${c}.unv || exit 1
+    fi
+```
+
+The argument that the Code Aster executable needs is an "export" file that defines some run-time options for the execution (memory and cpu limits, number of MPI instances, etc.) and links Fortran file units (the ones that were introduced in 1954) to actual filesystem names, like the "comm" (input) file, the mesh file, the output file, etc. Interestingly enough, Code Aster would modify the input export file (sic) and rename relative file paths to absolute ones. This makes it hard to track export files with Git, but what `run.sh` does is it uses a template export file
+
+```
+P actions make_etude
+P debug nodebug
+P memjob 2097152
+P memory_limit 15500.0
+P mode interactif
+P mpi_nbcpu 1
+P mpi_nbnoeud 1
+P ncpus 0
+P time_limit 9000.0
+P tpsjob 16
+P version stable
+A memjeveux 128.0
+A tpmax 9000.0
+
+F comm le10.comm         D  1
+F libr le10_2nd-_m_.unv  D  20
+F libr le10-_m_.rmed     R  80
+F mess message-_m_       R  6
+F resu DD-_m_.txt        R  17
+R base base-stage1-_m_   R  0
+```
+
+and then `sed` would replace `_m_` with `${m}` to have a per-$c$ Git-ignored export file which can be further modified as needed.
+
+The actual problem definition is stored in `le10.comm`:
+
+```
+DEBUT(LANG='EN')
+mesh = LIRE_MAILLAGE(UNITE=20,FORMAT='IDEAS')
+model = AFFE_MODELE(AFFE=_F(MODELISATION=('3D', ), PHENOMENE='MECANIQUE', TOUT='OUI'), MAILLAGE=mesh)
+
+mater = DEFI_MATERIAU(ELAS=_F(E=210000.0, NU=0.3))
+fieldmat = AFFE_MATERIAU(AFFE=_F(MATER=(mater, ), TOUT='OUI'), MODELE=model)
+
+load = AFFE_CHAR_MECA(DDL_IMPO=(_F(DY=0.0, GROUP_MA=('DCDC', )),
+                                _F(DX=0.0, GROUP_MA=('ABAB', )),
+                                _F(DX=0.0, DY=0.0, GROUP_MA=('BCBC', )),
+                                _F(DZ=0.0, GROUP_MA=('midplane', ))),
+                      MODELE=model,
+                      PRES_REP=_F(GROUP_MA=('upper', ), PRES=1.0))
+
+reslin = MECA_STATIQUE(CHAM_MATER=fieldmat, EXCIT=_F(CHARGE=load), MODELE=model)
+
+reslin = CALC_CHAMP(reuse=reslin,
+                    CONTRAINTE=('SIGM_ELGA', 'SIGM_ELNO', 'SIGM_NOEU', 'SIEF_ELGA', 'SIEF_ELNO', 'SIEF_NOEU'),
+                    CRITERES=('SIEQ_ELGA', 'SIEQ_ELNO', 'SIEQ_NOEU'),
+                    RESULTAT=reslin)
+
+#IMPR_RESU(RESU=_F(RESULTAT=reslin), UNITE=80)
+
+IMPR_RESU(
+  FORMAT='RESULTAT', 
+  RESU=_F(
+    GROUP_MA=('DD', ), 
+    IMPR_COOR='OUI', 
+    NOM_CHAM=('SIGM_NOEU', ), 
+    NOM_CMP=('SIYY'), 
+    RESULTAT=reslin
+  ), 
+  UNITE=17
+)           
+          
+FIN()
+```
+
+Instead of writing the full results into unit 80 (i.e. `le10-${m}.rmed`), only an ASCII file with nodal values of the stress tensor are written for those nodes that belong to the `DD` physical group (the $D$-$D^\prime$) segment in the original geometry. For some reason, Code Aster won't accept a zero-dimensional physical group (i.e. a point) to write the ASCII result. So the `run.sh` has to parse this ASCII file so as to find the row corresponding to point $D$ and extract the value of $\sigma_y$, which is the fifth column:
+
+```bash
+      grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-${m}-${c}.txt | awk '{print $5}' >> aster_default_${m}-${c}.sigmay
+```
+
+The total number of degrees of freedom is taken from the "message" output (unit 6) by grepping the French expression for "degrees of freedom". Luckily UTF8 works well:
+
+```bash
+      grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster_default_${m}-${c}.sigmay
+```
+
+
+
+## CalculiX
+
+Thanks Sergio Pluchinsky for all the help to set up the inputs and the mesh files.
+
+I just followed his suggestions without understanding them. 
+The way CalculiX input files work will remain unheard of for me.
+I will just explain what `run.sh` does (which is cumbersome IMHO) to make CalculiX work.
+It should be noted before the explanation starts that I had to modify the Gmsh UNV writer to handle both "groups of nodes" and "groups of elements" at the same time: https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d . So make sure the Gmsh version you use is later than that commit.
+Also, there is this `unical.c` conversion tool from UNV to INP that I initially borrowed from <https://github.com/calculix/unical1> but had to modify to make it work.
+
+TO BE COMPLETED
+
+ 
+
+
+# Setting up the codes
+
+## Gmsh
 
 Both the continuous geometry and the discretized meshes are created with [Gmsh](http://gmsh.info/).
 The `run.sh` script will not run if `gmsh` is not a valid command.
 
 It is better to use latest versions instead of the one distributed in the operating system's package repositories.
+In fact, to run the CalculiX test, version 4.9 or later is needed.
 Either the official binaries or a compiled-from-scratch version will do.
 
-To compile from source:
+To compile from source (OpenCASCADE is needed to create the CAD):
 
 ```terminal
 sudo apt-get install libocct-data-exchange-dev libocct-foundation-dev libocct-modeling-data-dev
 git clone https://gitlab.onelab.info/gmsh/gmsh.git
 cd gmsh
 mkdir build && cd build
+cmake ..
 make
 sudo make install
 ```
 
-To download the no-X binary version:
+To download the no-X binary version and copy it to a system-wide location do:
 
 ```terminal
 wget http://gmsh.info/bin/Linux/gmsh-nox-git-Linux64-sdk.tgz
@@ -163,31 +463,6 @@ Issue tracker : https://gitlab.onelab.info/gmsh/gmsh/issues
 $
 ```
  
-## General comments and caveats
-
- * The objective of this test is to compare consumption of resources for cloud-based computations. It is therefore suggested to run it on a cloud server and not on a local laptop.
- 
- * In order to have the most fair comparison possible, event though the codes can measure CPU and memory consumption, all of them are run through the `time` tool (the actual binary tool at `/usr/bin/time`, not the shell's internal).
- 
- * This is a **serial test only** so the variable `OMP_NUM_THREADS` is set to one to avoid spawning OpenMP threads. Parallel tests will come later on.
- 
- * The hex mesh is created as a first-order mesh and then either 
-   
-    1. converted to a (straight) second-order incomplete (i.e. hex20) mesh, or
-    2. the first-order mesh is fed to the code and it is asked to use second-order elements.
-   
-   depending on the capabilities of each code.
-   
- 
- * The second column of the output is the total number of degrees of freedom. In principle for a simple problem like this one it should be equal to three times the number of nodes. But Code Aster (apparently) sets Dirichlet boundary conditions as Lagrange multipliers, increasing the matrix size. On the contrary, CalculiX removes the degrees of freedom that correspond to nodes with  Dirichlet boundary conditions resulting in a smaller matrix size. Sparselizard needs complete elements so it uses hex27 when reading a hex8 mesh and setting order = 2, resulting in a (much) higher degree-of-freedom count.
- 
- * When the mesh is big, chances are that the code runs out of memory being killed by the operating system (if there is no swap partition, which there should be not). Code Aster has a mode in which it can run with less memory than the actual requested, at the expense of larger CPU times (apparently by using a tailor-made disk-swapping procedure). This would explain the discontinuities in the Code Aster's curves.
-
-
-# Particular comments about the codes
-
-> **Disclaimer**: I am the author of FeenoX so all of my comments are likely to be biased.
-If you are reading this and feel like something is not true or way too biased, please contact me and help me to have the fairest comparison possible. There might still be some subjectivity and I apologize in advance for that.
 
 
 ## FeenoX
@@ -202,7 +477,7 @@ tar xvzf feenox-v0.1.152-g8329396-linux-amd64.tar.gz
 sudo cp feenox-v0.1.152-g8329396-linux-amd64/bin/feenox /usr/local/bin
 ```
 
-Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc from `apt` (which might be considered "old" in some GNU/Linux distributions). This will also enable the MUMPS solver and will add an extra curve named "FeenoX MUMPS" to the results:
+Instead, it can be compiled from the [Github repository](https://github.com/seamplex/feenox) using stack PETSc from `apt` (which might be considered "old" in some GNU/Linux distributions). This will also enable the MUMPS solver (so an extra curve named "feenox mumps" will be added to the results):
 
 ```terminal
 sudo apt-get install gcc make git automake autoconf libgsl-dev petsc-dev slepc-dev
@@ -215,7 +490,7 @@ make check
 sudo make install
 ```
 
-Custom PETSc versions are architectures are supported as well. The default preconditioner+solver pair GAMG+cg is supported with all PETSc configurations. To make the MUMPS direct solver available, PETSc has to be configured and linked properly (i.e. configure with `--download-mumps` or use the PETSc packages from the operating system's repositories). See the [compilation guide](https://www.seamplex.com/feenox/doc/compilation.html) for further details.
+Custom PETSc versions and architectures are supported as well. The default preconditioner+solver pair GAMG+cg is supported with all PETSc configurations. To make the MUMPS direct solver available, PETSc has to be configured and linked properly (i.e. configure with `--download-mumps` or use the PETSc packages from the operating system's repositories). See the [compilation guide](https://www.seamplex.com/feenox/doc/compilation.html) for further details.
 
 Either way, check it works globally:
 
@@ -241,37 +516,12 @@ $
 
 The `PETSc options` line will tell if MUMPS is available or not, so grepping will tell:
 
-```
+```terminal
 $ feenox -V | grep -i mumps | wc -l
 1
 $
 ```
 
-
-The `run.sh` script calls `feenox` with the `le10.fee` input file as the first argument and `${m}-${c}` as the second one, resulting in something like `tet-1` or `hex-0.2`. This argument is expanded where the input file contains a `$1`, namely the mesh file name---which should already contain a second-order mesh. It prints the total number of degrees of freedom and the stress\ $\sigma_y$ at point $D$. It does not write any post-processing file (the `WRITE_MESH` keyword is commented out):
-
-```feenox
-# NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical DIMENSIONS 3
-DEFAULT_ARGUMENT_VALUE 1 1
-READ_MESH le10_2nd-$1.msh   # FeenoX honors the order of the mesh
-
-BC upper    p=1      # 1 Mpa
-BC DCDC     v=0      # Face DCD'C' zero y-displacement
-BC ABAB     u=0      # Face ABA'B' zero x-displacement
-BC BCBC     u=0 v=0  # Face BCB'C' x and y displ. fixed
-BC midplane w=0      #  z displacements fixed along mid-plane
-
-E = 210e3   # Young modulus in MPa (because mesh is in mm)
-nu = 0.3    # Poisson's ratio
-
-SOLVE_PROBLEM   # TODO: implicit
-
-PRINT total_dofs %.8f sigmay(2000,0,300)
-
-# write post-processing data for paraview
-# WRITE_MESH le10-feenox-${c}.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauzx tauyz
-```
 
 
 
@@ -279,8 +529,9 @@ PRINT total_dofs %.8f sigmay(2000,0,300)
 
 In order to test [Sparselizard](http://sparselizard.org/), a sub-directory named `sparselizard` should exist in the directory where `run.sh` is, and an executable named `sparselizard` should exist in that sub-directory. 
 
-This can be achieved by cloning and compiling the [Github repository](https://github.com/halbux/sparselizard/). It should use PETSc/SLEPC obtained by executing the `install_external_libs/install_petsc.sh` script (which pulls latest main from the Gitlab repository). Also the Gmsh API is needed to read `.msh` v4, so run `install_external_libsoptional_install_gmsh_api.sh` as well.
-The `main.cpp` is the file `le10.cpp` provided in the `le10-aster-lizard` directory, so a symbolic link has to be added:
+This can be achieved by cloning and compiling the [Github repository](https://github.com/halbux/sparselizard/). It should use PETSc/SLEPc obtained by executing the `install_external_libs/install_petsc.sh` script (which pulls latest main from the Gitlab repository). Also the Gmsh API is needed to read `.msh` v4, so run `install_external_libsoptional_install_gmsh_api.sh` as well.
+The `main.cpp` is the file `le10.cpp` provided in the `le10-aster-lizard` directory.
+Thefore, a symbolic link has to be added in the `sparselizard` directory to point `main.cpp` to `../le10.cpp`:
 
 
 ```terminal
@@ -301,10 +552,8 @@ cd ..
 
 ## Code Aster
 
-Thanks Cyprien Rusu for all the help and explanations.
-
-Code Aster is very tricky to compile (and use!). 
-This works in Ubuntu 20.04:
+Code Aster is tricky to compile (and use, at least for me). 
+The following works (only) in Ubuntu 20.04:
 
 ```terminal
 wget https://www.code-aster.org/FICHIERS/aster-full-src-14.6.0-1.noarch.tar.gz
@@ -316,24 +565,77 @@ cd
 source aster/etc/codeaster/profile.sh 
 ```
 
-Check it works globally:
+Check it does work globally:
 
-```
+```terminal
 $ as_run --getversion
 <INFO> Version exploitation 14.6.0 - 11/06/2020 - rev. b3490fa3b76c
 $
 ```
 
+Note that compilation from the repository fails in Debian\ 11:
+
+```terminal
+$ sudo apt-get install mercurial
+$ sudo apt-get install gcc g++ gfortran cmake python3 python3-dev python3-numpy tk bison flex dh-exec
+$ sudo apt-get install liblapack-dev libblas-dev libboost-python-dev libboost-numpy-dev zlib1g-dev
+$ hg clone http://hg.code.sf.net/p/codeaster/src codeaster-src
+$ cd codeaster-src
+$ ./waf configure
+$ ./waf build
+checking environment... executing: ./waf.engine build --out=build/std --jobs=4
+Waf: Entering directory `/home/gtheler/codigos/3ros/codeaster-src/build/std/release'
+[1521/8549] Processing bibfor/echange/lub_module.F90
+[2174/8549] Compiling bibfor/prepost/cmqlql.F90
+[2175/8549] Compiling bibfor/prepost/cmhho.F90
+[2177/8549] Compiling bibfor/prepost/cm1518.F90
+[4370/8549] Compiling bibfor/algorith/dtmprep_noli_lub.F90
+[6623/8549] Compiling bibfor/algorith/dtmclean_noli_yacs.F90
+[7258/8549] Compiling bibcxx/Utilities/GenericParameter.cxx
+[7259/8549] Compiling bibcxx/Utilities/CppToFortranGlossary.cxx
+[7260/8549] Compiling bibcxx/Utilities/ConvertibleValue.cxx
+[7263/8549] Compiling bibcxx/PythonBindings/LoadResultInterface.cxx
+In file included from ../../../bibcxx/Utilities/ConvertibleValue.cxx:24:
+../../../bibcxx/Utilities/ConvertibleValue.h: In member function ‘const ReturnValue& ConvertibleValue<ValueType1, ValueType2>::getValue() const’:
+../../../bibcxx/Utilities/ConvertibleValue.h:69:24: error: ‘runtime_error’ is not a member of ‘std’
+   69 |             throw std::runtime_error( "Impossible to convert " + _valToConvert );
+      |                        ^~~~~~~~~~~~~
+
+In file included from /usr/include/boost/smart_ptr/detail/sp_thread_sleep.hpp:22,
+                 from /usr/include/boost/smart_ptr/detail/yield_k.hpp:23,
+                 from /usr/include/boost/smart_ptr/detail/spinlock_gcc_atomic.hpp:14,
+                 from /usr/include/boost/smart_ptr/detail/spinlock.hpp:42,
+                 from /usr/include/boost/smart_ptr/detail/spinlock_pool.hpp:25,
+                 from /usr/include/boost/smart_ptr/shared_ptr.hpp:29,
+                 from /usr/include/boost/shared_ptr.hpp:17,
+                 from ../../../bibcxx/include/astercxx.h:37,
+                 from ../../../bibcxx/PythonBindings/LoadResultInterface.h:27,
+                 from ../../../bibcxx/PythonBindings/LoadResultInterface.cxx:24:
+/usr/include/boost/bind.hpp:36:1: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   36 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+/usr/include/boost/detail/iterator.hpp:13:1: note: ‘#pragma message: This header is deprecated. Use <iterator> instead.’
+   13 | BOOST_HEADER_DEPRECATED("<iterator>")
+      | ^~~~~~~~~~~~~~~~~~~~~~~
+
+Waf: Leaving directory `/home/gtheler/codigos/3ros/codeaster-src/build/std/release'
+Build failed
+ -> task in 'asterbibcxx' failed with exit status 1 (run with -v to display more information)
+$ 
+```
+
+
+
 ## CalculiX
 
-Thanks Sergio Pluchinsky.
+Thanks Sergio Pluchinsky for all the help to set up the inputs and the mesh files.
 
-CalculiX is available at Debian/Ubuntu repositories, although the versions are not up to date and they only have the Spooles solver.
+CalculiX is available at Debian/Ubuntu repositories, although the versions are not up to date and they only have the Spooles solver and the internal iterative solver with either diagonal or Cholesky preconditioning.
 
 There are sources which come with an already-working makefile (i.e. the don't need configuration).
-Sadly, the official sources won't compile (and throw millions of warnings) with newer `gcc` (which is known to be more picky than previous versions):
+Sadly, the official sources won't compile (and throw millions of warnings) in Debian\ 11:
 
-```
+```terminal
 $ wget http://www.dhondt.de/ccx_2.18.src.tar.bz2
 $ tar xf ccx_2.18.src.tar.bz2 
 $ cd CalculiX/ccx_2.18/src/
@@ -363,13 +665,33 @@ make: *** [Makefile:11: cubtri.o] Error 1
 $  
 ```
 
-So we are sticking with the `apt` repository.
+Neither Ubuntu 20.04, that has a more permissive `gcc/gfortran` version, works
+
+```terminal
+$ make
+Warning: ‘nelemv’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+zienzhu.f:368:0:
+
+  368 |                      idxnode=idxnode1
+      | 
+Warning: ‘idxnode1’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+zienzhu.f:768:0:
+
+  768 |                      if(ielem.eq.k.or.iaddelem.eq.k) cycle loop3
+      | 
+Warning: ‘iaddelem’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+cc -Wall -O2  -I ../../../SPOOLES.2.2 -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT -c add_rect.c
+cc -Wall -O2  -I ../../../SPOOLES.2.2 -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT -c arpack.c
+In file included from arpack.c:26:
+spooles.h:26:10: fatal error: misc.h: No such file or directory
+   26 | #include <misc.h>
+      |          ^~~~~~~~
+compilation terminated.
+make: *** [Makefile:9: arpack.o] Error 1
+$
+```
 
 
-Regarding the generation of the input, IMHO it is cumbersome to say the least.
+So we are sticking with the binaries from the `apt` repository and the default Spooles and internal solvers.
 
-https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d
 
-## Reflex
-
-TO-DO
