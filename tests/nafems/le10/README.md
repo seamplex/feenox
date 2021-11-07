@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
   
   formulation elasticity;
   elasticity += integral(upper, array1x3(0,0,-1)*tf(u));  // p=1 @ upper
-  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -2 means use 2nd order gauss points
+  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // 0 means "integrate 4th order polynomials exactly"
   elasticity.generate();
   
   vec solu = solve(elasticity.A(), elasticity.b());
@@ -406,9 +406,10 @@ The total number of degrees of freedom is taken from the "message" output (unit 
 
 Thanks Sergio Pluchinsky for all the help to set up the inputs and the mesh files.
 
-I just followed his suggestions without understanding them. 
-The way CalculiX input files work will remain unheard of for me.
-I will just explain what `run.sh` does (which is cumbersome IMHO) to make CalculiX work.
+As explained below, I just followed his suggestions without understanding them. 
+The way CalculiX input files work will remain unheard of to me for the time being.
+
+The following paragraph explains what `run.sh` does (which is needlessly cumbersome IMHO) to make CalculiX work.
 It should be noted before the explanation starts that I had to modify the Gmsh UNV writer to handle both "groups of nodes" and "groups of elements" at the same time: https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d . So make sure the Gmsh version you use is later than that commit.
 Also, there is this `unical.c` conversion tool from UNV to INP that I initially borrowed from <https://github.com/calculix/unical1> but had to modify to make it work and is included in this directory.
 
@@ -421,7 +422,29 @@ The second-order mesh `le10_2nd-${m}-${c}.msh` is converted to UNV but with both
     fi
 ```
 
-The main input is a template that reads the appropiate `.inp` mesh file for $c$ and sets succesively the Spooles solver, the internal with diagonal scaling and the internal with Cholesky preconditioning. But due to some reason I still cannot understand, there has to be one template for `tet` and one for `hex`:
+The main input is a template that reads the appropiate `.inp` mesh file for $c$ and sets succesively the Spooles solver, the internal with diagonal scaling and the internal with Cholesky preconditioning.
+There is a reason I still cannot understand that explains why there has to be one template for `tet` and one for `hex`. In effect, Sergio pointed me to section that explains the `DLOAD` keyword (used to set a pressure boundary condition) in the `ccx` manual. It says (casing is verbatim):
+
+> This option allows the specification of distributed loads. These include constant pressure loading on element faces, edge loading on shells and mass loading (load per unit mass) either by gravity forces or by centrifugal forces. 
+> For surface loading the faces of the elements are numbered as follows (for the node numbering of the elements see Section 3.1):
+>
+> for hexahedral elements:
+>
+>  * face 1: 1-2-3-4
+>  * face 2: 5-8-7-6
+>  * face 3: 1-5-6-2
+>  * face 4: 2-6-7-3
+>  * face 5: 3-7-8-4
+>  * face 6: 4-8-5-1
+>
+> for tetrahedral elements:
+>
+>  * Face 1: 1-2-3
+>  * Face 2: 1-4-2
+>  * Face 3: 2-4-3
+>  * Face 4: 3-4-1
+
+So it seems that CalculiX needs some sort of mesh-dependent numbering of the faces of volumetric elements to set surface Neumann boundary conditions (!). This is why I had to blindly rely on Sergio's expertise to handle these `UPPERFn` and `Pn` lines within the `Dload` section. In any case, the two templates for tets and hexes are, respectively:
 
 ```
 *include, input = le10_mesh-tet-xxx.inp 
@@ -478,13 +501,21 @@ S, E
 *End step
 ```
 
-This template is filtered with `sed` to have a working input file:
+The appropriate template is filtered with `sed` that replaces `xxx` with the appropriate mesh and uncomments each of the solver lines successively to have a working input file:
 
 ```bash
         sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Spooles/*Static, Solver=Spooles/' > le10_spooles_${m}-${c}.inp
 ```
 
-To read the stress at point\ $D$, an `awk` file that parses the output `.frd` file and searches for the nodal values of the stress tensor based on the coordinates of the point\ $D$ had to be written:
+To read the stress at point\ $D$, an `awk` file that parses the output `.frd` file and searches for the nodal values of the stress tensor based on the coordinates of the point\ $D$ had to be written. It has to take into account that this `.frd` file does not have blank-separated fields but fixed-width ASCII columns, such as
+
+```
+ -1       371-1.52894E+00 1.19627E+00-5.85388E-02-8.97020E-03 1.73081E-03 7.02901E-01
+```
+
+where negative values appear concatenated with the previous one as a single ASCII token.
+
+
 
 ```awk
 #!/usr/bin/gawk
