@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
   
   formulation elasticity;
   elasticity += integral(upper, array1x3(0,0,-1)*tf(u));  // p=1 @ upper
-  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // 0 means "integrate 4th order polynomials exactly"
+  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -2 gives an exact integration for up to 4th order polynomial"
   elasticity.generate();
   
   vec solu = solve(elasticity.A(), elasticity.b());
