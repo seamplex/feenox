@@ -446,7 +446,7 @@ There is a reason I still cannot understand that explains why there has to be on
 >  * Face 3: 2-4-3
 >  * Face 4: 3-4-1
 
-So it seems that CalculiX needs some sort of mesh-dependent numbering of the faces of volumetric elements to set surface Neumann boundary conditions (!). This is why I had to blindly rely on Sergio's expertise to handle these `UPPERFn` and `Pn` lines within the `Dload` section. In any case, the two templates for tets and hexes are, respectively:
+So it seems that CalculiX needs some sort of mesh-dependent numbering of the faces of volumetric elements to set surface Neumann boundary conditions (!). This is why I had to blindly rely on Sergio's expertise to handle these `UPPERFn` and `Pn` lines within the `Dload` section below. In any case, the two templates for tets and hexes are, respectively:
 
 ```
 *include, input = le10_mesh-tet-xxx.inp 
@@ -515,7 +515,7 @@ To read the stress at point\ $D$, an `awk` file that parses the output `.frd` fi
  -1       371-1.52894E+00 1.19627E+00-5.85388E-02-8.97020E-03 1.73081E-03 7.02901E-01
 ```
 
-where negative values appear concatenated with the previous one as a single ASCII token.
+where negative values appear concatenated with the previous one as a single ASCII token in a non-UNIX-friendly way.
 
 
 
