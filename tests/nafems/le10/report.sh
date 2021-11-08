@@ -46,7 +46,7 @@ EOF
 
   # terminal with reference
   if [ -e le10-ref.txt ]; then
-  cat << EOF > report-${1}.md
+  cat << EOF >> report-${1}.md
 \`\`\`terminal
 $ time feenox le10-ref.fee
 $(cat le10-ref.txt)

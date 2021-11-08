@@ -413,7 +413,7 @@ The way CalculiX input files work will remain unheard of to me for the time bein
 
 The following paragraph explains what `run.sh` does (which is needlessly cumbersome IMHO) to make CalculiX work.
 It should be noted before the explanation starts that I had to modify the Gmsh UNV writer to handle both "groups of nodes" and "groups of elements" at the same time: https://gitlab.onelab.info/gmsh/gmsh/-/commit/a7fef9f6e8a7c870cf39b8702c57f3e33bfa948d . So make sure the Gmsh version you use is later than that commit.
-Also, there is this `unical.c` conversion tool from UNV to INP that I initially borrowed from <https://github.com/calculix/unical1> but had to modify to make it work and is included in this directory.
+Also, there is this `unical.c` conversion tool from UNV to INP that I initially borrowed from <https://github.com/calculix/unical1> but had to modify to make it work and is included in this directory. For large problems, this conversion procedure takes a non-trivial amount of time (i.e. more than five minutes for $c=0.128125$) which is not accounted for in the resulting curves.
 
 The second-order mesh `le10_2nd-${m}-${c}.msh` is converted to UNV but with both options `SaveGroupsOfElements` and `SaveGroupsOfNodes` equal to true. Then, this UNV (which needs a Gmsh version later than commit `a7fef9f6` from November 2021 otherwise the next step will fail if there are an odd number of nodes) is read by the slighlty-modified tool `unica1l` that creates a `.inp` mesh file which can be read by CalculiX:
 
