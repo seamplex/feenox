@@ -41,7 +41,7 @@ Physical Curve("DD", 7) = {6,14};
 // Physical Point("D", 8) = {8};
 
 // meshing settings, read Gmsh' manual for further reference
-Mesh.ElementOrder = 2;
+Mesh.ElementOrder = 1;
 Mesh.RecombineAll = 1;
 Mesh.SecondOrderLinear = 1;
 Mesh.SecondOrderIncomplete = 1;
