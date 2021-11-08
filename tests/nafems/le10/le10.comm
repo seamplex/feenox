@@ -5,14 +5,18 @@ model = AFFE_MODELE(AFFE=_F(MODELISATION=('3D', ), PHENOMENE='MECANIQUE', TOUT='
 mater = DEFI_MATERIAU(ELAS=_F(E=210000.0, NU=0.3))
 fieldmat = AFFE_MATERIAU(AFFE=_F(MATER=(mater, ), TOUT='OUI'), MODELE=model)
 
-load = AFFE_CHAR_MECA(DDL_IMPO=(_F(DY=0.0, GROUP_MA=('DCDC', )),
+BC = AFFE_CHAR_CINE(MECA_IMPO=(_F(DY=0.0, GROUP_MA=('DCDC', )),
                                 _F(DX=0.0, GROUP_MA=('ABAB', )),
                                 _F(DX=0.0, DY=0.0, GROUP_MA=('BCBC', )),
                                 _F(DZ=0.0, GROUP_MA=('midplane', ))),
                       MODELE=model,
+                      )
+
+load = AFFE_CHAR_MECA(
+                      MODELE=model,
                       PRES_REP=_F(GROUP_MA=('upper', ), PRES=1.0))
 
-reslin = MECA_STATIQUE(CHAM_MATER=fieldmat, EXCIT=_F(CHARGE=load), MODELE=model)
+reslin = MECA_STATIQUE(CHAM_MATER=fieldmat, EXCIT=(_F(CHARGE=BC),_F(CHARGE=load),), MODELE=model, SOLVEUR=_F(METHODE='MUMPS',))
 
 reslin = CALC_CHAMP(reuse=reslin,
                     CONTRAINTE=('SIGM_ELGA', 'SIGM_ELNO', 'SIGM_NOEU', 'SIEF_ELGA', 'SIEF_ELNO', 'SIEF_NOEU'),
@@ -22,15 +26,15 @@ reslin = CALC_CHAMP(reuse=reslin,
 #IMPR_RESU(RESU=_F(RESULTAT=reslin), UNITE=80)
 
 IMPR_RESU(
-  FORMAT='RESULTAT', 
+  FORMAT='RESULTAT',
   RESU=_F(
-    GROUP_MA=('DD', ), 
-    IMPR_COOR='OUI', 
-    NOM_CHAM=('SIGM_NOEU', ), 
-    NOM_CMP=('SIYY'), 
+    GROUP_MA=('DD', ),
+    IMPR_COOR='OUI',
+    NOM_CHAM=('SIGM_NOEU', ),
+    NOM_CMP=('SIYY'),
     RESULTAT=reslin
-  ), 
+  ),
   UNITE=17
-)           
-          
+)          
+         
 FIN()
