@@ -11,6 +11,6 @@ if [ ! -e le10-ref.msh ]; then
   gmsh -3 le10-ref.geo
 fi
 
-/usr/bin/time feenox -i le10-ref.fee | tee le10-ref.txt
+/usr/bin/time feenox -i le10-ref.fee 2>&1 | tee le10-ref.txt
 
 
