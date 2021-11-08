@@ -48,7 +48,7 @@ EOF
   if [ -e le10-ref.txt ]; then
     echo >> report-${1}.md
     echo "\`\`\`terminal" >> report-${1}.md
-    cat table-${1}.md >> report-${1}.md
+    cat le10-ref.txt >> report-${1}.md
     echo "\`\`\`" >> report-${1}.md
     echo >> report-${1}.md
   fi
