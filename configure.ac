@@ -180,7 +180,8 @@ AS_IF([test "x${with_petsc}" != "xno"], [
     AS_IF([test ! -e "${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables"], [
       AC_MSG_RESULT([broken])
       AC_MSG_ERROR([cannot find ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables.
-Do you have a working PETSc > 3.6.0 installation?])
+Do you have a working PETSc installation? See this page for help:
+https://seamplex.com/feenox/doc/compilation.html])
       petsc_found=0
     ],
       AC_MSG_RESULT([${PETSC_ARCH}])
