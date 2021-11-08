@@ -46,11 +46,14 @@ EOF
 
   # terminal with reference
   if [ -e le10-ref.txt ]; then
-    echo >> report-${1}.md
-    echo "\`\`\`terminal" >> report-${1}.md
-    cat le10-ref.txt >> report-${1}.md
-    echo "\`\`\`" >> report-${1}.md
-    echo >> report-${1}.md
+  cat << EOF > report-${1}.md
+\`\`\`terminal
+$ time feenox le10-ref.fee
+$(cat le10-ref.txt)
+$
+\`\`\`
+
+EOF
   fi
   
 cat << EOF >> report-${1}.md
