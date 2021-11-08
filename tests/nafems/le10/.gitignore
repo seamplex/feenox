@@ -10,6 +10,7 @@
 *.dats
 *.pdf
 *.svg
+le10-ref.txt
 sparselizard
 output
 base-stage1*
@@ -25,5 +26,8 @@ DD*.txt
 *.12d
 spooles.out
 unical1
-plot.gp
-plot-sigmay.gp
+plot-*.gp
+report-*.md
+calculix*.txt
+output
+

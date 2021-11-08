@@ -35,19 +35,27 @@ if [ "x$(ls *${1}*.dat | wc -l)" != "x0" ]; then
 title: Report for resource consumption in the NAFEMS LE10 problem
 subtitle: ${1} case
 lang: en-US
-author: Jeremy Theler
 date: ${date}
 ...
+EOF
 
-|         |        
-|---------|------------------------------------------------------------------------------------------------
-| Host    |  $(uname -a) 
-| CPU     |  $(cat /proc/cpuinfo | grep "model name" | head -n1 | cut -d: -f2) 
-| Memory  |  $(cat /proc/meminfo  | head -n1 | cut -d: -f2)
-| Date    |  $(stat *${1}.dat | grep Change | sort | tail -n1 | cut -d" " -f2,3,4)
+  # table with architecture
+  if [ -e table-${1}.md ]; then
+    cat table-${1}.md >> report-${1}.md
+  fi
+
+  # terminal with reference
+  if [ -e le10-ref.txt ]; then
+    echo >> report-${1}.md
+    echo "\`\`\`terminal" >> report-${1}.md
+    cat table-${1}.md >> report-${1}.md
+    echo "\`\`\`" >> report-${1}.md
+    echo >> report-${1}.md
+  fi
   
+cat << EOF >> report-${1}.md
 
-![Reference ${1} mesh for \$c=1\$](le10-${1}-mesh.png)
+![Coarser ${1} mesh for \$c=1\$](le10-${1}-mesh.png)
 
 EOF
 

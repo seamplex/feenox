@@ -113,6 +113,20 @@ if [ "x${1}" == "x--check" ]; then
 fi
 
 
+# create a markdown table with some data about the architecture
+cat << EOF > table-${m}.md
+
+|         |        
+|---------|------------------------------------------------------------------------------------------------
+| Date    |  $(date)
+| Host    |  $(uname -a) 
+| CPU     |  $(cat /proc/cpuinfo | grep "model name" | head -n1 | cut -d: -f2) 
+| Number  |  $(cat /proc/cpuinfo  | grep processor | wc -l)
+| Memory  |  $(cat /proc/meminfo  | head -n1 | cut -d: -f2)
+  
+EOF
+
+
 for c in $(feenox steps.fee ${min} ${steps}); do
 
   if [ ! -e le10-${m}-${c}.msh ]; then
