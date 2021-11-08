@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
   elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -2 gives an exact integration for up to 4th order polynomial"
   elasticity.generate();
   
-  vec solu = solve(elasticity.A(), elasticity.b());
+  vec solu = solve(elasticity.A(), elasticity.b(), "cholesky");
 
   // Transfer the data from the solution vector to the u field:
   u.setdata(bulk, solu);
