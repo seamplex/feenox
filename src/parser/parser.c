@@ -3228,28 +3228,28 @@ int feenox_parse_find_extrema(void) {
     mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_max);
   }
   if (name_x_min != NULL) {
-    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_x_min);
+    mesh_find_extrema->x_min = feenox_get_or_define_variable_get_ptr(name_x_min);
   }
   if (name_x_max != NULL) {
-    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_x_max);
+    mesh_find_extrema->x_max = feenox_get_or_define_variable_get_ptr(name_x_max);
   }
   if (name_y_min != NULL) {
-    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_y_min);
+    mesh_find_extrema->y_min = feenox_get_or_define_variable_get_ptr(name_y_min);
   }
   if (name_y_max != NULL) {
-    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_y_max);
+    mesh_find_extrema->y_max = feenox_get_or_define_variable_get_ptr(name_y_max);
   }
   if (name_z_min != NULL) {
-    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_z_min);
+    mesh_find_extrema->z_min = feenox_get_or_define_variable_get_ptr(name_z_min);
   }
   if (name_z_max != NULL) {
-    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_z_max);
+    mesh_find_extrema->z_max = feenox_get_or_define_variable_get_ptr(name_z_max);
   }
   if (name_i_min != NULL) {
-    mesh_find_extrema->min = feenox_get_or_define_variable_get_ptr(name_i_min);
+    mesh_find_extrema->i_min = feenox_get_or_define_variable_get_ptr(name_i_min);
   }
   if (name_i_max != NULL) {
-    mesh_find_extrema->max = feenox_get_or_define_variable_get_ptr(name_i_max);
+    mesh_find_extrema->i_max = feenox_get_or_define_variable_get_ptr(name_i_max);
   }
   
   LL_APPEND(feenox.mesh.find_extremas, mesh_find_extrema);
