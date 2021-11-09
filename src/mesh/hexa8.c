@@ -519,6 +519,80 @@ double feenox_mesh_hexa8_dhdr(int j, int m, double *vec_r) {
 
 
 int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
+
+  // divide the hex8 into six tet4 and check if the point is inside any of them
+  element_t tet;
+  tet.type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON4];
+  feenox_check_alloc(tet.node = calloc(tet.type->nodes, sizeof(node_t *)));
+  
+  // first tet: 0 1 3 4
+  tet.node[0] = element->node[0];
+  tet.node[1] = element->node[1];
+  tet.node[2] = element->node[3];
+  tet.node[3] = element->node[4];
+  if (tet.type->point_in_element(&tet, x)) {
+    feenox_free(tet.node);
+    return 1;
+  }
+
+  // second tet: 5 4 7 1
+  tet.node[0] = element->node[5];
+  tet.node[1] = element->node[4];
+  tet.node[2] = element->node[7];
+  tet.node[3] = element->node[1];
+  if (tet.type->point_in_element(&tet, x)) {
+    feenox_free(tet.node);
+    return 1;
+  }
+  
+  // third tet: 3 4 7 1
+  tet.node[0] = element->node[3];
+  tet.node[1] = element->node[4];
+  tet.node[2] = element->node[7];
+  tet.node[3] = element->node[1];
+  if (tet.type->point_in_element(&tet, x)) {
+    feenox_free(tet.node);
+    return 1;
+  }
+
+  // forth tet: 3 1 2 7
+  tet.node[0] = element->node[3];
+  tet.node[1] = element->node[1];
+  tet.node[2] = element->node[2];
+  tet.node[3] = element->node[7];
+  if (tet.type->point_in_element(&tet, x)) {
+    feenox_free(tet.node);
+    return 1;
+  }
+
+  // fifth tet: 5 7 6 1
+  tet.node[0] = element->node[5];
+  tet.node[1] = element->node[7];
+  tet.node[2] = element->node[6];
+  tet.node[3] = element->node[1];
+  if (tet.type->point_in_element(&tet, x)) {
+    feenox_free(tet.node);
+    return 1;
+  }
+  
+  // sixth tet: 2 7 6 1
+  tet.node[0] = element->node[2];
+  tet.node[1] = element->node[7];
+  tet.node[2] = element->node[6];
+  tet.node[3] = element->node[1];
+  if (tet.type->point_in_element(&tet, x)) {
+    feenox_free(tet.node);
+    return 1;
+  }
+  
+  feenox_free(tet.node);
+  return 0;
+  
+  
+}
+
+/*
+int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   
   double zero, one, lambda1, lambda2, lambda3, lambda4;
   gsl_vector *tetra_aux_index = gsl_vector_alloc(4);
@@ -716,10 +790,8 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   
   return flag;
 
-
-
-
 }
+ */
 
 double feenox_mesh_hex_vol(element_t *element) {
 
