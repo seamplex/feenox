@@ -108,7 +108,7 @@ Physical Volume("bulk") = {1};
 
 // meshing settings, read Gmsh' manual for further reference
 Mesh.ElementOrder = 2;      // use second-order tetrahedra
-Mesh.Algorithm = 6;         // 2D mesh algorithm:  6: Frontal Delaunayfe  
+Mesh.Algorithm = 6;         // 2D mesh algorithm:  6: Frontal Delaunay
 Mesh.Algorithm3D = 10;      // 3D mesh algorithm: 10: HXT
 Mesh.Optimize = 1;          // Optimize the mesh
 Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimization
@@ -116,7 +116,7 @@ Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimizati
 Mesh.MeshSizeMax = 80;     // main element size 
 Mesh.MeshSizeMin = 20;      // refined element size
 
-// local refinement around the point D (entity 5)
+// local refinement around the point D (entity 4)
 Field[1] = Distance;
 Field[1].NodesList = {4};
 Field[2] = Threshold;
@@ -136,7 +136,7 @@ one-to-one correspondence with the original problem formulation from
 
 ```feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical DIMENSIONS 3
+PROBLEM mechanical 3D
 READ_MESH nafems-le10.msh   # mesh in millimeters
 
 # LOADING: uniform normal pressure on the upper surface
@@ -172,6 +172,64 @@ $
 
 
 ![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width=75%}
+
+# NAFEMS LE11 "Solid Cylinder/Taper/Sphere-Temperature" benchmark
+
+::: {#fig:nafems-le11-problem}
+![Problem statement](nafems-le11-problem.png){width="48%"} ![Structured
+hex mesh](nafems-le11-mesh.png){width="48%"}
+
+The NAFEMS LE11 problem formulation
+:::
+
+Following the spirit from LE10, note how easy it is to give a
+space-dependent temperature field in FeenoX. Just write
+$\sqrt{x^2+y^2}+z$ like `sqrt(x^2 + y^2) + z`!
+
+
+```feenox
+# NAFEMS Benchmark LE-11: solid cylinder/taper/sphere-temperature
+PROBLEM mechanical 3D
+READ_MESH nafems-le11.msh
+
+# linear temperature gradient in the radial and axial direction
+# as an algebraic expression as human-friendly as it can be
+T(x,y,z) := sqrt(x^2 + y^2) + z
+
+BC xz     v=0       # displacement vector is [u,v,w]
+BC yz     u=0       # u = displacement in x
+BC xy     w=0       # v = displacement in y
+BC HIH'I' w=0       # w = displacement in z
+
+E = 210e3*1e6       # mesh is in meters, so E=210e3 MPa -> Pa
+nu = 0.3            # dimensionless
+alpha = 2.3e-4      # in 1/ºC as in the problem
+SOLVE_PROBLEM
+
+# for post-processing in Paraview
+WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigmax sigmay sigmaz
+
+PRINT "sigma_z(A) =" %.2f sigmaz(1,0,0)/1e6 "MPa" SEP " "
+PRINT "wall time  =" %.2f wall_time() "seconds"  SEP " "
+```
+
+
+```terminal
+$ gmsh -3 nafems-le11.geo
+[...]
+$ feenox nafems-le11.fee
+sigma_z(A) = -105.04 MPa
+wall time  = 3.24 seconds
+$
+```
+
+
+::: {#fig:nafems-le11-result}
+![Problem statement](nafems-le11-temperature.png){width=48%}
+![Structured hex mesh](nafems-le11-sigmaz.png){width=48%}
+
+The NAFEMS LE11 problem results
+:::
 
 # How to solve a maze without AI
 
@@ -376,7 +434,7 @@ Then another `.geo` file is merged to build
     [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
     [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
     [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
--   `${c}`: 1,2,`\dots`{=tex},10
+-   `${c}`: 1,2,$\dots$,10
 
 ::: {#fig:cantilever-mesh}
 ![Tetrahedra](cantilever-tet.png){width="45%"}

@@ -5,6 +5,7 @@ rm -f ${out}
 for i in hello          \
          lorenz         \
          nafems-le10    \
+         nafems-le11    \
          maze           \
          fibo_formula   \
          fibo_vector    \

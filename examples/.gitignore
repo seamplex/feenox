@@ -11,3 +11,5 @@ cantilever*.msh
 cantilever*.dat
 fork*.msh
 fork.dat
+*.vtk
+nafems-le11.msh
