@@ -1,5 +1,5 @@
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical DIMENSIONS 3
+PROBLEM mechanical 3D
 DEFAULT_ARGUMENT_VALUE 1 1
 READ_MESH le10_2nd-$1.msh   # FeenoX honors the order of the mesh
 

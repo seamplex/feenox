@@ -18,7 +18,7 @@
 #$ sigma_y @ D =   -5.38016        MPa
 #$ $
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical DIMENSIONS 3
+PROBLEM mechanical 3D
 READ_MESH nafems-le10.msh   # mesh in millimeters
 
 # LOADING: uniform normal pressure on the upper surface
