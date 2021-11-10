@@ -9,9 +9,13 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-# this t4 is separated from t1 & t2 because it needs gmsh
+# t1 and t4 are separated from t2 & t3 because they needs gmsh
 checkpetsc
 checkgmsh
+
+gmsh -2 ${dir}/nafems-t1.geo
+answerfloat nafems-t1.fee 50 0.1
+exitifwrong $?
 
 gmsh -2 ${dir}/nafems-t4.geo
 answer nafems-t4.fee 18.3

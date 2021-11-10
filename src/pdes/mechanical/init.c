@@ -61,6 +61,19 @@ int feenox_problem_init_parser_mechanical(void) {
       feenox.pde.dofs = 2;
     }
   } else {
+    if (feenox.pde.dim == 0) {
+      // default is 3d
+      feenox.pde.dim = 3;
+    } else if (feenox.pde.dim == 1)   {
+      feenox_push_error_message("cannot solve 1D mechanical problems");
+      return FEENOX_ERROR;
+    } else if (feenox.pde.dim == 2)   {
+      feenox_push_error_message("to solve 2D problems give either plane_stress, plane_strain or axisymmetric");
+      return FEENOX_ERROR;
+    } else if (feenox.pde.dim != 3) {
+      feenox_push_error_message("dimension inconsistency, expected DIMENSION 3");
+      return FEENOX_ERROR;
+    }
     feenox.pde.dofs = feenox.pde.dim;
   }
 

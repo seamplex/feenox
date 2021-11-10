@@ -1,0 +1,19 @@
+PROBLEM mechanical 2D plane_stress
+READ_MESH nafems-t1.msh
+
+E = 100e3
+nu = 0.3
+alpha_bulk = 0
+alpha_hot = 1e-3
+T(x,y) = (x^2+y^2) < 1
+
+BC x v=0
+BC y u=0
+
+SOLVE_PROBLEM
+
+PRINT sigmay(1.005,0)
+
+# sigmay_profile(x) := sigmay(x,0)
+# PRINT_FUNCTION sigmay_profile MIN 0.9 MAX 1.1 NSTEPS 100
+# WRITE_MESH nafems-t1.vtk VECTOR u v 0  sigmax sigmay tauxy

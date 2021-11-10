@@ -29,8 +29,8 @@ TESTS = \
         tests/mesh.sh \
         tests/modal.sh \
         tests/nafems-lex.sh \
-        tests/nafems-tx.sh \
-        tests/nafems-t4.sh \
+        tests/nafems-t1-4.sh \
+        tests/nafems-t2-3.sh \
         tests/neutron_diffusion_src.sh \
         tests/neutron_diffusion_keff.sh \
         tests/parallelepiped.sh \

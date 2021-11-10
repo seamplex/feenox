@@ -79,6 +79,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   double ex = gsl_matrix_get(element->dphidx_node[j], 0, 0);
   double ey = gsl_matrix_get(element->dphidx_node[j], 1, 1);
   double ez = 0;
+  // TODO: axisymmetric
   if (feenox.pde.dofs == 3) {
     ez = gsl_matrix_get(element->dphidx_node[j], 2, 2);
   }  
@@ -91,17 +92,43 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
   }  
   
-  // normal stresses
+  
+  // TODO: virtual
   double lambda_div = lambda*(ex + ey + ez);
-  double two_mu = 2*mu;
-  double sigmax = lambda_div + two_mu * ex;
+  double two_mu = two_mu = 2*mu;
+  double sigmax = 0;
   double sigmay = 0;
   double sigmaz = 0;
-  if (feenox.pde.dim == 3) {
+  double tauxy = 0;
+  double tauyz = 0;
+  double tauzx = 0;
+  
+  if (mechanical.variant == variant_full || mechanical.variant == variant_plane_strain) {
+    // normal stresses
+    sigmax = lambda_div + two_mu * ex;
     sigmay = lambda_div + two_mu * ey;
     sigmaz = lambda_div + two_mu * ez;
-  }  
   
+    // shear stresses
+    tauxy = mu * gammaxy;
+    if (feenox.pde.dofs == 3) {
+      tauyz = mu * gammayz;
+      tauzx = mu * gammazx;
+    }
+  } else if (mechanical.variant == variant_plane_stress) {
+    
+      double E = mu*(3*lambda + 2*mu)/(lambda+mu);
+      double nu = lambda / (2*(lambda+mu));
+    
+      double c1 = E/(1-nu*nu);
+      double c2 = nu * c1;
+
+      sigmax = c1 * ex + c2 * ey;
+      sigmay = c2 * ex + c1 * ey;
+      tauxy = c1*0.5*(1-nu) * gammaxy;
+    
+  }
+
   // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
   if (mechanical.alpha.defined) {
     double alpha = mechanical.alpha.eval(&mechanical.alpha, node->x, element->physical_group->material);
@@ -110,20 +137,11 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       double thermal_stress = E/(1-2*nu) * alpha * DT;
     
       sigmax -= thermal_stress;
+      sigmay -= thermal_stress;
       if (feenox.pde.dim == 3) {
-        sigmay -= thermal_stress;
         sigmaz -= thermal_stress;
       }  
     }
-  }
-  
-  // shear stresses
-  double tauxy = mu * gammaxy;
-  double tauyz = 0;
-  double tauzx = 0;
-  if (feenox.pde.dofs == 3) {
-    tauyz = mu * gammayz;
-    tauzx = mu * gammazx;
   }
   
   node->flux[FLUX_SIGMAX] += rel_weight * (sigmax - node->flux[FLUX_SIGMAX]);

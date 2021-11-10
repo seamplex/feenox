@@ -14,7 +14,8 @@ struct mechanical_t {
   enum {
     variant_full,
     variant_plane_stress,
-    variant_plane_strain
+    variant_plane_strain,
+    variant_axisymmetric,
   } variant;  
   
   distribution_t E;     // Young's modulus
