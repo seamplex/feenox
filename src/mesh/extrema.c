@@ -204,8 +204,22 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         }
       } else {
         if (function->type == function_type_pointwise_mesh_node && function->mesh == mesh) {
-          feenox_push_error_message("FIND_EXTREMA with OVER on a node-centered function not implemented yet.");
-          return FEENOX_ERROR;
+          
+          size_t i = 0;
+          unsigned int j = 0;
+          for (i = 0; i < physical_group->n_elements; i++) {
+            element = &mesh->element[physical_group->element[i]];
+            for (j = 0; j < element->type->nodes; j++) {
+              val = function->data_value[element->node[j]->index_mesh];
+              if (val > value[FEENOX_EXTREMA_MAX]) {
+                feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, element->node[j]->index_mesh, val, element->node[j]->x);
+              }
+              if (val < value[FEENOX_EXTREMA_MIN]) {
+                feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, element->node[j]->index_mesh, val, element->node[j]->x);
+              }  
+            }
+          }
+          
         } else {
           feenox_push_error_message("FIND_EXTREMA with OVER on a node-centered generic function not implemented yet.");
           return FEENOX_ERROR;
@@ -221,16 +235,14 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         for (i = 0; i < physical_group->n_elements; i++) {
           element = &mesh->element[physical_group->element[i]];
           for (j = 0; j < element->type->nodes; j++) {
-          
-            feenox_mesh_update_coord_vars(mesh->node[j].x);
+            feenox_mesh_update_coord_vars(element->node[j]->x);
             val = feenox_expression_eval(expr);
             if (val > value[FEENOX_EXTREMA_MAX]) {
-              feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, element->node[j]->index_mesh, val, mesh->node[j].x);
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, element->node[j]->index_mesh, val, element->node[j]->x);
             }
             if (val < value[FEENOX_EXTREMA_MIN]) {
-              feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, element->node[j]->index_mesh, val, mesh->node[j].x);
+              feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, element->node[j]->index_mesh, val, element->node[j]->x);
             }
-        
           }
         }
       }

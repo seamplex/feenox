@@ -33,7 +33,6 @@ int feenox_instruction_mesh_integrate(void *arg) {
   element_t *element = NULL;
   double integral = 0;
   
-  // same as find extrema
   // TODO: take into account expressions of x and nx
   // TODO: make one actual function for each field location and function type, virtual?
   // TODO: choose dimension?
