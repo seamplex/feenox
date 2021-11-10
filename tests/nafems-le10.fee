@@ -12,26 +12,99 @@ nu = 0.3
 
 SOLVE_PROBLEM 
 
+# stress tensor at point D
 MATRIX stress ROWS 3 COLS 3 DATA \
     sigmax(2000,0,300)  tauxy(2000,0,300)  tauzx(2000,0,300) \
     tauxy(2000,0,300)  sigmay(2000,0,300)  tauyz(2000,0,300) \
     tauzx(2000,0,300)   tauyz(2000,0,300) sigmaz(2000,0,300)
     
-INTEGRATE 1 RESULT vol
+# total volume
+INTEGRATE 1 RESULT vol   
 
+# average of displacement
 INTEGRATE u RESULT Iu
 INTEGRATE v RESULT Iv
 INTEGRATE w RESULT Iw
-FIND_EXTREMA u(x,y,z)^2+v(x,y,z)^2+w(x,y,z)^2 X_MAX displ_x Y_MAX displ_y Z_MAX displ_z
 
+# maximum displacement
+FIND_EXTREMA u(x,y,z)^2+v(x,y,z)^2+w(x,y,z)^2 X_MAX max_displ_x Y_MAX max_displ_y Z_MAX max_displ_z
+
+# average von Mises
 INTEGRATE sigma RESULT Is
+
+# min/max von Mises
 FIND_EXTREMA sigma MIN min_sigma X_MIN min_sigma_x Y_MIN min_sigma_y Z_MIN min_sigma_z \
                    MAX max_sigma X_MAX max_sigma_x Y_MAX max_sigma_y Z_MAX max_sigma_z
                    
+                   
+# face DCD'C' area
+INTEGRATE 1 OVER DCD'C' RESULT area_dcdc
+
+# average of displacement over face DCD'C'
+INTEGRATE u OVER DCD'C' RESULT Iu_dcdc 
+INTEGRATE v OVER DCD'C' RESULT Iv_dcdc 
+INTEGRATE w OVER DCD'C' RESULT Iw_dcdc 
+
+# min/max displacement of face DCD'C'
+FIND_EXTREMA u(x,y,z)^2+v(x,y,z)^2+w(x,y,z)^2 OVER DCD'C' \
+  X_MAX max_displ_x_dcdc Y_MAX max_displ_y_dcdc Z_MAX max_displ_z_dcdc  \
+  X_MIN min_displ_x_dcdc Y_MIN min_displ_y_dcdc Z_MIN min_displ_z_dcdc                 
+
+# average von Mises on face DCD'C'
+INTEGRATE sigma OVER DCD'C' RESULT Is_dcdc
+
+# min/max von Mises
+FIND_EXTREMA sigma MIN min_sigma_dcdc X_MIN min_sigma_x_dcdc Y_MIN min_sigma_y_dcdc Z_MIN min_sigma_z_dcdc \
+                   MAX max_sigma_dcdc X_MAX max_sigma_x_dcdc Y_MAX max_sigma_y_dcdc Z_MAX max_sigma_z_dcdc OVER DCD'C'
+  
+  
+# output
+PRINT "stress tensor at D"
 PRINT %+.2f stress
+
+PRINT
+PRINT "von Mises at D"
 PRINT %.2f sigma(2000,0,300)
 
+PRINT
+PRINT "average displacement on bulk"
 PRINT %+.4f Iu/vol Iv/vol Iw/vol
-PRINT %+.4f u(displ_x,displ_y,displ_z) v(displ_x,displ_y,displ_z) w(displ_x,displ_y,displ_z)
-PRINT %+.2f displ_x displ_y displ_z
+
+PRINT
+PRINT "maximum displacement on bulk"
+PRINT %+.4f u(max_displ_x,max_displ_y,max_displ_z) v(max_displ_x,max_displ_y,max_displ_z) w(max_displ_x,max_displ_y,max_displ_z)
+
+PRINT
+PRINT "location of maximum displacement on bulk"
+PRINT %+.2f max_displ_x max_displ_y max_displ_z
+
+PRINT
+PRINT "min/max/average von Mises on bulk"
 PRINT %+.2f min_sigma max_sigma Is/vol
+
+PRINT
+PRINT "location of min/max von Mises on bulk"
+PRINT %+.2f min_sigma_x min_sigma_y min_sigma_z
+PRINT %+.2f max_sigma_x max_sigma_y max_sigma_z
+
+
+PRINT
+PRINT "average displacement on DCD'C'"
+PRINT %+.4f Iu_dcdc/area_dcdc Iv_dcdc/area_dcdc Iw_dcdc/area_dcdc
+
+PRINT
+PRINT "maximum displacement on DCD'C'"
+PRINT %+.4f u(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc) v(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc) w(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc)
+
+PRINT
+PRINT "location of maximum displacement on DCD'C'"
+PRINT %+.2f max_displ_x_dcdc max_displ_y_dcdc max_displ_z_dcdc
+
+PRINT
+PRINT "min/max/average von Mises on DCD'C'"
+PRINT %+.2f min_sigma_dcdc max_sigma_dcdc Is_dcdc/area_dcdc
+
+PRINT
+PRINT "location of min/max von Mises on DCD'C'"
+PRINT %+.2f min_sigma_x_dcdc min_sigma_y_dcdc min_sigma_z_dcdc
+PRINT %+.2f max_sigma_x_dcdc max_sigma_y_dcdc max_sigma_z_dcdc

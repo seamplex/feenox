@@ -1,8 +1,39 @@
+stress tensor at D
 -0.08	+0.05	-0.04
 +0.05	-5.45	+0.01
 -0.04	+0.01	-1.02	
+
+von Mises at D
 4.97
--0.000144	-0.000375	-0.060851
+
+average displacement on bulk
+-0.0001	-0.0004	-0.0609
+
+maximum displacement on bulk
 +0.0000	-0.0417	-0.1976
+
+location of maximum displacement on bulk
 +0.00	+1000.00	+300.00
+
+min/max/average von Mises on bulk
 +0.46	+15.79	+4.21
+
+location of min/max von Mises on bulk
++0.00	+1000.00	+0.00
++587.74	+2704.66	+300.00
+
+average displacement on DCD'C'
+-0.0002	+0.0000	-0.0441
+
+maximum displacement on DCD'C'
+-0.0275	-0.0000	-0.0982
+
+location of maximum displacement on DCD'C'
++2000.00	+0.00	+300.00
+
+min/max/average von Mises on DCD'C'
++0.66	+10.59	+3.67
+
+location of min/max von Mises on DCD'C'
++2000.00	+0.00	-43.98
++3250.00	+0.00	+300.00
