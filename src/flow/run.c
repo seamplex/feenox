@@ -22,7 +22,7 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
-int feenox_run_standard(void) {
+int feenox_run(void) {
 
   feenox_call(feenox_init_before_run());
   

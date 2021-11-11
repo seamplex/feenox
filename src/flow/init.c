@@ -43,9 +43,6 @@ int feenox_initialize(int argc, char **argv) {
   int show_help = 0;
   int show_version = 0;
   
-  // assume the user wants a standard run
-  feenox.run = feenox_run_standard;
-  
 ///help+usage+desc usage: feenox [options] inputfile [replacement arguments]  
   
   const struct option longopts[] = {

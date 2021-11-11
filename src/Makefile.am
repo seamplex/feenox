@@ -30,7 +30,7 @@ feenox_SOURCES = \
 ./flow/cleanup.c \
 ./flow/instruction.c \
 ./flow/step.c \
-./flow/run_standard.c \
+./flow/run.c \
 ./parser/parser.c \
 ./parser/parser.h \
 ./parser/auxiliary.c \

@@ -1422,9 +1422,6 @@ struct feenox_t {
     mode_list_vars
   } mode;
   
-  // pointer to the run function (normal, fit, etc)
-  int (*run)(void);
-  
   int debug;
   
   int rank;            // in serial or without petsc, this is always zero
@@ -1819,8 +1816,8 @@ struct feenox_t {
 
 // function declarations
 
-// run_standard.c
-extern int feenox_run_standard(void);
+// run.c
+extern int feenox_run(void);
 extern void feenox_limit_time_step(void);
 
 // step.c
