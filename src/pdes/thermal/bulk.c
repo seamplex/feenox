@@ -23,7 +23,6 @@
 #include "thermal.h"
 extern feenox_t feenox;
 extern thermal_t thermal;
-extern double zero[3];
 
 int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigned int v) {
 
@@ -32,7 +31,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
-  double *x = zero;
+  double *x = NULL;
   if (thermal.space_stiffness || thermal.space_source || thermal.space_mass) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];

@@ -23,6 +23,8 @@ extern int feenox_problem_bc_set_mechanical_normal_stress(element_t *element, bc
 extern int feenox_problem_bc_set_mechanical_traction(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 // mechanical/bulk.c
+extern int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes);
+int feenox_problem_build_compute_mechanical_C(const double *x, material_t *material);
 extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsigned int v);
 
 // mechanical/post.c

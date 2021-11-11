@@ -23,7 +23,6 @@
 #include "neutron_diffusion.h"
 extern feenox_t feenox;
 extern neutron_diffusion_t neutron_diffusion;
-extern double zero[3];
 
 int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *this, unsigned int v) {
 
@@ -33,7 +32,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   
-  double *x = zero;
+  double *x = NULL;
   if (neutron_diffusion.space_XS) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];

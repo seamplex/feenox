@@ -25,15 +25,29 @@ struct mechanical_t {
   double T0;            // reference temperature
 
 #ifdef HAVE_PETSC  
-/*  
-  PetscBool space_E;
-  PetscBool space_nu;
-  PetscBool space_alpha;
-  PetscBool space_T;
- */
-  
+  PetscBool space_dependent_properties;
   MatNullSpace rigid_body_base;
 #endif
+  
+  size_t n_nodes;
+  size_t stress_strain_size;
+
+  // auxiliary intermediate matrices
+  gsl_matrix *C;    // stress-strain matrix, 6x6 for 3d
+  gsl_matrix *B;    // strain-displacement matrix, 6x(3*n_nodes) for 3d
+  gsl_matrix *CB;   // product of C times B, 6x(3*n_nodes) for 3d
+  gsl_vector *et;   // thermal strain vector, size 6 for 3d
+  gsl_vector *Cet;  // product of C times et, size 6 for 3d
+  
+  // caches
+/*  
+  double E;
+  double nu;
+  
+  double lambda;
+  double mu;
+  double lambda2mu;
+*/  
   
   double hourglass_epsilon;
   

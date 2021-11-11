@@ -23,7 +23,6 @@
 #include "modal.h"
 extern feenox_t feenox;
 extern modal_t modal;
-extern double zero[3];
 
 int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned int v) {
 
@@ -33,7 +32,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned 
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   
-  double *x = zero;
+  double *x = NULL;
   if (modal.space_E || modal.space_nu || modal.space_rho) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];

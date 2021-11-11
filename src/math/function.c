@@ -21,6 +21,7 @@
  */
 #include "feenox.h"
 extern feenox_t feenox;
+const double zero[3] = {0, 0, 0};
 
 int feenox_define_function(const char *name, unsigned int n_arguments) {
   return (feenox_define_function_get_ptr(name, n_arguments) != NULL) ? FEENOX_OK : FEENOX_ERROR;
@@ -520,9 +521,13 @@ int feenox_function_init(function_t *this) {
 }
 
 // evaluate a function
-double feenox_function_eval(function_t *this, const double *x) {
+double feenox_function_eval(function_t *this, const double *const_x) {
 
+  // y is the returned value
   double y = 0;
+  
+  // if x is null we assume it is a 3d-vector with zeroes
+  const double *x = (const_x != NULL) ? const_x : zero;
   
   // check if we need to initialize
   if (this->initialized == 0) {
@@ -542,6 +547,7 @@ double feenox_function_eval(function_t *this, const double *x) {
     feenox_call(feenox_mesh_update_function_gmsh(this, feenox_special_var_value(t), feenox_special_var_value(dt)));
     this->mesh_time = feenox_special_var_value(t);
   }
+  
     
   // TODO: virtual methods
   if (this->type == function_type_pointwise_mesh_node) {

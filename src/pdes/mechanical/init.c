@@ -182,6 +182,34 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_call(feenox_distribution_init(&mechanical.T, "T"));
   mechanical.T.space_dependent = feenox_expression_depends_on_space(mechanical.T.dependency_variables);
   
+  // if all the properties are given by variables, we can optimize some stuff
+  mechanical.space_dependent_properties = mechanical.E.variable == NULL ||
+                                          mechanical.nu.variable == NULL ||
+                                          mechanical.alpha.variable == NULL ||
+                                          mechanical.T.variable == NULL;
+                                          
+  if (mechanical.variant == variant_full) {
+    mechanical.stress_strain_size = 6;
+  } else if (mechanical.variant == variant_axisymmetric) {
+    mechanical.stress_strain_size = 4;
+  } else if (mechanical.variant == variant_plane_stress || mechanical.variant == variant_plane_strain) {
+    mechanical.stress_strain_size = 3;
+  } else {
+    feenox_push_error_message("internal mismatch, unknown variant");
+    return FEENOX_ERROR;
+  }
+  
+  feenox_check_alloc(mechanical.C = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
+  if (mechanical.alpha.defined) {
+    feenox_check_alloc(mechanical.et = gsl_vector_calloc(mechanical.stress_strain_size));
+    feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
+  }
+  
+  // cache properties
+  feenox_call(feenox_problem_build_compute_mechanical_C(NULL, NULL));
+  
+                                          
+  
   // TODO: read T0
   
   // TODO: check nonlinearity!

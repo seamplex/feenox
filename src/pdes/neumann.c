@@ -1,5 +1,6 @@
 #include "feenox.h"
 extern feenox_t feenox;
+extern double zero[3];
 
 int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *value) {
 
@@ -26,7 +27,6 @@ double feenox_problem_bc_natural_weight(element_t *element, unsigned int v) {
 }
 
 double *feenox_problem_bc_natural_x(element_t *element, bc_data_t *bc_data, unsigned int v) {
-  static double zero[3] = {0, 0, 0};
   double *x = zero;
   if (bc_data->space_dependent) {
     feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration);

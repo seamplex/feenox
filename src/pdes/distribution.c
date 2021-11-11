@@ -258,12 +258,14 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
   }
   
   if (this->last_property_data != NULL) {
-    // the property has an expression of x,y & z, it's not a function
-    feenox_var_value(feenox.mesh.vars.x) = x[0];
-    if (feenox.pde.dim > 1) {
-      feenox_var_value(feenox.mesh.vars.y) = x[1];
-      if (feenox.pde.dim > 2) {
-        feenox_var_value(feenox.mesh.vars.z) = x[2];
+    if (x != NULL) {
+      // the property has an expression of x,y & z, it's not a function
+      feenox_var_value(feenox.mesh.vars.x) = x[0];
+      if (feenox.pde.dim > 1) {
+        feenox_var_value(feenox.mesh.vars.y) = x[1];
+        if (feenox.pde.dim > 2) {
+          feenox_var_value(feenox.mesh.vars.z) = x[2];
+        }  
       }
     }
     return feenox_expression_eval(&this->last_property_data->expr);
