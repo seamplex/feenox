@@ -202,8 +202,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     # default
     if [ ! -e aster_default_${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
-      sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/default/ > le10-${m}-${c}.export
-      ${time} -o aster_default_${m}-${c}.time as_run le10-${m}-${c}.export
+      sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/default/ > le10_default-${m}-${c}.export
+      ${time} -o aster_default_${m}-${c}.time as_run le10_default-${m}-${c}.export
       grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster_default_${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-default-${m}-${c}.txt | awk '{print $5}' >> aster_default_${m}-${c}.sigmay
     fi
@@ -221,8 +221,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     # cholesky (subintegrated)
     if [ ! -e aster_cholesky_${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
-      sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/cholesky/ > le10-${m}-${c}.export
-      ${time} -o aster_cholesky_${m}-${c}.time as_run le10-${m}-${c}.export
+      sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/cholesky/ > le10_cholesky-${m}-${c}.export
+      ${time} -o aster_cholesky_${m}-${c}.time as_run le10_cholesky-${m}-${c}.export
       grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster_cholesky_${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-cholesky-${m}-${c}.txt | awk '{print $5}' >> aster_cholesky_${m}-${c}.sigmay
     fi
@@ -240,8 +240,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     # mumps
     if [ ! -e aster_mumps_${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
-      sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/mumps/ > le10-${m}-${c}.export
-      ${time} -o aster_mumps_${m}-${c}.time as_run le10-${m}-${c}.export
+      sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/mumps/ > le10_mumps-${m}-${c}.export
+      ${time} -o aster_mumps_${m}-${c}.time as_run le10_mumps-${m}-${c}.export
       grep "degrés de liberté:" message-${m}-${c}  | awk '{printf("%g\t", $7)}' > aster_mumps_${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-mumps-${m}-${c}.txt | awk '{print $5}' >> aster_mumps_${m}-${c}.sigmay
     fi
