@@ -83,7 +83,7 @@ if [ ! -z "$(which ccx)" ]; then
   cc unical1.c -o unical1
   rm -f calculix_${m}*.dat
   
-  ccx -v > version_calculix
+  ccx -v > version_calculix.txt
   
 fi
 
