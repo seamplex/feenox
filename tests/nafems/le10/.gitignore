@@ -21,6 +21,9 @@ le10_mesh-*.inp
 le10_spooles*.inp
 le10_diagonal*.inp
 le10_cholesky*.inp
+le10_default*.export
+le10_cholesky*.export
+le10_mumps*.export
 message*
 DD*.txt
 *.12d
