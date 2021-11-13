@@ -65,7 +65,7 @@ if [ ! -z "$(which as_run)" ]; then
   has_aster="yes"
   rm -f aster_default_${m}*.dat
   
-  as_run --version > version_aster.txt
+  as_run --getversion > version_aster.txt
   
 fi
 
