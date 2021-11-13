@@ -39,12 +39,17 @@ if [ ! -z "$(which feenox)" ]; then
     has_feenox_mumps="yes"
     rm -f feenox_mumps_${m}*.dat
   fi
+  
+  feenox -V > version_feenox.txt
 fi
 
-# --- Sparselizard ----------------------gi
+# --- Sparselizard ----------------------
 if [ -e "sparselizard/sparselizard" ]; then
   has_sparselizard="yes"
   rm -f sparselizard_mumps_${m}*.dat
+  
+  cd sparselizard; git describe --tags > ../version_sparselizard.txt; cd ..
+  
 fi
 
 # --- Code Aster ----------------------
@@ -59,6 +64,9 @@ if [ ! -z "$(which as_run)" ]; then
 
   has_aster="yes"
   rm -f aster_default_${m}*.dat
+  
+  as_run --version > version_aster.txt
+  
 fi
 
 # --- CalculiX ----------------------
@@ -74,6 +82,9 @@ if [ ! -z "$(which ccx)" ]; then
   has_calculix="yes"
   cc unical1.c -o unical1
   rm -f calculix_${m}*.dat
+  
+  ccx -v > version_calculix
+  
 fi
 
 
@@ -91,6 +102,9 @@ if [ ! -z "$(which reflexCLI)" ]; then
   rm -f reflex_gamg_${m}*.dat
   rm -f reflex_mumps_${m}*.dat
   rm -f reflex_hypre_${m}*.dat
+  
+  reflexCLI -v > version_reflex.txt
+  
 fi
 
 # manually-disabled codes
@@ -329,6 +343,9 @@ for c in $(feenox steps.fee ${min} ${steps}); do
         echo >> calculix_cholesky_${m}.dat
       fi  
     fi
+    
+    # delete unwanted dats
+    rm -f le10_*.dat
     
   fi
   

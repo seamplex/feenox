@@ -1,5 +1,5 @@
 set grid
-set terminal svg size 1200,900 dynamic enhanced mouse standalone
+set terminal svg size 1200,720 dynamic enhanced mouse standalone font "sans-serif,16"
 
 
 set key above

@@ -119,6 +119,12 @@ if [ -z "${pdfyaml}" ]; then
   pdfyaml=pdf
 fi
 
+if [ "x$(grep toc: ${stuff}.md)" = "xfalse" ]; then
+  toc=""
+else
+  toc="--toc"
+fi
+
 
 pandoc ${dir}/hash.yaml ${dir}/${pdfyaml}.yaml ${stuff}.md \
   --standalone --toc \
