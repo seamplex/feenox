@@ -40,8 +40,8 @@ date: ${date}
 EOF
 
   # table with architecture
-  if [ -e table-${1}.md ]; then
-    cat table-${1}.md >> report-${1}.md
+  if [ -e arch-${1}.md ]; then
+    cat arch-${1}.md >> report-${1}.md
   fi
 
   # terminal with reference
@@ -62,18 +62,21 @@ cat << EOF >> report-${1}.md
 
 EOF
 
+  # figures
   echo -n "plot " > plot-${1}.gp
 
   for i in feenox_*.dat sparselizard_*.dat aster_*.dat calculix_*.dat reflex_*.dat; do
-    program=$(echo $(basename ${i} .dat) | cut -d"_" -f 1)
-    solver=$(echo $(basename ${i} .dat) | cut -d"_" -f 2)
-    shape=$(echo $(basename ${i} .dat) | cut -d"_" -f 3)
+    if [ -e ${i} ]; then
+      program=$(echo $(basename ${i} .dat) | cut -d"_" -f 1)
+      solver=$(echo $(basename ${i} .dat) | cut -d"_" -f 2)
+      shape=$(echo $(basename ${i} .dat) | cut -d"_" -f 3)
   
-    if [ "x${shape}" = "x${1}" ]; then
-      echo ${program} ${solver} ${shape}
-      echo -n "\"${i}s\" u cx:cy  w lp lw ${lw[$program]} pt ${lt[$solver]} dashtype ${lt[$solver]}  lc \"${color[$program]}\"  ti \"${program} ${solver}\", " >> plot-${1}.gp
-      sort -r -g ${i} | grep -v nan | grep -v exited > ${i}s
-    fi  
+      if [ "x${shape}" = "x${1}" ]; then
+        echo ${program} ${solver} ${shape}
+        echo -n "\"${i}s\" u cx:cy  w lp lw ${lw[$program]} pt ${lt[$solver]} dashtype ${lt[$solver]}  lc \"${color[$program]}\"  ti \"${program} ${solver}\", " >> plot-${1}.gp
+        sort -r -g ${i} | grep -v nan | grep -v exited > ${i}s
+      fi
+    fi
   done
 
   cat plot-${1}.gp | tr -d '\n' > plot-${1}-sigmay.gp
@@ -90,6 +93,36 @@ EOF
     echo >> report-${1}.md
   done
   echo >> report-${1}.md
+
+  
+  # tables with data
+  for c in $(cat *.dat | awk '{print $1}' | sort -rg | uniq); do
+  
+    cat << EOF  >> report-${1}.md
+Program | Solver | DOFs | $\\sigma_y$ | Wall [s] | Kernel [s] | User [s] | Memory [Gb]
+--------|--------|-----:|:-----------:|:--------:|:----------:|:--------:|:-----------:
+EOF
+  
+    for i in feenox_*.dat sparselizard_*.dat aster_*.dat calculix_*.dat reflex_*.dat; do
+      if [ -e ${i} ]; then
+        program=$(echo $(basename ${i} .dat) | cut -d"_" -f 1)
+        solver=$(echo $(basename ${i} .dat) | cut -d"_" -f 2)
+        shape=$(echo $(basename ${i} .dat) | cut -d"_" -f 3)
+      
+        if [ "x${shape}" = "x${1}" ]; then
+          grep -w ^${c} ${i} | awk -vprogram=${program} -vsolver=${solver} '{printf("%s | %s | %\047d | %.2f | %.1f | %.1f | %.1f  | %.2f\n", program, solver, $2, $3, $4, $5, $6, $7/(1024*1024));}'  >> report-${1}.md
+        fi
+      fi
+    done
+
+    cat << EOF  >> report-${1}.md
+ 
+Table: \$c=${c}\$
+
+
+EOF
+  done
+  
   
 else
 
