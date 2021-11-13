@@ -28,6 +28,6 @@ spooles.out
 unical1
 plot-*.gp
 report-*.md
+table-*.md
 calculix*.txt
 output
-
