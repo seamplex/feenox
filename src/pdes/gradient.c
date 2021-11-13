@@ -25,6 +25,11 @@ extern feenox_t feenox;
 int feenox_problem_gradient_compute(void) {
   
 #ifdef HAVE_PETSC
+  
+  if (feenox.pde.m2 == NULL) {
+    feenox_check_alloc(feenox.pde.m2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
+  }
+  
   // the mesh for "rough" mode is different
   mesh_t *mesh = (feenox.pde.rough == 0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
   
@@ -42,7 +47,7 @@ int feenox_problem_gradient_compute(void) {
       for (m = 0; m < feenox.pde.dim; m++) {
         // derivative of the degree of freedom g with respect to dimension m
         feenox_gradient_fill(feenox.pde, gradient[g][m]);
-        feenox_gradient_fill(feenox.pde, delta_gradient[g][m]);
+//        feenox_gradient_fill(feenox.pde, delta_gradient[g][m]);
       }
     }
         
@@ -84,7 +89,7 @@ int feenox_problem_gradient_compute(void) {
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
         feenox.pde.gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].dphidx, g, m);
-        feenox.pde.delta_gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].delta_dphidx, g, m);
+//        feenox.pde.delta_gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].delta_dphidx, g, m);
       }
     }
     
@@ -156,6 +161,8 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
   unsigned int m = 0;
   unsigned int j = 0;
   size_t j_global = 0;
+  
+//  feenox.pde.gradient_evaluation = gradient_at_nodes;
   
   if (feenox.pde.gradient_evaluation == gradient_gauss_extrapolated && this->type->gauss[mesh->integration].extrap != NULL) {
     
@@ -263,7 +270,6 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   double delta = 0;
   double sum_weight = 0;
   double rel_weight = 0;
-  gsl_matrix *m2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim);
   int found = 0;
       
   if (node->dphidx == NULL) {
@@ -271,11 +277,13 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   } else {
     gsl_matrix_set_zero(node->dphidx);
   }  
+/*  
   if (node->delta_dphidx == NULL) {
     node->delta_dphidx = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim);
   } else {
     gsl_matrix_set_zero(node->delta_dphidx);
   }
+*/
   
   if (feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc != NULL) {
     feenox_call(feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc(node));
@@ -287,6 +295,7 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   unsigned int n = 0;
   element_t *element = NULL;
   element_ll_t *associated_element = NULL;
+  gsl_matrix_set_zero(feenox.pde.m2);
   LL_FOREACH(node->associated_elements, associated_element) {
     element = associated_element->element;
     if (element->dphidx_node != NULL) {
@@ -306,8 +315,8 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
               current = gsl_matrix_ptr(element->dphidx_node[j], g, m);
               delta = *current - *mean;
               *mean += rel_weight * delta;
-              gsl_matrix_add_to_element(m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
-              gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(m2, g, m)/sum_weight));
+              gsl_matrix_add_to_element(feenox.pde.m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
+//              gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(feenox.pde.m2, g, m)/sum_weight));
             }
           }
 
@@ -318,8 +327,6 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
       }
     }
   }
-      
-  gsl_matrix_free(m2);
   
   return FEENOX_OK;
       

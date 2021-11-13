@@ -1619,6 +1619,7 @@ struct feenox_t {
     size_t global_size;            // total number of DoFs
     
     int compute_gradients;   // do we need to compute gradients?
+    gsl_matrix *m2;
     
     int rough;               // keep each element's contribution to the gradient?
     int roughish;            // average only on the same physical group?
