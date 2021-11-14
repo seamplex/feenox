@@ -1,0 +1,52 @@
+#. # Thermal slabs
+#. 
+#. ## One-dimensional linear thermal slab
+#.
+#.
+#. Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
+#.
+#. $$
+#. \begin{cases}
+#. T(0) = 0 & \text{(left)} \\
+#. T(1) = 1 & \text{(right)} \\
+#. \end{cases}
+#. $$
+#.
+#. and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
+#. 
+#. 
+#. * English self-evident input
+#.   - Syntactic sugared plain-text ASCII file
+#.   - Simple problems (like this one) need simple inputs
+#.   - UNIX rule of simplicity
+#.   - Robust parser (you can say `heat` or `thermal`)
+#.    
+#. * Output is 100% user-defined
+#.   - No `PRINT` no output
+#.   - UNIX rule of silence
+#.   
+#. * There is no node at $x=1/2=0.5$!
+#.   - FeenoX knows how to interpolate
+#.
+#. * Mesh separated from problem
+#.   - Git-friendly `.geo`
+#.
+#.     ```{.c include="^slab.geo"}
+#.     ```
+#.   - UNIX rule of composition
+#.   - Git-friendly `.fee`
+#$ $ gmsh -1 slab.geo
+#$ [...]
+#$ Info    : 4 nodes 5 elements
+#$ Info    : Writing 'slab.msh'...
+#$ [...]
+#$ $ feenox thermal-1d-dirichlet-uniform-k.fee 
+#$ 0.5
+#$ $ 
+PROBLEM thermal 1D    # tell FeenoX what we want to solve 
+READ_MESH slab.msh    # read mesh in Gmsh's v4.1 format
+k = 1                 # set uniform conductivity
+BC left  T=0          # set fixed temperatures as BCs
+BC right T=1          # "left" and "right" are defined in the mesh
+SOLVE_PROBLEM         # we are ready to solve the problem
+PRINT T(1/2)          # ask for the temperature at x=1/2

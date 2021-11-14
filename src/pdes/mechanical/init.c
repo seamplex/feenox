@@ -39,7 +39,15 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node = feenox_problem_gradient_add_elemental_contribution_to_node_mechanical;
   feenox.pde.feenox_problem_gradient_fill_fluxes = feenox_problem_gradient_fill_fluxes_mechanical;
   
-  if (feenox.pde.symmetry_axis != symmetry_axis_none ||
+  
+  // move symmetry_axis which is a general PDE setting to
+  // the mechanically-particular axisymmetric variant
+  if (feenox.pde.symmetry_axis != symmetry_axis_none) {
+      mechanical.variant = variant_axisymmetric;
+  }
+  
+  // check consistency of problem type and dimensions
+  if (mechanical.variant == variant_axisymmetric ||
       mechanical.variant == variant_plane_stress ||
       mechanical.variant == variant_plane_strain) {
 
@@ -54,12 +62,13 @@ int feenox_problem_init_parser_mechanical(void) {
 
     if (feenox.pde.dofs != 0) {
       if (feenox.pde.dofs != 2) {
-        feenox_push_error_message("DOF inconsistency");
+        feenox_push_error_message("DOF inconsistency, expected DOFs per node = 2");
         return FEENOX_ERROR;
       }
     } else {
       feenox.pde.dofs = 2;
     }
+    
   } else {
     if (feenox.pde.dim == 0) {
       // default is 3d
@@ -76,6 +85,20 @@ int feenox_problem_init_parser_mechanical(void) {
     }
     feenox.pde.dofs = feenox.pde.dim;
   }
+  
+  // set material model virtual method
+  // TODO: orthotropic
+  if (mechanical.variant == variant_full) {
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;    
+  } else if (mechanical.variant == variant_plane_stress) {
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+  } else if (mechanical.variant == variant_plane_strain) {
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;  
+  } else {
+    feenox_push_error_message("not yet implemented");
+    return FEENOX_ERROR;
+  }
+  
 
   // TODO: custom names
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
@@ -173,6 +196,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // initialize distributions
+  // TODO: orthotropic
   feenox_distribution_define_mandatory(mechanical, E, "E", "elastic modulus");
   feenox_distribution_define_mandatory(mechanical, nu, "nu", "Poisson’s ratio");
   
@@ -206,7 +230,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // cache properties
-  feenox_call(feenox_problem_build_compute_mechanical_C(NULL, NULL));
+  feenox_call(mechanical.compute_C(NULL, NULL));
   
                                           
   

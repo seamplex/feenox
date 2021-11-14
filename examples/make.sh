@@ -10,6 +10,7 @@ for i in hello          \
          fibo_formula   \
          fibo_vector    \
          fibo_iterative \
+         thermal-1d-dirichlet-uniform-k \
          cantilever     \
          fork           \
   ; do

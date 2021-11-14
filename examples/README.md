@@ -15,6 +15,7 @@ For a presentation of these examples, see the "FeenoX Overview Presentation" (Au
  * [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
  * [Markdown examples sources](https://github.com/gtheler/2021-presentation)
 
+Also, the `tests` [directory in the Github repository](https://github.com/seamplex/feenox/tree/main/tests) has dozens of test cases which can be used as examples for reference and verification.
 
 ```include
 examples.md
