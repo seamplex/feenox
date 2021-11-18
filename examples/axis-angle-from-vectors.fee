@@ -1,0 +1,13 @@
+# compute axis-angle from original and transformed vectors
+
+VECTOR orig  SIZE 3 DATA 1 0 0
+VECTOR trans SIZE 3 DATA 1/sqrt(3) 1/sqrt(3) -1/sqrt(3)
+
+VECTOR a SIZE 3
+
+a[1] = orig[2]*trans[3]-orig[3]*trans[2]
+a[2] = orig[3]*trans[1]-orig[1]*trans[3]
+a[3] = orig[1]*trans[2]-orig[2]*trans[1]
+
+theta = acos(vecdot(orig, trans)/(vecnorm(orig)*vecnorm(trans)))
+PRINT "(" a(1) "," a(2) "," a(3) ")," theta SEP " "

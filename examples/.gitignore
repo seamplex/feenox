@@ -13,3 +13,5 @@ fork*.msh
 fork.dat
 *.vtk
 nafems-le11.msh
+nafems-le1.msh
+nafems-le1.pvsm
