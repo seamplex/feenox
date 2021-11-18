@@ -33,23 +33,15 @@ int feenox_problem_solve_petsc_nonlinear(void) {
     // TODO: move to a separate function
     petsc_call(SNESCreate(PETSC_COMM_WORLD, &feenox.pde.snes));
 
-    // we need the matrices built and assembled to  the matrices here and put a flag that it is already built
-    // so we do not build it again in the first step of the SNES
-//    feenox_call(feenox_build());
-//    feenox_call(feenox_dirichlet_eval());
-//    feenox_call(feenox_dirichlet_set_J(feenox.pde.J));
-//    feenox.pde.already_built = PETSC_TRUE;
-    
     // monitor
 //    petsc_call(SNESMonitorSet(feenox.pde.snes, feenox.pde.snes_monitor, NULL, 0));
 
-//    petsc_call(VecDuplicate(feenox.pde.phi, &feenox.pde.r));
     feenox_check_alloc(feenox.pde.r = feenox_problem_create_vector("r"));
     petsc_call(SNESSetFunction(feenox.pde.snes, feenox.pde.r, feenox_snes_residual, NULL));
     feenox_check_alloc(feenox.pde.J_snes = feenox_problem_create_matrix("J_snes"));
     petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J_snes, feenox.pde.J_snes, feenox_snes_jacobian, NULL));    
     
-  // TODO
+    // TODO
     feenox_call(feenox_problem_setup_snes(feenox.pde.snes));
   }  
   
@@ -61,6 +53,7 @@ int feenox_problem_solve_petsc_nonlinear(void) {
   petsc_call(SNESGetConvergedReason(feenox.pde.snes, &reason));
   if (reason < 0) {
     feenox_push_error_message("PETSc's non-linear solver did not converge with reason '%s' (%d)", SNESConvergedReasons[reason], reason);
+    // TODO: go deeper into the KSP and PC
     return FEENOX_ERROR;
   }
   
@@ -144,7 +137,6 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
   printf("residual\n");
   VecView(r, PETSC_VIEWER_STDOUT_WORLD);
  */
-//  feenox.pde.already_built = PETSC_FALSE;
 
   return FEENOX_OK;
 }
@@ -154,10 +146,10 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
   
   // J_snes = (K + JK*phi - Jb)_bc
   // TODO: we want SAME_NONZERO_PATTERN!
-  MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(J_snes, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(J_snes, MAT_FINAL_ASSEMBLY);
+  petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+  petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+  petsc_call(MatAssemblyBegin(J_snes, MAT_FINAL_ASSEMBLY));
+  petsc_call(MatAssemblyEnd(J_snes, MAT_FINAL_ASSEMBLY));
   petsc_call(MatCopy(feenox.pde.K, J_snes, DIFFERENT_NONZERO_PATTERN));
   
   if (feenox.pde.has_jacobian_K) {
@@ -177,26 +169,19 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
 
 PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy) {
   
-  int i;
-  double current_progress;
   
   if (feenox.pde.progress_r0 == 0) {
     feenox.pde.progress_r0 = rnorm;
   }
-  
-  if (rnorm < 1e-20) {
+
+  double current_progress = (rnorm > 1e-20) ? log((rnorm/feenox.pde.progress_r0))/log(feenox_var_value(feenox.pde.vars.ksp_rtol)) : 1;
+  if (current_progress > 1) {
     current_progress = 1;
-  } else {
-    current_progress = log((rnorm/feenox.pde.progress_r0))/log(feenox_var_value(feenox.pde.vars.ksp_rtol));
-    if (current_progress > 1) {
-      current_progress = 1;
-    }
   } 
 
-//  printf("%d %e %e\n", n, rnorm/feenox.pde.progress_r0, current_progress);
-  
   if (feenox.pde.progress_ascii == PETSC_TRUE) {
-    for (i = (int)(100*feenox.pde.progress_last); i < (int)(100*current_progress); i++) {
+    size_t i = 0;
+    for (i = (size_t)(100*feenox.pde.progress_last); i < (size_t)(100*current_progress); i++) {
       printf(CHAR_PROGRESS_SOLVE);
       fflush(stdout);
     }

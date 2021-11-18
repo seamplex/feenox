@@ -32,8 +32,6 @@ int feenox_problem_dirichlet_eval(void) {
     // if we are here then we know more or less the number of BCs we need
     n_bcs = feenox.pde.n_dirichlet_rows;
   }  
-//  size_t current_size = n_bcs;
-
   
   bc_t *bc = NULL;
   bc_data_t *bc_data = NULL;
@@ -43,7 +41,6 @@ int feenox_problem_dirichlet_eval(void) {
   feenox.pde.dirichlet_k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
 
-    // TODO: high-order nodes end up with a different penalty weight
     // TODO: optimize the way this loop is done to avoid checking
     //       several times for the same group, wasting time and money
     LL_FOREACH(feenox.pde.mesh->node[j].associated_elements, element_list) {
@@ -56,22 +53,15 @@ int feenox_problem_dirichlet_eval(void) {
               // if there is a condition we evaluate it now
               if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
 
-/*                
-                if (feenox.pde.dirichlet_k >= (current_size-4)) {            
-                  current_size += n_bcs;
-                  feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, current_size * sizeof(PetscInt)));
-                  feenox_check_alloc(feenox.pde.dirichlet_values  = realloc(feenox.pde.dirichlet_values,  current_size * sizeof(PetscScalar)));
-                  feenox_check_alloc(feenox.pde.dirichlet_derivatives  = realloc(feenox.pde.dirichlet_derivatives,  current_size * sizeof(PetscScalar)));
-                }
- */
-                
                 if (bc_data->space_dependent) {
                   feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
                 }  
-                // we pass a pointer to k and this method increments it as needed
                 feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j));
-                
-              }  
+
+              }
+              // TODO: high-order nodes end up with a different penalty weight
+              // TODO: multi-freedom constrains, penalty/lagrange
+              // TODO: tangential & radial symmetry
             }  
           }
         }
@@ -93,12 +83,11 @@ int feenox_problem_dirichlet_eval(void) {
   return FEENOX_OK;
 }
 
-
 #ifdef HAVE_PETSC
-// K - stiffness matrix: needs a one in the diagonal and the value in b and keep symmetry
+// K - stiffness matrix: needs one (alpha) in the diagonal, value (alpha*value) in b and keep symmetry
 // b - RHS: needs to be updated when modifying K
-// this is called only when solving an explicit KSP (or EPS) so it takes
-// K and b and writes K_bc and b_bc
+// this is called only when solving an explicit KSP (or EPS) so 
+// it takes K and b and writes K_bc and b_bc
 int feenox_problem_dirichlet_set_K(void) {
   
 /*
@@ -139,12 +128,15 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   }  
   
-  // TODO: scale up the diagonal!
-  // see alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
+  if (feenox.pde.dirichlet_scale == 0)
+  {
+    feenox_problem_dirichlet_compute_scale();
+  }
+  
   if (feenox.pde.symmetric_K == PETSC_TRUE) {
-    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b_bc));
+    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   } else {  
-    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, rhs, feenox.pde.b_bc));
+    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   }  
   petsc_call(VecDestroy(&rhs));
   
@@ -178,8 +170,13 @@ int feenox_problem_dirichlet_set_M(void) {
 // J - Jacobian matrix: same as K but without the RHS vector
 int feenox_problem_dirichlet_set_J(Mat J) {
 
-  // the jacobian is exactly one for the dirichlet values and zero otherwise without keeping symmetry
-  petsc_call(MatZeroRowsColumns(J, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 1.0, NULL, NULL));
+  if (feenox.pde.dirichlet_scale == 0)
+  {
+    feenox_problem_dirichlet_compute_scale();
+  }
+  
+  // the jacobian is exactly one (actually alpha) for the dirichlet values and zero otherwise without keeping symmetry
+  petsc_call(MatZeroRowsColumns(J, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, NULL, NULL));
 
   return FEENOX_OK;
 }
@@ -192,8 +189,6 @@ int feenox_problem_dirichlet_set_phi(Vec phi) {
   
 }
 
-//#define USEZERO
-
 // phi - solution: the values at the BC DOFs are zeroed
 int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot) {
 
@@ -201,22 +196,45 @@ int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot) {
   return FEENOX_OK;
 }
 
-// r - residual: the BC indexes are set to the difference between the value and the solution
+// r - residual: the BC indexes are set to the difference between the value and the solution, scaled by alpha
 int feenox_problem_dirichlet_set_r(Vec r, Vec phi) {
 
   size_t k;
   
-  // TODO: put this array somewhere and avoid allocing/freeing each time
+  // TODO: put this array somewhere and avoid allocating/freeing each time
   PetscScalar *diff;
   feenox_check_alloc(diff = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
   petsc_call(VecGetValues(phi, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, diff));
+  
+  if (feenox.pde.dirichlet_scale == 0)
+  {
+    feenox_problem_dirichlet_compute_scale();
+  }
+  
   for (k = 0; k < feenox.pde.n_dirichlet_rows; k++) {
     diff[k] -= feenox.pde.dirichlet_values[k];
+    diff[k] *= feenox.pde.dirichlet_scale;
   }
+  
   
   petsc_call(VecSetValues(r, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, diff, INSERT_VALUES));
   feenox_free(diff);
 
   return FEENOX_OK;
 }
+
+// this is alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
+int feenox_problem_dirichlet_compute_scale(void) {
+  
+  if (1) {
+    feenox.pde.dirichlet_scale = 1.0;
+  } else if (0) {
+    PetscScalar trace = 0;
+    petsc_call(MatGetTrace(feenox.pde.K, &trace));
+    feenox.pde.dirichlet_scale = 0.1 * trace/feenox.pde.size_global;
+  }  
+  
+  return FEENOX_OK;
+}
+
 #endif

@@ -526,13 +526,13 @@ int feenox_problem_init_runtime_general(void) {
   }
 
   // allocate global petsc objects
-  if (feenox.pde.global_size == 0) {
+  if (feenox.pde.size_global == 0) {
     feenox_push_error_message("internal error, problem init did not set global size");
     return FEENOX_ERROR;
   }
   
   
-  feenox_var_value(feenox.pde.vars.total_dofs) = (double)(feenox.pde.global_size);
+  feenox_var_value(feenox.pde.vars.total_dofs) = (double)(feenox.pde.size_global);
   
   // TODO: choose width from input
   feenox.pde.width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
@@ -645,7 +645,7 @@ Mat feenox_problem_create_matrix(const char *name) {
   
   Mat A = NULL;
   petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
-  petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.global_size, feenox.pde.global_size));
+  petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.size_global, feenox.pde.size_global));
   petsc_call_null(MatSetFromOptions(A));
   // TODO:  MatXAIJSetPreallocation
   petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL, feenox.pde.width, PETSC_NULL));

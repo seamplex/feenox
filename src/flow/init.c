@@ -352,14 +352,14 @@ int feenox_init_special_objects(void) {
   feenox_var_value(dummy) = ON_ERROR_NO_REPORT;
 
   
-///va+realtime_scale+desc If this variable is not zero, then the transient problem is run trying to syncrhonize the
-///va+realtime_scale+desc problem time with realtime, up to a scale given.
-///va+realtime_scale+detail  For example, if the scale is set to one, then
-///va+realtime_scale+detail FeenoX will advance the problem time at the same pace that the real wall time advances. If set to
-///va+realtime_scale+detail two, FeenoX time wil advance twice as fast as real time, and so on. If the calculation time is
-///va+realtime_scale+detail slower than real time modified by the scale, this variable has no effect on the overall behavior
-///va+realtime_scale+detail and execution will proceed as quick as possible with no delays.
-  feenox_special_var(realtime_scale) = feenox_get_or_define_variable_get_ptr("realtime_scale");
+//va+realtime_scale+desc If this variable is not zero, then the transient problem is run trying to syncrhonize the
+//va+realtime_scale+desc problem time with realtime, up to a scale given.
+//va+realtime_scale+detail  For example, if the scale is set to one, then
+//va+realtime_scale+detail FeenoX will advance the problem time at the same pace that the real wall time advances. If set to
+//va+realtime_scale+detail two, FeenoX time wil advance twice as fast as real time, and so on. If the calculation time is
+//va+realtime_scale+detail slower than real time modified by the scale, this variable has no effect on the overall behavior
+//va+realtime_scale+detail and execution will proceed as quick as possible with no delays.
+//  feenox_special_var(realtime_scale) = feenox_get_or_define_variable_get_ptr("realtime_scale");
 
   // files 
 /*  

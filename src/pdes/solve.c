@@ -61,8 +61,8 @@ int feenox_problem_phi_to_solution(Vec phi) {
   petsc_call(VecScatterEnd(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD));
 
   petsc_call(VecGetLocalSize(phi_full, &nlocal));
-  if (nlocal != feenox.pde.global_size) {
-    feenox_push_error_message("internal check of problem size with scatter failed, %d != %d\n", nlocal, feenox.pde.global_size);
+  if (nlocal != feenox.pde.size_global) {
+    feenox_push_error_message("internal check of problem size with scatter failed, %d != %d\n", nlocal, feenox.pde.size_global);
     return FEENOX_OK;
   }
   petsc_call(VecGetArray(phi_full, &phi_full_array));

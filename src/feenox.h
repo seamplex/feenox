@@ -1214,7 +1214,7 @@ struct mesh_t {
   
   int update_each_step;
   
-  expr_t scale_factor;           // factor de escala al leer la posicion de los nodos
+  expr_t scale_factor;           // scale factor when reading the coordinates of the nodes
   expr_t offset_x;               // offset en nodos
   expr_t offset_y;               // offset en nodos
   expr_t offset_z;               // offset en nodos
@@ -1495,7 +1495,7 @@ struct feenox_t {
     var_t *on_nan;
     var_t *on_gsl_error;
     var_t *on_ida_error;
-    var_t *realtime_scale;
+//    var_t *realtime_scale;
   } special_vars;
 
 
@@ -1616,7 +1616,7 @@ struct feenox_t {
     unsigned int dofs;             // DoFs per node/cell
     size_t width;                  // number of expected non-zeros per row
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
-    size_t global_size;            // total number of DoFs
+    size_t size_global;            // total number of DoFs
     
     int compute_gradients;   // do we need to compute gradients?
     gsl_matrix *m2;
@@ -1733,14 +1733,15 @@ struct feenox_t {
 
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
-//    PetscBool first_build;         // avoids showing building progress in subsequent builds for SNES
-//    PetscBool already_built;       // avoids building twice in the first step of SNES
 
     // stuff for mpi parallelization
     PetscInt nodes_local, size_local;
     PetscInt first_row, last_row;
     PetscInt first_node, last_node;
     PetscInt first_element, last_element;
+    
+    // dirichlet BC scaling factor
+    PetscScalar dirichlet_scale;
 
     // global objects
     Vec phi;       // the unknown (solution) vector
@@ -2207,6 +2208,7 @@ extern int feenox_problem_dirichlet_set_J(Mat J);
 extern int feenox_problem_dirichlet_set_r(Vec r, Vec phi);
 extern int feenox_problem_dirichlet_set_phi(Vec phi);
 extern int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot);
+extern int feenox_problem_dirichlet_compute_scale(void);
 
 // neumann.c
 extern int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *value);

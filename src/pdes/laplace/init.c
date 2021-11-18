@@ -68,7 +68,7 @@ int feenox_problem_init_runtime_laplace(void) {
   feenox.pde.mesh->data_type = data_type_node;
   
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.global_size = feenox.pde.spatial_unknowns * feenox.pde.dofs;
+  feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   
   // check if we were given an initial solution
   if ((feenox.pde.initial_condition = feenox_get_function_ptr("phi_0")) != NULL) {
