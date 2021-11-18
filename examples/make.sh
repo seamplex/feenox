@@ -4,18 +4,19 @@ out=examples.md
 rm -f ${out}
 for i in hello          \
          lorenz         \
+         thermal-1d-dirichlet-uniform-k \
          nafems-le10    \
          nafems-le11    \
+         nafems-le1     \
          maze           \
          fibo_formula   \
          fibo_vector    \
          fibo_iterative \
-         thermal-1d-dirichlet-uniform-k \
          cantilever     \
          fork           \
   ; do
   echo ${i}
-  grep '#\.' ${i}.fee | sed 's/#.//' | sed 's/^[ \t]*//' | \
+  grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \
     pandoc -t markdown   --lua-filter=../doc/include-files.lua \
                          --lua-filter=../doc/include-code-files.lua \
                          --lua-filter=../doc/not-in-format.lua \

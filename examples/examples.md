@@ -83,6 +83,77 @@ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 The Lorenz attractor computed with FeenoX plotted with two different tools
 :::
 
+# Thermal slabs
+
+## One-dimensional linear
+
+Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
+
+$$
+\begin{cases}
+T(0) = 0 & \text{(left)} \\
+T(1) = 1 & \text{(right)} \\
+\end{cases}
+$$
+
+and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
+
+Please note that:
+
+-   The input written in a self-evident English-like dialect
+    -   Syntactic sugared plain-text ASCII file
+    -   Simple problems (like this one) need simple inputs
+    -   FeenoX follows the UNIX rule of simplicity
+    -   Robust parser (you can say `heat` or `thermal`)
+-   Output is 100% user-defined
+    -   No `PRINT` no output
+    -   Feenox follows the UNIX rule of silence
+-   There is no node at $x=1/2=0.5$!
+    -   FeenoX knows how to interpolate
+-   Mesh separated from problem
+    -   The geometry comes from a Git-friendly `.geo`
+
+    ``` c
+    Point(1) = {0, 0, 0};          // geometry: 
+    Point(2) = {1, 0, 0};          // two points
+    Line(1) = {1, 2};              // and a line connecting them!
+
+    Physical Point("left") = {1};  // groups for BCs and materials
+    Physical Point("right") = {2};
+    Physical Line("bulk") = {1};   // needed due to how Gmsh works
+
+    Mesh.MeshSizeMax = 1/3;        // mesh size, three line elements
+    Mesh.MeshSizeMin = Mesh.MeshSizeMax;
+    ```
+
+    -   UNIX rule of composition
+    -   The actual input file is a Git-friendly `.fee`
+
+
+```feenox
+PROBLEM thermal 1D    # tell FeenoX what we want to solve 
+READ_MESH slab.msh    # read mesh in Gmsh's v4.1 format
+k = 1                 # set uniform conductivity
+BC left  T=0          # set fixed temperatures as BCs
+BC right T=1          # "left" and "right" are defined in the mesh
+SOLVE_PROBLEM         # we are ready to solve the problem
+PRINT T(1/2)          # ask for the temperature at x=1/2
+```
+
+
+```terminal
+$ gmsh -1 slab.geo
+[...]
+Info    : 4 nodes 5 elements
+Info    : Writing 'slab.msh'...
+[...]
+$ feenox thermal-1d-dirichlet-uniform-k.fee 
+0.5
+$ 
+```
+
+
+
 # NAFEMS LE10 "Thick plate pressure" benchmark
 
 ![The NAFEMS LE10 problem statement and the corresponding FeenoX
@@ -230,6 +301,44 @@ $
 
 The NAFEMS LE11 problem results
 :::
+
+# NAFEMS LE1 "Elliptical membrane" plane-stress benchmark
+
+![The NAFEMS LE1 problem](nafems-le1-figure.svg){width="90%"}
+
+Tell FenooX the problem is `plane_stress`. Use the `nafems-le1.geo` file
+provided to create the mesh. Read it with `READ_MESH`, set material
+properties, `BC`s and `SOLVE_PROBLEM`!
+
+
+```feenox
+PROBLEM mechanical plane_stress
+READ_MESH nafems-le1.msh
+
+E = 210e3
+nu = 0.3
+
+BC AB u=0
+BC CD v=0
+BC BC tension=10
+
+SOLVE_PROBLEM
+
+WRITE_MESH nafems-le1.vtk VECTOR u v 0 sigmax sigmay tauxy
+PRINT "σy at point D = " %.4f sigmay(2000,0) "(reference is 92.7)" SEP " "
+```
+
+
+```terminal
+$ gmsh -2 nafems-le11.geo
+[...]
+$ feenox nafems-le1.fee
+σy at point D =  92.7011 (reference is 92.7)
+$
+```
+
+
+![Normal stress $\sigma_y$ over 500x-warped displacements for LE1 created with Paraview](nafems-le1-sigmay.png){width=85%}
 
 # How to solve a maze without AI
 
@@ -382,86 +491,6 @@ $ feenox fibo_iterative.fee > three
 $ diff one two
 $ diff two three
 $
-```
-
-
-
-# Thermal slabs
-
-## One-dimensional linear thermal slab
-
-Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
-
-$$
-\begin{cases}
-T(0) = 0 & \text{(left)} \\
-T(1) = 1 & \text{(right)} \\
-\end{cases}
-$$
-
-and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
-
--   English self-evident input
-
--   Syntactic sugared plain-text ASCII file
-
--   Simple problems (like this one) need simple inputs
-
--   UNIX rule of simplicity
-
--   Robust parser (you can say `heat` or `thermal`)
-
--   Output is 100% user-defined
-
--   No `PRINT` no output
-
--   UNIX rule of silence
-
--   There is no node at $x=1/2=0.5$!
-
--   FeenoX knows how to interpolate
-
--   Mesh separated from problem
-
--   Git-friendly `.geo`
-
-``` c
-Point(1) = {0, 0, 0};          // geometry: 
-Point(2) = {1, 0, 0};          // two points
-Line(1) = {1, 2};              // and a line connecting them!
-
-Physical Point("left") = {1};  // groups for BCs and materials
-Physical Point("right") = {2};
-Physical Line("bulk") = {1};   // needed due to how Gmsh works
-
-Mesh.MeshSizeMax = 1/3;        // mesh size, three line elements
-Mesh.MeshSizeMin = Mesh.MeshSizeMax;
-```
-
--   UNIX rule of composition
--   Git-friendly `.fee`
-
-
-```feenox
-PROBLEM thermal 1D    # tell FeenoX what we want to solve 
-READ_MESH slab.msh    # read mesh in Gmsh's v4.1 format
-k = 1                 # set uniform conductivity
-BC left  T=0          # set fixed temperatures as BCs
-BC right T=1          # "left" and "right" are defined in the mesh
-SOLVE_PROBLEM         # we are ready to solve the problem
-PRINT T(1/2)          # ask for the temperature at x=1/2
-```
-
-
-```terminal
-$ gmsh -1 slab.geo
-[...]
-Info    : 4 nodes 5 elements
-Info    : Writing 'slab.msh'...
-[...]
-$ feenox thermal-1d-dirichlet-uniform-k.fee 
-0.5
-$ 
 ```
 
 
@@ -630,7 +659,7 @@ def create_mesh(r, w, l1, l2, n):
   gmsh.write("fork.msh")  
   gmsh.finalize()
   return len(nodes)
-
+  
 def main():
   target = 440    # target frequency
   eps = 1e-2      # tolerance
@@ -651,7 +680,7 @@ def main():
       result = subprocess.run(['feenox', 'fork.fee'], stdout=subprocess.PIPE)
       freq = float(result.stdout.decode('utf-8'))
       error = target - freq
-
+    
     print(nodes, l1, freq)
 ```
 

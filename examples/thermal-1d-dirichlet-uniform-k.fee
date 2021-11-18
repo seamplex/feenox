@@ -1,6 +1,6 @@
 #. # Thermal slabs
 #. 
-#. ## One-dimensional linear thermal slab
+#. ## One-dimensional linear
 #.
 #.
 #. Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
@@ -15,26 +15,28 @@
 #. and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
 #. 
 #. 
-#. * English self-evident input
-#.   - Syntactic sugared plain-text ASCII file
-#.   - Simple problems (like this one) need simple inputs
-#.   - UNIX rule of simplicity
-#.   - Robust parser (you can say `heat` or `thermal`)
+#. Please note that:
+#.
+#.  * The input written in a self-evident English-like dialect
+#.     - Syntactic sugared plain-text ASCII file
+#.     - Simple problems (like this one) need simple inputs
+#.     - FeenoX follows the UNIX rule of simplicity
+#.     - Robust parser (you can say `heat` or `thermal`)
 #.    
-#. * Output is 100% user-defined
-#.   - No `PRINT` no output
-#.   - UNIX rule of silence
+#.  * Output is 100% user-defined
+#.     - No `PRINT` no output
+#.     - Feenox follows the UNIX rule of silence
 #.   
-#. * There is no node at $x=1/2=0.5$!
-#.   - FeenoX knows how to interpolate
+#.  * There is no node at $x=1/2=0.5$!
+#.     - FeenoX knows how to interpolate
 #.
-#. * Mesh separated from problem
-#.   - Git-friendly `.geo`
+#.  * Mesh separated from problem
+#.     - The geometry comes from a Git-friendly `.geo`
 #.
-#.     ```{.c include="^slab.geo"}
+#.     ```{.c include="slab.geo"}
 #.     ```
-#.   - UNIX rule of composition
-#.   - Git-friendly `.fee`
+#.     - UNIX rule of composition
+#.     - The actual input file is a Git-friendly `.fee`
 #$ $ gmsh -1 slab.geo
 #$ [...]
 #$ Info    : 4 nodes 5 elements
