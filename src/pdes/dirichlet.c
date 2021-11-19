@@ -226,12 +226,12 @@ int feenox_problem_dirichlet_set_r(Vec r, Vec phi) {
 // this is alpha in https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300
 int feenox_problem_dirichlet_compute_scale(void) {
   
-  if (1) {
-    feenox.pde.dirichlet_scale = 1.0;
-  } else if (0) {
+  if (feenox.pde.dirichlet_scale_fraction != 0) {
     PetscScalar trace = 0;
     petsc_call(MatGetTrace(feenox.pde.K, &trace));
-    feenox.pde.dirichlet_scale = 0.1 * trace/feenox.pde.size_global;
+    feenox.pde.dirichlet_scale = feenox.pde.dirichlet_scale_fraction * trace/feenox.pde.size_global;
+  } else if (feenox.pde.dirichlet_scale == 0) {
+    feenox.pde.dirichlet_scale = 1.0;
   }  
   
   return FEENOX_OK;

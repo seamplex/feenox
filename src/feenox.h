@@ -1742,6 +1742,7 @@ struct feenox_t {
     
     // dirichlet BC scaling factor
     PetscScalar dirichlet_scale;
+    PetscScalar dirichlet_scale_fraction;
 
     // global objects
     Vec phi;       // the unknown (solution) vector

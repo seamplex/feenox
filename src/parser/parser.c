@@ -2742,32 +2742,29 @@ int feenox_parse_problem(void) {
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
-///kw_pde+PROBLEM+usage [
-        
-///kw_pde+PROBLEM+usage mechanical
-///kw_pde+PROBLEM+usage |
+///kw_pde+PROBLEM+detail Currently, FeenoX can solve the following types of PDE problems:
 ///kw_pde+PROBLEM+detail @    
+///kw_pde+PROBLEM+usage [ laplace 
 ///kw_pde+PROBLEM+detail  * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
     if (strcasecmp(token, "laplace") == 0 || strcasecmp(token, "poisson") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_laplace;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_laplace;
     
+///kw_pde+PROBLEM+usage | mechanical
 ///kw_pde+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
 ///kw_pde+PROBLEM+detail If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
-///kw_pde+PROBLEM+detail `plane_stress` or `plane_strain` has to be set instead.
+///kw_pde+PROBLEM+detail `plane_stress` or `plane_strain` has to be given instead of `mechanical`.
     } else if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_mechanical;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
 
-///kw_pde+PROBLEM+usage thermal
-///kw_pde+PROBLEM+usage |
+///kw_pde+PROBLEM+usage | thermal
 ///kw_pde+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
     } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_thermal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
 
-///kw_pde+PROBLEM+usage modal
-///kw_pde+PROBLEM+usage |
+///kw_pde+PROBLEM+usage | modal
 ///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
     } else if (strcasecmp(token, "modal") == 0) {
 #ifndef HAVE_SLEPC
@@ -2777,7 +2774,7 @@ int feenox_parse_problem(void) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_modal;
       feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
       
-///kw_pde+PROBLEM+usage neutron_diffusion
+///kw_pde+PROBLEM+usage | neutron_diffusion
 ///kw_pde+PROBLEM+usage ]@
 ///kw_pde+PROBLEM+detail  * `neutron_diffusion` multi-group core-level neutron diffusion with a FEM formulation 
     } else if (strcasecmp(token, "neutron_diffusion") == 0) {
@@ -2787,13 +2784,10 @@ int feenox_parse_problem(void) {
       
 ///kw_pde+PROBLEM+detail @    
 ///kw_pde+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
-///kw_pde+PROBLEM+detail Check out [FeenoX repository](https:\/\/github.com/seamplex/feenox/blob/main/doc/programming.md)
-///kw_pde+PROBLEM+detail for licensing information, programming guides and code of conduct.
-///kw_pde+PROBLEM+detail @    
+///kw_pde+PROBLEM+detail Check out the [programming guide in the FeenoX repository](https:\/\/github.com/seamplex/feenox/blob/main/doc/programming.md).
 
-///kw_pde+PROBLEM+usage @
 ///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
-///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or with the keyword `DIMENSIONS`.
+///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIMENSIONS`.
 ///kw_pde+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
 ///kw_pde+PROBLEM+usage [ 1D |
     } else if (strcasecmp(token, "1d") == 0) {
@@ -2814,10 +2808,19 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
 
-///kw_pde+PROBLEM+usage [ MESH <identifier> ] @
-///kw_pde+PROBLEM+detail If there are more than one `MESH`es define, the one over which the problem is to be solved
+///kw_pde+PROBLEM+usage [ AXISYMMETRIC { x | y } ]
+///kw_pde+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
+///kw_pde+PROBLEM+detail to be two-dimensional in the $x$-$y$ plane and the problem 
+///kw_pde+PROBLEM+detail is assumed to be axi-symmetric around the given axis. 
+    } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
+      char *keywords[] = { "x", "y" };
+      int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
+
+///kw_pde+PROBLEM+usage [ MESH <identifier> ]
+///kw_pde+PROBLEM+detail If there are more than one `MESH`es defined, the one over which the problem is to be solved
 ///kw_pde+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
-///kw_pde+PROBLEM+detail defined in the input file is the one over which the problem is solved.
+///kw_pde+PROBLEM+detail defined in the input file with `READ_MESH` (which can be defined after the `PROBLEM` keyword) is the one over which the problem is solved.
     } else if (strcasecmp(token, "MESH") == 0) {
       char *mesh_name;
 
@@ -2830,23 +2833,11 @@ int feenox_parse_problem(void) {
       }
       feenox_free(mesh_name);
       
-      // TODO: shouldn't this go in the MESH keyword?
-///kw_pde+PROBLEM+usage @[
-///kw_pde+PROBLEM+usage AXISYMMETRIC { x | y }
-///kw_pde+PROBLEM+usage |
-///kw_pde+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
-///kw_pde+PROBLEM+detail to be two-dimensional in the $x$-$y$ plane and the problem 
-///kw_pde+PROBLEM+detail is assumed to be axi-symmetric around the given axis. 
-    } else if (strcasecmp(token, "AXISYMMETRIC") == 0) {
-      char *keywords[] = { "x", "y" };
-      int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
-      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
-
 ///kw_pde+PROBLEM+usage [ PROGRESS ]@
 ///kw_pde+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
 ///kw_pde+PROBLEM+detail progress of the ensamble of the stiffness matrix (or matrices),
 ///kw_pde+PROBLEM+detail the solution of the system of equations
-///kw_pde+PROBLEM+detail and the computation of gradients (stresses).
+///kw_pde+PROBLEM+detail and the computation of gradients (stresses, heat fluxes, etc.), if applicable.
     } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
       feenox.pde.progress_ascii = PETSC_TRUE;
       
@@ -2857,7 +2848,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage [ TRANSIENT |
     } else if (strcasecmp(token, "TRANSIENT") == 0) {
       feenox.pde.transient_type = transient_type_transient;
-///kw_pde+PROBLEM+usage QUASISTATIC]@
+///kw_pde+PROBLEM+usage QUASISTATIC ]
     } else if (strcasecmp(token, "QUASISTATIC") == 0) {
       feenox.pde.transient_type = transient_type_quasistatic;
 
@@ -2869,6 +2860,7 @@ int feenox_parse_problem(void) {
       feenox.pde.math_type = math_type_linear;
 
 ///kw_pde+PROBLEM+usage | NON_LINEAR ]
+///kw_pde+PROBLEM+usage | NON_LINEAR ] @      
     } else if (strcasecmp(token, "NON_LINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
@@ -2941,6 +2933,28 @@ int feenox_parse_problem(void) {
       char *keywords[] = {"omega", "lambda", ""};
       int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.eigen_formulation));
+
+///kw_pde+PROBLEM+usage [ DIRICHLET_SCALING { absolute <expr> | relative <expr> } ]@
+///kw_pde+PROBLEM+detail The `DIRICHLET_SCALING` keyword controls the way Dirichlet boundary conditions
+///kw_pde+PROBLEM+detail are scaled when computing the residual. Roughly, it defines how to compute
+///kw_pde+PROBLEM+detail the parameter\ $\alpha$ in <https:\/\/scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300>
+///kw_pde+PROBLEM+detail If `absolute`, then $\alpha$ is equal to the given expression.
+///kw_pde+PROBLEM+detail If `relative`, then $\alpha$ is equal to the given fraction of the average diagonal entries in the stiffness matrix.
+///kw_pde+PROBLEM+detail Default is\ $\alpha = 1$.
+    } else if (strcasecmp(token, "DIRICHLET_SCALING") == 0) {
+      char *scaling_type = NULL;
+      feenox_call(feenox_parser_string(&scaling_type));
+      if (strcasecmp(scaling_type, "absolute") == 0) {
+        feenox_call(feenox_parser_expression_in_string(&feenox.pde.dirichlet_scale));
+        
+      } else if (strcasecmp(scaling_type, "relative") == 0) { 
+        feenox_call(feenox_parser_expression_in_string(&feenox.pde.dirichlet_scale_fraction));
+        
+      } else {
+        feenox_push_error_message("expected either 'absolute' or 'relative' instead '%s'", scaling_type);
+        return FEENOX_ERROR;
+      }
+      
       
     } else if (feenox_problem_parse_particular != NULL) {
       feenox_call(feenox_problem_parse_particular(token));
