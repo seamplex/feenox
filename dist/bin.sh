@@ -87,7 +87,8 @@ cd ${package}-${version}-${target} || exit 1
   cp ../${package}/doc/syntax-kate.sh        share/doc || exit 1
   cp ../${package}/doc/syntax-tex.sh         share/doc || exit 1
   
-  cp -r ../${package}/examples/*             share/doc/examples || exit 1
+#   cp -r ../${package}/examples/*             share/doc/examples || exit 1
+  echo "See https://www.seamplex.com/feenox/examples" > examples/README || exit 1
   cp -r ../${package}/tests/*                share/doc/tests || exit 1
   
 cd ..
