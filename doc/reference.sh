@@ -28,7 +28,7 @@ else
   touch defs.h
 fi
 
-kws=$(grep "///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | sort | uniq)
+kws=$(grep "^///${tag}+" ${src} | awk '{print $1}' | awk -F+ '{print $2}' | sort | uniq)
 
 for kw in ${kws}; do
 
@@ -142,7 +142,8 @@ EOF
   # el cut saca los tags especiales, el gcc permite usar los defines para documentar los defaults,
   # el primer sed transforma una arroba seguida de un newline en un newline
   # el segundo se es para poder poner links como https:/\/ (sin la barra del medio gcc piensa que es un comentario)
-  grep "///${tag}+${kw}+detail" ${src} | cut -d" " -f2- | gcc -E -P -include defs.h - | sed 's/@$//' | sed 's_/\\/_//_'
+#  grep "///${tag}+${kw}+detail" ${src} | cut -d" " -f2- | gcc -E -P -include defs.h - | sed 's/@$//' | sed 's_/\\/_//_'
+  grep "^///${tag}+${kw}+detail" ${src} | cut -d" " -f2- | sed 's/@$//' 
   echo
 
   # examples

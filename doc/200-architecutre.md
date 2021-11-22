@@ -1,5 +1,5 @@
 
-The tool must be aimed at being executed unattended on remote cloud servers which are expected to have a mainstream (as of the 202s) architecture regarding operating system (GNU/Linux variants and other UNIX-like OSes) and hardware stack, such as
+The tool must be aimed at being executed unattended on remote servers which are expected to have a mainstream (as of the 202s) architecture regarding operating system (GNU/Linux variants and other UNIX-like OSes) and hardware stack, such as
 
  * a few Intel-compatible CPUs per host
  * a few levels of memory caches

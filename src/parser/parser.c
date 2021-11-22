@@ -965,7 +965,7 @@ int feenox_parse_initial_conditions(void) {
 ///kw_dae+INITIAL_CONDITIONS+detail The `FROM_DERIVATIVES` option means calling IDA’s `IDACalcIC` routine with the parameter IDA_Y_INIT.
 ///kw_dae+INITIAL_CONDITIONS+detail Wasora should be able to automatically detect which variables in phase-space are differential and
 ///kw_dae+INITIAL_CONDITIONS+detail which are purely algebraic. However, the [`DIFFERENTIAL`] keyword may be used to explicitly define them.
-///kw_dae+INITIAL_CONDITIONS+detail See the (SUNDIALS documentation)[https:/\/computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
+///kw_dae+INITIAL_CONDITIONS+detail See the (SUNDIALS documentation)[https://computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
   
 ///kw_dae+INITIAL_CONDITIONS+usage { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
   char *keywords[] = {"AS_PROVIDED",
@@ -1336,9 +1336,9 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+usage nearest |
 ///kw+FUNCTION+detail  * nearest, $f(\vec{x})$ is equal to the value of the closest definition point
 ///kw+FUNCTION+usage shepard |
-///kw+FUNCTION+detail  * shepard, [inverse distance weighted average definition points](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting) (might lead to inefficient evaluation)
+///kw+FUNCTION+detail  * shepard, [inverse distance weighted average definition points](https://en.wikipedia.org/wiki/Inverse_distance_weighting) (might lead to inefficient evaluation)
 ///kw+FUNCTION+usage shepard_kd |
-///kw+FUNCTION+detail  * shepard_kd, [average of definition points within a kd-tree](https:/\/en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
+///kw+FUNCTION+detail  * shepard_kd, [average of definition points within a kd-tree](https://en.wikipedia.org/wiki/Inverse_distance_weighting#Modified_Shepard&#39;s_method) (more efficient evaluation provided `SHEPARD_RADIUS` is set to a proper value)
 ///kw+FUNCTION+usage bilinear
 ///kw+FUNCTION+detail  * bilinear, only available if the definition points configure an structured hypercube-like grid. If $n>3$, `SIZES` should be given.
 ///kw+FUNCTION+usage } ]
@@ -2141,9 +2141,9 @@ int feenox_parse_read_mesh(void) {
 ///kw_pde+READ_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
 ///kw_pde+READ_MESH+detail The format is read from the extension, which should be either
 ///kw_pde+READ_MESH+detail @
-///kw_pde+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http:\/\/gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
-///kw_pde+READ_MESH+detail  * `.vtk` [ASCII legacy VTK](https:\/\/lorensen.github.io/VTKExamples/site/VTKFileFormats/)
-///kw_pde+READ_MESH+detail  * `.frd` [CalculiX’s FRD ASCII output](https:\/\/web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html))
+///kw_pde+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
+///kw_pde+READ_MESH+detail  * `.vtk` [ASCII legacy VTK](https://lorensen.github.io/VTKExamples/site/VTKFileFormats/)
+///kw_pde+READ_MESH+detail  * `.frd` [CalculiX’s FRD ASCII output](https://web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html)
 ///kw_pde+READ_MESH+detail @
 ///kw_pde+READ_MESH+detail Note than only MSH is suitable for defining PDE domains, as it is the only one that provides
 ///kw_pde+READ_MESH+detail physical groups (a.k.a labels) which are needed in order to define materials and boundary conditions.
@@ -2744,7 +2744,7 @@ int feenox_parse_problem(void) {
 
 ///kw_pde+PROBLEM+detail Currently, FeenoX can solve the following types of PDE problems:
 ///kw_pde+PROBLEM+detail @    
-///kw_pde+PROBLEM+usage [ laplace 
+///kw_pde+PROBLEM+usage [ laplace
 ///kw_pde+PROBLEM+detail  * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
     if (strcasecmp(token, "laplace") == 0 || strcasecmp(token, "poisson") == 0) {
       feenox_problem_parse_particular = feenox_problem_parse_problem_laplace;
@@ -2784,7 +2784,7 @@ int feenox_parse_problem(void) {
       
 ///kw_pde+PROBLEM+detail @    
 ///kw_pde+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
-///kw_pde+PROBLEM+detail Check out the [programming guide in the FeenoX repository](https:\/\/github.com/seamplex/feenox/blob/main/doc/programming.md).
+///kw_pde+PROBLEM+detail Check out the [programming guide in the FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md).
 
 ///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
 ///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIMENSIONS`.
@@ -2792,13 +2792,13 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage [ 1D |
     } else if (strcasecmp(token, "1d") == 0) {
       feenox.pde.dim = 1;
-///kw_pde+PROBLEM+usage   2D |
+///kw_pde+PROBLEM+usage 2D |
     } else if (strcasecmp(token, "2d") == 0) {
       feenox.pde.dim = 2;
-///kw_pde+PROBLEM+usage   3D |
+///kw_pde+PROBLEM+usage 3D |
     } else if (strcasecmp(token, "3d") == 0) {
       feenox.pde.dim = 3;
-///kw_pde+PROBLEM+usage   DIMENSIONS <expr> ]
+///kw_pde+PROBLEM+usage DIMENSIONS <expr> ]
     } else if (strcasecmp(token, "DIMENSIONS") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
@@ -2809,6 +2809,7 @@ int feenox_parse_problem(void) {
       }
 
 ///kw_pde+PROBLEM+usage [ AXISYMMETRIC { x | y } ]
+///kw_pde+PROBLEM+usage @
 ///kw_pde+PROBLEM+detail If the `AXISYMMETRIC` keyword is given, the mesh is expected 
 ///kw_pde+PROBLEM+detail to be two-dimensional in the $x$-$y$ plane and the problem 
 ///kw_pde+PROBLEM+detail is assumed to be axi-symmetric around the given axis. 
@@ -2860,12 +2861,13 @@ int feenox_parse_problem(void) {
       feenox.pde.math_type = math_type_linear;
 
 ///kw_pde+PROBLEM+usage | NON_LINEAR ]
-///kw_pde+PROBLEM+usage | NON_LINEAR ] @      
+///kw_pde+PROBLEM+usage @
     } else if (strcasecmp(token, "NON_LINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
 
-///kw_pde+PROBLEM+usage [ MODES <expr> ] @
+///kw_pde+PROBLEM+usage [ MODES <expr> ]
+///kw_pde+PROBLEM+usage @
 ///kw_pde+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
 ///kw_pde+PROBLEM+detail The default value is problem dependent.
     } else if (strcasecmp(token, "MODES") == 0) {
@@ -2880,34 +2882,33 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]@
 ///kw_pde+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
 ///kw_pde+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
-///kw_pde+PROBLEM+detail @          
-///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <http:\/\/petsc.org/release/docs/manualpages/PC/PCType.html>.
+///kw_pde+PROBLEM+detail @
+///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <http://petsc.org/release/docs/manualpages/PC/PCType.html>.
     } else if (strcasecmp(token, "PRECONDITIONER") == 0 || strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.pc_type));
 
 ///kw_pde+PROBLEM+usage [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http:\/\/petsc.org/release/docs/manualpages/KSP/KSPType.html>.
+///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http://petsc.org/release/docs/manualpages/KSP/KSPType.html>.
     } else if (strcasecmp(token, "LINEAR_SOLVER") == 0 || strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ksp_type));
           
 ///kw_pde+PROBLEM+usage [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http:\/\/petsc.org/release/docs/manualpages/SNES/SNESType.html>.
-///kw_pde+PROBLEM+detail @
+///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http://petsc.org/release/docs/manualpages/SNES/SNESType.html>.
         } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
 ///kw_pde+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http:\/\/petsc.org/release/docs/manualpages/TS/TSType.html>.
+///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http://petsc.org/release/docs/manualpages/TS/TSType.html>.
     } else if (strcasecmp(token, "TRANSIENT_SOLVER") == 0 || strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
 
 ///kw_pde+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http:\/\/petsc.org/release/docs/manualpages/TS/TSAdaptType.html>.
+///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http://petsc.org/release/docs/manualpages/TS/TSAdaptType.html>.
     } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
 
 ///kw_pde+PROBLEM+usage [ EIGEN_SOLVER { krylovschur | lanczos | arnoldi | power | gd | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https:\/\/slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
+///kw_pde+PROBLEM+detail  * List of `EIGEN_SOLVER`s <https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html>.
     } else if (strcasecmp(token, "EIGEN_SOLVER") == 0 || strcasecmp(token, "EPS") == 0 || strcasecmp(token, "EPS_TYPE") == 0) {
 #ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.eps_type));
@@ -2917,7 +2918,7 @@ int feenox_parse_problem(void) {
 #endif
       
 ///kw_pde+PROBLEM+usage [ SPECTRAL_TRANSFORMATION { shift | sinvert | cayley | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https:\/\/slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
+///kw_pde+PROBLEM+detail  * List of `SPECTRAL_TRANSFORMATION`s <https://slepc.upv.es/documentation/current/docs/manualpages/ST/STType.html>.
     } else if (strcasecmp(token, "SPECTRAL_TRANSFORMATION") == 0 || strcasecmp(token, "ST") == 0 || strcasecmp(token, "ST_TYPE") == 0) {
 #ifdef HAVE_SLEPC
       feenox_call(feenox_parser_string((char **)&feenox.pde.st_type));
@@ -2927,8 +2928,9 @@ int feenox_parse_problem(void) {
 #endif
 
 ///kw_pde+PROBLEM+usage [ EIGEN_FORMULATION { omega | lambda } ]@
-///kw_pde+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$,
-///kw_pde+PROBLEM+detail and $M \phi = \lambda K \phi$$ if it is `lambda`.
+///kw_pde+PROBLEM+detail @
+///kw_pde+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$ is solved,
+///kw_pde+PROBLEM+detail and $M \phi = \lambda K \phi$ if it is `lambda`.
     } else if (strcasecmp(token, "EIGEN_FORMULATION") == 0) {
       char *keywords[] = {"omega", "lambda", ""};
       int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
@@ -2937,7 +2939,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage [ DIRICHLET_SCALING { absolute <expr> | relative <expr> } ]@
 ///kw_pde+PROBLEM+detail The `DIRICHLET_SCALING` keyword controls the way Dirichlet boundary conditions
 ///kw_pde+PROBLEM+detail are scaled when computing the residual. Roughly, it defines how to compute
-///kw_pde+PROBLEM+detail the parameter\ $\alpha$ in <https:\/\/scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300>
+///kw_pde+PROBLEM+detail the parameter\ $\alpha$ in <https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300>
 ///kw_pde+PROBLEM+detail If `absolute`, then $\alpha$ is equal to the given expression.
 ///kw_pde+PROBLEM+detail If `relative`, then $\alpha$ is equal to the given fraction of the average diagonal entries in the stiffness matrix.
 ///kw_pde+PROBLEM+detail Default is\ $\alpha = 1$.

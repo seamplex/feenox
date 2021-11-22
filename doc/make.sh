@@ -95,6 +95,9 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
 # echo "unix man page in html"
 # pandoc -s -t html feenox.1 -o feenox.1.html
 
+# this one goes into the windows zip
+pandoc -s double-click.md -t plain -o double-click.txt --lua-filter=include-files.lua
+
 
 
 for i in programming compilation srs FAQ CODE_OF_CONDUCT; do

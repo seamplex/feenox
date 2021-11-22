@@ -36,59 +36,60 @@ cd ${package}
   make || exit 1
 cd ..
 
-mkdir -p ${package}-${version}-${target}
-cd ${package}-${version}-${target}
+mkdir -p ${package}-${version}-${target} || exit 1
+cd ${package}-${version}-${target} || exit 1
 
-  mkdir -p bin
-  mkdir -p share/doc/examples
-  mkdir -p share/doc/tests
-  mkdir -p share/man/man1
+  mkdir -p bin || exit 1
+  mkdir -p share/doc/examples || exit 1
+  mkdir -p share/doc/tests || exit 1
 
   if [ "x${target}" = "xlinux-amd64" ]; then
   
-    cp ../${package}/${package} bin
+    mkdir -p share/man/man1 || exit 1
+    cp ../${package}/doc/${package}.1 share/man/man1 || exit 1
+    gzip -f share/man/man1/${package}.1 || exit 1
+    
+    cp ../${package}/${package} bin || exit 1
 
-    cp ../${package}/AUTHORS   share/doc
-    cp ../${package}/ChangeLog share/doc
-    cp ../${package}/COPYING   share/doc
-    cp ../${package}/README    share/doc
-    cp ../${package}/TODO      share/doc
+    cp ../${package}/AUTHORS   share/doc || exit 1
+    cp ../${package}/ChangeLog share/doc || exit 1
+    cp ../${package}/COPYING   share/doc || exit 1
+    cp ../${package}/README    share/doc || exit 1
+    cp ../${package}/TODO      share/doc || exit 1
 
-    cp ../${package}/doc/${package}-manual.pdf   share/doc
-    cp ../${package}/doc/${package}-desc.pdf     share/doc
-    cp ../${package}/doc/${package}-desc.info    share/doc
-    cp ../${package}/doc/programming.pdf         share/doc
-    cp ../${package}/doc/compilation.pdf         share/doc
-    cp ../${package}/doc/FAQ.pdf                 share/doc
-    cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc
+    cp ../${package}/doc/${package}-manual.pdf   share/doc || exit 1
+    cp ../${package}/doc/${package}-desc.pdf     share/doc || exit 1
+    cp ../${package}/doc/${package}-desc.info    share/doc || exit 1
+    cp ../${package}/doc/programming.pdf         share/doc || exit 1
+    cp ../${package}/doc/compilation.pdf         share/doc || exit 1
+    cp ../${package}/doc/FAQ.pdf                 share/doc || exit 1
+    cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc || exit 1
     
   elif [ "x${target}" = "xwindows64" ]; then   
   
-    cp ../${package}/${package}.exe bin
-    cp /bin/cygwin1.dll bin
+    cp ../${package}/${package}.exe bin || exit 1
+    cp /bin/cygwin1.dll bin || exit 1
     
-    unix2dos -n ../${package}/AUTHORS   AUTHORS.txt
-    unix2dos -n ../${package}/ChangeLog ChangeLog.txt
-    unix2dos -n ../${package}/COPYING   COPYING.txt
-    unix2dos -n ../${package}/README    README.txt
-    unix2dos -n ../${package}/TODO      TODO.txt
+    # -n means "new file"
+    unix2dos -n ../${package}/AUTHORS   AUTHORS.txt || exit 1
+    unix2dos -n ../${package}/ChangeLog ChangeLog.txt || exit 1
+    unix2dos -n ../${package}/COPYING   COPYING.txt || exit 1
+    unix2dos -n ../${package}/README    README.txt || exit 1
+    unix2dos -n ../${package}/TODO      TODO.txt || exit 1
+    unix2dos -n ../${package}/TODO      TODO.txt || exit 1
     
-    # TODO: put something that says "get away from windows"
-    # add a link to online documentation
+    unix2dos -n ../${package}/doc/double-click.txt why-nothing-happens-when-I-double-click-on-feenox.exe.txt
     
   fi
 
-  cp ../${package}/doc/${package}.xml        share/doc
-  cp ../${package}/doc/${package}-desc.texi  share/doc
-  cp ../${package}/doc/syntax-kate.sh        share/doc
-  cp ../${package}/doc/syntax-tex.sh         share/doc
+  cp ../${package}/doc/${package}.xml        share/doc || exit 1
+  cp ../${package}/doc/${package}-desc.texi  share/doc || exit 1
+  cp ../${package}/doc/syntax-kate.sh        share/doc || exit 1
+  cp ../${package}/doc/syntax-tex.sh         share/doc || exit 1
   
-
-  cp -r ../${package}/examples/*             share/doc/examples
-  cp -r ../${package}/tests/*                share/doc/tests
+  cp -r ../${package}/examples/*             share/doc/examples || exit 1
+  cp -r ../${package}/tests/*                share/doc/tests || exit 1
   
-  cp ../${package}/doc/${package}.1 share/man/man1
-  gzip -f share/man/man1/${package}.1
 cd ..
 
 if [ ! -e ${target} ]; then
