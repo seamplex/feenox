@@ -46,9 +46,9 @@ Mesh.RecombineAll = 1;
 Mesh.SecondOrderLinear = 1;
 Mesh.SecondOrderIncomplete = 1;
 
-Transfinite Curve {4, 9, 17, 2, 12, 20} = 6/Mesh.MeshSizeFactor +1 Using Progression 1.01;
-Transfinite Curve {1, 11, 19, -3, -7, -15} = 4/Mesh.MeshSizeFactor +1 Using Progression 1.01;
-Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 1/Mesh.MeshSizeFactor +1;
+Transfinite Curve {4, 9, 17, 2, 12, 20} = 12/Mesh.MeshSizeFactor +1 Using Progression 1.01;
+Transfinite Curve {1, 11, 19, -3, -7, -15} = 8/Mesh.MeshSizeFactor +1 Using Progression 1.01;
+Transfinite Curve {8, 16, 10, 18, 6, 14, 5, 13} = 2/Mesh.MeshSizeFactor +1;
 
 Transfinite Surface {1} = {4, 1, 2, 3};
 Transfinite Surface {2} = {4, 3, 5, 6};
