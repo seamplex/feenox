@@ -182,6 +182,25 @@ answer1() {
   return ${level}
 }
 
+answer2() {
+  echo -n "${1} ${2} ${3}... "
+  answer=$(${feenox} ${dir}/${1} ${2} ${3})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    return 2
+  fi
+  
+  if [ "${answer}" = "${4}" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected '${4}' and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
 
 answerfloat() {
   echo -n "${1} ... "

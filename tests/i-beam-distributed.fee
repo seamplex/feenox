@@ -1,0 +1,4 @@
+q = total_force/length
+w_eb = q*length^4/(8*E*I)
+
+BC top   tz=total_force/(width*length)

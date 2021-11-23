@@ -1,0 +1,3 @@
+w_eb = total_force*length^3/(3*E*I)
+
+BC right tz=total_force/2400

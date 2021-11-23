@@ -1,0 +1,18 @@
+PROBLEM mechanical 3D
+READ_MESH i-beam-$2.msh
+
+E = 200e3          # Young modulus [MPa]
+nu = 0             # Poisson's ratio
+total_force = -10  # Total vertical force [N]
+width = 60         # [mm]
+thickness = 10     # [mm]
+length = 1000      # [mm]
+
+# analytical moment of inertia
+I = 2*thickness*width^3/12 + 2*(width*thickness^3/12 + width*thickness*(0.5*(width+thickness))^2)
+
+INCLUDE i-beam-$1.fee
+BC left  fixed
+
+SOLVE_PROBLEM
+PRINT %+.0e (w(1000,0,0)-w_eb)/w_eb
