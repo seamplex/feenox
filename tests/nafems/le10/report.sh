@@ -96,7 +96,7 @@ EOF
 cat << EOF >> report-${1}.md
 # Initial mesh
 
-![Coarser ${1} mesh for \$c=1\$](le10-${1}-mesh.png)
+![Coarser ${1} mesh for \$c=1\$](le10-${1}-mesh.png){width=90%}
 
 EOF
 

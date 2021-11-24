@@ -83,7 +83,9 @@ if [ ! -z "$(which ccx)" ]; then
 
   has_calculix="yes"
   cc unical1.c -o unical1
-  rm -f calculix_${m}*.dat
+  rm -f calculix_cholesky_${m}*.dat
+  rm -f calculix_diagonal_${m}*.dat
+  rm -f calculix_spooles_${m}*.dat
   
   ccx -v > version_calculix.txt
   
