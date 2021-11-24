@@ -42,7 +42,7 @@ geometry:
 - foot=1cm
 - top=2.5cm
 - head=1cm
-toc: false
+toc: true
 ...
 EOF
 
@@ -148,14 +148,8 @@ EOF
 EOF
   
   for c in $(cat *.dat | awk '{print $1}' | sort -rg | uniq); do
-  
-    cat << EOF  >> report-${1}.md
-\\rowcolors{1}{black!0}{black!10}    
-    
-Program | Solver | DOFs | $\\sigma_y$ | Wall [s] | Kernel [s] | User [s] | Memory [Gb]
---------|--------|-----:|------------:|---------:|-----------:|---------:|------------:
-EOF
-  
+
+    rm -f tmp-table.md
     for i in feenox_*.dat sparselizard_*.dat aster_*.dat calculix_*.dat reflex_*.dat; do
       if [ -e ${i} ]; then
         program=$(echo $(basename ${i} .dat) | cut -d"_" -f 1)
@@ -163,17 +157,44 @@ EOF
         shape=$(echo $(basename ${i} .dat) | cut -d"_" -f 3)
       
         if [ "x${shape}" = "x${1}" ]; then
-          grep -w ^${c} ${i} | awk -vprogram=${program} -vsolver=${solver} '{printf("%s | %s | %\047d | %.3f | %.1f | %.1f | %.1f  | %.2f\n", program, solver, $2, $3, $4, $5, $6, $7/(1024*1024));}'  >> report-${1}.md
+          grep -w ^${c} ${i} | gawk -vprogram=${program} -vsolver=${solver} '{printf("%s | %s | %\047d | %.3f | %.1f | %.1f | %.1f  | %.2f\n", program, solver, $2, $3, $4, $5, $6, $7/(1024*1024));}'  >> tmp-table.md
         fi
       fi
     done
-
+  
+    cat << EOF  >> report-${1}.md
+## \$c=${c}\$
+    
+\\rowcolors{1}{black!0}{black!10}    
+    
+Program | Solver | DOFs | $\\sigma_y$ | Wall [s] | Kernel [s] | User [s] | Memory [Gb]
+--------|--------|-----:|------------:|---------:|-----------:|---------:|------------:
+EOF
+  
+    sort -g -k 9 tmp-table.md >> report-${1}.md
     cat << EOF  >> report-${1}.md
  
-Table: \$c=${c}\$
+Table: \$c=${c}\$ sorted by wall time
 
 
 EOF
+
+
+    cat << EOF  >> report-${1}.md
+\\rowcolors{1}{black!0}{black!10}    
+    
+Program | Solver | DOFs | $\\sigma_y$ | Wall [s] | Kernel [s] | User [s] | Memory [Gb]
+--------|--------|-----:|------------:|---------:|-----------:|---------:|------------:
+EOF
+  
+    sort -g -k 15 tmp-table.md >> report-${1}.md
+    cat << EOF  >> report-${1}.md
+ 
+Table: \$c=${c}\$ sorted by memory
+
+
+EOF
+
   done
   
   
