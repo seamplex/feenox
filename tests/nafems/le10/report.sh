@@ -124,7 +124,7 @@ EOF
   done
 
   cat plot-${1}.gp | tr -d '\n' > plot-${1}-sigmay.gp
-  echo "-5.38 w l lw 1 lc \"plum\" ti \"reference\"" >> plot-${1}-sigmay.gp
+  echo "-5.38 w l lw 1 lc \"red\" ti \"reference\"" >> plot-${1}-sigmay.gp
 
   if [ ! -z "$(which gnuplot)" ]; then
     sed s/xxx/${1}/ figures.gp | gnuplot -  
