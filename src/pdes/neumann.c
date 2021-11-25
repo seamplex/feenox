@@ -13,7 +13,6 @@ int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *va
 #endif
   
   return FEENOX_OK;
-  
 }
 
 double feenox_problem_bc_natural_weight(element_t *element, unsigned int v) {

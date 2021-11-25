@@ -11,6 +11,7 @@ TESTS = \
         tests/abort.sh \
         tests/algebraic_expr.sh \
         tests/builtin.sh \
+        tests/cylinder-traction-force.sh \
         tests/default_argument_value.sh \
         tests/expressions_constants.sh \
         tests/expressions_variables.sh \

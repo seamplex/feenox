@@ -48,14 +48,13 @@ int feenox_define_physical_group(const char *name, const char *mesh_name, int di
 
 
 physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag) {
-  char *dummy_aux = NULL;
-  physical_group_t *physical_group;
-  mesh_t *actual_mesh; 
   
   if (name == NULL || strcmp(name, "") == 0) {
     feenox_push_error_message("mandatory name needed for physical group");
     return NULL;
   }
+  
+  mesh_t *actual_mesh = NULL; 
   if ((actual_mesh = mesh) == NULL) {
     if ((actual_mesh = feenox.mesh.mesh_main) == NULL) {
       feenox_push_error_message("no mesh for defining physical group '%s'", name);
@@ -64,10 +63,12 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
   }
   
   int already_exists = 0;
+  physical_group_t *physical_group = NULL;
   if ((physical_group = feenox_get_physical_group_ptr(name, actual_mesh)) == NULL) {
-    already_exists = 0; // this is used to define special variables below
+    // this is used to define special variables below
     feenox_check_alloc_null(physical_group = calloc(1, sizeof(physical_group_t)));
     feenox_check_alloc_null(physical_group->name = strdup(name));
+    physical_group->dimension = -1;
     HASH_ADD_KEYPTR(hh, actual_mesh->physical_groups, physical_group->name, strlen(name), physical_group);
   } else {
     already_exists = 1;
@@ -83,8 +84,8 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
     physical_group->tag = tag;
   }
 
-  if (dimension != 0) {
-    if (physical_group->dimension != 0) {
+  if (dimension != -1) {
+    if (physical_group->dimension != -1) {
       if (physical_group->dimension != dimension) {
         feenox_push_error_message("physical group '%s' had been previously defined as dimension '%d' and now dimension '%d' is required", name, physical_group->dimension, dimension);
         return NULL;
@@ -96,32 +97,65 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
   // -----------------------------  
   if (already_exists == 0) {
     if (feenox_check_name(name) == FEENOX_OK) {
-      // volume (or area or length)
-      feenox_check_minusone_null(asprintf(&dummy_aux, "%s_vol", physical_group->name));
-      // check again in case there are duplicates in meshes
-      if (feenox_check_name(dummy_aux) == FEENOX_OK) {
-        if ((physical_group->var_vol = feenox_define_variable_get_ptr(dummy_aux)) == NULL) {
-          return NULL;
-        }
-      } else {
-        feenox_pop_error_message();
-      }  
+      if (physical_group->dimension > 0) {
+        
+        // volume (or area or length)
+        char *name_measure = NULL;
+        char *measure[4] = {"", "length", "area", "volume"};
+        feenox_check_minusone_null(asprintf(&name_measure, "%s_%s", physical_group->name, measure[physical_group->dimension]));
+        // check again in case there are duplicates in meshes
+        if (feenox_check_name(name_measure) == FEENOX_OK) {
+          if ((physical_group->var_volume = feenox_define_variable_get_ptr(name_measure)) == NULL) {
+            return NULL;
+          }
+        } else {
+          feenox_pop_error_message();
+        }  
+        feenox_free(name_measure);
+       
+        // center of gravity
+        char *name_cog = NULL;
+        feenox_check_minusone_null(asprintf(&name_cog, "%s_cog", physical_group->name));
+        if (feenox_check_name(name_cog) == FEENOX_OK) {
+          if ((physical_group->vector_cog = feenox_define_vector_get_ptr(name_cog, 3)) == NULL) {
+            return NULL;
+          }
+        } else {
+          feenox_pop_error_message();
+        }  
+        feenox_free(name_cog);
+      }
+      
     } else {
       feenox_pop_error_message();
     }
-    feenox_free(dummy_aux);
 
-    // center of gravity
-    feenox_check_minusone_null(asprintf(&dummy_aux, "%s_cog", physical_group->name));
-    if (feenox_check_name(dummy_aux) == FEENOX_OK) {
-      if ((physical_group->vector_cog = feenox_define_vector_get_ptr(dummy_aux, 3)) == NULL) {
-        return NULL;
-      }
-    } else {
-      feenox_pop_error_message();
-    }  
-    feenox_free(dummy_aux);
 
   } 
   return physical_group;
+}
+
+
+double feenox_physical_group_compute_volume(physical_group_t *this, mesh_t *mesh) {
+  this->volume = 0;
+  
+  for (size_t i = 0; i < this->n_elements; i++) {
+    element_t *element = &mesh->element[this->element[i]];
+    for (unsigned int v = 0; v < element->type->gauss[mesh->integration].V; v++) {
+      feenox_call(feenox_mesh_compute_w_at_gauss(element, v, mesh->integration));
+
+      for (size_t j = 0; j < element->type->nodes; j++) {
+        double wh = element->w[v] * element->type->gauss[mesh->integration].h[v][j];
+        this->volume += wh ;
+        for (size_t m = 0; m < 3; m++) {
+          this->cog[m] += wh * element->node[j]->x[m];
+        }
+      }
+    }
+  }
+
+  feenox_var_value(this->var_volume) = this->volume;
+  
+  
+  return this->volume;
 }

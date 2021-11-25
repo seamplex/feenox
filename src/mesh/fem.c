@@ -195,19 +195,10 @@ int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, g
 // compute the gradient of the shape functions with respect to x evalauted at gauss point v of scheme integration
 int feenox_mesh_compute_dhdx_at_gauss(element_t *this, int v, int integration) {
 
-  int V_changed = 0;
   gsl_matrix *dhdx;
   
-  if (this->dhdx == NULL || this->V_dhdx != this->type->gauss[integration].V) {
-    int v_prime;
-    for (v_prime = 0; v_prime < this->V_dhdx; v_prime++) {
-      gsl_matrix_free(this->dhdx[v_prime]);
-    }
-    feenox_free(this->dhdx);
-
-    this->V_dhdx = this->type->gauss[integration].V;
-    feenox_check_alloc(this->dhdx = calloc(this->V_dhdx, sizeof(gsl_matrix *)));
-    V_changed = 1;
+  if (this->dhdx == NULL) {
+    feenox_check_alloc(this->dhdx = calloc(this->type->gauss[integration].V, sizeof(gsl_matrix *)));
   }
   
   if (this->dhdx[v] == NULL) {
@@ -216,7 +207,7 @@ int feenox_mesh_compute_dhdx_at_gauss(element_t *this, int v, int integration) {
     return FEENOX_OK;
   }
   
-  if (this->drdx == NULL || this->drdx[v] == NULL || V_changed) {
+  if (this->drdx == NULL || this->drdx[v] == NULL) {
     feenox_call(feenox_mesh_compute_drdx_at_gauss(this, v, integration));
   }
 
@@ -256,18 +247,8 @@ int feenox_mesh_compute_h(element_t *this, double *r, double *h) {
 
 int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integration) {
   
-  int V_changed = 0;
-  
-  if (this->drdx == NULL || this->V_drdx != this->type->gauss[integration].V) {
-    int v_prime;
-    for (v_prime = 0; v_prime < this->V_drdx; v_prime++) {
-      gsl_matrix_free(this->drdx[v_prime]);
-    }
-    feenox_free(this->drdx);
-
-    this->V_drdx = this->type->gauss[integration].V;
-    feenox_check_alloc(this->drdx = calloc(this->V_drdx, sizeof(gsl_matrix *)));
-    V_changed = 1;
+  if (this->drdx == NULL) {
+    feenox_check_alloc(this->drdx = calloc(this->type->gauss[integration].V, sizeof(gsl_matrix *)));
   }
   if (this->drdx[v] == NULL) {
     feenox_check_alloc(this->drdx[v] = gsl_matrix_calloc(this->type->dim, this->type->dim));
@@ -275,7 +256,7 @@ int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integ
     return FEENOX_OK;
   }
   
-  if (this->dxdr == NULL || this->dxdr[v] == NULL || V_changed) {
+  if (this->dxdr == NULL || this->dxdr[v] == NULL) {
     feenox_call(feenox_mesh_compute_dxdr_at_gauss(this, v, integration));
   }
   
@@ -287,7 +268,6 @@ int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integ
 #endif
   
   return FEENOX_OK; 
-  
 }
 
 
@@ -352,16 +332,8 @@ int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integ
   double *r;
   gsl_matrix *dxdr;
   
-  if (this->dxdr == NULL || this->V_dxdr != this->type->gauss[integration].V) {
-    int v_prime;
-    for (v_prime = 0; v_prime < this->V_dxdr; v_prime++) {
-      gsl_matrix_free(this->dxdr[v_prime]);
-    }
-    feenox_free(this->dxdr);
-
-    this->V_dxdr = this->type->gauss[integration].V;
-    feenox_check_alloc(this->dxdr = calloc(this->V_dxdr, sizeof(gsl_matrix *)));
-//    V_changed = 1;
+  if (this->dxdr == NULL) {
+    feenox_check_alloc(this->dxdr = calloc(this->type->gauss[integration].V, sizeof(gsl_matrix *)));
   }
   
   if (this->dxdr[v] == NULL) {

@@ -196,7 +196,7 @@ Table: \$c=${c}\$ sorted by memory
 EOF
 
   done
-  
+  rm -f tmp-table.md  
   
 else
   echo "nothing to plot for ${1}"

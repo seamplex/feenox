@@ -21,6 +21,7 @@ extern int feenox_problem_bc_set_mechanical_compression(element_t *element, bc_d
 extern int feenox_problem_bc_set_mechanical_tension(element_t *element, bc_data_t *bc_data, unsigned int v);
 extern int feenox_problem_bc_set_mechanical_normal_stress(element_t *element, bc_data_t *bc_data, unsigned int v, signed int sign);
 extern int feenox_problem_bc_set_mechanical_traction(element_t *element, bc_data_t *bc_data, unsigned int v);
+extern int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 // mechanical/bulk.c
 extern int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes);

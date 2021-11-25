@@ -1619,15 +1619,10 @@ int feenox_parse_open_close(const char *what) {
 
 int feenox_parse_print(void) {
  
-  char *token;
-  print_t *print;
-  matrix_t *dummy_matrix;
-  vector_t *dummy_vector;
-  int n;
-
   // I don't expect anybody to want to use this PRINT instruction through the API
   // so we just parse and define everything here
-  print = calloc(1, sizeof(print_t));
+  print_t *print = NULL;
+  feenox_check_alloc(print = calloc(1, sizeof(print_t)));
 
   char *keywords[] = {"SKIP_STEP", "SKIP_STATIC_STEP", "SKIP_TIME", "SKIP_HEADER_STEP", ""};
   expr_t *expressions[] = {
@@ -1663,6 +1658,8 @@ int feenox_parse_print(void) {
 ///kw+PRINT+usage [ TEXT <string_1> ... TEXT <string_n> ]
 ///kw+PRINT+usage @
   
+  int n = 0;
+  char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 ///kw+PRINT+usage [ FILE { <file_path> | <file_id> } ]
 ///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
@@ -1724,6 +1721,8 @@ int feenox_parse_print(void) {
       print_token_t *print_token = calloc(1, sizeof(print_token_t));
       LL_APPEND(print->tokens, print_token);
 
+      matrix_t *matrix = NULL;
+      vector_t *vector = NULL;
       if (token[0] == '%') {
         feenox_check_alloc(print_token->format = strdup(token));
 
@@ -1732,13 +1731,13 @@ int feenox_parse_print(void) {
           return FEENOX_ERROR;
         }
 
-      } else if ((dummy_matrix = feenox_get_matrix_ptr(token)) != NULL) {
+      } else if ((matrix = feenox_get_matrix_ptr(token)) != NULL) {
         feenox_check_alloc(print_token->text = strdup(token));   // nos quedamos con el texto para el header
-        print_token->matrix = dummy_matrix;
+        print_token->matrix = matrix;
 
-      } else if ((dummy_vector = feenox_get_vector_ptr(token)) != NULL) {
+      } else if ((vector = feenox_get_vector_ptr(token)) != NULL) {
         print_token->text = strdup(token);   // nos quedamos con el texto para el header
-        print_token->vector = dummy_vector;
+        print_token->vector = vector;
 
       } else {
         if (feenox_expression_parse(&print_token->expression, token) != FEENOX_OK) {
@@ -2505,7 +2504,7 @@ int feenox_parse_physical_group(void) {
   char *mesh_name = NULL;
   char *material_name = NULL;
   char *bc_name = NULL;
-  unsigned int dimension = 0;
+  unsigned int dimension = -1;
   unsigned int id = 0;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
 ///kw_pde+PHYSICAL_GROUP+usage [ MESH <name> ]
@@ -3088,7 +3087,7 @@ int feenox_parse_integrate(void) {
     
   if (name_physical_group != NULL) {
     if ((mesh_integrate->physical_group = feenox_get_physical_group_ptr(name_physical_group, mesh_integrate->mesh)) == NULL) {
-      if ((mesh_integrate->physical_group = feenox_define_physical_group_get_ptr(name_physical_group, mesh_integrate->mesh, 0, 0)) == NULL) {
+      if ((mesh_integrate->physical_group = feenox_define_physical_group_get_ptr(name_physical_group, mesh_integrate->mesh, -1, 0)) == NULL) {
         return FEENOX_ERROR;
       }
     }
@@ -3230,7 +3229,7 @@ int feenox_parse_find_extrema(void) {
     
   if (name_physical_group != NULL) {
     if ((mesh_find_extrema->physical_group = feenox_get_physical_group_ptr(name_physical_group, mesh_find_extrema->mesh)) == NULL) {
-      if ((mesh_find_extrema->physical_group = feenox_define_physical_group_get_ptr(name_physical_group, mesh_find_extrema->mesh, 0, 0)) == NULL) {
+      if ((mesh_find_extrema->physical_group = feenox_define_physical_group_get_ptr(name_physical_group, mesh_find_extrema->mesh, -1, 0)) == NULL) {
         return FEENOX_ERROR;
       }
     }

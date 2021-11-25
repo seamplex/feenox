@@ -2,7 +2,7 @@ SetFactory("OpenCASCADE");
 
 n = 1/Mesh.MeshSizeFactor;
 
-l = 1000;
+l = 500;
 h = 80;
 w = 60;
 t = 10;
@@ -85,7 +85,7 @@ Physical Surface("top", 4) = {33, 31, 28};
 
 Mesh.ElementOrder = 2;
 Mesh.RecombineAll = 1;
-Mesh.SecondOrderIncomplete = 0;
+Mesh.SecondOrderIncomplete = 1;
 
 Transfinite Curve {1, 7, 3, 5, 9, 15, 11, 13} = 2*n+1;
 Transfinite Curve {8, 20, 17, 4, 12, 22, 19, 16} = 1*n+1;

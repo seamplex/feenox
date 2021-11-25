@@ -6,6 +6,7 @@
 #define BC_TYPE_MECHANICAL_PRESSURE_TENSION     2
 #define BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION 3
 #define BC_TYPE_MECHANICAL_TRACTION             4
+#define BC_TYPE_MECHANICAL_FORCE                5
 
 typedef struct mechanical_t mechanical_t;
 

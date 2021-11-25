@@ -245,8 +245,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
     gsl_matrix_set_zero(feenox.pde.Jbi);
   }
 
-  unsigned int v = 0;
-  for (v = 0; v < V; v++) {
+  for (unsigned int v = 0; v < V; v++) {
     feenox_call(bc_data->set(this, bc_data, v));
   }
   

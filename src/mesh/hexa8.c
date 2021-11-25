@@ -833,6 +833,7 @@ double feenox_mesh_hex_vol(element_t *element) {
   
    element->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3+v4+v5+v6);
  }  
+ 
  return element->volume;
 
 }

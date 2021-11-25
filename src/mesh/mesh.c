@@ -108,8 +108,7 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
-  int i;
-  for (i = 0; i < this->n_elements; i++) {
+  for (size_t i = 0; i < this->n_elements; i++) {
     
     // check the dimension of the element, the higher is the topological dim of the mes
     if (this->element[i].type->dim > this->dim_topo) {
@@ -155,10 +154,9 @@ int feenox_instruction_mesh_read(void *arg) {
   if (feenox.mesh.need_cells) {
     feenox_call(feenox_mesh_element2cell(this));
     feenox_check_alloc(this->cells_argument = calloc(this->dim, sizeof(double *)));
-    unsigned int m = 0;
-    for (m = 0; m < this->dim; m++) {
+    for (unsigned int m = 0; m < this->dim; m++) {
       feenox_check_alloc(this->cells_argument[m] = calloc(this->n_cells, sizeof(double)));
-      for (i = 0; i < this->n_cells; i++) {
+      for (size_t i = 0; i < this->n_cells; i++) {
         this->cells_argument[m][i] = this->cell[i].x[m]; 
       }
     }
@@ -183,59 +181,38 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
-  // sweep all functions, if there's one with mesh we need to link it to this one
-/*  
-  HASH_ITER(hh, feenox.functions, function, tmp_function) {
-    if (function->mesh != NULL && function->mesh == mesh) {
-
-      function->initialized = 0;
-      
-      if (function->type == type_pointwise_mesh_node) {
-        function->data_size = this->n_nodes;
-        function->data_argument = this->nodes_argument;
-      } else if (function->type == type_pointwise_mesh_cell) {
-        function->data_size = this->n_cells;
-        function->data_argument = this->cells_argument;
-      }
-      
-      if (function->vector_value != NULL) {
-        function->vector_value->size = function->data_size;
-      }
-    }
-  }
-*/  
   // compute the volume (or area or length) and center of gravity of the groups
-/*  
+  // but only if the variable groupname_vol or the vector groupname_cog 
+  // are used in one of the expressions
   if (this->dim != 0) {
     for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-      vol = cog[0] = cog[1] = cog[2] = 0;
-      for (i = 0; i < physical_group->n_elements; i++) {
-        // TODO: can' we use reduced integration? or a single gauss point?
-        element = &this->element[physical_group->element[i]];
-        for (v = 0; v < element->type->gauss[this->integration].V; v++) {
-          mesh_compute_integration_weight_at_gauss(element, v, this->integration);
+      
+      if ((physical_group->var_volume != NULL && physical_group->var_volume->used) ||
+          (physical_group->vector_cog != NULL && physical_group->vector_cog->used)) {
+        physical_group->volume = 0;
+        physical_group->cog[0] = 0;
+        physical_group->cog[1] = 0;
+        physical_group->cog[2] = 0;
+        
+        for (size_t i = 0; i < physical_group->n_elements; i++) {
+          element_t *element = &this->element[physical_group->element[i]];
+          for (unsigned int v = 0; v < element->type->gauss[this->integration].V; v++) {
+            feenox_call(feenox_mesh_compute_w_at_gauss(element, v, this->integration));
 
-          for (j = 0; j < element->type->nodes; j++) {
-               vol += element->w[v] * element->type->gauss[this->integration].h[v][j];
-            cog[0] += element->w[v] * element->type->gauss[this->integration].h[v][j] * element->node[j]->x[0];
-            cog[1] += element->w[v] * element->type->gauss[this->integration].h[v][j] * element->node[j]->x[1];
-            cog[2] += element->w[v] * element->type->gauss[this->integration].h[v][j] * element->node[j]->x[2];
+            for (size_t j = 0; j < element->type->nodes; j++) {
+              double wh = element->w[v] * element->type->gauss[this->integration].h[v][j];
+              physical_group->volume += wh ;
+              for (size_t m = 0; m < 3; m++) {
+                physical_group->cog[m] += wh * element->node[j]->x[m];
+              }
+            }
           }
         }
-      }
-      physical_group->volume = vol;
-      physical_group->cog[0] = cog[0]/vol;
-      physical_group->cog[1] = cog[1]/vol;
-      physical_group->cog[2] = cog[2]/vol;
-
-      // save them to feenox so they are available in the input file
-      if (physical_group->var_vol != NULL) {
-        feenox_var_value(physical_group->var_vol) = vol;
-      }
-
-      if (physical_group->vector_cog != NULL) {
-        if (!physical_group->vector_cog->initialized) {
-          feenox_call(feenox_vector_init(physical_group->vector_cog));
+        
+        feenox_var_value(physical_group->var_volume) = physical_group->volume;
+        
+        if (physical_group->vector_cog->initialized == 0) {
+          feenox_call(feenox_vector_init(physical_group->vector_cog, 0));
         }
         gsl_vector_set(physical_group->vector_cog->value, 0, physical_group->cog[0]);
         gsl_vector_set(physical_group->vector_cog->value, 1, physical_group->cog[1]);
@@ -243,7 +220,7 @@ int feenox_instruction_mesh_read(void *arg) {
       }
     }
   }
-*/
+
   // create a k-dimensional tree and try to figure out what the maximum number of neighbours each node has
   if (this->kd_nodes == NULL) {
     this->kd_nodes = kd_create(this->dim);

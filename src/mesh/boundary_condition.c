@@ -62,6 +62,18 @@ bc_t *feenox_define_bc_get_ptr(const char *name, mesh_t *mesh) {
       }
     }
     
+    // create a new physical group so name_area etc. are available for the parser
+    // TODO: we don't know the dimension!
+/*    
+    physical_group_t *physical_group = NULL;
+    if ((physical_group = feenox_get_physical_group_ptr(name, NULL)) == NULL) {
+      if ((physical_group = feenox_define_physical_group_get_ptr(name, NULL, dimension, tag)) == NULL) {
+        return FEENOX_ERROR;
+      }
+    }   
+ */
+    
+    
     HASH_ADD_STR(feenox.mesh.bcs, name, bc);
     
   } else {

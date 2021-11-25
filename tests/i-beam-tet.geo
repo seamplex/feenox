@@ -1,6 +1,6 @@
 SetFactory("OpenCASCADE");
 
-l = 1000;
+l = 500;
 h = 80;
 w = 60;
 t = 10;
@@ -47,8 +47,8 @@ Physical Surface("left", 2) = {1};
 Physical Surface("right", 3) = {14};
 Physical Surface("top", 4) = {11};
 
-Mesh.ElementOrder = 1;
-Mesh.MeshSizeMin = t;
+Mesh.ElementOrder = 2;
+Mesh.MeshSizeMin = 2*t;
 Mesh.MeshSizeMax = 2*t;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;

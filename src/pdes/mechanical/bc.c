@@ -55,7 +55,19 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
     } else if (strcmp(lhs, "tz") == 0) {
       bc_data->dof = 2;
     }
-    
+
+  } else if (strcmp(lhs, "Fx") == 0 || strcmp(lhs, "Fy") == 0 || strcmp(lhs, "Fz") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_FORCE;
+    bc_data->type_math = bc_type_math_neumann;
+    bc_data->set = feenox_problem_bc_set_mechanical_force;
+    if (strcmp(lhs, "Fx") == 0) {
+      bc_data->dof = 0;
+    } else if (strcmp(lhs, "Fy") == 0) {
+      bc_data->dof = 1;
+    } else if (strcmp(lhs, "Fz") == 0) {
+      bc_data->dof = 2;
+    }
+
   } else {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
     return FEENOX_ERROR;
@@ -93,7 +105,7 @@ int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t nod
     
   } else {
     
-    // fixed means homogeneous dirichlet bc
+    // -1 means all dofs
     feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], 0));
     if (feenox.pde.dofs > 1) {
       feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[1], 0));
@@ -162,13 +174,39 @@ int feenox_problem_bc_set_mechanical_traction(element_t *element, bc_data_t *bc_
 
 #ifdef HAVE_PETSC
   // TODO: cache if not space dependent
+  // TODO: have different functions, one for space and one for constant?
   if (bc_data->space_dependent) {
     feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration);
     feenox_mesh_update_coord_vars(element->x[v]);
   }
   // TODO: set all the DOFs at the same time
   double t[3] = {0,0,0};
+  // TODO: wrap feenox_expression_eval() with vitrual methods according to the dependence of the bc
   t[bc_data->dof] = feenox_expression_eval(&bc_data->expr);
+//  printf("%g\n", t[bc_data->dof]);
+  feenox_call(feenox_problem_bc_natural_set(element, v, t));
+  
+#endif
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t *bc_data, unsigned int v) {
+
+#ifdef HAVE_PETSC
+  // TODO: cache if not space dependent
+  if (bc_data->space_dependent) {
+    feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration);
+    feenox_mesh_update_coord_vars(element->x[v]);
+  }
+  // TODO: set all the DOFs at the same time
+  double t[3] = {0,0,0};
+  if (element->physical_group->volume == 0) {
+    element->physical_group->volume = feenox_physical_group_compute_volume(element->physical_group, feenox.pde.mesh);
+  }
+  t[bc_data->dof] = feenox_expression_eval(&bc_data->expr) / element->physical_group->volume;
+//  printf("%g\n", t[bc_data->dof]);
   feenox_call(feenox_problem_bc_natural_set(element, v, t));
   
 #endif

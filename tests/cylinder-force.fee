@@ -1,0 +1,9 @@
+PROBLEM mechanical
+READ_MESH cylinder.msh
+E=1
+nu=0.25
+BC bottom fixed
+BC top    Fx=1
+
+SOLVE_PROBLEM
+PRINT %.3f u(1,0,0)

@@ -913,7 +913,7 @@ struct physical_group_t {
   double volume;
   double cog[3];
   
-  var_t *var_vol;
+  var_t *var_volume;
   vector_t *vector_cog;
   
   // a linked list seems to be too expensive
@@ -1004,21 +1004,13 @@ struct element_t {
   double *w;       // weights of the gauss points
   double **x;      // coordinates fo the gauss points 
   
-  // these matrices are evalauted at the gauss points
+  // these are pointers to arrays of matrices are evalauted at the gauss points
   gsl_matrix **dhdx;
   gsl_matrix **dxdr;
   gsl_matrix **drdx;
   gsl_matrix **H;
   gsl_matrix **B;
   
-  // these are the number of gauss points currently being used
-  // if this number changes, everything needs to be re-computed
-  // for instance sub-integration might be used for building matrices
-  // but the canonical set of gauss points might be needed to recover stresses  
-  // we need one size for each of the seven objects above because we need
-  // to change them individually otherwise the first wins and the others loose
-  size_t V_w, V_x, V_H, V_B, V_dxdr, V_drdx, V_dhdx;    
-
   gsl_matrix **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
   gsl_matrix **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
   double **property_at_node;  // 2d array [j][N] of property N evaluated at node j
@@ -1066,12 +1058,6 @@ struct neighbor_t {
   double x_ij[3];
   double n_ij[3];
   double S_ij;
-  
-  // distancia entre los centro de la cara y el centro de la celda
-  // (cache para mallas estructuradas)
-//  double di;     // celda principal
-//  double dj;     // celda vecina  
-  
 };
 
 struct material_t {
@@ -2093,6 +2079,7 @@ extern int feenox_instruction_mesh_find_extrema(void *arg);
 // physical_group.c
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
 extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
+extern double feenox_physical_group_compute_volume(physical_group_t *this, mesh_t *mesh);
 
 // material.c
 extern material_t *feenox_get_material_ptr(const char *name);
