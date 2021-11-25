@@ -125,8 +125,13 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
 int feenox_instruction_file_open(void *arg) {
   
   file_t *file = (file_t *)arg;
-  char *newfilepath;
   
+  // stdin is already opened
+  if (file == feenox.special_files._stdin) {
+    return FEENOX_OK;
+  }
+  
+  char *newfilepath = NULL;
   if ((newfilepath = feenox_evaluate_string(file->format, file->n_format_args, file->arg)) == NULL) {
     return FEENOX_ERROR;
   }

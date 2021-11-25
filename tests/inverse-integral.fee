@@ -1,5 +1,5 @@
 INCLUDE parameters.fee    # kinetic parameters
-FUNCTION flux(t) FILE_PATH flux.dat
+FUNCTION flux(t) FILE flux.dat
 
 VAR t'   # dummy integration variable
 

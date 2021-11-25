@@ -1,0 +1,6 @@
+FUNCTION s(t) FILE sine.dat INTERPOLATION steffen
+t_0 = vecmin(vec_s_t)
+end_time = vecmax(vec_s_t)
+PRINT t d_dt(s(t))
+# TODO: have two processes synchronized through shmem and semaphores,
+#       one sends sin(t) and the other one computes the derivative on the fly

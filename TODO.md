@@ -4,11 +4,10 @@
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
- * check typos in BC names
-
  
 ## Tests
- 
+
+ * write a README and an explanation of each tests
  * cell-based mesh writes and integrations
  * FIT ranges
 
@@ -22,9 +21,8 @@
  * HISTORY
  * PRINT_FUNCTION PHYSICAL_ENTITY
  
-## Wasora stuff
+## Wasora-like stuff
 
- * derivative of a column with respect to another one as a UNIX filter
  * vector & matrix assignements & DAEs
  * debug mode, line-by-line
  * trap signit & sigterm
@@ -39,6 +37,7 @@
 
  * logaritmic ranges for PRINT_FUNCTION
  * default separator after TEXT is space, after numerical is tab
+ * PRINTF instruction
  * PRINT_FUNCTION with %f in between arguments
  * BLAS
    - BLAS a * b = s   # scalar dot
@@ -68,6 +67,7 @@
  * frd? (to be able to use ccx's post processor... is it worth it?)
  * binary msh and vtk
  * support CGNS formats
+ * MED
  * problem-aware WRITE_POST 
    - full | displacements | stresses | strains | von_mises | tresca | principal
    - full | temperature | heat_flux
@@ -79,7 +79,7 @@
  
  * mustache instead of m4
  * gmsh as a library? maybe not, just import both gmsh and feenox in Python and use them together
-
+ * use dmplex?
  
 # PDEs
 
@@ -87,7 +87,6 @@
  
 ## Laplace/Poisson/Helmholtz
 
- * like heat with different BCs and gradients
  * poisson f = 1, eta = 0
  * helmholtz f = 1, eta = 1
  * see 2D example in Gmsh list
@@ -107,7 +106,7 @@
  * orthotropic linear
  * non-linear
  * stresses: count negative jacobians and worst jacobians
- * stress linearization (do we need a per-problem parser?)
+ * stress linearization (per-problem parser)
  * reactions
  * strain energy
 
@@ -117,6 +116,11 @@
  
 ## Neutron
 
- * diffusion/transport
- * FEM/FVM
+ * transport
+ * FVM
+ * benchmarks
+ 
+## V & V
+
+ * MMS
 

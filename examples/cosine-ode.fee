@@ -1,0 +1,10 @@
+FUNCTION s(t) FILE sine.dat INTERPOLATION steffen
+a = vecmin(vec_s_t)
+b = vecmax(vec_s_t)
+d = (b-a)/100
+end_time = (b-a)-2*d
+# min_dt = 0.1  # optional
+PHASE_SPACE sine
+sine_dot_0 = derivative(s(t), t, 0-a+d) 
+sine = s(t)
+PRINT t+a-d sine_dot

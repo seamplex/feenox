@@ -290,14 +290,16 @@ int feenox_parser_string_format(char **string, int *n_args) {
 
 int feenox_parser_file(file_t **file) {
   
-  char *token;
-  
+  char *token = NULL;
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected file identifier");
     return FEENOX_ERROR;
   }
-
-  if ((*file = feenox_get_file_ptr(token)) == NULL) {
+  
+  // "-" means stdin
+  if (strcmp(token, "-") == 0 || strcmp(token, "stdin")) {
+    *file = feenox.special_files._stdin;
+  } else if ((*file = feenox_get_file_ptr(token)) == NULL) {
     feenox_call(feenox_define_file(token, token, 0, NULL));
     if ((*file = feenox_get_file_ptr(token)) == NULL) {
       return FEENOX_ERROR;
@@ -306,24 +308,7 @@ int feenox_parser_file(file_t **file) {
   return FEENOX_OK;
 }
 
-/*
-int feenox_parser_function(function_t **function) {
-  
-  char *token;
-  
-  if ((token = feenox_get_next_token(NULL)) == NULL) {
-    feenox_push_error_message("expected function name");
-    return FEENOX_ERROR;
-  }
 
-  if ((*function = feenox_get_function_ptr(token)) == NULL) {
-    feenox_push_error_message("undefined function identifier '%s' (remember that only the function name is needed, not the arguments)", token);
-    return FEENOX_ERROR;
-  }
-  
-  return FEENOX_OK;
-}
-*/
 int feenox_parser_vector(vector_t **vector) {
   
   char *token;

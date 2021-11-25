@@ -4,8 +4,6 @@
   <highlighting>
     <list name="prim_keywords">
       <item>ABORT</item>
-      <item>ADIABATIC</item>
-      <item>ALGORITHM</item>
       <item>ALIAS</item>
       <item>AS</item>
       <item>ASCENDING</item>
@@ -29,6 +27,7 @@
       <item>DIM</item>
       <item>DIMENSION</item>
       <item>DIMENSIONS</item>
+      <item>DIRICHLET_SCALING</item>
       <item>DUMP</item>
       <item>EIGEN_FORMULATION</item>
       <item>EIGEN_SOLVER</item>
@@ -38,7 +37,6 @@
       <item>EPSABS</item>
       <item>EPSREL</item>
       <item>EPS_TYPE</item>
-      <item>EXPAND</item>
       <item>FILE</item>
       <item>FILE_FORMAT</item>
       <item>FILE_PATH</item>
@@ -64,7 +62,6 @@
       <item>INITIAL_CONDITIONS_MODE</item>
       <item>INPUT</item>
       <item>INPUT_FILE</item>
-      <item>INPUT_FILE_PATH</item>
       <item>INTEGRATE</item>
       <item>INTEGRATION</item>
       <item>INTERPOLATION</item>
@@ -77,19 +74,15 @@
       <item>LINEAR</item>
       <item>LINEAR_SOLVER</item>
       <item>M</item>
-      <item>M4</item>
-      <item>MACRO</item>
       <item>MAIN</item>
       <item>MATERIAL</item>
       <item>MATRIX</item>
       <item>MAX</item>
-      <item>MAX_DAUGHTERS</item>
       <item>MAX_ITER</item>
       <item>M_bc</item>
       <item>MESH</item>
       <item>METHOD</item>
       <item>MIN</item>
-      <item>MINIMIZE</item>
       <item>MODE</item>
       <item>MODES</item>
       <item>NODE</item>
@@ -101,17 +94,12 @@
       <item>NON_LINEAR_SOLVER</item>
       <item>NONLINEAR_SOLVER</item>
       <item>NO_PHYSICAL_NAMES</item>
-      <item>NORERUN</item>
       <item>NSTEPS</item>
       <item>OFFSET</item>
       <item>OPEN</item>
-      <item>OPTIMIZE</item>
-      <item>OUTER_STEPS</item>
       <item>OUTPUT</item>
       <item>OUTPUT_FILE</item>
-      <item>OUTPUT_FILE_PATH</item>
       <item>OVER</item>
-      <item>PARAMETRIC</item>
       <item>PATH</item>
       <item>PC</item>
       <item>PC_TYPE</item>
@@ -135,7 +123,6 @@
       <item>RE_READ</item>
       <item>RESIDUALS</item>
       <item>RESULT</item>
-      <item>ROUTINE</item>
       <item>ROWS</item>
       <item>SCALAR_FORMAT</item>
       <item>SCALE</item>
@@ -143,7 +130,6 @@
       <item>SEMAPHORE</item>
       <item>SEP</item>
       <item>SEPARATOR</item>
-      <item>SHELL</item>
       <item>SHEPARD_EXPONENT</item>
       <item>SHEPARD_RADIUS</item>
       <item>SHM</item>
@@ -172,7 +158,6 @@
       <item>TS_ADAPT</item>
       <item>TS_ADAPT_TYPE</item>
       <item>TS_TYPE</item>
-      <item>TYPE</item>
       <item>UNKNOWNS</item>
       <item>UPDATE_EACH_STEP</item>
       <item>VAR</item>
@@ -180,7 +165,6 @@
       <item>VARIABLES</item>
       <item>VARS</item>
       <item>VECTOR</item>
-      <item>VECTOR_DATA</item>
       <item>VECTORS</item>
       <item>VECTOR_SORT</item>
       <item>VERBOSE</item>
@@ -196,22 +180,19 @@
       <item>Z_MIN</item>
       <item>ALLOWED</item>
       <item>AS_PROVIDED</item>
-      <item>GRADTOL</item>
-      <item>MAX_ITER</item>
       <item>NONE</item>
       <item>POST</item>
       <item>SKIP_HEADER_STEP</item>
       <item>SKIP_STATIC_STEP</item>
       <item>SKIP_STEP</item>
       <item>SKIP_TIME</item>
-      <item>TOL</item>
       <item>WAIT</item>
     </list>
     <list name="sec_keywords">
     </list>
     <list name="internals">
+      <item>dae_rtol</item>
       <item>done</item>
-      <item>done_outer</item>
       <item>done_static</item>
       <item>done_transient</item>
       <item>dont_quit</item>
@@ -220,7 +201,6 @@
       <item>end_time</item>
       <item>i</item>
       <item>infinite</item>
-      <item>in_outer_initial</item>
       <item>in_static</item>
       <item>in_static_first</item>
       <item>in_static_last</item>
@@ -232,16 +212,14 @@
       <item>min_dt</item>
       <item>ncores</item>
       <item>on_gsl_error</item>
-      <item>on_ida_error</item>
       <item>on_nan</item>
+      <item>on_sundials_error</item>
       <item>pi</item>
       <item>pid</item>
       <item>quit</item>
       <item>realtime_scale</item>
-      <item>rel_error</item>
       <item>report</item>
       <item>static_steps</item>
-      <item>step_outer</item>
       <item>step_static</item>
       <item>step_transient</item>
       <item>t</item>
@@ -260,6 +238,7 @@
       <item>cpu_time</item>
       <item>d_dt</item>
       <item>deadband</item>
+      <item>derivative</item>
       <item>equal</item>
       <item>exp</item>
       <item>expint1</item>
@@ -267,8 +246,12 @@
       <item>expint3</item>
       <item>expintn</item>
       <item>floor</item>
+      <item>func_min</item>
+      <item>gauss_kronrod</item>
+      <item>gauss_legendre</item>
       <item>heaviside</item>
       <item>if</item>
+      <item>integral</item>
       <item>integral_dt</item>
       <item>integral_euler_dt</item>
       <item>is_even</item>
@@ -289,8 +272,11 @@
       <item>min</item>
       <item>mod</item>
       <item>not</item>
+      <item>prod</item>
+      <item>quasi_random</item>
       <item>random</item>
       <item>random_gauss</item>
+      <item>root</item>
       <item>round</item>
       <item>sawtooth_wave</item>
       <item>sgn</item>
@@ -298,11 +284,20 @@
       <item>sinh</item>
       <item>sqrt</item>
       <item>square_wave</item>
+      <item>sum</item>
       <item>tan</item>
       <item>tanh</item>
       <item>threshold_max</item>
       <item>threshold_min</item>
       <item>triangular_wave</item>
+      <item>vecdot</item>
+      <item>vecmax</item>
+      <item>vecmaxindex</item>
+      <item>vecmin</item>
+      <item>vecminindex</item>
+      <item>vecnorm</item>
+      <item>vecsize</item>
+      <item>vecsum</item>
       <item>wall_time</item>
     </list>
     <contexts>

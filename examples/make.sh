@@ -12,6 +12,7 @@ for i in hello          \
          fibo_formula   \
          fibo_vector    \
          fibo_iterative \
+         derivative     \
          cantilever     \
          fork           \
   ; do

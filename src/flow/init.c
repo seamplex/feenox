@@ -361,24 +361,19 @@ int feenox_init_special_objects(void) {
 //va+realtime_scale+detail and execution will proceed as quick as possible with no delays.
 //  feenox_special_var(realtime_scale) = feenox_get_or_define_variable_get_ptr("realtime_scale");
 
-  // files 
-/*  
-  feenox.special_files.stdin_ = feenox_define_file("stdin", "stdin", 0, NULL, "r", 0);
-  feenox.special_files.stdin_->pointer = stdin;
-*/
+  // standard unix files 
+  feenox_call(feenox_define_file("stdin", "stdin", 0, "r"));
+  feenox.special_files._stdin = feenox_get_file_ptr("stdin");
+  feenox.special_files._stdin->pointer = stdin;
+
   feenox_call(feenox_define_file("stdout", "stdout", 0, "w"));
-  feenox.special_files.stdout_ = feenox_get_file_ptr("stdout");
-  feenox.special_files.stdout_->pointer = stdout;
-/*
-  feenox.special_files.stderr_ = feenox_define_file("stderr", "stderr", 0, NULL, "w", 0);
-  feenox.special_files.stderr_->pointer = stderr;
-*/
-  // el framework de mallas
-/*  
-  if (!feenox_mesh.initialized) {
-    feenox_call(feenox_mesh_init_before_parser());
-  }
-*/
+  feenox.special_files._stdout = feenox_get_file_ptr("stdout");
+  feenox.special_files._stdout->pointer = stdout;
+
+  feenox_call(feenox_define_file("stderr", "stderr", 0, "w"));
+  feenox.special_files._stderr = feenox_get_file_ptr("stderr");
+  feenox.special_files._stderr->pointer = stderr;
+
   return FEENOX_OK;
 
 }

@@ -10,7 +10,7 @@ done
 src="../src"
 parsers="../src/parser/parser.c"
 inits="../src/flow/init.c"
-functions="../src/math/builtin_functions.c"
+functions="../src/math/builtin_functions.c ../src/math/builtin_functionals.c ../src/math/builtin_vectorfunctions.c"
 
 UPPER1=$(grep strcasecmp ${parsers}   | sed -r 's/[^"]*("[^"]*")?/ \1/g;s/" +"/\n/g;s/ *"//g' | sort | mawk '$1 in p{next}{p[$1];print}' | mawk '/^[A-Z]/')
 UPPER2=$(grep keywords   ${parsers}   | sed -r 's/[^"]*("[^"]*")?/ \1/g;s/" +"/\n/g;s/ *"//g' | sort | mawk '$1 in p{next}{p[$1];print}' | mawk '/^[A-Z]/')

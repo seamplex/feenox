@@ -1,0 +1,17 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+set size ratio 9.0/16.0
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set terminal pdf
+
+set xlabel "$t$"
+
+set key bottom left
+
+set output "derivative.pdf"
+plot cos(x) w l color blue, "f_prime.dat" w p color red

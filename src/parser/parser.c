@@ -1264,7 +1264,7 @@ int feenox_parse_function(void) {
 
 ///kw+FUNCTION+usage FILE { <file> } |
 ///kw+FUNCTION+usage @  
-    } else if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+    } else if (strcasecmp(token, "FILE") == 0) {
 ///kw+FUNCTION+detail If a `FILE` is given, an ASCII file containing at least $n+1$ columns is expected.
 ///kw+FUNCTION+detail By default, the first $n$ columns are the values of the arguments and the last column
 ///kw+FUNCTION+detail is the value of the function at those points.
@@ -1766,7 +1766,7 @@ int feenox_parse_print(void) {
   
   // default file is stdout
   if (print->file == NULL) {
-    print->file = feenox.special_files.stdout_;
+    print->file = feenox.special_files._stdout;
   }
   
   LL_APPEND(feenox.prints, print);
@@ -1949,7 +1949,7 @@ int feenox_parse_print_function(void) {
   }
 
   if (print_function->file == NULL) {
-    print_function->file = feenox.special_files.stdout_;
+    print_function->file = feenox.special_files._stdout;
   }
   
   LL_APPEND(feenox.print_functions, print_function);
@@ -2022,7 +2022,7 @@ int feenox_parse_print_vector(void) {
   }
 
   if (print_vector->file == NULL) {
-    print_vector->file = feenox.special_files.stdout_;
+    print_vector->file = feenox.special_files._stdout;
   }
 
   LL_APPEND(feenox.print_vectors, print_vector);

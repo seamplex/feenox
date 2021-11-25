@@ -1,10 +1,10 @@
 VAR log_a_inf b_inf
 fitted_log_e_inf(log_h) := log_a_inf + b_inf*log_h
-FUNCTION log_e_inf(log_h) FILE_PATH $1 COLUMNS 4 5
+FUNCTION log_e_inf(log_h) FILE $1 COLUMNS 4 5
 
 VAR log_a_2 b_2
 fitted_log_e_2(log_h) := log_a_2 + b_2*log_h
-FUNCTION log_e_2(log_h)   FILE_PATH $1 COLUMNS 4 6
+FUNCTION log_e_2(log_h)   FILE $1 COLUMNS 4 6
 
 FIT fitted_log_e_inf TO log_e_inf VIA log_a_inf b_inf #GRADIENT 1 log_h VERBOSE
 FIT fitted_log_e_2   TO log_e_2   VIA log_a_2   b_2   #GRADIENT 1 log_h VERBOSE

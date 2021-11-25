@@ -1491,9 +1491,9 @@ struct feenox_t {
 
   
   struct {
-//    file_t *stdin_;
-    file_t *stdout_;
-//    file_t *stderr_;
+    file_t *_stdin;
+    file_t *_stdout;
+    file_t *_stderr;
   } special_files;  
 
   struct {
