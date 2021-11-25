@@ -1,0 +1,5 @@
+READ_MESH i-beam-$1.msh
+INTEGRATE z^2 OVER left RESULT I
+width = 60
+thickness = 10
+PRINT I-(2*thickness*width^3/12+2*(width*thickness^3/12+width*thickness*(0.5*(width+thickness))^2))

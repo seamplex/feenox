@@ -236,7 +236,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
       fi  
     fi
     
-    # cholesky (subintegrated)
+    # cholesky
     if [ ! -e aster_cholesky_${m}-${c}.sigmay ]; then
       echo "running Aster c = ${c}"
       sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/cholesky/ > le10_cholesky-${m}-${c}.export

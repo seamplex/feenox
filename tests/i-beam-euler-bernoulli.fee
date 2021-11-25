@@ -11,11 +11,13 @@ length = 500        # [mm]
 # analytical moment of inertia
 I = 2*thickness*width^3/12 + 2*(width*thickness^3/12 + width*thickness*(0.5*(width+thickness))^2)
 
-INCLUDE i-beam-$1.fee
+BC $1   Fz=total_force
 BC left  fixed
 
-# bernoulli's prediction (k = 3 for end, k = 8 for dist)
-w_eb = total_force*length^3/(k*E*I)
+# bernoulli's prediction (k = 3 for point load at end, k = 8 for distributed)
+k_right = 3
+k_top = 8
+w_eb = total_force*length^3/(k_$1*E*I)
 
 SOLVE_PROBLEM
 PRINT %+.0e (w(1000,0,0)-w_eb)/w_eb

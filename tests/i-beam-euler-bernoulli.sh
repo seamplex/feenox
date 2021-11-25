@@ -15,14 +15,14 @@ checkgmsh
 gmsh -3 ${dir}/i-beam-hex.geo
 gmsh -3 ${dir}/i-beam-tet.geo
 
-answer2 i-beam-euler-bernoulli.fee end tet "+3e-02"
+answer2 i-beam-euler-bernoulli.fee right tet "+3e-02"
 exitifwrong $?
 
-answer2 i-beam-euler-bernoulli.fee end hex "+3e-02"
+answer2 i-beam-euler-bernoulli.fee right hex "+3e-02"
 exitifwrong $?
 
-answer2 i-beam-euler-bernoulli.fee distributed tet "+4e-02"
+answer2 i-beam-euler-bernoulli.fee top tet "+4e-02"
 exitifwrong $?
 
-answer2 i-beam-euler-bernoulli.fee distributed hex "+4e-02"
+answer2 i-beam-euler-bernoulli.fee top hex "+4e-02"
 exitifwrong $?
