@@ -297,7 +297,7 @@ int feenox_parser_file(file_t **file) {
   }
   
   // "-" means stdin
-  if (strcmp(token, "-") == 0 || strcmp(token, "stdin")) {
+  if (strcmp(token, "-") == 0 || strcmp(token, "stdin") == 0) {
     *file = feenox.special_files._stdin;
   } else if ((*file = feenox_get_file_ptr(token)) == NULL) {
     feenox_call(feenox_define_file(token, token, 0, NULL));
