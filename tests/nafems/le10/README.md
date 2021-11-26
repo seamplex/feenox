@@ -6,18 +6,19 @@ toc: true
 ...
 
 
-:::: {.not-in-format .html}
- * [See this report in HTML](https://www.seamplex.com/feenox/tests/nafems/le10/)
-::::
-
-:::: {.not-in-format .latex}
- * [Download this report in PDF](https://www.seamplex.com/feenox/tests/nafems/le10/README.pdf)
-::::
-
- * [Results for the unstructured tetrahedral mesh](https://www.seamplex.com/feenox/tests/nafems/le10/report-tet.html)
-    - [PDF](https://www.seamplex.com/feenox/tests/nafems/le10/report-tet.pdf)
- * [Results for the structured hexahedral mesh](https://www.seamplex.com/feenox/tests/nafems/le10/report-hex.html)
-    - [PDF](https://www.seamplex.com/feenox/tests/nafems/le10/report-hex.pdf)
+> :::: {.not-in-format .html}
+>  * [See this report in HTML](https://www.seamplex.com/feenox/tests/nafems/le10/)
+> ::::
+> 
+> :::: {.not-in-format .latex}
+>  * [Download this report in PDF](https://www.seamplex.com/feenox/tests/nafems/le10/README.pdf)
+> ::::
+> 
+>  * [Github repository with sources and scripts](https://github.com/seamplex/feenox/tree/main/tests/nafems/le10)
+>  * [Results for the unstructured tetrahedral mesh](https://www.seamplex.com/feenox/tests/nafems/le10/report-tet.html)
+>     - [PDF](https://www.seamplex.com/feenox/tests/nafems/le10/report-tet.pdf)
+>  * [Results for the structured hexahedral mesh](https://www.seamplex.com/feenox/tests/nafems/le10/report-hex.html)
+>     - [PDF](https://www.seamplex.com/feenox/tests/nafems/le10/report-hex.pdf)
 
 # Introduction
 
