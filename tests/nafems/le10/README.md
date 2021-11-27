@@ -236,27 +236,7 @@ If you are reading this and feel like something is not true or is indeed way too
 
 The `run.sh` script calls the executable `feenox` with the `le10.fee` input file as the first argument and `${m}-${c}` as the second one, resulting in something like `tet-1` or `hex-0.2`. This argument is expanded where the input file contains a `$1`, namely the mesh file name. FeenoX prints the total number of degrees of freedom and the stress $\sigma_y$ at point $D$. It does not write any post-processing file (the `WRITE_MESH` keyword is commented out):
 
-```feenox
-# NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical
-READ_MESH le10_2nd-$1.msh   # FeenoX honors the order of the mesh
-
-BC upper    p=1      # 1 Mpa
-BC DCDC     v=0      # Face DCD'C' zero y-displacement
-BC ABAB     u=0      # Face ABA'B' zero x-displacement
-BC BCBC     u=0 v=0  # Face BCB'C' x and y displ. fixed
-BC midplane w=0      #  z displacements fixed along mid-plane
-
-E = 210e3   # Young modulus in MPa (because mesh is in mm)
-nu = 0.3    # Poisson's ratio
-
-SOLVE_PROBLEM   # TODO: implicit
-
-PRINT total_dofs %.8f sigmay(2000,0,300)
-
-# write post-processing data for paraview
-# WRITE_MESH le10-feenox-${c}.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauzx tauyz
-
+```{.feenox include="le10.fee"}
 ```
 
 The mesh file should already contain a second-order mesh. The file `le10-tet.geo` creates tet10 elements, but the `le10-hex.geo` creates hex8 elements that have to be converted to hex20 before FeenoX can use them. This is achieved in the `run.sh` script within the block
@@ -301,7 +281,7 @@ PC Object: 1 MPI processes
 $
 ```
 
-If the MUMPS solver is available through PETSc, `run.sh` adds the command-line option `--mumps` to create another curve, “feenox_mumps”:
+If the [MUMPS](https://petsc.org/release/docs/manualpages/Mat/MATSOLVERMUMPS.html) solver is available through PETSc, `run.sh` adds the command-line option `--mumps` to create another curve, “feenox_mumps”:
 
 ```terminal
 $ feenox le10.fee tet-1 --mumps --ksp_view
@@ -343,75 +323,11 @@ $
 Thanks to Alexandre Halbach for the discussions about Sparselizard's internals.
 The following `main.cpp` is used to solve the NAFEMS LE10 benchmark with Sparselizard:
 
-```c++
-// NAFEMS LE10 Benchmark solved with Sparselizard
-
-#include "sparselizard.h"
-using namespace sl;
-
-int main(int argc, char **argv) {
-  
-  int bulk = 1;
-  int upper = 2;
-  int DCDC = 3;
-  int ABAB = 4;
-  int BCBC = 5;
-  int midplane = 6;
-  
-  double young = 210e3;
-  double poisson = 0.3;
-  
-  std::string c = (argc > 1) ? argv[1] : "tet-1";
-  mesh mymesh("gmsh:../le10-"+c+".msh", 0);
-  field u("h1xyz");
-  
-  parameter E;
-  E|bulk = young;
-  parameter nu;
-  nu|bulk = poisson;
-
-  u.setorder(bulk, 2);  
-  u.compy().setconstraint(DCDC); // v=0 @ DCDC
-  u.compx().setconstraint(ABAB); // u=0 @ ABAB
-  u.compx().setconstraint(BCBC); // u=0 @ BCBC
-  u.compy().setconstraint(BCBC); // v=0 @ BCBC
-  u.compz().setconstraint(midplane); // w=0 @ midplae
-  
-  formulation elasticity;
-  elasticity += integral(upper, array1x3(0,0,-1)*tf(u));  // p=1 @ upper
-  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -2 gives an exact integration for up to 4th order polynomial"
-  elasticity.generate();
-  
-  vec solu = solve(elasticity.A(), elasticity.b());
-
-  // Transfer the data from the solution vector to the u field:
-  u.setdata(bulk, solu);
-
-  double lambda = young * poisson/((1+poisson)*(1-2*poisson));
-  double mu = 0.5*young/(1+poisson);
-  
-  expression H(6,6,{lambda+2*mu,      lambda,      lambda,  0,  0,  0,
-                    lambda,      lambda+2*mu,      lambda,  0,  0,  0,
-                    lambda,           lambda, lambda+2*mu,  0,  0,  0,
-                         0,                0,           0, mu,  0,  0,
-                         0,                0,           0,  0,  mu, 0,
-                         0,                0,           0,  0,  0, mu});
-
-  expression sigma = H*strain(u);
-//   u.write(bulk, "le10-sparselizard-displ.vtk", 2);
-//   comp(1, sigma).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
-
-  field sigmayy("h1");
-  sigmayy.setorder(bulk, 2);
-  sigmayy.setvalue(bulk, comp(1, sigma));  
-  
-  std::cout << elasticity.countdofs() << "\t" << sigmayy.interpolate(bulk, {2000, 0, 300})[0] << std::endl;
-  
-  return 0;
-}
+```{.cpp include="le10.cpp"}
 ```
 
 The main function takes one argument which should be the same as in FeenoX, i.e. `tet-1`, `hex-0.25`, etc. which is used to read the mesh file as created by Gmsh from the parent directory. The problem order is set to two. The Dirichlet BCs are then set. The Neumann BC is set into the elasticity weak formulation as a surface integral. The volume integral is performed using 2nd-order Gauss points and then the problem is solved for the displacements. The stress tensor field is explicitly computed out of the strain using the linear elastic 6x6 matrix in Voigt notation. The stress at point\ $D$ is interpolated from a smoothed field over all the elemental contributions to the node and printed into the standard output, along with the total number of degrees of freedom being solved for.
+Sparselizard uses MUMPS through PETSc. By default, it will use the LU preconditioner. But since the stiffness matrix is symmetric, we choose to use the Cholesky preconditioner.
 
 Note that as already discussed, Sparselizards needs tensor-product elements for the hex case.
 Therefore, the choice of order equal to two triggers the addition of unknowns at the 12 edges, at the 6 faces and 1 at the volume besides the 8 corners resulting in 27 unknowns (per each of the three degrees of freedom of the problem). The other codes stick to incomplete hex20 elements, so the total number of degrees of freedom is larger for Sparselizard than for the other codes for the same\ $c$.
@@ -433,27 +349,7 @@ It was decided to use the text-based (and archaic format UNV). The second-order 
 
 The argument that the Code Aster executable needs in order to run a case is an "export" file that defines some run-time options for the execution (memory and CPU limits, number of MPI instances, etc.) and links Fortran file units (the ones that were introduced in 1954) to actual file system names, like the "comm" (input) file, the mesh file, the output file, etc. Interestingly enough, Code Aster would modify the input export file (sic) and rename relative file paths contained in it to absolute ones. This makes it hard to track export files with Git, but what `run.sh` does is it uses a template export file
 
-```
-P actions make_etude
-P debug nodebug
-P memjob 2097152
-P memory_limit 15500.0
-P mode interactif
-P mpi_nbcpu 1
-P mpi_nbnoeud 1
-P ncpus 0
-P time_limit 9000.0
-P tpsjob 16
-P version stable
-A memjeveux 128.0
-A tpmax 9000.0
-
-F comm le10__s_.comm       D  1
-F libr le10_2nd-_m_.unv    D  20
-F libr le10-_m_.rmed       R  80
-F mess message__s_-_m_     R  6
-F resu DD-_s_-_m_.txt      R  17
-R base base-stage1-_s_-_m_ R  0
+```{include="le10.export"}
 ```
 
 and then use `sed` would replace `_m_` with `${m}` to have a per-$c$ Git-ignored export file which can be further modified as needed.
@@ -463,136 +359,17 @@ There are three variants to solve the NAFEMS LE10 problem with Code Aster, name
 
  * `le10_default.comm`
 
+   ```{include="le10_default.comm"}
    ```
-   DEBUT(LANG='EN')
-   mesh = LIRE_MAILLAGE(UNITE=20, FORMAT='IDEAS')
-   model = AFFE_MODELE(AFFE=_F(MODELISATION=('3D', ), PHENOMENE='MECANIQUE', TOUT='OUI'), MAILLAGE=mesh)
-   
-   mater = DEFI_MATERIAU(ELAS=_F(E=210000.0, NU=0.3))
-   fieldmat = AFFE_MATERIAU(AFFE=_F(MATER=(mater, ), TOUT='OUI'), MODELE=model)
-   
-   load = AFFE_CHAR_MECA(DDL_IMPO=(_F(DY=0.0, GROUP_MA=('DCDC', )),
-                                   _F(DX=0.0, GROUP_MA=('ABAB', )),
-                                   _F(DX=0.0, DY=0.0, GROUP_MA=('BCBC', )),
-                                   _F(DZ=0.0, GROUP_MA=('midplane', ))),
-                         MODELE=model,
-                         PRES_REP=_F(GROUP_MA=('upper', ), PRES=1.0))
-   
-   reslin = MECA_STATIQUE(CHAM_MATER=fieldmat, EXCIT=_F(CHARGE=load), MODELE=model)
-   
-   reslin = CALC_CHAMP(reuse=reslin,
-                       CONTRAINTE=('SIGM_ELGA', 'SIGM_ELNO', 'SIGM_NOEU', 'SIEF_ELGA', 'SIEF_ELNO', 'SIEF_NOEU'),
-                       CRITERES=('SIEQ_ELGA', 'SIEQ_ELNO', 'SIEQ_NOEU'),
-                       RESULTAT=reslin)
-   
-   #IMPR_RESU(RESU=_F(RESULTAT=reslin), UNITE=80)
-   
-   IMPR_RESU(
-     FORMAT='RESULTAT', 
-     RESU=_F(
-       GROUP_MA=('DD', ), 
-       IMPR_COOR='OUI', 
-       NOM_CHAM=('SIGM_NOEU', ), 
-       NOM_CMP=('SIYY'), 
-       RESULTAT=reslin
-     ), 
-     UNITE=17
-   )           
-             
-   FIN()
-   ```
-
  
  * `le10_cholesky.comm`
 
-    ```
-    DEBUT(LANG='EN')
-    mesh = LIRE_MAILLAGE(UNITE=20, FORMAT='IDEAS')
-    model = AFFE_MODELE(AFFE=_F(MODELISATION=('3D', ), PHENOMENE='MECANIQUE', TOUT='OUI'), MAILLAGE=mesh)
-    
-    mater = DEFI_MATERIAU(ELAS=_F(E=210000.0, NU=0.3))
-    fieldmat = AFFE_MATERIAU(AFFE=_F(MATER=(mater, ), TOUT='OUI'), MODELE=model)
-    
-    BC = AFFE_CHAR_CINE(MECA_IMPO=(_F(DY=0.0, GROUP_MA=('DCDC', )),
-                                    _F(DX=0.0, GROUP_MA=('ABAB', )),
-                                    _F(DX=0.0, DY=0.0, GROUP_MA=('BCBC', )),
-                                    _F(DZ=0.0, GROUP_MA=('midplane', ))),
-                          MODELE=model,
-                          )
-    
-    load = AFFE_CHAR_MECA(
-                          MODELE=model,
-                          PRES_REP=_F(GROUP_MA=('upper', ), PRES=1.0))
-    
-    reslin = MECA_STATIQUE(CHAM_MATER=fieldmat, EXCIT=(_F(CHARGE=BC),_F(CHARGE=load),), MODELE=model,
-                           SOLVEUR=_F(METHODE='GCPC', PRE_COND='LDLT_INC'),
-                           )
-    
-    reslin = CALC_CHAMP(reuse=reslin,
-                        CONTRAINTE=('SIGM_ELGA', 'SIGM_ELNO', 'SIGM_NOEU', 'SIEF_ELGA', 'SIEF_ELNO', 'SIEF_NOEU'),
-                        CRITERES=('SIEQ_ELGA', 'SIEQ_ELNO', 'SIEQ_NOEU'),
-                        RESULTAT=reslin)
-    
-    #IMPR_RESU(RESU=_F(RESULTAT=reslin), UNITE=80)
-    
-    IMPR_RESU(
-      FORMAT='RESULTAT',
-      RESU=_F(
-        GROUP_MA=('DD', ),
-        IMPR_COOR='OUI',
-        NOM_CHAM=('SIGM_NOEU', ),
-        NOM_CMP=('SIYY'),
-        RESULTAT=reslin
-      ),
-      UNITE=17
-    )          
-             
-    FIN()
-    ``` 
+   ```{include="le10_cholesky.comm"}
+   ```
  
  * `le10_mumps.comm`
 
-   ```
-   DEBUT(LANG='EN')
-   mesh = LIRE_MAILLAGE(UNITE=20, FORMAT='IDEAS')
-   model = AFFE_MODELE(AFFE=_F(MODELISATION=('3D', ), PHENOMENE='MECANIQUE', TOUT='OUI'), MAILLAGE=mesh)
-   
-   mater = DEFI_MATERIAU(ELAS=_F(E=210000.0, NU=0.3))
-   fieldmat = AFFE_MATERIAU(AFFE=_F(MATER=(mater, ), TOUT='OUI'), MODELE=model)
-   
-   BC = AFFE_CHAR_CINE(MECA_IMPO=(_F(DY=0.0, GROUP_MA=('DCDC', )),
-                                   _F(DX=0.0, GROUP_MA=('ABAB', )),
-                                   _F(DX=0.0, DY=0.0, GROUP_MA=('BCBC', )),
-                                   _F(DZ=0.0, GROUP_MA=('midplane', ))),
-                         MODELE=model,
-                         )
-   
-   load = AFFE_CHAR_MECA(
-                         MODELE=model,
-                         PRES_REP=_F(GROUP_MA=('upper', ), PRES=1.0))
-   
-   reslin = MECA_STATIQUE(CHAM_MATER=fieldmat, EXCIT=(_F(CHARGE=BC),_F(CHARGE=load),), MODELE=model, SOLVEUR=_F(METHODE='MUMPS',))
-   
-   reslin = CALC_CHAMP(reuse=reslin,
-                       CONTRAINTE=('SIGM_ELGA', 'SIGM_ELNO', 'SIGM_NOEU', 'SIEF_ELGA', 'SIEF_ELNO', 'SIEF_NOEU'),
-                       CRITERES=('SIEQ_ELGA', 'SIEQ_ELNO', 'SIEQ_NOEU'),
-                       RESULTAT=reslin)
-   
-   #IMPR_RESU(RESU=_F(RESULTAT=reslin), UNITE=80)
-   
-   IMPR_RESU(
-     FORMAT='RESULTAT',
-     RESU=_F(
-       GROUP_MA=('DD', ),
-       IMPR_COOR='OUI',
-       NOM_CHAM=('SIGM_NOEU', ),
-       NOM_CMP=('SIYY'),
-       RESULTAT=reslin
-     ),
-     UNITE=17
-   )          
-            
-   FIN()
+   ```{include="le10_mumps.comm"}
    ```
 
 To retrieve the stress at point $D$, instead of writing the full results into unit 80 (i.e. `le10-${m}.rmed`), only an ASCII file with nodal values of the stress tensor are written for those nodes that belong to the `DD` physical group (the $D$-$D^\prime$) segment in the original geometry. For some reason, Code Aster won't accept a zero-dimensional physical group (i.e. a point) to write the ASCII result. So the `run.sh` has to parse this ASCII file so as to find the row corresponding to point $D$ and extract the value of $\sigma_y$, which is the fifth column:
@@ -655,61 +432,13 @@ So it seems that CalculiX needs some sort of mesh-dependent numbering of the fac
 
  * `le10-tet.inp`
 
-    ```
-    *include, input = le10_mesh-tet-xxx.inp 
-    *Material, Name=STEEL
-    *Elastic
-    200e3, 0.3
-    *Solid section, Elset=C3D10, Material=STEEL
-    *Step
-    **Static, Solver=PaStiX
-    **Static, Solver=Pardiso
-    **Static, Solver=Spooles
-    **Static, Solver=Iterative scaling
-    **Static, Solver=Iterative Cholesky
-    *Boundary, Fixed
-    ABAB, 1, 1
-    DCDC, 2, 2
-    BCBC, 1, 2
-    MIDPLANE, 3, 3
-    *Dload
-    UPPERF1, P1, 1
-    UPPERF2, P2, 1
-    UPPERF3, P3, 1
-    UPPERF4, P4, 1
-    *Node file
-    RF, U
-    *El file
-    S, E
-    *End step
-    ```
+   ```{include="le10-tet.inp"}
+   ```
+   
  * `le10-hex.inp`
- 
-    ```
-    *include, input = le10_mesh-hex-xxx.inp 
-    *Material, Name=STEEL
-    *Elastic
-    200e3, 0.3
-    *Solid section, Elset=C3D20, Material=STEEL
-    *Step
-    **Static, Solver=PaStiX
-    **Static, Solver=Pardiso
-    **Static, Solver=Spooles
-    **Static, Solver=Iterative scaling
-    **Static, Solver=Iterative Cholesky
-    *Boundary, Fixed
-    ABAB, 1, 1
-    DCDC, 2, 2
-    BCBC, 1, 2
-    MIDPLANE, 3, 3
-    *Dload
-    UPPERF6, P6, 1
-    *Node file
-    RF, U
-    *El file
-    S, E
-    *End step
-    ```
+
+   ```{include="le10-hex.inp"}
+   ```
 
 These templates are filtered with `sed` that replaces `xxx` with the appropriate mesh and un-comments each of the solver lines successively to have a working input file:
 
@@ -726,28 +455,7 @@ To read the stress at point\ $D$, an `awk` file that parses the output `.frd` fi
 where negative values appear concatenated with the previous one as a single ASCII token in a non-UNIX-friendly way.
 
 
-
-```awk
-#!/usr/bin/gawk
-{
-  # this only works for all-positive coordinates, otherwise we would have to use substr()
-  if ($3 == "2.00000E+03" && $4 = "0.00000E+00" && $5 == "3.00000E+02")
-  {
-    node = $2
-  }    
-    
-  
-  if ($1 == -4 && $2 == "STRESS") {
-    stresses = 1
-  }
-    
-  if (node != 0 && stresses == 1 && found == 0) {
-    if (strtonum(substr($0,4,10)) == node) {
-      printf("%e\t", substr($0, 26, 12))
-      found = 1
-    }  
-  }
-}
+```{.awk include="frd-stress-at-node.awk"}
 ```
 
 The total number of degrees of freedom is read from the standard output grepping for "number of equations":
