@@ -15,6 +15,8 @@ for i in hello          \
          derivative     \
          cantilever     \
          fork           \
+         iaea-2dpwr     \
+         cubesphere     \
   ; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \

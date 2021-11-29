@@ -1,0 +1,18 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+set size ratio 1.0/3.0
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set mytics 100
+set terminal pdf
+
+set xlabel "Fillet percentage [\%]"
+set ylabel "Reactivity $\rho$ [PCM]"
+
+set output "cubesphere.pdf"
+
+plot "cubesphere.dat" u 1:3 w lp lt 1 lw 1 pt 1 color plum ti ""

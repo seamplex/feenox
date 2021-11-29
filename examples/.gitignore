@@ -1,3 +1,6 @@
+gmsh.py
+lib*
+__pycache__/
 cosas
 test.fee
 lorenz.dat
@@ -15,3 +18,5 @@ fork.dat
 nafems-le11.msh
 nafems-le1.msh
 nafems-le1.pvsm
+iaea-2dpwr*.msh
+cubesphere*.msh

@@ -822,3 +822,234 @@ $
 
 ![Estimated length\ $\ell_1$ needed to get 440\ Hz for different mesh refinement levels\ $n$](fork.svg){#fig:fork}
 
+# IAEA 2D PWR Benchmark
+
+![The IAEA 2D PWR Benchmark (1977)](iaea-2dpwr-figure.svg){width="100%"}
+
+
+```feenox
+#                       BENCHMARK PROBLEM
+#          
+# Identification: 11-A2          Source Situation ID.11
+# Date Submitted: June 1976      By: R. R. Lee (CE)
+#                                    D. A. Menely (Ontario Hydro)
+#                                    B. Micheelsen (Riso-Denmark)
+#                                    D. R. Vondy (ORNL)
+#                                    M. R. Wagner (KWU)
+#                                    W. Werner (GRS-Munich)
+#
+# Date Accepted:  June 1977      By: H. L. Dodds, Jr. (U. of Tenn.)
+#                                    M. V. Gregory (SRL)
+#
+# Descriptive Title: Two-dimensional LWR Problem,
+#                    also 2D IAEA Benchmark Problem
+#
+# Reduction of Source Situation
+#           1. Two-groupo diffusion theory
+#           2. Two-dimensional (x,y)-geometry
+#
+PROBLEM neutron_diffusion 2D GROUPS 2
+DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eigth
+READ_MESH iaea-2dpwr-$1.msh
+
+# define materials and cross sections according to the two-group constants
+# each material corresponds to a physical entity in the geometry file
+Bg2 = 0.8e-4  # axial geometric buckling in the z direction
+MATERIAL fuel1 {
+  D1=1.5    Sigma_a1=0.010+D1(x,y)*Bg2    Sigma_s1.2=0.02
+  D2=0.4    Sigma_a2=0.080+D2(x,y)*Bg2    nuSigma_f2=0.135   }#eSigmaF_2 nuSigmaF_2(x,y) }
+
+MATERIAL fuel2 {
+  D1=1.5    Sigma_a1=0.010+D1(x,y)*Bg2    Sigma_s1.2=0.02
+  D2=0.4    Sigma_a2=0.085+D2(x,y)*Bg2    nuSigma_f2=0.135   }#eSigmaF_2 nuSigmaF_2(x,y) }
+
+MATERIAL fuel2rod {
+  D1=1.5    Sigma_a1=0.010+D1(x,y)*Bg2    Sigma_s1.2=0.02
+  D2=0.4    Sigma_a2=0.130+D2(x,y)*Bg2    nuSigma_f2=0.135   }#eSigmaF_2 nuSigmaF_2(x,y) }
+
+MATERIAL reflector {
+  D1=2.0    Sigma_a1=0.000+D1(x,y)*Bg2    Sigma_s1.2=0.04
+  D2=0.3    Sigma_a2=0.010+D2(x,y)*Bg2 }
+
+  
+# define boundary conditions as requested by the problem
+BC external vacuum=0.4692  # "external" is the name of the entity in the .geo
+BC mirror   mirror         # the first mirror is the name, the second is the BC type
+
+# # set the power setpoint equal to the volume of the core
+# # (and set eSigmaF_2 = nuSigmaF_2 as above)
+# power = 17700
+
+SOLVE_PROBLEM   # solve!
+PRINT %.5f "keff = " keff
+WRITE_MESH iaea-2dpwr-$1.vtk phi1 phi2
+
+```
+
+
+```terminal
+$ gmsh -2 iaea-2dpwr-quarter.geo
+$ [...]
+$ gmsh -2 iaea-2dpwr-eighth.geo
+$ [...]
+$ feenox iaea-2dpwr.fee quarter
+keff =  1.02986
+$ feenox iaea-2dpwr.fee eighth
+$keff =  1.02975
+$
+```
+
+
+![Fast and thermal flux for the 2D IAEA PWR benchmark (2021)](iaea-2dpwr-fluxes.png){width=100%}
+
+# Cube-spherical bare reactor
+
+It is easy to compute the effective multiplication factor of a one-group
+bare cubical reactor. Or a spherical reactor. And we know that for the
+same mass, the former is smaller than the latter.
+
+::: {#fig:cube-and-sphere}
+![Cubical reactor](cubesphere-0.png){width="49%"} ![Spherical
+reactor](cubesphere-100.png){width="49%"}
+
+One eight of two bare reactors
+:::
+
+But what happens "in the middle"? That is to say, how does
+$k_\text{eff}$ changes when we morph the cube into a sphere? Enter Gmsh
+& Feenox.
+
+::: {#fig:cube-morph-sphere}
+![75% cube/25% sphere](cubesphere-25.png){width="33%"}
+![50% cube/50% sphere](cubesphere-50.png){width="33%"}
+![25% cube/75% sphere](cubesphere-75.png){width="33%"}
+
+Continuous morph between a cube and a sphere
+:::
+
+``` python
+import os
+import math
+import gmsh
+
+def create_mesh(vol, F):
+  gmsh.initialize()
+  gmsh.option.setNumber("General.Terminal", 0)  
+  
+  f = 0.01*F
+  a = (vol / (1/8*4/3*math.pi*f**3 + 3*1/4*math.pi*f**2*(1-f) + 3*f*(1-f)**2 + (1-f)**3))**(1.0/3.0)
+  
+  internal = []
+  gmsh.model.add("cubesphere")
+  if (F < 1):
+    # a cube
+    gmsh.model.occ.addBox(0, 0, 0, a, a, a, 1)
+    internal = [1,3,5]
+    external = [2,4,6]
+
+  elif (F > 99):
+    # a sphere
+    gmsh.model.occ.addSphere(0, 0, 0, a, 1, 0, math.pi/2, math.pi/2)
+    internal = [2,3,4]
+    external = [1]
+    
+  else:
+    gmsh.model.occ.addBox(0, 0, 0, a, a, a, 1)
+    gmsh.model.occ.fillet([1], [12, 7, 6], [f*a], True)
+    internal = [1,4,6]
+    external = [2,3,5,7,8,9,10]
+
+  gmsh.model.occ.synchronize()
+
+  gmsh.model.addPhysicalGroup(3, [1], 1)  
+  gmsh.model.setPhysicalName(3, 1, "fuel")
+    
+  gmsh.model.addPhysicalGroup(2, internal, 2)  
+  gmsh.model.setPhysicalName(2, 2, "internal")
+  gmsh.model.addPhysicalGroup(2, external, 3)  
+  gmsh.model.setPhysicalName(2, 3, "external")
+  
+  gmsh.model.occ.synchronize()
+  
+  gmsh.option.setNumber("Mesh.ElementOrder", 2)
+  gmsh.option.setNumber("Mesh.Optimize", 1)
+  gmsh.option.setNumber("Mesh.OptimizeNetgen", 1)
+  gmsh.option.setNumber("Mesh.HighOrderOptimize", 1)
+  
+  gmsh.option.setNumber("Mesh.CharacteristicLengthMin", a/10);
+  gmsh.option.setNumber("Mesh.CharacteristicLengthMax", a/10);
+  
+  gmsh.model.mesh.generate(3)
+  gmsh.write("cubesphere-%g.msh"%(F))  
+
+  gmsh.model.remove()
+  #gmsh.fltk.run()
+  
+  gmsh.finalize()
+  return
+
+
+def main():
+  
+  vol0 = 100**3
+  
+  for F in range(0,101,5):   # mesh refinement level
+    create_mesh(vol0, F)
+    # TODO: FeenoX Python API!
+    os.system("feenox cubesphere.fee %g"%(F))
+    
+
+if __name__ == "__main__":
+  main()
+```
+
+
+```feenox
+PROBLEM neutron_diffusion DIMENSIONS 3
+READ_MESH cubesphere-$1.msh DIMENSIONS 3
+
+# MATERIAL fuel
+D1 = 1.03453E+00
+Sigma_a1 = 5.59352E-03
+nuSigma_f1 = 6.68462E-03
+Sigma_s1.1 = 3.94389E-01
+
+PHYSICAL_GROUP fuel DIM 3
+BC internal    mirror
+BC external    vacuum
+
+SOLVE_PROBLEM
+
+PRINT HEADER $1 keff 1e5*(keff-1)/keff fuel_volume
+```
+
+
+```terminal
+$ python cubesphere.py | tee cubesphere.dat 
+0       1.05626 5326.13 1e+06
+5       1.05638 5337.54 999980
+10      1.05675 5370.58 999980
+15      1.05734 5423.19 999992
+20      1.05812 5492.93 999995
+25      1.05906 5576.95 999995
+30      1.06013 5672.15 999996
+35      1.06129 5775.31 999997
+40      1.06251 5883.41 999998
+45      1.06376 5993.39 999998
+50      1.06499 6102.55 999998
+55      1.06619 6208.37 999998
+60      1.06733 6308.65 999998
+65      1.06839 6401.41 999999
+70      1.06935 6485.03 999998
+75      1.07018 6557.96 999998
+80      1.07088 6618.95 999998
+85      1.07143 6666.98 999999
+90      1.07183 6701.24 999999
+95      1.07206 6721.33 999998
+100     1.07213 6727.64 999999
+$
+```
+
+
+![Static reactivity vs. percentage of sphericity](cubesphere.svg){width=100%}
+
