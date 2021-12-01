@@ -172,14 +172,17 @@ int feenox_instruction_mesh_read(void *arg) {
     feenox_var_value(feenox.mesh.vars.elements) = (double)this->n_elements;
   }
   
-  // see if there was any un-read function
-  node_data_t *node_data;
+  // see if there was any un-read scalar function
+  // TODO: check for vectors
+/*  
+  node_data_t *node_data = NULL;
   LL_FOREACH(this->node_datas, node_data) {
     if (node_data->function->mesh == NULL) {
       feenox_push_error_message("cannot find data for function '%s' in mesh '%s'", node_data->name_in_mesh, this->file->name);
       return FEENOX_ERROR;
     }
   }
+ */
   
   // compute the volume (or area or length) and center of gravity of the groups
   // but only if the variable groupname_vol or the vector groupname_cog 

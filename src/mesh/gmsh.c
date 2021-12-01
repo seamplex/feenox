@@ -864,30 +864,53 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 //      int timestep = data[0];
       int dofs = data[1];
       int num_nodes = data[2];
-      
-      if (dofs != 1) {
-        feenox_push_error_message("cannot handle non-scalar field '%s'", string_tag);
-        return FEENOX_ERROR;
-      }
+
       if (num_nodes != this->n_nodes) {
         feenox_push_error_message("field '%s' has %d nodes and the mesh has %ld nodes", string_tag, num_nodes, this->n_nodes);
         return FEENOX_ERROR;
       }
+
+      // to handle vector functions we need 3
+      function_t **functions = NULL;
+      feenox_check_alloc(functions = calloc(dofs, sizeof(function_t *)));
       
-      // if we made it this far, we have a function!
-      // TODO: use vectors instead of argument_data
-      if (function->data_size != num_nodes) {
-        function->type = function_type_pointwise_mesh_node;
-        function->mesh = this;
-        if (this->nodes_argument == NULL) {
-          feenox_call(feenox_mesh_create_nodes_argument(this));
+      unsigned int g = 0;
+      if (dofs == 1) {
+        functions[0] = function;
+      } else if (dofs == 3) {
+        
+        char *components[3] = {"x", "y", "z"};
+        for (g = 0; g < dofs; g++) {
+          char *function_name = NULL;
+          feenox_check_minusone(asprintf(&function_name, "%s_%s", function->name, components[g]));
+          if ((functions[g] = feenox_get_function_ptr(function_name)) == NULL) {
+            feenox_push_error_message("internal mismatch, cannot find function '%s'", function_name);
+            return FEENOX_ERROR;
+          }
+          feenox_free(function_name);
         }
-        function->data_argument = this->nodes_argument;
-        function->data_size = num_nodes;
-        if (function->data_value != NULL) {
-          feenox_free(function->data_value);
-        }
-        feenox_check_alloc(function->data_value = calloc(num_nodes, sizeof(double)));
+        
+      } else {
+        feenox_push_error_message("cannot handle field '%s' with %d components", string_tag, dofs);
+        return FEENOX_ERROR;
+      }
+      
+      
+      for (g = 0; g < dofs; g++) {
+        // TODO: use vectors instead of argument_data
+        if (functions[g]->data_size != num_nodes) {
+          functions[g]->type = function_type_pointwise_mesh_node;
+          functions[g]->mesh = this;
+          if (this->nodes_argument == NULL) {
+            feenox_call(feenox_mesh_create_nodes_argument(this));
+          }
+          functions[g]->data_argument = this->nodes_argument;
+          functions[g]->data_size = num_nodes;
+          if (functions[g]->data_value != NULL) {
+            feenox_free(functions[g]->data_value);
+          }
+          feenox_check_alloc(functions[g]->data_value = calloc(num_nodes, sizeof(double)));
+        }  
       }  
 
       feenox_mesh_gmsh_readnewline();
@@ -897,13 +920,15 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       double value = 0;
       for (j = 0; j < num_nodes; j++) {
         feenox_call(feenox_gmsh_read_data_int(this, 1, &node, binary));
-        feenox_call(feenox_gmsh_read_data_double(this, 1, &value, binary));
+        for (g = 0; g < dofs; g++) {
+          feenox_call(feenox_gmsh_read_data_double(this, 1, &value, binary));
         
-        if ((node_index = (this->sparse==0) ? node-1 : this->tag2index[node]) < 0) {
-          feenox_push_error_message("node %d does not exist", node);
-          return FEENOX_ERROR;
-        }
-        function->data_value[node_index] = value;
+          if ((node_index = (this->sparse==0) ? node-1 : this->tag2index[node]) < 0) {
+            feenox_push_error_message("node %d does not exist", node);
+            return FEENOX_ERROR;
+          }
+          functions[g]->data_value[node_index] = value;
+        }  
       }
 
       // the newline

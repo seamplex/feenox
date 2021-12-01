@@ -2160,15 +2160,15 @@ int feenox_parse_read_mesh(void) {
     
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw_pde+READ_MESH+detail The spatial dimensions cab be given with `DIMENSION`.
+///kw_pde+READ_MESH+detail The spatial dimensions can be given with `DIM`.
 ///kw_pde+READ_MESH+detail If material properties are uniform and given with variables,
 ///kw_pde+READ_MESH+detail the number of dimensions are not needed and will be read from the file at runtime.
 ///kw_pde+READ_MESH+detail But if either properties are given by spatial functions or if functions
 ///kw_pde+READ_MESH+detail are to be read from the mesh with `READ_DATA` or `READ_FUNCTION`, then
 ///kw_pde+READ_MESH+detail the number of dimensions ought to be given explicitly because FeenoX needs to know
 ///kw_pde+READ_MESH+detail how many arguments these functions take. 
-///kw_pde+READ_MESH+usage [ DIMENSIONS <num_expr> ]@
-    if (strcasecmp(token, "DIMENSIONS") == 0) {
+///kw_pde+READ_MESH+usage [ DIM <num_expr> ]@
+    if (strcasecmp(token, "DIM") == 0 || strcasecmp(token, "DIMENSIONS") == 0) {
       double xi;
       feenox_call(feenox_parser_expression_in_string(&xi));
       mesh->dim = (int)(round(xi));
@@ -2208,17 +2208,18 @@ int feenox_parse_read_mesh(void) {
       mesh->update_each_step = 1;
 
 
-///kw_pde+READ_MESH+detail For each `READ_FIELD` keyword, a point-wise defined function of space named `<function_name>`
+///kw_pde+READ_MESH+detail For each `READ_FIELD` keyword, a point-wise defined scalar function of space named `<function_name>`
 ///kw_pde+READ_MESH+detail is defined and filled with the scalar data named `<name_in_mesh>`  contained in the mesh file.
 ///kw_pde+READ_MESH+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
 ///kw_pde+READ_MESH+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
 ///kw_pde+READ_MESH+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
-    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0) {
+    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0 || strcasecmp(token, "READ_VECTOR") == 0) {
 
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
+      int vector = (strcasecmp(token, "READ_VECTOR") == 0);
 
       if (mesh->dim == 0) {
-        feenox_push_error_message("READ_FIELD needs DIMENSIONS to be set", token);
+        feenox_push_error_message("READ_* needs DIM to be set", token);
         return FEENOX_ERROR;
       }
 
@@ -2246,6 +2247,19 @@ int feenox_parse_read_mesh(void) {
       feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
       node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
       LL_APPEND(mesh->node_datas, node_data);
+      
+      // if they asked for a vector we have to define the three functions
+      // here so they are available for further usage
+      if (vector) {
+        char *components[3] = {"x", "y", "z"};
+        for (unsigned g = 0; g < 3; g++) {
+          char *actual_function_name = NULL;
+          feenox_check_minusone(asprintf(&actual_function_name, "%s_%s", function_name, components[g]));
+          feenox_call(feenox_define_function(actual_function_name, mesh->dim));
+          feenox_free(actual_function_name);
+        }  
+      }
+      
       feenox_free(name_in_mesh);
       feenox_free(function_name);
 
@@ -2786,7 +2800,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail Check out the [programming guide in the FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md).
 
 ///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
-///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIMENSIONS`.
+///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIM`.
 ///kw_pde+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
 ///kw_pde+PROBLEM+usage [ 1D |
     } else if (strcasecmp(token, "1d") == 0) {
@@ -2797,8 +2811,8 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage 3D |
     } else if (strcasecmp(token, "3d") == 0) {
       feenox.pde.dim = 3;
-///kw_pde+PROBLEM+usage DIMENSIONS <expr> ]
-    } else if (strcasecmp(token, "DIMENSIONS") == 0) {
+///kw_pde+PROBLEM+usage DIM <expr> ]
+    } else if (strcasecmp(token, "DIM") == 0 || strcasecmp(token, "DIMENSIONS") == 0) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
       feenox.pde.dim = (unsigned int)(xi);
