@@ -16,6 +16,9 @@ toc: true
 >   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
 >   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
+> * FeenoX for nuclear-related problems Presentation, December 2021
+>   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-brasil.pdf)
+>   - [Markdown examples sources](https://github.com/gtheler/2021-brasil)
 :::
 
 
