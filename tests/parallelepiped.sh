@@ -12,6 +12,14 @@ fi
 checkpetsc
 checkgmsh
 
-gmsh -v 0 -3 ${dir}/parallelepiped.geo
+gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 2
 answerzero parallelepiped.fee
+exitifwrong $?
+
+
+gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 1 -clscale 2 -o parallelepiped-coarse.msh
+answerzero parallelepiped-thermal.fee
+exitifwrong $?
+
+answerzero parallelepiped-from-msh.fee
 exitifwrong $?

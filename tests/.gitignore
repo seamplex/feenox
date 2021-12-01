@@ -10,7 +10,7 @@ nafems-t1.msh
 nafems-t4.msh
 nafems-le10.msh
 2dpwr-*.msh
-parallelepiped.msh
+parallelepiped*.msh
 nafems-t4-result.msh
 nafems-le1-*.vtk
 i-beam*.msh

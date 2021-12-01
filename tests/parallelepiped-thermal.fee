@@ -1,0 +1,27 @@
+# references:
+#  - http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf
+#  - https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf
+PROBLEM thermal 3D
+READ_MESH parallelepiped-coarse.msh
+
+k = 1
+BC left    q=+2
+BC right   q=-2
+BC front   q=+3
+BC back    q=-3
+BC bottom  q=+4
+BC top     q=-4
+BC A       T=0
+
+SOLVE_PROBLEM
+
+# analytical solution
+Te(x,y,z) = 40 - 2*x - 3*y - 4*z
+
+# compute the L-2 norm of the error in the displacement field
+INTEGRATE (T(x,y,z)-Te(x,y,z))^2 RESULT num
+PHYSICAL_GROUP bulk DIM 3  # this is just to compute the volume
+
+WRITE_MESH parallelepiped-thermal.msh T
+
+PRINT num/bulk_volume

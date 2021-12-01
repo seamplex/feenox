@@ -28,12 +28,15 @@ Physical Point("C",4) = {12};
 
 Physical Surface("left", 5) = {1};
 Physical Surface("right", 6) = {2};
+Physical Surface("front", 7) = {3};
+Physical Surface("back", 8) = {4};
+Physical Surface("bottom", 9) = {5};
+Physical Surface("top", 10) = {6};
 
-Physical Volume("bulk", 7) = {1};
+Physical Volume("bulk", 11) = {1};
 
 Mesh.MeshSizeMin = h/5;
 Mesh.MeshSizeMax = h/5;
-Mesh.ElementOrder = 2;
 Mesh.HighOrderOptimize = 1;
 
 
