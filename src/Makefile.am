@@ -90,6 +90,7 @@ feenox_SOURCES = \
 ./pdes/petsc_ksp.c \
 ./pdes/petsc_snes.c \
 ./pdes/petsc_ts.c \
+./pdes/reaction.c \
 ./pdes/slepc_eps.c \
 ./pdes/solve.c \
 ./pdes/laplace/laplace.h \

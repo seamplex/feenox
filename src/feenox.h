@@ -288,6 +288,7 @@ typedef struct mesh_find_extrema_t mesh_find_extrema_t;
 
 typedef struct fit_t fit_t;
 typedef struct dump_t dump_t;
+typedef struct reaction_t reaction_t;
 
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
@@ -1388,6 +1389,17 @@ struct dump_t {
   dump_t *next;
 };
 
+
+struct reaction_t {
+  physical_group_t *physical_group;
+  var_t *scalar;
+  vector_t *vector;
+  int order;
+  expr_t x0[3];
+  
+  reaction_t *next;
+};
+
 // global FeenoX singleton structure
 struct feenox_t {
   int argc;
@@ -1441,7 +1453,6 @@ struct feenox_t {
   print_function_t *print_functions;
   print_vector_t *print_vectors;
   fit_t *fits;
-  dump_t *dumps;
   
   struct {
     var_t *done;
@@ -1639,6 +1650,9 @@ struct feenox_t {
     instruction_t *instruction;
     function_t *initial_condition;
 
+    dump_t *dumps;
+    reaction_t *reactions;
+    
     struct {
       var_t *ksp_atol;
       var_t *ksp_rtol;
@@ -1971,6 +1985,9 @@ extern int feenox_instruction_dump(void *arg);
 extern int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer);
 #endif
 
+// reaction.c
+extern int feenox_instruction_reaction(void *arg);
+
 // matrix.c
 extern int feenox_matrix_init(matrix_t *this);
 
@@ -2079,6 +2096,7 @@ extern int feenox_instruction_mesh_find_extrema(void *arg);
 // physical_group.c
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
 extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
+extern physical_group_t *feenox_get_or_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
 extern double feenox_physical_group_compute_volume(physical_group_t *this, mesh_t *mesh);
 
 // material.c

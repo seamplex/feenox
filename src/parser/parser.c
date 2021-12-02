@@ -310,6 +310,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_bc());
       return FEENOX_OK;
       
+///kw_pde+REACTION+desc Compute the reaction (force, moment, power, etc.) at selected face, edge or vertex.
+///kw_pde+REACTION+usage REACTION
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "REACTION") == 0) {
+      feenox_call(feenox_parse_reaction());
+      return FEENOX_OK;
+      
 ///kw_pde+SOLVE_PROBLEM+desc Explicitly solve the PDE problem.
 ///kw_pde+SOLVE_PROBLEM+usage SOLVE_PROBLEM
     } else if (strcasecmp(token, "SOLVE_PROBLEM") == 0) {
@@ -2618,10 +2625,8 @@ int feenox_parse_material(void) {
       feenox_call(feenox_parser_string(&physical_group_name));  
 
       physical_group_t *physical_group = NULL;
-      if ((physical_group = feenox_get_physical_group_ptr(physical_group_name, material->mesh)) == NULL) {
-        if ((physical_group = feenox_define_physical_group_get_ptr(physical_group_name, material->mesh, material->mesh->dim_topo, 0)) == NULL) {
-          return FEENOX_ERROR;
-        }
+      if ((physical_group = feenox_get_or_define_physical_group_get_ptr(physical_group_name, material->mesh, material->mesh->dim_topo, 0)) == NULL) {
+        return FEENOX_ERROR;
       }
           
       // TODO: api
@@ -2717,10 +2722,8 @@ int feenox_parse_bc(void) {
       feenox_call(feenox_parser_string(&physical_group_name));  
 
       physical_group_t *physical_group = NULL;
-      if ((physical_group = feenox_get_physical_group_ptr(physical_group_name, bc->mesh)) == NULL) {
-        if ((physical_group = feenox_define_physical_group_get_ptr(physical_group_name, bc->mesh, bc->mesh->dim_topo, 0)) == NULL) {
-          return FEENOX_ERROR;
-        }
+      if ((physical_group = feenox_get_or_define_physical_group_get_ptr(physical_group_name, bc->mesh, 0, 0)) == NULL) {
+        return FEENOX_ERROR;
       }
           
       // TODO: api
@@ -2742,6 +2745,92 @@ int feenox_parse_bc(void) {
     }
   }
   feenox_free(bc_name);
+  
+  return FEENOX_OK;
+}
+
+int feenox_parse_reaction(void) {
+
+///kw_pde+REACTION+usage <physical_group>
+  if (feenox.mesh.mesh_main == NULL) {
+    feenox_push_error_message("REACTION before giving a MESH");
+    return FEENOX_ERROR;
+  }
+  
+  if (feenox.pde.bc_parse == NULL) {
+    feenox_push_error_message("REACTION before setting the PROBLEM type");
+    return FEENOX_ERROR;
+  }
+  
+  reaction_t *reaction = NULL;
+  feenox_check_alloc(reaction = calloc(1, sizeof(reaction_t)));
+    
+  char *group_name = NULL;
+  feenox_call(feenox_parser_string(&group_name));
+  if ((reaction->physical_group = feenox_get_or_define_physical_group_get_ptr(group_name, feenox.mesh.mesh_main, 0, 0)) == NULL) {
+    return FEENOX_ERROR;
+  }
+  
+  
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+
+///kw_pde+REACTION+usage [ MOMENT
+///kw_pde+REACTION+detail If the `MOMENT` keyword is not given, the zero-th order reaction is computed,
+///kw_pde+REACTION+detail i.e. force in elasticity and power in thermal.
+    if (strcasecmp(token, "MOMENT") == 0) {
+      reaction->order = 1;
+    
+///kw_pde+REACTION+usage [ X0 <expr> ] [ Y0 <expr> ] [ Z0 <expr> ] ]
+///kw_pde+REACTION+detail If the `MOMENT` keyword is given, then the coordinates of the center
+///kw_pde+REACTION+detail can be given with `X0`, `Y0` and `Z0`. If they are not, the moment is
+///kw_pde+REACTION+detail computed about the barycenter of the physical group.
+    } else if (strcasecmp(token, "X0") == 0 || strcasecmp(token, "Y0") == 0 || strcasecmp(token, "Z0") == 0) {
+      char *expr_string;
+      int dof = token[0]-'X';
+      feenox_call(feenox_parser_string(&expr_string));
+      feenox_call(feenox_expression_parse(&reaction->x0[dof], expr_string));
+      feenox_free(expr_string);
+      
+///kw_pde+REACTION+usage RESULT { <variable> | <vector> }
+///kw_pde+REACTION+detail The resulting reaction will be stored in the variable (thermal) or vector (elasticity) provided.
+///kw_pde+REACTION+detail If the variable or vector does not exist, it will be created.
+    } else if (strcasecmp(token, "RESULT") == 0) {
+      char *result_name = NULL;
+      feenox_call(feenox_parser_string(&result_name));
+
+      // at least one of these will be null
+      reaction->scalar = feenox_get_variable_ptr(result_name);
+      reaction->vector = feenox_get_vector_ptr(result_name);
+
+      if (reaction->scalar == NULL && reaction->vector == NULL) {
+        // none of them exist, create the appropriate thing
+        if (feenox.pde.dofs == 1) {
+          if ((reaction->scalar = feenox_define_variable_get_ptr(result_name)) == NULL) {
+            return FEENOX_ERROR;
+          }
+        } else {
+          if ((reaction->vector = feenox_define_vector_get_ptr(result_name, feenox.pde.dofs)) == NULL) {
+            return FEENOX_ERROR;
+          }
+        }
+      } else if (reaction->scalar != NULL && feenox.pde.dofs != 1) {
+        feenox_push_error_message("RESULT should pass a vector of size %d not a variable", feenox.pde.dofs);
+        return FEENOX_ERROR;
+      } else if (reaction->vector != NULL && feenox.pde.dofs == 1) {
+        feenox_push_error_message("RESULT should pass a variable not a vector");
+        return FEENOX_ERROR;
+      } else if (reaction->vector != NULL && feenox.pde.dofs != reaction->vector->size) {
+        feenox_push_error_message("RESULT should pass a vector of size %d not of size %d", feenox.pde.dofs, reaction->vector->size);
+        return FEENOX_ERROR;
+      }
+      free(result_name);
+    }
+  }
+  
+  LL_APPEND(feenox.pde.reactions, reaction);
+  feenox_call(feenox_add_instruction(feenox_instruction_reaction, reaction));
+  
   
   return FEENOX_OK;
 }
@@ -3513,7 +3602,7 @@ int feenox_parse_dump(void) {
 
   }
   
-  LL_APPEND(feenox.dumps, dump);
+  LL_APPEND(feenox.pde.dumps, dump);
   feenox_call(feenox_add_instruction(feenox_instruction_dump, dump));
   
   
