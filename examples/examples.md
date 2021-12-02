@@ -906,7 +906,8 @@ $
 
 It is easy to compute the effective multiplication factor of a one-group
 bare cubical reactor. Or a spherical reactor. And we know that for the
-same mass, the former is smaller than the latter.
+same mass, the $k_\text{eff}$ for the former is smaller than for the
+latter.
 
 ::: {#fig:cube-and-sphere}
 ![Cubical reactor](cubesphere-0.png){width="49%"} ![Spherical
