@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox function for computing reactions
  *
- *  Copyright (C) 2009--2015,2021 jeremy theler
+ *  Copyright (C) 2016--2021 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -26,11 +26,7 @@ int feenox_instruction_reaction(void *arg) {
 
 #ifdef HAVE_PETSC
   reaction_t *reaction = (reaction_t *)arg;
-/*  
-  PetscInt i, j, j_local, k;
-  PetscInt add;
   
-*/
   if (reaction->vector != NULL && reaction->vector->initialized == 0) {
     feenox_vector_init(reaction->vector, 0);
   }
@@ -79,7 +75,7 @@ int feenox_instruction_reaction(void *arg) {
     }
   }
   
-  // the IS of the columns the same for all the DOFs
+  // the IS of the columns is the same for all the DOFs
   IS set_cols = NULL;
   petsc_call(ISCreateStride(PETSC_COMM_WORLD, feenox.pde.size_local, feenox.pde.first_row, 1, &set_cols));
 
@@ -88,7 +84,7 @@ int feenox_instruction_reaction(void *arg) {
   Vec K_row_u[] = {NULL, NULL, NULL};
   double R[] = {0, 0, 0};
   for (g = 0; g < feenox.pde.dofs; g++) {
-    // the one for the rows depends on the DOF
+    // the IS of the rows depends on the DOF
     petsc_call(ISCreateGeneral(PETSC_COMM_WORLD, k, row[g], PETSC_USE_POINTER, &set_rows[g]));
     petsc_call(MatCreateSubMatrix(feenox.pde.K, set_rows[g], set_cols, MAT_INITIAL_MATRIX, &K_row[g]));
     petsc_call(MatCreateVecs(K_row[g], PETSC_NULL, &K_row_u[g]));
