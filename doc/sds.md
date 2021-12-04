@@ -459,7 +459,7 @@ $ python fork.py > fork.dat
 $
 ``` 
 
-![Estimated length\ $\ell_1$ needed to get 440\ Hz for different mesh refinement levels\ $n$](fork.svg){#fig:fork}
+![Estimated length\ $\ell_1$ needed to get 440\ Hz for different mesh refinement levels\ $n$](fork.svg){#fig:fork width_latex=85%}
 
 Note that the approach used here is to use Gmsh Python API to build the mesh and then fork the FeenoX executable to solve the fork (no pun intended). There are plans to provide a Python API for FeenoX so the problem can be set up, solved and the results read back directly from the script instead of needing to do a fork+exec, read back the standard output as a string and then convert it to a Python `float`.
 
@@ -473,24 +473,32 @@ Note that the approach used here is to use Gmsh Python API to build the mesh and
 > 230-efficiency.md
 > ```
 
-**TO DO**: re-solve NAFEMS LE10 for different meshes with
+One of the most widely known quotations in computer science is that one that says “premature optimization is the root of all evil.” that is an extremely over-simplified version of Donald E. Knuth’s analysis in hist The Art of Computer Programming. Bottom line is that the programmer should not not spend too much time trying to optimize code based on hunches but based on profiling measurements. Yet a disciplined programmer can tell when an algorithm will be way too inefficient (say something that scales up like $O(n^2)$) and how small changes can improve performance (say by understanding how caching levels work). It is also true that usually an improvement in one aspect leads to a deterioration in another one (e.g. decrease in CPU time by caching intermediate results increasing RAM usage).
 
- * FeenoX
- * Code Aster
- * Sparselizard
- * CCX?
+Even though FeenoX is still evolving so it could be premature in many cases, it is informative to compare running times and memory consumption when solving the same problem with different cloud-friendly FEA programs. In effect, a [serial single-thread single-host comparison of resource usage when solving the NAFEMS LE10 problem](https://seamplex.com/feenox/tests/nafems/le10/) introduced above was performed, using both [unstructured tetrahedral](https://www.seamplex.com/feenox/tests/nafems/le10/report-tet.html) and [structured hexahedral](https://www.seamplex.com/feenox/tests/nafems/le10/report-hex.html) meshes. @Fig:le10-tet shows two figures of the many ones contained in the detailed report. In general, FeenoX using the iterative approach based on PETSc’s Geometric-Algebraic Multigrid Preconditioner  and a conjugate gradients solver is faster for (relatively) large problems at the expense of a larger memory consumption. The curves that use MUMPS confirm the well-known theoretical result that direct linear solvers are robust but not scalable. 
+
+The large memory consumption shown by FeenoX is due to a high level of caching intermediate results. For instance, all the shape functions evaluated at the integration points are computed once when building the stiffness matrix, stored in RAM and then re-used when recovering the gradients of the displacements needed to compute the stresses.  There are also a number of non-premature optimization tasks that can improve both the CPU and memory usage that ought to be performed at later stages of the project.
+
+::: {#fig:le10-tet}
+![Wall time vs. number of degrees of freedom](wall-dofs-tet.svg){#fig:wall-dofs-tet width_html=100% width_latex=90%}
+
+![Memory vs. number of degrees of freedom](memory-dofs-tet.svg){#fig:memory-dofs-tet width_html=100% width_latex=90%}
+
+Resource consumption when solving the NAFEMS LE10 problem in the cloud for tetrahedral meshes.
+:::
+
+Regarding storage, FeenoX needs space to store the input file (negligible), the mesh file in `.msh` format (which can be either ASCII or binary) and the optional output files in `.msh` or `.vtk` formats. All of these files can be stored gzip-compressed and un-compressed on demand by exploiting FeenoX’ script-friendliness using proper calls to `gzip` before and/or after calling the `feenox` binary.
  
-Measure (with `time`):
-
- * CPU time
- * Wall time
- * Memory
-
 ## Scalability  {#sec:scalability}
  
 > ```include
 > 240-scalability.md
 > ```
+
+Since there is a limit for the problem size that a single host can handle, sufficiently large problems have to be split among several. .
+
+openmp != mpi
+
 
  * OpenMP in PETSc
  * Gmsh partitions
