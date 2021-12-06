@@ -495,9 +495,13 @@ Regarding storage, FeenoX needs space to store the input file (negligible), the 
 > 240-scalability.md
 > ```
 
-Since there is a limit for the problem size that a single host can handle, sufficiently large problems have to be split among several. .
+The time needed to solve a relatively large problem can be reduced by exploiting the fact that most cloud servers (and even laptop computers) have more than one CPU available. There are some tasks that can be split into several processors sharing a common memory address space and they will scale up perfectly, such as building the elemental matrices and assembling the global stiffness matrix. There are some other tasks that might not scale perfectly but that nevertheless might (or might not) reduce the overall wall time if split among processors using a common memory space, such as solving the linear system\ $K \cdot \vec{u} = \vec{b}$. The usual scheme to parallelize a problem under these conditions is to use [OpenMP](https://en.wikipedia.org/wiki/OpenMP).
 
-openmp != mpi
+Yet, if the problem is large enough, a server might not have enough physical random-access memory to be able to handle the whole problem. The problem now has to be split among different servers which, in turn, might have several processors each. Some of the processors share the same address space but most of them will only have access to a fraction of the whole global problem data. In these cases, there are no tasks that can scale up perfectly since even when building and assembling the matrices, a processor needs some piece of data which is handled by another processor with a different address space and that has to be conveyed specifically from one process to another one. The usual scheme to parallelize a problem under these conditions is to use [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface), whose two most well-known implementations are [Open MPI](https://www.open-mpi.org/) and [MPICH](https://www.mpich.org/).
+
+
+do not mix! twice as much code to maintain, multiple points of failure
+overhead = neglibible
 
 
  * OpenMP in PETSc
