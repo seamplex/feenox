@@ -1,0 +1,15 @@
+PROBLEM heat 1d
+READ_MESH slab.msh
+
+BC left  T=0
+BC right q=0
+
+k = 1
+q = 1
+
+SOLVE_PROBLEM
+
+INTEGRATE q    RESULT q_total
+REACTION left  RESULT q_left
+REACTION right RESULT q_right
+PRINT %.3f q_total+q_left+q_right

@@ -37,4 +37,3 @@ ENDIF
 
 # check the numerical heat flux is the same as the analytical one
 PRINT q_left+k*(T_analytical-T0)/l*(l/20)^2
-PRINT q_left

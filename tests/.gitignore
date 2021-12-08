@@ -14,3 +14,7 @@ parallelepiped*.msh
 nafems-t4-result.msh
 nafems-le1-*.vtk
 i-beam*.msh
+K.m
+K_bc.m
+b.m
+b_bc.m

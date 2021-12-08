@@ -35,6 +35,11 @@ exitifwrong $?
 answerzero thermal-slab-uniform-source.fee
 exitifwrong $?
 
+answer thermal-slab-uniform-source-dirichlet-neumann.fee "0.100"
+exitifwrong $?
+
+
+
 if [ ! -z "$(which octave)" ]; then
   base="thermal-slab-uniform-source-octave"
   echo "K_bc; b_bc; K_bc\\\\b_bc" | octave > ${base}.last

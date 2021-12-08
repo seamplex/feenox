@@ -362,7 +362,7 @@ Other non-free implementations like Intel\ MPI might work but were not tested. H
 
 The FeenoX executable will show the configured compiler and flags when invoked with the `--versions` option:
 
-```
+```terminal
 $ feenox --versions
 FeenoX v0.1.47-g868dbb7-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
