@@ -1,0 +1,58 @@
+#. ## Mechanical problem
+#.
+#. Now this input file reads the scalar function `T` stored in the coarse first-order mesh file
+#. `parallelepiped-temperature.msh` and uses it to solve the mechanical problem in the finer
+#. second-order mesh `parallelepiped.msh`.
+#. The numerical solution for the displacemetns over the fine mesh is written in a VTK file
+#. (along with the temperature as interpolated from the coarse mesh) and compared
+#. to the analytical solution using the $L_2$ norm.
+#. 
+#$ $ gmsh -3 parallelepiped.geo -order 2
+#$ [...]
+#$ Info    : 2564 nodes 2162 elements
+#$ Info    : Writing 'parallelepiped.msh'...
+#$ Info    : Done writing 'parallelepiped.msh'
+#$ Info    : Stopped on Fri Dec 10 10:39:27 2021 (From start: Wall 0.165707s, CPU 0.258751s)
+#$ $ feenox parallelepiped-mechanical.fee
+#$ 0.000345839
+#$ $
+PROBLEM mechanical 3D
+
+# this is where we solve the mechanical problem
+READ_MESH parallelepiped.msh MAIN   
+
+# this is where we read the temperature from
+READ_MESH parallelepiped-temperature.msh DIM 3 READ_FUNCTION T
+
+# mechanical properties
+E(x,y,z) = 1000/(800-T(x,y,z))   # young's modulus
+nu = 0.3                         # poisson's ratio
+
+# boundary conditions
+BC O fixed
+BC B u=0 w=0
+BC C u=0
+
+# here "load" is a fantasy name applied to both "left" and "right"
+BC load tension=1 PHYSICAL_GROUP left PHYSICAL_GROUP right
+
+SOLVE_PROBLEM
+WRITE_MESH parallelepiped-mechanical.vtk T VECTOR u v w
+
+# analytical solutions
+h = 10
+A = 0.002
+B = 0.003
+C = 0.004
+D = 0.76
+
+# the "e" means exact
+ue(x,y,z) := A/2*(x^2 + nu*(y^2+z^2)) + B*x*y + C*x*z + D*x - nu*A*h/4*(y+z)
+ve(x,y,z) := -nu*(A*x*y + B/2*(y^2-z^2+x^2/nu) + C*y*z + D*y -A*h/4*x - C*h/4*z)
+we(x,y,z) := -nu*(A*x*z + B*y*z + C/2*(z^2-y^2+x^2/nu) + D*z + C*h/4*y - A*h/4*x)
+
+# compute the L-2 norm of the error in the displacement field
+INTEGRATE (u(x,y,z)-ue(x,y,z))^2+(v(x,y,z)-ve(x,y,z))^2+(w(x,y,z)-we(x,y,z))^2 RESULT num MESH parallelepiped.msh
+INTEGRATE 1 RESULT den MESH parallelepiped.msh
+PRINT num/den
+#> ![Displacements and temperature distribution over the fine mesh in Paraview (yes, still a rainbow pallete)](parallelepiped-mechanical.png)
