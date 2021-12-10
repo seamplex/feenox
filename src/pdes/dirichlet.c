@@ -41,22 +41,33 @@ int feenox_problem_dirichlet_eval(void) {
   feenox.pde.dirichlet_k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
 
-    // TODO: optimize the way this loop is done to avoid checking
-    //       several times for the same group, wasting time and money
+//    printf("node = %ld\n", j);
+    
+    // TODO: optimize these ugly loops
+    // maybe if we went the other way and looped over the elements first?
+    // merge_sort + remove duplicates?
+    physical_group_t *last_physical_group = NULL;
     LL_FOREACH(feenox.pde.mesh->node[j].associated_elements, element_list) {
       element = element_list->element;
-      if (element != NULL && element->type->dim < feenox.pde.dim && element->physical_group != NULL) {
+//      printf(" element = %ld\n", element->tag);
+      if (element != NULL && element->type->dim < feenox.pde.dim && element->physical_group != NULL && element->physical_group != last_physical_group) {
+//        printf("  candidate\n");
         LL_FOREACH(element->physical_group->bcs, bc) {
+//          printf("   bc = %s\n", bc->name);
           DL_FOREACH(bc->bc_datums, bc_data) {
+//            printf("    data = %d\n", bc_data->type_math);
             if (bc_data->type_math == bc_type_math_dirichlet) {
 
               // if there is a condition we evaluate it now
-              if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
+              if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
 
                 if (bc_data->space_dependent) {
                   feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
-                }  
+                }
+//                printf("      FOUND NODE %ld\n", j);
+//                printf("%ld\n", j);                
                 feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j));
+                last_physical_group = element->physical_group;
 
               }
               // TODO: high-order nodes end up with a different penalty weight

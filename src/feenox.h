@@ -137,6 +137,7 @@
 #define DEFAULT_INTEGRATION_KEY            GSL_INTEG_GAUSS31
 
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
+#define DEFAULT_CONDITION_THRESHOLD        (9.765625e-4)         // (1/2)^-10
 
 #define DEFAULT_FIT_MAX_ITER          100
 #define DEFAULT_FIT_XTOL              1e-8

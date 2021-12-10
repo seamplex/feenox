@@ -74,7 +74,7 @@ int feenox_instruction_reaction(void *arg) {
       }
     }
   }
-  
+
   // the IS of the columns is the same for all the DOFs
   IS set_cols = NULL;
   petsc_call(ISCreateStride(PETSC_COMM_WORLD, feenox.pde.size_local, feenox.pde.first_row, 1, &set_cols));

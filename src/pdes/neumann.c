@@ -36,15 +36,3 @@ double *feenox_problem_bc_natural_x(element_t *element, bc_data_t *bc_data, unsi
   return x;
 }
 
-  
-
-/*
-int feenox_neumann_add(size_t index, double value) {
-  
-  feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index;
-  feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = value;
-  feenox.pde.dirichlet_k++;
-  
-  return FEENOX_OK;
-}
-*/

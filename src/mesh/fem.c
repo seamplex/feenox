@@ -520,8 +520,6 @@ int feenox_mesh_compute_H_at_gauss(element_t *this, unsigned int v, unsigned int
 
 int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned int dofs, int integration) {
 
-  int m, d, j;  
-  
   if (element->B == NULL) {
     feenox_check_alloc(element->B = calloc(element->type->gauss[integration].V, sizeof(gsl_matrix *)));
   }
@@ -536,10 +534,10 @@ int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned 
   }
   
   
-  for (m = 0; m < element->type->dim; m++) {
-    for (d = 0; d < dofs; d++) {
-      for (j = 0; j < element->type->nodes; j++) {
-        gsl_matrix_set(element->B[v], dofs*m+d, dofs*j+d, gsl_matrix_get(element->dhdx[v], j, m));
+  for (unsigned int m = 0; m < element->type->dim; m++) {
+    for (unsigned int g = 0; g < dofs; g++) {
+      for (unsigned int j = 0; j < element->type->nodes; j++) {
+        gsl_matrix_set(element->B[v], dofs*m+g, dofs*j+g, gsl_matrix_get(element->dhdx[v], j, m));
       }
     }
   }

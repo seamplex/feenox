@@ -137,10 +137,12 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
   feenox_var_value(feenox_special_var(t)) = t;
 
   if (feenox.pde.math_type == math_type_nonlinear) {
-    // TODO: know when to recompute the matrix or not and when to recompute the gradients or not
     feenox_call(feenox_problem_phi_to_solution(phi));
-    feenox_call(feenox_problem_build());
-  }  
+  }
+
+  // TODO: for time-dependent neumann BCs it should not be needed to re-build the whole matrix, just the RHS
+  feenox_call(feenox_problem_build());
+  
   // TODO: be smart about this too
   feenox_call(feenox_problem_dirichlet_eval());
 

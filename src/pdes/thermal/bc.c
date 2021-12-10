@@ -90,12 +90,14 @@ int feenox_problem_bc_set_thermal_temperature(bc_data_t *bc_data, size_t node_in
 }
 
 // this virtual method builds the surface elemental matrix
+// TODO: one method for constant flux, one for temp, one for space
 int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v) {
   
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x =feenox_problem_bc_natural_x(element, bc_data, v);
+  // add a pointer to void in bc_data and cast it to an array of doubles
+  double *x = feenox_problem_bc_natural_x(element, bc_data, v);
   double q = feenox_expression_eval(&bc_data->expr);
   feenox_call(feenox_problem_bc_natural_set(element, v, &q));
   
@@ -150,21 +152,19 @@ int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_d
     return FEENOX_ERROR;
   }
 
+
+  // TODO: the h*T goes directly to the stiffness matrix
+  // this is not efficient because if h depends on t or T we might need to re-build the whole K
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*h, element->H[v], element->H[v], 1.0, feenox.pde.Ki));
+
+  // the h*Tref goes to b
   gsl_vector_set(feenox.pde.Nb, 0, h*Tref);
-  
-  // TODO: this is a scalar! no need to have a matrix
-  gsl_matrix *Na = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs);
-  gsl_matrix_set(Na, 0, 0, h);
+  feenox_call(gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi)); 
 
-  gsl_matrix *NaH = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.n_local_nodes);
-  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, Na, element->H[v], 0, NaH);
-  gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, element->H[v], NaH, 1.0, feenox.pde.Ki);
-  gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi); 
-
-  gsl_matrix_free(Na);
-  gsl_matrix_free(NaH);
-  
 #endif
   
   return FEENOX_OK;
 }
+
+// TODO: we can do something of the like for radiation but care
+// has to be taken regarding the units of the temperatures!
