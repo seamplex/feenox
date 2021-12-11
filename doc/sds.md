@@ -109,7 +109,7 @@ Even though the initial version of FeenoX does not provide an API for high-level
 # Architecture {#sec:architecture}
 
 > ```include
-> 200-architecutre.md
+> 200-architecture.md
 > ```
 
 FeenoX can be seen as a third-system effect, being the third version written from scratch after a first implementation in 2009 and an second one which was far more complex and had far more features circa 2012--2014. The third attempt explicitly addresses the "do one thing well" idea from UNIX. 
@@ -159,7 +159,7 @@ For solving ODEs/DAEs, FeenoX relies on [Lawrence Livermore’s SUNDIALS library
  * actively developed and updated,
  * very well known in the industry and academia.
 
-Moreover, PETSc and SLEPc are scalable through the [MPI standard](https://www.mcs.anl.gov/research/projects/mpi/standard.html). This means that programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. FeenoX has been run on
+Moreover, PETSc and SLEPc are scalable through the [MPI standard](https://www.mcs.anl.gov/research/projects/mpi/standard.html) (further discussed in @sec:scalability). This means that programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. FeenoX has been run on
 
  - Raspberry Pi
  - Laptop (GNU/Linux & Windows 10)
@@ -495,20 +495,30 @@ Regarding storage, FeenoX needs space to store the input file (negligible), the 
 > 240-scalability.md
 > ```
 
-The time needed to solve a relatively large problem can be reduced by exploiting the fact that most cloud servers (and even laptop computers) have more than one CPU available. There are some tasks that can be split into several processors sharing a common memory address space and they will scale up perfectly, such as building the elemental matrices and assembling the global stiffness matrix. There are some other tasks that might not scale perfectly but that nevertheless might (or might not) reduce the overall wall time if split among processors using a common memory space, such as solving the linear system\ $K \cdot \vec{u} = \vec{b}$. The usual scheme to parallelize a problem under these conditions is to use [OpenMP](https://en.wikipedia.org/wiki/OpenMP).
+The time needed to solve a relatively large problem can be reduced by exploiting the fact that most cloud servers (and even laptop computers) have more than one CPU available. There are some tasks that can be split into several processors sharing a common memory address space that will scale up perfectly, such as building the elemental matrices and assembling the global stiffness matrix. There are some other tasks that might not scale perfectly but that nevertheless might (or might not) reduce the overall wall time if split among processors using a common memory space, such as solving the linear system\ $K \cdot \vec{u} = \vec{b}$. The usual scheme to parallelize a problem under these conditions is to use the [OpenMP](https://en.wikipedia.org/wiki/OpenMP) framework.
 
-Yet, if the problem is large enough, a server might not have enough physical random-access memory to be able to handle the whole problem. The problem now has to be split among different servers which, in turn, might have several processors each. Some of the processors share the same address space but most of them will only have access to a fraction of the whole global problem data. In these cases, there are no tasks that can scale up perfectly since even when building and assembling the matrices, a processor needs some piece of data which is handled by another processor with a different address space and that has to be conveyed specifically from one process to another one. The usual scheme to parallelize a problem under these conditions is to use [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface), whose two most well-known implementations are [Open MPI](https://www.open-mpi.org/) and [MPICH](https://www.mpich.org/).
+Yet, if the problem is large enough, a server might not have enough physical random-access memory to be able to handle the whole problem. The problem now has to be split among different servers which, in turn, might have several processors each. Some of the processors share the same address space but most of them will only have access to a fraction of the whole global problem data. In these cases, there are no tasks that can scale up perfectly since even when building and assembling the matrices, a processor needs some piece of data which is handled by another processor with a different address space and that has to be conveyed specifically from one process to another one. The usual scheme to parallelize a problem under these conditions is to use the [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) standard and one of its two most well-known implementations, either [Open MPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/).
 
+It might seem that the most effective approach to solve a large problem is to use OpenMP among threads running in processors that share the memory address space and to use MPI among processes running in different hosts. But even though this hybrid OpenMPI+MPI scheme is possible, there are at least three main drawbacks with respect to a pure MPI approach:
 
-do not mix! twice as much code to maintain, multiple points of failure
-overhead = neglibible
+ i. the overall performance is not be significantly better
+ ii. the amount of lines of code that has to be maintained is more than doubled
+ iii. the number of possible points of synchronization failure increases
 
+Hence, FeenoX uses MPI (mainly through PETSc and SLEPc) to handle large parallel problems.
 
- * OpenMP in PETSc
- * Gmsh partitions
- * run something big to see how it fails
- 
- * show RAM vs. nodes for mumps & gamg
+::: {#fig:nafems-le1-metis}
+![Structured grid](nafems-le1-struct-metis.png){width=49%}
+![Unstructured grid](nafems-le1-unstruct-metis.png){width=49%}
+
+Partition of the 2D NAFEMS LE1 domain into four different sub-domains computed in Gmsh using Metis.
+:::
+
+Most of the overhead of parallelized tasks come from the fact that one process need data stored in another process.
+Therefore, the discretized domain has to be split among processes in such a way as to minimize the number of inter-process communication. This problem, called domain decomposition, can be handled either by the mesher or by the solver itself, usually using a third-part library such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview). It should be noted that the domain decomposition problem does not have a unique solution. On the one hand, it depends on the actual mesh being distributed over parallel processes as illustrated in @fig:nafems-le1-metis. On the other hand, the optimal solution might depend on the kind of topology boundaries to minimize (shared nodes, shared faces) and other subtle options that partitioning libraries allow.
+
+FeenoX relies on Gmsh to perform the domain decomposition (using Metis) and to provide the partitioning information in the mesh file read by the `READ_MESH` keyword.
+
 
 ## Flexibility
  
@@ -516,11 +526,92 @@ overhead = neglibible
 > 250-flexibility.md
 > ```
 
-FeenoX comes from nuclear + experience (what to do and what not to do)
+The third-system effect mentioned in @sec:architecture involves almost ten years of experience in the nuclear industry,^[This experience also shaped many of the features that FeenoX has and most of the features is does deliberately not have.] where complex dependencies of multiple material properties over space through intermediate distributions (temperature, neutronic poisons, etc.) and time (control rod positions, fuel burn-up, etc.) are mandatory.
 
-Materials: a material library (perhaps included in a frontend GUI?) can write FeenoX’ material definitions. Flexiblity.
+One of the cornerstone design decisions in FeenoX is that **everything is an expression**. Here, “everything” means any location in the input file where a numerical value is expected. The most common use case is in the `PRINT` keyword. For example, the [Sophomore's dream](https://en.wikipedia.org/wiki/Sophomore%27s_dream) (in contrast to [Freshman's dream](https://en.wikipedia.org/wiki/Freshman%27s_dream)) identity
+
+
+$$
+\int_{0}^{1} x^{-x} \, dx = \sum_{n=1}^{\infty} n^{-n}
+$$
+
+can be illustrated like this:
+
+```{.feenox include="sophomore.fee"}
+```
+
+```terminal
+$ feenox sophomore.fee
+1.2912861
+1.2912860
+$
+```
+
+Of course most engineering problems will not need explicit integrals (a few of them do, though) but some of them might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” UNIX principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible.”
+
+Flexibility in defining non-trivial material properties is illustrated with the following example, where two non- squares made of different dimensional materials are juxtaposed in thermal contact and subject to different boundary conditions at each of the fours sides (@fig:two-squares-mesh).
+
+![Two squares in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width=75%}
+
+The yellow square is made of a certain material with a conductivity that depends algebraically on the temperature like
+
+$$
+k_\text{yellow}(x,y) = \frac{1}{2} + T(x,y)
+$$
+
+The cyan square has a space-dependent temperature given by a table of scattered data without any particular topology:
+
+| $x$ | $y$ | $k_\text{cyan}$ |
+|:---:|:---:|:---------------:|
+|  1  |  0  |      1.0        |
+|  1  |  1  |      1.5        |
+|  2  |  0  |      1.3        |
+|  2  |  1  |      1.8        |
+| 1.5 | 0.5 |      1.7        |
+
+The cyan square generates a temperature-dependent power density given by
+
+$$
+q^{\prime \prime}_\text{cyan}(x,y) = 0.2 \cdot T(x,y)
+$$
+
+The yellow one does not generate any power so $q^{\prime \prime}_\text{yellow} = 0$. Boundary conditions are
+
+$$
+\begin{cases}
+T(x,y) = y & \text{at the left edge} \\
+T(x,y) = 1-cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge} \\
+q'(x,y) = 2-y & \text{at the right edge} \\
+q'(x,y) = 1 & \text{at the top edge} \\
+\end{cases}
+$$
+
+The input file illustrate how flexible FeenoX and, again, how much the problem definition in a format that the computer can understand resemble the humanly-written formulation of the engineering problem:
+
+```{.feenox include="two-squares.fee"}
+```
+
+Note that FeenoX is flexible enough to...
+
+ 1. handle mixed meshes (the yellow square is meshed with triangles and the other one with quadrangles) 
+ 2. use point-wise defined properties even though there is not underlying structure nor topology for the points where the data is defined
+ 3. understand that the problem is non-linear so it uses PETSc’s SNES framework automatically (the conductivity and power source depend on the temperature).
+
  
- * everything is an expression, show sophomore's identity
+::: {#fig:two-squares-results}
+![Temperature](two-squares-temperature.png){width=75%}
+
+![Conductivity](two-squares-conductivity.png){width=75%}
+
+Temperature (main result) and conductivity for the two-squares thermal problem.
+:::
+
+
+
+
+**simple problems ought to have simple inputs**
+
+
  * 1d & 2d interpolated data for functions
  * thermal transient valve with k(T) and BCs(x,t)
 

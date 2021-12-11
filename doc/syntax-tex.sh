@@ -1,7 +1,7 @@
 #!/bin/sh
-#  Generate keywords.tex with
-#    $ ./syntax-tex.sh > keywords.tex
-#  and then include syntax.tex (which includes keywords.tex) in your preamble
+#  Generate syntax-feenox.tex with
+#    $ ./syntax-tex.sh > syntax-feenox.tex
+#  and then include syntax.tex (which includes syntax-feenox.tex) in your preamble
 
 . ./keywords.sh
 

@@ -1,0 +1,4 @@
+VAR x
+PRINT %.7f integral(x^(-x),x,0,1)
+VAR n
+PRINT %.7f sum(n^(-n),n,1,1000)
