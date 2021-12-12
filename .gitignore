@@ -42,3 +42,4 @@ mesh2d.msh
 laplace-square.msh
 nafems-t4-result.msh
 nafems-le1*.vtk
+parallelepiped-*.msh

@@ -551,7 +551,7 @@ Of course most engineering problems will not need explicit integrals (a few of t
 
 Flexibility in defining non-trivial material properties is illustrated with the following example, where two non- squares made of different dimensional materials are juxtaposed in thermal contact and subject to different boundary conditions at each of the fours sides (@fig:two-squares-mesh).
 
-![Two squares in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width=75%}
+![Two non-dimensional $1 \times 1$ squares each in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width=75%}
 
 The yellow square is made of a certain material with a conductivity that depends algebraically on the temperature like
 
@@ -559,9 +559,9 @@ $$
 k_\text{yellow}(x,y) = \frac{1}{2} + T(x,y)
 $$
 
-The cyan square has a space-dependent temperature given by a table of scattered data without any particular topology:
+The cyan square has a space-dependent temperature given by a table of scattered data as a function of the spatial coordinates\ $x$ and\ $y$ (origin is left bottom corner of the yellow square) without any particular structure on the definition points:
 
-| $x$ | $y$ | $k_\text{cyan}$ |
+| $x$ | $y$ | $k_\text{cyan}(x,y)$ |
 |:---:|:---:|:---------------:|
 |  1  |  0  |      1.0        |
 |  1  |  1  |      1.5        |
@@ -569,7 +569,7 @@ The cyan square has a space-dependent temperature given by a table of scattered 
 |  2  |  1  |      1.8        |
 | 1.5 | 0.5 |      1.7        |
 
-The cyan square generates a temperature-dependent power density given by
+The cyan square generates a temperature-dependent power density (per unit area) given by
 
 $$
 q^{\prime \prime}_\text{cyan}(x,y) = 0.2 \cdot T(x,y)
@@ -579,14 +579,14 @@ The yellow one does not generate any power so $q^{\prime \prime}_\text{yellow} =
 
 $$
 \begin{cases}
-T(x,y) = y & \text{at the left edge} \\
-T(x,y) = 1-cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge} \\
-q'(x,y) = 2-y & \text{at the right edge} \\
-q'(x,y) = 1 & \text{at the top edge} \\
+T(x,y) = y & \text{at the left edge $y=0$} \\
+T(x,y) = 1-cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge $x=0$} \\
+q'(x,y) = 2-y & \text{at the right edge $x=2$} \\
+q'(x,y) = 1 & \text{at the top edge $y=1$} \\
 \end{cases}
 $$
 
-The input file illustrate how flexible FeenoX and, again, how much the problem definition in a format that the computer can understand resemble the humanly-written formulation of the engineering problem:
+The input file illustrate how flexible FeenoX is and, again, how the problem definition in a format that the computer can understand resembles the humanly-written formulation of the original engineering problem:
 
 ```{.feenox include="two-squares.fee"}
 ```
@@ -594,14 +594,14 @@ The input file illustrate how flexible FeenoX and, again, how much the problem d
 Note that FeenoX is flexible enough to...
 
  1. handle mixed meshes (the yellow square is meshed with triangles and the other one with quadrangles) 
- 2. use point-wise defined properties even though there is not underlying structure nor topology for the points where the data is defined
- 3. understand that the problem is non-linear so it uses PETSc’s SNES framework automatically (the conductivity and power source depend on the temperature).
+ 2. use point-wise defined properties even though there is not underlying structure nor topology for the points where the data is defined (FeenoX could have read data from a `.msh` or `.vtk` file respecting the underlying topology)
+ 3. understand that the problem is non-linear so as to use PETSc’s SNES framework automatically (the conductivity and power source depend on the temperature).
 
  
 ::: {#fig:two-squares-results}
-![Temperature](two-squares-temperature.png){width=75%}
+![Temperature defined at nodes](two-squares-temperature.png){width=75%}
 
-![Conductivity](two-squares-conductivity.png){width=75%}
+![Conductivity defined at cells](two-squares-conductivity.png){width=75%}
 
 Temperature (main result) and conductivity for the two-squares thermal problem.
 :::

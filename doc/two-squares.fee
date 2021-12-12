@@ -1,7 +1,7 @@
-PROBLEM thermal 2d
+PROBLEM thermal 2d            # heat conduction in two dimensions
 READ_MESH two-squares.msh
 
-k_yellow(x,y) = 1/2+T(x,y)
+k_yellow(x,y) = 1/2+T(x,y)    # thermal conductivity
 FUNCTION k_cyan(x,y) INTERPOLATION shepard DATA {
     1   0    1.0
     1   1    1.5
@@ -9,14 +9,13 @@ FUNCTION k_cyan(x,y) INTERPOLATION shepard DATA {
     2   1    1.8
     1.5 0.5  1.7 }
 
-q_cyan(x,y) = 1-0.2*T(x,y)
+q_cyan(x,y) = 1-0.2*T(x,y)    # dissipated power density
 q_yellow(x,y) = 0
     
-BC left   T=y              # temperature
+BC left   T=y                 # temperature (dirichlet) bc
 BC bottom T=1-cos(pi/2*x)
-BC right  q=2-y            # heat flux
+BC right  q=2-y               # heat flux (neumann) bc
 BC top    q=1
 
 SOLVE_PROBLEM
- 
-WRITE_MESH two-squares.vtk  T #CELLS k
+WRITE_MESH two-squares-results.msh  T #CELLS k
