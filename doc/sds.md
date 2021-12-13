@@ -580,7 +580,7 @@ The yellow one does not generate any power so $q^{\prime \prime}_\text{yellow} =
 $$
 \begin{cases}
 T(x,y) = y & \text{at the left edge} \\
-T(x,y) = 1-cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge} \\
+T(x,y) = 1-\cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge} \\
 q'(x,y) = 2-y & \text{at the right edge} \\
 q'(x,y) = 1 & \text{at the top edge} \\
 \end{cases}
