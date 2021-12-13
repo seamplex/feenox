@@ -13,7 +13,7 @@ documentclass: report
 > 100-introduction.md
 > ```
 
-Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). This condition leaves all of the well-known non-free (i.e. wrongly-called "commercial") finite-element solvers in the market (NASTRAN, Abaqus, ANSYS, Midas, etc.) out of the tender.
+Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). This condition leaves all of the well-known non-free (i.e. [incorrectly-called "commercial"](https://www.gnu.org/philosophy/words-to-avoid.en.html#Commercial)) finite-element solvers available in the market (NASTRAN, Abaqus, ANSYS, Midas, etc.) out of the tender.
 
 ```include
 licensing.md
@@ -25,7 +25,7 @@ licensing.md
 > 110-objective.md
 > ```
 
-The choice of the initial supported features is based on the types of problem that the FeenoX' precursor codes (namely wasora, Fino and milonga, referred to as "previous versions" from now ow) already have been supporting since more than ten years now. It is also a first choice so scope can be bounded. A subsequent road map and release plans can be designed as requested. FeenoX' first version includes a subset of the required functionality, namely
+The choice of the initial supported features is based on the types of problem that the FeenoX' precursor codes (namely wasora, Fino and milonga, referred to as "previous versions" from now on) already have been supporting since more than ten years now. It is also a first usable version so scope can be bounded. A subsequent road map and release plans can be designed as requested. FeenoX' first version includes a subset of the required functionality, namely
 
  * open and closed-loop dynamical systems
  * Laplace/Poisson/Helmholtz equations
@@ -34,7 +34,7 @@ The choice of the initial supported features is based on the types of problem th
  * structural modal analysis
  * multi-group neutron transport and diffusion
  
-FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture of more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy for the actual computational implementation. Besides POSIX, as explained further below, FeenoX also uses MPI which is a well-known industry standard for massive parallel executions of processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
+FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture of more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy for the actual computational implementation. Besides POSIX, as explained further below in @sec:scalability, FeenoX also uses MPI which is a well-known industry standard for massive execution of parallel processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
 
 The requirement to run in the cloud and scale up as needed rules out some the open source solver [CalculiX](http://www.calculix.de/). There are some other requirements in the SRS that also leave CalculiX out of the tender.
 
@@ -51,7 +51,7 @@ Indeed, FeenoX is designed to work very much like a transfer function between on
 transfer.md
 ```
 
-Technically speaking, FeenoX can be seen as a UNIX filter designed to read an ASCII-based stream of characters (i.e. the input file, which in turn can include other input files or read data from mesh and/or data files) and to write ASCII-formatted data into the standard output and/or other files. The input file can be created either by a human or by another programs. The output stream and/or files can be read by either a human and/or another programs.
+Technically speaking, FeenoX can be seen as a UNIX filter designed to read an ASCII-based stream of characters (i.e. the input file, which in turn can include other input files or contain instructions to read data from mesh and/or other data files) and to write ASCII-formatted data into the standard output and/or other files. The input file can be created either by a human or by another program. The output stream and/or files can be read by either a human and/or another programs.
 A quotation from [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/) helps to illustrate this idea:
 
 > [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy), the inventor of [Unix pipes](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29) and one of the founders of the [Unix tradition](https://en.wikipedia.org/wiki/Unix), had this to say at the time:
@@ -67,21 +67,26 @@ A quotation from [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix P
 >   * This is the Unix philosophy: Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface.
 
 
-Keep in mind that even though the quotes above and many FEA programs that are still mainstream today date both from the early 1970s, fifty years later they still
+Keep in mind that even though 
 
- * Do not make just only one thing well.
- * Do complicate old programs by adding new features.
- * Do not expect the their output to become the input to another.
- * Do clutter output with extraneous information.
- * Do use stringently columnar and/or binary input (and output!) formats.
- * Do insist on interactive output.
+ i. the quotes above, and
+ ii. many FEA programs that are still mainstream today
+ 
+date both from the early 1970s, fifty years later they still
+
+ * do not make just only one thing well,
+ * do complicate old programs by adding new features,
+ * do not expect the their output to become the input to another,
+ * do clutter output with extraneous information,
+ * do use stringently columnar and/or binary input (and output!) formats, and/or
+ * do insist on interactive output.
 
 
 ```include
 lorenz.md
 ```
 
-As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the rule of _separation_ that essentially implies to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of gnuplot to plot is a clear example of separation.
+As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the rule of _separation_ that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to PDEs, where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows the UNIX rule of separation.
 Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 
 From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user. Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based immersive augmented-reality application) without needing the modify the backend. Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
@@ -551,7 +556,7 @@ Of course most engineering problems will not need explicit integrals (a few of t
 
 Flexibility in defining non-trivial material properties is illustrated with the following example, where two non- squares made of different dimensional materials are juxtaposed in thermal contact and subject to different boundary conditions at each of the fours sides (@fig:two-squares-mesh).
 
-![Two squares in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width=75%}
+![Two non-dimensional $1 \times 1$ squares each in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width=75%}
 
 The yellow square is made of a certain material with a conductivity that depends algebraically on the temperature like
 
@@ -559,9 +564,9 @@ $$
 k_\text{yellow}(x,y) = \frac{1}{2} + T(x,y)
 $$
 
-The cyan square has a space-dependent temperature given by a table of scattered data without any particular topology:
+The cyan square has a space-dependent temperature given by a table of scattered data as a function of the spatial coordinates\ $x$ and\ $y$ (origin is left bottom corner of the yellow square) without any particular structure on the definition points:
 
-| $x$ | $y$ | $k_\text{cyan}$ |
+| $x$ | $y$ | $k_\text{cyan}(x,y)$ |
 |:---:|:---:|:---------------:|
 |  1  |  0  |      1.0        |
 |  1  |  1  |      1.5        |
@@ -569,7 +574,7 @@ The cyan square has a space-dependent temperature given by a table of scattered 
 |  2  |  1  |      1.8        |
 | 1.5 | 0.5 |      1.7        |
 
-The cyan square generates a temperature-dependent power density given by
+The cyan square generates a temperature-dependent power density (per unit area) given by
 
 $$
 q^{\prime \prime}_\text{cyan}(x,y) = 0.2 \cdot T(x,y)
@@ -579,14 +584,14 @@ The yellow one does not generate any power so $q^{\prime \prime}_\text{yellow} =
 
 $$
 \begin{cases}
-T(x,y) = y & \text{at the left edge} \\
-T(x,y) = 1-\cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge} \\
-q'(x,y) = 2-y & \text{at the right edge} \\
-q'(x,y) = 1 & \text{at the top edge} \\
+T(x,y) = y & \text{at the left edge $y=0$} \\
+T(x,y) = 1-\cos\left(\frac{1}{2}\pi \cdot x\right) & \text{at the bottom edge $x=0$} \\
+q'(x,y) = 2-y & \text{at the right edge $x=2$} \\
+q'(x,y) = 1 & \text{at the top edge $y=1$} \\
 \end{cases}
 $$
 
-The input file illustrate how flexible FeenoX and, again, how much the problem definition in a format that the computer can understand resemble the humanly-written formulation of the engineering problem:
+The input file illustrate how flexible FeenoX is and, again, how the problem definition in a format that the computer can understand resembles the humanly-written formulation of the original engineering problem:
 
 ```{.feenox include="two-squares.fee"}
 ```
@@ -594,26 +599,53 @@ The input file illustrate how flexible FeenoX and, again, how much the problem d
 Note that FeenoX is flexible enough to...
 
  1. handle mixed meshes (the yellow square is meshed with triangles and the other one with quadrangles) 
- 2. use point-wise defined properties even though there is not underlying structure nor topology for the points where the data is defined
- 3. understand that the problem is non-linear so it uses PETSc’s SNES framework automatically (the conductivity and power source depend on the temperature).
+ 2. use point-wise defined properties even though there is not underlying structure nor topology for the points where the data is defined (FeenoX could have read data from a `.msh` or `.vtk` file respecting the underlying topology)
+ 3. understand that the problem is non-linear so as to use PETSc’s SNES framework automatically (the conductivity and power source depend on the temperature).
 
  
 ::: {#fig:two-squares-results}
-![Temperature](two-squares-temperature.png){width=75%}
+![Temperature defined at nodes](two-squares-temperature.png){width=75%}
 
-![Conductivity](two-squares-conductivity.png){width=75%}
+![Conductivity defined at cells](two-squares-conductivity.png){width=75%}
 
 Temperature (main result) and conductivity for the two-squares thermal problem.
 :::
 
+In the very same sense that variables `x`, `y` and `z` appearing in the input refer to the spatial coordinates\ $x$, $y$ and\ $z$ respectively, the special variable `t` refers to the time\ $t$. The requirement of allowing time-dependent boundary conditions can be illustrated by solving the NAFEMS\ T3 one-dimensional transient heat transfer benchmark. It consists of a slab of\ 0.1\ meters long subject to a fixed homogeneous temperature on one side, i.e.
 
+$$T(x=0)=0~\text{°C}$$
 
+and to a transient temperature
+
+$$
+T(x=0.1~\text{m},t)=100~\text{°C} \cdot \sin\left( \frac{\pi \cdot t}{40~\text{s}}\right)
+$$
+
+at the other side. There is zero internal heat generation, at $t=0$ all temperature is equal to 0°C (sic) and conductivity, specific heat and density are constant and uniform. The problem asks for the temperature at location\ $x=0.08~\text{m}$ at time\ $t=32~\text{s}$. The reference result is $T(0.08~\text{m},32~\text{s})=36.60~\text{°C}$.
+
+```{.feenox include="nafems-t3.fee"}
+```
+
+```terminal
+$ gmsh -1 slab-0.1m.geo 
+[...]
+Info    : Done meshing 1D (Wall 0.000213023s, CPU 0.000836s)
+Info    : 61 nodes 62 elements
+Info    : Writing 'slab-0.1m.msh'...
+Info    : Done writing 'slab-0.1m.msh'
+Info    : Stopped on Sun Dec 12 19:41:18 2021 (From start: Wall 0.00293443s, CPU 0.02605s)
+$ feenox nafems-t3.fee 
+T(0.08m,32s) = 	36.5996	ºC
+$ pyxplot nafems-t3.ppl
+$
+```
+
+![Temperature vs. time at three axial locations for the NAFEMS\ T3 benchmark](nafems-t3.pdf)
 
 **simple problems ought to have simple inputs**
 
+thermal slabs - shared with examples
 
- * 1d & 2d interpolated data for functions
- * thermal transient valve with k(T) and BCs(x,t)
 
 ## Extensibility {#sec:extensibility}
 

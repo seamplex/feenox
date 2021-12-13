@@ -1,0 +1,24 @@
+PROBLEM heat DIM 1 # NAFEMS-T3 benchmark: 1d transient heat conduction
+READ_MESH slab-0.1m.msh
+
+end_time = 32      # transient up to 32 seconds
+T_0(x) = 0         # initial condition "all temperature is equal to 0°C"
+
+# prescribed temperatures as boundary conditions
+BC left  T=0       
+BC right T=100*sin(pi*t/40)
+
+# uniform and constant properties
+k = 35.0           # conductivity [W/(m K)]
+cp = 440.5         # heat capacity [J/(kg K)]
+rho = 7200         # density [kg/m^3]
+
+SOLVE_PROBLEM
+
+# print detailed evolution into an ASCII file 
+PRINT FILE nafems-t3.dat %.3f t dt %.2f T(0.05) T(0.08) T(0.1) 
+
+# print the asked result into the standard output
+IF done
+ PRINT "T(0.08m,32s) = " T(0.08) "ºC"
+ENDIF
