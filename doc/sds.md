@@ -640,7 +640,7 @@ $ pyxplot nafems-t3.ppl
 $
 ```
 
-![Temperature vs. time at three axial locations for the NAFEMS\ T3 benchmark](nafems-t3.pdf)
+![Temperature vs. time at three axial locations for the NAFEMS\ T3 benchmark](nafems-t3.svg)
 
 **simple problems ought to have simple inputs**
 
