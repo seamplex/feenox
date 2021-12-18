@@ -1,0 +1,6 @@
+PROBLEM thermal 1d
+READ_MESH slab.msh
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT T(0.5)

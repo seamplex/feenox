@@ -17,6 +17,7 @@ In other words, FeenoX is a computational tool to solve
 in such a way that the input is a near-English text file that defines the problem to be solved.
 
 
+One of the main features of this allegedly particular design basis is that **simple problems ought to have simple inputs** (_rule of simplicity_) or, quoting Alan Kay, “simple things should be simple, complex things should be possible.”
 
 ```include
 thermal1d.md

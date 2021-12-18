@@ -1,4 +1,3 @@
-One of the main features of this allegedly particular design basis is that **simple problems ought to have simple inputs** (_rule of simplicity_) or, quoting Alan Kay, “simple things should be simple, complex things should be possible.”
 For instance, to solve one-dimensional heat conduction over the domain $x\in[0,1]$ (which is indeed one of the most simple engineering problems we can find) the following input file is enough:
 
 ```{.feenox include="thermal-1d-dirichlet-constant-k.fee"}
@@ -23,7 +22,7 @@ $ feenox thermal-1d-dirichlet-space-k.fee
 $
 ```
 
-FeenoX has an **everything is an expression** design principle, meaning that any numerical input can be an algebraic expression (e.g. `T(1/2)` is the same as `T(0.5)`). If we want to have a temperature-dependent conductivity (which renders the problem non-linear) we can take advantage of the fact that $T(x)$ is available not only as an argument to `PRINT` but also for the definition of algebraic functions:
+The other main decision in FeenoX design is an **everything is an expression** design principle, meaning that any numerical input can be an algebraic expression (e.g. `T(1/2)` is the same as `T(0.5)`). If we want to have a temperature-dependent conductivity (which renders the problem non-linear) we can take advantage of the fact that $T(x)$ is available not only as an argument to `PRINT` but also for the definition of algebraic functions:
 
 ```{.feenox include="thermal-1d-dirichlet-temperature-k.fee"}
 ```

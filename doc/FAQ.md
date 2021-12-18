@@ -96,7 +96,7 @@ Because I am not insane (yet).
 
 If you actually asked this, then FeenoX is not for you.
 
-## Go, Python or Julia?
+## Go, Rust or Julia?
 
 I don't know either of them nor if any of these languages would be a good fit for FeenoX.
 Keep in mind that it took me a while to know why not Fortran nor C++ even though there are people that would choose them over C.

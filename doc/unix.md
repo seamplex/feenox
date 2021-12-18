@@ -55,6 +55,7 @@
 > Developers should design for visibility and discoverability by writing in a way that their thought process can lucidly be seen by future developers working on the project and using input and output formats that make it easy to identify valid input and correct output. This rule aims to reduce debugging time and extend the lifespan of programs.
 
  * Written in C99
+ * Makes use of structures and function pointers to give the same functionality as C++’s virtual methods without needing to introduce other complexities that make the code base harder to maintain and to debug.
 
 
 # Rule of Robustness
@@ -88,14 +89,23 @@
 
 > Developers should design programs so that they do not print unnecessary output. This rule aims to allow other programs and developers to pick out the information they need from a program's output without having to parse verbosity.
 
- * No `PRINT` no output.
+ * No `PRINT` (or `WRITE_MESH`), no output.
 
 
 # Rule of Repair
 
 > Developers should design programs that fail in a manner that is easy to localize and diagnose or in other words “fail noisily”. This rule aims to prevent incorrect output from a program from becoming an input and corrupting the output of other code undetected.
 
-Input errors are detected before the computation is started and run-time errors (i.e. a division by zero) con be user controled, they can be fatal or ignored.
+ * Input errors are detected before the computation is started:
+ 
+   ```terminal
+   $ feenox thermal-error.fee 
+   error: undefined thermal conductivity 'k'
+   $ 
+   ```
+
+ 
+ * Run-time errors can be user controled, they can be fatal or ignored.
 
 
 # Rule of Economy
@@ -109,7 +119,7 @@ Input errors are detected before the computation is started and run-time errors 
 
 > Developers should avoid writing code by hand and instead write abstract high-level programs that generate code. This rule aims to reduce human errors and save time.
 
- * Inputs are M4-friendly.
+ * Inputs are M4-like-macro friendly.
  * Parametric runs can be done from scripts through command line arguments expansion.
  * Documentation is created out of simple Markdown sources and assembled as needed.
 

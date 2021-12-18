@@ -519,7 +519,7 @@ Hence, FeenoX uses MPI (mainly through PETSc and SLEPc) to handle large parallel
 Partition of the 2D NAFEMS LE1 domain into four different sub-domains computed in Gmsh using Metis.
 :::
 
-Most of the overhead of parallelized tasks come from the fact that one process need data stored in another process.
+Most of the overhead of parallelized tasks come from the fact that processes need data stored in other processes that use another memory address space.
 Therefore, the discretized domain has to be split among processes in such a way as to minimize the number of inter-process communication. This problem, called domain decomposition, can be handled either by the mesher or by the solver itself, usually using a third-part library such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview). It should be noted that the domain decomposition problem does not have a unique solution. On the one hand, it depends on the actual mesh being distributed over parallel processes as illustrated in @fig:nafems-le1-metis. On the other hand, the optimal solution might depend on the kind of topology boundaries to minimize (shared nodes, shared faces) and other subtle options that partitioning libraries allow.
 
 FeenoX relies on Gmsh to perform the domain decomposition (using Metis) and to provide the partitioning information in the mesh file read by the `READ_MESH` keyword.
@@ -556,7 +556,7 @@ Of course most engineering problems will not need explicit integrals (a few of t
 
 Flexibility in defining non-trivial material properties is illustrated with the following example, where two non- squares made of different dimensional materials are juxtaposed in thermal contact and subject to different boundary conditions at each of the fours sides (@fig:two-squares-mesh).
 
-![Two non-dimensional $1 \times 1$ squares each in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width=75%}
+![Two non-dimensional $1 \times 1$ squares each in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width_latex=75% width_html=100%}
 
 The yellow square is made of a certain material with a conductivity that depends algebraically on the temperature like
 
@@ -604,9 +604,9 @@ Note that FeenoX is flexible enough to...
 
  
 ::: {#fig:two-squares-results}
-![Temperature defined at nodes](two-squares-temperature.png){width=75%}
+![Temperature defined at nodes](two-squares-temperature.png){width_latex=75%  width_html=100%}
 
-![Conductivity defined at cells](two-squares-conductivity.png){width=75%}
+![Conductivity defined at cells](two-squares-conductivity.png){width_latex=75%  width_html=100%}
 
 Temperature (main result) and conductivity for the two-squares thermal problem.
 :::
@@ -640,11 +640,10 @@ $ pyxplot nafems-t3.ppl
 $
 ```
 
-![Temperature vs. time at three axial locations for the NAFEMS\ T3 benchmark](nafems-t3.svg)
+![Temperature vs. time at three axial locations for the NAFEMS\ T3 benchmark](nafems-t3.svg){#fig:nafems-t3 width=100%}
 
-**simple problems ought to have simple inputs**
 
-thermal slabs - shared with examples
+Besides “everything is an expression,” FeenoX follows another cornerstone rule: **simple problems ought to have simple inputs**, akin to UNIX’ _rule of simplicity_---that addresses the first half of Alan Kay’s quote above. This rule is further discussed in @sec:input.
 
 
 ## Extensibility {#sec:extensibility}
@@ -654,15 +653,53 @@ thermal slabs - shared with examples
 > 260-extensibility.md
 > ```
 
- * user-provided routines
- * skel for pdes and annotated models
- * laplace skel
+Even though FeenoX is written in C, it makes extensive use of function pointers to mimic C++’s virtual methods. This way, depending on the problem type given with the `PROBLEM` keyword, particular routines are called to
 
+ 1. initialize and set up solver options (steady-state/transient, linear/non-linear, regular/eigenproblem, etc.)
+ 2. parse boundary conditions given in the `BC` keyword
+ 3. build elemental contributions for
+     a. volumetric stiffness and/or mass matrices
+     b. natural boundary conditions
+ 4. compute secondary fields (heat fluxes, strains and stresses, etc.) out of the gradients of the primary fields
+ 5. compute per-problem key performance indicators (min/max temperature, displacement, stress, etc.)
+ 6. write particular post-processing outputs
+ 
+Indeed, each of the supported problems, namely
+
+ * [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)
+ * [`thermal`](https://github.com/seamplex/feenox/tree/main/src/pdes/thermal)
+ * [`mechanical`](https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical)
+ * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
+ * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
+
+is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods that are resolved at runtime when parsing the main input file. Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`).
+
+As already discussed in @sec:introduction, FeenoX is free-as-in-freedom software licensed under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version.
+In the particular case of additional problem types, this fact has two implications.
+
+ i. Every person in the world is free to modify FeenoX to suit their needs, including adding a new problem type either using one of the existing ones as a template or by creating a new directory from scratch, without asking anybody of any kind of permission. In case this person does not how to program, he or she has the freedom to hire somebody else to do it. This is the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
+ 
+ ii. The authors own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it under also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, the authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free.
+ 
+
+Regarding additional material models, the virtual methods that compute the elemental contributions to the stiffness matrix also use function pointers to different material models (linear isotropic elastic, orthotropic, etc.) that are resolved at run time. Following the same principle, new models might be added by adding new routines and resolving them depending on the user’s input.
+
+ 
 ## Interoperability {#sec:interoperability}
  
 > ```include
 > 270-interoperatibility.md
 > ```
+
+@Sec:scope already introduced the ideas about interoperability behind the UNIX philosophy (@sec:unix) which make up for most the the FeenoX design basis. Essentially, they sum up to “do only one thing but do it well.” Since FeenoX is  filter (or a transfer-function), interoperability is a must. So far, this SDS has already shown examples of exchanging information with
+
+ * Kate (with syntax highlighting)
+ * Gmsh (both as a mesher and a post-processor)
+ * Paraview
+ * Gnuplot
+ * Pyxplot
+ 
+ 
 
  * UNIX
  * POSIX

@@ -27,12 +27,14 @@ The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) d
 
 The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
 
- * [Software Requirements specifications in PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (RFQ)
- * [Software Design specifications in PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (FeenoX' offer)
+ * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
+ * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX' offer)
  * [Mid-term PhD review presentation slides with the SRS/SDS explanation in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
- * [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
- * Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
-
+   - [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
+   - Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
+ * [A free and open source computational tool for solving (nuclear-related) differential equations in the cloud](https://www.seamplex.com/feenox/doc/2021-brasil.pdf) (INAC/ENFIR Congress, December 2021).
+   - Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-brasil)
+   
 ## Frequently Asked Questions
 
  * [Frequently Asked Questions](./FAQ.md)
@@ -58,7 +60,8 @@ Annotated examples can be found in the [examples](../examples) directory. These 
  * [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
  * [Markdown examples sources](https://github.com/gtheler/2021-presentation)
  
-
+Make sure you also browse the [tests](https://github.com/seamplex/feenox/tree/main/tests) directory of the Git repository and the [Software Design specifications](./sds.md) document.
+ 
 ## Tutorials
 
 Step-by-step instructions and explanations to solve increasingly-complex problems are given in the [tutorials](../tutorials) directory.
