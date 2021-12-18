@@ -201,17 +201,16 @@ enum version_type {
 };
 
 // macro to check error returns in function calls
-#define feenox_call(function)        if ((function) != FEENOX_OK) return FEENOX_ERROR
-#define feenox_call_null(function)   if ((function) != FEENOX_OK) return NULL
-#define feenox_check_null(function)  if ((function) == NULL) return FEENOX_ERROR
+#define feenox_call(function)           if (__builtin_expect((function), FEENOX_OK) != FEENOX_OK) return FEENOX_ERROR
+#define feenox_call_null(function)      if (__builtin_expect((function), FEENOX_OK) != FEENOX_OK) return NULL
+#define feenox_check_null(function)     if ((function) == NULL) return FEENOX_ERROR
 #ifdef HAVE_SUNDIALS
- #define ida_call(function)          if ((err = function) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
+ #define ida_call(function)             if ((err = __builtin_expect(!!(function), FEENOX_OK)) < 0) { feenox_push_error_message("IDA returned error %d", err); return FEENOX_ERROR; }
 #endif
 
 #ifdef HAVE_PETSC
-// #define petsc_call(function)        {PetscErrorCode petsc_err = s; if (petsc_err) { feenox_push_error_message("PETSc error"); CHKERRQ(petsc_err); }
- #define petsc_call(function)        if ((function) != 0) { feenox_push_error_message("PETSc error"); CHKERRQ(1); }
- #define petsc_call_null(function)   if ((function) != 0) { feenox_push_error_message("PETSc error"); return NULL; }
+ #define petsc_call(function)           if (__builtin_expect((function), 0)) { feenox_push_error_message("PETSc error"); CHKERRQ(1); }
+ #define petsc_call_null(function)      if (__builtin_expect((function), 0)) { feenox_push_error_message("PETSc error"); return NULL; }
 
 #endif
 

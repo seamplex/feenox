@@ -128,7 +128,7 @@ int feenox_problem_init_parser_general(void) {
   
   // get the number of processes and the rank
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.n_procs));
-  petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.rank));
+  petsc_call(MPI_Comm_rank(PETSC_COMM_WORLD, &feenox.rank));
 
   // segfaults are segfaults, try to leave PETSC out of them
   signal(SIGSEGV, SIG_DFL);
