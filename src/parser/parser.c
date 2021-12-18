@@ -1725,8 +1725,8 @@ int feenox_parse_print(void) {
       
 ///kw+PRINT+usage @
 // see the objects above
-      print_token_t *print_token = calloc(1, sizeof(print_token_t));
-      LL_APPEND(print->tokens, print_token);
+      print_token_t *print_token = NULL;
+      feenox_check_alloc(print_token = calloc(1, sizeof(print_token_t)));
 
       matrix_t *matrix = NULL;
       vector_t *vector = NULL;
@@ -1763,6 +1763,9 @@ int feenox_parse_print(void) {
           feenox_check_alloc(print_token->text = strdup(token));   // text for the header
         }
       }
+      
+      LL_APPEND(print->tokens, print_token);      
+      
     }
   }
 
@@ -1993,20 +1996,25 @@ int feenox_parse_print_vector(void) {
 //      print_vector->header = 1;
           
 ///kw+PRINT_VECTOR+usage @
-///kw+PRINT_VECTOR+usage [ FORMAT <print_format> ]
-    } else if (strcasecmp(token, "FORMAT") == 0) {
-      // TODO: like in PRINT  
-      if (feenox_parser_string(&print_vector->format) != FEENOX_OK) {
+///kw+PRINT_VECTOR+usage [ SEP <string> ]
+///kw+PRINT_VECTOR+detail The `SEP` keyword expects a string used to separate printed objects.
+///kw+PRINT_VECTOR+detail To print objects without any separation in between give an empty string like `SEP ""`.
+///kw+PRINT_VECTOR+detail The default is a tabulator character 'DEFAULT_PRINT_SEPARATOR' character. 
+    } else if (strcasecmp(token, "SEP") == 0) {
+      if (feenox_parser_string(&print_vector->separator) != FEENOX_OK) {
           return FEENOX_ERROR;
       }
 
     } else {
 
       // agregamos un eslabon a la lista de tokens
-      print_token_t *print_token = calloc(1, sizeof(print_token_t));
-      LL_APPEND(print_vector->tokens, print_token);
+      print_token_t *print_token;
+      feenox_check_alloc(print_token = calloc(1, sizeof(print_token_t)));
 
-      if ((print_token->vector = feenox_get_vector_ptr(token)) != NULL) {
+      if (token[0] == '%') {
+        feenox_check_alloc(print_token->format = strdup(token));
+      
+      } else if ((print_token->vector = feenox_get_vector_ptr(token)) != NULL) {
        if (print_vector->first_vector == NULL) {
          // es el primer vector
          print_vector->first_vector = print_token->vector;
@@ -2016,14 +2024,13 @@ int feenox_parse_print_vector(void) {
         feenox_call(feenox_expression_parse(&print_token->expression, token));
             
       }
+      
+      LL_APPEND(print_vector->tokens, print_token);
+      
     }
   }
 
-  // llenamos defaults
-  if (print_vector->format == NULL) {
-    feenox_check_alloc(print_vector->format = strdup(DEFAULT_PRINT_FORMAT));
-  }
-
+  // fill in the defaults
   if (print_vector->separator == NULL) {
     print_vector->separator = strdup(DEFAULT_PRINT_SEPARATOR);
   }

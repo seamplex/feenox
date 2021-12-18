@@ -416,6 +416,12 @@ int feenox_instruction_print_vector(void *arg) {
     feenox_call(feenox_vector_init(print_vector->first_vector, 0));
   }
   
+  char default_print_format[] = DEFAULT_PRINT_FORMAT;
+  char *current_format = (print_vector->tokens != NULL) ? print_vector->tokens->format : NULL;
+  if (print_vector->tokens == NULL || print_vector->tokens->format == NULL) {
+    current_format = default_print_format;
+  }
+  
   if ((n_elems_per_line = (int)feenox_expression_eval(&print_vector->elems_per_line)) || print_vector->horizontal) {
 
     LL_FOREACH(print_vector->tokens, print_token) {
@@ -433,20 +439,25 @@ int feenox_instruction_print_vector(void *arg) {
       for (k = 0; k < print_vector->first_vector->size; k++) {
         
         if (print_token->vector != NULL) {
-          fprintf(print_vector->file->pointer, print_vector->format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));
+          fprintf(print_vector->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));
 
         } else if (print_token->expression.items != NULL) {
           feenox_var_value(feenox.special_vars.i) = k+1;
-          fprintf(print_vector->file->pointer, print_vector->format, feenox_expression_eval(&print_token->expression));
+          fprintf(print_vector->file->pointer, current_format, feenox_expression_eval(&print_token->expression));
+         
+        } else if (print_token->format != NULL) {
+          current_format = print_token->format;
           
         }
 
-        if (++j == n_elems_per_line) {
-          j = 0;
-          fprintf(print_vector->file->pointer, "\n");
-        } else {
-          fprintf(print_vector->file->pointer, "%s", print_vector->separator);
-        }
+        if (print_token->format == NULL) {
+          if (++j == n_elems_per_line) {
+            j = 0;
+            fprintf(print_vector->file->pointer, "\n");
+          } else {
+            fprintf(print_vector->file->pointer, "%s", print_vector->separator);
+          }
+        }  
       }
       fprintf(print_vector->file->pointer, "\n");
     }
@@ -466,19 +477,23 @@ int feenox_instruction_print_vector(void *arg) {
             return FEENOX_ERROR;
           }
           
-          fprintf(print_vector->file->pointer, print_vector->format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));
+          fprintf(print_vector->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));
 
         } else if (print_token->expression.items != NULL) {
           feenox_var_value(feenox.special_vars.i) = k+1;
-          fprintf(print_vector->file->pointer, print_vector->format, feenox_expression_eval(&print_token->expression));
+          fprintf(print_vector->file->pointer, current_format, feenox_expression_eval(&print_token->expression));
           
+        } else if (print_token->format != NULL) {
+          current_format = print_token->format;
         }
 
-        if (print_token->next != NULL) {
-          fprintf(print_vector->file->pointer, "%s", print_vector->separator);
-        } else {
-          fprintf(print_vector->file->pointer, "\n");
-        }
+        if (print_token->format == NULL) {
+          if (print_token->next != NULL) {
+            fprintf(print_vector->file->pointer, "%s", print_vector->separator);
+          } else {
+            fprintf(print_vector->file->pointer, "\n");
+          }
+        }  
       }
     }
   }

@@ -811,9 +811,7 @@ struct print_vector_t {
   // de argumentos), no es igual a first_token->function porque esa puede ser NULL
   vector_t *first_vector;
   
-  // formato de los numeritos "%e" 
-  char *format;
-  // separador de cosas "\t" 
+  // stuff separator (default is tab)
   char *separator;
   
   int horizontal;
