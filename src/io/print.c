@@ -416,11 +416,7 @@ int feenox_instruction_print_vector(void *arg) {
     feenox_call(feenox_vector_init(print_vector->first_vector, 0));
   }
   
-  char default_print_format[] = DEFAULT_PRINT_FORMAT;
-  char *current_format = (print_vector->tokens != NULL) ? print_vector->tokens->format : NULL;
-  if (print_vector->tokens == NULL || print_vector->tokens->format == NULL) {
-    current_format = default_print_format;
-  }
+  char *current_format = feenox_print_vector_current_format_reset(print_vector);
   
   if ((n_elems_per_line = (int)feenox_expression_eval(&print_vector->elems_per_line)) || print_vector->horizontal) {
 
@@ -460,6 +456,7 @@ int feenox_instruction_print_vector(void *arg) {
         }  
       }
       fprintf(print_vector->file->pointer, "\n");
+      current_format = feenox_print_vector_current_format_reset(print_vector);
     }
 
   } else {
@@ -492,6 +489,7 @@ int feenox_instruction_print_vector(void *arg) {
             fprintf(print_vector->file->pointer, "%s", print_vector->separator);
           } else {
             fprintf(print_vector->file->pointer, "\n");
+            current_format = feenox_print_vector_current_format_reset(print_vector);
           }
         }  
       }
@@ -504,41 +502,14 @@ int feenox_instruction_print_vector(void *arg) {
 
 }
 
-/*
-int feenox_instruction_print_matrix(void *arg) {
-  print_matrix_t *print_matrix = (print_matrix_t *)arg;
-
-
-  int j, k;
-
-  int have_to_print = 1;
-
-  if (have_to_print) {
-
-    if (print_matrix->file->pointer == NULL) {
-      feenox_instruction_open_file(print_matrix->file);
-    }
-
-    for (k = 0; k < print_matrix->matrix->rows; k++) {
-      for (j = 0; j < print_matrix->matrix->cols; j++) {
-
-//        if (print_matrix->matrix->is_crisp == 0) {
-//          fprintf(print_matrix->file->pointer, print_matrix->format, print_matrix->matrix->element[k][j]->current[0]);
-//        } else {
-          fprintf(print_matrix->file->pointer, print_matrix->format, gsl_matrix_get(print_matrix->matrix->current, k, j));
-//        }
-        fprintf(print_matrix->file->pointer, "%s", print_matrix->separator);
-      }
-      fprintf(print_matrix->file->pointer, "\n");
-    }
+char *feenox_print_vector_current_format_reset(print_vector_t *this) {
+  char *current_format = (this->tokens != NULL) ? this->tokens->format : NULL;
+  if (this->tokens == NULL || this->tokens->format == NULL) {
+    current_format = DEFAULT_PRINT_FORMAT;
   }
-
-  fflush(print_matrix->file->pointer);
   
-  return 0;
-
+  return current_format;
 }
-*/
 
 
 int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file) {

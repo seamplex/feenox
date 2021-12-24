@@ -165,6 +165,11 @@ double feenox_physical_group_compute_volume(physical_group_t *this, mesh_t *mesh
       }
     }
   }
+  
+  for (size_t m = 0; m < 3; m++) {
+    this->cog[m] /= this->volume;
+  }
+  
 
   if (this->var_volume != NULL) {
     feenox_var_value(this->var_volume) = this->volume;

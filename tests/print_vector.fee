@@ -1,0 +1,18 @@
+VECTOR x[3]
+VECTOR y[3]
+VECTOR z[3]
+VECTOR large[12]
+
+x[i] = 1/1
+y[i] = 1/i
+z[i] = 1/i^2
+large[i] = i
+
+PRINT %.1f x %.2f y %.3f z
+PRINT %.6f SEP "," x
+PRINT %.5f SEP " " y
+PRINT %.4f SEP "X" z
+
+PRINT_VECTOR SEP "\t|\t" %.1f x  %.2f y %.3f z
+# TODO: elems_per_line
+# PRINT_VECTOR large 

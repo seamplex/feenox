@@ -111,10 +111,11 @@ the problem to be solved.
 One of the main features of this allegedly particular design basis is
 that simple problems ought to have simple inputs (rule of simplicity)
 or, quoting Alan Kay, “simple things should be simple, complex things
-should be possible.” For instance, to solve one-dimensional heat
-conduction over the domain x ∈ [0,1] (which is indeed one of the most
-simple engineering problems we can find) the following input file is
-enough:
+should be possible.”
+
+For instance, to solve one-dimensional heat conduction over the domain
+x ∈ [0,1] (which is indeed one of the most simple engineering problems
+we can find) the following input file is enough:
 
     PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
     READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
@@ -155,12 +156,13 @@ input above: instead of defining a scalar k we define a function of x
     0.584959	0.584963
     $
 
-FeenoX has an everything is an expression design principle, meaning that
-any numerical input can be an algebraic expression (e.g. T(1/2) is the
-same as T(0.5)). If we want to have a temperature-dependent conductivity
-(which renders the problem non-linear) we can take advantage of the fact
-that T(x) is available not only as an argument to PRINT but also for the
-definition of algebraic functions:
+The other main decision in FeenoX design is an everything is an
+expression design principle, meaning that any numerical input can be an
+algebraic expression (e.g. T(1/2) is the same as T(0.5)). If we want to
+have a temperature-dependent conductivity (which renders the problem
+non-linear) we can take advantage of the fact that T(x) is available not
+only as an argument to PRINT but also for the definition of algebraic
+functions:
 
     PROBLEM thermal DIMENSIONS 1
     READ_MESH slab.msh

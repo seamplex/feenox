@@ -2018,6 +2018,7 @@ extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z
 extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_print_function(void *arg);
 extern int feenox_instruction_print_vector(void *arg);
+extern char *feenox_print_vector_current_format_reset(print_vector_t *this);
 extern int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file);
 extern int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file);
 

@@ -113,10 +113,11 @@ the problem to be solved.
 One of the main features of this allegedly particular design basis is
 that **simple problems ought to have simple inputs** (*rule of
 simplicity*) or, quoting Alan Kay, “simple things should be simple,
-complex things should be possible.” For instance, to solve
-one-dimensional heat conduction over the domain *x* ∈ \[0,1\] (which is
-indeed one of the most simple engineering problems we can find) the
-following input file is enough:
+complex things should be possible.”
+
+For instance, to solve one-dimensional heat conduction over the domain
+*x* ∈ \[0,1\] (which is indeed one of the most simple engineering
+problems we can find) the following input file is enough:
 
 ``` feenox
 PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
@@ -167,12 +168,13 @@ $ feenox thermal-1d-dirichlet-space-k.fee
 $
 ```
 
-FeenoX has an **everything is an expression** design principle, meaning
-that any numerical input can be an algebraic expression (e.g. `T(1/2)`
-is the same as `T(0.5)`). If we want to have a temperature-dependent
-conductivity (which renders the problem non-linear) we can take
-advantage of the fact that *T*(*x*) is available not only as an argument
-to `PRINT` but also for the definition of algebraic functions:
+The other main decision in FeenoX design is an **everything is an
+expression** design principle, meaning that any numerical input can be
+an algebraic expression (e.g. `T(1/2)` is the same as `T(0.5)`). If we
+want to have a temperature-dependent conductivity (which renders the
+problem non-linear) we can take advantage of the fact that *T*(*x*) is
+available not only as an argument to `PRINT` but also for the definition
+of algebraic functions:
 
 ``` feenox
 PROBLEM thermal DIMENSIONS 1
@@ -241,7 +243,7 @@ PRINT t x y z        # four-column plain-ASCII output
 ```
 
 <figure>
-<img src="doc/lorenz.svg" data-width_latex="75%" data-width_html="100%" data-width_texinfo="12cm" alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" /><figcaption aria-hidden="true">The Lorenz attractor solved with FeenoX and drawn with Gnuplot</figcaption>
+<img src="doc/lorenz.svg" id="fig:lorenz-gnuplot" data-width_latex="75%" data-width_html="100%" data-width_texinfo="12cm" alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" /><figcaption aria-hidden="true">The Lorenz attractor solved with FeenoX and drawn with Gnuplot</figcaption>
 </figure>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
@@ -299,11 +301,11 @@ isotropic, a single global scalar for *E* and a global single scalar
 for *ν* are enough.
 
 <figure>
-<img src="doc/nafems-le10-problem-input.svg" data-width_html="100%" data-width_latex="100%" data-width_texinfo="15cm" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
+<img src="doc/nafems-le10-problem-input.svg" id="fig:nafems-le10-problem-input" data-width_html="100%" data-width_latex="100%" data-width_texinfo="15cm" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
 </figure>
 
 <figure>
-<img src="doc/nafems-le10.png" data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
+<img src="doc/nafems-le10.png" id="fig:nafems-le10-sigmay" data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
 </figure>
 
 For the sake of visual completeness, post-processing data with the

@@ -35,11 +35,20 @@ int feenox_instruction_reaction(void *arg) {
   unsigned int g = 0;
   Vec arm[] = {NULL, NULL, NULL};
   double x0[] = {0, 0, 0};
-  PetscInt *node = NULL;
+  PetscInt *node_index = NULL;
   if (reaction->order == 1) {
-    feenox_check_alloc(node = calloc(feenox.pde.size_local, sizeof(PetscInt)));
+    feenox_check_alloc(node_index = calloc(feenox.pde.size_local, sizeof(PetscInt)));
     for (g = 0; g < feenox.pde.dofs; g++) {
-      x0[g] = (reaction->x0[g].items != NULL) ? feenox_expression_eval(&reaction->x0[g]) : reaction->physical_group->cog[g];
+      if (reaction->x0[g].items != NULL) {
+        // if an explcit coordinate was given, use it
+        x0[g] = feenox_expression_eval(&reaction->x0[g]);
+      } else {
+        // use the COG
+        if (reaction->physical_group->volume == 0) {
+          feenox_physical_group_compute_volume(reaction->physical_group, feenox.pde.mesh);
+        }
+        x0[g] = reaction->physical_group->cog[g];
+      }
       petsc_call(MatCreateVecs(feenox.pde.K, PETSC_NULL, &arm[g]));
     }
   }
@@ -67,7 +76,7 @@ int feenox_instruction_reaction(void *arg) {
             row[g][k] = feenox.pde.mesh->node[j].index_dof[g];
           }
           if (reaction->order == 1) {
-            node[k] = j;
+            node_index[k] = j;
           }
           k++;
         }
@@ -92,8 +101,9 @@ int feenox_instruction_reaction(void *arg) {
     
     if (reaction->order == 1) {
       petsc_call(MatCreateVecs(K_row[g], PETSC_NULL, &arm[g]));
+      // TODO: do not set non-local values
       for (j = 0; j < k; j++) {
-        petsc_call(VecSetValue(arm[g], j, feenox.pde.mesh->node[node[j]].x[g] - x0[g], INSERT_VALUES));
+        petsc_call(VecSetValue(arm[g], j, feenox.pde.mesh->node[node_index[j]].x[g] - x0[g], INSERT_VALUES));
       }
     }
     
@@ -106,30 +116,28 @@ int feenox_instruction_reaction(void *arg) {
   // for first-order moments we need to do another loop because moments need all the three forces
   if (reaction->order == 1) {
     for (g = 0; g < feenox.pde.dofs; g++) {
-      PetscScalar Fy_dz = 0;
-      PetscScalar Fz_dy = 0;
-      PetscScalar Fx_dz = 0;
-      PetscScalar Fz_dx = 0;
-      PetscScalar Fx_dy = 0;
-      PetscScalar Fy_dx = 0;
-    
+      int a;
+      int b;
       switch (g) {
         case 0:
-          petsc_call(VecDot(K_row_u[1], arm[2], &Fy_dz));
-          petsc_call(VecDot(K_row_u[2], arm[1], &Fz_dy));
-          R[g] = Fy_dz + Fz_dy;
+          a = 1;
+          b = 2;
         break;
         case 1:
-          petsc_call(VecDot(K_row_u[0], arm[2], &Fx_dz));
-          petsc_call(VecDot(K_row_u[2], arm[0], &Fz_dx));
-          R[g] = Fx_dz + Fz_dx;
+          a = 0;
+          b = 2;
         break;
         case 2:
-          petsc_call(VecDot(K_row_u[0], arm[1], &Fx_dy));
-          petsc_call(VecDot(K_row_u[1], arm[0], &Fy_dx));
-          R[g] = Fx_dy + Fy_dx;
+          a = 0;
+          b = 1;
         break;
       }
+
+      PetscScalar Fa_db = 0;
+      petsc_call(VecDot(K_row_u[a], arm[b], &Fa_db));
+      PetscScalar Fb_da = 0;
+      petsc_call(VecDot(K_row_u[b], arm[a], &Fb_da));
+      R[g] = Fa_db + Fb_da;
     }  
   }
   
@@ -152,7 +160,7 @@ int feenox_instruction_reaction(void *arg) {
 
   petsc_call(ISDestroy(&set_cols));
   if (reaction->order == 1) {
-    feenox_free(node);
+    feenox_free(node_index);
   }
     
 
