@@ -39,3 +39,5 @@ two-squares.vtk
 two-squares-results.msh
 nafems-t3.dat
 slab-0.1m.msh
+slab.msh
+wire-hex.msh

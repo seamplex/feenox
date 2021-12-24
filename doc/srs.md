@@ -29,7 +29,7 @@ pdfyaml: none
 # Architecture {#sec:architecture}
 
 ```include
-200-architecutre.md
+200-architecture.md
 ```
 
 ## Deployment {#sec:deployment}

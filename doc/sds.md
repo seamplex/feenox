@@ -34,7 +34,7 @@ The choice of the initial supported features is based on the types of problem th
  * structural modal analysis
  * multi-group neutron transport and diffusion
  
-FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture of more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of UNIX philosophy for the actual computational implementation. Besides POSIX, as explained further below in @sec:scalability, FeenoX also uses MPI which is a well-known industry standard for massive execution of parallel processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
+FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture of more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of Unix philosophy (further explained in @sec:unix) for the actual computational implementation. Besides POSIX, as explained further below in @sec:scalability, FeenoX also uses MPI which is a well-known industry standard for massive execution of parallel processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
 
 The requirement to run in the cloud and scale up as needed rules out some the open source solver [CalculiX](http://www.calculix.de/). There are some other requirements in the SRS that also leave CalculiX out of the tender.
 
@@ -51,7 +51,7 @@ Indeed, FeenoX is designed to work very much like a transfer function between on
 transfer.md
 ```
 
-Technically speaking, FeenoX can be seen as a UNIX filter designed to read an ASCII-based stream of characters (i.e. the input file, which in turn can include other input files or contain instructions to read data from mesh and/or other data files) and to write ASCII-formatted data into the standard output and/or other files. The input file can be created either by a human or by another program. The output stream and/or files can be read by either a human and/or another programs.
+Technically speaking, FeenoX can be seen as a Unix filter designed to read an ASCII-based stream of characters (i.e. the input file, which in turn can include other input files or contain instructions to read data from mesh and/or other data files) and to write ASCII-formatted data into the standard output and/or other files. The input file can be created either by a human or by another program. The output stream and/or files can be read by either a human and/or another programs.
 A quotation from [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/) helps to illustrate this idea:
 
 > [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy), the inventor of [Unix pipes](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29) and one of the founders of the [Unix tradition](https://en.wikipedia.org/wiki/Unix), had this to say at the time:
@@ -86,7 +86,7 @@ date both from the early 1970s, fifty years later they still
 lorenz.md
 ```
 
-As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the rule of _separation_ that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to PDEs, where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows the UNIX rule of separation.
+As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the _rule of separation_ that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to PDEs, where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows rule of separation.
 Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 
 From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user. Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based immersive augmented-reality application) without needing the modify the backend. Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
@@ -117,7 +117,7 @@ Even though the initial version of FeenoX does not provide an API for high-level
 > 200-architecture.md
 > ```
 
-FeenoX can be seen as a third-system effect, being the third version written from scratch after a first implementation in 2009 and an second one which was far more complex and had far more features circa 2012--2014. The third attempt explicitly addresses the "do one thing well" idea from UNIX. 
+FeenoX can be seen as a third-system effect, being the third version written from scratch after a first implementation in 2009 and an second one which was far more complex and had far more features circa 2012--2014. The third attempt explicitly addresses the "do one thing well" idea from Unix. 
 
 Furthermore, not only is FeenoX itself both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but, following the _rule of composition_, it also is designed to connect and to work with  other free and open source software such as
 
@@ -510,6 +510,7 @@ It might seem that the most effective approach to solve a large problem is to us
  ii. the amount of lines of code that has to be maintained is more than doubled
  iii. the number of possible points of synchronization failure increases
 
+In many ways, the pure MPI mode has fewer synchronizations and thus should perform better.
 Hence, FeenoX uses MPI (mainly through PETSc and SLEPc) to handle large parallel problems.
 
 ::: {#fig:nafems-le1-metis}
@@ -552,7 +553,7 @@ $ feenox sophomore.fee
 $
 ```
 
-Of course most engineering problems will not need explicit integrals (a few of them do, though) but some of them might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” UNIX principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible.”
+Of course most engineering problems will not need explicit integrals (a few of them do, though) but some of them might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” Unix principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible.”
 
 Flexibility in defining non-trivial material properties is illustrated with the following example, where two non- squares made of different dimensional materials are juxtaposed in thermal contact and subject to different boundary conditions at each of the fours sides (@fig:two-squares-mesh).
 
@@ -643,7 +644,7 @@ $
 ![Temperature vs. time at three axial locations for the NAFEMS\ T3 benchmark](nafems-t3.svg){#fig:nafems-t3 width=100%}
 
 
-Besides “everything is an expression,” FeenoX follows another cornerstone rule: **simple problems ought to have simple inputs**, akin to UNIX’ _rule of simplicity_---that addresses the first half of Alan Kay’s quote above. This rule is further discussed in @sec:input.
+Besides “everything is an expression,” FeenoX follows another cornerstone rule: **simple problems ought to have simple inputs**, akin to Unix’ _rule of simplicity_---that addresses the first half of Alan Kay’s quote above. This rule is further discussed in @sec:input.
 
 
 ## Extensibility {#sec:extensibility}
@@ -679,7 +680,7 @@ In the particular case of additional problem types, this fact has two implicatio
 
  i. Every person in the world is free to modify FeenoX to suit their needs, including adding a new problem type either using one of the existing ones as a template or by creating a new directory from scratch, without asking anybody of any kind of permission. In case this person does not how to program, he or she has the freedom to hire somebody else to do it. This is the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
  
- ii. The authors own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it under also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, the authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free.
+ ii. The authors own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it under also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free.
  
 
 Regarding additional material models, the virtual methods that compute the elemental contributions to the stiffness matrix also use function pointers to different material models (linear isotropic elastic, orthotropic, etc.) that are resolved at run time. Following the same principle, new models might be added by adding new routines and resolving them depending on the user’s input.
@@ -691,24 +692,108 @@ Regarding additional material models, the virtual methods that compute the eleme
 > 270-interoperatibility.md
 > ```
 
-@Sec:scope already introduced the ideas about interoperability behind the UNIX philosophy (@sec:unix) which make up for most the the FeenoX design basis. Essentially, they sum up to “do only one thing but do it well.” Since FeenoX is  filter (or a transfer-function), interoperability is a must. So far, this SDS has already shown examples of exchanging information with
+@Sec:scope already introduced the ideas about interoperability behind the Unix philosophy which make up for most the the FeenoX design basis. Essentially, they sum up to “do only one thing but do it well.” Since FeenoX is  filter (or a transfer-function), interoperability is a must. So far, this SDS has already shown examples of exchanging information with:
 
- * Kate (with syntax highlighting)
- * Gmsh (both as a mesher and a post-processor)
- * Paraview
- * Gnuplot
- * Pyxplot
+ * [Kate](https://kate-editor.org/) (with syntax highlighting): @fig:nafems-le10-problem-input
+ * [Gmsh](http://gmsh.info/) (both as a mesher and a post-processor): [@fig:maze123;@fig:mazes;@fig:cantilever-mesh;@fig:fork-meshed;@fig:nafems-le1-metis;@fig:two-squares-mesh;@fig:two-squares-results]
+ * [Paraview](https://www.paraview.org/): @fig:nafems-le10-sigmay
+ * [Gnuplot](http://gnuplot.info/): [@fig:lorenz-gnuplot;@fig:le10-tet]
+ * [Pyxplot](http://www.pyxplot.org.uk/): [@fig:cantilever-displacement;@fig:fork;@fig:nafems-t3]
+
  
+To illustrate both the filter approach, consider the following input file that solves Laplace’s equation $\nabla^2 \phi = 0$ on a square with some space-dependent boundary conditions. Either Gmsh or Paraview can be used to post-process the results:
  
+```include
+laplace.md
+```
+
+A great deal of FeenoX interoperability capabilities comes from another design decision: **output is 100% controlled by the user** (further discussed in @sec:output), a.k.a. “no `PRINT`, no OUTPUT” whose corollary is the UNIX _rule of silence_.
+The following input file computes the natural frequencies of oscillation of a cantilevered wire both using the Euler-Bernoulli theory and finite elements. It writes a [GFM table](https://github.github.com/gfm/#tables-extension-) into the standard output which is then piped to [Pandoc](https://pandoc.org/) and then converted to HTML:
+
+```{.feenox include="wire.fee"}
+```
+
+```terminal
+$ gmsh -3 wire-hex.geo 
+[...]
+$ $ feenox wire.fee | pandoc  
+<table>
+<caption>Comparison of analytical and numerical frequencies, in Hz</caption>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline"><em>n</em></span></th>
+<th style="text-align: center;">FEM</th>
+<th style="text-align: center;">Euler</th>
+<th style="text-align: center;">Relative difference [%]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">45.84</td>
+<td style="text-align: center;">45.84</td>
+<td style="text-align: center;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">287.1</td>
+<td style="text-align: center;">287.3</td>
+<td style="text-align: center;">0.06</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">803.4</td>
+<td style="text-align: center;">804.5</td>
+<td style="text-align: center;">0.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">1573</td>
+<td style="text-align: center;">1576</td>
+<td style="text-align: center;">0.24</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">2596</td>
+<td style="text-align: center;">2606</td>
+<td style="text-align: center;">0.38</td>
+</tr>
+</tbody>
+</table>
+$
+```
+
+Of course these kind of FeenoX-generated tables can be inserted verbatim into Markdown documents (just like this one) and rendered as @tbl:wire-freq.
+
+  $n$ |   FEM  | Euler | Relative difference [%]
+:----:+:------:+:-----:+:-----------------------:
+1 | 45.84 | 45.84 | 0.02
+2 | 287.1 | 287.3 | 0.06
+3 | 803.4 | 804.5 | 0.13
+4 | 1573 | 1576 | 0.24
+5 | 2596 | 2606 | 0.38
+
+: Comparison of analytical and numerical frequencies, in Hz {#tbl:wire-freq}
+
+
+
+::: {#fig:latex-tables}
+![A multi-billion-dollar agency using the Windows philosophy (presumably mouse-based copy and paste into Word)](nureg.png)
+
+![A small third-world consulting company using the Unix philosophy (FeenoX+AWK+LaTeX)](cne.png){#fig:cne}
+
+Results of the same fatigue problem solved using two different philosophies.
+:::
 
  * UNIX
  * POSIX
  * shmem
  * mpi
- * Gmsh
  * moustache
- * print -> awk -> latex tables NUREG
 
+ 
+It should be noted that all of the programs and tools mentioned to be interoperable with FeenoX are free and open source software.
+ 
 # Interfaces
 
  

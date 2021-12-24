@@ -1,0 +1,1 @@
+../examples/wire-hex.geo

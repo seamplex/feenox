@@ -1,0 +1,43 @@
+# compute the first five natural modes of a cantilever wire
+# see https://www.seamplex.com/fino/doc/alambre.pdf (in Spanish)
+# (note that there is a systematic error of a factor of two in the measured values)
+# see https://www.seamplex.com/feenox/examples for a slighly more complex example
+
+# wire geometry
+l = 0.5*303e-3   # [ m ] cantilever length
+d = 1.948e-3     # [ m ] diameter
+
+# material properties for copper
+mass = 0.5*8.02e-3       # [ kg ] total mass (half the measured because of the experimental disposition)
+volume = pi*(0.5*d)^2*l
+rho = mass/volume        # [ kg / m^3 ] density = mass (measured) / volume 
+E = 2*66.2e9             # [ Pa ] Young modulus (twice because the factor-two error)
+nu = 0                   # Poisson’s ratio (does not appear in Euler-Bernoulli)
+
+# compute analytical solution
+# first compute the first five roots ok cosh(kl)*cos(kl)+1 
+VECTOR kl[5]
+kl[i] = root(cosh(t)*cos(t)+1, t, 3*i-2,3*i+1)
+
+# then compute the frequencies according to Euler-Bernoulli
+# note that we need to use SI inside the square root
+A = pi * (d/2)^2
+I = pi/4 * (d/2)^4
+
+VECTOR f_euler[5]
+f_euler[i] = 1/(2*pi) * kl(i)^2 * sqrt((E * I)/(rho * A * l^4))
+
+# now compute the modes numerically with FEM
+# note that each mode is duplicated as it is degenerated
+PROBLEM modal 3D MODES 10
+READ_MESH wire-hex.msh
+BC fixed fixed
+SOLVE_PROBLEM
+
+
+# write a github-formatted markdown table comparing the frequencies
+PRINT "  \$n\$ |   FEM  | Euler | Relative difference [%]"
+PRINT ":----:+:------:+:-----:+:-----------------------:"
+PRINT_VECTOR SEP " | "  %g i  %.4g f(2*i-1) f_euler   %.2f 100*(f_euler(i)-f(2*i-1))/f_euler(i)
+PRINT
+PRINT ": Comparison of analytical and numerical frequencies, in Hz"

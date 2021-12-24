@@ -14,9 +14,9 @@ $
 Also note that since there is only one material there is no need to do an explicit link between material properties and physical volumes in the mesh (*rule of simplicity*). And since the properties are uniform and isotropic, a single global scalar for\ $E$ and a global single scalar for\ $\nu$ are enough.
 
 
-![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg){width_html=100% width_latex=100% width_texinfo=15cm} 
+![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg){#fig:nafems-le10-problem-input width_html=100% width_latex=100% width_texinfo=15cm} 
 
-![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width_html=100% width_latex=70% width_texinfo=12cm}
+![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){#fig:nafems-le10-sigmay width_html=100% width_latex=70% width_texinfo=12cm}
 
 For the sake of visual completeness, post-processing data with the scalar distribution of $\sigma_y$ and the vector field of displacements $[u,v,w]$ can be created by adding one line to the input file:
 

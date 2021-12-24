@@ -74,31 +74,42 @@ an open source computational tool. Then a fictitious “offer” to the
 above tender is given in a [software design specifications][2] document
 that explains the design decisions and features included in FeenoX.
 
--   [Software Requirements specifications in PDF][] (RFQ)
--   [Software Design specifications in
-    PDF][Software Requirements specifications in PDF] (FeenoX’ offer)
+-   [Software Requirements specifications][3] [PDF][] (Fictitious RFQ)
+-   [Software Design specifications][4] [PDF][5] (Imaginary FeenoX’
+    offer)
 -   [Mid-term PhD review presentation slides with the SRS/SDS
     explanation in PDF][] (August 2021).
--   [Video recording of the presentation][] (Slides are in English but
-    audio is in Spanish).
--   Browse the repository with the sources of the examples in the
-    presentation [here][]
+    -   [Video recording of the presentation][] (Slides are in English
+        but audio is in Spanish).
+    -   Browse the repository with the sources of the examples in the
+        presentation [here][]
+-   [A free and open source computational tool for solving
+    (nuclear-related) differential equations in the cloud][] (INAC/ENFIR
+    Congress, December 2021).
+    -   Browse the repository with the sources of the examples in the
+        presentation [here][6]
 
   [1]: ./srs.md
   [2]: ./sds.md
-  [Software Requirements specifications in PDF]: https://www.seamplex.com/feenox/doc/srs.pdf
+  [3]: srs.md
+  [PDF]: https://www.seamplex.com/feenox/doc/srs.pdf
+  [4]: sds.md
+  [5]: https://www.seamplex.com/feenox/doc/sds.pdf
   [Mid-term PhD review presentation slides with the SRS/SDS explanation in PDF]:
     https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Video recording of the presentation]: https://youtu.be/-RJ5qn7E9uE
   [here]: https://github.com/gtheler/2021-presentation
+  [A free and open source computational tool for solving (nuclear-related) differential equations in the cloud]:
+    https://www.seamplex.com/feenox/doc/2021-brasil.pdf
+  [6]: https://github.com/gtheler/2021-brasil
 
 ## Frequently Asked Questions
 
--   [Frequently Asked Questions][3]
+-   [Frequently Asked Questions][7]
 -   Ask yours on [GitHub Discussions][]
 -   Check also the [GitHub Issues][]
 
-  [3]: ./FAQ.md
+  [7]: ./FAQ.md
   [GitHub Discussions]: https://github.com/seamplex/feenox/discussions/
   [GitHub Issues]: https://github.com/seamplex/feenox/issues
 
@@ -125,19 +136,25 @@ presentation:
 -   [Slides in PDF][]
 -   [Markdown examples sources][]
 
+Make sure you also browse the [tests][] directory of the Git repository
+and the [Software Design
+specifications][Software Design specifications2] document.
+
   [examples]: ../examples
   [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Markdown examples sources]: https://github.com/gtheler/2021-presentation
+  [tests]: https://github.com/seamplex/feenox/tree/main/tests
+  [Software Design specifications2]: ./sds.md
 
 ## Tutorials
 
 Step-by-step instructions and explanations to solve increasingly-complex
-problems are given in the [tutorials][4] directory.
+problems are given in the [tutorials][8] directory.
 
 **TO BE DONE**
 
-  [4]: ../tutorials
+  [8]: ../tutorials
 
 ## Case files
 
@@ -178,10 +195,10 @@ See the [FeenoX history][].
 
 ## Asking questions & reporting bugs
 
--   Use [Github discussions][5] to ask for help,
+-   Use [Github discussions][9] to ask for help,
 -   Use the [Github issue tracker][] to report bugs.
 
-  [5]: https://github.com/seamplex/feenox/discussions
+  [9]: https://github.com/seamplex/feenox/discussions
   [Github issue tracker]: https://github.com/seamplex/feenox/issues
 
 ## Compiling from source
@@ -200,14 +217,14 @@ formulations of existing PDEs. For elliptic operators feel free to use
 the Laplace equation as a template.
 
 1.  Read the [programming guide][]
-2.  Browse [Github discussions][Github discussions5]
+2.  Browse [Github discussions][Github discussions9]
 3.  Fork the [Github repository][]
 4.  Create a pull request
 
 It is mandatory to observe the [Code of Conduct][].
 
   [programming guide]: ./programming.md
-  [Github discussions5]: https://github.com/seamplex/feenox/discussions
+  [Github discussions9]: https://github.com/seamplex/feenox/discussions
   [Github repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: CODE_OF_CONDUCT.md
 
