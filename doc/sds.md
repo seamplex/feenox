@@ -947,3 +947,13 @@ git.md
 ```{.include shift-heading-level-by=1}
 unix.md
 ```
+
+# Appendix: Downloading & compiling {#sec:download}
+
+```{.include shift-heading-level-by=1}
+download.md
+```
+
+```{.include shift-heading-level-by=1}
+compilation.md
+```

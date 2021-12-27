@@ -24,3 +24,7 @@ temp-cylinder*.png
 *.mp4
 parallelepiped*.msh
 parallelepiped*.vtk
+cylinder.msh
+temp-cylinder.msh
+wire-*.msh
+wire-*.md

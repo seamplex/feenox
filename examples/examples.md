@@ -1194,3 +1194,260 @@ $
 
 ![Displacements and temperature distribution over the fine mesh in Paraview (yes, still a rainbow pallete)](parallelepiped-mechanical.png)
 
+# Non-dimensional transient heat conduction on a cylinder
+
+Let us solve a dimensinless transient problem over a cylinder.
+Conductivity and heat capacity are unity. Initial condition is a linear
+temperature profile along the $x$ axis:
+
+$$
+T(x,y,z,0) = x
+$$
+
+The base of the cylinder has a prescribed time and space-dependent
+temperature
+
+$$
+T(0,y,z,t) = \sin( 2\pi \cdot t) \cdot \sin( 2\pi \cdot y)
+$$
+
+The other faces have a convection conditions with (non-dimensional) heat
+transfer coefficient $h=0.1$ and $T_\text{ref} = 1$.
+
+![Locally-refined cylinder for a transient thermal
+problem.](cylinder.png){width="100%"}
+
+
+```feenox
+PROBLEM thermal 3D
+READ_MESH cylinder.msh
+
+end_time = 2  # final time [ non-dimensional units ]
+# the time step is automatically computed
+
+# initial condition (if not given, stead-state is computed)
+T_0(x,y,z) = x
+
+# dimensionless uniform and constant material properties
+k = 1
+kappa = 1
+
+# BCs 
+BC hot   T=sin(2*pi*t)*sin(2*pi*y)
+BC cool  h=0.1  Tref=1
+
+SOLVE_PROBLEM
+
+# print the temperature at the center of the base vs time
+PRINT %e t T(0,0,0) T(0.5,0,0) T(1,0,0)
+
+WRITE_MESH temp-cylinder.msh T
+
+IF done
+ PRINT "\# open temp-anim-cylinder.geo in Gmsh to create a quick rough video"
+ PRINT "\# run  temp-anim-cylinder.py  to get a nicer and smoother video"
+ENDIF
+```
+
+
+```terminal
+$ gmsh -3 cylinder.geo
+[...]
+Info    : Done optimizing mesh (Wall 0.624941s, CPU 0.624932s)
+Info    : 1986 nodes 10705 elements
+Info    : Writing 'cylinder.msh'...
+Info    : Done writing 'cylinder.msh'
+Info    : Stopped on Fri Dec 24 10:35:32 2021 (From start: Wall 0.800542s, CPU 0.896698s)
+$ feenox temp-cylinder-tran.fee 
+0.000000e+00    0.000000e+00    5.000000e-01    1.000000e+00
+1.451938e-04    4.406425e-07    5.000094e-01    9.960851e-01
+3.016938e-04    9.155974e-07    5.000171e-01    9.921274e-01
+5.566768e-04    1.689432e-06    5.000251e-01    9.862244e-01
+8.565589e-04    2.599523e-06    5.000292e-01    9.800113e-01
+1.245867e-03    3.780993e-06    5.000280e-01    9.728705e-01
+1.780756e-03    5.404230e-06    5.000176e-01    9.643259e-01
+2.492280e-03    7.563410e-06    4.999932e-01    9.545723e-01
+3.428621e-03    1.040457e-05    4.999538e-01    9.436480e-01
+[...]
+1.978669e+00    -6.454358e-05   1.500891e-01    2.286112e-01
+1.989334e+00    -3.234439e-05   1.500723e-01    2.285660e-01
+2.000000e+00    1.001730e-14    1.500572e-01    2.285223e-01
+# open temp-anim-cylinder.geo in Gmsh to create a quick rough video
+# run  temp-anim-cylinder.py  to get a nicer and smoother video
+$ python3 temp-anim-cylinder.py
+Info    : Reading 'temp-cylinder.msh'...
+Info    : 1986 nodes
+Info    : 10612 elements
+Info    : Done reading 'temp-cylinder.msh'
+0 1 0.0
+0.01 12 0.8208905327853042
+0.02 15 0.8187351216040447
+0.03 17 0.7902629708599855
+[...]
+Info    : Writing 'temp-cylinder-smooth-198.png'...
+Info    : Done writing 'temp-cylinder-smooth-198.png'
+199
+Info    : Writing 'temp-cylinder-smooth-199.png'...
+Info    : Done writing 'temp-cylinder-smooth-199.png'
+all frames dumped, now run
+ffmpeg -framerate 20 -f image2 -i temp-cylinder-smooth-%03d.png temp-cylinder-smooth.mp4
+to get a video
+$ ffmpeg -y -f image2 -i temp-cylinder-smooth-%03d.png  -framerate 20 -pix_fmt yuv420p -c:v libx264 -filter:v crop='floor(in_w/2)*2:floor(in_h/2)*2'  temp-cylinder-smooth.mp4
+[...]
+$
+```
+
+
+![Transient temperature distribution](temp-cylinder-smooth.mp4){width=100%}
+
+# Five natural modes of a cantilevered wire
+
+Back in [college](https://www.ib.edu.ar/), we had this subject
+Experimental Physics 101. I had to measure the natual modes of two
+cantilevered wires and determine the Young modulus of of those
+measurements. The [report is
+here](https://www.seamplex.com/fino/doc/alambre.pdf). Two comments: 1.
+It is in Spanish 2. There was a systematic error and a factor of two
+sneaked in into the measured values
+
+Here is a finite-element version of the experimental setup with a
+comparison to then theoretical values written directly as Markdown
+tables. The material (either aluminum or copper) and the mesh type
+(either tet or hex) and be chosen at runtime through command line
+arguments.
+
+
+```feenox
+#
+DEFAULT_ARGUMENT_VALUE 1 hex       # mesh, either hex or unstruct
+DEFAULT_ARGUMENT_VALUE 2 copper    # material, either copper or aluminum
+
+l = 0.5*303e-3   # cantilever wire length [ m ]
+d = 1.948e-3     # wire diameter [ m ]
+
+
+# material properties for copper
+m_copper = 0.5*8.02e-3  # total mass (half the measured because of the experimental disposition) [ kg ]
+E_copper = 2*66.2e9     # [ Pa ] Young modulus (twice because the factor-two error)
+
+# material properties for aluminum
+m_aluminum = 0.5*2.67e-3
+E_aluminum = 2*40.2e9
+
+# problem’s properties
+E = E_$2                     # [ MPa ]
+rho = m_$2/(pi*(0.5*d)^2*l)  # [ kg / m^3 ] density = mass (measured) / volume 
+nu = 0                       # Poisson’s ratio (does not appear in Euler-Bernoulli)
+
+# analytical solution
+VECTOR kl[5]
+VECTOR f_euler[5]
+
+# first compute the first five roots ok cosh(kl)*cos(kl)+1 
+kl[i] = root(cosh(t)*cos(t)+1, t, 3*i-2,3*i+1)
+
+# then compute the frequencies according to Euler-Bernoulli
+# note that we need to use SI inside the square root
+A = pi * (d/2)^2
+I = pi/4 * (d/2)^4
+f_euler[i] = 1/(2*pi) * kl(i)^2 * sqrt((E * I)/(rho * A * l^4))
+
+# now compute the modes numerically with FEM
+# note that each mode is duplicated as it is degenerated
+READ_MESH wire-$1.msh DIMENSIONS 3
+PROBLEM modal MODES 10
+BC fixed fixed
+SOLVE_PROBLEM
+
+# github-formatted markdown table
+# compare the frequencies
+PRINT "  \$n\$   |    FEM [Hz]   |   Euler [Hz]  |  Relative difference [%]"
+PRINT   ":------:|:-------------:|:-------------:|:--------------:"
+PRINT_VECTOR SEP "\t|\t" i  %.4g f(2*i-1) f_euler   %.2f 100*(f_euler(i)-f(2*i-1))/f_euler(i)
+PRINT
+PRINT ": $2 wire over $1 mesh"
+
+# commonmark table
+PRINT
+PRINT "  \$n\$   |          \$L\$          |       \$\\Gamma\$        |      \$\\mu\$    |       \$M\$"
+PRINT   ":------:+:---------------------:+:---------------------:+:-------------:+:--------------:"
+PRINT_VECTOR SEP "\t|\t" i "%+.1e" L Gamma "%.4f" mu Mu  
+PRINT
+PRINT ": $2 wire over $1 mesh, participation and excitation factors \$L\$ and \$\\Gamma\$, effective per-mode and cummulative mass fractions \$\\mu\$ and \$M\$"
+
+# write the modes into a vtk file
+WRITE_MESH wire-$1-$2.vtk \
+ VECTOR u1 v1 w1 VECTOR u2 v2 w2 VECTOR u3 v3 w3 \
+ VECTOR u4 v4 w4 VECTOR u5 v5 w5 VECTOR u6 v6 w6 \
+ VECTOR u7 v7 w7 VECTOR u8 v8 w8 VECTOR u9 v9 w9 VECTOR u10 v10 w10
+
+# and into a msh file
+WRITE_MESH wire-$1-$2.msh {
+ u1 v1 w1
+ u2 v2 w2
+ u3 v3 w3
+ u4 v4 w4
+ u5 v5 w5
+ u6 v6 w6
+ u7 v7 w7
+ u8 v8 w8
+ u9 v9 w9
+ u10 v10 w10
+}
+```
+
+
+```terminal
+$ gmsh -3 wire-hex.geo
+[...]
+Info    : Done meshing order 2 (Wall 0.0169025s, CPU 0.016804s)
+Info    : 8398 nodes 4676 elements
+Info    : Writing 'wire-hex.msh'...
+Info    : Done writing 'wire-hex.msh'
+Info    : Stopped on Fri Dec 24 17:07:19 2021 (From start: Wall 0.0464517s, CPU 0.133498s)
+$ gmsh -3 wire-tet.geo
+[...]
+Info    : Done optimizing mesh (Wall 0.0229018s, CPU 0.022892s)
+Info    : 16579 nodes 13610 elements
+Info    : Writing 'wire-tet.msh'...
+Info    : Done writing 'wire-tet.msh'
+Info    : Stopped on Fri Dec 24 17:07:59 2021 (From start: Wall 2.5798s, CPU 2.64745s)
+$ feenox wire.fee 
+  $n$   |    FEM [Hz]   |   Euler [Hz]  |  Relative difference [%]
+:------:|:-------------:|:-------------:|:--------------:
+1       |       45.84   |       45.84   |       0.02
+2       |       287.1   |       287.3   |       0.06
+3       |       803.4   |       804.5   |       0.13
+4       |       1573    |       1576    |       0.24
+5       |       2596    |       2606    |       0.38
+
+: copper wire over hex mesh
+
+  $n$   |          $L$          |       $\Gamma$        |      $\mu$    |       $M$
+:------:+:---------------------:+:---------------------:+:-------------:+:--------------:
+1       |       +1.3e-03        |       +4.2e-01        |       0.1371  |       0.1371
+2       |       -1.8e-03        |       -5.9e-01        |       0.2716  |       0.4087
+3       |       +9.1e-05        |       +1.7e-02        |       0.0004  |       0.4091
+4       |       -1.7e-03        |       -3.0e-01        |       0.1252  |       0.5343
+5       |       -3.3e-05        |       -5.9e-03        |       0.0000  |       0.5343
+6       |       -9.9e-04        |       -1.8e-01        |       0.0431  |       0.5775
+7       |       +7.3e-04        |       +1.2e-01        |       0.0221  |       0.5995
+8       |       +4.5e-06        |       +7.5e-04        |       0.0000  |       0.5995
+9       |       +5.4e-04        |       +9.9e-02        |       0.0134  |       0.6129
+10      |       +2.7e-05        |       +4.9e-03        |       0.0000  |       0.6129
+
+: copper wire over hex mesh, participation and excitation factors $L$ and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and $M$
+$ feenox wire.fee hex copper | pandoc -o wire-hex-copper.html
+$ feenox wire.fee tet copper | pandoc -o  wire-tet-copper.md
+$ feenox wire.fee hex aluminum | pandoc -o  wire-hex-aluminum.md
+$ feenox wire.fee tet aluminum | pandoc -o  wire-tet-aluminum.md
+```
+
+
+```include
+wire-hex-copper.md
+wire-tet-copper.md
+wire-hex-aluminum.md
+wire-tet-aluminum.md
+```
+

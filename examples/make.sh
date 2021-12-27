@@ -17,8 +17,10 @@ for i in hello          \
          fork           \
          iaea-2dpwr     \
          cubesphere     \
-         parallelepiped-thermal \
+         parallelepiped-thermal    \
          parallelepiped-mechanical \
+         temp-cylinder-tran        \
+         wire   \
   ; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \
