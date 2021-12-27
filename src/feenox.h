@@ -376,6 +376,8 @@ struct var_t {
   int initialized;
   int reallocated;
   int used;
+  int assigned_init;
+  int assigned_zero;
   
   // these are pointers so the actual holder can be anything, from another
   // variable (i.e. an alias), a vector element (another alias) or even
@@ -403,6 +405,8 @@ struct vector_t {
   int initialized;
   int reallocated;
   int used;
+  int assigned_init;
+  int assigned_zero;
   
   expr_t size_expr;
   int size;
@@ -425,6 +429,8 @@ struct matrix_t {
   int initialized;  
   int reallocated;
   int used;
+  int assigned_init;
+  int assigned_zero;
   
   expr_t cols_expr;
   expr_t rows_expr;

@@ -1,0 +1,8 @@
+static_steps = 100
+f_init = 1
+f = 0.5*f
+s = s+f
+
+IF done
+ PRINT s
+ENDIF

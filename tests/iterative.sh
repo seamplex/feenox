@@ -11,3 +11,9 @@ fi
 
 answerdiff fibo_iterative.fee
 exitifwrong $?
+
+answerdiff iterative.fee
+exitifwrong $?
+
+answer geometric_series.fee "2"
+exitifwrong $?

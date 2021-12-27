@@ -25,12 +25,6 @@ extern feenox_t feenox;
 // API
 int feenox_add_assignment(const char *left_hand, const char *right_hand) {
   
-  char *dummy;
-  char *dummy_index_range;
-  char *dummy_par;
-  char *dummy_init;
-  char *dummy_0;
-  
   assignment_t *assignment = NULL;
   feenox_check_alloc(assignment = calloc(1, sizeof(assignment_t)));
   
@@ -39,23 +33,27 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
     
   // first from right to left
   // range of indices
-  if ((dummy_index_range = strchr(left_hand, '<')) != NULL) {
-    *dummy_index_range = '\0';
+  char *index_range = NULL;
+  if ((index_range = strchr(left_hand, '<')) != NULL) {
+    *index_range = '\0';
   }
   
   // subindexes between brackets if it is a vector or matrix
-  if ((dummy_par = strchr(left_hand, '[')) != NULL) {
-    *dummy_par = '\0';
+  char *bracket = NULL;
+  if ((bracket = strchr(left_hand, '[')) != NULL) {
+    *bracket = '\0';
   }
   
   // initial values, either _init o _0
-  if ((dummy_init = feenox_ends_in_init(left_hand)) != NULL) {
-    *dummy_init = '\0';
+  char *init = NULL;
+  if ((init = feenox_ends_in_init(left_hand)) != NULL) {
+    *init = '\0';
     assignment->initial_static = 1;
   }
   
-  if ((dummy_0 = feenox_ends_in_zero(left_hand)) != NULL) {
-    *dummy_0 = '\0';
+  char *zero = NULL;
+  if ((zero = feenox_ends_in_zero(left_hand)) != NULL) {
+    *zero = '\0';
     assignment->initial_transient = 1;
   }
   
@@ -73,73 +71,85 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
     assignment->scalar = 1;
   }
   feenox_free(sanitized_lhs);
-    
+
+  
   // now from lef to right
   // re-build the string
-  if (dummy_0 != NULL) {
-    *dummy_0 = '_';
+  if (zero != NULL) {
+    *zero = '_';
+    if (assignment->variable != NULL) {
+      assignment->variable->assigned_zero = 1;
+    } else if (assignment->vector != NULL) {
+      assignment->vector->assigned_zero = 1;
+    } else if (assignment->matrix != NULL) {
+      assignment->matrix->assigned_zero = 1;
+    }
   }
-  if (dummy_init != NULL) {
-    *dummy_init = '_';
+  if (init != NULL) {
+    *init = '_';
+    if (assignment->variable != NULL) {
+      assignment->variable->assigned_init = 1;
+    } else if (assignment->vector != NULL) {
+      assignment->vector->assigned_init = 1;
+    } else if (assignment->matrix != NULL) {
+      assignment->matrix->assigned_init = 1;
+    }
   }
   
-  // if there are parenthesis, then there are subindexes
-  if (dummy_par != NULL) {
+  // if there are brackets, then there are subindexes
+  if (bracket != NULL) {
     if (assignment->matrix == NULL && assignment->vector == NULL) {
       feenox_push_error_message("'%s' is neither a vector nor a matrix, functions are defined using ':=' instead of '='", left_hand);
       return FEENOX_ERROR;      
     }
-    *dummy_par = '[';
+    *bracket = '[';
     
     // TODO: check for dependence on i and j by looking at the list of items
     if (assignment->matrix != NULL) {
-      // si aparecen o la letra "i" o la letra "j" entonces no es escalar
-      assignment->scalar = (strchr(dummy_par, 'i') == NULL) && (strchr(dummy_par, 'j') == NULL);
-      // si aparece la letra "i" y no la letra "j" entonces se varia solo las filas
-      assignment->expression_only_of_i = (strchr(dummy_par, 'j') == NULL) && (strchr(dummy_par, 'i') != NULL);
-      // si no aparece la letra "i" pero si la letra "j" entonces se varia solo las columnas
-      assignment->expression_only_of_j = (strchr(dummy_par, 'i') == NULL) && (strchr(dummy_par, 'j') != NULL);
-      // si no es es "i,j" entonces no es plain
-      if (strcmp("(i,j)", dummy_par) != 0) {
+      // if either "i" or "j" appear then it is not a scalar
+      assignment->scalar = (strchr(bracket, 'i') == NULL) && (strchr(bracket, 'j') == NULL);
+      // if "i" appears but not "j" then only sweep over rows only
+      assignment->expression_only_of_i = (strchr(bracket, 'j') == NULL) && (strchr(bracket, 'i') != NULL);
+      // if "i" does not appear but "j" does the sweep over cols only
+      assignment->expression_only_of_j = (strchr(bracket, 'i') == NULL) && (strchr(bracket, 'j') != NULL);
+      // if it is not "i,j" then it is plain
+      if (strcmp("(i,j)", bracket) != 0) {
         assignment->plain = 0;
       }
-      feenox_call(feenox_parse_range(dummy_par, '[', ',', ']', &assignment->row, &assignment->col));
+      feenox_call(feenox_parse_range(bracket, '[', ',', ']', &assignment->row, &assignment->col));
     } else if (assignment->vector != NULL) {
-      if ((dummy = strrchr(dummy_par, ']')) == NULL) {
+      char *dummy = NULL;
+      if ((dummy = strrchr(bracket, ']')) == NULL) {
         feenox_push_error_message("unmatched bracket for '%s'", left_hand);
         return FEENOX_ERROR;
       }
       *dummy = '\0';
       
       // si aparece la letra "i" entonces no es escalar
-      assignment->scalar = (strchr(dummy_par+1, 'i') == NULL);
+      assignment->scalar = (strchr(bracket+1, 'i') == NULL);
       
       // si no es "i" entonces no es plain
-      if (strcmp("i", dummy_par+1) != 0) {
+      if (strcmp("i", bracket+1) != 0) {
         assignment->plain = 0;
       }
-      feenox_call(feenox_expression_parse(&assignment->row, dummy_par+1));
+      feenox_call(feenox_expression_parse(&assignment->row, bracket+1));
       *dummy = ')';
     }
   }
   
-  // si hay rango de indices
-  if (dummy_index_range != NULL) {
+  // if there is an index range
+  if (index_range != NULL) {
     if (assignment->matrix == NULL && assignment->vector == NULL) {
-      if (feenox_get_function_ptr(left_hand) != NULL) {
-        feenox_push_error_message("functions are defined using ':=' instead of '='", left_hand);  
-      } else {
-        feenox_push_error_message("'%s' is neither a vector nor a matrix", left_hand);
-      }
+      feenox_push_error_message("'%s' is neither a vector nor a matrix", left_hand);
       return FEENOX_ERROR;
     }
-    *dummy_index_range = '<';
+    *index_range = '<';
     
     if (assignment->matrix != NULL) {
-      feenox_call(feenox_parse_range(dummy_index_range, '<', ':', ';', &assignment->i_min, &assignment->i_max));
-      feenox_call(feenox_parse_range(strchr(dummy_index_range, ';'), ';', ':', '>', &assignment->j_min, &assignment->j_max));
+      feenox_call(feenox_parse_range(index_range, '<', ':', ';', &assignment->i_min, &assignment->i_max));
+      feenox_call(feenox_parse_range(strchr(index_range, ';'), ';', ':', '>', &assignment->j_min, &assignment->j_max));
     } else if (assignment->vector != NULL) {
-      feenox_call(feenox_parse_range(dummy_index_range, '<', ':', '>', &assignment->i_min, &assignment->i_max));
+      feenox_call(feenox_parse_range(index_range, '<', ':', '>', &assignment->i_min, &assignment->i_max));
     }
   }
   
@@ -320,77 +330,29 @@ int feenox_get_assignment_rowcol(assignment_t *assignment, size_t i, size_t j, s
   return FEENOX_OK;  
 }
 
-/*
-// verifica si tenemos que poner los valores iniciales de una variable
-void feenox_check_initial_variable(var_t *var) {
-  
-  if (var != NULL) {
-    if (feenox_var(feenox_special_var(in_static))) {
-      *var->initial_transient = feenox_value(var);
-      if ((int)(feenox_var(feenox_special_var(step_static))) == 1) {
-        *var->initial_static = feenox_value(var);
-      }
-    }
-  }
-  return;  
-}
-
-// verifica si tenemos que poner los valores iniciales de una variable
-void feenox_check_initial_vector(vector_t *vector) {
-  
-  if (vector != NULL) {
-    if (!vector->initialized) {
-      feenox_vector_init(vector);
-    }
-    if (feenox_var(feenox_special_var(in_static))) {
-      gsl_vector_memcpy(vector->initial_transient, feenox_value_ptr(vector));
-      if ((int)(feenox_var(feenox_special_var(step_static))) == 1) {
-        gsl_vector_memcpy(vector->initial_static, feenox_value_ptr(vector));
-      }
-    }
-  }
-  return;  
-}
-
-// verifica si tenemos que poner los valores iniciales de una variable
-void feenox_check_initial_matrix(matrix_t *matrix) {
-  
-  if (matrix != NULL) {
-    if (feenox_var(feenox_special_var(in_static))) {
-      gsl_matrix_memcpy(matrix->initial_transient, feenox_value_ptr(matrix));
-      if ((int)(feenox_var(feenox_special_var(step_static))) == 1) {
-        gsl_matrix_memcpy(matrix->initial_static, feenox_value_ptr(matrix));
-      }
-    }
-  }
-  return;  
-}
-*/
-
-// ejecuta una asignacion escalar 
 int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned int col) {
 
   double *current = NULL;
   double *initial_static = NULL;
   double *initial_transient = NULL;
+  int assigned_zero = 0;
+  int assigned_init = 0;
   
   double value = feenox_expression_eval(&assignment->rhs);
 
   if (assignment->variable != NULL) {
-//    constant = assignment->variable->constant;
     current = feenox_value_ptr(assignment->variable);
     initial_static = assignment->variable->initial_static;
     initial_transient = assignment->variable->initial_transient;
+    assigned_zero = assignment->variable->assigned_zero;
+    assigned_init = assignment->variable->assigned_init;
     
-  // TODO: estos punteros se podrian pedir solo si son necesarios, es decir
-  // si estamos en init o cosa por el estilo
   } else if (assignment->vector != NULL) {
     
     if (!assignment->vector->initialized) {
       feenox_vector_init(assignment->vector, 0);
     }
     
-//    constant = assignment->vector->constant;
     current = gsl_vector_ptr(feenox_value_ptr(assignment->vector), row);
     if (assignment->vector->initial_static != NULL) {
       initial_static = gsl_vector_ptr(assignment->vector->initial_static, row);
@@ -399,13 +361,16 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
       initial_transient = gsl_vector_ptr(assignment->vector->initial_transient, row);
     } 
     
+    assigned_zero = assignment->vector->assigned_zero;
+    assigned_init = assignment->vector->assigned_init;
+    
+    
   } else if (assignment->matrix != NULL) {
     
     if (!assignment->matrix->initialized) {
       feenox_matrix_init(assignment->matrix);
     }
     
-//    constant = assignment->matrix->constant;
     current = gsl_matrix_ptr(feenox_value_ptr(assignment->matrix), row, col);
     if (assignment->matrix->initial_static != NULL) {
       initial_static = gsl_matrix_ptr(assignment->matrix->initial_static, row, col);
@@ -413,26 +378,24 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
     if (assignment->matrix->initial_transient != NULL) {
       initial_transient = gsl_matrix_ptr(assignment->matrix->initial_transient, row, col);
     }
+
+    assigned_zero = assignment->vector->assigned_zero;
+    assigned_init = assignment->vector->assigned_init;
     
   } else {
+    feenox_push_error_message("internal mistmatch, neither variable nor vector nor matrix found for assigment");
     return FEENOX_OK;
   }
   
-
-  // si tenemos constant y no estamos el primer paso, a comerla
-/*  
-  if (constant && ((int)(feenox_var(feenox_special_var(step_static))) != 1 || (int)(feenox_var(feenox_special_var(step_transient))) != 0)) {
-    return FEENOX_OK;
-  }
-*/  
+  int in_static = (int)(feenox_special_var_value(in_static));
+  int in_static_initial = in_static && (int)(feenox_special_var_value(step_static)) == 1;
   if (assignment->initial_static) {
-    // si pide _init solo asignamos si estamos en static_step y en el paso uno
-    if ((int)(feenox_special_var_value(in_static)) && (int)(feenox_special_var_value(step_static)) == 1) {
+    if (in_static_initial) {
       *current = value;
       if (initial_static != NULL) {
         *initial_static = value;
       }
-      if (initial_transient) {
+      if (initial_transient != NULL) {
         *initial_transient = value;
       }  
     }
@@ -440,8 +403,7 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
     return FEENOX_OK;
     
   } else if (assignment->initial_transient) {
-    // si pide _0 solo asignamos si estamos en static_step    
-    if ((int)(feenox_special_var_value(in_static))) {
+    if (in_static) {
       *current = value;
       if (initial_transient != NULL) {
         *initial_transient = value;
@@ -449,23 +411,11 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
     }
 
     return FEENOX_OK;
-      
   }
     
-  // no gano ningun otro asi que hacemos la asignacion que nos pidieron
-  if (current != NULL) {
+  // general assignment
+  if (current != NULL && (assigned_init == 0 || in_static_initial == 0) && (assigned_zero == 0 || in_static == 0)) {
     *current = value;
-
-    if (feenox_special_var_value(in_static)) {
-      if (initial_transient != NULL) {
-        *initial_transient = value;
-      }  
-      if ((int)(feenox_special_var_value(step_static)) == 1) {
-        if (initial_static != NULL) {
-          *initial_static = value;
-        }  
-      }
-    }
   }
 
   return FEENOX_OK;

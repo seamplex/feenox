@@ -1,0 +1,5 @@
+static_steps = 3
+x_init = 1
+x = 2*x
+
+PRINT x

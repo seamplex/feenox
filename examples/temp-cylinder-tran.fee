@@ -1,6 +1,6 @@
 #. # Non-dimensional transient heat conduction on a cylinder
 #.
-#. Let us solve a dimensinless transient problem over a cylinder. Conductivity and heat capacity are unity.
+#. Let us solve a dimensionless transient problem over a cylinder. Conductivity and heat capacity are unity.
 #. Initial condition is a linear temperature profile along the\ $x$ axis:
 #.
 #. $$

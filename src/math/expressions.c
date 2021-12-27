@@ -34,9 +34,8 @@ const char factorseparators[] = "&|=!<>+-*/^,()[] \t\n";
 
 char *feenox_ends_in_zero(const char *name) {
 
-  char *dummy;
-
-  if (((dummy = strstr(name, "_0")) != 0) && (isblank(dummy[2]) || dummy[2] == '\0')) {
+  char *dummy = NULL;
+  if (((dummy = strstr(name, "_0")) != NULL) && (isblank(dummy[2]) || dummy[2] == '\0')) {
     return dummy;
   } else {
     return NULL;
@@ -46,9 +45,8 @@ char *feenox_ends_in_zero(const char *name) {
 
 char *feenox_ends_in_init(const char *name) {
 
-  char *dummy;
-
-  if (((dummy = strstr(name, "_init")) != 0) && (dummy[5] == '\0' || dummy[5] == '(')) {
+  char *dummy = NULL;
+  if (((dummy = strstr(name, "_init")) != NULL) && (isblank(dummy[5]) || dummy[5] == '\0' || dummy[5] == '[')) {
     return dummy;
   } else {
     return NULL;
@@ -60,7 +58,7 @@ char *feenox_ends_in_dot(const char *name) {
 
   char *dummy;
 
-  if (((dummy = strstr(name, "_dot")) != 0) && (dummy[4] == '\0' || dummy[4] == '(')) {
+  if (((dummy = strstr(name, "_dot")) != NULL) && (isblank(dummy[4]) || dummy[4] == '\0' || dummy[4] == '[')) {
     return dummy;
   } else {
     return NULL;
@@ -108,7 +106,7 @@ int feenox_count_arguments(char *string, size_t *n_chars) {
 int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, size_t *n_chars) {
 
   if (string[0] != '(' && string[0] != '[') {
-    feenox_push_error_message("arguments must start with a parenthesis");
+    feenox_push_error_message("arguments must start with a parenthesis for functions and with a bracket for vectors or matrices");
     return FEENOX_ERROR;
   }
   
