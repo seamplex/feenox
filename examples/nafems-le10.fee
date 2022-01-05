@@ -41,4 +41,4 @@ PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
 
 # write post-processing data for paraview
 WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
-#> ![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width=75%}
+#> ![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width_latex=75% width_html=100%}

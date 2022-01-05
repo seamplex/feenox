@@ -83,6 +83,51 @@ $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 The Lorenz attractor computed with FeenoX plotted with two different tools
 :::
 
+# The logistic map
+
+Plot the asymptotic behavior of the [logistic
+map](https://en.wikipedia.org/wiki/Logistic_map)
+
+$$
+x_{n+1} = r \cdot x \cdot (1-x)
+$$
+
+
+```feenox
+DEFAULT_ARGUMENT_VALUE 1 2.6   # by default show r in [2.6:4]
+DEFAULT_ARGUMENT_VALUE 2 4
+
+steps_per_r = 2^10
+steps_asymptotic = 2^8
+steps_for_r = 2^10
+
+static_steps = steps_for_r*steps_per_r
+
+# change r every steps_per_r steps
+IF mod(step_static,steps_per_r)=1
+ r = quasi_random($1,$2)
+ENDIF
+
+x_init = 0.5           # start at x = 0.5
+x = r*x*(1-x)          # apply the map
+
+IF step_static-steps_per_r*floor(step_static/steps_per_r)>(steps_per_r-steps_asymptotic)
+ # write the asymptotic behavior only
+ PRINT r x
+ENDIF
+```
+
+
+```terminal
+$ gnuplot
+gnuplot> plot "< feenox logistic.fee" w p pt 50 ps 0.02
+gnuplot> quit
+$
+```
+
+
+![Asymptotic behavior of the logistic map.](logistic.png)
+
 # Thermal slabs
 
 ## One-dimensional linear
@@ -1196,7 +1241,7 @@ $
 
 # Non-dimensional transient heat conduction on a cylinder
 
-Let us solve a dimensinless transient problem over a cylinder.
+Let us solve a dimensionless transient problem over a cylinder.
 Conductivity and heat capacity are unity. Initial condition is a linear
 temperature profile along the $x$ axis:
 

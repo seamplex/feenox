@@ -1,0 +1,27 @@
+# quote from fortune cookies:
+# 
+# Once upon a time, when I was training to be a mathematician, a group of
+# us bright young students taking number theory discovered the names of the
+# smaller prime numbers.
+# 
+# 2:  The Odd Prime --
+#         It's the only even prime, therefore is odd.  QED.
+# 3:  The True Prime --
+#         Lewis Carroll: "If I tell you 3 times, it's true."
+# 31: The Arbitrary Prime --
+#         Determined by unanimous unvote.  We needed an arbitrary prime in
+#         case the prof asked for one, and so had an election.  91 received
+#         the most votes (well, it *looks* prime) and 3+4i the next most.
+#         However, 31 was the only candidate to receive none at all.
+# 41: The Female Prime --
+#         The polynomial X**2 - X + 41 is
+#         prime for integer values from 1 to 40.
+# 43: The Male Prime - they form a prime pair.
+# 
+# Since the composite numbers are formed from primes, their qualities
+# are derived from those primes.  So, for instance, the number 6 is "odd
+# but true", while the powers of 2 are all extremely odd numbers
+# 
+
+f(x) := x^2 - x + 41
+PRINT_FUNCTION f MIN 1 MAX 40 STEP 1 FORMAT %g

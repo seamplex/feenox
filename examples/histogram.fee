@@ -1,0 +1,21 @@
+# compute an histogram representation of individual samples
+# call this input as
+# feenox histogram.fee histogram-samples 15 5 2.25 2.55 | gnuplot -p -e "plot '< cat' with histeps"
+
+N = $2    # number of samples
+n = $3    # number of bins
+a = $4    # lower end of range
+b = $5    # upper end of range
+
+VECTOR data SIZE N     # vector with the actual data
+VECTOR hist SIZE n     # histogram bins
+
+# either read data from a file 
+# READ data ASCII_FILE_PATH $1
+# or generate some random data
+data[i] = random_gauss(0.5*(a+b),0.25*(b-a))
+
+s = (b-a)/n
+hist[i] = sum(is_in_interval(data[j], a+(i-1)*s, a+i*s), j, 1, N)
+
+PRINT_VECTOR a+(i-1/2)*s hist 

@@ -1,0 +1,42 @@
+# the double pendulum solved by the lagrangian formulation
+# and numerically computing its derivatives
+
+end_time = 15
+
+# parameters
+m1 = 0.3
+m2 = 0.2
+l1 = 0.3
+l2 = 0.25
+g = 9.8
+
+# inital conditions
+theta1_0 = pi/2
+theta2_0 = pi
+
+PHASE_SPACE theta1 theta2 dL_dthetadot1 dL_dthetadot2
+VAR theta1' theta2' theta1_dot' theta2_dot'
+
+L(theta1,theta2,theta1_dot,theta2_dot) := {
+# kinetic energy of m1
+ 1/2*m1*l1^2*theta1_dot^2 + 
+# kinetic energy of m2
+ 1/2*m2*(l1^2*theta1_dot^2 + l2^2*theta2_dot^2 + 2*l1*l2*theta1_dot*theta2_dot*cos(theta1-theta2))
+ + ( 
+# potential energy of m1 
+ m1*g *  l1*cos(theta1) +
+# potential energy of m2
+ m2*g * (l1*cos(theta1) + l2*cos(theta2))
+ ) }
+
+dL_dthetadot1 .= derivative(L(theta1, theta2, theta1_dot', theta2_dot), theta1_dot', theta1_dot)
+dL_dthetadot2 .= derivative(L(theta1, theta2, theta1_dot, theta2_dot'), theta2_dot', theta2_dot)
+
+dL_dthetadot1_dot .= derivative(L(theta1', theta2,theta1_dot, theta2_dot), theta1', theta1)
+dL_dthetadot2_dot .= derivative(L(theta1, theta2',theta1_dot, theta2_dot), theta2', theta2)
+
+
+# output the results vs. time
+PRINT t theta1 theta2 theta1_dot theta2_dot \
+   l1*sin(theta1)                -l1*cos(theta1) \
+   l1*sin(theta1)+l2*sin(theta2) -l1*cos(theta1)-l2*cos(theta2) 

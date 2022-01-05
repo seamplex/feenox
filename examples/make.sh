@@ -4,6 +4,7 @@ out=examples.md
 rm -f ${out}
 for i in hello          \
          lorenz         \
+         logistic       \
          thermal-1d-dirichlet-uniform-k \
          nafems-le10    \
          nafems-le11    \

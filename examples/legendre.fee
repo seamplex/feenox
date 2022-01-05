@@ -1,0 +1,14 @@
+# Legendre's polynomials
+p0(x) = 1
+p1(x) = x
+p2(x) = 1/2*(3*x^2 - 1)
+p3(x) = 1/2*(5*x^3 - 3*x)
+p4(x) = 1/8*(35*x^4 - 30*x^2 + 3)
+
+# find its roots
+PRINT "Legendre's polynomials roots"
+PRINT %+.10f root(p1(x),x,-1,1)
+PRINT %+.10f root(p2(x),x,-1,0)    root(p2(x),x,0,1)
+PRINT %+.10f root(p3(x),x,-1,-0.1) root(p3(x),x,-0.1,0.1) root(p3(x),x,0.1,1)
+PRINT %+.10f root(p4(x),x,-1,-0.5) root(p4(x),x,-0.5,0)   root(p4(x),x,0,0.5) root(p4(x),x,0.5,1)
+
