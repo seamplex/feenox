@@ -90,7 +90,9 @@ PRINT %+.2f max_sigma_x max_sigma_y max_sigma_z
 
 PRINT
 PRINT "average displacement on DCD'C'"
-PRINT %+.4f Iu_dcdc/area_dcdc Iv_dcdc/area_dcdc Iw_dcdc/area_dcdc
+# the second component gives +0.0000 sometimes and -0.0000 some other times
+# PRINT %+.4f Iu_dcdc/area_dcdc Iv_dcdc/area_dcdc Iw_dcdc/area_dcdc
+PRINT %+.4f Iu_dcdc/area_dcdc  Iw_dcdc/area_dcdc
 
 PRINT
 PRINT "maximum displacement on DCD'C'"
