@@ -1,3 +1,25 @@
+/*------------ -------------- -------- --- ----- ---   --       -            -
+ *  feenox mechanical header
+ *
+ *  Copyright (C) 2015-2022 jeremy theler
+ *
+ *  This file is part of Feenox <https://www.seamplex.com/feenox>.
+ *
+ *  feenox is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Feenox is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *------------------- ------------  ----    --------  --     -       -         -
+ */
+
 #ifndef MECHANICAL_H
 #define MECHANICAL_H
 
@@ -19,10 +41,25 @@ struct mechanical_t {
     variant_axisymmetric,
   } variant;  
   
+  enum {
+    material_model_unknown,
+    material_model_elastic_isotropic,
+    material_model_elastic_orthotropic,    
+  } material_model;
+
+  // isotropic properties  
   distribution_t E;     // Young's modulus
   distribution_t nu;    // Poisson's ratio
   distribution_t alpha; // (mean) thermal expansion coefficient
-  distribution_t T;     // temperture distribution
+  
+  // orthotropic properties
+  distribution_t E_x, E_y, E_z;             // Young's moduli
+  distribution_t nu_xy, nu_yz, nu_zx;       // Poisson's ratios
+  distribution_t G_xy, G_yz, G_zx;          // Shear moduli
+  distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient
+  
+  // temperature field
+  distribution_t T;     // temperature distribution
   double T0;            // reference temperature
 
 #ifdef HAVE_PETSC  

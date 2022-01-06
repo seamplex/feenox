@@ -40,7 +40,7 @@ The inverse of a 3x3 matrix:
 with DET  =  a11(a33a22-a32a23)-a21(a33a12-a32a13)+a31(a23a12-a22a13)
 */
 
-int feenox_mesh_jacobian_invert(gsl_matrix *direct, gsl_matrix *inverse) {
+int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
 
   double det = 0;
   double invdet = 0;
@@ -169,7 +169,7 @@ int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, g
     dxdr = gsl_matrix_calloc(this->type->dim, this->type->dim);
     
     feenox_call(feenox_mesh_compute_dxdr(this, r, dxdr));
-    feenox_call(feenox_mesh_jacobian_invert(dxdr, drdx));
+    feenox_call(feenox_mesh_matrix_invert(dxdr, drdx));
   }
   
   
@@ -260,7 +260,7 @@ int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integ
     feenox_call(feenox_mesh_compute_dxdr_at_gauss(this, v, integration));
   }
   
-  feenox_call(feenox_mesh_jacobian_invert(this->dxdr[v], this->drdx[v]));
+  feenox_call(feenox_mesh_matrix_invert(this->dxdr[v], this->drdx[v]));
 
 #ifdef FEM_DUMP  
   printf("drdx(%d,%d) = \n", this->index, v);

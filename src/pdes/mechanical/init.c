@@ -1,3 +1,25 @@
+/*------------ -------------- -------- --- ----- ---   --       -            -
+ *  feenox elastic mechanical initialization routines
+ *
+ *  Copyright (C) 2015-2022 jeremy theler
+ *
+ *  This file is part of Feenox <https://www.seamplex.com/feenox>.
+ *
+ *  feenox is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Feenox is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *------------------- ------------  ----    --------  --     -       -         -
+ */
+
 #include "feenox.h"
 #include "mechanical.h"
 extern feenox_t feenox;
@@ -86,20 +108,6 @@ int feenox_problem_init_parser_mechanical(void) {
     feenox.pde.dofs = feenox.pde.dim;
   }
   
-  // set material model virtual method
-  // TODO: orthotropic
-  if (mechanical.variant == variant_full) {
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;    
-  } else if (mechanical.variant == variant_plane_stress) {
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
-  } else if (mechanical.variant == variant_plane_strain) {
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;  
-  } else {
-    feenox_push_error_message("not yet implemented");
-    return FEENOX_ERROR;
-  }
-  
-
   // TODO: custom names
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
@@ -196,10 +204,114 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // initialize distributions
-  // TODO: orthotropic
-  feenox_distribution_define_mandatory(mechanical, E, "E", "elastic modulus");
-  feenox_distribution_define_mandatory(mechanical, nu, "nu", "Poisson’s ratio");
   
+  // first see if we have linear elastic
+  feenox_call(feenox_distribution_init(&mechanical.E, "E"));  
+  feenox_call(feenox_distribution_init(&mechanical.nu, "nu"));  
+  
+  if (mechanical.E.defined && mechanical.nu.defined) {
+    mechanical.material_model = material_model_elastic_isotropic;
+  } else if (mechanical.E.defined) {
+    feenox_push_error_message("Young modulus E defined but Poisson’s ratio nu not defined");
+    return FEENOX_ERROR;
+  } else if (mechanical.nu.defined) {
+    feenox_push_error_message("Poisson’s ratio nu defined but Young modulus E not defined");
+    return FEENOX_ERROR;
+  }
+  
+  // see if there are orthotropic properties
+  feenox_call(feenox_distribution_init(&mechanical.E_x, "Ex"));
+  if (mechanical.E_x.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.E_x, "E_x"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.E_y, "Ey"));
+  if (mechanical.E_y.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.E_y, "E_y"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.E_z, "Ez"));
+  if (mechanical.E_z.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.E_z, "E_z"));
+  }
+
+  feenox_call(feenox_distribution_init(&mechanical.nu_xy, "nuxy"));
+  if (mechanical.nu_xy.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.nu_xy, "nu_xy"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.nu_yz, "nuyz"));
+  if (mechanical.nu_yz.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.nu_yz, "nu_yz"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.nu_zx, "nuzx"));
+  if (mechanical.nu_zx.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.nu_zx, "nu_zx"));
+  }
+  
+  feenox_call(feenox_distribution_init(&mechanical.G_xy, "Gxy"));
+  if (mechanical.G_xy.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.G_xy, "G_xy"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.G_yz, "Gyz"));
+  if (mechanical.G_yz.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.G_yz, "G_yz"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.G_zx, "Gzx"));
+  if (mechanical.G_zx.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.G_zx, "G_zx"));
+  }
+  
+  // check for consistency
+  int n_ortho = mechanical.E_x.defined   + mechanical.E_y.defined   + mechanical.E_z.defined   +
+                mechanical.nu_xy.defined + mechanical.nu_yz.defined + mechanical.nu_zx.defined +
+                mechanical.G_xy.defined  + mechanical.G_yz.defined  + mechanical.G_zx.defined;
+  
+  if (n_ortho > 0) {
+    if (mechanical.material_model == material_model_elastic_isotropic) {
+      feenox_push_error_message("Both isotropic and orthotropic properties given, choose one");
+      return FEENOX_ERROR;
+    } else if (n_ortho < 6) {
+      feenox_push_error_message("%d orthotropic properties missing", 6-n_ortho);
+      return FEENOX_ERROR;
+    } else if (mechanical.material_model == material_model_unknown) {
+      mechanical.material_model = material_model_elastic_orthotropic;
+    }
+  }
+  
+  
+  
+
+  // set material model virtual method
+  if (mechanical.variant == variant_full) {
+    
+    if (mechanical.material_model == material_model_elastic_isotropic) {
+      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
+    } else if (mechanical.material_model == material_model_elastic_orthotropic)  {
+      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
+    } else {
+      feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
+      return FEENOX_ERROR;
+    }
+    
+  } else if (mechanical.variant == variant_plane_stress) {
+    
+    if (mechanical.material_model != material_model_elastic_isotropic) {
+      feenox_push_error_message("plane stress can be used with elastic isotropic materials only");
+      return FEENOX_ERROR;
+    }
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+    
+  } else if (mechanical.variant == variant_plane_strain) {
+    
+    if (mechanical.material_model != material_model_elastic_isotropic) {
+      feenox_push_error_message("plane strain can be used with elastic isotropic materials only");
+      return FEENOX_ERROR;
+    }
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;  
+    
+  } else {
+    feenox_push_error_message("not yet implemented");
+    return FEENOX_ERROR;
+  }
+
   feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
   mechanical.alpha.space_dependent = feenox_expression_depends_on_space(mechanical.alpha.dependency_variables);
 
