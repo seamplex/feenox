@@ -56,6 +56,9 @@ extern int feenox_problem_build_compute_mechanical_C_elastic_plane_strain(const 
 extern int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *x, material_t *material);
 
 
+extern int feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j, double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx, double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyx, double *tauzx);
+extern int feenox_problem_gradient_compute_stress_from_strain_elastic_orthotropic(node_t *node, element_t *element, unsigned int j, double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx, double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyx, double *tauzx);
+
 // mechanical/post.c
 extern int feenox_problem_solve_post_mechanical(void);
 

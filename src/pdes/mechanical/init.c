@@ -279,13 +279,15 @@ int feenox_problem_init_runtime_mechanical(void) {
   
   
 
-  // set material model virtual method
+  // set material model virtual methods
   if (mechanical.variant == variant_full) {
     
     if (mechanical.material_model == material_model_elastic_isotropic) {
       mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
+      mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic;
     } else if (mechanical.material_model == material_model_elastic_orthotropic)  {
       mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
+      mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_orthotropic;
     } else {
       feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
       return FEENOX_ERROR;
@@ -298,6 +300,7 @@ int feenox_problem_init_runtime_mechanical(void) {
       return FEENOX_ERROR;
     }
     mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+    mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic;
     
   } else if (mechanical.variant == variant_plane_strain) {
     
@@ -305,7 +308,8 @@ int feenox_problem_init_runtime_mechanical(void) {
       feenox_push_error_message("plane strain can be used with elastic isotropic materials only");
       return FEENOX_ERROR;
     }
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;  
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
+    mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic;
     
   } else {
     feenox_push_error_message("not yet implemented");

@@ -27,6 +27,12 @@ extern mechanical_t mechanical;
 int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *x, material_t *material) {
   
   // TODO: check ranges of validity
+  // E > 0
+  // G > 0
+  // | nu_ij | < sqrt(E_i/E_j)
+  // 1 - nu12*nu21 - nu23*nu32 - nu31*nu13 - 2*nu21*nu32*nu13 > 0
+  
+  // TODO: handle engineering 
   double E_x = mechanical.E_x.eval(&mechanical.E_x, x, material);
   double E_y = mechanical.E_y.eval(&mechanical.E_y, x, material);
   double E_z = mechanical.E_z.eval(&mechanical.E_z, x, material);
@@ -37,7 +43,6 @@ int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *
   double G_yz = mechanical.G_yz.eval(&mechanical.G_yz, x, material);
   double G_zx = mechanical.G_zx.eval(&mechanical.G_zx, x, material);
   
-  // TODO: check that young moduli are positive
   gsl_matrix *S = NULL; // reduced compliance matrix (only the normal-stress stuff)
   feenox_check_alloc(S = gsl_matrix_calloc(3, 3));  
   gsl_matrix *C = NULL; // reduced stiffness matrix
@@ -86,12 +91,31 @@ int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *
   gsl_matrix_set(mechanical.C, 2, 1, gsl_matrix_get(C, 2, 1));
   gsl_matrix_set(mechanical.C, 2, 2, gsl_matrix_get(C, 2, 2));
     
-  gsl_matrix_set(mechanical.C, 3, 3, G_yz);
-  gsl_matrix_set(mechanical.C, 4, 4, G_zx);
-  gsl_matrix_set(mechanical.C, 5, 5, G_xy);
+  // the following subscripts have to match rows 3-5 of mechanical.B
+  // note that this is not voigt notation! that would be
+  // xx,yy,zz,yz,xz,xy and we use xx,yy,zz,xy,yz,zx
+  gsl_matrix_set(mechanical.C, 3, 3, G_xy);
+  gsl_matrix_set(mechanical.C, 4, 4, G_yz);
+  gsl_matrix_set(mechanical.C, 5, 5, G_zx);
     
   gsl_matrix_free(C);
   gsl_matrix_free(S);
     
+  return FEENOX_OK;
+}
+
+
+int feenox_problem_gradient_compute_stress_from_strain_elastic_orthotropic(node_t *node, element_t *element, unsigned int j,
+    double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
+    double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
+  
+  // TODO: non-uniform properties
+  *sigmax = gsl_matrix_get(mechanical.C, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C, 0, 1) * epsilony + gsl_matrix_get(mechanical.C, 0, 2) * epsilonz;
+  *sigmay = gsl_matrix_get(mechanical.C, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C, 1, 1) * epsilony + gsl_matrix_get(mechanical.C, 1, 2) * epsilonz;
+  *sigmaz = gsl_matrix_get(mechanical.C, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C, 2, 1) * epsilony + gsl_matrix_get(mechanical.C, 2, 2) * epsilonz;
+  *tauxy = gsl_matrix_get(mechanical.C, 3, 3) * gammaxy;
+  *tauyz = gsl_matrix_get(mechanical.C, 4, 4) * gammayz;
+  *tauzx = gsl_matrix_get(mechanical.C, 5, 5) * gammazx;
+  
   return FEENOX_OK;
 }

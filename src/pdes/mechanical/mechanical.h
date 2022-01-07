@@ -70,7 +70,11 @@ struct mechanical_t {
   size_t n_nodes;
   size_t stress_strain_size;
 
+  // C-like virtual methods (i.e. function pointers)
   int (*compute_C)(const double *x, material_t *material);
+  int (*compute_stress_from_strain)(node_t *node, element_t *element, unsigned int j,
+    double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
+    double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
   
   
   // auxiliary intermediate matrices

@@ -71,7 +71,6 @@ int feenox_problem_solve_post_modal(void) {
     PetscScalar Mu = 0;
 
     // TODO: this is pretty inefficient
-    PetscScalar omega = 0;
     PetscScalar norm = 0;
     PetscScalar mu = 0;
     PetscScalar phiMphi = 0;

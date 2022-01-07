@@ -50,3 +50,49 @@ int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x,
     
   return FEENOX_OK;
 }
+
+
+int feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
+    double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
+    double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
+
+  // TODO: cache properties
+  // TODO: check what has to be computed and what not
+  double E  = mechanical.E.eval(&mechanical.E, node->x, element->physical_group->material);
+  double nu = mechanical.nu.eval(&mechanical.nu, node->x, element->physical_group->material);
+  double lambda = E*nu/((1+nu)*(1-2*nu));
+  double mu = 0.5*E/(1+nu);
+  
+  double lambda_div = lambda*(epsilonx + epsilony + epsilonz);
+  double two_mu = two_mu = 2*mu;
+
+  // TODO: separate
+  if (mechanical.variant == variant_full || mechanical.variant == variant_plane_strain) {
+    // normal stresses
+    *sigmax = lambda_div + two_mu * epsilonx;
+    *sigmay = lambda_div + two_mu * epsilony;
+    *sigmaz = lambda_div + two_mu * epsilonz;
+  
+    // shear stresses
+    *tauxy = mu * gammaxy;
+    if (feenox.pde.dofs == 3) {
+      *tauyz = mu * gammayz;
+      *tauzx = mu * gammazx;
+    }
+  } else if (mechanical.variant == variant_plane_stress) {
+    
+      double E = mu*(3*lambda + 2*mu)/(lambda+mu);
+      double nu = lambda / (2*(lambda+mu));
+    
+      double c1 = E/(1-nu*nu);
+      double c2 = nu * c1;
+
+      *sigmax = c1 * epsilonx + c2 * epsilony;
+      *sigmay = c2 * epsilonx + c1 * epsilony;
+      *sigmaz = 0;
+      *tauxy = c1*0.5*(1-nu) * gammaxy;
+    
+  }
+  
+  return FEENOX_OK;
+}

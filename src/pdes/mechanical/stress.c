@@ -88,23 +88,13 @@ int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
   return FEENOX_OK;
 }
 
+// TODO: why both node and j?
 int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight) {
 
-  // TODO: cache properties
-  // TODO: orthotropic
-  // TODO: check what has to be computed and what not
-  double E  = mechanical.E.eval(&mechanical.E, node->x, element->physical_group->material);
-  double nu = mechanical.nu.eval(&mechanical.nu, node->x, element->physical_group->material);
-  double lambda = E*nu/((1+nu)*(1-2*nu));
-  double mu = 0.5*E/(1+nu);
-  
-  double ex = gsl_matrix_get(element->dphidx_node[j], 0, 0);
-  double ey = gsl_matrix_get(element->dphidx_node[j], 1, 1);
-  double ez = 0;
-  // TODO: axisymmetric
-  if (feenox.pde.dofs == 3) {
-    ez = gsl_matrix_get(element->dphidx_node[j], 2, 2);
-  }  
+  // read strains from gradient
+  double epsilonx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
+  double epsilony = gsl_matrix_get(element->dphidx_node[j], 1, 1);
+  double epsilonz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
   
   double gammaxy = gsl_matrix_get(element->dphidx_node[j], 0, 1) + gsl_matrix_get(element->dphidx_node[j], 1, 0);
   double gammayz = 0;
@@ -113,44 +103,21 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     gammayz = gsl_matrix_get(element->dphidx_node[j], 1, 2) + gsl_matrix_get(element->dphidx_node[j], 2, 1);
     gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
   }  
-  
-  
-  // TODO: virtual
-  double lambda_div = lambda*(ex + ey + ez);
-  double two_mu = two_mu = 2*mu;
+
   double sigmax = 0;
   double sigmay = 0;
   double sigmaz = 0;
   double tauxy = 0;
   double tauyz = 0;
   double tauzx = 0;
-  
-  if (mechanical.variant == variant_full || mechanical.variant == variant_plane_strain) {
-    // normal stresses
-    sigmax = lambda_div + two_mu * ex;
-    sigmay = lambda_div + two_mu * ey;
-    sigmaz = lambda_div + two_mu * ez;
-  
-    // shear stresses
-    tauxy = mu * gammaxy;
-    if (feenox.pde.dofs == 3) {
-      tauyz = mu * gammayz;
-      tauzx = mu * gammazx;
-    }
-  } else if (mechanical.variant == variant_plane_stress) {
-    
-      double E = mu*(3*lambda + 2*mu)/(lambda+mu);
-      double nu = lambda / (2*(lambda+mu));
-    
-      double c1 = E/(1-nu*nu);
-      double c2 = nu * c1;
 
-      sigmax = c1 * ex + c2 * ey;
-      sigmay = c2 * ex + c1 * ey;
-      tauxy = c1*0.5*(1-nu) * gammaxy;
-    
-  }
-
+  // compute stresses
+  feenox_call(mechanical.compute_stress_from_strain(node, element, j,
+                                                    epsilonx, epsilony, epsilonz, gammaxy, gammayz, gammazx,
+                                                    &sigmax, &sigmay, &sigmaz, &tauxy, &tauyz, &tauzx));
+  
+  // TODO: move to virtual
+/*  
   // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
   if (mechanical.alpha.defined) {
     double alpha = mechanical.alpha.eval(&mechanical.alpha, node->x, element->physical_group->material);
@@ -165,6 +132,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       }  
     }
   }
+*/
   
   node->flux[FLUX_SIGMAX] += rel_weight * (sigmax - node->flux[FLUX_SIGMAX]);
   node->flux[FLUX_SIGMAY] += rel_weight * (sigmay - node->flux[FLUX_SIGMAY]);
