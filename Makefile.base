@@ -10,6 +10,8 @@ EXTRA_DIST = examples \
 TESTS = \
         tests/abort.sh \
         tests/algebraic_expr.sh \
+        tests/beam-modal.sh \
+        tests/beam-ortho.sh \
         tests/builtin.sh \
         tests/cylinder-traction-force.sh \
         tests/default_argument_value.sh \
@@ -29,7 +31,6 @@ TESTS = \
         tests/laplace2d.sh \
         tests/materials.sh \
         tests/mesh.sh \
-        tests/modal.sh \
         tests/moment-of-inertia.sh \
         tests/nafems-le1.sh \
         tests/nafems-le10.sh \
