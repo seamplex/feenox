@@ -44,6 +44,8 @@ TESTS = \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
         tests/trig.sh \
+        tests/two-cubes-isotropic.sh \
+        tests/two-cubes-orthotropic.sh \
         tests/vector.sh
 
 XFAIL_TESTS = tests/abort.sh         

@@ -162,15 +162,15 @@ int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
       (mechanical.sigma3 != NULL && mechanical.sigma3->used) ||
       (mechanical.tresca != NULL && mechanical.tresca->used)) {
     
-    feenox_principal_stress_compute(mesh->node[j].flux[FLUX_SIGMAX],
-                                    mesh->node[j].flux[FLUX_SIGMAY],
-                                    mesh->node[j].flux[FLUX_SIGMAZ],
-                                    mesh->node[j].flux[FLUX_TAUXY],
-                                    mesh->node[j].flux[FLUX_TAUYZ],
-                                    mesh->node[j].flux[FLUX_TAUZX],
-                                    &mechanical.sigma1->data_value[j],
-                                    &mechanical.sigma2->data_value[j],
-                                    &mechanical.sigma3->data_value[j]);
+    feenox_principal_stress_from_cauchy(mesh->node[j].flux[FLUX_SIGMAX],
+                                        mesh->node[j].flux[FLUX_SIGMAY],
+                                        mesh->node[j].flux[FLUX_SIGMAZ],
+                                        mesh->node[j].flux[FLUX_TAUXY],
+                                        mesh->node[j].flux[FLUX_TAUYZ],
+                                        mesh->node[j].flux[FLUX_TAUZX],
+                                        &mechanical.sigma1->data_value[j],
+                                        &mechanical.sigma2->data_value[j],
+                                        &mechanical.sigma3->data_value[j]);
     
     if (mechanical.sigma->used) {
       mechanical.sigma->data_value[j] = feenox_vonmises_from_principal(mechanical.sigma1->data_value[j],
@@ -199,7 +199,7 @@ int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
 
 
 
-int feenox_principal_stress_compute(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
+int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
   // stress invariants
   // https://en.wikiversity.org/wiki/Principal_stresses
   double I1 = sigmax + sigmay + sigmaz;
@@ -229,6 +229,25 @@ int feenox_principal_stress_compute(double sigmax, double sigmay, double sigmaz,
   
 }
 
+int feenox_stress_from_strain(node_t *node, element_t *element, unsigned int j,
+    double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
+    double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
+  
+  if (mechanical.uniform_C == 0) {
+    mechanical.compute_C(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
+  }  
+  
+  *sigmax = gsl_matrix_get(mechanical.C, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C, 0, 1) * epsilony + gsl_matrix_get(mechanical.C, 0, 2) * epsilonz;
+  *sigmay = gsl_matrix_get(mechanical.C, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C, 1, 1) * epsilony + gsl_matrix_get(mechanical.C, 1, 2) * epsilonz;
+  *sigmaz = gsl_matrix_get(mechanical.C, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C, 2, 1) * epsilony + gsl_matrix_get(mechanical.C, 2, 2) * epsilonz;
+  *tauxy = gsl_matrix_get(mechanical.C, 3, 3) * gammaxy;
+  *tauyz = gsl_matrix_get(mechanical.C, 4, 4) * gammayz;
+  *tauzx = gsl_matrix_get(mechanical.C, 5, 5) * gammazx;
+  
+  return FEENOX_OK;
+}
+
+
 double feenox_vonmises_from_principal(double sigma1, double sigma2, double sigma3) {
   
   return sqrt(0.5*(gsl_pow_2(sigma1-sigma2) + gsl_pow_2(sigma2-sigma3) + gsl_pow_2(sigma3-sigma1)));
@@ -241,3 +260,4 @@ double feenox_vonmises_from_stress_tensor(double sigmax, double sigmay, double s
                        6.0 * (gsl_pow_2(tauxy) + gsl_pow_2(tauyz) + gsl_pow_2(tauzx))));
   
 }
+

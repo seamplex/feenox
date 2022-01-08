@@ -39,19 +39,17 @@ struct thermal_t {
   distribution_t cp;          // heat capacity
   distribution_t rhocp;       // density times heat capacity
 
-#ifdef HAVE_PETSC  
-  PetscBool space_stiffness;
-  PetscBool temperature_stiffness;
+  int space_dependent_stiffness;
+  int temperature_dependent_stiffness;
 
-  PetscBool space_mass;
-  PetscBool temperature_mass;
+  int space_dependent_mass;
+  int temperature_dependent_mass;
   
-  PetscBool space_source;
-  PetscBool temperature_source;
+  int space_dependent_source;
+  int temperature_dependent_source;
 
-  PetscBool space_bc;
-  PetscBool temperature_bc;
-#endif
+  int space_dependent_bc;
+  int temperature_dependent_bc;
   
   // heat fluxes
   function_t *qx;

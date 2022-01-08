@@ -94,37 +94,37 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_check_minusone(asprintf(&name, "D%d", g+1));
     feenox_distribution_init(&neutron_diffusion.D[g], name);
     if (neutron_diffusion.D[g].defined) {
-      neutron_diffusion.D[g].space_dependent = feenox_expression_depends_on_space(neutron_diffusion.D[g].dependency_variables);
+      neutron_diffusion.D[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.D[g].dependency_variables);
     }
     feenox_free(name);
     
     feenox_check_minusone(asprintf(&name, "Sigma_t%d", g+1));
     feenox_distribution_init(&neutron_diffusion.sigma_t[g], name);
     if (neutron_diffusion.sigma_t[g].defined) {
-      neutron_diffusion.sigma_t[g].space_dependent = feenox_expression_depends_on_space(neutron_diffusion.sigma_t[g].dependency_variables);
+      neutron_diffusion.sigma_t[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.sigma_t[g].dependency_variables);
     }
     feenox_free(name);
     
     feenox_check_minusone(asprintf(&name, "Sigma_a%d", g+1));
     feenox_distribution_init(&neutron_diffusion.sigma_a[g], name);
     if (neutron_diffusion.sigma_a[g].defined) {
-      neutron_diffusion.sigma_a[g].space_dependent = feenox_expression_depends_on_space(neutron_diffusion.sigma_a[g].dependency_variables);
+      neutron_diffusion.sigma_a[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.sigma_a[g].dependency_variables);
     }  
     feenox_free(name);
 
     feenox_check_minusone(asprintf(&name, "nuSigma_f%d", g+1));
     feenox_distribution_init(&neutron_diffusion.nu_sigma_f[g], name);
     if (neutron_diffusion.nu_sigma_f[g].defined) {
-      neutron_diffusion.has_fission = PETSC_TRUE;
-      neutron_diffusion.nu_sigma_f[g].space_dependent = feenox_expression_depends_on_space(neutron_diffusion.nu_sigma_f[g].dependency_variables);
+      neutron_diffusion.has_fission = 1;
+      neutron_diffusion.nu_sigma_f[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.nu_sigma_f[g].dependency_variables);
     }  
     feenox_free(name);
 
     feenox_check_minusone(asprintf(&name, "S%d", g+1));
     feenox_distribution_init(&neutron_diffusion.source[g], name);
     if (neutron_diffusion.source[g].defined) {
-      neutron_diffusion.has_sources = PETSC_TRUE;
-      neutron_diffusion.source[g].space_dependent = feenox_expression_depends_on_space(neutron_diffusion.source[g].dependency_variables);
+      neutron_diffusion.has_sources = 1;
+      neutron_diffusion.source[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.source[g].dependency_variables);
     }  
     feenox_free(name);
     
@@ -134,19 +134,19 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
       feenox_check_minusone(asprintf(&name, "Sigma_s%d.%d", g+1, g_prime+1));
       feenox_distribution_init(&neutron_diffusion.sigma_s[g][g_prime], name);
       if (neutron_diffusion.sigma_s[g][g_prime].defined) {
-        neutron_diffusion.sigma_s[g][g_prime].space_dependent = feenox_expression_depends_on_space(neutron_diffusion.sigma_s[g][g_prime].dependency_variables);
+        neutron_diffusion.sigma_s[g][g_prime].uniform = feenox_expression_depends_on_space(neutron_diffusion.sigma_s[g][g_prime].dependency_variables);
       }  
       feenox_free(name);
     }
   }
 
 
-  if (neutron_diffusion.has_sources == PETSC_FALSE && neutron_diffusion.has_fission == PETSC_FALSE) {
+  if (neutron_diffusion.has_sources == 0 && neutron_diffusion.has_fission == 0) {
     feenox_push_error_message("neither fission nor sources found");
     return FEENOX_ERROR;
   }
   
-  if (neutron_diffusion.has_sources == PETSC_FALSE) {
+  if (neutron_diffusion.has_sources == 0) {
 #ifdef HAVE_SLEPC    
     // TODO: higher harmonics?
     feenox.pde.nev = 1;
@@ -166,20 +166,20 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   }
   
 
-  feenox.pde.math_type = (neutron_diffusion.has_sources == PETSC_TRUE) ? math_type_linear :  math_type_eigen;
-  feenox.pde.solve     = (neutron_diffusion.has_sources == PETSC_TRUE) ? feenox_problem_solve_petsc_linear : feenox_problem_solve_slepc_eigen;
+  feenox.pde.math_type = neutron_diffusion.has_sources ? math_type_linear : math_type_eigen;
+  feenox.pde.solve     = neutron_diffusion.has_sources ? feenox_problem_solve_petsc_linear : feenox_problem_solve_slepc_eigen;
   
-  feenox.pde.has_stiffness = PETSC_TRUE;
-  feenox.pde.has_mass = (neutron_diffusion.has_sources == PETSC_TRUE) ? PETSC_FALSE : PETSC_TRUE;
-  feenox.pde.has_rhs  = (neutron_diffusion.has_sources == PETSC_TRUE) ? PETSC_TRUE : PETSC_FALSE;
+  feenox.pde.has_stiffness = 1;
+  feenox.pde.has_mass = !neutron_diffusion.has_sources;
+  feenox.pde.has_rhs  =  neutron_diffusion.has_sources;
   
-  feenox.pde.has_jacobian_K = PETSC_FALSE;
-  feenox.pde.has_jacobian_M = PETSC_FALSE;
-  feenox.pde.has_jacobian_b = PETSC_FALSE;
+  feenox.pde.has_jacobian_K = 0;
+  feenox.pde.has_jacobian_M = 0;
+  feenox.pde.has_jacobian_b = 0;
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
   
-  feenox.pde.symmetric_K = PETSC_FALSE;
-  feenox.pde.symmetric_M = PETSC_FALSE;
+  feenox.pde.symmetric_K = 0;
+  feenox.pde.symmetric_M = 0;
 #endif
   return FEENOX_OK;
 }
@@ -190,7 +190,7 @@ int feenox_problem_setup_pc_neutron_diffusion(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
-    if (neutron_diffusion.has_sources == PETSC_FALSE) {
+    if (neutron_diffusion.has_sources == 0) {
       // PC for EPS
 #ifdef PETSC_HAVE_MUMPS
       petsc_call(PCSetType(pc, PCCHOLESKY));
@@ -213,7 +213,7 @@ int feenox_problem_setup_ksp_neutron_diffusion(KSP ksp ) {
   KSPType ksp_type = NULL;
   petsc_call(KSPGetType(ksp, &ksp_type));
   if (ksp_type == NULL) {
-    if (neutron_diffusion.has_sources == PETSC_FALSE) {
+    if (neutron_diffusion.has_sources == 0) {
       // KSP for EPS
       // defaults
     } else {

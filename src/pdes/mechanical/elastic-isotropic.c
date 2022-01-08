@@ -52,7 +52,7 @@ int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x,
 }
 
 
-int feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
+int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
 
@@ -79,6 +79,7 @@ int feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic(node_t 
       *tauyz = mu * gammayz;
       *tauzx = mu * gammazx;
     }
+    
   } else if (mechanical.variant == variant_plane_stress) {
     
       double E = mu*(3*lambda + 2*mu)/(lambda+mu);

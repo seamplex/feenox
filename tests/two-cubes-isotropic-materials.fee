@@ -1,0 +1,13 @@
+PROBLEM mechanical
+READ_MESH two-cubes.msh
+
+MATERIAL soft E=1e3   nu=0.2
+MATERIAL hard E=200e3 nu=0.3
+
+BC left  fixed
+BC right Fx=1000
+
+SOLVE_PROBLEM
+
+WRITE_MESH two-cubes-isotropic-materials.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT %.1f sigma(0,0,0)

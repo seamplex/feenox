@@ -18,3 +18,5 @@ K.m
 K_bc.m
 b.m
 b_bc.m
+two-cubes-*.vtk
+two-cubes.msh

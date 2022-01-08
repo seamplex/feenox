@@ -26,17 +26,6 @@ extern feenox_t feenox;
 #include <unistd.h>   // for sysconf
 
 
-#ifdef HAVE_PETSC
-// TODO: deprecate petsc < 3.7.0
-// this is a wrapper because PetscOptionsHasName changed its arguments after 3.7.0
-#if PETSC_VERSION_LT(3,7,0)
- #define PetscOptionsHasNameWrapper(a, b, c) PetscOptionsHasName(a, b, c)
-#else
- #define PetscOptionsHasNameWrapper(a, b, c) PetscOptionsHasName(PETSC_NULL, a, b, c)
-#endif
-#endif
-
-
 int feenox_problem_init_parser_general(void) {
 
 #ifdef HAVE_PETSC
@@ -96,7 +85,7 @@ int feenox_problem_init_parser_general(void) {
   // see if the user asked for mumps in the command line
   PetscBool flag = PETSC_FALSE;
   // recall that we already dumped one dash above!
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-mumps", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-mumps", &flag));
   if (flag == PETSC_TRUE) {
 #ifdef PETSC_HAVE_MUMPS
     feenox.pde.ksp_type = strdup("mumps");
@@ -109,19 +98,19 @@ int feenox_problem_init_parser_general(void) {
 
   // see if the user asked for progress in the command line
   if (feenox.pde.progress_ascii == PETSC_FALSE) {
-    petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-progress", &feenox.pde.progress_ascii));
+    petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-progress", &feenox.pde.progress_ascii));
   }  
 
   // see if the user asked for a forced problem type
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-linear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_linear;
   }
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-non-linear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-non-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;
   }
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "-nonlinear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-nonlinear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;
   }
@@ -426,7 +415,7 @@ int feenox_problem_init_runtime_general(void) {
   // check for further commandline options
   // see if the user asked for mumps in the command line
   PetscBool flag = PETSC_FALSE;
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "--mumps", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "--mumps", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.ksp_type = strdup("mumps");
     feenox.pde.pc_type = strdup("mumps");
@@ -434,19 +423,19 @@ int feenox_problem_init_runtime_general(void) {
 
   // see if the user asked for progress in the command line
   if (feenox.pde.progress_ascii == PETSC_FALSE) {
-    petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "--progress", &feenox.pde.progress_ascii));
+    petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "--progress", &feenox.pde.progress_ascii));
   }  
 
   // see if the user asked for a forced problem type
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "--linear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "--linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_linear;
   }
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "--non-linear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "--non-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;
   }
-  petsc_call(PetscOptionsHasNameWrapper(PETSC_NULL, "--nonlinear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "--nonlinear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;
   }

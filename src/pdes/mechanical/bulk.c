@@ -46,11 +46,15 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+
+  if (mechanical.n_nodes != this->type->nodes) {
+    feenox_call(feenox_problem_build_allocate_aux_mechanical(this->type->nodes));
+  }
   
-  double *x = NULL;
-  if (mechanical.space_dependent_properties == PETSC_TRUE) {
+  if (mechanical.uniform_C == 0) {
+    // material stress-strain relationship
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
-    x = this->x[v];
+    mechanical.compute_C(this->x[v], this->physical_group != NULL ? this->physical_group->material : NULL);
   }
   
   // TODO: axisymmetric
@@ -58,22 +62,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
 //  double r_for_axisymmetric = 1;
 //  double w = this->w[v] * r_for_axisymmetric;
   
-  material_t *material = NULL;
-  if (this->physical_group != NULL && this->physical_group->material != NULL) {
-    material = this->physical_group->material;
-  }
-
-  if (mechanical.n_nodes != this->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_mechanical(this->type->nodes));
-  }
-
-  // material stress-strain relationship
-  if (mechanical.E.variable == NULL || mechanical.nu.variable == NULL) {
-    mechanical.compute_C(x, material);
-  }  
-  
-  
-
   unsigned int j = 0;
   gsl_matrix *dhdx = this->dhdx[v];
   for (j = 0; j < mechanical.n_nodes; j++) {
@@ -118,6 +106,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, this->w[v], mechanical.B, mechanical.CB, 1.0, feenox.pde.Ki));
 
   // thermal expansion vector
+/*  
   if (mechanical.alpha.defined) {
     // TODO: cache with C
     double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
@@ -133,7 +122,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
       feenox_call(gsl_blas_dgemv(CblasTrans, this->w[v], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
     }  
   }  
-  
+*/  
   // TODO: rhs with volumetric sources
   // TODO: cleanup aux matrices C, B and CB
   

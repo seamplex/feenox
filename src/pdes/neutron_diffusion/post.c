@@ -28,7 +28,7 @@ extern neutron_diffusion_t neutron_diffusion;
 int feenox_problem_solve_post_neutron_diffusion(void) {
 
 #ifdef HAVE_PETSC  
-  if (neutron_diffusion.has_sources == PETSC_FALSE) {
+  if (neutron_diffusion.has_sources == 0) {
 #ifdef HAVE_SLEPC
     if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
       feenox_var_value(neutron_diffusion.keff) = 1.0/feenox.pde.eigenvalue[0];

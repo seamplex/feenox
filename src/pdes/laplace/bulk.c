@@ -33,7 +33,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *this, unsigne
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double *x = NULL;
-  if (laplace.space_source || laplace.space_mass) {
+  if (laplace.space_dependent_source || laplace.space_dependent_mass) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];
   }

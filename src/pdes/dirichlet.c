@@ -165,7 +165,7 @@ int feenox_problem_dirichlet_set_K(void) {
     feenox_problem_dirichlet_compute_scale();
   }
   
-  if (feenox.pde.symmetric_K == PETSC_TRUE) {
+  if (feenox.pde.symmetric_K) {
     petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   } else {  
     petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
@@ -189,7 +189,7 @@ int feenox_problem_dirichlet_set_M(void) {
   }
   
   // the mass matrix is like the stiffness one but with zero instead of one
-  if (feenox.pde.symmetric_M == PETSC_TRUE) {
+  if (feenox.pde.symmetric_M) {
     petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
   } else {  
     petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  

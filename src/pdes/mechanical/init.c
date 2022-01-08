@@ -210,12 +210,20 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_call(feenox_distribution_init(&mechanical.nu, "nu"));  
   
   if (mechanical.E.defined && mechanical.nu.defined) {
+    if (mechanical.E.full == 0) {
+      feenox_push_error_message("Young modulus 'E' is not defined over all volumes");
+      return FEENOX_ERROR;
+    }
+    if (mechanical.nu.full == 0) {
+      feenox_push_error_message("Poisson’s ratio 'nu' is not defined over all volumes");
+      return FEENOX_ERROR;
+    }
     mechanical.material_model = material_model_elastic_isotropic;
   } else if (mechanical.E.defined) {
-    feenox_push_error_message("Young modulus E defined but Poisson’s ratio nu not defined");
+    feenox_push_error_message("Young modulus 'E' defined but Poisson’s ratio 'nu' not defined");
     return FEENOX_ERROR;
   } else if (mechanical.nu.defined) {
-    feenox_push_error_message("Poisson’s ratio nu defined but Young modulus E not defined");
+    feenox_push_error_message("Poisson’s ratio 'nu' defined but Young modulus 'E' not defined");
     return FEENOX_ERROR;
   }
   
@@ -268,8 +276,8 @@ int feenox_problem_init_runtime_mechanical(void) {
     if (mechanical.material_model == material_model_elastic_isotropic) {
       feenox_push_error_message("Both isotropic and orthotropic properties given, choose one");
       return FEENOX_ERROR;
-    } else if (n_ortho < 6) {
-      feenox_push_error_message("%d orthotropic properties missing", 6-n_ortho);
+    } else if (n_ortho < 9) {
+      feenox_push_error_message("%d orthotropic properties missing", 9-n_ortho);
       return FEENOX_ERROR;
     } else if (mechanical.material_model == material_model_unknown) {
       mechanical.material_model = material_model_elastic_orthotropic;
@@ -280,53 +288,49 @@ int feenox_problem_init_runtime_mechanical(void) {
   
 
   // set material model virtual methods
-  if (mechanical.variant == variant_full) {
-    
-    if (mechanical.material_model == material_model_elastic_isotropic) {
+  if (mechanical.material_model == material_model_elastic_isotropic) {
+      
+    mechanical.uniform_C = (mechanical.E.uniform && mechanical.nu.uniform);
+    if (mechanical.variant == variant_full) {
+      
       mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
-      mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic;
-    } else if (mechanical.material_model == material_model_elastic_orthotropic)  {
-      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
-      mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_orthotropic;
-    } else {
-      feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
+      mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_elastic_isotropic;
+      
+    } else if (mechanical.variant == variant_plane_stress) {      
+      
+      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+      mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
+      
+    } else if (mechanical.variant == variant_plane_strain) {  
+      
+      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
+      mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
+      
+    }  
+
+    
+      
+  } else if (mechanical.material_model == material_model_elastic_orthotropic)  {
+      
+    if (mechanical.variant != variant_full) {
+      feenox_push_error_message("only elastic orthotropic materials cannot be used in plane stress/strain");
       return FEENOX_ERROR;
     }
-    
-  } else if (mechanical.variant == variant_plane_stress) {
-    
-    if (mechanical.material_model != material_model_elastic_isotropic) {
-      feenox_push_error_message("plane stress can be used with elastic isotropic materials only");
-      return FEENOX_ERROR;
-    }
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
-    mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic;
-    
-  } else if (mechanical.variant == variant_plane_strain) {
-    
-    if (mechanical.material_model != material_model_elastic_isotropic) {
-      feenox_push_error_message("plane strain can be used with elastic isotropic materials only");
-      return FEENOX_ERROR;
-    }
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
-    mechanical.compute_stress_from_strain = feenox_problem_gradient_compute_stress_from_strain_elastic_isotropic;
+
+    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
+    mechanical.compute_stress_from_strain = feenox_stress_from_strain;
     
   } else {
-    feenox_push_error_message("not yet implemented");
+    feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
     return FEENOX_ERROR;
   }
 
   feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
-  mechanical.alpha.space_dependent = feenox_expression_depends_on_space(mechanical.alpha.dependency_variables);
+  mechanical.alpha.uniform = feenox_expression_depends_on_space(mechanical.alpha.dependency_variables);
 
   feenox_call(feenox_distribution_init(&mechanical.T, "T"));
-  mechanical.T.space_dependent = feenox_expression_depends_on_space(mechanical.T.dependency_variables);
+  mechanical.T.uniform = feenox_expression_depends_on_space(mechanical.T.dependency_variables);
   
-  // if all the properties are given by variables, we can optimize some stuff
-  mechanical.space_dependent_properties = mechanical.E.variable == NULL ||
-                                          mechanical.nu.variable == NULL ||
-                                          mechanical.alpha.variable == NULL ||
-                                          mechanical.T.variable == NULL;
                                           
   if (mechanical.variant == variant_full) {
     mechanical.stress_strain_size = 6;
@@ -345,8 +349,10 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
   }
   
-  // cache properties
-  feenox_call(mechanical.compute_C(NULL, NULL));
+  if (mechanical.uniform_C) {
+    // cache properties
+    feenox_call(mechanical.compute_C(NULL, NULL));
+  }  
   
                                           
   
@@ -356,18 +362,18 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.math_type = math_type_linear;
   feenox.pde.solve = feenox_problem_solve_petsc_linear;
   
-  feenox.pde.has_stiffness = PETSC_TRUE;
+  feenox.pde.has_stiffness = 1;
   // TODO: transient
-  feenox.pde.has_mass = PETSC_FALSE;
-  feenox.pde.has_rhs = PETSC_TRUE;
+  feenox.pde.has_mass = 0;
+  feenox.pde.has_rhs = 1;
   
-  feenox.pde.has_jacobian_K = PETSC_FALSE;
-  feenox.pde.has_jacobian_M = PETSC_FALSE;
-  feenox.pde.has_jacobian_b = PETSC_FALSE;
+  feenox.pde.has_jacobian_K = 0;
+  feenox.pde.has_jacobian_M = 0;
+  feenox.pde.has_jacobian_b = 0;
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
   
-  feenox.pde.symmetric_K = PETSC_TRUE;
-  feenox.pde.symmetric_M = PETSC_TRUE;
+  feenox.pde.symmetric_K = 1;
+  feenox.pde.symmetric_M = 1;
 
   // see if we have to compute gradients
   feenox.pde.compute_gradients |= (mechanical.sigmax != NULL && mechanical.sigmax->used) ||
@@ -450,7 +456,7 @@ int feenox_problem_setup_ksp_mechanical(KSP ksp) {
   petsc_call(KSPGetType(ksp, &ksp_type));
   if (ksp_type == NULL) {
     // if the user did not choose anything, we default to CG or GMRES
-    petsc_call(KSPSetType(ksp, (feenox.pde.symmetric_K == PETSC_TRUE && feenox.pde.symmetric_M == PETSC_TRUE) ? KSPCG : KSPGMRES));
+    petsc_call(KSPSetType(ksp, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES));
   }  
 
   return FEENOX_OK;

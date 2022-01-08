@@ -62,14 +62,18 @@ struct mechanical_t {
   distribution_t T;     // temperature distribution
   double T0;            // reference temperature
 
-#ifdef HAVE_PETSC  
-  PetscBool space_dependent_properties;
-  MatNullSpace rigid_body_base;
-#endif
+  // flags to speed up things
+  int uniform_C;
+  int constant_C;
   
   size_t n_nodes;
   size_t stress_strain_size;
 
+  // holder for the rigid-body displacements
+#ifdef HAVE_PETSC  
+  MatNullSpace rigid_body_base;
+#endif
+  
   // C-like virtual methods (i.e. function pointers)
   int (*compute_C)(const double *x, material_t *material);
   int (*compute_stress_from_strain)(node_t *node, element_t *element, unsigned int j,
@@ -84,7 +88,7 @@ struct mechanical_t {
   gsl_vector *et;   // thermal strain vector, size 6 for 3d
   gsl_vector *Cet;  // product of C times et, size 6 for 3d
   
-  double hourglass_epsilon;
+//  double hourglass_epsilon;
   
   var_t *U[3];
 

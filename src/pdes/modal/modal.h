@@ -40,13 +40,12 @@ struct modal_t {
   distribution_t nu;    // Poisson's ratio
   distribution_t rho;   // density
 
+  int space_E;
+  int space_nu;
+  int space_rho;
+  
 #ifdef HAVE_PETSC  
-  PetscBool space_E;
-  PetscBool space_nu;
-  PetscBool space_rho;
-  
   MatNullSpace rigid_body_base;
-  
 #endif
   
   var_t *M_T;

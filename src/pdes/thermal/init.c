@@ -110,8 +110,10 @@ int feenox_problem_init_runtime_thermal(void) {
 ///pr_thermal+k+description The thermal conductivity in units of power per length per degree of temperature.
 ///pr_thermal+k+description This property is mandatory.
   feenox_distribution_define_mandatory(thermal, k, "k", "thermal conductivity");
-  thermal.k.space_dependent = feenox_expression_depends_on_space(thermal.k.dependency_variables);
+  thermal.k.uniform = feenox_expression_depends_on_space(thermal.k.dependency_variables);
   thermal.k.non_linear = feenox_expression_depends_on_function(thermal.k.dependency_functions, feenox.pde.solution[0]);  
+  
+  // TODO: orthotropic heat conduction
   
 ///pr_thermal+q'''+usage q'''
 ///pr_thermal+q'''+description The volumetric power dissipated in the material in units of power per unit of volume.
@@ -123,10 +125,10 @@ int feenox_problem_init_runtime_thermal(void) {
 ///pr_thermal+q+description Alias for `q'''`
     feenox_call(feenox_distribution_init(&thermal.q, "q"));
   }
-  thermal.q.space_dependent = feenox_expression_depends_on_space(thermal.q.dependency_variables);
+  thermal.q.uniform = feenox_expression_depends_on_space(thermal.q.dependency_variables);
   thermal.q.non_linear = feenox_expression_depends_on_function(thermal.q.dependency_functions, feenox.pde.solution[0]);  
   
-  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) ? PETSC_TRUE : PETSC_FALSE;
+  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0);
   if (feenox.pde.has_mass) {
 ///pr_thermal+kappa+usage kappa
 ///pr_thermal+kappa+description Thermal diffusivity in units of area per unit of time. 
@@ -167,34 +169,34 @@ int feenox_problem_init_runtime_thermal(void) {
     }
   }
 
-  thermal.kappa.space_dependent = feenox_expression_depends_on_space(thermal.kappa.dependency_variables);
-  thermal.rho.space_dependent   = feenox_expression_depends_on_space(thermal.rho.dependency_variables);
-  thermal.cp.space_dependent    = feenox_expression_depends_on_space(thermal.cp.dependency_variables);
-  thermal.rhocp.space_dependent = feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
+  thermal.kappa.uniform = feenox_expression_depends_on_space(thermal.kappa.dependency_variables);
+  thermal.rho.uniform   = feenox_expression_depends_on_space(thermal.rho.dependency_variables);
+  thermal.cp.uniform    = feenox_expression_depends_on_space(thermal.cp.dependency_variables);
+  thermal.rhocp.uniform = feenox_expression_depends_on_space(thermal.rhocp.dependency_variables);
 
   thermal.kappa.non_linear      = feenox_expression_depends_on_function(thermal.kappa.dependency_functions,  feenox.pde.solution[0]);
   thermal.rho.non_linear        = feenox_expression_depends_on_function(thermal.rho.dependency_functions,    feenox.pde.solution[0]);
   thermal.cp.non_linear         = feenox_expression_depends_on_function(thermal.cp.dependency_functions,     feenox.pde.solution[0]);
   thermal.rhocp.non_linear      = feenox_expression_depends_on_function(thermal.rhocp.dependency_functions,  feenox.pde.solution[0]);
   
-  thermal.space_stiffness = thermal.k.space_dependent ||
-                            thermal.kx.space_dependent ||
-                            thermal.ky.space_dependent ||
-                            thermal.kz.space_dependent;
-  thermal.space_source = thermal.q.space_dependent;
-  thermal.space_mass = thermal.kappa.space_dependent ||
-                       thermal.rho.space_dependent   ||
-                       thermal.cp.space_dependent    ||
-                       thermal.rhocp.space_dependent;
+  thermal.space_dependent_stiffness = thermal.k.uniform ||
+                            thermal.kx.uniform ||
+                            thermal.ky.uniform ||
+                            thermal.kz.uniform;
+  thermal.space_dependent_source = thermal.q.uniform;
+  thermal.space_dependent_mass = thermal.kappa.uniform ||
+                       thermal.rho.uniform   ||
+                       thermal.cp.uniform    ||
+                       thermal.rhocp.uniform;
   
-  thermal.temperature_stiffness = feenox_expression_depends_on_function(thermal.k.dependency_functions,     feenox.pde.solution[0]) ||
-                                  feenox_expression_depends_on_function(thermal.kx.dependency_functions,    feenox.pde.solution[0]) ||
-                                  feenox_expression_depends_on_function(thermal.ky.dependency_functions,    feenox.pde.solution[0]) ||
-                                  feenox_expression_depends_on_function(thermal.kz.dependency_functions,    feenox.pde.solution[0]);
-  thermal.temperature_mass      = feenox_expression_depends_on_function(thermal.kappa.dependency_functions, feenox.pde.solution[0]) ||
-                                  feenox_expression_depends_on_function(thermal.rho.dependency_functions,   feenox.pde.solution[0]) ||
-                                  feenox_expression_depends_on_function(thermal.cp.dependency_functions,    feenox.pde.solution[0]) ||
-                                  feenox_expression_depends_on_function(thermal.rhocp.dependency_functions, feenox.pde.solution[0]);
+  thermal.temperature_dependent_stiffness = feenox_expression_depends_on_function(thermal.k.dependency_functions,     feenox.pde.solution[0]) ||
+                                            feenox_expression_depends_on_function(thermal.kx.dependency_functions,    feenox.pde.solution[0]) ||
+                                            feenox_expression_depends_on_function(thermal.ky.dependency_functions,    feenox.pde.solution[0]) ||
+                                            feenox_expression_depends_on_function(thermal.kz.dependency_functions,    feenox.pde.solution[0]);
+  thermal.temperature_dependent_mass      = feenox_expression_depends_on_function(thermal.kappa.dependency_functions, feenox.pde.solution[0]) ||
+                                            feenox_expression_depends_on_function(thermal.rho.dependency_functions,   feenox.pde.solution[0]) ||
+                                            feenox_expression_depends_on_function(thermal.cp.dependency_functions,    feenox.pde.solution[0]) ||
+                                            feenox_expression_depends_on_function(thermal.rhocp.dependency_functions, feenox.pde.solution[0]);
   
   // check BCs are consistent
   bc_t *bc = NULL;
@@ -245,19 +247,19 @@ int feenox_problem_init_runtime_thermal(void) {
       }
       
       bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
-      thermal.space_bc |= bc_data->space_dependent;
+      thermal.space_dependent_bc |= bc_data->space_dependent;
       
       bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
-      thermal.temperature_bc |= bc_data->nonlinear;
+      thermal.temperature_dependent_bc |= bc_data->nonlinear;
       
     }
   }
   
   if (feenox.pde.math_type == math_type_automatic) {
-    feenox.pde.math_type = (thermal.temperature_stiffness == PETSC_FALSE &&
-                            thermal.temperature_mass      == PETSC_FALSE &&
-                            thermal.temperature_source    == PETSC_FALSE &&
-                            thermal.temperature_bc        == PETSC_FALSE) ? math_type_linear : math_type_nonlinear;
+    feenox.pde.math_type = (thermal.temperature_dependent_stiffness == 0 &&
+                            thermal.temperature_dependent_mass      == 0 &&
+                            thermal.temperature_dependent_source    == 0 &&
+                            thermal.temperature_dependent_bc        == 0) ? math_type_linear : math_type_nonlinear;
   }
   
   // TODO: check for transient_type
@@ -265,17 +267,17 @@ int feenox_problem_init_runtime_thermal(void) {
                          ((feenox.pde.math_type == math_type_linear) ? feenox_problem_solve_petsc_linear :
                                                                        feenox_problem_solve_petsc_nonlinear);
   
-  feenox.pde.has_stiffness = PETSC_TRUE;
-  feenox.pde.has_rhs = PETSC_TRUE;
+  feenox.pde.has_stiffness = 1;
+  feenox.pde.has_rhs = 1;
   // has_mass is above
   
-  feenox.pde.has_jacobian_K = thermal.temperature_stiffness;
-  feenox.pde.has_jacobian_M = thermal.temperature_mass;
-  feenox.pde.has_jacobian_b = (thermal.temperature_source || thermal.temperature_bc);
+  feenox.pde.has_jacobian_K = thermal.temperature_dependent_stiffness;
+  feenox.pde.has_jacobian_M = thermal.temperature_dependent_mass;
+  feenox.pde.has_jacobian_b = (thermal.temperature_dependent_source || thermal.temperature_dependent_bc);
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
   
-  feenox.pde.symmetric_K = PETSC_TRUE;
-  feenox.pde.symmetric_M = PETSC_TRUE;
+  feenox.pde.symmetric_K = 1;
+  feenox.pde.symmetric_M = 1;
   
   
   // see if we have to compute gradients

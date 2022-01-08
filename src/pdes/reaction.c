@@ -63,15 +63,15 @@ int feenox_instruction_reaction(void *arg) {
   size_t j = 0;
   size_t k = 0;
   unsigned int j_local = 0;
-  PetscBool add = PETSC_FALSE;
+  int add = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
-    add = PETSC_FALSE;
+    add = 0;
     // this could have been done by sweeping the assigned elements and checking out if the nodes belong to the entity
-    for (i = 0; add == PETSC_FALSE && i < reaction->physical_group->n_elements; i++) {
+    for (i = 0; add == 0 && i < reaction->physical_group->n_elements; i++) {
       element_t *element = &feenox.pde.mesh->element[reaction->physical_group->element[i]];
-      for (j_local = 0; add == PETSC_FALSE && j_local < element->type->nodes; j_local++) {
+      for (j_local = 0; add == 0 && j_local < element->type->nodes; j_local++) {
         if (element->node[j_local]->index_mesh == j) {
-          add = PETSC_TRUE;
+          add = 1;
           for (g = 0; g < feenox.pde.dofs; g++) {
             row[g][k] = feenox.pde.mesh->node[j].index_dof[g];
           }

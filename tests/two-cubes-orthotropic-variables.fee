@@ -1,0 +1,36 @@
+PROBLEM mechanical
+READ_MESH two-cubes.msh
+
+Ex_soft = 0.1*100000
+Ey_soft = 0.1*75000
+Ez_soft = 0.1*50000
+Gxy_soft = 0.1*30000.0
+Gyz_soft = 0.1*40000.0
+Gzx_soft = 0.1*35000.0
+nuxy_soft = 0.3
+nuyz_soft = 0.25
+nu13_soft = 0.4
+nuzx_soft = nu13_soft * Ez_soft/Ex_soft
+
+Ex_hard = 10*100000
+Ey_hard = 10*75000
+Ez_hard = 10*50000
+Gxy_hard = 10*30000.0
+Gyz_hard = 10*40000.0
+Gzx_hard = 10*35000.0
+nuxy_hard = 0.3
+nuyz_hard = 0.25
+nu13_hard = 0.4
+nuzx_hard = nu13_hard * Ez_hard/Ex_hard
+
+
+BC left  fixed
+BC right Fx=1000
+
+SOLVE_PROBLEM
+
+DUMP K format OCTAVE
+
+WRITE_MESH two-cubes-orthotropic-variables.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT %.1f sigma(0,0,0)
+

@@ -1,0 +1,40 @@
+PROBLEM mechanical
+READ_MESH two-cubes.msh
+
+MATERIAL soft {
+  Ex=0.1*100000
+  Ey=0.1*75000
+  Ez=0.1*50000
+  Gxy=0.1*30000.0
+  Gyz=0.1*40000.0
+  Gzx=0.1*35000.0
+  nuxy=0.3
+  nuyz=0.25
+  nu13=0.4
+  nuzx=0.4*50000/100000
+}
+
+MATERIAL hard {
+  Ex=10*100000
+  Ey=10*75000
+  Ez=10*50000
+  Gxy=10*30000.0
+  Gyz=10*40000.0
+  Gzx=10*35000.0
+  nuxy=0.3
+  nuyz=0.25
+  nu13=0.4
+  nuzx=0.4*50000/100000
+}
+
+BC left  fixed
+BC right Fx=1000
+
+SOLVE_PROBLEM
+
+DUMP K format OCTAVE
+
+WRITE_MESH two-cubes-orthotropic-materials.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT %.1f sigma(0,0,0)
+
+
