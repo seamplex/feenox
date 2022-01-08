@@ -370,11 +370,12 @@ int feenox_problem_init_runtime_mechanical(void) {
   
   switch (mechanical.thermal_expansion_model) {
     case thermal_expansion_model_isotropic:
-      mechanical.compute_et = feenox_problem_build_compute_mechanical_et_isotropic;
-      mechanical.compute_thermal_stress = feenox_stress_thermal_isotropic;
+      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_isotropic;
+      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_isotropic;
     break;
     case thermal_expansion_model_orthotropic:
-      // XXX
+      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_orthotropic;
+      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_orthotropic;
     break;
     default:
     break;

@@ -89,7 +89,7 @@ struct mechanical_t {
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
 
-  int (*compute_et)(const double *x, material_t *material);
+  int (*compute_thermal_strain)(const double *x, material_t *material);
   int (*compute_thermal_stress)(const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z);
 
   

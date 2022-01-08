@@ -32,13 +32,15 @@ int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *
   // | nu_ij | < sqrt(E_i/E_j)
   // 1 - nu12*nu21 - nu23*nu32 - nu31*nu13 - 2*nu21*nu32*nu13 > 0
   
-  // TODO: handle engineering 
   double E_x = mechanical.E_x.eval(&mechanical.E_x, x, material);
   double E_y = mechanical.E_y.eval(&mechanical.E_y, x, material);
   double E_z = mechanical.E_z.eval(&mechanical.E_z, x, material);
+
+  // TODO: handle engineering nu12,nu23 and nu13 (instead of nu31)
   double nu_xy = mechanical.nu_xy.eval(&mechanical.nu_xy, x, material);
   double nu_yz = mechanical.nu_yz.eval(&mechanical.nu_yz, x, material);
   double nu_zx = mechanical.nu_zx.eval(&mechanical.nu_zx, x, material);
+  
   double G_xy = mechanical.G_xy.eval(&mechanical.G_xy, x, material);
   double G_yz = mechanical.G_yz.eval(&mechanical.G_yz, x, material);
   double G_zx = mechanical.G_zx.eval(&mechanical.G_zx, x, material);
@@ -48,9 +50,9 @@ int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *
   gsl_matrix *C = NULL; // reduced stiffness matrix
   feenox_check_alloc(C = gsl_matrix_calloc(3, 3));  
   
-  // if you noticed that C is called the stiffness tensor and S is called the compliance
-  // tensor and wondered about it, this is not a mistake and there is no intention to confuse
-  // you. It is a long-time convention that cannot be reverted anymore
+  // > if you noticed that C is called the stiffness tensor and S is called the compliance
+  // > tensor and wondered about it, this is not a mistake and there is no intention to confuse
+  // > you. It is a long-time convention that cannot be reverted anymore
   // source: https://www.weizmann.ac.il/chembiophys/bouchbinder/sites/chemphys.bouchbinder/files/uploads/Courses/2016/ta5-linear_elasticity-i.pdf
 
     

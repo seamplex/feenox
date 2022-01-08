@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX algebraic expressions evaluation routines
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2022 jeremy theler
  *
  *  This file is part of Feenox.
  *
@@ -200,7 +200,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       // TODO: to avoid problems with spaces a get_next_char() method is needed
       } else if (last_op == '(' && (string[0] == '-' || string[0] == '+') && (isalpha(string[1]) || string[1] == '(')) {
         
-        // having "(-xxx..." is like having "(0-xxx..."
+        // having "(-something..." is like having "(0-something..."
         feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
         item->type = EXPR_CONSTANT;
         item->constant = 0;

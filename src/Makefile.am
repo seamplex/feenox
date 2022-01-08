@@ -117,6 +117,7 @@ feenox_SOURCES = \
 ./pdes/mechanical/elastic-plane-strain.c \
 ./pdes/mechanical/elastic-orthotropic.c \
 ./pdes/mechanical/expansion-isotropic.c \
+./pdes/mechanical/expansion-orthotropic.c \
 ./pdes/modal/modal.h \
 ./pdes/modal/methods.h \
 ./pdes/modal/init.c \
