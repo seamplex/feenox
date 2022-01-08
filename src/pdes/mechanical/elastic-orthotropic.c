@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic orthotropic mechanical material
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -47,6 +47,12 @@ int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *
   feenox_check_alloc(S = gsl_matrix_calloc(3, 3));  
   gsl_matrix *C = NULL; // reduced stiffness matrix
   feenox_check_alloc(C = gsl_matrix_calloc(3, 3));  
+  
+  // if you noticed that C is called the stiffness tensor and S is called the compliance
+  // tensor and wondered about it, this is not a mistake and there is no intention to confuse
+  // you. It is a long-time convention that cannot be reverted anymore
+  // source: https://www.weizmann.ac.il/chembiophys/bouchbinder/sites/chemphys.bouchbinder/files/uploads/Courses/2016/ta5-linear_elasticity-i.pdf
+
     
   // fill the 3x3 reduced compliance matrix first
   // [     1/E1  -nu21/E2   -nu31/E3  ]

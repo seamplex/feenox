@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic isotropic plane-stress mechanical material
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2021-2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox mechanical header
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2021-2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -41,12 +41,19 @@ struct mechanical_t {
     variant_axisymmetric,
   } variant;  
   
+  // TODO: have a "mixed" material model where each volume has its own model
   enum {
     material_model_unknown,
     material_model_elastic_isotropic,
     material_model_elastic_orthotropic,    
   } material_model;
 
+  enum {
+    thermal_expansion_model_none,
+    thermal_expansion_model_isotropic,
+    thermal_expansion_model_orthotropic,    
+  } thermal_expansion_model;
+  
   // isotropic properties  
   distribution_t E;     // Young's modulus
   distribution_t nu;    // Poisson's ratio
@@ -65,6 +72,8 @@ struct mechanical_t {
   // flags to speed up things
   int uniform_C;
   int constant_C;
+  int uniform_expansion;
+  int constant_expansion;
   
   size_t n_nodes;
   size_t stress_strain_size;
@@ -79,7 +88,10 @@ struct mechanical_t {
   int (*compute_stress_from_strain)(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
-  
+
+  int (*compute_et)(const double *x, material_t *material);
+  int (*compute_thermal_stress)(const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z);
+
   
   // auxiliary intermediate matrices
   gsl_matrix *C;    // stress-strain matrix, 6x6 for 3d

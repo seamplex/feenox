@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic mechanical initialization routines
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2021-2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -209,6 +209,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_call(feenox_distribution_init(&mechanical.E, "E"));  
   feenox_call(feenox_distribution_init(&mechanical.nu, "nu"));  
   
+  // TODO: allow different volumes to have different material models
   if (mechanical.E.defined && mechanical.nu.defined) {
     if (mechanical.E.full == 0) {
       feenox_push_error_message("Young modulus 'E' is not defined over all volumes");
@@ -274,7 +275,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   
   if (n_ortho > 0) {
     if (mechanical.material_model == material_model_elastic_isotropic) {
-      feenox_push_error_message("Both isotropic and orthotropic properties given, choose one");
+      feenox_push_error_message("both isotropic and orthotropic properties given, choose one");
       return FEENOX_ERROR;
     } else if (n_ortho < 9) {
       feenox_push_error_message("%d orthotropic properties missing", 9-n_ortho);
@@ -284,54 +285,104 @@ int feenox_problem_init_runtime_mechanical(void) {
     }
   }
   
+  // thermal expansion model
+  // first try isotropic
+  feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
+  if (mechanical.alpha.defined) {
+    mechanical.thermal_expansion_model = thermal_expansion_model_isotropic;
+  }
+  
+  // see if there are orthotropic properties
+  feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alphax"));
+  if (mechanical.alpha_x.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alpha_x"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alphay"));
+  if (mechanical.alpha_y.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alpha_y"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alphaz"));
+  if (mechanical.alpha_z.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alpha_z"));
+  }
+  
+  // check for consistency
+  n_ortho = mechanical.alpha_x.defined   + mechanical.alpha_y.defined   + mechanical.alpha_z.defined;
+  
+  if (n_ortho > 0) {
+    if (mechanical.thermal_expansion_model == thermal_expansion_model_isotropic) {
+      feenox_push_error_message("both isotropic and orthotropic thermal expansion coefficients given, choose one");
+      return FEENOX_ERROR;
+    } else if (n_ortho < 3) {
+      feenox_push_error_message("%d orthotropic thermal expansion coefficients missing", 3-n_ortho);
+      return FEENOX_ERROR;
+    } else if (mechanical.thermal_expansion_model == thermal_expansion_model_none) {
+      mechanical.thermal_expansion_model = thermal_expansion_model_orthotropic;
+    }
+  }
+    
+  // temperature used for the thermal expansion
+  feenox_call(feenox_distribution_init(&mechanical.T, "T"));
   
   
 
   // set material model virtual methods
-  if (mechanical.material_model == material_model_elastic_isotropic) {
+  switch (mechanical.material_model) {
+  
+    case material_model_elastic_isotropic:
+      mechanical.uniform_C = (mechanical.E.uniform && mechanical.nu.uniform);
+      if (mechanical.variant == variant_full) {
       
-    mechanical.uniform_C = (mechanical.E.uniform && mechanical.nu.uniform);
-    if (mechanical.variant == variant_full) {
+        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
+        mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_elastic_isotropic;
       
-      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
-      mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_elastic_isotropic;
+      } else if (mechanical.variant == variant_plane_stress) {      
       
-    } else if (mechanical.variant == variant_plane_stress) {      
+        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+        mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
       
-      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
-      mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
+      } else if (mechanical.variant == variant_plane_strain) {  
       
-    } else if (mechanical.variant == variant_plane_strain) {  
+        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
+        mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
       
-      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
-      mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
-      
-    }  
-
+      }  
+    break;
     
+    case material_model_elastic_orthotropic:
       
-  } else if (mechanical.material_model == material_model_elastic_orthotropic)  {
-      
-    if (mechanical.variant != variant_full) {
-      feenox_push_error_message("only elastic orthotropic materials cannot be used in plane stress/strain");
+      if (mechanical.variant != variant_full) {
+        feenox_push_error_message("only elastic orthotropic materials cannot be used in plane stress/strain");
+        return FEENOX_ERROR;
+      }
+
+      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
+      mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+    
+    break;
+    
+    default:
+      feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
       return FEENOX_ERROR;
-    }
-
-    mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
-    mechanical.compute_stress_from_strain = feenox_stress_from_strain;
-    
-  } else {
-    feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
-    return FEENOX_ERROR;
+    break;
   }
 
-  feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
-  mechanical.alpha.uniform = feenox_expression_depends_on_space(mechanical.alpha.dependency_variables);
-
-  feenox_call(feenox_distribution_init(&mechanical.T, "T"));
-  mechanical.T.uniform = feenox_expression_depends_on_space(mechanical.T.dependency_variables);
   
-                                          
+  switch (mechanical.thermal_expansion_model) {
+    case thermal_expansion_model_isotropic:
+      mechanical.compute_et = feenox_problem_build_compute_mechanical_et_isotropic;
+      mechanical.compute_thermal_stress = feenox_stress_thermal_isotropic;
+    break;
+    case thermal_expansion_model_orthotropic:
+      // XXX
+    break;
+    default:
+    break;
+  }
+  
+
+    
+  // size of stress-strain matrix
   if (mechanical.variant == variant_full) {
     mechanical.stress_strain_size = 6;
   } else if (mechanical.variant == variant_axisymmetric) {
@@ -343,18 +394,17 @@ int feenox_problem_init_runtime_mechanical(void) {
     return FEENOX_ERROR;
   }
   
+  // allocate stress-strain objects
   feenox_check_alloc(mechanical.C = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
-  if (mechanical.alpha.defined) {
-    feenox_check_alloc(mechanical.et = gsl_vector_calloc(mechanical.stress_strain_size));
-    feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
-  }
-  
   if (mechanical.uniform_C) {
     // cache properties
     feenox_call(mechanical.compute_C(NULL, NULL));
   }  
-  
-                                          
+
+  if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
+    feenox_check_alloc(mechanical.et = gsl_vector_calloc(mechanical.stress_strain_size));
+    feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
+  }
   
   // TODO: read T0
   

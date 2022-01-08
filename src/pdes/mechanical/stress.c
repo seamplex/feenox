@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to compute stresses
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2021-2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -116,23 +116,19 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
                                                     epsilonx, epsilony, epsilonz, gammaxy, gammayz, gammazx,
                                                     &sigmax, &sigmay, &sigmaz, &tauxy, &tauyz, &tauzx));
   
-  // TODO: move to virtual
-/*  
-  // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
-  if (mechanical.alpha.defined) {
-    double alpha = mechanical.alpha.eval(&mechanical.alpha, node->x, element->physical_group->material);
-    if (alpha != 0) {
-      double DT = mechanical.T.eval(&mechanical.T, node->x, element->physical_group->material) - mechanical.T0;
-      double thermal_stress = E/(1-2*nu) * alpha * DT;
+  if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
+    // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
+    double sigmat_x = 0;
+    double sigmat_y = 0;
+    double sigmat_z = 0;
     
-      sigmax -= thermal_stress;
-      sigmay -= thermal_stress;
-      if (feenox.pde.dim == 3) {
-        sigmaz -= thermal_stress;
-      }  
-    }
+    feenox_call(mechanical.compute_thermal_stress(node->x, element->physical_group->material, &sigmat_x, &sigmat_y, &sigmat_z));
+
+    sigmax -= sigmat_x;
+    sigmay -= sigmat_y;
+    sigmaz -= sigmat_z;
   }
-*/
+
   
   node->flux[FLUX_SIGMAX] += rel_weight * (sigmax - node->flux[FLUX_SIGMAX]);
   node->flux[FLUX_SIGMAY] += rel_weight * (sigmay - node->flux[FLUX_SIGMAY]);

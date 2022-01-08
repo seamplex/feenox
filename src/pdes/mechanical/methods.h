@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox mechanical methods
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2021-2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -55,8 +55,10 @@ extern int feenox_problem_build_compute_mechanical_C_elastic_plane_stress(const 
 extern int feenox_problem_build_compute_mechanical_C_elastic_plane_strain(const double *x, material_t *material);
 extern int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *x, material_t *material);
 
+extern int feenox_problem_build_compute_mechanical_et_isotropic (const double *x, material_t *material);
 
 extern int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j, double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx, double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyx, double *tauzx);
+extern int feenox_stress_thermal_isotropic (const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z);
 
 // mechanical/post.c
 extern int feenox_problem_solve_post_mechanical(void);
