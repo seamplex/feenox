@@ -32,8 +32,6 @@ BC right Fx=1000
 
 SOLVE_PROBLEM
 
-DUMP K format OCTAVE
-
 WRITE_MESH two-cubes-orthotropic-materials.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
 PRINT %.1f sigma(0,0,0)
 
