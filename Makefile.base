@@ -34,6 +34,7 @@ TESTS = \
         tests/moment-of-inertia.sh \
         tests/nafems-le1.sh \
         tests/nafems-le10.sh \
+        tests/nafems-le11.sh \
         tests/nafems-t1-4.sh \
         tests/nafems-t2-3.sh \
         tests/neutron_diffusion_src.sh \
@@ -74,8 +75,14 @@ DISTCLEANFILES = \
                  tests/2dpwr-quarter.msh \
                  tests/fibo_iterative.last \
                  tests/parallelepiped.msh \
+                 tests/print_function.last \
+                 tests/i-beam-tet.msh \
+                 tests/print_vector.last \
+                 tests/i-beam-hex.msh \
+                 tests/iterative.last \
                  mesh2d.msh \
                  laplace-square.msh
+                 
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
