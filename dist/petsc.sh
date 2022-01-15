@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -ex
+
 if [ ! -e ../src ]; then
   echo "run from dist directory"
   exit 0
