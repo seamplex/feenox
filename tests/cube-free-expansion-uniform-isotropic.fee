@@ -14,5 +14,15 @@ T = 9.87654321
 SOLVE_PROBLEM
 
 WRITE_MESH cube-free-expansion-uniform-isotropic.vtk VECTOR u v w sigma
-expected = alpha*T
-PRINT sqrt((u(1,1,1)-expected)^2+(v(1,1,1)-expected)^2+(w(1,1,1)-expected)^2)+sigma(1,1,1)
+
+VECTOR diff_displ[3]
+diff_displ[1] = u(1,1,1)-alpha*T
+diff_displ[2] = v(1,1,1)-alpha*T
+diff_displ[3] = w(1,1,1)-alpha*T
+
+VECTOR diff_stress[3]
+diff_stress[1] = sigmax(0.5,0.5,0.5)-0
+diff_stress[2] = sigmay(0.5,0.5,0.5)-0
+diff_stress[3] = sigmaz(0.5,0.5,0.5)-0
+
+PRINT vecnorm(diff_displ)+vecnorm(diff_stress)

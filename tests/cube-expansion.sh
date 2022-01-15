@@ -19,3 +19,12 @@ exitifwrong $?
 
 answerzero cube-restrained-expansion-uniform-isotropic.fee
 exitifwrong $?
+
+answerzero cube-free-expansion-uniform-orthotropic.fee
+exitifwrong $?
+
+answerzero cube-restrained-expansion-uniform-orthotropic.fee
+exitifwrong $?
+
+answerzero cube-free-expansion-alpha-of-space.fee
+exitifwrong $?
