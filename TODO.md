@@ -4,9 +4,11 @@
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
+ * analyze memory overcommit
  
 ## Tests
 
+ * automated nightly builds and tests
  * write a README and an explanation of each test
  * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations
@@ -55,6 +57,7 @@
 
  * list symbols with "-l" (is there any clash with petsc?)
  * $1 = ${1}
+ * $0 should have the main input file basename (without the extension)
  
 ## Error handling 
  
@@ -92,6 +95,7 @@
    - this is wrong!
  * remove the need of needing an explicit SOLVE_PROBLEM
    - detect which varaibles/functions are PDE outputs and call solve_problem() the first time they are needed
+ * benchmark MPI and MNMPI
  
 ## Laplace/Poisson/Helmholtz
 

@@ -47,9 +47,16 @@ TESTS = \
         tests/trig.sh \
         tests/two-cubes-isotropic.sh \
         tests/two-cubes-orthotropic.sh \
-        tests/vector.sh
+        tests/vector.sh \
+        tests/xfail-few-properties-ortho-young.sh \
+        tests/xfail-few-properties-ortho-poisson.sh \
+        tests/xfail-few-properties-ortho-shear.sh
 
-XFAIL_TESTS = tests/abort.sh         
+XFAIL_TESTS = tests/abort.sh \
+              tests/xfail-few-properties-ortho-young.sh \
+              tests/xfail-few-properties-ortho-poisson.sh \
+              tests/xfail-few-properties-ortho-shear.sh
+
 
 DISTCLEANFILES = \
                  config.guess \
