@@ -323,7 +323,27 @@ int feenox_problem_init_runtime_mechanical(void) {
     
   // temperature used for the thermal expansion
   feenox_call(feenox_distribution_init(&mechanical.T, "T"));
-  
+
+  // reference temperature: it has to be a variable
+  feenox_call(feenox_distribution_init(&mechanical.T_ref, "T0"));
+  if (mechanical.T_ref.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.T_ref, "T_0"));
+  }
+  if (mechanical.T_ref.defined) {
+    if (mechanical.T_ref.uniform == 0) {
+      feenox_push_error_message("reference temperature T0 has to be uniform");
+      return FEENOX_ERROR;
+    }
+    // TODO: it is hard to know if a variable will be constant in time...
+/*    
+    if (mechanical.T_ref.constant == 0) {
+      feenox_push_error_message("reference temperature T0 has to be constant");
+      return FEENOX_ERROR;
+    }
+ */
+    // evaluate reference temperature and store it in T0
+    mechanical.T0 = mechanical.T_ref.eval(&mechanical.T_ref, NULL, NULL);
+  }
   
 
   // set material model virtual methods
@@ -406,8 +426,6 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_check_alloc(mechanical.et = gsl_vector_calloc(mechanical.stress_strain_size));
     feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
   }
-  
-  // TODO: read T0
   
   // TODO: check nonlinearity!
   feenox.pde.math_type = math_type_linear;

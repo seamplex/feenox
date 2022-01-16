@@ -67,7 +67,8 @@ struct mechanical_t {
   
   // temperature field
   distribution_t T;     // temperature distribution
-  double T0;            // reference temperature
+  distribution_t T_ref; // reference temperature (has to be a constant)
+  double T0;            // evaluated T_ref
 
   // flags to speed up things
   int uniform_C;

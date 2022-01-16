@@ -952,6 +952,17 @@ int feenox_expression_depends_on_space(var_ll_t *variables) {
   return depends;
 }
 
+int feenox_expression_depends_on_time(var_ll_t *variables) {
+  var_ll_t *item = NULL;
+  LL_FOREACH(variables, item) {
+    if (item->var != NULL && item->var == feenox.special_vars.t) {
+      return 1;
+    }  
+  }
+      
+  return 0;
+}
+
 int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function) {
   int depends = 0;
   function_ll_t *item = NULL;

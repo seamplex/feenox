@@ -29,7 +29,7 @@ int feenox_problem_build_compute_mechanical_strain_isotropic (const double *x, m
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
   double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
   double alpha_delta_T = alpha * delta_T;
-
+  
   gsl_vector_set(mechanical.et, 0, alpha_delta_T);
   gsl_vector_set(mechanical.et, 1, alpha_delta_T);
   if (feenox.pde.dim > 2) {

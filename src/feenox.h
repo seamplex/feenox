@@ -2241,6 +2241,7 @@ extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t
 extern int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function);
 
 extern int feenox_expression_depends_on_space(var_ll_t *variables);
+extern int feenox_expression_depends_on_time(var_ll_t *variables);
 extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
 
 // build.c
