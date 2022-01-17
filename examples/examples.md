@@ -1345,7 +1345,9 @@ $
 ```
 
 
+:::: {.not-in-format .latex .texi}
 ![Transient temperature distribution](temp-cylinder-smooth.mp4){width=100%}
+::::
 
 # Five natural modes of a cantilevered wire
 
