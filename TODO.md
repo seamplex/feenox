@@ -5,25 +5,27 @@
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
  * analyze memory overcommit
+ * allow PETSc configured with `--download-slepc`
+ * insert expansion `mpicc` into `feenox -V`
  
 ## Tests
 
- * automated nightly builds and tests
- * write a README and an explanation of each test
+ * automated nightly builds and tests (laminar?)
+ * write a `README` and an explanation of each test
  * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations
- * FIT ranges
+ * `FIT` ranges
 
 ## Wasora keywords
 
- * SEMAPHORE + SHARED_MEMORY
- * READ / WRITE
- * SOLVE
- * M4 (MUSTACHE? MACRO?)
- * SHELL
- * HISTORY
- * PRINT_FUNCTION PHYSICAL_ENTITY
- * CALL user routines (check hash of feenox.h)
+ * `SEMAPHORE` + `SHARED_MEMORY`
+ * `READ` / `WRITE`
+ * `SOLVE`
+ * `M4` (MUSTACHE? MACRO?)
+ * `SHELL`
+ * `HISTORY`
+ * `PRINT_FUNCTION PHYSICAL_ENTITY`
+ * `CALL` user routines (check hash of feenox.h)
  
 ## Wasora-like stuff
 
@@ -39,31 +41,31 @@
 
 ## Nice to have
 
- * logaritmic ranges for PRINT_FUNCTION
- * default separator after TEXT should be space, after numerical should be tab
- * PRINTF instruction
- * PRINT_FUNCTION with %f in between arguments (like PRINT_VECTOR)
- * BLAS
-   - BLAS a * b = s   # scalar dot
-   - BLAS a x b = c   # vector cross
-   - BLAS A * b = c   # matrix-vector
-   - BLAS a + b = c   # vector
-   - BLAS A + B = C   # matrix
-   - BLAS a - b = c
-   - BLAS A - B = C
+ * logaritmic ranges for `PRINT_FUNCTION`
+ * default separator after `TEXT` should be space, after numerical should be tab
+ * `PRINTF` instruction
+ * `PRINT_FUNCTION` with `%f` in between arguments (like `PRINT_VECTOR`)
+ * `BLAS` 
+   - `BLAS a * b = s   # scalar dot`
+   - `BLAS a x b = c   # vector cross`
+   - `BLAS A * b = c   # matrix-vector`
+   - `BLAS a + b = c   # vector`
+   - `BLAS A + B = C   # matrix`
+   - `BLAS a - b = c`
+   - `BLAS A - B = C`
    
  
 ## Command-line arguments
 
- * list symbols with "-l" (is there any clash with petsc?)
- * $1 = ${1}
- * $0 should have the main input file basename (without the extension)
+ * list symbols with `-l` (is there any clash with petsc?)
+ * `$1` = `${1}`
+ * `$0` should have the main input file basename (without the extension)
  
 ## Error handling 
  
- * gsl error handling
- * feenox_nan_error()
- * feenox_gsl_handler()
+ * GSL error handling
+ * `feenox_nan_error()`
+ * `feenox_gsl_handler()`
 
 ## Postprocessing output
 
@@ -74,12 +76,12 @@
  * msh v4.1
  * support CGNS formats
  * MED
- * problem-aware WRITE_POST 
-   - full | displacements | stresses | strains | von_mises | tresca | principal
-   - full | temperature | heat_flux
-   - full | mode_1 | mode_n1 | modes
-   - full | flue_1 | fluxes | currents
-   - automatic call to SOLVE_PROBLEM?
+ * problem-aware `WRITE_POST`
+   - `full | displacements | stresses | strains | von_mises | tresca | principal`
+   - `full | temperature | heat_flux`
+   - `full | mode_1 | mode_n1 | modes`
+   - `full | flux_1 | fluxes | currents`
+   - implicit call to `SOLVE_PROBLEM`?
  
 ## Extensions
  
@@ -93,9 +95,9 @@
  * allow different material model for each volume!
    - so far we have a global material model, i.e. all the materials have to be orthotropic
    - this is wrong!
- * remove the need of needing an explicit SOLVE_PROBLEM
-   - detect which varaibles/functions are PDE outputs and call solve_problem() the first time they are needed
- * benchmark MPI and MNMPI
+ * remove the need of needing an explicit `SOLVE_PROBLEM`
+   - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
+ * benchmark MPI
  
 ## Laplace/Poisson/Helmholtz
 
