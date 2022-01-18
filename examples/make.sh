@@ -21,7 +21,9 @@ for i in hello          \
          parallelepiped-thermal    \
          parallelepiped-mechanical \
          temp-cylinder-tran        \
-         wire   \
+         wire           \
+         asme-expansion             \
+         cube-orthotropic-expansion \
   ; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \

@@ -1,0 +1,34 @@
+PROBLEM mechanical
+READ_MESH cube.msh
+
+E = 1
+nu = 0.3
+
+BC restrain fixed \
+  PHYSICAL_GROUP left   \
+  PHYSICAL_GROUP right  \
+  PHYSICAL_GROUP front  \
+  PHYSICAL_GROUP back   \
+  PHYSICAL_GROUP bottom \
+  PHYSICAL_GROUP top
+
+alpha = 0.123456879
+T = 9.87654321
+
+SOLVE_PROBLEM
+
+WRITE_MESH cube-restrained-expansion-uniform-orthotropic.vtk VECTOR u v w sigmax sigmay sigmaz
+
+VECTOR diff_displ[3]
+diff_displ[1] = u(0.5,0.5,0.5)-0
+diff_displ[2] = v(0.5,0.5,0.5)-0
+diff_displ[3] = w(0.5,0.5,0.5)-0
+
+
+VECTOR diff_stress[3]
+expected = -E/(1-2*nu)*alpha*T
+diff_stress[1] = sigmax(0.5,0.5,0.5)-expected
+diff_stress[2] = sigmay(0.5,0.5,0.5)-expected
+diff_stress[3] = sigmaz(0.5,0.5,0.5)-expected
+
+PRINT vecnorm(diff_displ)+vecnorm(diff_stress)

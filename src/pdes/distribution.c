@@ -55,6 +55,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = full;
     this->eval = feenox_distribution_eval_property;
+    this->uniform = 0;
+    this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
     
     return FEENOX_OK;
   }
@@ -97,6 +99,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = full;
     this->eval = feenox_distribution_eval_function_local;
+    this->uniform = 0;
+    this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
     return FEENOX_OK;
   }
   
@@ -107,13 +111,15 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
       feenox_push_error_message("function '%s' should have %d arguments instead of %d to be used as a distribution", this->function->name, feenox.pde.dim, this->function->n_arguments);
       return FEENOX_ERROR;
     }
-    
+
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_function_global;
     this->expr = &this->function->algebraic_expression;
     feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, this->function));
     feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, this->function));
+    this->uniform = (feenox_expression_depends_on_space(this->dependency_variables) == 0);
+    this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
     
     return FEENOX_OK;
   }
@@ -148,6 +154,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = full;
     this->eval = feenox_distribution_eval_variable_local;
+    this->uniform = 0;
     return FEENOX_OK;
   }
   
@@ -157,6 +164,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_variable_global;
+    this->uniform = 1;
     return FEENOX_OK;
   }
   
@@ -228,17 +236,21 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
 
   if (material == NULL) {
     // these can be zeroes if the properties do not depend on space
-    switch (feenox.pde.dim) {
-      case 1:
-        feenox_push_error_message("cannot find a material for point x=%g", x[0]);
-        break;
-      case 2:
-        feenox_push_error_message("cannot find a material for point x=%g, y=%g", x[0], x[1]);
-        break;
-      case 3:
-        feenox_push_error_message("cannot find a material for point x=%g, y=%g, z=%g", x[0], x[1], x[2]);
-        break;
-    }
+    if (x != NULL) {
+      switch (feenox.pde.dim) {
+        case 1:
+          feenox_push_error_message("cannot find a material for point x=%g", x[0]);
+          break;
+        case 2:
+          feenox_push_error_message("cannot find a material for point x=%g, y=%g", x[0], x[1]);
+          break;
+        case 3:
+          feenox_push_error_message("cannot find a material for point x=%g, y=%g, z=%g", x[0], x[1], x[2]);
+          break;
+      }
+    } else {
+      feenox_push_error_message("no material nor coordinate for property '%s'", this->name);
+    }  
     feenox_runtime_error();
   }
   

@@ -28,16 +28,16 @@ struct laplace_t {
   distribution_t f;
   distribution_t alpha;
 
-#ifdef HAVE_PETSC  
-  PetscBool space_mass;
-  PetscBool phi_mass;
+  // TODO: uniform instead of "space-dependent"
+  // TODO: constant (i.e. non-time-depedent)
+  int space_dependent_mass;
+  int phi_dependent_mass;
   
-  PetscBool space_source;
-  PetscBool phi_source;
+  int space_dependent_source;
+  int phi_dependent_source;
 
-  PetscBool space_bc;
-  PetscBool phi_bc;
-#endif
+  int space_dependent_bc;
+  int phi_dependent_bc;
   
   // caches for uniform properties
   struct {

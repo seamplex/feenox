@@ -59,7 +59,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
   unsigned int g_prime = 0;
   for (g = 0; g < feenox.pde.dofs; g++) {
     // independent sources
-    if (neutron_diffusion.has_sources == PETSC_TRUE) {
+    if (neutron_diffusion.has_sources) {
       // TODO: macro to make it nicer
       gsl_vector_set(S, g, neutron_diffusion.source[g].eval(&neutron_diffusion.source[g], x, material));
     }
@@ -68,7 +68,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
     for (g_prime = 0; g_prime < feenox.pde.dofs; g_prime++) {
       gsl_matrix_set(A, g, g_prime, -neutron_diffusion.sigma_s[g_prime][g].eval(&neutron_diffusion.sigma_s[g_prime][g], x, material));
     
-      if (neutron_diffusion.has_fission == PETSC_TRUE) {
+      if (neutron_diffusion.has_fission) {
         gsl_matrix_set(X, g, g_prime, chi[g]*neutron_diffusion.nu_sigma_f[g_prime].eval(&neutron_diffusion.nu_sigma_f[g_prime], x, material));
       }  
     }
@@ -130,7 +130,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
   
   // elemental fission matrix
   gsl_matrix *XH = NULL;
-  if (neutron_diffusion.has_fission == PETSC_TRUE) {
+  if (neutron_diffusion.has_fission) {
     XH = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs * J);
     feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, X, this->H[v], 0, XH));
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, this->w[v], this->H[v], XH, 1.0, Xi));
@@ -139,7 +139,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
 //   feenox_debug_print_gsl_matrix(Xi, stdout);
   
   
-  if (neutron_diffusion.has_sources == PETSC_TRUE) {
+  if (neutron_diffusion.has_sources) {
     feenox_call(gsl_blas_dgemv(CblasTrans, this->w[v], this->H[v], S, 1.0, feenox.pde.bi));
   }
   
@@ -149,8 +149,8 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
   //   K = Ki + Ai
   //   M = Xi
   gsl_matrix_add(Ki, Ai);
-  if (neutron_diffusion.has_fission == PETSC_TRUE) {
-    if (neutron_diffusion.has_sources == PETSC_TRUE) {
+  if (neutron_diffusion.has_fission) {
+    if (neutron_diffusion.has_sources) {
       gsl_matrix_scale(Xi, -1.0);
       gsl_matrix_add(Ki, Xi);
     } else {

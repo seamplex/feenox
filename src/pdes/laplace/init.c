@@ -82,13 +82,13 @@ int feenox_problem_init_runtime_laplace(void) {
 ///pr_laplace+f+description The right hand side of the equation\ $\nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+f+description If not given, default is zero (i.e. Laplace).
   feenox_call(feenox_distribution_init(&laplace.f, "f"));
-  laplace.f.space_dependent = feenox_expression_depends_on_space(laplace.f.dependency_variables);
+  laplace.f.uniform = feenox_expression_depends_on_space(laplace.f.dependency_variables);
   laplace.f.non_linear = feenox_expression_depends_on_function(laplace.f.dependency_functions, feenox.pde.solution[0]);  
   
 ///pr_laplace+alpha+description The coefficient of the temporal derivative for the transient
 ///pr_laplace+alpha+description equation \ $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+alpha+description If not given, default is one.
-  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) ? PETSC_TRUE : PETSC_FALSE;
+  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0);
   if (feenox.pde.has_mass) {
     feenox_call(feenox_distribution_init(&laplace.alpha, "alpha"));
     if (laplace.alpha.defined == 0) {
@@ -102,35 +102,35 @@ int feenox_problem_init_runtime_laplace(void) {
     }
   }
 
-  laplace.alpha.space_dependent = feenox_expression_depends_on_space(laplace.alpha.dependency_variables);
+  laplace.alpha.uniform = feenox_expression_depends_on_space(laplace.alpha.dependency_variables);
   laplace.alpha.non_linear      = feenox_expression_depends_on_function(laplace.alpha.dependency_functions,  feenox.pde.solution[0]);
   
-  laplace.space_source = laplace.f.space_dependent;
-  laplace.space_mass = laplace.alpha.space_dependent;
+  laplace.space_dependent_source = laplace.f.uniform;
+  laplace.space_dependent_mass = laplace.alpha.uniform;
   
-  laplace.phi_mass      = feenox_expression_depends_on_function(laplace.alpha.dependency_functions, feenox.pde.solution[0]);
+  laplace.phi_dependent_mass      = feenox_expression_depends_on_function(laplace.alpha.dependency_functions, feenox.pde.solution[0]);
   
   if (feenox.pde.math_type == math_type_automatic) {
-    feenox.pde.math_type = (laplace.phi_mass      == PETSC_FALSE &&
-                            laplace.phi_source    == PETSC_FALSE &&
-                            laplace.phi_bc        == PETSC_FALSE) ? math_type_linear : math_type_nonlinear;
+    feenox.pde.math_type = (laplace.phi_dependent_mass   == 0 &&
+                            laplace.phi_dependent_source == 0 &&
+                            laplace.phi_dependent_bc     == 0) ? math_type_linear : math_type_nonlinear;
   }
   
   feenox.pde.solve = (feenox_special_var_value(end_time) > 0) ? feenox_problem_solve_petsc_transient :
                          ((feenox.pde.math_type == math_type_linear) ? feenox_problem_solve_petsc_linear :
                                                                        feenox_problem_solve_petsc_nonlinear);
   
-  feenox.pde.has_stiffness = PETSC_TRUE;
-  feenox.pde.has_rhs = PETSC_TRUE;
+  feenox.pde.has_stiffness = 1;
+  feenox.pde.has_rhs = 1;
   // has_mass is above
   
-  feenox.pde.has_jacobian_K = PETSC_FALSE;
-  feenox.pde.has_jacobian_M = laplace.phi_mass;
-  feenox.pde.has_jacobian_b = (laplace.phi_source || laplace.phi_bc);
+  feenox.pde.has_jacobian_K = 0;
+  feenox.pde.has_jacobian_M = laplace.phi_dependent_mass;
+  feenox.pde.has_jacobian_b = (laplace.phi_dependent_source || laplace.phi_dependent_bc);
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
   
-  feenox.pde.symmetric_K = PETSC_TRUE;
-  feenox.pde.symmetric_M = PETSC_TRUE;
+  feenox.pde.symmetric_K = 1;
+  feenox.pde.symmetric_M = 1;
   
 #endif  
   return FEENOX_OK;

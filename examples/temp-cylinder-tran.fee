@@ -90,4 +90,6 @@ IF done
  PRINT "\# open temp-anim-cylinder.geo in Gmsh to create a quick rough video"
  PRINT "\# run  temp-anim-cylinder.py  to get a nicer and smoother video"
 ENDIF
+#> :::: {.not-in-format .latex .texi}
 #> ![Transient temperature distribution](temp-cylinder-smooth.mp4){width=100%}
+#> ::::

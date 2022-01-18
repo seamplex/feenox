@@ -35,12 +35,10 @@ struct neutron_diffusion_t {
   distribution_t **sigma_s;
   distribution_t *source;
 
-#ifdef HAVE_PETSC  
-//  PetscBool has_dirichlet_bcs;
-  PetscBool has_sources;
-  PetscBool has_fission;
-  PetscBool space_XS;
-#endif
+//  int has_dirichlet_bcs;
+  int has_sources;
+  int has_fission;
+  int space_XS;
 
   var_t *keff;
   

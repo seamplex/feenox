@@ -1,3 +1,24 @@
+/*------------ -------------- -------- --- ----- ---   --       -            -
+ *  feenox routines to build elemental objects
+ *
+ *  Copyright (C) 2015-2022 jeremy theler
+ *
+ *  This file is part of Feenox <https://www.seamplex.com/feenox>.
+ *
+ *  feenox is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Feenox is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *------------------- ------------  ----    --------  --     -       -         -
+ */
 #include "feenox.h"
 extern feenox_t feenox;
 
@@ -11,19 +32,19 @@ int feenox_problem_build(void) {
   
   // TODO: may we don't need to always empty stuff, i.e. if we decide to re-use the matrices
   // empty global objects
-  if (feenox.pde.has_stiffness == PETSC_TRUE) {
+  if (feenox.pde.has_stiffness) {
     petsc_call(MatZeroEntries(feenox.pde.K));
   }  
-  if (feenox.pde.has_mass == PETSC_TRUE) {
+  if (feenox.pde.has_mass) {
     petsc_call(MatZeroEntries(feenox.pde.M));
   }
-  if (feenox.pde.has_jacobian_K == PETSC_TRUE) {
+  if (feenox.pde.has_jacobian_K) {
     petsc_call(MatZeroEntries(feenox.pde.JK));
   }
-  if (feenox.pde.has_jacobian_b == PETSC_TRUE) {
+  if (feenox.pde.has_jacobian_b) {
     petsc_call(MatZeroEntries(feenox.pde.Jb));
   }
-  if (feenox.pde.has_rhs == PETSC_TRUE) {
+  if (feenox.pde.has_rhs) {
     petsc_call(VecZeroEntries(feenox.pde.b));
   }  
   
@@ -164,19 +185,19 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
     
   // initialize to zero the elemental objects
-  if (feenox.pde.has_stiffness == PETSC_TRUE) {
+  if (feenox.pde.has_stiffness) {
     gsl_matrix_set_zero(feenox.pde.Ki);
   }  
-  if (feenox.pde.has_mass == PETSC_TRUE) {
+  if (feenox.pde.has_mass) {
     gsl_matrix_set_zero(feenox.pde.Mi);
   }
-  if (feenox.pde.has_jacobian_K == PETSC_TRUE) {
+  if (feenox.pde.has_jacobian_K) {
     gsl_matrix_set_zero(feenox.pde.JKi);
   }
-  if (feenox.pde.has_jacobian_b == PETSC_TRUE) {
+  if (feenox.pde.has_jacobian_b) {
     gsl_matrix_set_zero(feenox.pde.Jbi);
   }
-  if (feenox.pde.has_rhs == PETSC_TRUE) {
+  if (feenox.pde.has_rhs) {
     gsl_vector_set_zero(feenox.pde.bi);
   }
 
@@ -198,19 +219,19 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   // compute the indices of the DOFs to ensamble
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
 
-  if (feenox.pde.has_stiffness == PETSC_TRUE)  {
+  if (feenox.pde.has_stiffness)  {
     petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Ki, 0, 0), ADD_VALUES));
   }  
-  if (feenox.pde.has_mass == PETSC_TRUE)  {
+  if (feenox.pde.has_mass)  {
     petsc_call(MatSetValues(feenox.pde.M, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Mi, 0, 0), ADD_VALUES));
   }
-  if (feenox.pde.has_jacobian_K == PETSC_TRUE) {
+  if (feenox.pde.has_jacobian_K) {
     petsc_call(MatSetValues(feenox.pde.JK, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.JKi, 0, 0), ADD_VALUES));
   }
-  if (feenox.pde.has_jacobian_b == PETSC_TRUE) {
+  if (feenox.pde.has_jacobian_b) {
     petsc_call(MatSetValues(feenox.pde.Jb, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, gsl_matrix_ptr(feenox.pde.Jbi, 0, 0), ADD_VALUES));
   }
-  if (feenox.pde.has_rhs == PETSC_TRUE) {
+  if (feenox.pde.has_rhs) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
   }
 

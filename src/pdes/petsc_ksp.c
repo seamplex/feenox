@@ -63,13 +63,15 @@ int feenox_problem_solve_petsc_linear(void) {
   
   
   // do the work!
+  // TODO: have a flag in case we want to just build
   petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
   
   // check for convergence
-  KSPConvergedReason reason;
+  KSPConvergedReason reason = 0;
   petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));
   if (reason < 0) {
     feenox_push_error_message("PETSc's linear solver did not converge with reason '%s' (%d)", KSPConvergedReasons[reason], reason);
+    // TODO: dive into the PC
     return FEENOX_ERROR;
   }
 
@@ -152,7 +154,7 @@ int feenox_problem_setup_ksp(KSP ksp) {
     feenox_call(feenox.pde.setup_ksp(ksp));
   }
 
-  if (feenox.pde.symmetric_K == PETSC_TRUE) {
+  if (feenox.pde.symmetric_K) {
     // K is symmetric. Set symmetric flag to enable ICC/Cholesky preconditioner
     // TODO: this is K for ksp but J for snes
     if (feenox.pde.has_stiffness) {

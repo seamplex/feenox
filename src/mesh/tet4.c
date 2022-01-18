@@ -289,58 +289,6 @@ double feenox_mesh_tet4_dhdr(int j, int m, double *vec_r) {
 
 }
 
-
-
-/*
-int mesh_point_in_tetrahedron(element_t *element, const double *x) {
-
-// http://en.wikipedia.org/wiki/Barycentric_coordinate_system  
-  double zero, one, lambda1, lambda2, lambda3, lambda4;
-  double xi;
-  gsl_matrix *T = gsl_matrix_alloc(3, 3);
-  gsl_vector *xx4 = gsl_vector_alloc(3);
-  gsl_vector *lambda = gsl_vector_alloc(3);
-  gsl_permutation *p = gsl_permutation_alloc(3);
-  int s, flag;
-  int i, j;
-  
-  for (i = 0; i < 3; i++) {
-    for (j = 0; j < 3; j++) {
-      gsl_matrix_set(T, i, j, element->node[j]->x[i] - element->node[3]->x[i]);
-    }
-    gsl_vector_set(xx4, i, x[i] - element->node[3]->x[i]);
-  }
-  gsl_linalg_LU_decomp (T, p, &s);
-  if ((xi = fabs(gsl_linalg_LU_det (T, s))) < 1e-20) {
-//    feenox_push_error_message("element %d is degenerate", element->tag);
-//    feenox_runtime_error();
-    return 0;
-  }
-  gsl_linalg_LU_solve (T, p, xx4, lambda);
-
-  zero = -feenox_var(wasora_mesh.vars.eps);
-  one = 1+feenox_var(wasora_mesh.vars.eps);
-  lambda1 = gsl_vector_get(lambda, 0);
-  lambda2 = gsl_vector_get(lambda, 1);
-  lambda3 = gsl_vector_get(lambda, 2);
-  lambda4 = 1 - gsl_vector_get(lambda, 0) - gsl_vector_get(lambda, 1) - gsl_vector_get(lambda, 2);
-  
-  flag = (lambda1 > zero && lambda1 < one &&
-          lambda2 > zero && lambda2 < one &&
-          lambda3 > zero && lambda3 < one &&
-          lambda4 > zero && lambda4 < one);
-
-  
-  gsl_matrix_free(T);
-  gsl_vector_free(xx4);
-  gsl_vector_free(lambda);
-  gsl_permutation_free(p);
-  
-  return flag;
-}
-*/
-
-
 int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
 
 // http://en.wikipedia.org/wiki/Barycentric_coordinate_system  
@@ -404,9 +352,6 @@ int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
   zero = -feenox_var_value(feenox.mesh.vars.eps);
   one = 1+feenox_var_value(feenox.mesh.vars.eps);
   lambda4 = 1 - lambda[0] - lambda[1] - lambda[2];
-  
-  
-//  printf("\n%d %g %g %g %g\n", element->tag, lambda[0], lambda[1], lambda[2], lambda4);
   
   return (lambda[0] > zero && lambda[0] < one &&
           lambda[1] > zero && lambda[1] < one &&

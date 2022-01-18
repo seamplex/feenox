@@ -1,0 +1,32 @@
+PROBLEM mechanical
+READ_MESH two-cubes.msh
+
+Ex_soft(x,y,z) = 0.1*100000
+Ey_soft(x,y,z) = 0.1*75000
+Ez_soft(x,y,z) = 0.1*50000
+Gxy_soft(x,y,z) = 0.1*30000.0
+Gyz_soft(x,y,z) = 0.1*40000.0
+Gzx_soft(x,y,z) = 0.1*35000.0
+nuxy_soft(x,y,z) = 0.3
+nuyz_soft(x,y,z) = 0.25
+nu13_soft(x,y,z) = 0.4
+nuzx_soft(x,y,z) = nu13_soft(x,y,z) * Ez_soft(x,y,z)/Ex_soft(x,y,z)
+
+Ex_hard(x,y,z) = 10*100000
+Ey_hard(x,y,z) = 10*75000
+Ez_hard(x,y,z) = 10*50000
+Gxy_hard(x,y,z) = 10*30000.0
+Gyz_hard(x,y,z) = 10*40000.0
+Gzx_hard(x,y,z) = 10*35000.0
+nuxy_hard(x,y,z) = 0.3
+nuyz_hard(x,y,z) = 0.25
+nu13_hard(x,y,z) = 0.4
+nuzx_hard(x,y,z) = nu13_hard(x,y,z) * Ez_hard(x,y,z)/Ex_hard(x,y,z)
+
+BC left  fixed
+BC right Fx=1000
+
+SOLVE_PROBLEM
+
+WRITE_MESH two-cubes-orthotropic-functions.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT %.1f sigma(0,0,0)

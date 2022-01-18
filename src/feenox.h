@@ -185,8 +185,7 @@
 #define feenox_distribution_define_mandatory(type, name, quoted_name, description) {\
   feenox_call(feenox_distribution_init(&(type.name), quoted_name)); \
   if (type.name.defined == 0) { feenox_push_error_message("undefined %s '%s'", description, quoted_name);  return FEENOX_ERROR; } \
-  if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } \
-  type.name.space_dependent = feenox_expression_depends_on_space(type.name.dependency_variables); }
+  if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } }
 
 #define feenox_gradient_fill(location, fun_nam) {\
   location.fun_nam->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough; \
@@ -1112,12 +1111,12 @@ struct distribution_t  {
   var_ll_t *dependency_variables;
   function_ll_t *dependency_functions;
   
-#ifdef HAVE_PETSC  
-  // does this distribution depend on space?
-  PetscBool space_dependent;
+  // is this distribution uniform? (i.e. does not depend on space)
+  int uniform;
+  // is this distribution constant? (i.e. does not depend on time) 
+  int constant;
   // does this distribution depend on the solution itself?
-  PetscBool non_linear; 
-#endif
+  int non_linear; 
   
   // virtual method to evaluate at a point
   double (*eval)(distribution_t *this, const double *x, material_t *material);
@@ -1724,17 +1723,17 @@ struct feenox_t {
       gradient_actual
     } gradient_highorder_nodes;
   
-#ifdef HAVE_PETSC    
-    PetscBool has_stiffness;
-    PetscBool has_mass;
-    PetscBool has_rhs;
-    PetscBool has_jacobian;
-    PetscBool has_jacobian_K;
-    PetscBool has_jacobian_M;
-    PetscBool has_jacobian_b;
-    PetscBool symmetric_K;
-    PetscBool symmetric_M;
+    int has_stiffness;
+    int has_mass;
+    int has_rhs;
+    int has_jacobian;
+    int has_jacobian_K;
+    int has_jacobian_M;
+    int has_jacobian_b;
+    int symmetric_K;
+    int symmetric_M;
 
+#ifdef HAVE_PETSC    
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
 
@@ -1796,8 +1795,8 @@ struct feenox_t {
 #endif
 
     PetscBool progress_ascii;
-    double progress_r0;
-    double progress_last;
+    PetscReal progress_r0;
+    PetscReal progress_last;
 
     expr_t eps_ncv;
     expr_t st_shift;
@@ -2059,6 +2058,7 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, d
 
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *this);
+extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
 extern int feenox_mesh_compute_w_at_gauss(element_t *this, unsigned int v, int integration);
 extern int feenox_mesh_compute_H_at_gauss(element_t *this, unsigned int v, unsigned int dofs, int integration);
 extern int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned int dofs, int integration);
@@ -2241,6 +2241,7 @@ extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t
 extern int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function);
 
 extern int feenox_expression_depends_on_space(var_ll_t *variables);
+extern int feenox_expression_depends_on_time(var_ll_t *variables);
 extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
 
 // build.c

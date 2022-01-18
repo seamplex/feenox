@@ -1,0 +1,24 @@
+PROBLEM mechanical
+READ_MESH cylinder.msh
+
+Ex = 1
+Ey = 2
+Ez = 3
+
+nuxy = 0.3
+nuyz = 0.3
+nuzx = 0.3
+
+Gxy = 3
+Gyz = 2
+Gzx = 1
+
+alphax = 0.1
+alphay = 0.2
+alphaz = 0.3
+
+T(x,y,z) = x^2+y^2+z^2
+
+BC bottom fixed
+SOLVE_PROBLEM
+PRINT %.2f displ_max

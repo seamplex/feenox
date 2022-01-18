@@ -1,0 +1,26 @@
+PROBLEM mechanical
+READ_MESH cube.msh
+
+# the problem has "analytical" solutions if the temperature
+# and the mechanical properties are uniform
+T0 = 1        # test non-zero reference temperature
+T(x,y,z) = 2
+E = 1
+nu = 0.3
+
+alpha_x(x,y,z) = x
+alpha_y(x,y,z) = 1-sqrt(abs(y))
+alpha_z(x,y,z) = z^2-1/2
+
+BC left   u=0
+BC front  v=0
+BC bottom w=0
+
+SOLVE_PROBLEM
+
+# subscript a stands for "analytical"
+u_a = integral(alpha_x(x,y,z) * (T(x,y,z)-T0), x, 0, 1)
+v_a = integral(alpha_y(x,y,z) * (T(x,y,z)-T0), y, 0, 1)
+w_a = integral(alpha_z(x,y,z) * (T(x,y,z)-T0), z, 0, 1)
+
+PRINT %e (u(1,0,0)-u_a)^2+(v(0,1,0)-v_a)^2+(w(0,0,1)-w_a)^2+(dudx(1,0,0)-alpha_x(1,0,0))^2+(dvdy(0,1,0)-alpha_y(0,1,0))^2+(dwdz(0,0,1)-alpha_z(0,0,1))^2

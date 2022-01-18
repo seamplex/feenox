@@ -16,16 +16,21 @@ if [ -z "$(which git)" ]; then
   echo "git is not installed"
 fi
 
+if [ -z "${branch}" ]; then
+  branch="main"
+fi
+
 if [ ! -e ${package} ]; then
-  git clone .. ${package} || exit 1
-else 
-  cd ${package}
-    git pull || exit 1
-  cd ..
+  git clone .. ${package}
 fi
 
 cd ${package}
-  ./autogen.sh || exit 1
+  git checkout ${branch}
+  git pull
+cd ..
+
+cd ${package}
+  ./autogen.sh
   if [ ! -e version.m4 ]; then
     echo "error: version.m4 does not exist"
     exit 1

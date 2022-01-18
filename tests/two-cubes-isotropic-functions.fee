@@ -1,0 +1,16 @@
+PROBLEM mechanical
+READ_MESH two-cubes.msh
+
+E_soft(x,y,z) = 1e3
+nu_soft(x,y,z) = 0.2
+ 
+E_hard(x,y,z) = 200e3
+nu_hard(x,y,z) = 0.3
+
+BC left  fixed
+BC right Fx=1000
+
+SOLVE_PROBLEM
+
+WRITE_MESH two-cubes-isotropic-functions.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT %.1f sigma(0,0,0)

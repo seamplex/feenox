@@ -32,7 +32,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double *x = NULL;
-  if (thermal.space_stiffness || thermal.space_source || thermal.space_mass) {
+  if (thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
     x = this->x[v];
   }
@@ -75,7 +75,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
 //      gsl_blas_dgemm(CblasTrans, CblasNoTrans, -1.0/3.0*w*dkdT*T, this->B[v], this->B[v], 1.0, feenox.pde.JKi);
 //    }
 
-    if (thermal.temperature_source) {
+    if (thermal.temperature_dependent_source) {
       double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
       // mind the positive sign!
       gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, this->H[v], this->H[v], 1.0, feenox.pde.Jbi);

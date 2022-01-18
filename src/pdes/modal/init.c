@@ -194,22 +194,22 @@ int feenox_problem_init_runtime_modal(void) {
   feenox_distribution_define_mandatory(modal, nu, "nu", "Poisson’s ratio");
   feenox_distribution_define_mandatory(modal, rho, "rho", "density");
 
-  modal.rho.space_dependent = feenox_expression_depends_on_space(modal.rho.dependency_variables);
+  modal.rho.uniform = feenox_expression_depends_on_space(modal.rho.dependency_variables);
 
   feenox.pde.math_type = math_type_eigen;
   feenox.pde.solve = feenox_problem_solve_slepc_eigen;
   
-  feenox.pde.has_stiffness = PETSC_TRUE;
-  feenox.pde.has_mass = PETSC_TRUE;
-  feenox.pde.has_rhs = PETSC_FALSE;
+  feenox.pde.has_stiffness = 1;
+  feenox.pde.has_mass = 1;
+  feenox.pde.has_rhs = 0;
   
-  feenox.pde.has_jacobian_K = PETSC_FALSE;
-  feenox.pde.has_jacobian_M = PETSC_FALSE;
-  feenox.pde.has_jacobian_b = PETSC_FALSE;
+  feenox.pde.has_jacobian_K = 0;
+  feenox.pde.has_jacobian_M = 0;
+  feenox.pde.has_jacobian_b = 0;
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
   
-  feenox.pde.symmetric_K = PETSC_TRUE;
-  feenox.pde.symmetric_M = PETSC_TRUE;
+  feenox.pde.symmetric_K = 1;
+  feenox.pde.symmetric_M = 1;
 #endif
   return FEENOX_OK;
 }
