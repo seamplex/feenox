@@ -12,7 +12,13 @@ fi
 checkpetsc
 checkgmsh
 
-for i in nafems-le11-*.geo; do gmsh -3 $i; done
+for i in ${dir}/nafems-le11-*.geo; do
+ if [ -e ${i} ]; then
+   gmsh -3 ${i}
+ else
+   exit 77
+ fi
+done
 
 answer1 nafems-le11.fee tet4 "-108.2"
 exitifwrong $?
