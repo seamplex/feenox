@@ -52,11 +52,11 @@ v
 ^                 
 |                 
 2                 
-|`\               
-|  `\             
-|    `\           
-|      `\         
-|        `\       
+|`\
+|  `\
+|    `\
+|      `\
+|        `\
 0----------1 --> u 
 */   
   element_type->node_coords = calloc(element_type->nodes, sizeof(double *));

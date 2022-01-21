@@ -48,11 +48,11 @@ int feenox_mesh_triang6_init(void) {
 Triangle6:    
     
 2             
-|`\           
-|  `\         
+|`\
+|  `\
 5    `4       
-|      `\     
-|        `\   
+|      `\
+|        `\
 0-----3----1  
 */     
   element_type->node_coords = calloc(element_type->nodes, sizeof(double *));
