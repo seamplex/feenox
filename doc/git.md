@@ -1,4 +1,13 @@
-To compile the Git repository, proceed as follows. This procedure does need `git` and `autoconf` but new versions can be pulled and recompiled easily.
+To compile the Git repository, proceed as follows.
+This procedure does need `git` and `autoconf` but new versions can be pulled and recompiled easily.
+If something goes wrong and you get an error, do not hesitate to ask in FeenoX' [discussion page](https://github.com/seamplex/feenox/discussions).
+
+:::: {.only-in-format .html }
+```{=html}
+<asciinema-player src="feenox-clone-configure-make-check-install.cast" cols="128" rows="32" preload="true" poster="npt:0:10"></asciinema-player>
+```
+::::
+
 
  1. Install mandatory dependencies
 
