@@ -79,7 +79,8 @@ echo "help as markdown definition list"
 ./help-md.sh > help.md
 
 echo "help as a raw txt (which is used in feenox -v)"
-./help-txt.sh > help.txt
+./help-options-txt.sh | awk '{printf("%s\\n\\\n", $0)}' > help-options.txt
+./help-extra-txt.sh   | awk '{printf("%s\\n\\\n", $0)}' > help-extra.txt
 
 echo "unix man page"
 m4 date.m4 > date.yaml

@@ -43,11 +43,9 @@ int feenox_initialize(int argc, char **argv) {
   int show_help = 0;
   int show_version = 0;
   
-///help+usage+desc usage: feenox [options] inputfile [replacement arguments]  
-  
   const struct option longopts[] = {
 ///op+help+option `-h`, `--help`
-///op+help+desc display usage and commmand-line help and exit
+///op+help+desc display options and explanations of commmand-line usage
     { "help",         no_argument,       NULL, 'h'},
 ///op+version+option `-v`, `--version`
 ///op+version+desc display brief version information and exit
@@ -63,8 +61,6 @@ int feenox_initialize(int argc, char **argv) {
 //op+summarize+option `-s`, `--sumarize`
 //op+summarize+desc list all symbols in the input file and exit
 //    { "summarize",    no_argument,       NULL, 's'},
-    // TODO
-    // --progress, --mumps, etc. are handled by the pde initialization routines    
     { NULL, 0, NULL, 0 }
   };  
  
@@ -130,7 +126,7 @@ int feenox_initialize(int argc, char **argv) {
   feenox.optind = optind;
   
   if (show_help) {
-    feenox_show_help(argv[0]);
+    feenox_show_help(argv[0], 1);
     exit(EXIT_SUCCESS);
   } else if (show_version) {
     feenox_show_version(show_version);
@@ -138,7 +134,7 @@ int feenox_initialize(int argc, char **argv) {
   } else if (feenox.optind == argc) {
     feenox_show_version(version_compact);
     printf("\n");
-    feenox_show_help(argv[0]);
+    feenox_show_help(argv[0], 0);
     exit(EXIT_SUCCESS);
   }
   

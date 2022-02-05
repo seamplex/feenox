@@ -38,7 +38,7 @@ checkida() {
  fi
 }
 
-# checks if feenox is compiled with ida and skips the test if necessary
+# checks if feenox is compiled with petsc and skips the test if necessary
 checkpetsc() {
  if [ $(${feenox} --versions | grep 'PETSc' | grep -v 'N/A'| wc -l) = 0 ]; then
   echo "FeenoX was not compiled with PETSc, skipping test"
@@ -46,10 +46,19 @@ checkpetsc() {
  fi
 }
 
-# checks if feenox is compiled with ida and skips the test if necessary
+
+# checks if feenox is compiled with slepc and skips the test if necessary
 checkslepc() {
  if [ $(${feenox} --versions | grep 'SLEPc' | grep -v 'N/A'| wc -l) = 0 ]; then
   echo "FeenoX was not compiled with SLEPc, skipping test"
+  exit 77
+ fi
+}
+
+# checks if feenox is compiled with mumps and skips the test if necessary
+checkmumps() {
+ if [ $(${feenox} --versions | grep 'mumps' | grep -v 'N/A'| wc -l) = 0 ]; then
+  echo "FeenoX was not compiled with MUMPS, skipping test"
   exit 77
  fi
 }

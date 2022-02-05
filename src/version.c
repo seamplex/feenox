@@ -23,21 +23,7 @@
 extern feenox_t feenox;
 
 #include "version.h"
-
-// TODO: put in a hader and generate it from doc
-#define FEENOX_ONE_LINER "a free no-fee no-X uniX-like finite-element(ish) computational engineering tool"
-#define FEENOX_HELP "\
-  -h, --help         display usage and commmand-line help and exit\n\
-  -v, --version      display brief version information and exit\n\
-  -V, --versions     display detailed version information\n\
-  -s, --sumarize     list all symbols in the input file and exit\n\
-\n\
-Instructions will be read from standard input if “-” is passed as\n\
-inputfile, i.e.\n\
-\n\
-    $ echo \"PRINT 2+2\" | feenox -\n\
-    4\n\
-"
+#include "help.h"
 
 #include <stdio.h>
 #include <gsl/gsl_version.h>
@@ -58,15 +44,17 @@ inputfile, i.e.\n\
 #include <slepcsys.h>
 #endif
 
-void feenox_show_help(const char *progname) {
+void feenox_show_help(const char *progname, int extra) {
   // in parallel runs only print from first processor
   if (feenox.rank != 0) {
     return;
   }
   
+  // TODO: use a defined string with %s
   printf("usage: %s [options] inputfile [replacement arguments]\n\n", progname);
   
-  printf("%s\n", FEENOX_HELP);
+  printf("%s\n", FEENOX_HELP_OPTIONS);
+  printf("%s\n", extra ? FEENOX_HELP_EXTRA : "Run with --help for further explanations.");
   
   printf("Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com\n");
   printf("Feenox home page: https://www.seamplex.com/feenox/\n");

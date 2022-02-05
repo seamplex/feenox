@@ -44,6 +44,8 @@ TESTS = \
         tests/print.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
+        tests/thermal-slab-no-k.sh \
+        tests/thermal-slab-wrong-bc.sh \
         tests/trig.sh \
         tests/two-cubes-isotropic.sh \
         tests/two-cubes-orthotropic.sh \
@@ -53,6 +55,8 @@ TESTS = \
         tests/xfail-few-properties-ortho-shear.sh
 
 XFAIL_TESTS = tests/abort.sh \
+              tests/thermal-slab-no-k.sh \
+              tests/thermal-slab-wrong-bc.sh \
               tests/xfail-few-properties-ortho-young.sh \
               tests/xfail-few-properties-ortho-poisson.sh \
               tests/xfail-few-properties-ortho-shear.sh

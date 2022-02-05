@@ -5,4 +5,5 @@ Makefile.in
 version-vcs.h
 variables.mak
 version.h
+help.h
 feenox

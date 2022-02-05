@@ -29,5 +29,21 @@ exitifwrong $?
 answer thermal-two-squares-material-implicit-temperature.fee "0.599969"
 exitifwrong $?
 
+checkmumps
+
+i=thermal-two-squares-material-explicit-uniform
+echo -n "${i} (MUMPS)... "
+answer=$(${feenox} ${dir}/${i}.fee --mumps --ksp_view | grep INFO | wc -l)
+if [ ${answer} -gt 0 ]; then
+  echo "ok"
+  level=0
+else
+  echo "wrong, no INFO found"
+  level=1
+fi
+exitifwrong ${level}
+
+
+
 
 

@@ -654,7 +654,7 @@ Besides “everything is an expression,” FeenoX follows another cornerstone ru
 > 260-extensibility.md
 > ```
 
-Even though FeenoX is written in C, it makes extensive use of function pointers to mimic C++’s virtual methods. This way, depending on the problem type given with the `PROBLEM` keyword, particular routines are called to
+Even though FeenoX is written in C, it makes extensive use of function pointers to mimic C++’s virtual methods. This way, depending on the problem type given with the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword, particular routines are called to
 
  1. initialize and set up solver options (steady-state/transient, linear/non-linear, regular/eigenproblem, etc.)
  2. parse boundary conditions given in the `BC` keyword
@@ -673,17 +673,22 @@ Indeed, each of the supported problems, namely
  * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
  * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
 
-is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods that are resolved at runtime when parsing the main input file. Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`).
+is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods (recall that they are function pointers) that are resolved at runtime when parsing the main input file. Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`).
 
-As already discussed in @sec:introduction, FeenoX is free-as-in-freedom software licensed under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version.
+As already discussed in @sec:introduction, FeenoX is [free-as-in-freedom](https://en.wikipedia.org/wiki/Free_as_in_Freedom) software licensed under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version.
 In the particular case of additional problem types, this fact has two implications.
 
- i. Every person in the world is free to modify FeenoX to suit their needs, including adding a new problem type either using one of the existing ones as a template or by creating a new directory from scratch, without asking anybody of any kind of permission. In case this person does not how to program, he or she has the freedom to hire somebody else to do it. This is the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
+ i. Every person in the world is free to modify FeenoX to suit their needs, including adding a new problem type either by
  
- ii. The authors own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it under also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free.
+     a. using one of the existing ones as a template, or
+     b. creating a new directory from scratch,
+     
+    without asking anybody for any kind of permission. In case this person does not how to program, he or she has the freedom to hire somebody else to do it. It is this the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
+ 
+ ii. People adding code own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it under also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free---a.k.a. as [copyleft](https://en.wikipedia.org/wiki/Copyleft).
  
 
-Regarding additional material models, the virtual methods that compute the elemental contributions to the stiffness matrix also use function pointers to different material models (linear isotropic elastic, orthotropic, etc.) that are resolved at run time. Following the same principle, new models might be added by adding new routines and resolving them depending on the user’s input.
+Regarding additional material models, the virtual methods that compute the elemental contributions to the stiffness matrix also use function pointers to different material models (linear isotropic elastic, orthotropic elastic, etc.) and behaviors (isotropic thermal expansion, orthotropic thermal expansion, etc.) that are resolved at run time. Following the same principle, new models might be added by adding new routines and resolving them depending on the user’s input.
 
  
 ## Interoperability {#sec:interoperability}
@@ -871,7 +876,15 @@ $
 ```
 ::::
 
+Once again, these ASCII-based progress bars can be parsed by the calling entity and then present it back to the user. For example, @fig:caeplex-progress shows how the web-based GUI CAEplex shows progress inside an Onshape tab.
 
+
+![ASCII progress bars parsed and converted into a web-based interface](caeplex-progress.png){#fig:caeplex-progress width_latex=65% width_html=100%}
+
+
+FeenoX pr
+
+Since the main input file is the first argument (not counting POSIX options starting with at least one dash)
 
 ## Problem input {#sec:input}
 
@@ -879,6 +892,19 @@ $
 > 310-input.md
 > ```
 
+FeenoX currently satisfies requirement a. but eventually could also satisfy requirement b.
+The input files are indeed plain-text ASCII files with English-like keywords that define the problem.
+The main features of the input format are:
+
+ #. They are [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) by using English-like keywords. Nouns are definitions and verbs are instructions, which should be as self-evident as possible.
+ #. Simple problems need simple inputs.
+ #. Similar problems need similar inputs.
+ #. Everything is an expression.
+ #. 
+ #. Expansion of command-line arguments.
+
+ 
+ 
 dar ejemplos
 comparar con <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-membrane/tested-codes.html>
 

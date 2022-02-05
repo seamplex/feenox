@@ -20,9 +20,19 @@ if test ! -d ".git"; then
 fi
 
 ./autoclean.sh
-touch src/variables.mak
+touch ./src/variables.mak
 
-# echo "#define FEENOX_ONE_LINER \"desc\"" | m4 -Ddesc="$(cat doc/one-liner.md)" > src/help.h
+echo "hola"
+cat << EOF > ./src/help.h
+#define FEENOX_ONE_LINER     "$(cat doc/help-one-liner.txt)"
+#define FEENOX_HELP_OPTIONS  "\\
+$(cat doc/help-options.txt)
+"
+#define FEENOX_HELP_EXTRA    "\\
+$(cat doc/help-extra.txt)
+"
+EOF
+
 
 # major version is equal to the latest tag
 version=$(git describe --tags | sed 's/-/./')

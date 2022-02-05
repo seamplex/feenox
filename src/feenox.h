@@ -1839,7 +1839,7 @@ extern int feenox_init_before_run(void);
 extern int feenox_mesh_init_special_objects(void);
 
 // version.c
-extern void feenox_show_help(const char *progname);
+extern void feenox_show_help(const char *progname, int extra);
 extern void feenox_show_version(int version);
 extern void feenox_copyright(void);
 extern void feenox_shortversion(void);
