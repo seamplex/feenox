@@ -44,7 +44,7 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX' 
     ./configure --enable-download-gsl
     ```
     
-    If you do not have Internet access, get the tarball manually, copy it to the same directory as `configure` and run again.
+    If you do not have Internet access, get the tarball manually, copy it to the same directory as `configure` and run again. See the [detailed compilation instructions](compilation.md) for an explanation.
 
  5. Run test suite (optional)
  

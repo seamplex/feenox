@@ -1,5 +1,6 @@
 # General things to do
 
+ * use `spack`
  * https://joss.theoj.org/
  * FIT to mesh-based functions
  * FIT taking into account uncertainties

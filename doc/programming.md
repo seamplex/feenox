@@ -97,7 +97,7 @@ Then create a new C/C++ project File->New Project... choose C/C++ Project with E
  * FeenoX uses the [GNU Autools](https://en.wikipedia.org/wiki/GNU_Autotools) (i.e. [Autoconf](https://www.gnu.org/software/autoconf/) and [Automake](https://www.gnu.org/software/automake/)).
  * If you really feel that you have to use [CMake](https://cmake.org/) for your contributions, feel free to do so (UNIX rule of diversity) but make sure that at the end of the day `./configure && make` still works.
 
-## Test suite
+## Test suite {#sec:test-suite}
 
  * The directory `tests` contains the test suite with shell scripts that return appropriate errorlevels according to [Automake’s generic test scripts](https://www.gnu.org/software/automake/manual/html_node/Scripts_002dbased-Testsuites.html). In a nutshell:
  
