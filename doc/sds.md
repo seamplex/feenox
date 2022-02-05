@@ -785,14 +785,8 @@ Of course these kind of FeenoX-generated tables can be inserted verbatim into Ma
 Results of the same fatigue problem solved using two different philosophies.
 :::
 
- * UNIX
- * POSIX
- * shmem
- * mpi
- * moustache
-
  
-It should be noted that all of the programs and tools mentioned to be interoperable with FeenoX are free and open source software.
+It should be noted that all of the programs and tools mentioned to be interoperable with FeenoX are [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software). This is not a requirement from the SRS, but is indeed a nice-to-have feature.
  
 # Interfaces
 
@@ -800,6 +794,84 @@ It should be noted that all of the programs and tools mentioned to be interopera
 > ```include
 > 300-interfaces.md
 > ```
+
+FeenoX is provided as a console-only executable which can be run remotely through SSH or inside a containerized environment without any requirement such as graphical servers or special input devices. The input file provided as the first argument to the `feenox` binary contains all the information needed to solve the problem, so any further human intervention is not needed after execution begins. 
+
+If the execution finishes successfully, FeenoX returns a zero errorlevel to the calling shell (and follows the UNIX _rule of silence_):
+
+```terminal
+$ feenox maze.fee
+$ echo $?
+0
+$
+```
+
+If there is problem during execution (including parsing and run-time errors), a line prefixed with `error:` is written into the standard error file descriptor and a non-zero errorlevel is returned:
+
+```terminal
+$ feenox hello.fee 
+error: input file needs at least one more argument in commandline
+$ echo $?
+1
+$ feenox hello.fee world
+Hello world!
+$ echo $?
+0
+$ 
+```
+
+This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it. For example, following the _rule of repair_, ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
+
+```terminal
+$ feenox thermal-1d-dirichlet-no-k.fee
+error: undefined thermal conductivity 'k'
+$ feenox thermal-1d-dirichlet-wrong-bc.fee
+error: boundary condition 'xxx' does not have a physical group in mesh file 'slab.msh'
+$ 
+```
+
+
+If the command-line option `--progress` (or the `PROGRESS` keyword in [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem)) is used, then FeenoX writes into the standard output three “bars” showing the progress of
+
+ 1. (`.`) the build and assembly of the problem matrices (stiffness and mass if applicable)
+ 2. (`-`) the iterative solution of the problem (either linear or non-linear)
+ 3. (`=`) the recovery of gradient-based (i.e. strains and stresses) out of the primary solution
+ 
+::: {.not-in-format .html}
+```terminal
+$ gmsh -3 nafems-le10.geo
+Info    : Running 'gmsh -3 nafems-le10.geo' [Gmsh 4.9.4-git-10d6a15fd, 1 node, max. 1 thread]
+Info    : Started on Sat Feb  5 11:26:39 2022
+Info    : Reading 'nafems-le10.geo'...
+Info    : Reading 'nafems-le10.step'...
+Info    :  - Label 'Shapes/Open CASCADE STEP translator 7.6 1' (3D)
+Info    : Done reading 'nafems-le10.step'
+Info    : Done reading 'nafems-le10.geo'
+Info    : Meshing 1D...
+[...]
+Info    : Done optimizing mesh (0.106654 s)
+Info    : Done optimizing high-order mesh (0.106654 s)
+Info    : Done optimizing mesh (Wall 0.114461s, CPU 0.114465s)
+Info    : 50580 nodes 40278 elements
+Info    : Writing 'nafems-le10.msh'...
+Info    : Done writing 'nafems-le10.msh'
+Info    : Stopped on Sat Feb  5 11:26:40 2022 (From start: Wall 1.08693s, CPU 1.1709s)
+$ feenox nafems-le10.fee --progress
+....................................................................................................
+----------------------------------------------------------------------------------------------------
+====================================================================================================
+sigma_y @ D =   -5.38228        MPa
+$ 
+```
+:::
+
+:::: {.only-in-format .html }
+```{=html}
+<asciinema-player src="feenox-progress.cast" cols="128" rows="32" preload="true" poster="npt:0:1"></asciinema-player>
+```
+::::
+
+
 
 ## Problem input {#sec:input}
 
