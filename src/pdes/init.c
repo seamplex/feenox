@@ -41,9 +41,20 @@ int feenox_problem_init_parser_general(void) {
     feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d and PetscScalar = %d", sizeof(double), sizeof(PetscReal));
     return FEENOX_ERROR;
   }
+
+  // we already have processed basic options, now we loop over the original argv and convert
+  // double-dash options to single-dash so --snes_view transforsm to -snes_view
+  unsigned int i = 0;
+  for (i = 0; i < feenox.argc; i++) {
+    if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
+      char *tmp;
+      feenox_check_alloc(tmp = strdup(feenox.argv_orig[i]+1));
+      feenox_free(feenox.argv_orig[i]);
+      feenox.argv_orig[i] = tmp;
+    }
+  }
   
   PetscInt major, minor, subminor;
-  
  #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
   petsc_call(SlepcInitialize(&feenox.argc, &feenox.argv_orig, (char*)0, PETSC_NULL));
@@ -366,19 +377,8 @@ int feenox_problem_init_runtime_general(void) {
   
   // command-line arguments take precedence over the options in the input file
   // so we have to read them here and overwrite what he have so far
+  // recall that we alreay stripped off one dash from the original argv array
 
-  // we already have processed basic options, now we loop over the original argv and convert
-  // double-dash options to single-dash so --snes_view transforsm to -snes_view
-  unsigned int i = 0;
-  for (i = 0; i < feenox.argc; i++) {
-    if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
-      char *tmp;
-      feenox_check_alloc(tmp = strdup(feenox.argv_orig[i]+1));
-      feenox_free(feenox.argv_orig[i]);
-      feenox.argv_orig[i] = tmp;
-    }
-  }
-  
   // see if the user asked for mumps in the command line
   PetscBool flag = PETSC_FALSE;
   
