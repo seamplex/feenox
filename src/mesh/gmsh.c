@@ -870,19 +870,20 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         return FEENOX_ERROR;
       }
 
-      // to handle vector functions we need 3
+      // to handle vector/tensor functions we need more
       function_t **functions = NULL;
       feenox_check_alloc(functions = calloc(dofs, sizeof(function_t *)));
       
       unsigned int g = 0;
       if (dofs == 1) {
         functions[0] = function;
-      } else if (dofs == 3) {
+      } else if (dofs == 3 || dofs == 6) {
         
-        char *components[3] = {"x", "y", "z"};
+        char *components[6] = {"x", "y", "z", "xy", "yz", "zx"};
         for (g = 0; g < dofs; g++) {
           char *function_name = NULL;
           feenox_check_minusone(asprintf(&function_name, "%s_%s", function->name, components[g]));
+          // these functions have already been defined in the parser
           if ((functions[g] = feenox_get_function_ptr(function_name)) == NULL) {
             feenox_push_error_message("internal mismatch, cannot find function '%s'", function_name);
             return FEENOX_ERROR;
@@ -1029,209 +1030,93 @@ int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names)
 }
 
 
-int feenox_mesh_write_scalar_gmsh(mesh_write_t *mesh_write, function_t *function, field_location_t field_location, char *printf_format) {
+int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist) {
 
-  mesh_t *mesh = NULL;
-  
-  if (mesh_write->mesh != NULL) {
-    mesh = mesh_write->mesh;
-  } else if (function != NULL) {
-    mesh = function->mesh;
-  } else {
-    feenox_push_error_message("do not know which mesh to apply to post-process function '%s'", function->name);
-    return FEENOX_ERROR;
-  }
-
-  // TODO
-  if (field_location == field_location_cells) {
-    fprintf(mesh_write->file->pointer, "$ElementData\n");
-    if (mesh->n_cells == 0) {
-      feenox_call(feenox_mesh_element2cell(mesh));
+  // TODO: split as virtual methods
+  if (dist->field_location == field_location_cells) {
+    fprintf(this->file->pointer, "$ElementData\n");
+    if (this->mesh->n_cells == 0) {
+      feenox_call(feenox_mesh_element2cell(this->mesh));
     }
   } else {
-    fprintf(mesh_write->file->pointer, "$NodeData\n");
+    fprintf(this->file->pointer, "$NodeData\n");
   }
 
   // one string tag
-  fprintf(mesh_write->file->pointer, "1\n");
+  fprintf(this->file->pointer, "1\n");
   // the name of the vew
-  fprintf(mesh_write->file->pointer, "\"%s\"\n", function->name);
+  fprintf(this->file->pointer, "\"%s\"\n", dist->name);
   // the other one (optional) is the interpolation scheme
   
   // one real tag (only one)
-  fprintf(mesh_write->file->pointer, "1\n");                          
+  fprintf(this->file->pointer, "1\n");                          
   // time
-  fprintf(mesh_write->file->pointer, "%g\n", feenox_special_var_value(t));
+  fprintf(this->file->pointer, "%g\n", feenox_special_var_value(t));
 
   // thre integer tags
-  fprintf(mesh_write->file->pointer, "3\n");
+  fprintf(this->file->pointer, "3\n");
   // timestep
-  fprintf(mesh_write->file->pointer, "%d\n", (feenox_special_var_value(end_time) > 0) ? (unsigned int)(feenox_special_var_value(step_transient)) : (unsigned int)(feenox_special_var_value(step_static)));
-  // number of data per node: one (scalar)
-  fprintf(mesh_write->file->pointer, "%d\n", 1);
+  fprintf(this->file->pointer, "%d\n", (feenox_special_var_value(end_time) > 0) ? (unsigned int)(feenox_special_var_value(step_transient)) : (unsigned int)(feenox_special_var_value(step_static)));
+  // number of data per node
+  fprintf(this->file->pointer, "%d\n", dist->size);
 
-  // custom format
+  // custom printf format
   char *format = NULL;
-  if (printf_format == NULL) {
-    feenox_check_alloc(format = strdup("%ld %g\n"));
+  if (dist->printf_format == NULL) {
+    feenox_check_alloc(format = strdup(" %g"));
   } else {
-    if (printf_format[0] == '%') {
-      feenox_check_minusone(asprintf(&format, "%%ld %s\n", printf_format));
+    if (dist->printf_format[0] == '%') {
+      feenox_check_minusone(asprintf(&format, " %s", dist->printf_format));
     } else {
-      feenox_check_minusone(asprintf(&format, "%%ld %%%s\n", printf_format));
+      feenox_check_minusone(asprintf(&format, " %%%s", dist->printf_format));
     }  
   }
   
-  size_t i = 0;
-  if (field_location == field_location_cells) {
-    // number of data
-    fprintf(mesh_write->file->pointer, "%ld\n", mesh->n_cells);
-
-    if (function->type == function_type_pointwise_mesh_cell && function->mesh == mesh) {
-      for (i = 0; i < function->data_size; i++) {
-        fprintf(mesh_write->file->pointer, format, mesh->cell[i].element->tag, function->data_value[i]);
-      }
-    } else {
-      for (i = 0; i < mesh->n_cells; i++) {
-        fprintf(mesh_write->file->pointer, format, mesh->cell[i].element->tag, feenox_function_eval(function, mesh->cell[i].x));
-      }
-    }
-    fprintf(mesh_write->file->pointer, "$EndElementData\n");
-    
-  } else  {
-    
-    // number of data
-    fprintf(mesh_write->file->pointer, "%ld\n", mesh->n_nodes);              
-  
-    if (function->type == function_type_pointwise_mesh_node && function->mesh == mesh) {
-      for (i = 0; i < function->data_size; i++) {
-        fprintf(mesh_write->file->pointer, format, mesh->node[i].tag, function->data_value[i]);
-      }
-    } else {
-      for (i = 0; i < mesh->n_nodes; i++) {
-        fprintf(mesh_write->file->pointer, format, mesh->node[i].tag, feenox_function_eval(function, mesh->node[i].x));
-      }
-    }
-    fprintf(mesh_write->file->pointer, "$EndNodeData\n");    
-  }
-  
-  fflush(mesh_write->file->pointer);
-  feenox_free(format);
-
-  return FEENOX_OK;
-
-}
-
-int feenox_mesh_write_vector_gmsh(mesh_write_t *mesh_write, function_t **function, field_location_t field_location, char *printf_format) {
-
-  mesh_t *mesh = NULL;
-  if (mesh_write->mesh != NULL) {
-    mesh = mesh_write->mesh;
-  } else if (function != NULL) {
-    mesh = function[0]->mesh;
-  } else {
-    return FEENOX_ERROR;
-  }
-
-  if (field_location == field_location_cells) {
-    fprintf(mesh_write->file->pointer, "$ElementData\n");
-    if (mesh->n_cells == 0) {
-      feenox_call(feenox_mesh_element2cell(mesh));
-    }
-  } else {
-    fprintf(mesh_write->file->pointer, "$NodeData\n");
-  }
-
-  // only one string tag
-  fprintf(mesh_write->file->pointer, "1\n");
-  // view name
-  fprintf(mesh_write->file->pointer, "\"%s_%s_%s\"\n", function[0]->name, function[1]->name, function[2]->name);
-  // the other optional is the interpolation scheme
-  
-  // only one real tag
-  fprintf(mesh_write->file->pointer, "1\n");                          
-  // time
-  fprintf(mesh_write->file->pointer, "%g\n", (feenox_special_var_value(end_time) > 0) ? feenox_special_var_value(t) : feenox_special_var_value(step_static));
-
-  // three integer tags
-  fprintf(mesh_write->file->pointer, "3\n");
-  // timestep
-  fprintf(mesh_write->file->pointer, "%d\n", (feenox_special_var_value(end_time) > 0) ? (unsigned int)(feenox_special_var_value(step_transient)) : (unsigned int)(feenox_special_var_value(step_static)));
-  // number of values per point 3 (a vector)
-  fprintf(mesh_write->file->pointer, "%d\n", 3);
-
-  
-  if (field_location == field_location_cells) {
+  if (dist->field_location == field_location_cells) {
 
     // number of point data
-    fprintf(mesh_write->file->pointer, "%ld\n", mesh->n_cells);              
+    fprintf(this->file->pointer, "%ld\n", this->mesh->n_cells);              
 
-    // custom format
-    char *format = NULL;
-    if (printf_format == NULL) {
-      feenox_check_alloc(format = strdup("%ld %g %g %g\n"));
-    } else {
-      if (printf_format[0] == '%') {
-        feenox_check_minusone(asprintf(&format, "%%ld %s %s %s\n", printf_format, printf_format, printf_format));
-      } else {
-        feenox_check_minusone(asprintf(&format, "%%ld %%%s %%%s %%%s\n", printf_format, printf_format, printf_format));
-      }  
-    }
-    
+    // cell tag - data
     size_t i = 0;
-    for (i = 0; i < mesh->n_cells; i++) {
-      fprintf(mesh_write->file->pointer, format, mesh->cell[i].element->tag,
-                                                 feenox_function_eval(function[0], mesh->cell[i].x),
-                                                 feenox_function_eval(function[1], mesh->cell[i].x),
-                                                 feenox_function_eval(function[2], mesh->cell[i].x));
+    unsigned int g = 0;
+    double value = 0;
+    for (i = 0; i < this->mesh->n_cells; i++) {
+      fprintf(this->file->pointer, "%ld", this->mesh->cell[i].element->tag);
+      for (g = 0; g < dist->size; g++) {
+        value = (dist->field[g]->type == function_type_pointwise_mesh_cell && dist->field[g]->mesh == this->mesh) ?
+                  dist->field[g]->data_value[i] :
+                  feenox_function_eval(dist->field[g], this->mesh->cell[i].x);
+        fprintf(this->file->pointer, format, value);
+      }
+      fprintf(this->file->pointer, "\n");
     }
-    fprintf(mesh_write->file->pointer, "$EndElementData\n");
-    feenox_free(format);
+    fprintf(this->file->pointer, "$EndElementData\n");
     
   } else {
     
     // number of point data
-    fprintf(mesh_write->file->pointer, "%ld\n", mesh->n_nodes);              
+    fprintf(this->file->pointer, "%ld\n", this->mesh->n_nodes);              
 
-    // custom format
-    char *format = NULL;
-    if (printf_format == NULL) {
-      feenox_check_alloc(format = strdup("%g "));
-    } else {
-      if (printf_format[0] == '%') {
-        feenox_check_minusone(asprintf(&format, "%s ", printf_format));
-      } else {
-        feenox_check_minusone(asprintf(&format, "%%%s ", printf_format));
-      }  
-    }
-  
+    // point tag - data
     size_t j = 0;
-    for (j = 0; j < mesh->n_nodes; j++) {
-      fprintf(mesh_write->file->pointer, "%ld ", mesh->node[j].tag);
-      
-      if (function[0]->type == function_type_pointwise_mesh_node && function[0]->data_size == mesh_write->mesh->n_nodes) {
-        fprintf(mesh_write->file->pointer, format, function[0]->data_value[j]);
-      } else {
-        fprintf(mesh_write->file->pointer, format, feenox_function_eval(function[0], mesh->node[j].x));
+    unsigned int g = 0;
+    double value = 0;
+    for (j = 0; j < this->mesh->n_nodes; j++) {
+      fprintf(this->file->pointer, "%ld", this->mesh->node[j].tag);
+      for (g = 0; g < dist->size; g++) {
+        value = (dist->field[g]->type == function_type_pointwise_mesh_node && dist->field[g]->mesh == this->mesh) ?
+                  dist->field[g]->data_value[j] :
+                  feenox_function_eval(dist->field[g], this->mesh->node[j].x);
+        fprintf(this->file->pointer, format, value);
       }
-
-      if (function[1]->type == function_type_pointwise_mesh_node && function[1]->data_size == mesh_write->mesh->n_nodes) {
-        fprintf(mesh_write->file->pointer, format, function[1]->data_value[j]);
-      } else {
-        fprintf(mesh_write->file->pointer, format, feenox_function_eval(function[1], mesh->node[j].x));
-      }
-
-      if (function[2]->type == function_type_pointwise_mesh_node && function[2]->data_size == mesh_write->mesh->n_nodes) {
-        fprintf(mesh_write->file->pointer, format, function[2]->data_value[j]);
-      } else {
-        fprintf(mesh_write->file->pointer, format, feenox_function_eval(function[2], mesh->node[j].x));
-      }
-      fprintf(mesh_write->file->pointer, "\n");
+      fprintf(this->file->pointer, "\n");
     }
-    fprintf(mesh_write->file->pointer, "$EndNodeData\n");
-  }
+    fprintf(this->file->pointer, "$EndNodeData\n");
+  }  
  
-  fflush(mesh_write->file->pointer);
+  fflush(this->file->pointer);
+  feenox_free(format);
   
 
   return FEENOX_OK;

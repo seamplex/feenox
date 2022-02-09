@@ -51,13 +51,20 @@ void feenox_show_help(const char *progname, int extra) {
   }
   
   // TODO: use a defined string with %s
-  printf("usage: %s [options] inputfile [replacement arguments]\n\n", progname);
+  printf("usage: %s %s\n\n", progname, FEENOX_HELP_USAGE);
+  printf("%s\n", FEENOX_HELP_OPTIONS_BASE);
+
+  if (extra) {
+    printf("%s\n", FEENOX_HELP_OPTIONS_PDE);
+    printf("%s\n", FEENOX_HELP_EXTRA);
+  } else {
+    printf("Run with --help for further explanations.\n");
+  }
   
-  printf("%s\n", FEENOX_HELP_OPTIONS);
-  printf("%s\n", extra ? FEENOX_HELP_EXTRA : "Run with --help for further explanations.");
-  
-  printf("Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com\n");
-  printf("Feenox home page: https://www.seamplex.com/feenox/\n");
+  if (extra) {
+    printf("Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com\n");
+    printf("Feenox home page: https://www.seamplex.com/feenox/\n");
+  }  
   
   return;
 }
@@ -107,7 +114,7 @@ void feenox_shortversion(void) {
   printf("%s\n", PACKAGE_VERSION);
 #endif
 
-  printf("%s\n", FEENOX_ONE_LINER);
+  printf("%s\n", FEENOX_HELP_ONE_LINER);
 
   return;
 }

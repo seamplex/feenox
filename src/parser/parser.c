@@ -2228,14 +2228,15 @@ int feenox_parse_read_mesh(void) {
 ///kw_pde+READ_MESH+usage [ READ_FIELD <name_in_mesh> AS <function_name> ] [ READ_FIELD ... ] @
 ///kw_pde+READ_MESH+detail The `READ_FUNCTION` keyword is a shortcut when the scalar name and the to-be-defined function are the same.
 ///kw_pde+READ_MESH+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
-    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0 || strcasecmp(token, "READ_VECTOR") == 0) {
+    } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0 || strcasecmp(token, "READ_VECTOR") == 0 || strcasecmp(token, "READ_SYMMETRIC_TENSOR") == 0) {
 
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
       int vector = (strcasecmp(token, "READ_VECTOR") == 0);
+      int symmetric_tensor = (strcasecmp(token, "READ_SYMMETRIC_TENSOR") == 0);
 
+      // default to three dimensions
       if (mesh->dim == 0) {
-        feenox_push_error_message("READ_* needs DIM to be set", token);
-        return FEENOX_ERROR;
+        mesh->dim = 3;
       }
 
       char *name_in_mesh = NULL;
@@ -2265,9 +2266,9 @@ int feenox_parse_read_mesh(void) {
       
       // if they asked for a vector we have to define the three functions
       // here so they are available for further usage
-      if (vector) {
-        char *components[3] = {"x", "y", "z"};
-        for (unsigned g = 0; g < 3; g++) {
+      if (vector || symmetric_tensor) {
+        char *components[6] = {"x", "y", "z", "xy", "yz", "zx"};
+        for (unsigned g = 0; g < (symmetric_tensor ? 6 : 3); g++) {
           char *actual_function_name = NULL;
           feenox_check_minusone(asprintf(&actual_function_name, "%s_%s", function_name, components[g]));
           feenox_call(feenox_define_function(actual_function_name, mesh->dim));
@@ -2336,11 +2337,10 @@ int feenox_parse_write_mesh(void) {
   mesh_write_t *mesh_write = NULL;
   feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
 
-///kw_pde+WRITE_MESH+usage { <file_path> | <file_id> }
-///kw_pde+WRITE_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
-///kw_pde+WRITE_MESH+detail The format is automatically detected from the extension. Otherwise, the keyword `FILE_FORMAT` can
-///kw_pde+WRITE_MESH+detail be use to give the format explicitly.
-
+///kw_pde+WRITE_MESH+usage <file>
+///kw_pde+WRITE_MESH+detail The format is automatically detected from the extension, which should be
+///kw_pde+WRITE_MESH+detail either `msh` (version 2.2 ASCII) or `vtk` (legacy ASCII).
+///kw_pde+WRITE_MESH+detail Otherwise, the keyword `FILE_FORMAT` has to be given to set the format explicitly.
   feenox_call(feenox_parser_file(&mesh_write->file));
   if (mesh_write->file->mode == NULL) {
     feenox_check_alloc(mesh_write->file->mode = strdup("w"));
@@ -2349,8 +2349,8 @@ int feenox_parse_write_mesh(void) {
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
 ///kw_pde+WRITE_MESH+usage [ MESH <mesh_identifier> ]
-///kw_pde+WRITE_MESH+detail If there are several meshes defined then which one should be used has to be
-///kw_pde+WRITE_MESH+detail given explicitly with `MESH`.
+///kw_pde+WRITE_MESH+detail If there are several meshes defined by `READ_MESH`, the mesh used to write the
+///kw_pde+WRITE_MESH+detail data has be given explicitly with `MESH`.
     if (strcasecmp(token, "MESH") == 0) {
       
       char *mesh_name = NULL;
@@ -2363,13 +2363,14 @@ int feenox_parse_write_mesh(void) {
       feenox_free(mesh_name);
           
 ///kw_pde+WRITE_MESH+usage [ NO_MESH ]
-///kw_pde+WRITE_MESH+detail If the `NO_MESH` keyword is given, only the results are written into the output file.
+///kw_pde+WRITE_MESH+detail If the `NO_MESH` keyword is given, only the results are written into the
+///kw_pde+WRITE_MESH+detail output file without any mesh data.
 ///kw_pde+WRITE_MESH+detail Depending on the output format, this can be used to avoid repeating data and/or
 ///kw_pde+WRITE_MESH+detail creating partial output files which can the be latter assembled by post-processing scripts.
     } else if (strcasecmp(token, "NOMESH") == 0 || strcasecmp(token, "NO_MESH") == 0) {
       mesh_write->no_mesh = 1;
 
-///kw_pde+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]
+///kw_pde+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]@
     } else if (strcasecmp(token, "FILE_FORMAT") == 0) {
       char *keywords[] = {"gmsh", "vtk", ""};
       int values[] = {post_format_gmsh, post_format_vtk, 0};
@@ -2378,7 +2379,7 @@ int feenox_parse_write_mesh(void) {
 ///kw_pde+WRITE_MESH+usage [ NO_PHYSICAL_NAMES ]
 ///kw_pde+WRITE_MESH+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
 ///kw_pde+WRITE_MESH+detail section that sets the actual names of the physical entities is not written.      
-///kw_pde+WRITE_MESH+detail This can be needed to avoid name clashes when dealing with multiple `.msh` files.
+///kw_pde+WRITE_MESH+detail This might be needed in some cases to avoid name clashes when dealing with multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
       mesh_write->no_physical_names = 1;
       
@@ -2397,42 +2398,78 @@ int feenox_parse_write_mesh(void) {
       mesh_write->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;
 
-///kw_pde+WRITE_MESH+detail Also, the `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
+///kw_pde+WRITE_MESH+detail The `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
 ///kw_pde+WRITE_MESH+detail representation of the fields that follow. Default is `%g`.
-///kw_pde+WRITE_MESH+usage [ SCALAR_FORMAT <printf_specification>]
+///kw_pde+WRITE_MESH+usage [ SCALAR_FORMAT <printf_specification> ]@
     } else if (strcasecmp(token, "SCALAR_FORMAT") == 0) {
       feenox_call(feenox_parser_string(&mesh_write->printf_format));
       
 ///kw_pde+WRITE_MESH+detail The data to be written has to be given as a list of fields,
 ///kw_pde+WRITE_MESH+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
-///kw_pde+WRITE_MESH+detail and/or expressions (such as `x^2+y^2+z^2`).
-///kw_pde+WRITE_MESH+detail Each field is written as a scalar, unless the keyword `VECTOR` is given.
-///kw_pde+WRITE_MESH+detail In this case, there should be exactly three fields following `VECTOR`.
-///kw_pde+WRITE_MESH+usage [ VECTOR <field_x> <field_y> <field_z> ] [...]
-    } else if (strcasecmp(token, "VECTOR") == 0) {
+///kw_pde+WRITE_MESH+detail and/or expressions (such as `T(x,y,z)*sqrt(x^2+y^2+z^2)`).
+///kw_pde+WRITE_MESH+detail Each field is written as a scalar, unless either the keywords `VECTOR`
+///kw_pde+WRITE_MESH+detail or `SYMMETRIC_TENSOR` are given.
+///kw_pde+WRITE_MESH+usage [ <scalar_field_1> ] [ <scalar_field_2> ] [...] @
+      
+///kw_pde+WRITE_MESH+detail In the first case, the next three fields following the `VECTOR` keyword
+///kw_pde+WRITE_MESH+detail are taken as the vector elements.
+///kw_pde+WRITE_MESH+usage [ VECTOR <field_x> <field_y> <field_z> ] [...] @
+      
+///kw_pde+WRITE_MESH+detail In the latter, the next six fields following the `SYMMETRIC_TENSOR` keyword
+///kw_pde+WRITE_MESH+detail are taken as the tensor elements.
+///kw_pde+WRITE_MESH+usage [ SYMMETRIC_TENSOR <field_xx> <field_yy> <field_zz> <field_xy> <field_yz> <field_zx> ] [...] @
+    } else {
       
       mesh_write_dist_t *mesh_write_dist = NULL;
       feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
-      feenox_check_alloc(mesh_write_dist->vector = calloc(3, sizeof(function_t *)));
-          
-      unsigned int i = 0;
-      for (i = 0; i < 3; i++) {
-            
+      
+      mesh_write_dist->size = 1;
+      
+      if (strcasecmp(token, "VECTOR") == 0) {
+        mesh_write_dist->size = 3;
         if ((token = feenox_get_next_token(NULL)) == NULL) {
           feenox_push_error_message("expected function name");
           return FEENOX_ERROR;
         }
-            
-        if ((mesh_write_dist->vector[i] = feenox_get_function_ptr(token)) == NULL) {
-          feenox_check_alloc(mesh_write_dist->vector[i] = calloc(1, sizeof(function_t)));
-          feenox_check_alloc(mesh_write_dist->vector[i]->name = strdup(token));
-          mesh_write_dist->vector[i]->type = function_type_algebraic;
-          mesh_write_dist->vector[i]->n_arguments = 3;
-          mesh_write_dist->vector[i]->n_arguments_given = 3;
-          mesh_write_dist->vector[i]->var_argument = feenox.mesh.vars.arr_x;
-          feenox_call(feenox_expression_parse(&mesh_write_dist->vector[i]->algebraic_expression, token)); 
+      } else if (strcasecmp(token, "SYMMETRIC_TENSOR") == 0 || strcasecmp(token, "SYMM_TENSOR") == 0) {
+        mesh_write_dist->size = 6;
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected function name");
+          return FEENOX_ERROR;
         }
-        mesh_write_dist->vector[i]->used = 1;
+      }
+      
+      feenox_check_alloc(mesh_write_dist->field = calloc(mesh_write_dist->size, sizeof(function_t *)));
+          
+      unsigned int i = 0;
+      for (i = 0; i < mesh_write_dist->size; i++) {
+
+        // we have to read a new token only for i > 0
+        if (i > 0) {
+          if ((token = feenox_get_next_token(NULL)) == NULL) {
+            feenox_push_error_message("expected function name");
+            return FEENOX_ERROR;
+          }
+        }  
+        
+        if (strcasecmp(token, "NAME") == 0) {
+          feenox_call(feenox_parser_string(&mesh_write_dist->name));
+          if ((token = feenox_get_next_token(NULL)) == NULL) {
+            feenox_push_error_message("expected function name");
+            return FEENOX_ERROR;
+          }
+        }
+            
+        if ((mesh_write_dist->field[i] = feenox_get_function_ptr(token)) == NULL) {
+          feenox_check_alloc(mesh_write_dist->field[i] = calloc(1, sizeof(function_t)));
+          feenox_check_alloc(mesh_write_dist->field[i]->name = strdup(token));
+          mesh_write_dist->field[i]->type = function_type_algebraic;
+          mesh_write_dist->field[i]->n_arguments = 3;
+          mesh_write_dist->field[i]->n_arguments_given = 3;
+          mesh_write_dist->field[i]->var_argument = feenox.mesh.vars.arr_x;
+          feenox_call(feenox_expression_parse(&mesh_write_dist->field[i]->algebraic_expression, token)); 
+        }
+        mesh_write_dist->field[i]->used = 1;
         
         mesh_write_dist->field_location = mesh_write->field_location;
         if (mesh_write->printf_format != NULL) {
@@ -2440,30 +2477,12 @@ int feenox_parse_write_mesh(void) {
         }  
       }
           
-      LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
-          
-          
-    } else {
-          
-///kw_pde+WRITE_MESH+usage [ <field_1> ] [ <field_2> ] ...
-      mesh_write_dist_t *mesh_write_dist = NULL;
-      feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
-          
-      if ((mesh_write_dist->scalar = feenox_get_function_ptr(token)) == NULL) {
-        feenox_check_alloc(mesh_write_dist->scalar = calloc(1, sizeof(function_t)));
-        feenox_check_alloc(mesh_write_dist->scalar->name = strdup(token));
-        mesh_write_dist->scalar->type = function_type_algebraic;
-        mesh_write_dist->scalar->n_arguments = 3;
-        mesh_write_dist->scalar->n_arguments_given = 3;
-        mesh_write_dist->scalar->var_argument = feenox.mesh.vars.arr_x;
-        feenox_call(feenox_expression_parse(&mesh_write_dist->scalar->algebraic_expression, token)); 
+      if (mesh_write_dist->name == NULL) {
+        mesh_write_dist->name = strdup(mesh_write_dist->field[0]->name);
+        for (i = 1; i < mesh_write_dist->size; i++) {
+          feenox_check_minusone(asprintf(&mesh_write_dist->name, "%s_%s", mesh_write_dist->name, mesh_write_dist->field[i]->name));
+        }
       }
-      
-      mesh_write_dist->scalar->used = 1;
-      mesh_write_dist->field_location = mesh_write->field_location;
-      if (mesh_write->printf_format != NULL) {
-        feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
-      }  
       
       LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
     }
@@ -2482,7 +2501,7 @@ int feenox_parse_write_mesh(void) {
   if (mesh_write->post_format == post_format_fromextension) {
     char *ext = mesh_write->file->format + strlen(mesh_write->file->format) - 4;
 
-           if (strcasecmp(ext, ".pos") == 0 || strcasecmp(ext, ".msh") == 0) {
+    if (strcasecmp(ext, ".msh") == 0) {
       mesh_write->post_format = post_format_gmsh;
     } else if (strcasecmp(ext, ".vtk") == 0) {
       mesh_write->post_format = post_format_vtk;
@@ -2493,19 +2512,17 @@ int feenox_parse_write_mesh(void) {
   }
 
   
-  // TODO
+  // TODO: unify writers
   switch (mesh_write->post_format) {
     case post_format_gmsh:
       mesh_write->write_header = feenox_mesh_write_header_gmsh;
       mesh_write->write_mesh   = feenox_mesh_write_mesh_gmsh;
-      mesh_write->write_scalar = feenox_mesh_write_scalar_gmsh;
-      mesh_write->write_vector = feenox_mesh_write_vector_gmsh;
+      mesh_write->write_data   = feenox_mesh_write_data_gmsh;
     break;
     case post_format_vtk:
       mesh_write->write_header = feenox_mesh_write_header_vtk;
       mesh_write->write_mesh   = feenox_mesh_write_mesh_vtk;
-      mesh_write->write_scalar = feenox_mesh_write_scalar_vtk;
-      mesh_write->write_vector = feenox_mesh_write_vector_vtk;
+      mesh_write->write_data   = feenox_mesh_write_data_vtk;
     break;
     default:
       return FEENOX_ERROR;

@@ -1,0 +1,1 @@
+[options] inputfile [replacement arguments]

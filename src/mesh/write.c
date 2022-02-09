@@ -58,12 +58,7 @@ int feenox_instruction_mesh_write(void *arg) {
       feenox_call(feenox_mesh_element2cell(mesh_write->mesh));
     }
 
-    if (mesh_write_dist->scalar != NULL) {
-      feenox_call(mesh_write->write_scalar(mesh_write, mesh_write_dist->scalar, mesh_write_dist->field_location, mesh_write_dist->printf_format));
-    } else {
-      feenox_call(mesh_write->write_vector(mesh_write, mesh_write_dist->vector, mesh_write_dist->field_location, mesh_write_dist->printf_format));
-    }
-    // TODO: tensors
+    feenox_call(mesh_write->write_data(mesh_write, mesh_write_dist));
   }
   
   // as vtk does not support multiple time steps, it is better to close the file now

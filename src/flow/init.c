@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX initialization routines
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2022 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -42,10 +42,11 @@ int feenox_initialize(int argc, char **argv) {
   int option_index = 0;
   int show_help = 0;
   int show_version = 0;
-  
+
+///help+usage+desc [options] inputfile [replacement arguments]  
   const struct option longopts[] = {
 ///op+help+option `-h`, `--help`
-///op+help+desc display options and explanations of commmand-line usage
+///op+help+desc display options and detailed explanations of commmand-line usage
     { "help",         no_argument,       NULL, 'h'},
 ///op+version+option `-v`, `--version`
 ///op+version+desc display brief version information and exit
@@ -64,7 +65,7 @@ int feenox_initialize(int argc, char **argv) {
     { NULL, 0, NULL, 0 }
   };  
  
-///help+extra+desc Instructions will be read from standard input if "-" is passed as inputfile, i.e.
+///help+extra+desc Instructions will be read from standard input if "-" is passed as `inputfile`, i.e.
 ///help+extra+desc @
 ///help+extra+desc ```terminal
 ///help+extra+desc $ echo 'PRINT 2+2' | feenox -
@@ -87,6 +88,9 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc $ echo 'PRINT $1+$2' | feenox - 3 4
 ///help+extra+desc 7
 ///help+extra+desc ```
+///help+extra+desc @
+///help+extra+desc See <https://www.seamplex.com/feenox/examples> for annotated examples.
+  
   
   
   

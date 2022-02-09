@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 for i in feenox touch sed pandoc xelatex makeinfo texi2pdf inkscape convert pandoc-crossref; do
  if [ -z "$(which $i)" ]; then
@@ -78,9 +78,11 @@ done
 echo "help as markdown definition list"
 ./help-md.sh > help.md
 
-echo "help as a raw txt (which is used in feenox -v)"
-./help-options-txt.sh | awk '{printf("%s\\n\\\n", $0)}' > help-options.txt
-./help-extra-txt.sh   | awk '{printf("%s\\n\\\n", $0)}' > help-extra.txt
+echo "help as a raw txt (which is used in feenox -h)"
+./help-txt.sh usage   ../src/flow/init.c > help-usage.txt
+./help-options-txt.sh ../src/flow/init.c > help-options-base.txt
+./help-options-txt.sh ../src/pdes/init.c > help-options-pde.txt
+./help-txt.sh extra   ../src/flow/init.c > help-extra.txt
 
 echo "unix man page"
 m4 date.m4 > date.yaml

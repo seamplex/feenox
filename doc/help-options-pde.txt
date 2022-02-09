@@ -1,0 +1,4 @@
+  --progress         print ASCII progress bars
+  --mumps            ask PETSc to use the direct linear solver MUMPS
+  --linear           force FeenoX to solve the problem as linear
+  --non-linear       force FeenoX to solve the problem as non-linear

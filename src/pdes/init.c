@@ -383,7 +383,7 @@ int feenox_problem_init_runtime_general(void) {
   PetscBool flag = PETSC_FALSE;
   
 ///op+progress+option `--progress`
-///op+progress+desc print ASCII progress bars
+///op+progress+desc print ASCII progress bars when solving PDEs
   if (feenox.pde.progress_ascii == PETSC_FALSE) {
     petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-progress", &feenox.pde.progress_ascii));
   }  
@@ -397,14 +397,14 @@ int feenox_problem_init_runtime_general(void) {
   }
 
 ///op+linear+option `--linear`
-///op+linear+desc force FeenoX to solve the problem as linear
+///op+linear+desc force FeenoX to solve the PDE problem as linear
   petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_linear;
   }
 
 ///op+non-linear+option `--non-linear`
-///op+non-linear+desc force FeenoX to solve the problem as non-linear
+///op+non-linear+desc force FeenoX to solve the PDE problem as non-linear
   petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-non-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;

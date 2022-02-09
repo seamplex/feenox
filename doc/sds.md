@@ -882,9 +882,13 @@ Once again, these ASCII-based progress bars can be parsed by the calling entity 
 ![ASCII progress bars parsed and converted into a web-based interface](caeplex-progress.png){#fig:caeplex-progress width_latex=65% width_html=100%}
 
 
-FeenoX pr
+PETSc args
 
 Since the main input file is the first argument (not counting POSIX options starting with at least one dash)
+
+Shebang
+
+replacement args
 
 ## Problem input {#sec:input}
 

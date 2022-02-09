@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 for i in grep awk sort uniq gcc; do
  if [ -z "$(which $i)" ]; then

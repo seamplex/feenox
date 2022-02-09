@@ -1,20 +1,23 @@
-Instructions will be read from standard input if “-” is passed as\n\
-inputfile, i.e.\n\
-\n\
-    $ echo 'PRINT 2+2' | feenox -\n\
-    4\n\
-\n\
-PETSc and SLEPc options can be passed in [options] as well, with the\n\
-difference that two hyphens have to be used instead of only once. For\n\
-example, to pass the PETSc option -ksp_view the actual FeenoX invocation\n\
-should be\n\
-\n\
-    $ feenox --ksp_view input.fee\n\
-\n\
-The optional [replacement arguments] part of the command line mean that\n\
-each argument after the input file that does not start with an hyphen\n\
-will be expanded verbatim in the input file in each occurrence of $1,\n\
-$2, etc. For example\n\
-\n\
-    $ echo 'PRINT $1+$2' | feenox - 3 4\n\
-    7\n\
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+    $ echo 'PRINT 2+2' | feenox -
+    4
+
+PETSc and SLEPc options can be passed in [options] as well, with the
+difference that two hyphens have to be used instead of only once. For
+example, to pass the PETSc option -ksp_view the actual FeenoX invocation
+should be
+
+    $ feenox --ksp_view input.fee
+
+The optional [replacement arguments] part of the command line mean that
+each argument after the input file that does not start with an hyphen
+will be expanded verbatim in the input file in each occurrence of $1,
+$2, etc. For example
+
+    $ echo 'PRINT $1+$2' | feenox - 3 4
+    7
+
+See https://www.seamplex.com/feenox/examples for annotated examples of
+usage.

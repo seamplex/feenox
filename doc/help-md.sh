@@ -1,12 +1,15 @@
-#!/bin/bash
+#!/bin/bash -e
+
+# create a markdown version of the usage and command-line options
 
 srcs="../src/flow/init.c ../src/pdes/init.c"
 kws=$(grep "///op+" ${srcs} | awk '{print $1}' | awk -F+ '{print $2}' | uniq)
 
-# echo "~~~terminal"
-# grep "///help+usage+desc" ../src/flow/init.c | cut -d" " -f2- | sed 's/@$//' | sed 's_/\\/_//_'
-# echo "~~~"
-# echo
+echo "~~~terminal"
+echo -n "feenox "
+grep "///help+usage+desc" ../src/flow/init.c | cut -d" " -f2- | sed 's/@$//' | sed 's_/\\/_//_'
+echo "~~~"
+echo
 
 
 for kw in ${kws}; do

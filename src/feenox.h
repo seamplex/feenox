@@ -1249,12 +1249,12 @@ typedef enum {
 } field_location_t;
 
 struct mesh_write_dist_t {
+  char *name;
+  unsigned int size;
+  function_t **field;
+  
   field_location_t field_location;
   char *printf_format;
-  
-  function_t *scalar;
-  function_t **vector;
-  function_t ***tensor;
   
   mesh_write_dist_t *next;
 };
@@ -1274,19 +1274,15 @@ struct mesh_write_t {
   field_location_t field_location;
   char *printf_format;
   
-  int (*write_header)(FILE *);
-  int (*write_mesh)(mesh_t *, FILE *, int);
-  int (*write_scalar)(mesh_write_t *, function_t *, field_location_t, char *);
-  int (*write_vector)(mesh_write_t *, function_t **, field_location_t, char *);
+  int (*write_header)(FILE *file);
+  int (*write_mesh)(mesh_t *mesh, FILE *file, int no_physical_names);
+  int (*write_data)(mesh_write_t *this, mesh_write_dist_t *dist);
   
-  // thee two are to know if we have to change the type in VTK
+  // these two are to know if we have to change the type in VTK
   int point_init;
   int cell_init;
   
   mesh_write_dist_t *mesh_write_dists;
-  
-  // flags genericos para codigos particulares
-  int flags;
   
   mesh_write_t *next;
 };
@@ -2081,8 +2077,7 @@ extern int feenox_mesh_read_gmsh(mesh_t *this);
 extern int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt);
 extern int feenox_mesh_write_header_gmsh(FILE *file);
 extern int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names);
-extern int feenox_mesh_write_scalar_gmsh(mesh_write_t *mesh_post, function_t *function, field_location_t field_location, char *printf_format);
-extern int feenox_mesh_write_vector_gmsh(mesh_write_t *mesh_post, function_t **function, field_location_t field_location, char *printf_format);
+extern int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist);
 
 extern int feenox_gmsh_read_data_int(mesh_t *this, size_t n, int *data, int binary);
 extern int feenox_gmsh_read_data_size_t(mesh_t *this, size_t n, size_t *data, int binary);
@@ -2159,8 +2154,7 @@ extern int feenox_mesh_element2cell(mesh_t *this);
 extern int feenox_mesh_write_unstructured_mesh_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_header_vtk(FILE *file);
 extern int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy);
-extern int feenox_mesh_write_scalar_vtk(mesh_write_t *mesh_post, function_t *function, field_location_t field_location, char *printf_format);
-extern int feenox_mesh_write_vector_vtk(mesh_write_t *mesh_post, function_t **function, field_location_t field_location, char *printf_format);
+extern int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist);
 
 
 // neighbors.c

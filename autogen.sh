@@ -22,14 +22,17 @@ fi
 ./autoclean.sh
 touch ./src/variables.mak
 
-echo "hola"
 cat << EOF > ./src/help.h
-#define FEENOX_ONE_LINER     "$(cat doc/help-one-liner.txt)"
-#define FEENOX_HELP_OPTIONS  "\\
-$(cat doc/help-options.txt)
+#define FEENOX_HELP_ONE_LINER     "$(cat doc/help-one-liner.txt)"
+#define FEENOX_HELP_USAGE         "$(cat doc/help-usage.txt)"
+#define FEENOX_HELP_OPTIONS_BASE  "\\
+$(awk '{printf("%s\\n\\\n", $0)}' doc/help-options-base.txt)
 "
-#define FEENOX_HELP_EXTRA    "\\
-$(cat doc/help-extra.txt)
+#define FEENOX_HELP_OPTIONS_PDE   "\\
+$(awk '{printf("%s\\n\\\n", $0)}' doc/help-options-pde.txt)
+"
+#define FEENOX_HELP_EXTRA          "\\
+$(awk '{printf("%s\\n\\\n", $0)}' doc/help-extra.txt)
 "
 EOF
 

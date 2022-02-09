@@ -1,0 +1,3 @@
+  -h, --help         display options and detailed explanations of commmand-line usage
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
