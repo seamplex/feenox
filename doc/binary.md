@@ -28,23 +28,15 @@ Check if it works by calling `feenox` from any directory (you might need to open
 
 ```terminal
 $ feenox
-FeenoX v0.1.67-g8899dfd-dirty 
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-usage: feenox [options] inputfile [replacement arguments]
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display usage and commmand-line help and exit
+  -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
-  -s, --sumarize     list all symbols in the input file and exit
 
-Instructions will be read from standard input if “-” is passed as
-inputfile, i.e.
-
-    $ echo "PRINT 2+2" | feenox -
-    4
-
-Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
-Feenox home page: https://www.seamplex.com/feenox/
+Run with --help for further explanations.
 $ 
 ```

@@ -131,10 +131,10 @@ void feenox_copyright(void) {
   /* It is important to separate the year from the rest of the message,
      as done here, to avoid having to retranslate the message when a new
      year comes around.  */  
-  printf("Copyright © Seamplex %d--%d %s\n\
+  printf("Copyright © %d--%d Seamplex, https://seamplex.com/feenox\n\
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. \n\
 FeenoX is free software: you are free to change and redistribute it.\n\
-There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2022, "jeremy theler"); 
+There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2022); 
 }
 
 void feenox_longversion(void) {

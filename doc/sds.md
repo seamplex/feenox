@@ -263,24 +263,16 @@ As FeenoX is designed to run as a file filter (i.e. as a transfer function betwe
 
 ```terminal
 $ feenox
-FeenoX v0.1.77-g9325958
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-usage: feenox [options] inputfile [replacement arguments]
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display usage and commmand-line help and exit
+  -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
-  -s, --sumarize     list all symbols in the input file and exit
 
-Instructions will be read from standard input if “-” is passed as
-inputfile, i.e.
-
-    $ echo "PRINT 2+2" | feenox -
-    4
-
-Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
-Feenox home page: https://www.seamplex.com/feenox/
+Run with --help for further explanations.
 ```
 
 The program can also be executed remotely
@@ -824,10 +816,10 @@ The `--version` option follows the [GNU Coding Standards guidelines](https://www
 
 ```terminal
 $ feenox --version
-FeenoX v0.2.12-gc5934bb-dirty 
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright (C) 2009--2022 jeremy theler
+Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -838,21 +830,22 @@ The `--versions` option shows more information about the FeenoX build and the li
 
 ```terminal
 $ feenox -V
-FeenoX v0.2.12-gc5934bb-dirty 
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Wed Feb 9 08:19:05 2022 -0300
-Build date         : Sat Feb 12 10:25:42 2022 -0300
+Last commit date   : Sat Feb 12 15:35:05 2022 -0300
+Build date         : Sat Feb 12 15:35:44 2022 -0300
 Build architecture : linux-gnu x86_64
-Compiler           : gcc (Ubuntu 11.2.0-7ubuntu2) 11.2.0
+Compiler version   : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
 Compiler flags     : -O3
-Builder            : gtheler@chalmers
+Builder            : gtheler@tom
 GSL version        : 2.6
 SUNDIALS version   : 5.7.0
-PETSc version      : Petsc Release Version 3.14.5, Mar 03, 2021 
-PETSc arch         : rel-mpi-double-int32
-PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --download-slepc --with-64-bit-indices=no --with-debugging=no --with-precision=double --with-scalar-type=real COPTFLAGS=-O3 CXXOPTFLAGS=-O3 FOPTFLAGS=-O3 PETSC_ARCH=rel-mpi-double-int32
-SLEPc version      : N/A
+PETSc version      : Petsc Release Version 3.16.3, Jan 05, 2022 
+PETSc arch         : arch-linux-c-debug
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack
+SLEPc version      : SLEPc Release Version 3.16.1, Nov 17, 2021
 $
 ```
 
@@ -860,29 +853,22 @@ The `--help` option gives a more detailed usage:
 
 ```terminal
 $ feenox --help
-usage: feenox [options] inputfile [replacement arguments]
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
 
-  --progress         print ASCII progress bars
+  --progress         print ASCII progress bars when solving PDEs
   --mumps            ask PETSc to use the direct linear solver MUMPS
-  --linear           force FeenoX to solve the problem as linear
-  --non-linear       force FeenoX to solve the problem as non-linear
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Instructions will be read from standard input if “-” is passed as
 inputfile, i.e.
 
     $ echo 'PRINT 2+2' | feenox -
     4
-
-PETSc and SLEPc options can be passed in [options] as well, with the
-difference that two hyphens have to be used instead of only once. For
-example, to pass the PETSc option -ksp_view the actual FeenoX invocation
-should be
-
-    $ feenox --ksp_view input.fee
 
 The optional [replacement arguments] part of the command line mean that
 each argument after the input file that does not start with an hyphen
@@ -892,10 +878,17 @@ $2, etc. For example
     $ echo 'PRINT $1+$2' | feenox - 3 4
     7
 
-See https://www.seamplex.com/feenox/examples for annotated examples of
-usage.
+PETSc and SLEPc options can be passed in [petsc options] as well, with
+the difference that two hyphens have to be used instead of only once.
+For example, to pass the PETSc option -ksp_view the actual FeenoX
+invocation should be
 
-Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
+    $ feenox input.fee --ksp_view
+
+See https://www.seamplex.com/feenox/examples for annotated examples.
+
+Report bugs at https://github.com/seamplex/feenox/issues
+Ask questions at https://github.com/seamplex/feenox/discussions
 Feenox home page: https://www.seamplex.com/feenox/
 $
 ```

@@ -247,35 +247,27 @@ The binary executable will be located in the `src` directory but a copy will be 
 
 ```terminal
 $ ./feenox
-FeenoX v0.1.24-g6cfe063 
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-usage: ./feenox [options] inputfile [replacement arguments]
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display usage and commmand-line help and exit
+  -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
-  -s, --sumarize     list all symbols in the input file and exit
 
-Instructions will be read from standard input if “-” is passed as
-inputfile, i.e.
-
-    $ echo "PRINT 2+2" | feenox -
-    4
-
-Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
-Feenox home page: https://www.seamplex.com/feenox/
+Run with --help for further explanations.
 $
 ```
 
-The `-v` (or `--version`) option shows the version and a copyright notice:
+The `-v` (or `--version`) option shows the version and a copyright notice:^[The word `dirty` means the current Git worktree used to compile the binary had some changes that were not commited yet.]
 
 ```terminal
 $ ./feenox -v
-FeenoX v0.1.24-g6cfe063
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright (C) 2009--2021 jeremy theler
+Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -292,7 +284,8 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 Last commit date   : Sun Aug 29 11:34:04 2021 -0300
 Build date         : Sun Aug 29 11:44:50 2021 -0300
 Build architecture : linux-gnu x86_64
-Compiler           : gcc (Ubuntu 10.3.0-1ubuntu1) 10.3.0
+Compiler version   : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
 Compiler flags     : -O3
 Builder            : gtheler@chalmers
 GSL version        : 2.6
@@ -639,10 +632,10 @@ Check that FeenoX is now available from any directory (note the command is `feen
 ```terminal
 $ cd
 $ feenox -v
-FeenoX v0.2.6-g3237ce9
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright (C) 2009--2022 jeremy theler
+Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -716,21 +709,22 @@ The FeenoX executable will show the configured compiler and flags when invoked w
 
 ```terminal
 $ feenox --versions
-FeenoX v0.1.47-g868dbb7-dirty 
+FeenoX v0.2.14-gbbf48c9-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Mon Sep 6 16:39:53 2021 -0300
-Build date         : Tue Sep 07 14:29:42 2021 -0300
+Last commit date   : Sat Feb 12 15:35:05 2022 -0300
+Build date         : Sat Feb 12 15:35:44 2022 -0300
 Build architecture : linux-gnu x86_64
-Compiler           : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler version   : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
 Compiler flags     : -O3
 Builder            : gtheler@tom
 GSL version        : 2.6
 SUNDIALS version   : 5.7.0
-PETSc version      : Petsc Release Version 3.15.0, Mar 30, 2021 
-PETSc arch         : arch-linux2-c-debug
-PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --with-x=0
-SLEPc version      : SLEPc Release Version 3.15.1, May 28, 2021
+PETSc version      : Petsc Release Version 3.16.3, Jan 05, 2022 
+PETSc arch         : arch-linux-c-debug
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack
+SLEPc version      : SLEPc Release Version 3.16.1, Nov 17, 2021
 $
 ```
 
