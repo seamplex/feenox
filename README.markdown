@@ -455,7 +455,8 @@ below][] for details.
 
 To compile the Git repository, proceed as follows. This procedure does
 need `git` and `autoconf` but new versions can be pulled and recompiled
-easily.
+easily. If something goes wrong and you get an error, do not hesitate to
+ask in FeenoX’ [discussion page][].
 
 1.  Install mandatory dependencies
 
@@ -497,7 +498,8 @@ easily.
     ```
 
     If you do not have Internet access, get the tarball manually, copy
-    it to the same directory as `configure` and run again.
+    it to the same directory as `configure` and run again. See the
+    [detailed compilation instructions][] for an explanation.
 
 5.  Run test suite (optional)
 
@@ -520,9 +522,11 @@ git pull
 sudo make install
 ```
 
-See the [detailed compilation instructions][] for further details.
+See the [detailed compilation instructions][5] for further details.
 
-  [detailed compilation instructions]: doc/compilation.md
+  [discussion page]: https://github.com/seamplex/feenox/discussions
+  [detailed compilation instructions]: compilation.md
+  [5]: doc/compilation.md
 
 # Licensing
 
@@ -562,7 +566,7 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][5] version 3 or, at the user convenience, any later version.
+License][6] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[3]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -620,7 +624,7 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [5]: https://www.gnu.org/licenses/gpl-3.0
+  [6]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
@@ -630,11 +634,11 @@ Home page: <https://www.seamplex.com/feenox>
 Repository: <https://github.com/seamplex/feenox>  
 Bug reporting: <https://github.com/seamplex/feenox/issues>  
 Discussions: <https://github.com/seamplex/feenox/discussions>  
-Follow us: [YouTube][] [LinkedIn][] [Github][6]
+Follow us: [YouTube][] [LinkedIn][] [Github][7]
 
 ------------------------------------------------------------------------
 
-FeenoX is copyright ©2009-2021 [Seamplex][]  
+FeenoX is copyright ©2009-2022 [Seamplex][]  
 FeenoX is licensed under [GNU GPL version 3][] or (at your option) any
 later version.  
 FeenoX is free software: you are free to change and redistribute it.  
@@ -643,7 +647,7 @@ See the [copying conditions][].
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
-  [6]: https://github.com/seamplex
+  [7]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html
   [copying conditions]: COPYING

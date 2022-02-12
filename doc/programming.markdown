@@ -36,7 +36,7 @@
   [<span class="toc-section-number">3.3</span> Programming IDEs]: #programming-ides
   [<span class="toc-section-number">3.3.1</span> Netbeans]: #netbeans
   [<span class="toc-section-number">3.4</span> Makefiles]: #makefiles
-  [<span class="toc-section-number">3.5</span> Test suite]: #test-suite
+  [<span class="toc-section-number">3.5</span> Test suite]: #sec:test-suite
   [<span class="toc-section-number">3.6</span> Coding style]: #coding-style
   [<span class="toc-section-number">3.7</span> Virtual methods]: #virtual-methods
   [<span class="toc-section-number">3.8</span> Memory management]: #memory-management

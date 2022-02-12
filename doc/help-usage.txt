@@ -1,1 +1,1 @@
-[options] inputfile [replacement arguments]
+[options] inputfile [replacement arguments] [petsc options]

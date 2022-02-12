@@ -14,12 +14,12 @@ checkgmsh
 
 gmsh -3 ${dir}/two-cubes.geo
 
-answer two-cubes-orthotropic-variables.fee "9.8"
+answer two-cubes-orthotropic-variables.fee "9.9"
 exitifwrong $?
 
-answer two-cubes-orthotropic-functions.fee "9.8"
+answer two-cubes-orthotropic-functions.fee "9.9"
 exitifwrong $?
 
-answer two-cubes-orthotropic-materials.fee "9.8"
+answer two-cubes-orthotropic-materials.fee "9.9"
 exitifwrong $?
 

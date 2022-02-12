@@ -11,6 +11,12 @@ Mesh.MeshSizeMin = 3;
 Mesh.Algorithm = 1;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;
+
+Transfinite Curve "*" = 5;
+Transfinite Surface "*";
+Transfinite Volume "*";
+Mesh.FlexibleTransfinite = 1;
+
 Mesh.ElementOrder = 2;
 Mesh.SecondOrderLinear = 1;
 

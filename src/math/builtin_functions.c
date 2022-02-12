@@ -173,7 +173,6 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
 ///fn+clock+desc It defaults to one, meaning `CLOCK_MONOTONIC`.
 ///fn+clock+desc The list and the meanings of the other available values for\ $f$ can be checked
 ///fn+clock+desc in the `clock_gettime (2)` system call manual page.
-///fn+clock+example clock.fee
 double feenox_builtin_clock(expr_item_t *f) {
 
 #ifdef HAVE_CLOCK_GETTIME
@@ -262,7 +261,6 @@ double feenox_builtin_cpu_time(expr_item_t *f) {
 ///fn+last+desc The optional flag\ $p$ should be set to one if the reference to `last`
 ///fn+last+desc is done in an assignment over a variable that already appears inside
 ///fn+last+desc expression\ $x$ such as `x = last(x)`. See example number 2.
-///fn+last+example last1.fee last2.fee
 double feenox_builtin_last(expr_item_t *f) {
 
   double y = 0;
@@ -318,7 +316,6 @@ double feenox_builtin_last(expr_item_t *f) {
 ///fn+d_dt+desc Unlike the functional `derivative`, the full dependence of these variables with time
 ///fn+d_dt+desc does not need to be known beforehand, i.e. the expression `x` might involve variables
 ///fn+d_dt+desc read from a shared-memory object at each time step.
-///fn+d_dt+example d_dt.fee
 double feenox_builtin_d_dt(expr_item_t *f) {
 
   double y = 0;
@@ -361,7 +358,6 @@ double feenox_builtin_d_dt(expr_item_t *f) {
 ///fn+integral_dt+desc Unlike the functional `integral`, the full dependence of these variables with time
 ///fn+integral_dt+desc does not need to be known beforehand, i.e. the expression `x` might involve variables
 ///fn+integral_dt+desc read from a shared-memory object at each time step.
-///fn+integral_dt+example integral_dt.fee
 double feenox_builtin_integral_dt(expr_item_t *f) {
 
   double y;
@@ -433,7 +429,6 @@ double feenox_builtin_integral_euler_dt(expr_item_t *f) {
 ///fn+square_wave+desc controls the frequency of the wave and\ $\phi$ controls its phase.
 ///fn+square_wave+math \begin{cases} 1 & \text{if $x - \lfloor x \rfloor < 0.5$} \\ 0 & \text{otherwise} \end{cases}
 ///fn+square_wave+plotx 0 2.75 1e-3    0 3 1     0 1 0.5    0.25  0.25
-///fn+square_wave+example square_wave.fee
 double feenox_builtin_square_wave(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
   return ((x - floor(x)) < 0.5);
@@ -463,7 +458,6 @@ double feenox_builtin_triangular_wave(expr_item_t *f) {
 ///fn+sawtooth_wave+desc a linear function of time such as\ $\omega t+\phi$, where\ $\omega$ controls 
 ///fn+sawtooth_wave+desc the frequency of the wave and $\phi$ controls its phase.
 ///fn+sawtooth_wave+plotx 0 2.75 1e-3    0 3 1     0 1 0.5    0.25  0.25
-///fn+sawtooth_wave+example sawtooth_wave.fee
 double feenox_builtin_sawtooth_wave(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
   return x - floor(x);
@@ -476,7 +470,6 @@ double feenox_builtin_sawtooth_wave(expr_item_t *f) {
 ///fn+sin+desc a linear function of time such as\ $\omega t+\phi$, where\ $\omega$ controls the frequency of the wave
 ///fn+sin+desc and\ $\phi$ controls its phase.
 ///fn+sin+plotx -2*pi 2*pi pi/100     -6 +6 2     -1 +1 0.5   1  0.25
-///fn+sin+example sin.fee
 double feenox_builtin_sin(expr_item_t *f) {
   return sin(feenox_expression_eval(&f->arg[0]));
 }
@@ -486,7 +479,6 @@ double feenox_builtin_sin(expr_item_t *f) {
 ///fn+asin+desc Computes the arc in radians whose sine is equal to the argument\ $x$.
 ///fn+asin+desc A NaN error is raised if\ $|x|>1$.
 ///fn+asin+plotx -1 1 1/100      -1 1 0.5     -1.5 1.5 1    0.25 0.5
-///fn+asin+example asin.fee
 double feenox_builtin_asin(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
@@ -505,7 +497,6 @@ double feenox_builtin_asin(expr_item_t *f) {
 ///fn+acos+desc Computes the arc in radians whose cosine is equal to the argument\ $x$.
 ///fn+acos+desc A NaN error is raised if\ $|x|>1$.
 ///fn+acos+plotx -1 1 1/100   -1 1 0.5    0 3.5 1   0.25 0.5
-///fn+acos+example acos.fee
 double feenox_builtin_acos(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
@@ -522,7 +513,6 @@ double feenox_builtin_acos(expr_item_t *f) {
 ///fn+j0+math J_0(x)
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument\ $x$.
 ///fn+j0+plotx 0 10 0.05
-///fn+j0+example j0.fee
 double feenox_builtin_j0(expr_item_t *f) {
   return gsl_sf_bessel_J0(feenox_expression_eval(&f->arg[0]));
 }
@@ -575,7 +565,6 @@ double feenox_builtin_tanh(expr_item_t *f) {
 ///fn+atan+math \arctan(x)
 ///fn+atan+desc Computes, in radians, the arc tangent of the argument\ $x$.
 ///fn+atan+plotx -6 6 pi/100    -6 6 2     -1 1 1     1 0.5
-///fn+atan2+example atan.fee
 double feenox_builtin_atan(expr_item_t *f) {
   return atan(feenox_expression_eval(&f->arg[0]));
 }
@@ -584,7 +573,6 @@ double feenox_builtin_atan(expr_item_t *f) {
 ///fn+atan2+math \arctan(y/x)
 ///fn+atan2+desc Computes, in radians, the arc tangent of quotient\ $y/x$, using the signs of the two arguments
 ///fn+atan2+desc to determine the quadrant of the result, which is in the range $[-\pi,\pi]$.
-///fn+atan2+example atan2.fee
 double feenox_builtin_atan2(expr_item_t *f) {
   return atan2(feenox_expression_eval(&f->arg[0]), feenox_expression_eval(&f->arg[1]));
 }
@@ -594,7 +582,6 @@ double feenox_builtin_atan2(expr_item_t *f) {
 ///fn+exp+usage exp(x)
 ///fn+exp+math e^x
 ///fn+exp+plotx -2 2 1e-2    -2 +2 1     0  8  2    0.25  1
-///fn+exp+example exp.fee
 double feenox_builtin_exp(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
@@ -606,7 +593,6 @@ double feenox_builtin_exp(expr_item_t *f) {
 ///fn+expint1+usage expint1(x)
 ///fn+expint1+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]
 ///fn+expint1+plotx 1e-2 2.0 1e-2
-///fn+expint1+example expint1.fee
 double feenox_builtin_expint1(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
@@ -656,7 +642,6 @@ double feenox_builtin_expintn(expr_item_t *f) {
 ///fn+log+usage log(x)
 ///fn+log+math \ln(x)
 ///fn+log+plotx 0.1 3.75 1e-2    0  4  0.5   -2 1 1     0.25  0.25
-///fn+log+example log1.fee log2.fee
 double feenox_builtin_log(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
@@ -673,7 +658,6 @@ double feenox_builtin_log(expr_item_t *f) {
 ///fn+abs+usage abs(x)
 ///fn+abs+math |x|
 ///fn+abs+plotx   -2.5 +2.5 1e-2   -2 2 1   0 2 1   0.5 0.5
-///fn+abs+example abs.fee
 double feenox_builtin_abs(expr_item_t *f) {
   return fabs(feenox_expression_eval(&f->arg[0]));
 }
@@ -716,7 +700,6 @@ double feenox_builtin_is_odd(expr_item_t *f) {
 ///fn+heaviside+usage heaviside(x, [delta])
 ///fn+heaviside+math \begin{cases} 0 & \text{if $x < 0$} \\ x / \delta & \text{if $0 < x < \delta$} \\ 1 & \text{if $x > \delta$} \end{cases}
 ///fn+heaviside+plotx -2.5 2.5 5e-3    -2 +2 1   0 1 0.5   0.5 0.25
-///fn+heaviside+example heaviside.fee
 double feenox_builtin_heaviside(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
   double delta = feenox_expression_eval(&f->arg[1]);

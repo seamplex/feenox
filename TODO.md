@@ -11,7 +11,8 @@
  
 ## Tests
 
- * automated nightly builds and tests (laminar?)
+ * move all `doc/examples` to `tests`
+ * automated nightly builds and tests (Laminar CI?)
  * write a `README` and an explanation of each test
  * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations

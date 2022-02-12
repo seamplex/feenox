@@ -608,8 +608,6 @@ int feenox_parse_line(void) {
       
 // --- SOLVE -----------------------------------------------------
 //kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
-//TODO: example
-//kw+SOLVE+example solve1.was solve2.was
 //kw+SOLVE+usage SOLVE
       
     } else if (strcasecmp(token, "SOLVE") == 0) {
@@ -926,8 +924,6 @@ int feenox_parse_implicit(void) {
 ///kw+IMPLICIT+detail declaration of variables can be forced by giving `IMPLICIT NONE`.
 ///kw+IMPLICIT+detail Whether implicit declaration is allowed or explicit declaration is required
 ///kw+IMPLICIT+detail depends on the last `IMPLICIT` keyword given, which by default is `ALLOWED`.
-//TODO: example
-//kw+IMPLICIT+example implicit.was
 
 ///kw+IMPLICIT+usage { NONE | ALLOWED }
   char *keywords[] = {"NONE", "ALLOWED", ""};

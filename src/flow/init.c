@@ -43,7 +43,7 @@ int feenox_initialize(int argc, char **argv) {
   int show_help = 0;
   int show_version = 0;
 
-///help+usage+desc [options] inputfile [replacement arguments]  
+///help+usage+desc [options] inputfile [replacement arguments] [petsc options]  
   const struct option longopts[] = {
 ///op+help+option `-h`, `--help`
 ///op+help+desc display options and detailed explanations of commmand-line usage
@@ -72,14 +72,6 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc 4
 ///help+extra+desc ```
 ///help+extra+desc @
-///help+extra+desc PETSc and SLEPc options can be passed in `[options]` as well, with the difference that
-///help+extra+desc two hyphens have to be used instead of only once. For example, to pass the
-///help+extra+desc PETSc option `-ksp_view` the actual FeenoX invocation should be
-///help+extra+desc @
-///help+extra+desc ```terminal
-///help+extra+desc $ feenox --ksp_view input.fee
-///help+extra+desc ```
-///help+extra+desc @
 ///help+extra+desc The optional `[replacement arguments]` part of the command line mean that each
 ///help+extra+desc argument after the input file that does not start with an hyphen will be expanded
 ///help+extra+desc verbatim in the input file in each occurrence of `$1`, `$2`, etc. For example
@@ -87,6 +79,14 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc ```terminal
 ///help+extra+desc $ echo 'PRINT $1+$2' | feenox - 3 4
 ///help+extra+desc 7
+///help+extra+desc ```
+///help+extra+desc @
+///help+extra+desc PETSc and SLEPc options can be passed in `[petsc options]` as well, with the
+///help+extra+desc difference that two hyphens have to be used instead of only once. For example,
+///help+extra+desc to pass the PETSc option `-ksp_view` the actual FeenoX invocation should be
+///help+extra+desc @
+///help+extra+desc ```terminal
+///help+extra+desc $ feenox input.fee --ksp_view
 ///help+extra+desc ```
 ///help+extra+desc @
 ///help+extra+desc See <https://www.seamplex.com/feenox/examples> for annotated examples.

@@ -1,0 +1,11 @@
+# read the function from stdin
+FUNCTION f(t) FILE - INTERPOLATION steffen
+
+a = vecmin(vec_f_t)   # detect the domain range
+b = vecmax(vec_f_t)
+h = (b-a)/10
+
+VAR t'
+f'(t) = derivative(f(t'),t',t)
+
+PRINT_FUNCTION f' MIN a+0.5*h MAX b-0.5*h STEP h

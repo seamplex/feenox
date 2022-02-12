@@ -1,14 +1,18 @@
 General things to do
 
+-   use spack
 -   https://joss.theoj.org/
 -   FIT to mesh-based functions
 -   FIT taking into account uncertainties
 -   extended integration (as in reduced, full, extended)
 -   analyze memory overcommit
+-   allow PETSc configured with --download-slepc
+-   insert expansion mpicc into feenox -V
 
 Tests
 
--   automated nightly builds and tests
+-   move all doc/examples to tests
+-   automated nightly builds and tests (Laminar CI?)
 -   write a README and an explanation of each test
 -   make an index of the keywords used in each test and link them from
     the doc as examples
@@ -46,23 +50,23 @@ Nice to have
 -   PRINTF instruction
 -   PRINT_FUNCTION with %f in between arguments (like PRINT_VECTOR)
 -   BLAS
-    -   BLAS a * b = s # scalar dot
-    -   BLAS a x b = c # vector cross
-    -   BLAS A * b = c # matrix-vector
-    -   BLAS a + b = c # vector
-    -   BLAS A + B = C # matrix
+    -   BLAS a * b = s   # scalar dot
+    -   BLAS a x b = c   # vector cross
+    -   BLAS A * b = c   # matrix-vector
+    -   BLAS a + b = c   # vector
+    -   BLAS A + B = C   # matrix
     -   BLAS a - b = c
     -   BLAS A - B = C
 
 Command-line arguments
 
--   list symbols with “-l” (is there any clash with petsc?)
+-   list symbols with -l (is there any clash with petsc?)
 -   $1 = ${1}
 -   $0 should have the main input file basename (without the extension)
 
 Error handling
 
--   gsl error handling
+-   GSL error handling
 -   feenox_nan_error()
 -   feenox_gsl_handler()
 
@@ -76,12 +80,11 @@ Postprocessing output
 -   support CGNS formats
 -   MED
 -   problem-aware WRITE_POST
-    -   full | displacements | stresses | strains | von_mises | tresca |
-        principal
+    -   full | displacements | stresses | strains | von_mises | tresca | principal
     -   full | temperature | heat_flux
     -   full | mode_1 | mode_n1 | modes
-    -   full | flue_1 | fluxes | currents
-    -   automatic call to SOLVE_PROBLEM?
+    -   full | flux_1 | fluxes | currents
+    -   implicit call to SOLVE_PROBLEM?
 
 Extensions
 
@@ -99,9 +102,9 @@ PDEs
         have to be orthotropic
     -   this is wrong!
 -   remove the need of needing an explicit SOLVE_PROBLEM
-    -   detect which varaibles/functions are PDE outputs and call
+    -   detect which variables/functions are PDE outputs and call
         solve_problem() the first time they are needed
--   benchmark MPI and MNMPI
+-   benchmark MPI
 
 Laplace/Poisson/Helmholtz
 

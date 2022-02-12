@@ -75,7 +75,6 @@ typedef struct {
 ///fu+derivative+desc according to the indicated flag $p$.
 ///fu+derivative+desc Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 ///fu+derivative+math \left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} 
-///fu+derivative+example derivative.was
 double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 
   double error;
@@ -154,7 +153,6 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 ///fu+integral+desc be used instead.
 ///fu+integral+desc See GSL reference for further information.
 ///fu+integral+math \int_a^b f(x) \, dx  
-///fu+integral+example integral1.was integral2.was integral3.was
 double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
   double x_old;
   double x_lower;
@@ -237,7 +235,6 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
 ///fu+gauss_kronrod+desc Defaults are $\epsilon = (1/2)^{-10} \approx 10^{-3}$.
 ///fu+gauss_kronrod+desc See GSL reference for further information.
 ///fu+gauss_kronrod+math \int_a^b f(x) \, dx  
-///fu+gauss_kronrod+examples integral3.was
 
 double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
   double error;
@@ -292,7 +289,6 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
 ///fu+gauss_legendre+desc Default is $n = 12$.
 ///fu+gauss_legendre+desc See GSL reference for further information.
 ///fu+gauss_legendre+math \int_a^b f(x) \, dx  
-///fu+gauss_legendre+examples integral3.was
 double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
 
   double x_old;
@@ -377,7 +373,6 @@ double feenox_builtin_prod(expr_item_t *a, var_t *var_x) {
 ///fu+sum+desc given in the third argument and $b$
 ///fu+sum+desc given in the fourth argument, $i=a,a+1,\dots,b-1,b$. 
 ///fu+sum+math \sum_{i=a}^b f_i  
-///fu+sum+example sum1.was sum2.was sum3.was
 double feenox_builtin_sum(expr_item_t *a, var_t *var_x) {
 
   int i;
@@ -429,7 +424,6 @@ double feenox_builtin_sum(expr_item_t *a, var_t *var_x) {
 ///fu+root+desc If no roots are contained in the range and
 ///fu+root+desc $p \neq 0$, the returned value can be any value.
 ///fu+root+desc Default is $\epsilon = (1/2)^{-10} \approx 10^{3}$.
-///fu+root+example root1.was root2.was root3.was root4.was
 double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
   int iter;
   int gsl_status;
@@ -572,7 +566,6 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
 ///fu+func_min+desc Default is $\epsilon = (1/2)^{-20} \approx 9.6\times 10^{-7}$.
 ///fu+func_min+usage y = func_min(f(x), x, a, b, [eps], [alg], [p])
 ///fu+func_min+math y = \left\{ x \in [a,b] / f(x) = \min_{[a,b]} f(x) \right \} 
-///fu+func_min+example func_min.was
 
 double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   

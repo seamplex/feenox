@@ -231,7 +231,7 @@ Mesh.Algorithm3D = 10;      // 3D mesh algorithm: 10: HXT
 Mesh.Optimize = 1;          // Optimize the mesh
 Mesh.HighOrderOptimize = 1; // Optimize high-order meshes? 2: elastic+optimization
 
-Mesh.MeshSizeMax = 80;     // main element size 
+Mesh.MeshSizeMax = 80;      // main element size 
 Mesh.MeshSizeMin = 20;      // refined element size
 
 // local refinement around the point D (entity 4)
@@ -1486,10 +1486,10 @@ $ feenox wire.fee
 10      |       +2.7e-05        |       +4.9e-03        |       0.0000  |       0.6129
 
 : copper wire over hex mesh, participation and excitation factors $L$ and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and $M$
-$ feenox wire.fee hex copper | pandoc -o wire-hex-copper.html
-$ feenox wire.fee tet copper | pandoc -o  wire-tet-copper.md
-$ feenox wire.fee hex aluminum | pandoc -o  wire-hex-aluminum.md
-$ feenox wire.fee tet aluminum | pandoc -o  wire-tet-aluminum.md
+$ feenox wire.fee hex copper   | pandoc -o wire-hex-copper.md
+$ feenox wire.fee tet copper   | pandoc -o wire-tet-copper.md
+$ feenox wire.fee hex aluminum | pandoc -o wire-hex-aluminum.md
+$ feenox wire.fee tet aluminum | pandoc -o wire-tet-aluminum.md
 ```
 
 

@@ -46,7 +46,6 @@ struct builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTION
 
 ///fv+vecsize+usage vecsize(b)
 ///fv+vecsize+desc Returns the size of vector $\vec{b}$.
-///fv+vecsize+example vecsize.was
 double feenox_builtin_vecsize(vector_t **arg) {
   if (!arg[0]->initialized) {
     feenox_vector_init(arg[0], 0);
@@ -57,7 +56,6 @@ double feenox_builtin_vecsize(vector_t **arg) {
 ///fv+vecsum+usage vecsum(b)
 ///fv+vecsum+math \sum_{i=1}^{\text{vecsize}(\vec{b})} b_i
 ///fv+vecsum+desc Computes the sum of all the components of vector $\vec{b}$.
-///fv+vecsum+example vecsum.was
 double feenox_builtin_vecsum(vector_t **arg) {
 
   int i;
@@ -79,8 +77,7 @@ double feenox_builtin_vecsum(vector_t **arg) {
 ///fv+vecnorm+usage vecnorm(b)
 ///fv+vecnorm+math \sqrt{\sum_{i=1}^{\text{vecsize}(\vec{b})} b^2_i}
 ///fv+vecnorm+desc Computes euclidean norm of vector $\vec{b}$. Other norms can be computed explicitly
-///fv+vecnorm+desc using the `sum` functional, as illustrated in the example.
-///fv+vecnorm+example vecnorm.was
+///fv+vecnorm+desc using the `sum` functional.
 double feenox_builtin_vecnorm(vector_t **arg) {
 
   int i;
@@ -102,7 +99,6 @@ double feenox_builtin_vecnorm(vector_t **arg) {
 ///fv+vecmin+math \min_i b_i
 ///fv+vecmin+desc Returns the smallest element of vector $\vec{b}$, taking into account its sign
 ///fv+vecmin+desc (i.e. $-2 < 1$).
-///fv+vecmin+example vecmin.was
 double feenox_builtin_vecmin(vector_t **arg) {
 
   double y;
@@ -119,7 +115,6 @@ double feenox_builtin_vecmin(vector_t **arg) {
 ///fv+vecmax+math \max_i b_i
 ///fv+vecmax+desc Returns the biggest element of vector $\vec{b}$, taking into account its sign
 ///fv+vecmax+desc (i.e. $1 > -2$).
-///fv+vecmax+example vecmax.was
 double feenox_builtin_vecmax(vector_t **arg) {
 
   double y;
@@ -136,7 +131,6 @@ double feenox_builtin_vecmax(vector_t **arg) {
 ///fv+vecminindex+math i / b_i = \min_i b_i
 ///fv+vecminindex+desc Returns the index of the smallest element of vector $\vec{b}$, taking into account its sign
 ///fv+vecminindex+desc (i.e. $-2 < 1$).
-///fv+vecminindex+example vecminindex.was
 double feenox_builtin_vecminindex(vector_t **arg) {
 
   double y;
@@ -153,7 +147,6 @@ double feenox_builtin_vecminindex(vector_t **arg) {
 ///fv+vecmaxindex+math i / b_i = \max_i b_i
 ///fv+vecmaxindex+desc Returns the index of the biggest element of vector $\vec{b}$, taking into account its sign
 ///fv+vecmaxindex+desc (i.e. $2 > -1$).
-///fv+vecmaxindex+example vecminindex.was
 double feenox_builtin_vecmaxindex(vector_t **arg) {
 
   double y;
@@ -170,7 +163,6 @@ double feenox_builtin_vecmaxindex(vector_t **arg) {
 ///fv+vecdot+math \vec{a} \cdot \vec{b} = \sum_{i=1}^{\text{vecsize}(\vec{a})} a_i \cdot b_i
 ///fv+vecdot+desc Computes the dot product between vectors $\vec{a}$ and $\vec{b}$, which should
 ///fv+vecdot+desc have the same size.
-///fv+vecdot+example vecdot.was
 double feenox_builtin_vecdot(vector_t **arg) {
 
   int i;

@@ -800,8 +800,108 @@ It should be noted that all of the programs and tools mentioned to be interopera
 > 300-interfaces.md
 > ```
 
-FeenoX is provided as a console-only executable which can be run remotely through SSH or inside a containerized environment without any requirement such as graphical servers or special input devices. The input file provided as the first argument to the `feenox` binary contains all the information needed to solve the problem, so any further human intervention is not needed after execution begins. 
+FeenoX is provided as a console-only executable which can be run remotely through SSH or inside a containerized environment without any requirement such as graphical servers or special input devices.
+When executed without any arguments, FeenoX writes a brief message with the version (further discussed in\ @sec:traceability) and the basic usage on the standard output and return to the calling shell with a return errorlevel zero:
 
+```terminal
+$ feenox 
+FeenoX v0.2.12-gc5934bb-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: feenox [options] inputfile [replacement arguments]
+
+  -h, --help         display options and detailed explanations of commmand-line usage
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+
+Run with --help for further explanations.
+$ echo $?
+0
+$ 
+```
+
+The `--version` option follows the [GNU Coding Standards guidelines](https://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion):
+
+```terminal
+$ feenox --version
+FeenoX v0.2.12-gc5934bb-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Copyright (C) 2009--2022 jeremy theler
+GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
+FeenoX is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+$
+```
+
+The `--versions` option shows more information about the FeenoX build and the libraries the binary was linked against:
+
+```terminal
+$ feenox -V
+FeenoX v0.2.12-gc5934bb-dirty 
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Wed Feb 9 08:19:05 2022 -0300
+Build date         : Sat Feb 12 10:25:42 2022 -0300
+Build architecture : linux-gnu x86_64
+Compiler           : gcc (Ubuntu 11.2.0-7ubuntu2) 11.2.0
+Compiler flags     : -O3
+Builder            : gtheler@chalmers
+GSL version        : 2.6
+SUNDIALS version   : 5.7.0
+PETSc version      : Petsc Release Version 3.14.5, Mar 03, 2021 
+PETSc arch         : rel-mpi-double-int32
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack --download-slepc --with-64-bit-indices=no --with-debugging=no --with-precision=double --with-scalar-type=real COPTFLAGS=-O3 CXXOPTFLAGS=-O3 FOPTFLAGS=-O3 PETSC_ARCH=rel-mpi-double-int32
+SLEPc version      : N/A
+$
+```
+
+The `--help` option gives a more detailed usage:
+
+```terminal
+$ feenox --help
+usage: feenox [options] inputfile [replacement arguments]
+
+  -h, --help         display options and detailed explanations of commmand-line usage
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+
+  --progress         print ASCII progress bars
+  --mumps            ask PETSc to use the direct linear solver MUMPS
+  --linear           force FeenoX to solve the problem as linear
+  --non-linear       force FeenoX to solve the problem as non-linear
+
+Instructions will be read from standard input if “-” is passed as
+inputfile, i.e.
+
+    $ echo 'PRINT 2+2' | feenox -
+    4
+
+PETSc and SLEPc options can be passed in [options] as well, with the
+difference that two hyphens have to be used instead of only once. For
+example, to pass the PETSc option -ksp_view the actual FeenoX invocation
+should be
+
+    $ feenox --ksp_view input.fee
+
+The optional [replacement arguments] part of the command line mean that
+each argument after the input file that does not start with an hyphen
+will be expanded verbatim in the input file in each occurrence of $1,
+$2, etc. For example
+
+    $ echo 'PRINT $1+$2' | feenox - 3 4
+    7
+
+See https://www.seamplex.com/feenox/examples for annotated examples of
+usage.
+
+Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com
+Feenox home page: https://www.seamplex.com/feenox/
+$
+```
+
+
+The input file provided as the first argument to the `feenox` binary contains all the information needed to solve the problem, so any further human intervention is not needed after execution begins. 
 If the execution finishes successfully, FeenoX returns a zero errorlevel to the calling shell (and follows the UNIX _rule of silence_):
 
 ```terminal
@@ -825,7 +925,9 @@ $ echo $?
 $ 
 ```
 
-This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it. For example, following the _rule of repair_, ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
+This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it.
+
+Following the _rule of repair_, ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
 
 ```terminal
 $ feenox thermal-1d-dirichlet-no-k.fee
@@ -876,19 +978,19 @@ $
 ```
 ::::
 
-Once again, these ASCII-based progress bars can be parsed by the calling entity and then present it back to the user. For example, @fig:caeplex-progress shows how the web-based GUI CAEplex shows progress inside an Onshape tab.
+Once again, these ASCII-based progress bars can be parsed by the calling entity and then present it back to the user. For example,\ @fig:caeplex-progress shows how the web-based GUI CAEplex shows progress inside an Onshape tab.
 
 
 ![ASCII progress bars parsed and converted into a web-based interface](caeplex-progress.png){#fig:caeplex-progress width_latex=65% width_html=100%}
 
+Since FeenoX uses PETSc (and SLEpc), command-line options can be passed from FeenoX to PETSc. The only difference is that since FeenoX follows the POSIX standard regarding options and PETSc does not, double dashes are required instead of PETSc' single-dash approach. That is to say, instead of `-ksp_view` one would have to pass `--ksp_view`:
 
-PETSc args
+
+replacement args, wire hex/tet copper/aluminum
 
 Since the main input file is the first argument (not counting POSIX options starting with at least one dash)
+Shebang, derivative filter
 
-Shebang
-
-replacement args
 
 ## Problem input {#sec:input}
 
@@ -908,6 +1010,7 @@ The main features of the input format are:
  #. Expansion of command-line arguments.
 
  
+`.fee` to have extension-based syntax highlighting, but any extension is allowed.
  
 dar ejemplos
 comparar con <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-membrane/tested-codes.html>

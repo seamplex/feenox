@@ -1,6 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
 
-for i in grep awk sort uniq gcc; do
+for i in grep awk sort uniq gcc script; do
  if [ -z "$(which $i)" ]; then
   echo "error: ${i} not installed"
   exit 1
@@ -13,7 +13,7 @@ tag=${2}
 
 if [ -z "${tag}" ]; then
   echo "usage: $0 src tag";
-  exit
+  exit 0
 fi
 
 # get the defines in feenox.h to get the defaults
@@ -154,7 +154,7 @@ EOF
   
     if [ ! -e "examples/${ex}" ]; then
       echo "example ${ex} does not exist" > /dev/stderr
-      exit 1
+      exit 2
     fi
   
     i=$((${i} + 1))
@@ -181,10 +181,10 @@ EOF
        cat tmp >> ${ex}.term
        script -aq -c ./tmp ${ex}.term 2>&1 | grep error: > errors
        if [ ! -z "$(cat errors)" ]; then
-         echo "error: something happened on the way to heaven"
+         echo "error: something happened on the way to heaven" > /dev/stderr 
          cat ./tmp > /dev/stderr
          cat errors > /dev/stderr
-         exit 1
+         exit 3
        fi
        k=$((${k} + 1))
       done
