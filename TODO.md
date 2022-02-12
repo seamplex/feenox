@@ -5,8 +5,6 @@
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
- * analyze memory overcommit
- * allow PETSc configured with `--download-slepc`
  * insert expansion `mpicc` into `feenox -V`
  
 ## Tests

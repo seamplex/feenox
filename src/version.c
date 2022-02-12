@@ -62,7 +62,8 @@ void feenox_show_help(const char *progname, int extra) {
   }
   
   if (extra) {
-    printf("Report bugs at https://github.com/seamplex/feenox or to jeremy@seamplex.com\n");
+    printf("Report bugs at https://github.com/seamplex/feenox/issues\n");
+    printf("Ask questions at https://github.com/seamplex/feenox/discussions\n");
     printf("Feenox home page: https://www.seamplex.com/feenox/\n");
   }  
   
@@ -108,8 +109,8 @@ void feenox_shortversion(void) {
   printf("FeenoX ");
 #ifdef FEENOX_GIT_BRANCH
   printf("%s%s %s\n", FEENOX_GIT_VERSION,
-                             (FEENOX_GIT_CLEAN==0)?"":"-dirty",
-                             strcmp(FEENOX_GIT_BRANCH, "main")?FEENOX_GIT_BRANCH:"");
+                             (FEENOX_GIT_CLEAN==0) ? "" : "-dirty",
+                             strcmp(FEENOX_GIT_BRANCH, "main") ? FEENOX_GIT_BRANCH : "");
 #else
   printf("%s\n", PACKAGE_VERSION);
 #endif
@@ -130,7 +131,7 @@ void feenox_copyright(void) {
   /* It is important to separate the year from the rest of the message,
      as done here, to avoid having to retranslate the message when a new
      year comes around.  */  
-  printf("Copyright (C) %d--%d %s\n\
+  printf("Copyright © Seamplex %d--%d %s\n\
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. \n\
 FeenoX is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2022, "jeremy theler"); 
@@ -153,7 +154,10 @@ void feenox_longversion(void) {
   printf("Build architecture : %s\n", FEENOX_COMPILER_ARCH);
 #endif
 #ifdef FEENOX_COMPILER_VERSION
-  printf("Compiler           : %s\n", FEENOX_COMPILER_VERSION);
+  printf("Compiler version   : %s\n", FEENOX_COMPILER_VERSION);
+#endif
+#ifdef FEENOX_COMPILER_SHOW
+  printf("Compiler expansion : %s\n", FEENOX_COMPILER_SHOW);
 #endif
 #ifdef FEENOX_COMPILER_CFLAGS
   printf("Compiler flags     : %s\n", FEENOX_COMPILER_CFLAGS);

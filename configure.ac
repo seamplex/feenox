@@ -214,6 +214,18 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
   slepc_found=1
 
   AC_MSG_CHECKING([for SLEPc dir])
+  
+  AS_IF([test -z "${SLEPC_DIR}"], [
+    # first try to see if PETSc was configured with --with-download-slepc
+    export SLEPC_DIR=${PETSC_DIR}/${PETSC_ARCH}/externalpackages/git.slepc
+    AS_IF([test ! -d ${SLEPC_DIR}],[
+      # otherwise see if it is in the standard location as installed with apt
+      # this works in Debian, not sure about other (it does not on Fedora)
+      export SLEPC_DIR=/usr/lib/petsc
+    ])
+  AC_MSG_CHECKING([empty, trying ${SLEPC_DIR}])      
+  ])
+     
   AS_IF([ test -z "${SLEPC_DIR}" ], [
     AC_MSG_CHECKING([empty, trying /usr/lib/slepc])
     export SLEPC_DIR=/usr/lib/slepc
@@ -325,6 +337,16 @@ Either install them with your package manager or configure with --enable-downloa
 
 
 
+# give some information about the compiler in the summary
+compiler_command="${CC}"
+compiler_show="${compiler_command}"
+AS_IF([test "x${have_petsc}" = "xyes"],[
+  AS_IF([test ! -z "$(which mpicc)"],[
+    compiler_command="mpicc"
+    compiler_show="$(${compiler_command} -show)"
+  ])
+])
+
 
 ######################
 # create version.h
@@ -339,23 +361,14 @@ EOF
 
 AS_IF([test -e .git -a ! -z "$(which git)"],[
   cat << EOF >> ${srcdir}/src/version.h
-#define FEENOX_GIT_VERSION   "$(git describe --tags | sed 's/-/./')"
-#define FEENOX_GIT_BRANCH    "$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')"
-#define FEENOX_GIT_DATE      "$(git log --pretty=format:"%ad" | head -n1)"
-#define FEENOX_GIT_CLEAN     $(git status --porcelain | wc -l)
-
+#define FEENOX_GIT_VERSION        "$(git describe --tags | sed 's/-/./')"
+#define FEENOX_GIT_BRANCH         "$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')"
+#define FEENOX_GIT_DATE           "$(git log --pretty=format:"%ad" | head -n1)"
+#define FEENOX_GIT_CLEAN          $(git status --porcelain | wc -l)
+#define FEENOX_GIT_COMPILER_SHOW  "${compilter_show}"
 EOF
 ])
 
-# give some information about the compiler in the summary
-compiler_command="${CC}"
-compiler_show="${compiler_command}"
-AS_IF([test "x${have_petsc}" = "xyes"],[
-  AS_IF([test ! -z "$(which mpicc)"],[
-    compiler_command="mpicc"
-    compiler_show="$(${compiler_command} -show)"
-  ])
-])
 
 
 cat << EOF >> ${srcdir}/src/version.h
