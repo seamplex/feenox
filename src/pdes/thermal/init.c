@@ -260,19 +260,21 @@ int feenox_problem_init_runtime_thermal(void) {
   if (feenox.pde.initial_condition == NULL) {
     // average BC temperatures
     thermal.guessed_initial_guess /= thermal.n_bc_temperatures++;
-    // TODO: allow custom-named solution
-    feenox_check_null(feenox.pde.initial_condition = feenox_define_function_get_ptr("T0", feenox.pde.dim));
-    feenox_call(feenox_function_set_argument_variable("T0", 0, "x"));
-    if (feenox.pde.dim > 1) {
-      feenox_call(feenox_function_set_argument_variable("T0", 1, "y"));
-      if (feenox.pde.dim > 2) {
-        feenox_call(feenox_function_set_argument_variable("T0", 2, "z"));
+    
+    if (feenox_get_variable_ptr("T0") == NULL) {
+      feenox_check_null(feenox.pde.initial_condition = feenox_define_function_get_ptr("T0", feenox.pde.dim));
+      feenox_call(feenox_function_set_argument_variable("T0", 0, "x"));
+      if (feenox.pde.dim > 1) {
+        feenox_call(feenox_function_set_argument_variable("T0", 1, "y"));
+        if (feenox.pde.dim > 2) {
+          feenox_call(feenox_function_set_argument_variable("T0", 2, "z"));
+        }
       }
+      char *evaluated_temp = NULL;
+      feenox_check_minusone(asprintf(&evaluated_temp, "%g", thermal.guessed_initial_guess));
+      feenox_call(feenox_function_set_expression("T0", evaluated_temp));
+      feenox_free(evaluated_temp);
     }
-    char *evaluated_temp = NULL;
-    feenox_check_minusone(asprintf(&evaluated_temp, "%g", thermal.guessed_initial_guess));
-    feenox_call(feenox_function_set_expression("T0", evaluated_temp));
-    feenox_free(evaluated_temp);
   }
   
   
