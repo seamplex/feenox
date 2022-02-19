@@ -1647,6 +1647,7 @@ struct feenox_t {
 
     // instruction pointer to know before/after transient PDE
     instruction_t *instruction;
+    function_t *initial_guess;
     function_t *initial_condition;
 
     dump_t *dumps;

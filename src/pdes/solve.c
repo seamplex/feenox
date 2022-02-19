@@ -21,11 +21,11 @@ int feenox_instruction_solve_problem(void *arg) {
     feenox_call(feenox_problem_init_runtime_general());
   }
 
-  if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_condition != NULL) {
+  if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_guess != NULL) {
     // fill the petsc vector with the data from the initial condition function of space
     size_t j = 0;
     for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
-      petsc_call(VecSetValue(feenox.pde.phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(feenox.pde.initial_condition, feenox.pde.mesh->node[j].x), INSERT_VALUES));
+      petsc_call(VecSetValue(feenox.pde.phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(feenox.pde.initial_guess, feenox.pde.mesh->node[j].x), INSERT_VALUES));
     }
     // TODO: add prefixes to allow -vec_view
     petsc_call(VecAssemblyBegin(feenox.pde.phi));

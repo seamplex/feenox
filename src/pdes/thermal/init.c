@@ -74,7 +74,13 @@ int feenox_problem_init_parser_thermal(void) {
       feenox_call(feenox_problem_define_solution_function("qz", &thermal.qz, 1));
     }
   }
-  
+
+///pr_thermal+T_0+description The initial condition for the temperature in transient problems.
+///pr_thermal+T_0+description If not given, a steady-steady computation at $t=0$ is performed.  
+
+///pr_thermal+T_0+description The initial guess for the temperature in steady-state problems.
+///pr_thermal+T_0+description If not given, a uniform distribution equal to the the average
+///pr_thermal+T_0+description of all the temperature appearing in boundary conditions is used.
   
 ///va_thermal+T_max+detail The maximum temperature\ $T_\text{max}$.
   feenox_check_null(thermal.T_max = feenox_define_variable_get_ptr("T_max"));
@@ -93,6 +99,14 @@ int feenox_problem_init_runtime_thermal(void) {
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
+  
+  // check if we were given an initial guess
+  if ((feenox.pde.initial_guess = feenox_get_function_ptr("T_guess")) != NULL) {
+    if (feenox.pde.initial_guess->n_arguments != feenox.pde.dim) {
+      feenox_push_error_message("intial guess function T_guess ought to have %d arguments instead of %d", feenox.pde.dim, feenox.pde.initial_condition->n_arguments);
+      return FEENOX_ERROR;
+    }
+  }
   
   // check if we were given an initial solution
   if ((feenox.pde.initial_condition = feenox_get_function_ptr("T_0")) != NULL) {
@@ -257,24 +271,24 @@ int feenox_problem_init_runtime_thermal(void) {
   
   
   // if there is no initial guess, make up one
-  if (feenox.pde.initial_condition == NULL) {
+  if (feenox.pde.initial_guess == NULL) {
     // average BC temperatures
     thermal.guessed_initial_guess /= thermal.n_bc_temperatures++;
     
-    if (feenox_get_variable_ptr("T0") == NULL) {
-      feenox_check_null(feenox.pde.initial_condition = feenox_define_function_get_ptr("T0", feenox.pde.dim));
-      feenox_call(feenox_function_set_argument_variable("T0", 0, "x"));
+    if (feenox.pde.initial_guess == NULL) {
+      feenox_check_null(feenox.pde.initial_guess = feenox_define_function_get_ptr("T_guess", feenox.pde.dim));
+      feenox_call(feenox_function_set_argument_variable("T_guess", 0, "x"));
       if (feenox.pde.dim > 1) {
-        feenox_call(feenox_function_set_argument_variable("T0", 1, "y"));
+        feenox_call(feenox_function_set_argument_variable("T_guess", 1, "y"));
         if (feenox.pde.dim > 2) {
-          feenox_call(feenox_function_set_argument_variable("T0", 2, "z"));
+          feenox_call(feenox_function_set_argument_variable("T_guess", 2, "z"));
         }
       }
-      char *evaluated_temp = NULL;
-      feenox_check_minusone(asprintf(&evaluated_temp, "%g", thermal.guessed_initial_guess));
-      feenox_call(feenox_function_set_expression("T0", evaluated_temp));
-      feenox_free(evaluated_temp);
-    }
+    }  
+    char *evaluated_temp = NULL;
+    feenox_check_minusone(asprintf(&evaluated_temp, "%g", thermal.guessed_initial_guess));
+    feenox_call(feenox_function_set_expression("T_guess", evaluated_temp));
+    feenox_free(evaluated_temp);
   }
   
   
