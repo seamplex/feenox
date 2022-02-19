@@ -48,7 +48,8 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
     bc_data->set = feenox_problem_bc_set_thermal_convection;
     bc_data->fills_matrix = 1;
 
-  } else if (strcmp(lhs, "Tref") == 0 || strcmp(lhs, "Tinf") == 0) {
+  } else if (strcmp(lhs, "Tref") == 0 || strcmp(lhs, "T_ref") == 0 ||
+             strcmp(lhs, "Tinf") == 0 || strcmp(lhs, "T_inf") == 0) {
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_CONVECTION_TEMPERATURE;
     bc_data->type_math = bc_type_math_robin;
@@ -61,6 +62,13 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
   }
 
   feenox_call(feenox_expression_parse(&bc_data->expr, rhs));
+  
+  // for non-linear problems it is important to have a good initial guess
+  // if the user did not give us one in T_0 we average all the temperatures from the BCs
+  if (bc_data->type_phys == BC_TYPE_THERMAL_TEMPERATURE || bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE ) {
+    thermal.guessed_initial_guess += feenox_expression_eval(&bc_data->expr);
+    thermal.n_bc_temperatures++;
+  }
   
   bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
   bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);

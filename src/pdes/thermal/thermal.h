@@ -51,6 +51,9 @@ struct thermal_t {
   int space_dependent_bc;
   int temperature_dependent_bc;
   
+  double guessed_initial_guess;
+  int n_bc_temperatures;
+  
   // heat fluxes
   function_t *qx;
   function_t *qy;
