@@ -350,7 +350,7 @@ $
 
 These three calls were examples of direct execution of FeenoX: a single call with a single argument to solve a single fixed problem.
 
-## Parametric
+## Parametric {@sec:parametric}
 
 To use FeenoX in a parametric run, one has to successively call the executable passing the main input file path in the first argument followed by an arbitrary number of parameters. These extra parameters will be expanded as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `hello.fee` is
 
@@ -976,13 +976,98 @@ Once again, these ASCII-based progress bars can be parsed by the calling entity 
 
 ![ASCII progress bars parsed and converted into a web-based interface](caeplex-progress.png){#fig:caeplex-progress width_latex=65% width_html=100%}
 
-Since FeenoX uses PETSc (and SLEpc), command-line options can be passed from FeenoX to PETSc. The only difference is that since FeenoX follows the POSIX standard regarding options and PETSc does not, double dashes are required instead of PETSc' single-dash approach. That is to say, instead of `-ksp_view` one would have to pass `--ksp_view`:
+Since FeenoX uses PETSc (and SLEPc), command-line options can be passed from FeenoX to PETSc. The only difference is that since FeenoX follows the POSIX standard regarding options and PETSc does not, double dashes are required instead of PETSc' single-dash approach. That is to say, instead of `-ksp_monitor` one would have to pass `--ksp_monitor`:
 
+```terminal
+$ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor
+  0 KSP Residual norm 1.913149816332e+00 
+  1 KSP Residual norm 2.897817223901e-02 
+  2 KSP Residual norm 3.059845525572e-03 
+  3 KSP Residual norm 1.943995979588e-04 
+  4 KSP Residual norm 7.418444674938e-06 
+  5 KSP Residual norm 1.233527903582e-07 
+0.5
+$
+```
 
-replacement args, wire hex/tet copper/aluminum
+Any PETSc command-line option takes precedence over the settings in the input file, so the preconditioner can be changed even if explicitly given with the [`PRECONDITIONER`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword:
 
-Since the main input file is the first argument (not counting POSIX options starting with at least one dash)
-Shebang, derivative filter
+```terminal
+$ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor --pc_type ilu
+  0 KSP Residual norm 1.962141687033e+00 
+  1 KSP Residual norm 5.362273771017e-16 
+0.5
+$
+```
+
+If PETSc is compiled with MUMPS, FeenoX provides a `--mumps` option:
+
+```terminal
+$ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor --mumps
+  0 KSP Residual norm 1.004987562109e+01 
+  1 KSP Residual norm 4.699798436762e-15 
+0.5
+$
+```
+
+As already explained in @sec:parametric, FeenoX supports run-time replacement arguments that get replaced verbatim in the input file. This feature is handy when the same problem has to be solved over different meshes, such as when investigating the $h$-convergence order over Gmsh's element scale factor `-clscale`:
+
+```{.feenox include="thermal-1d-dirichlet-temperature-k-parametric.fee"}
+```
+
+```terminal
+$ for c in $(feenox steps.fee); do gmsh -v 0 -1 slab.geo -clscale ${c} -o slab-${c}.msh; feenox thermal-1d-dirichlet-temperature-k-parametric.fee ${c}; done  | sort -g
+11      +6.50e-07
+13      +3.15e-07
+14      +2.29e-07
+15      +1.70e-07
+17      +1.00e-07
+20      +5.04e-08
+24      +2.34e-08
+32      +7.19e-09
+39      +3.46e-09
+49      +1.31e-09
+$
+```
+
+Since the main input file is the first argument (not counting POSIX options starting with at least one dash), FeenoX might be invoked indirectly by adding a shebang line to the input file with the location of the system-wide executable and setting execution permissions on the input file itself. So if we modify the above `hello.fee` example as `hello`
+
+```{.feenox include="hello"}
+```
+
+and then we do
+
+```terminal
+$ chmod +x hello
+$ ./hello world
+Hello world!
+$ ./hello universe
+Hello universe!
+$
+```
+
+For example, the following she-banged input file can be used to compute the derivative of a column with respect to the other as a UNIX filter:
+
+```{.feenox include="derivative.fee"}
+```
+
+```terminal
+$ feenox f.fee "sin(t)" 1 | ./derivative.fee 
+0.05    0.998725
+0.15    0.989041
+0.25    0.968288
+0.35    0.939643
+0.45    0.900427
+0.55    0.852504
+0.65    0.796311
+0.75    0.731216
+0.85    0.66018
+0.95    0.574296
+$
+```
+
+Shebanged input files can be used to hard-code PETSc options:
+
 
 
 ## Problem input {#sec:input}
