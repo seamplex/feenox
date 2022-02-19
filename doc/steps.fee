@@ -1,0 +1,2 @@
+static_steps = 10
+PRINT if(step_static=1,1,quasi_random(0.1,1))

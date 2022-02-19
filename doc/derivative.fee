@@ -1,0 +1,14 @@
+#!/usr/local/bin/feenox
+FUNCTION f(t) FILE - INTERPOLATION steffen
+
+a = vecmin(vec_f_t)
+b = vecmax(vec_f_t)
+
+# time step from arguments (or default 10 steps)
+DEFAULT_ARGUMENT_VALUE 1 (b-a)/10
+h = $1
+
+VAR t'
+f'(t) = derivative(f(t'),t',t)
+
+PRINT_FUNCTION f' MIN a+0.5*h MAX b-0.5*h STEP h
