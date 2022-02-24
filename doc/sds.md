@@ -918,7 +918,7 @@ $ echo $?
 $ 
 ```
 
-This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it.
+This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initiating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it.
 
 Following the _rule of repair_, ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
 
@@ -927,6 +927,21 @@ $ feenox thermal-1d-dirichlet-no-k.fee
 error: undefined thermal conductivity 'k'
 $ feenox thermal-1d-dirichlet-wrong-bc.fee
 error: boundary condition 'xxx' does not have a physical group in mesh file 'slab.msh'
+$ 
+```
+
+Error code are designed to be useful and helpful. An attempt to open a file might fail due to a wide variety of reasons. FeenoX clearly states which one caused the error so it can be remedied:
+
+```terminal
+$ cat test.fee 
+READ_MESH cantilever.msh
+$ feenox test.fee 
+$ chmod -r cantilever.msh 
+$ feenox test.fee 
+error: 'Permission denied' when opening file 'cantilever.msh' with mode 'r'
+$ rm cantilever.msh 
+$ feenox test.fee 
+error: 'No such file or directory' when opening file 'cantilever.msh' with mode 'r'
 $ 
 ```
 

@@ -39,6 +39,8 @@ int feenox_problem_solve_petsc_transient(void) {
         petsc_call(SNESDestroy(&feenox.pde.snes));
         feenox.pde.snes = NULL;
       }
+    } else {
+      feenox_function_to_phi(feenox.pde.initial_condition, feenox.pde.phi);
     }
     
     if (feenox.pde.ts == NULL) {

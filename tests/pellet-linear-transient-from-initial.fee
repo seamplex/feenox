@@ -1,0 +1,30 @@
+PROBLEM heat 3D PC_TYPE gamg KSP_TYPE cg
+READ_MESH pellet.msh
+
+end_time = 30
+k = 2.8
+rho = 0.001*10970
+cp = 0.235
+
+# q is in W / m^3 = 300 W/cm * 100 cm/m / area
+r = 4e-3
+q = 300 * 100 / (pi*r^2)
+
+FUNCTION T_ext(t) DATA {
+0    40
+10   40
+20   420
+30   420
+}
+
+BC symmetry q=0
+BC external T=T_ext(t)
+
+T_0(x,y,z) = 40
+
+SOLVE_PROBLEM
+IF done
+  PRINT t %.0f T(0,0,0) SEP " "
+ENDIF
+
+# WRITE_MESH pellet-linear-transient-from-initial.msh T

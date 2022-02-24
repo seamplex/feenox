@@ -1,0 +1,17 @@
+# https://www.nuclear-power.com/nuclear-engineering/heat-transfer/heat-generation/temperature-profile-nuclear-fuel/
+PROBLEM heat 3D
+READ_MESH pellet.msh
+
+k = 2.8
+
+# q is in W / m^3 = 300 W/cm * 100 cm/m / area
+r = 4e-3
+q = 300 * 100 / (pi*r^2)
+
+BC symmetry q=0
+BC external T=420
+
+SOLVE_PROBLEM
+PRINT T_max-1276
+
+# WRITE_MESH pellet-linear.vtk T
