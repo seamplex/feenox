@@ -86,8 +86,10 @@ that explains the design decisions and features included in FeenoX.
 -   [A free and open source computational tool for solving
     (nuclear-related) differential equations in the cloud][] (INAC/ENFIR
     Congress, December 2021).
+    -   [Video recording of the presentation][6] (Turn on the CCs, I am
+        not a native English speaker).
     -   Browse the repository with the sources of the examples in the
-        presentation [here][6]
+        presentation [here][7]
 
   [1]: ./srs.md
   [2]: ./sds.md
@@ -101,15 +103,16 @@ that explains the design decisions and features included in FeenoX.
   [here]: https://github.com/gtheler/2021-presentation
   [A free and open source computational tool for solving (nuclear-related) differential equations in the cloud]:
     https://www.seamplex.com/feenox/doc/2021-brasil.pdf
-  [6]: https://github.com/gtheler/2021-brasil
+  [6]: https://youtu.be/e8kFmFOsbPk
+  [7]: https://github.com/gtheler/2021-brasil
 
 ## Frequently Asked Questions
 
--   [Frequently Asked Questions][7]
+-   [Frequently Asked Questions][8]
 -   Ask yours on [GitHub Discussions][]
 -   Check also the [GitHub Issues][]
 
-  [7]: ./FAQ.md
+  [8]: ./FAQ.md
   [GitHub Discussions]: https://github.com/seamplex/feenox/discussions/
   [GitHub Issues]: https://github.com/seamplex/feenox/issues
 
@@ -150,11 +153,11 @@ specifications][Software Design specifications2] document.
 ## Tutorials
 
 Step-by-step instructions and explanations to solve increasingly-complex
-problems are given in the [tutorials][8] directory.
+problems are given in the [tutorials][9] directory.
 
 **TO BE DONE**
 
-  [8]: ../tutorials
+  [9]: ../tutorials
 
 ## Case files
 
@@ -195,10 +198,10 @@ See the [FeenoX history][].
 
 ## Asking questions & reporting bugs
 
--   Use [Github discussions][9] to ask for help,
+-   Use [Github discussions][10] to ask for help,
 -   Use the [Github issue tracker][] to report bugs.
 
-  [9]: https://github.com/seamplex/feenox/discussions
+  [10]: https://github.com/seamplex/feenox/discussions
   [Github issue tracker]: https://github.com/seamplex/feenox/issues
 
 ## Compiling from source
@@ -217,14 +220,14 @@ formulations of existing PDEs. For elliptic operators feel free to use
 the Laplace equation as a template.
 
 1.  Read the [programming guide][]
-2.  Browse [Github discussions][Github discussions9]
+2.  Browse [Github discussions][Github discussions10]
 3.  Fork the [Github repository][]
 4.  Create a pull request
 
 It is mandatory to observe the [Code of Conduct][].
 
   [programming guide]: ./programming.md
-  [Github discussions9]: https://github.com/seamplex/feenox/discussions
+  [Github discussions10]: https://github.com/seamplex/feenox/discussions
   [Github repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: CODE_OF_CONDUCT.md
 
