@@ -1,0 +1,2 @@
+#!/usr/local/bin/feenox
+PRINT "Hello $1!"

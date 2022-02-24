@@ -22,14 +22,8 @@ int feenox_instruction_solve_problem(void *arg) {
   }
 
   if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_guess != NULL) {
-    // fill the petsc vector with the data from the initial condition function of space
-    size_t j = 0;
-    for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
-      petsc_call(VecSetValue(feenox.pde.phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(feenox.pde.initial_guess, feenox.pde.mesh->node[j].x), INSERT_VALUES));
-    }
-    // TODO: add prefixes to allow -vec_view
-    petsc_call(VecAssemblyBegin(feenox.pde.phi));
-    petsc_call(VecAssemblyEnd(feenox.pde.phi));
+    // TODO: what about SLEPc?
+    feenox_call(feenox_function_to_phi(feenox.pde.initial_guess, feenox.pde.phi));
   } 
   
   // solve the problem with this per-mathematics virtual method
@@ -48,6 +42,21 @@ int feenox_instruction_solve_problem(void *arg) {
 }
 
 #ifdef HAVE_PETSC
+int feenox_function_to_phi(function_t *function, Vec phi) {
+  // fill the petsc vector with the data from the initial condition function of space
+  size_t j = 0;
+  for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
+    petsc_call(VecSetValue(phi, feenox.pde.mesh->node[j].index_dof[0], feenox_function_eval(function, feenox.pde.mesh->node[j].x), INSERT_VALUES));
+  }
+  
+  // TODO: add prefixes to allow -vec_view
+  petsc_call(VecAssemblyBegin(phi));
+  petsc_call(VecAssemblyEnd(phi));
+  
+  return FEENOX_OK;
+}
+
+
 int feenox_problem_phi_to_solution(Vec phi) {
 
   VecScatter         vscat;
