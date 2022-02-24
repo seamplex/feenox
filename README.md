@@ -17,6 +17,7 @@ toc: true
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
 >   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
 > * FeenoX for nuclear-related problems Presentation, December 2021
+>   - [Recording with CCs](https://youtu.be/e8kFmFOsbPk)
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-brasil.pdf)
 >   - [Markdown examples sources](https://github.com/gtheler/2021-brasil)
 :::

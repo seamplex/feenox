@@ -33,6 +33,7 @@ The FeenoX project starts as an offer to an imaginary â€œrequest for quotationsâ
    - [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
    - Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
  * [A free and open source computational tool for solving (nuclear-related) differential equations in the cloud](https://www.seamplex.com/feenox/doc/2021-brasil.pdf) (INAC/ENFIR Congress, December 2021).
+   - [Video recording of the presentation](https://youtu.be/e8kFmFOsbPk) (Turn on the CCs, I am not a native English speaker).
    - Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-brasil)
    
 ## Frequently Asked Questions
