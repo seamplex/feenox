@@ -40,6 +40,7 @@ The inverse of a 3x3 matrix:
 with DET  =  a11(a33a22-a32a23)-a21(a33a12-a32a13)+a31(a23a12-a22a13)
 */
 
+// TODO: virtual methods linked to the element type
 int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
 
   double det = 0;
@@ -54,7 +55,9 @@ int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
     	gsl_matrix_set(inverse, 0, 0, 1.0/gsl_matrix_get(direct, 0, 0));
       break;
     case 2:
-      if ((det = feenox_mesh_determinant(direct)) == 0) {
+      det = + gsl_matrix_get(direct, 0, 0) * gsl_matrix_get(direct, 1, 1)
+            - gsl_matrix_get(direct, 0, 1) * gsl_matrix_get(direct, 1, 0);
+      if (det == 0) {
         feenox_push_error_message("singular 2x2 jacobian");
         return FEENOX_ERROR;
       }
@@ -65,69 +68,52 @@ int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
       gsl_matrix_set(inverse, 1, 1,  invdet*gsl_matrix_get(direct, 0, 0));
       break;
     case 3:
-      if ((det = feenox_mesh_determinant(direct)) == 0) {
-        feenox_push_error_message("singular 3x3 jacobian");
-        return FEENOX_ERROR;
-      }
-      invdet = 1.0/det;
-      gsl_matrix_set(inverse, 0, 0, +invdet*(gsl_matrix_get(direct, 2, 2)*gsl_matrix_get(direct, 1, 1) -
-                                             gsl_matrix_get(direct, 2, 1)*gsl_matrix_get(direct, 1, 2)));
-      gsl_matrix_set(inverse, 0, 1, -invdet*(gsl_matrix_get(direct, 2, 2)*gsl_matrix_get(direct, 0, 1) -
-                                             gsl_matrix_get(direct, 2, 1)*gsl_matrix_get(direct, 0, 2)));
-      gsl_matrix_set(inverse, 0, 2, +invdet*(gsl_matrix_get(direct, 1, 2)*gsl_matrix_get(direct, 0, 1) -
-                                             gsl_matrix_get(direct, 1, 1)*gsl_matrix_get(direct, 0, 2)));
-      
-      gsl_matrix_set(inverse, 1, 0, -invdet*(gsl_matrix_get(direct, 2, 2)*gsl_matrix_get(direct, 1, 0) -
-                                             gsl_matrix_get(direct, 2, 0)*gsl_matrix_get(direct, 1, 2)));
-      gsl_matrix_set(inverse, 1, 1, +invdet*(gsl_matrix_get(direct, 2, 2)*gsl_matrix_get(direct, 0, 0) -
-                                             gsl_matrix_get(direct, 2, 0)*gsl_matrix_get(direct, 0, 2)));
-      gsl_matrix_set(inverse, 1, 2, -invdet*(gsl_matrix_get(direct, 1, 2)*gsl_matrix_get(direct, 0, 0) -
-                                             gsl_matrix_get(direct, 1, 0)*gsl_matrix_get(direct, 0, 2)));
+      // code from PETSc src/ksp/ksp/tutorials/ex42.c
+      {
+        double a00 = gsl_matrix_get(direct, 0, 0);
+        double a01 = gsl_matrix_get(direct, 0, 1);
+        double a02 = gsl_matrix_get(direct, 0, 2);
+        double a10 = gsl_matrix_get(direct, 1, 0);
+        double a11 = gsl_matrix_get(direct, 1, 1);
+        double a12 = gsl_matrix_get(direct, 1, 2);
+        double a20 = gsl_matrix_get(direct, 2, 0);
+        double a21 = gsl_matrix_get(direct, 2, 1);
+        double a22 = gsl_matrix_get(direct, 2, 2);
 
-      gsl_matrix_set(inverse, 2, 0, +invdet*(gsl_matrix_get(direct, 2, 1)*gsl_matrix_get(direct, 1, 0) -
-                                             gsl_matrix_get(direct, 2, 0)*gsl_matrix_get(direct, 1, 1)));
-      gsl_matrix_set(inverse, 2, 1, -invdet*(gsl_matrix_get(direct, 2, 1)*gsl_matrix_get(direct, 0, 0) -
-                                             gsl_matrix_get(direct, 2, 0)*gsl_matrix_get(direct, 0, 1)));
-      gsl_matrix_set(inverse, 2, 2, +invdet*(gsl_matrix_get(direct, 1, 1)*gsl_matrix_get(direct, 0, 0) -
-                                             gsl_matrix_get(direct, 1, 0)*gsl_matrix_get(direct, 0, 1)));
+        double t4  = a20 * a01;
+        double t6  = a20 * a02;
+        double t8  = a10 * a01;
+        double t10 = a10 * a02;
+        double t12 = a00 * a11;
+        double t14 = a00 * a12;
+        double den = (t4 * a12 - t6 * a11 - t8 * a22 + t10 * a21 + t12 * a22 - t14 * a21);
+/*        
+        if (den == 0) {
+          feenox_push_error_message("singular 3x3 jacobian");
+          return FEENOX_ERROR;
+        }
+*/
+        double t17 = 1.0 / den;
+
+        gsl_matrix_set(inverse, 0, 0, +(a11 * a22 - a12 * a21) * t17);
+        gsl_matrix_set(inverse, 0, 1, -(a01 * a22 - a02 * a21) * t17);
+        gsl_matrix_set(inverse, 0, 2, +(a01 * a12 - a02 * a11) * t17);
+        gsl_matrix_set(inverse, 1, 0, -(-a20 * a12 + a10 * a22) * t17);
+        gsl_matrix_set(inverse, 1, 1, +(-t6 + a00 * a22) * t17);
+        gsl_matrix_set(inverse, 1, 2, -(-t10 + t14) * t17);
+        gsl_matrix_set(inverse, 2, 0, +(-a20 * a11 + a10 * a21) * t17);
+        gsl_matrix_set(inverse, 2, 1, -(-t4 + a00 * a21) * t17);
+        gsl_matrix_set(inverse, 2, 2, +(-t8 + t12) * t17);
+      }
       break;
     default:
       feenox_push_error_message("invalid size %d of matrix to invert", direct->size1);
       break;
   }
-
-/*  
-static void matrix_inverse_3x3(PetscScalar A[3][3],PetscScalar B[3][3])
-{
-  PetscScalar t4, t6, t8, t10, t12, t14, t17;
-
-  t4  = A[2][0] * A[0][1];
-  t6  = A[2][0] * A[0][2];
-  t8  = A[1][0] * A[0][1];
-  t10 = A[1][0] * A[0][2];
-  t12 = A[0][0] * A[1][1];
-  t14 = A[0][0] * A[1][2];
-  t17 = 0.1e1 / (t4 * A[1][2] - t6 * A[1][1] - t8 * A[2][2] + t10 * A[2][1] + t12 * A[2][2] - t14 * A[2][1]);
-
-  B[0][0] = (A[1][1] * A[2][2] - A[1][2] * A[2][1]) * t17;
-  B[0][1] = -(A[0][1] * A[2][2] - A[0][2] * A[2][1]) * t17;
-  B[0][2] = (A[0][1] * A[1][2] - A[0][2] * A[1][1]) * t17;
-  B[1][0] = -(-A[2][0] * A[1][2] + A[1][0] * A[2][2]) * t17;
-  B[1][1] = (-t6 + A[0][0] * A[2][2]) * t17;
-  B[1][2] = -(-t10 + t14) * t17;
-  B[2][0] = (-A[2][0] * A[1][1] + A[1][0] * A[2][1]) * t17;
-  B[2][1] = -(-t4 + A[0][0] * A[2][1]) * t17;
-  B[2][2] = (-t8 + t12) * t17;
-}
-  
-  return;
-*/
-  
   return FEENOX_OK;
 }
 
-
-double feenox_mesh_determinant(gsl_matrix *this) {
+inline double feenox_mesh_determinant(gsl_matrix *this) {
 
   switch (this->size1) {
     case 0:
@@ -380,16 +366,18 @@ inline int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, in
 */    
 
   double k = (1-feenox_mesh_dot(e->normal, e_z))/(s*s);
-  double R[3][3];
-  R[0][0] = 1     + k * (-u[2]*u[2] - u[1]*u[1]);
-  R[0][1] = -u[2] + k * (u[0]*u[1]);
-  R[0][2] = +u[1] + k * (u[0]*u[2]);
-  R[1][0] = +u[2] + k * (u[0]*u[1]);
-  R[1][1] = 1     + k * (-u[2]*u[2] - u[0]*u[0]);
-  R[1][2] = -u[0] + k * (u[1]*u[2]);
-  R[2][0] = -u[1] + k * (u[0]*u[2]);
-  R[2][1] = +u[0] + k * (u[1]*u[2]);
-  R[2][2] = 1     + k * (-u[1]*u[1] - u[0]*u[0]);
+  double R[3][3] = {{ 1     + k * (-u[2]*u[2] - u[1]*u[1]),
+                      -u[2] + k * (u[0]*u[1]),
+                      +u[1] + k * (u[0]*u[2])},
+                    {
+                      +u[2] + k * (u[0]*u[1]),
+                      1     + k * (-u[2]*u[2] - u[0]*u[0]),
+                      -u[0] + k * (u[1]*u[2])},
+                    {
+                      -u[1] + k * (u[0]*u[2]),
+                      +u[0] + k * (u[1]*u[2]),
+                      1     + k * (-u[1]*u[1] - u[0]*u[0])
+                    }};
 
   double xi = 0;
   for (unsigned int m = 0; m < 2; m++) {
