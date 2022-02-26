@@ -171,14 +171,12 @@ int feenox_problem_build_element_volumetric(element_t *this) {
 
 #ifdef HAVE_PETSC
   
+  // TODO: maybe we can relax this requirement
   if (this->physical_group == NULL) {
     feenox_push_error_message("volumetric element %d does not have an associated physical group", this->tag);
     return FEENOX_ERROR;
   }
-  
-  // total number of gauss points
-  unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
-  
+    
   // if the current element's size is not equal to the previous one, re-allocate
   if (feenox.pde.n_local_nodes != this->type->nodes) {
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
@@ -200,21 +198,14 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   if (feenox.pde.has_rhs) {
     gsl_vector_set_zero(feenox.pde.bi);
   }
-
-//  printf("Xi=\n");
-//  feenox_debug_print_gsl_matrix(feenox.pde.Mi, stdout);
   
   // loop over gauss points to integrate elemental matrices and vectors
+  unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
   unsigned int v = 0;
   for (v = 0; v < V; v++) {
     // this is a virtual method that depends on the problem type
     feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, v));
   }
-  
-//  printf("Ki=\n");
-//  feenox_debug_print_gsl_matrix(feenox.pde.Ki, stdout);
-//  printf("Xi=\n");
-//  feenox_debug_print_gsl_matrix(feenox.pde.Mi, stdout);
  
   // compute the indices of the DOFs to ensamble
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));

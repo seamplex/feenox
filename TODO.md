@@ -1,5 +1,7 @@
 # General things to do
 
+ * implicit call to `SOLVE_PROBLEM`?
+ * automatically link virtual methods in autogen depending on the directories under `pdes`
  * use `spack`
  * https://joss.theoj.org/
  * FIT to mesh-based functions
@@ -81,7 +83,6 @@
    - `full | temperature | heat_flux`
    - `full | mode_1 | mode_n1 | modes`
    - `full | flux_1 | fluxes | currents`
-   - implicit call to `SOLVE_PROBLEM`?
  
 ## Extensions
  

@@ -44,7 +44,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
 
   if (mechanical.n_nodes != this->type->nodes) {

@@ -29,7 +29,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double *x = NULL;
   if (thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass) {

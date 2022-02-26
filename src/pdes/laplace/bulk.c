@@ -23,14 +23,13 @@
 #include "laplace.h"
 extern feenox_t feenox;
 extern laplace_t laplace;
-//double zero[3] = {0, 0, 0};
 
 int feenox_problem_build_volumetric_gauss_point_laplace(element_t *this, unsigned int v) {
 
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
   double *x = NULL;
   if (laplace.space_dependent_source || laplace.space_dependent_mass) {
@@ -43,13 +42,14 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *this, unsigne
   double r_for_axisymmetric = 1;
   double w = this->w[v] * r_for_axisymmetric;
   
+  // laplace stiffness matrix Bt*B
+  // note we don't allow any coefficient in the laplacian term
+  gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, this->B[v], this->B[v], 1.0, feenox.pde.Ki);
+
   material_t *material = NULL;
   if (this->physical_group != NULL && this->physical_group->material != NULL) {
     material = this->physical_group->material;
   }
-
-  // laplace stiffness matrix Bt*B
-  gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, this->B[v], this->B[v], 1.0, feenox.pde.Ki);
   
   // right-hand side
   // TODO: there should be a way to use BLAS instead of a for loop

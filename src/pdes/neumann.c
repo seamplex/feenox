@@ -17,7 +17,7 @@ int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *va
 
 double feenox_problem_bc_natural_weight(element_t *element, unsigned int v) {
   feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration);
-  feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration);
+  feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.mesh->integration);
 
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);

@@ -135,7 +135,7 @@ int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_d
 
   // TODO: remove duplicate, use a macro
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.mesh->integration));
   if (bc_data->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
     feenox_mesh_update_coord_vars(element->x[v]);
