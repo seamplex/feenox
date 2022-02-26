@@ -104,7 +104,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
               (physical_group != NULL && element->physical_group == physical_group)) {
             for (v = 0; v < element->type->gauss[mesh->integration].V; v++) {
               feenox_mesh_compute_w_at_gauss(element, v, mesh->integration);
-              // TODO: check is the integrand depends on space
+              // TODO: check if the integrand depends on space
               feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
               integral += element->w[v] * feenox_function_eval(mesh_integrate->function, element->x[v]);
             }  

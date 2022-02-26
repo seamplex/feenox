@@ -24,28 +24,26 @@
 extern feenox_t feenox;
 extern modal_t modal;
 
-int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned int v) {
+int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int v) {
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
   
   double *x = NULL;
   if (modal.space_E || modal.space_nu || modal.space_rho) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
-    x = this->x[v];
+    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
+    x = e->x[v];
   }
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
   double r_for_axisymmetric = 1;
-  double w = this->w[v] * r_for_axisymmetric;
+  double w = e->w[v] * r_for_axisymmetric;
   
   material_t *material = NULL;
-  if (this->physical_group != NULL && this->physical_group->material != NULL) {
-    material = this->physical_group->material;
+  if (e->physical_group != NULL && e->physical_group->material != NULL) {
+    material = e->physical_group->material;
   }
 
   gsl_matrix *C = gsl_matrix_calloc(6, 6);
@@ -73,11 +71,11 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned 
   gsl_matrix_set(C, 4, 4, mu);
   gsl_matrix_set(C, 5, 5, mu);
   
-  unsigned int J = this->type->nodes;
+  unsigned int J = e->type->nodes;
   gsl_matrix *B = gsl_matrix_calloc(6, feenox.pde.dofs * J);
   gsl_matrix *CB = gsl_matrix_calloc(6, feenox.pde.dofs * J);
   
-  gsl_matrix *dhdx = this->dhdx[v];
+  gsl_matrix *dhdx = e->dhdx[v];
 
   unsigned int j = 0;
   for (j = 0; j < J; j++) {
@@ -102,7 +100,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *this, unsigned 
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, CB, 1.0, feenox.pde.Ki));
 
   // elemental mass H'*rho*H
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rho, this->H[v], this->H[v], 1.0, feenox.pde.Mi));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rho, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
   
   gsl_matrix_free(B);
   gsl_matrix_free(CB);

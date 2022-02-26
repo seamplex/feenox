@@ -239,14 +239,11 @@ int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V)
 }
 
 int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type) {
-  
-  int v, j, m;
-  
-  for (v = 0; v < gauss->V; v++) {
-    for (j = 0; j < element_type->nodes; j++) {
 
+  for (unsigned int v = 0; v < gauss->V; v++) {
+    for (unsigned int j = 0; j < element_type->nodes; j++) {
       gauss->h[v][j] = element_type->h(j, gauss->r[v]);
-      for (m = 0; m < element_type->dim; m++) {
+      for (unsigned int m = 0; m < element_type->dim; m++) {
         gsl_matrix_set(gauss->dhdr[v], j, m, element_type->dhdr(j, m, gauss->r[v]));
       }
       
@@ -258,22 +255,22 @@ int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type
 
 
 // esta no rellena los nodos!
-int feenox_mesh_create_element(element_t *element, int index, int tag, int type, physical_group_t *physical_group) {
+int feenox_mesh_create_element(element_t *e, size_t index, size_t tag, unsigned int type, physical_group_t *physical_group) {
  
-  element->index = index;
-  element->tag = tag;
-  element->type = &(feenox.mesh.element_types[type]);
-  element->node  = calloc(element->type->nodes, sizeof(node_t *));
-  element->physical_group = physical_group;
+  e->index = index;
+  e->tag = tag;
+  e->type = &(feenox.mesh.element_types[type]);
+  e->node  = calloc(e->type->nodes, sizeof(node_t *));
+  e->physical_group = physical_group;
   
   return FEENOX_OK;
 }
 
-int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *element) {
+int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *e) {
   
   element_ll_t *item = NULL;
   feenox_check_alloc(item = calloc(1, sizeof(element_ll_t)));
-  item->element = element;
+  item->element = e;
   LL_APPEND(*list, item);
   
   return FEENOX_OK;
@@ -281,7 +278,6 @@ int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *element) {
 }
 
 int feenox_mesh_add_material_to_list(material_ll_t **list, material_t *material) {
-  
   
   // solo agregamos el material si es que no esta en la lista
   material_ll_t *item = NULL;
@@ -301,10 +297,8 @@ int feenox_mesh_add_material_to_list(material_ll_t **list, material_t *material)
 
 int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]) {
   
-  int j;
-  
   barycenter[0] = barycenter[1] = barycenter[2] = 0;
-  for (j = 0; j < this->type->nodes; j++) {
+  for (unsigned int j = 0; j < this->type->nodes; j++) {
     barycenter[0] += this->node[j]->x[0];
     barycenter[1] += this->node[j]->x[1];
     barycenter[2] += this->node[j]->x[2];
@@ -318,14 +312,12 @@ int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[])
 
 
 int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs) {
-  size_t j;
-  unsigned int g;
   
   this->degrees_of_freedom = dofs;
 
-  for (j = 0; j < this->n_nodes; j++) {
+  for (size_t j = 0; j < this->n_nodes; j++) {
     feenox_check_alloc(this->node[j].index_dof = malloc(this->degrees_of_freedom*sizeof(size_t)));
-    for (g = 0; g < this->degrees_of_freedom; g++) {
+    for (unsigned int g = 0; g < this->degrees_of_freedom; g++) {
       this->node[j].index_dof[g] = this->degrees_of_freedom*j + g;
     }
   }  
@@ -333,12 +325,23 @@ int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs) {
   return FEENOX_OK;
 }
 
-
-int feenox_mesh_compute_local_node_index(element_t *element, int global_index) {
-  int j;
-  int local_index = -1;
+int feenox_mesh_compute_normal_2d(element_t *e) {
+  if (e->normal == NULL) {
+    feenox_check_alloc(e->normal = calloc(3, sizeof(double)));
+    double a[3], b[3];
+    feenox_mesh_subtract(e->node[0]->x, e->node[1]->x, a);
+    feenox_mesh_subtract(e->node[0]->x, e->node[2]->x, b);
+    feenox_mesh_normalized_cross(a, b, e->normal);
+  }
   
-  for (j = 0; j < element->type->nodes; j++) {
+  return FEENOX_OK;
+}
+
+
+unsigned int feenox_mesh_compute_local_node_index(element_t *element, size_t global_index) {
+  unsigned int local_index = -1;
+  
+  for (unsigned int j = 0; j < element->type->nodes; j++) {
     if (element->node[j]->tag == global_index+1) {
       local_index = j;
       break;
@@ -346,7 +349,6 @@ int feenox_mesh_compute_local_node_index(element_t *element, int global_index) {
   }
   
   return local_index;
-  
 }
 
 

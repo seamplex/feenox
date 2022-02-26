@@ -28,9 +28,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *thi
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_wHB_at_gauss(this, v));
   
   double *x = NULL;
   if (neutron_diffusion.space_XS) {

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related FEM routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2022 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -66,7 +66,7 @@ int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
       break;
     case 3:
       if ((det = feenox_mesh_determinant(direct)) == 0) {
-        feenox_push_error_message("singular 3x3 matrix");
+        feenox_push_error_message("singular 3x3 jacobian");
         return FEENOX_ERROR;
       }
       invdet = 1.0/det;
@@ -137,16 +137,16 @@ double feenox_mesh_determinant(gsl_matrix *this) {
       return gsl_matrix_get(this, 0, 0);
     break;
     case 2:
-      return + gsl_matrix_get(this, 0, 0)*gsl_matrix_get(this, 1, 1)
-             - gsl_matrix_get(this, 0, 1)*gsl_matrix_get(this, 1, 0);
+      return + gsl_matrix_get(this, 0, 0) * gsl_matrix_get(this, 1, 1)
+             - gsl_matrix_get(this, 0, 1) * gsl_matrix_get(this, 1, 0);
     break;
     case 3:
-      return + gsl_matrix_get(this, 0, 0)*gsl_matrix_get(this, 1, 1)*gsl_matrix_get(this, 2, 2)
-             + gsl_matrix_get(this, 0, 1)*gsl_matrix_get(this, 1, 2)*gsl_matrix_get(this, 2, 0)
-             + gsl_matrix_get(this, 0, 2)*gsl_matrix_get(this, 1, 0)*gsl_matrix_get(this, 2, 1) 
-             - gsl_matrix_get(this, 0, 2)*gsl_matrix_get(this, 1, 1)*gsl_matrix_get(this, 2, 0)
-             - gsl_matrix_get(this, 0, 1)*gsl_matrix_get(this, 1, 0)*gsl_matrix_get(this, 2, 2) 
-             - gsl_matrix_get(this, 0, 0)*gsl_matrix_get(this, 1, 2)*gsl_matrix_get(this, 2, 1);  
+      return + gsl_matrix_get(this, 0, 0) * gsl_matrix_get(this, 1, 1) * gsl_matrix_get(this, 2, 2)
+             + gsl_matrix_get(this, 0, 1) * gsl_matrix_get(this, 1, 2) * gsl_matrix_get(this, 2, 0)
+             + gsl_matrix_get(this, 0, 2) * gsl_matrix_get(this, 1, 0) * gsl_matrix_get(this, 2, 1) 
+             - gsl_matrix_get(this, 0, 2) * gsl_matrix_get(this, 1, 1) * gsl_matrix_get(this, 2, 0)
+             - gsl_matrix_get(this, 0, 1) * gsl_matrix_get(this, 1, 0) * gsl_matrix_get(this, 2, 2) 
+             - gsl_matrix_get(this, 0, 0) * gsl_matrix_get(this, 1, 2) * gsl_matrix_get(this, 2, 1);  
     break;
   }
   
@@ -252,11 +252,10 @@ inline int feenox_mesh_compute_drdx_at_gauss(element_t *e, unsigned int v, int i
 
 inline int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr) {
 
-  // warning! ths only works with volumetric elements, see dxdr_at_gauss()
-  unsigned int m, m_prime, j;
-  for (m = 0; m < e->type->dim; m++) {
-    for (m_prime = 0; m_prime < e->type->dim; m_prime++) {
-      for (j = 0; j < e->type->nodes; j++) {
+  // warning! this only works with volumetric elements, see dxdr_at_gauss()
+  for (unsigned int m = 0; m < e->type->dim; m++) {
+    for (unsigned int m_prime = 0; m_prime < e->type->dim; m_prime++) {
+      for (unsigned int j = 0; j < e->type->nodes; j++) {
         gsl_matrix_add_to_element(dxdr, m, m_prime, e->type->dhdr(j, m_prime, r) * e->node[j]->x[m]);
       }
     }
@@ -266,18 +265,26 @@ inline int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr) {
 }
 
 
-void mesh_compute_x(element_t *e, double *r, double *x) {
+inline void mesh_compute_x(element_t *e, double *r, double *x) {
 
   // only for volumetric elements
-  unsigned int m, j;
-  for (m = 0; m < 3; m++) {
-    x[m] = 0;
-    for (j = 0; j < e->type->nodes; j++) {
-      x[m] += e->type->h(j, r) * e->node[j]->x[m];
+  x[0] = x[1] = x[2];
+  for (unsigned int j = 0; j < e->type->nodes; j++) {
+    double h = e->type->h(j, r);
+    for (unsigned int m = 0; m < 3; m++) {
+      x[m] += h * e->node[j]->x[m];
     }
   }
 
   return;
+}
+
+inline int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v) {
+  
+  feenox_call(feenox_mesh_compute_w_at_gauss(e, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(e, v, feenox.pde.mesh->integration));
+  
+  return FEENOX_OK;
 }
 
 inline int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v) {
@@ -309,6 +316,118 @@ inline int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int inte
   return FEENOX_OK;
 }
 
+inline int feenox_mesh_compute_dxdr_at_gauss_1d(element_t *e, unsigned int v, int integration) {
+  
+  // we are a line but not aligned with the x axis we have to compute the axial coordinate l
+  double dx = e->node[1]->x[0] - e->node[0]->x[0];
+  double dy = e->node[1]->x[1] - e->node[0]->x[1];
+  double dz = e->node[1]->x[2] - e->node[0]->x[2];
+  double l = gsl_hypot3(dx, dy, dz);
+
+  double dxdr = 0;
+  for (unsigned int j = 0; j < e->type->nodes; j++) {
+    dxdr += gsl_matrix_get(e->type->gauss[integration].dhdr[v], j, 0) *
+              (e->node[j]->x[0] * dx/l + e->node[j]->x[1] * dy/l + e->node[j]->x[2] * dz/l);
+  }
+  
+  gsl_matrix_set(e->dxdr[v], 0, 0, dxdr);
+  
+  return FEENOX_OK;
+}
+
+inline int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, int integration) {
+  /*
+   * if we are a triangle or a quadrangle (quadrangles are double-triangles so they are alike)
+   * but we do not live on the x-y plane we have to do some tricks:
+   * we need a transformation matrix R that maps the outward normal n into [0,0,1]
+   * i.e. such that when R is applied to the triangle, it will now live in the xy plane
+   * note that there are infinite Rs that do this (because the resulting triangle can look like this
+   * 
+   * 
+   *    +                                       +----------+
+   *    |`\                                     `\         |
+   *    |  `\                                     `\       |
+   *    |    `\             or like this            `\     |
+   *    |      `\                                     `\   |
+   *    |        `\                                     `\ |
+   *    +----------+                                      `+
+   * 
+   * see 
+   * http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+   */
+
+  double e_z[3] = {0, 0, 1};
+  double u[3];
+  feenox_mesh_cross(e->normal, e_z, u);
+  double s = gsl_hypot3(u[0], u[1], u[2]);
+
+/*
+(%i4) U:matrix([0, -u2, u1],[u2, 0, -u0],[-u1, u0, 0]);
+                           [  0    - u2   u1  ]
+                           [                  ]
+(%o4)                      [  u2    0    - u0 ]
+                           [                  ]
+                           [ - u1   u0    0   ]
+(%i5) U . U;
+                 [     2     2                           ]
+                 [ - u2  - u1      u0 u1        u0 u2    ]
+                 [                                       ]
+(%o5)            [                  2     2              ]
+                 [    u0 u1     - u2  - u0      u1 u2    ]
+                 [                                       ]
+                 [                               2     2 ]
+                 [    u0 u2        u1 u2     - u1  - u0  ]
+*/    
+
+  double k = (1-feenox_mesh_dot(e->normal, e_z))/(s*s);
+  double R[3][3];
+  R[0][0] = 1     + k * (-u[2]*u[2] - u[1]*u[1]);
+  R[0][1] = -u[2] + k * (u[0]*u[1]);
+  R[0][2] = +u[1] + k * (u[0]*u[2]);
+  R[1][0] = +u[2] + k * (u[0]*u[1]);
+  R[1][1] = 1     + k * (-u[2]*u[2] - u[0]*u[0]);
+  R[1][2] = -u[0] + k * (u[1]*u[2]);
+  R[2][0] = -u[1] + k * (u[0]*u[2]);
+  R[2][1] = +u[0] + k * (u[1]*u[2]);
+  R[2][2] = 1     + k * (-u[1]*u[1] - u[0]*u[0]);
+
+  double xi = 0;
+  for (unsigned int m = 0; m < 2; m++) {
+    for (unsigned int m_prime = 0; m_prime < 2; m_prime++) {
+      xi = 0;
+      for (unsigned int j = 0; j < e->type->nodes; j++) {
+        xi += gsl_matrix_get(e->type->gauss[integration].dhdr[v], j, m) *
+               (e->node[j]->x[0] * R[m_prime][0] +
+                e->node[j]->x[1] * R[m_prime][1] +
+                e->node[j]->x[2] * R[m_prime][2]);
+      }
+      gsl_matrix_set(e->dxdr[v], m, m_prime, xi);
+    }
+  }
+
+  return FEENOX_OK;
+}
+
+
+inline int feenox_mesh_compute_dxdr_at_gauss_general(element_t *e, unsigned int v, int integration) {
+  // we can do a full traditional computation
+  // i.e. lines are in the x axis
+  //      surfaces are on the xy plane
+  //      volumes are always volumes!
+
+  double xi = 0;
+  for (unsigned int m = 0; m < e->type->dim; m++) {
+    for (unsigned int m_prime = 0; m_prime < e->type->dim; m_prime++) {
+      xi = 0;
+      for (unsigned int j = 0; j < e->type->nodes; j++) {
+        xi += gsl_matrix_get(e->type->gauss[integration].dhdr[v], j, m_prime) * e->node[j]->x[m];
+      }
+      gsl_matrix_set(e->dxdr[v], m, m_prime, xi);
+    }
+  }
+  return FEENOX_OK;
+}
+
 
 // magic magic magic!
 inline int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int integration) {
@@ -323,133 +442,39 @@ inline int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int i
     return FEENOX_OK;
   }
 
-  gsl_matrix *dxdr = e->dxdr[v];
-  double *r = e->type->gauss[integration].r[v];
-
-  // TODO: virtual methods?
-  if (e->type->dim == 0) {
-    // a point does not have any derivative, if we are here then just keep silence
-    ;
-  } else if (e->type->dim == 1 && (e->node[0]->x[1] != 0 || e->node[1]->x[1] != 0 ||
-                                   e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0)) {
-    // if we are a line but not aligned with the x axis we have to compute the axial coordinate l
-    double dx = e->node[1]->x[0] - e->node[0]->x[0];
-    double dy = e->node[1]->x[1] - e->node[0]->x[1];
-    double dz = e->node[1]->x[2] - e->node[0]->x[2];
-    double l = gsl_hypot3(dx, dy, dz);
-
-    for (unsigned int j = 0; j < e->type->nodes; j++) {
-      gsl_matrix_add_to_element(dxdr, 0, 0, e->type->dhdr(j, 0, r) * (e->node[j]->x[0] * dx/l +
-                                                                      e->node[j]->x[1] * dy/l +
-                                                                      e->node[j]->x[2] * dz/l));
-    }
-    
-  } else if (e->type->dim == 2 && (e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0 || e->node[2]->x[2])) {
-    
-    /*
-     * if we are a triangle or a quadrangle (quadrangles are double-triangles so they are alike)
-     * but we do not live on the x-y plane we have to do some tricks:
-     * we need a transformation matrix R that maps the outward normal n into [0,0,1]
-     * i.e. such that when R is applied to the triangle, it will now live in the xy plane
-     * note that there are infinite Rs that do this (because the resulting triangle can look like this
-     * 
-     * 
-     *    +                                       +----------+
-     *    |`\                                     `\         |
-     *    |  `\                                     `\       |
-     *    |    `\             or like this           `\      |
-     *    |      `\                                     `\   |
-     *    |        `\                                     `\ |
-     *    +----------+                                      `+
-     * 
-     * see 
-     * http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
-     */
-    
-    double n[3], a[3], b[3];
-    feenox_mesh_subtract(e->node[0]->x, e->node[1]->x, a);
-    feenox_mesh_subtract(e->node[0]->x, e->node[2]->x, b);
-    feenox_mesh_normalized_cross(a, b, n);
-    
-    double nz[3] = {0, 0, 1};
-    double u[3];
-    feenox_mesh_cross(n, nz, u);
-    double s = gsl_hypot3(u[0], u[1], u[2]);
-    
-    double R[3][3];
-/*
- (%i4) U:matrix([0, -u2, u1],[u2, 0, -u0],[-u1, u0, 0]);
-                             [  0    - u2   u1  ]
-                             [                  ]
-(%o4)                        [  u2    0    - u0 ]
-                             [                  ]
-                             [ - u1   u0    0   ]
-(%i5) U . U;
-                   [     2     2                           ]
-                   [ - u2  - u1      u0 u1        u0 u2    ]
-                   [                                       ]
-(%o5)              [                  2     2              ]
-                   [    u0 u1     - u2  - u0      u1 u2    ]
-                   [                                       ]
-                   [                               2     2 ]
-                   [    u0 u2        u1 u2     - u1  - u0  ]
-*/    
-
-    // TODO: we could have checked for this condition during an initialization phase
-    //       and then link to the appropriate method to compute the jacobian
-    if (fabs(s) < feenox_var_value(feenox.mesh.vars.eps)) {
-      // we are lucky, the transformation is a translation so R it's easy
-      // we could have tested for n against nz to begin with
-      R[0][0] = 1;
-      R[0][1] = 0;
-      R[0][2] = 0;
-      R[1][0] = 0;
-      R[1][1] = 1;
-      R[1][2] = 0;
-      R[2][0] = 0;
-      R[2][1] = 0;
-      R[2][2] = 1;
+  // choose which virtual method to call
+  // in principle there is no need to have virtual methods
+  // they make sense only if we do this "selection" in an initialization
+  // but it does not make sense to do the selection if dxdr is not needed
+//  if (e->compute_dxdr == NULL) {
+    if (e->type->dim == 1 && (e->node[0]->x[1] != 0 || e->node[1]->x[1] != 0 ||
+                              e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0)) {
+      
+//      e->compute_dxdr = feenox_mesh_compute_dxdr_at_gauss_1d;
+      feenox_call(feenox_mesh_compute_dxdr_at_gauss_1d(e, v, integration));
+      
+    } else if (e->type->dim == 2 && (e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0 || e->node[2]->x[2])) {
+      
+      feenox_call(feenox_mesh_compute_normal_2d(e));
+      double eps = feenox_var_value(feenox.mesh.vars.eps);
+      // ANDs are more efficient than ORs because the minute one does not hold the evaluation finishes
+      if (fabs(e->normal[0]) < eps && fabs(e->normal[1]) < eps && fabs(fabs(e->normal[2])-1) < eps) {
+        
+//        e->compute_dxdr = feenox_mesh_compute_dxdr_at_gauss_general;
+        feenox_call(feenox_mesh_compute_dxdr_at_gauss_general(e, v, integration));
+        
+      } else {
+//        e->compute_dxdr = feenox_mesh_compute_dxdr_at_gauss_2d;
+        feenox_call(feenox_mesh_compute_dxdr_at_gauss_2d(e, v, integration));
+      }
+      
     } else {
-      double c = feenox_mesh_dot(n, nz);
-      double k = (1-c)/(s*s);
-      R[0][0] = 1     + k * (-u[2]*u[2] - u[1]*u[1]);
-      R[0][1] = -u[2] + k * (u[0]*u[1]);
-      R[0][2] = +u[1] + k * (u[0]*u[2]);
-      R[1][0] = +u[2] + k * (u[0]*u[1]);
-      R[1][1] = 1     + k * (-u[2]*u[2] - u[0]*u[0]);
-      R[1][2] = -u[0] + k * (u[1]*u[2]);
-      R[2][0] = -u[1] + k * (u[0]*u[2]);
-      R[2][1] = +u[0] + k * (u[1]*u[2]);
-      R[2][2] = 1     + k * (-u[1]*u[1] - u[0]*u[0]);
+      
+//      e->compute_dxdr = feenox_mesh_compute_dxdr_at_gauss_general;
+      feenox_call(feenox_mesh_compute_dxdr_at_gauss_general(e, v, integration));
     }
-    
-    for (unsigned int m = 0; m < 2; m++) {
-      for (unsigned int m_prime = 0; m_prime < 2; m_prime++) {
-        for (unsigned int j = 0; j < e->type->nodes; j++) {
-          gsl_matrix_add_to_element(dxdr, m, m_prime, e->type->dhdr(j, m, r) * (e->node[j]->x[0] * R[m_prime][0] +
-                                                                                e->node[j]->x[1] * R[m_prime][1] +
-                                                                                e->node[j]->x[2] * R[m_prime][2]));
-        }
-      }
-    }
-    
-  } else {
-    // we can do a full traditional computation
-    // i.e. lines are in the x axis
-    //      surfaces are on the xy plane
-    //      volumes are always volumes!
-    
-    // dxdr = dhdr * 
-    for (unsigned int m = 0; m < 2; m++) {
-      for (unsigned int m_prime = 0; m_prime < 2; m_prime++) {
-        for (unsigned int j = 0; j < e->type->nodes; j++) {
-          // TODO: matrix-vector product
-          gsl_matrix_add_to_element(dxdr, m, m_prime, gsl_matrix_get(e->type->gauss[integration].dhdr[v], j, m_prime) * e->node[j]->x[m]);
-        }
-      }
-    }
-    
-  } 
+//  }  
+//  feenox_call(e->compute_dxdr(e, v, integration));
   
   return FEENOX_OK;
 }

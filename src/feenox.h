@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX common framework header
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2022 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -984,14 +984,15 @@ struct element_type_t {
   double **node_coords;
   node_relative_t **node_parents;
   
+  // virtual (sic) methods!
   // shape functions and derivatives in the local coords
   double (*h)(int i, double *r);
   double (*dhdr)(int i, int j, double *r);
 
-  // virtual (sic) methods!
+  // convenience methods
   int (*point_in_element)(element_t *e, const double *x);
   double (*element_volume)(element_t *e);
-  
+
   gauss_t gauss[2];    // sets of gauss points
                        // 0 - full integration
                        // 1 - reduced integration
@@ -1005,8 +1006,9 @@ struct element_t {
   double quality;
   double volume;
   double gradient_weight;   // this weight is used to average the contribution of this element to nodal gradients
-  double *w;       // weights of the gauss points
-  double **x;      // coordinates fo the gauss points 
+  double *w;                // weights of the gauss points time determinant of the jacobian
+  double **x;               // coordinates fo the gauss points 
+  double *normal;           // outward normal direction (only for 2d elements)
   
   // these are pointers to arrays of matrices are evalauted at the gauss points
   gsl_matrix **dhdx;
@@ -1024,6 +1026,8 @@ struct element_t {
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
 
+  int (*compute_dxdr)(element_t *e, unsigned int v, int integration);
+  
 #ifdef HAVE_PETSC
   PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
 #endif
@@ -1550,7 +1554,7 @@ struct feenox_t {
       var_t *mesh_failed_interpolation_factor;
     } vars;
 
-  } mesh;  
+  } mesh;
   
   struct {
     unsigned int dimension;
@@ -2056,12 +2060,16 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, d
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *this);
 extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_H_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
 extern int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr);
+extern int feenox_mesh_compute_dxdr_at_gauss_1d(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_dxdr_at_gauss_general(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_drdx_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_dhdx_at_gauss(element_t *e, int v, int integration);
@@ -2126,7 +2134,7 @@ extern bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string);
 
 
 // init.c
-int feenox_mesh_element_types_init(void);
+extern int feenox_mesh_element_types_init(void);
 
 // geom.c
 // TODO: rename mesh_* -> feenox_mesh_*
@@ -2144,8 +2152,9 @@ extern double feenox_mesh_subtract_squared_module2d(const  double *b, const  dou
 extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
 
 // element.c
-extern int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *element);
-extern int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]);
+extern int feenox_mesh_compute_normal_2d(element_t *e);
+extern int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *e);
+extern int feenox_mesh_compute_element_barycenter(element_t *e, double barycenter[]);
 extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
 
 // cell.c

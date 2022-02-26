@@ -39,22 +39,20 @@ int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes) {
 
 
 
-int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsigned int v) {
+int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigned int v) {
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
 
-  if (mechanical.n_nodes != this->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_mechanical(this->type->nodes));
+  if (mechanical.n_nodes != e->type->nodes) {
+    feenox_call(feenox_problem_build_allocate_aux_mechanical(e->type->nodes));
   }
   
   if (mechanical.uniform_C == 0) {
     // material stress-strain relationship
-    feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
-    mechanical.compute_C(this->x[v], this->physical_group != NULL ? this->physical_group->material : NULL);
+    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
+    mechanical.compute_C(e->x[v], e->physical_group != NULL ? e->physical_group->material : NULL);
   }
   
   // TODO: axisymmetric
@@ -63,7 +61,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
 //  double w = this->w[v] * r_for_axisymmetric;
   
   unsigned int j = 0;
-  gsl_matrix *dhdx = this->dhdx[v];
+  gsl_matrix *dhdx = e->dhdx[v];
   for (j = 0; j < mechanical.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
@@ -103,18 +101,18 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsi
 
   // elemental stiffness B'*C*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mechanical.C, mechanical.B, 0, mechanical.CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, this->w[v], mechanical.B, mechanical.CB, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], mechanical.B, mechanical.CB, 1.0, feenox.pde.Ki));
 
   // thermal expansion strain vector
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
     // if C is not uniform we already have x
     if (mechanical.uniform_C == 1 && mechanical.uniform_expansion == 0) {
-      feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
+      feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
     }
-    mechanical.compute_thermal_strain(this->x[v], this->physical_group != NULL ? this->physical_group->material : NULL);
+    mechanical.compute_thermal_strain(e->x[v], e->physical_group != NULL ? e->physical_group->material : NULL);
     
     feenox_call(gsl_blas_dgemv(CblasTrans, 1.0, mechanical.C, mechanical.et, 0, mechanical.Cet));
-    feenox_call(gsl_blas_dgemv(CblasTrans, this->w[v], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
+    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
   }  
 
   // TODO: rhs with volumetric sources
