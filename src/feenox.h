@@ -2056,16 +2056,17 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, d
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *this);
 extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
-extern int feenox_mesh_compute_w_at_gauss(element_t *this, unsigned int v, int integration);
-extern int feenox_mesh_compute_H_at_gauss(element_t *this, unsigned int v, int integration);
-extern int feenox_mesh_compute_B_at_gauss(element_t *element, unsigned int v, unsigned int dofs, int integration);
-extern int feenox_mesh_compute_dhdx(element_t *this, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
-extern int feenox_mesh_compute_dxdr(element_t *this, double *r, gsl_matrix *dxdr);
-extern int feenox_mesh_compute_drdx_at_gauss(element_t *this, unsigned int v, int integration);
-extern int feenox_mesh_compute_dxdr_at_gauss(element_t *this, unsigned int v, int integration);
-extern int feenox_mesh_compute_dhdx_at_gauss(element_t *this, int v, int integration);
-extern int feenox_mesh_compute_x_at_gauss(element_t *this, unsigned int v, int integration);
-extern int feenox_mesh_compute_dof_indices(element_t *this, mesh_t *mesh);
+extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v);
+extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_H_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
+extern int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr);
+extern int feenox_mesh_compute_drdx_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_dhdx_at_gauss(element_t *e, int v, int integration);
+extern int feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
 
 #define feenox_mesh_update_coord_vars(val) {\
   feenox_var_value(feenox.mesh.vars.x) = val[0];\

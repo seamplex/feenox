@@ -30,7 +30,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
   
   feenox_call(feenox_mesh_compute_w_at_gauss(this, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(this, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.dofs, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_B_at_gauss(this, v, feenox.pde.mesh->integration));
   double *x = NULL;
   if (thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass) {
     feenox_call(feenox_mesh_compute_x_at_gauss(this, v, feenox.pde.mesh->integration));
@@ -49,7 +49,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
 
   // thermal stiffness matrix Bt*k*B
   double k = thermal.k.eval(&thermal.k, x, material);
-  gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, this->B[v], this->B[v], 1.0, feenox.pde.Ki);
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, this->B[v], this->B[v], 1.0, feenox.pde.Ki));
   
   // volumetric heat source term Ht*q
   // TODO: total source Q
@@ -78,7 +78,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *this, unsigne
     if (thermal.temperature_dependent_source) {
       double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
       // mind the positive sign!
-      gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, this->H[v], this->H[v], 1.0, feenox.pde.Jbi);
+      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, this->H[v], this->H[v], 1.0, feenox.pde.Jbi));
     }  
   }
     

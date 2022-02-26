@@ -115,7 +115,7 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
     // TODO: axisymmetric
     double w = element->w[v];
     // mind the positive sign!
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Jbi);
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Jbi));
   }
   
 #endif
