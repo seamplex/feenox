@@ -254,7 +254,7 @@ inline int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr) {
 inline void mesh_compute_x(element_t *e, double *r, double *x) {
 
   // only for volumetric elements
-  x[0] = x[1] = x[2];
+  x[0] = x[1] = x[2] = 0;
   for (unsigned int j = 0; j < e->type->nodes; j++) {
     double h = e->type->h(j, r);
     for (unsigned int m = 0; m < 3; m++) {
