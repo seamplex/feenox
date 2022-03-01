@@ -2265,11 +2265,7 @@ extern int feenox_problem_gradient_compute(void);
 extern int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh);
 extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 
-// problem-dependent virtual methods
-#include "pdes/laplace/methods.h"
-#include "pdes/thermal/methods.h"
-#include "pdes/mechanical/methods.h"
-#include "pdes/modal/methods.h"
-#include "pdes/neutron_diffusion/methods.h"
+// include problem-dependent virtual methods
+#include "pdes/methods.h"
 
 #endif    /* FEENOX_H  */

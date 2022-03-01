@@ -71,13 +71,16 @@
 
 ## Postprocessing output
 
- * symmetric & full tensors
- * vtu format
- * frd? (to be able to use ccx's post processor... is it worth it?)
- * binary msh and vtk
- * msh v4.1
- * support CGNS formats
- * MED
+ * formats
+   - vtu?
+   - xdmf? (needs DMView() and VecView())
+   - frd? (to be able to use ccx's post processor... is it worth it?)
+   - binary msh and vtk
+   - msh v4.1
+   - cgns?
+   - med?
+ 
+ * full tensors
  * problem-aware `WRITE_POST`
    - `full | displacements | stresses | strains | von_mises | tresca | principal`
    - `full | temperature | heat_flux`

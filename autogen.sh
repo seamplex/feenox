@@ -49,40 +49,36 @@ done
 # do not add doc to src unless they ask for it
 echo -n "creating Makefile.am... "
 if [ "x$1" = "x--doc" ]; then
-  cat << EOF > Makefile.am
-SUBDIRS = src doc
-
-dist_doc_DATA = AUTHORS ChangeLog TODO COPYING \\
-                README README.markdown \\
-                doc/feenox-desc.texi \\
-                doc/feenox.xml \\
-                doc/README.md \\
-                doc/CODE_OF_CONDUCT \\
-                doc/programming \\
-                doc/compilation \\
-                doc/FAQ \\
-                doc/syntax-kate.sh \\
-                doc/syntax-tex.sh \\
-                doc/nafems-le10-problem-input.eps \\
-                doc/lorenz.eps \\
-                doc/cantilever-displacement.eps \\
-                doc/fork.eps \\
-                doc/fork-meshed.eps \\
-                doc/laplace-square-gmsh.eps \\
-                doc/laplace-square-paraview.eps \\
-                doc/nafems-le10.eps
-                
-dist_man_MANS = doc/feenox.1
-EOF
-
+  cp Makefile-doc.am Makefile.am
 else
-  cat << EOF > Makefile.am
-SUBDIRS = src
-EOF
-
+  echo "SUBDIRS = src" > Makefile.am
 fi
-cat Makefile.base >> Makefile.am
+
+cat Makefile-base.am >> Makefile.am
 touch doc/feenox-desc.texi
+echo "ok"
+
+
+# detect the sources in pdes
+echo -n "creating src/Makefile.am... "
+
+cd src/pdes
+echo "// automatically generated in autogen.sh" > methods.h
+for pde in *; do
+ if [ -d ${pde} ]; then
+  if [ ! -e ${pde}/methods.h ]; then
+    echo "warning: ${pde} does not contain methods.h"
+  else
+    echo "#include \"${pde}/methods.h\"" >> methods.h
+  fi  
+ fi
+done
+
+cd ..
+
+cp Makefile-base.am Makefile.am
+find pdes \( -name "*.c" -o -name "*.h" \) | xargs echo -n >> Makefile.am
+cd ..
 echo "ok"
 
 echo "calling autoreconf... "
