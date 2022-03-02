@@ -27,7 +27,7 @@ extern neutron_diffusion_t neutron_diffusion;
 int feenox_problem_init_parser_neutron_diffusion(void) {
 
 #ifdef HAVE_PETSC
-  feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_neutron_diffusion;
+  feenox.pde.init_runtime_particular = feenox_problem_init_runtime_neutron_diffusion;
   feenox.pde.bc_parse = feenox_problem_bc_parse_neutron_diffusion;
 #ifdef HAVE_SLEPC
   feenox.pde.setup_eps = feenox_problem_setup_eps_neutron_diffusion;

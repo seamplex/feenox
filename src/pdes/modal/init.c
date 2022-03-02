@@ -45,7 +45,7 @@ int feenox_problem_parse_problem_modal(const char *token) {
 int feenox_problem_init_parser_modal(void) {
 
 #ifdef HAVE_SLEPC  
-  feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_modal;
+  feenox.pde.init_runtime_particular = feenox_problem_init_runtime_modal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_modal;
   feenox.pde.setup_eps = feenox_problem_setup_eps_modal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_modal;

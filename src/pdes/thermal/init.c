@@ -40,7 +40,7 @@ int feenox_problem_parse_problem_thermal(const char *token) {
 int feenox_problem_init_parser_thermal(void) {
 
 #ifdef HAVE_PETSC
-  feenox.pde.problem_init_runtime_particular = feenox_problem_init_runtime_thermal;
+  feenox.pde.init_runtime_particular = feenox_problem_init_runtime_thermal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_thermal;

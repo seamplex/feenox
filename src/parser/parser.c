@@ -2869,61 +2869,16 @@ int feenox_parse_reaction(void) {
 int feenox_parse_problem(void) {
 
 #ifdef HAVE_PETSC
-  int (*feenox_problem_parse_particular)(const char *) = NULL;
-  int (*feenox_problem_init_parser_particular)(void) = NULL;
-
-  char *token = NULL;
+  char *token = feenox_get_next_token(NULL);
+  feenox_call(feenox_pde_parse_problem_type(token));
+  
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-
-///kw_pde+PROBLEM+detail Currently, FeenoX can solve the following types of PDE problems:
-///kw_pde+PROBLEM+detail @    
-///kw_pde+PROBLEM+usage [ laplace
-///kw_pde+PROBLEM+detail  * `laplace` (or `poisson`) solves the Laplace (or Poisson) equation.
-    if (strcasecmp(token, "laplace") == 0 || strcasecmp(token, "poisson") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_problem_laplace;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_laplace;
-    
-///kw_pde+PROBLEM+usage | mechanical
-///kw_pde+PROBLEM+detail  * `mechanical` (or `elastic`) solves the mechanical elastic problem.
-///kw_pde+PROBLEM+detail If the mesh is two-dimensional, and not `AXISYMMETRIC`, either
-///kw_pde+PROBLEM+detail `plane_stress` or `plane_strain` has to be given instead of `mechanical`.
-    } else if (strcasecmp(token, "mechanical") == 0 || strcasecmp(token, "elastic") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_problem_mechanical;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_mechanical;
-
-///kw_pde+PROBLEM+usage | thermal
-///kw_pde+PROBLEM+detail  * `thermal` (or `heat` ) solves the heat conduction problem.
-    } else if (strcasecmp(token, "thermal") == 0 || strcasecmp(token, "heat") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_problem_thermal;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_thermal;
-
-///kw_pde+PROBLEM+usage | modal
-///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.        
-    } else if (strcasecmp(token, "modal") == 0) {
-#ifndef HAVE_SLEPC
-      feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
-      return FEENOX_ERROR;
-#endif
-      feenox_problem_parse_particular = feenox_problem_parse_problem_modal;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_modal;
-      
-///kw_pde+PROBLEM+usage | neutron_diffusion
-///kw_pde+PROBLEM+usage ]@
-///kw_pde+PROBLEM+detail  * `neutron_diffusion` multi-group core-level neutron diffusion with a FEM formulation 
-    } else if (strcasecmp(token, "neutron_diffusion") == 0) {
-      feenox_problem_parse_particular = feenox_problem_parse_problem_neutron_diffusion;
-      feenox_problem_init_parser_particular = feenox_problem_init_parser_neutron_diffusion;
-
-      
-///kw_pde+PROBLEM+detail @    
-///kw_pde+PROBLEM+detail If you are a programmer and want to contribute with another problem type, please do so!
-///kw_pde+PROBLEM+detail Check out the [programming guide in the FeenoX repository](https://github.com/seamplex/feenox/blob/main/doc/programming.md).
 
 ///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
 ///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIM`.
 ///kw_pde+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
 ///kw_pde+PROBLEM+usage [ 1D |
-    } else if (strcasecmp(token, "1d") == 0) {
+    if (strcasecmp(token, "1d") == 0) {
       feenox.pde.dim = 1;
 ///kw_pde+PROBLEM+usage 2D |
     } else if (strcasecmp(token, "2d") == 0) {
@@ -3091,8 +3046,8 @@ int feenox_parse_problem(void) {
       }
       
       
-    } else if (feenox_problem_parse_particular != NULL) {
-      feenox_call(feenox_problem_parse_particular(token));
+    } else if (feenox.pde.parse_particular != NULL) {
+      feenox_call(feenox.pde.parse_particular(token));
       
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
@@ -3110,14 +3065,14 @@ int feenox_parse_problem(void) {
     feenox.pde.dim = feenox.pde.mesh->dim;
   }
   
-  if (feenox_problem_init_parser_particular == NULL) {
+  if (feenox.pde.init_parser_particular == NULL) {
     feenox_push_error_message("undefined PROBLEM type");
     return FEENOX_ERROR;     
   }
   
   if (feenox.pde.petscinit_called == PETSC_FALSE) {
     feenox_call(feenox_problem_init_parser_general());
-    feenox_call(feenox_problem_init_parser_particular());
+    feenox_call(feenox.pde.init_parser_particular());
   } else {
     feenox_push_error_message("PROBLEM already initialized");
     return FEENOX_ERROR;    

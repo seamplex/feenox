@@ -1628,7 +1628,9 @@ struct feenox_t {
     mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
   
     // problem-specific virtual methods
-    int (*problem_init_runtime_particular)(void);
+    int (*parse_particular)(const char *);
+    int (*init_parser_particular)(void);
+    int (*init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
     int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t node_index);
 #ifdef HAVE_PETSC
@@ -2264,6 +2266,9 @@ extern int feenox_problem_build_assembly(void);
 extern int feenox_problem_gradient_compute(void);
 extern int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh);
 extern int feenox_problem_gradient_smooth_at_node(node_t *node);
+
+// pdes/parse.c
+extern int feenox_pde_parse_problem_type(const char *token);
 
 // include problem-dependent virtual methods
 #include "pdes/methods.h"
