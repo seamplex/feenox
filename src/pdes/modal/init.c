@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for modal analysis: initialization
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2022 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -25,7 +25,13 @@ extern feenox_t feenox;
 modal_t modal;
 
 int feenox_problem_parse_problem_modal(const char *token) {
-  
+
+///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.
+#ifndef HAVE_SLEPC
+  feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
+  return FEENOX_ERROR;
+#endif
+      
   if (token != NULL) {
     if (strcasecmp(token, "plane_stress") == 0) {
       modal.variant = variant_plane_stress;

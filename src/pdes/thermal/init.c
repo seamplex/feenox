@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for the heat equation: initialization
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021-2022 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -24,9 +24,10 @@
 extern feenox_t feenox;
 thermal_t thermal;
 
-///pb_thermal+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.
 int feenox_problem_parse_problem_thermal(const char *token) {
 
+///kw_pde+PROBLEM+detail  * `thermal` solves the heat conduction problem.
+  
   // no need to parse anything;
   if (token != NULL) {
     feenox_push_error_message("undefined keyword '%s'", token);

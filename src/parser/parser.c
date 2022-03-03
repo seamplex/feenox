@@ -278,8 +278,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
-///kw_pde+PROBLEM+desc Ask FeenoX to solve a partial-differential equation problem.
-///kw_pde+PROBLEM+usage PROBLEM
+// description is in pdes/parse.c      
     } else if (strcasecmp(token, "PROBLEM") == 0) {
 #ifdef HAVE_PETSC      
       feenox_call(feenox_parse_problem());
@@ -3027,7 +3026,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage [ DIRICHLET_SCALING { absolute <expr> | relative <expr> } ]@
 ///kw_pde+PROBLEM+detail The `DIRICHLET_SCALING` keyword controls the way Dirichlet boundary conditions
 ///kw_pde+PROBLEM+detail are scaled when computing the residual. Roughly, it defines how to compute
-///kw_pde+PROBLEM+detail the parameter\ $\alpha$ in <https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300>
+///kw_pde+PROBLEM+detail the parameter\ $\alpha$.^[<https://scicomp.stackexchange.com/questions/3298/appropriate-space-for-weak-solutions-to-an-elliptical-pde-with-mixed-inhomogeneo/3300#3300>]
 ///kw_pde+PROBLEM+detail If `absolute`, then $\alpha$ is equal to the given expression.
 ///kw_pde+PROBLEM+detail If `relative`, then $\alpha$ is equal to the given fraction of the average diagonal entries in the stiffness matrix.
 ///kw_pde+PROBLEM+detail Default is\ $\alpha = 1$.

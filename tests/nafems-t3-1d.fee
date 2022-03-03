@@ -1,6 +1,6 @@
 # NAFEMS-T3 benchmark: 1d transient heat conduction with dirichlet
 READ_MESH slab-1d-0.1m.msh DIMENSIONS 1
-PROBLEM heat
+PROBLEM thermal
 
 # transient up to 32 seconds
 dt_0 = 5e-3

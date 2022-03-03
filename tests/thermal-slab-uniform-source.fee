@@ -1,5 +1,5 @@
 READ_MESH slab.msh
-PROBLEM heat DIMENSIONS 1 DIRICHLET_SCALING relative 1
+PROBLEM thermal DIMENSIONS 1 DIRICHLET_SCALING relative 1
 
 BC left  T=0
 BC right T=0

@@ -1,4 +1,4 @@
-PROBLEM heat 1d
+PROBLEM thermal 1d
 READ_MESH slab.msh
 
 BC left  T=0

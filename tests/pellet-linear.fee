@@ -1,5 +1,5 @@
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/heat-generation/temperature-profile-nuclear-fuel/
-PROBLEM heat 3D
+PROBLEM thermal 3D
 READ_MESH pellet.msh
 
 k = 2.8

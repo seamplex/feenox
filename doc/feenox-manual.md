@@ -144,7 +144,7 @@ reference-laplace-va.md
 
 ## The heat conduction equation
 
-Set `PROBLEM` to `thermal` (or `heat`) to solve thermal conduction:
+Set `PROBLEM` to `thermal` to solve thermal conduction:
 
 $$\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)$$
 

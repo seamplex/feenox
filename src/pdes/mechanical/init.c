@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic mechanical initialization routines
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021--2022 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -26,6 +26,10 @@ extern feenox_t feenox;
 mechanical_t mechanical;
 
 int feenox_problem_parse_problem_mechanical(const char *token) {
+  
+///kw_pde+PROBLEM+detail  * `mechanical` solves the elastic problem using a displacement-based FEM formulation.
+///kw_pde+PROBLEM+detail If the mesh is two-dimensional and not `AXISYMMETRIC`, either
+///kw_pde+PROBLEM+detail `plane_stress` or `plane_strain` has to be given instead of `mechanical`.
   
   if (token != NULL) {
     if (strcasecmp(token, "plane_stress") == 0) {

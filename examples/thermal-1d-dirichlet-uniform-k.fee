@@ -21,7 +21,6 @@
 #.     - Syntactic sugared plain-text ASCII file
 #.     - Simple problems (like this one) need simple inputs
 #.     - FeenoX follows the UNIX rule of simplicity
-#.     - Robust parser (you can say `heat` or `thermal`)
 #.    
 #.  * Output is 100% user-defined
 #.     - No `PRINT` no output

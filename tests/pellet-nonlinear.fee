@@ -1,5 +1,5 @@
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/heat-generation/temperature-profile-nuclear-fuel/
-PROBLEM heat 3D
+PROBLEM thermal 3D
 READ_MESH pellet.msh
 
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/

@@ -1,5 +1,5 @@
 # NAFEMS-T3 benchmark: 1d transient heat conduction with dirichlet
-PROBLEM heat 3D
+PROBLEM thermal 3D
 READ_MESH slab-3d-0.1m.msh
 
 

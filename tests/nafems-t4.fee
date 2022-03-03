@@ -1,5 +1,5 @@
 # NAFEMS-T4 benchmark: 2d steady-state heat conduction with convection
-PROBLEM heat 2D
+PROBLEM thermal 2D
 READ_MESH nafems-t4.msh
 
 # thermal conductivity

@@ -53,7 +53,9 @@ echo "creating the reference markdown from the commented sources"
 echo " - keywords"
 ./reference.sh ../src/parser/parser.c                kw     > reference-kw.md
 ./reference.sh ../src/parser/parser.c                kw_dae > reference-dae-kw.md
-./reference.sh ../src/parser/parser.c                kw_pde > reference-pde-kw.md
+cat ../src/pdes/parse.c ../src/parser/parser.c > tmp
+./reference.sh tmp                                   kw_pde > reference-pde-kw.md
+rm tmp
 echo " - variables"
 ./reference.sh ../src/flow/init.c                    va     > reference-va.md
 ./reference.sh ../src/flow/init.c                    va_dae > reference-dae-va.md

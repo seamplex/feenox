@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for Laplace's equation: initialization
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2022 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -24,8 +24,11 @@
 extern feenox_t feenox;
 laplace_t laplace;
 
+///pb_laplace+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.
 int feenox_problem_parse_problem_laplace(const char *token) {
 
+///kw_pde+PROBLEM+detail  * `laplace` solves the Laplace (or Poisson) equation.
+  
   // no need to parse anything;
   if (token != NULL) {
     feenox_push_error_message("undefined keyword '%s'", token);

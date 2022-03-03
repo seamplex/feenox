@@ -1,6 +1,6 @@
 # NAFEMS-T2 benchmark: 1d steady-state heat conduction with radiation
 READ_MESH slab-3d-0.1m.msh DIMENSIONS 3
-PROBLEM heat
+PROBLEM thermal
 
 l = 0.1      # slab length in meters (used in the mesh)
 

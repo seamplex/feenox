@@ -1,4 +1,4 @@
-PROBLEM heat 3D
+PROBLEM thermal 3D
 READ_MESH pellet.msh
 
 end_time = 30

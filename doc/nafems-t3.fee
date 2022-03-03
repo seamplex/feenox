@@ -1,4 +1,4 @@
-PROBLEM heat DIM 1 # NAFEMS-T3 benchmark: 1d transient heat conduction
+PROBLEM thermal DIM 1 # NAFEMS-T3 benchmark: 1d transient heat conduction
 READ_MESH slab-0.1m.msh
 
 end_time = 32      # transient up to 32 seconds

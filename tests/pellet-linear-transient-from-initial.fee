@@ -1,4 +1,4 @@
-PROBLEM heat 3D PC_TYPE gamg KSP_TYPE cg
+PROBLEM thermal 3D PC_TYPE gamg KSP_TYPE cg
 READ_MESH pellet.msh
 
 end_time = 30

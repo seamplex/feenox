@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for neutron diffusion FEM: initialization
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2022 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -26,6 +26,8 @@ extern neutron_diffusion_t neutron_diffusion;
 
 int feenox_problem_init_parser_neutron_diffusion(void) {
 
+///kw_pde+PROBLEM+detail  * `neutron_diffusion` multi-group core-level neutron diffusion with a FEM formulation 
+  
 #ifdef HAVE_PETSC
   feenox.pde.init_runtime_particular = feenox_problem_init_runtime_neutron_diffusion;
   feenox.pde.bc_parse = feenox_problem_bc_parse_neutron_diffusion;
