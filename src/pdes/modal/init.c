@@ -175,6 +175,9 @@ int feenox_problem_init_parser_modal(void) {
     feenox_free(modename);
   }
 
+#else
+  feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
+  return FEENOX_ERROR;
 #endif
   
   return FEENOX_OK;
