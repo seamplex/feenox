@@ -56,9 +56,12 @@ int feenox_initialize(int argc, char **argv) {
     { "versions",     no_argument,       NULL, 'V'},
     { "long-version", no_argument,       NULL, 'V'},
     { "version-long", no_argument,       NULL, 'V'},
+///op+pdes+option `--pdes`
+///op+pdes+desc list the types of `PROBLEM`s that FeenoX can solve, one per line
+    { "pdes",         no_argument,       NULL, 'p'},
 //op+debug+option `-d`, `--debug`.
 //op+debug+desc start in debug mode
-    { "debug",        no_argument,       NULL, 'd'},
+//    { "debug",        no_argument,       NULL, 'd'},
 //op+summarize+option `-s`, `--sumarize`
 //op+summarize+desc list all symbols in the input file and exit
 //    { "summarize",    no_argument,       NULL, 's'},
@@ -113,12 +116,15 @@ int feenox_initialize(int argc, char **argv) {
       case 'V':
         show_version = version_info;
         break;
-      case 'd':
-        feenox.debug = 1;
+      case 'p':
+        show_version = version_available_pdes;
         break;
-      case 's':
-        feenox.mode = mode_list_vars;
-        break;
+//      case 'd':
+//        feenox.debug = 1;
+//        break;
+//      case 's':
+//        feenox.mode = mode_list_vars;
+//        break;
       case '?':
         break;
       default:

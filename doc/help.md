@@ -17,6 +17,11 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 :    display detailed version information
 
 
+`--pdes`
+
+:    list the types of `PROBLEM`s that FeenoX can solve, one per line
+
+
 `--progress`
 
 :    print ASCII progress bars when solving PDEs

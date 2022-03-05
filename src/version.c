@@ -24,6 +24,7 @@ extern feenox_t feenox;
 
 #include "version.h"
 #include "help.h"
+#include "pdes/available.h"
 
 #include <stdio.h>
 #include <gsl/gsl_version.h>
@@ -75,6 +76,15 @@ void feenox_show_version(int version) {
   
   // in parallel runs only print from first processor
   if (feenox.rank != 0) {
+    return;
+  }
+  
+  if (version == version_available_pdes) {
+#if HAVE_PETSC
+    printf(AVAILABLE_PDES);
+#else
+    printf("FeenoX was not linked against PETSc. No PDEs are available.\n");
+#endif
     return;
   }
   
@@ -208,4 +218,3 @@ void feenox_longversion(void) {
 
   return;
 }
-

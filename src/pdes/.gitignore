@@ -1,1 +1,4 @@
+# generated from autogen.sh
 methods.h
+parse.c
+available.h

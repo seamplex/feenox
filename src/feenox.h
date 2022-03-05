@@ -196,7 +196,8 @@
 enum version_type {
   version_compact,
   version_copyright,
-  version_info
+  version_info,
+  version_available_pdes,
 };
 
 // macro to check error returns in function calls
