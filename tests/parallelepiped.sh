@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpetsc
+checkpde mechanical
 checkgmsh
 
 gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 2

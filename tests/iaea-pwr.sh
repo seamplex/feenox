@@ -11,6 +11,7 @@ fi
 
 checkgmsh
 checkslepc
+checkpde neutron_diffusion
 
 gmsh -v 0 -2 ${dir}/2dpwr-quarter.geo
 answer1 2dpwr.fee quarter "1.02986"

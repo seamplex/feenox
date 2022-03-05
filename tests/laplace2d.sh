@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpetsc
+checkpde laplace
 checkgmsh
 
 gmsh -2 ${dir}/square-centered.geo

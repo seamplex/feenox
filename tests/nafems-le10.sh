@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpetsc
+checkpde mechanical
 checkgmsh
 
 gmsh -3 ${dir}/nafems-le10.geo

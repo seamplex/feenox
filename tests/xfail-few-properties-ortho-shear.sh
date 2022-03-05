@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpetsc
+checkpde mechanical
 
 answer xfail-few-properties-ortho-shear.fee "0.41"
 exit $?

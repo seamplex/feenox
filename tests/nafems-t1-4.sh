@@ -9,8 +9,9 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+checkpde thermal
+
 # t1 and t4 are separated from t2 & t3 because they needs gmsh
-checkpetsc
 checkgmsh
 
 gmsh -2 ${dir}/nafems-t1.geo

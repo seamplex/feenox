@@ -1,0 +1,23 @@
+PROBLEM elastic 3D
+READ_MESH cube-hex.msh
+
+E = 1
+nu = 0
+
+BC left  fixed
+BC right Fx=1
+
+SOLVE_PROBLEM
+REACTION left   RESULT left
+REACTION right  RESULT right
+REACTION bottom RESULT bottom
+REACTION top    RESULT top
+REACTION front  RESULT front
+REACTION back   RESULT back
+
+PRINT left
+PRINT right
+PRINT bottom
+PRINT top
+PRINT front
+PRINT back

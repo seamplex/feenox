@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpetsc
+checkpde thermal
 
 answer thermal-two-squares-material-explicit-uniform.fee "0.75"
 exitifwrong $?

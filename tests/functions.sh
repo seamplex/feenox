@@ -55,6 +55,14 @@ checkslepc() {
  fi
 }
 
+checkpde() {
+ checkpetsc
+ if [ $(${feenox} --pdes | grep $1 | wc -l) = 0 ]; then
+  echo "FeenoX was not compiled with $1, skipping test"
+  exit 77
+ fi
+}
+
 # checks if feenox is compiled with mumps and skips the test if necessary
 checkmumps() {
  if [ $(${feenox} --versions | grep 'mumps' | grep -v 'N/A'| wc -l) = 0 ]; then

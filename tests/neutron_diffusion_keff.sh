@@ -9,6 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+checkpde neutron_diffusion
 checkslepc
 
 answerzero ud20-1-0-sl.fee

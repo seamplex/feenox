@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpetsc
+checkpde mechanical
 has_gmsh=$(which gmsh)
 
 # # for i in tri3 tri6s tri6c quad4 quad8s quad8c quad9s quad9c; do

@@ -10,6 +10,7 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkslepc
+checkpde modal
 
 # the meshes are in the git repository, but just in case this is how they can be re-generated
 # for i in beam-cantilever-*.geo; do gmsh -3 $i; done
