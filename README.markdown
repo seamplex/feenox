@@ -20,9 +20,9 @@ The world is already full of finite-element programs and every day a
 grad student creates a new one from scratch. So why adding FeenoX to the
 already-crowded space of FEA tools?
 
-To better illustrate the point, let us first consider what the options
-are when an engineer needs to to write a technical report, paper or
-document:
+To better illustrate FeenoX’ unfair advantage (in the entrepreneurial
+sense), let us first consider what the options are when an engineer
+needs to to write a technical report, paper or document:
 
 | Feature                           | Microsoft Word | Google Docs | Markdown[1] | (La)TeX |
 |:----------------------------------|:--------------:|:-----------:|:-----------:|:-------:|
@@ -35,10 +35,10 @@ document:
 | Non-nerd friendliness             |       ✅        |      ✅      |      😐      |    ❌    |
 
 After analyzing the pros and cons of each alternative, at some point it
-should be evident that Markdown (plus friends) gives the best trade off.
-We can then perform a similar analysis for the options available in
-order to solve an engineering problem casted as a PDE, say by using a
-finite-element formulation:
+should be evident that [Markdown][] (plus friends) gives the best trade
+off. We can then perform a similar analysis for the options available in
+order to solve an engineering problem casted as a partial differential
+equation, say by using a finite-element formulation:
 
 | Feature               | Desktop GUIs | Web frontends | FeenoX[2] | Libraries |
 |:----------------------|:------------:|:-------------:|:---------:|:---------:|
@@ -51,16 +51,20 @@ finite-element formulation:
 | Non-nerd friendliness |      ✅       |       ✅       |     😐     |     ❌     |
 
 Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
-programs (like Code Aster with Salome or CalculiX with PrePoMax) and
-libraries (like MoFEM or Sparselizard) what Markdown is to Word and
-(La)TeX, respectively and deliberately.
+programs (like [Code_Aster][] with [Salome-Meca][] or [CalculiX][] with
+[PrePoMax][]) and libraries (like [MoFEM][] or [Sparselizard][]) what
+[Markdown][1] is to Word and [(La)TeX][], respectively and
+*deliberately*.
 
 On the other hand, FeenoX meets a fictitious-yet-plausible [Software
 Requirement Specifications][] that no other single tool (that I am aware
 of) meets completely. The FeenoX [Software Design Specifications][]
-address each requirement of the SRS. The first and more important
-requirement is that FeenoX is both free (as in freedom) and open source.
-See [Licensing][].
+address each requirement of the SRS. The two more important design-basis
+features are that FeenoX is…
+
+1.  a cloud-first computational tool (not just cloud *friendly,* but
+    cloud **first**).
+2.  both free (as in freedom) and open source. See [Licensing][].
 
 If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
 [FAQs][].
@@ -71,11 +75,19 @@ If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
 [2] Here “FeenoX” means ([FeenoX][] + [Gmsh][] + [Paraview][] + [Git][]
 + [Github][] / [Gitlab][] / [Gitea][])
 
+  [Markdown]: https://en.wikipedia.org/wiki/Markdown
+  [Code_Aster]: https://www.code-aster.org/spip.php?rubrique2
+  [Salome-Meca]: https://www.code-aster.org/V2/spip.php?article303
+  [CalculiX]: http://www.calculix.de/
+  [PrePoMax]: https://prepomax.fs.um.si/
+  [MoFEM]: http://mofem.eng.gla.ac.uk/mofem/html/
+  [Sparselizard]: http://sparselizard.org/
+  [1]:
+  [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
   [Licensing]: #licensing
   [FAQs]: doc/FAQ.md
-  [Markdown]: https://en.wikipedia.org/wiki/Markdown
   [Pandoc]: https://pandoc.org/
   [Git]: https://git-scm.com/
   [Github]: https://github.com/
@@ -135,7 +147,7 @@ $ feenox thermal-1d-dirichlet-constant-k.fee
 $ 
 ```
 
-The mesh is assumed to have been already created with [Gmsh][1] (or any
+The mesh is assumed to have been already created with [Gmsh][2] (or any
 other pre-processing tool and converted to `.msh` format with [Meshio][]
 for example). This assumption follows the *rule of composition* and
 prevents the actual input file to be polluted with mesh-dependent data
@@ -319,7 +331,7 @@ WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
 
 This VTK file can then be post-processed to create interactive 3D views,
 still screenshots, browser and mobile-friendly webGL models, etc. In
-particular, using [Paraview][2] one can get a colorful bitmapped PNG
+particular, using [Paraview][3] one can get a colorful bitmapped PNG
 (the displacements are far more interesting than the stresses in this
 problem).
 
@@ -353,7 +365,7 @@ Some basic rules are
 
     Following the *rules of separation, parsimony and diversity*,
     **there is no embedded graphical interface** but means of using
-    generic pre and post processing tools—in particular, [Gmsh][1] and
+    generic pre and post processing tools—in particular, [Gmsh][2] and
     [Paraview][] respectively. See also [CAEplex][] for a web-based
     interface.
 
@@ -394,14 +406,14 @@ problems, as implied in the “community-contributed problems” bullet
 above (*rules of modularity and extensibility*). See the
 [documentation][] for details about how to contribute.
 
-  [1]: http://gmsh.info/
+  [2]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
   [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
   [gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
-  [2]: https://www.paraview.org
+  [3]: https://www.paraview.org
   [Paraview]: https://www.paraview.org/
   [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
@@ -423,8 +435,8 @@ below][] for details.
 | Github repository  | <https://github.com/seamplex/feenox/>          |
 
 -   Be aware that FeenoX is a backend. It **does not have a GUI**. Read
-    the [documentation][3], especially the [description][] and the
-    [FAQs][4]. Ask for help on the [GitHub discussions page][].
+    the [documentation][4], especially the [description][] and the
+    [FAQs][5]. Ask for help on the [GitHub discussions page][].
 
 -   Binaries are provided as statically-linked executables for
     convenience. They do not support MUMPS nor MPI and have only basic
@@ -444,9 +456,9 @@ below][] for details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
-  [3]: https://seamplex.com/feenox/doc/
+  [4]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [4]: https://seamplex.com/feenox/doc/FAQ.html
+  [5]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilatation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
@@ -522,11 +534,11 @@ git pull
 sudo make install
 ```
 
-See the [detailed compilation instructions][5] for further details.
+See the [detailed compilation instructions][6] for further details.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [detailed compilation instructions]: compilation.md
-  [5]: doc/compilation.md
+  [6]: doc/compilation.md
 
 # Licensing
 
@@ -566,7 +578,7 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][6] version 3 or, at the user convenience, any later version.
+License][7] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[3]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -624,7 +636,7 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [6]: https://www.gnu.org/licenses/gpl-3.0
+  [7]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
@@ -634,7 +646,7 @@ Home page: <https://www.seamplex.com/feenox>
 Repository: <https://github.com/seamplex/feenox>  
 Bug reporting: <https://github.com/seamplex/feenox/issues>  
 Discussions: <https://github.com/seamplex/feenox/discussions>  
-Follow us: [YouTube][] [LinkedIn][] [Github][7]
+Follow us: [YouTube][] [LinkedIn][] [Github][8]
 
 ------------------------------------------------------------------------
 
@@ -647,7 +659,7 @@ See the [copying conditions][].
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
-  [7]: https://github.com/seamplex
+  [8]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html
   [copying conditions]: COPYING

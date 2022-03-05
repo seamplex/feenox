@@ -13,11 +13,24 @@ documentclass: report
 > 100-introduction.md
 > ```
 
-Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). This condition leaves all of the well-known non-free (i.e. [incorrectly-called "commercial"](https://www.gnu.org/philosophy/words-to-avoid.en.html#Commercial)) finite-element solvers available in the market (NASTRAN, Abaqus, ANSYS, Midas, etc.) out of the tender.
+[FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems.
+
+```{.include}
+why.md
+```
+
+Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). 
 
 ```include
 licensing.md
 ```
+
+To sum up this section, FeenoX is...
+
+ 1. a cloud-first computational tool (not just cloud _friendly,_ but cloud **first**).
+ 2. both free ([as in freedom](https://en.wikipedia.org/wiki/Free_as_in_Freedom)) and open source.
+
+
 
 ## Objective {#sec:objective}
 
@@ -33,10 +46,11 @@ The choice of the initial supported features is based on the types of problem th
  * mechanical elasticity
  * structural modal analysis
  * multi-group neutron transport and diffusion
- 
-FeenoX is designed to be developed and executed under GNU/Linux, which is the architecture of more than 95% of the internet servers which we collectively call “the cloud.” It should be noted that GNU/Linux is a POSIX-compliant version of UNIX and that FeenoX follows the rules of Unix philosophy (further explained in @sec:unix) for the actual computational implementation. Besides POSIX, as explained further below in @sec:scalability, FeenoX also uses MPI which is a well-known industry standard for massive execution of parallel processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC or laptop.
 
-The requirement to run in the cloud and scale up as needed rules out some the open source solver [CalculiX](http://www.calculix.de/). There are some other requirements in the SRS that also leave CalculiX out of the tender.
+@Sec:extensibility explains the mechanisms that FeenoX provides in order to add (or even remove) other types of problems  to be solved.
+ 
+Recalling that FeenoX is a “cloud-first” tool, it is designed to be developed and executed primarily on [GNU/Linux](https://www.gnu.org/gnu/linux-and-gnu.html) hosts, which is the architecture of more than 90% of the internet servers which we collectively call “the public cloud.” It should be noted that GNU/Linux is a [POSIX](https://en.wikipedia.org/wiki/POSIX)-compliant operating system which is compatible with [Unix](https://en.wikipedia.org/wiki/Unix), and that FeenoX follows the rules of Unix philosophy (further explained in @sec:unix) for the actual computational implementation. Besides the POSIX standard, as explained further below in @sec:scalability, FeenoX also uses [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) which is a well-known industry standard for massive execution of parallel processes, both in multi-core hosts and multi-hosts environments. Finally, if performance and/or scalability are not important issues, FeenoX can be run in a (properly cooled) local PC, laptop or even in embedded systems such as [Raspberry\ Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) (see @sec:architecture).
+
 
 ## Scope {#sec:scope}
 
@@ -45,16 +59,16 @@ The requirement to run in the cloud and scale up as needed rules out some the op
 > ```
 
 
-Indeed, FeenoX is designed to work very much like a transfer function between one (or more) files and zero or more output files:
+Since FeenoX is designed to be executed _in the cloud_, it works very much like a transfer function between one (or more) files and zero or more output files:
 
 ```include
 transfer.md
 ```
 
-Technically speaking, FeenoX can be seen as a Unix filter designed to read an ASCII-based stream of characters (i.e. the input file, which in turn can include other input files or contain instructions to read data from mesh and/or other data files) and to write ASCII-formatted data into the standard output and/or other files. The input file can be created either by a human or by another program. The output stream and/or files can be read by either a human and/or another programs.
+Technically speaking, FeenoX can be seen as a [Unix filter](https://en.wikipedia.org/wiki/Filter_(software)) designed to read an [ASCII](https://en.wikipedia.org/wiki/ASCII)-based stream of characters (i.e. the input file, which in turn can include other input files or contain instructions to read data from mesh and/or other data files) and to write ASCII-formatted data into the standard output and/or other files. The input file can be prepared either by a human or by another program. The output stream and/or files can be read by either a human and/or another programs.
 A quotation from [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/) helps to illustrate this idea:
 
-> [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy), the inventor of [Unix pipes](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29) and one of the founders of the [Unix tradition](https://en.wikipedia.org/wiki/Unix), had this to say at the time:
+> [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy), the inventor of [Unix pipes](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29) and one of the founders of the [Unix tradition](https://en.wikipedia.org/wiki/Unix_philosophy), had this to say at the time:
 >
 >   (i) Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new features.
 >
@@ -67,12 +81,7 @@ A quotation from [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix P
 >   * This is the Unix philosophy: Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface.
 
 
-Keep in mind that even though 
-
- i. the quotes above, and
- ii. many FEA programs that are still mainstream today
- 
-date both from the early 1970s, fifty years later they still
+Keep in mind that even though both the quotes above and many finite-element programs that are still mainstream today date both from the early 1970s, fifty years later the latter still
 
  * do not make just only one thing well,
  * do complicate old programs by adding new features,
@@ -81,17 +90,19 @@ date both from the early 1970s, fifty years later they still
  * do use stringently columnar and/or binary input (and output!) formats, and/or
  * do insist on interactive output.
 
+There are other FEA tools that even though born closer in time, also follow the above bullets literally.
 
 ```include
 lorenz.md
 ```
 
-As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's 17 Unix Rules ([sec:unix]) in particular. One of the main ideas is the _rule of separation_ that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to PDEs, where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows rule of separation.
+As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's\ 17\ Unix Rules ([sec:unix]) in particular. One of the main ideas is the _rule of separation_ that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to partial differential equations (PDEs), where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows rule of separation.
 Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 
 From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user. Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based immersive augmented-reality application) without needing the modify the backend. Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
 
 In the very same sense, FeenoX does not discretize continuous domains for PDE problems itself, but relies on separate tools for this end. Fortunately, there already exists one meshing tool which is FOSS (GPLv2) and shares most (if not all) of the design basis principles with FeenoX: the three-dimensional finite element mesh generator [Gmsh](http://gmsh.info/).
+
 Strictly speaking, FeenoX does not need to be used along with Gmsh but with any other mesher able to write meshes in Gmsh's format `.msh`. But since Gmsh also
 
  * is free and open source,
@@ -117,44 +128,50 @@ Even though the initial version of FeenoX does not provide an API for high-level
 > 200-architecture.md
 > ```
 
-FeenoX can be seen as a third-system effect, being the third version written from scratch after a first implementation in 2009 and an second one which was far more complex and had far more features circa 2012--2014. The third attempt explicitly addresses the "do one thing well" idea from Unix. 
+FeenoX can be seen as a third-system effect, being the third version written from scratch after a first implementation in 2009 and an second one which was far more complex and had far more features circa 2012--2014. The third attempt explicitly addresses the “do one thing well” idea from Unix. 
 
 Furthermore, not only is FeenoX itself both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but, following the _rule of composition_, it also is designed to connect and to work with  other free and open source software such as
 
  * [Gmsh](http://gmsh.info/) for pre and/or post-processing
  * [ParaView](https://www.paraview.org/) for post-processing
- * [Gnuplot](http://gnuplot.info/) for plotting
- * [Pyxplot](http://www.pyxplot.org.uk/) for plotting
+ * [Gnuplot](http://gnuplot.info/) for plotting 1D/2D results
+ * [Pyxplot](http://www.pyxplot.org.uk/) for plotting 1D results
  * [Pandoc](https://pandoc.org/) for creating tables and documents
  * [TeX](https://tug.org/) for creating tables and documents
  
 and many others, which are readily available in all major GNU/Linux distributions.
 
-FeenoX also makes use of high-quality free and open source mathematical libraries which contain numerical methods designed by mathematicians and programmed by professional programmers. In particuar, it depends on
+FeenoX also makes use of high-quality free and open source mathematical libraries which contain numerical methods designed by mathematicians and implemented by professional programmers. In particular, it depends on
 
  * [GNU Scientific Library](https://www.gnu.org/software/gsl/) for general mathematics,
  * [SUNDIALS IDA](https://computing.llnl.gov/projects/sundials/ida) for ODEs and DAEs,
  * [PETSc](http://https://petsc.org) for PDEs, and
  * [SLEPc](http://slepc.upv.es/) for PDEs involving eigen problems
  
-Therefore, if one zooms in into the block of the transfer function above, FeenoX can also be seen as a glue layer between the input file and the mesh defining a PDE-casted problem and the mathematical libraries used to solve the discretized equations. This way, FeenoX bounds its scope to do only one thing and to do it well: to build and solve finite-element formulations of thermo-mechanical problems. And it does so on high grounds, both
+Therefore, if one zooms in into the block of the transfer function above, FeenoX can also be seen as a [glue layer](https://www.linuxtopia.org/online_books/programming_books/art_of_unix_programming/ch04s03_1.html) between the input files defining a physical problem and the mathematical libraries used to solve the discretized equations. This way, FeenoX bounds its scope to do only one thing and to do it well: to build and solve finite-element formulations of physical problems. And it does so on high grounds, both ethical and technological:
 
- i. ethical: since it is [free software](https://www.gnu.org/philosophy/open-source-misses-the-point.en.html), all users can
-      0. run,
-      1. share,
-      2. modify, and/or
-      3. re-share their modifications.
+Ethical
+
+:   Since it is [free software](https://www.gnu.org/philosophy/open-source-misses-the-point.en.html), all users can
+
+     0. run,
+     1. share,
+     2. modify, and/or
+     3. re-share their modifications.
       
-    If a user cannot read or write code to make FeenoX suit her needs, at least she has the _freedom_ to hire someone to do it for her, and
-    
- ii. technological: since it is [open source](http://www.catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/), advanced users can detect and correct bugs and even improve the algorithms. [Given enough eyeballs, all bugs are shallow.](https://en.wikipedia.org/wiki/Linus%27s_law)
+    If a user cannot read or write code to make FeenoX suit her needs, at least she has the _freedom_ to hire someone to do it for her.
 
-FeenoX’ main development architecture is Debian GNU/Linux running over 64-bits Intel-compatible processors.
-All the dependencies are free and/or open source and already available in Debian’s official repositories, as explained in @sec:deployment.
+Technological
+
+:   Since it is [open source](http://www.catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/), advanced users can detect and correct bugs and even improve the algorithms. [Given enough eyeballs, all bugs are shallow.](https://en.wikipedia.org/wiki/Linus%27s_law)
+
+
+FeenoX’ main development architecture is [Debian GNU/Linux](https://www.debian.org/) running over 64-bits Intel-compatible processors.
+All the dependencies are free and/or open source and already available in Debian’s latest stable official repositories, as explained in @sec:deployment.
 
 The POSIX standard is followed whenever possible, allowing thus FeenoX to be compiled in other operating systems and architectures such as Windows (using [Cygwin](https://www.cygwin.com/)) and MacOS. The build procedure is the well-known and mature `./configure && make` command. 
 
-FeenoX is written in plain\ C conforming to the ISO\ C99 specification (plus POSIX extensions), which is a standard, mature and widely supported language with compilers for a wide variety of architectures. 
+FeenoX is written in\ [C](https://en.wikipedia.org/wiki/C_(programming_language)) conforming to the [ISO\ C99](https://en.wikipedia.org/wiki/C99) specification (plus POSIX extensions), which is a standard, mature and widely supported language with compilers for a wide variety of architectures. 
 For its basic mathematical capabilities, FeenoX uses the [GNU Scientifc Library](https://www.gnu.org/software/gsl/).
 For solving ODEs/DAEs, FeenoX relies on [Lawrence Livermore’s SUNDIALS library](https://computing.llnl.gov/projects/sundials/ida). For PDEs, FeenoX uses [Argonne’s PETSc library](https://www.mcs.anl.gov/petsc/) and [Universitat Politècnica de València's SLEPc library](https://slepc.upv.es/). All of them are
 
@@ -162,7 +179,7 @@ For solving ODEs/DAEs, FeenoX relies on [Lawrence Livermore’s SUNDIALS library
  * written in C (neither Fortran nor C++),
  * mature and stable,
  * actively developed and updated,
- * very well known in the industry and academia.
+ * very well known both in the industry and academia.
 
 Moreover, PETSc and SLEPc are scalable through the [MPI standard](https://www.mcs.anl.gov/research/projects/mpi/standard.html) (further discussed in @sec:scalability). This means that programs using both these libraries can run on either large high-performance supercomputers or low-end laptops. FeenoX has been run on
 
@@ -171,9 +188,9 @@ Moreover, PETSc and SLEPc are scalable through the [MPI standard](https://www.mc
  - Macbook
  - Desktop PC
  - Bare-metal servers
- - Vagrant/Virtualbox
- - Docker/Kubernetes
- - AWS/DigitalOcean/Contabo
+ - Vagrant/Virtualbox virtual machines
+ - Docker/Kubernetes containers
+ - AWS/DigitalOcean/Contabo instances
 
 Due to the way that FeenoX is designed and the policy separated from the mechanism, it is possible to control a running instance remotely from a separate client which can eventually run on a mobile device ([@fig:caeplex-ipad]).
 
@@ -197,12 +214,12 @@ As already stated, FeenoX can be compiled from its sources using the well-establ
 
 The configuration and compilation is based on [GNU Autotools](https://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html) that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of UNIX variants. It has been tested with
 
- * GNU C compiler
- * LLVM Clang compiler
- * Intel C compiler
+ * [GNU C compiler](https://gcc.gnu.org/)
+ * [LLVM Clang compiler](http://clang.org/)
+ * [Intel C compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)
 
  
-FeenoX depends on the four open source libraries stated in @sec:architecture, with the last three of them being optional. The only mandatory library is the GNU Scientific Library which is part of the GNU/Linux operating system and as such is readily available in all distributions as `libgsl-dev`. The sources of the rest of the optional libraries are also widely available in most common GNU/Linux distributions.
+FeenoX depends on the four open source libraries stated in @sec:architecture, although the last three of them are optional. The only mandatory library is the GNU Scientific Library which is part of the GNU/Linux operating system and as such is readily available in all distributions as `libgsl-dev`. The sources of the rest of the optional libraries are also widely available in most common GNU/Linux distributions.
 
 In effect, doing 
 
@@ -217,7 +234,7 @@ If using the Git repository as a source, then [Git](https://git-scm.com/) itself
 sudo apt-get install git autoconf automake
 ```
 
-Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executables that do not need any other shared libraries to be present on the target host, but their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweights the limited functionality and scalability of the tool.
+Even though compiling FeenoX from sources is the recommended way to obtain the tool, since the target binary can be compiled using particularly suited compilation options, flags and optimizations (especially those related to MPI, linear algebra kernels and direct and/or iterative sparse solvers), there are also tarballs with usable binaries for some of the most common architectures---including some non-GNU/Linux variants. These binary distributions contain statically-linked executable files that do not need any other shared libraries to be installed on the target host. However, their flexibility and efficiency is generic and far from ideal. Yet the flexibility of having an execution-ready distribution package for users that do not know how to compile C source code outweighs the limited functionality and scalability of the tool.
 
 For example, first PETSc can be built with a `-Ofast` flag:
 
@@ -241,7 +258,7 @@ $ make -j8
 # make install
 ```
    
-If one does not care about the details of the compilation, then a pre-compiled statically-linked binaries can be directly downloaded very much as when downloading Gmsh:
+If one does not care about the details of the compilation, then a pre-compiled statically-linked binary can be directly downloaded very much as when downloading Gmsh:
  
 ```terminal
 $ wget http://gmsh.info/bin/Linux/gmsh-Linux64.tgz
@@ -259,11 +276,11 @@ Since all the commands needed to either download a binary executable or to compi
 > 220-execution.md
 > ```
 
-As FeenoX is designed to run as a file filter (i.e. as a transfer function between input and output files) and it explicitly avoids having a graphical interface, the binary executable works as any other UNIX terminal command. When invoked without arguments, it prints its version (a through explanation of the versioning scheme is given in @sec:traceability), a one-line description and the usage options:
+As FeenoX is designed to run as a file filter---or as a transfer function between input and output files from a more traditional engineering point of view---and it explicitly avoids having a graphical interface, the binary executable works as any other Unix terminal command. When invoked without arguments, it prints its version (a thorough explanation of the versioning scheme is given in @sec:traceability), a one-line description and the usage options:
 
 ```terminal
 $ feenox
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.37-g5b19c32
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
@@ -271,20 +288,25 @@ usage: feenox [options] inputfile [replacement arguments] [petsc options]
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
 
 Run with --help for further explanations.
 ```
 
-The program can also be executed remotely
+The program can also be executed remotely either
 
- 1. on a server through a SSH session
- 2. in a container as part of a provisioning script
+ a. on a server through a [SSH](https://en.wikipedia.org/wiki/Secure_Shell) session
+ b. in a [container](https://en.wikipedia.org/wiki/OS-level_virtualization) as part of a provisioning script
 
 
  
-FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. Progress can be as simple as an ASCII bar (triggered with `--progress`) to more complex mechanisms like writing the status in a shared memory segment.
+FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. Progress can be as simple as an ASCII bar (triggered with `--progress` in the command line or with the keyword `PROGRESS` in the input file) to more complex mechanisms like writing the status in a shared memory segment.
 
-Regarding its execution, there are three ways of solving problems: direct execution, parametric runs and optimization loops.
+Regarding its execution, there are three ways of solving problems:
+
+ 1. direct execution
+ 2. parametric runs, and
+ 3. optimization loops.
  
 ### Direct execution
 
@@ -350,6 +372,8 @@ $
 
 These three calls were examples of direct execution of FeenoX: a single call with a single argument to solve a single fixed problem.
 
+
+
 ## Parametric {@sec:parametric}
 
 To use FeenoX in a parametric run, one has to successively call the executable passing the main input file path in the first argument followed by an arbitrary number of parameters. These extra parameters will be expanded as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `hello.fee` is
@@ -367,7 +391,7 @@ Hello Universe!
 $
 ```
 
-To have an actual parametric run, an external loop has to successively call FeenoX with the parametric arguments. For example, say this file `cantilever.fee` fixes the face called "left" and sets a load in the negative\ $z$ direction of a mesh called `cantilever-$1-$2.msh`. The output is a single line containing the number of nodes of the mesh and the displacement in the vertical direction\ $w(500,0,0)$ at the center of the cantilever's free face:
+To have an actual parametric run, an external loop has to successively call FeenoX with the parametric arguments. For example, say this file `cantilever.fee` fixes the face called “left” and sets a load in the negative\ $z$ direction of a mesh called `cantilever-$1-$2.msh`. The output is a single line containing the number of nodes of the mesh and the displacement in the vertical direction\ $w(500,0,0)$ at the center of the cantilever's free face:
 
 ```{.feenox include="cantilever.fee"}
 ```
@@ -379,7 +403,7 @@ To have an actual parametric run, an external loop has to successively call Feen
 Cantilevered beam meshed with structured tetrahedra and hexahedra
 :::
 
-Now the following Bash script first calls Gmsh to create the meshes `cantilever-${element}-${c}.msh` where
+Now the following [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) script first calls Gmsh to create the meshes `cantilever-${element}-${c}.msh` where
 
  * `${element}`: tet4, tet10, hex8, hex20, hex27
  * `${c}`: 1,2,\dots,10
@@ -389,7 +413,7 @@ It then calls FeenoX with the input above and passes `${element}` and `${c}` as 
 ```{.bash include="cantilever.sh"}
 ```
 
-After the execution of the Bash script, thanks to the design decision that output is 100% defined by the user (in this case with the `PRINT` instruction), one has several files `cantilever-${element}.dat` files. When plotted, these show the shear locking effect of fully-integrated first-order elements as illustrated in @fig:cantilever-displacement. The theoretical Euler-Bernoulli result is just a reference as, among other things, it does not take into account the effect of the material's Poisson's ratio.
+After the execution of the script, thanks to the design decision that output is 100% defined by the user (in this case with the `PRINT` instruction), one has several files `cantilever-${element}.dat` files. When plotted, these show the shear locking effect of fully-integrated first-order elements as illustrated in @fig:cantilever-displacement. The theoretical [Euler-Bernoulli](https://en.wikipedia.org/wiki/Euler%E2%80%93Bernoulli_beam_theory) result is just a reference as, among other things, it does not take into account the effect of the material's [Poisson's ratio](https://en.wikipedia.org/wiki/Poisson%27s_ratio).
 Note that the abscissa shows the number of _nodes_, which are proportional to the number of degrees of freedom (i.e. the size of the problem matrix) and not the number of _elements_, which is irrelevant here and in most problems.
 
 
@@ -398,7 +422,7 @@ Note that the abscissa shows the number of _nodes_, which are proportional to th
 
 ### Optimization loops
 
-Optimization loops work very much like parametric runs from the FeenoX point of view. The difference is mainly on the calling script that has to implement a certain optimization algorithm such as conjugate gradients, Nelder-Mead, simulated annealing, genetic algorithms, etc. to choose which parameters to pass to FeenoX as command-line argument.
+Optimization loops work very much like parametric runs from the FeenoX point of view. The difference is mainly on the calling script that has to implement a certain optimization algorithm such as [conjugate gradients](https://en.wikipedia.org/wiki/Conjugate_gradient_method), [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method), [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing), [genetic algorithms](https://en.wikipedia.org/wiki/Genetic_algorithm), etc. to choose which parameters to pass to FeenoX as command-line argument.
 The only particularity on FeenoX' side is that since the next argument that the optimization loop will pass might depend on the result of the current step, care has to be taken in order to be able to return back to the calling script whatever results it needs in order to compute the next arguments. This is usually just the scalar being optimized for, but it can also include other results such as derivatives or other relevant data.
 
 To illustrate how to use FeenoX in an optimization loop, let us consider the problem of finding the length\ $\ell_1$ of a tuning fork (@fig:fork-meshed) such that the fundamental frequency on a free-free oscillation is equal to the base\ A frequency at\ 440\ Hz.
@@ -449,7 +473,7 @@ def main():
     print(nodes, l1, freq)
 ```
 
-Since the computed frequency depends both on the length\ $\ell_1$ and on the mesh refinement level\ $n$, there are actually two nested loops: one parametric over $n=1,2\dots,7$ and the optimization loop itself that tries to find\ $\ell_1$ so as to obtain a frequency equal to 440\ Hz within 0.01% of error.
+Since the computed frequency depends both on the length\ $\ell_1$ and on the mesh refinement level\ $n$, there are actually two nested loops: one parametric over $n=1,2\dots,7$ and the optimization loop itself that tries to find\ $\ell_1$ so as to obtain a frequency equal to 440\ Hz within\ 0.01% of error.
 
 ```terminal
 $ python fork.py > fork.dat
@@ -470,7 +494,7 @@ Note that the approach used here is to use Gmsh Python API to build the mesh and
 > 230-efficiency.md
 > ```
 
-One of the most widely known quotations in computer science is that one that says “premature optimization is the root of all evil.” that is an extremely over-simplified version of Donald E. Knuth’s analysis in hist The Art of Computer Programming. Bottom line is that the programmer should not not spend too much time trying to optimize code based on hunches but based on profiling measurements. Yet a disciplined programmer can tell when an algorithm will be way too inefficient (say something that scales up like $O(n^2)$) and how small changes can improve performance (say by understanding how caching levels work). It is also true that usually an improvement in one aspect leads to a deterioration in another one (e.g. decrease in CPU time by caching intermediate results increasing RAM usage).
+One of the most widely known quotations in computer science is that one that says “premature optimization is the root of all evil.” that is an extremely over-simplified version of [Donald E. Knuth’s](https://en.wikipedia.org/wiki/Donald_Knuth) analysis in his [The Art of Computer Programming](https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming). Bottom line is that the programmer should not not spend too much time trying to optimize code based on hunches but based on profiling measurements. Yet a disciplined programmer can tell when an algorithm will be way too inefficient (say something that scales up like $O(n^2)$) and how small changes can improve performance (say by understanding how caching levels work in order to implement faster nested loops). It is also true that usually an improvement in one aspect leads to a deterioration in another one (e.g. a decrease in CPU time by caching intermediate results in an increase of RAM usage).
 
 Even though FeenoX is still evolving so it could be premature in many cases, it is informative to compare running times and memory consumption when solving the same problem with different cloud-friendly FEA programs. In effect, a [serial single-thread single-host comparison of resource usage when solving the NAFEMS LE10 problem](https://seamplex.com/feenox/tests/nafems/le10/) introduced above was performed, using both [unstructured tetrahedral](https://www.seamplex.com/feenox/tests/nafems/le10/report-tet.html) and [structured hexahedral](https://www.seamplex.com/feenox/tests/nafems/le10/report-hex.html) meshes. @Fig:le10-tet shows two figures of the many ones contained in the detailed report. In general, FeenoX using the iterative approach based on PETSc’s Geometric-Algebraic Multigrid Preconditioner  and a conjugate gradients solver is faster for (relatively) large problems at the expense of a larger memory consumption. The curves that use MUMPS confirm the well-known theoretical result that direct linear solvers are robust but not scalable. 
 
