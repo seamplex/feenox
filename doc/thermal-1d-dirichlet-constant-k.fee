@@ -1,4 +1,4 @@
-PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+PROBLEM thermal 1D               # tell FeenoX what we want to solve 
 READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 k = 1                            # set uniform conductivity
 BC left  T=0                     # set fixed temperatures as BCs
