@@ -374,7 +374,7 @@ These three calls were examples of direct execution of FeenoX: a single call wit
 
 
 
-## Parametric {@sec:parametric}
+## Parametric {#sec:parametric}
 
 To use FeenoX in a parametric run, one has to successively call the executable passing the main input file path in the first argument followed by an arbitrary number of parameters. These extra parameters will be expanded as string literals `$1`, `$2`, etc. appearing in the input file. For example, if `hello.fee` is
 
