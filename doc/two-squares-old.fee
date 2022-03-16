@@ -1,0 +1,22 @@
+PROBLEM thermal 2d
+READ_MESH two-squares.msh
+
+FUNCTION cond(x,y) INTERPOLATION shepard DATA {
+    1   0    1.0
+    1   1    1.5
+    2   0    1.3
+    2   1    1.8
+    1.5 0.5  1.7 }
+
+#        name   conductivity  power density
+MATERIAL yellow k=0.5+T(x,y)  q=0
+MATERIAL cyan   k=cond(x,y)   q=1-0.2*T(x,y)
+    
+BC left   T=y              # temperature
+BC bottom T=1-cos(pi/2*x)
+BC right  q=2-y            # heat flux
+BC top    q=1
+
+SOLVE_PROBLEM
+ 
+WRITE_MESH two-squares-results.msh  T CELLS k

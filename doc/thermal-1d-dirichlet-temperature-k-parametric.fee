@@ -1,4 +1,4 @@
-PROBLEM thermal DIMENSIONS 1
+PROBLEM thermal 1D
 READ_MESH slab-$1.msh
 k(x) = 1+T(x)
 BC left  T=0

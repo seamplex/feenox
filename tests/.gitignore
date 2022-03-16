@@ -26,3 +26,5 @@ two-cubes-*.vtk
 two-cubes.msh
 pellet*.msh
 pellet*.vtk
+encased_rod.msh
+encased_rod.vtk

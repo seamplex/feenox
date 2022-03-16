@@ -1,0 +1,20 @@
+PROBLEM thermal 3D
+READ_MESH encased_rod.msh
+
+k_cu = 372
+k_ss = 18
+
+BC left  T=400
+BC right T=100
+
+SOLVE_PROBLEM
+
+WRITE_MESH encased_rod.vtk T VECTOR qx qy qz
+
+# T1(x) = T(x,0.005,0.02)
+# T2(x) = T(x,0.020,0.02)
+# T3(x) = T(x,0.035,0.02)
+# 
+# PRINT_FUNCTION T1 T2 T3 MIN 0 MAX 0.5 STEP 0.001
+
+PRINT T(0.25,0.005,0.02)-T(0.25,0.020,0.02)

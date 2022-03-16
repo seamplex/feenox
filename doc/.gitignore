@@ -41,4 +41,5 @@ nafems-t3.dat
 slab*.msh
 wire-hex.msh
 maze.msh
-
+square-centered.msh
+laplace-square.vtk

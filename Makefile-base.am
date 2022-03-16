@@ -15,6 +15,7 @@ TESTS = \
         tests/builtin.sh \
         tests/cylinder-traction-force.sh \
         tests/default_argument_value.sh \
+        tests/encased_rod.sh \
         tests/expressions_constants.sh \
         tests/expressions_variables.sh \
         tests/expressions_functions.sh \

@@ -1287,6 +1287,9 @@ struct mesh_write_t {
   int point_init;
   int cell_init;
   
+  // this is to know if we already wrote LOOKUP_TABLE
+  int lookup_table_init;
+  
   mesh_write_dist_t *mesh_write_dists;
   
   mesh_write_t *next;

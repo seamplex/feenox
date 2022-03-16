@@ -516,11 +516,11 @@ Regarding storage, FeenoX needs space to store the input file (negligible), the 
 > 240-scalability.md
 > ```
 
-The time needed to solve a relatively large problem can be reduced by exploiting the fact that most cloud servers (and even laptop computers) have more than one CPU available. There are some tasks that can be split into several processors sharing a common memory address space that will scale up perfectly, such as building the elemental matrices and assembling the global stiffness matrix. There are some other tasks that might not scale perfectly but that nevertheless might (or might not) reduce the overall wall time if split among processors using a common memory space, such as solving the linear system\ $K \cdot \vec{u} = \vec{b}$. The usual scheme to parallelize a problem under these conditions is to use the [OpenMP](https://en.wikipedia.org/wiki/OpenMP) framework.
+The time needed to solve a relatively large problem can be reduced by exploiting the fact that most cloud servers (and even laptop computers) have more than one CPU available. There are some tasks that can be split into several processors sharing a common memory address space that will scale up almost perfectly, such as building the elemental matrices and assembling the global stiffness matrix. There are some other tasks that might not scale perfectly but that nevertheless might (or might not) reduce the overall wall time if split among processors using a common memory space, such as solving the linear system\ $K \cdot \vec{u} = \vec{b}$. The usual scheme to parallelize a problem under these conditions is to use the [OpenMP](https://en.wikipedia.org/wiki/OpenMP) framework.
 
-Yet, if the problem is large enough, a server might not have enough physical random-access memory to be able to handle the whole problem. The problem now has to be split among different servers which, in turn, might have several processors each. Some of the processors share the same address space but most of them will only have access to a fraction of the whole global problem data. In these cases, there are no tasks that can scale up perfectly since even when building and assembling the matrices, a processor needs some piece of data which is handled by another processor with a different address space and that has to be conveyed specifically from one process to another one. The usual scheme to parallelize a problem under these conditions is to use the [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) standard and one of its two most well-known implementations, either [Open MPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/).
+Yet, if the problem is large enough, a server might not have enough physical random-access memory to be able to handle the whole problem. The problem now has to be split among different servers which, in turn, might have several processors each. Some of the processors share the same address space but most of them will only have access to a fraction of the whole global problem data. In these cases, there are no tasks that can scale up perfectly since even when building and assembling the matrices, a processor needs some piece of data which is handled by another processor with a different address space and that has to be conveyed specifically from one process to another one. The usual scheme to parallelize a problem under these conditions is to use the [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) standard and one of its two most well-known implementations, either [Open\ MPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/).
 
-It might seem that the most effective approach to solve a large problem is to use OpenMP among threads running in processors that share the memory address space and to use MPI among processes running in different hosts. But even though this hybrid OpenMPI+MPI scheme is possible, there are at least three main drawbacks with respect to a pure MPI approach:
+It might seem that the most effective approach to solve a large problem is to use OpenMP (not to be confused with OpenMPI!) among threads running in processors that share the memory address space and to use MPI among processes running in different hosts. But even though this hybrid OpenMP+MPI scheme is possible, there are at least three main drawbacks with respect to a pure MPI approach:
 
  i. the overall performance is not be significantly better
  ii. the amount of lines of code that has to be maintained is more than doubled
@@ -533,23 +533,22 @@ Hence, FeenoX uses MPI (mainly through PETSc and SLEPc) to handle large parallel
 ![Structured grid](nafems-le1-struct-metis.png){width=49%}
 ![Unstructured grid](nafems-le1-unstruct-metis.png){width=49%}
 
-Partition of the 2D NAFEMS LE1 domain into four different sub-domains computed in Gmsh using Metis.
+Partition of the [2D NAFEMS LE1](https://www.seamplex.com/feenox/examples/#nafems-le1-elliptical-membrane-plane-stress-benchmark) domain into four different sub-domains computed in [Gmsh](http://gmsh.info/) using [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
 :::
 
-Most of the overhead of parallelized tasks come from the fact that processes need data stored in other processes that use another memory address space.
-Therefore, the discretized domain has to be split among processes in such a way as to minimize the number of inter-process communication. This problem, called domain decomposition, can be handled either by the mesher or by the solver itself, usually using a third-part library such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview). It should be noted that the domain decomposition problem does not have a unique solution. On the one hand, it depends on the actual mesh being distributed over parallel processes as illustrated in @fig:nafems-le1-metis. On the other hand, the optimal solution might depend on the kind of topology boundaries to minimize (shared nodes, shared faces) and other subtle options that partitioning libraries allow.
+Most of the overhead of parallelized tasks come from the fact that processes need data stored in other processes (i.e. the so-called ghost points) that use a differet virtual memory address space.
+Therefore, the discretized domain has to be split among processes in such a way as to minimize the number of inter-process communication. This problem, called domain decomposition, can be handled either by the mesher or by the solver itself, usually using a third-part library such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview). It should be noted that the domain decomposition problem does not have a unique solution. On the one hand, it depends on the actual mesh being distributed over parallel processes as illustrated in @fig:nafems-le1-metis. On the other hand, the optimal solution might depend on the kind of topology boundaries to minimize (shared nodes, shared faces) and other subtle parameters and options that partitioning libraries allow.
 
-FeenoX relies on Gmsh to perform the domain decomposition (using Metis) and to provide the partitioning information in the mesh file read by the `READ_MESH` keyword.
+FeenoX relies on [Gmsh](http://gmsh.info/) to perform the domain decomposition (using Metis at mesh-time) and to provide the partitioning information in the mesh file read by the `READ_MESH` keyword.
 
 
-## Flexibility
+## Flexibility {#sec:flexibility}
  
 > ```include
 > 250-flexibility.md
 > ```
 
-The third-system effect mentioned in @sec:architecture involves almost ten years of experience in the nuclear industry,^[This experience also shaped many of the features that FeenoX has and most of the features is does deliberately not have.] where complex dependencies of multiple material properties over space through intermediate distributions (temperature, neutronic poisons, etc.) and time (control rod positions, fuel burn-up, etc.) are mandatory.
-
+The third-system effect mentioned in @sec:architecture involves more than ten years of experience in the nuclear industry,^[This experience also shaped many of the features that FeenoX has and most of the features is does deliberately not have.] where complex dependencies of multiple material properties over space through intermediate distributions (temperature, neutronic poisons, etc.) and time (control rod positions, fuel burn-up, etc.) are mandatory.
 One of the cornerstone design decisions in FeenoX is that **everything is an expression**. Here, “everything” means any location in the input file where a numerical value is expected. The most common use case is in the `PRINT` keyword. For example, the [Sophomore's dream](https://en.wikipedia.org/wiki/Sophomore%27s_dream) (in contrast to [Freshman's dream](https://en.wikipedia.org/wiki/Freshman%27s_dream)) identity
 
 
@@ -569,13 +568,13 @@ $ feenox sophomore.fee
 $
 ```
 
-Of course most engineering problems will not need explicit integrals (a few of them do, though) but some of them might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” Unix principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible.”
+Of course most engineering problems will not need explicit integrals---although a few of them do---but some might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” Unix principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible.”
 
-Flexibility in defining non-trivial material properties is illustrated with the following example, where two non- squares made of different dimensional materials are juxtaposed in thermal contact and subject to different boundary conditions at each of the fours sides (@fig:two-squares-mesh).
+Flexibility in defining non-trivial material properties is illustrated with the following example, where two squares made of different dimensionless materials are juxtaposed in thermal contact (glued?) and subject to different boundary conditions at each of the four sides (@fig:two-squares-mesh).
 
 ![Two non-dimensional $1 \times 1$ squares each in thermal contact made of different materials.](two-squares-mesh.svg){#fig:two-squares-mesh width_latex=75% width_html=100%}
 
-The yellow square is made of a certain material with a conductivity that depends algebraically on the temperature like
+The yellow square is made of a certain material with a conductivity that depends algebraically (and fictitiously) the temperature like
 
 $$
 k_\text{yellow}(x,y) = \frac{1}{2} + T(x,y)
@@ -670,7 +669,7 @@ Besides “everything is an expression,” FeenoX follows another cornerstone ru
 > 260-extensibility.md
 > ```
 
-Even though FeenoX is written in C, it makes extensive use of function pointers to mimic C++’s virtual methods. This way, depending on the problem type given with the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword, particular routines are called to
+Even though FeenoX is written in\ [C](https://en.wikipedia.org/wiki/C_(programming_language)), it makes extensive use of [function pointers](https://en.wikipedia.org/wiki/Function_pointer) to mimic [C++](https://en.wikipedia.org/wiki/C%2B%2B)’s [virtual methods](https://en.wikipedia.org/wiki/Virtual_function). This way, depending on the problem type given with the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword, particular routines are called to
 
  1. initialize and set up solver options (steady-state/transient, linear/non-linear, regular/eigenproblem, etc.)
  2. parse boundary conditions given in the `BC` keyword
@@ -689,19 +688,73 @@ Indeed, each of the supported problems, namely
  * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
  * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
 
-is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods (recall that they are function pointers) that are resolved at runtime when parsing the main input file. Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`).
+is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods (recall that they are function pointers) that are resolved at runtime when parsing the main input file.
+
+FeenoX was designed separating the common "mathematical" routines from the particular "physcal" routines in such a way that any of these directories can be removed and the code would still compile. In effect, let us remove the directory `src/pdes/thermal` from a temporary clone of the main Git repository:
+
+```terminal
+~$ cd tmp/
+~/tmp$ git clone https://github.com/seamplex/feenox
+Cloning into 'feenox'...
+remote: Enumerating objects: 6908, done.
+remote: Counting objects: 100% (4399/4399), done.
+remote: Compressing objects: 100% (3208/3208), done.
+remote: Total 6908 (delta 3085), reused 2403 (delta 1126), pack-reused 2509
+Receiving objects: 100% (6908/6908), 10.94 MiB | 6.14 MiB/s, done.
+Resolving deltas: 100% (4904/4904), done.
+~/tmp$ cd feenox
+~/tmp/feenox$ rm -rf src/pdes/thermal/
+~/tmp/feenox$ ./autogen.sh 
+creating Makefile.am... ok
+creating src/Makefile.am... ok
+calling autoreconf... 
+configure.ac:18: installing './compile'
+configure.ac:15: installing './config.guess'
+configure.ac:15: installing './config.sub'
+configure.ac:17: installing './install-sh'
+configure.ac:17: installing './missing'
+parallel-tests: installing './test-driver'
+src/Makefile.am: installing './depcomp'
+done
+~/tmp/feenox$ ./configure.sh 
+[...]
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating src/Makefile
+config.status: creating doc/Makefile
+config.status: executing depfiles commands
+~/tmp/feenox$ make
+[...]
+make[1]: Leaving directory '/home/gtheler/tmp/feenox'
+~/tmp/feenox$
+```
+
+Now if one wants to run the thermal problem with the two juxtaposed squares from\ @sec:flexibility above, the "temporary" FeenoX will complain. But it will still solve the NAFEMS\ LE10 problem right away:
+
+```terminal
+~/tmp/feenox$ cd doc/
+~/tmp/feenox/doc$ ../feenox two-squares.fee 
+error: two-squares.fee: 1: unknown problem type 'thermal'
+~/tmp/feenox/doc$ cd ../examples
+~/tmp/feenox/examples$ ../feenox nafems-le10.fee 
+sigma_y @ D =   -5.38367        MPa
+~/tmp/feenox/examples$
+```
+
+Besides removals, additions are far more interesting to discuss.
+Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`). More information can be found in the FeenoX [programming & contributing](https://www.seamplex.com/feenox/doc/#programming-and-contributing) section.
 
 As already discussed in @sec:introduction, FeenoX is [free-as-in-freedom](https://en.wikipedia.org/wiki/Free_as_in_Freedom) software licensed under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version.
-In the particular case of additional problem types, this fact has two implications.
+In the particular case of additions to the code base, this fact has two implications.
 
- i. Every person in the world is free to modify FeenoX to suit their needs, including adding a new problem type either by
+ i. Every person in the world is _free_ to modify FeenoX to suit their needs, including adding a new problem type either by
  
      a. using one of the existing ones as a template, or
-     b. creating a new directory from scratch,
+     b. creating a new directory from scratch
      
-    without asking anybody for any kind of permission. In case this person does not how to program, he or she has the freedom to hire somebody else to do it. It is this the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
+    without asking anybody for any kind of permission. In case this person does not how to program, he or she has the _freedom_ to hire somebody else to do it. It is this the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
  
- ii. People adding code own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it under also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free---a.k.a. as [copyleft](https://en.wikipedia.org/wiki/Copyleft).
+ ii. People adding code own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free---a.k.a. as [copyleft](https://en.wikipedia.org/wiki/Copyleft).
  
 
 Regarding additional material models, the virtual methods that compute the elemental contributions to the stiffness matrix also use function pointers to different material models (linear isotropic elastic, orthotropic elastic, etc.) and behaviors (isotropic thermal expansion, orthotropic thermal expansion, etc.) that are resolved at run time. Following the same principle, new models might be added by adding new routines and resolving them depending on the user’s input.
@@ -1049,6 +1102,25 @@ $ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor --mumps
 $
 ```
 
+An illustration of the usage of PETSc arguments and the fact that FeenoX automatically detects whether a problem is linear or not is given below. The case `thermal-1d-dirichlet-uniform-k.fee` is linear while the `two-squares.fee` from section\ @sec:flexibility is not. Therefore, an SNES monitor should give output for the latter but not for the former. In effect:
+
+```terminal
+$ feenox thermal-1d-dirichlet-uniform-k.fee --snes_monitor
+0.5
+$ feenox two-squares.fee --snes_monitor
+  0 SNES Function norm 9.658033489479e+00 
+  1 SNES Function norm 1.616559951959e+00 
+  2 SNES Function norm 1.879821597500e-01 
+  3 SNES Function norm 2.972104258103e-02 
+  4 SNES Function norm 2.624028350822e-03 
+  5 SNES Function norm 1.823396478825e-04 
+  6 SNES Function norm 2.574514225532e-05 
+  7 SNES Function norm 2.511975376809e-06 
+  8 SNES Function norm 4.230090605033e-07 
+  9 SNES Function norm 5.154440365087e-08 
+$
+```
+
 As already explained in @sec:parametric, FeenoX supports run-time replacement arguments that get replaced verbatim in the input file. This feature is handy when the same problem has to be solved over different meshes, such as when investigating the $h$-convergence order over Gmsh's element scale factor `-clscale`:
 
 ```{.feenox include="thermal-1d-dirichlet-temperature-k-parametric.fee"}
@@ -1074,7 +1146,7 @@ Since the main input file is the first argument (not counting POSIX options star
 ```{.feenox include="hello"}
 ```
 
-and then we do
+and then we can do
 
 ```terminal
 $ chmod +x hello
@@ -1105,8 +1177,6 @@ $ feenox f.fee "sin(t)" 1 | ./derivative.fee
 $
 ```
 
-Shebanged input files can be used to hard-code PETSc options:
-
 
 
 ## Problem input {#sec:input}
@@ -1116,35 +1186,39 @@ Shebanged input files can be used to hard-code PETSc options:
 > ```
 
 FeenoX currently satisfies requirement a. but eventually could also satisfy requirement b.
-The input files are indeed plain-text ASCII files with English-like keywords that define the problem.
+The input files are indeed plain-text ASCII files with English-like keywords that fully define the problem.
 The main features of the input format are:
 
- #. They are [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) by using English-like keywords. Nouns are definitions and verbs are instructions, which should be as self-evident as possible.
+ #. It is [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) by using English-like keywords.
+ #. Nouns are definitions and verbs are instructions.
  #. Simple problems need simple inputs.
- #. Similar problems need similar inputs.
- #. Everything is an expression.
- #. 
- #. Expansion of command-line arguments.
-
+ #. Simple things should be simple, complex things should be possible. 
+ #. Whenever a numerical value is needed an expression can be given, A.K.A "everything is an expression."
+ #. The input file should match as much as possible the paper (or blackboard) formulation of the problem.
+ #. It should be possible to read run-time arguments from the command line.
+ #. Input files should be [distributed version control](https://en.wikipedia.org/wiki/Distributed_version_control)-friendly.
  
 `.fee` to have extension-based syntax highlighting, but any extension is allowed.
- 
+ver le10/le11
+
+
+ASCII but UTF8 friendly
+
+¡hola niños!
+olá mundo
+spiel fussball?
+
+
+
 dar ejemplos
 comparar con <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-membrane/tested-codes.html>
 
 macro-friendly inputs, rule of generation
 
-**Simple problems should need simple inputs.**
-
-English-like input. Nouns are definitions, verbs are instructions.
-
-**Similar problems should need similar inputs.**
-
-thermal slab steady state and transient
-
 1d neutron
 
 VCS tracking, example with hello world.
+data separated from mesh
 
 API in C?
 

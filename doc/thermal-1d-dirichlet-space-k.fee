@@ -1,4 +1,4 @@
-PROBLEM thermal DIMENSIONS 1
+PROBLEM thermal 1D
 READ_MESH slab.msh
 k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
