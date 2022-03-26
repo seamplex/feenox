@@ -15,7 +15,7 @@ documentclass: report
 
 [FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems.
 
-```{.include}
+```include
 why.md
 ```
 
@@ -690,7 +690,12 @@ Indeed, each of the supported problems, namely
 
 is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods (recall that they are function pointers) that are resolved at runtime when parsing the main input file.
 
-FeenoX was designed separating the common "mathematical" routines from the particular "physcal" routines in such a way that any of these directories can be removed and the code would still compile. In effect, let us remove the directory `src/pdes/thermal` from a temporary clone of the main Git repository:
+FeenoX was designed with separated common "mathematical" routines from the particular "physical" ones in such a way that any of these directories can be removed and the code would still compile. For example, let us remove the directory `src/pdes/thermal` from a temporary clone of the main Git repository. The `autogen.sh` script is smart enough to 
+
+ i. tell which types of PDEs are available by reading the subdirectories in `src/pdes`, and
+ ii. link the available virtual methods to the appropriate function pointers which are resolved at runtime.
+ 
+In effect,
 
 ```terminal
 ~$ cd tmp/
@@ -729,7 +734,7 @@ make[1]: Leaving directory '/home/gtheler/tmp/feenox'
 ~/tmp/feenox$
 ```
 
-Now if one wants to run the thermal problem with the two juxtaposed squares from\ @sec:flexibility above, the "temporary" FeenoX will complain. But it will still solve the NAFEMS\ LE10 problem right away:
+Now if one wants to run the thermal problem with the two juxtaposed squares from\ @sec:flexibility above, the "temporary" FeenoX will complain. But it will still solve the [NAFEMS\ LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) problem right away:
 
 ```terminal
 ~/tmp/feenox$ cd doc/
@@ -741,8 +746,20 @@ sigma_y @ D =   -5.38367        MPa
 ~/tmp/feenox/examples$
 ```
 
-Besides removals, additions are far more interesting to discuss.
-Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`). More information can be found in the FeenoX [programming & contributing](https://www.seamplex.com/feenox/doc/#programming-and-contributing) section.
+The list of available PDEs that a certain FeenoX binary has can be found by using the `--pdes` option. They are sorted alphabetically, one type per line:
+
+```terminal
+~/tmp/feenox/examples$ feenox --pdes
+laplace
+mechanical
+modal
+neutron_diffusion
+~/tmp/feenox/examples$
+```
+
+
+Besides removals, additions---which are also handled by `autogen.sh` as describe above--- are far more interesting to discuss.
+Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`). More information can be found in the [FeenoX programming & contributing](https://www.seamplex.com/feenox/doc/#programming-and-contributing) section.
 
 As already discussed in @sec:introduction, FeenoX is [free-as-in-freedom](https://en.wikipedia.org/wiki/Free_as_in_Freedom) software licensed under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version.
 In the particular case of additions to the code base, this fact has two implications.
@@ -1185,42 +1202,113 @@ $
 > 310-input.md
 > ```
 
-FeenoX currently satisfies requirement a. but eventually could also satisfy requirement b.
+FeenoX currently works by reading an input file (which in turn can recursively include further input files) with an _ad-hoc_ format, whose rationale is described in this section. Therefore, it does satisfy requirement\ a. but eventually could also satisfy requirement\ b.
+
+As already explained in\ @sec:introduction, the motto is “FeenoX is---in a certain sense---to desktop FEA programs  and libraries what Markdown is to Word and (La)TeX, respectively and _deliberately_.” Hence, the input files act as the Markdown source: instructions about what to do but not how to do it.
 The input files are indeed plain-text ASCII files with English-like keywords that fully define the problem.
-The main features of the input format are:
+The main features of the input format, thoroughly described below, are:
 
  #. It is [syntactically sugared](https://en.wikipedia.org/wiki/Syntactic_sugar) by using English-like keywords.
  #. Nouns are definitions and verbs are instructions.
  #. Simple problems need simple inputs.
  #. Simple things should be simple, complex things should be possible. 
- #. Whenever a numerical value is needed an expression can be given, A.K.A "everything is an expression."
+ #. Whenever a numerical value is needed an expression can be given (i.e. “everything is an expression.”)
  #. The input file should match as much as possible the paper (or blackboard) formulation of the problem.
+ #. It provides means to compare numerical solutions against analytical ones.
  #. It should be possible to read run-time arguments from the command line.
  #. Input files should be [distributed version control](https://en.wikipedia.org/wiki/Distributed_version_control)-friendly.
  
-`.fee` to have extension-based syntax highlighting, but any extension is allowed.
-ver le10/le11
+### Syntactic sugar & highlighting
 
+The first argument not starting with a dash to the `feenox` executable is the path to the main input file. This main input file can in turn include other FeenoX input files and/or read data from other files (such as meshes) or resources (such as shared memory objects). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness). The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)). Throughout the FeenoX repository and documentation the extension `.fee` is used. But again, any extension (even no extension) can be used.
+
+
+::: {#fig:highlighting}
+![Kate](highlighting-kate.png){width=49%}
+![Vim](highlighting-vim.png){width=49%}
+
+Syntax highlighitng of input files in GUI and cloud-friendly text editors
+:::
+
+The ultimate goal of FeenoX is to solve mathematical equations that are hard to solve with pencil and paper. In particular, to integrate differential equations (recall that the first usable computer was named ENIAC, which stands for Electronic Numerical Integrator and Computer). The input file format was designed as to how to ask the _computer_ what to _compute_. The syntax, based on keywords and alphanumerical arguments was chosen as to sit in the middle of the purely binary numerical system employed by digital computers^[Analog and quantum computers are out of the scope.] and the purely linguistical nature of human communication. The rationale behind its design is that an average user can peek a FeenoX input file and tell what it is asking the computer to compute, as already illustrated for the [NAFEMS\ LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) in @fig:nafems-le10-problem-input. Even if the input files are created by a computer and not by a human, the code used to create a human-friendly input file will be human-friendlier than a code that writes only zeroes and ones as its output (that will become the input of another one following the Unix _rule of composition_). As an exercise, compare the input file in @fig:nafems-le10-problem-input (or in @fig:highlighting) with the inputs files used by other open source FEA solvers shown in appendix @sec:le10-other.
+
+
+
+### Definitions and instructions
+
+The way to tell the computer what problem it has to solve and how to solve it is by using keywords in the input file.
+Each non-commented line of the input file should start with either
+
+ i. a primary keyword such as `PROBLEM` or `READ_MESH`, or
+ ii. a variable such as `end_time` or a vector or matrix with the corresponding index(es) such as `v[2]` or `A[i][j]` followed by the `=` keyword, or
+ iii. a function name with its arguments such as `f(x,y)` followed by the `=` keyword.
+ 
+A primary keyword usually is followed by arguments and/or secondary keywords, which in turn can take arguments as well. All keywords, both primary and secondary, consists of English words. , and is either a _definition_ or an _instruction_. The former are nouns and the latter are verbs. 
+
+### Simple inputs
+
+thermal slabs
+
+### Complex things
+
+transient thermal with quasi-static mechanical
+
+
+### Everything is an expression
+
+everything is an expression, especially temperature
+rule of least surprise
+
+Rule of least surprise: f(x) = 12 ⋅ x2
+f(x) = 1/2 * x^2
+
+
+### Matching formulations
+
+LE10/LE11
+
+Lorenz
+
+comparar con <>
+
+
+
+### Comparison of solutions
+
+1d neutron slab
+compare with analytical solution
+
+MMS
+
+
+### Run-time arguments
+
+Already shown
+
+### Git and macro-friendliness {#sec:git-friendliness}
 
 ASCII but UTF8 friendly
 
-¡hola niños!
-olá mundo
-spiel fussball?
+```{.feenox include="hello-utf8.fee"}
+```
 
+```terminal
+$ feenox hello-utf8.fee 
+Olá Mundo
+שלום עולם
+مرحبا بالعالم
+你好世界
+gtheler@tom:~/codigos/feenox/doc$ 
+```
 
-
-dar ejemplos
-comparar con <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-membrane/tested-codes.html>
 
 macro-friendly inputs, rule of generation
+ejemplo del alpha-flex
 
-1d neutron
 
 VCS tracking, example with hello world.
 data separated from mesh
 
-API in C?
 
 ## Results output {#sec:output}
 
@@ -1353,3 +1441,28 @@ download.md
 ```{.include shift-heading-level-by=1}
 compilation.md
 ```
+# Appendix: Inputs for solving LE10 with other FEA programs {#sec:le10-other}
+
+This appendix illustrates the differences in the input file formats used by FeenoX and the ones used by other open source finite-element solvers. The problem being solved is the [NAFEMS\ LE10 benchmark](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark), first discussed in @sec:scope:
+
+```{.feenox include="nafems-le10.fee"}
+```
+
+See the following URL and its links for further details about solving this problem with the other codes: <https://cofea.readthedocs.io/en/latest/benchmarks/004-eliptic-membrane/tested-codes.html>
+
+## CalculiX
+
+```{include="le10-calculix.inp"}
+```
+
+## Code Aster
+
+```{include="le10-aster.comm"}
+```
+
+## Elmer
+
+```{include="le10-elmer.elm"}
+```
+
+

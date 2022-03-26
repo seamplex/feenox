@@ -1,0 +1,45 @@
+** Mesh ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+*INCLUDE, INPUT=Mesh/fine-lin-hex.inp		# Path to mesh for ccx solver
+
+** Mesh ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+*MATERIAL, NAME=Steel				# Defining a material
+*DENSITY
+ 7800						# Defining a density
+*ELASTIC,
+2.1e11, 0.3					# Defining Young modulus and Poisson's ratio
+
+** Sections ++++++++++++++++++++++++++++++++++++++++++++++++
+
+*SOLID SECTION, ELSET=ELIPSE, MATERIAL=Steel 	# Assigning material and plane stress elements
+0.1,						# to the elements sets in mesh and adding thickness
+
+** Steps +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+*STEP						# Begin of analysis
+*STATIC, SOLVER=SPOOLES				# Selection of elastic analysis
+
+** Field outputs +++++++++++++++++++++++++++++++++++++++++++
+
+*EL FILE					# Commands responsible for saving results
+E, S
+*NODE FILE
+U
+
+** Boundary conditions +++++++++++++++++++++++++++++++++++++
+
+*BOUNDARY,					# Applying translation = 0 on desired nodes
+AB,1,1,0
+*BOUNDARY
+CD,2,2,0
+
+** Boundary conditions(adding pressure) ++++++++++++++++++++
+
+*DLOAD
+*INCLUDE, INPUT=Pressure/fine-lin-hex.dlo
+
+** End step ++++++++++++++++++++++++++++++++++++++++++++++++
+
+*END STEP					# End on analysis
+

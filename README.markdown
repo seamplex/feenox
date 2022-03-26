@@ -132,7 +132,7 @@ For instance, to solve one-dimensional heat conduction over the domain
 problems we can find) the following input file is enough:
 
 ``` feenox
-PROBLEM thermal DIMENSIONS 1     # tell FeenoX what we want to solve 
+PROBLEM thermal 1D               # tell FeenoX what we want to solve 
 READ_MESH slab.msh               # read mesh in Gmsh's v4.1 format
 k = 1                            # set uniform conductivity
 BC left  T=0                     # set fixed temperatures as BCs
@@ -165,7 +165,7 @@ of *x* (we also update the output to show the analytical solution as
 well):
 
 ``` feenox
-PROBLEM thermal DIMENSIONS 1
+PROBLEM thermal 1D
 READ_MESH slab.msh
 k(x) = 1+x                       # space-dependent conductivity
 BC left  T=0
@@ -189,7 +189,7 @@ available not only as an argument to `PRINT` but also for the definition
 of algebraic functions:
 
 ``` feenox
-PROBLEM thermal DIMENSIONS 1
+PROBLEM thermal 1D
 READ_MESH slab.msh
 k(x) = 1+T(x)                    # temperature-dependent conductivity
 BC left  T=0
@@ -293,7 +293,7 @@ nu = 0.3    # Poisson's ratio
 SOLVE_PROBLEM   # solve!
 
 # print the direct stress y at D (and nothing more)
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
 ```
 
 The problem asks for the normal stress in the *y* direction

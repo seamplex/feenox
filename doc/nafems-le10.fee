@@ -18,4 +18,4 @@ nu = 0.3    # Poisson's ratio
 SOLVE_PROBLEM   # solve!
 
 # print the direct stress y at D (and nothing more)
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"

@@ -103,7 +103,7 @@ or by following the instructions in the documentation.
 
 ### PETSc
 
-The [Portable, Extensible Toolkit for Scientific Computation]((https://petsc.org/)), pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It is used by FeenoX to solve PDEs with the keyword [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem), like the [NAFEMS LE10 benchmark problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark).
+The [Portable, Extensible Toolkit for Scientific Computation]((https://petsc.org/)), pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It is used by FeenoX to solve PDEs with the keyword [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem), like the [NAFEMS\ LE10 benchmark problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark).
 
 
 Install either by doing

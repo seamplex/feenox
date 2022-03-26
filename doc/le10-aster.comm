@@ -1,0 +1,50 @@
+mesh = LIRE_MAILLAGE(identifier='0:1',				# Reading a mesh
+                     FORMAT='IDEAS',
+                     UNITE=80)
+
+model = AFFE_MODELE(identifier='1:1',				# Assignig plane stress
+                    AFFE=_F(MODELISATION=('C_PLAN', ),		# elements to mesh
+                            PHENOMENE='MECANIQUE',
+                            TOUT='OUI'),
+                    MAILLAGE=mesh)
+
+mater = DEFI_MATERIAU(identifier='2:1',				# Defining elastic material
+                      ELAS=_F(E=210000000000.0,
+                              NU=0.3))
+
+materfl = AFFE_MATERIAU(identifier='3:1',			# Assigning material to model
+                        AFFE=_F(MATER=(mater, ),
+                                TOUT='OUI'),
+                        MODELE=model)
+
+mecabc = AFFE_CHAR_MECA(identifier='4:1',			# Applying boundary conditions
+                        DDL_IMPO=(_F(DX=0.0,			# displacement = 0
+                                     GROUP_MA=('AB', )),	# to the selected group of elements
+                                  _F(DY=0.0,
+                                     GROUP_MA=('CD', ))),
+                        MODELE=model)
+
+mecach = AFFE_CHAR_MECA(identifier='5:1',			# Applying pressure to the
+                        MODELE=model,				# group of elements
+                        PRES_REP=_F(GROUP_MA=('BC', ),
+                                    PRES=-10000000.0))
+
+result = MECA_STATIQUE(identifier='6:1',			# Defining the results of
+                       CHAM_MATER=materfl,			# simulation
+                       EXCIT=(_F(CHARGE=mecabc),
+                              _F(CHARGE=mecach)),
+                       MODELE=model)
+
+SYY = CALC_CHAMP(identifier='7:1',				# Calculating stresses in
+                 CHAM_MATER=materfl,				# computed domain
+                 CONTRAINTE=('SIGM_NOEU', ),
+                 MODELE=model,
+                 RESULTAT=result)
+
+IMPR_RESU(identifier='8:1',					# Saving the results
+          FORMAT='MED',	  
+          RESU=(_F(RESULTAT=result),
+                _F(RESULTAT=SYY)),
+          UNITE=80)
+
+FIN()

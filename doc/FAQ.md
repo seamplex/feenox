@@ -26,7 +26,7 @@ In increasing order of complexity and comprehensiveness, these resources explain
 
 It does not mean anything particular, but
 
- * The last X makes it rhyme with UNIX and Linux.
+ * The last X makes it rhyme with Unix and Linux.
  * "noX" means that there is no graphical (i.e. _X_) interface
  * Fee-no means that there are no fees involved (free as in "free beer")
  * FeenoX is the successor of the now-superseded FEA program Fino
