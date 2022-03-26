@@ -1234,7 +1234,7 @@ The ultimate goal of FeenoX is to solve mathematical equations that are hard to 
 
 
 
-### Definitions and instructions
+### Definitions and instructions {#sec:nouns_verbs}
 
 The way to tell the computer what problem it has to solve and how to solve it is by using keywords in the input file.
 Each non-commented line of the input file should start with either
@@ -1243,11 +1243,70 @@ Each non-commented line of the input file should start with either
  ii. a variable such as `end_time` or a vector or matrix with the corresponding index(es) such as `v[2]` or `A[i][j]` followed by the `=` keyword, or
  iii. a function name with its arguments such as `f(x,y)` followed by the `=` keyword.
  
-A primary keyword usually is followed by arguments and/or secondary keywords, which in turn can take arguments as well. All keywords, both primary and secondary, consists of English words. , and is either a _definition_ or an _instruction_. The former are nouns and the latter are verbs. 
+A primary keyword usually is followed by arguments and/or secondary keywords, which in turn can take arguments as well. For example, in
 
-### Simple inputs
+```feenox
+PROBLEM mechanical DIMENSIONS 3
+READ_MESH nafems-le10.msh 
+```
 
-thermal slabs
+we have `PROBLEM` acting as a primary keyword, taking `mechanical` as its first argument and then `DIMENSIONS` as a secondary keyword with `3` being an argument to the secondary keyword. Then `READ_MESH` is another primary keyword taking `nafems-le10.msh` as its argument.
+
+A primary keyword can be
+
+ 1. a definition,
+ 2. an instruction, or
+ 3. both.
+ 
+Definitions are English _nouns_ and instructions are English _verbs_. 
+In the example above, `PROBLEM` is a definition because it tells FeenoX about something it has to do, but does not do anything actually. 
+
+
+### Simple inputs {#sec:simple}
+
+Consider solving heat conduction on a one-dimensional slab spanning the unitary range\ $x \in [0,1]$. The slab has a uniform unitary conductivity\ $k=1$ and Dirichlet boundary conditions
+
+$$
+\begin{cases}
+T(0) &= 0 \\
+T(1) &= 1
+\end{cases}
+$$
+
+This simple problem has the following simple input:
+
+```{.feenox include=thermal-1d-dirichlet-uniform-k.fee}
+```
+
+```terminal
+$ feenox thermal-1d-dirichlet-uniform-k.fee
+0.5
+$
+```
+
+Now, if instead of having a uniform conductivity the problem had a space-dependent\ $k(x) = 1+x$ then the input would read
+
+```{.feenox include=thermal-1d-dirichlet-space-k.fee}
+```
+
+```terminal
+$ feenox thermal-1d-dirichlet-space-k.fee 
+0.584893	0.584963
+$
+```
+
+Finally, if the conductivity depended on temperature (rendering the problem non-linear) say like\ $k(x) = 1 + T(x)$ then
+
+```{.feenox include=thermal-1d-dirichlet-temperature-k.fee}
+```
+
+```terminal
+$ feenox thermal-1d-dirichlet-space-k.fee 
+0.581139	0.581139
+$
+```
+
+Note that FeenoX could figure out by itself that the two first cases were linear while the last one was not. This can be verified by passing the extra argument `--snes_view`. In the first two cases, there will be no extra output. In the last one, the details of the non-linear solver used by PETSc will be written into the standard output. The experienced reader should take some time to compare the effort and level of complexity that other FEA solvers require in order to set up simple problems like these. 
 
 ### Complex things
 
