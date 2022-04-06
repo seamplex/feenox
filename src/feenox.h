@@ -1946,8 +1946,8 @@ extern var_t *feenox_define_variable_get_ptr(const char *name);
 
 extern vector_t *feenox_define_vector_get_ptr(const char *name, size_t size);
 
-extern void feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
-extern void feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
+extern int feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
+extern int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
 
 // getptr.c
 extern var_t *feenox_get_variable_ptr(const char *name);

@@ -97,10 +97,10 @@ int feenox_vector_init(vector_t *this, int no_initial) {
   }
 
   if ((size = this->size) == 0 && (size = (int)(round(feenox_expression_eval(&this->size_expr)))) == 0) {
-    feenox_push_error_message("vector '%s' has zero size", this->name);
+    feenox_push_error_message("vector '%s' has zero size at initialization", this->name);
     return FEENOX_ERROR;
   } else if (size < 0) {
-    feenox_push_error_message("vector '%s' has negative size %d", this->name, size);
+    feenox_push_error_message("vector '%s' has negative size %d at initialization", this->name, size);
     return FEENOX_ERROR;
   }
   

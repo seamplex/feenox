@@ -183,7 +183,7 @@ int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist) {
   }
       
   fprintf(this->file->pointer, " %s double\n", dist->name);
-  if (this->lookup_table_init == 0) {
+  if (dist->size == 1 && this->lookup_table_init == 0) {
     fprintf(this->file->pointer, "LOOKUP_TABLE default\n");
     this->lookup_table_init = 1;
   }

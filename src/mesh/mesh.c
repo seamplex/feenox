@@ -250,6 +250,23 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }  
   
+  // loop over all functions and see if some of them needs us
+  function_t *function = NULL;
+  for (function = feenox.functions; function != NULL; function = function->hh.next) {
+    if (function->mesh == this && function->vector_argument != NULL) {
+      function->data_size = this->n_nodes;
+      function->data_argument = this->nodes_argument;
+      for (unsigned int g = 0; g < function->n_arguments; g++) {
+        function->vector_argument[g]->size = function->data_size;
+        feenox_call(feenox_vector_init(function->vector_argument[g], 1));
+        feenox_call(feenox_realloc_vector_ptr(function->vector_argument[g], function->data_argument[g], 0));
+      }  
+      function->vector_value->size = function->data_size;
+      feenox_call(feenox_vector_init(function->vector_value, 1));
+      function->data_value = gsl_vector_ptr(feenox_value_ptr(function->vector_value), 0);
+    }
+  }
+  
   this->initialized = 1;
 
   return FEENOX_OK;

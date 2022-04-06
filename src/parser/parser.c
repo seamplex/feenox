@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2022 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -1282,6 +1282,15 @@ int feenox_parse_function(void) {
     } else if (strcasecmp(token, "VECTORS") == 0) {
       feenox_call(feenox_parse_function_vectors(function));
       
+///kw+FUNCTION+usage MESH <mesh> |
+///kw+FUNCTION+usage @  
+///kw+FUNCTION+detail If `MESH` is given, the function is point-wise defined over the mesh topology.
+///kw+FUNCTION+detail That is to say, the independent variables (i.e. the spatial coordinates) coincide with the mesh nodes.
+///kw+FUNCTION+detail The dependent variable (i.e. the function value) is set by "filling" a vector
+///kw+FUNCTION+detail named `vec_f` (where `f` has to be replaced with the function name) of size equal to the number of nodes.      
+    } else if (strcasecmp(token, "MESH") == 0) {
+      feenox_call(feenox_parse_function_mesh(function));
+
 ///kw+FUNCTION+usage DATA <num_1> <num_2> ... <num_N>
 ///kw+FUNCTION+usage @
 ///kw+FUNCTION+usage }
@@ -1458,6 +1467,47 @@ int feenox_parse_function_vectors(function_t *function) {
   
   return FEENOX_OK;
 }
+
+
+int feenox_parse_function_mesh(function_t *function) {
+
+  // TODO: cells
+  function->type = function_type_pointwise_mesh_node;
+  if ((function->mesh = feenox_parser_mesh()) == NULL) {
+    return FEENOX_ERROR;
+  }
+  
+  if (function->n_arguments != function->mesh->dim) {
+    feenox_push_error_message("function '%s' has %d arguments and mesh '%s' has %d dimensions", function->name, function->n_arguments, function->mesh->file->name, function->mesh->dim);
+    return FEENOX_ERROR;
+  }
+  
+  // TODO: unify code, this is repeated in buffered_data
+  // the independent values
+  char *name = NULL;
+  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
+  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
+//  feenox_call(feenox_vector_init(function->vector_value, 1));
+//  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
+  feenox_free(name);
+
+  // the arguments
+  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
+  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
+  unsigned int i = 0;
+  for (i = 0; i < function->n_arguments; i++) {
+    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
+    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
+//    feenox_call(feenox_vector_init(function->vector_argument[i], 1));
+//    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
+    feenox_free(name);
+  }
+
+  
+  
+  return FEENOX_OK;
+}
+
 
 int feenox_parse_sort_vector(void) {
       
@@ -2146,6 +2196,10 @@ int feenox_parse_read_mesh(void) {
   mesh_t *mesh = NULL;
   feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
 
+  // default to three dimensions
+//  mesh->dim = 3;
+  
+
 ///kw_pde+READ_MESH+usage { <file_path> | <file_id> }
 ///kw_pde+READ_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
 ///kw_pde+READ_MESH+detail The format is read from the extension, which should be either
@@ -2229,11 +2283,6 @@ int feenox_parse_read_mesh(void) {
       int vector = (strcasecmp(token, "READ_VECTOR") == 0);
       int symmetric_tensor = (strcasecmp(token, "READ_SYMMETRIC_TENSOR") == 0);
 
-      // default to three dimensions
-      if (mesh->dim == 0) {
-        mesh->dim = 3;
-      }
-
       char *name_in_mesh = NULL;
       feenox_call(feenox_parser_string(&name_in_mesh));
 
@@ -2311,7 +2360,7 @@ int feenox_parse_read_mesh(void) {
   }
 
   // if nobody told us the dimension, check if there is one in the PROBLEM keyword
-  if (mesh->dim == 0 && feenox.pde.dim != 0) {
+  if (feenox.pde.dim != 0) {
     mesh->dim = feenox.pde.dim;
   }
   
@@ -2910,16 +2959,9 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
 ///kw_pde+PROBLEM+detail defined in the input file with `READ_MESH` (which can be defined after the `PROBLEM` keyword) is the one over which the problem is solved.
     } else if (strcasecmp(token, "MESH") == 0) {
-      char *mesh_name;
-
-      // TODO: function parse_mesh() or something of the like
-      feenox_call(feenox_parser_string(&mesh_name));
-      if ((feenox.pde.mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
-        feenox_push_error_message("unknown mesh '%s'", mesh_name);
-        feenox_free(mesh_name);
+      if ((feenox.pde.mesh = feenox_parser_mesh()) == NULL) {
         return FEENOX_ERROR;
       }
-      feenox_free(mesh_name);
       
 ///kw_pde+PROBLEM+usage [ PROGRESS ]@
 ///kw_pde+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
@@ -3593,4 +3635,21 @@ int feenox_parse_dump(void) {
   
   
   return FEENOX_OK;
+}
+
+
+mesh_t *feenox_parser_mesh(void) {
+  
+  char *mesh_name = NULL;
+  feenox_call_null(feenox_parser_string(&mesh_name));
+
+  mesh_t *mesh = NULL;
+  if ((mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+    feenox_push_error_message("unknown mesh '%s'", mesh_name);
+    feenox_free(mesh_name);
+    return NULL;
+  }
+  
+  feenox_free(mesh_name);
+  return mesh;
 }

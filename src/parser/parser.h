@@ -53,6 +53,8 @@ struct feenox_parser_t {
 extern int feenox_parse_input_file(const char *filepath, int from, int to);
 extern int feenox_parse_line(void);
 
+extern mesh_t *feenox_parser_mesh(void);
+
 // auxiliary.c
 extern int feenox_read_line(FILE *file_ptr);
 extern char *feenox_get_next_token(char *line);
@@ -85,6 +87,7 @@ extern int feenox_parse_matrix(void);
 extern int feenox_parse_function(void);
 extern int feenox_parse_function_data(function_t *function);
 extern int feenox_parse_function_vectors(function_t *function);
+extern int feenox_parse_function_mesh(function_t *function);
 
 extern int feenox_parse_sort_vector(void);
 
@@ -113,5 +116,6 @@ extern int feenox_parse_integrate(void);
 extern int feenox_parse_find_extrema(void);
 extern int feenox_parse_fit(void);
 extern int feenox_parse_dump(void);
+
 
 #endif  
