@@ -9,9 +9,5 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpde thermal
-checkgmsh
-
-gmsh -3 ${dir}/encased_rod.geo
-answerzero encased_rod.fee 1e-4
+answer function_over_mesh.fee "0.6"
 exitifwrong $?

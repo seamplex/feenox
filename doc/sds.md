@@ -1085,7 +1085,7 @@ Once again, these ASCII-based progress bars can be parsed by the calling entity 
 
 ![ASCII progress bars parsed and converted into a web-based interface](caeplex-progress.png){#fig:caeplex-progress width_latex=65% width_html=100%}
 
-Since FeenoX uses PETSc (and SLEPc), command-line options can be passed from FeenoX to PETSc. The only difference is that since FeenoX follows the POSIX standard regarding options and PETSc does not, double dashes are required instead of PETSc' single-dash approach. That is to say, instead of `-ksp_monitor` one would have to pass `--ksp_monitor`:
+Since FeenoX uses PETSc (and SLEPc), command-line options can be passed from FeenoX to PETSc. The only difference is that since FeenoX follows the POSIX standard regarding options and PETSc does not, double dashes are required instead of PETSc' single-dash approach. That is to say, instead of `-ksp_monitor` one would have to pass `--ksp_monitor` (see @sec:simple for details about the input files):
 
 ```terminal
 $ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor
@@ -1239,8 +1239,8 @@ The ultimate goal of FeenoX is to solve mathematical equations that are hard to 
 The way to tell the computer what problem it has to solve and how to solve it is by using keywords in the input file.
 Each non-commented line of the input file should start with either
 
- i. a primary keyword such as `PROBLEM` or `READ_MESH`, or
- ii. a variable such as `end_time` or a vector or matrix with the corresponding index(es) such as `v[2]` or `A[i][j]` followed by the `=` keyword, or
+ i. a primary keyword such as [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) or [`READ_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh), or
+ ii. a variable such as [`end_time`](https://www.seamplex.com/feenox/doc/feenox-manual.html#end_time) or a vector or matrix with the corresponding index(es) such as `v[2]` or `A[i][j]` followed by the `=` keyword, or
  iii. a function name with its arguments such as `f(x,y)` followed by the `=` keyword.
  
 A primary keyword usually is followed by arguments and/or secondary keywords, which in turn can take arguments as well. For example, in
@@ -1248,9 +1248,12 @@ A primary keyword usually is followed by arguments and/or secondary keywords, wh
 ```feenox
 PROBLEM mechanical DIMENSIONS 3
 READ_MESH nafems-le10.msh 
+[...]
+# print the direct stress y at D (and nothing more)
+PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
 ```
 
-we have `PROBLEM` acting as a primary keyword, taking `mechanical` as its first argument and then `DIMENSIONS` as a secondary keyword with `3` being an argument to the secondary keyword. Then `READ_MESH` is another primary keyword taking `nafems-le10.msh` as its argument.
+we have `PROBLEM` acting as a primary keyword, taking `mechanical` as its first argument and then `DIMENSIONS` as a secondary keyword with `3` being an argument to the secondary keyword. Then `READ_MESH` is another primary keyword  taking `nafems-le10.msh` as its argument. 
 
 A primary keyword can be
 
@@ -1259,7 +1262,8 @@ A primary keyword can be
  3. both.
  
 Definitions are English _nouns_ and instructions are English _verbs_. 
-In the example above, `PROBLEM` is a definition because it tells FeenoX about something it has to do, but does not do anything actually. 
+In the example above, `PROBLEM` is a definition because it tells FeenoX about something it has to do (i.e. that it has to solve a three-dimensional problem), but does not do anything actually. On the other hand, `READ_MESH` is both a definition and an instruction: it defines that there exists a mesh named `nafems-le10.msh` which might be referenced later (for example in an `INTEGRATE` or `WRITE_MESH` instructions), but it also asks FeenoX to read the mesh at that point of the instruction list (more details below).  Finally, `PRINT` is a primary keyword taking different types and number or arguments. It is an instruction because it does not define anything, it just asks FeenoX to print the value of the function named `sigmay` evaluated at\ $2000,0,300$. In this case, `sigmay` is a function which is implicitly defined when `PROBLEM` is set to `mechanical`. If `sigmay` was referenced before `PROBLEM`, FeenoX would not find it. And if the problem was of any other type, FeenoX would not find it even when referenced from the last line of the input file.
+
 
 
 ### Simple inputs {#sec:simple}

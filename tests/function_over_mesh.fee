@@ -1,0 +1,7 @@
+READ_MESH tet1.msh DIM 3
+FUNCTION f(x,y,z) MESH tet1.msh
+
+vec_f[i] = 1*vec_f_x[i] + 2*vec_f_y[i] + 3*vec_f_z[i]
+# PRINT_FUNCTION f
+
+PRINT f(0.1,0.1,0.1)

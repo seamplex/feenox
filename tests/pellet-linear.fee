@@ -11,7 +11,10 @@ q = 300 * 100 / (pi*r^2)
 BC symmetry q=0
 BC external T=420
 
+# the reference solution is
+T_ref = 420 + q/(4*k)*r^2
+
 SOLVE_PROBLEM
-PRINT T_max-1276
+PRINT T_max-1277
 
 # WRITE_MESH pellet-linear.vtk T

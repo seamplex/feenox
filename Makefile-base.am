@@ -27,6 +27,7 @@ TESTS = \
         tests/function_algebraic.sh \
         tests/function_data.sh \
         tests/function_file.sh \
+        tests/function_mesh.sh \
         tests/function_vectors.sh \
         tests/integral.sh \
         tests/laplace2d.sh \
