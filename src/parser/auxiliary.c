@@ -228,7 +228,7 @@ int feenox_parser_match_keyword_expression(char *token, char *keyword[], expr_t 
 
 int feenox_parser_expression_in_string(double *result) {
   
-  char *token;
+  char *token = NULL;
   
   if ((token = feenox_get_next_token(NULL)) == NULL) {
     feenox_push_error_message("expected expression");
@@ -240,6 +240,47 @@ int feenox_parser_expression_in_string(double *result) {
   return FEENOX_OK;
 }
 
+int feenox_parser_expression_in_string_integer(int *result) {
+  
+  char *token = NULL;
+  
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected expression");
+    return FEENOX_ERROR;
+  }
+  
+  *result = (int)feenox_expression_evaluate_in_string(token);
+
+  return FEENOX_OK;
+}
+
+int feenox_parser_expression_in_string_unsigned_integer(unsigned int *result) {
+  
+  char *token = NULL;
+  
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected expression");
+    return FEENOX_ERROR;
+  }
+  
+  *result = (unsigned int)feenox_expression_evaluate_in_string(token);
+
+  return FEENOX_OK;
+}
+
+int feenox_parser_expression_in_string_sizet(size_t *result) {
+  
+  char *token = NULL;
+  
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected expression");
+    return FEENOX_ERROR;
+  }
+  
+  *result = (size_t)feenox_expression_evaluate_in_string(token);
+
+  return FEENOX_OK;
+}
 
 int feenox_parser_string(char **string) {
   

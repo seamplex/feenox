@@ -63,6 +63,9 @@ extern int feenox_parser_string(char **string);
 extern int feenox_parser_expression(expr_t *expr);
 extern int feenox_parser_expressions(expr_t *expr[], size_t n);
 extern int feenox_parser_expression_in_string(double *result);
+extern int feenox_parser_expression_in_string_integer(int *result);
+extern int feenox_parser_expression_in_string_unsigned_integer(unsigned int *result);
+extern int feenox_parser_expression_in_string_sizet(size_t *result);
 extern int feenox_parser_string_format(char **string, int *n_args);
 
 extern int feenox_add_function_from_string(const char *string, char **name);
@@ -116,6 +119,7 @@ extern int feenox_parse_integrate(void);
 extern int feenox_parse_find_extrema(void);
 extern int feenox_parse_fit(void);
 extern int feenox_parse_dump(void);
+extern int feenox_parse_solve(void);
 
 
 #endif  

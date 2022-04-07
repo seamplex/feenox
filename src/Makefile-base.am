@@ -44,8 +44,9 @@ feenox_SOURCES = \
 ./math/dae.c \
 ./math/expressions.c \
 ./math/fit.c \
-./math/matrix.c \
 ./math/function.c \
+./math/matrix.c \
+./math/solve.c \
 ./math/vector.c \
 ./mesh/init.c \
 ./mesh/geometry.c \

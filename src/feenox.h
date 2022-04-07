@@ -139,10 +139,16 @@
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
 #define DEFAULT_CONDITION_THRESHOLD        (9.765625e-4)         // (1/2)^-10
 
-#define DEFAULT_FIT_MAX_ITER          100
-#define DEFAULT_FIT_XTOL              1e-8
-#define DEFAULT_FIT_GTOL              1e-8
-#define DEFAULT_FIT_FTOL              0.0
+#define DEFAULT_FIT_MAX_ITER               100
+#define DEFAULT_FIT_XTOL                   1e-8
+#define DEFAULT_FIT_GTOL                   1e-8
+#define DEFAULT_FIT_FTOL                   0.0
+
+#define DEFAULT_SOLVE_METHOD               gsl_multiroot_fsolver_dnewton
+#define DEFAULT_SOLVE_EPSREL               0   // zero means do not look for deltas in derivatives
+#define DEFAULT_SOLVE_EPSABS               1e-6
+#define DEFAULT_SOLVE_MAX_ITER             128
+
 
 #define MINMAX_ARGS           10
 
@@ -287,6 +293,7 @@ typedef struct mesh_integrate_t mesh_integrate_t;
 typedef struct mesh_find_extrema_t mesh_find_extrema_t;
 
 typedef struct fit_t fit_t;
+typedef struct solve_t solve_t;
 typedef struct dump_t dump_t;
 typedef struct reaction_t reaction_t;
 
@@ -1337,30 +1344,29 @@ struct fit_t {
   unsigned int max_iter;
   int verbose;
   
-  // cantidad de parametros (i.e. a y b -> 2)
+  // number of parameters to fit (i.e. a & b -> 2)
   unsigned int n_via;
-  // cantidad de datos experimentales a ajustar (i.e. del orden de 1000)
+  // number of experimental data to fit (order 1,000)
   size_t n_data;
   
-  // apuntador a la funcion cuyos parametros hay que ajustar
+  // algebraic function whose parameters we have to fit 
   function_t *function;
-  // apuntador a la funcion point-wise que tiene los datos experimentales
+  // point-wise function with the experimental data
   function_t *data;
   
-  // arreglo de apuntadores a las variables que funcionan como parametros
-  // y a sus incertezas estadisticas resultantes
+  // pointers to the variables acting as parameters
   var_t **via;
+  // and their statistical uncertainties
   var_t **sigma;
 
-  // arreglo de tamanio n_params con las expresiones de la derivada de 
-  // la funcion function con respecto a los parametros
-  // si es NULL hay que calcularlo a manopla numericamente
+  // array of size n_params with the analytical derivatives of the function with respect to the params
+  // if it is NULL we have to compute it numerically
   expr_t *gradient;  
   
-  // lo mismo pero para el guess inicial
+  // same thing for the initial guess
   expr_t *guess;
   
-  // rango donde debe evaluarse la funcion a ajustar
+  // range where to fit
   multidim_range_t range;
   
   //expr_t tol_abs;
@@ -1375,6 +1381,23 @@ struct fit_t {
   
   fit_t *next;
   
+};
+
+struct solve_t {
+  size_t n_unknowns;
+  var_t **unknown;
+  expr_t *residual;
+  
+  expr_t *guess;
+  
+  expr_t epsabs;
+  expr_t epsrel;
+  int max_iter;
+  int verbose;
+
+  const gsl_multiroot_fsolver_type *type;
+  
+  solve_t *next;  
 };
 
 struct dump_t {
@@ -1460,6 +1483,7 @@ struct feenox_t {
   print_function_t *print_functions;
   print_vector_t *print_vectors;
   fit_t *fits;
+  solve_t *solves;
   
   struct {
     var_t *done;
@@ -1982,12 +2006,9 @@ extern int feenox_instruction_alias(void *arg);
 
 // fit.c
 extern int feenox_instruction_fit(void *arg);
-extern int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
-extern int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
-extern int feenox_fit_in_range(fit_t *this);
-extern void feenox_fit_update_x(fit_t *this, size_t j);
-extern void feenox_fit_update_vias(fit_t *this, const gsl_vector *via);
-extern void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w);
+
+// solve.c
+extern int feenox_instruction_solve(void *arg);
 
 // dump.c
 extern int feenox_instruction_dump(void *arg);

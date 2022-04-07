@@ -1,0 +1,5 @@
+# from https://www.gnu.org/software/gsl/doc/html/multiroots.html
+a = 1
+b = 10
+SOLVE FOR 2 UNKNOWNS x y   a*(1-x) b*(y-x^2)
+PRINT (1-x)^2+(1-y)^2

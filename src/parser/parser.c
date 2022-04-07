@@ -355,6 +355,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_dump());
       return FEENOX_OK;
       
+///kw+SOLVE+desc Solve a (small) system of non-linear equations.
+///kw+DUMP+usage SOLVE
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "SOLVE") == 0) {
+      feenox_call(feenox_parse_solve());
+      return FEENOX_OK;
+      
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these
@@ -603,132 +610,6 @@ int feenox_parse_line(void) {
       }
 
       return FEENOX_OK;
-
-      
-// --- SOLVE -----------------------------------------------------
-//kw+SOLVE+desc Solve a non-linear system of\ $n$ equations with\ $n$ unknowns.
-//kw+SOLVE+usage SOLVE
-      
-    } else if (strcasecmp(token, "SOLVE") == 0) {
-
-      double xi;
-      int i;
-      solve_t *solve;
-      solve = calloc(1, sizeof(solve_t));
-      LL_APPEND(feenox.solves, solve);
-
-//kw+SOLVE+usage <n> 
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      if ((solve->n = (int)(xi)) <= 0) {
-        feenox_push_error_message("expected a positive number of unknowns instead of %d", solve->n);
-        return FEENOX_ERROR;
-      }
-
-      solve->unknown = calloc(solve->n, sizeof(var_t *));
-      solve->residual = calloc(solve->n, sizeof(expr_t));
-      solve->guess = calloc(solve->n, sizeof(expr_t));
-
-      while ((token = feenox_get_next_token(NULL)) != NULL) {
-//kw+SOLVE+usage UNKNOWNS <var_1> <var_2> ... <var_n>
-        if (strcasecmp(token, "UNKNOWNS") == 0) {
-          for (i = 0; i < solve->n; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected %d variables and found only %d", solve->n, i);
-            }
-            if ((solve->unknown[i] = feenox_get_or_define_variable_ptr(token)) == NULL) {
-              return FEENOX_ERROR;
-            }
-          }
-          
-//kw+SOLVE+usage RESIDUALS <expr_1> <expr_2> ... <expr_n> ]
-        } else if (strcasecmp(token, "RESIDUALS") == 0) {
-          for (i = 0; i < solve->n; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected %d expressions and found only %d", solve->n, i);
-            }
-            feenox_call(feenox_parse_expression(token, &solve->residual[i]));
-          }
-      
-//kw+SOLVE+usage GUESS <expr_1> <expr_2> ... <expr_n> ]
-        } else if (strcasecmp(token, "GUESS") == 0) {
-          for (i = 0; i < solve->n; i++) {
-            if ((token = feenox_get_next_token(NULL)) == NULL) {
-              feenox_push_error_message("expected %d expressions and found only %d", solve->n, i);
-            }
-            feenox_call(feenox_parse_expression(token, &solve->guess[i]));
-          }
-      
-//kw+SOLVE+usage [ METHOD
-        } else if (strcasecmp(token, "METHOD") == 0) {
-
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected method name");
-            return FEENOX_ERROR;
-          }
-
-//kw+SOLVE+usage {
-//kw+SOLVE+usage dnewton |
-          if (strcasecmp(token, "dnewton") == 0) {
-            solve->type = gsl_multiroot_fsolver_dnewton;
-//kw+SOLVE+usage hybrid |
-          } else if (strcasecmp(token, "hybrid") == 0) {
-            solve->type = gsl_multiroot_fsolver_hybrid;
-//kw+SOLVE+usage hybrids |
-          } else if (strcasecmp(token, "hybrids") == 0) {
-            solve->type = gsl_multiroot_fsolver_hybrids;
-//kw+SOLVE+usage broyden }
-          } else if (strcasecmp(token, "broyden") == 0) {
-            solve->type = gsl_multiroot_fsolver_hybrid;
-          }
-//kw+SOLVE+usage ]
-          
-//kw+SOLVE+usage [ EPSABS <expr> ]
-        } else if (strcasecmp(token, "EPSABS") == 0) {
-
-          feenox_call(feenox_parser_expression(&solve->epsabs));
-
-//kw+SOLVE+usage [ EPSREL <expr> ]
-        } else if (strcasecmp(token, "EPSREL") == 0) {
-
-          feenox_call(feenox_parser_expression(&solve->epsrel));
-
-//kw+SOLVE+usage [ MAX_ITER <expr> ]
-        } else if (strcasecmp(token, "MAX_ITER") == 0) {
-
-          feenox_call(feenox_parser_expression_in_string(&xi));
-          if ((solve->max_iter = (int)xi) < 0) {
-            feenox_push_error_message("expected a positive integer for MAX_ITER");
-            return FEENOX_ERROR;
-          }
-
-//kw+SOLVE+usage [ VERBOSE ]
-        } else if (strcasecmp(token, "VERBOSE") == 0) {
-
-          solve->verbose = 1;          
-
-        } else {
-          feenox_push_error_message("unkown keyword '%s'", token);
-          return FEENOX_ERROR;
-        }
-        
-      }
-        
-      if (solve->residual[0].n_tokens == 0) {
-        feenox_push_error_message("no RESIDUALs to solve");
-        return FEENOX_ERROR;
-      }
-      
-      if (solve->type == NULL) {
-        solve->type = DEFAULT_SOLVE_METHOD;
-      }
-
-      if (feenox_define_instruction(feenox_instruction_solve, solve) == NULL) {
-        return FEENOX_ERROR;
-      }
-
-      return FEENOX_OK;      
-
-
 
 // ----- HISTORY  -----------------------------------------------------------------
 //kw+HISTORY+desc Record the time history of a variable as a function of time.
@@ -2233,11 +2114,9 @@ int feenox_parse_read_mesh(void) {
 ///kw_pde+READ_MESH+detail how many arguments these functions take. 
 ///kw_pde+READ_MESH+usage [ DIM <num_expr> ]@
     if (strcasecmp(token, "DIM") == 0 || strcasecmp(token, "DIMENSIONS") == 0) {
-      double xi;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      mesh->dim = (int)(round(xi));
+      feenox_call(feenox_parser_expression_in_string_unsigned_integer(&mesh->dim));
       if (mesh->dim < 1 || mesh->dim > 3) {
-        feenox_push_error_message("mesh dimensions have to be either 1, 2 or 3, not '%g'", xi);
+        feenox_push_error_message("mesh dimensions have to be either 1, 2 or 3");
         return FEENOX_ERROR;
       }
 
@@ -2606,17 +2485,13 @@ int feenox_parse_physical_group(void) {
 ///kw_pde+PHYSICAL_GROUP+usage [ DIMENSION <expr> ]
 ///kw_pde+PHYSICAL_GROUP+detail An explicit dimension of the physical group can be provided with `DIMENSION`.
     } else if (strcasecmp(token, "DIMENSION") == 0 || strcasecmp(token, "DIM") == 0) {
-      double xi;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      dimension = (unsigned int)(round(xi));
+      feenox_call(feenox_parser_expression_in_string_unsigned_integer(&dimension));
 
 ///kw_pde+PHYSICAL_GROUP+usage [ ID <expr> ]@
 ///kw_pde+PHYSICAL_GROUP+detail An explicit id can be given with `ID`.
 ///kw_pde+PHYSICAL_GROUP+detail Both dimension and id should match the values in the mesh.
     } else if (strcasecmp(token, "ID") == 0 || strcasecmp(token, "DIM") == 0) {
-      double xi;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      id = (unsigned int)(round(xi));
+      feenox_call(feenox_parser_expression_in_string_unsigned_integer(&id));
       
 ///kw_pde+PHYSICAL_GROUP+usage [ MATERIAL <name> |
 ///kw_pde+PHYSICAL_GROUP+detail For volumetric elements, physical groups can be linked to materials using `MATERIAL`.
@@ -2936,9 +2811,7 @@ int feenox_parse_problem(void) {
       feenox.pde.dim = 3;
 ///kw_pde+PROBLEM+usage DIM <expr> ]
     } else if (strcasecmp(token, "DIM") == 0 || strcasecmp(token, "DIMENSIONS") == 0) {
-      double xi = 0;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      feenox.pde.dim = (unsigned int)(xi);
+      feenox_call(feenox_parser_expression_in_string_unsigned_integer(&feenox.pde.dim));
       if (feenox.pde.dim < 1 || feenox.pde.dim > 3)  {
         feenox_push_error_message("either one, two or three dimensions should be selected instead of '%d'", feenox.pde.dim);
         return FEENOX_ERROR;
@@ -3000,9 +2873,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail The number of modes to be computed when solving eigenvalue problems is given by `MODES`.
 ///kw_pde+PROBLEM+detail The default value is problem dependent.
     } else if (strcasecmp(token, "MODES") == 0) {
-      double xi = 0;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      feenox.pde.nev = (int)(xi);
+      feenox_call(feenox_parser_expression_in_string_integer(&feenox.pde.nev));
       if (feenox.pde.nev < 1)  {
         feenox_push_error_message("a positive number of modes should be given instead of '%d'", feenox.pde.nev);
         return FEENOX_ERROR;
@@ -3531,9 +3402,8 @@ int feenox_parse_fit(void) {
 */
 ///kw+FIT+usage [ MAX_ITER <expr> ]@
     } else if (strcasecmp(token, "MAX_ITER") == 0) {
-      double xi = 0;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      if ((fit->max_iter = (int)xi) < 0) {
+      feenox_call(feenox_parser_expression_in_string_unsigned_integer(&fit->max_iter));
+      if (fit->max_iter < 0) {
         feenox_push_error_message("expected a positive integer for MAX_ITER");
         return FEENOX_ERROR;
       }
@@ -3635,6 +3505,136 @@ int feenox_parse_dump(void) {
   
   
   return FEENOX_OK;
+}
+
+int feenox_parse_solve(void) {
+  
+  solve_t *solve = NULL;
+  feenox_check_alloc(solve = calloc(1, sizeof(solve_t)));
+  size_t n_equations = 0;
+
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+SOLVE+usage FOR <n>
+    if (strcasecmp(token, "FOR") == 0) {
+      feenox_call(feenox_parser_expression_in_string_sizet(&solve->n_unknowns));
+      if (solve->n_unknowns <= 0) {
+        feenox_push_error_message("expected a positive number of unknowns instead of %d", solve->n_unknowns);
+        return FEENOX_ERROR;
+      }
+
+      feenox_check_alloc(solve->unknown = calloc(solve->n_unknowns, sizeof(var_t *)));
+      feenox_check_alloc(solve->residual = calloc(solve->n_unknowns, sizeof(expr_t)));
+      
+///kw+SOLVE+usage UNKNOWNS <var_1> <var_2> ... <var_n>
+    } else if (strcasecmp(token, "UNKNOWNS") == 0) {
+      
+      if (solve->n_unknowns == 0) {
+        feenox_push_error_message("FOR should become before UNKNOWNS");
+        return FEENOX_ERROR;
+      }
+      
+      for (unsigned int i = 0; i < solve->n_unknowns; i++) {
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected %d variables and found only %d", solve->n_unknowns, i);
+        }
+        if ((solve->unknown[i] = feenox_get_or_define_variable_get_ptr(token)) == NULL) {
+          return FEENOX_ERROR;
+        }
+      }
+      
+///kw+SOLVE+usage [ METHOD
+    } else if (strcasecmp(token, "METHOD") == 0) {
+
+      if ((token = feenox_get_next_token(NULL)) == NULL) {
+        feenox_push_error_message("expected method name");
+        return FEENOX_ERROR;
+      }
+
+///kw+SOLVE+usage {
+///kw+SOLVE+usage dnewton |
+      if (strcasecmp(token, "dnewton") == 0) {
+        solve->type = gsl_multiroot_fsolver_dnewton;
+///kw+SOLVE+usage hybrid |
+      } else if (strcasecmp(token, "hybrid") == 0) {
+        solve->type = gsl_multiroot_fsolver_hybrid;
+///kw+SOLVE+usage hybrids |
+      } else if (strcasecmp(token, "hybrids") == 0) {
+        solve->type = gsl_multiroot_fsolver_hybrids;
+///kw+SOLVE+usage broyden }
+      } else if (strcasecmp(token, "broyden") == 0) {
+        solve->type = gsl_multiroot_fsolver_hybrid;
+///kw+SOLVE+usage ]
+      }
+          
+///kw+SOLVE+usage [ EPSABS <expr> ]
+    } else if (strcasecmp(token, "EPSABS") == 0) {
+      feenox_call(feenox_parser_expression(&solve->epsabs));
+
+///kw+SOLVE+usage [ EPSREL <expr> ]
+    } else if (strcasecmp(token, "EPSREL") == 0) {
+      feenox_call(feenox_parser_expression(&solve->epsrel));
+
+///kw+SOLVE+usage [ MAX_ITER <expr> ]
+    } else if (strcasecmp(token, "MAX_ITER") == 0) {
+      feenox_call(feenox_parser_expression_in_string_integer(&solve->max_iter));
+      if (solve->max_iter < 0) {
+        feenox_push_error_message("expected a positive integer for MAX_ITER");
+        return FEENOX_ERROR;
+      }
+
+//kw+SOLVE+usage [ VERBOSE ]
+    } else if (strcasecmp(token, "VERBOSE") == 0) {
+      solve->verbose = 1;          
+          
+    } else {
+//kw+SOLVE+usage <equation_1> <equation_2> ... <equation_n>
+      if (solve->n_unknowns == 0) {
+        feenox_push_error_message("FOR should become before the equations");
+        return FEENOX_ERROR;
+      }
+
+      if (n_equations == solve->n_unknowns) {
+        feenox_push_error_message("more equations than unknowns");
+        return FEENOX_ERROR;
+      }
+      
+      char *equal_sign = strchr(token, '=');
+      if (equal_sign == NULL) {
+        // no equal sign means residual (equal to zero)
+        feenox_call(feenox_expression_parse(&solve->residual[n_equations++], token));
+      } else {
+        *equal_sign = '\0';
+        char *residual = NULL;
+        feenox_check_minusone(asprintf(&residual, "(%s)-(%s)", token, equal_sign+1));
+        feenox_call(feenox_expression_parse(&solve->residual[n_equations++], residual));
+        feenox_free(residual);
+      }
+    }
+  }
+
+  if (solve->n_unknowns == 0) {
+    feenox_push_error_message("do not know the number of unknowns");
+    return FEENOX_ERROR;
+  }
+  
+  if (n_equations == 0) {
+    feenox_push_error_message("no equations to solve");
+    return FEENOX_ERROR;
+  }
+  if (n_equations < solve->n_unknowns) {
+    feenox_push_error_message("less equations (%ld) than unknowns (%ld)", n_equations, solve->n_unknowns);
+    return FEENOX_ERROR;
+  }
+      
+  if (solve->type == NULL) {
+    solve->type = DEFAULT_SOLVE_METHOD;
+  }
+
+  feenox_call(feenox_add_instruction(feenox_instruction_solve, solve));
+  LL_APPEND(feenox.solves, solve);
+      
+  return FEENOX_OK;        
 }
 
 

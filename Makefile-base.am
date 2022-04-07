@@ -44,6 +44,7 @@ TESTS = \
         tests/parallelepiped.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
+        tests/solve.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
         tests/thermal-slab-no-k.sh \

@@ -22,6 +22,14 @@
 #include "feenox.h"
 extern feenox_t feenox;
 
+int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
+int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
+int feenox_fit_in_range(fit_t *this);
+void feenox_fit_update_x(fit_t *this, size_t j);
+void feenox_fit_update_vias(fit_t *this, const gsl_vector *via);
+void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w);
+
+
 int feenox_instruction_fit(void *arg) {
   fit_t *fit = (fit_t *)arg;
   

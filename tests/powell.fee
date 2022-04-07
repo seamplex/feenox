@@ -1,0 +1,11 @@
+# from https://www.gnu.org/software/gsl/doc/html/multiroots.html
+A = 1e4
+x0 = 0.5
+x1 = 1
+
+SOLVE FOR 2 UNKNOWNS x0 x1 {
+  A*x0*x1=1
+  exp(-x0)+exp(-x1)=(1+1/A)
+}
+
+PRINT %.6f x0 x1 SEP " "

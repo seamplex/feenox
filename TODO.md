@@ -1,6 +1,7 @@
 # General things to do
 
  * implicit call to `SOLVE_PROBLEM`?
+ * use `MatPreallocator` to efficiently pre-allocate the matrices
  * automatically link virtual methods in autogen depending on the directories under `pdes`
  * use `spack`
  * https://joss.theoj.org/
