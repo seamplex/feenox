@@ -1,0 +1,17 @@
+READ_MESH hex20.msh DIM 3
+READ_MESH hex27.msh DIM 3
+
+FUNCTION f20(x,y,z) MESH hex20.msh
+FUNCTION f27(x,y,z) MESH hex27.msh
+f(x,y,z) = sin(x^3 + y^2 + z)
+
+vec_f20[i] = f(vec_f20_x[i], vec_f20_y[i], vec_f20_z[i])
+vec_f27[i] = f(vec_f27_x[i], vec_f27_y[i], vec_f27_z[i])
+
+If0 = integral(integral(integral(f(x,y,z), z, 0, 1), y, 0, 1), x, 0, 1)
+INTEGRATE f20  MESH hex20.msh RESULT If20
+INTEGRATE f27  MESH hex27.msh RESULT If27
+
+PRINT %.10f If0
+PRINT %.10f If20  %+.2e If20-If0
+PRINT %.10f If27  %+.2e If27-If0
