@@ -1,17 +1,41 @@
+# these two are instructions to read a two meshes
+# but they also define two mesh names that can be referred to later
 READ_MESH hex20.msh DIM 3
 READ_MESH hex27.msh DIM 3
 
+# these three lines are definitions, they define three functions
+# the first two also define four vectors for each function
+#  1. vec_f20_x and vec_f27_x with the x coordinates of the mesh' nodes
+#  2. vec_f20_y and vec_f27_y with the y coordinates of the mesh' nodes
+#  3. vec_f20_z and vec_f27_z with the z coordinates of the mesh' nodes
+#  4. vec_f20 and vec_f27 with the value of the function at the i-th node
+# these definitions do not evaluate the functions, but they fill vectors 1-3
+# (we'll fill vectors 4 below)
+# note that these definitions refer to the meshes defined above in READ_MESH
 FUNCTION f20(x,y,z) MESH hex20.msh
 FUNCTION f27(x,y,z) MESH hex27.msh
 f(x,y,z) = sin(x^3 + y^2 + z)
 
+# these two lines are assignment instructions, they "fill" in
+# the vectors with the value of the functinos f20(x,y,z) and f27(x,y,z)
+# by evaluating f(x,y,z) at the nodes of the two meshes
+# (there is a implicit loop for the index i over the size of the vectors)
 vec_f20[i] = f(vec_f20_x[i], vec_f20_y[i], vec_f20_z[i])
 vec_f27[i] = f(vec_f27_x[i], vec_f27_y[i], vec_f27_z[i])
 
+# this line is an assignment, that first defines a variale If0
+# and then calls the functional integral three times to perform a
+# "continuous" (in the sense that it is numeric but adapative) triple integration
 If0 = integral(integral(integral(f(x,y,z), z, 0, 1), y, 0, 1), x, 0, 1)
+
+# these two lines are instructions, they integrate functions f20 and f27 over
+# each of the meshes and then they store the results in the (implicitly defined)
+# variables If20 and If27
 INTEGRATE f20  MESH hex20.msh RESULT If20
 INTEGRATE f27  MESH hex27.msh RESULT If27
 
+# these lines are instructions, they print stuff to the standard output
+# nothing is defined
 PRINT %.10f If0
 PRINT %.10f If20  %+.2e If20-If0
 PRINT %.10f If27  %+.2e If27-If0
