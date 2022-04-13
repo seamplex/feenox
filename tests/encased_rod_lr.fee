@@ -9,7 +9,7 @@ BC right T=100
 
 SOLVE_PROBLEM
 
-WRITE_MESH encased_rod.vtk T VECTOR qx qy qz
+WRITE_MESH encased_rod_lb.vtk T VECTOR qx qy qz
 
 # T1(x) = T(x,0.005,0.02)
 # T2(x) = T(x,0.020,0.02)

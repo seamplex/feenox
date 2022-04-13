@@ -8,8 +8,11 @@ Physical Volume("ss", 1) = {1, 3};
 Physical Volume("cu", 2) = {2};
 Physical Surface("left", 3) = {12, 7, 1};
 Physical Surface("right", 4) = {13, 8, 2};
+Physical Surface("top", 5) = {14};
+Physical Surface("bottom", 6) = {3};
 
-Mesh.MeshSizeMax = 0.005;
+Mesh.MeshSizeMax = 0.01;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;
 Mesh.Algorithm = 8;
+Mesh.ElementOrder = 2;

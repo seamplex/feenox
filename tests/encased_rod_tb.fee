@@ -1,0 +1,20 @@
+PROBLEM thermal 3D
+READ_MESH encased_rod.msh
+
+k_cu = 372
+k_ss = 18
+
+BC top    T=400
+BC bottom T=100
+
+SOLVE_PROBLEM
+
+WRITE_MESH encased_rod_tb.vtk T VECTOR qx qy qz
+
+T_top_num   = T(0.25,0.03,0.02)
+T_bot_num   = T(0.25,0.01,0.02)
+delta_T_cu_num = T_top_num - T_bot_num
+
+delta_T_cu = 300/(1 + 2*(k_cu/0.02)/(k_ss/0.01))
+
+PRINT delta_T_cu_num-delta_T_cu
