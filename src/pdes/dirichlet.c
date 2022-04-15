@@ -107,7 +107,6 @@ int feenox_problem_dirichlet_eval(void) {
                 feenox_call(feenox.pde.bc_set_dirichlet(element, bc_data, j));
               } else if (bc_data->type_math == bc_type_math_multifreedom) {
                 // TODO: high-order nodes end up with a different penalty weight
-                // TODO: multi-freedom constrains with lagrange
                 feenox_call(feenox.pde.bc_set_multifreedom(element, bc_data, j));
               }
             }  
@@ -172,8 +171,8 @@ int feenox_problem_dirichlet_set_K(void) {
   
   
   // add multifreedom constrains using the penalty method (before setting the rows to zero)
+  // TODO: multi-freedom constrains with lagrange
   if (feenox.pde.n_multifreedom_nodes > 0) {
-    double weight = 1e8;
     gsl_matrix *P = NULL;
     feenox_check_alloc(P = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     for (unsigned int k = 0; k < feenox.pde.n_multifreedom_nodes; k++) {
@@ -181,7 +180,7 @@ int feenox_problem_dirichlet_set_K(void) {
       PetscInt *l = feenox.pde.multifreedom_indexes[k];
 
       gsl_matrix_set_zero(P);
-      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, weight, c, c, 0, P));
+      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, feenox_var_value(feenox.pde.vars.penalty_weight), c, c, 0, P));
       petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, gsl_matrix_ptr(P, 0, 0), ADD_VALUES));
     }
     gsl_matrix_free(P);

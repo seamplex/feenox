@@ -157,8 +157,6 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
   
   
   if (bc_data->type_phys == BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY) {
-    // TODO: check if we can get away with a regular dirichlet BC
-    
     // outward normal (smoothed over all elements on the physical group of the BC)
     PetscScalar n_element[3] = {0, 0, 0};
     PetscScalar n_nodal[3] = {0, 0, 0};
@@ -172,17 +170,28 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
         n_nodal[2] += n_element[2];
       }
     }
+    
+    int coordinate_direction = -1;
     double norm = gsl_hypot3(n_nodal[0], n_nodal[1], n_nodal[2]);
     if (PetscLikely(norm != 0)) {
-      n_nodal[0] /= norm;
-      n_nodal[1] /= norm;
-      n_nodal[2] /= norm;
+      // if the outward normal coincides with one of the three axes, we can get away with a regular dirichlet BC
+      for (unsigned int g = 0; g < 3; g++) {
+        n_nodal[g] /= norm;
+        if (fabs(n_nodal[g]) > (1-1e-4)) {
+          coordinate_direction = g;
+        }  
+      }
     } else {
       feenox_push_error_message("outward normal has zero norm");
       return FEENOX_ERROR;
     }
+
     
-    feenox_call(feenox_problem_multifreedom_add(node_global_index, n_nodal));
+    if (coordinate_direction != -1) {
+      feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[coordinate_direction], 0));
+    } else {
+      feenox_call(feenox_problem_multifreedom_add(node_global_index, n_nodal));
+    }  
     
   } else if (bc_data->type_phys == BC_TYPE_MECHANICAL_RADIAL_SYMMETRY) {
     
