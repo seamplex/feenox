@@ -33,6 +33,27 @@ int feenox_problem_dirichlet_add(size_t index, double value) {
   return FEENOX_OK;
 }
 
+int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
+
+#ifdef HAVE_PETSC
+  PetscInt *l = NULL;
+  feenox_check_alloc(l = calloc(feenox.pde.dofs, sizeof(PetscInt)));
+  
+  gsl_matrix *c = NULL;
+  feenox_check_alloc(c = gsl_matrix_alloc(1, feenox.pde.dofs));
+
+  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+    l[g] = feenox.pde.mesh->node[index].index_dof[g];
+    gsl_matrix_set(c, 0, g, coefficients[g]);
+  }
+  
+  feenox.pde.multifreedom_indexes[feenox.pde.multifreedom_k] = l;
+  feenox.pde.multifreedom_coefficients[feenox.pde.multifreedom_k] = c;
+  feenox.pde.multifreedom_k++;
+#endif
+  
+  return FEENOX_OK;
+}
 
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_problem_dirichlet_eval(void) {
@@ -44,11 +65,16 @@ int feenox_problem_dirichlet_eval(void) {
     // on the first iteration, assume that all the nodes need a dirichlet BC
     // then we trim the extra space to save memory
     // TODO: allow the user to provide a factor at runtime
+    // TODO: be smarted and re-allocate as needed
     n_bcs = feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
 
     feenox_check_alloc(feenox.pde.dirichlet_indexes = calloc(n_bcs, sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = calloc(n_bcs, sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.dirichlet_derivatives = calloc(n_bcs, sizeof(PetscScalar)));
+    
+    feenox_check_alloc(feenox.pde.multifreedom_indexes = calloc(n_bcs, sizeof(PetscInt)));
+    feenox_check_alloc(feenox.pde.multifreedom_coefficients = calloc(n_bcs, sizeof(PetscScalar)));
+    
   } else {
     // if we are here then we know more or less the number of BCs we need
     n_bcs = feenox.pde.n_dirichlet_rows;
@@ -61,39 +87,29 @@ int feenox_problem_dirichlet_eval(void) {
   size_t j = 0;
   feenox.pde.dirichlet_k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
-
-//    printf("node = %ld\n", j);
-    
-    // TODO: optimize these ugly loops
+    // TODO: optimize these ugly nested loops
     // maybe if we went the other way and looped over the elements first?
     // merge_sort + remove duplicates?
     physical_group_t *last_physical_group = NULL;
-    LL_FOREACH(feenox.pde.mesh->node[j].associated_elements, element_list) {
+    LL_FOREACH(feenox.pde.mesh->node[j].element_list, element_list) {
       element = element_list->element;
-//      printf(" element = %ld\n", element->tag);
       if (element != NULL && element->type->dim < feenox.pde.dim && element->physical_group != NULL && element->physical_group != last_physical_group) {
-//        printf("  candidate\n");
+        last_physical_group = element->physical_group;
         LL_FOREACH(element->physical_group->bcs, bc) {
-//          printf("   bc = %s\n", bc->name);
           DL_FOREACH(bc->bc_datums, bc_data) {
-//            printf("    data = %d\n", bc_data->type_math);
-            if (bc_data->type_math == bc_type_math_dirichlet) {
-
-              // if there is a condition we evaluate it now
-              if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
-
-                if (bc_data->space_dependent) {
-                  feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
-                }
-//                printf("      FOUND NODE %ld\n", j);
-//                printf("%ld\n", j);                
-                feenox_call(feenox.pde.bc_set_dirichlet(bc_data, j));
-                last_physical_group = element->physical_group;
-
+            // if there is a condition we evaluate it now
+            if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
+              if (bc_data->space_dependent) {
+                feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
               }
-              // TODO: high-order nodes end up with a different penalty weight
-              // TODO: multi-freedom constrains, penalty/lagrange
-              // TODO: tangential & radial symmetry
+              // TODO: normal-dependent
+              if (bc_data->type_math == bc_type_math_dirichlet) {
+                feenox_call(feenox.pde.bc_set_dirichlet(element, j, bc_data));
+              } else if (bc_data->type_math == bc_type_math_multifreedom) {
+                // TODO: high-order nodes end up with a different penalty weight
+                // TODO: multi-freedom constrains with lagrange
+                feenox_call(feenox.pde.bc_set_multifreedom(element, j, bc_data));
+              }
             }  
           }
         }
@@ -109,6 +125,13 @@ int feenox_problem_dirichlet_eval(void) {
     feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.n_dirichlet_rows * sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.dirichlet_derivatives = realloc(feenox.pde.dirichlet_derivatives, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
+  }
+  if (feenox.pde.n_multifreedom_nodes != feenox.pde.multifreedom_k) {
+    feenox.pde.n_multifreedom_nodes = feenox.pde.multifreedom_k;
+    
+    // if k == 0 this like freeing
+    feenox_check_alloc(feenox.pde.multifreedom_indexes = realloc(feenox.pde.multifreedom_indexes, feenox.pde.n_multifreedom_nodes * sizeof(PetscInt *)));
+    feenox_check_alloc(feenox.pde.multifreedom_coefficients = realloc(feenox.pde.multifreedom_coefficients, feenox.pde.n_multifreedom_nodes * sizeof(gsl_matrix *)));
   }
 
 #endif
@@ -145,6 +168,25 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.K_bc), "K_bc"));
   } else {
     petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
+  }
+  
+  
+  // add multifreedom constrains using the penalty method (before setting the rows to zero)
+  if (feenox.pde.n_multifreedom_nodes > 0) {
+    double weight = 1e8;
+    gsl_matrix *P = NULL;
+    feenox_check_alloc(P = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    for (unsigned int k = 0; k < feenox.pde.n_multifreedom_nodes; k++) {
+      gsl_matrix *c = feenox.pde.multifreedom_coefficients[k];
+      PetscInt *l = feenox.pde.multifreedom_indexes[k];
+
+      gsl_matrix_set_zero(P);
+      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, weight, c, c, 0, P));
+      petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, gsl_matrix_ptr(P, 0, 0), ADD_VALUES));
+    }
+    gsl_matrix_free(P);
+    petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
+    petsc_call(MatAssemblyEnd(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
   }
   
   // this vector holds the dirichlet values and is used to re-write

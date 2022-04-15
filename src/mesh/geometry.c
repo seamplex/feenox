@@ -98,8 +98,9 @@ double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a)
 int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   
   double a[3], b[3], surface_center[3], volumetric_neighbor_center[3];
-  element_t *volumetric_neighbor;
+  element_t *volumetric_neighbor = NULL;
 
+  // TODO: virtuals!
   if (element->type->dim == 0) {
     feenox_push_error_message("trying to compute the outward normal of a point (element %d)", element->tag);
     return FEENOX_ERROR;

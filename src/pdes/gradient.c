@@ -296,7 +296,7 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   element_t *element = NULL;
   element_ll_t *associated_element = NULL;
   gsl_matrix_set_zero(feenox.pde.m2);
-  LL_FOREACH(node->associated_elements, associated_element) {
+  LL_FOREACH(node->element_list, associated_element) {
     element = associated_element->element;
     if (element->dphidx_node != NULL) {
       found = 0;

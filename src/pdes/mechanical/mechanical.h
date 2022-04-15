@@ -29,6 +29,7 @@
 #define BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION 3
 #define BC_TYPE_MECHANICAL_TRACTION             4
 #define BC_TYPE_MECHANICAL_FORCE                5
+#define BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY  6
 
 typedef struct mechanical_t mechanical_t;
 

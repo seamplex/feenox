@@ -56,6 +56,7 @@ int feenox_problem_init_parser_mechanical(void) {
 //  feenox.pde.setup_snes = feenox_problem_setup_snes_mechanical;
   
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_mechanical_displacement;
+  feenox.pde.bc_set_multifreedom = feenox_problem_bc_set_mechanical_multifreedom;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
   feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
   

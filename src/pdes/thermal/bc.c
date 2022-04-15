@@ -85,11 +85,11 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const c
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_thermal_temperature(bc_data_t *bc_data, size_t node_index) {
+int feenox_problem_bc_set_thermal_temperature(element_t *element, size_t node_global_index, bc_data_t *bc_data) {
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));  
+  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));  
   // TODO: only in transient
 //  feenox.pde.dirichlet_derivatives[*k] = feenox_expression_derivative_wrt_variable(&bc_data->expr, feenox_special_var(t), feenox_special_var_value(t));
   

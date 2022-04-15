@@ -89,6 +89,11 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
       bc_data->dof = 2;
     }
 
+  } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "tangential") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY;
+    bc_data->type_math = bc_type_math_multifreedom;
+    // TODO: x0, y0 and z0
+    
   } else {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
     return FEENOX_ERROR;
@@ -139,6 +144,50 @@ int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t nod
   
 #endif
   
+  return FEENOX_OK;
+}
+
+int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *bc_data, size_t node_index) {
+  
+#ifdef HAVE_PETSC
+  
+  
+  if (bc_data->type_phys == BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY) {
+    // TODO: check if we can get away with a regular dirichlet BC
+    
+    // outward normal (smoothed over all elements)
+    PetscScalar n_element[3] = {0, 0, 0};
+    PetscScalar n_nodal[3] = {0, 0, 0};
+    element_ll_t *element_item = NULL;
+    // TODO: only smooth over elements on the same physical group as the bc
+    LL_FOREACH(feenox.pde.mesh->node[node_index].element_list, element_item) {
+      if (element_item->element != NULL && element_item->element->type->dim == (feenox.pde.dim-1)) {
+        feenox_call(feenox_mesh_compute_outward_normal(element_item->element, n_element));
+        n_nodal[0] += n_element[0];
+        n_nodal[1] += n_element[1];
+        n_nodal[2] += n_element[2];
+      }
+    }
+    double norm = gsl_hypot3(n_nodal[0], n_nodal[1], n_nodal[2]);
+    if (PetscLikely(norm != 0)) {
+      n_nodal[0] /= norm;
+      n_nodal[1] /= norm;
+      n_nodal[2] /= norm;
+    } else {
+      feenox_push_error_message("outward normal has zero norm");
+      return FEENOX_ERROR;
+    }
+    
+    n_nodal[0] = -1;
+    n_nodal[1] = 0;
+    n_nodal[2] = 0;
+    
+    feenox_call(feenox_problem_multifreedom_add(node_index, n_nodal));
+
+  }  
+  // TODO: radial & generic expression
+  
+#endif
   
   return FEENOX_OK;
 }

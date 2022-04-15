@@ -893,9 +893,9 @@ struct node_t {
   gsl_matrix *dphidx;       // derivative of the m-th DOF with respect to coordinate g
                             // (this is a gsl_matrix to avoid having to do double mallocs and forgetting about row/col-major
   gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
-  double *flux;             // holder of arbitrary functions evaluated at the node (sigmas and taus)
+  double *flux;             // holder of arbitrary functions evaluated at the node (e.g. sigmas and taus)
   
-  element_ll_t *associated_elements;
+  element_ll_t *element_list;
 };
 
 
@@ -1153,6 +1153,7 @@ struct bc_data_t {
     bc_type_math_dirichlet,
     bc_type_math_neumann,
     bc_type_math_robin,
+    bc_type_math_multifreedom
   } type_math;
   
   int type_phys;     // problem-based flag that tells which type of BC this is
@@ -1660,7 +1661,8 @@ struct feenox_t {
     int (*init_parser_particular)(void);
     int (*init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
-    int (*bc_set_dirichlet)(bc_data_t *bc_data, size_t node_index);
+    int (*bc_set_dirichlet)(element_t *element, size_t node_global_index, bc_data_t *bc_data);
+    int (*bc_set_multifreedom)(element_t *element, size_t node_global_index, bc_data_t *bc_data);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
@@ -1721,9 +1723,6 @@ struct feenox_t {
       vector_t **phi;
     } vectors;
 
-    // reusable number of dirichlet rows to know how much memory to allocate
-    size_t n_dirichlet_rows;
-    
     char **unknown_name;          // one for each DOF
   
     // the functions with the solutions (one for each DOF)
@@ -1798,12 +1797,21 @@ struct feenox_t {
     PetscScalar *eigenvalue;    // eigenvalue vector
     Vec *eigenvector;           // eivenvectors vector
 
+    
     // internal storage of evaluated dirichlet conditions
     PetscInt        *dirichlet_indexes;
     PetscScalar     *dirichlet_values;
     PetscScalar     *dirichlet_derivatives;
     size_t          dirichlet_k;
-  
+    // reusable number of dirichlet rows to know how much memory to allocate
+    size_t n_dirichlet_rows;
+
+    // internal storage of multi-freedom conditions
+    PetscInt        **multifreedom_indexes;
+    gsl_matrix      **multifreedom_coefficients;
+    size_t          multifreedom_k;
+    size_t          n_multifreedom_nodes;
+    
     // PETSc's solvers
     TS ts;
     SNES snes;
@@ -2245,6 +2253,7 @@ extern int feenox_problem_solve_slepc_eigen(void);
 
 // dirichlet.c
 extern int feenox_problem_dirichlet_add(size_t index, double value);
+extern int feenox_problem_multifreedom_add(size_t index, double *coefficients);
 extern int feenox_problem_dirichlet_eval(void);
 extern int feenox_problem_dirichlet_set_K(void);
 extern int feenox_problem_dirichlet_set_M(void);
@@ -2285,7 +2294,7 @@ extern int feenox_problem_build_allocate_elemental_objects(element_t *this);
 extern int feenox_problem_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
 extern int feenox_problem_build_elemental_objects_allocate(element_t *this);
 extern int feenox_problem_build_elemental_objects_free(void);
-extern int feenox_problem_build_assembly(void);
+extern int feenox_problem_build_assemble(void);
 
 // gradient.c
 extern int feenox_problem_gradient_compute(void);

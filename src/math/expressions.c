@@ -810,6 +810,7 @@ double feenox_expression_evaluate_in_string(const char *string) {
   val = feenox_expression_eval(&expr);
   // TODO
   // feenox_destroy_expression(&expr);
+  feenox_free(expr.string);
   
   return val;
 }

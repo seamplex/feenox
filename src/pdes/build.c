@@ -95,7 +95,7 @@ int feenox_problem_build(void) {
     return FEENOX_ERROR;
   }
 
-  feenox_call(feenox_problem_build_assembly());
+  feenox_call(feenox_problem_build_assemble());
 
   // TODO: put 100 as a define or as a variable
   if (feenox.pde.progress_ascii == PETSC_TRUE) {  
@@ -312,7 +312,7 @@ inline double fino_compute_r_for_axisymmetric(element_t *element, int v) {
 */
 
 
-int feenox_problem_build_assembly(void) {
+int feenox_problem_build_assemble(void) {
   
 #ifdef HAVE_PETSC
 

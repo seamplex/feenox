@@ -1,14 +1,12 @@
 # General things to do
 
  * implicit call to `SOLVE_PROBLEM`?
- * use `MatPreallocator` to efficiently pre-allocate the matrices
- * automatically link virtual methods in autogen depending on the directories under `pdes`
+ * use `MatPreallocator` to efficiently pre-allocate the matrices? use a `DMPlex`? 
  * use `spack`
  * https://joss.theoj.org/
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
- * insert expansion `mpicc` into `feenox -V`
  
 ## Tests
 
@@ -23,7 +21,6 @@
 
  * `SEMAPHORE` + `SHARED_MEMORY`
  * `READ` / `WRITE`
- * `SOLVE`
  * `M4` (MUSTACHE? MACRO?)
  * `SHELL`
  * `HISTORY`
@@ -92,7 +89,7 @@
  
  * mustache instead of m4
  * gmsh as a library? maybe not, just import both gmsh and feenox in Python and use them together
- * use dmplex?
+ * use dmplex? for real or just for allocating the matrices?
  
 # PDEs
 
@@ -102,7 +99,7 @@
    - this is wrong!
  * remove the need of needing an explicit `SOLVE_PROBLEM`
    - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
- * benchmark MPI
+ * benchmark MPI (read `.msh` with partitioning info first)
  
 ## Laplace/Poisson/Helmholtz
 

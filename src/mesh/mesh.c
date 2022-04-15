@@ -46,8 +46,8 @@ int feenox_instruction_mesh_read(void *arg) {
   this->bounding_box_max.index_mesh = SIZE_MAX;
   this->bounding_box_min.index_dof = NULL;
   this->bounding_box_max.index_dof = NULL;
-  this->bounding_box_min.associated_elements = NULL;
-  this->bounding_box_max.associated_elements = NULL;
+  this->bounding_box_min.element_list = NULL;
+  this->bounding_box_max.element_list = NULL;
   
   double scale_factor = feenox_expression_eval(&this->scale_factor);
   double offset[3];
@@ -232,7 +232,7 @@ int feenox_instruction_mesh_read(void *arg) {
     
       size_t first_neighbor_nodes = 1;  // el nodo mismo
       element_ll_t *element_item;
-      LL_FOREACH(this->node[j].associated_elements, element_item) {
+      LL_FOREACH(this->node[j].element_list, element_item) {
         if (element_item->element->type->dim == this->dim) {
           if (element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
               element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
@@ -309,7 +309,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       kd_res_free(res_item);    
     }  
     
-    LL_FOREACH(nearest_node->associated_elements, element_item) {
+    LL_FOREACH(nearest_node->element_list, element_item) {
       if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
         element = element_item->element;
         break;
@@ -349,7 +349,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       
     while(element == NULL && kd_res_end(presults) == 0) {
       second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
-      LL_FOREACH(second_nearest_node->associated_elements, element_item) {
+      LL_FOREACH(second_nearest_node->element_list, element_item) {
           
         cached_element = NULL;
         HASH_FIND_INT(cache, &element_item->element->tag, cached_element);
@@ -390,7 +390,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
 
     // just what is close
     if (dist2 < DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) {
-      LL_FOREACH(nearest_node->associated_elements, element_item) {
+      LL_FOREACH(nearest_node->element_list, element_item) {
         if (element_item->element->type->dim == mesh->dim) {
           element = element_item->element;
           break;
@@ -453,8 +453,8 @@ int feenox_mesh_free(mesh_t *mesh) {
     for (i = 0; i < mesh->n_elements; i++) {
       if (mesh->element[i].node != NULL) {
         for (j = 0; j < mesh->element[i].type->nodes; j++) {
-          LL_FOREACH_SAFE(mesh->element[i].node[j]->associated_elements, element_item, element_tmp) {
-            LL_DELETE(mesh->element[i].node[j]->associated_elements, element_item);
+          LL_FOREACH_SAFE(mesh->element[i].node[j]->element_list, element_item, element_tmp) {
+            LL_DELETE(mesh->element[i].node[j]->element_list, element_item);
             feenox_free(element_item);
           }
           

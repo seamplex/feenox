@@ -661,7 +661,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               return FEENOX_ERROR;
             }
             this->element[i].node[j] = &this->node[node_index];
-            feenox_mesh_add_element_to_list(&this->element[i].node[j]->associated_elements, &this->element[i]);
+            feenox_mesh_add_element_to_list(&this->element[i].node[j]->element_list, &this->element[i]);
           }
         }
         
@@ -767,7 +767,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
                 feenox_push_error_message("node %d in element %d does not exist", node, this->element[i].tag);
                 return FEENOX_ERROR;
               }
-              feenox_mesh_add_element_to_list(&this->element[i].node[j]->associated_elements, &this->element[i]);
+              feenox_mesh_add_element_to_list(&this->element[i].node[j]->element_list, &this->element[i]);
             }
             i++;
           }

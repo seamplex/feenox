@@ -53,7 +53,7 @@ element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
   target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
 
   for (j = 0; j < this->type->nodes; j++) {
-    LL_FOREACH(this->node[j]->associated_elements, element_item) {
+    LL_FOREACH(this->node[j]->element_list, element_item) {
       if (this->type->dim == (element_item->element->type->dim-1)) {  // los vecinos volumetricos
         if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
           return element_item->element;
@@ -69,7 +69,7 @@ element_t *mesh_find_node_neighbor_of_dim(node_t *node, int dim) {
   int j;
   element_ll_t *element_item;
   
-  LL_FOREACH(node->associated_elements, element_item) {
+  LL_FOREACH(node->element_list, element_item) {
     if (dim == element_item->element->type->dim) {
       for (j = 0; j < element_item->element->type->nodes; j++) {
         if (node->tag == element_item->element->node[j]->tag) {
@@ -96,7 +96,7 @@ int mesh_find_neighbors(mesh_t *this) {
     this->cell[i].ifaces = calloc(this->cell[i].element->type->faces, sizeof(int *));
     
     for (j = 0; j < this->cell[i].element->type->nodes; j++) {
-      LL_FOREACH(this->cell[i].element->node[j]->associated_elements, element_item) {
+      LL_FOREACH(this->cell[i].element->node[j]->element_list, element_item) {
 
         memset(nodes, 0, sizeof(nodes));
         if ((l = element_item->element->index) != this->cell[i].element->index) {
