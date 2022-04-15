@@ -92,6 +92,10 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
   } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "tangential") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
+    
+  } else if (strcmp(lhs, "radial") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_RADIAL_SYMMETRY;
+    bc_data->type_math = bc_type_math_multifreedom;
     // TODO: x0, y0 and z0
     
   } else {
@@ -178,14 +182,50 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
       return FEENOX_ERROR;
     }
     
-    n_nodal[0] = -1;
-    n_nodal[1] = 0;
-    n_nodal[2] = 0;
-    
     feenox_call(feenox_problem_multifreedom_add(node_global_index, n_nodal));
+    
+  } else if (bc_data->type_phys == BC_TYPE_MECHANICAL_RADIAL_SYMMETRY) {
+    
+    double x[3] = {0,0,0};
+    double eps = 1e-2;
+    
+    if (element->physical_group->volume == 0) {
+      feenox_call(feenox_physical_group_compute_volume(element->physical_group, feenox.pde.mesh));
+    }
+    
+    for (unsigned int g = 0; g < 3; g++) {
+//      x[g] = feenox.pde.mesh->node[node_global_index].x[g] - ((bc_data->expr[g].items == NULL) ? element->physical_entity->cog[d] : feenox_expression_eval(bc_data->expr[g]));
+      x[g] = feenox.pde.mesh->node[node_global_index].x[g] - element->physical_group->cog[g];
+    }  
+    
+    double coefficients[3] = {0,0,0};
 
+    // x-y
+    if (fabs(x[0]) > eps && fabs(x[1]) > eps) {
+      coefficients[0] = +x[1];
+      coefficients[1] = -x[0];
+      coefficients[2] = 0;
+      feenox_call(feenox_problem_multifreedom_add(node_global_index, coefficients));
+    }      
+    
+    // x-z
+    if (fabs(x[0]) > eps && fabs(x[2]) > eps) {
+      coefficients[0] = +x[2];
+      coefficients[1] = 0;
+      coefficients[2] = -x[0];
+      feenox_call(feenox_problem_multifreedom_add(node_global_index, coefficients));
+    }      
+    
+    // y-z
+    if (fabs(x[1]) > eps && fabs(x[2]) > eps) {
+      coefficients[0] = 0;
+      coefficients[1] = +x[2];
+      coefficients[2] = -x[1];
+      feenox_call(feenox_problem_multifreedom_add(node_global_index, coefficients));
+    }      
+    
   }  
-  // TODO: radial & generic expression
+  // TODO: generic expression
   
 #endif
   

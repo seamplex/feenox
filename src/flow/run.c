@@ -160,7 +160,7 @@ int feenox_run(void) {
       feenox_call(feenox_step(feenox.instructions, feenox.dae.instruction));
       // integration step
       // remember what the time was so we can then compute dt
-      t_old = feenox_special_var_value(t);
+      double t_old = feenox_special_var_value(t);
       double ida_step_t_old = 0;
       double ida_step_t_new = 0;
       int err = 0;

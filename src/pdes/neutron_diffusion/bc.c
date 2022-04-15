@@ -55,7 +55,7 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_neutron_diffusion_null(element_t *element, size_t node_global_index, bc_data_t *bc_data) {
+int feenox_problem_bc_set_neutron_diffusion_null(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
 
 #ifdef HAVE_PETSC
   unsigned int g = 0;

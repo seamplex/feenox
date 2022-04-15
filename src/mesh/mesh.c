@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2022 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -192,6 +192,9 @@ int feenox_instruction_mesh_read(void *arg) {
       
       if ((physical_group->var_volume != NULL && physical_group->var_volume->used) ||
           (physical_group->vector_cog != NULL && physical_group->vector_cog->used)) {
+        
+        // TODO: why dont' we use feenox_physical_group_compute_volume()?
+        
         physical_group->volume = 0;
         physical_group->cog[0] = 0;
         physical_group->cog[1] = 0;
