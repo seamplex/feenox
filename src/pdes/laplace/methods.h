@@ -36,7 +36,7 @@ extern int feenox_problem_build_volumetric_gauss_point_laplace(element_t *elemen
 
 // laplace/bc.c
 extern int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, const char *rhs);
-extern int feenox_problem_bc_set_laplace_phi(bc_data_t *bc_data, size_t node_index);
+extern int feenox_problem_bc_set_laplace_phi(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 extern int feenox_problem_bc_set_laplace_derivative(element_t *element, bc_data_t *bc_data, unsigned int v);
 
 

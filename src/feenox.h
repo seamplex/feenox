@@ -1661,8 +1661,8 @@ struct feenox_t {
     int (*init_parser_particular)(void);
     int (*init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, const char *);
-    int (*bc_set_dirichlet)(element_t *element, size_t node_global_index, bc_data_t *bc_data);
-    int (*bc_set_multifreedom)(element_t *element, size_t node_global_index, bc_data_t *bc_data);
+    int (*bc_set_dirichlet)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
+    int (*bc_set_multifreedom)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);

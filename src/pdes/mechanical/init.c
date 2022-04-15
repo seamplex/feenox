@@ -463,8 +463,8 @@ int feenox_problem_init_runtime_mechanical(void) {
                                   (mechanical.tresca != NULL && mechanical.tresca->used);
       
 
-  return FEENOX_OK;
 #endif
+  return FEENOX_OK;
 }
 
 

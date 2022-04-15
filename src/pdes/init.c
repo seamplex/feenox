@@ -244,9 +244,9 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 
 int feenox_problem_define_solutions(void) {
   
-  char dimension_name[3][2] = {"x", "y", "z"};
   
 #ifdef HAVE_PETSC
+  char dimension_name[3][2] = {"x", "y", "z"};
   if (feenox.pde.dim == 0) {
     feenox_push_error_message("do not know how many dimensions the problem has, tell me with DIMENSIONS in either PROBLEM or READ_MESH");
     return FEENOX_ERROR;

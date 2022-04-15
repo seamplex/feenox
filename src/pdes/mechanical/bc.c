@@ -120,23 +120,23 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
   return FEENOX_OK;
 }
 
-int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t node_index) {
+int feenox_problem_bc_set_mechanical_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
   
 #ifdef HAVE_PETSC
   
   if (bc_data->dof != -1) {
     
     // only one dof
-    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[bc_data->dof], feenox_expression_eval(&bc_data->expr)));
+    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[bc_data->dof], feenox_expression_eval(&bc_data->expr)));
     
   } else {
     
     // -1 means all dofs
-    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[0], 0));
+    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[0], 0));
     if (feenox.pde.dofs > 1) {
-      feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[1], 0));
+      feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[1], 0));
       if (feenox.pde.dofs > 2) {
-        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_index].index_dof[2], 0));
+        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[2], 0));
       }
     }
     
@@ -147,7 +147,7 @@ int feenox_problem_bc_set_mechanical_displacement(bc_data_t *bc_data, size_t nod
   return FEENOX_OK;
 }
 
-int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *bc_data, size_t node_index) {
+int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
   
 #ifdef HAVE_PETSC
   
@@ -155,13 +155,13 @@ int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *bc_data, size_t nod
   if (bc_data->type_phys == BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY) {
     // TODO: check if we can get away with a regular dirichlet BC
     
-    // outward normal (smoothed over all elements)
+    // outward normal (smoothed over all elements on the physical group of the BC)
     PetscScalar n_element[3] = {0, 0, 0};
     PetscScalar n_nodal[3] = {0, 0, 0};
     element_ll_t *element_item = NULL;
-    // TODO: only smooth over elements on the same physical group as the bc
-    LL_FOREACH(feenox.pde.mesh->node[node_index].element_list, element_item) {
-      if (element_item->element != NULL && element_item->element->type->dim == (feenox.pde.dim-1)) {
+    LL_FOREACH(feenox.pde.mesh->node[node_global_index].element_list, element_item) {
+      element_t *e = element_item->element;
+      if (e != NULL && e->type->dim == (feenox.pde.dim-1) && e->physical_group == element->physical_group) {
         feenox_call(feenox_mesh_compute_outward_normal(element_item->element, n_element));
         n_nodal[0] += n_element[0];
         n_nodal[1] += n_element[1];
@@ -182,7 +182,7 @@ int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *bc_data, size_t nod
     n_nodal[1] = 0;
     n_nodal[2] = 0;
     
-    feenox_call(feenox_problem_multifreedom_add(node_index, n_nodal));
+    feenox_call(feenox_problem_multifreedom_add(node_global_index, n_nodal));
 
   }  
   // TODO: radial & generic expression

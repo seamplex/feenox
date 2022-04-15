@@ -66,7 +66,6 @@ int feenox_run(void) {
 #ifdef HAVE_SUNDIALS
   double ida_step_dt = INFTY;
 #endif
-  double t_old = 0;
 
   // TODO: in quasistatic, should we increase the time with the initial dt?
   
@@ -137,7 +136,7 @@ int feenox_run(void) {
       
       feenox_call(feenox_step(feenox.instructions, feenox.pde.instruction));
       
-      t_old = feenox_special_var_value(t);
+//    double t_old = feenox_special_var_value(t);
       feenox_call(feenox_instruction_solve_problem(NULL));
 //      feenox_special_var_value(dt) = feenox_special_var_value(t) - t_old;
 //      feenox_special_var_value(t) = t_old + feenox_special_var_value(dt);

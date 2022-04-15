@@ -70,10 +70,10 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const cha
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_modal_displacement(bc_data_t *bc_data, size_t node_index) {
+int feenox_problem_bc_set_modal_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
 
 #ifdef HAVE_PETSC
-  feenox_call(feenox_problem_bc_set_mechanical_displacement(bc_data, node_index));  
+  feenox_call(feenox_problem_bc_set_mechanical_displacement(element, bc_data, node_global_index));  
 #endif
   
   return FEENOX_OK;

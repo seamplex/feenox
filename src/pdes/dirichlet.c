@@ -104,11 +104,11 @@ int feenox_problem_dirichlet_eval(void) {
               }
               // TODO: normal-dependent
               if (bc_data->type_math == bc_type_math_dirichlet) {
-                feenox_call(feenox.pde.bc_set_dirichlet(element, j, bc_data));
+                feenox_call(feenox.pde.bc_set_dirichlet(element, bc_data, j));
               } else if (bc_data->type_math == bc_type_math_multifreedom) {
                 // TODO: high-order nodes end up with a different penalty weight
                 // TODO: multi-freedom constrains with lagrange
-                feenox_call(feenox.pde.bc_set_multifreedom(element, j, bc_data));
+                feenox_call(feenox.pde.bc_set_multifreedom(element, bc_data, j));
               }
             }  
           }
