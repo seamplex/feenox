@@ -606,7 +606,13 @@ double feenox_function_eval(function_t *this, const double *const_x) {
     
     if (this->n_arguments == 1) {
 
-      y = (this->interp != NULL) ? gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel) : 0;
+      if (x[0] < this->data_argument[0][0]) {
+        y = this->data_value[0];
+      } else if (x[0] > this->data_argument[0][this->data_size-1]) {
+        y = this->data_value[this->data_size-1];
+      } else if (this->interp != NULL) {
+        y = gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel);
+      }
 
     } else {
 
