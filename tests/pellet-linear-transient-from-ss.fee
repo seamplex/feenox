@@ -1,10 +1,10 @@
 PROBLEM thermal 3D
 READ_MESH pellet.msh
 
-end_time = 30
-k = 2.8
-rho = 0.001*10970
-cp = 0.235
+end_time = 60  # seconds
+k = 2.8        # W / (m K)
+rho = 10980    # kg / m^3
+cp = 300       # J / (kg K)
 
 # q is in W / m^3 = 300 W/cm * 100 cm/m / area
 r = 4e-3
@@ -14,15 +14,16 @@ FUNCTION T_ext(t) DATA {
 0    420
 10   420
 20   900
-30   900
+60   900
 }
 
 BC symmetry q=0
 BC external T=T_ext(t)
 
 SOLVE_PROBLEM
+# PRINT t T(0,0,0) T(0.5*r,0,0) T(0.85*r,0,0)
 IF done
-  PRINT t %.0f T(0,0,0) SEP " "
+  PRINT %.0f T(0,0,0)
 ENDIF
 
 # WRITE_MESH pellet-linear-transient-from-ss.msh T

@@ -14,25 +14,31 @@ checkgmsh
 
 gmsh -3 ${dir}/pellet.geo
 
-# run with --ksp_view to see the difference
-answerzero pellet-linear.fee 1.5
+# run with --ksp_view to see the difference between these two
+answerzero pellet-linear.fee 1e-2
 exitifwrong $?
 
-answerzero pellet-linear-guess.fee 1.5
+answerzero pellet-linear-guess.fee 1e-2
 exitifwrong $?
 
 
-# run with --snes_view to see the difference
-answerzero pellet-nonlinear.fee 1117 2
+# run with --snes_view
+answer pellet-nonlinear.fee "1115"
 exitifwrong $?
 
-answerzero pellet-nonlinear-guess.fee 1117 2
+answer pellet-nonlinear-guess.fee "1115"
 exitifwrong $?
 
 
 # transients
-answer pellet-linear-transient-from-ss.fee "30 1757"
+answer pellet-linear-transient-from-ss.fee "1753"
 exitifwrong $?
 
-answer pellet-linear-transient-from-initial.fee "30 1277"
+answer pellet-linear-transient-from-initial.fee "1273"
+exitifwrong $?
+
+answer pellet-nonlinear-transient-from-ss.fee "1929"
+exitifwrong $?
+
+answer pellet-nonlinear-transient-from-initial.fee "1115"
 exitifwrong $?

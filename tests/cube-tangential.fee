@@ -1,0 +1,17 @@
+PROBLEM mechanical
+READ_MESH cube-hex.msh
+
+E = 1
+nu = 0.3
+
+BC bottom symmetry
+BC left   symmetry
+BC front  symmetry
+BC top    tension=0.12345678
+BC right  tension=0.23456789
+BC back   compression=0.345678901
+
+SOLVE_PROBLEM
+
+DUMP K K_bc b b_bc FORMAT octave 
+PRINT %.6f sigma1(0,0,0) sigma2(0,0,0) sigma3(0,0,0) SEP " "

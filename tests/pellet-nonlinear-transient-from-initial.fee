@@ -1,7 +1,7 @@
-# https://www.nuclear-power.com/nuclear-engineering/heat-transfer/heat-generation/temperature-profile-nuclear-fuel/
 PROBLEM thermal 3D
 READ_MESH pellet.msh
 
+end_time = 60  # seconds
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/
 
 # T is in Celsius, T' is in Kelvin
@@ -12,14 +12,30 @@ cond(T') = 100/(7.5408 + 17.692*tau(T') + 3.614*tau(T')^2) + 6400/(tau(T')^(5/2)
 # k is in W/(m K)
 k(x,y,z) = cond(T(x,y,z))
 
+# both of these should depend on temperature
+rho = 10980    # kg / m^3
+cp = 300       # J / (kg K)
+
 # q is in W / m^3 = 300 W/cm * 100 cm/m / area
 r = 4e-3
 q = 300 * 100 / (pi*r^2)
 
+FUNCTION T_ext(t) DATA {
+0    40
+10   40
+20   420
+60   420
+}
+
 BC symmetry q=0
-BC external T=420
+BC external T=T_ext(t)
+
+T_0(x,y,z) = 40
 
 SOLVE_PROBLEM
-PRINT %.0f T_max
+# PRINT t T(0,0,0) T(0.5*r,0,0) T(0.85*r,0,0)
+IF done
+  PRINT %.0f T(0,0,0)
+ENDIF
 
-# WRITE_MESH pellet-nonlinear.vtk T
+# WRITE_MESH pellet-nonlinear-transient-from-initial.msh T
