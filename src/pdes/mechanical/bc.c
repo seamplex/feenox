@@ -322,7 +322,7 @@ int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t *bc_dat
   // TODO: set all the DOFs at the same time
   double t[3] = {0,0,0};
   if (element->physical_group->volume == 0) {
-    feenox_physical_group_compute_volume(element->physical_group, feenox.pde.mesh);
+    feenox_call(feenox_physical_group_compute_volume(element->physical_group, feenox.pde.mesh));
   }
   t[bc_data->dof] = feenox_expression_eval(&bc_data->expr) / element->physical_group->volume;
 //  printf("%g\n", t[bc_data->dof]);

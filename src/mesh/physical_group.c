@@ -148,7 +148,7 @@ physical_group_t *feenox_get_or_define_physical_group_get_ptr(const char *name, 
 }
 
 
-double feenox_physical_group_compute_volume(physical_group_t *this, mesh_t *mesh) {
+int feenox_physical_group_compute_volume(physical_group_t *this, const mesh_t *mesh) {
   this->volume = 0;
   
   for (size_t i = 0; i < this->n_elements; i++) {
@@ -166,14 +166,13 @@ double feenox_physical_group_compute_volume(physical_group_t *this, mesh_t *mesh
     }
   }
   
-  for (size_t m = 0; m < 3; m++) {
-    this->cog[m] /= this->volume;
-  }
-  
+  this->cog[0] /= this->volume;
+  this->cog[1] /= this->volume;
+  this->cog[2] /= this->volume;
 
   if (this->var_volume != NULL) {
     feenox_var_value(this->var_volume) = this->volume;
   }
   
-  return this->volume;
+  return FEENOX_OK;
 }

@@ -45,7 +45,7 @@ int feenox_instruction_reaction(void *arg) {
       } else {
         // use the COG
         if (reaction->physical_group->volume == 0) {
-          feenox_physical_group_compute_volume(reaction->physical_group, feenox.pde.mesh);
+          feenox_call(feenox_physical_group_compute_volume(reaction->physical_group, feenox.pde.mesh));
         }
         x0[g] = reaction->physical_group->cog[g];
       }
