@@ -31,13 +31,13 @@ exitifwrong $?
 
 
 # transients
-answer pellet-linear-transient-from-ss.fee "1753"
+answer pellet-linear-transient-from-ss.fee "1453"
 exitifwrong $?
 
 answer pellet-linear-transient-from-initial.fee "1273"
 exitifwrong $?
 
-answer pellet-nonlinear-transient-from-ss.fee "1929"
+answer pellet-nonlinear-transient-from-ss.fee "1438"
 exitifwrong $?
 
 answer pellet-nonlinear-transient-from-initial.fee "1115"

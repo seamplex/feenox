@@ -1,7 +1,7 @@
 PROBLEM thermal 3D
 READ_MESH pellet.msh
 
-end_time = 60  # seconds
+end_time = 30  # seconds
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/
 
 # T is in Celsius, T' is in Kelvin
@@ -21,16 +21,16 @@ r = 4e-3
 q = 300 * 100 / (pi*r^2)
 
 FUNCTION T_ext(t) DATA {
-0    40
-10   40
-20   420
-60   420
+0    300
+1    300
+10   420
+30   420
 }
 
 BC symmetry q=0
 BC external T=T_ext(t)
 
-T_0(x,y,z) = 40
+T_0(x,y,z) = 300
 
 SOLVE_PROBLEM
 # PRINT t T(0,0,0) T(0.5*r,0,0) T(0.85*r,0,0)
