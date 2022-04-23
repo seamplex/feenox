@@ -44,13 +44,10 @@ int feenox_problem_gradient_fill_mechanical(void) {
     feenox_gradient_fill(mechanical, tauzx);
   }
   
-  if (mechanical.sigma1->used) {
+  // if one is used, all of them are
+  if (mechanical.sigma1->used || mechanical.sigma2->used || mechanical.sigma3->used) {
     feenox_gradient_fill(mechanical, sigma1);
-  }
-  if (mechanical.sigma2->used) {
     feenox_gradient_fill(mechanical, sigma2);
-  }
-  if (mechanical.sigma3->used) {
     feenox_gradient_fill(mechanical, sigma3);
   }
   if (mechanical.sigma->used) {
