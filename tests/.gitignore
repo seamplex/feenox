@@ -2,6 +2,7 @@
 *.log
 *.trs
 *.last
+*.m
 tmp.*
 mesh2d.msh
 square-centered.msh
@@ -27,4 +28,4 @@ two-cubes.msh
 pellet*.msh
 pellet*.vtk
 encased_rod.msh
-encased_rod.vtk
+encased_rod*.vtk

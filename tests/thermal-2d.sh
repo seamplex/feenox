@@ -11,22 +11,22 @@ fi
 
 checkpde thermal
 
-answer thermal-two-squares-material-explicit-uniform.fee "0.75"
+answer thermal-two-squares-material-explicit-uniform.fee "0.750"
 exitifwrong $?
 
-answer thermal-two-squares-material-implicit-uniform.fee "0.75"
+answer thermal-two-squares-material-implicit-uniform.fee "0.750"
 exitifwrong $?
 
-answer thermal-two-squares-material-explicit-space.fee "0.71773"
+answer thermal-two-squares-material-explicit-space.fee "0.718"
 exitifwrong $?
 
-answer thermal-two-squares-material-implicit-space.fee "0.71773"
+answer thermal-two-squares-material-implicit-space.fee "0.718"
 exitifwrong $?
 
-answer thermal-two-squares-material-explicit-temperature.fee "0.599969"
+answer thermal-two-squares-material-explicit-temperature.fee "0.600"
 exitifwrong $?
 
-answer thermal-two-squares-material-implicit-temperature.fee "0.599969"
+answer thermal-two-squares-material-implicit-temperature.fee "0.600"
 exitifwrong $?
 
 checkmumps

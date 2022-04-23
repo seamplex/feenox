@@ -1,0 +1,14 @@
+PROBLEM thermal 3d
+READ_MESH convectionbc.msh
+
+T_0(x,y,z) = 10   # initial guess
+
+BC Convection h=T(x,y,z) Tref=29.615
+BC Temp       T=200
+BC Flux       q=50000
+
+k = 400
+
+SOLVE_PROBLEM
+
+PRINT T(1.25,1,5.91044)

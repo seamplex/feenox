@@ -1,0 +1,14 @@
+PROBLEM mechanical
+READ_MESH cube-hex.msh
+
+E = 1
+nu = 0.3
+
+BC bottom tangential radial
+BC top    tension=0.12345678
+
+SOLVE_PROBLEM
+
+# DUMP K K_bc b b_bc FORMAT octave 
+# WRITE_MESH cube-radial.vtk VECTOR u v w
+PRINT %.6f sigma1(0,0,0) w(0,0,0) w(1,1,1) SEP " "

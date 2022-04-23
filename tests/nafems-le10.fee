@@ -72,7 +72,8 @@ PRINT %+.4f Iu/vol Iv/vol Iw/vol
 
 PRINT
 PRINT "maximum displacement on bulk"
-PRINT %+.4f u(max_displ_x,max_displ_y,max_displ_z) v(max_displ_x,max_displ_y,max_displ_z) w(max_displ_x,max_displ_y,max_displ_z)
+# the abs() is there to avoid differences between +0.0000 and -0.0000
+PRINT %+.4f abs(u(max_displ_x,max_displ_y,max_displ_z)) v(max_displ_x,max_displ_y,max_displ_z) w(max_displ_x,max_displ_y,max_displ_z)
 
 PRINT
 PRINT "location of maximum displacement on bulk"
@@ -91,12 +92,11 @@ PRINT %+.2f max_sigma_x max_sigma_y max_sigma_z
 PRINT
 PRINT "average displacement on DCD'C'"
 # the second component gives +0.0000 sometimes and -0.0000 some other times
-# PRINT %+.4f Iu_dcdc/area_dcdc Iv_dcdc/area_dcdc Iw_dcdc/area_dcdc
-PRINT %+.4f Iu_dcdc/area_dcdc  Iw_dcdc/area_dcdc
+PRINT %+.4f Iu_dcdc/area_dcdc abs(Iv_dcdc/area_dcdc) Iw_dcdc/area_dcdc
 
 PRINT
 PRINT "maximum displacement on DCD'C'"
-PRINT %+.4f u(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc) v(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc) w(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc)
+PRINT %+.4f u(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc) abs(v(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc)) w(max_displ_x_dcdc,max_displ_y_dcdc,max_displ_z_dcdc)
 
 PRINT
 PRINT "location of maximum displacement on DCD'C'"

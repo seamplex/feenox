@@ -14,8 +14,8 @@ checkgmsh
 
 gmsh -3 ${dir}/encased_rod.geo
 
-answerzero encased_rod_lr.fee 1e-4
+answerzero encased_rod_lr.fee 1e-3
 exitifwrong $?
 
-answerzero encased_rod_tb.fee 1e-4
+answerzero encased_rod_tb.fee 1e-3
 exitifwrong $?

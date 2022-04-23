@@ -23,10 +23,10 @@ location of min/max von Mises on bulk
 +587.74	+2704.66	+300.00
 
 average displacement on DCD'C'
--0.0002	-0.0441
+-0.0002	+0.0000	-0.0441
 
 maximum displacement on DCD'C'
--0.0275	-0.0000	-0.0982
+-0.0275	+0.0000	-0.0982
 
 location of maximum displacement on DCD'C'
 +2000.00	+0.00	+300.00

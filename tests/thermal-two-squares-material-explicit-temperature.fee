@@ -9,4 +9,4 @@ BC right T=1
 
 SOLVE_PROBLEM
 
-PRINT T(1,0.5)
+PRINT %.3f T(1,0.5)

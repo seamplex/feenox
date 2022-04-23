@@ -14,3 +14,6 @@ checkpde mechanical
 answer cube-tangential.fee "0.234568 0.123457 -0.345679"
 exitifwrong $?
 
+answer cube-radial.fee "0.123457 0.000000 0.123457"
+exitifwrong $?
+
