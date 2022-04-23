@@ -74,6 +74,7 @@ extern int feenox_parser_file(file_t **file);
 
 extern int feenox_parser_vector(vector_t **vector);
 extern int feenox_parser_variable(var_t **var);
+extern int feenox_parser_get_or_define_variable(var_t **var);
 extern int feenox_parser_keywords_ints(char *keyword[], int *value, int *option);
 extern int feenox_parser_match_keyword_expression(char *token, char *keyword[], expr_t *expr[], size_t n);
 

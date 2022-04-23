@@ -33,6 +33,7 @@
 #define BC_TYPE_MECHANICAL_RADIAL_SYMMETRY      7
 
 typedef struct mechanical_t mechanical_t;
+typedef struct feenox_linearize_t feenox_linearize_t;
 
 struct mechanical_t {
   
@@ -142,7 +143,37 @@ struct mechanical_t {
   function_t *sigma;       // von mises
   function_t *delta_sigma; // uncertainty
   function_t *tresca;
+  
+  feenox_linearize_t *linearizes;
+};
 
+
+struct feenox_linearize_t {
+  enum {
+    linearize_composition_vonmises,
+    linearize_composition_tresca,
+    linearize_composition_principal1,
+    linearize_composition_principal2,
+    linearize_composition_principal3
+  } composition;
+  
+  expr_t x1;
+  expr_t y1;
+  expr_t z1;
+  expr_t x2;
+  expr_t y2;
+  expr_t z2;
+
+// TODO: ignore through thickness
+//  int ignore_through_thickness;
+  file_t *file;
+  
+  var_t *M;     // membrane
+  var_t *MB;    // membrane plus bending
+  var_t *P;     // peak
+  
+  
+  feenox_linearize_t *next;
 };
 
 #endif /* MECHANICAL_H */

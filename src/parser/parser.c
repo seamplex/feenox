@@ -356,12 +356,19 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
       
 ///kw+SOLVE+desc Solve a (small) system of non-linear equations.
-///kw+DUMP+usage SOLVE
+///kw+SOLVE+usage SOLVE
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "SOLVE") == 0) {
       feenox_call(feenox_parse_solve());
       return FEENOX_OK;
-      
+
+// TODO: move this to a per-physics parser      
+///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME VII-Sec 5.
+///kw_pde+LINEARIZE_STRESS+usage LINEARIZE_STRESS
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
+      feenox_call(feenox_parse_linearize_stress());
+      return FEENOX_OK;      
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these
@@ -2234,7 +2241,7 @@ int feenox_parse_read_mesh(void) {
   } else if (strcasecmp(ext, ".frd") == 0) {
     mesh->reader = feenox_mesh_read_frd;
   } else {
-    feenox_push_error_message("unknown extension '%s'", ext);
+    feenox_push_error_message("unknown extension '%s', valid formats are '.msh', '.vtk' and '.frd'", ext);
     return FEENOX_ERROR;
   }
 

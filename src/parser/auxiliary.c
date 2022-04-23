@@ -384,6 +384,23 @@ int feenox_parser_variable(var_t **var) {
   return FEENOX_OK;
 }
 
+int feenox_parser_get_or_define_variable(var_t **var) {
+  
+  char *token;
+  
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected variable name");
+    return FEENOX_ERROR;
+  }
+
+  if ((*var = feenox_get_or_define_variable_get_ptr(token)) == NULL) {
+    feenox_push_error_message("undefined variable identifier '%s'", token);
+    return FEENOX_ERROR;
+  }
+  
+  return FEENOX_OK;
+}
+
 
 int feenox_parser_keywords_ints(char *keyword[], int *value, int *option) {
 

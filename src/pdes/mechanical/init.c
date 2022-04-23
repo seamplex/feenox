@@ -25,28 +25,6 @@
 extern feenox_t feenox;
 mechanical_t mechanical;
 
-int feenox_problem_parse_problem_mechanical(const char *token) {
-  
-///kw_pde+PROBLEM+detail  * `mechanical` solves the elastic problem using a displacement-based FEM formulation.
-///kw_pde+PROBLEM+detail If the mesh is two-dimensional and not `AXISYMMETRIC`, either
-///kw_pde+PROBLEM+detail `plane_stress` or `plane_strain` has to be given instead of `mechanical`.
-  
-  if (token != NULL) {
-    if (strcasecmp(token, "plane_stress") == 0) {
-      mechanical.variant = variant_plane_stress;
-  
-    } else if (strcasecmp(token, "plane_strain") == 0) {
-      mechanical.variant = variant_plane_strain;
-  
-    } else {
-      feenox_push_error_message("undefined keyword '%s'", token);
-      return FEENOX_ERROR;
-      
-    }
-  } 
-  return FEENOX_OK;
-} 
-
 int feenox_problem_init_parser_mechanical(void) {
 #ifdef HAVE_PETSC
   feenox.pde.init_runtime_particular = feenox_problem_init_runtime_mechanical;
