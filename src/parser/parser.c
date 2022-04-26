@@ -3103,7 +3103,7 @@ int feenox_parse_integrate(void) {
   }
   
   if (name_result != NULL) {
-    mesh_integrate->result = feenox_get_or_define_variable_get_ptr(name_result);
+    feenox_check_null(mesh_integrate->result = feenox_get_or_define_variable_get_ptr(name_result));
   } else {
     feenox_push_error_message("RESULT is mandatory for INTEGRATE");
     return FEENOX_ERROR;

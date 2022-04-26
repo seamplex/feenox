@@ -726,7 +726,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           physical_group = NULL;
           if (geometrical != 0) {
             // the whole block has the same physical group, find it once and that's it
-            HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entitqqy);
+            HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
             if (geometrical_entity == NULL) {
               feenox_push_error_message("geometrical entity '%d' of dimension '%d' does not exist", geometrical, dimension);
               return FEENOX_ERROR;
