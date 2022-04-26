@@ -240,7 +240,7 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
     AC_MSG_RESULT([broken2])
     slepc_found=0
   ], [test ! -f "${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables"], [
-    AC_MSG_RESULT(${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables)
+#    AC_MSG_RESULT(${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables)
     AC_MSG_RESULT([broken3])
     slepc_found=0
   ],

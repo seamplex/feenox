@@ -1,0 +1,113 @@
+#. # Thermo-elastic expansion of finite cylinders
+#.
+#. Let us solve the following problem introduced by J.\ Veeder in his [technical report AECL-2660 from 1967](https://inis.iaea.org/search/search.aspx?orig_q=RN:40103718).
+#.
+#. > ![](veeder-problem.png){width=50%}
+#. >
+#. > Consider a finite solid cylinder (see insert) of radius\ $b$ and length\ $2h$,
+#. > with the origin of coordinates at the centre.
+#. > It may be shown that the temperature distribution in a cylindrical
+#. > fuel pellet operating in a reactor is given approximately by
+#. > 
+#. > $$T(r) = T_0 + T_1 \cdot \left[ 1 - \left(\frac{r}{b} \right)^2 \right]$$
+#. > 
+#. > where\ $T_0$ is the pellet surface temperature and\ $T_1$ is the
+#. > temperature difference between the centre and surface.
+#. > The thermal expansion is thus seen to be the sum of two terms,
+#. > the first of which produces uniform expansion (zero stress)
+#. > at constant temperature\ $T_0$, and is therefore computationally trivial.
+#. > Tho second term introduces non-uniform body forces
+#. > which distort the pellet from its original cylindrical shape.
+#.
+#. The problem is axisymmetric on the azimutal angle and axially-symmetric along the mid-plane.
+#. The FeenoX input uses the `tangential` and `radial` boundary conditions applied to the base of
+#. the upper half of a 3D cylinder. The geometry is meshed using 27-noded hexahedra.
+#.
+#. Two one-dimensional profiles for the non-dimensional range\ $[0:1]$ at the external surfaces are written into an ASCII file ready to be plotted:
+#.
+#.  1. axial dependency of the displacement\ $v(z') = v(0,v,z'h)$ in the\ $y$ direction at fixed $x=0$ and $y=b$, and
+#.  2. radial dependency of the displacement\ $w(r') = w(0,r'b, h)$ in the\ $z$ direction at fixed $x=0$ and $z=h$
+#. 
+#. These two profiles are compared to the power expansion series given in the original report from 1967.
+#. Note that the authors expect a 5% difference between the reference solution and the real one.
+#.
+#. ![3D mesh of the upper half of the Veeder problem](veeder-mesh.png)
+#$ $ gmsh -3 veeder.geo
+#$ [...]
+#$ $ feenox veeder.fee
+#$ $ pyxplot veeder.ppl 
+#$ $
+PROBLEM mechanical
+READ_MESH veeder.msh
+
+b = 1     # cylinder radius
+h = 0.5   # cylinder height 
+
+E = 1         # young modulus (does not matter for the displacement, only for stresses)
+nu = 1/3      # poisson ratio
+alpha = 1e-5  # temperature expansion coefficient
+
+# temperature distribution as in the original paper
+T1 = 1        # maximum temperature
+T0 = 0        # reference temperature (where expansion is zero)
+T(x,y,z) := T0 + T1*(1-(x^2+y^2)/(b^2))
+
+
+# boundary conditions (note that the cylinder can still expand on the x-y plane)
+BC inf      tangential radial
+
+# solve!
+SOLVE_PROBLEM
+
+# write vtk output
+WRITE_MESH veeder.vtk    T sigma dudx dudy dudz dvdx dvdy dvdz dwdx dwdy dwdz  sigma1 sigma2 sigma3  VECTOR u v w
+
+# non-dimensional numerical displacement profiles 
+v_num(z') = v(0, b, z'*h)/(alpha*T1*b)
+w_num(r') = w(0, r'*b, h)/(alpha*T1*b)
+
+########
+# reference solution
+# coefficients of displacement functions for h/b = 0.5
+a00 =  0.66056
+a01 = -0.44037
+a10 =  0.23356
+a02 = -0.06945
+a11 = -0.10417
+a20 =  0.00288
+
+b00 = -0.01773
+b01 = -0.46713
+b10 = -0.04618
+b02 = +0.10417
+b11 = -0.01152
+b20 = -0.00086
+ 
+# coefficients of displacement functions for h/b = 1.0
+# a00 =  0.73197
+# a01 = -0.48798
+# a10 =  0.45680
+# a02 = -0.01140
+# a11 = -0.06841
+# a20 =  0.13611
+# 
+# b00 =  0.26941
+# b01 = -0.45680
+# b10 = -0.25670
+# b02 =  0.03420
+# b11 = -0.27222
+# b20 = -0.08167
+
+
+R(r') = r'^2 - 1
+Z(z') = z'^2 - 1
+
+v_ref(r',z') = r' * (a00 + a01*R(r') + a10*Z(z') + a02* R(r')^2 + a11 * R(r')*Z(z') + a20 * Z(z')^2)
+w_ref(r',z') = z' * (b00 + b01*R(r') + b10*Z(z') + b02* R(r')^2 + b11 * R(r')*Z(z') + b20 * Z(z')^2)
+
+
+PRINT_FUNCTION FILE veeder_v.dat  v_num v_ref(1,z') MIN 0 MAX 1 NSTEPS 50 HEADER
+PRINT_FUNCTION FILE veeder_w.dat  w_num w_ref(r',1) MIN 0 MAX 1 NSTEPS 50 HEADER
+#> ![100,000x-warped displacements](veeder.png){width_latex=75% width_html=100%}
+#>
+#> ![Comparison of 1-D displacement profiles](veeder-displacements.svg){width=100%}

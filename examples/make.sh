@@ -24,6 +24,7 @@ for i in hello          \
          wire           \
          asme-expansion             \
          cube-orthotropic-expansion \
+         veeder         \
   ; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \

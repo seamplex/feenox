@@ -1,0 +1,46 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+#set size ratio 1
+set axis x arrow nomirrored atzero
+set axis y arrow nomirrored
+
+set xrange [0:1]
+set yrange [-0.1:1.0]
+
+set xtics 0,0.2,1
+set ytics 0,0.2,1
+
+set mxtics 0.1
+set mytics 0.1
+
+set grid
+set key above
+
+set terminal pdf
+
+set xlabel "non-dimensional coordinate $r'$ or $z'$"
+set ylabel "non-dimensional displacement $v$ or $w$"
+
+set output "veeder-displacements.pdf"
+plot "veeder_v.dat" u 1:2         w l lt 1 lw 3 color cyan ti "$v^\prime(z^\prime)$ (FeenoX)",\
+     "veeder_v.dat" u 1:3         w l lt 2 lw 2 color blue ti "$v^\prime(z^\prime)$ (ref.~$\pm 5\%$)",\
+     "veeder_v.dat" u 1:($3*1.05) w l lt 3 color blue ti "",\
+     "veeder_v.dat" u 1:($3*0.95) w l lt 3 color blue ti "",\
+     "veeder_w.dat" u 1:2         w l lt 1 lw 3 color green     ti "$w^\prime(r^\prime)$ (FeenoX)",\
+     "veeder_w.dat" u 1:3         w l lt 2 lw 2 color olivegreen ti "$w^\prime(r^\prime)$ (ref.~$\pm 5\%$)",\
+     "veeder_w.dat" u 1:($3*1.05) w l lt 3 color olivegreen ti "",\
+     "veeder_w.dat" u 1:($3*0.95) w l lt 3 color olivegreen ti ""
+# 
+
+#      
+# set xlabel "$\rho = x/b$"
+# set ylabel "$\tilde{w}(\rho) = \frac{w(\rho \cdot b,0,h)}{b \cdot \alpha \cdot T_0}$"
+# set yrange [-0.1:0.65]
+# 
+# set output "w.pdf"
+# plot "profile.dat" u 1:6 w l lw 2 color black ti "Original $\pm 5\%$",\
+#      "profile.dat" u 1:($6*1.05) w l lt 2 color grey ti "",\
+#      "profile.dat" u 1:($6*0.95) w l lt 2 color grey ti "",\
+#      "profile.dat" u 1:5 w l lw 3 lt 1 color green     ti "Fino"
+#      

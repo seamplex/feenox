@@ -27,3 +27,12 @@ parallelepiped*.vtk
 cylinder.msh
 temp-cylinder.msh
 wire-*.msh
+cube-hex.msh
+cube-tet.msh
+cube-orthotropic-expansion.pvsm
+veeder-veeder-displacements.pdf
+veeder.msh
+veeder.pvsm
+veeder.vtk
+veeder_v.dat
+veeder_w.dat
