@@ -27,18 +27,20 @@ extern mechanical_t mechanical;
 struct linearize_params_t {
   double x1, y1, z1;
   double x2, y2, z2;
-  double t;
+  double length;
   
   function_t *function;
 };
 double feenox_linearization_integrand_membrane(double t_prime, void *params);
 double feenox_linearization_integrand_bending(double t_prime, void *params);
+double feenox_linearization_integrate(gsl_function *F, function_t *function);
 
 int feenox_instruction_linearize(void *arg) {
   
   feenox_linearize_t *linearize = (feenox_linearize_t *)arg;
 
   // http://www.eng-tips.com/faqs.cfm?fid=982
+  // te actual equations are in ASME V
   struct linearize_params_t params;
   params.x1 = feenox_expression_eval(&linearize->x1);
   params.y1 = feenox_expression_eval(&linearize->y1);
@@ -48,107 +50,31 @@ int feenox_instruction_linearize(void *arg) {
   params.y2 = feenox_expression_eval(&linearize->y2);
   params.z2 = feenox_expression_eval(&linearize->z2);
   
-  params.t = gsl_hypot3(params.x2-params.x1, params.y2-params.y1, params.z2-params.z1);
+  params.length = gsl_hypot3(params.x2-params.x1, params.y2-params.y1, params.z2-params.z1);
+  gsl_function F = {NULL, &params};
   
-  gsl_function F;
-  F.params = &params;
+  // membrane stress
   F.function = &feenox_linearization_integrand_membrane;
-
-  // TODO: choose integration intervals
-  gsl_integration_workspace *w = gsl_integration_workspace_alloc(DEFAULT_INTEGRATION_INTERVALS);
-  double error = 0;  
-
-  // membrane
-  double sigmax_m = 0;
-  params.function = mechanical.sigmax;
+  double sigmax_m = feenox_linearization_integrate(&F, mechanical.sigmax) / params.length;
+  double sigmay_m = feenox_linearization_integrate(&F, mechanical.sigmay) / params.length;
+  double sigmaz_m = feenox_linearization_integrate(&F, mechanical.sigmaz) / params.length;
+  double tauxy_m = feenox_linearization_integrate(&F, mechanical.tauxy) / params.length;
+  double tauyz_m = feenox_linearization_integrate(&F, mechanical.tauyz) / params.length;
+  double tauzx_m = feenox_linearization_integrate(&F, mechanical.tauzx) / params.length;
   
-  // int gsl_integration_qag(const gsl_function *f, double a, double b, double epsabs, double epsrel, size_t limit, int key, gsl_integration_workspace *workspace, double *result, double *abserr)
-  // int gsl_integration_qags(const gsl_function *f, double a, double b, double epsabs, double epsrel, size_t limit, gsl_integration_workspace *workspace, double *result, double *abserr)
-  // int gsl_integration_qagp(const gsl_function *f, double *pts, size_t npts, double epsabs, double epsrel, size_t limit, gsl_integration_workspace *workspace, double *result, double *abserr)  
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &sigmax_m, &error);
-
-  double sigmay_m = 0;
-  params.function = mechanical.sigmay;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &sigmay_m, &error);
-
-  double sigmaz_m = 0;
-  params.function = mechanical.sigmaz;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &sigmaz_m, &error);
-  
-  double tauxy_m = 0;
-  params.function = mechanical.tauxy;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &tauxy_m, &error);
-
-  double tauyz_m = 0;
-  double tauzx_m = 0;
-  if (feenox.pde.dim > 2) {
-    params.function = mechanical.tauyz;
-    gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &tauyz_m, &error);
-  
-    params.function = mechanical.tauzx;
-    gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &tauzx_m, &error);
-  }
-
-  // bending
+  // bending stress
   F.function = &feenox_linearization_integrand_bending;
- 
-  double sigmax_b = 0;
-  params.function = mechanical.sigmax;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &sigmax_b, &error);
+  double den = gsl_pow_2(params.length)/6.0;
+  double sigmax_b = feenox_linearization_integrate(&F, mechanical.sigmax) / den;
+  double sigmay_b = feenox_linearization_integrate(&F, mechanical.sigmay) / den;
+  double sigmaz_b = feenox_linearization_integrate(&F, mechanical.sigmaz) / den;
+  double tauxy_b = feenox_linearization_integrate(&F, mechanical.tauxy) / den;
+  double tauyz_b = feenox_linearization_integrate(&F, mechanical.tauyz) / den;
+  double tauzx_b = feenox_linearization_integrate(&F, mechanical.tauzx) / den;
 
-  double sigmay_b = 0;
-  params.function = mechanical.sigmay;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &sigmay_b, &error);
-
-  double sigmaz_b = 0;
-  params.function = mechanical.sigmaz;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &sigmaz_b, &error);
-  
-  double tauxy_b = 0;
-  params.function = mechanical.tauxy;
-  gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &tauxy_b, &error);
-
-  double tauyz_b = 0;  
-  double tauzx_b = 0;
-  if (feenox.pde.dim > 2) {
-    
-    params.function = mechanical.tauyz;
-    gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &tauyz_b, &error);
-  
-    params.function = mechanical.tauzx;
-    gsl_integration_qags (&F, 0, params.t, 0, DEFAULT_INTEGRATION_INTERVALS, DEFAULT_INTEGRATION_INTERVALS, w, &tauzx_b, &error);
-  }
-  
-  gsl_integration_workspace_free(w);
-  
-
-  sigmax_m /= params.t;
-  sigmay_m /= params.t;
-  sigmaz_m /= params.t;
-  tauxy_m  /= params.t;
-  
-  double den = gsl_pow_2(params.t)/6.0;
-  sigmax_b /= den;
-  sigmay_b /= den;
-  sigmaz_b /= den;
-  tauxy_b  /= den;
-
-  if (feenox.pde.dim > 2) {
-    tauyz_m  /= params.t;
-    tauzx_m  /= params.t;
-    tauyz_b  /= den;
-    tauzx_b  /= den;
-  }
-
-  
-  double x1[3];
-  x1[0] = params.x1;
-  x1[1] = params.y1;
-  x1[2] = params.z1;
-  double x2[3];
-  x2[0] = params.x2;
-  x2[1] = params.y2;
-  x2[2] = params.z2;
+  // now we have to compose these guys
+  double x1[3] = {params.x1, params.y1, params.z1};
+  double x2[3] = {params.x2, params.y2, params.z2};
  
   double M = 0;
   double B = 0;
@@ -234,9 +160,16 @@ int feenox_instruction_linearize(void *arg) {
   }
   P = T - MB;
   
-  feenox_var_value(linearize->M) = M;
-  feenox_var_value(linearize->MB) = MB;
-  feenox_var_value(linearize->P) = P;
+  // store results
+  if (linearize->M != NULL) {
+    feenox_var_value(linearize->M) = M;
+  }
+  if (linearize->MB != NULL) {
+    feenox_var_value(linearize->MB) = MB;
+  }
+  if (linearize->P != NULL) {
+    feenox_var_value(linearize->P) = P;
+  }  
   
   if (linearize->file != NULL) {
     if (linearize->file->pointer == NULL) {
@@ -269,7 +202,6 @@ int feenox_instruction_linearize(void *arg) {
     fprintf(linearize->file->pointer, "#   $\\tau_{yz}$ = %g\n", tauyz_b);
     fprintf(linearize->file->pointer, "#   $\\tau_{zx}$ = %g\n", tauzx_b);
     fprintf(linearize->file->pointer, "#\n");
-/*
     fprintf(linearize->file->pointer, "# ## Membrane plus bending stress tensor\n");
     fprintf(linearize->file->pointer, "#\n");
     fprintf(linearize->file->pointer, "#  $\\sigma_{x}$ = %g\n", sigmax_m+sigmax_b);
@@ -279,7 +211,6 @@ int feenox_instruction_linearize(void *arg) {
     fprintf(linearize->file->pointer, "#   $\\tau_{yz}$ = %g\n", tauyz_m+tauyz_b);
     fprintf(linearize->file->pointer, "#   $\\tau_{zx}$ = %g\n", tauzx_m+tauzx_b);
     fprintf(linearize->file->pointer, "#\n");
-*/
     fprintf(linearize->file->pointer, "# ## Linearization results\n");
     fprintf(linearize->file->pointer, "#\n");
     fprintf(linearize->file->pointer, "#                Membrane stress $M$ = %g\n", feenox_var_value(linearize->M));
@@ -310,24 +241,47 @@ int feenox_instruction_linearize(void *arg) {
   return FEENOX_OK;
 }
 
-double feenox_linearization_integrand_membrane(double t_prime, void *params) {
+double feenox_linearization_integrand_membrane(double t, void *params) {
   struct linearize_params_t *p = (struct linearize_params_t *)params;
   
+  double t_prime = t/p->length;
   double x[3];
-  x[0] = p->x1 + t_prime/p->t * (p->x2 - p->x1);
-  x[1] = p->y1 + t_prime/p->t * (p->y2 - p->y1);
-  x[2] = p->z1 + t_prime/p->t * (p->z2 - p->z1);
+  x[0] = p->x1 + t_prime * (p->x2 - p->x1);
+  x[1] = p->y1 + t_prime * (p->y2 - p->y1);
+  x[2] = p->z1 + t_prime * (p->z2 - p->z1);
 
   return feenox_function_eval(p->function, x);
 }
 
-double feenox_linearization_integrand_bending(double t_prime, void *params) {
+double feenox_linearization_integrand_bending(double t, void *params) {
   struct linearize_params_t *p = (struct linearize_params_t *)params;
   
+  double t_prime = t/p->length;
   double x[3];
-  x[0] = p->x1 + t_prime/p->t * (p->x2 - p->x1);
-  x[1] = p->y1 + t_prime/p->t * (p->y2 - p->y1);
-  x[2] = p->z1 + t_prime/p->t * (p->z2 - p->z1);
+  x[0] = p->x1 + t_prime * (p->x2 - p->x1);
+  x[1] = p->y1 + t_prime * (p->y2 - p->y1);
+  x[2] = p->z1 + t_prime * (p->z2 - p->z1);
 
-  return feenox_function_eval(p->function, x) * (0.5*p->t - t_prime);
+  return feenox_function_eval(p->function, x) * (0.5*p->length - t);
 }
+
+
+double feenox_linearization_integrate(gsl_function *F, function_t *function) {
+  struct linearize_params_t *p = (struct linearize_params_t *)F->params;
+  p->function = function;
+  double result = 0;
+  double epsabs = 0;
+  double epsrel = 1e-4;
+  size_t limit = DEFAULT_INTEGRATION_INTERVALS;
+  int key = GSL_INTEG_GAUSS31;
+  double  abserr = 0;
+  gsl_integration_workspace *w = gsl_integration_workspace_alloc(limit);
+  if (w == NULL) {
+    feenox_runtime_error();
+  }
+  gsl_integration_qag(F, 0, p->length, epsabs, epsrel, limit, key, w, &result, &abserr);
+  gsl_integration_workspace_free(w);
+  
+  return result;
+}
+
