@@ -153,7 +153,9 @@ int feenox_instruction_mesh_integrate(void *arg) {
     }
   }  
   
-  feenox_var_value(result) = integral;
+  if (result != NULL) {
+    feenox_var_value(result) = integral;
+  }  
 
   return FEENOX_OK;
 }

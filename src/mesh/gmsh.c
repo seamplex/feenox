@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related gmsh routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2022 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -249,6 +249,11 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         if (geometrical_entity->num_physicals != 0) {
           feenox_check_alloc(geometrical_entity->physical = calloc(geometrical_entity->num_physicals, sizeof(int)));
           feenox_call(feenox_gmsh_read_data_int(this, geometrical_entity->num_physicals, geometrical_entity->physical, binary));
+          // gmsh can give a negative tag for the physical entity, depending on the orientation of the geometrical entity
+          // we do not care about that (should we?) so we take the absolute value
+          for (int k = 0; k < geometrical_entity->num_physicals; k++) {
+            geometrical_entity->physical[k] = abs(geometrical_entity->physical[k]);
+          }
         }
         
         // points do not have bounding groups
@@ -721,7 +726,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           physical_group = NULL;
           if (geometrical != 0) {
             // the whole block has the same physical group, find it once and that's it
-            HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entity);
+            HASH_FIND(hh[dimension], this->geometrical_entities[dimension], &geometrical, sizeof(int), geometrical_entitqqy);
             if (geometrical_entity == NULL) {
               feenox_push_error_message("geometrical entity '%d' of dimension '%d' does not exist", geometrical, dimension);
               return FEENOX_ERROR;

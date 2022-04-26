@@ -25,13 +25,13 @@ extern feenox_t feenox;
 
 // get a pointer to a physical group
 physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {
-  physical_group_t *physical_group;
-  mesh_t *dummy;
-  mesh_t *tmp;
+  physical_group_t *physical_group = NULL;
   if (mesh != NULL) {
     HASH_FIND_STR(mesh->physical_groups, name, physical_group);
   } else {
     // barremos todas las mallas
+    mesh_t *dummy = NULL;
+    mesh_t *tmp = NULL;
     HASH_ITER(hh, feenox.mesh.meshes, dummy, tmp) {
       HASH_FIND_STR(dummy->physical_groups, name, physical_group);
       if (physical_group != NULL) {
