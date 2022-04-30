@@ -40,7 +40,7 @@ int feenox_instruction_linearize(void *arg) {
   feenox_linearize_t *linearize = (feenox_linearize_t *)arg;
 
   // http://www.eng-tips.com/faqs.cfm?fid=982
-  // te actual equations are in ASME V
+  // the actual equations are in ASME VIII-div 2 sec 5
   struct linearize_params_t params;
   params.x1 = feenox_expression_eval(&linearize->x1);
   params.y1 = feenox_expression_eval(&linearize->y1);

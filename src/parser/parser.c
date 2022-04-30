@@ -363,7 +363,7 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
 // TODO: move this to a per-physics parser      
-///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME VII-Sec 5.
+///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME VIII Div\ 2 Sec1\ 5.
 ///kw_pde+LINEARIZE_STRESS+usage LINEARIZE_STRESS
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
