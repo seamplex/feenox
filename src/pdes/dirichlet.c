@@ -72,8 +72,8 @@ int feenox_problem_dirichlet_eval(void) {
     feenox_check_alloc(feenox.pde.dirichlet_values = calloc(n_bcs, sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.dirichlet_derivatives = calloc(n_bcs, sizeof(PetscScalar)));
     
-    feenox_check_alloc(feenox.pde.multifreedom_indexes = calloc(n_bcs, sizeof(PetscInt)));
-    feenox_check_alloc(feenox.pde.multifreedom_coefficients = calloc(n_bcs, sizeof(PetscScalar)));
+    feenox_check_alloc(feenox.pde.multifreedom_indexes = calloc(n_bcs, sizeof(PetscInt *)));
+    feenox_check_alloc(feenox.pde.multifreedom_coefficients = calloc(n_bcs, sizeof(PetscScalar *)));
     
   } else {
     // if we are here then we know more or less the number of BCs we need

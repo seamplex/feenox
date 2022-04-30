@@ -188,7 +188,6 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
       return FEENOX_ERROR;
     }
 
-    printf("node %ld\telement %ld\tnormal %g %g %g\n", node_global_index+1, element->tag, normal[0], normal[1], normal[2]);
     if (coordinate_direction != -1) {
       feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[coordinate_direction], 0));
     } else {
