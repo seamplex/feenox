@@ -1,0 +1,60 @@
+
+# Current
+
+ * handle hanging nodes
+ * volumetric forces in mechanical
+ * stress linearization according to ASME VIII Div\ 2 Sec\ 5.
+ * tangential and radial symmetry as multi-dof BCs using the penalty method
+ * solve (small) systems of non-linear equations given as expressions
+ * functions over meshes using vectors
+ * argument `--pdes` lists the available PDEs FeenoX can solve
+ * auto-detect PDE directories: if one adds or deletes one directory from `src/pdes` FeenoX will compile anyway.
+ * faster direct inversion of 3x3 matrices using code from PETSc
+ * separateed initial conditions from initial guess
+ 
+
+# v0.2 (Jan 2022)
+
+ * orthotropic elasticity
+ * orthotropic thermal expansion
+ * compute reactions
+ * virtual methods (function pointers) for material models
+ * plane stress and strain
+ * neutron diffusion problem
+ * free-free modal analysis
+ * multi-dimensional interpolation using Shepard's method for point-wise functions
+ * traction BC in mechanical
+ * 3D thermal MMS with space-dependent conductivity
+ 
+# v0.1 (Aug 2021)
+
+ * laplace problem
+ * compute gradients of PDE solutions only if they are used
+ * use brackets for vectors and parenthesis for functions
+ * find extrema of mesh-based functions at gauss points
+ * 2d & 3d thermal MMS tests
+ * thermal expansion in mechanical
+ * binary `.msh` v4.x reader
+ * function fitting
+ * per-problem virtual methods
+ * modal problem
+ * mechanical problem
+ * cleaner pointwise-defined functions
+ * jacobian for non-linear thermal
+ * check consistency between PETSc/SLEPc headers and libraries
+ * cell-based output
+ * check dependency of expressions and decide linearity automatically
+ * implicit materials
+ * thermal problem
+ * skeleton for PDEs
+ * ODEs
+ * renamed branch `master` to `main`
+ * scripts to build binaries for distribution
+ * support for `clang`
+ * regressions tests under target `make check`
+ 
+ 
+# v0.0 (Dec 2020)
+
+ * initial development version to move stuff from [wasora](https://github.com/seamplex/wasora)/[Fino](https://github.com/seamplex/fino)/[milonga](https://github.com/seamplex/milonga) to the new [FeenoX repository](https://github.com/seamplex/feenox^).
+ 
