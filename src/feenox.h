@@ -963,10 +963,11 @@ struct elementary_entity_t {
 
 
 struct gauss_t {
-  unsigned int V;      // number of points (v=1,2,...,V )
+  int V;               // number of points (v=1,2,...,V )
   double *w;           // weights (w[v] is the weight of the v-th point)
   double **r;          // coordinates (r[v][m] is the coordinate of the v-th point in dimension m)
   
+  // TODO: array of gsl_vectors
   double **h;          // shape functions evaluated at the gauss points h[v][j]
   gsl_matrix **dhdr;   // derivatives dhdr[v](j,m)
   
@@ -1647,6 +1648,7 @@ struct feenox_t {
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t size_global;            // total number of DoFs
     
+    int handle_hanging_nodes;      // TODO: read this flag
     int compute_gradients;   // do we need to compute gradients?
     gsl_matrix *m2;
     

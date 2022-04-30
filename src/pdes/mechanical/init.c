@@ -328,6 +328,22 @@ int feenox_problem_init_runtime_mechanical(void) {
     mechanical.T0 = mechanical.T_ref.eval(&mechanical.T_ref, NULL, NULL);
   }
   
+  
+  // volumetric force densities
+  feenox_call(feenox_distribution_init(&mechanical.f_x, "fx"));
+  if (mechanical.f_x.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.f_x, "f_x"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.f_y, "fy"));
+  if (mechanical.f_y.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.f_y, "f_y"));
+  }
+  feenox_call(feenox_distribution_init(&mechanical.f_z, "fz"));
+  if (mechanical.f_z.defined == 0) {
+    feenox_call(feenox_distribution_init(&mechanical.f_z, "f_z"));
+  }
+  
+  
 
   // set material model virtual methods
   switch (mechanical.material_model) {

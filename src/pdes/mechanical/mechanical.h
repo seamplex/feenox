@@ -73,14 +73,19 @@ struct mechanical_t {
   distribution_t T_ref; // reference temperature (has to be a constant)
   double T0;            // evaluated T_ref
 
+  // volumetric force densityies
+  distribution_t f_x;
+  distribution_t f_y;
+  distribution_t f_z;
+  
   // flags to speed up things
   int uniform_C;
   int constant_C;
   int uniform_expansion;
   int constant_expansion;
   
-  size_t n_nodes;
-  size_t stress_strain_size;
+  int n_nodes;
+  int stress_strain_size;
 
   // holder for the rigid-body displacements
 #ifdef HAVE_PETSC  

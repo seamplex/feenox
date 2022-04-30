@@ -55,9 +55,8 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   // TODO: there should be a way to use BLAS instead of a for loop
   if (thermal.q.defined) {
     double q = thermal.q.eval(&thermal.q, x, material);
-    unsigned int j = 0;
-    // TODO: H*q
-    for (j = 0; j < e->type->nodes; j++) {
+    // TODO: H*q as BLAS
+    for (int j = 0; j < e->type->nodes; j++) {
       gsl_vector_add_to_element(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
     }
   }

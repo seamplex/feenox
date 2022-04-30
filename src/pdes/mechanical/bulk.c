@@ -60,9 +60,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 //  double r_for_axisymmetric = 1;
 //  double w = this->w[v] * r_for_axisymmetric;
   
-  unsigned int j = 0;
   gsl_matrix *dhdx = e->dhdx[v];
-  for (j = 0; j < mechanical.n_nodes; j++) {
+  for (int j = 0; j < mechanical.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
       
@@ -98,6 +97,30 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
       return FEENOX_ERROR;
     }
   }
+  
+  // volumetric force densities
+  if (mechanical.f_x.defined || mechanical.f_y.defined || mechanical.f_z.defined) {
+    if (mechanical.f_x.uniform == 0 || mechanical.f_y.uniform == 0 || mechanical.f_z.uniform == 0) {
+      feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
+    }
+    
+    for (int j = 0; j < e->type->nodes; j++) {
+      int offset = feenox.pde.dofs*j;
+      material_t *material = e->physical_group != NULL ? e->physical_group->material : NULL;
+      double wh = e->w[v] * e->type->gauss[feenox.pde.mesh->integration].h[v][j];
+      if (mechanical.f_x.defined) {
+        gsl_vector_add_to_element(feenox.pde.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, e->x[v], material));
+      }  
+      if (mechanical.f_y.defined) {
+        gsl_vector_add_to_element(feenox.pde.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, e->x[v], material));
+      }
+      if (mechanical.f_z.defined) {
+        gsl_vector_add_to_element(feenox.pde.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, e->x[v], material));
+      }  
+    }
+  }
+    
+  
 
   // elemental stiffness B'*C*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mechanical.C, mechanical.B, 0, mechanical.CB));
@@ -113,9 +136,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     
     feenox_call(gsl_blas_dgemv(CblasTrans, 1.0, mechanical.C, mechanical.et, 0, mechanical.Cet));
     feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
-  }  
-
-  // TODO: rhs with volumetric sources
+  }
+  
   // TODO: cleanup aux matrices C, B and CB
   
 #endif
