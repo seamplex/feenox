@@ -42,7 +42,7 @@ int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
   gsl_matrix *c = NULL;
   feenox_check_alloc(c = gsl_matrix_alloc(1, feenox.pde.dofs));
 
-  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+  for (int g = 0; g < feenox.pde.dofs; g++) {
     l[g] = feenox.pde.mesh->node[index].index_dof[g];
     gsl_matrix_set(c, 0, g, coefficients[g]);
   }
@@ -144,23 +144,41 @@ int feenox_problem_dirichlet_eval(void) {
 // it takes K and b and writes K_bc and b_bc
 int feenox_problem_dirichlet_set_K(void) {
   
-/*
+  if (feenox.pde.dirichlet_scale == 0)
+  {
+    feenox_problem_dirichlet_compute_scale();
+  }
+  
   // sometimes there are hanging nodes with no associated volumes
   // this can trigger zeros on the diagonal and MatZeroRowsColumns complains
-  // TODO: execute this block only if a special flag is set, i.e. PROBLEM HANDLE_HANGING_NODES
-  // TODO: change to MatGetDiagonal
-  PetscScalar diag = 0;
-  PetscInt k = 0;
-  for (k = feenox.pde.first_row; k < feenox.pde.last_row; k++) {
-    petsc_call(MatGetValues(feenox.pde.K, 1, &k, 1, &k, &diag));
-    if (diag == 0) {
-      petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
-      petsc_call(MatSetValue(feenox.pde.K, k, k, 1.0, INSERT_VALUES));
-      petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
-      feenox_call(feenox_build_assembly());
+  feenox.pde.handle_hanging_nodes = 1;
+  if (feenox.pde.handle_hanging_nodes) {
+    PetscBool found = PETSC_FALSE;
+    Vec vec_diagonal = NULL;
+    petsc_call(VecDuplicate(feenox.pde.phi, &vec_diagonal));
+    petsc_call(MatGetDiagonal(feenox.pde.K, vec_diagonal));
+    const PetscScalar *array_diagonal;
+    petsc_call(VecGetArrayRead(vec_diagonal, &array_diagonal));
+    PetscInt size = feenox.pde.last_row - feenox.pde.first_row;
+
+    petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
+    for (PetscInt j = 0; j < size; j++) {
+      if (array_diagonal[j] == 0) {
+        PetscInt row = feenox.pde.first_row + j;
+        petsc_call(MatSetValue(feenox.pde.K, row, row, feenox.pde.dirichlet_scale, INSERT_VALUES));
+        found = PETSC_TRUE;
+      }  
+    }
+    petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
+  
+    petsc_call(VecRestoreArrayRead(vec_diagonal, &array_diagonal));
+    petsc_call(VecDestroy(&vec_diagonal));
+ 
+    if (found) {
+      petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+      petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
     }  
-  }
-*/
+  }  
   
   if (feenox.pde.K_bc == NULL) {
     petsc_call(MatDuplicate(feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.K_bc));
@@ -200,11 +218,6 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &rhs));
     petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   }  
-  
-  if (feenox.pde.dirichlet_scale == 0)
-  {
-    feenox_problem_dirichlet_compute_scale();
-  }
   
   if (feenox.pde.symmetric_K) {
     petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));

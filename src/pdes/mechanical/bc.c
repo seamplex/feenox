@@ -155,29 +155,31 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
   
 #ifdef HAVE_PETSC
   
-  
   if (bc_data->type_phys == BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY) {
     // outward normal (smoothed over all elements on the physical group of the BC)
+    // TODO: choose to smooth or to use the local one
+    PetscScalar normal[3] = {0, 0, 0};
     PetscScalar n_element[3] = {0, 0, 0};
-    PetscScalar n_nodal[3] = {0, 0, 0};
     element_ll_t *element_item = NULL;
     LL_FOREACH(feenox.pde.mesh->node[node_global_index].element_list, element_item) {
       element_t *e = element_item->element;
       if (e != NULL && e->type->dim == (feenox.pde.dim-1) && e->physical_group == element->physical_group) {
         feenox_call(feenox_mesh_compute_outward_normal(element_item->element, n_element));
-        n_nodal[0] += n_element[0];
-        n_nodal[1] += n_element[1];
-        n_nodal[2] += n_element[2];
+        normal[0] += n_element[0];
+        normal[1] += n_element[1];
+        normal[2] += n_element[2];
       }
     }
+
+//    feenox_call(feenox_mesh_compute_outward_normal(element, normal));
     
     int coordinate_direction = -1;
-    double norm = gsl_hypot3(n_nodal[0], n_nodal[1], n_nodal[2]);
+    double norm = gsl_hypot3(normal[0], normal[1], normal[2]);
     if (PetscLikely(norm != 0)) {
       // if the outward normal coincides with one of the three axes, we can get away with a regular dirichlet BC
       for (unsigned int g = 0; g < 3; g++) {
-        n_nodal[g] /= norm;
-        if (fabs(n_nodal[g]) > (1-1e-4)) {
+        normal[g] /= norm;
+        if (fabs(normal[g]) > (1-1e-4)) {
           coordinate_direction = g;
         }  
       }
@@ -186,11 +188,11 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
       return FEENOX_ERROR;
     }
 
-    
+    printf("node %ld\telement %ld\tnormal %g %g %g\n", node_global_index+1, element->tag, normal[0], normal[1], normal[2]);
     if (coordinate_direction != -1) {
       feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[coordinate_direction], 0));
     } else {
-      feenox_call(feenox_problem_multifreedom_add(node_global_index, n_nodal));
+      feenox_call(feenox_problem_multifreedom_add(node_global_index, normal));
     }  
     
   } else if (bc_data->type_phys == BC_TYPE_MECHANICAL_RADIAL_SYMMETRY) {
