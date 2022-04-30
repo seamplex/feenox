@@ -147,9 +147,9 @@ echo "ok"
 
 # changelog
 if [ ! -z "$(which pandoc)" ]; then
-  pandoc Changelog.md -t plain -o Changelog
+  pandoc ChangeLog.md -t plain -o ChangeLog
 else
-  cp Changelog.md Changelog
+  cp ChangeLog.md ChangeLog
 fi
 
 echo "calling autoreconf... "
