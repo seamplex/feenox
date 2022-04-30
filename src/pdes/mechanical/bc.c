@@ -173,11 +173,12 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
 
 //    feenox_call(feenox_mesh_compute_outward_normal(element, normal));
     
+    
     int coordinate_direction = -1;
     double norm = gsl_hypot3(normal[0], normal[1], normal[2]);
     if (PetscLikely(norm != 0)) {
       // if the outward normal coincides with one of the three axes, we can get away with a regular dirichlet BC
-      for (unsigned int g = 0; g < 3; g++) {
+      for (int g = 0; g < 3; g++) {
         normal[g] /= norm;
         if (fabs(normal[g]) > (1-1e-4)) {
           coordinate_direction = g;
@@ -203,7 +204,8 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
       feenox_call(feenox_physical_group_compute_volume(element->physical_group, feenox.pde.mesh));
     }
     
-    for (unsigned int g = 0; g < 3; g++) {
+    // TODO!
+    for (int g = 0; g < 3; g++) {
 //      x[g] = feenox.pde.mesh->node[node_global_index].x[g] - ((bc_data->expr[g].items == NULL) ? element->physical_entity->cog[d] : feenox_expression_eval(bc_data->expr[g]));
       x[g] = feenox.pde.mesh->node[node_global_index].x[g] - element->physical_group->cog[g];
     }  

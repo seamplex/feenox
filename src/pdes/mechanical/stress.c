@@ -254,3 +254,13 @@ double feenox_vonmises_from_stress_tensor(double sigmax, double sigmay, double s
   
 }
 
+
+double feenox_tresca_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx) {
+  
+  double sigma1 = 0;
+  double sigma3 = 0;
+  feenox_call(feenox_principal_stress_from_cauchy(sigmax, sigmay, sigmaz, tauxy, tauyz, tauzx, &sigma1, NULL, &sigma3));
+  
+  return fabs(sigma1 - sigma3);  
+}
+

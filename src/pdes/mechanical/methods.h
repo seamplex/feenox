@@ -80,6 +80,7 @@ extern int feenox_stress_from_strain(node_t *node, element_t *element, unsigned 
 extern int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3);
 extern double feenox_vonmises_from_principal(double sigma1, double sigma2, double sigma3);
 extern double feenox_vonmises_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx);
+extern double feenox_tresca_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx);
 
 // mechanical/linearize.c
 extern int feenox_instruction_linearize(void *arg);
