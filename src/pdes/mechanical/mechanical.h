@@ -154,14 +154,6 @@ struct mechanical_t {
 
 
 struct feenox_linearize_t {
-  enum {
-    linearize_composition_vonmises,
-    linearize_composition_tresca,
-    linearize_composition_principal1,
-    linearize_composition_principal2,
-    linearize_composition_principal3
-  } composition;
-  
   expr_t x1;
   expr_t y1;
   expr_t z1;
@@ -173,9 +165,30 @@ struct feenox_linearize_t {
 //  int ignore_through_thickness;
   file_t *file;
   
+  // von mises
   var_t *M;     // membrane
   var_t *MB;    // membrane plus bending
   var_t *P;     // peak
+  
+  // tresca
+  var_t *Mt;
+  var_t *MBt;
+  var_t *Pt;
+  
+  // principal1
+  var_t *M1;
+  var_t *MB1;
+  var_t *P1;
+
+  // principal2
+  var_t *M2;
+  var_t *MB2;
+  var_t *P2;
+  
+  // principal3
+  var_t *M3;
+  var_t *MB3;
+  var_t *P3;
   
   
   feenox_linearize_t *next;

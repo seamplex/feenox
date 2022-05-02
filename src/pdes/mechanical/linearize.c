@@ -34,7 +34,9 @@ struct linearize_params_t {
 double feenox_linearization_integrand_membrane(double t_prime, void *params);
 double feenox_linearization_integrand_bending(double t_prime, void *params);
 double feenox_linearization_integrate(gsl_function *F, function_t *function);
+int feenox_linearization_compute_and_store(function_t *total_function, const double x1[], const double x2[], double M, double MBplus, double MBminus, var_t *var_M, var_t *var_MB, var_t *var_P);
 
+  
 int feenox_instruction_linearize(void *arg) {
   
   feenox_linearize_t *linearize = (feenox_linearize_t *)arg;
@@ -77,83 +79,44 @@ int feenox_instruction_linearize(void *arg) {
   double x1[3] = {params.x1, params.y1, params.z1};
   double x2[3] = {params.x2, params.y2, params.z2};
  
-  double M = 0;
-  double MBplus = 0;
-  double MBminus = 0;
-  function_t *total_function = NULL;
-  char *total_name = NULL;
+  if (linearize->M != NULL || linearize->MB != NULL || linearize->P != NULL) {
+    double M = feenox_vonmises_from_stress_tensor(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m);
+    double MBplus  = feenox_vonmises_from_stress_tensor(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b);
+    double MBminus = feenox_vonmises_from_stress_tensor(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b);
+    feenox_call(feenox_linearization_compute_and_store(mechanical.sigma, x1, x2, M, MBplus, MBminus, linearize->M, linearize->MB, linearize->P));
+  }
 
-  switch (linearize->composition) {
-    case linearize_composition_vonmises:
-      total_function = mechanical.sigma;
-      total_name = strdup("Von Mises");
-      M = feenox_vonmises_from_stress_tensor(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m);
-      MBplus = feenox_vonmises_from_stress_tensor(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b);
-      MBminus = feenox_vonmises_from_stress_tensor(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b);
-    break;
-
-    case linearize_composition_tresca:
-      total_function = mechanical.tresca;
-      total_name = strdup("Tresca");
-      M = feenox_tresca_from_stress_tensor(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m);
-      MBplus = feenox_tresca_from_stress_tensor(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b);
-      MBminus = feenox_tresca_from_stress_tensor(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b);
-    break;
-
-    case linearize_composition_principal1:
-      total_function = mechanical.sigma1;
-      total_name = strdup("Principal 1");
-      feenox_principal_stress_from_cauchy(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m, &M, NULL, NULL);
-      feenox_principal_stress_from_cauchy(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b, &MBplus, NULL, NULL);
-      feenox_principal_stress_from_cauchy(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b, &MBminus, NULL, NULL);
-    break;
-
-    case linearize_composition_principal2:
-      total_function = mechanical.sigma2;
-      total_name = strdup("Principal 2");
-      feenox_principal_stress_from_cauchy(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m, NULL, &M, NULL);
-      feenox_principal_stress_from_cauchy(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b, NULL, &MBplus, NULL);
-      feenox_principal_stress_from_cauchy(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b, NULL, &MBminus, NULL);
-    break;
+  if (linearize->Mt != NULL || linearize->MBt != NULL || linearize->Pt != NULL) {
+    double M = feenox_tresca_from_stress_tensor(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m);
+    double MBplus = feenox_tresca_from_stress_tensor(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b);
+    double MBminus = feenox_tresca_from_stress_tensor(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b);
+    feenox_call(feenox_linearization_compute_and_store(mechanical.tresca, x1, x2, M, MBplus, MBminus, linearize->Mt, linearize->MBt, linearize->Pt));
+  }
   
-    case linearize_composition_principal3:
-      total_function = mechanical.sigma3;
-      total_name = strdup("Principal 3");
-      feenox_principal_stress_from_cauchy(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m, NULL, NULL, &M);
-      feenox_principal_stress_from_cauchy(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b, NULL, NULL, &MBplus);
-      feenox_principal_stress_from_cauchy(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b, NULL, NULL, &MBminus);
-    break;
-  }
+  if (linearize->M1 != NULL || linearize->MB1 != NULL || linearize->P1 != NULL ||
+      linearize->M2 != NULL || linearize->MB2 != NULL || linearize->P2 != NULL ||
+      linearize->M3 != NULL || linearize->MB3 != NULL || linearize->P3 != NULL) {
 
-  // OJO! esto no es asi, hay que hacer un tensor que sea la diferencia
-  double T1 = feenox_function_eval(total_function, x1);
-  double T2 = feenox_function_eval(total_function, x2);
-
-  double MB = 0;
-  double T = 0;
-  double B = 0;
-  if (linearize->composition != linearize_composition_principal3) {
-    MB = (MBplus > MBminus) ? MBplus : MBminus;
-    T = (T1 > T2) ? T1 : T2;
-    B = MB - M;
-  } else {
-    MB = (MBplus < MBminus) ? MBplus : MBminus;
-    T = (T1 < T2) ? T1 : T2;
-    B = M - MB;
+    double M1, M2, M3;
+    double MBplus1, MBplus2, MBplus3;
+    double MBminus1, MBminus2, MBminus3;
+    
+    feenox_principal_stress_from_cauchy(sigmax_m, sigmay_m, sigmaz_m, tauxy_m, tauyz_m, tauzx_m, &M1, &M2, &M3);
+    feenox_principal_stress_from_cauchy(sigmax_m+sigmax_b, sigmay_m+sigmay_b, sigmaz_m+sigmaz_b, tauxy_m+tauxy_b, tauyz_m+tauyz_b, tauzx_m+tauzx_b, &MBplus1,  &MBplus2,  &MBplus3);
+    feenox_principal_stress_from_cauchy(sigmax_m-sigmax_b, sigmay_m-sigmay_b, sigmaz_m-sigmaz_b, tauxy_m-tauxy_b, tauyz_m-tauyz_b, tauzx_m-tauzx_b, &MBminus1, &MBminus2, &MBminus3);
+    
+    if (linearize->M1 != NULL || linearize->MB1 != NULL || linearize->P1 != NULL) {
+      feenox_call(feenox_linearization_compute_and_store(mechanical.sigma1, x1, x2, M1, MBplus1, MBminus1, linearize->M1, linearize->MB1, linearize->P1));
+    }
+    if (linearize->M2 != NULL || linearize->MB2 != NULL || linearize->P2 != NULL) {
+      feenox_call(feenox_linearization_compute_and_store(mechanical.sigma2, x1, x2, M2, MBplus2, MBminus2, linearize->M2, linearize->MB2, linearize->P2));
+    }
+    if (linearize->M3 != NULL || linearize->MB3 != NULL || linearize->P3 != NULL) {
+      feenox_call(feenox_linearization_compute_and_store(mechanical.sigma3, x1, x2, M3, MBplus3, MBminus3, linearize->M3, linearize->MB3, linearize->P3));
+    }
   }
-  double P = T - MB;
   
-  // store results
-  if (linearize->M != NULL) {
-    feenox_var_value(linearize->M) = M;
-  }
-  if (linearize->MB != NULL) {
-    feenox_var_value(linearize->MB) = MB;
-  }
-  if (linearize->P != NULL) {
-    feenox_var_value(linearize->P) = P;
-  }  
-  
+/*  
   if (linearize->file != NULL) {
     if (linearize->file->pointer == NULL) {
       feenox_call(feenox_instruction_file_open(linearize->file));
@@ -220,6 +183,7 @@ int feenox_instruction_linearize(void *arg) {
   }    
    
   feenox_free(total_name);
+*/
   
   return FEENOX_OK;
 }
@@ -268,3 +232,36 @@ double feenox_linearization_integrate(gsl_function *F, function_t *function) {
   return result;
 }
 
+
+int feenox_linearization_compute_and_store(function_t *total_function, const double x1[], const double x2[], double M, double MBplus, double MBminus, var_t *var_M, var_t *var_MB, var_t *var_P) {
+  // OJO! esto no es asi, hay que hacer un tensor que sea la diferencia
+  double T1 = feenox_function_eval(total_function, x1);
+  double T2 = feenox_function_eval(total_function, x2);
+
+  double MB = 0;
+  double T = 0;
+//  double B = 0;
+  if (total_function != mechanical.sigma3) {
+    MB = (MBplus > MBminus) ? MBplus : MBminus;
+    T = (T1 > T2) ? T1 : T2;
+//    B = MB - M;
+  } else {
+    MB = (MBplus < MBminus) ? MBplus : MBminus;
+    T = (T1 < T2) ? T1 : T2;
+//    B = M - MB;
+  }
+  double P = T - MB;
+  
+  // store results
+  if (var_M != NULL) {
+    feenox_var_value(var_M) = M;
+  }
+  if (var_MB != NULL) {
+    feenox_var_value(var_MB) = MB;
+  }
+  if (var_P != NULL) {
+    feenox_var_value(var_P) = P;
+  }  
+  
+  return FEENOX_OK;
+}
