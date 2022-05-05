@@ -151,8 +151,7 @@ int feenox_problem_dirichlet_set_K(void) {
   
   // sometimes there are hanging nodes with no associated volumes
   // this can trigger zeros on the diagonal and MatZeroRowsColumns complains
-  feenox.pde.handle_hanging_nodes = 1;
-  if (feenox.pde.handle_hanging_nodes) {
+  if (feenox.pde.hanging_nodes) {
     PetscBool found = PETSC_FALSE;
     Vec vec_diagonal = NULL;
     petsc_call(VecDuplicate(feenox.pde.phi, &vec_diagonal));
@@ -164,9 +163,17 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
     for (PetscInt j = 0; j < size; j++) {
       if (array_diagonal[j] == 0) {
-        PetscInt row = feenox.pde.first_row + j;
-        petsc_call(MatSetValue(feenox.pde.K, row, row, feenox.pde.dirichlet_scale, INSERT_VALUES));
         found = PETSC_TRUE;
+        if (feenox.pde.hanging_nodes == hanging_nodes_detect) {
+          size_t index = j / feenox.pde.dofs;
+          if (j % index == 0) {
+            // only report the first dof where the hanging node is found
+            feenox_push_error_message("%d", feenox.pde.mesh->node[index].tag);
+          }  
+        } else {
+          PetscInt row = feenox.pde.first_row + j;
+          petsc_call(MatSetValue(feenox.pde.K, row, row, feenox.pde.dirichlet_scale, INSERT_VALUES));
+        }  
       }  
     }
     petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
@@ -175,8 +182,13 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(VecDestroy(&vec_diagonal));
  
     if (found) {
-      petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
-      petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+      if (feenox.pde.hanging_nodes == hanging_nodes_detect) {
+        feenox_push_error_message("hanging nodes detected:");
+        return FEENOX_ERROR;
+      } else {
+        petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+        petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
+      }
     }  
   }  
   
@@ -185,7 +197,7 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.K_bc), "K_bc"));
   } else {
     petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
-  }
+  } 
   
   
   // add multifreedom constrains using the penalty method (before setting the rows to zero)

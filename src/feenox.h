@@ -1648,7 +1648,11 @@ struct feenox_t {
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t size_global;            // total number of DoFs
     
-    int handle_hanging_nodes;      // TODO: read this flag
+    enum  {
+      hanging_nodes_nothing,
+      hanging_nodes_detect,
+      hanging_nodes_handle
+    } hanging_nodes;
     int compute_gradients;   // do we need to compute gradients?
     gsl_matrix *m2;
     
@@ -1662,7 +1666,7 @@ struct feenox_t {
     int (*parse_particular)(const char *);
     int (*init_parser_particular)(void);
     int (*init_runtime_particular)(void);
-    int (*bc_parse)(bc_data_t *, const char *, const char *);
+    int (*bc_parse)(bc_data_t *, const char *, char *);
     int (*bc_set_dirichlet)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
     int (*bc_set_multifreedom)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 #ifdef HAVE_PETSC

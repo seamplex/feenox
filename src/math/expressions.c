@@ -399,7 +399,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       // TODO: differentiate between functions and vectors/matrices
       // arguments have to be in parenthesis
       if (*argument != '[' && *argument != '(') {
-        feenox_push_error_message("expected parenthesis after '%s'", token);
+        feenox_push_error_message("expected parenthesis or bracket after '%s'", token);
         return NULL;
       }
 

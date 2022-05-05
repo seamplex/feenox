@@ -2843,14 +2843,27 @@ int feenox_parse_problem(void) {
         return FEENOX_ERROR;
       }
       
-///kw_pde+PROBLEM+usage [ PROGRESS ]@
+///kw_pde+PROBLEM+usage [ PROGRESS ]
 ///kw_pde+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
 ///kw_pde+PROBLEM+detail progress of the ensamble of the stiffness matrix (or matrices),
 ///kw_pde+PROBLEM+detail the solution of the system of equations
 ///kw_pde+PROBLEM+detail and the computation of gradients (stresses, heat fluxes, etc.), if applicable.
     } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
       feenox.pde.progress_ascii = PETSC_TRUE;
-      
+
+///kw_pde+PROBLEM+usage [ DETECT_HANGING_NODES
+///kw_pde+PROBLEM+detail If either `DETECT_HANGING_NODES` or `HANDLE_HANGING_NODES` are given, 
+///kw_pde+PROBLEM+detail an intermediate check for nodes without any associated elements will be performed.
+///kw_pde+PROBLEM+detail For well-behaved meshes this check is redundant so by detault it is not done.
+///kw_pde+PROBLEM+detail With `DETECT_HANGING_NODES`, FeenoX will report the tag of the hanging nodes and stop.
+    } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
+      feenox.pde.hanging_nodes = hanging_nodes_detect;
+///kw_pde+PROBLEM+detail With `HANDLE_HANGIND_NODES`, FeenoX will fix those nodes and try to solve the problem anyway.
+///kw_pde+PROBLEM+usage | HANDLE_HANGIND_NODES ]@
+    } else if (strcasecmp(token, "HANDLE_HANGING_NODES") == 0) {
+      feenox.pde.hanging_nodes = hanging_nodes_handle;
+ 
+     
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
 ///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.

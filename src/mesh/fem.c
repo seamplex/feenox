@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's mesh-related FEM routines
+ *  feenox's mesh-related finite-element routines
  *
  *  Copyright (C) 2014--2022 jeremy theler
  *
@@ -295,8 +295,10 @@ inline int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int inte
   }
   // this is where the magic ends
   
+  // TODO: choose to take the absolute value or not?
   if (e->w[v] == 0) {
     e->w[v] = e->type->gauss[integration].w[v] * fabs(feenox_mesh_determinant(e->dxdr[v]));
+//    e->w[v] = e->type->gauss[integration].w[v] * feenox_mesh_determinant(e->dxdr[v]);    
   }  
 
   return FEENOX_OK;

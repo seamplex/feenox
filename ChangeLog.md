@@ -1,7 +1,8 @@
 
 # Current
 
- * handle hanging nodes
+ * detect/handle hanging nodes
+ * muti-dof BCs using expressions for mechanical 0=expression of space & displacements
  * volumetric forces in mechanical
  * stress linearization according to ASME VIII Div\ 2 Sec\ 5.
  * tangential and radial symmetry as multi-dof BCs using the penalty method

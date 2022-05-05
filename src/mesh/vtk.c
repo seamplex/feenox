@@ -201,14 +201,13 @@ int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist) {
     }  
   }
 
+  // TODO: virtual methods
   if (dist->field_location == field_location_cells) {
 
-    size_t i = 0;
-    unsigned int g = 0;
-    double value = 0;
-    for (i = 0; i < this->mesh->n_cells; i++) {
-      for (g = 0; g < dist->size; g++) {
-        value = (dist->field[g]->type == function_type_pointwise_mesh_cell && dist->field[g]->mesh == this->mesh) ?
+    for (size_t i = 0; i < this->mesh->n_cells; i++) {
+      for (int g = 0; g < dist->size; g++) {
+        // TODO: remove the conditional from the loop
+        double value = (dist->field[g]->type == function_type_pointwise_mesh_cell && dist->field[g]->mesh == this->mesh) ?
                   dist->field[g]->data_value[i] :
                   feenox_function_eval(dist->field[g], this->mesh->cell[i].x);
         fprintf(this->file->pointer, format, value);
@@ -218,12 +217,10 @@ int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist) {
     
   } else {
     
-    size_t j = 0;
-    unsigned int g = 0;
-    double value = 0;
-    for (j = 0; j < this->mesh->n_nodes; j++) {
-      for (g = 0; g < dist->size; g++) {
-        value = (dist->field[g]->type == function_type_pointwise_mesh_node && dist->field[g]->mesh == this->mesh) ?
+    for (size_t j = 0; j < this->mesh->n_nodes; j++) {
+      for (int g = 0; g < dist->size; g++) {
+        // TODO: remove the conditional from the loop
+        double value = (dist->field[g]->type == function_type_pointwise_mesh_node && dist->field[g]->mesh == this->mesh) ?
                   dist->field[g]->data_value[j] :
                   feenox_function_eval(dist->field[g], this->mesh->node[j].x);
         fprintf(this->file->pointer, format, value);
