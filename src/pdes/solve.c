@@ -66,8 +66,8 @@ int feenox_problem_phi_to_solution(Vec phi) {
 
   // TODO: if nprocs == 1 then we already have the full vector
   petsc_call(VecScatterCreateToAll(phi, &vscat, &phi_full));
-  petsc_call(VecScatterBegin(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD));
-  petsc_call(VecScatterEnd(vscat, phi, phi_full, INSERT_VALUES,SCATTER_FORWARD));
+  petsc_call(VecScatterBegin(vscat, phi, phi_full, INSERT_VALUES, SCATTER_FORWARD));
+  petsc_call(VecScatterEnd(vscat, phi, phi_full, INSERT_VALUES, SCATTER_FORWARD));
 
   petsc_call(VecGetLocalSize(phi_full, &nlocal));
   if (nlocal != feenox.pde.size_global) {
@@ -84,8 +84,7 @@ int feenox_problem_phi_to_solution(Vec phi) {
       feenox_check_alloc(feenox.pde.mesh->node[j].phi = calloc(feenox.pde.dofs, sizeof(double)));
     }
     
-    unsigned int g = 0;
-    for (g = 0; g < feenox.pde.dofs; g++) {
+    for (int g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.mesh->node[j].phi[g] = phi_full_array[feenox.pde.mesh->node[j].index_dof[g]];
 
       // if we are not in rough mode we fill the solution here
@@ -97,8 +96,7 @@ int feenox_problem_phi_to_solution(Vec phi) {
         
       if (feenox.pde.nev > 1) {
         PetscScalar xi = 0;
-        unsigned int i = 0;
-        for (i = 0; i < feenox.pde.nev; i++) {
+        for (int i = 0; i < feenox.pde.nev; i++) {
           // the values already have the excitation factor
           PetscInt index = feenox.pde.mesh->node[j].index_dof[g];
           petsc_call(VecGetValues(feenox.pde.eigenvector[i], 1, &index, &xi));

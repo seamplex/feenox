@@ -9,5 +9,5 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-answer expressions_functions.fee "0"
+answer expressions_functions.fee "1.5"
 exitifwrong $?

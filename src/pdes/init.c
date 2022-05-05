@@ -311,8 +311,7 @@ int feenox_problem_define_solutions(void) {
       
       // there are many solution functions in modal
       feenox_check_alloc(feenox.pde.mode[g] = calloc(feenox.pde.nev, sizeof(function_t *)));
-      unsigned int i;
-      for (i = 0; i < feenox.pde.nev; i++) {
+      for (int i = 0; i < feenox.pde.nev; i++) {
         char *modename = NULL;
         feenox_check_minusone(asprintf(&modename, "%s%d", name, i+1));
         feenox_call(feenox_problem_define_solution_function(modename, &feenox.pde.mode[g][i], 0));
@@ -320,7 +319,7 @@ int feenox_problem_define_solutions(void) {
         
         feenox.pde.mode[g][i]->mesh = feenox.pde.solution[g]->mesh;
         feenox.pde.mode[g][i]->var_argument = feenox.pde.solution[g]->var_argument;
-        feenox.pde.mode[g][i]->type = feenox.pde.solution[g]->type;
+        
       }
     }
     feenox_free(name);
@@ -340,6 +339,7 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   (*function)->mesh = feenox.pde.mesh; // esto puede cambiar a rough despues  
   feenox_problem_define_solution_clean_nodal_arguments(*function);
   (*function)->var_argument = feenox.pde.solution[0]->var_argument;
+  // TODO: what about FVM?
   (*function)->type = function_type_pointwise_mesh_node;
   (*function)->is_gradient = is_gradient;
 

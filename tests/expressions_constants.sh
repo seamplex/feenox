@@ -57,6 +57,9 @@ exitifwrong $?
 answer1 expr.fee 'sqrt(5)+(-2*(-2))*(-1)' "-1.76393"
 exitifwrong $?
 
+answer1 expr.fee '(1+sqrt(5))/2' "1.61803"
+exitifwrong $?
+
 
 answer1 expr.fee 'pi' "3.14159"
 exitifwrong $?
@@ -129,4 +132,7 @@ answer1 expr.fee '1+*1' "1+*1"
 exitifwrong $?
 
 answer1 expr.fee '(1+1' "(1+1"
+exitifwrong $?
+
+answer1 expr.fee '10x' "10x"
 exitifwrong $?
