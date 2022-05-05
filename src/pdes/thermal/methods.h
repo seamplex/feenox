@@ -35,7 +35,7 @@ extern int feenox_problem_setup_ksp_thermal(KSP ksp);
 extern int feenox_problem_build_volumetric_gauss_point_thermal(element_t *element, unsigned int v);
 
 // thermal/bc.c
-extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs);
+extern int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *rhs);
 
 extern int feenox_problem_bc_set_thermal_temperature(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 

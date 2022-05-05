@@ -24,7 +24,15 @@
 extern feenox_t feenox;
 extern mechanical_t mechanical;
 
-int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, const char *rhs) {
+typedef struct {
+  expr_t *expr;
+  int dof;
+} feenox_gsl_function_of_uvw_params_t;
+
+double feenox_gsl_function_of_uvw(double x, void *params);
+
+
+int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char *rhs) {
   
   // TODO: document BCs with triple comments
   if (strcmp(lhs, "fixed") == 0) {
@@ -97,6 +105,28 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, cons
     bc_data->type_phys = BC_TYPE_MECHANICAL_RADIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
     // TODO: x0, y0 and z0
+    
+  } else if (strcmp(lhs, "0") == 0) {
+    bc_data->type_phys = BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION;
+    bc_data->type_math = bc_type_math_multifreedom;
+    
+    // trick: the idea is that the user might write an expression of space
+    // x,y,z but also maybe of u,v y w. However, u,v,w are functinos and not variables!
+    // what we do is to define variables named U,V,W and string-replace  u,v,w -> U,V,W
+    // in the entered expression
+    
+    // TODO: there should be a separator (i.e. operator) before and after
+    char *s = rhs;
+    while (*s != '\0') {
+      if (*s == 'u') {
+        *s = 'U';
+      } else if (*s == 'v') {
+        *s = 'V';
+      } else if (*s == 'w') {
+        *s = 'W';
+      }
+      s++;
+    }    
     
   } else {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
@@ -204,7 +234,7 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
       feenox_call(feenox_physical_group_compute_volume(element->physical_group, feenox.pde.mesh));
     }
     
-    // TODO!
+    // TODO! read center of the radial condition
     for (int g = 0; g < 3; g++) {
 //      x[g] = feenox.pde.mesh->node[node_global_index].x[g] - ((bc_data->expr[g].items == NULL) ? element->physical_entity->cog[d] : feenox_expression_eval(bc_data->expr[g]));
       x[g] = feenox.pde.mesh->node[node_global_index].x[g] - element->physical_group->cog[g];
@@ -236,8 +266,28 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
       feenox_call(feenox_problem_multifreedom_add(node_global_index, coefficients));
     }      
     
+  } else if (bc_data->type_phys == BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION) {
+    
+    feenox_gsl_function_of_uvw_params_t params = { &bc_data->expr, -1 };
+    gsl_function F = {feenox_gsl_function_of_uvw, &params};
+    
+    double coefficients[3] = {0, 0, 0};
+
+    // TODO: choose
+    double h = 1e-5;
+    double result = 0;
+    double abserr = 0;
+    for (int g = 0; g < 3; g++) {
+      params.dof = g;
+      gsl_deriv_central(&F, 0, h, &result, &abserr);
+      coefficients[g] = -result;
+    }  
+    
+    // TODO: non-homogeneous RHS
+    feenox_call(feenox_problem_multifreedom_add(node_global_index, coefficients));
+    
   }  
-  // TODO: generic expression
+  
   
 #endif
   
@@ -334,4 +384,24 @@ int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t *bc_dat
 #endif
   
   return FEENOX_OK;
+}
+
+
+// esto sirve para calcular derivadas con GSL
+double feenox_gsl_function_of_uvw(double x, void *params) {
+  feenox_gsl_function_of_uvw_params_t *p = (feenox_gsl_function_of_uvw_params_t *)params;
+
+  feenox_var_value(mechanical.displ_for_bc[0]) = 0;
+  feenox_var_value(mechanical.displ_for_bc[1]) = 0;
+  feenox_var_value(mechanical.displ_for_bc[2]) = 0;
+  feenox_var_value(mechanical.displ_for_bc[p->dof]) = x;
+  
+  double y = feenox_expression_eval(p->expr);
+
+  if (gsl_isnan(y) || gsl_isinf(y)) {
+    feenox_nan_error();
+  }
+
+  return y;
+
 }

@@ -24,7 +24,7 @@
 extern feenox_t feenox;
 extern modal_t modal;
 
-int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const char *rhs) {
+int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
   // TODO: document BCs with triple comments
   if (strcmp(lhs, "fixed") == 0) {

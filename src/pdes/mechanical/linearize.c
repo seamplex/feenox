@@ -31,6 +31,7 @@ struct linearize_params_t {
   
   function_t *function;
 };
+
 double feenox_linearization_integrand_membrane(double t_prime, void *params);
 double feenox_linearization_integrand_bending(double t_prime, void *params);
 double feenox_linearization_integrate(gsl_function *F, function_t *function);

@@ -38,7 +38,7 @@ extern int feenox_problem_setup_eps_modal(EPS eps);
 extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element, unsigned int v);
 
 // modal/bc.c
-extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, const char *rhs);
+extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs);
 extern int feenox_problem_bc_set_modal_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 
 // modal/post.c

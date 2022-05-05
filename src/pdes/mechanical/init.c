@@ -121,17 +121,15 @@ int feenox_problem_init_parser_mechanical(void) {
   feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, 1));
 
 
-// these are for the algebraic expressions in the  which are implicitly-defined BCs
-// i.e. 0=u*nx+v*ny
+// these are for the algebraic expressions in the  implicitly-defined BCs
+// i.e. 0=u*nx+v*ny or 0=u*y-v*x
 // here they are defined as uppercase because there already exist functions named u, v and w
 // but the parser changes their case when an implicit BC is read
-/*  
-  mechanical.vars.U[0]= feenox_define_variable_get_ptr("U");
-  mechanical.vars.U[1]= feenox_define_variable_get_ptr("V");
-  mechanical.vars.U[2]= feenox_define_variable_get_ptr("W");
- */
+  mechanical.displ_for_bc[0]= feenox_define_variable_get_ptr("U");
+  mechanical.displ_for_bc[1]= feenox_define_variable_get_ptr("V");
+  mechanical.displ_for_bc[2]= feenox_define_variable_get_ptr("W");
 
-///va+strain_energy+detail The strain energy stored in the solid, computed as
+  ///va+strain_energy+detail The strain energy stored in the solid, computed as
 ///va+strain_energy+detail $1/2 \cdot \vec{u}^T  K \vec{u}$
 ///va+strain_energy+detail where $\vec{u}$ is the displacements vector and $K$ is the stiffness matrix.
   feenox_check_alloc(mechanical.strain_energy = feenox_define_variable_get_ptr("strain_energy"));

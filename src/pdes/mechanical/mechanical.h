@@ -31,6 +31,7 @@
 #define BC_TYPE_MECHANICAL_FORCE                5
 #define BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY  6
 #define BC_TYPE_MECHANICAL_RADIAL_SYMMETRY      7
+#define BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION  8
 
 typedef struct mechanical_t mechanical_t;
 typedef struct feenox_linearize_t feenox_linearize_t;
@@ -111,7 +112,8 @@ struct mechanical_t {
   
 //  double hourglass_epsilon;
   
-  var_t *U[3];
+  // for implicit multi-dof BCs
+  var_t *displ_for_bc[3];
 
   var_t *strain_energy;
 
@@ -133,6 +135,7 @@ struct mechanical_t {
   var_t *u_at_sigma_max;
   var_t *v_at_sigma_max;
   var_t *w_at_sigma_max;
+  
   
   // cauchy stresses
   function_t *sigmax;

@@ -24,7 +24,7 @@
 extern feenox_t feenox;
 extern neutron_diffusion_t neutron_diffusion;
 
-int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, const char *rhs) {
+int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
   if (strcmp(lhs, "null") == 0) {
     bc_data->type_math = bc_type_math_dirichlet;

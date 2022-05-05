@@ -38,7 +38,7 @@ extern int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace);
 #endif
         
 // mechanical/bc.c
-extern int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, const char *rhs);
+extern int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char *rhs);
 
 extern int feenox_problem_bc_set_mechanical_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 extern int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t *bc_data, size_t node_global_index);

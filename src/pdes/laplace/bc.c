@@ -24,7 +24,7 @@
 extern feenox_t feenox;
 extern laplace_t laplace;
 
-int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, const char *rhs) {
+int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
 ///bc_laplace+phi+usage phi=<expr>
 ///bc_laplace+phi+description Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.   

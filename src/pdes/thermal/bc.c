@@ -27,7 +27,7 @@ extern thermal_t thermal;
 // this virtual method is called from the parser, it fills in the already-allocated
 // structure bc_data according to the two strings lhs=rhs, i.e. q=1 or T=1+x 
 // note that h=a and Tref=b are handled by two bc_datas but linked together through next
-int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, const char *rhs) {
+int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
   // TODO: document BCs with triple comments
   if (strcmp(lhs, "T") == 0) {
