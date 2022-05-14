@@ -1222,6 +1222,10 @@ The main features of the input format, thoroughly described below, are:
 
 The first argument not starting with a dash to the `feenox` executable is the path to the main input file. This main input file can in turn include other FeenoX input files and/or read data from other files (such as meshes) or resources (such as shared memory objects). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness). The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)). Throughout the FeenoX repository and documentation the extension `.fee` is used. But again, any extension (even no extension) can be used.
 
+> Show that including `.geo` works (spinning disk)
+
+> `.fee` is removed from `$0`
+
 
 ::: {#fig:highlighting}
 ![Kate](highlighting-kate.png){width=49%}

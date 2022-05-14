@@ -9,8 +9,8 @@ for i in git autoconf m4 make; do
 done
 
 package=feenox
-petsc_ver=3.17.0
-slepc_ver=3.17.0
+petsc_ver=3.17.1
+slepc_ver=3.17.1
 
 if [ -z "$(which git)" ]; then
   echo "git is not installed"

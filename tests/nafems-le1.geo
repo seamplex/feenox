@@ -23,7 +23,7 @@ Ellipse (4) = {0,0,0, d, a, 0, Pi/2};
 Coherence;
 
 // create the surface
-Curve Loop(1) = {1, -2, 3, 4};
+Curve Loop(1) = {-1, 2, -3, -4};
 Plane Surface(1) = {1};
 
 // define physical groups

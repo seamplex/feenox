@@ -26,6 +26,15 @@
 // for POSIX in C99
 #define _GNU_SOURCE   
 
+#if defined(HAVE___BUILTIN_EXPECT)
+#  define feenox_unlikely(cond)   __builtin_expect(!!(cond),0)
+#  define feenox_likely(cond)     __builtin_expect(!!(cond),1)
+#else
+#  define feenox_unlikely(cond)   (cond)
+#  define feenox_likely(cond)     (cond)
+#endif
+
+// for inlining as much as possible GSL
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
 

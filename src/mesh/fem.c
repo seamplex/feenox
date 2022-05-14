@@ -157,8 +157,7 @@ int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_
     feenox_call(feenox_mesh_compute_dxdr(e, r, dxdr));
     feenox_call(feenox_mesh_matrix_invert(dxdr, drdx));
   }
-  
-  
+
   gsl_matrix_set_zero(dhdx);
   unsigned int j, m, m_prime;
   for (j = 0; j < e->type->nodes; j++) {
@@ -197,7 +196,7 @@ inline int feenox_mesh_compute_dhdx_at_gauss(element_t *e, int v, int integratio
     feenox_call(feenox_mesh_compute_drdx_at_gauss(e, v, integration));
   }
 
-  // dxdx = dhdr * drdx
+  // dhdx = dhdr * drdx
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, e->type->gauss[integration].dhdr[v], e->drdx[v], 0.0, e->dhdx[v]));
 
   return FEENOX_OK;
@@ -296,9 +295,20 @@ inline int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int inte
   // this is where the magic ends
   
   // TODO: choose to take the absolute value or not?
+  // TODO: choose to complain or not
   if (e->w[v] == 0) {
-    e->w[v] = e->type->gauss[integration].w[v] * fabs(feenox_mesh_determinant(e->dxdr[v]));
-//    e->w[v] = e->type->gauss[integration].w[v] * feenox_mesh_determinant(e->dxdr[v]);    
+    double det = feenox_mesh_determinant(e->dxdr[v]);
+//    if (det <= 0) {
+//      feenox_push_error_message("negative determinant for element %ld at integration point %d of %d", e->tag, v+1, e->type->gauss[integration].V);
+//      return FEENOX_ERROR;
+//      printf("negative determinant %g for element %ld at integration point %d of %d\n", det, e->tag, v+1, e->type->gauss[integration].V);
+//      feenox_debug_print_gsl_matrix(e->dxdr[v], stdout);
+//    } else {
+//      printf("positive determinant %g for element %ld at integration point %d of %d\n", det, e->tag, v+1, e->type->gauss[integration].V);      
+//    }      
+    
+    e->w[v] = e->type->gauss[integration].w[v] * fabs(det);
+//    e->w[v] = e->type->gauss[integration].w[v] * det;
   }  
 
   return FEENOX_OK;
@@ -325,7 +335,7 @@ inline int feenox_mesh_compute_dxdr_at_gauss_1d(element_t *e, unsigned int v, in
 
 inline int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, int integration) {
   /*
-   * if we are a triangle or a quadrangle (quadrangles are double-triangles so they are alike)
+   * if we are a triangle or a quadrangle (quadrangles are two triangles so they are alike)
    * but we do not live on the x-y plane we have to do some tricks:
    * we need a transformation matrix R that maps the outward normal n into [0,0,1]
    * i.e. such that when R is applied to the triangle, it will now live in the xy plane
@@ -381,6 +391,7 @@ inline int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, in
                       1     + k * (-u[1]*u[1] - u[0]*u[0])
                     }};
 
+  // TODO: can this loop be re-written as a matrix-something product?
   double xi = 0;
   for (unsigned int m = 0; m < 2; m++) {
     for (unsigned int m_prime = 0; m_prime < 2; m_prime++) {
@@ -432,10 +443,9 @@ inline int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int i
     return FEENOX_OK;
   }
 
-  // choose which virtual method to call
-  // in principle there is no need to have virtual methods
-  // they make sense only if we do this "selection" in an initialization
-  // but it does not make sense to do the selection if dxdr is not needed
+  // TODO: once the problem type and dimension is set, we know which element type
+  //       needs which kind of dxdr computation: we can then use some virtual
+  //       functions defined in e->type
 //  if (e->compute_dxdr == NULL) {
     if (e->type->dim == 1 && (e->node[0]->x[1] != 0 || e->node[1]->x[1] != 0 ||
                               e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0)) {
@@ -534,7 +544,7 @@ int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int v, int integration
     feenox_call(feenox_mesh_compute_dhdx_at_gauss(e, v, integration));
   }
   
-  
+  // TODO: if dofs == 1 this is a transpose
   for (unsigned int m = 0; m < e->type->dim; m++) {
     for (unsigned int g = 0; g < dofs; g++) {
       for (unsigned int j = 0; j < e->type->nodes; j++) {

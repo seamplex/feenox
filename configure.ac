@@ -49,6 +49,25 @@ AC_CHECK_FUNCS([getrusage],[],[])
 # check for asprintf
 AC_CHECK_FUNCS([asprintf],[],[])
 
+# check for feenox_likely
+AX_GCC_BUILTIN(__builtin_expect)
+
+
+# some other stuff that should be pretty standard
+# but we comment out to have a smaller compilation string
+
+#AC_CHECK_FUNCS([floor memset pow rint sqrt strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr], [], [])
+#AC_CHECK_HEADERS(fcntl.h limits.h malloc.h stddef.h, [], [])
+#AC_CHECK_HEADER_STDBOOL
+#AC_CHECK_TYPES([ptrdiff_t])
+#AC_C_INLINE
+#AC_FUNC_ALLOCA
+#AC_FUNC_MALLOC
+#AC_FUNC_REALLOC
+#AC_TYPE_SIZE_T
+#AC_TYPE_UINT16_T
+#AC_TYPE_UINT32_T
+#AC_TYPE_UINT8_T
 
 
 ######################

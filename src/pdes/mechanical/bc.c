@@ -206,7 +206,7 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
     
     int coordinate_direction = -1;
     double norm = gsl_hypot3(normal[0], normal[1], normal[2]);
-    if (PetscLikely(norm != 0)) {
+    if (feenox_likely(norm != 0)) {
       // if the outward normal coincides with one of the three axes, we can get away with a regular dirichlet BC
       for (int g = 0; g < 3; g++) {
         normal[g] /= norm;

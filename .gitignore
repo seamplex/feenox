@@ -46,3 +46,5 @@ nafems-le1*.vtk
 two-cubes-*.vtk
 parallelepiped-*.msh
 encased_rod*.vtk
+nafems-le*.msh
+spinning-disk-*.msh

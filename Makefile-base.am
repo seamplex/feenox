@@ -8,6 +8,7 @@ EXTRA_DIST = examples \
 
 
 TESTS = \
+        tests/annulus-modal.sh \
         tests/abort.sh \
         tests/algebraic_expr.sh \
         tests/beam-modal.sh \
@@ -45,6 +46,7 @@ TESTS = \
         tests/point-kinetics.sh \
         tests/print.sh \
         tests/solve.sh \
+        tests/spinning-disk.sh \
         tests/symmetry.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \

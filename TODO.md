@@ -7,6 +7,9 @@
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
+ * make GSL optional
+   - rewrite BLAS using ad-hoc routines
+   - wrap all GSL calls inside `#ifdef`
  
 ## Tests
 
@@ -17,6 +20,17 @@
  * cell-based mesh writes and integrations
  * `FIT` ranges
 
+## Optimizations
+
+ * if the elements are straight all the jacobians are the same and there is no need to sweep over gauss points
+ * make a two lists of elements, one for bulk and one for BCs and loop over those
+ * rewrite `fem.c` to store per-gauss point data in a cache-friendly way
+ * remove branches
+ * think about inline
+ * use ad-hoc matrices instead of `gsl_matrix`?
+   - have a contiguous array of memory that stores all the per-element matrices in a row-major order
+   - access them using macros `dhdx(row,col)`
+ 
 ## Wasora keywords
 
  * `SEMAPHORE` + `SHARED_MEMORY`
@@ -41,6 +55,7 @@
 
 ## Nice to have
 
+ * add a keyword and command-line argument to set `OMP_NUM_THREADS`
  * logaritmic ranges for `PRINT_FUNCTION`
  * default separator after `TEXT` should be space, after numerical should be tab
  * `PRINTF` instruction
@@ -125,7 +140,7 @@
 
 ## Modal
 
- * partially-unconstrained DOFs
+ * partially-unconstrained DOFs in arbitrary directions
  
 ## Neutron
 

@@ -49,9 +49,8 @@ int feenox_problem_build(void) {
   }  
   
   size_t volumetric_elements = 0;
-  unsigned int ascii_progress_chars = 0;  
-  size_t i = 0;
-  for (i = feenox.pde.first_element; i < feenox.pde.last_element; i++) {
+  int ascii_progress_chars = 0;  
+  for (size_t i = feenox.pde.first_element; i < feenox.pde.last_element; i++) {
 
 // ------ progress bar ------------------------------------------    
     if (feenox.pde.progress_ascii == PETSC_TRUE && (i % step) == 0) {
@@ -61,6 +60,7 @@ int feenox_problem_build(void) {
     }
 // --------------------------------------------------------------    
     
+    // TODO: make a list of bulk elements and another with BC elements
     if (feenox.pde.mesh->element[i].type->dim == feenox.pde.dim) {
       
       // volumetric elements need volumetric builds
