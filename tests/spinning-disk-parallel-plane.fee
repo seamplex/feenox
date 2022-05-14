@@ -1,0 +1,38 @@
+PROBLEM mechanical 2D plane_stress
+READ_MESH spinning-disk-parallel-plane-$1.msh
+
+# MKS
+E = 200e9
+nu = 0.3
+rho = 7800
+
+omega = 1000 * 2*pi/60
+f_x(x,y) = rho * omega^2* x
+f_y(x,y) = rho * omega^2* y
+
+penalty_weight = 100*E
+BC symmetry1 symmetry
+BC symmetry2 symmetry
+
+SOLVE_PROBLEM
+
+# non-dimensional numerical projection
+sigma_h(r) = sigmay(r,0) / (rho*omega^2/8)
+sigma_r(r) = sigmax(r,0) / (rho*omega^2/8)
+
+# analytical solution
+INCLUDE spinning-disk-dimensions.geo
+S_h(r) = ((3+nu)*R^2 - (1+3*nu)*r^2)
+S_r(r) = (3+nu) * (R^2 - r^2)
+
+
+# WRITE_MESH spinning-disk-parallel-plane-$1.vtk VECTOR u v 0   sigma
+
+# profiles along r
+# PRINT_FUNCTION S_h sigma_h S_r sigma_r MIN 0 MAX R NSTEPS 20 FILE spinning-disk-parallel-plane-$1.dat
+
+# integral errors
+error_h = sqrt(integral((S_h(r)-sigma_h(r))^2, r, 0, R)) / R;
+error_r = sqrt(integral((S_r(r)-sigma_r(r))^2, r, 0, R)) / R;
+
+PRINT error_h+error_r

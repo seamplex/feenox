@@ -1,7 +1,7 @@
 READ_MESH $1.msh DIMENSIONS 3 READ_FUNCTION T
 
 INTEGRATE 1 RESULT volume
-h = sqrt(volume/cells)
+h = (volume/cells)^(1/3)
 
 T_mms(x,y,z) := $2
 

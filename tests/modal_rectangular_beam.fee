@@ -5,8 +5,9 @@ E = 2e11
 nu = 0.3
 rho = 7800
 
-BC left u v w
+BC left fixed
 
 SOLVE_PROBLEM
 
 PRINT_VECTOR f
+WRITE_MESH rectangular_beam.vtk VECTOR u1 v1 w1

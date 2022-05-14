@@ -1,0 +1,56 @@
+PROBLEM modal 3D MODES 7
+READ_MESH annulus.msh SCALE 1e-3  # scaled to have length in meters
+
+# SI units
+E = 210e9
+nu = 0.3
+rho = 7855
+BC inner fixed
+
+# numerical
+SOLVE_PROBLEM 
+
+# analytical
+# source: Formulas for  natural frequency and mode shape, by Robert D. Blevings (1979)
+a = 508e-3
+b = 1016e-3
+h = 25.4e-3
+
+# table of squared lambda for b/a = 0.5 and nu = 0.3
+n_modes = 7
+VECTOR lambda2min[n_modes]
+d = 0.05
+lambda2min[1] = 13.0-d
+lambda2min[2] = 13.3-d
+lambda2min[3] = lambda2min[2]
+lambda2min[4] = 14.7-d
+lambda2min[5] = lambda2min[4]
+lambda2min[6] = 18.5-d
+lambda2min[7] = lambda2min[6]
+
+VECTOR lambda2max[n_modes]
+lambda2max[i] = lambda2min[i] + 2*d
+
+VECTOR famin[n_modes]
+VECTOR famax[n_modes]
+famin[i] = lambda2min[i]/(2*pi*a^2) * sqrt(E*h^3/(12*rho*h*(1-nu^2)))
+famax[i] = lambda2max[i]/(2*pi*a^2) * sqrt(E*h^3/(12*rho*h*(1-nu^2)))
+
+# write comparison
+PRINT_VECTOR %.0f famin f famax
+
+# PRINT_VECTOR f
+# WRITE_MESH annulus-modal.vtk \
+#  VECTOR u1 v1 w1 \
+#  VECTOR u2 v2 w2 VECTOR u3 v3 w3 \
+#  VECTOR u4 v4 w4 VECTOR u5 v5 w5 \
+#  VECTOR u6 v6 w6 VECTOR u7 v7 w7 \
+#  VECTOR u8 v8 w8 VECTOR u9 v9 w9 \
+#  VECTOR u10 v10 w10 VECTOR u11 v11 w11 \
+#  VECTOR u12 v12 w12 VECTOR u13 v13 w13 \
+#  VECTOR u14 v14 w14 VECTOR u15 v15 w15 \
+#  VECTOR u16 v16 w16 VECTOR u17 v17 w17 \
+#  VECTOR u18 v18 w18 VECTOR u19 v19 w19 \
+#  VECTOR u20 v20 w20 VECTOR u21 v21 w21 \
+#  VECTOR u22 v22 w22 VECTOR u23 v23 w23 \
+#  VECTOR u24 v24 w24 

@@ -29,3 +29,9 @@ pellet*.msh
 pellet*.vtk
 encased_rod.msh
 encased_rod*.vtk
+spinning-disk*.dat
+spinning-disk*.msh
+spinning-disk*.vtk
+annulus.msh
+annulus-modal.vtk
+modal-annulus.json

@@ -11,8 +11,8 @@ Transfinite Curve {11, 12, 9, 10} = 20+1;
 Transfinite Surface "*";
 Transfinite Volume "*";
 
-Physical Surface("volume") = {1};
-Physical Volume("left") = {1};
+Physical Surface("left") = {1};
+Physical Volume("volume") = {1};
 
 Mesh.RecombineAll = 1;
 Mesh.ElementOrder = 2;
