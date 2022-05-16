@@ -28,7 +28,7 @@ int feenox_define_function(const char *name, unsigned int n_arguments) {
 }
 
   
-function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments) {
+function_t *feenox_define_function_get_ptr(const char *name, int n_arguments) {
 
   if (feenox_check_name(name) != FEENOX_OK) {
     return NULL;

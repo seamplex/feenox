@@ -57,6 +57,7 @@ int feenox_problem_init_parser_modal(void) {
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_modal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_modal;
   feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_modal_displacement;
+  feenox.pde.bc_set_multifreedom = feenox_problem_bc_set_modal_multifreedom;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_modal;
   feenox.pde.solve_post = feenox_problem_solve_post_modal;
   
@@ -125,7 +126,7 @@ int feenox_problem_init_parser_modal(void) {
 
 
 ///ve+m+desc _Size:_ number of requested modes.
-///ve+m+desc _Elements:_ The generalized modal mass $M_i$ of the $i$-th mode computed as
+///ve+m+desc _Elements:_ The generalized modal mass $m_i$ of the $i$-th mode computed as
 ///ve+m+desc
 ///ve+m+desc \[ \text{m}_i = \frac{1}{n_\text{DOFs}} \vec{\phi}_i^T \cdot M \cdot \vec{\phi}_i \]
 ///va+m+desc 

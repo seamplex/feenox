@@ -24,6 +24,13 @@
 
 #define DEFAULT_MODAL_MODES        10
 
+#define BC_TYPE_MECHANICAL_UNDEFINED            0
+#define BC_TYPE_MECHANICAL_DISPLACEMENT         1
+#define BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY  2
+#define BC_TYPE_MECHANICAL_RADIAL_SYMMETRY      3
+#define BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION  4
+
+
 typedef struct modal_t modal_t;
 
 struct modal_t {

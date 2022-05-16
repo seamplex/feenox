@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox definition functions
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2022 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -268,10 +268,9 @@ int feenox_matrix_attach_data(const char *name, expr_t *datas) {
 }
 
 
-int feenox_define_file(const char *name, const char *format, unsigned int n_format_args, const char *mode) {
+int feenox_define_file(const char *name, const char *format, int n_format_args, const char *mode) {
 
-  file_t *file;
-
+  file_t *file = NULL;
   HASH_FIND_STR(feenox.files, name, file);
   if (file != NULL) {
     feenox_push_error_message("there already exists a file named '%s'", name);
@@ -282,7 +281,7 @@ int feenox_define_file(const char *name, const char *format, unsigned int n_form
   feenox_check_alloc(file->name = strdup(name));
   feenox_check_alloc(file->format = strdup(format));
   if ((file->n_format_args = n_format_args) > 0) {
-    feenox_check_alloc(file->arg = calloc(file->n_format_args, sizeof(expr_t *)));
+    feenox_check_alloc(file->arg = calloc(file->n_format_args, sizeof(expr_t)));
   }  
   if (mode != NULL && strcmp(mode, "") == 0) {
     feenox_check_alloc(file->mode = strdup(mode));
@@ -308,9 +307,9 @@ file_t *feenox_get_or_define_file_get_ptr(const char *name) {
 
 
 
-int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression) {
+int feenox_file_set_path_argument(const char *name, int i, const char *expression) {
   
-  file_t *file;
+  file_t *file = NULL;
   if ((file = feenox_get_file_ptr(name)) == NULL) {
     feenox_push_error_message("unkown file '%s'", name);
     return FEENOX_ERROR;

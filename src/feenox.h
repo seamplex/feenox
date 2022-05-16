@@ -513,8 +513,8 @@ struct function_t {
   } type;
   
   // number of arguments the function takes
-  unsigned int n_arguments;
-  unsigned int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
+  int n_arguments;
+  int n_arguments_given;  // check to see if the API gave us all the arguments the function needs
 
   // array of pointers to already-existing variables for the arguments
   var_t **var_argument;
@@ -1982,10 +1982,10 @@ extern int feenox_define_matrix(const char *name, const char *rows, const char *
 extern int feenox_matrix_attach_data(const char *name, expr_t *datas);
 
 extern int feenox_define_function(const char *name, unsigned int n_arguments);
-extern function_t *feenox_define_function_get_ptr(const char *name, unsigned int n_arguments);
+extern function_t *feenox_define_function_get_ptr(const char *name, int n_arguments);
 
-extern int feenox_define_file(const char *name, const char *format, unsigned int n_args, const char *mode);
-extern int feenox_file_set_path_argument(const char *name, unsigned int i, const char *expression);
+extern int feenox_define_file(const char *name, const char *format, int n_args, const char *mode);
+extern int feenox_file_set_path_argument(const char *name, int i, const char *expression);
 extern file_t *feenox_get_or_define_file_get_ptr(const char *name);
 
 extern var_t *feenox_get_or_define_variable_get_ptr(const char *name);

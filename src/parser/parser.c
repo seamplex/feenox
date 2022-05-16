@@ -1498,13 +1498,14 @@ int feenox_parse_file(char *mode) {
 
   feenox_call(feenox_define_file(name, format, n_args, mode));
   
-  int i;
-  for (i = 0; i < n_args; i++) {
+  for (int i = 0; i < n_args; i++) {
     feenox_call(feenox_file_set_path_argument(name, i, arg[i]));
   }
 
   feenox_free(format);
-  feenox_free(custom_mode);
+  if (custom_mode != mode) {
+    feenox_free(custom_mode);
+  }  
   feenox_free(name);
   
   return FEENOX_OK;
