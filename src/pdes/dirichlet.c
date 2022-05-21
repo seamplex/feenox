@@ -86,6 +86,7 @@ int feenox_problem_dirichlet_eval(void) {
   element_ll_t *element_list = NULL;
   size_t j = 0;
   feenox.pde.dirichlet_k = 0;
+  feenox.pde.multifreedom_k = 0;
   for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
     // TODO: optimize these ugly nested loops
     // maybe if we went the other way and looped over the elements first?
