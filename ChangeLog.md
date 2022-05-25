@@ -1,6 +1,7 @@
 
 # Current
 
+ * read time-dependent functions in `.msh` files
  * detect/handle hanging nodes
  * muti-dof BCs using expressions for mechanical 0=expression of space & displacements
  * volumetric forces in mechanical
@@ -11,7 +12,7 @@
  * argument `--pdes` lists the available PDEs FeenoX can solve
  * auto-detect PDE directories: if one adds or deletes one directory from `src/pdes` FeenoX will compile anyway.
  * faster direct inversion of 3x3 matrices using code from PETSc
- * separateed initial conditions from initial guess
+ * separated initial conditions from initial guess
  
 
 # v0.2 (Jan 2022)
