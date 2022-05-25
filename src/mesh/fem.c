@@ -391,12 +391,27 @@ inline int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, in
                       1     + k * (-u[1]*u[1] - u[0]*u[0])
                     }};
 
+/*  
+  printf("coords\n");
+  for (int i = 0; i < 3; i++) {
+    printf("%g\t%g\t%g\n", e->node[i]->x[0], e->node[i]->x[1], e->node[i]->x[2]);
+  }
+  
+
+  printf("R\n");
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      printf("%g\t", R[i][j]);
+    }
+    printf("\n");
+  }  
+*/                    
   // TODO: can this loop be re-written as a matrix-something product?
   double xi = 0;
-  for (unsigned int m = 0; m < 2; m++) {
-    for (unsigned int m_prime = 0; m_prime < 2; m_prime++) {
+  for (int m = 0; m < 2; m++) {
+    for (int m_prime = 0; m_prime < 2; m_prime++) {
       xi = 0;
-      for (unsigned int j = 0; j < e->type->nodes; j++) {
+      for (int j = 0; j < e->type->nodes; j++) {
         xi += gsl_matrix_get(e->type->gauss[integration].dhdr[v], j, m) *
                (e->node[j]->x[0] * R[m_prime][0] +
                 e->node[j]->x[1] * R[m_prime][1] +
@@ -415,6 +430,8 @@ inline int feenox_mesh_compute_dxdr_at_gauss_general(element_t *e, unsigned int 
   // i.e. lines are in the x axis
   //      surfaces are on the xy plane
   //      volumes are always volumes!
+
+//  printf("traditional\n");
 
   double xi = 0;
   for (unsigned int m = 0; m < e->type->dim; m++) {
@@ -468,6 +485,15 @@ inline int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int i
         feenox_call(feenox_mesh_compute_dxdr_at_gauss_2d(e, v, integration));
       }
       
+/*      
+      printf("dxdr\n");
+      for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+          printf("%g\t", gsl_matrix_get(e->dxdr[v], i, j));
+        }
+        printf("\n");
+      }        
+*/      
     } else {
       
 //      e->compute_dxdr = feenox_mesh_compute_dxdr_at_gauss_general;

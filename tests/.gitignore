@@ -35,3 +35,6 @@ spinning-disk*.vtk
 annulus.msh
 annulus-modal.vtk
 modal-annulus.json
+square-f.msh
+square-out.msh
+output

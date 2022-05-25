@@ -1,0 +1,7 @@
+READ_MESH square.msh DIM 2
+end_time = 1
+
+f(x,y) = sin(pi*x*y)*cos(t)
+
+PRINT t f(0.5,0.5)
+WRITE_MESH square-f.msh f

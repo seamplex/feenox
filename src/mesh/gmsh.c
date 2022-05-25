@@ -962,7 +962,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 
   // close the mesh file
   fclose(fp);
-  fp = NULL;
+  this->file->pointer = NULL;
   
   // limpiar hashes
   
@@ -1132,18 +1132,18 @@ int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist) {
 // read the next available time step and interpolate
 int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) {
  
-  char buffer[BUFFER_LINE_SIZE];
-  double time, alpha;
   mesh_t *mesh = function->mesh;
   double *new_data = NULL; 
-  int j, node, node_index;
   int done = 0;
 
   if (mesh->file->pointer == NULL) {
     feenox_call(feenox_instruction_file_open(mesh->file));
   }
 
-   while (done == 0 && fgets(buffer, BUFFER_LINE_SIZE-1, mesh->file->pointer) != NULL) {
+  double time = 0;
+  
+  char buffer[BUFFER_LINE_SIZE];
+  while (done == 0 && fgets(buffer, BUFFER_LINE_SIZE-1, mesh->file->pointer) != NULL) {
 
     if (strncmp("\n", buffer, 1) == 0) {
       ;
@@ -1151,12 +1151,8 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
     // ------------------------------------------------------  
     } else if (strncmp("$NodeData", buffer, 9) == 0) {
       
-      double value;
-      int j, timestep, dofs, nodes;
-      int n_string_tags, n_real_tags, n_integer_tags;
-      char *string_tag = NULL;
-      
       // string-tags
+      int n_string_tags = 0;
       if (fscanf(mesh->file->pointer, "%d", &n_string_tags) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
@@ -1173,13 +1169,14 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
-      string_tag = strtok(buffer, "\"");
+      char *string_tag = strtok(buffer, "\"");
       
       if (strcmp(string_tag, function->name_in_mesh) != 0) {
         continue;
       }
       
       // real-tags
+      int n_real_tags = 0;
       if (fscanf(mesh->file->pointer, "%d", &n_real_tags) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
@@ -1197,6 +1194,7 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
       }
       
       // integer-tags
+      int n_integer_tags = 0;
       if (fscanf(mesh->file->pointer, "%d", &n_integer_tags) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
@@ -1204,14 +1202,20 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
       if (n_integer_tags != 3) {
         continue;
       }
+      
+      int timestep = 0;
       if (fscanf(mesh->file->pointer, "%d", &timestep) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
+      
+      int dofs = 0;
       if (fscanf(mesh->file->pointer, "%d", &dofs) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
       }
+      
+      int nodes = 0;
       if (fscanf(mesh->file->pointer, "%d", &nodes) == 0) {
         feenox_push_error_message("error reading file");
         return FEENOX_ERROR;
@@ -1226,9 +1230,13 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
         return FEENOX_ERROR;
       }
       
-      new_data = calloc(nodes, sizeof(double));
+      feenox_check_alloc(new_data = calloc(nodes, sizeof(double)));
       
-      for (j = 0; j < nodes; j++) {
+      // the format says the node tag is now an int
+      double value = 0;
+      int node = 0;
+      int node_index = 0;
+      for (int j = 0; j < nodes; j++) {
         if (fscanf(mesh->file->pointer, "%d %lf", &node, &value) == 0) {
           feenox_push_error_message("error reading file");
           return FEENOX_ERROR;
@@ -1262,10 +1270,9 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
   }
   
   if (new_data != NULL) {
-    if ((alpha = (t-function->mesh_time)/(time-function->mesh_time)) < 1) {
-      for (j = 0; j < function->data_size; j++) {
-        function->data_value[j] += alpha * (new_data[j] - function->data_value[j]);
-      }
+    double alpha = (t-function->mesh_time)/(time-function->mesh_time);
+    for (size_t j = 0; j < function->data_size; j++) {
+      function->data_value[j] += alpha * (new_data[j] - function->data_value[j]);
     }
     feenox_free(new_data);
   }

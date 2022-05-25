@@ -52,6 +52,7 @@ TESTS = \
         tests/thermal-2d.sh \
         tests/thermal-slab-no-k.sh \
         tests/thermal-slab-wrong-bc.sh \
+        tests/transient-mesh.sh \
         tests/trig.sh \
         tests/two-cubes-isotropic.sh \
         tests/two-cubes-orthotropic.sh \

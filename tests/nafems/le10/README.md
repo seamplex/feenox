@@ -594,7 +594,7 @@ Therefore, a symbolic link has to be added in the `sparselizard` directory to po
 
 
 ```terminal
-cd feenox/tests/nafems/le10-aster-lizard
+cd feenox/tests/nafems/le10
 git clone https://github.com/halbux/sparselizard/
 cd sparselizard/
 ln -s ../le10.cpp main.cpp

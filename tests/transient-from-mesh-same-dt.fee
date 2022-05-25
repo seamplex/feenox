@@ -1,0 +1,4 @@
+READ_MESH square-f.msh DIM 2 READ_FUNCTION f
+end_time = 1
+
+PRINT t f(0.5,0.5)
