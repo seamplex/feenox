@@ -48,24 +48,22 @@ int feenox_problem_init_parser_general(void) {
   // -mg_levels_pc_type and sor separately
   int petsc_argc = 0;
   char **petsc_argv = NULL;
-  feenox_check_alloc(petsc_argv = calloc(1, sizeof(char *)));
+  feenox_check_alloc(petsc_argv = calloc(feenox.argc, sizeof(char *)));
   petsc_argv[0] = feenox.argv_orig[0];
   for (int i = 0; i < feenox.argc; i++) {
     if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
-      feenox_check_alloc(petsc_argv = realloc(petsc_argv, ++petsc_argc));
       feenox_check_alloc(petsc_argv[petsc_argc] = strdup(feenox.argv_orig[i]+1));
       char *value = NULL;
-      if ((value = strchr(petsc_argv[petsc_argc], '=')) != NULL) {
+      if ((value = strchr(petsc_argv[petsc_argc++], '=')) != NULL) {
         *value = '\0';
-        feenox_check_alloc(petsc_argv = realloc(petsc_argv, ++petsc_argc));
-        petsc_argv[petsc_argc-1] = strdup(value+1);
+        petsc_argv[petsc_argc++] = strdup(value+1);
       }
     }
   }
-  // this one takes into account argv[0]
-  petsc_argc++;
   
-  PetscInt major, minor, subminor;
+  PetscInt major = 0;
+  PetscInt minor = 0;
+  PetscInt subminor = 0;
  #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
   petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
@@ -454,7 +452,6 @@ int feenox_problem_init_runtime_general(void) {
     }
     feenox.pde.solution[g]->mesh = (feenox.pde.rough==0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
     feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dim, sizeof(var_t *)));
-    feenox_check_alloc(feenox.pde.solution[g]->var_argument = calloc(feenox.pde.dofs, sizeof(var_t *)));
     feenox.pde.solution[g]->var_argument[0] = feenox.mesh.vars.x;
     if (feenox.pde.dim > 1) {
       feenox.pde.solution[g]->var_argument[1] = feenox.mesh.vars.y;
