@@ -53,15 +53,17 @@ int feenox_problem_init_parser_general(void) {
   for (int i = 0; i < feenox.argc; i++) {
     if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
       feenox_check_alloc(petsc_argv = realloc(petsc_argv, ++petsc_argc));
-      feenox_check_alloc(petsc_argv[petsc_argc-1] = strdup(feenox.argv_orig[i]+1));
+      feenox_check_alloc(petsc_argv[petsc_argc] = strdup(feenox.argv_orig[i]+1));
       char *value = NULL;
-      if ((value = strchr(petsc_argv[petsc_argc-1], '=')) != NULL) {
+      if ((value = strchr(petsc_argv[petsc_argc], '=')) != NULL) {
         *value = '\0';
         feenox_check_alloc(petsc_argv = realloc(petsc_argv, ++petsc_argc));
         petsc_argv[petsc_argc-1] = strdup(value+1);
       }
     }
   }
+  // this one takes into account argv[0]
+  petsc_argc++;
   
   PetscInt major, minor, subminor;
  #ifdef HAVE_SLEPC  

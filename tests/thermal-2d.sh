@@ -38,7 +38,7 @@ if [ ${answer} -gt 0 ]; then
   echo "ok"
   level=0
 else
-  echo "wrong, no INFO found"
+  echo "wrong, MUMPS was not used"
   level=1
 fi
 exitifwrong ${level}
