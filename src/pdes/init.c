@@ -54,7 +54,7 @@ int feenox_problem_init_parser_general(void) {
     if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
       feenox_check_alloc(petsc_argv[++petsc_argc] = strdup(feenox.argv_orig[i]+1));
       char *value = NULL;
-      if ((value = strchr(petsc_argv[petsc_argc-1], '=')) != NULL) {
+      if ((value = strchr(petsc_argv[petsc_argc], '=')) != NULL) {
         *value = '\0';
         petsc_argv[++petsc_argc] = strdup(value+1);
       }
