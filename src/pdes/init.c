@@ -43,21 +43,30 @@ int feenox_problem_init_parser_general(void) {
   }
 
   // we already have processed basic options, now we loop over the original argv and convert
-  // double-dash options to single-dash so --snes_view transforsm to -snes_view
-  unsigned int i = 0;
-  for (i = 0; i < feenox.argc; i++) {
+  // double-dash options to single-dash so --snes_view transforms into -snes_view
+  // and split equal signs into two arguments, i.e. --mg_levels_pc_type=sor transforms into
+  // -mg_levels_pc_type and sor separately
+  int petsc_argc = 1;
+  char **petsc_argv = NULL;
+  feenox_check_alloc(petsc_argv = calloc(1, sizeof(char *)));
+  petsc_argv[0] = feenox.argv_orig[0];
+  for (int i = 0; i < feenox.argc; i++) {
     if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
-      char *tmp;
-      feenox_check_alloc(tmp = strdup(feenox.argv_orig[i]+1));
-      feenox_free(feenox.argv_orig[i]);
-      feenox.argv_orig[i] = tmp;
+      feenox_check_alloc(petsc_argv = realloc(petsc_argv, ++petsc_argc));
+      feenox_check_alloc(petsc_argv[petsc_argc-1] = strdup(feenox.argv_orig[i]+1));
+      char *value = NULL;
+      if ((value = strchr(petsc_argv[petsc_argc-1], '=')) != NULL) {
+        *value = '\0';
+        feenox_check_alloc(petsc_argv = realloc(petsc_argv, ++petsc_argc));
+        petsc_argv[petsc_argc-1] = strdup(value+1);
+      }
     }
   }
   
   PetscInt major, minor, subminor;
  #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
-  petsc_call(SlepcInitialize(&feenox.argc, &feenox.argv_orig, (char*)0, PETSC_NULL));
+  petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
   
   // check the headers correspond to the runtime
   petsc_call(SlepcGetVersionNumber(&major, &minor, &subminor, NULL));
@@ -67,7 +76,7 @@ int feenox_problem_init_parser_general(void) {
   }
  #else
   // initialize PETSc
-  petsc_call(PetscInitialize(&feenox.argc, &feenox.argv_orig, (char*)0, PETSC_NULL));
+  petsc_call(PetscInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
  #endif
 
   // check the headers correspond to the runtime
