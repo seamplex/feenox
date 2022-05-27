@@ -46,7 +46,7 @@ int feenox_problem_init_parser_general(void) {
   // double-dash options to single-dash so --snes_view transforms into -snes_view
   // and split equal signs into two arguments, i.e. --mg_levels_pc_type=sor transforms into
   // -mg_levels_pc_type and sor separately
-  int petsc_argc = 1;
+  int petsc_argc = 0;
   char **petsc_argv = NULL;
   feenox_check_alloc(petsc_argv = calloc(1, sizeof(char *)));
   petsc_argv[0] = feenox.argv_orig[0];
@@ -61,10 +61,6 @@ int feenox_problem_init_parser_general(void) {
         petsc_argv[petsc_argc-1] = strdup(value+1);
       }
     }
-  }
-  
-  for (int i = 0; i < petsc_argc; i++) {
-    printf("%s\n", petsc_argv[i]);
   }
   
   PetscInt major, minor, subminor;
