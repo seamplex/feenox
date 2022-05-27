@@ -63,6 +63,10 @@ int feenox_problem_init_parser_general(void) {
     }
   }
   
+  for (int i = 0; i < petsc_argc; i++) {
+    printf("%s\n", petsc_argv[i]);
+  }
+  
   PetscInt major, minor, subminor;
  #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
