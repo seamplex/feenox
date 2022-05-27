@@ -52,14 +52,16 @@ int feenox_problem_init_parser_general(void) {
   petsc_argv[0] = feenox.argv_orig[0];
   for (int i = 0; i < feenox.argc; i++) {
     if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
-      feenox_check_alloc(petsc_argv[petsc_argc] = strdup(feenox.argv_orig[i]+1));
+      feenox_check_alloc(petsc_argv[++petsc_argc] = strdup(feenox.argv_orig[i]+1));
       char *value = NULL;
-      if ((value = strchr(petsc_argv[petsc_argc++], '=')) != NULL) {
+      if ((value = strchr(petsc_argv[petsc_argc-1], '=')) != NULL) {
         *value = '\0';
-        petsc_argv[petsc_argc++] = strdup(value+1);
+        petsc_argv[++petsc_argc] = strdup(value+1);
       }
     }
   }
+  // this one takes into account argv[0]
+  petsc_argc++;
   
   PetscInt major = 0;
   PetscInt minor = 0;
