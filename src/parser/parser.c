@@ -287,6 +287,13 @@ int feenox_parse_line(void) {
       feenox_push_error_message("FeenoX is not compiled with PETSc so it cannot solve PROBLEMs");
       return FEENOX_ERROR;
 #endif      
+
+///kw_pde+PETSC_OPTIONS+desc Pass verbatim options to PETSc.
+///kw_pde+PETSC_OPTIONS+usage PETSC_OPTIONS
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "PETSC_OPTIONS") == 0) {
+      feenox_call(feenox_parse_petsc_options());
+      return FEENOX_OK;
       
 ///kw_pde+PHYSICAL_GROUP+desc Explicitly defines a physical group of elements on a mesh.
 ///kw_pde+PHYSICAL_GROUP+usage PHYSICAL_GROUP
@@ -3016,6 +3023,35 @@ int feenox_parse_problem(void) {
   
 }
 
+int feenox_parse_petsc_options(void) {
+
+#ifdef HAVE_PETSC  
+  size_t size = feenox.pde.petsc_options == NULL ? 0 : strlen(feenox.pde.petsc_options);
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw_pde+PETSC_OPTIONS+detail Options for PETSc can be passed either in at run time in the command line
+///kw_pde+PETSC_OPTIONS+detail (run with `-h` to see how) or they can be set in the input file with `PETSC_OPTIONS`.
+///kw_pde+PETSC_OPTIONS+detail This is handy when a particular problem is best suited to be solved using a particular
+///kw_pde+PETSC_OPTIONS+detail set of options which can the be embedded into the problem definition.
+///kw_pde+PETSC_OPTIONS+detail @    
+///kw_pde+PETSC_OPTIONS+detail The string is passed verbatim to PETSc as if the options were set in the command line.
+///kw_pde+PETSC_OPTIONS+detail Note that in this case, the string is passed verbatim to PETSc.
+///kw_pde+PETSC_OPTIONS+detail This means that they are non-POSIX options but they have to be in the native PETSc format.
+///kw_pde+PETSC_OPTIONS+detail That is to say, while in the command line one would give `--ksp_view`, here one has to give `-ksp_view`.
+///kw_pde+PETSC_OPTIONS+detail Conversely, instead of `--mg_levels_pc_type=sor` one has to give `-mg_levels_pc_type sor`.
+    size += strlen(token) + 2;
+    feenox_check_alloc(feenox.pde.petsc_options = realloc(feenox.pde.petsc_options, size));
+    strcat(feenox.pde.petsc_options, " ");
+    strcat(feenox.pde.petsc_options, token);
+  }    
+
+  return FEENOX_OK;  
+  
+#else
+  feenox_push_error_message("FeenoX is not compiled with PETSc so PETSC_OPTIONS cannot be set")
+  return FEENOX_ERROR;
+#endif
+}
 int feenox_parse_solve_problem(void) {
  
 ///kw_pde+SOLVE_PROBLEM+detail Whenever the instruction `SOLVE_PROBLEM` is executed,

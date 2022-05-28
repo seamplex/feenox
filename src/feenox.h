@@ -1779,6 +1779,7 @@ struct feenox_t {
     int symmetric_M;
 
 #ifdef HAVE_PETSC    
+    char *petsc_options;
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
 

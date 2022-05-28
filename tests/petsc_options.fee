@@ -1,0 +1,12 @@
+PROBLEM mechanical PC gamg KSP gmres
+PETSC_OPTIONS -ksp_view
+PETSC_OPTIONS -mg_levels_pc_type ilu
+READ_MESH cube-hex.msh
+
+E = 1
+nu = 0.3
+
+BC left  fixed
+BC right p=1
+
+SOLVE_PROBLEM

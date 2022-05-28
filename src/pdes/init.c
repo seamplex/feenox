@@ -88,7 +88,6 @@ int feenox_problem_init_parser_general(void) {
     return FEENOX_ERROR;
   }
   
-  
   feenox.pde.petscinit_called = PETSC_TRUE;
   
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.n_procs));
@@ -385,6 +384,11 @@ int feenox_problem_define_solution_clean_nodal_arguments(function_t *function) {
 int feenox_problem_init_runtime_general(void) {
 
 #ifdef HAVE_PETSC
+
+  // first set options from PETSC_OPTIONS
+  if (feenox.pde.petsc_options != NULL) {
+    petsc_call(PetscOptionsInsertString(NULL, feenox.pde.petsc_options));
+  }
   
   // command-line arguments take precedence over the options in the input file
   // so we have to read them here and overwrite what he have so far
