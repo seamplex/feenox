@@ -1,0 +1,22 @@
+PROBLEM thermal 1D
+READ_MESH slab.msh
+
+end_time = 10
+k = 1
+kappa = 0.1
+
+FUNCTION f(t) DATA {
+0    0
+1    1
+2    1
+3    2
+4    0
+10   0
+}
+BC left  T=f(t)
+
+w = 0.5*pi
+BC right T=1+sin(w*t)
+
+SOLVE_PROBLEM
+PRINT t T(0) T(0.5) T(1)

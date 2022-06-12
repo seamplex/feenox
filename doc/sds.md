@@ -568,7 +568,7 @@ $ feenox sophomore.fee
 $
 ```
 
-Of course most engineering problems will not need explicit integrals---although a few of them do---but some might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” Unix principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible.”
+Of course most engineering problems will not need explicit integrals---although a few of them do---but some might need summation loops, so it is handy to have these functionals available inside the FEA tool. This might seem to go against the “keep it simple” and “do one thing good” Unix principle, but definitely follows [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible” (further discussion in\ @sec:complex).
 
 Flexibility in defining non-trivial material properties is illustrated with the following example, where two squares made of different dimensionless materials are juxtaposed in thermal contact (glued?) and subject to different boundary conditions at each of the four sides (@fig:two-squares-mesh).
 
@@ -1328,19 +1328,104 @@ $
 
 Note that FeenoX could figure out by itself that the two first cases were linear while the last one was not. This can be verified by passing the extra argument `--snes_view`. In the first two cases, there will be no extra output. In the last one, the details of the non-linear solver used by PETSc will be written into the standard output. The experienced reader should take some time to compare the effort and level of complexity that other FEA solvers require in order to set up simple problems like these. 
 
-### Complex things
+### Complex things {#sec:complex}
 
-transient thermal with quasi-static mechanical
+[Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible” has already been mentioned. The first part of the quote was addressed in the previous section. Of course, complexity can scale up almost indefinitely so we cannot show an example right here. But the following repositories contain the scripts and input files (for Gmsh, FeenoX and other common Unix tools such as Sed and Awk) that solve non-trivial problems using FeenoX as the main tool and employing free and open source software only, both for the computation and for the creation of figures and result tables.
 
+Convergence study on stress linearization of an infinite pipe according to ASME
 
+:   A parametric study over the number of elements through the thickness of a pipe and the error committed when computing membrane and bending stresses according to ASME\ VIII Div\ 2 Sec\ 5. The study uses the following element types
+
+     - unstructured tet4
+     - unstructured straight tet10
+     - unstructured curved tet10
+     - structured straight tet10
+     - structured curved tet10
+     - structured hex8
+     - structured straight hex20
+     - structured curved hex20
+     - structured straight hex27
+     - structured curved hex27
+
+    The linearized stresses for different number of elements through the pipe thickness are compared against the analytical solution. Figures with the meshes employed in each case and with plots of profiles vs. the radial coordinate and linearized stresses vs. number of elements through the thickness are created. 
+
+Environmentally-assisted fatigue analysis of dissimilar material interfaces in piping systems of a nuclear power plant
+
+:   A case that studies environmentally-assisted fatigue using environment factors applied to traditional in-air ASME fatigue analysis for operational an incidental transients in nuclear power plant as propose by EPRI. A fictitious CAD geometry representing a section of a piping system is studied. Four operational transients are made up with time-dependent data for pressure and water temperature.
+
+    1. A transient heat conduction problem with temperature-dependent material properties (according to ASME property tables) are solved over a small region around a material interface between carbon and stainless steel.
+    2. Primary stresses according to ASME are computed for each of the operational transients.
+    3. The results of a modal analysis study are convoluted with a frequency spectrum of a design-basis earthquake using the SRSS method to obtain an equivalent static volumetric force distribution.
+    4. The time-dependent temperature distribution for each transient is then used in quasi-static mechanical problems to compute secondary stresses according to ASME, including the equivalent seismic loads at the moment of higher thermal stresses.
+    5. The history of linearized Tresca stresses are juxtaposed to compute the cumulative usage factors using the ASME peak-valley method.
+    6. Environmental data is used to affect each cumulative usage factors with an environment factor to account for in-water conditions.
+
+These repositories contain a `run.sh` that, when executed in a properly-set-up GNU/Linux host (either on premises or in the cloud), will perform a number of steps including
+
+ - creation of appropriate meshes
+ - execution FeenoX
+ - generation post-processing views, plots or tables with the results
+ - etc.
+ 
+Refer to the READMEs in each repository for further details about the mathematical models involved.
+
+ 
 ### Everything is an expression
 
-everything is an expression, especially temperature
-rule of least surprise
+As explained in the history of FeenoX (@sec:history), the first objective of the code was to solve ODEs written in an ASCII file as human-friendly as possible. So even before any other feature, the first thing I coded in the FeenoX ancestors was an algebraic parser and evaluator. This was back in 2009, and I performed an online search before writing the whole thing from scratch. I found a nice post in Slack Overflow^[<http://stackoverflow.com/questions/1384811/code-golf-mathematical-expression-evaluator-that-respects-pemdas>] that discussed some cool ideas and even had some code published under the terms of the Creative Commons license.
 
-Rule of least surprise: f(x) = 12 ⋅ x2
+Besides ODEs, algebraic expressions are a must if one will be dealing with arbitrary functions in general and spatial distributions in particular---which is essentially what PDE solvers are for. If a piece of software wants to allow features ranging from comparing numerical results with analytical expression to converting material properties from a system of units to another one in a straightforward way for the user (either an actual human being or a computer creating an input file), it ought to be able to handle algebraic expressions. 
+
+Appropriately handling algebraic expressions leads to fulfilling the Unix rule of least surprise. If the user needs to define a function $f(x) = 1/2 \cdot x^2$, all she has to do is write
+
+```feenox
 f(x) = 1/2 * x^2
+```
 
+And conversely, if someone reads the line above, she can rest assure that there's a function called\ $f(x)$ that will evaluate to\ $1/2 \cdot x^2$ when needed. In effect, anyone can expect the output of this instruction
+
+```feenox
+PRINT integral(f(x), x, 0, 1)
+```
+
+to be one third.
+
+Of course expressions are needed to get 100%-user defined output (further discussed in\ @sec:output), as with the `PRINT` instruction above. 
+But once an algebraic parser and evaluator is available, it does not make sense to keep force the user to write numerical data only. What if a the angular speed is in RPM and the model needs it in radians per second? Instead of having to write `104.72`, FeenoX allows the user to write
+
+```
+w = 1000 * 60*pi/180
+```
+
+This way, 
+
+ 1. it is easy to see what the speed in RPM is
+ 2. precision is not lost
+ 3. should the speed change, it is trivial to change the `1000` for anything else.
+ 
+ 
+
+Whenever an input keyword needs a numerical value, any expression will do:
+
+```feenox
+n = 3
+VECTOR x SIZE 2+n
+x[i] = i^2
+PRINT x
+```
+
+```terminal
+$ feenox vector_size_one_plus_n.fee 
+1       4       9       16      25
+$
+```
+
+It goes without saying that algebraic expressions are a must when defining transient and/or space-dependent boundary conditions for PDEs:
+
+```{.feenox include="thermal-1d-transient.fee"}
+```
+
+So remember, in FeenoX "everything is an expression."
 
 ### Matching formulations
 
@@ -1354,8 +1439,10 @@ comparar con <>
 
 ### Comparison of solutions
 
-1d neutron slab
+1d neutron slab keff
 compare with analytical solution
+
+paralellepiped
 
 MMS
 

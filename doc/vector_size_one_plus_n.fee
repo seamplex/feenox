@@ -1,0 +1,4 @@
+n = 3
+VECTOR x SIZE 2+n
+x[i] = i^2
+PRINT x
