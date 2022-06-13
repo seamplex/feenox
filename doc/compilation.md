@@ -743,8 +743,11 @@ export PETSC_ARCH=arch-linux-c-opt
 ./configure --with-debugging=0 --download-mumps --download-scalapack --with-cxx=0 --COPTFLAGS=-O3 --FOPTFLAGS=-O3 
 ```
 
-
-
+```
+export PETSC_DIR=$PWD
+./configure --with-debugging=0 --with-openmp=0 --with-x=0 --with-cxx=0 --COPTFLAGS=-O3 --FOPTFLAGS=-O3 
+make PETSC_DIR=/home/ubuntu/reflex-deps/petsc-3.17.0 PETSC_ARCH=arch-linux-c-opt all
+```
 
 
 
