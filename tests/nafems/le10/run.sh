@@ -147,7 +147,7 @@ EOF
 if [ ! -z "$(which lstopo)" ]; then
   rm -f arch-${m}.svg
   lstopo arch-${m}.svg
-  echo "![](arch-${m}.svg)\\ " > arch-${m}.md
+  echo "![](arch-${m}.svg)\\ " >> arch-${m}.md
 fi
 
 
