@@ -144,6 +144,13 @@ cat << EOF > arch-${m}.md
   
 EOF
 
+if [ ! -z "$(which lstopo)" ]; then
+  rm -f arch-${m}.svg
+  lstopo arch-${m}.svg
+  echo "![](arch-${m}.svg)\\ " > arch-${m}.md
+fi
+
+
 
 for c in $(feenox steps.fee ${min} ${steps}); do
 
