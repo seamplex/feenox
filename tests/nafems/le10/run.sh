@@ -194,7 +194,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     if [ ! -e sparselizard_mumps_${m}-${c}.sigmay ]; then
       echo "Running Sparselizard m = ${m} c = ${c}"
       cd sparselizard
-      ${time} -o ../sparselizard_mumps_${m}-${c}.time ./run_sparselizard.sh ${m}-${c} > ../sparselizard_mumps_${m}-${c}.sigmay
+      ${time} -o ../sparselizard_mumps_${m}-${c}.time ./run_sparselizard.sh ${m}-${c} | grep -v Info > ../sparselizard_mumps_${m}-${c}.sigmay
       cd ..
     fi
     
