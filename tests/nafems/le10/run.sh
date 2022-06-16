@@ -34,11 +34,20 @@ export OMP_NUM_THREADS=1
 if [ ! -z "$(which feenox)" ]; then
   has_feenox="yes"
   rm -f feenox_gamg_${m}*.dat
-  $(feenox -V | grep mumps > /dev/null)
-  if [ $? -eq 0 ]; then
+  
+  # see if there is a separate binary for mumps
+  if [ ! -z "$(which feenox-mumps)" ]; then
     has_feenox_mumps="yes"
+    feenox_mumps="feenox-mumps"
     rm -f feenox_mumps_${m}*.dat
-  fi
+  else
+    $(feenox -V | grep mumps > /dev/null)
+    if [ $? -eq 0 ]; then
+      has_feenox_mumps="yes"
+      feenox_mumps="feenox"
+      rm -f feenox_mumps_${m}*.dat
+    fi
+  fi  
   
   feenox -V > version_feenox.txt
 fi
@@ -181,7 +190,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   if [ ! -z "${has_feenox_mumps}" ]; then
     if [ ! -e feenox_mumps_${m}-${c}.sigmay ]; then
       echo "running FeenoX MUMPS c = ${c}"
-      ${time} -o feenox_mumps_${m}-${c}.time feenox le10.fee ${m}-${c} --mumps > feenox_mumps_${m}-${c}.sigmay
+      ${time} -o feenox_mumps_${m}-${c}.time ${feenox_mumps} le10.fee ${m}-${c} --mumps > feenox_mumps_${m}-${c}.sigmay
     fi
 
     if [ -e feenox_mumps_${m}-${c}.sigmay ]; then
