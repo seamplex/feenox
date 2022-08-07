@@ -270,7 +270,7 @@ and pipes work.
 Let us solve the linear elasticity benchmark problem [NAFEMS LE10][]
 “Thick plate pressure.” Assuming a proper mesh has already been created
 in Gmsh, note how well the FeenoX input file matches the problem
-statement:
+statement from @fig:nafems-le10-problem-input:
 
 ``` feenox
 # NAFEMS Benchmark LE-10: thick plate pressure

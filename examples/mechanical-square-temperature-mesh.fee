@@ -1,0 +1,2 @@
+# read the temperature from a previous result
+READ_MESH thermal-square-temperature.msh DIM 2 READ_FUNCTION T

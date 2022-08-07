@@ -2173,6 +2173,11 @@ int feenox_parse_read_mesh(void) {
 ///kw_pde+READ_MESH+usage [ READ_FUNCTION <function_name> ] [READ_FUNCTION ...] @
     } else if (strcasecmp(token, "READ_FIELD") == 0 || strcasecmp(token, "READ_FUNCTION") == 0 || strcasecmp(token, "READ_VECTOR") == 0 || strcasecmp(token, "READ_SYMMETRIC_TENSOR") == 0) {
 
+      if (mesh->dim == 0) {
+        feenox_push_error_message("need an explicit dimension when reading a function from a mesh");
+        return FEENOX_ERROR;
+      }
+      
       int custom_name = (strcasecmp(token, "READ_FIELD") == 0);
       int vector = (strcasecmp(token, "READ_VECTOR") == 0);
       int symmetric_tensor = (strcasecmp(token, "READ_SYMMETRIC_TENSOR") == 0);
@@ -2866,8 +2871,8 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail With `DETECT_HANGING_NODES`, FeenoX will report the tag of the hanging nodes and stop.
     } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_detect;
-///kw_pde+PROBLEM+detail With `HANDLE_HANGIND_NODES`, FeenoX will fix those nodes and try to solve the problem anyway.
-///kw_pde+PROBLEM+usage | HANDLE_HANGIND_NODES ]@
+///kw_pde+PROBLEM+detail With `HANDLE_HANGING_NODES`, FeenoX will fix those nodes and try to solve the problem anyway.
+///kw_pde+PROBLEM+usage | HANDLE_HANGING_NODES ]@
     } else if (strcasecmp(token, "HANDLE_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_handle;
  
@@ -3621,7 +3626,7 @@ int feenox_parse_solve(void) {
 ///kw+SOLVE+usage broyden }
       } else if (strcasecmp(token, "broyden") == 0) {
         solve->type = gsl_multiroot_fsolver_hybrid;
-///kw+SOLVE+usage ]
+///kw+SOLVE+usage ]@
       }
           
 ///kw+SOLVE+usage [ EPSABS <expr> ]
@@ -3640,7 +3645,7 @@ int feenox_parse_solve(void) {
         return FEENOX_ERROR;
       }
 
-//kw+SOLVE+usage [ VERBOSE ]
+//kw+SOLVE+usage [ VERBOSE ]@
     } else if (strcasecmp(token, "VERBOSE") == 0) {
       solve->verbose = 1;          
           

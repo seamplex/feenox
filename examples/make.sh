@@ -18,13 +18,14 @@ for i in hello          \
          fork           \
          iaea-2dpwr     \
          cubesphere     \
-         parallelepiped-thermal    \
-         parallelepiped-mechanical \
-         temp-cylinder-tran        \
-         wire           \
+         parallelepiped-thermal     \
+         parallelepiped-mechanical  \
+         temp-cylinder-tran         \
+         wire                       \
          asme-expansion             \
          cube-orthotropic-expansion \
-         veeder         \
+         veeder                     \
+         mechanical-square-temperature \
   ; do
   echo ${i}
   grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \

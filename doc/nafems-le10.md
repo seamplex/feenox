@@ -1,4 +1,4 @@
-Let us solve the linear elasticity benchmark problem [NAFEMS\ LE10](https://www.nafems.org/publications/resource_center/p18/) “Thick plate pressure.” Assuming a proper mesh has already been created in Gmsh, note how well the FeenoX input file matches the problem statement:
+Let us solve the linear elasticity benchmark problem [NAFEMS\ LE10](https://www.nafems.org/publications/resource_center/p18/) “Thick plate pressure.” Assuming a proper mesh has already been created in Gmsh, note how well the FeenoX input file matches the problem statement from @fig:nafems-le10-problem-input:
 
 ```{.feenox include="nafems-le10.fee"}
 ```

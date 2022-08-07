@@ -175,7 +175,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         // "more or less" easy
         HASH_ADD(hh_tag[dimension], this->physical_groups_by_tag[dimension], tag, sizeof(int), physical_group);
 
-        // try to autoatically link materials and BCs
+        // try to automatically link materials and BCs
         // actually it should be either one (material) or the other (bc) or none
         
         // if the physical group does not already have a material, look for one with the same name

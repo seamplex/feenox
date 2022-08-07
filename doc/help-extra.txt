@@ -23,5 +23,4 @@ For PETSc options that take values, en equal sign has to be used:
 
     $ feenox input.fee --mg_levels_pc_type=sor
 
-    
 See https://www.seamplex.com/feenox/examples for annotated examples.

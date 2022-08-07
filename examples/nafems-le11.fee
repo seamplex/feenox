@@ -15,7 +15,7 @@
 #$ [...]
 #$ $ feenox nafems-le11.fee
 #$ sigma_z(A) = -105.04 MPa
-#$ wall time  = 3.24 seconds
+#$ wall time  = wall time  = 1.91 seconds
 #$ $
 # NAFEMS Benchmark LE-11: solid cylinder/taper/sphere-temperature
 PROBLEM mechanical 3D

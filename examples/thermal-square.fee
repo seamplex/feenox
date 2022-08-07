@@ -1,0 +1,9 @@
+PROBLEM thermal 2D
+READ_MESH square-centered-unstruct.msh # [-1:+1]x[-1:+1]
+
+BC bottom    T=-150
+BC top       T=+550
+k = 1
+
+SOLVE_PROBLEM
+WRITE_MESH thermal-square-temperature.msh T

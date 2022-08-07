@@ -9,7 +9,7 @@ for i in git autoconf m4 make; do
 done
 
 package=feenox
-petsc_ver=3.17.1
+petsc_ver=3.17.2
 slepc_ver=3.17.1
 
 if [ -z "$(which git)" ]; then

@@ -549,7 +549,7 @@ FeenoX relies on [Gmsh](http://gmsh.info/) to perform the domain decomposition (
 > ```
 
 The third-system effect mentioned in @sec:architecture involves more than ten years of experience in the nuclear industry,^[This experience also shaped many of the features that FeenoX has and most of the features is does deliberately not have.] where complex dependencies of multiple material properties over space through intermediate distributions (temperature, neutronic poisons, etc.) and time (control rod positions, fuel burn-up, etc.) are mandatory.
-One of the cornerstone design decisions in FeenoX is that **everything is an expression**. Here, “everything” means any location in the input file where a numerical value is expected. The most common use case is in the `PRINT` keyword. For example, the [Sophomore's dream](https://en.wikipedia.org/wiki/Sophomore%27s_dream) (in contrast to [Freshman's dream](https://en.wikipedia.org/wiki/Freshman%27s_dream)) identity
+One of the cornerstone design decisions in FeenoX is that **everything is an expression** (@sec:expression). Here, “everything” means any location in the input file where a numerical value is expected. The most common use case is in the `PRINT` keyword. For example, the [Sophomore's dream](https://en.wikipedia.org/wiki/Sophomore%27s_dream) (in contrast to [Freshman's dream](https://en.wikipedia.org/wiki/Freshman%27s_dream)) identity
 
 
 $$
@@ -1332,7 +1332,7 @@ Note that FeenoX could figure out by itself that the two first cases were linear
 
 [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible” has already been mentioned. The first part of the quote was addressed in the previous section. Of course, complexity can scale up almost indefinitely so we cannot show an example right here. But the following repositories contain the scripts and input files (for Gmsh, FeenoX and other common Unix tools such as Sed and Awk) that solve non-trivial problems using FeenoX as the main tool and employing free and open source software only, both for the computation and for the creation of figures and result tables.
 
-Convergence study on stress linearization of an infinite pipe according to ASME
+[Convergence study on stress linearization of an infinite pipe according to ASME](https://github.com/seamplex/pipe-linearize)
 
 :   A parametric study over the number of elements through the thickness of a pipe and the error committed when computing membrane and bending stresses according to ASME\ VIII Div\ 2 Sec\ 5. The study uses the following element types
 
@@ -1349,7 +1349,7 @@ Convergence study on stress linearization of an infinite pipe according to ASME
 
     The linearized stresses for different number of elements through the pipe thickness are compared against the analytical solution. Figures with the meshes employed in each case and with plots of profiles vs. the radial coordinate and linearized stresses vs. number of elements through the thickness are created. 
 
-Environmentally-assisted fatigue analysis of dissimilar material interfaces in piping systems of a nuclear power plant
+[Environmentally-assisted fatigue analysis of dissimilar material interfaces in piping systems of a nuclear power plant](https://github.com/seamplex/piping-asme-fatigue)
 
 :   A case that studies environmentally-assisted fatigue using environment factors applied to traditional in-air ASME fatigue analysis for operational an incidental transients in nuclear power plant as propose by EPRI. A fictitious CAD geometry representing a section of a piping system is studied. Four operational transients are made up with time-dependent data for pressure and water temperature.
 
@@ -1370,7 +1370,7 @@ These repositories contain a `run.sh` that, when executed in a properly-set-up G
 Refer to the READMEs in each repository for further details about the mathematical models involved.
 
  
-### Everything is an expression
+### Everything is an expression {#sec:expression}
 
 As explained in the history of FeenoX (@sec:history), the first objective of the code was to solve ODEs written in an ASCII file as human-friendly as possible. So even before any other feature, the first thing I coded in the FeenoX ancestors was an algebraic parser and evaluator. This was back in 2009, and I performed an online search before writing the whole thing from scratch. I found a nice post in Slack Overflow^[<http://stackoverflow.com/questions/1384811/code-golf-mathematical-expression-evaluator-that-respects-pemdas>] that discussed some cool ideas and even had some code published under the terms of the Creative Commons license.
 
@@ -1425,15 +1425,55 @@ It goes without saying that algebraic expressions are a must when defining trans
 ```{.feenox include="thermal-1d-transient.fee"}
 ```
 
-So remember, in FeenoX "everything is an expression."
+Besides purely algebraic expressions, FeenoX can handle point-wise defined functions which can then be used in algebraic expressions.
+A useful example is allowing material properties (e.g. Young modulus) to depend on temperature.
+Consider a simple plane-strain square\ $[-1,+1]\times[-1,+1]$ fixed on one side and with a uniform tension in the opposite one while leaving the other two free.
+The square's Young modulus depends on temperature according to a one-dimensional point-wise defined function $E_\text{carbon}(T)$ given by pairs stated according to one of the many material properties tables from ASME\ II and interpolated using Steffen's method. Althouhg in this example the temperature is given as an algebraic expression of space, in particular
+
+$$T(x,y)~[\text{\textdegree}C] = 200 + 350 \cdot y$$
+
+```{.feenox include="mechanical-square-temperature.fee"}
+```
+
+By replacing `T(x,y) = 200 + 350*y` with `T(x,y) = 200` we can compare the results of the temperature-dependent case with the uniform-properties case (@fig:mechanical-square):
+
+```terminal
+$ feenox mechanical-square-temperature.fee 
+$ diff mechanical-square-temperature.fee mechanical-square-uniform.fee 
+29c29
+< T(x,y) := 200 + 350*y
+---
+> T(x,y) := 200
+38c38
+< WRITE_MESH mechanical-square-temperature.vtk  E  VECTOR u v 0   
+---
+> WRITE_MESH mechanical-square-uniform.vtk  E  VECTOR u v 0   
+$ feenox mechanical-square-uniform.fee 
+$
+```
+
+::: {#fig:mechanical-square}
+![Temperature-dependent\ $E$](mechanical-square-temperature.png){width_latex=49%}
+![Uniform $E$ for reference](mechanical-square-uniform.png){width_latex=49%}
+
+Mechanical plane-strain square with temperature-dependent Young modulus and comparison with uniform reference case.
+:::
+
+
+In real applications this distribution\ $T(x,y)$ can be read from the output of an actual heat conduction problem. See @sec:non-conformal for a revisit of this case, reading the temperature from an unstructured triangular mesh instead of hard-coding it as an algebraic expression of space.
+
+So remember, in FeenoX *everything is an expression*---especially temperature, as also shown in the next section.
 
 ### Matching formulations
 
-LE10/LE11
 
-Lorenz
+The [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system) system and the [NAFEMS\ LE10](https://www.nafems.org/publications/resource_center/p18/) benchmark problem, both discussed earlier in @sec:scope, illustrate how well the FeenoX input file matches the usual human-readable formulation of ODE or PDE problems. In effect, @fig:nafems-le10-problem-input shows there is a trivial one-to-one correspondence between the sections of the problem formuated in a sheet of paper and the text file `nafems-le10.fee`. A further example can be given by solving the following case.
 
-comparar con <>
+```include
+nafems-le11.md
+```
+
+This feature can be better appreciated by comparing the input files needed to solve these kind of NAFEMS benchmarks with other finite-element tools. @Sec:le10-other gives a glympse for the NAFEMS\ LE10 problem, where the input files are way too cryptic and cumbersome as compared to what FeenoX needs.
 
 
 
@@ -1453,19 +1493,41 @@ Already shown
 
 ### Git and macro-friendliness {#sec:git-friendliness}
 
-ASCII but UTF8 friendly
+The FeenoX input files as plain ASCII files by design.
+This means that they can be tracked with Git or any other version control system so as to allow reliable traceability of computations. Along with the facts that FeenoX interacts well with
+ 
+ a. Gmsh, that can either use ASCII input files as well or be used as an API from C, C++, Python and Julia, and
+ b. Other scripting languages such as Bash, Python or even AWK, whose input files are ASCII files as well,
+ 
+makes it possible to track a whole computation using FeenoX as a Git repository, as already exemplified in @sec:complex.
+It is important to note that what files that should be tracked in Git include
 
-```{.feenox include="hello-utf8.fee"}
-```
+ 1. READMEs and documentation in Markdown
+ 2. Shell scripts
+ 3. Gmsh input files and/or scripts
+ 4. FeenoX input files
 
-```terminal
-$ feenox hello-utf8.fee 
-Olá Mundo
-שלום עולם
-مرحبا بالعالم
-你好世界
-gtheler@tom:~/codigos/feenox/doc$ 
-```
+Files that should not be tracked include
+
+ 1. Documentation in HTML or PDF
+ 2. Mesh files
+ 3. VTK and result files
+
+since in principle they could be generated from the files in the Git repository by executing the scripts, Gmsh and/or FeenoX.
+
+Even more, in some cases, the FeenoX input files---following the Unix rule of generation--can be created out of generic macros that create particular cases. For example, say one has a mesh of a fin-based dissipator where all the surfaces are named `surf_1_`$i$ for $i=1,...,26$. All of them will have a convection boundary condition while surface number\ 6 is the one that is attached to the electronic part that has to be cooled.
+
+
+
+Besides being ASCII files, should special characters be needed for any reason within a particular application of FeenoX, UTF-8 characters can be used natively as illustrated in @fig:utf-8.
+
+::: {#fig:utf-8}
+![UTF-8 in Kate](utf8-kate.png)
+![UTF-8 in Bash (through Konsole)](utf8-shell.png}
+
+Mechanical plane-strain square with temperature-dependent Young modulus and comparison with uniform reference case.
+:::
+
 
 
 macro-friendly inputs, rule of generation
@@ -1494,6 +1556,57 @@ yaml/json friendly outputs
 vtk (vtu), gmsh, frd?
 
 90% is serial (vtk), no need to complicate due to 10%
+
+### Data exchange between non-conformal meshes {#sec:non-conformal}
+
+To illustrate how the output of a FeenoX execution can be read by another FeenoX instance, let us revisit the plane-strain square from @sec:expression. This time, instead of setting the temperature with an algebraic expression, we will solve a thermal problem that gives rise to the same temperature distribution but on a different mesh.
+
+First, we solve a thermal problem on the same square\ $[-1,+1]\times[-1,+1]$ such that the resulting temperature field is $T(x,y) = 200 + 350\cdot y$:
+
+```{.feenox include="thermal-square.fee"}
+```
+
+Now, we read the temperature\ $T(x,y)$ from the thermal output mesh file `thermal-square-temperature.msh` (which is a triangular unstructured grid) into the mechanical input mesh file `square-centered.msh` (which is a structured quadrangular grid):
+
+```{.feenox include="mechanical-square-temperature-from-msh.fee"}
+```
+
+Indeed, the terminal mimic shows the difference between the mechanical input from this section and the one that used an explicit algebraic expression.
+
+```terminal
+$ gmsh -2 square-centered-unstruct.geo 
+[...]
+Info    : Done meshing 2D (Wall 0.012013s, CPU 0.033112s)
+Info    : 65 nodes 132 elements
+Info    : Writing 'square-centered-unstruct.msh'...
+Info    : Done writing 'square-centered-unstruct.msh'
+Info    : Stopped on Wed Aug  3 17:47:39 2022 (From start: Wall 0.0208329s, CPU 0.064825s)
+$ feenox thermal-square.fee 
+$ feenox mechanical-square-temperature-from-msh.fee 
+$ diff mechanical-square-temperature-from-msh.fee mechanical-square-temperature.fee
+26,27c26,29
+< # read the temperature from a previous result
+< READ_MESH thermal-square-temperature.msh DIM 2 READ_FUNCTION T
+---
+> 
+> # known temperature distribution
+> # (we could have read it from an outpout of a thermal problem)
+> T(x,y) := 200 + 350*y
+36c38
+< WRITE_MESH mechanical-square-temperature-from-msh.vtk  E T VECTOR u v 0   
+---
+> WRITE_MESH mechanical-square-temperature.vtk  E  VECTOR u v 0   
+$ 
+```
+
+::: {#fig:mechanical-square-from-temp}
+![Numerical temperature~$T(x,y)$ as the result of a thermal problem over an unstructured grid](thermal-square-temperature.png){width_latex=42%}
+![Plane-strain with temperature-dependent~$E(T)$ case](mechanical-square-temperature-from-msh.png){width_latex=55%}
+
+Mechanical plane-strain square with temperature-dependent Young modulus read from a non-conformal mesh as the result of a thermal problem. Compare with @fig:mechanical-square.
+:::
+
+
 
 # Quality assurance {#sec:qa}
 
@@ -1597,6 +1710,14 @@ git.md
 ```{.include shift-heading-level-by=1}
 unix.md
 ```
+
+# Appendix: FeenoX history {#sec:history}
+
+```{.include shift-heading-level-by=1}
+history.md
+```
+
+
 
 # Appendix: Downloading & compiling {#sec:download}
 

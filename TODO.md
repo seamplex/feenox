@@ -147,6 +147,7 @@
  * transport
  * FVM
  * benchmarks
+ * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE
  
 ## V & V
 

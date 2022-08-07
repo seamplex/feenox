@@ -394,7 +394,6 @@ int feenox_problem_init_runtime_general(void) {
   // so we have to read them here and overwrite what he have so far
   // recall that we alreay stripped off one dash from the original argv array
 
-  // see if the user asked for mumps in the command line
   PetscBool flag = PETSC_FALSE;
   
 ///op+progress+option `--progress`
