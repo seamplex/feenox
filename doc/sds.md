@@ -1479,12 +1479,147 @@ This feature can be better appreciated by comparing the input files needed to so
 
 ### Comparison of solutions
 
-1d neutron slab keff
-compare with analytical solution
+One cornerstone design feature is that FeenoX has to provide a way to compare its numerical results with other already-know solutions---either analytical or numerical---in order to verify their validity. Indeed, being able to take the difference between the numerical result and an algebraic expression evaluated at arbitrary locations (usually quadrature points to compute~$L_p$ norms of the error) is a must if code verification through the Method of Manufactured Solutions is required (see @sec:mms).
 
-paralellepiped
+Let us consider a one-dimensional slab reactor with uniform macroscopic cross sections
 
-MMS
+$$
+\begin{aligned}
+\Sigma_t &= 0.54628~\text{cm}^{-1} \\
+\Sigma_s &= 0.464338~\text{cm}^{-1} \\
+\nu\Sigma_f &= 1.70 \cdot 0.054628~\text{cm}^{-1}
+\end{aligned}
+$$
+
+such that, if computed with neutron transport theory, is exactly critical with a width of $a = 2 \cdot 10.371065~\text{cm}$. Just to illustrate a simple case, we can solve it using the diffusion approximation with zero flux at both as. This case has an analytical solution for both the effective multiplication factor
+
+$$
+k_\text{eff} = \frac{\nu\Sigma_f}{(\Sigma_t - \Sigma_s) + D \cdot \left(\frac{\pi}{a} \right)^2}
+$$
+
+and the flux distribution
+
+$$
+\phi(x) = \frac{\pi}{2} \cdot \sin\left(\frac{x}{a} \cdot \pi\right)
+$$
+
+provided the diffusion coefficient\ $D$ is defined as
+
+$$
+D = \frac{1}{3 \cdot \Sigma_t}
+$$
+
+
+We can solve both the numerical and analytical problems in FeenoX, and more importantly, we can subtract them at any point of space we want:
+
+```{.feenox include="neutron-diffusion-1d-null.fee"}
+```
+
+```terminal
+$ feenox neutron-diffusion-1d-null.fee 
+# x     phi1    phi_diff        phi1(x)-phi_diff(x)
++0.000  +0.000  +0.000  +0.000
++10.371 +1.574  +1.571  +0.003
++20.742 +0.000  +0.000  -0.000
++1.474  +0.348  +0.348  +0.001
++2.829  +0.654  +0.653  +0.001
++4.074  +0.911  +0.909  +0.002
++5.217  +1.118  +1.116  +0.002
++6.268  +1.280  +1.277  +0.002
++7.233  +1.399  +1.397  +0.003
++8.120  +1.483  +1.480  +0.003
++8.935  +1.537  +1.534  +0.003
++9.683  +1.565  +1.562  +0.003
++11.059 +1.565  +1.562  +0.003
++11.807 +1.537  +1.534  +0.003
++12.622 +1.483  +1.480  +0.003
++13.509 +1.399  +1.397  +0.003
++14.474 +1.280  +1.277  +0.002
++15.525 +1.118  +1.116  +0.002
++16.668 +0.911  +0.909  +0.002
++17.913 +0.654  +0.653  +0.001
++19.268 +0.348  +0.348  +0.001
+# keff      =   0.96774162
+# kdiff     =   0.96797891
+# rel error =   -2.45e-04
+$
+```
+
+Something similar could have been done for two groups of energy, although the equations get a little bit more complex so we leave it as an example in the Git repository.
+
+A notable non-trivial thermo-mechanical problem that nevertheless has an analytical solution for the displacement field is the  [“Parallelepiped whose Young’s modulus is a function of the temperature”](https://www.seamplex.com/feenox/examples/#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature) (@fig:parallelepiped).
+The problem consists of finding the non-dimensional temperature\ $T$ and displacements\ $u$, $v$
+and $w$ distributions within a solid parallelepiped of length\ $\ell$ whose base is a square of $h\times h$.
+The solid is subject to heat fluxes and to a traction pressure at the same time.
+The non-dimensional Young’s modulus\ $E$ of the material depends on the temperature\ $T$
+in a know algebraically way, whilst both the Poisson coefficient\ $\nu$ and the thermal conductivity\ $k$
+are uniform and do not depend on the spatial coordinates:
+
+$$
+\begin{align*}
+E(T) &= \frac{1000}{800-T} \\
+\nu &= 0.3 \\
+k &= 1 \\
+\end{align*}
+$$
+
+![Parallelepiped whose Young’s modulus is a function of the temperature. Original figure from [v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
+
+The thermal boundary conditions are
+
+ * Temperature at point\ $A$ at $(\ell,0,0)$ is zero \label{temp0}
+ * Heat flux $q^{\prime \prime}$ through $x=\ell$ is +2
+ * Heat flux $q^{\prime \prime}$ through $x=0$ is -2
+ * Heat flux $q^{\prime \prime}$ through $y=h/2$ is +3
+ * Heat flux $q^{\prime \prime}$ through $y=-h/2$ is -3
+ * Heat flux $q^{\prime \prime}$ through $z=h/2$ is +4
+ * Heat flux $q^{\prime \prime}$ through $z=-h/2$ is -4
+
+The mechanical boundary conditions are
+
+ * Point $O$ at $(0,0,0)$ is fixed
+ * Point $B$ at $(0,h/2,0)$ is restricted to move only in the\ $y$ direction
+ * Point $C$ at $(0,0,/h2)$ cannot move in the\ $x$ direction
+ * Surfaces\ $x=0$ and\ $x=\ell$ are subject to an uniform normal traction equal to one
+
+The analytical solution is
+ 
+$$ 
+\begin{align*}
+T(x,y,z) &= -2x -3y -4z + 40 \\
+u(x,y,z) &= \frac{A}{2} \cdot\left[x^2 + \nu\cdot\left(y^2+z^2\right)\right] + B\cdot xy + C\cdot xz + D\cdot x - \nu\cdot \frac{Ah}{4} \cdot \left(y+z\right) \\
+v(x,y,z) &= -\nu\cdot \left[A\cdot x y + \frac{B}{2} \cdot \left(y^2-z^2+\frac{x^2}{\nu}\right) + C\cdot y z + D\cdot y -A\cdot h/4\cdot x - C\cdot h/4\cdot z\right] \\
+w(x,y,z) &= -\nu\cdot \left[A\cdot x z + B\cdot yz + C/2\cdot \left(z^2-y^2+\frac{x^2}{\nu}\right) + D\cdot z + \frac{Ch}{4} \cdot y - \frac{Ah}{4} \cdot x\right] \\
+\end{align*}
+$$
+
+where~$A=0.002$, $B=0.003$, $C=0.004$ and~$D=0.76$.
+The reference results are the temperature at points O and D and the displacements at points A and D (@tab:parallelepiped} (table~\ref{tab:reference}).
+
+Point |  Unknown  |  Reference value
+:----:|:---------:|:---------------------
+  O   |    $T$    | +40.0
+  D   |    $T$    | -35.0
+  A   |    $u$    | +15.6
+      |    $v$    | -0.57
+      |    $w$    | -0.77
+  D   |    $u$    | +16.3
+      |    $v$    | -1.785
+      |    $w$    | -2.0075
+
+: Reference results the original benchmark problem {#tab:parallelepiped}
+
+First, the thermal problem is solved with FeenoX and the temperature distribution $T(x,y,z)$ is written into a `.msh` file.
+
+```{.feenox include="neutron-diffusion-1d-null.fee"}
+```
+
+Then, the mechanical problem reads two meshes: one for solving the actual mechanical problem and another one for reading $T(x,y,z)$ from the previous step. Note that the former contains second-order hexahedra and the latter first-order tetrahedra. After effectively solving the problem, it writes again @tab:parallelepiped in Markdown. 
+
+The FeenoX implementation illustrates several design features, namely
+
+ 
+
 
 
 ### Run-time arguments
@@ -1515,7 +1650,21 @@ Files that should not be tracked include
 
 since in principle they could be generated from the files in the Git repository by executing the scripts, Gmsh and/or FeenoX.
 
-Even more, in some cases, the FeenoX input files---following the Unix rule of generation--can be created out of generic macros that create particular cases. For example, say one has a mesh of a fin-based dissipator where all the surfaces are named `surf_1_`$i$ for $i=1,...,26$. All of them will have a convection boundary condition while surface number\ 6 is the one that is attached to the electronic part that has to be cooled.
+Even more, in some cases, the FeenoX input files---following the Unix rule of generation--can be created out of generic macros that create particular cases. For example, say one has a mesh of a fin-based dissipator where all the surfaces are named `surf_1_`$i$ for $i=1,...,26$. All of them will have a convection boundary condition while surface number\ 6 is the one that is attached to the electronic part that has to be cooled. Instead of having to "manually" giving the list of surfaces that have the convection condition, we can use M4 to do it for us:
+
+```{.feenox include="fins.fee.m4"}
+```
+
+Note that since FeenoX was born in Unix, we can pipe the output of `m4` to FeenoX directly by using `-` as the input file in the command line:
+
+```terminal
+$ m4 fins.fee.m4 | feenox -
+$
+```
+
+@Fig:fins-temperature confirms that all the faces have the right boundary conditions: face number six got the power BC and all the rest got the convection BC.
+
+![Temperature distribution in a fin dissipator where all the faces have a convection BC except one that has a fixed heat flux of $q'' = 1,000 \text{W} \cdot \text{m}^{-2}$.](fins-temp.png){#fig:fins-temperature}
 
 
 
@@ -1600,8 +1749,8 @@ $
 ```
 
 ::: {#fig:mechanical-square-from-temp}
-![Numerical temperature~$T(x,y)$ as the result of a thermal problem over an unstructured grid](thermal-square-temperature.png){width_latex=42%}
-![Plane-strain with temperature-dependent~$E(T)$ case](mechanical-square-temperature-from-msh.png){width_latex=55%}
+![Numerical temperature$T(x,y)$ as the result of a thermal problem over an unstructured grid](thermal-square-temperature.png){width_latex=42%}
+![Plane-strain with temperature-dependent$E(T)$ case](mechanical-square-temperature-from-msh.png){width_latex=55%}
 
 Mechanical plane-strain square with temperature-dependent Young modulus read from a non-conformal mesh as the result of a thermal problem. Compare with @fig:mechanical-square.
 :::
@@ -1658,6 +1807,10 @@ mailing listings
 open source (really, not like CCX -> mostrar ejemplo)
 GPLv3+ free
 Git + gitlab, github, bitbucket
+
+### Method of Exact Solutions {#sec:mes}
+
+### Method of Manufactured Solutions {#sec:mms}
 
 ## Validation
 

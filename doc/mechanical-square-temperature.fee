@@ -1,0 +1,38 @@
+PROBLEM mechanical plane_strain
+READ_MESH square-centered.msh # [-1:+1]x[-1:+1]
+
+# fixed at left, uniform traction in the x direction at right
+BC left    fixed
+BC right   tx=50
+
+# ASME II Part D pag. 785 Carbon steels with C<=0.30%
+FUNCTION E_carbon(temp) INTERPOLATION steffen DATA {
+-200  216
+-125  212
+-75   209
+25    202
+100   198
+150   195
+200   192
+250   189
+300   185
+350   179
+400   171
+450   162
+500   151
+550   137
+}
+
+
+# known temperature distribution
+# (we could have read it from an outpout of a thermal problem)
+T(x,y) := 200 + 350*y
+
+# Young modulus is the function above evaluated at the local temperature
+E(x,y) := E_carbon(T(x,y))
+
+# uniform Poisson's ratio
+nu = 0.3
+
+SOLVE_PROBLEM
+WRITE_MESH mechanical-square-temperature.vtk  E  VECTOR u v 0   
