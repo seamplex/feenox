@@ -1,6 +1,28 @@
 #. # Parallelepiped whose Young’s modulus is a function of the temperature
 #.
-#. The thermo-mechanical problem is solved in two stages. First, the heat conduction
+#. The problem consists of finding the non-dimensional temperature\ $T$ and displacements\ $u$, $v$
+#. and $w$ distributions within a solid parallelepiped of length\ $l$ whose base is a square of $h\times h$.
+#. The solid is subject to heat fluxes and to a traction pressure at the same time.
+#. The non-dimensional Young’s modulus\ $E$ of the material depends on the temperature\ $T$
+#. in a know algebraically way, whilst both the Poisson coefficient\ $\nu$ and the thermal conductivity\ $k$
+#. are uniform and do not depend on the spatial coordinates:
+#.
+#. $$
+#. \begin{align*}
+#. E(T) &= \frac{1000}{800-T} \\
+#. \nu &= 0.3 \\
+#. k &= 1 \\
+#. \end{align*}
+#. $$
+#.
+#. ![Original figure from [v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
+#.
+#. References:
+#. 
+#.  * <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
+#.  * <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
+#.
+#. This thermo-mechanical problem is solved in two stages. First, the heat conduction
 #. equation is solved over a coarse first-order mesh to find the non-dimensional temperature distribution.
 #. Then, a mechanical problem is solved where $T(x,y,z)$ is read from the first mesh
 #. and interpolated into a finer second-order mesh so to as evaluate the non-dimensional Young's modulus
@@ -10,11 +32,6 @@
 #.
 #. Note that there are not thermal expansion effects (i.e. the thermal expansion coefficient is $\alpha=0$).
 #. Yet, suprinsingly enough, the problem has analytical solutions for both the temperature and the displacement fields.
-#.
-#. References:
-#. 
-#.  * <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
-#.  * <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
 #.
 #. ## Thermal problem
 #.
