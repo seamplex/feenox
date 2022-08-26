@@ -149,10 +149,6 @@ pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
 sed -i 's/@verbatim/@smallformat\n@verbatim/' feenox-desc.texi
 sed -i 's/@end verbatim/@end verbatim\n@end smallformat/' feenox-desc.texi         
 
-makeinfo feenox-desc.texi > /dev/null
-texi2pdf feenox-desc.texi > /dev/null
-
-
 # TODO: as a lua filter
 for i in logo \
          nafems-le10-problem-input \
@@ -178,4 +174,10 @@ for i in laplace-square-gmsh \
   fi
 done
 
+echo "  makeinfo"
+makeinfo feenox-desc.texi > /dev/null
+echo "  texi2pdf"
+texi2pdf feenox-desc.texi > /dev/null
 
+
+echo "it's all good man"
