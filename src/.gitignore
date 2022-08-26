@@ -2,6 +2,7 @@
 *.o
 Makefile
 Makefile.in
+/Makefile.am
 version-vcs.h
 variables.mak
 version.h

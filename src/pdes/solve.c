@@ -21,10 +21,13 @@ int feenox_instruction_solve_problem(void *arg) {
     feenox_call(feenox_problem_init_runtime_general());
   }
 
+  // mongocho
+/*  
   if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_guess != NULL) {
     // TODO: what about SLEPc?
     feenox_call(feenox_function_to_phi(feenox.pde.initial_guess, feenox.pde.phi));
   } 
+ */
   
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)

@@ -1,0 +1,16 @@
+# problem taken from Ansys Workbench Verification manual (case VMMECH002) 
+PROBLEM mechanical 3D
+READ_MESH rectangular_plate_with_hole.msh
+
+E = 1000
+nu = 0
+
+BC left  fixed
+BC right p=-100
+
+SOLVE_PROBLEM
+
+FIND_EXTREMA sigmax OVER hole MAX sigmax_max
+PRINT sigmax_max 
+WRITE_MESH rectangular_plate_with_hole.vtk VECTOR u v w sigmax
+

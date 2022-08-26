@@ -15,10 +15,10 @@ checkgmsh
 gmsh -3 ${dir}/pellet.geo
 
 # run with --ksp_view to see the difference between these two
-answerzero pellet-linear.fee 1e-2
+answerzero pellet-linear.fee 5e-2
 exitifwrong $?
 
-answerzero pellet-linear-guess.fee 1e-2
+answerzero pellet-linear-guess.fee 5e-2
 exitifwrong $?
 
 

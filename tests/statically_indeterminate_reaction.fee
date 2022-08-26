@@ -1,0 +1,18 @@
+# problem taken from Ansys Workbench Verification manual (case VMMECH001) 
+PROBLEM mechanical 3D
+READ_MESH statically_indeterminate_reaction.msh
+
+E = 2.9008e7
+nu = 0.3
+
+BC bottom fixed
+BC top    fixed
+BC one    Fz=-1000
+BC two    Fz=-500
+
+SOLVE_PROBLEM
+
+REACTION bottom RESULT R_bottom
+REACTION top    RESULT R_top
+
+PRINT sqrt(((R_bottom[3]-600)/600)^2+((R_top[3]-900)/900)^2)

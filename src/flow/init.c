@@ -92,10 +92,13 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc $ feenox input.fee --ksp_view
 ///help+extra+desc ```
 ///help+extra+desc @
+///help+extra+desc For PETSc options that take values, en equal sign has to be used:
+///help+extra+desc @
+///help+extra+desc ```terminal
+///help+extra+desc $ feenox input.fee --mg_levels_pc_type=sor
+///help+extra+desc ```
+///help+extra+desc @
 ///help+extra+desc See <https://www.seamplex.com/feenox/examples> for annotated examples.
-  
-  
-  
   
   // make a copy before calling getopt so we can re-use argv & argc for PETSc
   feenox_check_alloc(feenox.argv_orig = malloc((argc+1) * sizeof(char *)));

@@ -1,0 +1,22 @@
+PROBLEM thermal 3D
+READ_MESH parallelepiped-hex.msh
+
+k = 1     # unitary non-dimensional thermal conductivity
+
+# boundary conditions
+BC left    q=+2
+BC right   q=-2
+BC front   q=+3
+BC back    q=-3
+BC bottom  q=+4
+BC top     q=-4
+BC A       T=0
+
+SOLVE_PROBLEM
+WRITE_MESH parallelepiped-temperature.msh T
+
+# compute the L-2 norm of the error in the displacement field
+Te(x,y,z) = 40 - 2*x - 3*y - 4*z   # analytical solution, "e" means exact
+INTEGRATE (T(x,y,z)-Te(x,y,z))^2 RESULT num
+PHYSICAL_GROUP bulk DIM 3  # this is just to compute the volume
+PRINT "L2-error = " num/bulk_volume

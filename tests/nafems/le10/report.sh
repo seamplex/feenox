@@ -52,7 +52,7 @@ EOF
     
 # Architecture
     
-\\rowcolors{1}{black!0}{black!10}    
+\\rowcolors{1}{black!0}{black!10}
 
 EOF
     cat arch-${1}.md >> report-${1}.md
@@ -165,7 +165,7 @@ EOF
     cat << EOF  >> report-${1}.md
 ## \$c=${c}\$
     
-\\rowcolors{1}{black!0}{black!10}    
+\\rowcolors{1}{black!0}{black!10}
     
 Program | Solver | DOFs | $\\sigma_y$ | Wall [s] | Kernel [s] | User [s] | Memory [Gb]
 --------|--------|-----:|------------:|---------:|-----------:|---------:|------------:
@@ -181,7 +181,7 @@ EOF
 
 
     cat << EOF  >> report-${1}.md
-\\rowcolors{1}{black!0}{black!10}    
+\\rowcolors{1}{black!0}{black!10}
     
 Program | Solver | DOFs | $\\sigma_y$ | Wall [s] | Kernel [s] | User [s] | Memory [Gb]
 --------|--------|-----:|------------:|---------:|-----------:|---------:|------------:

@@ -24,7 +24,6 @@ export PETSC_DIR=$(pwd)
 ./configure PETSC_DIR=${PETSC_DIR} \
             PETSC_ARCH=${PETSC_ARCH} \
             --with-mpi=0 \
-            --with-fc=0 \
             --with-cxx=0 \
             --with-fortran-bindings=0 \
             --with-fc=0 \

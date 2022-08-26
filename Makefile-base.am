@@ -43,10 +43,12 @@ TESTS = \
         tests/neutron_diffusion_src.sh \
         tests/neutron_diffusion_keff.sh \
         tests/parallelepiped.sh \
+        tests/petsc_options.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
         tests/solve.sh \
         tests/spinning-disk.sh \
+        tests/statically_indeterminate_reaction.sh \
         tests/symmetry.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \

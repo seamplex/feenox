@@ -66,5 +66,11 @@ to pass the PETSc option `-ksp_view` the actual FeenoX invocation should be
 $ feenox input.fee --ksp_view
 ```
 
+For PETSc options that take values, en equal sign has to be used:
+
+```terminal
+$ feenox input.fee --mg_levels_pc_type=sor
+```
+
 See <https://www.seamplex.com/feenox/examples> for annotated examples.
 

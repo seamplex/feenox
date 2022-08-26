@@ -17,9 +17,12 @@ AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 AC_PROG_CC
+# TODO: define it only if enabling the benchmarking directory
+AC_PROG_CXX
 AC_PROG_INSTALL
- 
-# TODO:investigate
+AC_PROG_RANLIB
+
+# TODO: investigate
 #AX_CODE_COVERAGE
 
 ######################
@@ -410,7 +413,7 @@ EOF
 m4_include(config_links.m4)
 
   
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile]) 
+AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
 
 AS_BOX([Summary of dependencies])
 AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])

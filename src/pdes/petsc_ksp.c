@@ -60,8 +60,7 @@ int feenox_problem_solve_petsc_linear(void) {
     petsc_call(KSPSetInitialGuessNonzero(feenox.pde.ksp, PETSC_TRUE));
   } 
   feenox.pde.progress_last = 0;
-  
-  
+
   // do the work!
   // TODO: have a flag in case we want to just build
   petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
@@ -141,8 +140,8 @@ int feenox_problem_setup_ksp(KSP ksp) {
 #ifdef PETSC_HAVE_MUMPS
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
-    // mumps is a particular case, see feenox_set_pc
-    KSPSetType(ksp, KSPPREONLY);
+    // mumps is a particular case, see feenox_problem_setup_pc
+    petsc_call(KSPSetType(ksp, KSPPREONLY));
   } else if (feenox.pde.ksp_type != NULL) {
 #else
   if (feenox.pde.ksp_type != NULL) {
@@ -206,8 +205,6 @@ int feenox_problem_setup_ksp(KSP ksp) {
 
   // read command-line options
   petsc_call(KSPSetFromOptions(ksp));
-  // TODO: why does this call fail?
-//  petsc_call(KSPSetUp(ksp));
   
   return FEENOX_OK;
 }

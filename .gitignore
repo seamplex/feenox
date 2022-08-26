@@ -2,7 +2,7 @@
 .dirstamp
 Makefile
 Makefile.in
-Makefile.am
+/Makefile.am
 aclocal.m4
 autom4te.cache/
 compile
@@ -25,6 +25,7 @@ README.pdf
 # binaries, tarballs and libraries
 feenox-v*
 feenox
+src/libfeenox.a
 src/feenox
 feenox.exe
 src/feenox.exe
@@ -48,3 +49,4 @@ parallelepiped-*.msh
 encased_rod*.vtk
 nafems-le*.msh
 spinning-disk-*.msh
+square-f.msh

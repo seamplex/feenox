@@ -129,8 +129,8 @@ for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
 done
 
 for i in sds feenox-manual; do
- echo $i
- ./pdf.sh $i
+ echo ${i}
+ ./pdf.sh ${i}
 done
 
 

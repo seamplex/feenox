@@ -24,7 +24,9 @@
 #define FEENOX_H
 
 // for POSIX in C99
+#ifndef _GNU_SOURCE   
 #define _GNU_SOURCE   
+#endif
 
 #if defined(HAVE___BUILTIN_EXPECT)
 #  define feenox_unlikely(cond)   __builtin_expect(!!(cond),0)
@@ -74,7 +76,11 @@
  #include <sunlinsol/sunlinsol_dense.h>
 #endif
 
+// petsc complains if its headers are included from c++ within extern C
 #ifdef HAVE_PETSC
+#ifdef __cplusplus
+extern "C++" {
+#endif  // C++
  #include <petscsys.h>
  #include <petscpc.h>
  #include <petscsnes.h>
@@ -83,6 +89,9 @@
  #ifdef HAVE_SLEPC
   #include <slepceps.h>
  #endif // HAVE_SLEPC
+#ifdef __cplusplus
+}
+#endif  // C++
 #endif  // HAVE_PETSC
 
 
@@ -1141,7 +1150,7 @@ struct distribution_t  {
   int non_linear; 
   
   // virtual method to evaluate at a point
-  double (*eval)(distribution_t *this, const double *x, material_t *material);
+  double (*eval)(distribution_t *, const double *x, material_t *material);
 };
 
 
@@ -1256,7 +1265,7 @@ struct mesh_t {
   element_t *last_chosen_element;     // interpolation cache
 
   // virtual method for format-dependet reader
-  int (*reader)(mesh_t *this);
+  int (*reader)(mesh_t *);
 
   int initialized;
 
@@ -1299,7 +1308,7 @@ struct mesh_write_t {
   
   int (*write_header)(FILE *file);
   int (*write_mesh)(mesh_t *mesh, FILE *file, int no_physical_names);
-  int (*write_data)(mesh_write_t *this, mesh_write_dist_t *dist);
+  int (*write_data)(mesh_write_t *, mesh_write_dist_t *dist);
   
   // these two are to know if we have to change the type in VTK
   int point_init;
@@ -1685,7 +1694,7 @@ struct feenox_t {
 #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
 #endif
-    int (*build_element_volumetric_gauss_point)(element_t *this, unsigned int v);
+    int (*build_element_volumetric_gauss_point)(element_t *, unsigned int v);
     int (*solve)(void);
     int (*solve_post)(void);
     
@@ -1935,11 +1944,11 @@ extern int feenox_instruction_abort(void *arg);
 
 
 // expressions.c
-extern int feenox_expression_parse(expr_t *this, const char *string);
+extern int feenox_expression_parse(expr_t *, const char *string);
 extern expr_item_t *feenox_expression_parse_item(const char *string);
 extern int feenox_parse_range(char *string, const char left_delim, const char middle_delim, const char right_delim, expr_t *a, expr_t *b);
 
-extern double feenox_expression_eval(expr_t *this);
+extern double feenox_expression_eval(expr_t *);
 extern double feenox_expression_evaluate_in_string(const char *string);
 
 extern int feenox_pull_dependencies_variables(var_ll_t **to, var_ll_t *from);
@@ -1994,8 +2003,8 @@ extern var_t *feenox_define_variable_get_ptr(const char *name);
 
 extern vector_t *feenox_define_vector_get_ptr(const char *name, size_t size);
 
-extern int feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents);
-extern int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents);
+extern int feenox_realloc_variable_ptr(var_t *, double *newptr, int copy_contents);
+extern int feenox_realloc_vector_ptr(vector_t *, double *newptr, int copy_contents);
 
 // getptr.c
 extern var_t *feenox_get_variable_ptr(const char *name);
@@ -2037,27 +2046,27 @@ extern int feenox_instruction_solve(void *arg);
 // dump.c
 extern int feenox_instruction_dump(void *arg);
 #ifdef HAVE_PETSC
-extern int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer);
+extern int feenox_dump_open_viewer(dump_t *, const char *name, PetscViewer *viewer);
 #endif
 
 // reaction.c
 extern int feenox_instruction_reaction(void *arg);
 
 // matrix.c
-extern int feenox_matrix_init(matrix_t *this);
+extern int feenox_matrix_init(matrix_t *);
 
 // vector.c
-extern int feenox_vector_init(vector_t *this, int no_initial);
+extern int feenox_vector_init(vector_t *, int no_initial);
 extern int feenox_instruction_sort_vector(void *arg);
-extern double feenox_vector_get(vector_t *this, const size_t i);
-extern double feenox_vector_get_initial_static(vector_t *this, const size_t i);
-extern double feenox_vector_get_initial_transient(vector_t *this, const size_t i);
-extern int feenox_vector_set(vector_t *this, const size_t i, double value);
-extern int feenox_vector_set_size(vector_t *this, const size_t size);
+extern double feenox_vector_get(vector_t *, const size_t i);
+extern double feenox_vector_get_initial_static(vector_t *, const size_t i);
+extern double feenox_vector_get_initial_transient(vector_t *, const size_t i);
+extern int feenox_vector_set(vector_t *, const size_t i, double value);
+extern int feenox_vector_set_size(vector_t *, const size_t size);
 
 // function.c
-extern int feenox_function_init(function_t *this);
-extern int feenox_function_set_args(function_t *this, double *x);
+extern int feenox_function_init(function_t *);
+extern int feenox_function_set_args(function_t *, double *x);
 extern int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name);
 extern int feenox_function_set_expression(const char *name, const char *expression);
 extern int feenox_function_set_interpolation(const char *name, const char *type);
@@ -2065,8 +2074,8 @@ extern int feenox_function_set_file(const char *name, file_t *file, unsigned int
 extern int function_set_buffered_data(function_t *function, double *buffer, size_t n_data, unsigned int n_columns, unsigned int *columns);
 size_t feenox_structured_scalar_index(unsigned int n_dims, size_t *size, size_t *index, int x_increases_first);
 
-extern double feenox_function_eval(function_t *this, const double *x);
-extern double feenox_factor_function_eval(expr_item_t *this);
+extern double feenox_function_eval(function_t *, const double *x);
+extern double feenox_factor_function_eval(expr_item_t *);
 
 extern int feenox_function_is_structured_grid_2d(double *x, double *y, size_t n, size_t *nx, size_t *ny);
 extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, size_t n, size_t *nx, size_t *ny, size_t *nz);
@@ -2075,7 +2084,7 @@ extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z
 extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_print_function(void *arg);
 extern int feenox_instruction_print_vector(void *arg);
-extern char *feenox_print_vector_current_format_reset(print_vector_t *this);
+extern char *feenox_print_vector_current_format_reset(print_vector_t *);
 extern int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file);
 extern int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file);
 
@@ -2089,27 +2098,27 @@ extern double feenox_gsl_function(double x, void *params);
 
 // mesh.c
 extern int feenox_instruction_mesh_read(void *arg);
-extern int feenox_mesh_create_nodes_argument(mesh_t *this);
-extern int feenox_mesh_free(mesh_t *this);
+extern int feenox_mesh_create_nodes_argument(mesh_t *);
+extern int feenox_mesh_free(mesh_t *);
 
-extern int feenox_mesh_read_vtk(mesh_t *this);
-extern int feenox_mesh_read_frd(mesh_t *this);
+extern int feenox_mesh_read_vtk(mesh_t *);
+extern int feenox_mesh_read_frd(mesh_t *);
 
-extern node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x);
-extern element_t *feenox_mesh_find_element(mesh_t *this, node_t *nearest_node, const double *x);
+extern node_t *feenox_mesh_find_nearest_node(mesh_t *, const double *x);
+extern element_t *feenox_mesh_find_element(mesh_t *, node_t *nearest_node, const double *x);
 
 // interpolate.c
 extern double feenox_function_property_eval(struct function_t *function, const double *x);
-extern int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) ;
+extern int feenox_mesh_interp_solve_for_r(element_t *, const double *x, double *r) ;
 extern int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector *residual);
 extern int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J);
 extern int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_vector *residual, gsl_matrix * J);
 
 extern double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x);
-extern int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, double *r);
+extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, double *r);
 
 // fem.c
-extern double feenox_mesh_determinant(gsl_matrix *this);
+extern double feenox_mesh_determinant(gsl_matrix *);
 extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
 extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v);
@@ -2134,22 +2143,22 @@ extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
 }
 
 // gmsh.c
-extern int feenox_mesh_read_gmsh(mesh_t *this);
+extern int feenox_mesh_read_gmsh(mesh_t *);
 extern int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt);
 extern int feenox_mesh_write_header_gmsh(FILE *file);
-extern int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names);
-extern int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_mesh_gmsh(mesh_t *, FILE *file, int no_physical_names);
+extern int feenox_mesh_write_data_gmsh(mesh_write_t *, mesh_write_dist_t *dist);
 
-extern int feenox_gmsh_read_data_int(mesh_t *this, size_t n, int *data, int binary);
-extern int feenox_gmsh_read_data_size_t(mesh_t *this, size_t n, size_t *data, int binary);
-extern int feenox_gmsh_read_data_double(mesh_t *this, size_t n, double *data, int binary);
+extern int feenox_gmsh_read_data_int(mesh_t *, size_t n, int *data, int binary);
+extern int feenox_gmsh_read_data_size_t(mesh_t *, size_t n, size_t *data, int binary);
+extern int feenox_gmsh_read_data_double(mesh_t *, size_t n, double *data, int binary);
 
 // write.c
 extern int feenox_instruction_mesh_write(void *arg);
 
 // integrate.c
 extern int feenox_instruction_mesh_integrate(void *arg);
-extern double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function_t *function);
+extern double feenox_mesh_integral_over_element(element_t *, mesh_t *mesh, function_t *function);
     
 // extrema.c
 extern int feenox_instruction_mesh_find_extrema(void *arg);
@@ -2158,7 +2167,7 @@ extern int feenox_instruction_mesh_find_extrema(void *arg);
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
 extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
 extern physical_group_t *feenox_get_or_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
-extern int feenox_physical_group_compute_volume(physical_group_t *this, const mesh_t *mesh);
+extern int feenox_physical_group_compute_volume(physical_group_t *, const mesh_t *mesh);
 
 // material.c
 extern material_t *feenox_get_material_ptr(const char *name);
@@ -2206,21 +2215,21 @@ extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
 extern int feenox_mesh_compute_normal_2d(element_t *e);
 extern int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *e);
 extern int feenox_mesh_compute_element_barycenter(element_t *e, double barycenter[]);
-extern int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs);
+extern int feenox_mesh_init_nodal_indexes(mesh_t *, int dofs);
 
 // cell.c
-extern int feenox_mesh_element2cell(mesh_t *this);
+extern int feenox_mesh_element2cell(mesh_t *);
 
 // vtk.c
 // TODO: rename feenox_mesh_write_mesh_vtk
 extern int feenox_mesh_write_unstructured_mesh_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_header_vtk(FILE *file);
-extern int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_mesh_vtk(mesh_t *, FILE *file, int dummy);
+extern int feenox_mesh_write_data_vtk(mesh_write_t *, mesh_write_dist_t *dist);
 
 
 // neighbors.c
-extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this);
+extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *);
 
 
 // init.c
@@ -2287,13 +2296,13 @@ extern double *feenox_problem_bc_natural_x(element_t *element, bc_data_t *bc_dat
 #endif
 
 // distribution.c
-extern int feenox_distribution_init(distribution_t *this, const char *name);
-extern double feenox_distribution_eval(distribution_t *this, const double *x, material_t *material);
-extern double feenox_distribution_eval_property(distribution_t *this, const double *x, material_t *material);
-extern double feenox_distribution_eval_function_global(distribution_t *this, const double *x, material_t *material);
-extern double feenox_distribution_eval_function_local(distribution_t *this, const double *x, material_t *material);
-extern double feenox_distribution_eval_variable_global(distribution_t *this, const double *x, material_t *material);
-extern double feenox_distribution_eval_variable_local(distribution_t *this, const double *x, material_t *material);
+extern int feenox_distribution_init(distribution_t *, const char *name);
+extern double feenox_distribution_eval(distribution_t *, const double *x, material_t *material);
+extern double feenox_distribution_eval_property(distribution_t *, const double *x, material_t *material);
+extern double feenox_distribution_eval_function_global(distribution_t *, const double *x, material_t *material);
+extern double feenox_distribution_eval_function_local(distribution_t *, const double *x, material_t *material);
+extern double feenox_distribution_eval_variable_global(distribution_t *, const double *x, material_t *material);
+extern double feenox_distribution_eval_variable_local(distribution_t *, const double *x, material_t *material);
 
 extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function);
 extern int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function);
@@ -2304,17 +2313,17 @@ extern int feenox_expression_depends_on_function(function_ll_t *functions, funct
 
 // build.c
 extern int feenox_problem_build(void);
-extern int feenox_problem_build_element_volumetric(element_t *this);
-extern int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data);
-extern int feenox_problem_build_allocate_elemental_objects(element_t *this);
-extern int feenox_problem_build_element_volumetric_gauss_point(element_t *this, unsigned int v);
-extern int feenox_problem_build_elemental_objects_allocate(element_t *this);
+extern int feenox_problem_build_element_volumetric(element_t *);
+extern int feenox_problem_build_element_natural_bc(element_t *, bc_data_t *bc_data);
+extern int feenox_problem_build_allocate_elemental_objects(element_t *);
+extern int feenox_problem_build_element_volumetric_gauss_point(element_t *, unsigned int v);
+extern int feenox_problem_build_elemental_objects_allocate(element_t *);
 extern int feenox_problem_build_elemental_objects_free(void);
 extern int feenox_problem_build_assemble(void);
 
 // gradient.c
 extern int feenox_problem_gradient_compute(void);
-extern int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh);
+extern int feenox_problem_gradient_compute_at_element(element_t *, mesh_t *mesh);
 extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 
 // pdes/parse.c

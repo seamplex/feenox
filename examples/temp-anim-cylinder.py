@@ -25,8 +25,9 @@ n_steps = int(gmsh.option.getNumber("View[0].NbTimeStep"))
 times = []
 temps = []
 
+view_tag = gmsh.view.getTags()[0]
 for i in range(n_steps):
-  kind, tags, temp, t, _ = gmsh.view.getModelData(0, i)
+  kind, tags, temp, t, _ = gmsh.view.getModelData(view_tag, i)
   temps.append(temp)
   times.append(t)
 
@@ -52,7 +53,7 @@ while t < end_time:
   step += 1
   t += dt
 
-gmsh.view.remove(0)
+gmsh.view.remove(view_tag)
 gmsh.fltk.initialize()
 
 for i in range(step):

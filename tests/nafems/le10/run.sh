@@ -34,11 +34,20 @@ export OMP_NUM_THREADS=1
 if [ ! -z "$(which feenox)" ]; then
   has_feenox="yes"
   rm -f feenox_gamg_${m}*.dat
-  $(feenox -V | grep mumps > /dev/null)
-  if [ $? -eq 0 ]; then
+  
+  # see if there is a separate binary for mumps
+  if [ ! -z "$(which feenox-mumps)" ]; then
     has_feenox_mumps="yes"
+    feenox_mumps="feenox-mumps"
     rm -f feenox_mumps_${m}*.dat
-  fi
+  else
+    $(feenox -V | grep mumps > /dev/null)
+    if [ $? -eq 0 ]; then
+      has_feenox_mumps="yes"
+      feenox_mumps="feenox"
+      rm -f feenox_mumps_${m}*.dat
+    fi
+  fi  
   
   feenox -V > version_feenox.txt
 fi
@@ -144,6 +153,13 @@ cat << EOF > arch-${m}.md
   
 EOF
 
+if [ ! -z "$(which lstopo)" ]; then
+  rm -f arch-${m}.svg
+  lstopo arch-${m}.svg
+  echo "![](arch-${m}.svg)\\ " >> arch-${m}.md
+fi
+
+
 
 for c in $(feenox steps.fee ${min} ${steps}); do
 
@@ -174,7 +190,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   if [ ! -z "${has_feenox_mumps}" ]; then
     if [ ! -e feenox_mumps_${m}-${c}.sigmay ]; then
       echo "running FeenoX MUMPS c = ${c}"
-      ${time} -o feenox_mumps_${m}-${c}.time feenox le10.fee ${m}-${c} --mumps > feenox_mumps_${m}-${c}.sigmay
+      ${time} -o feenox_mumps_${m}-${c}.time ${feenox_mumps} le10.fee ${m}-${c} --mumps > feenox_mumps_${m}-${c}.sigmay
     fi
 
     if [ -e feenox_mumps_${m}-${c}.sigmay ]; then
@@ -194,7 +210,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     if [ ! -e sparselizard_mumps_${m}-${c}.sigmay ]; then
       echo "Running Sparselizard m = ${m} c = ${c}"
       cd sparselizard
-      ${time} -o ../sparselizard_mumps_${m}-${c}.time ./run_sparselizard.sh ${m}-${c} > ../sparselizard_mumps_${m}-${c}.sigmay
+      ${time} -o ../sparselizard_mumps_${m}-${c}.time ./run_sparselizard.sh ${m}-${c} | grep -v Info > ../sparselizard_mumps_${m}-${c}.sigmay
       cd ..
     fi
     

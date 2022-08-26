@@ -1,0 +1,53 @@
+READ_MESH parallelepiped-tet.msh DIM 3
+READ_MESH parallelepiped-hex.msh DIM 3
+
+# analytical solutions
+h = 10
+l = 20
+A = 0.002
+B = 0.003
+C = 0.004
+D = 0.76
+nu = 0.3
+
+u(x,y,z) := A/2*(x^2 + nu*(y^2+z^2)) + B*x*y + C*x*z + D*x - nu*A*h/4*(y+z)
+v(x,y,z) := -nu*(A*x*y + B/2*(y^2-z^2+x^2/nu) + C*y*z + D*y -A*h/4*x - C*h/4*z)
+w(x,y,z) := -nu*(A*x*z + B*y*z + C/2*(z^2-y^2+x^2/nu) + D*z + C*h/4*y - A*h/4*x)
+
+FUNCTION u_hex(x,y,z) MESH parallelepiped-tet.msh
+FUNCTION v_hex(x,y,z) MESH parallelepiped-tet.msh
+FUNCTION w_hex(x,y,z) MESH parallelepiped-tet.msh
+
+vec_u_hex[i] = u(vec_u_hex_x[i], vec_u_hex_y[i], vec_u_hex_z[i])
+vec_v_hex[i] = v(vec_v_hex_x[i], vec_v_hex_y[i], vec_v_hex_z[i])
+vec_w_hex[i] = w(vec_w_hex_x[i], vec_w_hex_y[i], vec_w_hex_z[i])
+
+INTEGRATE u_hex  MESH parallelepiped-tet.msh RESULT I_u_hex
+INTEGRATE v_hex  MESH parallelepiped-tet.msh RESULT I_v_hex
+INTEGRATE w_hex  MESH parallelepiped-tet.msh RESULT I_w_hex
+
+
+
+FUNCTION u_tet(x,y,z) MESH parallelepiped-hex.msh
+FUNCTION v_tet(x,y,z) MESH parallelepiped-hex.msh
+FUNCTION w_tet(x,y,z) MESH parallelepiped-hex.msh
+
+vec_u_tet[i] = u(vec_u_tet_x[i], vec_u_tet_y[i], vec_u_tet_z[i])
+vec_v_tet[i] = v(vec_v_tet_x[i], vec_v_tet_y[i], vec_v_tet_z[i])
+vec_w_tet[i] = w(vec_w_tet_x[i], vec_w_tet_y[i], vec_w_tet_z[i])
+
+INTEGRATE u_tet  MESH parallelepiped-hex.msh RESULT I_u_tet
+INTEGRATE v_tet  MESH parallelepiped-hex.msh RESULT I_v_tet
+INTEGRATE w_tet  MESH parallelepiped-hex.msh RESULT I_w_tet
+
+
+I_u_0 = integral(integral(integral(u(x,y,z), z, -h/2, +h/2), y, -h/2, +h/2), x, 0, l)
+I_v_0 = integral(integral(integral(v(x,y,z), z, -h/2, +h/2), y, -h/2, +h/2), x, 0, l)
+I_w_0 = integral(integral(integral(w(x,y,z), z, -h/2, +h/2), y, -h/2, +h/2), x, 0, l)
+
+
+
+PRINT %.10f I_u_hex I_v_hex I_w_hex
+PRINT %.10f I_u_tet I_v_tet I_w_tet
+PRINT %.10f I_u_0   I_v_0   I_w_0
+

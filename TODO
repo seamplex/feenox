@@ -1,14 +1,16 @@
 General things to do
 
 -   implicit call to SOLVE_PROBLEM?
--   automatically link virtual methods in autogen depending on the
-    directories under pdes
+-   use MatPreallocator to efficiently pre-allocate the matrices? use a
+    DMPlex?
 -   use spack
 -   https://joss.theoj.org/
 -   FIT to mesh-based functions
 -   FIT taking into account uncertainties
 -   extended integration (as in reduced, full, extended)
--   insert expansion mpicc into feenox -V
+-   make GSL optional
+    -   rewrite BLAS using ad-hoc routines
+    -   wrap all GSL calls inside #ifdef
 
 Tests
 
@@ -20,11 +22,24 @@ Tests
 -   cell-based mesh writes and integrations
 -   FIT ranges
 
+Optimizations
+
+-   if the elements are straight all the jacobians are the same and
+    there is no need to sweep over gauss points
+-   make a two lists of elements, one for bulk and one for BCs and loop
+    over those
+-   rewrite fem.c to store per-gauss point data in a cache-friendly way
+-   remove branches
+-   think about inline
+-   use ad-hoc matrices instead of gsl_matrix?
+    -   have a contiguous array of memory that stores all the
+        per-element matrices in a row-major order
+    -   access them using macros dhdx(row,col)
+
 Wasora keywords
 
 -   SEMAPHORE + SHARED_MEMORY
 -   READ / WRITE
--   SOLVE
 -   M4 (MUSTACHE? MACRO?)
 -   SHELL
 -   HISTORY
@@ -45,6 +60,7 @@ API
 
 Nice to have
 
+-   add a keyword and command-line argument to set OMP_NUM_THREADS
 -   logaritmic ranges for PRINT_FUNCTION
 -   default separator after TEXT should be space, after numerical should
     be tab
@@ -93,7 +109,7 @@ Extensions
 -   mustache instead of m4
 -   gmsh as a library? maybe not, just import both gmsh and feenox in
     Python and use them together
--   use dmplex?
+-   use dmplex? for real or just for allocating the matrices?
 
 PDEs
 
@@ -106,7 +122,7 @@ PDEs
 -   remove the need of needing an explicit SOLVE_PROBLEM
     -   detect which variables/functions are PDE outputs and call
         solve_problem() the first time they are needed
--   benchmark MPI
+-   benchmark MPI (read .msh with partitioning info first)
 
 Laplace/Poisson/Helmholtz
 
@@ -132,7 +148,7 @@ Mechanical
 
 Modal
 
--   partially-unconstrained DOFs
+-   partially-unconstrained DOFs in arbitrary directions
 
 Neutron
 

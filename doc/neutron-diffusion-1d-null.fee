@@ -1,0 +1,26 @@
+PROBLEM neutron_diffusion 1D
+READ_MESH slab-UD20-1-0-SL.msh
+
+a = 2 * 10.371065 # critical size of the problem UD20-1-0-SL (number 22 report Los Alamos)
+
+Sigma_t1 = 0.54628
+Sigma_s1.1 = 0.464338
+nuSigma_f1 = 1.70*0.054628
+D1 = 1/(3*Sigma_t1)
+
+# null scalar flux at both ends of the slab 
+BC left  null
+BC right null
+
+SOLVE_PROBLEM
+
+# analytical effective multiplication factor (diffusion approximation)
+keff_diff = nuSigma_f1/((Sigma_t1-Sigma_s1.1) + D1*(pi/a)^2)
+
+# analytical normalized flux distribution (diffusion approximation)
+phi_diff(x) = pi/2 * sin(x/a * pi)
+
+PRINT_FUNCTION FORMAT %+.3f phi1 phi_diff phi1(x)-phi_diff(x) HEADER
+PRINT TEXT "\# keff      = " %.8f keff
+PRINT TEXT "\# kdiff     = " %.8f keff_diff
+PRINT TEXT "\# rel error = " %+.2e (keff-keff_diff)/keff
