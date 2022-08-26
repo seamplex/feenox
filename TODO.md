@@ -1,7 +1,11 @@
 # General things to do
 
  * implicit call to `SOLVE_PROBLEM`?
- * use `MatPreallocator` to efficiently pre-allocate the matrices? use a `DMPlex`? 
+ * use `MatPreallocator` to efficiently pre-allocate the matrices?
+ * use `DMPlex`?
+    - allocate matrices
+    - write vtus
+    - dump states
  * use `spack`
  * https://joss.theoj.org/
  * FIT to mesh-based functions
@@ -10,6 +14,7 @@
  * make GSL optional
    - rewrite BLAS using ad-hoc routines
    - wrap all GSL calls inside `#ifdef`
+   - use a large chunk of contiguous memory in the heap to store shape functions, gradients, etc
  
 ## Tests
 
@@ -30,7 +35,11 @@
  * use ad-hoc matrices instead of `gsl_matrix`?
    - have a contiguous array of memory that stores all the per-element matrices in a row-major order
    - access them using macros `dhdx(row,col)`
- 
+ * have compile-time macros that will optimize for
+   - speed
+   - memory
+   - something else
+   
 ## Wasora keywords
 
  * `SEMAPHORE` + `SHARED_MEMORY`
@@ -100,11 +109,6 @@
    - `full | mode_1 | mode_n1 | modes`
    - `full | flux_1 | fluxes | currents`
  
-## Extensions
- 
- * mustache instead of m4
- * gmsh as a library? maybe not, just import both gmsh and feenox in Python and use them together
- * use dmplex? for real or just for allocating the matrices?
  
 # PDEs
 
@@ -115,6 +119,8 @@
  * remove the need of needing an explicit `SOLVE_PROBLEM`
    - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
  * benchmark MPI (read `.msh` with partitioning info first)
+ * openmp to build matrices and compute stresses
+ * glue
  
 ## Laplace/Poisson/Helmholtz
 

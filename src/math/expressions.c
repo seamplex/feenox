@@ -3,7 +3,8 @@
  *
  *  Copyright (C) 2009--2022 jeremy theler
  *
- *  This file is part of Feenox.
+ *  This file is part of Feenox. It is based on ideas posted at
+ *  http://stackoverflow.com/questions/1384811/code-golf-mathematical-expression-evaluator-that-respects-pemdas
  *
  *  Feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
