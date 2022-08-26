@@ -437,10 +437,10 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         size_t num_blocks;
         if (version_min == 0) {
           // en 4.0 no tenemos min y max
-          if (fscanf(fp, "%ld %ld", &num_blocks, &this->n_nodes) < 2) {
-            feenox_push_error_message("error reading node blocks");
-            return FEENOX_ERROR;
-          }
+          size_t data[2] = {0,0};
+          feenox_call(feenox_gmsh_read_data_size_t(this, 2, data, binary));
+          num_blocks = data[0];
+          this->n_nodes = data[1];
         } else {
           size_t data[4] = {0,0,0,0};
           feenox_call(feenox_gmsh_read_data_size_t(this, 4, data, binary));
@@ -472,29 +472,22 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         
         size_t j = 0;
         for (size_t l = 0; l < num_blocks; l++) {
-          int geometrical;
-          int dimension;
-          int parametric;
-          size_t num_nodes;
-          // v4.0 and v4.1 have geometrical and dimension switched
-          if (version_min == 0) {
-            if (fscanf(fp, "%d %d %d %ld", &geometrical, &dimension, &parametric, &num_nodes) < 4) {
-              feenox_push_error_message("not enough data in node block");
-              return FEENOX_ERROR;
-            }
-          } else {
-            int data[3] = {0,0,0};
-            feenox_call(feenox_gmsh_read_data_int(this, 3, data, binary));
-            dimension = data[0];
-            geometrical = data[1];
-            parametric = data[2];
-            feenox_call(feenox_gmsh_read_data_size_t(this, 1, &num_nodes, binary));
-          }
+          size_t num_nodes = 0;
 
+          int data[3] = {0,0,0};
+          feenox_call(feenox_gmsh_read_data_int(this, 3, data, binary));
+          
+          // v4.0 and v4.1 have geometrical and dimension switched
+          int dimension = (version_min == 0) ? data[1] : data[0];
+          int geometrical = (version_min == 0) ? data[0] : data[1];
+          int parametric = data[2];
           if (parametric) {
             feenox_push_error_message("mesh '%s' contains parametric data, which is unsupported yet", this->file->path);
             return FEENOX_ERROR;
           }
+          
+          feenox_call(feenox_gmsh_read_data_size_t(this, 1, &num_nodes, binary));
+
           
           if (version_min == 0) {
             // here we have tag and coordinate in the same line

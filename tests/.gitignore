@@ -38,3 +38,6 @@ modal-annulus.json
 square-f.msh
 square-out.msh
 output
+rectangular_plate_with_hole.msh
+rectangular_plate_with_hole.vtk
+statically_indeterminate_reaction.msh

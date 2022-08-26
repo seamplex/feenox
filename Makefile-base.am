@@ -48,6 +48,7 @@ TESTS = \
         tests/print.sh \
         tests/solve.sh \
         tests/spinning-disk.sh \
+        tests/statically_indeterminate_reaction.sh \
         tests/symmetry.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \

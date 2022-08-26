@@ -3180,6 +3180,8 @@ int feenox_parse_find_extrema(void) {
   char *token = feenox_get_next_token(NULL);
   if ((mesh_find_extrema->function = feenox_get_function_ptr(token)) == NULL) {
     feenox_call(feenox_expression_parse(&mesh_find_extrema->expr, token));
+  } else {
+    mesh_find_extrema->function->used = 1;
   }
   
   char *name_mesh = NULL;

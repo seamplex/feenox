@@ -677,7 +677,7 @@ When PETSc is detected FeenoX uses the `mpicc` executable, which is a wrapper to
 ```
 
 
-To know which is the default MPI implementation, just run `configure` without arguments and pay attention to the "Compiler" line in the "Summary of dependencies" section. For example, for OpenMPI a typical summary would be
+To know which is the default MPI implementation, just run `./configure` without arguments and pay attention to the "Compiler" line in the "Summary of dependencies" section. For example, for OpenMPI a typical summary would be
 
 ```terminal
 ## ----------------------- ##

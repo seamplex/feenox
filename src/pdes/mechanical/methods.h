@@ -51,7 +51,7 @@ extern int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t 
 
 // mechanical/bulk.c
 extern int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes);
-extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *this, unsigned int v);
+extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *, unsigned int v);
 
 // material models
 extern int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x, material_t *material);
