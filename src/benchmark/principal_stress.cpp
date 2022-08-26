@@ -40,28 +40,50 @@ feenox_t feenox;
   *sigma2 = c2 + c3 * cos(phi - 2.0*M_PI/3.0); \
   *sigma3 = c2 + c3 * cos(phi - 4.0*M_PI/3.0);
 
+#define ARGS_DECL (double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) 
+#define ARGS_CALL (sigmax, sigmay, sigmaz, tauxy, tauyz, tauzx, sigma1, sigma2, sigma3)
   
 extern "C" {
 
-inline int feenox_principal_stress_from_cauchy_inline(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
+inline int feenox_principal_stress_from_cauchy_inline ARGS_DECL {
   COMPUTE_PRINCIPAL_STRESS_FROM_CAUCHY;
   return FEENOX_OK;
 }
 
-int feenox_principal_stress_from_cauchy_call(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
+int feenox_principal_stress_from_cauchy_call ARGS_DECL {
   COMPUTE_PRINCIPAL_STRESS_FROM_CAUCHY;
   return FEENOX_OK;
 }
+
+int feenox_principal_stress_from_cauchy_wrapper ARGS_DECL {
+  return feenox_principal_stress_from_cauchy ARGS_CALL;
+}
+
+int feenox_principal_stress_from_cauchy_wrapper2 ARGS_DECL {
+  return feenox_principal_stress_from_cauchy_wrapper ARGS_CALL;
+}
+
+int feenox_principal_stress_from_cauchy_wrapper3 ARGS_DECL {
+  return feenox_principal_stress_from_cauchy_wrapper2 ARGS_CALL;
+}
+void feenox_principal_stress_from_cauchy_void ARGS_DECL {
+  COMPUTE_PRINCIPAL_STRESS_FROM_CAUCHY;
+}
+
 
 } // extern C
 
 
+int feenox_principal_stress_from_cauchy_call_cpp ARGS_DECL {
+  COMPUTE_PRINCIPAL_STRESS_FROM_CAUCHY;
+  return FEENOX_OK;
+}
 
 static void BM_principal_stress_feenox(benchmark::State& state) {
   INIT_SIGMAS;
   
   for (auto _ : state) {
-    feenox_principal_stress_from_cauchy(sigmax, sigmay, sigmaz, tauxy, tauyz, tauzx, sigma1, sigma2, sigma3);
+    feenox_principal_stress_from_cauchy ARGS_CALL;
   }
 }
 
@@ -69,9 +91,52 @@ static void BM_principal_stress_call(benchmark::State& state) {
   INIT_SIGMAS;
   
   for (auto _ : state) {
-    feenox_principal_stress_from_cauchy_call(sigmax, sigmay, sigmaz, tauxy, tauyz, tauzx, sigma1, sigma2, sigma3);
+    feenox_principal_stress_from_cauchy_call ARGS_CALL;
   }
 }
+
+static void BM_principal_stress_wrapper(benchmark::State& state) {
+  INIT_SIGMAS;
+  
+  for (auto _ : state) {
+    feenox_principal_stress_from_cauchy_wrapper ARGS_CALL;
+  }
+}
+
+static void BM_principal_stress_wrapper2(benchmark::State& state) {
+  INIT_SIGMAS;
+  
+  for (auto _ : state) {
+    feenox_principal_stress_from_cauchy_wrapper2 ARGS_CALL;
+  }
+}
+
+static void BM_principal_stress_wrapper3(benchmark::State& state) {
+  INIT_SIGMAS;
+  
+  for (auto _ : state) {
+    feenox_principal_stress_from_cauchy_wrapper3 ARGS_CALL;
+  }
+}
+
+
+static void BM_principal_stress_void(benchmark::State& state) {
+  INIT_SIGMAS;
+  
+  for (auto _ : state) {
+    feenox_principal_stress_from_cauchy_void ARGS_CALL;
+  }
+}
+
+
+static void BM_principal_stress_call_cpp(benchmark::State& state) {
+  INIT_SIGMAS;
+  
+  for (auto _ : state) {
+    feenox_principal_stress_from_cauchy_call_cpp ARGS_CALL;
+  }
+}
+
 
 static void BM_principal_stress_expanded(benchmark::State& state) {
   INIT_SIGMAS;
@@ -89,7 +154,7 @@ static void BM_principal_stress_inline(benchmark::State& state) {
   INIT_SIGMAS;
   
   for (auto _ : state) {
-    feenox_principal_stress_from_cauchy_inline(sigmax, sigmay, sigmaz, tauxy, tauyz, tauzx, sigma1, sigma2, sigma3);
+    feenox_principal_stress_from_cauchy_inline ARGS_CALL;
     benchmark::DoNotOptimize(sigma1);
     benchmark::DoNotOptimize(sigma2);
     benchmark::DoNotOptimize(sigma3);
@@ -98,6 +163,11 @@ static void BM_principal_stress_inline(benchmark::State& state) {
 
 BENCHMARK(BM_principal_stress_feenox);
 BENCHMARK(BM_principal_stress_call);
+BENCHMARK(BM_principal_stress_void);
+BENCHMARK(BM_principal_stress_wrapper);
+BENCHMARK(BM_principal_stress_wrapper2);
+BENCHMARK(BM_principal_stress_wrapper3);
+BENCHMARK(BM_principal_stress_call_cpp);
 BENCHMARK(BM_principal_stress_expanded);
 BENCHMARK(BM_principal_stress_inline);
 

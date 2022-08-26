@@ -3053,7 +3053,7 @@ int feenox_parse_petsc_options(void) {
   return FEENOX_OK;  
   
 #else
-  feenox_push_error_message("FeenoX is not compiled with PETSc so PETSC_OPTIONS cannot be set")
+  feenox_push_error_message("FeenoX is not compiled with PETSc so PETSC_OPTIONS cannot be set");
   return FEENOX_ERROR;
 #endif
 }
