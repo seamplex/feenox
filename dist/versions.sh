@@ -1,16 +1,16 @@
 #!/bin/false
 
+petsc_ver=3.17.4
+slepc_ver=3.17.2
+package=feenox
+
 # check for needed tools
-for i in git autoconf m4 make; do
+for i in git autoconf m4 make wget; do
   if [ -z "$(which $i)" ]; then
     echo "error: $i not installed"
     exit 1
   fi
 done
-
-package=feenox
-petsc_ver=3.17.2
-slepc_ver=3.17.1
 
 if [ -z "$(which git)" ]; then
   echo "git is not installed"

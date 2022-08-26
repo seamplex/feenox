@@ -17,17 +17,18 @@ AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 AC_PROG_CC
-# TODO: define it only if enabling the benchmarking directory
-AC_PROG_CXX
-AC_PROG_INSTALL
-AC_PROG_RANLIB
 
+AC_PROG_INSTALL
+
+# TODO: define it only if enabling the benchmarking directoryAC_PROG_RANLIB
+AC_PROG_CXX
 # TODO: investigate
 #AX_CODE_COVERAGE
 
 ######################
 # optimization flags
-AS_IF([test "$CFLAGS" = "-g -O2"], [CFLAGS="-O3"])
+AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-Ofast -flto=auto"])
+AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
 
 ######################
 # libraries
@@ -413,7 +414,8 @@ EOF
 m4_include(config_links.m4)
 
   
-AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
+#AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile]) 
 
 AS_BOX([Summary of dependencies])
 AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
@@ -430,5 +432,7 @@ AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO
 )
 AS_ECHO(  ["  Compiler                ${compiler_show}"])
+AS_ECHO(  ["  Compiler flags          ${CFLAGS}"])
+AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])
 
 AC_OUTPUT

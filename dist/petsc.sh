@@ -21,9 +21,8 @@ fi
 
 cd petsc-${petsc_ver}
 export PETSC_DIR=$(pwd)
-./configure PETSC_DIR=${PETSC_DIR} \
-            PETSC_ARCH=${PETSC_ARCH} \
-            --with-mpi=0 \
+export PETSC_ARCH=${PETSC_ARCH}
+./configure --with-mpi=0 \
             --with-cxx=0 \
             --with-fortran-bindings=0 \
             --with-fc=0 \
@@ -55,11 +54,7 @@ fi
 
 cd slepc-${slepc_ver}
 export SLEPC_DIR=$(pwd)
-export PETSC_DIR=${PETSC_DIR}
-export PETSC_ARCH=${PETSC_ARCH}
-./configure 
+./configure
 make 
 make check
 cd ..
-
-

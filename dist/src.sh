@@ -1,5 +1,13 @@
 #!/bin/bash -ex
 
+# check for needed tools
+for i in pandoc pandoc-crossref; do
+  if [ -z "$(which $i)" ]; then
+    echo "error: $i not installed"
+    exit 1
+  fi
+done
+
 if [ ! -e ../src ]; then
   echo "run from dist directory"
   exit 0
@@ -32,11 +40,6 @@ cd ${tmp_dir}
  ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
  cd doc
   ./make.sh
-#   make info
-#   make pdf
-  ./pdf.sh feenox-manual
-  ./pdf.sh srs
-  ./pdf.sh sds
  cd .. 
  make distcheck
 cd ${current_dir}
