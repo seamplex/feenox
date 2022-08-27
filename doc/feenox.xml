@@ -20,10 +20,12 @@
       <item>CLOSE</item>
       <item>COLS</item>
       <item>COLUMNS</item>
+      <item>COMPUTE_REACTION</item>
       <item>DATA</item>
       <item>DEFAULT_ARGUMENT_VALUE</item>
       <item>DESCENDING</item>
       <item>DESCENDING_ORDER</item>
+      <item>DETECT_HANGING_NODES</item>
       <item>DIM</item>
       <item>DIMENSION</item>
       <item>DIMENSIONS</item>
@@ -42,13 +44,14 @@
       <item>FILE_PATH</item>
       <item>FIND_EXTREMA</item>
       <item>FIT</item>
+      <item>FOR</item>
       <item>FORMAT</item>
       <item>FROM</item>
       <item>FUNCTION</item>
       <item>FUNCTION_DATA</item>
       <item>GAUSS</item>
       <item>GRADIENT</item>
-      <item>GUESS</item>
+      <item>HANDLE_HANGING_NODES</item>
       <item>HEADER</item>
       <item>HISTORY</item>
       <item>ID</item>
@@ -72,6 +75,7 @@
       <item>KSP</item>
       <item>KSP_TYPE</item>
       <item>LINEAR</item>
+      <item>LINEARIZE_STRESS</item>
       <item>LINEAR_SOLVER</item>
       <item>M</item>
       <item>MAIN</item>
@@ -85,6 +89,8 @@
       <item>MIN</item>
       <item>MODE</item>
       <item>MODES</item>
+      <item>MOMENT</item>
+      <item>NAME</item>
       <item>NODE</item>
       <item>NODES</item>
       <item>NO_MESH</item>
@@ -103,6 +109,7 @@
       <item>PATH</item>
       <item>PC</item>
       <item>PC_TYPE</item>
+      <item>PETSC_OPTIONS</item>
       <item>PHASE_SPACE</item>
       <item>PHYSICAL_ENTITY</item>
       <item>PHYSICAL_GROUP</item>
@@ -116,12 +123,14 @@
       <item>QUASISTATIC</item>
       <item>RANGE_MAX</item>
       <item>RANGE_MIN</item>
+      <item>REACTION</item>
       <item>READ</item>
       <item>READ_FIELD</item>
       <item>READ_FUNCTION</item>
       <item>READ_MESH</item>
+      <item>READ_SYMMETRIC_TENSOR</item>
+      <item>READ_VECTOR</item>
       <item>RE_READ</item>
-      <item>RESIDUALS</item>
       <item>RESULT</item>
       <item>ROWS</item>
       <item>SCALAR_FORMAT</item>
@@ -146,6 +155,8 @@
       <item>STEP</item>
       <item>STRING</item>
       <item>ST_TYPE</item>
+      <item>SYMMETRIC_TENSOR</item>
+      <item>SYMM_TENSOR</item>
       <item>TEXT</item>
       <item>TIME_ADAPTATION</item>
       <item>TIME_PATH</item>
@@ -171,11 +182,14 @@
       <item>VIA</item>
       <item>WRITE</item>
       <item>WRITE_MESH</item>
+      <item>X0</item>
       <item>X_INCREASES_FIRST</item>
       <item>X_MAX</item>
       <item>X_MIN</item>
+      <item>Y0</item>
       <item>Y_MAX</item>
       <item>Y_MIN</item>
+      <item>Z0</item>
       <item>Z_MAX</item>
       <item>Z_MIN</item>
       <item>ALLOWED</item>

@@ -24,15 +24,25 @@ To better illustrate FeenoX’ unfair advantage (in the entrepreneurial
 sense), let us first consider what the options are when an engineer
 needs to to write a technical report, paper or document:
 
-  Feature                              Microsoft Word   Google Docs   Markdown[1]   (La)TeX
-  ----------------------------------- ---------------- ------------- ------------- ---------
-  Aesthetics                                 ❌               ❌             ✅           ✅
-  Convertibility (to other formats)          😐               😐             ✅           😐
-  Traceability                               ❌               😐             ✅           ✅
-  Mobile-friendliness                        ❌               ✅             ✅           ❌
-  Collaborativeness                          ❌               ✅             ✅           😐
-  Licensing/openness                         ❌               ❌             ✅           ✅
-  Non-nerd friendliness                      ✅               ✅             😐           ❌
+  -----------------------------------------------------------------------------
+  Feature                 Microsoft   Google Docs   Markdown[1]     (La)TeX
+                            Word                                 
+  --------------------- ------------- ------------ ------------- --------------
+  Aesthetics                 ❌            ❌           ✅             ✅
+
+  Convertibility (to         😐            😐           ✅             😐
+  other formats)                                                 
+
+  Traceability               ❌            😐           ✅             ✅
+
+  Mobile-friendliness        ❌            ✅           ✅             ❌
+
+  Collaborativeness          ❌            ✅           ✅             😐
+
+  Licensing/openness         ❌            ❌           ✅             ✅
+
+  Non-nerd friendliness      ✅            ✅           😐             ❌
+  -----------------------------------------------------------------------------
 
 After analyzing the pros and cons of each alternative, at some point it
 should be evident that Markdown (plus friends) gives the best trade off.
@@ -40,15 +50,24 @@ We can then perform a similar analysis for the options available in
 order to solve an engineering problem casted as a partial differential
 equation, say by using a finite-element formulation:
 
-  Feature                  Desktop GUIs   Web frontends   FeenoX[2]   Libraries
-  ----------------------- -------------- --------------- ----------- -----------
-  Flexibility                   😐               ❌             ✅           ✅
-  Scalability                   ❌               😐             ✅           ✅
-  Traceability                  ❌               😐             ✅           ✅
-  Cloud-friendliness            ❌               ✅             ✅           ✅
-  Collaborativeness             ❌               ✅             ✅           ❌
-  Licensing/openness          ✅/😐/❌             ❌             ✅           ✅
-  Non-nerd friendliness         ✅               ✅             😐           ❌
+  --------------------------------------------------------------------------
+  Feature              Desktop GUIs  Web frontends   FeenoX[2]   Libraries
+  -------------------- ------------ --------------- ----------- ------------
+  Flexibility               😐            ❌            ✅           ✅
+
+  Scalability               ❌            😐            ✅           ✅
+
+  Traceability              ❌            😐            ✅           ✅
+
+  Cloud-friendliness        ❌            ✅            ✅           ✅
+
+  Collaborativeness         ❌            ✅            ✅           ❌
+
+  Licensing/openness     ✅/😐/❌         ❌            ✅           ✅
+
+  Non-nerd                  ✅            ✅            😐           ❌
+  friendliness                                                  
+  --------------------------------------------------------------------------
 
 Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
 programs (like Code_Aster with Salome-Meca or CalculiX with PrePoMax)
@@ -389,12 +408,15 @@ FeenoX is distributed under the terms of the GNU General Public License
 version 3 or (at your option) any later version. See licensing below for
 details.
 
-  -------------------- ----------------------------------------------
-  GNU/Linux binaries   https://www.seamplex.com/feenox/dist/linux
-  Windows binaries     https://www.seamplex.com/feenox/dist/windows
-  Source tarballs      https://www.seamplex.com/feenox/dist/src
-  Github repository    https://github.com/seamplex/feenox/
-  -------------------- ----------------------------------------------
+  ------------------------ ----------------------------------------------
+  GNU/Linux binaries       https://www.seamplex.com/feenox/dist/linux
+
+  Windows binaries         https://www.seamplex.com/feenox/dist/windows
+
+  Source tarballs          https://www.seamplex.com/feenox/dist/src
+
+  Github repository        https://github.com/seamplex/feenox/
+  ------------------------ ----------------------------------------------
 
 -   Be aware that FeenoX is a backend. It does not have a GUI. Read the
     documentation, especially the description and the FAQs. Ask for help

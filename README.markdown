@@ -1,11 +1,11 @@
 # FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
--   [<span class="toc-section-number">1</span> Why FeenoX?][]
--   [<span class="toc-section-number">2</span> What is FeenoX?][]
--   [<span class="toc-section-number">3</span> Download][]
-    -   [<span class="toc-section-number">3.1</span> Git repository][]
--   [<span class="toc-section-number">4</span> Licensing][]
--   [<span class="toc-section-number">5</span> Further information][]
+- [<span class="toc-section-number">1</span> Why FeenoX?][]
+- [<span class="toc-section-number">2</span> What is FeenoX?][]
+- [<span class="toc-section-number">3</span> Download][]
+  - [<span class="toc-section-number">3.1</span> Git repository][]
+- [<span class="toc-section-number">4</span> Licensing][]
+- [<span class="toc-section-number">5</span> Further information][]
 
   [<span class="toc-section-number">1</span> Why FeenoX?]: #why-feenox
   [<span class="toc-section-number">2</span> What is FeenoX?]: #what-is-feenox
@@ -24,15 +24,15 @@ To better illustrate FeenoX’ unfair advantage (in the entrepreneurial
 sense), let us first consider what the options are when an engineer
 needs to to write a technical report, paper or document:
 
-| Feature                           | Microsoft Word | Google Docs | Markdown[1] | (La)TeX |
-|:----------------------------------|:--------------:|:-----------:|:-----------:|:-------:|
-| Aesthetics                        |       ❌        |      ❌      |      ✅      |    ✅    |
-| Convertibility (to other formats) |       😐        |      😐      |      ✅      |    😐    |
-| Traceability                      |       ❌        |      😐      |      ✅      |    ✅    |
-| Mobile-friendliness               |       ❌        |      ✅      |      ✅      |    ❌    |
-| Collaborativeness                 |       ❌        |      ✅      |      ✅      |    😐    |
-| Licensing/openness                |       ❌        |      ❌      |      ✅      |    ✅    |
-| Non-nerd friendliness             |       ✅        |      ✅      |      😐      |    ❌    |
+| Feature                           | Microsoft Word | Google Docs | Markdown[^1] | (La)TeX |
+|:----------------------------------|:--------------:|:-----------:|:------------:|:-------:|
+| Aesthetics                        |       ❌       |     ❌      |      ✅      |   ✅    |
+| Convertibility (to other formats) |       😐       |     😐      |      ✅      |   😐    |
+| Traceability                      |       ❌       |     😐      |      ✅      |   ✅    |
+| Mobile-friendliness               |       ❌       |     ✅      |      ✅      |   ❌    |
+| Collaborativeness                 |       ❌       |     ✅      |      ✅      |   😐    |
+| Licensing/openness                |       ❌       |     ❌      |      ✅      |   ✅    |
+| Non-nerd friendliness             |       ✅       |     ✅      |      😐      |   ❌    |
 
 After analyzing the pros and cons of each alternative, at some point it
 should be evident that [Markdown][] (plus friends) gives the best trade
@@ -40,15 +40,15 @@ off. We can then perform a similar analysis for the options available in
 order to solve an engineering problem casted as a partial differential
 equation, say by using a finite-element formulation:
 
-| Feature               | Desktop GUIs | Web frontends | FeenoX[2] | Libraries |
-|:----------------------|:------------:|:-------------:|:---------:|:---------:|
-| Flexibility           |      😐       |       ❌       |     ✅     |     ✅     |
-| Scalability           |      ❌       |       😐       |     ✅     |     ✅     |
-| Traceability          |      ❌       |       😐       |     ✅     |     ✅     |
-| Cloud-friendliness    |      ❌       |       ✅       |     ✅     |     ✅     |
-| Collaborativeness     |      ❌       |       ✅       |     ✅     |     ❌     |
-| Licensing/openness    |    ✅/😐/❌     |       ❌       |     ✅     |     ✅     |
-| Non-nerd friendliness |      ✅       |       ✅       |     😐     |     ❌     |
+| Feature               | Desktop GUIs | Web frontends | FeenoX[^2] | Libraries |
+|:----------------------|:------------:|:-------------:|:----------:|:---------:|
+| Flexibility           |      😐      |      ❌       |     ✅     |    ✅     |
+| Scalability           |      ❌      |      😐       |     ✅     |    ✅     |
+| Traceability          |      ❌      |      😐       |     ✅     |    ✅     |
+| Cloud-friendliness    |      ❌      |      ✅       |     ✅     |    ✅     |
+| Collaborativeness     |      ❌      |      ✅       |     ✅     |    ❌     |
+| Licensing/openness    |   ✅/😐/❌   |      ❌       |     ✅     |    ✅     |
+| Non-nerd friendliness |      ✅      |      ✅       |     😐     |    ❌     |
 
 Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
 programs (like [Code_Aster][] with [Salome-Meca][] or [CalculiX][] with
@@ -69,11 +69,11 @@ features are that FeenoX is…
 If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
 [FAQs][].
 
-[1] Here “[Markdown][]” means ([Pandoc][] + [Git][] + [Github][] /
-[Gitlab][] / [Gitea][])
+[^1]: Here “[Markdown][]” means ([Pandoc][] + [Git][] + [Github][] /
+    [Gitlab][] / [Gitea][])
 
-[2] Here “FeenoX” means ([FeenoX][] + [Gmsh][] + [Paraview][] + [Git][]
-+ [Github][] / [Gitlab][] / [Gitea][])
+[^2]: Here “FeenoX” means ([FeenoX][] + [Gmsh][] + [Paraview][] +
+    [Git][] + [Github][] / [Gitlab][] / [Gitea][])
 
   [Markdown]: https://en.wikipedia.org/wiki/Markdown
   [Code_Aster]: https://www.code-aster.org/spip.php?rubrique2
@@ -101,9 +101,9 @@ If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
 
 FeenoX can be seen either as
 
--   a syntactically-sweetened way of asking the computer to solve
-    engineering-related mathematical problems, and/or
--   a finite-element(ish) tool with a particular design basis.
+- a syntactically-sweetened way of asking the computer to solve
+  engineering-related mathematical problems, and/or
+- a finite-element(ish) tool with a particular design basis.
 
 Note that some of the problems solved with FeenoX might not actually
 rely on the finite element method, but on general mathematical models
@@ -112,12 +112,12 @@ finite-element(ish) tool.
 
 In other words, FeenoX is a computational tool to solve
 
--   dynamical systems written as sets of ODEs/DAEs, or
--   steady or quasi-static thermo-mechanical problems, or
--   steady or transient heat conduction problems, or
--   modal analysis problems, or
--   neutron diffusion or transport problems, or
--   community-contributed problems
+- dynamical systems written as sets of ODEs/DAEs, or
+- steady or quasi-static thermo-mechanical problems, or
+- steady or transient heat conduction problems, or
+- modal analysis problems, or
+- neutron diffusion or transport problems, or
+- community-contributed problems
 
 in such a way that the input is a near-English text file that defines
 the problem to be solved.
@@ -128,8 +128,8 @@ simplicity*) or, quoting Alan Kay, “simple things should be simple,
 complex things should be possible.”
 
 For instance, to solve one-dimensional heat conduction over the domain
-*x* ∈ \[0,1\] (which is indeed one of the most simple engineering
-problems we can find) the following input file is enough:
+$x\in[0,1]$ (which is indeed one of the most simple engineering problems
+we can find) the following input file is enough:
 
 ``` feenox
 PROBLEM thermal 1D               # tell FeenoX what we want to solve 
@@ -160,8 +160,8 @@ and/or material properties.
 Another design-basis decision is that **similar problems ought to have
 similar inputs** (*rule of least surprise*). So in order to have a
 space-dependent conductivity, we only have to replace one line in the
-input above: instead of defining a scalar *k* we define a function
-of *x* (we also update the output to show the analytical solution as
+input above: instead of defining a scalar $k$ we define a function
+of $x$ (we also update the output to show the analytical solution as
 well):
 
 ``` feenox
@@ -184,7 +184,7 @@ The other main decision in FeenoX design is an **everything is an
 expression** design principle, meaning that any numerical input can be
 an algebraic expression (e.g. `T(1/2)` is the same as `T(0.5)`). If we
 want to have a temperature-dependent conductivity (which renders the
-problem non-linear) we can take advantage of the fact that *T*(*x*) is
+problem non-linear) we can take advantage of the fact that $T(x)$ is
 available not only as an argument to `PRINT` but also for the definition
 of algebraic functions:
 
@@ -210,23 +210,23 @@ attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
 
 <div class="only-in-format texi plain gfm">
 
-*ẋ* = *σ* ⋅ (*y*−*x*)  
-*ẏ* = *x* ⋅ (*r*−*z*) − *y*  
-*ż* = *x**y* − *b**z*
+$\dot{x} = \sigma \cdot (y - x)$  
+$\dot{y} = x \cdot (r - z) - y$  
+$\dot{z} = x y - b z$
 
 </div>
 
-for 0 \< *t* \< 40 with initial conditions
+for $0 < t < 40$ with initial conditions
 
 <div class="only-in-format texi plain gfm">
 
-*x*(0) =  − 11  
-*y*(0) =  − 16  
-*z*(0) = 22.5
+$x(0) = -11$  
+$y(0) = -16$  
+$z(0) = 22.5$
 
 </div>
 
-and *σ* = 10, *r* = 28 and *b* = 8/3, which are the classical parameters
+and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
 seminal 1963 paper [Deterministic non-periodic flow][].
 
@@ -255,11 +255,15 @@ PRINT t x y z        # four-column plain-ASCII output
 ```
 
 <figure>
-<img src="doc/lorenz.svg" id="fig:lorenz-gnuplot" data-width_latex="75%" data-width_html="100%" data-width_texinfo="12cm" alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" /><figcaption aria-hidden="true">The Lorenz attractor solved with FeenoX and drawn with Gnuplot</figcaption>
+<img src="doc/lorenz.svg" id="fig:lorenz-gnuplot" data-width_latex="75%"
+data-width_html="100%" data-width_texinfo="12cm"
+alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
+<figcaption aria-hidden="true">The Lorenz attractor solved with FeenoX
+and drawn with Gnuplot</figcaption>
 </figure>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
-columns (*t*, *x*, *y* and *z*) which we can then redirect to a file and
+columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and
 plot it with a standard tool such as Gnuplot. Note the importance of
 relying on plain ASCII text formats both for input and output, as
 recommended by the UNIX philosophy and the *rule of composition*: other
@@ -296,9 +300,9 @@ SOLVE_PROBLEM   # solve!
 PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
 ```
 
-The problem asks for the normal stress in the *y* direction
-*σ*<sub>*y*</sub> at point “D,” which is what FeenoX writes (and nothing
-else, *rule of economy*):
+The problem asks for the normal stress in the $y$ direction $\sigma_y$
+at point “D,” which is what FeenoX writes (and nothing else, *rule of
+economy*):
 
 ``` terminal
 $ feenox nafems-le10.fee 
@@ -309,21 +313,31 @@ $
 Also note that since there is only one material there is no need to do
 an explicit link between material properties and physical volumes in the
 mesh (*rule of simplicity*). And since the properties are uniform and
-isotropic, a single global scalar for *E* and a global single scalar
-for *ν* are enough.
+isotropic, a single global scalar for $E$ and a global single scalar
+for $\nu$ are enough.
 
 <figure>
-<img src="doc/nafems-le10-problem-input.svg" id="fig:nafems-le10-problem-input" data-width_html="100%" data-width_latex="100%" data-width_texinfo="15cm" alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" /><figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the corresponding FeenoX input</figcaption>
+<img src="doc/nafems-le10-problem-input.svg"
+id="fig:nafems-le10-problem-input" data-width_html="100%"
+data-width_latex="100%" data-width_texinfo="15cm"
+alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the
+corresponding FeenoX input</figcaption>
 </figure>
 
 <figure>
-<img src="doc/nafems-le10.png" id="fig:nafems-le10-sigmay" data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm" alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" /><figcaption aria-hidden="true">Normal stress <span class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined around point <span class="math inline"><em>D</em></span> over 5,000x-warped displacements for LE10 created with Paraview</figcaption>
+<img src="doc/nafems-le10.png" id="fig:nafems-le10-sigmay"
+data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm"
+alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
+<figcaption aria-hidden="true">Normal stress <span
+class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined
+around point <span class="math inline"><em>D</em></span> over
+5,000x-warped displacements for LE10 created with Paraview</figcaption>
 </figure>
 
 For the sake of visual completeness, post-processing data with the
-scalar distribution of *σ*<sub>*y*</sub> and the vector field of
-displacements \[*u*,*v*,*w*\] can be created by adding one line to the
-input file:
+scalar distribution of $\sigma_y$ and the vector field of displacements
+$[u,v,w]$ can be created by adding one line to the input file:
 
 ``` feenox
 WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
@@ -354,49 +368,48 @@ Please note the following two points about both cases above:
 
 Some basic rules are
 
--   FeenoX is just a **solver** working as a *transfer function* between
-    input and output files.
+- FeenoX is just a **solver** working as a *transfer function* between
+  input and output files.
 
-                                     +------------+
-         mesh (*.msh)  }             |            |             { terminal
-         data (*.dat)  } input ----> |   FeenoX   |----> output { data files
-         input (*.fee) }             |            |             { post (vtk/msh)
-                                     +------------+
+                                   +------------+
+       mesh (*.msh)  }             |            |             { terminal
+       data (*.dat)  } input ----> |   FeenoX   |----> output { data files
+       input (*.fee) }             |            |             { post (vtk/msh)
+                                   +------------+
 
-    Following the *rules of separation, parsimony and diversity*,
-    **there is no embedded graphical interface** but means of using
-    generic pre and post processing tools—in particular, [Gmsh][2] and
-    [Paraview][] respectively. See also [CAEplex][] for a web-based
-    interface.
+  Following the *rules of separation, parsimony and diversity*, **there
+  is no embedded graphical interface** but means of using generic pre
+  and post processing tools—in particular, [Gmsh][2] and [Paraview][]
+  respectively. See also [CAEplex][] for a web-based interface.
 
--   The input files should be [syntactically sugared][] so as to be as
-    self-describing as possible.
+- The input files should be [syntactically sugared][] so as to be as
+  self-describing as possible.
 
--   **Simple** problems ought to need **simple** input files.
+- **Simple** problems ought to need **simple** input files.
 
--   Similar problems ought to need similar input files.
+- Similar problems ought to need similar input files.
 
--   **Everything is an expression**. Whenever a number is expected, an
-    algebraic expression can be entered as well. Variables, vectors,
-    matrices and functions are supported. Here is how to replace the
-    boundary condition on the right side of the slab above with a
-    radiation condition:
+- **Everything is an expression**. Whenever a number is expected, an
+  algebraic expression can be entered as well. Variables, vectors,
+  matrices and functions are supported. Here is how to replace the
+  boundary condition on the right side of the slab above with a
+  radiation condition:
 
-    ``` feenox
-    sigma = 1       # non-dimensional stefan-boltzmann constant
-    e = 0.8         # emissivity 
-    Tinf=1          # non-dimensional reference temperature
-    BC right q=sigma*e*(Tinf^4-T(x)^4)
-    ```
+  ``` feenox
+  sigma = 1       # non-dimensional stefan-boltzmann constant
+  e = 0.8         # emissivity 
+  Tinf=1          # non-dimensional reference temperature
+  BC right q=sigma*e*(Tinf^4-T(x)^4)
+  ```
 
-    This “everything is an expression” principle directly allows the
-    application of the Method of Manufactured Solutions for code
-    verification.
+  This “everything is an expression” principle directly allows the
+  application of the Method of Manufactured Solutions for code
+  verification.
 
--   FeenoX should run natively in the cloud and be able to massively
-    scale in parallel. See the [Software Requirements Specification][]
-    and the [Software Development
-    Specification][Software Requirements Specification] for details.
+- FeenoX should run natively in the cloud and be able to massively scale
+  in parallel. See the [Software Requirements Specification][] and the
+  [Software Development
+  Specification][Software Requirements Specification] for details.
 
 Since it is free ([as in freedom][]) and open source, contributions to
 add features (and to fix bugs) are welcome. In particular, each kind of
@@ -434,25 +447,25 @@ below][] for details.
 | Source tarballs    | <https://www.seamplex.com/feenox/dist/src>     |
 | Github repository  | <https://github.com/seamplex/feenox/>          |
 
--   Be aware that FeenoX is a backend. It **does not have a GUI**. Read
-    the [documentation][4], especially the [description][] and the
-    [FAQs][5]. Ask for help on the [GitHub discussions page][].
+- Be aware that FeenoX is a backend. It **does not have a GUI**. Read
+  the [documentation][4], especially the [description][] and the
+  [FAQs][5]. Ask for help on the [GitHub discussions page][].
 
--   Binaries are provided as statically-linked executables for
-    convenience. They do not support MUMPS nor MPI and have only basic
-    optimization flags. Please compile from source for high-end
-    applications. See [detailed compilatation instructions][].
+- Binaries are provided as statically-linked executables for
+  convenience. They do not support MUMPS nor MPI and have only basic
+  optimization flags. Please compile from source for high-end
+  applications. See [detailed compilatation instructions][].
 
--   Try to avoid Windows as much as you can. The binaries are provided
-    as transitional packages for people that for some reason still use
-    such an outdated, anachronous, awful and invasive operating system.
-    They are compiled with [Cygwin][] and have no support whatsoever.
-    Really, really, **get rid of Windows ASAP**.
+- Try to avoid Windows as much as you can. The binaries are provided as
+  transitional packages for people that for some reason still use such
+  an outdated, anachronous, awful and invasive operating system. They
+  are compiled with [Cygwin][] and have no support whatsoever. Really,
+  really, **get rid of Windows ASAP**.
 
-    > “It is really worth any amount of time and effort to get away from
-    > Windows if you are doing computational science.”
-    >
-    > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
+  > “It is really worth any amount of time and effort to get away from
+  > Windows if you are doing computational science.”
+  >
+  > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
@@ -579,7 +592,7 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 
 FeenoX is licensed under the terms of the [GNU General Public
 License][7] version 3 or, at the user convenience, any later version.
-This means that users get the four essential freedoms:[3]
+This means that users get the four essential freedoms:[^3]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
 1.  The freedom to *study* how the program works, and *change* it so it
@@ -620,18 +633,19 @@ running over free and open source operating systems. In addition, the
 FeenoX documentation is licensed under the terms of the [GNU Free
 Documentation License v1.3][] (or any later version).
 
-[3]  There are some examples of pieces of computational software which
-are described as “open source” in which even the first of the four
-freedoms is denied. The most iconic case is that of Android, whose
-sources are readily available online but there is no straightforward way
-of updating one’s mobile phone firmware with a customized version, not
-to mention vendor and hardware lock ins and the possibility of bricking
-devices if something unexpected happens. In the nuclear industry, it is
-the case of a Monte Carlo particle-transport program that requests users
-to sign an agreement about the objective of its usage before allowing
-its execution. The software itself might be open source because the
-source code is provided after signing the agreement, but it is not free
-(as in freedom) at all.
+[^3]:  There are some examples of pieces of computational software which
+    are described as “open source” in which even the first of the four
+    freedoms is denied. The most iconic case is that of Android, whose
+    sources are readily available online but there is no straightforward
+    way of updating one’s mobile phone firmware with a customized
+    version, not to mention vendor and hardware lock ins and the
+    possibility of bricking devices if something unexpected happens. In
+    the nuclear industry, it is the case of a Monte Carlo
+    particle-transport program that requests users to sign an agreement
+    about the objective of its usage before allowing its execution. The
+    software itself might be open source because the source code is
+    provided after signing the agreement, but it is not free (as in
+    freedom) at all.
 
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
