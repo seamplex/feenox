@@ -26,13 +26,15 @@ If you do not currently use GNU/Linux as your main operating system and still do
  iii. use a GNU/Linux box through an virtual computer emulator (e.g. VirtualBox, VMWare, Vagrant, etc.)
 
 
-Up to this point, I assume you have access to a shell as a regular user and that you have permissions to use `sudo`. If you do not know what this means, look it up in your favorite search enginer.
+Up to this point, I assume you have access to a shell as a regular user and that you have permissions to use `sudo`.
+If you do not know what this means, look it up in your favorite search engine or ask for help.
+
 In the following sections there will be terminal mimics. Lines starting with `$` show commands that ought to be typed into the command line. The `$` itself does not have to be typed as it is part of the prompt. Lines not starting with a dollar sign show the output of the invoked command.
 
 
 # FeenoX
 
-The most important thing to be set up is FeenoX itself. Since there are still no Debian packages for FeenoX, the most straighforward way to go is to download the Linux binary tarball from https://seamplex.com/feenox/dist/linux/ and copy the executable into `/usr/local/bin` so it is globally available. To download the tarball you need `wget` and to uncompress it `tar` and `gz` (which should be already installed anyway), so do
+The most important thing to be set up is FeenoX itself. Since there are still no Debian packages for FeenoX, the most straightforward way to go is to download the Linux binary tarball from <https://seamplex.com/feenox/dist/linux/> and copy the executable into `/usr/local/bin` so it is globally available. To download the tarball you need `wget` and to un-compress it `tar` and `gz` (which should be already installed anyway), so do
 
 ```
 $ sudo apt-get install wget tar gzip
@@ -41,7 +43,7 @@ $ tar xvzf feenox-v0.2.85-g48a2b76-linux-amd64.tar.gz
 $ sudo cp feenox-v0.2.85-g48a2b76-linux-amd64/bin/feenox /usr/local/bin/
 ```
 
-You should now be able to invoke FeenoX by executing `feenox` from any directory. See the [“Invocation”] section of the [FeenoX Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) for details about how to invoke it.
+You should now be able to invoke FeenoX by executing `feenox` from any directory. See the “Invocation” section of the [FeenoX Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) for details about how to invoke it.
 Check this is the case:
 
 ```
@@ -123,7 +125,7 @@ It has a non-trivial learning curve but it is worth to learn its basics because 
 
 To enable syntax highlighting copy the file `fee.vim` into `~/.vim/syntax`.
 
-![FeenoX input file edited in Vim on Konsole](../highlighting-vim.png)
+![FeenoX input file edited in Vim on Konsole](highlighting-vim.png)
 
 
 
@@ -131,5 +133,26 @@ To enable syntax highlighting copy the file `fee.vim` into `~/.vim/syntax`.
 
 For those using a native GNU/Linux box with a graphical interface, the recommended editor is [Kate](https://kate-editor.org/).
 
-![FeenoX input file edited in Kate on Plasma](../highlighting-kate.png)
+![FeenoX input file edited in Kate on Plasma](highlighting-kate.png)
+
+
+# Post-processors
+
+FeenoX can write mesh results either in `.msh` or `.vtk` format. The former can be read and postprocessed by Gmsh. The latter can be read and postprocessed by a few different tools, but Paraview is the flagship postprocessor.
+In general any version will do, so it can be installed with
+
+```
+$ sudo apt-get install paraview
+```
+
+Also binaries and source versions can be [downloaded](https://www.paraview.org/download/).
+
+Note that both Gmsh in post-processing mode and Paraview make sense only if you have access to a graphical device.
+
+# Other UNIX tools
+
+## Awk
+
+## M4
+
 
