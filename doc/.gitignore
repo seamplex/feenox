@@ -29,11 +29,14 @@ compilation
 compilation.markdown
 feenox-manual
 feenox-manual.markdown
+feenox-manual.tex
 programming
 sds
 sds.markdown
+sds.tex
 srs
 srs.markdown
+srs.tex
 two-squares.msh
 two-squares.vtk
 two-squares-results.msh
