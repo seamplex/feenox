@@ -2088,7 +2088,7 @@ int feenox_parse_read_mesh(void) {
   // we have at least one mesh so we need to define the whole set of special vars
   feenox_call(feenox_mesh_init_special_objects());
   
-  // TODO: api?
+  // TODO: api? yes
   mesh_t *mesh = NULL;
   feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
 

@@ -48,20 +48,22 @@ int feenox_problem_init_parser_general(void) {
   // -mg_levels_pc_type and sor separately
   int petsc_argc = 0;
   char **petsc_argv = NULL;
-  feenox_check_alloc(petsc_argv = calloc(feenox.argc, sizeof(char *)));
-  petsc_argv[0] = feenox.argv_orig[0];
-  for (int i = 0; i < feenox.argc; i++) {
-    if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
-      feenox_check_alloc(petsc_argv[++petsc_argc] = strdup(feenox.argv_orig[i]+1));
-      char *value = NULL;
-      if ((value = strchr(petsc_argv[petsc_argc], '=')) != NULL) {
-        *value = '\0';
-        petsc_argv[++petsc_argc] = strdup(value+1);
+  if (feenox.argc != 0) {  // in benchmark argc might be zero
+    feenox_check_alloc(petsc_argv = calloc(feenox.argc, sizeof(char *)));
+    petsc_argv[0] = feenox.argv_orig[0];
+    for (int i = 0; i < feenox.argc; i++) {
+      if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
+        feenox_check_alloc(petsc_argv[++petsc_argc] = strdup(feenox.argv_orig[i]+1));
+        char *value = NULL;
+        if ((value = strchr(petsc_argv[petsc_argc], '=')) != NULL) {
+          *value = '\0';
+          petsc_argv[++petsc_argc] = strdup(value+1);
+        }
       }
     }
+    // this one takes into account argv[0]
+    petsc_argc++;
   }
-  // this one takes into account argv[0]
-  petsc_argc++;
   
   PetscInt major = 0;
   PetscInt minor = 0;
