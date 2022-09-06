@@ -1,7 +1,9 @@
 ---
 title: Tensile test
 subtitle: FeenoX Tutorial \#1
-titleblock: FeenoX Tutorial \#1: Tensile test
+titleblock: |
+ FeenoX Tutorial \#1: Tensile test
+ =================================
 lang: en-US
 number-sections: true
 toc: true
