@@ -1,7 +1,13 @@
 ---
 title: Tensile test
 subtitle: FeenoX Tutorial \#1
+titleblock: FeenoX Tutorial \#1: Tensile test
+lang: en-US
+number-sections: true
+toc: true
 ...
+
+# Foreword
 
 Welcome to FeenoX’ tutorial number one!
 This first case...
@@ -12,6 +18,14 @@ This first case...
 
 > _Heads up_: this tutorial, being the first is also detailed and long. Those impatient readers might want to check directly some of the [annotated examples](https://seamplex.com/feenox/examples/) in [FeenoX webpage](https://seamplex.com/feenox/).
  
+For the nearly impatient, here is a summary of what we are going to achieve by the end of the tutorial:
+
+**Terminal mimic**
+
+**Paraview picture**
+
+
+
 
 # Unix philosophy {#sec:unix}
 
@@ -306,7 +320,7 @@ This is not true for most of the other FEA tools available today, particularly t
 Given that the problem is relatively simple, following the rule of [simplicity](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877917),
 the input file [`tensile-test.fee`](tensile-test.fee) ought to be also simple. Other cases with more complexity might lead to more complex input files.
 
-```{.fino style=fino}
+```feenox
 # tensile test example for FeenoX, see https://caeplex.com/p/41dd1
 MESH FILE_PATH tensile-test.msh  # mesh file in Gmsh format (either version 2.2 or 4.x)
 

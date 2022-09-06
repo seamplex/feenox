@@ -6,8 +6,9 @@ else
   stuff=$1
 fi
 
+
 # check for needed tools
-for i in grep cut locale sed date wc; do
+for i in grep cut locale sed date wc pandoc xelatex pandoc-crossref; do
  if [ -z "$(which $i)" ]; then
   echo "error: $i not installed"
   exit 1
@@ -100,7 +101,7 @@ date: ${date}
 EOF
 
 dir=""
-for i in . .. doc; do
+for i in . .. doc ../..; do
   if [ -e ${i}/code-style.lua ]; then
     dir=${i}
   fi
@@ -127,7 +128,7 @@ fi
 
 
 pandoc ${dir}/hash.yaml ${dir}/${pdfyaml}.yaml ${stuff}.md \
-  --standalone --toc \
+  --standalone ${toc} \
   --lua-filter=${dir}/include-files.lua \
   --lua-filter=${dir}/include-code-files.lua \
   --lua-filter=${dir}/not-in-format.lua \

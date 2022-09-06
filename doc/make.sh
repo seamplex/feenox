@@ -16,37 +16,13 @@ fi
 # main README
 echo "creating main README for Github"
 cd ..
- # TODO: function to call pandoc
- pandoc README.md -f markdown+emoji -t gfm   -o README.markdown  \
-   --standalone --toc --number-sections \
-   --reference-links --reference-location=section \
-   --lua-filter=doc/include-files.lua \
-   --lua-filter=doc/include-code-files.lua \
-   --lua-filter=doc/not-in-format.lua \
-   --lua-filter=doc/only-in-format.lua \
-   --lua-filter=doc/img-width.lua
-   
- pandoc README.md  -f markdown+emoji  -t plain -o README \
-   --standalone --toc --number-sections \
-   --reference-links --reference-location=section \
-   --lua-filter=doc/include-files.lua \
-   --lua-filter=doc/include-code-files.lua \
-   --lua-filter=doc/not-in-format.lua \
-   --lua-filter=doc/only-in-format.lua \
-   --lua-filter=doc/img-width.lua
-   
-  pandoc TODO.md    -t plain -o TODO
+doc/pdf.sh
+doc/markdown.sh README
+doc/markdown.sh TODO
 cd doc
 
 echo "creating doc's README"
-pandoc README.md  -t gfm   -o README.markdown \
-  --standalone --toc --reference-links --reference-location=section \
-  --lua-filter=include-files.lua \
-  --lua-filter=include-code-files.lua \
-  --lua-filter=not-in-format.lua \
-  --lua-filter=only-in-format.lua \
-  --lua-filter=img-width.lua
-
+./markdown.sh README
 
 
 echo "creating the reference markdown from the commented sources"
@@ -105,29 +81,14 @@ pandoc -s double-click.md -t plain -o double-click.txt --lua-filter=include-file
 
 
 
+echo "PDF + Markdown"
 for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
- echo $i
- ./pdf.sh $i
- 
-  pandoc ${i}.md  -t gfm   -o ${i}.markdown  \
-   --standalone --toc --number-sections \
-   --reference-links --reference-location=section \
-   --lua-filter=include-files.lua \
-   --lua-filter=include-code-files.lua \
-   --lua-filter=not-in-format.lua \
-   --lua-filter=only-in-format.lua \
-   --lua-filter=img-width.lua
-   
- pandoc ${i}.md  -t plain -o ${i} \
-   --standalone --toc --number-sections \
-   --reference-links --reference-location=section \
-   --lua-filter=include-files.lua \
-   --lua-filter=include-code-files.lua \
-   --lua-filter=not-in-format.lua \
-   --lua-filter=only-in-format.lua \
-   --lua-filter=img-width.lua
+ echo ${i}
+ ./pdf.sh ${i}
+ ./markdown.sh ${i}
 done
 
+echo "PDF only"
 for i in sds feenox-manual; do
  echo ${i}
  ./pdf.sh ${i}
@@ -136,7 +97,7 @@ done
 
 
 
-echo "feenox-desc"
+echo "feenox-desc as Texi"
 pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
   --standalone --toc \
   --lua-filter=include-files.lua \

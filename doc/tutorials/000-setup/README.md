@@ -1,9 +1,16 @@
 ---
 title: Setting up your workspace
-subtitle: FeenoX Tutorial #0
+subtitle: FeenoX Tutorial \#0
+titleblock: FeenoX Tutorial \#0: Setting up your workspace
+lang: en-US
+number-sections: true
+toc: true
 ...
 
-Once again, [FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on GNU/Linux platforms. Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach, although this is discouraged because those two operating systems are
+
+# Foreword
+
+[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on GNU/Linux platforms. Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach, although this is discouraged because those two operating systems are
 
  1. not cloud-friendly, let alone cloud-first; and
  2. neither free-as-in-free-beer nor open source.
@@ -36,7 +43,7 @@ In the following sections there will be terminal mimics. Lines starting with `$`
 
 The most important thing to be set up is FeenoX itself. Since there are still no Debian packages for FeenoX, the most straightforward way to go is to download the Linux binary tarball from <https://seamplex.com/feenox/dist/linux/> and copy the executable into `/usr/local/bin` so it is globally available. To download the tarball you need `wget` and to un-compress it `tar` and `gz` (which should be already installed anyway), so do
 
-```
+```terminal
 $ sudo apt-get install wget tar gzip
 $ wget https://seamplex.com/feenox/dist/linux/feenox-v0.2.85-g48a2b76-linux-amd64.tar.gz
 $ tar xvzf feenox-v0.2.85-g48a2b76-linux-amd64.tar.gz
@@ -46,7 +53,7 @@ $ sudo cp feenox-v0.2.85-g48a2b76-linux-amd64/bin/feenox /usr/local/bin/
 You should now be able to invoke FeenoX by executing `feenox` from any directory. See the “Invocation” section of the [FeenoX Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) for details about how to invoke it.
 Check this is the case:
 
-```
+```terminal
 $ feenox
 FeenoX v0.2.114-g45b8799-dirty 
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
@@ -70,19 +77,35 @@ If you get an error, plase ask for help in the [Github discussion page](https://
 If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, read the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html).
 
 
+## Executing an example
+
+Find the `examples` directory and go into it.
+If you downloaded the binary tarball, it will be in `share/doc/examples`.
+If you downloaded the source tarball or cloned the repository, it will directly `examples`.
+
+```terminal
+cd share/doc/examples
+feenox 
+```
+
+
+
+## Executing a test
+
+
 # Gmsh
 
 To solve problems involving partial differential equations (i.e. elasticity, heat conduction, etc.) FeenoX needs a mesh in [Gmsh's MSH format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format). Any mesher whose output format can be converted to `.msh` should work, altough of course the most natural way to create these meshes is to use [Gmsh](http://gmsh.info/) itself.
 
 The easiest way to go is to install Gmsh from the `apt` repository:
 
-```
+```terminal
 $ sudo apt-get install gmsh
 ```
 
 Check `gmsh` is globally available by calling it with `-info`:
 
-```
+```terminal
 $ gmsh -info
 Version       : 4.10.5
 License       : GNU General Public License
@@ -102,7 +125,7 @@ $
 
 It should be noted that depending on the version of the base opearating system, the Gmsh version in the `apt` repository might be old enough so as to fail with the examples provided in the tutorials, that are based on recent Gmsh versions. If this is the case, as with FeenoX above, you can always [download newer Gmsh binaries](http://gmsh.info/#Download):
 
-```
+```terminal
 $ wget http://gmsh.info/bin/Linux/gmsh-4.10.5-Linux64.tgz
 $ tar gmsh-4.10.5-Linux64.tgz
 $ sudo cp gmsh-4.10.5-Linux64/bin/gmsh /usr/local/bin
@@ -141,7 +164,7 @@ For those using a native GNU/Linux box with a graphical interface, the recommend
 FeenoX can write mesh results either in `.msh` or `.vtk` format. The former can be read and postprocessed by Gmsh. The latter can be read and postprocessed by a few different tools, but Paraview is the flagship postprocessor.
 In general any version will do, so it can be installed with
 
-```
+```terminal
 $ sudo apt-get install paraview
 ```
 
