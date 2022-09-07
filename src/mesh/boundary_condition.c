@@ -39,6 +39,7 @@ int feenox_define_bc(const char *bc_name, const char *mesh_name) {
     }  
   } else {
     if ((mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+      feenox_push_error_message("cannot find mesh '%s'");
       return FEENOX_ERROR;
     }  
   }      
