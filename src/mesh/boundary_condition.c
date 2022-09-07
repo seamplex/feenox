@@ -33,12 +33,12 @@ int feenox_define_bc(const char *bc_name, const char *mesh_name) {
   
   mesh_t *mesh = NULL;
   if (mesh_name == NULL || strcmp(mesh_name, "") == 0) {
-    if ((mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
+    if ((mesh = feenox.mesh.mesh_main) == NULL) {
+      feenox_push_error_message("define at least one mesh before a BC");
       return FEENOX_ERROR;
     }  
   } else {
-    if (feenox.mesh.mesh_main == NULL) {
-      feenox_push_error_message("define at least one mesh before a BC");
+    if ((mesh = feenox_get_mesh_ptr(mesh_name)) == NULL) {
       return FEENOX_ERROR;
     }  
   }      
