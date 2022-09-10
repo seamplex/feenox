@@ -388,6 +388,9 @@ $
 
 # How to solve a maze without AI
 
+> See this LinkedIn post to see some comments and discussions:
+> <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+
 Say you are Homer Simpson and you want to solve a maze drawn in a
 restaurant's placemat, one where both the start and end are known
 beforehand. In order to avoid falling into the alligator's mouth, you
@@ -428,7 +431,112 @@ $
 
 ![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png){width_html=100% width_latex=50%}
 
-See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+
+
+## Transient top-down
+
+Instead of solving a steady-state en exploiting the ellipticity of
+Laplace's operator, let us see what happens if we solve a transient
+instead.
+
+
+```feenox
+PROBLEM laplace 2D
+READ_MESH maze.msh
+
+phi_0(x,y) = 0              # inital condition
+end_time = 100              # some end time where we know we reached the steady-state
+alpha = 1e-6                # factor of the time derivative to make it advance faster
+BC start   phi=if(t<1,t,1)  # a ramp from zero to avoid discontinuities with the initial condition
+BC end     phi=0            # homogeneous BC at the end (so we move from top to bottom)
+
+SOLVE_PROBLEM
+PRINT t
+
+WRITE_MESH maze-tran-td.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+```
+
+
+```terminal
+$ feenox maze-tran-td.fee
+0
+0.00433078
+0.00949491
+0.0170774
+0.0268599
+[...]
+55.8631
+64.0819
+74.5784
+87.2892
+100
+$ gmsh maze-tran-td-anim.geo
+# all frames dumped, now run
+ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.mp4
+ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.gif
+$ ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.mp4
+[...]
+$ ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.gif
+[...]
+
+```
+
+
+![Transient top-bottom solution to the maze found by FeenoX (and drawn by Gmsh)](maze-tran-td.gif){width_html=100% width_latex=50%}
+
+
+
+## Transient bottom-up
+
+Now let us see what happens if we travel the maze from the exit up to
+the inlet. It looks like the solver tries a few different paths that
+lead nowhere until the actual solution is found.
+
+
+```feenox
+PROBLEM laplace 2D
+READ_MESH maze.msh
+
+phi_0(x,y) = 0
+end_time = 100
+alpha = 1e-6
+BC end     phi=if(t<1,t,1)
+BC start   phi=0 
+
+SOLVE_PROBLEM
+PRINT t
+
+WRITE_MESH maze-tran-bu.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+```
+
+
+```terminal
+$ feenox maze-tran-bu.fee
+0
+0.00402961
+0.00954806
+0.0180156
+0.0285787
+[...]
+65.3715
+72.6894
+81.8234
+90.9117
+100
+$ gmsh maze-tran-bu-anim.geo
+# all frames dumped, now run
+ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.mp4
+ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
+$ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.mp4
+[...]
+$ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
+[...]
+
+```
+
+
+![Transient bottom-up solution. The first attempt does not seem to be good.](maze-tran-bu.gif){width_html=100% width_latex=50%}
+
 
 
 # The Fibonacci sequence
@@ -1102,7 +1210,32 @@ $
 
 # Parallelepiped whose Young's modulus is a function of the temperature
 
-The thermo-mechanical problem is solved in two stages. First, the heat
+The problem consists of finding the non-dimensional temperature $T$ and
+displacements $u$, $v$ and $w$ distributions within a solid
+parallelepiped of length $l$ whose base is a square of $h\times h$. The
+solid is subject to heat fluxes and to a traction pressure at the same
+time. The non-dimensional Young's modulus $E$ of the material depends on
+the temperature $T$ in a know algebraically way, whilst both the Poisson
+coefficient $\nu$ and the thermal conductivity $k$ are uniform and do
+not depend on the spatial coordinates:
+
+$$
+\begin{aligned}
+E(T) &= \frac{1000}{800-T} \\
+\nu &= 0.3 \\
+k &= 1 \\
+\end{aligned}
+$$
+
+![Original figure from
+[v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
+
+References:
+
+-   <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
+-   <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
+
+This thermo-mechanical problem is solved in two stages. First, the heat
 conduction equation is solved over a coarse first-order mesh to find the
 non-dimensional temperature distribution. Then, a mechanical problem is
 solved where $T(x,y,z)$ is read from the first mesh and interpolated
@@ -1115,11 +1248,6 @@ Note that there are not thermal expansion effects (i.e. the thermal
 expansion coefficient is $\alpha=0$). Yet, suprinsingly enough, the
 problem has analytical solutions for both the temperature and the
 displacement fields.
-
-References:
-
--   <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
--   <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
 
 ## Thermal problem
 

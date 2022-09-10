@@ -24,7 +24,7 @@ export PETSC_DIR=$(pwd)/petsc-${petsc_ver}
 export SLEPC_DIR=$(pwd)/slepc-${slepc_ver}
 cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
-              --enable-download-gsl CFLAGS="-Ofast -flto -DLD_STATIC" LDFLAGS="-flto=auto -static" || exit 1
+              --enable-download-gsl CFLAGS="-O3 -flto -DLD_STATIC" LDFLAGS="-flto=auto -static" || exit 1
 
   if [ "x${target}" = "xlinux-amd64" ]; then
     cd doc
@@ -57,6 +57,7 @@ cd ${package}-${version}-${target} || exit 1
     cp ../${package}/README    share/doc || exit 1
     cp ../${package}/TODO      share/doc || exit 1
 
+    cp ../${package}/README.pdf                  share/doc || exit 1
     cp ../${package}/doc/${package}-manual.pdf   share/doc || exit 1
     cp ../${package}/doc/${package}-desc.pdf     share/doc || exit 1
     cp ../${package}/doc/${package}-desc.info    share/doc || exit 1

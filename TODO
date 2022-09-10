@@ -1,3 +1,39 @@
+-   1 General things to do
+    -   1.1 Tests
+    -   1.2 Optimizations
+    -   1.3 Wasora keywords
+    -   1.4 Wasora-like stuff
+    -   1.5 API
+    -   1.6 Nice to have
+    -   1.7 Command-line arguments
+    -   1.8 Error handling
+    -   1.9 Postprocessing output
+-   2 PDEs
+    -   2.1 Laplace/Poisson/Helmholtz
+    -   2.2 Heat
+    -   2.3 Mechanical
+    -   2.4 Modal
+    -   2.5 Neutron
+    -   2.6 V & V
+
+  [1 General things to do]: #general-things-to-do
+  [1.1 Tests]: #tests
+  [1.2 Optimizations]: #optimizations
+  [1.3 Wasora keywords]: #wasora-keywords
+  [1.4 Wasora-like stuff]: #wasora-like-stuff
+  [1.5 API]: #api
+  [1.6 Nice to have]: #nice-to-have
+  [1.7 Command-line arguments]: #command-line-arguments
+  [1.8 Error handling]: #error-handling
+  [1.9 Postprocessing output]: #postprocessing-output
+  [2 PDEs]: #pdes
+  [2.1 Laplace/Poisson/Helmholtz]: #laplacepoissonhelmholtz
+  [2.2 Heat]: #heat
+  [2.3 Mechanical]: #mechanical
+  [2.4 Modal]: #modal
+  [2.5 Neutron]: #neutron
+  [2.6 V & V]: #v-v
+
 General things to do
 
 -   implicit call to SOLVE_PROBLEM?

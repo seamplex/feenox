@@ -5,8 +5,12 @@ cosas
 test.fee
 lorenz.dat
 lorenz.html
-maze.msh
+maze*.msh
 maze-solved.msh
+maze-tran*.msh
+maze-*.png
+maze*.gif
+maze*.mp4
 *-post.sh
 add
 nafems-le10.msh
@@ -22,7 +26,6 @@ iaea-2dpwr*.msh
 cubesphere*.msh
 temp-cylinder*.png
 *.mp4
-parallelepiped*.msh
 parallelepiped*.vtk
 cylinder.msh
 temp-cylinder.msh
@@ -37,3 +40,5 @@ veeder.vtk
 veeder_v.dat
 veeder_w.dat
 thermal-square-temperature.msh
+square-centered-unstruct.msh
+square-centered.msh

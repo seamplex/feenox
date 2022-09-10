@@ -31,7 +31,7 @@ export PETSC_ARCH=${PETSC_ARCH}
             --with-debugging=0 \
             --with-shared-libraries=0 \
             --download-f2cblaslapack \
-            --COPTFLAGS="-Ofast"
+            --COPTFLAGS="-O3"
 
 # export PETSC_ARCH=arch-linux2-serial-mumps-static
 # ./configure --with-mpi=0 --with-cxx=0 --with-fortran-bindings=0 --with-fc=0 --with-c2html=0 --with-x=0 --with-debugging=0 --with-shared-libraries=0 --with-mumps-serial=1 --download-mumps --download-openblas --COPTFLAGS="-Ofast" --FOPTFLAGS="-Ofast"

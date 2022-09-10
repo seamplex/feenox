@@ -10,6 +10,8 @@ for i in hello          \
          nafems-le11    \
          nafems-le1     \
          maze           \
+         maze-tran-td   \
+         maze-tran-bu   \
          fibo_formula   \
          fibo_vector    \
          fibo_iterative \

@@ -21,6 +21,8 @@ ChangeLog
 
 # doc
 README.pdf
+TODO.markdown
+hash.yaml
 
 # binaries, tarballs and libraries
 feenox-v*

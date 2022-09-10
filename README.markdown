@@ -24,6 +24,8 @@ To better illustrate FeenoX’ unfair advantage (in the entrepreneurial
 sense), let us first consider what the options are when an engineer
 needs to to write a technical report, paper or document:
 
+<div class="not-in-format latex">
+
 | Feature                           | Microsoft Word | Google Docs | Markdown[^1] | (La)TeX |
 |:----------------------------------|:--------------:|:-----------:|:------------:|:-------:|
 | Aesthetics                        |       ❌       |     ❌      |      ✅      |   ✅    |
@@ -34,11 +36,15 @@ needs to to write a technical report, paper or document:
 | Licensing/openness                |       ❌       |     ❌      |      ✅      |   ✅    |
 | Non-nerd friendliness             |       ✅       |     ✅      |      😐      |   ❌    |
 
+</div>
+
 After analyzing the pros and cons of each alternative, at some point it
 should be evident that [Markdown][] (plus friends) gives the best trade
 off. We can then perform a similar analysis for the options available in
 order to solve an engineering problem casted as a partial differential
 equation, say by using a finite-element formulation:
+
+<div class="not-in-format latex">
 
 | Feature               | Desktop GUIs | Web frontends | FeenoX[^2] | Libraries |
 |:----------------------|:------------:|:-------------:|:----------:|:---------:|
@@ -49,6 +55,8 @@ equation, say by using a finite-element formulation:
 | Collaborativeness     |      ❌      |      ✅       |     ✅     |    ❌     |
 | Licensing/openness    |   ✅/😐/❌   |      ❌       |     ✅     |    ✅     |
 | Non-nerd friendliness |      ✅      |      ✅       |     😐     |    ❌     |
+
+</div>
 
 Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
 programs (like [Code_Aster][] with [Salome-Meca][] or [CalculiX][] with
@@ -82,7 +90,7 @@ If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
   [PrePoMax]: https://prepomax.fs.um.si/
   [MoFEM]: http://mofem.eng.gla.ac.uk/mofem/html/
   [Sparselizard]: http://sparselizard.org/
-  [1]:
+  [1]: https://commonmark.org/
   [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html

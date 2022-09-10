@@ -16,7 +16,7 @@ fi
 # main README
 echo "creating main README for Github"
 cd ..
-doc/pdf.sh
+doc/pdf.sh README
 doc/markdown.sh README
 doc/markdown.sh TODO
 cd doc

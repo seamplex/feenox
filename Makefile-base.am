@@ -46,6 +46,8 @@ TESTS = \
         tests/petsc_options.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
+        tests/reactions.sh \
+        tests/reactions-elastic.sh \
         tests/solve.sh \
         tests/spinning-disk.sh \
         tests/statically_indeterminate_reaction.sh \

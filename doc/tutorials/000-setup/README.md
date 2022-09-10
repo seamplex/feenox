@@ -1,7 +1,9 @@
 ---
 title: Setting up your workspace
 subtitle: FeenoX Tutorial \#0
-titleblock: FeenoX Tutorial \#0: Setting up your workspace
+titleblock: |
+ FeenoX Tutorial #0: Setting up your workspace
+ ==============================================
 lang: en-US
 number-sections: true
 toc: true
@@ -10,14 +12,14 @@ toc: true
 
 # Foreword
 
-[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on GNU/Linux platforms. Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach, although this is discouraged because those two operating systems are
+[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on [GNU/Linux](https://en.wikipedia.org/wiki/Linux) platforms. Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach, although this is discouraged because those two operating systems are
 
  1. not cloud-friendly, let alone cloud-first; and
  2. neither free-as-in-free-beer nor open source.
  
 In order to take the tutorials that follow, it is then recommended to stick to GNU/Linux as explained below.
 
-The best way to learn and to understand how FeenoX works is to use a native GNU/Linux distribution as the main operating system, either in a laptop or a desktop PC. This sentence from PETSc's Matt Kneppley from 2015 speaks for itself:
+The best way to learn and to understand how FeenoX works is to use a native GNU/Linux distribution as the main operating system, either in a laptop or a desktop\ PC. This sentence from PETSc's Matt Kneppley from 2015 speaks for itself:
 
 > “It is really worth any amount of time and effort to get away from Windows if you are doing computational science.”
 >
@@ -25,18 +27,22 @@ The best way to learn and to understand how FeenoX works is to use a native GNU/
 
 
 
-If you already use GNU/Linux any distribution will do, although FeenoX is developed in Debian so `apt` (or `apt-get`) will be used as the package manager.
-If you do not currently use GNU/Linux as your main operating system and still do not want to spend any time nor effort on doing things right, you can either
+ a. If you already use GNU/Linux then you are almost set! Any distribution will do, although FeenoX is developed in Debian so `apt-get` (or `apt`) will be used as the package manager. Note that the names of the packages being installed as dependencies may vary from distribution to distribution.
 
- i. fire up a virtual GNU/Linux server in a cloud provider (e.g. AWS, Azure, DigitalOcean, Contabo, etc.) and connect through SSH
- ii. use a containerized GNU/Linux (e.g. with `docker`)
- iii. use a GNU/Linux box through an virtual computer emulator (e.g. VirtualBox, VMWare, Vagrant, etc.)
+ b. If you do not currently use GNU/Linux as your main operating system and still do not want to spend any time nor effort on doing things right, you can either
+
+    i. fire up a virtual GNU/Linux server in a cloud provider (e.g. AWS, Azure, DigitalOcean, Contabo, etc.) and connect through SSH
+    ii. use a containerized GNU/Linux (e.g. with `docker`)
+    iii. use a GNU/Linux box through an virtual computer emulator (e.g. VirtualBox, VMWare, Vagrant, etc.)
 
 
 Up to this point, I assume you have access to a shell as a regular user and that you have permissions to use `sudo`.
-If you do not know what this means, look it up in your favorite search engine or ask for help.
+If you do not know what this means, look it up in your favorite search engine or ask for help. Spend some time (which will be really worth it) familiarizing with working with the terminal, issuing commands, etc.
 
-In the following sections there will be terminal mimics. Lines starting with `$` show commands that ought to be typed into the command line. The `$` itself does not have to be typed as it is part of the prompt. Lines not starting with a dollar sign show the output of the invoked command.
+In the following sections there will be terminal mimics.
+Lines starting with `$` show commands that ought to be typed into the command line.
+The `$` itself does not have to be typed as it is part of the prompt.
+Lines not starting with a dollar sign show the output of the invoked command.
 
 
 # FeenoX
@@ -50,12 +56,14 @@ $ tar xvzf feenox-v0.2.85-g48a2b76-linux-amd64.tar.gz
 $ sudo cp feenox-v0.2.85-g48a2b76-linux-amd64/bin/feenox /usr/local/bin/
 ```
 
+If you do not have root access, read the complete [download](https://www.seamplex.com/feenox/download.html) or [compilation](https://www.seamplex.com/feenox/doc/compilation.html) instructions. Search for "root" and read along.
+
 You should now be able to invoke FeenoX by executing `feenox` from any directory. See the “Invocation” section of the [FeenoX Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) for details about how to invoke it.
 Check this is the case:
 
 ```terminal
 $ feenox
-FeenoX v0.2.114-g45b8799-dirty 
+FeenoX v0.2.114-g45b8799
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
@@ -69,28 +77,61 @@ Run with --help for further explanations.
 $
 ```
 
-If you get an error, plase ask for help in the [Github discussion page](https://github.com/seamplex/feenox/discussions).
+If you get stuck or get an error, plase ask for help in the [Github discussion page](https://github.com/seamplex/feenox/discussions).
 
 
 ## Compiling from source
 
-If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, read the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html).
+If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, follow the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html). Again, do not hesitate to ask in the [Github discussion page](https://github.com/seamplex/feenox/discussions). 
 
 
 ## Executing an example
 
-Find the `examples` directory and go into it.
-If you downloaded the binary tarball, it will be in `share/doc/examples`.
-If you downloaded the source tarball or cloned the repository, it will directly `examples`.
+The FeenoX examples are a set of annotated input files that can be found online at <https://www.seamplex.com/feenox/examples/>.
+These examples range from a simple “Hello World” down to thermo-mechanical problems.
+
+Let us run one of them to check FeenoX works.
+Find the [`examples`](https://github.com/seamplex/feenox/tree/main/examples) directory and `cd` into it.
+If you have a binary version, it will be in `share/doc/examples`.
+If you have the source tarball or cloned the repository, it will be directly `examples`.
+
+So far the only example that already comes with a mesh (so Gmsh is not needed to run it) is the [“Parallelepiped...”](https://www.seamplex.com/feenox/examples/#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature) one:
 
 ```terminal
-cd share/doc/examples
-feenox 
+$ cd examples
+$ feenox parallelepiped-thermal.fee 
+2.43384e-10
+$ feenox parallelepiped-mechanical.fee
+9.5239e-05
+$ 
 ```
+
+The smaller the numbers, the better the convergence with respect to the analytical solution.
+After installing Gmsh below, we will refine the meshes and check these numbers decrease.
 
 
 
 ## Executing a test
+
+By design, FeenoX has to have a set of tests such that if a regression is introduced in the code (say someone flips a sign by mistake), the bug can be quickly detected and eventually fixed. The tests are run with `make check` when compiling the source, as explained in the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html).
+
+Alternatively, go to the `tests` directory, pick any of the shell scripts ending in `.sh` and run them:
+
+```terminal
+$ cd tests
+$ ./nafems-le1.sh
+nafems-le1.fee 1 ... ok
+nafems-le1.fee 2 ... ok
+nafems-le1.fee 3 ... ok
+nafems-le1.fee 4 ... ok
+nafems-le1.fee 5 ... ok
+nafems-le1.fee 6 ... ok
+nafems-le1.fee 7 ... ok
+nafems-le1.fee 8 ... ok
+$
+```
+
+If any of the lines does not say `ok` but something else, then the code contains at least one error.
 
 
 # Gmsh

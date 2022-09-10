@@ -8,11 +8,11 @@
 #. are uniform and do not depend on the spatial coordinates:
 #.
 #. $$
-#. \begin{align*}
+#. \begin{aligned}
 #. E(T) &= \frac{1000}{800-T} \\
 #. \nu &= 0.3 \\
 #. k &= 1 \\
-#. \end{align*}
+#. \end{aligned}
 #. $$
 #.
 #. ![Original figure from [v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}

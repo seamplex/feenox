@@ -1,0 +1,1 @@
+../doc/square-centered.geo

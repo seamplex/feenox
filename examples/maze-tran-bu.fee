@@ -1,0 +1,42 @@
+#. ## Transient bottom-up
+#.
+#. Now let us see what happens if we travel the maze from the exit up to the inlet.
+#. It looks like the solver tries a few different paths that lead nowhere until the actual solution is found.
+#.
+#$ $ feenox maze-tran-bu.fee
+#$ 0
+#$ 0.00402961
+#$ 0.00954806
+#$ 0.0180156
+#$ 0.0285787
+#$ [...]
+#$ 65.3715
+#$ 72.6894
+#$ 81.8234
+#$ 90.9117
+#$ 100
+#$ $ gmsh maze-tran-bu-anim.geo
+#$ # all frames dumped, now run
+#$ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.mp4
+#$ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
+#$ $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.mp4
+#$ [...]
+#$ $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
+#$ [...]
+#$ 
+PROBLEM laplace 2D
+READ_MESH maze.msh
+
+phi_0(x,y) = 0
+end_time = 100
+alpha = 1e-6
+BC end     phi=if(t<1,t,1)
+BC start   phi=0 
+
+SOLVE_PROBLEM
+PRINT t
+
+WRITE_MESH maze-tran-bu.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+#> ![Transient bottom-up solution. The first attempt does not seem to be good.](maze-tran-bu.gif){width_html=100% width_latex=50%}
+#>
+#>

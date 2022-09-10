@@ -1555,12 +1555,13 @@ The non-dimensional Young’s modulus\ $E$ of the material depends on the temper
 in a know algebraically way, whilst both the Poisson coefficient\ $\nu$ and the thermal conductivity\ $k$
 are uniform and do not depend on the spatial coordinates:
 
-\begin{align}
+$$
+\begin{aligned}
 E(T) &= \frac{1000}{800-T} \\
 \nu &= 0.3 \\
 k &= 1
-\end{align}
-
+\end{aligned}
+$$
 
 ![Parallelepiped whose Young’s modulus is a function of the temperature. Original figure from [v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
 
@@ -1582,13 +1583,15 @@ The mechanical boundary conditions are
  * Surfaces\ $x=0$ and\ $x=\ell$ are subject to an uniform normal traction equal to one
 
 The analytical solution is
- 
-\begin{align}
+
+$$
+\begin{aligned}
 T(x,y,z) &= -2x -3y -4z + 40 \\
 u(x,y,z) &= \frac{A}{2} \cdot\left[x^2 + \nu\cdot\left(y^2+z^2\right)\right] + B\cdot xy + C\cdot xz + D\cdot x - \nu\cdot \frac{Ah}{4} \cdot \left(y+z\right) \\
 v(x,y,z) &= -\nu\cdot \left[A\cdot x y + \frac{B}{2} \cdot \left(y^2-z^2+\frac{x^2}{\nu}\right) + C\cdot y z + D\cdot y -A\cdot h/4\cdot x - C\cdot h/4\cdot z\right] \\
 w(x,y,z) &= -\nu\cdot \left[A\cdot x z + B\cdot yz + C/2\cdot \left(z^2-y^2+\frac{x^2}{\nu}\right) + D\cdot z + \frac{Ch}{4} \cdot y - \frac{Ah}{4} \cdot x\right] \\
-\end{align}
+\end{aligned}
+$$
 
 where~$A=0.002$, $B=0.003$, $C=0.004$ and~$D=0.76$.
 The reference results are the temperature at points O and D and the displacements at points A and D (@tab:parallelepiped} (table~\ref{tab:reference}).

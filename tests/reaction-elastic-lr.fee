@@ -1,4 +1,4 @@
-PROBLEM elastic 3D
+PROBLEM mechanical 3D
 READ_MESH cube-hex.msh
 
 E = 1
@@ -15,9 +15,9 @@ REACTION top    RESULT top
 REACTION front  RESULT front
 REACTION back   RESULT back
 
-PRINT left
-PRINT right
-PRINT bottom
-PRINT top
-PRINT front
-PRINT back
+PRINT %.4f left
+PRINT %.4f right
+PRINT %.4f bottom
+PRINT %.4f top
+PRINT %.4f front
+PRINT %.4f back

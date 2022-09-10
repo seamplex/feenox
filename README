@@ -25,23 +25,23 @@ sense), let us first consider what the options are when an engineer
 needs to to write a technical report, paper or document:
 
   -----------------------------------------------------------------------------
-  Feature                 Microsoft   Google Docs   Markdown[1]     (La)TeX
-                            Word                                 
-  --------------------- ------------- ------------ ------------- --------------
-  Aesthetics                 ❌            ❌           ✅             ✅
+  Feature                      Microsoft    Google    Markdown[1]    (La)TeX
+                                 Word        Docs                  
+  --------------------------- ----------- ---------- ------------- ------------
+  Aesthetics                      ❌          ❌          ✅            ✅
 
-  Convertibility (to         😐            😐           ✅             😐
-  other formats)                                                 
+  Convertibility (to other        😐          😐          ✅            😐
+  formats)                                                         
 
-  Traceability               ❌            😐           ✅             ✅
+  Traceability                    ❌          😐          ✅            ✅
 
-  Mobile-friendliness        ❌            ✅           ✅             ❌
+  Mobile-friendliness             ❌          ✅          ✅            ❌
 
-  Collaborativeness          ❌            ✅           ✅             😐
+  Collaborativeness               ❌          ✅          ✅            😐
 
-  Licensing/openness         ❌            ❌           ✅             ✅
+  Licensing/openness              ❌          ❌          ✅            ✅
 
-  Non-nerd friendliness      ✅            ✅           😐             ❌
+  Non-nerd friendliness           ✅          ✅          😐            ❌
   -----------------------------------------------------------------------------
 
 After analyzing the pros and cons of each alternative, at some point it
@@ -50,24 +50,24 @@ We can then perform a similar analysis for the options available in
 order to solve an engineering problem casted as a partial differential
 equation, say by using a finite-element formulation:
 
-  --------------------------------------------------------------------------
-  Feature              Desktop GUIs  Web frontends   FeenoX[2]   Libraries
-  -------------------- ------------ --------------- ----------- ------------
-  Flexibility               😐            ❌            ✅           ✅
+  ----------------------------------------------------------------------------
+  Feature                       Desktop       Web      FeenoX[2]   Libraries
+                                 GUIs      frontends              
+  --------------------------- ----------- ----------- ----------- ------------
+  Flexibility                     😐          ❌          ✅           ✅
 
-  Scalability               ❌            😐            ✅           ✅
+  Scalability                     ❌          😐          ✅           ✅
 
-  Traceability              ❌            😐            ✅           ✅
+  Traceability                    ❌          😐          ✅           ✅
 
-  Cloud-friendliness        ❌            ✅            ✅           ✅
+  Cloud-friendliness              ❌          ✅          ✅           ✅
 
-  Collaborativeness         ❌            ✅            ✅           ❌
+  Collaborativeness               ❌          ✅          ✅           ❌
 
-  Licensing/openness     ✅/😐/❌         ❌            ✅           ✅
+  Licensing/openness           ✅/😐/❌       ❌          ✅           ✅
 
-  Non-nerd                  ✅            ✅            😐           ❌
-  friendliness                                                  
-  --------------------------------------------------------------------------
+  Non-nerd friendliness           ✅          ✅          😐           ❌
+  ----------------------------------------------------------------------------
 
 Therefore, on the one hand, FeenoX is—in a certain sense—to desktop FEA
 programs (like Code_Aster with Salome-Meca or CalculiX with PrePoMax)
@@ -99,7 +99,7 @@ Gitlab / Gitea)
   [PrePoMax]: https://prepomax.fs.um.si/
   [MoFEM]: http://mofem.eng.gla.ac.uk/mofem/html/
   [Sparselizard]: http://sparselizard.org/
-  [1]:
+  [1]: https://commonmark.org/
   [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html

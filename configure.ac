@@ -20,13 +20,11 @@ AC_PROG_CC
 
 AC_PROG_INSTALL
 
-# TODO: define it only if enabling the benchmarking directoryAC_PROG_RANLIB
-AC_PROG_CXX
 # TODO: investigate
 #AX_CODE_COVERAGE
 
 ######################
-# optimization flags
+# default optimization flags
 AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-Ofast -flto=auto"])
 AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
 
@@ -102,13 +100,13 @@ AX_GCC_BUILTIN(__builtin_expect)
 #])
 
 # check if we have everything
-AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
-            "x${ac_cv_header_readline_readline_h}" = "xyes" ],
-  [
-    AC_DEFINE(HAVE_READLINE)
-    have_readline="yes"
-  ],
-)
+#AS_IF([test "x${ac_cv_lib_readline_readline}" = "xyes" -a \
+            #"x${ac_cv_header_readline_readline_h}" = "xyes" ],
+  #[
+    #AC_DEFINE(HAVE_READLINE)
+    #have_readline="yes"
+  #],
+#)
 
 
 
@@ -379,21 +377,18 @@ rm -f ${srcdir}/src/version.h
 
 feenox_version=feenoxversion
 cat << EOF >> ${srcdir}/src/version.h
-#define FEENOX_VERSION       "${feenox_version}"
+#define FEENOX_VERSION              "${feenox_version}"
 
 EOF
 
 AS_IF([test -e .git -a ! -z "$(which git)"],[
   cat << EOF >> ${srcdir}/src/version.h
-#define FEENOX_GIT_VERSION        "$(git describe --tags | sed 's/-/./')"
-#define FEENOX_GIT_BRANCH         "$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')"
-#define FEENOX_GIT_DATE           "$(git log --pretty=format:"%ad" | head -n1)"
-#define FEENOX_GIT_CLEAN          $(git status --porcelain | wc -l)
-#define FEENOX_GIT_COMPILER_SHOW  "${compilter_show}"
+#define FEENOX_GIT_VERSION          "$(git describe --tags | sed 's/-/./')"
+#define FEENOX_GIT_BRANCH           "$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')"
+#define FEENOX_GIT_DATE             "$(git log --pretty=format:"%ad" | head -n1)"
+#define FEENOX_GIT_CLEAN            $(git status --porcelain | wc -l)
 EOF
 ])
-
-
 
 cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_COMPILATION_DATE     "$(date +'%a %b %d %H:%M:%S %Y %z')"
@@ -401,11 +396,11 @@ cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_COMPILATION_USERNAME "$(whoami | sed s/\\\\\\\\//)"
 #define FEENOX_COMPILATION_HOSTNAME "$(hostname)"
 
-#define FEENOX_COMPILER_COMMAND   "${compiler_command}"
-#define FEENOX_COMPILER_ARCH     "${host_os} ${host_cpu}"
-#define FEENOX_COMPILER_VERSION  "$(${compiler_command} --version | head -n1)"
-#define FEENOX_COMPILER_CFLAGS   "${CFLAGS}"
-#define FEENOX_COMPILER_SHOW     "${compiler_show}"
+#define FEENOX_COMPILER_COMMAND     "${compiler_command}"
+#define FEENOX_COMPILER_ARCH        "${host_os} ${host_cpu}"
+#define FEENOX_COMPILER_VERSION     "$(${compiler_command} --version | head -n1)"
+#define FEENOX_COMPILER_CFLAGS      "${CFLAGS}"
+#define FEENOX_COMPILER_SHOW        "${compiler_show}"
 EOF
 
 
