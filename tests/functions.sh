@@ -4,7 +4,7 @@
 functions_found=yes
 
 # see how to invoke FeenoX
-for i in  ../feenox ../src/feenox ./feenox ./src/feenox ../../../bin /usr/local/bin; do
+for i in  ../feenox ../src/feenox ./feenox ./src/feenox ../../../bin/feenox /usr/local/bin/feenox; do
   if [ -f ${i} ]; then
     feenox=${i}
   fi
