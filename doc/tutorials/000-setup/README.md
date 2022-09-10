@@ -3,7 +3,7 @@ title: Setting up your workspace
 subtitle: FeenoX Tutorial \#0
 titleblock: |
  FeenoX Tutorial #0: Setting up your workspace
- ==============================================
+ =============================================
 lang: en-US
 number-sections: true
 toc: true

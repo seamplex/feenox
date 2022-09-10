@@ -23,7 +23,7 @@ This first case...
 For the nearly impatient, here is a summary of what we are going to achieve by the end of the tutorial.
 We are going to understand what each of the parts of the FeenoX input file do:
 
-```{.fee include="tensile-test.fee"}
+```{.feenox include="tensile-test.fee"}
 ```
 
 And we are going to run bot Gmsh and FeenoX to obtain the results listed in @sec:expected.
@@ -317,7 +317,7 @@ This allows for [extensibility](https://homepage.cs.uri.edu/~thenry/resources/un
 
 # FeenoX Input file {#sec:input}
 
-As discussed in @sec:unix, FeenoX reads a plain-text input file---which in turns also reads the mesh generated above---that defines the problem, asks FeenoX to solve it and writes whatever output is needed. See section “Interfaces” in the [SDS](https://seamplex.com/feenox/doc/sds.html#interfaces) for a thorough discussion of both inputs and outputs.
+As discussed in @sec:unix, FeenoX reads a plain-text input file---which in turns also reads the mesh generated in te previos section---that defines the problem, asks FeenoX to solve it and writes whatever output is needed. See section “Interfaces” in the [SDS](https://seamplex.com/feenox/doc/sds.html#interfaces) for a thorough discussion of both inputs and outputs.
 
 The input file is a [syntactically-sweetened](http://en.wikipedia.org/wiki/Syntactic_sugar) way to ask the computer to perform the actual computation (which is what computers do). This input file, as illustrated in the example below lives somewhere near the English language so a person can read through it from the top down to the bottom and more or less understand what is going on (rule of [least surprise](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878339)). The idea is that this input file should match as much as possible the definition of the problem as an engineer would cast it in a plain sheet of paper (or blackboard).
 
@@ -331,7 +331,7 @@ This is not true for most of the other FEA tools available today, particularly t
 Given that the problem is relatively simple, following the rule of [simplicity](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877917),
 the input file [`tensile-test.fee`](tensile-test.fee) ought to be also simple. Other cases with more complexity might lead to more complex input files.
 
-```{.fee include="tensile-test.fee"}
+```{.feenox include="tensile-test.fee"}
 ```
 
  * The mesh [`tensile-test.msh`](tensile-test.msh) is the output of Gmsh when invoked with the input [`tensile-test.geo`](tensile-test.geo) above. It can be either [version\ 4.1](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format) or [2.2](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format-version-2-_0028Legacy_0029).

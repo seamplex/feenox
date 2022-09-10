@@ -10,7 +10,7 @@
 - [<span class="toc-section-number">7</span> Results][]
   - [<span class="toc-section-number">7.1</span> Check][]
 
-  [<span class="toc-section-number">1</span> Foreword]: #foreword
+  [<span class="toc-section-number">1</span> Foreword]: #sec:foreword
   [<span class="toc-section-number">2</span> Unix philosophy]: #sec:unix
   [<span class="toc-section-number">3</span> Problem description]: #problem-description
   [<span class="toc-section-number">3.1</span> Expected results]: #sec:expected
@@ -39,7 +39,58 @@ Welcome to FeenoX’ tutorial number one! This first case…
 > [annotated examples][] in [FeenoX webpage][].
 
 For the nearly impatient, here is a summary of what we are going to
-achieve by the end of the tutorial:
+achieve by the end of the tutorial. We are going to understand what each
+of the parts of the FeenoX input file do:
+
+``` feenox
+PROBLEM mechanical           # self-descriptive
+READ_MESH tensile-test.msh   # lengths are in mm
+
+# material properties, E and nu are "special" variables for the mechanical problem
+E = 200e3   # [ MPa = N / mm^2 ]
+nu = 0.3
+
+# boundary conditions, fixed and Fx are "special" keywords for the mechanical problem
+# the names "left" and "right" should match the physcal names in the .geo
+BC left  fixed
+BC right Fx=10e3  # [ N ]
+
+# we can now solve the problem, after this keyword the results will be available for output
+SOLVE_PROBLEM
+
+# essentially we are done by now, we have to write the expected results
+
+# 1. a VTK file to be post-processed in ParaView with
+#    a. the displacements [u,v,w] as a vector
+#    b. the von Mises stress sigma as a scalar
+#    c. the six components of the stress tensor as six scalars
+WRITE_MESH tensile-test.vtk VECTOR u v w  sigma sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT "1. post-processing view written in tensile-test.vtk"
+
+# 2. the displacement vector at the center of the specimen
+PRINT "2. displacement in x at origin:   " u(0,0,0)   "[ mm ]"
+PRINT "   displacement in y at (0,10,0): " v(0,10,0)  "[ mm ]"
+PRINT "   displacement in z at (0,0,2.5):" w(0,0,2.5) "[ mm ]"
+
+# 3. the principal stresses at the center
+PRINT "3. principal stresses at origin: " %.4f sigma1(0,0,0) sigma2(0,0,0) sigma3(0,0,0) "[ MPa ]"
+
+# 4. the reaction at the left surface
+REACTION left  RESULT R_left
+PRINT "4. reaction at left surface: " R_left "[ N ]"
+
+# 5. stress concentrations at a sharp edge
+PRINT "5. stress concentrations at x=55, y=10, z=2.5 mm"
+PRINT "von Mises stress:" sigma(55,10,2.5) "[ MPa ]"
+PRINT "Tresca    stress:" sigma1(55,10,2.5)-sigma3(55,10,2.5) "[ MPa ]"
+PRINT "stress tensor:"
+PRINT %.1f sigmax(55,10,2.5) tauxy(55,10,2.5)  tauzx(55,10,2.5)
+PRINT %.1f tauxy(55,10,2.5)  sigmay(55,10,2.5) tauyz(55,10,2.5)
+PRINT %.1f tauzx(55,10,2.5)  tauyz(55,10,2.5)  sigmaz(55,10,2.5)
+```
+
+And we are going to run bot Gmsh and FeenoX to obtain the results listed
+in @sec:expected.
 
 **Terminal mimic**
 
@@ -432,7 +483,7 @@ Gmsh to generate the bulk elements.
     Physical Surface ("right") =  {7};  // right face, will hold the load
         
     // step #4:
-    Mesh.MeshSizeMax = 1.5;       // set the max element size lc (in mm)
+    Mesh.MeshSizeMax = 3;         // set the max element size lc (in mm)
     Mesh.ElementOrder = 2;        // ask for second-order tetrahedra
     Mesh.OptimizeNetgen = 1;      // optimize linear elements
     Mesh.HighOrderOptimize = 3;   // optimize quadratic elements
@@ -445,31 +496,28 @@ Gmsh to generate the bulk elements.
 
     ``` terminal
     $ gmsh -3 tensile-test.geo
-    Info    : Running 'gmsh -3 tensile-test.geo' [Gmsh 4.10.5, 1 node, max. 1 thread]    
-    Info    : Started on Sat Sep  3 15:36:58 2022    [...]
-    Info    : Reading 'tensile-test.geo'...    Info    : [100%] Meshing surface 14 order 2
-    Info    : Reading 'tensile-test-specimen.step'...    Info    : [100%] Meshing volume 1 order 2
-    Info    :  - Label 'Shapes/ASSEMBLY/=>[0:1:1:2]/Pad' (3D)    Info    : Surface mesh: worst distortion = 0.909145 (0 elements in ]0, 0.2]); worst gamma = 0.75719
-    Info    :  - Color (0.8, 0.8, 0.8) (3D & Surfaces)    Info    : Volume mesh: worst distortion = 0.761171 (0 elements in ]0, 0.2])
-    Info    : Done reading 'tensile-test-specimen.step'    Info    : Done meshing order 2 (Wall 0.22224s, CPU 0.222229s)
-    Info    : Done reading 'tensile-test.geo'    Info    : Optimizing mesh (HighOrderElastic)...
-    Info    : Meshing 1D...    Info    : Applying elastic analogy to high-order mesh...
-    Info    : [  0%] Meshing curve 1 (Line)    Info    : High-order tools set up: 49495 nodes are considered
-    Info    : [ 10%] Meshing curve 2 (Line)    Info    : Surface mesh: worst distortion = 0.909145 (0 elements in ]0, 0.2]); worst gamma = 0.75719
-    Info    : [ 10%] Meshing curve 3 (Line)    Info    : Final surface mesh: worst distortion = 0.909145 (0 elements in ]0, 0.2]); worst gamma = 0.75719
+    Info    : Running 'gmsh -3 tensile-test.geo' [Gmsh 4.10.5, 1 node, max. 1 thread]
+    Info    : Started on Sat Sep 10 15:22:59 2022
+    Info    : Reading 'tensile-test.geo'...
+    Info    : Reading 'tensile-test-specimen.step'...
+    Info    :  - Label 'Shapes/ASSEMBLY/=>[0:1:1:2]/Pad' (3D)
+    Info    :  - Color (0.8, 0.8, 0.8) (3D & Surfaces)
+    Info    : Done reading 'tensile-test-specimen.step'
+    Info    : Done reading 'tensile-test.geo'
+    Info    : Meshing 1D...
+    Info    : [  0%] Meshing curve 1 (Line)
+    Info    : [ 10%] Meshing curve 2 (Line)
+    Info    : [ 10%] Meshing curve 3 (Line)
     [...]
     -----8<----- more output cut out -----8<-----
     [...]
-    Info    : Volume mesh: worst distortion = 0.761171 (0 elements in ]0, 0.2])
-    Info    : Generating elastic system...
-    Info    : Solving linear system (89067 unknowns)...
-    Info    : Final volume mesh: worst distortion = 0.831408 (0 elements in ]0, 0.2])
-    Info    : Done applying elastic analogy to high-order mesh (5.0267 s)
-    Info    : Done optimizing mesh (Wall 4.7834s, CPU 5.03213s)
-    Info    : 50027 nodes 40376 elements
+    Info    : Final volume mesh: worst distortion = 0.796943 (0 elements in ]0, 0.2])
+    Info    : Done applying elastic analogy to high-order mesh (0.652083 s)
+    Info    : Done optimizing mesh (Wall 0.595085s, CPU 0.652091s)
+    Info    : 10754 nodes 8949 elements
     Info    : Writing 'tensile-test.msh'...
     Info    : Done writing 'tensile-test.msh'
-    Info    : Stopped on Sat Sep  3 15:37:06 2022 (From start: Wall 8.12854s, CPU 8.5042s)
+    Info    : Stopped on Sat Sep 10 15:23:01 2022 (From start: Wall 1.35632s, CPU 1.62598s)
     $
     ```
 
@@ -497,12 +545,17 @@ Gmsh to generate the bulk elements.
     - Tools $\rightarrow$ Options $\rightarrow$ Mesh $\rightarrow$ 3D
       element faces
 
+    We can then add a clipping plane to peek at the tetrahedra in the
+    bulk of the specimen:
+
+    - Tools $\rightarrow$ Clipping $\rightarrow$ Mesh $\rightarrow$
+      $A=0$, $B=1$, “Keep whole elements”
+
     Now you should get
 
     ![][4] 
 
-    We are seeing the faces of the tetrahedra that make up the bulk of
-    the mesh. Feel free to close Gmsh now, we are done with it.
+    Feel free to close Gmsh now, we are done with it.
 
 In general, multi-solid problems need to have different physical volumes
 in order for FeenoX to be able to set different mechanical properties.
@@ -570,10 +623,10 @@ and does not depend on the details of the mesh. This allows for
 # FeenoX Input file
 
 As discussed in @sec:unix, FeenoX reads a plain-text input file—which in
-turns also reads the mesh generated above—that defines the problem, asks
-FeenoX to solve it and writes whatever output is needed. See section
-“Interfaces” in the [SDS][] for a thorough discussion of both inputs and
-outputs.
+turns also reads the mesh generated in te previos section—that defines
+the problem, asks FeenoX to solve it and writes whatever output is
+needed. See section “Interfaces” in the [SDS][] for a thorough
+discussion of both inputs and outputs.
 
 The input file is a [syntactically-sweetened][] way to ask the computer
 to perform the actual computation (which is what computers do). This
@@ -584,7 +637,12 @@ surprise][]). The idea is that this input file should match as much as
 possible the definition of the problem as an engineer would cast it in a
 plain sheet of paper (or blackboard).
 
-**blackboard picture with the problem definition**
+<figure>
+<img src="blackboard.jpg" id="fig:blackboard"
+alt="Human-made formulation of the tensile test problem in a board." />
+<figcaption aria-hidden="true">Human-made formulation of the tensile
+test problem in a board.</figcaption>
+</figure>
 
 Yet in the extreme case that the complexity of the problem asks for, the
 input file could be machine-generated by a script or a macro (rule of
@@ -604,62 +662,88 @@ simple. Other cases with more complexity might lead to more complex
 input files.
 
 ``` feenox
-# tensile test example for FeenoX, see https://caeplex.com/p/41dd1
-MESH FILE_PATH tensile-test.msh  # mesh file in Gmsh format (either version 2.2 or 4.x)
+PROBLEM mechanical           # self-descriptive
+READ_MESH tensile-test.msh   # lengths are in mm
 
-# uniform properties given as scalar variables
-E = 200e3   # [ MPa ] Young modulus = 200 GPa
-nu = 0.3    # Poisson’s ratio
+# material properties, E and nu are "special" variables for the mechanical problem
+E = 200e3   # [ MPa = N / mm^2 ]
+nu = 0.3
 
-# boundary conditions ("left" and "right" come from the names in the mesh)
-PHYSICAL_GROUP left  BC fixed       # fixed end
-PHYSICAL_GROUP right BC Fx=1e4      # [ N ] load in x+
+# boundary conditions, fixed and Fx are "special" keywords for the mechanical problem
+# the names "left" and "right" should match the physcal names in the .geo
+BC left  fixed
+BC right Fx=10e3  # [ N ]
 
-FINO_SOLVER PROGRESS_ASCII  # print ascii progress bars (optional) 
-FINO_STEP                   # solve
+# we can now solve the problem, after this keyword the results will be available for output
+SOLVE_PROBLEM
 
-# compute reaction force at fixed end
-FINO_REACTION PHYSICAL_GROUP left RESULT R
+# essentially we are done by now, we have to write the expected results
 
-# write results (Von Mises, principal and displacements) in a VTK file
-MESH_POST FILE_PATH tensile-test.vtk sigma sigma1 sigma2 sigma3 VECTOR u v w
+# 1. a VTK file to be post-processed in ParaView with
+#    a. the displacements [u,v,w] as a vector
+#    b. the von Mises stress sigma as a scalar
+#    c. the six components of the stress tensor as six scalars
+WRITE_MESH tensile-test.vtk VECTOR u v w  sigma sigmax sigmay sigmaz tauxy tauyz tauzx
+PRINT "1. post-processing view written in tensile-test.vtk"
 
-# print some results (otherwise output will be null)
-PRINT "displ_max = " %.3f displ_max "mm"
-PRINT "sigma_max = " %.1f sigma_max "MPa"
-PRINT "principal1 at center = " %.8f sigma1(0,0,0) "MPa"
-PRINT "reaction  = [" %.3e R "] Newtons"
-PRINT FILE_PATH tensile-sigma.dat %.0f sigma(0,0,0)
+# 2. the displacement vector at the center of the specimen
+PRINT "2. displacement in x at origin:   " u(0,0,0)   "[ mm ]"
+PRINT "   displacement in y at (0,10,0): " v(0,10,0)  "[ mm ]"
+PRINT "   displacement in z at (0,0,2.5):" w(0,0,2.5) "[ mm ]"
+
+# 3. the principal stresses at the center
+PRINT "3. principal stresses at origin: " %.4f sigma1(0,0,0) sigma2(0,0,0) sigma3(0,0,0) "[ MPa ]"
+
+# 4. the reaction at the left surface
+REACTION left  RESULT R_left
+PRINT "4. reaction at left surface: " R_left "[ N ]"
+
+# 5. stress concentrations at a sharp edge
+PRINT "5. stress concentrations at x=55, y=10, z=2.5 mm"
+PRINT "von Mises stress:" sigma(55,10,2.5) "[ MPa ]"
+PRINT "Tresca    stress:" sigma1(55,10,2.5)-sigma3(55,10,2.5) "[ MPa ]"
+PRINT "stress tensor:"
+PRINT %.1f sigmax(55,10,2.5) tauxy(55,10,2.5)  tauzx(55,10,2.5)
+PRINT %.1f tauxy(55,10,2.5)  sigmay(55,10,2.5) tauyz(55,10,2.5)
+PRINT %.1f tauzx(55,10,2.5)  tauyz(55,10,2.5)  sigmaz(55,10,2.5)
 ```
 
 - The mesh [`tensile-test.msh`][] is the output of Gmsh when invoked
   with the input [`tensile-test.geo`][] above. It can be either
   [version 4.1][] or [2.2][].
+
 - The mechanical properties, namely the Young modulus $E$ and the
   Poisson’s ratio $\nu$ are uniform in space. Therefore, they can be
   simply set using special variables `E` and `nu`.
+
 - Boundary conditions are set by referring to the physical surfaces
   defined in the mesh. The keyword `fixed` is a shortcut for setting the
   individual displacements in each direction `u=0`, `v=0` and `w=0`.
+
 - An explicit location within the logical flow of the input file hast to
   be given where FeenoX ought to actually solve the problem with the
   keyword `FINO_STEP`. It should be after defining the material
   properties and the boundary conditions and before computing secondary
   results (such as the reactions) and asking for outputs.
+
 - The reaction in the physical group “left” is computed after the
   problem is solved (i.e. after `FINO_STEP`) and the result is stored in
   a vector named `R` of size three. There is nothing special about the
   name `R`, it could have been any other valid identifier name.
+
 - A [post-processing output file][] in format [VTK][] is created,
   containing:
+
   - The von Mises stress `sigma` ($\sigma$) as an scalar field
   - The three principal stresses `sigma1`, `sigma_2` and `sigma_3`
     ($\sigma_1$, $\sigma_2$ and $\sigma_3$ respectively) as three scalar
     fields
   - The displacement vector $\mathbf{u}=[u,v,w]$ as a three-dimensional
     vector field
+
 - Some results are printed to the terminal (i.e. the [standard
   output][]) to summarize the run. Note that
+
   1.  The actual output (including post-processing files) is 100%
       defined by the user, and
   2.  If no output instructions are given in the input file (`PRINT`,
@@ -670,6 +754,7 @@ PRINT FILE_PATH tensile-sigma.dat %.0f sigma(0,0,0)
   find and process a single result in a soup of megabytes of a cluttered
   output file far outweighs the cost of running a computation from
   scratch with the needed result as the only output.
+
 - Finally, the von Mises stress $\sigma(0,0,0)$ evaluated at the origin
   is written to an [ASCII][] file [`tensile-sigma.dat`][] rounded to the
   nearest integer (in MPa). This is used to test the outcome of FeenoX’s
