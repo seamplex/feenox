@@ -11,7 +11,7 @@ Physical Surface ("left") =  {1};   // left face, to be fixed
 Physical Surface ("right") =  {7};  // right face, will hold the load
     
 // step #4:
-Mesh.MeshSizeMax = 1.5;       // set the max element size lc (in mm)
+Mesh.MeshSizeMax = 3;         // set the max element size lc (in mm)
 Mesh.ElementOrder = 2;        // ask for second-order tetrahedra
 Mesh.OptimizeNetgen = 1;      // optimize linear elements
 Mesh.HighOrderOptimize = 3;   // optimize quadratic elements

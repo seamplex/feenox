@@ -25,10 +25,22 @@ or optimization workflow. In any case, if you want to learn how to
 create your web-based interface or how to implement an optimization
 workflow on your own, you will need to start running simple cases
 manually and then increasing the complexity until reaching the solve
-state-of-the-art capabilities. Indeed, it is this the main goal of the
-tutorials, namely to be able to run relatively small problems in FeenoX
-by creating the appropriate input files and, eventually meshes or other
-needed data files.
+state-of-the-art capabilities.
+
+Recall by reading again the [project’s main README][], that FeenoX is—in
+a certain sense—to desktop FEA programs (like [Code_Aster][] with
+[Salome-Meca][] or [CalculiX][] with [PrePoMax][]) and libraries (like
+[MoFEM][] or [Sparselizard][]) what [Markdown][] is to Word and
+[(La)TeX][], respectively and *deliberately*.
+
+Indeed, it is this the main goal of the tutorials, namely to be able to
+run relatively small problems in FeenoX by creating the appropriate
+input files and, eventually meshes or other needed data files. This way,
+by the end of each tutorial you will better understsand how FeenoX works
+and thus, how to make it work the way you need and/or want. And if not,
+you always have the *freedom* to hire someone to explain it to you and
+even to modify the code to make it work the way you need and/or want
+since it is [free and open source software][].
 
 1.  [Setting up your workspace][]
 
@@ -36,6 +48,16 @@ needed data files.
   [documentation]: https://www.seamplex.com/feenox/doc
   [Software Requirements Specification]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html
+  [project’s main README]: https://github.com/seamplex/feenox
+  [Code_Aster]: https://www.code-aster.org/spip.php?rubrique2
+  [Salome-Meca]: https://www.code-aster.org/V2/spip.php?article303
+  [CalculiX]: http://www.calculix.de/
+  [PrePoMax]: https://prepomax.fs.um.si/
+  [MoFEM]: http://mofem.eng.gla.ac.uk/mofem/html/
+  [Sparselizard]: http://sparselizard.org/
+  [Markdown]: https://commonmark.org/
+  [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
+  [free and open source software]: https://www.seamplex.com/feenox/#licensing
   [Setting up your workspace]: 000-setup
 
 # General tutorials

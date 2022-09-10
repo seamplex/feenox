@@ -9,7 +9,7 @@ number-sections: true
 toc: true
 ...
 
-# Foreword
+# Foreword {#sec:foreword}
 
 Welcome to FeenoX’ tutorial number one!
 This first case...
@@ -20,7 +20,14 @@ This first case...
 
 > _Heads up_: this tutorial, being the first is also detailed and long. Those impatient readers might want to check directly some of the [annotated examples](https://seamplex.com/feenox/examples/) in [FeenoX webpage](https://seamplex.com/feenox/).
  
-For the nearly impatient, here is a summary of what we are going to achieve by the end of the tutorial:
+For the nearly impatient, here is a summary of what we are going to achieve by the end of the tutorial.
+We are going to understand what each of the parts of the FeenoX input file do:
+
+```{.fee include="tensile-test.fee"}
+```
+
+And we are going to run bot Gmsh and FeenoX to obtain the results listed in @sec:expected.
+
 
 **Terminal mimic**
 
@@ -235,35 +242,33 @@ Since we are solving a mechanical problem with FeenoX, any surface (or edge or v
   
     ```terminal
     $ gmsh -3 tensile-test.geo
-    Info    : Running 'gmsh -3 tensile-test.geo' [Gmsh 4.10.5, 1 node, max. 1 thread]    
-    Info    : Started on Sat Sep  3 15:36:58 2022    [...]
-    Info    : Reading 'tensile-test.geo'...    Info    : [100%] Meshing surface 14 order 2
-    Info    : Reading 'tensile-test-specimen.step'...    Info    : [100%] Meshing volume 1 order 2
-    Info    :  - Label 'Shapes/ASSEMBLY/=>[0:1:1:2]/Pad' (3D)    Info    : Surface mesh: worst distortion = 0.909145 (0 elements in ]0, 0.2]); worst gamma = 0.75719
-    Info    :  - Color (0.8, 0.8, 0.8) (3D & Surfaces)    Info    : Volume mesh: worst distortion = 0.761171 (0 elements in ]0, 0.2])
-    Info    : Done reading 'tensile-test-specimen.step'    Info    : Done meshing order 2 (Wall 0.22224s, CPU 0.222229s)
-    Info    : Done reading 'tensile-test.geo'    Info    : Optimizing mesh (HighOrderElastic)...
-    Info    : Meshing 1D...    Info    : Applying elastic analogy to high-order mesh...
-    Info    : [  0%] Meshing curve 1 (Line)    Info    : High-order tools set up: 49495 nodes are considered
-    Info    : [ 10%] Meshing curve 2 (Line)    Info    : Surface mesh: worst distortion = 0.909145 (0 elements in ]0, 0.2]); worst gamma = 0.75719
-    Info    : [ 10%] Meshing curve 3 (Line)    Info    : Final surface mesh: worst distortion = 0.909145 (0 elements in ]0, 0.2]); worst gamma = 0.75719
+    Info    : Running 'gmsh -3 tensile-test.geo' [Gmsh 4.10.5, 1 node, max. 1 thread]
+    Info    : Started on Sat Sep 10 15:22:59 2022
+    Info    : Reading 'tensile-test.geo'...
+    Info    : Reading 'tensile-test-specimen.step'...
+    Info    :  - Label 'Shapes/ASSEMBLY/=>[0:1:1:2]/Pad' (3D)
+    Info    :  - Color (0.8, 0.8, 0.8) (3D & Surfaces)
+    Info    : Done reading 'tensile-test-specimen.step'
+    Info    : Done reading 'tensile-test.geo'
+    Info    : Meshing 1D...
+    Info    : [  0%] Meshing curve 1 (Line)
+    Info    : [ 10%] Meshing curve 2 (Line)
+    Info    : [ 10%] Meshing curve 3 (Line)
     [...]
     -----8<----- more output cut out -----8<-----
     [...]
-    Info    : Volume mesh: worst distortion = 0.761171 (0 elements in ]0, 0.2])
-    Info    : Generating elastic system...
-    Info    : Solving linear system (89067 unknowns)...
-    Info    : Final volume mesh: worst distortion = 0.831408 (0 elements in ]0, 0.2])
-    Info    : Done applying elastic analogy to high-order mesh (5.0267 s)
-    Info    : Done optimizing mesh (Wall 4.7834s, CPU 5.03213s)
-    Info    : 50027 nodes 40376 elements
+    Info    : Final volume mesh: worst distortion = 0.796943 (0 elements in ]0, 0.2])
+    Info    : Done applying elastic analogy to high-order mesh (0.652083 s)
+    Info    : Done optimizing mesh (Wall 0.595085s, CPU 0.652091s)
+    Info    : 10754 nodes 8949 elements
     Info    : Writing 'tensile-test.msh'...
     Info    : Done writing 'tensile-test.msh'
-    Info    : Stopped on Sat Sep  3 15:37:06 2022 (From start: Wall 8.12854s, CPU 8.5042s)
+    Info    : Stopped on Sat Sep 10 15:23:01 2022 (From start: Wall 1.35632s, CPU 1.62598s)
     $
     ```
     
-    If you don't like Gmsh' verbosity, you can change it with the command-line option `-v`. I recommend you read its [extensive documentation](http://gmsh.info/doc/texinfo/gmsh.html) for further details.
+    If you don't like Gmsh' verbosity, you can change it with the command-line option `-v`.
+    I recommend you read its [extensive documentation](http://gmsh.info/doc/texinfo/gmsh.html) for further details.
     
  6. Now that the mesh file has been created, you can open it with the Gmsh GUI to check how it looks like.
  
@@ -280,11 +285,15 @@ Since we are solving a mechanical problem with FeenoX, any surface (or edge or v
     
      * Tools $\rightarrow$ Options $\rightarrow$ Mesh $\rightarrow$ 3D element faces
      
+    We can then add a clipping plane to peek at the tetrahedra in the bulk of the specimen:
+    
+     * Tools $\rightarrow$ Clipping $\rightarrow$ Mesh $\rightarrow$ $A=0$, $B=1$, "Keep whole elements"
+     
     Now you should get 
     
     ![](gmsh-mesh-volume.png)\ 
     
-    We are seeing the faces of the tetrahedra that make up the bulk of the mesh. Feel free to close Gmsh now, we are done with it.
+    Feel free to close Gmsh now, we are done with it.
 
 
 In general, multi-solid problems need to have different physical volumes in order for FeenoX to be able to set different mechanical properties. Even though this simple problem has a single solid and an explicit link is not needed, a physical volumetric group is needed in order for Gmsh to write the volumetric elements (i.e. tetrahedra) into the [output MSH file](tensile-test.msh) (which is an input for FeenoX).
@@ -312,7 +321,7 @@ As discussed in @sec:unix, FeenoX reads a plain-text input file---which in turns
 
 The input file is a [syntactically-sweetened](http://en.wikipedia.org/wiki/Syntactic_sugar) way to ask the computer to perform the actual computation (which is what computers do). This input file, as illustrated in the example below lives somewhere near the English language so a person can read through it from the top down to the bottom and more or less understand what is going on (rule of [least surprise](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878339)). The idea is that this input file should match as much as possible the definition of the problem as an engineer would cast it in a plain sheet of paper (or blackboard).
 
-**blackboard picture with the problem definition**
+![Human-made formulation of the tensile test problem in a board.](blackboard.jpg){#fig:blackboard}
 
 Yet in the extreme case that the complexity of the problem asks for, the input file could be machine-generated by a script or a macro (rule of [generation](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878742)).
 Or if the circumstances call for an actual graphical interface for properly processing (both pre and post) the problem, the input file could be created by a separate cooperating front-end such as [CAEplex](https://www.caeplex.com) in [@fig:tensile-cad] above (rule of [separation](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877777)).
@@ -322,34 +331,7 @@ This is not true for most of the other FEA tools available today, particularly t
 Given that the problem is relatively simple, following the rule of [simplicity](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877917),
 the input file [`tensile-test.fee`](tensile-test.fee) ought to be also simple. Other cases with more complexity might lead to more complex input files.
 
-```feenox
-# tensile test example for FeenoX, see https://caeplex.com/p/41dd1
-MESH FILE_PATH tensile-test.msh  # mesh file in Gmsh format (either version 2.2 or 4.x)
-
-# uniform properties given as scalar variables
-E = 200e3   # [ MPa ] Young modulus = 200 GPa
-nu = 0.3    # Poisson’s ratio
-
-# boundary conditions ("left" and "right" come from the names in the mesh)
-PHYSICAL_GROUP left  BC fixed       # fixed end
-PHYSICAL_GROUP right BC Fx=1e4      # [ N ] load in x+
-
-FINO_SOLVER PROGRESS_ASCII  # print ascii progress bars (optional) 
-FINO_STEP                   # solve
-
-# compute reaction force at fixed end
-FINO_REACTION PHYSICAL_GROUP left RESULT R
-
-# write results (Von Mises, principal and displacements) in a VTK file
-MESH_POST FILE_PATH tensile-test.vtk sigma sigma1 sigma2 sigma3 VECTOR u v w
-
-# print some results (otherwise output will be null)
-PRINT "displ_max = " %.3f displ_max "mm"
-PRINT "sigma_max = " %.1f sigma_max "MPa"
-PRINT "principal1 at center = " %.8f sigma1(0,0,0) "MPa"
-PRINT "reaction  = [" %.3e R "] Newtons"
-PRINT FILE_PATH tensile-sigma.dat %.0f sigma(0,0,0)
-
+```{.fee include="tensile-test.fee"}
 ```
 
  * The mesh [`tensile-test.msh`](tensile-test.msh) is the output of Gmsh when invoked with the input [`tensile-test.geo`](tensile-test.geo) above. It can be either [version\ 4.1](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format) or [2.2](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format-version-2-_0028Legacy_0029).
@@ -363,6 +345,7 @@ PRINT FILE_PATH tensile-sigma.dat %.0f sigma(0,0,0)
     - The displacement vector $\mathbf{u}=[u,v,w]$ as a three-dimensional vector field
  * Some results are printed to the terminal (i.e. the [standard output](https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout))) to summarize the run.
  Note that
+ 
      1. The actual output (including post-processing files) is 100% defined by the user, and
      2. If no output instructions are given in the input file (`PRINT`, `MESH_POST`, etc.) then no output will be obtained.
  

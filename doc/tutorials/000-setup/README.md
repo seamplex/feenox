@@ -136,7 +136,7 @@ If any of the lines does not say `ok` but something else, then the code contains
 
 # Gmsh
 
-To solve problems involving partial differential equations (i.e. elasticity, heat conduction, etc.) FeenoX needs a mesh in [Gmsh's MSH format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format). Any mesher whose output format can be converted to `.msh` should work, altough of course the most natural way to create these meshes is to use [Gmsh](http://gmsh.info/) itself.
+To solve problems involving partial differential equations (i.e. elasticity, heat conduction, neutron transport, etc.) FeenoX needs a mesh in [Gmsh's MSH format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format). Any mesher whose output format can be converted to `.msh` should work, altough of course the most natural way to create these meshes is to use [Gmsh](http://gmsh.info/) itself.
 
 The easiest way to go is to install Gmsh from the `apt` repository:
 
@@ -177,17 +177,35 @@ Also, Gmsh can be compiled from source by following the [instructions in the doc
 
 It is important to note that Gmsh creates its meshes by reading an input file with extension `.geo` without needing to use a graphical interface at all. Therefore, Gmsh can be used even through `ssh` or `docker` where there is no graphical device. However, it does provide a GUI that is very handy to create the `.geo` in the first place and to help identify the ids of the surfaces that will be subject to boundary conditions. So you will be able to go through the tutorials in text-only mode but you will not be able to exploit its full potential nor even see what the mesh you are using look like.
 
+## Checking that mesh refinement gives more accurate results
+
+Let us now go back to the `examples` directory and refine the mesh of the [“Parallelepiped...”](https://www.seamplex.com/feenox/examples/#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature) case.
+
+```terminal
+$ gmsh -3 parallelepiped.geo -order 1 -clscale 1.2 -o parallelepiped-coarse.msh
+[...]
+$ gmsh -3 parallelepiped.geo -order 2 -clscale 0.6
+[...]
+$ feenox parallelepiped-thermal.fee 
+1.05973e-10
+$ feenox parallelepiped-mechanical.fee
+6.95446e-05
+$ 
+```
+
+Don't worry if you do not undertsand the Gmsh command line. We will work out the details in the tutorials.
+
 
 # Text editor
 
-In order to create the both the FeenoX and the Gmsh input files, you will need a text editor. In principle any editor will do, but since FeenoX uses keywords to define the problem being solved, it is way more efficient (and aesthetically pleasant) to use one that supports syntax highlighting.
+In order to create the both the FeenoX and the Gmsh input files, you will need a text editor. In principle any editor will do, but since FeenoX uses keywords to define the problem being solved, it is way more efficient (and aesthetically more pleasant) to use one that supports syntax highlighting.
 
 ## Vim
 
 The `vim` text editor can be perfectly used to edit input files. It is text-only so it works through `ssh` and `docker`.
-It has a non-trivial learning curve but it is worth to learn its basics because at some point you will want to run FeenoX in an actual cloud server and [Vim](https://www.vim.org/) will be your friend there.
+It has a non-trivial learning curve but it is worth to learn its basics because at some point you will want to run FeenoX in an actual cloud server. [Vim](https://www.vim.org/) will be your friend there.
 
-To enable syntax highlighting copy the file `fee.vim` into `~/.vim/syntax`.
+To enable syntax highlighting copy the file [`fee.vim`](https://raw.githubusercontent.com/seamplex/feenox/main/doc/fee.vim) into `~/.vim/syntax`.
 
 ![FeenoX input file edited in Vim on Konsole](highlighting-vim.png)
 
@@ -197,12 +215,17 @@ To enable syntax highlighting copy the file `fee.vim` into `~/.vim/syntax`.
 
 For those using a native GNU/Linux box with a graphical interface, the recommended editor is [Kate](https://kate-editor.org/).
 
+To enable syntax highlighting copy the file [`feenox.xml`](https://raw.githubusercontent.com/seamplex/feenox/main/doc/feenox.xml) into `~/.local/share/katepart5/syntax/`.
+
+
 ![FeenoX input file edited in Kate on Plasma](highlighting-kate.png)
 
 
 # Post-processors
 
-FeenoX can write mesh results either in `.msh` or `.vtk` format. The former can be read and postprocessed by Gmsh. The latter can be read and postprocessed by a few different tools, but Paraview is the flagship postprocessor.
+FeenoX can write mesh results either in `.msh` or `.vtk` format.
+The former can be read and postprocessed by Gmsh.
+The latter can be read and postprocessed by a few different tools, but Paraview is the flagship postprocessor.
 In general any version will do, so it can be installed with
 
 ```terminal
@@ -215,8 +238,12 @@ Note that both Gmsh in post-processing mode and Paraview make sense only if you 
 
 # Other UNIX tools
 
+To be done.
+
 ## Awk
+
+To be done.
 
 ## M4
 
-
+To be done.
