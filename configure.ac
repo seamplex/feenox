@@ -26,7 +26,8 @@ AC_PROG_INSTALL
 ######################
 # default optimization flags
 AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-Ofast -flto=auto"])
-AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
+# the CFLAGS are passed down to the linker as well
+# AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
 
 ######################
 # libraries
@@ -400,6 +401,7 @@ cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_COMPILER_ARCH        "${host_os} ${host_cpu}"
 #define FEENOX_COMPILER_VERSION     "$(${compiler_command} --version | head -n1)"
 #define FEENOX_COMPILER_CFLAGS      "${CFLAGS}"
+#define FEENOX_COMPILER_LDFLAGS     "${LDFLAGS}"
 #define FEENOX_COMPILER_SHOW        "${compiler_show}"
 EOF
 
