@@ -25,7 +25,7 @@ AC_PROG_INSTALL
 
 ######################
 # default optimization flags
-AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-Ofast -flto=auto"])
+AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-Ofast -flto=auto -no-pie"])
 # the CFLAGS are passed down to the linker as well
 # AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
 
