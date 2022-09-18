@@ -1,6 +1,17 @@
 #. # How to solve a maze without AI
 #.
-#. > See this LinkedIn post to see some comments and discussions: <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+#. > See these LinkedIn posts to see some comments and discussions:
+#. >
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/>
+#. >
+#. > Other people's maze-related posts:
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6973921855275458560/>
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6974663157952745472/>
+#. >  * <https://www.linkedin.com/feed/update/urn:li:activity:6974979951049519104/>
 #. 
 #. Say you are Homer Simpson and you want to solve a maze drawn in a restaurant's placemat, one where both the start and end are known beforehand. In order to avoid falling into the alligator's mouth, you can exploit the ellipticity of the Laplacian operator to solve any maze (even a hand-drawn one) without needing any fancy AI or ML algorithm. Just FeenoX and a bunch of standard open source tools to convert a bitmapped picture of the maze into an unstructured mesh.
 #.

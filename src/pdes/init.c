@@ -24,7 +24,7 @@ extern feenox_t feenox;
 
 #include <signal.h>   // for signal
 #include <unistd.h>   // for sysconf
-
+#include <stdlib.h>   // for setenv
 
 int feenox_problem_init_parser_general(void) {
 
@@ -94,6 +94,8 @@ int feenox_problem_init_parser_general(void) {
   
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.n_procs));
   petsc_call(MPI_Comm_rank(PETSC_COMM_WORLD, &feenox.rank));
+  
+  feenox_call(setenv("OMP_NUM_THREADS", "1", 0));
 
   // segfaults are segfaults, try to leave PETSC out of them
   signal(SIGSEGV, SIG_DFL);
