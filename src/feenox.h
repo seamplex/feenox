@@ -1882,7 +1882,7 @@ struct feenox_t {
   } pde;
   
 };
-
+extern feenox_t feenox;
 
 // function declarations
 

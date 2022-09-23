@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
 
 int feenox_instruction_mesh_write(void *arg) {
 

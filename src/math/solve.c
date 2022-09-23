@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 
 int feenox_solve_f(const gsl_vector *x, void *params, gsl_vector *f);

@@ -48,6 +48,7 @@ struct feenox_parser_t {
 
   conditional_block_t *active_conditional_block;  
 };
+extern feenox_parser_t feenox_parser;
 
 // parser.c
 extern int feenox_parse_input_file(const char *filepath, int from, int to);

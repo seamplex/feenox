@@ -46,6 +46,7 @@ struct laplace_t {
   } cache;
   
 };  
+extern laplace_t laplace;
 
 
 #endif /* LAPLACE_H */

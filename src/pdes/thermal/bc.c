@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "thermal.h"
-extern feenox_t feenox;
-extern thermal_t thermal;
 
 // this virtual method is called from the parser, it fills in the already-allocated
 // structure bc_data according to the two strings lhs=rhs, i.e. q=1 or T=1+x 

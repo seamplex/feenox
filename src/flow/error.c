@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 #include <assert.h>
 #include <stdio.h>

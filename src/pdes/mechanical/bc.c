@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "mechanical.h"
-extern feenox_t feenox;
-extern mechanical_t mechanical;
 
 typedef struct {
   expr_t *expr;

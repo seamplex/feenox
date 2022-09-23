@@ -21,7 +21,6 @@
  */
 #include "feenox.h"
 #include "modal.h"
-extern feenox_t feenox;
 modal_t modal;
 
 int feenox_problem_parse_problem_modal(const char *token) {

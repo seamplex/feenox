@@ -20,8 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
 
 

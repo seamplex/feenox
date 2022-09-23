@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
 
 // get a pointer to a bc
 bc_t *feenox_get_bc_ptr(const char *name) {

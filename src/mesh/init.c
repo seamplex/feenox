@@ -20,8 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 
 int feenox_mesh_init_special_objects(void) {
   

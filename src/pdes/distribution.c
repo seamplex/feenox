@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 // this method updates the linked list of variables and functions the distribution
 // depends on, but it does not set the non_linear nor space_dependent flags

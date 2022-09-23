@@ -21,10 +21,7 @@
  */
 #include "feenox.h"
 #include "neutron_diffusion.h"
-extern feenox_t feenox;
-neutron_diffusion_t neutron_diffusion;
 #include "../../parser/parser.h"
-extern feenox_parser_t feenox_parser;
 
 int feenox_problem_parse_problem_neutron_diffusion(const char *token) {
   

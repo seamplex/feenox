@@ -21,12 +21,10 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
 
 // --------------------------------------------------------------
-// cuadrangulo de cuatro nodos
+// eight-node quadrangle
 // --------------------------------------------------------------
 int feenox_mesh_quad8_init(void) {
   

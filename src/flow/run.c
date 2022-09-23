@@ -17,10 +17,9 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
- *------------------- ------------  ----    --------  --     -       -         -
+ *------------------- ------------  ----    -x-------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 int feenox_run(void) {
 

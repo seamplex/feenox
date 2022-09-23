@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 // API
 int feenox_add_assignment(const char *left_hand, const char *right_hand) {

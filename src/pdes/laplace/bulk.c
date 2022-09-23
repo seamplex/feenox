@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "laplace.h"
-extern feenox_t feenox;
-extern laplace_t laplace;
 
 int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned int v) {
 

@@ -22,7 +22,6 @@
 
 #include "feenox.h"
 #include "mechanical.h"
-extern feenox_t feenox;
 mechanical_t mechanical;
 
 int feenox_problem_init_parser_mechanical(void) {

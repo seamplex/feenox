@@ -20,12 +20,10 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
 
 // --------------------------------------------------------------
-// prisma de seis nodos
+// six-node prism
 // --------------------------------------------------------------
 
 int feenox_mesh_prism6_init(void) {

@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "neutron_diffusion.h"
-extern feenox_t feenox;
-extern neutron_diffusion_t neutron_diffusion;
 
 int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *this, unsigned int v) {
 

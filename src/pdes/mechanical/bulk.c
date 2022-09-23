@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "mechanical.h"
-extern feenox_t feenox;
-extern mechanical_t mechanical;
 
 int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes) {
   

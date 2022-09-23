@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 int feenox_instruction_if(void *arg) {
   conditional_block_t *conditional_block = (conditional_block_t *)arg;

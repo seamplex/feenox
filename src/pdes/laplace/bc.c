@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "laplace.h"
-extern feenox_t feenox;
-extern laplace_t laplace;
 
 int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, char *rhs) {
 

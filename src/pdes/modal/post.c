@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "modal.h"
-extern feenox_t feenox;
-extern modal_t modal;
 
 int feenox_problem_solve_post_modal(void) {
 

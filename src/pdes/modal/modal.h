@@ -64,7 +64,7 @@ struct modal_t {
   vector_t *mu;
   vector_t *Mu;
 };  
-
+extern modal_t modal;
 
 #endif /* MODAL_H */
 

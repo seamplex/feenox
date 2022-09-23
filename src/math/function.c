@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 const double zero[3] = {0, 0, 0};
 
 int feenox_define_function(const char *name, unsigned int n_arguments) {

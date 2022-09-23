@@ -22,8 +22,6 @@
 
 #include "feenox.h"
 #include "mechanical.h"
-extern feenox_t feenox;
-extern mechanical_t mechanical;
 
 // this works for both 2d and 3d
 #define FLUX_SIGMAX  0

@@ -20,12 +20,10 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
 
 // --------------------------------------------------------------
-// punto de un nodo
+// one-node point
 // --------------------------------------------------------------
 int feenox_mesh_one_node_point_init(void) {
   

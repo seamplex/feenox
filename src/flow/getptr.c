@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 extern builtin_function_t       builtin_function[N_BUILTIN_FUNCTIONS];
 extern builtin_functional_t     builtin_functional[N_BUILTIN_FUNCTIONALS];
 extern builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTIONS];

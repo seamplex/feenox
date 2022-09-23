@@ -21,7 +21,6 @@
  */
 #include "feenox.h"
 #include "thermal.h"
-extern feenox_t feenox;
 thermal_t thermal;
 
 int feenox_problem_parse_problem_thermal(const char *token) {

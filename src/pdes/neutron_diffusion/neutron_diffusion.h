@@ -43,6 +43,7 @@ struct neutron_diffusion_t {
   var_t *keff;
   
 };  
+extern neutron_diffusion_t neutron_diffusion;
 
 
 #endif /* NEUTRON_DIFFUSION_FEM_H */

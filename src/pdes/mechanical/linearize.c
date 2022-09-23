@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "mechanical.h"
-extern feenox_t feenox;
-extern mechanical_t mechanical;
 
 struct linearize_params_t {
   double x1, y1, z1;

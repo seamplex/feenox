@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
 
 #define feenox_mesh_gmsh_readnewline()  \
   if (fgets(buffer, BUFFER_LINE_SIZE-1, fp) == NULL) { \

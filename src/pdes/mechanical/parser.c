@@ -20,13 +20,8 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
-
 #include "../../parser/parser.h"
-extern feenox_parser_t feenox_parser;
-
 #include "mechanical.h"
-extern mechanical_t mechanical;
 
 int feenox_problem_parse_problem_mechanical(const char *token) {
   

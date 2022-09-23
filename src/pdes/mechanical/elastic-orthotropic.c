@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "mechanical.h"
-extern feenox_t feenox;
-extern mechanical_t mechanical;
 
 int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *x, material_t *material) {
   

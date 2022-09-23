@@ -20,8 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 
 struct mesh_interp_params {
   element_t *element;

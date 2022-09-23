@@ -20,8 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
-
 
 // get a pointer to a physical group
 physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t *mesh) {

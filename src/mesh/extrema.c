@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include <feenox.h>
-extern feenox_t feenox;
 
 #define FEENOX_EXTREMA_MIN 0
 #define FEENOX_EXTREMA_MAX 1

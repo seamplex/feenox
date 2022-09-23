@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
 int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);

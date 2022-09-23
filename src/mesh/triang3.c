@@ -20,10 +20,11 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
 
+// -------------------------------------
+// three-node triangle
+// -------------------------------------
 
 int feenox_mesh_triang3_init(void) {
 

@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 // from gsl/roots/root.h
 #define SAFE_FUNC_CALL(f, x, yp) \

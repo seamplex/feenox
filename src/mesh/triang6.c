@@ -20,9 +20,11 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
+
+// -------------------------------------
+// six-node triangle
+// -------------------------------------
 
 int feenox_mesh_triang6_init(void) {
 

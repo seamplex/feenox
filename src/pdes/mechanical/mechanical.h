@@ -196,6 +196,7 @@ struct feenox_linearize_t {
   
   feenox_linearize_t *next;
 };
+extern mechanical_t mechanical;
 
 #endif /* MECHANICAL_H */
 

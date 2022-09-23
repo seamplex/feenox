@@ -20,8 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 
 int mesh_count_common_nodes(element_t *e1, element_t *e2, int *nodes) {
   

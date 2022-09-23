@@ -20,8 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
-
 
 double feenox_vector_get(vector_t *this, const size_t i) {
 

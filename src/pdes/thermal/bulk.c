@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "thermal.h"
-extern feenox_t feenox;
-extern thermal_t thermal;
 
 int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned int v) {
 

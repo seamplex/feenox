@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 // get a pointer to a material
 material_t *feenox_get_material_ptr(const char *name) {

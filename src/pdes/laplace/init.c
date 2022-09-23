@@ -21,7 +21,6 @@
  */
 #include "feenox.h"
 #include "laplace.h"
-extern feenox_t feenox;
 laplace_t laplace;
 
 ///pb_laplace+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.

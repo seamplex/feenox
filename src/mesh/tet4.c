@@ -20,12 +20,10 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
-
 #include "element.h"
 
 // -------------------------------------
-// iso-parametric four-noded tetrahedron
+// four-node tetrahedron
 // -------------------------------------
 
 int feenox_mesh_tet4_init(void) {

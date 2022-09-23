@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
-extern feenox_t feenox;
 
 // c = b - a
 void feenox_mesh_subtract(const double *a, const double *b, double *c) {

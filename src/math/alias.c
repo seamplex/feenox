@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 int feenox_instruction_alias(void *arg) {
   alias_t *alias = (alias_t *)arg;

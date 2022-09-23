@@ -21,7 +21,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 #include <math.h>
 #include <ctype.h>

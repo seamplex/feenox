@@ -75,6 +75,7 @@ struct thermal_t {
   } cache;
   
 };  
+extern thermal_t thermal;
 
 
 #endif /* THERMAL_H */

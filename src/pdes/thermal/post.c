@@ -21,8 +21,6 @@
  */
 #include "feenox.h"
 #include "thermal.h"
-extern feenox_t feenox;
-extern thermal_t thermal;
 
 // TODO: move to heatflux
 

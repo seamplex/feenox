@@ -20,7 +20,6 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-extern feenox_t feenox;
 
 #include <signal.h>   // for signal
 #include <unistd.h>   // for sysconf

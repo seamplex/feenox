@@ -1,5 +1,4 @@
 #include "feenox.h"
-extern feenox_t feenox;
 
 int feenox_add_instruction(int (*routine)(void *), void *argument) {
   return (feenox_add_instruction_and_get_ptr(routine, argument) == NULL);
