@@ -247,7 +247,8 @@ possible:
 
     PRINT t x y z        # four-column plain-ASCII output
 
-[The Lorenz attractor solved with FeenoX and drawn with Gnuplot]
+[Figure 1: The Lorenz attractor solved with FeenoX and drawn with
+Gnuplot]
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
 columns (t, x, y and z) which we can then redirect to a file and plot it
@@ -260,7 +261,7 @@ FeenoX’ outputs. This is essentially how UNIX filters and pipes work.
 Let us solve the linear elasticity benchmark problem NAFEMS LE10 “Thick
 plate pressure.” Assuming a proper mesh has already been created in
 Gmsh, note how well the FeenoX input file matches the problem statement
-from @fig:nafems-le10-problem-input:
+from fig. 2:
 
     # NAFEMS Benchmark LE-10: thick plate pressure
     PROBLEM mechanical DIMENSIONS 3
@@ -298,9 +299,10 @@ mesh (rule of simplicity). And since the properties are uniform and
 isotropic, a single global scalar for E and a global single scalar for ν
 are enough.
 
-[The NAFEMS LE10 problem statement and the corresponding FeenoX input]
+[Figure 2: The NAFEMS LE10 problem statement and the corresponding
+FeenoX input]
 
-[Normal stress σ_(y) refined around point D over 5,000x-warped
+[Figure 3: Normal stress σ_(y) refined around point D over 5,000x-warped
 displacements for LE10 created with Paraview]
 
 For the sake of visual completeness, post-processing data with the
@@ -388,11 +390,12 @@ details about how to contribute.
   [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
   [gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
-  [The Lorenz attractor solved with FeenoX and drawn with Gnuplot]: doc/lorenz.svg
+  [Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot]:
+    doc/lorenz.svg
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
-  [The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
+  [Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
     doc/nafems-le10-problem-input.svg
-  [Normal stress σ_(y) refined around point D over 5,000x-warped displacements for LE10 created with Paraview]:
+  [Figure 3: Normal stress σ_(y) refined around point D over 5,000x-warped displacements for LE10 created with Paraview]:
     doc/nafems-le10.png
   [3]: https://www.paraview.org
   [Paraview]: https://www.paraview.org/

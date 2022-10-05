@@ -13,9 +13,12 @@
   - [<span class="toc-section-number">4.1</span> Vim][]
   - [<span class="toc-section-number">4.2</span> Kate][]
 - [<span class="toc-section-number">5</span> Post-processors][]
-- [<span class="toc-section-number">6</span> Other UNIX tools][]
-  - [<span class="toc-section-number">6.1</span> Awk][]
-  - [<span class="toc-section-number">6.2</span> M4][]
+- [<span class="toc-section-number">6</span> Notes on hardware][]
+  - [<span class="toc-section-number">6.1</span> Memory][]
+  - [<span class="toc-section-number">6.2</span> CPU][]
+- [<span class="toc-section-number">7</span> Other UNIX tools][]
+  - [<span class="toc-section-number">7.1</span> Awk][]
+  - [<span class="toc-section-number">7.2</span> M4][]
 
   [<span class="toc-section-number">1</span> Foreword]: #foreword
   [<span class="toc-section-number">2</span> FeenoX]: #feenox
@@ -29,9 +32,12 @@
   [<span class="toc-section-number">4.1</span> Vim]: #vim
   [<span class="toc-section-number">4.2</span> Kate]: #kate
   [<span class="toc-section-number">5</span> Post-processors]: #post-processors
-  [<span class="toc-section-number">6</span> Other UNIX tools]: #other-unix-tools
-  [<span class="toc-section-number">6.1</span> Awk]: #awk
-  [<span class="toc-section-number">6.2</span> M4]: #m4
+  [<span class="toc-section-number">6</span> Notes on hardware]: #notes-on-hardware
+  [<span class="toc-section-number">6.1</span> Memory]: #memory
+  [<span class="toc-section-number">6.2</span> CPU]: #cpu
+  [<span class="toc-section-number">7</span> Other UNIX tools]: #other-unix-tools
+  [<span class="toc-section-number">7.1</span> Awk]: #awk
+  [<span class="toc-section-number">7.2</span> M4]: #m4
 
 # Foreword
 
@@ -349,6 +355,12 @@ Note that both Gmsh in post-processing mode and Paraview make sense only
 if you have access to a graphical device.
 
   [downloaded]: https://www.paraview.org/download/
+
+# Notes on hardware
+
+## Memory
+
+## CPU
 
 # Other UNIX tools
 

@@ -13,17 +13,17 @@ if [ ! -e "design" ]; then
   exit 1
 fi
 
-# main README
+# main README & TODO
 echo "creating main README for Github"
-cd ..
-doc/pdf.sh README
-doc/markdown.sh README
-doc/markdown.sh TODO
-cd doc
+./md2.sh --pdf   ../README
+./md2.sh --gfm   ../README
+./md2.sh --plain ../README
+./md2.sh --plain ../TODO
 
 echo "creating doc's README"
-./markdown.sh README
-
+./md2.sh --pdf   README
+./md2.sh --gfm   README
+./md2.sh --plain README
 
 echo "creating the reference markdown from the commented sources"
 echo " - keywords"
@@ -72,26 +72,27 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
   --lua-filter=img-width.lua \
   --lua-filter=manfilter.lua
 
-# this goes into the make script of the webpage
-# echo "unix man page in html"
-# pandoc -s -t html feenox.1 -o feenox.1.html
+echo "unix man page in html"
+pandoc -s -t html feenox.1 -o feenox.1.html
 
 # this one goes into the windows zip
 pandoc -s double-click.md -t plain -o double-click.txt --lua-filter=include-files.lua
 
 
 
-echo "PDF + Markdown"
+echo "PDF + HTML + Markdown"
 for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
  echo ${i}
- ./pdf.sh ${i}
- ./markdown.sh ${i}
+ ./md2.sh --pdf  ${i}
+ ./md2.sh --html ${i}
+ ./md2.sh --gfm  ${i}
 done
 
-echo "PDF only"
+echo "PDF + HTML"
 for i in sds feenox-manual; do
  echo ${i}
- ./pdf.sh ${i}
+ ./md2.sh --pdf ${i}
+ ./md2.sh --html ${i}
 done
 
 

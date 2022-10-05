@@ -4,10 +4,12 @@ titleblock: |
  FeenoX documentation index
  ==========================
 lang: en-US
-toc: true 
 ...
 
 > FeenoX documentation is released under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html), or any later version.
+
+Every bit of FeenoX documentation is written in [Pandoc](https://pandoc.org/)-flavored Markdown.
+It is then converted to HTML, PDF, Unix manpage or Texinfo as needed.
 
 
 # FeenoX manual and description
@@ -21,12 +23,16 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
  * [HTML description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
  * [PDF description](https://www.seamplex.com/feenox/doc/feenox-desc.pdf)
 
-The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) directory of the Git repository. They are in [Pandoc](https://pandoc.org/)-flavored Markdown.
+The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) directory of the Git repository.
+
 
 ## Design
 
-The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
+ 1. The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool.
+ 
+ 2. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
 
+ 
  * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
  * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX' offer)
  * [Mid-term PhD review presentation slides with the SRS/SDS explanation in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
@@ -38,7 +44,7 @@ The FeenoX project starts as an offer to an imaginary “request for quotations�
    
 ## Frequently Asked Questions
 
- * [Frequently Asked Questions](./FAQ.md)
+Check out FeenoX’ [Frequently Asked Questions](./FAQ.md)
  * Ask yours on [GitHub Discussions](https://github.com/seamplex/feenox/discussions/)
  * Check also the [GitHub Issues](https://github.com/seamplex/feenox/issues)
  
@@ -55,25 +61,36 @@ Go directly to the point and see how to solve problems with FeenoX. Everything (
 
 ## Quick examples
 
-Annotated examples can be found in the [examples](../examples) directory. These are simple and quick (but varied) cases. They are based on the August 2021 presentation:
+[Annotated examples](https://www.seamplex.com/feenox/examples) can be found in the [examples](https://github.com/seamplex/feenox/tree/main/examples) directory of the Github repository.
+
+ * [Online annotated examples](https://www.seamplex.com/feenox/examples)
+ * [Github examples directory](https://github.com/seamplex/feenox/tree/main/examples)
+
+These are simple and quick (but varied) cases. They are based on the August 2021 presentation:
 
  * [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
  * [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
  * [Markdown examples sources](https://github.com/gtheler/2021-presentation)
- 
-Make sure you also browse the [tests](https://github.com/seamplex/feenox/tree/main/tests) directory of the Git repository and the [Software Design specifications](./sds.md) document.
+
+The regression tests can also be used as quick examples:
+
+ * [Regression tests](https://github.com/seamplex/feenox/tree/main/tests)
  
 ## Tutorials
 
-Step-by-step instructions and explanations to solve increasingly-complex problems are given in the [tutorials](../tutorials) directory.
+Step-by-step instructions and explanations to solve increasingly-complex problems are given in the [tutorials](tutorials) directory.
 
-**TO BE DONE**
 
-## Case files
+### Introduction
 
-Detailed solutions of benchmarks, V&V cases and/or problems with industrial interest. These cases include parametric studies for mesh convergence, comparisons with analytical or other programs, efficiency measurements,  etc. Since these cases involve other tools, figures, data files, etc. they have a separate repository.
+ 1. [Setting up your workspace](tutorials/000-setup)
+ 
+### General tutorials
+ 
+ 1. [Overview: the tensile test case](tutorials/110-tensile-test)
+ 2. Fun & games: solving a maze without AI
 
-**TO BE DONE**
+
 
 # Background and generalities
 

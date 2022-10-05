@@ -236,6 +236,14 @@ Also binaries and source versions can be [downloaded](https://www.paraview.org/d
 
 Note that both Gmsh in post-processing mode and Paraview make sense only if you have access to a graphical device.
 
+
+# Notes on hardware
+
+## Memory
+
+## CPU
+
+
 # Other UNIX tools
 
 To be done.

@@ -12,10 +12,6 @@ for i in git autoconf m4 make wget; do
   fi
 done
 
-if [ -z "$(which git)" ]; then
-  echo "git is not installed"
-fi
-
 if [ -z "${branch}" ]; then
   branch="main"
 fi
@@ -46,7 +42,7 @@ elif [ "x${name}" == "xCYGWIN_NT-10.0" ]; then
   PETSC_ARCH=cygwin-serial-static
   target=windows64
 else
-  echo "unknown uname '${name}'"
+  echo "error: unknown uname '${name}'"
   exit 1
 fi
 

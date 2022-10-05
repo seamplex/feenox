@@ -1,20 +1,3 @@
-PROBLEM mechanical           # self-descriptive
-READ_MESH tensile-test.msh   # lengths are in mm
-
-# material properties, E and nu are "special" variables for the mechanical problem
-E = 200e3   # [ MPa = N / mm^2 ]
-nu = 0.3
-
-# boundary conditions, fixed and Fx are "special" keywords for the mechanical problem
-# the names "left" and "right" should match the physical names in the .geo
-BC left  fixed
-BC right Fx=10e3  # [ N ]
-
-# we can now solve the problem, after this keyword the results will be available for output
-SOLVE_PROBLEM
-
-# essentially we are done by now, we have to write the expected results
-
 # 1. a VTK file to be post-processed in ParaView with
 #    a. the displacements [u,v,w] as a vector
 #    b. the von Mises stress sigma as a scalar

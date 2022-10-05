@@ -126,6 +126,25 @@ inline double feenox_mesh_determinant(gsl_matrix *this) {
              - gsl_matrix_get(this, 0, 1) * gsl_matrix_get(this, 1, 0);
     break;
     case 3:
+// compare to eigen's proposal
+/*
+template<typename Derived>
+inline const typename Derived::Scalar bruteforce_det3_helper
+(const MatrixBase<Derived>& matrix, int a, int b, int c)
+{
+  return matrix.coeff(0,a)
+         * (matrix.coeff(1,b) * matrix.coeff(2,c) - matrix.coeff(1,c) * matrix.coeff(2,b));
+}
+template<typename Derived> struct determinant_impl<Derived, 3>
+{
+  static inline typename traits<Derived>::Scalar run(const Derived& m)
+  {
+    return bruteforce_det3_helper(m,0,1,2)
+          - bruteforce_det3_helper(m,1,0,2)
+          + bruteforce_det3_helper(m,2,0,1);
+  }
+};
+*/
       return + gsl_matrix_get(this, 0, 0) * gsl_matrix_get(this, 1, 1) * gsl_matrix_get(this, 2, 2)
              + gsl_matrix_get(this, 0, 1) * gsl_matrix_get(this, 1, 2) * gsl_matrix_get(this, 2, 0)
              + gsl_matrix_get(this, 0, 2) * gsl_matrix_get(this, 1, 0) * gsl_matrix_get(this, 2, 1) 
@@ -138,7 +157,7 @@ inline double feenox_mesh_determinant(gsl_matrix *this) {
   return 0.0;
 }
 
-// copmpute the gradient of h with respect to x evaluated at r
+// copmpute the gradient of h with respect to x evaluated at any arbitrary 
 int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx) {
 
   gsl_matrix *dxdr = NULL;
@@ -156,16 +175,16 @@ int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_
     feenox_call(feenox_mesh_compute_dxdr(e, r, dxdr));
     feenox_call(feenox_mesh_matrix_invert(dxdr, drdx));
   }
-
-  gsl_matrix_set_zero(dhdx);
-  unsigned int j, m, m_prime;
-  for (j = 0; j < e->type->nodes; j++) {
-    for (m = 0; m < e->type->dim; m++) {
-      for (m_prime = 0; m_prime < e->type->dim; m_prime++) {
-        gsl_matrix_add_to_element(dhdx, j, m, e->type->dhdr(j, m_prime, r) * gsl_matrix_get(drdx, m_prime, m));
-      }
+  
+  gsl_matrix *dhdr = NULL;
+  feenox_check_alloc(dhdr = gsl_matrix_alloc(e->type->nodes, e->type->dim));
+  for (int j = 0; j < e->type->nodes; j++) {
+    for (int m = 0; m < e->type->dim; m++) {
+      gsl_matrix_set(dhdr, j, m, e->type->dhdr(j, m, r));
     }
   }
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, dhdr, drdx, 0.0, dhdx));
+  gsl_matrix_free(dhdr);
 
   if (drdx_ref == NULL) {
     gsl_matrix_free(drdx);
@@ -297,13 +316,25 @@ inline int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int inte
   // TODO: choose to complain or not
   if (e->w[v] == 0) {
     double det = feenox_mesh_determinant(e->dxdr[v]);
+    if (det == 0) {
+      printf("element %ld\n", e->tag);
+    }
+//    printf("element %ld point %d det = %g\n", e->tag, v, det);
+//    printf("%g %g %g\n", e->node[0]->x[0], e->node[0]->x[1], e->node[0]->x[2]);
+//    printf("%g %g %g\n", e->node[1]->x[0], e->node[1]->x[1], e->node[1]->x[2]);
+//    printf("%g %g %g\n", e->node[2]->x[0], e->node[2]->x[1], e->node[2]->x[2]);
+    
+//    if (fabs(det) < 1e-6) {
+//      printf("det = %g\n for element %ld at v = %d / %d\n", det, e->tag, v+1, e->type->gauss[integration].V);
+//    }
+    
 //    if (det <= 0) {
 //      feenox_push_error_message("negative determinant for element %ld at integration point %d of %d", e->tag, v+1, e->type->gauss[integration].V);
 //      return FEENOX_ERROR;
 //      printf("negative determinant %g for element %ld at integration point %d of %d\n", det, e->tag, v+1, e->type->gauss[integration].V);
 //      feenox_debug_print_gsl_matrix(e->dxdr[v], stdout);
 //    } else {
-//      printf("positive determinant %g for element %ld at integration point %d of %d\n", det, e->tag, v+1, e->type->gauss[integration].V);      
+//      printf("positive determinant %g for element %ld at integration point %d of %d\n", det, e->tag, v+1, e->type->gauss[integration].V);
 //    }      
     
     e->w[v] = e->type->gauss[integration].w[v] * fabs(det);

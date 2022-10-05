@@ -644,7 +644,7 @@ $
 
 If it is not and you went through the `$HOME/bin` path, make sure it is in the `PATH` (pun). Add
 
-```
+```c
 export PATH=${PATH}:${HOME}/bin
 ``` 
 
@@ -737,13 +737,13 @@ Thus, the recommended way to set flags is in `configure` and not in `make`.
 Particular explanation for FeenoX is to be done.
 For now, follow the [general explanation from PETSc’s website](https://petsc.org/release/install/).
 
-```
+```terminal
 export PETSC_DIR=$PWD
 export PETSC_ARCH=arch-linux-c-opt
 ./configure --with-debugging=0 --download-mumps --download-scalapack --with-cxx=0 --COPTFLAGS=-O3 --FOPTFLAGS=-O3 
 ```
 
-```
+```terminal
 export PETSC_DIR=$PWD
 ./configure --with-debugging=0 --with-openmp=0 --with-x=0 --with-cxx=0 --COPTFLAGS=-O3 --FOPTFLAGS=-O3 
 make PETSC_DIR=/home/ubuntu/reflex-deps/petsc-3.17.2 PETSC_ARCH=arch-linux-c-opt all

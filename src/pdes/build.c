@@ -82,8 +82,8 @@ int feenox_problem_build(void) {
             // and only apply them if the condition holds true (or if there's no condition at all)
             if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
               feenox_call(feenox_problem_build_element_natural_bc(&feenox.pde.mesh->element[i], bc_data));
-            }  
-          }  
+            }
+          }
         }
       }
     }
@@ -177,6 +177,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
     
   // if the current element's size is not equal to the previous one, re-allocate
+  // TODO: data-oriented approach, these objects in native arrays
   if (feenox.pde.n_local_nodes != this->type->nodes) {
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }

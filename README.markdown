@@ -265,9 +265,9 @@ PRINT t x y z        # four-column plain-ASCII output
 <figure>
 <img src="doc/lorenz.svg" id="fig:lorenz-gnuplot" data-width_latex="75%"
 data-width_html="100%" data-width_texinfo="12cm"
-alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
-<figcaption aria-hidden="true">The Lorenz attractor solved with FeenoX
-and drawn with Gnuplot</figcaption>
+alt="Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
+<figcaption aria-hidden="true">Figure 1: The Lorenz attractor solved
+with FeenoX and drawn with Gnuplot</figcaption>
 </figure>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
@@ -282,7 +282,7 @@ and pipes work.
 Let us solve the linear elasticity benchmark problem [NAFEMS LE10][]
 “Thick plate pressure.” Assuming a proper mesh has already been created
 in Gmsh, note how well the FeenoX input file matches the problem
-statement from @fig:nafems-le10-problem-input:
+statement from fig. 2:
 
 ``` feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
@@ -328,16 +328,16 @@ for $\nu$ are enough.
 <img src="doc/nafems-le10-problem-input.svg"
 id="fig:nafems-le10-problem-input" data-width_html="100%"
 data-width_latex="100%" data-width_texinfo="15cm"
-alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
-<figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the
-corresponding FeenoX input</figcaption>
+alt="Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption aria-hidden="true">Figure 2: The NAFEMS LE10 problem
+statement and the corresponding FeenoX input</figcaption>
 </figure>
 
 <figure>
 <img src="doc/nafems-le10.png" id="fig:nafems-le10-sigmay"
 data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm"
-alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
-<figcaption aria-hidden="true">Normal stress <span
+alt="Figure 3: Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
+<figcaption aria-hidden="true">Figure 3: Normal stress <span
 class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined
 around point <span class="math inline"><em>D</em></span> over
 5,000x-warped displacements for LE10 created with Paraview</figcaption>

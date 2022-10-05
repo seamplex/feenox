@@ -1216,7 +1216,7 @@ The main features of the input format, thoroughly described below, are:
  #. The input file should match as much as possible the paper (or blackboard) formulation of the problem.
  #. It provides means to compare numerical solutions against analytical ones.
  #. It should be possible to read run-time arguments from the command line.
- #. Input files should be [distributed version control](https://en.wikipedia.org/wiki/Distributed_version_control)-friendly.
+ #. Input files are [distributed version control](https://en.wikipedia.org/wiki/Distributed_version_control)-friendly.
  
 ### Syntactic sugar & highlighting
 

@@ -72,7 +72,6 @@ echo ${automatic} > available.h
 
 cat << EOF >> parse.c
 #include "feenox.h"
-extern feenox_t feenox;
 
 int feenox_pde_parse_problem_type(const char *token) {
 

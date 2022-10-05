@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 if [ ! -e ../src ]; then
-  echo "run from dist directory"
+  echo "error: run from dist directory"
   exit 0
 fi
 
@@ -12,7 +12,7 @@ if [ ! -e petsc-${petsc_ver} ]; then
  if [ ! -e petsc-${petsc_ver}.tar.gz ]; then
   wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-${petsc_ver}.tar.gz
   if [ ! -e petsc-${petsc_ver}.tar.gz ]; then
-   echo "cannot download PETSc"
+   echo "error: cannot download PETSc"
    exit 1
   fi
  fi
@@ -22,6 +22,10 @@ fi
 cd petsc-${petsc_ver}
 export PETSC_DIR=$(pwd)
 export PETSC_ARCH=${PETSC_ARCH}
+
+# f2cblaslapack is not sse-enabled but download-openblas does not work
+# it fails saying that gcc_s is not found at link time
+# petsc does not use mucy use of blas and gsl uses cblas, we should be good
 ./configure --with-mpi=0 \
             --with-cxx=0 \
             --with-fortran-bindings=0 \
@@ -45,7 +49,7 @@ if [ ! -e slepc-${slepc_ver} ]; then
  if [ ! -e slepc-${slepc_ver}.tar.gz ]; then
   wget https://slepc.upv.es/download/distrib/slepc-${slepc_ver}.tar.gz
   if [ ! -e slepc-${slepc_ver}.tar.gz ]; then
-   echo "cannot download SLEPc"
+   echo "error: cannot download SLEPc"
    exit 1
   fi
  fi

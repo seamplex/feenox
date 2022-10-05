@@ -9,7 +9,9 @@
 - [<span class="toc-section-number">2</span> Hands on][]
   - [<span class="toc-section-number">2.1</span> Quick examples][]
   - [<span class="toc-section-number">2.2</span> Tutorials][]
-  - [<span class="toc-section-number">2.3</span> Case files][]
+    - [<span class="toc-section-number">2.2.1</span> Introduction][]
+    - [<span class="toc-section-number">2.2.2</span> General
+      tutorials][]
 - [<span class="toc-section-number">3</span> Background and
   generalities][]
   - [<span class="toc-section-number">3.1</span> Software requirements
@@ -31,6 +33,10 @@
 > FeenoX documentation is released under the terms of the [GNU Free
 > Documentation License v1.3][], or any later version.
 
+Every bit of FeenoX documentation is written in [Pandoc][]-flavored
+Markdown. It is then converted to HTML, PDF, Unix manpage or Texinfo as
+needed.
+
   [<span class="toc-section-number">1</span> FeenoX manual and description]:
     #feenox-manual-and-description
   [<span class="toc-section-number">1.1</span> Design]: #design
@@ -40,7 +46,8 @@
   [<span class="toc-section-number">2</span> Hands on]: #hands-on
   [<span class="toc-section-number">2.1</span> Quick examples]: #quick-examples
   [<span class="toc-section-number">2.2</span> Tutorials]: #tutorials
-  [<span class="toc-section-number">2.3</span> Case files]: #case-files
+  [<span class="toc-section-number">2.2.1</span> Introduction]: #introduction
+  [<span class="toc-section-number">2.2.2</span> General tutorials]: #general-tutorials
   [<span class="toc-section-number">3</span> Background and generalities]:
     #background-and-generalities
   [<span class="toc-section-number">3.1</span> Software requirements specifications]:
@@ -58,6 +65,7 @@
   [<span class="toc-section-number">4.4</span> How FeenoX documentation system works]:
     #how-feenox-documentation-system-works
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
+  [Pandoc]: https://pandoc.org/
 
 # FeenoX manual and description
 
@@ -72,8 +80,7 @@ reference.
 - [HTML description][]
 - [PDF description][]
 
-The sources are in the [doc][] directory of the Git repository. They are
-in [Pandoc][]-flavored Markdown.
+The sources are in the [doc][] directory of the Git repository.
 
   [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
   [Texinfo]: https://www.gnu.org/software/texinfo/
@@ -83,15 +90,16 @@ in [Pandoc][]-flavored Markdown.
   [HTML description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [PDF description]: https://www.seamplex.com/feenox/doc/feenox-desc.pdf
   [doc]: https://github.com/seamplex/feenox/tree/main/doc
-  [Pandoc]: https://pandoc.org/
 
 ## Design
 
-The FeenoX project starts as an offer to an imaginary “request for
-quotations” that defines [software requirements specifications][] for an
-open source computational tool. Then a fictitious “offer” to the above
-tender is given in a [software design specifications][] document that
-explains the design decisions and features included in FeenoX.
+1.  The FeenoX project starts as an offer to an imaginary “request for
+    quotations” that defines [software requirements specifications][]
+    for an open source computational tool.
+
+2.  Then a fictitious “offer” to the above tender is given in a
+    [software design specifications][] document that explains the design
+    decisions and features included in FeenoX.
 
 - [Software Requirements specifications][1] [PDF][] (Fictitious RFQ)
 - [Software Design specifications][2] [PDF][3] (Imaginary FeenoX’ offer)
@@ -126,9 +134,8 @@ explains the design decisions and features included in FeenoX.
 
 ## Frequently Asked Questions
 
-- [Frequently Asked Questions][]
-- Ask yours on [GitHub Discussions][]
-- Check also the [GitHub Issues][]
+Check out FeenoX’ [Frequently Asked Questions][] \* Ask yours on [GitHub
+Discussions][] \* Check also the [GitHub Issues][]
 
   [Frequently Asked Questions]: ./FAQ.md
   [GitHub Discussions]: https://github.com/seamplex/feenox/discussions/
@@ -149,42 +156,49 @@ Everything (except the case files) is included in the Git repository.
 
 ## Quick examples
 
-Annotated examples can be found in the [examples][] directory. These are
-simple and quick (but varied) cases. They are based on the August 2021
-presentation:
+[Annotated examples][] can be found in the [examples][] directory of the
+Github repository.
+
+- [Online annotated examples][Annotated examples]
+- [Github examples directory][examples]
+
+These are simple and quick (but varied) cases. They are based on the
+August 2021 presentation:
 
 - [Recording (audio in Spanish, slides in English)][]
 - [Slides in PDF][]
 - [Markdown examples sources][]
 
-Make sure you also browse the [tests][] directory of the Git repository
-and the [Software Design specifications][] document.
+The regression tests can also be used as quick examples:
 
-  [examples]: ../examples
+- [Regression tests][]
+
+  [Annotated examples]: https://www.seamplex.com/feenox/examples
+  [examples]: https://github.com/seamplex/feenox/tree/main/examples
   [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
   [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
   [Markdown examples sources]: https://github.com/gtheler/2021-presentation
-  [tests]: https://github.com/seamplex/feenox/tree/main/tests
-  [Software Design specifications]: ./sds.md
+  [Regression tests]: https://github.com/seamplex/feenox/tree/main/tests
 
 ## Tutorials
 
 Step-by-step instructions and explanations to solve increasingly-complex
 problems are given in the [tutorials][] directory.
 
-**TO BE DONE**
+  [tutorials]: tutorials
 
-  [tutorials]: ../tutorials
+### Introduction
 
-## Case files
+1.  [Setting up your workspace][]
 
-Detailed solutions of benchmarks, V&V cases and/or problems with
-industrial interest. These cases include parametric studies for mesh
-convergence, comparisons with analytical or other programs, efficiency
-measurements, etc. Since these cases involve other tools, figures, data
-files, etc. they have a separate repository.
+  [Setting up your workspace]: tutorials/000-setup
 
-**TO BE DONE**
+### General tutorials
+
+1.  [Overview: the tensile test case][]
+2.  Fun & games: solving a maze without AI
+
+  [Overview: the tensile test case]: tutorials/110-tensile-test
 
 # Background and generalities
 

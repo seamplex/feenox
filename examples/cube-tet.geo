@@ -16,6 +16,6 @@ Mesh.Algorithm = 8;
 Mesh.Algorithm3D = 10;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;
-Mesh.OptimizeHighorder = 1;
+Mesh.HighOrderOptimize = 1;
 Mesh.MeshSizeMin = a/n;
 Mesh.MeshSizeMax = a/n;

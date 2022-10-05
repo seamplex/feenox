@@ -9,5 +9,4 @@ geometry:
 - head=2cm
 colorlinks: true
 mathspec: true
-listings: true
 ...

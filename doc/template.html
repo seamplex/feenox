@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+  <!-- Meta -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+$for(author-meta)$
+  <meta name="author" content="$author-meta$" />
+$endfor$
+$if(date-meta)$
+  <meta name="dcterms.date" content="$date-meta$" />
+$endif$
+$if(keywords)$
+  <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+$endif$
+  <meta name="description" content="">
+  <link rel="shortcut icon" href="favicon.ico">  
+  <link rel="stylesheet" href="$rootdir$/assets/css/bootstrap.min.css">   
+  <link rel="stylesheet" href="$rootdir$/assets/css/webfont.css">   
+  <link id="theme-style" rel="stylesheet" href="$rootdir$/assets/css/styles.css">
+
+$for(css)$
+  <link rel="stylesheet" href="$css$" />
+$endfor$
+$if(math)$
+  $math$
+$endif$
+$for(header-includes)$
+  $header-includes$
+$endfor$
+
+  <style>
+   code {white-space: pre; position: relative; overflow: auto;}
+   span.smallcaps{font-variant: small-caps;}
+   span.underline{text-decoration: underline;}
+   div.column{display: inline-block; vertical-align: top; width: 50%;}
+   pre.feenox { background-color: #eeeeee; padding: 1em; border: 0.15em solid #666666; border-radius: 0.2em; }  
+   pre.terminal { background-color: #333333; padding: 1em; border: 0.2em solid #6699cc; border-radius: 0.2em; }  
+$if(quotes)$
+   q { quotes: "“" "”" "‘" "’"; }
+$endif$
+  </style>
+$if(highlighting-css)$
+  <style>
+$highlighting-css$
+code.sourceCode {white-space: pre; overflow: auto;}
+code.wrap {white-space: pre-wrap;}
+pre.terminal code {background-color: #333333; color: white; display: block;}
+  </style>
+$endif$
+<!-- in feenox/download the highlighting-css variable is empty -->
+  <style>pre.terminal code {background-color: #333333; color: white;}</style>
+
+
+<!--Start of Tawk.to Script-->
+<!--
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5cc4322dd6e05b735b448b8e/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+-->
+<!--End of Tawk.to Script-->
+
+ </head>
+  
+ <body class="body-blue">
+  <!-- ******navigation bar****** -->
+  <header id="header" class="header">
+   <div class="container">
+    <nav class="navbar navbar-expand-lg">
+     <div class="branding">
+      <h1 class="logo">
+       <a href="index.html">
+        <span aria-hidden="true" class="icon_documents_alt icon"></span>
+        <span class="text-bold">FeenoX</span>
+       </a>
+      </h1>
+      <small class="d-none d-lg-inline"><em>
+       A free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+      </em></small>
+     </div><!--//branding-->
+              
+     <div class="top-search-box">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#feenox_navbarcontent" aria-controls="feenox_navbarcontent" aria-expanded="false" aria-label="Toggle navigation">
+       <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="feenox_navbarcontent">
+       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+         <a class="nav-link" href="$rootdir$/">Home</a>
+        </li>
+        <li class="nav-item">
+         <a class="nav-link" href="$rootdir$/examples">Examples</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Documentation
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="$rootdir$/doc">Index</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/feenox-manual.html">Manual</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/feenox-desc.html">Description</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/srs.html">Requirements</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/sds.html">Design</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/compilation.html">Compilation</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/programming.html">Programming</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/FAQ.html">FAQs</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/history.html">History</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+         <a class="nav-link" href="$rootdir$/download.html">Download</a>
+        </li>
+       </ul>
+      </div> <!--// collapse navbar-collapse-->
+     </div> <!--// top-search-box-->
+    </nav>
+   </div><!--//container-->
+  </header><!--//header--> 
+
+$for(include-before)$
+$include-before$
+$endfor$
+
+  <div class="page-wrapper"> 
+   <div class="doc-wrapper">
+    <div class="container">
+$if(title)$
+     <div id="doc-header" class="doc-header text-center">
+     <h1 class="doc-title">$title$</h1>
+  $if(subtitle)$
+     <p class="lead">$subtitle$</p>
+  $endif$
+  $for(author)$
+     <p class="meta">$author$</p>
+  $endfor$
+  $if(date)$
+     <p class="meta">$date$</p>
+  $endif$
+  $if(abstract)$
+     <hr>
+     <p class="blockquote"><strong>Abstract</strong>.&nbsp;$abstract$</p>
+  $endif$
+     </div><!--//doc-header--> 
+$endif$
+     <div class="doc-body row">
+      <div class="doc-content col-md-9 col-12 order-1">
+       <div class="content-inner">
+       
+$if(toc)$
+        <div class="callout-block callout-success-outline callout-toc">
+          <h3 class="callout-title">Table of contents</h3>
+          
+$table-of-contents$
+          
+        </div><!--//callout-block-->
+$endif$
+
+$body$
+
+       </div><!--//content-inner-->
+      </div><!--//doc-content-->
+      <div class="doc-sidebar col-md-3 col-12 order-0 d-none d-md-flex">
+       <div id="doc-nav" class="doc-nav">
+        <nav id="doc-menu" class="nav doc-menu flex-column sticky">
+<!--  side_toc_start -->
+$table-of-contents$
+<!--  side_toc_end    -->
+        <p class="text-center"><a href="#header"><small>Back to top</small></a><p>
+        </nav><!--//doc-menu-->
+       </div><!--//doc-nav-->
+      </div><!--//doc-sidebar-->
+     </div><!--//doc-body-->     
+    </div><!--//container-->
+   </div><!--//doc-wrapper-->
+  </div><!--//page-wrapper-->
+ 
+ <footer id="footer" class="footer text-center">
+  <div class="container">
+   <!--/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) */-->
+   <small class="copyright">Designed with <span class="sr-only">love</span><i class="fas fa-heart"></i> by <a href="https://themes.3rdwavemedia.com/" target="_blank">Xiaoying Riley</a> for developers</small>
+  </div><!--//container-->
+ </footer><!--//footer-->
+ 
+  
+ <!-- Main Javascript -->    
+ <script src="$rootdir$/assets/js/bootstrap.bundle.min.js"></script>
+ <script src="$rootdir$/assets/js/stickyfill.min.js"></script>
+ <script src="$rootdir$/assets/js/gumshoe.polyfills.min.js"></script> 
+ <script src="$rootdir$/assets/js/main.js"></script> 
+ 
+ </body>
+</html> 
+
