@@ -920,6 +920,7 @@ struct node_t {
 struct node_data_t {
   char *name_in_mesh;
   function_t *function;
+  int found;
   
   node_data_t *next;
 };

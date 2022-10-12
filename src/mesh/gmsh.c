@@ -822,6 +822,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       LL_FOREACH(this->node_datas, node_data) {
         if (strcmp(string_tag, node_data->name_in_mesh) == 0) {
           function = node_data->function;
+          node_data->found = 1;
           feenox_check_alloc(function->name_in_mesh = strdup(node_data->name_in_mesh));
         }
       }
@@ -956,7 +957,15 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
   fclose(fp);
   this->file->pointer = NULL;
   
-  // limpiar hashes
+  // check if we found everything
+  node_data_t *node_data = NULL;
+  LL_FOREACH(this->node_datas, node_data) {
+    if (node_data->found == 0) {
+      feenox_push_error_message("requested function '%s' was not found in the mesh '%s'", node_data->name_in_mesh, this->file->name);
+      return FEENOX_ERROR;
+    }
+  }
+  
   
   return FEENOX_OK;
 }

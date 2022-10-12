@@ -51,9 +51,24 @@ help.md
 
 # INPUT-FILE KEYWORDS
 
+## GENERIC KEYWORDS
+
 ```{.include shift-heading-level-by=1}
 reference-kw.md
 ```
+
+## DAE-RELATED KEYWORDS
+
+```{.include shift-heading-level-by=1}
+reference-dae-kw.md
+```
+
+### PDE-RELATED KEYWORDS
+
+```{.include shift-heading-level-by=1}
+reference-pde-kw.md
+```
+
 
 # SPECIAL VARIABLES
 
