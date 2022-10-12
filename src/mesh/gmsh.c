@@ -957,16 +957,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
   fclose(fp);
   this->file->pointer = NULL;
   
-  // check if we found everything
-  node_data_t *node_data = NULL;
-  LL_FOREACH(this->node_datas, node_data) {
-    if (node_data->found == 0) {
-      feenox_push_error_message("requested function '%s' was not found in the mesh '%s'", node_data->name_in_mesh, this->file->name);
-      return FEENOX_ERROR;
-    }
-  }
-  
-  
   return FEENOX_OK;
 }
 

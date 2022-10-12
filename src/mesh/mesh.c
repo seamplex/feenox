@@ -39,7 +39,16 @@ int feenox_instruction_mesh_read(void *arg) {
   // read the actual mesh with a format-dependent reader (who needs C++?)
   feenox_call(this->reader(this));
   
-  // sweep nodes ande define the bounding box
+  // check if we found everything
+  node_data_t *node_data = NULL;
+  LL_FOREACH(this->node_datas, node_data) {
+    if (node_data->found == 0) {
+      feenox_push_error_message("requested function '%s' was not found in the mesh '%s'", node_data->name_in_mesh, this->file->name);
+      return FEENOX_ERROR;
+    }
+  }
+  
+  // sweep nodes and define the bounding box
   // TODO: see if this can go inside one of the kd loops
   this->bounding_box_min.index_mesh = SIZE_MAX;
   this->bounding_box_max.index_mesh = SIZE_MAX;
