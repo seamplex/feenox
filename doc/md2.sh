@@ -194,6 +194,10 @@ pandoc ${in}.md \
     --number-sections --toc --toc-depth=4 \
     ${template_args} ${format_args} -o ${out}
 
+if [ $? -ne 0 ]; then
+  echo "error: pandoc failed"
+  exit 1
+fi
 
 # post
 if [ "x${format}" = "x.html" ]; then

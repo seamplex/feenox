@@ -4,7 +4,7 @@ subtitle: A free no-fee no-X uniX-like finite-element(ish) computational enginee
 author: Jeremy Theler
 infoname: feenox
 lang: en-US
-template: manual.tex
+template: manual
 documentclass: book
 classoption: oneside
 ...
