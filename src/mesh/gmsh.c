@@ -477,8 +477,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_call(feenox_gmsh_read_data_int(this, 3, data, binary));
           
           // v4.0 and v4.1 have geometrical and dimension switched
-          int dimension = (version_min == 0) ? data[1] : data[0];
-          int geometrical = (version_min == 0) ? data[0] : data[1];
+//          int dimension = (version_min == 0) ? data[1] : data[0];
+//          int geometrical = (version_min == 0) ? data[0] : data[1];
           int parametric = data[2];
           if (parametric) {
             feenox_push_error_message("mesh '%s' contains parametric data, which is unsupported yet", this->file->path);

@@ -578,7 +578,15 @@ void feenox_finalize(void) {
   feenox_free(feenox.argv_orig);
 */
 //  feenox_free(feenox.main_input_filepath);
-  
+ 
+  if (feenox.pde.petscinit_called == PETSC_TRUE) {
+#ifdef HAVE_SLEPC  
+    SlepcFinalize();
+#else
+    PetscFinalize();
+#endif    
+  }
+    
   return;
 
 }

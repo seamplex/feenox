@@ -67,7 +67,7 @@ int feenox_problem_init_parser_general(void) {
   PetscInt major = 0;
   PetscInt minor = 0;
   PetscInt subminor = 0;
- #ifdef HAVE_SLEPC  
+#ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
   petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
   
@@ -77,10 +77,10 @@ int feenox_problem_init_parser_general(void) {
     feenox_push_error_message("linked against SLEPc %d.%d.%d but using headers from %d.%d.%d", major, minor, subminor, SLEPC_VERSION_MAJOR, SLEPC_VERSION_MINOR, SLEPC_VERSION_SUBMINOR);
     return FEENOX_ERROR;
   }
- #else
+#else
   // initialize PETSc
   petsc_call(PetscInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
- #endif
+#endif
 
   // check the headers correspond to the runtime
   petsc_call(PetscGetVersionNumber(&major, &minor, &subminor, NULL));
