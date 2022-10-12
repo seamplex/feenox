@@ -3,7 +3,7 @@
 #. Now this input file reads the scalar function `T` stored in the coarse first-order mesh file
 #. `parallelepiped-temperature.msh` and uses it to solve the mechanical problem in the finer
 #. second-order mesh `parallelepiped.msh`.
-#. The numerical solution for the displacemetns over the fine mesh is written in a VTK file
+#. The numerical solution for the displacements over the fine mesh is written in a VTK file
 #. (along with the temperature as interpolated from the coarse mesh) and compared
 #. to the analytical solution using the $L_2$ norm.
 #. 

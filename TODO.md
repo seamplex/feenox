@@ -19,7 +19,7 @@
 ## Tests
 
  * move all `doc/examples` to `tests`
- * automated nightly builds and tests (Laminar CI?)
+ * automated nightly builds and tests (Laminar CI? github actions?)
  * write a `README` and an explanation of each test
  * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations
@@ -28,17 +28,25 @@
 ## Optimizations
 
  * if the elements are straight all the jacobians are the same and there is no need to sweep over gauss points
- * make a two lists of elements, one for bulk and one for BCs and loop over those
+ * make two lists of elements, one for bulk and one for BCs and loop over those
  * rewrite `fem.c` to store per-gauss point data in a cache-friendly way
  * remove branches
- * think about inline
+ * think about inline - LTO?
  * use ad-hoc matrices instead of `gsl_matrix`?
    - have a contiguous array of memory that stores all the per-element matrices in a row-major order
    - access them using macros `dhdx(row,col)`
+   - mind SSE!
+   - https://github.com/niswegmann/small-matrix-inverse
  * have compile-time macros that will optimize for
    - speed
    - memory
    - something else
+ * create FeenoX flavors with compile-time 
+   - problem type (so we can avoid function pointers)
+   - problem dimension (so we can hardcode sizes)
+   - full or axi-symmetry
+   - scalar size (float or double)
+   
    
 ## Wasora keywords
 
