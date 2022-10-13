@@ -271,9 +271,9 @@ int feenox_problem_init_runtime_thermal(void) {
   
   
   // if there is no initial guess, make up one
-  if (feenox.pde.initial_guess == NULL) {
+  if (feenox.pde.initial_guess == NULL && thermal.n_bc_temperatures != 0) {
     // average BC temperatures
-    thermal.guessed_initial_guess /= thermal.n_bc_temperatures++;
+    thermal.guessed_initial_guess /= thermal.n_bc_temperatures;
     
     if (feenox.pde.initial_guess == NULL) {
       feenox_check_null(feenox.pde.initial_guess = feenox_define_function_get_ptr("T_guess", feenox.pde.dim));
