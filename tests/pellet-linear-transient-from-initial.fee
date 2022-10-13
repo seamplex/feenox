@@ -2,6 +2,7 @@ PROBLEM thermal 3D PC_TYPE gamg KSP_TYPE cg
 READ_MESH pellet.msh
 
 end_time = 30  # seconds
+dt_0 = 5e-3
 k = 2.8        # W / (m K)
 rho = 10980    # kg / m^3
 cp = 300       # J / (kg K)

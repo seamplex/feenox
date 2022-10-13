@@ -15,9 +15,10 @@ REACTION top    RESULT top
 REACTION front  RESULT front
 REACTION back   RESULT back
 
-PRINT %.4f left
-PRINT %.4f right
-PRINT %.4f bottom
-PRINT %.4f top
-PRINT %.4f front
-PRINT %.4f back
+PRINT %.4f left[1]        abs(left[2])   abs(left[3])
+PRINT %.4f right[1]       abs(right[2])  abs(right[3])
+PRINT %.4f abs(bottom[1]) abs(bottom[2]) abs(bottom[3])
+PRINT %.4f abs(top[1])    abs(top[2])    abs(top[3])
+PRINT %.4f abs(front[1])  abs(front[2])  abs(front[3])
+PRINT %.4f abs(back[1])   abs(back[2])   abs(back[3])
+

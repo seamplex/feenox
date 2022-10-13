@@ -34,7 +34,7 @@ exitifwrong $?
 answer pellet-linear-transient-from-ss.fee "1453"
 exitifwrong $?
 
-answer pellet-linear-transient-from-initial.fee "1273"
+answer pellet-linear-transient-from-initial.fee "1272"
 exitifwrong $?
 
 answer pellet-nonlinear-transient-from-ss.fee "1438"
