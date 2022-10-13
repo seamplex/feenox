@@ -10,9 +10,8 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkpde mechanical
-checkgmsh
-
-gmsh -3 ${dir}/cube-hex.geo
+# checkgmsh
+# gmsh -3 ${dir}/cube-hex.geo
 
 answerdiff reaction-elastic-lr.fee
 exitifwrong $?
