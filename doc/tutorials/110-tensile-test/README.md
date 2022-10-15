@@ -16,147 +16,37 @@ This first case...
  
  1. serves as a step-by-step tutorial to use FeenoX for the first time.
  2. shows that FeenoX does what a finite-element(ish) tool is supposed to do, and
- 3. (last but not least) illustrates FeenoX’ design basis and the philosophy behind its implementation (spoiler alert, it's the [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)) and encourages the reader to consider and evaluate the differences (both advantages and disadvantages) between the approach proposed in this tutorial with traditional both free and non-free finite-element programs,.
+ 3. (last but not least) illustrates FeenoX’ design basis and the philosophy behind its implementation (spoiler alert, it's the [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy), discussed in @sec:unix) and encourages the reader to consider and evaluate the differences (both advantages and disadvantages) between the approach proposed in this tutorial with traditional both free and non-free finite-element programs,.
 
 > _Heads up_: this tutorial, being the first is also detailed and long. Those impatient readers might want to check directly some of the [annotated examples](https://seamplex.com/feenox/examples/) in [FeenoX webpage](https://seamplex.com/feenox/).
  
 
-  a. Here is a 1-min video of what we are going to go through during the tutorial:
+ * Here is a 1-min video of what we are going to go through during the tutorial:
 
-     ![](https://seamplex.com/feenox/doc/tutorials/110-tensile-test/quick.mp4){width=100%}
+   :::: {.not-in-format .latex}
+   ![](https://seamplex.com/feenox/doc/tutorials/110-tensile-test/quick.mp4){width=100%}\ 
+   ::::
 
-  b. We are going to understand what each of the parts of the FeenoX input file do:
+   :::: {.only-in-format .latex}
+   ![](quick.png){width=100% width_latex=100%}\ 
+   ::::
 
-     ```{.feenox include="tensile-test.fee"}
-     ```
-
-  c. We are going to run
      
-      1. Gmsh,
-      2. FeenoX, and
-      3. Paraview
+ * We are going to understand what each of the parts of the FeenoX input file does:
+
+   ```{.feenox include="tensile-test.fee"}
+   ```
+
+ * We are going to run
      
-     to obtain the results listed in @sec:expected.
+    1. Gmsh,
+    2. FeenoX, and
+    3. Paraview
+    
+   to obtain the results listed in @sec:expected.
 
     
 
-# Unix philosophy {#sec:unix}
-
-> You can skip this section if you want to go directly where the meat is, i.e @sec:problem.
-> But at some point, it important that you read this section at least one.
-
-FeenoX’ cloud-first design and implementation is largely based on the [Unix philosophy](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html), as introduced in [Eric Raymond](http://www.catb.org/esr/)’s seminal book [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/). A quotation from such seminal book helps to illustrate this idea:
-
-> [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy), the inventor of [Unix pipes](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29) and one of the founders of the [Unix tradition](https://en.wikipedia.org/wiki/Unix), had this to say at the time:
->
->   (i) Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new features.
->
->   (ii) Expect the output of every program to become the input to another, as yet unknown, program. Don't clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don't insist on interactive input.
->
-> [...]
->
-> He later summarized it this way (quoted in “A Quarter Century of Unix” in 1994):
->
->   * This is the Unix philosophy: Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface.
-
-
-Keep in mind that even though the quotes above and many FEA programs that are still mainstream today date both from the early 1970s, fifty years later they still
-
- * Do not make just only one thing well.
- * Do complicate old programs by adding new features.
- * Do not expect the their output to become the input to another.
- * Do clutter output with extraneous information.
- * Do use stringently columnar and/or binary input (and output!) formats.
- * Do insist on interactive output.
-
-A further note is that not only is FeenoX both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but it also is designed to connect and to work with ([rule of composition](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877684)) other free and open source software, like
-
- * [Gmsh](http://gmsh.info/),
- * [ParaView](https://www.paraview.org/),
- * [Gnuplot](http://gnuplot.info/),
- * [Pyxplot](http://www.pyxplot.org.uk/),
- * [Pandoc](https://pandoc.org/),
- * [TeX](https://tug.org/)
- 
-and many others, including of course the operating system [GNU](https://www.gnu.org/)/[Linux](https://www.kernel.org/).
-
-> _Heads up_: it is extremely important to note here that 
->
->  a. the adjective “free” in the expression “free software” refers to _freedom_ and not to _price_. A better wording would be “libre software” instead. When we say “free software” we mean “free” as in “free speech” not as in “free beer.” The difference will be made clear throughout the tutorial. In what follows, we use “gratis” or “for a fee” when referring to price and “free” and “privative” (because it privates users from their freedom) or “non-free” when referring to freedom.
->  b. “free software” does not mean “open source.” The two terms are related but not equal, having different technical and ethical meanings with different roots and rationales for each one. There are books and discussions online about the matter. The important thing to remember here is that FeenoX is both _free_ and _open source_ under the terms of [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version. The opposite is of “open source” is “closed source.” Note that a closed-source piece of software is privative by definition, but an open-source piece of software can be either free (as most open-source software is) or non-free (as a tiny fraction is).
->  c. the importance of FeenoX (and in general any engineering-related tool) being free (it is GPLv3+) and open source (its source tree can be cloned from Github) is way more profound than the basic fact you do not have to pay a software license. The most important issue of FeenoX being open source is that anyone can
->
->      1. see,
->      2. analyze, and eventually
->      3. understand
->
->     what equations are being solved and how they are being solved withing a digital computer. The most important issue of FeenoX being free software, besides the three pints above, is that anyone can _modify_ it to suit their needs and then share those modifications. Of course most people do not know how to see, analyze, understand and/or modify computational source code. But the main key is that these people have the _freedom_ to ask somebody else to do it for them, either gratis or for a fee. This is not the case for other non-free (wrongly called “commercial”) engineering tools, where users do not have the freedom to see what and how the equations are being solved, let alone asking a third party to review them.
->
->     On the other hand, even though it is true that FeenoX can be executed by anyone without paying any royalty to the owner of the copyright, that does not mean that its usage is completely gratis. These issues still hold:
->      #. Downloading and executing the tool might incur in expenses such as electricity consumption, network connections, storage capacity, computing power, etc. 
->      #. Even though the tool is freely distributed under the GPLv3+, people distributing it can charge a fee for the distribution. It is not illegal to sell free software for a fee. It is illegal to _prevent_ other people from distributing it gratis and to _prevent_ other people from accessing the source code, though.
->      #. There can be services that provide the execution of the tool in the cloud (i.e. somebody else’s computer) for a fee (e.g. [CAEplex](https://www.caeplex.com)).
->      #. The code does have a copyright owner, which is the original author of FeenoX. Yet, instead of using these rights to take freedom away from its users, they are used to make nobody can take it away by using the [copyleft licensing mechanism](https://en.wikipedia.org/wiki/Copyleft).
->      #. There might be application cases for which the tool as it is might be limited or inadequate. As already discussed, it is possible (i.e. anybody has the _freedom_) to hire someone (possibly the original author of the code) to modify FeenoX in order to add features or functionalities in such a way to allow for the adequate application of the tool. These kind of works might involve a development fee.
-
-In particular, this tutorial has been created from scratch using free and open source software only (Markdown converted to PDF and HTML with Pandoc using Kate as the main editor).
-Even the [terminal recorder](https://asciinema.org/) used to show the [actual execution](#sec:execution) is GPLv3. 
-
-Following the Unix philosophy, FeenoX also makes use of high-quality free and open source mathematical libraries which contain numerical methods designed by mathematicians and programmed by professional programmers instead of hard-coding ad-hoc mathematical algorithms. In particular, it uses
-
- * [GNU Scientific Library](https://www.gnu.org/software/gsl/)
- * [PETSc](https://www.mcs.anl.gov/petsc/) (and all its respective dependencies)
- * [SLEPc](http://slepc.upv.es/)
- * [kdtree](https://github.com/jtsiomb/kdtree)
- * [uthash](http://troydhanson.github.com/uthash/)
- 
-This way, FeenoX bounds its scope to doing only one thing and to doing it well: namely, to build and solve finite-element formulations of partial differential equations instead of implementing numerical methods to solve the discretized equations. And it does so on high grounds, both
-
- i. _ethical_: since it is [free software](https://www.gnu.org/philosophy/open-source-misses-the-point.en.html), all users can
- 
-      0. run,
-      1. share,
-      2. modify, and/or
-      3. re-share their modifications.
-      
-    If a user cannot read or write code to either
-    
-      a. check that FeenoX solves the right equations right (i.e. to perform independent verification and validation), and/or
-      b. to modify FeenoX to suit their needs,
-      
-    at least they has the _freedom_ to hire someone to do it for her, and
-    
- ii. _technological_: since it is [open source](http://www.catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/), advanced users can detect and correct bugs and even improve the algorithms. [Given enough eyeballs, all bugs are shallow.](https://en.wikipedia.org/wiki/Linus%27s_law)
- 
-Check out the [programming and contributing](https://seamplex.com/feenox/doc/#programming-and-contributing) section of the FeenoX documentation for further details regarding
-
- #. FeenoX’ roadmap
- #. Programming languages
- #. Coding styles and guidelines
- #. Rules of conduct
- #. Related tools
- #. etc.
- 
- 
-A final preliminary comment before starting the actual tutorial is that FeenoX is designed to work as an engineering “transfer function” between one (or more) input files and zero (or more) output files (which might include the terminal):
-
-```include
-transfer.md
-```
-
-In computer-science, this transfer-function-like workflow is called a _filter_ or _pipe_. Indeed, we already quoted [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy) who invented [Unix pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)). When solving a finite-element problem, FeenoX thus needs two files:
-
- 1. A FeenoX input file (discussed in @sec:input)
- 2. A mesh file (discussed in @sec:mesh)
-
-Depending on the expected results (@sec:expected) there might be zero (i.e. rule of silence) or more outputs, such as
-
- 1. User-formatted output to the standard output (i.e. the terminal)
- 2. VTK files for post-processing with ParaView
- 3. MSH files for post-processing with Gmsh (or to be re-read in further computations)
- 4. ASCII files with subsets of resulting distributions
- 5. Other user-defined output
- 
  
  
 # Problem description {#sec:problem}
@@ -180,8 +70,6 @@ Tensile test specimen CAD from CAEplex <https://caeplex.com/p/41dd1> `(rotate an
 
 ## Expected results {#sec:expected}
 
-The following results are expected to be obtained by the end of the tutorial:
-
  1. Compute the displacement and stress distribution within the geometry. Create pictures of their distribution with a post-processing tool.
  2. Show that the specimen experiences elongation along the\ $x$ axis and a mild contraction in\ $y$ (and even milder in $z$).
  3. Check that the normal tension at the center of the specimen matches the theoretical solution $\sigma_x = F_x/A$
@@ -193,7 +81,7 @@ The following results are expected to be obtained by the end of the tutorial:
 
 # Geometry and mesh {#sec:mesh}
 
-Following the general idea of performing only one thing well (thoroughly discussed in the [FeenoX Software Design Specification](https://seamplex.com/feenox/doc/sds.html)), and the particular Unix rules of
+Following the general idea of performing only one thing well (thoroughly discussed in the [FeenoX Software Design Specification](https://seamplex.com/feenox/doc/sds.html)), and the particular Unix rules (@sec:unix) of
 
  a. [composition](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877684), and
  b. [parsimony](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878022)
@@ -206,7 +94,14 @@ In the particular case of the tensile test problem, the geometry is given as a [
 It is meshed by [Gmsh](http://gmsh.info/) (or, following the rule of [diversity](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2879078), any other meshing tool which can write meshes in [MSH format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format)
 keeping information about [physical groups](http://gmsh.info/doc/texinfo/gmsh.html#Elementary-entities-vs-physical-groups)).
 
-A 3D CAD file consists of volumes, surfaces, edges and vertices. Each volume is defined by a set its boundary surfaces, each surface by a set of its boundary edges, and each edge by a set of its boundary vertices. Volumes are linked to material properties surfaces, edges and points are linked to boundary conditions. For 2D problems, material properties are assigned to surfaces and boundary conditions to edges and vertices. For 1D problems, material properties are assigned to edges and boundary conditions to vertices.
+A 3D CAD file consists of volumes, surfaces, edges and vertices. Each volume is defined by a set its boundary surfaces, each surface by a set of its boundary edges, and each edge by a set of its boundary vertices. Depending on the problem dimension, these geometrical entities will be linked to either material properties or boundary conditions:
+
+
+|  Problem dimension  |    Material properties     |      Boundary conditions      |
+|:-------------------:|:--------------------------:|:------------------------------:
+|          1          |         Volumes            | Surfaces, edges and vertices  |
+|          2          |         Surfaces           | Edges and vertices  |
+|          3          |         Edges              | Vertices  |
 
 Even though mathematically speaking the whole boundary of the domain ought to have an associated boundary condition, depending on the type of physical problem being solved, some entities in the boundary might not need to have an explicit boundary condition. For instance, when solving a mechanical problem, those surfaces without an explicit condition are treated as “free” surfaces, i.e. free to deform with a traction identically zero without a prescribed displacement. For a thermal heat-conduction problem, free surfaces usually mean they are treated as adiabatic. Each case has to be checked with the documentation of the tool being used to solve the problem.
 
@@ -343,7 +238,7 @@ Out of the full input file listed in @sec:foreword, the lines that actually ask 
 ```{.feenox include="tensile-test-base.fee"}
 ```
 
-The details of why, how and what “FeenoX input files” look like is discussed in [section\ 3.1 of the Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html#sec:input). TL; DR: there are definitions and instructions.
+The details of why, how and what “FeenoX input files” look like is discussed in [section\ 3.1 of the Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html#sec:input). TL; DR: there are definitions (nouns) and instructions (verbs).
 The first line is a definition that asks FeenoX to solve a mechanical problem.
 The second line is an instruction that reads the mesh that we created in the previous step.
 
@@ -351,10 +246,10 @@ The next two lines are instructions that assign numerical values to specially-na
 In this case, since there is only one material with homogeneous properties we can use the special scalar variables `E` and `nu` to hold the Young modulus and Poisson’s ratio respectively. For completeness, this is a quick table about how to define material properties:
 
 
-|                             |      Single material                 |      Multi material            |
-|:---------------------------:|:------------------------------------:|:------------------------------:|
-|  Homogeneous                |   `E = 200e3`                        |  `E_name = 200e3`      |
-|  Non-homogeneous            |   `E(x,y,z) = 1000/(800-T(x,y,z))`   |  `E_name(x,y,z) = 1000/(800-T(x,y,z))`   |
+|                  |    Single material                |     Multi material                    |
+|:----------------:|:---------------------------------:|:-------------------------------------:|
+|  Homogeneous     | `E = 200e3`                       | `E_name = 200e3`                      |
+|  Non-homogeneous | `E(x,y,z) = 1000/(800-T(x,y,z))`  | `E_name(x,y,z) = 1000/(800-T(x,y,z))` |
 
 
 Since this is the first tutorial, it is expected that we have to handle the simpler case, namely `E=200e3` and `nu=0.3`.
@@ -384,7 +279,7 @@ BC left  fixed
 BC right Fx=10e3  # [ N ]
 ```
 
-The keyword `BC` tells FeenoX that it has to set a boundary condition on the physical surface given by the second word. This time we do need to give a physical surface name, since nothing is obvious here. The type and value of the boundary condition is defined by the remaining of the line: 
+The keyword [`BC`](https://seamplex.com/feenox/doc/feenox-manual.html#bc) tells FeenoX that it has to set a boundary condition on the physical surface given by the second word. This time we do need to give a physical surface name, since nothing is obvious here. The type and value of the boundary condition is defined by the remaining of the line: 
 
  a. the “left” surface is fully fixed
  b. the “right” surface has a total force in the $x$ direction equal to one thousand Newtons
@@ -398,7 +293,7 @@ BC right Fx=0.05*E  # [ N ]
 is also perfectly valid, provided the units of the factor\ 0.05 make sense. Compare with how boundary conditions have to be set in other FEA software.
 
 
-The final line contains the keyword `SOLVE_PROBLEM` telling FeenoX that all keywords needed to fully define the problem have been already given and it can proceed to solve it. When executed, FeenoX will read all the definitions and define whatever is needed to be defined. It will then execute all the instructions in the order of appearance in the input file, minding some basic conditional blocks. When it executes `SOLVE_PROBLEM`, well, it solves the problem.
+The final line contains the keyword [`SOLVE_PROBLEM`](https://seamplex.com/feenox/doc/feenox-manual.html#solve_problem) telling FeenoX that all keywords needed to fully define the problem have been already given and it can proceed to solve it. When executed, FeenoX will read all the definitions and define whatever is needed to be defined. It will then execute all the instructions in the order of appearance in the input file, minding some basic conditional blocks. When it executes `SOLVE_PROBLEM`, well, it solves the problem.
 
 ## Outputs
 
@@ -423,6 +318,9 @@ WRITE_MESH tensile-test.vtk VECTOR u v w  sigma sigmax sigmay sigmaz tauxy tauyz
 PRINT "1. post-processing view written in tensile-test.vtk"
 ```
 
+The instruction [`WRITE_MESH`](https://seamplex.com/feenox/doc/feenox-manual.html#write_mesh) asks FeenoX to write a file for post-processing. Here, we want to write a file named `tensile-test.vtk` containing a vector with the three displacements $[u,v,w]$, then the von Mises stress $\sigma$ and finally the six components of the stress tensor.
+
+
 ### Show elongation in $x$ and contraction in $y$
 
 ```feenox
@@ -432,6 +330,9 @@ PRINT "   displacement in y at (0,10,0): " v(0,10,0)  "[ mm ]"
 PRINT "   displacement in z at (0,0,2.5):" w(0,0,2.5) "[ mm ]"
 ```
 
+The displacement field can be accessed as three scalar functions of space $u(x,y,z)$, $v(x,y,z)$ and $w(x,y,z)$. These functions can be evaluated at any arbitrary point in space, and that is what these [`PRINT`](https://seamplex.com/feenox/doc/feenox-manual.html#print) instructions do.
+
+
 ### Check normal tension at center
 
 ```feenox
@@ -439,13 +340,19 @@ PRINT "   displacement in z at (0,0,2.5):" w(0,0,2.5) "[ mm ]"
 PRINT "3. principal stresses at origin: " %.4f sigma1(0,0,0) sigma2(0,0,0) sigma3(0,0,0) "[ MPa ]"
 ```
 
+Same thing happens to the principal stresses $\sigma_1$, $\sigma_2$ and $\sigma_3$.
+
+
 ### Check reactions
 
 ```feenox
 # 4. the reaction at the left surface
-REACTION left  RESULT R_left
+COMPUTE_REACTION left  RESULT R_left
 PRINT "4. reaction at left surface: " R_left "[ N ]"
 ```
+
+The [`COMPUTE_REACTION`](https://seamplex.com/feenox/doc/feenox-manual.html#compute_reaction) keyword takes a physical group as the first parameter and stores the result in either the scalar or vector given after `RESULT`. In this case, it is a vector whose three elements are printed in the same line.
+
 
 ### Show stress concentrations
 
@@ -459,6 +366,9 @@ PRINT %.1f sigmax(55,10,2.5) tauxy(55,10,2.5)  tauzx(55,10,2.5)
 PRINT %.1f tauxy(55,10,2.5)  sigmay(55,10,2.5) tauyz(55,10,2.5)
 PRINT %.1f tauzx(55,10,2.5)  tauyz(55,10,2.5)  sigmaz(55,10,2.5)
 ```
+
+A couple of `PRINT`s. Note that FeenoX does not have a tresca stress function, but it can be easily computed as $\sigma_1-\sigma_3$. Recall that “everything is an expression.”
+
 
 ## Notes
 
@@ -480,7 +390,7 @@ Some notes summarizing the section:
  
  * Boundary conditions are set by referring to the physical surfaces defined in the mesh. The keyword `fixed` is a shortcut for setting the individual displacements in each direction `u=0`, `v=0` and `w=0`.
  
- * An explicit location within the logical flow of the input file hast to be given where FeenoX ought to actually solve the problem with the keyword `SOLVE_PROBLEM`. It should be after defining the material properties and the boundary conditions and before computing secondary results (such as the reactions) and asking for outputs.
+ * An explicit location within the logical flow of the input file hast to be given where FeenoX ought to actually solve the problem with the keyword [`SOLVE_PROBLEM`](https://seamplex.com/feenox/doc/feenox-manual.html#solve_problem). It should be after defining the material properties and the boundary conditions and before computing secondary results (such as the reactions) and asking for outputs.
  
  * The reaction in the physical group “left” is computed after the problem is solved (i.e. after `SOLVE_PROBLEM`) and the result is stored in a vector named `R_left` of size three. There is nothing special about the name `R_left`, it could have been any other valid identifier name.
  
@@ -554,4 +464,124 @@ $ paraview tensile-test.vtk
 ```
 
 > Congratulations! You just finished your first FeenoX tutorial 
+> Please take some minutes to dig further down into the philosophy of what you just achieved.
 
+
+
+# Unix philosophy {#sec:unix}
+
+> You can skip this section if you want to go directly where the meat is, i.e @sec:problem.
+> But at some point, it important that you read this section at least one.
+
+FeenoX’ cloud-first design and implementation is largely based on the [Unix philosophy](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html), as introduced in [Eric Raymond](http://www.catb.org/esr/)’s seminal book [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/). A quotation from such seminal book helps to illustrate this idea:
+
+> [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy), the inventor of [Unix pipes](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29) and one of the founders of the [Unix tradition](https://en.wikipedia.org/wiki/Unix), had this to say at the time:
+>
+>   (i) Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new features.
+>
+>   (ii) Expect the output of every program to become the input to another, as yet unknown, program. Don't clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don't insist on interactive input.
+>
+> [...]
+>
+> He later summarized it this way (quoted in “A Quarter Century of Unix” in 1994):
+>
+>   * This is the Unix philosophy: Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface.
+
+
+Keep in mind that even though the quotes above and many FEA programs that are still mainstream today date both from the early 1970s, fifty years later they still
+
+ * Do not make just only one thing well.
+ * Do complicate old programs by adding new features.
+ * Do not expect the their output to become the input to another.
+ * Do clutter output with extraneous information.
+ * Do use stringently columnar and/or binary input (and output!) formats.
+ * Do insist on interactive output.
+
+A further note is that not only is FeenoX both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but it also is designed to connect and to work with ([rule of composition](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877684)) other free and open source software, like
+
+ * [Gmsh](http://gmsh.info/),
+ * [ParaView](https://www.paraview.org/),
+ * [Gnuplot](http://gnuplot.info/),
+ * [Pyxplot](http://www.pyxplot.org.uk/),
+ * [Pandoc](https://pandoc.org/),
+ * [TeX](https://tug.org/)
+ 
+and many others, including of course the operating system [GNU](https://www.gnu.org/)/[Linux](https://www.kernel.org/).
+
+> _Heads up_: it is extremely important to note here that 
+>
+>  a. the adjective “free” in the expression “free software” refers to _freedom_ and not to _price_. A better wording would be “libre software” instead. When we say “free software” we mean “free” as in “free speech” not as in “free beer.” The difference will be made clear throughout the tutorial. In what follows, we use “gratis” or “for a fee” when referring to price and “free” and “privative” (because it privates users from their freedom) or “non-free” when referring to freedom.
+>  b. “free software” does not mean “open source.” The two terms are related but not equal, having different technical and ethical meanings with different roots and rationales for each one. There are books and discussions online about the matter. The important thing to remember here is that FeenoX is both _free_ and _open source_ under the terms of [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version. The opposite is of “open source” is “closed source.” Note that a closed-source piece of software is privative by definition, but an open-source piece of software can be either free (as most open-source software is) or non-free (as a tiny fraction is).
+>  c. the importance of FeenoX (and in general any engineering-related tool) being free (it is GPLv3+) and open source (its source tree can be cloned from Github) is way more profound than the basic fact you do not have to pay a software license. The most important issue of FeenoX being open source is that anyone can
+>
+>      1. see,
+>      2. analyze, and eventually
+>      3. understand
+>
+>     what equations are being solved and how they are being solved withing a digital computer. The most important issue of FeenoX being free software, besides the three pints above, is that anyone can _modify_ it to suit their needs and then share those modifications. Of course most people do not know how to see, analyze, understand and/or modify computational source code. But the main key is that these people have the _freedom_ to ask somebody else to do it for them, either gratis or for a fee. This is not the case for other non-free (wrongly called “commercial”) engineering tools, where users do not have the freedom to see what and how the equations are being solved, let alone asking a third party to review them.
+>
+>     On the other hand, even though it is true that FeenoX can be executed by anyone without paying any royalty to the owner of the copyright, that does not mean that its usage is completely gratis. These issues still hold:
+>      #. Downloading and executing the tool might incur in expenses such as electricity consumption, network connections, storage capacity, computing power, etc. 
+>      #. Even though the tool is freely distributed under the GPLv3+, people distributing it can charge a fee for the distribution. It is not illegal to sell free software for a fee. It is illegal to _prevent_ other people from distributing it gratis and to _prevent_ other people from accessing the source code, though.
+>      #. There can be services that provide the execution of the tool in the cloud (i.e. somebody else’s computer) for a fee (e.g. [CAEplex](https://www.caeplex.com)).
+>      #. The code does have a copyright owner, which is the original author of FeenoX. Yet, instead of using these rights to take freedom away from its users, they are used to make nobody can take it away by using the [copyleft licensing mechanism](https://en.wikipedia.org/wiki/Copyleft).
+>      #. There might be application cases for which the tool as it is might be limited or inadequate. As already discussed, it is possible (i.e. anybody has the _freedom_) to hire someone (possibly the original author of the code) to modify FeenoX in order to add features or functionalities in such a way to allow for the adequate application of the tool. These kind of works might involve a development fee.
+
+In particular, this tutorial has been created from scratch using free and open source software only (Markdown converted to PDF and HTML with Pandoc using Kate as the main editor).
+Even the [terminal recorder](https://asciinema.org/) used to show the [actual execution](#sec:execution) is GPLv3. 
+
+Following the Unix philosophy, FeenoX also makes use of high-quality free and open source mathematical libraries which contain numerical methods designed by mathematicians and programmed by professional programmers instead of hard-coding ad-hoc mathematical algorithms. In particular, it uses
+
+ * [GNU Scientific Library](https://www.gnu.org/software/gsl/)
+ * [PETSc](https://www.mcs.anl.gov/petsc/) (and all its respective dependencies)
+ * [SLEPc](http://slepc.upv.es/)
+ * [kdtree](https://github.com/jtsiomb/kdtree)
+ * [uthash](http://troydhanson.github.com/uthash/)
+ 
+This way, FeenoX bounds its scope to doing only one thing and to doing it well: namely, to build and solve finite-element formulations of partial differential equations instead of implementing numerical methods to solve the discretized equations. And it does so on high grounds, both
+
+ i. _ethical_: since it is [free software](https://www.gnu.org/philosophy/open-source-misses-the-point.en.html), all users can
+ 
+      0. run,
+      1. share,
+      2. modify, and/or
+      3. re-share their modifications.
+      
+    If a user cannot read or write code to either
+    
+      a. check that FeenoX solves the right equations right (i.e. to perform independent verification and validation), and/or
+      b. to modify FeenoX to suit their needs,
+      
+    at least they has the _freedom_ to hire someone to do it for her, and
+    
+ ii. _technological_: since it is [open source](http://www.catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/), advanced users can detect and correct bugs and even improve the algorithms. [Given enough eyeballs, all bugs are shallow.](https://en.wikipedia.org/wiki/Linus%27s_law)
+ 
+Check out the [programming and contributing](https://seamplex.com/feenox/doc/#programming-and-contributing) section of the FeenoX documentation for further details regarding
+
+ #. FeenoX’ roadmap
+ #. Programming languages
+ #. Coding styles and guidelines
+ #. Rules of conduct
+ #. Related tools
+ #. etc.
+ 
+ 
+A final preliminary comment before starting the actual tutorial is that FeenoX is designed to work as an engineering “transfer function” between one (or more) input files and zero (or more) output files (which might include the terminal):
+
+```include
+transfer.md
+```
+
+In computer-science, this transfer-function-like workflow is called a _filter_ or _pipe_. Indeed, we already quoted [Doug McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy) who invented [Unix pipelines](https://en.wikipedia.org/wiki/Pipeline_(Unix)). When solving a finite-element problem, FeenoX thus needs two files:
+
+ 1. A FeenoX input file (discussed in @sec:input)
+ 2. A mesh file (discussed in @sec:mesh)
+
+Depending on the expected results (@sec:expected) there might be zero (i.e. rule of silence) or more outputs, such as
+
+ 1. User-formatted output to the standard output (i.e. the terminal)
+ 2. VTK files for post-processing with ParaView
+ 3. MSH files for post-processing with Gmsh (or to be re-read in further computations)
+ 4. ASCII files with subsets of resulting distributions
+ 5. Other user-defined output
+ 

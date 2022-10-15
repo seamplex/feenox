@@ -14,7 +14,7 @@ PRINT "   displacement in z at (0,0,2.5):" w(0,0,2.5) "[ mm ]"
 PRINT "3. principal stresses at origin: " %.4f sigma1(0,0,0) sigma2(0,0,0) sigma3(0,0,0) "[ MPa ]"
 
 # 4. the reaction at the left surface
-REACTION left  RESULT R_left
+COMPUTE_REACTION left  RESULT R_left
 PRINT "4. reaction at left surface: " R_left "[ N ]"
 
 # 5. stress concentrations at a sharp edge

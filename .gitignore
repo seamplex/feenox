@@ -52,3 +52,4 @@ encased_rod*.vtk
 nafems-le*.msh
 spinning-disk-*.msh
 square-f.msh
+cube-radial.vtk
