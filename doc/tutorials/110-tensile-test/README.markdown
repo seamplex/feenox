@@ -17,7 +17,7 @@
       concentrations][]
   - [<span class="toc-section-number">4.2</span> Notes][]
 - [<span class="toc-section-number">5</span> Execution][]
-- [<span class="toc-section-number">6</span> Unix philosophy][]
+- [<span class="toc-section-number">6</span> Unix philosophy\*][]
 
   [<span class="toc-section-number">1</span> Foreword]: #sec:foreword
   [<span class="toc-section-number">2</span> Problem description]: #sec:problem
@@ -36,7 +36,7 @@
     #show-stress-concentrations
   [<span class="toc-section-number">4.2</span> Notes]: #notes
   [<span class="toc-section-number">5</span> Execution]: #sec:execution
-  [<span class="toc-section-number">6</span> Unix philosophy]: #sec:unix
+  [<span class="toc-section-number">6</span> Unix philosophy\*]: #sec:unix
 
 # Foreword
 
@@ -815,15 +815,33 @@ You can now open Paraview:
 $ paraview tensile-test.vtk
 ```
 
-> Congratulations! You just finished your first FeenoX tutorial Please
-> take some minutes to dig further down into the philosophy of what you
-> just achieved.
+> Congratulations! You just finished your first FeenoX tutorial
 
-# Unix philosophy
+- Keep in mind this was a very detailed tutorial where we digged into a
+  lot of subtle details. Forthcoming tutorials will not be as detailed
+  as this one.
 
-> You can skip this section if you want to go directly where the meat
-> is, i.e sec. 2. But at some point, it important that you read this
-> section at least one.
+- The problem was selected to be very simple. Any actual industrial
+  application will need further discussions, such as
+
+  1.  The left face cannot be really fully fixed in a tensile test
+      machine.
+  2.  There are other boundary conditions that better describe the
+      actual physics.
+  3.  If we wanted to understand what happens in a pure tensile case we
+      would need to have another type of boundary condition in the left
+      face.
+  4.  The material properties are assumed to be uniform and linear. A
+      thorough discussion of the application of these two assumptions
+      have to be given before any actual application.
+
+Please take some minutes to dig further down into the philosophy of what
+you just achieved.
+
+# Unix philosophy\*
+
+> This section is optional so you can skip it. Nevertheless, it
+> important that you read this section at least one.
 
 FeenoX’ cloud-first design and implementation is largely based on the
 [Unix philosophy][6], as introduced in [Eric Raymond][]’s seminal book

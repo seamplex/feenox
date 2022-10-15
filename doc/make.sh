@@ -18,12 +18,14 @@ echo "creating main README for Github"
 ./md2.sh --pdf   ../README
 ./md2.sh --gfm   ../README
 ./md2.sh --plain ../README
+./md2.sh --html  ../README
 ./md2.sh --plain ../TODO
 
 echo "creating doc's README"
 ./md2.sh --pdf   README
 ./md2.sh --gfm   README
 ./md2.sh --plain README
+./md2.sh --html  README
 
 echo "creating the reference markdown from the commented sources"
 echo " - keywords"

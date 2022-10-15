@@ -20,9 +20,11 @@ version.m4
 ChangeLog
 
 # doc
+README.html
 README.pdf
 TODO.markdown
 hash.yaml
+examples/README.html
 
 # binaries, tarballs and libraries
 feenox-v*

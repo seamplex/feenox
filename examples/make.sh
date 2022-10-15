@@ -57,3 +57,7 @@ for i in hello          \
   grep '#>' ${i}.fee | sed 's/#>//' | sed 's/^[ \t]*//' >> ${out}
   echo >> ${out}
 done
+
+../doc/md2.sh --pdf README
+../doc/md2.sh --gfm README
+../doc/md2.sh --html README

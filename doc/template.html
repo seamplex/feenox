@@ -36,8 +36,11 @@ $endfor$
    span.smallcaps{font-variant: small-caps;}
    span.underline{text-decoration: underline;}
    div.column{display: inline-block; vertical-align: top; width: 50%;}
-   pre.feenox { background-color: #eeeeee; padding: 1em; border: 0.15em solid #666666; border-radius: 0.2em; }  
-   pre.terminal { background-color: #333333; padding: 1em; border: 0.2em solid #6699cc; border-radius: 0.2em; }  
+   pre.feenox   { background-color: #eeeeee; padding: 1em; border: 0.15em solid #666666; border-radius: 0.2em;}  
+   pre.c        { background-color: #eeeef0; padding: 1em; border: 0.10em solid #666699; border-radius: 0.2em;}  
+   pre.bash     { background-color: #e5e6e5; padding: 1em; border: 0.10em solid #333333; border-radius: 0.2em;}  
+   pre.python   { background-color: #ffeeee; padding: 1em; border: 0.10em solid #996666; border-radius: 0.2em;}  
+   pre.terminal { background-color: #333333; padding: 1em; border: 0.20em solid #6699cc; border-radius: 0.2em;}  
 $if(quotes)$
    q { quotes: "“" "”" "‘" "’"; }
 $endif$
@@ -47,11 +50,16 @@ $if(highlighting-css)$
 $highlighting-css$
 code.sourceCode {white-space: pre; overflow: auto;}
 code.wrap {white-space: pre-wrap;}
-pre.terminal code {background-color: #333333; color: white; display: block;}
   </style>
 $endif$
-<!-- in feenox/download the highlighting-css variable is empty -->
-  <style>pre.terminal code {background-color: #333333; color: white;}</style>
+<style>
+pre.feenox   code {display: block;}
+pre.c        code {display: block;}
+pre.bash     code {display: block;}
+pre.python   code {display: block;}
+pre.terminal code {display: block;}
+pre.terminal code {color: white;}
+</style>
 
 
 <!--Start of Tawk.to Script-->
@@ -100,6 +108,17 @@ s0.parentNode.insertBefore(s1,s0);
         </li>
         <li class="nav-item">
          <a class="nav-link" href="$rootdir$/examples">Examples</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Tutorials
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="$rootdir$/doc/tutorials">Index</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/tutorials/000-setup">Set up your workspace</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/doc/tutorials/000-setup">Tensile test case</a></li>
+          </ul>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

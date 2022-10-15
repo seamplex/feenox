@@ -1,12 +1,135 @@
+# FeenoX annotated examples
+
+- [<span class="toc-section-number">1</span> Hello World (and
+  Universe)!][]
+- [<span class="toc-section-number">2</span> Lorenz’ attractor—the one
+  with the butterfly][]
+- [<span class="toc-section-number">3</span> The logistic map][]
+- [<span class="toc-section-number">4</span> Thermal slabs][]
+  - [<span class="toc-section-number">4.1</span> One-dimensional
+    linear][]
+- [<span class="toc-section-number">5</span> NAFEMS LE10 “Thick plate
+  pressure” benchmark][]
+- [<span class="toc-section-number">6</span> NAFEMS LE11 “Solid
+  Cylinder/Taper/Sphere-Temperature” benchmark][]
+- [<span class="toc-section-number">7</span> NAFEMS LE1 “Elliptical
+  membrane” plane-stress benchmark][]
+- [<span class="toc-section-number">8</span> How to solve a maze without
+  AI][]
+  - [<span class="toc-section-number">8.1</span> Transient top-down][]
+  - [<span class="toc-section-number">8.2</span> Transient bottom-up][]
+- [<span class="toc-section-number">9</span> The Fibonacci sequence][]
+  - [<span class="toc-section-number">9.1</span> Using the closed-form
+    formula as a function][]
+  - [<span class="toc-section-number">9.2</span> Using a vector][]
+  - [<span class="toc-section-number">9.3</span> Solving an iterative
+    problem][]
+- [<span class="toc-section-number">10</span> Computing the derivative
+  of a function as a UNIX filter][]
+- [<span class="toc-section-number">11</span> Parametric study on a
+  cantilevered beam][]
+- [<span class="toc-section-number">12</span> Optimizing the length of a
+  tuning fork][]
+- [<span class="toc-section-number">13</span> IAEA 2D PWR Benchmark][]
+- [<span class="toc-section-number">14</span> Cube-spherical bare
+  reactor][]
+- [<span class="toc-section-number">15</span> Parallelepiped whose
+  Young’s modulus is a function of the temperature][]
+  - [<span class="toc-section-number">15.1</span> Thermal problem][]
+  - [<span class="toc-section-number">15.2</span> Mechanical problem][]
+- [<span class="toc-section-number">16</span> Non-dimensional transient
+  heat conduction on a cylinder][]
+- [<span class="toc-section-number">17</span> Five natural modes of a
+  cantilevered wire][]
+- [<span class="toc-section-number">18</span> On the evaluation of
+  thermal expansion coefficients][]
+  - [<span class="toc-section-number">18.1</span> Orthotropic free
+    expansion of a cube][]
+- [<span class="toc-section-number">19</span> Thermo-elastic expansion
+  of finite cylinders][]
+- [<span class="toc-section-number">20</span> Temperature-dependent
+  material properties][]
+
+All the files needed to run theses examples are available in the
+[examples][] directory of the [Git repository][] and any of the
+[tarballs][], both [source][] and [binary][].
+
+For a presentation of these examples, see the “FeenoX Overview
+Presentation” (August 2021).
+
+- [Recording (audio in Spanish, slides in English)][]
+- [Slides in PDF][]
+- [Markdown examples sources][]
+
+Also, the `tests` [directory in the Github repository][] has dozens of
+test cases which can be used as examples for reference and for
+mathematical verification of the results obtained with FeenoX.
+
+  [<span class="toc-section-number">1</span> Hello World (and Universe)!]:
+    #hello-world-and-universe
+  [<span class="toc-section-number">2</span> Lorenz’ attractor—the one with the butterfly]:
+    #lorenz-attractorthe-one-with-the-butterfly
+  [<span class="toc-section-number">3</span> The logistic map]: #the-logistic-map
+  [<span class="toc-section-number">4</span> Thermal slabs]: #thermal-slabs
+  [<span class="toc-section-number">4.1</span> One-dimensional linear]: #one-dimensional-linear
+  [<span class="toc-section-number">5</span> NAFEMS LE10 “Thick plate pressure” benchmark]:
+    #nafems-le10-thick-plate-pressure-benchmark
+  [<span class="toc-section-number">6</span> NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark]:
+    #nafems-le11-solid-cylindertapersphere-temperature-benchmark
+  [<span class="toc-section-number">7</span> NAFEMS LE1 “Elliptical membrane” plane-stress benchmark]:
+    #nafems-le1-elliptical-membrane-plane-stress-benchmark
+  [<span class="toc-section-number">8</span> How to solve a maze without AI]:
+    #how-to-solve-a-maze-without-ai
+  [<span class="toc-section-number">8.1</span> Transient top-down]: #transient-top-down
+  [<span class="toc-section-number">8.2</span> Transient bottom-up]: #transient-bottom-up
+  [<span class="toc-section-number">9</span> The Fibonacci sequence]: #the-fibonacci-sequence
+  [<span class="toc-section-number">9.1</span> Using the closed-form formula as a function]:
+    #using-the-closed-form-formula-as-a-function
+  [<span class="toc-section-number">9.2</span> Using a vector]: #using-a-vector
+  [<span class="toc-section-number">9.3</span> Solving an iterative problem]:
+    #solving-an-iterative-problem
+  [<span class="toc-section-number">10</span> Computing the derivative of a function as a UNIX filter]:
+    #computing-the-derivative-of-a-function-as-a-unix-filter
+  [<span class="toc-section-number">11</span> Parametric study on a cantilevered beam]:
+    #parametric-study-on-a-cantilevered-beam
+  [<span class="toc-section-number">12</span> Optimizing the length of a tuning fork]:
+    #optimizing-the-length-of-a-tuning-fork
+  [<span class="toc-section-number">13</span> IAEA 2D PWR Benchmark]: #iaea-2d-pwr-benchmark
+  [<span class="toc-section-number">14</span> Cube-spherical bare reactor]:
+    #cube-spherical-bare-reactor
+  [<span class="toc-section-number">15</span> Parallelepiped whose Young’s modulus is a function of the temperature]:
+    #parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature
+  [<span class="toc-section-number">15.1</span> Thermal problem]: #thermal-problem
+  [<span class="toc-section-number">15.2</span> Mechanical problem]: #mechanical-problem
+  [<span class="toc-section-number">16</span> Non-dimensional transient heat conduction on a cylinder]:
+    #non-dimensional-transient-heat-conduction-on-a-cylinder
+  [<span class="toc-section-number">17</span> Five natural modes of a cantilevered wire]:
+    #five-natural-modes-of-a-cantilevered-wire
+  [<span class="toc-section-number">18</span> On the evaluation of thermal expansion coefficients]:
+    #on-the-evaluation-of-thermal-expansion-coefficients
+  [<span class="toc-section-number">18.1</span> Orthotropic free expansion of a cube]:
+    #orthotropic-free-expansion-of-a-cube
+  [<span class="toc-section-number">19</span> Thermo-elastic expansion of finite cylinders]:
+    #thermo-elastic-expansion-of-finite-cylinders
+  [<span class="toc-section-number">20</span> Temperature-dependent material properties]:
+    #temperature-dependent-material-properties
+  [examples]: https://github.com/seamplex/feenox/tree/main/examples
+  [Git repository]: https://github.com/seamplex/feenox
+  [tarballs]: https://www.seamplex.com/feenox/download.html
+  [source]: https://www.seamplex.com/feenox/dist/src
+  [binary]: https://www.seamplex.com/feenox/dist/linux
+  [Recording (audio in Spanish, slides in English)]: https://youtu.be/-RJ5qn7E9uE
+  [Slides in PDF]: https://www.seamplex.com/feenox/doc/2021-feenox.pdf
+  [Markdown examples sources]: https://github.com/gtheler/2021-presentation
+  [directory in the Github repository]: https://github.com/seamplex/feenox/tree/main/tests
+
 # Hello World (and Universe)!
 
-
-```feenox
+``` feenox
 PRINT "Hello $1!"
 ```
 
-
-```terminal
+``` terminal
 $ feenox hello.fee World
 Hello World!
 $ feenox hello.fee Universe
@@ -14,9 +137,7 @@ Hello Universe!
 $
 ```
 
-
-
-# Lorenz' attractor---the one with the butterfly
+# Lorenz’ attractor—the one with the butterfly
 
 Solve
 
@@ -40,14 +161,11 @@ $$
 
 and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
-seminal 1963 paper [Deterministic non-periodic
-flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
-This example's input file ressembles the parameters, inital conditions
-and differential equations of the problem as naturally as possible with
-an ASCII file.
+seminal 1963 paper [Deterministic non-periodic flow][]. This example’s
+input file ressembles the parameters, inital conditions and differential
+equations of the problem as naturally as possible with an ASCII file.
 
-
-```feenox
+``` feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
 end_time = 40         # we go from t=0 to 40 non-dimensional units
 
@@ -67,26 +185,30 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
-
-```terminal
+``` terminal
 $ feenox lorenz.fee > lorenz.dat
 $ gnuplot lorenz.gp
 $ python3 lorenz.py
 $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 ```
 
+<div id="fig:ex_lorenz" class="subfigures">
 
-::: {#fig:ex_lorenz}
-![Gnuplot](lorenz-gnuplot.svg){width=48%}
-![Matplotlib](lorenz-matplotlib.png){width=48%}
+<img src="lorenz-gnuplot.svg" title="fig:" style="width:48.0%"
+alt="a" />
+<img src="lorenz-matplotlib.png" title="fig:" style="width:48.0%"
+alt="b" />
 
-The Lorenz attractor computed with FeenoX plotted with two different tools
-:::
+Figure 1: The Lorenz attractor computed with FeenoX plotted with two
+different tools. a — Gnuplot, b — Matplotlib
+
+</div>
+
+  [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
 
 # The logistic map
 
-Plot the asymptotic behavior of the [logistic
-map](https://en.wikipedia.org/wiki/Logistic_map)
+Plot the asymptotic behavior of the [logistic map][]
 
 $$
 x_{n+1} = r \cdot x \cdot (1-x)
@@ -94,8 +216,7 @@ $$
 
 for a range of the parameter $r$.
 
-
-```feenox
+``` feenox
 DEFAULT_ARGUMENT_VALUE 1 2.6   # by default show r in [2.6:4]
 DEFAULT_ARGUMENT_VALUE 2 4
 
@@ -119,16 +240,17 @@ IF step_static-steps_per_r*floor(step_static/steps_per_r)>(steps_per_r-steps_asy
 ENDIF
 ```
 
-
-```terminal
+``` terminal
 $ gnuplot
 gnuplot> plot "< feenox logistic.fee" w p pt 50 ps 0.02
 gnuplot> quit
 $
 ```
 
+![Asymptotic behavior of the logistic map.][]
 
-![Asymptotic behavior of the logistic map.](logistic.png)
+  [logistic map]: https://en.wikipedia.org/wiki/Logistic_map
+  [Asymptotic behavior of the logistic map.]: logistic.png
 
 # Thermal slabs
 
@@ -147,36 +269,35 @@ and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
 
 Please note that:
 
--   The input written in a self-evident English-like dialect
-    -   Syntactic sugared plain-text ASCII file
-    -   Simple problems (like this one) need simple inputs
-    -   FeenoX follows the UNIX rule of simplicity
--   Output is 100% user-defined
-    -   No `PRINT` no output
-    -   Feenox follows the UNIX rule of silence
--   There is no node at $x=1/2=0.5$!
-    -   FeenoX knows how to interpolate
--   Mesh separated from problem
-    -   The geometry comes from a Git-friendly `.geo`
+- The input written in a self-evident English-like dialect
+  - Syntactic sugared plain-text ASCII file
+  - Simple problems (like this one) need simple inputs
+  - FeenoX follows the UNIX rule of simplicity
+- Output is 100% user-defined
+  - No `PRINT` no output
+  - Feenox follows the UNIX rule of silence
+- There is no node at $x=1/2=0.5$!
+  - FeenoX knows how to interpolate
+- Mesh separated from problem
+  - The geometry comes from a Git-friendly `.geo`
 
-    ``` c
-    Point(1) = {0, 0, 0};          // geometry: 
-    Point(2) = {1, 0, 0};          // two points
-    Line(1) = {1, 2};              // and a line connecting them!
+  ``` c
+  Point(1) = {0, 0, 0};          // geometry: 
+  Point(2) = {1, 0, 0};          // two points
+  Line(1) = {1, 2};              // and a line connecting them!
 
-    Physical Point("left") = {1};  // groups for BCs and materials
-    Physical Point("right") = {2};
-    Physical Line("bulk") = {1};   // needed due to how Gmsh works
+  Physical Point("left") = {1};  // groups for BCs and materials
+  Physical Point("right") = {2};
+  Physical Line("bulk") = {1};   // needed due to how Gmsh works
 
-    Mesh.MeshSizeMax = 1/3;        // mesh size, three line elements
-    Mesh.MeshSizeMin = Mesh.MeshSizeMax;
-    ```
+  Mesh.MeshSizeMax = 1/3;        // mesh size, three line elements
+  Mesh.MeshSizeMin = Mesh.MeshSizeMax;
+  ```
 
-    -   UNIX rule of composition
-    -   The actual input file is a Git-friendly `.fee`
+  - UNIX rule of composition
+  - The actual input file is a Git-friendly `.fee`
 
-
-```feenox
+``` feenox
 PROBLEM thermal 1D    # tell FeenoX what we want to solve 
 READ_MESH slab.msh    # read mesh in Gmsh's v4.1 format
 k = 1                 # set uniform conductivity
@@ -186,8 +307,7 @@ SOLVE_PROBLEM         # we are ready to solve the problem
 PRINT T(1/2)          # ask for the temperature at x=1/2
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -1 slab.geo
 [...]
 Info    : 4 nodes 5 elements
@@ -198,18 +318,19 @@ $ feenox thermal-1d-dirichlet-uniform-k.fee
 $ 
 ```
 
+# NAFEMS LE10 “Thick plate pressure” benchmark
 
+<figure>
+<img src="nafems-le10-problem-input.svg" style="width:100.0%"
+alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption aria-hidden="true">The NAFEMS LE10 problem statement and the
+corresponding FeenoX input</figcaption>
+</figure>
 
-# NAFEMS LE10 "Thick plate pressure" benchmark
-
-![The NAFEMS LE10 problem statement and the corresponding FeenoX
-input](nafems-le10-problem-input.svg){width="100%"}
-
-Assuming the CAD has already been created in [STEP
-format](nafems-le10.step) (for instance using Gmsh with [this geo
-file](https://github.com/seamplex/feenox/blob/main/examples/nafems-le10-cad.geo)),
-create a tetrahedral locally-refined unstructured grid with Gmsh using
-the following `.geo` file:
+Assuming the CAD has already been created in [STEP format][] (for
+instance using Gmsh with [this geo file][]), create a tetrahedral
+locally-refined unstructured grid with Gmsh using the following `.geo`
+file:
 
 ``` c
 // NAFEMS LE10 benchmark unstructured locally-refined tetrahedral mesh
@@ -243,15 +364,13 @@ Field[2].LcMax = Mesh.MeshSizeMax;
 Field[2].DistMin = 2 * Mesh.MeshSizeMax;
 Field[2].DistMax = 6 * Mesh.MeshSizeMax;
 Background Field = {2};
-
 ```
 
 and then use this pretty-straightforward input file that has a
 one-to-one correspondence with the original problem formulation from
 1990:
 
-
-```feenox
+``` feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
 PROBLEM mechanical 3D
 READ_MESH nafems-le10.msh   # mesh in millimeters
@@ -278,8 +397,7 @@ PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
 WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 nafems-le10.geo
 [...]
 $ feenox nafems-le10.fee
@@ -287,24 +405,37 @@ sigma_y @ D =   -5.38016        MPa
 $
 ```
 
+<figure>
+<img src="nafems-le10.png" data-width_latex="75%" data-width_html="100%"
+alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
+<figcaption aria-hidden="true">Normal stress <span
+class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined
+around point <span class="math inline"><em>D</em></span> over
+5,000x-warped displacements for LE10 created with Paraview</figcaption>
+</figure>
 
-![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width_latex=75% width_html=100%}
+  [STEP format]: nafems-le10.step
+  [this geo file]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10-cad.geo
 
-# NAFEMS LE11 "Solid Cylinder/Taper/Sphere-Temperature" benchmark
+# NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark
 
-::: {#fig:nafems-le11-problem}
-![Problem statement](nafems-le11-problem.png){width="48%"} ![Structured
-hex mesh](nafems-le11-mesh.png){width="48%"}
+<div id="fig:nafems-le11-problem" class="subfigures">
 
-The NAFEMS LE11 problem formulation
-:::
+<img src="nafems-le11-problem.png" title="fig:" style="width:48.0%"
+alt="a" />
+<img src="nafems-le11-mesh.png" title="fig:" style="width:48.0%"
+alt="b" />
+
+Figure 2: The NAFEMS LE11 problem formulation. a — Problem statement, b
+— Structured hex mesh
+
+</div>
 
 Following the spirit from LE10, note how easy it is to give a
 space-dependent temperature field in FeenoX. Just write
 $\sqrt{x^2+y^2}+z$ like `sqrt(x^2 + y^2) + z`!
 
-
-```feenox
+``` feenox
 # NAFEMS Benchmark LE-11: solid cylinder/taper/sphere-temperature
 PROBLEM mechanical 3D
 READ_MESH nafems-le11.msh
@@ -330,8 +461,7 @@ PRINT "sigma_z(A) =" %.2f sigmaz(1,0,0)/1e6 "MPa" SEP " "
 PRINT "wall time  =" %.2f wall_time() "seconds"  SEP " "
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 nafems-le11.geo
 [...]
 $ feenox nafems-le11.fee
@@ -340,24 +470,31 @@ wall time  = wall time  = 1.91 seconds
 $
 ```
 
+<div id="fig:nafems-le11-result" class="subfigures">
 
-::: {#fig:nafems-le11-result}
-![Problem statement](nafems-le11-temperature.png){width=48%}
-![Structured hex mesh](nafems-le11-sigmaz.png){width=48%}
+<img src="nafems-le11-temperature.png" title="fig:" style="width:48.0%"
+alt="a" />
+<img src="nafems-le11-sigmaz.png" title="fig:" style="width:48.0%"
+alt="b" />
 
-The NAFEMS LE11 problem results
-:::
+Figure 3: The NAFEMS LE11 problem results. a — Problem statement, b —
+Structured hex mesh
 
-# NAFEMS LE1 "Elliptical membrane" plane-stress benchmark
+</div>
 
-![The NAFEMS LE1 problem](nafems-le1-figure.svg){width="90%"}
+# NAFEMS LE1 “Elliptical membrane” plane-stress benchmark
+
+<figure>
+<img src="nafems-le1-figure.svg" style="width:90.0%"
+alt="The NAFEMS LE1 problem" />
+<figcaption aria-hidden="true">The NAFEMS LE1 problem</figcaption>
+</figure>
 
 Tell FenooX the problem is `plane_stress`. Use the `nafems-le1.geo` file
 provided to create the mesh. Read it with `READ_MESH`, set material
 properties, `BC`s and `SOLVE_PROBLEM`!
 
-
-```feenox
+``` feenox
 PROBLEM mechanical plane_stress
 READ_MESH nafems-le1.msh
 
@@ -374,8 +511,7 @@ WRITE_MESH nafems-le1.vtk VECTOR u v 0 sigmax sigmay tauxy
 PRINT "σy at point D = " %.4f sigmay(2000,0) "(reference is 92.7)" SEP " "
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -2 nafems-le11.geo
 [...]
 $ feenox nafems-le1.fee
@@ -383,17 +519,22 @@ $ feenox nafems-le1.fee
 $
 ```
 
-
-![Normal stress $\sigma_y$ over 500x-warped displacements for LE1 created with Paraview](nafems-le1-sigmay.png){width=85%}
+<figure>
+<img src="nafems-le1-sigmay.png" style="width:85.0%"
+alt="Normal stress \sigma_y over 500x-warped displacements for LE1 created with Paraview" />
+<figcaption aria-hidden="true">Normal stress <span
+class="math inline"><em>σ</em><sub><em>y</em></sub></span> over
+500x-warped displacements for LE1 created with Paraview</figcaption>
+</figure>
 
 # How to solve a maze without AI
 
 > See these LinkedIn posts to see some comments and discussions:
 >
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/>
 >
-> Other people's maze-related posts: \*
+> Other people’s maze-related posts: \*
 > <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
 > \*
 > <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
@@ -409,18 +550,23 @@ $
 > <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
 
 Say you are Homer Simpson and you want to solve a maze drawn in a
-restaurant's placemat, one where both the start and end are known
-beforehand. In order to avoid falling into the alligator's mouth, you
+restaurant’s placemat, one where both the start and end are known
+beforehand. In order to avoid falling into the alligator’s mouth, you
 can exploit the ellipticity of the Laplacian operator to solve any maze
 (even a hand-drawn one) without needing any fancy AI or ML algorithm.
 Just FeenoX and a bunch of standard open source tools to convert a
 bitmapped picture of the maze into an unstructured mesh.
 
-![Bitmapped maze from <https://www.mazegenerator.net> (left) and 2D mesh
-(right)](maze12.png){width="100%"}
+<figure>
+<img src="maze12.png" style="width:100.0%"
+alt="Bitmapped maze from https://www.mazegenerator.net (left) and 2D mesh (right)" />
+<figcaption aria-hidden="true">Bitmapped maze from <a
+href="https://www.mazegenerator.net"
+class="uri">https://www.mazegenerator.net</a> (left) and 2D mesh
+(right)</figcaption>
+</figure>
 
-
-```feenox
+``` feenox
 PROBLEM laplace 2D  # pretty self-descriptive, isn't it?
 READ_MESH maze.msh
 
@@ -437,27 +583,27 @@ WRITE_MESH maze-solved.msh \
     VECTOR dphidx dphidy 0 
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -2 maze.geo
 [...]
 $ feenox maze.fee
 $
 ```
 
-
-![Solution to the maze found by FeenoX (and drawn by Gmsh)](maze3.png){width_html=100% width_latex=50%}
-
-
+<figure>
+<img src="maze3.png" data-width_html="100%" data-width_latex="50%"
+alt="Solution to the maze found by FeenoX (and drawn by Gmsh)" />
+<figcaption aria-hidden="true">Solution to the maze found by FeenoX (and
+drawn by Gmsh)</figcaption>
+</figure>
 
 ## Transient top-down
 
 Instead of solving a steady-state en exploiting the ellipticity of
-Laplace's operator, let us see what happens if we solve a transient
+Laplace’s operator, let us see what happens if we solve a transient
 instead.
 
-
-```feenox
+``` feenox
 PROBLEM laplace 2D
 READ_MESH maze.msh
 
@@ -473,8 +619,7 @@ PRINT t
 WRITE_MESH maze-tran-td.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
 ```
 
-
-```terminal
+``` terminal
 $ feenox maze-tran-td.fee
 0
 0.00433078
@@ -495,13 +640,15 @@ $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.mp4
 [...]
 $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.gif
 [...]
-
 ```
 
-
-![Transient top-bottom solution to the maze found by FeenoX (and drawn by Gmsh)](maze-tran-td.gif){width_html=100% width_latex=50%}
-
-
+<figure>
+<img src="maze-tran-td.gif" data-width_html="100%"
+data-width_latex="50%"
+alt="Transient top-bottom solution to the maze found by FeenoX (and drawn by Gmsh)" />
+<figcaption aria-hidden="true">Transient top-bottom solution to the maze
+found by FeenoX (and drawn by Gmsh)</figcaption>
+</figure>
 
 ## Transient bottom-up
 
@@ -509,8 +656,7 @@ Now let us see what happens if we travel the maze from the exit up to
 the inlet. It looks like the solver tries a few different paths that
 lead nowhere until the actual solution is found.
 
-
-```feenox
+``` feenox
 PROBLEM laplace 2D
 READ_MESH maze.msh
 
@@ -526,8 +672,7 @@ PRINT t
 WRITE_MESH maze-tran-bu.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
 ```
 
-
-```terminal
+``` terminal
 $ feenox maze-tran-bu.fee
 0
 0.00402961
@@ -548,13 +693,15 @@ $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.mp4
 [...]
 $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
 [...]
-
 ```
 
-
-![Transient bottom-up solution. The first attempt does not seem to be good.](maze-tran-bu.gif){width_html=100% width_latex=50%}
-
-
+<figure>
+<img src="maze-tran-bu.gif" data-width_html="100%"
+data-width_latex="50%"
+alt="Transient bottom-up solution. The first attempt does not seem to be good." />
+<figcaption aria-hidden="true">Transient bottom-up solution. The first
+attempt does not seem to be good.</figcaption>
+</figure>
 
 # The Fibonacci sequence
 
@@ -563,26 +710,22 @@ $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
 When directly executing FeenoX, one gives a single argument to the
 executable with the path to the main input file. For example, the
 following input computes the first twenty numbers of the [Fibonacci
-sequence](https://en.wikipedia.org/wiki/Fibonacci_number) using the
-closed-form formula
+sequence][] using the closed-form formula
 
 $$
 f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}
 $$
 
-where $\varphi=(1+\sqrt{5})/2$ is the [Golden
-ratio](https://en.wikipedia.org/wiki/Golden_ratio).
+where $\varphi=(1+\sqrt{5})/2$ is the [Golden ratio][].
 
-
-```feenox
+``` feenox
 # the fibonacci sequence as function
 phi = (1+sqrt(5))/2 
 f(n) = (phi^n - (1-phi)^n)/sqrt(5)
 PRINT_FUNCTION f MIN 1 MAX 20 STEP 1
 ```
 
-
-```terminal
+``` terminal
 $ feenox fibo_formula.fee | tee one
 1	1
 2	1
@@ -607,15 +750,15 @@ $ feenox fibo_formula.fee | tee one
 $
 ```
 
-
+  [Fibonacci sequence]: https://en.wikipedia.org/wiki/Fibonacci_number
+  [Golden ratio]: https://en.wikipedia.org/wiki/Golden_ratio
 
 ## Using a vector
 
 We could also have computed these twenty numbers by using the direct
 definition of the sequence into a vector $\vec{f}$ of size 20.
 
-
-```feenox
+``` feenox
 # the fibonacci sequence as a vector
 VECTOR f SIZE 20
 
@@ -625,21 +768,17 @@ f[i]<3:vecsize(f)> = f[i-2] + f[i-1]
 PRINT_VECTOR i f
 ```
 
-
-```terminal
+``` terminal
 $ feenox fibo_vector.fee > two
 $
 ```
-
-
 
 ## Solving an iterative problem
 
 Finally, we print the sequence as an iterative problem and check that
 the three outputs are the same.
 
-
-```feenox
+``` feenox
 static_steps = 20
 #static_iterations = 1476  # limit of doubles
 
@@ -656,22 +795,19 @@ ENDIF
 PRINT step_static f_n
 ```
 
-
-```terminal
+``` terminal
 $ feenox fibo_iterative.fee > three
 $ diff one two
 $ diff two three
 $
 ```
 
-
-
 # Computing the derivative of a function as a UNIX filter
 
 This example illustrates how well FeenoX integrates into the UNIX
-philosophy. Let's say one has a function $f(t)$ as an ASCII file with
+philosophy. Let’s say one has a function $f(t)$ as an ASCII file with
 two columns and one wants to compute the derivative $f'(t)$. Just pipe
-the function file into this example's input file `derivative.fee` used
+the function file into this example’s input file `derivative.fee` used
 as a filter.
 
 For example, this small input file `f.fee` writes the function of time
@@ -708,24 +844,21 @@ $
 Then we can pipe the output of this command to the derivative filter.
 Note that
 
--   The `derivative.fee` has the execution flag has on and a [shebang
-    line](https://en.wikipedia.org/wiki/Shebang_(Unix)) pointing to a
-    global location of the FeenoX binary in `/usr/local/bin` e.g. after
-    doing `sudo make install`.
--   The first argument of `derivative.fee` controls the time step. This
-    is only important to control the number of output lines. It does not
-    have anything to do with precision, since the derivative is computed
-    using an adaptive centered numerical differentiation scheme using
-    the [GNU Scientific
-    Library](https://www.gnu.org/software/gsl/doc/html/diff.html).
--   Before doing the actual differentiation, the input data is
-    interpolated using a third-order monotonous scheme (also with
-    [GSL](https://www.gnu.org/software/gsl/doc/html/interp.html#c.gsl_interp_type.gsl_interp_steffen)).
--   TL;DR: this is not just "current value minus last value divided time
-    increment."
+- The `derivative.fee` has the execution flag has on and a [shebang
+  line][] pointing to a global location of the FeenoX binary in
+  `/usr/local/bin` e.g. after doing `sudo make install`.
+- The first argument of `derivative.fee` controls the time step. This is
+  only important to control the number of output lines. It does not have
+  anything to do with precision, since the derivative is computed using
+  an adaptive centered numerical differentiation scheme using the [GNU
+  Scientific Library][].
+- Before doing the actual differentiation, the input data is
+  interpolated using a third-order monotonous scheme (also with
+  [GSL][]).
+- TL;DR: this is not just “current value minus last value divided time
+  increment.”
 
-
-```feenox
+``` feenox
 #!/usr/local/bin/feenox
 
 # read the function from stdin
@@ -747,8 +880,7 @@ f'(t) = derivative(f(t'),t',t)
 PRINT_FUNCTION f' MIN a+0.5*h MAX b-0.5*h STEP h
 ```
 
-
-```terminal
+``` terminal
 $ chmod +x derivative.sh
 $ feenox f.fee "sin(t)" 1 | ./derivative.fee 0.1 | tee f_prime.dat
 0.05    0.998725
@@ -764,24 +896,27 @@ $ feenox f.fee "sin(t)" 1 | ./derivative.fee 0.1 | tee f_prime.dat
 $
 ```
 
+![Numerical derivative as a UNIX filter and actual analytical result][]
 
-![Numerical derivative as a UNIX filter and actual analytical result](derivative.svg)
+  [shebang line]: https://en.wikipedia.org/wiki/Shebang_(Unix)
+  [GNU Scientific Library]: https://www.gnu.org/software/gsl/doc/html/diff.html
+  [GSL]: https://www.gnu.org/software/gsl/doc/html/interp.html#c.gsl_interp_type.gsl_interp_steffen
+  [Numerical derivative as a UNIX filter and actual analytical result]: derivative.svg
 
 # Parametric study on a cantilevered beam
 
 If an external loop successively calls FeenoX with extra command-line
 arguments, a parametric run is obtained. This file `cantilever.fee`
-fixes the face called "left" and sets a load in the negative $z$
+fixes the face called “left” and sets a load in the negative $z$
 direction of a mesh called `cantilever-$1-$2.msh`, where `$1` is the
 first argument after the inpt file and `$2` the second one. The output
 is a single line containing the number of nodes of the mesh and the
 displacement in the vertical direction $w(500,0,0)$ at the center of the
-cantilever's free face.
+cantilever’s free face.
 
 The following Bash script first calls Gmsh to create the meshes. To do
-so, it first starts with a base
-[`cantilever.geo`](https://github.com/seamplex/feenox/blob/main/examples/cantilever.geo)
-file that creates the CAD:
+so, it first starts with a base [`cantilever.geo`][] file that creates
+the CAD:
 
 ``` c
 // https://autofem.com/examples/determining_natural_frequencie.html
@@ -809,25 +944,24 @@ Transfinite Volume "*";
 Then another `.geo` file is merged to build
 `cantilever-${element}-${c}.msh` where
 
--   `${element}`:
-    [tet4](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet4.geo),
-    [tet10](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet10.geo),
-    [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
-    [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
-    [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
--   `${c}`: 1,2,$\dots$,10
+- `${element}`: [tet4][], [tet10][], [hex8][], [hex20][], [hex27][]
+- `${c}`: 1,2,$\dots$,10
 
-::: {#fig:cantilever-mesh}
-![Tetrahedra](cantilever-tet.png){width="45%"}
-![Hexahedra](cantilever-hex.png){width="45%"}
+<div id="fig:cantilever-mesh" class="subfigures">
 
-Cantilevered beam meshed with structured tetrahedra and hexahedra
-:::
+<img src="cantilever-tet.png" title="fig:" style="width:45.0%"
+alt="a" />
+<img src="cantilever-hex.png" title="fig:" style="width:45.0%"
+alt="b" />
 
-It then calls FeenoX with the input
-[`cantilever.fee`](https://github.com/seamplex/feenox/blob/main/examples/cantilever.fee)
-and passes `${element}` and `${c}` as extra arguments, which then are
-expanded as `$1` and `$2` respectively.
+Figure 4: Cantilevered beam meshed with structured tetrahedra and
+hexahedra. a — Tetrahedra, b — Hexahedra
+
+</div>
+
+It then calls FeenoX with the input [`cantilever.fee`][] and passes
+`${element}` and `${c}` as extra arguments, which then are expanded as
+`$1` and `$2` respectively.
 
 ``` bash
 #!/bin/bash
@@ -856,13 +990,12 @@ instruction), one has several files `cantilever-${element}.dat` files.
 When plotted, these show the shear locking effect of fully-integrated
 first-order elements. The theoretical Euler-Bernoulli result is just a
 reference as, among other things, it does not take into account the
-effect of the material's Poisson's ratio. Note that the abscissa shows
+effect of the material’s Poisson’s ratio. Note that the abscissa shows
 the number of *nodes*, which are proportional to the number of degrees
 of freedom (i.e. the size of the problem matrix) and not the number of
 *elements*, which is irrelevant here and in most problems.
 
-
-```feenox
+``` feenox
 PROBLEM elastic 3D
 READ_MESH cantilever-$1-$2.msh   # in meters
 
@@ -876,11 +1009,9 @@ SOLVE_PROBLEM
 
 # z-displacement (components are u,v,w) at the tip vs. number of nodes
 PRINT nodes %e w(500,0,0) "\# $1 $2"
-
 ```
 
-
-```terminal
+``` terminal
 $ ./cantilever.sh
 102     -7.641572e-05   # tet4 1
 495     -2.047389e-04   # tet4 2
@@ -892,18 +1023,36 @@ $ ./cantilever.sh
 $ pyxplot cantilever.ppl
 ```
 
+<figure>
+<img src="cantilever-displacement.svg" style="width:100.0%"
+alt="Displacement at the free tip of a cantilevered beam vs. number of nodes for different element types" />
+<figcaption aria-hidden="true">Displacement at the free tip of a
+cantilevered beam vs. number of nodes for different element
+types</figcaption>
+</figure>
 
-![Displacement at the free tip of a cantilevered beam vs. number of nodes for different element types](cantilever-displacement.svg){width=100%}
+  [`cantilever.geo`]: https://github.com/seamplex/feenox/blob/main/examples/cantilever.geo
+  [tet4]: https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet4.geo
+  [tet10]: https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet10.geo
+  [hex8]: https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo
+  [hex20]: https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo
+  [hex27]: https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo
+  [`cantilever.fee`]: https://github.com/seamplex/feenox/blob/main/examples/cantilever.fee
 
 # Optimizing the length of a tuning fork
 
 To illustrate how to use FeenoX in an optimization loop, let us consider
-the problem of finding the length $\ell_1$ of a tuning fork
-(@fig:fork-meshed) such that the fundamental frequency on a free-free
-oscillation is equal to the base A frequency at 440 Hz.
+the problem of finding the length $\ell_1$ of a tuning fork (fig. 5)
+such that the fundamental frequency on a free-free oscillation is equal
+to the base A frequency at 440 Hz.
 
-![What length $\ell_1$ is needed so the fork vibrates at
-440 Hz?](fork-meshed.svg){#fig:fork-meshed width="20%"}
+<figure>
+<img src="fork-meshed.svg" id="fig:fork-meshed" style="width:20.0%"
+alt="Figure 5: What length \ell_1 is needed so the fork vibrates at 440 Hz?" />
+<figcaption aria-hidden="true">Figure 5: What length <span
+class="math inline">ℓ<sub>1</sub></span> is needed so the fork vibrates
+at 440 Hz?</figcaption>
+</figure>
 
 The FeenoX input is extremely simple input file, since it has to solve
 the free-free mechanical modal problem (i.e. without any Dirichlet
@@ -911,14 +1060,13 @@ boundary condition). All it has to do is to print the fundamental
 frequency.
 
 To find the length $\ell_1$, FeenoX is sucessively called from a Python
-driving script called
-[`fork.py`](https://github.com/seamplex/feenox/blob/main/examples/fork.py).
-This script uses Gmsh's Python API to create the CAD and the mesh of the
-tuning fork given the geometrical arguments $r$, $w$, $\ell_1$ and
-$\ell_2$. The parameter $n$ controls the number of elements through the
-fork's thickness. Here is the driving script without the CAD & mesh
-details (the full implementation of the function is available in the
-examples directory of the FeenoX distribution):
+driving script called [`fork.py`][]. This script uses Gmsh’s Python API
+to create the CAD and the mesh of the tuning fork given the geometrical
+arguments $r$, $w$, $\ell_1$ and $\ell_2$. The parameter $n$ controls
+the number of elements through the fork’s thickness. Here is the driving
+script without the CAD & mesh details (the full implementation of the
+function is available in the examples directory of the FeenoX
+distribution):
 
 ``` python
 import math
@@ -968,8 +1116,7 @@ parametric over $n=1,2\dots,7$ and the optimization loop itself that
 tries to find $\ell_1$ so as to obtain a frequency equal to 440 Hz
 within 0.01% of error.
 
-
-```feenox
+``` feenox
 PROBLEM modal 3D MODES 1  # only one mode needed
 READ_MESH fork.msh  # in [m]
 E = 2.07e11         # in [Pa]
@@ -983,22 +1130,33 @@ SOLVE_PROBLEM
 PRINT f(1)
 ```
 
-
-```terminal
+``` terminal
 $ python fork.py > fork.dat
 $ pyxplot fork.ppl
 $
 ```
 
+<figure>
+<img src="fork.svg" id="fig:fork"
+alt="Figure 6: Estimated length \ell_1 needed to get 440 Hz for different mesh refinement levels n" />
+<figcaption aria-hidden="true">Figure 6: Estimated length <span
+class="math inline">ℓ<sub>1</sub></span> needed to get 440 Hz for
+different mesh refinement levels <span
+class="math inline"><em>n</em></span></figcaption>
+</figure>
 
-![Estimated length\ $\ell_1$ needed to get 440\ Hz for different mesh refinement levels\ $n$](fork.svg){#fig:fork}
+  [`fork.py`]: https://github.com/seamplex/feenox/blob/main/examples/fork.py
 
 # IAEA 2D PWR Benchmark
 
-![The IAEA 2D PWR Benchmark (1977)](iaea-2dpwr-figure.svg){width="100%"}
+<figure>
+<img src="iaea-2dpwr-figure.svg" style="width:100.0%"
+alt="The IAEA 2D PWR Benchmark (1977)" />
+<figcaption aria-hidden="true">The IAEA 2D PWR Benchmark
+(1977)</figcaption>
+</figure>
 
-
-```feenox
+``` feenox
 #                       BENCHMARK PROBLEM
 #          
 # Identification: 11-A2          Source Situation ID.11
@@ -1054,11 +1212,9 @@ BC mirror   mirror         # the first mirror is the name, the second is the BC 
 SOLVE_PROBLEM   # solve!
 PRINT %.5f "keff = " keff
 WRITE_MESH iaea-2dpwr-$1.vtk phi1 phi2
-
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -2 iaea-2dpwr-quarter.geo
 $ [...]
 $ gmsh -2 iaea-2dpwr-eighth.geo
@@ -1070,8 +1226,12 @@ $keff =  1.02975
 $
 ```
 
-
-![Fast and thermal flux for the 2D IAEA PWR benchmark (2021)](iaea-2dpwr-fluxes.png){width=100%}
+<figure>
+<img src="iaea-2dpwr-fluxes.png" style="width:100.0%"
+alt="Fast and thermal flux for the 2D IAEA PWR benchmark (2021)" />
+<figcaption aria-hidden="true">Fast and thermal flux for the 2D IAEA PWR
+benchmark (2021)</figcaption>
+</figure>
 
 # Cube-spherical bare reactor
 
@@ -1080,24 +1240,31 @@ bare cubical reactor. Or a spherical reactor. And we know that for the
 same mass, the $k_\text{eff}$ for the former is smaller than for the
 latter.
 
-::: {#fig:cube-and-sphere}
-![Cubical reactor](cubesphere-0.png){width="49%"} ![Spherical
-reactor](cubesphere-100.png){width="49%"}
+<div id="fig:cube-and-sphere" class="subfigures">
 
-One eight of two bare reactors
-:::
+<img src="cubesphere-0.png" title="fig:" style="width:49.0%" alt="a" />
+<img src="cubesphere-100.png" title="fig:" style="width:49.0%"
+alt="b" />
 
-But what happens "in the middle"? That is to say, how does
+Figure 7: One eight of two bare reactors. a — Cubical reactor, b —
+Spherical reactor
+
+</div>
+
+But what happens “in the middle”? That is to say, how does
 $k_\text{eff}$ changes when we morph the cube into a sphere? Enter Gmsh
 & Feenox.
 
-::: {#fig:cube-morph-sphere}
-![75% cube/25% sphere](cubesphere-25.png){width="33%"}
-![50% cube/50% sphere](cubesphere-50.png){width="33%"}
-![25% cube/75% sphere](cubesphere-75.png){width="33%"}
+<div id="fig:cube-morph-sphere" class="subfigures">
 
-Continuous morph between a cube and a sphere
-:::
+<img src="cubesphere-25.png" title="fig:" style="width:33.0%" alt="a" />
+<img src="cubesphere-50.png" title="fig:" style="width:33.0%" alt="b" />
+<img src="cubesphere-75.png" title="fig:" style="width:33.0%" alt="c" />
+
+Figure 8: Continuous morph between a cube and a sphere. a —
+75% cube/25% sphere, b — 50% cube/50% sphere, c — 25% cube/75% sphere
+
+</div>
 
 ``` python
 import os
@@ -1175,8 +1342,7 @@ if __name__ == "__main__":
   main()
 ```
 
-
-```feenox
+``` feenox
 PROBLEM neutron_diffusion DIMENSIONS 3
 READ_MESH cubesphere-$1.msh DIMENSIONS 3
 
@@ -1195,8 +1361,7 @@ SOLVE_PROBLEM
 PRINT HEADER $1 keff 1e5*(keff-1)/keff fuel_volume
 ```
 
-
-```terminal
+``` terminal
 $ python cubesphere.py | tee cubesphere.dat 
 0       1.05626 5326.13 1e+06
 5       1.05638 5337.54 999980
@@ -1222,16 +1387,20 @@ $ python cubesphere.py | tee cubesphere.dat
 $
 ```
 
+<figure>
+<img src="cubesphere.svg" style="width:100.0%"
+alt="Static reactivity vs. percentage of sphericity" />
+<figcaption aria-hidden="true">Static reactivity vs. percentage of
+sphericity</figcaption>
+</figure>
 
-![Static reactivity vs. percentage of sphericity](cubesphere.svg){width=100%}
-
-# Parallelepiped whose Young's modulus is a function of the temperature
+# Parallelepiped whose Young’s modulus is a function of the temperature
 
 The problem consists of finding the non-dimensional temperature $T$ and
 displacements $u$, $v$ and $w$ distributions within a solid
 parallelepiped of length $l$ whose base is a square of $h\times h$. The
 solid is subject to heat fluxes and to a traction pressure at the same
-time. The non-dimensional Young's modulus $E$ of the material depends on
+time. The non-dimensional Young’s modulus $E$ of the material depends on
 the temperature $T$ in a know algebraically way, whilst both the Poisson
 coefficient $\nu$ and the thermal conductivity $k$ are uniform and do
 not depend on the spatial coordinates:
@@ -1244,20 +1413,24 @@ k &= 1 \\
 \end{aligned}
 $$
 
-![Original figure from
-[v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
+<figure>
+<img src="parallelepiped.svg" id="fig:parallelepiped"
+alt="Figure 9: Original figure from v7.03.100.pdf" />
+<figcaption aria-hidden="true">Figure 9: Original figure from <a
+href="http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf">v7.03.100.pdf</a></figcaption>
+</figure>
 
 References:
 
--   <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
--   <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
+- <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
+- <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
 
 This thermo-mechanical problem is solved in two stages. First, the heat
 conduction equation is solved over a coarse first-order mesh to find the
 non-dimensional temperature distribution. Then, a mechanical problem is
 solved where $T(x,y,z)$ is read from the first mesh and interpolated
 into a finer second-order mesh so to as evaluate the non-dimensional
-Young's modulus as
+Young’s modulus as
 
 $$E\Big(T(x,y,z)\Big) = \frac{1000}{800-T(x,y,z)}$$
 
@@ -1274,8 +1447,7 @@ mesh, writes the resulting temperature distribution into
 numerical result with respect to the analytical
 solution $T(x,y,z) = 40 - 2x - 3y - 4z$.
 
-
-```feenox
+``` feenox
 PROBLEM thermal 3D
 READ_MESH parallelepiped-coarse.msh
 
@@ -1300,8 +1472,7 @@ PHYSICAL_GROUP bulk DIM 3  # this is just to compute the volume
 PRINT num/bulk_volume
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 parallelepiped.geo -order 1 -clscale 2 -o parallelepiped-coarse.msh
 [...]
 Info    : 117 nodes 567 elements
@@ -1313,8 +1484,11 @@ $ feenox parallelepiped-thermal.fee
 $
 ```
 
+![Temperature distribution over the coarse mesh in Gmsh (yes, it is a
+rainbow pallete)][]
 
-![Temperature distribution over the coarse mesh in Gmsh (yes, it is a rainbow pallete)](parallelepiped-temperature.png)
+  [Temperature distribution over the coarse mesh in Gmsh (yes, it is a rainbow pallete)]:
+    parallelepiped-temperature.png
 
 ## Mechanical problem
 
@@ -1326,8 +1500,7 @@ the fine mesh is written in a VTK file (along with the temperature as
 interpolated from the coarse mesh) and compared to the analytical
 solution using the $L_2$ norm.
 
-
-```feenox
+``` feenox
 PROBLEM mechanical 3D
 
 # this is where we solve the mechanical problem
@@ -1369,8 +1542,7 @@ INTEGRATE 1 RESULT den MESH parallelepiped.msh
 PRINT num/den
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 parallelepiped.geo -order 2
 [...]
 Info    : 2564 nodes 2162 elements
@@ -1382,8 +1554,11 @@ $ feenox parallelepiped-mechanical.fee
 $
 ```
 
+![Displacements and temperature distribution over the fine mesh in
+Paraview (yes, still a rainbow pallete)][]
 
-![Displacements and temperature distribution over the fine mesh in Paraview (yes, still a rainbow pallete)](parallelepiped-mechanical.png)
+  [Displacements and temperature distribution over the fine mesh in Paraview (yes, still a rainbow pallete)]:
+    parallelepiped-mechanical.png
 
 # Non-dimensional transient heat conduction on a cylinder
 
@@ -1405,11 +1580,14 @@ $$
 The other faces have a convection conditions with (non-dimensional) heat
 transfer coefficient $h=0.1$ and $T_\text{ref} = 1$.
 
-![Locally-refined cylinder for a transient thermal
-problem.](cylinder.png){width="100%"}
+<figure>
+<img src="cylinder.png" style="width:100.0%"
+alt="Locally-refined cylinder for a transient thermal problem." />
+<figcaption aria-hidden="true">Locally-refined cylinder for a transient
+thermal problem.</figcaption>
+</figure>
 
-
-```feenox
+``` feenox
 PROBLEM thermal 3D
 READ_MESH cylinder.msh
 
@@ -1440,8 +1618,7 @@ IF done
 ENDIF
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 cylinder.geo
 [...]
 Info    : Done optimizing mesh (Wall 0.624941s, CPU 0.624932s)
@@ -1488,20 +1665,25 @@ $ ffmpeg -y -f image2 -i temp-cylinder-smooth-%03d.png  -framerate 20 -pix_fmt y
 $
 ```
 
+<div class="not-in-format latex texi">
 
-:::: {.not-in-format .latex .texi}
-![Transient temperature distribution](temp-cylinder-smooth.mp4){width=100%}
-::::
+<figure>
+<video src="temp-cylinder-smooth.mp4" style="width:100.0%"
+controls=""><a href="temp-cylinder-smooth.mp4">Transient temperature
+distribution</a></video>
+<figcaption aria-hidden="true">Transient temperature
+distribution</figcaption>
+</figure>
+
+</div>
 
 # Five natural modes of a cantilevered wire
 
-Back in [college](https://www.ib.edu.ar/), we had this subject
-Experimental Physics 101. I had to measure the natual modes of two
-cantilevered wires and determine the Young modulus of of those
-measurements. The [report is
-here](https://www.seamplex.com/fino/doc/alambre.pdf). Two comments: 1.
-It is in Spanish 2. There was a systematic error and a factor of two
-sneaked in into the measured values
+Back in [college][], we had this subject Experimental Physics 101. I had
+to measure the natual modes of two cantilevered wires and determine the
+Young modulus of of those measurements. The [report is here][]. Two
+comments: 1. It is in Spanish 2. There was a systematic error and a
+factor of two sneaked in into the measured values
 
 Here is a finite-element version of the experimental setup with a
 comparison to then theoretical values written directly as Markdown
@@ -1509,8 +1691,7 @@ tables. The material (either aluminum or copper) and the mesh type
 (either tet or hex) and be chosen at runtime through command line
 arguments.
 
-
-```feenox
+``` feenox
 #
 DEFAULT_ARGUMENT_VALUE 1 hex       # mesh, either hex or unstruct
 DEFAULT_ARGUMENT_VALUE 2 copper    # material, either copper or aluminum
@@ -1589,8 +1770,7 @@ WRITE_MESH wire-$1-$2.msh {
 }
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 wire-hex.geo
 [...]
 Info    : Done meshing order 2 (Wall 0.0169025s, CPU 0.016804s)
@@ -1636,13 +1816,116 @@ $ feenox wire.fee hex aluminum | pandoc -o wire-hex-aluminum.md
 $ feenox wire.fee tet aluminum | pandoc -o wire-tet-aluminum.md
 ```
 
+| $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
+|:---:|:----------:|:------------:|:-------------------------:|
+|  1  |   45.84    |    45.84     |           0.02            |
+|  2  |   287.1    |    287.3     |           0.06            |
+|  3  |   803.4    |    804.5     |           0.13            |
+|  4  |    1573    |     1576     |           0.24            |
+|  5  |    2596    |     2606     |           0.38            |
 
-```include
-wire-hex-copper.md
-wire-tet-copper.md
-wire-hex-aluminum.md
-wire-tet-aluminum.md
-```
+copper wire over hex mesh
+
+| $n$ |   $L$    | $\Gamma$ | $\mu$  |  $M$   |
+|:---:|:--------:|:--------:|:------:|:------:|
+|  1  | -1.8e-03 | -5.9e-01 | 0.2713 | 0.2713 |
+|  2  | +1.3e-03 | +4.2e-01 | 0.1374 | 0.4087 |
+|  3  | +9.7e-05 | +1.8e-02 | 0.0004 | 0.4091 |
+|  4  | -1.6e-03 | -3.1e-01 | 0.1251 | 0.5343 |
+|  5  | -3.5e-05 | -6.3e-03 | 0.0001 | 0.5343 |
+|  6  | -9.9e-04 | -1.8e-01 | 0.0431 | 0.5774 |
+|  7  | +7.2e-04 | +1.2e-01 | 0.0221 | 0.5995 |
+|  8  | -8.6e-06 | -1.5e-03 | 0.0000 | 0.5995 |
+|  9  | -2.6e-05 | -4.7e-03 | 0.0000 | 0.5996 |
+| 10  | +5.4e-04 | +9.9e-02 | 0.0134 | 0.6130 |
+
+copper wire over hex mesh, participation and excitation factors $L$ and
+$\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and
+$M$
+
+| $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
+|:---:|:----------:|:------------:|:-------------------------:|
+|  1  |   45.84    |    45.84     |           0.00            |
+|  2  |   287.2    |    287.3     |           0.05            |
+|  3  |   803.4    |    804.5     |           0.13            |
+|  4  |    1573    |     1576     |           0.24            |
+|  5  |    2596    |     2606     |           0.38            |
+
+copper wire over tet mesh
+
+| $n$ |   $L$    | $\Gamma$ | $\mu$  |  $M$   |
+|:---:|:--------:|:--------:|:------:|:------:|
+|  1  | -1.9e-03 | -6.1e-01 | 0.2925 | 0.2925 |
+|  2  | +1.2e-03 | +3.8e-01 | 0.1163 | 0.4087 |
+|  3  | -1.0e-03 | -3.3e-01 | 0.0861 | 0.4948 |
+|  4  | +7.0e-04 | +2.3e-01 | 0.0395 | 0.5343 |
+|  5  | -6.0e-04 | -1.9e-01 | 0.0292 | 0.5634 |
+|  6  | +4.2e-04 | +1.3e-01 | 0.0140 | 0.5774 |
+|  7  | -4.0e-04 | -1.3e-01 | 0.0133 | 0.5908 |
+|  8  | +3.3e-04 | +1.1e-01 | 0.0087 | 0.5995 |
+|  9  | +3.5e-04 | +1.1e-01 | 0.0096 | 0.6091 |
+| 10  | -2.2e-04 | -6.9e-02 | 0.0038 | 0.6129 |
+
+copper wire over tet mesh, participation and excitation factors $L$ and
+$\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and
+$M$
+
+| $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
+|:---:|:----------:|:------------:|:-------------------------:|
+|  1  |   61.91    |    61.92     |           0.02            |
+|  2  |   387.8    |     388      |           0.06            |
+|  3  |    1085    |     1086     |           0.13            |
+|  4  |    2124    |     2129     |           0.24            |
+|  5  |    3506    |     3519     |           0.38            |
+
+aluminum wire over hex mesh
+
+| $n$ |   $L$    | $\Gamma$ | $\mu$  |  $M$   |
+|:---:|:--------:|:--------:|:------:|:------:|
+|  1  | -6.9e-04 | -6.2e-01 | 0.3211 | 0.3211 |
+|  2  | +3.6e-04 | +3.3e-01 | 0.0876 | 0.4087 |
+|  3  | +4.2e-05 | +2.4e-02 | 0.0008 | 0.4095 |
+|  4  | -5.4e-04 | -3.1e-01 | 0.1248 | 0.5343 |
+|  5  | +3.7e-05 | +2.3e-02 | 0.0006 | 0.5349 |
+|  6  | -3.0e-04 | -1.9e-01 | 0.0425 | 0.5774 |
+|  7  | +2.4e-04 | +1.2e-01 | 0.0221 | 0.5995 |
+|  8  | -3.2e-06 | -1.6e-03 | 0.0000 | 0.5995 |
+|  9  | +1.8e-04 | +9.8e-02 | 0.0132 | 0.6127 |
+| 10  | -9.5e-06 | -5.2e-03 | 0.0000 | 0.6128 |
+
+aluminum wire over hex mesh, participation and excitation factors $L$
+and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
+and $M$
+
+| $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
+|:---:|:----------:|:------------:|:-------------------------:|
+|  1  |   61.91    |    61.92     |           0.00            |
+|  2  |   387.8    |     388      |           0.05            |
+|  3  |    1085    |     1086     |           0.13            |
+|  4  |    2124    |     2129     |           0.24            |
+|  5  |    3506    |     3519     |           0.38            |
+
+aluminum wire over tet mesh
+
+| $n$ |   $L$    | $\Gamma$ | $\mu$  |  $M$   |
+|:---:|:--------:|:--------:|:------:|:------:|
+|  1  | -6.4e-04 | -6.1e-01 | 0.2923 | 0.2923 |
+|  2  | +4.0e-04 | +3.8e-01 | 0.1164 | 0.4087 |
+|  3  | -3.5e-04 | -3.3e-01 | 0.0861 | 0.4948 |
+|  4  | +2.3e-04 | +2.3e-01 | 0.0395 | 0.5343 |
+|  5  | -2.0e-04 | -1.9e-01 | 0.0292 | 0.5634 |
+|  6  | +1.4e-04 | +1.3e-01 | 0.0140 | 0.5774 |
+|  7  | -1.3e-04 | -1.3e-01 | 0.0133 | 0.5908 |
+|  8  | +1.1e-04 | +1.1e-01 | 0.0087 | 0.5995 |
+|  9  | +1.2e-04 | +1.1e-01 | 0.0096 | 0.6091 |
+| 10  | -7.3e-05 | -6.9e-02 | 0.0038 | 0.6129 |
+
+aluminum wire over tet mesh, participation and excitation factors $L$
+and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
+and $M$
+
+  [college]: https://www.ib.edu.ar/
+  [report is here]: https://www.seamplex.com/fino/doc/alambre.pdf
 
 # On the evaluation of thermal expansion coefficients
 
@@ -1666,8 +1949,8 @@ $$
 \Delta \epsilon = \alpha \cdot \Delta T
 $$
 
-But if the strain is not linear with respect to the temperature---which
-is the most common case---then $\alpha$ depends on $T$. Therefore, when
+But if the strain is not linear with respect to the temperature—which is
+the most common case—then $\alpha$ depends on $T$. Therefore, when
 dealing with finite temperature increments $\Delta T = T-T_0$ where the
 thermal expansion coefficient $\alpha(T)$ depends on the temperature
 itself then *mean* values for the thermal expansion ought to be used:
@@ -1699,12 +1982,16 @@ Let $\epsilon(T)$ be the linear thermal expansion of a given material in
 a certain direction when heating a piece of such material from an
 initial temperature $T_0$ up to $T$ so that $\epsilon(T_0)=0$.
 
-![Table TE2 of thermal expansion properties for Aluminum alloys from
-ASME II Part D (figure from [this
-report](https://www.ramsay-maunder.co.uk/knowledge-base/technical-notes/asmeansys-potential-issue-with-thermal-expansion-calculations/).](asme-expansion-table.png){#fig:table-asme-expansion}
+<figure>
+<img src="asme-expansion-table.png" id="fig:table-asme-expansion"
+alt="Figure 10: Table TE2 of thermal expansion properties for Aluminum alloys from ASME II Part D (figure from this report." />
+<figcaption aria-hidden="true">Figure 10: Table TE2 of thermal expansion
+properties for Aluminum alloys from ASME II Part D (figure from <a
+href="https://www.ramsay-maunder.co.uk/knowledge-base/technical-notes/asmeansys-potential-issue-with-thermal-expansion-calculations/">this
+report</a>.</figcaption>
+</figure>
 
-From our previous analysis, we can see that in
-@fig:table-asme-expansion:
+From our previous analysis, we can see that in fig. 10:
 
 $$
 \begin{aligned}
@@ -1716,12 +2003,11 @@ $$
 
 Therefore,
 
-i.  $A(T)$ can be computed out of $C(T)$
-ii. $B(T)$ can be computed either out of $A(T)$ or $C(T)$
-iii. $C(T)$ can be computed out of $A(T)$
+1.  $A(T)$ can be computed out of $C(T)$
+2.  $B(T)$ can be computed either out of $A(T)$ or $C(T)$
+3.  $C(T)$ can be computed out of $A(T)$
 
-
-```feenox
+``` feenox
 # just in case we wanted to interpolate with another method (linear, splines, etc.)
 DEFAULT_ARGUMENT_VALUE 1 steffen
 
@@ -1752,8 +2038,7 @@ C_fromA(T) := 1e-3*integral(A(T'), T', T0, T)
 PRINT_FUNCTION A A_fromC   B B_fromA B_fromC   C C_fromA MIN T_min+1 MAX T_max-1 STEP 1
 ```
 
-
-```terminal
+``` terminal
 $ cat asme-expansion-table.dat 
 # temp  A       B        C
 20      21.7    21.7     0
@@ -1774,23 +2059,28 @@ $ pyxplot asme-expansion.ppl
 $
 ```
 
+<img src="asme-expansion-A.svg" style="width:100.0%"
+alt="Column A(T) from C(T)" />
+<img src="asme-expansion-B.svg" style="width:100.0%"
+alt="Column B(T) from A(T) and C(T)" />
+<img src="asme-expansion-C.svg" style="width:100.0%"
+alt="Column C(T) from A(T)" />
 
-![Column $A(T)$ from $C(T)$](asme-expansion-A.svg){width=100%}
-![Column $B(T)$ from $A(T)$ and $C(T)$](asme-expansion-B.svg){width=100%}
-![Column $C(T)$ from $A(T)$](asme-expansion-C.svg){width=100%}
+The conclusion (see [this][], [this][1] and [this][2] reports) is that
+values rounded to only one decimal value as presented in the ASME code
+section II subsection D tables are not enough to satisfy the
+mathematical relationships between the physical magnitudes related to
+thermal expansion properties of the materials listed. Therefore, care
+has to be taken as which of the three columns is chosen when using the
+data for actual thermo-mechanical numerical computations. As an
+exercise, the reader is encouraged to try different interpolation
+algorithms to see how the results change. *Spoiler alert*: they are also
+highly sensible to the interpolation method used to “fill in” the gaps
+between the table values.
 
-The conclusion (see
-[this](https://www.linkedin.com/pulse/accuracy-thermal-expansion-properties-asme-bpv-code-angus-ramsay/),
-[this](https://www.seamplex.com/docs/SP-WA-17-TN-F38B-A.pdf) and
-[this](https://www.linkedin.com/pulse/ansys-potential-issue-thermal-expansion-calculations-angus-ramsay/) reports)
-is that values rounded to only one decimal value as presented in the ASME code
-section II subsection D tables are not enough to satisfy the mathematical relationships
-between the physical magnitudes related to thermal expansion properties of the materials listed.
-Therefore, care has to be taken as which of the three columns is chosen when using the data
-for actual thermo-mechanical numerical computations.
-As an exercise, the reader is encouraged to try different interpolation algorithms to
-see how the results change. _Spoiler alert_: they are also highly sensible to the interpolation method used
-to “fill in” the gaps between the table values.
+  [this]: https://www.linkedin.com/pulse/accuracy-thermal-expansion-properties-asme-bpv-code-angus-ramsay/
+  [1]: https://www.seamplex.com/docs/SP-WA-17-TN-F38B-A.pdf
+  [2]: https://www.linkedin.com/pulse/ansys-potential-issue-thermal-expansion-calculations-angus-ramsay/
 
 ## Orthotropic free expansion of a cube
 
@@ -1807,8 +2097,7 @@ the ASME table TE-2, respectively. If the data was consistent, the
 displacement at any point with the same coordinates $x=y=z$ would be
 exactly equal.
 
-
-```feenox
+``` feenox
 DEFAULT_ARGUMENT_VALUE 1 steffen
 DEFAULT_ARGUMENT_VALUE 2 hex
 
@@ -1855,8 +2144,7 @@ PRINT %.3e "displacement in y at (1,1,1) = " v(1,1,1)
 PRINT %.3e "displacement in z at (1,1,1) = " w(1,1,1)
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 cube-hex.geo
 [...]
 $ gmsh -3 cube-tet.geo
@@ -1880,20 +2168,25 @@ displacement in z at (1,1,1) =  4.438e-03
 $ 
 ```
 
+<figure>
+<img src="cube-orthotropic-expansion.png" style="width:100.0%"
+alt="Warped displacement (\times 500) of the cube using ASME’s three columns." />
+<figcaption aria-hidden="true">Warped displacement (<span
+class="math inline"> × 500</span>) of the cube using ASME’s three
+columns.</figcaption>
+</figure>
 
-![Warped displacement ($\times 500$) of the cube using ASME's three columns.](cube-orthotropic-expansion.png){width=100%}
-
-Differences cannot be seen graphically, but they are there as the terminal mimic illustrates.
-Yet, they are not as large nor as sensible to meshing and interpolation settings as one would
-have expected after seeing the plots from the previous section. 
+Differences cannot be seen graphically, but they are there as the
+terminal mimic illustrates. Yet, they are not as large nor as sensible
+to meshing and interpolation settings as one would have expected after
+seeing the plots from the previous section.
 
 # Thermo-elastic expansion of finite cylinders
 
 Let us solve the following problem introduced by J. Veeder in his
-[technical report AECL-2660 from
-1967](https://inis.iaea.org/search/search.aspx?orig_q=RN:40103718).
+[technical report AECL-2660 from 1967][].
 
-> ![](veeder-problem.png){width="50%"}
+> <img src="veeder-problem.png" style="width:50.0%" />
 >
 > Consider a finite solid cylinder (see insert) of radius $b$ and
 > length $2h$, with the origin of coordinates at the centre. It may be
@@ -1928,10 +2221,9 @@ These two profiles are compared to the power expansion series given in
 the original report from 1967. Note that the authors expect a 5%
 difference between the reference solution and the real one.
 
-![3D mesh of the upper half of the Veeder problem](veeder-mesh.png)
+![3D mesh of the upper half of the Veeder problem][]
 
-
-```feenox
+``` feenox
 PROBLEM mechanical
 READ_MESH veeder.msh
 
@@ -2005,8 +2297,7 @@ PRINT_FUNCTION FILE veeder_v.dat  v_num v_ref(1,z') MIN 0 MAX 1 NSTEPS 50 HEADER
 PRINT_FUNCTION FILE veeder_w.dat  w_num w_ref(r',1) MIN 0 MAX 1 NSTEPS 50 HEADER
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -3 veeder.geo
 [...]
 $ feenox veeder.fee
@@ -2014,18 +2305,29 @@ $ pyxplot veeder.ppl
 $
 ```
 
+<figure>
+<img src="veeder.png" data-width_latex="75%" data-width_html="100%"
+alt="100,000x-warped displacements" />
+<figcaption aria-hidden="true">100,000x-warped
+displacements</figcaption>
+</figure>
 
-![100,000x-warped displacements](veeder.png){width_latex=75% width_html=100%}
+<figure>
+<img src="veeder-displacements.svg" style="width:100.0%"
+alt="Comparison of 1-D displacement profiles" />
+<figcaption aria-hidden="true">Comparison of 1-D displacement
+profiles</figcaption>
+</figure>
 
-![Comparison of 1-D displacement profiles](veeder-displacements.svg){width=100%}
+  [technical report AECL-2660 from 1967]: https://inis.iaea.org/search/search.aspx?orig_q=RN:40103718
+  [3D mesh of the upper half of the Veeder problem]: veeder-mesh.png
 
 # Temperature-dependent material properties
 
 Let us solve a plane-strain square fixed on the left, with an horizontal
 traction on the right and free on the other two sides. The Young modulus
 depends on the temperature $E(T)$ as given in the ASME II part D tables
-of material properties, interpolated using a [monotonic cubic
-scheme](https://en.wikipedia.org/wiki/Monotone_cubic_interpolation).
+of material properties, interpolated using a [monotonic cubic scheme][].
 
 Actually, this example shows three cases:
 
@@ -2080,8 +2382,7 @@ one of three secondary input files are included:
     READ_MESH thermal-square-temperature.msh DIM 2 READ_FUNCTION T
     ```
 
-
-```feenox
+``` feenox
 # 2d plane strain mechanical problem over the [-1:+1]x[-1:+1] square
 PROBLEM mechanical plane_strain
 READ_MESH square-centered.msh 
@@ -2122,8 +2423,7 @@ PRINT u(1,1) v(1,1)
 WRITE_MESH mechanical-square-temperature-$1.vtk  E T VECTOR u v 0   
 ```
 
-
-```terminal
+``` terminal
 $ gmsh -2 square-centered.geo
 [...]
 Info    : Done meshing 2D (Wall 0.00117144s, CPU 0.00373s)
@@ -2148,8 +2448,18 @@ $ feenox mechanical-square-temperature.fee mesh
 $ 
 ```
 
+<figure>
+<img src="thermal-square-temperature.png" style="width:100.0%"
+alt="Temperature distribution from a heat conduction problem." />
+<figcaption aria-hidden="true">Temperature distribution from a heat
+conduction problem.</figcaption>
+</figure>
 
-![Temperature distribution from a heat conduction problem.](thermal-square-temperature.png){width=100%}
+<figure>
+<img src="mechanical-square-temperature.png" style="width:100.0%"
+alt="Young modulus distribution over the final displacements." />
+<figcaption aria-hidden="true">Young modulus distribution over the final
+displacements.</figcaption>
+</figure>
 
-![Young modulus distribution over the final displacements.](mechanical-square-temperature.png){width=100%}
-
+  [monotonic cubic scheme]: https://en.wikipedia.org/wiki/Monotone_cubic_interpolation

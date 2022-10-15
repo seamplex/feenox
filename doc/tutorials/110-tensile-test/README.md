@@ -464,14 +464,23 @@ $ paraview tensile-test.vtk
 ```
 
 > Congratulations! You just finished your first FeenoX tutorial 
-> Please take some minutes to dig further down into the philosophy of what you just achieved.
+
+ * Keep in mind this was a very detailed tutorial where we digged into a lot of subtle details. Forthcoming tutorials will not be as detailed as this one.
+ * The problem was selected to be very simple. Any actual industrial application will need further discussions, such as
+ 
+    a. The left face cannot be really fully fixed in a tensile test machine.
+    b. There are other boundary conditions that better describe the actual physics.
+    c. If we wanted to understand what happens in a pure tensile case we would need to have another type of boundary condition in the left face.
+    d. The material properties are assumed to be uniform and linear. A thorough discussion of the application of these two assumptions have to be given before any actual application.
+
+Please take some minutes to dig further down into the philosophy of what you just achieved.
 
 
 
-# Unix philosophy {#sec:unix}
+# Unix philosophy* {#sec:unix}
 
-> You can skip this section if you want to go directly where the meat is, i.e @sec:problem.
-> But at some point, it important that you read this section at least one.
+> This section is optional so you can skip it.
+> Nevertheless, it important that you read this section at least one.
 
 FeenoX’ cloud-first design and implementation is largely based on the [Unix philosophy](https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html), as introduced in [Eric Raymond](http://www.catb.org/esr/)’s seminal book [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/). A quotation from such seminal book helps to illustrate this idea:
 
