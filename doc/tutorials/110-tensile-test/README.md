@@ -8,9 +8,9 @@ lang: en-US
 number-sections: true
 toc: true
 prev_link: ../000-setup
-prev_title: #0 Setup your system
+prev_title: \#0 Setup your system
 next_link: ../120-mazes
-next_title: #2 Solving mazes without AI
+next_title: \#2 Solving mazes without AI
 ...
 
 # Foreword {#sec:foreword}

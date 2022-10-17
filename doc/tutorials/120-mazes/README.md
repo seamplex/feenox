@@ -8,7 +8,7 @@ lang: en-US
 number-sections: true
 toc: true
 prev_link: ../110-tensile-test
-prev_title: #1 Tensile test
+prev_title: \#1 Tensile test
 ...
 
 

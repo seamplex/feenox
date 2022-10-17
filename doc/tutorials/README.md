@@ -8,7 +8,7 @@ lang: en-US
 number-sections: true
 toc: true
 next_link: 000-setup
-bext_title: #0 Setup your system 
+next_title: \#0 Setup your system 
 ...
 
 # Introduction

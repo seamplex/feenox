@@ -10,7 +10,7 @@ toc: true
 prev_link: ..
 prev_title: Tutorials index
 next_link: ../110-tensile-test
-next_title: #1 Tensile test
+next_title: \#1 Tensile test
 ...
 
 
