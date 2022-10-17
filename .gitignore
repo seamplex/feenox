@@ -20,7 +20,7 @@ version.m4
 ChangeLog
 
 # doc
-README.html
+/README.html
 README.pdf
 TODO.markdown
 hash.yaml
