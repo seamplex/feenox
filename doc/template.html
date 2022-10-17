@@ -161,19 +161,27 @@ $endfor$
     <div class="container">
 $if(title)$
      <div id="doc-header" class="doc-header text-center">
-     <h1 class="doc-title">$title$</h1>
+      <h1 class="doc-title">$title$</h1>
   $if(subtitle)$
-     <p class="lead">$subtitle$</p>
+      <p class="lead">$subtitle$</p>
+  $endif$
+      <div class="meta">  
+  $if(prev_link)$
+       <a href="$prev_link$">&larr;&nbsp;$prev_title$</a>&nbsp;
+  $endif$
+  $if(next_link)$
+       &nbsp;<a href="$next_link$">$next_title$&nbsp;&rarr;</a>
   $endif$
   $for(author)$
-     <p class="meta">$author$</p>
+       <p class="meta">$author$</p>
   $endfor$
   $if(date)$
-     <p class="meta">$date$</p>
+       <p class="meta">$date$</p>
   $endif$
+      </div>  
   $if(abstract)$
-     <hr>
-     <p class="blockquote"><strong>Abstract</strong>.&nbsp;$abstract$</p>
+      <hr>
+      <p class="blockquote text-left"><strong>Abstract</strong>.&nbsp;$abstract$</p>
   $endif$
      </div><!--//doc-header--> 
 $endif$

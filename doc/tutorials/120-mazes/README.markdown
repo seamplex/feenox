@@ -288,7 +288,7 @@ $$
 \begin{cases}
 \phi=0 & \text{at “start”} \\
 \phi=1 & \text{at “end”} \\
-\nabla \phi \cdot \hat{\vec{n}} = 0 & \text{everywhere else} \\
+\nabla \phi \cdot \hat{\mathbf{n}} = 0 & \text{everywhere else} \\
 \end{cases}
 $$
 
@@ -326,7 +326,7 @@ large gradient. The solution $\phi(x,y)$ is mapped into a function
 $$\nabla \phi =
 \begin{bmatrix}
 \frac{\partial \phi}{\partial x} \\
-\frac{\partial \phi}{\partial y}·
+\frac{\partial \phi}{\partial y}
 \end{bmatrix}
 $$ is mapped into two scalar functions, `dphidx(x,y)` and `dphidy(x,y)`.
 So we write a scalar field with the magnitude of the
@@ -340,9 +340,10 @@ $ feenox maze.fee
 $
 ```
 
-That’s it. Remember the rule of silence.
+That’s it. Remember the [Unix rule][] of silence.
 
   [`WRITE_MESH`]: https://seamplex.com/feenox/doc/feenox-manual.html#write_mesh
+  [Unix rule]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/#sec:unix
 
 # Results
 

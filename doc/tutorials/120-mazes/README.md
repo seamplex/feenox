@@ -7,6 +7,8 @@ titleblock: |
 lang: en-US
 number-sections: true
 toc: true
+prev_link: ../110-tensile-test
+prev_title: #1 Tensile test
 ...
 
 
@@ -207,7 +209,7 @@ $$
 \begin{cases}
 \phi=0 & \text{at “start”} \\
 \phi=1 & \text{at “end”} \\
-\nabla \phi \cdot \hat{\vec{n}} = 0 & \text{everywhere else} \\
+\nabla \phi \cdot \hat{\mathbf{n}} = 0 & \text{everywhere else} \\
 \end{cases}
 $$
 
@@ -227,7 +229,7 @@ The solution\ $\phi(x,y)$ is mapped into a function `phi(x,y)`. Its gradient
 $$\nabla \phi =
 \begin{bmatrix}
 \frac{\partial \phi}{\partial x} \\
-\frac{\partial \phi}{\partial y}·
+\frac{\partial \phi}{\partial y}
 \end{bmatrix}
 $$
 is mapped into two scalar functions, `dphidx(x,y)` and `dphidy(x,y)`.
@@ -239,7 +241,7 @@ $ feenox maze.fee
 $
 ```
 
-That's it. Remember the rule of silence.
+That's it. Remember the [Unix rule](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/#sec:unix) of silence.
  
  
 # Results
