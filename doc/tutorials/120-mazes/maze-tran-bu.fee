@@ -1,0 +1,13 @@
+PROBLEM laplace 2D
+READ_MESH maze.msh
+
+phi_0(x,y) = 0
+end_time = 500
+alpha = 1e-3
+BC end     phi=if(t<1,t,1)
+BC start   phi=0 
+
+SOLVE_PROBLEM
+PRINT t
+
+WRITE_MESH maze-tran-bu.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 

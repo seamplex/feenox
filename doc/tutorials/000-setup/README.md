@@ -12,14 +12,15 @@ toc: true
 
 # Foreword
 
-[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on [GNU/Linux](https://en.wikipedia.org/wiki/Linux) platforms. Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach, although this is discouraged because those two operating systems are
+[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on [GNU/Linux](https://en.wikipedia.org/wiki/Linux) platforms.
+Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach. However, this is _highly_ discouraged because those two operating systems are
 
  1. not cloud-friendly, let alone cloud-first; and
  2. neither free-as-in-free-beer nor open source.
  
-In order to take the tutorials that follow, it is then recommended to stick to GNU/Linux as explained below.
+In order to take the tutorials that follow, it is then recommended to stick to **GNU/Linux** as explained below.
 
-The best way to learn and to understand how FeenoX works is to use a native GNU/Linux distribution as the main operating system, either in a laptop or a desktop\ PC. This sentence from PETSc's Matt Kneppley from 2015 speaks for itself:
+The best way to learn and to understand how FeenoX works is to use a native GNU/Linux distribution as the main operating system, either in a laptop or a desktop\ PC. This sentence from [PETSc](https://petsc.org/)'s Matt Kneppley from 2015 speaks for itself:
 
 > “It is really worth any amount of time and effort to get away from Windows if you are doing computational science.”
 >
@@ -27,33 +28,63 @@ The best way to learn and to understand how FeenoX works is to use a native GNU/
 
 
 
- a. If you already use GNU/Linux then you are almost set! Any distribution will do, although FeenoX is developed in Debian so `apt-get` (or `apt`) will be used as the package manager. Note that the names of the packages being installed as dependencies may vary from distribution to distribution.
+ * If you already use GNU/Linux then you are almost set! Any distribution will do, although FeenoX is developed in [Debian](https://www.debian.org/) so `apt-get` (or `apt`) will be used as the package manager. Note that the names of the packages being installed as dependencies may vary from distribution to distribution.
 
- b. If you do not currently use GNU/Linux as your main operating system and still do not want to spend any time nor effort on doing things right, you can either
+ * If you do not currently use GNU/Linux as your main operating system and still do not want to spend any time nor effort on doing things right, you can either
 
-    i. fire up a virtual GNU/Linux server in a cloud provider (e.g. AWS, Azure, DigitalOcean, Contabo, etc.) and connect through SSH
-    ii. use a containerized GNU/Linux (e.g. with `docker`)
+    i. fire up a virtual GNU/Linux server in a cloud provider (e.g. AWS, Azure, DigitalOcean, Contabo, etc.) and connect through SSH, or
+    ii. use a containerized GNU/Linux (e.g. with `docker`), or
     iii. use a GNU/Linux box through an virtual computer emulator (e.g. VirtualBox, VMWare, Vagrant, etc.)
+    
+   Note that any of these three options is at least as difficult as using a native GNU/Linux box.
 
 
-Up to this point, I assume you have access to a shell as a regular user and that you have permissions to use `sudo`.
-If you do not know what this means, look it up in your favorite search engine or ask for help. Spend some time (which will be really worth it) familiarizing with working with the terminal, issuing commands, etc.
+Up to this point, I assume you have access to a Unix-like shell (i.e. a GNU/Linux terminal, MacOS or even Cygwin or something of the like) as a regular user and that you have permissions to use `sudo`.
+If you do not know what this means, look it up in your favorite search engine, watch some videos online or---even better---ask for help.
+Spend some time (which will be really worth it) familiarizing with working with the terminal, issuing commands, etc.
 
 In the following sections there will be terminal mimics.
 Lines starting with `$` show commands that ought to be typed into the command line.
 The `$` itself does not have to be typed as it is part of the prompt.
-Lines not starting with a dollar sign show the output of the invoked command.
+Lines not starting with a dollar sign show the output of the invoked command. For example
+
+```terminal
+$ feenox
+FeenoX v0.2.144-g31d72de
+a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
+
+  -h, --help         display options and detailed explanations of commmand-line usage
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+  --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+
+Run with --help for further explanations.
+$
+```
+
+When the output of a command is too long and not important for the tutorial, an ellipsis is denoted with `[...]`:
+
+```terminal
+$ feenox
+[...]
+$
+```
+
 
 
 # FeenoX
 
-The most important thing to be set up is FeenoX itself. Since there are still no Debian packages for FeenoX, the most straightforward way to go is to download the Linux binary tarball from <https://seamplex.com/feenox/dist/linux/> and copy the executable into `/usr/local/bin` so it is globally available. To download the tarball you need `wget` and to un-compress it `tar` and `gz` (which should be already installed anyway), so do
+The most important thing to set up is FeenoX itself. Since there are still no Debian packages for FeenoX, the most straightforward way to go is to download the Linux binary tarball from <https://seamplex.com/feenox/dist/linux/> and copy the executable into `/usr/local/bin` so it is globally available. To download the tarball you need `wget` and to un-compress it `tar` and `gz` (which should be already installed anyway), so do
 
 ```terminal
 $ sudo apt-get install wget tar gzip
-$ wget https://seamplex.com/feenox/dist/linux/feenox-v0.2.85-g48a2b76-linux-amd64.tar.gz
-$ tar xvzf feenox-v0.2.85-g48a2b76-linux-amd64.tar.gz
-$ sudo cp feenox-v0.2.85-g48a2b76-linux-amd64/bin/feenox /usr/local/bin/
+$ wget https://seamplex.com/feenox/dist/linux/feenox-v0.2.142-g8f80cb9-linux-amd64.tar.gz
+[...]
+$ tar xvzf feenox-v0.2.142-g8f80cb9-linux-amd64.tar.gz
+[...]
+$ sudo cp feenox-v0.2.142-g8f80cb9-linux-amd64/bin/feenox /usr/local/bin/
 ```
 
 If you do not have root access, read the complete [download](https://www.seamplex.com/feenox/download.html) or [compilation](https://www.seamplex.com/feenox/doc/compilation.html) instructions. Search for "root" and read along.
@@ -63,7 +94,7 @@ Check this is the case:
 
 ```terminal
 $ feenox
-FeenoX v0.2.114-g45b8799
+FeenoX v0.2.144-g31d72de
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
@@ -82,13 +113,14 @@ If you get stuck or get an error, plase ask for help in the [Github discussion p
 
 ## Compiling from source
 
-If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, follow the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html). Again, do not hesitate to ask in the [Github discussion page](https://github.com/seamplex/feenox/discussions). 
+If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, follow the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html).
+Again, do not hesitate to ask in the [Github discussion page](https://github.com/seamplex/feenox/discussions). 
 
 
 ## Executing an example
 
 The FeenoX examples are a set of annotated input files that can be found online at <https://www.seamplex.com/feenox/examples/>.
-These examples range from a simple “Hello World” down to thermo-mechanical problems.
+These examples range from a simple [“Hello World”](https://www.seamplex.com/feenox/examples/#hello-world-and-universe) down to [thermo-mechanical problems](https://www.seamplex.com/feenox/examples/#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature).
 
 Let us run one of them to check FeenoX works.
 Find the [`examples`](https://github.com/seamplex/feenox/tree/main/examples) directory and `cd` into it.
@@ -153,7 +185,7 @@ License       : GNU General Public License
 Build OS      : Linux64
 Build date    : 20220701
 Build host    : gmsh.info
-Build options : 64Bit ALGLIB[contrib] ANN[contrib] Bamg Blas[petsc] Blossom Cgns DIntegration Dlopen DomHex Eigen[contrib] Fltk Gmm[contrib] Hxt Jpeg Kbipack Lapack[petsc] LinuxJoystick MathEx[contrib] Med Mesh Metis[contrib] Mmg Mpeg Netgen ONELAB ONELABMetamodel OpenCASCADE OpenCASCADE-CAF OpenGL OpenMP OptHom PETSc Parser Plugins Png Post QuadMeshingTools QuadTri Solver TetGen/BR Voro++[contrib] WinslowUntangler Zlib
+Build options : 64Bit ALGLIB[contrib] ANN[contrib] Bamg Blas[petsc] Blossom Cgns DIntegration Dlopen DomHex Eigen[contrib] Fltk Gmm[contrib] Hxt Jpeg Kbipack Lapack[petsc] LinuxJoystick MathEx[contrib] Med Mesh Metis[contrib] Mmg Mpeg Netgen ONELAB ONELABMetamodel OpenCASCADE OpenCASCADE-CAF OpenGL OpenMP OptHom PETSc Parser Plugins Png Post QuadMeshingTools QuadTri Solver TetGen/BR Voro++[contrib] WinslowUntangler ZlibF
 FLTK version  : 1.4.0
 PETSc version : 3.14.4 (real arithmtic)
 OCC version   : 7.6.1
@@ -168,14 +200,16 @@ It should be noted that depending on the version of the base opearating system, 
 
 ```terminal
 $ wget http://gmsh.info/bin/Linux/gmsh-4.10.5-Linux64.tgz
-$ tar gmsh-4.10.5-Linux64.tgz
+[...]
+$ tar xvzf gmsh-4.10.5-Linux64.tgz
+[...]
 $ sudo cp gmsh-4.10.5-Linux64/bin/gmsh /usr/local/bin
 ```
 
 Also, Gmsh can be compiled from source by following the [instructions in the documentation](http://gmsh.info/doc/texinfo/gmsh.html#Compiling-the-source-code).
 
 
-It is important to note that Gmsh creates its meshes by reading an input file with extension `.geo` without needing to use a graphical interface at all. Therefore, Gmsh can be used even through `ssh` or `docker` where there is no graphical device. However, it does provide a GUI that is very handy to create the `.geo` in the first place and to help identify the ids of the surfaces that will be subject to boundary conditions. So you will be able to go through the tutorials in text-only mode but you will not be able to exploit its full potential nor even see what the mesh you are using look like.
+It is important to note that Gmsh creates its meshes by reading an input file with extension `.geo` without needing to use a graphical interface at all. Therefore, Gmsh can be used even through `ssh` or `docker` where there is no graphical device. However, it does provide a GUI that is very handy to create the `.geo` in the first place and to help identify the ids of the surfaces that will be subject to boundary conditions (or volumes for material properties). So you will be able to go through the tutorials in text-only mode but you will not be able to exploit its full potential nor even see what the mesh you are using look like.
 
 ## Checking that mesh refinement gives more accurate results
 
@@ -199,6 +233,9 @@ Don't worry if you do not undertsand the Gmsh command line. We will work out the
 # Text editor
 
 In order to create the both the FeenoX and the Gmsh input files, you will need a text editor. In principle any editor will do, but since FeenoX uses keywords to define the problem being solved, it is way more efficient (and aesthetically more pleasant) to use one that supports syntax highlighting.
+
+So far, FeenoX supports highlighting for Vim and Kate, both discussed below.
+Other editors such as Emacs, Nano, Pico, Gedit, etc. can be used.
 
 ## Vim
 
@@ -224,8 +261,8 @@ To enable syntax highlighting copy the file [`feenox.xml`](https://raw.githubuse
 # Post-processors
 
 FeenoX can write mesh results either in `.msh` or `.vtk` format.
-The former can be read and postprocessed by Gmsh.
-The latter can be read and postprocessed by a few different tools, but Paraview is the flagship postprocessor.
+The former can be read and postprocessed by [Gmsh](http://gmsh.info/).
+The latter can be read and postprocessed by a few different tools, but [Paraview](https://www.paraview.org/) is the flagship postprocessor.
 In general any version will do, so it can be installed with
 
 ```terminal
@@ -241,17 +278,11 @@ Note that both Gmsh in post-processing mode and Paraview make sense only if you 
 
 ## Memory
 
+Solving PDEs with FeenoX might need a lot of memory (depending on the problem size).
+Mind the total RAM your system has. If you are using a laptop, FeenoX might thrash it if the problem is way too big.
+
 ## CPU
 
+Solving problems with FeenoX during a lot of time might increase the CPU temperature significantly.
+Make sure your hardware is properly cooled before executing FeenoX during a long period of time.
 
-# Other UNIX tools
-
-To be done.
-
-## Awk
-
-To be done.
-
-## M4
-
-To be done.

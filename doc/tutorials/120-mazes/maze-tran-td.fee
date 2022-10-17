@@ -1,0 +1,13 @@
+PROBLEM laplace 2D
+READ_MESH maze.msh
+
+phi_0(x,y) = 0              # inital condition
+end_time = 500              # some end time where we know we reached the steady-state
+alpha = 1e-3                # factor of the time derivative to make it advance faster
+BC start   phi=if(t<1,t,1)  # a ramp from zero to avoid discontinuities with the initial condition
+BC end     phi=0            # homogeneous BC at the end (so we move from top to bottom)
+
+SOLVE_PROBLEM
+PRINT t
+
+WRITE_MESH maze-tran-td.msh phi sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 

@@ -1,15 +1,16 @@
 # FeenoX Tutorial \#1: Tensile test
 
 - [<span class="toc-section-number">1</span> Foreword][]
+  - [<span class="toc-section-number">1.1</span> Summary][]
 - [<span class="toc-section-number">2</span> Problem description][]
   - [<span class="toc-section-number">2.1</span> Expected results][]
 - [<span class="toc-section-number">3</span> Geometry and mesh][]
 - [<span class="toc-section-number">4</span> FeenoX Input file][]
   - [<span class="toc-section-number">4.1</span> Outputs][]
     - [<span class="toc-section-number">4.1.1</span> Displacements and
-      stress distribution][]
-    - [<span class="toc-section-number">4.1.2</span> Show elongation in
-      $x$ and contraction in $y$][]
+      stresses][]
+    - [<span class="toc-section-number">4.1.2</span> Show elongation and
+      contraction][]
     - [<span class="toc-section-number">4.1.3</span> Check normal
       tension at center][]
     - [<span class="toc-section-number">4.1.4</span> Check reactions][]
@@ -20,15 +21,16 @@
 - [<span class="toc-section-number">6</span> Unix philosophy\*][]
 
   [<span class="toc-section-number">1</span> Foreword]: #sec:foreword
+  [<span class="toc-section-number">1.1</span> Summary]: #summary
   [<span class="toc-section-number">2</span> Problem description]: #sec:problem
   [<span class="toc-section-number">2.1</span> Expected results]: #sec:expected
   [<span class="toc-section-number">3</span> Geometry and mesh]: #sec:mesh
   [<span class="toc-section-number">4</span> FeenoX Input file]: #sec:input
   [<span class="toc-section-number">4.1</span> Outputs]: #outputs
-  [<span class="toc-section-number">4.1.1</span> Displacements and stress distribution]:
-    #displacements-and-stress-distribution
-  [<span class="toc-section-number">4.1.2</span> Show elongation in $x$ and contraction in $y$]:
-    #show-elongation-in-x-and-contraction-in-y
+  [<span class="toc-section-number">4.1.1</span> Displacements and stresses]:
+    #displacements-and-stresses
+  [<span class="toc-section-number">4.1.2</span> Show elongation and contraction]:
+    #show-elongation-and-contraction
   [<span class="toc-section-number">4.1.3</span> Check normal tension at center]:
     #check-normal-tension-at-center
   [<span class="toc-section-number">4.1.4</span> Check reactions]: #check-reactions
@@ -40,12 +42,14 @@
 
 # Foreword
 
-Welcome to FeenoX’ tutorial number one! This first case…
+Welcome to **FeenoX’ tutorial number one**. Good for you! This first
+case…
 
-1.  serves as a step-by-step tutorial to use FeenoX for the first time.
-2.  shows that FeenoX does what a finite-element(ish) tool is supposed
-    to do, and
-3.  (last but not least) illustrates FeenoX’ design basis and the
+1.  serves as a step-by-step tutorial to use [FeenoX][] for the first
+    time.
+2.  shows that [FeenoX][] does what a finite-element(ish) tool is
+    supposed to do, and
+3.  (last but not least) illustrates [FeenoX][]’ design basis and the
     philosophy behind its implementation (spoiler alert, it’s the [Unix
     philosophy][], discussed in sec. 6) and encourages the reader to
     consider and evaluate the differences (both advantages and
@@ -55,6 +59,13 @@ Welcome to FeenoX’ tutorial number one! This first case…
 > *Heads up*: this tutorial, being the first is also detailed and long.
 > Those impatient readers might want to check directly some of the
 > [annotated examples][] in [FeenoX webpage][].
+
+  [FeenoX]: https://www.seamplex.com/feenox/
+  [Unix philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
+  [annotated examples]: https://seamplex.com/feenox/examples/
+  [FeenoX webpage]: https://seamplex.com/feenox/
+
+## Summary
 
 - Here is a 1-min video of what we are going to go through during the
   tutorial:
@@ -68,8 +79,8 @@ Welcome to FeenoX’ tutorial number one! This first case…
 
   </div>
 
-- We are going to understand what each of the parts of the FeenoX input
-  file does:
+- We are going to understand what each of the parts of the [FeenoX][]
+  input file does:
 
   ``` feenox
   PROBLEM mechanical           # self-descriptive
@@ -120,15 +131,25 @@ Welcome to FeenoX’ tutorial number one! This first case…
 
 - We are going to run
 
-  1.  Gmsh,
-  2.  FeenoX, and
-  3.  Paraview
+  1.  [Gmsh][],
+  2.  [FeenoX][], and
+  3.  [ParaView][]
 
-  to obtain the results listed in sec. 2.1.
+  to obtain the results listed in sec. 2.1. Note that these three tools
+  (and any other tool used throuhgout any of the tutorials, including
+  the operating system is free (as an “free speech”) and open source (as
+  in “the source code is available”).
 
-  [Unix philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
-  [annotated examples]: https://seamplex.com/feenox/examples/
-  [FeenoX webpage]: https://seamplex.com/feenox/
+<figure>
+<img src="paraview.png" style="width:100.0%"
+alt="Post-processing tensile-test.vtk in Paraview" />
+<figcaption aria-hidden="true">Post-processing
+<code>tensile-test.vtk</code> in Paraview</figcaption>
+</figure>
+
+  [FeenoX]: https://www.seamplex.com/feenox/
+  [Gmsh]: http://gmsh.info/
+  [ParaView]: https://www.paraview.org/
 
 # Problem description
 
@@ -174,9 +195,11 @@ particular Unix rules (sec. 6) of
 
 the generation of the set of nodes and elements required to perform a
 mechanical computation using the finite element method is outside of
-FeenoX’ scope. That is to say,
+[FeenoX][]’ scope. That is to say,
 
-> The finite-element mesh is an *input* to FeenoX.
+> The finite-element mesh is not a direct *input* of [FeenoX][]. It has
+> to be created and stored in a separate file which is then referred
+> from the actual input file.
 
 In the particular case of the tensile test problem, the geometry is
 given as a [STEP file][]. It is meshed by [Gmsh][] (or, following the
@@ -191,9 +214,9 @@ linked to either material properties or boundary conditions:
 
 | Problem dimension | Material properties |     Boundary conditions      |
 |:-----------------:|:-------------------:|:----------------------------:|
-|         1         |       Volumes       | Surfaces, edges and vertices |
+|         3         |       Volumes       | Surfaces, edges and vertices |
 |         2         |      Surfaces       |      Edges and vertices      |
-|         3         |        Edges        |           Vertices           |
+|         1         |        Edges        |           Vertices           |
 
 Even though mathematically speaking the whole boundary of the domain
 ought to have an associated boundary condition, depending on the type of
@@ -203,8 +226,9 @@ a mechanical problem, those surfaces without an explicit condition are
 treated as “free” surfaces, i.e. free to deform with a traction
 identically zero without a prescribed displacement. For a thermal
 heat-conduction problem, free surfaces usually mean they are treated as
-adiabatic. Each case has to be checked with the documentation of the
-tool being used to solve the problem.
+adiabatic. In general, each case has to be checked with the
+documentation of the finite-element tool being used to solve the
+problem. In the case of FeenoX, we will walk through them togeteher.
 
 The creation of a finite-element mesh involves basically four steps:
 
@@ -216,31 +240,33 @@ The creation of a finite-element mesh involves basically four steps:
 4.  setting up meshing options, such as the elements’
     - type: tetrahedra or hexahedra (there might be transition elements
       such as wedges, pyramids, etc. as well)
-    - order
-    - sizing
-    - quality
+    - order: linear or quadratic (higher-order elements are not
+      currently supported in FeenoX)
+    - sizing: characteristic edge sizes, possible locally-refined
+    - quality: extra optimization steps to remove negative jacobians (in
+      curved second-order elements) and improve overall mesh quality
     - etc.
 
-Since we are solving a mechanical problem with FeenoX, any surface (or
-edge or vertex) that does not have an explicit boundary condition will
-act as a free surface (homogeneous traction). Also, the problem asks for
-conditions on only two surfaces, namely the two longitudinal ends of the
-tensile test specimen so we have to identify only these two faces.
-Moreover, since there is only one volume in the CAD file we do not need
-to explicitly link it to material properties (as there is only one, the
-link is trivial and it is performed automatically by FeenoX as explained
-in the next section). But still, we need to identify it so as to have
-Gmsh to generate the bulk elements.
+Since we are solving a mechanical problem with [FeenoX][], any surface
+(or edge or vertex) that does not have an explicit boundary condition
+will act as a free surface (homogeneous traction). Also, the problem
+asks for conditions on only two surfaces, namely the two longitudinal
+ends of the tensile test specimen so we have to identify only these two
+faces. Moreover, since there is only one volume in the CAD file we do
+not need to explicitly link it to material properties (as there is only
+one, the link is trivial and it is performed automatically by [FeenoX][]
+as explained in the next section). But still, we need to identify it so
+as to have [Gmsh][] to generate the bulk elements.
 
-1.  Open the file `tensile-test-specimen.step` with Gmsh (in a shell
-    capable of doing graphics):
+1.  In a shell capable of doing graphics, open the file
+    `tensile-test-specimen.step` with [Gmsh][]:
 
     ``` terminal
     $ gmsh tensile-test-specimen.step
     ```
 
-2.  Rotate the model until you see the whole 3D geometry and ask Gmsh to
-    show the ids of the geometrical surfaces by going to
+2.  Rotate the model until you see the whole 3D geometry and ask
+    [Gmsh][] to show the ids of the geometrical surfaces by going to
 
     - Tools $\rightarrow$ Options $\rightarrow$ Geometry $\rightarrow$
       Surface labels
@@ -252,11 +278,12 @@ Gmsh to generate the bulk elements.
 3.  Note that the left-most (in the $x$ axis) surface has an id of one
     and the right-most surface has an id of seven. That’s all we need to
     know about the CAD model, that the “left” surface is 1 in the STEP
-    and that “right” is 7. You can close the Gmsh graphical window now.
+    and that “right” is 7. You can close the [Gmsh][] graphical window
+    now.
 
-4.  Open your text editor (mine is Kate with syntax highlighting set to
-    “C”) and create a file named `tensile-test.geo` with the following
-    content:
+4.  Open your text editor (mine is [Kate][] with syntax highlighting set
+    to “C”) and create a file named [`tensile-test.geo`][] with the
+    following content:
 
     ``` c
     // step #1: read the cad file (length units are millimeters)
@@ -278,7 +305,7 @@ Gmsh to generate the bulk elements.
     Mesh.HighOrderOptimize = 3;   // optimize quadratic elements
     ```
 
-5.  Call Gmsh from the shell passing `-3` as the first parameter and
+5.  Call [Gmsh][] from the shell passing `-3` as the first parameter and
     `tensile-test.geo` as the second to create a three-dimensional mesh
     (that is what the `-3` means) named `tensile-test.msh` (this step
     does not need to have a graphical terminal):
@@ -310,18 +337,18 @@ Gmsh to generate the bulk elements.
     $
     ```
 
-    If you don’t like Gmsh’ verbosity, you can change it with the
+    If you don’t like [Gmsh][]’ verbosity, you can change it with the
     command-line option `-v`. I recommend you read its [extensive
     documentation][] for further details.
 
 6.  Now that the mesh file has been created, you can open it with the
-    Gmsh GUI to check how it looks like.
+    [Gmsh][] GUI to check how it looks like.
 
     ``` terminal
     $ gmsh tensile-test.msh
     ```
 
-    By default, Gmsh will show you something like this:
+    By default, [Gmsh][] will show you something like this:
 
     ![][2] 
 
@@ -344,14 +371,14 @@ Gmsh to generate the bulk elements.
 
     ![][3] 
 
-    Feel free to close Gmsh now, we are done with it.
+    Feel free to close [Gmsh][] now, we are done with it.
 
 In general, multi-solid problems need to have different physical volumes
-in order for FeenoX to be able to set different mechanical properties.
-Even though this simple problem has a single solid and an explicit link
-is not needed, a physical volumetric group is needed in order for Gmsh
-to write the volumetric elements (i.e. tetrahedra) into the [output MSH
-file][] (which is an input for FeenoX).
+in order for [FeenoX][] to be able to set different mechanical
+properties. Even though this simple problem has a single solid and an
+explicit link is not needed, a physical volumetric group is needed in
+order for [Gmsh][] to write the volumetric elements (i.e. tetrahedra)
+into the [output MSH file][] (which is an input for [FeenoX][]).
 
 The usage of [physical groups][] to define boundary conditions follows
 the rule of [representation][] as it folds knowledge into data instead
@@ -372,31 +399,34 @@ and does not depend on the details of the mesh. This allows for
 1.  The mesh can be refined (or coarsened) arbitrarily, either by
 
     1.  changing the value of `Mesh.MeshSizeMax` in the GEO file,
-    2.  passing a refinement factor in Gmsh’s command-line option
+    2.  passing a refinement factor in [Gmsh][]’s command-line option
         `-clscale`, and/or
     3.  using one of the many [ways of specifying mesh element sizes][],
 
-    and then using it in FeenoX with *exactly the same input file*.
+    and then using it in [FeenoX][] with *exactly the same input file*.
     There is no need to re-compute nodal loads nor to perform any other
     pre-processing step, providing [simplicity][]. More advanced
     tutorials (and some examples such as [this one][]) show how to
     perform parametric mesh convergence studies (and even [optimization
     loops][]).
 
-2.  A mesh with many physical groups can be used for both many cases
-    (say a tensile case first and a bending case later) where they set
+2.  A mesh with many physical groups can be used for many cases (say a
+    tensile case first and a bending case later) where they set
     different boundary conditions on different sets of physical groups.
     This provides [clarity][].
 
   [FeenoX Software Design Specification]: https://seamplex.com/feenox/doc/sds.html
   [composition]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877684
   [parsimony]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878022
+  [FeenoX]: https://www.seamplex.com/feenox/
   [STEP file]: tensile-test-specimen.step
   [Gmsh]: http://gmsh.info/
   [diversity]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2879078
   [MSH format]: http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format
   [physical groups]: http://gmsh.info/doc/texinfo/gmsh.html#Elementary-entities-vs-physical-groups
   [1]: gmsh-cad.png
+  [Kate]: ../000-setup
+  [`tensile-test.geo`]: tensile-test.geo
   [extensive documentation]: http://gmsh.info/doc/texinfo/gmsh.html
   [2]: gmsh-mesh-surface-only.png
   [3]: gmsh-mesh-volume.png
@@ -411,11 +441,11 @@ and does not depend on the details of the mesh. This allows for
 
 # FeenoX Input file
 
-As discussed in sec. 6, FeenoX reads a plain-text input file—which in
-turns also reads the mesh generated in the previous section—that defines
-the problem, asks FeenoX to solve it and writes whatever output is
-needed. See section “Interfaces” in the [SDS][] for a thorough
-discussion of both inputs and outputs.
+[FeenoX][] reads a plain-text input file—which in turns also reads the
+mesh generated in the previous section—that defines the problem, asks
+[FeenoX][] to solve it and writes whatever output is needed. See section
+“Interfaces” in the [SDS][] for a thorough discussion of both inputs and
+outputs.
 
 The input file is a [syntactically-sweetened][] way to ask the computer
 to perform the actual computation (which is what computers do). This
@@ -439,11 +469,11 @@ input file could be machine-generated by a script or a macro (rule of
 interface for properly processing (both pre and post) the problem, the
 input file could be created by a separate cooperating front-end such as
 [CAEplex][] in fig. 1 above (rule of [separation][]). In any case, the
-input files—both for Gmsh and for FeenoX—can be tracked with [Git][] in
-order to increase traceability and repeatability of engineering
-computations. This is not true for most of the other FEA tools available
-today, particularly the ones that do not follow McIlroy’s
-recommendations above.
+input files—both for [Gmsh][] and for [FeenoX][]—can be tracked with
+[Git][] in order to increase traceability and repeatability of
+engineering computations. This is not true for most of the other FEA
+tools available today, particularly the ones that do not follow
+McIlroy’s recommendations above.
 
 Given that the problem is relatively simple, following the rule of
 [simplicity][4], the input file [`tensile-test.fee`][] ought to be also
@@ -451,7 +481,7 @@ simple. Other cases with more complexity might lead to more complex
 input files.
 
 Out of the full input file listed in sec. 1, the lines that actually ask
-FeenoX to perform the problem at hand are:
+[FeenoX][] to perform the problem at hand are:
 
 ``` feenox
 PROBLEM mechanical           # self-descriptive
@@ -472,17 +502,23 @@ SOLVE_PROBLEM
 
 The details of why, how and what “FeenoX input files” look like is
 discussed in [section 3.1 of the Software Design Specification][]. TL;
-DR: there are definitions (nouns) and instructions (verbs). The first
-line is a definition that asks FeenoX to solve a mechanical problem. The
-second line is an instruction that reads the mesh that we created in the
-previous step.
+DR: there are
+
+- definitions (nouns), and
+- instructions (verbs).
+
+The first line is a *definition* (“problem” is a noun) that asks
+[FeenoX][] to solve a mechanical problem. The second line is an
+*instruction* (“read” is a verb) that reads the mesh that we created in
+the previous step.
 
 The next two lines are instructions that assign numerical values to
-specially-named variables that hold the material properties. In this
-case, since there is only one material with homogeneous properties we
-can use the special scalar variables `E` and `nu` to hold the Young
-modulus and Poisson’s ratio respectively. For completeness, this is a
-quick table about how to define material properties:
+specially-named variables that hold the material properties using the
+`=` instruction. In this case, since there is only one material with
+homogeneous properties we can use the special scalar variables `E` and
+`nu` to hold the Young modulus and Poisson’s ratio respectively. For
+completeness, this is a quick table about how to define material
+properties:
 
 |                 |         Single material          |            Multi material             |
 |:---------------:|:--------------------------------:|:-------------------------------------:|
@@ -524,16 +560,16 @@ about these two lines:
     nu = 1/3
     ```
 
-    is perfectly valid. In FeenoX, everything is an expression. Remember
-    that (and compare with what you have to do to write algebraic
-    expressions in other FEA software).
+    would be perfectly valid. In [FeenoX][], everything is an
+    expression. Remember that (and compare with what you have to do to
+    write algebraic expressions in other FEA software).
 
 4.  Note that this simple case where there is only one material, we do
     not have to “link” material properties to physical volume in the
-    mesh. FeenoX is smart enough to figure it out by it own, need to
+    mesh. [FeenoX][] is smart enough to figure it out by it own, need to
     tell it the obvious. Compare with other FEA software.
 
-Next two lines set the boundary conditions:
+The next two lines set the boundary conditions:
 
 ``` feenox
 # boundary conditions, fixed and Fx are "special" keywords for the mechanical problem
@@ -542,13 +578,14 @@ BC left  fixed
 BC right Fx=10e3  # [ N ]
 ```
 
-The keyword [`BC`][] tells FeenoX that it has to set a boundary
+The keyword [`BC`][] tells [FeenoX][] that it has to set a boundary
 condition on the physical surface given by the second word. This time we
 do need to give a physical surface name, since nothing is obvious here.
 The type and value of the boundary condition is defined by the remaining
 of the line:
 
-1.  the “left” surface is fully fixed
+1.  the “left” surface is fully `fixed`, which is a shortcut for `u=0`,
+    `v=0` and `w=0`.
 2.  the “right” surface has a total force in the $x$ direction equal to
     one thousand Newtons
 
@@ -564,20 +601,22 @@ is also perfectly valid, provided the units of the factor 0.05 make
 sense. Compare with how boundary conditions have to be set in other FEA
 software.
 
-The final line contains the keyword [`SOLVE_PROBLEM`][] telling FeenoX
-that all keywords needed to fully define the problem have been already
-given and it can proceed to solve it. When executed, FeenoX will read
-all the definitions and define whatever is needed to be defined. It will
-then execute all the instructions in the order of appearance in the
-input file, minding some basic conditional blocks. When it executes
-`SOLVE_PROBLEM`, well, it solves the problem.
+The final line contains the keyword [`SOLVE_PROBLEM`][] telling
+[FeenoX][] that all keywords needed to fully define the problem have
+been already given and it can proceed to solve it. When executed,
+[FeenoX][] will read all the definitions and define whatever is needed
+to be defined. It will then execute all the instructions in the order of
+appearance in the input file, minding some basic conditional blocks.
+When it executes `SOLVE_PROBLEM`, well, it solves the problem.
 
+  [FeenoX]: https://www.seamplex.com/feenox/
   [SDS]: https://seamplex.com/feenox/doc/sds.html#interfaces
   [syntactically-sweetened]: http://en.wikipedia.org/wiki/Syntactic_sugar
   [least surprise]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878339
   [generation]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878742
   [CAEplex]: https://www.caeplex.com
   [separation]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877777
+  [Gmsh]: http://gmsh.info/
   [Git]: https://en.wikipedia.org/wiki/Git
   [4]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2877917
   [`tensile-test.fee`]: tensile-test.fee
@@ -592,19 +631,21 @@ input file, minding some basic conditional blocks. When it executes
 
 The remaining part of the input file writes the five results that the
 problem formulation expects to be computed as required in sec. 2.1. Note
-(and compare with other FEA software) that the output in FeenoX is 100%
-defined by the user. If there are no output instructions, FeenoX
-will—following the Unix rule of silence—run silently. If the user wants
-to know something, she will have to ask FeenoX for an explicit output.
-The rationale behind this rule is that engineering time is far more
-expensive than computer time. Therefore, most of the time it makes much
-more sense to re-run a case that directly shows what one needs instead
-of having to manually browse through tons of numbers in order to find
-one single value. This last policy comes from really old design patterns
-dating from times when computer time was more expensive than people’s
-time. Again, compare with other FEA software.
+(and compare with other FEA software) that the output in [FeenoX][] is
+100% defined by the user. If there are no output instructions,
+[FeenoX][] will—following the Unix rule of silence—run silently. If the
+user wants to know something, she will have to ask [FeenoX][] for an
+explicit output. The rationale behind this rule is that engineering time
+is far more expensive than computer time. Therefore, most of the time it
+makes much more sense to re-run a case that directly shows what one
+needs instead of having to manually browse through tons of numbers in
+order to find one single value. This last policy comes from really old
+design patterns dating from times when computer time was more expensive
+than people’s time. Again, compare with other FEA software.
 
-### Displacements and stress distribution
+  [FeenoX]: https://www.seamplex.com/feenox/
+
+### Displacements and stresses
 
 ``` feenox
 # 1. a VTK file to be post-processed in ParaView with
@@ -615,15 +656,16 @@ WRITE_MESH tensile-test.vtk VECTOR u v w  sigma sigmax sigmay sigmaz tauxy tauyz
 PRINT "1. post-processing view written in tensile-test.vtk"
 ```
 
-The instruction [`WRITE_MESH`][] asks FeenoX to write a file for
+The instruction [`WRITE_MESH`][] asks [FeenoX][] to write a file for
 post-processing. Here, we want to write a file named `tensile-test.vtk`
 containing a vector with the three displacements $[u,v,w]$, then the von
 Mises stress $\sigma$ and finally the six components of the stress
 tensor.
 
   [`WRITE_MESH`]: https://seamplex.com/feenox/doc/feenox-manual.html#write_mesh
+  [FeenoX]: https://www.seamplex.com/feenox/
 
-### Show elongation in $x$ and contraction in $y$
+### Show elongation and contraction
 
 ``` feenox
 # 2. the displacement vector at the center of the specimen
@@ -677,15 +719,18 @@ PRINT %.1f tauxy(55,10,2.5)  sigmay(55,10,2.5) tauyz(55,10,2.5)
 PRINT %.1f tauzx(55,10,2.5)  tauyz(55,10,2.5)  sigmaz(55,10,2.5)
 ```
 
-A couple of `PRINT`s. Note that FeenoX does not have a tresca stress
-function, but it can be easily computed as $\sigma_1-\sigma_3$. Recall
-that “everything is an expression.”
+A couple of [`PRINT`][]s. Note that [FeenoX][] does not have a Tresca
+stress function, but it can be easily computed as $\sigma_1-\sigma_3$.
+Recall that “everything is an expression.”
+
+  [`PRINT`]: https://seamplex.com/feenox/doc/feenox-manual.html#print
+  [FeenoX]: https://www.seamplex.com/feenox/
 
 ## Notes
 
 Some notes summarizing the section:
 
-- The FeenoX input file is clean as a whistle:
+- The [FeenoX][] input file is clean as a whistle:
 
   - It is [syntactically sugared][] by using English-like keywords.
   - Nouns are definitions and verbs are instructions.
@@ -697,9 +742,14 @@ Some notes summarizing the section:
     blackboard) formulation of the problem.
   - Input files are [distributed version control][]-friendly.
 
-- The mesh [`tensile-test.msh`][] is the output of Gmsh when invoked
-  with the input [`tensile-test.geo`][] above. It can be either
-  [version 4.1][] or [2.2][]. It is not part of FeenoX the input file.
+  See a more detailed decription (and discussion) about the input in
+  [section 3 of the Software Design Specification][].
+
+- The mesh `tensile-test.msh` file is the output of [Gmsh][] when
+  invoked with the input [`tensile-test.geo`][] above. It can be either
+  [version 4.1][] or [2.2][]. It is not part of [FeenoX][] the input
+  file, but referred to by the file name. This allows the input file to
+  be tracked by Git (or any other DVCS).
 
 - The mechanical properties, namely the Young modulus $E$ and the
   Poisson’s ratio $\nu$ are uniform in space. Therefore, they can be
@@ -710,7 +760,7 @@ Some notes summarizing the section:
   individual displacements in each direction `u=0`, `v=0` and `w=0`.
 
 - An explicit location within the logical flow of the input file hast to
-  be given where FeenoX ought to actually solve the problem with the
+  be given where [FeenoX][] ought to actually solve the problem with the
   keyword [`SOLVE_PROBLEM`][]. It should be after defining the material
   properties and the boundary conditions and before computing secondary
   results (such as the reactions) and asking for outputs.
@@ -748,12 +798,14 @@ Some notes summarizing the section:
 
 - The principal stresses $\sigma_1$, $\sigma_2$ and $\sigma_3$ are
   evaluated at the origin. There is no need to have an actual node at
-  $\mathbf{x}=(0,0,0)$ since FeenoX can evaluate functions at any
+  $\mathbf{x}=(0,0,0)$ since [FeenoX][] can evaluate functions at any
   arbitrary point.
 
+  [FeenoX]: https://www.seamplex.com/feenox/
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
   [distributed version control]: https://en.wikipedia.org/wiki/Distributed_version_control
-  [`tensile-test.msh`]: tensile-test.msh
+  [section 3 of the Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html#sec:input
+  [Gmsh]: http://gmsh.info/
   [`tensile-test.geo`]: tensile-test.geo
   [version 4.1]: http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format
   [2.2]: http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format-version-2-_0028Legacy_0029
@@ -766,10 +818,11 @@ Some notes summarizing the section:
 
 # Execution
 
-Opening a terminal and calling both Gmsh and FeenoX in sequence should
-go as smooth (and as fast) as follows.
+Opening a terminal and calling both [Gmsh][] and [FeenoX][] in sequence
+should go as smooth (and as fast) as follows.
 
-<asciinema-player src="tensile-test.cast" cols="133" rows="32" preload="true" poster="npt:0:20"></asciinema-player>
+<div id="tensile-test-execution"></div>
+<script>AsciinemaPlayer.create('tensile-test.cast', document.getElementById('tensile-test-execution'), {cols:133,rows:32, poster: 'npt:0:20'});</script>
 
 Here is a static mimic of a 22-second terminal session:
 
@@ -809,13 +862,20 @@ stress tensor:
 $
 ```
 
-You can now open Paraview:
+You can now open [ParaView][]:
 
 ``` terminal
 $ paraview tensile-test.vtk
 ```
 
-> Congratulations! You just finished your first FeenoX tutorial
+<figure>
+<img src="paraview.png" style="width:100.0%"
+alt="Post-processing tensile-test.vtk in Paraview" />
+<figcaption aria-hidden="true">Post-processing
+<code>tensile-test.vtk</code> in Paraview</figcaption>
+</figure>
+
+> Congratulations! You just finished your **first FeenoX tutorial**!
 
 - Keep in mind this was a very detailed tutorial where we digged into a
   lot of subtle details. Forthcoming tutorials will not be as detailed
@@ -838,14 +898,18 @@ $ paraview tensile-test.vtk
 Please take some minutes to dig further down into the philosophy of what
 you just achieved.
 
+  [Gmsh]: http://gmsh.info/
+  [FeenoX]: https://www.seamplex.com/feenox/
+  [ParaView]: https://www.paraview.org/
+
 # Unix philosophy\*
 
 > This section is optional so you can skip it. Nevertheless, it
 > important that you read this section at least one.
 
-FeenoX’ cloud-first design and implementation is largely based on the
-[Unix philosophy][6], as introduced in [Eric Raymond][]’s seminal book
-[The Art of Unix Programming][]. A quotation from such seminal book
+[FeenoX][]’ cloud-first design and implementation is largely based on
+the [Unix philosophy][6], as introduced in [Eric Raymond][]’s seminal
+book [The Art of Unix Programming][]. A quotation from such seminal book
 helps to illustrate this idea:
 
 > [Doug McIlroy][], the inventor of [Unix pipes][] and one of the
@@ -879,7 +943,7 @@ years later they still
 - Do use stringently columnar and/or binary input (and output!) formats.
 - Do insist on interactive output.
 
-A further note is that not only is FeenoX both [free][] and
+A further note is that not only is [FeenoX][] both [free][] and
 [open-source][] software but it also is designed to connect and to work
 with ([rule of composition][]) other free and open source software, like
 
@@ -973,7 +1037,7 @@ and open source software only (Markdown converted to PDF and HTML with
 Pandoc using Kate as the main editor). Even the [terminal recorder][]
 used to show the [actual execution][] is GPLv3.
 
-Following the Unix philosophy, FeenoX also makes use of high-quality
+Following the Unix philosophy, [FeenoX][] also makes use of high-quality
 free and open source mathematical libraries which contain numerical
 methods designed by mathematicians and programmed by professional
 programmers instead of hard-coding ad-hoc mathematical algorithms. In
@@ -985,8 +1049,8 @@ particular, it uses
 - [kdtree][]
 - [uthash][]
 
-This way, FeenoX bounds its scope to doing only one thing and to doing
-it well: namely, to build and solve finite-element formulations of
+This way, [FeenoX][] bounds its scope to doing only one thing and to
+doing it well: namely, to build and solve finite-element formulations of
 partial differential equations instead of implementing numerical methods
 to solve the discretized equations. And it does so on high grounds, both
 
@@ -1021,9 +1085,9 @@ documentation for further details regarding
 6.  etc.
 
 A final preliminary comment before starting the actual tutorial is that
-FeenoX is designed to work as an engineering “transfer function” between
-one (or more) input files and zero (or more) output files (which might
-include the terminal):
+[FeenoX][] is designed to work as an engineering “transfer function”
+between one (or more) input files and zero (or more) output files (which
+might include the terminal):
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal
@@ -1034,21 +1098,22 @@ include the terminal):
 In computer-science, this transfer-function-like workflow is called a
 *filter* or *pipe*. Indeed, we already quoted [Doug McIlroy][] who
 invented [Unix pipelines][]. When solving a finite-element problem,
-FeenoX thus needs two files:
+[FeenoX][] thus needs two files:
 
 1.  A FeenoX input file (discussed in sec. 4)
 2.  A mesh file (discussed in sec. 3)
 
 Depending on the expected results (sec. 2.1) there might be zero
-(i.e. rule of silence) or more outputs, such as
+(i.e. rule of [silence][]) or more outputs, such as
 
 1.  User-formatted output to the standard output (i.e. the terminal)
-2.  VTK files for post-processing with ParaView
-3.  MSH files for post-processing with Gmsh (or to be re-read in further
-    computations)
+2.  VTK files for post-processing with [ParaView][]
+3.  MSH files for post-processing with [Gmsh][] (or to be re-read in
+    further computations)
 4.  ASCII files with subsets of resulting distributions
 5.  Other user-defined output
 
+  [FeenoX]: https://www.seamplex.com/feenox/
   [6]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html
   [Eric Raymond]: http://www.catb.org/esr/
   [The Art of Unix Programming]: http://www.catb.org/esr/writings/taoup/
@@ -1081,3 +1146,4 @@ Depending on the expected results (sec. 2.1) there might be zero
   [Given enough eyeballs, all bugs are shallow.]: https://en.wikipedia.org/wiki/Linus%27s_law
   [programming and contributing]: https://seamplex.com/feenox/doc/#programming-and-contributing
   [Unix pipelines]: https://en.wikipedia.org/wiki/Pipeline_(Unix)
+  [silence]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2878450
