@@ -2,7 +2,7 @@
 
 for i in feenox touch sed pandoc xelatex makeinfo texi2pdf inkscape convert pandoc-crossref; do
  if [ -z "$(which $i)" ]; then
-  echo "error: $i not installed"
+  echo "error: ${i} not installed"
   exit 1
  fi
 done

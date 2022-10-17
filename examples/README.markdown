@@ -534,20 +534,15 @@ class="math inline"><em>σ</em><sub><em>y</em></sub></span> over
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/>
 >
-> Other people’s maze-related posts: \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
-> \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
-> \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
-> \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6973921855275458560/>
-> \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6974663157952745472/>
-> \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6974979951049519104/>
-> \*
-> <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
+> Other people’s maze-related posts:
+>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6973921855275458560/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6974663157952745472/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6974979951049519104/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
 
 Say you are Homer Simpson and you want to solve a maze drawn in a
 restaurant’s placemat, one where both the start and end are known
@@ -1679,8 +1674,8 @@ distribution</figcaption>
 
 # Five natural modes of a cantilevered wire
 
-Back in [college][], we had this subject Experimental Physics 101. I had
-to measure the natual modes of two cantilevered wires and determine the
+Back in [College][], we had this subject Experimental Physics 101. I had
+to measure the natural modes of two cantilevered wires and determine the
 Young modulus of of those measurements. The [report is here][]. Two
 comments: 1. It is in Spanish 2. There was a systematic error and a
 factor of two sneaked in into the measured values
@@ -1924,7 +1919,7 @@ aluminum wire over tet mesh, participation and excitation factors $L$
 and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
 and $M$
 
-  [college]: https://www.ib.edu.ar/
+  [College]: https://www.ib.edu.ar/
   [report is here]: https://www.seamplex.com/fino/doc/alambre.pdf
 
 # On the evaluation of thermal expansion coefficients

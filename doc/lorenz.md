@@ -1,5 +1,5 @@
 
-For example, let us consider the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system). Here is one way of getting an image of the butterfly-shaped attractor using FeenoX to compute it and [gnuplot](http://www.gnuplot.info/) to draw it. Solve 
+For example, let us consider the famous chaotic [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system). Here is one way of getting an image of the butterfly-shaped attractor using FeenoX to compute it and [Gnuplot](http://www.gnuplot.info/) to draw it. Solve 
 
 ::: {.not-in-format .texi .plain .gfm}
 $$
@@ -45,7 +45,7 @@ The following ASCII input file ressembles the parameters, inital conditions and 
 
 ![The Lorenz attractor solved with FeenoX and drawn with Gnuplot](lorenz.svg){#fig:lorenz-gnuplot width_latex=75% width_html=100% width_texinfo=12cm}
 
-Indeed, when executing FeenoX with this input file, we get four ASCII columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and plot it with a standard tool such as Gnuplot. Note the importance of relying on plain ASCII text  formats both for input and output, as recommended by the UNIX philosophy and the _rule of composition_: other programs can easily create inputs for FeenoX and other programs can easily understand FeenoX' outputs. This is essentially how UNIX filters and pipes work.
+Indeed, when executing FeenoX with this input file, we get four ASCII columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and plot it with a standard tool such as [Gnuplot]((http://www.gnuplot.info/)). Note the importance of relying on plain ASCII text  formats both for input and output, as recommended by the UNIX philosophy and the _rule of composition_: other programs can easily create inputs for FeenoX and other programs can easily understand FeenoX' outputs. This is essentially how UNIX filters and pipes work.
 
 
  

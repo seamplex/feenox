@@ -11,7 +11,6 @@ toc: true
 
 
 ::: {.only-in-format .html .markdown}
-> * [FeenoX annotated examples](https://www.seamplex.com/feenox/examples)
 > * FeenoX Overview Presentation, August 2021
 >   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)

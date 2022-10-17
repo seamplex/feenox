@@ -209,7 +209,7 @@ functions:
 
 For example, let us consider the famous chaotic Lorenz’ dynamical
 system. Here is one way of getting an image of the butterfly-shaped
-attractor using FeenoX to compute it and gnuplot to draw it. Solve
+attractor using FeenoX to compute it and Gnuplot to draw it. Solve
 
 ẋ = σ ⋅ (y−x)
 ẏ = x ⋅ (r−z) − y
@@ -388,16 +388,17 @@ details about how to contribute.
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
   [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
-  [gnuplot]: http://www.gnuplot.info/
+  [Gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
   [Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot]:
     doc/lorenz.svg
+  [3]: (http://www.gnuplot.info/)
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
   [Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
     doc/nafems-le10-problem-input.svg
   [Figure 3: Normal stress σ_(y) refined around point D over 5,000x-warped displacements for LE10 created with Paraview]:
     doc/nafems-le10.png
-  [3]: https://www.paraview.org
+  [4]: https://www.paraview.org
   [Paraview]: https://www.paraview.org/
   [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
@@ -443,9 +444,9 @@ details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
-  [4]: https://seamplex.com/feenox/doc/
+  [5]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [5]: https://seamplex.com/feenox/doc/FAQ.html
+  [6]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilatation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
@@ -509,7 +510,7 @@ See the detailed compilation instructions for further details.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [detailed compilation instructions]: compilation.md
-  [6]: doc/compilation.md
+  [7]: doc/compilation.md
 
 Licensing
 
@@ -607,7 +608,7 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [7]: https://www.gnu.org/licenses/gpl-3.0
+  [8]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
@@ -630,7 +631,7 @@ See the copying conditions.
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
-  [8]: https://github.com/seamplex
+  [9]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html
   [copying conditions]: COPYING

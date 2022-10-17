@@ -214,7 +214,7 @@ $
 
 For example, let us consider the famous chaotic [Lorenz’ dynamical
 system][]. Here is one way of getting an image of the butterfly-shaped
-attractor using FeenoX to compute it and [gnuplot][] to draw it. Solve
+attractor using FeenoX to compute it and [Gnuplot][] to draw it. Solve
 
 <div class="only-in-format texi plain gfm">
 
@@ -272,8 +272,8 @@ with FeenoX and drawn with Gnuplot</figcaption>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
 columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and
-plot it with a standard tool such as Gnuplot. Note the importance of
-relying on plain ASCII text formats both for input and output, as
+plot it with a standard tool such as [Gnuplot][3]. Note the importance
+of relying on plain ASCII text formats both for input and output, as
 recommended by the UNIX philosophy and the *rule of composition*: other
 programs can easily create inputs for FeenoX and other programs can
 easily understand FeenoX’ outputs. This is essentially how UNIX filters
@@ -353,7 +353,7 @@ WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
 
 This VTK file can then be post-processed to create interactive 3D views,
 still screenshots, browser and mobile-friendly webGL models, etc. In
-particular, using [Paraview][3] one can get a colorful bitmapped PNG
+particular, using [Paraview][4] one can get a colorful bitmapped PNG
 (the displacements are far more interesting than the stresses in this
 problem).
 
@@ -431,10 +431,11 @@ above (*rules of modularity and extensibility*). See the
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/
   [Lorenz’ dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
-  [gnuplot]: http://www.gnuplot.info/
+  [Gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
+  [3]: (http://www.gnuplot.info/)
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
-  [3]: https://www.paraview.org
+  [4]: https://www.paraview.org
   [Paraview]: https://www.paraview.org/
   [CAEplex]: www.caeplex.com
   [syntactically sugared]: https://en.wikipedia.org/wiki/Syntactic_sugar
@@ -456,8 +457,8 @@ below][] for details.
 | Github repository  | <https://github.com/seamplex/feenox/>          |
 
 - Be aware that FeenoX is a backend. It **does not have a GUI**. Read
-  the [documentation][4], especially the [description][] and the
-  [FAQs][5]. Ask for help on the [GitHub discussions page][].
+  the [documentation][5], especially the [description][] and the
+  [FAQs][6]. Ask for help on the [GitHub discussions page][].
 
 - Binaries are provided as statically-linked executables for
   convenience. They do not support MUMPS nor MPI and have only basic
@@ -477,9 +478,9 @@ below][] for details.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
-  [4]: https://seamplex.com/feenox/doc/
+  [5]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [5]: https://seamplex.com/feenox/doc/FAQ.html
+  [6]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilatation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
@@ -555,11 +556,11 @@ git pull
 sudo make install
 ```
 
-See the [detailed compilation instructions][6] for further details.
+See the [detailed compilation instructions][7] for further details.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [detailed compilation instructions]: compilation.md
-  [6]: doc/compilation.md
+  [7]: doc/compilation.md
 
 # Licensing
 
@@ -599,7 +600,7 @@ following text was borrowed from the [Gmsh documentation][]. Replacing
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][7] version 3 or, at the user convenience, any later version.
+License][8] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[^3]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -658,7 +659,7 @@ Documentation License v1.3][] (or any later version).
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [7]: https://www.gnu.org/licenses/gpl-3.0
+  [8]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
@@ -668,7 +669,7 @@ Home page: <https://www.seamplex.com/feenox>
 Repository: <https://github.com/seamplex/feenox>  
 Bug reporting: <https://github.com/seamplex/feenox/issues>  
 Discussions: <https://github.com/seamplex/feenox/discussions>  
-Follow us: [YouTube][] [LinkedIn][] [Github][8]
+Follow us: [YouTube][] [LinkedIn][] [Github][9]
 
 ------------------------------------------------------------------------
 
@@ -681,7 +682,7 @@ See the [copying conditions][].
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
-  [8]: https://github.com/seamplex
+  [9]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html
   [copying conditions]: COPYING
