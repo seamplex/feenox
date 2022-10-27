@@ -32,6 +32,15 @@ The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) d
  
  2. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
 
+
+::::::::: {.only-in-format .html .markdown}
+> **Why FeenoX works the way it works** (i.e. why it does not run in Windows) 
+>
+> ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+> <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/66WvYTb4pSg?rel=0" allowfullscreen></iframe>
+> :::::
+::::::::: 
+
  
  * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
  * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX' offer)

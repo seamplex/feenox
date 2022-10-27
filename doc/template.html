@@ -171,7 +171,7 @@ $if(title)$
        &nbsp;<a href="$next_link$">$next_title$&nbsp;&rarr;</a>
   $endif$
   $if(pdf_available)$
-       <a href="$pdf_available$.pdf">Get PDF version</a>
+       <p class="meta"><a href="$pdf_available$.pdf">Get PDF version</a></p>
   $endif$
   $for(author)$
        <p class="meta">$author$</p>
@@ -209,11 +209,23 @@ $body$
 <!--  side_toc_start -->
 $table-of-contents$
 <!--  side_toc_end    -->
-        <p class="text-center"><a href="#header"><small>Back to top</small></a><p>
+        <p class="text-center"><a href="#header"><small>&uarr;&nbsp;Back to top</small></a><p>
         </nav><!--//doc-menu-->
        </div><!--//doc-nav-->
       </div><!--//doc-sidebar-->
      </div><!--//doc-body-->     
+     
+     <div id="doc-header" class="doc-header text-center">
+      <div class="meta">  
+  $if(prev_link)$
+       <a href="$prev_link$">&larr;&nbsp;$prev_title$</a>&nbsp;
+  $endif$
+  $if(next_link)$
+       &nbsp;<a href="$next_link$">$next_title$&nbsp;&rarr;</a>
+  $endif$
+       <p class="meta"><a href="#header">&uarr;&nbsp;Back to top</a></p>
+     </div><!--//doc-header-->      
+     
     </div><!--//container-->
    </div><!--//doc-wrapper-->
   </div><!--//page-wrapper-->

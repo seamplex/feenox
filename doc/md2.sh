@@ -137,7 +137,7 @@ fi
 if [ "x${format}" = "x.html" ]; then
   format_args="--katex --email-obfuscation=javascript -t html5+smart"
   template_args="--template=${rootdir}/doc/${template}.html"
-  if [ -e ${dir}/${in}.md ]; then
+  if [ -e ${in}.pdf ]; then
     format_args+=" --metadata=pdf_available:${in}"
   fi
  

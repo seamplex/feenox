@@ -17,6 +17,15 @@ next_title: \#1 Tensile test
 # Foreword
 
 [FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on [GNU/Linux](https://en.wikipedia.org/wiki/Linux) platforms.
+
+::::::::: {.only-in-format .html .markdown}
+Here is a 5-min explanation of why it works this way, and why it is not expected to run in Windows (although it _can_ run in Windows if you try hard enough, but it is not worth it):
+
+::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/66WvYTb4pSg?rel=0" allowfullscreen></iframe>
+:::::
+::::::::: 
+
 Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach. However, this is _highly_ discouraged because those two operating systems are
 
  1. not cloud-friendly, let alone cloud-first; and
@@ -89,6 +98,7 @@ $ wget https://seamplex.com/feenox/dist/linux/feenox-v0.2.142-g8f80cb9-linux-amd
 $ tar xvzf feenox-v0.2.142-g8f80cb9-linux-amd64.tar.gz
 [...]
 $ sudo cp feenox-v0.2.142-g8f80cb9-linux-amd64/bin/feenox /usr/local/bin/
+$
 ```
 
 If you do not have root access, read the complete [download](https://www.seamplex.com/feenox/download.html) or [compilation](https://www.seamplex.com/feenox/doc/compilation.html) instructions. Search for "root" and read along.

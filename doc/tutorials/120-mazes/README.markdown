@@ -63,34 +63,42 @@ unstructured mesh.
 
 We will…
 
-1.  create and download a random maze online.
-2.  create a FEM mesh for the aisle of the maze (the walls will be the
+1.  Create and download a random maze online.
+
+2.  Create a FEM mesh for the aisle of the maze (the walls will be the
     boundary of the domain) using [Gmsh][].
-3.  solve $\nabla^2 \phi(x,y) = 0$ subject to $\phi(x,y) = 1$ at the
-    inlet and $\phi(x,y) = 0$ at the outlet (with homogeneous Neumann
-    boundary conditions everywhere else) using [FeenoX][]:
 
-``` feenox
-PROBLEM laplace 2D
-READ_MESH maze.msh
+3.  Solve $\nabla^2 \phi(x,y) = 0$ subject to the following boundary
+    conditions:
 
-# boundary conditions (default is homogeneous Neumann)
-BC start  phi=0 
-BC end    phi=1
+    $$
+    \begin{cases}
+    \phi(x,y) = 1 & \text{at the inlet} \\
+    \phi(x,y) = 0 & \text{at the outlet} \\
+    \frac{\partial \phi}{\partial n} = 0 & \text{everywhere else} \\
+    \end{cases}
+    $$
 
-SOLVE_PROBLEM
-```
+    ``` feenox
+    PROBLEM laplace 2D
+    READ_MESH maze.msh
 
-4.  show the solution of the maze given by $\nabla \phi$, properly
+    BC start  phi=0 
+    BC end    phi=1
+
+    SOLVE_PROBLEM
+    ```
+
+4.  Show the solution of the maze given by $\nabla \phi$, properly
     scaled, in [Gmsh][]:
 
-``` feenox
-# write the norm of gradient as a scalar field
-# and the gradient as a 2d vector into a .msh file
- WRITE_MESH maze-solved.msh \
-     sqrt(dphidx(x,y)^2+dphidy(x,y)^2) \
-     VECTOR dphidx dphidy 0 
-```
+    ``` feenox
+    # write the norm of gradient as a scalar field
+    # and the gradient as a 2d vector into a .msh file
+     WRITE_MESH maze-solved.msh \
+         sqrt(dphidx(x,y)^2+dphidy(x,y)^2) \
+         VECTOR dphidx dphidy 0 
+    ```
 
 5.  As a bonus, we will also solve a transient case to see how Laplace
     “tries” all the paths and only keeps the ones that do not find any
@@ -117,7 +125,6 @@ to found by FeenoX (and drawn by Gmsh)
 </div>
 
   [Gmsh]: http://gmsh.info/
-  [FeenoX]: https://www.seamplex.com/feenox/
 
 # Creating the mesh
 

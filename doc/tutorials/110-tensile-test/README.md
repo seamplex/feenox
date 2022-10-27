@@ -51,7 +51,18 @@ This first case...
    to obtain the results listed in @sec:expected.
    Note that these three tools (and any other tool used throuhgout any of the tutorials, including the operating system is free (as an “free speech”) and open source (as in “the source code is available”).
 
+ * We are going to illustrate that [FeenoX](https://www.seamplex.com/feenox/) (and [Gmsh](http://gmsh.info/) and up to some degree, [ParaView](https://www.paraview.org/) as well) works very much like an engineering “transfer function” between one (or more) input files and zero (or more) output files (which might include the terminal):
+
+   ```include
+   transfer.md
+   ```
+   
+   This design-basis decision has to do both with
     
+    1. The fact that [FeenoX](https://www.seamplex.com/feenox/) is a **cloud-first** tool. Not cloud friendly nor cloud native, but **cloud first**.
+    2. The Unix Philosophy, discussed in @sec:unix.
+
+   
 ![Post-processing `tensile-test.vtk` in Paraview](paraview.png){width=100%}
 
  
@@ -126,6 +137,24 @@ The creation of a finite-element mesh involves basically four steps:
     * etc.
 
 Since we are solving a mechanical problem with [FeenoX](https://www.seamplex.com/feenox/), any surface (or edge or vertex) that does not have an explicit boundary condition will act as a free surface (homogeneous traction). Also, the problem asks for conditions on only two surfaces, namely the two longitudinal ends of the tensile test specimen so we have to identify only these two faces. Moreover, since there is only one volume in the CAD file we do not need to explicitly link it to material properties (as there is only one, the link is trivial and it is performed automatically by [FeenoX](https://www.seamplex.com/feenox/) as explained in the next section). But still, we need to identify it so as to have [Gmsh](http://gmsh.info/) to generate the bulk elements.
+
+ 0. If you have not already, clone the [FeenoX repository](https://github.com/seamplex/feenox/) and `cd` to [`doc/tutorials/110-tensile-test`](https://github.com/seamplex/feenox/tree/main/doc/tutorials/110-tensile-test). Make sure you have `git` installed first.
+ 
+    ```terminal
+    $ sudo apt-get install git
+    [...]
+    $ git clone https://github.com/seamplex/feenox/
+    Cloning into 'feenox'...
+    remote: Enumerating objects: 8224, done.
+    remote: Counting objects: 100% (1126/1126), done.
+    remote: Compressing objects: 100% (567/567), done.
+    remote: Total 8224 (delta 599), reused 959 (delta 528), pack-reused 7098
+    Receiving objects: 100% (8224/8224), 20.76 MiB | 17.25 MiB/s, done.
+    Resolving deltas: 100% (5873/5873), done.
+    $ cd feenox/doc/tutorials/110-tensile-test
+    $
+    ```
+ 
 
  1. In a shell capable of doing graphics, open the file `tensile-test-specimen.step` with [Gmsh](http://gmsh.info/):
 
@@ -435,7 +464,7 @@ Opening a terminal and calling both [Gmsh](http://gmsh.info/) and [FeenoX](https
 <script>AsciinemaPlayer.create('tensile-test.cast', document.getElementById('tensile-test-execution'), {cols:133,rows:32, poster: 'npt:0:20'});</script>
 ```
 
-Here is a static mimic of a 22-second terminal session:
+Here is a static mimic of a 12-second terminal session:
 
 ```terminal
 $ gmsh -3 tensile-test.geo

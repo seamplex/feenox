@@ -36,10 +36,11 @@
 # Foreword
 
 [FeenoX][] is a cloud-first engineering tool. Therefore, it runs
-natively on [GNU/Linux][] platforms. Theoretically, the tool could be
-compiled and run in other architectures such as Windows or MacOS in a
-non-cloud approach. However, this is *highly* discouraged because those
-two operating systems are
+natively on [GNU/Linux][] platforms.
+
+Theoretically, the tool could be compiled and run in other architectures
+such as Windows or MacOS in a non-cloud approach. However, this is
+*highly* discouraged because those two operating systems are
 
 1.  not cloud-friendly, let alone cloud-first; and
 2.  neither free-as-in-free-beer nor open source.
@@ -137,6 +138,7 @@ $ wget https://seamplex.com/feenox/dist/linux/feenox-v0.2.142-g8f80cb9-linux-amd
 $ tar xvzf feenox-v0.2.142-g8f80cb9-linux-amd64.tar.gz
 [...]
 $ sudo cp feenox-v0.2.142-g8f80cb9-linux-amd64/bin/feenox /usr/local/bin/
+$
 ```
 
 If you do not have root access, read the complete [download][] or

@@ -140,6 +140,23 @@ case…
   the operating system is free (as an “free speech”) and open source (as
   in “the source code is available”).
 
+- We are going to illustrate that [FeenoX][] (and [Gmsh][] and up to
+  some degree, [ParaView][] as well) works very much like an engineering
+  “transfer function” between one (or more) input files and zero (or
+  more) output files (which might include the terminal):
+
+                                   +------------+
+       mesh (*.msh)  }             |            |             { terminal
+       data (*.dat)  } input ----> |   FeenoX   |----> output { data files
+       input (*.fee) }             |            |             { post (vtk/msh)
+                                   +------------+
+
+  This design-basis decision has to do both with
+
+  1.  The fact that [FeenoX][] is a **cloud-first** tool. Not cloud
+      friendly nor cloud native, but **cloud first**.
+  2.  The Unix Philosophy, discussed in sec. 6.
+
 <figure>
 <img src="paraview.png" style="width:100.0%"
 alt="Post-processing tensile-test.vtk in Paraview" />
@@ -257,6 +274,16 @@ not need to explicitly link it to material properties (as there is only
 one, the link is trivial and it is performed automatically by [FeenoX][]
 as explained in the next section). But still, we need to identify it so
 as to have [Gmsh][] to generate the bulk elements.
+
+0.  If you have not already, clone the [FeenoX repository][] and `cd` to
+    [`doc/tutorials/110-tensile-test`][].
+
+    ``` terminal
+    $ git clone https://github.com/seamplex/feenox/
+    [...]
+    $ cd feenox/doc/tutorials/110-tensile-test
+    $
+    ```
 
 1.  In a shell capable of doing graphics, open the file
     `tensile-test-specimen.step` with [Gmsh][]:
@@ -424,6 +451,8 @@ and does not depend on the details of the mesh. This allows for
   [diversity]: https://homepage.cs.uri.edu/~thenry/resources/unix_art/ch01s06.html#id2879078
   [MSH format]: http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format
   [physical groups]: http://gmsh.info/doc/texinfo/gmsh.html#Elementary-entities-vs-physical-groups
+  [FeenoX repository]: https://github.com/seamplex/feenox/
+  [`doc/tutorials/110-tensile-test`]: https://github.com/seamplex/feenox/tree/main/doc/tutorials/110-tensile-test
   [1]: gmsh-cad.png
   [Kate]: ../000-setup
   [`tensile-test.geo`]: tensile-test.geo

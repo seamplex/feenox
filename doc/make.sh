@@ -19,6 +19,7 @@ echo "creating main README for Github"
 ./md2.sh --gfm   ../README
 ./md2.sh --plain ../README
 ./md2.sh --html  ../README
+./md2.sh --html  ../download.md
 ./md2.sh --plain ../TODO
 
 echo "creating doc's README"

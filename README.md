@@ -10,15 +10,31 @@ toc: true
 ...
 
 
+
+
 ::: {.only-in-format .html .markdown}
-> * FeenoX Overview Presentation, August 2021
->   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
->   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
->   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
+> **News**
+>
+> * Why FeenoX works the way it works (i.e. does not run in Windows):
+>
+>   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+>   <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/66WvYTb4pSg?rel=0" allowfullscreen></iframe>
+>   :::::
+>
+> * [FeenoX tutorials](doc/tutorials):
+>   - [Setting up your workspace](doc/tutorials/000-setup)
+>   - [Tensile test](doc/tutorials/110-tensile-test)
+>   - [Solving mazes with PDES instead of AI](doc/tutorials/120-mazes)
+>
 > * FeenoX for nuclear-related problems Presentation, December 2021
 >   - [Recording with CCs](https://youtu.be/e8kFmFOsbPk)
 >   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-brasil.pdf)
 >   - [Markdown examples sources](https://github.com/gtheler/2021-brasil)
+>
+> * FeenoX Overview Presentation, August 2021
+>   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
+>   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
+>   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
 :::
 
 
