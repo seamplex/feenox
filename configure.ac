@@ -244,7 +244,7 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
     AS_IF([test ! -d ${SLEPC_DIR}],[
       # otherwise see if it is in the standard location as installed with apt
       # this works in Debian, not sure about other (it does not on Fedora)
-      export SLEPC_DIR=/usr/lib/petsc
+      export SLEPC_DIR=/usr/lib/slepc
     ])
   AC_MSG_CHECKING([empty, trying ${SLEPC_DIR}])      
   ])
@@ -257,14 +257,13 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
     AC_MSG_RESULT([no])
     slepc_found=0
   ], [test ! -d "${SLEPC_DIR}/include"], [
-    AC_MSG_RESULT([broken1])
+    AC_MSG_RESULT([broken no include])
     slepc_found=0
   ], [test ! -f "${SLEPC_DIR}/include/slepcversion.h"], [
-    AC_MSG_RESULT([broken2])
+    AC_MSG_RESULT([broken no version])
     slepc_found=0
   ], [test ! -f "${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables"], [
-#    AC_MSG_RESULT(${SLEPC_DIR}/${PETSC_ARCH}/lib/slepc/conf/slepcvariables)
-    AC_MSG_RESULT([broken3])
+    AC_MSG_RESULT([broken no variables])
     slepc_found=0
   ],
     AC_MSG_RESULT([${SLEPC_DIR}])
