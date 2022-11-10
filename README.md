@@ -15,6 +15,20 @@ toc: true
 ::: {.only-in-format .html .markdown}
 > **News**
 >
+> * FeenoX, a cloud-first free and open source finite-element(ish) tool. Science Circle, on-line course. November 2022.
+>   - [Recordings](https://youtu.be/EZSjFzJAhbw)
+>   - [Markdown examples sources](https://github.com/gtheler/2022-feenox-sci-circle)
+>
+>   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+>   <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/EZSjFzJAhbw?rel=0" allowfullscreen></iframe>
+>   :::::
+>
+> * FeenoX hands-on tutorial. Science Circle, on-line course. October 2022 <https://www.youtube.com/watch?v=b3K2QewI8jE>
+>
+>   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+>   <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/b3K2QewI8jE?rel=0" allowfullscreen></iframe>
+>   :::::
+> 
 > * Why FeenoX works the way it works (i.e. does not run in Windows):
 >
 >   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}

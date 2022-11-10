@@ -622,7 +622,7 @@ Check out the [programming and contributing](https://seamplex.com/feenox/doc/#pr
  #. etc.
  
  
-A final preliminary comment before starting the actual tutorial is that [FeenoX](https://www.seamplex.com/feenox/) is designed to work as an engineering “transfer function” between one (or more) input files and zero (or more) output files (which might include the terminal):
+A final comment is that [FeenoX](https://www.seamplex.com/feenox/) is designed to work as an engineering “transfer function” between one (or more) input files and zero (or more) output files (which might include the terminal):
 
 ```include
 transfer.md

@@ -1,6 +1,7 @@
 
 # Current
 
+ * updated LE10 benchmark
  * read time-dependent functions in `.msh` files
  * detect/handle hanging nodes
  * muti-dof BCs using expressions for mechanical 0=expression of space & displacements
