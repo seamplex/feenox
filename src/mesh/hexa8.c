@@ -139,26 +139,26 @@ Hexahedron:
 }
 
 
-void feenox_mesh_gauss_init_hexa1(element_type_t *element_type, gauss_t *gauss) {
+int feenox_mesh_gauss_init_hexa1(element_type_t *element_type, gauss_t *gauss) {
 
   // ---- one Gauss point  ----  
-  feenox_mesh_alloc_gauss(gauss, element_type, 1);
+  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 1));
   
   gauss->w[0] = 8 * 1.0;
   gauss->r[0][0] = 0.0;
   gauss->r[0][1] = 0.0;
   gauss->r[0][2] = 0.0;
   
-  feenox_mesh_init_shape_at_gauss(gauss, element_type);  
+  feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));  
     
-  return;
+  return FEENOX_OK;
 }
 
 
-void feenox_mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss) {
+int feenox_mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss) {
 
   // ---- eight Gauss points  ----  
-  feenox_mesh_alloc_gauss(gauss, element_type, 8);
+  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 8));
 
   gauss->w[0] = 8 * 1.0/8.0;
   gauss->r[0][0] = -1.0/M_SQRT3;
@@ -200,20 +200,20 @@ void feenox_mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss) 
   gauss->r[7][1] = +1.0/M_SQRT3;
   gauss->r[7][2] = +1.0/M_SQRT3;
   
-  feenox_mesh_init_shape_at_gauss(gauss, element_type);
+  feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
   
-  return;
+  return FEENOX_OK;
 }
 
 
 
-void feenox_mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss) {
+int feenox_mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss) {
 
   double const w1 = 5.0/9.0;
   double const w2 = 8.0/9.0;
   
   // ---- one Gauss point  ----  
-  feenox_mesh_alloc_gauss(gauss, element_type, 27);
+  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 27));
 
   
   //Reference https://www.code-aster.org/V2/doc/v11/en/man_r/r3/r3.01.01.pdf
@@ -355,9 +355,9 @@ void feenox_mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss)
   gauss->r[26][2] =  0.0;
 
 
-  feenox_mesh_init_shape_at_gauss(gauss, element_type);
+  feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
 
-  return;
+  return FEENOX_OK;
 }  
   
 

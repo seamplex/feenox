@@ -442,8 +442,6 @@ int feenox_function_init(function_t *this) {
 
         if (this->rectangular_mesh) {
 
-          int step;
-
           // checkeamos solo el size (porq el usuario pudo meter fruta para dimension mayor a 3)
           size_t i = 0;
           size_t j = 1;
@@ -460,6 +458,7 @@ int feenox_function_init(function_t *this) {
             feenox_check_alloc(this->rectangular_mesh_point[i] = calloc(this->rectangular_mesh_size[i], sizeof(double)));
           }
 
+          int step = 0;
           if (this->x_increases_first) {
             step = 1;
             for (i = 0; i < this->n_arguments; i++) {

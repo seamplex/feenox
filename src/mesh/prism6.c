@@ -110,15 +110,13 @@ u   |    ,/ `\    |    v
 }
 
 
-void feenox_mesh_prism_gauss6_init(element_type_t *element_type) {
+int feenox_mesh_prism_gauss6_init(element_type_t *element_type) {
 
-  gauss_t *gauss;
-  
   // dos juegos de puntos de gauss
   
   // el primero es el default
   // ---- seis puntos de Gauss sobre el elemento unitario ----  
-    gauss = &element_type->gauss[integration_full];
+    gauss_t *gauss = &element_type->gauss[integration_full];
     gauss->V = 6;
     feenox_mesh_alloc_gauss(gauss, element_type, gauss->V = 6);
    
@@ -152,20 +150,20 @@ void feenox_mesh_prism_gauss6_init(element_type_t *element_type) {
     gauss->r[5][1] = 2.0/3.0;
     gauss->r[5][2] = +1/M_SQRT3;
     
-    feenox_mesh_init_shape_at_gauss(gauss, element_type);
+    feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
     
   // ---- un punto de Gauss sobre el elemento unitario ----  
     gauss = &element_type->gauss[integration_reduced];
     gauss->V = 1;
-    feenox_mesh_alloc_gauss(gauss, element_type, gauss->V);
+    feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, gauss->V));
   
     gauss->w[0] = 0.5 * 1.0;
     gauss->r[0][0] = 0;
     gauss->r[0][1] = 0;
 
-    feenox_mesh_init_shape_at_gauss(gauss, element_type);    
+    feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
   
-  return;
+  return FEENOX_OK;
 }
 
 double feenox_mesh_prism6_h(int j, double *vec_r) {

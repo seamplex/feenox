@@ -365,7 +365,8 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
         cached_element = NULL;
         HASH_FIND_INT(cache, &element_item->element->tag, cached_element);
         if (cached_element == NULL) {
-          struct cached_element *cached_element = malloc(sizeof(struct cached_element));
+          struct cached_element *cached_element = NULL;
+          feenox_check_alloc_null(cached_element = malloc(sizeof(struct cached_element)));
           cached_element->id = element_item->element->tag;
           HASH_ADD_INT(cache, id, cached_element);
         

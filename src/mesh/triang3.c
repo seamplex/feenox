@@ -120,10 +120,10 @@ v
 
 
 
-void feenox_mesh_gauss_init_triang3(element_type_t *element_type, gauss_t *gauss) {
+int feenox_mesh_gauss_init_triang3(element_type_t *element_type, gauss_t *gauss) {
 
   // ---- three Gauss points
-  feenox_mesh_alloc_gauss(gauss, element_type, 3);
+  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 3));
   
   gauss->w[0] = 1.0/2.0 * 1.0/3.0;
   gauss->r[0][0] = 1.0/6.0;
@@ -137,24 +137,24 @@ void feenox_mesh_gauss_init_triang3(element_type_t *element_type, gauss_t *gauss
   gauss->r[2][0] = 1.0/6.0;
   gauss->r[2][1] = 2.0/3.0;
 
-  feenox_mesh_init_shape_at_gauss(gauss, element_type);
+  feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
     
 
-  return;
+  return FEENOX_OK;
 }
 
-void feenox_mesh_gauss_init_triang1(element_type_t *element_type, gauss_t *gauss) {
+int feenox_mesh_gauss_init_triang1(element_type_t *element_type, gauss_t *gauss) {
 
   // ---- one Gauss point
-  feenox_mesh_alloc_gauss(gauss, element_type, 1);
+  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 1));
   
   gauss->w[0] = 0.5 * 1.0;
   gauss->r[0][0] = 1.0/3.0;
   gauss->r[0][1] = 1.0/3.0;
 
-  feenox_mesh_init_shape_at_gauss(gauss, element_type);  
+  feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));  
 
-  return;
+  return FEENOX_OK;
   
 }
 

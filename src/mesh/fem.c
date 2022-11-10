@@ -316,9 +316,9 @@ inline int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int inte
   // TODO: choose to complain or not
   if (e->w[v] == 0) {
     double det = feenox_mesh_determinant(e->dxdr[v]);
-    if (det == 0) {
-      printf("element %ld\n", e->tag);
-    }
+    // if (det == 0) {
+    //   printf("element %ld\n", e->tag);
+    // }
 //    printf("element %ld point %d det = %g\n", e->tag, v, det);
 //    printf("%g %g %g\n", e->node[0]->x[0], e->node[0]->x[1], e->node[0]->x[2]);
 //    printf("%g %g %g\n", e->node[1]->x[0], e->node[1]->x[1], e->node[1]->x[2]);

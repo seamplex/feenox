@@ -197,7 +197,7 @@ int feenox_mesh_element_types_init(void) {
   unsigned i, j, d;
   for (i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
     if (feenox.mesh.element_types[i].node_coords != NULL) {
-      feenox.mesh.element_types[i].barycenter_coords = calloc(feenox.mesh.element_types[i].dim, sizeof(double));
+      feenox_check_alloc(feenox.mesh.element_types[i].barycenter_coords = calloc(feenox.mesh.element_types[i].dim, sizeof(double)));
       for (j = 0; j < feenox.mesh.element_types[i].nodes; j++) {
         for (d = 0; d < feenox.mesh.element_types[i].dim; d++) {
           feenox.mesh.element_types[i].barycenter_coords[d] += feenox.mesh.element_types[i].node_coords[j][d];
@@ -220,15 +220,15 @@ int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V)
 
   gauss->V = V;
 
-  gauss->w = calloc(gauss->V, sizeof(double));
-  gauss->r = calloc(gauss->V, sizeof(double *));
-  gauss->h = calloc(gauss->V, sizeof(double *));
-  gauss->dhdr = calloc(gauss->V, sizeof(double **));
+  feenox_check_alloc(gauss->w = calloc(gauss->V, sizeof(double)));
+  feenox_check_alloc(gauss->r = calloc(gauss->V, sizeof(double *)));
+  feenox_check_alloc(gauss->h = calloc(gauss->V, sizeof(double *)));
+  feenox_check_alloc(gauss->dhdr = calloc(gauss->V, sizeof(double **)));
   for (v = 0; v < gauss->V; v++) {
-    gauss->r[v] = calloc(dim, sizeof(double));
+    feenox_check_alloc(gauss->r[v] = calloc(dim, sizeof(double)));
     
-    gauss->h[v] = calloc(element_type->nodes, sizeof(double));
-    gauss->dhdr[v] = gsl_matrix_calloc(element_type->nodes, dim);
+    feenox_check_alloc(gauss->h[v] = calloc(element_type->nodes, sizeof(double)));
+    feenox_check_alloc(gauss->dhdr[v] = gsl_matrix_calloc(element_type->nodes, dim));
   }
   
   return FEENOX_OK;
@@ -257,7 +257,7 @@ int feenox_mesh_create_element(element_t *e, size_t index, size_t tag, unsigned 
   e->index = index;
   e->tag = tag;
   e->type = &(feenox.mesh.element_types[type]);
-  e->node  = calloc(e->type->nodes, sizeof(node_t *));
+  feenox_check_alloc(e->node  = calloc(e->type->nodes, sizeof(node_t *)));
   e->physical_group = physical_group;
   
   return FEENOX_OK;

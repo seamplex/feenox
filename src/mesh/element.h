@@ -26,25 +26,25 @@ extern int feenox_mesh_prism15_init(void);
 
 extern int feenox_mesh_one_node_point_init(void);
 
-extern void feenox_mesh_gauss_init_line2(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_line1(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_line3(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_line2(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_line1(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_line3(element_type_t *element_type, gauss_t *gauss);
 
-extern void feenox_mesh_gauss_init_triang1(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_triang3(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_triang1(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_triang3(element_type_t *element_type, gauss_t *gauss);
 
-extern void feenox_mesh_gauss_init_quad1(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_quad4(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_quad9(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_quad1(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_quad4(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_quad9(element_type_t *element_type, gauss_t *gauss);
 
-extern void feenox_mesh_gauss_init_tet1(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_tet1(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss);
 
-extern void feenox_mesh_gauss_init_hexa1(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss);
-extern void feenox_mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_hexa1(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_hexa8(element_type_t *element_type, gauss_t *gauss);
+extern int feenox_mesh_gauss_init_hexa27(element_type_t *element_type, gauss_t *gauss);
 
-extern void feenox_mesh_prism_gauss6_init(element_type_t *element_type);
+extern int feenox_mesh_prism_gauss6_init(element_type_t *element_type);
 
 // TODO: either tet or tetrahedron in both
 extern int feenox_mesh_point_in_line(element_t *this, const double *x);
