@@ -60,16 +60,18 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   }
   
   if (feenox.pde.has_jacobian) {
+    // TODO: hint the interpolation with the current element
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     
     // TODO: this is not working as expected
-//    if (thermal.temperature_k) {
-      // TODO: this might now work if the distribution is not given as an
+    if (thermal.temperature_dependent_stiffness) {
+      // TODO: this might not work if the distribution is not given as an
       //       algebraic expression but as a pointwise function of T
       //       (but it works if using a property!)
-//      double dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
-//      gsl_blas_dgemm(CblasTrans, CblasNoTrans, -1.0/3.0*w*dkdT*T, this->B[v], this->B[v], 1.0, feenox.pde.JKi);
-//    }
+      double dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
+      printf("%g\n", dkdT);
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dkdT*T, e->B[v], e->B[v], 1.0, feenox.pde.JKi);      
+    }
 
     if (thermal.temperature_dependent_source) {
       double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);

@@ -25,6 +25,7 @@ feenox_parser_t feenox_parser;
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include <stdlib.h>
 #if HAVE_SYSCONF
  #include <unistd.h>
@@ -3339,6 +3340,11 @@ int feenox_parse_find_extrema(void) {
 
 int feenox_parse_fit(void) {
 
+#ifndef HAVE_GSL
+  feenox_push_error_message("FIT keyword needs GNU Scientific Library");
+  return FEENOX_ERROR;
+#endif
+
 ///kw+FIT+detail The function with the data has to be point-wise defined
 ///kw+FIT+detail (i.e. a `FUNCTION` read from a file, with inline `DATA` or defined over a mesh).
 ///kw+FIT+detail The function to be fitted has to be parametrized with at least one of
@@ -3513,10 +3519,13 @@ int feenox_parse_fit(void) {
     }
   }
 
+#ifdef HAVE_GSL
   // TODO: choose
   if (fit->max_iter == 0) {
     fit->max_iter = DEFAULT_FIT_MAX_ITER;
   }
+#endif
+  
   
   // TODO: cleanup var_list
   // TODO: add instruction
@@ -3571,6 +3580,12 @@ int feenox_parse_dump(void) {
 }
 
 int feenox_parse_solve(void) {
+
+#ifndef HAVE_GNU
+  feenox_push_error_message("SOLVE keyword needs GNU Scientific Library");
+  return FEENOX_ERROR;
+#endif
+      
   
   solve_t *solve = NULL;
   feenox_check_alloc(solve = calloc(1, sizeof(solve_t)));
@@ -3614,6 +3629,7 @@ int feenox_parse_solve(void) {
         return FEENOX_ERROR;
       }
 
+#ifdef HAVE_GSL      
 ///kw+SOLVE+usage {
 ///kw+SOLVE+usage dnewton |
       if (strcasecmp(token, "dnewton") == 0) {
@@ -3629,7 +3645,8 @@ int feenox_parse_solve(void) {
         solve->type = gsl_multiroot_fsolver_hybrid;
 ///kw+SOLVE+usage ]@
       }
-          
+#endif
+      
 ///kw+SOLVE+usage [ EPSABS <expr> ]
     } else if (strcasecmp(token, "EPSABS") == 0) {
       feenox_call(feenox_parser_expression(&solve->epsabs));
@@ -3690,9 +3707,11 @@ int feenox_parse_solve(void) {
     return FEENOX_ERROR;
   }
       
+#ifdef HAVE_GSL  
   if (solve->type == NULL) {
     solve->type = DEFAULT_SOLVE_METHOD;
   }
+#endif
 
   feenox_call(feenox_add_instruction(feenox_instruction_solve, solve));
   LL_APPEND(feenox.solves, solve);

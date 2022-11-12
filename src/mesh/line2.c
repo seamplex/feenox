@@ -71,23 +71,23 @@ Line:
   
   // full integration: two points
   feenox_mesh_gauss_init_line2(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 2);
+  element_type->gauss[integration_full].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 2);
   
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT3 * element_type->node_coords[j][0];
     
     for (v = 0; v < 2; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_line2_h(v, r));
+      feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_line2_h(v, r));
     }
   }
   
 
   // reduced integration: one point
   feenox_mesh_gauss_init_line1(element_type, &element_type->gauss[integration_reduced]);
-  element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 1));
   
   for (j = 0; j < element_type->nodes; j++) {
-    gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
   }
   
   return FEENOX_OK;

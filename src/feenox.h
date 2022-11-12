@@ -36,6 +36,7 @@
 #  define feenox_likely(cond)     (cond)
 #endif
 
+#ifdef HAVE_GSL
 // for inlining as much as possible GSL
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
@@ -65,6 +66,26 @@
 #include <gsl/gsl_sort_vector_double.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_version.h>
+
+#define lowlevel_vector_t gsl_vector
+#define lowlevel_matrix_t gsl_matrix
+#else
+struct lowlevel_vector_t {
+  int size;
+  double *data;
+};
+struct lowlevel_matrix_t {
+  int size1;  // rows, keep the GSL nomenclature
+  int size2;  // cols
+  double *data;
+};
+
+#ifndef M_SQRT3
+#define M_SQRT3    1.73205080756887729352744634151      /* sqrt(3) */
+#endif
+#define gsl_pow_2(x)      ((x)*(x))
+#define gsl_hypot3(a,b,c) sqrt((a)*(a)+(b)*(b)+(c)*(c))
+#endif
 
 #if HAVE_SUNDIALS
  #include <ida/ida.h>
@@ -137,7 +158,6 @@ extern "C++" {
 // reasonable defaults
 #define DEFAULT_DT                         1.0/16.0
 #define DEFAULT_DAE_RTOL                   1e-6
-#define DEFAULT_RANDOM_METHOD              gsl_rng_mt19937
 
 #define DEFAULT_PRINT_FORMAT               "%g"
 #define DEFAULT_PRINT_SEPARATOR            "\t"
@@ -146,6 +166,8 @@ extern "C++" {
 #define CHAR_PROGRESS_SOLVE                "-"
 #define CHAR_PROGRESS_GRADIENT             "="
 
+#ifdef HAVE_GSL
+#define DEFAULT_RANDOM_METHOD              gsl_rng_mt19937
 
 #define DEFAULT_ROOT_MAX_TER               1024
 #define DEFAULT_ROOT_TOLERANCE             (9.765625e-4)         // (1/2)^-10
@@ -167,7 +189,12 @@ extern "C++" {
 #define DEFAULT_SOLVE_EPSABS               1e-6
 #define DEFAULT_SOLVE_MAX_ITER             128
 
+#define DEFAULT_INTERPOLATION              (*gsl_interp_linear)
+#endif
 
+#define DEFAULT_SHEPARD_RADIUS                     1.0
+#define DEFAULT_SHEPARD_EXPONENT                   2
+#define DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD   9.5367431640625e-07 // (1/2)^-20
 #define MINMAX_ARGS           10
 
 // zero & infinite
@@ -178,13 +205,7 @@ extern "C++" {
 #define MESH_TOL 1e-6
 #define MESH_FAILED_INTERPOLATION_FACTOR -1
 
-#define DEFAULT_INTERPOLATION              (*gsl_interp_linear)
-#define DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD   9.5367431640625e-07 // (1/2)^-20
-#define DEFAULT_SHEPARD_RADIUS                     1.0
-#define DEFAULT_SHEPARD_EXPONENT                   2
-
-
-// usamos los de gmsh, convertimos a vtk y frd con tablas
+// feenox uses the types from Gmsh, for vtk and frd we convert with tables
 #define ELEMENT_TYPE_UNDEFINED      0
 #define ELEMENT_TYPE_LINE2          1
 #define ELEMENT_TYPE_TRIANGLE3      2
@@ -233,8 +254,8 @@ enum version_type {
 #endif
 
 #ifdef HAVE_PETSC
- #define petsc_call(function)           if (__builtin_expect((function), 0)) { feenox_push_error_message("PETSc error"); CHKERRQ(1); }
- #define petsc_call_null(function)      if (__builtin_expect((function), 0)) { feenox_push_error_message("PETSc error"); return NULL; }
+ #define petsc_call(function)           if (PetscUnlikely((function))) { feenox_push_error_message("PETSc error"); CHKERRQ(1); }
+ #define petsc_call_null(function)      if (PetscUnlikely((function))) { feenox_push_error_message("PETSc error"); return NULL; }
 
 #endif
 
@@ -258,12 +279,7 @@ enum version_type {
 // pointer to the content of an object
 #define feenox_value_ptr(obj)  (obj->value)
 
-// GSL's equivalent to PETSc's ADD_VALUES
-#define gsl_vector_add_to_element(vector,i,x)    gsl_vector_set((vector),(i),gsl_vector_get((vector),(i))+(x))
-#define gsl_matrix_add_to_element(matrix,i,j,x)  gsl_matrix_set((matrix),(i),(j),gsl_matrix_get((matrix),(i),(j))+(x))
-
-
-// number of internal functions, functional adn vector functions
+// number of internal functions, functional and vector functions
 #define N_BUILTIN_FUNCTIONS         57
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
@@ -272,6 +288,10 @@ enum version_type {
 
 // forward declarations
 typedef struct feenox_t feenox_t;
+
+typedef struct lowlevel_vector_t lowlevel_vector_t;
+typedef struct lowlevel_matrix_t lowlevel_matrix_t;
+
 typedef struct builtin_function_t builtin_function_t;
 typedef struct builtin_functional_t builtin_functional_t;
 typedef struct builtin_vectorfunction_t builtin_vectorfunction_t;
@@ -436,10 +456,9 @@ struct vector_t {
   expr_t size_expr;
   int size;
 
-  gsl_vector *value;
-  gsl_vector *initial_transient;
-  gsl_vector *initial_static;
-
+  lowlevel_vector_t *value;
+  lowlevel_vector_t *initial_transient;
+  lowlevel_vector_t *initial_static;
   
   // linked list with the expressions of the initial elements
   expr_t *datas;
@@ -463,11 +482,11 @@ struct matrix_t {
   int cols;
   int rows;
   
-  gsl_matrix *value;
-  gsl_matrix *initial_transient;
-  gsl_matrix *initial_static;
+  lowlevel_matrix_t *value;
+  lowlevel_matrix_t *initial_transient;
+  lowlevel_matrix_t *initial_static;
 
-  // flag para saber si el apuntador de arriba lo alocamos nosotros o alguien mas
+  // flag to know if the pointers above was allocated by us or somebody else
   int realloced;
   
   expr_t *datas;
@@ -558,10 +577,12 @@ struct function_t {
   size_t *rectangular_mesh_size;
   double **rectangular_mesh_point;
 
+#ifdef HAVE_GSL  
   // helpers to interpolate 1D with GSL
   gsl_interp *interp;
   gsl_interp_accel *interp_accel;
   gsl_interp_type interp_type;
+#endif
 
   // multidimensional interpolation type
   enum {
@@ -901,16 +922,27 @@ struct dae_t {
 // mesh-realted structs -----------------------------
 // node
 struct node_t {
-  size_t tag;               // number assigned by Gmsh
+  // TODO: create an array of
+  //        1. tags
+  //        2. node coordinates
+  //        3. index_dofs
+  //        4. phi
+  //        5. derivatives of phi wrt x
+  //        6. fluxes
   size_t index_mesh;        // index within the node array
+  size_t tag;               // number assigned by Gmsh
 
   double x[3];              // spatial coordinates of the node
   size_t *index_dof;        // index within the solution vector for each DOF
   
   double *phi;              // values of the solution functions at the node
+#ifdef HAVE_GSL  
   gsl_matrix *dphidx;       // derivative of the m-th DOF with respect to coordinate g
+#else
+  double *dphidx;
+#endif
                             // (this is a gsl_matrix to avoid having to do double mallocs and forgetting about row/col-major
-  gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
+//  gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
   double *flux;             // holder of arbitrary functions evaluated at the node (e.g. sigmas and taus)
   
   element_ll_t *element_list;
@@ -988,9 +1020,8 @@ struct gauss_t {
   
   // TODO: array of gsl_vectors
   double **h;          // shape functions evaluated at the gauss points h[v][j]
-  gsl_matrix **dhdr;   // derivatives dhdr[v](j,m)
-  
-  gsl_matrix *extrap;  // matrix to extrapolate the values from the gauss points to the nodes
+  lowlevel_matrix_t **dhdr;   // derivatives dhdr[v](j,m)
+  lowlevel_matrix_t *extrap;  // matrix to extrapolate the values from the gauss points to the nodes
 };
 
 
@@ -1038,16 +1069,16 @@ struct element_t {
   double **x;               // coordinates fo the gauss points 
   double *normal;           // outward normal direction (only for 2d elements)
   
-  // these are pointers to arrays of matrices are evalauted at the gauss points
-  gsl_matrix **dhdx;
-  gsl_matrix **dxdr;
-  gsl_matrix **drdx;
-  gsl_matrix **H;
-  gsl_matrix **B;
+  // these are pointers to arrays of matrices that are evalauted at the gauss points
+  lowlevel_matrix_t **dhdx;
+  lowlevel_matrix_t **dxdr;
+  lowlevel_matrix_t **drdx;
+  lowlevel_matrix_t **H;
+  lowlevel_matrix_t **B;
   
-  gsl_matrix **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
-  gsl_matrix **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
-  double **property_at_node;  // 2d array [j][N] of property N evaluated at node j
+  lowlevel_matrix_t **dphidx_gauss;  // spatial derivatives of the DOFs at the gauss points
+  lowlevel_matrix_t **dphidx_node;   // spatial derivatives of the DOFs at the nodes (extrapoladed or evaluated)
+  double **property_at_node;         // 2d array [j][N] of property N evaluated at node j
 
   element_type_t *type;                  // pointer to the element type
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
@@ -1416,7 +1447,9 @@ struct solve_t {
   int max_iter;
   int verbose;
 
+#ifdef HAVE_GSL
   const gsl_multiroot_fsolver_type *type;
+#endif
   
   solve_t *next;  
 };
@@ -1673,7 +1706,7 @@ struct feenox_t {
       hanging_nodes_handle
     } hanging_nodes;
     int compute_gradients;   // do we need to compute gradients?
-    gsl_matrix *m2;
+    lowlevel_matrix_t *m2;
     
     int rough;               // keep each element's contribution to the gradient?
     int roughish;            // average only on the same physical group?
@@ -1828,15 +1861,16 @@ struct feenox_t {
     PetscInt        *dirichlet_indexes;
     PetscScalar     *dirichlet_values;
     PetscScalar     *dirichlet_derivatives;
-    size_t          dirichlet_k;
+    PetscInt          dirichlet_k;
+    
     // reusable number of dirichlet rows to know how much memory to allocate
-    size_t n_dirichlet_rows;
+    PetscInt  n_dirichlet_rows;
 
     // internal storage of multi-freedom conditions
-    PetscInt        **multifreedom_indexes;
-    gsl_matrix      **multifreedom_coefficients;
-    size_t          multifreedom_k;
-    size_t          n_multifreedom_nodes;
+    PetscInt          **multifreedom_indexes;
+    lowlevel_matrix_t **multifreedom_coefficients;
+    PetscInt            multifreedom_k;
+    PetscInt            n_multifreedom_nodes;
     
     // PETSc's solvers
     TS ts;
@@ -1870,13 +1904,13 @@ struct feenox_t {
     // elemental (local) objects
     size_t n_local_nodes;
     unsigned int elemental_size;  // current size of objects = n_local_nodes * dofs
-    gsl_matrix *Ki;               // elementary stiffness matrix
-    gsl_matrix *Mi;               // elementary mass matrix
-    gsl_matrix *JKi;              // elementary jacobian for stiffness matrix
-    gsl_matrix *Jbi;              // elementary jacobian for RHS vector
-    gsl_vector *bi;               // elementary right-hand side vector
+    lowlevel_matrix_t *Ki;               // elementary stiffness matrix
+    lowlevel_matrix_t *Mi;               // elementary mass matrix
+    lowlevel_matrix_t *JKi;              // elementary jacobian for stiffness matrix
+    lowlevel_matrix_t *Jbi;              // elementary jacobian for RHS vector
+    lowlevel_matrix_t *bi;               // elementary right-hand side vector
     // TODO: shouldn't this be Hb?
-    gsl_vector *Nb;               // teporary vector for natural BCs
+    lowlevel_matrix_t *Nb;               // teporary vector for natural BCs
 
 #endif  // HAVE_PETSC    
     
@@ -2054,9 +2088,22 @@ extern int feenox_dump_open_viewer(dump_t *, const char *name, PetscViewer *view
 extern int feenox_instruction_reaction(void *arg);
 
 // matrix.c
+extern lowlevel_matrix_t *feenox_lowlevel_matrix_calloc(const size_t rows, const size_t cols);
+extern int feenox_lowlevel_matrix_free(lowlevel_matrix_t **this);
+extern double *feenox_lowlevel_matrix_get_ptr(lowlevel_matrix_t *this, const size_t i, const size_t j);
+extern double feenox_lowlevel_matrix_get(lowlevel_matrix_t *this, const size_t i, const size_t j);
+extern int feenox_lowlevel_matrix_set(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value);
+extern int feenox_lowlevel_matrix_add_to_element(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value);
+extern double feenox_matrix_get(matrix_t *this, const size_t i,  const size_t j);
 extern int feenox_matrix_init(matrix_t *);
 
+
 // vector.c
+extern lowlevel_vector_t *feenox_lowlevel_vector_calloc(const size_t size);
+extern int feenox_lowlevel_vector_free(lowlevel_vector_t **this);
+extern double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this, const size_t i);
+extern double feenox_lowlevel_vector_get(lowlevel_vector_t *this, const size_t i);
+extern int feenox_lowlevel_vector_set(lowlevel_vector_t *this, const size_t i, const double value);
 extern int feenox_vector_init(vector_t *, int no_initial);
 extern int feenox_instruction_sort_vector(void *arg);
 extern double feenox_vector_get(vector_t *, const size_t i);
@@ -2066,6 +2113,7 @@ extern int feenox_vector_set(vector_t *, const size_t i, double value);
 extern int feenox_vector_set_size(vector_t *, const size_t size);
 
 // function.c
+extern int feenox_cmp(const double a, const double b, const double eps);
 extern int feenox_function_init(function_t *);
 extern int feenox_function_set_args(function_t *, double *x);
 extern int feenox_function_set_argument_variable(const char *name, unsigned int i, const char *variable_name);
@@ -2086,8 +2134,8 @@ extern int feenox_instruction_print(void *arg);
 extern int feenox_instruction_print_function(void *arg);
 extern int feenox_instruction_print_vector(void *arg);
 extern char *feenox_print_vector_current_format_reset(print_vector_t *);
-extern int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file);
-extern int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file);
+extern int feenox_debug_print_vector(lowlevel_vector_t *b, FILE *file);
+extern int feenox_debug_print_matrix(lowlevel_matrix_t *A, FILE *file);
 
 // conditional.c
 extern int feenox_instruction_if(void *arg);
@@ -2110,24 +2158,26 @@ extern element_t *feenox_mesh_find_element(mesh_t *, node_t *nearest_node, const
 
 // interpolate.c
 extern double feenox_function_property_eval(struct function_t *function, const double *x);
-extern int feenox_mesh_interp_solve_for_r(element_t *, const double *x, double *r) ;
+extern int feenox_mesh_interp_solve_for_r(element_t *e, const double *x, double *r) ;
+#ifdef HAVE_GSL
 extern int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector *residual);
 extern int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J);
 extern int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_vector *residual, gsl_matrix * J);
+#endif
 
 extern double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x);
 extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, double *r);
 
 // fem.c
-extern double feenox_mesh_determinant(gsl_matrix *);
-extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+extern double feenox_mesh_determinant(lowlevel_matrix_t *this);
+extern int feenox_mesh_matrix_invert(lowlevel_matrix_t *direct, lowlevel_matrix_t *inverse);
 extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_H_at_gauss(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
-extern int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr);
+extern int feenox_mesh_compute_dhdx(element_t *e, double *r, lowlevel_matrix_t *drdx_ref, lowlevel_matrix_t *dhdx);
+extern int feenox_mesh_compute_dxdr(element_t *e, double *r, lowlevel_matrix_t *dxdr);
 extern int feenox_mesh_compute_dxdr_at_gauss_1d(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, int integration);
 extern int feenox_mesh_compute_dxdr_at_gauss_general(element_t *e, unsigned int v, int integration);

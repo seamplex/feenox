@@ -512,9 +512,11 @@ double feenox_builtin_acos(expr_item_t *f) {
 ///fn+j0+math J_0(x)
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument\ $x$.
 ///fn+j0+plotx 0 10 0.05
+#ifdef HAVE_GSL
 double feenox_builtin_j0(expr_item_t *f) {
   return gsl_sf_bessel_J0(feenox_expression_eval(&f->arg[0]));
 }
+#endif
 
 ///fn+cos+usage cos(x)
 ///fn+cos+math \cos(x)
@@ -581,17 +583,24 @@ double feenox_builtin_atan2(expr_item_t *f) {
 ///fn+exp+usage exp(x)
 ///fn+exp+math e^x
 ///fn+exp+plotx -2 2 1e-2    -2 +2 1     0  8  2    0.25  1
+#ifdef HAVE_GSL
 double feenox_builtin_exp(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
   return (x < GSL_LOG_DBL_MIN) ? 0 : gsl_sf_exp(x);
 }
+#else
+double feenox_builtin_exp(expr_item_t *f) {
+  return exp(feenox_expression_eval(&f->arg[0]));
+}
+#endif
 
 ///fn+expint1+desc Computes the first exponential integral function of the argument\ $x$.
 ///fn+expint1+desc If\ $x$ is zero, a NaN error is issued.
 ///fn+expint1+usage expint1(x)
 ///fn+expint1+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]
 ///fn+expint1+plotx 1e-2 2.0 1e-2
+#ifdef HAVE_GSL
 double feenox_builtin_expint1(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
 
@@ -635,7 +644,7 @@ double feenox_builtin_expintn(expr_item_t *f) {
 
   return gsl_sf_expint_En(n, x);
 }
-
+#endif
 ///fn+log+desc Computes the natural logarithm of the argument\ $x$. If\ $x$ is zero or negative,
 ///fn+log+desc a NaN error is issued.
 ///fn+log+usage log(x)
@@ -648,8 +657,11 @@ double feenox_builtin_log(expr_item_t *f) {
     feenox_nan_error();
     return 0;
   }
-
+#ifdef HAVE_GSL
   return gsl_sf_log(x);
+#else
+  return log(x);
+#endif  
 }
 
 
@@ -681,17 +693,20 @@ double feenox_builtin_sqrt(expr_item_t *f) {
 ///fn+is_even+desc Returns one if the argument\ $x$ rounded to the nearest integer is even.
 ///fn+is_even+usage is_even(x)
 ///fn+is_even+math  \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}
+#ifdef HAVE_GSL
 double feenox_builtin_is_even(expr_item_t *f) {
   return GSL_IS_EVEN((int)(round(feenox_expression_eval(&f->arg[0]))));
 }
+#endif
 
 ///fn+is_odd+desc Returns one if the argument\ $x$ rounded to the nearest integer is odd.
 ///fn+is_odd+usage is_odd(x)
 ///fn+is_odd+math  \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}
+#ifdef HAVE_GSL
 double feenox_builtin_is_odd(expr_item_t *f) {
   return GSL_IS_ODD((int)(round(feenox_expression_eval(&f->arg[0]))));
 }
-
+#endif
 
 ///fn+heaviside+desc Computes the zero-centered Heaviside step function of the argument\ $x$.
 ///fn+heaviside+desc If the optional second argument $\delta$ is provided, the discontinuous
@@ -1017,12 +1032,13 @@ double feenox_builtin_equal(expr_item_t *f) {
   if (fabs(a) < 1 || fabs(b) < 1) {
     return (fabs(a-b) < eps)?1:0;
   } else {
-    return (gsl_fcmp(a, b, eps) == 0) ? 1 : 0;
+    return (feenox_cmp(a, b, eps) == 0) ? 1 : 0;
   }
 
 
 }
 
+#ifdef HAVE_GSL
 double feenox_builtin_quasi_random(expr_item_t *f) {
 
   double y = 0;
@@ -1046,7 +1062,7 @@ double feenox_builtin_quasi_random(expr_item_t *f) {
 
   return y;
 }
-
+#endif
 
 
 ///fn+random+desc Returns a random real number uniformly distributed between the first
@@ -1059,6 +1075,7 @@ double feenox_builtin_quasi_random(expr_item_t *f) {
 ///fn+random+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random+usage random(x1, x2, [s])
 ///fn+random+math  x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1
+#ifdef HAVE_GSL
 double feenox_builtin_random(expr_item_t *f) {
 
   double y = 0;
@@ -1121,6 +1138,7 @@ double feenox_builtin_random_gauss(expr_item_t *f) {
   // TODO: no camina con seed y fit al mismo tiempo
 
 }
+#endif
 
 ///fn+limit+desc Limits the first argument\ $x$ to the interval $[a,b]$. The second argument $a$ should
 ///fn+limit+desc be less than the third argument $b$.

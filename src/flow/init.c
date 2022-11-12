@@ -167,10 +167,12 @@ int feenox_initialize(int argc, char **argv) {
   feenox_check_alloc(feenox.main_input_dirname = strdup(dirname(argv[feenox.optind])));
   
   
+#ifdef HAVE_GSL
   // turn of GSL error handler
   gsl_set_error_handler_off();
   // TODO: use our own
   // gsl_set_error_handler(feenox_gsl_handler);
+#endif
 
   signal(SIGINT,  feenox_signal_handler);
   signal(SIGTERM, feenox_signal_handler);

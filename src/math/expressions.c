@@ -635,13 +635,13 @@ double feenox_expression_eval(expr_t *this) {
 
         switch (item->type) {
           case EXPR_VECTOR | EXPR_CURRENT:
-            item->value = gsl_vector_get(item->vector->value, i-1);
+            item->value = feenox_lowlevel_vector_get(item->vector->value, i-1);
           break;
           case EXPR_VECTOR | EXPR_INITIAL_TRANSIENT:
-            item->value = gsl_vector_get(item->vector->initial_transient, i-1);
+            item->value = feenox_lowlevel_vector_get(item->vector->initial_transient, i-1);
           break;
           case EXPR_VECTOR | EXPR_INITIAL_STATIC:
-            item->value = gsl_vector_get(item->vector->initial_static, i-1);
+            item->value = feenox_lowlevel_vector_get(item->vector->initial_static, i-1);
           break;
         }
       break;
@@ -670,13 +670,13 @@ double feenox_expression_eval(expr_t *this) {
 
         switch (item->type) {
           case EXPR_MATRIX | EXPR_CURRENT:
-            item->value = gsl_matrix_get(item->matrix->value, i-1, j-1);
+            item->value = feenox_lowlevel_matrix_get(item->matrix->value, i-1, j-1);
           break;
           case EXPR_MATRIX | EXPR_INITIAL_TRANSIENT:
-            item->value = gsl_matrix_get(item->matrix->initial_transient, i-1, j-1);
+            item->value = feenox_lowlevel_matrix_get(item->matrix->initial_transient, i-1, j-1);
           break;
           case EXPR_MATRIX | EXPR_INITIAL_STATIC:
-            item->value = gsl_matrix_get(item->matrix->initial_static, i-1, j-1);
+            item->value = feenox_lowlevel_matrix_get(item->matrix->initial_static, i-1, j-1);
           break;
         }
       break;
@@ -740,14 +740,14 @@ double feenox_expression_eval(expr_t *this) {
            if (fabs(P->value) < 1 || fabs(E->value) < 1) {
              P->value = (fabs(P->value - E->value) < feenox_special_var_value(zero))?1:0;
            } else {
-             P->value = (gsl_fcmp(P->value, E->value, feenox_special_var_value(zero)) == 0)?1:0;
+             P->value = (feenox_cmp(P->value, E->value, feenox_special_var_value(zero)) == 0)?1:0;
            }
           break;
           case '!':
            if (fabs(P->value) < 1 || fabs(E->value) < 1) {
              P->value = (fabs(P->value - E->value) < feenox_special_var_value(zero))?0:1;
            } else {
-             P->value = (gsl_fcmp(P->value, E->value, feenox_special_var_value(zero)) == 0)?0:1;
+             P->value = (feenox_cmp(P->value, E->value, feenox_special_var_value(zero)) == 0)?0:1;
            }
           break;
           case '<':
@@ -786,11 +786,12 @@ double feenox_expression_eval(expr_t *this) {
 
   }
 
+#ifdef HAVE_GSL  
   if (gsl_isnan(this->items->value) || gsl_isinf(this->items->value)) {
 //    feenox_push_error_message("in '%s'", this->string);
     feenox_nan_error();
   }
-
+#endif
 
   return this->items->value;
 
@@ -832,6 +833,8 @@ double feenox_expression_derivative_wrt_function_gsl_function(double x, void *pa
 }
 
 double feenox_expression_derivative_wrt_function(expr_t *expr, function_t *function, double x) {
+  double result = 0;
+#ifdef HAVE_GSL
   gsl_function F;
   struct feenox_expression_derivative_params p;
   F.function = &feenox_expression_derivative_wrt_function_gsl_function;
@@ -839,8 +842,9 @@ double feenox_expression_derivative_wrt_function(expr_t *expr, function_t *funct
   p.function = function;
   F.params = &p;
   
-  double result, abserr;
+  double abserr;
   gsl_deriv_central(&F, x, DEFAULT_DERIVATIVE_STEP, &result, &abserr); 
+#endif
   
   return result;
 }
@@ -862,6 +866,8 @@ double feenox_expression_derivative_wrt_variable_gsl_function(double x, void *pa
 }
 
 double feenox_expression_derivative_wrt_variable(expr_t *expr, var_t *variable, double x) {
+  double result = 0;
+#ifdef HAVE_GSL  
   gsl_function F;
   struct feenox_expression_derivative_params p;
   F.function = &feenox_expression_derivative_wrt_variable_gsl_function;
@@ -869,9 +875,9 @@ double feenox_expression_derivative_wrt_variable(expr_t *expr, var_t *variable, 
   p.variable = variable;
   F.params = &p;
   
-  double result, abserr;
+  double abserr;
   gsl_deriv_central(&F, x, DEFAULT_DERIVATIVE_STEP, &result, &abserr); 
-  
+#endif  
   return result;
 }
 

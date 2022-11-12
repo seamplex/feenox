@@ -220,6 +220,7 @@ int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V)
 
   gauss->V = V;
 
+  // TODO: 1d-arrays and not pointers to pointers to pointers
   feenox_check_alloc(gauss->w = calloc(gauss->V, sizeof(double)));
   feenox_check_alloc(gauss->r = calloc(gauss->V, sizeof(double *)));
   feenox_check_alloc(gauss->h = calloc(gauss->V, sizeof(double *)));
@@ -228,7 +229,7 @@ int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V)
     feenox_check_alloc(gauss->r[v] = calloc(dim, sizeof(double)));
     
     feenox_check_alloc(gauss->h[v] = calloc(element_type->nodes, sizeof(double)));
-    feenox_check_alloc(gauss->dhdr[v] = gsl_matrix_calloc(element_type->nodes, dim));
+    feenox_check_alloc(gauss->dhdr[v] = feenox_lowlevel_matrix_calloc(element_type->nodes, dim));
   }
   
   return FEENOX_OK;
@@ -241,7 +242,7 @@ int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type
     for (unsigned int j = 0; j < element_type->nodes; j++) {
       gauss->h[v][j] = element_type->h(j, gauss->r[v]);
       for (unsigned int m = 0; m < element_type->dim; m++) {
-        gsl_matrix_set(gauss->dhdr[v], j, m, element_type->dhdr(j, m, gauss->r[v]));
+        feenox_lowlevel_matrix_set(gauss->dhdr[v], j, m, element_type->dhdr(j, m, gauss->r[v]));
       }
       
     }

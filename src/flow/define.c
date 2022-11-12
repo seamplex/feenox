@@ -49,17 +49,18 @@ int feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents) 
 }
 
 int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents) {
-  
-  double *oldptr = gsl_vector_ptr(feenox_value_ptr(this), 0);
 
-  // si copy_contents es true copiamos el contenido del vector de feenox
-  // antes de tirar el apuntador a la basura
+  double *oldptr = feenox_value_ptr(this)->data;
+
+  // if copy_contents is true we copy the old content before
+  // throwing the pointer away
   if (copy_contents) {
     memcpy(newptr, oldptr, this->size * sizeof(double));
   }
 
-  // si el puntero es de feenox, lo liberamos
+  // if the pointer is ours, we free it
   if (this->reallocated == 0) {
+#ifdef HAVE_GSL
     if (feenox_value_ptr(this)->stride != 1) {
       feenox_push_error_message("vector '%s' cannot be realloced: stride not equal to 1", this->name);
       return FEENOX_ERROR;
@@ -72,6 +73,7 @@ int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents)
       feenox_push_error_message("vector '%s' cannot be realloced: data not pointing to block", this->name);
       return FEENOX_ERROR;
     }
+#endif
 
     feenox_free(oldptr);
   }
@@ -82,23 +84,20 @@ int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents)
   return FEENOX_OK;
 }
 
-void feenox_realloc_matrix_ptr(matrix_t *matrix, double *newptr, int copy_contents) {
-  
-  double *oldptr = gsl_matrix_ptr(feenox_value_ptr(matrix), 0, 0);
-  
-  // si copy_contents es true copiamos el contenido del vector de feenox
-  // antes de tirar el apuntador a la basura
+void feenox_realloc_matrix_ptr(matrix_t *this, double *newptr, int copy_contents) {
+
+  double *oldptr = feenox_value_ptr(this)->data;
+
   if (copy_contents) {
-    memcpy(newptr, oldptr, matrix->rows*matrix->cols * sizeof(double));
+    memcpy(newptr, oldptr, this->rows*this->cols * sizeof(double));
   }
   
-  // si el puntero es de feenox, lo liberamos
-  if (matrix->realloced == 0) {
+  if (this->realloced == 0) {
     feenox_free(oldptr);
   }
   
-  matrix->realloced = 1;
-  feenox_value_ptr(matrix)->data = newptr;
+  this->realloced = 1;
+  feenox_value_ptr(this)->data = newptr;
   
   return;
 }

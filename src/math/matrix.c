@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX matrix routines
  *
- *  Copyright (C) 2015 jeremy theler
+ *  Copyright (C) 2015,2022 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -21,13 +21,67 @@
  */
 #include "feenox.h"
 
+lowlevel_matrix_t *feenox_lowlevel_matrix_calloc(const size_t rows, const size_t cols) {
+#ifdef HAVE_GSL
+  return gsl_matrix_calloc(rows, cols);
+#else
+  lowlevel_matrix_t *lowlevel_matrix = NULL;
+  feenox_check_alloc_null(lowlevel_matrix = malloc(sizeof(lowlevel_matrix_t)));
+  lowlevel_matrix->size1 = rows;
+  lowlevel_matrix->size2 = cols;
+  feenox_check_alloc_null(lowlevel_matrix->data = calloc(rows*cols, sizeof(double)));
+  return lowlevel_matrix;
+#endif
+}
+
+int feenox_lowlevel_matrix_free(lowlevel_matrix_t **this) {
+#ifdef HAVE_GSL
+  return gsl_matrix_free(*this);
+  *this = NULL;
+#else
+  lowlevel_matrix_t *A = *this;
+  free(A->data);
+  feenox_free(A);
+#endif
+  return FEENOX_OK;
+}
+
+double feenox_lowlevel_matrix_get(lowlevel_matrix_t *this, const size_t i, const size_t j) {
+#ifdef HAVE_GSL
+  return gsl_matrix_get(this, i, j);
+#else
+  return this->data[i*this->size1 + j];
+#endif
+}
+
+int feenox_lowlevel_matrix_set(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
+#ifdef HAVE_GSL
+  return gsl_matrix_set(this, i, j, value);
+#else
+  this->data[i*this->size1 + j] = value;
+  return FEENOX_OK;
+#endif
+}
+
+int feenox_lowlevel_matrix_add_to_element(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
+#ifdef HAVE_GSL
+  return gsl_matrix_set(this, i, j, gsl_matrix_get(matrix,i,j) + value);
+#else
+  this->data[i*this->size1 + j] += value;
+  return FEENOX_OK;
+#endif
+}
+
+
+
+
 double feenox_matrix_get(matrix_t *this, const size_t i,  const size_t j) {
   
   if (!this->initialized) {
     feenox_call(feenox_matrix_init(this));
   }
   
-  return gsl_matrix_get(feenox_value_ptr(this), i, j);
+  return feenox_lowlevel_matrix_get(feenox_value_ptr(this), i, j);
 }
 
 double feenox_matrix_get_initial_static(matrix_t *this, const size_t i,  const size_t j) {
@@ -36,7 +90,7 @@ double feenox_matrix_get_initial_static(matrix_t *this, const size_t i,  const s
     feenox_call(feenox_matrix_init(this));
   }
   
-  return gsl_matrix_get(this->initial_static, i, j);
+  return feenox_lowlevel_matrix_get(this->initial_static, i, j);
 }
 
 double feenox_matrix_get_initial_transient(matrix_t *this, const size_t i,  const size_t j) {
@@ -45,9 +99,22 @@ double feenox_matrix_get_initial_transient(matrix_t *this, const size_t i,  cons
     feenox_call(feenox_matrix_init(this));
   }
   
-  return gsl_matrix_get(this->initial_transient, i, j);
+  return feenox_lowlevel_matrix_get(this->initial_transient, i, j);
 }
 
+int feenox_matrix_set(matrix_t *this, const size_t i, const size_t j, double value) {
+  
+  if (this->initialized == 0) {
+    if (feenox_matrix_init(this) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+      return FEENOX_ERROR;
+    }
+  }
+  
+  feenox_lowlevel_matrix_set(feenox_value_ptr(this), i, j, value);
+  
+  return FEENOX_OK;
+}
 
 int feenox_matrix_init(matrix_t *this) {
 
@@ -74,15 +141,15 @@ int feenox_matrix_init(matrix_t *this) {
   
   this->rows = rows;
   this->cols = cols;
-  feenox_value_ptr(this) = gsl_matrix_calloc(rows, cols);
-  this->initial_static = gsl_matrix_calloc(rows, cols);
-  this->initial_transient = gsl_matrix_calloc(rows, cols);
+  feenox_value_ptr(this) = feenox_lowlevel_matrix_calloc(rows, cols);
+  this->initial_static = feenox_lowlevel_matrix_calloc(rows, cols);
+  this->initial_transient = feenox_lowlevel_matrix_calloc(rows, cols);
   
   if (this->datas != NULL) {
     i = 0;
     j = 0;
     LL_FOREACH(this->datas, data) {
-      gsl_matrix_set(feenox_value_ptr(this), i, j++, feenox_expression_eval(data));
+      feenox_matrix_set(this, i, j++, feenox_expression_eval(data));
       if (j == this->cols) {
         j = 0;
         i++;

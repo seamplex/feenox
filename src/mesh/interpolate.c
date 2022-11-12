@@ -82,16 +82,16 @@ double feenox_mesh_interpolate_function_node(struct function_t *function, const 
     
   } else {
     
-    gsl_matrix *dhdx = gsl_matrix_alloc(element->type->nodes, element->type->dim);
+    lowlevel_matrix_t *dhdx = feenox_lowlevel_matrix_calloc(element->type->nodes, element->type->dim);
     
     feenox_mesh_compute_dhdx(element, r, NULL, dhdx);
       
     for (j = 0; j < element->type->nodes; j++) {
-      y += gsl_matrix_get(dhdx, j, function->spatial_derivative_with_respect_to)
+      y += feenox_lowlevel_matrix_get(dhdx, j, function->spatial_derivative_with_respect_to)
             * function->spatial_derivative_of->data_value[element->node[j]->index_mesh];
     }
     
-    gsl_matrix_free(dhdx);
+    feenox_lowlevel_matrix_free(&dhdx);
     
   }  
   
@@ -101,27 +101,27 @@ double feenox_mesh_interpolate_function_node(struct function_t *function, const 
 
 
 int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) {
-  
-  int gsl_status;
-  int m;
-  size_t iter = 0;  
-  struct mesh_interp_params p;
-  gsl_vector *test;
-  gsl_multiroot_fdfsolver *s;  
-  const gsl_multiroot_fdfsolver_type *T;
-  gsl_multiroot_function_fdf fun = {&feenox_mesh_interp_residual,
-                                    &feenox_mesh_interp_jacob,
-                                    &feenox_mesh_interp_residual_jacob,
-                                    this->type->dim, &p};
-  
+
   if (this->type->id == ELEMENT_TYPE_TETRAHEDRON4 || this->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
     
     // the tetrahedron is an easy one (it's linear)
     // usually using this for tet10 is good enough
     // TODO: check error
     feenox_mesh_compute_r_tetrahedron(this, x, r);
-
+    
   } else {
+#ifdef HAVE_GSL    
+    int gsl_status;
+    int m;
+    size_t iter = 0;  
+    struct mesh_interp_params p;
+    gsl_vector *test;
+    gsl_multiroot_fdfsolver *s;  
+    const gsl_multiroot_fdfsolver_type *T;
+    gsl_multiroot_function_fdf fun = {&feenox_mesh_interp_residual,
+                                    &feenox_mesh_interp_jacob,
+                                    &feenox_mesh_interp_residual_jacob,
+                                    this->type->dim, &p};
   
     p.element = this;
     p.x = x;
@@ -152,19 +152,21 @@ int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) 
     gsl_vector_free(test);
     gsl_multiroot_fdfsolver_free(s);
   
+#else
+  feenox_push_error_message("non-tet4 interpolation needs GSL");
+  return FEENOX_ERROR;
+#endif
   }
   
   return FEENOX_OK;
-    
-  
 }
 
 
 
 
 // vemos que r hace que las x se interpolen exactamente (isoparametricos)
-int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector *residual) {
-
+int feenox_mesh_interp_residual(const lowlevel_vector_t *test, void *params, lowlevel_vector_t *residual) {
+#ifdef HAVE_GSL
   int i, j;
   double xi;
   
@@ -180,12 +182,14 @@ int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector
   }
   
   return GSL_SUCCESS;
-  
+#else
+  return FEENOX_OK;
+#endif  
 }
 
 
-int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J) {
-
+int feenox_mesh_interp_jacob(const lowlevel_vector_t *test, void *params, lowlevel_matrix_t *J) {
+#ifdef HAVE_GSL
   int i, j, k;
   double xi;
   
@@ -204,16 +208,22 @@ int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J
   }
      
   return GSL_SUCCESS;
-
+#else
+  return FEENOX_OK;
+#endif  
 }
 
 
-int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_vector *residual, gsl_matrix * J) {
+int feenox_mesh_interp_residual_jacob(const lowlevel_vector_t *test, void *params, lowlevel_vector_t *residual, lowlevel_matrix_t * J) {
+#ifdef HAVE_GSL
   // can this be improved?
   feenox_mesh_interp_residual(test, params, residual);
   feenox_mesh_interp_jacob(test, params, J);
   
   return GSL_SUCCESS;
+#else
+  return FEENOX_OK;
+#endif  
 }
 
 

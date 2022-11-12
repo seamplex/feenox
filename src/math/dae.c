@@ -260,8 +260,8 @@ int feenox_dae_init(void) {
       phase_object->offset = i;
       sunindextype k = 0;
       for (k = 0; k < phase_object->vector->size; k++) {
-        feenox.dae.phase_value[i] = gsl_vector_ptr(feenox_value_ptr(phase_object->vector), k);
-        feenox.dae.phase_derivative[i] = gsl_vector_ptr(feenox_value_ptr(phase_object->vector_dot), k);
+        feenox.dae.phase_value[i] = feenox_lowlevel_vector_get_ptr(feenox_value_ptr(phase_object->vector), k);
+        feenox.dae.phase_derivative[i] = feenox_lowlevel_vector_get_ptr(feenox_value_ptr(phase_object->vector_dot), k);
         i++;
       }
 
@@ -272,8 +272,8 @@ int feenox_dae_init(void) {
       int l = 0;
       for (k = 0; k < phase_object->matrix->rows; k++) {
         for (l = 0; l < phase_object->matrix->cols; l++) {
-          feenox.dae.phase_value[i] = gsl_matrix_ptr(feenox_value_ptr(phase_object->matrix), k, l);
-          feenox.dae.phase_derivative[i] = gsl_matrix_ptr(feenox_value_ptr(phase_object->matrix_dot), k, l);
+          feenox.dae.phase_value[i] = feenox_lowlevel_matrix_get_ptr(feenox_value_ptr(phase_object->matrix), k, l);
+          feenox.dae.phase_derivative[i] = feenox_lowlevel_matrix_get_ptr(feenox_value_ptr(phase_object->matrix_dot), k, l);
           i++;
         }
       }
@@ -373,8 +373,8 @@ int feenox_dae_init(void) {
     feenox.dae.abs_error = N_VNew_Serial(feenox.dae.dimension);
 
     for (i = 0; i < feenox.dae.dimension; i++) {
-      if (gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i) > 0) {
-        NV_DATA_S(feenox.dae.abs_error)[i] = gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i);
+      if (feenox_vector_get(feenox.special_vectors.abs_error, i) > 0) {
+        NV_DATA_S(feenox.dae.abs_error)[i] = feenox_vector_get(feenox.special_vectors.abs_error, i);
       } else {
         NV_DATA_S(feenox.dae.abs_error)[i] = feenox_special_var_value(dae_rtol);
       }

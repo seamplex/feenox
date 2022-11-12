@@ -113,7 +113,7 @@ int feenox_instruction_print(void *arg) {
         feenox_call(feenox_vector_init(print_token->vector, 0));
       }
       for (i = 0; i < print_token->vector->size; i++) {
-        fprintf(print->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), i));
+        fprintf(print->file->pointer, current_format, feenox_vector_get(print_token->vector, i));
         if (i != print_token->vector->size-1) {
           fprintf(print->file->pointer, "%s", print->separator);
         }
@@ -130,7 +130,7 @@ int feenox_instruction_print(void *arg) {
       }
       for (i = 0; i < print_token->matrix->rows; i++) {
         for (j = 0; j < print_token->matrix->cols; j++) {
-          fprintf(print->file->pointer, current_format, gsl_matrix_get(feenox_value_ptr(print_token->matrix), i, j));
+          fprintf(print->file->pointer, current_format, feenox_matrix_get(print_token->matrix, i, j));
           if (j != print_token->matrix->cols-1) {
             fprintf(print->file->pointer, "%s", print->separator);
           }
@@ -366,8 +366,8 @@ int feenox_instruction_print_function(void *arg) {
               print_function->first_function->n_arguments == 2 &&
               print_function->first_function->rectangular_mesh &&
               j != print_function->first_function->data_size &&
-              gsl_fcmp(print_function->first_function->data_argument[0][j], print_function->first_function->data_argument[0][j+1], print_function->first_function->multidim_threshold) != 0 &&
-              gsl_fcmp(print_function->first_function->data_argument[1][j], print_function->first_function->data_argument[1][j+1], print_function->first_function->multidim_threshold) != 0) {
+              feenox_cmp(print_function->first_function->data_argument[0][j], print_function->first_function->data_argument[0][j+1], print_function->first_function->multidim_threshold) != 0 &&
+              feenox_cmp(print_function->first_function->data_argument[1][j], print_function->first_function->data_argument[1][j+1], print_function->first_function->multidim_threshold) != 0) {
             fprintf(print_function->file->pointer, "\n");
           }
           
@@ -434,7 +434,7 @@ int feenox_instruction_print_vector(void *arg) {
       for (k = 0; k < print_vector->first_vector->size; k++) {
         
         if (print_token->vector != NULL) {
-          fprintf(print_vector->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));
+          fprintf(print_vector->file->pointer, current_format, feenox_vector_get(print_token->vector, k));
 
         } else if (print_token->expression.items != NULL) {
           feenox_var_value(feenox.special_vars.i) = k+1;
@@ -473,7 +473,7 @@ int feenox_instruction_print_vector(void *arg) {
             return FEENOX_ERROR;
           }
           
-          fprintf(print_vector->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), k));
+          fprintf(print_vector->file->pointer, current_format, feenox_vector_get(print_token->vector, k));
 
         } else if (print_token->expression.items != NULL) {
           feenox_var_value(feenox.special_vars.i) = k+1;
@@ -511,13 +511,10 @@ char *feenox_print_vector_current_format_reset(print_vector_t *this) {
 }
 
 
-int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file) {
+int feenox_debug_print_vector(lowlevel_vector_t *b, FILE *file) {
 
-  double xi;
-  int i;
-
-  for (i = 0; i < b->size; i++) {
-    xi = gsl_vector_get(b, i);
+  for (int i = 0; i < b->size; i++) {
+    double xi = feenox_lowlevel_vector_get(b, i);
     if (xi != 0) {
       fprintf(file, "% .1e ", xi);
     } else {
@@ -530,14 +527,11 @@ int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file) {
 
 }
 
-int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file) {
+int feenox_debug_print_matrix(lowlevel_matrix_t *A, FILE *file) {
 
-  double xi;
-  int i, j;
-
-  for (i = 0; i < A->size1; i++) {
-    for (j = 0; j < A->size2; j++) {
-      xi = gsl_matrix_get(A, i, j);
+  for (int i = 0; i < A->size1; i++) {
+    for (int j = 0; j < A->size2; j++) {
+      double xi = feenox_lowlevel_matrix_get(A, i, j);
 /*      
     if (xi != 0) {
       fprintf(file, "% .1e ", xi);

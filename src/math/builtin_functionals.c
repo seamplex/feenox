@@ -58,7 +58,7 @@ typedef struct {
   var_t *variable;
 } gsl_function_arguments_t;
 
-
+#ifdef HAVE_GSL
 ///fu+derivative+usage derivative(f(x), x, a, [h], [p])
 ///fu+derivative+desc Computes the derivative of the expression $f(x)$ 
 ///fu+derivative+desc given in the first argument with respect to the variable $x$
@@ -681,3 +681,4 @@ double feenox_gsl_function(double x, void *params) {
   return y;
 
 }
+#endif

@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+#include <errno.h>
 
 FILE *feenox_fopen(const char *filepath, const char *mode) {
   

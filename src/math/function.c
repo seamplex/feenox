@@ -22,6 +22,22 @@
 #include "feenox.h"
 const double zero[3] = {0, 0, 0};
 
+int feenox_cmp(const double a, const double b, const double eps) {
+#ifdef HAVE_GSL
+  retirm gsl_fcmp(a, b, eps);
+#else
+  double delta = eps * ((fabs (a) > fabs (b)) ? a : b);
+  double diff = a - b;
+  if (diff > delta) {
+    return 1;
+  } else if (diff < -delta) {
+    return -1;
+  } else {
+    return 0;
+  }
+#endif
+}
+
 int feenox_define_function(const char *name, unsigned int n_arguments) {
   return (feenox_define_function_get_ptr(name, n_arguments) != NULL) ? FEENOX_OK : FEENOX_ERROR;
 }
@@ -163,7 +179,7 @@ int function_set_buffered_data(function_t *function, double *buffer, size_t n_da
   feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
   feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
   feenox_call(feenox_vector_init(function->vector_value, 1));
-  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
+  function->data_value = function->vector_value->value->data;
   feenox_free(name);
 
   // the arguments
@@ -174,17 +190,17 @@ int function_set_buffered_data(function_t *function, double *buffer, size_t n_da
     feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
     feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
     feenox_call(feenox_vector_init(function->vector_argument[i], 1));
-    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
+    function->data_argument[i] = function->vector_argument[i]->value->data;
     feenox_free(name);
   }
   
   size_t j = 0;
   for (j = 0; j < function->data_size; j++) {
     for (i = 0; i < function->n_arguments; i++) {
-      gsl_vector_set(function->vector_argument[i]->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
+      feenox_lowlevel_vector_set(function->vector_argument[i]->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     }
     // remember than since 1971 now i has n_arguments+1
-    gsl_vector_set(function->vector_value->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
+    feenox_lowlevel_vector_set(function->vector_value->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     
     // TODO: check for monotonicity in 1D
     // to allow for steps
@@ -205,7 +221,16 @@ int feenox_function_set_interpolation(const char *name, const char *type) {
     return FEENOX_ERROR;
   }
   
-  if (strcasecmp(type, "linear") == 0) {
+  if (strcasecmp(type, "nearest") == 0) {
+    function->multidim_interp = interp_nearest;
+  } else if (strcasecmp(type, "shepard") == 0) {
+    function->multidim_interp = interp_shepard;
+  } else if (strcasecmp(type, "shepard_kd") == 0 || strcasecmp(type, "modified_shepard") == 0) {
+    function->multidim_interp = interp_shepard_kd;
+  } else if (strcasecmp(type, "bilinear") == 0 || strcasecmp(type, "rectangle") == 0 || strcasecmp(type, "rectangular") == 0) {
+    function->multidim_interp = interp_bilinear;
+#ifdef HAVE_GSL  
+  } else if (strcasecmp(type, "linear") == 0) {
     function->interp_type = *gsl_interp_linear;
   } else if (strcasecmp(type, "polynomial") == 0) {
     function->interp_type = *gsl_interp_polynomial;
@@ -219,14 +244,7 @@ int feenox_function_set_interpolation(const char *name, const char *type) {
     function->interp_type = *gsl_interp_akima_periodic;
   } else if (strcasecmp(type, "steffen") == 0) {
     function->interp_type = *gsl_interp_steffen;
-  } else if (strcasecmp(type, "nearest") == 0) {
-    function->multidim_interp = interp_nearest;
-  } else if (strcasecmp(type, "shepard") == 0) {
-    function->multidim_interp = interp_shepard;
-  } else if (strcasecmp(type, "shepard_kd") == 0 || strcasecmp(type, "modified_shepard") == 0) {
-    function->multidim_interp = interp_shepard_kd;
-  } else if (strcasecmp(type, "bilinear") == 0 || strcasecmp(type, "rectangle") == 0 || strcasecmp(type, "rectangular") == 0) {
-    function->multidim_interp = interp_bilinear;
+#endif
   } else {
     feenox_push_error_message("undefined interpolation method '%s'", type);
     return FEENOX_ERROR;
@@ -280,9 +298,11 @@ double feenox_factor_function_eval(expr_item_t *this) {
     
   }
 
+#ifdef HAVE_GSL  
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();
   }
+#endif
 
   return y;
 
@@ -323,7 +343,7 @@ int feenox_function_init(function_t *this) {
         }
 
         if (this->data_argument[i] == NULL) {
-          this->data_argument[i] = gsl_vector_ptr(&feenox_var_value(this->vector_argument[i]), 0);
+          this->data_argument[i] = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_argument[i]), 0);
         }  
       }
 
@@ -335,13 +355,14 @@ int feenox_function_init(function_t *this) {
         return FEENOX_ERROR;
       }
       if (this->data_value == NULL) {
-        this->data_value = gsl_vector_ptr(&feenox_var_value(this->vector_value), 0);
+        this->data_value = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_value), 0);
       }
     }
     
     if (this->mesh == NULL) {
       if (this->n_arguments == 1) {
 
+#ifdef HAVE_GSL        
         if (this->interp_type.name == NULL) {
           // interpolacion 1D por default 
           this->interp_type = DEFAULT_INTERPOLATION;      
@@ -357,6 +378,7 @@ int feenox_function_init(function_t *this) {
         feenox_push_error_message("in function %s", this->name);
         gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size);
         feenox_pop_error_message();
+#endif
 
       } else {
 
@@ -608,8 +630,10 @@ double feenox_function_eval(function_t *this, const double *const_x) {
         y = this->data_value[0];
       } else if (x[0] > this->data_argument[0][this->data_size-1]) {
         y = this->data_value[this->data_size-1];
+#ifdef HAVE_GSL
       } else if (this->interp != NULL) {
         y = gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel);
+#endif
       }
 
     } else {
@@ -753,7 +777,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
           }
 
           c[i] = floor(0.5*(a[i]+b[i]));
-          if (gsl_fcmp(this->rectangular_mesh_point[i][c[i]], x[i], this->multidim_threshold) != 0) {
+          if (feenox_cmp(this->rectangular_mesh_point[i][c[i]], x[i], this->multidim_threshold) != 0) {
             flag = 0;
           }
         }
@@ -995,9 +1019,11 @@ double feenox_function_eval(function_t *this, const double *const_x) {
   }
 
 
+#ifdef HAVE_GSL  
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();
   }
+#endif
 
   return y;
 
@@ -1044,7 +1070,7 @@ int feenox_function_is_structured_grid_2d(double *x, double *y, size_t n, size_t
       // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
       return 0;
     }
-  } while (gsl_fcmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
+  } while (feenox_cmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
   
   // si i es uno entonces a comerla
   if (i == 1) {
@@ -1062,7 +1088,7 @@ int feenox_function_is_structured_grid_2d(double *x, double *y, size_t n, size_t
 
   // si x[j] != x[j-nx] entonces no es una grilla estructurada
   for (i = *nx; i < n; i++) {
-    if (gsl_fcmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
+    if (feenox_cmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
       return 0;
     }
   }
@@ -1070,7 +1096,7 @@ int feenox_function_is_structured_grid_2d(double *x, double *y, size_t n, size_t
   // ahora miramos el conjunto y, tienen que ser nx valores igualitos consecutivos
   for (i = 0; i < *ny; i++) {
     for (j = 0; j < (*nx)-1; j++) {
-      if (gsl_fcmp(y[i*(*nx) + j], y[i*(*nx) + j + 1], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(y[n-1]-y[0])) != 0) {
+      if (feenox_cmp(y[i*(*nx) + j], y[i*(*nx) + j + 1], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(y[n-1]-y[0])) != 0) {
         return 0;
       }
     }
@@ -1096,7 +1122,7 @@ int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, size_
       // si recorrimos todo el set y nunca aparecio otra vez el x[0] a comerla
       return 0;
     }
-  } while (gsl_fcmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
+  } while (feenox_cmp(x[i], x[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
 
   // si i es uno entonces a comerla
   if (i == 1) {
@@ -1115,7 +1141,7 @@ int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, size_
       // si recorrimos todo el set y nunca aparecio otra vez el y[0] a comerla
       return 0;
     }
-  } while (gsl_fcmp(y[i], y[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
+  } while (feenox_cmp(y[i], y[0], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) != 0);
   
   // si i es uno entonces a comerla
   if (i == *nx || i % ((*nx)) != 0) {
@@ -1135,12 +1161,12 @@ int feenox_function_is_structured_grid_3d(double *x, double *y, double *z, size_
 
 
   for (i = *nx; i < n; i++) {
-    if (gsl_fcmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
+    if (feenox_cmp(x[i], x[i-(*nx)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
       return 0;
     }
   }
   for (i = (*nx)*(*ny); i < n; i++) {
-    if (gsl_fcmp(y[i], y[i-(*nx)*(*ny)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
+    if (feenox_cmp(y[i], y[i-(*nx)*(*ny)], DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD*fabs(x[(*nx)-1]-x[0])) != 0) {
       return 0;
     }
   }

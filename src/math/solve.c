@@ -21,11 +21,13 @@
  */
 #include "feenox.h"
 
-
+#ifdef HAVE_GSL
 int feenox_solve_f(const gsl_vector *x, void *params, gsl_vector *f);
 int feenox_solve_print_state (solve_t *solve, const size_t iter, gsl_multiroot_fsolver *s);
+#endif
 
 int feenox_instruction_solve(void *arg) {
+#ifdef HAVE_GSL
   solve_t *solve = (solve_t *)arg;
   gsl_multiroot_function f = {&feenox_solve_f, solve->n_unknowns, solve};  
   
@@ -83,10 +85,12 @@ int feenox_instruction_solve(void *arg) {
   // cleanup
   gsl_multiroot_fsolver_free(s);
   gsl_vector_free(x);
+#endif
   
   return FEENOX_OK;
 }
 
+#ifdef HAVE_GSL
 int feenox_solve_f(const gsl_vector *x, void *params, gsl_vector *f) {
   solve_t *solve = (solve_t *)params;
 
@@ -129,3 +133,4 @@ int feenox_solve_print_state(solve_t *solve, const size_t iter, gsl_multiroot_fs
   
   return FEENOX_OK;
 }
+#endif

@@ -66,7 +66,7 @@ double feenox_builtin_vecsum(vector_t **arg) {
 
   s = 0;
   for (i = 0; i < arg[0]->size; i++) {
-    s += gsl_vector_get(feenox_value_ptr(arg[0]), i);
+    s += feenox_lowlevel_vector_get(feenox_value_ptr(arg[0]), i);
   }
 
   return s;
@@ -77,6 +77,7 @@ double feenox_builtin_vecsum(vector_t **arg) {
 ///fv+vecnorm+math \sqrt{\sum_{i=1}^{\text{vecsize}(\vec{b})} b^2_i}
 ///fv+vecnorm+desc Computes euclidean norm of vector $\vec{b}$. Other norms can be computed explicitly
 ///fv+vecnorm+desc using the `sum` functional.
+#ifdef HAVE_GSL
 double feenox_builtin_vecnorm(vector_t **arg) {
 
   int i;
@@ -157,6 +158,7 @@ double feenox_builtin_vecmaxindex(vector_t **arg) {
   y = (double)(gsl_vector_max_index(feenox_value_ptr(arg[0]))+1);
   return y;
 }
+#endif
 
 ///fv+vecdot+usage vecdot(a,b)
 ///fv+vecdot+math \vec{a} \cdot \vec{b} = \sum_{i=1}^{\text{vecsize}(\vec{a})} a_i \cdot b_i
@@ -182,7 +184,7 @@ double feenox_builtin_vecdot(vector_t **arg) {
   
   s = 0;
   for (i = 0; i < arg[0]->size; i++) {
-    s += gsl_vector_get(feenox_value_ptr(arg[0]), i)*gsl_vector_get(feenox_value_ptr(arg[1]), i);
+    s += feenox_lowlevel_vector_get(feenox_value_ptr(arg[0]), i) * feenox_lowlevel_vector_get(feenox_value_ptr(arg[1]), i);
   }
 
   return s;
