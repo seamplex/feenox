@@ -59,7 +59,8 @@ int feenox_problem_build(void) {
     }
 // --------------------------------------------------------------    
     
-    // TODO: make a list of bulk elements and another with BC elements
+    // TODO: make a list of bulk elements and another with BC elements?
+    //       measure!
     if (feenox.pde.mesh->element[i].type->dim == feenox.pde.dim) {
       
       // volumetric elements need volumetric builds
@@ -170,7 +171,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
 
 #ifdef HAVE_PETSC
   
-  // TODO: maybe we can relax this requirement
+  // TODO: maybe we can relax this requirement, add a flag to allow it
   if (this->physical_group == NULL) {
     feenox_push_error_message("volumetric element %d does not have an associated physical group", this->tag);
     return FEENOX_ERROR;

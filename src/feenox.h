@@ -936,11 +936,7 @@ struct node_t {
   size_t *index_dof;        // index within the solution vector for each DOF
   
   double *phi;              // values of the solution functions at the node
-#ifdef HAVE_GSL  
-  gsl_matrix *dphidx;       // derivative of the m-th DOF with respect to coordinate g
-#else
-  double *dphidx;
-#endif
+  lowlevel_matrix_t *dphidx;       // derivative of the m-th DOF with respect to coordinate g
                             // (this is a gsl_matrix to avoid having to do double mallocs and forgetting about row/col-major
 //  gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
   double *flux;             // holder of arbitrary functions evaluated at the node (e.g. sigmas and taus)
@@ -2169,6 +2165,8 @@ extern double feenox_mesh_interpolate_function_node(struct function_t *function,
 extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, double *r);
 
 // fem.c
+extern int feenox_matmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
+extern int feenox_matTmatmult_add_to_existing(double weight, lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
 extern double feenox_mesh_determinant(lowlevel_matrix_t *this);
 extern int feenox_mesh_matrix_invert(lowlevel_matrix_t *direct, lowlevel_matrix_t *inverse);
 extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);

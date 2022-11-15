@@ -94,14 +94,14 @@ int feenox_instruction_mesh_read(void *arg) {
   }
   
   feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_min, 1));
-  gsl_vector_set(feenox.mesh.vars.bbox_min->value, 0, x_min[0]);
-  gsl_vector_set(feenox.mesh.vars.bbox_min->value, 1, x_min[1]);
-  gsl_vector_set(feenox.mesh.vars.bbox_min->value, 2, x_min[2]);
+  feenox_lowlevel_vector_set(feenox.mesh.vars.bbox_min->value, 0, x_min[0]);
+  feenox_lowlevel_vector_set(feenox.mesh.vars.bbox_min->value, 1, x_min[1]);
+  feenox_lowlevel_vector_set(feenox.mesh.vars.bbox_min->value, 2, x_min[2]);
 
   feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_max, 1));
-  gsl_vector_set(feenox.mesh.vars.bbox_max->value, 0, x_max[0]);
-  gsl_vector_set(feenox.mesh.vars.bbox_max->value, 1, x_max[1]);
-  gsl_vector_set(feenox.mesh.vars.bbox_max->value, 2, x_max[2]);
+  feenox_lowlevel_vector_set(feenox.mesh.vars.bbox_max->value, 0, x_max[0]);
+  feenox_lowlevel_vector_set(feenox.mesh.vars.bbox_max->value, 1, x_max[1]);
+  feenox_lowlevel_vector_set(feenox.mesh.vars.bbox_max->value, 2, x_max[2]);
   
   // allocate arrays for the elements that belong to a physical group
   // (arrays are more efficient than a linked list)
@@ -228,9 +228,9 @@ int feenox_instruction_mesh_read(void *arg) {
         if (physical_group->vector_cog->initialized == 0) {
           feenox_call(feenox_vector_init(physical_group->vector_cog, 0));
         }
-        gsl_vector_set(physical_group->vector_cog->value, 0, physical_group->cog[0]);
-        gsl_vector_set(physical_group->vector_cog->value, 1, physical_group->cog[1]);
-        gsl_vector_set(physical_group->vector_cog->value, 2, physical_group->cog[2]);
+        feenox_lowlevel_vector_set(physical_group->vector_cog->value, 0, physical_group->cog[0]);
+        feenox_lowlevel_vector_set(physical_group->vector_cog->value, 1, physical_group->cog[1]);
+        feenox_lowlevel_vector_set(physical_group->vector_cog->value, 2, physical_group->cog[2]);
       }
     }
   }
@@ -274,7 +274,7 @@ int feenox_instruction_mesh_read(void *arg) {
       }  
       function->vector_value->size = function->data_size;
       feenox_call(feenox_vector_init(function->vector_value, 1));
-      function->data_value = gsl_vector_ptr(feenox_value_ptr(function->vector_value), 0);
+      function->data_value = feenox_lowlevel_vector_get_ptr(feenox_value_ptr(function->vector_value), 0);
     }
   }
   
@@ -471,7 +471,7 @@ int feenox_mesh_free(mesh_t *mesh) {
           }
           
           if (mesh->element[i].dphidx_node != NULL && mesh->element[i].dphidx_node[j] != NULL) {
-            gsl_matrix_free(mesh->element[i].dphidx_node[j]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].dphidx_node[j]);
           }
 
           if (mesh->element[i].property_at_node != NULL && mesh->element[i].property_at_node[j] != NULL) {
@@ -496,22 +496,22 @@ int feenox_mesh_free(mesh_t *mesh) {
             feenox_free(mesh->element[i].x[v]);
           }
           if (mesh->element[i].H != NULL && mesh->element[i].H[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].H[v]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].H[v]);
           }  
           if (mesh->element[i].B != NULL && mesh->element[i].B[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].B[v]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].B[v]);
           }  
           if (mesh->element[i].dxdr != NULL && mesh->element[i].dxdr[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].dxdr[v]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].dxdr[v]);
           }
           if (mesh->element[i].drdx != NULL && mesh->element[i].drdx[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].drdx[v]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].drdx[v]);
           }  
           if (mesh->element[i].dhdx != NULL && mesh->element[i].dhdx[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].dhdx[v]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].dhdx[v]);
           }  
           if (mesh->element[i].dphidx_gauss != NULL && mesh->element[i].dphidx_gauss[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].dphidx_gauss[v]);
+            feenox_lowlevel_matrix_free(&mesh->element[i].dphidx_gauss[v]);
           }  
         }
       }  
@@ -578,11 +578,13 @@ int feenox_mesh_free(mesh_t *mesh) {
         feenox_free(mesh->node[j].phi);
       }
       if (mesh->node[j].dphidx != NULL) {
-        gsl_matrix_free(mesh->node[j].dphidx);
+        feenox_lowlevel_matrix_free(&mesh->node[j].dphidx);
       }
+/*      
       if (mesh->node[j].delta_dphidx != NULL) {
-        gsl_matrix_free(mesh->node[j].delta_dphidx);
+        feenox_lowlevel_matrix_free(&mesh->node[j].delta_dphidx);
       }
+ */
       if (mesh->node[j].flux != NULL) {
         feenox_free(mesh->node[j].flux);
       }

@@ -54,7 +54,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
     double f = laplace.f.eval(&laplace.f, x, material);
     unsigned int j = 0;
     for (j = 0; j < e->type->nodes; j++) {
-      gsl_vector_add_to_element(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * f);
+      gsl_vector_add_to_existing(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * f);
     }
   }
   

@@ -447,10 +447,8 @@ int feenox_problem_init_runtime_general(void) {
   
   // link the solution functions with the mesh
   // and check if we have to compute gradients
-  unsigned int m = 0;
-  unsigned int g = 0;
-  for (g = 0; g < feenox.pde.dofs; g++) {
-    for (m = 0; m < feenox.pde.dim; m++) {
+  for (int g = 0; g < feenox.pde.dofs; g++) {
+    for (int m = 0; m < feenox.pde.dim; m++) {
       feenox.pde.solution[g]->var_argument[m] = feenox.mesh.vars.arr_x[m];
       if (feenox.pde.gradient != NULL && feenox.pde.gradient[g] != NULL && feenox.pde.gradient[g][m] != NULL) {
          feenox.pde.compute_gradients |= feenox.pde.gradient[g][m]->used;
