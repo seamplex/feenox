@@ -216,7 +216,7 @@ int feenox_problem_setup_pc(PC pc) {
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
 #if PETSC_VERSION_GT(3,9,0)
-    petsc_call(PCSetType(pc, PCCHOLESKY));
+    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 
 // if we want to set further options for mumps we need to retrieve the matrix

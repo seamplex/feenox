@@ -230,7 +230,7 @@ int feenox_problem_setup_pc_modal(PC pc) {
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
 #ifdef PETSC_HAVE_MUMPS
-    petsc_call(PCSetType(pc, PCCHOLESKY));
+    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #else
     // TODO: this will complain in parallel
