@@ -13,6 +13,5 @@ Physical Surface("bottom", 6) = {3};
 
 Mesh.MeshSizeMax = 0.01;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 6;
 Mesh.ElementOrder = 2;
