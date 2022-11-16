@@ -1,0 +1,41 @@
+PROBLEM thermal 3D
+DEFAULT_ARGUMENT_VALUE 1 struct
+READ_MESH long-bar-$1.msh
+
+# numerical data
+a = 0.038
+b = 0.00582
+Tl = 100
+Tref = 5
+h = 0.005
+
+# solve numerical
+# conductivity
+k(x,y,z) = a*(1 + b*T(x,y,z))
+
+# boundary conditions
+BC rear  T=Tl
+BC front h=h Tref=Tref
+
+SOLVE_PROBLEM
+
+# solve analytical
+VAR Tr'
+tmp(x,Tr') = (-1 + sqrt(1 + 4*1/2*b*(Tl + 1/2*b*Tl^2 - h*(Tr'-Tref)/a * x)))/(b)
+Tr = root(tmp(20,Tr)-Tr, Tr, Tref, Tl)
+temp(x) = tmp(x,Tr)
+
+# extract 1d profile of the numerical solution along z
+temp1d(x) = T(1,1,x)
+
+# comparison with Ansys' reference result (it has rounding errors)
+# Tansys(x) = -171.82 + sqrt(73886.82 - 1492.13*x)
+# PRINT_FUNCTION temp temp1d temp(x)-temp1d(x) Tansys(x)-temp1d(x) MIN 0 MAX 20 NSTEPS 200
+
+# write the temperature distribution to make it available for the mechanical step
+WRITE_MESH long-bar-$1-temperature.msh T
+ 
+# compute error
+INTEGRATE (T(x,y,z)-temp(z))^2 RESULT num
+PHYSICAL_GROUP bulk DIM 3  # this is just to compute the volume
+PRINT num/bulk_volume

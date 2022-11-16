@@ -1,0 +1,20 @@
+PROBLEM mechanical 3D
+DEFAULT_ARGUMENT_VALUE 1 struct
+DEFAULT_ARGUMENT_VALUE 2 $1
+READ_MESH long-bar-$1.msh
+READ_MESH long-bar-$2-temperature.msh DIM 3 READ_FUNCTION T
+
+E = 2e11
+nu = 0
+alpha = 1.5e-5
+T0 = 5
+
+BC rear  tangential radial
+BC front tangential radial
+
+SOLVE_PROBLEM
+
+FIND_EXTREMA w MAX w_max X_MAX w_max_x Y_MAX w_max_y Z_MAX w_max_z
+# "target" is 0.00232 but that's too small
+# the subtracted value is the one reported in ansys mechanical
+PRINT (w_max-0.002341)/w_max #w_max_x w_max_y w_max_z
