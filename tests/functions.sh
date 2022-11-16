@@ -10,7 +10,7 @@ for i in  ../feenox ../src/feenox ./feenox ./src/feenox ../../../bin/feenox /usr
   fi
 done
 if [ -z "${feenox}" ]; then
-  echo "could not find feenox executable"
+  echo "error: could not find feenox executable"
   exit 1
 fi
 
@@ -104,7 +104,7 @@ answer() {
 answerdiff() {
   echo -n "${1} ... "
   base=$(basename ${1} .fee)
-  ${feenox} ${dir}/${1} > ${dir}/${base}.last
+  ${feenox} ${dir}/${1} | sed 's/-0.0000/0.0000/g' > ${dir}/${base}.last
   error=$?
   
   difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
