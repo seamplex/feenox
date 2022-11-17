@@ -412,15 +412,15 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // allocate stress-strain objects
-  feenox_check_alloc(mechanical.C = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
+  feenox_check_alloc(mechanical.C = feenox_lowlevel_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
   if (mechanical.uniform_C) {
     // cache properties
     feenox_call(mechanical.compute_C(NULL, NULL));
   }  
 
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
-    feenox_check_alloc(mechanical.et = gsl_vector_calloc(mechanical.stress_strain_size));
-    feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
+    feenox_check_alloc(mechanical.et = feenox_lowlevel_vector_calloc(mechanical.stress_strain_size));
+    feenox_check_alloc(mechanical.Cet = feenox_lowlevel_vector_calloc(mechanical.stress_strain_size));
   }
   
   // TODO: check nonlinearity!

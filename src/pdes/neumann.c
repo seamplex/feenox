@@ -26,10 +26,10 @@ int feenox_problem_bc_natural_set(element_t *e, unsigned int v, double *value) {
 
 #ifdef HAVE_PETSC
   for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-    gsl_vector_set(feenox.pde.Nb, g, value[g]);
+    feenox_lowlevel_vector_set(feenox.pde.bn,  g, value[g]);
   }  
   double w = feenox_problem_bc_natural_weight(e, v);
-  feenox_call(gsl_blas_dgemv(CblasTrans, w, e->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi));
+  feenox_call(feenox_matTvecmult_add_to_existing(w, e->H[v], feenox.pde.bn, feenox.pde.bi));
 #endif
   
   return FEENOX_OK;

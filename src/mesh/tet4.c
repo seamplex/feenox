@@ -101,12 +101,12 @@ Tetrahedron:
   // gauss points and extrapolation matrices
   
   // full integration: 4 points
-  feenox_mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]);
-  feenox_check_alloc(element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 4));
+  feenox_call(feenox_mesh_gauss_init_tet4(element_type, &element_type->gauss[integration_full]));
+  feenox_check_alloc(element_type->gauss[integration_full].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 4));
 
   // reduced integration: 1 point
-  feenox_mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]);
-  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1));
+  feenox_call(feenox_mesh_gauss_init_tet1(element_type, &element_type->gauss[integration_reduced]));
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 1));
   
   // the two extrapolation matrices
   a = (5.0-M_SQRT5)/20.0;
@@ -118,33 +118,33 @@ Tetrahedron:
   r[1] = c;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, v, feenox_mesh_tet4_h(v, r));
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 0, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = d;
   r[1] = c;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, v, feenox_mesh_tet4_h(v, r));
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 1, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = c;
   r[1] = d;
   r[2] = c;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, v, feenox_mesh_tet4_h(v, r));
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 2, v, feenox_mesh_tet4_h(v, r));
   }
 
   r[0] = c;
   r[1] = c;
   r[2] = d;
   for (v = 0; v < 4; v++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, v, feenox_mesh_tet4_h(v, r));
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 3, v, feenox_mesh_tet4_h(v, r));
   }
   
   // reduced
   for (j = 0; j < element_type->nodes; j++) {
-    gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
   }  
 
   return FEENOX_OK;

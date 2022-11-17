@@ -157,6 +157,7 @@ template<typename Derived> struct determinant_impl<Derived, 3>
   return 0.0;
 }
 
+// TODO: move to blas.c
 int feenox_matmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C)
 {
 #ifdef HAVE_GSL
@@ -166,15 +167,32 @@ int feenox_matmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matri
 #endif
 }
 
-int feenox_matTmatmult_add_to_existing(double weight, lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C)
+int feenox_matTmatmult_add_to_existing(double alpha, lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C)
 {
 #ifdef HAVE_GSL
-  return gsl_blas_dgemm(CblasTrans, CblasNoTrans, weight, A, B, 1, C);
+  return gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, A, B, 1, C);
 #else
   return 0;
 #endif
 }
 
+int feenox_matTvecmult(double alpha, lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c)
+{
+#ifdef HAVE_GSL
+  return gsl_blas_dgemv(CblasTrans, alpha, A, b, 0, c);
+#else
+  return 0;
+#endif
+}
+
+int feenox_matTvecmult_add_to_existing(double alpha, lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c)
+{
+#ifdef HAVE_GSL
+  return gsl_blas_dgemv(CblasTrans, alpha, A, b, 1, c);
+#else
+  return 0;
+#endif
+}
 // compute the gradient of h with respect to x evaluated at any arbitrary 
 int feenox_mesh_compute_dhdx(element_t *e, double *r, lowlevel_matrix_t *drdx_ref, lowlevel_matrix_t *dhdx) {
 
@@ -277,7 +295,7 @@ inline int feenox_mesh_compute_dxdr(element_t *e, double *r, lowlevel_matrix_t *
   for (unsigned int m = 0; m < e->type->dim; m++) {
     for (unsigned int m_prime = 0; m_prime < e->type->dim; m_prime++) {
       for (unsigned int j = 0; j < e->type->nodes; j++) {
-        feenox_lowlevel_matrix_add_to_existing(dxdr, m, m_prime, e->type->dhdr(j, m_prime, r) * e->node[j]->x[m]);
+        feenox_lowlevel_matrix_add_element_to_existing(dxdr, m, m_prime, e->type->dhdr(j, m_prime, r) * e->node[j]->x[m]);
       }
     }
   }

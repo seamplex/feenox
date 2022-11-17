@@ -206,8 +206,8 @@ int feenox_mesh_hexa27_init(void) {
   feenox_mesh_compute_coords_from_parent(element_type, 26);    
 
   // full integration: 3x3x3
-  feenox_mesh_gauss_init_hexa27(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 27);
+  feenox_call(feenox_mesh_gauss_init_hexa27(element_type, &element_type->gauss[integration_full]));
+  feenox_check_alloc(element_type->gauss[integration_full].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 27));
 
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
@@ -215,13 +215,13 @@ int feenox_mesh_hexa27_init(void) {
     r[2] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][2];
     
     for (v = 0; v < 27; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa27_h(v, r));
+      feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa27_h(v, r));
     }
   }
   
   // reduced integration: 2x2x2
-  feenox_mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_reduced]);
-  element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 8);
+  feenox_call(feenox_mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_reduced]));
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 8));
   
   // the two extrapolation matrices
   for (j = 0; j < element_type->nodes; j++) {
@@ -230,7 +230,7 @@ int feenox_mesh_hexa27_init(void) {
     r[2] = M_SQRT3 * element_type->node_coords[j][2];
 
     for (v = 0; v < 8; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_hexa8_h(v, r));
+      feenox_lowlevel_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_hexa8_h(v, r));
     }
   }
   

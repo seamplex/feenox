@@ -26,10 +26,10 @@ int feenox_problem_build_compute_mechanical_strain_orthotropic (const double *x,
   
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
 
-  gsl_vector_set(mechanical.et, 0, mechanical.alpha_x.eval(&mechanical.alpha_x, x, material) * delta_T);
-  gsl_vector_set(mechanical.et, 1, mechanical.alpha_y.eval(&mechanical.alpha_y, x, material) * delta_T);
+  feenox_lowlevel_vector_set(mechanical.et, 0, mechanical.alpha_x.eval(&mechanical.alpha_x, x, material) * delta_T);
+  feenox_lowlevel_vector_set(mechanical.et, 1, mechanical.alpha_y.eval(&mechanical.alpha_y, x, material) * delta_T);
   if (feenox.pde.dim > 2) {
-    gsl_vector_set(mechanical.et, 2, mechanical.alpha_z.eval(&mechanical.alpha_z, x, material) * delta_T);
+    feenox_lowlevel_vector_set(mechanical.et, 2, mechanical.alpha_z.eval(&mechanical.alpha_z, x, material) * delta_T);
   }
   
   return FEENOX_OK;
@@ -48,9 +48,9 @@ int feenox_problem_build_compute_mechanical_stress_orthotropic (const double *x,
     mechanical.compute_C(x, material);
   }
 
-  *sigmat_x = delta_T * (alpha_x * gsl_matrix_get(mechanical.C, 0, 0) + alpha_y * gsl_matrix_get(mechanical.C, 0, 1) + alpha_z * gsl_matrix_get(mechanical.C, 0, 2));
-  *sigmat_y = delta_T * (alpha_x * gsl_matrix_get(mechanical.C, 1, 0) + alpha_y * gsl_matrix_get(mechanical.C, 1, 1) + alpha_z * gsl_matrix_get(mechanical.C, 1, 2));
-  *sigmat_z = delta_T * (alpha_x * gsl_matrix_get(mechanical.C, 2, 0) + alpha_y * gsl_matrix_get(mechanical.C, 2, 1) + alpha_z * gsl_matrix_get(mechanical.C, 2, 2));
+  *sigmat_x = delta_T * (alpha_x * feenox_lowlevel_matrix_get(mechanical.C, 0, 0) + alpha_y * feenox_lowlevel_matrix_get(mechanical.C, 0, 1) + alpha_z * feenox_lowlevel_matrix_get(mechanical.C, 0, 2));
+  *sigmat_y = delta_T * (alpha_x * feenox_lowlevel_matrix_get(mechanical.C, 1, 0) + alpha_y * feenox_lowlevel_matrix_get(mechanical.C, 1, 1) + alpha_z * feenox_lowlevel_matrix_get(mechanical.C, 1, 2));
+  *sigmat_z = delta_T * (alpha_x * feenox_lowlevel_matrix_get(mechanical.C, 2, 0) + alpha_y * feenox_lowlevel_matrix_get(mechanical.C, 2, 1) + alpha_z * feenox_lowlevel_matrix_get(mechanical.C, 2, 2));
   
   return FEENOX_OK;
   

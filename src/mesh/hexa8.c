@@ -114,8 +114,8 @@ Hexahedron:
   // gauss points and extrapolation matrices
   
   // full integration: 2x2x2
-  feenox_mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 8);
+  feenox_call(feenox_mesh_gauss_init_hexa8(element_type, &element_type->gauss[integration_full]));
+  feenox_check_alloc(element_type->gauss[integration_full].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 8));
 
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT3 * element_type->node_coords[j][0];
@@ -123,16 +123,16 @@ Hexahedron:
     r[2] = M_SQRT3 * element_type->node_coords[j][2];
     
     for (v = 0; v < 8; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa8_h(v, r));
+      feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa8_h(v, r));
     }
   }
   
   // reduced integration: 1
-  feenox_mesh_gauss_init_hexa1(element_type, &element_type->gauss[integration_reduced]);
-  element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
+  feenox_call(feenox_mesh_gauss_init_hexa1(element_type, &element_type->gauss[integration_reduced]));
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 1));
 
   for (j = 0; j < element_type->nodes; j++) {
-    gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
+    feenox_lowlevel_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
   }
 
   return FEENOX_OK;

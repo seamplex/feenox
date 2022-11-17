@@ -84,6 +84,7 @@ struct lowlevel_matrix_t {
 #define M_SQRT3    1.73205080756887729352744634151      /* sqrt(3) */
 #endif
 #define gsl_pow_2(x)      ((x)*(x))
+#define gsl_pow_3(x)      ((x)*(x)*(x))
 #define gsl_hypot3(a,b,c) sqrt((a)*(a)+(b)*(b)+(c)*(c))
 #endif
 
@@ -1904,9 +1905,8 @@ struct feenox_t {
     lowlevel_matrix_t *Mi;               // elementary mass matrix
     lowlevel_matrix_t *JKi;              // elementary jacobian for stiffness matrix
     lowlevel_matrix_t *Jbi;              // elementary jacobian for RHS vector
-    lowlevel_matrix_t *bi;               // elementary right-hand side vector
-    // TODO: shouldn't this be Hb?
-    lowlevel_matrix_t *Nb;               // teporary vector for natural BCs
+    lowlevel_vector_t *bi;               // elementary right-hand side vector
+    lowlevel_vector_t *bn;               // temporary vector for natural BCs
 
 #endif  // HAVE_PETSC    
     
@@ -2167,6 +2167,11 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 // fem.c
 extern int feenox_matmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
 extern int feenox_matTmatmult_add_to_existing(double weight, lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
+extern int feenox_matTvecmult_add_to_existing(double alpha, lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c);
+extern int feenox_lowlevel_matrix_add_element_to_existing(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value);
+extern int feenox_lowlevel_vector_add_element_to_existing(lowlevel_vector_t *this, const size_t i, const double value);
+
+
 extern double feenox_mesh_determinant(lowlevel_matrix_t *this);
 extern int feenox_mesh_matrix_invert(lowlevel_matrix_t *direct, lowlevel_matrix_t *inverse);
 extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);

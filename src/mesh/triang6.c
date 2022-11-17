@@ -92,54 +92,54 @@ Triangle6:
   
   // full integration: 3 points
   feenox_mesh_gauss_init_triang3(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3);
+  feenox_check_alloc(element_type->gauss[integration_full].extrap =feenox_lowlevel_matrix_calloc(element_type->nodes, 3));
 
   // reduced integration: 1 point
   feenox_mesh_gauss_init_triang1(element_type, &element_type->gauss[integration_reduced]);
-  element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap =feenox_lowlevel_matrix_calloc(element_type->nodes, 1));
   
   // the two extrapolation matrices
   // first the full one
   r[0] = -1.0/3.0;
   r[1] = -1.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 0, j, feenox_mesh_triang3_h(j, r));
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 0, j, feenox_mesh_triang3_h(j, r));
   }  
   
   r[0] = +5.0/3.0;
   r[1] = -1.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 1, j, feenox_mesh_triang3_h(j, r));
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 1, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = -1.0/3.0;
   r[1] = +5.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 2, j, feenox_mesh_triang3_h(j, r));
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 2, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = +2.0/3.0;
   r[1] = -1.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 3, j, feenox_mesh_triang3_h(j, r));
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 3, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = +2.0/3.0;
   r[1] = +2.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 4, j, feenox_mesh_triang3_h(j, r));
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 4, j, feenox_mesh_triang3_h(j, r));
   }  
 
   r[0] = -1.0/3.0;
   r[1] = +2.0/3.0;
   for (j = 0; j < 3; j++) {
-    gsl_matrix_set(element_type->gauss[integration_full].extrap, 5, j, feenox_mesh_triang3_h(j, r));
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, 5, j, feenox_mesh_triang3_h(j, r));
   }  
   
   // the reduced one is a vector of ones
   for (j = 0; j < element_type->nodes; j++) {
     // reduced
-    gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
+   feenox_lowlevel_matrix_set(element_type->gauss[integration_reduced].extrap, j, 0, 1.0);
   }
   
   return FEENOX_OK;    

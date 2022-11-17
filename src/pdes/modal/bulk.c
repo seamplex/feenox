@@ -44,7 +44,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
     material = e->physical_group->material;
   }
 
-  gsl_matrix *C = gsl_matrix_calloc(6, 6);
+  lowlevel_matrix_t *C = feenox_lowlevel_matrix_calloc(6, 6);
   double E = modal.E.eval(&modal.E, x, material);
   double nu = modal.nu.eval(&modal.nu, x, material);
   double rho = modal.rho.eval(&modal.rho, x, material);
@@ -53,56 +53,56 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   double mu = 0.5*E/(1+nu);
   double lambda2mu = lambda + 2*mu;
   
-  gsl_matrix_set(C, 0, 0, lambda2mu);
-  gsl_matrix_set(C, 0, 1, lambda);
-  gsl_matrix_set(C, 0, 2, lambda);
+  feenox_lowlevel_matrix_set(C, 0, 0, lambda2mu);
+  feenox_lowlevel_matrix_set(C, 0, 1, lambda);
+  feenox_lowlevel_matrix_set(C, 0, 2, lambda);
 
-  gsl_matrix_set(C, 1, 0, lambda);
-  gsl_matrix_set(C, 1, 1, lambda2mu);
-  gsl_matrix_set(C, 1, 2, lambda);
+  feenox_lowlevel_matrix_set(C, 1, 0, lambda);
+  feenox_lowlevel_matrix_set(C, 1, 1, lambda2mu);
+  feenox_lowlevel_matrix_set(C, 1, 2, lambda);
 
-  gsl_matrix_set(C, 2, 0, lambda);
-  gsl_matrix_set(C, 2, 1, lambda);
-  gsl_matrix_set(C, 2, 2, lambda2mu);
+  feenox_lowlevel_matrix_set(C, 2, 0, lambda);
+  feenox_lowlevel_matrix_set(C, 2, 1, lambda);
+  feenox_lowlevel_matrix_set(C, 2, 2, lambda2mu);
   
-  gsl_matrix_set(C, 3, 3, mu);
-  gsl_matrix_set(C, 4, 4, mu);
-  gsl_matrix_set(C, 5, 5, mu);
+  feenox_lowlevel_matrix_set(C, 3, 3, mu);
+  feenox_lowlevel_matrix_set(C, 4, 4, mu);
+  feenox_lowlevel_matrix_set(C, 5, 5, mu);
   
   unsigned int J = e->type->nodes;
-  gsl_matrix *B = gsl_matrix_calloc(6, feenox.pde.dofs * J);
-  gsl_matrix *CB = gsl_matrix_calloc(6, feenox.pde.dofs * J);
+  lowlevel_matrix_t *B = feenox_lowlevel_matrix_calloc(6, feenox.pde.dofs * J);
+  lowlevel_matrix_t *CB = feenox_lowlevel_matrix_calloc(6, feenox.pde.dofs * J);
   
-  gsl_matrix *dhdx = e->dhdx[v];
+  lowlevel_matrix_t *dhdx = e->dhdx[v];
 
   unsigned int j = 0;
   for (j = 0; j < J; j++) {
-    gsl_matrix_set(B, 0, 3*j+0, gsl_matrix_get(dhdx, j, 0));
+    feenox_lowlevel_matrix_set(B, 0, 3*j+0, feenox_lowlevel_matrix_get(dhdx, j, 0));
       
-    gsl_matrix_set(B, 1, 3*j+1, gsl_matrix_get(dhdx, j, 1));
+    feenox_lowlevel_matrix_set(B, 1, 3*j+1, feenox_lowlevel_matrix_get(dhdx, j, 1));
       
-    gsl_matrix_set(B, 2, 3*j+2, gsl_matrix_get(dhdx, j, 2));
+    feenox_lowlevel_matrix_set(B, 2, 3*j+2, feenox_lowlevel_matrix_get(dhdx, j, 2));
     
-    gsl_matrix_set(B, 3, 3*j+0, gsl_matrix_get(dhdx, j, 1));
-    gsl_matrix_set(B, 3, 3*j+1, gsl_matrix_get(dhdx, j, 0));
+    feenox_lowlevel_matrix_set(B, 3, 3*j+0, feenox_lowlevel_matrix_get(dhdx, j, 1));
+    feenox_lowlevel_matrix_set(B, 3, 3*j+1, feenox_lowlevel_matrix_get(dhdx, j, 0));
 
-    gsl_matrix_set(B, 4, 3*j+1, gsl_matrix_get(dhdx, j, 2));
-    gsl_matrix_set(B, 4, 3*j+2, gsl_matrix_get(dhdx, j, 1));
+    feenox_lowlevel_matrix_set(B, 4, 3*j+1, feenox_lowlevel_matrix_get(dhdx, j, 2));
+    feenox_lowlevel_matrix_set(B, 4, 3*j+2, feenox_lowlevel_matrix_get(dhdx, j, 1));
 
-    gsl_matrix_set(B, 5, 3*j+0, gsl_matrix_get(dhdx, j, 2));
-    gsl_matrix_set(B, 5, 3*j+2, gsl_matrix_get(dhdx, j, 0));
+    feenox_lowlevel_matrix_set(B, 5, 3*j+0, feenox_lowlevel_matrix_get(dhdx, j, 2));
+    feenox_lowlevel_matrix_set(B, 5, 3*j+2, feenox_lowlevel_matrix_get(dhdx, j, 0));
   }
 
   // elemental stiffness B'*C*B
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0, CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, CB, 1.0, feenox.pde.Ki));
+  feenox_call(feenox_matmatmult(C, B, CB));
+  feenox_call(feenox_matTmatmult_add_to_existing(w, B, CB, feenox.pde.Ki));
 
   // elemental mass H'*rho*H
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rho, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
+  feenox_call(feenox_matTmatmult_add_to_existing(w * rho, e->H[v], e->H[v], feenox.pde.Mi));
   
-  gsl_matrix_free(B);
-  gsl_matrix_free(CB);
-  gsl_matrix_free(C);
+  feenox_lowlevel_matrix_free(&B);
+  feenox_lowlevel_matrix_free(&CB);
+  feenox_lowlevel_matrix_free(&C);
   
 #endif
   

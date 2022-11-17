@@ -104,11 +104,11 @@ struct mechanical_t {
 
   
   // auxiliary intermediate matrices
-  gsl_matrix *C;    // stress-strain matrix, 6x6 for 3d
-  gsl_matrix *B;    // strain-displacement matrix, 6x(3*n_nodes) for 3d
-  gsl_matrix *CB;   // product of C times B, 6x(3*n_nodes) for 3d
-  gsl_vector *et;   // thermal strain vector, size 6 for 3d
-  gsl_vector *Cet;  // product of C times et, size 6 for 3d
+  lowlevel_matrix_t *C;    // stress-strain matrix, 6x6 for 3d
+  lowlevel_matrix_t *B;    // strain-displacement matrix, 6x(3*n_nodes) for 3d
+  lowlevel_matrix_t *CB;   // product of C times B, 6x(3*n_nodes) for 3d
+  lowlevel_vector_t *et;   // thermal strain vector, size 6 for 3d
+  lowlevel_vector_t *Cet;  // product of C times et, size 6 for 3d
   
 //  double hourglass_epsilon;
   

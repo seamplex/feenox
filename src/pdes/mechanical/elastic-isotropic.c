@@ -30,21 +30,21 @@ int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x,
   double mu = 0.5*E/(1+nu);
   double lambda2mu = lambda + 2*mu;
   
-  gsl_matrix_set(mechanical.C, 0, 0, lambda2mu);
-  gsl_matrix_set(mechanical.C, 0, 1, lambda);
-  gsl_matrix_set(mechanical.C, 0, 2, lambda);
+  feenox_lowlevel_matrix_set(mechanical.C, 0, 0, lambda2mu);
+  feenox_lowlevel_matrix_set(mechanical.C, 0, 1, lambda);
+  feenox_lowlevel_matrix_set(mechanical.C, 0, 2, lambda);
 
-  gsl_matrix_set(mechanical.C, 1, 0, lambda);
-  gsl_matrix_set(mechanical.C, 1, 1, lambda2mu);
-  gsl_matrix_set(mechanical.C, 1, 2, lambda);
+  feenox_lowlevel_matrix_set(mechanical.C, 1, 0, lambda);
+  feenox_lowlevel_matrix_set(mechanical.C, 1, 1, lambda2mu);
+  feenox_lowlevel_matrix_set(mechanical.C, 1, 2, lambda);
 
-  gsl_matrix_set(mechanical.C, 2, 0, lambda);
-  gsl_matrix_set(mechanical.C, 2, 1, lambda);
-  gsl_matrix_set(mechanical.C, 2, 2, lambda2mu);
+  feenox_lowlevel_matrix_set(mechanical.C, 2, 0, lambda);
+  feenox_lowlevel_matrix_set(mechanical.C, 2, 1, lambda);
+  feenox_lowlevel_matrix_set(mechanical.C, 2, 2, lambda2mu);
   
-  gsl_matrix_set(mechanical.C, 3, 3, mu);
-  gsl_matrix_set(mechanical.C, 4, 4, mu);
-  gsl_matrix_set(mechanical.C, 5, 5, mu);
+  feenox_lowlevel_matrix_set(mechanical.C, 3, 3, mu);
+  feenox_lowlevel_matrix_set(mechanical.C, 4, 4, mu);
+  feenox_lowlevel_matrix_set(mechanical.C, 5, 5, mu);
     
   return FEENOX_OK;
 }

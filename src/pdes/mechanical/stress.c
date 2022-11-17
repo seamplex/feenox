@@ -87,16 +87,16 @@ int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
 int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight) {
 
   // read strains from gradient
-  double epsilonx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
-  double epsilony = gsl_matrix_get(element->dphidx_node[j], 1, 1);
-  double epsilonz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
+  double epsilonx = feenox_lowlevel_matrix_get(element->dphidx_node[j], 0, 0);
+  double epsilony = feenox_lowlevel_matrix_get(element->dphidx_node[j], 1, 1);
+  double epsilonz = (feenox.pde.dofs == 3) ? feenox_lowlevel_matrix_get(element->dphidx_node[j], 2, 2) : 0;
   
-  double gammaxy = gsl_matrix_get(element->dphidx_node[j], 0, 1) + gsl_matrix_get(element->dphidx_node[j], 1, 0);
+  double gammaxy = feenox_lowlevel_matrix_get(element->dphidx_node[j], 0, 1) + feenox_lowlevel_matrix_get(element->dphidx_node[j], 1, 0);
   double gammayz = 0;
   double gammazx = 0;
   if (feenox.pde.dofs == 3) {
-    gammayz = gsl_matrix_get(element->dphidx_node[j], 1, 2) + gsl_matrix_get(element->dphidx_node[j], 2, 1);
-    gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
+    gammayz = feenox_lowlevel_matrix_get(element->dphidx_node[j], 1, 2) + feenox_lowlevel_matrix_get(element->dphidx_node[j], 2, 1);
+    gammazx = feenox_lowlevel_matrix_get(element->dphidx_node[j], 2, 0) + feenox_lowlevel_matrix_get(element->dphidx_node[j], 0, 2);
   }  
 
   double sigmax = 0;
@@ -228,12 +228,12 @@ int feenox_stress_from_strain(node_t *node, element_t *element, unsigned int j,
     mechanical.compute_C(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
   }  
   
-  *sigmax = gsl_matrix_get(mechanical.C, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C, 0, 1) * epsilony + gsl_matrix_get(mechanical.C, 0, 2) * epsilonz;
-  *sigmay = gsl_matrix_get(mechanical.C, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C, 1, 1) * epsilony + gsl_matrix_get(mechanical.C, 1, 2) * epsilonz;
-  *sigmaz = gsl_matrix_get(mechanical.C, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C, 2, 1) * epsilony + gsl_matrix_get(mechanical.C, 2, 2) * epsilonz;
-  *tauxy = gsl_matrix_get(mechanical.C, 3, 3) * gammaxy;
-  *tauyz = gsl_matrix_get(mechanical.C, 4, 4) * gammayz;
-  *tauzx = gsl_matrix_get(mechanical.C, 5, 5) * gammazx;
+  *sigmax = feenox_lowlevel_matrix_get(mechanical.C, 0, 0) * epsilonx + feenox_lowlevel_matrix_get(mechanical.C, 0, 1) * epsilony + feenox_lowlevel_matrix_get(mechanical.C, 0, 2) * epsilonz;
+  *sigmay = feenox_lowlevel_matrix_get(mechanical.C, 1, 0) * epsilonx + feenox_lowlevel_matrix_get(mechanical.C, 1, 1) * epsilony + feenox_lowlevel_matrix_get(mechanical.C, 1, 2) * epsilonz;
+  *sigmaz = feenox_lowlevel_matrix_get(mechanical.C, 2, 0) * epsilonx + feenox_lowlevel_matrix_get(mechanical.C, 2, 1) * epsilony + feenox_lowlevel_matrix_get(mechanical.C, 2, 2) * epsilonz;
+  *tauxy = feenox_lowlevel_matrix_get(mechanical.C, 3, 3) * gammaxy;
+  *tauyz = feenox_lowlevel_matrix_get(mechanical.C, 4, 4) * gammayz;
+  *tauzx = feenox_lowlevel_matrix_get(mechanical.C, 5, 5) * gammazx;
   
   return FEENOX_OK;
 }

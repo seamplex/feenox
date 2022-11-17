@@ -27,10 +27,10 @@ int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes) {
   mechanical.n_nodes = n_nodes;
   
   feenox_free(mechanical.B);
-  feenox_check_alloc(mechanical.B = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
+  feenox_check_alloc(mechanical.B = feenox_lowlevel_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
   
   feenox_free(mechanical.CB);
-  feenox_check_alloc(mechanical.CB = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
+  feenox_check_alloc(mechanical.CB = feenox_lowlevel_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
 
   return FEENOX_OK;
 }
@@ -58,23 +58,23 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 //  double r_for_axisymmetric = 1;
 //  double w = this->w[v] * r_for_axisymmetric;
   
-  gsl_matrix *dhdx = e->dhdx[v];
+  lowlevel_matrix_t *dhdx = e->dhdx[v];
   for (int j = 0; j < mechanical.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
       
-      gsl_matrix_set(mechanical.B, 0, 3*j+0, gsl_matrix_get(dhdx, j, 0));
-      gsl_matrix_set(mechanical.B, 1, 3*j+1, gsl_matrix_get(dhdx, j, 1));
-      gsl_matrix_set(mechanical.B, 2, 3*j+2, gsl_matrix_get(dhdx, j, 2));
+      feenox_lowlevel_matrix_set(mechanical.B, 0, 3*j+0, feenox_lowlevel_matrix_get(dhdx, j, 0));
+      feenox_lowlevel_matrix_set(mechanical.B, 1, 3*j+1, feenox_lowlevel_matrix_get(dhdx, j, 1));
+      feenox_lowlevel_matrix_set(mechanical.B, 2, 3*j+2, feenox_lowlevel_matrix_get(dhdx, j, 2));
     
-      gsl_matrix_set(mechanical.B, 3, 3*j+0, gsl_matrix_get(dhdx, j, 1));
-      gsl_matrix_set(mechanical.B, 3, 3*j+1, gsl_matrix_get(dhdx, j, 0));
+      feenox_lowlevel_matrix_set(mechanical.B, 3, 3*j+0, feenox_lowlevel_matrix_get(dhdx, j, 1));
+      feenox_lowlevel_matrix_set(mechanical.B, 3, 3*j+1, feenox_lowlevel_matrix_get(dhdx, j, 0));
 
-      gsl_matrix_set(mechanical.B, 4, 3*j+1, gsl_matrix_get(dhdx, j, 2));
-      gsl_matrix_set(mechanical.B, 4, 3*j+2, gsl_matrix_get(dhdx, j, 1));
+      feenox_lowlevel_matrix_set(mechanical.B, 4, 3*j+1, feenox_lowlevel_matrix_get(dhdx, j, 2));
+      feenox_lowlevel_matrix_set(mechanical.B, 4, 3*j+2, feenox_lowlevel_matrix_get(dhdx, j, 1));
 
-      gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, j, 2));
-      gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, j, 0));
+      feenox_lowlevel_matrix_set(mechanical.B, 5, 3*j+0, feenox_lowlevel_matrix_get(dhdx, j, 2));
+      feenox_lowlevel_matrix_set(mechanical.B, 5, 3*j+2, feenox_lowlevel_matrix_get(dhdx, j, 0));
       
     } else if (mechanical.variant == variant_axisymmetric) {
       
@@ -85,11 +85,11 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
       
       // plane stress and plane strain are the same
       // see equation 14.18 IFEM CH.14 sec 14.4.1 pag 14-11
-      gsl_matrix_set(mechanical.B, 0, 2*j+0, gsl_matrix_get(dhdx, j, 0));
-      gsl_matrix_set(mechanical.B, 1, 2*j+1, gsl_matrix_get(dhdx, j, 1));
+      feenox_lowlevel_matrix_set(mechanical.B, 0, 2*j+0, feenox_lowlevel_matrix_get(dhdx, j, 0));
+      feenox_lowlevel_matrix_set(mechanical.B, 1, 2*j+1, feenox_lowlevel_matrix_get(dhdx, j, 1));
     
-      gsl_matrix_set(mechanical.B, 2, 2*j+0, gsl_matrix_get(dhdx, j, 1));
-      gsl_matrix_set(mechanical.B, 2, 2*j+1, gsl_matrix_get(dhdx, j, 0));
+      feenox_lowlevel_matrix_set(mechanical.B, 2, 2*j+0, feenox_lowlevel_matrix_get(dhdx, j, 1));
+      feenox_lowlevel_matrix_set(mechanical.B, 2, 2*j+1, feenox_lowlevel_matrix_get(dhdx, j, 0));
 
     } else {
       return FEENOX_ERROR;
@@ -107,13 +107,13 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
       material_t *material = e->physical_group != NULL ? e->physical_group->material : NULL;
       double wh = e->w[v] * e->type->gauss[feenox.pde.mesh->integration].h[v][j];
       if (mechanical.f_x.defined) {
-        gsl_vector_add_to_element(feenox.pde.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, e->x[v], material));
+        feenox_lowlevel_vector_add_element_to_existing(feenox.pde.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, e->x[v], material));
       }  
       if (mechanical.f_y.defined) {
-        gsl_vector_add_to_element(feenox.pde.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, e->x[v], material));
+        feenox_lowlevel_vector_add_element_to_existing(feenox.pde.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, e->x[v], material));
       }
       if (mechanical.f_z.defined) {
-        gsl_vector_add_to_element(feenox.pde.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, e->x[v], material));
+        feenox_lowlevel_vector_add_element_to_existing(feenox.pde.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, e->x[v], material));
       }  
     }
   }

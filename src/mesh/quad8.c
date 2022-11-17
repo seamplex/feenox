@@ -101,27 +101,27 @@ int feenox_mesh_quad8_init(void) {
   
   // full integration: 3x3
   feenox_mesh_gauss_init_quad9(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 9);
+  feenox_check_alloc(element_type->gauss[integration_full].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 9));
 
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
     r[1] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][1];
     
     for (v = 0; v < 9; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_quad9_h(v, r));
+      feenox_lowlevel_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_quad9_h(v, r));
     }
   }
   
   // reduced integration: 2x2
   feenox_mesh_gauss_init_quad4(element_type, &element_type->gauss[integration_reduced]);
-  element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 4);
+  feenox_check_alloc(element_type->gauss[integration_reduced].extrap = feenox_lowlevel_matrix_calloc(element_type->nodes, 4));
   
   for (j = 0; j < element_type->nodes; j++) {
     r[0] = M_SQRT3 * element_type->node_coords[j][0];
     r[1] = M_SQRT3 * element_type->node_coords[j][1];
     
     for (v = 0; v < 4; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_quad4_h(v, r));
+      feenox_lowlevel_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_quad4_h(v, r));
     }
   }
   

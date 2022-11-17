@@ -63,7 +63,7 @@ int feenox_lowlevel_matrix_set(lowlevel_matrix_t *this, const size_t i, const si
 #endif
 }
 
-int feenox_lowlevel_matrix_add_to_existing(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
+int feenox_lowlevel_matrix_add_element_to_existing(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
 #ifdef HAVE_GSL
   return gsl_matrix_set(this, i, j, gsl_matrix_get(matrix,i,j) + value);
 #else
@@ -72,6 +72,14 @@ int feenox_lowlevel_matrix_add_to_existing(lowlevel_matrix_t *this, const size_t
 #endif
 }
 
+int feenox_lowlevel_vector_add_element_to_existing(lowlevel_vector_t *this, const size_t i, const double value) {
+#ifdef HAVE_GSL
+  return gsl_vector_set(this, i, gsl_vector_get(matrix,j) + value);
+#else
+  this->data[i] += value;
+  return FEENOX_OK;
+#endif
+}
 
 
 
