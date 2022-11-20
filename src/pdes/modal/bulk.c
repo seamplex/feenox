@@ -94,11 +94,12 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   }
 
   // elemental stiffness B'*C*B
+  // TODO: matTmatmatmult
   feenox_call(feenox_matmatmult(C, B, CB));
-  feenox_call(feenox_matTmatmult_add_to_existing(w, B, CB, feenox.pde.Ki));
+  feenox_call(feenox_matTmatmult_accum(w, B, CB, feenox.pde.Ki));
 
   // elemental mass H'*rho*H
-  feenox_call(feenox_matTmatmult_add_to_existing(w * rho, e->H[v], e->H[v], feenox.pde.Mi));
+  feenox_call(feenox_matTmatmult_accum(w * rho, e->H[v], e->H[v], feenox.pde.Mi));
   
   feenox_lowlevel_matrix_free(&B);
   feenox_lowlevel_matrix_free(&CB);

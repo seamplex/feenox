@@ -33,6 +33,14 @@ lowlevel_vector_t *feenox_lowlevel_vector_calloc(const size_t size) {
 #endif
 }
 
+int feenox_lowlevel_vector_set_zero(lowlevel_vector_t *b) {
+#ifdef HAVE_GSL
+  return gsl_vector_set_zero(b);
+#else
+  return FEENOX_OK;
+#endif
+}
+
 int feenox_lowlevel_vector_free(lowlevel_vector_t **this) {
 #ifdef HAVE_GSL
   return gsl_vector_free(*this);

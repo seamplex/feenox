@@ -25,9 +25,9 @@
 typedef struct {
   expr_t *expr;
   int dof;
-} feenox_gsl_function_of_uvw_params_t;
+} lowlevel_function_of_uvw_params_t;
 
-double feenox_gsl_function_of_uvw(double x, void *params);
+double feenox_lowlevel_function_of_uvw(double x, void *params);
 
 
 int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char *rhs) {
@@ -266,18 +266,18 @@ int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t 
     
   } else if (bc_data->type_phys == BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION) {
     
-    feenox_gsl_function_of_uvw_params_t params = { &bc_data->expr, -1 };
-    gsl_function F = {feenox_gsl_function_of_uvw, &params};
-    
+    lowlevel_function_of_uvw_params_t params = { &bc_data->expr, -1 };
+    lowlevel_function_t F = {feenox_lowlevel_function_of_uvw, &params};
+
     double coefficients[3] = {0, 0, 0};
 
     // TODO: choose
     double h = 1e-5;
     double result = 0;
-    double abserr = 0;
+    // TODO: dim?    
     for (int g = 0; g < 3; g++) {
       params.dof = g;
-      gsl_deriv_central(&F, 0, h, &result, &abserr);
+      feenox_lowlevel_derivative(&F, 0, h,&result);
       coefficients[g] = -result;
     }  
     
@@ -385,9 +385,9 @@ int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t *bc_dat
 }
 
 
-// esto sirve para calcular derivadas con GSL
-double feenox_gsl_function_of_uvw(double x, void *params) {
-  feenox_gsl_function_of_uvw_params_t *p = (feenox_gsl_function_of_uvw_params_t *)params;
+// wrapper for computing GSL-like derivatives
+double feenox_lowlevel_function_of_uvw(double x, void *params) {
+  lowlevel_function_of_uvw_params_t *p = (lowlevel_function_of_uvw_params_t *)params;
 
   feenox_var_value(mechanical.displ_for_bc[0]) = 0;
   feenox_var_value(mechanical.displ_for_bc[1]) = 0;
@@ -396,9 +396,11 @@ double feenox_gsl_function_of_uvw(double x, void *params) {
   
   double y = feenox_expression_eval(p->expr);
 
+#ifdef HAVE_GSL
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();
   }
+#endif
 
   return y;
 

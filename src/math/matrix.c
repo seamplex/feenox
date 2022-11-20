@@ -34,6 +34,14 @@ lowlevel_matrix_t *feenox_lowlevel_matrix_calloc(const size_t rows, const size_t
 #endif
 }
 
+int feenox_lowlevel_matrix_set_zero(lowlevel_matrix_t *A) {
+#ifdef HAVE_GSL
+  return gsl_matrix_set_zero(A);
+#else
+  return FEENOX_OK;
+#endif
+}
+
 int feenox_lowlevel_matrix_free(lowlevel_matrix_t **this) {
 #ifdef HAVE_GSL
   return gsl_matrix_free(*this);

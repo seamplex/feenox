@@ -30,14 +30,16 @@ struct linearize_params_t {
   function_t *function;
 };
 
+#ifdef HAVE_GSL
 double feenox_linearization_integrand_membrane(double t_prime, void *params);
 double feenox_linearization_integrand_bending(double t_prime, void *params);
 double feenox_linearization_integrate(gsl_function *F, function_t *function);
 int feenox_linearization_compute_and_store(function_t *total_function, const double x1[], const double x2[], double M, double MBplus, double MBminus, var_t *var_M, var_t *var_MB, var_t *var_P);
-
+#endif
   
 int feenox_instruction_linearize(void *arg) {
   
+#ifdef HAVE_GSL
   feenox_linearize_t *linearize = (feenox_linearize_t *)arg;
 
   // http://www.eng-tips.com/faqs.cfm?fid=982
@@ -183,10 +185,13 @@ int feenox_instruction_linearize(void *arg) {
    
   feenox_free(total_name);
 */
-  
+#endif
   return FEENOX_OK;
 }
 
+
+
+#ifdef HAVE_GSL
 double feenox_linearization_integrand_membrane(double t, void *params) {
   struct linearize_params_t *p = (struct linearize_params_t *)params;
   
@@ -264,3 +269,4 @@ int feenox_linearization_compute_and_store(function_t *total_function, const dou
   
   return FEENOX_OK;
 }
+#endif

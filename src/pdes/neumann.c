@@ -29,7 +29,7 @@ int feenox_problem_bc_natural_set(element_t *e, unsigned int v, double *value) {
     feenox_lowlevel_vector_set(feenox.pde.bn,  g, value[g]);
   }  
   double w = feenox_problem_bc_natural_weight(e, v);
-  feenox_call(feenox_matTvecmult_add_to_existing(w, e->H[v], feenox.pde.bn, feenox.pde.bi));
+  feenox_call(feenox_matTvecmult_accum(w, e->H[v], feenox.pde.bn, feenox.pde.bi));
 #endif
   
   return FEENOX_OK;

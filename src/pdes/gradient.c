@@ -26,7 +26,7 @@ int feenox_problem_gradient_compute(void) {
 #ifdef HAVE_PETSC
   
   if (feenox.pde.m2 == NULL) {
-    feenox_check_alloc(feenox.pde.m2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
+    feenox_check_alloc(feenox.pde.m2 = feenox_lowlevel_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
   }
   
   // the mesh for "rough" mode is different
@@ -87,8 +87,8 @@ int feenox_problem_gradient_compute(void) {
     // we now have the averages, now fill in the functions
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
-        feenox.pde.gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].dphidx, g, m);
-//        feenox.pde.delta_gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].delta_dphidx, g, m);
+        feenox.pde.gradient[g][m]->data_value[j] = feenox_lowlevel_matrix_get(mesh->node[j].dphidx, g, m);
+//        feenox.pde.delta_gradient[g][m]->data_value[j] = feenox_lowlevel_matrix_get(mesh->node[j].delta_dphidx, g, m);
       }
     }
     
@@ -125,10 +125,11 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
   // if already alloced, no need to realloc
   
   if (this->dphidx_node == NULL) {
-    feenox_check_alloc(this->dphidx_node = calloc(J, sizeof(gsl_matrix *)));
+    // I don't like this
+    feenox_check_alloc(this->dphidx_node = calloc(J, sizeof(lowlevel_matrix_t *)));
     unsigned int j = 0;
     for (j = 0; j < J; j++) {
-      feenox_check_alloc(this->dphidx_node[j] = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
+      feenox_check_alloc(this->dphidx_node[j] = feenox_lowlevel_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
     }  
   }
 
@@ -166,20 +167,20 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
   if (feenox.pde.gradient_evaluation == gradient_gauss_extrapolated && this->type->gauss[mesh->integration].extrap != NULL) {
     
     // extrapolation matrix to get the nodal values
-    gsl_vector *at_gauss = NULL;
-    feenox_check_alloc(at_gauss = gsl_vector_alloc(V));
-    gsl_vector *at_nodes = NULL;
-    feenox_check_alloc(at_nodes = gsl_vector_alloc(J));
+    lowlevel_vector_t *at_gauss = NULL;
+    feenox_check_alloc(at_gauss = feenox_lowlevel_vector_calloc(V));
+    lowlevel_vector_t *at_nodes = NULL;
+    feenox_check_alloc(at_nodes = feenox_lowlevel_vector_calloc(J));
     if (this->dphidx_gauss == NULL) {
-      feenox_check_alloc(this->dphidx_gauss = calloc(V, sizeof(gsl_matrix *)));
+      feenox_check_alloc(this->dphidx_gauss = calloc(V, sizeof(lowlevel_matrix_t *)));
     }  
     
     for (v = 0; v < V; v++) {
     
       if (this->dphidx_gauss[v] == NULL) {
-        feenox_check_alloc(this->dphidx_gauss[v] = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
+        feenox_check_alloc(this->dphidx_gauss[v] = feenox_lowlevel_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
       } else {
-        gsl_matrix_set_zero(this->dphidx_gauss[v]);
+        feenox_lowlevel_matrix_set_zero(this->dphidx_gauss[v]);
       }
       feenox_call(feenox_mesh_compute_dhdx_at_gauss(this, v, mesh->integration));
 
@@ -190,7 +191,7 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
         for (m = 0; m < feenox.pde.dim; m++) {
           for (j = 0; j < this->type->nodes; j++) {
             j_global = this->node[j]->index_mesh;
-            gsl_matrix_add_to_element(this->dphidx_gauss[v], g, m, gsl_matrix_get(this->dhdx[v], j, m) * mesh->node[j_global].phi[g]);
+            feenox_lowlevel_matrix_accum(this->dphidx_gauss[v], g, m, feenox_lowlevel_matrix_get(this->dhdx[v], j, m) * mesh->node[j_global].phi[g]);
           }
         }
       }
@@ -200,17 +201,17 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
         for (v = 0; v < V; v++) {
-          gsl_vector_set(at_gauss, v, gsl_matrix_get(this->dphidx_gauss[v], g, m));
+          feenox_lowlevel_vector_set(at_gauss, v, feenox_lowlevel_matrix_get(this->dphidx_gauss[v], g, m));
         }  
         
-        gsl_blas_dgemv(CblasNoTrans, 1.0, this->type->gauss[mesh->integration].extrap, at_gauss, 0, at_nodes);
+        feenox_call(feenox_matvecmult(this->type->gauss[mesh->integration].extrap, at_gauss, at_nodes));
         for (j = 0; j < J; j++) {
-          gsl_matrix_set(this->dphidx_node[j], g, m, gsl_vector_get(at_nodes, j));
+           feenox_call(feenox_lowlevel_matrix_set(this->dphidx_node[j], g, m, feenox_lowlevel_vector_get(at_nodes, j)));
         }
       }
     }
-    gsl_vector_free(at_gauss);
-    gsl_vector_free(at_nodes);
+    feenox_lowlevel_vector_free(&at_gauss);
+    feenox_lowlevel_vector_free(&at_nodes);
     
   } else {
 
@@ -226,17 +227,17 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
           den += 1.0;
           for (g = 0; g < feenox.pde.dofs; g++) {
             for (m = 0; m < feenox.pde.dim; m++) {
-              gsl_matrix_add_to_element(this->dphidx_node[j], g, m, gsl_matrix_get(this->dphidx_node[parent->index], g, m));
+              feenox_lowlevel_matrix_accum(this->dphidx_node[j], g, m, feenox_lowlevel_matrix_get(this->dphidx_node[parent->index], g, m));
             }  
           }
         }  
-        gsl_matrix_scale(this->dphidx_node[j], 1.0/den);          
+        feenox_lowlevel_matrix_scale(this->dphidx_node[j], 1.0/den);          
       
       } else {
         
         // direct evalution at the nodes
-        gsl_matrix *dhdx = NULL;
-        feenox_check_alloc(dhdx = gsl_matrix_calloc(J, feenox.pde.dim));
+        lowlevel_matrix_t *dhdx = NULL;
+        feenox_check_alloc(dhdx = feenox_lowlevel_matrix_calloc(J, feenox.pde.dim));
         feenox_call(feenox_mesh_compute_dhdx(this, this->type->node_coords[j], NULL, dhdx));
       
         // the derivatives of each dof g with respect to the coordinate mas nueve derivadas (o menos)
@@ -247,11 +248,11 @@ int feenox_problem_gradient_compute_at_element(element_t *this, mesh_t *mesh) {
           for (m = 0; m < feenox.pde.dim; m++) {
             for (j_local_prime = 0; j_local_prime < J; j_local_prime++) {
               j_global_prime = this->node[j_local_prime]->index_mesh;
-              gsl_matrix_add_to_element(this->dphidx_node[j], g, m, gsl_matrix_get(dhdx, j_local_prime, m) * mesh->node[j_global_prime].phi[g]);
+              feenox_lowlevel_matrix_accum(this->dphidx_node[j], g, m, feenox_lowlevel_matrix_get(dhdx, j_local_prime, m) * mesh->node[j_global_prime].phi[g]);
             }
           }
         }
-        gsl_matrix_free(dhdx);
+        feenox_lowlevel_matrix_free(&dhdx);
       }
     }
   }
@@ -272,9 +273,9 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   int found = 0;
       
   if (node->dphidx == NULL) {
-    feenox_check_alloc(node->dphidx = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
+    feenox_check_alloc(node->dphidx = feenox_lowlevel_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
   } else {
-    gsl_matrix_set_zero(node->dphidx);
+    feenox_lowlevel_matrix_set_zero(node->dphidx);
   }  
 /*  
   if (node->delta_dphidx == NULL) {
@@ -294,7 +295,7 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   unsigned int n = 0;
   element_t *element = NULL;
   element_ll_t *associated_element = NULL;
-  gsl_matrix_set_zero(feenox.pde.m2);
+  feenox_call(feenox_lowlevel_matrix_set_zero(feenox.pde.m2));
   LL_FOREACH(node->element_list, associated_element) {
     element = associated_element->element;
     if (element->dphidx_node != NULL) {
@@ -310,11 +311,11 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
           // derivative and uncertainties according to weldford
           for (g = 0; g < feenox.pde.dofs; g++) {
             for (m = 0; m < feenox.pde.dim; m++) {
-              mean = gsl_matrix_ptr(node->dphidx, g, m);
-              current = gsl_matrix_ptr(element->dphidx_node[j], g, m);
+              mean = feenox_lowlevel_matrix_get_ptr(node->dphidx, g, m);
+              current = feenox_lowlevel_matrix_get_ptr(element->dphidx_node[j], g, m);
               delta = *current - *mean;
               *mean += rel_weight * delta;
-              gsl_matrix_add_to_element(feenox.pde.m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
+              feenox_lowlevel_matrix_accum(feenox.pde.m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
 //              gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(feenox.pde.m2, g, m)/sum_weight));
             }
           }

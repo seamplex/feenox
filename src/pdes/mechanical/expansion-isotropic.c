@@ -28,10 +28,10 @@ int feenox_problem_build_compute_mechanical_strain_isotropic (const double *x, m
   double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
   double alpha_delta_T = alpha * delta_T;
   
-  gsl_vector_set(mechanical.et, 0, alpha_delta_T);
-  gsl_vector_set(mechanical.et, 1, alpha_delta_T);
+  feenox_lowlevel_vector_set(mechanical.et, 0, alpha_delta_T);
+  feenox_lowlevel_vector_set(mechanical.et, 1, alpha_delta_T);
   if (feenox.pde.dim > 2) {
-    gsl_vector_set(mechanical.et, 2, alpha_delta_T);
+    feenox_lowlevel_vector_set(mechanical.et, 2, alpha_delta_T);
   }
   
   return FEENOX_OK;
@@ -49,10 +49,10 @@ int feenox_problem_build_compute_mechanical_stress_isotropic (const double *x, m
     mechanical.compute_C(x, material);
   }
 
-  *sigmat_x = alpha_delta_T * (gsl_matrix_get(mechanical.C, 0, 0) + gsl_matrix_get(mechanical.C, 0, 1) + gsl_matrix_get(mechanical.C, 0, 2));
-  *sigmat_y = alpha_delta_T * (gsl_matrix_get(mechanical.C, 1, 0) + gsl_matrix_get(mechanical.C, 1, 1) + gsl_matrix_get(mechanical.C, 1, 2));
+  *sigmat_x = alpha_delta_T * (feenox_lowlevel_matrix_get(mechanical.C, 0, 0) + feenox_lowlevel_matrix_get(mechanical.C, 0, 1) + feenox_lowlevel_matrix_get(mechanical.C, 0, 2));
+  *sigmat_y = alpha_delta_T * (feenox_lowlevel_matrix_get(mechanical.C, 1, 0) + feenox_lowlevel_matrix_get(mechanical.C, 1, 1) + feenox_lowlevel_matrix_get(mechanical.C, 1, 2));
   if (feenox.pde.dofs > 2) {
-    *sigmat_z = alpha_delta_T * (gsl_matrix_get(mechanical.C, 2, 0) + gsl_matrix_get(mechanical.C, 2, 1) + gsl_matrix_get(mechanical.C, 2, 2));
+    *sigmat_z = alpha_delta_T * (feenox_lowlevel_matrix_get(mechanical.C, 2, 0) + feenox_lowlevel_matrix_get(mechanical.C, 2, 1) + feenox_lowlevel_matrix_get(mechanical.C, 2, 2));
   }  
   
   return FEENOX_OK;

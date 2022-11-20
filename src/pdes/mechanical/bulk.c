@@ -107,13 +107,13 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
       material_t *material = e->physical_group != NULL ? e->physical_group->material : NULL;
       double wh = e->w[v] * e->type->gauss[feenox.pde.mesh->integration].h[v][j];
       if (mechanical.f_x.defined) {
-        feenox_lowlevel_vector_add_element_to_existing(feenox.pde.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, e->x[v], material));
+        feenox_lowlevel_vector_accum(feenox.pde.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, e->x[v], material));
       }  
       if (mechanical.f_y.defined) {
-        feenox_lowlevel_vector_add_element_to_existing(feenox.pde.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, e->x[v], material));
+        feenox_lowlevel_vector_accum(feenox.pde.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, e->x[v], material));
       }
       if (mechanical.f_z.defined) {
-        feenox_lowlevel_vector_add_element_to_existing(feenox.pde.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, e->x[v], material));
+        feenox_lowlevel_vector_accum(feenox.pde.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, e->x[v], material));
       }  
     }
   }
@@ -121,8 +121,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
 
   // elemental stiffness B'*C*B
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mechanical.C, mechanical.B, 0, mechanical.CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], mechanical.B, mechanical.CB, 1.0, feenox.pde.Ki));
+  feenox_call(feenox_matmatmult(mechanical.C, mechanical.B, mechanical.CB));
+  feenox_call(feenox_matTmatmult_accum(e->w[v], mechanical.B, mechanical.CB, feenox.pde.Ki));
 
   // thermal expansion strain vector
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
@@ -132,8 +132,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     }
     mechanical.compute_thermal_strain(e->x[v], e->physical_group != NULL ? e->physical_group->material : NULL);
     
-    feenox_call(gsl_blas_dgemv(CblasTrans, 1.0, mechanical.C, mechanical.et, 0, mechanical.Cet));
-    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
+    feenox_call(feenox_matTvecmult(mechanical.C, mechanical.et, mechanical.Cet));
+    feenox_call(feenox_matTvecmult_accum(e->w[v], mechanical.B, mechanical.Cet, feenox.pde.bi));
   }
   
   // TODO: cleanup aux matrices C, B and CB
