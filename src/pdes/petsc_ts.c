@@ -136,34 +136,34 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
   
 //  static int count = 0;
   feenox_var_value(feenox_special_var(t)) = t;
-
+  
   if (feenox.pde.math_type == math_type_nonlinear) {
     feenox_call(feenox_problem_phi_to_solution(phi));
   }
-
+  
   // TODO: for time-dependent neumann BCs it should not be needed to re-build the whole matrix, just the RHS
   feenox_call(feenox_problem_build());
-  
+
   // TODO: be smart about this too
-  feenox_call(feenox_problem_dirichlet_eval());
+  feenox_call(feenox_problem_dirichlet_eval());  
 
   // compute the residual R(t,phi,phi_dot) = M*(phi_dot)_dirichlet + K*(phi)_dirichlet - b
   
   // TODO: store in a global temporary vector
   Vec tmp;
-  VecDuplicate(phi, &tmp);
+  petsc_call(VecDuplicate(phi, &tmp));
 
   // set dirichlet BCs on the time derivative and multiply by M
-  VecCopy(phi_dot, tmp);
+  petsc_call(VecCopy(phi_dot, tmp));
   feenox_call(feenox_problem_dirichlet_set_phi_dot(tmp));
   petsc_call(MatMult(feenox.pde.M, tmp, r));
   
   // set dirichlet BCs on the solution and multiply by K
-  VecCopy(phi, tmp);
+  petsc_call(VecCopy(phi, tmp));
   feenox_call(feenox_problem_dirichlet_set_phi(tmp));
 
   petsc_call(MatMultAdd(feenox.pde.K, tmp, r, r));
-  VecDestroy(&tmp);
+  petsc_call(VecDestroy(&tmp));
   
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
 
@@ -182,4 +182,5 @@ PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec phi, Vec phi_dot, Pets
   
   return FEENOX_OK;
 }
+
 #endif
