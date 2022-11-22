@@ -699,7 +699,10 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             }
           } else {
             int data[3] = {0,0,0};
-            feenox_call(feenox_gmsh_read_data_int(this, 3, data, binary));
+            if (feenox_gmsh_read_data_int(this, 3, data, binary) != FEENOX_OK) {
+              feenox_push_error_message("reading element block %ld out of %ld,", l+1, num_blocks);
+              return FEENOX_ERROR;
+            }
             dimension = data[0];
             geometrical = data[1];
             type = data[2];
