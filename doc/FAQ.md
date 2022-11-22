@@ -6,7 +6,7 @@ lang: en-US
 
 # What is FeenoX?
 
-It is "a free no-fee no-X uniX-like finite-element(ish) computational engineering tool."
+It is "cloud-first a free no-fee no-X uniX-like finite-element(ish) computational engineering tool."
 Essentially, a finite-element program with a particular design basis:
 
 > FeenoX is to finite-element programs and libraries what Markdown is to word processors (like Word) and typesetting systems (like TeX), respectively.
@@ -14,6 +14,7 @@ Essentially, a finite-element program with a particular design basis:
 In increasing order of complexity and comprehensiveness, these resources explain what [FeenoX](https://www.seamplex.com/feenox) is:
 
  * The [examples](https://www.seamplex.com/feenox/examples) will give a brief overview of what FeenoX can do.
+ * The [tutorials](https://www.seamplex.com/feenox/doc/tutorials) will walk your through how to use FeenoX to solve problems.
  * The [README](https://www.seamplex.com/feenox/) in the [GitHub repository](https://github.com/seamplex/feenox/) has a brief introduction (after explaining why).
  * There is also a [description](https://www.seamplex.com/feenox/doc/feenox-desc.html) in the [documentation](https://seamplex.com/feenox/doc/).
  * FeenoX is an "offer" to a fictitious "tender" for a computational tool. The RFQ is the [Software Requirements Specification](https://www.seamplex.com/feenox/doc/srs.pdf) and the explanation of how FeenoX addresses each requirement is the [Software Design Specification](https://www.seamplex.com/feenox/doc/srs.pdf).
