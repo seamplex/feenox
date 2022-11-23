@@ -144,7 +144,7 @@ int feenox_instruction_reaction(void *arg) {
     if (feenox.pde.dofs == 1) {
       feenox_var_value(reaction->scalar) = R[0];
     } else {
-      gsl_vector_set(reaction->vector->value, g, R[g]);
+      feenox_call(feenox_vector_set(reaction->vector, g, R[g]));
     }
     
     petsc_call(VecDestroy(&K_row_u[g]));

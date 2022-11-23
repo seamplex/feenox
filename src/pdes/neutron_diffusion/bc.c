@@ -79,7 +79,7 @@ int feenox_problem_bc_set_neutron_diffusion_vacuum(element_t *element, bc_data_t
   }
   
   double coeff = (bc_data->expr.items != NULL) ? feenox_expression_eval(&bc_data->expr) : 0.5;
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, element->w[v] * coeff, element->H[v], element->H[v], 1.0, feenox.pde.Ki));
+  feenox_call(feenox_matTmatmult_accum(element->w[v] * coeff, element->H[v], element->H[v], feenox.pde.Ki));
   
 #endif
   

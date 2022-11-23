@@ -46,7 +46,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
   // thermal stiffness matrix Bt*k*B
   double k = thermal.k.eval(&thermal.k, x, material);
-  feenox_call(feenox_matTmatmult_add_to_existing(w*k, e->B[v], e->B[v], feenox.pde.Ki));
+  feenox_call(feenox_matTmatmult_accum(w*k, e->B[v], e->B[v], feenox.pde.Ki));
   
   // volumetric heat source term Ht*q
   // TODO: total source Q
@@ -55,7 +55,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
     double q = thermal.q.eval(&thermal.q, x, material);
     // TODO: H*q as BLAS
     for (int j = 0; j < e->type->nodes; j++) {
-      feenox_lowlevel_vector_add_to_existing(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
+      feenox_lowlevel_vector_accum(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
     }
   }
   
@@ -69,14 +69,13 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       //       algebraic expression but as a pointwise function of T
       //       (but it works if using a property!)
       double dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
-      printf("%g\n", dkdT);
-      gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dkdT*T, e->B[v], e->B[v], 1.0, feenox.pde.JKi);      
+      feenox_call(feenox_matTmatmult_accum(w*dkdT*T, e->B[v], e->B[v], feenox.pde.JKi));      
     }
 
     if (thermal.temperature_dependent_source) {
       double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
       // mind the positive sign!
-      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, e->H[v], e->H[v], 1.0, feenox.pde.Jbi));
+      feenox_call(feenox_matTmatmult_accum(w*dqdT, e->H[v], e->H[v], feenox.pde.Jbi));
     }  
   }
     
@@ -94,7 +93,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       feenox_push_error_message("no heat capacity found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rhocp, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
+    feenox_call(feenox_matTmatmult_accum(w * rhocp, e->H[v], e->H[v], feenox.pde.Mi));
   }
   
 

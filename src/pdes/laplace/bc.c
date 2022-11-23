@@ -84,7 +84,7 @@ int feenox_problem_bc_set_laplace_derivative(element_t *element, bc_data_t *bc_d
     // TODO: axisymmetric
     double w = element->w[v];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, element->H[v], element->H[v], 1.0, feenox.pde.Jbi));
+    feenox_call(feenox_matTmatmult_accum(+w*dderivativedphi, element->H[v], element->H[v], feenox.pde.Jbi));
   }
   
 #endif

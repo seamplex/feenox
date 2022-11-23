@@ -38,12 +38,14 @@ int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
   PetscInt *l = NULL;
   feenox_check_alloc(l = calloc(feenox.pde.dofs, sizeof(PetscInt)));
   
-  gsl_matrix *c = NULL;
-  feenox_check_alloc(c = gsl_matrix_alloc(1, feenox.pde.dofs));
+  // TODO: avoid allocating each time
+  // TODO: measure with benchmark
+  lowlevel_matrix_t *c = NULL;
+  feenox_check_alloc(c = feenox_lowlevel_matrix_calloc(1, feenox.pde.dofs));
 
   for (int g = 0; g < feenox.pde.dofs; g++) {
     l[g] = feenox.pde.mesh->node[index].index_dof[g];
-    gsl_matrix_set(c, 0, g, coefficients[g]);
+    feenox_call(feenox_lowlevel_matrix_set(c, 0, g, coefficients[g]));
   }
   
   feenox.pde.multifreedom_indexes[feenox.pde.multifreedom_k] = l;
@@ -130,7 +132,7 @@ int feenox_problem_dirichlet_eval(void) {
     
     // if k == 0 this like freeing
     feenox_check_alloc(feenox.pde.multifreedom_indexes = realloc(feenox.pde.multifreedom_indexes, feenox.pde.n_multifreedom_nodes * sizeof(PetscInt *)));
-    feenox_check_alloc(feenox.pde.multifreedom_coefficients = realloc(feenox.pde.multifreedom_coefficients, feenox.pde.n_multifreedom_nodes * sizeof(gsl_matrix *)));
+    feenox_check_alloc(feenox.pde.multifreedom_coefficients = realloc(feenox.pde.multifreedom_coefficients, feenox.pde.n_multifreedom_nodes * sizeof(lowlevel_matrix_t *)));
   }
 
 #endif
@@ -203,17 +205,18 @@ int feenox_problem_dirichlet_set_K(void) {
   // add multifreedom constrains using the penalty method (before setting the rows to zero)
   // TODO: multi-freedom constrains with lagrange
   if (feenox.pde.n_multifreedom_nodes > 0) {
-    gsl_matrix *P = NULL;
-    feenox_check_alloc(P = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    lowlevel_matrix_t *P = NULL;
+    feenox_check_alloc(P = feenox_lowlevel_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     for (unsigned int k = 0; k < feenox.pde.n_multifreedom_nodes; k++) {
-      gsl_matrix *c = feenox.pde.multifreedom_coefficients[k];
+      lowlevel_matrix_t *c = feenox.pde.multifreedom_coefficients[k];
       PetscInt *l = feenox.pde.multifreedom_indexes[k];
 
-      gsl_matrix_set_zero(P);
-      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, feenox_var_value(feenox.pde.vars.penalty_weight), c, c, 0, P));
-      petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, gsl_matrix_ptr(P, 0, 0), ADD_VALUES));
+      feenox_lowlevel_matrix_set_zero(P);
+      feenox_call(feenox_matTmatmult(c, c, P));
+      feenox_call(feenox_lowlevel_matrix_scale(P, feenox_var_value(feenox.pde.vars.penalty_weight)));
+      petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, feenox_lowlevel_matrix_get_ptr(P), ADD_VALUES));
     }
-    gsl_matrix_free(P);
+    feenox_lowlevel_matrix_free(&P);
     petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
     petsc_call(MatAssemblyEnd(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
   }

@@ -35,15 +35,15 @@ int feenox_mesh_init_special_objects(void) {
 //va+x+desc Holder variable for spatial dependance of functions, such spatial distribution
 //va+x+desc of physical properties or results of partial differential equations.
   feenox_check_null(feenox.mesh.vars.x = feenox_get_or_define_variable_get_ptr("x"));
-  feenox_realloc_variable_ptr(feenox.mesh.vars.x, feenox_lowlevel_vector_get_ptr(feenox_value_ptr(feenox.mesh.vars.vec_x), 0), 0);
+  feenox_realloc_variable_ptr(feenox.mesh.vars.x, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(feenox.mesh.vars.vec_x), 0), 0);
 
 //va+y+desc Idem as `x`.
   feenox_check_null(feenox.mesh.vars.y = feenox_get_or_define_variable_get_ptr("y"));
-  feenox_realloc_variable_ptr(feenox.mesh.vars.y, feenox_lowlevel_vector_get_ptr(feenox_value_ptr(feenox.mesh.vars.vec_x), 1), 0);
+  feenox_realloc_variable_ptr(feenox.mesh.vars.y, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(feenox.mesh.vars.vec_x), 1), 0);
 
 //va+z+desc Idem as `x`.
   feenox_check_null(feenox.mesh.vars.z = feenox_get_or_define_variable_get_ptr("z"));
-  feenox_realloc_variable_ptr(feenox.mesh.vars.z, feenox_lowlevel_vector_get_ptr(feenox_value_ptr(feenox.mesh.vars.vec_x), 2), 0);
+  feenox_realloc_variable_ptr(feenox.mesh.vars.z, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(feenox.mesh.vars.vec_x), 2), 0);
 
 // y ya que estamos las ponemos en un array numerico
   feenox.mesh.vars.arr_x[0] = feenox.mesh.vars.x;
@@ -58,15 +58,15 @@ int feenox_mesh_init_special_objects(void) {
   
 //va+x+desc Holder variable for the local outward normal in surfaces.
   feenox_check_null(feenox.mesh.vars.nx = feenox_get_or_define_variable_get_ptr("nx"));
-  feenox_realloc_variable_ptr(feenox.mesh.vars.nx, feenox_lowlevel_vector_get_ptr(feenox_value_ptr(feenox.mesh.vars.vec_n), 0), 0);
+  feenox_realloc_variable_ptr(feenox.mesh.vars.nx, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(feenox.mesh.vars.vec_n), 0), 0);
 
 //va+y+desc Idem as `nx`.
   feenox_check_null(feenox.mesh.vars.ny = feenox_get_or_define_variable_get_ptr("ny"));
-  feenox_realloc_variable_ptr(feenox.mesh.vars.ny, feenox_lowlevel_vector_get_ptr(feenox_value_ptr(feenox.mesh.vars.vec_n), 1), 0);
+  feenox_realloc_variable_ptr(feenox.mesh.vars.ny, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(feenox.mesh.vars.vec_n), 1), 0);
 
 //va+z+desc Idem as `x`.
   feenox_check_null(feenox.mesh.vars.nz = feenox_get_or_define_variable_get_ptr("nz"));
-  feenox_realloc_variable_ptr(feenox.mesh.vars.nz, feenox_lowlevel_vector_get_ptr(feenox_value_ptr(feenox.mesh.vars.vec_n), 2), 0);
+  feenox_realloc_variable_ptr(feenox.mesh.vars.nz, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(feenox.mesh.vars.vec_n), 2), 0);
 
   feenox.mesh.vars.arr_n[0] = feenox.mesh.vars.nx;
   feenox.mesh.vars.arr_n[1] = feenox.mesh.vars.ny;

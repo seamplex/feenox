@@ -311,8 +311,8 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
           // derivative and uncertainties according to weldford
           for (g = 0; g < feenox.pde.dofs; g++) {
             for (m = 0; m < feenox.pde.dim; m++) {
-              mean = feenox_lowlevel_matrix_get_ptr(node->dphidx, g, m);
-              current = feenox_lowlevel_matrix_get_ptr(element->dphidx_node[j], g, m);
+              mean = feenox_lowlevel_matrix_get_ptr_ij(node->dphidx, g, m);
+              current = feenox_lowlevel_matrix_get_ptr_ij(element->dphidx_node[j], g, m);
               delta = *current - *mean;
               *mean += rel_weight * delta;
               feenox_lowlevel_matrix_accum(feenox.pde.m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));

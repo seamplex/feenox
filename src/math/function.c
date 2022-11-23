@@ -343,7 +343,7 @@ int feenox_function_init(function_t *this) {
         }
 
         if (this->data_argument[i] == NULL) {
-          this->data_argument[i] = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_argument[i]), 0);
+          this->data_argument[i] = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_argument[i]));
         }  
       }
 
@@ -355,7 +355,7 @@ int feenox_function_init(function_t *this) {
         return FEENOX_ERROR;
       }
       if (this->data_value == NULL) {
-        this->data_value = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_value), 0);
+        this->data_value = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_value));
       }
     }
     

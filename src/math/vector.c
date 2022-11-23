@@ -53,11 +53,19 @@ int feenox_lowlevel_vector_free(lowlevel_vector_t **this) {
   return FEENOX_OK;
 }
 
-double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this, const size_t i) {
+double *feenox_lowlevel_vector_get_ptr_i(lowlevel_vector_t *this, const size_t i) {
 #ifdef HAVE_GSL
   return gsl_vector_get_ptr(this, i);
 #else
   return &(this->data[i]);
+#endif
+}
+
+double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this) {
+#ifdef HAVE_GSL
+  return gsl_vector_get_ptr(this, 0);
+#else
+  return &(this->data[0]);
 #endif
 }
 

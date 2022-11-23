@@ -87,6 +87,10 @@ struct lowlevel_matrix_t {
 #define gsl_pow_2(x)      ((x)*(x))
 #define gsl_pow_3(x)      ((x)*(x)*(x))
 #define gsl_hypot3(a,b,c) sqrt((a)*(a)+(b)*(b)+(c)*(c))
+
+#define GSL_MAX(a,b) ((a) > (b) ? (a) : (b))
+#define GSL_MIN(a,b) ((a) < (b) ? (a) : (b))
+
 struct lowlevel_function_struct 
 {
   double (*function) (double x, void * params);
@@ -186,7 +190,6 @@ extern "C++" {
 #define DEFAULT_INTEGRATION_KEY            GSL_INTEG_GAUSS31
 
 #define DEFAULT_DERIVATIVE_STEP            (9.765625e-4)         // (1/2)^-10
-#define DEFAULT_CONDITION_THRESHOLD        (9.765625e-4)         // (1/2)^-10
 
 #define DEFAULT_FIT_MAX_ITER               100
 #define DEFAULT_FIT_XTOL                   1e-8
@@ -209,6 +212,7 @@ extern "C++" {
 // zero & infinite
 #define ZERO          (8.881784197001252323389053344727e-16)  // (1/2)^-50
 #define INFTY         (1125899906842624.0)                    // 2^50
+#define DEFAULT_CONDITION_THRESHOLD        (9.765625e-4)         // (1/2)^-10
 
 #define MESH_INF 1e22
 #define MESH_TOL 1e-6
@@ -2095,7 +2099,8 @@ extern int feenox_instruction_reaction(void *arg);
 extern lowlevel_matrix_t *feenox_lowlevel_matrix_calloc(const size_t rows, const size_t cols);
 extern int feenox_lowlevel_matrix_set_zero(lowlevel_matrix_t *A);
 extern int feenox_lowlevel_matrix_free(lowlevel_matrix_t **this);
-extern double *feenox_lowlevel_matrix_get_ptr(lowlevel_matrix_t *this, const size_t i, const size_t j);
+extern double *feenox_lowlevel_matrix_get_ptr(lowlevel_matrix_t *this);
+extern double *feenox_lowlevel_matrix_get_ptr_ij(lowlevel_matrix_t *this, const size_t i, const size_t j);
 extern double feenox_lowlevel_matrix_get(lowlevel_matrix_t *this, const size_t i, const size_t j);
 extern int feenox_lowlevel_matrix_set(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value);
 extern int feenox_lowlevel_matrix_accum(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value);
@@ -2107,7 +2112,8 @@ extern int feenox_matrix_init(matrix_t *);
 extern lowlevel_vector_t *feenox_lowlevel_vector_calloc(const size_t size);
 extern int feenox_lowlevel_vector_set_zero(lowlevel_vector_t *b);
 extern int feenox_lowlevel_vector_free(lowlevel_vector_t **this);
-extern double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this, const size_t i);
+extern double *feenox_lowlevel_vector_get_ptr_i(lowlevel_vector_t *this, const size_t i);
+extern double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this);
 extern double feenox_lowlevel_vector_get(lowlevel_vector_t *this, const size_t i);
 extern int feenox_lowlevel_vector_set(lowlevel_vector_t *this, const size_t i, const double value);
 extern int feenox_vector_init(vector_t *, int no_initial);
@@ -2176,7 +2182,9 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 
 // fem.c
 extern int feenox_lowlevel_matrix_scale(lowlevel_matrix_t *A, double alpha);
+extern int feenox_lowlevel_matrix_add(lowlevel_matrix_t *A, lowlevel_matrix_t *B);
 extern int feenox_matmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
+extern int feenox_matTmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
 extern int feenox_matTmatmult_accum(double weight, lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C);
 extern int feenox_matTvecmult_accum(double alpha, lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c);
 extern int feenox_matvecmult(lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c);

@@ -176,6 +176,15 @@ int feenox_matmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matri
 #endif
 }
 
+int feenox_matTmatmult(lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C)
+{
+#ifdef HAVE_GSL
+  return gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, A, B, 0, C);
+#else
+  return 0;
+#endif
+}
+
 int feenox_matTmatmult_accum(double alpha, lowlevel_matrix_t *A, lowlevel_matrix_t *B, lowlevel_matrix_t *C)
 {
 #ifdef HAVE_GSL
@@ -207,6 +216,15 @@ int feenox_matTvecmult_accum(double alpha, lowlevel_matrix_t *A, lowlevel_vector
 {
 #ifdef HAVE_GSL
   return gsl_blas_dgemv(CblasTrans, alpha, A, b, 1, c);
+#else
+  return 0;
+#endif
+}
+
+int feenox_lowlevel_matrix_add(lowlevel_matrix_t *A, lowlevel_matrix_t *B)
+{
+#ifdef HAVE_GSL
+  return gsl_matrix_sum(A, B);
 #else
   return 0;
 #endif

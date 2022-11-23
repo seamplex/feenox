@@ -60,7 +60,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node_t *n
   double k = thermal.k.eval(&thermal.k, node->x, element->physical_group->material);
   unsigned int m = 0;
   for (m = 0; m < feenox.pde.dim; m++) {
-    heat_flux = -k * gsl_matrix_get(element->dphidx_node[j], 0, m);
+    heat_flux = -k * feenox_lowlevel_matrix_get(element->dphidx_node[j], 0, m);
     node->flux[m] += rel_weight * (heat_flux - node->flux[m]);
   }
   

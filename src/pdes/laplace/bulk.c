@@ -41,7 +41,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   
   // laplace stiffness matrix Bt*B
   // note we don't allow any coefficient in the laplacian term
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, e->B[v], e->B[v], 1.0, feenox.pde.Ki));
+  feenox_call(feenox_matTmatmult_accum(w, e->B[v], e->B[v], feenox.pde.Ki));
 
   material_t *material = NULL;
   if (e->physical_group != NULL && e->physical_group->material != NULL) {
@@ -54,7 +54,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
     double f = laplace.f.eval(&laplace.f, x, material);
     unsigned int j = 0;
     for (j = 0; j < e->type->nodes; j++) {
-      gsl_vector_add_to_existing(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * f);
+      feenox_lowlevel_vector_accum(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * f);
     }
   }
   
@@ -72,7 +72,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_push_error_message("no alpha found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * alpha, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
+    feenox_call(feenox_matTmatmult_accum(w * alpha, e->H[v], e->H[v], feenox.pde.Mi));
   }
   
 

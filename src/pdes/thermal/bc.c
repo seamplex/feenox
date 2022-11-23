@@ -113,7 +113,7 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
     // TODO: axisymmetric
     double w = element->w[v];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dqdT, element->H[v], element->H[v], 1.0, feenox.pde.Jbi));
+    feenox_call(feenox_matTmatmult_accum(+w*dqdT, element->H[v], element->H[v], feenox.pde.Jbi));
   }
   
 #endif
@@ -161,11 +161,11 @@ int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_d
 
   // TODO: the h*T goes directly to the stiffness matrix
   // this is not efficient because if h depends on t or T we might need to re-build the whole K
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*h, element->H[v], element->H[v], 1.0, feenox.pde.Ki));
+  feenox_call(feenox_matTmatmult_accum(w*h, element->H[v], element->H[v], feenox.pde.Ki));
 
   // the h*Tref goes to b
-  gsl_vector_set(feenox.pde.Nb, 0, h*Tref);
-  feenox_call(gsl_blas_dgemv(CblasTrans, w, element->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi)); 
+  feenox_call(feenox_lowlevel_vector_set(feenox.pde.bn, 0, h*Tref));
+  feenox_call(feenox_matTvecmult_accum(w, element->H[v], feenox.pde.bn, feenox.pde.bi)); 
 
 #endif
   
