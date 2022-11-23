@@ -54,6 +54,22 @@ int feenox_lowlevel_matrix_free(lowlevel_matrix_t **this) {
   return FEENOX_OK;
 }
 
+double *feenox_lowlevel_matrix_get_ptr_ij(lowlevel_matrix_t *this, const size_t i, const size_t j) {
+#ifdef HAVE_GSL
+  return gsl_matrix_get_ptr(this, i, j);
+#else
+  return &(this->data[i*this->size1 + j]);
+#endif
+}
+
+double *feenox_lowlevel_matrix_get_ptr(lowlevel_matrix_t *this) {
+#ifdef HAVE_GSL
+  return gsl_matrix_get_ptr(this, 0, 0);
+#else
+  return this->data;
+#endif
+}
+
 double feenox_lowlevel_matrix_get(lowlevel_matrix_t *this, const size_t i, const size_t j) {
 #ifdef HAVE_GSL
   return gsl_matrix_get(this, i, j);

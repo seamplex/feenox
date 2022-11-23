@@ -65,7 +65,7 @@ double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this) {
 #ifdef HAVE_GSL
   return gsl_vector_get_ptr(this, 0);
 #else
-  return &(this->data[0]);
+  return this->data;
 #endif
 }
 
