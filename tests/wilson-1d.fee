@@ -1,0 +1,38 @@
+# 1d problem from
+# Gary L. Wilson, Roger A. Rydin & Seppo Orivuori (1988) A Comparison of Two
+# Efficient Nonlinear Heat Conduction Methodologies Using a Two-Dimensional Time-Dependent
+# Benchmark Problem, Nuclear Technology, 82:1, 94-105, DOI: 10.13182/NT88-A34120
+# http://dx.doi.org/10.13182/NT88-A34120
+
+PROBLEM thermal 1d
+READ_MESH wilson-1d.msh
+
+k(x) = 1 + 0.5*T(x)
+rhocp(x) = 1 + 0.5*T(x)
+
+BC left  q=1
+BC right T=limit(1e5*t,0,1)
+T_0(x) = 0
+
+end_time = 0.25
+
+# is there an analytical solution?
+FUNCTION T_left(t) INTERPOLATION steffen DATA {
+0.000 0.000
+0.025 0.171
+0.050 0.238
+0.075 0.288
+0.100 0.330
+0.125 0.366
+0.150 0.398
+0.175 0.427
+0.200 0.453
+0.225 0.478
+0.250 0.501
+}
+
+SOLVE_PROBLEM
+
+IF done
+ PRINT abs(T(0)-T_left(t))
+ENDIF

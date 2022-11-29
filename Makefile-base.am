@@ -65,7 +65,8 @@ TESTS = \
         tests/xfail-few-properties-ortho-young.sh \
         tests/xfail-few-properties-ortho-poisson.sh \
         tests/xfail-few-properties-ortho-shear.sh \
-        tests/uo2-pellet.sh
+        tests/uo2-pellet.sh \
+        tests/wilson.sh
 
 XFAIL_TESTS = tests/abort.sh \
               tests/thermal-slab-no-k.sh \

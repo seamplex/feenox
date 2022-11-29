@@ -1,0 +1,37 @@
+# 2d problem from
+# Gary L. Wilson, Roger A. Rydin & Seppo Orivuori (1988) A Comparison of Two
+# Efficient Nonlinear Heat Conduction Methodologies Using a Two-Dimensional Time-Dependent
+# Benchmark Problem, Nuclear Technology, 82:1, 94-105, DOI: 10.13182/NT88-A34120
+# http://dx.doi.org/10.13182/NT88-A34120
+
+PROBLEM thermal 2d
+READ_MESH wilson-2d.msh
+
+k(x,y) = 1 + 0.5*T(x,y)
+rhocp(x,y) = 1 + 0.5*T(x,y)
+
+BC heat q=1                PHYSICAL_GROUP left  PHYSICAL_GROUP bottom
+BC temp T=limit(1e5*t,0,1) PHYSICAL_GROUP right PHYSICAL_GROUP top
+T_0(x,y) = 0
+
+end_time = 17.25
+
+T_q1_ref = 2.3872
+T_q2_ref = 1.1972
+T_q3_ref = 1.5903
+T_q4_ref = 1.5903
+
+SOLVE_PROBLEM
+
+# PRINT t
+# WRITE_MESH wilson-2d-result.msh T
+
+IF done
+ INTEGRATE T OVER quadrant1 RESULT int_q1
+ INTEGRATE T OVER quadrant2 RESULT int_q2
+ INTEGRATE T OVER quadrant3 RESULT int_q3
+ INTEGRATE T OVER quadrant4 RESULT int_q4
+ area = 1.5^2
+
+ PRINT abs(int_q1/area-T_q1_ref)+abs(int_q2/area-T_q2_ref)+abs(int_q3/area-T_q3_ref)+abs(int_q4/area-T_q4_ref)
+ENDIF
