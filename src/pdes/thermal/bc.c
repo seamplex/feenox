@@ -164,7 +164,7 @@ int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_d
   feenox_call(feenox_matTmatmult_accum(w*h, element->H[v], element->H[v], feenox.pde.Ki));
 
   // the h*Tref goes to b
-  feenox_call(feenox_lowlevel_vector_set(feenox.pde.bn, 0, h*Tref));
+  feenox_lowlevel_vector_set(feenox.pde.bn, 0, h*Tref);
   feenox_call(feenox_matTvecmult_accum(w, element->H[v], feenox.pde.bn, feenox.pde.bi)); 
 
 #endif

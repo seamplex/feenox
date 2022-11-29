@@ -33,37 +33,37 @@ lowlevel_vector_t *feenox_lowlevel_vector_calloc(const size_t size) {
 #endif
 }
 
-int feenox_lowlevel_vector_set_zero(lowlevel_vector_t *b) {
+void feenox_lowlevel_vector_set_zero(lowlevel_vector_t *b) {
 #ifdef HAVE_GSL
-  return gsl_vector_set_zero(b);
+  gsl_vector_set_zero(b);
 #else
-  return FEENOX_OK;
 #endif
+  return;
 }
 
-int feenox_lowlevel_vector_free(lowlevel_vector_t **this) {
+void feenox_lowlevel_vector_free(lowlevel_vector_t **this) {
 #ifdef HAVE_GSL
-  return gsl_vector_free(*this);
+  gsl_vector_free(*this);
   *this = NULL;
 #else
   lowlevel_vector_t *b = *this;
   free(b->data);
   feenox_free(b);
 #endif
-  return FEENOX_OK;
+  return;
 }
 
-double *feenox_lowlevel_vector_get_ptr_i(lowlevel_vector_t *this, const size_t i) {
+double *feenox_lowlevel_vector_ptr_i(lowlevel_vector_t *this, const size_t i) {
 #ifdef HAVE_GSL
-  return gsl_vector_get_ptr(this, i);
+  return gsl_vector_ptr(this, i);
 #else
   return &(this->data[i]);
 #endif
 }
 
-double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this) {
+double *feenox_lowlevel_vector_ptr(lowlevel_vector_t *this) {
 #ifdef HAVE_GSL
-  return gsl_vector_get_ptr(this, 0);
+  return gsl_vector_ptr(this, 0);
 #else
   return this->data;
 #endif
@@ -77,22 +77,22 @@ double feenox_lowlevel_vector_get(lowlevel_vector_t *this, const size_t i) {
 #endif
 }
 
-int feenox_lowlevel_vector_set(lowlevel_vector_t *this, const size_t i, const double value) {
+void feenox_lowlevel_vector_set(lowlevel_vector_t *this, const size_t i, const double value) {
 #ifdef HAVE_GSL
-  return gsl_vector_set(this, i, value);
+  gsl_vector_set(this, i, value);
 #else
   this->data[i] = value;
-  return FEENOX_OK;
 #endif
+  return;
 }
 
-int feenox_lowlevel_vector_accum(lowlevel_vector_t *this, const size_t i, const double value) {
+void feenox_lowlevel_vector_accum(lowlevel_vector_t *this, const size_t i, const double value) {
 #ifdef HAVE_GSL
-  return gsl_vector_set(this, i, gsl_vector_get(this,i) + value);
+  gsl_vector_set(this, i, gsl_vector_get(this, i) + value);
 #else
   this->data[i] += value;
-  return FEENOX_OK;
 #endif
+  return;
 }
 
 

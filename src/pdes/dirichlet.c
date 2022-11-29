@@ -45,7 +45,7 @@ int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
 
   for (int g = 0; g < feenox.pde.dofs; g++) {
     l[g] = feenox.pde.mesh->node[index].index_dof[g];
-    feenox_call(feenox_lowlevel_matrix_set(c, 0, g, coefficients[g]));
+    feenox_lowlevel_matrix_set(c, 0, g, coefficients[g]);
   }
   
   feenox.pde.multifreedom_indexes[feenox.pde.multifreedom_k] = l;
@@ -214,7 +214,7 @@ int feenox_problem_dirichlet_set_K(void) {
       feenox_lowlevel_matrix_set_zero(P);
       feenox_call(feenox_matTmatmult(c, c, P));
       feenox_call(feenox_lowlevel_matrix_scale(P, feenox_var_value(feenox.pde.vars.penalty_weight)));
-      petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, feenox_lowlevel_matrix_get_ptr(P), ADD_VALUES));
+      petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, feenox_lowlevel_matrix_ptr(P), ADD_VALUES));
     }
     feenox_lowlevel_matrix_free(&P);
     petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));

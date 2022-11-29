@@ -26,7 +26,9 @@
 #include "pdes/available.h"
 
 #include <stdio.h>
+#ifdef HAVE_GSL
 #include <gsl/gsl_version.h>
+#endif
 
 #if HAVE_READLINE
 #include <readline/readline.h>
@@ -175,9 +177,13 @@ void feenox_longversion(void) {
   printf("Builder            : %s@%s\n", FEENOX_COMPILATION_USERNAME, FEENOX_COMPILATION_HOSTNAME);
 #endif  
   
+#ifdef HAVE_GSL
   printf("GSL version        : %s\n", gsl_version);
-  
-#if HAVE_SUNDIALS
+#else
+  printf("GSL version        : N/A\n");
+#endif
+
+#ifdef HAVE_SUNDIALS
   char *sundials_version = malloc(BUFFER_TOKEN_SIZE);
   SUNDIALSGetVersion(sundials_version, BUFFER_TOKEN_SIZE);
 #else

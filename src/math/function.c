@@ -24,7 +24,7 @@ const double zero[3] = {0, 0, 0};
 
 int feenox_cmp(const double a, const double b, const double eps) {
 #ifdef HAVE_GSL
-  retirm gsl_fcmp(a, b, eps);
+  return gsl_fcmp(a, b, eps);
 #else
   double delta = eps * ((fabs (a) > fabs (b)) ? a : b);
   double diff = a - b;
@@ -343,7 +343,7 @@ int feenox_function_init(function_t *this) {
         }
 
         if (this->data_argument[i] == NULL) {
-          this->data_argument[i] = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_argument[i]));
+          this->data_argument[i] = feenox_lowlevel_vector_ptr(&feenox_var_value(this->vector_argument[i]));
         }  
       }
 
@@ -355,7 +355,7 @@ int feenox_function_init(function_t *this) {
         return FEENOX_ERROR;
       }
       if (this->data_value == NULL) {
-        this->data_value = feenox_lowlevel_vector_get_ptr(&feenox_var_value(this->vector_value));
+        this->data_value = feenox_lowlevel_vector_ptr(&feenox_var_value(this->vector_value));
       }
     }
     

@@ -213,19 +213,19 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
 
   if (feenox.pde.has_stiffness)  {
-    petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_get_ptr(feenox.pde.Ki), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_ptr(feenox.pde.Ki), ADD_VALUES));
   }  
   if (feenox.pde.has_mass)  {
-    petsc_call(MatSetValues(feenox.pde.M, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_get_ptr(feenox.pde.Mi), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.M, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_ptr(feenox.pde.Mi), ADD_VALUES));
   }
   if (feenox.pde.has_jacobian_K) {
-    petsc_call(MatSetValues(feenox.pde.JK, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_get_ptr(feenox.pde.JKi), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.JK, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_ptr(feenox.pde.JKi), ADD_VALUES));
   }
   if (feenox.pde.has_jacobian_b) {
-    petsc_call(MatSetValues(feenox.pde.Jb, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_get_ptr(feenox.pde.Jbi), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.Jb, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_ptr(feenox.pde.Jbi), ADD_VALUES));
   }
   if (feenox.pde.has_rhs) {
-    petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, feenox_lowlevel_vector_get_ptr(feenox.pde.bi), ADD_VALUES));
+    petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, feenox_lowlevel_vector_ptr(feenox.pde.bi), ADD_VALUES));
   }
 
 #endif  
@@ -246,17 +246,17 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   if (feenox.pde.bn == NULL) {
     feenox_check_alloc(feenox.pde.bn = feenox_lowlevel_vector_calloc(feenox.pde.dofs));
   } else {
-    feenox_call(feenox_lowlevel_vector_set_zero(feenox.pde.bn));
+    feenox_lowlevel_vector_set_zero(feenox.pde.bn);
   }
 
   if (feenox.pde.has_rhs)   {
-    feenox_call(feenox_lowlevel_vector_set_zero(feenox.pde.bi));
+    feenox_lowlevel_vector_set_zero(feenox.pde.bi);
   }  
   if (bc_data->fills_matrix) {
-    feenox_call(feenox_lowlevel_matrix_set_zero(feenox.pde.Ki));
+    feenox_lowlevel_matrix_set_zero(feenox.pde.Ki);
   }
   if (feenox.pde.has_jacobian_b) {
-    feenox_call(feenox_lowlevel_matrix_set_zero(feenox.pde.Jbi));
+    feenox_lowlevel_matrix_set_zero(feenox.pde.Jbi);
   }
 
   for (unsigned int v = 0; v < V; v++) {
@@ -265,11 +265,11 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));
   if (feenox.pde.has_rhs == PETSC_TRUE) {
-    petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, feenox_lowlevel_vector_get_ptr(feenox.pde.bi), ADD_VALUES));
+    petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, this->l, feenox_lowlevel_vector_ptr(feenox.pde.bi), ADD_VALUES));
   }
   if (bc_data->fills_matrix) {
     petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, this->l,
-                                          feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_get_ptr(feenox.pde.Ki), ADD_VALUES));
+                                          feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_ptr(feenox.pde.Ki), ADD_VALUES));
   }
 /*
   if (feenox.pde.has_jacobian_K) {
@@ -277,7 +277,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   } 
 */
   if (feenox.pde.has_jacobian_b) {
-    petsc_call(MatSetValues(feenox.pde.Jb, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_get_ptr(feenox.pde.Jbi), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.Jb, feenox.pde.elemental_size, this->l, feenox.pde.elemental_size, this->l, feenox_lowlevel_matrix_ptr(feenox.pde.Jbi), ADD_VALUES));
   }
 
 #endif

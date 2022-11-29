@@ -30,6 +30,14 @@ exitifwrong() {
   fi  
 }  
 
+# checks if feenox is compiled with petsc and skips the test if necessary
+checkgsl() {
+ if [ $(${feenox} --versions | grep 'GSL' | grep -v 'N/A'| wc -l) = 0 ]; then
+  echo "FeenoX was not compiled with GNU GSL, skipping test"
+  exit 77
+ fi
+}
+
 # checks if feenox is compiled with ida and skips the test if necessary
 checkida() {
  if [ $(${feenox} --versions | grep 'SUNDIAL' | grep -v 'N/A'| wc -l) = 0 ]; then

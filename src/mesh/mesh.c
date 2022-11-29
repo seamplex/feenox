@@ -274,7 +274,7 @@ int feenox_instruction_mesh_read(void *arg) {
       }  
       function->vector_value->size = function->data_size;
       feenox_call(feenox_vector_init(function->vector_value, 1));
-      function->data_value = feenox_lowlevel_vector_get_ptr(feenox_value_ptr(function->vector_value));
+      function->data_value = feenox_lowlevel_vector_ptr(feenox_value_ptr(function->vector_value));
     }
   }
   

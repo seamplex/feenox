@@ -43,11 +43,11 @@ int feenox_instruction_alias(void *arg) {
         feenox_push_error_message("col %d greater than matrix size %dx%d in alias '%s'", col, alias->matrix->rows, alias->matrix->cols, alias->new_variable->name);
       }
       
-      feenox_realloc_variable_ptr(alias->new_variable, feenox_lowlevel_matrix_get_ptr_ij(feenox_value_ptr(alias->matrix), row, col), 0);
+      feenox_realloc_variable_ptr(alias->new_variable, feenox_lowlevel_matrix_ptr_ij(feenox_value_ptr(alias->matrix), row, col), 0);
       feenox_free(alias->new_variable->initial_static);
-      alias->new_variable->initial_static = feenox_lowlevel_matrix_get_ptr_ij(alias->matrix->initial_static, row, col);
+      alias->new_variable->initial_static = feenox_lowlevel_matrix_ptr_ij(alias->matrix->initial_static, row, col);
       feenox_free(alias->new_variable->initial_transient);
-      alias->new_variable->initial_transient = feenox_lowlevel_matrix_get_ptr_ij(alias->matrix->initial_transient, row, col);
+      alias->new_variable->initial_transient = feenox_lowlevel_matrix_ptr_ij(alias->matrix->initial_transient, row, col);
       
     } else if (alias->vector != NULL) {
       
@@ -58,11 +58,11 @@ int feenox_instruction_alias(void *arg) {
         feenox_push_error_message("subscript %d greater than vector size %d in alias '%s'", row, alias->vector->size, alias->new_variable->name);
       }
       
-      feenox_realloc_variable_ptr(alias->new_variable, feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(alias->vector), row), 0);
+      feenox_realloc_variable_ptr(alias->new_variable, feenox_lowlevel_vector_ptr_i(feenox_value_ptr(alias->vector), row), 0);
       feenox_free(alias->new_variable->initial_static);
-      alias->new_variable->initial_static = feenox_lowlevel_vector_get_ptr_i(alias->vector->initial_static, row);
+      alias->new_variable->initial_static = feenox_lowlevel_vector_ptr_i(alias->vector->initial_static, row);
       feenox_free(alias->new_variable->initial_transient);
-      alias->new_variable->initial_transient = feenox_lowlevel_vector_get_ptr_i(alias->vector->initial_transient, row);
+      alias->new_variable->initial_transient = feenox_lowlevel_vector_ptr_i(alias->vector->initial_transient, row);
       
     } else if (alias->variable != NULL) {
       

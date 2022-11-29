@@ -3581,7 +3581,7 @@ int feenox_parse_dump(void) {
 
 int feenox_parse_solve(void) {
 
-#ifndef HAVE_GNU
+#ifndef HAVE_GSL
   feenox_push_error_message("SOLVE keyword needs GNU Scientific Library");
   return FEENOX_ERROR;
 #endif

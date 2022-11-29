@@ -323,12 +323,13 @@ int feenox_mesh_point_in_prism(element_t *element, const double *x) {
     //here we define 3 tetrahedrons which compose the original prism
     //These tetrahedrons are (0,1,2,3), (4,3,5,1), (2,3,5,1)
   double zero, one, lambda1, lambda2, lambda3, lambda4;
-  feenox_lowlevel_vector *tetra_aux_index = feenox_lowlevel_vector_alloc(4);
+  gsl_vector *tetra_aux_index = gsl_vector_alloc(4);
   gsl_matrix *T = gsl_matrix_alloc(3, 3);
   gsl_vector *xx4 = gsl_vector_alloc(3);
   gsl_vector *lambda = gsl_vector_alloc(3);
   gsl_permutation *p = gsl_permutation_alloc(3);
-  int s, flag;
+//  int s, flag;
+  int s;
   int i, j, jj, jj_end;
   
   

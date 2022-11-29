@@ -9,6 +9,8 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+checkgsl
+
 answer powell.fee "0.000011 9.106146"
 exitifwrong $?
 

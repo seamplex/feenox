@@ -139,7 +139,7 @@ int feenox_instruction_fit(void *arg) {
   
 }
 
-#ifdef HAVEG_GSL
+#ifdef HAVE_GSL
 void feenox_fit_update_x(fit_t *this, size_t j) {
   unsigned int i = 0;
   for (i = 0; i < this->data->n_arguments; i++) {

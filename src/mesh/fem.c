@@ -224,13 +224,13 @@ int feenox_matTvecmult_accum(double alpha, lowlevel_matrix_t *A, lowlevel_vector
 int feenox_lowlevel_matrix_add(lowlevel_matrix_t *A, lowlevel_matrix_t *B)
 {
 #ifdef HAVE_GSL
-  return gsl_matrix_sum(A, B);
+  return gsl_matrix_add(A, B);
 #else
   return 0;
 #endif
 }
 
-int feenox_lowlevel_derivative(const lowlevel_function_t *f, double *x, double h, double *result) {
+int feenox_lowlevel_derivative(const lowlevel_function_t *f, double x, double h, double *result) {
 #ifdef HAVE_GSL
   double abserr = 0;
   return gsl_deriv_central(f, x, h, result, &abserr);

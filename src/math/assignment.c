@@ -352,12 +352,12 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
       feenox_vector_init(assignment->vector, 0);
     }
     
-    current = feenox_lowlevel_vector_get_ptr_i(feenox_value_ptr(assignment->vector), row);
+    current = feenox_lowlevel_vector_ptr_i(feenox_value_ptr(assignment->vector), row);
     if (assignment->vector->initial_static != NULL) {
-      initial_static = feenox_lowlevel_vector_get_ptr_i(assignment->vector->initial_static, row);
+      initial_static = feenox_lowlevel_vector_ptr_i(assignment->vector->initial_static, row);
     }
     if (assignment->vector->initial_transient != NULL) {
-      initial_transient = feenox_lowlevel_vector_get_ptr_i(assignment->vector->initial_transient, row);
+      initial_transient = feenox_lowlevel_vector_ptr_i(assignment->vector->initial_transient, row);
     } 
     
     assigned_zero = assignment->vector->assigned_zero;
@@ -370,12 +370,12 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
       feenox_matrix_init(assignment->matrix);
     }
     
-    current = feenox_lowlevel_matrix_get_ptr_ij(feenox_value_ptr(assignment->matrix), row, col);
+    current = feenox_lowlevel_matrix_ptr_ij(feenox_value_ptr(assignment->matrix), row, col);
     if (assignment->matrix->initial_static != NULL) {
-      initial_static = feenox_lowlevel_matrix_get_ptr_ij(assignment->matrix->initial_static, row, col);
+      initial_static = feenox_lowlevel_matrix_ptr_ij(assignment->matrix->initial_static, row, col);
     }
     if (assignment->matrix->initial_transient != NULL) {
-      initial_transient = feenox_lowlevel_matrix_get_ptr_ij(assignment->matrix->initial_transient, row, col);
+      initial_transient = feenox_lowlevel_matrix_ptr_ij(assignment->matrix->initial_transient, row, col);
     }
 
     assigned_zero = assignment->vector->assigned_zero;

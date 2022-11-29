@@ -34,37 +34,37 @@ lowlevel_matrix_t *feenox_lowlevel_matrix_calloc(const size_t rows, const size_t
 #endif
 }
 
-int feenox_lowlevel_matrix_set_zero(lowlevel_matrix_t *A) {
+void feenox_lowlevel_matrix_set_zero(lowlevel_matrix_t *A) {
 #ifdef HAVE_GSL
-  return gsl_matrix_set_zero(A);
+  gsl_matrix_set_zero(A);
 #else
-  return FEENOX_OK;
+  return;
 #endif
 }
 
-int feenox_lowlevel_matrix_free(lowlevel_matrix_t **this) {
+void feenox_lowlevel_matrix_free(lowlevel_matrix_t **this) {
 #ifdef HAVE_GSL
-  return gsl_matrix_free(*this);
+  gsl_matrix_free(*this);
   *this = NULL;
 #else
   lowlevel_matrix_t *A = *this;
   free(A->data);
   feenox_free(A);
 #endif
-  return FEENOX_OK;
+  return;
 }
 
-double *feenox_lowlevel_matrix_get_ptr_ij(lowlevel_matrix_t *this, const size_t i, const size_t j) {
+double *feenox_lowlevel_matrix_ptr_ij(lowlevel_matrix_t *this, const size_t i, const size_t j) {
 #ifdef HAVE_GSL
-  return gsl_matrix_get_ptr(this, i, j);
+  return gsl_matrix_ptr(this, i, j);
 #else
   return &(this->data[i*this->size1 + j]);
 #endif
 }
 
-double *feenox_lowlevel_matrix_get_ptr(lowlevel_matrix_t *this) {
+double *feenox_lowlevel_matrix_ptr(lowlevel_matrix_t *this) {
 #ifdef HAVE_GSL
-  return gsl_matrix_get_ptr(this, 0, 0);
+  return gsl_matrix_ptr(this, 0, 0);
 #else
   return this->data;
 #endif
@@ -78,31 +78,31 @@ double feenox_lowlevel_matrix_get(lowlevel_matrix_t *this, const size_t i, const
 #endif
 }
 
-int feenox_lowlevel_matrix_set(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
+void feenox_lowlevel_matrix_set(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
 #ifdef HAVE_GSL
-  return gsl_matrix_set(this, i, j, value);
+  gsl_matrix_set(this, i, j, value);
 #else
   this->data[i*this->size1 + j] = value;
-  return FEENOX_OK;
 #endif
+  return;
 }
 
-int feenox_lowlevel_matrix_accum(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
+void feenox_lowlevel_matrix_accum(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value) {
 #ifdef HAVE_GSL
-  return gsl_matrix_set(this, i, j, gsl_matrix_get(matrix,i,j) + value);
+  gsl_matrix_set(this, i, j, gsl_matrix_get(this, i, j) + value);
 #else
   this->data[i*this->size1 + j] += value;
-  return FEENOX_OK;
 #endif
+  return;
 }
 
-int feenox_lowlevel_vector_add_element_to_existing(lowlevel_vector_t *this, const size_t i, const double value) {
+void feenox_lowlevel_vector_add_element_to_existing(lowlevel_vector_t *this, const size_t i, const double value) {
 #ifdef HAVE_GSL
-  return gsl_vector_set(this, i, gsl_vector_get(matrix,j) + value);
+  gsl_vector_set(this, i, gsl_vector_get(this, i) + value);
 #else
   this->data[i] += value;
-  return FEENOX_OK;
 #endif
+  return;
 }
 
 
