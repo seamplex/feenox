@@ -194,7 +194,7 @@ int feenox_problem_setup_pc_neutron_diffusion(PC pc) {
     if (neutron_diffusion.has_sources == 0) {
       // PC for EPS
 #ifdef PETSC_HAVE_MUMPS
-      petsc_call(PCSetType(pc, PCCHOLESKY));
+      petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
       petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #else
       // TODO: this will complain in parallel

@@ -313,7 +313,8 @@ int feenox_problem_init_runtime_thermal(void) {
   feenox.pde.has_jacobian_b = (thermal.temperature_dependent_source || thermal.temperature_dependent_bc);
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
   
-  feenox.pde.symmetric_K = 1;
+  // if the conductivity depends on temperature the jacobian is not symmetric
+  feenox.pde.symmetric_K = !thermal.temperature_dependent_stiffness;
   feenox.pde.symmetric_M = 1;
   
   

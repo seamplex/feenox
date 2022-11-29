@@ -10,7 +10,7 @@ for i in  ../feenox ../src/feenox ./feenox ./src/feenox ../../../bin/feenox /usr
   fi
 done
 if [ -z "${feenox}" ]; then
-  echo "could not find feenox executable"
+  echo "error: could not find feenox executable"
   exit 1
 fi
 
@@ -104,7 +104,7 @@ answer() {
 answerdiff() {
   echo -n "${1} ... "
   base=$(basename ${1} .fee)
-  ${feenox} ${dir}/${1} > ${dir}/${base}.last
+  ${feenox} ${dir}/${1} | sed 's/-0.0000/0.0000/g' > ${dir}/${base}.last
   error=$?
   
   difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
@@ -178,6 +178,57 @@ answerzero() {
   return ${level}
 }
 
+
+answerzero1() {
+  echo -n "${1} ${2}... "
+  answer=$(${feenox} ${dir}/${1} ${2})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    return 2
+  fi
+
+  if [ -z "${3}" ]; then
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")
+  else  
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" "${3}")
+  fi  
+  if [ "${result}" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected zero and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
+
+answerzero2() {
+  echo -n "${1} ${2} ${3}... "
+  answer=$(${feenox} ${dir}/${1} ${2} ${3})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    return 2
+  fi
+
+  if [ -z "${4}" ]; then
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")
+  else  
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" "${4}")
+  fi  
+  if [ "${result}" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected zero and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
 
 answer1() {
   echo -n "${1} ${2} ... "

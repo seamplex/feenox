@@ -41,4 +41,4 @@ output
 rectangular_plate_with_hole.msh
 rectangular_plate_with_hole.vtk
 statically_indeterminate_reaction.msh
-long-bar*.msh
+long-bar-*.msh

@@ -140,7 +140,6 @@
 
  * parallel runs
  * convection with a separate matrix? think!
- * jacobians for non-linear problems
  * explain that radiation is better off as an expression
  * same for total heat sources/bcs
  * orthotropic conductivity

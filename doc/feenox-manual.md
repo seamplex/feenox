@@ -1,6 +1,6 @@
 ---
 title: FeenoX manual
-subtitle: A free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+subtitle: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 author: Jeremy Theler
 infoname: feenox
 lang: en-US

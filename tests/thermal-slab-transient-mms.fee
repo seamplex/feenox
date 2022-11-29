@@ -1,0 +1,25 @@
+READ_MESH slab.msh
+PROBLEM thermal DIMENSIONS 1 DIRICHLET_SCALING relative 1
+
+end_time = 1
+T_0(x) = 0
+BC left  T=0
+BC right T=0
+
+T_mms(x,t) = sin(pi*x)*t
+q_mms(x) = sin(pi*x)*(1+pi^2*t)
+k_mms(x) = 1+T_mms(x,t)
+rhocp_mms(x) = 1+T_mms(x,t)
+
+k(x) = 1+T(x)
+rhocp(x) = 1+T(x)
+
+
+VAR x' x'' t'
+q(x) = -derivative(k_mms(x') * derivative(T_mms(x'',t), x'', x'), x', x) + rhocp_mms(x)*derivative(T_mms(x,t'),t',t)
+
+SOLVE_PROBLEM
+
+IF done
+  PRINT T(0.5)-T_mms(0.5,end_time)
+ENDIF

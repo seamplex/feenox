@@ -201,9 +201,11 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
   
   // loop over gauss points to integrate elemental matrices and vectors
+  // TODO: loop inside the builder
   int V = this->type->gauss[feenox.pde.mesh->integration].V;
   for (int v = 0; v < V; v++) {
     // this is a virtual method that depends on the problem type
+    // TODO: hardcode the name of the method to allow inlining with LTO
     feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, v));
   }
  

@@ -1,8 +1,8 @@
 ---
 title: FeenoX
-subtitle: A free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+subtitle: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 titleblock: |
- FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+ FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
  =======================================================================================
 lang: en-US
 number-sections: true

@@ -25,8 +25,6 @@ int feenox_problem_solve_petsc_nonlinear(void) {
 
 #ifdef HAVE_PETSC
   
-  SNESConvergedReason reason;
-  
   if (feenox.pde.snes == NULL) {
     // TODO: move to a separate function
     petsc_call(SNESCreate(PETSC_COMM_WORLD, &feenox.pde.snes));
@@ -48,6 +46,7 @@ int feenox_problem_solve_petsc_nonlinear(void) {
   petsc_call(SNESSolve(feenox.pde.snes, NULL, feenox.pde.phi));
   
   // check convergence
+  SNESConvergedReason reason;
   petsc_call(SNESGetConvergedReason(feenox.pde.snes, &reason));
   if (reason < 0) {
     feenox_push_error_message("PETSc's non-linear solver did not converge with reason '%s' (%d)", SNESConvergedReasons[reason], reason);
@@ -93,8 +92,8 @@ int feenox_problem_setup_snes(SNES snes) {
                                      PETSC_DEFAULT));
   
   petsc_call(SNESSetFromOptions(snes));
-  // TODO: this one also complains 
-//  petsc_call(SNESSetUp(snes));
+  // TODO: this call complains about DM (?) in thermal-slab-transient.fee 
+  // petsc_call(SNESSetUp(snes));
   
   // customize ksp (and pc)---this needs to come after setting the jacobian
   KSP ksp;
@@ -104,7 +103,8 @@ int feenox_problem_setup_snes(SNES snes) {
   return FEENOX_OK;
 }  
 
-PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
+/*
+PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
 
   feenox_call(feenox_problem_phi_to_solution(phi));
   feenox_call(feenox_problem_build());
@@ -125,19 +125,36 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r,void *ctx) {
   // set dirichlet BCs on the residual
   feenox_call(feenox_problem_dirichlet_set_r(r, phi));
 
-/*  
-  printf("solution\n");
-  VecView(phi, PETSC_VIEWER_STDOUT_WORLD);
+  return FEENOX_OK;
+}  
+*/
 
-  printf("solution with BC\n");
-  VecView(feenox.pde.phi_bc, PETSC_VIEWER_STDOUT_WORLD);
+
+PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
+  // set dirichlet BCs on the solution
+  if (feenox.pde.phi_bc == NULL) {
+    feenox_check_alloc(feenox.pde.phi_bc = feenox_problem_create_vector("phi_bc"));
+  }
+  feenox_call(feenox_problem_dirichlet_eval());  
+  feenox_call(VecCopy(phi, feenox.pde.phi_bc));
+  feenox_call(feenox_problem_dirichlet_set_phi(feenox.pde.phi_bc));
+
+  // build the jacobian
+  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi_bc));
+  feenox_call(feenox_problem_build());
   
-  printf("residual\n");
-  VecView(r, PETSC_VIEWER_STDOUT_WORLD);
- */
+  // multiply  K by phi_bc
+  petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
+  
+  // subtract b
+  petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
+  
+  // set dirichlet BCs on the residual
+  feenox_call(feenox_problem_dirichlet_set_r(r, phi));
 
   return FEENOX_OK;
 }
+
 
 PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *ctx) {
   

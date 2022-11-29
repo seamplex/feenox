@@ -22,6 +22,7 @@
 #include "feenox.h"
 #include "thermal.h"
 
+// TODO: put the gauss loop inside this call so we can cache number of nodes, etc
 int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned int v) {
 
 #ifdef HAVE_PETSC
@@ -45,6 +46,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   }
 
   // thermal stiffness matrix Bt*k*B
+  // if k depends on T then there should be a more efficient way of evaluating k
   double k = thermal.k.eval(&thermal.k, x, material);
   feenox_call(feenox_matTmatmult_accum(w*k, e->B[v], e->B[v], feenox.pde.Ki));
   
@@ -60,16 +62,34 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   }
   
   if (feenox.pde.has_jacobian) {
-    // TODO: hint the interpolation with the current element
-    double T = feenox_function_eval(feenox.pde.solution[0], x);
-    
-    // TODO: this is not working as expected
+    gsl_matrix *local_vec_T = NULL;
+    int nodes = e->type->nodes;
+    feenox_check_alloc(local_vec_T = gsl_matrix_calloc(nodes, 1));
+    double T = 0;
+    double Tj = 0;
+    for (int j = 0; j < nodes; j++) {
+      Tj = feenox.pde.solution[0]->data_value[e->node[j]->index_dof[0]];
+      gsl_matrix_set(local_vec_T, j, 0, Tj);
+      T += gsl_matrix_get(e->H[v], 0, j) * Tj; 
+    }  
+
     if (thermal.temperature_dependent_stiffness) {
-      // TODO: this might not work if the distribution is not given as an
-      //       algebraic expression but as a pointwise function of T
-      //       (but it works if using a property!)
       double dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
-      feenox_call(feenox_matTmatmult_accum(w*dkdT*T, e->B[v], e->B[v], feenox.pde.JKi));      
+      gsl_matrix *TH = gsl_matrix_calloc(nodes, nodes);
+      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, local_vec_T, e->H[v], 1, TH);
+
+      // add a convenience function, mind the allocation
+      gsl_matrix *BtB = gsl_matrix_calloc(nodes, nodes);
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, e->B[v], e->B[v], 1, BtB);
+
+      // debug
+      gsl_matrix *BtBTH = gsl_matrix_calloc(nodes, nodes);
+      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, BtB, TH, 1, BtBTH);
+//      printf("element %ld gauss %d\n", e->tag, v);
+//      feenox_debug_print_gsl_matrix(BtBTH, stdout);
+//      printf("\n");
+
+      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, w*dkdT, BtB, TH, 1, feenox.pde.JKi);
     }
 
     if (thermal.temperature_dependent_source) {

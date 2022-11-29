@@ -35,6 +35,9 @@ exitifwrong $?
 answerzero thermal-slab-uniform-source.fee
 exitifwrong $?
 
+answerzero thermal-slab-transient-mms.fee 2e-3
+exitifwrong $?
+
 answer thermal-slab-uniform-source-dirichlet-neumann.fee "0.100"
 exitifwrong $?
 
