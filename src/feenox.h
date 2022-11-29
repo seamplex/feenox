@@ -2116,6 +2116,7 @@ extern double *feenox_lowlevel_vector_get_ptr_i(lowlevel_vector_t *this, const s
 extern double *feenox_lowlevel_vector_get_ptr(lowlevel_vector_t *this);
 extern double feenox_lowlevel_vector_get(lowlevel_vector_t *this, const size_t i);
 extern int feenox_lowlevel_vector_set(lowlevel_vector_t *this, const size_t i, const double value);
+extern int feenox_lowlevel_vector_accum(lowlevel_vector_t *this, const size_t i, const double value);
 extern int feenox_vector_init(vector_t *, int no_initial);
 extern int feenox_instruction_sort_vector(void *arg);
 extern double feenox_vector_get(vector_t *, const size_t i);
@@ -2189,8 +2190,6 @@ extern int feenox_matTmatmult_accum(double weight, lowlevel_matrix_t *A, lowleve
 extern int feenox_matTvecmult_accum(double alpha, lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c);
 extern int feenox_matvecmult(lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c);
 extern int feenox_matTvecmult(lowlevel_matrix_t *A, lowlevel_vector_t *b, lowlevel_vector_t *c);
-extern int feenox_lowlevel_matrix_accum(lowlevel_matrix_t *this, const size_t i, const size_t j, const double value);
-extern int feenox_lowlevel_vector_accum(lowlevel_vector_t *this, const size_t i, const double value);
 extern int feenox_lowlevel_derivative(const lowlevel_function_t *f, double *x, double h, double *result);
 
 extern double feenox_mesh_determinant(lowlevel_matrix_t *this);

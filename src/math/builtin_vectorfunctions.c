@@ -21,7 +21,7 @@
  */
 #include "feenox.h"
 
-
+#ifdef HAVE_GSL
 double feenox_builtin_vecdot(vector_t **);
 double feenox_builtin_vecnorm(vector_t **);
 double feenox_builtin_vecmin(vector_t **);
@@ -190,3 +190,4 @@ double feenox_builtin_vecdot(vector_t **arg) {
   return s;
 }
 
+#endif

@@ -88,27 +88,27 @@ builtin_function_t *feenox_get_builtin_function_ptr(const char *name) {
 }
 
 builtin_vectorfunction_t *feenox_get_builtin_vectorfunction_ptr(const char *name) {
-  int i;
+#ifdef HAVE_GSL
 
-  for (i = 0; i < N_BUILTIN_VECTOR_FUNCTIONS; i++) {
+  for (int i = 0; i < N_BUILTIN_VECTOR_FUNCTIONS; i++) {
     if (strcmp(name, builtin_vectorfunction[i].name) == 0) {
       return &builtin_vectorfunction[i];
     }
   }
-
+#endif
+  
   return NULL;
 
 }
 
 builtin_functional_t *feenox_get_builtin_functional_ptr(const char *name) {
-  int i;
-
-  for (i = 0; i < N_BUILTIN_FUNCTIONALS; i++) {
+#ifdef HAVE_GSL
+  for (int i = 0; i < N_BUILTIN_FUNCTIONALS; i++) {
     if (strcmp(name, builtin_functional[i].name) == 0) {
       return &builtin_functional[i];
     }
   }
-  
+#endif  
   return NULL;
 
 }

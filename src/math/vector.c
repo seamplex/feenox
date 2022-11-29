@@ -86,6 +86,15 @@ int feenox_lowlevel_vector_set(lowlevel_vector_t *this, const size_t i, const do
 #endif
 }
 
+int feenox_lowlevel_vector_accum(lowlevel_vector_t *this, const size_t i, const double value) {
+#ifdef HAVE_GSL
+  return gsl_vector_set(this, i, gsl_vector_get(this,i) + value);
+#else
+  this->data[i] += value;
+  return FEENOX_OK;
+#endif
+}
+
 
 double feenox_vector_get(vector_t *this, const size_t i) {
 

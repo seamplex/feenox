@@ -354,6 +354,8 @@ Either install them with your package manager or configure with --enable-downloa
   AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR([GNU Scientific library CBLAS libgsl-dev not found]))
  #)
  AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library libgsl-dev not found]))
+ AC_DEFINE(HAVE_GSL)
+
  gsl_version="from system"
 ])
 

@@ -512,11 +512,15 @@ double feenox_builtin_acos(expr_item_t *f) {
 ///fn+j0+math J_0(x)
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument\ $x$.
 ///fn+j0+plotx 0 10 0.05
-#ifdef HAVE_GSL
 double feenox_builtin_j0(expr_item_t *f) {
+#ifdef HAVE_GSL
   return gsl_sf_bessel_J0(feenox_expression_eval(&f->arg[0]));
-}
+#else
+  feenox_push_error_message("j0 needs GSL");
+  feenox_runtime_error();
+  return 0;
 #endif
+}
 
 ///fn+cos+usage cos(x)
 ///fn+cos+math \cos(x)
@@ -600,8 +604,8 @@ double feenox_builtin_exp(expr_item_t *f) {
 ///fn+expint1+usage expint1(x)
 ///fn+expint1+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]
 ///fn+expint1+plotx 1e-2 2.0 1e-2
-#ifdef HAVE_GSL
 double feenox_builtin_expint1(expr_item_t *f) {
+#ifdef HAVE_GSL
   double x = feenox_expression_eval(&f->arg[0]);
 
   if (x == 0) {
@@ -610,6 +614,11 @@ double feenox_builtin_expint1(expr_item_t *f) {
   }
 
   return gsl_sf_expint_E1(x);
+#else
+  feenox_push_error_message("expint1 needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif
 }
 
 ///fn+expint2+desc Computes the second exponential integral function of the argument\ $x$.
@@ -617,7 +626,13 @@ double feenox_builtin_expint1(expr_item_t *f) {
 ///fn+expint2+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]
 ///fn+expint2+plotx 0.0 2.0 1e-2
 double feenox_builtin_expint2(expr_item_t *f) {
+#ifdef HAVE_GSL
   return gsl_sf_expint_E2(feenox_expression_eval(&f->arg[0]));
+#else
+  feenox_push_error_message("expint2 needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif  
 }
 
 ///fn+expint3+desc Computes the third exponential integral function of the argument\ $x$.
@@ -625,7 +640,13 @@ double feenox_builtin_expint2(expr_item_t *f) {
 ///fn+expint3+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]
 ///fn+expint3+plotx 0.0 2.0 1e-2
 double feenox_builtin_expint3(expr_item_t *f) {
+#ifdef HAVE_GSL
   return gsl_sf_expint_En(3, feenox_expression_eval(&f->arg[0]));
+#else
+  feenox_push_error_message("expint3 needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif  
 }
 
 ///fn+expintn+desc Computes the $n$-th exponential integral function of the argument\ $x$.
@@ -633,8 +654,8 @@ double feenox_builtin_expint3(expr_item_t *f) {
 ///fn+expintn+usage expintn(n,x)
 ///fn+expintn+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]
 double feenox_builtin_expintn(expr_item_t *f) {
-  int n;
-  n = ((int)(round(feenox_expression_eval(&f->arg[0]))));
+#ifdef HAVE_GSL
+  int n = ((int)(round(feenox_expression_eval(&f->arg[0]))));
   double x = feenox_expression_eval(&f->arg[1]);
 
   if ((n == 1 || n == 0) && x == 0) {
@@ -643,8 +664,14 @@ double feenox_builtin_expintn(expr_item_t *f) {
   }
 
   return gsl_sf_expint_En(n, x);
+#else
+  feenox_push_error_message("expintn needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif  
+  
 }
-#endif
+
 ///fn+log+desc Computes the natural logarithm of the argument\ $x$. If\ $x$ is zero or negative,
 ///fn+log+desc a NaN error is issued.
 ///fn+log+usage log(x)
@@ -693,20 +720,28 @@ double feenox_builtin_sqrt(expr_item_t *f) {
 ///fn+is_even+desc Returns one if the argument\ $x$ rounded to the nearest integer is even.
 ///fn+is_even+usage is_even(x)
 ///fn+is_even+math  \begin{cases}1 &\text{if $x$ is even} \\ 0 &\text{if $x$ is odd} \end{cases}
-#ifdef HAVE_GSL
 double feenox_builtin_is_even(expr_item_t *f) {
+#ifdef HAVE_GSL
   return GSL_IS_EVEN((int)(round(feenox_expression_eval(&f->arg[0]))));
+#else
+  feenox_push_error_message("is_even needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif  
 }
-#endif
 
 ///fn+is_odd+desc Returns one if the argument\ $x$ rounded to the nearest integer is odd.
 ///fn+is_odd+usage is_odd(x)
 ///fn+is_odd+math  \begin{cases}1 &\text{if $x$ is odd} \\ 0 &\text{if $x$ is even} \end{cases}
-#ifdef HAVE_GSL
 double feenox_builtin_is_odd(expr_item_t *f) {
+#ifdef HAVE_GSL
   return GSL_IS_ODD((int)(round(feenox_expression_eval(&f->arg[0]))));
-}
+#else
+  feenox_push_error_message("is_odd needs GSL");
+  feenox_runtime_error();
+  return 0;
 #endif
+}
 
 ///fn+heaviside+desc Computes the zero-centered Heaviside step function of the argument\ $x$.
 ///fn+heaviside+desc If the optional second argument $\delta$ is provided, the discontinuous
@@ -1038,9 +1073,8 @@ double feenox_builtin_equal(expr_item_t *f) {
 
 }
 
-#ifdef HAVE_GSL
 double feenox_builtin_quasi_random(expr_item_t *f) {
-
+#ifdef HAVE_GSL
   double y = 0;
   double r = 0;
   double x1 = feenox_expression_eval(&f->arg[0]);
@@ -1061,8 +1095,12 @@ double feenox_builtin_quasi_random(expr_item_t *f) {
   }
 
   return y;
-}
+#else
+  feenox_push_error_message("quasi_random needs GSL");
+  feenox_runtime_error();
+  return 0;
 #endif
+}
 
 
 ///fn+random+desc Returns a random real number uniformly distributed between the first
@@ -1075,9 +1113,9 @@ double feenox_builtin_quasi_random(expr_item_t *f) {
 ///fn+random+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random+usage random(x1, x2, [s])
 ///fn+random+math  x_1 + r \cdot (x_2-x_1) \quad \quad 0 \leq r < 1
-#ifdef HAVE_GSL
 double feenox_builtin_random(expr_item_t *f) {
 
+#ifdef HAVE_GSL
   double y = 0;
   double x1 = feenox_expression_eval(&f->arg[0]);
   double x2 = feenox_expression_eval(&f->arg[1]);
@@ -1102,6 +1140,11 @@ double feenox_builtin_random(expr_item_t *f) {
   }
 
   return y;
+#else
+  feenox_push_error_message("random needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif
 }
 
 
@@ -1115,7 +1158,7 @@ double feenox_builtin_random(expr_item_t *f) {
 ///fn+random_gauss+desc Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
 ///fn+random_gauss+usage random_gauss(x1, x2, [s])
 double feenox_builtin_random_gauss(expr_item_t *f) {
-
+#ifdef HAVE_GSL
   double x[3];
   x[0] = feenox_expression_eval(&f->arg[0]);
   x[1] = feenox_expression_eval(&f->arg[1]);
@@ -1135,10 +1178,13 @@ double feenox_builtin_random_gauss(expr_item_t *f) {
 
   return x[0] + gsl_ran_gaussian((const gsl_rng *)f->aux, x[1]);
 
-  // TODO: no camina con seed y fit al mismo tiempo
+#else
+  feenox_push_error_message("random_gauss needs GSL");
+  feenox_runtime_error();
+  return 0;
+#endif
 
 }
-#endif
 
 ///fn+limit+desc Limits the first argument\ $x$ to the interval $[a,b]$. The second argument $a$ should
 ///fn+limit+desc be less than the third argument $b$.

@@ -29,7 +29,7 @@ do { \
     GSL_ERROR("function value is not finite", GSL_EBADFUNC); \
 } while (0)
 
-
+#ifdef HAVE_GSL
 double feenox_builtin_derivative(expr_item_t *, var_t *);
 double feenox_builtin_integral(expr_item_t *, var_t *);
 double feenox_builtin_simpson(expr_item_t *, var_t *);
@@ -51,7 +51,7 @@ struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
     {"root",                4, 7, &feenox_builtin_root},
     {"func_min",            4, 8, &feenox_builtin_func_min},
 };
-
+#endif
 
 typedef struct {
   expr_t *expression;
