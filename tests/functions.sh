@@ -4,10 +4,13 @@
 functions_found=yes
 
 # see how to invoke FeenoX
+feenox=""
 for i in  ../feenox ../src/feenox ./feenox ./src/feenox ../../../bin/feenox /usr/local/bin/feenox; do
-  if [ -f ${i} ]; then
-    feenox=${i}
-  fi
+  if [ -z "${feenox}" ]; then
+    if [ -f ${i} ]; then
+      feenox=${i}
+    fi
+  fi 
 done
 if [ -z "${feenox}" ]; then
   echo "error: could not find feenox executable"
