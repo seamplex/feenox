@@ -20,6 +20,7 @@ for i in hello          \
          fork           \
          iaea-2dpwr     \
          cubesphere     \
+         two-zone-slab  \
          parallelepiped-thermal     \
          parallelepiped-mechanical  \
          temp-cylinder-tran         \

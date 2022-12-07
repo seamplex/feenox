@@ -1,0 +1,34 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+set size ratio 1.0/2.5
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set key left bottom
+set terminal pdf
+
+set xlabel "Width $a$ of zone $A$"
+set ylabel "$k_\text{eff}$"
+
+set output "two-zone-slab-keff.pdf"
+
+plot "two-zone-slab-uniform-10.dat"   w l       color red     lw 2 lt 1 ti "$n=10$ uniform",\
+     "two-zone-slab-uniform-20.dat"   w l       color magenta lw 2 lt 1 ti "$n=20$ uniform",\
+     "two-zone-slab-nonuniform-10.dat" w l       color blue    lw 1 lt 2 ti "$n=10$ non-uniform",\
+     "two-zone-slab-nonuniform-20.dat" w l       color cyan    lw 1 lt 2 ti "$n=20$ non-uniform",\
+     "two-zone-slab-nonuniform-20.dat" u 1:3 w l color black   lw 3 lt 3 ti "Analytical solution"
+     
+set output "two-zone-slab-error.pdf"
+set ylabel "Error with respect to analytical solution"
+set yrange [-0.025:0.005]
+
+plot "two-zone-slab-uniform-10.dat"   u 1:4 w l       color red     lw 2 lt 1 ti "$n=10$ uniform",\
+     "two-zone-slab-uniform-20.dat"   u 1:4 w l       color magenta lw 2 lt 1 ti "$n=20$ uniform",\
+     "two-zone-slab-nonuniform-10.dat" u 1:4 w l       color blue    lw 1 lt 2 ti "$n=10$ non-uniform",\
+     "two-zone-slab-nonuniform-20.dat" u 1:4 w l       color cyan    lw 1 lt 2 ti "$n=20$ non-uniform"
+     
+     
+     

@@ -44,3 +44,6 @@ thermal-square-temperature.msh
 square-centered-unstruct.msh
 square-centered.msh
 wilson-*.msh
+two-zone-*.dat
+two-zone-*.msh
+ab.geo

@@ -1220,6 +1220,159 @@ $
 
 ![Static reactivity vs. percentage of sphericity](cubesphere.svg){width=100%}
 
+# Illustration of the XS dilution & smearing effect
+
+> The best way to solve a problem is to avoid it in the first place.
+>
+> Richard M. Stallman
+
+Let us consider a two-zone slab reactor:
+
+a.  Zone $A$ has $k_\infty < 1$ and extends from $x=0$ to $x=a$.
+b.  Zone $B$ has $k_\infty > 1$ and extends from $x=a$ to $x=b$.
+
+-   The slab is solved with a one-group diffusion approach.
+-   Both zones have uniform macroscopic cross sections.
+-   Flux $\phi$ is equal to zero at both at $x=0$ and at $x=b$.
+
+Under these conditions, the overall analytical effective multiplication
+factor is $k_\text{eff}$ such that
+
+$$
+ \sqrt{D_A\cdot\left(\Sigma_{aA}- \frac{\nu\Sigma_{fA}}{k_\text{eff}}\right)} \cdot
+  \tan\left[\sqrt{\frac{1}{D_B} \cdot\left( \frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB} \right) }\cdot (a-b) \right]
+$$ $$
+ = \sqrt{D_B\cdot\left(\frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB}\right)} \cdot
+  \tanh\left[\sqrt{\frac{1}{D_A} \cdot\left( \Sigma_{aA}-\frac{\nu\Sigma_{fA}}{k_\text{eff}} \right)} \cdot b\right]
+$$
+
+We can then compare the numerical $k_\text{eff}$ computed using...
+
+i.  a non-uniform grid with $n+1$ nodes such that there is a node
+    exactly at $x=b$.
+ii. an uniform grid (mimicking a neutronic code that cannot handle case
+    i.) with $n$ uniformly-spaced elements. The element that contains
+    point $x=b$ is assigned to a pseudo material $AB$ that linearly
+    interpolates the macroscopic cross sections according to where in
+    the element the point $x=b$ lies. That is to say, if the element
+    width is 10 and $b=52$ then this $AB$ material will be 20% of
+    material $A$ and 80% of material $B$.
+
+The objective of this example is to show that case i. will monotonically
+converge to the analytical multiplication factor as
+$n \rightarrow \infty$ while case ii. will show a XS dilution and
+smearing effect.
+
+``` bash
+#!/bin/bash
+
+b="100"   # total width of the slab
+if [ -z $1 ]; then
+  n="10"    # number of cells
+else
+  n=$1
+fi
+
+rm -rf two-zone-slab-*-${n}.dat
+
+# sweep a (width of first material) between 10 and 90
+for a in $(seq 35 57); do
+  cat << EOF > ab.geo
+a = ${a};
+b = ${b};
+n = ${n};
+lc = b/n;
+EOF
+  for m in uniform nonuniform; do
+    gmsh -1 -v 0 two-zone-slab-${m}.geo
+    feenox two-zone-slab.fee ${m} | tee -a two-zone-slab-${m}-${n}.dat
+  done
+done
+
+```
+
+
+```feenox
+
+#  FeenoX of course can solve both cases, but there are many other neutronic tools out there that can handle ony structured grids.
+PROBLEM neutron_diffusion 1D
+DEFAULT_ARGUMENT_VALUE 1 nonuniform
+READ_MESH two-zone-slab-$1.msh
+
+# this ab.geo is created from the driving shell script
+INCLUDE ab.geo
+
+# pure material A from x=0 to x=a
+D1_A = 0.5
+Sigma_a1_A = 0.014
+nuSigma_f1_A = 0.010
+
+# pure material B from x=a to x=b
+D1_B = 1.2
+Sigma_a1_B = 0.010
+nuSigma_f1_B = 0.014
+
+# meta-material (only used for uniform grid to illustrate XS dilution)
+a_left  = floor(a/lc)*lc;
+xi = (a - a_left)/lc
+Sigma_tr_A = 1/(3*D1_A)
+Sigma_tr_B = 1/(3*D1_B)
+Sigma_tr_AB = xi*Sigma_tr_A + (1-xi)*Sigma_tr_B
+D1_AB = 1/(3*Sigma_tr_AB)
+Sigma_a1_AB = xi * Sigma_a1_A + (1-xi)*Sigma_a1_B
+nuSigma_f1_AB = xi * nuSigma_f1_A + (1-xi)*nuSigma_f1_B
+
+BC left  null
+BC right null
+
+SOLVE_PROBLEM
+
+
+# compute the analytical keff
+F1(k) = sqrt(D1_A*(Sigma_a1_A-nuSigma_f1_A/k)) * tan(sqrt((1/D1_B)*(nuSigma_f1_B/k-Sigma_a1_B))*(a-b))
+F2(k) = sqrt(D1_B*(nuSigma_f1_B/k-Sigma_a1_B)) * tanh(sqrt((1/D1_A)*(Sigma_a1_A-nuSigma_f1_A/k))*b)
+k = root(F1(k)-F2(k), k, 1, 1.2)
+
+# # and the fluxes (not needed here but for reference)
+# B_A = sqrt((Sigma_a1_A - nuSigma_f1_A/k)/D1_A)
+# fluxA(x) = sinh(B_A*x)
+# 
+# B_B = sqrt((nuSigma_f1_B/k - Sigma_a1_B)/D1_B)
+# fluxB(x)= sinh(B_A*b)/sin(B_B*(a-b)) * sin(B_B*(a-x))
+# 
+# # normalization factor
+# f = a/(integral(fluxA(x), x, 0, b) + integral(fluxB(x), x, b, a))
+# flux(x) := f * if(x < b, fluxA(x), fluxB(x))
+
+PRINT a keff k keff-k b n lc nodes
+
+# PRINT_FUNCTION flux MIN 0 MAX a STEP a/1000 FILE_PATH two-zone-analytical.dat
+# PRINT_FUNCTION phi1 phi1(x)-flux(x)         FILE_PATH two-zone-numerical.dat
+```
+
+
+```terminal
+$ ./two-zone-slab.sh 10
+[...]
+$ ./two-zone-slab.sh 20
+[...]
+$ pyxplot two-zone-slab.ppl
+$
+```
+
+
+![$k_\text{eff}$ vs. $a$](two-zone-slab-keff.svg){width=100%}
+
+![Error vs. $a$](two-zone-slab-error.svg){width=100%}
+
+> To illustrate the point of this example, think about the following 2D case:
+>
+> ![](2d-slanted.png){width=50%}\ 
+>
+>  1. How would you solve something like this with a neutronic tool that only allowed structured grids?
+>  2. Even if the two control rods were not slanted, as long as they were not inserted up to the same height there would be XS dilution & semaring when using a structured grid (even if the tool allows non-uniform cells in each direction).
+>  3. Consider RMS’s quotation above: the best way to solve a problem (i.e. XS dilution) is to avoid it in the first place (i.e. to use a tool able to handle unstructured grids).
+
 # Parallelepiped whose Young's modulus is a function of the temperature
 
 The problem consists of finding the non-dimensional temperature $T$ and
