@@ -12,7 +12,7 @@ fi
 checkpde mechanical
 checkgmsh
 
-gmsh -3 ${dir}/two-cubes.geo
+gmsh -3 ${dir}/two-cubes.geo || exit $?
 
 answer two-cubes-orthotropic-variables.fee "9.9"
 exitifwrong $?

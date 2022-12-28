@@ -12,7 +12,7 @@ fi
 checkpde thermal
 checkgmsh
 
-gmsh -3 ${dir}/encased_rod.geo
+gmsh -3 ${dir}/encased_rod.geo || exit $?
 
 answerzero encased_rod_lr.fee 1e-3
 exitifwrong $?

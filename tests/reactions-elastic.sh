@@ -11,7 +11,7 @@ fi
 
 checkpde mechanical
 # checkgmsh
-# gmsh -3 ${dir}/cube-hex.geo
+# gmsh -3 ${dir}/cube-hex.geo || exit $?
 
 answerdiff reaction-elastic-lr.fee
 exitifwrong $?

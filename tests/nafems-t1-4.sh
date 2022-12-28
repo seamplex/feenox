@@ -14,10 +14,10 @@ checkpde thermal
 # t1 and t4 are separated from t2 & t3 because they needs gmsh
 checkgmsh
 
-gmsh -2 ${dir}/nafems-t1.geo
+gmsh -2 ${dir}/nafems-t1.geo || exit $?
 answerfloat nafems-t1.fee 50 0.1
 exitifwrong $?
 
-gmsh -2 ${dir}/nafems-t4.geo
+gmsh -2 ${dir}/nafems-t4.geo || exit $?
 answer nafems-t4.fee 18.3
 exitifwrong $?

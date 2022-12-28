@@ -12,11 +12,11 @@ fi
 checkpde mechanical
 checkgmsh
 
-gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 2
+gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 2 || exit $?
 answerzero parallelepiped.fee
 exitifwrong $?
 
-gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 1 -clscale 2 -o parallelepiped-coarse.msh
+gmsh -v 0 -3 ${dir}/parallelepiped.geo -order 1 -clscale 2 -o parallelepiped-coarse.msh || exit $?
 answerzero parallelepiped-thermal.fee
 exitifwrong $?
 

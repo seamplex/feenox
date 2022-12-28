@@ -13,7 +13,7 @@ checkpde thermal
 checkgmsh
 
 for i in struct unstruct; do
- gmsh -3 ${dir}/long-bar-${i}.geo
+ gmsh -3 ${dir}/long-bar-${i}.geo || exit $?
  answerzero1 long-bar-thermal.fee ${i}
  exitifwrong $?
 done

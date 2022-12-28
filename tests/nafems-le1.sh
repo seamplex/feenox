@@ -16,7 +16,7 @@ has_gmsh=$(which gmsh)
 # for i in $(seq 1 8); do
 #   if [ ! -e nafems-le1-${i}.msh ]; then
 #     if [ ! -z "${has_gmsh}" ]; then
-#       gmsh -2 -setnumber Mesh.NodeType ${i} nafems-le1.geo -o nafems-le1-${i}.msh
+#       gmsh -2 -setnumber Mesh.NodeType ${i} nafems-le1.geo -o nafems-le1-${i}.msh || exit $?
 #     else
 #       exit 77
 #     fi
