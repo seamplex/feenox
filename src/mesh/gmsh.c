@@ -1058,7 +1058,7 @@ int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist) {
   // time
   fprintf(this->file->pointer, "%g\n", feenox_special_var_value(t));
 
-  // thre integer tags
+  // three integer tags
   fprintf(this->file->pointer, "3\n");
   // timestep
   fprintf(this->file->pointer, "%d\n", (feenox_special_var_value(end_time) > 0) ? (unsigned int)(feenox_special_var_value(step_transient)) : (unsigned int)(feenox_special_var_value(step_static)));

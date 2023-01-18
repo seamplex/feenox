@@ -4,4 +4,4 @@ end_time = 1
 f(x,y) = sin(pi*x*y)*cos(t)
 
 PRINT t f(0.5,0.5)
-WRITE_MESH square-f.msh f
+WRITE_MESH square-f.msh %.8f f 

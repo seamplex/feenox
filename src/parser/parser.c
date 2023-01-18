@@ -2340,11 +2340,12 @@ int feenox_parse_write_mesh(void) {
       mesh_write->field_location = field_location_cells;
       feenox.mesh.need_cells = 1;
 
-///kw_pde+WRITE_MESH+detail The `SCALAR_FORMAT` keyword can be used to define the precision of the ASCII
-///kw_pde+WRITE_MESH+detail representation of the fields that follow. Default is `%g`.
-///kw_pde+WRITE_MESH+usage [ SCALAR_FORMAT <printf_specification> ]@
-    } else if (strcasecmp(token, "SCALAR_FORMAT") == 0) {
-      feenox_call(feenox_parser_string(&mesh_write->printf_format));
+///kw_pde+WRITE_MESH+detail If a printf-like format specifier starting with `%` is given, 
+///kw_pde+WRITE_MESH+detail that format is used for the fields that follow.
+///kw_pde+WRITE_MESH+detail Make sure the format reads floating-point data, i.e. do not use `%d`. Default is `%g`.
+///kw_pde+WRITE_MESH+usage [ <printf_specification> ]@
+    } else if (token[0] == '%') {
+      mesh_write->printf_format = strdup(token);
       
 ///kw_pde+WRITE_MESH+detail The data to be written has to be given as a list of fields,
 ///kw_pde+WRITE_MESH+detail i.e. distributions (such as `k` or `E`), functions of space (such as `T`)
@@ -2424,6 +2425,10 @@ int feenox_parse_write_mesh(void) {
         for (i = 1; i < mesh_write_dist->size; i++) {
           feenox_check_minusone(asprintf(&mesh_write_dist->name, "%s_%s", mesh_write_dist->name, mesh_write_dist->field[i]->name));
         }
+      }
+      
+      if (mesh_write->printf_format != NULL) {
+        mesh_write_dist->printf_format = strdup(mesh_write->printf_format);
       }
       
       LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
