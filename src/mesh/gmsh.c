@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related gmsh routines
  *
- *  Copyright (C) 2014--2022 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -800,14 +800,14 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       // number of string tags (ASCII int)
       int n_string_tags = 0;
       feenox_call(feenox_gmsh_read_data_int(this, 1, &n_string_tags, 0));
-      if (n_string_tags != 1) {
-        feenox_push_error_message("do not know hwo to handle numStringTags != 1");
+      if (n_string_tags > 2) {
+        feenox_push_error_message("number of string tags cannot be larger than two");
         return FEENOX_ERROR;
       }
       
       feenox_mesh_gmsh_readnewline();
       
-      // actual string tag (string)
+      // the first actual string tag (string) is the post-processing view name
       feenox_mesh_gmsh_readnewline();
 
       char *string_tag = NULL;
@@ -835,6 +835,11 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         continue;
       }
       
+      // the second (optional) string tag is the interpolation scheme which we ignore for now
+      if (n_string_tags > 1) {
+        feenox_mesh_gmsh_readnewline();
+      }
+      
       // real-tags (all ASCII stuff)
       int n_real_tags = 0;
       feenox_call(feenox_gmsh_read_data_int(this, 1, &n_real_tags, 0));
@@ -855,16 +860,17 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       // integer-tags
       int n_integer_tags = 0;
       feenox_call(feenox_gmsh_read_data_int(this, 1, &n_integer_tags, 0));
-      if (n_integer_tags != 3) {
-        feenox_push_error_message("expected three integer tags for '%s'", string_tag);
+      if (n_integer_tags > 4) {
+        feenox_push_error_message("number of integer tags cannot be larger than four for '%s'", string_tag);
         return FEENOX_ERROR;
       }
       
-      int data[3] = {0,0,0};
-      feenox_call(feenox_gmsh_read_data_int(this, 3, data, 0));
+      int data[4] = {0,0,0,0};
+      feenox_call(feenox_gmsh_read_data_int(this, n_integer_tags, data, 0));
 //      int timestep = data[0];
       int dofs = data[1];
       int num_nodes = data[2];
+//      int partition_index = data[3];
 
       if (num_nodes != this->n_nodes) {
         feenox_push_error_message("field '%s' has %d nodes and the mesh has %ld nodes", string_tag, num_nodes, this->n_nodes);
