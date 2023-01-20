@@ -12,5 +12,5 @@ Physical Surface("two") = {6};
 Physical Volume("bulk") = {1,2,3};
 
 Mesh.MeshSizeMax = 0.5;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 Mesh.ElementOrder = 2;

@@ -41,7 +41,7 @@ Mesh.MeshSizeMax = r;
 Mesh.Algorithm = 8;
 Mesh.RecombineAll = 1;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 Mesh.ElementOrder = 1;
 Mesh.SecondOrderLinear = 0;
 

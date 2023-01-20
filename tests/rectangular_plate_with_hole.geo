@@ -17,5 +17,5 @@ Physical Volume("bulk") = {1};
 Mesh.MeshSizeMax = t;
 Mesh.MeshSizeMin = 0.1*t;
 Mesh.MeshSizeFromCurvature = 24;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 Mesh.ElementOrder = 2;

@@ -157,10 +157,10 @@ Mesh.Light = 0;
 General.SmallAxes = 0;
 
 // meshing options
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 6;
 Mesh.RecombineAll = 1;  // recombine triangles to obtain quads
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 
 Mesh.MeshSizeMin = 5;
 Mesh.MeshSizeMax = 5;

@@ -7,7 +7,7 @@ Mesh.MeshSizeMax = a/4;
 Mesh.MeshSizeMin = a/4;
 Mesh.Algorithm = 1;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 Mesh.ElementOrder = 2;
 Mesh.SecondOrderLinear = 1;
 

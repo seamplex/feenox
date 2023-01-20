@@ -51,7 +51,7 @@ BC mirror   mirror         # the first mirror is the name, the second is the BC 
 # power = 17700
 
 SOLVE_PROBLEM   # solve!
-PRINT %.5f keff
+PRINT %.4f keff
 
 
 

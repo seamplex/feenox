@@ -51,4 +51,4 @@ Mesh.ElementOrder = 2;
 Mesh.MeshSizeMin = 2*t;
 Mesh.MeshSizeMax = 2*t;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;

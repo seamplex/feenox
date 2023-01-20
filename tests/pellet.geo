@@ -8,7 +8,7 @@ Physical Surface("external") = {1};
 Physical Volume("bulk") = {1};
 
 Mesh.ElementOrder = 2;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 Mesh.HighOrderOptimize = 1;
 Mesh.SecondOrderLinear = 0;
 Mesh.MeshSizeMin = 0.5*(r+l)/10;

@@ -98,7 +98,7 @@ General.SmallAxes = 0;
 Mesh.Algorithm = 6;
 Mesh.RecombineAll = 0;  // recombine triangles to obtain quads
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 
 Mesh.MeshSizeMin = 5;
 Mesh.MeshSizeMax = 5;

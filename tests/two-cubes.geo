@@ -10,7 +10,7 @@ Mesh.MeshSizeMax = 3;
 Mesh.MeshSizeMin = 3;
 Mesh.Algorithm = 1;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 
 Transfinite Curve "*" = 5;
 Transfinite Surface "*";
