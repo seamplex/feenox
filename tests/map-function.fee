@@ -1,0 +1,2 @@
+# define an algebraic function
+f(x,y,z) = x + 2*y^2 + 3*z^3 + cos(x*y) + log(1+y*z)

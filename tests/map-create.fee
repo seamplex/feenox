@@ -1,0 +1,3 @@
+READ_MESH map-cube-$1.msh                # read the base mesh
+INCLUDE map-function.fee                 # read analytical f(x,y,z)
+WRITE_MESH map-cube-$1-src.msh %.10f f   # evaluate it at the nodes and write it into a "source" mesh

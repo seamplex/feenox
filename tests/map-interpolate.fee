@@ -1,0 +1,15 @@
+# read the function f(x,y,z) from the nodes of the source mesh
+READ_MESH map-cube-$1-src.msh DIM 3 READ_FIELD f AS f_pointwise
+
+# read the dest mesh
+READ_MESH map-cube-$2.msh
+
+# read analytical f(x,y,z)
+INCLUDE map-function.fee
+
+# evaluate f(x,y,z) at the nodes of the dest mesh and write it into $1 -> $2
+WRITE_MESH map-cube-$1-$2-dst.msh MESH map-cube-$2.msh %.10f f_pointwise abs(f_pointwise(x,y,z)-f(x,y,z))
+
+INTEGRATE (f_pointwise(x,y,z)-f(x,y,z))^2 RESULT num
+INTEGRATE 1                               RESULT den
+PRINT num/den
