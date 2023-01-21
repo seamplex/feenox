@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related initialization routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -98,7 +98,7 @@ int feenox_mesh_init_special_objects(void) {
 //va+mesh_failed_interpolation_factor+desc an element using the $k$-dimensional tree (most efficient), and more robust brute-force approach is taken
 //va+mesh_failed_interpolation_factor+desc less eficient using a radius of size `mesh_failed_interpolation_factor` times the distance between $\vec{x}$
 //va+mesh_failed_interpolation_factor+desc and the nearest node to \vec{x$} is performed.
-//va+mesh_failed_interpolation_factor+desc If this factor is zero or negative, then the value at the nearest node to $x$ is returned. Default is DEFAULT_MESH_FAILED_INTERPOLATION_FACTOR.
+//va+mesh_failed_interpolation_factor+desc If this factor is zero, then the value at the nearest node to $x$ is returned. Default is DEFAULT_MESH_FAILED_INTERPOLATION_FACTOR.
   feenox_check_null(feenox.mesh.vars.mesh_failed_interpolation_factor = feenox_get_or_define_variable_get_ptr("mesh_failed_interpolation_factor"));
   feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor) = MESH_FAILED_INTERPOLATION_FACTOR;
   

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related routines
  *
- *  Copyright (C) 2014--2022 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -299,40 +299,39 @@ node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x) {
 
 element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const double *x) {
 
-  double x_nearest[3] = {0, 0, 0};
-  double dist2;
-  element_t *element = NULL;
-  element_ll_t *element_item;
-  node_t *second_nearest_node;
-  void *res_item;   
-
   // try the last chosen element
-  element = mesh->last_chosen_element;
-  
+  element_t *element = mesh->last_chosen_element;
+
   // test if the last (cached) chosen_element is the one
   if (element == NULL || element->type->point_in_element(element, x) == 0) {
     element = NULL;
     
-    // find the nearest node if not provided
-    if (nearest_node == NULL) {
-      res_item = kd_nearest(mesh->kd_nodes, x);
-      nearest_node = (node_t *)(kd_res_item(res_item, x_nearest));
-      kd_res_free(res_item);    
-    }  
-    
+    element_ll_t *element_item = NULL;
     LL_FOREACH(nearest_node->element_list, element_item) {
       if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
-        element = element_item->element;
-        break;
+        return element_item->element;
       }  
     }
   }
+
+  // find the nearest node if not provided
+  double x_nearest[3] = {0, 0, 0};
+  if (nearest_node == NULL) {
+    void *res_item = kd_nearest(mesh->kd_nodes, x);
+    nearest_node = (node_t *)(kd_res_item(res_item, x_nearest));
+    kd_res_free(res_item);    
+  } else {
+    x_nearest[0] = nearest_node->x[0];
+    x_nearest[1] = nearest_node->x[1];
+    x_nearest[2] = nearest_node->x[2];
+  }
   
-
   if (element == NULL && feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor) > 0) {
-    // if we do not find any then the mesh might be deformed or the point might be outside the domain
-    // so we see if we can find another one
-
+    // in some cases (a small percentage of a reasonable mesh) none of the elements associated
+    // to the nearest node contains the point se we have to increase the radius of search
+    // the new radius is either mesh_failed_interpolation_factor or 2
+    
+    double dist2 = 0;
     switch (mesh->dim) {
       case 1:
         dist2 = gsl_pow_2(fabs(x[0] - x_nearest[0]));
@@ -351,17 +350,23 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       UT_hash_handle hh;
     };
       
+//#define CACHED    
+#ifdef CACHED
     struct cached_element *cache = NULL;
     struct cached_element *tmp = NULL;
     struct cached_element *cached_element = NULL;
+#endif
 
-    // we ask for the nodes which are within a radius mesh_failed_interpolation_factor times the last one
+    // we ask for the nodes which are within the "failed" factor times the last one
     struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
       
     while(element == NULL && kd_res_end(presults) == 0) {
-      second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
+      node_t *second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
+      element_ll_t *element_item = NULL;
       LL_FOREACH(second_nearest_node->element_list, element_item) {
-          
+        
+#ifdef CACHED
+        // this "cached" scheme seems to be slower
         cached_element = NULL;
         HASH_FIND_INT(cache, &element_item->element->tag, cached_element);
         if (cached_element == NULL) {
@@ -375,17 +380,26 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
             break;
           }
         }  
+#else
+        if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
+          element = element_item->element;
+          break;
+        }
+#endif
       }
       kd_res_next(presults);
     }
     kd_res_free(presults);
 
+#ifdef CACHED
     HASH_ITER(hh, cache, cached_element, tmp) {
       HASH_DEL(cache, cached_element);
       feenox_free(cached_element);
     }  
+#endif
   }  
   
+/*   
   if (element == NULL) {
     // if still we did not find anything, 
     switch (mesh->dim) {
@@ -402,6 +416,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
 
     // just what is close
     if (dist2 < DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) {
+      element_ll_t *element_item = NULL;
       LL_FOREACH(nearest_node->element_list, element_item) {
         if (element_item->element->type->dim == mesh->dim) {
           element = element_item->element;
@@ -410,7 +425,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       }
     }
   }
-  
+*/  
   // update cache
   mesh->last_chosen_element = element;
 

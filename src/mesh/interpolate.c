@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related function interpolation routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -27,57 +27,51 @@ struct mesh_interp_params {
 };
 
 
-double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x) {
+double feenox_mesh_interpolate_function_node(struct function_t *this, const double *x) {
   
-  double r[3] = {0, 0, 0};    // vector with the local coordinates within the element
-  double y, dist2;
-  static element_t *element;
-  node_t *nearest_node;
-  mesh_t *mesh = function->mesh;  
-  int j;
-
-  
-  if (function->data_value == NULL) {
+  if (this->data_value == NULL) {
     return 0;
   }
 
   // find the nearest node
-  nearest_node = feenox_mesh_find_nearest_node(mesh, x);
+  node_t *nearest_node = feenox_mesh_find_nearest_node(this->mesh, x);
 
   // check is it is close enough to a node
-  switch (mesh->dim) {
+  switch (this->mesh->dim) {
     case 1:
-      if ((dist2 = gsl_pow_2(fabs(x[0]-nearest_node->x[0]))) < gsl_pow_2(function->multidim_threshold)) {
-        return function->data_value[nearest_node->index_mesh];
+      if (gsl_pow_2(fabs(x[0]-nearest_node->x[0])) < gsl_pow_2(this->multidim_threshold)) {
+        return this->data_value[nearest_node->index_mesh];
       }
     break;
     case 2:
-      if ((dist2 = (feenox_mesh_subtract_squared_module2d(x, nearest_node->x))) < gsl_pow_2(function->multidim_threshold)) {
-        return function->data_value[nearest_node->index_mesh];
+      if (feenox_mesh_subtract_squared_module2d(x, nearest_node->x) < gsl_pow_2(this->multidim_threshold)) {
+        return this->data_value[nearest_node->index_mesh];
       }
     break;
     case 3:
-      if ((dist2 = (feenox_mesh_subtract_squared_module(x, nearest_node->x))) < gsl_pow_2(function->multidim_threshold)) {
-        return function->data_value[nearest_node->index_mesh];
+      if (feenox_mesh_subtract_squared_module(x, nearest_node->x) < gsl_pow_2(this->multidim_threshold)) {
+        return this->data_value[nearest_node->index_mesh];
       }
     break;
   }
 
-  if ((element = feenox_mesh_find_element(mesh, nearest_node, x)) != NULL) {
+  element_t *element = NULL;
+  double r[3] = {0, 0, 0};    // vector with the local coordinates within the element
+  if ((element = feenox_mesh_find_element(this->mesh, nearest_node, x)) != NULL) {
     if (feenox_mesh_interp_solve_for_r(element, x, r) != FEENOX_OK) {
       return 0;
     }
   } else {
     // should we return the nearest node value?
-    return function->data_value[nearest_node->index_mesh];
+    return this->data_value[nearest_node->index_mesh];
   }
   
   // compute the interpolation
-  y = 0;
-  if (function->spatial_derivative_of == NULL) {
+  double y = 0;
+  if (this->spatial_derivative_of == NULL) {
     
-    for (j = 0; j < element->type->nodes; j++) {
-      y += element->type->h(j, r) * function->data_value[element->node[j]->index_mesh];
+    for (int j = 0; j < element->type->nodes; j++) {
+      y += element->type->h(j, r) * this->data_value[element->node[j]->index_mesh];
     }
     
   } else {
@@ -86,9 +80,9 @@ double feenox_mesh_interpolate_function_node(struct function_t *function, const 
     
     feenox_mesh_compute_dhdx(element, r, NULL, dhdx);
       
-    for (j = 0; j < element->type->nodes; j++) {
-      y += gsl_matrix_get(dhdx, j, function->spatial_derivative_with_respect_to)
-            * function->spatial_derivative_of->data_value[element->node[j]->index_mesh];
+    for (int j = 0; j < element->type->nodes; j++) {
+      y += gsl_matrix_get(dhdx, j, this->spatial_derivative_with_respect_to)
+            * this->spatial_derivative_of->data_value[element->node[j]->index_mesh];
     }
     
     gsl_matrix_free(dhdx);
@@ -222,40 +216,32 @@ int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_
 
 int feenox_mesh_compute_r_tetrahedron(element_t *this, const double *x, double *r) {
 
-  int j, j_prime;
-  
-  
   if (this->type->id == ELEMENT_TYPE_TETRAHEDRON4 || this->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
     
     // reference: eq (9.11) from AFEM.Ch09
-    
-//    double xi0, one;
-    double sixV;
-//    double sixV01;
-    double sixV02, sixV03, sixV04;
 
-    // porque ya teniamos todo desde 1    
+    // these are of size one because we have the equations with indices starting from one
     double dx[5][5];
     double dy[5][5];
     double dz[5][5];
-    for (j = 0; j < 4; j++) {
-      for (j_prime = 0; j_prime < 4; j_prime++) {
+    for (int j = 0; j < 4; j++) {
+      for (int j_prime = 0; j_prime < 4; j_prime++) {
         dx[j+1][j_prime+1] = this->node[j]->x[0] - this->node[j_prime]->x[0];
         dy[j+1][j_prime+1] = this->node[j]->x[1] - this->node[j_prime]->x[1];
         dz[j+1][j_prime+1] = this->node[j]->x[2] - this->node[j_prime]->x[2];
       }
     }
   
-    // arrancan en uno
-    sixV = dx[2][1] * (dy[2][3] * dz[3][4] - dy[3][4] * dz[2][3] ) + dx[3][2] * (dy[3][4] * dz[1][2] - dy[1][2] * dz[3][4] ) + dx[4][3] * (dy[1][2] * dz[2][3] - dy[2][3] * dz[1][2]);
+    // these d* indices start from one
+    double sixV = dx[2][1] * (dy[2][3] * dz[3][4] - dy[3][4] * dz[2][3] ) + dx[3][2] * (dy[3][4] * dz[1][2] - dy[1][2] * dz[3][4] ) + dx[4][3] * (dy[1][2] * dz[2][3] - dy[2][3] * dz[1][2]);
  
-    // estos si arrancan en cero
+    // but the nodes and coordinates start from zero
 //    sixV01 = this->node[1]->x[0] * (this->node[2]->x[1]*this->node[3]->x[2] - this->node[3]->x[1]*this->node[2]->x[2]) + this->node[2]->x[0] * (this->node[3]->x[1]*this->node[1]->x[2] - this->node[1]->x[1]*this->node[3]->x[2]) + this->node[3]->x[0] * (this->node[1]->x[1]*this->node[2]->x[2] - this->node[2]->x[1]*this->node[1]->x[2]);
-    sixV02 = this->node[0]->x[0] * (this->node[3]->x[1]*this->node[2]->x[2] - this->node[2]->x[1]*this->node[3]->x[2]) + this->node[2]->x[0] * (this->node[0]->x[1]*this->node[3]->x[2] - this->node[3]->x[1]*this->node[0]->x[2]) + this->node[3]->x[0] * (this->node[2]->x[1]*this->node[0]->x[2] - this->node[0]->x[1]*this->node[2]->x[2]);
-    sixV03 = this->node[0]->x[0] * (this->node[1]->x[1]*this->node[3]->x[2] - this->node[3]->x[1]*this->node[1]->x[2]) + this->node[1]->x[0] * (this->node[3]->x[1]*this->node[0]->x[2] - this->node[0]->x[1]*this->node[3]->x[2]) + this->node[3]->x[0] * (this->node[0]->x[1]*this->node[1]->x[2] - this->node[1]->x[1]*this->node[0]->x[2]);
-    sixV04 = this->node[0]->x[0] * (this->node[2]->x[1]*this->node[1]->x[2] - this->node[1]->x[1]*this->node[2]->x[2]) + this->node[1]->x[0] * (this->node[0]->x[1]*this->node[2]->x[2] - this->node[2]->x[1]*this->node[0]->x[2]) + this->node[2]->x[0] * (this->node[1]->x[1]*this->node[0]->x[2] - this->node[0]->x[1]*this->node[1]->x[2]);
+    double sixV02 = this->node[0]->x[0] * (this->node[3]->x[1]*this->node[2]->x[2] - this->node[2]->x[1]*this->node[3]->x[2]) + this->node[2]->x[0] * (this->node[0]->x[1]*this->node[3]->x[2] - this->node[3]->x[1]*this->node[0]->x[2]) + this->node[3]->x[0] * (this->node[2]->x[1]*this->node[0]->x[2] - this->node[0]->x[1]*this->node[2]->x[2]);
+    double sixV03 = this->node[0]->x[0] * (this->node[1]->x[1]*this->node[3]->x[2] - this->node[3]->x[1]*this->node[1]->x[2]) + this->node[1]->x[0] * (this->node[3]->x[1]*this->node[0]->x[2] - this->node[0]->x[1]*this->node[3]->x[2]) + this->node[3]->x[0] * (this->node[0]->x[1]*this->node[1]->x[2] - this->node[1]->x[1]*this->node[0]->x[2]);
+    double sixV04 = this->node[0]->x[0] * (this->node[2]->x[1]*this->node[1]->x[2] - this->node[1]->x[1]*this->node[2]->x[2]) + this->node[1]->x[0] * (this->node[0]->x[1]*this->node[2]->x[2] - this->node[2]->x[1]*this->node[0]->x[2]) + this->node[2]->x[0] * (this->node[1]->x[1]*this->node[0]->x[2] - this->node[0]->x[1]*this->node[1]->x[2]);
     
-    // otra vez en uno
+    // back again from one
 //    xi0 =                1.0/sixV * (sixV01 * 1 + (dy[4][2]*dz[3][2] - dy[3][2]*dz[4][2])*gsl_vector_get(x, 0) + (dx[3][2]*dz[4][2] - dx[4][2]*dz[3][2])*gsl_vector_get(x, 1) + (dx[4][2]*dy[3][2] - dx[3][2]*dy[4][2])*gsl_vector_get(x, 2));
     r[0] = 1.0/sixV * (sixV02 * 1 + (dy[3][1]*dz[4][3] - dy[3][4]*dz[1][3])*x[0] + (dx[4][3]*dz[3][1] - dx[1][3]*dz[3][4])*x[1] + (dx[3][1]*dy[4][3] - dx[3][4]*dy[1][3])*x[2]);
     r[1] = 1.0/sixV * (sixV03 * 1 + (dy[2][4]*dz[1][4] - dy[1][4]*dz[2][4])*x[0] + (dx[1][4]*dz[2][4] - dx[2][4]*dz[1][4])*x[1] + (dx[2][4]*dy[1][4] - dx[1][4]*dy[2][4])*x[2]);

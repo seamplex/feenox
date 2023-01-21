@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related tetrahedron element routines
  *
- *  Copyright (C) 2015--2020 jeremy theler
+ *  Copyright (C) 2015--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -291,37 +291,32 @@ double feenox_mesh_tet4_dhdr(int j, int m, double *vec_r) {
 int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
 
 // http://en.wikipedia.org/wiki/Barycentric_coordinate_system  
-  double zero, one, lambda4;
   double T[3][3];
-  double inv[3][3];
-  double xx0[3];
-  double lambda[3];
-  double det;
-  double t4, t6, t8, t10, t12, t14, t17;
-  int i, j, k;
-  
-  for (j = 1; j < 4; j++) {
-    T[0][j-1] = element->node[j]->x[0] - element->node[0]->x[0];
-    T[1][j-1] = element->node[j]->x[1] - element->node[0]->x[1];
-    T[2][j-1] = element->node[j]->x[2] - element->node[0]->x[2];
+  for (int j = 1; j < 4; j++) {
+    for (int g = 0; g < 3; g++) {
+      T[g][j-1] = element->node[j]->x[g] - element->node[0]->x[g];
+    }
   }
-  xx0[0] = x[0] - element->node[0]->x[0];
-  xx0[1] = x[1] - element->node[0]->x[1];
-  xx0[2] = x[2] - element->node[0]->x[2];
+
+  double xx0[3];
+  for (int g = 0; g < 3; g++) {
+    xx0[g] = x[g] - element->node[0]->x[g];
+  }
   
-  t4  = T[2][0] * T[0][1];
-  t6  = T[2][0] * T[0][2];
-  t8  = T[1][0] * T[0][1];
-  t10 = T[1][0] * T[0][2];
-  t12 = T[0][0] * T[1][1];
-  t14 = T[0][0] * T[1][2];
-  det = t4 * T[1][2] - t6 * T[1][1] - t8 * T[2][2] + t10 * T[2][1] + t12 * T[2][2] - t14 * T[2][1];
+  double t4  = T[2][0] * T[0][1];
+  double t6  = T[2][0] * T[0][2];
+  double t8  = T[1][0] * T[0][1];
+  double t10 = T[1][0] * T[0][2];
+  double t12 = T[0][0] * T[1][1];
+  double t14 = T[0][0] * T[1][2];
+  double det = t4 * T[1][2] - t6 * T[1][1] - t8 * T[2][2] + t10 * T[2][1] + t12 * T[2][2] - t14 * T[2][1];
   if (fabs(det) < 1e-12) {
     // if the element is degenerate it cannot contain any point
     return 0;
   }
-  t17 = 1.0 / det;
+  double t17 = 1.0 / det;
 
+  double inv[3][3];
   inv[0][0] = +(T[1][1] * T[2][2] - T[1][2] * T[2][1]) * t17;
   inv[0][1] = -(T[0][1] * T[2][2] - T[0][2] * T[2][1]) * t17;
   inv[0][2] = +(T[0][1] * T[1][2] - T[0][2] * T[1][1]) * t17;
@@ -332,16 +327,17 @@ int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
   inv[2][1] = -(-t4 + T[0][0] * T[2][1]) * t17;
   inv[2][2] = (-t8 + t12) * t17;
     
-  for (i = 0; i < 3; i++) {
+  double lambda[3];
+  for (int i = 0; i < 3; i++) {
     lambda[i] = 0;
-    for (k = 0; k < 3; k++) {
+    for (int k = 0; k < 3; k++) {
       lambda[i] += inv[i][k] * xx0[k];
     }
   }
  
-  zero = -feenox_var_value(feenox.mesh.vars.eps);
-  one = 1+feenox_var_value(feenox.mesh.vars.eps);
-  lambda4 = 1 - lambda[0] - lambda[1] - lambda[2];
+  double zero = -feenox_var_value(feenox.mesh.vars.eps);
+  double one = 1+feenox_var_value(feenox.mesh.vars.eps);
+  double lambda4 = 1 - lambda[0] - lambda[1] - lambda[2];
   
   return (lambda[0] > zero && lambda[0] < one &&
           lambda[1] > zero && lambda[1] < one &&

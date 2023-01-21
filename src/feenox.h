@@ -176,7 +176,7 @@ extern "C++" {
 
 #define MESH_INF 1e22
 #define MESH_TOL 1e-6
-#define MESH_FAILED_INTERPOLATION_FACTOR -1
+#define MESH_FAILED_INTERPOLATION_FACTOR 1.5
 
 #define DEFAULT_INTERPOLATION              (*gsl_interp_linear)
 #define DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD   9.5367431640625e-07 // (1/2)^-20
@@ -1053,6 +1053,8 @@ struct element_t {
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
+  
+  int flag;
 
   int (*compute_dxdr)(element_t *e, unsigned int v, int integration);
   
@@ -2207,6 +2209,7 @@ extern double feenox_mesh_subtract_cross_2d(const double *a, const double *b, co
 extern double feenox_mesh_dot(const double *a, const double *b);
 extern double feenox_mesh_subtract_dot(const double *b, const double *a, const double *c);
 extern double feenox_mesh_subtract_module(const double *b, const double *a);
+#define feenox_mesh_distance(a,b) feenox_mesh_subtract_module((a),(b))
 extern double feenox_mesh_subtract_squared_module(const  double *b, const  double *a);
 extern double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a);
 

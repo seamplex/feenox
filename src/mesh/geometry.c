@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related geometry routines
  *
- *  Copyright (C) 2014--2016 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -79,7 +79,7 @@ double feenox_mesh_subtract_module(const double *b, const double *a) {
   return gsl_hypot3(b[0]-a[0], b[1]-a[1], b[2]-a[2]);
 }
 
-// squared module al cuadrado de (b-a)
+// squared module of (b-a)
 double feenox_mesh_subtract_squared_module(const  double *b, const  double *a) {
   double dx = (b[0]-a[0]);
   double dy = (b[1]-a[1]);
@@ -87,7 +87,7 @@ double feenox_mesh_subtract_squared_module(const  double *b, const  double *a) {
   return dx*dx + dy*dy + dz*dz;
 }
 
-// squared module of (b-a)
+// squared module of (b-a) in 2d
 double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a) {
   return (b[0]-a[0])*(b[0]-a[0]) + (b[1]-a[1])*(b[1]-a[1]);
 }
