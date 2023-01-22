@@ -1,0 +1,31 @@
+PROBLEM thermal 3d
+
+# https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl
+READ_MESH bunny.msh SCALE 1e-3
+PHYSICAL_GROUP bunny DIM 3 # this is to compute the COG
+
+# https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/
+# T is in Celsius, T' is in Kelvin
+VAR T'
+tau(T') = (T'+273.15)/1000 
+# conductivity is in W/(m K)
+cond(T') = 100/(7.5408 + 17.692*tau(T') + 3.614*tau(T')^2) + 6400/(tau(T')^(5/2))*exp(-16.35/tau(T'))
+
+k(x,y,z) = cond(T(x,y,z))
+rho = 10970
+cp = 320e3
+
+Toven = 400
+BC base q=0
+BC rest h=1000 Tref=limit(Toven*t,0,Toven)
+
+T_0(x,y,z) = 0
+end_time = 1e5
+
+SOLVE_PROBLEM
+done = T(bunny_cog[1],bunny_cog[2],bunny_cog[3]) > 0.5*Toven
+
+PRINT t T(bunny_cog[1],bunny_cog[2],bunny_cog[3])
+WRITE_MESH bunny-thermal.msh T
+
+
