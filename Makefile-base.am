@@ -14,6 +14,7 @@ TESTS = \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
         tests/builtin.sh \
+        tests/cog.sh \
         tests/cylinder-traction-force.sh \
         tests/default_argument_value.sh \
         tests/encased_rod.sh \

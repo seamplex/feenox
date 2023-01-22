@@ -224,6 +224,9 @@ int feenox_instruction_mesh_read(void *arg) {
         }
         
         feenox_var_value(physical_group->var_volume) = physical_group->volume;
+        for (size_t m = 0; m < 3; m++) {
+          physical_group->cog[m] /= physical_group->volume;
+        }
         
         if (physical_group->vector_cog->initialized == 0) {
           feenox_call(feenox_vector_init(physical_group->vector_cog, 0));
