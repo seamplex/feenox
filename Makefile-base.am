@@ -107,19 +107,19 @@ DISTCLEANFILES = \
                  tests/print_vector.last \
                  tests/i-beam-hex.msh \
                  tests/iterative.last \
-                 test/mesh2d.msh \
-                 test/laplace-square.msh \
-                 test/square-f.msh \
-                 test/map-cube-4-10-dst.msh \
-                 test/tests/transient-from-mesh-same-dt.last \
-                 test/tests/transient-to-mesh.last \
-                 test/tests/cube.msh \
-                 test/tests/transient-from-mesh-different-dt.last \
-                 test/map-cube-4-src.msh \
-                 test/map-cube-10-4-dst.msh \
-                 test/map-cube-10.msh \
-                 test/map-cube-4.msh \
-                 test/map-cube-10-src.msh
+                 mesh2d.msh \
+                 laplace-square.msh \
+                 square-f.msh \
+                 map-cube-4-10-dst.msh \
+                 tests/transient-from-mesh-same-dt.last \
+                 tests/transient-to-mesh.last \
+                 tests/cube.msh \
+                 tests/transient-from-mesh-different-dt.last \
+                 map-cube-4-src.msh \
+                 map-cube-10-4-dst.msh \
+                 map-cube-10.msh \
+                 map-cube-4.msh \
+                 map-cube-10-src.msh
                  
 
 all-local:
