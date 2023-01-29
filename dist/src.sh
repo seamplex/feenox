@@ -22,7 +22,7 @@ fi
 . versions.sh
 
 if [ "x${name}" != "xLinux" ]; then
-  echo "source tarballs should be created only in GNU/Linux"
+  echo "error: source tarballs should be created only in GNU/Linux"
   exit 0
 fi
 
@@ -37,7 +37,7 @@ git clone .. ${tmp_dir}
 cd ${tmp_dir} 
  git checkout ${branch}
  ./autogen.sh --doc
- ./configure PETSC_DIR="" SLEPC_DIR="" PETSC_ARCH=""
+ ./configure --without-sundials --without-petsc
  cd doc
   ./make.sh
  cd .. 
@@ -47,8 +47,8 @@ cd ${current_dir}
 if [ -e ${tmp_dir}/${package}-${version}.tar.gz ]; then
  mkdir -p src
  mv ${tmp_dir}/${package}-${version}.tar.gz src
- echo "temporary dir ${tmp_dir} not removed"
+ echo "success: temporary dir ${tmp_dir} not removed"
 else
- echo "could not create source tarball ${tmp_dir}/${package}-${version}.tar.gz, quitting..."
+ echo "error: could not create source tarball ${tmp_dir}/${package}-${version}.tar.gz, quitting..."
  exit 1
 fi

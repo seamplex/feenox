@@ -1,8 +1,8 @@
 #!/bin/bash -ex
 
 if [ ! -e ../src ]; then
-  echo "run from dist directory"
-  exit 0
+  echo "error: run from dist directory"
+  exit 1
 fi
 
 . versions.sh
