@@ -37,8 +37,7 @@ $(awk '{printf("%s\\n\\\n", $0)}' doc/help-extra.txt)
 EOF
 
 
-# major version is equal to the latest tag
-version=$(git describe --tags | sed 's/-/./')
+version=$(git describe --tags | sed 's/-/./' | cut -d- -f1 | tr -d v)
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
 rm -f config_links.m4

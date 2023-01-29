@@ -199,9 +199,11 @@ void feenox_longversion(void) {
   char petscarch[BUFFER_TOKEN_SIZE];
   
   PetscGetVersion(petscversion, BUFFER_TOKEN_SIZE);
-  PetscGetArchType(petscarch, BUFFER_TOKEN_SIZE);
   printf("PETSc version      : %s\n", petscversion);
-  printf("PETSc arch         : %s\n", petscarch);
+  PetscGetArchType(petscarch, BUFFER_TOKEN_SIZE);
+  if (strlen(petscarch) > 0) {
+    printf("PETSc arch         : %s\n", petscarch);
+  }  
   printf("PETSc options      : %s\n", petscconfigureoptions);
 #else
   printf("PETSc version      : N/A\n");
