@@ -289,12 +289,9 @@ int feenox_instruction_mesh_read(void *arg) {
 
 node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x) {
   
-  node_t *node;
-  void *res_item;  
-  
   // TODO: if kd_nodes is null, initialize it here
-  res_item = kd_nearest(this->kd_nodes, x);
-  node = (node_t *)(kd_res_item(res_item, NULL));
+  void *res_item = kd_nearest(this->kd_nodes, x);
+  node_t *node = (node_t *)(kd_res_item(res_item, NULL));
   kd_res_free(res_item);    
 
   return node;
@@ -307,8 +304,11 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
 
   // test if the last (cached) chosen_element is the one
   if (element == NULL || element->type->point_in_element(element, x) == 0) {
-    element = NULL;
     
+    if (nearest_node == NULL) {
+      nearest_node = feenox_mesh_find_nearest_node(mesh, x);
+    }
+    element = NULL;
     element_ll_t *element_item = NULL;
     LL_FOREACH(nearest_node->element_list, element_item) {
       if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
@@ -317,16 +317,8 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     }
   }
 
-  // find the nearest node if not provided
-  double x_nearest[3] = {0, 0, 0};
   if (nearest_node == NULL) {
-    void *res_item = kd_nearest(mesh->kd_nodes, x);
-    nearest_node = (node_t *)(kd_res_item(res_item, x_nearest));
-    kd_res_free(res_item);    
-  } else {
-    x_nearest[0] = nearest_node->x[0];
-    x_nearest[1] = nearest_node->x[1];
-    x_nearest[2] = nearest_node->x[2];
+    nearest_node = feenox_mesh_find_nearest_node(mesh, x);
   }
   
   if (element == NULL && feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor) > 0) {
@@ -337,13 +329,13 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     double dist2 = 0;
     switch (mesh->dim) {
       case 1:
-        dist2 = gsl_pow_2(fabs(x[0] - x_nearest[0]));
+        dist2 = gsl_pow_2(fabs(x[0] - nearest_node->x[0]));
       break;
       case 2:
-        dist2 = feenox_mesh_subtract_squared_module2d(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module2d(x, nearest_node->x);
       break;
       case 3:
-        dist2 = feenox_mesh_subtract_squared_module(x, x_nearest);
+        dist2 = feenox_mesh_subtract_squared_module(x, nearest_node->x);
       break;
     }
     
@@ -364,7 +356,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
       
     while(element == NULL && kd_res_end(presults) == 0) {
-      node_t *second_nearest_node = (node_t *)(kd_res_item(presults, x_nearest));
+      node_t *second_nearest_node = (node_t *)(kd_res_item(presults, nearest_node->x));
       element_ll_t *element_item = NULL;
       LL_FOREACH(second_nearest_node->element_list, element_item) {
         
