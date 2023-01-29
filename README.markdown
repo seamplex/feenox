@@ -1,4 +1,4 @@
-# FeenoX: a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+# FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 - [<span class="toc-section-number">1</span> Why FeenoX?][]
 - [<span class="toc-section-number">2</span> What is FeenoX?][]
@@ -262,12 +262,13 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
-<figure>
-<img src="doc/lorenz.svg" id="fig:lorenz-gnuplot" data-width_latex="75%"
-data-width_html="100%" data-width_texinfo="12cm"
-alt="Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
-<figcaption aria-hidden="true">Figure 1: The Lorenz attractor solved
-with FeenoX and drawn with Gnuplot</figcaption>
+<figure id="fig:lorenz-gnuplot" data-width_latex="75%"
+data-width_html="100%" data-width_texinfo="12cm">
+<img src="doc/lorenz.svg" data-width_latex="75%" data-width_html="100%"
+data-width_texinfo="12cm"
+alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
+<figcaption>Figure 1: The Lorenz attractor solved with FeenoX and drawn
+with Gnuplot</figcaption>
 </figure>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
@@ -324,20 +325,21 @@ mesh (*rule of simplicity*). And since the properties are uniform and
 isotropic, a single global scalar for $E$ and a global single scalar
 for $\nu$ are enough.
 
-<figure>
-<img src="doc/nafems-le10-problem-input.svg"
-id="fig:nafems-le10-problem-input" data-width_html="100%"
+<figure id="fig:nafems-le10-problem-input" data-width_html="100%"
+data-width_latex="100%" data-width_texinfo="15cm">
+<img src="doc/nafems-le10-problem-input.svg" data-width_html="100%"
 data-width_latex="100%" data-width_texinfo="15cm"
-alt="Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
-<figcaption aria-hidden="true">Figure 2: The NAFEMS LE10 problem
-statement and the corresponding FeenoX input</figcaption>
+alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption>Figure 2: The NAFEMS LE10 problem statement and the
+corresponding FeenoX input</figcaption>
 </figure>
 
-<figure>
-<img src="doc/nafems-le10.png" id="fig:nafems-le10-sigmay"
-data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm"
-alt="Figure 3: Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
-<figcaption aria-hidden="true">Figure 3: Normal stress <span
+<figure id="fig:nafems-le10-sigmay" data-width_html="100%"
+data-width_latex="70%" data-width_texinfo="12cm">
+<img src="doc/nafems-le10.png" data-width_html="100%"
+data-width_latex="70%" data-width_texinfo="12cm"
+alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
+<figcaption>Figure 3: Normal stress <span
 class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined
 around point <span class="math inline"><em>D</em></span> over
 5,000x-warped displacements for LE10 created with Paraview</figcaption>
