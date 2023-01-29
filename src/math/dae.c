@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  DAE evaluation routines
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+#include "sundials/sundials_version.h"
 extern const char factorseparators[];
 
 
@@ -404,10 +405,14 @@ int feenox_dae_init(void) {
     return FEENOX_ERROR;
   }
     
+#if SUNDIALS_VERSION_MAJOR <= 5
   if ((feenox.dae.LS = SUNDenseLinearSolver(feenox.dae.x, feenox.dae.A)) == NULL) {
+#else
+  if ((feenox.dae.LS = SUNLinSol_Dense(feenox.dae.x, feenox.dae.A)) == NULL) {
+#endif    
     return FEENOX_ERROR;
   }
-
+  
   ida_call(IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));
   ida_call(IDASetInitStep(feenox.dae.system, feenox_special_var_value(dt)));
 

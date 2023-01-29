@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX version and description routines
  *
- *  Copyright (C) 2009--2022 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -178,8 +178,8 @@ void feenox_longversion(void) {
   printf("GSL version        : %s\n", gsl_version);
   
 #if HAVE_SUNDIALS
-  char *sundials_version = malloc(BUFFER_TOKEN_SIZE);
-  SUNDIALSGetVersion(sundials_version, BUFFER_TOKEN_SIZE);
+  char sundials_version[BUFFER_TOKEN_SIZE];
+  SUNDIALSGetVersion(sundials_version, BUFFER_TOKEN_SIZE-1);
 #else
   char *sundials_version = "N/A";
 #endif
