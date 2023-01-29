@@ -111,54 +111,60 @@ AX_GCC_BUILTIN(__builtin_expect)
 
 
 
-######################
-# check for SUNDIALS (optional)
-# the default is read from the macro argument, but the help string
-# does not expand variables so it always states that it is "check"
-AC_ARG_WITH(
-  [sundials],
-  AS_HELP_STRING([--with-sundials], [use SUNDIALS to solve DAEs @<:@default=check@:>@]),
-  [],
-  [with_sundials=check]
-)
-
- 
-have_sundials="no"
-AS_IF([test "x${with_sundials}" != "xno"] , [
-  AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
-    [],
-    AS_IF([test "x${with_sundials}" != "xcheck"], AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev headers failed]))
-  )
-  AC_CHECK_LIB([sundials_ida], [IDAInit],
-    [],
-    AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
-    )
-  )  
-  AC_CHECK_HEADER([nvector/nvector_serial.h],
-    [],
-    AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
-    )
-  )
-  AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
-    [],
-    AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
-    )  
-  )
-])
-
-# check if we have everything
-AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
-            "x${ac_cv_header_sundials_sundials_types_h}" = "xyes" -a  \
-            "x${ac_cv_lib_sundials_nvecserial_N_VNew_Serial}" = "xyes" -a \
-            "x${ac_cv_header_nvector_nvector_serial_h}" = "xyes"],
-  [
-    AC_DEFINE(HAVE_SUNDIALS)
-    have_sundials="yes"
-  ]
-)
+# ######################
+# # check for SUNDIALS (optional)
+# # the default is read from the macro argument, but the help string
+# # does not expand variables so it always states that it is "check"
+# AC_ARG_WITH(
+#   [sundials],
+#   AS_HELP_STRING([--with-sundials], [use SUNDIALS to solve DAEs @<:@default=check@:>@]),
+#   [],
+#   [with_sundials=check]
+# )
+# 
+#  
+# have_sundials="no"
+# AS_IF([test "x${with_sundials}" != "xno"] , [
+#   AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
+#     [],
+#     AS_IF([test "x${with_sundials}" != "xcheck"], AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev headers failed]))
+#   )
+#   AC_CHECK_LIB([sundials_ida], [IDAInit],
+#     [],
+#     AS_IF([test "x${with_sundials}" != "xcheck"],
+#       AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
+#     )
+#   )  
+#   AC_CHECK_HEADER([nvector/nvector_serial.h],
+#     [],
+#     AS_IF([test "x${with_sundials}" != "xcheck"],
+#       AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
+#     )
+#   )
+#   AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
+#     [],
+#     AS_IF([test "x${with_sundials}" != "xcheck"],
+#       AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
+#     )  
+#   )
+# 
+#   # this is needed for sundials >= 5
+#   AC_CHECK_LIB([sundials_sunlinsoldense], [SUNDenseLinearSolver],
+#     [],
+#     AS_IF([test "x${with_sundials}" != "xcheck"])
+#   )
+# ])
+# 
+# # check if we have everything
+# AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
+#             "x${ac_cv_header_sundials_sundials_types_h}" = "xyes" -a  \
+#             "x${ac_cv_lib_sundials_nvecserial_N_VNew_Serial}" = "xyes" -a \
+#             "x${ac_cv_header_nvector_nvector_serial_h}" = "xyes"],
+#   [
+#     AC_DEFINE(HAVE_SUNDIALS)
+#     have_sundials="yes"
+#   ]
+# )
   
   
 
