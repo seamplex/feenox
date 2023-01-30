@@ -374,45 +374,52 @@ void feenox_free_m4(void) {
   
   return;
 }
+*/
+ 
 void feenox_free_dae(void) {
 
 #ifdef HAVE_SUNDIALS
-  dae_t *dae, *tmp;
+  dae_t *dae = NULL;
+  dae_t *tmp = NULL;
   
-  if (feenox_dae.daes != NULL) {
-    LL_FOREACH_SAFE(feenox_dae.daes, dae, tmp) {
-      feenox_destroy_expression(&dae->residual);
-      feenox_destroy_expression(&dae->expr_i_min);
-      feenox_destroy_expression(&dae->expr_i_max);
-      feenox_destroy_expression(&dae->expr_j_min);
-      feenox_destroy_expression(&dae->expr_j_max);
-      LL_DELETE(feenox_dae.daes, dae);
-      feenox_free(dae);
-    }
+  LL_FOREACH_SAFE(feenox.dae.daes, dae, tmp) {
+    feenox_expression_destroy(&dae->residual);
+    feenox_expression_destroy(&dae->expr_i_min);
+    feenox_expression_destroy(&dae->expr_i_max);
+    feenox_expression_destroy(&dae->expr_j_min);
+    feenox_expression_destroy(&dae->expr_j_max);
+    LL_DELETE(feenox.dae.daes, dae);
+    feenox_free(dae);
   }
 
-  if (feenox_dae.system != NULL) {
-    IDAFree(&feenox_dae.system);
-    feenox_dae.system = NULL;
+  if (feenox.dae.system != NULL) {
+    IDAFree(&feenox.dae.system);
+    feenox.dae.system = NULL;
   }
     
-  if (feenox_dae.x != NULL) {
-    N_VDestroy_Serial(feenox_dae.x);
-    feenox_dae.x = NULL;
+  if (feenox.dae.x != NULL) {
+    N_VDestroy_Serial(feenox.dae.x);
+    feenox.dae.x = NULL;
   }
-  if (feenox_dae.dxdt != NULL) {
-    N_VDestroy_Serial(feenox_dae.dxdt);
-    feenox_dae.dxdt = NULL;
+  if (feenox.dae.dxdt != NULL) {
+    N_VDestroy_Serial(feenox.dae.dxdt);
+    feenox.dae.dxdt = NULL;
   }
-  if (feenox_dae.id != NULL) {
-    N_VDestroy_Serial(feenox_dae.id);
-    feenox_dae.id = NULL;
+  if (feenox.dae.id != NULL) {
+    N_VDestroy_Serial(feenox.dae.id);
+    feenox.dae.id = NULL;
   }
+  
+#if SUNDIALS_VERSION_MAJOR >= 6
+  SUNContext_Free(&feenox.dae.ctx);
+#endif
+  
   
 #endif  
   return;
 }
 
+/*
 void feenox_free_assignments(void) {
   assignment_t *assignment, *tmp;
 
@@ -447,19 +454,20 @@ void feenox_free_instructions(void) {
   
   return;
 }
-
-void feenox_destroy_expression(expr_t *expr) {
-  
-  int i, j;
-  int nallocs = 0;
-  
+*/
+ 
+void feenox_expression_destroy(expr_t *expr) {
   if (expr == NULL) {
     return;
   }
   
-  for (i = 0; i < expr->n_tokens; i++) {
-    if (expr->token[i].arg != NULL) {
-      switch (expr->token[i].type) {
+  int nallocs = 0;
+  expr_item_t *item = NULL;
+  expr_item_t *tmp = NULL;
+  
+  LL_FOREACH_SAFE(expr->items, item, tmp) {
+    if (item->arg != NULL) {
+      switch (item->type) {
         case EXPR_VECTOR:
           nallocs = 1;
         break;
@@ -467,48 +475,45 @@ void feenox_destroy_expression(expr_t *expr) {
           nallocs = 2;
         break;
         case EXPR_BUILTIN_FUNCTION:
-          nallocs = expr->token[i].builtin_function->max_arguments;
+          nallocs = item->builtin_function->max_arguments;
         break;
         case EXPR_BUILTIN_FUNCTIONAL: 
-          nallocs = expr->token[i].builtin_functional->max_arguments;
+          nallocs = item->builtin_functional->max_arguments;
         break;
         case EXPR_FUNCTION:
-          nallocs = expr->token[i].function->n_arguments;
+          nallocs = item->function->n_arguments;
         break;
         case EXPR_BUILTIN_VECTORFUNCTION:
-          nallocs = expr->token[i].builtin_vectorfunction->max_arguments;
+          nallocs = item->builtin_vectorfunction->max_arguments;
         break;
         default:
           nallocs = 0;
         break;
       }
-      for (j = nallocs-1; j >= 0; j--) {
-        feenox_destroy_expression(&expr->token[i].arg[j]);
+      for (int j = nallocs-1; j >= 0; j--) {
+        feenox_expression_destroy(&item->arg[j]);
       }
-      feenox_free(expr->token[i].arg);
+      feenox_free(item->arg);
     }
-    if (expr->token[i].vector != NULL || expr->token[i].builtin_vectorfunction != NULL) {
-      feenox_free(expr->token[i].vector_arg);
+    if (item->vector != NULL || item->builtin_vectorfunction != NULL) {
+      feenox_free(item->vector_arg);
     }
-    if (expr->token[i].aux != NULL) {
-      feenox_free(expr->token[i].aux);
+    if (item->aux != NULL) {
+      feenox_free(item->aux);
     }
-  }
-  
-  if (expr->n_tokens != 0) {
-    feenox_free(expr->token);
+    feenox_free(item);
   }
   
   if (expr->string != NULL) {
     feenox_free(expr->string);
     expr->string = NULL;
   }
-  expr = NULL;  
+  expr = NULL;
   
   return;
   
 }
-*/
+
 
 void feenox_finalize(void) {
 
@@ -552,7 +557,9 @@ void feenox_finalize(void) {
 
   
   feenox_free_assignments();
+*/
   feenox_free_dae();
+/*  
   feenox_free_prints();
   feenox_free_print_vectors();
   feenox_free_print_functions();

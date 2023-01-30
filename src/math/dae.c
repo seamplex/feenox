@@ -200,7 +200,7 @@ int feenox_dae_init(void) {
     return FEENOX_ERROR;
   }
   
-  // primero calculamos el tamanio del phase space
+  // first we compute the size of the phase space
   feenox.dae.dimension = 0;
   phase_object_t *phase_object = NULL;
   LL_FOREACH(feenox.dae.phase_objects, phase_object) {
@@ -339,27 +339,28 @@ int feenox_dae_init(void) {
     feenox_push_error_message("less DAE equations %d than phase space dimension %d", i, feenox.dae.dimension);
     return FEENOX_ERROR;
   }
-  
-  feenox.dae.x = N_VNew_Serial(feenox.dae.dimension);
-  feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension);
-  feenox.dae.id = N_VNew_Serial(feenox.dae.dimension);
+ 
+  int err = 0; // this is used inside the ida_call() macro
+  ida_call(SUNContext_Create(NULL, &feenox.dae.ctx));
+  feenox_check_alloc(feenox.dae.x = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
+  feenox_check_alloc(feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
+  feenox_check_alloc(feenox.dae.id = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
 
-  if ((feenox.dae.system = IDACreate()) == NULL)  {
+  if ((feenox.dae.system = IDACreate(feenox.dae.ctx)) == NULL)  {
     feenox_push_error_message("failed to create IDA object");
     return FEENOX_ERROR;
   }
   
-  // llenamos el vector de ida con las variables del usuario 
+  // fill in the IDA vector with the user variables
   for (i = 0; i < feenox.dae.dimension; i++) {
     NV_DATA_S(feenox.dae.x)[i] = *(feenox.dae.phase_value[i]);
     NV_DATA_S(feenox.dae.dxdt)[i] = *(feenox.dae.phase_derivative[i]);
-    // suponemos que son algebraicas, despues marcamos las diferenciales
-    // pero hay que inicializar el vector id!
+    // assume they are algebraic, then we'll mark the differentials
+    // but we need to initialize the vector id
     // TODO: user IDA's header
     NV_DATA_S(feenox.dae.id)[i] = DAE_ALGEBRAIC; 
   }
   // initialize IDA
-  int err = 0; // this is used inside the ida_call() macro
   ida_call(IDAInit(feenox.dae.system, feenox_ida_dae, feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt));
 
   // seteo de tolerancias 
@@ -371,7 +372,7 @@ int feenox_dae_init(void) {
       return FEENOX_ERROR;
     }
 
-    feenox.dae.abs_error = N_VNew_Serial(feenox.dae.dimension);
+    feenox.dae.abs_error = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx);
 
     for (i = 0; i < feenox.dae.dimension; i++) {
       if (gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i) > 0) {
@@ -401,19 +402,20 @@ int feenox_dae_init(void) {
   
   ida_call(IDASetId(feenox.dae.system, feenox.dae.id));
  
-  if ((feenox.dae.A = SUNDenseMatrix(feenox.dae.dimension, feenox.dae.dimension)) == NULL) {
+  if ((feenox.dae.A = SUNDenseMatrix(feenox.dae.dimension, feenox.dae.dimension, feenox.dae.ctx)) == NULL) {
     return FEENOX_ERROR;
   }
     
-#if SUNDIALS_VERSION_MAJOR <= 5
-  if ((feenox.dae.LS = SUNDenseLinearSolver(feenox.dae.x, feenox.dae.A)) == NULL) {
+#if SUNDIALS_VERSION_MAJOR >= 6
+  if ((feenox.dae.LS = SUNLinSol_Dense(feenox.dae.x, feenox.dae.A, feenox.dae.ctx)) == NULL) {
 #else
-  if ((feenox.dae.LS = SUNLinSol_Dense(feenox.dae.x, feenox.dae.A)) == NULL) {
+  if ((feenox.dae.LS = SUNDenseLinearSolver(feenox.dae.x, feenox.dae.A)) == NULL) {
 #endif    
     return FEENOX_ERROR;
   }
   
-  ida_call(IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));
+//  ida_call(IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));
+  ida_call(IDASetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));  
   ida_call(IDASetInitStep(feenox.dae.system, feenox_special_var_value(dt)));
 
   if (feenox_special_var_value(max_dt) != 0) {
@@ -437,7 +439,7 @@ int feenox_dae_init(void) {
 int feenox_dae_ic(void) {
   
 #ifdef HAVE_SUNDIALS
-  int err;
+  int err = 0;
 
   if (feenox.dae.initial_conditions_mode == initial_conditions_from_variables) {
     if ((err = IDACalcIC(feenox.dae.system, IDA_YA_YDP_INIT, feenox_special_var_value(dt))) != IDA_SUCCESS) {

@@ -23,8 +23,6 @@
 
 int feenox_run(void) {
 
-  feenox_call(feenox_init_before_run());
-  
   // first the static step (or steps)
   feenox_special_var_value(in_static) = 1;
   feenox_special_var_value(in_static_first) = 1;

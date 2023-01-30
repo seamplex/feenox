@@ -222,11 +222,13 @@ int feenox_init_special_objects(void) {
 ///va+step_static+desc Indicates the current step number of the iterative static calculation.
 ///va+step_static+detail This is a read-only variable that contains the current step of the static calculation.
   feenox_special_var(step_static) = feenox_get_or_define_variable_get_ptr("step_static");
+  feenox_special_var_value(step_static) = 0;
   
 
 ///va+step_transient+desc Indicates the current step number of the transient static calculation.
 ///va+step_transient+detail This is a read-only variable that contains the current step of the transient calculation.
   feenox_special_var(step_transient) = feenox_get_or_define_variable_get_ptr("step_transient");
+  feenox_special_var_value(step_transient) = 0;
   
 ///va+in_static+desc Flag that indicates if FeenoX is solving the iterative static calculation.
 ///va+in_static+detail This is a read-only variable that is non zero if the static calculation.
@@ -256,6 +258,7 @@ int feenox_init_special_objects(void) {
 ///va+static_steps+desc Number of steps that ought to be taken during the static calculation, to be set by the user. 
 ///va+static_steps+detail The default value is one, meaning only one static step. 
   feenox_special_var(static_steps) = feenox_get_or_define_variable_get_ptr("static_steps");
+  feenox_special_var_value(static_steps) = 1;
   
 
 ///va+end_time+desc Final time of the transient calculation, to be set by the user. 
@@ -269,6 +272,7 @@ int feenox_init_special_objects(void) {
 ///va+t+detail transient code by means of shared-memory objects.
 ///va+t+detail Care should be taken when solving DAE systems and overwriting `t`.
   feenox_special_var(t) = feenox_get_or_define_variable_get_ptr("t");
+  feenox_special_var_value(t) = 0;  
   
 
 ///va+dt+desc Actual value of the time step for transient calculations.
@@ -403,108 +407,3 @@ int feenox_init_after_parser(void) {
   return WASORA_RUNTIME_OK;
 }
 */
-  
-// before each run we need to reset time, clear histories, etc
-int feenox_init_before_run(void) {
-//  int i;
-//  history_t *history;
-//  file_t *file;
-  
-  feenox_special_var_value(step_static) = 0;
-  feenox_special_var_value(step_transient) = 0;
-  feenox_special_var_value(static_steps) = 1;
-  feenox_special_var_value(t) = 0;
-  feenox_special_var_value(dt) = DEFAULT_DT;
-  feenox_special_var_value(dae_rtol) = DEFAULT_DAE_RTOL;
-  
-  
-  feenox_special_var_value(done_static) = 0;
-  feenox_special_var_value(done_transient) = 0;
-  feenox_special_var_value(done) = 0;
-
-  // does anybody dare to change pi?
-  feenox_special_var_value(pi) = M_PI;
-  feenox_special_var_value(zero) = ZERO;
-  feenox_special_var_value(infinite) = INFTY;
-#ifdef HAVE_SYSCONF
-  feenox_special_var_value(ncores) = (double)sysconf(_SC_NPROCESSORS_ONLN);
-#endif
-  feenox_special_var_value(pid) = (double)getpid();
-  
-  feenox.time_path_current = feenox.time_paths;
-  
-  
-#ifdef HAVE_SUNDIALS
-  // el cuento es asi: cuando hacemos estudios parametricos, las condiciones
-  // iniciales se vuelven a calcular porque ponemos t = 0
-  // pero las derivadas valen lo ultimo que valian al terminar el paso anterior
-  // asi que a menos que querramos hacer estudios adiabaticos (TODO!)
-  // volvemos a poner las derivadas en cero
-  // si el usuario da explicitamente los valores de las derivas, es lo mismo
-  // que las condiciones iniciales asi que todo manzana
-  if (feenox.dae.phase_derivative != NULL) {
-    unsigned int i = 0;
-    for (i = 0; i < feenox.dae.dimension; i++) {
-      *(feenox.dae.phase_value[i]) = 0;
-      *(feenox.dae.phase_derivative[i]) = 0;
-    }
-  }
-  
-  if (feenox.dae.system != NULL) {
-    IDAFree(&feenox.dae.system);
-    feenox.dae.system = NULL;
-  }
-    
-  if (feenox.dae.x != NULL) {
-    N_VDestroy_Serial(feenox.dae.x);
-    feenox.dae.x = NULL;
-  }
-  if (feenox.dae.dxdt != NULL) {
-    N_VDestroy_Serial(feenox.dae.dxdt);
-    feenox.dae.dxdt = NULL;
-  }
-  if (feenox.dae.id != NULL) {
-    N_VDestroy_Serial(feenox.dae.id);
-    feenox.dae.id = NULL;
-  }  
-#endif  
-
-/*  
-  LL_FOREACH(feenox.histories, history) {
-    history->function->data_size = 0;
-    history->position = 0;
-
-    if (history->function->data_value != NULL) {
-      feenox_free(history->function->data_value);
-    }
-    if (history->function->data_argument != NULL) {
-      feenox_free(history->function->data_argument[0]);
-      feenox_free(history->function->data_argument);
-    }
-  }  
-*/
-  print_t *print;
-  LL_FOREACH(feenox.prints, print) {
-    print->last_static_step = 0;
-    print->last_step = 0;
-    print->last_time = 0;
-    print->last_header_step = 0;
-    print->header_already_printed = 0;
-  }  
-
-  // si no estamos en parametrico o en optimizacion cerramos los files
-  // TODO: marcar los files como global o algo asi
-/*  
-  if (feenox.parametric.outer_steps == 0 && feenox.min.n == 0) {
-    for (file = feenox.files; file != NULL; file = file->hh.next) {
-      if (file->pointer != NULL && fileno(file->pointer) > 2) {
-        feenox_instruction_close_file(file);
-      }
-    }
-  }  
-*/
-  
-  // TODO: init before run the PDEs
-
-  return FEENOX_OK;
-}

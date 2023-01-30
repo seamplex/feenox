@@ -147,12 +147,6 @@ AS_IF([test "x${with_sundials}" != "xno"] , [
       AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
     )  
   )
-
-  # this is needed for sundials >= 5
-  AC_CHECK_LIB([sundials_sunlinsoldense], [SUNDenseLinearSolver],
-    [],
-    AS_IF([test "x${with_sundials}" != "xcheck"])
-  )
 ])
 
 # check if we have everything

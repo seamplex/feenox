@@ -1627,6 +1627,9 @@ struct feenox_t {
     N_Vector abs_error;
     SUNMatrix A;
     SUNLinearSolver LS;
+#if SUNDIALS_VERSION_MAJOR >= 6
+    SUNContext ctx;
+#endif
 #endif
 
     dae_t *daes;
@@ -1900,7 +1903,6 @@ extern int feenox_step(instruction_t *first, instruction_t *last);
 extern int feenox_initialize(int argc, char **argv);
 extern int feenox_init_special_objects(void);
 extern int feenox_init_after_parser(void);
-extern int feenox_init_before_run(void);
 
 // mesh's init.c
 extern int feenox_mesh_init_special_objects(void);
@@ -2332,6 +2334,9 @@ extern int feenox_problem_gradient_smooth_at_node(node_t *node);
 
 // pdes/parse.c
 extern int feenox_pde_parse_problem_type(const char *token);
+
+// cleanup.c
+extern void feenox_expression_destroy(expr_t *expr);
 
 // include problem-dependent virtual methods
 #include "pdes/methods.h"
