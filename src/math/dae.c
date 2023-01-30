@@ -20,7 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "sundials/sundials_version.h"
+#include <sundials/sundials_version.h>
 extern const char factorseparators[];
 
 
