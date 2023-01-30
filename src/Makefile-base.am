@@ -1,4 +1,12 @@
-include variables.mak
+if INCLUDE_SLEPC
+  include $(SLEPC_DIR)/lib/slepc/conf/slepc_variables
+endif
+if INCLUDE_PETSC
+  include $(PETSC_DIR)/lib/petsc/conf/variables
+endif
+
+
+
 undefine DESTDIR  # this variable is set by petsc somewhere and we need it empty to make install
 
 # include $(top_srcdir)/aminclude_static.am
