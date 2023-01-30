@@ -84,9 +84,8 @@ cd ${package}-${version}-${target} || exit 1
   fi
 
   cp ../${package}/doc/${package}.xml        share/doc || exit 1
+  cp ../${package}/doc/fee.vim               share/doc || exit 1
   cp ../${package}/doc/${package}-desc.texi  share/doc || exit 1
-  cp ../${package}/doc/syntax-kate.sh        share/doc || exit 1
-  cp ../${package}/doc/syntax-tex.sh         share/doc || exit 1
   
   cp -rL ../${package}/examples/             share/doc || exit 1
   echo "See https://www.seamplex.com/feenox/examples" > share/doc/examples/README || exit 1

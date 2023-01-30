@@ -158,5 +158,8 @@ makeinfo feenox-desc.texi > /dev/null
 echo "  texi2pdf"
 texi2pdf feenox-desc.texi > /dev/null
 
+# copy the README to README-doc because when using Makefile-doc.am there are two READMEs,
+# one for the rood and one for the doc and that cannot happen when doing make distcheck
+cp README README-doc
 
 echo "it's all good man"

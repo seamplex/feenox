@@ -1,12 +1,16 @@
 SUBDIRS = src doc
 
-dist_doc_DATA = AUTHORS ChangeLog TODO COPYING \
-                README README.markdown \
+# the eps files are neded for the description in texinfo
+dist_doc_DATA = AUTHORS \
+                ChangeLog \
+                TODO \
+                COPYING \
+                README \
+                README.markdown \
                 doc/feenox-desc.texi \
                 doc/feenox.xml \
                 doc/fee.vim \
-                doc/README \
-                doc/README.md \
+                doc/README-doc
                 doc/CODE_OF_CONDUCT.markdown \
                 doc/programming.markdown \
                 doc/compilation.markdown \
