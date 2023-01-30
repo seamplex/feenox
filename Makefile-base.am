@@ -172,7 +172,8 @@ DISTCLEANFILES = \
                  nafems-le1-7.vtk \
                  nafems-le11-tet4.vtk \
                  tests/annulus-modal.last \
-                 tests/annulus.msh                 
+                 tests/annulus.msh \
+                 cube-radial.vtk
                  
 
 all-local:
