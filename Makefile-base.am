@@ -1,10 +1,11 @@
 EXTRA_DIST = examples \
-             doc/programming.pdf \
-             doc/compilation.pdf \
-             doc/FAQ.pdf \
-             doc/CODE_OF_CONDUCT.pdf \
-             doc/srs.pdf doc/srs.markdown \
-             doc/sds.pdf doc/feenox-manual.pdf
+             doc/programming \
+             doc/compilation \
+             doc/FAQ \
+             doc/CODE_OF_CONDUCT \
+             doc/srs \
+             doc/sds \
+             doc/feenox-manual
 
 
 TESTS = \
