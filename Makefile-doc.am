@@ -10,7 +10,7 @@ dist_doc_DATA = AUTHORS \
                 doc/feenox-desc.texi \
                 doc/feenox.xml \
                 doc/fee.vim \
-                doc/README-doc
+                doc/README-doc \
                 doc/CODE_OF_CONDUCT.markdown \
                 doc/programming.markdown \
                 doc/compilation.markdown \
