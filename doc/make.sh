@@ -7,6 +7,10 @@ for i in feenox touch sed pandoc xelatex makeinfo texi2pdf inkscape convert pand
  fi
 done
 
+pdf=1
+if [ "x${1}" == "x--no-pdf" ]; then
+  pdf=0
+fi
 
 if [ ! -e "design" ]; then
   echo "error: execute from doc directory"
@@ -15,7 +19,9 @@ fi
 
 # main README & TODO
 echo "creating main README for Github"
-./md2.sh --pdf   ../README
+if [ ${pdf} = 1 ]; then
+  ./md2.sh --pdf   ../README
+fi
 ./md2.sh --gfm   ../README
 ./md2.sh --plain ../README
 ./md2.sh --html  ../README
@@ -23,7 +29,9 @@ echo "creating main README for Github"
 ./md2.sh --plain ../TODO
 
 echo "creating doc's README"
-./md2.sh --pdf   README
+if [ ${pdf} = 1 ]; then
+  ./md2.sh --pdf   README
+fi
 ./md2.sh --gfm   README
 ./md2.sh --plain README
 ./md2.sh --html  README
@@ -86,7 +94,9 @@ pandoc -s double-click.md -t plain -o double-click.txt --lua-filter=include-file
 echo "PDF + HTML + Markdown"
 for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
  echo ${i}
- ./md2.sh --pdf  ${i}
+ if [ ${pdf} = 1 ]; then
+  ./md2.sh --pdf  ${i}
+ fi
  ./md2.sh --html ${i}
  ./md2.sh --gfm  ${i}
 done
@@ -94,7 +104,9 @@ done
 echo "PDF + HTML"
 for i in sds feenox-manual; do
  echo ${i}
- ./md2.sh --pdf ${i}
+ if [ ${pdf} = 1 ]; then
+  ./md2.sh --pdf ${i}
+ fi
  ./md2.sh --html ${i}
 done
 
