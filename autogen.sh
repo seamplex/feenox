@@ -20,8 +20,6 @@ if test ! -d ".git"; then
 fi
 
 ./autoclean.sh
-touch ./src/variables.mak
-
 cat << EOF > ./src/help.h
 #define FEENOX_HELP_ONE_LINER     "$(cat doc/help-one-liner.txt)"
 #define FEENOX_HELP_USAGE         "$(cat doc/help-usage.txt)"

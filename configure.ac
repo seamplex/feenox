@@ -280,15 +280,8 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
 
 # if slepc is found we need to include its makefile,
 # otherwise petsc and otherwise nothing
-rm -f ${srcdir}/src/variables.mak
-AS_IF([test "x${have_slepc}" = "xyes"],
-  [echo "include \$(SLEPC_DIR)/lib/slepc/conf/slepc_variables" > ${srcdir}/src/variables.mak],
-  AS_IF([test "x${have_petsc}" = "xyes"],
-    [echo "include \$(PETSC_DIR)/lib/petsc/conf/variables" > ${srcdir}/src/variables.mak],
-    [touch ${srcdir}/src/variables.mak]
-  )
-)
-
+AM_CONDITIONAL([INCLUDE_PETSC], [test "x${have_slepc}" = "xyes" -a "x${have_slepc}" = "xno"])
+AM_CONDITIONAL([INCLUDE_SLEPC], [test "x${have_slepc}" = "xyes"])
 
 
 ######################
