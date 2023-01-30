@@ -91,23 +91,25 @@ pandoc -s double-click.md -t plain -o double-click.txt --lua-filter=include-file
 
 
 
-echo "PDF + HTML + Markdown"
+echo "PDF + HTML + Markdown + plain"
 for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
  echo ${i}
  if [ ${pdf} = 1 ]; then
   ./md2.sh --pdf  ${i}
  fi
- ./md2.sh --html ${i}
- ./md2.sh --gfm  ${i}
+ ./md2.sh --html  ${i}
+ ./md2.sh --gfm   ${i}
+ ./md2.sh --plain ${i}
 done
 
-echo "PDF + HTML"
+echo "PDF + HTML + plain"
 for i in sds feenox-manual; do
  echo ${i}
  if [ ${pdf} = 1 ]; then
-  ./md2.sh --pdf ${i}
+  ./md2.sh --pdf  ${i}
  fi
- ./md2.sh --html ${i}
+ ./md2.sh --html  ${i}
+ ./md2.sh --plain ${i}
 done
 
 
