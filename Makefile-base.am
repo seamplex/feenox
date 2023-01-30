@@ -120,7 +120,58 @@ DISTCLEANFILES = \
                  map-cube-10-4-dst.msh \
                  map-cube-10.msh \
                  map-cube-4.msh \
-                 map-cube-10-src.msh
+                 map-cube-10-src.msh \
+                 two-cubes-orthotropic-variables.vtk \
+                 nafems-le1-5.vtk \
+                 parallelepiped-thermal.msh \
+                 long-bar-unstruct-temperature.msh \
+                 two-cubes-orthotropic-functions.vtk \
+                 tests/reaction-elastic-lt.last \
+                 tests/spinning-disk-parallel-solid-halfquarter_unstruct.msh \
+                 tests/reaction-displ.last \
+                 tests/nafems-le11-tet4.msh \
+                 tests/pellet.msh \
+                 tests/wilson-2d.msh \
+                 tests/nafems-le11-hex27.msh \
+                 tests/two-cubes.msh \
+                 tests/spinning-disk-parallel-plane-quarter_unstruct.msh \
+                 tests/spinning-disk-parallel-plane-eighth_unstruct.msh \
+                 tests/reaction-elastic-lr.last \
+                 tests/spinning-disk-parallel-solid-halfeighth_unstruct.msh \
+                 tests/long-bar-struct.msh \
+                 tests/reaction-force.last \
+                 tests/nafems-t1.msh \
+                 tests/long-bar-unstruct.msh \
+                 tests/encased_rod.msh \
+                 tests/spinning-disk-parallel-plane-sixteenth_unstruct.msh \
+                 tests/nafems-le11-tet10.msh \
+                 tests/statically_indeterminate_reaction.msh \
+                 tests/wilson-1d.msh \
+                 tests/spinning-disk-parallel-solid-halfsixteenth_unstruct.msh \
+                 tests/nafems-le11-hex8.msh \
+                 tests/nafems-le11-hex20.msh \
+                 nafems-le1-4.vtk \
+                 nafems-le11-hex27.vtk \
+                 nafems-le1-1.vtk \
+                 nafems-le1-2.vtk \
+                 long-bar-struct-temperature.msh \
+                 nafems-le11-hex20.vtk \
+                 nafems-le1-6.vtk \
+                 parallelepiped-coarse.msh \
+                 nafems-le1-8.vtk \
+                 encased_rod_tb.vtk \
+                 encased_rod_lb.vtk \
+                 two-cubes-isotropic-materials.vtk \
+                 nafems-t4-result.msh \
+                 nafems-le1-3.vtk \
+                 nafems-le11-tet10.vtk \
+                 two-cubes-isotropic-functions.vtk \
+                 nafems-le11-hex8.vtk \
+                 two-cubes-orthotropic-materials.vtk \
+                 two-cubes-isotropic-variables.vtk \
+                 nafems-le1-7.vtk \
+                 nafems-le11-tet4.vtk
+                 
                  
 
 all-local:
