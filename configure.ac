@@ -280,7 +280,7 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
 
 # if slepc is found we need to include its makefile,
 # otherwise petsc and otherwise nothing
-AM_CONDITIONAL([INCLUDE_PETSC], [test "x${have_slepc}" = "xyes" -a "x${have_slepc}" = "xno"])
+AM_CONDITIONAL([INCLUDE_PETSC], [test "x${have_petsc}" = "xyes" -a "x${have_slepc}" = "xno"])
 AM_CONDITIONAL([INCLUDE_SLEPC], [test "x${have_slepc}" = "xyes"])
 
 
