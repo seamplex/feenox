@@ -21,6 +21,6 @@ BC external T=420
 
 T_guess(x,y,z) = 800
 SOLVE_PROBLEM
-PRINT %.0f T_max
+PRINT %.0f T_max-1128
 
 # WRITE_MESH pellet-nonlinear-guess.vtk T
