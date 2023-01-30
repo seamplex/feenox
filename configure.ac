@@ -12,7 +12,7 @@ m4_include([version.m4])
 m4_include([ax_gcc_builtin.m4])
 AC_INIT([feenox],feenoxversion,[jeremy@seamplex.com])
 
-AC_CONFIG_SRCDIR([src/feenox.c])
+AC_CONFIG_SRCDIR([${srcdir}/src/feenox.c])
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
