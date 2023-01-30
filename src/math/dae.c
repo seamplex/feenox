@@ -341,12 +341,18 @@ int feenox_dae_init(void) {
   }
  
   int err = 0; // this is used inside the ida_call() macro
+#if SUNDIALS_VERSION_MAJOR >= 6
   ida_call(SUNContext_Create(NULL, &feenox.dae.ctx));
   feenox_check_alloc(feenox.dae.x = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
   feenox_check_alloc(feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
   feenox_check_alloc(feenox.dae.id = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
-
   if ((feenox.dae.system = IDACreate(feenox.dae.ctx)) == NULL)  {
+#else
+  feenox_check_alloc(feenox.dae.x = N_VNew_Serial(feenox.dae.dimension));
+  feenox_check_alloc(feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension));
+  feenox_check_alloc(feenox.dae.id = N_VNew_Serial(feenox.dae.dimension));
+  if ((feenox.dae.system = IDACreate()) == NULL)  {
+#endif
     feenox_push_error_message("failed to create IDA object");
     return FEENOX_ERROR;
   }
@@ -372,7 +378,11 @@ int feenox_dae_init(void) {
       return FEENOX_ERROR;
     }
 
+#if SUNDIALS_VERSION_MAJOR >= 6
     feenox.dae.abs_error = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx);
+#else
+    feenox.dae.abs_error = N_VNew_Serial(feenox.dae.dimension);
+#endif
 
     for (i = 0; i < feenox.dae.dimension; i++) {
       if (gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i) > 0) {
@@ -402,7 +412,11 @@ int feenox_dae_init(void) {
   
   ida_call(IDASetId(feenox.dae.system, feenox.dae.id));
  
+#if SUNDIALS_VERSION_MAJOR >= 6
   if ((feenox.dae.A = SUNDenseMatrix(feenox.dae.dimension, feenox.dae.dimension, feenox.dae.ctx)) == NULL) {
+#else
+  if ((feenox.dae.A = SUNDenseMatrix(feenox.dae.dimension, feenox.dae.dimension)) == NULL) {    
+#endif
     return FEENOX_ERROR;
   }
     
@@ -461,27 +475,21 @@ int feenox_dae_ic(void) {
 #ifdef HAVE_SUNDIALS
 int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params) {
 
-  int i, j, k;
-  dae_t *dae;
- 
   // this function is called many times in a single FeenoX time step for intermediate
   // times which are internal to IDA, nevertheless there might be some residuals
   // that explicitly depend on time so we update FeenoX's time with IDA's time
   feenox_special_var_value(t) = t;
 
   // copy the phase space from IDA to FeenoX
-  for (k = 0; k < feenox.dae.dimension; k++) {
+  for (int k = 0; k < feenox.dae.dimension; k++) {
     *(feenox.dae.phase_value[k]) = NV_DATA_S(yy)[k];
     *(feenox.dae.phase_derivative[k]) = NV_DATA_S(yp)[k];
   }
 
   // evaluate the residuals in FeenoX and leave them for IDA
-  k = 0;
+  int k = 0;
+  dae_t *dae = NULL;
   LL_FOREACH(feenox.dae.daes, dae) {
-    
-    // fall-offs para detectar errores (i.e. una expresion vectorial que dependa de j)
-    j = 0;
-    i = 0;
     
     if (dae->i_max == 0) {
       // ecuacion escalar
@@ -489,14 +497,14 @@ int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *para
       
     } else {
          
-      for (i = dae->i_min; i < dae->i_max; i++) {
+      for (int i = dae->i_min; i < dae->i_max; i++) {
         feenox_special_var_value(i) = (double)i+1;
         if (dae->j_max == 0) {
           
           // ecuacion vectorial
           NV_DATA_S(rr)[k++] = feenox_expression_eval(&dae->residual);
         } else {
-          for (j = dae->j_min; j < dae->j_max; j++) {
+          for (int j = dae->j_min; j < dae->j_max; j++) {
             feenox_special_var_value(j) = (double)j+1;
             
             // ecuacion matricial
