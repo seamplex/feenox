@@ -22,7 +22,7 @@ answerzero pellet-linear-guess.fee 5e-2
 exitifwrong $?
 
 
-# run with --snes_view
+# run with --snes_monitor
 answerzero pellet-nonlinear.fee 5
 exitifwrong $?
 

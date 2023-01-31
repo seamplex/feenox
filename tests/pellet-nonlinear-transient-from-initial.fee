@@ -1,7 +1,8 @@
 PROBLEM thermal 3D
 READ_MESH pellet.msh
 
-end_time = 30  # seconds
+end_time = 3  # small time to run the test faster [seconds]
+
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/
 
 # T is in Celsius, T' is in Kelvin
@@ -35,7 +36,7 @@ T_0(x,y,z) = 300
 SOLVE_PROBLEM
 # PRINT t T(0,0,0) T(0.5*r,0,0) T(0.85*r,0,0)
 IF done
-  PRINT %.0f T(0,0,0)-1128
+  PRINT %.0f T(0,0,0)-711
 ENDIF
 
 # WRITE_MESH pellet-nonlinear-transient-from-initial.msh T
