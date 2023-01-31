@@ -1,2 +1,2 @@
 DEFAULT_ARGUMENT_VALUE 2 1e-3
-PRINT abs(($1)<($2))
+PRINT abs($1)<($2)
