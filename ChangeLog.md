@@ -1,6 +1,10 @@
-
 # Current
 
+ 
+
+# v0.3 (Feb 2023)
+
+ * first attempt and creating debian packages
  * added jacobian for temperature-dependent conductivity
  * updated LE10 benchmark
  * read time-dependent functions in `.msh` files
