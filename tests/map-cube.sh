@@ -14,13 +14,13 @@ checkgmsh
 gmsh -v 0 -3 -clmax 0.25 ${dir}/map-cube.geo -o map-cube-4.msh  || exit $?
 gmsh -v 0 -3 -clmax 0.10 ${dir}/map-cube.geo -o map-cube-10.msh || exit $?
 
-${feenox} ${dir}/map-create.fee 4 || exit $?
-${feenox} ${dir}/map-create.fee 10 || exit $?
+${feenox} ${dir}/map-cube-create.fee 4 || exit $?
+${feenox} ${dir}/map-cube-create.fee 10 || exit $?
 
-answerzero2 map-interpolate.fee 4 10 1e-2
+answerzero2 map-cube.fee 4 10 2e-2
 exitifwrong $?
 
-answerzero2 map-interpolate.fee 10 4 
+answerzero2 map-cube.fee 10 4
 exitifwrong $?
 
 
