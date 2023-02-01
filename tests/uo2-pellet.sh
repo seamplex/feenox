@@ -23,22 +23,22 @@ exitifwrong $?
 
 
 # run with --snes_monitor
-answerzero pellet-nonlinear.fee 5
+answerzero pellet-nonlinear.fee 12
 exitifwrong $?
 
-answerzero pellet-nonlinear-guess.fee 5
+answerzero pellet-nonlinear-guess.fee 12
 exitifwrong $?
 
 
 # transients
-answerzero pellet-linear-transient-from-ss.fee 5
+answerzero pellet-linear-transient-from-ss.fee 15
 exitifwrong $?
 
-answerzero pellet-linear-transient-from-initial.fee 5
+answerzero pellet-linear-transient-from-initial.fee 15
 exitifwrong $?
 
-answerzero pellet-nonlinear-transient-from-ss.fee 5
+answerzero pellet-nonlinear-transient-from-ss.fee 15
 exitifwrong $?
 
-answerzero pellet-nonlinear-transient-from-initial.fee 5
+answerzero pellet-nonlinear-transient-from-initial.fee 15
 exitifwrong $?
