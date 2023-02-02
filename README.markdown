@@ -451,21 +451,28 @@ FeenoX is distributed under the terms of the [GNU General Public License
 version 3][] or (at your option) any later version. See [licensing
 below][] for details.
 
-|                    |                                                |
-|--------------------|------------------------------------------------|
-| GNU/Linux binaries | <https://www.seamplex.com/feenox/dist/linux>   |
-| Windows binaries   | <https://www.seamplex.com/feenox/dist/windows> |
-| Source tarballs    | <https://www.seamplex.com/feenox/dist/src>     |
-| Github repository  | <https://github.com/seamplex/feenox/>          |
+|                                     |                                                |
+|-------------------------------------|------------------------------------------------|
+| Debian/Ubuntu packages (unofficial) | <https://www.seamplex.com/feenox/dist/deb>     |
+| GNU/Linux static binaries           | <https://www.seamplex.com/feenox/dist/linux>   |
+| Windows binaries                    | <https://www.seamplex.com/feenox/dist/windows> |
+| Source tarballs                     | <https://www.seamplex.com/feenox/dist/src>     |
+| Github repository                   | <https://github.com/seamplex/feenox/>          |
 
 - Be aware that FeenoX is a backend. It **does not have a GUI**. Read
   the [documentation][5], especially the [description][] and the
   [FAQs][6]. Ask for help on the [GitHub discussions page][].
 
-- Binaries are provided as statically-linked executables for
-  convenience. They do not support MUMPS nor MPI and have only basic
-  optimization flags. Please compile from source for high-end
-  applications. See [detailed compilatation instructions][].
+- Debian/Ubuntu packages are unofficial, i.e. they are not available in
+  `apt` repositories. They contain dynamically-linked binaries and their
+  dependencies are hard-coded for each Debian/Ubuntu release. Make sure
+  you get the right `.deb` for your release (i.e. `bookworm`/`bullseye`
+  for Debian, `kinetic`/`focal` for Ubuntu).
+
+- Generic GNU/Linux binaries are provided as statically-linked
+  executables for convenience. They do not support MUMPS nor MPI and
+  have only basic optimization flags. Please compile from source for
+  high-end applications. See [detailed compilatation instructions][].
 
 - Try to avoid Windows as much as you can. The binaries are provided as
   transitional packages for people that for some reason still use such

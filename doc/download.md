@@ -21,32 +21,32 @@ toc: true
 # Downloads {#sec:downloads}
 
 ```{.include}
-doc/downloads.md
+downloads.md
 ```
 
 ## Debian/Ubuntu packages
 
 ```{.include}
-doc/debian.md
+debian.md
 ```
 
 
 ## Statically-linked binaries
 
 ```{.include}
-doc/binary.md
+binary.md
 ```
 
 ## Compile from source
 
 ```{.include}
-doc/source.md
+source.md
 ```
 
 ## Github repository
 
 ```{.include}
-doc/git.md
+git.md
 ```
 
 See the [Compilation Guide](doc/compile.md) for details.
@@ -58,10 +58,10 @@ Ask in the [GitHub Discussions page](https://github.com/seamplex/feenox/discussi
 FeenoX is distributed under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html) version 3 or (at your option) any later version. The following text was borrowed from the [Gmsh documentation](http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions). Replacing “Gmsh” with “FeenoX” gives:
 
 > ```include
-> doc/freesw.md
+> freesw.md
 > ```
 
 ```include
-doc/licensing.md
+licensing.md
 ```
 

@@ -82,7 +82,7 @@ doc/introduction.md
 # Download
 
 ```include
-doc/download.md
+doc/downloads.md
 ```
 
 ## Git repository
