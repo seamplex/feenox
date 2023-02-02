@@ -430,8 +430,12 @@ int feenox_dae_init(void) {
     return FEENOX_ERROR;
   }
   
-//  ida_call(IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));
+#if SUNDIALS_VERSION_MAJOR >= 4
   ida_call(IDASetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));  
+#else
+  ida_call(IDADlsSetLinearSolver(feenox.dae.system, feenox.dae.LS, feenox.dae.A));
+#endif
+  
   ida_call(IDASetInitStep(feenox.dae.system, feenox_special_var_value(dt)));
 
   if (feenox_special_var_value(max_dt) != 0) {
