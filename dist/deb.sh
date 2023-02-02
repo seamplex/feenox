@@ -22,7 +22,8 @@ if [ "x${name}" != "xLinux" ]; then
 fi
 
 codename=$(lsb_release -a | grep Codename | cut -d: -f2 | xargs)
-if [[ "x${codename}" != "xbookworm" ]] && [[ "x${codename}" != "xbullseye" ]]; then
+if [[ "x${codename}" != "xbookworm" ]] && [[ "x${codename}" != "xbullseye" ]] &&
+   [[ "x${codename}" != "xkinetic"  ]] && [[ "x${codename}" != "xfocal" ]]; then
   echo "error: ${codename} is not valid"
   exit 1
 fi
