@@ -117,9 +117,7 @@ void feenox_shortversion(void) {
   
   printf("FeenoX ");
 #ifdef FEENOX_GIT_BRANCH
-  printf("%s%s %s\n", FEENOX_GIT_VERSION,
-                             (FEENOX_GIT_CLEAN==0) ? "" : "-dirty",
-                             strcmp(FEENOX_GIT_BRANCH, "main") ? FEENOX_GIT_BRANCH : "");
+  printf("%s %s\n", FEENOX_GIT_VERSION, strcmp(FEENOX_GIT_BRANCH, "main") ? FEENOX_GIT_BRANCH : "");
 #else
   printf("%s\n", PACKAGE_VERSION);
 #endif
