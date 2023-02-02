@@ -2,7 +2,7 @@
 
 # check for needed tools
 for i in pandoc pandoc-crossref feenox; do
-  if [ -z "$(which $i)" ]; then
+  if [ -z "$(which ${i})" ]; then
     echo "error: ${i} not installed"
     exit 1
   fi

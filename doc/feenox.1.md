@@ -5,7 +5,7 @@ author: Jeremy Theler <jeremy@seamplex.com>
   
 # NAME
 
-FeenoX - a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX - a cloud-first free no-X uniX-like finite-element(ish) computational engineering tool
 
 # SYNOPSIS
 

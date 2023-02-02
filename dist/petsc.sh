@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-if [ ! -e ../src ]; then
+if [ ! -e ../tests ]; then
   echo "error: run from dist directory"
   exit 0
 fi

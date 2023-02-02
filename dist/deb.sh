@@ -1,15 +1,15 @@
 #!/bin/bash -ex
 
 # check for needed tools
-for i in lsb_release apt-cache xargs md5sum dpkg-deb; do
-  if [ -z "$(which $i)" ]; then
+for i in lsb_release apt-cache xargs md5sum dpkg-deb tar gzip; do
+  if [ -z "$(which ${i})" ]; then
     echo "error: ${i} not installed"
     exit 1
   fi
 done
 
 
-if [ ! -e ../src ]; then
+if [ ! -e ../tests ]; then
   echo "error: run from dist directory"
   exit 1
 fi
@@ -21,16 +21,11 @@ if [ "x${name}" != "xLinux" ]; then
   exit 1
 fi
 
-codename=$(lsb_release -a | grep Codename | cut -d: -f2 | xargs)
-if [[ "x${codename}" != "xbookworm" ]] && [[ "x${codename}" != "xbullseye" ]] &&
-   [[ "x${codename}" != "xkinetic"  ]] && [[ "x${codename}" != "xfocal" ]]; then
-  echo "error: ${codename} is not valid"
-  exit 1
-fi
 
 # -----------------------------------------------------------
 #   debian package
 # -----------------------------------------------------------
+codename=$(lsb_release -a | grep Codename | cut -d: -f2 | xargs)
 deb_version=1
 dir=${package}-${version}_${deb_version}_amd64
 rm -rf ${dir}
@@ -68,9 +63,25 @@ EOF
 #   doc
 # -----------------------------------------------------------
 if [ ! -e src/${package}-${version}.tar.gz ]; then
+  # try to download source
+  for i in wget; do
+    if [ -z "$(which ${i})" ]; then
+      echo "error: ${i} not installed"
+      exit 1
+    fi
+  done
+  
+  mkdir -p src
+  cd src
+    wget https://seamplex.com/feenox/dist/src/feenox-${version}.tar.gz 
+  cd ..  
+fi
+if [ ! -e src/${package}-${version}.tar.gz ]; then
   echo "error: cannot find src/${package}-${version}.tar.gz, run ./src.sh first"
   exit 1
 fi
+
+
 
 rm -rf ${package}-${version} 
 tar xvzf src/${package}-${version}.tar.gz
@@ -144,5 +155,5 @@ cd ..
 # -----------------------------------------------------------
 # TODO: use dpkg-buildpackage
 dpkg-deb --root-owner-group --build ${dir}
-mkdir -p debian/${codename}
-mv *.deb debian/${codename}
+mkdir -p deb/${codename}
+mv *.deb deb/${codename}
