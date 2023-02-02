@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-for i in feenox touch sed pandoc xelatex makeinfo texi2pdf inkscape convert pandoc-crossref; do
+for i in feenox touch sed pandoc makeinfo inkscape convert pandoc-crossref; do
  if [ -z "$(which $i)" ]; then
   echo "error: ${i} not installed"
   exit 1
@@ -12,10 +12,22 @@ if [ "x${1}" == "x--no-pdf" ]; then
   pdf=0
 fi
 
+if [ ${pdf} = 1 ]; then
+ for i in xelatex texi2pdf; do
+  if [ -z "$(which $i)" ]; then
+   echo "error: ${i} not installed"
+   exit 1
+  fi
+ done
+fi
+
+
 if [ ! -e "design" ]; then
   echo "error: execute from doc directory"
   exit 1
 fi
+
+
 
 # main README & TODO
 echo "creating main README for Github"
@@ -155,8 +167,10 @@ done
 
 echo "  makeinfo"
 makeinfo feenox-desc.texi > /dev/null
-echo "  texi2pdf"
-texi2pdf feenox-desc.texi > /dev/null
+if [ ${pdf} = 1 ]; then
+ echo "  texi2pdf"
+ texi2pdf feenox-desc.texi > /dev/null
+fi 
 
 # copy the README to README-doc because when using Makefile-doc.am there are two READMEs,
 # one for the rood and one for the doc and that cannot happen when doing make distcheck
