@@ -1,10 +1,12 @@
 Debian/Ubuntu packages are available at <https://www.seamplex.com/feenox/dist/>.
 Find the directory for your Debian or Ubuntu release, i.e.
 
- * `bookworm` is Debian 12
- * `bullseye` is Debian 11
- * `kinetic` is Ubuntu 22.10
- * `focal` is Ubunutu 20.04
+ * [`bookworm`](https://www.seamplex.com/feenox/dist/deb/bookworm) is Debian 12
+ * [`bullseye`](https://www.seamplex.com/feenox/dist/deb/bullseye) is Debian 11
+ * [`buster`](https://www.seamplex.com/feenox/dist/deb/buster) is Debian 10
+ * [`kinetic`](https://www.seamplex.com/feenox/dist/deb/kinetic) is Ubuntu 22.10
+ * [`jammy`](https://www.seamplex.com/feenox/dist/deb/jammy) is Ubuntu 22.04
+ * [`focal`](https://www.seamplex.com/feenox/dist/deb/focal) is Ubuntu 20.04
  
 If you know how to install `.deb` packages, feel free to use your method (i.e. `gdebi` or with the "Software Center" thing).
 
@@ -44,7 +46,7 @@ Please try the statically-linked binaries below or ask in the [FeenoX discussion
 
 The FeenoX Unix man page should be available in section one:
 
-```
+```terminal
 $ man -k feenox
 feenox (1)           - a cloud-first free no-X uniX-like finite-element(ish) computational engineering tool
 $ man feenox
