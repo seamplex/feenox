@@ -48,22 +48,34 @@ Note that since the `.deb` package contains a dynamically linked binary, it has 
 ## Using Vagrant
 
 ```terminal
-mkdir ubuntu18.04
-cd ubuntu18.04
-vagrant init ubuntu/bionic64      # <- this needs virtualbox
-vagrant init generic/ubuntu1804   # <- this works with libvrt
+mkdir jammy
+cd jammy
+vagrant init ubuntu/jammy64       # <- this needs virtualbox
+vagrant init generic/ubuntu2204   # <- this works with libvrt
 vagrant up
 vagrant ssh
 ```
 
-```terminal
-sudo apt-get install -y autoconf make  libgsl-dev libsundials-dev
-git clone https://github.com/seamplex/feenox
-cd feenox/dist
-mkdir src
-cd src
-version=$(git describe --tags | sed 's/-/./' | cut -d- -f1 | tr -d v)
-wget https://seamplex.com/feenox/dist/src/feenox-${version}.tar.gz
-cd ..
+Then clone FeenoX, compile, go to `dist` and run `deb.sh`:
 
+```terminal
+sudo apt-get install git autoconf automake make gcc g++ libgsl-dev libsundials-dev wget
+sudo apt-get install petsc-dev slepc-dev     # <- these names depend on the linux dist/version
+sudo apt-get install libpetsc-dev libslepc-dev     # <- these names depend on the linux dist/version
+git clone https://github.com/seamplex/feenox/
+cd feenox
+./autogen.sh
+./configure
+make
+cd dist
+./deb.sh
 ```
+
+## Names
+
+ * `bookworm` is Debian 12
+ * `bullseye` is Debian 11
+ * `buster` is Debian 10
+ * `kinetic` is Ubuntu 22.10
+ * `jammy` is Ubuntu 22.04
+ * `focal` is Ubuntu 20.04

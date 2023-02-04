@@ -15,6 +15,14 @@ toc: true
 ::: {.only-in-format .html .markdown}
 > **News**
 >
+> * [Debian/Ubuntu `.deb` packages available](download.html#debian) for FeenoX version\ 0.3.
+>
+> * A cloud-first approach for solving core-level neutron transport. 8a. Reunión Anual GArCyAR 2022, December 2022.
+>   - [Recordings](https://www.youtube.com/watch?v=rdZtyMf5m0k)
+>   - [Slides in PDF](8a. Reunión Anual GArCyAR 2022)
+>   - [Markdown examples sources](https://github.com/gtheler/2022-garcar)
+>
+>
 > * FeenoX, a cloud-first free and open source finite-element(ish) tool. Science Circle, on-line course. November 2022.
 >   - [Recordings](https://youtu.be/EZSjFzJAhbw)
 >   - [Markdown examples sources](https://github.com/gtheler/2022-feenox-sci-circle)
