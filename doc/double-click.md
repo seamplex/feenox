@@ -10,7 +10,7 @@ Recall that FeenoX is designed as a cloud-first tool, and “the cloud” runs o
 
 ```terminal
 > feenox.exe
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]

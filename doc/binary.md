@@ -30,7 +30,7 @@ Check if it works by calling `feenox` from any directory (you might need to open
 
 ```terminal
 $ feenox
-FeenoX v0.2.102-g0cb44d2-dirty 
+FeenoX v0.2.102-g0cb44d2
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]

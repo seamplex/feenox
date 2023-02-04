@@ -891,7 +891,7 @@ When executed without any arguments, FeenoX writes a brief message with the vers
 
 ```terminal
 $ feenox 
-FeenoX v0.2.12-gc5934bb-dirty 
+FeenoX v0.2.12-gc5934bb
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments]
@@ -910,7 +910,7 @@ The `--version` option follows the [GNU Coding Standards guidelines](https://www
 
 ```terminal
 $ feenox --version
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
@@ -924,7 +924,7 @@ The `--versions` option shows more information about the FeenoX build and the li
 
 ```terminal
 $ feenox -V
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 Last commit date   : Sat Feb 12 15:35:05 2022 -0300

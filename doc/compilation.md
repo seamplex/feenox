@@ -247,7 +247,7 @@ The binary executable will be located in the `src` directory but a copy will be 
 
 ```terminal
 $ ./feenox
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
@@ -260,11 +260,11 @@ Run with --help for further explanations.
 $
 ```
 
-The `-v` (or `--version`) option shows the version and a copyright notice:^[The word `dirty` means the current Git worktree used to compile the binary had some changes that were not commited yet.]
+The `-v` (or `--version`) option shows the version and a copyright notice:
 
 ```terminal
 $ ./feenox -v
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
@@ -632,7 +632,7 @@ Check that FeenoX is now available from any directory (note the command is `feen
 ```terminal
 $ cd
 $ feenox -v
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
@@ -709,7 +709,7 @@ The FeenoX executable will show the configured compiler and flags when invoked w
 
 ```terminal
 $ feenox --versions
-FeenoX v0.2.14-gbbf48c9-dirty 
+FeenoX v0.2.14-gbbf48c9
 a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 Last commit date   : Sat Feb 12 15:35:05 2022 -0300
