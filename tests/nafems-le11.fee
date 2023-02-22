@@ -1,7 +1,7 @@
 PROBLEM mechanical 3D
 READ_MESH nafems-le11-$1.msh
 
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 BC xz     v=0
 BC yz     u=0

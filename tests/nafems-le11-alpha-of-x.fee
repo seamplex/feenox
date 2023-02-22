@@ -1,0 +1,17 @@
+PROBLEM mechanical 3D
+READ_MESH nafems-le11-hex27.msh
+
+T(x,y,z) = 1
+
+BC xz     v=0
+BC yz     u=0
+BC xy     w=0
+BC HIH'I' w=0
+
+E = 2.11e11
+nu = 0.3
+alpha(x,y,z) = 2.3e-4*(sqrt(x^2 + y^2) + z)
+
+SOLVE_PROBLEM
+
+PRINT %.1f sigmaz(1,0,0)/1e6

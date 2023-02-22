@@ -34,3 +34,10 @@ exitifwrong $?
 
 answer1 nafems-le11.fee hex27 "-104.8"
 exitifwrong $?
+
+
+answer nafems-le11-alpha-of-x.fee "-104.8"
+exitifwrong $?
+
+answer nafems-le11-alpha-of-T.fee "-104.8"
+exitifwrong $?
