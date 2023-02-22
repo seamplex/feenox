@@ -177,7 +177,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
     
   // if the current element's size is not equal to the previous one, re-allocate
-  // TODO: data-oriented approach, these objects in native arrays
+  // TODO: data-oriented approach, store these objects in native arrays
   if (feenox.pde.n_local_nodes != this->type->nodes) {
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }

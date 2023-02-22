@@ -22,14 +22,18 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-int feenox_problem_build_allocate_aux_mechanical(size_t n_nodes) {
+int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
   
   mechanical.n_nodes = n_nodes;
   
-  feenox_free(mechanical.B);
+  if (mechanical.B != NULL) {
+    gsl_matrix_free(mechanical.B);
+  }
   feenox_check_alloc(mechanical.B = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
   
-  feenox_free(mechanical.CB);
+  if (mechanical.CB != NULL) {
+    gsl_matrix_free(mechanical.CB);
+  }
   feenox_check_alloc(mechanical.CB = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
 
   return FEENOX_OK;

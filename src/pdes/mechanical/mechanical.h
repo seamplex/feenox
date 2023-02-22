@@ -85,8 +85,8 @@ struct mechanical_t {
   int uniform_expansion;
   int constant_expansion;
   
-  int n_nodes;
-  int stress_strain_size;
+  unsigned int n_nodes;
+  unsigned int stress_strain_size;
 
   // holder for the rigid-body displacements
 #ifdef HAVE_PETSC  

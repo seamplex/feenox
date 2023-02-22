@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's routines for neutron diffusion FEM: global header
+ *  feenox's routines for neutron transport FEM: global header
  *
- *  Copyright (C) 2021--2023 jeremy theler
+ *  Copyright (C) 2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -19,46 +19,43 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#ifndef NEUTRON_DIFFUSION_H
-#define NEUTRON_DIFFUSION_H
+#ifndef NEUTRON_TRANSPORT_H
+#define NEUTRON_TRANSPORT_H
 
-typedef struct neutron_diffusion_t neutron_diffusion_t;
+typedef struct neutron_transport_t neutron_transport_t;
 
-struct neutron_diffusion_t {
 
-  unsigned int groups;  
-  
-  distribution_t *D;
-  distribution_t *Sigma_t;
-  distribution_t *Sigma_a;
-  distribution_t *nu_Sigma_f;
-  distribution_t **Sigma_s;
-  distribution_t *S;
-  
-  // diffusion coefficients, (groups * dim) x (groups * dim)
-  gsl_matrix *diff;
-  
-  // removal XSs: groups x groups
-  gsl_matrix *removal;
 
-  // fission XSs: groups x groups
-  gsl_matrix *nufission;
-  
-  // independent sources: groups
-  gsl_vector *src;  
-  
-  // fission spectrum: groups
-  double *chi;
+struct neutron_transport_t {
 
-  // elemental matrices  
-  unsigned int n_nodes;
-  gsl_matrix *DB;
-  gsl_matrix *AH;
-  gsl_matrix *XH;
-  gsl_matrix *Ki;
-  gsl_matrix *Ai;
-  gsl_matrix *Xi;
+  unsigned int N;
+  unsigned int directions;
+  unsigned int groups;
   
+  // directions and weights
+  double **Omega;
+  double *w;
+  
+  
+  // total XS
+  distribution_t *sigma_t;
+  
+  // absorption XS
+  distribution_t *sigma_a;
+  
+  // scattering XS
+  distribution_t **sigma_s0;
+  distribution_t **sigma_s1;
+  
+  // product of nu and fission XS
+  distribution_t *nu_sigma_f;
+
+  // product of energy per fission and fission XS
+  distribution_t *e_sigma_f;
+  
+  // independent neutron source
+  distribution_t *source;
+
 //  int has_dirichlet_bcs;
   int has_sources;
   int has_fission;
@@ -67,8 +64,8 @@ struct neutron_diffusion_t {
   var_t *keff;
   
 };  
-extern neutron_diffusion_t neutron_diffusion;
+extern neutron_transport_t neutron_transport;
 
 
-#endif /* NEUTRON_DIFFUSION_FEM_H */
+#endif /* NEUTRON_TRANSPORT_FEM_H */
 

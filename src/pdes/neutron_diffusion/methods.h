@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for neutron diffusion FEM: virtual methods
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -35,6 +35,7 @@ extern int feenox_problem_setup_eps_neutron_diffusion(EPS eps);
 #endif
 
 // neutron_diffusion/bulk.c
+extern int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int n_nodes);
 extern int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *element, unsigned int v);
 
 // neutron_diffusion/bc.c
