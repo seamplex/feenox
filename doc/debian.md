@@ -13,7 +13,7 @@ If you know how to install `.deb` packages, feel free to use your method (i.e. `
 You can can always use `dpkg` (as root):
 
 ```terminal
-$ sudo dpkg -i feenox-0.3_1_amd64.deb`
+$ sudo dpkg -i feenox-0.3_1_amd64.deb
 ```
 
 Most likely, this step will fail due to failed dependencies.

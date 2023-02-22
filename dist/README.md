@@ -59,9 +59,9 @@ vagrant ssh
 Then clone FeenoX, compile, go to `dist` and run `deb.sh`:
 
 ```terminal
-sudo apt-get install git autoconf automake make gcc g++ libgsl-dev libsundials-dev wget
-sudo apt-get install petsc-dev slepc-dev     # <- these names depend on the linux dist/version
-sudo apt-get install libpetsc-dev libslepc-dev     # <- these names depend on the linux dist/version
+sudo apt-get install -y git autoconf automake make gcc g++ libgsl-dev libsundials-dev wget
+sudo apt-get install -y petsc-dev slepc-dev           # <- these names depend on the linux dist/version
+sudo apt-get install -y libpetsc-dev libslepc-dev     # <- these names depend on the linux dist/version
 git clone https://github.com/seamplex/feenox/
 cd feenox
 ./autogen.sh
