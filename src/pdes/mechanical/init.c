@@ -3,20 +3,20 @@
  *
  *  Copyright (C) 2021--2022 jeremy theler
  *
- *  This file is part of Feenox <https://www.seamplex.com/feenox>.
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
  *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 
@@ -57,7 +57,7 @@ int feenox_problem_init_parser_mechanical(void) {
 
     if (feenox.pde.dim != 0) {
       if (feenox.pde.dim != 2) {
-        feenox_push_error_message("dimension inconsistency, expected DIMENSION 2");
+        feenox_push_error_message("dimension inconsistency, expected 2 dimensions not %d", feenox.pde.dim);
         return FEENOX_ERROR;
       }
     } else {
@@ -84,7 +84,7 @@ int feenox_problem_init_parser_mechanical(void) {
       feenox_push_error_message("to solve 2D problems give either plane_stress, plane_strain or axisymmetric");
       return FEENOX_ERROR;
     } else if (feenox.pde.dim != 3) {
-      feenox_push_error_message("dimension inconsistency, expected DIMENSION 3");
+      feenox_push_error_message("dimension inconsistency, expected DIM 3 instead of %d", feenox.pde.dim);
       return FEENOX_ERROR;
     }
     feenox.pde.dofs = feenox.pde.dim;
@@ -102,6 +102,8 @@ int feenox_problem_init_parser_mechanical(void) {
   
   feenox_call(feenox_problem_define_solutions());
 
+  // ------- elasticity-related outputs -----------------------------------  
+  // TODO: document
   feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, 1));
   feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, 1));
   feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, 1));
@@ -179,6 +181,7 @@ int feenox_problem_init_runtime_mechanical(void) {
 
 #ifdef HAVE_PETSC 
   // we are FEM not FVM
+  feenox.mesh.default_field_location = field_location_nodes;
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
@@ -368,7 +371,7 @@ int feenox_problem_init_runtime_mechanical(void) {
     case material_model_elastic_orthotropic:
       
       if (mechanical.variant != variant_full) {
-        feenox_push_error_message("only elastic orthotropic materials cannot be used in plane stress/strain");
+        feenox_push_error_message("elastic orthotropic materials cannot be used in plane stress/strain");
         return FEENOX_ERROR;
       }
 
@@ -383,22 +386,6 @@ int feenox_problem_init_runtime_mechanical(void) {
     break;
   }
 
-  
-  switch (mechanical.thermal_expansion_model) {
-    case thermal_expansion_model_isotropic:
-      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_isotropic;
-      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_isotropic;
-    break;
-    case thermal_expansion_model_orthotropic:
-      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_orthotropic;
-      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_orthotropic;
-    break;
-    default:
-    break;
-  }
-  
-
-    
   // size of stress-strain matrix
   if (mechanical.variant == variant_full) {
     mechanical.stress_strain_size = 6;
@@ -416,7 +403,22 @@ int feenox_problem_init_runtime_mechanical(void) {
   if (mechanical.uniform_C) {
     // cache properties
     feenox_call(mechanical.compute_C(NULL, NULL));
-  }  
+  } 
+
+
+  
+  switch (mechanical.thermal_expansion_model) {
+    case thermal_expansion_model_isotropic:
+      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_isotropic;
+      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_isotropic;
+    break;
+    case thermal_expansion_model_orthotropic:
+      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_orthotropic;
+      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_orthotropic;
+    break;
+    default:
+    break;
+  }
 
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
     feenox_check_alloc(mechanical.et = gsl_vector_calloc(mechanical.stress_strain_size));

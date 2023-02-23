@@ -10,13 +10,13 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #ifndef MODAL_H
@@ -38,22 +38,57 @@ struct modal_t {
   enum {
     variant_full,
     variant_plane_stress,
-    variant_plane_strain
+    variant_plane_strain,
+    variant_axisymmetric,
   } variant;  
   
-  int has_dirichlet_bcs;
+  // TODO: have a "mixed" material model where each volume has its own model
+  enum {
+    material_model_unknown,
+    material_model_elastic_isotropic,
+    material_model_elastic_orthotropic,    
+  } material_model;
   
+  int has_dirichlet_bcs;
+
+  distribution_t rho;   // density
+  
+  // isotropic properties    
   distribution_t E;     // Young's modulus
   distribution_t nu;    // Poisson's ratio
-  distribution_t rho;   // density
+  
+  // orthotropic properties
+  distribution_t E_x, E_y, E_z;             // Young's moduli
+  distribution_t nu_xy, nu_yz, nu_zx;       // Poisson's ratios
+  distribution_t G_xy, G_yz, G_zx;          // Shear moduli
+  distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient  
 
   int space_E;
   int space_nu;
   int space_rho;
+
+  // flags to speed up things
+  int uniform_C;
+  int constant_C;
+  int uniform_expansion;
+  int constant_expansion;
   
+  unsigned int n_nodes;
+  unsigned int stress_strain_size;
+
+  // holder for the rigid-body displacements
 #ifdef HAVE_PETSC  
   MatNullSpace rigid_body_base;
 #endif
+  
+  int (*compute_C)(const double *x, material_t *material);
+  
+  // auxiliary intermediate matrices
+  gsl_matrix *C;    // stress-strain matrix, 6x6 for 3d
+  gsl_matrix *B;    // strain-displacement matrix, 6x(3*n_nodes) for 3d
+  gsl_matrix *CB;   // product of C times B, 6x(3*n_nodes) for 3d
+  gsl_vector *et;   // thermal strain vector, size 6 for 3d
+  gsl_vector *Cet;  // product of C times et, size 6 for 3d
   
   var_t *M_T;
   vector_t *f;

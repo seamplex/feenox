@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -128,17 +128,17 @@ int feenox_instruction_mesh_read(void *arg) {
       this->order = this->element[i].type->order;
     }
 
-    // nos acordamos del elemento que tenga el mayor numero de nodos
+    // remember the element with the largest number of nodes
     if (this->element[i].type->nodes > this->max_nodes_per_element) {
       this->max_nodes_per_element = this->element[i].type->nodes;
     }
 
-    // y del que tenga mayor cantidad de vecinos
+    // and the one with most neighbors
     if (this->element[i].type->faces > this->max_faces_per_element) {
       this->max_faces_per_element = this->element[i].type->faces;
     }
 
-    // armamos la lista de elementos de cada entidad
+    // create the list of element for the entity
     physical_group = this->element[i].physical_group;
     if (physical_group != NULL && physical_group->i_element < physical_group->n_elements) {
       physical_group->element[physical_group->i_element++] = i;
@@ -159,6 +159,7 @@ int feenox_instruction_mesh_read(void *arg) {
   }
   
   // see if we need to create cells and allocate space for arguments
+  feenox.mesh.need_cells |= feenox.mesh.vars.cells->used;
   if (feenox.mesh.need_cells) {
     feenox_call(feenox_mesh_element2cell(this));
     feenox_check_alloc(this->cells_argument = calloc(this->dim, sizeof(double *)));

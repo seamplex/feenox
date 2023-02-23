@@ -177,21 +177,25 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
 
 // default virtual method for undefined distributions
 double feenox_distribution_eval(distribution_t *this, const double *x, material_t *material) {
-  return 0;
+  this->value = 0;
+  return this->value;
 }
 
 double feenox_distribution_eval_variable_global(distribution_t *this, const double *x, material_t *material) {
-  return feenox_var_value(this->variable);
+  this->value = feenox_var_value(this->variable);
+  return this->value;
 }
 
 double feenox_distribution_eval_function_global(distribution_t *this, const double *x, material_t *material) {
-  return feenox_function_eval(this->function, x);
+  this->value = feenox_function_eval(this->function, x);
+  return this->value;
 }
 
 double feenox_distribution_eval_variable_local(distribution_t *this, const double *x, material_t *material) {
   
   if (material == NULL) {
-    return 0;
+    this->value = 0;
+    return this->value;
   }
   
   if (material != this->last_material) {
@@ -205,14 +209,16 @@ double feenox_distribution_eval_variable_local(distribution_t *this, const doubl
     feenox_free(var_name);
   }
   
-  return feenox_var_value(this->variable);      
+  this->value = feenox_var_value(this->variable);
+  return this->value;
 }
 
 
 double feenox_distribution_eval_function_local(distribution_t *this, const double *x, material_t *material) {
   
   if (material == NULL) {
-    return 0;
+    this->value = 0;
+    return this->value;
   }
   
   if (material != this->last_material) {
@@ -227,7 +233,8 @@ double feenox_distribution_eval_function_local(distribution_t *this, const doubl
     feenox_free(function_name);
   }
   
-  return feenox_function_eval(this->function, x);      
+  this->value = feenox_function_eval(this->function, x);
+  return this->value;
 }
 
   
@@ -264,7 +271,8 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
       this->expr = &property_data->expr;
     } else {
       this->expr = NULL;
-      return 0;
+      this->value = 0;
+      return this->value;
     }  
   }
   
@@ -279,9 +287,11 @@ double feenox_distribution_eval_property(distribution_t *this, const double *x, 
         }  
       }
     }
-    return feenox_expression_eval(&this->last_property_data->expr);
+    this->value = feenox_expression_eval(&this->last_property_data->expr);
+    return this->value;
   }
   
+  this->value = 0;
   return 0;
 
 }

@@ -1140,6 +1140,7 @@ struct distribution_t  {
   material_t *last_material;
   property_data_t *last_property_data;
   expr_t *expr;
+  double value;
   
   // dependencies
   var_ll_t *dependency_variables;
@@ -2125,6 +2126,8 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *);
 extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+extern double *feenox_mesh_compute_x_if_needed(element_t *e, unsigned int v, int condition);
+extern material_t *feenox_mesh_get_material(element_t *e);
 extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v);
 extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int integration);

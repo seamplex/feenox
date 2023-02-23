@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -40,8 +40,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
       // cell-based functions
       if (function->type == function_type_pointwise_mesh_cell && function->mesh == mesh) {
         // function defined over a cell integrated over a cell, cool!
-        size_t i = 0;
-        for (i = 0; i < mesh->n_cells; i++) {
+        for (size_t i = 0; i < mesh->n_cells; i++) {
           element = mesh->cell[i].element;
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
@@ -50,8 +49,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
         }
       } else {
         // location is cell but function is not cell
-        size_t i = 0;
-        for (i = 0; i < mesh->n_cells; i++) {
+        for (size_t i = 0; i < mesh->n_cells; i++) {
           element = mesh->cell[i].element;
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {

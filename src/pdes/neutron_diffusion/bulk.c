@@ -10,13 +10,13 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
@@ -58,17 +58,8 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
-  
-  double *x = NULL;
-  if (neutron_diffusion.space_XS) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
-    x = e->x[v];
-  }
-  
-  material_t *material = NULL;
-  if (e->physical_group != NULL && e->physical_group->material != NULL) {
-    material = e->physical_group->material;
-  }
+  double *x = feenox_mesh_compute_x_if_needed(e, v, neutron_diffusion.space_XS);
+  material_t *material = feenox_mesh_get_material(e);
   
   gsl_matrix_set_zero(neutron_diffusion.diff);
   gsl_matrix_set_zero(neutron_diffusion.removal);

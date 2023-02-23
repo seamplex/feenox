@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -533,8 +533,10 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         vector_function = 1;
       }
   
-      if (strncmp(tmp, "double", 6) != 0 && strncmp(tmp, "float", 5) != 0) {
-        feenox_push_error_message("either float or double data expected");
+      if (strncmp(tmp, "double", 6) != 0 &&
+          strncmp(tmp, "float", 5) != 0 &&
+          strncmp(tmp, "int", 3) != 0) {
+        feenox_push_error_message("either int, float or double data expected");
         return FEENOX_ERROR;
       }
 
@@ -551,17 +553,21 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         } else {
           for (int i = 0; i < 3; i++) {
             // try name1 name2 name3
-            feenox_call(snprintf(tmp, BUFFER_SIZE-1, "%s%d", name, i+1));
-            if (strcmp(tmp, node_data->name_in_mesh) == 0) {
+            char *tried_name;
+            feenox_check_minusone(asprintf(&tried_name, "%s%d", name, i+1));
+            if (strcmp(tried_name, node_data->name_in_mesh) == 0) {
               vector[i] = node_data->function;
               node_data->found = 1;
             }
+            feenox_free(tried_name);
+               
             // try namex namey namez
-            feenox_call(snprintf(tmp, BUFFER_SIZE-1, "%s%c", name, 'x'+i));
-            if (strcmp(tmp, node_data->name_in_mesh) == 0) {
+            feenox_check_minusone(asprintf(&tried_name, "%s%c", name, 'x'+i));
+            if (strcmp(tried_name, node_data->name_in_mesh) == 0) {
               vector[i] = node_data->function;
               node_data->found = 1;
             }
+            feenox_free(tried_name);
           }  
         }  
       }

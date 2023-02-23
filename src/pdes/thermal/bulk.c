@@ -10,13 +10,13 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
@@ -28,23 +28,14 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
-  
-  double *x = NULL;
-  if (thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
-    x = e->x[v];
-  }
+  double *x = feenox_mesh_compute_x_if_needed(e, v, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
+  material_t *material = feenox_mesh_get_material(e);  
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
   double r_for_axisymmetric = 1;
   double w = e->w[v] * r_for_axisymmetric;
   
-  material_t *material = NULL;
-  if (e->physical_group != NULL && e->physical_group->material != NULL) {
-    material = e->physical_group->material;
-  }
-
   // thermal stiffness matrix Bt*k*B
   // if k depends on T then there should be a more efficient way of evaluating k
   double k = thermal.k.eval(&thermal.k, x, material);

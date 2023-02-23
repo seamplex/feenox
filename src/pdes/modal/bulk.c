@@ -10,99 +10,110 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
 #include "modal.h"
+
+int feenox_problem_build_allocate_aux_modal(unsigned int n_nodes) {
+  
+  modal.n_nodes = n_nodes;
+  
+  if (modal.B != NULL) {
+    gsl_matrix_free(modal.B);
+  }
+  feenox_check_alloc(modal.B = gsl_matrix_calloc(modal.stress_strain_size, feenox.pde.dofs * modal.n_nodes));
+  
+  if (modal.CB != NULL) {
+    gsl_matrix_free(modal.CB);
+  }
+  feenox_check_alloc(modal.CB = gsl_matrix_calloc(modal.stress_strain_size, feenox.pde.dofs * modal.n_nodes));
+
+  return FEENOX_OK;
+}
 
 int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int v) {
 
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
-  
-  double *x = NULL;
-  if (modal.space_E || modal.space_nu || modal.space_rho) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
-    x = e->x[v];
-  }
+  material_t *material = feenox_mesh_get_material(e);
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
+/*  
   double r_for_axisymmetric = 1;
   double w = e->w[v] * r_for_axisymmetric;
+ */
   
-  material_t *material = NULL;
-  if (e->physical_group != NULL && e->physical_group->material != NULL) {
-    material = e->physical_group->material;
+  if (modal.n_nodes != e->type->nodes) {
+    feenox_call(feenox_problem_build_allocate_aux_modal(e->type->nodes));
   }
-
-  gsl_matrix *C = gsl_matrix_calloc(6, 6);
-  double E = modal.E.eval(&modal.E, x, material);
-  double nu = modal.nu.eval(&modal.nu, x, material);
-  double rho = modal.rho.eval(&modal.rho, x, material);
   
-  double lambda = E*nu/((1+nu)*(1-2*nu));
-  double mu = 0.5*E/(1+nu);
-  double lambda2mu = lambda + 2*mu;
+  if (modal.uniform_C == 0) {
+    // material stress-strain relationship
+    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
+    modal.compute_C(e->x[v], material);
+  }
   
-  gsl_matrix_set(C, 0, 0, lambda2mu);
-  gsl_matrix_set(C, 0, 1, lambda);
-  gsl_matrix_set(C, 0, 2, lambda);
-
-  gsl_matrix_set(C, 1, 0, lambda);
-  gsl_matrix_set(C, 1, 1, lambda2mu);
-  gsl_matrix_set(C, 1, 2, lambda);
-
-  gsl_matrix_set(C, 2, 0, lambda);
-  gsl_matrix_set(C, 2, 1, lambda);
-  gsl_matrix_set(C, 2, 2, lambda2mu);
-  
-  gsl_matrix_set(C, 3, 3, mu);
-  gsl_matrix_set(C, 4, 4, mu);
-  gsl_matrix_set(C, 5, 5, mu);
-  
-  unsigned int J = e->type->nodes;
-  gsl_matrix *B = gsl_matrix_calloc(6, feenox.pde.dofs * J);
-  gsl_matrix *CB = gsl_matrix_calloc(6, feenox.pde.dofs * J);
-  
+  // TODO: unify with mechanical!
   gsl_matrix *dhdx = e->dhdx[v];
-
-  unsigned int j = 0;
-  for (j = 0; j < J; j++) {
-    gsl_matrix_set(B, 0, 3*j+0, gsl_matrix_get(dhdx, j, 0));
+  for (int j = 0; j < modal.n_nodes; j++) {
+    // TODO: virtual methods? they cannot be inlined...
+    if (modal.variant == variant_full) {
       
-    gsl_matrix_set(B, 1, 3*j+1, gsl_matrix_get(dhdx, j, 1));
-      
-    gsl_matrix_set(B, 2, 3*j+2, gsl_matrix_get(dhdx, j, 2));
+      gsl_matrix_set(modal.B, 0, 3*j+0, gsl_matrix_get(dhdx, j, 0));
+      gsl_matrix_set(modal.B, 1, 3*j+1, gsl_matrix_get(dhdx, j, 1));
+      gsl_matrix_set(modal.B, 2, 3*j+2, gsl_matrix_get(dhdx, j, 2));
     
-    gsl_matrix_set(B, 3, 3*j+0, gsl_matrix_get(dhdx, j, 1));
-    gsl_matrix_set(B, 3, 3*j+1, gsl_matrix_get(dhdx, j, 0));
+      gsl_matrix_set(modal.B, 3, 3*j+0, gsl_matrix_get(dhdx, j, 1));
+      gsl_matrix_set(modal.B, 3, 3*j+1, gsl_matrix_get(dhdx, j, 0));
 
-    gsl_matrix_set(B, 4, 3*j+1, gsl_matrix_get(dhdx, j, 2));
-    gsl_matrix_set(B, 4, 3*j+2, gsl_matrix_get(dhdx, j, 1));
+      gsl_matrix_set(modal.B, 4, 3*j+1, gsl_matrix_get(dhdx, j, 2));
+      gsl_matrix_set(modal.B, 4, 3*j+2, gsl_matrix_get(dhdx, j, 1));
 
-    gsl_matrix_set(B, 5, 3*j+0, gsl_matrix_get(dhdx, j, 2));
-    gsl_matrix_set(B, 5, 3*j+2, gsl_matrix_get(dhdx, j, 0));
+      gsl_matrix_set(modal.B, 5, 3*j+0, gsl_matrix_get(dhdx, j, 2));
+      gsl_matrix_set(modal.B, 5, 3*j+2, gsl_matrix_get(dhdx, j, 0));
+      
+    } else if (modal.variant == variant_axisymmetric) {
+      
+      feenox_push_error_message("axisymmetric still not implemented");
+      return FEENOX_ERROR;
+      
+    } else if (modal.variant == variant_plane_stress || modal.variant == variant_plane_strain) {
+      
+      // plane stress and plane strain are the same
+      // see equation 14.18 IFEM CH.14 sec 14.4.1 pag 14-11
+      gsl_matrix_set(modal.B, 0, 2*j+0, gsl_matrix_get(dhdx, j, 0));
+      gsl_matrix_set(modal.B, 1, 2*j+1, gsl_matrix_get(dhdx, j, 1));
+    
+      gsl_matrix_set(modal.B, 2, 2*j+0, gsl_matrix_get(dhdx, j, 1));
+      gsl_matrix_set(modal.B, 2, 2*j+1, gsl_matrix_get(dhdx, j, 0));
+
+    } else {
+      return FEENOX_ERROR;
+    }
   }
 
-  // elemental stiffness B'*C*B
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0, CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, CB, 1.0, feenox.pde.Ki));
 
-  // elemental mass H'*rho*H
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rho, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
   
-  gsl_matrix_free(B);
-  gsl_matrix_free(CB);
-  gsl_matrix_free(C);
+  // elemental stiffness B'*C*B
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, modal.C, modal.B, 0, modal.CB));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], modal.B, modal.CB, 1.0, feenox.pde.Ki));
+  
+  // elemental mass H'*rho*H
+  if (modal.rho.uniform == 0) {
+    double *x = feenox_mesh_compute_x_if_needed(e, v, modal.space_rho);
+    modal.rho.eval(&modal.rho, x, material);
+  }
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v] * modal.rho.value, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
   
 #endif
   

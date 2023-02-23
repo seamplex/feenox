@@ -10,13 +10,13 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
@@ -38,6 +38,8 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->set = feenox_problem_bc_set_neutron_diffusion_vacuum;
     bc_data->fills_matrix = 1;
     bc_data->dof = -1;
+
+  // TODO: fixed current
     
   } else {
     feenox_push_error_message("unknown neutron_diffusion boundary condition '%s'", lhs);

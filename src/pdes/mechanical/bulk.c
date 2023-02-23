@@ -140,8 +140,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
   }
   
-  // TODO: cleanup aux matrices C, B and CB
-  
 #endif
   
   return FEENOX_OK;

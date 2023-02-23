@@ -10,13 +10,13 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #ifndef MODAL_METHODS_H
@@ -42,6 +42,11 @@ extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, ch
 extern int feenox_problem_bc_set_modal_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 extern int feenox_problem_bc_set_modal_multifreedom(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 
+// material models
+extern int feenox_problem_build_compute_modal_C_elastic_isotropic(const double *x, material_t *material);
+extern int feenox_problem_build_compute_modal_C_elastic_plane_stress(const double *x, material_t *material);
+extern int feenox_problem_build_compute_modal_C_elastic_plane_strain(const double *x, material_t *material);
+extern int feenox_problem_build_compute_modal_C_elastic_orthotropic(const double *x, material_t *material);
 
 // modal/post.c
 extern int feenox_problem_solve_post_modal(void);

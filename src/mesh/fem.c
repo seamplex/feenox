@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -281,6 +281,21 @@ inline void mesh_compute_x(element_t *e, double *r, double *x) {
 
   return;
 }
+
+inline double *feenox_mesh_compute_x_if_needed(element_t *e, unsigned int v, int condition) {
+  if (condition) {
+    feenox_call_null(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
+    return e->x[v];
+  }
+  
+  return NULL;
+}
+  
+inline material_t *feenox_mesh_get_material(element_t *e) {
+  return (e->physical_group != NULL) ? e->physical_group->material : NULL;
+}
+
+
 
 inline int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v) {
   

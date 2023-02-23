@@ -1,12 +1,12 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox's routines for neutron diffusion FEM: input parsing
+ *  FeenoX parser for modal-specific keywords
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2023 jeremy theler
  *
- *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
+ *  This file is part of FeenoX.
  *
- *  feenox is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
+ *  FeenoX is free software: you can redistribute it and/or modify
+ *  it under the terms "of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
@@ -20,17 +20,24 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "neutron_diffusion.h"
 #include "../../parser/parser.h"
+#include "modal.h"
 
-int feenox_problem_parse_problem_neutron_diffusion(const char *token) {
-  
-  if (token != NULL) {
-    if (strcasecmp(token, "GROUPS") == 0) {
-      double xi = 0;
-      feenox_call(feenox_parser_expression_in_string(&xi));
-      neutron_diffusion.groups = (unsigned int)(xi);
+int feenox_problem_parse_problem_modal(const char *token) {
+
+///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.
+#ifndef HAVE_SLEPC
+  feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
+  return FEENOX_ERROR;
+#endif
       
+  if (token != NULL) {
+    if (strcasecmp(token, "plane_stress") == 0) {
+      modal.variant = variant_plane_stress;
+  
+    } else if (strcasecmp(token, "plane_strain") == 0) {
+      modal.variant = variant_plane_strain;
+  
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
@@ -38,5 +45,4 @@ int feenox_problem_parse_problem_neutron_diffusion(const char *token) {
   } 
   
   return FEENOX_OK;
-}  
-
+}

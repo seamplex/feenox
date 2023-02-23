@@ -10,42 +10,18 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
 #include "modal.h"
 modal_t modal;
-
-int feenox_problem_parse_problem_modal(const char *token) {
-
-///kw_pde+PROBLEM+detail  * `modal` computes the natural mechanical frequencies and oscillation modes.
-#ifndef HAVE_SLEPC
-  feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
-  return FEENOX_ERROR;
-#endif
-      
-  if (token != NULL) {
-    if (strcasecmp(token, "plane_stress") == 0) {
-      modal.variant = variant_plane_stress;
-  
-    } else if (strcasecmp(token, "plane_strain") == 0) {
-      modal.variant = variant_plane_strain;
-  
-    } else {
-      feenox_push_error_message("undefined keyword '%s'", token);
-      return FEENOX_ERROR;
-    }
-  } 
-  
-  return FEENOX_OK;
-}  
 
 int feenox_problem_init_parser_modal(void) {
 
@@ -60,9 +36,16 @@ int feenox_problem_init_parser_modal(void) {
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_modal;
   feenox.pde.solve_post = feenox_problem_solve_post_modal;
   
-  if (feenox.pde.symmetry_axis != symmetry_axis_none ||
-                 modal.variant == variant_plane_stress ||
-                 modal.variant == variant_plane_strain) {
+  // move symmetry_axis which is a general PDE setting to
+  // the mechanically-particular axisymmetric variant
+  if (feenox.pde.symmetry_axis != symmetry_axis_none) {
+      modal.variant = variant_axisymmetric;
+  }
+  
+  // check consistency of problem type and dimensions
+  if (modal.variant == variant_axisymmetric ||
+      modal.variant == variant_plane_stress ||
+      modal.variant == variant_plane_strain) {
 
     if (feenox.pde.dim != 0) {
       if (feenox.pde.dim != 2) {
@@ -75,24 +58,31 @@ int feenox_problem_init_parser_modal(void) {
 
     if (feenox.pde.dofs != 0) {
       if (feenox.pde.dofs != 2) {
-        feenox_push_error_message("DOF inconsistency");
+        feenox_push_error_message("DOF inconsistency, expected DOFs per node = 2");
         return FEENOX_ERROR;
       }
     } else {
       feenox.pde.dofs = 2;
     }
+    
   } else {
+    if (feenox.pde.dim == 0) {
+      // default is 3d
+      feenox.pde.dim = 3;
+    } else if (feenox.pde.dim == 1)   {
+      feenox_push_error_message("cannot solve 1D modal problems");
+      return FEENOX_ERROR;
+    } else if (feenox.pde.dim == 2)   {
+      feenox_push_error_message("to solve 2D problems give either plane_stress, plane_strain or axisymmetric");
+      return FEENOX_ERROR;
+    } else if (feenox.pde.dim != 3) {
+      feenox_push_error_message("dimension inconsistency, expected DIM 3 instead of %d", feenox.pde.dim);
+      return FEENOX_ERROR;
+    }
     feenox.pde.dofs = feenox.pde.dim;
-  }  
-  
-  // if there are no explicit number of eigenvalues we set a non-zero value here
-  if (feenox.pde.nev == 0) {
-    feenox.pde.nev = DEFAULT_MODAL_MODES;
   }
-
-  // vector problem    
-  feenox.pde.dofs = feenox.pde.dim;
   
+  // TODO: custom names
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
   if (feenox.pde.dofs > 1) {
@@ -101,11 +91,15 @@ int feenox_problem_init_parser_modal(void) {
       feenox_check_alloc(feenox.pde.unknown_name[2] = strdup("w"));
     }  
   }
+  
   feenox_call(feenox_problem_define_solutions());
-  
-  // we'd rather ser nodes than cells 
-  feenox.mesh.default_field_location = field_location_nodes;
-  
+
+  // if there are no explicit number of eigenvalues we set a non-zero value here
+  if (feenox.pde.nev == 0) {
+    feenox.pde.nev = DEFAULT_MODAL_MODES;
+  }
+
+  // ------- modal-related vectors & outputs -----------------------------------  
 ///va+M_T+desc A scalar with the total mass\ $m$ computed from the mass matrix\ $M$ as
 ///va+M_T+desc 
 ///va+M_T+desc \[ M_T = \frac{1}{n_\text{DOFs}} \cdot \vec{1}^T \cdot M \cdot \vec{1} \]
@@ -188,6 +182,7 @@ int feenox_problem_init_runtime_modal(void) {
 
 #ifdef HAVE_PETSC  
   // we are FEM not FVM
+  feenox.mesh.default_field_location = field_location_nodes;
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
@@ -199,11 +194,142 @@ int feenox_problem_init_runtime_modal(void) {
   }
   
   // initialize distributions
-  feenox_distribution_define_mandatory(modal, E, "E", "elastic modulus");
-  feenox_distribution_define_mandatory(modal, nu, "nu", "Poisson’s ratio");
   feenox_distribution_define_mandatory(modal, rho, "rho", "density");
-
   modal.rho.uniform = feenox_expression_depends_on_space(modal.rho.dependency_variables);
+  
+  
+  // initialize distributions
+  
+  // first see if we have linear elastic
+  feenox_call(feenox_distribution_init(&modal.E, "E"));  
+  feenox_call(feenox_distribution_init(&modal.nu, "nu"));  
+  
+  // TODO: allow different volumes to have different material models
+  if (modal.E.defined && modal.nu.defined) {
+    if (modal.E.full == 0) {
+      feenox_push_error_message("Young modulus 'E' is not defined over all volumes");
+      return FEENOX_ERROR;
+    }
+    if (modal.nu.full == 0) {
+      feenox_push_error_message("Poisson’s ratio 'nu' is not defined over all volumes");
+      return FEENOX_ERROR;
+    }
+    modal.material_model = material_model_elastic_isotropic;
+  } else if (modal.E.defined) {
+    feenox_push_error_message("Young modulus 'E' defined but Poisson’s ratio 'nu' not defined");
+    return FEENOX_ERROR;
+  } else if (modal.nu.defined) {
+    feenox_push_error_message("Poisson’s ratio 'nu' defined but Young modulus 'E' not defined");
+    return FEENOX_ERROR;
+  }
+  
+  // see if there are orthotropic properties
+  feenox_call(feenox_distribution_init(&modal.E_x, "Ex"));
+  if (modal.E_x.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.E_x, "E_x"));
+  }
+  feenox_call(feenox_distribution_init(&modal.E_y, "Ey"));
+  if (modal.E_y.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.E_y, "E_y"));
+  }
+  feenox_call(feenox_distribution_init(&modal.E_z, "Ez"));
+  if (modal.E_z.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.E_z, "E_z"));
+  }
+
+  feenox_call(feenox_distribution_init(&modal.nu_xy, "nuxy"));
+  if (modal.nu_xy.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.nu_xy, "nu_xy"));
+  }
+  feenox_call(feenox_distribution_init(&modal.nu_yz, "nuyz"));
+  if (modal.nu_yz.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.nu_yz, "nu_yz"));
+  }
+  feenox_call(feenox_distribution_init(&modal.nu_zx, "nuzx"));
+  if (modal.nu_zx.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.nu_zx, "nu_zx"));
+  }
+  
+  feenox_call(feenox_distribution_init(&modal.G_xy, "Gxy"));
+  if (modal.G_xy.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.G_xy, "G_xy"));
+  }
+  feenox_call(feenox_distribution_init(&modal.G_yz, "Gyz"));
+  if (modal.G_yz.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.G_yz, "G_yz"));
+  }
+  feenox_call(feenox_distribution_init(&modal.G_zx, "Gzx"));
+  if (modal.G_zx.defined == 0) {
+    feenox_call(feenox_distribution_init(&modal.G_zx, "G_zx"));
+  }
+  
+  // check for consistency
+  int n_ortho = modal.E_x.defined   + modal.E_y.defined   + modal.E_z.defined   +
+                modal.nu_xy.defined + modal.nu_yz.defined + modal.nu_zx.defined +
+                modal.G_xy.defined  + modal.G_yz.defined  + modal.G_zx.defined;
+  
+  if (n_ortho > 0) {
+    if (modal.material_model == material_model_elastic_isotropic) {
+      feenox_push_error_message("both isotropic and orthotropic properties given, choose one");
+      return FEENOX_ERROR;
+    } else if (n_ortho < 9) {
+      feenox_push_error_message("%d orthotropic properties missing", 9-n_ortho);
+      return FEENOX_ERROR;
+    } else if (modal.material_model == material_model_unknown) {
+      modal.material_model = material_model_elastic_orthotropic;
+    }
+  }  
+
+
+  // set material model virtual methods
+  switch (modal.material_model) {
+  
+    case material_model_elastic_isotropic:
+      modal.uniform_C = (modal.E.uniform && modal.nu.uniform);
+      if (modal.variant == variant_full) {
+        modal.compute_C = feenox_problem_build_compute_modal_C_elastic_isotropic;
+      } else if (modal.variant == variant_plane_stress) {      
+        modal.compute_C = feenox_problem_build_compute_modal_C_elastic_plane_stress;  
+      } else if (modal.variant == variant_plane_strain) {  
+        modal.compute_C = feenox_problem_build_compute_modal_C_elastic_plane_strain;
+      }  
+    break;
+    
+    case material_model_elastic_orthotropic:
+      
+      if (modal.variant != variant_full) {
+        feenox_push_error_message("elastic orthotropic materials cannot be used in plane stress/strain");
+        return FEENOX_ERROR;
+      }
+
+      modal.compute_C = feenox_problem_build_compute_modal_C_elastic_orthotropic;
+    
+    break;
+    
+    default:
+      feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
+      return FEENOX_ERROR;
+    break;
+  }
+
+  // size of stress-strain matrix
+  if (modal.variant == variant_full) {
+    modal.stress_strain_size = 6;
+  } else if (modal.variant == variant_axisymmetric) {
+    modal.stress_strain_size = 4;
+  } else if (modal.variant == variant_plane_stress || modal.variant == variant_plane_strain) {
+    modal.stress_strain_size = 3;
+  } else {
+    feenox_push_error_message("internal mismatch, unknown variant");
+    return FEENOX_ERROR;
+  }
+  
+  // allocate stress-strain objects
+  feenox_check_alloc(modal.C = gsl_matrix_calloc(modal.stress_strain_size, modal.stress_strain_size));
+  if (modal.uniform_C) {
+    // cache properties
+    feenox_call(modal.compute_C(NULL, NULL));
+  } 
 
   feenox.pde.math_type = math_type_eigen;
   feenox.pde.solve = feenox_problem_solve_slepc_eigen;
