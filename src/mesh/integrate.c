@@ -71,19 +71,15 @@ int feenox_instruction_mesh_integrate(void *arg) {
         }
 */      
         
-        double xi = 0;
-        unsigned int v = 0;
-        unsigned int j = 0;
-        size_t i = 0;
-        for (i = 0; i < mesh->n_elements; i++) {
+        for (size_t i = 0; i < mesh->n_elements; i++) {
           element = &mesh->element[i];
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
-            for (v = 0; v < element->type->gauss[mesh->integration].V; v++) {
+            for (unsigned int v = 0; v < element->type->gauss[mesh->integration].V; v++) {
               feenox_mesh_compute_w_at_gauss(element, v, mesh->integration);
 
-              xi = 0;
-              for (j = 0; j < element->type->nodes; j++) {
+              double xi = 0;
+              for (unsigned int j = 0; j < element->type->nodes; j++) {
                 xi += element->type->gauss[mesh->integration].h[v][j] * function->data_value[element->node[j]->tag - 1];
               }
 

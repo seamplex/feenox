@@ -331,7 +331,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   }
   
   size_t *celldata = NULL;
-  feenox_check_alloc(celldata = malloc(numdata * sizeof(size_t)));
+  feenox_check_alloc(celldata = calloc(numdata, sizeof(size_t)));
   for (size_t i = 0; i < numdata; i++) {
     if (fscanf(fp, "%ld", &celldata[i]) != 1) {
       feenox_push_error_message("run out of CELLS data");
@@ -495,6 +495,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       }
       
       this->element[i].node[j_gmsh] = &this->node[celldata[l++]];
+      feenox_mesh_add_element_to_list(&this->element[i].node[j_gmsh]->element_list, &this->element[i]);
     }
   }
 
@@ -591,6 +592,9 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         // if we made it down here, we have a function
         scalar->type = function_type_pointwise_mesh_node;
         scalar->mesh = this;
+        if (this->nodes_argument == NULL) {
+          feenox_call(feenox_mesh_create_nodes_argument(this));
+        }
         scalar->data_argument = this->nodes_argument;
         scalar->data_size = this->n_nodes;
         feenox_check_alloc(scalar->data_value = calloc(this->n_nodes, sizeof(double)));
@@ -608,6 +612,9 @@ int feenox_mesh_read_vtk(mesh_t *this) {
           if (vector[i] != NULL) {
             vector[i]->type = function_type_pointwise_mesh_node;
             vector[i]->mesh = this;
+            if (this->nodes_argument == NULL) {
+              feenox_call(feenox_mesh_create_nodes_argument(this));
+            }
             vector[i]->data_argument = this->nodes_argument;
             vector[i]->data_size = this->n_nodes;
             feenox_check_alloc(vector[i]->data_value = calloc(this->n_nodes, sizeof(double)));
