@@ -1,4 +1,4 @@
-# generated from autogen.sh
-methods.h
-parse.c
-available.h
+# these guys are generated from autogen.sh
+/methods.h
+/parse.c
+/available.h
