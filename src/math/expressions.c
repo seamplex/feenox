@@ -218,6 +218,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       } else if ((last_op != '\0' && last_op != ')') && (*oper == '+' || *oper == '-')) {
         
         if ((item = feenox_expression_parse_item(string)) == NULL) {
+          feenox_free(string_copy);
           return FEENOX_ERROR;
         }
         item->level = level;
@@ -247,17 +248,20 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       } else {
         
         feenox_push_error_message("two adjacent operators '%c' and '%c'", last_op, *string);
+        feenox_free(string_copy);
         return FEENOX_ERROR;
         
       }
     } else {
       // a constant, variable or function
       if ((item = feenox_expression_parse_item(string)) == NULL) {
+        feenox_free(string_copy);
         return FEENOX_ERROR;
       }
       LL_APPEND(this->items, item);
       item->level = level;
       if (item->n_chars <= 0) {
+        feenox_free(string_copy);
         return FEENOX_ERROR;
       }
       string += item->n_chars;
@@ -270,9 +274,11 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
 
   if (level != 1) {
     feenox_push_error_message("unmatched opening bracket in algebraic expression");
+    feenox_free(string_copy);
     return FEENOX_ERROR;
   } else if (oper != NULL && *oper != ')') {
     feenox_push_error_message("missing argument for operator '%c'", *oper);
+    feenox_free(string_copy);
     return FEENOX_ERROR;
   }
 
@@ -285,19 +291,20 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
 // parse a item within an expression (which means a constant, a variable or a function)
 expr_item_t *feenox_expression_parse_item(const char *string) {
 
-  // number of characters read, we put this into the allocated item at the end of this routine
-  size_t n = 0;
-  int n_int = 0; // sscanf can only return ints, not size_t
-  char *backup ;
-  feenox_check_alloc_null(backup = strdup(string));
+
   expr_item_t *item = NULL;
   feenox_check_alloc_null(item = calloc(1, sizeof(expr_item_t)));
 
   // either an explicit number or an explicit sign or a dot for gringos that write ".1" instead of "0.1"  
+  char *backup = NULL;
+  feenox_check_alloc_null(backup = strdup(string));
+  size_t n = 0;
   if (isdigit((int)(*string)) || ((*string == '-' || *string == '+' || *string == '.') && isdigit((int)string[1]))) {
     // a number
-    double constant;
+    double constant = 0;
+    int n_int = 0; // sscanf can only return ints, not size_t
     if (sscanf(string, "%lf%n", &constant, &n_int) == 0) {
+      feenox_free(item);
       return NULL;
     }
     n += n_int;
@@ -307,6 +314,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     // we got letters
     char *token = strtok(backup, factorseparators);
     if (token == NULL || strlen(token) == 0) {
+      feenox_free(backup);
+      feenox_free(item);
       return NULL;
     }
 
@@ -332,6 +341,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
     // cannot ask for both
     if (wants_initial_transient && wants_initial_static) {
       feenox_push_error_message("cannot ask for both _0 and _init");
+      feenox_free(backup);
+      feenox_free(item);
       return NULL;
     }
     
@@ -357,6 +368,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       // check that variables don't need arguments
       if (string[strlen(token)] == '(' || string[strlen(token)] == '[') {
         feenox_push_error_message("variable '%s' does not take arguments (it is a variable)", token);
+        feenox_free(backup);
+        feenox_free(item);
         return NULL;
       }
       var->used = 1;
@@ -400,6 +413,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       // arguments have to be in parenthesis
       if (*argument != '[' && *argument != '(') {
         feenox_push_error_message("expected parenthesis or bracket after '%s'", token);
+        feenox_free(backup);
+        feenox_free(item);
         return NULL;
       }
 
@@ -407,17 +422,23 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       size_t n_chars_count;
       int n_arguments = feenox_count_arguments(argument, &n_chars_count);
       if (n_arguments <= 0) {
+        feenox_free(backup);
+        feenox_free(item);
         return NULL;
       }
 
       char **arg = NULL;
       size_t n_chars_parse;
       if (feenox_read_arguments(argument, n_arguments, &arg, &n_chars_parse) == FEENOX_ERROR) {
+        feenox_free(backup);
+        feenox_free(item);
         return NULL;
       }
       
       if (n_chars_count != n_chars_parse) {
         feenox_push_error_message("internal parser mismatch");
+        feenox_free(backup);
+        feenox_free(item);
         return NULL;
       }
 
@@ -431,6 +452,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
         if (n_arguments < 1 || n_arguments > 1) {
           feenox_push_error_message("vector '%s' takes exactly one subindex expression", vector->name);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
         n_arguments_max = 1;
@@ -439,6 +462,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
         if (n_arguments < 2 || n_arguments > 2) {
           feenox_push_error_message("matrix '%s' takes exactly two subindex expressions", matrix->name);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
         n_arguments_max = 2;
@@ -450,10 +475,14 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
         if (n_arguments < item->builtin_function->min_arguments) {
           feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, item->builtin_function->min_arguments, (item->builtin_function->min_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
         if (n_arguments > item->builtin_function->max_arguments) {
           feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, item->builtin_function->max_arguments, (item->builtin_function->max_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
 
@@ -467,10 +496,14 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
         if (n_arguments < item->builtin_vectorfunction->min_arguments) {
           feenox_push_error_message("function '%s' takes at least %d argument%s instead of %d", token, item->builtin_vectorfunction->min_arguments, (item->builtin_vectorfunction->min_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
         if (n_arguments > item->builtin_vectorfunction->max_arguments) {
           feenox_push_error_message("function '%s' takes at most %d argument%s instead of %d", token, item->builtin_vectorfunction->max_arguments, (item->builtin_vectorfunction->max_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
 
@@ -483,10 +516,14 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
         if (n_arguments < item->builtin_functional->min_arguments) {
           feenox_push_error_message("functional '%s' takes at least %d argument%s instead of %d", token, item->builtin_functional->min_arguments, (item->builtin_functional->min_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
         if (n_arguments > item->builtin_functional->max_arguments) {
           feenox_push_error_message("functional '%s' takes at most %d argument%s instead of %d", token, item->builtin_functional->max_arguments, (item->builtin_functional->max_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
 
@@ -500,6 +537,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
         if (n_arguments != item->function->n_arguments) {
           feenox_push_error_message("function '%s' takes exactly %d argument%s instead of %d", token, item->function->n_arguments, (item->function->n_arguments==1)?"":"s", n_arguments);
+          feenox_free(backup);
+          feenox_free(item);
           return NULL;
         }
 
@@ -517,6 +556,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         }  
         
       } else {
+        feenox_free(backup);
+        feenox_free(item);
         return NULL;
       }
 
@@ -527,22 +568,27 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       }
 
 
-      unsigned int i = 0;
-      for (i = 0; i < n_arguments; i++) {
+      for (int i = 0; i < n_arguments; i++) {
         if (item->type == EXPR_BUILTIN_VECTORFUNCTION) {
           feenox_call_null(feenox_strip_blanks(arg[i]));
           if ((item->vector_arg[i] = feenox_get_vector_ptr(arg[i])) == NULL) {
             feenox_push_error_message("undefined vector '%s'", arg[i]);
+            feenox_free(backup);
+            feenox_free(item);
             return NULL;
           }
         } else if (item->type == EXPR_BUILTIN_FUNCTIONAL && i == 1) {
           // if it is a functional the second argument is a variable
           feenox_call_null(feenox_strip_blanks(arg[i]));
           if ((item->functional_var_arg = feenox_get_variable_ptr(arg[i])) == NULL) {
+            feenox_free(backup);
+            feenox_free(item);
             return NULL;
           }
         } else {
           if (feenox_expression_parse(&item->arg[i], arg[i]) != FEENOX_OK) {
+            feenox_free(backup);
+            feenox_free(item);
             return NULL;
           }
           
@@ -557,6 +603,8 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
     if (item->type == EXPR_UNDEFINED) {
       feenox_push_error_message("unknown symbol '%s'", token);
+      feenox_free(backup);
+      feenox_free(item);
       return NULL;
     }
   }

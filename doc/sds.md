@@ -1220,11 +1220,37 @@ The main features of the input format, thoroughly described below, are:
  
 ### Syntactic sugar & highlighting
 
-The first argument not starting with a dash to the `feenox` executable is the path to the main input file. This main input file can in turn include other FeenoX input files and/or read data from other files (such as meshes) or resources (such as shared memory objects). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness). The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)). Throughout the FeenoX repository and documentation the extension `.fee` is used. But again, any extension (even no extension) can be used.
+The first argument not starting with a dash to the `feenox` executable is the path to the main input file. This main input file can in turn include other FeenoX input files and/or read data from other files (such as meshes) or resources (such as shared memory objects). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness). The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)).
 
-> Show that including `.geo` works (spinning disk)
+In principle any extension (even no extension) can be used for the FeenoX input files.
+Throughout the FeenoX repository and documentation the extension `.fee` is used, which has a couple of advantages:
 
-> `.fee` is removed from `$0`
+ 1. The `.fee` extension is detected by syntax-highlighting extensions as shown in @fig:highlighting.
+ 2. The expression `$0` (or `${0}`) is expanded to the basename of the input file, i.e. the directory part (if present) is removed  and the `.fee` extension is removed. Therefore, 
+ 
+    ```feenox
+    WRITE_MESH ${0}.vtk VECTOR u v w  sigma
+    ```
+    
+    would print the displacement field as a vector and the von\ Mises stress as a scalar in a file named `whatever-the-input-file-name-is.vtk`.
+
+Still, the extension is not enforced.
+For instance, the [test directory](https://github.com/seamplex/feenox/tree/main/tests) includes some [spinning-disk cases](https://github.com/seamplex/feenox/blob/main/tests/spinning-disk-parallel-solid-half.fee) that compare the analytical solution for the hoop and radial stresses with the numerical ones obtained with FeenoX.
+These cases read the radius\ $R$ and thickness\ $t$ from the `.geo` file used by Gmsh to build the mesh in the first place:
+
+```feenox
+# analytical solution
+INCLUDE spinning-disk-dimensions.geo
+S_h(r) = ((3+nu)*R^2 - (1+3*nu)*r^2)
+S_r(r) = (3+nu) * (R^2 - r^2)
+```
+
+where `spinning-disk-dimensions.geo` is
+
+```c
+R = 0.1;
+t = 0.003;
+```
 
 
 ::: {#fig:highlighting}

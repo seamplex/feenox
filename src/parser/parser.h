@@ -38,6 +38,7 @@ struct feenox_parser_t {
   
   int implicit_none;
   int reading_daes;
+  int inside_yaml;
   
   char *line;
   char *full_line; // strtok breaks line so we keep a copy with the full one

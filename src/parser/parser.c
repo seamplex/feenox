@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser
  *
- *  Copyright (C) 2009--2022 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *

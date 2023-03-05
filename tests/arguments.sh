@@ -9,6 +9,9 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+answer arguments_self.fee "arguments_self"
+exitifwrong $?
+
 answer2 arguments_quoted.fee hello world! "hello hello world!"
 exitifwrong $?
 

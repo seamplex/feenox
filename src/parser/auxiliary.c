@@ -56,7 +56,7 @@ int feenox_read_line(FILE *file_ptr) {
       } else if (c == '}') {
         in_brackets = 0;
       } else if (c == '$') {
-        // commandline arguments
+        // handle commandline arguments
         
         // check if there's an opening bracket or parenthesis
         c = fgetc(file_ptr);
@@ -73,7 +73,7 @@ int feenox_read_line(FILE *file_ptr) {
         
         int n = 0;
         if (fscanf(file_ptr, "%d", &n) != 1) {
-          feenox_push_error_message("failed to match $n");
+          feenox_push_error_message("failed to match $%sn%s", argument_in_brackets?"{":"", argument_in_brackets?"}":"");
           return (lines==0 && i !=0 )? -1 : -lines;
         }
         if (argument_in_brackets == 1) {
@@ -99,10 +99,24 @@ int feenox_read_line(FILE *file_ptr) {
           return (lines==0 && i !=0 )? -1: -lines;
         }
 
-        int j = 0;
         if (feenox.argv[feenox.optind+n] == NULL) {
           return FEENOX_ERROR;
         }
+        
+        if (n == 0) {
+          // remove the directory and trailing .fee extension so ${0} has the case name
+          char *tmp = NULL;
+          feenox_check_alloc(tmp = strdup(feenox.argv[feenox.optind]));
+          feenox.argv[feenox.optind] = strdup(basename(tmp));
+          feenox_free(tmp);
+
+          char *fee = strstr(feenox.argv[feenox.optind], ".fee");
+          if (fee != NULL) {
+            *fee = '\0';
+          }
+        }
+        
+        int j = 0;
         while (feenox.argv[feenox.optind+n][j] != 0) {
           // watch out!
           // this cannot be put in a single line because the '\0' might come
