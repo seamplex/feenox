@@ -31,13 +31,9 @@
 // reads a line from the input file and returns it "nicely-formatted" 
 int feenox_read_line(FILE *file_ptr) {
 
-  int i;
-  int c;
-  int in_comment = 0;
-  int in_brackets = 0;
-  int lines = 0;
 
   // ignore trailing whitespace
+  int c = 0;
   do {
     c = fgetc(file_ptr);
     // if we find a newline, then there's nothing for us
@@ -47,7 +43,10 @@ int feenox_read_line(FILE *file_ptr) {
     }
   } while (isspace(c));
 
-  i = 0;
+  int i = 0;
+  int in_comment = 0;
+  int in_brackets = 0;
+  int lines = 0;
   while ( !((c == EOF) || (in_brackets == 0 && c == '\n')) ) {
     if (in_comment == 0) {
       if (c == '#' || c == ';') {
@@ -58,11 +57,37 @@ int feenox_read_line(FILE *file_ptr) {
         in_brackets = 0;
       } else if (c == '$') {
         // commandline arguments
-        int j, n;
+        
+        // check if there's an opening bracket or parenthesis
+        c = fgetc(file_ptr);
+        if (c == EOF) {
+          feenox_push_error_message("unexpected end of file");
+          return FEENOX_ERROR;
+        }
+        int argument_in_brackets = (c == '{' || c == '(');
+        if (argument_in_brackets == 0) {
+          if (ungetc(c, file_ptr) == EOF) {
+            return FEENOX_ERROR;
+          }
+        }
+        
+        int n = 0;
         if (fscanf(file_ptr, "%d", &n) != 1) {
           feenox_push_error_message("failed to match $n");
-          return (lines==0 && i!=0)?-1:-lines;
+          return (lines==0 && i !=0 )? -1 : -lines;
         }
+        if (argument_in_brackets == 1) {
+          c = fgetc(file_ptr);
+          if (c == EOF) {
+            feenox_push_error_message("unexpected end of file");
+            return FEENOX_ERROR;
+          }
+          if (c != '}' && c != ')') {
+            feenox_push_error_message("expected closing bracket for argument");
+            return FEENOX_ERROR;
+          }
+        }
+          
         if (feenox.optind+n >= feenox.argc) {
           // call recursively so we finish reading the line
           feenox_read_line(file_ptr);
@@ -71,10 +96,10 @@ int feenox_read_line(FILE *file_ptr) {
             feenox_parser.line[0] = ' ';
             feenox_parser.line[1] = '\0';
            }
-          return (lines==0 && i!=0)?-1:-lines;
+          return (lines==0 && i !=0 )? -1: -lines;
         }
 
-        j = 0;
+        int j = 0;
         if (feenox.argv[feenox.optind+n] == NULL) {
           return FEENOX_ERROR;
         }
@@ -144,8 +169,8 @@ int feenox_read_line(FILE *file_ptr) {
       feenox_check_alloc(feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size));
     }
 
-    // pedimos lo que viene en futbol de primera
-    // contamos las lineas aca porque si nos toca \n nos vamos sin comerla ni beberla
+    // ask what's next in futbol de primera
+    // count the lines here because if we get \n we go back without eating nor drinking
     if ((c = fgetc(file_ptr)) == '\n') {
       lines++;
     }
