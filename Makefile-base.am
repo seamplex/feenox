@@ -51,6 +51,7 @@ TESTS = \
         tests/print.sh \
         tests/reactions.sh \
         tests/reactions-elastic.sh \
+        tests/reed.sh \
         tests/solve.sh \
         tests/spinning-disk.sh \
         tests/statically_indeterminate_reaction.sh \
