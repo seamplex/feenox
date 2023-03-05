@@ -26,13 +26,14 @@ modal_t modal;
 int feenox_problem_init_parser_modal(void) {
 
 #ifdef HAVE_SLEPC  
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
+  
   feenox.pde.init_runtime_particular = feenox_problem_init_runtime_modal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_modal;
   feenox.pde.setup_eps = feenox_problem_setup_eps_modal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_modal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_modal;
-  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_modal_displacement;
-  feenox.pde.bc_set_multifreedom = feenox_problem_bc_set_modal_multifreedom;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_modal;
   feenox.pde.solve_post = feenox_problem_solve_post_modal;
   
@@ -181,8 +182,6 @@ int feenox_problem_init_parser_modal(void) {
 int feenox_problem_init_runtime_modal(void) {
 
 #ifdef HAVE_PETSC  
-  // we are FEM not FVM
-  feenox.mesh.default_field_location = field_location_nodes;
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;

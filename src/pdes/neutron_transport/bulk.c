@@ -22,185 +22,208 @@
 #include "feenox.h"
 #include "neutron_transport.h"
 
-int feenox_problem_build_volumetric_gauss_point_neutron_transport(element_t *this, unsigned int v) {
+
+int feenox_problem_build_allocate_aux_neutron_transport(unsigned int n_nodes) {
+  
+  neutron_transport.n_nodes = n_nodes;
+  int dofs = neutron_transport.groups * neutron_transport.directions;
+  int size = neutron_transport.n_nodes * neutron_transport.groups * neutron_transport.directions;
+    
+  if (neutron_transport.Ki != NULL) {
+    gsl_matrix_free(neutron_transport.Ki);
+    gsl_matrix_free(neutron_transport.Ai);
+    gsl_matrix_free(neutron_transport.Xi);
+    if (neutron_transport.has_sources) {
+      gsl_vector_free(neutron_transport.Si);
+    }
+    
+    
+    gsl_matrix_free(neutron_transport.P);
+    gsl_matrix_free(neutron_transport.OMEGAB);
+    gsl_matrix_free(neutron_transport.AH);
+    gsl_matrix_free(neutron_transport.Xi);
+    if (neutron_transport.has_fission) {
+      gsl_matrix_free(neutron_transport.XH);
+    }
+  }
+    
+  feenox_check_alloc(neutron_transport.Ki = gsl_matrix_calloc(size, size));
+  feenox_check_alloc(neutron_transport.Ai = gsl_matrix_calloc(size, size));
+  feenox_check_alloc(neutron_transport.Xi = gsl_matrix_calloc(size, size));
+  if (neutron_transport.has_sources) {
+    feenox_check_alloc(neutron_transport.Si = gsl_vector_calloc(size));
+  }
+  
+  feenox_check_alloc(neutron_transport.P = gsl_matrix_calloc(dofs, size));
+  feenox_check_alloc(neutron_transport.OMEGAB = gsl_matrix_calloc(dofs, size));
+  feenox_check_alloc(neutron_transport.AH = gsl_matrix_calloc(dofs, size));
+  if (neutron_transport.has_fission) {
+    feenox_check_alloc(neutron_transport.XH = gsl_matrix_calloc(dofs, size));
+  }
+ 
+  return FEENOX_OK;
+}
+
+int feenox_problem_build_volumetric_gauss_point_neutron_transport(element_t *e, unsigned int v) {
 
 #ifdef HAVE_PETSC
-  
-/*  
 
-  if (Source == NULL) {
-    Source = malloc(milonga.groups * sizeof(double));
-    SigmaA = malloc(milonga.groups * sizeof(double));
-    SigmaT = malloc(milonga.groups * sizeof(double));
-    SigmaS0 = malloc(milonga.groups * sizeof(double *));
-    SigmaS1 = malloc(milonga.groups * sizeof(double *));
-    chinuSigmaF = malloc(milonga.groups * sizeof(double *));
-    for (g = 0; g < milonga.groups; g++) {
-      SigmaS0[g] = malloc(milonga.groups * sizeof(double));
-      SigmaS1[g] = malloc(milonga.groups * sizeof(double));
-      chinuSigmaF[g] = malloc(milonga.groups * sizeof(double));
+  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
+  double *x = feenox_mesh_compute_x_if_needed(e, v, neutron_transport.space_XS);
+  material_t *material = feenox_mesh_get_material(e);
+  
+  // initialize to zero
+  gsl_matrix_set_zero(neutron_transport.removal);
+  if (neutron_transport.has_fission) {
+    gsl_matrix_set_zero(neutron_transport.nufission);
+  }
+  if (neutron_transport.has_sources) {
+    gsl_vector_set_zero(neutron_transport.src);
+  }
+
+  // TODO: if XS are uniform then compute only once these cached properties
+  for (int g = 0; g < neutron_transport.groups; g++) {
+    // independent sources
+    if (neutron_transport.S[g].defined) {
+      neutron_transport.S[g].eval(&neutron_transport.S[g], x, material);
     }
-  }
-  
-
-  if (element->physical_entity == NULL) {
-    wasora_push_error_message("element %d needs a physical entity", element->tag);
-    PetscFunctionReturn(WASORA_RUNTIME_ERROR);
-  } else if (element->physical_entity->material == NULL) {
-    wasora_push_error_message("physical entity '%s' needs a material", element->physical_entity->material);
-    PetscFunctionReturn(WASORA_RUNTIME_ERROR);
-  }
-
-  material_xs = (xs_t *)(element->physical_entity->material->ext);
-
-  if (J != element->type->nodes) {
-    wasora_call(sn_elements_allocate_particular_elemental_objects(element));
-  }
-
-  // inicializar Ki Ai Xi Si <- 0
-  gsl_matrix_set_zero(Ki);
-  gsl_matrix_set_zero(Ai);
-  gsl_matrix_set_zero(Xi);
-  gsl_vector_set_zero(Si);
-
-  // factor de estabilizacion
-  tau = wasora_var(milonga.vars.sn_alpha) * 0.5 * gsl_hypot3(element->node[1]->x[0]-element->node[0]->x[0],
-                                                             element->node[1]->x[1]-element->node[0]->x[1],
-                                                             element->node[1]->x[2]-element->node[0]->x[2]);
-  
-  // para cada punto de gauss
-  for (v = 0; v < element->type->gauss[GAUSS_POINTS_CANONICAL].V; v++) {
-
-    // para este punto de gauss, calculamos las matrices H y B
-    w_gauss = mesh_compute_fem_objects_at_gauss(wasora_mesh.main_mesh, element, v);
     
-    // la estabilizacion de petrov
-    for (j = 0; j < element->type->nodes; j++) {
-      xi = element->type->h(j, wasora_mesh.main_mesh->fem.r);
-      for (m = 0; m < milonga.directions; m++) {
-        for (g = 0; g < milonga.groups; g++) {
-          // parte base, igual a las h
-          gsl_matrix_set(P, dof_index(m,g), milonga.directions*milonga.groups*j + dof_index(m,g), xi);
-          // correccion
-          for (n = 0; n < milonga.dimensions; n++) {
-            gsl_matrix_add_to_element(P, dof_index(m,g), milonga.directions*milonga.groups*j + dof_index(m,g), 
-                               tau * Omega[m][n] * gsl_matrix_get(wasora_mesh.main_mesh->fem.dhdx, j, n));
-          }
-        }
+    // fission
+    if (neutron_transport.nu_Sigma_f[g].defined) {
+      neutron_transport.nu_Sigma_f[g].eval(&neutron_transport.nu_Sigma_f[g], x, material);
+    }
+    
+    // scattering
+    for (int g_prime = 0; g_prime < neutron_transport.groups; g_prime++) {
+      if (neutron_transport.Sigma_s0[g_prime][g].defined) {
+        neutron_transport.Sigma_s0[g_prime][g].eval(&neutron_transport.Sigma_s0[g_prime][g], x, material);
+      }
+      if (neutron_transport.Sigma_s1[g_prime][g].defined) {
+        neutron_transport.Sigma_s1[g_prime][g].eval(&neutron_transport.Sigma_s1[g_prime][g], x, material);
       }
     }
     
-    
-    // inicializamos las matrices con las XS (estas si dependen de la formulacion)
-    gsl_matrix_set_zero(A);
-    gsl_matrix_set_zero(X);
-    gsl_vector_set_zero(S);
-
-    for (g = 0; g < milonga.groups; g++) {
-     
-      if (material_xs->S[g]->n_tokens != 0) {
-        if ((Source[g] = wasora_evaluate_expression(material_xs->S[g])) != 0) {
-          milonga.has_sources = 1;
-          this_element_has_sources = 1;
-        } else {
-          Source[g] = 0;
-        }
-      }
-      if (material_xs->SigmaA[g]->n_tokens != 0) {
-        SigmaA[g] = wasora_evaluate_expression(material_xs->SigmaA[g]);
-      } else {
-        SigmaA[g] = 0;
-      }
-      if (material_xs->SigmaT[g]->n_tokens != 0) {
-        SigmaT[g] = wasora_evaluate_expression(material_xs->SigmaT[g]);
-      } else {
-        SigmaT[g] = 0;
-      }
-      
-      for (g_prime = 0; g_prime < milonga.groups; g_prime++) {
-        if (material_xs->SigmaS0[g][g_prime]->n_tokens != 0) {
-          SigmaS0[g][g_prime] = wasora_evaluate_expression(material_xs->SigmaS0[g][g_prime]);
-        } else {
-          SigmaS0[g][g_prime] = 0;
-        }
-        if (material_xs->SigmaS1[g][g_prime]->n_tokens != 0) {
-          SigmaS1[g][g_prime] = wasora_evaluate_expression(material_xs->SigmaS1[g][g_prime]);
-        } else {
-          SigmaS1[g][g_prime] = 0;
-        }
-        if (material_xs->nuSigmaF[g]->n_tokens != 0 && gsl_vector_get(wasora_value_ptr(milonga.vectors.chi), g_prime) != 0) {
-          chinuSigmaF[g][g_prime] = gsl_vector_get(wasora_value_ptr(milonga.vectors.chi), g_prime) * wasora_evaluate_expression(material_xs->nuSigmaF[g]);
-          this_element_has_fission = 1;
-          milonga.has_fission = 1;
-        } else {
-          chinuSigmaF[g][g_prime] = 0;
-        }
-      }
+    // absorption
+    if (neutron_transport.Sigma_t[g].defined) {
+      neutron_transport.Sigma_t[g].eval(&neutron_transport.Sigma_t[g], x, material);
     }
+    if (neutron_transport.Sigma_a[g].defined) {
+      neutron_transport.Sigma_a[g].eval(&neutron_transport.Sigma_a[g], x, material);
+    }
+  }
        
-      
-    for (m = 0; m < milonga.directions; m++) {
-      for (g = 0; g < milonga.groups; g++) {
-        gsl_vector_set(S, dof_index(m,g), Source[g]);
+  for (unsigned int n = 0; n < neutron_transport.directions; n++) {
+    for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+      // independent sources
+      int diag = dof_index(n,g);
+      gsl_vector_set(neutron_transport.src, diag, neutron_transport.S[g].value);
         
-        // scattering y fision
-        for (g_prime = 0; g_prime < milonga.groups; g_prime++) {
-          for (m_prime = 0; m_prime < milonga.directions; m_prime++) {
-            // scattering
-            xi = -w[m_prime] * SigmaS0[g_prime][g];
-            // si tenemos scattering anisotropico, l = 1
-            if (material_xs->SigmaS1[g_prime][g]->n_tokens != 0) {
-              xi -= w[m_prime] * SigmaS1[g_prime][g] * 3.0 * mesh_dot(Omega[m], Omega[m_prime]);
-            }
-            gsl_matrix_set(A, dof_index(m,g), dof_index(m_prime,g_prime), xi);
+      // scattering and fission
+      for (unsigned int g_prime = 0; g_prime < neutron_transport.groups; g_prime++) {
+        for (unsigned int n_prime = 0; n_prime < neutron_transport.directions; n_prime++) {
+          // scattering
+          double xi = -neutron_transport.w[n_prime] * neutron_transport.Sigma_s0[g_prime][g].value;
+          // anisotropic scattering l = 1
+          if (neutron_transport.Sigma_s1[g_prime][g].defined) {
+            xi -= neutron_transport.w[n_prime] * neutron_transport.Sigma_s1[g_prime][g].value * 3.0 * feenox_mesh_dot(neutron_transport.Omega[n], neutron_transport.Omega[n_prime]);
+          }
+          gsl_matrix_set(neutron_transport.removal, diag, dof_index(n_prime,g_prime), xi);
 
-            // fision
-            gsl_matrix_set(X, dof_index(m,g), dof_index(m_prime,g_prime), +w[m_prime] * chinuSigmaF[g_prime][g]);
+          // fision
+          if (neutron_transport.has_fission) {
+            gsl_matrix_set(neutron_transport.nufission, diag, dof_index(n_prime,g_prime), +neutron_transport.w[n_prime] * neutron_transport.chi[g] * neutron_transport.nu_Sigma_f[g_prime].value);
           }
         }
-
-        // absorcion
-        xi = gsl_matrix_get(A, dof_index(m,g), dof_index(m,g));
-        if (SigmaT[g] != 0) {
-          xi += SigmaT[g];
-        } else {
-          xi += SigmaA[g];
-          for (g_prime = 0; g_prime < milonga.groups; g_prime++) {
-            xi += SigmaS0[g][g_prime];
-          }
-        }
-        gsl_matrix_set(A, dof_index(m,g), dof_index(m,g), xi);
       }
-    }
-    
-    // armamos la matriz elemental del termino de fugas (estabilizada con petrov)
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, OMEGA, wasora_mesh.main_mesh->fem.B, 0, OMEGAB);
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w_gauss, P, OMEGAB, 1, Ki);    
 
-    // la matriz elemental de scattering (estabilizada con petrov)
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, A, wasora_mesh.main_mesh->fem.H, 0, AH);
-    gsl_blas_dgemm(CblasTrans, CblasNoTrans, w_gauss, P, AH, 1, Ai);
-    
-    // la matriz elemental de fision (estabilizada con petrov)
-    if (this_element_has_fission) {
-      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, X, wasora_mesh.main_mesh->fem.H, 0, XH);
-      gsl_blas_dgemm(CblasTrans, CblasNoTrans, w_gauss, P, XH, 1, Xi);
+      // absorption
+      double xi = gsl_matrix_get(neutron_transport.removal, diag, diag);
+      if (neutron_transport.Sigma_t[g].defined) {
+        xi += neutron_transport.Sigma_t[g].value;
+      } else {
+        xi += neutron_transport.Sigma_a[g].value;
+        for (unsigned int g_prime = 0; g_prime < neutron_transport.groups; g_prime++) {
+          xi += neutron_transport.Sigma_s0[g][g_prime].value;
+        }
+      }
+      gsl_matrix_set(neutron_transport.removal, diag, diag, xi);
     }
-    // el vector elemental de fuentes (estabilizado con petrov)
-    if (this_element_has_sources) {
-      gsl_blas_dgemv(CblasTrans, w_gauss, P, S, 1, Si);
-    }
+  }
+
+  // TODO: store current number of nodes in feenox.pde and call the method automatically?
+  // this should be done outside the gauss loop!
+  if (neutron_transport.n_nodes != e->type->nodes) {
+    feenox_call(feenox_problem_build_allocate_aux_neutron_transport(e->type->nodes));
   }
   
-  petsc_call(MatSetValues(milonga.R, L, wasora_mesh.main_mesh->fem.l, L, wasora_mesh.main_mesh->fem.l, gsl_matrix_ptr(Ki, 0, 0), ADD_VALUES));
-  petsc_call(MatSetValues(milonga.R, L, wasora_mesh.main_mesh->fem.l, L, wasora_mesh.main_mesh->fem.l, gsl_matrix_ptr(Ai, 0, 0), ADD_VALUES));  
-  if (this_element_has_fission) {
-    petsc_call(MatSetValues(milonga.F, L, wasora_mesh.main_mesh->fem.l, L, wasora_mesh.main_mesh->fem.l, gsl_matrix_ptr(Xi, 0, 0), ADD_VALUES));
+  // initialize Ki Ai Xi Si <- 0
+  gsl_matrix_set_zero(neutron_transport.Ki);
+  gsl_matrix_set_zero(neutron_transport.Ai);
+  if (neutron_transport.has_fission) {
+    gsl_matrix_set_zero(neutron_transport.Xi);
   }
-  if (this_element_has_sources) {
-    petsc_call(VecSetValues(milonga.S, L, wasora_mesh.main_mesh->fem.l, gsl_vector_ptr(Si, 0), ADD_VALUES));
+  if (neutron_transport.has_sources) {
+    gsl_vector_set_zero(neutron_transport.Si);
   }
-*/  
+
+  // petrov stabilization
+  double tau = feenox_var_value(neutron_transport.sn_alpha) * 0.5 * gsl_hypot3(e->node[1]->x[0]-e->node[0]->x[0],
+                                                                               e->node[1]->x[1]-e->node[0]->x[1],
+                                                                               e->node[1]->x[2]-e->node[0]->x[2]);
+  for (unsigned int j = 0; j < neutron_transport.n_nodes; j++) {
+    double xi = e->type->gauss[feenox.pde.mesh->integration].h[v][j];
+    for (unsigned int n = 0; n < neutron_transport.directions; n++) {
+      for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+        // parte base, igual a las h
+        int diag = dof_index(n,g);
+        gsl_matrix_set(neutron_transport.P, diag, neutron_transport.directions * neutron_transport.groups * j + diag, xi);
+        // correccion
+        for (unsigned int m = 0; m < feenox.pde.dim; m++) {
+          gsl_matrix_add_to_element(neutron_transport.P, diag, neutron_transport.directions * neutron_transport.groups * j + diag, 
+                             tau * neutron_transport.Omega[n][m] * gsl_matrix_get(e->dhdx[v], j, m));
+        }
+      }
+    }
+  }
+
+  // petrov-stabilized leakage term
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_transport.OMEGA, e->B[v], 0.0, neutron_transport.OMEGAB));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], neutron_transport.P, neutron_transport.OMEGAB, 1.0, neutron_transport.Ki));
+
+  // petrov-stabilized revmoval term
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_transport.removal, e->H[v], 0.0, neutron_transport.AH));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], neutron_transport.P, neutron_transport.AH, 1.0, neutron_transport.Ai));
+  
+  // petrov-stabilized fission term
+  if (neutron_transport.has_fission) {
+    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, neutron_transport.nufission, e->H[v], 0.0, neutron_transport.XH));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], neutron_transport.P, neutron_transport.XH, 1.0, neutron_transport.Xi));
+  }
+  // petrov-stabilized source term
+  if (neutron_transport.has_sources) {
+    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], neutron_transport.P, neutron_transport.src, 1, neutron_transport.Si));
+  }
+  
+  // for source-driven problems
+  //   K = Ki + Ai - Xi
+  // for criticallity problems
+  //   K = Ki + Ai
+  //   M = Xi
+  gsl_matrix_add(neutron_transport.Ki, neutron_transport.Ai);
+  if (neutron_transport.has_fission) {
+    if (neutron_transport.has_sources) {
+      gsl_matrix_scale(neutron_transport.Xi, -1.0);
+      gsl_matrix_add(neutron_transport.Ki, neutron_transport.Xi);
+    } else {
+      gsl_matrix_add(feenox.pde.Mi, neutron_transport.Xi);
+    }  
+  }
+
+  if (neutron_transport.has_sources) {
+      gsl_vector_add(feenox.pde.bi, neutron_transport.Si);
+  }
+  
+  gsl_matrix_add(feenox.pde.Ki, neutron_transport.Ki);
 #endif
   
   return FEENOX_OK;

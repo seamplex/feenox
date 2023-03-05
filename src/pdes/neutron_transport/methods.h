@@ -35,13 +35,13 @@ extern int feenox_problem_setup_eps_neutron_transport(EPS eps);
 #endif
 
 // neutron_transport/bulk.c
+extern int feenox_problem_build_allocate_aux_neutron_transport(unsigned int n_nodes);
 extern int feenox_problem_build_volumetric_gauss_point_neutron_transport(element_t *element, unsigned int v);
 
 // neutron_transport/bc.c
 extern int feenox_problem_bc_parse_neutron_transport(bc_data_t *bc_data, const char *lhs, char *rhs);
-extern int feenox_problem_bc_set_neutron_transport_null(element_t *element, bc_data_t *bc_data, size_t node_global_index);
-extern int feenox_problem_bc_set_neutron_transport_vacuum(element_t *element, bc_data_t *bc_data, unsigned int v);
-extern int feenox_problem_bc_set_neutron_transport_mirror(element_t *element, bc_data_t *bc_data, unsigned int v);
+extern int feenox_problem_bc_set_neutron_transport_vacuum(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_neutron_transport_mirror(bc_data_t *this, element_t *e, size_t j_global);
 
 // neutron_transport/post.c
 extern int feenox_problem_solve_post_neutron_transport(void);

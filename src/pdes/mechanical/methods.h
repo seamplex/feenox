@@ -40,14 +40,16 @@ extern int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace);
 // mechanical/bc.c
 extern int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char *rhs);
 
-extern int feenox_problem_bc_set_mechanical_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index);
-extern int feenox_problem_bc_set_mechanical_multifreedom(element_t *element, bc_data_t *bc_data, size_t node_global_index);
+extern int feenox_problem_bc_set_mechanical_displacement(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_mechanical_symmetry(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_mechanical_radial(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *this, element_t *e, size_t j_global);
 
-extern int feenox_problem_bc_set_mechanical_compression(element_t *element, bc_data_t *bc_data, unsigned int v);
-extern int feenox_problem_bc_set_mechanical_tension(element_t *element, bc_data_t *bc_data, unsigned int v);
-extern int feenox_problem_bc_set_mechanical_normal_stress(element_t *element, bc_data_t *bc_data, unsigned int v, signed int sign);
-extern int feenox_problem_bc_set_mechanical_traction(element_t *element, bc_data_t *bc_data, unsigned int v);
-extern int feenox_problem_bc_set_mechanical_force(element_t *element, bc_data_t *bc_data, unsigned int v);
+extern int feenox_problem_bc_set_mechanical_compression(bc_data_t *this, element_t *e, unsigned int v);
+extern int feenox_problem_bc_set_mechanical_tension(bc_data_t *this, element_t *e, unsigned int v);
+extern int feenox_problem_bc_set_mechanical_normal_stress(bc_data_t *this, element_t *e, unsigned int v, signed int sign);
+extern int feenox_problem_bc_set_mechanical_traction(bc_data_t *this, element_t *e, unsigned int v);
+extern int feenox_problem_bc_set_mechanical_force(bc_data_t *this, element_t *e, unsigned int v);
 
 // mechanical/bulk.c
 extern int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes);

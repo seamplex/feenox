@@ -99,10 +99,12 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   double a[3], b[3], surface_center[3], volumetric_neighbor_center[3];
   element_t *volumetric_neighbor = NULL;
 
-  // TODO: virtuals!
+  // TODO: a method linked to the element type
   if (element->type->dim == 0) {
-    feenox_push_error_message("trying to compute the outward normal of a point (element %d)", element->tag);
-    return FEENOX_ERROR;
+    n[0] = 1;
+    n[1] = 0;
+    n[2] = 0;    
+    
   } else if (element->type->dim == 1) {
 
     // OJO que no camina con lineas que no estan en el plano xy!!

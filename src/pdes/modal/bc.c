@@ -28,18 +28,21 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
   if (strcmp(lhs, "fixed") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
+    bc_data->set_essential = feenox_problem_bc_set_modal_displacement;
     bc_data->dof = -1;
     modal.has_dirichlet_bcs = 1;
     
   } else if (strcmp(lhs, "u") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
+    bc_data->set_essential = feenox_problem_bc_set_modal_displacement;
     bc_data->dof = 0;
     modal.has_dirichlet_bcs = 1;
     
   } else if (strcmp(lhs, "v") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
+    bc_data->set_essential = feenox_problem_bc_set_modal_displacement;
     bc_data->dof = 1;
     modal.has_dirichlet_bcs = 1;
     if (feenox.pde.dofs < 1) {
@@ -50,6 +53,7 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
   } else if (strcmp(lhs, "w") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
+    bc_data->set_essential = feenox_problem_bc_set_modal_displacement;
     bc_data->dof = 2;
     modal.has_dirichlet_bcs = 1;
     if (feenox.pde.dofs < 2) {
@@ -60,15 +64,18 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
   } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "tangential") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
+    bc_data->set_essential = feenox_problem_bc_set_modal_multifreedom;
     
   } else if (strcmp(lhs, "radial") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_RADIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
+    bc_data->set_essential = feenox_problem_bc_set_modal_multifreedom;
     // TODO: x0, y0 and z0
     
   } else if (strcmp(lhs, "0") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION;
     bc_data->type_math = bc_type_math_multifreedom;
+    bc_data->set_essential = feenox_problem_bc_set_modal_multifreedom;
     
     // trick: the idea is that the user might write an expression of space
     // x,y,z but also maybe of u,v y w. However, u,v,w are functinos and not variables!
@@ -103,10 +110,11 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_modal_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
+int feenox_problem_bc_set_modal_displacement(bc_data_t *this, element_t *e, size_t j_global) {
 
 #ifdef HAVE_PETSC
-  feenox_call(feenox_problem_bc_set_mechanical_displacement(element, bc_data, node_global_index));  
+  // TODO: duplicate but independent code vs. reusable code
+  feenox_call(feenox_problem_bc_set_mechanical_displacement(this, e, j_global));  
 #endif
   
   return FEENOX_OK;
@@ -114,10 +122,10 @@ int feenox_problem_bc_set_modal_displacement(element_t *element, bc_data_t *bc_d
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_modal_multifreedom(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
+int feenox_problem_bc_set_modal_multifreedom(bc_data_t *this, element_t *e, size_t j_global) {
 
 #ifdef HAVE_PETSC
-  feenox_call(feenox_problem_bc_set_mechanical_multifreedom(element, bc_data, node_global_index));  
+  feenox_call(feenox_problem_bc_set_mechanical_multifreedom(this, e, j_global));  
 #endif
   
   return FEENOX_OK;

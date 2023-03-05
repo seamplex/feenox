@@ -61,6 +61,24 @@ int feenox_problem_solve_post_neutron_transport(void) {
     }  
 #endif
   }
+  
+  
+  // compute the scalar fluxes out of the directional fluxes
+  for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+    feenox_secondary_fill(neutron_transport, phi[g]);
+  }
+  
+  for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
+    for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+      double xi = 0;
+      for (unsigned int n = 0; n < neutron_transport.directions; n++) {
+        xi += neutron_transport.w[n] * feenox.pde.solution[n * neutron_transport.groups + g]->data_value[j];
+      }
+      neutron_transport.phi[g]->data_value[j] = xi;
+    }
+  }  
+  
+  
 #endif
 
   return FEENOX_OK;

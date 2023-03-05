@@ -59,7 +59,6 @@ struct neutron_diffusion_t {
   gsl_matrix *Ai;
   gsl_matrix *Xi;
   
-//  int has_dirichlet_bcs;
   int has_sources;
   int has_fission;
   int space_XS;

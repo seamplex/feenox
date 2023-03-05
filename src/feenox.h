@@ -211,7 +211,7 @@ extern "C++" {
   if (type.name.defined == 0) { feenox_push_error_message("undefined %s '%s'", description, quoted_name);  return FEENOX_ERROR; } \
   if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } }
 
-#define feenox_gradient_fill(location, fun_nam) {\
+#define feenox_secondary_fill(location, fun_nam) {\
   location.fun_nam->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough; \
   location.fun_nam->data_argument = location.fun_nam->mesh->nodes_argument;   \
   location.fun_nam->data_size = location.fun_nam->mesh->n_nodes; \
@@ -1191,7 +1191,8 @@ struct bc_data_t {
   expr_t expr;
   expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
   
-  int (*set)(element_t *element, bc_data_t *bc_data, unsigned int v);
+  int (*set_essential)(bc_data_t *, element_t *, size_t j_global);
+  int (*set_natural)(bc_data_t *, element_t *, unsigned int v);
   
   bc_data_t *prev, *next;   // doubly-linked list in ech bc_t
 };
@@ -1692,8 +1693,8 @@ struct feenox_t {
     int (*init_parser_particular)(void);
     int (*init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, char *);
-    int (*bc_set_dirichlet)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
-    int (*bc_set_multifreedom)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
+//    int (*bc_set_dirichlet)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
+//    int (*bc_set_multifreedom)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
@@ -1836,13 +1837,21 @@ struct feenox_t {
     PetscScalar     *dirichlet_derivatives;
     size_t          dirichlet_k;
     // reusable number of dirichlet rows to know how much memory to allocate
-    size_t n_dirichlet_rows;
+    size_t          dirichlet_rows;
 
+    // mimicked nodes (e.g. mirror or periodic conditions)
+    PetscInt        *mimicked_index_follower;
+    PetscInt        *mimicked_index_guide;
+    // we imply that the coefficient of the guide is equal to one
+    PetscScalar     *mimicked_coefficient_follower;
+    size_t          mimicked_k;
+    size_t          mimicked_nodes;
+    
     // internal storage of multi-freedom conditions
     PetscInt        **multifreedom_indexes;
     gsl_matrix      **multifreedom_coefficients;
     size_t          multifreedom_k;
-    size_t          n_multifreedom_nodes;
+    size_t          multifreedom_nodes;
     
     // PETSc's solvers
     TS ts;
@@ -2288,6 +2297,7 @@ extern int feenox_problem_solve_slepc_eigen(void);
 // dirichlet.c
 extern int feenox_problem_dirichlet_add(size_t index, double value);
 extern int feenox_problem_multifreedom_add(size_t index, double *coefficients);
+extern int feenox_problem_mimicked_add(size_t index_guide, size_t index_follower, double coefficient_follower);
 extern int feenox_problem_dirichlet_eval(void);
 extern int feenox_problem_dirichlet_set_K(void);
 extern int feenox_problem_dirichlet_set_M(void);

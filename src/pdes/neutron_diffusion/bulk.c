@@ -21,6 +21,7 @@
  */
 #include "feenox.h"
 #include "neutron_diffusion.h"
+#include "pdes/neutron_transport/neutron_transport.h"
 
 int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int n_nodes) {
   
@@ -63,7 +64,9 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   
   gsl_matrix_set_zero(neutron_diffusion.diff);
   gsl_matrix_set_zero(neutron_diffusion.removal);
-  gsl_matrix_set_zero(neutron_diffusion.nufission);
+  if (neutron_transport.has_fission) {
+    gsl_matrix_set_zero(neutron_diffusion.nufission);
+  }
   
   for (int g = 0; g < neutron_diffusion.groups; g++) {
     // independent sources
@@ -109,12 +112,6 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
     }
   }
 
-/*  
-  feenox_debug_print_gsl_matrix(neutron_diffusion.removal, stdout);
-  feenox_debug_print_gsl_matrix(neutron_diffusion.nufission, stdout);
-  feenox_debug_print_gsl_matrix(neutron_diffusion.diff, stdout);
-*/
-  
   if (neutron_diffusion.n_nodes != e->type->nodes) {
     feenox_call(feenox_problem_build_allocate_aux_neutron_diffusion(e->type->nodes));
   }

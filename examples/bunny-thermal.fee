@@ -17,7 +17,7 @@ cp = 320e3
 
 Toven = 400
 BC base q=0
-BC rest h=1000 Tref=limit(Toven*t,0,Toven)
+BC rest h=1000 Tref=Toven*heaviside(t,1)
 
 T_0(x,y,z) = 0
 end_time = 1e5

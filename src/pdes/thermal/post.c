@@ -35,8 +35,7 @@ int feenox_problem_solve_post_thermal(void) {
   feenox_var_value(thermal.T_max) = -INFTY;
   feenox_var_value(thermal.T_min) = +INFTY;
   
-  size_t j = 0;
-  for (j = 0; j < feenox.pde.mesh->n_nodes; j++) {
+  for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
     T = feenox.pde.solution[0]->data_value[j];
     if (T > feenox_var_value(thermal.T_max)) {
       feenox_var_value(thermal.T_max) = T;

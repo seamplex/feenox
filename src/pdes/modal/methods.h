@@ -39,8 +39,8 @@ extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element,
 
 // modal/bc.c
 extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs);
-extern int feenox_problem_bc_set_modal_displacement(element_t *element, bc_data_t *bc_data, size_t node_global_index);
-extern int feenox_problem_bc_set_modal_multifreedom(element_t *element, bc_data_t *bc_data, size_t node_global_index);
+extern int feenox_problem_bc_set_modal_displacement(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_modal_multifreedom(bc_data_t *this, element_t *e, size_t j_global);
 
 // material models
 extern int feenox_problem_build_compute_modal_C_elastic_isotropic(const double *x, material_t *material);

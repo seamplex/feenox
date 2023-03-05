@@ -28,7 +28,7 @@ int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, char *r
 ///bc_laplace+phi+description Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.   
   if (strcmp(lhs, "phi") == 0) {
     bc_data->type_math = bc_type_math_dirichlet;
-
+    bc_data->set_essential = feenox_problem_bc_set_laplace_phi;
 
 ///bc_laplace+phi'+usage phi'=<expr>
 ///bc_laplace+phi'+description Neumann natural boundary condition in which the value of the normal outward derivative\ $\frac{\partial \phi}{\partial n}$ is prescribed.     
@@ -36,7 +36,7 @@ int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, char *r
 ///bc_laplace+dphidn+description Alias for `phi'`.     
   } else if (strcmp(lhs, "phi'") == 0 || strcmp(lhs, "dphidn") == 0) {
     bc_data->type_math = bc_type_math_neumann;
-    bc_data->set = feenox_problem_bc_set_laplace_derivative;
+    bc_data->set_natural = feenox_problem_bc_set_laplace_derivative;
 
   } else {
     feenox_push_error_message("unknown laplace boundary condition '%s'", lhs);
@@ -57,11 +57,11 @@ int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, char *r
 }
 
 
-int feenox_problem_bc_set_laplace_phi(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
+int feenox_problem_bc_set_laplace_phi(bc_data_t *this, element_t *e, size_t j_global) {
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));
+  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[0], feenox_expression_eval(&this->expr)));
   // TODO: only in transient
 //  feenox.pde.dirichlet_derivatives[*k] = feenox_expression_derivative_wrt_variable(&bc_data->expr, feenox_special_var(t), feenox_special_var_value(t));
   
@@ -69,22 +69,22 @@ int feenox_problem_bc_set_laplace_phi(element_t *element, bc_data_t *bc_data, si
   return FEENOX_OK;
 }
 
-int feenox_problem_bc_set_laplace_derivative(element_t *element, bc_data_t *bc_data, unsigned int v) {
+int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsigned int v) {
   
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x = feenox_problem_bc_natural_x(element, bc_data, v);
-  double derivative = feenox_expression_eval(&bc_data->expr);
-  feenox_call(feenox_problem_bc_natural_set(element, v, &derivative));
+  double *x = feenox_problem_bc_natural_x(e, this, v);
+  double derivative = feenox_expression_eval(&this->expr);
+  feenox_call(feenox_problem_bc_natural_set(e, v, &derivative));
   
-  if (bc_data->nonlinear) {
+  if (this->nonlinear) {
     double phi = feenox_function_eval(feenox.pde.solution[0], x);
-    double dderivativedphi = feenox_expression_derivative_wrt_function(&bc_data->expr, feenox.pde.solution[0], phi);
+    double dderivativedphi = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], phi);
     // TODO: axisymmetric
-    double w = element->w[v];
+    double w = e->w[v];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, element->H[v], element->H[v], 1.0, feenox.pde.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, e->H[v], e->H[v], 1.0, feenox.pde.Jbi));
   }
   
 #endif

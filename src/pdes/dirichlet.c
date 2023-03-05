@@ -32,7 +32,7 @@ int feenox_problem_dirichlet_add(size_t index, double value) {
   return FEENOX_OK;
 }
 
-int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
+int feenox_problem_multifreedom_add(size_t j_global, double *coefficients) {
 
 #ifdef HAVE_PETSC
   PetscInt *l = NULL;
@@ -42,7 +42,7 @@ int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
   feenox_check_alloc(c = gsl_matrix_alloc(1, feenox.pde.dofs));
 
   for (int g = 0; g < feenox.pde.dofs; g++) {
-    l[g] = feenox.pde.mesh->node[index].index_dof[g];
+    l[g] = feenox.pde.mesh->node[j_global].index_dof[g];
     gsl_matrix_set(c, 0, g, coefficients[g]);
   }
   
@@ -54,13 +54,31 @@ int feenox_problem_multifreedom_add(size_t index, double *coefficients) {
   return FEENOX_OK;
 }
 
+// for mimicked we set an homogeneous dirichlet BC on the follower and add
+// the coefficient in the column of the guide index
+int feenox_problem_mimicked_add(size_t index_guide, size_t index_follower, double coefficient_follower) {
+#ifdef HAVE_PETSC
+  feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index_follower;
+  feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = 0;
+  feenox.pde.dirichlet_k++;
+  
+  feenox.pde.mimicked_index_follower[feenox.pde.mimicked_k] = index_follower;
+  feenox.pde.mimicked_index_guide[feenox.pde.mimicked_k] = index_guide;
+  feenox.pde.mimicked_coefficient_follower[feenox.pde.mimicked_k] = coefficient_follower;
+  feenox.pde.mimicked_k++;
+#endif
+  
+  return FEENOX_OK;
+  
+}
+
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_problem_dirichlet_eval(void) {
 
 #ifdef HAVE_PETSC
 
   size_t n_bcs = 0;
-  if (feenox.pde.n_dirichlet_rows == 0) {
+  if (feenox.pde.dirichlet_rows == 0) {
     // on the first iteration, assume that all the nodes need a dirichlet BC
     // then we trim the extra space to save memory
     // TODO: allow the user to provide a factor at runtime
@@ -73,42 +91,44 @@ int feenox_problem_dirichlet_eval(void) {
     
     feenox_check_alloc(feenox.pde.multifreedom_indexes = calloc(n_bcs, sizeof(PetscInt *)));
     feenox_check_alloc(feenox.pde.multifreedom_coefficients = calloc(n_bcs, sizeof(PetscScalar *)));
+
+    feenox_check_alloc(feenox.pde.mimicked_index_guide = calloc(n_bcs, sizeof(PetscInt *)));
+    feenox_check_alloc(feenox.pde.mimicked_index_follower = calloc(n_bcs, sizeof(PetscInt *)));
+    // we imply that the coefficient of the guide is equal to one
+    feenox_check_alloc(feenox.pde.mimicked_coefficient_follower = calloc(n_bcs, sizeof(PetscScalar *)));
     
   } else {
     // if we are here then we know more or less the number of BCs we need
-    n_bcs = feenox.pde.n_dirichlet_rows;
+    n_bcs = feenox.pde.dirichlet_rows;
   }  
   
-  bc_t *bc = NULL;
-  bc_data_t *bc_data = NULL;
-  element_t *element = NULL;
-  element_ll_t *element_list = NULL;
-  size_t j = 0;
   feenox.pde.dirichlet_k = 0;
   feenox.pde.multifreedom_k = 0;
-  for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {
+  feenox.pde.mimicked_k = 0;
+  for (size_t j_global = feenox.pde.first_node; j_global < feenox.pde.last_node; j_global++) {
     // TODO: optimize these ugly nested loops
     // maybe if we went the other way and looped over the elements first?
     // merge_sort + remove duplicates?
     physical_group_t *last_physical_group = NULL;
-    LL_FOREACH(feenox.pde.mesh->node[j].element_list, element_list) {
-      element = element_list->element;
+    element_ll_t *element_list = NULL;
+    LL_FOREACH(feenox.pde.mesh->node[j_global].element_list, element_list) {
+      element_t *element = element_list->element;
       if (element != NULL && element->type->dim < feenox.pde.dim && element->physical_group != NULL && element->physical_group != last_physical_group) {
         last_physical_group = element->physical_group;
+        bc_t *bc = NULL;
         LL_FOREACH(element->physical_group->bcs, bc) {
+          bc_data_t *bc_data = NULL;
           DL_FOREACH(bc->bc_datums, bc_data) {
             // if there is a condition we evaluate it now
-            if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
-              if (bc_data->space_dependent) {
-                feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j].x);
-              }
+            if (bc_data->set_essential != NULL && (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD)) {
+              
               // TODO: normal-dependent
-              if (bc_data->type_math == bc_type_math_dirichlet) {
-                feenox_call(feenox.pde.bc_set_dirichlet(element, bc_data, j));
-              } else if (bc_data->type_math == bc_type_math_multifreedom) {
-                // TODO: high-order nodes end up with a different penalty weight
-                feenox_call(feenox.pde.bc_set_multifreedom(element, bc_data, j));
+              if (bc_data->space_dependent) {
+                feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j_global].x);
               }
+              
+              // TODO: for multi-freedom high-order nodes end up with a different penalty weight
+              feenox_call(bc_data->set_essential(bc_data, element, j_global));
             }  
           }
         }
@@ -117,20 +137,24 @@ int feenox_problem_dirichlet_eval(void) {
   }
 
   // now we know how many rows we need to change
-  if (feenox.pde.n_dirichlet_rows != feenox.pde.dirichlet_k) {
-    feenox.pde.n_dirichlet_rows = feenox.pde.dirichlet_k;
+  if (feenox.pde.dirichlet_rows != feenox.pde.dirichlet_k) {
+    feenox.pde.dirichlet_rows = feenox.pde.dirichlet_k;
     
     // if k == 0 this like freeing
-    feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.n_dirichlet_rows * sizeof(PetscInt)));
-    feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
-    feenox_check_alloc(feenox.pde.dirichlet_derivatives = realloc(feenox.pde.dirichlet_derivatives, feenox.pde.n_dirichlet_rows * sizeof(PetscScalar)));
+    feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_rows * sizeof(PetscInt)));
+    feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.dirichlet_rows * sizeof(PetscScalar)));
+    feenox_check_alloc(feenox.pde.dirichlet_derivatives = realloc(feenox.pde.dirichlet_derivatives, feenox.pde.dirichlet_rows * sizeof(PetscScalar)));
   }
-  if (feenox.pde.n_multifreedom_nodes != feenox.pde.multifreedom_k) {
-    feenox.pde.n_multifreedom_nodes = feenox.pde.multifreedom_k;
-    
-    // if k == 0 this like freeing
-    feenox_check_alloc(feenox.pde.multifreedom_indexes = realloc(feenox.pde.multifreedom_indexes, feenox.pde.n_multifreedom_nodes * sizeof(PetscInt *)));
-    feenox_check_alloc(feenox.pde.multifreedom_coefficients = realloc(feenox.pde.multifreedom_coefficients, feenox.pde.n_multifreedom_nodes * sizeof(gsl_matrix *)));
+  if (feenox.pde.multifreedom_nodes != feenox.pde.multifreedom_k) {
+    feenox.pde.multifreedom_nodes = feenox.pde.multifreedom_k;
+    feenox_check_alloc(feenox.pde.multifreedom_indexes = realloc(feenox.pde.multifreedom_indexes, feenox.pde.multifreedom_nodes * sizeof(PetscInt *)));
+    feenox_check_alloc(feenox.pde.multifreedom_coefficients = realloc(feenox.pde.multifreedom_coefficients, feenox.pde.multifreedom_nodes * sizeof(gsl_matrix *)));
+  }
+  if (feenox.pde.mimicked_nodes != feenox.pde.mimicked_k) {
+    feenox.pde.mimicked_nodes = feenox.pde.mimicked_k;
+    feenox_check_alloc(feenox.pde.mimicked_index_guide = realloc(feenox.pde.mimicked_index_guide, feenox.pde.mimicked_nodes * sizeof(PetscInt *)));
+    feenox_check_alloc(feenox.pde.mimicked_index_follower = realloc(feenox.pde.mimicked_index_follower, feenox.pde.mimicked_nodes * sizeof(PetscInt *)));
+    feenox_check_alloc(feenox.pde.mimicked_coefficient_follower = realloc(feenox.pde.mimicked_coefficient_follower, feenox.pde.mimicked_nodes * sizeof(PetscScalar)));
   }
 
 #endif
@@ -199,13 +223,13 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatCopy(feenox.pde.K, feenox.pde.K_bc, SAME_NONZERO_PATTERN));
   } 
   
-  
+
   // add multifreedom constrains using the penalty method (before setting the rows to zero)
   // TODO: multi-freedom constrains with lagrange
-  if (feenox.pde.n_multifreedom_nodes > 0) {
+  if (feenox.pde.multifreedom_nodes > 0) {
     gsl_matrix *P = NULL;
     feenox_check_alloc(P = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    for (unsigned int k = 0; k < feenox.pde.n_multifreedom_nodes; k++) {
+    for (unsigned int k = 0; k < feenox.pde.multifreedom_nodes; k++) {
       gsl_matrix *c = feenox.pde.multifreedom_coefficients[k];
       PetscInt *l = feenox.pde.multifreedom_indexes[k];
 
@@ -228,16 +252,25 @@ int feenox_problem_dirichlet_set_K(void) {
     }
     petsc_call(VecCopy(feenox.pde.b, feenox.pde.b_bc));
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &rhs));
-    petsc_call(VecSetValues(rhs, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
+    petsc_call(VecSetValues(rhs, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   }  
   
   if (feenox.pde.symmetric_K) {
-    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
+    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   } else {  
-    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
+    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   }  
   petsc_call(VecDestroy(&rhs));
   
+  // mimicked nodes ------------------------------------------------------------
+  if (feenox.pde.mimicked_nodes > 0) {
+    for (unsigned int k = 0; k < feenox.pde.mimicked_nodes; k++) {
+      petsc_call(MatSetValue(feenox.pde.K_bc, feenox.pde.mimicked_index_follower[k], feenox.pde.mimicked_index_guide[k], feenox.pde.dirichlet_scale * feenox.pde.mimicked_coefficient_follower[k], INSERT_VALUES));
+    }
+    petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
+    petsc_call(MatAssemblyEnd(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
+  }
+    
   return FEENOX_OK;
 }
 
@@ -256,9 +289,9 @@ int feenox_problem_dirichlet_set_M(void) {
   
   // the mass matrix is like the stiffness one but with zero instead of one
   if (feenox.pde.symmetric_M) {
-    petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+    petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
   } else {  
-    petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  
+    petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  
   }  
 
   return FEENOX_OK;
@@ -274,7 +307,7 @@ int feenox_problem_dirichlet_set_J(Mat J) {
   }
   
   // the jacobian is exactly one (actually alpha) for the dirichlet values and zero otherwise without keeping symmetry
-  petsc_call(MatZeroRowsColumns(J, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, NULL, NULL));
+  petsc_call(MatZeroRowsColumns(J, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, NULL, NULL));
 
   return FEENOX_OK;
 }
@@ -282,7 +315,7 @@ int feenox_problem_dirichlet_set_J(Mat J) {
 // phi - solution: the BC values are set directly in order to be used as a initial condition or guess
 int feenox_problem_dirichlet_set_phi(Vec phi) {
   
-  petsc_call(VecSetValues(phi, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
+  petsc_call(VecSetValues(phi, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   return FEENOX_OK;
   
 }
@@ -290,7 +323,7 @@ int feenox_problem_dirichlet_set_phi(Vec phi) {
 // phi - solution: the values at the BC DOFs are zeroed
 int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot) {
 
-  petsc_call(VecSetValues(phi_dot, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_derivatives, INSERT_VALUES));
+  petsc_call(VecSetValues(phi_dot, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_derivatives, INSERT_VALUES));
   return FEENOX_OK;
 }
 
@@ -301,21 +334,21 @@ int feenox_problem_dirichlet_set_r(Vec r, Vec phi) {
   
   // TODO: put this array somewhere and avoid allocating/freeing each time
   PetscScalar *diff;
-  feenox_check_alloc(diff = calloc(feenox.pde.n_dirichlet_rows, sizeof(PetscScalar)));
-  petsc_call(VecGetValues(phi, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, diff));
+  feenox_check_alloc(diff = calloc(feenox.pde.dirichlet_rows, sizeof(PetscScalar)));
+  petsc_call(VecGetValues(phi, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diff));
   
   if (feenox.pde.dirichlet_scale == 0)
   {
     feenox_problem_dirichlet_compute_scale();
   }
   
-  for (k = 0; k < feenox.pde.n_dirichlet_rows; k++) {
+  for (k = 0; k < feenox.pde.dirichlet_rows; k++) {
     diff[k] -= feenox.pde.dirichlet_values[k];
     diff[k] *= feenox.pde.dirichlet_scale;
   }
   
   
-  petsc_call(VecSetValues(r, feenox.pde.n_dirichlet_rows, feenox.pde.dirichlet_indexes, diff, INSERT_VALUES));
+  petsc_call(VecSetValues(r, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diff, INSERT_VALUES));
   feenox_free(diff);
 
   return FEENOX_OK;

@@ -78,9 +78,9 @@ int feenox_problem_build(void) {
         bc_data_t *bc_data = NULL;
         DL_FOREACH(bc->bc_datums, bc_data) {
           // we only handle natural BCs here, essential BCs are handled in feenox_dirichlet_*()
-          if (bc_data->set != NULL && bc_data->type_math != bc_type_math_dirichlet && bc_data->disabled == 0) {
+          if (bc_data->set_natural != NULL && bc_data->disabled == 0) {
             // and only apply them if the condition holds true (or if there's no condition at all)
-            if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > 1e-3) {
+            if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
               feenox_call(feenox_problem_build_element_natural_bc(&feenox.pde.mesh->element[i], bc_data));
             }
           }
@@ -259,7 +259,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   }
 
   for (unsigned int v = 0; v < V; v++) {
-    feenox_call(bc_data->set(this, bc_data, v));
+    feenox_call(bc_data->set_natural(bc_data, this, v));
   }
   
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));

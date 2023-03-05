@@ -39,7 +39,7 @@ int feenox_problem_solve_petsc_linear(void) {
 
   feenox_call(feenox_problem_build());
   feenox_call(feenox_problem_dirichlet_eval());
-  feenox_call(feenox_problem_dirichlet_set_K());  
+  feenox_call(feenox_problem_dirichlet_set_K());
   
   // check if the stiffness matrix K has a near nullspace 
   // and pass it on to K_bc
@@ -68,6 +68,11 @@ int feenox_problem_solve_petsc_linear(void) {
   KSPConvergedReason reason = 0;
   petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));
   if (reason < 0) {
+    // if the input file asks for a DUMP then we do it now
+    if (feenox.pde.dumps != NULL) {
+      feenox_instruction_dump((void *)feenox.pde.dumps);
+    }
+    
     feenox_push_error_message("PETSc's linear solver did not converge with reason '%s' (%d)", KSPConvergedReasons[reason], reason);
     // TODO: dive into the PC
     return FEENOX_ERROR;

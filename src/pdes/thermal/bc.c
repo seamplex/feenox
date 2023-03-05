@@ -32,18 +32,19 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *r
     // temperature
     bc_data->type_phys = BC_TYPE_THERMAL_TEMPERATURE;
     bc_data->type_math = bc_type_math_dirichlet;
+    bc_data->set_essential = feenox_problem_bc_set_thermal_temperature;
     
   } else if (strcmp(lhs, "q''") == 0 || strcmp(lhs, "q") == 0) {
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_HEATFLUX;
     bc_data->type_math = bc_type_math_neumann;
-    bc_data->set = feenox_problem_bc_set_thermal_heatflux;
+    bc_data->set_natural = feenox_problem_bc_set_thermal_heatflux;
 
   } else if (strcmp(lhs, "h") == 0) {
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_CONVECTION_COEFFICIENT;
     bc_data->type_math = bc_type_math_robin;
-    bc_data->set = feenox_problem_bc_set_thermal_convection;
+    bc_data->set_natural = feenox_problem_bc_set_thermal_convection;
     bc_data->fills_matrix = 1;
 
   } else if (strcmp(lhs, "Tref") == 0 || strcmp(lhs, "T_ref") == 0 ||
@@ -51,7 +52,7 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *r
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_CONVECTION_TEMPERATURE;
     bc_data->type_math = bc_type_math_robin;
-    bc_data->set = feenox_problem_bc_set_thermal_convection;
+    bc_data->set_natural = feenox_problem_bc_set_thermal_convection;
     bc_data->fills_matrix = 1;
     
   } else {
@@ -83,11 +84,11 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *r
 
 
 // this virtual method fills in the dirichlet indexes and values with bc_data
-int feenox_problem_bc_set_thermal_temperature(element_t *element, bc_data_t *bc_data, size_t node_global_index) {
+int feenox_problem_bc_set_thermal_temperature(bc_data_t *this, element_t *e, size_t j_global) {
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[node_global_index].index_dof[0], feenox_expression_eval(&bc_data->expr)));  
+  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[0], feenox_expression_eval(&this->expr)));  
   // TODO: only in transient
 //  feenox.pde.dirichlet_derivatives[*k] = feenox_expression_derivative_wrt_variable(&bc_data->expr, feenox_special_var(t), feenox_special_var_value(t));
   
@@ -97,19 +98,19 @@ int feenox_problem_bc_set_thermal_temperature(element_t *element, bc_data_t *bc_
 
 // this virtual method builds the surface elemental matrix
 // TODO: one method for constant flux, one for temp, one for space
-int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_data, unsigned int v) {
+int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *element, unsigned int v) {
   
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
   // add a pointer to void in bc_data and cast it to an array of doubles
-  double *x = feenox_problem_bc_natural_x(element, bc_data, v);
-  double q = feenox_expression_eval(&bc_data->expr);
+  double *x = feenox_problem_bc_natural_x(element, this, v);
+  double q = feenox_expression_eval(&this->expr);
   feenox_call(feenox_problem_bc_natural_set(element, v, &q));
   
-  if (bc_data->nonlinear) {
+  if (this->nonlinear) {
     double T = feenox_function_eval(feenox.pde.solution[0], x);
-    double dqdT = feenox_expression_derivative_wrt_function(&bc_data->expr, feenox.pde.solution[0], T);
+    double dqdT = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], T);
     // TODO: axisymmetric
     double w = element->w[v];
     // mind the positive sign!
@@ -122,19 +123,19 @@ int feenox_problem_bc_set_thermal_heatflux(element_t *element, bc_data_t *bc_dat
 }
 
 // this virtual method builds the surface elemental matrix
-int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_data, unsigned int v) {
+int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *element, unsigned int v) {
   
 #ifdef HAVE_PETSC
 
   // convection needs something in the next bc_data, if there is nothing then we are done
-  if (bc_data->next == NULL) {
+  if (this->next == NULL) {
     return FEENOX_OK;
   }
 
   // TODO: remove duplicate, use a macro
   feenox_call(feenox_mesh_compute_w_at_gauss(element, v, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_at_gauss(element, v, feenox.pde.mesh->integration));
-  if (bc_data->space_dependent) {
+  if (this->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(element, v, feenox.pde.mesh->integration));
     feenox_mesh_update_coord_vars(element->x[v]);
   }
@@ -147,12 +148,12 @@ int feenox_problem_bc_set_thermal_convection(element_t *element, bc_data_t *bc_d
   double h = 0;
   double Tref = 0;
   
-  if (bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && bc_data->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
-    h = feenox_expression_eval(&bc_data->expr);
-    Tref = feenox_expression_eval(&bc_data->next->expr);
-  } else if (bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && bc_data->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
-    Tref = feenox_expression_eval(&bc_data->expr);
-    h = feenox_expression_eval(&bc_data->next->expr);
+  if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
+    h = feenox_expression_eval(&this->expr);
+    Tref = feenox_expression_eval(&this->next->expr);
+  } else if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
+    Tref = feenox_expression_eval(&this->expr);
+    h = feenox_expression_eval(&this->next->expr);
   } else {
     feenox_push_error_message("convection condition needs h and Tref");
     return FEENOX_ERROR;

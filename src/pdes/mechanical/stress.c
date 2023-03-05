@@ -33,26 +33,26 @@
 
 int feenox_problem_gradient_fill_mechanical(void) {
   
-  feenox_gradient_fill(mechanical, sigmax);
-  feenox_gradient_fill(mechanical, sigmay);
-  feenox_gradient_fill(mechanical, tauxy);
+  feenox_secondary_fill(mechanical, sigmax);
+  feenox_secondary_fill(mechanical, sigmay);
+  feenox_secondary_fill(mechanical, tauxy);
   if (feenox.pde.dofs == 3) {
-    feenox_gradient_fill(mechanical, sigmaz);
-    feenox_gradient_fill(mechanical, tauyz);
-    feenox_gradient_fill(mechanical, tauzx);
+    feenox_secondary_fill(mechanical, sigmaz);
+    feenox_secondary_fill(mechanical, tauyz);
+    feenox_secondary_fill(mechanical, tauzx);
   }
   
   // if one is used, all of them are
   if (mechanical.sigma1->used || mechanical.sigma2->used || mechanical.sigma3->used) {
-    feenox_gradient_fill(mechanical, sigma1);
-    feenox_gradient_fill(mechanical, sigma2);
-    feenox_gradient_fill(mechanical, sigma3);
+    feenox_secondary_fill(mechanical, sigma1);
+    feenox_secondary_fill(mechanical, sigma2);
+    feenox_secondary_fill(mechanical, sigma3);
   }
   if (mechanical.sigma->used) {
-    feenox_gradient_fill(mechanical, sigma);
+    feenox_secondary_fill(mechanical, sigma);
   }
   if (mechanical.tresca->used) {
-    feenox_gradient_fill(mechanical, tresca);
+    feenox_secondary_fill(mechanical, tresca);
   }
   
   return FEENOX_OK;

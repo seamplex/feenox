@@ -1,6 +1,9 @@
 # Current
 
  * under development
+ * multi-group neutron transport with discrete ordinates ($S_N$ method)
+ * mimicked-nodes BCs
+ * read mesh fields from VTK files
 
 # v0.3 (Feb 2023)
 

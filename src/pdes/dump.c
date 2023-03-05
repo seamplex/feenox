@@ -27,32 +27,32 @@ int feenox_instruction_dump(void *arg) {
   dump_t *dump = (dump_t *)arg;
   PetscViewer viewer = NULL;
 
-  if (dump->K) {
+  if (dump->K && feenox.pde.K != NULL) {
     feenox_call(feenox_dump_open_viewer(dump, "K", &viewer));
     petsc_call(MatView(feenox.pde.K, viewer));
     petsc_call(PetscViewerDestroy(&viewer));
   }
-  if (dump->K_bc) {
+  if (dump->K_bc && feenox.pde.K_bc) {
     feenox_call(feenox_dump_open_viewer(dump, "K_bc", &viewer));
     petsc_call(MatView(feenox.pde.K_bc, viewer));
     petsc_call(PetscViewerDestroy(&viewer));
   }
-  if (dump->b) {
+  if (dump->b && feenox.pde.b) {
     feenox_call(feenox_dump_open_viewer(dump, "b", &viewer));
     petsc_call(VecView(feenox.pde.b, viewer));
     petsc_call(PetscViewerDestroy(&viewer));
   }
-  if (dump->b_bc) {
+  if (dump->b_bc && feenox.pde.b_bc) {
     feenox_call(feenox_dump_open_viewer(dump, "b_bc", &viewer));
     petsc_call(VecView(feenox.pde.b_bc, viewer));
     petsc_call(PetscViewerDestroy(&viewer));
   }
-  if (dump->M) {
+  if (dump->M && feenox.pde.M) {
     feenox_call(feenox_dump_open_viewer(dump, "M", &viewer));
     petsc_call(MatView(feenox.pde.M, viewer));
     petsc_call(PetscViewerDestroy(&viewer));
   }
-  if (dump->M_bc) {
+  if (dump->M_bc && feenox.pde.M_bc) {
     feenox_call(feenox_dump_open_viewer(dump, "M_bc", &viewer));
     petsc_call(MatView(feenox.pde.M_bc, viewer));
     petsc_call(PetscViewerDestroy(&viewer));

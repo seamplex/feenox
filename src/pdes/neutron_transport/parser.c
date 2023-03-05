@@ -39,7 +39,8 @@ int feenox_problem_parse_problem_neutron_transport(const char *token) {
           neutron_transport.N != 4 &&
           neutron_transport.N != 6 &&
           neutron_transport.N != 8) {
-        feenox_push_error_message("only S2, S4, S6 and S6 are supported, S%d is not", neutron_transport.N);
+        feenox_push_error_message("S%d is not supported, only S2, S4, S6 and S8 are", neutron_transport.N);
+        return FEENOX_ERROR;
       }
       
     } else {

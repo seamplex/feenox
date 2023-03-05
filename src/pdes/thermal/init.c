@@ -26,7 +26,7 @@ thermal_t thermal;
 int feenox_problem_parse_problem_thermal(const char *token) {
 
 ///kw_pde+PROBLEM+detail  * `thermal` solves the heat conduction problem.
-  
+
   // no need to parse anything;
   if (token != NULL) {
     feenox_push_error_message("undefined keyword '%s'", token);
@@ -40,11 +40,14 @@ int feenox_problem_parse_problem_thermal(const char *token) {
 int feenox_problem_init_parser_thermal(void) {
 
 #ifdef HAVE_PETSC
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
+
   feenox.pde.init_runtime_particular = feenox_problem_init_runtime_thermal;
   feenox.pde.bc_parse = feenox_problem_bc_parse_thermal;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_thermal;
-  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_temperature;
+//  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_temperature;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_thermal;
   feenox.pde.solve_post = feenox_problem_solve_post_thermal;
   feenox.pde.feenox_problem_gradient_fill = feenox_problem_gradient_fill_thermal;
@@ -59,7 +62,6 @@ int feenox_problem_init_parser_thermal(void) {
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
   feenox_call(feenox_problem_define_solutions());
-  feenox.mesh.default_field_location = field_location_nodes;
     
   // heat fluxes
 ///re_thermal+qx+description The heat flux field\ $q_x(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial x}$ in the\ $x$ direction. This is a secondary unknown of the problem.  

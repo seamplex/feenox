@@ -26,14 +26,15 @@ mechanical_t mechanical;
 
 int feenox_problem_init_parser_mechanical(void) {
 #ifdef HAVE_PETSC
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
+  
   feenox.pde.init_runtime_particular = feenox_problem_init_runtime_mechanical;
   feenox.pde.bc_parse = feenox_problem_bc_parse_mechanical;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_mechanical;
   feenox.pde.setup_pc = feenox_problem_setup_pc_mechanical;
 //  feenox.pde.setup_snes = feenox_problem_setup_snes_mechanical;
   
-  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_mechanical_displacement;
-  feenox.pde.bc_set_multifreedom = feenox_problem_bc_set_mechanical_multifreedom;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_mechanical;
   feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
   
@@ -91,6 +92,7 @@ int feenox_problem_init_parser_mechanical(void) {
   }
   
   // TODO: custom names
+  // TODO: document
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
   if (feenox.pde.dofs > 1) {
@@ -180,8 +182,6 @@ int feenox_problem_init_parser_mechanical(void) {
 int feenox_problem_init_runtime_mechanical(void) {
 
 #ifdef HAVE_PETSC 
-  // we are FEM not FVM
-  feenox.mesh.default_field_location = field_location_nodes;
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;

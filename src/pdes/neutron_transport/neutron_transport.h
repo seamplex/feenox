@@ -22,6 +22,8 @@
 #ifndef NEUTRON_TRANSPORT_H
 #define NEUTRON_TRANSPORT_H
 
+#define dof_index(n,g) ((n)*neutron_transport.groups + (g))
+
 typedef struct neutron_transport_t neutron_transport_t;
 
 
@@ -38,30 +40,67 @@ struct neutron_transport_t {
   
   
   // total XS
-  distribution_t *sigma_t;
+  distribution_t *Sigma_t;
   
   // absorption XS
-  distribution_t *sigma_a;
+  distribution_t *Sigma_a;
   
   // scattering XS
-  distribution_t **sigma_s0;
-  distribution_t **sigma_s1;
+  distribution_t **Sigma_s0;
+  distribution_t **Sigma_s1;
   
   // product of nu and fission XS
-  distribution_t *nu_sigma_f;
+  distribution_t *nu_Sigma_f;
 
   // product of energy per fission and fission XS
-  distribution_t *e_sigma_f;
+//  distribution_t *e_Sigma_f;
   
   // independent neutron source
-  distribution_t *source;
+  distribution_t *S;
+  
+  
+  // removal XSs: groups x groups
+  gsl_matrix *removal;
 
-//  int has_dirichlet_bcs;
+  // fission XSs: groups x groups
+  gsl_matrix *nufission;
+  
+  // independent sources: groups
+  gsl_vector *src;  
+  
+  // fission spectrum: groups
+  double *chi;
+  
+
+  
+  // elemental matrices  
+  unsigned int n_nodes;
+  
+  gsl_matrix *P;
+  gsl_matrix *OMEGA;
+  gsl_matrix *OMEGAB;
+  gsl_matrix *AH;
+  gsl_matrix *XH;
+  
+  gsl_matrix *Ki;
+  gsl_matrix *Ai;
+  gsl_matrix *Xi;
+  gsl_vector *Si;
+
+  
   int has_sources;
   int has_fission;
   int space_XS;
 
+  var_t *sn_alpha;
+  
+  // --- results ----------------------
+  
+  // effective multiplication factor
   var_t *keff;
+  // scalar fluxes (array of G functions)
+  function_t **phi;
+  
   
 };  
 extern neutron_transport_t neutron_transport;

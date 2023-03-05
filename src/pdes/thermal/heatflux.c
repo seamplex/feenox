@@ -24,11 +24,11 @@
 
 int feenox_problem_gradient_fill_thermal(void) {
   
-  feenox_gradient_fill(thermal, qx);
+  feenox_secondary_fill(thermal, qx);
   if (feenox.pde.dim > 1) {
-    feenox_gradient_fill(thermal, qy);
+    feenox_secondary_fill(thermal, qy);
     if (feenox.pde.dim > 2) {
-      feenox_gradient_fill(thermal, qz);
+      feenox_secondary_fill(thermal, qz);
     }
   }
   

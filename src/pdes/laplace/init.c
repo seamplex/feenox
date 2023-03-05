@@ -41,11 +41,13 @@ int feenox_problem_parse_problem_laplace(const char *token) {
 int feenox_problem_init_parser_laplace(void) {
 
 #ifdef HAVE_PETSC
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
+
   feenox.pde.init_runtime_particular = feenox_problem_init_runtime_laplace;
   feenox.pde.bc_parse = feenox_problem_bc_parse_laplace;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_laplace;
   feenox.pde.setup_pc = feenox_problem_setup_pc_laplace;
-  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_laplace_phi;
   feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_laplace;
   
   // laplace is a scalar problem
@@ -55,9 +57,6 @@ int feenox_problem_init_parser_laplace(void) {
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("phi"));
   feenox_call(feenox_problem_define_solutions());
 
-  // we'd rather ser nodes than cells  
-  feenox.mesh.default_field_location = field_location_nodes;
-    
 #endif
   return FEENOX_OK;
 }
