@@ -9,15 +9,15 @@ EXTRA_DIST = examples \
 
 
 TESTS = \
-        tests/annulus-modal.sh \
         tests/abort.sh \
         tests/algebraic_expr.sh \
+        tests/annulus-modal.sh \
+        tests/arguments.sh \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
         tests/builtin.sh \
         tests/cog.sh \
         tests/cylinder-traction-force.sh \
-        tests/default_argument_value.sh \
         tests/encased_rod.sh \
         tests/expressions_constants.sh \
         tests/expressions_variables.sh \
