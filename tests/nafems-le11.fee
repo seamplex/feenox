@@ -3,8 +3,8 @@ READ_MESH nafems-le11-$1.msh
 
 T(x,y,z) = sqrt(x^2 + y^2) + z
 
-BC xz     v=0
-BC yz     u=0
+BC xz     symmetry
+BC yz     symmetry
 BC xy     w=0
 BC HIH'I' w=0
 
