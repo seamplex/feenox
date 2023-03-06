@@ -1,0 +1,20 @@
+PROBLEM mechanical 3d
+
+READ_MESH bunny.msh SCALE 1e-3
+
+E = 220e9
+nu = 0.31
+alpha = 10.5e-6
+
+BC base symmetry radial
+
+# T_0(x,y,z) = 0
+dt = 1
+end_time = 10
+
+SOLVE_PROBLEM
+WRITE_MESH bunny-mech.msh VECTOR u v w
+
+PRINT t
+
+

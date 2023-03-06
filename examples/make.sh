@@ -1,7 +1,16 @@
 #!/bin/bash
 
-out=examples.md
-rm -f ${out}
+for i in feenox touch awk pandoc makeinfo yq grep cut xargs; do
+ if [ -z "$(which $i)" ]; then
+  echo "error: ${i} not installed"
+  exit 1
+ fi
+done
+
+for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_transport; do
+  cp ${i}.yaml ${i}.md
+done
+
 for i in hello          \
          lorenz         \
          logistic       \
@@ -30,8 +39,12 @@ for i in hello          \
          veeder                     \
          mechanical-square-temperature \
   ; do
-  echo ${i}
-  grep '#\.' ${i}.fee | sed 's/#\. //' | sed 's/#\.//' | sed 's/^[\t]*//' | \
+  in=${i}.fee
+  out=$(grep category ${in} | cut -d: -f2 | xargs).md
+  echo ${i} '->' ${out}
+  
+  # the actual markdown
+  awk -f extract_yaml.awk ${in} | yq -r .intro | \
     pandoc -t markdown   --lua-filter=../doc/include-files.lua \
                          --lua-filter=../doc/include-code-files.lua \
                          --lua-filter=../doc/not-in-format.lua \
@@ -41,24 +54,34 @@ for i in hello          \
   
   echo >> ${out}
   echo '```feenox' >> ${out}
-  cat ${i}.fee | grep -v '#\.' | grep -v '#\$' | grep -v '#>' >> ${out}
+  awk -f extract_fee.awk ${in} >> ${out}
   echo '```' >> ${out}
   echo >> ${out}
 
   
   echo >> ${out}
   echo '```terminal' >> ${out}
-  grep '#\$' ${i}.fee | sed 's/#\$//' | sed 's/^[ \t]*//' >> ${out}
-#   bash ${i}-post.sh
-#   rm -f ${i}-post.sh
+  awk -f extract_yaml.awk ${in} | yq -r .terminal >> ${out}
   echo '```' >> ${out}
   echo >> ${out}
   
   echo >> ${out}
-  grep '#>' ${i}.fee | sed 's/#>//' | sed 's/^[ \t]*//' >> ${out}
+  awk -f extract_yaml.awk ${in} | yq -r .figures | grep -v null >> ${out}
   echo >> ${out}
 done
 
-../doc/md2.sh --pdf README
-../doc/md2.sh --gfm README
-../doc/md2.sh --html README
+touch neutron_transport.md
+
+rm -f examples.md
+for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_transport; do
+  echo "- $(yq -r .title ${i}.yaml)" >> examples.md
+  # shift-heading-level does not work
+  pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed 's/- /  - /'  >> examples.md
+#   ../doc/md2.sh --pdf  ${i}.md
+  ../doc/md2.sh --gfm  ${i}.md
+  ../doc/md2.sh --html ${i}.md
+done
+
+
+../doc/md2.sh --gfm  README.md
+../doc/md2.sh --html README.md

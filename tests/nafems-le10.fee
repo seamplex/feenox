@@ -1,5 +1,9 @@
+---
+title: NAFEMS LE10 benchmark
+...
+
 PROBLEM mechanical 3D
-READ_MESH nafems-le10.msh
+READ_MESH $0.msh
 
 BC upper    p=1
 BC DCD'C'   v=0

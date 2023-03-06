@@ -1,21 +1,26 @@
-#. ## Mechanical problem
-#.
-#. Now this input file reads the scalar function `T` stored in the coarse first-order mesh file
-#. `parallelepiped-temperature.msh` and uses it to solve the mechanical problem in the finer
-#. second-order mesh `parallelepiped.msh`.
-#. The numerical solution for the displacements over the fine mesh is written in a VTK file
-#. (along with the temperature as interpolated from the coarse mesh) and compared
-#. to the analytical solution using the $L_2$ norm.
-#. 
-#$ $ gmsh -3 parallelepiped.geo -order 2
-#$ [...]
-#$ Info    : 2564 nodes 2162 elements
-#$ Info    : Writing 'parallelepiped.msh'...
-#$ Info    : Done writing 'parallelepiped.msh'
-#$ Info    : Stopped on Fri Dec 10 10:39:27 2021 (From start: Wall 0.165707s, CPU 0.258751s)
-#$ $ feenox parallelepiped-mechanical.fee
-#$ 0.000345839
-#$ $
+---
+category: mechanical
+intro: |
+  ## Mechanical problem
+ 
+  Now this input file reads the scalar function `T` stored in the coarse first-order mesh file
+  `parallelepiped-temperature.msh` and uses it to solve the mechanical problem in the finer
+  second-order mesh `parallelepiped.msh`.
+  The numerical solution for the displacements over the fine mesh is written in a VTK file
+  (along with the temperature as interpolated from the coarse mesh) and compared
+  to the analytical solution using the $L_2$ norm.
+  
+terminal: |
+  $ gmsh -3 parallelepiped.geo -order 2
+  [...]
+  Info    : 2564 nodes 2162 elements
+  Info    : Writing 'parallelepiped.msh'...
+  Info    : Done writing 'parallelepiped.msh'
+  Info    : Stopped on Fri Dec 10 10:39:27 2021 (From start: Wall 0.165707s, CPU 0.258751s)
+  $ feenox parallelepiped-mechanical.fee 
+  1.46196e-06
+  $ 
+...
 PROBLEM mechanical 3D
 
 # this is where we solve the mechanical problem
@@ -55,4 +60,7 @@ we(x,y,z) := -nu*(A*x*z + B*y*z + C/2*(z^2-y^2+x^2/nu) + D*z + C*h/4*y - A*h/4*x
 INTEGRATE (u(x,y,z)-ue(x,y,z))^2+(v(x,y,z)-ve(x,y,z))^2+(w(x,y,z)-we(x,y,z))^2 RESULT num MESH parallelepiped.msh
 INTEGRATE 1 RESULT den MESH parallelepiped.msh
 PRINT num/den
-#> ![Displacements and temperature distribution over the fine mesh in Paraview (yes, still a rainbow pallete)](parallelepiped-mechanical.png)
+---
+figures: |
+  ![Displacements and temperature distribution over the fine mesh in Paraview (yes, still a rainbow pallete)](parallelepiped-mechanical.png)
+...

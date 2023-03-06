@@ -49,3 +49,21 @@ two-zone-*.msh
 ab.geo
 bunny.msh
 
+examples_sections.md
+basic.html
+daes.html
+laplace.html
+mechanical.html
+modal.html
+neutron_diffusion.html
+neutron_transport.html
+thermal.html
+
+basic.pdf
+daes.pdf
+laplace.pdf
+mechanical.pdf
+modal.pdf
+neutron_diffusion.pdf
+neutron_transport.pdf
+thermal.pdf

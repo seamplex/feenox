@@ -49,13 +49,13 @@ int feenox_read_line(FILE *file_ptr) {
   int lines = 0;
   while ( !((c == EOF) || (in_brackets == 0 && c == '\n')) ) {
     if (in_comment == 0) {
-      if (c == '#' || c == ';') {
+      if (feenox_parser.inside_yaml == 0 && (c == '#' || c == ';')) {
         in_comment = 1;
-      } else if (c == '{') {
+      } else if (feenox_parser.inside_yaml == 0 && c == '{') {
         in_brackets = 1;
-      } else if (c == '}') {
+      } else if (feenox_parser.inside_yaml == 0 && c == '}') {
         in_brackets = 0;
-      } else if (c == '$') {
+      } else if (feenox_parser.inside_yaml == 0 && c == '$') {
         // handle commandline arguments
         
         // check if there's an opening bracket or parenthesis
@@ -124,7 +124,7 @@ int feenox_read_line(FILE *file_ptr) {
           feenox_parser.line[i++] = feenox.argv[feenox.optind+n][j++];
         }
 
-      } else if (c == '\\') {
+      } else if (feenox_parser.inside_yaml == 0 &&  c == '\\') {
 
         switch (c = fgetc(file_ptr)) {
           case '"':
@@ -193,6 +193,22 @@ int feenox_read_line(FILE *file_ptr) {
   
   feenox_parser.line[i] = '\0';
   
+  // finite-state machine for yaml:
+  // --- can begin/end a yaml block
+  // ... can only end it
+  if (strcmp(feenox_parser.line, "...") == 0) {
+    if (feenox_parser.inside_yaml == 1) {
+      feenox_parser.inside_yaml = 0;
+      feenox_parser.line[0] = '\0';
+    } else {
+      feenox_push_error_message("yaml end block '...' without opening block '---'");
+      return FEENOX_OK;
+    }
+  } else if (strcmp(feenox_parser.line, "---") == 0) {
+    feenox_parser.inside_yaml = !feenox_parser.inside_yaml;
+    feenox_parser.line[0] = '\0';
+  }
+
   // if lines is zero but we did read something, we need to return one
   // otherwise the final lines of input files not ending in \n are ignored
   return (lines == 0 && i != 0) ? 1 : lines;

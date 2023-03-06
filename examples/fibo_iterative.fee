@@ -1,6 +1,15 @@
-#. ## Solving an iterative problem
-#.
-#. Finally, we print the sequence as an iterative problem and check that the three outputs are the same.
+---
+category: basic
+intro: |
+  ## Solving an iterative problem
+ 
+  Finally, we print the sequence as an iterative problem and check that the three outputs are the same.
+terminal: |
+  $ feenox fibo_iterative.fee > three
+  $ diff one two
+  $ diff two three
+  $
+...
 static_steps = 20
 #static_iterations = 1476  # limit of doubles
 
@@ -15,7 +24,3 @@ ELSE
 ENDIF
 
 PRINT step_static f_n
-#$ $ feenox fibo_iterative.fee > three
-#$ $ diff one two
-#$ $ diff two three
-#$ $

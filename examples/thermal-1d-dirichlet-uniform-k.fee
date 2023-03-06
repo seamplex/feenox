@@ -1,49 +1,54 @@
-#. # Thermal slabs
-#. 
-#. ## One-dimensional linear
-#.
-#.
-#. Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
-#.
-#. $$
-#. \begin{cases}
-#. T(0) = 0 & \text{(left)} \\
-#. T(1) = 1 & \text{(right)} \\
-#. \end{cases}
-#. $$
-#.
-#. and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
-#. 
-#. 
-#. Please note that:
-#.
-#.  * The input written in a self-evident English-like dialect
-#.     - Syntactic sugared plain-text ASCII file
-#.     - Simple problems (like this one) need simple inputs
-#.     - FeenoX follows the UNIX rule of simplicity
-#.    
-#.  * Output is 100% user-defined
-#.     - No `PRINT` no output
-#.     - Feenox follows the UNIX rule of silence
-#.   
-#.  * There is no node at $x=1/2=0.5$!
-#.     - FeenoX knows how to interpolate
-#.
-#.  * Mesh separated from problem
-#.     - The geometry comes from a Git-friendly `.geo`
-#.
-#.     ```{.c include="slab.geo"}
-#.     ```
-#.     - UNIX rule of composition
-#.     - The actual input file is a Git-friendly `.fee`
-#$ $ gmsh -1 slab.geo
-#$ [...]
-#$ Info    : 4 nodes 5 elements
-#$ Info    : Writing 'slab.msh'...
-#$ [...]
-#$ $ feenox thermal-1d-dirichlet-uniform-k.fee 
-#$ 0.5
-#$ $ 
+---
+category: thermal
+intro: |
+  # Thermal slabs
+  
+  ## One-dimensional linear
+ 
+ 
+  Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
+ 
+  $$
+  \begin{cases}
+  T(0) = 0 & \text{(left)} \\
+  T(1) = 1 & \text{(right)} \\
+  \end{cases}
+  $$
+ 
+  and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
+  
+  
+  Please note that:
+ 
+   * The input written in a self-evident English-like dialect
+      - Syntactic sugared plain-text ASCII file
+      - Simple problems (like this one) need simple inputs
+      - FeenoX follows the UNIX rule of simplicity
+     
+   * Output is 100% user-defined
+      - No `PRINT` no output
+      - Feenox follows the UNIX rule of silence
+    
+   * There is no node at $x=1/2=0.5$!
+      - FeenoX knows how to interpolate
+ 
+   * Mesh separated from problem
+      - The geometry comes from a Git-friendly `.geo`
+ 
+      ```{.c include="slab.geo"}
+      ```
+      - UNIX rule of composition
+      - The actual input file is a Git-friendly `.fee`
+terminal: |
+  $ gmsh -1 slab.geo
+  [...]
+  Info    : 4 nodes 5 elements
+  Info    : Writing 'slab.msh'...
+  [...]
+  $ feenox thermal-1d-dirichlet-uniform-k.fee 
+  0.5
+  $ 
+...
 PROBLEM thermal 1D    # tell FeenoX what we want to solve 
 READ_MESH slab.msh    # read mesh in Gmsh's v4.1 format
 k = 1                 # set uniform conductivity

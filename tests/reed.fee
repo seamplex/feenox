@@ -1,4 +1,4 @@
-# solves the reed 1d benchmark
+# solve the reed 1d benchmark
 #
 #     |         |    |         |    |         |
 #  m  | src= 50 | 0  |    0    | 1  |    0    |    v

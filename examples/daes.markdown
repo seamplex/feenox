@@ -1,0 +1,72 @@
+# Ordinary Differential Equations & Differential-Algebraic Equations
+
+- [<span class="toc-section-number">1</span> Lorenz’ attractor—the one
+  with the butterfly][]
+
+  [<span class="toc-section-number">1</span> Lorenz’ attractor—the one with the butterfly]:
+    #lorenz-attractorthe-one-with-the-butterfly
+
+# Lorenz’ attractor—the one with the butterfly
+
+Solve
+
+$$
+\begin{cases}
+\dot{x} &= \sigma \cdot (y - x)  \\
+\dot{y} &= x \cdot (r - z) - y   \\
+\dot{z} &= x y - b z             \\
+\end{cases}
+$$
+
+for $0 < t < 40$ with initial conditions
+
+$$
+\begin{cases}
+x(0) = -11  \\
+y(0) = -16  \\
+z(0) = 22.5 \\
+\end{cases}
+$$
+
+and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
+that generate the butterfly as presented by Edward Lorenz back in his
+seminal 1963 paper [Deterministic non-periodic flow][]. This example’s
+input file ressembles the parameters, inital conditions and differential
+equations of the problem as naturally as possible with an ASCII file.
+
+``` feenox
+PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z
+end_time = 40         # we go from t=0 to 40 non-dimensional units
+
+sigma = 10            # the original parameters from the 1963 paper
+r = 28
+b = 8/3
+
+x_0 = -11             # initial conditions
+y_0 = -16
+z_0 = 22.5
+
+# the dynamical system's equations written as naturally as possible
+x_dot = sigma*(y - x)
+y_dot = x*(r - z) - y
+z_dot = x*y - b*z
+
+PRINT t x y z        # four-column plain-ASCII output
+```
+
+``` terminal
+$ feenox lorenz.fee > lorenz.dat
+$ gnuplot lorenz.gp
+$ python3 lorenz.py
+$ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
+```
+
+<figure id="fig:ex_lorenz">
+<p><img src="lorenz-gnuplot.svg" style="width:48.0%" alt="Gnuplot" />
+<img src="lorenz-matplotlib.png" style="width:48.0%"
+alt="Matplotlib" /></p>
+<figcaption><p>Figure 1: The Lorenz attractor computed with FeenoX
+plotted with two different tools</p></figcaption>
+</figure>
+
+  [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2

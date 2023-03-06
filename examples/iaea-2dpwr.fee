@@ -1,16 +1,20 @@
-#. # IAEA 2D PWR Benchmark
-#.
-#. ![The IAEA 2D PWR Benchmark (1977)](iaea-2dpwr-figure.svg){width=100%}
-#.
-#$ $ gmsh -2 iaea-2dpwr-quarter.geo
-#$ $ [...]
-#$ $ gmsh -2 iaea-2dpwr-eighth.geo
-#$ $ [...]
-#$ $ feenox iaea-2dpwr.fee quarter
-#$ keff =  1.02986
-#$ $ feenox iaea-2dpwr.fee eighth
-#$ $keff =  1.02975
-#$ $
+---
+category: neutron_diffusion
+intro: |
+  # IAEA 2D PWR Benchmark
+ 
+  ![The IAEA 2D PWR Benchmark (1977)](iaea-2dpwr-figure.svg){width=100%}
+terminal: | 
+  $ gmsh -2 iaea-2dpwr-quarter.geo
+  $ [...]
+  $ gmsh -2 iaea-2dpwr-eighth.geo
+  $ [...]
+  $ feenox iaea-2dpwr.fee quarter
+  keff =  1.02986
+  $ feenox iaea-2dpwr.fee eighth
+  $keff =  1.02975
+  $
+...
 #                       BENCHMARK PROBLEM
 #          
 # Identification: 11-A2          Source Situation ID.11
@@ -66,5 +70,7 @@ BC mirror   mirror         # the first mirror is the name, the second is the BC 
 SOLVE_PROBLEM   # solve!
 PRINT %.5f "keff = " keff
 WRITE_MESH iaea-2dpwr-$1.vtk phi1 phi2
-#> ![Fast and thermal flux for the 2D IAEA PWR benchmark (2021)](iaea-2dpwr-fluxes.png){width=100%}
-
+---
+figures: |
+  ![Fast and thermal flux for the 2D IAEA PWR benchmark (2021)](iaea-2dpwr-fluxes.png){width=100%}
+...

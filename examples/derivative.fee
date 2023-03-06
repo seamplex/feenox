@@ -1,71 +1,74 @@
 #!/usr/local/bin/feenox
-#. # Computing the derivative of a function as a UNIX filter
-#.
-#. This example illustrates how well FeenoX integrates into the UNIX philosophy.
-#. Let's say one has a function\ $f(t)$ as an ASCII file with two columns and
-#. one wants to compute the derivative\ $f'(t)$. Just pipe the function file
-#. into this example's input file `derivative.fee` used as a filter.
-#.
-#. For example, this small input file `f.fee` writes the function of time
-#. provided in the first command-line argument from zero up to the second command-line
-#. argument:
-#.
-#. ```{.feenox include="f.fee"}
-#. ```
-#. 
-#. ```terminal
-#. $ feenox f.fee "sin(t)" 1
-#. 0       0
-#. 0.0625  0.0624593
-#. 0.125   0.124675
-#. 0.1875  0.186403
-#. 0.25    0.247404
-#. 0.3125  0.307439
-#. 0.375   0.366273
-#. 0.4375  0.423676
-#. 0.5     0.479426
-#. 0.5625  0.533303
-#. 0.625   0.585097
-#. 0.6875  0.634607
-#. 0.75    0.681639
-#. 0.8125  0.726009
-#. 0.875   0.767544
-#. 0.9375  0.806081
-#. 1       0.841471
-#. $
-#. ```
-#.
-#. Then we can pipe the output of this command to the derivative filter.
-#. Note that
-#.
-#.   * The `derivative.fee` has the execution flag has on and a
-#.     [shebang line](https://en.wikipedia.org/wiki/Shebang_(Unix))
-#.     pointing to a global location of the FeenoX binary in `/usr/local/bin`
-#.     e.g. after doing `sudo make install`.
-#.   * The first argument of `derivative.fee` controls the time step.
-#.     This is only important to control the number of output lines.
-#.     It does not have anything to do with precision, since the derivative
-#.     is computed using an adaptive centered numerical differentiation scheme
-#.     using the [GNU Scientific Library](https://www.gnu.org/software/gsl/doc/html/diff.html).
-#.   * Before doing the actual differentiation, the input data is interpolated
-#.     using a third-order monotonous scheme (also with
-#.     [GSL](https://www.gnu.org/software/gsl/doc/html/interp.html#c.gsl_interp_type.gsl_interp_steffen)).
-#.   * TL;DR: this is not just "current value minus last value divided time increment."
-#.
-#$ $ chmod +x derivative.sh
-#$ $ feenox f.fee "sin(t)" 1 | ./derivative.fee 0.1 | tee f_prime.dat
-#$ 0.05    0.998725
-#$ 0.15    0.989041
-#$ 0.25    0.968288
-#$ 0.35    0.939643
-#$ 0.45    0.900427
-#$ 0.55    0.852504
-#$ 0.65    0.796311
-#$ 0.75    0.731216
-#$ 0.85    0.66018
-#$ 0.95    0.574296
-#$ $
-
+---
+category: basic
+intro: |
+  # Computing the derivative of a function as a UNIX filter
+ 
+  This example illustrates how well FeenoX integrates into the UNIX philosophy.
+  Let's say one has a function\ $f(t)$ as an ASCII file with two columns and
+  one wants to compute the derivative\ $f'(t)$. Just pipe the function file
+  into this example's input file `derivative.fee` used as a filter.
+ 
+  For example, this small input file `f.fee` writes the function of time
+  provided in the first command-line argument from zero up to the second command-line
+  argument:
+ 
+  ```{.feenox include="f.fee"}
+  ```
+  
+  ```terminal
+  $ feenox f.fee "sin(t)" 1
+  0       0
+  0.0625  0.0624593
+  0.125   0.124675
+  0.1875  0.186403
+  0.25    0.247404
+  0.3125  0.307439
+  0.375   0.366273
+  0.4375  0.423676
+  0.5     0.479426
+  0.5625  0.533303
+  0.625   0.585097
+  0.6875  0.634607
+  0.75    0.681639
+  0.8125  0.726009
+  0.875   0.767544
+  0.9375  0.806081
+  1       0.841471
+  $
+  ```
+ 
+  Then we can pipe the output of this command to the derivative filter.
+  Note that
+ 
+    * The `derivative.fee` has the execution flag has on and a
+      [shebang line](https://en.wikipedia.org/wiki/Shebang_(Unix))
+      pointing to a global location of the FeenoX binary in `/usr/local/bin`
+      e.g. after doing `sudo make install`.
+    * The first argument of `derivative.fee` controls the time step.
+      This is only important to control the number of output lines.
+      It does not have anything to do with precision, since the derivative
+      is computed using an adaptive centered numerical differentiation scheme
+      using the [GNU Scientific Library](https://www.gnu.org/software/gsl/doc/html/diff.html).
+    * Before doing the actual differentiation, the input data is interpolated
+      using a third-order monotonous scheme (also with
+      [GSL](https://www.gnu.org/software/gsl/doc/html/interp.html#c.gsl_interp_type.gsl_interp_steffen)).
+    * TL;DR: this is not just "current value minus last value divided time increment."
+terminal: | 
+  $ chmod +x derivative.sh
+  $ feenox f.fee "sin(t)" 1 | ./derivative.fee 0.1 | tee f_prime.dat
+  0.05    0.998725
+  0.15    0.989041
+  0.25    0.968288
+  0.35    0.939643
+  0.45    0.900427
+  0.55    0.852504
+  0.65    0.796311
+  0.75    0.731216
+  0.85    0.66018
+  0.95    0.574296
+  $
+...
 # read the function from stdin
 FUNCTION f(t) FILE - INTERPOLATION steffen
 
@@ -83,4 +86,7 @@ f'(t) = derivative(f(t'),t',t)
 
 # write the result
 PRINT_FUNCTION f' MIN a+0.5*h MAX b-0.5*h STEP h
-#> ![Numerical derivative as a UNIX filter and actual analytical result](derivative.svg)
+---
+figures: |
+  ![Numerical derivative as a UNIX filter and actual analytical result](derivative.svg)
+...

@@ -1,5 +1,9 @@
+---
+title: NAFEMS LE11 benchmark
+...
+
 PROBLEM mechanical 3D
-READ_MESH nafems-le11-$1.msh
+READ_MESH $0-$1.msh
 
 T(x,y,z) = sqrt(x^2 + y^2) + z
 
@@ -14,5 +18,5 @@ alpha = 2.3e-4
 
 SOLVE_PROBLEM
 
-WRITE_MESH nafems-le11-$1.vtk VECTOR u v w T sigmax sigmay sigmaz tauxy tauyz tauzx
+WRITE_MESH ${0}-${1}.vtk VECTOR u v w T sigmax sigmay sigmaz tauxy tauyz tauzx
 PRINT %.1f sigmaz(1,0,0)/1e6

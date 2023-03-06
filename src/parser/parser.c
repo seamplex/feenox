@@ -85,7 +85,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
     // by a from/to INCLUDE directive so it is not a catasthropic error
     line_num += abs(delta_line_num);
     
-    if (feenox_parser.line[0] != '\0' && ((from == 0 || line_num >= from) && ((to == 0) || line_num <= to))) {
+    if (feenox_parser.line[0] != '\0' && feenox_parser.inside_yaml == 0 && ((from == 0 || line_num >= from) && ((to == 0) || line_num <= to))) {
       // we do have to process the line so if delta_line_num is negative, we complain now
       if (delta_line_num < 0) {
         feenox_push_error_message("input file needs at least one more argument in commandline");
@@ -103,12 +103,12 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       feenox_free(feenox_parser.full_line);
     }
   }
-
+  
   if (strcmp(filepath, "-") != 0) {
     fclose(input_file_stream);
   }
-  
-  return FEENOX_OK;
+
+  return (feenox.error_level == 0) ? FEENOX_OK : FEENOX_ERROR;
 
 }
 
