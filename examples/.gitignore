@@ -49,6 +49,10 @@ two-zone-*.msh
 ab.geo
 bunny.msh
 
+reed*.csv
+reed.msh
+
+
 examples_sections.md
 basic.html
 daes.html
@@ -67,3 +71,4 @@ modal.pdf
 neutron_diffusion.pdf
 neutron_transport.pdf
 thermal.pdf
+

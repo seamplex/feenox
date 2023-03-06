@@ -28,6 +28,7 @@ for i in hello          \
          cantilever     \
          fork           \
          iaea-2dpwr     \
+         reed           \
          cubesphere     \
          two-zone-slab  \
          parallelepiped-thermal     \
@@ -70,13 +71,11 @@ for i in hello          \
   echo >> ${out}
 done
 
-touch neutron_transport.md
-
 rm -f examples.md
 for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_transport; do
   echo "- $(yq -r .title ${i}.yaml)" >> examples.md
   # shift-heading-level does not work
-  pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed 's/- /  - /'  >> examples.md
+  pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed s/\(\#/\(${i}.md\#/ | sed 's/- /  - /'  >> examples.md
 #   ../doc/md2.sh --pdf  ${i}.md
   ../doc/md2.sh --gfm  ${i}.md
   ../doc/md2.sh --html ${i}.md

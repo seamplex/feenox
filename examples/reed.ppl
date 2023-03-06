@@ -1,0 +1,25 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+set axis x arrow nomirrored atzero
+set axis y arrow nomirrored
+
+set xrange [0:8]
+set yrange [0:2]
+
+set grid
+set key above
+
+set terminal pdf
+
+set xlabel "non-dimensional $x$"
+set ylabel "non-dimensional scalar flux $\\phi(x)$"
+
+set output "reed-flux.pdf"
+plot \
+     "reed-ref.csv" w lp pt 1 ps 1.5 lw 4 color tan   ti "Independent reference",\
+     "reed-s2.csv"  w lp pt 2 ps 0.5 lw 1 color red   ti "FeenoX $S_2$",\
+     "reed-s4.csv"  w lp pt 3 ps 0.5 lw 1 color blue  ti "FeenoX $S_4$",\
+     "reed-s6.csv"  w lp pt 4 ps 0.5 lw 1 color green ti "FeenoX $S_6$",\
+     "reed-s8.csv"  w lp pt 5 ps 0.5 lw 1 color black ti "FeenoX $S_8$"
+     
