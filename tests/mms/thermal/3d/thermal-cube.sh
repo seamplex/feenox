@@ -3,7 +3,13 @@
 bcs="dirichlet neumann"
 elems="tet4 tet10 hex8 hex20 hex27"
 algos="struct delaunay hxt"
-cs="12 16 20 24 28 32 36 38 40"
+# cs="12 16 20 24 28 32 36 38 40"
+
+bcs="dirichlet"
+elems="hex8"
+algos="struct"
+cs="12 16 20"
+
 
 # if this flag is true then the error is computed by first writing
 # T(x,y,z) into a vtk, converting it to .msh with meshio and
@@ -11,7 +17,7 @@ cs="12 16 20 24 28 32 36 38 40"
 # if it is false the error is computed directly in a single call to FeenoX
 vtk=0
 
-for i in feenox gmsh maxima meshio-convert tr; do
+for i in feenox gmsh maxima meshio tr; do
  if [ -z "$(which ${i})" ]; then
   echo "error: ${i} not installed"
   exit 1
@@ -33,6 +39,11 @@ fi
 T=$(grep "T_mms(x,y,z) :=" thermal-cube${n}.fee | sed 's/T_mms(x,y,z)//' | sed 's/:=//')
 T_mms=$(grep "T_mms(x,y,z) :=" thermal-cube${n}.fee)
 k_mms=$(grep "k_mms(x,y,z) :=" thermal-cube${n}.fee)
+
+# cat << EOF
+# ${T_mms};
+# ${k_mms};
+# EOF
 
 ## call maxima to compute q_mms(x)
 maxima --very-quiet << EOF > /dev/null
@@ -84,16 +95,17 @@ for bc in ${bcs}; do
        lc=$(echo "PRINT 1/${c}" | feenox -)
        gmsh -v 0 -3 cube.geo ${elem}.geo ${algo}.geo -clscale ${lc} -o cube-${elem}-${algo}-${c}.msh
      fi
-  
+
      if [ ${vtk} = 0 ]; then
       feenox thermal-cube${n}.fee ${bc} ${elem} ${algo} ${c} 0 | tee -a ${dat}.dat
      else
       if [ ! -e ${name}.vtk ]; then
        feenox thermal-cube${n}.fee ${bc} ${elem} ${algo} ${c} 1
       fi
-       meshio-convert ${name}.vtk ${name}.msh 2> /dev/null
+       meshio convert ${name}.vtk ${name}.msh #2> /dev/null
        feenox error3d.fee ${name} "${T}" ${c} | tee -a ${dat}.dat
-     fi  
+     fi
+     
     done
   
     feenox fit.fee ${dat} | sed 's/-/_/g' >> thermal-cube${n}-fits.ppl

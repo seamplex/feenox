@@ -31,7 +31,6 @@
  * make two lists of elements, one for bulk and one for BCs and loop over those
  * rewrite `fem.c` to store per-gauss point data in a cache-friendly way
  * remove branches
- * think about inline - LTO?
  * use ad-hoc matrices instead of `gsl_matrix`?
    - have a contiguous array of memory that stores all the per-element matrices in a row-major order
    - access them using macros `dhdx(row,col)`
@@ -90,8 +89,6 @@
 ## Command-line arguments
 
  * list symbols with `-l` (is there any clash with petsc?)
- * `$1` = `${1}`
- * `$0` should have the main input file basename (without the extension)
  
 ## Error handling 
  
@@ -148,7 +145,6 @@
 
  * non-linear
  * stresses: count negative jacobians and worst jacobians
- * stress linearization (per-problem parser)
  * strain energy (global and local)
 
 ## Modal
@@ -157,7 +153,6 @@
  
 ## Neutron
 
- * transport
  * FVM
  * benchmarks
  * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE

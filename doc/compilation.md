@@ -141,7 +141,7 @@ Note that
 
 ## FeenoX source code
 
-There are two ways of getting FeenoX' source code:
+There are two ways of getting FeenoX's source code:
 
  1. Cloning the GitHub repository at <https://github.com/seamplex/feenox>
  2. Downloading a source tarball from <https://seamplex.com/feenox/dist/src/>
@@ -300,7 +300,7 @@ $
 
 ## Test suite {#sec:test-suite}
 
-The [`test`](https://github.com/seamplex/feenox/tree/main/tests) directory contains a set of test cases whose output is known so that unintended regressions can be detected quickly (see the [programming guide](programming.md) for more information). The test suite ought to be run after each modification in FeenoX’ source code. It consists of a set of scripts and input files needed to solve dozens of cases. The output of each execution is compared to a reference solution. In case the output does not match the reference, the test suite fails.
+The [`test`](https://github.com/seamplex/feenox/tree/main/tests) directory contains a set of test cases whose output is known so that unintended regressions can be detected quickly (see the [programming guide](programming.md) for more information). The test suite ought to be run after each modification in FeenoX’s source code. It consists of a set of scripts and input files needed to solve dozens of cases. The output of each execution is compared to a reference solution. In case the output does not match the reference, the test suite fails.
 
 :::: {.only-in-format .html }
 ```{=html}

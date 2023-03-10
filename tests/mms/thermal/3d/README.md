@@ -1,8 +1,16 @@
 # Cube #1
 
-uniform conductivity
+steady-state uniform conductivity
 
 # Cube #2
 
-space-dependent conductivity
+steady-state space-dependent conductivity
+
+# Cube #3
+
+steady-state temperature-dependent
+
+# Cube #3
+
+steady-state space & temperature-dependent
 

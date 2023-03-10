@@ -15,7 +15,7 @@ next_title: \#2 Solving mazes without AI
 
 # Foreword {#sec:foreword}
 
-Welcome to **FeenoX’ tutorial number one**. Good for you!
+Welcome to **FeenoX’s tutorial number one**. Good for you!
 This first case...
  
  1. serves as a step-by-step tutorial to use [FeenoX](https://www.seamplex.com/feenox/) for the first time.
@@ -614,7 +614,7 @@ This way, [FeenoX](https://www.seamplex.com/feenox/) bounds its scope to doing o
  
 Check out the [programming and contributing](https://seamplex.com/feenox/doc/#programming-and-contributing) section of the FeenoX documentation for further details regarding
 
- #. FeenoX’ roadmap
+ #. FeenoX’s roadmap
  #. Programming languages
  #. Coding styles and guidelines
  #. Rules of conduct

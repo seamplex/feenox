@@ -167,7 +167,7 @@ int feenox_run(void) {
         ida_call(IDASetMaxStep(feenox.dae.system, feenox_special_var_value(max_dt)));
       }
 
-      // if the actual IDA's dt is smaller than FeenoX' min_dt
+      // if the actual IDA's dt is smaller than FeenoX's min_dt
       if (ida_step_dt < feenox_special_var_value(min_dt) || (feenox_special_var_value(min_dt) != 0 && feenox_special_var_value(t) == 0)) {
 
         if (feenox.time_path_current != NULL && feenox.time_path_current->items != NULL) {

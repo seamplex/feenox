@@ -1,4 +1,4 @@
-To better illustrate FeenoX’ unfair advantage (in the entrepreneurial sense), let us first consider what the options are when an engineer needs to to write a technical report, paper or document:
+To better illustrate FeenoX’s unfair advantage (in the entrepreneurial sense), let us first consider what the options are when an engineer needs to to write a technical report, paper or document:
 
 ::: {.not-in-format .latex}
  Feature                               | Microsoft Word |  Google Docs  |  Markdown[^1]    |  (La)TeX

@@ -43,7 +43,7 @@ The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) d
 
  
  * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
- * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX' offer)
+ * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX's offer)
  * [Mid-term PhD review presentation slides with the SRS/SDS explanation in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf) (August 2021).
    - [Video recording of the presentation](https://youtu.be/-RJ5qn7E9uE) (Slides are in English but audio is in Spanish).
    - Browse the repository with the sources of the examples in the presentation [here](https://github.com/gtheler/2021-presentation)
@@ -53,7 +53,8 @@ The sources are in the [doc](https://github.com/seamplex/feenox/tree/main/doc) d
    
 ## Frequently Asked Questions
 
-Check out FeenoX’ [Frequently Asked Questions](./FAQ.md)
+Check out FeenoX’s [Frequently Asked Questions](./FAQ.md).
+
  * Ask yours on [GitHub Discussions](https://github.com/seamplex/feenox/discussions/)
  * Check also the [GitHub Issues](https://github.com/seamplex/feenox/issues)
  

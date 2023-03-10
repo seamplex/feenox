@@ -38,7 +38,7 @@ To sum up this section, FeenoX is...
 > 110-objective.md
 > ```
 
-The choice of the initial supported features is based on the types of problem that the FeenoX' precursor codes (namely wasora, Fino and milonga, referred to as "previous versions" from now on) already have been supporting since more than ten years now. It is also a first usable version so scope can be bounded. A subsequent road map and release plans can be designed as requested. FeenoX' first version includes a subset of the required functionality, namely
+The choice of the initial supported features is based on the types of problem that the FeenoX's precursor codes (namely wasora, Fino and milonga, referred to as "previous versions" from now on) already have been supporting since more than ten years now. It is also a first usable version so scope can be bounded. A subsequent road map and release plans can be designed as requested. FeenoX's first version includes a subset of the required functionality, namely
 
  * open and closed-loop dynamical systems
  * Laplace/Poisson/Helmholtz equations
@@ -166,7 +166,7 @@ Technological
 :   Since it is [open source](http://www.catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/), advanced users can detect and correct bugs and even improve the algorithms. [Given enough eyeballs, all bugs are shallow.](https://en.wikipedia.org/wiki/Linus%27s_law)
 
 
-FeenoX’ main development architecture is [Debian GNU/Linux](https://www.debian.org/) running over 64-bits Intel-compatible processors.
+FeenoX’s main development architecture is [Debian GNU/Linux](https://www.debian.org/) running over 64-bits Intel-compatible processors.
 All the dependencies are free and/or open source and already available in Debian’s latest stable official repositories, as explained in @sec:deployment.
 
 The POSIX standard is followed whenever possible, allowing thus FeenoX to be compiled in other operating systems and architectures such as Windows (using [Cygwin](https://www.cygwin.com/)) and MacOS. The build procedure is the well-known and mature `./configure && make` command. 
@@ -423,7 +423,7 @@ Note that the abscissa shows the number of _nodes_, which are proportional to th
 ### Optimization loops
 
 Optimization loops work very much like parametric runs from the FeenoX point of view. The difference is mainly on the calling script that has to implement a certain optimization algorithm such as [conjugate gradients](https://en.wikipedia.org/wiki/Conjugate_gradient_method), [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method), [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing), [genetic algorithms](https://en.wikipedia.org/wiki/Genetic_algorithm), etc. to choose which parameters to pass to FeenoX as command-line argument.
-The only particularity on FeenoX' side is that since the next argument that the optimization loop will pass might depend on the result of the current step, care has to be taken in order to be able to return back to the calling script whatever results it needs in order to compute the next arguments. This is usually just the scalar being optimized for, but it can also include other results such as derivatives or other relevant data.
+The only particularity on FeenoX's side is that since the next argument that the optimization loop will pass might depend on the result of the current step, care has to be taken in order to be able to return back to the calling script whatever results it needs in order to compute the next arguments. This is usually just the scalar being optimized for, but it can also include other results such as derivatives or other relevant data.
 
 To illustrate how to use FeenoX in an optimization loop, let us consider the problem of finding the length\ $\ell_1$ of a tuning fork (@fig:fork-meshed) such that the fundamental frequency on a free-free oscillation is equal to the base\ A frequency at\ 440\ Hz.
 
@@ -508,7 +508,7 @@ The large memory consumption shown by FeenoX is due to a high level of caching i
 Resource consumption when solving the NAFEMS LE10 problem in the cloud for tetrahedral meshes.
 :::
 
-Regarding storage, FeenoX needs space to store the input file (negligible), the mesh file in `.msh` format (which can be either ASCII or binary) and the optional output files in `.msh` or `.vtk` formats. All of these files can be stored gzip-compressed and un-compressed on demand by exploiting FeenoX’ script-friendliness using proper calls to `gzip` before and/or after calling the `feenox` binary.
+Regarding storage, FeenoX needs space to store the input file (negligible), the mesh file in `.msh` format (which can be either ASCII or binary) and the optional output files in `.msh` or `.vtk` formats. All of these files can be stored gzip-compressed and un-compressed on demand by exploiting FeenoX’s script-friendliness using proper calls to `gzip` before and/or after calling the `feenox` binary.
  
 ## Scalability  {#sec:scalability}
  
@@ -771,7 +771,7 @@ In the particular case of additions to the code base, this fact has two implicat
      
     without asking anybody for any kind of permission. In case this person does not how to program, he or she has the _freedom_ to hire somebody else to do it. It is this the sense of the word “free” in the compound phrase “free software:” freedom to do what they think fit (except to make it non-free, see next bullet).
  
- ii. People adding code own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’ main code base.] That is to say, free software ought to remain free---a.k.a. as [copyleft](https://en.wikipedia.org/wiki/Copyleft).
+ ii. People adding code own the copyright of the additional code. Yet, if they want to distribute the modified version they have to do it also under the terms of the GPLv3+ and under a name that does not induce the users to think the modified version is the original FeenoX distribution.^[Even better, these authors should ask to merge their contributions into FeenoX’s main code base.] That is to say, free software ought to remain free---a.k.a. as [copyleft](https://en.wikipedia.org/wiki/Copyleft).
  
 
 Regarding additional material models, the virtual methods that compute the elemental contributions to the stiffness matrix also use function pointers to different material models (linear isotropic elastic, orthotropic elastic, etc.) and behaviors (isotropic thermal expansion, orthotropic thermal expansion, etc.) that are resolved at run time. Following the same principle, new models might be added by adding new routines and resolving them depending on the user’s input.
