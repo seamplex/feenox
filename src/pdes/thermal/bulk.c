@@ -43,22 +43,19 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   
   // volumetric heat source term Ht*q
   // TODO: total source Q
-  // TODO: there should be a way to use BLAS instead of a for loop
   if (thermal.q.defined) {
     double q = thermal.q.eval(&thermal.q, x, material);
-    // TODO: H*q as BLAS
-    for (int j = 0; j < e->type->nodes; j++) {
-      gsl_vector_add_to_element(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
-    }
+    gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
+    feenox_call(gsl_vector_axpby(w*q, &H.vector, 1.0, feenox.pde.bi));
   }
   
   if (feenox.pde.has_jacobian) {
     gsl_matrix *local_vec_T = NULL;
-    int nodes = e->type->nodes;
+    unsigned int nodes = e->type->nodes;
     feenox_check_alloc(local_vec_T = gsl_matrix_calloc(nodes, 1));
     double T = 0;
     double Tj = 0;
-    for (int j = 0; j < nodes; j++) {
+    for (unsigned int j = 0; j < nodes; j++) {
       Tj = feenox.pde.solution[0]->data_value[e->node[j]->index_dof[0]];
       gsl_matrix_set(local_vec_T, j, 0, Tj);
       T += gsl_matrix_get(e->H[v], 0, j) * Tj; 

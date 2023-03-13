@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX mathematical functions evaluation
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -292,7 +292,7 @@ double feenox_factor_function_eval(expr_item_t *this) {
 int feenox_function_init(function_t *this) {
 
   if (this->initialized) {
-    return 0;
+    return FEENOX_OK;
   }
   
   // TODO: arrange into smaller functions
@@ -307,8 +307,7 @@ int feenox_function_init(function_t *this) {
     this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
 
     if (this->vector_argument != NULL) {
-      unsigned int i = 0;
-      for (i = 0; i < this->n_arguments; i++) {
+      for (unsigned int i = 0; i < this->n_arguments; i++) {
         if (this->vector_argument[i]->initialized == 0) {
           feenox_call(feenox_vector_init(this->vector_argument[i], 1));
         }
@@ -325,11 +324,12 @@ int feenox_function_init(function_t *this) {
         if (this->data_argument[i] == NULL) {
           this->data_argument[i] = gsl_vector_ptr(&feenox_var_value(this->vector_argument[i]), 0);
         }  
+        
+        if (this->vector_value->initialized == 0) {
+          feenox_call(feenox_vector_init(this->vector_argument[i], 1));
+        }
       }
 
-      if (this->vector_value->initialized == 0) {
-        feenox_call(feenox_vector_init(this->vector_argument[i], 1));
-      }
       if (this->vector_value->size != this->data_size) {
         feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", this->data_size, this->vector_value->size, this->name);
         return FEENOX_ERROR;

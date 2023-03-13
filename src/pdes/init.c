@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's PDE initialization routines
  *
- *  Copyright (C) 2015--2022 Seamplex
+ *  Copyright (C) 2015--2023 Seamplex
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -274,11 +274,10 @@ int feenox_problem_define_solutions(void) {
     feenox_check_alloc(feenox.pde.mode = calloc(feenox.pde.dofs, sizeof(function_t *)));
   }
 
-  unsigned int g = 0;
-  for (g = 0; g < feenox.pde.dofs; g++) {
+  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
     char *name = NULL;
     if (feenox.pde.unknown_name == NULL) {
-      feenox_check_minusone(asprintf(&name, "phi%d", g+1));
+      feenox_check_minusone(asprintf(&name, "phi%u", g+1));
     } else {
       feenox_check_minusone(asprintf(&name, "%s", feenox.pde.unknown_name[g]));
     }
@@ -325,7 +324,7 @@ int feenox_problem_define_solutions(void) {
       for (int i = 0; i < feenox.pde.nev; i++) {
         char *modename = NULL;
         feenox_check_minusone(asprintf(&modename, "%s%d", name, i+1));
-        feenox_call(feenox_problem_define_solution_function(modename, &feenox.pde.mode[g][i], 0));
+        feenox_call(feenox_problem_define_solution_function(modename, &feenox.pde.mode[g][i], FEENOX_SOLUTION_NOT_GRADIENT));
         feenox_free(modename);
         
         feenox.pde.mode[g][i]->mesh = feenox.pde.solution[g]->mesh;
@@ -347,13 +346,14 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
     feenox_push_error_message("result function '%s' defined twice", name);
     return FEENOX_OK;
   }
-  (*function)->mesh = feenox.pde.mesh; // esto puede cambiar a rough despues  
+  // we don't have a valid mesh here, do we?
+//  (*function)->mesh = feenox.pde.mesh; // esto puede cambiar a rough despues  
   feenox_problem_define_solution_clean_nodal_arguments(*function);
   (*function)->var_argument = feenox.pde.solution[0]->var_argument;
   (*function)->type = (feenox.mesh.default_field_location == field_location_cells) ? function_type_pointwise_mesh_cell : function_type_pointwise_mesh_node;
   (*function)->is_gradient = is_gradient;
 
-  return 0;
+  return FEENOX_OK;
 }
 
 /*
@@ -370,8 +370,7 @@ int fino_function_clean_nodal_data(function_t *function) {
 int feenox_problem_define_solution_clean_nodal_arguments(function_t *function) {
  
   if (function->data_argument != NULL) {
-    unsigned int m = 0;
-    for (m = 0; m < feenox.pde.dim; m++) {
+    for (unsigned int m = 0; m < feenox.pde.dim; m++) {
       feenox_free(function->data_argument[m]);
     }
     feenox_free(function->data_argument);
@@ -446,10 +445,8 @@ int feenox_problem_init_runtime_general(void) {
   
   // link the solution functions with the mesh
   // and check if we have to compute gradients
-  unsigned int m = 0;
-  unsigned int g = 0;
-  for (g = 0; g < feenox.pde.dofs; g++) {
-    for (m = 0; m < feenox.pde.dim; m++) {
+  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+    for (unsigned int m = 0; m < feenox.pde.dim; m++) {
       feenox.pde.solution[g]->var_argument[m] = feenox.mesh.vars.arr_x[m];
       if (feenox.pde.gradient != NULL && feenox.pde.gradient[g] != NULL && feenox.pde.gradient[g][m] != NULL) {
          feenox.pde.compute_gradients |= feenox.pde.gradient[g][m]->used;
@@ -469,9 +466,8 @@ int feenox_problem_init_runtime_general(void) {
   }  
 
 
-  physical_group_t *physical_group = NULL;
   // this is a loop over a hash, not over a linked list
-  for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+  for (physical_group_t * physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->bcs != NULL && physical_group->n_elements == 0) {
       feenox_push_error_message("physical entity '%s' has a BC but no associated elements", physical_group->name);
       return FEENOX_ERROR;
@@ -483,10 +479,10 @@ int feenox_problem_init_runtime_general(void) {
     }
   }
 
-  bc_t *bc = NULL;
   // this is a loop over a hash, not over a linked list
-  for (bc = feenox.mesh.bcs; bc != NULL; bc = bc->hh.next) {
+  for (bc_t *bc = feenox.mesh.bcs; bc != NULL; bc = bc->hh.next) {
     if (bc->has_explicit_groups == 0) {
+      physical_group_t *physical_group;
       HASH_FIND_STR(feenox.pde.mesh->physical_groups, bc->name, physical_group);
     
       if (physical_group == NULL) {
@@ -563,12 +559,11 @@ int feenox_problem_init_runtime_general(void) {
   // fill in the holders of the continuous functions that will hold the solution
   
   if (feenox.pde.rough == 0) {
-    unsigned int g = 0;
     if (feenox.pde.solution == NULL) {
-      feenox_push_error_message("inconsistent internal state, solution funcions not allocated", physical_group->name);
+      feenox_push_error_message("inconsistent internal state, solution funcions not allocated");
       return FEENOX_ERROR;
     }
-    for (g = 0; g < feenox.pde.dofs; g++) {
+    for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.solution[g]->mesh = feenox.pde.mesh;
       feenox.pde.solution[g]->data_size = feenox.pde.spatial_unknowns;
       feenox.pde.solution[g]->data_argument = feenox.pde.mesh->nodes_argument;

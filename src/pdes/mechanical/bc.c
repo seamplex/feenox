@@ -152,7 +152,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
     }
   }
 
-  if (bc_data->nonlinear && bc_data->type_phys == BC_TYPE_MECHANICAL_DISPLACEMENT) {
+  if (bc_data->nonlinear && bc_data->type_math == bc_type_math_dirichlet) {
     feenox_push_error_message("essential boundary condition '%s' cannot depend on temperature", rhs);
     return FEENOX_ERROR;
   }

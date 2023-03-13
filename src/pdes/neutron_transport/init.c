@@ -27,7 +27,9 @@ neutron_transport_t neutron_transport;
 // TODO: unify with diffusion
 int feenox_problem_init_parser_neutron_transport(void) {
 
-///kw_pde+PROBLEM+detail  * `neutron_transport` multi-group core-level neutron transport using $S_N$ for angular and FEM for spatial discretizations
+///kw_pde+PROBLEM+detail  * `neutron_transport` multi-group core-level neutron transport using 
+///kw_pde+PROBLEM+detail     - discrete ordinates $S_N$ for angular discretization, and
+///kw_pde+PROBLEM+detail     - isoparametric finite elements for spatial discretization.
 
   // we are FEM
   feenox.mesh.default_field_location = field_location_nodes;
@@ -70,8 +72,11 @@ int feenox_problem_init_parser_neutron_transport(void) {
   // dofs = number of directions * number of groups
   feenox.pde.dofs =  neutron_transport.directions * neutron_transport.groups;
   
+  // ------- neutron transport outputs -----------------------------------  
+  
+  // the angular fluxes psi
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-  // TODO: document
+  // TODO: document from comments
   for (int n = 0; n < neutron_transport.directions; n++) {
     for (int g = 0; g < neutron_transport.groups; g++) {
       feenox_check_minusone(asprintf(&feenox.pde.unknown_name[n * neutron_transport.groups + g], "psi%d.%d", n+1, g+1));
@@ -79,15 +84,14 @@ int feenox_problem_init_parser_neutron_transport(void) {
   }
   feenox_call(feenox_problem_define_solutions());
 
-  // ------- neutron transport outputs -----------------------------------  
+  // the scalar fluxes psi
   // TODO: document
   // TODO: for one group make an alias between phi1 and phi
   feenox_check_alloc(neutron_transport.phi = calloc(neutron_transport.groups, sizeof(function_t *)));
-  for (int g = 0; g < neutron_transport.groups; g++) {
+  for (unsigned int g = 0; g < neutron_transport.groups; g++) {
     char *name = NULL;
-    feenox_check_minusone(asprintf(&name, "phi%d", g+1));
-    // the las argument is 1 for gradient and 0 for non-gradient
-    feenox_call(feenox_problem_define_solution_function(name, &neutron_transport.phi[g], 0));
+    feenox_check_minusone(asprintf(&name, "phi%u", g+1));
+    feenox_call(feenox_problem_define_solution_function(name, &neutron_transport.phi[g], FEENOX_SOLUTION_NOT_GRADIENT));
     free(name);
   }
   
@@ -187,10 +191,6 @@ int feenox_problem_init_parser_neutron_transport(void) {
     // table 4-1 page 162 from lewiss
     // we could have used file sndir2.dat from fentraco, but the values are different
 
-    double s6_mu1 = 0.2666355;
-    double s6_mu2 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (2-1) / (6-2));
-    double s6_mu3 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (3-1) / (6-2));
-
     // this is for 2 and 3 dimensions
     int N_octs = (feenox.pde.dim) ? 4 : 8;
     int J_octs = neutron_transport.directions / N_octs;
@@ -234,6 +234,9 @@ int feenox_problem_init_parser_neutron_transport(void) {
       
       case 6:
         double s6_mu1 = 0.2666355;
+        double s6_mu2 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (2-1) / (6-2));
+        double s6_mu3 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (3-1) / (6-2));
+        
         double s6_w1 = 0.1761263;
         double s6_w2 = 0.1572071;
 
@@ -290,6 +293,28 @@ int feenox_problem_init_parser_neutron_transport(void) {
       }
     }
   }
+  
+  // checks
+  double s = 0;
+  for (unsigned int n = 0; n < neutron_transport.directions; n++) {
+    s += neutron_transport.w[n];
+  }
+  assert(fabs(s-1) < 1e-6);
+  
+  for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+    s = 0;
+    for (unsigned int n = 0; n < neutron_transport.directions; n++) {
+      s += neutron_transport.w[n] * neutron_transport.Omega[n][d];
+    }
+    assert(fabs(s) < 1e-6);
+    
+    s = 0;
+    for (unsigned int n = 0; n < neutron_transport.directions; n++) {
+      s += neutron_transport.w[n] * gsl_pow_2(neutron_transport.Omega[n][d]);
+    }
+    assert(fabs(s-1.0/3.0) < 1e-6);
+  }
+  
   // ---------------------------------------------------------------------------
   
 #endif
@@ -306,20 +331,20 @@ int feenox_problem_init_runtime_neutron_transport(void) {
   feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // set the size of the eigenvectors (we did not know their size in init_parser() above
-  for (int i = 0; i < feenox.pde.nev; i++) {
+  for (PetscInt i = 0; i < feenox.pde.nev; i++) {
     feenox_call(feenox_vector_set_size(feenox.pde.vectors.phi[i], feenox.pde.size_global));
   }
   
   // initialize XSs
-  // TODO: allow not to give the group in one-group problems
-  int G = neutron_transport.groups;
+  // TODO: allow not to give the group number in one-group problems
+  unsigned int G = neutron_transport.groups;
   feenox_check_alloc(neutron_transport.Sigma_t    = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_transport.Sigma_a    = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_transport.nu_Sigma_f = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_transport.S          = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_transport.Sigma_s0   = calloc(G, sizeof(distribution_t *)));
   feenox_check_alloc(neutron_transport.Sigma_s1   = calloc(G, sizeof(distribution_t *)));
-  for (int g = 0; g < G; g++) {
+  for (unsigned int g = 0; g < G; g++) {
     char *name = NULL;
 
     feenox_check_minusone(asprintf(&name, "Sigma_t%d", g+1));
@@ -409,8 +434,8 @@ int feenox_problem_init_runtime_neutron_transport(void) {
   }
   
   // allocate elemental XS matrices
-  int N = neutron_transport.directions;
-  int NG = N*G;
+  unsigned int N = neutron_transport.directions;
+  unsigned int NG = N*G;
   feenox_check_alloc(neutron_transport.removal   = gsl_matrix_calloc(NG, NG));
   feenox_check_alloc(neutron_transport.nufission = gsl_matrix_calloc(NG, NG));
   feenox_check_alloc(neutron_transport.src       = gsl_vector_calloc(NG));  
@@ -449,18 +474,12 @@ int feenox_problem_setup_pc_neutron_transport(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
+    petsc_call(PCSetType(pc, PCLU));
     if (neutron_transport.has_sources == 0) {
       // PC for EPS
 #ifdef PETSC_HAVE_MUMPS
-      petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
       petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-#else
-      // TODO: this will complain in parallel
-      petsc_call(PCSetType(pc, PCLU));    
 #endif
-    } else {
-      // plain PC
-      // defaults
     }
   }
   
@@ -473,11 +492,7 @@ int feenox_problem_setup_ksp_neutron_transport(KSP ksp ) {
   petsc_call(KSPGetType(ksp, &ksp_type));
   if (ksp_type == NULL) {
     if (neutron_transport.has_sources == 0) {
-      // KSP for EPS
-      // defaults
-    } else {
-      // plain KSP
-      // defaults
+      petsc_call(KSPSetType(ksp, KSPPREONLY))
     }
   }  
 

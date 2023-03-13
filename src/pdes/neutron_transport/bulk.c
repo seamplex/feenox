@@ -189,19 +189,23 @@ int feenox_problem_build_volumetric_gauss_point_neutron_transport(element_t *e, 
   // petrov-stabilized leakage term
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_transport.OMEGA, e->B[v], 0.0, neutron_transport.OMEGAB));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], neutron_transport.P, neutron_transport.OMEGAB, 1.0, neutron_transport.Ki));
+//  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->H[v], neutron_transport.OMEGAB, 1.0, neutron_transport.Ki));
 
   // petrov-stabilized revmoval term
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_transport.removal, e->H[v], 0.0, neutron_transport.AH));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], neutron_transport.P, neutron_transport.AH, 1.0, neutron_transport.Ai));
+//  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->H[v], neutron_transport.AH, 1.0, neutron_transport.Ai));
   
   // petrov-stabilized fission term
   if (neutron_transport.has_fission) {
-    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, neutron_transport.nufission, e->H[v], 0.0, neutron_transport.XH));
+    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_transport.nufission, e->H[v], 0.0, neutron_transport.XH));
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], neutron_transport.P, neutron_transport.XH, 1.0, neutron_transport.Xi));
+//    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->H[v], neutron_transport.XH, 1.0, neutron_transport.Xi));
   }
   // petrov-stabilized source term
   if (neutron_transport.has_sources) {
-    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], neutron_transport.P, neutron_transport.src, 1, neutron_transport.Si));
+    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], neutron_transport.P, neutron_transport.src, 1.0, neutron_transport.Si));
+//    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], e->H[v],             neutron_transport.src, 1.0, feenox.pde.bi));
   }
   
   // for source-driven problems

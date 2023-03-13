@@ -69,11 +69,11 @@ int feenox_problem_init_parser_thermal(void) {
 ///re_thermal+qy+description Only available for two and three-dimensional problems.  
 ///re_thermal+qz+description The heat flux field\ $q_z(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial z}$ in the\ $x$ direction. This is a secondary unknown of the problem.  
 ///re_thermal+qz+description Only available for three-dimensional problems.
-  feenox_call(feenox_problem_define_solution_function("qx", &thermal.qx, 1));
+  feenox_call(feenox_problem_define_solution_function("qx", &thermal.qx, FEENOX_SOLUTION_GRADIENT));
   if (feenox.pde.dim > 1) {
-    feenox_call(feenox_problem_define_solution_function("qy", &thermal.qy, 1));
+    feenox_call(feenox_problem_define_solution_function("qy", &thermal.qy, FEENOX_SOLUTION_GRADIENT));
     if (feenox.pde.dim > 2) {
-      feenox_call(feenox_problem_define_solution_function("qz", &thermal.qz, 1));
+      feenox_call(feenox_problem_define_solution_function("qz", &thermal.qz, FEENOX_SOLUTION_GRADIENT));
     }
   }
 

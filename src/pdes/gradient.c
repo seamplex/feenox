@@ -45,7 +45,7 @@ int feenox_problem_gradient_compute(void) {
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
         // derivative of the degree of freedom g with respect to dimension m
-        feenox_secondary_fill(feenox.pde, gradient[g][m]);
+        feenox_aux_solution_fill(feenox.pde, gradient[g][m]);
 //        feenox_gradient_fill(feenox.pde, delta_gradient[g][m]);
       }
     }

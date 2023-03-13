@@ -26,7 +26,7 @@ int feenox_problem_bc_parse_neutron_transport(bc_data_t *bc_data, const char *lh
 
   // TODO: should this be the default BC?
   if (strcmp(lhs, "vacuum") == 0 || strcmp(lhs, "null") == 0) {
-    // null is supported for compatibility with diffusion
+    // "null" is supported for compatibility with diffusion
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_neutron_transport_vacuum;
     bc_data->dof = -1;
@@ -43,6 +43,14 @@ int feenox_problem_bc_parse_neutron_transport(bc_data_t *bc_data, const char *lh
     feenox_push_error_message("unknown neutron_transport boundary condition '%s'", lhs);
     return FEENOX_ERROR;
   }
+  
+  bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
+  bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
+
+  if (bc_data->nonlinear && bc_data->type_math == bc_type_math_dirichlet) {
+    feenox_push_error_message("essential boundary condition '%s' cannot depend on phi", rhs);
+    return FEENOX_ERROR;
+  }
 
   feenox_call(feenox_expression_parse(&bc_data->expr, rhs));
 
@@ -57,7 +65,7 @@ int feenox_problem_bc_set_neutron_transport_vacuum(bc_data_t *this, element_t *e
 
 #ifdef HAVE_PETSC
   double outward_normal[3];
-  feenox_mesh_compute_outward_normal(e, outward_normal);
+  feenox_call(feenox_mesh_compute_outward_normal(e, outward_normal));
   for (unsigned n = 0; n < neutron_transport.directions; n++) {
     if (feenox_mesh_dot(neutron_transport.Omega[n], outward_normal) < 0) {
       // if the direction is inward set it to zero
@@ -83,7 +91,7 @@ int feenox_problem_bc_set_neutron_transport_mirror(bc_data_t *this, element_t *e
   feenox_call(feenox_mesh_compute_outward_normal(e, outward_normal));
   for (unsigned n = 0; n < neutron_transport.directions; n++) {
     if ((Omega_dot_outward = feenox_mesh_dot(neutron_transport.Omega[n], outward_normal)) < 0) {
-      // if the direction is inward then we have to reflect
+      // if the direction is inward then we have to reflect it
       // if Omega is the incident direction with respect to the outward normal then
       // reflected = Omega - 2*(Omega dot outward_normal) * outward_normal
       

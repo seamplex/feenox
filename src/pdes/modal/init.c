@@ -162,10 +162,9 @@ int feenox_problem_init_parser_modal(void) {
 
   // define eigenvectors (we don't know its size yet)
   feenox_check_alloc(feenox.pde.vectors.phi = calloc(feenox.pde.nev, sizeof(vector_t *)));;
-  unsigned int i = 0;
-  for (i = 0; i < feenox.pde.nev; i++) {
+  for (unsigned int i = 0; i < feenox.pde.nev; i++) {
     char *modename = NULL;
-    feenox_check_minusone(asprintf(&modename, "phi%d", i+1));
+    feenox_check_minusone(asprintf(&modename, "phi%u", i+1));
     feenox_check_alloc(feenox.pde.vectors.phi[i] = feenox_define_vector_get_ptr(modename, 0));
     feenox_free(modename);
   }

@@ -206,12 +206,15 @@ extern "C++" {
 
 #define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
 
+#define FEENOX_SOLUTION_NOT_GRADIENT  0
+#define FEENOX_SOLUTION_GRADIENT 1
+
 #define feenox_distribution_define_mandatory(type, name, quoted_name, description) {\
   feenox_call(feenox_distribution_init(&(type.name), quoted_name)); \
   if (type.name.defined == 0) { feenox_push_error_message("undefined %s '%s'", description, quoted_name);  return FEENOX_ERROR; } \
   if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } }
 
-#define feenox_secondary_fill(location, fun_nam) {\
+#define feenox_aux_solution_fill(location, fun_nam) {\
   location.fun_nam->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough; \
   location.fun_nam->data_argument = location.fun_nam->mesh->nodes_argument;   \
   location.fun_nam->data_size = location.fun_nam->mesh->n_nodes; \

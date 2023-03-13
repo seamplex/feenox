@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX text output routines
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -175,10 +175,6 @@ int feenox_instruction_print_function(void *arg) {
   print_function_t *print_function = (print_function_t *)arg;
   print_token_t *print_token;
   
-  int j, k;
-//  int flag = 0;
-  double *x, *x_min, *x_max, *x_step;
-
   // in parallel runs only print from first processor
   if (feenox.rank != 0) {
     return FEENOX_OK;
@@ -197,7 +193,7 @@ int feenox_instruction_print_function(void *arg) {
     fprintf(print_function->file->pointer, "# ");
     
     // primero los argumentos de la primera funcion
-    for (k = 0; k < print_function->first_function->n_arguments; k++) {
+    for (int k = 0; k < print_function->first_function->n_arguments; k++) {
       fprintf(print_function->file->pointer, "%s", print_function->first_function->var_argument[k]->name);
       fprintf(print_function->file->pointer, "%s", print_function->separator);
     }
@@ -218,12 +214,16 @@ int feenox_instruction_print_function(void *arg) {
       (print_function->range.step != NULL || print_function->range.nsteps != NULL)) {
     // nos dieron los puntos donde se quiere dibujar las funciones
 
-    x = calloc(print_function->first_function->n_arguments, sizeof(double));
-    x_min = calloc(print_function->first_function->n_arguments, sizeof(double));
-    x_max = calloc(print_function->first_function->n_arguments, sizeof(double));
-    x_step = calloc(print_function->first_function->n_arguments, sizeof(double));
+    double *x = NULL;
+    feenox_check_alloc(x = calloc(print_function->first_function->n_arguments, sizeof(double)));
+    double *x_min = NULL;
+    feenox_check_alloc(x_min = calloc(print_function->first_function->n_arguments, sizeof(double)));
+    double *x_max = NULL;
+    feenox_check_alloc(x_max = calloc(print_function->first_function->n_arguments, sizeof(double)));
+    double *x_step = NULL;
+    feenox_check_alloc(x_step = calloc(print_function->first_function->n_arguments, sizeof(double)));
 
-    for (j = 0; j < print_function->first_function->n_arguments; j++) {
+    for (int j = 0; j < print_function->first_function->n_arguments; j++) {
       x_min[j] = feenox_expression_eval(&print_function->range.min[j]);
       if (print_function->range.nsteps != NULL &&
           feenox_expression_eval(&print_function->range.nsteps[j]) != 1) {
@@ -247,7 +247,7 @@ int feenox_instruction_print_function(void *arg) {
     while (x[0] < x_max[0] * (1 + feenox_special_var_value(zero))) {
 
       // imprimimos los argumentos
-      for (j = 0; j < print_function->first_function->n_arguments; j++) {
+      for (int j = 0; j < print_function->first_function->n_arguments; j++) {
         fprintf(print_function->file->pointer, print_function->format, x[j]);
         fprintf(print_function->file->pointer, "%s", print_function->separator);
       }
@@ -275,7 +275,7 @@ int feenox_instruction_print_function(void *arg) {
       // incrementamos el ultimo argumento
       x[print_function->first_function->n_arguments-1] += x_step[print_function->first_function->n_arguments-1];
       // y vamos mirando si hay que reiniciarlos
-      for (j = print_function->first_function->n_arguments-2; j >= 0; j--) {
+      for (int j = print_function->first_function->n_arguments-2; j >= 0; j--) {
         if (x[j+1] > (x_max[j+1] + 0.1*x_step[j+1])) {
           x[j+1] = x_min[j+1];
           x[j] += x_step[j];
@@ -299,9 +299,10 @@ int feenox_instruction_print_function(void *arg) {
 
 
     // imprimimos en los puntos de definicion de la primera
-    x = calloc(print_function->first_function->n_arguments, sizeof(double));
+    double *x = NULL;
+    feenox_check_alloc(x = calloc(print_function->first_function->n_arguments, sizeof(double)));
 
-    for (j = 0; j < print_function->first_function->data_size; j++) {
+    for (int j = 0; j < print_function->first_function->data_size; j++) {
 
       // TODO
 /*        
@@ -318,7 +319,7 @@ int feenox_instruction_print_function(void *arg) {
 //       if (print_function->physical_entity == NULL || flag) {
       
         // los argumentos de la primera funcion
-        for (k = 0; k < print_function->first_function->n_arguments; k++) {
+        for (int k = 0; k < print_function->first_function->n_arguments; k++) {
           // nos acordamos los argumentos para las otras funciones que vienen despues
           x[k] = print_function->first_function->data_argument[k][j];
           fprintf(print_function->file->pointer, print_function->format, x[k]);

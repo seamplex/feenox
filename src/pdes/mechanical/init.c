@@ -106,22 +106,22 @@ int feenox_problem_init_parser_mechanical(void) {
 
   // ------- elasticity-related outputs -----------------------------------  
   // TODO: document
-  feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, 1));
-  feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, 1));
-  feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, 1));
+  feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, FEENOX_SOLUTION_GRADIENT));
 
   if (feenox.pde.dofs == 3) {
-    feenox_call(feenox_problem_define_solution_function("sigmaz", &mechanical.sigmaz, 1));
-    feenox_call(feenox_problem_define_solution_function("tauyz", &mechanical.tauyz, 1));
-    feenox_call(feenox_problem_define_solution_function("tauzx", &mechanical.tauzx, 1));
+    feenox_call(feenox_problem_define_solution_function("sigmaz", &mechanical.sigmaz, FEENOX_SOLUTION_GRADIENT));
+    feenox_call(feenox_problem_define_solution_function("tauyz", &mechanical.tauyz, FEENOX_SOLUTION_GRADIENT));
+    feenox_call(feenox_problem_define_solution_function("tauzx", &mechanical.tauzx, FEENOX_SOLUTION_GRADIENT));
   }
 
-  feenox_call(feenox_problem_define_solution_function("sigma1", &mechanical.sigma1, 1));
-  feenox_call(feenox_problem_define_solution_function("sigma2", &mechanical.sigma2, 1));
-  feenox_call(feenox_problem_define_solution_function("sigma3", &mechanical.sigma3, 1));
-  feenox_call(feenox_problem_define_solution_function("sigma", &mechanical.sigma, 1));
-//  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, 1));
-  feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, 1));
+  feenox_call(feenox_problem_define_solution_function("sigma1", &mechanical.sigma1, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("sigma2", &mechanical.sigma2, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("sigma3", &mechanical.sigma3, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("sigma", &mechanical.sigma, FEENOX_SOLUTION_GRADIENT));
+//  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, FEENOX_SOLUTION_GRADIENT));
 
 
 // these are for the algebraic expressions in the  implicitly-defined BCs

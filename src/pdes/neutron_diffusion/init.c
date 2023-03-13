@@ -46,9 +46,8 @@ int feenox_problem_init_parser_neutron_diffusion(void) {
   feenox.pde.dofs = neutron_diffusion.groups;
   
   feenox_check_alloc(feenox.pde.unknown_name = calloc(neutron_diffusion.groups, sizeof(char *)));
-  unsigned int g = 0;
-  for (g = 0; g < neutron_diffusion.groups; g++) {
-    feenox_check_minusone(asprintf(&feenox.pde.unknown_name[g], "phi%d", g+1));
+  for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
+    feenox_check_minusone(asprintf(&feenox.pde.unknown_name[g], "phi%u", g+1));
   }
   feenox_call(feenox_problem_define_solutions());
   
