@@ -35,7 +35,13 @@ $(awk '{printf("%s\\n\\\n", $0)}' doc/help-extra.txt)
 EOF
 
 
-version=$(git describe --tags | sed 's/-/./' | cut -d- -f1 | tr -d v)
+# check if there are tags
+if [ ! -z "$(git tag)" ]; then
+  what="tags"
+else
+  what="all"
+fi
+version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
 rm -f config_links.m4
@@ -45,7 +51,7 @@ done
 
 # do not add doc to src unless they ask for it
 echo -n "creating Makefile.am... "
-if [ "x$1" = "x--doc" ]; then
+if [ "x${1}" = "x--doc" ]; then
   cp Makefile-doc.am Makefile.am
 else
   echo "SUBDIRS = src" > Makefile.am
