@@ -167,20 +167,17 @@ int feenox_problem_build_volumetric_gauss_point_neutron_transport(element_t *e, 
   }
 
   // petrov stabilization
-  double tau = feenox_var_value(neutron_transport.sn_alpha) * 0.5 * gsl_hypot3(e->node[1]->x[0]-e->node[0]->x[0],
-                                                                               e->node[1]->x[1]-e->node[0]->x[1],
-                                                                               e->node[1]->x[2]-e->node[0]->x[2]);
+  int NG = neutron_transport.directions * neutron_transport.groups;
+  double tau = 0.5 * feenox_var_value(neutron_transport.sn_alpha) * neutron_transport.geometric_factor * e->type->volume(e) / e->type->area(e);
+  feenox_call(gsl_matrix_memcpy(neutron_transport.P, e->H[v]));
   for (unsigned int j = 0; j < neutron_transport.n_nodes; j++) {
-    double xi = e->type->gauss[feenox.pde.mesh->integration].h[v][j];
+    int NGj = NG*j;
     for (unsigned int n = 0; n < neutron_transport.directions; n++) {
-      for (unsigned int g = 0; g < neutron_transport.groups; g++) {
-        // parte base, igual a las h
-        int diag = dof_index(n,g);
-        gsl_matrix_set(neutron_transport.P, diag, neutron_transport.directions * neutron_transport.groups * j + diag, xi);
-        // correccion
-        for (unsigned int m = 0; m < feenox.pde.dim; m++) {
-          gsl_matrix_add_to_element(neutron_transport.P, diag, neutron_transport.directions * neutron_transport.groups * j + diag, 
-                             tau * neutron_transport.Omega[n][m] * gsl_matrix_get(e->dhdx[v], j, m));
+      for (unsigned int m = 0; m < feenox.pde.dim; m++) {
+        double xi = tau * neutron_transport.Omega[n][m] * gsl_matrix_get(e->dhdx[v], j, m);
+        for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+          int diag = dof_index(n,g);
+          gsl_matrix_add_to_element(neutron_transport.P, diag, NGj + diag, xi);
         }
       }
     }

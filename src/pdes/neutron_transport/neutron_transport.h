@@ -37,6 +37,9 @@ struct neutron_transport_t {
   // directions and weights
   double **Omega;
   double *w;
+
+  // for SUPG: 1 for 1D, 4 for 2D and 6 for 3D
+  double geometric_factor;
   
   
   // total XS

@@ -304,7 +304,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
   element_t *element = mesh->last_chosen_element;
 
   // test if the last (cached) chosen_element is the one
-  if (element == NULL || element->type->point_in_element(element, x) == 0) {
+  if (element == NULL || element->type->point_inside(element, x) == 0) {
     
     if (nearest_node == NULL) {
       nearest_node = feenox_mesh_find_nearest_node(mesh, x);
@@ -312,7 +312,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     element = NULL;
     element_ll_t *element_item = NULL;
     LL_FOREACH(nearest_node->element_list, element_item) {
-      if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
+      if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_inside(element_item->element, x)) {
         return element_item->element;
       }  
     }
@@ -371,13 +371,13 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
           cached_element->id = element_item->element->tag;
           HASH_ADD_INT(cache, id, cached_element);
         
-          if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
+          if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_inside(element_item->element, x)) {
             element = element_item->element;
             break;
           }
         }  
 #else
-        if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_in_element(element_item->element, x)) {
+        if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_inside(element_item->element, x)) {
           element = element_item->element;
           break;
         }

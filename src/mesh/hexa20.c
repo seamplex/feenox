@@ -42,8 +42,8 @@ int feenox_mesh_hexa20_init(void) {
   element_type->nodes_per_face = 8;
   element_type->h = feenox_mesh_hexa20_h;
   element_type->dhdr = feenox_mesh_hexa20_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_hexahedron;
-  element_type->element_volume = feenox_mesh_hex_vol;
+  element_type->point_inside = feenox_mesh_point_in_hexahedron;
+  element_type->volume = feenox_mesh_hex_volume;
 
   // from Gmsh’ doc
 /*

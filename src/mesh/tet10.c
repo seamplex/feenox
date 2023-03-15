@@ -43,8 +43,8 @@ int feenox_mesh_tet10_init(void) {
   element_type->nodes_per_face = 6;
   element_type->h = feenox_mesh_tet10_h;
   element_type->dhdr = feenox_mesh_tet10_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_tetrahedron;
-  element_type->element_volume = feenox_mesh_tet_vol;
+  element_type->point_inside = feenox_mesh_point_in_tetrahedron;
+  element_type->volume = feenox_mesh_tet_volume;
 
 /*
    

@@ -55,15 +55,17 @@ extern int feenox_mesh_point_in_hexahedron(element_t *this, const double *x);
 extern int feenox_mesh_point_in_prism(element_t *element, const double *x);
 
 
-extern double feenox_mesh_point_vol(element_t *this);
-extern double feenox_mesh_line_vol(element_t *this);
-extern double feenox_mesh_triang_vol(element_t *this);
-extern double feenox_mesh_quad_vol(element_t *this);
-extern double feenox_mesh_tet_vol(element_t *this);
-extern double feenox_mesh_hex_vol(element_t *this);
-extern double feenox_mesh_prism_vol(element_t *this);
+extern double feenox_mesh_point_volume(element_t *this);
+extern double feenox_mesh_line_volume(element_t *this);
+extern double feenox_mesh_triang_volume(element_t *this);
+extern double feenox_mesh_quad_volume(element_t *this);
+extern double feenox_mesh_tet_volume(element_t *this);
+extern double feenox_mesh_hex_volume(element_t *this);
+extern double feenox_mesh_prism_volume(element_t *this);
 
-
+extern double feenox_mesh_line_area(element_t *this);
+extern double feenox_mesh_triang_area(element_t *this);
+extern double feenox_mesh_quad_area(element_t *this);
 
 
 

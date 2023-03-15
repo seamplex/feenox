@@ -42,8 +42,9 @@ int feenox_mesh_quad9_init(void) {
   element_type->nodes_per_face = 3;
   element_type->h = feenox_mesh_quad9_h;
   element_type->dhdr = feenox_mesh_quad9_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_quadrangle;
-  element_type->element_volume = feenox_mesh_quad_vol;
+  element_type->point_inside = feenox_mesh_point_in_quadrangle;
+  element_type->volume = feenox_mesh_quad_volume;
+  element_type->area = feenox_mesh_quad_area;
 
   // from Gmsh’ doc
 /*

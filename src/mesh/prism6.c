@@ -41,8 +41,8 @@ int feenox_mesh_prism6_init(void) {
   element_type->nodes_per_face = 4;   // Ojo aca que en nodos por cara pusimos el maximo valor (4) ya que depende de la cara
   element_type->h = feenox_mesh_prism6_h;
   element_type->dhdr = feenox_mesh_prism6_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_prism;
-  element_type->element_volume = feenox_mesh_prism_vol;
+  element_type->point_inside = feenox_mesh_point_in_prism;
+  element_type->volume = feenox_mesh_prism_volume;
 
     // coordenadas de los nodos
 /*  
@@ -420,7 +420,7 @@ int feenox_mesh_point_in_prism(element_t *element, const double *x) {
 }
     
 // TODO: generalizar a prismas no paralelos
-double feenox_mesh_prism_vol(element_t *this) {
+double feenox_mesh_prism_volume(element_t *this) {
 
 //  return 0.5 * fabs(element->node[0]->x[2]-element->node[3]->x[2])* fabs(feenox_mesh_subtract_cross_2d(element->node[0]->x, element->node[1]->x, element->node[2]->x));
 

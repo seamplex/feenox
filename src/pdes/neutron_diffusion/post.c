@@ -42,7 +42,7 @@ int feenox_problem_solve_post_neutron_diffusion(void) {
     for (i = 0; i < feenox.pde.mesh->n_elements; i++) {
       element_t *element = &feenox.pde.mesh->element[i]; 
       if (element->type != NULL && element->type->dim == feenox.pde.dim) {
-        num += element->type->element_volume(element);
+        num += element->type->volume(element);
         for (g = 0; g < feenox.pde.dofs; g++) {
           den += feenox_mesh_integral_over_element(element, feenox.pde.mesh, feenox.pde.solution[g]);
         }

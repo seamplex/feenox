@@ -43,8 +43,9 @@ int feenox_mesh_line2_init(void) {
   element_type->nodes_per_face = 1;
   element_type->h = feenox_mesh_line2_h;
   element_type->dhdr = feenox_mesh_line2_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_line;
-  element_type->element_volume = feenox_mesh_line_vol;
+  element_type->point_inside = feenox_mesh_point_in_line;
+  element_type->volume = feenox_mesh_line_volume;
+  element_type->area = feenox_mesh_line_area;
 
   // from Gmsh’ doc
 /*
@@ -187,10 +188,18 @@ int feenox_mesh_point_in_line(element_t *element, const double *x) {
 }
 
 
-double feenox_mesh_line_vol(element_t *element) {
+double feenox_mesh_line_volume(element_t *element) {
   
   if (element->volume == 0) {
     element->volume = fabs(element->node[1]->x[0] - element->node[0]->x[0]);
   }  
   return element->volume;
+}
+
+double feenox_mesh_line_area(element_t *element) {
+  
+  if (element->area == 0) {
+    element->area = 1;
+  }  
+  return element->area;
 }

@@ -59,12 +59,15 @@ int feenox_problem_init_parser_neutron_transport(void) {
   switch(feenox.pde.dim) {
     case 1:
       neutron_transport.directions = neutron_transport.N;
+      neutron_transport.geometric_factor = 1;
       break;
     case 2:
       neutron_transport.directions = 0.5*neutron_transport.N*(neutron_transport.N+2);
+      neutron_transport.geometric_factor = 4;
       break;
     case 3:
       neutron_transport.directions = neutron_transport.N*(neutron_transport.N+2);
+      neutron_transport.geometric_factor = 6;
       break;
   }
   

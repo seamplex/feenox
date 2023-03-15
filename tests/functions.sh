@@ -110,6 +110,12 @@ answerdiff() {
   ${feenox} ${dir}/${1} | sed 's/-0.0000/0.0000/g' > ${dir}/${base}.last
   error=$?
   
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
+  
+  
   difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
   if [ -z "${difference}" ]; then
     echo "ok"
@@ -128,6 +134,11 @@ answer1diff() {
   ${feenox} ${dir}/${1} ${2} > ${dir}/${base}.last
   error=$?
   
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
+  
   difference=$(diff -w ${dir}/${base}.ref ${dir}/${base}.last)
   if [ -z "${difference}" ]; then
     echo "ok"
@@ -144,6 +155,12 @@ answer1diff() {
 answerfloat() {
   echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
 
   if [ "$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${2}" "${3}")" = "1" ]; then
     echo "ok"
@@ -276,6 +293,12 @@ answer2() {
 answerfloat() {
   echo -n "${1} ... "
   answer=$(${feenox} ${dir}/${1})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
 
   if [ "$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${2}" "${3}")" = "1" ]; then
     echo "ok"
@@ -292,6 +315,12 @@ answerfloat() {
 answer1float() {
   echo -n "${1} ${2} ... "
   answer=$(${feenox} ${dir}/${1} ${2})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
   
   if [ -z "${4}" ]; then
     result=$(${feenox} ${dir}/cmp-float.fee "(${answer})" "${3}")
@@ -313,6 +342,12 @@ answer1float() {
 answer1zero() {
   echo -n "${1} ${2} ... "
   answer=$(${feenox} ${dir}/${1} ${2})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
 
   if [ -z "${3}" ]; then
     result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")
@@ -333,6 +368,12 @@ answer1zero() {
 
 answer2sorthead1() {
   answer=$(${feenox} ${dir}/$1 $2 $3 | sort -rg | head -n1)
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
   
   if [ "${answer}" = "$4" ]; then
     echo "ok"

@@ -128,6 +128,7 @@ int feenox_problem_dirichlet_eval(void) {
               }
               
               // TODO: for multi-freedom high-order nodes end up with a different penalty weight
+              // TODO: pass the node insteado of the index
               feenox_call(bc_data->set_essential(bc_data, element, j_global));
             }  
           }

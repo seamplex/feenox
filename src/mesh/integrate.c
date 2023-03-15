@@ -44,7 +44,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           element = mesh->cell[i].element;
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
-            integral += function->data_value[i] * mesh->cell[i].element->type->element_volume(mesh->cell[i].element);
+            integral += function->data_value[i] * mesh->cell[i].element->type->volume(mesh->cell[i].element);
           }
         }
       } else {
@@ -53,7 +53,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           element = mesh->cell[i].element;
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
-            integral += feenox_function_eval(function, mesh->cell[i].x) * mesh->cell[i].element->type->element_volume(mesh->cell[i].element);
+            integral += feenox_function_eval(function, mesh->cell[i].x) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
           }
         }
       }
@@ -115,7 +115,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
             (physical_group != NULL && element->physical_group == physical_group)) {
           // TODO: inlined function
           feenox_mesh_update_coord_vars(mesh->cell[i].x);
-          integral += feenox_expression_eval(expr) * mesh->cell[i].element->type->element_volume(mesh->cell[i].element);
+          integral += feenox_expression_eval(expr) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
         }
       }
     } else {

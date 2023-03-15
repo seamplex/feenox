@@ -150,8 +150,8 @@ int feenox_mesh_element_types_init(void) {
   element_type->nodes_per_face = 0;
   element_type->h = NULL;
   element_type->dhdr = NULL;
-  element_type->point_in_element = NULL;
-  element_type->element_volume = NULL;
+  element_type->point_inside = NULL;
+  element_type->volume = NULL;
   
   // line ----------------------------------------------------------------------
   feenox_call(feenox_mesh_line2_init());

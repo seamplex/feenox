@@ -43,8 +43,8 @@ int feenox_mesh_hexa8_init(void) {
   element_type->nodes_per_face = 4;
   element_type->h = feenox_mesh_hexa8_h;
   element_type->dhdr = feenox_mesh_hexa8_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_hexahedron;
-  element_type->element_volume = feenox_mesh_hex_vol;
+  element_type->point_inside = feenox_mesh_point_in_hexahedron;
+  element_type->volume = feenox_mesh_hex_volume;
 
   // from Gmsh’ doc
 /*
@@ -528,7 +528,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   tet.node[1] = element->node[1];
   tet.node[2] = element->node[3];
   tet.node[3] = element->node[4];
-  if (tet.type->point_in_element(&tet, x)) {
+  if (tet.type->point_inside(&tet, x)) {
     feenox_free(tet.node);
     return 1;
   }
@@ -538,7 +538,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   tet.node[1] = element->node[4];
   tet.node[2] = element->node[7];
   tet.node[3] = element->node[1];
-  if (tet.type->point_in_element(&tet, x)) {
+  if (tet.type->point_inside(&tet, x)) {
     feenox_free(tet.node);
     return 1;
   }
@@ -548,7 +548,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   tet.node[1] = element->node[4];
   tet.node[2] = element->node[7];
   tet.node[3] = element->node[1];
-  if (tet.type->point_in_element(&tet, x)) {
+  if (tet.type->point_inside(&tet, x)) {
     feenox_free(tet.node);
     return 1;
   }
@@ -558,7 +558,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   tet.node[1] = element->node[1];
   tet.node[2] = element->node[2];
   tet.node[3] = element->node[7];
-  if (tet.type->point_in_element(&tet, x)) {
+  if (tet.type->point_inside(&tet, x)) {
     feenox_free(tet.node);
     return 1;
   }
@@ -568,7 +568,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   tet.node[1] = element->node[7];
   tet.node[2] = element->node[6];
   tet.node[3] = element->node[1];
-  if (tet.type->point_in_element(&tet, x)) {
+  if (tet.type->point_inside(&tet, x)) {
     feenox_free(tet.node);
     return 1;
   }
@@ -578,7 +578,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   tet.node[1] = element->node[7];
   tet.node[2] = element->node[6];
   tet.node[3] = element->node[1];
-  if (tet.type->point_in_element(&tet, x)) {
+  if (tet.type->point_inside(&tet, x)) {
     feenox_free(tet.node);
     return 1;
   }
@@ -589,7 +589,7 @@ int feenox_mesh_point_in_hexahedron(element_t *element, const double *x) {
   
 }
 
-double feenox_mesh_hex_vol(element_t *element) {
+double feenox_mesh_hex_volume(element_t *element) {
 
 
  if (element->volume == 0) {

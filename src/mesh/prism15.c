@@ -42,8 +42,8 @@ int feenox_mesh_prism15_init(void) {
   element_type->nodes_per_face = 8;   // Ojo aca que en nodos por cara pusimos el maximo valor (8) ya que depende de la cara
   element_type->h = feenox_mesh_prism15_h;
   element_type->dhdr = feenox_mesh_prism15_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_prism;
-  element_type->element_volume = feenox_mesh_prism_vol;
+  element_type->point_inside = feenox_mesh_point_in_prism;
+  element_type->volume = feenox_mesh_prism_volume;
 
     // coordenadas de los nodos
 /*  

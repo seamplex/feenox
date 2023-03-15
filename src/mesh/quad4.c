@@ -41,8 +41,9 @@ int feenox_mesh_quad4_init(void) {
   element_type->nodes_per_face = 2;
   element_type->h = feenox_mesh_quad4_h;
   element_type->dhdr = feenox_mesh_quad4_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_quadrangle;
-  element_type->element_volume = feenox_mesh_quad_vol;
+  element_type->point_inside = feenox_mesh_point_in_quadrangle;
+  element_type->volume = feenox_mesh_quad_volume;
+  element_type->area = feenox_mesh_quad_area;
 
   // from Gmsh’ doc
 /*
@@ -317,7 +318,7 @@ int feenox_mesh_point_in_quadrangle(element_t *element, const double *x) {
   return 0;
 }
 
-double feenox_mesh_quad_vol(element_t *this) {
+double feenox_mesh_quad_volume(element_t *this) {
 
   if (this->volume == 0) {
     this->volume = fabs(0.5*
@@ -329,3 +330,14 @@ double feenox_mesh_quad_vol(element_t *this) {
   return this->volume;
 }
 
+double feenox_mesh_quad_area(element_t *this) {
+
+  if (this->area == 0) {
+    this->area += sqrt(gsl_pow_2(this->node[0]->x[0] - this->node[1]->x[0]) + gsl_pow_2(this->node[0]->x[1] - this->node[1]->x[1]));
+    this->area += sqrt(gsl_pow_2(this->node[1]->x[0] - this->node[2]->x[0]) + gsl_pow_2(this->node[1]->x[1] - this->node[2]->x[1]));
+    this->area += sqrt(gsl_pow_2(this->node[2]->x[0] - this->node[3]->x[0]) + gsl_pow_2(this->node[2]->x[1] - this->node[3]->x[1]));
+    this->area += sqrt(gsl_pow_2(this->node[3]->x[0] - this->node[0]->x[0]) + gsl_pow_2(this->node[3]->x[1] - this->node[0]->x[1]));
+  }  
+  
+  return this->area;
+}

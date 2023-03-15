@@ -42,8 +42,9 @@ int feenox_mesh_triang3_init(void) {
   element_type->nodes_per_face = 2;
   element_type->h = feenox_mesh_triang3_h;
   element_type->dhdr = feenox_mesh_triang3_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_triangle;
-  element_type->element_volume = feenox_mesh_triang_vol;
+  element_type->point_inside = feenox_mesh_point_in_triangle;
+  element_type->volume = feenox_mesh_triang_volume;
+  element_type->area = feenox_mesh_triang_area;
 
   // from Gmsh’ doc
 /*
@@ -253,9 +254,21 @@ int feenox_mesh_point_in_triangle(element_t *element, const double *x) {
 }
 
 
-double feenox_mesh_triang_vol(element_t *this) {
+double feenox_mesh_triang_volume(element_t *this) {
   if (this->volume == 0) {
     this->volume = 0.5 * fabs(feenox_mesh_subtract_cross_2d(this->node[0]->x, this->node[1]->x, this->node[2]->x));
   }  
   return this->volume;
+}
+
+
+double feenox_mesh_triang_area(element_t *this) {
+
+  if (this->area == 0) {
+    this->area += sqrt(gsl_pow_2(this->node[0]->x[0] - this->node[1]->x[0]) + gsl_pow_2(this->node[0]->x[1] - this->node[1]->x[1]));
+    this->area += sqrt(gsl_pow_2(this->node[1]->x[0] - this->node[2]->x[0]) + gsl_pow_2(this->node[1]->x[1] - this->node[2]->x[1]));
+    this->area += sqrt(gsl_pow_2(this->node[2]->x[0] - this->node[0]->x[0]) + gsl_pow_2(this->node[2]->x[1] - this->node[0]->x[1]));
+  }  
+  
+  return this->area;
 }

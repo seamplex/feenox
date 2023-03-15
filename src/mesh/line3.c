@@ -43,8 +43,9 @@ int feenox_mesh_line3_init(void) {
   element_type->nodes_per_face = 1;
   element_type->h = feenox_mesh_line3_h;
   element_type->dhdr = feenox_mesh_line3_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_line;
-  element_type->element_volume = feenox_mesh_line_vol;
+  element_type->point_inside = feenox_mesh_point_in_line;
+  element_type->volume = feenox_mesh_line_volume;
+  element_type->area = feenox_mesh_line_area;  
 
   // from Gmsh’ doc
 /*

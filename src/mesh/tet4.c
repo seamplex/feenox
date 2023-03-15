@@ -43,8 +43,8 @@ int feenox_mesh_tet4_init(void) {
   element_type->nodes_per_face = 3;
   element_type->h = feenox_mesh_tet4_h;
   element_type->dhdr = feenox_mesh_tet4_dhdr;
-  element_type->point_in_element = feenox_mesh_point_in_tetrahedron;
-  element_type->element_volume = feenox_mesh_tet_vol;
+  element_type->point_inside = feenox_mesh_point_in_tetrahedron;
+  element_type->volume = feenox_mesh_tet_volume;
 
 
   // from Gmsh’ doc
@@ -346,7 +346,7 @@ int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
 }
 
 
-double feenox_mesh_tet_vol(element_t *this) {
+double feenox_mesh_tet_volume(element_t *this) {
 
   if (this->volume == 0) {
     double a[3], b[3], c[3];

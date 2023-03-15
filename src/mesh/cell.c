@@ -68,7 +68,7 @@ int feenox_mesh_element2cell(mesh_t *this) {
  */
       feenox_call(feenox_mesh_compute_element_barycenter(this->cell[i_cell].element, this->cell[i_cell].x));
       
-      this->cell[i_cell].volume = this->cell[i_cell].element->type->element_volume(this->cell[i_cell].element);      
+      this->cell[i_cell].volume = this->cell[i_cell].element->type->volume(this->cell[i_cell].element);      
       
       i_cell++;
 
@@ -85,7 +85,7 @@ int mesh_compute_coords(mesh_t *this) {
   size_t i = 0;
   for (i = 0; i < this->n_cells; i++) {
     feenox_call(feenox_mesh_compute_element_barycenter(this->cell[i].element, this->cell[i].x));
-    this->cell[i].volume = this->cell[i].element->type->element_volume(this->cell[i].element);
+    this->cell[i].volume = this->cell[i].element->type->volume(this->cell[i].element);
   }
   
   return FEENOX_OK;
