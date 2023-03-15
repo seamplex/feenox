@@ -86,7 +86,7 @@ for pde in *; do
   if [ -e ${pde}/methods.h ] && [ -e ${pde}/init.c ]; then
 
     echo "#include \"${pde}/methods.h\"" >> methods.h
-    echo "${pde}\\\\n\\" >> available.h
+    echo "${pde}\\n\\" >> available.h
 
     if [ ${first} -eq 0 ]; then
       sep="|"
