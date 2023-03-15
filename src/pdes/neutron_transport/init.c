@@ -202,6 +202,7 @@ int feenox_problem_init_parser_neutron_transport(void) {
     // and then we fill in the others
     switch (neutron_transport.N) {
       case 2:
+      {
         // table 4-1 from lewiss (p 162)
         // coincides with table 1 p 208 from stammler-abbate
         double s2_mu1 = 1.0/M_SQRT3;
@@ -212,9 +213,11 @@ int feenox_problem_init_parser_neutron_transport(void) {
         neutron_transport.Omega[0][2] = (feenox.pde.dim == 3) ? s2_mu1 : 0;  // if we don't set this to zero the anisotropic scattering fails in 2d
         
         neutron_transport.w[0] = s2_w1/(double)(N_octs);
+      }
       break;
       
       case 4:
+      {
         double s4_mu1 = 0.3500212;
         double s4_mu2 = sqrt(s4_mu1*s4_mu1 + (2-6*s4_mu1*s4_mu1) * (2-1) / (4-2));
         double s4_w1 = 1.0/3.0;
@@ -233,9 +236,11 @@ int feenox_problem_init_parser_neutron_transport(void) {
         neutron_transport.Omega[2][1] = s4_mu1;
         neutron_transport.Omega[2][2] = (feenox.pde.dim == 3) ? s4_mu1 : 0;
         neutron_transport.w[2] = s4_w1/(double)(N_octs);;
+      }
       break;
       
       case 6:
+      {
         double s6_mu1 = 0.2666355;
         double s6_mu2 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (2-1) / (6-2));
         double s6_mu3 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (3-1) / (6-2));
@@ -272,8 +277,8 @@ int feenox_problem_init_parser_neutron_transport(void) {
         neutron_transport.Omega[5][1] = s6_mu3;
         neutron_transport.Omega[5][2] = (feenox.pde.dim == 3) ? s6_mu1 : 0;
         neutron_transport.w[5] = s6_w1/(double)(N_octs);
-
-        break;
+      }
+      break;
         
 // TODO:
 // #define S8_MU1    0.2182179
