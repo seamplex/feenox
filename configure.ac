@@ -397,7 +397,7 @@ cat << EOF >> ${srcdir}/src/version.h
 #define FEENOX_COMPILER_VERSION     "$(${compiler_command} --version | head -n1)"
 #define FEENOX_COMPILER_CFLAGS      "${CFLAGS}"
 #define FEENOX_COMPILER_LDFLAGS     "${LDFLAGS}"
-#define FEENOX_COMPILER_SHOW        "${compiler_show}"
+#define FEENOX_COMPILER_SHOW        "$(echo ${compiler_show} | sed 's/"/\\"/g')"
 EOF
 
 
