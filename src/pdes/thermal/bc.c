@@ -166,7 +166,9 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
 
   // the h*Tref goes to b
   gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
+#ifdef HAVE_GSL_VECTOR_AXPBY
   feenox_call(gsl_vector_axpby(w*h*Tref, &H.vector, 1.0, feenox.pde.bi));
+#endif
   
 
 #endif

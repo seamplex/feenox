@@ -46,7 +46,9 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   if (thermal.q.defined) {
     double q = thermal.q.eval(&thermal.q, x, material);
     gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
+#ifdef HAVE_GSL_VECTOR_AXPBY
     feenox_call(gsl_vector_axpby(w*q, &H.vector, 1.0, feenox.pde.bi));
+#endif
   }
   
   if (feenox.pde.has_jacobian) {
