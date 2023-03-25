@@ -13,5 +13,6 @@ BC back   compression=0.345678901
 
 SOLVE_PROBLEM
 
+# WRITE_MESH $0.vtk VECTOR u v w sigmax sigmay sigmaz
 DUMP K K_bc b b_bc FORMAT octave 
 PRINT %.6f sigma1(0,0,0) sigma2(0,0,0) sigma3(0,0,0) SEP " "

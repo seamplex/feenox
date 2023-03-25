@@ -166,8 +166,8 @@ int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
                                         &sigma2,
                                         &sigma3);
     feenox_vector_set(mechanical.sigma1->vector_value, j, sigma1);
-    feenox_vector_set(mechanical.sigma1->vector_value, j, sigma2);
-    feenox_vector_set(mechanical.sigma1->vector_value, j, sigma3);
+    feenox_vector_set(mechanical.sigma2->vector_value, j, sigma2);
+    feenox_vector_set(mechanical.sigma3->vector_value, j, sigma3);
     
     if (mechanical.sigma->used) {
       feenox_vector_set(mechanical.sigma->vector_value, j, feenox_vonmises_from_principal(sigma1, sigma2, sigma3));

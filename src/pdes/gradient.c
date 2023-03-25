@@ -58,8 +58,7 @@ int feenox_problem_gradient_compute(void) {
   // step 1. sweep elements and compute tensors at each node of each element
   size_t progress = 0;
   unsigned int ascii_progress_chars = 0;
-  size_t i = 0;
-  for (i = 0; i < mesh->n_elements; i++) {
+  for (size_t i = 0; i < mesh->n_elements; i++) {
     if ((feenox.pde.progress_ascii == PETSC_TRUE) && (progress++ % step) == 0) {
       printf(CHAR_PROGRESS_GRADIENT);  
       fflush(stdout);
@@ -72,8 +71,7 @@ int feenox_problem_gradient_compute(void) {
   }
   
   // step 2. sweep nodes of the output mesh (same as input in smooth, rough in rough)
-  size_t j = 0;
-  for (j = 0; j < mesh->n_nodes; j++) {
+  for (size_t j = 0; j < mesh->n_nodes; j++) {
     if ((feenox.pde.progress_ascii == PETSC_TRUE) && (progress++ % step) == 0) {
       printf(CHAR_PROGRESS_GRADIENT);  
       fflush(stdout);
