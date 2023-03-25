@@ -51,40 +51,40 @@ int feenox_problem_solve_post_mechanical(void) {
     if (uses_displ_max) {
       displ2 = 0;
       for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-        displ2 += gsl_pow_2(feenox.pde.solution[g]->data_value[j]);
+        displ2 += gsl_pow_2(feenox_vector_get(feenox.pde.solution[g]->vector_value, j));
       }
       if (displ2 >= max_displ2) {
         max_displ2 = displ2;
 
         feenox_var_value(mechanical.displ_max) = sqrt(displ2);
-        feenox_var_value(mechanical.displ_max_x) = feenox.pde.solution[0]->data_argument[0][j];
-        feenox_var_value(mechanical.displ_max_y) = feenox.pde.solution[0]->data_argument[1][j];
+        feenox_var_value(mechanical.displ_max_x) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[0], j);
+        feenox_var_value(mechanical.displ_max_y) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[1], j);
         if (feenox.pde.dim == 3) {
-          feenox_var_value(mechanical.displ_max_z) = feenox.pde.solution[0]->data_argument[2][j];
+          feenox_var_value(mechanical.displ_max_z) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[2], j);
         }
 
-        feenox_var_value(mechanical.u_at_displ_max) = feenox.pde.solution[0]->data_value[j];
-        feenox_var_value(mechanical.v_at_displ_max) = feenox.pde.solution[1]->data_value[j];
+        feenox_var_value(mechanical.u_at_displ_max) = feenox_vector_get(feenox.pde.solution[0]->vector_value, j);
+        feenox_var_value(mechanical.v_at_displ_max) = feenox_vector_get(feenox.pde.solution[1]->vector_value, j);
         if (feenox.pde.dim == 3) {
-          feenox_var_value(mechanical.w_at_displ_max) = feenox.pde.solution[2]->data_value[j];
+          feenox_var_value(mechanical.w_at_displ_max) = feenox_vector_get(feenox.pde.solution[2]->vector_value, j);
         }
       }
     }
     
     if (uses_sigma_max) {
-      if (mechanical.sigma->data_value[j] > sigma_max) {
-        feenox_var_value(mechanical.sigma_max) = mechanical.sigma->data_value[j];
+      if (feenox_vector_get(mechanical.sigma->vector_value, j) > sigma_max) {
+        feenox_var_value(mechanical.sigma_max) = feenox_vector_get(mechanical.sigma->vector_value, j);
         // TODO: not cache friendly!
-        feenox_var_value(mechanical.sigma_max_x) = feenox.pde.solution[0]->data_argument[0][j];
-        feenox_var_value(mechanical.sigma_max_y) = feenox.pde.solution[0]->data_argument[1][j];
+        feenox_var_value(mechanical.sigma_max_x) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[0], j);
+        feenox_var_value(mechanical.sigma_max_y) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[1], j);
         if (feenox.pde.dim == 3) {
-          feenox_var_value(mechanical.sigma_max_z) = feenox.pde.solution[0]->data_argument[2][j];
+          feenox_var_value(mechanical.sigma_max_z) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[2], j);
         }  
 
-        feenox_var_value(mechanical.u_at_sigma_max) = feenox.pde.solution[0]->data_value[j];
-        feenox_var_value(mechanical.v_at_sigma_max) = feenox.pde.solution[1]->data_value[j];
+        feenox_var_value(mechanical.u_at_sigma_max) = feenox_vector_get(feenox.pde.solution[0]->vector_value, j);
+        feenox_var_value(mechanical.v_at_sigma_max) = feenox_vector_get(feenox.pde.solution[1]->vector_value, j);
         if (feenox.pde.dim == 3) {
-          feenox_var_value(mechanical.w_at_sigma_max) = feenox.pde.solution[2]->data_value[j];
+          feenox_var_value(mechanical.w_at_sigma_max) = feenox_vector_get(feenox.pde.solution[2]->vector_value, j);
         }
       }
     }

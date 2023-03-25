@@ -157,41 +157,21 @@ int function_set_buffered_data(function_t *function, double *buffer, size_t n_da
   }
   
   function->data_size = n_data / n_columns;
-
-  // the independent values
-  char *name = NULL;
-  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
-  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
-  feenox_call(feenox_vector_init(function->vector_value, 1));
-  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
-  feenox_free(name);
-
-  // the arguments
-  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
-  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
-  unsigned int i = 0;
-  for (i = 0; i < function->n_arguments; i++) {
-    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
-    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
-    feenox_call(feenox_vector_init(function->vector_argument[i], 1));
-    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
-    feenox_free(name);
-  }
+  feenox_call(feenox_create_pointwise_function_vectors(function));
   
-  size_t j = 0;
-  for (j = 0; j < function->data_size; j++) {
+  for (size_t j = 0; j < function->data_size; j++) {
+    int i = 0;
     for (i = 0; i < function->n_arguments; i++) {
-      gsl_vector_set(function->vector_argument[i]->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
+      feenox_vector_set(function->vector_argument[i], j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     }
     // remember than since 1971 now i has n_arguments+1
-    gsl_vector_set(function->vector_value->value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
+    feenox_vector_set(function->vector_value, j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     
     // TODO: check for monotonicity in 1D
     // to allow for steps
-    if (function->n_arguments == 1 && j > 1 && (function->data_argument[0][j] == function->data_argument[0][j-1])) {
-      function->data_argument[i][j] += 1e-6*(function->data_argument[0][j-1] - function->data_argument[0][j-2]);
+    if (function->n_arguments == 1 && j > 1 && (feenox_vector_get(function->vector_argument[0], j) == feenox_vector_get(function->vector_argument[0], j-1))) {
+      feenox_vector_add(function->vector_argument[i], j, 1e-6*(feenox_vector_get(function->vector_argument[0], j-1) - feenox_vector_get(function->vector_argument[0], j-2)));
     }
-    
   }
   
   return FEENOX_OK;
@@ -321,10 +301,6 @@ int feenox_function_init(function_t *this) {
           }
         }
 
-        if (this->data_argument[i] == NULL) {
-          this->data_argument[i] = gsl_vector_ptr(&feenox_var_value(this->vector_argument[i]), 0);
-        }  
-        
         if (this->vector_value->initialized == 0) {
           feenox_call(feenox_vector_init(this->vector_argument[i], 1));
         }
@@ -334,12 +310,18 @@ int feenox_function_init(function_t *this) {
         feenox_push_error_message("vector sizes do not match (%d and %d) in function '%s'", this->data_size, this->vector_value->size, this->name);
         return FEENOX_ERROR;
       }
-      if (this->data_value == NULL) {
-        this->data_value = gsl_vector_ptr(&feenox_var_value(this->vector_value), 0);
-      }
     }
-    
+
+
     if (this->mesh == NULL) {
+      
+      double **data_argument = NULL;
+      feenox_check_alloc(data_argument = calloc(this->n_arguments, sizeof(double *)));
+      for (int i = 0; i < this->n_arguments; i++) {
+        data_argument[i] = gsl_vector_ptr(feenox_value_ptr(this->vector_argument[i]), 0);
+      }
+      double *data_value = gsl_vector_ptr(this->vector_value->value, 0);
+      
       if (this->n_arguments == 1) {
 
         if (this->interp_type.name == NULL) {
@@ -355,21 +337,20 @@ int feenox_function_init(function_t *this) {
         this->interp_accel = gsl_interp_accel_alloc();
 
         feenox_push_error_message("in function %s", this->name);
-        gsl_interp_init(this->interp, this->data_argument[0], this->data_value, this->data_size);
+        gsl_interp_init(this->interp, data_argument[0], data_value, this->data_size);
         feenox_pop_error_message();
 
       } else {
 
         if (this->n_arguments == 2) {
-
-          if (this->data_argument != NULL) {
+          if (data_argument[0] != NULL) {
             // does it have a regular mesh in 2d?
             size_t nx = 0;
             size_t ny = 0;
-            if (feenox_function_is_structured_grid_2d(this->data_argument[0], this->data_argument[1], this->data_size, &nx, &ny)) {
+            if (feenox_function_is_structured_grid_2d(data_argument[0], data_argument[1], this->data_size, &nx, &ny)) {
               this->rectangular_mesh = 1;
               this->x_increases_first = 1;
-            } else if (feenox_function_is_structured_grid_2d(this->data_argument[1], this->data_argument[0], this->data_size, &ny, &nx)) {
+            } else if (feenox_function_is_structured_grid_2d(data_argument[1], data_argument[0], this->data_size, &ny, &nx)) {
               this->rectangular_mesh = 1;
               this->x_increases_first = 0;
             } else {
@@ -384,16 +365,15 @@ int feenox_function_init(function_t *this) {
           }  
 
         } else if (this->n_arguments == 3) {
-
-          if (this->data_argument != NULL) {
+          if (data_argument[0] != NULL) {
             // miramos si tiene una malla regular en 3d
             size_t nx = 0;
             size_t ny = 0;
             size_t nz = 0;
-            if (feenox_function_is_structured_grid_3d(this->data_argument[0], this->data_argument[1], this->data_argument[2], this->data_size, &nx, &ny, &nz)) {
+            if (feenox_function_is_structured_grid_3d(data_argument[0], data_argument[1], data_argument[2], this->data_size, &nx, &ny, &nz)) {
               this->rectangular_mesh = 1;
               this->x_increases_first = 1;
-            } else if (feenox_function_is_structured_grid_3d(this->data_argument[2], this->data_argument[1], this->data_argument[0], this->data_size, &nz, &ny, &nx)) {
+            } else if (feenox_function_is_structured_grid_3d(data_argument[2], data_argument[1], data_argument[0], this->data_size, &nz, &ny, &nx)) {
               this->rectangular_mesh = 1;
               this->x_increases_first = 0;
             } else {
@@ -463,7 +443,7 @@ int feenox_function_init(function_t *this) {
             step = 1;
             for (i = 0; i < this->n_arguments; i++) {
               for (j = 0; j < this->rectangular_mesh_size[i]; j++) {
-                this->rectangular_mesh_point[i][j] = this->data_argument[i][step*j];
+                this->rectangular_mesh_point[i][j] = data_argument[i][step*j];
               }
               step *= this->rectangular_mesh_size[i];
             }
@@ -472,7 +452,7 @@ int feenox_function_init(function_t *this) {
             for (i = 0; i < this->n_arguments; i++) {
               step /= this->rectangular_mesh_size[i];
               for (j = 0; j < this->rectangular_mesh_size[i]; j++) {
-                this->rectangular_mesh_point[i][j] = this->data_argument[i][step*j];
+                this->rectangular_mesh_point[i][j] = data_argument[i][step*j];
               }
             }
           }
@@ -499,13 +479,11 @@ int feenox_function_init(function_t *this) {
         feenox_check_alloc(point = calloc(this->n_arguments, sizeof(double)));
         this->kd = kd_create(this->n_arguments);
 
-        size_t j = 0;
-        unsigned int k = 0;
-        for (j = 0; j < this->data_size; j++) {
-          for (k = 0; k < this->n_arguments; k++) {
-            point[k] = this->data_argument[k][j];
+        for (size_t j = 0; j < this->data_size; j++) {
+          for (int k = 0; k < this->n_arguments; k++) {
+            point[k] = data_argument[k][j];
           }
-          kd_insert(this->kd, point, &this->data_value[j]);
+          kd_insert(this->kd, point, gsl_vector_ptr(feenox_value_ptr(this->vector_value), j));
         }
 
         feenox_free(point);
@@ -604,12 +582,12 @@ double feenox_function_eval(function_t *this, const double *const_x) {
     
     if (this->n_arguments == 1) {
 
-      if (x[0] < this->data_argument[0][0]) {
-        y = this->data_value[0];
-      } else if (x[0] > this->data_argument[0][this->data_size-1]) {
-        y = this->data_value[this->data_size-1];
+      if (x[0] < feenox_vector_get(this->vector_argument[0], 0)) {
+        y = feenox_vector_get(this->vector_value, 0);
+      } else if (x[0] > feenox_vector_get(this->vector_argument[0], this->data_size-1)) {
+        y = feenox_vector_get(this->vector_value, this->data_size-1);
       } else if (this->interp != NULL) {
-        y = gsl_interp_eval(this->interp, this->data_argument[0], this->data_value, x[0], this->interp_accel);
+        y = gsl_interp_eval(this->interp, gsl_vector_ptr(this->vector_argument[0]->value, 0), gsl_vector_ptr(this->vector_value->value, 0), x[0], this->interp_accel);
       }
 
     } else {
@@ -630,14 +608,13 @@ double feenox_function_eval(function_t *this, const double *const_x) {
         double den = 0;
         double w_i, y_i, dist2, diff;
       
-        size_t i = 0;
-        for (i = 0; i < this->data_size; i++) {
+        for (size_t i = 0; i < this->data_size; i++) {
         
-          y_i = this->data_value[i];
+          y_i = feenox_vector_get(this->vector_value, i);
       
           dist2 = 0;
           for (j = 0; j < this->n_arguments; j++) {
-            diff = (x[j]-this->data_argument[j][i]);
+            diff = (x[j] - feenox_vector_get(this->vector_argument[j], i));
             dist2 += diff*diff;
           }
           if (dist2 < this->multidim_threshold) {
@@ -760,7 +737,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
 
         if (flag) {
           // we've been asked a point of the definition
-          y = this->data_value[feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, c, this->x_increases_first)];
+          y = feenox_vector_get(this->vector_value, feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, c, this->x_increases_first));
         } else {
           // we need to interpolate
           for (i = 0; i < this->n_arguments; i++) {
@@ -785,7 +762,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
               // y tambien como es el termino correspondiente a la funcion de forma
               shape *= ((i & (1<<j)) == 0) ? (1.0-r[j]) : (1.0+r[j]);
             }
-            y += shape * this->data_value[feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, ctilde, this->x_increases_first)];
+            y += shape * feenox_vector_get(this->vector_value, feenox_structured_scalar_index(this->n_arguments, this->rectangular_mesh_size, ctilde, this->x_increases_first));
           }
         
           y *= 1.0/(1<<this->n_arguments);
@@ -828,7 +805,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
         for (j = 0; j < this->n_arguments; j++) {
 
           // leg es cateto en ingles segun google
-          leg = fabs(this->data_argument[j][i]-x[j]);
+          leg = fabs(data_argument[j][i]-x[j]);
 
           // si nos dieron una distancia caracteristica, entonces no hace falta
           // calcular todas las distancias, aquellos puntos que tengan al menos
@@ -882,7 +859,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
         // nos fabricamos una matriz para calcular los coeficientes del plano definido
         // por estos tres (o n) puntos
         for (j = 0; j < this->n_arguments; j++) {
-          gsl_matrix_set(A, i, j, this->data_argument[j][index[closest[i]]]);
+          gsl_matrix_set(A, i, j, data_argument[j][index[closest[i]]]);
         }
 
         gsl_matrix_set(A, i, this->n_arguments, 1);
@@ -943,7 +920,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
           for (i = 0; i < this->n_arguments; i++) {
             // arriba que quiere decir esta mantriz
             for (j = 0; j < this->n_arguments; j++) {
-              gsl_matrix_set(A, i, j, this->data_argument[j][index[closest[i]]]);
+              gsl_matrix_set(A, i, j, data_argument[j][index[closest[i]]]);
             }
             gsl_matrix_set(A, i, this->n_arguments, 1);
             // y el vector de terminos independientes para resolver el problema
@@ -952,7 +929,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
 
           // escribimos la ultima fila de la matriz con los nuevos valores
           for (j = 0; j < this->n_arguments; j++) {
-            gsl_matrix_set(A, this->n_arguments, j, this->data_argument[j][index[closest[k]]]);
+            gsl_matrix_set(A, this->n_arguments, j, data_argument[j][index[closest[k]]]);
           }
           gsl_matrix_set(A, this->n_arguments, this->n_arguments, 1);
 

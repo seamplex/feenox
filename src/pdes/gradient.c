@@ -40,12 +40,12 @@ int feenox_problem_gradient_compute(void) {
   
   unsigned int g = 0;
   unsigned int m = 0;
-  if (feenox.pde.gradient[0][0]->data_value == NULL) {
+  if (feenox.pde.gradient[0][0]->vector_value == NULL) {
     // gradient vector
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
         // derivative of the degree of freedom g with respect to dimension m
-        feenox_aux_solution_fill(feenox.pde, gradient[g][m]);
+        feenox_problem_fill_aux_solution(feenox.pde.gradient[g][m]);
 //        feenox_gradient_fill(feenox.pde, delta_gradient[g][m]);
       }
     }
@@ -87,7 +87,7 @@ int feenox_problem_gradient_compute(void) {
     // we now have the averages, now fill in the functions
     for (g = 0; g < feenox.pde.dofs; g++) {
       for (m = 0; m < feenox.pde.dim; m++) {
-        feenox.pde.gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].dphidx, g, m);
+        feenox_vector_set(feenox.pde.gradient[g][m]->vector_value, j, gsl_matrix_get(mesh->node[j].dphidx, g, m));
 //        feenox.pde.delta_gradient[g][m]->data_value[j] = gsl_matrix_get(mesh->node[j].delta_dphidx, g, m);
       }
     }

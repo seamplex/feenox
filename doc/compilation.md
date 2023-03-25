@@ -33,7 +33,8 @@ In particular, [PETSc](https://petsc.org/release/) (and [SLEPc](https://slepc.up
 
 ## Mandatory dependencies
 
-FeenoX has one mandatory dependency for run-time execution and the standard build toolchain for compilation. It is written in\ C99 so only a C compiler is needed, although `make` is also required. Free and open source compilers are favored. The usual C compiler is `gcc` but `clang` can also be used. Nevertheless, the non-free `icc` has also been tested.
+FeenoX has one mandatory dependency for run-time execution and the standard build toolchain for compilation. It is written in\ C99 so only a C compiler is needed, although `make` is also required. Free and open source compilers are favored.
+The usual C compiler is `gcc` but `clang` or Intel’s `icc` and the newer `icx` can also be used.
 
 Note that there is no need to have a Fortran nor a C++ compiler to build FeenoX. They might be needed to build other dependencies (such as PETSc and its dependencies), but not to compile FeenoX if all the dependencies are installed from the oeprating system's package repositories. In case the build toolchain is not already installed, do so with
 
@@ -664,47 +665,25 @@ By default the C flags are `-O3`, without debugging. To add the `-g` flag, just 
 
 ## Using a different compiler
 
-Without PETSc, FeenoX uses the `CC` environment variable to set the compiler. So configure like
+FeenoX uses the `CC` environment variable to set the compiler. So configure like
+
+```terminal
+export CC=clang; ./configure
+```
+
+Note that the `CC` variable has to be _exported_ and not _passed_ to configure. That is to say, don't configure like
 
 ```terminal
 ./configure CC=clang
 ```
 
-When PETSc is detected FeenoX uses the `mpicc` executable, which is a wrapper to an actual C compiler with extra flags needed to find the headers and the MPI library. To change the wrapped compiler, you should set `MPICH_CC` or `OMPI_CC`, depending if you are using MPICH or OpenMPI. For example, to force MPICH to use `clang` do
+Mind also the following environment variables when using MPI-enabled PETSc:
 
-```terminal
-./configure MPICH_CC=clang CC=clang
-```
+ * `MPICH_CC`
+ * `OMPI_CC`
+ * `I_MPI_CC`
 
-
-To know which is the default MPI implementation, just run `./configure` without arguments and pay attention to the "Compiler" line in the "Summary of dependencies" section. For example, for OpenMPI a typical summary would be
-
-```terminal
-## ----------------------- ##
-## Summary of dependencies ##
-## ----------------------- ##
-  GNU Scientific Library  from system
-  SUNDIALS                yes
-  PETSc                   yes /usr/lib/petsc 
-  SLEPc                   yes /usr/lib/slepc
-  Compiler                gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include -pthread -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
-```
-
-For MPICH:
-
-```terminal
-## ----------------------- ##
-## Summary of dependencies ##
-## ----------------------- ##
-  GNU Scientific Library  from system
-  SUNDIALS                yes
-  PETSc                   yes /home/gtheler/libs/petsc-3.15.0 arch-linux2-c-debug
-  SLEPc                   yes /home/gtheler/libs/slepc-3.15.1
-  Compiler                gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
-```
-
-Other non-free implementations like Intel\ MPI might work but were not tested. However, it should be noted that the MPI implementation used to compile FeenoX has to match the one used to compile PETSc. Therefore, if you compiled PETSc on your own, it is up to you to ensure MPI compatibility. If you are using PETSc as provided by your distribution's repositories, you will have to find out which one was used (it is usually OpenMPI) and use the same one when compiling FeenoX.
-
+Depending on how your system is configured, this last command might show `clang` but not actually use it.
 The FeenoX executable will show the configured compiler and flags when invoked with the `--versions` option:
 
 ```terminal
@@ -728,8 +707,30 @@ SLEPc version      : SLEPc Release Version 3.16.1, Nov 17, 2021
 $
 ```
 
-Note that the reported values are the ones used in `configure` and not in `make`.
-Thus, the recommended way to set flags is in `configure` and not in `make`.
+You can check which compiler was actually used by analyzing the `feenox` binary as
+
+```terminal
+$ objdump -s --section .comment ./feenox 
+
+./feenox:     file format elf64-x86-64
+
+Contents of section .comment:
+ 0000 4743433a 20284465 6269616e 2031322e  GCC: (Debian 12.
+ 0010 322e302d 31342920 31322e32 2e300044  2.0-14) 12.2.0.D
+ 0020 65626961 6e20636c 616e6720 76657273  ebian clang vers
+ 0030 696f6e20 31342e30 2e3600             ion 14.0.6.     
+$ 
+```
+
+It should be noted that the MPI implementation used to compile FeenoX has to match the one used to compile PETSc.
+Therefore, if you compiled PETSc on your own, it is up to you to ensure MPI compatibility.
+If you are using PETSc as provided by your distribution's repositories,
+you will have to find out which one was used (it is usually OpenMPI) and use the same one when compiling FeenoX.
+FeenoX has been tested using PETSc compiled with
+
+ * MPICH
+ * OpenMPI
+ * Intel MPI
 
 
 ## Compiling PETSc

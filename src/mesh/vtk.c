@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related vtk routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -21,6 +21,7 @@
  */
 #include "../feenox.h"
 #include "element.h"
+#include <ctype.h>
 
 
 #define BUFFER_SIZE 256
@@ -208,7 +209,7 @@ int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist) {
       for (int g = 0; g < dist->size; g++) {
         // TODO: remove the conditional from the loop
         double value = (dist->field[g]->type == function_type_pointwise_mesh_cell && dist->field[g]->mesh == this->mesh) ?
-                  dist->field[g]->data_value[i] :
+                  feenox_vector_get(dist->field[g]->vector_value, i) :
                   feenox_function_eval(dist->field[g], this->mesh->cell[i].x);
         fprintf(this->file->pointer, format, value);
       }
@@ -221,7 +222,7 @@ int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist) {
       for (int g = 0; g < dist->size; g++) {
         // TODO: remove the conditional from the loop
         double value = (dist->field[g]->type == function_type_pointwise_mesh_node && dist->field[g]->mesh == this->mesh) ?
-                  dist->field[g]->data_value[j] :
+                  feenox_vector_get(dist->field[g]->vector_value, j) :
                   feenox_function_eval(dist->field[g], this->mesh->node[j].x);
         fprintf(this->file->pointer, format, value);
       }
@@ -262,6 +263,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   // format has to be ASCII
   fgets(buffer, BUFFER_SIZE-1, fp);
   if (strncmp(buffer, "ASCII", 5) != 0) {
+    buffer[strlen(buffer)-1] = '\0';
     feenox_push_error_message("only ASCII VTK files are supported, not '%s'", buffer);
     return FEENOX_ERROR;
   }
@@ -298,7 +300,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   }
   
   if (strncmp(tmp, "double", 6) != 0 && strncmp(tmp, "float", 5) != 0) {
-    feenox_push_error_message("either float or double data expected");
+    feenox_push_error_message("either float or double data expected instead of '%s'", tmp);
     return FEENOX_ERROR;
   }
   
@@ -323,20 +325,73 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     }  
   } while (strncmp(buffer, "CELLS", 5) != 0);
   
-      
-  size_t numdata = 0;
-  if (sscanf(buffer, "CELLS %ld %ld", &this->n_elements, &numdata) != 2) {
+
+  size_t num_cells = 0;
+  size_t num_data = 0;
+  size_t num_indexes = 0;
+  if (sscanf(buffer, "CELLS %ld %ld", &num_cells, &num_data) != 2) {
     feenox_push_error_message("expected CELLS");
     return FEENOX_ERROR;
   }
   
+  // in vtk version 5.1 the cells are stored as offset + connectivy
   size_t *celldata = NULL;
-  feenox_check_alloc(celldata = calloc(numdata, sizeof(size_t)));
-  for (size_t i = 0; i < numdata; i++) {
-    if (fscanf(fp, "%ld", &celldata[i]) != 1) {
-      feenox_push_error_message("run out of CELLS data");
+  size_t *connectivity = NULL;
+  int offset_connectivity = 0;
+  int c = fgetc(fp);
+  if (isdigit(c)) {
+    // old-fashion 4.x format
+    offset_connectivity = 0;
+    num_indexes = num_data;
+    if (ungetc(c, fp) == EOF) {
       return FEENOX_ERROR;
-    }  
+    }
+    
+  } else if (c == 'O') {
+    // new 5.1 format OFFSET
+    offset_connectivity = 1;
+    num_indexes = num_cells;
+    num_cells--;
+    if (fscanf(fp, "FFSETS %s", tmp) != 1) {
+      feenox_push_error_message("expected OFFSETS");
+      return FEENOX_ERROR;
+    }
+  }
+  
+  
+  feenox_check_alloc(celldata = calloc(num_data, sizeof(size_t)));
+  for (size_t i = 0; i < num_indexes; i++) {
+    if (fscanf(fp, "%ld", &celldata[i]) != 1) {
+      feenox_push_error_message("ran out of CELLS data");
+      return FEENOX_ERROR;
+    }
+//    printf("%ld\t%ld\n", i, celldata[i]);
+  }
+  
+  if (offset_connectivity) {
+    // CONNECTIVITY vtktypeint64
+    do {
+      if (!feof(fp)) {
+        fgets(buffer, BUFFER_SIZE-1, fp);
+      } else {
+        feenox_push_error_message("expecting CONNECTIVITY");
+        return FEENOX_ERROR;
+      }  
+    } while (strncmp(buffer, "CONNECTIVITY", 12) != 0);    
+  
+    if (sscanf(buffer, "CONNECTIVITY %s", tmp) != 1) {
+      feenox_push_error_message("expected CONNECTIVITY");
+      return FEENOX_ERROR;
+    }
+
+    feenox_check_alloc(connectivity = calloc(num_data, sizeof(size_t)));
+    for (size_t i = 0; i < num_data; i++) {
+      if (fscanf(fp, "%ld", &connectivity[i]) != 1) {
+        feenox_push_error_message("ran out of CONNECTIVITY data");
+        return FEENOX_ERROR;
+      }
+//      printf("%ld\t%ld\n", i, connectivity[i]);
+    }
   }
   
 
@@ -350,42 +405,36 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     }  
   } while (strncmp(buffer, "CELL_TYPES", 10) != 0);
   
-  size_t check = 0;
-  if (sscanf(buffer, "CELL_TYPES %ld", &check) != 1) {
+  if (sscanf(buffer, "CELL_TYPES %ld", &this->n_elements) != 1) {
     feenox_push_error_message("expected CELL_TYPES");
     return FEENOX_ERROR;
   }
-  
-  if (this->n_elements != check) {
-    feenox_push_error_message("CELL has %ld and CELL_TYPES has %ld", this->n_elements, check);
-    return FEENOX_ERROR;
-  }
-  
-  
   
   size_t l = 0;
   feenox_check_alloc(this->element = calloc(this->n_elements, sizeof(element_t)));
   for (size_t i = 0; i < this->n_elements; i++) {
     int celltype = 0;
     if (fscanf(fp, "%d", &celltype) != 1) {
-      feenox_push_error_message("run out of CELLS data");
+      feenox_push_error_message("ran out of CELL_TYPES data");
       return FEENOX_ERROR;
     }
 
     // TODO: make a map
-    for (int k = 0; k < NUMBER_ELEMENT_TYPE; k++) {
+    for (int k = 0; k < NUMBER_ELEMENT_TYPE && this->element[i].type == NULL; k++) {
       if (vtkfromgmsh_types[k] == celltype) {
         this->element[i].type = &(feenox.mesh.element_types[k]);
       }
     }
     
+    size_t n_nodes = (offset_connectivity == 0) ? celldata[l++] : celldata[i+1] - celldata[i];
+    
     if (this->element[i].type == NULL) {
       // puede ser alguno de los high-order
       if (celltype == 60 || celltype == 68) {
         // line
-        if (celldata[l] == 2) {
+        if (n_nodes == 2) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE2];
-        } else if (celldata[l] == 3) {
+        } else if (n_nodes == 3) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE3];
         } else {
           feenox_push_error_message("high-order lines are supported up to order two");
@@ -393,9 +442,9 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       } else if (celltype == 61 || celltype == 69) {
         // triangle
-        if (celldata[l] == 3) {
+        if (n_nodes == 3) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
-        } else if (celldata[l] == 6) {
+        } else if (n_nodes == 6) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE6];
         } else {
           feenox_push_error_message("high-order triangles are supported up to order two");
@@ -403,11 +452,11 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       } else if (celltype == 62 || celltype == 70) {
         // quad
-        if (celldata[l] == 4) {
+        if (n_nodes == 4) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_QUADRANGLE4];
-        } else if (celldata[l] == 8) {
+        } else if (n_nodes == 8) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_QUADRANGLE8];
-        } else if (celldata[l] == 9) {
+        } else if (n_nodes == 9) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_QUADRANGLE9];
         } else {
           feenox_push_error_message("high-order quadrangles are supported up to order two");
@@ -415,9 +464,9 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       } else if (celltype == 64 || celltype == 71) {
         // tetrahedron
-        if (celldata[l] == 4) {
+        if (n_nodes == 4) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON4];
-        } else if (celldata[l] == 10) {
+        } else if (n_nodes == 10) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON10];
         } else {
           feenox_push_error_message("high-order tetrahedra are supported up to order two");
@@ -425,11 +474,11 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       } else if (celltype == 67 || celltype == 72) {
         // hexahedron
-        if (celldata[l] == 8) {
+        if (n_nodes == 8) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON8];
-        } else if (celldata[l] == 20) {
+        } else if (n_nodes == 20) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON20];
-        } else if (celldata[l] == 27) {
+        } else if (n_nodes == 27) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON27];
         } else {
           feenox_push_error_message("high-order hexahedra are supported up to order two");
@@ -437,7 +486,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       } else if (celltype == 65 || celltype == 73) {
         // prism/wedge
-        if (celldata[l] == 6) {
+        if (n_nodes == 6) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM6];
         } else {
           feenox_push_error_message("high-order wedges are supported up to order one");
@@ -445,7 +494,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       } else if (celltype == 66 || celltype == 74) {
         // prism/wedge
-        if (celldata[l] == 5) {
+        if (n_nodes == 5) {
           this->element[i].type = &feenox.mesh.element_types[ELEMENT_TYPE_PYRAMID5];
         } else {
           feenox_push_error_message("high-order pyramids are supported up to order one");
@@ -453,8 +502,6 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         }
       }
     }
-    
-    
     
     // element type
     if (this->element[i].type == NULL) {
@@ -467,8 +514,8 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     }
     
     // nodes, we have the data in celldata
-    if (this->element[i].type->nodes != celldata[l++]) {
-      feenox_push_error_message("CELL %d gives %d nodes but type '%s' has %d nodes", i, celldata[l], this->element[i].type->name, this->element[i].type->nodes);
+    if (this->element[i].type->nodes != n_nodes) {
+      feenox_push_error_message("CELL %d gives %d nodes but type '%s' has %d nodes", i, n_nodes, this->element[i].type->name, this->element[i].type->nodes);
       return FEENOX_ERROR;
     }
     
@@ -494,13 +541,15 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         j_gmsh = j;
       }
       
-      this->element[i].node[j_gmsh] = &this->node[celldata[l++]];
+      size_t node_index = (offset_connectivity == 0) ? celldata[l++] : connectivity[celldata[i]+j];
+      this->element[i].node[j_gmsh] = &this->node[node_index];
       feenox_mesh_add_element_to_list(&this->element[i].node[j_gmsh]->element_list, &this->element[i]);
     }
   }
 
 
   // we have the mesh already, now we peek what else the file has
+  // TODO: CELL_DATA
   while (fgets(buffer, BUFFER_SIZE-1, fp) != NULL) {
     
     if (strncmp("POINT_DATA", buffer, 10) == 0) {
@@ -537,7 +586,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       if (strncmp(tmp, "double", 6) != 0 &&
           strncmp(tmp, "float", 5) != 0 &&
           strncmp(tmp, "int", 3) != 0) {
-        feenox_push_error_message("either int, float or double data expected");
+        feenox_push_error_message("either int, float or double data expected instead of '%s'", tmp);
         return FEENOX_ERROR;
       }
 
@@ -577,47 +626,48 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       if (scalar == NULL && vector[0] == NULL && vector[1] == NULL && vector[2] == NULL) {
         continue;
       }
+  
+      // dummy lookup_table
+      int c = fgetc(fp);
+      if (ungetc(c, fp) == EOF) {
+        return FEENOX_ERROR;
+      }
+      if (c == 'L') {
+        fgets(buffer, BUFFER_SIZE-1, fp);
+      }
       
-      // LOOKUP_TABLE default (only for scalars)
       if (vector_function == 0) {
-        do {
-          if (!feof(fp)) {
-            fgets(buffer, BUFFER_SIZE-1, fp);
-          } else {
-            feenox_push_error_message("expecting LOOKUP_TABLE");
-            return FEENOX_ERROR;
-          }  
-        } while (strncmp(buffer, "LOOKUP_TABLE", 12) != 0);
-      
+        
         // if we made it down here, we have a function
-        scalar->type = function_type_pointwise_mesh_node;
-        scalar->mesh = this;
         if (this->nodes_argument == NULL) {
           feenox_call(feenox_mesh_create_nodes_argument(this));
         }
-        scalar->data_argument = this->nodes_argument;
+
+        scalar->type = function_type_pointwise_mesh_node;
+        scalar->mesh = this;
         scalar->data_size = this->n_nodes;
-        feenox_check_alloc(scalar->data_value = calloc(this->n_nodes, sizeof(double)));
+        scalar->vector_value->size = this->n_nodes;
+        feenox_call(feenox_vector_init(scalar->vector_value, 1));        
       
+        double xi = 0;
         for (size_t j = 0; j < this->n_nodes; j++) {
-          if (fscanf(fp, "%lf", &scalar->data_value[j]) != 1) {
+          if (fscanf(fp, "%lf", &xi) != 1) {
             feenox_push_error_message("ran out of SCALARS data");
             return FEENOX_ERROR;
-          }  
+          }
+          feenox_vector_set(scalar->vector_value, j, xi);
         }
         
       } else {
 
         for (int i = 0; i < 3; i++) {
           if (vector[i] != NULL) {
+            // if we made it down here, we have a function
             vector[i]->type = function_type_pointwise_mesh_node;
             vector[i]->mesh = this;
-            if (this->nodes_argument == NULL) {
-              feenox_call(feenox_mesh_create_nodes_argument(this));
-            }
-            vector[i]->data_argument = this->nodes_argument;
             vector[i]->data_size = this->n_nodes;
-            feenox_check_alloc(vector[i]->data_value = calloc(this->n_nodes, sizeof(double)));
+            vector[i]->vector_value->size = this->n_nodes;
+            feenox_call(feenox_vector_init(vector[i]->vector_value, 1));        
           }  
         }
       
@@ -630,7 +680,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
             
           for (int i = 0; i < 3; i++) {
             if (vector[i] != NULL) {
-              vector[i]->data_value[j] = f[i];
+              feenox_vector_set(vector[i]->vector_value, j, f[i]);
             }
           }  
         }

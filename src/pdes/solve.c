@@ -97,21 +97,20 @@ int feenox_problem_phi_to_solution(Vec phi) {
   petsc_call(VecGetArray(phi_full, &phi_full_array));
   
   // make up G functions with the solution
-  size_t j = 0;
-  for (j = 0; j < feenox.pde.spatial_unknowns; j++) {
+  for (size_t j = 0; j < feenox.pde.spatial_unknowns; j++) {
     
     if (feenox.pde.mesh->node[j].phi == NULL) {
       feenox_check_alloc(feenox.pde.mesh->node[j].phi = calloc(feenox.pde.dofs, sizeof(double)));
     }
     
-    for (int g = 0; g < feenox.pde.dofs; g++) {
+    for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.mesh->node[j].phi[g] = phi_full_array[feenox.pde.mesh->node[j].index_dof[g]];
 
       // if we are not in rough mode we fill the solution here
       // because it is easier, in rough mode we need to
       // iterate over the elements instead of over the nodes
       if (feenox.pde.rough == 0) {
-        feenox.pde.solution[g]->data_value[j] = feenox.pde.mesh->node[j].phi[g];
+        feenox_vector_set(feenox.pde.solution[g]->vector_value, j, feenox.pde.mesh->node[j].phi[g]);
       }
         
       if (feenox.pde.nev > 1) {
@@ -120,7 +119,8 @@ int feenox_problem_phi_to_solution(Vec phi) {
           // the values already have the excitation factor
           PetscInt index = feenox.pde.mesh->node[j].index_dof[g];
           petsc_call(VecGetValues(feenox.pde.eigenvector[i], 1, &index, &xi));
-          feenox.pde.mode[g][i]->data_value[j] = xi;
+          feenox_vector_set(feenox.pde.mode[g][i]->vector_value, j, xi);
+          // TODO: point this to the former!
           feenox_vector_set(feenox.pde.vectors.phi[i], j, xi);
         }
       }
@@ -136,14 +136,11 @@ int feenox_problem_phi_to_solution(Vec phi) {
     node_t *node;  
     // in rough mode we need to iterate over the elements first and then over the nodes
     // TODO: see if the order of the loops is the optimal one
-    unsigned int g = 0;
-    size_t i = 0;
-    size_t j = 0;
-    for (g = 0; g < feenox.pde.dofs; g++) {
-      for (i = 0; i < feenox.pde.mesh_rough->n_elements; i++) {
-        for (j = 0; j < feenox.pde.mesh_rough->element[i].type->nodes; j++) {
+    for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+      for (size_t i = 0; i < feenox.pde.mesh_rough->n_elements; i++) {
+        for (size_t j = 0; j < feenox.pde.mesh_rough->element[i].type->nodes; j++) {
           node = feenox.pde.mesh_rough->element[i].node[j];  
-          feenox.pde.solution[g]->data_value[node->index_mesh] = node->phi[g];  
+          feenox_vector_set(feenox.pde.solution[g]->vector_value, node->index_mesh, node->phi[g]);
         }
       }
     }

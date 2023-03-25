@@ -73,7 +73,6 @@ Optimizations
     over those
 -   rewrite fem.c to store per-gauss point data in a cache-friendly way
 -   remove branches
--   think about inline - LTO?
 -   use ad-hoc matrices instead of gsl_matrix?
     -   have a contiguous array of memory that stores all the
         per-element matrices in a row-major order
@@ -132,8 +131,6 @@ Nice to have
 Command-line arguments
 
 -   list symbols with -l (is there any clash with petsc?)
--   $1 = ${1}
--   $0 should have the main input file basename (without the extension)
 
 Error handling
 
@@ -191,7 +188,6 @@ Mechanical
 
 -   non-linear
 -   stresses: count negative jacobians and worst jacobians
--   stress linearization (per-problem parser)
 -   strain energy (global and local)
 
 Modal
@@ -200,7 +196,6 @@ Modal
 
 Neutron
 
--   transport
 -   FVM
 -   benchmarks
 -   Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE

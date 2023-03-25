@@ -33,26 +33,26 @@
 
 int feenox_problem_gradient_fill_mechanical(void) {
   
-  feenox_aux_solution_fill(mechanical, sigmax);
-  feenox_aux_solution_fill(mechanical, sigmay);
-  feenox_aux_solution_fill(mechanical, tauxy);
+  feenox_problem_fill_aux_solution(mechanical.sigmax);
+  feenox_problem_fill_aux_solution(mechanical.sigmay);
+  feenox_problem_fill_aux_solution(mechanical.tauxy);
   if (feenox.pde.dofs == 3) {
-    feenox_aux_solution_fill(mechanical, sigmaz);
-    feenox_aux_solution_fill(mechanical, tauyz);
-    feenox_aux_solution_fill(mechanical, tauzx);
+    feenox_problem_fill_aux_solution(mechanical.sigmaz);
+    feenox_problem_fill_aux_solution(mechanical.tauyz);
+    feenox_problem_fill_aux_solution(mechanical.tauzx);
   }
   
   // if one is used, all of them are
   if (mechanical.sigma1->used || mechanical.sigma2->used || mechanical.sigma3->used) {
-    feenox_aux_solution_fill(mechanical, sigma1);
-    feenox_aux_solution_fill(mechanical, sigma2);
-    feenox_aux_solution_fill(mechanical, sigma3);
+    feenox_problem_fill_aux_solution(mechanical.sigma1);
+    feenox_problem_fill_aux_solution(mechanical.sigma2);
+    feenox_problem_fill_aux_solution(mechanical.sigma3);
   }
   if (mechanical.sigma->used) {
-    feenox_aux_solution_fill(mechanical, sigma);
+    feenox_problem_fill_aux_solution(mechanical.sigma);
   }
   if (mechanical.tresca->used) {
-    feenox_aux_solution_fill(mechanical, tresca);
+    feenox_problem_fill_aux_solution(mechanical.tresca);
   }
   
   return FEENOX_OK;
@@ -139,13 +139,13 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
 
 int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
   
-  mechanical.sigmax->data_value[j] = mesh->node[j].flux[FLUX_SIGMAX];
-  mechanical.sigmay->data_value[j] = mesh->node[j].flux[FLUX_SIGMAY];
-  mechanical.tauxy->data_value[j] = mesh->node[j].flux[FLUX_TAUXY];
+  feenox_vector_set(mechanical.sigmax->vector_value, j, mesh->node[j].flux[FLUX_SIGMAX]);
+  feenox_vector_set(mechanical.sigmay->vector_value, j, mesh->node[j].flux[FLUX_SIGMAY]);
+  feenox_vector_set(mechanical.tauxy->vector_value, j, mesh->node[j].flux[FLUX_TAUXY]);
   if (feenox.pde.dofs == 3) {
-    mechanical.sigmaz->data_value[j] = mesh->node[j].flux[FLUX_SIGMAZ];
-    mechanical.tauyz->data_value[j] = mesh->node[j].flux[FLUX_TAUYZ];
-    mechanical.tauzx->data_value[j] = mesh->node[j].flux[FLUX_TAUZX];
+    feenox_vector_set(mechanical.sigmaz->vector_value, j, mesh->node[j].flux[FLUX_SIGMAZ]);
+    feenox_vector_set(mechanical.tauyz->vector_value, j, mesh->node[j].flux[FLUX_TAUYZ]);
+    feenox_vector_set(mechanical.tauzx->vector_value, j, mesh->node[j].flux[FLUX_TAUZX]);
   }
 
   if ((mechanical.sigma1 != NULL && mechanical.sigma1->used) ||
@@ -153,32 +153,36 @@ int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
       (mechanical.sigma3 != NULL && mechanical.sigma3->used) ||
       (mechanical.tresca != NULL && mechanical.tresca->used)) {
     
+    double sigma1 = 0;
+    double sigma2 = 0;
+    double sigma3 = 0;
     feenox_principal_stress_from_cauchy(mesh->node[j].flux[FLUX_SIGMAX],
                                         mesh->node[j].flux[FLUX_SIGMAY],
                                         mesh->node[j].flux[FLUX_SIGMAZ],
                                         mesh->node[j].flux[FLUX_TAUXY],
                                         mesh->node[j].flux[FLUX_TAUYZ],
                                         mesh->node[j].flux[FLUX_TAUZX],
-                                        &mechanical.sigma1->data_value[j],
-                                        &mechanical.sigma2->data_value[j],
-                                        &mechanical.sigma3->data_value[j]);
+                                        &sigma1,
+                                        &sigma2,
+                                        &sigma3);
+    feenox_vector_set(mechanical.sigma1->vector_value, j, sigma1);
+    feenox_vector_set(mechanical.sigma1->vector_value, j, sigma2);
+    feenox_vector_set(mechanical.sigma1->vector_value, j, sigma3);
     
     if (mechanical.sigma->used) {
-      mechanical.sigma->data_value[j] = feenox_vonmises_from_principal(mechanical.sigma1->data_value[j],
-                                                                       mechanical.sigma2->data_value[j],
-                                                                       mechanical.sigma3->data_value[j]);
+      feenox_vector_set(mechanical.sigma->vector_value, j, feenox_vonmises_from_principal(sigma1, sigma2, sigma3));
     }
     if (mechanical.tresca->used) {
-      mechanical.tresca->data_value[j] = mechanical.sigma1->data_value[j] - mechanical.sigma3->data_value[j];
+      feenox_vector_set(mechanical.tresca->vector_value, j, sigma1 - sigma3);
     }
   } else if (mechanical.sigma->used) {
     
-    mechanical.sigma->data_value[j] = feenox_vonmises_from_stress_tensor(mesh->node[j].flux[FLUX_SIGMAX],
+    feenox_vector_set(mechanical.sigma->vector_value, j, feenox_vonmises_from_stress_tensor(mesh->node[j].flux[FLUX_SIGMAX],
                                                                          mesh->node[j].flux[FLUX_SIGMAY],
                                                                          mesh->node[j].flux[FLUX_SIGMAZ],
                                                                          mesh->node[j].flux[FLUX_TAUXY],
                                                                          mesh->node[j].flux[FLUX_TAUYZ],
-                                                                         mesh->node[j].flux[FLUX_TAUZX]);    
+                                                                         mesh->node[j].flux[FLUX_TAUZX]));
     
   }
   

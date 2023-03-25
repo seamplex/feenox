@@ -53,10 +53,10 @@ int feenox_problem_solve_post_neutron_transport(void) {
     double factor = num/den;
   
     // normalize the fluxes
-    size_t j = 0;
-    for (j = 0; j < feenox.pde.mesh->n_nodes; j++) {
+    for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
       for (g = 0; g < feenox.pde.dofs; g++) {
-        feenox.pde.solution[g]->data_value[j] *= factor;
+        double xi = feenox_vector_get(feenox.pde.solution[g]->vector_value, j);
+        feenox_vector_set(feenox.pde.solution[g]->vector_value, j, factor*xi);
       }
     }  
 #endif
@@ -65,16 +65,17 @@ int feenox_problem_solve_post_neutron_transport(void) {
   
   // compute the scalar fluxes out of the directional fluxes
   for (unsigned int g = 0; g < neutron_transport.groups; g++) {
-    feenox_aux_solution_fill(neutron_transport, phi[g]);
+    feenox_problem_fill_aux_solution(neutron_transport.phi[g]);
   }
   
   for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
     for (unsigned int g = 0; g < neutron_transport.groups; g++) {
       double xi = 0;
       for (unsigned int n = 0; n < neutron_transport.directions; n++) {
-        xi += neutron_transport.w[n] * feenox.pde.solution[n * neutron_transport.groups + g]->data_value[j];
+        xi += neutron_transport.w[n] * feenox_vector_get(feenox.pde.solution[n * neutron_transport.groups + g]->vector_value, j);
       }
-      neutron_transport.phi[g]->data_value[j] = xi;
+      // TODO: wrapper, the pde has to set the function value not the vector
+      feenox_vector_set(neutron_transport.phi[g]->vector_value, j, xi);
     }
   }  
   

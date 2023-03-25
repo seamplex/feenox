@@ -1351,7 +1351,7 @@ int feenox_parse_function_vectors(function_t *function) {
 
   function->type = function_type_pointwise_data;
   feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
-  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
+//  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
   
   unsigned int i = 0;
   for (i = 0; i < function->n_arguments; i++) {
@@ -1376,28 +1376,7 @@ int feenox_parse_function_mesh(function_t *function) {
     return FEENOX_ERROR;
   }
   
-  // TODO: unify code, this is repeated in buffered_data
-  // the independent values
-  char *name = NULL;
-  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
-  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
-//  feenox_call(feenox_vector_init(function->vector_value, 1));
-//  function->data_value = gsl_vector_ptr(function->vector_value->value, 0);
-  feenox_free(name);
-
-  // the arguments
-  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
-  feenox_check_alloc(function->data_argument = calloc(function->n_arguments, sizeof(double *)));
-  unsigned int i = 0;
-  for (i = 0; i < function->n_arguments; i++) {
-    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
-    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
-//    feenox_call(feenox_vector_init(function->vector_argument[i], 1));
-//    function->data_argument[i] = gsl_vector_ptr(function->vector_argument[i]->value, 0);
-    feenox_free(name);
-  }
-
-  
+  feenox_call(feenox_create_pointwise_function_vectors(function));
   
   return FEENOX_OK;
 }
@@ -2204,6 +2183,9 @@ int feenox_parse_read_mesh(void) {
       feenox_check_alloc(node_data = calloc(1, sizeof(node_data_t)));
       feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
       node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
+      node_data->function->mesh = mesh;
+      feenox_call(feenox_create_pointwise_function_vectors(node_data->function));
+      
       LL_APPEND(mesh->node_datas, node_data);
       
       // if they asked for a vector we have to define the three functions

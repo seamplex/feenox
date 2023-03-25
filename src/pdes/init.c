@@ -348,7 +348,7 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   }
   // we don't have a valid mesh here, do we?
 //  (*function)->mesh = feenox.pde.mesh; // esto puede cambiar a rough despues  
-  feenox_problem_define_solution_clean_nodal_arguments(*function);
+//  feenox_problem_define_solution_clean_nodal_arguments(*function);
   (*function)->var_argument = feenox.pde.solution[0]->var_argument;
   (*function)->type = (feenox.mesh.default_field_location == field_location_cells) ? function_type_pointwise_mesh_cell : function_type_pointwise_mesh_node;
   (*function)->is_gradient = is_gradient;
@@ -356,29 +356,16 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   return FEENOX_OK;
 }
 
-/*
-int fino_function_clean_nodal_data(function_t *function) {
- 
-  if (function != NULL && function->data_value != NULL) {  
-    feenox_free(function->data_value);
-    function->data_value = NULL;
+int feenox_problem_fill_aux_solution(function_t *function) {
+  function->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough;
+  function->data_size = function->mesh->n_nodes;
+  feenox_call(feenox_create_pointwise_function_vectors(function));
+  for (unsigned int m = 0; m < function->n_arguments; m++) {
+    feenox_realloc_vector_ptr(function->vector_argument[m], gsl_vector_ptr(function->mesh->nodes_argument[m], 0), 0);
   }
-  
-  return 0;
-}
-*/
-int feenox_problem_define_solution_clean_nodal_arguments(function_t *function) {
- 
-  if (function->data_argument != NULL) {
-    for (unsigned int m = 0; m < feenox.pde.dim; m++) {
-      feenox_free(function->data_argument[m]);
-    }
-    feenox_free(function->data_argument);
-  }
-  
+
   return FEENOX_OK;
 }
-
 
 int feenox_problem_init_runtime_general(void) {
 
@@ -566,8 +553,7 @@ int feenox_problem_init_runtime_general(void) {
     for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
       feenox.pde.solution[g]->mesh = feenox.pde.mesh;
       feenox.pde.solution[g]->data_size = feenox.pde.spatial_unknowns;
-      feenox.pde.solution[g]->data_argument = feenox.pde.mesh->nodes_argument;
-      feenox_check_alloc(feenox.pde.solution[g]->data_value = calloc(feenox.pde.spatial_unknowns, sizeof(double)));
+      feenox_create_pointwise_function_vectors(feenox.pde.solution[g]);
     
       // in some cases (e.g. neutron) we do not know if we have to solve
       // a KSP or an EPS until we read the material data, which is far too late
@@ -576,9 +562,8 @@ int feenox_problem_init_runtime_general(void) {
         unsigned int i = 0;
         for (i = 0; i < feenox.pde.nev; i++) {
           feenox.pde.mode[g][i]->mesh = feenox.pde.mesh;
-          feenox.pde.mode[g][i]->data_argument = feenox.pde.solution[0]->data_argument;
           feenox.pde.mode[g][i]->data_size = feenox.pde.mesh->n_nodes;
-          feenox_check_alloc(feenox.pde.mode[g][i]->data_value = calloc(feenox.pde.spatial_unknowns, sizeof(double)));
+          feenox_create_pointwise_function_vectors(feenox.pde.mode[g][i]);
         }
       }
     }

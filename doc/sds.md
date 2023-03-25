@@ -1,7 +1,7 @@
 ---
 title: FeenoX Software Design Specification
 lang: en-US
-abstract: This Software Design Specifications (SDS) document applies to an imaginary Software Requirement Specifications (SRS) document issued by a fictitious agency asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. The latter can be seen as a request for quotation and the former as an offer for the fictitious tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
+abstract: This Software Design Specifications (SDS) document applies to an imaginary Software Requirement Specifications (SRS) document issued by a fictitious agency asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. The latter can be seen as a “Request for Quotation” and the former as an offer for the fictitious tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
 number-sections: true
 toc: true
 documentclass: report
@@ -265,7 +265,7 @@ $ wget http://gmsh.info/bin/Linux/gmsh-Linux64.tgz
 $ wget https://seamplex.com/feenox/dist/linux/feenox-linux-amd64.tar.gz
 ```
 
-Appendix has @sec:download more details about how to download and compile FeenoX. The full documentation contains a [compilation guide](https://seamplex.com/feenox/doc/compilation.html) with further detailed explanations of each of the steps involved.
+Appendix @sec:download has more details about how to download and compile FeenoX. The full documentation contains a [compilation guide](https://seamplex.com/feenox/doc/compilation.html) with further detailed explanations of each of the steps involved.
 Since all the commands needed to either download a binary executable or to compile from source with customized optimization flags can be automatized, FeenoX can be built into a container such as Docker. This way, deployment and scalability can be customized and tweaked as needed.
 
 
@@ -396,8 +396,9 @@ To have an actual parametric run, an external loop has to successively call Feen
 ```{.feenox include="cantilever.fee"}
 ```
 
-::: {#fig:cantilever-mesh}
+::: {#fig:cantilever-mesh layout-ncol=2}
 ![Tetrahedra](cantilever-tet.png){width_latex=49%}
+
 ![Hexahedra](cantilever-hex.png){width_latex=49%}
 
 Cantilevered beam meshed with structured tetrahedra and hexahedra
@@ -500,7 +501,7 @@ Even though FeenoX is still evolving so it could be premature in many cases, it 
 
 The large memory consumption shown by FeenoX is due to a high level of caching intermediate results. For instance, all the shape functions evaluated at the integration points are computed once when building the stiffness matrix, stored in RAM and then re-used when recovering the gradients of the displacements needed to compute the stresses.  There are also a number of non-premature optimization tasks that can improve both the CPU and memory usage that ought to be performed at later stages of the project.
 
-::: {#fig:le10-tet}
+::: {#fig:le10-tet layout-ncol=2}
 ![Wall time vs. number of degrees of freedom](wall-dofs-tet.svg){#fig:wall-dofs-tet width_html=100% width_latex=90%}
 
 ![Memory vs. number of degrees of freedom](memory-dofs-tet.svg){#fig:memory-dofs-tet width_html=100% width_latex=90%}
@@ -529,8 +530,9 @@ It might seem that the most effective approach to solve a large problem is to us
 In many ways, the pure MPI mode has fewer synchronizations and thus should perform better.
 Hence, FeenoX uses MPI (mainly through PETSc and SLEPc) to handle large parallel problems.
 
-::: {#fig:nafems-le1-metis}
+::: {#fig:nafems-le1-metis layout-ncol=2}
 ![Structured grid](nafems-le1-struct-metis.png){width=49%}
+
 ![Unstructured grid](nafems-le1-unstruct-metis.png){width=49%}
 
 Partition of the [2D NAFEMS LE1](https://www.seamplex.com/feenox/examples/#nafems-le1-elliptical-membrane-plane-stress-benchmark) domain into four different sub-domains computed in [Gmsh](http://gmsh.info/) using [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
@@ -619,7 +621,7 @@ Note that FeenoX is flexible enough to...
  3. understand that the problem is non-linear so as to use PETSc’s SNES framework automatically (the conductivity and power source depend on the temperature).
 
  
-::: {#fig:two-squares-results}
+::: {#fig:two-squares-results layout-ncol=2}
 ![Temperature defined at nodes](two-squares-temperature.png){width_latex=75%  width_html=100%}
 
 ![Conductivity defined at cells](two-squares-conductivity.png){width_latex=75%  width_html=100%}
@@ -687,6 +689,7 @@ Indeed, each of the supported problems, namely
  * [`mechanical`](https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical)
  * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
  * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
+ * [`neutron_transport`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_transport)
 
 is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods (recall that they are function pointers) that are resolved at runtime when parsing the main input file.
 
@@ -868,7 +871,7 @@ Of course these kind of FeenoX-generated tables can be inserted verbatim into Ma
 
 
 
-::: {#fig:latex-tables}
+::: {#fig:latex-tables layout-ncol=1}
 ![A multi-billion-dollar agency using the Windows philosophy (presumably mouse-based copy and paste into Word)](nureg.png)
 
 ![A small third-world consulting company using the Unix philosophy (FeenoX+AWK+LaTeX)](cne.png){#fig:cne}
@@ -1253,8 +1256,9 @@ t = 0.003;
 ```
 
 
-::: {#fig:highlighting}
+::: {#fig:highlighting layout-ncol=2}
 ![Kate](highlighting-kate.png){width=49%}
+
 ![Vim](highlighting-vim.png){width=49%}
 
 Syntax highlighitng of input files in GUI and cloud-friendly text editors
@@ -1478,8 +1482,9 @@ $ feenox mechanical-square-uniform.fee
 $
 ```
 
-::: {#fig:mechanical-square}
+::: {#fig:mechanical-square layout-ncol=2}
 ![Temperature-dependent\ $E$](mechanical-square-temperature.png){width_latex=49%}
+
 ![Uniform $E$ for reference](mechanical-square-uniform.png){width_latex=49%}
 
 Mechanical plane-strain square with temperature-dependent Young modulus and comparison with uniform reference case.
@@ -1620,7 +1625,7 @@ w(x,y,z) &= -\nu\cdot \left[A\cdot x z + B\cdot yz + C/2\cdot \left(z^2-y^2+\fra
 $$
 
 where~$A=0.002$, $B=0.003$, $C=0.004$ and~$D=0.76$.
-The reference results are the temperature at points O and D and the displacements at points A and D (@tab:parallelepiped} (table~\ref{tab:reference}).
+The reference results are the temperature at points O and D and the displacements at points A and D (@tbl:parallelepiped}.
 
 Point |  Unknown  |  Reference value
 :----:|:---------:|:---------------------
@@ -1633,16 +1638,16 @@ Point |  Unknown  |  Reference value
       |    $v$    | -1.785
       |    $w$    | -2.0075
 
-: Reference results the original benchmark problem {#tab:parallelepiped}
+: Reference results the original benchmark problem {#tbl:parallelepiped}
 
 First, the thermal problem is solved with FeenoX and the temperature distribution $T(x,y,z)$ is written into a `.msh` file.
 
 ```{.feenox include="neutron-diffusion-1d-null.fee"}
 ```
 
-Then, the mechanical problem reads two meshes: one for solving the actual mechanical problem and another one for reading $T(x,y,z)$ from the previous step. Note that the former contains second-order hexahedra and the latter first-order tetrahedra. After effectively solving the problem, it writes again @tab:parallelepiped in Markdown. 
+Then, the mechanical problem reads two meshes: one for solving the actual mechanical problem and another one for reading $T(x,y,z)$ from the previous step. Note that the former contains second-order hexahedra and the latter first-order tetrahedra. After effectively solving the problem, it writes again @tbl:parallelepiped in Markdown. 
 
-The FeenoX implementation illustrates several design features, namely
+The FeenoX implementation illustrates several design features, namely????????????
 
  
 
@@ -1696,9 +1701,10 @@ $
 
 Besides being ASCII files, should special characters be needed for any reason within a particular application of FeenoX, UTF-8 characters can be used natively as illustrated in @fig:utf-8.
 
-::: {#fig:utf-8}
+::: {#fig:utf-8 layout-ncol=2}
 ![UTF-8 in Kate](utf8-kate.png)
-![UTF-8 in Bash (through Konsole)](utf8-shell.png}
+
+![UTF-8 in Bash (through Konsole)](utf8-shell.png)
 
 Mechanical plane-strain square with temperature-dependent Young modulus and comparison with uniform reference case.
 :::
@@ -1774,8 +1780,9 @@ $ diff mechanical-square-temperature-from-msh.fee mechanical-square-temperature.
 $ 
 ```
 
-::: {#fig:mechanical-square-from-temp}
+::: {#fig:mechanical-square-from-temp layout-ncol=2}
 ![Numerical temperature$T(x,y)$ as the result of a thermal problem over an unstructured grid](thermal-square-temperature.png){width_latex=42%}
+
 ![Plane-strain with temperature-dependent$E(T)$ case](mechanical-square-temperature-from-msh.png){width_latex=55%}
 
 Mechanical plane-strain square with temperature-dependent Young modulus read from a non-conformal mesh as the result of a thermal problem. Compare with @fig:mechanical-square.
@@ -1821,7 +1828,6 @@ regressions, example of the change of a sign
 
 github
 
-mailing listings
 
 ## Verification {#sec:verification}
 

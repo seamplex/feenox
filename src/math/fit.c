@@ -140,7 +140,7 @@ int feenox_instruction_fit(void *arg) {
 void feenox_fit_update_x(fit_t *this, size_t j) {
   unsigned int i = 0;
   for (i = 0; i < this->data->n_arguments; i++) {
-    this->x[i] = this->data->data_argument[i][j];
+    this->x[i] = feenox_vector_get(this->data->vector_argument[i], j);
     feenox_var_value(this->function->var_argument[i]) = this->x[i];
   }
   return;
@@ -179,7 +179,7 @@ int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f) {
   size_t j = 0;
   for (j = 0; j < this->n_data; j++) {
     feenox_fit_update_x(this, j);
-    gsl_vector_set(f, j, feenox_fit_in_range(this) ? (feenox_function_eval(this->function, this->x) - this->data->data_value[j]) : 0);
+    gsl_vector_set(f, j, feenox_fit_in_range(this) ? (feenox_function_eval(this->function, this->x) - feenox_vector_get(this->data->vector_value, j)) : 0);
   }
 //  feenox_debug_print_gsl_vector(f, stdout);
 

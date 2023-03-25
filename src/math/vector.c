@@ -21,6 +21,38 @@
  */
 #include "feenox.h"
 
+// TODO: put the realloc thing inside this one
+int feenox_create_pointwise_function_vectors(function_t *function) {
+
+  // the independent values
+  char *name = NULL;
+  feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
+  feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
+  if (function->data_size != 0) {
+    feenox_call(feenox_vector_init(function->vector_value, 1));
+  }
+  feenox_free(name);
+
+  // the arguments
+  feenox_check_alloc(function->vector_argument = calloc(function->n_arguments, sizeof(vector_t *)));
+  if (function->var_argument == NULL) {
+    feenox_check_alloc(function->var_argument = calloc(function->n_arguments, sizeof(double *)));
+  }
+  for (int i = 0; i < function->n_arguments; i++) {
+    if (function->var_argument[i] == NULL) {
+      function->var_argument[i] = feenox.mesh.vars.arr_x[i];
+    }
+    feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
+    feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
+    if (function->data_size != 0) {
+      feenox_call(feenox_vector_init(function->vector_argument[i], 1));
+    }
+    feenox_free(name);
+  }  
+    
+  return FEENOX_OK;
+}
+
 double feenox_vector_get(vector_t *this, const size_t i) {
 
   if (this->initialized == 0) {
@@ -67,6 +99,20 @@ int feenox_vector_set(vector_t *this, const size_t i, double value) {
   }
   
   gsl_vector_set(feenox_value_ptr(this), i, value);
+  
+  return FEENOX_OK;
+}
+
+int feenox_vector_add(vector_t *this, const size_t i, double value) {
+  
+  if (this->initialized == 0) {
+    if (feenox_vector_init(this, 0) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+      return FEENOX_ERROR;
+    }
+  }
+  
+  gsl_vector_set(feenox_value_ptr(this), i, gsl_vector_get(feenox_value_ptr(this), i) + value);
   
   return FEENOX_OK;
 }

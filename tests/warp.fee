@@ -1,0 +1,19 @@
+READ_MESH ${1}.vtk DIMENSIONS 3 {
+  READ_FIELD u_v_w1 AS u
+  READ_FIELD u_v_w2 AS v
+  READ_FIELD u_v_w3 AS w
+}
+
+VECTOR dxv[nodes]
+VECTOR dyv[nodes]
+VECTOR dzv[nodes]
+
+DEFAULT_ARGUMENT_VALUE 2 1e5
+k = $2
+
+dxv[i] = vec_u_x[i] + k*vec_u[i]
+dyv[i] = vec_u_y[i] + k*vec_v[i]
+dzv[i] = vec_u_z[i] + k*vec_w[i]
+
+# PRINT_VECTOR dxv dyv dzv
+PRINT %.5f dxv[1] vec_u_x[1] vec_u[1] SEP " "

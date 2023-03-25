@@ -102,7 +102,8 @@ The sources are in the [doc][] directory of the Git repository.
     decisions and features included in FeenoX.
 
 - [Software Requirements specifications][1] [PDF][] (Fictitious RFQ)
-- [Software Design specifications][2] [PDF][3] (Imaginary FeenoX’ offer)
+- [Software Design specifications][2] [PDF][3] (Imaginary FeenoX’s
+  offer)
 - [Mid-term PhD review presentation slides with the SRS/SDS explanation
   in PDF][] (August 2021).
   - [Video recording of the presentation][] (Slides are in English but
@@ -134,8 +135,10 @@ The sources are in the [doc][] directory of the Git repository.
 
 ## Frequently Asked Questions
 
-Check out FeenoX’ [Frequently Asked Questions][] \* Ask yours on [GitHub
-Discussions][] \* Check also the [GitHub Issues][]
+Check out FeenoX’s [Frequently Asked Questions][].
+
+- Ask yours on [GitHub Discussions][]
+- Check also the [GitHub Issues][]
 
   [Frequently Asked Questions]: ./FAQ.md
   [GitHub Discussions]: https://github.com/seamplex/feenox/discussions/

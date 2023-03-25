@@ -44,7 +44,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           element = mesh->cell[i].element;
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
-            integral += function->data_value[i] * mesh->cell[i].element->type->volume(mesh->cell[i].element);
+            integral += feenox_vector_get(function->vector_value, i) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
           }
         }
       } else {
@@ -80,7 +80,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
 
               double xi = 0;
               for (unsigned int j = 0; j < element->type->nodes; j++) {
-                xi += element->type->gauss[mesh->integration].h[v][j] * function->data_value[element->node[j]->tag - 1];
+                xi += element->type->gauss[mesh->integration].h[v][j] * feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
               }
 
               integral += element->w[v] * xi;
@@ -167,7 +167,7 @@ double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function
  
     xi = 0;
     for (j = 0; j < this->type->nodes; j++) {
-      xi += this->type->gauss[mesh->integration].h[v][j] * function->data_value[this->node[j]->index_mesh];
+      xi += this->type->gauss[mesh->integration].h[v][j] * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
     }
 
     integral += this->w[v] * xi;

@@ -321,7 +321,7 @@ int feenox_instruction_print_function(void *arg) {
         // los argumentos de la primera funcion
         for (int k = 0; k < print_function->first_function->n_arguments; k++) {
           // nos acordamos los argumentos para las otras funciones que vienen despues
-          x[k] = print_function->first_function->data_argument[k][j];
+          x[k] = feenox_vector_get(print_function->first_function->vector_argument[k], j);
           fprintf(print_function->file->pointer, print_function->format, x[k]);
           fprintf(print_function->file->pointer, "%s", print_function->separator);
         }
@@ -338,8 +338,8 @@ int feenox_instruction_print_function(void *arg) {
             
             if (print_token->function == print_function->first_function || print_token->function->data_size == print_function->first_function->data_size) {
               // la primera funcion tiene los puntos posta asi que no hay que interpolar
-              if (print_token->function->data_value != NULL) {
-                fprintf(print_function->file->pointer, print_function->format, print_token->function->data_value[j]);
+              if (print_token->function->vector_value != NULL) {
+                fprintf(print_function->file->pointer, print_function->format, feenox_vector_get(print_token->function->vector_value, j));
               } else {
                 fprintf(print_function->file->pointer, print_function->format, 0.0);
               }
@@ -367,8 +367,8 @@ int feenox_instruction_print_function(void *arg) {
               print_function->first_function->n_arguments == 2 &&
               print_function->first_function->rectangular_mesh &&
               j != print_function->first_function->data_size &&
-              gsl_fcmp(print_function->first_function->data_argument[0][j], print_function->first_function->data_argument[0][j+1], print_function->first_function->multidim_threshold) != 0 &&
-              gsl_fcmp(print_function->first_function->data_argument[1][j], print_function->first_function->data_argument[1][j+1], print_function->first_function->multidim_threshold) != 0) {
+              gsl_fcmp(feenox_vector_get(print_function->first_function->vector_argument[0], j), feenox_vector_get(print_function->first_function->vector_argument[0], j+1), print_function->first_function->multidim_threshold) != 0 &&
+              gsl_fcmp(feenox_vector_get(print_function->first_function->vector_argument[1], j), feenox_vector_get(print_function->first_function->vector_argument[1], j+1), print_function->first_function->multidim_threshold) != 0) {
             fprintf(print_function->file->pointer, "\n");
           }
           

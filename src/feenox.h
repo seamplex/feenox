@@ -214,12 +214,6 @@ extern "C++" {
   if (type.name.defined == 0) { feenox_push_error_message("undefined %s '%s'", description, quoted_name);  return FEENOX_ERROR; } \
   if (type.name.full == 0) { feenox_push_error_message("%s '%s' is not defined over all volumes", description, quoted_name); return FEENOX_ERROR; } }
 
-#define feenox_aux_solution_fill(location, fun_nam) {\
-  location.fun_nam->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough; \
-  location.fun_nam->data_argument = location.fun_nam->mesh->nodes_argument;   \
-  location.fun_nam->data_size = location.fun_nam->mesh->n_nodes; \
-  feenox_check_alloc(location.fun_nam->data_value = calloc(location.fun_nam->mesh->n_nodes, sizeof(double))); }
-
 enum version_type {
   version_compact,
   version_copyright,
@@ -538,14 +532,9 @@ struct function_t {
   // number of tuples (independent, dependent) data for pointwise functions
   size_t data_size;
 
-  // arrays with the data 
+  // vectors with the data 
   vector_t **vector_argument;
   vector_t *vector_value;
-
-  double **data_argument;
-  double *data_value;
-  int data_argument_allocated;
-
   
   // this is in case there is a derivative of a mesh-based function and
   // we want to interpolate with the shape functions
@@ -1251,8 +1240,8 @@ struct mesh_t {
   expr_t offset_y;               // offset en nodos
   expr_t offset_z;               // offset en nodos
     
-  double **nodes_argument;
-  double **cells_argument;
+  gsl_vector **nodes_argument;
+  gsl_vector **cells_argument;
 
   node_data_t *node_datas;
   
@@ -2076,12 +2065,14 @@ extern int feenox_instruction_reaction(void *arg);
 extern int feenox_matrix_init(matrix_t *);
 
 // vector.c
+extern int feenox_create_pointwise_function_vectors(function_t *function);
 extern int feenox_vector_init(vector_t *, int no_initial);
 extern int feenox_instruction_sort_vector(void *arg);
 extern double feenox_vector_get(vector_t *, const size_t i);
 extern double feenox_vector_get_initial_static(vector_t *, const size_t i);
 extern double feenox_vector_get_initial_transient(vector_t *, const size_t i);
 extern int feenox_vector_set(vector_t *, const size_t i, double value);
+extern int feenox_vector_add(vector_t *this, const size_t i, double value);
 extern int feenox_vector_set_size(vector_t *, const size_t size);
 
 // function.c
@@ -2260,7 +2251,7 @@ extern int feenox_problem_init_parser_general(void);
 extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function, int is_gradient);
-extern int feenox_problem_define_solution_clean_nodal_arguments(function_t *);
+extern int feenox_problem_fill_aux_solution(function_t *function);
 #ifdef HAVE_PETSC
 extern Mat feenox_problem_create_matrix(const char *name);
 extern Vec feenox_problem_create_vector(const char *name); 

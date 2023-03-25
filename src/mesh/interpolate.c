@@ -29,7 +29,7 @@ struct mesh_interp_params {
 
 double feenox_mesh_interpolate_function_node(struct function_t *this, const double *x) {
   
-  if (this->data_value == NULL) {
+  if (this->vector_value == NULL) {
     return 0;
   }
 
@@ -40,17 +40,17 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
   switch (this->mesh->dim) {
     case 1:
       if (gsl_pow_2(fabs(x[0]-nearest_node->x[0])) < gsl_pow_2(this->multidim_threshold)) {
-        return this->data_value[nearest_node->index_mesh];
+        return feenox_vector_get(this->vector_value, nearest_node->index_mesh);
       }
     break;
     case 2:
       if (feenox_mesh_subtract_squared_module2d(x, nearest_node->x) < gsl_pow_2(this->multidim_threshold)) {
-        return this->data_value[nearest_node->index_mesh];
+        return feenox_vector_get(this->vector_value, nearest_node->index_mesh);
       }
     break;
     case 3:
       if (feenox_mesh_subtract_squared_module(x, nearest_node->x) < gsl_pow_2(this->multidim_threshold)) {
-        return this->data_value[nearest_node->index_mesh];
+        return feenox_vector_get(this->vector_value, nearest_node->index_mesh);
       }
     break;
   }
@@ -63,7 +63,7 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
     }
   } else {
     // should we return the nearest node value?
-    return this->data_value[nearest_node->index_mesh];
+    return feenox_vector_get(this->vector_value, nearest_node->index_mesh);
   }
   
   // compute the interpolation
@@ -71,7 +71,7 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
   if (this->spatial_derivative_of == NULL) {
     
     for (int j = 0; j < element->type->nodes; j++) {
-      y += element->type->h(j, r) * this->data_value[element->node[j]->index_mesh];
+      y += element->type->h(j, r) * feenox_vector_get(this->vector_value, element->node[j]->index_mesh);
     }
     
   } else {
@@ -82,7 +82,7 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
       
     for (int j = 0; j < element->type->nodes; j++) {
       y += gsl_matrix_get(dhdx, j, this->spatial_derivative_with_respect_to)
-            * this->spatial_derivative_of->data_value[element->node[j]->index_mesh];
+            * feenox_vector_get(this->spatial_derivative_of->vector_value, element->node[j]->index_mesh);
     }
     
     gsl_matrix_free(dhdx);

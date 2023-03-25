@@ -50,7 +50,15 @@ int feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents) 
 
 int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents) {
   
-  double *oldptr = gsl_vector_ptr(feenox_value_ptr(this), 0);
+  if (newptr == NULL) {
+    feenox_push_error_message("newptr is null");
+    return FEENOX_ERROR;
+  }
+  
+  double *oldptr = NULL;
+  if (feenox_value_ptr(this) != NULL) {
+    oldptr = gsl_vector_ptr(feenox_value_ptr(this), 0);
+  }
 
   // si copy_contents es true copiamos el contenido del vector de feenox
   // antes de tirar el apuntador a la basura
@@ -58,7 +66,10 @@ int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents)
     memcpy(newptr, oldptr, this->size * sizeof(double));
   }
 
-  // si el puntero es de feenox, lo liberamos
+  if (oldptr == NULL) {
+    feenox_check_alloc(feenox_value_ptr(this) = gsl_vector_alloc(this->size));
+  }
+  
   if (this->reallocated == 0) {
     if (feenox_value_ptr(this)->stride != 1) {
       feenox_push_error_message("vector '%s' cannot be realloced: stride not equal to 1", this->name);

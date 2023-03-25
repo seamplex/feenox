@@ -164,9 +164,9 @@ int feenox_instruction_mesh_read(void *arg) {
     feenox_call(feenox_mesh_element2cell(this));
     feenox_check_alloc(this->cells_argument = calloc(this->dim, sizeof(double *)));
     for (unsigned int m = 0; m < this->dim; m++) {
-      feenox_check_alloc(this->cells_argument[m] = calloc(this->n_cells, sizeof(double)));
+      feenox_check_alloc(this->cells_argument[m] = gsl_vector_alloc(this->n_cells));
       for (size_t i = 0; i < this->n_cells; i++) {
-        this->cells_argument[m][i] = this->cell[i].x[m]; 
+        gsl_vector_set(this->cells_argument[m], i, this->cell[i].x[m]); 
       }
     }
   }
@@ -269,16 +269,20 @@ int feenox_instruction_mesh_read(void *arg) {
   function_t *function = NULL;
   for (function = feenox.functions; function != NULL; function = function->hh.next) {
     if (function->mesh == this && function->vector_argument != NULL) {
-      function->data_size = this->n_nodes;
-      function->data_argument = this->nodes_argument;
-      for (unsigned int g = 0; g < function->n_arguments; g++) {
-        function->vector_argument[g]->size = function->data_size;
-        feenox_call(feenox_vector_init(function->vector_argument[g], 1));
-        feenox_call(feenox_realloc_vector_ptr(function->vector_argument[g], function->data_argument[g], 0));
-      }  
+      
+      // TODO: cells
+      if (function->data_size == 0) {
+        function->data_size = this->n_nodes;
+      } else if (function->data_size != this->n_nodes) {
+        feenox_push_error_message("internal mismatch, data size = %ld != n_ndoes = %ld", function->data_size, this->n_nodes);
+      }
+      for (unsigned int m = 0; m < this->dim; m++) {
+        function->vector_argument[m]->size = function->data_size;
+        feenox_call(feenox_vector_init(function->vector_argument[m], 1));
+        feenox_realloc_vector_ptr(function->vector_argument[m], gsl_vector_ptr(this->nodes_argument[m], 0), 0);
+      }
       function->vector_value->size = function->data_size;
       feenox_call(feenox_vector_init(function->vector_value, 1));
-      function->data_value = gsl_vector_ptr(feenox_value_ptr(function->vector_value), 0);
     }
   }
   
@@ -644,12 +648,10 @@ mesh_t *feenox_get_mesh_ptr(const char *name) {
 int feenox_mesh_create_nodes_argument(mesh_t *this) {
   
   feenox_check_alloc(this->nodes_argument = calloc(this->dim, sizeof(double *)));
-  size_t j = 0;
-  unsigned int m = 0;
-  for (m = 0; m < this->dim; m++) {
-    feenox_check_alloc(this->nodes_argument[m] = calloc(this->n_nodes, sizeof(double)));
-    for (j = 0; j < this->n_nodes; j++) {
-      this->nodes_argument[m][j] = this->node[j].x[m]; 
+  for (unsigned int m = 0; m < this->dim; m++) {
+    feenox_check_alloc(this->nodes_argument[m] = gsl_vector_alloc(this->n_nodes));
+    for (size_t j = 0; j < this->n_nodes; j++) {
+      gsl_vector_set(this->nodes_argument[m], j, this->node[j].x[m]); 
     }  
   }
   

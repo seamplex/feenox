@@ -27,9 +27,9 @@
 #define feenox_store_extrema_function(minmax, ind, val) \
   value[minmax] = val;  \
   index[minmax] = ind;  \
-  x[minmax] = function->data_argument[0][ind];  \
-  y[minmax] = (function->n_arguments > 1)?function->data_argument[1][ind] : 0;  \
-  z[minmax] = (function->n_arguments > 2)?function->data_argument[2][ind] : 0;
+  x[minmax] = feenox_vector_get(function->vector_argument[0], ind);  \
+  y[minmax] = (function->n_arguments > 1)?feenox_vector_get(function->vector_argument[1], ind) : 0;  \
+  z[minmax] = (function->n_arguments > 2)?feenox_vector_get(function->vector_argument[2], ind) : 0;
 
 #define feenox_store_extrema_mesh(minmax, ind, val, where) \
   value[minmax] = val;  \
@@ -59,7 +59,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
       if (function->mesh == mesh && ((mesh_find_extrema->field_location == field_location_cells && function->type == function_type_pointwise_mesh_cell) ||
                                      (mesh_find_extrema->field_location == field_location_nodes && function->type == function_type_pointwise_mesh_node))) {
         for (size_t i = 0; i < function->data_size; i++) {
-          val = function->data_value[i];
+          val = feenox_vector_get(function->vector_value, i);
           if (val > value[FEENOX_EXTREMA_MAX]) {
             feenox_store_extrema_function(FEENOX_EXTREMA_MAX, i, val);
           }
@@ -202,7 +202,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           for (i = 0; i < physical_group->n_elements; i++) {
             element_t *element = &mesh->element[physical_group->element[i]];
             for (j = 0; j < element->type->nodes; j++) {
-              val = function->data_value[element->node[j]->index_mesh];
+              val = feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
               if (val > value[FEENOX_EXTREMA_MAX]) {
                 feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, element->node[j]->index_mesh, val, element->node[j]->x);
               }

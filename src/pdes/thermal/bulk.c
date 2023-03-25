@@ -58,7 +58,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
     double T = 0;
     double Tj = 0;
     for (unsigned int j = 0; j < nodes; j++) {
-      Tj = feenox.pde.solution[0]->data_value[e->node[j]->index_dof[0]];
+      Tj = feenox_vector_get(feenox.pde.solution[0]->vector_value, e->node[j]->index_dof[0]);
       gsl_matrix_set(local_vec_T, j, 0, Tj);
       T += gsl_matrix_get(e->H[v], 0, j) * Tj; 
     }  

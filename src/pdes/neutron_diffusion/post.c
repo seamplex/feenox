@@ -37,13 +37,11 @@ int feenox_problem_solve_post_neutron_diffusion(void) {
     // normalization without power
     double num = 0;
     double den = 0;
-    unsigned int g = 0;
-    size_t i = 0;
-    for (i = 0; i < feenox.pde.mesh->n_elements; i++) {
+    for (size_t i = 0; i < feenox.pde.mesh->n_elements; i++) {
       element_t *element = &feenox.pde.mesh->element[i]; 
       if (element->type != NULL && element->type->dim == feenox.pde.dim) {
         num += element->type->volume(element);
-        for (g = 0; g < feenox.pde.dofs; g++) {
+        for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
           den += feenox_mesh_integral_over_element(element, feenox.pde.mesh, feenox.pde.solution[g]);
         }
       }
@@ -52,10 +50,10 @@ int feenox_problem_solve_post_neutron_diffusion(void) {
     double factor = num/den;
   
     // normalize the fluxes
-    size_t j = 0;
-    for (j = 0; j < feenox.pde.mesh->n_nodes; j++) {
-      for (g = 0; g < feenox.pde.dofs; g++) {
-        feenox.pde.solution[g]->data_value[j] *= factor;
+    for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
+      for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+        double xi = feenox_vector_get(feenox.pde.solution[g]->vector_value, j);
+        feenox_vector_set(feenox.pde.solution[g]->vector_value, j, factor*xi);        
       }
     }  
 #endif

@@ -24,11 +24,11 @@
 
 int feenox_problem_gradient_fill_thermal(void) {
   
-  feenox_aux_solution_fill(thermal, qx);
+  feenox_problem_fill_aux_solution(thermal.qx);
   if (feenox.pde.dim > 1) {
-    feenox_aux_solution_fill(thermal, qy);
+    feenox_problem_fill_aux_solution(thermal.qy);
     if (feenox.pde.dim > 2) {
-      feenox_aux_solution_fill(thermal, qz);
+      feenox_problem_fill_aux_solution(thermal.qz);
     }
   }
   
@@ -69,11 +69,12 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node_t *n
 
 int feenox_problem_gradient_fill_fluxes_thermal(mesh_t *mesh, size_t j) {
   
-  thermal.qx->data_value[j] = mesh->node[j].flux[0];
+  // TODO: wrappers so pdes don't have to access the vectors
+  feenox_vector_set(thermal.qx->vector_value, j, mesh->node[j].flux[0]);
   if (feenox.pde.dim > 1) {
-    thermal.qy->data_value[j] = mesh->node[j].flux[1];
+    feenox_vector_set(thermal.qx->vector_value, j, mesh->node[j].flux[1]);
     if (feenox.pde.dim > 2) {
-      thermal.qz->data_value[j] = mesh->node[j].flux[2];
+      feenox_vector_set(thermal.qx->vector_value, j, mesh->node[j].flux[2]);
     }
   }
   

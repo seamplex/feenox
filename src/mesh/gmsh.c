@@ -904,38 +904,31 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       }
       
       
-      for (g = 0; g < dofs; g++) {
-        // TODO: use vectors instead of argument_data
-        if (functions[g]->data_size != num_nodes) {
-          functions[g]->type = function_type_pointwise_mesh_node;
-          functions[g]->mesh = this;
-          if (this->nodes_argument == NULL) {
-            feenox_call(feenox_mesh_create_nodes_argument(this));
-          }
-          functions[g]->data_argument = this->nodes_argument;
-          functions[g]->data_size = num_nodes;
-          if (functions[g]->data_value != NULL) {
-            feenox_free(functions[g]->data_value);
-          }
-          feenox_check_alloc(functions[g]->data_value = calloc(num_nodes, sizeof(double)));
-        }  
+      if (this->nodes_argument == NULL) {
+        feenox_call(feenox_mesh_create_nodes_argument(this));
+      }
+      for (unsigned int g = 0; g < dofs; g++) {
+        functions[g]->type = function_type_pointwise_mesh_node;
+        functions[g]->data_size = num_nodes;
+        functions[g]->mesh = this;
+        functions[g]->vector_value->size = num_nodes;
+        feenox_call(feenox_vector_init(functions[g]->vector_value, 1));
       }  
 
       feenox_mesh_gmsh_readnewline();
       
-      size_t j = 0;
       int node = 0;
       double value = 0;
-      for (j = 0; j < num_nodes; j++) {
+      for (size_t j = 0; j < num_nodes; j++) {
         feenox_call(feenox_gmsh_read_data_int(this, 1, &node, binary));
-        for (g = 0; g < dofs; g++) {
+        for (unsigned int g = 0; g < dofs; g++) {
           feenox_call(feenox_gmsh_read_data_double(this, 1, &value, binary));
         
           if ((node_index = (this->sparse==0) ? node-1 : this->tag2index[node]) < 0) {
             feenox_push_error_message("node %d does not exist", node);
             return FEENOX_ERROR;
           }
-          functions[g]->data_value[node_index] = value;
+          feenox_vector_set(functions[g]->vector_value, node_index, value);
         }  
       }
 
@@ -1090,7 +1083,7 @@ int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist) {
       fprintf(this->file->pointer, "%ld", this->mesh->cell[i].element->tag);
       for (g = 0; g < dist->size; g++) {
         value = (dist->field[g]->type == function_type_pointwise_mesh_cell && dist->field[g]->mesh == this->mesh) ?
-                  dist->field[g]->data_value[i] :
+                  feenox_vector_get(dist->field[g]->vector_value, i) :
                   feenox_function_eval(dist->field[g], this->mesh->cell[i].x);
         fprintf(this->file->pointer, format, value);
       }
@@ -1104,14 +1097,12 @@ int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist) {
     fprintf(this->file->pointer, "%ld\n", this->mesh->n_nodes);              
 
     // point tag - data
-    size_t j = 0;
-    unsigned int g = 0;
     double value = 0;
-    for (j = 0; j < this->mesh->n_nodes; j++) {
+    for (size_t j = 0; j < this->mesh->n_nodes; j++) {
       fprintf(this->file->pointer, "%ld", this->mesh->node[j].tag);
-      for (g = 0; g < dist->size; g++) {
+      for (unsigned int g = 0; g < dist->size; g++) {
         value = (dist->field[g]->type == function_type_pointwise_mesh_node && dist->field[g]->mesh == this->mesh) ?
-                  dist->field[g]->data_value[j] :
+                  feenox_vector_get(dist->field[g]->vector_value, j) :
                   feenox_function_eval(dist->field[g], this->mesh->node[j].x);
         fprintf(this->file->pointer, format, value);
       }
@@ -1272,7 +1263,7 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
   if (new_data != NULL) {
     double alpha = (t-function->mesh_time)/(time-function->mesh_time);
     for (size_t j = 0; j < function->data_size; j++) {
-      function->data_value[j] += alpha * (new_data[j] - function->data_value[j]);
+      feenox_vector_add(function->vector_value, j, alpha * (new_data[j] - feenox_vector_get(function->vector_value, j)));
     }
     feenox_free(new_data);
   }
