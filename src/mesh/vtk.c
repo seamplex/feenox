@@ -547,9 +547,11 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   // TODO: CELL_DATA
   int n_fields = 0;
   int field_data = 0;
+  int point_data = 1;
   while (fgets(buffer, BUFFER_SIZE-1, fp) != NULL) {
     
     if (strncmp("POINT_DATA", buffer, 10) == 0) {
+      point_data = 1;
 
       size_t check = 0;
       if (sscanf(buffer, "POINT_DATA %ld", &check) != 1) {
@@ -561,6 +563,11 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         feenox_push_error_message("expecting %ld POINT_DATA instead of %ld", this->n_nodes, check);
         return FEENOX_ERROR;
       }
+
+    } else if (strncmp("CELL_DATA", buffer, 9) == 0) {
+      // TODO: cell data
+      point_data = 0;
+      
       
     } else if (strncmp("METADATA", buffer, 8) == 0) {
       
@@ -583,7 +590,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       }
       field_data = 1;
       
-    } else if (strncmp(buffer, "SCALARS", 7) == 0) {
+    } else if (strncmp(buffer, "SCALARS", 7) == 0 && point_data != 0) {
       
       char name[BUFFER_SIZE];
       if (sscanf(buffer, "SCALARS %s %s", name, tmp) != 2) {
@@ -600,7 +607,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       
       feenox_call(feenox_mesh_read_vtk_field_node(this, fp, name, 1));
 
-    } else if (strncmp(buffer, "VECTORS", 7) == 0) {
+    } else if (strncmp(buffer, "VECTORS", 7) == 0 && point_data != 0) {
       
       char name[BUFFER_SIZE];
       if (sscanf(buffer, "VECTORS %s %s", name, tmp) != 2) {
@@ -617,7 +624,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       
       feenox_call(feenox_mesh_read_vtk_field_node(this, fp, name, 3));
       
-    } else if (field_data != 0) {
+    } else if (field_data != 0 && point_data != 0) {
       
       char name[BUFFER_SIZE];
       int size = 0;
@@ -675,7 +682,7 @@ int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, un
         }
         feenox_free(tried_name);
 
-        if (size == 3) {
+        if (functions[i] == NULL && i < 3) {
           // try namex namey namez
           feenox_check_minusone(asprintf(&tried_name, "%s%c", name, 'x'+i));
           if (strcmp(tried_name, node_data->name_in_mesh) == 0) {
@@ -704,11 +711,13 @@ int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, un
   }
 
   for (unsigned int i = 0; i < size; i++) {
-    functions[i]->type = function_type_pointwise_mesh_node;
-    functions[i]->mesh = this;
-    functions[i]->data_size = this->n_nodes;
-    functions[i]->vector_value->size = this->n_nodes;
-    feenox_call(feenox_vector_init(functions[i]->vector_value, 1));
+    if (functions[i] != NULL) {
+      functions[i]->type = function_type_pointwise_mesh_node;
+      functions[i]->mesh = this;
+      functions[i]->data_size = this->n_nodes;
+      functions[i]->vector_value->size = this->n_nodes;
+      feenox_call(feenox_vector_init(functions[i]->vector_value, 1));
+    }
   }
 
   for (size_t j = 0; j < this->n_nodes; j++) {
