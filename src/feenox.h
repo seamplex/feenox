@@ -2236,7 +2236,7 @@ extern int feenox_mesh_element2cell(mesh_t *);
 
 // vtk.c
 // TODO: rename feenox_mesh_write_mesh_vtk
-extern int feenox_vtk_read_data(mesh_t *this, FILE *fp, const char *name, int size);
+extern int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, unsigned int size);
 extern int feenox_mesh_write_unstructured_mesh_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_header_vtk(FILE *file);
 extern int feenox_mesh_write_mesh_vtk(mesh_t *, FILE *file, int dummy);

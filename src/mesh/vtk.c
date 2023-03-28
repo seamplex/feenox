@@ -77,8 +77,7 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
     
   fprintf(file, "DATASET UNSTRUCTURED_GRID\n");
   fprintf(file, "POINTS %ld double\n", this->n_nodes);
-  size_t j = 0;
-  for (j = 0; j < this->n_nodes; j++) { 
+  for (size_t j = 0; j < this->n_nodes; j++) { 
     if (this->node[j].tag != j+1) {
       feenox_push_error_message("VTK output needs sorted nodes");
       return FEENOX_ERROR;
@@ -89,8 +88,7 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
 
   size_t size = 0;
   size_t volumelements = 0;
-  size_t i = 0;
-  for (i = 0; i < this->n_elements; i++) {
+  for (size_t i = 0; i < this->n_elements; i++) {
     if (this->element[i].type->dim == this->dim_topo) {
       size += 1 + this->element[i].type->nodes;
       volumelements++;
@@ -98,20 +96,20 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
   }
 
   fprintf(file, "CELLS %ld %ld\n", volumelements, size);
-  for (i = 0; i < this->n_elements; i++) {
+  for (size_t i = 0; i < this->n_elements; i++) {
     if (this->element[i].type->dim == this->dim_topo) {
       switch(this->element[i].type->id)
         {
         case ELEMENT_TYPE_HEXAHEDRON27: 
           fprintf(file, "%d ", 27);
-          for(j = 0; j < 27 ; ++j) {
+          for (int j = 0; j < 27 ; ++j) {
             fprintf(file, " %ld", (this->element[i].node[hexa27fromgmsh[j]]->tag)-1);
            }
           fprintf(file, "\n");
         break;
         case ELEMENT_TYPE_HEXAHEDRON20:
           fprintf(file, "%d ", 20);
-          for(j = 0; j < 20 ; ++j) {
+          for (int j = 0; j < 20 ; ++j) {
             fprintf(file, " %ld", (this->element[i].node[hexa20fromgmsh[j]]->tag)-1);
           }
           fprintf(file, "\n");
@@ -119,7 +117,7 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
         default:
           fprintf(file, "%d ", this->element[i].type->nodes);
           // ojo! capaz que no funcione si no estan ordenados los indices
-          for (j = 0; j < this->element[i].type->nodes; j++) {
+          for (unsigned int j = 0; j < this->element[i].type->nodes; j++) {
             // el tet10 es diferente!
             if (vtkfromgmsh_types[this->element[i].type->id] == 24 && (j == 8 || j == 9)) {
               if (j == 8) {
@@ -139,7 +137,7 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
   fprintf(file, "\n");
   
   fprintf(file, "CELL_TYPES %ld\n", volumelements);
-  for (i = 0; i < this->n_elements; i++) {
+  for (size_t i = 0; i < this->n_elements; i++) {
     if (this->element[i].type->dim == this->dim_topo) {
       fprintf(file, "%d\n", vtkfromgmsh_types[this->element[i].type->id]);
     }
@@ -184,7 +182,6 @@ int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist) {
   }
       
   fprintf(this->file->pointer, " %s double\n", dist->name);
-//  if (dist->size == 1 && this->lookup_table_init == 0) {
   if (dist->size == 1) {  
     fprintf(this->file->pointer, "LOOKUP_TABLE default\n");
     this->lookup_table_init = 1;
@@ -365,7 +362,6 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       feenox_push_error_message("ran out of CELLS data");
       return FEENOX_ERROR;
     }
-//    printf("%ld\t%ld\n", i, celldata[i]);
   }
   
   if (offset_connectivity) {
@@ -390,7 +386,6 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         feenox_push_error_message("ran out of CONNECTIVITY data");
         return FEENOX_ERROR;
       }
-//      printf("%ld\t%ld\n", i, connectivity[i]);
     }
   }
   
@@ -603,8 +598,8 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         return FEENOX_ERROR;
       }
       
-      feenox_call(feenox_vtk_read_data(this, fp, name, 1));
-      
+      feenox_call(feenox_mesh_read_vtk_field_node(this, fp, name, 1));
+
     } else if (strncmp(buffer, "VECTORS", 7) == 0) {
       
       char name[BUFFER_SIZE];
@@ -620,7 +615,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
         return FEENOX_ERROR;
       }
       
-      feenox_call(feenox_vtk_read_data(this, fp, name, 3));
+      feenox_call(feenox_mesh_read_vtk_field_node(this, fp, name, 3));
       
     } else if (field_data != 0) {
       
@@ -634,12 +629,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
           return FEENOX_ERROR;
         }
         
-        if (size != 1 && size != 3) {
-          feenox_push_error_message("expected either size 1 or 3 instead of %d", size);
-          return FEENOX_ERROR;
-        }
-        
-        feenox_call(feenox_vtk_read_data(this, fp, name, size));
+        feenox_call(feenox_mesh_read_vtk_field_node(this, fp, name, size));
         
       }
 
@@ -655,44 +645,52 @@ int feenox_mesh_read_vtk(mesh_t *this) {
 
 
 
-int feenox_vtk_read_data(mesh_t *this, FILE *fp, const char *name, int size) {
+int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, unsigned int size) {
  
   char buffer[BUFFER_SIZE];
   
   // check if we have to read this scalar or vector field
+  function_t **functions = NULL;
+  feenox_check_alloc(functions = calloc(size, sizeof(function_t *)));
+  
+  int found_something = 0;
   node_data_t *node_data = NULL;
-  function_t *scalar = NULL;
-  function_t *vector[3] = {NULL, NULL, NULL};
   LL_FOREACH(this->node_datas, node_data) {
+    
     if (size == 1) {
       if (strcmp(name, node_data->name_in_mesh) == 0) {
-        scalar = node_data->function;
         node_data->found = 1;
+        found_something = 1;
+        functions[0] = node_data->function;
       }
-    } else if (size == 3) {
-      for (int i = 0; i < 3; i++) {
+    } else {
+      for (unsigned int i = 0; i < size; i++) {
         // try name1 name2 name3
-        char *tried_name;
+        char *tried_name = NULL;
         feenox_check_minusone(asprintf(&tried_name, "%s%d", name, i+1));
         if (strcmp(tried_name, node_data->name_in_mesh) == 0) {
-          vector[i] = node_data->function;
           node_data->found = 1;
+          found_something = 1;
+          functions[i] = node_data->function;
         }
         feenox_free(tried_name);
 
-        // try namex namey namez
-        feenox_check_minusone(asprintf(&tried_name, "%s%c", name, 'x'+i));
-        if (strcmp(tried_name, node_data->name_in_mesh) == 0) {
-          vector[i] = node_data->function;
-          node_data->found = 1;
+        if (size == 3) {
+          // try namex namey namez
+          feenox_check_minusone(asprintf(&tried_name, "%s%c", name, 'x'+i));
+          if (strcmp(tried_name, node_data->name_in_mesh) == 0) {
+            node_data->found = 1;
+            found_something = 1;
+            functions[i] = node_data->function;
+          }
+          feenox_free(tried_name);
         }
-        feenox_free(tried_name);
-      }  
-    }  
+      }
+    }
   }
 
   // if we don't have to read anything, keep on
-  if (scalar == NULL && vector[0] == NULL && vector[1] == NULL && vector[2] == NULL) {
+  if (found_something == 0) {
     return FEENOX_OK;
   }
 
@@ -705,55 +703,29 @@ int feenox_vtk_read_data(mesh_t *this, FILE *fp, const char *name, int size) {
     fgets(buffer, BUFFER_SIZE-1, fp);
   }
 
-  if (size == 1) {
-
-    // if we made it down here, we have a function
-    if (this->nodes_argument == NULL) {
-      feenox_call(feenox_mesh_create_nodes_argument(this));
-    }
-
-    scalar->type = function_type_pointwise_mesh_node;
-    scalar->mesh = this;
-    scalar->data_size = this->n_nodes;
-    scalar->vector_value->size = this->n_nodes;
-    feenox_call(feenox_vector_init(scalar->vector_value, 1));        
-
-    double xi = 0;
-    for (size_t j = 0; j < this->n_nodes; j++) {
-      if (fscanf(fp, "%lf", &xi) != 1) {
-        feenox_push_error_message("ran out of SCALARS data");
-        return FEENOX_ERROR;
-      }
-      feenox_vector_set(scalar->vector_value, j, xi);
-    }
-
-  } else if (size == 3) {
-
-    for (int i = 0; i < 3; i++) {
-      if (vector[i] != NULL) {
-        // if we made it down here, we have a function
-        vector[i]->type = function_type_pointwise_mesh_node;
-        vector[i]->mesh = this;
-        vector[i]->data_size = this->n_nodes;
-        vector[i]->vector_value->size = this->n_nodes;
-        feenox_call(feenox_vector_init(vector[i]->vector_value, 1));        
-      }  
-    }
-
-    for (size_t j = 0; j < this->n_nodes; j++) {
-      double f[3];
-      if (fscanf(fp, "%lf %lf %lf", &f[0], &f[1], &f[2]) != 3) {
-        feenox_push_error_message("ran out of VECTORS data");
-        return FEENOX_ERROR;
-      }
-
-      for (int i = 0; i < 3; i++) {
-        if (vector[i] != NULL) {
-          feenox_vector_set(vector[i]->vector_value, j, f[i]);
-        }
-      }  
-    }
+  for (unsigned int i = 0; i < size; i++) {
+    functions[i]->type = function_type_pointwise_mesh_node;
+    functions[i]->mesh = this;
+    functions[i]->data_size = this->n_nodes;
+    functions[i]->vector_value->size = this->n_nodes;
+    feenox_call(feenox_vector_init(functions[i]->vector_value, 1));
   }
+
+  for (size_t j = 0; j < this->n_nodes; j++) {
+    double xi = 0;
+    for (unsigned int i = 0; i < size; i++) {
+      if (fscanf(fp, "%lf", &xi) != 1) {
+        feenox_push_error_message("ran out of field data");
+        return FEENOX_ERROR;
+      }
+      
+      if (functions[i] != NULL) {
+        feenox_vector_set(functions[i]->vector_value, j, xi);
+      }
+    }  
+  }
+  
+  feenox_free(functions);
   
   return FEENOX_OK;
 }

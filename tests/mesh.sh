@@ -35,6 +35,8 @@ for i in msh vtk; do
   exitifwrong $? 
 done
 
-
 answer mesh3d.fee "50"
+exitifwrong $?
+
+answerzero read_vtk5.fee
 exitifwrong $?

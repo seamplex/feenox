@@ -1,0 +1,29 @@
+# test this "v5" vtk thing
+# this vtk file is the output of the reaction-force.fee case,
+# opened with paraview and then re-exported as vtk again
+READ_MESH reaction-force-v5.vtk DIM 3 {
+ READ_FIELD u_v_w1 as u
+ READ_FIELD u_v_w2 as v
+ READ_FIELD u_v_w3 as w
+ READ_FUNCTION sigmax
+ READ_FUNCTION sigmay
+ READ_FUNCTION sigmaz
+}
+
+
+READ_MESH reaction.msh SCALE 1e-3
+INTEGRATE sigmax(x,y,z)*(-1) OVER surf_1_1 MESH reaction.msh RESULT Rleft
+INTEGRATE sigmax             OVER surf_1_3 MESH reaction.msh RESULT Rright
+
+INTEGRATE sigmay(x,y,z)*(-1) OVER surf_1_2 MESH reaction.msh RESULT Rbottom
+INTEGRATE sigmay             OVER surf_1_4 MESH reaction.msh RESULT Rtop
+
+INTEGRATE sigmaz(x,y,z)*(-1) OVER surf_1_6 MESH reaction.msh RESULT Rfront
+INTEGRATE sigmaz             OVER surf_1_5 MESH reaction.msh RESULT Rback
+
+
+# PRINT %.2f Rleft   Rright %.1e Rleft+Rright
+# PRINT %.2f Rbottom Rtop   %.1e Rbottom+Rtop
+# PRINT %.2f Rfront  Rback  %.1e Rfront+Rback
+
+PRINT sqrt((Rleft+Rright)^2+(Rbottom+Rtop)^2+(Rfront+Rback)^2)
