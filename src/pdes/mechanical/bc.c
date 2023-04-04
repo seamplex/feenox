@@ -1,37 +1,28 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox routines to handle mechanical BCs
+ *  feenox's routines to handle mechanical BCs
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021-2023 jeremy theler
  *
- *  This file is part of Feenox <https://www.seamplex.com/feenox>.
+ *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
  *  feenox is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Feenox is distributed in the hope that it will be useful,
+ *  FeenoX is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Feenox.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
 #include "mechanical.h"
 
-typedef struct {
-  expr_t *expr;
-  int dof;
-} feenox_gsl_function_of_uvw_params_t;
-
-double feenox_gsl_function_of_uvw(double x, void *params);
-
-
 int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char *rhs) {
-  
   // TODO: document BCs with triple comments
   if (strcmp(lhs, "fixed") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
@@ -102,7 +93,6 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
   } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "tangential") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
-    // TODO: split
     bc_data->set_essential = feenox_problem_bc_set_mechanical_symmetry;
     
   } else if (strcmp(lhs, "radial") == 0) {
@@ -132,7 +122,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
         *s = 'W';
       }
       s++;
-    }    
+    }
     
   } else {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
@@ -153,7 +143,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
   }
 
   if (bc_data->nonlinear && bc_data->type_math == bc_type_math_dirichlet) {
-    feenox_push_error_message("essential boundary condition '%s' cannot depend on temperature", rhs);
+    feenox_push_error_message("essential boundary condition '%s' cannot depend on the unknown", rhs);
     return FEENOX_ERROR;
   }
   
@@ -161,7 +151,6 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
 }
 
 int feenox_problem_bc_set_mechanical_displacement(bc_data_t *this, element_t *e, size_t j_global) {
-  
 #ifdef HAVE_PETSC
   
   if (this->dof != -1) {
@@ -283,11 +272,17 @@ int feenox_problem_bc_set_mechanical_radial(bc_data_t *this, element_t *e, size_
   return FEENOX_OK;
 }
 
+
+typedef struct {
+  expr_t *expr;
+  int dof;
+} feenox_gsl_function_of_uvw_params_t;
+
 int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *this, element_t *e, size_t j_global) {
   
 #ifdef HAVE_PETSC
   feenox_gsl_function_of_uvw_params_t params = { &this->expr, -1 };
-  gsl_function F = {feenox_gsl_function_of_uvw, &params};
+  gsl_function F = {feenox_mechanical_gsl_function_of_uvw, &params};
 
   double coefficients[3] = {0, 0, 0};
 
@@ -401,8 +396,8 @@ int feenox_problem_bc_set_mechanical_force(bc_data_t *this, element_t *e, unsign
 }
 
 
-// esto sirve para calcular derivadas con GSL
-double feenox_gsl_function_of_uvw(double x, void *params) {
+// wrapper to compute derivatives with GSL
+double feenox_mechanical_gsl_function_of_uvw(double x, void *params) {
   feenox_gsl_function_of_uvw_params_t *p = (feenox_gsl_function_of_uvw_params_t *)params;
 
   feenox_var_value(mechanical.displ_for_bc[0]) = 0;

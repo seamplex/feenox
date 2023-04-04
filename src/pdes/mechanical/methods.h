@@ -44,12 +44,14 @@ extern int feenox_problem_bc_set_mechanical_displacement(bc_data_t *this, elemen
 extern int feenox_problem_bc_set_mechanical_symmetry(bc_data_t *this, element_t *e, size_t j_global);
 extern int feenox_problem_bc_set_mechanical_radial(bc_data_t *this, element_t *e, size_t j_global);
 extern int feenox_problem_bc_set_mechanical_multifreedom(bc_data_t *this, element_t *e, size_t j_global);
+extern double feenox_mechanical_gsl_function_of_uvw(double x, void *params);
 
 extern int feenox_problem_bc_set_mechanical_compression(bc_data_t *this, element_t *e, unsigned int v);
 extern int feenox_problem_bc_set_mechanical_tension(bc_data_t *this, element_t *e, unsigned int v);
 extern int feenox_problem_bc_set_mechanical_normal_stress(bc_data_t *this, element_t *e, unsigned int v, signed int sign);
 extern int feenox_problem_bc_set_mechanical_traction(bc_data_t *this, element_t *e, unsigned int v);
 extern int feenox_problem_bc_set_mechanical_force(bc_data_t *this, element_t *e, unsigned int v);
+
 
 // mechanical/bulk.c
 extern int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes);

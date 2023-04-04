@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for modal analysis: initialization
  *
- *  Copyright (C) 2021--2022 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -169,6 +169,15 @@ int feenox_problem_init_parser_modal(void) {
     feenox_free(modename);
   }
 
+  
+// these are for the algebraic expressions in the  implicitly-defined BCs
+// i.e. 0=u*nx+v*ny or 0=u*y-v*x
+// here they are defined as uppercase because there already exist functions named u, v and w
+// but the parser changes their case when an implicit BC is read
+  modal.displ_for_bc[0]= feenox_define_variable_get_ptr("U");
+  modal.displ_for_bc[1]= feenox_define_variable_get_ptr("V");
+  modal.displ_for_bc[2]= feenox_define_variable_get_ptr("W");
+  
 #else
   feenox_push_error_message("modal problems need a FeenoX binary linked against SLEPc.");
   return FEENOX_ERROR;

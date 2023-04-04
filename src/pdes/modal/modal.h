@@ -98,6 +98,9 @@ struct modal_t {
   vector_t *Gamma;
   vector_t *mu;
   vector_t *Mu;
+  
+  // for implicit multi-dof BCs
+  var_t *displ_for_bc[3];
 };  
 extern modal_t modal;
 
