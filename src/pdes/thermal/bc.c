@@ -165,9 +165,12 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*h, e->H[v], e->H[v], 1.0, feenox.pde.Ki));
 
   // the h*Tref goes to b
-  gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
 #ifdef HAVE_GSL_VECTOR_AXPBY
+  gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
   feenox_call(gsl_vector_axpby(w*h*Tref, &H.vector, 1.0, feenox.pde.bi));
+#else
+  gsl_vector_set(feenox.pde.Nb, 0, h*Tref);
+  feenox_call(gsl_blas_dgemv(CblasTrans, w, e->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi)); 
 #endif
   
 

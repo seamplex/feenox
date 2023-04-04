@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for the heat equation: bulk elements
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -45,9 +45,14 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   // TODO: total source Q
   if (thermal.q.defined) {
     double q = thermal.q.eval(&thermal.q, x, material);
-    gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
+
 #ifdef HAVE_GSL_VECTOR_AXPBY
+    gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
     feenox_call(gsl_vector_axpby(w*q, &H.vector, 1.0, feenox.pde.bi));
+#else
+    for (unsigned int j = 0; j < e->type->nodes; j++) {
+      gsl_vector_add_to_element(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
+    }
 #endif
   }
   
