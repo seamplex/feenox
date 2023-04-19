@@ -17,7 +17,7 @@ the problem of finding the length $\ell_1$ of a tuning fork (fig. 1)
 such that the fundamental frequency on a free-free oscillation is equal
 to the base A frequency at 440 Hz.
 
-<figure id="fig:fork-meshed" width="20%">
+<figure id="fig:fork-meshed">
 <img src="fork-meshed.svg" style="width:20.0%"
 alt="What length \ell_1 is needed so the fork vibrates at 440 Hz?" />
 <figcaption>Figure 1: What length <span

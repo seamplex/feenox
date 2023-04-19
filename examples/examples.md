@@ -22,6 +22,8 @@
     - [One-dimensional linear](thermal.md#one-dimensional-linear)
   - [Non-dimensional transient heat conduction on a
   cylinder](thermal.md#non-dimensional-transient-heat-conduction-on-a-cylinder)
+  - [Non-dimensional transient heat conduction with time-dependent
+  properties](thermal.md#non-dimensional-transient-heat-conduction-with-time-dependent-properties)
 - Linear elasticity
   - [NAFEMS LE10 “Thick plate pressure”
   benchmark](mechanical.md#nafems-le10-thick-plate-pressure-benchmark)

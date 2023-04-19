@@ -139,12 +139,11 @@ around point <span class="math inline"><em>D</em></span> over
 
 # NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark
 
-<figure id="fig:nafems-le11-problem">
-<p><img src="nafems-le11-problem.png" style="width:48.0%"
-alt="Problem statement" /> <img src="nafems-le11-mesh.png"
-style="width:48.0%" alt="Structured hex mesh" /></p>
-<figcaption><p>Figure 1: The NAFEMS LE11 problem
-formulation</p></figcaption>
+<figure id="fig:nafems-le11-problem" class="subfigures">
+<p><img src="nafems-le11-problem.png" style="width:48.0%" alt="a" />
+<img src="nafems-le11-mesh.png" style="width:48.0%" alt="b" /></p>
+<figcaption><p>Figure 1: The NAFEMS LE11 problem formulation. a —
+Problem statement, b — Structured hex mesh</p></figcaption>
 </figure>
 
 Following the spirit from LE10, note how easy it is to give a
@@ -186,12 +185,11 @@ wall time  = wall time  = 1.91 seconds
 $
 ```
 
-<figure id="fig:nafems-le11-result">
-<p><img src="nafems-le11-temperature.png" style="width:48.0%"
-alt="Problem statement" /> <img src="nafems-le11-sigmaz.png"
-style="width:48.0%" alt="Structured hex mesh" /></p>
-<figcaption><p>Figure 2: The NAFEMS LE11 problem
-results</p></figcaption>
+<figure id="fig:nafems-le11-result" class="subfigures">
+<p><img src="nafems-le11-temperature.png" style="width:48.0%" alt="a" />
+<img src="nafems-le11-sigmaz.png" style="width:48.0%" alt="b" /></p>
+<figcaption><p>Figure 2: The NAFEMS LE11 problem results. a — Problem
+statement, b — Structured hex mesh</p></figcaption>
 </figure>
 
 # NAFEMS LE1 “Elliptical membrane” plane-stress benchmark
@@ -283,11 +281,11 @@ Then another `.geo` file is merged to build
 - `${element}`: [tet4][], [tet10][], [hex8][], [hex20][], [hex27][]
 - `${c}`: 1,2,$\dots$,10
 
-<figure id="fig:cantilever-mesh">
-<p><img src="cantilever-tet.png" style="width:45.0%" alt="Tetrahedra" />
-<img src="cantilever-hex.png" style="width:45.0%" alt="Hexahedra" /></p>
+<figure id="fig:cantilever-mesh" class="subfigures">
+<p><img src="cantilever-tet.png" style="width:45.0%" alt="a" /> <img
+src="cantilever-hex.png" style="width:45.0%" alt="b" /></p>
 <figcaption><p>Figure 3: Cantilevered beam meshed with structured
-tetrahedra and hexahedra</p></figcaption>
+tetrahedra and hexahedra. a — Tetrahedra, b — Hexahedra</p></figcaption>
 </figure>
 
 It then calls FeenoX with the input [`cantilever.fee`][] and passes
@@ -327,7 +325,7 @@ of freedom (i.e. the size of the problem matrix) and not the number of
 *elements*, which is irrelevant here and in most problems.
 
 ``` feenox
-PROBLEM elastic 3D
+PROBLEM mechanical 3D
 READ_MESH cantilever-$1-$2.msh   # in meters
 
 E = 2.1e11         # Young modulus in Pascals

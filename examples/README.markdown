@@ -102,6 +102,8 @@ propose benchmark problems to add to the suite.
   - [Thermal slabs][]
     - [One-dimensional linear][]
   - [Non-dimensional transient heat conduction on a cylinder][]
+  - [Non-dimensional transient heat conduction with time-dependent
+    properties][]
 - Linear elasticity
   - [NAFEMS LE10 “Thick plate pressure” benchmark][]
   - [NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark][]
@@ -139,6 +141,8 @@ propose benchmark problems to add to the suite.
   [Thermal slabs]: thermal.md#thermal-slabs
   [One-dimensional linear]: thermal.md#one-dimensional-linear
   [Non-dimensional transient heat conduction on a cylinder]: thermal.md#non-dimensional-transient-heat-conduction-on-a-cylinder
+  [Non-dimensional transient heat conduction with time-dependent properties]:
+    thermal.md#non-dimensional-transient-heat-conduction-with-time-dependent-properties
   [NAFEMS LE10 “Thick plate pressure” benchmark]: mechanical.md#nafems-le10-thick-plate-pressure-benchmark
   [NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark]: mechanical.md#nafems-le11-solid-cylindertapersphere-temperature-benchmark
   [NAFEMS LE1 “Elliptical membrane” plane-stress benchmark]: mechanical.md#nafems-le1-elliptical-membrane-plane-stress-benchmark

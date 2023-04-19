@@ -61,12 +61,12 @@ $ python3 lorenz.py
 $ sh lorenz2x3d.sh < lorenz.dat > lorenz.html
 ```
 
-<figure id="fig:ex_lorenz">
-<p><img src="lorenz-gnuplot.svg" style="width:48.0%" alt="Gnuplot" />
-<img src="lorenz-matplotlib.png" style="width:48.0%"
-alt="Matplotlib" /></p>
+<figure id="fig:ex_lorenz" class="subfigures">
+<p><img src="lorenz-gnuplot.svg" style="width:48.0%" alt="a" /> <img
+src="lorenz-matplotlib.png" style="width:48.0%" alt="b" /></p>
 <figcaption><p>Figure 1: The Lorenz attractor computed with FeenoX
-plotted with two different tools</p></figcaption>
+plotted with two different tools. a — Gnuplot, b —
+Matplotlib</p></figcaption>
 </figure>
 
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2

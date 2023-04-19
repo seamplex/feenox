@@ -294,7 +294,7 @@ of freedom (i.e. the size of the problem matrix) and not the number of
 
 
 ```feenox
-PROBLEM elastic 3D
+PROBLEM mechanical 3D
 READ_MESH cantilever-$1-$2.msh   # in meters
 
 E = 2.1e11         # Young modulus in Pascals

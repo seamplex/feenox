@@ -39,6 +39,7 @@ for i in hello          \
          cube-orthotropic-expansion \
          veeder                     \
          mechanical-square-temperature \
+         two-cubes-thermal \
   ; do
   in=${i}.fee
   out=$(grep category ${in} | cut -d: -f2 | xargs).md

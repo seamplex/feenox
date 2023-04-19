@@ -105,25 +105,24 @@ bare cubical reactor. Or a spherical reactor. And we know that for the
 same mass, the $k_\text{eff}$ for the former is smaller than for the
 latter.
 
-<figure id="fig:cube-and-sphere">
-<p><img src="cubesphere-0.png" style="width:49.0%"
-alt="Cubical reactor" /> <img src="cubesphere-100.png"
-style="width:49.0%" alt="Spherical reactor" /></p>
-<figcaption><p>Figure 1: One eight of two bare reactors</p></figcaption>
+<figure id="fig:cube-and-sphere" class="subfigures">
+<p><img src="cubesphere-0.png" style="width:49.0%" alt="a" /> <img
+src="cubesphere-100.png" style="width:49.0%" alt="b" /></p>
+<figcaption><p>Figure 1: One eight of two bare reactors. a — Cubical
+reactor, b — Spherical reactor</p></figcaption>
 </figure>
 
 But what happens “in the middle”? That is to say, how does
 $k_\text{eff}$ changes when we morph the cube into a sphere? Enter Gmsh
 & Feenox.
 
-<figure id="fig:cube-morph-sphere">
-<p><img src="cubesphere-25.png" style="width:33.0%"
-alt="75% cube/25% sphere" /> <img src="cubesphere-50.png"
-style="width:33.0%" alt="50% cube/50% sphere" /> <img
-src="cubesphere-75.png" style="width:33.0%"
-alt="25% cube/75% sphere" /></p>
-<figcaption><p>Figure 2: Continuous morph between a cube and a
-sphere</p></figcaption>
+<figure id="fig:cube-morph-sphere" class="subfigures">
+<p><img src="cubesphere-25.png" style="width:33.0%" alt="a" /> <img
+src="cubesphere-50.png" style="width:33.0%" alt="b" /> <img
+src="cubesphere-75.png" style="width:33.0%" alt="c" /></p>
+<figcaption><p>Figure 2: Continuous morph between a cube and a sphere. a
+— 75% cube/25% sphere, b — 50% cube/50% sphere, c —
+25% cube/75% sphere</p></figcaption>
 </figure>
 
 ``` python
