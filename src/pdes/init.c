@@ -69,7 +69,7 @@ int feenox_problem_init_parser_general(void) {
   PetscInt subminor = 0;
 #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
-  petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
+  petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULLPTR));
   
   // check the headers correspond to the runtime
   petsc_call(SlepcGetVersionNumber(&major, &minor, &subminor, NULL));
@@ -79,7 +79,7 @@ int feenox_problem_init_parser_general(void) {
   }
 #else
   // initialize PETSc
-  petsc_call(PetscInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULL));
+  petsc_call(PetscInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULLPTR));
 #endif
 
   // check the headers correspond to the runtime
@@ -211,16 +211,6 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox.pde.vars.eps_st_nu = feenox_define_variable_get_ptr("eps_st_nu");
 ///va+snes_max_it+detail Default is zero.
   feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
-  
-///va+gamg_threshold+name feenox_gamg_threshold
-///va+gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph for the
-///va+gamg_threshold+detail [Geometric Algebraic Multigrid Preconditioner](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMG.html)
-///va+gamg_threshold+detail as passed to PETSc’s
-///va+gamg_threshold+detail [`PCGAMGSetThreshold`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/PCGAMGSetThreshold.html).
-///va+gamg_threshold+detail A value of 0.0 means keep all nonzero entries in the graph; negative means keep even zero entries in the graph.
-  feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("gamg_threshold");
-///va+feenox_gamg_threshold+detail Default `0.01`.  
-  feenox_var_value(feenox.pde.vars.gamg_threshold) = 0.01;
   
 ///va+feenox_penalty_weight+name feenox_penalty_weight
 ///va+feenox_penalty_weight+detail The weight\ $w$ used when setting multi-freedom boundary conditions.
@@ -385,12 +375,12 @@ int feenox_problem_init_runtime_general(void) {
 ///op+progress+option `--progress`
 ///op+progress+desc print ASCII progress bars when solving PDEs
   if (feenox.pde.progress_ascii == PETSC_FALSE) {
-    petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-progress", &feenox.pde.progress_ascii));
+    petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-progress", &feenox.pde.progress_ascii));
   }  
 
 ///op+mumps+option `--mumps`
 ///op+mumps+desc ask PETSc to use the direct linear solver MUMPS
-  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-mumps", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-mumps", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.ksp_type = strdup("mumps");
     feenox.pde.pc_type = strdup("mumps");
@@ -398,18 +388,18 @@ int feenox_problem_init_runtime_general(void) {
 
 ///op+linear+option `--linear`
 ///op+linear+desc force FeenoX to solve the PDE problem as linear
-  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-linear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_linear;
   }
 
 ///op+non-linear+option `--non-linear`
 ///op+non-linear+desc force FeenoX to solve the PDE problem as non-linear
-  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-non-linear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-non-linear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;
   }
-  petsc_call(PetscOptionsHasName(PETSC_NULL, PETSC_NULL, "-nonlinear", &flag));
+  petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-nonlinear", &flag));
   if (flag == PETSC_TRUE) {
     feenox.pde.math_type = math_type_nonlinear;
   }
@@ -494,7 +484,9 @@ int feenox_problem_init_runtime_general(void) {
   feenox_var_value(feenox.pde.vars.total_dofs) = (double)(feenox.pde.size_global);
   
   // TODO: choose width from input
+//#if PETSC_VERSION_LT(3,19,0)
   feenox.pde.width = GSL_MAX(feenox.pde.mesh->max_nodes_per_element, feenox.pde.mesh->max_first_neighbor_nodes) * feenox.pde.dofs;
+//#endif
   
   // ask how many local nodes we own
   feenox.pde.nodes_local = PETSC_DECIDE;
@@ -603,9 +595,10 @@ Mat feenox_problem_create_matrix(const char *name) {
   petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
   petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.size_global, feenox.pde.size_global));
   petsc_call_null(MatSetFromOptions(A));
-  // TODO:  MatXAIJSetPreallocation
-  petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL, feenox.pde.width, PETSC_NULL));
-  petsc_call_null(MatSeqAIJSetPreallocation(A, feenox.pde.width, PETSC_NULL));
+//#if PETSC_VERSION_LT(3,19,0)
+  petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULLPTR, feenox.pde.width, PETSC_NULLPTR));
+  petsc_call_null(MatSeqAIJSetPreallocation(A, feenox.pde.width, PETSC_NULLPTR));
+//#endif
 
   // this flag needs the matrix type to be set, and we had just set it with setfromoptions   
   petsc_call_null(MatSetOption(A, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));

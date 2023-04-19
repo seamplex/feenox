@@ -48,7 +48,7 @@ int feenox_instruction_reaction(void *arg) {
         }
         x0[g] = reaction->physical_group->cog[g];
       }
-      petsc_call(MatCreateVecs(feenox.pde.K, PETSC_NULL, &arm[g]));
+      petsc_call(MatCreateVecs(feenox.pde.K, PETSC_NULLPTR, &arm[g]));
     }
   }
   
@@ -95,11 +95,11 @@ int feenox_instruction_reaction(void *arg) {
     // the IS of the rows depends on the DOF
     petsc_call(ISCreateGeneral(PETSC_COMM_WORLD, k, row[g], PETSC_USE_POINTER, &set_rows[g]));
     petsc_call(MatCreateSubMatrix(feenox.pde.K, set_rows[g], set_cols, MAT_INITIAL_MATRIX, &K_row[g]));
-    petsc_call(MatCreateVecs(K_row[g], PETSC_NULL, &K_row_u[g]));
+    petsc_call(MatCreateVecs(K_row[g], PETSC_NULLPTR, &K_row_u[g]));
     petsc_call(MatMult(K_row[g], feenox.pde.phi, K_row_u[g]));
     
     if (reaction->order == 1) {
-      petsc_call(MatCreateVecs(K_row[g], PETSC_NULL, &arm[g]));
+      petsc_call(MatCreateVecs(K_row[g], PETSC_NULLPTR, &arm[g]));
       // TODO: do not set non-local values
       for (j = 0; j < k; j++) {
         petsc_call(VecSetValue(arm[g], j, feenox.pde.mesh->node[node_index[j]].x[g] - x0[g], INSERT_VALUES));

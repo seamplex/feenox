@@ -1,0 +1,43 @@
+---
+category: thermal
+intro: |
+  # Non-dimensional transient heat conduction with time-dependent properties
+
+  Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one made with a material with unitary properties and the other one whose properties depend explicitly ony time. We glue the two cubes together, fix one side of the unitary material to a fixed zero temperature and set a ramp of temperature between zero and one at the opposite end of the material with time-varying properties.
+ 
+terminal: |
+  $ gmsh -3 two-cubes.geo
+  [...]
+  $ feenox two-cubes-thermal.fee > two-cubes-thermal.dat
+  $ 
+...
+PROBLEM thermal 3D
+READ_MESH two-cubes.msh
+
+end_time = 50
+# initial condition (if not given, stead-state is computed)
+# T_0(x,y,z) = 0
+
+# dimensionless uniform and constant material properties
+k_left = 0.1+0.9*heaviside(t-20,20)
+rho_left = 2-heaviside(t-20,20)
+cp_left = 2-heaviside(t-20,20)
+
+# dimensionless uniform and constant material properties
+k_right = 1
+rho_right = 1
+cp_right = 1
+
+# BCs 
+BC zero  T=0
+BC ramp  T=limit(t,0,1)
+BC side  q=0
+
+SOLVE_PROBLEM
+
+PRINT t T(0,0,0) T(0.5,0,0) T(1,0,0) T(1.5,0,0) T(2,0,0)
+
+---
+figures: |
+  ![Temporal evolution of temperatures at three locations](two-cubes-thermal.svg){width=100%}
+...

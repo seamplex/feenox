@@ -125,7 +125,7 @@ int feenox_problem_solve_slepc_eigen(void) {
   unsigned int i = 0;
   for (i = 0; i < feenox.pde.nev; i++) {
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &feenox.pde.eigenvector[i]));
-    petsc_call(EPSGetEigenpair(feenox.pde.eps, i, &feenox.pde.eigenvalue[i], &imag, feenox.pde.eigenvector[i], PETSC_NULL));
+    petsc_call(EPSGetEigenpair(feenox.pde.eps, i, &feenox.pde.eigenvalue[i], &imag, feenox.pde.eigenvector[i], PETSC_NULLPTR));
 
     // TODO: should we allow complex eigenvalues?
     if (fabs(imag) > feenox_var_value(feenox.pde.vars.eps_tol)) {

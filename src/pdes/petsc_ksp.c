@@ -248,14 +248,6 @@ int feenox_problem_setup_pc(PC pc) {
     
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
-  if (pc_type != NULL && strcmp(pc_type, PCGAMG) == 0) {
-#if PETSC_VERSION_LT(3,8,0)
-    PCGAMGSetThreshold(pc, (PetscReal)feenox_var_value(feenox.pde.vars.gamg_threshold));
-#else
-    PCGAMGSetThreshold(pc, (PetscReal *)(feenox_value_ptr(feenox.pde.vars.gamg_threshold)), 1);
-#endif
-    petsc_call(PCGAMGSetNSmooths(pc, 1));
-  }
 
   return FEENOX_OK;
 }

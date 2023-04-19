@@ -92,6 +92,12 @@ extern "C++" {
 #ifdef __cplusplus
 }
 #endif  // C++
+
+// PETSC_NULL is deprecated but it was not defined before 3.16
+#if PETSC_VERSION_LT(3,16,0)
+#define PETSC_NULLPTR  PETSC_NULL
+#endif
+
 #endif  // HAVE_PETSC
 
 
@@ -1733,8 +1739,6 @@ struct feenox_t {
       var_t *eps_max_it;
       var_t *eps_st_sigma;
       var_t *eps_st_nu;
-      
-      var_t *gamg_threshold;
       
       var_t *penalty_weight;
       var_t *nodes_rough;
