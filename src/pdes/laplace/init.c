@@ -23,21 +23,6 @@
 #include "laplace.h"
 laplace_t laplace;
 
-///pb_laplace+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.
-int feenox_problem_parse_problem_laplace(const char *token) {
-
-///kw_pde+PROBLEM+detail  * `laplace` solves the Laplace (or Poisson) equation.
-  
-  // no need to parse anything;
-  if (token != NULL) {
-    feenox_push_error_message("undefined keyword '%s'", token);
-    return FEENOX_ERROR;
-  }
- 
-  return FEENOX_OK;
-}
-
-
 int feenox_problem_init_parser_laplace(void) {
 
 #ifdef HAVE_PETSC

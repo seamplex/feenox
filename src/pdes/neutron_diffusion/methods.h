@@ -22,8 +22,11 @@
 #ifndef NEUTRON_DIFFUSION_FEM_METHODS_H
 #define NEUTRON_DIFFUSION_FEM_METHODS_H
 
+// neutron_diffusion/parser.c
+extern int feenox_problem_parse_problem_neutron_diffusion(const char *token);
+extern int feenox_problem_parse_post_neutron_diffusion(mesh_write_t *mesh_write, const char *token);
+
 // neutron_diffusion/init.c
-extern int feenox_problem_parse_problem_neutron_diffusion(const char *);
 extern int feenox_problem_init_parser_neutron_diffusion(void);
 extern int feenox_problem_init_runtime_neutron_diffusion(void);
 #ifdef HAVE_PETSC

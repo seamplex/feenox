@@ -103,19 +103,6 @@ int feenox_read_line(FILE *file_ptr) {
           return FEENOX_ERROR;
         }
         
-        if (n == 0) {
-          // remove the directory and trailing .fee extension so ${0} has the case name
-          char *tmp = NULL;
-          feenox_check_alloc(tmp = strdup(feenox.argv[feenox.optind]));
-          feenox.argv[feenox.optind] = strdup(basename(tmp));
-          feenox_free(tmp);
-
-          char *fee = strstr(feenox.argv[feenox.optind], ".fee");
-          if (fee != NULL) {
-            *fee = '\0';
-          }
-        }
-        
         int j = 0;
         while (feenox.argv[feenox.optind+n][j] != 0) {
           // watch out!
@@ -753,6 +740,54 @@ int feenox_add_function_from_string(const char *string, char **name) {
     }
     feenox_free(arg_name);
   }
+  
+  return FEENOX_OK;
+}
+
+
+
+
+
+int feenox_add_post_field(mesh_write_t *mesh_write, unsigned int size, char **token, const char *name, field_location_t location) {
+  
+  mesh_write_dist_t *mesh_write_dist = NULL;
+  feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
+  mesh_write_dist->field_location = location;      
+  mesh_write_dist->size = size;
+  
+  feenox_check_alloc(mesh_write_dist->field = calloc(mesh_write_dist->size, sizeof(function_t *)));
+  for (unsigned int i = 0; i < mesh_write_dist->size; i++) {
+    if ((mesh_write_dist->field[i] = feenox_get_function_ptr(token[i])) == NULL) {
+      // if there's no function with the provided name we define one
+      feenox_check_alloc(mesh_write_dist->field[i] = calloc(1, sizeof(function_t)));
+      feenox_check_alloc(mesh_write_dist->field[i]->name = strdup(token[i]));
+      mesh_write_dist->field[i]->type = function_type_algebraic;
+      mesh_write_dist->field[i]->n_arguments = 3;
+      mesh_write_dist->field[i]->n_arguments_given = 3;
+      mesh_write_dist->field[i]->var_argument = feenox.mesh.vars.arr_x;
+      feenox_call(feenox_expression_parse(&mesh_write_dist->field[i]->algebraic_expression, token[i])); 
+    } else {
+      // mark the function as used so secondary fields such as stresses are computed 
+      mesh_write_dist->field[i]->used = 1;
+    }
+  }
+          
+  if (name != NULL) {
+    mesh_write_dist->name = strdup(name);
+  } else {
+    mesh_write_dist->name = strdup(mesh_write_dist->field[0]->name);
+    for (unsigned int i = 1; i < mesh_write_dist->size; i++) {
+      feenox_check_minusone(asprintf(&mesh_write_dist->name, "%s_%s", mesh_write_dist->name, mesh_write_dist->field[i]->name));
+    }
+  }
+  
+  if (mesh_write->printf_format != NULL) {
+    feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
+  }
+
+
+  LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
+  
   
   return FEENOX_OK;
 }

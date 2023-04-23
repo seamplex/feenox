@@ -52,3 +52,34 @@ int feenox_problem_parse_problem_neutron_transport(const char *token) {
   return FEENOX_OK;
 }  
 
+
+
+int feenox_problem_parse_post_neutron_transport(mesh_write_t *mesh_write, const char *token) {
+
+  if (strcmp(token, "all") == 0) {
+    feenox_call(feenox_problem_parse_post_neutron_transport(mesh_write, "scalar_fluxes"));
+    feenox_call(feenox_problem_parse_post_neutron_transport(mesh_write, "angular_fluxes"));
+    
+  } else if (strcmp(token, "scalar_flux") == 0 || strcmp(token, "scalar_fluxes") == 0) {
+    
+    for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &neutron_transport.phi[g]->name, NULL, field_location_nodes));
+    }
+    
+  } else if (strcmp(token, "angular_flux") == 0 || strcmp(token, "angular_fluxes") == 0) {
+
+    for (int n = 0; n < neutron_transport.directions; n++) {
+      for (int g = 0; g < neutron_transport.groups; g++) {
+        feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.unknown_name[n * neutron_transport.groups + g], NULL, field_location_nodes));
+      }
+    }
+    
+    
+  } else {
+    feenox_push_error_message("undefined keyword '%s' for neutron_transport WRITE_RESULTS", token);
+    return FEENOX_ERROR;
+  }
+  
+  return FEENOX_OK;
+}
+

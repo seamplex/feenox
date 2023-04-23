@@ -45,6 +45,72 @@ int feenox_problem_parse_problem_mechanical(const char *token) {
   return FEENOX_OK;
 } 
 
+int feenox_problem_parse_post_mechanical(mesh_write_t *mesh_write, const char *token) {
+
+  if (strcmp(token, "all") == 0) {
+    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "displacements"));
+    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "strains"));
+    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "stresses"));
+    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "principal"));
+    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "vonmises"));
+    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "tresca"));
+    
+  } else if (strcmp(token, "displacements") == 0 || strcmp(token, "displ") == 0) {
+    
+    char *tokens[3] = {NULL, NULL, NULL};
+    for (unsigned int g = 0; g < 3; g++) {
+      tokens[g] = strdup((g < feenox.pde.dofs) ? feenox.pde.unknown_name[g] : "0");
+    }
+    
+    feenox_call(feenox_add_post_field(mesh_write, 3, tokens, "displacements", field_location_nodes));
+    
+    for (unsigned int g = 0; g < 3; g++) {
+      feenox_free(tokens[g]);
+    }
+
+  } else if (strcmp(token, "strains") == 0 || strcmp(token, "strain") == 0) {
+    
+    for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+      for (unsigned int m = 0; m < feenox.pde.dim; m++) {
+        feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.gradient[g][m]->name, NULL, field_location_nodes));
+      }
+    }
+    
+  } else if (strcmp(token, "stresses") == 0 || strcmp(token, "stress") == 0) {
+    
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigmax->name, NULL, field_location_nodes));
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigmay->name, NULL, field_location_nodes));
+    if (feenox.pde.dim == 3) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigmaz->name, NULL, field_location_nodes));
+    }
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.tauxy->name, NULL, field_location_nodes));
+    if (feenox.pde.dim == 3) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.tauyz->name, NULL, field_location_nodes));
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.tauzx->name, NULL, field_location_nodes));
+    }
+
+  } else if (strcmp(token, "principal") == 0) {
+    
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigma1->name, NULL, field_location_nodes));
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigma2->name, NULL, field_location_nodes));
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigma3->name, NULL, field_location_nodes));
+
+  } else if (strcmp(token, "vonmises") == 0) {
+    
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigma->name, NULL, field_location_nodes));
+    
+  } else if (strcmp(token, "tresca") == 0) {
+    
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.tresca->name, NULL, field_location_nodes));
+    
+  } else {
+    feenox_push_error_message("undefined keyword '%s' for mechanical WRITE_RESULTS", token);
+    return FEENOX_ERROR;
+  }
+ 
+  return FEENOX_OK;
+}
+
 
 int feenox_parse_linearize_stress(void) {
   

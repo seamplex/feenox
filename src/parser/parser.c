@@ -270,13 +270,20 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_read_mesh());
       return FEENOX_OK;
 
-///kw_pde+WRITE_MESH+desc Write a mesh and functions of space-time to a file for post-processing.
+///kw_pde+WRITE_MESH+desc Write a mesh and/or generic functions of space-time to a post-processing file.
 ///kw_pde+WRITE_MESH+usage WRITE_MESH
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "WRITE_MESH") == 0) {
       feenox_call(feenox_parse_write_mesh());
       return FEENOX_OK;
 
+///kw_pde+WRITE_RESULTS+desc Write the problem mesh and problem results to a file for post-processing.
+///kw_pde+WRITE_RESULTS+usage WRITE_RESULTS
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "WRITE_RESULTS") == 0) {
+      feenox_call(feenox_parse_write_results());
+      return FEENOX_OK;
+      
 // description is in pdes/parse.c      
     } else if (strcasecmp(token, "PROBLEM") == 0) {
 #ifdef HAVE_PETSC      
@@ -2286,6 +2293,12 @@ int feenox_parse_write_mesh(void) {
       }
       feenox_free(mesh_name);
           
+///kw_pde+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]
+    } else if (strcasecmp(token, "FILE_FORMAT") == 0) {
+      char *keywords[] = {"gmsh", "vtk", ""};
+      int values[] = {post_format_gmsh, post_format_vtk, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
+
 ///kw_pde+WRITE_MESH+usage [ NO_MESH ]
 ///kw_pde+WRITE_MESH+detail If the `NO_MESH` keyword is given, only the results are written into the
 ///kw_pde+WRITE_MESH+detail output file without any mesh data.
@@ -2293,14 +2306,8 @@ int feenox_parse_write_mesh(void) {
 ///kw_pde+WRITE_MESH+detail creating partial output files which can the be latter assembled by post-processing scripts.
     } else if (strcasecmp(token, "NOMESH") == 0 || strcasecmp(token, "NO_MESH") == 0) {
       mesh_write->no_mesh = 1;
-
-///kw_pde+WRITE_MESH+usage [ FILE_FORMAT { gmsh | vtk } ]@
-    } else if (strcasecmp(token, "FILE_FORMAT") == 0) {
-      char *keywords[] = {"gmsh", "vtk", ""};
-      int values[] = {post_format_gmsh, post_format_vtk, 0};
-      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
-
-///kw_pde+WRITE_MESH+usage [ NO_PHYSICAL_NAMES ]
+      
+///kw_pde+WRITE_MESH+usage [ NO_PHYSICAL_NAMES ]@
 ///kw_pde+WRITE_MESH+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
 ///kw_pde+WRITE_MESH+detail section that sets the actual names of the physical entities is not written.      
 ///kw_pde+WRITE_MESH+detail This might be needed in some cases to avoid name clashes when dealing with multiple `.msh` files.
@@ -2338,83 +2345,178 @@ int feenox_parse_write_mesh(void) {
       
 ///kw_pde+WRITE_MESH+detail In the first case, the next three fields following the `VECTOR` keyword
 ///kw_pde+WRITE_MESH+detail are taken as the vector elements.
-///kw_pde+WRITE_MESH+usage [ VECTOR <field_x> <field_y> <field_z> ] [...] @
+///kw_pde+WRITE_MESH+usage [ VECTOR [ NAME <name> ] <field_x> <field_y> <field_z> ] [...] @
       
 ///kw_pde+WRITE_MESH+detail In the latter, the next six fields following the `SYMMETRIC_TENSOR` keyword
 ///kw_pde+WRITE_MESH+detail are taken as the tensor elements.
-///kw_pde+WRITE_MESH+usage [ SYMMETRIC_TENSOR <field_xx> <field_yy> <field_zz> <field_xy> <field_yz> <field_zx> ] [...] @
+///kw_pde+WRITE_MESH+usage [ SYMMETRIC_TENSOR [ NAME <name> ] <field_xx> <field_yy> <field_zz> <field_xy> <field_yz> <field_zx> ] [...] @
     } else {
       
-      mesh_write_dist_t *mesh_write_dist = NULL;
-      feenox_check_alloc(mesh_write_dist = calloc(1, sizeof(mesh_write_dist_t)));
-      
-      mesh_write_dist->size = 1;
-      
+      unsigned int size = 1;
       if (strcasecmp(token, "VECTOR") == 0) {
-        mesh_write_dist->size = 3;
+        size = 3;
         if ((token = feenox_get_next_token(NULL)) == NULL) {
           feenox_push_error_message("expected function name");
           return FEENOX_ERROR;
         }
       } else if (strcasecmp(token, "SYMMETRIC_TENSOR") == 0 || strcasecmp(token, "SYMM_TENSOR") == 0) {
-        mesh_write_dist->size = 6;
+        size = 6;
         if ((token = feenox_get_next_token(NULL)) == NULL) {
           feenox_push_error_message("expected function name");
           return FEENOX_ERROR;
         }
       }
       
-      feenox_check_alloc(mesh_write_dist->field = calloc(mesh_write_dist->size, sizeof(function_t *)));
-          
-      unsigned int i = 0;
-      for (i = 0; i < mesh_write_dist->size; i++) {
+      char *name = NULL;
+      if (strcasecmp(token, "NAME") == 0) {
+        feenox_call(feenox_parser_string(&name));
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected function name");
+          return FEENOX_ERROR;
+        }
+      }
+      
+      
+      char **tokens = NULL;
+      feenox_check_alloc(tokens = calloc(size, sizeof(char *)));
+      feenox_check_alloc(tokens[0] = strdup(token));
+      for (unsigned int i = 1; i < size; i++) {
+        if ((token = feenox_get_next_token(NULL)) == NULL) {
+          feenox_push_error_message("expected function name");
+          return FEENOX_ERROR;
+        }
+        feenox_check_alloc(tokens[i] = strdup(token));
+      }
+      
+      feenox_call(feenox_add_post_field(mesh_write, size, tokens, name, mesh_write->field_location));
 
-        // we have to read a new token only for i > 0
-        if (i > 0) {
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected function name");
-            return FEENOX_ERROR;
-          }
-        }  
-        
-        if (strcasecmp(token, "NAME") == 0) {
-          feenox_call(feenox_parser_string(&mesh_write_dist->name));
-          if ((token = feenox_get_next_token(NULL)) == NULL) {
-            feenox_push_error_message("expected function name");
-            return FEENOX_ERROR;
-          }
-        }
-            
-        if ((mesh_write_dist->field[i] = feenox_get_function_ptr(token)) == NULL) {
-          feenox_check_alloc(mesh_write_dist->field[i] = calloc(1, sizeof(function_t)));
-          feenox_check_alloc(mesh_write_dist->field[i]->name = strdup(token));
-          mesh_write_dist->field[i]->type = function_type_algebraic;
-          mesh_write_dist->field[i]->n_arguments = 3;
-          mesh_write_dist->field[i]->n_arguments_given = 3;
-          mesh_write_dist->field[i]->var_argument = feenox.mesh.vars.arr_x;
-          feenox_call(feenox_expression_parse(&mesh_write_dist->field[i]->algebraic_expression, token)); 
-        }
-        mesh_write_dist->field[i]->used = 1;
-        
-        mesh_write_dist->field_location = mesh_write->field_location;
-        if (mesh_write->printf_format != NULL) {
-          feenox_check_alloc(mesh_write_dist->printf_format = strdup(mesh_write->printf_format));
-        }  
-      }
-          
-      if (mesh_write_dist->name == NULL) {
-        mesh_write_dist->name = strdup(mesh_write_dist->field[0]->name);
-        for (i = 1; i < mesh_write_dist->size; i++) {
-          feenox_check_minusone(asprintf(&mesh_write_dist->name, "%s_%s", mesh_write_dist->name, mesh_write_dist->field[i]->name));
-        }
+      for (unsigned int i = 1; i < size; i++) {
+        feenox_free(tokens[i]);
       }
       
-      if (mesh_write->printf_format != NULL) {
-        mesh_write_dist->printf_format = strdup(mesh_write->printf_format);
-      }
-      
-      LL_APPEND(mesh_write->mesh_write_dists, mesh_write_dist);
     }
+  }
+
+  // if there's only one mesh, use that one, otherwise ask which one 
+  if (mesh_write->mesh == NULL) {
+    if (feenox.mesh.mesh_main == feenox.mesh.meshes) {
+      mesh_write->mesh = feenox.mesh.mesh_main;
+    } else {
+      feenox_push_error_message("do not know what mesh should the post-processing be applied to");
+      return FEENOX_ERROR;
+    }
+  }
+
+  if (mesh_write->post_format == post_format_fromextension) {
+    char *ext = mesh_write->file->format + strlen(mesh_write->file->format) - 4;
+
+    if (strcasecmp(ext, ".msh") == 0) {
+      mesh_write->post_format = post_format_gmsh;
+    } else if (strcasecmp(ext, ".vtk") == 0) {
+      mesh_write->post_format = post_format_vtk;
+    } else {
+      feenox_push_error_message("unknown extension '%s' and no FORMAT given", ext);
+      return FEENOX_ERROR;
+    }
+  }
+
+  
+  // TODO: unify writers
+  switch (mesh_write->post_format) {
+    case post_format_gmsh:
+      mesh_write->write_header = feenox_mesh_write_header_gmsh;
+      mesh_write->write_mesh   = feenox_mesh_write_mesh_gmsh;
+      mesh_write->write_data   = feenox_mesh_write_data_gmsh;
+    break;
+    case post_format_vtk:
+      mesh_write->write_header = feenox_mesh_write_header_vtk;
+      mesh_write->write_mesh   = feenox_mesh_write_mesh_vtk;
+      mesh_write->write_data   = feenox_mesh_write_data_vtk;
+    break;
+    default:
+      return FEENOX_ERROR;
+    break;
+  }
+
+  LL_APPEND(feenox.mesh.mesh_writes, mesh_write);
+  feenox_call(feenox_add_instruction(feenox_instruction_mesh_write, mesh_write));
+  
+  return FEENOX_OK;
+}
+
+
+int feenox_parse_write_results(void) {
+  
+  mesh_write_t *mesh_write = NULL;
+  feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
+
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {          
+///kw_pde+WRITE_RESULTS+usage [ FORMAT { gmsh | vtk } ]
+///kw_pde+WRITE_RESULTS+detail Default format is `gmsh`.
+    if (strcasecmp(token, "FORMAT") == 0) {
+      char *keywords[] = {"gmsh", "vtk", ""};
+      int values[] = {post_format_gmsh, post_format_vtk, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
+      
+    } else if (strcasecmp(token, "FILE") == 0) {
+///kw_pde+WRITE_RESULTS+usage [ FILE <file> ]@
+///kw_pde+WRITE_RESULTS+detail If no `FILE` is provided, the output file is the same as the input file replacing the
+///kw_pde+WRITE_RESULTS+detail `.fee` extension with the format extension, i.e. `$0.msh`.
+///kw_pde+WRITE_RESULTS+detail If there are further optional command line arguments, they are added pre-pending a dash,
+///kw_pde+WRITE_RESULTS+detail i.e. `$0-[$1-[$2...]].msh`
+///kw_pde+WRITE_RESULTS+detail Otherwise the given `FILE` is used.
+///kw_pde+WRITE_RESULTS+detail If no explicit `FORMAT` is given, the format is read from the `FILE` extension.
+      feenox_call(feenox_parser_file(&mesh_write->file));
+      if (mesh_write->file->mode == NULL) {
+        feenox_check_alloc(mesh_write->file->mode = strdup("w"));
+      }
+
+///kw_pde+WRITE_RESULTS+usage [ NO_PHYSICAL_NAMES ]
+///kw_pde+WRITE_RESULTS+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+///kw_pde+WRITE_RESULTS+detail section that sets the actual names of the physical entities is not written.      
+///kw_pde+WRITE_RESULTS+detail This might be needed in some cases to avoid name clashes when dealing with multiple `.msh` files.
+    } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
+      mesh_write->no_physical_names = 1;
+      
+///kw_pde+WRITE_RESULTS+detail If a printf-like format specifier starting with `%` is given, 
+///kw_pde+WRITE_RESULTS+detail that format is used for the fields that follow.
+///kw_pde+WRITE_RESULTS+detail Make sure the format reads floating-point data, i.e. do not use `%d`. Default is `%g`.
+///kw_pde+WRITE_RESULTS+usage [ <printf_specification> ]@
+    } else if (token[0] == '%') {
+      mesh_write->printf_format = strdup(token);
+      
+    } else {
+      feenox.pde.parse_post(mesh_write, token);
+      
+    }
+  }
+
+  // if there's no file, use $0[-$1-[$2-...]]
+  if (mesh_write->file == NULL) {
+    size_t size = 5;  // the dot, the extension and 0
+    for (int i = feenox.optind; i < feenox.argc; i++) {
+      size += strlen(feenox.argv[i])+1;
+    }
+    char *file_path = NULL;
+    feenox_check_alloc(file_path = calloc(size, sizeof(char)));
+    feenox_check_alloc(strcpy(file_path, feenox.argv[feenox.optind]));
+    for (int i = feenox.optind+1; i < feenox.argc; i++) {
+      feenox_check_alloc(strcat(file_path, "-"));
+      feenox_check_alloc(strcat(file_path, feenox.argv[i]));
+    }
+    feenox_check_alloc(strcat(file_path, "."));
+    feenox_check_alloc(strcat(file_path, (mesh_write->post_format == post_format_vtk) ? "vtk" : "msh"));
+    
+    feenox_call(feenox_define_file(file_path, file_path, 0, "w"));
+    if ((mesh_write->file = feenox_get_file_ptr(file_path)) == NULL) {
+      return FEENOX_ERROR;
+    }
+  }
+  
+  // if there's no particular keyword, pass "all"
+  if (mesh_write->mesh_write_dists == NULL) {
+    feenox.pde.parse_post(mesh_write, "all");
   }
 
   // if there's only one mesh, use that one, otherwise ask which one 
@@ -2977,8 +3079,8 @@ int feenox_parse_problem(void) {
       }
       
       
-    } else if (feenox.pde.parse_particular != NULL) {
-      feenox_call(feenox.pde.parse_particular(token));
+    } else if (feenox.pde.parse_problem != NULL) {
+      feenox_call(feenox.pde.parse_problem(token));
       
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);

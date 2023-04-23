@@ -85,7 +85,7 @@ int feenox_problem_init_parser_mechanical(void) {
       feenox_push_error_message("to solve 2D problems give either plane_stress, plane_strain or axisymmetric");
       return FEENOX_ERROR;
     } else if (feenox.pde.dim != 3) {
-      feenox_push_error_message("dimension inconsistency, expected DIM 3 instead of %d", feenox.pde.dim);
+      feenox_push_error_message("dimension inconsistency, expected DIM 2 or 3 instead of %d", feenox.pde.dim);
       return FEENOX_ERROR;
     }
     feenox.pde.dofs = feenox.pde.dim;

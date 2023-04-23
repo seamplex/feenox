@@ -22,8 +22,11 @@
 #ifndef NEUTRON_TRANSPORT_FEM_METHODS_H
 #define NEUTRON_TRANSPORT_FEM_METHODS_H
 
-// neutron_transport/init.c
+// neutron_transport/parser.c
 extern int feenox_problem_parse_problem_neutron_transport(const char *);
+extern int feenox_problem_parse_post_neutron_transport(mesh_write_t *mesh_write, const char *token);
+
+// neutron_transport/init.c
 extern int feenox_problem_init_parser_neutron_transport(void);
 extern int feenox_problem_init_runtime_neutron_transport(void);
 #ifdef HAVE_PETSC

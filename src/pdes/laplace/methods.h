@@ -23,7 +23,9 @@
 #define LAPLACE_METHODS_H
 
 // laplace/init.c
-extern int feenox_problem_parse_problem_laplace(const char *);
+extern int feenox_problem_parse_problem_laplace(const char *token);
+extern int feenox_problem_parse_post_laplace(mesh_write_t *mesh_write, const char *token);
+
 extern int feenox_problem_init_parser_laplace(void);
 extern int feenox_problem_init_runtime_laplace(void);
 #ifdef HAVE_PETSC

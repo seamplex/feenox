@@ -71,7 +71,7 @@ extern int feenox_parser_expression_in_string_sizet(size_t *result);
 extern int feenox_parser_string_format(char **string, int *n_args);
 
 extern int feenox_add_function_from_string(const char *string, char **name);
-
+extern int feenox_add_post_field(mesh_write_t *mesh_write, unsigned int size, char **token, const char *name, field_location_t location);
 extern int feenox_parser_file(file_t **file);
 
 extern int feenox_parser_vector(vector_t **vector);
@@ -112,6 +112,7 @@ extern int feenox_parse_phase_space(void);
 
 extern int feenox_parse_read_mesh(void);
 extern int feenox_parse_write_mesh(void);
+extern int feenox_parse_write_results(void);
 extern int feenox_parse_physical_group(void);
 extern int feenox_parse_material(void);
 extern int feenox_parse_bc(void);

@@ -46,3 +46,16 @@ int feenox_problem_parse_problem_modal(const char *token) {
   
   return FEENOX_OK;
 }
+
+int feenox_problem_parse_post_modal(mesh_write_t *mesh_write, const char *token) {
+
+  if (strcmp(token, "all") == 0) {
+    ;
+  } else {
+    feenox_push_error_message("undefined keyword '%s' for modal WRITE_RESULTS", token);
+    return FEENOX_ERROR;
+  }
+  
+  return FEENOX_OK;
+}
+  

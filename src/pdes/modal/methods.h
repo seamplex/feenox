@@ -22,8 +22,11 @@
 #ifndef MODAL_METHODS_H
 #define MODAL_METHODS_H
 
+// modal/parser.c
+extern int feenox_problem_parse_problem_modal(const char *token);
+extern int feenox_problem_parse_post_modal(mesh_write_t *mesh_write, const char *token);
+
 // modal/init.c
-extern int feenox_problem_parse_problem_modal(const char *);
 extern int feenox_problem_init_parser_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
 #ifdef HAVE_PETSC

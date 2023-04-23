@@ -154,19 +154,25 @@ int feenox_initialize(int argc, char **argv) {
   // after getopt() the arguments are re-ordered as needed to further
   // process the input file and the replacement arguments
   feenox.argc = argc;
-  feenox_check_alloc(feenox.argv = malloc((argc+1) * sizeof(char *)));
+  feenox_check_alloc(feenox.argv = calloc(argc+1, sizeof(char *)));
   for (i = 0; i < argc; i++) {
     feenox_check_alloc(feenox.argv[i] = strdup(argv[i]));
   }
-  feenox.argv[i] = NULL;
   
   // get a pointer to the main input file
-  feenox.main_input_filepath = feenox.argv[feenox.optind];
+  feenox.main_input_filepath = strdup(feenox.argv[feenox.optind]);
   
   // remember the base directory of the input file so we can try harder to find files
   feenox_check_alloc(feenox.main_input_dirname = strdup(dirname(argv[feenox.optind])));
   
+  // remove the directory and trailing .fee extension so ${0} has the case name
+  char *fee = strstr(feenox.argv[feenox.optind], ".fee");
+  if (fee != NULL) {
+    *fee = '\0';
+  }
+  feenox.argv[i] = NULL;
   
+
   // turn of GSL error handler
   gsl_set_error_handler_off();
   // TODO: use our own

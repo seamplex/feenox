@@ -95,7 +95,7 @@ int feenox_problem_init_parser_neutron_transport(void) {
     char *name = NULL;
     feenox_check_minusone(asprintf(&name, "phi%u", g+1));
     feenox_call(feenox_problem_define_solution_function(name, &neutron_transport.phi[g], FEENOX_SOLUTION_NOT_GRADIENT));
-    free(name);
+    feenox_free(name);
   }
   
 ///va_neutron_transport+keff+desc The effective multiplication factor\ $k_\text{eff}$.
@@ -483,12 +483,9 @@ int feenox_problem_setup_pc_neutron_transport(PC pc) {
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
     petsc_call(PCSetType(pc, PCLU));
-    if (neutron_transport.has_sources == 0) {
-      // PC for EPS
 #ifdef PETSC_HAVE_MUMPS
       petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #endif
-    }
   }
   
   return FEENOX_OK;
@@ -499,9 +496,7 @@ int feenox_problem_setup_ksp_neutron_transport(KSP ksp ) {
   KSPType ksp_type = NULL;
   petsc_call(KSPGetType(ksp, &ksp_type));
   if (ksp_type == NULL) {
-    if (neutron_transport.has_sources == 0) {
-      petsc_call(KSPSetType(ksp, KSPPREONLY))
-    }
+    petsc_call(KSPSetType(ksp, KSPPREONLY))
   }  
 
   return FEENOX_OK;

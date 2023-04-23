@@ -1689,7 +1689,8 @@ struct feenox_t {
     mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
   
     // problem-specific virtual methods
-    int (*parse_particular)(const char *);
+    int (*parse_problem)(const char *);
+    int (*parse_post)(mesh_write_t *, const char *);
     int (*init_parser_particular)(void);
     int (*init_runtime_particular)(void);
     int (*bc_parse)(bc_data_t *, const char *, char *);

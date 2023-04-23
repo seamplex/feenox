@@ -293,7 +293,7 @@ int feenox_define_file(const char *name, const char *format, int n_format_args, 
   if ((file->n_format_args = n_format_args) > 0) {
     feenox_check_alloc(file->arg = calloc(file->n_format_args, sizeof(expr_t)));
   }  
-  if (mode != NULL && strcmp(mode, "") == 0) {
+  if (mode != NULL && strcmp(mode, "") != 0) {
     feenox_check_alloc(file->mode = strdup(mode));
   }
 

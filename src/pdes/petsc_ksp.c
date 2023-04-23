@@ -54,10 +54,12 @@ int feenox_problem_solve_petsc_linear(void) {
   // try to use the solution as the initial guess (it already has Dirichlet BCs
   // but in quasi-static it has the previous solution which should be similar)
   // mumps cannot be used with a non-zero guess  
+/*  
   if ((feenox.pde.ksp_type == NULL || strcasecmp(feenox.pde.ksp_type, "mumps") != 0) &&
       (feenox.pde.pc_type  == NULL || strcasecmp(feenox.pde.pc_type,  "mumps") != 0)) {
     petsc_call(KSPSetInitialGuessNonzero(feenox.pde.ksp, PETSC_TRUE));
   } 
+*/
   feenox.pde.progress_last = 0;
 
   // do the work!

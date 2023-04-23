@@ -25,6 +25,7 @@
 
 // mechanical/parse.c
 extern int feenox_problem_parse_problem_mechanical(const char *);
+extern int feenox_problem_parse_post_mechanical(mesh_write_t *mesh_write, const char *);
 extern int feenox_parse_linearize_stress();
 
 // mechanical/init.c

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for the heat equation: virtual methods
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -23,7 +23,10 @@
 #define THERMAL_METHODS_H
 
 // thermal/init.c
-extern int feenox_problem_parse_problem_thermal(const char *);
+extern int feenox_problem_parse_problem_thermal(const char *token);
+extern int feenox_problem_parse_post_thermal(mesh_write_t *mesh_write, const char *token);
+
+// thermal/parser.c
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 #ifdef HAVE_PETSC
