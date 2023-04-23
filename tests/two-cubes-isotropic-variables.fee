@@ -12,5 +12,6 @@ BC right Fx=1000
 
 SOLVE_PROBLEM
 
-WRITE_MESH two-cubes-isotropic-variables.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+WRITE_RESULTS FORMAT vtk displacements stresses
+
 PRINT %.1f sigma(0,0,0)

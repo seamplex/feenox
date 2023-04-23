@@ -19,7 +19,7 @@ nuzx = nu13 * Ez/Ex
 
 SOLVE_PROBLEM
 
-# WRITE_MESH orthotropic-beam.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
+WRITE_RESULTS displ stress
 b = 0.05;
 h = 0.02;
 PRINT SEP " " %.1f sigmax(0,b/2,h/2) sigmay(0,b/2,h/2) sigmaz(0,b/2,h/2) tauxy(0,b/2,h/2) tauzx(0,b/2,h/2)

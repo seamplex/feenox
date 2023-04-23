@@ -2,11 +2,12 @@
 
  * implicit call to `SOLVE_PROBLEM`?
  * use `MatPreallocator` to efficiently pre-allocate the matrices?
+    - check v3.19
  * use `DMPlex`?
     - allocate matrices
     - write vtus
     - dump states
- * use `spack`
+ * use `spack`? sow?
  * https://joss.theoj.org/
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
@@ -108,11 +109,6 @@
    - med?
  
  * full tensors
- * problem-aware `WRITE_POST`
-   - `full | displacements | stresses | strains | von_mises | tresca | principal`
-   - `full | temperature | heat_flux`
-   - `full | mode_1 | mode_n1 | modes`
-   - `full | flux_1 | fluxes | currents`
  
  
 # PDEs
@@ -126,6 +122,7 @@
  * benchmark MPI (read `.msh` with partitioning info first)
  * openmp to build matrices and compute stresses
  * glue
+ * `-mpi_linear_solver_server`
  
 ## Laplace/Poisson/Helmholtz
 
@@ -157,7 +154,13 @@
  * benchmarks
  * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE
  
-## V & V
+# V & V
 
  * MMS
 
+# PDEs
+
+ - CFD?
+ - LBM?
+ - Electromagnetism?
+ 

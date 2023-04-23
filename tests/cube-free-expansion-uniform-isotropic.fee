@@ -13,7 +13,7 @@ T = 9.87654321
 
 SOLVE_PROBLEM
 
-WRITE_MESH cube-free-expansion-uniform-isotropic.vtk VECTOR u v w sigma
+WRITE_RESULTS FORMAT vtk displacements vonmises
 
 VECTOR diff_displ[3]
 diff_displ[1] = u(1,1,1)-alpha*T

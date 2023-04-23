@@ -10,5 +10,5 @@ BC top    tension=0.12345678
 SOLVE_PROBLEM
 
 # DUMP K K_bc b b_bc FORMAT octave 
-WRITE_MESH cube-radial.vtk sigmax sigmay sigmaz tauxy tauyz tauzx sigma1 sigma2 sigma3 sigma VECTOR u v w
+WRITE_RESULTS FORMAT vtk stresses principal vonmises displ
 PRINT %.6f sigma1(0,0,0) w(0,0,0) w(1,1,1) SEP " "

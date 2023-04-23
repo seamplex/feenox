@@ -26,7 +26,7 @@ S_h(r) = ((3+nu)*R^2 - (1+3*nu)*r^2)
 S_r(r) = (3+nu) * (R^2 - r^2)
 
 
-# WRITE_MESH spinning-disk-parallel-plane-$1.vtk VECTOR u v 0   sigma
+WRITE_RESULTS FORMAT vtk displ vonmises
 
 # profiles along r
 # PRINT_FUNCTION S_h sigma_h S_r sigma_r MIN 0 MAX R NSTEPS 20 FILE spinning-disk-parallel-plane-$1.dat

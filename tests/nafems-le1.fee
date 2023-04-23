@@ -13,5 +13,5 @@ BC BC tension=10
 
 SOLVE_PROBLEM
 
-WRITE_MESH ${0}-${1}.vtk VECTOR u v 0 sigmax sigmay tauxy
+WRITE_RESULTS FILE ${0}-${1}.vtk displacements stresses
 PRINT %.1f sigmay(2000,0)

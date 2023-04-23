@@ -3,5 +3,5 @@ READ_MESH square-centered.msh
 BC left  phi=+y
 BC right phi=-y
 SOLVE_PROBLEM
-WRITE_MESH laplace-square.msh phi VECTOR NAME grad_phi dphidx dphidy 0
+WRITE_RESULTS FILE laplace-square.msh
 PRINT phi(1,1) dphidx(1,1) dphidy(1,1) SEP " "

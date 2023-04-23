@@ -109,7 +109,8 @@ for pde in *; do
     fi
     cat << EOF >> parse.c
 if (strcasecmp(token, "${pde}") == 0) {
-    feenox.pde.parse_particular = feenox_problem_parse_problem_${pde};
+    feenox.pde.parse_problem = feenox_problem_parse_problem_${pde};
+    feenox.pde.parse_post = feenox_problem_parse_post_${pde};
     feenox.pde.init_parser_particular = feenox_problem_init_parser_${pde};
     
 EOF
