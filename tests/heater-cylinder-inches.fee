@@ -1,0 +1,17 @@
+# Case VMMECH006: Heater with Nonlinear Conductivity
+PROBLEM thermal 3D
+READ_MESH $0.msh
+
+k(x,y,z) := 0.01375 * (1 + 0.001*T(x,y,z))
+q = 10
+
+BC front     T=212
+BC adiabatic q=0
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk all
+FIND_EXTREMA sqrt(qx(x,y,z)^2+qy(x,y,z)^2) MAX q_max
+
+# reference says target temp is 476 which needs a very fine mesh
+# TODO: axisymmetric
+PRINT sqrt((T_max-481.97)^2+(q_max-9.9944)^2)

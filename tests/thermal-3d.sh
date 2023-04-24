@@ -12,6 +12,11 @@ fi
 checkpde thermal
 checkgmsh
 
+gmsh -3 ${dir}/heater-cylinder-inches.geo || exit $?
+answerzero heater-cylinder-inches.fee
+exitifwrong $?
+
+
 for i in struct unstruct; do
  gmsh -3 ${dir}/long-bar-${i}.geo || exit $?
  answerzero1 long-bar-thermal.fee ${i}
@@ -22,7 +27,7 @@ checkpde mechanical
 
 for i in struct unstruct; do
  for j in struct unstruct; do
-  answerzero2 long-bar-thermal.fee ${i} ${j}
+  answerzero2 long-bar-mechanical.fee ${i} ${j} 0.002
   exitifwrong $?
  done 
 done

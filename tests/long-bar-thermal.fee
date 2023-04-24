@@ -1,3 +1,4 @@
+# Case VMMECH007:Thermal Stress in a Bar with Temperature Dependent Conductivity
 PROBLEM thermal 3D
 DEFAULT_ARGUMENT_VALUE 1 struct
 READ_MESH long-bar-$1.msh

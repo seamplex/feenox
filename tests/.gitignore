@@ -45,3 +45,5 @@ long-bar-*.msh
 wilson*.msh
 map-*.msh
 orthotropic-beam-*.msh
+heater-cylinder-inches.msh
+heater-cylinder-inches.vtk

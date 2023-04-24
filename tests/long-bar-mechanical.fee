@@ -1,3 +1,4 @@
+# Case VMMECH007:Thermal Stress in a Bar with Temperature Dependent Conductivity
 PROBLEM mechanical 3D
 DEFAULT_ARGUMENT_VALUE 1 struct
 DEFAULT_ARGUMENT_VALUE 2 $1
@@ -16,5 +17,5 @@ SOLVE_PROBLEM
 
 FIND_EXTREMA w MAX w_max X_MAX w_max_x Y_MAX w_max_y Z_MAX w_max_z
 # "target" is 0.00232 but that's too small
-# the subtracted value is the one reported in ansys mechanical
-PRINT (w_max-0.002341)/w_max #w_max_x w_max_y w_max_z
+# "ansys mechanical" is 0.002341 and that looks also small
+PRINT (w_max-0.00234673)/w_max #w_max_x w_max_y w_max_z

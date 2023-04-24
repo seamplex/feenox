@@ -22,11 +22,11 @@
 #ifndef THERMAL_METHODS_H
 #define THERMAL_METHODS_H
 
-// thermal/init.c
+// thermal/parser.c
 extern int feenox_problem_parse_problem_thermal(const char *token);
 extern int feenox_problem_parse_post_thermal(mesh_write_t *mesh_write, const char *token);
 
-// thermal/parser.c
+// thermal/init.c
 extern int feenox_problem_init_parser_thermal(void);
 extern int feenox_problem_init_runtime_thermal(void);
 #ifdef HAVE_PETSC

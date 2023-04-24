@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  FeenoX parser for laplace-specific keywords
+ *  FeenoX parser for thermal-specific keywords
  *
  *  Copyright (C) 2023 jeremy theler
  *
@@ -21,16 +21,15 @@
  */
 #include "feenox.h"
 #include "../../parser/parser.h"
-#include "laplace.h"
+#include "thermal.h"
 
-///pb_laplace+NONE+description Laplace's equation does not need any extra keyword to `PROBLEM`.
-int feenox_problem_parse_problem_laplace(const char *token) {
+int feenox_problem_parse_problem_thermal(const char *token) {
 
-///kw_pde+PROBLEM+detail  * `laplace` solves the Laplace (or Poisson) equation.
-  
+///kw_pde+PROBLEM+detail  * `thermal` solves the heat conduction problem.
+
   // no need to parse anything;
   if (token != NULL) {
-    feenox_push_error_message("undefined keyword '%s' for laplace PROBLEM", token);
+    feenox_push_error_message("undefined keyword '%s'", token);
     return FEENOX_ERROR;
   }
  
@@ -38,32 +37,31 @@ int feenox_problem_parse_problem_laplace(const char *token) {
 }
 
 
-int feenox_problem_parse_post_laplace(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_post_thermal(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
     
-    feenox_call(feenox_problem_parse_post_laplace(mesh_write, "phi"));
-    feenox_call(feenox_problem_parse_post_laplace(mesh_write, "gradient"));
+    feenox_call(feenox_problem_parse_post_thermal(mesh_write, "temperature"));
+    feenox_call(feenox_problem_parse_post_thermal(mesh_write, "heat_flux"));
     
-  } else if (strcmp(token, "phi") == 0) {
+  } else if (strcmp(token, "temperature") == 0 || strcmp(token, "T") == 0) {
     
     feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.solution[0]->name, NULL, field_location_nodes));
     
-  } else if (strcmp(token, "grad_phi") == 0 || strcmp(token, "gradient") == 0) {
+  } else if (strcmp(token, "heat_flux") == 0 || strcmp(token, "heat_fluxes") == 0) {
     
     char *tokens[3] = {NULL, NULL, NULL};
-    for (unsigned int m = 0; m < 3; m++) {
-      tokens[m] = strdup((m < feenox.pde.dim) ? feenox.pde.gradient[0][m]->name : "0");
-    }
-    
-    feenox_call(feenox_add_post_field(mesh_write, 3, tokens, "grad_phi", field_location_nodes));
+    tokens[0] = strdup((0 < feenox.pde.dim) ? thermal.qx->name : "0");
+    tokens[1] = strdup((1 < feenox.pde.dim) ? thermal.qy->name : "0");
+    tokens[2] = strdup((2 < feenox.pde.dim) ? thermal.qz->name : "0");
+    feenox_call(feenox_add_post_field(mesh_write, 3, tokens, "heat_flux", field_location_nodes));
     
     for (unsigned int m = 0; m < 3; m++) {
       feenox_free(tokens[m]);
     }
     
   } else {
-    feenox_push_error_message("undefined keyword '%s' for laplace WRITE_RESULTS", token);
+    feenox_push_error_message("undefined keyword '%s' for thermal WRITE_RESULTS", token);
     return FEENOX_ERROR;
   }
  
