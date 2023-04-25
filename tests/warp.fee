@@ -16,4 +16,4 @@ dyv[i] = vec_u_y[i] + k*vec_v[i]
 dzv[i] = vec_u_z[i] + k*vec_w[i]
 
 # PRINT_VECTOR dxv dyv dzv
-PRINT %.5f dxv[1] vec_u_x[1] vec_u[1] SEP " "
+PRINT %.3e dxv[1] vec_u_x[1] vec_u[1] SEP " "

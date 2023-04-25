@@ -37,7 +37,7 @@
 
 int feenox_initialize(int argc, char **argv) {
   
-  int i, optc;
+  int optc = 0;
   int option_index = 0;
   int show_help = 0;
   int show_version = 0;
@@ -101,6 +101,7 @@ int feenox_initialize(int argc, char **argv) {
   
   // make a copy before calling getopt so we can re-use argv & argc for PETSc
   feenox_check_alloc(feenox.argv_orig = malloc((argc+1) * sizeof(char *)));
+  int i = 0;
   for (i = 0; i < argc; i++) {
     feenox_check_alloc(feenox.argv_orig[i] = strdup(argv[i]));
   }
@@ -158,7 +159,8 @@ int feenox_initialize(int argc, char **argv) {
   for (i = 0; i < argc; i++) {
     feenox_check_alloc(feenox.argv[i] = strdup(argv[i]));
   }
-  
+  feenox.argv[i] = NULL;
+   
   // get a pointer to the main input file
   feenox.main_input_filepath = strdup(feenox.argv[feenox.optind]);
   
@@ -166,13 +168,23 @@ int feenox_initialize(int argc, char **argv) {
   feenox_check_alloc(feenox.main_input_dirname = strdup(dirname(argv[feenox.optind])));
   
   // remove the directory and trailing .fee extension so ${0} has the case name
-  char *fee = strstr(feenox.argv[feenox.optind], ".fee");
+  // first we have to make a copy of the current argv to pass it to basename
+  // because basename might break the argument
+  char *argv0 = NULL;
+  feenox_check_alloc(argv0 = strdup(feenox.argv[feenox.optind]));
+  // we should now free the original argv;
+  feenox_free(feenox.argv[feenox.optind]);
+  // get the basename (it is a pointer to statically allocated memory)
+  char *argv0_basename = basename(argv0);
+  char *fee = strstr(argv0_basename, ".fee");
   if (fee != NULL) {
     *fee = '\0';
   }
-  feenox.argv[i] = NULL;
+  // put the resulting argv0 in the actual argv0
+  feenox_check_alloc(feenox.argv[feenox.optind] = strdup(argv0_basename));
+  // free argv0
+  feenox_free(argv0);
   
-
   // turn of GSL error handler
   gsl_set_error_handler_off();
   // TODO: use our own

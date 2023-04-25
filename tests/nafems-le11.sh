@@ -37,19 +37,19 @@ exitifwrong $?
 
 
 
-answer1 warp.fee nafems-le11-tet4 "63.31560 1.00000 0.00062"
+answer1 warp.fee nafems-le11-tet4  "6.332e+01 1.000e+00 6.232e-04"
 exitifwrong $?
 
-answer1 warp.fee nafems-le11-tet10 "65.56050 1.00000 0.00065"
+answer1 warp.fee nafems-le11-tet10 "6.556e+01 1.000e+00 6.456e-04"
 exitifwrong $?
 
-answer1 warp.fee nafems-le11-hex8 "65.08550 1.00000 0.00064"
+answer1 warp.fee nafems-le11-hex8  "6.509e+01 1.000e+00 6.409e-04"
 exitifwrong $?
 
-answer1 warp.fee nafems-le11-hex20 "65.62840 1.00000 0.00065"
+answer1 warp.fee nafems-le11-hex20 "6.563e+01 1.000e+00 6.463e-04"
 exitifwrong $?
 
-answer1 warp.fee nafems-le11-hex27 "65.68890 1.00000 0.00065"
+answer1 warp.fee nafems-le11-hex27 "6.569e+01 1.000e+00 6.469e-04"
 exitifwrong $?
 
 

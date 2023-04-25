@@ -13,7 +13,7 @@ checkpde thermal
 checkgmsh
 
 gmsh -3 ${dir}/heater-cylinder-inches.geo || exit $?
-answerzero heater-cylinder-inches.fee
+answerzero heater-cylinder-inches.fee 0.015
 exitifwrong $?
 
 

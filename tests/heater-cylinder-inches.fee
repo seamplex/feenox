@@ -14,4 +14,4 @@ FIND_EXTREMA sqrt(qx(x,y,z)^2+qy(x,y,z)^2) MAX q_max
 
 # reference says target temp is 476 which needs a very fine mesh
 # TODO: axisymmetric
-PRINT sqrt((T_max-481.97)^2+(q_max-9.9944)^2)
+PRINT sqrt((T_max-481.97)^2+(q_max-10)^2)

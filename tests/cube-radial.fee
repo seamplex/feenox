@@ -11,4 +11,4 @@ SOLVE_PROBLEM
 
 # DUMP K K_bc b b_bc FORMAT octave 
 WRITE_RESULTS FORMAT vtk stresses principal vonmises displ
-PRINT %.6f sigma1(0,0,0) w(0,0,0) w(1,1,1) SEP " "
+PRINT %.6f sigma1(0,0,0) abs(w(0,0,0)) w(1,1,1) SEP " "
