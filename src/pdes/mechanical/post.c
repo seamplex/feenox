@@ -24,6 +24,10 @@
 
 int feenox_problem_solve_post_mechanical(void) {
 
+  if (mechanical.strain_energy->used) {
+    feenox_call(feenox_strain_energy());
+  }
+  
   int uses_displ_max = (mechanical.displ_max->used ||
                    mechanical.displ_max_x->used ||
                    mechanical.displ_max_y->used ||
@@ -88,8 +92,7 @@ int feenox_problem_solve_post_mechanical(void) {
         }
       }
     }
-    
-  }  
+  }
   
   return FEENOX_OK;
 }

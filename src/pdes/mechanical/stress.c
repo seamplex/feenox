@@ -266,3 +266,27 @@ double feenox_tresca_from_stress_tensor(double sigmax, double sigmay, double sig
   return fabs(sigma1 - sigma3);  
 }
 
+int feenox_strain_energy(void) {
+
+  Vec Kphi = NULL;
+  petsc_call(VecDuplicate(feenox.pde.phi, &Kphi));
+  petsc_call(MatMult(feenox.pde.K, feenox.pde.phi, Kphi));
+  PetscScalar e = 0;
+  petsc_call(VecDot(feenox.pde.phi, Kphi, &e));
+  petsc_call(VecDestroy(&Kphi));
+  feenox_var_value(mechanical.strain_energy) = 0.5*e;
+
+/*  
+  if (fino.problem_kind == problem_kind_axisymmetric) {
+    wasora_var(fino.vars.strain_energy) *= 2*M_PI;
+  }
+*/
+  if (feenox_var_value(feenox_special_var(in_static))) {
+    if ((int)(feenox_var_value(feenox_special_var(step_static))) == 1) {
+      *mechanical.strain_energy->initial_static = *mechanical.strain_energy->value;
+    }
+    *mechanical.strain_energy->initial_transient = *mechanical.strain_energy->value;
+  }
+  
+  return FEENOX_OK;
+}
