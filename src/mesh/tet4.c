@@ -45,6 +45,7 @@ int feenox_mesh_tet4_init(void) {
   element_type->dhdr = feenox_mesh_tet4_dhdr;
   element_type->point_inside = feenox_mesh_point_in_tetrahedron;
   element_type->volume = feenox_mesh_tet_volume;
+  element_type->area = feenox_mesh_tet_area;
 
 
   // from Gmsh’ doc
@@ -362,6 +363,47 @@ double feenox_mesh_tet_volume(element_t *this) {
 
 // AFEM.Ch09.pdf
 // 6V = J = x 21 (y 23 z 34 − y34 z 23 ) + x32 (y34 z 12 − y12 z34 ) + x 43 (y12 z23 − y23 z 12),
-  
- 
 }
+
+double feenox_mesh_tet_area(element_t *this) {
+
+  if (this->area == 0) {
+    element_t triangle;
+    triangle.type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
+    triangle.node = NULL;
+    feenox_check_alloc(triangle.node = calloc(3, sizeof(node_t *)));
+    
+    // first triangle: 0 1 2
+    triangle.node[0] = this->node[0];
+    triangle.node[1] = this->node[1];
+    triangle.node[2] = this->node[2];
+    triangle.volume = 0;
+    this->area += triangle.type->volume(&triangle);
+    
+    // first triangle: 0 1 3
+    triangle.node[0] = this->node[0];
+    triangle.node[1] = this->node[1];
+    triangle.node[2] = this->node[3];
+    triangle.volume = 0;
+    this->area += triangle.type->volume(&triangle);
+
+    // first triangle: 0 2 3
+    triangle.node[0] = this->node[0];
+    triangle.node[1] = this->node[2];
+    triangle.node[2] = this->node[3];
+    triangle.volume = 0;
+    this->area += triangle.type->volume(&triangle);
+
+    // first triangle: 1 2 3
+    triangle.node[0] = this->node[1];
+    triangle.node[1] = this->node[2];
+    triangle.node[2] = this->node[3];
+    triangle.volume = 0;
+    this->area += triangle.type->volume(&triangle);
+    
+    feenox_free(triangle.node);
+  }  
+  
+  return this->area; 
+}
+

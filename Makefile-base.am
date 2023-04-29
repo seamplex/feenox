@@ -34,6 +34,7 @@ TESTS = \
         tests/function_vectors.sh \
         tests/integral.sh \
         tests/laplace2d.sh \
+        tests/los-alamos.sh \
         tests/map-cube.sh \
         tests/materials.sh \
         tests/mesh.sh \

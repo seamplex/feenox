@@ -684,12 +684,9 @@ Even though FeenoX is written in\ [C](https://en.wikipedia.org/wiki/C_(programmi
  
 Indeed, each of the supported problems, namely
 
- * [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)
- * [`thermal`](https://github.com/seamplex/feenox/tree/main/src/pdes/thermal)
- * [`mechanical`](https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical)
- * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
- * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
- * [`neutron_transport`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_transport)
+```include
+pdes.md
+```
 
 is a separate directory under [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) that implements these “virtual” methods (recall that they are function pointers) that are resolved at runtime when parsing the main input file.
 

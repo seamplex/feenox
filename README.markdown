@@ -1,24 +1,30 @@
 # FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 - [<span class="toc-section-number">1</span> Why FeenoX?][]
-- [<span class="toc-section-number">2</span> What is FeenoX?][]
-- [<span class="toc-section-number">3</span> Download][]
-  - [<span class="toc-section-number">3.1</span> Git repository][]
-- [<span class="toc-section-number">4</span> Licensing][]
-- [<span class="toc-section-number">5</span> Further information][]
+- [<span class="toc-section-number">2</span> How is FeenoX different?][]
+- [<span class="toc-section-number">3</span> What is FeenoX anyway?][]
+- [<span class="toc-section-number">4</span> Download][]
+  - [<span class="toc-section-number">4.1</span> Git repository][]
+- [<span class="toc-section-number">5</span> Licensing][]
+- [<span class="toc-section-number">6</span> Further information][]
 
   [<span class="toc-section-number">1</span> Why FeenoX?]: #why-feenox
-  [<span class="toc-section-number">2</span> What is FeenoX?]: #what-is-feenox
-  [<span class="toc-section-number">3</span> Download]: #download
-  [<span class="toc-section-number">3.1</span> Git repository]: #git-repository
-  [<span class="toc-section-number">4</span> Licensing]: #licensing
-  [<span class="toc-section-number">5</span> Further information]: #further-information
+  [<span class="toc-section-number">2</span> How is FeenoX different?]: #how-is-feenox-different
+  [<span class="toc-section-number">3</span> What is FeenoX anyway?]: #what-is-feenox-anyway
+  [<span class="toc-section-number">4</span> Download]: #download
+  [<span class="toc-section-number">4.1</span> Git repository]: #git-repository
+  [<span class="toc-section-number">5</span> Licensing]: #sec:licensing
+  [<span class="toc-section-number">6</span> Further information]: #further-information
 
 # Why FeenoX?
 
+> If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
+> [FAQs][].
+
 The world is already full of finite-element programs and every day a
 grad student creates a new one from scratch. So why adding FeenoX to the
-already-crowded space of FEA tools?
+already-crowded space of FEA tools? Here is \***why FeenoX is
+different**.
 
 To better illustrate FeenoX’s unfair advantage (in the entrepreneurial
 sense), let us first consider what the options are when an engineer
@@ -64,25 +70,13 @@ programs (like [Code_Aster][] with [Salome-Meca][] or [CalculiX][] with
 [Markdown][1] is to Word and [(La)TeX][], respectively and
 *deliberately*.
 
-On the other hand, FeenoX meets a fictitious-yet-plausible [Software
-Requirement Specifications][] that no other single tool (that I am aware
-of) meets completely. The FeenoX [Software Design Specifications][]
-address each requirement of the SRS. The two more important design-basis
-features are that FeenoX is…
-
-1.  a cloud-first computational tool (not just cloud *friendly,* but
-    cloud **first**).
-2.  both free (as in freedom) and open source. See [Licensing][].
-
-If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
-[FAQs][].
-
 [^1]: Here “[Markdown][]” means ([Pandoc][] + [Git][] + [Github][] /
     [Gitlab][] / [Gitea][])
 
 [^2]: Here “FeenoX” means ([FeenoX][] + [Gmsh][] + [Paraview][] +
     [Git][] + [Github][] / [Gitlab][] / [Gitea][])
 
+  [FAQs]: doc/FAQ.md
   [Markdown]: https://en.wikipedia.org/wiki/Markdown
   [Code_Aster]: https://www.code-aster.org/spip.php?rubrique2
   [Salome-Meca]: https://www.code-aster.org/V2/spip.php?article303
@@ -92,10 +86,6 @@ If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
   [Sparselizard]: http://sparselizard.org/
   [1]: https://commonmark.org/
   [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
-  [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
-  [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
-  [Licensing]: #licensing
-  [FAQs]: doc/FAQ.md
   [Pandoc]: https://pandoc.org/
   [Git]: https://git-scm.com/
   [Github]: https://github.com/
@@ -105,7 +95,114 @@ If by “Why FeenoX?” you mean “Why is FeenoX named that way?,” read the
   [Gmsh]: http://gmsh.info
   [Paraview]: https://www.paraview.org/
 
-# What is FeenoX?
+# How is FeenoX different?
+
+FeenoX meets a fictitious-yet-plausible [Software Requirement
+Specifications][] that no other single tool (that I am aware of) meets
+completely. The FeenoX [Software Design Specifications][] address each
+requirement of the SRS. Two of the most important design-basis features
+are that FeenoX is…
+
+1.  a cloud-native computational tool (not just cloud *friendly,* but
+    cloud **first**).
+2.  both free (as in freedom) and open source. See [Licensing][].
+
+But the most important idea is that FeenoX provides a general
+mathematical framework to solve PDEs with a bunch of entry points (as C
+functions) where new types of PDEs (e.g. electromagnetism, fluid
+mechanics, etc.) can be added to the set of what FeenoX can solve.
+FeenoX will provide means to
+
+- parse the input file, handle command-line arguments, read mesh files,
+  assign variables, evaluate conditionals, write results, etc.
+  `feenox     PROBLEM laplace 3D     READ_MESH square-$1.msh     [...]     WRITE_RESULTS FORMAT vtk`
+
+- handle material properties given as algebraic expressions involving
+  pointwise-defined functions of space, temperature, time, etc.
+
+  ``` feenox
+  MATERIAL steel     E=210e3*(1-1e-3*(T(x,y,z)-20))   nu=0.3
+  MATERIAL aluminum  E=69e3                           nu=7/25
+  ```
+
+- read problem-specific boundary conditions as algebraic expressions
+
+  ``` feenox
+  sigma = 5.670374419e-8  # W m^2 / K^4 as in wikipedia
+  e = 0.98      # non-dimensional
+  T0 = 1000     # K
+  Tinf = 300    # K
+
+  BC left  T=T0
+  BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
+  ```
+
+- access shape functions and its derivatives evaluated at gauss points
+  or at arbitrary locations for computing elementary contributions to
+
+  - stiffness matrix
+  - mass matrix
+  - right-hand side vector
+
+- solve the discretized equations using the appropriate
+  [PETSc][]/[SLEPc][] objects, i.e.
+
+  - [KSP][] for linear static problems
+  - [SNES][] for non-linear static problems
+  - [TS][] for transient problems
+  - [EPS][] for eigenvalue problems
+
+This general framework constitutes the bulk of [FeenoX source code][].
+The particular functions that implement each problem type are located in
+subdirectories [`src/pdes`][], namely
+
+- [`laplace`][]
+- [`thermal`][]
+- [`mechanical`][]
+- [`modal`][]
+- [`neutron_diffusion`][]
+- [`neutron_transport`][]
+
+Engineers, researchers, scientists, developers and/or hobbyists just
+need to use one of these directories (say [`laplace`][]) as a template
+and
+
+1.  replace every occurrence of `laplace` in symbol names with the name
+    of the new PDE
+2.  modify the initialization functions in `init.c` and set
+    - the names of the unknowns
+    - the names of the materials
+    - the mathematical type and properties of problem
+    - etc.
+3.  modify the contents of the elemental matrices in `bulk.c` in the FEM
+    formulation of the problem being added
+4.  modify the contents of how the boundary conditions are parsed and
+    set in `bc.c`
+5.  re-run `autogen.sh`, `./configure` and `make` to get a FeenoX
+    executable with support for the new PDE.
+
+They also ought to to read, understand and mind the [GPLv3+ licensing
+terms][Licensing].
+
+  [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
+  [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
+  [Licensing]: #sec:licensing
+  [PETSc]: https://petsc.org/
+  [SLEPc]: https://slepc.upv.es/
+  [KSP]: https://petsc.org/release/manual/ksp/
+  [SNES]: https://petsc.org/release/manual/snes/
+  [TS]: https://petsc.org/release/manual/ts/
+  [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
+  [FeenoX source code]: https://github.com/seamplex/feenox
+  [`src/pdes`]: https://github.com/seamplex/feenox/tree/main/src/pdes
+  [`laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
+  [`thermal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal
+  [`mechanical`]: https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical
+  [`modal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/modal
+  [`neutron_diffusion`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion
+  [`neutron_transport`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_transport
+
+# What is FeenoX anyway?
 
 FeenoX can be seen either as
 
@@ -262,8 +359,7 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
-<figure id="fig:lorenz-gnuplot" data-width_latex="75%"
-data-width_html="100%" data-width_texinfo="12cm">
+<figure id="fig:lorenz-gnuplot">
 <img src="doc/lorenz.svg" data-width_latex="75%" data-width_html="100%"
 data-width_texinfo="12cm"
 alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
@@ -325,8 +421,7 @@ mesh (*rule of simplicity*). And since the properties are uniform and
 isotropic, a single global scalar for $E$ and a global single scalar
 for $\nu$ are enough.
 
-<figure id="fig:nafems-le10-problem-input" data-width_html="100%"
-data-width_latex="100%" data-width_texinfo="15cm">
+<figure id="fig:nafems-le10-problem-input">
 <img src="doc/nafems-le10-problem-input.svg" data-width_html="100%"
 data-width_latex="100%" data-width_texinfo="15cm"
 alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
@@ -334,8 +429,7 @@ alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
 corresponding FeenoX input</figcaption>
 </figure>
 
-<figure id="fig:nafems-le10-sigmay" data-width_html="100%"
-data-width_latex="70%" data-width_texinfo="12cm">
+<figure id="fig:nafems-le10-sigmay">
 <img src="doc/nafems-le10.png" data-width_html="100%"
 data-width_latex="70%" data-width_texinfo="12cm"
 alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
@@ -682,16 +776,14 @@ Follow us: [YouTube][] [LinkedIn][] [Github][9]
 
 ------------------------------------------------------------------------
 
-FeenoX is copyright ©2009-2022 [Seamplex][]  
+FeenoX is copyright ©2009-2023 [Seamplex][]  
 FeenoX is licensed under [GNU GPL version 3][] or (at your option) any
 later version.  
 FeenoX is free software: you are free to change and redistribute it.  
-There is **NO WARRANTY**, to the extent permitted by law.  
-See the [copying conditions][].
+There is **NO WARRANTY**, to the extent permitted by law.
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
   [9]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html
-  [copying conditions]: COPYING

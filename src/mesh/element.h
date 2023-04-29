@@ -66,6 +66,7 @@ extern double feenox_mesh_prism_volume(element_t *this);
 extern double feenox_mesh_line_area(element_t *this);
 extern double feenox_mesh_triang_area(element_t *this);
 extern double feenox_mesh_quad_area(element_t *this);
+extern double feenox_mesh_tet_area(element_t *this);
 
 
 

@@ -1838,14 +1838,6 @@ struct feenox_t {
     // reusable number of dirichlet rows to know how much memory to allocate
     size_t          dirichlet_rows;
 
-    // mimicked nodes (e.g. mirror or periodic conditions)
-    PetscInt        *mimicked_index_follower;
-    PetscInt        *mimicked_index_guide;
-    // we imply that the coefficient of the guide is equal to one
-    PetscScalar     *mimicked_coefficient_follower;
-    size_t          mimicked_k;
-    size_t          mimicked_nodes;
-    
     // internal storage of multi-freedom conditions
     PetscInt        **multifreedom_indexes;
     gsl_matrix      **multifreedom_coefficients;

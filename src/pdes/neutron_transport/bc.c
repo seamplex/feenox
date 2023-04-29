@@ -38,7 +38,7 @@ int feenox_problem_bc_parse_neutron_transport(bc_data_t *bc_data, const char *lh
 
   // TODO: albedo
   // TODO: white current
-  // TODO: individual flux as a function of theta & phi  
+  // TODO: individual scalar fluxes as a function of theta & phi  
   } else {
     feenox_push_error_message("unknown neutron_transport boundary condition '%s'", lhs);
     return FEENOX_ERROR;
@@ -97,11 +97,9 @@ int feenox_problem_bc_set_neutron_transport_mirror(bc_data_t *this, element_t *e
       // if Omega is the incident direction with respect to the outward normal then
       // reflected = Omega - 2*(Omega dot outward_normal) * outward_normal
       
-//      printf("n       = %d\t[%+.2f %+.2f %+.2f]\n", n, neutron_transport.Omega[n][0], neutron_transport.Omega[n][1], neutron_transport.Omega[n][2]);
       for (int m = 0; m < 3; m++) {
         reflected[m] = neutron_transport.Omega[n][m] - 2*Omega_dot_outward * outward_normal[m];
       }
-//      printf("reflect =   \t[%+.2f %+.2f %+.2f]\n", reflected[0], reflected[1], reflected[2]);
 
       unsigned int n_prime = 0;
       for (n_prime = 0; n_prime < neutron_transport.directions; n_prime++) {
@@ -117,28 +115,15 @@ int feenox_problem_bc_set_neutron_transport_mirror(bc_data_t *this, element_t *e
         return FEENOX_ERROR;
       }
       
-//      printf("n_prime = %d\t[%+.2f %+.2f %+.2f]\n", n_prime, neutron_transport.Omega[n_prime][0], neutron_transport.Omega[n_prime][1], neutron_transport.Omega[n_prime][2]);
+      double *coefficients = NULL;
+      feenox_check_alloc(coefficients = calloc(feenox.pde.dofs, sizeof(double)));
       
       for (unsigned int g = 0; g < neutron_transport.groups; g++) {
-        size_t index_guide = feenox.pde.mesh->node[j_global].index_dof[dof_index(n,g)];
-        size_t index_follower = feenox.pde.mesh->node[j_global].index_dof[dof_index(n_prime,g)];
-        
-        unsigned int den = 1;
-        for (size_t k = 0; k < feenox.pde.mimicked_k; k++) {
-          den += (feenox.pde.mimicked_index_follower[k] == index_follower);
-        }
-        double coeff = -1.0/(double)(den);
-        for (size_t k = 0; k < feenox.pde.mimicked_k; k++) {
-          if (feenox.pde.mimicked_index_follower[k] == index_follower) {
-            feenox.pde.mimicked_coefficient_follower[k] = coeff;
-          }
-        }
-        
-//        printf("guide    dir %d group %d local index %u global index %lu\n", n,       g, dof_index(n,g),       index_guide);
-//        printf("follower dir %d group %d local index %u global index %lu\n", n_prime, g, dof_index(n_prime,g), index_follower);
-        feenox_call(feenox_problem_mimicked_add(index_guide, index_follower, coeff));
+        coefficients[dof_index(n,g)] = -1;
+        coefficients[dof_index(n_prime,g)] = +1;
       }
-
+      feenox_call(feenox_problem_multifreedom_add(j_global, coefficients));
+      feenox_free(coefficients);
     }
   }
       

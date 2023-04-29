@@ -1,0 +1,13 @@
+# Los Alamos LA-13511 Analytical Benchmark Test Set for Criticallity Code Verification
+# problem 7
+PROBLEM neutron_transport 2D GROUPS 1 SN 4
+READ_MESH $0.msh
+
+INCLUDE Pu-239b.fee
+
+BC mirror  mirror
+BC vacuum  vacuum 
+
+SOLVE_PROBLEM
+
+PRINT keff-0.996359

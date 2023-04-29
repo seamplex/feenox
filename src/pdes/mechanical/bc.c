@@ -215,7 +215,6 @@ int feenox_problem_bc_set_mechanical_symmetry(bc_data_t *this, element_t *e, siz
   // if the condition results in a direction normal to one of the three coordinate planes
   // then we set a traditional dirichlet bc (i.e. u=0 or v=0 or w=0)
   // otherwise we need a generic multifreedom
-  // TODO: what if one of the coefficients is zero? maybe we can use a mimicked node...
   if (coordinate_direction != -1) {
     feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[coordinate_direction], 0));
   } else {

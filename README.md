@@ -62,25 +62,89 @@ toc: true
 
 # Why FeenoX?
 
+> If by "Why FeenoX?" you mean "Why is FeenoX named that way?," read the [FAQs](doc/FAQ.md).
+
+
 The world is already full of finite-element programs and every day a grad student creates a new one from scratch.
 So why adding FeenoX to the already-crowded space of FEA tools?
+Here is ***why FeenoX is different**.
 
 ```{.include}
 doc/why.md
 ```
 
+# How is FeenoX different?
 
-On the other hand, FeenoX meets a fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) that no other single tool (that I am aware of) meets completely. The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
-The two more important design-basis features are that FeenoX is...
+FeenoX meets a fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) that no other single tool (that I am aware of) meets completely.
+The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
+Two of the most important design-basis features are that FeenoX is...
 
- 1. a cloud-first computational tool (not just cloud _friendly,_ but cloud **first**).
- 2. both free (as in freedom) and open source. See [Licensing].
+ #. a cloud-native computational tool (not just cloud _friendly,_ but cloud **first**).
+ #. both free (as in freedom) and open source. See [Licensing].
+ 
+But the most important idea is that FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve. FeenoX will provide means to
+
+  - parse the input file, handle command-line arguments, read mesh files, assign variables, evaluate conditionals, write results, etc.
+    ```feenox
+    PROBLEM laplace 3D
+    READ_MESH square-$1.msh
+    [...]
+    WRITE_RESULTS FORMAT vtk
+    ```
+    
+  - handle material properties given as algebraic expressions involving pointwise-defined functions of space, temperature, time, etc.
+    
+    ```feenox
+    MATERIAL steel     E=210e3*(1-1e-3*(T(x,y,z)-20))   nu=0.3
+    MATERIAL aluminum  E=69e3                           nu=7/25
+    ```
+    
+  - read problem-specific boundary conditions as algebraic expressions
+    
+    ```feenox
+    sigma = 5.670374419e-8  # W m^2 / K^4 as in wikipedia
+    e = 0.98      # non-dimensional
+    T0 = 1000     # K
+    Tinf = 300    # K
+
+    BC left  T=T0
+    BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
+    ```
+
+  - access shape functions and its derivatives evaluated at gauss points or at arbitrary locations for computing elementary contributions to
+     * stiffness matrix
+     * mass matrix
+     * right-hand side vector
+    
+  - solve the discretized equations using the appropriate [PETSc](https://petsc.org/)/[SLEPc](https://slepc.upv.es/) objects, i.e.
+    * [KSP](https://petsc.org/release/manual/ksp/) for linear static problems
+    * [SNES](https://petsc.org/release/manual/snes/) for non-linear static problems
+    * [TS](https://petsc.org/release/manual/ts/) for transient problems
+    * [EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html) for eigenvalue problems
+
+This general framework constitutes the bulk of [FeenoX source code](https://github.com/seamplex/feenox).
+The particular functions that implement each problem type are located in subdirectories [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes), namely
+
+```include
+doc/pdes.md
+```
+      
+Engineers, researchers, scientists, developers and/or hobbyists just need to use one of these directories (say [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)) as a template and
+
+ #. replace every occurrence of `laplace` in symbol names with the name of the new PDE
+ #. modify the initialization functions in `init.c` and set 
+     * the names of the unknowns
+     * the names of the materials
+     * the mathematical type and properties of problem 
+     * etc.
+ #. modify the contents of the elemental matrices in `bulk.c` in the FEM formulation of the problem being added
+ #. modify the contents of how the boundary conditions are parsed and set in `bc.c`
+ #. re-run `autogen.sh`, `./configure` and `make` to get a FeenoX executable with support for the new PDE.
+
+They also ought to to read, understand and mind the [GPLv3+ licensing terms](#sec:licensing).
 
 
-If by "Why FeenoX?" you mean "Why is FeenoX named that way?," read the [FAQs](doc/FAQ.md).
-
-
-# What is FeenoX?
+# What is FeenoX anyway?
 
 ```{.include}
 doc/introduction.md
@@ -101,7 +165,7 @@ doc/git.md
 
 See the [detailed compilation instructions](doc/compilation.md) for further details.
 
-# Licensing
+# Licensing {#sec:licensing}
 
 FeenoX is distributed under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html) version 3 or (at your option) any later version. The following text was borrowed from the [Gmsh documentation](http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions). Replacing “Gmsh” with “FeenoX” gives:
 
@@ -126,8 +190,7 @@ Follow us: [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA)
 
 ---------------------------
 
-FeenoX is copyright ©2009-2022 [Seamplex](https://www.seamplex.com)  
+FeenoX is copyright ©2009-2023 [Seamplex](https://www.seamplex.com)  
 FeenoX is licensed under [GNU GPL version 3](http://www.gnu.org/copyleft/gpl.html) or (at your option) any later version.  
 FeenoX is free software: you are free to change and redistribute it.  
 There is **NO WARRANTY**, to the extent permitted by law.  
-See the [copying conditions](COPYING).  

@@ -16,7 +16,8 @@
     -   2.3 Mechanical
     -   2.4 Modal
     -   2.5 Neutron
-    -   2.6 V & V
+-   3 V & V
+-   4 PDEs
 
   [1 General things to do]: #general-things-to-do
   [1.1 Tests]: #tests
@@ -34,17 +35,19 @@
   [2.3 Mechanical]: #mechanical
   [2.4 Modal]: #modal
   [2.5 Neutron]: #neutron
-  [2.6 V & V]: #v-v
+  [3 V & V]: #v-v
+  [4 PDEs]: #pdes-1
 
 General things to do
 
 -   implicit call to SOLVE_PROBLEM?
 -   use MatPreallocator to efficiently pre-allocate the matrices?
+    -   check v3.19 and see if it works well
 -   use DMPlex?
-    -   allocate matrices
-    -   write vtus
-    -   dump states
--   use spack
+    -   allocate matrices?
+    -   write vtus?
+    -   dump states?
+-   use spack? sow?
 -   https://joss.theoj.org/
 -   FIT to mesh-based functions
 -   FIT taking into account uncertainties
@@ -54,16 +57,18 @@ General things to do
     -   wrap all GSL calls inside #ifdef
     -   use a large chunk of contiguous memory in the heap to store
         shape functions, gradients, etc
+-   MPI
 
 Tests
 
 -   move all doc/examples to tests
--   automated nightly builds and tests (Laminar CI? github actions?)
 -   write a README and an explanation of each test
+-   automated nightly builds and tests (Laminar CI? github actions?)
 -   make an index of the keywords used in each test and link them from
     the doc as examples
 -   cell-based mesh writes and integrations
 -   FIT ranges
+-   MPI
 
 Optimizations
 
@@ -88,6 +93,7 @@ Optimizations
     -   problem dimension (so we can hardcode sizes)
     -   full or axi-symmetry
     -   scalar size (float or double)
+    -   all elements are of the same type
 
 Wasora keywords
 
@@ -96,14 +102,14 @@ Wasora keywords
 -   M4 (MUSTACHE? MACRO?)
 -   SHELL
 -   HISTORY
--   PRINT_FUNCTION PHYSICAL_ENTITY
+-   PRINT_FUNCTION PHYSICAL_ENTITY -> for dumping and reading back BCs
 -   CALL user routines (check hash of feenox.h)
 
 Wasora-like stuff
 
 -   vector & matrix assignements & DAEs
 -   debug mode, line-by-line
--   trap signit & sigterm
+-   trap and handle signit & sigterm
 
 API
 
@@ -130,7 +136,8 @@ Nice to have
 
 Command-line arguments
 
--   list symbols with -l (is there any clash with petsc?)
+-   list symbols with -l
+-   dump shape funcionts, gauss points, etc.
 
 Error handling
 
@@ -149,11 +156,6 @@ Postprocessing output
     -   cgns?
     -   med?
 -   full tensors
--   problem-aware WRITE_POST
-    -   full | displacements | stresses | strains | von_mises | tresca | principal
-    -   full | temperature | heat_flux
-    -   full | mode_1 | mode_n1 | modes
-    -   full | flux_1 | fluxes | currents
 
 PDEs
 
@@ -168,7 +170,9 @@ PDEs
         solve_problem() the first time they are needed
 -   benchmark MPI (read .msh with partitioning info first)
 -   openmp to build matrices and compute stresses
--   glue
+-   glue (mortar)
+-   investigate -mpi_linear_solver_server
+-   direct elimination for multi-freedom BCs
 
 Laplace/Poisson/Helmholtz
 
@@ -188,7 +192,7 @@ Mechanical
 
 -   non-linear
 -   stresses: count negative jacobians and worst jacobians
--   strain energy (global and local)
+-   strain energy density
 
 Modal
 
@@ -197,9 +201,15 @@ Modal
 Neutron
 
 -   FVM
--   benchmarks
+-   benchmarks/tests
 -   Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE
 
 V & V
 
 -   MMS
+
+PDEs
+
+-   CFD?
+-   LBM?
+-   Electromagnetism?

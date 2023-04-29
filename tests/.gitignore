@@ -48,3 +48,6 @@ orthotropic-beam-*.msh
 heater-cylinder-inches.msh
 heater-cylinder-inches.vtk
 reaction-force.vtk
+la-IN.msh
+la-p*.msh
+la-p*.vtk

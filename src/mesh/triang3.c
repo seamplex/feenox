@@ -28,9 +28,7 @@
 
 int feenox_mesh_triang3_init(void) {
 
-  double r[2];
-  element_type_t *element_type;
-  int j;
+  element_type_t *element_type = NULL;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
   feenox_check_alloc(element_type->name = strdup("triang3"));
@@ -63,6 +61,7 @@ v
 */   
   element_type->node_coords = calloc(element_type->nodes, sizeof(double *));
   element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *));    
+  int j = 0;
   for (j = 0; j < element_type->nodes; j++) {
     element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
   }
@@ -90,6 +89,8 @@ v
   feenox_mesh_gauss_init_triang1(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 1);
   
+  double r[2];
+
   // the two extrapolation matrices
   // first the full one
   r[0] = -1.0/3.0;

@@ -59,15 +59,18 @@ int feenox_problem_init_parser_neutron_transport(void) {
   switch(feenox.pde.dim) {
     case 1:
       neutron_transport.directions = neutron_transport.N;
-      neutron_transport.geometric_factor = 1;
+      neutron_transport.supg_dimension_factor = 1;
       break;
     case 2:
       neutron_transport.directions = 0.5*neutron_transport.N*(neutron_transport.N+2);
-      neutron_transport.geometric_factor = 4;
+//      neutron_transport.supg_dimension_factor = 4;
+      neutron_transport.supg_dimension_factor = 6;
       break;
     case 3:
       neutron_transport.directions = neutron_transport.N*(neutron_transport.N+2);
-      neutron_transport.geometric_factor = 6;
+//      neutron_transport.supg_dimension_factor = 6;
+//      neutron_transport.supg_dimension_factor = 12;
+      neutron_transport.supg_dimension_factor = 16;
       break;
   }
   
@@ -195,7 +198,7 @@ int feenox_problem_init_parser_neutron_transport(void) {
     // we could have used file sndir2.dat from fentraco, but the values are different
 
     // this is for 2 and 3 dimensions
-    int N_octs = (feenox.pde.dim) ? 4 : 8;
+    int N_octs = (feenox.pde.dim == 2) ? 4 : 8;
     int J_octs = neutron_transport.directions / N_octs;
 
     // first set the weights as all the possible permutations in the first octant

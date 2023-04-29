@@ -2,11 +2,11 @@
 
  * implicit call to `SOLVE_PROBLEM`?
  * use `MatPreallocator` to efficiently pre-allocate the matrices?
-    - check v3.19
+    - check v3.19 and see if it works well
  * use `DMPlex`?
-    - allocate matrices
-    - write vtus
-    - dump states
+    - allocate matrices?
+    - write vtus?
+    - dump states?
  * use `spack`? sow?
  * https://joss.theoj.org/
  * FIT to mesh-based functions
@@ -16,15 +16,17 @@
    - rewrite BLAS using ad-hoc routines
    - wrap all GSL calls inside `#ifdef`
    - use a large chunk of contiguous memory in the heap to store shape functions, gradients, etc
+ * MPI
  
 ## Tests
 
  * move all `doc/examples` to `tests`
- * automated nightly builds and tests (Laminar CI? github actions?)
  * write a `README` and an explanation of each test
+ * automated nightly builds and tests (Laminar CI? github actions?)
  * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations
  * `FIT` ranges
+ * MPI
 
 ## Optimizations
 
@@ -46,6 +48,7 @@
    - problem dimension (so we can hardcode sizes)
    - full or axi-symmetry
    - scalar size (float or double)
+   - all elements are of the same type
    
    
 ## Wasora keywords
@@ -55,14 +58,14 @@
  * `M4` (MUSTACHE? MACRO?)
  * `SHELL`
  * `HISTORY`
- * `PRINT_FUNCTION PHYSICAL_ENTITY`
+ * `PRINT_FUNCTION PHYSICAL_ENTITY` -> for dumping and reading back BCs
  * `CALL` user routines (check hash of feenox.h)
  
 ## Wasora-like stuff
 
  * vector & matrix assignements & DAEs
  * debug mode, line-by-line
- * trap signit & sigterm
+ * trap and handle signit & sigterm
 
 ## API
 
@@ -89,7 +92,8 @@
  
 ## Command-line arguments
 
- * list symbols with `-l` (is there any clash with petsc?)
+ * list symbols with `-l`
+ * dump shape funcionts, gauss points, etc.
  
 ## Error handling 
  
@@ -121,8 +125,9 @@
    - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
  * benchmark MPI (read `.msh` with partitioning info first)
  * openmp to build matrices and compute stresses
- * glue
- * `-mpi_linear_solver_server`
+ * glue (mortar)
+ * investigate `-mpi_linear_solver_server`
+ * direct elimination for multi-freedom BCs
  
 ## Laplace/Poisson/Helmholtz
 
@@ -142,7 +147,7 @@
 
  * non-linear
  * stresses: count negative jacobians and worst jacobians
- * strain energy (global and local)
+ * strain energy density
 
 ## Modal
 
@@ -151,7 +156,7 @@
 ## Neutron
 
  * FVM
- * benchmarks
+ * benchmarks/tests
  * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE
  
 # V & V

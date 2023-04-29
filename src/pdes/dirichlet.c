@@ -54,24 +54,6 @@ int feenox_problem_multifreedom_add(size_t j_global, double *coefficients) {
   return FEENOX_OK;
 }
 
-// for mimicked we set an homogeneous dirichlet BC on the follower and add
-// the coefficient in the column of the guide index
-int feenox_problem_mimicked_add(size_t index_guide, size_t index_follower, double coefficient_follower) {
-#ifdef HAVE_PETSC
-  feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index_follower;
-  feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = 0;
-  feenox.pde.dirichlet_k++;
-  
-  feenox.pde.mimicked_index_follower[feenox.pde.mimicked_k] = index_follower;
-  feenox.pde.mimicked_index_guide[feenox.pde.mimicked_k] = index_guide;
-  feenox.pde.mimicked_coefficient_follower[feenox.pde.mimicked_k] = coefficient_follower;
-  feenox.pde.mimicked_k++;
-#endif
-  
-  return FEENOX_OK;
-  
-}
-
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_problem_dirichlet_eval(void) {
 
@@ -92,11 +74,6 @@ int feenox_problem_dirichlet_eval(void) {
     feenox_check_alloc(feenox.pde.multifreedom_indexes = calloc(n_bcs, sizeof(PetscInt *)));
     feenox_check_alloc(feenox.pde.multifreedom_coefficients = calloc(n_bcs, sizeof(PetscScalar *)));
 
-    feenox_check_alloc(feenox.pde.mimicked_index_guide = calloc(n_bcs, sizeof(PetscInt *)));
-    feenox_check_alloc(feenox.pde.mimicked_index_follower = calloc(n_bcs, sizeof(PetscInt *)));
-    // we imply that the coefficient of the guide is equal to one
-    feenox_check_alloc(feenox.pde.mimicked_coefficient_follower = calloc(n_bcs, sizeof(PetscScalar *)));
-    
   } else {
     // if we are here then we know more or less the number of BCs we need
     n_bcs = feenox.pde.dirichlet_rows;
@@ -104,7 +81,6 @@ int feenox_problem_dirichlet_eval(void) {
   
   feenox.pde.dirichlet_k = 0;
   feenox.pde.multifreedom_k = 0;
-  feenox.pde.mimicked_k = 0;
   for (size_t j_global = feenox.pde.first_node; j_global < feenox.pde.last_node; j_global++) {
     // TODO: optimize these ugly nested loops
     // maybe if we went the other way and looped over the elements first?
@@ -150,12 +126,6 @@ int feenox_problem_dirichlet_eval(void) {
     feenox.pde.multifreedom_nodes = feenox.pde.multifreedom_k;
     feenox_check_alloc(feenox.pde.multifreedom_indexes = realloc(feenox.pde.multifreedom_indexes, feenox.pde.multifreedom_nodes * sizeof(PetscInt *)));
     feenox_check_alloc(feenox.pde.multifreedom_coefficients = realloc(feenox.pde.multifreedom_coefficients, feenox.pde.multifreedom_nodes * sizeof(gsl_matrix *)));
-  }
-  if (feenox.pde.mimicked_nodes != feenox.pde.mimicked_k) {
-    feenox.pde.mimicked_nodes = feenox.pde.mimicked_k;
-    feenox_check_alloc(feenox.pde.mimicked_index_guide = realloc(feenox.pde.mimicked_index_guide, feenox.pde.mimicked_nodes * sizeof(PetscInt *)));
-    feenox_check_alloc(feenox.pde.mimicked_index_follower = realloc(feenox.pde.mimicked_index_follower, feenox.pde.mimicked_nodes * sizeof(PetscInt *)));
-    feenox_check_alloc(feenox.pde.mimicked_coefficient_follower = realloc(feenox.pde.mimicked_coefficient_follower, feenox.pde.mimicked_nodes * sizeof(PetscScalar)));
   }
 
 #endif
@@ -260,18 +230,11 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   } else {  
     petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
-  }  
-  petsc_call(VecDestroy(&rhs));
-  
-  // mimicked nodes ------------------------------------------------------------
-  if (feenox.pde.mimicked_nodes > 0) {
-    for (unsigned int k = 0; k < feenox.pde.mimicked_nodes; k++) {
-      petsc_call(MatSetValue(feenox.pde.K_bc, feenox.pde.mimicked_index_follower[k], feenox.pde.mimicked_index_guide[k], feenox.pde.dirichlet_scale * feenox.pde.mimicked_coefficient_follower[k], INSERT_VALUES));
-    }
-    petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
-    petsc_call(MatAssemblyEnd(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
   }
-    
+  if (rhs != NULL) {
+    petsc_call(VecDestroy(&rhs));
+  }
+  
   return FEENOX_OK;
 }
 
