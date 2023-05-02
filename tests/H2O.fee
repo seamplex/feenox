@@ -1,0 +1,14 @@
+# material H2O
+
+nuSigma_f1_refl = 0
+Sigma_s1.1_refl = 0.293760
+Sigma_t1_refl   = 0.32640
+
+# these ones are not used by the problem but to check
+Sigma_c1_refl   = 0.032640
+c_refl = 0.9
+
+IF equal(Sigma_t1_refl,Sigma_c1_refl+Sigma_s1.1_refl)=0|equal(c_refl,Sigma_s1.1_refl/Sigma_t1_refl)=0
+  PRINT "XS mismatch in $0"
+  ABORT
+ENDIF

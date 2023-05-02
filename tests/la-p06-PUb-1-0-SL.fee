@@ -8,6 +8,10 @@ INCLUDE Pu-239b.fee
 BC mirror  mirror
 BC vacuum  vacuum 
 
+sn_alpha = 0.1
 SOLVE_PROBLEM
 
-PRINT keff-0.994503
+rc = 2.256751
+
+PRINT %.3f keff phi1(0.25*rc)/phi1(0) phi1(0.50*rc)/phi1(0) phi1(0.75*rc)/phi1(0) phi1(1.00*rc)/phi1(0) SEP " "
+

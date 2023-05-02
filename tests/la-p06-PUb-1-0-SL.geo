@@ -1,5 +1,5 @@
 rc = 2.256751;
-n = 10;
+n = 40;
 
 SetFactory("OpenCASCADE");
 Point(1) = {0, 0, 0};

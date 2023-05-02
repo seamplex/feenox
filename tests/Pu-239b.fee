@@ -1,0 +1,16 @@
+# material PU-239 (a)
+
+nu1_fuel = 2.84
+Sigma_f1_fuel = 0.081600
+nuSigma_f1_fuel = nu1_fuel*Sigma_f1_fuel
+Sigma_s1.1_fuel = 0.225216
+Sigma_t1_fuel   = 0.32640
+
+# these ones are not used by the problem but to check
+Sigma_c1_fuel = 0.019584
+c_fuel = 1.4
+
+IF equal(Sigma_t1_fuel,Sigma_c1_fuel+Sigma_f1_fuel+Sigma_s1.1_fuel)=0|equal(c_fuel,(Sigma_s1.1_fuel+nuSigma_f1_fuel)/Sigma_t1_fuel)=0
+  PRINT "XS mismatch in $0"
+  ABORT
+ENDIF
