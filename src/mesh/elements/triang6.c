@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related second-order triangle element routines
  *
- *  Copyright (C) 2017--2020 jeremy theler
+ *  Copyright (C) 2017--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -19,8 +19,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "../feenox.h"
-#include "element.h"
+#include "../../feenox.h"
+#include "../element.h"
 
 // -------------------------------------
 // six-node triangle
@@ -45,6 +45,7 @@ int feenox_mesh_triang6_init(void) {
   element_type->point_inside = feenox_mesh_point_in_triangle;
   element_type->volume = feenox_mesh_triang_volume;
   element_type->area = feenox_mesh_triang_area;
+  element_type->size = feenox_mesh_triang_size;
 
   // from Gmsh’ doc
 /*

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related hexahedron element routines
  *
- *  Copyright (C) 2014--2020 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -19,8 +19,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "../feenox.h"
-#include "element.h"
+#include "../../feenox.h"
+#include "../element.h"
 
 
 // --------------------------------------------------------------
@@ -45,6 +45,7 @@ int feenox_mesh_hexa8_init(void) {
   element_type->dhdr = feenox_mesh_hexa8_dhdr;
   element_type->point_inside = feenox_mesh_point_in_hexahedron;
   element_type->volume = feenox_mesh_hex_volume;
+  element_type->size = feenox_mesh_hex_size;
 
   // from Gmsh’ doc
 /*
@@ -632,4 +633,16 @@ double feenox_mesh_hex_volume(element_t *element) {
  
  return element->volume;
 
+}
+
+double feenox_mesh_hex_size(element_t *this) {
+
+  if (this->size == 0) {
+    this->size = 1.0/4.0 * (feenox_mesh_subtract_module(this->node[0]->x, this->node[5]->x) +
+                            feenox_mesh_subtract_module(this->node[1]->x, this->node[6]->x) +
+                            feenox_mesh_subtract_module(this->node[2]->x, this->node[7]->x) +
+                            feenox_mesh_subtract_module(this->node[3]->x, this->node[8]->x));
+  }  
+  
+  return this->size;
 }

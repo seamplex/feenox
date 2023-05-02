@@ -2,7 +2,7 @@
  *  feenox's mesh-related hexahedron element routines
  *
  *  Copyright (C) 2014--2017 C.P. Camusso.
- *  Copyright (C) 2017--2020 jeremy theler
+ *  Copyright (C) 2017--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -20,8 +20,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "../feenox.h"
-#include "element.h"
+#include "../../feenox.h"
+#include "../element.h"
 
 // --------------------------------------------------------------
 // hexahedro de 20 nodos
@@ -44,6 +44,7 @@ int feenox_mesh_hexa20_init(void) {
   element_type->dhdr = feenox_mesh_hexa20_dhdr;
   element_type->point_inside = feenox_mesh_point_in_hexahedron;
   element_type->volume = feenox_mesh_hex_volume;
+  element_type->size = feenox_mesh_hex_size;
 
   // from Gmsh’ doc
 /*

@@ -1019,6 +1019,7 @@ struct element_type_t {
   int (*point_inside)(element_t *e, const double *x);
   double (*volume)(element_t *e);
   double (*area)(element_t *e);
+  double (*size)(element_t *e);
 
   gauss_t gauss[2];    // sets of gauss points
                        // 0 - full integration
@@ -1033,6 +1034,7 @@ struct element_t {
   double quality;
   double volume;
   double area;
+  double size;
   double gradient_weight;   // this weight is used to average the contribution of this element to nodal gradients
   double *w;                // weights of the gauss points time determinant of the jacobian
   double **x;               // coordinates fo the gauss points 

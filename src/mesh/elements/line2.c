@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related line element routines
  *
- *  Copyright (C) 2014--2020 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -19,8 +19,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "../feenox.h"
-#include "element.h"
+#include "../../feenox.h"
+#include "../element.h"
 
 // --------------------------------------------------------------
 // two-node line
@@ -46,6 +46,7 @@ int feenox_mesh_line2_init(void) {
   element_type->point_inside = feenox_mesh_point_in_line;
   element_type->volume = feenox_mesh_line_volume;
   element_type->area = feenox_mesh_line_area;
+  element_type->size = feenox_mesh_line_size;
 
   // from Gmsh’ doc
 /*
@@ -182,24 +183,32 @@ double feenox_mesh_line2_dhdr(int k, int m, double *arg) {
 
 
 
-int feenox_mesh_point_in_line(element_t *element, const double *x) {
-  return ((x[0] >= element->node[0]->x[0] && x[0] <= element->node[1]->x[0]) ||
-          (x[0] >= element->node[1]->x[0] && x[0] <= element->node[0]->x[0]));
+int feenox_mesh_point_in_line(element_t *this, const double *x) {
+  return ((x[0] >= this->node[0]->x[0] && x[0] <= this->node[1]->x[0]) ||
+          (x[0] >= this->node[1]->x[0] && x[0] <= this->node[0]->x[0]));
 }
 
 
-double feenox_mesh_line_volume(element_t *element) {
+double feenox_mesh_line_volume(element_t *this) {
   
-  if (element->volume == 0) {
-    element->volume = fabs(element->node[1]->x[0] - element->node[0]->x[0]);
+  if (this->volume == 0) {
+    this->volume = fabs(this->node[1]->x[0] - this->node[0]->x[0]);
   }  
-  return element->volume;
+  return this->volume;
 }
 
-double feenox_mesh_line_area(element_t *element) {
+double feenox_mesh_line_area(element_t *this) {
   
-  if (element->area == 0) {
-    element->area = 1;
+  if (this->area == 0) {
+    this->area = 1;
   }  
-  return element->area;
+  return this->area;
+}
+
+double feenox_mesh_line_size(element_t *this) {
+  
+  if (this->size == 0) {
+    this->size = feenox_mesh_line_volume(this);
+  }  
+  return this->size;
 }

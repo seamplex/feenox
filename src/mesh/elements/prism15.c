@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related prism15 element routines
  *
- *  Copyright (C) 2015--2020 jeremy theler & ezequiel manavela chiapero
+ *  Copyright (C) 2015--2023 jeremy theler & ezequiel manavela chiapero
  *
  *  This file is part of feenox.
  *
@@ -19,8 +19,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "../feenox.h"
-#include "element.h"
+#include "../../feenox.h"
+#include "../element.h"
 
 
 // --------------------------------------------------------------

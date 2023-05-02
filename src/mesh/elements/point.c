@@ -19,8 +19,8 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#include "../feenox.h"
-#include "element.h"
+#include "../../feenox.h"
+#include "../element.h"
 
 // --------------------------------------------------------------
 // one-node point
@@ -41,6 +41,7 @@ int feenox_mesh_one_node_point_init(void) {
   element_type->dhdr = feenox_mesh_one_node_point_dhdr;
   element_type->volume = feenox_mesh_point_volume;
   element_type->point_inside = NULL;
+  
   
   // ------------
   // gauss points and extrapolation matrices

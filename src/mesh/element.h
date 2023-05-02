@@ -69,7 +69,11 @@ extern double feenox_mesh_quad_area(element_t *this);
 extern double feenox_mesh_tet_area(element_t *this);
 
 
-
+extern double feenox_mesh_line_size(element_t *this);
+extern double feenox_mesh_triang_size(element_t *this);
+extern double feenox_mesh_quad_size(element_t *this);
+extern double feenox_mesh_tet_size(element_t *this);
+extern double feenox_mesh_hex_size(element_t *this);
 
 
 

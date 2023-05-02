@@ -168,7 +168,8 @@ int feenox_problem_build_volumetric_gauss_point_neutron_transport(element_t *e, 
 
   // petrov stabilization
   int NG = neutron_transport.directions * neutron_transport.groups;
-  double tau = 0.5 * feenox_var_value(neutron_transport.sn_alpha) * neutron_transport.supg_dimension_factor * e->type->volume(e) / e->type->area(e);
+//  double tau = 0.5 * feenox_var_value(neutron_transport.sn_alpha) * neutron_transport.supg_dimension_factor * e->type->volume(e) / e->type->area(e);
+  double tau = feenox_var_value(neutron_transport.sn_alpha) * e->type->size(e);
   
   feenox_call(gsl_matrix_memcpy(neutron_transport.P, e->H[v]));
   for (unsigned int j = 0; j < neutron_transport.n_nodes; j++) {
