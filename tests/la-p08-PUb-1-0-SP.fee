@@ -1,8 +1,8 @@
 # Los Alamos LA-13511 Analytical Benchmark Test Set for Criticallity Code Verification
 # problem 7
 
-# run with --st_mat_mumps_icntl_14=40
-PROBLEM neutron_transport 3D GROUPS 1 SN 4
+# may need to be run with --st_mat_mumps_icntl_14=40
+PROBLEM neutron_sn 3D GROUPS 1 SN 4
 READ_MESH $0.msh
 
 INCLUDE Pu-239b.fee

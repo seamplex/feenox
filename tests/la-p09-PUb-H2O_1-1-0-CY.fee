@@ -1,6 +1,6 @@
 # Los Alamos LA-13511 Analytical Benchmakr Test Set for Criticallity Code Verification
 # problem 9
-PROBLEM neutron_transport 2D GROUPS 1 SN 4
+PROBLEM neutron_sn 2D GROUPS 1 SN 6
 READ_MESH $0.msh
 
 INCLUDE Pu-239b.fee
@@ -12,5 +12,5 @@ BC vacuum  vacuum
 sn_alpha = 0.65
 SOLVE_PROBLEM
 
-PRINT keff-0.997747
+PRINT keff-0.999252
 # WRITE_RESULTS FILE pepe.msh

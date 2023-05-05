@@ -14,7 +14,7 @@
 #    x=0       x=2  x=3       x=5  x=6       x=8   
 
 DEFAULT_ARGUMENT_VALUE 1 2
-PROBLEM neutron_transport DIM 1 GROUPS 1 SN $1
+PROBLEM neutron_sn DIM 1 GROUPS 1 SN $1
 READ_MESH reed.msh
  
 MATERIAL source_abs    S1=50 Sigma_t1=50 Sigma_s1.1=0

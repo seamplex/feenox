@@ -10,7 +10,7 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkgmsh
-checkpde neutron_transport
+checkpde neutron_sn
 
 gmsh -v 0 -1 ${dir}/reed.geo || exit $?
 
