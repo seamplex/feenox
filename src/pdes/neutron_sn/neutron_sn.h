@@ -41,7 +41,7 @@ struct neutron_sn_t {
   // for SUPG: factor relating volume/area of an element depending on the dimension
   // if there were circles, spheres: 1 for 1D, 4 for 2D and 6 for 3D
   // if there were triang, tets:     1 for 1D, 6 for 2D and 12 for 3d
-  double supg_dimension_factor;
+//  double supg_dimension_factor;
   
   
   // total XS

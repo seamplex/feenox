@@ -23,8 +23,16 @@
 #include "neutron_sn.h"
 neutron_sn_t neutron_sn;
 
+int feenox_problem_neutron_sn_init_cosines(double *mu, double mu1) {
+  mu[0] = mu1;
+  double C = 2*(1-3*gsl_pow_2(mu1))/(neutron_sn.N-2);
+  for (int i = 1; i < neutron_sn.N/2; i++) {
+    mu[i] = sqrt(gsl_pow_2(mu1) + C*i);
+  }
+  
+  return FEENOX_OK;
+}
 
-// TODO: unify with diffusion
 int feenox_problem_init_parser_neutron_sn(void) {
 
 ///kw_pde+PROBLEM+detail  * `neutron_sn` multi-group core-level neutron transport using 
@@ -54,23 +62,27 @@ int feenox_problem_init_parser_neutron_sn(void) {
   if (neutron_sn.N == 0) {
     neutron_sn.N = 2;
   }
+  if (neutron_sn.N % 2 != 0) {
+    feenox_push_error_message("number of ordinates N = %d has to be even", neutron_sn.N);
+    return FEENOX_ERROR;
+  }
   
   // stammler's eq 6.19
   switch(feenox.pde.dim) {
     case 1:
       neutron_sn.directions = neutron_sn.N;
-      neutron_sn.supg_dimension_factor = 1;
+//      neutron_sn.supg_dimension_factor = 1;
       break;
     case 2:
       neutron_sn.directions = 0.5*neutron_sn.N*(neutron_sn.N+2);
 //      neutron_sn.supg_dimension_factor = 4;
-      neutron_sn.supg_dimension_factor = 6;
+//      neutron_sn.supg_dimension_factor = 6;
       break;
     case 3:
       neutron_sn.directions = neutron_sn.N*(neutron_sn.N+2);
 //      neutron_sn.supg_dimension_factor = 6;
 //      neutron_sn.supg_dimension_factor = 12;
-      neutron_sn.supg_dimension_factor = 16;
+//      neutron_sn.supg_dimension_factor = 16;
       break;
   }
   
@@ -201,84 +213,85 @@ int feenox_problem_init_parser_neutron_sn(void) {
     int N_octs = (feenox.pde.dim == 2) ? 4 : 8;
     int J_octs = neutron_sn.directions / N_octs;
 
+    double *mu = NULL;
+    feenox_check_alloc(mu = calloc(neutron_sn.N/2, sizeof(double)));
+
     // first set the weights as all the possible permutations in the first octant
     // and then we fill in the others
+    // the initial cosine directions passed to feenox_problem_neutron_sn_init_cosines()
+    // are taken from table 4-1 from lewiss (p 162)
+    // which coincide with table 1 p 208 from stammler-abbate
+    
     switch (neutron_sn.N) {
       case 2:
       {
-        // table 4-1 from lewiss (p 162)
-        // coincides with table 1 p 208 from stammler-abbate
-        double s2_mu1 = 1.0/M_SQRT3;
-        double s2_w1 = 1.0;
+        feenox_call(feenox_problem_neutron_sn_init_cosines(mu, 1.0/M_SQRT3));
         
-        neutron_sn.Omega[0][0] = s2_mu1;
-        neutron_sn.Omega[0][1] = s2_mu1;
-        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? s2_mu1 : 0;  // if we don't set this to zero the anisotropic scattering fails in 2d
+        neutron_sn.Omega[0][0] = mu[0];
+        neutron_sn.Omega[0][1] = mu[0];
+        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
         
-        neutron_sn.w[0] = s2_w1/(double)(N_octs);
+        neutron_sn.w[0] = 1.0/(double)(N_octs);
       }
       break;
       
       case 4:
       {
-        double s4_mu1 = 0.3500212;
-        double s4_mu2 = sqrt(s4_mu1*s4_mu1 + (2-6*s4_mu1*s4_mu1) * (2-1) / (4-2));
+        feenox_call(feenox_problem_neutron_sn_init_cosines(mu, 0.3500212));
         double s4_w1 = 1.0/3.0;
         
-        neutron_sn.Omega[0][0] = s4_mu1;
-        neutron_sn.Omega[0][1] = s4_mu1;
-        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? s4_mu2 : 0;
+        neutron_sn.Omega[0][0] = mu[0];
+        neutron_sn.Omega[0][1] = mu[0];
+        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? mu[1] : 0;
         neutron_sn.w[0] = s4_w1/(double)(N_octs);
 
-        neutron_sn.Omega[1][0] = s4_mu1;
-        neutron_sn.Omega[1][1] = s4_mu2;
-        neutron_sn.Omega[1][2] = (feenox.pde.dim == 3) ? s4_mu1 : 0;
+        neutron_sn.Omega[1][0] = mu[0];
+        neutron_sn.Omega[1][1] = mu[1];
+        neutron_sn.Omega[1][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
         neutron_sn.w[1] = s4_w1/(double)(N_octs);;
 
-        neutron_sn.Omega[2][0] = s4_mu2;
-        neutron_sn.Omega[2][1] = s4_mu1;
-        neutron_sn.Omega[2][2] = (feenox.pde.dim == 3) ? s4_mu1 : 0;
+        neutron_sn.Omega[2][0] = mu[1];
+        neutron_sn.Omega[2][1] = mu[0];
+        neutron_sn.Omega[2][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
         neutron_sn.w[2] = s4_w1/(double)(N_octs);;
       }
       break;
       
       case 6:
       {
-        double s6_mu1 = 0.2666355;
-        double s6_mu2 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (2-1) / (6-2));
-        double s6_mu3 = sqrt(s6_mu1*s6_mu1 + (2-6*s6_mu1*s6_mu1) * (3-1) / (6-2));
+        feenox_call(feenox_problem_neutron_sn_init_cosines(mu, 0.2666355));
         
         double s6_w1 = 0.1761263;
         double s6_w2 = 0.1572071;
 
-        neutron_sn.Omega[0][0] = s6_mu1;
-        neutron_sn.Omega[0][1] = s6_mu1;
-        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? s6_mu3 : 0;
+        neutron_sn.Omega[0][0] = mu[0];
+        neutron_sn.Omega[0][1] = mu[0];
+        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? mu[2] : 0;
         neutron_sn.w[0] = s6_w1/(double)(N_octs);
 
-        neutron_sn.Omega[1][0] = s6_mu1;
-        neutron_sn.Omega[1][1] = s6_mu2;
-        neutron_sn.Omega[1][2] = (feenox.pde.dim == 3) ? s6_mu2 : 0;
+        neutron_sn.Omega[1][0] = mu[0];
+        neutron_sn.Omega[1][1] = mu[1];
+        neutron_sn.Omega[1][2] = (feenox.pde.dim == 3) ? mu[1] : 0;
         neutron_sn.w[1] = s6_w2/(double)(N_octs);
         
-        neutron_sn.Omega[2][0] = s6_mu2;
-        neutron_sn.Omega[2][1] = s6_mu1;
-        neutron_sn.Omega[2][2] = (feenox.pde.dim == 3) ? s6_mu2 : 0;
+        neutron_sn.Omega[2][0] = mu[1];
+        neutron_sn.Omega[2][1] = mu[0];
+        neutron_sn.Omega[2][2] = (feenox.pde.dim == 3) ? mu[1] : 0;
         neutron_sn.w[2] = s6_w2/(double)(N_octs);
         
-        neutron_sn.Omega[3][0] = s6_mu2;
-        neutron_sn.Omega[3][1] = s6_mu2;
-        neutron_sn.Omega[3][2] = (feenox.pde.dim == 3) ? s6_mu1 : 0;
+        neutron_sn.Omega[3][0] = mu[1];
+        neutron_sn.Omega[3][1] = mu[1];
+        neutron_sn.Omega[3][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
         neutron_sn.w[3] = s6_w2/(double)(N_octs);
 
-        neutron_sn.Omega[4][0] = s6_mu3;
-        neutron_sn.Omega[4][1] = s6_mu1;
-        neutron_sn.Omega[4][2] = (feenox.pde.dim == 3) ? s6_mu1 : 0;
+        neutron_sn.Omega[4][0] = mu[2];
+        neutron_sn.Omega[4][1] = mu[0];
+        neutron_sn.Omega[4][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
         neutron_sn.w[4] = s6_w1/(double)(N_octs);
         
-        neutron_sn.Omega[5][0] = s6_mu1;
-        neutron_sn.Omega[5][1] = s6_mu3;
-        neutron_sn.Omega[5][2] = (feenox.pde.dim == 3) ? s6_mu1 : 0;
+        neutron_sn.Omega[5][0] = mu[0];
+        neutron_sn.Omega[5][1] = mu[2];
+        neutron_sn.Omega[5][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
         neutron_sn.w[5] = s6_w1/(double)(N_octs);
       }
       break;
@@ -293,6 +306,8 @@ int feenox_problem_init_parser_neutron_sn(void) {
         return FEENOX_ERROR;
       break;
     }
+    
+    feenox_free(mu);
     
     // we have filled the first octant, now fill in the other ones
     for (int n = 1; n < N_octs; n++) {
