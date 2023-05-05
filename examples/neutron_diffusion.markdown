@@ -1,24 +1,25 @@
 # Neutron diffusion
 
 - [<span class="toc-section-number">1</span> IAEA 2D PWR Benchmark][]
-- [<span class="toc-section-number">2</span> Cube-spherical bare
+- [<span class="toc-section-number">2</span> IAEA 3D PWR Benchmark][]
+- [<span class="toc-section-number">3</span> Cube-spherical bare
   reactor][]
-- [<span class="toc-section-number">3</span> Illustration of the XS
+- [<span class="toc-section-number">4</span> Illustration of the XS
   dilution & smearing effect][]
 
   [<span class="toc-section-number">1</span> IAEA 2D PWR Benchmark]: #iaea-2d-pwr-benchmark
-  [<span class="toc-section-number">2</span> Cube-spherical bare reactor]:
+  [<span class="toc-section-number">2</span> IAEA 3D PWR Benchmark]: #iaea-3d-pwr-benchmark
+  [<span class="toc-section-number">3</span> Cube-spherical bare reactor]:
     #cube-spherical-bare-reactor
-  [<span class="toc-section-number">3</span> Illustration of the XS dilution & smearing effect]:
+  [<span class="toc-section-number">4</span> Illustration of the XS dilution & smearing effect]:
     #illustration-of-the-xs-dilution-smearing-effect
 
 # IAEA 2D PWR Benchmark
 
 <figure>
 <img src="iaea-2dpwr-figure.svg" style="width:100.0%"
-alt="The IAEA 2D PWR Benchmark (1977)" />
-<figcaption aria-hidden="true">The IAEA 2D PWR Benchmark
-(1977)</figcaption>
+alt="The IAEA 2D PWR Benchmark" />
+<figcaption aria-hidden="true">The IAEA 2D PWR Benchmark</figcaption>
 </figure>
 
 ``` feenox
@@ -87,15 +88,165 @@ $ [...]
 $ feenox iaea-2dpwr.fee quarter
 keff =  1.02986
 $ feenox iaea-2dpwr.fee eighth
-$keff =  1.02975
+keff =  1.02975
 $
 ```
 
 <figure>
 <img src="iaea-2dpwr-fluxes.png" style="width:100.0%"
-alt="Fast and thermal flux for the 2D IAEA PWR benchmark (2021)" />
+alt="Fast and thermal flux for the 2D IAEA PWR benchmark" />
 <figcaption aria-hidden="true">Fast and thermal flux for the 2D IAEA PWR
-benchmark (2021)</figcaption>
+benchmark</figcaption>
+</figure>
+
+# IAEA 3D PWR Benchmark
+
+The IAEA 3D PWR Benchmark is a classical problem for core-level
+diffusion codes. The original geometry, cross sections and boundary
+conditions are shown in figs. 1-3.
+
+<figure id="fig:iaea-3dpwr-fig1">
+<img src="iaea-3dpwr-fig1.png"
+alt="The IAEA 3D PWR Benchmark, fig. 1" />
+<figcaption>Figure 1: The IAEA 3D PWR Benchmark, fig. 1</figcaption>
+</figure>
+
+<figure id="fig:iaea-3dpwr-fig2">
+<img src="iaea-3dpwr-fig2.png"
+alt="The IAEA 3D PWR Benchmark, fig. 2" />
+<figcaption>Figure 2: The IAEA 3D PWR Benchmark, fig. 2</figcaption>
+</figure>
+
+<figure id="fig:iaea-3dpwr-fig3">
+<img src="iaea-3dpwr-fig3.png"
+alt="The IAEA 3D PWR Benchmark, fig. 3" />
+<figcaption>Figure 3: The IAEA 3D PWR Benchmark, fig. 3</figcaption>
+</figure>
+
+The FeenoX approach consists of modeling both the original
+one-quarter-symmetric geometry *and* the more reasonable
+one-eighth-symmetry geometry in a 3D CAD cloud tool such as Onshape
+(figs. 4, 5). Then, the CAD is imported and meshed in Gmsh to obtain a
+second-order unstructured tetrahedral grids suitable to be used by
+FeenoX to solve the multi-group neutron diffusion equation (figs. 6, 7)
+
+<figure id="fig:iaea-3dpwr-quarter-onshape">
+<img src="iaea-3dpwr-quarter-onshape.png"
+alt="IAEA 3D PWR one-quarter CAD in Onshape (“fuel 2” is hidden)" />
+<figcaption>Figure 4: IAEA 3D PWR one-quarter CAD in Onshape (“fuel 2”
+is hidden)</figcaption>
+</figure>
+
+<figure id="fig:iaea-3dpwr-eighth-onshape">
+<img src="iaea-3dpwr-eighth-onshape.png"
+alt="IAEA 3D PWR one-eighth CAD in Onshape (“fuel 2” is hidden)" />
+<figcaption>Figure 5: IAEA 3D PWR one-eighth CAD in Onshape (“fuel 2” is
+hidden)</figcaption>
+</figure>
+
+<figure id="fig:iaea-3d-quarter-mesh" class="subfigures">
+<p><img src="iaea-3dpwr-quarter-mesh1.png" style="width:49.0%"
+alt="a" /> <img src="iaea-3dpwr-quarter-mesh2.png" style="width:49.0%"
+alt="b" /></p>
+<figcaption><p>Figure 6: Unstructured second-order tetrahedral grid for
+the quarter case. a — Full view, b — Cutaway view</p></figcaption>
+</figure>
+
+<figure id="fig:iaea-3d-eighth-mesh" class="subfigures">
+<p><img src="iaea-3dpwr-eighth-mesh1.png" alt="a" /> <img
+src="iaea-3dpwr-eighth-mesh2.png" alt="b" /></p>
+<figcaption><p>Figure 7: Unstructured second-order tetrahedral grid for
+the eighth case. a — Full view, b — Cutaway view</p></figcaption>
+</figure>
+
+The terminal mimic shows that the eighth case can be solved faster and
+needs less memory than the original quarter-symmetry case. Recall that
+the original problem does have 1/8th symmetry but since historically all
+core-level solvers can only handle structured hexahedral grids, nobody
+ever took advantage of it.
+
+``` feenox
+#                       BENCHMARK PROBLEM
+#          
+# Identification: 11
+# Date Submitted: June 1976      By: R. R. Lee (CE)
+#                                    D. A. Menely (Ontario Hydro)
+#                                    B. Micheelsen (Riso-Denmark)
+#                                    D. R. Vondy (ORNL)
+#                                    M. R. Wagner (KWU)
+#                                    W. Werner (GRS-Munich)
+#
+# Date Accepted:  June 1977      By: H. L. Dodds, Jr. (U. of Tenn.)
+#                                    M. V. Gregory (SRL)
+#
+# Descriptive Title: Multi-dimensional (x-y-z) LWR model
+#
+# Suggested Functions: Designed to provide a sever test for
+#                      the capabilities of coarse mesh
+#                      methods and flux synthesis approximations
+#
+# Configuration:       Three-dimensional configuration
+#                      including space dimensions and region
+#                      numbers: 2 Figures
+t0 = clock() # start measuring wall time
+PROBLEM neutron_diffusion 3D GROUPS 2
+
+DEFAULT_ARGUMENT_VALUE 1 quarter
+READ_MESH iaea-3dpwr-$1.msh
+
+MATERIAL fuel1     D1=1.5 D2=0.4 Sigma_s1.2=0.02 Sigma_a1=0.01 Sigma_a2=0.08  nuSigma_f2=0.135
+MATERIAL fuel2     D1=1.5 D2=0.4 Sigma_s1.2=0.02 Sigma_a1=0.01 Sigma_a2=0.085 nuSigma_f2=0.135
+MATERIAL fuel2rod  D1=1.5 D2=0.4 Sigma_s1.2=0.02 Sigma_a1=0.01 Sigma_a2=0.13  nuSigma_f2=0.135
+MATERIAL reflector D1=2.0 D2=0.3 Sigma_s1.2=0.04 Sigma_a1=0    Sigma_a2=0.01  nuSigma_f2=0
+MATERIAL reflrod   D1=2.0 D2=0.3 Sigma_s1.2=0.04 Sigma_a1=0    Sigma_a2=0.055 nuSigma_f2=0
+  
+BC vacuum   vacuum=0.4692
+BC mirror   mirror
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk
+
+# print results
+PRINT SEP " " "  keff = " %.5f keff
+PRINT SEP " " " nodes = " %g   nodes
+PRINT SEP " " "memory = " %.1f memory() "Gb"
+PRINT SEP " " "  wall = " %.1f clock()-t0 "sec"
+```
+
+``` terminal
+$ gmsh -3 iaea-3dpwr-quarter.geo
+$ [...]
+$ gmsh -3 iaea-3dpwr-eighth.geo
+$ [...]
+$ feenox iaea-3dpwr.fee quarter
+  keff =  1.02918
+ nodes =  70779
+memory =  3.9 Gb
+  wall =  33.8 sec
+$ feenox iaea-3dpwr.fee eighth
+  keff =  1.02912
+ nodes =  47798
+memory =  2.5 Gb
+  wall =  16.0 sec
+$
+```
+
+<figure id="fig:iaea-3dpwr-eighth-phi1" class="subfigures">
+<p><img src="iaea-3dpwr-eighth-phi1-1.png" style="width:25.0%"
+alt="a" /> <img src="iaea-3dpwr-eighth-phi1-2.png" style="width:25.0%"
+alt="b" /> <img src="iaea-3dpwr-eighth-phi1-3.png" style="width:45.0%"
+alt="c" /></p>
+<figcaption><p>Figure 8: Fast flux for the 3D IAEA PWR benchmark in
+1/8th symmetry. </p></figcaption>
+</figure>
+
+<figure id="fig:iaea-3dpwr-eighth-phi2" class="subfigures">
+<p><img src="iaea-3dpwr-eighth-phi2-1.png" style="width:25.0%"
+alt="a" /> <img src="iaea-3dpwr-eighth-phi2-2.png" style="width:25.0%"
+alt="b" /> <img src="iaea-3dpwr-eighth-phi2-3.png" style="width:45.0%"
+alt="c" /></p>
+<figcaption><p>Figure 9: Thermal flux for the 3D IAEA PWR benchmark in
+1/8th symmetry. </p></figcaption>
 </figure>
 
 # Cube-spherical bare reactor
@@ -108,7 +259,7 @@ latter.
 <figure id="fig:cube-and-sphere" class="subfigures">
 <p><img src="cubesphere-0.png" style="width:49.0%" alt="a" /> <img
 src="cubesphere-100.png" style="width:49.0%" alt="b" /></p>
-<figcaption><p>Figure 1: One eight of two bare reactors. a — Cubical
+<figcaption><p>Figure 10: One eight of two bare reactors. a — Cubical
 reactor, b — Spherical reactor</p></figcaption>
 </figure>
 
@@ -120,8 +271,8 @@ $k_\text{eff}$ changes when we morph the cube into a sphere? Enter Gmsh
 <p><img src="cubesphere-25.png" style="width:33.0%" alt="a" /> <img
 src="cubesphere-50.png" style="width:33.0%" alt="b" /> <img
 src="cubesphere-75.png" style="width:33.0%" alt="c" /></p>
-<figcaption><p>Figure 2: Continuous morph between a cube and a sphere. a
-— 75% cube/25% sphere, b — 50% cube/50% sphere, c —
+<figcaption><p>Figure 11: Continuous morph between a cube and a sphere.
+a — 75% cube/25% sphere, b — 50% cube/50% sphere, c —
 25% cube/75% sphere</p></figcaption>
 </figure>
 

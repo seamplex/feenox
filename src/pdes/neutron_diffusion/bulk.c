@@ -21,7 +21,6 @@
  */
 #include "feenox.h"
 #include "neutron_diffusion.h"
-#include "pdes/neutron_transport/neutron_transport.h"
 
 int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int n_nodes) {
   
@@ -64,7 +63,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   
   gsl_matrix_set_zero(neutron_diffusion.diff);
   gsl_matrix_set_zero(neutron_diffusion.removal);
-  if (neutron_transport.has_fission) {
+  if (neutron_diffusion.has_fission) {
     gsl_matrix_set_zero(neutron_diffusion.nufission);
   }
   

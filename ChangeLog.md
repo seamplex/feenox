@@ -1,6 +1,9 @@
 # Current
 
  * under development
+ * Los Alamos criticallity benchmarks in tests
+ * support for reading VTK v5 files
+ * WRITE_RESULTS keyword
  * split examples by problem type
  * YAML blocks in input file for metadata are allowed (so far they are ignored by FeenoX)
  * $0 (or ${0} or $(1)) expands to the base name of the main input, i.e. without the `.fee` extension

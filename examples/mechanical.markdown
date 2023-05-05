@@ -557,7 +557,7 @@ DEFAULT_ARGUMENT_VALUE 1 steffen
 DEFAULT_ARGUMENT_VALUE 2 hex
 
 PROBLEM mechanical
-READ_MESH cube-hex.msh
+READ_MESH cube-$2.msh
 
 # aluminum-like linear isotropic material properties
 E = 69e3
@@ -609,7 +609,7 @@ displacement in x at (1,1,1) =  4.451e-03
 displacement in y at (1,1,1) =  4.449e-03
 displacement in z at (1,1,1) =  4.437e-03
 $ feenox cube-orthotropic-expansion.fee linear tet
-displacement in x at (1,1,1) =  4.451e-03
+displacement in x at (1,1,1) =  4.452e-03
 displacement in y at (1,1,1) =  4.447e-03
 displacement in z at (1,1,1) =  4.438e-03
 $ feenox cube-orthotropic-expansion.fee akima hex

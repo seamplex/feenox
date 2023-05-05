@@ -75,7 +75,7 @@ FeenoX has three optional run-time dependencies. It can be compiled without any 
  
  * [PETSc](https://petsc.org/) provides support for solving partial differential equations (PDEs). This dependency is needed when running inputs with the `PROBLEM` keyword.
  
- * [SLEPc](https://slepc.upv.es/) provides support for solving eigen-value problems in partial differential equations (PDEs). This dependency is needed for inputs with `PROBLEM` types with eigen-value formulations such as `modal` and `neutron_transport`. 
+ * [SLEPc](https://slepc.upv.es/) provides support for solving eigen-value problems in partial differential equations (PDEs). This dependency is needed for inputs with `PROBLEM` types with eigen-value formulations such as `modal` and `neutron_sn`. 
 
 In absence of all these, FeenoX can still be used to 
 

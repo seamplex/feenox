@@ -1,5 +1,5 @@
 ---
-category: neutron_transport
+category: neutron_sn
 intro: |
   # Reed’s problem
   
@@ -14,7 +14,7 @@ terminal: |
   $ for n in 2 4 6 8; do feenox reed.fee ${n} | sort -g > reed-s${n}.csv; done
   $
 ...
-PROBLEM neutron_transport DIM 1 GROUPS 1 SN $1
+PROBLEM neutron_sn DIM 1 GROUPS 1 SN $1
 READ_MESH reed.msh
  
 MATERIAL source1       S1=50 Sigma_t1=50 Sigma_s1.1=0

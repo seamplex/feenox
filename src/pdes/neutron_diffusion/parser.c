@@ -43,7 +43,13 @@ int feenox_problem_parse_problem_neutron_diffusion(const char *token) {
 int feenox_problem_parse_post_neutron_diffusion(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
-    ;
+    feenox_call(feenox_problem_parse_post_neutron_diffusion(mesh_write, "fluxes"));
+    
+  } else if (strcmp(token, "flux") == 0 || strcmp(token, "fluxes") == 0) {
+
+    for (int g = 0; g < neutron_diffusion.groups; g++) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.unknown_name[g], NULL, field_location_nodes));
+    }
   } else {
     feenox_push_error_message("undefined keyword '%s' for neutron_diffusion WRITE_RESULTS", token);
     return FEENOX_ERROR;

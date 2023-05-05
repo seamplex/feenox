@@ -1,8 +1,8 @@
 ---
-title: Neutron transport
+title: Neutron transport using $S_N$
 titleblock: |
- Neutron transport
- =================
+ Neutron transport using $S_N$
+ =============================
 lang: en-US
 toc: true 
 ...
@@ -21,7 +21,7 @@ numerical discretizations.
 
 
 ```feenox
-PROBLEM neutron_transport DIM 1 GROUPS 1 SN $1
+PROBLEM neutron_sn DIM 1 GROUPS 1 SN $1
 READ_MESH reed.msh
  
 MATERIAL source1       S1=50 Sigma_t1=50 Sigma_s1.1=0

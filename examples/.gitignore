@@ -60,7 +60,7 @@ laplace.html
 mechanical.html
 modal.html
 neutron_diffusion.html
-neutron_transport.html
+neutron_sn.html
 thermal.html
 
 basic.pdf
@@ -69,10 +69,13 @@ laplace.pdf
 mechanical.pdf
 modal.pdf
 neutron_diffusion.pdf
-neutron_transport.pdf
+neutron_sn.pdf
 thermal.pdf
 
 two-cubes-thermal.dat
 two-cubes-thermal.pdf
 two-cubes.msh
 
+iaea-3dpwr-eighth.msh
+iaea-3dpwr-quarter.msh
+*.geo_unrolled

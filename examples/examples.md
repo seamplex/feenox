@@ -50,8 +50,9 @@
   wire](modal.md#five-natural-modes-of-a-cantilevered-wire)
 - Neutron diffusion
   - [IAEA 2D PWR Benchmark](neutron_diffusion.md#iaea-2d-pwr-benchmark)
+  - [IAEA 3D PWR Benchmark](neutron_diffusion.md#iaea-3d-pwr-benchmark)
   - [Cube-spherical bare reactor](neutron_diffusion.md#cube-spherical-bare-reactor)
   - [Illustration of the XS dilution & smearing
   effect](neutron_diffusion.md#illustration-of-the-xs-dilution-smearing-effect)
-- Neutron transport
-  - [Reed’s problem](neutron_transport.md#reeds-problem)
+- Neutron transport using $S_N$
+  - [Reed’s problem](neutron_sn.md#reeds-problem)

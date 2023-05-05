@@ -155,7 +155,8 @@
  
 ## Neutron
 
- * FVM
+ * add currents to the outputs? J1x J1y J1x?
+ * FVM?
  * benchmarks/tests
  * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE
  

@@ -21,7 +21,7 @@ The FeenoX examples are divided by the type of problem they solve:
 5.  [Linear elasticity][]
 6.  [Modal analysis][]
 7.  [Neutron diffusion][]
-8.  [Neutron transport][]
+8.  [Neutron $S_N$][]
 
 > Each type of partial differential equation (i.e. from Laplace
 > downward) is implemented in a subdirectory within [`src/pde`][] of the
@@ -55,7 +55,7 @@ Presentation” (August 2021).
   [Linear elasticity]: mechanical.md
   [Modal analysis]: modal.md
   [Neutron diffusion]: neutron_diffusion.md
-  [Neutron transport]: neutron_transport.md
+  [Neutron $S_N$]: neutron_sn.md
   [`src/pde`]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [Github discussion page]: https://github.com/seamplex/feenox/discussions
   [examples]: https://github.com/seamplex/feenox/tree/main/examples
@@ -121,9 +121,10 @@ propose benchmark problems to add to the suite.
   - [Five natural modes of a cantilevered wire][]
 - Neutron diffusion
   - [IAEA 2D PWR Benchmark][]
+  - [IAEA 3D PWR Benchmark][]
   - [Cube-spherical bare reactor][]
   - [Illustration of the XS dilution & smearing effect][]
-- Neutron transport
+- Neutron transport using $S_N$
   - [Reed’s problem][]
 
   [Hello World (and Universe)!]: basic.md#hello-world-and-universe
@@ -157,6 +158,7 @@ propose benchmark problems to add to the suite.
   [Optimizing the length of a tuning fork]: modal.md#optimizing-the-length-of-a-tuning-fork
   [Five natural modes of a cantilevered wire]: modal.md#five-natural-modes-of-a-cantilevered-wire
   [IAEA 2D PWR Benchmark]: neutron_diffusion.md#iaea-2d-pwr-benchmark
+  [IAEA 3D PWR Benchmark]: neutron_diffusion.md#iaea-3d-pwr-benchmark
   [Cube-spherical bare reactor]: neutron_diffusion.md#cube-spherical-bare-reactor
   [Illustration of the XS dilution & smearing effect]: neutron_diffusion.md#illustration-of-the-xs-dilution-smearing-effect
-  [Reed’s problem]: neutron_transport.md#reeds-problem
+  [Reed’s problem]: neutron_sn.md#reeds-problem

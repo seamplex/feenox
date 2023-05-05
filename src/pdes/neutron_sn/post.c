@@ -21,17 +21,17 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "neutron_transport.h"
+#include "neutron_sn.h"
 
-int feenox_problem_solve_post_neutron_transport(void) {
+int feenox_problem_solve_post_neutron_sn(void) {
 
 #ifdef HAVE_PETSC  
-  if (neutron_transport.has_sources == 0) {
+  if (neutron_sn.has_sources == 0) {
 #ifdef HAVE_SLEPC
     if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-      feenox_var_value(neutron_transport.keff) = 1.0/feenox.pde.eigenvalue[0];
+      feenox_var_value(neutron_sn.keff) = 1.0/feenox.pde.eigenvalue[0];
     } else {
-      feenox_var_value(neutron_transport.keff) = feenox.pde.eigenvalue[0];
+      feenox_var_value(neutron_sn.keff) = feenox.pde.eigenvalue[0];
     }
     
     // TODO: this is wrong
@@ -64,18 +64,18 @@ int feenox_problem_solve_post_neutron_transport(void) {
   
   
   // compute the scalar fluxes out of the directional fluxes
-  for (unsigned int g = 0; g < neutron_transport.groups; g++) {
-    feenox_problem_fill_aux_solution(neutron_transport.phi[g]);
+  for (unsigned int g = 0; g < neutron_sn.groups; g++) {
+    feenox_problem_fill_aux_solution(neutron_sn.phi[g]);
   }
   
   for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
-    for (unsigned int g = 0; g < neutron_transport.groups; g++) {
+    for (unsigned int g = 0; g < neutron_sn.groups; g++) {
       double xi = 0;
-      for (unsigned int n = 0; n < neutron_transport.directions; n++) {
-        xi += neutron_transport.w[n] * feenox_vector_get(feenox.pde.solution[n * neutron_transport.groups + g]->vector_value, j);
+      for (unsigned int n = 0; n < neutron_sn.directions; n++) {
+        xi += neutron_sn.w[n] * feenox_vector_get(feenox.pde.solution[n * neutron_sn.groups + g]->vector_value, j);
       }
       // TODO: wrapper, the pde has to set the function value not the vector
-      feenox_vector_set(neutron_transport.phi[g]->vector_value, j, xi);
+      feenox_vector_set(neutron_sn.phi[g]->vector_value, j, xi);
     }
   }  
   

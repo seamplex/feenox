@@ -86,13 +86,6 @@ Physical Surface("reflector",4) = {66};
 Physical Line("external",5) = {29, 30, 31, 32, 33};
 Physical Line("mirror",6) = {1, 9, 4, 14, 19, 28, 3, 10, 13, 27, 34};
 
-Color Goldenrod {Surface {54};}
-Color LimeGreen {Surface {56};}
-Color Firebrick {Surface {60, 58, 62};}
-Color BlueViolet {Surface {66};}
-
-Mesh.Light = 0;
-General.SmallAxes = 0;
 
 // meshing options
 Mesh.Algorithm = 6;
@@ -102,3 +95,5 @@ Mesh.OptimizeNetgen = 1;
 
 Mesh.MeshSizeMin = 5;
 Mesh.MeshSizeMax = 5;
+
+Merge "iaea-colors.geo";

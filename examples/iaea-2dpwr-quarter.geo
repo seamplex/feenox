@@ -147,15 +147,6 @@ Physical Surface("reflector",4) = {66};
 Physical Line("external",5) = {51, 50, 49, 48, 47, 46, 45, 44, 43, 42};
 Physical Line("mirror",6) = {52, 40, 28, 12, 17, 4, 1, 18, 5, 19, 29, 41};
 
-// colors and makeup
-Color Goldenrod {Surface {54};}
-Color LimeGreen {Surface {56};}
-Color Firebrick {Surface {60, 58, 64, 62};}
-Color BlueViolet {Surface {66};}
-
-Mesh.Light = 0;
-General.SmallAxes = 0;
-
 // meshing options
 Mesh.Algorithm = 8;
 Mesh.RecombineAll = 1;  // recombine triangles to obtain quads
@@ -166,3 +157,4 @@ Mesh.MeshSizeMin = 5;
 Mesh.MeshSizeMax = 5;
 
 
+Merge "iaea-colors.geo";

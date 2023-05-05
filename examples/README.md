@@ -18,7 +18,7 @@ The FeenoX examples are divided by the type of problem they solve:
  #. [Linear elasticity](mechanical.md)
  #. [Modal analysis](modal.md)
  #. [Neutron diffusion](neutron_diffusion.md)
- #. [Neutron transport](neutron_transport.md)
+ #. [Neutron $S_N$](neutron_sn.md)
 
 > Each type of partial differential equation (i.e. from Laplace downward) is implemented in a subdirectory within [`src/pde`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree.
 > Feel free to...

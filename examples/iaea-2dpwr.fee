@@ -3,7 +3,7 @@ category: neutron_diffusion
 intro: |
   # IAEA 2D PWR Benchmark
  
-  ![The IAEA 2D PWR Benchmark (1977)](iaea-2dpwr-figure.svg){width=100%}
+  ![The IAEA 2D PWR Benchmark](iaea-2dpwr-figure.svg){width=100%}
 terminal: | 
   $ gmsh -2 iaea-2dpwr-quarter.geo
   $ [...]
@@ -12,7 +12,7 @@ terminal: |
   $ feenox iaea-2dpwr.fee quarter
   keff =  1.02986
   $ feenox iaea-2dpwr.fee eighth
-  $keff =  1.02975
+  keff =  1.02975
   $
 ...
 #                       BENCHMARK PROBLEM
@@ -72,5 +72,5 @@ PRINT %.5f "keff = " keff
 WRITE_MESH iaea-2dpwr-$1.vtk phi1 phi2
 ---
 figures: |
-  ![Fast and thermal flux for the 2D IAEA PWR benchmark (2021)](iaea-2dpwr-fluxes.png){width=100%}
+  ![Fast and thermal flux for the 2D IAEA PWR benchmark](iaea-2dpwr-fluxes.png){width=100%}
 ...

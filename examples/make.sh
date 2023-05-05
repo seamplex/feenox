@@ -7,7 +7,7 @@ for i in feenox touch awk pandoc makeinfo yq grep cut xargs; do
  fi
 done
 
-for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_transport; do
+for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn; do
   cp ${i}.yaml ${i}.md
 done
 
@@ -28,6 +28,7 @@ for i in hello          \
          cantilever     \
          fork           \
          iaea-2dpwr     \
+         iaea-3dpwr     \
          reed           \
          cubesphere     \
          two-zone-slab  \
@@ -73,7 +74,7 @@ for i in hello          \
 done
 
 rm -f examples.md
-for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_transport; do
+for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn; do
   echo "- $(yq -r .title ${i}.yaml)" >> examples.md
   # shift-heading-level does not work
   pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed s/\(\#/\(${i}.md\#/ | sed 's/- /  - /'  >> examples.md

@@ -22,13 +22,13 @@
 #ifndef NEUTRON_TRANSPORT_H
 #define NEUTRON_TRANSPORT_H
 
-#define dof_index(n,g) ((n)*neutron_transport.groups + (g))
+#define dof_index(n,g) ((n)*neutron_sn.groups + (g))
 
-typedef struct neutron_transport_t neutron_transport_t;
+typedef struct neutron_sn_t neutron_sn_t;
 
 
 
-struct neutron_transport_t {
+struct neutron_sn_t {
 
   unsigned int N;
   unsigned int directions;
@@ -108,7 +108,7 @@ struct neutron_transport_t {
   
   
 };  
-extern neutron_transport_t neutron_transport;
+extern neutron_sn_t neutron_sn;
 
 
 #endif /* NEUTRON_TRANSPORT_FEM_H */

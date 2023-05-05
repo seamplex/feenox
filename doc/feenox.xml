@@ -133,7 +133,6 @@
       <item>RE_READ</item>
       <item>RESULT</item>
       <item>ROWS</item>
-      <item>SCALAR_FORMAT</item>
       <item>SCALE</item>
       <item>SEM</item>
       <item>SEMAPHORE</item>
@@ -182,6 +181,7 @@
       <item>VIA</item>
       <item>WRITE</item>
       <item>WRITE_MESH</item>
+      <item>WRITE_RESULTS</item>
       <item>X0</item>
       <item>X_INCREASES_FIRST</item>
       <item>X_MAX</item>
