@@ -2449,6 +2449,11 @@ int feenox_parse_write_results(void) {
   
   mesh_write_t *mesh_write = NULL;
   feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
+  
+  if (feenox.pde.parse_post == NULL) {
+    feenox_push_error_message("WRITE_RESULTS not implemented (probably no PROBLEM defined)");
+    return FEENOX_ERROR;
+  }
 
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          

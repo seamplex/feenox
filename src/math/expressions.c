@@ -180,6 +180,13 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
 
   while (*string != '\0') {
 
+    // a string like " - (x" where there's a blank after a minus is wrongly treated so we try to fix those now
+    if ((string[0] == '-' || string[0] == '+') && isblank(string[1])) {
+      char tmp = string[0];
+      string[0] = string[1];
+      string[1] = tmp;
+    }
+    
     if (isblank(*string)) {
       // blanks are ignored
       string++;
@@ -372,6 +379,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         feenox_free(item);
         return NULL;
       }
+      
       var->used = 1;
       item->type = EXPR_VARIABLE;
       item->variable = var;
@@ -406,7 +414,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         (builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL) {
 
       // copy into argument whatever is after the nam
-      char *argument;
+      char *argument = NULL;
       feenox_check_alloc_null(argument = strdup(string+strlen(token)));
 
       // TODO: differentiate between functions and vectors/matrices
