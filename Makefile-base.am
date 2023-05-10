@@ -9,6 +9,7 @@ EXTRA_DIST = examples \
 
 
 TESTS = \
+        tests/uo2-pellet.sh \
         tests/abort.sh \
         tests/algebraic_expr.sh \
         tests/annulus-modal.sh \
@@ -19,9 +20,8 @@ TESTS = \
         tests/cog.sh \
         tests/cylinder-traction-force.sh \
         tests/encased_rod.sh \
+        tests/expressions.sh \
         tests/expressions_constants.sh \
-        tests/expressions_variables.sh \
-        tests/expressions_functions.sh \
         tests/exp.sh \
         tests/i-beam-euler-bernoulli.sh \
         tests/iaea-pwr.sh \
@@ -70,7 +70,6 @@ TESTS = \
         tests/xfail-few-properties-ortho-young.sh \
         tests/xfail-few-properties-ortho-poisson.sh \
         tests/xfail-few-properties-ortho-shear.sh \
-        tests/uo2-pellet.sh \
         tests/wilson.sh
 
 XFAIL_TESTS = tests/abort.sh \

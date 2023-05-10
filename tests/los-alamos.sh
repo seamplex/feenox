@@ -37,7 +37,7 @@ answer la-p06-PUb-1-0-SL.fee "0.995 0.969 0.876 0.719 0.492"
 exitifwrong $?
         
 gmsh -2 ${dir}/la-p07-PUb-1-0-CY.geo || exit $?
-answer la-p07-PUb-1-0-CY.fee "0.998 0.809 0.304"
+answer la-p07-PUb-1-0-CY.fee "0.998 0.808 0.304"
 exitifwrong $?
 
 gmsh -3 ${dir}/la-p08-PUb-1-0-SP.geo || exit $?

@@ -1,0 +1,39 @@
+# from hamilton-analytical
+m1 = 0.3
+m2 = 0.2
+l1 = 0.3
+l2 = 0.25
+g = 9.8
+
+theta1 = 0.1
+theta2 = 0.2
+p1 = 0.3
+p2 = 0.4
+
+c1 = p1 * p2 * sin( theta1 - theta2 ) / ( l1 * l2 * ( m1 + m2 * sin( theta1 - theta2 ) ^2 ) )
+c2 = (p1^2*m2*l2^2 - 2*p1*p2*m2*l1*l2*cos(theta1-theta2) + p2^2*(m1+m2)*l1^2)*sin(2*(theta1-theta2))/(2*l1^2*l2^2*(m1+m2*sin(theta1-theta2)^2)^2)
+
+theta1_dot =            (p1*l2 - p2*l1*cos(theta1-theta2))/(l1^2*l2*(m1 + m2*sin(theta1-theta2)^2))
+theta2_dot = (p2*(m1+m2)/m2*l1 - p1*l2*cos(theta1-theta2))/(l1*l2^2*(m1 + m2*sin(theta1-theta2)^2))
+
+p1_dot = - (m1+m2)*g*l1*sin(theta1) - c1 + c2
+p2_dot =      - m2*g*l2*sin(theta2) + c1 - c2
+
+# the reference values come from julia
+PRINT theta1_dot-(-6.534433950331411)
+PRINT theta2_dot-(39.802146797976675)
+PRINT p1_dot-(-0.5362319852498947)
+PRINT p2_dot-(0.29212889068947734)
+
+
+# from hamilton-numerical
+H(theta1,theta2,p1,p2) = - (m1*g*l1*cos(theta1) + m2*g*(l1*cos(theta1) + l2*cos(theta2))) - (l2^2*m2*p1^2 - 2*l1*l2*m2*cos(theta1-theta2)*p1*p2 + l1^2*(m1+m2)*p2^2)/(l1^2*l2^2*m2 * (-2*m1-m2+m2*cos(2*(theta1-theta2))))
+
+PRINT H(theta1,theta2,p1,p2)-5.037375520944719
+
+
+# from some test
+f(time) = ((-1 * asin(((0.26568 * sin(((62.83185 * time) - acos(0.26568)))) / sqrt(((1 + (0.26568 ^ 2)) - ((2 * 0.26568) * cos(((62.83185 * time) - acos(0.26568))))))))) - asin(0.26568));
+
+PRINT f(0)
+PRINT f(0.01)+0.062722981468626149
