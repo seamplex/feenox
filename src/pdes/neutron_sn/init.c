@@ -23,12 +23,56 @@
 #include "neutron_sn.h"
 neutron_sn_t neutron_sn;
 
-int feenox_problem_neutron_sn_init_cosines(double *mu, double mu1) {
+int feenox_problem_neutron_sn_init_cosines(double mu1) {
+  // equation 21 in stammler
+  // equation 4-8 in lewis
+  int N_over_2 = neutron_sn.N/2;
+  double *mu = NULL;
+  feenox_check_alloc(mu = calloc(N_over_2, sizeof(double)));
+  
   mu[0] = mu1;
   double C = 2*(1-3*gsl_pow_2(mu1))/(neutron_sn.N-2);
-  for (int i = 1; i < neutron_sn.N/2; i++) {
+  for (int i = 1; i < N_over_2; i++) {
     mu[i] = sqrt(gsl_pow_2(mu1) + C*i);
   }
+  
+  // we have these triangles
+  // S4
+  // 1
+  // 1 1
+  //
+  // S6
+  // 1
+  // 2 2
+  // 1 2 1
+  //
+  // S8
+  // 1
+  // 2 2
+  // 2 3 2
+  // 1 2 2 1
+  
+  int i = 0;
+  int j = 0;
+  int k = 0;
+  int n = 0;
+  for (int row = 0; row < N_over_2; row++) {
+    for (int col = 0; col <= row; col++) {
+      i = N_over_2 - row - 1;
+      j = col;
+      k = N_over_2 + 2 - 3 - i - j;
+      
+//      printf("%d\t%d %d %d\n", n, i, j, k);
+      
+      neutron_sn.Omega[n][0] = mu[i];
+      neutron_sn.Omega[n][1] = mu[j];
+      neutron_sn.Omega[n][2] = (feenox.pde.dim == 3) ? mu[k] : 0;
+      n++;
+      
+    }
+  }
+  
+  feenox_free(mu);
   
   return FEENOX_OK;
 }
@@ -213,9 +257,6 @@ int feenox_problem_init_parser_neutron_sn(void) {
     int N_octs = (feenox.pde.dim == 2) ? 4 : 8;
     int J_octs = neutron_sn.directions / N_octs;
 
-    double *mu = NULL;
-    feenox_check_alloc(mu = calloc(neutron_sn.N/2, sizeof(double)));
-
     // first set the weights as all the possible permutations in the first octant
     // and then we fill in the others
     // the initial cosine directions passed to feenox_problem_neutron_sn_init_cosines()
@@ -225,11 +266,7 @@ int feenox_problem_init_parser_neutron_sn(void) {
     switch (neutron_sn.N) {
       case 2:
       {
-        feenox_call(feenox_problem_neutron_sn_init_cosines(mu, 1.0/M_SQRT3));
-        
-        neutron_sn.Omega[0][0] = mu[0];
-        neutron_sn.Omega[0][1] = mu[0];
-        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
+        feenox_call(feenox_problem_neutron_sn_init_cosines(1.0/M_SQRT3));
         
         neutron_sn.w[0] = 1.0/(double)(N_octs);
       }
@@ -237,78 +274,67 @@ int feenox_problem_init_parser_neutron_sn(void) {
       
       case 4:
       {
-        feenox_call(feenox_problem_neutron_sn_init_cosines(mu, 0.3500212));
+        feenox_call(feenox_problem_neutron_sn_init_cosines(0.3500212));
         double s4_w1 = 1.0/3.0;
-        
-        neutron_sn.Omega[0][0] = mu[0];
-        neutron_sn.Omega[0][1] = mu[0];
-        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? mu[1] : 0;
+
         neutron_sn.w[0] = s4_w1/(double)(N_octs);
-
-        neutron_sn.Omega[1][0] = mu[0];
-        neutron_sn.Omega[1][1] = mu[1];
-        neutron_sn.Omega[1][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
-        neutron_sn.w[1] = s4_w1/(double)(N_octs);;
-
-        neutron_sn.Omega[2][0] = mu[1];
-        neutron_sn.Omega[2][1] = mu[0];
-        neutron_sn.Omega[2][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
-        neutron_sn.w[2] = s4_w1/(double)(N_octs);;
+        
+        neutron_sn.w[1] = s4_w1/(double)(N_octs);
+        neutron_sn.w[2] = s4_w1/(double)(N_octs);
       }
       break;
       
       case 6:
       {
-        feenox_call(feenox_problem_neutron_sn_init_cosines(mu, 0.2666355));
+        feenox_call(feenox_problem_neutron_sn_init_cosines(0.2666355));
         
         double s6_w1 = 0.1761263;
         double s6_w2 = 0.1572071;
 
-        neutron_sn.Omega[0][0] = mu[0];
-        neutron_sn.Omega[0][1] = mu[0];
-        neutron_sn.Omega[0][2] = (feenox.pde.dim == 3) ? mu[2] : 0;
         neutron_sn.w[0] = s6_w1/(double)(N_octs);
-
-        neutron_sn.Omega[1][0] = mu[0];
-        neutron_sn.Omega[1][1] = mu[1];
-        neutron_sn.Omega[1][2] = (feenox.pde.dim == 3) ? mu[1] : 0;
-        neutron_sn.w[1] = s6_w2/(double)(N_octs);
         
-        neutron_sn.Omega[2][0] = mu[1];
-        neutron_sn.Omega[2][1] = mu[0];
-        neutron_sn.Omega[2][2] = (feenox.pde.dim == 3) ? mu[1] : 0;
+        neutron_sn.w[1] = s6_w2/(double)(N_octs);
         neutron_sn.w[2] = s6_w2/(double)(N_octs);
         
-        neutron_sn.Omega[3][0] = mu[1];
-        neutron_sn.Omega[3][1] = mu[1];
-        neutron_sn.Omega[3][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
-        neutron_sn.w[3] = s6_w2/(double)(N_octs);
-
-        neutron_sn.Omega[4][0] = mu[2];
-        neutron_sn.Omega[4][1] = mu[0];
-        neutron_sn.Omega[4][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
-        neutron_sn.w[4] = s6_w1/(double)(N_octs);
-        
-        neutron_sn.Omega[5][0] = mu[0];
-        neutron_sn.Omega[5][1] = mu[2];
-        neutron_sn.Omega[5][2] = (feenox.pde.dim == 3) ? mu[0] : 0;
+        neutron_sn.w[3] = s6_w1/(double)(N_octs);
+        neutron_sn.w[4] = s6_w2/(double)(N_octs);
         neutron_sn.w[5] = s6_w1/(double)(N_octs);
       }
       break;
+      
+      case 8:
+      {
+        feenox_call(feenox_problem_neutron_sn_init_cosines(0.2182179));
+
+        double s8_w1 = 0.1209877;
+        double s8_w2 = 0.0907407;
+        double s8_w3 = 0.0925926;       
         
-// TODO:
-// #define S8_MU1    0.2182179
-// #define S8_W1     0.1209877
-// #define S8_W2     0.0907407
-// #define S8_W3     0.0925926        
+
+        neutron_sn.w[0] = s8_w1/(double)(N_octs);
+        
+        neutron_sn.w[1] = s8_w2/(double)(N_octs);
+        neutron_sn.w[2] = s8_w2/(double)(N_octs);
+        
+        neutron_sn.w[3] = s8_w2/(double)(N_octs);
+        neutron_sn.w[4] = s8_w3/(double)(N_octs);
+        neutron_sn.w[5] = s8_w2/(double)(N_octs);
+        
+        neutron_sn.w[6] = s8_w1/(double)(N_octs);
+        neutron_sn.w[7] = s8_w2/(double)(N_octs);
+        neutron_sn.w[8] = s8_w2/(double)(N_octs);
+        neutron_sn.w[9] = s8_w1/(double)(N_octs);
+        
+      }
+      break;
+        
       default: 
         feenox_push_error_message("unsupported N = %d in %dD", neutron_sn.N, feenox.pde.dim);
         return FEENOX_ERROR;
       break;
     }
     
-    feenox_free(mu);
-    
+   
     // we have filled the first octant, now fill in the other ones
     for (int n = 1; n < N_octs; n++) {
       for (int j = 0; j < J_octs; j++) {
