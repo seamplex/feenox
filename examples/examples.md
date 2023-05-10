@@ -13,6 +13,7 @@
 - Ordinary Differential Equations & Differential-Algebraic Equations
   - [Lorenz’ attractor—the one with the
   butterfly](daes.md#lorenz-attractorthe-one-with-the-butterfly)
+  - [The double pendulum](daes.md#the-double-pendulum)
 - Laplace’s equation
   - [How to solve a maze without AI](laplace.md#how-to-solve-a-maze-without-ai)
     - [Transient top-down](laplace.md#transient-top-down)
@@ -43,6 +44,7 @@
   cylinders](mechanical.md#thermo-elastic-expansion-of-finite-cylinders)
   - [Temperature-dependent material
   properties](mechanical.md#temperature-dependent-material-properties)
+  - [Two cubes compressing each other](mechanical.md#two-cubes-compressing-each-other)
 - Mechanical modal analysis
   - [Optimizing the length of a tuning
   fork](modal.md#optimizing-the-length-of-a-tuning-fork)

@@ -14,6 +14,7 @@ done
 for i in hello          \
          lorenz         \
          logistic       \
+         double         \
          thermal-1d-dirichlet-uniform-k \
          nafems-le10    \
          nafems-le11    \
@@ -41,6 +42,7 @@ for i in hello          \
          veeder                     \
          mechanical-square-temperature \
          two-cubes-thermal \
+         two-cubes-mechanical \
   ; do
   in=${i}.fee
   out=$(grep category ${in} | cut -d: -f2 | xargs).md

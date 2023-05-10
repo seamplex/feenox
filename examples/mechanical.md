@@ -858,3 +858,71 @@ $
 ![Young modulus distribution over the final displacements.](mechanical-square-temperature.png){width=100%}
 
 
+# Two cubes compressing each other
+
+Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one
+made out of a (non-dimensional) "soft" material and one made out of a
+"hard" material. We glue the two cubes together, set radial and
+tangential symmetry conditions on one side of the soft cube (so as to
+allow pure traction conditions) and set a normal compressive pressure at
+the other end on the hard cube. Besides on single VTK file with the
+overall results, the von Mises stress output is split into two VTK
+files---namely `soft.vtk` and `hard.vtk` where the stress is non-zero
+only in the corresponding volume.
+
+This example illustrates how to
+
+1.  assign different material properties to different volumes
+2.  write VTK outputs segmented by mesh volumes
+3.  write results at nodes (default) and at cells
+
+
+```feenox
+PROBLEM mechanical 3D
+READ_MESH two-cubes2.msh
+
+MATERIAL left   E=1   nu=0.35  mat=1
+MATERIAL right  E=10  nu=0.25  mat=2
+
+# BCs 
+BC zero  tangential radial
+BC ramp  p=0.25
+
+SOLVE_PROBLEM
+
+sigma_at_1(x,y,z) = sigma(x,y,z)*(mat(x,y,z)=1)
+sigma_at_2(x,y,z) = sigma(x,y,z)*(mat(x,y,z)=2)
+
+WRITE_RESULTS format vtk displacements vonmises
+WRITE_MESH two-cubes-left.vtk  sigma_at_1 CELL NAME sigma_at_1_cells sigma_at_1
+WRITE_MESH two-cubes-right.vtk sigma_at_2 CELL NAME sigma_at_2_cells sigma_at_2
+
+```
+
+
+```terminal
+$ gmsh -3 two-cubes.geo -order 2 -o two-cubes2.msh
+[...]
+$ feenox two-cubes-mechanical.fee --mumps
+$ 
+
+```
+
+
+![Displacements and von Mises stresses from `WRITE_RESULTS`](two-cubes-mechanical-vonmises.png)
+
+::: {#fig:two-cubes-left}
+![Data at nodes](two-cubes-left-nodes.png){width=48%}
+![Data at cells](two-cubes-left-cells.png){width=48%}
+
+Von Mises stresses non-zero only over the left (soft) cube.
+:::
+
+::: {#fig:two-cubes-right}
+![Data at nodes](two-cubes-right-nodes.png){width=48%}
+![Data at cells](two-cubes-right-cells.png){width=48%}
+
+Von Mises stresses non-zero only over the right (hard) cube.
+:::
+
+

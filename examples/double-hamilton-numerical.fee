@@ -1,0 +1,19 @@
+# the double pendulum solved by the hamiltonian formulation
+# and numerically computing its derivatives
+
+PHASE_SPACE theta1 theta2 p1 p2
+VAR theta1' theta2' p1' p2'
+
+H(theta1,theta2,p1,p2) = \
+          - (m1*g*l1*cos(theta1) + m2*g*(l1*cos(theta1) \
+          + l2*cos(theta2))) \
+          - (l2^2*m2*p1^2 - 2*l1*l2*m2*cos(theta1-theta2)*p1*p2 + \
+               l1^2*(m1+m2)*p2^2)/(l1^2*l2^2*m2 \ 
+                 * (-2*m1-m2+m2*cos(2*(theta1-theta2))))
+
+
+theta1_dot .= +derivative(H(theta1,theta2,p1',p2), p1', p1)
+theta2_dot .= +derivative(H(theta1,theta2,p1,p2'), p2', p2)
+
+p1_dot     .= -derivative(H(theta1',theta2,p1,p2), theta1', theta1)
+p2_dot     .= -derivative(H(theta1,theta2',p1,p2), theta2', theta2)

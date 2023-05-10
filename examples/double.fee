@@ -1,0 +1,137 @@
+---
+category: daes
+intro: |
+  # The double pendulum
+
+  Find the location of the two bobs vs time in the double pendulum in @fig:double-pendulum.
+  
+  ![A chaotic double pendulum](double.svg){#fig:double-pendulum width=60%}
+  
+  Use these four different approaches:
+
+   a. Hamiltonian formulation with numerical derivatives
+   
+      $$
+      \begin{aligned}
+      \mathcal{H}(\theta_1, \theta_2, p_1, p_2) =&
+       - \frac{\ell_2^2 m_2 p_1^2 - 2 \ell_1 \ell_2 m_2 \cos(\theta_1-\theta_2) p_1 p_2 + \ell_1^2 (m_1+m_2) p_2^2}
+       {\ell_1^2 \ell_2^2 m_2 \left[-2m_1-m_2+m_2\cos\Big(2(\theta_1-\theta_2)\Big)\right]} \\
+       & - \Big[ m_1 g \ell_1 \cos \theta_1 + m_2 g (\ell_1 \cos \theta_1 + \ell_2 \cos \theta_2) \Big]
+      \end{aligned}
+      $$
+      
+      $$
+      \begin{cases}
+      \displaystyle  \dot{\theta}_1 &= \displaystyle +\frac{\partial \mathcal{H}}{\partial p_1} \\
+      \displaystyle  \dot{\theta}_2 &= \displaystyle +\frac{\partial \mathcal{H}}{\partial p_2} \\
+      \displaystyle  \dot{p}_1 &= \displaystyle -\frac{\partial \mathcal{H}}{\partial \theta_1} \\
+      \displaystyle  \dot{p}_2 &= \displaystyle -\frac{\partial \mathcal{H}}{\partial \theta_2} \\
+      \end{cases}
+      $$      
+
+
+      ```{.feenox include="double-hamilton-numerical.fee"}
+      ```
+      
+   b. Hamiltonian formulation with analytical derivatives
+
+      $$
+      \begin{cases}
+      \dot{\theta}_1 &= \displaystyle         \frac{p_1 \ell_2 - p_2 \ell_1 \cos(\theta_1-\theta_2)}{\ell_1^2 \ell_2 [m_1 + m_2 \sin^2(\theta_1-\theta_2)]} \\
+      \dot{\theta}_2 &= \displaystyle  \frac{p_2 (m_1+m_2)/m_2 \ell_1 - p_1 \ell_2 \cos(\theta_1-\theta_2)}{\ell_1 \ell_2^2 [m_1 + m_2 \sin^2(\theta_1-\theta_2)]} \\
+      \dot{p_1} &= \displaystyle -(m_1+m_2) g \ell_1 \sin(\theta_1) - c_1 + c_2 \\
+      \dot{p_2} &= \displaystyle -m_2 g \ell_2 \sin(\theta_2) + c_1 - c_2
+      \end{cases}
+      $$
+      where the expressions $c_1$ and $c_2$ are
+
+      $$\begin{aligned}
+      c1 &= \frac{p_1 p_2 \sin(\theta_1-\theta_2)}{\ell_1 \ell_2 \Big[m_1+m_2 \sin(\theta_1-\theta_2)^2\Big]} \\
+      c2 &= \frac{\Big[ p_1^2 m_2 \ell_2^2 - 2 p_1 p_2 m_2 \ell_1 \ell_2 \cos(\theta_1-\theta_2)
+         + p_2^2 (m_1+m_2) \ell_1^2)\Big] \sin(2 (\theta_1-\theta_2)}{
+        2 \ell_1^2 \ell_2^2 \left[m_1+m_2 \sin^2(\theta_1-\theta_2)\right]^2}
+      \end{aligned}
+      $$
+
+      ```{.feenox include="double-hamilton-analytical.fee"}
+      ```
+      
+   c. Lagrangian formulation with numerical derivatives
+   
+      $$
+      \begin{aligned}
+      \mathcal{L}(\theta_1, \theta_2, \dot{\theta}_1, \dot{\theta}_2) =& 
+      \frac{1}{2} m_1 \ell_1^2 \dot{\theta}_1^2 +
+      \frac{1}{2} m_2 \left[\ell_1^2 \dot{\theta}_1^2 + \ell_2^2 \dot{\theta}_2^2 + 2 \ell_1 \ell_2 \dot{\theta}_1 \dot{\theta}_2 \cos(\theta_1-\theta_2)\right] + \\
+      & m_1 g  \ell_1\cos \theta_1 + m_2 g \left(\ell_1\cos \theta_1 + \ell_2 \cos \theta_2 \right)
+      \end{aligned}
+      $$
+      
+      $$
+      \begin{cases}
+      \displaystyle \frac{\partial}{\partial t}\left(\frac{\partial \mathcal{L}}{\partial \dot{\theta}_1}\right) &= \displaystyle \frac{\partial \mathcal{L}}{\partial \theta_1} \\
+      \displaystyle  \frac{\partial}{\partial t}\left(\frac{\partial \mathcal{L}}{\partial \dot{\theta}_2}\right) &= \displaystyle \frac{\partial \mathcal{L}}{\partial \theta_2}
+      \end{cases}
+      $$
+      
+      ```{.feenox include="double-lagrange-numerical.fee"}
+      ```
+   
+   d. Lagrangian formulation with analytical derivatives
+   
+      $$
+      \begin{cases}
+      0 &= (m_1+m_2) \ell_1^2 \ddot{\theta}_1 + m_2 \ell_1 \ell_2 \ddot{\theta}_2 \cos(\theta_1-\theta_2) + m_2 \ell_1 \ell_2 \dot{\theta}_2^2 \sin(\theta_1-\theta_2) + \ell_1 (m_1+m_2) g \sin(\theta_1) \\
+      0 &= m_2 \ell_2^2 \ddot{\theta}_2 + m_2 \ell_1 \ell_2 \ddot{\theta}_1 \cos(\theta_1-\theta_2) - m_2 \ell_1 \ell_2 \dot{\theta}_1^2 \sin(\theta_1-\theta_2) + \ell_2 m_2 g \sin(\theta_2)
+      \end{cases}
+      $$
+
+      ```{.feenox include="double-lagrange-analytical.fee"}
+      ```
+
+  The combination Hamilton/Lagrange and numerical/analytical is given in the command line as arguments `$1` and `$2` respectively.   
+   
+terminal: |
+  $ for guy in hamilton lagrange; do
+     for form in numerical analytical; do
+       feenox double.fee $guy $form > double-${guy}-${form}.tsv;
+       m4 -Dguy=$guy -Dform=$form -Dtype=$RANDOM double.gp.m4 | gnuplot -;
+     done;
+    done
+  $ 
+...
+# the double pendulum solved using different formulations
+
+# parameters
+end_time = 10
+m1 = 0.3
+m2 = 0.2
+l1 = 0.3
+l2 = 0.25
+g = 9.8
+
+# inital conditions
+theta1_0 = pi/2
+theta2_0 = pi
+
+# include the selected formulation
+DEFAULT_ARGUMENT_VALUE 1 hamilton
+DEFAULT_ARGUMENT_VALUE 2 numerical
+INCLUDE double-$1-$2.fee
+
+# output the results vs. time
+PRINT t theta1 theta2 theta1_dot theta2_dot \
+      l1*sin(theta1)                -l1*cos(theta1) \
+      l1*sin(theta1)+l2*sin(theta2) -l1*cos(theta1)-l2*cos(theta2) 
+---
+figures: |
+  ::: {#fig:double-results}
+  ![Hamilton numerical](double-hamilton-numerical.svg){width=48%}
+  ![Hamilton analytical](double-hamilton-analytical.svg){width=48%}
+
+  ![Lagrange numerical](double-lagrange-numerical.svg){width=48%}
+  ![Lagrange analytical](double-lagrange-analytical.svg){width=48%}
+  
+  Position of the double pendulum's $m_2$ solved with four (slightly) different formulations
+  :::
+...

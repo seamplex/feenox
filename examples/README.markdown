@@ -94,6 +94,7 @@ propose benchmark problems to add to the suite.
   - [On the evaluation of thermal expansion coefficients][]
 - Ordinary Differential Equations & Differential-Algebraic Equations
   - [Lorenz’ attractor—the one with the butterfly][]
+  - [The double pendulum][]
 - Laplace’s equation
   - [How to solve a maze without AI][]
     - [Transient top-down][]
@@ -116,6 +117,7 @@ propose benchmark problems to add to the suite.
   - [Orthotropic free expansion of a cube][]
   - [Thermo-elastic expansion of finite cylinders][]
   - [Temperature-dependent material properties][]
+  - [Two cubes compressing each other][]
 - Mechanical modal analysis
   - [Optimizing the length of a tuning fork][]
   - [Five natural modes of a cantilevered wire][]
@@ -136,6 +138,7 @@ propose benchmark problems to add to the suite.
   [Computing the derivative of a function as a UNIX filter]: basic.md#computing-the-derivative-of-a-function-as-a-unix-filter
   [On the evaluation of thermal expansion coefficients]: basic.md#on-the-evaluation-of-thermal-expansion-coefficients
   [Lorenz’ attractor—the one with the butterfly]: daes.md#lorenz-attractorthe-one-with-the-butterfly
+  [The double pendulum]: daes.md#the-double-pendulum
   [How to solve a maze without AI]: laplace.md#how-to-solve-a-maze-without-ai
   [Transient top-down]: laplace.md#transient-top-down
   [Transient bottom-up]: laplace.md#transient-bottom-up
@@ -155,6 +158,7 @@ propose benchmark problems to add to the suite.
   [Orthotropic free expansion of a cube]: mechanical.md#orthotropic-free-expansion-of-a-cube
   [Thermo-elastic expansion of finite cylinders]: mechanical.md#thermo-elastic-expansion-of-finite-cylinders
   [Temperature-dependent material properties]: mechanical.md#temperature-dependent-material-properties
+  [Two cubes compressing each other]: mechanical.md#two-cubes-compressing-each-other
   [Optimizing the length of a tuning fork]: modal.md#optimizing-the-length-of-a-tuning-fork
   [Five natural modes of a cantilevered wire]: modal.md#five-natural-modes-of-a-cantilevered-wire
   [IAEA 2D PWR Benchmark]: neutron_diffusion.md#iaea-2d-pwr-benchmark

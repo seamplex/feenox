@@ -1,0 +1,15 @@
+# the double pendulum solved by the hamiltonian formulation
+# and analytically computing its derivatives
+
+PHASE_SPACE theta1 theta2 p1 p2 c1 c2
+
+theta1_dot .=            (p1*l2 - p2*l1*cos(theta1-theta2))/(l1^2*l2*(m1 + m2*sin(theta1-theta2)^2))
+theta2_dot .= (p2*(m1+m2)/m2*l1 - p1*l2*cos(theta1-theta2))/(l1*l2^2*(m1 + m2*sin(theta1-theta2)^2))
+
+p1_dot .= -(m1+m2)*g*l1*sin(theta1) - c1 + c2
+p2_dot .=      -m2*g*l2*sin(theta2) + c1 - c2
+
+c1 .= p1*p2*sin(theta1-theta2)/(l1*l2*(m1+m2*sin(theta1-theta2)^2))
+c2 .= { (p1^2*m2*l2^2 - 2*p1*p2*m2*l1*l2*cos(theta1-theta2)
+         + p2^2*(m1+m2)*l1^2)*sin(2*(theta1-theta2))/
+        (2*l1^2*l2^2*(m1+m2*sin(theta1-theta2)^2)^2) }

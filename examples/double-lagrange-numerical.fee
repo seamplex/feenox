@@ -1,0 +1,25 @@
+# the double pendulum solved by the lagrangian formulation
+# and numerically computing its derivatives
+
+PHASE_SPACE theta1 theta2 dL_dthetadot1 dL_dthetadot2
+VAR theta1' theta2' theta1_dot' theta2_dot'
+
+L(theta1,theta2,theta1_dot,theta2_dot) = {
+# kinetic energy of m1
+ 1/2*m1*l1^2*theta1_dot^2 + 
+# kinetic energy of m2
+ 1/2*m2*(l1^2*theta1_dot^2 + l2^2*theta2_dot^2 + 2*l1*l2*theta1_dot*theta2_dot*cos(theta1-theta2))
+ + ( 
+# potential energy of m1 
+ m1*g *  l1*cos(theta1) +
+# potential energy of m2
+ m2*g * (l1*cos(theta1) + l2*cos(theta2))
+ ) }
+
+# there is nothing wrong with numerical derivatives, is there?
+dL_dthetadot1 .= derivative(L(theta1, theta2, theta1_dot', theta2_dot), theta1_dot', theta1_dot)
+dL_dthetadot2 .= derivative(L(theta1, theta2, theta1_dot, theta2_dot'), theta2_dot', theta2_dot)
+
+dL_dthetadot1_dot .= derivative(L(theta1', theta2,theta1_dot, theta2_dot), theta1', theta1)
+dL_dthetadot2_dot .= derivative(L(theta1, theta2',theta1_dot, theta2_dot), theta2', theta2)
+

@@ -1,0 +1,16 @@
+# the double pendulum solved by the lagrangian formulation
+# and analytically computing its derivatives
+
+PHASE_SPACE theta1 theta2 omega1 omega2
+
+# reduction to a first-order system
+omega1 .= theta1_dot
+omega2 .= theta2_dot
+
+# lagrange equations
+0 .= (m1+m2)*l1^2*omega1_dot + m2*l1*l2*omega2_dot*cos(theta1-theta2) + \
+ m2*l1*l2*omega2^2*sin(theta1-theta2) + l1*(m1+m2)*g*sin(theta1)
+
+
+0 .= m2*l2^2*omega2_dot + m2*l1*l2*omega1_dot*cos(theta1-theta2) - \
+ m2*l1*l2*omega1^2*sin(theta1-theta2) + l2*m2*g*sin(theta2)

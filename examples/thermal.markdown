@@ -207,6 +207,13 @@ fix one side of the unitary material to a fixed zero temperature and set
 a ramp of temperature between zero and one at the opposite end of the
 material with time-varying properties.
 
+This example illustrates how to
+
+1.  assign different material properties to different volumes
+2.  give time-dependent material properties and boundary conditions
+3.  plot temperatures as function of time at arbitrary locations on
+    space
+
 ``` feenox
 PROBLEM thermal 3D
 READ_MESH two-cubes.msh

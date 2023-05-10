@@ -18,6 +18,8 @@
   finite cylinders][]
 - [<span class="toc-section-number">8</span> Temperature-dependent
   material properties][]
+- [<span class="toc-section-number">9</span> Two cubes compressing each
+  other][]
 
   [<span class="toc-section-number">1</span> NAFEMS LE10 “Thick plate pressure” benchmark]:
     #nafems-le10-thick-plate-pressure-benchmark
@@ -37,6 +39,8 @@
     #thermo-elastic-expansion-of-finite-cylinders
   [<span class="toc-section-number">8</span> Temperature-dependent material properties]:
     #temperature-dependent-material-properties
+  [<span class="toc-section-number">9</span> Two cubes compressing each other]:
+    #two-cubes-compressing-each-other
 
 # NAFEMS LE10 “Thick plate pressure” benchmark
 
@@ -922,3 +926,70 @@ displacements.</figcaption>
 </figure>
 
   [monotonic cubic scheme]: https://en.wikipedia.org/wiki/Monotone_cubic_interpolation
+
+# Two cubes compressing each other
+
+Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one
+made out of a (non-dimensional) “soft” material and one made out of a
+“hard” material. We glue the two cubes together, set radial and
+tangential symmetry conditions on one side of the soft cube (so as to
+allow pure traction conditions) and set a normal compressive pressure at
+the other end on the hard cube. Besides on single VTK file with the
+overall results, the von Mises stress output is split into two VTK
+files—namely `soft.vtk` and `hard.vtk` where the stress is non-zero only
+in the corresponding volume.
+
+This example illustrates how to
+
+1.  assign different material properties to different volumes
+2.  write VTK outputs segmented by mesh volumes
+3.  write results at nodes (default) and at cells
+
+``` feenox
+PROBLEM mechanical 3D
+READ_MESH two-cubes2.msh
+
+MATERIAL left   E=1   nu=0.35  mat=1
+MATERIAL right  E=10  nu=0.25  mat=2
+
+# BCs 
+BC zero  tangential radial
+BC ramp  p=0.25
+
+SOLVE_PROBLEM
+
+sigma_at_1(x,y,z) = sigma(x,y,z)*(mat(x,y,z)=1)
+sigma_at_2(x,y,z) = sigma(x,y,z)*(mat(x,y,z)=2)
+
+WRITE_RESULTS format vtk displacements vonmises
+WRITE_MESH two-cubes-left.vtk  sigma_at_1 CELL NAME sigma_at_1_cells sigma_at_1
+WRITE_MESH two-cubes-right.vtk sigma_at_2 CELL NAME sigma_at_2_cells sigma_at_2
+```
+
+``` terminal
+$ gmsh -3 two-cubes.geo -order 2 -o two-cubes2.msh
+[...]
+$ feenox two-cubes-mechanical.fee --mumps
+$ 
+```
+
+<figure>
+<img src="two-cubes-mechanical-vonmises.png"
+alt="Displacements and von Mises stresses from WRITE_RESULTS" />
+<figcaption aria-hidden="true">Displacements and von Mises stresses from
+<code>WRITE_RESULTS</code></figcaption>
+</figure>
+
+<figure id="fig:two-cubes-left" class="subfigures">
+<p><img src="two-cubes-left-nodes.png" style="width:48.0%" alt="a" />
+<img src="two-cubes-left-cells.png" style="width:48.0%" alt="b" /></p>
+<figcaption><p>Figure 5: Von Mises stresses non-zero only over the left
+(soft) cube.. a — Data at nodes, b — Data at cells</p></figcaption>
+</figure>
+
+<figure id="fig:two-cubes-right" class="subfigures">
+<p><img src="two-cubes-right-nodes.png" style="width:48.0%" alt="a" />
+<img src="two-cubes-right-cells.png" style="width:48.0%" alt="b" /></p>
+<figcaption><p>Figure 6: Von Mises stresses non-zero only over the right
+(hard) cube.. a — Data at nodes, b — Data at cells</p></figcaption>
+</figure>
