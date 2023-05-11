@@ -161,7 +161,7 @@ subdirectories [`src/pdes`][], namely
 - [`mechanical`][]
 - [`modal`][]
 - [`neutron_diffusion`][]
-- [`neutron_transport`][]
+- [`neutron_sn`][]
 
 Engineers, researchers, scientists, developers and/or hobbyists just
 need to use one of these directories (say [`laplace`][]) as a template
@@ -200,7 +200,7 @@ terms][Licensing].
   [`mechanical`]: https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical
   [`modal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/modal
   [`neutron_diffusion`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion
-  [`neutron_transport`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_transport
+  [`neutron_sn`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_sn
 
 # What is FeenoX anyway?
 

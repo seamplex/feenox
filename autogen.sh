@@ -45,7 +45,7 @@ version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
 rm -f config_links.m4
-for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref; do
+for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref tests/*.vtk; do
  echo "AC_CONFIG_LINKS([${i}:${i}])" >> config_links.m4
 done
 

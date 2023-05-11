@@ -1,6 +1,6 @@
 #!/bin/false
 
-petsc_ver=3.19.0
+petsc_ver=3.19.1
 slepc_ver=3.19.0
 package=feenox
 
