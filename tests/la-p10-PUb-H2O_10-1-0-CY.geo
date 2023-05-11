@@ -32,7 +32,8 @@ Mesh.MeshSizeMax = rc/(0.5*n);
 Mesh.MeshSizeMin = rc/(2*n);
 Mesh.Optimize = 1;
 //Mesh.OptimizeNetgen = 1;
-Mesh.Algorithm = 8;
+// 8 does not work in ubuntu (why not?)
+//Mesh.Algorithm = 8;
 Mesh.ElementOrder = 2;
 Mesh.RecombineAll = 0;
 
