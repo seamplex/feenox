@@ -19,7 +19,7 @@ jobs:
   # This is just a custom name "build" but it can be anything
   build:
     name: Compile and run tests
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y gcc make git automake autoconf libgsl-dev libsundials-dev petsc-dev slepc-dev
+          sudo apt-get install -y libgsl-dev libsundials-dev petsc-dev slepc-dev
       
       - name: Bootstrap with autoconf
         run: ./autogen.sh
