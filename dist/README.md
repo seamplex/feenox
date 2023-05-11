@@ -15,6 +15,15 @@ Also Debian `.deb` packages can be created (if running in a Debian box).
 
 # Binary tarball
 
+ 0. Install requirements
+ 
+    ```
+    apt-get install texlive-xetex texlive-fonts-extra texlive-science librsvg2-bin
+    ```
+    
+     * Pandoc and pandoc-crossref (the versions from apt might be old)
+
+
  1. Edit `versions.sh` and set the version of both PETSc and SLEPc, for instance
 
     ```bash

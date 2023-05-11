@@ -65,6 +65,7 @@
 
  * vector & matrix assignements & DAEs
  * debug mode, line-by-line
+   - run `feenox` with an option like `-d` or `--debug` and then present a gdb-like interface with print, and step by step advances
  * trap and handle signit & sigterm
 
 ## API
