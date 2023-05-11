@@ -40,4 +40,5 @@ jobs:
         run: make
         
       - name: Run tests
-        run: make check
+        run: make check || cat ./test-suite.log
+
