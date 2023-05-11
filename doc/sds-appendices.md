@@ -39,7 +39,7 @@ history.md
 # Appendix: Downloading & compiling {#sec:download}
 
 ```{.include shift-heading-level-by=1}
-download.md
+../download.md
 ```
 
 ```{.include shift-heading-level-by=1}

@@ -113,6 +113,7 @@ fi
 # TODO: mac
 if [ "x${target}" = "xlinux-amd64" ]; then
   tar -zcf ${package}-${version}-${target}.tar.gz ${package}-${version}-${target}
+  cp ${package}-${version}-${target}.tar.gz ${package}-${target}.tar.gz
   mv ${package}-${version}-${target}.tar.gz ${target}
 elif [ "x${target}" = "xwindows64" ]; then   
   zip -r   ${package}-${version}-${target}.zip    ${package}-${version}-${target}

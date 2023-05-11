@@ -1457,7 +1457,7 @@ A useful example is allowing material properties (e.g. Young modulus) to depend 
 Consider a simple plane-strain square\ $[-1,+1]\times[-1,+1]$ fixed on one side and with a uniform tension in the opposite one while leaving the other two free.
 The square's Young modulus depends on temperature according to a one-dimensional point-wise defined function $E_\text{carbon}(T)$ given by pairs stated according to one of the many material properties tables from ASME\ II and interpolated using Steffen's method. Althouhg in this example the temperature is given as an algebraic expression of space, in particular
 
-$$T(x,y)~[\text{\textdegree}C] = 200 + 350 \cdot y$$
+$$T(x,y)~[\text{ºC}] = 200 + 350 \cdot y$$
 
 ```{.feenox include="mechanical-square-temperature.fee"}
 ```

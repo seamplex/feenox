@@ -6,49 +6,49 @@ number-sections: true
 toc: true
 ---
 
-# Introduction {#sec:srs-introduction}
+# Introduction {#sec:introduction}
 
 ```include
 100-introduction.md
 ```
 
-## Objective {#sec:srs-objective}
+## Objective {#sec:objective}
 
 ```include
 110-objective.md
 ```
 
-## Scope {#sec:srs-scope}
+## Scope {#sec:scope}
 
 ```include
 120-scope.md
 ```
 
-# Architecture {#sec:srs-architecture}
+# Architecture {#sec:architecture}
 
 ```include
 200-architecture.md
 ```
 
-## Deployment {#sec:srs-deployment}
+## Deployment {#sec:deployment}
 
 ```include
 210-deployment.md
 ```
 
-## Execution {#sec:srs-execution}
+## Execution {#sec:execution}
 
 ```include
 220-execution.md
 ```
 
-## Efficiency {#sec:srs-efficiency}
+## Efficiency {#sec:efficiency}
 
 ```include
 230-efficiency.md
 ```
 
-## Scalability  {#sec:srs-scalability}
+## Scalability  {#sec:scalability}
 
 ```include
 240-scalability.md
@@ -60,13 +60,13 @@ toc: true
 250-flexibility.md
 ```
 
-## Extensibility {#sec:srs-extensibility}
+## Extensibility {#sec:extensibility}
 
 ```include
 260-extensibility.md
 ```
 
-## Interoperability {#sec:srs-interoperability}
+## Interoperability {#sec:interoperability}
 
 ```include
 270-interoperatibility.md
@@ -77,18 +77,18 @@ toc: true
 ```include
 300-interfaces.md
 ```
-## Problem input {#sec:srs-input}
+## Problem input {#sec:input}
 
 ```include
 310-input.md
 ```
-## Results output {#sec:srs-output}
+## Results output {#sec:output}
 
 ```include
 320-output.md
 ```
 
-# Quality assurance {#sec:srs-qa}
+# Quality assurance {#sec:qa}
 
 ```include
 400-qa.md
@@ -100,7 +100,7 @@ toc: true
 410-reproducibility.md
 ```
 
-## Automated testing {#sec:srs-testing}
+## Automated testing {#sec:testing}
 
 
 ```include
@@ -114,7 +114,7 @@ toc: true
 430-bugs.md
 ```
 
-## Verification {#sec:srs-verification}
+## Verification {#sec:verification}
 
 ```include
 440-verification.md
@@ -126,7 +126,7 @@ toc: true
 450-validation.md
 ```
 
-## Documentation {#sec:srs-documentation}
+## Documentation {#sec:documentation}
 
 ```include
 460-documentation.md
