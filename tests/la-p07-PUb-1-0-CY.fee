@@ -12,4 +12,4 @@ sn_alpha = 0.1
 SOLVE_PROBLEM
 
 rc = 4.279960
-PRINT %.3f keff phi1(0.50*rc,0)/phi1(0,0) phi1(1.00*rc,0)/phi1(0,0) SEP " "
+PRINT %.2f keff phi1(0.50*rc,0)/phi1(0,0) phi1(1.00*rc,0)/phi1(0,0) SEP " "
