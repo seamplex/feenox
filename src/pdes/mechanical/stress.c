@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to compute stresses
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021-2023 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -267,6 +267,7 @@ double feenox_tresca_from_stress_tensor(double sigmax, double sigmay, double sig
 }
 
 int feenox_strain_energy(void) {
+#ifdef HAVE_PETSC
 
   Vec Kphi = NULL;
   petsc_call(VecDuplicate(feenox.pde.phi, &Kphi));
@@ -287,6 +288,6 @@ int feenox_strain_energy(void) {
     }
     *mechanical.strain_energy->initial_transient = *mechanical.strain_energy->value;
   }
-  
+#endif  
   return FEENOX_OK;
 }

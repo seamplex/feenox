@@ -19,8 +19,8 @@
  *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#ifndef NEUTRON_TRANSPORT_FEM_METHODS_H
-#define NEUTRON_TRANSPORT_FEM_METHODS_H
+#ifndef NEUTRON_SN_METHODS_H
+#define NEUTRON_SN_METHODS_H
 
 // neutron_sn/parser.c
 extern int feenox_problem_parse_problem_neutron_sn(const char *);
@@ -49,4 +49,4 @@ extern int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e
 
 // neutron_sn/post.c
 extern int feenox_problem_solve_post_neutron_sn(void);
-#endif  // NEUTRON_TRANSPORT_FEM
+#endif  // NEUTRON_SN_METHODS_H

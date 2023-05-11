@@ -19,8 +19,8 @@
  *  along with FeenoX.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-#ifndef NEUTRON_TRANSPORT_H
-#define NEUTRON_TRANSPORT_H
+#ifndef NEUTRON_SN_H
+#define NEUTRON_SN_H
 
 #define dof_index(n,g) ((n)*neutron_sn.groups + (g))
 
@@ -111,5 +111,5 @@ struct neutron_sn_t {
 extern neutron_sn_t neutron_sn;
 
 
-#endif /* NEUTRON_TRANSPORT_FEM_H */
+#endif /* NEUTRON_SN_H */
 
