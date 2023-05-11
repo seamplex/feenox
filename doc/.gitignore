@@ -2,7 +2,6 @@ Makefile
 Makefile.in
 texinfo.tex
 feenox-desc.info
-feenox.1
 example10.1
 gmsh.1
 pandoc.1.md
