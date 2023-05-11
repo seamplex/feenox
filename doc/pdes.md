@@ -1,0 +1,6 @@
+ * [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)
+ * [`thermal`](https://github.com/seamplex/feenox/tree/main/src/pdes/thermal)
+ * [`mechanical`](https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical)
+ * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
+ * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
+ * [`neutron_sn`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_sn)
