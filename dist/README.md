@@ -27,8 +27,8 @@ Also Debian `.deb` packages can be created (if running in a Debian box).
  1. Edit `versions.sh` and set the version of both PETSc and SLEPc, for instance
 
     ```bash
-    petsc_ver=3.17.2
-    slepc_ver=3.17.1
+    petsc_ver=3.19.0
+    slepc_ver=3.19.0
     ```
    
  2. Run `./petsc.sh` to download, configure and compile the selected version of PETSc and SLEPc.
@@ -44,6 +44,9 @@ These will be unpacked in the current directory `dist` but are `.gitignore`d.
  
  The resulting binary has PETSc and SLEPc statically linked, but only their non-MPI versions.
  Also, it does not include MUMPS. Feel free to play with the scripts to see if you can make them work.
+ 
+ > To avoid generating the documentation (which needs pandoc, LaTeX, Inkscape, etc.) pass `--no-doc` to `./bin.sh`
+ 
 
 # Debian packages
 

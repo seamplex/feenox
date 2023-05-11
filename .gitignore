@@ -46,6 +46,7 @@ nbproject
 
 # outputs of "make check"
 mesh2d.msh
+mesh2d.vtk
 laplace-square.msh
 nafems-t4-result.msh
 nafems-le1*.vtk

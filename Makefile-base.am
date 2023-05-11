@@ -174,7 +174,10 @@ DISTCLEANFILES = \
                  nafems-le11-tet4.vtk \
                  tests/annulus-modal.last \
                  tests/annulus.msh \
-                 cube-radial.vtk
+                 cube-radial.vtk \
+                 mesh2d.vtk \
+                 ./tests/expressions_cumbersome.last
+                 
                  
 
 all-local:
