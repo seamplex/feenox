@@ -9,7 +9,7 @@ Mesh.MeshSizeMin = rc/n;
 Mesh.ElementOrder = 1;
 Mesh.RecombineAll = 0;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+//Mesh.OptimizeNetgen = 1;
 
 Physical Volume("fuel") = {1};
 Physical Surface("mirror") = {4, 3, 2};

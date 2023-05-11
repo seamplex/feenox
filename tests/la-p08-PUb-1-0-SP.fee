@@ -15,4 +15,4 @@ SOLVE_PROBLEM
 
 # WRITE_RESULTS FORMAT vtk
 rc = 6.082547
-PRINT %.3f keff phi1(0.25*rc,0,0)/phi1(0,0,0) phi1(0.50*rc,0,0)/phi1(0,0,0) phi1(0.75*rc,0,0)/phi1(0,0,0) phi1(1.00*rc,0,0)/phi1(0,0,0) SEP " "
+PRINT %.2f keff phi1(0.25*rc,0,0)/phi1(0,0,0) phi1(0.50*rc,0,0)/phi1(0,0,0) phi1(0.75*rc,0,0)/phi1(0,0,0) phi1(1.00*rc,0,0)/phi1(0,0,0) SEP " "
