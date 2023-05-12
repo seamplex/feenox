@@ -22,9 +22,7 @@ fi
 
 cd ${package}
   git checkout ${branch}
-  git fetch --tags
   git pull
-  git fetch --tags
 cd ..
 
 cd ${package}
@@ -33,11 +31,9 @@ cd ${package}
     echo "error: version.m4 does not exist"
     exit 1
   fi
-  cat version.m4
+  # the sed is just in case version is heads/main
   version=$(echo ${package}version | m4 version.m4 - | sed s_/_-_g)
 cd ..
-
-exit 1
 
 name=$(uname)
 if [ "x${name}" == "xLinux" ]; then
