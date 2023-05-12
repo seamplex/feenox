@@ -16,7 +16,7 @@ if [ ! -e petsc-${petsc_ver} ]; then
    exit 1
   fi
  fi
- tar xvzf petsc-${petsc_ver}.tar.gz
+ tar xzf petsc-${petsc_ver}.tar.gz
 fi 
 
 cd petsc-${petsc_ver}
@@ -53,7 +53,7 @@ if [ ! -e slepc-${slepc_ver} ]; then
    exit 1
   fi
  fi
- tar xvzf slepc-${slepc_ver}.tar.gz
+ tar xzf slepc-${slepc_ver}.tar.gz
 fi
 
 cd slepc-${slepc_ver}
