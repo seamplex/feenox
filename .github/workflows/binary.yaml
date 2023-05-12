@@ -1,0 +1,46 @@
+name: Binary tarball
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux static binary
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build binary
+        run: |
+             cd dist
+             ./petsc.sh
+             ./bin.sh --no-doc
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: true
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./dist/feenox-linux-amd64.tar.gz
+          asset_name: feenox-linux-amd64.tar.gz
+          asset_content_type: application/gzip
+          
+    - uses: actions/upload-artifact@v3
+      with:
+        name: feenox-linux-amd64.tar.gz
+        path: ./dist/feenox-linux-amd64.tar.gz
