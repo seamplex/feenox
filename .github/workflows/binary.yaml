@@ -9,11 +9,17 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # to fetch all tags so version is available
 
-      - name: Build binary
+      - name: Build PETSc and SLEPc
         run: |
           cd dist
           ./petsc.sh
+
+      - name: Build FeenoX (no-doc)
+        run: |
+          cd dist
           ./bin.sh --no-doc
           
       - name: Create Release

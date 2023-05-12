@@ -1,4 +1,4 @@
-name: compile_and_test
+name: Compile and test
 
 
 on:
@@ -9,21 +9,14 @@ on:
 # If you want to run it manually you would add "worflow_dispatch"
   workflow_dispatch:
   
-# defaults:
-#   run:
-#     shell: bash  
- 
-# Jobs are run separately and will spin up a new build machine for each sub-item
 jobs:
-  # Under jobs you can put whatever name you want
-  # This is just a custom name "build" but it can be anything
   build:
     name: Compile and run tests
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-
+        
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
