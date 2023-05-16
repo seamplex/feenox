@@ -43,7 +43,7 @@ FILE *feenox_fopen(const char *filepath, const char *mode) {
 char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
 
   int size = strlen(format)+1 + nargs*32;
-  char *string = malloc(size+1);
+  char *string = calloc(size+1, sizeof(char));
   
   switch (nargs) {
     case 0:
@@ -111,6 +111,7 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
     break;
     default:
       feenox_push_error_message("more than eight arguments for string");
+      feenox_free(string);
       return NULL;
     break;
   }
@@ -143,6 +144,7 @@ int feenox_instruction_file_open(void *arg) {
     }
     if (file->mode == NULL || strcmp(file->mode, "") == 0) {
       feenox_push_error_message("unknown open mode for file '%s' ('%s')", file->name, file->path);
+      feenox_free(newfilepath);
       return FEENOX_ERROR;
     }
     if ((file->pointer = feenox_fopen(file->path, file->mode)) == NULL) {

@@ -151,7 +151,7 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
   if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
     h = feenox_expression_eval(&this->expr);
     Tref = feenox_expression_eval(&this->next->expr);
-  } else if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE) {
+  } else if (this->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE && this->next->type_phys == BC_TYPE_THERMAL_CONVECTION_COEFFICIENT) {
     Tref = feenox_expression_eval(&this->expr);
     h = feenox_expression_eval(&this->next->expr);
   } else {

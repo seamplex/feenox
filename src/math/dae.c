@@ -58,6 +58,7 @@ int feenox_phase_space_add_object(const char *string, int differential) {
   } else if ((matrix = feenox_get_matrix_ptr(string)) != NULL) {
 
     feenox_push_error_message("matrix in phase space to be done");
+    feenox_free(phase_object);
     return FEENOX_ERROR;
     
 /*    

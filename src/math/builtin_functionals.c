@@ -432,7 +432,7 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
   double tmp;
   double epsrel;
 
-  gsl_root_fsolver *s;
+  gsl_root_fsolver *s = NULL;
   gsl_function function_to_solve;
   gsl_function_arguments_t function_arguments;
   
@@ -575,7 +575,7 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
 
   
   const gsl_min_fminimizer_type *T;
-  gsl_min_fminimizer *s;
+  gsl_min_fminimizer *s = NULL;
   gsl_function function_to_solve;
   gsl_function_arguments_t function_arguments;
 

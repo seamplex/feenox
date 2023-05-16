@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # to fetch all tags so version is available
+          fetch-depth: 0  # to fetch all tags so version from git describe is available
 
       - name: Build PETSc and SLEPc
         run: |

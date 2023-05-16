@@ -421,6 +421,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
       // arguments have to be in parenthesis
       if (*argument != '[' && *argument != '(') {
         feenox_push_error_message("expected parenthesis or bracket after '%s'", token);
+        feenox_free(argument);
         feenox_free(backup);
         feenox_free(item);
         return NULL;

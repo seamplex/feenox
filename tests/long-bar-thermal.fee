@@ -16,7 +16,7 @@ k(x,y,z) = a*(1 + b*T(x,y,z))
 
 # boundary conditions
 BC rear  T=Tl
-BC front h=h Tref=Tref
+BC front Tref=Tref h=h
 
 SOLVE_PROBLEM
 

@@ -58,12 +58,11 @@ int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents)
   double *oldptr = NULL;
   if (feenox_value_ptr(this) != NULL) {
     oldptr = gsl_vector_ptr(feenox_value_ptr(this), 0);
-  }
 
-  // si copy_contents es true copiamos el contenido del vector de feenox
-  // antes de tirar el apuntador a la basura
-  if (copy_contents) {
-    memcpy(newptr, oldptr, this->size * sizeof(double));
+    // if copy_contents is true we copy the contents before throwing the pointer away
+    if (copy_contents) {
+      memcpy(newptr, oldptr, this->size * sizeof(double));
+    }
   }
 
   if (oldptr == NULL) {

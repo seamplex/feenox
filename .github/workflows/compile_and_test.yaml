@@ -2,10 +2,10 @@ name: Compile and test
 
 
 on:
-  # push:
-  #   branches: [ main ]
-  # pull_request:
-  #   branches: [ main ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 # this "worflow_dispatch" means run it manually with a button in the UI
   workflow_dispatch:
   

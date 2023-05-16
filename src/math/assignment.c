@@ -160,7 +160,7 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
     feenox_call(feenox_add_instruction(feenox_instruction_assignment_scalar, assignment));
   } else if (assignment->vector != NULL) {
     feenox_call(feenox_add_instruction(feenox_instruction_assignment_vector, assignment));      
-  } else if (assignment->vector != NULL) {
+  } else if (assignment->matrix != NULL) {
     feenox_call(feenox_add_instruction(feenox_instruction_assignment_matrix, assignment));      
   } else {
     feenox_push_error_message("invalid assignment");
@@ -378,8 +378,8 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
       initial_transient = gsl_matrix_ptr(assignment->matrix->initial_transient, row, col);
     }
 
-    assigned_zero = assignment->vector->assigned_zero;
-    assigned_init = assignment->vector->assigned_init;
+    assigned_zero = assignment->matrix->assigned_zero;
+    assigned_init = assignment->matrix->assigned_init;
     
   } else {
     feenox_push_error_message("internal mistmatch, neither variable nor vector nor matrix found for assigment");
