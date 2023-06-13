@@ -2071,7 +2071,7 @@ extern double feenox_vector_get(vector_t *, const size_t i);
 extern double feenox_vector_get_initial_static(vector_t *, const size_t i);
 extern double feenox_vector_get_initial_transient(vector_t *, const size_t i);
 extern int feenox_vector_set(vector_t *, const size_t i, double value);
-extern int feenox_vector_add(vector_t *this, const size_t i, double value);
+extern int feenox_vector_add(vector_t *, const size_t i, double value);
 extern int feenox_vector_set_size(vector_t *, const size_t size);
 
 // function.c
@@ -2235,7 +2235,7 @@ extern int feenox_mesh_element2cell(mesh_t *);
 
 // vtk.c
 // TODO: rename feenox_mesh_write_mesh_vtk
-extern int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, unsigned int size);
+extern int feenox_mesh_read_vtk_field_node(mesh_t *mesh, FILE *fp, const char *name, unsigned int size);
 extern int feenox_mesh_write_unstructured_mesh_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_header_vtk(FILE *file);
 extern int feenox_mesh_write_mesh_vtk(mesh_t *, FILE *file, int dummy);

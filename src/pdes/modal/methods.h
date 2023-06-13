@@ -42,10 +42,10 @@ extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element,
 
 // modal/bc.c
 extern int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs);
-extern int feenox_problem_bc_set_modal_displacement(bc_data_t *this, element_t *e, size_t j_global);
-extern int feenox_problem_bc_set_modal_symmetry(bc_data_t *this, element_t *e, size_t j_global);
-extern int feenox_problem_bc_set_modal_radial(bc_data_t *this, element_t *e, size_t j_global);
-extern int feenox_problem_bc_set_modal_multifreedom(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_modal_displacement(bc_data_t *bc_data, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_modal_symmetry(bc_data_t *bc_data, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_modal_radial(bc_data_t *bc_data, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_modal_multifreedom(bc_data_t *bc_data, element_t *e, size_t j_global);
 extern double feenox_modal_gsl_function_of_uvw(double x, void *params);
 
 // material models

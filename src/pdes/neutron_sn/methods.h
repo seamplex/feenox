@@ -44,8 +44,8 @@ extern int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *ele
 
 // neutron_sn/bc.c
 extern int feenox_problem_bc_parse_neutron_sn(bc_data_t *bc_data, const char *lhs, char *rhs);
-extern int feenox_problem_bc_set_neutron_sn_vacuum(bc_data_t *this, element_t *e, size_t j_global);
-extern int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_neutron_sn_vacuum(bc_data_t *bc_data, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *bc_data, element_t *e, size_t j_global);
 
 // neutron_sn/post.c
 extern int feenox_problem_solve_post_neutron_sn(void);

@@ -243,13 +243,18 @@ int feenox_problem_setup_pc(PC pc) {
 #ifdef PETSC_HAVE_MUMPS  
   }  
 #endif
-
+  
   if (feenox.pde.setup_pc != NULL) {
     feenox_call(feenox.pde.setup_pc(pc));
   }
-    
+  
+  // read command-line options
+  petsc_call(PCSetFromOptions(pc));
+  
+/*  
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
+ */
 
   return FEENOX_OK;
 }
