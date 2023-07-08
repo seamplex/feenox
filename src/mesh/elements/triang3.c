@@ -26,26 +26,7 @@
 // three-node triangle
 // -------------------------------------
 
-int feenox_mesh_triang3_init(void) {
-
-  element_type_t *element_type = NULL;
-  
-  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
-  feenox_check_alloc(element_type->name = strdup("triang3"));
-  element_type->id = ELEMENT_TYPE_TRIANGLE3;
-  element_type->dim = 2;
-  element_type->order = 1;
-  element_type->nodes = 3;
-  element_type->faces = 3;
-  element_type->nodes_per_face = 2;
-  element_type->h = feenox_mesh_triang3_h;
-  element_type->dhdr = feenox_mesh_triang3_dhdr;
-  element_type->point_inside = feenox_mesh_point_in_triangle;
-  element_type->volume = feenox_mesh_triang_volume;
-  element_type->area = feenox_mesh_triang_area;
-  element_type->size = feenox_mesh_triang_size;
-  
-  // from Gmsh’ doc
+// from Gmsh’ doc
 /*
 Triangle:         
 
@@ -59,7 +40,25 @@ v
 |      `\
 |        `\
 0----------1 --> u 
-*/   
+*/  
+int feenox_mesh_triang3_init(void) {
+
+  element_type_t *element_type = NULL;
+  
+  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
+  element_type->id = ELEMENT_TYPE_TRIANGLE3;
+  element_type->dim = 2;
+  element_type->order = 1;
+  element_type->nodes = 3;
+  element_type->faces = 3;
+  element_type->nodes_per_face = 2;
+  element_type->h = feenox_mesh_triang3_h;
+  element_type->dhdxi = feenox_mesh_triang3_dhdr;
+  element_type->point_inside = feenox_mesh_point_in_triangle;
+  element_type->volume = feenox_mesh_triang_volume;
+  element_type->area = feenox_mesh_triang_area;
+  element_type->size = feenox_mesh_triang_size;
+  
   element_type->node_coords = calloc(element_type->nodes, sizeof(double *));
   element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *));    
   int j = 0;
@@ -78,7 +77,41 @@ v
   element_type->vertices++;
   element_type->node_coords[2][0] = 0;  
   element_type->node_coords[2][1] = 1;
+  
+  // for doc
+  element_type->name = "triang3";
+  element_type->desc = "Three-node triangle";
+  element_type->ascii_art = "\
+η                    \n\
+^                    \n\
+|                    \n\
+2                    \n\
+|`\\                  \n\
+|  `\\                \n\
+|    `\\              \n\
+|      `\\            \n\
+|        `\\          \n\
+0----------1 --> ξ";
 
+  element_type->h_latex = feenox_mesh_triang3_h_latex;
+  element_type->doc_n_edges = 3;
+  feenox_check_alloc(element_type->doc_edges = calloc(element_type->doc_n_edges, sizeof(int[2])));
+  element_type->doc_edges = malloc(element_type->doc_n_edges * sizeof(int[2]));
+  element_type->doc_edges[0][0] = 0;
+  element_type->doc_edges[0][1] = 1;
+  
+  element_type->doc_edges[1][0] = 1;
+  element_type->doc_edges[1][1] = 2;
+  
+  element_type->doc_edges[2][0] = 2;
+  element_type->doc_edges[2][1] = 0;
+
+  element_type->doc_n_faces = 1;
+  feenox_check_alloc(element_type->doc_faces = calloc(element_type->doc_n_faces, sizeof(int[8])));
+  element_type->doc_faces[0][0] = 1;
+  element_type->doc_faces[0][1] = 2;
+  element_type->doc_faces[0][2] = 3;
+  
   // ------------
   // gauss points and extrapolation matrices
   
@@ -129,16 +162,16 @@ int feenox_mesh_gauss_init_triang3(element_type_t *element_type, gauss_t *gauss)
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 3));
   
   gauss->w[0] = 1.0/2.0 * 1.0/3.0;
-  gauss->r[0][0] = 1.0/6.0;
-  gauss->r[0][1] = 1.0/6.0;
+  gauss->xi[0][0] = 1.0/6.0;
+  gauss->xi[0][1] = 1.0/6.0;
   
   gauss->w[1] = 1.0/2.0 * 1.0/3.0;
-  gauss->r[1][0] = 2.0/3.0;
-  gauss->r[1][1] = 1.0/6.0;
+  gauss->xi[1][0] = 2.0/3.0;
+  gauss->xi[1][1] = 1.0/6.0;
   
   gauss->w[2] = 1.0/2.0 * 1.0/3.0;
-  gauss->r[2][0] = 1.0/6.0;
-  gauss->r[2][1] = 2.0/3.0;
+  gauss->xi[2][0] = 1.0/6.0;
+  gauss->xi[2][1] = 2.0/3.0;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
     
@@ -152,8 +185,8 @@ int feenox_mesh_gauss_init_triang1(element_type_t *element_type, gauss_t *gauss)
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 1));
   
   gauss->w[0] = 0.5 * 1.0;
-  gauss->r[0][0] = 1.0/3.0;
-  gauss->r[0][1] = 1.0/3.0;
+  gauss->xi[0][0] = 1.0/3.0;
+  gauss->xi[0][1] = 1.0/3.0;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));  
 
@@ -162,25 +195,41 @@ int feenox_mesh_gauss_init_triang1(element_type_t *element_type, gauss_t *gauss)
 }
 
 
-double feenox_mesh_triang3_h(int j, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
+double feenox_mesh_triang3_h(int j, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta = vec_xi[1];
 
   switch (j) {
     case 0:
-      return 1-r-s;
+      return 1-xi-eta;
       break;
     case 1:
-      return r;
+      return xi;
       break;
     case 2:
-      return s;
+      return eta;
       break;
   }
 
   return 0;
-
 }
+
+char *feenox_mesh_triang3_h_latex(int j) {
+  switch (j) {
+    case 0:
+      return "1-\\xi-\\eta";
+      break;
+    case 1:
+      return "\\xi";
+      break;
+    case 2:
+      return "\\eta";
+      break;
+  }
+
+  return "";
+}
+
 
 double feenox_mesh_triang3_dhdr(int j, int m, double *vec_r) {
   

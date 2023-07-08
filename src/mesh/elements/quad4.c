@@ -40,7 +40,7 @@ int feenox_mesh_quad4_init(void) {
   element_type->faces = 4;
   element_type->nodes_per_face = 2;
   element_type->h = feenox_mesh_quad4_h;
-  element_type->dhdr = feenox_mesh_quad4_dhdr;
+  element_type->dhdxi = feenox_mesh_quad4_dhdr;
   element_type->point_inside = feenox_mesh_point_in_quadrangle;
   element_type->volume = feenox_mesh_quad_volume;
   element_type->area = feenox_mesh_quad_area;
@@ -115,8 +115,8 @@ int feenox_mesh_gauss_init_quad1(element_type_t *element_type, gauss_t *gauss) {
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 1));
   
   gauss->w[0] = 4 * 1.0;
-  gauss->r[0][0] = 0.0;
-  gauss->r[0][1] = 0.0;
+  gauss->xi[0][0] = 0.0;
+  gauss->xi[0][1] = 0.0;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));  
   
@@ -129,20 +129,20 @@ int feenox_mesh_gauss_init_quad4(element_type_t *element_type, gauss_t *gauss) {
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 4));
 
   gauss->w[0] = 4 * 0.25;
-  gauss->r[0][0] = -1.0/M_SQRT3;
-  gauss->r[0][1] = -1.0/M_SQRT3;
+  gauss->xi[0][0] = -1.0/M_SQRT3;
+  gauss->xi[0][1] = -1.0/M_SQRT3;
 
   gauss->w[1] = 4 * 0.25;
-  gauss->r[1][0] = +1.0/M_SQRT3;
-  gauss->r[1][1] = -1.0/M_SQRT3;
+  gauss->xi[1][0] = +1.0/M_SQRT3;
+  gauss->xi[1][1] = -1.0/M_SQRT3;
  
   gauss->w[2] = 4 * 0.25;
-  gauss->r[2][0] = +1.0/M_SQRT3;
-  gauss->r[2][1] = +1.0/M_SQRT3;
+  gauss->xi[2][0] = +1.0/M_SQRT3;
+  gauss->xi[2][1] = +1.0/M_SQRT3;
 
   gauss->w[3] = 4 * 0.25;
-  gauss->r[3][0] = -1.0/M_SQRT3;
-  gauss->r[3][1] = +1.0/M_SQRT3;
+  gauss->xi[3][0] = -1.0/M_SQRT3;
+  gauss->xi[3][1] = +1.0/M_SQRT3;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
   
@@ -160,40 +160,40 @@ int feenox_mesh_gauss_init_quad9(element_type_t *element_type, gauss_t *gauss) {
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 9));
   
   gauss->w[0] = w1;
-  gauss->r[0][0] = -M_SQRT3/M_SQRT5;
-  gauss->r[0][1] = -M_SQRT3/M_SQRT5;
+  gauss->xi[0][0] = -M_SQRT3/M_SQRT5;
+  gauss->xi[0][1] = -M_SQRT3/M_SQRT5;
 
   gauss->w[1] = w1;
-  gauss->r[1][0] = +M_SQRT3/M_SQRT5;
-  gauss->r[1][1] = -M_SQRT3/M_SQRT5;
+  gauss->xi[1][0] = +M_SQRT3/M_SQRT5;
+  gauss->xi[1][1] = -M_SQRT3/M_SQRT5;
  
   gauss->w[2] = w1;
-  gauss->r[2][0] = +M_SQRT3/M_SQRT5;
-  gauss->r[2][1] = +M_SQRT3/M_SQRT5;
+  gauss->xi[2][0] = +M_SQRT3/M_SQRT5;
+  gauss->xi[2][1] = +M_SQRT3/M_SQRT5;
 
   gauss->w[3] = w1;
-  gauss->r[3][0] = -M_SQRT3/M_SQRT5;
-  gauss->r[3][1] = +M_SQRT3/M_SQRT5;
+  gauss->xi[3][0] = -M_SQRT3/M_SQRT5;
+  gauss->xi[3][1] = +M_SQRT3/M_SQRT5;
     
   gauss->w[4] = w2;
-  gauss->r[4][0] = 0.0;
-  gauss->r[4][1] = -M_SQRT3/M_SQRT5;
+  gauss->xi[4][0] = 0.0;
+  gauss->xi[4][1] = -M_SQRT3/M_SQRT5;
 
   gauss->w[5] = w2;
-  gauss->r[5][0] = +M_SQRT3/M_SQRT5;
-  gauss->r[5][1] = 0.0;
+  gauss->xi[5][0] = +M_SQRT3/M_SQRT5;
+  gauss->xi[5][1] = 0.0;
  
   gauss->w[6] = w2;
-  gauss->r[6][0] = 0.0;
-  gauss->r[6][1] = +M_SQRT3/M_SQRT5;
+  gauss->xi[6][0] = 0.0;
+  gauss->xi[6][1] = +M_SQRT3/M_SQRT5;
 
   gauss->w[7] = w2;
-  gauss->r[7][0] = -M_SQRT3/M_SQRT5;
-  gauss->r[7][1] = 0.0;
+  gauss->xi[7][0] = -M_SQRT3/M_SQRT5;
+  gauss->xi[7][1] = 0.0;
    
   gauss->w[8] = w3;
-  gauss->r[8][0] = 0.0;
-  gauss->r[8][1] = 0.0;
+  gauss->xi[8][0] = 0.0;
+  gauss->xi[8][1] = 0.0;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
     

@@ -39,25 +39,28 @@ struct neutron_diffusion_t {
   gsl_matrix *diff;
   
   // removal XSs: groups x groups
-  gsl_matrix *removal;
+  gsl_matrix *R;
 
   // fission XSs: groups x groups
-  gsl_matrix *nufission;
+  gsl_matrix *X;
   
   // independent sources: groups
-  gsl_vector *src;  
+  gsl_vector *s;  
   
   // fission spectrum: groups
   double *chi;
 
-  // elemental matrices  
   unsigned int n_nodes;
+  // elemental matrices (size n_nodes*G x n_nodes*G)
+  gsl_matrix *Li;  // leakage
+  gsl_matrix *Ai;  // absorption
+  gsl_matrix *Fi;  // fission
+
+  // intermediate matrices
   gsl_matrix *DB;
   gsl_matrix *AH;
-  gsl_matrix *XH;
-  gsl_matrix *Ki;
-  gsl_matrix *Ai;
-  gsl_matrix *Xi;
+  gsl_matrix *FX;
+  
   
   int has_sources;
   int has_fission;

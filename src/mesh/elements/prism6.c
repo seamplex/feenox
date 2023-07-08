@@ -1,7 +1,8 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related prism element routines
  *
- *  Copyright (C) 2015--2023 jeremy theler & ezequiel manavela chiapero
+ *  Copyright (C) 2015 jeremy theler & ezequiel manavela chiapero
+ *  Copyright (C) 2017--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -28,11 +29,10 @@
 
 int feenox_mesh_prism6_init(void) {
 
-  element_type_t *element_type;
   int j;
 
-  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM6];
-  feenox_check_alloc(element_type->name = strdup("prism6"));
+  element_type_t *element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM6];
+  element_type->name = "prism6";
   element_type->id = ELEMENT_TYPE_PRISM6;
   element_type->dim = 3;
   element_type->order = 1;
@@ -40,7 +40,7 @@ int feenox_mesh_prism6_init(void) {
   element_type->faces = 5;
   element_type->nodes_per_face = 4;   // Ojo aca que en nodos por cara pusimos el maximo valor (4) ya que depende de la cara
   element_type->h = feenox_mesh_prism6_h;
-  element_type->dhdr = feenox_mesh_prism6_dhdr;
+  element_type->dhdxi = feenox_mesh_prism6_dhdr;
   element_type->point_inside = feenox_mesh_point_in_prism;
   element_type->volume = feenox_mesh_prism_volume;
 
@@ -117,78 +117,78 @@ int feenox_mesh_prism_gauss6_init(element_type_t *element_type) {
   // el primero es el default
   // ---- seis puntos de Gauss sobre el elemento unitario ----  
     gauss_t *gauss = &element_type->gauss[integration_full];
-    gauss->V = 6;
-    feenox_mesh_alloc_gauss(gauss, element_type, gauss->V = 6);
+    gauss->Q = 6;
+    feenox_mesh_alloc_gauss(gauss, element_type, gauss->Q = 6);
    
     gauss->w[0] = 1.0/6.0;
-    gauss->r[0][0] = 1.0/6.0;
-    gauss->r[0][1] = 1.0/6.0;
-    gauss->r[0][2] = -1/M_SQRT3;
+    gauss->xi[0][0] = 1.0/6.0;
+    gauss->xi[0][1] = 1.0/6.0;
+    gauss->xi[0][2] = -1/M_SQRT3;
   
     gauss->w[1] = 1.0/6.0;
-    gauss->r[1][0] = 2.0/3.0;
-    gauss->r[1][1] = 1.0/6.0;
-    gauss->r[1][2] = -1/M_SQRT3;
+    gauss->xi[1][0] = 2.0/3.0;
+    gauss->xi[1][1] = 1.0/6.0;
+    gauss->xi[1][2] = -1/M_SQRT3;
   
     gauss->w[2] = 1.0/6.0;
-    gauss->r[2][0] = 1.0/6.0;
-    gauss->r[2][1] = 2.0/3.0;
-    gauss->r[2][2] = -1/M_SQRT3;
+    gauss->xi[2][0] = 1.0/6.0;
+    gauss->xi[2][1] = 2.0/3.0;
+    gauss->xi[2][2] = -1/M_SQRT3;
 
     gauss->w[3] = 1.0/6.0;
-    gauss->r[3][0] = 1.0/6.0;
-    gauss->r[3][1] = 1.0/6.0;
-    gauss->r[3][2] = +1/M_SQRT3;
+    gauss->xi[3][0] = 1.0/6.0;
+    gauss->xi[3][1] = 1.0/6.0;
+    gauss->xi[3][2] = +1/M_SQRT3;
   
     gauss->w[4] = 1.0/6.0;
-    gauss->r[4][0] = 2.0/3.0;
-    gauss->r[4][1] = 1.0/6.0;
-    gauss->r[4][2] = +1/M_SQRT3;
+    gauss->xi[4][0] = 2.0/3.0;
+    gauss->xi[4][1] = 1.0/6.0;
+    gauss->xi[4][2] = +1/M_SQRT3;
   
     gauss->w[5] = 1.0/6.0;
-    gauss->r[5][0] = 1.0/6.0;
-    gauss->r[5][1] = 2.0/3.0;
-    gauss->r[5][2] = +1/M_SQRT3;
+    gauss->xi[5][0] = 1.0/6.0;
+    gauss->xi[5][1] = 2.0/3.0;
+    gauss->xi[5][2] = +1/M_SQRT3;
     
     feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
     
   // ---- un punto de Gauss sobre el elemento unitario ----  
     gauss = &element_type->gauss[integration_reduced];
-    gauss->V = 1;
-    feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, gauss->V));
+    gauss->Q = 1;
+    feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, gauss->Q));
   
     gauss->w[0] = 0.5 * 1.0;
-    gauss->r[0][0] = 0;
-    gauss->r[0][1] = 0;
+    gauss->xi[0][0] = 0;
+    gauss->xi[0][1] = 0;
 
     feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));
   
   return FEENOX_OK;
 }
 
-double feenox_mesh_prism6_h(int j, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
-  double t = vec_r[2];
+double feenox_mesh_prism6_h(int j, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta = vec_xi[1];
+  double zeta = vec_xi[2];
 
   switch (j) {
     case 0:
-      return 1.0/2.0*((1-r-s)*(1-t));
+      return 1.0/2.0*((1-xi-eta)*(1-zeta));
       break;
     case 1:
-      return 1.0/2.0*(r*(1-t));
+      return 1.0/2.0*(xi*(1-zeta));
       break;
     case 2:
-      return 1.0/2.0*(s*(1-t));
+      return 1.0/2.0*(eta*(1-zeta));
       break;
     case 3:
-      return 1.0/2.0*((1-r-s)*(1+t));
+      return 1.0/2.0*((1-xi-eta)*(1+zeta));
       break;
     case 4:
-      return 1.0/2.0*(r*(1+t));
+      return 1.0/2.0*(xi*(1+zeta));
       break;
     case 5:
-      return 1.0/2.0*(s*(1+t));
+      return 1.0/2.0*(eta*(1+zeta));
       break;
   }
 
@@ -196,87 +196,87 @@ double feenox_mesh_prism6_h(int j, double *vec_r) {
 
 }
 
-double feenox_mesh_prism6_dhdr(int j, int m, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
-  double t = vec_r[2];
+double feenox_mesh_prism6_dhdr(int j, int d, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta = vec_xi[1];
+  double zeta = vec_xi[2];
 
   switch (j) {
     case 0:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -1.0/2.0*(1-t);
+          return -1.0/2.0*(1-zeta);
         break;
         case 1:
-          return -1.0/2.0*(1-t);
+          return -1.0/2.0*(1-zeta);
         break;
         case 2:
-          return -1.0/2.0*(1-r-s);
+          return -1.0/2.0*(1-xi-eta);
         break;
       }
     break;
     case 1:
-      switch(m) {
+      switch(d) {
         case 0:
-          return 1.0/2.0*(1-t);
+          return 1.0/2.0*(1-zeta);
         break;
         case 1:
           return 0;
         break;
         case 2:
-          return -1.0/2.0*r;
+          return -1.0/2.0*xi;
         break;
       }
     break;
     case 2:
-      switch(m) {
+      switch(d) {
         case 0:
           return 0;
         break;
         case 1:
-          return 1.0/2.0*(1-t);
+          return 1.0/2.0*(1-zeta);
         break;
         case 2:
-          return -1.0/2.0*s;
+          return -1.0/2.0*eta;
         break;
       }
     break;
     case 3:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -1.0/2.0*(1+t);
+          return -1.0/2.0*(1+zeta);
         break;
         case 1:
-          return -1.0/2.0*(1+t);
+          return -1.0/2.0*(1+zeta);
         break;
         case 2:
-          return +1.0/2.0*(1-r-s);
+          return +1.0/2.0*(1-xi-eta);
         break;
       }
     break;
     case 4:
-      switch(m) {
+      switch(d) {
         case 0:
-          return 1.0/2.0*(1+t);
+          return 1.0/2.0*(1+zeta);
         break;
         case 1:
           return 0;
         break;
         case 2:
-          return +1.0/2.0*r;
+          return +1.0/2.0*xi;
         break;
       }
     break;
     case 5:
-      switch(m) {
+      switch(d) {
         case 0:
           return 0;
         break;
         case 1:
-          return 1.0/2.0*(1+t);
+          return 1.0/2.0*(1+zeta);
         break;
         case 2:
-          return +1.0/2.0*s;
+          return +1.0/2.0*eta;
         break;
       }
     break;

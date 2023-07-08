@@ -201,11 +201,11 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   
   // loop over gauss points to integrate elemental matrices and vectors
   // TODO: loop inside the builder
-  int V = this->type->gauss[feenox.pde.mesh->integration].V;
-  for (int v = 0; v < V; v++) {
+  int Q = this->type->gauss[feenox.pde.mesh->integration].Q;
+  for (unsigned int q = 0; q < Q; q++) {
     // this is a virtual method that depends on the problem type
     // TODO: hardcode the name of the method to allow inlining with LTO
-    feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, v));
+    feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, q));
   }
  
   // compute the indices of the DOFs to ensamble
@@ -236,7 +236,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
 
 #ifdef HAVE_PETSC
   // total number of gauss points
-  unsigned int V = this->type->gauss[feenox.pde.mesh->integration].V;
+  unsigned int Q = this->type->gauss[feenox.pde.mesh->integration].Q;
 
   if (feenox.pde.n_local_nodes != this->type->nodes) {
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
@@ -258,8 +258,8 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
     gsl_matrix_set_zero(feenox.pde.Jbi);
   }
 
-  for (unsigned int v = 0; v < V; v++) {
-    feenox_call(bc_data->set_natural(bc_data, this, v));
+  for (unsigned int q = 0; q < Q; q++) {
+    feenox_call(bc_data->set_natural(bc_data, this, q));
   }
   
   feenox_call(feenox_mesh_compute_dof_indices(this, feenox.pde.mesh));

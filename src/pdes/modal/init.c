@@ -145,7 +145,7 @@ int feenox_problem_init_parser_modal(void) {
   feenox_check_alloc(modal.Gamma = feenox_define_vector_get_ptr("Gamma", feenox.pde.nev));
 
 ///ve+mu+desc _Size:_ number of requested modes.
-///ve+mu+desc _Elements:_ The relatve effective modal mass $\mu_i$ of the $i$-th mode computed as
+///ve+mu+desc _Elements:_ The relative effective modal mass $\mu_i$ of the $i$-th mode computed as
 ///ve+mu+desc
 ///ve+mu+desc \[ \mu_i = \frac{L_i^2}{M_t \cdot n_\text{DOFs} \cdot m_i} \]
 ///ve+mu+desc

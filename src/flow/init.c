@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX initialization routines
  *
- *  Copyright (C) 2009--2022 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -46,18 +46,21 @@ int feenox_initialize(int argc, char **argv) {
   const struct option longopts[] = {
 ///op+help+option `-h`, `--help`
 ///op+help+desc display options and detailed explanations of commmand-line usage
-    { "help",         no_argument,       NULL, 'h'},
+    { "help",          no_argument,       NULL, 'h'},
 ///op+version+option `-v`, `--version`
 ///op+version+desc display brief version information and exit
-    { "version",      no_argument,       NULL, 'v'},
+    { "version",       no_argument,       NULL, 'v'},
 ///op+versions+option `-V`, `--versions`
 ///op+versions+desc display detailed version information
-    { "versions",     no_argument,       NULL, 'V'},
-    { "long-version", no_argument,       NULL, 'V'},
-    { "version-long", no_argument,       NULL, 'V'},
+    { "versions",      no_argument,       NULL, 'V'},
+    { "long-version",  no_argument,       NULL, 'V'},
+    { "version-long",  no_argument,       NULL, 'V'},
 ///op+pdes+option `--pdes`
 ///op+pdes+desc list the types of `PROBLEM`s that FeenoX can solve, one per line
-    { "pdes",         no_argument,       NULL, 'p'},
+    { "pdes",          no_argument,       NULL, 'p'},
+///op+elements_info+option `--elements_info`
+///op+elements_info+desc output a document with information about the supported element types
+    { "elements_info", no_argument,       NULL, 'e'},
 //op+debug+option `-d`, `--debug`.
 //op+debug+desc start in debug mode
 //    { "debug",        no_argument,       NULL, 'd'},
@@ -121,6 +124,9 @@ int feenox_initialize(int argc, char **argv) {
         break;
       case 'p':
         show_version = version_available_pdes;
+        break;
+      case 'e':
+        show_version = version_elements_info;
         break;
 //      case 'd':
 //        feenox.debug = 1;
@@ -186,7 +192,7 @@ int feenox_initialize(int argc, char **argv) {
   feenox_free(argv0);
   
   // turn of GSL error handler
-  gsl_set_error_handler_off();
+//  gsl_set_error_handler_off();
   // TODO: use our own
   // gsl_set_error_handler(feenox_gsl_handler);
 

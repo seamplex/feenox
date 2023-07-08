@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related point element routines
  *
- *  Copyright (C) 2014--2018 jeremy theler
+ *  Copyright (C) 2014--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -27,10 +27,8 @@
 // --------------------------------------------------------------
 int feenox_mesh_one_node_point_init(void) {
   
-  element_type_t *element_type;
-  
-  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_POINT1];
-  feenox_check_alloc(element_type->name = strdup("point"));
+  element_type_t *element_type = &feenox.mesh.element_types[ELEMENT_TYPE_POINT1];
+  element_type->name = "point";
   element_type->id = ELEMENT_TYPE_POINT1;
   element_type->dim = 0;
   element_type->order = 0;
@@ -38,7 +36,7 @@ int feenox_mesh_one_node_point_init(void) {
   element_type->faces = 0;
   element_type->nodes_per_face = 0;
   element_type->h = feenox_mesh_one_node_point_h;
-  element_type->dhdr = feenox_mesh_one_node_point_dhdr;
+  element_type->dhdxi = feenox_mesh_one_node_point_dhdr;
   element_type->volume = feenox_mesh_point_volume;
   element_type->point_inside = NULL;
   

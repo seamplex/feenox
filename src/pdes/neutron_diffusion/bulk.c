@@ -27,25 +27,24 @@ int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int n_nodes) {
   neutron_diffusion.n_nodes = n_nodes;
   int size = neutron_diffusion.n_nodes * neutron_diffusion.groups;
     
-  if (neutron_diffusion.Ki != NULL) {
-    gsl_matrix_free(neutron_diffusion.Ki);
+  if (neutron_diffusion.Li != NULL) {
+    gsl_matrix_free(neutron_diffusion.Li);
     gsl_matrix_free(neutron_diffusion.Ai);
-    gsl_matrix_free(neutron_diffusion.Xi);
     gsl_matrix_free(neutron_diffusion.DB);
     gsl_matrix_free(neutron_diffusion.AH);
-    gsl_matrix_free(neutron_diffusion.Xi);
     if (neutron_diffusion.has_fission) {
-      gsl_matrix_free(neutron_diffusion.XH);
+      gsl_matrix_free(neutron_diffusion.Fi);
+      gsl_matrix_free(neutron_diffusion.FX);
     }
   }
     
-  feenox_check_alloc(neutron_diffusion.Ki = gsl_matrix_calloc(size, size));
+  feenox_check_alloc(neutron_diffusion.Li = gsl_matrix_calloc(size, size));
   feenox_check_alloc(neutron_diffusion.Ai = gsl_matrix_calloc(size, size));
-  feenox_check_alloc(neutron_diffusion.Xi = gsl_matrix_calloc(size, size));
   feenox_check_alloc(neutron_diffusion.DB = gsl_matrix_calloc(neutron_diffusion.groups * feenox.pde.dim, size));
   feenox_check_alloc(neutron_diffusion.AH = gsl_matrix_calloc(neutron_diffusion.groups, size));
   if (neutron_diffusion.has_fission) {
-    feenox_check_alloc(neutron_diffusion.XH = gsl_matrix_calloc(neutron_diffusion.groups, size));
+    feenox_check_alloc(neutron_diffusion.Fi = gsl_matrix_calloc(size, size));
+    feenox_check_alloc(neutron_diffusion.FX = gsl_matrix_calloc(neutron_diffusion.groups, size));
   }
 
   return FEENOX_OK;
@@ -62,29 +61,29 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   material_t *material = feenox_mesh_get_material(e);
   
   gsl_matrix_set_zero(neutron_diffusion.diff);
-  gsl_matrix_set_zero(neutron_diffusion.removal);
+  gsl_matrix_set_zero(neutron_diffusion.R);
   if (neutron_diffusion.has_fission) {
-    gsl_matrix_set_zero(neutron_diffusion.nufission);
+    gsl_matrix_set_zero(neutron_diffusion.X);
   }
   
   for (int g = 0; g < neutron_diffusion.groups; g++) {
     // independent sources
     if (neutron_diffusion.has_sources) {
       // TODO: macro to make it nicer
-      gsl_vector_set(neutron_diffusion.src, g, neutron_diffusion.S[g].eval(&neutron_diffusion.S[g], x, material));
+      gsl_vector_set(neutron_diffusion.s, g, neutron_diffusion.S[g].eval(&neutron_diffusion.S[g], x, material));
     }
     
     // scattering and fission
     for (int g_prime = 0; g_prime < neutron_diffusion.groups; g_prime++) {
-      gsl_matrix_set(neutron_diffusion.removal, g, g_prime, -neutron_diffusion.Sigma_s[g_prime][g].eval(&neutron_diffusion.Sigma_s[g_prime][g], x, material));
+      gsl_matrix_set(neutron_diffusion.R, g, g_prime, -neutron_diffusion.Sigma_s[g_prime][g].eval(&neutron_diffusion.Sigma_s[g_prime][g], x, material));
     
       if (neutron_diffusion.has_fission) {
-        gsl_matrix_set(neutron_diffusion.nufission, g, g_prime, neutron_diffusion.chi[g]*neutron_diffusion.nu_Sigma_f[g_prime].eval(&neutron_diffusion.nu_Sigma_f[g_prime], x, material));
+        gsl_matrix_set(neutron_diffusion.X, g, g_prime, neutron_diffusion.chi[g]*neutron_diffusion.nu_Sigma_f[g_prime].eval(&neutron_diffusion.nu_Sigma_f[g_prime], x, material));
       }  
     }
     
     // absorption
-    double xi = gsl_matrix_get(neutron_diffusion.removal, g, g);
+    double xi = gsl_matrix_get(neutron_diffusion.R, g, g);
     if (neutron_diffusion.Sigma_t[g].defined) {
       xi += neutron_diffusion.Sigma_t[g].eval(&neutron_diffusion.Sigma_t[g], x, material);
     } else {
@@ -93,7 +92,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
         xi += neutron_diffusion.Sigma_s[g][g_prime].eval(&neutron_diffusion.Sigma_s[g][g_prime], x, material);
       }
     }
-    gsl_matrix_set(neutron_diffusion.removal, g, g, xi);
+    gsl_matrix_set(neutron_diffusion.R, g, g, xi);
     
     // leaks
     for (int m = 0; m < feenox.pde.dim; m++) {
@@ -115,28 +114,30 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
     feenox_call(feenox_problem_build_allocate_aux_neutron_diffusion(e->type->nodes));
   }
 
-  gsl_matrix_set_zero(neutron_diffusion.Ki);
+  gsl_matrix_set_zero(neutron_diffusion.Li);
   gsl_matrix_set_zero(neutron_diffusion.Ai);
-  gsl_matrix_set_zero(neutron_diffusion.Xi);
+  if (neutron_diffusion.has_fission) {
+    gsl_matrix_set_zero(neutron_diffusion.Fi);
+  }
   
   // elemental stiffness for the diffusion term B'*D*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.diff, e->B[v], 0.0, neutron_diffusion.DB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->B[v], neutron_diffusion.DB, 1.0, neutron_diffusion.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->B[v], neutron_diffusion.DB, 1.0, neutron_diffusion.Li));
 
   // elemental scattering H'*A*H
   // TODO: can we mix Ai and Ki?
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.removal, e->H[v], 0.0, neutron_diffusion.AH));
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.R, e->H[v], 0.0, neutron_diffusion.AH));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->H[v], neutron_diffusion.AH, 1.0, neutron_diffusion.Ai));
   
   // elemental fission matrix
   if (neutron_diffusion.has_fission) {
-    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.nufission, e->H[v], 0, neutron_diffusion.XH));
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->H[v], neutron_diffusion.XH, 1.0, neutron_diffusion.Xi));
+    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.X, e->H[v], 0, neutron_diffusion.FX));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[v], e->H[v], neutron_diffusion.FX, 1.0, neutron_diffusion.Fi));
   }
   
   
   if (neutron_diffusion.has_sources) {
-    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], e->H[v], neutron_diffusion.src, 1.0, feenox.pde.bi));
+    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[v], e->H[v], neutron_diffusion.s, 1.0, feenox.pde.bi));
   }
   
   // for source-driven problems
@@ -144,16 +145,16 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   // for criticallity problems
   //   K = Ki + Ai
   //   M = Xi
-  gsl_matrix_add(neutron_diffusion.Ki, neutron_diffusion.Ai);
+  gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Ai);
   if (neutron_diffusion.has_fission) {
     if (neutron_diffusion.has_sources) {
-      gsl_matrix_scale(neutron_diffusion.Xi, -1.0);
-      gsl_matrix_add(neutron_diffusion.Ki, neutron_diffusion.Xi);
+      gsl_matrix_scale(neutron_diffusion.Fi, -1.0);
+      gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Fi);
     } else {
-      gsl_matrix_add(feenox.pde.Mi, neutron_diffusion.Xi);
+      gsl_matrix_add(feenox.pde.Mi, neutron_diffusion.Fi);
     }  
   }
-  gsl_matrix_add(feenox.pde.Ki, neutron_diffusion.Ki);
+  gsl_matrix_add(feenox.pde.Ki, neutron_diffusion.Li);
   
  
 #endif

@@ -29,12 +29,11 @@
 
 int feenox_mesh_line3_init(void) {
 
-  double r[1];
-  element_type_t *element_type;
-  int j, v;
+  double xi[1];
+  unsigned int j, q;
   
-  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE3];
-  feenox_check_alloc(element_type->name = strdup("line3"));
+  element_type_t *element_type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE3];
+  element_type->name = "line3";
   element_type->id = ELEMENT_TYPE_LINE3;
   element_type->dim = 1;
   element_type->order = 2;
@@ -42,7 +41,7 @@ int feenox_mesh_line3_init(void) {
   element_type->faces = 2;
   element_type->nodes_per_face = 1;
   element_type->h = feenox_mesh_line3_h;
-  element_type->dhdr = feenox_mesh_line3_dhdr;
+  element_type->dhdxi = feenox_mesh_line3_dhdr;
   element_type->point_inside = feenox_mesh_point_in_line;
   element_type->volume = feenox_mesh_line_volume;
   element_type->area = feenox_mesh_line_area;  
@@ -78,10 +77,10 @@ Line3:
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3);
   
   for (j = 0; j < element_type->nodes; j++) {
-    r[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
+    xi[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
     
-    for (v = 0; v < 3; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_line3_h(v, r));
+    for (q = 0; q < 3; q++) {
+      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, q, feenox_mesh_line3_h(q, xi));
     }
   }
   
@@ -90,10 +89,10 @@ Line3:
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 2);
   
   for (j = 0; j < element_type->nodes; j++) {
-    r[0] = M_SQRT3 * element_type->node_coords[j][0];
+    xi[0] = M_SQRT3 * element_type->node_coords[j][0];
     
-    for (v = 0; v < 2; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_line2_h(v, r));
+    for (q = 0; q < 2; q++) {
+      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, q, feenox_mesh_line2_h(q, xi));
     }
   }
   
@@ -101,11 +100,10 @@ Line3:
   return FEENOX_OK;
 }
 
-double feenox_mesh_line3_h(int k, double *vec_r) {
-  double r = vec_r[0];
+double feenox_mesh_line3_h(int j, double *vec_xi) {
+  double r = vec_xi[0];
 
-  // Gmsh ordering
-  switch (k) {
+  switch (j) {
     case 0:
       return 0.5*r*(r-1);
       break;
@@ -121,23 +119,23 @@ double feenox_mesh_line3_h(int k, double *vec_r) {
 
 }
 
-double feenox_mesh_line3_dhdr(int k, int m, double *vec_r) {
-  double r = vec_r[0];
+double feenox_mesh_line3_dhdr(int j, int d, double *vec_xi) {
+  double xi = vec_xi[0];
 
-  switch(k) {
+  switch(j) {
     case 0:
-      if (m == 0) {
-        return r-0.5;
+      if (d == 0) {
+        return xi-0.5;
       }
       break;
     case 1:
-      if (m == 0) {
-        return r+0.5;
+      if (d == 0) {
+        return xi+0.5;
       }
       break;
     case 2:
-      if (m == 0) {
-        return -2*r;
+      if (d == 0) {
+        return -2*xi;
       }
       break;
   }

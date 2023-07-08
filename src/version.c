@@ -85,6 +85,10 @@ void feenox_show_version(int version) {
     printf("FeenoX was not linked against PETSc. No PDEs are available.\n");
 #endif
     return;
+  } else if (version == version_elements_info) {
+    feenox_mesh_element_types_init();
+    feenox_mesh_elements_info();
+    return;
   }
   
   feenox_shortversion();

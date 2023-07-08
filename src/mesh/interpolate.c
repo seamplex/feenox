@@ -191,7 +191,7 @@ int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J
       for (k = 0; k < element->type->nodes; k++) {
         // es negativo por como definimos el residuo
         // el cast explicito es para sacarnos de encima el const
-        xi -= element->type->dhdr(k, j, (double *)gsl_vector_const_ptr(test, 0)) * element->node[k]->x[i];
+        xi -= element->type->dhdxi(k, j, (double *)gsl_vector_const_ptr(test, 0)) * element->node[k]->x[i];
       }
       gsl_matrix_set(J, i, j, xi);
     }

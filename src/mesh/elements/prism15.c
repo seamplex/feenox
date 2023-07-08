@@ -1,7 +1,8 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related prism15 element routines
  *
- *  Copyright (C) 2015--2023 jeremy theler & ezequiel manavela chiapero
+ *  Copyright (C) 2015 jeremy theler & ezequiel manavela chiapero
+ *  Copyright (C) 2017--2023 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -29,10 +30,9 @@
 
 int feenox_mesh_prism15_init(void) {
 
-  element_type_t *element_type;
-  int j;
+  int q;
 
-  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM15];
+  element_type_t *element_type = &feenox.mesh.element_types[ELEMENT_TYPE_PRISM15];
   feenox_check_alloc(element_type->name = strdup("prism15"));
   element_type->id = ELEMENT_TYPE_PRISM15;
   element_type->dim = 3;
@@ -41,7 +41,7 @@ int feenox_mesh_prism15_init(void) {
   element_type->faces = 5;
   element_type->nodes_per_face = 8;   // Ojo aca que en nodos por cara pusimos el maximo valor (8) ya que depende de la cara
   element_type->h = feenox_mesh_prism15_h;
-  element_type->dhdr = feenox_mesh_prism15_dhdr;
+  element_type->dhdxi = feenox_mesh_prism15_dhdr;
   element_type->point_inside = feenox_mesh_point_in_prism;
   element_type->volume = feenox_mesh_prism_volume;
 
@@ -71,8 +71,8 @@ u   |    ,/ `\    |    v    |    ,/ `\    |
   
   element_type->node_coords = calloc(element_type->nodes, sizeof(double *));
   element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *));
-  for (j = 0; j < element_type->nodes; j++) {
-    element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
+  for (q = 0; q < element_type->nodes; q++) {
+    element_type->node_coords[q] = calloc(element_type->dim, sizeof(double));  
   }
   
   element_type->vertices++;  
@@ -112,56 +112,56 @@ u   |    ,/ `\    |    v    |    ,/ `\    |
 
 
 
-double feenox_mesh_prism15_h(int j, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
-  double t = vec_r[2];
+double feenox_mesh_prism15_h(int j, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta = vec_xi[1];
+  double zeta = vec_xi[2];
 
   switch (j) {
     case 0:
-      return ((t-1)*(1-s-r)*(t+2*s+2*r))/2;
+      return ((zeta-1)*(1-eta-xi)*(zeta+2*eta+2*xi))/2;
       break;
     case 1:
-      return (r*(1-t)*(2*r-2-t))/2;
+      return (xi*(1-zeta)*(2*xi-2-zeta))/2;
       break;
     case 2:
-      return (s*(1-t)*(2*s-2-t))/2;
+      return (eta*(1-zeta)*(2*eta-2-zeta))/2;
       break;
     case 3:
-      return (((-t)-1)*(1-s-r)*((-t)+2*s+2*r))/2;
+      return (((-zeta)-1)*(1-eta-xi)*((-zeta)+2*eta+2*xi))/2;
       break;
     case 4:
-      return (r*(1+t)*(2*r-2+t))/2;
+      return (xi*(1+zeta)*(2*xi-2+zeta))/2;
       break;
     case 5:
-      return (s*(1+t)*(2*s-2+t))/2;
+      return (eta*(1+zeta)*(2*eta-2+zeta))/2;
       break;
     case 6:
-      return 2*r*(1-s-r)*(1-t);
+      return 2*xi*(1-eta-xi)*(1-zeta);
       break;
     case 7:
-      return 2*s*(1-s-r)*(1-t);
+      return 2*eta*(1-eta-xi)*(1-zeta);
       break;
     case 8:
-      return (1-s-r)*(1-t*t);
+      return (1-eta-xi)*(1-zeta*zeta);
       break;
     case 9:
-      return 2*s*r*(1-t);
+      return 2*eta*xi*(1-zeta);
       break;
     case 10:
-      return r*(1-t*t);
+      return xi*(1-zeta*zeta);
       break;
     case 11:
-      return s*(1-t*t);
+      return eta*(1-zeta*zeta);
       break;
     case 12:
-      return 2*r*(1-s-r)*(1+t);
+      return 2*xi*(1-eta-xi)*(1+zeta);
       break;
     case 13:
-      return 2*s*(1-s-r)*(1+t);
+      return 2*eta*(1-eta-xi)*(1+zeta);
       break;
     case 14:
-      return 2*s*r*(1+t);
+      return 2*eta*xi*(1+zeta);
       break;
   }
 

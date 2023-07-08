@@ -211,7 +211,7 @@ int feenox_instruction_mesh_read(void *arg) {
         
         for (size_t i = 0; i < physical_group->n_elements; i++) {
           element_t *element = &this->element[physical_group->element[i]];
-          for (unsigned int v = 0; v < element->type->gauss[this->integration].V; v++) {
+          for (unsigned int v = 0; v < element->type->gauss[this->integration].Q; v++) {
             feenox_call(feenox_mesh_compute_w_at_gauss(element, v, this->integration));
 
             for (size_t j = 0; j < element->type->nodes; j++) {
@@ -505,7 +505,7 @@ int feenox_mesh_free(mesh_t *mesh) {
       }
       
       if (mesh->element[i].type != NULL) {
-        for (v = 0; v < mesh->element[i].type->gauss[mesh->integration].V; v++) {
+        for (v = 0; v < mesh->element[i].type->gauss[mesh->integration].Q; v++) {
 
           if (mesh->element[i].x != NULL && mesh->element[i].x[v] != NULL) {
             feenox_free(mesh->element[i].x[v]);
@@ -516,11 +516,11 @@ int feenox_mesh_free(mesh_t *mesh) {
           if (mesh->element[i].B != NULL && mesh->element[i].B[v] != NULL) {
             gsl_matrix_free(mesh->element[i].B[v]);
           }  
-          if (mesh->element[i].dxdr != NULL && mesh->element[i].dxdr[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].dxdr[v]);
+          if (mesh->element[i].dxdxi != NULL && mesh->element[i].dxdxi[v] != NULL) {
+            gsl_matrix_free(mesh->element[i].dxdxi[v]);
           }
-          if (mesh->element[i].drdx != NULL && mesh->element[i].drdx[v] != NULL) {
-            gsl_matrix_free(mesh->element[i].drdx[v]);
+          if (mesh->element[i].dxidx != NULL && mesh->element[i].dxidx[v] != NULL) {
+            gsl_matrix_free(mesh->element[i].dxidx[v]);
           }  
           if (mesh->element[i].dhdx != NULL && mesh->element[i].dhdx[v] != NULL) {
             gsl_matrix_free(mesh->element[i].dhdx[v]);
@@ -543,11 +543,11 @@ int feenox_mesh_free(mesh_t *mesh) {
       if (mesh->element[i].B != NULL) {
         feenox_free(mesh->element[i].B);
       }  
-      if (mesh->element[i].dxdr != NULL) {
-        feenox_free(mesh->element[i].dxdr);
+      if (mesh->element[i].dxdxi != NULL) {
+        feenox_free(mesh->element[i].dxdxi);
       }  
-      if (mesh->element[i].drdx != NULL) {
-        feenox_free(mesh->element[i].drdx);
+      if (mesh->element[i].dxidx != NULL) {
+        feenox_free(mesh->element[i].dxidx);
       }  
       if (mesh->element[i].dhdx != NULL) {
         feenox_free(mesh->element[i].dhdx);
@@ -595,9 +595,11 @@ int feenox_mesh_free(mesh_t *mesh) {
       if (mesh->node[j].dphidx != NULL) {
         gsl_matrix_free(mesh->node[j].dphidx);
       }
+/*      
       if (mesh->node[j].delta_dphidx != NULL) {
         gsl_matrix_free(mesh->node[j].delta_dphidx);
       }
+*/
       if (mesh->node[j].flux != NULL) {
         feenox_free(mesh->node[j].flux);
       }

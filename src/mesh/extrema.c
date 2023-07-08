@@ -107,7 +107,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           for (size_t i = 0; i < mesh->n_elements; i++) {
             element_t *element = &mesh->element[i];
             if (element->type->dim == mesh->dim) {
-              for (unsigned int v = 0; v < element->type->gauss[mesh->integration].V; v++) {
+              for (unsigned int v = 0; v < element->type->gauss[mesh->integration].Q; v++) {
                 feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
               
                 val = feenox_function_eval(function, element->x[v]);
@@ -165,7 +165,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         for (size_t i = 0; i < mesh->n_elements; i++) {
           element_t *element = &mesh->element[i];
           if (element->type->dim == mesh->dim) {
-            for (unsigned int v = 0; v < element->type->gauss[mesh->integration].V; v++) {
+            for (unsigned int v = 0; v < element->type->gauss[mesh->integration].Q; v++) {
               feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
               feenox_mesh_update_coord_vars(element->x[v]);
               val = feenox_expression_eval(expr);

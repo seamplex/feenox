@@ -34,7 +34,6 @@ int feenox_mesh_tet4_init(void) {
   int j, v;
   
   element_type = &feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON4];
-  feenox_check_alloc(element_type->name = strdup("tet4"));
   element_type->id = ELEMENT_TYPE_TETRAHEDRON4;
   element_type->dim = 3;
   element_type->order = 1;
@@ -42,7 +41,7 @@ int feenox_mesh_tet4_init(void) {
   element_type->faces = 4;
   element_type->nodes_per_face = 3;
   element_type->h = feenox_mesh_tet4_h;
-  element_type->dhdr = feenox_mesh_tet4_dhdr;
+  element_type->dhdxi = feenox_mesh_tet4_dhdr;
   element_type->point_inside = feenox_mesh_point_in_tetrahedron;
   element_type->volume = feenox_mesh_tet_volume;
   element_type->area = feenox_mesh_tet_area;
@@ -98,6 +97,71 @@ Tetrahedron:
   element_type->node_coords[3][0] = 0;  
   element_type->node_coords[3][1] = 0;
   element_type->node_coords[3][2] = 1;
+
+  // for doc
+  element_type->name = "tet4";
+  element_type->desc = "Four-node tetrahedron";
+  element_type->ascii_art = "\
+                   η                  \n\
+                 .                    \n\
+               ,/                     \n\
+              /                       \n\
+           2                          \n\
+         ,/|`\\                       \n\
+       ,/  |  `\\                     \n\
+     ,/    '.   `\\                   \n\
+   ,/       |     `\\                 \n\
+ ,/         |       `\\               \n\
+0-----------'.--------1 --> ξ         \n\
+ `\\.         |      ,/                \n\
+    `\\.      |    ,/                  \n\
+       `\\.   '. ,/                    \n\
+          `\\. |/                      \n\
+             `3                       \n\
+                `\\.                   \n\
+                   ` ζ                \n";
+
+  element_type->h_latex = feenox_mesh_tet4_h_latex;
+  element_type->doc_n_edges = 6;
+  feenox_check_alloc(element_type->doc_edges = calloc(element_type->doc_n_edges, sizeof(int[2])));
+  element_type->doc_edges = malloc(element_type->doc_n_edges * sizeof(int[2]));
+  element_type->doc_edges[0][0] = 0;
+  element_type->doc_edges[0][1] = 1;
+  
+  element_type->doc_edges[1][0] = 1;
+  element_type->doc_edges[1][1] = 2;
+  
+  element_type->doc_edges[2][0] = 2;
+  element_type->doc_edges[2][1] = 0;
+  
+  element_type->doc_edges[3][0] = 0;
+  element_type->doc_edges[3][1] = 3;
+  
+  element_type->doc_edges[4][0] = 1;
+  element_type->doc_edges[4][1] = 3;
+  
+  element_type->doc_edges[5][0] = 3;
+  element_type->doc_edges[5][1] = 2;
+  
+
+  element_type->doc_n_faces = 4;
+  feenox_check_alloc(element_type->doc_faces = calloc(element_type->doc_n_faces, sizeof(int[8])));
+  element_type->doc_faces[0][0] = 1;
+  element_type->doc_faces[0][1] = 2;
+  element_type->doc_faces[0][2] = 3;
+  
+  element_type->doc_faces[1][0] = 6;
+  element_type->doc_faces[1][1] = 3;
+  element_type->doc_faces[1][2] = 4;
+  
+  element_type->doc_faces[2][0] = 2;
+  element_type->doc_faces[2][1] = -6;
+  element_type->doc_faces[2][2] = -5;
+  
+  element_type->doc_faces[3][0] = 1;
+  element_type->doc_faces[3][1] = 5;
+  element_type->doc_faces[3][2] = -4;
+  
   
   // ------------
   // gauss points and extrapolation matrices
@@ -159,9 +223,9 @@ int feenox_mesh_gauss_init_tet1(element_type_t *element_type, gauss_t *gauss) {
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 4));
     
   gauss->w[0] = 1.0/6.0 * 1.0;
-  gauss->r[0][0] = 1.0/4.0;
-  gauss->r[0][1] = 1.0/4.0;
-  gauss->r[0][2] = 1.0/4.0;
+  gauss->xi[0][0] = 1.0/4.0;
+  gauss->xi[0][1] = 1.0/4.0;
+  gauss->xi[0][2] = 1.0/4.0;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));  
     
@@ -177,24 +241,24 @@ int feenox_mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss) {
   feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 4));
     
   gauss->w[0] = 1.0/6.0 * 1.0/4.0;
-  gauss->r[0][0] = a;
-  gauss->r[0][1] = a;
-  gauss->r[0][2] = a;
+  gauss->xi[0][0] = a;
+  gauss->xi[0][1] = a;
+  gauss->xi[0][2] = a;
   
   gauss->w[1] = 1.0/6.0 * 1.0/4.0;
-  gauss->r[1][0] = b;
-  gauss->r[1][1] = a;
-  gauss->r[1][2] = a;
+  gauss->xi[1][0] = b;
+  gauss->xi[1][1] = a;
+  gauss->xi[1][2] = a;
  
   gauss->w[2] = 1.0/6.0 * 1.0/4.0;
-  gauss->r[2][0] = a;
-  gauss->r[2][1] = b;
-  gauss->r[2][2] = a;
+  gauss->xi[2][0] = a;
+  gauss->xi[2][1] = b;
+  gauss->xi[2][2] = a;
     
   gauss->w[3] = 1.0/6.0 * 1.0/4.0;
-  gauss->r[3][0] = a;
-  gauss->r[3][1] = a;
-  gauss->r[3][2] = b;
+  gauss->xi[3][0] = a;
+  gauss->xi[3][1] = a;
+  gauss->xi[3][2] = b;
 
   feenox_call(feenox_mesh_init_shape_at_gauss(gauss, element_type));  
   
@@ -203,28 +267,46 @@ int feenox_mesh_gauss_init_tet4(element_type_t *element_type, gauss_t *gauss) {
 
 
 
-double feenox_mesh_tet4_h(int j, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
-  double t = vec_r[2];
+double feenox_mesh_tet4_h(int j, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta= vec_xi[1];
+  double zeta = vec_xi[2];
 
   switch (j) {
     case 0:
-      return 1-r-s-t;
+      return 1-xi-eta-zeta;
       break;
     case 1:
-      return r;
+      return xi;
       break;
     case 2:
-      return s;
+      return eta;
       break;
     case 3:
-      return t;
+      return zeta;
       break;
   }
 
   return 0;
+}
 
+char *feenox_mesh_tet4_h_latex(int j) {
+  switch (j) {
+    case 0:
+      return "1-\\xi-\\eta-\\zeta";
+      break;
+    case 1:
+      return "\\xi";
+      break;
+    case 2:
+      return "\\eta";
+      break;
+    case 3:
+      return "\\zeta";
+      break;
+  }
+
+  return "";
 }
 
 

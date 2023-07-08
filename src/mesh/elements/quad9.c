@@ -41,7 +41,7 @@ int feenox_mesh_quad9_init(void) {
   element_type->faces = 4;
   element_type->nodes_per_face = 3;
   element_type->h = feenox_mesh_quad9_h;
-  element_type->dhdr = feenox_mesh_quad9_dhdr;
+  element_type->dhdxi = feenox_mesh_quad9_dhdr;
   element_type->point_inside = feenox_mesh_point_in_quadrangle;
   element_type->volume = feenox_mesh_quad_volume;
   element_type->area = feenox_mesh_quad_area;

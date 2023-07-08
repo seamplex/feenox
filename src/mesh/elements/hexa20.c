@@ -24,16 +24,15 @@
 #include "../element.h"
 
 // --------------------------------------------------------------
-// hexahedro de 20 nodos
+// twenty-node hexahedron
 // --------------------------------------------------------------
 int feenox_mesh_hexa20_init(void) {
   
-  double r[3];
-  element_type_t *element_type;
-  int j, v;
+  double xi[3];
+  unsigned int j, q;
 
-  element_type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON20];
-  feenox_check_alloc(element_type->name = strdup("hexa20"));
+  element_type_t *element_type = &feenox.mesh.element_types[ELEMENT_TYPE_HEXAHEDRON20];
+  element_type->name = "hexa20";
   element_type->id = ELEMENT_TYPE_HEXAHEDRON20;
   element_type->dim = 3;
   element_type->order = 2;
@@ -41,7 +40,7 @@ int feenox_mesh_hexa20_init(void) {
   element_type->faces = 6;
   element_type->nodes_per_face = 8;
   element_type->h = feenox_mesh_hexa20_h;
-  element_type->dhdr = feenox_mesh_hexa20_dhdr;
+  element_type->dhdxi = feenox_mesh_hexa20_dhdr;
   element_type->point_inside = feenox_mesh_point_in_hexahedron;
   element_type->volume = feenox_mesh_hex_volume;
   element_type->size = feenox_mesh_hex_size;
@@ -162,12 +161,12 @@ int feenox_mesh_hexa20_init(void) {
   element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 27);
 
   for (j = 0; j < element_type->nodes; j++) {
-    r[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
-    r[1] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][1];
-    r[2] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][2];
+    xi[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
+    xi[1] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][1];
+    xi[2] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][2];
     
-    for (v = 0; v < 27; v++) {
-      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, v, feenox_mesh_hexa27_h(v, r));
+    for (q = 0; q < 27; q++) {
+      gsl_matrix_set(element_type->gauss[integration_full].extrap, j, q, feenox_mesh_hexa27_h(q, xi));
     }
   }
   
@@ -177,12 +176,12 @@ int feenox_mesh_hexa20_init(void) {
   
   // the two extrapolation matrices
   for (j = 0; j < element_type->nodes; j++) {
-    r[0] = M_SQRT3 * element_type->node_coords[j][0];
-    r[1] = M_SQRT3 * element_type->node_coords[j][1];
-    r[2] = M_SQRT3 * element_type->node_coords[j][2];
+    xi[0] = M_SQRT3 * element_type->node_coords[j][0];
+    xi[1] = M_SQRT3 * element_type->node_coords[j][1];
+    xi[2] = M_SQRT3 * element_type->node_coords[j][2];
 
-    for (v = 0; v < 8; v++) {
-      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, v, feenox_mesh_hexa8_h(v, r));
+    for (q = 0; q < 8; q++) {
+      gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, q, feenox_mesh_hexa8_h(q, xi));
     }
   }
 
@@ -215,71 +214,71 @@ Node here(gmsh)       Node reference        r        s        t
 17                      20                 -1        0        1
 */
 
-double feenox_mesh_hexa20_h(int j, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
-  double t = vec_r[2];
+double feenox_mesh_hexa20_h(int j, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta = vec_xi[1];
+  double zeta = vec_xi[2];
 
   switch (j) {
     case 0:
-      return (1-r)*(1-s)*(1-t)*(-2-r-s-t)/8.0;
+      return (1-xi)*(1-eta)*(1-zeta)*(-2-xi-eta-zeta)/8.0;
       break;
     case 1:
-      return (r+1)*(1-s)*(1-t)*(-2+r-s-t)/8.0;
+      return (xi+1)*(1-eta)*(1-zeta)*(-2+xi-eta-zeta)/8.0;
       break;
     case 2:
-      return (r+1)*(s+1)*(1-t)*(-2+r+s-t)/8.0;
+      return (xi+1)*(eta+1)*(1-zeta)*(-2+xi+eta-zeta)/8.0;
       break;
     case 3:
-      return (1-r)*(s+1)*(1-t)*(-2-r+s-t)/8.0;
+      return (1-xi)*(eta+1)*(1-zeta)*(-2-xi+eta-zeta)/8.0;
       break;
     case 4:
-      return (1-r)*(1-s)*(1+t)*(-2-r-s+t)/8.0;
+      return (1-xi)*(1-eta)*(1+zeta)*(-2-xi-eta+zeta)/8.0;
       break;
     case 5:
-      return (r+1)*(1-s)*(t+1)*(-2+r-s+t)/8.0;
+      return (xi+1)*(1-eta)*(zeta+1)*(-2+xi-eta+zeta)/8.0;
       break;
     case 6:
-      return (r+1)*(1+s)*(t+1)*(-2+r+s+t)/8.0;
+      return (xi+1)*(1+eta)*(zeta+1)*(-2+xi+eta+zeta)/8.0;
       break;
     case 7:
-      return (1-r)*(s+1)*(t+1)*(-2-r+s+t)/8.0;
+      return (1-xi)*(eta+1)*(zeta+1)*(-2-xi+eta+zeta)/8.0;
       break;
     case 8:
-      return (1-r*r)*(1-s)*(1-t)/4.0;
+      return (1-xi*xi)*(1-eta)*(1-zeta)/4.0;
       break;
     case 9:
-      return (1-r)*(1-s*s)*(1-t)/4.0;
+      return (1-xi)*(1-eta*eta)*(1-zeta)/4.0;
       break;
     case 10:
-      return (1-r)*(1-s)*(1-t*t)/4.0;
+      return (1-xi)*(1-eta)*(1-zeta*zeta)/4.0;
       break;
     case 11:
-      return (r+1)*(1-s*s)*(1-t)/4.0;
+      return (xi+1)*(1-eta*eta)*(1-zeta)/4.0;
       break;
     case 12:
-      return (r+1)*(1-s)*(1-t*t)/4.0;
+      return (xi+1)*(1-eta)*(1-zeta*zeta)/4.0;
       break;
     case 13:
-      return (1-r*r)*(s+1)*(1-t)/4.0;
+      return (1-xi*xi)*(eta+1)*(1-zeta)/4.0;
       break;
     case 14:
-      return (r+1)*(s+1)*(1-t*t)/4.0;
+      return (xi+1)*(eta+1)*(1-zeta*zeta)/4.0;
       break;
     case 15:
-      return (1-r)*(s+1)*(1-t*t)/4.0;
+      return (1-xi)*(eta+1)*(1-zeta*zeta)/4.0;
       break;
     case 16:
-      return (1-r*r)*(1-s)*(t+1)/4.0;
+      return (1-xi*xi)*(1-eta)*(zeta+1)/4.0;
       break;
     case 17:
-      return (1-r)*(1-s*s)*(t+1)/4.0;
+      return (1-xi)*(1-eta*eta)*(zeta+1)/4.0;
       break;
     case 18:
-      return (r+1)*(1-s*s)*(t+1)/4.0;
+      return (xi+1)*(1-eta*eta)*(zeta+1)/4.0;
       break;
     case 19:
-      return (1-r*r)*(s+1)*(t+1)/4.0;
+      return (1-xi*xi)*(eta+1)*(zeta+1)/4.0;
       break;
   }
 
@@ -287,269 +286,269 @@ double feenox_mesh_hexa20_h(int j, double *vec_r) {
 
 }
 
-double feenox_mesh_hexa20_dhdr(int j, int m, double *vec_r) {
-  double r = vec_r[0];
-  double s = vec_r[1];
-  double t = vec_r[2];
+double feenox_mesh_hexa20_dhdr(int j, int d, double *vec_xi) {
+  double xi = vec_xi[0];
+  double eta = vec_xi[1];
+  double zeta = vec_xi[2];
 
   switch (j) {
     case 0:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -0.125*(1-s)*(1-t)*(-t-s-r-2)-0.125*(1-r)*(1-s)*(1-t);
+          return -0.125*(1-eta)*(1-zeta)*(-zeta-eta-xi-2)-0.125*(1-xi)*(1-eta)*(1-zeta);
         break;
         case 1:
-          return -0.125*(1-r)*(1-t)*(-t-s-r-2)-0.125*(1-r)*(1-s)*(1-t);
+          return -0.125*(1-xi)*(1-zeta)*(-zeta-eta-xi-2)-0.125*(1-xi)*(1-eta)*(1-zeta);
         break;
         case 2:
-          return -0.125*(1-r)*(1-s)*(-t-s-r-2)-0.125*(1-r)*(1-s)*(1-t);
+          return -0.125*(1-xi)*(1-eta)*(-zeta-eta-xi-2)-0.125*(1-xi)*(1-eta)*(1-zeta);
         break;
       }
     break;
     case 1:
-      switch(m) {
+      switch(d) {
         case 0:
-          return  0.125*(1-s)*(1-t)*(-t-s+r-2)+0.125*(r+1)*(1-s)*(1-t);
+          return  0.125*(1-eta)*(1-zeta)*(-zeta-eta+xi-2)+0.125*(xi+1)*(1-eta)*(1-zeta);
         break;
         case 1:
-          return -0.125*(r+1)*(1-t)*(-t-s+r-2)-0.125*(r+1)*(1-s)*(1-t);
+          return -0.125*(xi+1)*(1-zeta)*(-zeta-eta+xi-2)-0.125*(xi+1)*(1-eta)*(1-zeta);
         break;
         case 2:
-          return -0.125*(r+1)*(1-s)*(-t-s+r-2)-0.125*(r+1)*(1-s)*(1-t);
+          return -0.125*(xi+1)*(1-eta)*(-zeta-eta+xi-2)-0.125*(xi+1)*(1-eta)*(1-zeta);
         break;
       }
     break;
     case 2:
-      switch(m) {
+      switch(d) {
         case 0:
-          return  0.125*(s+1)*(1-t)*(-t+s+r-2)+0.125*(r+1)*(s+1)*(1-t);
+          return  0.125*(eta+1)*(1-zeta)*(-zeta+eta+xi-2)+0.125*(xi+1)*(eta+1)*(1-zeta);
         break;
         case 1:
-          return  0.125*(r+1)*(1-t)*(-t+s+r-2)+0.125*(r+1)*(s+1)*(1-t);
+          return  0.125*(xi+1)*(1-zeta)*(-zeta+eta+xi-2)+0.125*(xi+1)*(eta+1)*(1-zeta);
         break;
         case 2:
-          return -0.125*(r+1)*(1+s)*(-t+s+r-2)-0.125*(r+1)*(s+1)*(1-t);
+          return -0.125*(xi+1)*(1+eta)*(-zeta+eta+xi-2)-0.125*(xi+1)*(eta+1)*(1-zeta);
         break;
       }
     break;
     case 3:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -0.125*(s+1)*(1-t)*(-t+s-r-2)-0.125*(1-r)*(s+1)*(1-t);
+          return -0.125*(eta+1)*(1-zeta)*(-zeta+eta-xi-2)-0.125*(1-xi)*(eta+1)*(1-zeta);
         break;
         case 1:
-          return  0.125*(1-r)*(1-t)*(-t+s-r-2)+0.125*(1-r)*(s+1)*(1-t);
+          return  0.125*(1-xi)*(1-zeta)*(-zeta+eta-xi-2)+0.125*(1-xi)*(eta+1)*(1-zeta);
         break;
         case 2:
-          return -0.125*(1-r)*(s+1)*(-t+s-r-2)-0.125*(1-r)*(s+1)*(1-t);
+          return -0.125*(1-xi)*(eta+1)*(-zeta+eta-xi-2)-0.125*(1-xi)*(eta+1)*(1-zeta);
         break;
       }
     break;
     case 4:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -0.125*(1-s)*(t+1)*(t-s-r-2)-0.125*(1-r)*(1-s)*(t+1);
+          return -0.125*(1-eta)*(zeta+1)*(zeta-eta-xi-2)-0.125*(1-xi)*(1-eta)*(zeta+1);
         break;
         case 1:
-          return -0.125*(1-r)*(t+1)*(t-s-r-2)-0.125*(1-r)*(1-s)*(t+1);
+          return -0.125*(1-xi)*(zeta+1)*(zeta-eta-xi-2)-0.125*(1-xi)*(1-eta)*(zeta+1);
         break;
         case 2:
-          return  0.125*(1-r)*(1-s)*(t-s-r-2)+0.125*(1-r)*(1-s)*(t+1);
+          return  0.125*(1-xi)*(1-eta)*(zeta-eta-xi-2)+0.125*(1-xi)*(1-eta)*(zeta+1);
         break;
       }
     break;
     case 5:
-      switch(m) {
+      switch(d) {
         case 0:
-          return  0.125*(1-s)*(t+1)*(t-s+r-2)+0.125*(r+1)*(1-s)*(t+1);
+          return  0.125*(1-eta)*(zeta+1)*(zeta-eta+xi-2)+0.125*(xi+1)*(1-eta)*(zeta+1);
         break;
         case 1:
-          return -0.125*(r+1)*(t+1)*(t-s+r-2)-0.125*(r+1)*(1-s)*(t+1);
+          return -0.125*(xi+1)*(zeta+1)*(zeta-eta+xi-2)-0.125*(xi+1)*(1-eta)*(zeta+1);
         break;
         case 2:
-          return  0.125*(r+1)*(1-s)*(t-s+r-2)+0.125*(r+1)*(1-s)*(t+1);
+          return  0.125*(xi+1)*(1-eta)*(zeta-eta+xi-2)+0.125*(xi+1)*(1-eta)*(zeta+1);
         break;
       }
     break;
     case 6:
-      switch(m) {
+      switch(d) {
         case 0:
-          return 0.125*(s+1)*(t+1)*(t+s+r-2)+0.125*(r+1)*(s+1)*(t+1);
+          return 0.125*(eta+1)*(zeta+1)*(zeta+eta+xi-2)+0.125*(xi+1)*(eta+1)*(zeta+1);
         break;
         case 1:
-          return 0.125*(r+1)*(t+1)*(t+s+r-2)+0.125*(r+1)*(s+1)*(t+1);
+          return 0.125*(xi+1)*(zeta+1)*(zeta+eta+xi-2)+0.125*(xi+1)*(eta+1)*(zeta+1);
         break;
         case 2:
-          return 0.125*(r+1)*(s+1)*(t+s+r-2)+0.125*(r+1)*(s+1)*(t+1);
+          return 0.125*(xi+1)*(eta+1)*(zeta+eta+xi-2)+0.125*(xi+1)*(eta+1)*(zeta+1);
         break;
       }
     break;
     case 7:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -0.125*(s+1)*(t+1)*(t+s-r-2)-0.125*(1-r)*(s+1)*(t+1);
+          return -0.125*(eta+1)*(zeta+1)*(zeta+eta-xi-2)-0.125*(1-xi)*(eta+1)*(zeta+1);
         break;
         case 1:
-          return  0.125*(1-r)*(t+1)*(t+s-r-2)+0.125*(1-r)*(s+1)*(t+1);
+          return  0.125*(1-xi)*(zeta+1)*(zeta+eta-xi-2)+0.125*(1-xi)*(eta+1)*(zeta+1);
         break;
         case 2:
-          return  0.125*(1-r)*(s+1)*(t+s-r-2)+0.125*(1-r)*(s+1)*(t+1);
+          return  0.125*(1-xi)*(eta+1)*(zeta+eta-xi-2)+0.125*(1-xi)*(eta+1)*(zeta+1);
         break;
       }
     break;
     case 8:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -0.5*r*(1-s)*(1-t);
+          return -0.5*xi*(1-eta)*(1-zeta);
         break;
         case 1:
-          return -(1-r*r)*(1-t)/4.0;
+          return -(1-xi*xi)*(1-zeta)/4.0;
         break;
         case 2:
-          return -(1-r*r)*(1-s)/4.0;
+          return -(1-xi*xi)*(1-eta)/4.0;
         break;
       }
     break;
     case 9:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -(1-s*s)*(1-t)/4.0;
+          return -(1-eta*eta)*(1-zeta)/4.0;
         break;
         case 1:
-          return -(1-r)*s*(1-t)/2.0;
+          return -(1-xi)*eta*(1-zeta)/2.0;
         break;
         case 2:
-          return -(1-r)*(1-s*s)/4.0;
+          return -(1-xi)*(1-eta*eta)/4.0;
         break;
       }
     break;
     case 10:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -(1-s)*(1-t*t)/4.0;
+          return -(1-eta)*(1-zeta*zeta)/4.0;
         break;
         case 1:
-          return -(1-r)*(1-t*t)/4.0;
+          return -(1-xi)*(1-zeta*zeta)/4.0;
         break;
         case 2:
-          return -(1-r)*(1-s)*t/2.0;
+          return -(1-xi)*(1-eta)*zeta/2.0;
         break;
       }
     break;
     case 11:
-      switch(m) {
+      switch(d) {
         case 0:
-          return (1-s*s)*(1-t)/4.0;
+          return (1-eta*eta)*(1-zeta)/4.0;
         break;
         case 1:
-          return -(r+1)*s*(1-t)/2.0;
+          return -(xi+1)*eta*(1-zeta)/2.0;
         break;
         case 2:
-          return -(r+1)*(1-s*s)/4.0;
+          return -(xi+1)*(1-eta*eta)/4.0;
         break;
       }
     break;
     case 12:
-      switch(m) {
+      switch(d) {
         case 0:
-          return (1-s)*(1-t*t)/4.0;
+          return (1-eta)*(1-zeta*zeta)/4.0;
         break;
         case 1:
-          return -(r+1)*(1-t*t)/4.0;
+          return -(xi+1)*(1-zeta*zeta)/4.0;
         break;
         case 2:
-          return -(r+1)*(1-s)*t/2.0;
+          return -(xi+1)*(1-eta)*zeta/2.0;
         break;
       }
     break;
     case 13:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -r*(s+1)*(1-t)/2.0;
+          return -xi*(eta+1)*(1-zeta)/2.0;
         break;
         case 1:
-          return (1-r*r)*(1-t)/4.0;
+          return (1-xi*xi)*(1-zeta)/4.0;
         break;
         case 2:
-          return -(1-r*r)*(s+1)/4.0;
+          return -(1-xi*xi)*(eta+1)/4.0;
         break;
       }
     break;
     case 14:
-      switch(m) {
+      switch(d) {
         case 0:
-          return (s+1)*(1-t*t)/4.0;
+          return (eta+1)*(1-zeta*zeta)/4.0;
         break;
         case 1:
-          return (r+1)*(1-t*t)/4.0;
+          return (xi+1)*(1-zeta*zeta)/4.0;
         break;
         case 2:
-          return -(r+1)*(s+1)*t/2.0;
+          return -(xi+1)*(eta+1)*zeta/2.0;
         break;
       }
     break;
     case 15:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -(s+1)*(1-t*t)/4.0;
+          return -(eta+1)*(1-zeta*zeta)/4.0;
         break;
         case 1:
-          return (1-r)*(1-t*t)/4.0;
+          return (1-xi)*(1-zeta*zeta)/4.0;
         break;
         case 2:
-          return -(1-r)*(s+1)*t/2.0;
+          return -(1-xi)*(eta+1)*zeta/2.0;
         break;
       }
     break;
     case 16:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -r*(1-s)*(t+1)/2.0;
+          return -xi*(1-eta)*(zeta+1)/2.0;
         break;
         case 1:
-          return -(1-r*r)*(t+1)/4.0;
+          return -(1-xi*xi)*(zeta+1)/4.0;
         break;
         case 2:
-          return (1-r*r)*(1-s)/4.0;
+          return (1-xi*xi)*(1-eta)/4.0;
         break;
       }
     break;
     case 17:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -(1-s*s)*(t+1)/4.0;
+          return -(1-eta*eta)*(zeta+1)/4.0;
         break;
         case 1:
-          return -(1-r)*s*(t+1)/2.0;
+          return -(1-xi)*eta*(zeta+1)/2.0;
         break;
         case 2:
-          return (1-r)*(1-s*s)/4.0;
+          return (1-xi)*(1-eta*eta)/4.0;
         break;
       }
     break;
     case 18:
-      switch(m) {
+      switch(d) {
         case 0:
-          return (1-s*s)*(t+1)/4.0;
+          return (1-eta*eta)*(zeta+1)/4.0;
         break;
         case 1:
-          return -(r+1)*s*(t+1)/2.0;
+          return -(xi+1)*eta*(zeta+1)/2.0;
         break;
         case 2:
-          return (r+1)*(1-s*s)/4.0;
+          return (xi+1)*(1-eta*eta)/4.0;
         break;
       }
     break;
     case 19:
-      switch(m) {
+      switch(d) {
         case 0:
-          return -r*(s+1)*(t+1)/2.0;
+          return -xi*(eta+1)*(zeta+1)/2.0;
         break;
         case 1:
-          return (1-r*r)*(t+1)/4.0;
+          return (1-xi*xi)*(zeta+1)/4.0;
         break;
         case 2:
-          return (1-r*r)*(s+1)/4.0;
+          return (1-xi*xi)*(eta+1)/4.0;
         break;
       }
     break;

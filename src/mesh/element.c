@@ -149,7 +149,7 @@ int feenox_mesh_element_types_init(void) {
   element_type->faces = 0;
   element_type->nodes_per_face = 0;
   element_type->h = NULL;
-  element_type->dhdr = NULL;
+  element_type->dhdxi = NULL;
   element_type->point_inside = NULL;
   element_type->volume = NULL;
   
@@ -194,16 +194,15 @@ int feenox_mesh_element_types_init(void) {
   feenox_call(feenox_mesh_one_node_point_init());
   
   // compute the barycenter of each element type in the r-space
-  unsigned i, j, d;
-  for (i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
+  for (unsigned int i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
     if (feenox.mesh.element_types[i].node_coords != NULL) {
       feenox_check_alloc(feenox.mesh.element_types[i].barycenter_coords = calloc(feenox.mesh.element_types[i].dim, sizeof(double)));
-      for (j = 0; j < feenox.mesh.element_types[i].nodes; j++) {
-        for (d = 0; d < feenox.mesh.element_types[i].dim; d++) {
+      for (unsigned int j = 0; j < feenox.mesh.element_types[i].nodes; j++) {
+        for (unsigned int d = 0; d < feenox.mesh.element_types[i].dim; d++) {
           feenox.mesh.element_types[i].barycenter_coords[d] += feenox.mesh.element_types[i].node_coords[j][d];
         }
       }
-      for (d = 0; d < feenox.mesh.element_types[i].dim; d++) {
+      for (unsigned int d = 0; d < feenox.mesh.element_types[i].dim; d++) {
         feenox.mesh.element_types[i].barycenter_coords[d] /= feenox.mesh.element_types[i].nodes;
       }
     }
@@ -213,22 +212,20 @@ int feenox_mesh_element_types_init(void) {
   
 };
 
-int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V) {
+int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int Q) {
 
-  int v;
-  int dim = (element_type->dim != 0) ? element_type->dim : 1;
-
-  gauss->V = V;
-
-  feenox_check_alloc(gauss->w = calloc(gauss->V, sizeof(double)));
-  feenox_check_alloc(gauss->r = calloc(gauss->V, sizeof(double *)));
-  feenox_check_alloc(gauss->h = calloc(gauss->V, sizeof(double *)));
-  feenox_check_alloc(gauss->dhdr = calloc(gauss->V, sizeof(double **)));
-  for (v = 0; v < gauss->V; v++) {
-    feenox_check_alloc(gauss->r[v] = calloc(dim, sizeof(double)));
+  gauss->Q = Q;
+  feenox_check_alloc(gauss->w = calloc(gauss->Q, sizeof(double)));
+  feenox_check_alloc(gauss->xi = calloc(gauss->Q, sizeof(double *)));
+  feenox_check_alloc(gauss->h = calloc(gauss->Q, sizeof(double *)));
+  feenox_check_alloc(gauss->dhdxi = calloc(gauss->Q, sizeof(double **)));
+  
+  unsigned int dim = (element_type->dim != 0) ? element_type->dim : 1;
+  for (unsigned int q = 0; q < gauss->Q; q++) {
+    feenox_check_alloc(gauss->xi[q] = calloc(dim, sizeof(double)));
     
-    feenox_check_alloc(gauss->h[v] = calloc(element_type->nodes, sizeof(double)));
-    feenox_check_alloc(gauss->dhdr[v] = gsl_matrix_calloc(element_type->nodes, dim));
+    feenox_check_alloc(gauss->h[q] = calloc(element_type->nodes, sizeof(double)));
+    feenox_check_alloc(gauss->dhdxi[q] = gsl_matrix_calloc(element_type->nodes, dim));
   }
   
   return FEENOX_OK;
@@ -237,11 +234,11 @@ int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int V)
 
 int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type) {
 
-  for (unsigned int v = 0; v < gauss->V; v++) {
+  for (unsigned int q = 0; q < gauss->Q; q++) {
     for (unsigned int j = 0; j < element_type->nodes; j++) {
-      gauss->h[v][j] = element_type->h(j, gauss->r[v]);
+      gauss->h[q][j] = element_type->h(j, gauss->xi[q]);
       for (unsigned int m = 0; m < element_type->dim; m++) {
-        gsl_matrix_set(gauss->dhdr[v], j, m, element_type->dhdr(j, m, gauss->r[v]));
+        gsl_matrix_set(gauss->dhdxi[q], j, m, element_type->dhdxi(j, m, gauss->xi[q]));
       }
       
     }
@@ -251,7 +248,7 @@ int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type
 }
 
 
-// esta no rellena los nodos!
+// note this one does not fill in the nodes
 int feenox_mesh_create_element(element_t *e, size_t index, size_t tag, unsigned int type, physical_group_t *physical_group) {
  
   e->index = index;
@@ -294,15 +291,16 @@ int feenox_mesh_add_material_to_list(material_ll_t **list, material_t *material)
 
 int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]) {
   
+  int J = this->type->nodes;
   barycenter[0] = barycenter[1] = barycenter[2] = 0;
-  for (unsigned int j = 0; j < this->type->nodes; j++) {
+  for (unsigned int j = 0; j < J; j++) {
     barycenter[0] += this->node[j]->x[0];
     barycenter[1] += this->node[j]->x[1];
     barycenter[2] += this->node[j]->x[2];
   }
-  barycenter[0] /= this->type->nodes; 
-  barycenter[1] /= this->type->nodes; 
-  barycenter[2] /= this->type->nodes; 
+  barycenter[0] /= J; 
+  barycenter[1] /= J; 
+  barycenter[2] /= J; 
   
   return FEENOX_OK;
 }
@@ -358,21 +356,204 @@ void feenox_mesh_add_node_parent(node_relative_t **parents, int index) {
 
 void feenox_mesh_compute_coords_from_parent(element_type_t *element_type, int j) {
   node_relative_t *parent;
-  int m;
   int den = 0;
   
   LL_FOREACH(element_type->node_parents[j], parent) {
     den++;
-    for (m = 0; m < element_type->dim; m++) {
-      element_type->node_coords[j][m] += element_type->node_coords[parent->index][m];  
+    for (unsigned int d = 0; d < element_type->dim; d++) {
+      element_type->node_coords[j][d] += element_type->node_coords[parent->index][d];
     }
   }
   
-  for (m = 0; m < element_type->dim; m++) {
+  for (unsigned int d = 0; d < element_type->dim; d++) {
     if (den == 0) {
       fprintf(stderr, "le tomaron la leche al gato\n");
     }
-    element_type->node_coords[j][m] /= den;
+    element_type->node_coords[j][d] /= den;
   }
   return;
+}
+
+int feenox_mesh_elements_info(void) {
+  
+  printf("# Elements supported by FeenoX\n\n");
+  printf(" Gmsh type | Internal name | Dimension | Order | Nodes | Details\n");
+  printf(":---------:|:-------------:|:---------:|:-----:|:-----:|:----------\n");
+  
+  for (unsigned int i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
+    element_type_t *element_type = &feenox.mesh.element_types[i];
+    if (element_type->id != 0 && element_type->nodes != 0) {
+      printf("    % 2d    |   `%s`   |   %d    |   %d   |   % 2d   |  @sec-%s\n",
+              element_type->id, element_type->name, element_type->dim,  element_type->order,element_type->nodes, element_type->name);
+    }
+  }
+  printf("\n");
+
+  for (unsigned int i = 0; i < NUMBER_ELEMENT_TYPE; i++) {
+    element_type_t *element_type = &feenox.mesh.element_types[i];
+    if (element_type->id != 0 && element_type->nodes != 0) {
+      printf("## %s {#sec-%s} \n\n", element_type->name, element_type->name);
+
+      printf("### Nodes and shape functions\n\n");
+      
+      if (feenox_mesh_elements_info_geo(&feenox.mesh.element_types[i])) {
+        printf("![%s](%s){#fig-%s}\n\n", element_type->name, element_type->name, element_type->name);
+      }
+      
+      if (element_type->ascii_art != NULL) {
+        printf("```\n%s\n```\n\n", element_type->ascii_art);
+      }
+      
+/*
+<text fill="#000000" x="1600" y="958" font-size="15" text-anchor="start" dy="0" font-family="Helvetica">ξ</text>
+<text fill="#000000" x="1570" y="928" font-size="15" text-anchor="start" dy="0" font-family="Helvetica">η</text>
+<text fill="#000000" x="1570" y="958" font-size="15" text-anchor="start" dy="0" font-family="Helvetica">ζ</text>
+*/      
+      
+      printf(" $j$%s%s%s%s\n", (element_type->dim > 0) ? " | $\\xi$ " : "", 
+                                   (element_type->dim > 1) ? " | $\\eta$ " : "",
+                                   (element_type->dim > 2) ? " | $\\zeta$ " : "",
+                                   (element_type->h_latex != NULL) ? " | $h_j(\\symbf{\\xi})$ " : "");
+      printf(":-------:%s%s%s%s\n",     (element_type->dim > 0) ? "|:------:" : "", 
+                                   (element_type->dim > 1) ? "|:------:" : "", 
+                                   (element_type->dim > 2) ? "|:------:" : "",
+                                   (element_type->h_latex != NULL) ? "|:----------------------------------" : "");
+      for (unsigned int j = 0; j < element_type->nodes; j++) {
+        printf("  % 2d ", j);
+        if (element_type->dim > 0) {
+          if (fabs(element_type->node_coords[j][0]) > 1e-4) {
+            printf("| %+g ", (element_type->node_coords[j][0]));
+          } else {
+            printf("|  0 ");
+          }
+          if (element_type->dim > 1) {
+            if (fabs(element_type->node_coords[j][1]) > 1e-4) {
+              printf("| %+g ", (element_type->node_coords[j][1]));
+            } else {
+              printf("|  0 ");
+            }
+            if (element_type->dim > 2) {
+              if (fabs(element_type->node_coords[j][2]) > 1e-4) {
+                printf("| %+g ", (element_type->node_coords[j][2]));
+              } else {
+                printf("|  0 ");
+              }
+            }
+          }
+        }
+        if (element_type->h_latex != NULL) {
+          printf("| $%s$", element_type->h_latex(j));
+        }
+        printf("\n");
+      }
+      printf("\n");
+    
+
+      printf("### Quadrature points\n\n");
+      
+      printf(" $q$ | $\\omega_q$%s%s%s\n", (element_type->dim > 0) ? " | $\\xi_q$ " : "", 
+                                             (element_type->dim > 1) ? " | $\\eta_q$ " : "",
+                                             (element_type->dim > 2) ? " | $\\zeta_q$ " : "");
+      printf(":-------:|:-------:%s%s%s\n",     (element_type->dim > 0) ? "|:------:" : "", 
+                                                  (element_type->dim > 1) ? "|:------:" : "", 
+                                                  (element_type->dim > 2) ? "|:------:" : "");
+      for (unsigned int q = 0; q < element_type->gauss[0].Q; q++) {
+        printf("  % 2d  |  %g  ", q, element_type->gauss[0].w[q]);
+        
+        if (element_type->dim > 0) {
+          if (fabs(element_type->gauss[0].xi[q][0]) > 1e-4) {
+            printf("| %+g ", (element_type->gauss[0].xi[q][0]));
+          } else {
+            printf("|  0 ");
+          }
+          if (element_type->dim > 1) {
+            if (fabs(element_type->gauss[0].xi[q][1]) > 1e-4) {
+              printf("| %+g ", (element_type->gauss[0].xi[q][1]));
+            } else {
+              printf("|  0 ");
+            }
+            if (element_type->dim > 2) {
+              if (fabs(element_type->gauss[0].xi[q][2]) > 1e-4) {
+                printf("| %+g ", (element_type->gauss[0].xi[q][2]));
+              } else {
+                printf("|  0 ");
+              }
+            }
+          }
+        }
+        printf("\n");
+      }
+      printf("\n");
+    }
+    printf("\n");
+  }
+  
+  return FEENOX_OK;
+}
+
+int feenox_mesh_elements_info_geo(element_type_t *element_type) {
+  
+  if (element_type->doc_edges == NULL) {
+    return 0;
+  }
+    
+  char *geo_name = NULL;
+  feenox_check_minusone(asprintf(&geo_name, "%s.geo", element_type->name));
+  FILE *geo = fopen(geo_name, "w");
+  if (geo == NULL) {
+    return 0;
+  }
+  for (int j = 0; j < element_type->nodes; j++) {
+    fprintf(geo, "Point (%d) = {%g, %g, %g};\n", j, (element_type->dim > 0) ? element_type->node_coords[j][0] : 0,
+                                                    (element_type->dim > 1) ? element_type->node_coords[j][1] : 0,
+                                                    (element_type->dim > 2) ? element_type->node_coords[j][2] : 0);
+  }
+  fprintf(geo, "\n");
+
+  if (element_type->dim > 0) {  
+    for (int l = 0; l < element_type->doc_n_edges; l++) {
+      fprintf(geo, "Line (%d) = {%d, %d};\n", 1+l, element_type->doc_edges[l][0], element_type->doc_edges[l][1]);
+    }
+    fprintf(geo, "\n");
+
+    if (element_type->dim > 1) {
+      for (int f = 0; f < element_type->doc_n_faces; f++) {
+        fprintf(geo, "Curve loop (%d) = {%d", 1+f, element_type->doc_faces[f][0]);
+        for (int l = 1; l < 8; l++) {
+          if (element_type->doc_faces[f][l] != 0) {
+            fprintf(geo, ", %d", element_type->doc_faces[f][l]);
+          }
+        }
+        fprintf(geo, "};\n");
+        fprintf(geo, "Plane Surface(%d) = {%d};\n", 1+f, 1+f);
+      }
+      fprintf(geo, "\n");
+      
+/*     
+      if (element_type->dim > 2) {
+        fprintf(geo, "xxx\n");
+      }
+*/
+    }
+  }
+  
+  fprintf(geo, "Geometry.PointLabels = 1;\n");
+//  fprintf(geo, "Geometry.PointType = 1;\n");
+  fprintf(geo, "Geometry.LabelType = 1;\n");
+  fprintf(geo, "Geometry.PointSize = 20;\n");
+  fprintf(geo, "Geometry.CurveWidth = 5;\n");
+  fprintf(geo, "Geometry.Points = 1;\n");
+  fprintf(geo, "Geometry.Surfaces = 0;\n");
+  fprintf(geo, "Geometry.Volumes = 0;\n");
+
+  fprintf(geo, "Geometry.Color.Points = {0,0,0};\n");
+  fprintf(geo, "Geometry.Color.Curves = {0,0,0};\n");
+// Geometry.SurfaceType = 2;
+
+
+  
+  fclose(geo);
+  
+  return 1;
+
 }

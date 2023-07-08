@@ -164,9 +164,9 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   
   // allocate elemental XS matrices
   feenox_check_alloc(neutron_diffusion.diff      = gsl_matrix_calloc(G * feenox.pde.dim, G * feenox.pde.dim));
-  feenox_check_alloc(neutron_diffusion.removal   = gsl_matrix_calloc(G, G));
-  feenox_check_alloc(neutron_diffusion.nufission = gsl_matrix_calloc(G, G));
-  feenox_check_alloc(neutron_diffusion.src       = gsl_vector_calloc(G));  
+  feenox_check_alloc(neutron_diffusion.R   = gsl_matrix_calloc(G, G));
+  feenox_check_alloc(neutron_diffusion.X = gsl_matrix_calloc(G, G));
+  feenox_check_alloc(neutron_diffusion.s       = gsl_vector_calloc(G));  
   feenox_check_alloc(neutron_diffusion.chi       = calloc(G, sizeof(double)));
   // TODO: read a vector called "chi"
   neutron_diffusion.chi[0] = 1;

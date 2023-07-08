@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX common framework header
  *
- *  Copyright (C) 2009--2022 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -190,7 +190,7 @@ extern "C++" {
 #define DEFAULT_SHEPARD_EXPONENT                   2
 
 
-// usamos los de gmsh, convertimos a vtk y frd con tablas
+// these are Gmsh's nomenclature, we then convert to vtk/frd with "tables"
 #define ELEMENT_TYPE_UNDEFINED      0
 #define ELEMENT_TYPE_LINE2          1
 #define ELEMENT_TYPE_TRIANGLE3      2
@@ -213,7 +213,7 @@ extern "C++" {
 #define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
 
 #define FEENOX_SOLUTION_NOT_GRADIENT  0
-#define FEENOX_SOLUTION_GRADIENT 1
+#define FEENOX_SOLUTION_GRADIENT      1
 
 #define feenox_distribution_define_mandatory(type, name, quoted_name, description) {\
   feenox_call(feenox_distribution_init(&(type.name), quoted_name)); \
@@ -225,6 +225,7 @@ enum version_type {
   version_copyright,
   version_info,
   version_available_pdes,
+  version_elements_info,
 };
 
 // macro to check error returns in function calls
@@ -899,16 +900,15 @@ struct dae_t {
 // mesh-realted structs -----------------------------
 // node
 struct node_t {
+  double x[3];              // spatial coordinates of the node
   size_t tag;               // number assigned by Gmsh
   size_t index_mesh;        // index within the node array
-
-  double x[3];              // spatial coordinates of the node
   size_t *index_dof;        // index within the solution vector for each DOF
   
   double *phi;              // values of the solution functions at the node
   gsl_matrix *dphidx;       // derivative of the m-th DOF with respect to coordinate g
                             // (this is a gsl_matrix to avoid having to do double mallocs and forgetting about row/col-major
-  gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
+//  gsl_matrix *delta_dphidx; // same as above but for the standard deviations of the derivatives
   double *flux;             // holder of arbitrary functions evaluated at the node (e.g. sigmas and taus)
   
   element_ll_t *element_list;
@@ -980,14 +980,13 @@ struct elementary_entity_t {
 
 
 struct gauss_t {
-  int V;               // number of points (v=1,2,...,V )
-  double *w;           // weights (w[v] is the weight of the v-th point)
-  double **r;          // coordinates (r[v][m] is the coordinate of the v-th point in dimension m)
+  int Q;               // number of points (q=1,2,...,Q )
+  double *w;           // weights (w[q] is the weight of the v-th point)
+  double **xi;         // coordinates (xi[q][d] is the coordinate of the q-th point in dimension d)
   
-  // TODO: array of gsl_vectors
-  double **h;          // shape functions evaluated at the gauss points h[v][j]
-  gsl_matrix **dhdr;   // derivatives dhdr[v](j,m)
-  
+  // TODO: array of gsl_vectors?
+  double **h;          // shape functions evaluated at the gauss points h[q][j]
+  gsl_matrix **dhdxi;   // derivatives dhdr[q](j,m)
   gsl_matrix *extrap;  // matrix to extrapolate the values from the gauss points to the nodes
 };
 
@@ -996,8 +995,6 @@ struct gauss_t {
 // this includes the pointers to the shape functions
 // the numbering is Gmsh-based
 struct element_type_t {
-  char *name;
-
   unsigned int id;              // as of Gmsh
   unsigned int dim;
   unsigned int order;
@@ -1012,8 +1009,8 @@ struct element_type_t {
   
   // virtual (sic) methods!
   // shape functions and derivatives in the local coords
-  double (*h)(int i, double *r);
-  double (*dhdr)(int i, int j, double *r);
+  double (*h)(int j, double *xi);
+  double (*dhdxi)(int j, int d, double *xi);
 
   // convenience methods
   int (*point_inside)(element_t *e, const double *x);
@@ -1024,6 +1021,18 @@ struct element_type_t {
   gauss_t gauss[2];    // sets of gauss points
                        // 0 - full integration
                        // 1 - reduced integration
+
+  // for doc only
+  // TODO: move somewhere else?
+  char *name;
+  char *desc;
+  char *ascii_art;
+  int doc_n_edges;
+  int (*doc_edges)[2];
+  int doc_n_faces;
+  int (*doc_faces)[8];
+  char *(*h_latex)(int j);
+
 };
 
 
@@ -1042,8 +1051,8 @@ struct element_t {
   
   // these are pointers to arrays of matrices are evalauted at the gauss points
   gsl_matrix **dhdx;
-  gsl_matrix **dxdr;
-  gsl_matrix **drdx;
+  gsl_matrix **dxdxi; // alias J
+  gsl_matrix **dxidx; // alias J^{-1}
   gsl_matrix **H;
   gsl_matrix **B;
   
@@ -1058,7 +1067,7 @@ struct element_t {
   
   int flag;
 
-  int (*compute_dxdr)(element_t *e, unsigned int v, int integration);
+//  int (*compute_dxdr)(element_t *e, unsigned int q, int integration);
   
 #ifdef HAVE_PETSC
   PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
@@ -1194,7 +1203,7 @@ struct bc_data_t {
   expr_t condition;  // if it is not null the BC only applies if this evaluates to non-zero
   
   int (*set_essential)(bc_data_t *, element_t *, size_t j_global);
-  int (*set_natural)(bc_data_t *, element_t *, unsigned int v);
+  int (*set_natural)(bc_data_t *, element_t *, unsigned int q);
   
   bc_data_t *prev, *next;   // doubly-linked list in ech bc_t
 };
@@ -1705,7 +1714,7 @@ struct feenox_t {
 #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
 #endif
-    int (*build_element_volumetric_gauss_point)(element_t *, unsigned int v);
+    int (*build_element_volumetric_gauss_point)(element_t *, unsigned int q);
     int (*solve)(void);
     int (*solve_post)(void);
     
@@ -2130,22 +2139,22 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *);
 extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
-extern double *feenox_mesh_compute_x_if_needed(element_t *e, unsigned int v, int condition);
+extern double *feenox_mesh_compute_x_if_needed(element_t *e, unsigned int q, int condition);
 extern material_t *feenox_mesh_get_material(element_t *e);
-extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int v);
-extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int v);
-extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_H_at_gauss(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *drdx_ref, gsl_matrix *dhdx);
-extern int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdr);
-extern int feenox_mesh_compute_dxdr_at_gauss_1d(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_dxdr_at_gauss_2d(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_dxdr_at_gauss_general(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_drdx_at_gauss(element_t *e, unsigned int v, int integration);
-extern int feenox_mesh_compute_dxdr_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q);
+extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q);
+extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_H_at_gauss(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_dhdx(element_t *e, double *r, gsl_matrix *dxidx_ref, gsl_matrix *dhdx);
+extern int feenox_mesh_compute_dxdr(element_t *e, double *r, gsl_matrix *dxdxi);
+extern int feenox_mesh_compute_dxdxi_at_gauss_1d(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_dxdxi_at_gauss_2d(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_dxdxi_at_gauss_general(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_drdx_at_gauss(element_t *e, unsigned int q, int integration);
+extern int feenox_mesh_compute_dxdxi_at_gauss(element_t *e, unsigned int q, int integration);
 extern int feenox_mesh_compute_dhdx_at_gauss(element_t *e, int v, int integration);
-extern int feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int v, int integration);
+extern int feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
 extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
 
 #define feenox_mesh_update_coord_vars(val) {\
@@ -2207,6 +2216,8 @@ extern bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string);
 
 // init.c
 extern int feenox_mesh_element_types_init(void);
+extern int feenox_mesh_elements_info(void);
+extern int feenox_mesh_elements_info_geo(element_type_t *element_type);
 
 // geom.c
 // TODO: rename mesh_* -> feenox_mesh_*
@@ -2304,9 +2315,9 @@ extern int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot);
 extern int feenox_problem_dirichlet_compute_scale(void);
 
 // neumann.c
-extern int feenox_problem_bc_natural_set(element_t *element, unsigned int v, double *value);
-extern double feenox_problem_bc_natural_weight(element_t *element, unsigned int v);
-extern double *feenox_problem_bc_natural_x(element_t *element, bc_data_t *bc_data, unsigned int v);
+extern int feenox_problem_bc_natural_set(element_t *element, unsigned int q, double *value);
+extern double feenox_problem_bc_natural_weight(element_t *element, unsigned int q);
+extern double *feenox_problem_bc_natural_x(element_t *element, bc_data_t *bc_data, unsigned int q);
 
 #endif
 
@@ -2331,7 +2342,7 @@ extern int feenox_problem_build(void);
 extern int feenox_problem_build_element_volumetric(element_t *);
 extern int feenox_problem_build_element_natural_bc(element_t *, bc_data_t *bc_data);
 extern int feenox_problem_build_allocate_elemental_objects(element_t *);
-extern int feenox_problem_build_element_volumetric_gauss_point(element_t *, unsigned int v);
+extern int feenox_problem_build_element_volumetric_gauss_point(element_t *, unsigned int q);
 extern int feenox_problem_build_elemental_objects_allocate(element_t *);
 extern int feenox_problem_build_elemental_objects_free(void);
 extern int feenox_problem_build_assemble(void);
