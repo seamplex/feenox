@@ -85,6 +85,7 @@ Two of the most important design-basis features are that FeenoX is...
 But the most important idea is that FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve. FeenoX will provide means to
 
   - parse the input file, handle command-line arguments, read mesh files, assign variables, evaluate conditionals, write results, etc.
+
     ```feenox
     PROBLEM laplace 3D
     READ_MESH square-$1.msh

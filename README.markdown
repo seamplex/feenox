@@ -115,7 +115,13 @@ FeenoX will provide means to
 
 - parse the input file, handle command-line arguments, read mesh files,
   assign variables, evaluate conditionals, write results, etc.
-  `feenox     PROBLEM laplace 3D     READ_MESH square-$1.msh     [...]     WRITE_RESULTS FORMAT vtk`
+
+  ``` feenox
+  PROBLEM laplace 3D
+  READ_MESH square-$1.msh
+  [...]
+  WRITE_RESULTS FORMAT vtk
+  ```
 
 - handle material properties given as algebraic expressions involving
   pointwise-defined functions of space, temperature, time, etc.
