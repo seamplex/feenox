@@ -69,22 +69,22 @@ int feenox_problem_bc_set_laplace_phi(bc_data_t *this, element_t *e, size_t j_gl
   return FEENOX_OK;
 }
 
-int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsigned int v) {
+int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsigned int q) {
   
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x = feenox_problem_bc_natural_x(e, this, v);
+  double *x = feenox_problem_bc_natural_x(e, this, q);
   double derivative = feenox_expression_eval(&this->expr);
-  feenox_call(feenox_problem_bc_natural_set(e, v, &derivative));
+  feenox_call(feenox_problem_bc_natural_set(e, q, &derivative));
   
   if (this->nonlinear) {
     double phi = feenox_function_eval(feenox.pde.solution[0], x);
     double dderivativedphi = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], phi);
     // TODO: axisymmetric
-    double w = e->w[v];
+    double w = e->w[q];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, e->H[v], e->H[v], 1.0, feenox.pde.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, e->H[q], e->H[q], 1.0, feenox.pde.Jbi));
   }
   
 #endif

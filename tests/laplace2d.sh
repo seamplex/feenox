@@ -13,5 +13,9 @@ checkpde laplace
 checkgmsh
 
 gmsh -2 ${dir}/square-centered.geo || exit $?
+
 answer laplace-square.fee "-1 -2.68735 -1"
+exitifwrong $?
+
+answer poisson-square.fee "0.2949 0.2044 -0.2044"
 exitifwrong $?

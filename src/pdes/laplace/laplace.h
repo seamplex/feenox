@@ -39,6 +39,9 @@ struct laplace_t {
   int space_dependent_bc;
   int phi_dependent_bc;
   
+  // right-hand-side vector of size one for the product H^T*f
+  gsl_vector *vec_f;
+  
   // caches for uniform properties
   struct {
     double f;

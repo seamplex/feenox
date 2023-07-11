@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for Laplace's equation: bulk elements
  *
- *  Copyright (C) 2021--2022 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -22,35 +22,28 @@
 #include "feenox.h"
 #include "laplace.h"
 
-int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned int v) {
+int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned int q) {
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
-  double *x = feenox_mesh_compute_x_if_needed(e, v, laplace.space_dependent_source || laplace.space_dependent_mass);
+  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
+  double *x = feenox_mesh_compute_x_if_needed(e, q, laplace.space_dependent_source || laplace.space_dependent_mass);
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
-  double r_for_axisymmetric = 1;
-  double w = e->w[v] * r_for_axisymmetric;
+//  double r_for_axisymmetric = 1;
+  double w = e->w[q];
   
   // laplace stiffness matrix Bt*B
   // note we don't allow any coefficient in the laplacian term
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, e->B[v], e->B[v], 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, e->B[q], e->B[q], 1.0, feenox.pde.Ki));
 
-  material_t *material = NULL;
-  if (e->physical_group != NULL && e->physical_group->material != NULL) {
-    material = e->physical_group->material;
-  }
+  material_t *material = feenox_mesh_get_material(e);
   
   // right-hand side
-  // TODO: there should be a way to use BLAS instead of a for loop
   if (laplace.f.defined) {
-    double f = laplace.f.eval(&laplace.f, x, material);
-    unsigned int j = 0;
-    for (j = 0; j < e->type->nodes; j++) {
-      gsl_vector_add_to_element(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * f);
-    }
+    gsl_vector_set(laplace.vec_f, 0, laplace.f.eval(&laplace.f, x, material));
+    feenox_call(gsl_blas_dgemv(CblasTrans, w, e->H[q], laplace.vec_f, 1.0, feenox.pde.bi));
   }
   
   if (feenox.pde.has_jacobian) {
@@ -67,7 +60,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_push_error_message("no alpha found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * alpha, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * alpha, e->H[q], e->H[q], 1.0, feenox.pde.Mi));
   }
   
 

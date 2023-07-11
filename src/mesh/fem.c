@@ -582,23 +582,27 @@ int feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration
 
 int feenox_mesh_compute_H_at_gauss(element_t *e, unsigned int q, int integration) {
   // TODO: esta H no depende del elemento, depende solamente de la cantidad de grados de libertad del problema
+  //       y de la cantidad de nodos entonces habria que mandarla a feenox.pde en lugar de hacerla por elemento
   if (e->H == NULL) {
     feenox_check_alloc(e->H = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   
-  unsigned int dofs = feenox.pde.dofs;
+  unsigned int G = feenox.pde.dofs;
   
   if (e->H[q] == NULL) {
-    feenox_check_alloc(e->H[q] = gsl_matrix_calloc(dofs, dofs*e->type->nodes));
+    feenox_check_alloc(e->H[q] = gsl_matrix_calloc(G, G*e->type->nodes));
   } else {
     return FEENOX_OK;
   }
   
-  for (unsigned int g = 0; g < dofs; g++) {
+  for (unsigned int g = 0; g < G; g++) {
     for (unsigned int j = 0; j < e->type->nodes; j++) {
-      gsl_matrix_set(e->H[q], g, dofs*j+g, e->type->gauss[integration].h[q][j]);
+      gsl_matrix_set(e->H[q], g, G*j+g, e->type->gauss[integration].h[q][j]);
     }
   }
+  
+//  feenox_debug_print_gsl_matrix(e->H[q], stdout);
+  
 
   return FEENOX_OK;  
 }
@@ -624,16 +628,18 @@ int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration
   // mondiola es una transpose! es la misma pero venimos transpuestos nosotros!
   // TODO: if dofs == 1 apuntar a e->dhdx y ya
   for (unsigned int d = 0; d < e->type->dim; d++) {
-    size_t dofs_times_d = feenox.pde.dofs*d;
+    size_t Gd = feenox.pde.dofs*d;
     for (unsigned int j = 0; j < e->type->nodes; j++) {
-      size_t dofs_times_j = feenox.pde.dofs*j;
-      double dhdx = gsl_matrix_get(e->dhdx[q], j, d);
+      size_t Gj = feenox.pde.dofs*j;
+      double dhjdx = gsl_matrix_get(e->dhdx[q], j, d);
       for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-        gsl_matrix_set(e->B[q], dofs_times_d+g, dofs_times_j+g, dhdx);
+        gsl_matrix_set(e->B[q], Gd+g, Gj+g, dhjdx);
       }
     }
   }
- 
+
+//  feenox_debug_print_gsl_matrix(e->B[q], stdout);
+  
   return FEENOX_OK;
 }
 

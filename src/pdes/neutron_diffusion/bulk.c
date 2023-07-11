@@ -141,10 +141,10 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   }
   
   // for source-driven problems
-  //   K = Ki + Ai - Xi
+  //   Ki = Li + Ai - Xi
   // for criticallity problems
-  //   K = Ki + Ai
-  //   M = Xi
+  //   Ki = Li + Ai
+  //   Mi = Xi
   gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Ai);
   if (neutron_diffusion.has_fission) {
     if (neutron_diffusion.has_sources) {
