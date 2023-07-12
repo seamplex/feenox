@@ -242,10 +242,10 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }
   
-  if (feenox.pde.Nb == NULL) {
-    feenox_check_alloc(feenox.pde.Nb = gsl_vector_calloc(feenox.pde.dofs));
+  if (feenox.pde.vec_f == NULL) {
+    feenox_check_alloc(feenox.pde.vec_f = gsl_vector_calloc(feenox.pde.dofs));
   } else {
-    gsl_vector_set_zero(feenox.pde.Nb);
+    gsl_vector_set_zero(feenox.pde.vec_f);
   }
 
   if (feenox.pde.has_rhs)   {
@@ -374,5 +374,20 @@ int feenox_problem_build_assemble(void) {
   }
 
 #endif  
+  return FEENOX_OK;
+}
+
+
+int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
+
+#ifdef HAVE_PETSC
+  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+    gsl_vector_set(feenox.pde.vec_f, g, value[g]);
+  }  
+  
+  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
+  feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], e->type->H_G[q], feenox.pde.vec_f, 1.0, feenox.pde.bi));
+#endif
+  
   return FEENOX_OK;
 }

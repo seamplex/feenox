@@ -379,9 +379,11 @@ int feenox_parse_line(void) {
 ///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME\ VIII Div\ 2 Sec\ 5.
 ///kw_pde+LINEARIZE_STRESS+usage LINEARIZE_STRESS
       // -----  -----------------------------------------------------------
+/*      
     } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
       feenox_call(feenox_parse_linearize_stress());
       return FEENOX_OK;      
+*/
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for Laplace's equation: boundary conditions
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -74,9 +74,9 @@ int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsi
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x = feenox_problem_bc_natural_x(e, this, q);
+  double *x = feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, this->space_dependent, q);
   double derivative = feenox_expression_eval(&this->expr);
-  feenox_call(feenox_problem_bc_natural_set(e, q, &derivative));
+  feenox_call(feenox_problem_rhs_set(e, q, &derivative));
   
   if (this->nonlinear) {
     double phi = feenox_function_eval(feenox.pde.solution[0], x);
@@ -84,7 +84,7 @@ int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsi
     // TODO: axisymmetric
     double w = e->w[q];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, e->H[q], e->H[q], 1.0, feenox.pde.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Jbi));
   }
   
 #endif

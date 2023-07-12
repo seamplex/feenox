@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for the heat equation: boundary conditions
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -98,23 +98,21 @@ int feenox_problem_bc_set_thermal_temperature(bc_data_t *this, element_t *e, siz
 
 // this virtual method builds the surface elemental matrix
 // TODO: one method for constant flux, one for temp, one for space
-int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsigned int v) {
+int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsigned int q) {
   
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
   // add a pointer to void in bc_data and cast it to an array of doubles
-  double *x = feenox_problem_bc_natural_x(e, this, v);
-  double q = feenox_expression_eval(&this->expr);
-  feenox_call(feenox_problem_bc_natural_set(e, v, &q));
+  double *x = feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, this->space_dependent, q);
+  double power = feenox_expression_eval(&this->expr);
+  feenox_call(feenox_problem_rhs_set(e, q, &power));
   
   if (this->nonlinear) {
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     double dqdT = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], T);
-    // TODO: axisymmetric
-    double w = e->w[v];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dqdT, e->H[v], e->H[v], 1.0, feenox.pde.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dqdT, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Jbi));
   }
   
 #endif
@@ -123,7 +121,7 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsign
 }
 
 // this virtual method builds the surface elemental matrix
-int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsigned int v) {
+int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsigned int q) {
   
 #ifdef HAVE_PETSC
 
@@ -133,17 +131,17 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
   }
 
   // TODO: remove duplicate, use a macro
-  feenox_call(feenox_mesh_compute_w_at_gauss(e, v, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_at_gauss(e, v, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_w_at_gauss(e, q, feenox.pde.mesh->integration));
+  feenox_call(feenox_mesh_compute_H_at_gauss(e, q, feenox.pde.mesh->integration));
   if (this->space_dependent) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, v, feenox.pde.mesh->integration));
-    feenox_mesh_update_coord_vars(e->x[v]);
+    feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+    feenox_mesh_update_coord_vars(e->x[q]);
   }
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
   double r_for_axisymmetric = 1;
-  double w = e->w[v] * r_for_axisymmetric;
+  double w = e->w[q] * r_for_axisymmetric;
   
   double h = 0;
   double Tref = 0;
@@ -162,16 +160,11 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
 
   // TODO: the h*T goes directly to the stiffness matrix
   // this is not efficient because if h depends on t or T we might need to re-build the whole K
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*h, e->H[v], e->H[v], 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*h, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Ki));
 
   // the h*Tref goes to b
-#ifdef HAVE_GSL_VECTOR_AXPBY
-  gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
-  feenox_call(gsl_vector_axpby(w*h*Tref, &H.vector, 1.0, feenox.pde.bi));
-#else
-  gsl_vector_set(feenox.pde.Nb, 0, h*Tref);
-  feenox_call(gsl_blas_dgemv(CblasTrans, w, e->H[v], feenox.pde.Nb, 1.0, feenox.pde.bi)); 
-#endif
+  gsl_vector_set(feenox.pde.vec_f, 0, h*Tref);
+  feenox_call(gsl_blas_dgemv(CblasTrans, w, e->type->H_G[q], feenox.pde.vec_f, 1.0, feenox.pde.bi)); 
   
 
 #endif

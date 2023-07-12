@@ -151,14 +151,14 @@ int feenox_physical_group_compute_volume(physical_group_t *this, const mesh_t *m
   
   for (size_t i = 0; i < this->n_elements; i++) {
     element_t *element = &mesh->element[this->element[i]];
-    for (unsigned int v = 0; v < element->type->gauss[mesh->integration].Q; v++) {
-      feenox_call(feenox_mesh_compute_w_at_gauss(element, v, mesh->integration));
+    for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
+      feenox_call(feenox_mesh_compute_w_at_gauss(element, q, mesh->integration));
 
       for (size_t j = 0; j < element->type->nodes; j++) {
-        double wh = element->w[v] * element->type->gauss[mesh->integration].h[v][j];
+        double wh = element->w[q] * gsl_matrix_get(element->type->gauss[mesh->integration].H_c[q], 1, j);
         this->volume += wh ;
-        for (size_t m = 0; m < 3; m++) {
-          this->cog[m] += wh * element->node[j]->x[m];
+        for (size_t d = 0; d < 3; d++) {
+          this->cog[d] += wh * element->node[j]->x[d];
         }
       }
     }

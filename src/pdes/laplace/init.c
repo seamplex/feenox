@@ -96,10 +96,6 @@ int feenox_problem_init_runtime_laplace(void) {
     }
   }
 
-  // allocate vector for computing the RHS as a matrix-vector product H^T*vec_f
-  feenox_check_alloc(laplace.vec_f = gsl_vector_alloc(1));
-  
-
   laplace.alpha.uniform = feenox_expression_depends_on_space(laplace.alpha.dependency_variables);
   laplace.alpha.non_linear      = feenox_expression_depends_on_function(laplace.alpha.dependency_functions,  feenox.pde.solution[0]);
   

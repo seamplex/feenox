@@ -217,15 +217,15 @@ int feenox_mesh_alloc_gauss(gauss_t *gauss, element_type_t *element_type, int Q)
   gauss->Q = Q;
   feenox_check_alloc(gauss->w = calloc(gauss->Q, sizeof(double)));
   feenox_check_alloc(gauss->xi = calloc(gauss->Q, sizeof(double *)));
-  feenox_check_alloc(gauss->h = calloc(gauss->Q, sizeof(double *)));
-  feenox_check_alloc(gauss->dhdxi = calloc(gauss->Q, sizeof(double **)));
+  feenox_check_alloc(gauss->H_c = calloc(gauss->Q, sizeof(gsl_matrix *)));
+  feenox_check_alloc(gauss->B_c = calloc(gauss->Q, sizeof(gsl_matrix *)));
   
   unsigned int dim = (element_type->dim != 0) ? element_type->dim : 1;
   for (unsigned int q = 0; q < gauss->Q; q++) {
     feenox_check_alloc(gauss->xi[q] = calloc(dim, sizeof(double)));
     
-    feenox_check_alloc(gauss->h[q] = calloc(element_type->nodes, sizeof(double)));
-    feenox_check_alloc(gauss->dhdxi[q] = gsl_matrix_calloc(element_type->nodes, dim));
+    feenox_check_alloc(gauss->H_c[q] = gsl_matrix_calloc(1, element_type->nodes));
+    feenox_check_alloc(gauss->B_c[q] = gsl_matrix_calloc(dim, element_type->nodes));
   }
   
   return FEENOX_OK;
@@ -236,11 +236,10 @@ int feenox_mesh_init_shape_at_gauss(gauss_t *gauss, element_type_t *element_type
 
   for (unsigned int q = 0; q < gauss->Q; q++) {
     for (unsigned int j = 0; j < element_type->nodes; j++) {
-      gauss->h[q][j] = element_type->h(j, gauss->xi[q]);
-      for (unsigned int m = 0; m < element_type->dim; m++) {
-        gsl_matrix_set(gauss->dhdxi[q], j, m, element_type->dhdxi(j, m, gauss->xi[q]));
+      gsl_matrix_set(gauss->H_c[q], 0, j, element_type->h(j, gauss->xi[q]));
+      for (unsigned int d = 0; d < element_type->dim; d++) {
+        gsl_matrix_set(gauss->B_c[q], d, j, element_type->dhdxi(j, d, gauss->xi[q]));
       }
-      
     }
   }
   

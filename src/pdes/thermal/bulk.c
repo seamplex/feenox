@@ -23,39 +23,39 @@
 #include "thermal.h"
 
 // TODO: put the gauss loop inside this call so we can cache number of nodes, etc
-int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned int v) {
+int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned int q) {
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, v));
-  double *x = feenox_mesh_compute_x_if_needed(e, v, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
+  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
+  double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
   material_t *material = feenox_mesh_get_material(e);  
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
   double r_for_axisymmetric = 1;
-  double w = e->w[v] * r_for_axisymmetric;
+  double w = e->w[q] * r_for_axisymmetric;
   
   // thermal stiffness matrix Bt*k*B
   // if k depends on T then there should be a more efficient way of evaluating k
   double k = thermal.k.eval(&thermal.k, x, material);
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, e->B[v], e->B[v], 1.0, feenox.pde.Ki));
+  unsigned int J = e->type->nodes;
+  unsigned int D = e->type->dim;
+  unsigned int G = feenox.pde.dofs;
+  gsl_matrix *BT_invJ = gsl_matrix_alloc(G*D, G*J);
+  feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
+  feenox_mesh_compute_B_G_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, BT_invJ));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*k, BT_invJ, BT_invJ, 1.0, feenox.pde.Ki));
   
   // volumetric heat source term Ht*q
   // TODO: total source Q
   if (thermal.q.defined) {
-    double q = thermal.q.eval(&thermal.q, x, material);
-
-#ifdef HAVE_GSL_VECTOR_AXPBY
-    gsl_vector_const_view H = gsl_matrix_const_row(e->H[v], 0);
-    feenox_call(gsl_vector_axpby(w*q, &H.vector, 1.0, feenox.pde.bi));
-#else
-    for (unsigned int j = 0; j < e->type->nodes; j++) {
-      gsl_vector_add_to_element(feenox.pde.bi, j, w * e->type->gauss[feenox.pde.mesh->integration].h[v][j] * q);
-    }
-#endif
+    double power = thermal.q.eval(&thermal.q, x, material);
+    feenox_call(feenox_problem_rhs_set(e, q, &power));
   }
   
+/*  
   if (feenox.pde.has_jacobian) {
     gsl_matrix *local_vec_T = NULL;
     unsigned int nodes = e->type->nodes;
@@ -65,17 +65,17 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
     for (unsigned int j = 0; j < nodes; j++) {
       Tj = feenox_vector_get(feenox.pde.solution[0]->vector_value, e->node[j]->index_dof[0]);
       gsl_matrix_set(local_vec_T, j, 0, Tj);
-      T += gsl_matrix_get(e->H[v], 0, j) * Tj; 
+      T += gsl_matrix_get(e->H_c[q], 0, j) * Tj; 
     }  
 
     if (thermal.temperature_dependent_stiffness) {
       double dkdT = feenox_expression_derivative_wrt_function(thermal.k.expr, feenox.pde.solution[0], T);
       gsl_matrix *TH = gsl_matrix_calloc(nodes, nodes);
-      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, local_vec_T, e->H[v], 1, TH);
+      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, local_vec_T, e->H_c[q], 1, TH);
 
       // add a convenience function, mind the allocation
       gsl_matrix *BtB = gsl_matrix_calloc(nodes, nodes);
-      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, e->B[v], e->B[v], 1, BtB);
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, e->B_c[q], e->B_c[q], 1, BtB);
 
       // debug
       gsl_matrix *BtBTH = gsl_matrix_calloc(nodes, nodes);
@@ -90,9 +90,11 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
     if (thermal.temperature_dependent_source) {
       double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
       // mind the positive sign!
-      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, e->H[v], e->H[v], 1.0, feenox.pde.Jbi));
-    }  
+      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*dqdT, e->H_c[q], e->H_c[q], 1.0, feenox.pde.Jbi));
+    } 
+    gsl_matrix_free(local_vec_T);
   }
+*/
     
   // mass matrix Ht*rho*cp*H
   if (feenox.pde.has_mass) {
@@ -108,7 +110,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       feenox_push_error_message("no heat capacity found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rhocp, e->H[v], e->H[v], 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * rhocp, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Mi));
   }
   
 

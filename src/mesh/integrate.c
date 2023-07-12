@@ -75,15 +75,15 @@ int feenox_instruction_mesh_integrate(void *arg) {
           element = &mesh->element[i];
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
-            for (unsigned int v = 0; v < element->type->gauss[mesh->integration].Q; v++) {
-              feenox_mesh_compute_w_at_gauss(element, v, mesh->integration);
+            for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
+              feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
 
               double xi = 0;
               for (unsigned int j = 0; j < element->type->nodes; j++) {
-                xi += element->type->gauss[mesh->integration].h[v][j] * feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
+                xi += gsl_matrix_get(element->type->gauss[mesh->integration].H_c[q], 1, j) * feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
               }
 
-              integral += element->w[v] * xi;
+              integral += element->w[q] * xi;
             }
           }
         }
@@ -160,17 +160,15 @@ double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function
   double integral = 0;
   double xi = 0;
 
-  unsigned int v = 0;
-  unsigned int j = 0;
-  for (v = 0; v < this->type->gauss[mesh->integration].Q; v++) {
-    feenox_mesh_compute_w_at_gauss(this, v, mesh->integration);
+  for (unsigned int q = 0; q < this->type->gauss[mesh->integration].Q; q++) {
+    feenox_mesh_compute_w_at_gauss(this, q, mesh->integration);
  
     xi = 0;
-    for (j = 0; j < this->type->nodes; j++) {
-      xi += this->type->gauss[mesh->integration].h[v][j] * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
+    for (unsigned int j = 0; j < this->type->nodes; j++) {
+      xi += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 1, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
     }
 
-    integral += this->w[v] * xi;
+    integral += this->w[q] * xi;
   }
 
   return integral;

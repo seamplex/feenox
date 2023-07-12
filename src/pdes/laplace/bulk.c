@@ -27,7 +27,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-  double *x = feenox_mesh_compute_x_if_needed(e, q, laplace.space_dependent_source || laplace.space_dependent_mass);
+  double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, laplace.space_dependent_source || laplace.space_dependent_mass);
   
   // TODO: axisymmetric
 //  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
@@ -36,14 +36,21 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   
   // laplace stiffness matrix Bt*B
   // note we don't allow any coefficient in the laplacian term
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, e->B[q], e->B[q], 1.0, feenox.pde.Ki));
+  unsigned int J = e->type->nodes;
+  unsigned int D = e->type->dim;
+  unsigned int G = feenox.pde.dofs;
+  gsl_matrix *BT_invJ = gsl_matrix_alloc(G*D, G*J);
+  feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
+  feenox_mesh_compute_B_G_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, BT_invJ));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, BT_invJ, BT_invJ, 1.0, feenox.pde.Ki));
 
   material_t *material = feenox_mesh_get_material(e);
   
   // right-hand side
   if (laplace.f.defined) {
-    gsl_vector_set(laplace.vec_f, 0, laplace.f.eval(&laplace.f, x, material));
-    feenox_call(gsl_blas_dgemv(CblasTrans, w, e->H[q], laplace.vec_f, 1.0, feenox.pde.bi));
+    double f = laplace.f.eval(&laplace.f, x, material);
+    feenox_call(feenox_problem_rhs_set(e, q, &f));
   }
   
   if (feenox.pde.has_jacobian) {
@@ -60,7 +67,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_push_error_message("no alpha found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * alpha, e->H[q], e->H[q], 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * alpha, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Mi));
   }
   
 
