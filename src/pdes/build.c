@@ -138,6 +138,9 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
   }
   if (feenox.pde.has_rhs) {
     feenox_check_alloc(feenox.pde.bi = gsl_vector_calloc(feenox.pde.elemental_size));
+    if (feenox.pde.vec_f == NULL) {
+      feenox_check_alloc(feenox.pde.vec_f = gsl_vector_calloc(feenox.pde.dofs));
+    }
   }
   
 #endif  
