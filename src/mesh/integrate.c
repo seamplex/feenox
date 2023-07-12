@@ -80,7 +80,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
 
               double xi = 0;
               for (unsigned int j = 0; j < element->type->nodes; j++) {
-                xi += gsl_matrix_get(element->type->gauss[mesh->integration].H_c[q], 1, j) * feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
+                xi += gsl_matrix_get(element->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
               }
 
               integral += element->w[q] * xi;
@@ -165,7 +165,7 @@ double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function
  
     xi = 0;
     for (unsigned int j = 0; j < this->type->nodes; j++) {
-      xi += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 1, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
+      xi += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
     }
 
     integral += this->w[q] * xi;
