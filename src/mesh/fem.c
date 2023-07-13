@@ -414,11 +414,14 @@ inline int feenox_mesh_compute_dxdxi_at_gauss_1d(element_t *e, unsigned int q, i
   double dy = e->node[1]->x[1] - e->node[0]->x[1];
   double dz = e->node[1]->x[2] - e->node[0]->x[2];
   double l = gsl_hypot3(dx, dy, dz);
-
+  dx /= l;
+  dy /= l;
+  dy /= l;
+  
   double dxdxi = 0;
   for (unsigned int j = 0; j < e->type->nodes; j++) {
-    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], j, 0) *
-              (e->node[j]->x[0] * dx/l + e->node[j]->x[1] * dy/l + e->node[j]->x[2] * dz/l);
+    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, j) *
+              (e->node[j]->x[0] * dx + e->node[j]->x[1] * dy + e->node[j]->x[2] * dz);
   }
   
   gsl_matrix_set(e->J[q], 0, 0, dxdxi);
