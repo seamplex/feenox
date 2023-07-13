@@ -262,20 +262,18 @@ inline int feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int i
 }
 
 
-
 inline int feenox_mesh_compute_J(element_t *e, double *xi, gsl_matrix *dxdxi) {
 
   // warning! this only works with volumetric elements, see dxdr_at_gauss()
   // dxdxi = J = B_c * C_i
-/*  
-  for (unsigned int d = 0; d < e->type->dim; d++) {
-    for (unsigned int d_prime = 0; d_prime < e->type->dim; d_prime++) {
-      for (unsigned int j = 0; j < e->type->nodes; j++) {
-        gsl_matrix_add_to_element(dxdxi, d, d_prime, e->type->dhdxi(j, d_prime, r) * e->node[j]->x[d]);
-      }
-    }
-  }
-*/
+  // for (unsigned int d = 0; d < e->type->dim; d++) {
+  //   for (unsigned int d_prime = 0; d_prime < e->type->dim; d_prime++) {
+  //     for (unsigned int j = 0; j < e->type->nodes; j++) {
+  //       gsl_matrix_add_to_element(dxdxi, d, d_prime, e->type->dhdxi(j, d_prime, r) * e->node[j]->x[d]);
+  //     }
+  //   }
+  // }
+
   // B_c matrix
   gsl_matrix *B_c = NULL;
   feenox_check_alloc(B_c = gsl_matrix_alloc(e->type->dim, e->type->nodes));
@@ -416,7 +414,9 @@ inline int feenox_mesh_compute_dxdxi_at_gauss_1d(element_t *e, unsigned int q, i
   double l = gsl_hypot3(dx, dy, dz);
   dx /= l;
   dy /= l;
-  dy /= l;
+  dz /= l;
+
+//  feenox_debug_print_gsl_matrix(e->type->gauss[integration].B_c[q], stdout);
   
   double dxdxi = 0;
   for (unsigned int j = 0; j < e->type->nodes; j++) {
@@ -425,6 +425,7 @@ inline int feenox_mesh_compute_dxdxi_at_gauss_1d(element_t *e, unsigned int q, i
   }
   
   gsl_matrix_set(e->J[q], 0, 0, dxdxi);
+//  feenox_debug_print_gsl_matrix(e->J[q], stdout);
   
   return FEENOX_OK;
 }
@@ -518,12 +519,12 @@ inline int feenox_mesh_compute_dxdxi_at_gauss_general(element_t *e, unsigned int
   //      surfaces are on the xy plane
   //      volumes are always volumes!
 
-  unsigned int dim = e->type->dim;
-  if (dim == 0)
+  unsigned int D = e->type->dim;
+  if (D == 0)
   {
     return FEENOX_OK;
   }
-  unsigned int nodes = e->type->nodes;
+  unsigned int J = e->type->nodes;
 
   // TODO: benchmark
 /*  
@@ -541,11 +542,12 @@ inline int feenox_mesh_compute_dxdxi_at_gauss_general(element_t *e, unsigned int
 //  printf("old-style J\n");
 //  feenox_debug_print_gsl_matrix(e->J[q], stdout);
 
+  // TODO: the original C_i is not memory-efficient so we should build C_i^T instead
   gsl_matrix *C_i = NULL;
-  feenox_check_alloc(C_i = gsl_matrix_alloc(nodes, dim));
-  for (unsigned int j = 0; j < nodes; j++) {
-    for (unsigned int d = 0; d < dim; d++) {
-       gsl_matrix_set(C_i, j, d, e->node[j]->x[d]);
+  feenox_check_alloc(C_i = gsl_matrix_alloc(D, J));
+  for (unsigned int d = 0; d < D; d++) {
+    for (unsigned int j = 0; j < J; j++) {
+       gsl_matrix_set(C_i, d, j, e->node[j]->x[d]);
     }
   }
   
@@ -555,7 +557,7 @@ inline int feenox_mesh_compute_dxdxi_at_gauss_general(element_t *e, unsigned int
 //  feenox_debug_print_gsl_matrix(e->type->gauss[integration].B_c[q], stdout);
   
 
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, e->type->gauss[integration].B_c[q], C_i, 0.0, e->J[q]));
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C_i, e->type->gauss[integration].B_c[q],  0.0, e->J[q]));
   gsl_matrix_free(C_i);
 //  printf("new-style J\n");
 //  feenox_debug_print_gsl_matrix(e->J[q], stdout);

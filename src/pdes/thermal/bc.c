@@ -103,16 +103,24 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsign
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
+//  printf("e = %ld q = %d\n", e->tag, q);  
   double *x = feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   double power = feenox_expression_eval(&this->expr);
+//  printf("power = %g\n", power);
+//  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
+//  printf("w = %g\n", e->w[q]);
+  
   feenox_call(feenox_problem_rhs_set(e, q, &power));
+  // feenox_debug_print_gsl_vector(feenox.pde.bi, stdout);
   
   if (this->nonlinear) {
+//    printf("mongocho");
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     double dqdT = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], T);
     // mind the positive sign!
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dqdT, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Jbi));
   }
+  
   
 #endif
   

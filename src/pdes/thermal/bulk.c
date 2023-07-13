@@ -39,24 +39,16 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   // thermal stiffness matrix Bt*k*B
   // if k depends on T then there should be a more efficient way of evaluating k
   double k = thermal.k.eval(&thermal.k, x, material);
-//  printf("%g\n", k);
   unsigned int J = e->type->nodes;
   unsigned int D = e->type->dim;
   unsigned int G = feenox.pde.dofs;
   gsl_matrix *B = gsl_matrix_alloc(G*D, G*J);
   feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_mesh_compute_B_G_at_gauss(e->type, q, feenox.pde.mesh->integration);
-//  printf("B_G = \n");
-//  feenox_debug_print_gsl_matrix(e->type->B_G[q], stdout);
-//  printf("\n");
-  
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, B));
-//  printf("\n");
-//  feenox_debug_print_gsl_matrix(B, stdout);
-//    printf("\n");
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, B));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q]*k, B, B, 1.0, feenox.pde.Ki));
  
-//  feenox_debug_print_gsl_matrix(feenox.pde.Ki, stdout);
+  // feenox_debug_print_gsl_matrix(feenox.pde.Ki, stdout);
   
   // volumetric heat source term Ht*q
   // TODO: total source Q
@@ -118,6 +110,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       feenox_push_error_message("no heat capacity found");
       return FEENOX_ERROR;
     }
+    // printf("%g\n", rhocp);
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * rhocp, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Mi));
   }
   

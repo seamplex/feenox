@@ -35,15 +35,14 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   double w = e->w[q];
   
   // laplace stiffness matrix Bt*B
-  // note we don't allow any coefficient in the laplacian term
   unsigned int J = e->type->nodes;
   unsigned int D = e->type->dim;
   unsigned int G = feenox.pde.dofs;
-  gsl_matrix *BT_invJ = gsl_matrix_alloc(G*D, G*J);
+  gsl_matrix *B = gsl_matrix_alloc(G*D, G*J);
   feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_mesh_compute_B_G_at_gauss(e->type, q, feenox.pde.mesh->integration);
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, BT_invJ));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, BT_invJ, BT_invJ, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, B));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, B, 1.0, feenox.pde.Ki));
 
   material_t *material = feenox_mesh_get_material(e);
   
