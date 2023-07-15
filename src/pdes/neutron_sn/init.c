@@ -52,22 +52,17 @@ int feenox_problem_neutron_sn_init_cosines(double mu1) {
   // 2 3 2
   // 1 2 2 1
   
-  int i = 0;
-  int j = 0;
-  int k = 0;
-  int n = 0;
+  int m = 0;
   for (int row = 0; row < N_over_2; row++) {
     for (int col = 0; col <= row; col++) {
-      i = N_over_2 - row - 1;
-      j = col;
-      k = N_over_2 + 2 - 3 - i - j;
+      int i = N_over_2 - row - 1;
+      int j = col;
+      int k = N_over_2 + 2 - 3 - i - j;
       
-//      printf("%d\t%d %d %d\n", n, i, j, k);
-      
-      neutron_sn.Omega[n][0] = mu[i];
-      neutron_sn.Omega[n][1] = mu[j];
-      neutron_sn.Omega[n][2] = (feenox.pde.dim == 3) ? mu[k] : 0;
-      n++;
+      neutron_sn.Omega[m][0] = mu[i];
+      neutron_sn.Omega[m][1] = mu[j];
+      neutron_sn.Omega[m][2] = (feenox.pde.dim == 3) ? mu[k] : 0;
+      m++;
       
     }
   }

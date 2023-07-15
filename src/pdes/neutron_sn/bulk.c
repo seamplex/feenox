@@ -23,11 +23,14 @@
 #include "neutron_sn.h"
 
 
-int feenox_problem_build_allocate_aux_neutron_sn(unsigned int n_nodes) {
+int feenox_problem_build_allocate_aux_neutron_sn(unsigned int J) {
   
-  neutron_sn.n_nodes = n_nodes;
-  int dofs = neutron_sn.groups * neutron_sn.directions;
-  int size = neutron_sn.n_nodes * neutron_sn.groups * neutron_sn.directions;
+  neutron_sn.n_nodes = J;
+  int G = neutron_sn.groups;
+  int M = neutron_sn.directions;
+  
+  int MG = M*G;
+  int JMG = J * MG;
     
   if (neutron_sn.Ki != NULL) {
     gsl_matrix_free(neutron_sn.Ki);
@@ -47,18 +50,18 @@ int feenox_problem_build_allocate_aux_neutron_sn(unsigned int n_nodes) {
     }
   }
     
-  feenox_check_alloc(neutron_sn.Ki = gsl_matrix_calloc(size, size));
-  feenox_check_alloc(neutron_sn.Ai = gsl_matrix_calloc(size, size));
-  feenox_check_alloc(neutron_sn.Xi = gsl_matrix_calloc(size, size));
+  feenox_check_alloc(neutron_sn.Ki = gsl_matrix_calloc(JMG, JMG));
+  feenox_check_alloc(neutron_sn.Ai = gsl_matrix_calloc(JMG, JMG));
+  feenox_check_alloc(neutron_sn.Xi = gsl_matrix_calloc(JMG, JMG));
   if (neutron_sn.has_sources) {
-    feenox_check_alloc(neutron_sn.Si = gsl_vector_calloc(size));
+    feenox_check_alloc(neutron_sn.Si = gsl_vector_calloc(JMG));
   }
   
-  feenox_check_alloc(neutron_sn.P = gsl_matrix_calloc(dofs, size));
-  feenox_check_alloc(neutron_sn.OMEGAB = gsl_matrix_calloc(dofs, size));
-  feenox_check_alloc(neutron_sn.AH = gsl_matrix_calloc(dofs, size));
+  feenox_check_alloc(neutron_sn.P = gsl_matrix_calloc(MG, JMG));
+  feenox_check_alloc(neutron_sn.OMEGAB = gsl_matrix_calloc(MG, JMG));
+  feenox_check_alloc(neutron_sn.AH = gsl_matrix_calloc(MG, JMG));
   if (neutron_sn.has_fission) {
-    feenox_check_alloc(neutron_sn.XH = gsl_matrix_calloc(dofs, size));
+    feenox_check_alloc(neutron_sn.XH = gsl_matrix_calloc(MG, JMG));
   }
  
   return FEENOX_OK;
@@ -173,13 +176,13 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   
   feenox_call(gsl_matrix_memcpy(neutron_sn.P, e->type->H_Gc[q]));
   for (unsigned int j = 0; j < neutron_sn.n_nodes; j++) {
-    int NGj = MG*j;
+    int MGj = MG*j;
     for (unsigned int n = 0; n < neutron_sn.directions; n++) {
       for (unsigned int m = 0; m < feenox.pde.dim; m++) {
         double xi = tau * neutron_sn.Omega[n][m] * gsl_matrix_get(e->B[q], m, j);
         for (unsigned int g = 0; g < neutron_sn.groups; g++) {
           int diag = dof_index(n,g);
-          gsl_matrix_add_to_element(neutron_sn.P, diag, NGj + diag, xi);
+          gsl_matrix_add_to_element(neutron_sn.P, diag, MGj + diag, xi);
         }
       }
     }
@@ -189,7 +192,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.OMEGA, e->B_G[q], 0.0, neutron_sn.OMEGAB));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], neutron_sn.P, neutron_sn.OMEGAB, 1.0, neutron_sn.Ki));
 
-  // petrov-stabilized revmoval term
+  // petrov-stabilized removal term
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.removal, e->type->H_Gc[q], 0.0, neutron_sn.AH));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], neutron_sn.P, neutron_sn.AH, 1.0, neutron_sn.Ai));
   
