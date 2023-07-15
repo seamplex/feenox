@@ -90,16 +90,16 @@ int feenox_instruction_mesh_integrate(void *arg) {
       } else {
         // general function
         size_t i = 0;
-        unsigned int v = 0;
+        unsigned int q = 0;
         for (i = 0; i < mesh->n_elements; i++) {
           element = &mesh->element[i];
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
-            for (v = 0; v < element->type->gauss[mesh->integration].Q; v++) {
-              feenox_mesh_compute_w_at_gauss(element, v, mesh->integration);
+            for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
+              feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
               // TODO: check if the integrand depends on space
-              feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
-              integral += element->w[v] * feenox_function_eval(mesh_integrate->function, element->x[v]);
+              feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
+              integral += element->w[q] * feenox_function_eval(mesh_integrate->function, element->x[q]);
             }  
           }
         }
@@ -120,17 +120,17 @@ int feenox_instruction_mesh_integrate(void *arg) {
       }
     } else {
       // an expression evaluated at the nodes
-      unsigned int v = 0;
+      unsigned int q = 0;
       size_t i = 0;
       for (i = 0; i < mesh->n_elements; i++) {
         element = &mesh->element[i];
         if ((physical_group == NULL && element->type->dim == mesh->dim) ||
             (physical_group != NULL && element->physical_group == physical_group)) {
-          for (v = 0; v < element->type->gauss[mesh->integration].Q; v++) {
-            feenox_mesh_compute_w_at_gauss(element, v, mesh->integration);
+          for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
+            feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
             // TODO: check is the integrand depends on space
-            feenox_mesh_compute_x_at_gauss(element, v, mesh->integration);
-            feenox_mesh_update_coord_vars(element->x[v]);
+            feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
+            feenox_mesh_update_coord_vars(element->x[q]);
             // si el elemento es de linea o de superficie calculamos la normal para tenerla en nx, ny y nz
             // TODO: nx
 /*            
@@ -139,7 +139,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
             }  
  */
             double xi = feenox_expression_eval(expr);
-            integral += element->w[v] * xi;
+            integral += element->w[q] * xi;
           }
         }
       }        

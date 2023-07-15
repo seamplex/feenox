@@ -27,7 +27,6 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
 #ifdef HAVE_PETSC
   
   feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-  double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, laplace.space_dependent_source || laplace.space_dependent_mass);
   
   // laplace stiffness matrix Bt*B
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], e->B[q], e->B[q], 1.0, feenox.pde.Ki));
@@ -35,6 +34,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   material_t *material = feenox_mesh_get_material(e);
   
   // right-hand side
+  double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, laplace.space_dependent_source || laplace.space_dependent_mass);
   if (laplace.f.defined) {
     double f = laplace.f.eval(&laplace.f, x, material);
     feenox_call(feenox_problem_rhs_set(e, q, &f));

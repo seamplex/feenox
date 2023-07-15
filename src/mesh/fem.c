@@ -317,8 +317,8 @@ inline int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q) {
   // TODO: can we lump these three in a single loop?
   feenox_call(feenox_mesh_compute_w_at_gauss(e, q, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_B_at_gauss(e, q, feenox.pde.mesh->integration));
-  
+  feenox_call(feenox_mesh_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration));
+
   
   return FEENOX_OK;
 }
@@ -576,8 +576,9 @@ int feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int
   
   // TODO: measure order of loops
   for (unsigned int j = 0; j < J; j++) {
+    double h = gsl_matrix_get(element_type->gauss[integration].H_c[q], 0, j);
     for (unsigned int g = 0; g < G; g++) {
-      gsl_matrix_set(element_type->H_Gc[q], g, G*j+g, gsl_matrix_get(element_type->gauss[integration].H_c[q], 1, j));
+      gsl_matrix_set(element_type->H_Gc[q], g, G*j+g, h);
     }
   }
 
@@ -639,6 +640,8 @@ int feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int
 
 int feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration) {
 
+  feenox_call(feenox_mesh_compute_B_at_gauss(e, q, integration));
+  
   unsigned int G = feenox.pde.dofs;
   if (e->B_G == NULL) {
     if (G == 1) {
@@ -656,7 +659,7 @@ int feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integrati
   
   unsigned int J = e->type->nodes;
   unsigned int D = e->type->dim;
-  feenox_check_alloc(e->B_G[q] = gsl_matrix_calloc(G*D, G*D*J));
+  feenox_check_alloc(e->B_G[q] = gsl_matrix_calloc(G*D, G*J));
   
   for (unsigned int d = 0; d < D; d++) {
     size_t Gd = G*d;

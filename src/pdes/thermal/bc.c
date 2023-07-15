@@ -103,24 +103,16 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsign
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-//  printf("e = %ld q = %d\n", e->tag, q);  
   double *x = feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   double power = feenox_expression_eval(&this->expr);
-//  printf("power = %g\n", power);
-//  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
-//  printf("w = %g\n", e->w[q]);
-  
   feenox_call(feenox_problem_rhs_set(e, q, &power));
-  // feenox_debug_print_gsl_vector(feenox.pde.bi, stdout);
   
   if (this->nonlinear) {
-//    printf("mongocho");
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     double dqdT = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], T);
     // mind the positive sign!
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dqdT, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Jbi));
   }
-  
   
 #endif
   
@@ -138,17 +130,15 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
   }
 
   // TODO: remove duplicate, use a macro
+  feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+/*  
   feenox_call(feenox_mesh_compute_w_at_gauss(e, q, feenox.pde.mesh->integration));
   feenox_call(feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration));
   if (this->space_dependent) {
     feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
     feenox_mesh_update_coord_vars(e->x[q]);
   }
-  
-  // TODO: axisymmetric
-//  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
-  double r_for_axisymmetric = 1;
-  double w = e->w[q] * r_for_axisymmetric;
+*/
   
   double h = 0;
   double Tref = 0;
@@ -164,14 +154,18 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
     return FEENOX_ERROR;
   }
 
-
+  // the h*Tref goes to b
+  double rhs = h*Tref;
+  feenox_call(feenox_problem_rhs_set(e, q, &rhs));
+  
   // TODO: the h*T goes directly to the stiffness matrix
   // this is not efficient because if h depends on t or T we might need to re-build the whole K
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w*h, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q]*h, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Ki));
 
-  // the h*Tref goes to b
+/*  
   gsl_vector_set(feenox.pde.vec_f, 0, h*Tref);
   feenox_call(gsl_blas_dgemv(CblasTrans, w, e->type->H_Gc[q], feenox.pde.vec_f, 1.0, feenox.pde.bi)); 
+*/
   
 
 #endif
