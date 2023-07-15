@@ -81,10 +81,8 @@ int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsi
   if (this->nonlinear) {
     double phi = feenox_function_eval(feenox.pde.solution[0], x);
     double dderivativedphi = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], phi);
-    // TODO: axisymmetric
-    double w = e->w[q];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +w*dderivativedphi, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dderivativedphi, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Jbi));
   }
   
 #endif

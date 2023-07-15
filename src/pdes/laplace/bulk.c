@@ -29,20 +29,8 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
   double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, laplace.space_dependent_source || laplace.space_dependent_mass);
   
-  // TODO: axisymmetric
-//  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
-//  double r_for_axisymmetric = 1;
-  double w = e->w[q];
-  
   // laplace stiffness matrix Bt*B
-  unsigned int J = e->type->nodes;
-  unsigned int D = e->type->dim;
-  unsigned int G = feenox.pde.dofs;
-  gsl_matrix *B = gsl_matrix_alloc(G*D, G*J);
-  feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
-  feenox_mesh_compute_B_G_at_gauss(e->type, q, feenox.pde.mesh->integration);
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, B));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w, B, B, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], e->B[q], e->B[q], 1.0, feenox.pde.Ki));
 
   material_t *material = feenox_mesh_get_material(e);
   
@@ -66,7 +54,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_push_error_message("no alpha found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, w * alpha, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * alpha, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Mi));
   }
   
 

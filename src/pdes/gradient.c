@@ -174,7 +174,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
       } else {
         gsl_matrix_set_zero(e->dphidx_gauss[q]);
       }
-      feenox_call(feenox_mesh_compute_dhdx_at_gauss(e, q, mesh->integration));
+      feenox_call(feenox_mesh_compute_B_at_gauss(e, q, mesh->integration));
 
       // aca habria que hacer una matriz con los phi globales
       // (de j y g, que de paso no depende de q asi que se podria hacer afuera del for de q)

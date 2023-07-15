@@ -389,7 +389,7 @@ int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
   }  
   
   feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
-  feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], e->type->H_G[q], feenox.pde.vec_f, 1.0, feenox.pde.bi));
+  feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], e->type->H_Gc[q], feenox.pde.vec_f, 1.0, feenox.pde.bi));
 #endif
   
   return FEENOX_OK;

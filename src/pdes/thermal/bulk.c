@@ -31,22 +31,8 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
   material_t *material = feenox_mesh_get_material(e);  
   
-  // TODO: axisymmetric
-//  r_for_axisymmetric = feenox_compute_r_for_axisymmetric(this, v);
-//  double r_for_axisymmetric = 1;
-//  double w = e->w[q] * r_for_axisymmetric;
-  
-  // thermal stiffness matrix Bt*k*B
-  // if k depends on T then there should be a more efficient way of evaluating k
   double k = thermal.k.eval(&thermal.k, x, material);
-  unsigned int J = e->type->nodes;
-  unsigned int D = e->type->dim;
-  unsigned int G = feenox.pde.dofs;
-  gsl_matrix *B = gsl_matrix_alloc(G*D, G*J);
-  feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
-  feenox_mesh_compute_B_G_at_gauss(e->type, q, feenox.pde.mesh->integration);
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, e->invJ[q], e->type->B_G[q], 0.0, B));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q]*k, B, B, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q]*k, e->B[q], e->B[q], 1.0, feenox.pde.Ki));
  
   // feenox_debug_print_gsl_matrix(feenox.pde.Ki, stdout);
   
@@ -76,7 +62,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
       // add a convenience function, mind the allocation
       gsl_matrix *BtB = gsl_matrix_calloc(nodes, nodes);
-      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, B, B, 1, BtB);
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, e->B[q], e->B[q], 1, BtB);
 
       gsl_matrix *BtBTH = gsl_matrix_calloc(nodes, nodes);
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, BtB, TH, 1, BtBTH);
@@ -111,7 +97,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       return FEENOX_ERROR;
     }
     // printf("%g\n", rhocp);
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * rhocp, e->type->H_G[q], e->type->H_G[q], 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * rhocp, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Mi));
   }
   
 
