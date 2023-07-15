@@ -129,16 +129,8 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
     return FEENOX_OK;
   }
 
-  // TODO: remove duplicate, use a macro
+  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
   feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
-/*  
-  feenox_call(feenox_mesh_compute_w_at_gauss(e, q, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration));
-  if (this->space_dependent) {
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
-    feenox_mesh_update_coord_vars(e->x[q]);
-  }
-*/
   
   double h = 0;
   double Tref = 0;
