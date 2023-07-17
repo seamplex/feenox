@@ -3,10 +3,12 @@
  * implicit call to `SOLVE_PROBLEM`?
  * use `MatPreallocator` to efficiently pre-allocate the matrices?
     - check v3.19 and see if it works well
+    - add an option to choose to allocate or not
  * use `DMPlex`?
     - allocate matrices?
     - write vtus?
     - dump states?
+    - choose to use it or not
  * use `spack`? sow?
  * https://joss.theoj.org/
  * FIT to mesh-based functions
@@ -22,7 +24,6 @@
 
  * move all `doc/examples` to `tests`
  * write a `README` and an explanation of each test
- * automated nightly builds and tests (Laminar CI? github actions?)
  * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations
  * `FIT` ranges
@@ -94,7 +95,6 @@
 ## Command-line arguments
 
  * list symbols with `-l`
- * dump shape funcionts, gauss points, etc.
  
 ## Error handling 
  
@@ -125,7 +125,7 @@
  * remove the need of needing an explicit `SOLVE_PROBLEM`
    - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
  * benchmark MPI (read `.msh` with partitioning info first)
- * openmp to build matrices and compute stresses
+ * openmp to build matrices and compute stresses? not sure, should be mpi on a partitioned mesh
  * glue (mortar)
  * investigate `-mpi_linear_solver_server`
  * direct elimination for multi-freedom BCs
@@ -157,9 +157,10 @@
 ## Neutron
 
  * add currents to the outputs? J1x J1y J1x?
+ * current in BCs
  * FVM?
  * benchmarks/tests
- * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE
+ * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE? where did I get this?
  
 # V & V
 
@@ -170,4 +171,5 @@
  - CFD?
  - LBM?
  - Electromagnetism?
- 
+ - FVM
+
