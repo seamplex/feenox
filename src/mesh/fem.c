@@ -607,36 +607,6 @@ int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration
   return FEENOX_OK;
 }  
 
-/*
-int feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration) {
-
-  unsigned int G = feenox.pde.dofs;
-  if (element_type->B_Gc == NULL) {
-    if (G == 1) {
-      element_type->B_Gc = element_type->B_c;
-      return FEENOX_OK;
-    }
-    feenox_check_alloc(element_type->B_Gc = calloc(element_type->gauss[integration].Q, sizeof(gsl_matrix *)));
-  }
-  
-  unsigned int J = element_type->nodes;
-  unsigned int D = element_type->dim;
-  feenox_check_alloc(element_type->B_Gc[q] = gsl_matrix_calloc(G*D, G*D*J));
-  
-  for (unsigned int d = 0; d < element_type->dim; d++) {
-    size_t Gd = G*d;
-    for (unsigned int j = 0; j < element_type->nodes; j++) {
-      size_t Gj = G*j;
-      double dhdxi = gsl_matrix_get(element_type->gauss[integration].B_c[q], d, j);
-      for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-        gsl_matrix_set(element_type->B_Gc[q], Gd+g, Gj+g, dhdxi);
-      }
-    }
-  }
-
-  return FEENOX_OK;
-}
-*/
 
 int feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration) {
 

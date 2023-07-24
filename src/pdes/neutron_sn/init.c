@@ -481,21 +481,21 @@ int feenox_problem_init_runtime_neutron_sn(void) {
   }
   
   // allocate elemental XS matrices
-  unsigned int N = neutron_sn.directions;
-  unsigned int NG = N*G;
-  feenox_check_alloc(neutron_sn.removal   = gsl_matrix_calloc(NG, NG));
-  feenox_check_alloc(neutron_sn.nufission = gsl_matrix_calloc(NG, NG));
-  feenox_check_alloc(neutron_sn.src       = gsl_vector_calloc(NG));  
-  feenox_check_alloc(neutron_sn.chi       = calloc(G, sizeof(double)));
+  unsigned int M = neutron_sn.directions;
+  unsigned int MG = M*G;
+  feenox_check_alloc(neutron_sn.R   = gsl_matrix_calloc(MG, MG));
+  feenox_check_alloc(neutron_sn.X   = gsl_matrix_calloc(MG, MG));
+  feenox_check_alloc(neutron_sn.s   = gsl_vector_calloc(MG));  
+  feenox_check_alloc(neutron_sn.chi = calloc(G, sizeof(double)));
   // TODO: read a vector called "chi"
   neutron_sn.chi[0] = 1;
   
   // direction matrix
-  feenox_check_alloc(neutron_sn.OMEGA     = gsl_matrix_calloc(NG, NG * feenox.pde.dim));
-  for (unsigned int n = 0; n < N; n++) {
+  feenox_check_alloc(neutron_sn.D = gsl_matrix_calloc(MG, MG * feenox.pde.dim));
+  for (unsigned int m = 0; m < M; m++) {
     for (unsigned int g = 0; g < G; g++) {
-      for (unsigned int m = 0; m < feenox.pde.dim; m++) {
-        gsl_matrix_set(neutron_sn.OMEGA, dof_index(n,g), m*NG + dof_index(n,g), neutron_sn.Omega[n][m]);
+      for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+        gsl_matrix_set(neutron_sn.D, dof_index(m,g), d*MG + dof_index(m,g), neutron_sn.Omega[m][d]);
       }
     }
   }  

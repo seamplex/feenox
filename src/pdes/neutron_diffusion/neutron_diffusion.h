@@ -36,7 +36,7 @@ struct neutron_diffusion_t {
   distribution_t *S;
   
   // diffusion coefficients, (groups * dim) x (groups * dim)
-  gsl_matrix *D_prime;
+  gsl_matrix *D_G;
   
   // removal XSs: groups x groups
   gsl_matrix *R;
@@ -51,7 +51,7 @@ struct neutron_diffusion_t {
   double *chi;
 
   unsigned int n_nodes;
-  // elemental matrices (size n_nodes*G x n_nodes*G)
+  // elemental matrices (size J*G x J*G)
   gsl_matrix *Li;  // leakage
   gsl_matrix *Ai;  // absorption
   gsl_matrix *Fi;  // fission

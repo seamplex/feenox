@@ -62,7 +62,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, neutron_diffusion.space_XS);
   material_t *material = feenox_mesh_get_material(e);
   
-  gsl_matrix_set_zero(neutron_diffusion.D_prime);
+  gsl_matrix_set_zero(neutron_diffusion.D_G);
   gsl_matrix_set_zero(neutron_diffusion.R);
   if (neutron_diffusion.has_fission) {
     gsl_matrix_set_zero(neutron_diffusion.X);
@@ -108,7 +108,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
       }
 
       unsigned int index = m*neutron_diffusion.groups + g;
-      gsl_matrix_set(neutron_diffusion.D_prime, index, index, xi);
+      gsl_matrix_set(neutron_diffusion.D_G, index, index, xi);
     }
   }
 
@@ -124,7 +124,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   
   // elemental stiffness for the diffusion term B'*D*B
   // TODO: convenience call for A'*B*A? that'd need an intermediate alloc
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.D_prime, e->B_G[q], 0.0, neutron_diffusion.DB));
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.D_G, e->B_G[q], 0.0, neutron_diffusion.DB));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], e->B_G[q], neutron_diffusion.DB, 1.0, neutron_diffusion.Li));
 
   // elemental scattering H'*A*H

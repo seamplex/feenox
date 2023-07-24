@@ -65,13 +65,13 @@ struct neutron_sn_t {
   
   
   // removal XSs: groups x groups
-  gsl_matrix *removal;
+  gsl_matrix *R;
 
   // fission XSs: groups x groups
-  gsl_matrix *nufission;
+  gsl_matrix *X;
   
   // independent sources: groups
-  gsl_vector *src;  
+  gsl_vector *s;  
   
   // fission spectrum: groups
   double *chi;
@@ -81,15 +81,22 @@ struct neutron_sn_t {
   // elemental matrices  
   unsigned int n_nodes;
   
+  // Petrov-stabilized H_cG
   gsl_matrix *P;
-  gsl_matrix *OMEGA;
-  gsl_matrix *OMEGAB;
+  
+  // Direction matrix
+  gsl_matrix *D;
+  
+  // intermediate
+  gsl_matrix *DB;
   gsl_matrix *AH;
   gsl_matrix *XH;
   
-  gsl_matrix *Ki;
-  gsl_matrix *Ai;
-  gsl_matrix *Xi;
+  // elemental matrices (size J*M*G x J*M*G)
+  
+  gsl_matrix *Li;  // leakage
+  gsl_matrix *Ai;  // absorption
+  gsl_matrix *Fi;  // fission
   gsl_vector *Si;
 
   

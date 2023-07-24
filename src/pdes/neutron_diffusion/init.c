@@ -163,7 +163,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   }
   
   // allocate elemental XS matrices
-  feenox_check_alloc(neutron_diffusion.D_prime      = gsl_matrix_calloc(G * feenox.pde.dim, G * feenox.pde.dim));
+  feenox_check_alloc(neutron_diffusion.D_G      = gsl_matrix_calloc(G * feenox.pde.dim, G * feenox.pde.dim));
   feenox_check_alloc(neutron_diffusion.R   = gsl_matrix_calloc(G, G));
   feenox_check_alloc(neutron_diffusion.X = gsl_matrix_calloc(G, G));
   feenox_check_alloc(neutron_diffusion.s       = gsl_vector_calloc(G));  
