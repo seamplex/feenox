@@ -28,6 +28,7 @@ extern int feenox_problem_parse_post_neutron_sn(mesh_write_t *mesh_write, const 
 
 // neutron_sn/init.c
 extern int feenox_problem_neutron_sn_init_cosines(double mu1);
+extern int feenox_problem_neutron_sn_init_triangles(double *weights);
 extern int feenox_problem_init_parser_neutron_sn(void);
 extern int feenox_problem_init_runtime_neutron_sn(void);
 #ifdef HAVE_PETSC

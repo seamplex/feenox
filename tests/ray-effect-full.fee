@@ -1,0 +1,30 @@
+# problem from
+# PHASE-SPACE FINITE ELEMENT METHODS APPLIED TO THE FIRST-ORDER  FORM OF THE TRANSPORT EQUATION
+# WILLIAM R. MARTIN,CARL E. YEHNERT, LEONARD LORENCE and JAMES J. DUDERSTAD
+# Annals of Nuclear Energy.  Vol. 8. pp. 633 to 646, 1981
+ 
+DEFAULT_ARGUMENT_VALUE 1 8
+PROBLEM neutron_sn 2D SN $1
+READ_MESH $0.msh
+
+c = 1/3
+Sigma_t = 0.75
+Sigma_s = c*Sigma_t
+
+BC vacuum vacuum
+
+MATERIAL src  Sigma_t1=Sigma_t Sigma_s1.1=Sigma_s S1=1
+MATERIAL bulk Sigma_t1=Sigma_t Sigma_s1.1=Sigma_s S1=0
+
+sn_alpha = 0.15
+
+SOLVE_PROBLEM
+
+PRINT 10*phi1(0,1.875)
+# PRINT "\# phi=" phi1(0,0)
+# PRINT "\# memory= " memory()
+
+# WRITE_RESULTS FILE $0-result.msh
+# profile(x) = 10*phi1(x,1.875)
+# PRINT_FUNCTION profile MIN 0 MAX 2 NSTEPS 50
+

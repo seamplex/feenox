@@ -35,6 +35,11 @@ int feenox_problem_parse_problem_neutron_sn(const char *token) {
       double xi = 0;
       feenox_call(feenox_parser_expression_in_string(&xi));
       neutron_sn.N = (unsigned int)(xi);
+      if (neutron_sn.N % 2 == 1) {
+        feenox_push_error_message("The N in SN should be even and %d is not (as far as I know)", neutron_sn.N);
+        return FEENOX_ERROR;
+      }
+/*      
       if (neutron_sn.N != 2 &&
           neutron_sn.N != 4 &&
           neutron_sn.N != 6 &&
@@ -42,6 +47,7 @@ int feenox_problem_parse_problem_neutron_sn(const char *token) {
         feenox_push_error_message("S%d is not supported, only S2, S4, S6 and S8 are", neutron_sn.N);
         return FEENOX_ERROR;
       }
+ */
       
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);

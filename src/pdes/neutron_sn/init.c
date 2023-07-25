@@ -23,55 +23,6 @@
 #include "neutron_sn.h"
 neutron_sn_t neutron_sn;
 
-int feenox_problem_neutron_sn_init_cosines(double mu1) {
-  // equation 21 in stammler
-  // equation 4-8 in lewis
-  int N_over_2 = neutron_sn.N/2;
-  double *mu = NULL;
-  feenox_check_alloc(mu = calloc(N_over_2, sizeof(double)));
-  
-  mu[0] = mu1;
-  double C = 2*(1-3*gsl_pow_2(mu1))/(neutron_sn.N-2);
-  for (int i = 1; i < N_over_2; i++) {
-    mu[i] = sqrt(gsl_pow_2(mu1) + C*i);
-  }
-  
-  // we have these triangles
-  // S4
-  // 1
-  // 1 1
-  //
-  // S6
-  // 1
-  // 2 2
-  // 1 2 1
-  //
-  // S8
-  // 1
-  // 2 2
-  // 2 3 2
-  // 1 2 2 1
-  
-  int m = 0;
-  for (int row = 0; row < N_over_2; row++) {
-    for (int col = 0; col <= row; col++) {
-      int i = N_over_2 - row - 1;
-      int j = col;
-      int k = N_over_2 + 2 - 3 - i - j;
-      
-      neutron_sn.Omega[m][0] = mu[i];
-      neutron_sn.Omega[m][1] = mu[j];
-      neutron_sn.Omega[m][2] = (feenox.pde.dim == 3) ? mu[k] : 0;
-      m++;
-      
-    }
-  }
-  
-  feenox_free(mu);
-  
-  return FEENOX_OK;
-}
-
 int feenox_problem_init_parser_neutron_sn(void) {
 
 ///kw_pde+PROBLEM+detail  * `neutron_sn` multi-group core-level neutron transport using 
@@ -110,18 +61,12 @@ int feenox_problem_init_parser_neutron_sn(void) {
   switch(feenox.pde.dim) {
     case 1:
       neutron_sn.directions = neutron_sn.N;
-//      neutron_sn.supg_dimension_factor = 1;
       break;
     case 2:
       neutron_sn.directions = 0.5*neutron_sn.N*(neutron_sn.N+2);
-//      neutron_sn.supg_dimension_factor = 4;
-//      neutron_sn.supg_dimension_factor = 6;
       break;
     case 3:
       neutron_sn.directions = neutron_sn.N*(neutron_sn.N+2);
-//      neutron_sn.supg_dimension_factor = 6;
-//      neutron_sn.supg_dimension_factor = 12;
-//      neutron_sn.supg_dimension_factor = 16;
       break;
   }
   
@@ -240,7 +185,7 @@ int feenox_problem_init_parser_neutron_sn(void) {
       break;
 
       default:
-        feenox_push_error_message("unsupported N = %d", neutron_sn.N);
+        feenox_push_error_message("unsupported N = %d in 1D", neutron_sn.N);
         return FEENOX_ERROR;
       break;
     }
@@ -248,78 +193,76 @@ int feenox_problem_init_parser_neutron_sn(void) {
     // table 4-1 page 162 from lewiss
     // we could have used file sndir2.dat from fentraco, but the values are different
 
-    // this is for 2 and 3 dimensions
-    int N_octs = (feenox.pde.dim == 2) ? 4 : 8;
-    int J_octs = neutron_sn.directions / N_octs;
-
     // first set the weights as all the possible permutations in the first octant
     // and then we fill in the others
     // the initial cosine directions passed to feenox_problem_neutron_sn_init_cosines()
     // are taken from table 4-1 from lewiss (p 162)
     // which coincide with table 1 p 208 from stammler-abbate
     
+    // TODO: allow user provided first cosine and weights
+    
+    double *weights_array = NULL;
     switch (neutron_sn.N) {
       case 2:
       {
         feenox_call(feenox_problem_neutron_sn_init_cosines(1.0/M_SQRT3));
-        
-        neutron_sn.w[0] = 1.0/(double)(N_octs);
+        feenox_check_alloc(weights_array = calloc(1, sizeof(double)));
+        weights_array[0] = 1;
       }
       break;
       
       case 4:
       {
         feenox_call(feenox_problem_neutron_sn_init_cosines(0.3500212));
-        double s4_w1 = 1.0/3.0;
-
-        neutron_sn.w[0] = s4_w1/(double)(N_octs);
-        
-        neutron_sn.w[1] = s4_w1/(double)(N_octs);
-        neutron_sn.w[2] = s4_w1/(double)(N_octs);
+        feenox_check_alloc(weights_array = calloc(1, sizeof(double)));
+        weights_array[0] = 1.0/3.0;
       }
       break;
       
       case 6:
       {
         feenox_call(feenox_problem_neutron_sn_init_cosines(0.2666355));
-        
-        double s6_w1 = 0.1761263;
-        double s6_w2 = 0.1572071;
+        feenox_check_alloc(weights_array = calloc(2, sizeof(double)));
+        weights_array[0] = 0.1761263;
+        weights_array[1] = 0.1572071;
 
-        neutron_sn.w[0] = s6_w1/(double)(N_octs);
-        
-        neutron_sn.w[1] = s6_w2/(double)(N_octs);
-        neutron_sn.w[2] = s6_w2/(double)(N_octs);
-        
-        neutron_sn.w[3] = s6_w1/(double)(N_octs);
-        neutron_sn.w[4] = s6_w2/(double)(N_octs);
-        neutron_sn.w[5] = s6_w1/(double)(N_octs);
       }
       break;
       
       case 8:
       {
         feenox_call(feenox_problem_neutron_sn_init_cosines(0.2182179));
-
-        double s8_w1 = 0.1209877;
-        double s8_w2 = 0.0907407;
-        double s8_w3 = 0.0925926;       
-        
-
-        neutron_sn.w[0] = s8_w1/(double)(N_octs);
-        
-        neutron_sn.w[1] = s8_w2/(double)(N_octs);
-        neutron_sn.w[2] = s8_w2/(double)(N_octs);
-        
-        neutron_sn.w[3] = s8_w2/(double)(N_octs);
-        neutron_sn.w[4] = s8_w3/(double)(N_octs);
-        neutron_sn.w[5] = s8_w2/(double)(N_octs);
-        
-        neutron_sn.w[6] = s8_w1/(double)(N_octs);
-        neutron_sn.w[7] = s8_w2/(double)(N_octs);
-        neutron_sn.w[8] = s8_w2/(double)(N_octs);
-        neutron_sn.w[9] = s8_w1/(double)(N_octs);
-        
+        feenox_check_alloc(weights_array = calloc(3, sizeof(double)));
+        weights_array[0] = 0.1209877;
+        weights_array[1] = 0.0907407;
+        weights_array[2] = 0.0925926;       
+      }
+      break;
+      
+      case 12:
+      {
+        feenox_call(feenox_problem_neutron_sn_init_cosines(0.1672126));
+        feenox_check_alloc(weights_array = calloc(5, sizeof(double)));
+        weights_array[0] = 0.0707626;
+        weights_array[1] = 0.0558811;
+        weights_array[2] = 0.0373377;
+        weights_array[3] = 0.0502819;
+        weights_array[4] = 0.0258513;
+      }
+      break;
+      
+      case 16:
+      {
+        feenox_call(feenox_problem_neutron_sn_init_cosines(0.1389568));
+        feenox_check_alloc(weights_array = calloc(8, sizeof(double)));
+        weights_array[0] = 0.0489872;
+        weights_array[1] = 0.0413296;
+        weights_array[2] = 0.0212326;
+        weights_array[3] = 0.0256207;
+        weights_array[4] = 0.0360486;
+        weights_array[5] = 0.0144589;
+        weights_array[6] = 0.0344958;
+        weights_array[7] = 0.0085179;
       }
       break;
         
@@ -329,8 +272,27 @@ int feenox_problem_init_parser_neutron_sn(void) {
       break;
     }
     
-   
+    // from the weights array now assign one weight to each direction
+    feenox_call(feenox_problem_neutron_sn_init_triangles(weights_array));
+    
+    // print the nice SN triangle
+/*    
+    int N_over_2 = neutron_sn.N/2;
+    for (int i = 0; i < N_over_2; i++) {
+      for (int j = 0; j < N_over_2-1-i; j++) {
+        printf(" ");
+      }
+      for (int j = 0; j < i+1; j++) {
+        printf("%d ", 1+neutron_sn.SN_triangle[i][j]);
+      }
+      printf("\n");
+    }
+*/
+    
     // we have filled the first octant, now fill in the other ones
+    // this is for 2 and 3 dimensions only
+    int N_octs = (feenox.pde.dim == 2) ? 4 : 8;
+    int J_octs = neutron_sn.directions / N_octs;
     for (int n = 1; n < N_octs; n++) {
       for (int j = 0; j < J_octs; j++) {
         neutron_sn.Omega[n*J_octs + j][0] = ((n & 1) ? (-1) : (+1)) * neutron_sn.Omega[j][0];
@@ -346,20 +308,29 @@ int feenox_problem_init_parser_neutron_sn(void) {
   for (unsigned int n = 0; n < neutron_sn.directions; n++) {
     s += neutron_sn.w[n];
   }
-  assert(fabs(s-1) < 1e-6);
+  if (fabs(s-1) > 1e-6) {
+    feenox_push_error_message("S%d weights do not sum up to one but to %g", neutron_sn.N, s);
+    return FEENOX_ERROR;
+  }
   
   for (unsigned int d = 0; d < feenox.pde.dim; d++) {
     s = 0;
     for (unsigned int n = 0; n < neutron_sn.directions; n++) {
       s += neutron_sn.w[n] * neutron_sn.Omega[n][d];
     }
-    assert(fabs(s) < 1e-6);
+    if (fabs(s) > 1e-6) {
+      feenox_push_error_message("S%d weights are not symmetric (zero != %g)", neutron_sn.N, s);
+      return FEENOX_ERROR;
+    }
     
     s = 0;
     for (unsigned int n = 0; n < neutron_sn.directions; n++) {
       s += neutron_sn.w[n] * gsl_pow_2(neutron_sn.Omega[n][d]);
     }
-    assert(fabs(s-1.0/3.0) < 1e-6);
+    if (fabs(s-1.0/3.0) > 1e-6) {
+      feenox_push_error_message("S%d weights are not symmetric (one third != %g)", neutron_sn.N, s);
+      return FEENOX_ERROR;
+    }
   }
   
   // ---------------------------------------------------------------------------
@@ -559,3 +530,142 @@ int feenox_problem_setup_eps_neutron_sn(EPS eps) {
 }
 #endif
 
+
+int feenox_problem_neutron_sn_init_cosines(double mu1) {
+  int N_over_2 = neutron_sn.N/2;
+  double *mu = NULL;
+  feenox_check_alloc(mu = calloc(N_over_2, sizeof(double)));
+  
+  // equation 21 in stammler
+  // equation 4-8 in lewis
+  mu[0] = mu1;
+  double C = 2*(1-3*gsl_pow_2(mu1))/(neutron_sn.N-2);
+  for (int i = 1; i < N_over_2; i++) {
+    mu[i] = sqrt(gsl_pow_2(mu1) + C*i);
+  }
+  
+  // now we have to assign the cosines to each of the m directions
+  int m = 0;
+  for (int row = 0; row < N_over_2; row++) {
+    for (int col = 0; col <= row; col++) {
+      int i = N_over_2 - row - 1;
+      int j = col;
+      int k = N_over_2 + 2 - 3 - i - j;
+      
+      neutron_sn.Omega[m][0] = mu[i];
+      neutron_sn.Omega[m][1] = mu[j];
+      neutron_sn.Omega[m][2] = (feenox.pde.dim == 3) ? mu[k] : 0;
+      m++;
+      
+    }
+  }
+  
+  feenox_free(mu);
+  
+  return FEENOX_OK;
+}
+
+
+
+int feenox_problem_neutron_sn_init_triangles(double *weights_array) {
+  
+  int N_over_2 = neutron_sn.N/2;
+  
+  // allocate stuff
+  int ***tmp = NULL;
+  feenox_check_alloc(tmp = calloc(6, sizeof(int **)));
+  for (int p = 0; p < 6; p++) {
+    feenox_check_alloc(tmp[p] = calloc(N_over_2, sizeof(int *)));
+    for (int j = 0; j < N_over_2; j++) {
+      feenox_check_alloc(tmp[p][j] = calloc(N_over_2, sizeof(int)));
+    }
+  }
+  feenox_check_alloc(neutron_sn.SN_triangle = calloc(N_over_2, sizeof(int *)));
+  for (int j = 0; j < N_over_2; j++) {
+    feenox_check_alloc(neutron_sn.SN_triangle[j] = calloc(N_over_2, sizeof(int *)));
+  }
+
+  int *weight_map = NULL;
+  feenox_check_alloc(weight_map = calloc(neutron_sn.N*(neutron_sn.N+1)/2, sizeof(int)));
+
+  // fill in the 6 temporary triangles
+  int m = 1;
+  for (int i = N_over_2-1; i >= 0; i--) {
+    for (int j = 0; j < i+1; j++) {
+      tmp[0][i][j] = m;
+      m++;
+    }
+  }
+
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      tmp[1][i][i-j] = tmp[0][i][j];
+    }
+  }
+  
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      tmp[2][i][j] = tmp[1][N_over_2-i-1 + j][j];
+    }
+  }
+
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      tmp[3][i][j] = tmp[0][N_over_2-j-1][N_over_2-i-1];
+    }
+  }
+  
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      tmp[4][i][j] = tmp[3][N_over_2-i-1 + j][j];
+    }
+  }
+
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      tmp[5][i][j] = tmp[0][N_over_2-i-1 + j][j];
+    }
+  }
+  
+  // compute the min and create a map
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      int min = neutron_sn.N;
+      for (int p = 0; p < 6; p++) {
+        if (tmp[p][i][j] < min) {
+          min = tmp[p][i][j];
+        }
+      }
+      
+      neutron_sn.SN_triangle[i][j] = min;
+      weight_map[min] = 1;
+    }
+  }
+  
+  // assign the weight and create the SN triangle 
+  double N_octs = (feenox.pde.dim == 2) ? 4 : 8;
+  m = 0;
+  for (int i = 0; i < N_over_2; i++) {
+    for (int j = 0; j < i+1; j++) {
+      int w = 0;
+      for (int k = 0; k < neutron_sn.SN_triangle[i][j]; k++) {
+        w += weight_map[k] != 0;
+      }
+      neutron_sn.w[m] = weights_array[w]/N_octs;
+      neutron_sn.SN_triangle[i][j] = w;
+      m++;
+    }
+  }
+  
+
+  for (int p = 0; p < 6; p++) {
+    for (int i = 0; i < N_over_2; i++) {
+      feenox_free(tmp[p][i]);
+    }
+    feenox_free(tmp[p]);
+  }
+  feenox_free(weight_map);
+  
+  return FEENOX_OK;
+
+}
