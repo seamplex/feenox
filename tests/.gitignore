@@ -7,6 +7,7 @@ tmp.*
 mesh2d.msh
 square-centered.msh
 laplace-square.msh
+poisson-square.msh
 nafems-t1.msh
 nafems-t4.msh
 nafems-le10.msh
@@ -51,3 +52,5 @@ reaction-force.vtk
 la-IN.msh
 la-p*.msh
 la-p*.vtk
+ray-effect*.msh
+PF.msh

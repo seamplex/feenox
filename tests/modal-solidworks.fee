@@ -1,0 +1,10 @@
+READ_MESH PF.msh
+PROBLEM modal MODES 6 DIMENSIONS 3
+E = 204e3
+nu = 0.29
+rho = 7.858e-9
+BC top    fixed
+BC bottom fixed
+SOLVE_PROBLEM
+# PRINT_VECTOR f mu Mu Gamma
+PRINT %.3f Mu[6]

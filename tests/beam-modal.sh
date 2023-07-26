@@ -49,3 +49,8 @@ exitifwrong $?
 
 # answer1 beam-cantilever-modal-free-free.fee hex27 "373.9 796.8 1076.3 1806.1 2139.9 2458.0"
 # exitifwrong $?
+
+checkgmsh
+
+gmsh -v 0 -3 ${dir}/PF.geo || exit $?
+answer modal-solidworks.fee "0.507"

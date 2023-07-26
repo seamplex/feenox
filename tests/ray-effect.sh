@@ -12,10 +12,18 @@ fi
 checkgmsh
 checkpde neutron_sn
 
-gmsh -2 ${dir}/ray-effect.geo || exit $?
-answer ray-effect.fee 1.37095
+gmsh -v 0 -2 ${dir}/ray-effect-full.geo || exit $?
+answer2 ray-effect.fee full 8 "1.371"
 exitifwrong $?
 
-gmsh -2 ${dir}/ray-effect-full.geo || exit $?
-answer ray-effect-full.fee 1.37098
+gmsh -v 0 -2 ${dir}/ray-effect-half.geo || exit $?
+answer2 ray-effect.fee half 8 "1.371"
+exitifwrong $?
+
+gmsh -v 0 -2 ${dir}/ray-effect-quarter.geo || exit $?
+answer2 ray-effect.fee quarter 8 "1.371"
+exitifwrong $?
+
+gmsh -v 0 -2 ${dir}/ray-effect-eighth.geo || exit $?
+answer2 ray-effect.fee eighth 8 "1.366"
 exitifwrong $?
