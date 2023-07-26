@@ -248,7 +248,7 @@ double feenox_factor_function_eval(expr_item_t *this) {
   } else {
 
     double *x = NULL;
-    feenox_check_alloc(x = malloc(this->function->n_arguments*sizeof(double)));
+    feenox_check_alloc(x = calloc(this->function->n_arguments, sizeof(double)));
 
     unsigned int i;
     for (i = 0; i < this->function->n_arguments; i++) {
