@@ -379,11 +379,10 @@ int feenox_parse_line(void) {
 ///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME\ VIII Div\ 2 Sec\ 5.
 ///kw_pde+LINEARIZE_STRESS+usage LINEARIZE_STRESS
       // -----  -----------------------------------------------------------
-/*      
     } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
       feenox_call(feenox_parse_linearize_stress());
       return FEENOX_OK;      
-*/
+
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these
@@ -2959,10 +2958,13 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
       feenox.pde.progress_ascii = PETSC_TRUE;
 
-///kw_pde+PROBLEM+usage [ DETECT_HANGING_NODES
+///kw_pde+PROBLEM+usage [ DO_NOT_DETEC_HANGING_NODES
+    } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
+      feenox.pde.hanging_nodes = hanging_nodes_nothing;
+///kw_pde+PROBLEM+usage | DETECT_HANGING_NODES
 ///kw_pde+PROBLEM+detail If either `DETECT_HANGING_NODES` or `HANDLE_HANGING_NODES` are given, 
 ///kw_pde+PROBLEM+detail an intermediate check for nodes without any associated elements will be performed.
-///kw_pde+PROBLEM+detail For well-behaved meshes this check is redundant so by detault it is not done.
+///kw_pde+PROBLEM+detail For well-behaved meshes this check is redundant so by detault it is not done (`DO_NOT_DETEC_HANGING_NODES`).
 ///kw_pde+PROBLEM+detail With `DETECT_HANGING_NODES`, FeenoX will report the tag of the hanging nodes and stop.
     } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_detect;
@@ -2972,6 +2974,18 @@ int feenox_parse_problem(void) {
       feenox.pde.hanging_nodes = hanging_nodes_handle;
  
      
+///kw_pde+PROBLEM+usage [ DETECT_UNRESOLVED_BCS
+///kw_pde+PROBLEM+detail By default, FeenoX checks that all physical groups referred to in the `BC` keywors exists (`DETECT_UNRESOLVED_BCS`).
+    } else if (strcasecmp(token, "DETECT_UNRESOLVED_BCS") == 0) {
+      feenox.pde.unresolved_bcs = unresolved_bcs_detect;
+///kw_pde+PROBLEM+usage | ALLOW_UNRESOLVED_BCS ]@
+///kw_pde+PROBLEM+detail If `ALLOW_UNRESOLVED_BCS` is given, FeenoX will ignore unresolved boundary conditions instead of complaining.
+///kw_pde+PROBLEM+detail This is handy when using the same input for different meshes which might have different groups, for example
+///kw_pde+PROBLEM+detail solving the same problem using a full geometry or a symmetric geometry. 
+///kw_pde+PROBLEM+detail The latter should have at least one symmetry BC whilst the former does not.
+    } else if (strcasecmp(token, "ALLOW_UNRESOLVED_BCS") == 0) {
+      feenox.pde.unresolved_bcs = unresolved_bcs_allow;
+      
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
 ///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.

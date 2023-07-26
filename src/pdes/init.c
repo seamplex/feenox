@@ -457,20 +457,22 @@ int feenox_problem_init_runtime_general(void) {
       }
     }
 
-    // this is a loop over a hash, not over a linked list
-    for (bc_t *bc = feenox.mesh.bcs; bc != NULL; bc = bc->hh.next) {
-      if (bc->has_explicit_groups == 0) {
-        physical_group_t *physical_group;
-        HASH_FIND_STR(feenox.pde.mesh->physical_groups, bc->name, physical_group);
+    if (feenox.pde.unresolved_bcs == unresolved_bcs_detect) {
+      // this is a loop over a hash, not over a linked list
+      for (bc_t *bc = feenox.mesh.bcs; bc != NULL; bc = bc->hh.next) {
+        if (bc->has_explicit_groups == 0) {
+          physical_group_t *physical_group;
+          HASH_FIND_STR(feenox.pde.mesh->physical_groups, bc->name, physical_group);
     
-        if (physical_group == NULL) {
-          feenox_push_error_message("boundary condition '%s' does not have a physical group in mesh file '%s'", bc->name, feenox.pde.mesh->file->path);
-          return FEENOX_ERROR;
-        }
+          if (physical_group == NULL) {
+            feenox_push_error_message("boundary condition '%s' does not have a physical group in mesh file '%s'. Set ALLOW_UNRESOLVED_BCS if you want to skip this check.", bc->name, feenox.pde.mesh->file->path);
+            return FEENOX_ERROR;
+          }
       
-        if (physical_group->n_elements == 0) {
-          feenox_push_error_message("physical group for boundary condition '%s' does not have any elements", bc->name);
-          return FEENOX_ERROR;
+          if (physical_group->n_elements == 0) {
+            feenox_push_error_message("physical group for boundary condition '%s' does not have any elements. Set ALLOW_UNRESOLVED_BCS if you want to skip this check.", bc->name);
+            return FEENOX_ERROR;
+          }
         }
       }
     }

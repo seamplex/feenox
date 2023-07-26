@@ -344,14 +344,14 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
       break;
     }
     
+//#define CACHED    
+#ifdef CACHED
     // this is a hash of elements we already saw so we do not need to check for them many times
     struct cached_element {
       int id;
       UT_hash_handle hh;
     };
-      
-//#define CACHED    
-#ifdef CACHED
+    
     struct cached_element *cache = NULL;
     struct cached_element *tmp = NULL;
     struct cached_element *cached_element = NULL;
@@ -361,7 +361,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     struct kdres *presults = kd_nearest_range(mesh->kd_nodes, x, feenox_var_value(feenox.mesh.vars.mesh_failed_interpolation_factor)*sqrt(dist2));
       
     while(element == NULL && kd_res_end(presults) == 0) {
-      node_t *second_nearest_node = (node_t *)(kd_res_item(presults, nearest_node->x));
+      node_t *second_nearest_node = (node_t *)(kd_res_item(presults, NULL));
       element_ll_t *element_item = NULL;
       LL_FOREACH(second_nearest_node->element_list, element_item) {
         

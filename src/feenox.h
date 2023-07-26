@@ -1663,6 +1663,16 @@ struct feenox_t {
       symmetry_axis_x,
       symmetry_axis_y
     } symmetry_axis;
+    
+    enum  {
+      hanging_nodes_nothing,
+      hanging_nodes_detect,
+      hanging_nodes_handle
+    } hanging_nodes;
+    enum  {
+      unresolved_bcs_detect,
+      unresolved_bcs_allow
+    } unresolved_bcs;
 
     // these can be read from the input but also we can figure them out
     enum {
@@ -1683,18 +1693,13 @@ struct feenox_t {
       eigen_formulation_omega,
       eigen_formulation_lambda
     } eigen_formulation;
-    
+
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
     unsigned int dofs;             // DoFs per node/cell
     size_t width;                  // number of expected non-zeros per row
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t size_global;            // total number of DoFs
     
-    enum  {
-      hanging_nodes_nothing,
-      hanging_nodes_detect,
-      hanging_nodes_handle
-    } hanging_nodes;
     int compute_gradients;   // do we need to compute gradients?
     gsl_matrix *m2;
     
