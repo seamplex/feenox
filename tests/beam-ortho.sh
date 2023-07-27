@@ -12,7 +12,7 @@ fi
 checkpde mechanical
 
 # the meshes are in the git repository, but just in case this is how they can be re-generated
-# for i in beam-cantilever-*.geo; do gmsh -3 $i; done
+# for i in beam-cantilever-*.geo; do gmsh -v 0 -3 $i; done
 
 
 answer1 orthotropic-beam.fee tet4 "12.5 2.4 2.3 -2.4 -2.6"

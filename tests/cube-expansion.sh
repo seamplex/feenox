@@ -12,7 +12,7 @@ fi
 checkpde mechanical
 checkgmsh
 
-gmsh -3 ${dir}/cube.geo || exit $?
+gmsh -v 0 -3 ${dir}/cube.geo || exit $?
 
 answerzero cube-free-expansion-uniform-isotropic.fee
 exitifwrong $?

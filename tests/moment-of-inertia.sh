@@ -12,14 +12,14 @@ fi
 checkgmsh
 
 if [ ! -e ${dir}/i-beam-hex.msh ]; then
-  gmsh -3 ${dir}/i-beam-hex.geo || exit $?
+  gmsh -v 0 -3 ${dir}/i-beam-hex.geo || exit $?
 fi
 
 answer1zero moment-of-inertia.fee hex
 exitifwrong $?
 
 if [ ! -e ${dir}/i-beam-tet.msh ]; then
-  gmsh -3 ${dir}/i-beam-tet.geo || exit $?
+  gmsh -v 0 -3 ${dir}/i-beam-tet.geo || exit $?
 fi
 
 answer1zero moment-of-inertia.fee tet

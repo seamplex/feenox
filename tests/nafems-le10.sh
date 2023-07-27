@@ -12,6 +12,6 @@ fi
 checkpde mechanical
 checkgmsh
 
-gmsh -3 ${dir}/nafems-le10.geo || exit $?
+gmsh -v 0 -3 ${dir}/nafems-le10.geo || exit $?
 answerdiff nafems-le10.fee
 exitifwrong $?

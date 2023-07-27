@@ -20,6 +20,6 @@ BC symmetry q=0
 BC external T=420
 
 SOLVE_PROBLEM
-PRINT %.0f T_max-1128
+PRINT %.0f T_max-1115
 
 # WRITE_MESH pellet-nonlinear.vtk T

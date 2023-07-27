@@ -14,7 +14,7 @@ checkgmsh
 
 for i in ${dir}/nafems-le11-*.geo; do
  if [ -e ${i} ]; then
-   gmsh -3 ${i} || exit $?
+   gmsh -v 0 -3 ${i} || exit $?
  else
    exit 77
  fi

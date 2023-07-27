@@ -13,6 +13,6 @@ checkgmsh
 checkslepc
 checkpde modal
 
-gmsh -3 ${dir}/annulus.geo || exit $?
+gmsh -v 0 -3 ${dir}/annulus.geo || exit $?
 answerdiff annulus-modal.fee
 exitifwrong $?

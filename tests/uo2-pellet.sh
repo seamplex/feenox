@@ -12,7 +12,7 @@ fi
 checkpde thermal
 checkgmsh
 
-gmsh -3 ${dir}/pellet.geo || exit $?
+gmsh -v 0 -3 ${dir}/pellet.geo || exit $?
 
 # run with --ksp_view to see the difference between these two
 answerzero pellet-linear.fee 5e-2

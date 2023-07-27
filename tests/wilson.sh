@@ -12,10 +12,10 @@ fi
 checkpde thermal
 checkgmsh
 
-gmsh -1 ${dir}/wilson-1d.geo || exit $?
+gmsh -v 0 -1 ${dir}/wilson-1d.geo || exit $?
 answerzero wilson-1d.fee
 exitifwrong $?
 
-gmsh -2 ${dir}/wilson-2d.geo || exit $?
+gmsh -v 0 -2 ${dir}/wilson-2d.geo || exit $?
 answerzero wilson-2d.fee 2e-2
 exitifwrong $?

@@ -13,7 +13,7 @@ checkslepc
 checkpde modal
 
 # the meshes are in the git repository, but just in case this is how they can be re-generated
-# for i in beam-cantilever-*.geo; do gmsh -3 $i; done
+# for i in beam-cantilever-*.geo; do gmsh -v 0 -3 $i; done
 
 
 answer1 beam-cantilever-modal.fee tet4 "249.7 341.2 1506.1 1962.4 2639.7 4050.7"

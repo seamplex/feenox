@@ -14,11 +14,11 @@ fi
 checkgmsh
 
 checkpde mechanical
-gmsh -2 ${dir}/nafems-t1.geo || exit $?
+gmsh -v 0 -2 ${dir}/nafems-t1.geo || exit $?
 answerfloat nafems-t1.fee 50 0.1
 exitifwrong $?
 
 checkpde thermal
-gmsh -2 ${dir}/nafems-t4.geo || exit $?
+gmsh -v 0 -2 ${dir}/nafems-t4.geo || exit $?
 answer nafems-t4.fee 18.3
 exitifwrong $?

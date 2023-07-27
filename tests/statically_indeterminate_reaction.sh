@@ -12,7 +12,7 @@ fi
 checkpde mechanical
 checkgmsh
 
-gmsh -3 ${dir}/statically_indeterminate_reaction.geo || exit $?
+gmsh -v 0 -3 ${dir}/statically_indeterminate_reaction.geo || exit $?
 
 answerzero statically_indeterminate_reaction.fee 1e-2
 exitifwrong $?
