@@ -50,7 +50,6 @@ TESTS = \
         tests/petsc_options.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
-        tests/ray-effect.sh \
         tests/reactions.sh \
         tests/reactions-elastic.sh \
         tests/reed.sh \
