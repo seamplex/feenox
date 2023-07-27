@@ -9,7 +9,7 @@ $ feenox thermal-1d-dirichlet-constant-k.fee
 $ 
 ```
 
-The mesh is assumed to have been already created with [Gmsh](http://gmsh.info/) (or any other pre-processing tool and converted to `.msh` format with [Meshio](https://github.com/nschloe/meshio) for example). This assumption follows the _rule of composition_  and prevents the actual input file to be polluted with mesh-dependent data (such as node coordinates and/or nodal loads) so as to keep it simple and make it [Git](https://git-scm.com/)-friendly (_rule of generation_). The only link between the mesh and the FeenoX input file is through physical groups (in the case above `left` and `right`) used to set boundary conditions and/or material properties.
+The mesh is assumed to have been already created with [Gmsh](http://gmsh.info/) (or any other pre-processing tool and converted to `.msh` format with [Meshio](https://github.com/nschloe/meshio) for example). This assumption follows the _rule of composition_  and prevents the actual input file from being polluted with mesh-dependent data (such as node coordinates and/or nodal loads) so as to keep it simple and make it [Git](https://git-scm.com/)-friendly (_rule of generation_). The only link between the mesh and the FeenoX input file is through physical groups (in the case above `left` and `right`) used to set boundary conditions and/or material properties.
 
 Another design-basis decision is that **similar problems ought to have similar inputs** (_rule of least surprise_). So in order to have a space-dependent conductivity, we only have to replace one line in the input above: instead of defining a scalar\ $k$ we define a function of\ $x$ (we also update the output to show the analytical solution as well):
 

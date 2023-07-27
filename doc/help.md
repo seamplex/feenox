@@ -22,6 +22,11 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 :    list the types of `PROBLEM`s that FeenoX can solve, one per line
 
 
+`--elements_info`
+
+:    output a document with information about the supported element types
+
+
 `--progress`
 
 :    print ASCII progress bars when solving PDEs

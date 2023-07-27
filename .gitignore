@@ -18,6 +18,8 @@ test-driver
 test-suite.log
 version.m4
 ChangeLog
+.deps
+*.Po
 
 # doc
 /README.html
@@ -61,4 +63,10 @@ long-bar-*.msh
 map-*.msh
 mesh2d.vtk
 spinning-disk-parallel-*.vtk
-
+thermal-square*.msh
+thermal-two-squares-*.msh
+ray-effect-*.msh
+orthotropic-beam-*.msh
+heater-cylinder-inches.vtk
+poisson-square.msh
+reaction-force.vtk

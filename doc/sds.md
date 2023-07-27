@@ -265,7 +265,8 @@ $ wget http://gmsh.info/bin/Linux/gmsh-Linux64.tgz
 $ wget https://seamplex.com/feenox/dist/linux/feenox-linux-amd64.tar.gz
 ```
 
-Appendix @sec:download has more details about how to download and compile FeenoX. The full documentation contains a [compilation guide](https://seamplex.com/feenox/doc/compilation.html) with further detailed explanations of each of the steps involved.
+Appendix @sec:download has more details about how to download and compile FeenoX.
+The full documentation contains a [compilation guide](https://seamplex.com/feenox/doc/compilation.html) with further detailed explanations of each of the steps involved.
 Since all the commands needed to either download a binary executable or to compile from source with customized optimization flags can be automatized, FeenoX can be built into a container such as Docker. This way, deployment and scalability can be customized and tweaked as needed.
 
 

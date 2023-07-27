@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2023-06-13" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2023-07-27" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -151,6 +151,9 @@ display detailed version information
 .TP
 \f[V]--pdes\f[R]
 list the types of \f[V]PROBLEM\f[R]s that FeenoX can solve, one per line
+.TP
+\f[V]--elements_info\f[R]
+output a document with information about the supported element types
 .TP
 \f[V]--progress\f[R]
 print ASCII progress bars when solving PDEs
@@ -1194,7 +1197,8 @@ Ask FeenoX to solve a partial differential equation problem.
 \f[C]
 PROBLEM { laplace | mechanical | modal | neutron_diffusion | neutron_sn | thermal }
  [ 1D | 2D | 3D | DIM <expr> ] [ AXISYMMETRIC { x | y } ] 
- [ MESH <identifier> ] [ PROGRESS ] [ DETECT_HANGING_NODES | HANDLE_HANGING_NODES ]
+ [ MESH <identifier> ] [ PROGRESS ] [ DO_NOT_DETEC_HANGING_NODES | DETECT_HANGING_NODES | HANDLE_HANGING_NODES ]
+ [ DETECT_UNRESOLVED_BCS | ALLOW_UNRESOLVED_BCS ]
  [ TRANSIENT | QUASISTATIC ] [ LINEAR | NON_LINEAR ] 
  [ MODES <expr> ] 
  [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
@@ -1252,11 +1256,20 @@ If either \f[V]DETECT_HANGING_NODES\f[R] or
 \f[V]HANDLE_HANGING_NODES\f[R] are given, an intermediate check for
 nodes without any associated elements will be performed.
 For well-behaved meshes this check is redundant so by detault it is not
-done.
+done (\f[V]DO_NOT_DETEC_HANGING_NODES\f[R]).
 With \f[V]DETECT_HANGING_NODES\f[R], FeenoX will report the tag of the
 hanging nodes and stop.
 With \f[V]HANDLE_HANGING_NODES\f[R], FeenoX will fix those nodes and try
 to solve the problem anyway.
+By default, FeenoX checks that all physical groups referred to in the
+\f[V]BC\f[R] keywors exists (\f[V]DETECT_UNRESOLVED_BCS\f[R]).
+If \f[V]ALLOW_UNRESOLVED_BCS\f[R] is given, FeenoX will ignore
+unresolved boundary conditions instead of complaining.
+This is handy when using the same input for different meshes which might
+have different groups, for example solving the same problem using a full
+geometry or a symmetric geometry.
+The latter should have at least one symmetry BC whilst the former does
+not.
 If the special variable \f[V]end_time\f[R] is zero, FeenoX solves a
 static problem\[em]although the variable \f[V]static_steps\f[R] is still
 honored.

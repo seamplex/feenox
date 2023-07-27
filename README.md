@@ -75,7 +75,7 @@ doc/why.md
 
 # How is FeenoX different?
 
-FeenoX meets a fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) that no other single tool (that I am aware of) meets completely.
+FeenoX meets fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html).
 The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
 Two of the most important design-basis features are that FeenoX is...
 
@@ -87,7 +87,7 @@ But the most important idea is that FeenoX provides a general mathematical frame
   - parse the input file, handle command-line arguments, read mesh files, assign variables, evaluate conditionals, write results, etc.
 
     ```feenox
-    PROBLEM laplace 3D
+    PROBLEM laplace 2D
     READ_MESH square-$1.msh
     [...]
     WRITE_RESULTS FORMAT vtk
@@ -112,7 +112,7 @@ But the most important idea is that FeenoX provides a general mathematical frame
     BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
     ```
 
-  - access shape functions and its derivatives evaluated at gauss points or at arbitrary locations for computing elementary contributions to
+  - access shape functions and its derivatives evaluated eitehr at Gauss points or at arbitrary locations for computing elementary contributions to
      * stiffness matrix
      * mass matrix
      * right-hand side vector
@@ -123,7 +123,7 @@ But the most important idea is that FeenoX provides a general mathematical frame
     * [TS](https://petsc.org/release/manual/ts/) for transient problems
     * [EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html) for eigenvalue problems
 
-This general framework constitutes the bulk of [FeenoX source code](https://github.com/seamplex/feenox).
+This general framework constitutes the bulk of [FeenoX’s source code](https://github.com/seamplex/feenox).
 The particular functions that implement each problem type are located in subdirectories [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes), namely
 
 ```include

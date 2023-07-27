@@ -97,11 +97,10 @@ programs (like [Code_Aster][] with [Salome-Meca][] or [CalculiX][] with
 
 # How is FeenoX different?
 
-FeenoX meets a fictitious-yet-plausible [Software Requirement
-Specifications][] that no other single tool (that I am aware of) meets
-completely. The FeenoX [Software Design Specifications][] address each
-requirement of the SRS. Two of the most important design-basis features
-are that FeenoX is…
+FeenoX meets fictitious-yet-plausible [Software Requirement
+Specifications][]. The FeenoX [Software Design Specifications][] address
+each requirement of the SRS. Two of the most important design-basis
+features are that FeenoX is…
 
 1.  a cloud-native computational tool (not just cloud *friendly,* but
     cloud **first**).
@@ -117,7 +116,7 @@ FeenoX will provide means to
   assign variables, evaluate conditionals, write results, etc.
 
   ``` feenox
-  PROBLEM laplace 3D
+  PROBLEM laplace 2D
   READ_MESH square-$1.msh
   [...]
   WRITE_RESULTS FORMAT vtk
@@ -143,8 +142,9 @@ FeenoX will provide means to
   BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
   ```
 
-- access shape functions and its derivatives evaluated at gauss points
-  or at arbitrary locations for computing elementary contributions to
+- access shape functions and its derivatives evaluated eitehr at Gauss
+  points or at arbitrary locations for computing elementary
+  contributions to
 
   - stiffness matrix
   - mass matrix
@@ -158,7 +158,7 @@ FeenoX will provide means to
   - [TS][] for transient problems
   - [EPS][] for eigenvalue problems
 
-This general framework constitutes the bulk of [FeenoX source code][].
+This general framework constitutes the bulk of [FeenoX’s source code][].
 The particular functions that implement each problem type are located in
 subdirectories [`src/pdes`][], namely
 
@@ -199,7 +199,7 @@ terms][Licensing].
   [SNES]: https://petsc.org/release/manual/snes/
   [TS]: https://petsc.org/release/manual/ts/
   [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
-  [FeenoX source code]: https://github.com/seamplex/feenox
+  [FeenoX’s source code]: https://github.com/seamplex/feenox
   [`src/pdes`]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [`laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [`thermal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal
@@ -261,12 +261,12 @@ $
 The mesh is assumed to have been already created with [Gmsh][2] (or any
 other pre-processing tool and converted to `.msh` format with [Meshio][]
 for example). This assumption follows the *rule of composition* and
-prevents the actual input file to be polluted with mesh-dependent data
-(such as node coordinates and/or nodal loads) so as to keep it simple
-and make it [Git][]-friendly (*rule of generation*). The only link
-between the mesh and the FeenoX input file is through physical groups
-(in the case above `left` and `right`) used to set boundary conditions
-and/or material properties.
+prevents the actual input file from being polluted with mesh-dependent
+data (such as node coordinates and/or nodal loads) so as to keep it
+simple and make it [Git][]-friendly (*rule of generation*). The only
+link between the mesh and the FeenoX input file is through physical
+groups (in the case above `left` and `right`) used to set boundary
+conditions and/or material properties.
 
 Another design-basis decision is that **similar problems ought to have
 similar inputs** (*rule of least surprise*). So in order to have a

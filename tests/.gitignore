@@ -54,3 +54,4 @@ la-p*.msh
 la-p*.vtk
 ray-effect*.msh
 PF.msh
+thermal-two-squares-material-explicit-uniform.msh
