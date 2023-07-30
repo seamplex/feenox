@@ -128,12 +128,12 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
       for (unsigned int g_prime = 0; g_prime < neutron_sn.groups; g_prime++) {
         for (unsigned int m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
           // scattering
-          double s = -neutron_sn.w[m_prime] * neutron_sn.Sigma_s0[g_prime][g].value;
+          double accum = -neutron_sn.w[m_prime] * neutron_sn.Sigma_s0[g_prime][g].value;
           // anisotropic scattering l = 1
           if (neutron_sn.Sigma_s1[g_prime][g].defined) {
-            s -= neutron_sn.w[m_prime] * neutron_sn.Sigma_s1[g_prime][g].value * 3.0 * feenox_mesh_dot(neutron_sn.Omega[m], neutron_sn.Omega[m_prime]);
+            accum -= neutron_sn.w[m_prime] * neutron_sn.Sigma_s1[g_prime][g].value * 3.0 * feenox_mesh_dot(neutron_sn.Omega[m], neutron_sn.Omega[m_prime]);
           }
-          gsl_matrix_set(neutron_sn.R, diag, dof_index(m_prime,g_prime), s);
+          gsl_matrix_set(neutron_sn.R, diag, dof_index(m_prime,g_prime), accum);
 
           // fision
           if (neutron_sn.has_fission) {
@@ -143,16 +143,16 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
       }
 
       // absorption
-      double xi = gsl_matrix_get(neutron_sn.R, diag, diag);
+      double accum = gsl_matrix_get(neutron_sn.R, diag, diag);
       if (neutron_sn.Sigma_t[g].defined) {
-        xi += neutron_sn.Sigma_t[g].value;
+        accum += neutron_sn.Sigma_t[g].value;
       } else {
-        xi += neutron_sn.Sigma_a[g].value;
+        accum += neutron_sn.Sigma_a[g].value;
         for (unsigned int g_prime = 0; g_prime < neutron_sn.groups; g_prime++) {
-          xi += neutron_sn.Sigma_s0[g][g_prime].value;
+          accum += neutron_sn.Sigma_s0[g][g_prime].value;
         }
       }
-      gsl_matrix_set(neutron_sn.R, diag, diag, xi);
+      gsl_matrix_set(neutron_sn.R, diag, diag, accum);
     }
   }
 
@@ -180,12 +180,12 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   feenox_call(gsl_matrix_memcpy(neutron_sn.P, e->type->H_Gc[q]));
   for (unsigned int j = 0; j < neutron_sn.n_nodes; j++) {
     int MGj = MG*j;
-    for (unsigned int n = 0; n < neutron_sn.directions; n++) {
-      for (unsigned int m = 0; m < feenox.pde.dim; m++) {
-        double xi = tau * neutron_sn.Omega[n][m] * gsl_matrix_get(e->B[q], m, j);
+    for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+      for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+        double value = tau * neutron_sn.Omega[m][d] * gsl_matrix_get(e->B[q], d, j);
         for (unsigned int g = 0; g < neutron_sn.groups; g++) {
-          int diag = dof_index(n,g);
-          gsl_matrix_add_to_element(neutron_sn.P, diag, MGj + diag, xi);
+          int diag = dof_index(m,g);
+          gsl_matrix_add_to_element(neutron_sn.P, diag, MGj + diag, value);
         }
       }
     }
