@@ -27,7 +27,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
+//  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
 
   double *x = feenox_mesh_compute_x_at_gauss_if_needed(e, q, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
   material_t *material = feenox_mesh_get_material(e);  

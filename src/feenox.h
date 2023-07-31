@@ -985,8 +985,8 @@ struct gauss_t {
   double **xi;         // coordinates (xi[q][d] is the coordinate of the q-th point in dimension d)
   
   // one matrix for each gauss point q
-  gsl_matrix **H_c;    // H(1,j) = h_j(x_q)
-  gsl_matrix **B_c;    // B(d,j) = d(h_j)/d(x_d) at x_q
+  gsl_matrix **H_c;    // H(1,j) = h_j(xi_q)
+  gsl_matrix **B_c;    // B(d,j) = d(h_j)/d(xi_d) at xi_q
   gsl_matrix *extrap;  // matrix to extrapolate the values from the gauss points to the nodes
 };
 
@@ -1896,6 +1896,7 @@ struct feenox_t {
     expr_t st_shift;
     expr_t st_anti_shift;  
 
+    // TODO: this is not thread safe!
     // elemental (local) objects
     size_t n_local_nodes;
     unsigned int elemental_size;  // current size of objects = n_local_nodes * dofs
@@ -2150,7 +2151,7 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *);
-extern gsl_matrix *feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+extern gsl_matrix *feenox_mesh_matrix_invert(gsl_matrix *direct);
 extern material_t *feenox_mesh_get_material(element_t *e);
 //extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q);
 //extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q);
@@ -2165,20 +2166,20 @@ extern double feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int q, int i
 
 extern gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
 
-extern gsl_matrix *feenox_mesh_compute_J(element_t *e, double *r, gsl_matrix *J);
-extern gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_mesh_compute_J(element_t *e, double *r);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration);
 
-extern gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi, gsl_matrix *B_c);
+extern gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi);
 
-extern gsl_matrix *feenox_mesh_compute_B(element_t *e, double *r, gsl_matrix *invJ_ref, gsl_matrix *B);
-extern gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *B);
-extern gsl_matrix *feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration, gsl_matrix *B_Gc);
-extern gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *B_G);
+extern gsl_matrix *feenox_mesh_compute_B(element_t *e, double *r, gsl_matrix *invJ_ref);
+extern gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
 
-extern gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *invJ);
+extern gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration);
 extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
 
 #define feenox_mesh_update_coord_vars(val) {\
