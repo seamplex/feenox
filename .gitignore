@@ -65,7 +65,7 @@ mesh2d.vtk
 spinning-disk-parallel-*.vtk
 thermal-square*.msh
 thermal-two-squares-*.msh
-ray-effect-*.msh
+ray-effect-*-?.msh
 orthotropic-beam-*.msh
 heater-cylinder-inches.vtk
 poisson-square.msh
