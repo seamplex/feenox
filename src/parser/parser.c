@@ -2985,6 +2985,13 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail The latter should have at least one symmetry BC whilst the former does not.
     } else if (strcasecmp(token, "ALLOW_UNRESOLVED_BCS") == 0) {
       feenox.pde.unresolved_bcs = unresolved_bcs_allow;
+
+///kw_pde+PROBLEM+usage [ PREALLOCATE ]
+    } else if (strcasecmp(token, "PREALLOCATE") == 0) {
+      feenox.pde.pre_allocate = PETSC_TRUE;
+///kw_pde+PROBLEM+usage [ ALLOW_NEW_NONZEROS ]
+    } else if (strcasecmp(token, "ALLOW_NEW_NONZEROS") == 0) {
+      feenox.pde.allow_new_nonzeros = PETSC_TRUE;
       
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.

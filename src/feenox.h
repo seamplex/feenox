@@ -1817,6 +1817,7 @@ struct feenox_t {
 
 #ifdef HAVE_PETSC    
     char *petsc_options;
+    PetscBool pre_allocate;        // preallocate? onyl works for petsc >= 3.19
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
 

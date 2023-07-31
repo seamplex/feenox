@@ -598,11 +598,11 @@ Mat feenox_problem_create_matrix(const char *name) {
   Mat A = NULL;
   petsc_call_null(MatCreate(PETSC_COMM_WORLD, &A));
   petsc_call_null(MatSetSizes(A, feenox.pde.size_local, feenox.pde.size_local, feenox.pde.size_global, feenox.pde.size_global));
+  if (feenox.pde.pre_allocate == PETSC_TRUE || PETSC_VERSION_LT(3,19,0)) {
+    petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULLPTR, feenox.pde.width, PETSC_NULLPTR));
+    petsc_call_null(MatSeqAIJSetPreallocation(A, feenox.pde.width, PETSC_NULLPTR));
+  }
   petsc_call_null(MatSetFromOptions(A));
-//#if PETSC_VERSION_LT(3,19,0)
-  petsc_call_null(MatMPIAIJSetPreallocation(A, feenox.pde.width, PETSC_NULLPTR, feenox.pde.width, PETSC_NULLPTR));
-  petsc_call_null(MatSeqAIJSetPreallocation(A, feenox.pde.width, PETSC_NULLPTR));
-//#endif
 
   // this flag needs the matrix type to be set, and we had just set it with setfromoptions   
   petsc_call_null(MatSetOption(A, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE));
@@ -611,7 +611,7 @@ Mat feenox_problem_create_matrix(const char *name) {
     petsc_call_null(PetscObjectSetName((PetscObject)(A), name));
   }
   
-  if (feenox.pde.allow_new_nonzeros) {
+  if (feenox.pde.allow_new_nonzeros == PETSC_TRUE) {
     petsc_call_null(MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
   }  
   
