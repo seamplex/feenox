@@ -1819,6 +1819,7 @@ struct feenox_t {
     char *petsc_options;
     PetscBool pre_allocate;        // preallocate? onyl works for petsc >= 3.19
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
+    PetscBool cache_B;
     PetscBool petscinit_called;    // flag
 
     // stuff for mpi parallelization
@@ -2149,36 +2150,35 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 
 // fem.c
 extern double feenox_mesh_determinant(gsl_matrix *);
-extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+extern gsl_matrix *feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
 extern material_t *feenox_mesh_get_material(element_t *e);
-extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q);
-extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q);
+//extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q);
+//extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q);
 
-extern int feenox_mesh_compute_C(element_t *e);
+extern gsl_matrix *feenox_mesh_compute_C(element_t *e, gsl_matrix *C);
 
-extern int feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
+extern double *feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
 extern double *feenox_mesh_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int condition);
 extern double *feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int condition);
 
-extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int q, int integration);
+extern double feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int q, int integration);
 
-extern int feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
 
-extern int feenox_mesh_compute_J(element_t *e, double *r, gsl_matrix *dxdxi);
-extern int feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_J(element_t *e, double *r, gsl_matrix *J);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration);
 
+extern gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi, gsl_matrix *B_c);
 
-extern gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi);
+extern gsl_matrix *feenox_mesh_compute_B(element_t *e, double *r, gsl_matrix *invJ_ref, gsl_matrix *B);
+extern gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *B);
+extern gsl_matrix *feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration, gsl_matrix *B_Gc);
+extern gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *B_G);
 
-extern int feenox_mesh_compute_B(element_t *e, double *r, gsl_matrix *dxidx_ref, gsl_matrix *dhdx);
-extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
-extern int feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
-
-extern int feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *invJ);
 extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
 
 #define feenox_mesh_update_coord_vars(val) {\

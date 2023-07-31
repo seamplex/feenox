@@ -76,16 +76,12 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
     
   } else {
     
-    gsl_matrix *dhdx = gsl_matrix_alloc(element->type->nodes, element->type->dim);
-    
-    feenox_mesh_compute_B(element, r, NULL, dhdx);
-      
+    gsl_matrix *B = feenox_mesh_compute_B(element, r, NULL, NULL);
     for (int j = 0; j < element->type->nodes; j++) {
-      y += gsl_matrix_get(dhdx, j, this->spatial_derivative_with_respect_to)
+      y += gsl_matrix_get(B, j, this->spatial_derivative_with_respect_to)
             * feenox_vector_get(this->spatial_derivative_of->vector_value, element->node[j]->index_mesh);
     }
-    
-    gsl_matrix_free(dhdx);
+    gsl_matrix_free(B);
     
   }  
   
