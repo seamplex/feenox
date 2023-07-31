@@ -1,6 +1,12 @@
 # Current
 
  * under development
+ * `PREALLOCATE` and `ALLOW_NEW_NONZEROS` options
+ * choose either to fail or allow missed `BC`s
+ * updated internal naming of FEM matrices to match the doc
+ * dump element drawings, node ordering and shape functions with `--elements_info`
+ * cleaned up source distributions
+ * CI using Github actions
  * Los Alamos criticallity benchmarks in tests
  * support for reading VTK v5 files
  * WRITE_RESULTS keyword
