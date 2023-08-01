@@ -174,7 +174,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
       } else {
         gsl_matrix_set_zero(e->dphidx_gauss[q]);
       }
-      feenox_call(feenox_mesh_compute_B_at_gauss(e, q, mesh->integration));
+      feenox_mesh_compute_B_at_gauss(e, q, mesh->integration);
 
       // aca habria que hacer una matriz con los phi globales
       // (de j y g, que de paso no depende de q asi que se podria hacer afuera del for de q)
@@ -228,9 +228,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
       } else {
         
         // direct evalution at the nodes
-        gsl_matrix *dhdx = NULL;
-        feenox_check_alloc(dhdx = gsl_matrix_calloc(J, feenox.pde.dim));
-        feenox_call(feenox_mesh_compute_B(e, e->type->node_coords[j], NULL, dhdx));
+        gsl_matrix *dhdx = feenox_mesh_compute_B(e, e->type->node_coords[j], NULL);
       
         // the derivatives of each dof g with respect to the coordinate mas nueve derivadas (o menos)
         // TODO: como arriba, aunque hay que pelar ojo si hay menos DOFs

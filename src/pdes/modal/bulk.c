@@ -43,7 +43,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
+//  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
   material_t *material = feenox_mesh_get_material(e);
   
   if (modal.n_nodes != e->type->nodes) {
@@ -52,7 +52,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   
   if (modal.uniform_C == 0) {
     // material stress-strain relationship
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+    feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
     modal.compute_C(e->x[q], material);
   }
   

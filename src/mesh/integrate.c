@@ -76,7 +76,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
             for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
+              feenox_mesh_compute_w_det_at_gauss(element, q, mesh->integration);
 
               double xi = 0;
               for (unsigned int j = 0; j < element->type->nodes; j++) {
@@ -96,7 +96,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
             for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
+              feenox_mesh_compute_w_det_at_gauss(element, q, mesh->integration);
               // TODO: check if the integrand depends on space
               feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
               integral += element->w[q] * feenox_function_eval(mesh_integrate->function, element->x[q]);
@@ -127,7 +127,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
         if ((physical_group == NULL && element->type->dim == mesh->dim) ||
             (physical_group != NULL && element->physical_group == physical_group)) {
           for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-            feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
+            feenox_mesh_compute_w_det_at_gauss(element, q, mesh->integration);
             // TODO: check is the integrand depends on space
             feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
             feenox_mesh_update_coord_vars(element->x[q]);
@@ -161,7 +161,7 @@ double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function
   double xi = 0;
 
   for (unsigned int q = 0; q < this->type->gauss[mesh->integration].Q; q++) {
-    feenox_mesh_compute_w_at_gauss(this, q, mesh->integration);
+    feenox_mesh_compute_w_det_at_gauss(this, q, mesh->integration);
  
     xi = 0;
     for (unsigned int j = 0; j < this->type->nodes; j++) {

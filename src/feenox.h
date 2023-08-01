@@ -2156,13 +2156,13 @@ extern material_t *feenox_mesh_get_material(element_t *e);
 //extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q);
 //extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q);
 
-extern gsl_matrix *feenox_mesh_compute_C(element_t *e, gsl_matrix *C);
+extern gsl_matrix *feenox_mesh_compute_C(element_t *e);
 
 extern double *feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
 extern double *feenox_mesh_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int condition);
 extern double *feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int condition);
 
-extern double feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int q, int integration);
+extern double feenox_mesh_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration);
 
 extern gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
 

@@ -45,7 +45,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
+//  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
 
   if (mechanical.n_nodes != e->type->nodes) {
     feenox_call(feenox_problem_build_allocate_aux_mechanical(e->type->nodes));
@@ -53,7 +53,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
   if (mechanical.uniform_C == 0) {
     // material stress-strain relationship
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+    feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
     mechanical.compute_C(e->x[q], e->physical_group != NULL ? e->physical_group->material : NULL);
   }
   
@@ -98,7 +98,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   // volumetric force densities
   if (mechanical.f_x.defined || mechanical.f_y.defined || mechanical.f_z.defined) {
     if (mechanical.f_x.uniform == 0 || mechanical.f_y.uniform == 0 || mechanical.f_z.uniform == 0) {
-      feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+      feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
     }
     
     for (int j = 0; j < e->type->nodes; j++) {
@@ -128,7 +128,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
     // if C is not uniform we already have x
     if (mechanical.uniform_C == 1 && mechanical.uniform_expansion == 0) {
-      feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+      feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
     }
     mechanical.compute_thermal_strain(e->x[q], e->physical_group != NULL ? e->physical_group->material : NULL);
     
