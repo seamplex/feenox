@@ -70,6 +70,13 @@ int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer)
   
   switch (this->format) {
     case dump_format_default:
+    case dump_format_octave:
+      feenox_check_minusone(asprintf(&path, "%s.m", name));
+      petsc_call(PetscViewerASCIIOpen(PETSC_COMM_WORLD, path, viewer));
+      petsc_call(PetscViewerPushFormat(*viewer, PETSC_VIEWER_ASCII_MATLAB ));
+      feenox_free(path);
+    break;
+    
     case dump_format_binary:
       feenox_check_minusone(asprintf(&path, "%s.bin", name));
       petsc_call(PetscViewerBinaryOpen(PETSC_COMM_WORLD, path, FILE_MODE_WRITE, viewer));
@@ -80,13 +87,6 @@ int feenox_dump_open_viewer(dump_t *this, const char *name, PetscViewer *viewer)
       feenox_check_minusone(asprintf(&path, "%s.txt", name));
       petsc_call(PetscViewerASCIIOpen(PETSC_COMM_WORLD, path, viewer));
       petsc_call(PetscViewerPushFormat(*viewer, PETSC_VIEWER_DEFAULT));
-      feenox_free(path);
-    break;
-    
-    case dump_format_octave:
-      feenox_check_minusone(asprintf(&path, "%s.m", name));
-      petsc_call(PetscViewerASCIIOpen(PETSC_COMM_WORLD, path, viewer));
-      petsc_call(PetscViewerPushFormat(*viewer, PETSC_VIEWER_ASCII_MATLAB ));
       feenox_free(path);
     break;
   }

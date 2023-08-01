@@ -174,19 +174,20 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
       } else {
         gsl_matrix_set_zero(e->dphidx_gauss[q]);
       }
-      feenox_mesh_compute_B_at_gauss(e, q, mesh->integration);
+      gsl_matrix *B = feenox_mesh_compute_B_at_gauss(e, q, mesh->integration);
 
       // aca habria que hacer una matriz con los phi globales
       // (de j y g, que de paso no depende de q asi que se podria hacer afuera del for de q)
-      // y ver como calcular la matriz dphidx como producto de dhdx y esta matriz
+      // y ver como calcular la matriz dphidx como producto de B y esta matriz
       for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
         for (unsigned int d = 0; d < feenox.pde.dim; d++) {
           for (unsigned int j = 0; j < e->type->nodes; j++) {
             j_global = e->node[j]->index_mesh;
-            gsl_matrix_add_to_element(e->dphidx_gauss[q], g, d, gsl_matrix_get(e->B[q], d, j) * mesh->node[j_global].phi[g]);
+            gsl_matrix_add_to_element(e->dphidx_gauss[q], g, d, gsl_matrix_get(B, d, j) * mesh->node[j_global].phi[g]);
           }
         }
       }
+      gsl_matrix_free(B);
     }
     
     // take the product of the extrapolation matrix times the values at the gauss points

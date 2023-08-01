@@ -57,7 +57,7 @@ gsl_matrix *feenox_mesh_matrix_invert(gsl_matrix *direct) {
         double d = gsl_matrix_get(direct, 1, 1); 
         double b = gsl_matrix_get(direct, 0, 1);
         double c = gsl_matrix_get(direct, 1, 0);
-        double det = a*b - c*d;
+        double det = a*d - b*c;
         double invdet = 1.0/det;
         
         if (inverse == NULL) {

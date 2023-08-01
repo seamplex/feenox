@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to build elemental objects
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2015-2023 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -388,8 +388,10 @@ int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
     gsl_vector_set(feenox.pde.vec_f, g, value[g]);
   }  
   
-//  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
-  feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], e->type->H_Gc[q], feenox.pde.vec_f, 1.0, feenox.pde.bi));
+  double wdet = feenox_mesh_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *H_Gc = feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_blas_dgemv(CblasTrans, wdet, H_Gc, feenox.pde.vec_f, 1.0, feenox.pde.bi));
+  // the H_Gc does not have to be freed
 #endif
   
   return FEENOX_OK;

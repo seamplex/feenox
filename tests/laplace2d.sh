@@ -19,3 +19,6 @@ exitifwrong $?
 
 answer poisson-square.fee "0.2949 0.2044 -0.2044"
 exitifwrong $?
+
+answerzero maze.fee
+exitifwrong $?
