@@ -229,7 +229,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
       } else {
         
         // direct evalution at the nodes
-        gsl_matrix *dhdx = feenox_mesh_compute_B(e, e->type->node_coords[j], NULL);
+        gsl_matrix *B = feenox_mesh_compute_B(e, e->type->node_coords[j]);
       
         // the derivatives of each dof g with respect to the coordinate mas nueve derivadas (o menos)
         // TODO: como arriba, aunque hay que pelar ojo si hay menos DOFs
@@ -238,11 +238,11 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
           for (unsigned int d = 0; d < feenox.pde.dim; d++) {
             for (unsigned int j_local_prime = 0; j_local_prime < J; j_local_prime++) {
               j_global_prime = e->node[j_local_prime]->index_mesh;
-              gsl_matrix_add_to_element(e->dphidx_node[j], g, d, gsl_matrix_get(dhdx, j_local_prime, d) * mesh->node[j_global_prime].phi[g]);
+              gsl_matrix_add_to_element(e->dphidx_node[j], g, d, gsl_matrix_get(B, j_local_prime, d) * mesh->node[j_global_prime].phi[g]);
             }
           }
         }
-        gsl_matrix_free(dhdx);
+        gsl_matrix_free(B);
       }
     }
   }
