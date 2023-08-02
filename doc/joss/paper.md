@@ -1,5 +1,5 @@
 ---
-title: 'FeenoX: a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool'
+title: 'FeenoX: a cloud-first finite-element(ish) computational engineering tool'
 tags:
   - engineering
   - partial differential equations
@@ -22,57 +22,28 @@ syntax-definition: feenox.xml
 
 [FeenoX](https://www.seamplex.com/feenox) is a computational tool to solve (currently)
 
- * dynamical systems written as sets of ODEs/DAEs, or
- * steady or transient heat conduction problems, or
- * steady or quasi-static thermo-mechanical problems, or
- * modal analysis problems, or
- * core-level steady-state neutronics
+ * [dynamical systems written as sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html), or
+ * [steady or transient heat conduction problems](https://seamplex.com/feenox/examples/thermal.html), or
+ * [steady or quasi-static thermo-mechanical problems](https://seamplex.com/feenox/examples/mechanical.html), or
+ * [modal analysis problems](https://seamplex.com/feenox/examples/modal.html), or
+ * [core-level steady-state neutronics](https://seamplex.com/feenox/examples/neutron_diffusion.html)
  
-in such a way that the input is a near-English text file that defines the problem to be solved.
+in such a way that the input is a near-English text file that defines the problem.
 FeenoX can be seen either as a finite-element(ish) tool with a particular design basis.
-Two of the main features of this design basis are
+Two of the main features of this [design basis](https://seamplex.com/feenox/doc/sds.html) are
 
  #. Simple problems ought to have simple inputs.
  #. There should be a one-to-one correspondence between the problem definition and FeenoX's input file (fig. \ref{le10}).
  
-![The NAFEMS LE10 problem statement @national1990nafems and the corresponding FeenoX input illustrating the one-to-one correspondence between them.\label{le10}](nafems-le10-problem-input.svg)
+![The NAFEMS LE10 problem statement [@national1990nafems] and the corresponding FeenoX input illustrating the one-to-one correspondence between the two.\label{le10}](nafems-le10-problem-input.svg)
 
 # Statement of need
 
-To better illustrate FeenoX’s unfair advantage, let us first consider what the options are when an engineer needs to to write a technical report, paper or document:
+As discussed in the [README](https://seamplex.com/feenox/#why-feenox), FeenoX is---in a certain sense---to desktop FEA programs (like [Code_Aster](https://www.code-aster.org/spip.php?rubrique2) with [Salome-Meca](https://www.code-aster.org/V2/spip.php?article303) or [CalculiX](http://www.calculix.de/) with [PrePoMax](https://prepomax.fs.um.si/)) and libraries (like [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) or [Sparselizard](http://sparselizard.org/)) what [Markdown](https://commonmark.org/) is to Word and [(La)TeX](https://en.wikipedia.org/wiki/LaTeX), respectively and _deliberately_.
 
-
-| Feature                | Microsoft Word |  Google Docs  |   Markdown   |   (La)TeX    |
-|:-----------------------|:--------------:|:-------------:|:------------:|:------------:|
-| Aesthetics             |  $\times$      | $\times$      | $\checkmark$ | $\checkmark$ |
-| Other formats          |  $\sim$        | $\sim$        | $\checkmark$ | $\sim$       |
-| Traceability           |  $\times$      | $\sim$        | $\checkmark$ | $\checkmark$ |
-| Mobile-friendliness    |  $\times$      | $\checkmark$  | $\checkmark$ | $\times$     |
-| Collaborativeness      |  $\times$      | $\checkmark$  | $\checkmark$ | $\sim$       |
-| Licensing/openness     |  $\times$      | $\times$      | $\checkmark$ | $\checkmark$ |
-| Non-nerd friendliness  |  $\checkmark$  | $\checkmark$  | $\sim$       | $\times$     |
-
-
-It should be evident that Markdown^[Here “[Markdown](https://en.wikipedia.org/wiki/Markdown)” means ([Pandoc](https://pandoc.org/) + [Git](https://git-scm.com/) + [Github](https://github.com/) / [Gitlab](https://about.gitlab.com/) / [Gitea](https://gitea.com/}{Gitea}))] gives the best trade off.
-We can then perform a similar analysis for the options available in order to solve an engineering problem casted as a partial differential equation, say by using a finite-element formulation:
-
-
-| Feature               | Desktop GUIs | Web frontends |    FeenoX    |   Libraries  |
-|:----------------------|:------------:|:-------------:|:------------:|:------------:|
-| Flexibility           | $\sim$       | $\times$      | $\checkmark$ | $\checkmark$ |
-| Scalability           | $\times$     | $\sim$        | $\checkmark$ | $\checkmark$ |
-| Traceability          | $\times$     | $\sim$        | $\checkmark$ | $\checkmark$ |
-| Cloud-friendliness    | $\times$     | $\checkmark$  | $\checkmark$ | $\checkmark$ |
-| Collaborativeness     | $\times$     | $\checkmark$  | $\checkmark$ | $\times$     |
-| Licensing/openness    | $\sim$       | $\times$      | $\checkmark$ | $\checkmark$ |
-| Non-nerd friendliness | $\checkmark$ | $\checkmark$  | $\sim$       | $\times$     |
-
-
-Therefore, on the one hand, FeenoX^[Here “FeenoX” means ([FeenoX](https://seamplex.com/feenox) + [Gmsh](http://gmsh.info) + [Paraview](https://www.paraview.org/) + [Git](https://git-scm.com/) + [Github](https://github.com/) / [Gitlab](https://about.gitlab.com/) / [Gitea](https://gitea.com/}{Gitea}))] is---in a certain sense---to desktop FEA programs (like [Code_Aster](https://www.code-aster.org/spip.php?rubrique2) with [Salome-Meca](https://www.code-aster.org/V2/spip.php?article303) or [CalculiX](http://www.calculix.de/) with [PrePoMax](https://prepomax.fs.um.si/)) and libraries (like [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) or [Sparselizard](http://sparselizard.org/)) what [Markdown](https://commonmark.org/) is to Word and [(La)TeX](https://en.wikipedia.org/wiki/LaTeX), respectively and _deliberately_.
-
-FeenoX meets fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html).
+FeenoX meets a fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html).
 The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
-The most important idea is that FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve. FeenoX will provide means to
+The most important idea is that FeenoX should give a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of problems FeenoX can solve. In particular, FeenoX provides means to
 
   - parse the input file, handle command-line arguments, read mesh files, assign variables, evaluate conditionals, write results, etc.
 
@@ -102,7 +73,7 @@ The most important idea is that FeenoX provides a general mathematical framework
     BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
     ```
 
-  - access shape functions and its derivatives evaluated either at Gauss points or at arbitrary locations for computing elementary contributions to
+  - access element shape functions and its derivatives evaluated either at Gauss points or at arbitrary locations for computing elementary contributions to
      * stiffness matrix
      * mass matrix
      * right-hand side vector
@@ -114,7 +85,7 @@ The most important idea is that FeenoX provides a general mathematical framework
     * [EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html) for eigenvalue problems
 
 This general framework constitutes the bulk of [FeenoX’s source code](https://github.com/seamplex/feenox).
-The particular functions that implement each problem type are located in subdirectories [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes), namely
+The particular functions that implement each problem type are located in subdirectories within [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes), namely
 
  * [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)
  * [`thermal`](https://github.com/seamplex/feenox/tree/main/src/pdes/thermal)
@@ -127,13 +98,15 @@ Engineers, researchers, scientists, developers and/or hobbyists just need to use
 
  #. replace every occurrence of `laplace` in symbol names with the name of the new PDE
  #. modify the initialization functions in `init.c` and set 
-     * the names of the unknowns
-     * the names of the materials
-     * the mathematical type and properties of problem 
+     * the names of the unknowns (e.g `T` for thermal, `u`, `v` and `w` for elasticity, etc.)
+     * the names of the material properties (e.g. `k` for thermal, `E` & `nu` for elasticity, etc.)
+     * the mathematical type and properties of problem (linear/non-linear static, transient, eigen, etc.)
      * etc.
  #. modify the contents of the elemental matrices in `bulk.c` in the FEM formulation of the problem being added
  #. modify the contents of how the boundary conditions are parsed and set in `bc.c`
  #. re-run `autogen.sh`, `./configure` and `make` to get a FeenoX executable with support for the new PDE.
+
+FeenoX's main focus is on flexibility. Its applications range from coupling neutronics with CFD in nuclear reactors [@milonga-openfoam] to providing a back end to [web-based thermo-mechanical solvers](https://www.caeplex.com).
 
 
 # References
