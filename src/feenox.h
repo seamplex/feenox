@@ -1822,6 +1822,7 @@ struct feenox_t {
 
     PetscBool cache_J;
     double *w;
+    double **x;
     gsl_matrix *C;
     gsl_matrix **Ji;
     gsl_matrix **invJi;

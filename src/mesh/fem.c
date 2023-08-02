@@ -273,7 +273,7 @@ inline double feenox_mesh_compute_w_det_at_gauss(element_t *e, unsigned int q, i
 
   double **w = (feenox.pde.cache_J) ? &e->w : &feenox.pde.w;
   if ((*w) == NULL) {
-    feenox_check_alloc((*w) = calloc(e->type->gauss[integration].Q, sizeof(double)));
+    (*w) = calloc(e->type->gauss[integration].Q, sizeof(double));
   } else if (feenox.pde.cache_J) {
     return (*w)[q];
   }
@@ -477,28 +477,23 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, 
 
 inline double *feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  double *x = NULL;
-  if (feenox.pde.cache_B) {
-    if (e->x == NULL) {
-      e->x = calloc(e->type->gauss[integration].Q, sizeof(double *));
-    }
-    if (e->x[q] == NULL) {
-      x = e->x[q] = calloc(3, sizeof(double));
-    } else {
-      return e->x[q];
-    }
-  } else {
-    x = calloc(3, sizeof(double));
+  double ***x = (feenox.pde.cache_J) ? &e->x : &feenox.pde.x;
+  if ((*x) == NULL) {
+    (*x) = calloc(e->type->gauss[integration].Q, sizeof(double));
+  } else if (feenox.pde.cache_J) {
+    return (*x)[q];
   }
+  
+  (*x)[q] = calloc(3, sizeof(double));
   
   for (unsigned int j = 0; j < e->type->nodes; j++) {
     double h = gsl_matrix_get(e->type->gauss[integration].H_c[q], 0, j);
     for (unsigned int d = 0; d < 3; d++) {
-      e->x[q][d] += h * e->node[j]->x[d];
+      (*x)[q][d] += h * e->node[j]->x[d];
     }
   }
 
-  return x;
+  return (*x)[q];
 }
 
 
@@ -509,23 +504,21 @@ inline gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_typ
     if (G == 1) {
       element_type->H_Gc = element_type->gauss[integration].H_c;
       return element_type->H_Gc[q];
+    } else {
+      element_type->H_Gc = calloc(element_type->gauss[integration].Q, sizeof(gsl_matrix *));
     }
-    element_type->H_Gc = calloc(element_type->gauss[integration].Q, sizeof(gsl_matrix *));
   }
   
-  if (element_type->H_Gc[q] != NULL) {
-    return element_type->H_Gc[q];
-  }
+  if (element_type->H_Gc[q] == NULL) {
+    unsigned int J = element_type->nodes;
+    element_type->H_Gc[q] = gsl_matrix_calloc(G, G*J);
   
-  
-  unsigned int J = element_type->nodes;
-  element_type->H_Gc[q] = gsl_matrix_calloc(G, G*J);
-  
-  // TODO: measure order of loops
-  for (unsigned int j = 0; j < J; j++) {
-    double h = gsl_matrix_get(element_type->gauss[integration].H_c[q], 0, j);
-    for (unsigned int g = 0; g < G; g++) {
-      gsl_matrix_set(element_type->H_Gc[q], g, G*j+g, h);
+    // TODO: measure order of loops
+    for (unsigned int j = 0; j < J; j++) {
+      double h = gsl_matrix_get(element_type->gauss[integration].H_c[q], 0, j);
+      for (unsigned int g = 0; g < G; g++) {
+        gsl_matrix_set(element_type->H_Gc[q], g, G*j+g, h);
+      }
     }
   }
 
@@ -536,11 +529,11 @@ inline gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, 
 
   gsl_matrix ***B = (feenox.pde.cache_B) ? &e->B : &feenox.pde.Bi;
   if (*B == NULL) {
-    feenox_check_alloc_null(*B = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
+    feenox_check_alloc_null((*B) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if ((*B)[q] == NULL) {
     (*B)[q] = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-  } else if (feenox.pde.cache_J) {
+  } else if (feenox.pde.cache_B) {
     return (*B)[q];
   }
   
@@ -552,43 +545,33 @@ inline gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, 
 
 inline gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  
-  gsl_matrix ***B_G = (feenox.pde.cache_B) ? &e->B_G : &feenox.pde.B_Gi;
-  if (*B_G == NULL) {
-    feenox_check_alloc_null(*B_G = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
+  unsigned int G = feenox.pde.dofs;
+  if (G == 1) {
+    // for G=1 B_G = B
+    return feenox_mesh_compute_B_at_gauss(e, q, integration);
   }
-  if (*B_G[q] == NULL) {
-    *B_G[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
-  } else if (feenox.pde.cache_J) {
+  gsl_matrix ***B_G = (feenox.pde.cache_B) ? &e->B_G : &feenox.pde.B_Gi;
+  if ((*B_G) == NULL) {
+    feenox_check_alloc_null((*B_G) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
+  }
+
+  unsigned int J = e->type->nodes;
+  unsigned int D = e->type->dim;
+
+  if ((*B_G)[q] == NULL) {
+    *B_G[q] = gsl_matrix_calloc(G*D, G*J);
+  } else if (feenox.pde.cache_B) {
     return *B_G[q];
   }
 
-  // xxx
-  gsl_matrix ***B = (feenox.pde.cache_B) ? &e->B : &feenox.pde.Bi;
-  if (*B == NULL) {
-    feenox_check_alloc_null(*B = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
-  }
-  if (*B[q] == NULL || feenox.pde.cache_B == 0) {
-    *B[q] = feenox_mesh_compute_B_at_gauss(e, q, integration);
-  }
-  unsigned int G = feenox.pde.dofs;
-  if (G == 1) {
-    *B_G[q] = *B[q];
-  } else {
-    unsigned int J = e->type->nodes;
-    unsigned int D = e->type->dim;
-    if (feenox.pde.cache_B == 0) {
-      *B_G[q] = gsl_matrix_calloc(G*D, G*J);
-    }
-  
-    for (unsigned int d = 0; d < D; d++) {
-      size_t Gd = G*d;
-      for (unsigned int j = 0; j < J; j++) {
-        size_t Gj = G*j;
-        double dhdxi = gsl_matrix_get(e->B[q], d, j);
-        for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-          gsl_matrix_set(e->B_G[q], Gd+g, Gj+g, dhdxi);
-        }
+  gsl_matrix *B = feenox_mesh_compute_B_at_gauss(e, q, integration);
+  for (unsigned int d = 0; d < D; d++) {
+    size_t Gd = G*d;
+    for (unsigned int j = 0; j < J; j++) {
+      size_t Gj = G*j;
+      double dhdxi = gsl_matrix_get(B, d, j);
+      for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+        gsl_matrix_set(e->B_G[q], Gd+g, Gj+g, dhdxi);
       }
     }
   }
@@ -608,9 +591,8 @@ int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh) {
   
   // the vector l contains the global indexes of each DOF in the element
   // note that this vector is always node major independently of the global orderin
-  unsigned int j, d;
-  for (j = 0; j < e->type->nodes; j++) {
-    for (d = 0; d < mesh->degrees_of_freedom; d++) {
+  for (unsigned int j = 0; j < e->type->nodes; j++) {
+    for (unsigned int d = 0; d < mesh->degrees_of_freedom; d++) {
       e->l[mesh->degrees_of_freedom*j + d] = e->node[j]->index_dof[d];
     }  
   }
