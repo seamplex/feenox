@@ -144,7 +144,7 @@ template<typename Derived> struct determinant_impl<Derived, 3>
 // build the canonic B_c matrix at an arbitrary location xi
 gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi) {
   
-  gsl_matrix *B_c = gsl_matrix_alloc(element_type->dim, element_type->nodes);
+  gsl_matrix *B_c = gsl_matrix_calloc(element_type->dim, element_type->nodes);
   for (int d = 0; d < element_type->dim; d++) {
     for (int j = 0; j < element_type->nodes; j++) {
       gsl_matrix_set(B_c, d, j, element_type->dhdxi(j, d, xi));
@@ -161,7 +161,7 @@ gsl_matrix *feenox_mesh_compute_B(element_t *e, double *xi) {
   gsl_matrix *invJ = feenox_mesh_matrix_invert(J, NULL);
   
   gsl_matrix *B_c = feenox_mesh_compute_B_c(e->type, xi);
-  gsl_matrix *B = gsl_matrix_alloc(e->type->dim, e->type->nodes);
+  gsl_matrix *B = gsl_matrix_calloc(e->type->dim, e->type->nodes);
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, B_c, 0.0, B);
   
   gsl_matrix_free(B_c);
@@ -174,12 +174,13 @@ gsl_matrix *feenox_mesh_compute_B(element_t *e, double *xi) {
 
 inline gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration) {
   
+  feenox.pde.cache_J = 1;  
   gsl_matrix ***invJ = (feenox.pde.cache_J) ? &e->invJ : &feenox.pde.invJi;
   if (*invJ == NULL) {
     feenox_check_alloc_null(*invJ = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if ((*invJ)[q] == NULL) {
-    (*invJ)[q] = gsl_matrix_alloc(e->type->dim, e->type->dim);
+    (*invJ)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
   } else if (feenox.pde.cache_J) {
     return (*invJ)[q];
   }
@@ -206,12 +207,12 @@ inline gsl_matrix *feenox_mesh_compute_C(element_t *e) {
     if (e->C != NULL) {
       return e->C;
     } else {
-      C = gsl_matrix_alloc(e->type->dim, e->type->nodes);
+      C = gsl_matrix_calloc(e->type->dim, e->type->nodes);
       e->C = C;
     }
   } else if (C == NULL) {
 */
-    C = gsl_matrix_alloc(e->type->dim, e->type->nodes);
+    C = gsl_matrix_calloc(e->type->dim, e->type->nodes);
 
 // }
  
@@ -240,7 +241,7 @@ inline gsl_matrix *feenox_mesh_compute_J(element_t *e, double *xi) {
   //   }
   // }
 
-  gsl_matrix *J = gsl_matrix_alloc(e->type->dim, e->type->dim);
+  gsl_matrix *J = gsl_matrix_calloc(e->type->dim, e->type->dim);
   gsl_matrix *B_c = feenox_mesh_compute_B_c(e->type, xi);
   gsl_matrix *C = feenox_mesh_compute_C(e);
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, B_c, C, 0.0, J);
@@ -349,7 +350,7 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int 
               (e->node[j]->x[0] * dx + e->node[j]->x[1] * dy + e->node[j]->x[2] * dz);
   }
   
-  gsl_matrix *J = gsl_matrix_alloc(1,1);
+  gsl_matrix *J = gsl_matrix_calloc(1,1);
   gsl_matrix_set(J, 0, 0, dxdxi);
   
   return J;
@@ -421,7 +422,7 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int 
   // write the new coordinates matrix and compute J (a.k.a dxdxi)
   // as the product between B and C
   
-  gsl_matrix *J = gsl_matrix_alloc(2,2);
+  gsl_matrix *J = gsl_matrix_calloc(2,2);
   double s = 0;
   for (int d = 0; d < 2; d++) {
     for (int d_prime = 0; d_prime < 2; d_prime++) {
@@ -466,7 +467,7 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned
 */
   
   gsl_matrix *C = (e->C != NULL) ? e->C : feenox_mesh_compute_C(e);
-  gsl_matrix *J = gsl_matrix_alloc(e->type->dim, e->type->dim);
+  gsl_matrix *J = gsl_matrix_calloc(e->type->dim, e->type->dim);
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C, e->type->gauss[integration].B_c[q], 0.0, J);
   
   return J;
@@ -581,39 +582,23 @@ inline gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_typ
 
 inline gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration) {
 
+  feenox.pde.cache_B = 1;
+  
   gsl_matrix ***B = (feenox.pde.cache_B) ? &e->B : &feenox.pde.Bi;
   if (*B == NULL) {
     feenox_check_alloc_null(*B = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if ((*B)[q] == NULL) {
-    (*B)[q] = gsl_matrix_alloc(e->type->dim, e->type->nodes);
-    printf("aloque B\n");
+    (*B)[q] = gsl_matrix_calloc(e->type->dim, e->type->nodes);
   } else if (feenox.pde.cache_J) {
     return (*B)[q];
   }
-//  printf("B = %p\n", &((*B)[q]));
-//  feenox_debug_print_gsl_matrix((*B)[q], stdout);
-
+  
   gsl_matrix ***invJ = (feenox.pde.cache_J) ? &e->invJ : &feenox.pde.invJi;
   if (*invJ == NULL) {
     feenox_check_alloc_null(*invJ = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
-//  if ((*invJ)[q] == NULL || feenox.pde.cache_J == 0) {
-//    (*invJ)[q] = feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
-  gsl_matrix *tmp = feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
-  printf("invJ = %p\n", tmp);
-//  }
-/*  
-  printf("tag = %ld dim = %d\n", e->tag, e->type->dim);
-  printf("invJ\n");
-  feenox_debug_print_gsl_matrix((*invJ)[q], stdout);
-  printf("B_c\n");
-  feenox_debug_print_gsl_matrix(e->type->gauss[integration].B_c[q], stdout);
-*/
-//  gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, (*invJ)[q], e->type->gauss[integration].B_c[q], 0.0, (*B)[q]);
-  gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, tmp, e->type->gauss[integration].B_c[q], 0.0, (*B)[q]);  
-  gsl_matrix_free(tmp);
-  
+  gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration), e->type->gauss[integration].B_c[q], 0.0, (*B)[q]);  
   return (*B)[q];
 }  
 
@@ -626,7 +611,7 @@ inline gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q
     feenox_check_alloc_null(*B_G = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if (*B_G[q] == NULL) {
-    *B_G[q] = gsl_matrix_alloc(e->type->dim, e->type->dim);
+    *B_G[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
   } else if (feenox.pde.cache_J) {
     return *B_G[q];
   }
