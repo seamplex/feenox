@@ -1821,6 +1821,8 @@ struct feenox_t {
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
 
     PetscBool cache_J;
+    double *w;
+    gsl_matrix *C;
     gsl_matrix **Ji;
     gsl_matrix **invJi;
     PetscBool cache_B;
@@ -2175,9 +2177,9 @@ extern gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_typ
 
 extern gsl_matrix *feenox_mesh_compute_J(element_t *e, double *xi);
 extern gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration);
-extern gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration);
-extern gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration);
-extern gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration, gsl_matrix *J);
 
 extern gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi);
 extern gsl_matrix *feenox_mesh_compute_B(element_t *e, double *xi);

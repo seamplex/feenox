@@ -165,8 +165,11 @@ gsl_matrix *feenox_mesh_compute_B(element_t *e, double *xi) {
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, B_c, 0.0, B);
   
   gsl_matrix_free(B_c);
+  B_c = NULL;
   gsl_matrix_free(invJ);
+  invJ = NULL;
   gsl_matrix_free(J);
+  J = NULL;
   
   return B;
 }
@@ -174,7 +177,6 @@ gsl_matrix *feenox_mesh_compute_B(element_t *e, double *xi) {
 
 inline gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration) {
   
-  feenox.pde.cache_J = 1;  
   gsl_matrix ***invJ = (feenox.pde.cache_J) ? &e->invJ : &feenox.pde.invJi;
   if (*invJ == NULL) {
     feenox_check_alloc_null(*invJ = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
@@ -185,36 +187,20 @@ inline gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int 
     return (*invJ)[q];
   }
 
-  gsl_matrix ***J = (feenox.pde.cache_J) ? &e->J : &feenox.pde.Ji;
-  if ((*J) == NULL) {
-    feenox_check_alloc_null((*J) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
-  }
-  if (feenox.pde.cache_J == 0 || (*J)[q] == NULL) {
-    (*J)[q] = feenox_mesh_compute_J_at_gauss(e, q, integration);
-  }
-
-  feenox_mesh_matrix_invert((*J)[q], (*invJ)[q]);
+  gsl_matrix *J = feenox_mesh_compute_J_at_gauss(e, q, integration);
+  feenox_mesh_matrix_invert(J, (*invJ)[q]);
   return (*invJ)[q];
 }
 
 // matrix with the coordinates
 inline gsl_matrix *feenox_mesh_compute_C(element_t *e) {
   
-  gsl_matrix *C = NULL;
-  // TODO: I don't like this
-/*
-  if (feenox.pde.cache_B) {
-    if (e->C != NULL) {
-      return e->C;
-    } else {
-      C = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-      e->C = C;
-    }
-  } else if (C == NULL) {
-*/
+  gsl_matrix *C = (feenox.pde.cache_J) ? e->C : feenox.pde.C;
+  if (C == NULL) {
     C = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-
-// }
+  } else if (feenox.pde.cache_J) {
+    return C;
+  }
  
   // TODO: this is not cache friendly, is it?
   for (unsigned int j = 0; j < e->type->nodes; j++) {
@@ -245,15 +231,12 @@ inline gsl_matrix *feenox_mesh_compute_J(element_t *e, double *xi) {
   gsl_matrix *B_c = feenox_mesh_compute_B_c(e->type, xi);
   gsl_matrix *C = feenox_mesh_compute_C(e);
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, B_c, C, 0.0, J);
-  if (feenox.pde.cache_B == PETSC_FALSE) {
-    feenox_free(C);
-  }
   gsl_matrix_free(B_c);
   
   return J;
 }
 
-
+/*
 inline void mesh_compute_x(element_t *e, double *xi, double *x) {
 
   x[0] = x[1] = x[2] = 0;
@@ -266,6 +249,7 @@ inline void mesh_compute_x(element_t *e, double *xi, double *x) {
 
   return;
 }
+*/
 
 inline double *feenox_mesh_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int condition) {
   return (condition) ? feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration) : NULL;
@@ -285,55 +269,22 @@ inline material_t *feenox_mesh_get_material(element_t *e) {
   return (e->physical_group != NULL) ? e->physical_group->material : NULL;
 }
 
-/*
-inline int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q) {
-  
-  // TODO: can we lump these two in a single loop?
-  feenox_call(feenox_mesh_compute_w_at_gauss(e, q, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration));
-  
-  return FEENOX_OK;
-}
-
-inline int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q) {
-  
-  // TODO: can we lump these three in a single loop?
-  feenox_call(feenox_mesh_compute_w_at_gauss(e, q, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration));
-  feenox_call(feenox_mesh_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration));
-
-  
-  return FEENOX_OK;
-}
-*/
-
 inline double feenox_mesh_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration) {
 
-/*
-  if (e->w == NULL) {
-    feenox_check_alloc(e->w = calloc(e->type->gauss[integration].Q, sizeof(double)));
+  double **w = (feenox.pde.cache_J) ? &e->w : &feenox.pde.w;
+  if ((*w) == NULL) {
+    feenox_check_alloc((*w) = calloc(e->type->gauss[integration].Q, sizeof(double)));
+  } else if (feenox.pde.cache_J) {
+    return (*w)[q];
   }
-  gsl_matrix *J = NULL;
-  if (e->J == NULL || e->J[q] == NULL) {
-    J = feenox_mesh_compute_J_at_gauss(e, q, integration);
-  } else {
-    J = e->J[q];
-  }
- */
-  gsl_matrix *J = feenox_mesh_compute_J_at_gauss(e, q, integration); 
   
-//  if (e->w[q] == 0) {
-    double det = feenox_mesh_determinant(J);
-    
   // TODO: choose to complain about zero or negative?
   // TODO: choose to take the absolute value or not? put these two as defines
-    return e->type->gauss[integration].w[q] * fabs(det);
-//    e->w[v] = e->type->gauss[integration].w[v] * det;
-//  }  
-
+  (*w)[q] = e->type->gauss[integration].w[q] * fabs(feenox_mesh_determinant(feenox_mesh_compute_J_at_gauss(e, q, integration)));
+  return (*w)[q];
 }
 
-inline gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration) {
+inline gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration, gsl_matrix *J) {
   
   // we are a line but not aligned with the x axis we have to compute the axial coordinate l
   double dx = e->node[1]->x[0] - e->node[0]->x[0];
@@ -350,13 +301,14 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int 
               (e->node[j]->x[0] * dx + e->node[j]->x[1] * dy + e->node[j]->x[2] * dz);
   }
   
-  gsl_matrix *J = gsl_matrix_calloc(1,1);
+  if (J == NULL) {
+    J = gsl_matrix_calloc(1,1);
+  }
   gsl_matrix_set(J, 0, 0, dxdxi);
-  
   return J;
 }
 
-inline gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration) {
+inline gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration, gsl_matrix *J) {
   /*
    * if we are a triangle or a quadrangle (quadrangles are two triangles so they are alike)
    * but we do not live on the x-y plane we have to do some tricks:
@@ -422,7 +374,9 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int 
   // write the new coordinates matrix and compute J (a.k.a dxdxi)
   // as the product between B and C
   
-  gsl_matrix *J = gsl_matrix_calloc(2,2);
+  if (J == NULL) {
+    J = gsl_matrix_calloc(2,2);
+  }
   double s = 0;
   for (int d = 0; d < 2; d++) {
     for (int d_prime = 0; d_prime < 2; d_prime++) {
@@ -441,7 +395,7 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int 
 }
 
 
-inline gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration) {
+inline gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration, gsl_matrix *J) {
   // we can do a full traditional computation
   // i.e. lines are in the x axis
   //      surfaces are on the xy plane
@@ -466,8 +420,10 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned
   }
 */
   
-  gsl_matrix *C = (e->C != NULL) ? e->C : feenox_mesh_compute_C(e);
-  gsl_matrix *J = gsl_matrix_calloc(e->type->dim, e->type->dim);
+  gsl_matrix *C = feenox_mesh_compute_C(e);
+  if (J == NULL) {
+    J = gsl_matrix_calloc(e->type->dim, e->type->dim);
+  }
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C, e->type->gauss[integration].B_c[q], 0.0, J);
   
   return J;
@@ -476,28 +432,24 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned
 
 // magic magic magic!
 inline gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration) {
-  
-  gsl_matrix *J = NULL;
-/*
-  if (feenox.pde.cache_B) {
-    if (e->J == NULL) {
-      e->J = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *));
-    }
-  
-    if (e->J[q] == NULL) {
-      e->J[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
-    } else {
-      return e->J[q];
-    }
+
+  gsl_matrix ***J = (feenox.pde.cache_J) ? &e->J : &feenox.pde.Ji;
+  if (*J == NULL) {
+    feenox_check_alloc_null(*J = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
-*/
+  if ((*J)[q] == NULL) {
+    (*J)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
+  } else if (feenox.pde.cache_J) {
+    return (*J)[q];
+  }
+  
   // TODO: once the problem type and dimension is set, we know which element type
   //       needs which kind of xixdr computation: we can then use some virtual
   //       functions defined in e->type
   if (e->type->dim == 1 && (e->node[0]->x[1] != 0 || e->node[1]->x[1] != 0 ||
                             e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0)) {
 
-    J = feenox_mesh_compute_J_at_gauss_1d(e, q, integration);
+    (*J)[q] = feenox_mesh_compute_J_at_gauss_1d(e, q, integration, (*J)[q]);
 
   } else if (e->type->dim == 2 && (e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0 || e->node[2]->x[2])) {
 
@@ -506,20 +458,20 @@ inline gsl_matrix *feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, 
     // ANDs are more efficient than ORs because the minute one does not hold the evaluation finishes
     if (fabs(e->normal[0]) < eps && fabs(e->normal[1]) < eps && fabs(fabs(e->normal[2])-1) < eps) {
 
-      J = feenox_mesh_compute_J_at_gauss_general(e, q, integration);
+      (*J)[q] = feenox_mesh_compute_J_at_gauss_general(e, q, integration, (*J)[q]);
 
     } else {
 
-      J = feenox_mesh_compute_J_at_gauss_2d(e, q, integration);
+      (*J)[q] = feenox_mesh_compute_J_at_gauss_2d(e, q, integration, (*J)[q]);
 
     }
 
   } else {
 
-    J = feenox_mesh_compute_J_at_gauss_general(e, q, integration);
+    (*J)[q] = feenox_mesh_compute_J_at_gauss_general(e, q, integration, (*J)[q]);
   }
   
-  return J;
+  return (*J)[q];
 }
 
 
@@ -582,8 +534,6 @@ inline gsl_matrix *feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_typ
 
 inline gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  feenox.pde.cache_B = 1;
-  
   gsl_matrix ***B = (feenox.pde.cache_B) ? &e->B : &feenox.pde.Bi;
   if (*B == NULL) {
     feenox_check_alloc_null(*B = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
@@ -594,11 +544,8 @@ inline gsl_matrix *feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, 
     return (*B)[q];
   }
   
-  gsl_matrix ***invJ = (feenox.pde.cache_J) ? &e->invJ : &feenox.pde.invJi;
-  if (*invJ == NULL) {
-    feenox_check_alloc_null(*invJ = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
-  }
-  gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration), e->type->gauss[integration].B_c[q], 0.0, (*B)[q]);  
+  gsl_matrix *invJ = feenox_mesh_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, e->type->gauss[integration].B_c[q], 0.0, (*B)[q]);  
   return (*B)[q];
 }  
 
@@ -616,6 +563,7 @@ inline gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q
     return *B_G[q];
   }
 
+  // xxx
   gsl_matrix ***B = (feenox.pde.cache_B) ? &e->B : &feenox.pde.Bi;
   if (*B == NULL) {
     feenox_check_alloc_null(*B = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
