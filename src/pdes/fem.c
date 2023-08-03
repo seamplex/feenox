@@ -192,16 +192,17 @@ inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
   gsl_matrix **C = (feenox.pde.cache_J) ? &e->C : &feenox.pde.C;
   if ((*C) == NULL) {
     (*C) = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-  } else if (feenox.pde.cache_J) {
+  } else if (feenox.pde.cache_J || e->tag == feenox.pde.current_element_tag) {
     return (*C);
   }
- 
+  
   // TODO: this is not cache friendly, is it?
   for (unsigned int j = 0; j < e->type->nodes; j++) {
     for (unsigned int d = 0; d < e->type->dim; d++) {
       gsl_matrix_set((*C), d, j, e->node[j]->x[d]);
     }
   }
+  feenox.pde.current_element_tag = e->tag;
   
   return (*C);
 }

@@ -1813,6 +1813,7 @@ struct feenox_t {
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
 
     PetscBool cache_J;
+    size_t current_element_tag;
     double *w;
     double **x;
     gsl_matrix *C;
