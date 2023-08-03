@@ -320,7 +320,7 @@ int feenox_problem_build_assemble(void) {
   
 #ifdef HAVE_PETSC
 
-  // TODOD: which is better?
+  // TODOD: which is better? measure!
 /*  
   petsc_call(MatAssemblyBegin(feenox.K, MAT_FINAL_ASSEMBLY));
   petsc_call(MatAssemblyEnd(feenox.K, MAT_FINAL_ASSEMBLY));

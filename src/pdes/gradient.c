@@ -25,9 +25,12 @@ int feenox_problem_gradient_compute(void) {
   
 #ifdef HAVE_PETSC
   
+/*  
+  // this is needed only for uncertainty in gradients
   if (feenox.pde.m2 == NULL) {
     feenox_check_alloc(feenox.pde.m2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
   }
+*/
   
   // the mesh for "rough" mode is different
   mesh_t *mesh = (feenox.pde.rough == 0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
@@ -124,8 +127,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
   
   if (e->dphidx_node == NULL) {
     feenox_check_alloc(e->dphidx_node = calloc(J, sizeof(gsl_matrix *)));
-    unsigned int j = 0;
-    for (j = 0; j < J; j++) {
+    for (unsigned int j = 0; j < J; j++) {
       feenox_check_alloc(e->dphidx_node[j] = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dim));
     }  
   }
@@ -159,6 +161,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
   if (feenox.pde.gradient_evaluation == gradient_gauss_extrapolated && e->type->gauss[mesh->integration].extrap != NULL) {
     
     // extrapolation matrix to get the nodal values
+    // TODO: allocate each time or have a holder?
     gsl_vector *at_gauss = NULL;
     feenox_check_alloc(at_gauss = gsl_vector_alloc(Q));
     gsl_vector *at_nodes = NULL;
@@ -187,7 +190,6 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
           }
         }
       }
-      gsl_matrix_free(B);
     }
     
     // take the product of the extrapolation matrix times the values at the gauss points
@@ -285,7 +287,7 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   unsigned int n = 0;
   element_t *element = NULL;
   element_ll_t *associated_element = NULL;
-  gsl_matrix_set_zero(feenox.pde.m2);
+//  gsl_matrix_set_zero(feenox.pde.m2);
   LL_FOREACH(node->element_list, associated_element) {
     element = associated_element->element;
     if (element->dphidx_node != NULL) {
@@ -305,7 +307,7 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
               current = gsl_matrix_ptr(element->dphidx_node[j], g, m);
               delta = *current - *mean;
               *mean += rel_weight * delta;
-              gsl_matrix_add_to_element(feenox.pde.m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
+//              gsl_matrix_add_to_element(feenox.pde.m2, g, m, element->gradient_weight * delta * ((*current)-(*mean)));
 //              gsl_matrix_set(node->delta_dphidx, g, m, sqrt(gsl_matrix_get(feenox.pde.m2, g, m)/sum_weight));
             }
           }
