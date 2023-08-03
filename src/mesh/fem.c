@@ -581,36 +581,24 @@ inline gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q
 
 
 #ifdef HAVE_PETSC
-int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh) {
+PetscInt *feenox_mesh_compute_dof_indices(element_t *e, int G) {
   
-  if (e->l == NULL) {
-    feenox_check_alloc(e->l = calloc(e->type->nodes * mesh->degrees_of_freedom, sizeof(double)));
-  } else {
-    return FEENOX_OK;
+  if (feenox.pde.l == NULL) {
+    feenox_check_alloc_null(feenox.pde.l = calloc(G * e->type->nodes, sizeof(PetscInt)));
   }
   
   // the vector l contains the global indexes of each DOF in the element
-  // note that this vector is always node major independently of the global orderin
+  // note that this vector is always node major independently of the global ordering
   for (unsigned int j = 0; j < e->type->nodes; j++) {
-    for (unsigned int d = 0; d < mesh->degrees_of_freedom; d++) {
-      e->l[mesh->degrees_of_freedom*j + d] = e->node[j]->index_dof[d];
+    for (unsigned int g = 0; g < G; g++) {
+      feenox.pde.l[G*j + g] = e->node[j]->index_dof[g];
     }  
   }
   
-  return FEENOX_OK;
+  return feenox.pde.l;
   
 }
 #endif
-
-/*
-inline int feenox_mesh_update_coord_vars(double *x) {
-  feenox_var_value(feenox.mesh.vars.x) = x[0];
-  feenox_var_value(feenox.mesh.vars.y) = x[1];
-  feenox_var_value(feenox.mesh.vars.z) = x[2];    
-  return FEENOX_OK;
-}
-*/
-
 /*
 inline int mesh_compute_normal(element_t *element) {
   double n[3];

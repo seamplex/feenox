@@ -1070,14 +1070,6 @@ struct element_t {
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
-  
-  int flag;
-
- 
-#ifdef HAVE_PETSC
-  PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
-#endif
-  
 };
 
 
@@ -1829,6 +1821,7 @@ struct feenox_t {
     PetscBool cache_B;
     gsl_matrix **Bi;
     gsl_matrix **B_Gi;
+    PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element    
     
     PetscBool petscinit_called;    // flag
 
@@ -2190,7 +2183,9 @@ extern gsl_matrix *feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_typ
 extern gsl_matrix *feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
 
 extern gsl_matrix *feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
+#ifdef HAVE_PETSC
+extern PetscInt *feenox_mesh_compute_dof_indices(element_t *e, int G);
+#endif
 
 #define feenox_mesh_update_coord_vars(val) {\
   feenox_var_value(feenox.mesh.vars.x) = val[0];\
