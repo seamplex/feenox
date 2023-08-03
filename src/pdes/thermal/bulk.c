@@ -34,7 +34,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   material_t *material = feenox_fem_get_material(e);  
   double k = thermal.k.eval(&thermal.k, x, material);
   
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet*k, B, B, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet*k, B, B, 1.0, feenox.fem.Ki));
  
   // volumetric heat source term Ht*q
   // TODO: total source Q
@@ -67,13 +67,13 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
       gsl_matrix *BtBTH = gsl_matrix_calloc(nodes, nodes);
       feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, BtB, TH, 1, BtBTH));
-      feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, wdet*dkdT, BtB, TH, 1, feenox.pde.JKi));
+      feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, wdet*dkdT, BtB, TH, 1, feenox.fem.JKi));
     }
 
     if (thermal.temperature_dependent_source) {
       double dqdT = feenox_expression_derivative_wrt_function(thermal.q.expr, feenox.pde.solution[0], T);
       // mind the positive sign!
-      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet*dqdT, H, H, 1.0, feenox.pde.Jbi));
+      feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet*dqdT, H, H, 1.0, feenox.fem.Jbi));
     } 
     gsl_matrix_free(local_vec_T);
   }
@@ -95,7 +95,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
     }
     gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
 //    gsl_matrix *H = e->type->H_Gc[q];
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * rhocp, H, H, 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * rhocp, H, H, 1.0, feenox.fem.Mi));
   }
   
 

@@ -33,7 +33,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
   
   // laplace stiffness matrix Bt*B
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, B, B, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, B, B, 1.0, feenox.fem.Ki));
 
   material_t *material = feenox_fem_get_material(e);
   
@@ -59,7 +59,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_push_error_message("no alpha found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * alpha, H, H, 1.0, feenox.pde.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * alpha, H, H, 1.0, feenox.fem.Mi));
   }
   
 

@@ -1811,19 +1811,6 @@ struct feenox_t {
     char *petsc_options;
     PetscBool pre_allocate;        // preallocate? onyl works for petsc >= 3.19
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
-
-    PetscBool cache_J;
-    size_t current_element_tag;
-    double *w;
-    double **x;
-    gsl_matrix *C;
-    gsl_matrix **Ji;
-    gsl_matrix **invJi;
-    PetscBool cache_B;
-    gsl_matrix **Bi;
-    gsl_matrix **B_Gi;
-    PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element    
-    
     PetscBool petscinit_called;    // flag
 
     // stuff for mpi parallelization
@@ -1875,9 +1862,6 @@ struct feenox_t {
     TS ts;
     SNES snes;
     KSP ksp;
-#ifdef HAVE_SLEPC
-    EPS eps;
-#endif
 
     // strings with types
     PCType pc_type;
@@ -1890,6 +1874,7 @@ struct feenox_t {
 #ifdef HAVE_SLEPC
     EPSType eps_type;
     STType st_type;
+    EPS eps;
 #endif
 
     PetscBool progress_ascii;
@@ -1900,6 +1885,23 @@ struct feenox_t {
     expr_t st_shift;
     expr_t st_anti_shift;  
 
+#endif  // HAVE_PETSC    
+    
+  } pde;
+
+  struct {
+#ifdef HAVE_PETSC
+    PetscBool cache_J;
+    PetscBool cache_B;
+    size_t current_element_tag;
+    double *w;
+    double **x;
+    gsl_matrix *C;
+    gsl_matrix **Ji;
+    gsl_matrix **invJi;
+    gsl_matrix **Bi;
+    gsl_matrix **B_Gi;
+    
     // TODO: this is not thread safe!
     // elemental (local) objects
     size_t n_local_nodes;
@@ -1912,9 +1914,10 @@ struct feenox_t {
 
     gsl_vector *vec_f;               // temporary vector for rhs things like H'*f
 
-#endif  // HAVE_PETSC    
-    
-  } pde;
+    PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element    
+#endif    
+  } fem;
+
   
 };
 extern feenox_t feenox;

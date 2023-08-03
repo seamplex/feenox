@@ -99,14 +99,14 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   
   // elemental stiffness B'*C*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, modal.C, modal.B, 0, modal.CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], modal.B, modal.CB, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], modal.B, modal.CB, 1.0, feenox.fem.Ki));
   
   // elemental mass H'*rho*H
   if (modal.rho.uniform == 0) {
     double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, modal.space_rho);
     modal.rho.eval(&modal.rho, x, material);
   }
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * modal.rho.value, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Mi));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * modal.rho.value, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.fem.Mi));
   
 #endif
   

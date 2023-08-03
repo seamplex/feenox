@@ -171,13 +171,13 @@ gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi) {
 inline gsl_matrix *feenox_fem_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration) {
   
   // TODO: macro
-  gsl_matrix ***invJ = (feenox.pde.cache_J) ? &e->invJ : &feenox.pde.invJi;
+  gsl_matrix ***invJ = (feenox.fem.cache_J) ? &e->invJ : &feenox.fem.invJi;
   if (*invJ == NULL) {
     feenox_check_alloc_null(*invJ = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if ((*invJ)[q] == NULL) {
     (*invJ)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
-  } else if (feenox.pde.cache_J) {
+  } else if (feenox.fem.cache_J) {
     return (*invJ)[q];
   }
 
@@ -189,10 +189,10 @@ inline gsl_matrix *feenox_fem_compute_invJ_at_gauss(element_t *e, unsigned int q
 // matrix with the coordinates
 inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
   
-  gsl_matrix **C = (feenox.pde.cache_J) ? &e->C : &feenox.pde.C;
+  gsl_matrix **C = (feenox.fem.cache_J) ? &e->C : &feenox.fem.C;
   if ((*C) == NULL) {
     (*C) = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-  } else if (feenox.pde.cache_J || e->tag == feenox.pde.current_element_tag) {
+  } else if (feenox.fem.cache_J || e->tag == feenox.fem.current_element_tag) {
     return (*C);
   }
   
@@ -202,7 +202,7 @@ inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
       gsl_matrix_set((*C), d, j, e->node[j]->x[d]);
     }
   }
-  feenox.pde.current_element_tag = e->tag;
+  feenox.fem.current_element_tag = e->tag;
   
   return (*C);
 }
@@ -251,10 +251,10 @@ inline material_t *feenox_fem_get_material(element_t *e) {
 
 inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  double **w = (feenox.pde.cache_J) ? &e->w : &feenox.pde.w;
+  double **w = (feenox.fem.cache_J) ? &e->w : &feenox.fem.w;
   if ((*w) == NULL) {
     (*w) = calloc(e->type->gauss[integration].Q, sizeof(double));
-  } else if (feenox.pde.cache_J) {
+  } else if (feenox.fem.cache_J) {
     return (*w)[q];
   }
   
@@ -413,13 +413,13 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
 // magic magic magic!
 inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  gsl_matrix ***J = (feenox.pde.cache_J) ? &e->J : &feenox.pde.Ji;
+  gsl_matrix ***J = (feenox.fem.cache_J) ? &e->J : &feenox.fem.Ji;
   if ((*J) == NULL) {
     feenox_check_alloc_null((*J) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if ((*J)[q] == NULL) {
     (*J)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
-  } else if (feenox.pde.cache_J) {
+  } else if (feenox.fem.cache_J) {
     return (*J)[q];
   }
   
@@ -457,13 +457,13 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, i
 
 inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  double ***x = (feenox.pde.cache_J) ? &e->x : &feenox.pde.x;
+  double ***x = (feenox.fem.cache_J) ? &e->x : &feenox.fem.x;
   if ((*x) == NULL) {
     feenox_check_alloc_null((*x) = calloc(e->type->gauss[integration].Q, sizeof(double *)));
   }
   if ((*x)[q] == NULL) {
     (*x)[q] = calloc(3, sizeof(double));
-  } else if (feenox.pde.cache_J) {
+  } else if (feenox.fem.cache_J) {
     return (*x)[q];
   }
   
@@ -508,13 +508,13 @@ inline gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_type_t *element_type
 
 inline gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  gsl_matrix ***B = (feenox.pde.cache_B) ? &e->B : &feenox.pde.Bi;
+  gsl_matrix ***B = (feenox.fem.cache_B) ? &e->B : &feenox.fem.Bi;
   if ((*B) == NULL) {
     feenox_check_alloc_null((*B) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
   if ((*B)[q] == NULL) {
     (*B)[q] = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-  } else if (feenox.pde.cache_B) {
+  } else if (feenox.fem.cache_B) {
     return (*B)[q];
   }
   
@@ -531,7 +531,7 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
     // for G=1 B_G = B
     return feenox_fem_compute_B_at_gauss(e, q, integration);
   }
-  gsl_matrix ***B_G = (feenox.pde.cache_B) ? &e->B_G : &feenox.pde.B_Gi;
+  gsl_matrix ***B_G = (feenox.fem.cache_B) ? &e->B_G : &feenox.fem.B_Gi;
   if ((*B_G) == NULL) {
     feenox_check_alloc_null((*B_G) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
   }
@@ -541,7 +541,7 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
 
   if ((*B_G)[q] == NULL) {
     *B_G[q] = gsl_matrix_calloc(G*D, G*J);
-  } else if (feenox.pde.cache_B) {
+  } else if (feenox.fem.cache_B) {
     return *B_G[q];
   }
 
@@ -564,19 +564,19 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
 #ifdef HAVE_PETSC
 PetscInt *feenox_fem_compute_dof_indices(element_t *e, int G) {
   
-  if (feenox.pde.l == NULL) {
-    feenox_check_alloc_null(feenox.pde.l = calloc(G * e->type->nodes, sizeof(PetscInt)));
+  if (feenox.fem.l == NULL) {
+    feenox_check_alloc_null(feenox.fem.l = calloc(G * e->type->nodes, sizeof(PetscInt)));
   }
   
   // the vector l contains the global indexes of each DOF in the element
   // note that this vector is always node major independently of the global ordering
   for (unsigned int j = 0; j < e->type->nodes; j++) {
     for (unsigned int g = 0; g < G; g++) {
-      feenox.pde.l[G*j + g] = e->node[j]->index_dof[g];
+      feenox.fem.l[G*j + g] = e->node[j]->index_dof[g];
     }  
   }
   
-  return feenox.pde.l;
+  return feenox.fem.l;
   
 }
 #endif

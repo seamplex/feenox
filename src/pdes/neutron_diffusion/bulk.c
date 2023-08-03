@@ -139,7 +139,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   
   
   if (neutron_diffusion.has_sources) {
-    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], e->type->H_Gc[q], neutron_diffusion.s, 1.0, feenox.pde.bi));
+    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], e->type->H_Gc[q], neutron_diffusion.s, 1.0, feenox.fem.bi));
   }
   
   // for source-driven problems
@@ -153,10 +153,10 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
       gsl_matrix_scale(neutron_diffusion.Fi, -1.0);
       gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Fi);
     } else {
-      gsl_matrix_add(feenox.pde.Mi, neutron_diffusion.Fi);
+      gsl_matrix_add(feenox.fem.Mi, neutron_diffusion.Fi);
     }  
   }
-  gsl_matrix_add(feenox.pde.Ki, neutron_diffusion.Li);
+  gsl_matrix_add(feenox.fem.Ki, neutron_diffusion.Li);
   
  
 #endif

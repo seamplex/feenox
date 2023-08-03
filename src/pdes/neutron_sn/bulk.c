@@ -220,15 +220,15 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
       gsl_matrix_scale(neutron_sn.Fi, -1.0);
       gsl_matrix_add(neutron_sn.Li, neutron_sn.Fi);
     } else {
-      gsl_matrix_add(feenox.pde.Mi, neutron_sn.Fi);
+      gsl_matrix_add(feenox.fem.Mi, neutron_sn.Fi);
     }  
   }
 
   if (neutron_sn.has_sources) {
-      gsl_vector_add(feenox.pde.bi, neutron_sn.Si);
+      gsl_vector_add(feenox.fem.bi, neutron_sn.Si);
   }
   
-  gsl_matrix_add(feenox.pde.Ki, neutron_sn.Li);
+  gsl_matrix_add(feenox.fem.Ki, neutron_sn.Li);
 #endif
   
   return FEENOX_OK;
