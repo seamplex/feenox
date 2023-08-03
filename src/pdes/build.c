@@ -212,7 +212,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
  
   // compute the indices of the DOFs to ensamble
-  PetscInt *l = feenox_mesh_compute_dof_indices(this, feenox.pde.dofs);
+  PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);
 
   if (feenox.pde.has_stiffness)  {
     petsc_call(MatSetValues(feenox.pde.K, feenox.pde.elemental_size, l, feenox.pde.elemental_size, l, gsl_matrix_ptr(feenox.pde.Ki, 0, 0), ADD_VALUES));
@@ -265,7 +265,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
     feenox_call(bc_data->set_natural(bc_data, this, q));
   }
   
-  PetscInt *l = feenox_mesh_compute_dof_indices(this, feenox.pde.dofs);
+  PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);
   if (feenox.pde.has_rhs == PETSC_TRUE) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.pde.elemental_size, l, gsl_vector_ptr(feenox.pde.bi, 0), ADD_VALUES));
   }
@@ -388,8 +388,8 @@ int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
     gsl_vector_set(feenox.pde.vec_f, g, value[g]);
   }  
   
-  double wdet = feenox_mesh_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
-  gsl_matrix *H_Gc = feenox_mesh_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
   feenox_call(gsl_blas_dgemv(CblasTrans, wdet, H_Gc, feenox.pde.vec_f, 1.0, feenox.pde.bi));
   // the H_Gc does not have to be freed
 #endif

@@ -74,7 +74,6 @@ feenox_SOURCES = \
 ./mesh/element.c \
 ./mesh/element.h \
 ./mesh/cell.c \
-./mesh/fem.c \
 ./mesh/write.c \
 ./mesh/integrate.c \
 ./mesh/extrema.c \

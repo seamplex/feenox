@@ -108,7 +108,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
             element_t *element = &mesh->element[i];
             if (element->type->dim == mesh->dim) {
               for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-                feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
+                feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
               
                 val = feenox_function_eval(function, element->x[q]);
                 if (val > value[FEENOX_EXTREMA_MAX]) {
@@ -135,7 +135,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         }
 
         for (size_t i = 0; i < mesh->n_cells; i++) {
-          feenox_mesh_update_coord_vars(mesh->cell[i].x);
+          feenox_fem_update_coord_vars(mesh->cell[i].x);
           val = feenox_expression_eval(expr);
           
           if (val > value[FEENOX_EXTREMA_MAX]) {
@@ -149,7 +149,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
       
       if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_nodes) {
         for (size_t i = 0; i < mesh->n_nodes; i++) {
-          feenox_mesh_update_coord_vars(mesh->node[i].x);
+          feenox_fem_update_coord_vars(mesh->node[i].x);
           val = feenox_expression_eval(expr);
           
           if (val > value[FEENOX_EXTREMA_MAX]) {
@@ -166,8 +166,8 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           element_t *element = &mesh->element[i];
           if (element->type->dim == mesh->dim) {
             for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
-              feenox_mesh_update_coord_vars(element->x[q]);
+              feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
+              feenox_fem_update_coord_vars(element->x[q]);
               val = feenox_expression_eval(expr);
             
               if (val > value[FEENOX_EXTREMA_MAX]) {
@@ -227,7 +227,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         for (i = 0; i < physical_group->n_elements; i++) {
           element_t *element = &mesh->element[physical_group->element[i]];
           for (j = 0; j < element->type->nodes; j++) {
-            feenox_mesh_update_coord_vars(element->node[j]->x);
+            feenox_fem_update_coord_vars(element->node[j]->x);
             val = feenox_expression_eval(expr);
             if (val > value[FEENOX_EXTREMA_MAX]) {
               feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, element->node[j]->index_mesh, val, element->node[j]->x);

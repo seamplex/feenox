@@ -329,7 +329,7 @@ int feenox_problem_bc_set_mechanical_normal_stress(bc_data_t *this, element_t *e
   feenox_call(feenox_mesh_compute_outward_normal(e, n));
 
   // TODO: cache if not space dependent
-  feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   double p = feenox_expression_eval(&this->expr);
   
   // remember that here p > 0 means compression
@@ -353,7 +353,7 @@ int feenox_problem_bc_set_mechanical_traction(bc_data_t *this, element_t *e, uns
 #ifdef HAVE_PETSC
   // TODO: cache if not space dependent
   // TODO: have different functions, one for space and one for constant?
-  feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
 
   // TODO: set all the DOFs at the same time
   double t[3] = {0,0,0};
@@ -374,7 +374,7 @@ int feenox_problem_bc_set_mechanical_force(bc_data_t *this, element_t *e, unsign
 
 #ifdef HAVE_PETSC
   // TODO: cache if not space dependent
-  feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   // TODO: set all the DOFs at the same time
   double t[3] = {0,0,0};
   if (e->physical_group->volume == 0) {

@@ -74,15 +74,18 @@ int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsi
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x = feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  double *x = feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   double derivative = feenox_expression_eval(&this->expr);
   feenox_call(feenox_problem_rhs_set(e, q, &derivative));
   
   if (this->nonlinear) {
     double phi = feenox_function_eval(feenox.pde.solution[0], x);
     double dderivativedphi = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], phi);
+    
+//    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+    gsl_matrix *H = e->type->H_Gc[q];
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dderivativedphi, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.pde.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dderivativedphi, H, H, 1.0, feenox.pde.Jbi));
   }
   
 #endif

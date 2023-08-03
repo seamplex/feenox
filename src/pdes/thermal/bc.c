@@ -103,7 +103,7 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsign
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x = feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  double *x = feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   double power = feenox_expression_eval(&this->expr);
   feenox_call(feenox_problem_rhs_set(e, q, &power));
   
@@ -129,8 +129,7 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
     return FEENOX_OK;
   }
 
-//  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
-  feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
   
   double h = 0;
   double Tref = 0;

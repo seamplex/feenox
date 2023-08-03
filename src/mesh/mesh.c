@@ -212,7 +212,7 @@ int feenox_instruction_mesh_read(void *arg) {
         for (size_t i = 0; i < physical_group->n_elements; i++) {
           element_t *element = &this->element[physical_group->element[i]];
           for (unsigned int q = 0; q < element->type->gauss[this->integration].Q; q++) {
-            feenox_call(feenox_mesh_compute_w_det_at_gauss(element, q, this->integration));
+            feenox_call(feenox_fem_compute_w_det_at_gauss(element, q, this->integration));
 
             for (size_t j = 0; j < element->type->nodes; j++) {
               double wh = element->w[q] * gsl_matrix_get(element->type->gauss[this->integration].H_c[q], 0, j);

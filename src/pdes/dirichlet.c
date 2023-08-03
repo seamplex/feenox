@@ -100,11 +100,11 @@ int feenox_problem_dirichlet_eval(void) {
               
               // TODO: normal-dependent
               if (bc_data->space_dependent) {
-                feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j_global].x);
+                feenox_fem_update_coord_vars(feenox.pde.mesh->node[j_global].x);
               }
               
               // TODO: for multi-freedom high-order nodes end up with a different penalty weight
-              // TODO: pass the node insteado of the index
+              // TODO: pass the node instead of the index
               feenox_call(bc_data->set_essential(bc_data, element, j_global));
             }  
           }

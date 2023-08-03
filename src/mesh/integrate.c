@@ -76,7 +76,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
             for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_w_det_at_gauss(element, q, mesh->integration);
+              feenox_fem_compute_w_det_at_gauss(element, q, mesh->integration);
 
               double xi = 0;
               for (unsigned int j = 0; j < element->type->nodes; j++) {
@@ -96,9 +96,9 @@ int feenox_instruction_mesh_integrate(void *arg) {
           if ((physical_group == NULL && element->type->dim == mesh->dim) ||
               (physical_group != NULL && element->physical_group == physical_group)) {
             for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_w_det_at_gauss(element, q, mesh->integration);
+              feenox_fem_compute_w_det_at_gauss(element, q, mesh->integration);
               // TODO: check if the integrand depends on space
-              feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
+              feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
               integral += element->w[q] * feenox_function_eval(mesh_integrate->function, element->x[q]);
             }  
           }
@@ -113,8 +113,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
         element = mesh->cell[i].element;
         if ((physical_group == NULL && element->type->dim == mesh->dim) ||
             (physical_group != NULL && element->physical_group == physical_group)) {
-          // TODO: inlined function
-          feenox_mesh_update_coord_vars(mesh->cell[i].x);
+          feenox_fem_update_coord_vars(mesh->cell[i].x);
           integral += feenox_expression_eval(expr) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
         }
       }
@@ -127,10 +126,10 @@ int feenox_instruction_mesh_integrate(void *arg) {
         if ((physical_group == NULL && element->type->dim == mesh->dim) ||
             (physical_group != NULL && element->physical_group == physical_group)) {
           for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-            feenox_mesh_compute_w_det_at_gauss(element, q, mesh->integration);
+            feenox_fem_compute_w_det_at_gauss(element, q, mesh->integration);
             // TODO: check is the integrand depends on space
-            feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
-            feenox_mesh_update_coord_vars(element->x[q]);
+            feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
+            feenox_fem_update_coord_vars(element->x[q]);
             // si el elemento es de linea o de superficie calculamos la normal para tenerla en nx, ny y nz
             // TODO: nx
 /*            
@@ -161,7 +160,7 @@ double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function
   double xi = 0;
 
   for (unsigned int q = 0; q < this->type->gauss[mesh->integration].Q; q++) {
-    feenox_mesh_compute_w_det_at_gauss(this, q, mesh->integration);
+    feenox_fem_compute_w_det_at_gauss(this, q, mesh->integration);
  
     xi = 0;
     for (unsigned int j = 0; j < this->type->nodes; j++) {
