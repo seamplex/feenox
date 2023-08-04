@@ -63,7 +63,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
       // add a convenience function, mind the allocation
       gsl_matrix *BtB = gsl_matrix_calloc(nodes, nodes);
-      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, e->B[q], e->B[q], 1, BtB);
+      gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, B, B, 1, BtB);
 
       gsl_matrix *BtBTH = gsl_matrix_calloc(nodes, nodes);
       feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, BtB, TH, 1, BtBTH));

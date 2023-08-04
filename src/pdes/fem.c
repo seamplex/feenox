@@ -21,6 +21,52 @@
  */
 #include "../feenox.h"
 
+
+int feenox_fem_elemental_caches_reset(void) {
+  
+  if (feenox.fem.current_gauss_type != NULL) {
+    for (unsigned int q = 0; q < feenox.fem.current_gauss_type->gauss[feenox.pde.mesh->integration].Q; q++) {
+      if (feenox.fem.Ji != NULL) {
+        gsl_matrix_free(feenox.fem.Ji[q]);
+        feenox.fem.Ji[q] = NULL;
+      }
+
+      if (feenox.fem.invJi != NULL) {
+        gsl_matrix_free(feenox.fem.invJi[q]);
+        feenox.fem.invJi[q] = NULL;
+      }
+
+      if (feenox.fem.Bi != NULL) {
+        gsl_matrix_free(feenox.fem.Bi[q]);
+        feenox.fem.Bi[q] = NULL;
+      }
+
+      if (feenox.fem.B_Gi != NULL) {
+        gsl_matrix_free(feenox.fem.B_Gi[q]);
+        feenox.fem.B_Gi[q] = NULL;
+      }
+    }
+  }
+  
+  feenox_free(feenox.fem.w);
+  
+  gsl_matrix_free(feenox.fem.C);
+  feenox.fem.C = NULL; 
+  
+  feenox_free(feenox.fem.Ji);
+  feenox_free(feenox.fem.invJi);
+  feenox_free(feenox.fem.Bi);
+  feenox_free(feenox.fem.B_Gi);
+  
+  feenox.fem.current_gauss_element_tag = 0;
+  feenox.fem.current_gauss_type = NULL;
+  
+  return FEENOX_OK;
+
+}
+
+
+
 // inverts a small-size square matrix
 // TODO: virtual methods linked to the element type?
 gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
@@ -188,11 +234,14 @@ inline gsl_matrix *feenox_fem_compute_invJ_at_gauss(element_t *e, unsigned int q
 
 // matrix with the coordinates
 inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
+    feenox_fem_elemental_caches_reset();
+  }
   
   gsl_matrix **C = (feenox.fem.cache_J) ? &e->C : &feenox.fem.C;
   if ((*C) == NULL) {
     (*C) = gsl_matrix_calloc(e->type->dim, e->type->nodes);
-  } else if (feenox.fem.cache_J || e->tag == feenox.fem.current_element_tag) {
+  } else if (feenox.fem.cache_J || e->tag == feenox.fem.current_gauss_element_tag) {
     return (*C);
   }
   
@@ -202,7 +251,7 @@ inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
       gsl_matrix_set((*C), d, j, e->node[j]->x[d]);
     }
   }
-  feenox.fem.current_element_tag = e->tag;
+  feenox.fem.current_gauss_element_tag = e->tag;
   
   return (*C);
 }
@@ -251,16 +300,23 @@ inline material_t *feenox_fem_get_material(element_t *e) {
 
 inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration) {
 
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
+    feenox_fem_elemental_caches_reset();
+  }
+  
   double **w = (feenox.fem.cache_J) ? &e->w : &feenox.fem.w;
   if ((*w) == NULL) {
     (*w) = calloc(e->type->gauss[integration].Q, sizeof(double));
+    feenox.fem.current_gauss_type = e->type;
   } else if (feenox.fem.cache_J) {
     return (*w)[q];
   }
   
+  gsl_matrix *J = feenox_fem_compute_J_at_gauss(e, q, integration);
+  
   // TODO: choose to complain about zero or negative?
   // TODO: choose to take the absolute value or not? put these two as defines
-  (*w)[q] = e->type->gauss[integration].w[q] * fabs(feenox_fem_determinant(feenox_fem_compute_J_at_gauss(e, q, integration)));
+  (*w)[q] = e->type->gauss[integration].w[q] * fabs(feenox_fem_determinant(J));
   return (*w)[q];
 }
 
@@ -404,6 +460,17 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
   if (J == NULL) {
     J = gsl_matrix_calloc(e->type->dim, e->type->dim);
   }
+/*  
+  printf("tag = %ld type = %d\n", e->tag, e->type->id);
+
+  printf("C = \n");
+  feenox_debug_print_gsl_matrix(C, stdout);
+  printf("B_c = \n");
+  feenox_debug_print_gsl_matrix(e->type->gauss[integration].B_c[q], stdout);
+  printf("J = \n");
+  feenox_debug_print_gsl_matrix(J, stdout);
+*/
+
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C, e->type->gauss[integration].B_c[q], 0.0, J);
   
   return J;
@@ -413,9 +480,14 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
 // magic magic magic!
 inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, int integration) {
 
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
+    feenox_fem_elemental_caches_reset();
+  }
+  
   gsl_matrix ***J = (feenox.fem.cache_J) ? &e->J : &feenox.fem.Ji;
   if ((*J) == NULL) {
     feenox_check_alloc_null((*J) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
+    feenox.fem.current_gauss_type = e->type;
   }
   if ((*J)[q] == NULL) {
     (*J)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
@@ -460,6 +532,7 @@ inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int i
   double ***x = (feenox.fem.cache_J) ? &e->x : &feenox.fem.x;
   if ((*x) == NULL) {
     feenox_check_alloc_null((*x) = calloc(e->type->gauss[integration].Q, sizeof(double *)));
+    feenox.fem.current_gauss_type = e->type;
   }
   if ((*x)[q] == NULL) {
     (*x)[q] = calloc(3, sizeof(double));
@@ -467,13 +540,15 @@ inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int i
     return (*x)[q];
   }
   
+  gsl_matrix *H = e->type->gauss[integration].H_c[q];
+  (*x)[q][0] = (*x)[q][1] = (*x)[q][2] = 0;
   for (unsigned int j = 0; j < e->type->nodes; j++) {
-    double h = gsl_matrix_get(e->type->gauss[integration].H_c[q], 0, j);
+    double h = gsl_matrix_get(H, 0, j);
     for (unsigned int d = 0; d < 3; d++) {
       (*x)[q][d] += h * e->node[j]->x[d];
     }
   }
-
+  
   return (*x)[q];
 }
 
@@ -508,9 +583,14 @@ inline gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_type_t *element_type
 
 inline gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration) {
 
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
+    feenox_fem_elemental_caches_reset();
+  }
+  
   gsl_matrix ***B = (feenox.fem.cache_B) ? &e->B : &feenox.fem.Bi;
   if ((*B) == NULL) {
     feenox_check_alloc_null((*B) = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *)));
+    feenox.fem.current_gauss_type = e->type;
   }
   if ((*B)[q] == NULL) {
     (*B)[q] = gsl_matrix_calloc(e->type->dim, e->type->nodes);

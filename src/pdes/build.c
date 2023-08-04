@@ -94,6 +94,11 @@ int feenox_problem_build(void) {
     return FEENOX_ERROR;
   }
 
+  // do we need this?
+  feenox_call(feenox_fem_elemental_caches_reset());
+  // xxx
+  
+  
   feenox_call(feenox_problem_build_assemble());
 
   // TODO: put 100 as a define or as a variable
@@ -119,25 +124,26 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
 
 #ifdef HAVE_PETSC
   
+  feenox_call(feenox_fem_elemental_caches_reset());
   feenox_call(feenox_problem_build_elemental_objects_free());
       
-  feenox.fem.n_local_nodes = this->type->nodes;
-  feenox.fem.elemental_size = this->type->nodes * feenox.pde.dofs;
+  feenox.fem.current_elemental_type = this->type;
+  feenox.fem.current_GJ = feenox.pde.dofs * this->type->nodes;
   
   if (feenox.pde.has_stiffness) {
-    feenox_check_alloc(feenox.fem.Ki = gsl_matrix_calloc(feenox.fem.elemental_size, feenox.fem.elemental_size));
+    feenox_check_alloc(feenox.fem.Ki = gsl_matrix_calloc(feenox.fem.current_GJ, feenox.fem.current_GJ));
   }  
   if (feenox.pde.has_mass) {
-    feenox_check_alloc(feenox.fem.Mi = gsl_matrix_calloc(feenox.fem.elemental_size, feenox.fem.elemental_size));
+    feenox_check_alloc(feenox.fem.Mi = gsl_matrix_calloc(feenox.fem.current_GJ, feenox.fem.current_GJ));
   }
   if (feenox.pde.has_jacobian_K) {
-    feenox_check_alloc(feenox.fem.JKi = gsl_matrix_calloc(feenox.fem.elemental_size, feenox.fem.elemental_size));
+    feenox_check_alloc(feenox.fem.JKi = gsl_matrix_calloc(feenox.fem.current_GJ, feenox.fem.current_GJ));
   }
   if (feenox.pde.has_jacobian_b) {
-    feenox_check_alloc(feenox.fem.Jbi = gsl_matrix_calloc(feenox.fem.elemental_size, feenox.fem.elemental_size));
+    feenox_check_alloc(feenox.fem.Jbi = gsl_matrix_calloc(feenox.fem.current_GJ, feenox.fem.current_GJ));
   }
   if (feenox.pde.has_rhs) {
-    feenox_check_alloc(feenox.fem.bi = gsl_vector_calloc(feenox.fem.elemental_size));
+    feenox_check_alloc(feenox.fem.bi = gsl_vector_calloc(feenox.fem.current_GJ));
     if (feenox.fem.vec_f == NULL) {
       feenox_check_alloc(feenox.fem.vec_f = gsl_vector_calloc(feenox.pde.dofs));
     }
@@ -154,14 +160,11 @@ int feenox_problem_build_elemental_objects_free(void) {
 
 #ifdef HAVE_PETSC
   
-  if (feenox.fem.n_local_nodes != 0 && feenox.fem.elemental_size != 0) {
-    gsl_matrix_free(feenox.fem.Ki);
-    gsl_matrix_free(feenox.fem.Mi);
-    gsl_vector_free(feenox.fem.bi);
-  }
+  gsl_matrix_free(feenox.fem.Ki);
+  gsl_matrix_free(feenox.fem.Mi);
+  gsl_vector_free(feenox.fem.bi);
   
-  feenox.fem.n_local_nodes = 0;
-  feenox.fem.elemental_size = 0;
+  feenox.fem.current_elemental_type = NULL;
   
 #endif  
   return FEENOX_OK;
@@ -181,7 +184,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
     
   // if the current element's size is not equal to the previous one, re-allocate
   // TODO: data-oriented approach, store these objects in native arrays
-  if (feenox.fem.n_local_nodes != this->type->nodes) {
+  if (feenox.fem.current_elemental_type != this->type) {
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }
     
@@ -215,19 +218,19 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);
 
   if (feenox.pde.has_stiffness)  {
-    petsc_call(MatSetValues(feenox.pde.K, feenox.fem.elemental_size, l, feenox.fem.elemental_size, l, gsl_matrix_ptr(feenox.fem.Ki, 0, 0), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.K, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Ki, 0, 0), ADD_VALUES));
   }  
   if (feenox.pde.has_mass)  {
-    petsc_call(MatSetValues(feenox.pde.M, feenox.fem.elemental_size, l, feenox.fem.elemental_size, l, gsl_matrix_ptr(feenox.fem.Mi, 0, 0), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.M, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Mi, 0, 0), ADD_VALUES));
   }
   if (feenox.pde.has_jacobian_K) {
-    petsc_call(MatSetValues(feenox.pde.JK, feenox.fem.elemental_size, l, feenox.fem.elemental_size, l, gsl_matrix_ptr(feenox.fem.JKi, 0, 0), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.JK, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.JKi, 0, 0), ADD_VALUES));
   }
   if (feenox.pde.has_jacobian_b) {
-    petsc_call(MatSetValues(feenox.pde.Jb, feenox.fem.elemental_size, l, feenox.fem.elemental_size, l, gsl_matrix_ptr(feenox.fem.Jbi, 0, 0), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.Jb, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Jbi, 0, 0), ADD_VALUES));
   }
   if (feenox.pde.has_rhs) {
-    petsc_call(VecSetValues(feenox.pde.b, feenox.fem.elemental_size, l, gsl_vector_ptr(feenox.fem.bi, 0), ADD_VALUES));
+    petsc_call(VecSetValues(feenox.pde.b, feenox.fem.current_GJ, l, gsl_vector_ptr(feenox.fem.bi, 0), ADD_VALUES));
   }
 
 #endif  
@@ -241,7 +244,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   // total number of gauss points
   unsigned int Q = this->type->gauss[feenox.pde.mesh->integration].Q;
 
-  if (feenox.fem.n_local_nodes != this->type->nodes) {
+  if (feenox.fem.current_elemental_type != this->type) {
     feenox_call(feenox_problem_build_elemental_objects_allocate(this));
   }
   
@@ -267,11 +270,11 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   
   PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);
   if (feenox.pde.has_rhs == PETSC_TRUE) {
-    petsc_call(VecSetValues(feenox.pde.b, feenox.fem.elemental_size, l, gsl_vector_ptr(feenox.fem.bi, 0), ADD_VALUES));
+    petsc_call(VecSetValues(feenox.pde.b, feenox.fem.current_GJ, l, gsl_vector_ptr(feenox.fem.bi, 0), ADD_VALUES));
   }
   if (bc_data->fills_matrix) {
-    petsc_call(MatSetValues(feenox.pde.K, feenox.fem.elemental_size, l,
-                                          feenox.fem.elemental_size, l, gsl_matrix_ptr(feenox.fem.Ki, 0, 0), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.K, feenox.fem.current_GJ, l,
+                                          feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Ki, 0, 0), ADD_VALUES));
   }
 /*
   if (feenox.pde.has_jacobian_K) {
@@ -279,7 +282,7 @@ int feenox_problem_build_element_natural_bc(element_t *this, bc_data_t *bc_data)
   } 
 */
   if (feenox.pde.has_jacobian_b) {
-    petsc_call(MatSetValues(feenox.pde.Jb, feenox.fem.elemental_size, l, feenox.fem.elemental_size, l, gsl_matrix_ptr(feenox.fem.Jbi, 0, 0), ADD_VALUES));
+    petsc_call(MatSetValues(feenox.pde.Jb, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Jbi, 0, 0), ADD_VALUES));
   }
 
 #endif
