@@ -103,7 +103,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   
   // elemental mass H'*rho*H
   if (modal.rho.uniform == 0) {
-    double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, modal.space_rho);
+    double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, modal.space_rho);
     modal.rho.eval(&modal.rho, x, material);
   }
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * modal.rho.value, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.fem.Mi));

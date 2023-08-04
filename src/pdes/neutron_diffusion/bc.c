@@ -75,7 +75,7 @@ int feenox_problem_bc_set_neutron_diffusion_vacuum(bc_data_t *this, element_t *e
 #ifdef HAVE_PETSC
 
 //  feenox_call(feenox_mesh_compute_wH_at_gauss(e, q));
-  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, feenox.pde.mesh->integration, this->space_dependent);
   // TODO: convenience call like  feenox_problem_rhs_set()?
   double coeff = (this->expr.items != NULL) ? feenox_expression_eval(&this->expr) : 0.5;
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * coeff, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.fem.Ki));

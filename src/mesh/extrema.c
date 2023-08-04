@@ -108,14 +108,14 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
             element_t *element = &mesh->element[i];
             if (element->type->dim == mesh->dim) {
               for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-                feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
+                double *x = feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
               
-                val = feenox_function_eval(function, element->x[q]);
+                val = feenox_function_eval(function, x);
                 if (val > value[FEENOX_EXTREMA_MAX]) {
-                  feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, element->x[q]);
+                  feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, x);
                 }
                 if (val < value[FEENOX_EXTREMA_MIN]) {
-                  feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, element->x[q]);
+                  feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, x);
                 }
               }
             }  
@@ -166,15 +166,14 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
           element_t *element = &mesh->element[i];
           if (element->type->dim == mesh->dim) {
             for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_fem_compute_x_at_gauss(element, q, mesh->integration);
-              feenox_fem_update_coord_vars(element->x[q]);
+              double *x = feenox_fem_compute_x_at_gauss_and_update_var(element, q, mesh->integration);
               val = feenox_expression_eval(expr);
             
               if (val > value[FEENOX_EXTREMA_MAX]) {
-                feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, element->x[q]);
+                feenox_store_extrema_mesh(FEENOX_EXTREMA_MAX, i, val, x);
               }
               if (val < value[FEENOX_EXTREMA_MIN]) {
-                feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, element->x[q]);
+                feenox_store_extrema_mesh(FEENOX_EXTREMA_MIN, i, val, x);
               }
             }
           }  

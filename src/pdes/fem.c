@@ -26,6 +26,10 @@ int feenox_fem_elemental_caches_reset(void) {
   
   if (feenox.fem.current_gauss_type != NULL) {
     for (unsigned int q = 0; q < feenox.fem.current_gauss_type->gauss[feenox.pde.mesh->integration].Q; q++) {
+      if (feenox.fem.x != NULL && feenox.fem.x[q] != NULL) {
+        feenox_free(feenox.fem.x[q]);
+      }
+      
       if (feenox.fem.Ji != NULL) {
         gsl_matrix_free(feenox.fem.Ji[q]);
         feenox.fem.Ji[q] = NULL;
@@ -53,6 +57,7 @@ int feenox_fem_elemental_caches_reset(void) {
   gsl_matrix_free(feenox.fem.C);
   feenox.fem.C = NULL; 
   
+  feenox_free(feenox.fem.x);
   feenox_free(feenox.fem.Ji);
   feenox_free(feenox.fem.invJi);
   feenox_free(feenox.fem.Bi);
@@ -142,6 +147,10 @@ gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
 
 inline double feenox_fem_determinant(gsl_matrix *this) {
 
+  if (this == NULL) {
+    return 1.0;
+  }
+  
   switch (this->size1) {
     case 0:
       return 1.0;
@@ -184,7 +193,7 @@ template<typename Derived> struct determinant_impl<Derived, 3>
     break;
   }
   
-  return 0.0;
+  return 1.0;
 }
 
 // build the canonic B_c matrix at an arbitrary location xi
@@ -280,19 +289,26 @@ inline gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi) {
   return J;
 }
 
-inline double *feenox_fem_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int condition) {
-  return (condition) ? feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration) : NULL;
+inline double *feenox_fem_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int integration, int condition) {
+  return (condition) ? feenox_fem_compute_x_at_gauss(e, q, integration) : NULL;
 }
 
-inline double *feenox_fem_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int condition) {
+inline double *feenox_fem_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int integration, int condition) {
   if (condition) {
-    double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    double *x = feenox_fem_compute_x_at_gauss(e, q, integration);
     feenox_fem_update_coord_vars(x);
     return x;
   }
   
   return NULL;
 }
+
+inline double *feenox_fem_compute_x_at_gauss_and_update_var(element_t *e, unsigned int q, int integration) {
+  double *x = feenox_fem_compute_x_at_gauss(e, q, integration);
+  feenox_fem_update_coord_vars(x);
+  return x;
+}
+
 
 inline material_t *feenox_fem_get_material(element_t *e) {
   return (e->physical_group != NULL) ? e->physical_group->material : NULL;
@@ -427,7 +443,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_2d(element_t *e, unsigned int q
     }
   }
 
-  return FEENOX_OK;
+  return J;
 }
 
 
@@ -460,16 +476,6 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
   if (J == NULL) {
     J = gsl_matrix_calloc(e->type->dim, e->type->dim);
   }
-/*  
-  printf("tag = %ld type = %d\n", e->tag, e->type->id);
-
-  printf("C = \n");
-  feenox_debug_print_gsl_matrix(C, stdout);
-  printf("B_c = \n");
-  feenox_debug_print_gsl_matrix(e->type->gauss[integration].B_c[q], stdout);
-  printf("J = \n");
-  feenox_debug_print_gsl_matrix(J, stdout);
-*/
 
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C, e->type->gauss[integration].B_c[q], 0.0, J);
   
@@ -529,6 +535,10 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, i
 
 inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int integration) {
 
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
+    feenox_fem_elemental_caches_reset();
+  }
+  
   double ***x = (feenox.fem.cache_J) ? &e->x : &feenox.fem.x;
   if ((*x) == NULL) {
     feenox_check_alloc_null((*x) = calloc(e->type->gauss[integration].Q, sizeof(double *)));

@@ -58,7 +58,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
 
 #ifdef HAVE_PETSC
   
-  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, neutron_diffusion.space_XS);
+  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, neutron_diffusion.space_XS);
   material_t *material = feenox_fem_get_material(e);
   
   gsl_matrix_set_zero(neutron_diffusion.D_G);

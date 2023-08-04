@@ -75,7 +75,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
 #ifdef HAVE_PETSC
 
 //  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, neutron_sn.space_XS);
+  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, neutron_sn.space_XS);
   material_t *material = feenox_fem_get_material(e);
   
   // initialize to zero

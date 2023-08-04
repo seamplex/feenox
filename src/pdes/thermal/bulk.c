@@ -30,7 +30,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
 
-  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
+  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
   material_t *material = feenox_fem_get_material(e);  
   double k = thermal.k.eval(&thermal.k, x, material);
   

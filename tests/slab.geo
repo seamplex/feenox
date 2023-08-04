@@ -6,5 +6,6 @@ Physical Point("left") = {1};
 Physical Point("right") = {2};
 Physical Line("bulk") = {1};
 
-n = 10;
-Mesh.MeshSizeMax = 1/n;
+//n = 10;
+//Mesh.MeshSizeMax = 1/n;
+Transfinite Curve {1} = 10+1;

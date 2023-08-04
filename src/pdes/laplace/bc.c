@@ -74,7 +74,7 @@ int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsi
 #ifdef HAVE_PETSC
   
   // TODO: cache if neither space nor temperature dependent
-  double *x = feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, this->space_dependent);
+  double *x = feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, feenox.pde.mesh->integration, this->space_dependent);
   double derivative = feenox_expression_eval(&this->expr);
   feenox_call(feenox_problem_rhs_set(e, q, &derivative));
   

@@ -124,11 +124,14 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
 
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_fem_elemental_caches_reset());
+//  feenox_call(feenox_fem_elemental_caches_reset());
   feenox_call(feenox_problem_build_elemental_objects_free());
       
   feenox.fem.current_elemental_type = this->type;
   feenox.fem.current_GJ = feenox.pde.dofs * this->type->nodes;
+
+  feenox_check_alloc(feenox.fem.l = calloc(feenox.fem.current_GJ, sizeof(PetscInt)));
+
   
   if (feenox.pde.has_stiffness) {
     feenox_check_alloc(feenox.fem.Ki = gsl_matrix_calloc(feenox.fem.current_GJ, feenox.fem.current_GJ));
@@ -162,7 +165,10 @@ int feenox_problem_build_elemental_objects_free(void) {
   
   gsl_matrix_free(feenox.fem.Ki);
   gsl_matrix_free(feenox.fem.Mi);
+  gsl_matrix_free(feenox.fem.JKi);
+  gsl_matrix_free(feenox.fem.Jbi);
   gsl_vector_free(feenox.fem.bi);
+  feenox_free(feenox.fem.l);
   
   feenox.fem.current_elemental_type = NULL;
   

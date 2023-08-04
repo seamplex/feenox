@@ -2321,8 +2321,9 @@ extern int feenox_problem_dirichlet_compute_scale(void);
 extern int feenox_fem_elemental_caches_reset(void);
 extern material_t *feenox_fem_get_material(element_t *e);
 extern double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
-extern double *feenox_fem_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int condition);
-extern double *feenox_fem_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int condition);
+extern double *feenox_fem_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int integration,  int condition);
+extern double *feenox_fem_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int integration, int condition);
+extern double *feenox_fem_compute_x_at_gauss_and_update_var(element_t *e, unsigned int q, int integration);
 
 extern double feenox_fem_determinant(gsl_matrix *);
 extern gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
