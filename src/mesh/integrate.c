@@ -152,17 +152,15 @@ int feenox_instruction_mesh_integrate(void *arg) {
 double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function_t *function) {
 
   double integral = 0;
-  double xi = 0;
 
   for (unsigned int q = 0; q < this->type->gauss[mesh->integration].Q; q++) {
-    feenox_fem_compute_w_det_at_gauss(this, q, mesh->integration);
- 
-    xi = 0;
+    double wdet = feenox_fem_compute_w_det_at_gauss(this, q, mesh->integration);
+    double val = 0;
     for (unsigned int j = 0; j < this->type->nodes; j++) {
-      xi += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
+      val += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
     }
 
-    integral += this->w[q] * xi;
+    integral += wdet * val;
   }
 
   return integral;

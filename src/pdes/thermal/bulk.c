@@ -27,13 +27,12 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
 #ifdef HAVE_PETSC
   
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
-  gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
-
   double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, thermal.space_dependent_stiffness || thermal.space_dependent_source || thermal.space_dependent_mass);
   material_t *material = feenox_fem_get_material(e);  
   double k = thermal.k.eval(&thermal.k, x, material);
-  
+
+  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet*k, B, B, 1.0, feenox.fem.Ki));
  
   // volumetric heat source term Ht*q

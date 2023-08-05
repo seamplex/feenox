@@ -630,9 +630,9 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
   unsigned int D = e->type->dim;
 
   if ((*B_G)[q] == NULL) {
-    *B_G[q] = gsl_matrix_calloc(G*D, G*J);
+    (*B_G)[q] = gsl_matrix_calloc(G*D, G*J);
   } else if (feenox.fem.cache_B) {
-    return *B_G[q];
+    return (*B_G)[q];
   }
 
   gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, integration);
@@ -642,12 +642,12 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
       size_t Gj = G*j;
       double dhdxi = gsl_matrix_get(B, d, j);
       for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-        gsl_matrix_set(e->B_G[q], Gd+g, Gj+g, dhdxi);
+        gsl_matrix_set((*B_G)[q], Gd+g, Gj+g, dhdxi);
       }
     }
   }
 
-  return *B_G[q];
+  return (*B_G)[q];
 }
 
 

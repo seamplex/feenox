@@ -177,12 +177,14 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
 //  double tau = 0.5 * feenox_var_value(neutron_sn.sn_alpha) * neutron_sn.supg_dimension_factor * e->type->volume(e) / e->type->area(e);
   double tau = feenox_var_value(neutron_sn.sn_alpha) * e->type->size(e);
   
-  feenox_call(gsl_matrix_memcpy(neutron_sn.P, e->type->H_Gc[q]));
+  gsl_matrix *H_G = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_matrix_memcpy(neutron_sn.P, H_G));
   for (unsigned int j = 0; j < neutron_sn.n_nodes; j++) {
     int MGj = MG*j;
     for (unsigned int m = 0; m < neutron_sn.directions; m++) {
       for (unsigned int d = 0; d < feenox.pde.dim; d++) {
-        double value = tau * neutron_sn.Omega[m][d] * gsl_matrix_get(e->B[q], d, j);
+        double value = tau * neutron_sn.Omega[m][d] * gsl_matrix_get(B, d, j);
         for (unsigned int g = 0; g < neutron_sn.groups; g++) {
           int diag = dof_index(m,g);
           gsl_matrix_add_to_element(neutron_sn.P, diag, MGj + diag, value);
@@ -192,21 +194,23 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   }
 
   // petrov-stabilized leakage term
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.D, e->B_G[q], 0.0, neutron_sn.DB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], neutron_sn.P, neutron_sn.DB, 1.0, neutron_sn.Li));
+  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *B_G = feenox_fem_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.D, B_G, 0.0, neutron_sn.DB));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, neutron_sn.P, neutron_sn.DB, 1.0, neutron_sn.Li));
 
   // petrov-stabilized removal term
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.R, e->type->H_Gc[q], 0.0, neutron_sn.AH));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], neutron_sn.P, neutron_sn.AH, 1.0, neutron_sn.Ai));
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.R, H_G, 0.0, neutron_sn.AH));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, neutron_sn.P, neutron_sn.AH, 1.0, neutron_sn.Ai));
   
   // petrov-stabilized fission term
   if (neutron_sn.has_fission) {
-    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.X, e->type->H_Gc[q], 0.0, neutron_sn.XH));
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], neutron_sn.P, neutron_sn.XH, 1.0, neutron_sn.Fi));
+    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_sn.X, H_G, 0.0, neutron_sn.XH));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, neutron_sn.P, neutron_sn.XH, 1.0, neutron_sn.Fi));
   }
   // petrov-stabilized source term
   if (neutron_sn.has_sources) {
-    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], neutron_sn.P, neutron_sn.s, 1.0, neutron_sn.Si));
+    feenox_call(gsl_blas_dgemv(CblasTrans, wdet, neutron_sn.P, neutron_sn.s, 1.0, neutron_sn.Si));
   }
   
   // for source-driven problems
