@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to build elemental mechanical objects
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -45,20 +45,19 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-
   if (mechanical.n_nodes != e->type->nodes) {
     feenox_call(feenox_problem_build_allocate_aux_mechanical(e->type->nodes));
   }
   
+  double *x = NULL;
   if (mechanical.uniform_C == 0) {
     // material stress-strain relationship
-    feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
-    mechanical.compute_C(e->x[q], e->physical_group != NULL ? e->physical_group->material : NULL);
+    double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    mechanical.compute_C(x, feenox_fem_get_material(e));
   }
   
-  gsl_matrix *dhdx = e->B[q];
-  for (int j = 0; j < mechanical.n_nodes; j++) {
+  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
       
@@ -94,26 +93,34 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
       return FEENOX_ERROR;
     }
   }
+
+  // wdet
+  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   
   // volumetric force densities
   if (mechanical.f_x.defined || mechanical.f_y.defined || mechanical.f_z.defined) {
-    if (mechanical.f_x.uniform == 0 || mechanical.f_y.uniform == 0 || mechanical.f_z.uniform == 0) {
-      feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+    if (x == NULL) {
+      x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);           
     }
-    
+    material_t *material = feenox_fem_get_material(e);
+      
+    gsl_matrix *H = e->type->gauss[feenox.pde.mesh->integration].H_c[q]; 
+    double f_x = mechanical.f_x.eval(&mechanical.f_x, x, material);
+    double f_y = mechanical.f_y.eval(&mechanical.f_y, x, material);
+    double f_z = mechanical.f_z.eval(&mechanical.f_z, x, material);
+
     for (int j = 0; j < e->type->nodes; j++) {
       int offset = feenox.pde.dofs*j;
-      material_t *material = e->physical_group != NULL ? e->physical_group->material : NULL;
       // TODO: matrix-vector product
-      double wh = e->w[q] * gsl_matrix_get(e->type->gauss[feenox.pde.mesh->integration].H_c[q], 0, j);
+      double wh = wdet * gsl_matrix_get(H, 0, j);
       if (mechanical.f_x.defined) {
-        gsl_vector_add_to_element(feenox.pde.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, e->x[q], material));
+        gsl_vector_add_to_element(feenox.fem.bi, offset+0, wh * f_x);
       }  
       if (mechanical.f_y.defined) {
-        gsl_vector_add_to_element(feenox.pde.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, e->x[q], material));
+        gsl_vector_add_to_element(feenox.fem.bi, offset+1, wh * f_y);
       }
       if (mechanical.f_z.defined) {
-        gsl_vector_add_to_element(feenox.pde.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, e->x[q], material));
+        gsl_vector_add_to_element(feenox.fem.bi, offset+2, wh * f_z);
       }  
     }
   }
@@ -122,18 +129,17 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 
   // elemental stiffness B'*C*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mechanical.C, mechanical.B, 0, mechanical.CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], mechanical.B, mechanical.CB, 1.0, feenox.pde.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, mechanical.B, mechanical.CB, 1.0, feenox.fem.Ki));
 
   // thermal expansion strain vector
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
-    // if C is not uniform we already have x
-    if (mechanical.uniform_C == 1 && mechanical.uniform_expansion == 0) {
-      feenox_call(feenox_mesh_compute_x_at_gauss(e, q, feenox.pde.mesh->integration));
+    if (x == NULL) {
+      x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);    
     }
-    mechanical.compute_thermal_strain(e->x[q], e->physical_group != NULL ? e->physical_group->material : NULL);
+    mechanical.compute_thermal_strain(x, feenox_fem_get_material(e));
     
     feenox_call(gsl_blas_dgemv(CblasTrans, 1.0, mechanical.C, mechanical.et, 0, mechanical.Cet));
-    feenox_call(gsl_blas_dgemv(CblasTrans, e->w[q], mechanical.B, mechanical.Cet, 1.0, feenox.pde.bi));
+    feenox_call(gsl_blas_dgemv(CblasTrans, wdet, mechanical.B, mechanical.Cet, 1.0, feenox.fem.bi));
   }
   
 #endif

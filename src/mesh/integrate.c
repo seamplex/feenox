@@ -29,7 +29,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
   expr_t *expr = &mesh_integrate->expr;
   physical_group_t *physical_group = mesh_integrate->physical_group;
   var_t *result = mesh_integrate->result;
-  element_t *element = NULL;
+  element_t *e = NULL;
   double integral = 0;
   
   // TODO: take into account expressions of x and nx
@@ -41,18 +41,18 @@ int feenox_instruction_mesh_integrate(void *arg) {
       if (function->type == function_type_pointwise_mesh_cell && function->mesh == mesh) {
         // function defined over a cell integrated over a cell, cool!
         for (size_t i = 0; i < mesh->n_cells; i++) {
-          element = mesh->cell[i].element;
-          if ((physical_group == NULL && element->type->dim == mesh->dim) ||
-              (physical_group != NULL && element->physical_group == physical_group)) {
+          e = mesh->cell[i].element;
+          if ((physical_group == NULL && e->type->dim == mesh->dim) ||
+              (physical_group != NULL && e->physical_group == physical_group)) {
             integral += feenox_vector_get(function->vector_value, i) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
           }
         }
       } else {
         // location is cell but function is not cell
         for (size_t i = 0; i < mesh->n_cells; i++) {
-          element = mesh->cell[i].element;
-          if ((physical_group == NULL && element->type->dim == mesh->dim) ||
-              (physical_group != NULL && element->physical_group == physical_group)) {
+          e = mesh->cell[i].element;
+          if ((physical_group == NULL && e->type->dim == mesh->dim) ||
+              (physical_group != NULL && e->physical_group == physical_group)) {
             integral += feenox_function_eval(function, mesh->cell[i].x) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
           }
         }
@@ -72,18 +72,18 @@ int feenox_instruction_mesh_integrate(void *arg) {
 */      
         
         for (size_t i = 0; i < mesh->n_elements; i++) {
-          element = &mesh->element[i];
-          if ((physical_group == NULL && element->type->dim == mesh->dim) ||
-              (physical_group != NULL && element->physical_group == physical_group)) {
-            for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
+          e = &mesh->element[i];
+          if ((physical_group == NULL && e->type->dim == mesh->dim) ||
+              (physical_group != NULL && e->physical_group == physical_group)) {
+            for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
+              double wdet =feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration);
 
               double xi = 0;
-              for (unsigned int j = 0; j < element->type->nodes; j++) {
-                xi += gsl_matrix_get(element->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, element->node[j]->index_mesh);
+              for (unsigned int j = 0; j < e->type->nodes; j++) {
+                xi += gsl_matrix_get(e->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, e->node[j]->index_mesh);
               }
 
-              integral += element->w[q] * xi;
+              integral += wdet * xi;
             }
           }
         }
@@ -92,14 +92,14 @@ int feenox_instruction_mesh_integrate(void *arg) {
         size_t i = 0;
         unsigned int q = 0;
         for (i = 0; i < mesh->n_elements; i++) {
-          element = &mesh->element[i];
-          if ((physical_group == NULL && element->type->dim == mesh->dim) ||
-              (physical_group != NULL && element->physical_group == physical_group)) {
-            for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-              feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
+          e = &mesh->element[i];
+          if ((physical_group == NULL && e->type->dim == mesh->dim) ||
+              (physical_group != NULL && e->physical_group == physical_group)) {
+            for (q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
               // TODO: check if the integrand depends on space
-              feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
-              integral += element->w[q] * feenox_function_eval(mesh_integrate->function, element->x[q]);
+              double *x = feenox_fem_compute_x_at_gauss(e, q, mesh->integration);
+              double wdet = feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration);
+              integral += wdet * feenox_function_eval(mesh_integrate->function, x);
             }  
           }
         }
@@ -110,27 +110,22 @@ int feenox_instruction_mesh_integrate(void *arg) {
       // an expression integrated over cells
       size_t i;
       for (i = 0; i < mesh->n_cells; i++) {
-        element = mesh->cell[i].element;
-        if ((physical_group == NULL && element->type->dim == mesh->dim) ||
-            (physical_group != NULL && element->physical_group == physical_group)) {
-          // TODO: inlined function
-          feenox_mesh_update_coord_vars(mesh->cell[i].x);
+        e = mesh->cell[i].element;
+        if ((physical_group == NULL && e->type->dim == mesh->dim) ||
+            (physical_group != NULL && e->physical_group == physical_group)) {
+          feenox_fem_update_coord_vars(mesh->cell[i].x);
           integral += feenox_expression_eval(expr) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
         }
       }
     } else {
-      // an expression evaluated at the nodes
-      unsigned int q = 0;
-      size_t i = 0;
-      for (i = 0; i < mesh->n_elements; i++) {
-        element = &mesh->element[i];
-        if ((physical_group == NULL && element->type->dim == mesh->dim) ||
-            (physical_group != NULL && element->physical_group == physical_group)) {
-          for (q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-            feenox_mesh_compute_w_at_gauss(element, q, mesh->integration);
-            // TODO: check is the integrand depends on space
-            feenox_mesh_compute_x_at_gauss(element, q, mesh->integration);
-            feenox_mesh_update_coord_vars(element->x[q]);
+      // an expression evaluated at the gauss points
+      for (size_t i = 0; i < mesh->n_elements; i++) {
+        e = &mesh->element[i];
+        if ((physical_group == NULL && e->type->dim == mesh->dim) ||
+            (physical_group != NULL && e->physical_group == physical_group)) {
+          for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
+            // TODO: check if the integrand depends on space
+            feenox_fem_compute_x_at_gauss_and_update_var(e, q, mesh->integration);
             // si el elemento es de linea o de superficie calculamos la normal para tenerla en nx, ny y nz
             // TODO: nx
 /*            
@@ -138,8 +133,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
               feenox_call(mesh_compute_normal(element));
             }  
  */
-            double xi = feenox_expression_eval(expr);
-            integral += element->w[q] * xi;
+            integral += feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration) * feenox_expression_eval(expr);
           }
         }
       }        
@@ -158,17 +152,15 @@ int feenox_instruction_mesh_integrate(void *arg) {
 double feenox_mesh_integral_over_element(element_t *this, mesh_t *mesh, function_t *function) {
 
   double integral = 0;
-  double xi = 0;
 
   for (unsigned int q = 0; q < this->type->gauss[mesh->integration].Q; q++) {
-    feenox_mesh_compute_w_at_gauss(this, q, mesh->integration);
- 
-    xi = 0;
+    double wdet = feenox_fem_compute_w_det_at_gauss(this, q, mesh->integration);
+    double val = 0;
     for (unsigned int j = 0; j < this->type->nodes; j++) {
-      xi += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
+      val += gsl_matrix_get(this->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, this->node[j]->index_mesh);
     }
 
-    integral += this->w[q] * xi;
+    integral += wdet * val;
   }
 
   return integral;

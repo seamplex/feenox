@@ -30,6 +30,9 @@ int feenox_problem_solve_slepc_eigen(void) {
   feenox_call(feenox_problem_dirichlet_eval());
   feenox_call(feenox_problem_dirichlet_set_K());  
   feenox_call(feenox_problem_dirichlet_set_M());
+  if (feenox.pde.missed_dump != NULL) {
+    feenox_call(feenox_instruction_dump(feenox.pde.missed_dump));
+  }
 
   // TODO: to help debug stuff, allow to execute DUMPs after building but before crashing  
 /*  

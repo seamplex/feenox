@@ -84,7 +84,7 @@ int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *
   
   
   // compute the stiffness by inverting the 3x3 compliance
-  feenox_call(feenox_mesh_matrix_invert(S, C));
+  C = feenox_fem_matrix_invert(S, C);
     
   // now fill the full 6x6 C
   gsl_matrix_set(mechanical.C, 0, 0, gsl_matrix_get(C, 0, 0));

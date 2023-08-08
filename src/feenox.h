@@ -980,13 +980,13 @@ struct elementary_entity_t {
 
 
 struct gauss_t {
-  int Q;               // number of points (q=1,2,...,Q )
+  unsigned int Q;               // number of points (q=1,2,...,Q )
   double *w;           // weights (w[q] is the weight of the v-th point)
   double **xi;         // coordinates (xi[q][d] is the coordinate of the q-th point in dimension d)
   
   // one matrix for each gauss point q
-  gsl_matrix **H_c;    // H(1,j) = h_j(x_q)
-  gsl_matrix **B_c;    // B(d,j) = d(h_j)/d(x_d) at x_q
+  gsl_matrix **H_c;    // H(1,j) = h_j(xi_q)
+  gsl_matrix **B_c;    // B(d,j) = d(h_j)/d(xi_d) at xi_q
   gsl_matrix *extrap;  // matrix to extrapolate the values from the gauss points to the nodes
 };
 
@@ -1070,14 +1070,6 @@ struct element_t {
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
-  
-  int flag;
-
- 
-#ifdef HAVE_PETSC
-  PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element
-#endif
-  
 };
 
 
@@ -1701,7 +1693,8 @@ struct feenox_t {
     size_t size_global;            // total number of DoFs
     
     int compute_gradients;   // do we need to compute gradients?
-    gsl_matrix *m2;
+    void *missed_dump;
+//    gsl_matrix *m2;
     
     int rough;               // keep each element's contribution to the gradient?
     int roughish;            // average only on the same physical group?
@@ -1870,9 +1863,6 @@ struct feenox_t {
     TS ts;
     SNES snes;
     KSP ksp;
-#ifdef HAVE_SLEPC
-    EPS eps;
-#endif
 
     // strings with types
     PCType pc_type;
@@ -1885,6 +1875,7 @@ struct feenox_t {
 #ifdef HAVE_SLEPC
     EPSType eps_type;
     STType st_type;
+    EPS eps;
 #endif
 
     PetscBool progress_ascii;
@@ -1895,9 +1886,32 @@ struct feenox_t {
     expr_t st_shift;
     expr_t st_anti_shift;  
 
+#endif  // HAVE_PETSC    
+    
+  } pde;
+
+  struct {
+#ifdef HAVE_PETSC
+    PetscBool cache_J;
+    PetscBool cache_B;
+
+    // TODO: this is not thread safe! we stick to MPI anyway...
+    size_t current_gauss_element_tag;
+//    unsigned int current_gauss_number_of_points;
+    element_type_t *current_gauss_type;
+
+    unsigned int current_GJ;
+    element_type_t *current_elemental_type;
+
+    double *w;
+    double **x;
+    gsl_matrix *C;
+    gsl_matrix **Ji;
+    gsl_matrix **invJi;
+    gsl_matrix **Bi;
+    gsl_matrix **B_Gi;
+    
     // elemental (local) objects
-    size_t n_local_nodes;
-    unsigned int elemental_size;  // current size of objects = n_local_nodes * dofs
     gsl_matrix *Ki;               // elementary stiffness matrix
     gsl_matrix *Mi;               // elementary mass matrix
     gsl_matrix *JKi;              // elementary jacobian for stiffness matrix
@@ -1906,9 +1920,10 @@ struct feenox_t {
 
     gsl_vector *vec_f;               // temporary vector for rhs things like H'*f
 
-#endif  // HAVE_PETSC    
-    
-  } pde;
+    PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element    
+#endif    
+  } fem;
+
   
 };
 extern feenox_t feenox;
@@ -2147,45 +2162,7 @@ extern int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *param
 extern double feenox_mesh_interpolate_function_node(struct function_t *function, const double *x);
 extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, double *r);
 
-// fem.c
-extern double feenox_mesh_determinant(gsl_matrix *);
-extern int feenox_mesh_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
-extern material_t *feenox_mesh_get_material(element_t *e);
-extern int feenox_mesh_compute_wH_at_gauss(element_t *e, unsigned int q);
-extern int feenox_mesh_compute_wHB_at_gauss(element_t *e, unsigned int q);
 
-extern int feenox_mesh_compute_C(element_t *e);
-
-extern int feenox_mesh_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
-extern double *feenox_mesh_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int condition);
-extern double *feenox_mesh_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int condition);
-
-extern int feenox_mesh_compute_w_at_gauss(element_t *e, unsigned int q, int integration);
-
-extern int feenox_mesh_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
-
-extern int feenox_mesh_compute_J(element_t *e, double *r, gsl_matrix *dxdxi);
-extern int feenox_mesh_compute_J_at_gauss(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration);
-
-
-extern gsl_matrix *feenox_mesh_compute_B_c(element_type_t *element_type, double *xi);
-
-extern int feenox_mesh_compute_B(element_t *e, double *r, gsl_matrix *dxidx_ref, gsl_matrix *dhdx);
-extern int feenox_mesh_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
-extern int feenox_mesh_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
-
-extern int feenox_mesh_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration);
-extern int feenox_mesh_compute_dof_indices(element_t *e, mesh_t *mesh);
-
-#define feenox_mesh_update_coord_vars(val) {\
-  feenox_var_value(feenox.mesh.vars.x) = val[0];\
-  feenox_var_value(feenox.mesh.vars.y) = val[1];\
-  feenox_var_value(feenox.mesh.vars.z) = val[2];\
-}
 
 // gmsh.c
 extern int feenox_mesh_read_gmsh(mesh_t *);
@@ -2339,6 +2316,47 @@ extern int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot);
 extern int feenox_problem_dirichlet_compute_scale(void);
 
 #endif
+
+
+// fem.c
+extern int feenox_fem_elemental_caches_reset(void);
+extern material_t *feenox_fem_get_material(element_t *e);
+extern double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int integration);
+extern double *feenox_fem_compute_x_at_gauss_if_needed(element_t *e, unsigned int q, int integration,  int condition);
+extern double *feenox_fem_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int integration, int condition);
+extern double *feenox_fem_compute_x_at_gauss_and_update_var(element_t *e, unsigned int q, int integration);
+
+extern double feenox_fem_determinant(gsl_matrix *);
+extern gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+
+extern double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_C(element_t *e);
+extern gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
+
+extern gsl_matrix *feenox_fem_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi);
+extern gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_fem_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+
+extern gsl_matrix *feenox_fem_compute_B_c(element_type_t *element_type, double *xi);
+extern gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi);
+
+extern gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
+
+#ifdef HAVE_PETSC
+extern PetscInt *feenox_fem_compute_dof_indices(element_t *e, int G);
+#endif
+
+#define feenox_fem_update_coord_vars(val) {\
+  feenox_var_value(feenox.mesh.vars.x) = val[0];\
+  feenox_var_value(feenox.mesh.vars.y) = val[1];\
+  feenox_var_value(feenox.mesh.vars.z) = val[2];\
+}
+
 
 // distribution.c
 extern int feenox_distribution_init(distribution_t *, const char *name);

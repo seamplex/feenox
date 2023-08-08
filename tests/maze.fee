@@ -1,0 +1,15 @@
+PROBLEM laplace 2D
+READ_MESH maze.msh
+
+phi_0(x,y) = 0
+end_time = 1
+alpha = 1e-6
+BC end     phi=if(t<1,t,1)
+BC start   phi=0 
+
+SOLVE_PROBLEM
+
+IF done
+  PRINT dphidy(431.799,-817.879)-(-0.00154393) 
+ENDIF
+

@@ -100,11 +100,11 @@ int feenox_problem_dirichlet_eval(void) {
               
               // TODO: normal-dependent
               if (bc_data->space_dependent) {
-                feenox_mesh_update_coord_vars(feenox.pde.mesh->node[j_global].x);
+                feenox_fem_update_coord_vars(feenox.pde.mesh->node[j_global].x);
               }
               
               // TODO: for multi-freedom high-order nodes end up with a different penalty weight
-              // TODO: pass the node insteado of the index
+              // TODO: pass the node instead of the index
               feenox_call(bc_data->set_essential(bc_data, element, j_global));
             }  
           }
@@ -231,6 +231,9 @@ int feenox_problem_dirichlet_set_K(void) {
   } else {  
     petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   }
+  
+//  petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0, NULL, NULL));  
+  
   if (rhs != NULL) {
     petsc_call(VecDestroy(&rhs));
   }
@@ -257,6 +260,8 @@ int feenox_problem_dirichlet_set_M(void) {
   } else {  
     petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  
   }  
+
+//  petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 1, NULL, NULL));  
 
   return FEENOX_OK;
 }

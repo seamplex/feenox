@@ -348,9 +348,6 @@ Either install them with your package manager or configure with --enable-downloa
  #)
  AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library libgsl-dev not found]))
  gsl_version="from system"
- 
- # this one appeared in gsl 2.6
- AC_CHECK_FUNCS([gsl_vector_axpby],[],[])
 ])
 
 

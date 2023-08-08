@@ -29,3 +29,18 @@ exitifwrong $?
 # gmsh -v 0 -2 ${dir}/ray-effect-eighth.geo || exit $?
 answer2 ray-effect.fee eighth 4 "1.385"
 exitifwrong $?
+
+
+checkpde neutron_diffusion
+
+answer1 ray-effect-diffusion.fee full "1.995"
+exitifwrong $?
+
+answer1 ray-effect-diffusion.fee half "1.995"
+exitifwrong $?
+
+answer1 ray-effect-diffusion.fee quarter "1.995"
+exitifwrong $?
+
+answer1 ray-effect-diffusion.fee eighth "1.995"
+exitifwrong $?

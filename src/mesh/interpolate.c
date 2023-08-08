@@ -56,9 +56,9 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
   }
 
   element_t *element = NULL;
-  double r[3] = {0, 0, 0};    // vector with the local coordinates within the element
+  double xi[3] = {0, 0, 0};    // vector with the local coordinates within the element
   if ((element = feenox_mesh_find_element(this->mesh, nearest_node, x)) != NULL) {
-    if (feenox_mesh_interp_solve_for_r(element, x, r) != FEENOX_OK) {
+    if (feenox_mesh_interp_solve_for_r(element, x, xi) != FEENOX_OK) {
       return 0;
     }
   } else {
@@ -71,21 +71,17 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
   if (this->spatial_derivative_of == NULL) {
     
     for (int j = 0; j < element->type->nodes; j++) {
-      y += element->type->h(j, r) * feenox_vector_get(this->vector_value, element->node[j]->index_mesh);
+      y += element->type->h(j, xi) * feenox_vector_get(this->vector_value, element->node[j]->index_mesh);
     }
     
   } else {
     
-    gsl_matrix *dhdx = gsl_matrix_alloc(element->type->nodes, element->type->dim);
-    
-    feenox_mesh_compute_B(element, r, NULL, dhdx);
-      
+    gsl_matrix *B = feenox_fem_compute_B(element, xi);
     for (int j = 0; j < element->type->nodes; j++) {
-      y += gsl_matrix_get(dhdx, j, this->spatial_derivative_with_respect_to)
+      y += gsl_matrix_get(B, j, this->spatial_derivative_with_respect_to)
             * feenox_vector_get(this->spatial_derivative_of->vector_value, element->node[j]->index_mesh);
     }
-    
-    gsl_matrix_free(dhdx);
+    gsl_matrix_free(B);
     
   }  
   

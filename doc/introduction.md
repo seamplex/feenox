@@ -7,11 +7,12 @@ Note that some of the problems solved with FeenoX might not actually rely on the
 
 In other words, FeenoX is a computational tool to solve
 
- * dynamical systems written as sets of ODEs/DAEs, or
- * steady or quasi-static thermo-mechanical problems, or
- * steady or transient heat conduction problems, or
- * modal analysis problems, or
- * neutron diffusion or transport problems, or
+
+ * [dynamical systems written as sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html), or
+ * [steady or transient heat conduction problems](https://seamplex.com/feenox/examples/thermal.html), or
+ * [steady or quasi-static thermo-mechanical problems](https://seamplex.com/feenox/examples/mechanical.html), or
+ * [modal analysis problems](https://seamplex.com/feenox/examples/modal.html), or
+ * [core-level steady-state neutronics](https://seamplex.com/feenox/examples/neutron_diffusion.html), or
  * community-contributed problems
 
 in such a way that the input is a near-English text file that defines the problem to be solved.
