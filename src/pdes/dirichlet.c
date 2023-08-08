@@ -231,6 +231,9 @@ int feenox_problem_dirichlet_set_K(void) {
   } else {  
     petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   }
+  
+//  petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0, NULL, NULL));  
+  
   if (rhs != NULL) {
     petsc_call(VecDestroy(&rhs));
   }
@@ -257,6 +260,8 @@ int feenox_problem_dirichlet_set_M(void) {
   } else {  
     petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  
   }  
+
+//  petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 1, NULL, NULL));  
 
   return FEENOX_OK;
 }

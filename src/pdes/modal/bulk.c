@@ -43,22 +43,19 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
 
 #ifdef HAVE_PETSC
   
-//  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-  material_t *material = feenox_fem_get_material(e);
-  
   if (modal.n_nodes != e->type->nodes) {
     feenox_call(feenox_problem_build_allocate_aux_modal(e->type->nodes));
   }
   
   if (modal.uniform_C == 0) {
     // material stress-strain relationship
-    feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
-    modal.compute_C(e->x[q], material);
+    double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    modal.compute_C(x, feenox_fem_get_material(e));
   }
   
   // TODO: unify with mechanical!
-  gsl_matrix *dhdx = e->B[q];
-  for (int j = 0; j < modal.n_nodes; j++) {
+  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  for (unsigned int j = 0; j < modal.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (modal.variant == variant_full) {
       
@@ -95,18 +92,20 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
     }
   }
 
-
+  // wdet
+  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   
   // elemental stiffness B'*C*B
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, modal.C, modal.B, 0, modal.CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q], modal.B, modal.CB, 1.0, feenox.fem.Ki));
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, modal.B, modal.CB, 1.0, feenox.fem.Ki));
   
   // elemental mass H'*rho*H
   if (modal.rho.uniform == 0) {
     double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, modal.space_rho);
-    modal.rho.eval(&modal.rho, x, material);
+    modal.rho.eval(&modal.rho, x, feenox_fem_get_material(e));
   }
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, e->w[q] * modal.rho.value, e->type->H_Gc[q], e->type->H_Gc[q], 1.0, feenox.fem.Mi));
+  gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * modal.rho.value, H, H, 1.0, feenox.fem.Mi));
   
 #endif
   

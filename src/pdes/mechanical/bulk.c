@@ -45,8 +45,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
 #ifdef HAVE_PETSC
   
-//  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-
   if (mechanical.n_nodes != e->type->nodes) {
     feenox_call(feenox_problem_build_allocate_aux_mechanical(e->type->nodes));
   }
@@ -59,7 +57,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   }
   
   gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
-  for (int j = 0; j < mechanical.n_nodes; j++) {
+  for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
       
@@ -133,8 +131,10 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 
   // thermal expansion strain vector
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
-    // if C is not uniform we already have x
-    mechanical.compute_thermal_strain(x, e->physical_group != NULL ? e->physical_group->material : NULL);
+    if (x == NULL) {
+      x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);    
+    }
+    mechanical.compute_thermal_strain(x, feenox_fem_get_material(e));
     
     feenox_call(gsl_blas_dgemv(CblasTrans, 1.0, mechanical.C, mechanical.et, 0, mechanical.Cet));
     feenox_call(gsl_blas_dgemv(CblasTrans, wdet, mechanical.B, mechanical.Cet, 1.0, feenox.fem.bi));

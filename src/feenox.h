@@ -1693,6 +1693,7 @@ struct feenox_t {
     size_t size_global;            // total number of DoFs
     
     int compute_gradients;   // do we need to compute gradients?
+    void *missed_dump;
 //    gsl_matrix *m2;
     
     int rough;               // keep each element's contribution to the gradient?

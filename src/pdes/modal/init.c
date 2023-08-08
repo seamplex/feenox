@@ -362,7 +362,8 @@ int feenox_problem_setup_pc_modal(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
-    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
+//    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
+    petsc_call(PCSetType(pc, PCLU));
 #ifdef PETSC_HAVE_MUMPS
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #endif
@@ -427,15 +428,18 @@ int feenox_problem_setup_eps_modal(EPS eps) {
   
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     if (st_type != NULL) {
+/*      
       if (strcmp(st_type, STSINVERT) != 0) {
         feenox_push_error_message("eigen formulation omega needs shift-and-invert spectral transformation");
         return FEENOX_ERROR;
       }  
+ */
     } else {
       petsc_call(STSetType(st, STSINVERT));
     }
     // shift and invert needs a target
     petsc_call(EPSSetTarget(eps, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
+    petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));
     
   } else {
     // lambda needs shift
