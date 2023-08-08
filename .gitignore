@@ -70,3 +70,4 @@ orthotropic-beam-*.msh
 heater-cylinder-inches.vtk
 poisson-square.msh
 reaction-force.vtk
+ray-effect-diffusion-*.msh
