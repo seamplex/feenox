@@ -2993,6 +2993,14 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "ALLOW_NEW_NONZEROS") == 0) {
       feenox.pde.allow_new_nonzeros = PETSC_TRUE;
       
+///kw_pde+PROBLEM+usage [ CACHE_J ]
+    } else if (strcasecmp(token, "CACHE_J") == 0) {
+      feenox.fem.cache_J = PETSC_TRUE;
+///kw_pde+PROBLEM+usage [ CACHE_B ]
+    } else if (strcasecmp(token, "CACHE_B") == 0) {
+      feenox.fem.cache_J = PETSC_TRUE;
+      feenox.fem.cache_B = PETSC_TRUE;
+      
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
 ///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.

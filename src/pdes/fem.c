@@ -324,7 +324,7 @@ inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, in
   if ((*w) == NULL) {
     (*w) = calloc(e->type->gauss[integration].Q, sizeof(double));
     feenox.fem.current_gauss_type = e->type;
-  } else if (feenox.fem.cache_J) {
+  } else if (feenox.fem.cache_J && (*w)[q] != 0) {
     return (*w)[q];
   }
   

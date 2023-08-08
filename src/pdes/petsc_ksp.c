@@ -40,6 +40,9 @@ int feenox_problem_solve_petsc_linear(void) {
   feenox_call(feenox_problem_build());
   feenox_call(feenox_problem_dirichlet_eval());
   feenox_call(feenox_problem_dirichlet_set_K());
+  if (feenox.pde.missed_dump != NULL) {
+    feenox_call(feenox_instruction_dump(feenox.pde.missed_dump));
+  }
   
   // check if the stiffness matrix K has a near nullspace 
   // and pass it on to K_bc
