@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for modal analysis: bulk elements
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *

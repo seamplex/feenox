@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to build elemental mechanical objects
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -99,26 +99,28 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
   // volumetric force densities
   if (mechanical.f_x.defined || mechanical.f_y.defined || mechanical.f_z.defined) {
-    if (mechanical.f_x.uniform == 0 || mechanical.f_y.uniform == 0 || mechanical.f_z.uniform == 0) {
-      feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    if (x == NULL) {
+      x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);           
     }
-    
-    x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    material_t *material = feenox_fem_get_material(e);
+      
+    gsl_matrix *H = e->type->gauss[feenox.pde.mesh->integration].H_c[q]; 
+    double f_x = mechanical.f_x.eval(&mechanical.f_x, x, material);
+    double f_y = mechanical.f_y.eval(&mechanical.f_y, x, material);
+    double f_z = mechanical.f_z.eval(&mechanical.f_z, x, material);
 
-    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
     for (int j = 0; j < e->type->nodes; j++) {
       int offset = feenox.pde.dofs*j;
-      material_t *material = e->physical_group != NULL ? e->physical_group->material : NULL;
       // TODO: matrix-vector product
       double wh = wdet * gsl_matrix_get(H, 0, j);
       if (mechanical.f_x.defined) {
-        gsl_vector_add_to_element(feenox.fem.bi, offset+0, wh * mechanical.f_x.eval(&mechanical.f_x, x, material));
+        gsl_vector_add_to_element(feenox.fem.bi, offset+0, wh * f_x);
       }  
       if (mechanical.f_y.defined) {
-        gsl_vector_add_to_element(feenox.fem.bi, offset+1, wh * mechanical.f_y.eval(&mechanical.f_y, x, material));
+        gsl_vector_add_to_element(feenox.fem.bi, offset+1, wh * f_y);
       }
       if (mechanical.f_z.defined) {
-        gsl_vector_add_to_element(feenox.fem.bi, offset+2, wh * mechanical.f_z.eval(&mechanical.f_z, x, material));
+        gsl_vector_add_to_element(feenox.fem.bi, offset+2, wh * f_z);
       }  
     }
   }
