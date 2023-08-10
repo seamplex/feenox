@@ -1,0 +1,42 @@
+# https://www.simscale.com/docs/validation-cases/bimetallic-strip-under-thermal-load/
+READ_MESH $0.msh
+PROBLEM mechanical
+
+T0 = 300
+T(x,y,z) = 400
+
+# can we give the three properties underscore the name of the volume
+E_top = 200e9
+nu_top = 0
+alpha_top = 1e-5
+
+E_bottom = 200e9
+nu_bottom = 0
+alpha_bottom = 2e-5
+
+# or using the MATERIAL keyword, but then in the analytical solution
+# we have to give the right value of x,y,z to choose between the two
+# MATERIAL top    E=200e9 nu=0 alpha=1e-5
+# MATERIAL bottom E=200e9 nu=0 alpha=2e-5
+
+# since E and nu are the same we could have given them as variables
+# E = 200e9
+# nu = 0
+
+BC left symmetry
+BC A    fixed
+BC B    w=0
+
+SOLVE_PROBLEM
+
+l = 10
+ta = 0.05
+tb = 0.05
+dx = l*(T(0,0,0)-T0)*(alpha_top+alpha_bottom)/2
+K1 = 4 + 6*ta/tb + 4*(ta/tb)^2 + E_top/E_bottom*(ta/tb)^3 + E_bottom/E_top*(tb/ta)
+dz = 3*l^2*(alpha_bottom-alpha_top)*(T(0,0,0)-T0)*(ta+tb)/(tb^2*K1)
+sigma_bottom =(alpha_bottom-alpha_top)*(T(0,0,0)-T0)*(E_bottom)/K1 * (3*ta/tb + 2 - E_top/E_bottom*(ta/tb)^3)
+
+PRINT (u(l,0,0)-dx)^2+(w(l,0,0)-dz)^2+(1e-6*sigmax(0,0,-tb)-1e-6*sigma_bottom)^2
+
+# WRITE_RESULTS FORMAT vtk FILE bimetallic-strip.vtk
