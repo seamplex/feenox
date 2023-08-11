@@ -49,6 +49,7 @@ TESTS = \
         tests/neutron_diffusion_keff.sh \
         tests/parallelepiped.sh \
         tests/petsc_options.sh \
+        tests/pipe.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
         tests/ray-effect.sh \

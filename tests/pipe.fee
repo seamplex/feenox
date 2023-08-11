@@ -23,12 +23,39 @@ nu = 0.3       # Poisson's ratio [ non-dimensional ]
 p = 10         # internal pressure [ MPa ]
 
 
+# ------------------------------------------------------------------------
 # definition of analytical solutions for comparison from
 # <http://eprints.whiterose.ac.uk/110536/1/art%253A10.1007%252Fs00707-016-1762-7.pdf>
 ur(x,y,z) = (p*a^2*sqrt(y^2+z^2))/(E*(b^2-a^2)) * ((1-2*nu)*(1+nu) + (1+nu)*b^2/(y^2+z^2))
 sigmal(x,y,z)     = 2*nu*p*a^2/(b^2-a^2)
 sigmar(x,y,z)     = p*a^2/(b^2-a^2) * (1 - b^2/(y^2+z^2))
 sigmatheta(x,y,z) = p*a^2/(b^2-a^2) * (1 + b^2/(y^2+z^2))
+
+
+# principal stresses along the radial coordinate (may be y or z)
+sigma1_anal(r) = sigmatheta(0,0,r)
+sigma2_anal(r) = sigmal(0,0,r)
+sigma3_anal(r) = sigmar(0,0,r)
+
+# computation of main membrane stresses
+M1 = 1/(b-a)*integral(sigma1_anal(r), r, a, b)
+M2 = 1/(b-a)*integral(sigma2_anal(r), r, a, b)
+M3 = 1/(b-a)*integral(sigma3_anal(r), r, a, b)
+
+# von mises and tresca membrane stresses
+Mt_anal = max(abs(M1-M2), abs(M2-M3), abs(M3-M1))
+Mv_anal = sqrt(((M1-M2)^2 + (M2-M3)^2 + (M3-M1)^2)/2)
+
+# computation of membrane plus bending stresses
+MB1 = M1 + 6/(b-a)^2*integral(sigma1_anal(r)*((a+b)/2-r), r, a, b)
+MB2 = M2 + 6/(b-a)^2*integral(sigma2_anal(r)*((a+b)/2-r), r, a, b)
+MB3 = M3 + 6/(b-a)^2*integral(sigma3_anal(r)*((a+b)/2-r), r, a, b)
+
+# von mises and tresca
+MBv_anal = sqrt(((MB1-MB2)^2 + (MB2-MB3)^2 + (MB3-MB1)^2)/2)
+MBt_anal = max(abs(MB1-MB2), abs(MB2-MB3), abs(MB3-MB1))
+
+
 
 # set boundary conditions
 BC pressure  pressure=p
@@ -46,9 +73,7 @@ SOLVE_PROBLEM
 # compute linearized stresses for both von Mises and Tresca
 LINEARIZE_STRESS FROM 0 a 0 TO 0 b 0     M Mv   MB MBv        Mt Mt   MBt MBt
  
-# t1 = wall_time()     # final wall time for FEA
-
-# compute L2 error
+# compute L2 errors
 volume = pi*(b^2-a^2)*l
 h = (volume/cells)^(1/3)
 
@@ -60,17 +85,9 @@ INTEGRATE (sigma3(x,y,z)-sigmar(x,y,z))^2     RESULT e2sigma3
 error_ur = sqrt(e2ur)/volume
 error_sigma1 = sqrt(e2sigma1)/volume
 error_sigma3 = sqrt(e2sigma3)/volume
+error_Mv = abs(Mv-Mv_anal)/Mv_anal
+error_MBv = abs(MBv-MBv_anal)/Mv_anal
+error_Mt = abs(Mt-Mt_anal)/Mv_anal
+error_MBt = abs(MBt-MBt_anal)/Mv_anal
 
-PRINT error_ur+error_sigma1+error_sigma3
-
-# # write convergence in standard output
-# PRINT {
-#  TEXT "$3 $2"             # number of elements through thickness and order
-#  %.3f Mv Mt  MBv MBt      # linearized stresses (von Mises and Tresca)
-#    %g nodes
-#       cells
-#  %.2f t1-t0               # wall time in seconds
-#  %.3f memory()            # in Gb
-#  # for computing the order of convergence
-#  %.3e log(h) log(error_ur) log(error_sigma1) log(error_sigma3)
-# }
+PRINT error_ur+error_sigma1+error_sigma3+error_Mv+error_MBv+error_Mt+error_MBt
