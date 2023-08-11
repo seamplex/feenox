@@ -140,70 +140,84 @@ int feenox_parse_linearize_stress(void) {
 ///kw_pde+LINEARIZE_STRESS+usage [ M <variable> ]
     } else if (strcasecmp(token, "M") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->M));
+      mechanical.sigma->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+usage [ MB <variable> ]
     } else if (strcasecmp(token, "MB") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->MB));
+      mechanical.sigma->used = 1;
       
 ///kw_pde+LINEARIZE_STRESS+usage [ P <variable> ] @
     } else if (strcasecmp(token, "P") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->P));
+      mechanical.sigma->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+detail Variables `Mt`, `MBt` and `Pt` use the Tresca stress intensity.
 ///kw_pde+LINEARIZE_STRESS+usage [ Mt <variable> ]
     } else if (strcasecmp(token, "Mt") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->Mt));
+      mechanical.tresca->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+usage [ MBt <variable> ]
     } else if (strcasecmp(token, "MBt") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->MBt));
+      mechanical.tresca->used = 1;
       
 ///kw_pde+LINEARIZE_STRESS+usage [ Pt <variable> ] @
     } else if (strcasecmp(token, "Pt") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->Pt));
+      mechanical.tresca->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+detail Variables `M1` (or 2 or 3), `MB1` (or 2 or 3) and `P1` (or 2 or 3)
 ///kw_pde+LINEARIZE_STRESS+detail use the principal stress 1 (or 2 or 3).
 ///kw_pde+LINEARIZE_STRESS+usage [ M1 <variable> ]
     } else if (strcasecmp(token, "M1") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->M1));
+      mechanical.sigma1->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+usage [ MB1 <variable> ]
     } else if (strcasecmp(token, "MB1") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->MB1));
+      mechanical.sigma1->used = 1;
       
 ///kw_pde+LINEARIZE_STRESS+usage [ P1 <variable> ] @
     } else if (strcasecmp(token, "P1") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->P1));
+      mechanical.sigma1->used = 1;
 
       
 ///kw_pde+LINEARIZE_STRESS+usage [ M2 <variable> ]
     } else if (strcasecmp(token, "M2") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->M2));
+      mechanical.sigma2->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+usage [ MB2 <variable> ]
     } else if (strcasecmp(token, "MB2") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->MB2));
+      mechanical.sigma2->used = 1;
       
 ///kw_pde+LINEARIZE_STRESS+usage [ P2 <variable> ] @
     } else if (strcasecmp(token, "P2") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->P2));
+      mechanical.sigma2->used = 1;
       
 
 ///kw_pde+LINEARIZE_STRESS+usage [ M3 <variable> ]
     } else if (strcasecmp(token, "M3") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->M3));
+      mechanical.sigma3->used = 1;
 
 ///kw_pde+LINEARIZE_STRESS+usage [ MB3 <variable> ]
     } else if (strcasecmp(token, "MB3") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->MB3));
+      mechanical.sigma3->used = 1;
       
 ///kw_pde+LINEARIZE_STRESS+usage [ P3 <variable> ] @
     } else if (strcasecmp(token, "P3") == 0) {
       feenox_call(feenox_parser_get_or_define_variable(&linearize->P3));
+      mechanical.sigma3->used = 1;
       
-      
-      
+            
 ///kw_pde+LINEARIZE_STRESS+usage [ FILE <file> ]
 ///kw_pde+LINEARIZE_STRESS+detail If the `FILE` keyword is given, the total, membrane and membrane plus bending
 ///kw_pde+LINEARIZE_STRESS++detail stresses are written as a function of a scalar $t \in [0,1]$.
