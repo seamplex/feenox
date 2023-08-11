@@ -57,3 +57,4 @@ thermal-two-squares-material-explicit-uniform.msh
 reed.msh
 maze.msh
 ray-effect-diffusion-*.msh
+pipe*.msh

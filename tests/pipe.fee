@@ -1,0 +1,59 @@
+# from https://github.com/seamplex/pipe-linearize
+
+# convergence study of linearized stresses in an infinite pipe
+# with respect to the number of elements in the pipe thickness
+# PROBLEM mechanical 3D PC gamg KSP cg
+# PETSC_OPTIONS -mg_levels_pc_type sor
+PROBLEM mechanical
+
+# t0 = wall_time()     # initial wall time
+
+# read mesh according to shape $1, order $2 and number of elements through thickness $2
+READ_MESH pipe-$1-$2-$3.msh 
+
+INCLUDE pipe-problem.fee  # read problem parameters
+
+# set boundary conditions
+BC pressure  pressure=p
+BC front     tangential radial
+BC back      tangential radial
+
+SOLVE_PROBLEM
+
+# write distribution of results in gmsh format (optional)
+# WRITE_MESH pipe-out-$1-$2-$3.msh VECTOR u v w sigma1 sigma2 sigma3 sigmax sigmay sigmaz tauxy tauyz tauzx
+
+# write same thing as ASCII data
+# PRINT_FUNCTION v sigma1 sigma2 sigma3  MIN 0 a 0 MAX 0 b 0 NSTEPS 1 200 1  FILE pipe-dist-$1-$2-$3.dat
+
+# compute linearized stresses for both von Mises and Tresca
+LINEARIZE_STRESS FROM 0 a 0 TO 0 b 0     M Mv   MB MBv        Mt Mt   MBt MBt
+ 
+# t1 = wall_time()     # final wall time for FEA
+
+# compute L2 error
+volume = pi*(b^2-a^2)*l
+h = (volume/cells)^(1/3)
+
+ur_fea(x,y,z) = sqrt(v(x,y,z)^2+w(x,y,z)^2)
+INTEGRATE (ur_fea(x,y,z)-ur(x,y,z))^2         RESULT e2ur
+INTEGRATE (sigma1(x,y,z)-sigmatheta(x,y,z))^2 RESULT e2sigma1
+INTEGRATE (sigma3(x,y,z)-sigmar(x,y,z))^2     RESULT e2sigma3
+
+error_ur = sqrt(e2ur)/volume
+error_sigma1 = sqrt(e2sigma1)/volume
+error_sigma3 = sqrt(e2sigma3)/volume
+
+PRINT error_ur+error_sigma1+error_sigma3
+
+# # write convergence in standard output
+# PRINT {
+#  TEXT "$3 $2"             # number of elements through thickness and order
+#  %.3f Mv Mt  MBv MBt      # linearized stresses (von Mises and Tresca)
+#    %g nodes
+#       cells
+#  %.2f t1-t0               # wall time in seconds
+#  %.3f memory()            # in Gb
+#  # for computing the order of convergence
+#  %.3e log(h) log(error_ur) log(error_sigma1) log(error_sigma3)
+# }

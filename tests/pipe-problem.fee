@@ -1,0 +1,18 @@
+# problem parameters for
+# 12"-inch schedule 100
+b = 323.8/2    # external radius [ mm ]
+a = b-21.5     # internal radius [ mm ]
+l = 2*(b-a)    # axial length [ mm ]
+
+E = 200e3      # Young modulus [ MPa ]
+nu = 0.3       # Poisson's ratio [ non-dimensional ]
+p = 10         # internal pressure [ MPa ]
+
+
+# definition of analytical solutions for comparison from
+# <http://eprints.whiterose.ac.uk/110536/1/art%253A10.1007%252Fs00707-016-1762-7.pdf>
+ur(x,y,z) = (p*a^2*sqrt(y^2+z^2))/(E*(b^2-a^2)) * ((1-2*nu)*(1+nu) + (1+nu)*b^2/(y^2+z^2))
+sigmal(x,y,z)     = 2*nu*p*a^2/(b^2-a^2)
+sigmar(x,y,z)     = p*a^2/(b^2-a^2) * (1 - b^2/(y^2+z^2))
+sigmatheta(x,y,z) = p*a^2/(b^2-a^2) * (1 + b^2/(y^2+z^2))
+
