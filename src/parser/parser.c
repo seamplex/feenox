@@ -82,7 +82,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
   while ((delta_line_num = feenox_read_line(input_file_stream)) != 0) {
     // a negative delta_line_num indicates that the line asks for an argument $n
     // which was not provided but this can occur on a line which is ignored
-    // by a from/to INCLUDE directive so it is not a catasthropic error
+    // by a from/to INCLUDE directive so it is not a catastrophic error
     line_num += abs(delta_line_num);
     
     if (feenox_parser.line[0] != '\0' && feenox_parser.inside_yaml == 0 && ((from == 0 || line_num >= from) && ((to == 0) || line_num <= to))) {
@@ -2229,7 +2229,7 @@ int feenox_parse_read_mesh(void) {
 
   char *ext = strrchr(mesh->file->format, '.');
   if (ext == NULL) {
-    feenox_push_error_message("no file extension given", ext);
+    feenox_push_error_message("no file extension given");
     return FEENOX_ERROR;
   }
 
@@ -3155,7 +3155,7 @@ int feenox_parse_problem(void) {
 int feenox_parse_petsc_options(void) {
 
 #ifdef HAVE_PETSC  
-  size_t size = feenox.pde.petsc_options == NULL ? 0 : strlen(feenox.pde.petsc_options);
+  size_t size_current = (feenox.pde.petsc_options == NULL) ? 0 : strlen(feenox.pde.petsc_options);
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 ///kw_pde+PETSC_OPTIONS+detail Options for PETSc can be passed either in at run time in the command line
@@ -3168,10 +3168,12 @@ int feenox_parse_petsc_options(void) {
 ///kw_pde+PETSC_OPTIONS+detail This means that they are non-POSIX options but they have to be in the native PETSc format.
 ///kw_pde+PETSC_OPTIONS+detail That is to say, while in the command line one would give `--ksp_view`, here one has to give `-ksp_view`.
 ///kw_pde+PETSC_OPTIONS+detail Conversely, instead of `--mg_levels_pc_type=sor` one has to give `-mg_levels_pc_type sor`.
-    size += strlen(token) + 2;
-    feenox_check_alloc(feenox.pde.petsc_options = realloc(feenox.pde.petsc_options, size));
+    size_t size_new = size_current + strlen(token) + 4;
+    feenox_check_alloc(feenox.pde.petsc_options = realloc(feenox.pde.petsc_options, size_new));
+    feenox.pde.petsc_options[size_current] = '\0';
     strcat(feenox.pde.petsc_options, " ");
     strcat(feenox.pde.petsc_options, token);
+    size_current = size_new;
   }    
 
   return FEENOX_OK;  

@@ -10,12 +10,12 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkpde mechanical
+checkmumps
 checkgmsh
 
 # run fem parametric cases
-# for shape in ust10 uct10 sst10 sct10 ssh20 sch20 ssh27 sch27; do
-for shape in uct10 sst10 sct10 ssh20 sch20 ssh27 sch27; do
-  gmsh -v 0 -3 pipe-${shape}-2-2.geo || exit 1
-  feenox pipe.fee ${shape} 2 2
+for shape in ust10 uct10 sst10 sct10 ssh20 sch20 ssh27 sch27; do
+  gmsh -v 0 -3 ${dir}/pipe-${shape}-2-2.geo || exit $?
+  answerzero1 pipe.fee ${shape}
 done
 

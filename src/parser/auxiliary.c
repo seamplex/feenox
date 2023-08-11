@@ -100,7 +100,8 @@ int feenox_read_line(FILE *file_ptr) {
         }
 
         if (feenox.argv[feenox.optind+n] == NULL) {
-          return FEENOX_ERROR;
+          // we need to return a negative number
+          return -1;
         }
         
         int j = 0;
