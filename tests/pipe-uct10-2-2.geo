@@ -1,4 +1,4 @@
-// unstructured curved tet10
+// // unstructured curved tet10
 Mesh.RecombineAll = 0;
 Mesh.SecondOrderLinear = 0;
 
@@ -16,11 +16,11 @@ Physical Surface("front") = {s(1)};
 Physical Surface("back") = {s(2)};
 Physical Surface("pressure") = {s(3)};
 
-Mesh.Algorithm = 6;
-Mesh.Algorithm3D = 4;
-Mesh.Optimize = 1;
+// Mesh.Algorithm = 6;
+// Mesh.Algorithm3D = 4;
+// Mesh.Optimize = 1;
 // Mesh.OptimizeNetgen = 1;
-Mesh.HighOrderOptimize = 2;
+// Mesh.HighOrderOptimize = 2;
 
 Mesh.CharacteristicLengthMax = (( 323.8/2    )-( ( 323.8/2    )-21.5     ))/2;
 Mesh.ElementOrder = 2;
