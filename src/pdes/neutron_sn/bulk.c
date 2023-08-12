@@ -177,7 +177,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
 //  double tau = 0.5 * feenox_var_value(neutron_sn.sn_alpha) * neutron_sn.supg_dimension_factor * e->type->volume(e) / e->type->area(e);
   double tau = feenox_var_value(neutron_sn.sn_alpha) * e->type->size(e);
   
-  gsl_matrix *H_G = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  gsl_matrix *H_G = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(gsl_matrix_memcpy(neutron_sn.P, H_G));
   for (unsigned int j = 0; j < neutron_sn.n_nodes; j++) {

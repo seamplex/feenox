@@ -551,7 +551,7 @@ inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int i
     return (*x)[q];
   }
   
-  gsl_matrix *H = feenox_fem_compute_H_c_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *H = feenox_fem_compute_H_c_at_gauss(e, q, integration);
   (*x)[q][0] = (*x)[q][1] = (*x)[q][2] = 0;
   for (unsigned int j = 0; j < e->type->nodes; j++) {
     double h = gsl_matrix_get(H, 0, j);
