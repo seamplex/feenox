@@ -213,10 +213,10 @@ int feenox_instruction_mesh_read(void *arg) {
           element_t *element = &this->element[physical_group->element[i]];
           for (unsigned int q = 0; q < element->type->gauss[this->integration].Q; q++) {
             double wdet = feenox_fem_compute_w_det_at_gauss(element, q, this->integration);
-            gsl_matrix *H = element->type->gauss[this->integration].H_c[q];
+            gsl_matrix *H_c = feenox_fem_compute_H_c_at_gauss(element, q, this->integration);
 
             for (unsigned int j = 0; j < element->type->nodes; j++) {
-              double wdeth = wdet * gsl_matrix_get(H, 0, j);
+              double wdeth = wdet * gsl_matrix_get(H_c, 0, j);
               physical_group->volume += wdeth ;
               for (unsigned int d = 0; d < 3; d++) {
                 physical_group->cog[d] += wdeth * element->node[j]->x[d];

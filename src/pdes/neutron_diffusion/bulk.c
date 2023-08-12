@@ -130,7 +130,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, B, neutron_diffusion.DB, 1.0, neutron_diffusion.Li));
 
   // elemental scattering H'*A*H
-  gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+  gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   // TODO: can we mix Ai and Ki?
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.R, H, 0.0, neutron_diffusion.AH));
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet,  H, neutron_diffusion.AH, 1.0, neutron_diffusion.Ai));

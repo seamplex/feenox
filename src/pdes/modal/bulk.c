@@ -104,8 +104,8 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
     double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, modal.space_rho);
     modal.rho.eval(&modal.rho, x, feenox_fem_get_material(e));
   }
-  gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * modal.rho.value, H, H, 1.0, feenox.fem.Mi));
+  gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
+  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * modal.rho.value, H_Gc, H_Gc, 1.0, feenox.fem.Mi));
   
 #endif
   

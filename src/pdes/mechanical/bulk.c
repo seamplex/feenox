@@ -104,7 +104,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     }
     material_t *material = feenox_fem_get_material(e);
       
-    gsl_matrix *H = e->type->gauss[feenox.pde.mesh->integration].H_c[q]; 
+    gsl_matrix *H = feenox_fem_compute_H_c_at_gauss(e, q, feenox.pde.mesh->integration);
     double f_x = mechanical.f_x.eval(&mechanical.f_x, x, material);
     double f_y = mechanical.f_y.eval(&mechanical.f_y, x, material);
     double f_z = mechanical.f_z.eval(&mechanical.f_z, x, material);

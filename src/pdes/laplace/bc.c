@@ -82,10 +82,10 @@ int feenox_problem_bc_set_laplace_derivative(bc_data_t *this, element_t *e, unsi
     double phi = feenox_function_eval(feenox.pde.solution[0], x);
     double dderivativedphi = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], phi);
     
-//    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
-    gsl_matrix *H = e->type->H_Gc[q];
+    double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+    gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     // mind the positive sign!
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +e->w[q]*dderivativedphi, H, H, 1.0, feenox.fem.Jbi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +wdet*dderivativedphi, H_Gc, H_Gc, 1.0, feenox.fem.Jbi));
   }
   
 #endif

@@ -18,6 +18,8 @@ TESTS = \
         tests/beam-ortho.sh \
         tests/bimetallic-strip.sh \
         tests/builtin.sh \
+        tests/bunny-modal.sh \
+        tests/bunny-thermal.sh \
         tests/cog.sh \
         tests/cylinder-traction-force.sh \
         tests/encased_rod.sh \

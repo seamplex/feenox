@@ -2331,7 +2331,8 @@ extern gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inve
 
 extern double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_fem_compute_C(element_t *e);
-extern gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_H_c_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_t *e, unsigned int q, int integration);
 
 extern gsl_matrix *feenox_fem_compute_invJ_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi);
@@ -2340,11 +2341,11 @@ extern gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q
 extern gsl_matrix *feenox_fem_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
 extern gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration, gsl_matrix *J);
 
-extern gsl_matrix *feenox_fem_compute_B_c(element_type_t *element_type, double *xi);
+extern gsl_matrix *feenox_fem_compute_B_c(element_t *e, double *xi);
 extern gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi);
 
 extern gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
-extern gsl_matrix *feenox_fem_compute_B_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_B_Gc_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
 
 #ifdef HAVE_PETSC

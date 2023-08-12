@@ -16,7 +16,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
 
 # Compiling and debuging
 
-See the [compilation.md](compilation instructions).
+See the [compilation instructions](compilation.md).
 
  
 # How we program FeenoX
@@ -197,22 +197,22 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
 
 ## Indices in PDEs
 
--------------------------------------------------------------
+------------------------------------------------------------------------------
    Index    Loop over...
------------ -------------------------------------------------
+----------- ------------------------------------------------------------------
    `i`      elements or cells
    
    `j`      nodes, either global or local. If there are loops
             which need both, use `j_local` and `j_global`.
             
-   `k`      dummy index         
+   `k`      dummy index
 
-   `m`      dimensions
+   `d`      **d**imensions
    
-   `d`      degree of freedoms
+   `g`      degree of freedoms (from **g**roups of energy actually)
    
-   `v`      Gauss points
--------------------------------------------------------------
+   `q`      Gauss (**q**uadrature) points
+------------------------------------------------------------------------------
 
  
 ## Git workflow
@@ -249,7 +249,7 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
 
 # Code of coduct
 
- * See the (code of conduct)[CODE_OF_COUNDUCT.md] for participating in the commnity.
+ * See the [code of conduct](CODE_OF_CONDUCT.md).
 
  
 # Release plans

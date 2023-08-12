@@ -50,7 +50,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   
   // mass matrix Ht*rho*cp*H
   if (feenox.pde.has_mass) {
-    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+    gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     double alpha = 0;
     if (laplace.alpha.defined) {
       alpha = laplace.alpha.eval(&laplace.alpha, x, material);
@@ -59,7 +59,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_push_error_message("no alpha found");
       return FEENOX_ERROR;
     }
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * alpha, H, H, 1.0, feenox.fem.Mi));
+    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * alpha, H_Gc, H_Gc, 1.0, feenox.fem.Mi));
   }
   
 

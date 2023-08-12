@@ -428,18 +428,16 @@ int feenox_problem_setup_eps_modal(EPS eps) {
   
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     if (st_type != NULL) {
-/*      
       if (strcmp(st_type, STSINVERT) != 0) {
         feenox_push_error_message("eigen formulation omega needs shift-and-invert spectral transformation");
         return FEENOX_ERROR;
       }  
- */
     } else {
       petsc_call(STSetType(st, STSINVERT));
     }
     // shift and invert needs a target
     petsc_call(EPSSetTarget(eps, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
-    petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));
+    petsc_call(EPSSetWhichEigenpairs(eps, EPS_TARGET_MAGNITUDE));
     
   } else {
     // lambda needs shift
@@ -469,8 +467,7 @@ int feenox_problem_setup_eps_modal(EPS eps) {
     petsc_call(MatNullSpaceGetVecs(modal.rigid_body_base, &has_const, &n, &vecs));
   
     // but eps needs modifiable vectors so we copy them
-    unsigned int k = 0;
-    for (k = 0; k < n; k++) {
+    for (unsigned int k = 0; k < n; k++) {
       petsc_call(VecDuplicate(vecs[k], &rigid[k]));
       petsc_call(VecCopy(vecs[k], rigid[k]));
     }

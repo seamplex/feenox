@@ -25,7 +25,8 @@
 int feenox_fem_elemental_caches_reset(void) {
   
   if (feenox.fem.current_gauss_type != NULL) {
-    for (unsigned int q = 0; q < feenox.fem.current_gauss_type->gauss[feenox.pde.mesh->integration].Q; q++) {
+    int integration = (feenox.pde.mesh != NULL) ? feenox.pde.mesh->integration : 0;
+    for (unsigned int q = 0; q < feenox.fem.current_gauss_type->gauss[integration].Q; q++) {
       if (feenox.fem.x != NULL && feenox.fem.x[q] != NULL) {
         feenox_free(feenox.fem.x[q]);
       }
@@ -197,12 +198,12 @@ template<typename Derived> struct determinant_impl<Derived, 3>
 }
 
 // build the canonic B_c matrix at an arbitrary location xi
-gsl_matrix *feenox_fem_compute_B_c(element_type_t *element_type, double *xi) {
+gsl_matrix *feenox_fem_compute_B_c(element_t *e, double *xi) {
   
-  gsl_matrix *B_c = gsl_matrix_calloc(element_type->dim, element_type->nodes);
-  for (int d = 0; d < element_type->dim; d++) {
-    for (int j = 0; j < element_type->nodes; j++) {
-      gsl_matrix_set(B_c, d, j, element_type->dhdxi(j, d, xi));
+  gsl_matrix *B_c = gsl_matrix_calloc(e->type->dim, e->type->nodes);
+  for (int d = 0; d < e->type->dim; d++) {
+    for (int j = 0; j < e->type->nodes; j++) {
+      gsl_matrix_set(B_c, d, j, e->type->dhdxi(j, d, xi));
     }
   }
   
@@ -215,7 +216,7 @@ gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi) {
   gsl_matrix *J = feenox_fem_compute_J(e, xi);
   gsl_matrix *invJ = feenox_fem_matrix_invert(J, NULL);
   
-  gsl_matrix *B_c = feenox_fem_compute_B_c(e->type, xi);
+  gsl_matrix *B_c = feenox_fem_compute_B_c(e, xi);
   gsl_matrix *B = gsl_matrix_calloc(e->type->dim, e->type->nodes);
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, B_c, 0.0, B);
   
@@ -281,7 +282,7 @@ inline gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi) {
   // }
 
   gsl_matrix *J = gsl_matrix_calloc(e->type->dim, e->type->dim);
-  gsl_matrix *B_c = feenox_fem_compute_B_c(e->type, xi);
+  gsl_matrix *B_c = feenox_fem_compute_B_c(e, xi);
   gsl_matrix *C = feenox_fem_compute_C(e);
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, B_c, C, 0.0, J);
   gsl_matrix_free(B_c);
@@ -550,7 +551,7 @@ inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int i
     return (*x)[q];
   }
   
-  gsl_matrix *H = e->type->gauss[integration].H_c[q];
+  gsl_matrix *H = feenox_fem_compute_H_c_at_gauss(e, q, feenox.pde.mesh->integration);
   (*x)[q][0] = (*x)[q][1] = (*x)[q][2] = 0;
   for (unsigned int j = 0; j < e->type->nodes; j++) {
     double h = gsl_matrix_get(H, 0, j);
@@ -562,33 +563,37 @@ inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int i
   return (*x)[q];
 }
 
+inline gsl_matrix *feenox_fem_compute_H_c_at_gauss(element_t *e, unsigned int q, int integration) {
+  return e->type->gauss[integration].H_c[q];
+}
 
-inline gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_type_t *element_type, unsigned int q, int integration) {
+
+inline gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_t *e, unsigned int q, int integration) {
   
-  if (element_type->H_Gc == NULL) {
+  if (e->type->H_Gc == NULL) {
     if (feenox.pde.dofs == 1) {
-      element_type->H_Gc = element_type->gauss[integration].H_c;
-      return element_type->H_Gc[q];
+      e->type->H_Gc = e->type->gauss[integration].H_c;
+      return e->type->H_Gc[q];
     } else {
-      element_type->H_Gc = calloc(element_type->gauss[integration].Q, sizeof(gsl_matrix *));
+      e->type->H_Gc = calloc(e->type->gauss[integration].Q, sizeof(gsl_matrix *));
     }
   }
   
-  if (element_type->H_Gc[q] == NULL) {
-    unsigned int J = element_type->nodes;
+  if (e->type->H_Gc[q] == NULL) {
+    unsigned int J = e->type->nodes;
     unsigned int G = feenox.pde.dofs;
-    element_type->H_Gc[q] = gsl_matrix_calloc(G, G*J);
+    e->type->H_Gc[q] = gsl_matrix_calloc(G, G*J);
   
     // TODO: measure order of loops
     for (unsigned int j = 0; j < J; j++) {
-      double h = gsl_matrix_get(element_type->gauss[integration].H_c[q], 0, j);
+      double h = gsl_matrix_get(e->type->gauss[integration].H_c[q], 0, j);
       for (unsigned int g = 0; g < G; g++) {
-        gsl_matrix_set(element_type->H_Gc[q], g, G*j+g, h);
+        gsl_matrix_set(e->type->H_Gc[q], g, G*j+g, h);
       }
     }
   }
 
-  return element_type->H_Gc[q];  
+  return e->type->H_Gc[q];  
 }
 
 inline gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration) {

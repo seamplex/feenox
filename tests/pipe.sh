@@ -17,5 +17,6 @@ checkgmsh
 for shape in ust10 uct10 sst10 sct10 ssh20 sch20 ssh27 sch27; do
   gmsh -v 0 -3 ${dir}/pipe-${shape}-2-2.geo || exit $?
   answerzero1 pipe.fee ${shape} 1e-2
+  exitifwrong $?
 done
 

@@ -76,7 +76,7 @@ int feenox_instruction_mesh_integrate(void *arg) {
           if ((physical_group == NULL && e->type->dim == mesh->dim) ||
               (physical_group != NULL && e->physical_group == physical_group)) {
             for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
-              double wdet =feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration);
+              double wdet = feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration);
 
               double xi = 0;
               for (unsigned int j = 0; j < e->type->nodes; j++) {

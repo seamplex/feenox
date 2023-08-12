@@ -58,4 +58,8 @@ reed.msh
 maze.msh
 ray-effect-diffusion-*.msh
 bimetallic*.msh
+bimetallic*.vtk
 pipe*.msh
+Stanford_Bunny.stl
+bunny*.msh
+bunny*.vtk

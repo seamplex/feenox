@@ -48,7 +48,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
     feenox_check_alloc(local_vec_T = gsl_matrix_calloc(nodes, 1));
     double T = 0;
     double Tj = 0;
-    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
+    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     for (unsigned int j = 0; j < nodes; j++) {
       Tj = feenox_vector_get(feenox.pde.solution[0]->vector_value, e->node[j]->index_dof[0]);
       gsl_matrix_set(local_vec_T, j, 0, Tj);
@@ -92,8 +92,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       feenox_push_error_message("no heat capacity found");
       return FEENOX_ERROR;
     }
-    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e->type, q, feenox.pde.mesh->integration);
-//    gsl_matrix *H = e->type->H_Gc[q];
+    gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet * rhocp, H, H, 1.0, feenox.fem.Mi));
   }
   
