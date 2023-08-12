@@ -19,7 +19,7 @@ Physical Surface("pressure") = {s(3)};
 Mesh.Algorithm = 6;
 Mesh.Algorithm3D = 4;
 Mesh.Optimize = 1;
-Mesh.OptimizeNetgen = 1;
+// Mesh.OptimizeNetgen = 1;
 Mesh.HighOrderOptimize = 2;
 
 Mesh.CharacteristicLengthMax = (( 323.8/2    )-( ( 323.8/2    )-21.5     ))/2;

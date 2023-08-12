@@ -217,7 +217,8 @@ double feenox_linearization_integrate(gsl_function *F, function_t *function) {
   p->function = function;
   double result = 0;
   double epsabs = 0;
-  double epsrel = 1e-4;
+  // TODO: choose the epsresl in the input file
+  double epsrel = 1e-3;
   size_t limit = DEFAULT_INTEGRATION_INTERVALS;
   int key = GSL_INTEG_GAUSS31;
   double  abserr = 0;
