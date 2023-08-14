@@ -17,6 +17,7 @@ TESTS = \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
         tests/bimetallic-strip.sh \
+        tests/bunny-thermal.sh \
         tests/builtin.sh \
         tests/cog.sh \
         tests/cylinder-traction-force.sh \
