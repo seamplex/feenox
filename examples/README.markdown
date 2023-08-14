@@ -85,6 +85,7 @@ propose benchmark problems to add to the suite.
 
 - Basic mathematics
   - [Hello World (and Universe)!][]
+  - [Ten ways of computing *π*][]
   - [The logistic map][]
   - [The Fibonacci sequence][]
     - [Using the closed-form formula as a function][]
@@ -130,6 +131,7 @@ propose benchmark problems to add to the suite.
   - [Reed’s problem][]
 
   [Hello World (and Universe)!]: basic.md#hello-world-and-universe
+  [Ten ways of computing *π*]: basic.md#ten-ways-of-computing-pi
   [The logistic map]: basic.md#the-logistic-map
   [The Fibonacci sequence]: basic.md#the-fibonacci-sequence
   [Using the closed-form formula as a function]: basic.md#using-the-closed-form-formula-as-a-function

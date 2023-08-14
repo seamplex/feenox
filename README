@@ -225,10 +225,10 @@ finite-element(ish) tool.
 In other words, FeenoX is a computational tool to solve
 
 -   dynamical systems written as sets of ODEs/DAEs, or
--   steady or quasi-static thermo-mechanical problems, or
 -   steady or transient heat conduction problems, or
+-   steady or quasi-static thermo-mechanical problems, or
 -   modal analysis problems, or
--   neutron diffusion or transport problems, or
+-   core-level steady-state neutronics, or
 -   community-contributed problems
 
 in such a way that the input is a near-English text file that defines
@@ -485,6 +485,11 @@ problems, as implied in the “community-contributed problems” bullet
 above (rules of modularity and extensibility). See the documentation for
 details about how to contribute.
 
+  [dynamical systems written as sets of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
+  [steady or transient heat conduction problems]: https://seamplex.com/feenox/examples/thermal.html
+  [steady or quasi-static thermo-mechanical problems]: https://seamplex.com/feenox/examples/mechanical.html
+  [modal analysis problems]: https://seamplex.com/feenox/examples/modal.html
+  [core-level steady-state neutronics]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [2]: http://gmsh.info/
   [Meshio]: https://github.com/nschloe/meshio
   [Git]: https://git-scm.com/

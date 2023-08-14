@@ -28,6 +28,6 @@ BC right vacuum
 
 SOLVE_PROBLEM
 
-FUNCTION ref(x) FILE reed-ref.csv
+FUNCTION ref(x) FILE reed-ref.csv INTERPOLATION steffen
 PRINT sqrt(integral((ref(x)-phi1(x))^2,x,0,8))/8
 

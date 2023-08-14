@@ -12,6 +12,7 @@ for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_s
 done
 
 for i in hello          \
+         pi             \
          lorenz         \
          logistic       \
          double         \

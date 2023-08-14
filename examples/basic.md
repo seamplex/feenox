@@ -25,6 +25,122 @@ $
 
 
 
+# Ten ways of computing $\pi$
+
+1.  Internal symbol `pi` equal to libc's `M_PI`
+
+    $$
+    \pi = \pi
+    $$
+
+2.  Four times the arc tangent of one
+
+    $$
+    \pi = 4 \cdot \arctan{1}
+    $$
+
+3.  The root of $tan(x)=0$.
+
+4.  The integral of the gaussian bell, squared.
+
+    $$
+    \pi = \left[ \int_{-\infty}^{\infty} e^{-x^2} \, dx \right]^2
+    $$
+
+5.  The integral of $(x^2 + y^2) < 1$ inside a unit square
+
+    $$
+    \pi = \int_{-1}^{+1} \int_{-1}^{+1} \left[(x^2 + y^2) < 1\right] \, dy \, dx
+    $$
+
+6.  The integral of one inside a parametrized circle
+
+    $$
+    \pi = \int_{-1}^{+1} \int_{-\sqrt{1-x^2}}^{+\sqrt{1-x^2}} \, dy \, dx
+    $$
+
+7.  The Gregoy-Leibniz sum
+
+    $$
+    \pi = 4 \cdot \sum_{i}^{\infty} \frac{(-1)^{i+1}}{2i-1}
+    $$
+
+8.  The Abraham-Sharp sum
+
+    $$
+    \pi =  \sum_{i}^{\infty} \frac{2 \cdot (-1)^i \cdot 3^{\frac{1}{2-i}}}{2i+1}
+    $$
+
+9.  An integral which is equal to $22/7-\pi$
+
+    $$
+    22/7 - \pi = \int_{0}^{1} \frac{x^4 \cdot (1-x)^4}{1+x^2} \, dx
+    $$
+
+10. Ramanujan-Sato series
+
+    $$
+    \frac{1}{\pi} = \frac{2 \cdot \sqrt{2}}{99^2} \cdot \sum_{i=0}^{\infty} \frac{(4i)!}{(i^4)!} \cdot \frac{26390 \cdot i +  1103}{396^{4i}}
+    $$
+
+
+```feenox
+# computing pi in ten different ways
+VECTOR piapprox SIZE 10
+VAR x y
+
+# the double-precision internal representation of pi (M_PI)
+piapprox[1] = pi
+
+# four times the arc-tangent of the unity
+piapprox[2] = 4*atan(1)
+
+# the abscissae x where tan(x) = 0 in the range [3:3.5]
+piapprox[3] = root(tan(x), x, 3, 3.5)
+
+# the square of the numerical integral of the guassian curve 
+piapprox[4] = integral(exp(-x^2), x, -10, 10)^2
+
+# the numerical integral of a circle inscribed in a unit square
+piapprox[5] = integral(integral((x^2+y^2) < 1, y, -1, 1), x, -1, 1)
+
+# the numerical integral of a circle parametrized with sqrt(1-x^2)
+piapprox[6] = integral(integral(1, y, -sqrt(1-x^2), sqrt(1-x^2)), x, -1, 1)
+
+# the gregory-leibniz sum (one hundred thousand terms)
+piapprox[7] = 4*sum((-1)^(i+1)/(2*i-1), i, 1, 1e5)
+
+# the abraham sharp sum (twenty-one terms)
+piapprox[8] = sum(2*(-1)^i * 3^(1/2-i)/(2*i+1), i, 0, 20)
+
+# this integral is equal to 22/7-pi
+piapprox[9] = 22/7-integral((x^4*(1-x)^4)/(1+x^2), x, 0, 1)
+
+# ramanujan-sato series
+piapprox[10] = 1/(2*sqrt(2)/(99^2)*sum(Gamma(4*i)/Gamma(i)^4 * (26390*i + 1103)/(396^(4*i)), i, 0, 2))
+
+PRINT_VECTOR "% .16f" piapprox piapprox(i)-pi
+```
+
+
+```terminal
+$ feenox pi.fee
+3.1415926535897931      0.0000000000000000
+3.1415926535897931      0.0000000000000000
+3.1415926535897936      0.0000000000000004
+3.1415926535899108      0.0000000000001177
+3.1417605332857996      0.0001678796960065
+3.1415956548678512      0.0000030012780581
+3.1415826535897198     -0.0000100000000733
+3.1415926535956351      0.0000000000058420
+3.1415926535897931      0.0000000000000000
+3.1415927109074255      0.0000000573176324
+$
+
+```
+
+
+
 # The logistic map
 
 Plot the asymptotic behavior of the [logistic

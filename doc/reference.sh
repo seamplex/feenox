@@ -13,6 +13,7 @@ tag=${2}
 
 if [ -z "${tag}" ]; then
   echo "usage: $0 src tag";
+  echo "example: $0 ../src/math/builtin_functions.c fn"
   exit 0
 fi
 

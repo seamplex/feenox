@@ -1,5 +1,6 @@
 - Basic mathematics
   - [Hello World (and Universe)!](basic.md#hello-world-and-universe)
+  - [Ten ways of computing *π*](basic.md#ten-ways-of-computing-pi)
   - [The logistic map](basic.md#the-logistic-map)
   - [The Fibonacci sequence](basic.md#the-fibonacci-sequence)
     - [Using the closed-form formula as a

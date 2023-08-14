@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2023-07-27" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2023-08-12" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -1199,7 +1199,7 @@ PROBLEM { laplace | mechanical | modal | neutron_diffusion | neutron_sn | therma
  [ 1D | 2D | 3D | DIM <expr> ] [ AXISYMMETRIC { x | y } ] 
  [ MESH <identifier> ] [ PROGRESS ] [ DO_NOT_DETEC_HANGING_NODES | DETECT_HANGING_NODES | HANDLE_HANGING_NODES ]
  [ DETECT_UNRESOLVED_BCS | ALLOW_UNRESOLVED_BCS ]
- [ TRANSIENT | QUASISTATIC ] [ LINEAR | NON_LINEAR ] 
+ [ PREALLOCATE ] [ ALLOW_NEW_NONZEROS ] [ CACHE_J ] [ CACHE_B ] [ TRANSIENT | QUASISTATIC ] [ LINEAR | NON_LINEAR ] 
  [ MODES <expr> ] 
  [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
  [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]
@@ -2020,6 +2020,19 @@ argument\ \f[I]x\f[R].
 .nf
 \f[C]
 floor(x)  
+\f[R]
+.fi
+.PP
+\ 
+.SS \f[V]Gamma\f[R]
+.RS
+.PP
+Computes the Gamma function\ \f[I]Γ\f[R](\f[I]x\f[R]).
+.RE
+.IP
+.nf
+\f[C]
+Gamma(x)  
 \f[R]
 .fi
 .PP

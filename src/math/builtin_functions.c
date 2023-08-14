@@ -66,6 +66,7 @@ double feenox_builtin_expint2(expr_item_t *);
 double feenox_builtin_expint3(expr_item_t *);
 double feenox_builtin_expintn(expr_item_t *);
 double feenox_builtin_floor(expr_item_t *);
+double feenox_builtin_Gamma(expr_item_t *);
 double feenox_builtin_heaviside(expr_item_t *);
 double feenox_builtin_if(expr_item_t *);
 double feenox_builtin_is_in_interval(expr_item_t *);
@@ -125,6 +126,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"expint3",             1, 1, &feenox_builtin_expint3},
     {"expintn",             2, 2, &feenox_builtin_expintn},
     {"floor",               1, 1, &feenox_builtin_floor},
+    {"Gamma",               1, 1, &feenox_builtin_Gamma},
     {"heaviside",           1, 2, &feenox_builtin_heaviside},
     {"if",                  1, 4, &feenox_builtin_if},
     {"integral_dt",         1, 1, &feenox_builtin_integral_dt},
@@ -773,6 +775,16 @@ double feenox_builtin_mod(expr_item_t *f) {
 
 double feenox_builtin_floor(expr_item_t *f) {
   return floor(feenox_expression_eval(&f->arg[0]));
+}
+
+///fn+Gamma+desc Computes the Gamma function $\Gamma(x)$.
+///fn+Gamma+usage Gamma(x)
+///fn+Gamma+math \int_0^\infty t^{x-1} \cdot e^{-t} \, dt
+///fn+Gamma+plotx  1 5 1e-1   1 5 1   0 25 5  0.5 2.5   
+
+double feenox_builtin_Gamma(expr_item_t *f) {
+  double x = feenox_expression_eval(&f->arg[0]);
+  return (x <= 0) ? 1 : gsl_sf_gamma(x);
 }
 
 

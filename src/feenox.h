@@ -268,7 +268,7 @@ enum version_type {
 
 
 // number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         57
+#define N_BUILTIN_FUNCTIONS         58
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
 

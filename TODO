@@ -41,9 +41,7 @@
 General things to do
 
 -   implicit call to SOLVE_PROBLEM?
--   use MatPreallocator to efficiently pre-allocate the matrices?
-    -   check v3.19 and see if it works well
-    -   add an option to choose to allocate or not
+-   for/while loops?
 -   use DMPlex?
     -   allocate matrices?
     -   write vtus?

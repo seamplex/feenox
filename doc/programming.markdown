@@ -70,9 +70,9 @@ Specification. Within this goal, there are three levels of importance:
 
 # Compiling and debuging
 
-See the [compilation.md][].
+See the [compilation instructions][].
 
-  [compilation.md]: compilation%20instructions
+  [compilation instructions]: compilation.md
 
 # How we program FeenoX
 
@@ -421,9 +421,9 @@ format has to provide a virtual reader/writer method.
 |  `i`  | elements or cells                                                                                |
 |  `j`  | nodes, either global or local. If there are loops which need both, use `j_local` and `j_global`. |
 |  `k`  | dummy index                                                                                      |
-|  `m`  | dimensions                                                                                       |
-|  `d`  | degree of freedoms                                                                               |
-|  `v`  | Gauss points                                                                                     |
+|  `d`  | **d**imensions                                                                                   |
+|  `g`  | degree of freedoms (from **g**roups of energy actually)                                          |
+|  `q`  | Gauss (**q**uadrature) points                                                                    |
 
 ## Git workflow
 
@@ -463,8 +463,9 @@ format has to provide a virtual reader/writer method.
 
 # Code of coduct
 
-- See the (code of conduct)\[CODE_OF_COUNDUCT.md\] for participating in
-  the commnity.
+- See the [code of conduct][].
+
+  [code of conduct]: CODE_OF_CONDUCT.md
 
 # Release plans
 
