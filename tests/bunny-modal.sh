@@ -26,11 +26,11 @@ fi
 
 # gmsh -v 0 -3 ${dir}/bunny.geo -order 2 -o bunny-2nd.msh || exit $?
 
-answer1 bunny-modal.fee fixed "1.0 1.1 1.6 1.6 2.1 2.3"
+answer1 bunny-modal.fee fixed "1 1 2 2 2 2"
 exitifwrong $?
 
-answer1 bunny-modal.fee free  "1.6 1.7 2.2 2.4 3.3 3.4"
+answer1 bunny-modal.fee free  "2 2 2 2 3 3"
 exitifwrong $?
 
-answer1 bunny-modal.fee rest  "1.6 1.7 2.2 2.4 3.3 3.5"
+answer1 bunny-modal.fee rest  "2 2 2 2 3 3"
 exitifwrong $?

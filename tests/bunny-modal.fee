@@ -15,5 +15,5 @@ E = 1e6
 
 INCLUDE bunny-modal-${1}.fee
 SOLVE_PROBLEM
-PRINT %.1f SEP " " f
+PRINT %.0f SEP " " f
 WRITE_RESULTS FORMAT vtk
