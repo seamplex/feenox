@@ -20,7 +20,7 @@ if [ ! -e Stanford_Bunny.stl ]; then
  fi
 fi 
 
-gmsh -v 0 -3 ${dir}/bunny.geo -o bunny.msh || exit $?
+gmsh -3 ${dir}/bunny.geo -o bunny.msh || exit $?
 
 answerzero bunny-thermal.fee 1e-2
 exitifwrong $?
