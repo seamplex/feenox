@@ -1,0 +1,86 @@
+solid Created by Gmsh
+facet normal -1 0 0
+  outer loop
+    vertex -28 -50 115
+    vertex -28 50 0
+    vertex -28 -50 0
+  endloop
+endfacet
+facet normal -1 0 0
+  outer loop
+    vertex -28 -50 115
+    vertex -28 50 115
+    vertex -28 50 0
+  endloop
+endfacet
+facet normal 1 0 0
+  outer loop
+    vertex 87 -50 115
+    vertex 87 -50 0
+    vertex 87 50 0
+  endloop
+endfacet
+facet normal 1 -0 0
+  outer loop
+    vertex 87 -50 115
+    vertex 87 50 0
+    vertex 87 50 115
+  endloop
+endfacet
+facet normal 0 -1 0
+  outer loop
+    vertex -28 -50 115
+    vertex -28 -50 0
+    vertex 87 -50 0
+  endloop
+endfacet
+facet normal -0 -1 -0
+  outer loop
+    vertex 87 -50 115
+    vertex -28 -50 115
+    vertex 87 -50 0
+  endloop
+endfacet
+facet normal 0 1 0
+  outer loop
+    vertex -28 50 115
+    vertex 87 50 0
+    vertex -28 50 0
+  endloop
+endfacet
+facet normal 0 1 0
+  outer loop
+    vertex 87 50 115
+    vertex 87 50 0
+    vertex -28 50 115
+  endloop
+endfacet
+facet normal -0 0 -1
+  outer loop
+    vertex 87 50 0
+    vertex -28 -50 0
+    vertex -28 50 0
+  endloop
+endfacet
+facet normal 0 -0 -1
+  outer loop
+    vertex 87 50 0
+    vertex 87 -50 0
+    vertex -28 -50 0
+  endloop
+endfacet
+facet normal 0 0 1
+  outer loop
+    vertex 87 50 115
+    vertex -28 50 115
+    vertex -28 -50 115
+  endloop
+endfacet
+facet normal 0 0 1
+  outer loop
+    vertex 87 50 115
+    vertex -28 -50 115
+    vertex 87 -50 115
+  endloop
+endfacet
+endsolid Created by Gmsh

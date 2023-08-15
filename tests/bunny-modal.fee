@@ -3,7 +3,11 @@ PROBLEM modal 3D MODES 6
 # create mesh with
 #  > wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl
 #  > gmsh -3 bunny.geo -order 2 -o bunny-2nd.msh
-READ_MESH bunny-2nd.msh
+# READ_MESH bunny-2nd.msh
+
+# 2nd-order meshing is buggy in the gmsh version in the ubuntu repo
+# which is used by github actions so we keep 1st order for now
+READ_MESH bunny.msh
 
 nu = 0.3
 rho = 1
@@ -13,4 +17,3 @@ INCLUDE bunny-modal-${1}.fee
 SOLVE_PROBLEM
 PRINT %.2f SEP " " f
 WRITE_RESULTS FORMAT vtk
-

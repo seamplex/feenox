@@ -1,0 +1,15 @@
+PROBLEM neutron_sn 3D SN 4
+READ_MESH bunny.msh
+
+nu1 = 2.4
+Sigma_f1 = 0.08
+nuSigma_f1 = nu1*Sigma_f1
+Sigma_s1.1 = 0.22
+Sigma_t1   = 0.4
+
+BC base  vacuum 
+BC rest  vacuum 
+
+SOLVE_PROBLEM
+PRINT keff-1.013
+WRITE_RESULTS

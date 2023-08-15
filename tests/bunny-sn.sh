@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
-checkpde modal
+checkpde neutron_sn
 checkslepc
 checkgmsh
 
@@ -24,13 +24,12 @@ if [ ! -e ${dir}/bunny.msh ]; then
   gmsh -3 ${dir}/bunny.geo || exit $?
 fi
 
-# gmsh -v 0 -3 ${dir}/bunny.geo -order 2 -o bunny-2nd.msh || exit $?
-
-answer1 bunny-modal.fee fixed "0.97 1.10 1.57 1.63 2.05 2.28"
+answerzero bunny-sn.fee 1e-2
 exitifwrong $?
 
-answer1 bunny-modal.fee free  "1.56 1.67 2.22 2.42 3.26 3.39"
-exitifwrong $?
+if [ ! -e ${dir}/bunny-box.msh ]; then
+  gmsh -3 ${dir}/bunny-box.geo || exit $?
+fi
 
-answer1 bunny-modal.fee rest  "1.56 1.67 2.23 2.43 3.32 3.48"
+answerzero bunny-sn-box.fee 1e-2
 exitifwrong $?

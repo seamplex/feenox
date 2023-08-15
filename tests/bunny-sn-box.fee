@@ -1,0 +1,11 @@
+PROBLEM neutron_sn 3D SN 4
+READ_MESH bunny-box.msh
+
+MATERIAL bunny  nuSigma_f1=2.4*0.08 Sigma_s1.1=0.22 Sigma_t1=0.4
+MATERIAL box    nuSigma_f1=0        Sigma_s1.1=0    Sigma_t1=0
+
+BC vacuum  vacuum 
+
+SOLVE_PROBLEM
+PRINT keff-1.015
+WRITE_RESULTS

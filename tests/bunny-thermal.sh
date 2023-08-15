@@ -12,16 +12,17 @@ fi
 checkpde thermal
 checkgmsh
 
-if [ ! -e ./Stanford_Bunny.stl -o -e ${dir}/Stanford_Bunny.stl ] ; then
- if [ ! -z "$(which wget)" ]; then
-   wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl || exit $?
-   mv Stanford_Bunny.stl ${dir}
- else
-   return 77
- fi
-fi 
+if [ ! -e ${dir}/bunny.msh ]; then
+  if [ ! -e ${dir}/Stanford_Bunny.stl ] ; then
+   if [ ! -z "$(which wget)" ]; then
+     wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl -O ${dir}/Stanford_Bunny.stl || exit $?
+   else
+     return 77
+   fi
+  fi 
+  gmsh -3 ${dir}/bunny.geo || exit $?
+fi
 
-gmsh -3 ${dir}/bunny.geo -o bunny.msh || exit $?
 
 answerzero bunny-thermal.fee 1e-2
 exitifwrong $?
