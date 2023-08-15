@@ -942,11 +942,11 @@ int feenox_parse_alias(void) {
     return FEENOX_ERROR;
   }
 
-  // if there are parenthesis they are sub-indexes
-  if ((dummy_openpar = strchr(existing_object, '(')) != NULL) {
+  // if there are brackets they are sub-indexes
+  if ((dummy_openpar = strchr(existing_object, '[')) != NULL) {
     dummy_comma = strchr(existing_object, ',');
-    if ((dummy_closepar = strrchr(existing_object, ')')) == NULL) {
-      feenox_push_error_message("expecting closing parenthesis in expression '%s'", existing_object);
+    if ((dummy_closepar = strrchr(existing_object, ']')) == NULL) {
+      feenox_push_error_message("expecting closing bracket in expression '%s'", existing_object);
     }
     
     *dummy_openpar = '\0';
