@@ -1,0 +1,141 @@
+##############################
+# vertical boiling channel
+# clausse & lahey nodalization, nondimensional DAE version
+# original model (N1+4 variables) as presented at MECOM 2010
+# Theler G., Clausse A., Bonetto F.,
+# The moving boiling-boundary model of a vertical two-phase flow channel revisited.
+# Mecanica Computacional, Volume XXIX Number 39, Fluid Mechanics (H), pages 3949-3976.
+# http://www.cimec.org.ar/ojs/index.php/mc/article/view/3277/3200
+# updated to work with FeenoX
+# jeremy@seamplex.com
+##############################
+
+##############################
+# non-dimensional parameters
+##############################
+DEFAULT_ARGUMENT_VALUE 1 14
+DEFAULT_ARGUMENT_VALUE 2 6.5
+Npch = $1    # phase-change number (read from command line)
+Nsub = $2    # subcooling number   (read from command line)
+
+Fr = 1       # froude number
+Lambda = 3   # distributed friction number
+ki = 6       # inlet head loss coefficient
+ke = 2       # outlet head loss coefficient
+
+##############################
+# phase-space definition
+##############################
+N1 = 6       # nodes in the one-phase region
+VECTOR l SIZE N1
+
+PHASE_SPACE l ui ue m rhoe
+
+# the boiling frontier is equal to the last one-phase node position
+# and we refer to it as lambda throughout the file
+ALIAS l[N1] AS lambda 
+
+
+##############################
+# DAE solver settings
+##############################
+end_time = 50        # final integration time
+
+# compute the initial derivatives of the differential objects
+# from the variables of both differential and algebraic objects
+INITIAL_CONDITIONS_MODE FROM_VARIABLES
+
+
+##############################
+# steady state values
+##############################
+IF Npch<(Nsub+1e-2)
+ PRINT "Npch =" Npch "should be larger than Nsub =" Nsub SEP " "
+ ABORT
+ENDIF
+
+# compute the needed euler (external pressure) number
+Eu = {  (1/Npch)*(Nsub^2 + 0.5*Lambda*Nsub^2 + ke*Nsub^2)
+      + (1/Npch^2)*(-Nsub^3 + Lambda*Nsub^2 - Lambda*Nsub^3
+                     + ki*Nsub^2 + ke*Nsub^2 - ke*Nsub^3)
+      + (Nsub/Npch)* 1/Fr * (1 + log(1 + Npch - Nsub)/Nsub)
+      + 0.5*Nsub^4/Npch^3*Lambda }
+      
+# and the steady-state (starred in the paper) values
+ui_star = Nsub/Npch
+lambda_star = Nsub/Npch
+m_star = lambda_star + 1/Npch*(log(1+Npch*(1-lambda_star)))
+rhoe_star = 1/(1 + Npch*(1-lambda_star))
+ue_star = ui_star + Nsub*(1-lambda_star)
+
+
+##############################
+# initial conditions
+##############################
+l_0[i] = lambda_star * i/N1
+m_0 = m_star
+ui_0 = ui_star*0.9     # disturbance
+ue_0 = ue_star
+rhoe_0 = rhoe_star
+
+# stop the integration if certain variables get out of
+# the [0:1] interval -> unstable condition
+done = done | m>1 | lambda>1 | ui<0 | ui>1
+
+
+##############################
+# the dynamical system equations
+##############################
+# equations (29)
+0 .= 0.5*(        0  + l_dot[1]) + N1*(l[1] -     0 ) - ui
+
+# TODO: this used to work but now it does not
+# 0[i]<2:N1> .= 0.5*(l_dot[i-1] + l_dot[i]) + N1*(l[i] - l[i-1]) - ui
+ 
+0 .= 0.5*(l_dot[2-1] + l_dot[2]) + N1*(l[2] - l[2-1]) - ui
+0 .= 0.5*(l_dot[3-1] + l_dot[3]) + N1*(l[3] - l[3-1]) - ui
+0 .= 0.5*(l_dot[4-1] + l_dot[4]) + N1*(l[4] - l[4-1]) - ui
+0 .= 0.5*(l_dot[5-1] + l_dot[5]) + N1*(l[5] - l[5-1]) - ui
+0 .= 0.5*(l_dot[6-1] + l_dot[6]) + N1*(l[6] - l[6-1]) - ui
+
+# equation (31)
+0 .= ui - ue + Nsub*(1-lambda)
+
+# equation (41)
+0 .=  (1-lambda)*log(1/rhoe)/(1/rhoe-1) - (m-lambda)
+
+# equation (36)
+0 .= m_dot + rhoe*ue - ui
+
+# equation (30)
+0 .=  {
+   + m*ui_dot + m_dot*ui
+   + Nsub/(1/rhoe-1)*
+      (-(1-lambda)*m_dot - (1-m)*l_dot(N1) + (1-lambda)*(1-m)/((1/rhoe-1)*rhoe^2)*rhoe_dot)
+   + rhoe * ue^2 - ui^2 
+   + m/Fr - Eu
+   + ki*ui^2 + ke*rhoe*ue^2
+   + Lambda*(  m*ui^2
+             + 0.5*(Nsub^2/Npch)*lambda^2
+             + (ue-ui)/(1/rhoe-1)*( (m-lambda)*((ue-ui)/(1/rhoe-1) - 2*ui)
+                                       + Nsub*(0.5-lambda -(1-lambda)^2/(1/rhoe-1))
+                                       + 2*ui*(1-lambda) )
+            ) }
+
+
+##############################
+# output results
+##############################
+# write information (commented out) in the ouput header
+IF in_static
+ PRINT "\# vertical boiling channel"
+ PRINT "\# Npch = "   Npch
+ PRINT "\# Nsub = "   Nsub
+ PRINT "\# Fr = "     Fr
+ PRINT "\# Lambda = " Lambda
+ PRINT "\# ki = "     ki
+ PRINT "\# ke = "     ke
+ PRINT "\# Eu = "     Eu
+ENDIF
+
+PRINT t lambda ui

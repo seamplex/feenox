@@ -1,0 +1,2 @@
+# 2. sine-shaped power profile
+qstar(z) = pi/2 * sin(z*pi)

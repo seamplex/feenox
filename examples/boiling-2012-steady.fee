@@ -1,0 +1,64 @@
+##############################
+# vertical boiling channel with arbitrary power distribution
+# steady-state computation of the continuous
+# boiling channel problem
+# as presented at ENIEF 2012
+# updated to work with FeenoX
+# jeremy@seamplex.com
+##############################
+
+
+IMPLICIT NONE
+DEFAULT_ARGUMENT_VALUE 1 uniform
+DEFAULT_ARGUMENT_VALUE 2 6.5
+DEFAULT_ARGUMENT_VALUE 3 9.5
+
+# first define some variables
+VAR z' lambda Nsub Npch Eu Fr Lambda ki ke norm
+
+# the problem parameters
+# (remember, the difficulty relies in computing Npch as a function of the rest)
+Nsub = $2
+Eu = $3
+Fr = 5
+Lambda = 3
+ki = 6
+ke = 2
+
+# include the steady-state power profile from a file:
+INCLUDE boiling-2012-$1.fee
+
+# the transient space-dependant power profile in this case
+# is constant and equal to the steady-state profile
+q(z,t) = qstar(z)
+
+# define the boiling boundary as a function of Npch
+lambdastar(Npch) = root(integral(qstar(z'), z', 0, z) - Nsub/Npch, z, 0, 1)
+
+# this expression appears several times, so it is handy to have it as a function
+q2phistar(z,Npch) = integral(qstar(z'), z', lambdastar(Npch), z)
+
+# define the function that has to be zero when the phase-change number is correctly defined
+F(Npch) = {
+   (Nsub/Npch + Nsub*q2phistar(1,Npch))^2/(1 + Npch * q2phistar(1,Npch))
+ - (Nsub/Npch)^2
+ + Lambda*(Nsub/Npch)^2*lambdastar(Npch)
+ + Lambda*integral((Nsub/Npch + Nsub*q2phistar(z,Npch))^2/(1 + Npch*q2phistar(z,Npch)), z, lambdastar(Npch), 1)
+ + ki*(Nsub/Npch)^2
+ + ke*(Nsub/Npch + Nsub*q2phistar(1,Npch))^2 / (1 + Npch*q2phistar(1,Npch)) 
+ + 1/Fr * (lambdastar(Npch) + integral(1/(1 + Npch*q2phistar(z,Npch)), z, lambdastar(Npch), 1))
+ - Eu
+}
+
+# define the steady-state solutions
+ustar(z) = if(z<lambda, Nsub/Npch, Nsub/Npch + Nsub * integral(qstar(z'), z', lambda, z))
+hstar(z) = -Nsub/Npch + integral(qstar(z'), z', 0, z)
+rhostar(z) = if(z<lambda, 1, 1/(1 + Npch * integral(qstar(z'), z', lambda, z)))
+
+Npch = root(F(Npch), Npch, Nsub+1e-3, 50)
+lambda = lambdastar(Npch)
+
+# print the results
+PRINT TEXT "\# Npch = " Npch
+PRINT TEXT "\# lambda* = " lambda
+PRINT_FUNCTION qstar ustar hstar rhostar MIN 0 MAX 1 STEP 1e-3
