@@ -12,9 +12,10 @@ fi
 checkpde thermal
 checkgmsh
 
-if [ ! -e Stanford_Bunny.stl ]; then
+if [ ! -e ./Stanford_Bunny.stl -o -e ${dir}/Stanford_Bunny.stl ] ; then
  if [ ! -z "$(which wget)" ]; then
    wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl || exit $?
+   mv Stanford_Bunny.stl ${dir}
  else
    return 77
  fi
