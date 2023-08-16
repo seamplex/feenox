@@ -1,7 +1,7 @@
 ##############################
 # vertical boiling channel
 # clausse & lahey nodalization, nondimensional DAE version
-# original model (N1+4 variables) as presented at MECOM 2010
+# version with eta (N1+5 variables) as presented at MECOM 2010
 # Theler G., Clausse A., Bonetto F.,
 # The moving boiling-boundary model of a vertical two-phase flow channel revisited.
 # Mecanica Computacional, Volume XXIX Number 39, Fluid Mechanics (H), pages 3949-3976.
@@ -23,13 +23,15 @@ Lambda = 3   # distributed friction number
 ki = 6       # inlet head loss coefficient
 ke = 2       # outlet head loss coefficient
 
+
+
 ##############################
 # phase-space definition
 ##############################
 N1 = 6       # nodes in the one-phase region
 VECTOR l SIZE N1
 
-PHASE_SPACE l ui ue m rhoe
+PHASE_SPACE l ui ue m rhoe eta
 
 # the boiling frontier is equal to the last one-phase node position
 # and we refer to it as lambda throughout the file
@@ -67,6 +69,7 @@ lambda_star = Nsub/Npch
 m_star = lambda_star + 1/Npch*(log(1+Npch*(1-lambda_star)))
 rhoe_star = 1/(1 + Npch*(1-lambda_star))
 ue_star = ui_star + Nsub*(1-lambda_star)
+eta_star = 1
 
 
 ##############################
@@ -77,6 +80,7 @@ m_0 = m_star
 ui_0 = 0.9*ui_star         # disturbance
 ue_0 = ue_star
 rhoe_0 = rhoe_star
+eta_0 = eta_star
 
 # stop the integration if certain variables get out of
 # the [0:1] interval -> unstable condition
@@ -105,8 +109,11 @@ ENDIF
 # equation (31)
 0 .= ui - ue + Nsub*(1-lambda)
 
-# equation (41)
-0 .=  (1-lambda)*log(1/rhoe)/(1/rhoe-1) - (m-lambda)
+# equation (34)
+0 .= rhoe - 1/(1+eta*Npch*(1-lambda))
+
+# equation (35)
+0 .= lambda - m + 1/(eta*Npch)*log(1/rhoe)
 
 # equation (36)
 0 .= m_dot + rhoe*ue - ui
@@ -114,16 +121,15 @@ ENDIF
 # equation (30)
 0 .= {
    + m*ui_dot + m_dot*ui
-   + Nsub/(1/rhoe-1)*
-      (-(1-lambda)*m_dot - (1-m)*l_dot[N1] + (1-lambda)*(1-m)/((1/rhoe-1)*rhoe^2)*rhoe_dot)
+   - Nsub*(1-m)/(eta^2*Npch)*eta_dot - Nsub/(eta*Npch)*m_dot
    + rhoe * ue^2 - ui^2 
    + m/Fr - Eu
    + ki*ui^2 + ke*rhoe*ue^2
-   + Lambda*(  m*ui^2
-             + 0.5*(Nsub^2/Npch)*lambda^2
-             + (ue-ui)/(1/rhoe-1)*( (m-lambda)*((ue-ui)/(1/rhoe-1) - 2*ui)
-                                       + Nsub*(0.5-lambda -(1-lambda)^2/(1/rhoe-1))
-                                       + 2*ui*(1-lambda) )
+   + Lambda*( m*ui^2
+              + (Nsub*log(1/rhoe))/(eta*Npch)^2*(Nsub/(eta*Npch) - 2*ui)
+              + lambda^2*Nsub^2/(2*Npch)
+              + 2*ui*Nsub*(1-lambda)/(eta*Npch)
+              + Nsub^2/(eta*Npch)*((0.5-lambda)-(1-lambda)/(eta*Npch))
             ) }
 
 

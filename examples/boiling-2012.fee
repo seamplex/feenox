@@ -12,7 +12,7 @@
 
 DEFAULT_ARGUMENT_VALUE 1 uniform
 DEFAULT_ARGUMENT_VALUE 2 6.5
-DEFAULT_ARGUMENT_VALUE 3 9.5
+DEFAULT_ARGUMENT_VALUE 3 9.725
 
 ##############################
 # non-dimensional parameters
@@ -30,7 +30,7 @@ ke = 2       # outlet head loss coefficient
 ##############################
 N1 = 6       # nodes in the one-phase region
 VECTOR l SIZE N1
-PHASE_SPACE l ui ue rhoe eta m phi hi Eu
+PHASE_SPACE l ui ue m rhoe phi eta hi
 
 # the boiling frontier is equal to the last one-phase node position
 # and we refer to it as lambda throughout the file
@@ -40,14 +40,11 @@ ALIAS l[N1] AS lambda
 ##############################
 # DAE solver settings
 ##############################
-dt_0 = 1e-6
-end_time = 60        # final integration time
+end_time = 50        # final integration time
 
 # compute the initial derivatives of the differential objects
 # from the variables of both differential and algebraic objects
-# INITIAL_CONDITIONS_MODE  FROM_VARIABLES
-# INITIAL_CONDITIONS_MODE  FROM_DERIVATIVES
-
+INITIAL_CONDITIONS_MODE FROM_VARIABLES
 
 # forbid implicit declaration of variables from now on to
 # detect typos at parse time
@@ -60,7 +57,7 @@ IMPLICIT NONE
 ##############################
 VAR z'
 # include the steady-state power profile from a file:
-INCLUDE boiling-2012-$1.fee
+INCLUDE boiling-2012-$(1).fee
 # the transient space-dependant power profile in this case
 # is constant and equal to the steady-state profile
 q(z,t) = qstar(z)
@@ -79,31 +76,34 @@ F(Npch) = {
  - Eu }
 Npch = root(F(Npch), Npch, Nsub+1e-3, 50)
 
+IF Npch<(Nsub+1e-2)
+ PRINT TEXT "Npch =" Npch TEXT "should be larger than Nsub =" Nsub SEP " "
+ ABORT
+ENDIF
+
 
 
 ##############################
 # initial conditions
 ##############################
-ui_0 = Nsub/Npch  # disturbance
+ui_0 = 0.9*Nsub/Npch  # disturbance
 hi_0 = -Nsub/Npch
 ue_0 = Nsub/Npch + Nsub * integral(qstar(z'), z', lambdastar(Npch), 1)
 rhoe_0 = 1/(1 + Npch * integral(qstar(z'), z', lambdastar(Npch), 1))
 eta_0 = 1
 m_0 = lambdastar(Npch) + integral(1/(1 + Npch * eta_0 * integral(qstar(z'),z',lambdastar(Npch),z)), z, lambdastar(Npch), 1)
-l_0(i) = root(hi_0 * i/N1 + integral(qstar(z'), z', 0, z), z, 0, 1)
+l_0[i] = root(hi_0 * i/N1 + integral(qstar(z'), z', 0, z), z, 0, 1)
 phi_0 = integral((Nsub/Npch + Nsub*integral(qstar(z'), z', lambdastar(Npch), z))/(1 + Npch*eta*integral(qstar(z'), z', lambdastar(Npch), z)), z, lambdastar(Npch), 1)
 
 
 # stop the integration if certain variables get out of
 # the [0:1] interval -> unstable condition
-done = Nsub>Npch | m>1 | lambda>1 | ui<0 | ui>1
+done = done | m>1 | lambda>1 | ui<0 | ui>1
 IF done
  PRINT TEXT "\# model is out of bounds" Nsub Npch m lambda ui
  ABORT
 ENDIF
 
-
-PRINT TEXT "hola"
 
 ##############################
 # the dynamical system equations
@@ -119,38 +119,47 @@ PRINT TEXT "hola"
 0 .= -1/hi*hi_dot * (N1 - 5-0.5)*(l[5] - l[5-1]) + 0.5*(l_dot[5] + l_dot[5-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[5-1], l[5])
 0 .= -1/hi*hi_dot * (N1 - 6-0.5)*(l[6] - l[6-1]) + 0.5*(l_dot[6] + l_dot[6-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[6-1], l[6])
 
-
 0 .= ui - ue + Nsub*integral(q(z,t), z, lambda, 1)
 0 .= rhoe - 1/(1 + Npch * eta * (1 - lambda))
 0 .= lambda - m + integral(1/(1 + Npch*eta*integral(q(z',t),z',lambda,z)), z, lambda, 1)
 0 .= m_dot + rhoe*ue - ui
 0 .= phi - integral((ui + Nsub*integral(q(z',t), z', lambda, z))/(1 + Npch*eta*integral(q(z',t), z', lambda, z)), z, lambda, 1)
-0 .={  ui_dot*lambda + ui*l_dot(N1) + phi_dot + rhoe*ue^2 - ui^2 
+
+
+0 .= {
+  + ui_dot*lambda
+  + ui*l_dot(N1)
+  + phi_dot
   + Lambda*(ui^2*lambda +
       integral((ui + Nsub  *  integral(q(z',t), z', lambda, z))^2/
                ( 1 + Npch*eta*integral(q(z',t), z', lambda, z)),
                 z, lambda, 1) )
-  + ki*ui^2 + ke*rhoe*ue^2 + 1/Fr*m - Eu 
-}
+  + rhoe * ue^2
+  - ui^2 
+  + ki*ui^2
+  + ke*rhoe*ue^2
+  + m/Fr
+  - Eu }
+
 
 # constant inlet enthalpy and pressure drop
 0 .= hi_dot
-0 .= Eu_dot
 
-PRINT TEXT "pianola"
-
+##############################
+# output results
+##############################
 # write information (commented out) in the ouput header
 IF in_static
- PRINT TEXT "\# vertical boiling channel"
- PRINT TEXT "\# Npch = "  Npch
- PRINT TEXT "\# Nsub = "  Nsub
- PRINT TEXT "\# Fr = "     Fr
- PRINT TEXT "\# Lambda = " Lambda
- PRINT TEXT "\# ki = "    ki
- PRINT TEXT "\# ke = "    ke
- PRINT TEXT "\# Eu = "     Eu
+ PRINT TEXT "\# vertical boiling channel with arbitrary power: $(1) (2012)"
+ PRINT TEXT "\# Npch = "   %.10f Npch
+ PRINT TEXT "\# Nsub = "   %.10f Nsub
+ PRINT TEXT "\# Fr   = "   %.10f Fr
+ PRINT TEXT "\# Lambda = " %.10f Lambda
+ PRINT TEXT "\# ki   = "   %.10f ki
+ PRINT TEXT "\# ke   = "   %.10f ke
+ PRINT TEXT "\# Eu   = "   %.10f Eu
 ENDIF
 
 # write the information needed to build a video with besssugo
 # PRINT t lambda ui hi eta*integral(q(z',t),z',lambda,1) l
-PRINT t
+PRINT t lambda ui

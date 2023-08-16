@@ -20,7 +20,7 @@ VAR z' lambda Nsub Npch Eu Fr Lambda ki ke norm
 # (remember, the difficulty relies in computing Npch as a function of the rest)
 Nsub = $2
 Eu = $3
-Fr = 5
+Fr = 1
 Lambda = 3
 ki = 6
 ke = 2
@@ -59,6 +59,13 @@ Npch = root(F(Npch), Npch, Nsub+1e-3, 50)
 lambda = lambdastar(Npch)
 
 # print the results
-PRINT TEXT "\# Npch = " Npch
+PRINT TEXT "\# vertical boiling channel"
+PRINT TEXT "\# Npch = "  Npch
+PRINT TEXT "\# Nsub = "  Nsub
+PRINT TEXT "\# Fr   = "     Fr
+PRINT TEXT "\# Lambda = " Lambda
+PRINT TEXT "\# ki   = "    ki
+PRINT TEXT "\# ke   = "    ke
+PRINT TEXT "\# Eu   = "     Eu
 PRINT TEXT "\# lambda* = " lambda
 PRINT_FUNCTION qstar ustar hstar rhostar MIN 0 MAX 1 STEP 1e-3
