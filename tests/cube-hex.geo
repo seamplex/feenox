@@ -15,6 +15,6 @@ Mesh.ElementOrder = 1;
 Mesh.RecombineAll = 1;
 Mesh.Recombine3DAll = 1;
 
-Transfinite Line "*" = n+1;
+Transfinite Line "*" = n/Mesh.MeshSizeFactor+1;
 Transfinite Surface "*";
 Transfinite Volume "*";

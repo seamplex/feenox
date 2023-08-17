@@ -15,6 +15,9 @@
   - [Lorenz’ attractor—the one with the
   butterfly](daes.md#lorenz-attractorthe-one-with-the-butterfly)
   - [The double pendulum](daes.md#the-double-pendulum)
+  - [Vertical boiling channel](daes.md#vertical-boiling-channel)
+    - [Original Clausse-Lahey formulation with uniform power
+    distribution](daes.md#original-clausse-lahey-formulation-with-uniform-power-distribution)
 - Laplace’s equation
   - [How to solve a maze without AI](laplace.md#how-to-solve-a-maze-without-ai)
     - [Transient top-down](laplace.md#transient-top-down)

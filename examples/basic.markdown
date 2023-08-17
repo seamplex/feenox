@@ -60,9 +60,13 @@ $
     \pi = 4 \cdot \arctan{1}
     $$
 
-3.  The root of $tan(x)=0$.
+3.  The root of $\tan x=0$
 
-4.  The integral of the gaussian bell, squared.
+    $$
+    x / \tan x = 0
+    $$
+
+4.  The integral of the gaussian bell, squared
 
     $$
     \pi = \left[ \int_{-\infty}^{\infty} e^{-x^2} \, dx \right]^2
@@ -137,7 +141,7 @@ piapprox[8] = sum(2*(-1)^i * 3^(1/2-i)/(2*i+1), i, 0, 20)
 piapprox[9] = 22/7-integral((x^4*(1-x)^4)/(1+x^2), x, 0, 1)
 
 # ramanujan-sato series
-piapprox[10] = 1/(2*sqrt(2)/(99^2)*sum(Gamma(4*i)/Gamma(i)^4 * (26390*i + 1103)/(396^(4*i)), i, 0, 2))
+piapprox[10] = 1/(2*sqrt(2)/(99^2)*sum(gammaf(4*i)/gammaf(i)^4 * (26390*i + 1103)/(396^(4*i)), i, 0, 2))
 
 PRINT_VECTOR "% .16f" piapprox piapprox(i)-pi
 ```

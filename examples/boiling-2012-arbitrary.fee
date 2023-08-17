@@ -1,5 +1,5 @@
-# arbitray normalized spline-interpolated power profile
-FUNCTION potencia(z) INTERPOLATION steffen DATA {
+# arbitray normalized interpolated power profile
+FUNCTION potencia(z) INTERPOLATION splines DATA {
 0      0
 0.2    2.5 
 0.5    3

@@ -39,7 +39,7 @@ ALIAS l[N1] AS lambda
 ##############################
 # DAE solver settings
 ##############################
-end_time = 50        # final integration time
+end_time = 100        # final integration time
 
 # compute the initial derivatives of the differential objects
 # from the variables of both differential and algebraic objects
@@ -132,13 +132,13 @@ ENDIF
 ##############################
 # write information (commented out) in the ouput header
 IF in_static
- PRINT "\# vertical boiling channel with uniform power (2010)"
- PRINT "\# Npch = "   %.10f Npch
- PRINT "\# Nsub = "   %.10f Nsub
- PRINT "\# Fr   = "   %.10f Fr
- PRINT "\# Lambda = " %.10f Lambda
- PRINT "\# ki   = "   %.10f ki
- PRINT "\# ke   = "   %.10f ke
+ PRINT "\# vertical boiling channel with uniform power (original formulation 2010)"
+ PRINT "\# Npch = "   Npch
+ PRINT "\# Nsub = "   Nsub
+ PRINT "\# Fr   = "   Fr
+ PRINT "\# Lambda = " Lambda
+ PRINT "\# ki   = "   ki
+ PRINT "\# ke   = "   ke
  PRINT "\# Eu   = "   %.10f Eu
 ENDIF
 

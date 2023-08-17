@@ -1,3 +1,108 @@
+---
+category: daes
+intro: |
+  # Vertical boiling channel
+  
+  ## Original Clausse-Lahey formulation with uniform power distribution
+ 
+  Implementation of the dynamical system as described in 
+  
+   * [The Moving Boiling-Boundary Model Of A Vertical Two-Phase Flow Channel Revisited](http://www.cimec.org.ar/ojs/index.php/mc/article/view/3277/3200), by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2010).
+  
+  The original paper was written using the **first** version of the code, named mochin.
+  Recall that FeenoX is a _third system effect_.
+  
+  ![Figure from the paper above.](boiling-2012-figure.png)  
+  
+  For reference, the non-dimensional equations are
+
+  $$
+  \begin{aligned}
+  0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
+  + \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
+  & \quad\quad\quad\quad - u_\text{i}(t) - \frac{N_1}{h_\text{i}(t)} \cdot \frac{N_\text{sub}}{N_\text{pch}} \int_{\ell_{n-1}(t)}^{\ell{n}(t)} q(z,t) \, dz \quad\quad\quad\quad\quad \text{for $n=1,\dots,N_1$}
+  \\
+  0 &=  u_\text{i}(t) - u_\text{e}(t)  + N_\text{sub} \int_{\lambda(t)}^{1} q(z',t) \, dz' 
+  \\
+  0 &=  \, \rho_\text{e}(t) - \frac{1}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{1} q(z',t) \, dz'}
+  \\
+  0 &= \lambda(t) - m(t) + \bigint_{\lambda(t)}^{1} \frac{dz}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} 
+  \\
+  0 &= \varphi(t) - \bigint_{\lambda(t)}^{1} \frac{ \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz
+  \\
+  0 &= \frac{d m(t)}{dt} + \rho_\text{e}(t) \cdot u_\text{e}(t) - u_\text{i}(t)
+  \\
+  0 &= 
+   \frac{d u_\text{i}(t)}{dt} \cdot \lambda(t) + u_\text{i}(t) \cdot \frac{d \lambda(t)}{dt} + \frac{d\varphi(t)}{dt}
+   + \rho_\text{e}(t) \, u_\text{e}^2(t) - \rho_\text{i}(t) \, u_\text{i}^2(t)  \\
+  & \quad\quad\quad\quad +
+  \Lambda \cdot \left[ u_\text{i}^2(t) \cdot \lambda(t) +
+   \bigint_{\lambda(t)}^{1} \frac{\left( \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'\right)^2}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz \right] \\
+  & \quad\quad\quad\quad\quad\quad
+   + k_\text{i} \cdot \rho_\text{i}(t) \, u_\text{i}^2(t)
+   + k_\text{e} \cdot \rho_\text{e}(t) \, u_\text{e}^2(t)
+  + \frac{m(t)}{\text{Fr}} - \text{Eu}(t) \\
+  0 &= h_\text{i}(t) + f(\vec{x}, \vec{\dot{x}}, t) \\
+  0 &= \text{Eu}(t) + g(\vec{x}, \vec{\dot{x}}, t)
+  \end{aligned}
+  $$
+  
+  where $\ell_0 = 0$ and $\ell_{N_1}=\lambda$. See the full paper for the details.
+  
+  The input file `boiling-2010-eta.fee` takes two optional arguments from the command line:
+  
+   1. The phase-change number $N_\text{pch}$ (default is 14)
+   2. The subcooling number $N_\text{sub}$ (default is 6.5)
+   
+  When run, FeenoX...
+  
+   a. computes the steady state conditions (including the Euler number of of the two numbers from the command line),
+   b. prints a commented-out block (each line starting with `#`) with the dimensionless numbers of the problem,
+   c. disturbs the inlet velocity to 90% of the nominal value,
+   d. solves the system up to a non-dimensional time of 100, and
+   e. for each time step, writes three columns:
+  
+      i. the non-dimensional time $t$
+      ii. the non-dimesinoal location of the boiling interface $\lambda$
+      iii. the non-dimensional inlet velocity $u_i$
+  
+  The input file [`boiling-2010.fee`](boiling-2010.fee) contains the original Clausse-Lahey formulation without the intermediate variable $\eta$.  
+  
+terminal: |
+  $ feenox boiling-2010.fee | tee boiling-2010-14-6.5.dat
+  # vertical boiling channel with uniform power (original formulation 2010)
+  # Npch =        14
+  # Nsub =        6.5
+  # Fr   =        1
+  # Lambda =      3
+  # ki   =        6
+  # ke   =        2
+  # Eu   =        9.1375899118
+  0       0.464286        0.417857
+  1.52588e-05     0.464286        0.41787
+  3.05176e-05     0.464286        0.417884
+  [...]
+  49.9456 0.260377        0.532362
+  49.9759 0.270814        0.556147
+  50      0.279815        0.574653
+  $ feenox boiling-2010.fee 16 5 | tee boiling-2010-16-5.dat
+  # vertical boiling channel with uniform power (original formulation 2010)
+  # Npch =        16
+  # Nsub =        5
+  # Fr   =        1
+  # Lambda =      3
+  # ki   =        6
+  # ke   =        2
+  # Eu   =        5.8724697515
+  0       0.3125  0.28125
+  1.52588e-05     0.3125  0.281258
+  3.05176e-05     0.3125  0.281267
+  [...]
+  9.70317 0.383792        0.00373348
+  9.71746 0.375037        -0.0176774
+  # model is out of bounds        5       16      0.600731        0.375037        -0.0176774  
+  $ 
+...
 ##############################
 # vertical boiling channel
 # clausse & lahey nodalization, nondimensional DAE version
@@ -41,7 +146,7 @@ ALIAS l[N1] AS lambda
 ##############################
 # DAE solver settings
 ##############################
-end_time = 50        # final integration time
+end_time = 100        # final integration time
 
 # compute the initial derivatives of the differential objects
 # from the variables of both differential and algebraic objects
@@ -138,14 +243,18 @@ ENDIF
 ##############################
 # write information (commented out) in the ouput header
 IF in_static
- PRINT "\# vertical boiling channel with uniform power (2010)"
- PRINT "\# Npch = "   %.10f Npch
- PRINT "\# Nsub = "   %.10f Nsub
- PRINT "\# Fr   = "   %.10f Fr
- PRINT "\# Lambda = " %.10f Lambda
- PRINT "\# ki   = "   %.10f ki
- PRINT "\# ke   = "   %.10f ke
+ PRINT "\# vertical boiling channel with uniform power (eta formulation 2010)"
+ PRINT "\# Npch = "   Npch
+ PRINT "\# Nsub = "   Nsub
+ PRINT "\# Fr   = "   Fr
+ PRINT "\# Lambda = " Lambda
+ PRINT "\# ki   = "   ki
+ PRINT "\# ke   = "   ke
  PRINT "\# Eu   = "   %.10f Eu
 ENDIF
 
 PRINT t lambda ui
+---
+figures: |
+  ![Projection of the full space into $\lambda$-$u_i$ for two combination of $N_\text{pch}$-$N_\text{sub}$. Red is unstable, green shows a limit cycle.](boiling-2010.svg)
+...

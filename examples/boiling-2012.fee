@@ -1,3 +1,75 @@
+---
+category: daes
+intro: |
+  ## Arbitrary power distribution
+ 
+  Extension of the Clausse-Lahey model to support arbitrary (and potentially time-dependent) power profiles as explained in
+  
+   * [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase Flow Loop](https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017), by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2012).
+  
+  The original paper was written using the **second** version of the code, named wasora.
+  Recall that FeenoX is a _third system effect_.
+  
+  ![Figure from the paper above.](boiling-2010-figure.png)  
+  
+  For reference, the non-dimensional equations are
+
+  $$
+  \begin{aligned}
+  0 &=  \frac{1}{2} \left (\frac{d\ell_{n-1}}{dt} + \frac{d\ell_n}{dt} \right) + N_{1} (\ell_n - \ell_{n-1}) - u_i \quad\quad \text{for $n=1,\dots,N_1$} \nonumber\\
+  0 &=  u_i - u_e + N_\text{sub} \, (1 - \lambda ) \nonumber\\
+  0 &= \rho_e - \frac{1}{1+N_\text{pch} \, \eta (1-\lambda)} \nonumber \\
+  0 &= \lambda - m + \frac{ \ln \left( 1/\rho_e \right) }{N_\text{pch} \, \eta} \nonumber \\
+  0 &= \dot{m} + \rho_e u_e - u_i \nonumber \\
+  0 &= m \, \dot{u}_i + u_i \, \dot{m} - \frac{N_\text{sub} (1-m)}{\eta^2 N_\text{pch}} \, \dot{\eta} - \frac{N_\text{sub}}{\eta N_\text{pch}} \, \dot{m} + \rho_e {u_e}^2 - {u_i}^2 + \frac{m}{\text{Fr}}  - \text{Eu}  \nonumber\\
+  & \quad\quad\quad + \Lambda \left\{ m \cdot u_i^2 + \frac{N_\text{sub} \ln(1/\rho_e)}{(\eta N_\text{pch})^2}\left( \frac{N_\text{sub}}{\eta N_\text{pch}} - 2 u_i \right) +  \frac{\lambda^2 N_\text{sub}^2}{2 N_\text{pch}} +  \frac{2 u_i N_\text{sub}(1-\lambda)}{(\eta N_\text{pch})} \right. \nonumber \\
+  & \quad\quad\quad\quad\quad\quad \left. + \frac{N_\text{sub}^2}{\eta N_\text{pch}} \left[ \left(\frac{1}{2} - \lambda \right) - \frac{1-\lambda}{\eta N_\text{pch}} \right] \right\} + k_i u_i^2 + k_e \rho_e u_e^2  & 
+  \end{aligned}
+  $$
+  
+  Again, see the full paper for the details.
+  
+  The input file `boiling-2012-steady.fee` computes the steady-state profiles of
+  
+   * the velocity $u(z)$
+   * the enthalpy $h(z)$
+   * the density $h(z)$
+   
+  where
+  
+   1. the first argument is a string with the power profile (default `uniform`), either
+   
+      a. `uniform`
+      
+          ```{.feenox include="boiling-2012-uniform.fee"}
+         ```
+   
+      b. `sine`
+   
+         ```{.feenox include="boiling-2012-sine.fee"}
+         ```
+   
+      c. `arbitrary`
+   
+         ```{.feenox include="boiling-2012-arbitrary.fee"}
+         ```
+  2. the second argument is the subcooling number $N_\text{sub}$ (default 6.5)
+  
+  3. the third argument is the Euler number $\text{Eu}$ (default is 11), from which the phase-change number $N_\text{pch}$ is computed.
+  
+  The transient problem is solved using the input below, `boiling-2012.fee`.
+  
+  > There is a slight difference in the distributed head loss term between the 2010 and 2012 formulations for the uniform power profile case. There's a bounty for those who can find it.
+  
+terminal: |
+  $ feenox boiling-2012.fee uniform | tee boiling-2012-uniform.dat
+  [...]
+  $ feenox boiling-2012.fee sine | tee boiling-2012-sine.dat
+  [...]
+  $ feenox boiling-2012.fee arbitrary | tee boiling-2012-arbitrary.dat
+  [...]
+  $ 
+...
 ##############################
 # vertical boiling channel with arbitrary power distribution
 # extended clausse & lahey nodalization
@@ -12,7 +84,7 @@
 
 DEFAULT_ARGUMENT_VALUE 1 uniform
 DEFAULT_ARGUMENT_VALUE 2 6.5
-DEFAULT_ARGUMENT_VALUE 3 9.725
+DEFAULT_ARGUMENT_VALUE 3 11
 
 ##############################
 # non-dimensional parameters
@@ -40,7 +112,7 @@ ALIAS l[N1] AS lambda
 ##############################
 # DAE solver settings
 ##############################
-end_time = 50        # final integration time
+end_time = 100        # final integration time
 
 # compute the initial derivatives of the differential objects
 # from the variables of both differential and algebraic objects
@@ -151,15 +223,17 @@ ENDIF
 # write information (commented out) in the ouput header
 IF in_static
  PRINT TEXT "\# vertical boiling channel with arbitrary power: $(1) (2012)"
- PRINT TEXT "\# Npch = "   %.10f Npch
- PRINT TEXT "\# Nsub = "   %.10f Nsub
- PRINT TEXT "\# Fr   = "   %.10f Fr
- PRINT TEXT "\# Lambda = " %.10f Lambda
- PRINT TEXT "\# ki   = "   %.10f ki
- PRINT TEXT "\# ke   = "   %.10f ke
+ PRINT TEXT "\# Npch = "   Npch
+ PRINT TEXT "\# Nsub = "   Nsub
+ PRINT TEXT "\# Fr   = "   Fr
+ PRINT TEXT "\# Lambda = " Lambda
+ PRINT TEXT "\# ki   = "   ki
+ PRINT TEXT "\# ke   = "   ke
  PRINT TEXT "\# Eu   = "   %.10f Eu
 ENDIF
 
-# write the information needed to build a video with besssugo
-# PRINT t lambda ui hi eta*integral(q(z',t),z',lambda,1) l
 PRINT t lambda ui
+---
+figures: |
+  ![Projection of the full space into $\lambda$-$u_i$ for $N_\text{sub} = 6.5$ and $\text{Eu} = 9.725$.](boiling-2012.svg)
+...
