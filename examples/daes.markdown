@@ -6,6 +6,8 @@
 - [<span class="toc-section-number">3</span> Vertical boiling channel][]
   - [<span class="toc-section-number">3.1</span> Original Clausse-Lahey
     formulation with uniform power distribution][]
+  - [<span class="toc-section-number">3.2</span> Arbitrary power
+    distribution][]
 
   [<span class="toc-section-number">1</span> Lorenz’ attractor—the one with the butterfly]:
     #lorenz-attractorthe-one-with-the-butterfly
@@ -13,6 +15,8 @@
   [<span class="toc-section-number">3</span> Vertical boiling channel]: #vertical-boiling-channel
   [<span class="toc-section-number">3.1</span> Original Clausse-Lahey formulation with uniform power distribution]:
     #original-clausse-lahey-formulation-with-uniform-power-distribution
+  [<span class="toc-section-number">3.2</span> Arbitrary power distribution]:
+    #arbitrary-power-distribution
 
 # Lorenz’ attractor—the one with the butterfly
 
@@ -307,11 +311,12 @@ Implementation of the dynamical system as described in
   Channel Revisited][], by Jeremy Theler, Alejandro Clausse and
   Fabián J. Bonetto (2010).
 
-The original paper was written using the **first** version of the code,
-named mochin. Recall that FeenoX is a *third system effect*.
+> The original paper was written using the **first** version of the
+> code, named mochin.  
+> Recall that FeenoX is a [third system effect][].
 
 <figure>
-<img src="boiling-2012-figure.png" alt="Figure from the paper above." />
+<img src="boiling-2010-figure.png" alt="Figure from the paper above." />
 <figcaption aria-hidden="true">Figure from the paper above.</figcaption>
 </figure>
 
@@ -319,37 +324,17 @@ For reference, the non-dimensional equations are
 
 $$
 \begin{aligned}
-0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
-+ \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
-& \quad\quad\quad\quad - u_\text{i}(t) - \frac{N_1}{h_\text{i}(t)} \cdot \frac{N_\text{sub}}{N_\text{pch}} \int_{\ell_{n-1}(t)}^{\ell{n}(t)} q(z,t) \, dz \quad\quad\quad\quad\quad \text{for $n=1,\dots,N_1$}
-\\
-0 &=  u_\text{i}(t) - u_\text{e}(t)  + N_\text{sub} \int_{\lambda(t)}^{1} q(z',t) \, dz' 
-\\
-0 &=  \, \rho_\text{e}(t) - \frac{1}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{1} q(z',t) \, dz'}
-\\
-0 &= \lambda(t) - m(t) + \bigint_{\lambda(t)}^{1} \frac{dz}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} 
-\\
-0 &= \varphi(t) - \bigint_{\lambda(t)}^{1} \frac{ \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz
-\\
-0 &= \frac{d m(t)}{dt} + \rho_\text{e}(t) \cdot u_\text{e}(t) - u_\text{i}(t)
-\\
-0 &= 
- \frac{d u_\text{i}(t)}{dt} \cdot \lambda(t) + u_\text{i}(t) \cdot \frac{d \lambda(t)}{dt} + \frac{d\varphi(t)}{dt}
- + \rho_\text{e}(t) \, u_\text{e}^2(t) - \rho_\text{i}(t) \, u_\text{i}^2(t)  \\
-& \quad\quad\quad\quad +
-\Lambda \cdot \left[ u_\text{i}^2(t) \cdot \lambda(t) +
- \bigint_{\lambda(t)}^{1} \frac{\left( \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'\right)^2}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz \right] \\
-& \quad\quad\quad\quad\quad\quad
- + k_\text{i} \cdot \rho_\text{i}(t) \, u_\text{i}^2(t)
- + k_\text{e} \cdot \rho_\text{e}(t) \, u_\text{e}^2(t)
-+ \frac{m(t)}{\text{Fr}} - \text{Eu}(t) \\
-0 &= h_\text{i}(t) + f(\vec{x}, \vec{\dot{x}}, t) \\
-0 &= \text{Eu}(t) + g(\vec{x}, \vec{\dot{x}}, t)
+0 &=  \frac{1}{2} \left (\frac{d\ell_{n-1}}{dt} + \frac{d\ell_n}{dt} \right) + N_{1} (\ell_n - \ell_{n-1}) - u_i \quad\quad \text{for $n=1,\dots,N_1$} \nonumber\\
+0 &=  u_i - u_e + N_\text{sub} \, (1 - \lambda ) \nonumber\\
+0 &= \rho_e - \frac{1}{1+N_\text{pch} \, \eta (1-\lambda)} \nonumber \\
+0 &= \lambda - m + \frac{ \ln \left( 1/\rho_e \right) }{N_\text{pch} \, \eta} \nonumber \\
+0 &= \dot{m} + \rho_e u_e - u_i \nonumber \\
+0 &= m \, \dot{u}_i + u_i \, \dot{m} - \frac{N_\text{sub} (1-m)}{\eta^2 N_\text{pch}} \, \dot{\eta} - \frac{N_\text{sub}}{\eta N_\text{pch}} \, \dot{m} + \rho_e {u_e}^2 - {u_i}^2 + \frac{m}{\text{Fr}}  - \text{Eu}  \nonumber\\
+& \quad\quad\quad + \Lambda \left\{ m \cdot u_i^2 + \frac{N_\text{sub} \ln(1/\rho_e)}{(\eta N_\text{pch})^2}\left( \frac{N_\text{sub}}{\eta N_\text{pch}} - 2 u_i \right) +  \frac{\lambda^2 N_\text{sub}^2}{2 N_\text{pch}} +  \frac{2 u_i N_\text{sub}(1-\lambda)}{(\eta N_\text{pch})} \right. \nonumber \\
+& \quad\quad\quad\quad\quad\quad \left. + \frac{N_\text{sub}^2}{\eta N_\text{pch}} \left[ \left(\frac{1}{2} - \lambda \right) - \frac{1-\lambda}{\eta N_\text{pch}} \right] \right\} + k_i u_i^2 + k_e \rho_e u_e^2  & 
 \end{aligned}
-$$
-
-where $\ell_0 = 0$ and $\ell_{N_1}=\lambda$. See the full paper for the
-details.
+$$ where $\ell_0 = 0$ and $\ell_{N_1}=\lambda$. See the full paper for
+the details.
 
 The input file `boiling-2010-eta.fee` takes two optional arguments from
 the command line:
@@ -569,7 +554,7 @@ $
 ```
 
 <figure>
-<img src="boiling-2010.svg"
+<img src="boiling-2010.svg" style="width:85.0%"
 alt="Projection of the full space into \lambda-u_i for two combination of N_\text{pch}-N_\text{sub}. Red is unstable, green shows a limit cycle." />
 <figcaption aria-hidden="true">Projection of the full space into <span
 class="math inline"><em>λ</em></span>-<span
@@ -582,4 +567,303 @@ green shows a limit cycle.</figcaption>
 
   [The Moving Boiling-Boundary Model Of A Vertical Two-Phase Flow Channel Revisited]:
     http://www.cimec.org.ar/ojs/index.php/mc/article/view/3277/3200
+  [third system effect]: ../doc/sds.md#sec:architecture
   [`boiling-2010.fee`]: boiling-2010.fee
+
+## Arbitrary power distribution
+
+Extension of the Clausse-Lahey model to support arbitrary (and
+potentially time-dependent) power profiles as explained in
+
+- [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase
+  Flow Loop][], by Jeremy Theler, Alejandro Clausse and Fabián J.
+  Bonetto (2012).
+
+> The original paper was written using the **second** version of the
+> code, named wasora.  
+> Recall that FeenoX is a [third system effect][].
+
+<figure>
+<img src="boiling-2012-figure.png" alt="Figure from the paper above." />
+<figcaption aria-hidden="true">Figure from the paper above.</figcaption>
+</figure>
+
+For reference, the non-dimensional equations are
+
+$$
+\begin{aligned}
+0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
++ \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
+& \quad\quad\quad\quad - u_\text{i}(t) - \frac{N_1}{h_\text{i}(t)} \cdot \frac{N_\text{sub}}{N_\text{pch}} \int_{\ell_{n-1}(t)}^{\ell{n}(t)} q(z,t) \, dz \quad\quad\quad\quad\quad \text{for $n=1,\dots,N_1$}
+\\
+0 &=  u_\text{i}(t) - u_\text{e}(t)  + N_\text{sub} \int_{\lambda(t)}^{1} q(z',t) \, dz' 
+\\
+0 &=  \, \rho_\text{e}(t) - \frac{1}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{1} q(z',t) \, dz'}
+\\
+0 &= \lambda(t) - m(t) + \int_{\lambda(t)}^{1} \frac{dz}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} 
+\\
+0 &= \varphi(t) - \int_{\lambda(t)}^{1} \frac{ \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz
+\\
+0 &= \frac{d m(t)}{dt} + \rho_\text{e}(t) \cdot u_\text{e}(t) - u_\text{i}(t)
+\\
+0 &= 
+ \frac{d u_\text{i}(t)}{dt} \cdot \lambda(t) + u_\text{i}(t) \cdot \frac{d \lambda(t)}{dt} + \frac{d\varphi(t)}{dt}
+ + \rho_\text{e}(t) \, u_\text{e}^2(t) - \rho_\text{i}(t) \, u_\text{i}^2(t)  \\
+& \quad\quad\quad\quad +
+\Lambda \cdot \left[ u_\text{i}^2(t) \cdot \lambda(t) +
+ \int_{\lambda(t)}^{1} \frac{\left( \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'\right)^2}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz \right] \\
+& \quad\quad\quad\quad\quad\quad
+ + k_\text{i} \cdot \rho_\text{i}(t) \, u_\text{i}^2(t)
+ + k_\text{e} \cdot \rho_\text{e}(t) \, u_\text{e}^2(t)
++ \frac{m(t)}{\text{Fr}} - \text{Eu}(t) \\
+0 &= h_\text{i}(t) + f(\mathbf{x}, \mathbf{\dot{x}}, t) \\
+0 &= \text{Eu}(t) + g(\mathbf{x}, \mathbf{\dot{x}}, t)
+\end{aligned}
+$$
+
+Again, see the full paper for the details.
+
+The input file `boiling-2012-steady.fee` computes the steady-state
+profiles of
+
+- the velocity $u(z)$
+- the enthalpy $h(z)$
+- the density $h(z)$
+
+where
+
+1.  the first argument is a string with the power profile (default
+    `uniform`), either
+
+    1.  `uniform`
+
+        ``` feenox
+        # uniform power profile
+        qstar(z) = 1
+        ```
+
+    2.  `sine`
+
+        ``` feenox
+        # 2. sine-shaped power profile
+        qstar(z) = pi/2 * sin(z*pi)
+        ```
+
+    3.  `arbitrary`
+
+        ``` feenox
+        # arbitray normalized interpolated power profile
+        FUNCTION potencia(z) INTERPOLATION splines DATA {
+        0      0
+        0.2    2.5 
+        0.5    3
+        0.6    2.5
+        0.7    1.4
+        0.85   0.3
+        1      0 }
+        norm = integral(potencia(z'), z', 0, 1)
+        qstar(z) = 1/norm * potencia(z)
+        ```
+
+2.  the second argument is the subcooling number $N_\text{sub}$ (default
+    6.5)
+
+3.  the third argument is the Euler number $\text{Eu}$ (default is 11),
+    from which the phase-change number $N_\text{pch}$ is computed.
+
+The transient problem is solved using the input below,
+`boiling-2012.fee`.
+
+> There is a slight difference in the distributed head loss term between
+> the 2010 and 2012 formulations for the uniform power profile case.
+> There’s a bounty for those who can find it.
+
+``` feenox
+##############################
+# vertical boiling channel with arbitrary power distribution
+# extended clausse & lahey nodalization
+# as presented at ENIEF 2012
+# Theler G., Clausse A., Bonetto F.,
+# A Moving Boiling-Boundary Model of an Arbitrary-Powered Two-Phase Flow Loop
+# Mecanica Computacional Volume XXXI, Number 5, Multiphase Flows, pages 695--720, 2012
+# https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017
+# updated to work with FeenoX
+# jeremy@seamplex.com
+##############################
+
+DEFAULT_ARGUMENT_VALUE 1 uniform
+DEFAULT_ARGUMENT_VALUE 2 6.5
+DEFAULT_ARGUMENT_VALUE 3 11
+
+##############################
+# non-dimensional parameters
+##############################
+Nsub = $2    # subcooling number
+Eu = $3      # euler number
+
+Fr = 1       # froude number
+Lambda = 3   # distributed friction number
+ki = 6       # inlet head loss coefficient
+ke = 2       # outlet head loss coefficient
+
+##############################
+# phase-space definition
+##############################
+N1 = 6       # nodes in the one-phase region
+VECTOR l SIZE N1
+PHASE_SPACE l ui ue m rhoe phi eta hi
+
+# the boiling frontier is equal to the last one-phase node position
+# and we refer to it as lambda throughout the file
+ALIAS l[N1] AS lambda 
+
+
+##############################
+# DAE solver settings
+##############################
+end_time = 100        # final integration time
+
+# compute the initial derivatives of the differential objects
+# from the variables of both differential and algebraic objects
+INITIAL_CONDITIONS_MODE FROM_VARIABLES
+
+# forbid implicit declaration of variables from now on to
+# detect typos at parse time
+IMPLICIT NONE   
+
+
+
+##############################
+# steady state values
+##############################
+VAR z'
+# include the steady-state power profile from a file:
+INCLUDE boiling-2012-$(1).fee
+# the transient space-dependant power profile in this case
+# is constant and equal to the steady-state profile
+q(z,t) = qstar(z)
+
+# functions needed for the steady-state computation
+lambdastar(Npch) = root(integral(qstar(z'), z', 0, z) - Nsub/Npch, z, 0, 1)
+q2phistar(z,Npch) = integral(qstar(z'), z', lambdastar(Npch), z)
+F(Npch) = {
+   (Nsub/Npch + Nsub*q2phistar(1,Npch))^2/(1 + Npch * q2phistar(1,Npch))
+ - (Nsub/Npch)^2
+ + Lambda*(Nsub/Npch)^2*lambdastar(Npch)
+ + Lambda*integral((Nsub/Npch + Nsub*q2phistar(z,Npch))^2/(1 + Npch*q2phistar(z,Npch)), z, lambdastar(Npch), 1)
+ + ki*(Nsub/Npch)^2
+ + ke*(Nsub/Npch + Nsub*q2phistar(1,Npch))^2 / (1 + Npch*q2phistar(1,Npch)) 
+ + 1/Fr * (lambdastar(Npch) + integral(1/(1 + Npch*q2phistar(z,Npch)), z, lambdastar(Npch), 1))
+ - Eu }
+Npch = root(F(Npch), Npch, Nsub+1e-3, 50)
+
+IF Npch<(Nsub+1e-2)
+ PRINT TEXT "Npch =" Npch TEXT "should be larger than Nsub =" Nsub SEP " "
+ ABORT
+ENDIF
+
+
+
+##############################
+# initial conditions
+##############################
+ui_0 = 0.9*Nsub/Npch  # disturbance
+hi_0 = -Nsub/Npch
+ue_0 = Nsub/Npch + Nsub * integral(qstar(z'), z', lambdastar(Npch), 1)
+rhoe_0 = 1/(1 + Npch * integral(qstar(z'), z', lambdastar(Npch), 1))
+eta_0 = 1
+m_0 = lambdastar(Npch) + integral(1/(1 + Npch * eta_0 * integral(qstar(z'),z',lambdastar(Npch),z)), z, lambdastar(Npch), 1)
+l_0[i] = root(hi_0 * i/N1 + integral(qstar(z'), z', 0, z), z, 0, 1)
+phi_0 = integral((Nsub/Npch + Nsub*integral(qstar(z'), z', lambdastar(Npch), z))/(1 + Npch*eta*integral(qstar(z'), z', lambdastar(Npch), z)), z, lambdastar(Npch), 1)
+
+
+# stop the integration if certain variables get out of
+# the [0:1] interval -> unstable condition
+done = done | m>1 | lambda>1 | ui<0 | ui>1
+IF done
+ PRINT TEXT "\# model is out of bounds" Nsub Npch m lambda ui
+ ABORT
+ENDIF
+
+
+##############################
+# the dynamical system equations
+##############################
+0 .= -1/hi*hi_dot * (N1 - 1-0.5)*(l[1] - 0)      + 0.5*(l_dot[1] + 0)          - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, 0,      l[1])
+
+# TODO: this used to work in wasora
+# 0(i)<2:N1> .= -1/hi*hi_dot * (N1 - i-0.5)*(l(i) - l(i-1)) + 0.5*(l_dot(i) + l_dot(i-1)) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l(i-1), l(i))
+
+0 .= -1/hi*hi_dot * (N1 - 2-0.5)*(l[2] - l[2-1]) + 0.5*(l_dot[2] + l_dot[2-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[2-1], l[2])
+0 .= -1/hi*hi_dot * (N1 - 3-0.5)*(l[3] - l[3-1]) + 0.5*(l_dot[3] + l_dot[3-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[3-1], l[3])
+0 .= -1/hi*hi_dot * (N1 - 4-0.5)*(l[4] - l[4-1]) + 0.5*(l_dot[4] + l_dot[4-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[4-1], l[4])
+0 .= -1/hi*hi_dot * (N1 - 5-0.5)*(l[5] - l[5-1]) + 0.5*(l_dot[5] + l_dot[5-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[5-1], l[5])
+0 .= -1/hi*hi_dot * (N1 - 6-0.5)*(l[6] - l[6-1]) + 0.5*(l_dot[6] + l_dot[6-1]) - ui - Nsub/Npch * N1/hi * integral(q(z,t), z, l[6-1], l[6])
+
+0 .= ui - ue + Nsub*integral(q(z,t), z, lambda, 1)
+0 .= rhoe - 1/(1 + Npch * eta * (1 - lambda))
+0 .= lambda - m + integral(1/(1 + Npch*eta*integral(q(z',t),z',lambda,z)), z, lambda, 1)
+0 .= m_dot + rhoe*ue - ui
+0 .= phi - integral((ui + Nsub*integral(q(z',t), z', lambda, z))/(1 + Npch*eta*integral(q(z',t), z', lambda, z)), z, lambda, 1)
+
+
+0 .= {
+  + ui_dot*lambda
+  + ui*l_dot(N1)
+  + phi_dot
+  + Lambda*(ui^2*lambda +
+      integral((ui + Nsub  *  integral(q(z',t), z', lambda, z))^2/
+               ( 1 + Npch*eta*integral(q(z',t), z', lambda, z)),
+                z, lambda, 1) )
+  + rhoe * ue^2
+  - ui^2 
+  + ki*ui^2
+  + ke*rhoe*ue^2
+  + m/Fr
+  - Eu }
+
+
+# constant inlet enthalpy and pressure drop
+0 .= hi_dot
+
+##############################
+# output results
+##############################
+# write information (commented out) in the ouput header
+IF in_static
+ PRINT TEXT "\# vertical boiling channel with arbitrary power: $(1) (2012)"
+ PRINT TEXT "\# Npch = "   Npch
+ PRINT TEXT "\# Nsub = "   Nsub
+ PRINT TEXT "\# Fr   = "   Fr
+ PRINT TEXT "\# Lambda = " Lambda
+ PRINT TEXT "\# ki   = "   ki
+ PRINT TEXT "\# ke   = "   ke
+ PRINT TEXT "\# Eu   = "   %.10f Eu
+ENDIF
+
+PRINT t lambda ui
+```
+
+``` terminal
+$ feenox boiling-2012.fee uniform | tee boiling-2012-uniform.dat
+[...]
+$ feenox boiling-2012.fee sine | tee boiling-2012-sine.dat
+[...]
+$ feenox boiling-2012.fee arbitrary | tee boiling-2012-arbitrary.dat
+[...]
+$ 
+```
+
+<figure>
+<img src="boiling-2012.svg" style="width:85.0%"
+alt="Projection of the full space into \lambda-u_i for N_\text{sub} = 6.5 and \text{Eu} = 9.725." />
+<figcaption aria-hidden="true">Projection of the full space into <span
+class="math inline"><em>λ</em></span>-<span
+class="math inline"><em>u</em><sub><em>i</em></sub></span> for <span
+class="math inline"><em>N</em><sub>sub</sub> = 6.5</span> and <span
+class="math inline">Eu = 9.725</span>.</figcaption>
+</figure>
+
+  [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase Flow Loop]:
+    https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017
+  [third system effect]: ../doc/sds.md#sec:architecture

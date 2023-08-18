@@ -17,6 +17,7 @@ for i in hello          \
          logistic       \
          double         \
          boiling-2010-eta   \
+         boiling-2012       \
          thermal-1d-dirichlet-uniform-k \
          nafems-le10    \
          nafems-le11    \

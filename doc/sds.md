@@ -128,7 +128,13 @@ Even though the initial version of FeenoX does not provide an API for high-level
 > 200-architecture.md
 > ```
 
-FeenoX can be seen as a third-system effect, being the third version written from scratch after a first implementation in 2009 and an second one which was far more complex and had far more features circa 2012--2014. The third attempt explicitly addresses the “do one thing well” idea from Unix. 
+Very much like the C language (after A & B) and Unix itself (after a first attempt and the failed MULTICS), FeenoX can be seen as a third-system effect:
+
+> A notorious ‘second-system effect’ often afflicts the successors of small experimental prototypes. The urge to add everything that was left out the first time around all too frequently leads to huge and overcomplicated design. Less well known, because less common, is the ‘third-system effect’: sometimes, after the second system has collapsed of its own weight, there is a chance to go back to simplicity and get it right.
+> 
+> From [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/)
+
+Feenox is indeed the third version written from scratch after a first implementation in 2009 (different small components with different names) and a second one (named wasora) which was far more complex and had far more features circa 2012--2014. The third attempt, FeenoX, explicitly addresses the “do one thing well” idea from Unix. 
 
 Furthermore, not only is FeenoX itself both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but, following the _rule of composition_, it also is designed to connect and to work with  other free and open source software such as
 

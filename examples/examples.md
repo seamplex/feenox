@@ -18,6 +18,7 @@
   - [Vertical boiling channel](daes.md#vertical-boiling-channel)
     - [Original Clausse-Lahey formulation with uniform power
     distribution](daes.md#original-clausse-lahey-formulation-with-uniform-power-distribution)
+    - [Arbitrary power distribution](daes.md#arbitrary-power-distribution)
 - Laplace’s equation
   - [How to solve a maze without AI](laplace.md#how-to-solve-a-maze-without-ai)
     - [Transient top-down](laplace.md#transient-top-down)

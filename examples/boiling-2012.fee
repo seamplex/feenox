@@ -7,23 +7,42 @@ intro: |
   
    * [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase Flow Loop](https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017), by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2012).
   
-  The original paper was written using the **second** version of the code, named wasora.
-  Recall that FeenoX is a _third system effect_.
+  > | The original paper was written using the **second** version of the code, named wasora.
+  > | Recall that FeenoX is a [third system effect](../doc/sds.md#sec:architecture).
   
-  ![Figure from the paper above.](boiling-2010-figure.png)  
+  
+  ![Figure from the paper above.](boiling-2012-figure.png)  
   
   For reference, the non-dimensional equations are
 
   $$
   \begin{aligned}
-  0 &=  \frac{1}{2} \left (\frac{d\ell_{n-1}}{dt} + \frac{d\ell_n}{dt} \right) + N_{1} (\ell_n - \ell_{n-1}) - u_i \quad\quad \text{for $n=1,\dots,N_1$} \nonumber\\
-  0 &=  u_i - u_e + N_\text{sub} \, (1 - \lambda ) \nonumber\\
-  0 &= \rho_e - \frac{1}{1+N_\text{pch} \, \eta (1-\lambda)} \nonumber \\
-  0 &= \lambda - m + \frac{ \ln \left( 1/\rho_e \right) }{N_\text{pch} \, \eta} \nonumber \\
-  0 &= \dot{m} + \rho_e u_e - u_i \nonumber \\
-  0 &= m \, \dot{u}_i + u_i \, \dot{m} - \frac{N_\text{sub} (1-m)}{\eta^2 N_\text{pch}} \, \dot{\eta} - \frac{N_\text{sub}}{\eta N_\text{pch}} \, \dot{m} + \rho_e {u_e}^2 - {u_i}^2 + \frac{m}{\text{Fr}}  - \text{Eu}  \nonumber\\
-  & \quad\quad\quad + \Lambda \left\{ m \cdot u_i^2 + \frac{N_\text{sub} \ln(1/\rho_e)}{(\eta N_\text{pch})^2}\left( \frac{N_\text{sub}}{\eta N_\text{pch}} - 2 u_i \right) +  \frac{\lambda^2 N_\text{sub}^2}{2 N_\text{pch}} +  \frac{2 u_i N_\text{sub}(1-\lambda)}{(\eta N_\text{pch})} \right. \nonumber \\
-  & \quad\quad\quad\quad\quad\quad \left. + \frac{N_\text{sub}^2}{\eta N_\text{pch}} \left[ \left(\frac{1}{2} - \lambda \right) - \frac{1-\lambda}{\eta N_\text{pch}} \right] \right\} + k_i u_i^2 + k_e \rho_e u_e^2  & 
+  0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
+  + \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
+  & \quad\quad\quad\quad - u_\text{i}(t) - \frac{N_1}{h_\text{i}(t)} \cdot \frac{N_\text{sub}}{N_\text{pch}} \int_{\ell_{n-1}(t)}^{\ell{n}(t)} q(z,t) \, dz \quad\quad\quad\quad\quad \text{for $n=1,\dots,N_1$}
+  \\
+  0 &=  u_\text{i}(t) - u_\text{e}(t)  + N_\text{sub} \int_{\lambda(t)}^{1} q(z',t) \, dz' 
+  \\
+  0 &=  \, \rho_\text{e}(t) - \frac{1}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{1} q(z',t) \, dz'}
+  \\
+  0 &= \lambda(t) - m(t) + \int_{\lambda(t)}^{1} \frac{dz}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} 
+  \\
+  0 &= \varphi(t) - \int_{\lambda(t)}^{1} \frac{ \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz
+  \\
+  0 &= \frac{d m(t)}{dt} + \rho_\text{e}(t) \cdot u_\text{e}(t) - u_\text{i}(t)
+  \\
+  0 &= 
+   \frac{d u_\text{i}(t)}{dt} \cdot \lambda(t) + u_\text{i}(t) \cdot \frac{d \lambda(t)}{dt} + \frac{d\varphi(t)}{dt}
+   + \rho_\text{e}(t) \, u_\text{e}^2(t) - \rho_\text{i}(t) \, u_\text{i}^2(t)  \\
+  & \quad\quad\quad\quad +
+  \Lambda \cdot \left[ u_\text{i}^2(t) \cdot \lambda(t) +
+   \int_{\lambda(t)}^{1} \frac{\left( \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'\right)^2}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz \right] \\
+  & \quad\quad\quad\quad\quad\quad
+   + k_\text{i} \cdot \rho_\text{i}(t) \, u_\text{i}^2(t)
+   + k_\text{e} \cdot \rho_\text{e}(t) \, u_\text{e}^2(t)
+  + \frac{m(t)}{\text{Fr}} - \text{Eu}(t) \\
+  0 &= h_\text{i}(t) + f(\mathbf{x}, \mathbf{\dot{x}}, t) \\
+  0 &= \text{Eu}(t) + g(\mathbf{x}, \mathbf{\dot{x}}, t)
   \end{aligned}
   $$
   
@@ -235,5 +254,5 @@ ENDIF
 PRINT t lambda ui
 ---
 figures: |
-  ![Projection of the full space into $\lambda$-$u_i$ for $N_\text{sub} = 6.5$ and $\text{Eu} = 9.725$.](boiling-2012.svg)
+  ![Projection of the full space into $\lambda$-$u_i$ for $N_\text{sub} = 6.5$ and $\text{Eu} = 9.725$.](boiling-2012.svg){width=85%}
 ...
