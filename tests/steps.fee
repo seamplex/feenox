@@ -1,0 +1,4 @@
+DEFAULT_ARGUMENT_VALUE 1 0.5
+DEFAULT_ARGUMENT_VALUE 2 10
+static_steps = $2
+PRINT if(step_static=1,1,quasi_random($1,1))
