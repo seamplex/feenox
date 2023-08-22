@@ -1881,6 +1881,12 @@ struct feenox_t {
     PetscBool progress_ascii;
     PetscReal progress_r0;
     PetscReal progress_last;
+    
+    PetscLogStage stage_init;
+    PetscLogStage stage_build;
+    PetscLogStage stage_solve;
+    PetscLogStage stage_post;
+    
 
     expr_t eps_ncv;
     expr_t st_shift;

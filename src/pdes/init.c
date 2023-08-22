@@ -48,7 +48,8 @@ int feenox_problem_init_parser_general(void) {
   int petsc_argc = 0;
   char **petsc_argv = NULL;
   if (feenox.argc != 0) {  // in benchmark argc might be zero
-    feenox_check_alloc(petsc_argv = calloc(feenox.argc, sizeof(char *)));
+    // worst-case scenario: all strings have arguments that we have to split into two
+    feenox_check_alloc(petsc_argv = calloc(2*feenox.argc, sizeof(char *)));
     petsc_argv[0] = feenox.argv_orig[0];
     for (int i = 0; i < feenox.argc; i++) {
       if (strlen(feenox.argv_orig[i]) > 2 && feenox.argv_orig[i][0] == '-' && feenox.argv_orig[i][1] == '-') {
@@ -68,7 +69,7 @@ int feenox_problem_init_parser_general(void) {
   PetscInt minor = 0;
   PetscInt subminor = 0;
 #ifdef HAVE_SLEPC  
-  // initialize SLEPc (which in turn initalizes PETSc) with the original argv & argc
+  // initialize SLEPc (which in turn initializes PETSc) with the original argv & argc
   petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULLPTR));
   
   // check the headers correspond to the runtime
@@ -93,6 +94,11 @@ int feenox_problem_init_parser_general(void) {
   
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.n_procs));
   petsc_call(MPI_Comm_rank(PETSC_COMM_WORLD, &feenox.rank));
+  
+  petsc_call(PetscLogStageRegister("init", &feenox.pde.stage_init));
+  petsc_call(PetscLogStageRegister("build", &feenox.pde.stage_build));
+  petsc_call(PetscLogStageRegister("solve", &feenox.pde.stage_solve));
+  petsc_call(PetscLogStageRegister("post", &feenox.pde.stage_post));
   
   // segfaults are segfaults, try to leave PETSC out of them
   signal(SIGSEGV, SIG_DFL);

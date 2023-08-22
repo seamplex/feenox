@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's linear solver using PETSc routines
  *
- *  Copyright (C) 2015--2021 jeremy theler
+ *  Copyright (C) 2015--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -24,6 +24,23 @@
 int feenox_problem_solve_petsc_linear(void) {
 
 #ifdef HAVE_PETSC
+
+  // build ---------------------------------------------------------------------
+  petsc_call(PetscLogStagePush(feenox.pde.stage_build));  
+
+  feenox_call(feenox_problem_build());
+  feenox_call(feenox_problem_dirichlet_eval());
+  feenox_call(feenox_problem_dirichlet_set_K());
+  
+  petsc_call(PetscLogStagePop());
+  // ---------------------------------------------------------------------------
+  
+  if (feenox.pde.missed_dump != NULL) {
+    feenox_call(feenox_instruction_dump(feenox.pde.missed_dump));
+  }
+
+  // solve ---------------------------------------------------------------------
+  petsc_call(PetscLogStagePush(feenox.pde.stage_solve));  
   
   // create a KSP object if needed
   if (feenox.pde.ksp == NULL) {
@@ -37,12 +54,6 @@ int feenox_problem_solve_petsc_linear(void) {
     feenox_call(feenox_problem_setup_ksp(feenox.pde.ksp));
   }
 
-  feenox_call(feenox_problem_build());
-  feenox_call(feenox_problem_dirichlet_eval());
-  feenox_call(feenox_problem_dirichlet_set_K());
-  if (feenox.pde.missed_dump != NULL) {
-    feenox_call(feenox_instruction_dump(feenox.pde.missed_dump));
-  }
   
   // check if the stiffness matrix K has a near nullspace 
   // and pass it on to K_bc
@@ -96,6 +107,8 @@ int feenox_problem_solve_petsc_linear(void) {
       fflush(stdout);
     }  
   }
+  petsc_call(PetscLogStagePop());
+  // ---------------------------------------------------------------------------
 
 #endif
   return FEENOX_OK;

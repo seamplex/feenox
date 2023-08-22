@@ -25,6 +25,8 @@ int feenox_instruction_solve_problem(void *arg) {
   
 #ifdef HAVE_PETSC
 
+  // init ----------------------------------------------------------------------
+  petsc_call(PetscLogStagePush(feenox.pde.stage_init));  
   // initialize only if we did not initialize before
   if (feenox.pde.spatial_unknowns == 0) {
     // if there is no explicit mesh, use the main one
@@ -45,10 +47,15 @@ int feenox_instruction_solve_problem(void *arg) {
     // TODO: what about SLEPc?
     feenox_call(feenox_function_to_phi(feenox.pde.initial_guess, feenox.pde.phi));
   } 
+  petsc_call(PetscLogStagePop());
+  // ---------------------------------------------------------------------------
   
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)
   feenox_call(feenox.pde.solve());
+  
+  // post ----------------------------------------------------------------------
+  petsc_call(PetscLogStagePush(feenox.pde.stage_post));  
   
   // TODO: how to do this in parallel?
   feenox_call(feenox_problem_phi_to_solution((feenox.pde.nev == 0) ? feenox.pde.phi : feenox.pde.eigenvector[0]));
@@ -56,6 +63,8 @@ int feenox_instruction_solve_problem(void *arg) {
   if (feenox.pde.solve_post != NULL) {
     feenox_call(feenox.pde.solve_post());
   }
+  petsc_call(PetscLogStagePop());
+  // ---------------------------------------------------------------------------
   
 #endif  
   return FEENOX_OK;
