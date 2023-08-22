@@ -36,6 +36,7 @@ mkdir -p ${dir}/DEBIAN
 # check the names of the dependencies
 libgsl=$(apt-cache search libgsl | grep "library package" | grep -v blas | cut -d" " -f1)
 libsundials=$(apt-cache search libsundials-ida | grep -v idas | cut -d" " -f1)
+libnvecserial=$(apt-cache search libsundials-nvecserial | cut -d" " -f1)
 libpetsc=$(apt-cache search libpetsc-real3 | grep -v 64 | grep -v dbg | grep -v dev | cut -d" " -f1)
 libslepc=$(apt-cache search libslepc-real3 | grep -v 64 | grep -v dbg | grep -v dev | cut -d" " -f1)
 
@@ -44,7 +45,7 @@ Package: ${package}
 Version: ${version}-${deb_version}
 Architecture: amd64
 Maintainer: Jeremy Theler <jeremy@seamplex.com>
-Depends: libc6, ${libgsl}, ${libsundials}, ${libpetsc}, ${libslepc}
+Depends: libc6, ${libgsl}, ${libsundials}, ${libnvecserial}, ${libpetsc}, ${libslepc}
 Recommends: gmsh, paraview
 Section: science
 Priority: optional

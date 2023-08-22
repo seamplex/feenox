@@ -17,3 +17,12 @@ exitifwrong $?
 
 answerdiff expressions_cumbersome.fee
 exitifwrong $?
+
+answerzero expressions_sum.fee
+exitifwrong $?
+
+answerzero expressions_seven.fee
+exitifwrong $?
+
+answerdiff steps.fee
+exitifwrong $?

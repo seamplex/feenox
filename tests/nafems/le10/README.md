@@ -31,7 +31,7 @@ The programs tested are
  * [Code Aster](http://https://www.code-aster.org)
  * [CalculiX](http://www.calculix.de/)
 
-The problem being solved is the [NAFEMS LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark). It was chosen because 
+The problem being solved is the [NAFEMS LE10 problem](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark). It was chosen because 
 
  a. It is a well-established benchmark since its publication in 1990
  b. It is simple yet has displacement boundary condition on an edge in addition to faces that makes it challenging
@@ -66,7 +66,7 @@ Even though there are some particular comments for each of the code used in this
 
 ## Reference solution
 
-The original problem formulation (which can be found in [one of FeenoX's annotated examples](https://seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark)) states that the reference solution is -5.38\ MPa. This can be confirmed with FeenoX using the input `le10-ref.fee`. 
+The original problem formulation (which can be found in [one of FeenoX's annotated examples](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark)) states that the reference solution is -5.38\ MPa. This can be confirmed with FeenoX using the input `le10-ref.fee`. 
 
 ```terminal
 $ gmsh -3 le10-ref.geo

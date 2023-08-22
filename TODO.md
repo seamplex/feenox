@@ -132,7 +132,7 @@
 
  * poisson f = 1, eta = 0
  * helmholtz f = 1, eta = 1
- * see 2D example in Gmsh list
+ * investigate `dsyrk()` insted of `dgemmv()` https://stackoverflow.com/questions/47013581/blas-matrix-by-matrix-transpose-multiply
  
 ## Heat
 
