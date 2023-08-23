@@ -19,6 +19,12 @@ if test ! -d ".git"; then
   exit 1
 fi
 
+git describe --all
+if test $? -ne 0; then
+  echo "error: git is not working (are you using /local in docker?)" 
+  exit 1
+fi
+
 ./autoclean.sh
 cat << EOF > ./src/help.h
 #define FEENOX_HELP_ONE_LINER     "$(cat doc/help-one-liner.txt)"
@@ -110,8 +116,8 @@ for pde in *; do
     cat << EOF >> parse.c
 if (strcasecmp(token, "${pde}") == 0) {
     feenox.pde.parse_problem = feenox_problem_parse_problem_${pde};
-    feenox.pde.parse_post = feenox_problem_parse_post_${pde};
-    feenox.pde.init_parser_particular = feenox_problem_init_parser_${pde};
+    feenox.pde.parse_problem_post = feenox_problem_parse_post_${pde};
+    feenox.pde.init_after_parse = feenox_problem_init_parser_${pde};
     
 EOF
     

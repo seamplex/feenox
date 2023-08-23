@@ -126,7 +126,7 @@ bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
   
   // we now call the problem-specific function that understands
   // what the string means and fill in the other bc_data fields
-  feenox_call_null(feenox.pde.bc_parse(bc_data, lhs, rhs));
+  feenox_call_null(feenox.pde.parse_bc(bc_data, lhs, rhs));
   
   // restore the equal sign so we can keep the original string just in case
   if (equal_sign != NULL) {

@@ -2451,7 +2451,7 @@ int feenox_parse_write_results(void) {
   mesh_write_t *mesh_write = NULL;
   feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
   
-  if (feenox.pde.parse_post == NULL) {
+  if (feenox.pde.parse_problem_post == NULL) {
     feenox_push_error_message("WRITE_RESULTS not implemented (probably no PROBLEM defined)");
     return FEENOX_ERROR;
   }
@@ -2493,7 +2493,7 @@ int feenox_parse_write_results(void) {
       mesh_write->printf_format = strdup(token);
       
     } else {
-      feenox.pde.parse_post(mesh_write, token);
+      feenox.pde.parse_problem_post(mesh_write, token);
       
     }
   }
@@ -2522,7 +2522,7 @@ int feenox_parse_write_results(void) {
   
   // if there's no particular keyword, pass "all"
   if (mesh_write->mesh_write_dists == NULL) {
-    feenox.pde.parse_post(mesh_write, "all");
+    feenox.pde.parse_problem_post(mesh_write, "all");
   }
 
   // if there's only one mesh, use that one, otherwise ask which one 
@@ -2740,7 +2740,7 @@ int feenox_parse_bc(void) {
     return FEENOX_ERROR;
   }
   
-  if (feenox.pde.bc_parse == NULL) {
+  if (feenox.pde.parse_bc == NULL) {
     feenox_push_error_message("BC before setting the PROBLEM type");
     return FEENOX_ERROR;
   }
@@ -2815,7 +2815,7 @@ int feenox_parse_reaction(void) {
     return FEENOX_ERROR;
   }
   
-  if (feenox.pde.bc_parse == NULL) {
+  if (feenox.pde.parse_bc == NULL) {
     feenox_push_error_message("REACTION before setting the PROBLEM type");
     return FEENOX_ERROR;
   }
@@ -3134,14 +3134,14 @@ int feenox_parse_problem(void) {
     feenox.pde.dim = feenox.pde.mesh->dim;
   }
   
-  if (feenox.pde.init_parser_particular == NULL) {
+  if (feenox.pde.init_after_parse == NULL) {
     feenox_push_error_message("undefined PROBLEM type");
     return FEENOX_ERROR;     
   }
   
   if (feenox.pde.petscinit_called == PETSC_FALSE) {
     feenox_call(feenox_problem_init_parser_general());
-    feenox_call(feenox.pde.init_parser_particular());
+    feenox_call(feenox.pde.init_after_parse());
   } else {
     feenox_push_error_message("PROBLEM already initialized");
     return FEENOX_ERROR;    

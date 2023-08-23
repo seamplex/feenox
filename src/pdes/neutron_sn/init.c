@@ -33,14 +33,14 @@ int feenox_problem_init_parser_neutron_sn(void) {
   feenox.mesh.default_field_location = field_location_nodes;
 
 #ifdef HAVE_PETSC
-  feenox.pde.init_runtime_particular = feenox_problem_init_runtime_neutron_sn;
-  feenox.pde.bc_parse = feenox_problem_bc_parse_neutron_sn;
+  feenox.pde.init_before_run = feenox_problem_init_runtime_neutron_sn;
+  feenox.pde.parse_bc = feenox_problem_bc_parse_neutron_sn;
 #ifdef HAVE_SLEPC
   feenox.pde.setup_eps = feenox_problem_setup_eps_neutron_sn;
 #endif
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_neutron_sn;
   feenox.pde.setup_pc = feenox_problem_setup_pc_neutron_sn;
-  feenox.pde.build_element_volumetric_gauss_point = feenox_problem_build_volumetric_gauss_point_neutron_sn;
+  feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_neutron_sn;
   feenox.pde.solve_post = feenox_problem_solve_post_neutron_sn;
   
   // default is 1 group

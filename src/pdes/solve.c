@@ -35,7 +35,7 @@ int feenox_instruction_solve_problem(void *arg) {
       return FEENOX_ERROR;
     }
 
-    feenox_call(feenox.pde.init_runtime_particular());
+    feenox_call(feenox.pde.init_before_run());
     if (feenox.pde.solve == NULL) {
       feenox_push_error_message("internal mismatch, undefined solver");
       return FEENOX_ERROR;

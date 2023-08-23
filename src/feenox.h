@@ -1703,13 +1703,11 @@ struct feenox_t {
     mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
   
     // problem-specific virtual methods
-    int (*parse_problem)(const char *);
-    int (*parse_post)(mesh_write_t *, const char *);
-    int (*init_parser_particular)(void);
-    int (*init_runtime_particular)(void);
-    int (*bc_parse)(bc_data_t *, const char *, char *);
-//    int (*bc_set_dirichlet)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
-//    int (*bc_set_multifreedom)(element_t *element, bc_data_t *bc_data, size_t node_global_index);
+    int (*parse_problem)(const char *token);
+    int (*parse_problem_post)(mesh_write_t *mesh_write, const char *token);
+    int (*parse_bc)(bc_data_t *, const char *, char *);
+    int (*init_after_parse)(void);
+    int (*init_before_run)(void);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
@@ -1717,19 +1715,21 @@ struct feenox_t {
 #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
 #endif
-    int (*build_element_volumetric_gauss_point)(element_t *, unsigned int q);
+    int (*element_build_volumetric)(element_t *e, unsigned int q);
+    int (*element_build_volumetric_at_gauss)(element_t *e, unsigned int q);
     int (*solve)(void);
     int (*solve_post)(void);
     
-    int (*feenox_problem_gradient_fill)(void);
-    int (*feenox_problem_gradient_properties_at_element_nodes)(element_t *element, mesh_t *mesh);
-    int (*feenox_problem_gradient_fluxes_at_node_alloc)(node_t *node);
-    int (*feenox_problem_gradient_add_elemental_contribution_to_node)(node_t *node, element_t *element, unsigned int j, double rel_weight);
-    int (*feenox_problem_gradient_fill_fluxes)(mesh_t *mesh, size_t j);
+    int (*gradient_fill)(void);
+    int (*gradient_nodal_properties)(element_t *e, mesh_t *mesh);
+    int (*gradient_alloc_nodal_fluxes)(node_t *node);
+    int (*gradient_add_elemental_contribution_to_node)(node_t *node, element_t *e, unsigned int j, double rel_weight);
+    int (*gradient_fill_fluxes)(mesh_t *mesh, size_t j_global);
 
 
     // instruction pointer to know before/after transient PDE
     instruction_t *instruction;
+    
     function_t *initial_guess;
     function_t *initial_condition;
 

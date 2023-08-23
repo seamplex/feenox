@@ -53,8 +53,8 @@ int feenox_problem_gradient_compute(void) {
       }
     }
         
-    if (feenox.pde.feenox_problem_gradient_fill != NULL) {
-      feenox_call(feenox.pde.feenox_problem_gradient_fill());
+    if (feenox.pde.gradient_fill != NULL) {
+      feenox_call(feenox.pde.gradient_fill());
     }  
   }
   
@@ -93,8 +93,8 @@ int feenox_problem_gradient_compute(void) {
       }
     }
     
-    if (feenox.pde.feenox_problem_gradient_fill_fluxes != NULL) {
-      feenox_call(feenox.pde.feenox_problem_gradient_fill_fluxes(mesh, j));
+    if (feenox.pde.gradient_fill_fluxes != NULL) {
+      feenox_call(feenox.pde.gradient_fill_fluxes(mesh, j));
     }  
   }
   
@@ -277,8 +277,8 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
   }
 */
   
-  if (feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc != NULL) {
-    feenox_call(feenox.pde.feenox_problem_gradient_fluxes_at_node_alloc(node));
+  if (feenox.pde.gradient_alloc_nodal_fluxes != NULL) {
+    feenox_call(feenox.pde.gradient_alloc_nodal_fluxes(node));
   }  
       
   size_t j = 0;
@@ -312,9 +312,9 @@ int feenox_problem_gradient_smooth_at_node(node_t *node) {
             }
           }
 
-          if (feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node != NULL) {
-            feenox_call(feenox.pde.feenox_problem_gradient_add_elemental_contribution_to_node(node, element, j, rel_weight));
-          }  
+          if (feenox.pde.gradient_add_elemental_contribution_to_node != NULL) {
+            feenox_call(feenox.pde.gradient_add_elemental_contribution_to_node(node, element, j, rel_weight));
+          }
         }
       }
     }

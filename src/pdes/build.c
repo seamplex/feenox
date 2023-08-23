@@ -217,7 +217,7 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   for (unsigned int q = 0; q < Q; q++) {
     // this is a virtual method that depends on the problem type
     // TODO: hardcode the name of the method to allow inlining with LTO
-    feenox_call(feenox.pde.build_element_volumetric_gauss_point(this, q));
+    feenox_call(feenox.pde.element_build_volumetric_at_gauss(this, q));
   }
  
   // compute the indices of the DOFs to ensamble
