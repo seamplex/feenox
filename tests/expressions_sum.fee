@@ -1,0 +1,2 @@
+VAR k
+PRINT sum(k^2,k,1,24)-70^2
