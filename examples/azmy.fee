@@ -1,0 +1,35 @@
+---
+category: neutron_sn
+intro: |
+  # Azmy’s problem
+  
+terminal: | 
+  $ gmsh -2 azmy.geo
+  $ feenox azmy.fee 4
+  $ feenox azmy.fee 6
+  $ feenox azmy.fee 8
+...
+DEFAULT_ARGUMENT_VALUE 1 4
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
+
+READ_MESH $0.msh
+
+S1_src = 1
+Sigma_t1_src = 1
+Sigma_s1.1_src = 0.5
+
+S1_abs = 0
+Sigma_t1_abs = 2
+Sigma_s1.1_abs = 0.1
+
+BC mirror   mirror
+BC vacuum   vacuum
+
+sn_alpha = 1/4
+SOLVE_PROBLEM
+
+WRITE_RESULTS
+
+---
+figures: |
+...
