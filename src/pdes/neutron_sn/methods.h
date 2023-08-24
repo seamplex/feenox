@@ -24,12 +24,12 @@
 
 // neutron_sn/parser.c
 extern int feenox_problem_parse_problem_neutron_sn(const char *);
-extern int feenox_problem_parse_post_neutron_sn(mesh_write_t *mesh_write, const char *token);
+extern int feenox_problem_parse_write_post_neutron_sn(mesh_write_t *mesh_write, const char *token);
 
 // neutron_sn/init.c
 extern int feenox_problem_neutron_sn_init_cosines(double mu1);
 extern int feenox_problem_neutron_sn_init_triangles(double *weights);
-extern int feenox_problem_init_parser_neutron_sn(void);
+extern int feenox_problem_parse_time_init_neutron_sn(void);
 extern int feenox_problem_init_runtime_neutron_sn(void);
 #ifdef HAVE_PETSC
 extern int feenox_problem_setup_pc_neutron_sn(PC pc);

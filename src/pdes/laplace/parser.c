@@ -32,18 +32,21 @@ int feenox_problem_parse_problem_laplace(const char *token) {
   if (token != NULL) {
     feenox_push_error_message("undefined keyword '%s' for laplace PROBLEM", token);
     return FEENOX_ERROR;
+  } else {
+    // if token is NULL we have to do the parse-time initialization
+    feenox_call(feenox_problem_parse_time_init_laplace());
   }
  
   return FEENOX_OK;
 }
 
 
-int feenox_problem_parse_post_laplace(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_write_post_laplace(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
     
-    feenox_call(feenox_problem_parse_post_laplace(mesh_write, "phi"));
-    feenox_call(feenox_problem_parse_post_laplace(mesh_write, "gradient"));
+    feenox_call(feenox_problem_parse_write_post_laplace(mesh_write, "phi"));
+    feenox_call(feenox_problem_parse_write_post_laplace(mesh_write, "gradient"));
     
   } else if (strcmp(token, "phi") == 0) {
     

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser for mechanical-specific keywords
  *
- *  Copyright (C) 2022 jeremy theler
+ *  Copyright (C) 2022--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -39,21 +39,23 @@ int feenox_problem_parse_problem_mechanical(const char *token) {
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
-      
     }
+  } else {
+    // if token is NULL we have to do the parse-time initialization
+    feenox_call(feenox_problem_parse_time_init_mechanical());
   } 
   return FEENOX_OK;
 } 
 
-int feenox_problem_parse_post_mechanical(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_write_post_mechanical(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
-    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "displacements"));
-    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "strains"));
-    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "stresses"));
-    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "principal"));
-    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "vonmises"));
-    feenox_call(feenox_problem_parse_post_mechanical(mesh_write, "tresca"));
+    feenox_call(feenox_problem_parse_write_post_mechanical(mesh_write, "displacements"));
+    feenox_call(feenox_problem_parse_write_post_mechanical(mesh_write, "strains"));
+    feenox_call(feenox_problem_parse_write_post_mechanical(mesh_write, "stresses"));
+    feenox_call(feenox_problem_parse_write_post_mechanical(mesh_write, "principal"));
+    feenox_call(feenox_problem_parse_write_post_mechanical(mesh_write, "vonmises"));
+    feenox_call(feenox_problem_parse_write_post_mechanical(mesh_write, "tresca"));
     
   } else if (strcmp(token, "displacements") == 0 || strcmp(token, "displ") == 0) {
     

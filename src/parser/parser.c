@@ -68,11 +68,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
     input_file_stream = stdin;
   } else {
     if ((input_file_stream = feenox_fopen(filepath, "r")) == NULL) {
-      if (strcmp(filepath, feenox.argv[feenox.optind]) == 0) {
-        feenox_push_error_message("input file '%s' could not be opened: %s", filepath, strerror(errno));
-      } else {
-        feenox_push_error_message("included file '%s' could not be opened: %s", filepath, strerror(errno));
-      }
+      feenox_push_error_message("input file '%s' could not be opened: %s", filepath, strerror(errno));
       return FEENOX_ERROR;
     }  
   }
@@ -2451,7 +2447,7 @@ int feenox_parse_write_results(void) {
   mesh_write_t *mesh_write = NULL;
   feenox_check_alloc(mesh_write = calloc(1, sizeof(mesh_write_t)));
   
-  if (feenox.pde.parse_problem_post == NULL) {
+  if (feenox.pde.parse_write_results == NULL) {
     feenox_push_error_message("WRITE_RESULTS not implemented (probably no PROBLEM defined)");
     return FEENOX_ERROR;
   }
@@ -2493,7 +2489,7 @@ int feenox_parse_write_results(void) {
       mesh_write->printf_format = strdup(token);
       
     } else {
-      feenox.pde.parse_problem_post(mesh_write, token);
+      feenox.pde.parse_write_results(mesh_write, token);
       
     }
   }
@@ -2522,7 +2518,7 @@ int feenox_parse_write_results(void) {
   
   // if there's no particular keyword, pass "all"
   if (mesh_write->mesh_write_dists == NULL) {
-    feenox.pde.parse_problem_post(mesh_write, "all");
+    feenox.pde.parse_write_results(mesh_write, "all");
   }
 
   // if there's only one mesh, use that one, otherwise ask which one 
@@ -2906,8 +2902,18 @@ int feenox_parse_reaction(void) {
 int feenox_parse_problem(void) {
 
 #ifdef HAVE_PETSC
+  if (feenox.pde.petscinit_called == PETSC_TRUE) {
+    feenox_push_error_message("ony one PROBLEM keyword allowed");
+    return FEENOX_ERROR;    
+  } 
+  
   char *token = feenox_get_next_token(NULL);
   feenox_call(feenox_pde_parse_problem_type(token));
+
+  if (feenox.pde.parse_problem == NULL) {
+    feenox_push_error_message("unknown PROBLEM type '%s', run with --pdes to see the list", token);
+    return FEENOX_ERROR;     
+  }
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
@@ -3134,18 +3140,9 @@ int feenox_parse_problem(void) {
     feenox.pde.dim = feenox.pde.mesh->dim;
   }
   
-  if (feenox.pde.init_after_parse == NULL) {
-    feenox_push_error_message("undefined PROBLEM type");
-    return FEENOX_ERROR;     
-  }
+  feenox_call(feenox_problem_parse_time_init());
+  feenox_call(feenox.pde.parse_problem(NULL));
   
-  if (feenox.pde.petscinit_called == PETSC_FALSE) {
-    feenox_call(feenox_problem_init_parser_general());
-    feenox_call(feenox.pde.init_after_parse());
-  } else {
-    feenox_push_error_message("PROBLEM already initialized");
-    return FEENOX_ERROR;    
-  } 
 #endif  
       
   return FEENOX_OK;

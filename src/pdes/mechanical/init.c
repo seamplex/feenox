@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic mechanical initialization routines
  *
- *  Copyright (C) 2021--2022 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -24,26 +24,28 @@
 #include "mechanical.h"
 mechanical_t mechanical;
 
-int feenox_problem_init_parser_mechanical(void) {
+int feenox_problem_parse_time_init_mechanical(void) {
 #ifdef HAVE_PETSC
-  // we are FEM
-  feenox.mesh.default_field_location = field_location_nodes;
-  
-  feenox.pde.init_before_run = feenox_problem_init_runtime_mechanical;
+  // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_mechanical;
+  feenox.pde.parse_write_results = feenox_problem_parse_write_post_mechanical;
+
+  feenox.pde.init_before_run = feenox_problem_init_runtime_mechanical;
+
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_mechanical;
   feenox.pde.setup_pc = feenox_problem_setup_pc_mechanical;
-//  feenox.pde.setup_snes = feenox_problem_setup_snes_mechanical;
   
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical;
+
   feenox.pde.solve_post = feenox_problem_solve_post_mechanical;
-  
   feenox.pde.gradient_fill = feenox_problem_gradient_fill_mechanical;
   feenox.pde.gradient_nodal_properties = feenox_problem_gradient_properties_at_element_nodes_mechanical;
   feenox.pde.gradient_alloc_nodal_fluxes = feenox_problem_gradient_fluxes_at_node_alloc_mechanical;
   feenox.pde.gradient_add_elemental_contribution_to_node = feenox_problem_gradient_add_elemental_contribution_to_node_mechanical;
   feenox.pde.gradient_fill_fluxes = feenox_problem_gradient_fill_fluxes_mechanical;
   
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
   
   // move symmetry_axis which is a general PDE setting to
   // the mechanically-particular axisymmetric variant

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for Laplace's equation: initialization
  *
- *  Copyright (C) 2021--2022 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -23,17 +23,21 @@
 #include "laplace.h"
 laplace_t laplace;
 
-int feenox_problem_init_parser_laplace(void) {
+int feenox_problem_parse_time_init_laplace(void) {
 
 #ifdef HAVE_PETSC
-  // we are FEM
-  feenox.mesh.default_field_location = field_location_nodes;
-
-  feenox.pde.init_before_run = feenox_problem_init_runtime_laplace;
+  // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_laplace;
+  feenox.pde.parse_write_results = feenox_problem_parse_write_post_laplace;
+  feenox.pde.init_before_run = feenox_problem_init_runtime_laplace;
+  
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_laplace;
   feenox.pde.setup_pc = feenox_problem_setup_pc_laplace;
+  
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_laplace;
+  
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
   
   // laplace is a scalar problem
   feenox.pde.dofs = 1;

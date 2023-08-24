@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for modal analysis: virtual methods
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -24,10 +24,10 @@
 
 // modal/parser.c
 extern int feenox_problem_parse_problem_modal(const char *token);
-extern int feenox_problem_parse_post_modal(mesh_write_t *mesh_write, const char *token);
+extern int feenox_problem_parse_write_post_modal(mesh_write_t *mesh_write, const char *token);
 
 // modal/init.c
-extern int feenox_problem_init_parser_modal(void);
+extern int feenox_problem_parse_time_init_modal(void);
 extern int feenox_problem_init_runtime_modal(void);
 #ifdef HAVE_PETSC
 extern int feenox_problem_setup_pc_modal(PC pc);

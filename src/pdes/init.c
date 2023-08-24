@@ -25,7 +25,7 @@
 #include <unistd.h>   // for sysconf
 #include <stdlib.h>   // for setenv
 
-int feenox_problem_init_parser_general(void) {
+int feenox_problem_parse_time_init(void) {
 
 #ifdef HAVE_PETSC
   if (feenox.pde.petscinit_called == PETSC_TRUE) {

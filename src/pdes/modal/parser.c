@@ -42,12 +42,15 @@ int feenox_problem_parse_problem_modal(const char *token) {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
     }
+  } else {
+    // if token is NULL we have to do the parse-time initialization
+    feenox_call(feenox_problem_parse_time_init_modal());
   } 
   
   return FEENOX_OK;
 }
 
-int feenox_problem_parse_post_modal(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_write_post_modal(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
     

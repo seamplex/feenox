@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for the heat equation: initialization
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021-2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -23,24 +23,29 @@
 #include "thermal.h"
 thermal_t thermal;
 
-int feenox_problem_init_parser_thermal(void) {
+int feenox_problem_parse_time_init_thermal(void) {
 
 #ifdef HAVE_PETSC
-  // we are FEM
-  feenox.mesh.default_field_location = field_location_nodes;
-
-  feenox.pde.init_before_run = feenox_problem_init_runtime_thermal;
+  // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_thermal;
+  feenox.pde.parse_write_results = feenox_problem_parse_write_post_thermal;
+  
+  feenox.pde.init_before_run = feenox_problem_init_runtime_thermal;
+  
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_thermal;
-//  feenox.pde.bc_set_dirichlet = feenox_problem_bc_set_thermal_temperature;
+  
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_thermal;
+  
   feenox.pde.solve_post = feenox_problem_solve_post_thermal;
   feenox.pde.gradient_fill = feenox_problem_gradient_fill_thermal;
   feenox.pde.gradient_nodal_properties = feenox_problem_gradient_properties_at_element_nodes_thermal;
   feenox.pde.gradient_alloc_nodal_fluxes = feenox_problem_gradient_fluxes_at_node_alloc_thermal;
   feenox.pde.gradient_add_elemental_contribution_to_node = feenox_problem_gradient_add_elemental_contribution_to_node_thermal;
   feenox.pde.gradient_fill_fluxes = feenox_problem_gradient_fill_fluxes_thermal;
+
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
   
   // thermal is a scalar problem
   feenox.pde.dofs = 1;

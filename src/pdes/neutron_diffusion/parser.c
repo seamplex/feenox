@@ -35,15 +35,17 @@ int feenox_problem_parse_problem_neutron_diffusion(const char *token) {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
     }
-  } 
-  
+  } else {
+    // if token is NULL we have to do the parse-time initialization
+    feenox_call(feenox_problem_parse_time_init_neutron_diffusion());
+  }  
   return FEENOX_OK;
 }  
 
-int feenox_problem_parse_post_neutron_diffusion(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_write_post_neutron_diffusion(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
-    feenox_call(feenox_problem_parse_post_neutron_diffusion(mesh_write, "fluxes"));
+    feenox_call(feenox_problem_parse_write_post_neutron_diffusion(mesh_write, "fluxes"));
     
   } else if (strcmp(token, "flux") == 0 || strcmp(token, "fluxes") == 0) {
 

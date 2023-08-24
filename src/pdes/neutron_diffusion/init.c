@@ -23,20 +23,29 @@
 #include "neutron_diffusion.h"
 neutron_diffusion_t neutron_diffusion;
 
-int feenox_problem_init_parser_neutron_diffusion(void) {
+int feenox_problem_parse_time_init_neutron_diffusion(void) {
 
 ///kw_pde+PROBLEM+detail  * `neutron_diffusion` multi-group core-level neutron diffusion with a FEM formulation 
   
 #ifdef HAVE_PETSC
-  feenox.pde.init_before_run = feenox_problem_init_runtime_neutron_diffusion;
+  // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_neutron_diffusion;
+  feenox.pde.parse_write_results = feenox_problem_parse_write_post_neutron_diffusion;
+  
+  feenox.pde.init_before_run = feenox_problem_init_runtime_neutron_diffusion;
+  
 #ifdef HAVE_SLEPC
   feenox.pde.setup_eps = feenox_problem_setup_eps_neutron_diffusion;
 #endif
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_neutron_diffusion;
   feenox.pde.setup_pc = feenox_problem_setup_pc_neutron_diffusion;
+  
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_neutron_diffusion;
+  
   feenox.pde.solve_post = feenox_problem_solve_post_neutron_diffusion;
+  
+  // we are FEM
+  feenox.mesh.default_field_location = field_location_nodes;
   
   // default is 1 group
   if (neutron_diffusion.groups == 0) {

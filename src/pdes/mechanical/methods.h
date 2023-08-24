@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox mechanical methods
  *
- *  Copyright (C) 2021-2022 jeremy theler
+ *  Copyright (C) 2021-2023 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -25,11 +25,11 @@
 
 // mechanical/parse.c
 extern int feenox_problem_parse_problem_mechanical(const char *);
-extern int feenox_problem_parse_post_mechanical(mesh_write_t *mesh_write, const char *);
+extern int feenox_problem_parse_write_post_mechanical(mesh_write_t *mesh_write, const char *);
 extern int feenox_parse_linearize_stress();
 
 // mechanical/init.c
-extern int feenox_problem_init_parser_mechanical(void);
+extern int feenox_problem_parse_time_init_mechanical(void);
 extern int feenox_problem_init_runtime_mechanical(void);
 #ifdef HAVE_PETSC
 extern int feenox_problem_setup_pc_mechanical(PC pc);

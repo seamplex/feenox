@@ -1704,9 +1704,8 @@ struct feenox_t {
   
     // problem-specific virtual methods
     int (*parse_problem)(const char *token);
-    int (*parse_problem_post)(mesh_write_t *mesh_write, const char *token);
+    int (*parse_write_results)(mesh_write_t *mesh_write, const char *token);
     int (*parse_bc)(bc_data_t *, const char *, char *);
-    int (*init_after_parse)(void);
     int (*init_before_run)(void);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
@@ -2265,7 +2264,7 @@ extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *);
 
 
 // init.c
-extern int feenox_problem_init_parser_general(void);
+extern int feenox_problem_parse_time_init(void);
 extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function, int is_gradient);

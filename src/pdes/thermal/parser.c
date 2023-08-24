@@ -31,18 +31,21 @@ int feenox_problem_parse_problem_thermal(const char *token) {
   if (token != NULL) {
     feenox_push_error_message("undefined keyword '%s'", token);
     return FEENOX_ERROR;
+  } else {
+    // if token is NULL we have to do the parse-time initialization
+    feenox_call(feenox_problem_parse_time_init_thermal());
   }
  
   return FEENOX_OK;
 }
 
 
-int feenox_problem_parse_post_thermal(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_write_post_thermal(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
     
-    feenox_call(feenox_problem_parse_post_thermal(mesh_write, "temperature"));
-    feenox_call(feenox_problem_parse_post_thermal(mesh_write, "heat_flux"));
+    feenox_call(feenox_problem_parse_write_post_thermal(mesh_write, "temperature"));
+    feenox_call(feenox_problem_parse_write_post_thermal(mesh_write, "heat_flux"));
     
   } else if (strcmp(token, "temperature") == 0 || strcmp(token, "T") == 0) {
     

@@ -39,32 +39,24 @@ int feenox_problem_parse_problem_neutron_sn(const char *token) {
         feenox_push_error_message("The N in SN should be even and %d is not (as far as I know)", neutron_sn.N);
         return FEENOX_ERROR;
       }
-/*      
-      if (neutron_sn.N != 2 &&
-          neutron_sn.N != 4 &&
-          neutron_sn.N != 6 &&
-          neutron_sn.N != 8) {
-        feenox_push_error_message("S%d is not supported, only S2, S4, S6 and S8 are", neutron_sn.N);
-        return FEENOX_ERROR;
-      }
- */
-      
     } else {
       feenox_push_error_message("undefined keyword '%s'", token);
       return FEENOX_ERROR;
     }
-  } 
-  
+  } else {
+    // if token is NULL we have to do the parse-time initialization
+    feenox_call(feenox_problem_parse_time_init_neutron_sn());
+  }  
   return FEENOX_OK;
 }  
 
 
 
-int feenox_problem_parse_post_neutron_sn(mesh_write_t *mesh_write, const char *token) {
+int feenox_problem_parse_write_post_neutron_sn(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {
-    feenox_call(feenox_problem_parse_post_neutron_sn(mesh_write, "scalar_fluxes"));
-    feenox_call(feenox_problem_parse_post_neutron_sn(mesh_write, "angular_fluxes"));
+    feenox_call(feenox_problem_parse_write_post_neutron_sn(mesh_write, "scalar_fluxes"));
+    feenox_call(feenox_problem_parse_write_post_neutron_sn(mesh_write, "angular_fluxes"));
     
   } else if (strcmp(token, "scalar_flux") == 0 || strcmp(token, "scalar_fluxes") == 0) {
     
