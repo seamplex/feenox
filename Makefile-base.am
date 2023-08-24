@@ -51,6 +51,7 @@ TESTS = \
         tests/nafems-t2-3.sh \
         tests/neutron_diffusion_src.sh \
         tests/neutron_diffusion_keff.sh \
+        tests/neutron-fully-mirrored.sh \
         tests/parallelepiped.sh \
         tests/petsc_options.sh \
         tests/pipe.sh \

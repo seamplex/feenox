@@ -64,3 +64,6 @@ Stanford_Bunny.stl
 bunny*.msh
 bunny*.vtk
 bunny-box.stl
+sn-square.vtk
+sn-square.msh
+square-struct.msh

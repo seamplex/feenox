@@ -74,6 +74,14 @@ checkmumps() {
  fi
 }
 
+# checks if feenox is compiled with mumps and skips the test if necessary
+checkhypre() {
+ if [ $(${feenox} --versions | grep 'hypre' | grep -v 'N/A'| wc -l) = 0 ]; then
+  echo "FeenoX was not compiled with HYPRE, skipping test"
+  exit 77
+ fi
+}
+
 
 # checks if gmsh executable is available in the path
 checkgmsh() {
