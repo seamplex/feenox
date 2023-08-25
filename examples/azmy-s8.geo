@@ -19,4 +19,4 @@ For i In {1 : 40}
   View[i].Visible = 0;
 EndFor
 
-Print "azmy-8-000.png";
+Print "azmy-8-00.png";
