@@ -5,9 +5,18 @@ intro: |
   
 terminal: | 
   $ gmsh -2 azmy.geo
+  $ feenox azmy.fee 2
+  16084 unknowns for S 2 , memory needed = 0.2 Gb
   $ feenox azmy.fee 4
+  48252 unknowns for S 4 , memory needed = 0.8 Gb
   $ feenox azmy.fee 6
+  96504 unknowns for S 6 , memory needed = 2.8 Gb
   $ feenox azmy.fee 8
+  160840 unknowns for S 8 , memory needed = 7.6 Gb
+  $ gmsh azmy-s4.geo
+  $ gmsh azmy-s6.geo
+  $ gmsh azmy-s8.geo
+  $
 ...
 DEFAULT_ARGUMENT_VALUE 1 4
 PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
@@ -29,7 +38,37 @@ sn_alpha = 1/4
 SOLVE_PROBLEM
 
 WRITE_RESULTS
+PRINT %g total_dofs "unknowns for S" $1 ", memory needed =" %.1f memory() "Gb" SEP " "
 
 ---
 figures: |
-...
+  ![](azmy-s4-01)
+  
+  ![](azmy-s4-02)
+
+  ![](azmy-s4-03)
+  
+  ![](azmy-s4-04)
+
+  ![](azmy-s4-05)
+  
+  ![](azmy-s4-06)
+
+  ![](azmy-s4-07)
+  
+  ![](azmy-s4-08)
+
+  ![](azmy-s4-09)
+
+  ![](azmy-s4-10)
+  
+  ![](azmy-s4-11)
+
+  ![](azmy-s4-12)
+  
+  ![](azmy-s4-00)
+  
+  ![](azmy-s6-00)
+
+  ![](azmy-s8-00)  
+  ...
