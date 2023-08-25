@@ -1,18 +1,35 @@
 ---
 category: neutron_sn
 intro: |
-  # Azmy’s problem
+intro: |
+  ## Fist-order locally-refined unstructured triangular grid
   
+  This example solves the problem using an unstructured first-order grid.
+  It computes the mean flux in each quadrant by integrating $\phi_1$ over $x$ and $y$ in custom ranges using the functional [`integral`](https://www.seamplex.com/feenox/doc/feenox-manual.html#integral).
+  
+  ![Fist-order locally-refined unstructured triangular grid](azmy-mesh.png)  
 terminal: | 
   $ gmsh -2 azmy.geo
   $ feenox azmy.fee 2
-  16084 unknowns for S 2 , memory needed = 0.2 Gb
+  LLQ     1.653e+00       (ref 1.676e+0)
+  LRQ     4.427e-02       (ref 4.159e-2)
+  URQ     2.717e-03       (ref 1.992e-3)
+  15704 unknowns for S 2 , memory needed = 0.1 Gb
   $ feenox azmy.fee 4
-  48252 unknowns for S 4 , memory needed = 0.8 Gb
+  LLQ     1.676e+00       (ref 1.676e+0)
+  LRQ     4.160e-02       (ref 4.159e-2)
+  URQ     1.991e-03       (ref 1.992e-3)
+  47112 unknowns for S 4 , memory needed = 0.4 Gb
   $ feenox azmy.fee 6
-  96504 unknowns for S 6 , memory needed = 2.8 Gb
+  LLQ     1.680e+00       (ref 1.676e+0)
+  LRQ     4.115e-02       (ref 4.159e-2)
+  URQ     1.890e-03       (ref 1.992e-3)
+  94224 unknowns for S 6 , memory needed = 1.6 Gb
   $ feenox azmy.fee 8
-  160840 unknowns for S 8 , memory needed = 7.6 Gb
+  LLQ     1.682e+00       (ref 1.676e+0)
+  LRQ     4.093e-02       (ref 4.159e-2)
+  URQ     1.844e-03       (ref 1.992e-3)
+  157040 unknowns for S 8 , memory needed = 4.3 Gb
   $ gmsh azmy-s4.geo
   $ gmsh azmy-s6.geo
   $ gmsh azmy-s8.geo
@@ -34,41 +51,58 @@ Sigma_s1.1_abs = 0.1
 BC mirror   mirror
 BC vacuum   vacuum
 
-sn_alpha = 1/4
+# sn_alpha = 1
 SOLVE_PROBLEM
 
-WRITE_RESULTS
+# compute mean values in each quadrant
+lower_left_quadrant = integral(integral(phi1(x,y),y,0,5),x,0,5)/(5*5)
+lower_right_quadrant = integral(integral(phi1(x,y),y,0,5),x,5,10)/(5*5)
+upper_right_quadrant = integral(integral(phi1(x,y),y,5,10),x,5,10)/(5*5)
+
+PRINT %.3e "LLQ" lower_left_quadrant  "(ref 1.676e+0)"
+PRINT %.3e "LRQ" lower_right_quadrant "(ref 4.159e-2)"
+PRINT %.3e "URQ" upper_right_quadrant "(ref 1.992e-3)"
+
+
+# compute three profiles along x=constant
+profile5(y) = phi1(5.84375,y)
+profile7(y) = phi1(7.84375,y)
+profile9(y) = phi1(9.84375,y)
+
+PRINT_FUNCTION profile5 profile7 profile9 MIN 0 MAX 10 NSTEPS 100 FILE $0-$1.dat
+
+# WRITE_RESULTS
 PRINT %g total_dofs "unknowns for S" $1 ", memory needed =" %.1f memory() "Gb" SEP " "
 
 ---
 figures: |
-  ![](azmy-s4-01)
+  ![$\psi_{1,1}$ for S$_4$](azmy-4-01.png)
   
-  ![](azmy-s4-02)
+  ![$\psi_{2,1}$ for S$_4$](azmy-4-02.png)
 
-  ![](azmy-s4-03)
+  ![$\psi_{3,1}$ for S$_4$](azmy-4-03.png)
   
-  ![](azmy-s4-04)
+  ![$\psi_{4,1}$ for S$_4$](azmy-4-04.png)
 
-  ![](azmy-s4-05)
+  ![$\psi_{5,1}$ for S$_4$](azmy-4-05.png)
   
-  ![](azmy-s4-06)
+  ![$\psi_{6,1}$ for S$_4$](azmy-4-06.png)
 
-  ![](azmy-s4-07)
+  ![$\psi_{7,1}$ for S$_4$](azmy-4-07.png)
   
-  ![](azmy-s4-08)
+  ![$\psi_{8,1}$ for S$_4$](azmy-4-08.png)
 
-  ![](azmy-s4-09)
+  ![$\psi_{9,1}$ for S$_4$](azmy-4-09.png)
 
-  ![](azmy-s4-10)
+  ![$\psi_{10,1}$ for S$_4$](azmy-4-10.png)
   
-  ![](azmy-s4-11)
+  ![$\psi_{11,1}$ for S$_4$](azmy-4-11.png)
 
-  ![](azmy-s4-12)
+  ![$\psi_{12,1}$ for S$_4$](azmy-4-12.png)
   
-  ![](azmy-s4-00)
+  ![$\phi_{1}$ for S$_4$](azmy-4-00.png)
   
-  ![](azmy-s6-00)
+  ![$\phi_{1}$ for S$_6$](azmy-6-00.png)
 
-  ![](azmy-s8-00)  
-  ...
+  ![$\phi_{1}$ for S$_8$](azmy-8-00.png)  
+...

@@ -146,6 +146,26 @@ physical_group_t *feenox_get_or_define_physical_group_get_ptr(const char *name, 
 }
 
 
+
+int feenox_physical_group_set_material(const char *group_name, const char *material_name, mesh_t *mesh) {
+  
+  physical_group_t *physical_group = feenox_get_physical_group_ptr(group_name, mesh);
+  if (physical_group == NULL) {
+    feenox_push_error_message("undefined physical group '%s'", group_name);
+    return FEENOX_ERROR;
+  }
+  
+  material_t *material = feenox_get_material_ptr(material_name);
+  if (material == NULL) {
+    feenox_push_error_message("undefined material '%s'", material_name);
+    return FEENOX_ERROR;
+  }
+    
+  physical_group->material = material;
+  
+  return FEENOX_OK;
+}
+
 int feenox_physical_group_compute_volume(physical_group_t *this, const mesh_t *mesh) {
   this->volume = 0;
   

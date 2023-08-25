@@ -14,23 +14,24 @@ Physical Curve("vacuum") = {4, 5};
 
 // --- meshing options ------------------------------------------
 n1 = 8;
-n2 = 32;
+n2 = 96;
 Mesh.MeshSizeMax = a/n1;
 Mesh.MeshSizeMin = a/n2;
 
-Mesh.Algorithm = 8;
+Mesh.Algorithm = 6;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;
-Mesh.RecombineAll = 1;
-Mesh.ElementOrder = 2;
+Mesh.RecombineAll = 0;
+Mesh.ElementOrder = 1;
 
 // local refinements
 Field[1] = Distance;
-Field[1].EdgesList = {1,2};
+Field[1].CurvesList = {1,2};
+Field[1].Sampling = 100;
 Field[2] = Threshold;
 Field[2].IField = 1;
 Field[2].LcMin = Mesh.MeshSizeMin;
 Field[2].LcMax = Mesh.MeshSizeMax;
-Field[2].DistMin = 2*Mesh.MeshSizeMin;
-Field[2].DistMax = 5*Mesh.MeshSizeMin;
+Field[2].DistMin = 4*Mesh.MeshSizeMin;
+Field[2].DistMax = 8*Mesh.MeshSizeMin;
 Background Field = {2};

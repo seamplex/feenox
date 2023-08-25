@@ -14,6 +14,7 @@ TESTS = \
         tests/annulus-modal.sh \
         tests/uo2-pellet.sh \
         tests/arguments.sh \
+        tests/azmy.sh \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
         tests/bimetallic-strip.sh \

@@ -20,9 +20,9 @@ For i In {0 : 12}
   EndFor 
 
   If ( i == 0 )
-    View[i].ColormapNumber = 1;
+    View[i].ColormapNumber = 2;
   Else
-    View[i].ColormapNumber = 4;
+    View[i].ColormapNumber = 12;
   EndIf
   
   View[i].RaiseZ = 1;

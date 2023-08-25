@@ -133,6 +133,9 @@ propose benchmark problems to add to the suite.
   - [Illustration of the XS dilution & smearing effect][]
 - Neutron transport using $S_N$
   - [Reed’s problem][]
+  - [Azmy’s problem][]
+    - [Second-order complete structured rectangular grid][]
+    - [Fist-order locally-refined unstructured triangular grid][]
 
   [Hello World (and Universe)!]: basic.md#hello-world-and-universe
   [Ten ways of computing *π*]: basic.md#ten-ways-of-computing-pi
@@ -175,3 +178,6 @@ propose benchmark problems to add to the suite.
   [Cube-spherical bare reactor]: neutron_diffusion.md#cube-spherical-bare-reactor
   [Illustration of the XS dilution & smearing effect]: neutron_diffusion.md#illustration-of-the-xs-dilution-smearing-effect
   [Reed’s problem]: neutron_sn.md#reeds-problem
+  [Azmy’s problem]: neutron_sn.md#azmys-problem
+  [Second-order complete structured rectangular grid]: neutron_sn.md#second-order-complete-structured-rectangular-grid
+  [Fist-order locally-refined unstructured triangular grid]: neutron_sn.md#fist-order-locally-refined-unstructured-triangular-grid

@@ -5,6 +5,8 @@
     <list name="prim_keywords">
       <item>ABORT</item>
       <item>ALIAS</item>
+      <item>ALLOW_NEW_NONZEROS</item>
+      <item>ALLOW_UNRESOLVED_BCS</item>
       <item>AS</item>
       <item>ASCENDING</item>
       <item>ASCENDING_ORDER</item>
@@ -15,6 +17,8 @@
       <item>BINARY_FILE</item>
       <item>BINARY_FILE_PATH</item>
       <item>BOUNDARY_CONDITION</item>
+      <item>CACHE_B</item>
+      <item>CACHE_J</item>
       <item>CELL</item>
       <item>CELLS</item>
       <item>CLOSE</item>
@@ -26,6 +30,7 @@
       <item>DESCENDING</item>
       <item>DESCENDING_ORDER</item>
       <item>DETECT_HANGING_NODES</item>
+      <item>DETECT_UNRESOLVED_BCS</item>
       <item>DIM</item>
       <item>DIMENSION</item>
       <item>DIMENSIONS</item>
@@ -51,6 +56,7 @@
       <item>FUNCTION_DATA</item>
       <item>GAUSS</item>
       <item>GRADIENT</item>
+      <item>GROUP</item>
       <item>HANDLE_HANGING_NODES</item>
       <item>HEADER</item>
       <item>HISTORY</item>
@@ -74,6 +80,7 @@
       <item>K_bc</item>
       <item>KSP</item>
       <item>KSP_TYPE</item>
+      <item>LABEL</item>
       <item>LINEAR</item>
       <item>LINEARIZE_STRESS</item>
       <item>LINEAR_SOLVER</item>
@@ -113,6 +120,7 @@
       <item>PHASE_SPACE</item>
       <item>PHYSICAL_ENTITY</item>
       <item>PHYSICAL_GROUP</item>
+      <item>PREALLOCATE</item>
       <item>PRECONDITIONER</item>
       <item>PRINT</item>
       <item>PRINT_FUNCTION</item>
@@ -261,6 +269,7 @@
       <item>expintn</item>
       <item>floor</item>
       <item>func_min</item>
+      <item>gammaf</item>
       <item>gauss_kronrod</item>
       <item>gauss_legendre</item>
       <item>heaviside</item>

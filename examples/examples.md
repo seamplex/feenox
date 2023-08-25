@@ -63,3 +63,8 @@
   effect](neutron_diffusion.md#illustration-of-the-xs-dilution-smearing-effect)
 - Neutron transport using $S_N$
   - [Reed’s problem](neutron_sn.md#reeds-problem)
+  - [Azmy’s problem](neutron_sn.md#azmys-problem)
+    - [Second-order complete structured rectangular
+    grid](neutron_sn.md#second-order-complete-structured-rectangular-grid)
+    - [Fist-order locally-refined unstructured triangular
+    grid](neutron_sn.md#fist-order-locally-refined-unstructured-triangular-grid)

@@ -2631,7 +2631,10 @@ int feenox_parse_physical_group(void) {
   }
   
   feenox_call(feenox_define_physical_group(name, mesh_name, dimension, id));
-  // feenox_physical_group_set_material()
+  if (material_name != NULL) {
+    feenox_call(feenox_physical_group_set_material(name, material_name, NULL));
+  }
+  
   // feenox_physical_group_add_bc()
   
       

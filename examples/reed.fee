@@ -3,7 +3,11 @@ category: neutron_sn
 intro: |
   # Reed’s problem
   
-  Reed’s problem ([William H. Reed (1971) New Difference Schemes for the Neutron Transport Equation, Nuclear Science and Engineering, 46:2, 309-314, DOI: 10.13182/NSE46-309](http://dx.doi.org/10.13182/NSE46-309)) is a common test problem for transport codes.
+  Reed’s problem as in
+  
+   * [William H. Reed, New Difference Schemes for the Neutron Transport Equation, Nuclear Science and Engineering, 46:2, 309-314 (1971). DOI: 10.13182/NSE46-309](http://dx.doi.org/10.13182/NSE46-309)
+  
+  is a common test problem for transport codes.
   It is comprised of heterogeneous materials with  strong absorber, vacuum, and scattering regions.
   These regions are valuable to testing different aspects of numerical discretizations. 
   

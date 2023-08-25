@@ -34,6 +34,8 @@ for i in hello          \
          iaea-2dpwr     \
          iaea-3dpwr     \
          reed           \
+         azmy-structured  \
+         azmy             \
          cubesphere     \
          two-zone-slab  \
          parallelepiped-thermal     \

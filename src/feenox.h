@@ -2194,6 +2194,7 @@ extern int feenox_instruction_mesh_find_extrema(void *arg);
 extern int feenox_define_physical_group(const char *name, const char *mesh_name, int dimension, int tag);
 extern physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
 extern physical_group_t *feenox_get_or_define_physical_group_get_ptr(const char *name, mesh_t *mesh, int dimension, int tag);
+extern int feenox_physical_group_set_material(const char *group_name, const char *material_name, mesh_t *mesh);
 extern int feenox_physical_group_compute_volume(physical_group_t *, const mesh_t *mesh);
 
 // material.c
