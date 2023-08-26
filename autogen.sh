@@ -14,18 +14,23 @@ for i in git autoconf m4 make; do
  fi
 done
 
+# check if git is available
 if test ! -d ".git"; then
   echo "error: this tree is not a repository (did you download instead of clone?)" 
   exit 1
 fi
 
+# sometimes in docker it can end up in forbidden locations like /local
 git describe --all
 if test $? -ne 0; then
   echo "error: git is not working (are you using /local in docker?)" 
   exit 1
 fi
 
+# clean
 ./autoclean.sh
+
+# create headers from text files in doc (which in turn come from parsing the .c sources)
 cat << EOF > ./src/help.h
 #define FEENOX_HELP_ONE_LINER     "$(cat doc/help-one-liner.txt)"
 #define FEENOX_HELP_USAGE         "$(cat doc/help-usage.txt)"
@@ -50,6 +55,7 @@ fi
 version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
+# these links are needed for make dist-check
 rm -f config_links.m4
 for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref tests/*.vtk; do
  echo "AC_CONFIG_LINKS([${i}:${i}])" >> config_links.m4

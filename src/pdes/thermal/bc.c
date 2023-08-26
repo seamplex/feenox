@@ -113,7 +113,7 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsign
     // mind the positive sign!
     gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, +wdet*dqdT, H, H, 1.0, feenox.fem.Jbi));
+    feenox_call(feenox_blas_BtB(H, +wdet*dqdT, feenox.fem.Jbi));
   }
   
 #endif
@@ -155,7 +155,7 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
   // this is not efficient because if h depends on t or T we might need to re-build the whole K
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet*h, H, H, 1.0, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtB(H, +wdet*h, feenox.fem.Ki));
 
 #endif
   

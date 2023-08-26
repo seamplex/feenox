@@ -399,7 +399,7 @@ int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
   
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  gsl_blas_dgemv(CblasTrans, wdet, H_Gc, feenox.fem.vec_f, 1.0, feenox.fem.bi);
+  feenox_call(feenox_blas_Atb(H_Gc, feenox.fem.vec_f, wdet, feenox.fem.bi));
 #endif
   
   return FEENOX_OK;

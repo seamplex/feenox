@@ -33,20 +33,20 @@ int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int J) {
     gsl_matrix_free(neutron_diffusion.Li);
     gsl_matrix_free(neutron_diffusion.Ai);
     gsl_matrix_free(neutron_diffusion.DB);
-    gsl_matrix_free(neutron_diffusion.AH);
+    gsl_matrix_free(neutron_diffusion.RH);
     if (neutron_diffusion.has_fission) {
       gsl_matrix_free(neutron_diffusion.Fi);
-      gsl_matrix_free(neutron_diffusion.FX);
+      gsl_matrix_free(neutron_diffusion.XH);
     }
   }
     
   feenox_check_alloc(neutron_diffusion.Li = gsl_matrix_calloc(GJ, GJ));
   feenox_check_alloc(neutron_diffusion.Ai = gsl_matrix_calloc(GJ, GJ));
   feenox_check_alloc(neutron_diffusion.DB = gsl_matrix_calloc(G*D, G*J));
-  feenox_check_alloc(neutron_diffusion.AH = gsl_matrix_calloc(G, GJ));
+  feenox_check_alloc(neutron_diffusion.RH = gsl_matrix_calloc(G, GJ));
   if (neutron_diffusion.has_fission) {
     feenox_check_alloc(neutron_diffusion.Fi = gsl_matrix_calloc(GJ, GJ));
-    feenox_check_alloc(neutron_diffusion.FX = gsl_matrix_calloc(G, GJ));
+    feenox_check_alloc(neutron_diffusion.XH = gsl_matrix_calloc(G, GJ));
   }
 
   return FEENOX_OK;
@@ -124,26 +124,19 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   // elemental stiffness for the diffusion term B'*D*B
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *B = feenox_fem_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration);
-  
-  // TODO: convenience call for A'*B*A? that'd need an intermediate alloc
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.D_G, B, 0.0, neutron_diffusion.DB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, B, neutron_diffusion.DB, 1.0, neutron_diffusion.Li));
+  feenox_call(feenox_blas_BtCB(B, neutron_diffusion.D_G, neutron_diffusion.DB, wdet, neutron_diffusion.Li));
 
   // elemental scattering H'*A*H
   gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  // TODO: can we mix Ai and Ki?
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.R, H, 0.0, neutron_diffusion.AH));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet,  H, neutron_diffusion.AH, 1.0, neutron_diffusion.Ai));
+  feenox_call(feenox_blas_BtCB(H, neutron_diffusion.R, neutron_diffusion.RH, wdet, neutron_diffusion.Ai));
   
   // elemental fission matrix
   if (neutron_diffusion.has_fission) {
-    feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, neutron_diffusion.X, H, 0, neutron_diffusion.FX));
-    feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, H, neutron_diffusion.FX, 1.0, neutron_diffusion.Fi));
+    feenox_call(feenox_blas_BtCB(H, neutron_diffusion.X, neutron_diffusion.XH, wdet, neutron_diffusion.Fi));
   }
   
-  
   if (neutron_diffusion.has_sources) {
-    feenox_call(gsl_blas_dgemv(CblasTrans, wdet, H, neutron_diffusion.s, 1.0, feenox.fem.bi));
+    feenox_call(feenox_blas_Atb(H, neutron_diffusion.s, wdet, feenox.fem.bi));
   }
   
   // for source-driven problems

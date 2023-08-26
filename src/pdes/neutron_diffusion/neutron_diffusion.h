@@ -58,8 +58,8 @@ struct neutron_diffusion_t {
 
   // intermediate matrices
   gsl_matrix *DB;
-  gsl_matrix *AH;
-  gsl_matrix *FX;
+  gsl_matrix *RH;
+  gsl_matrix *XH;
   
   
   int has_sources;

@@ -128,8 +128,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
 
   // elemental stiffness B'*C*B
-  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, mechanical.C, mechanical.B, 0, mechanical.CB));
-  feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, wdet, mechanical.B, mechanical.CB, 1.0, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtCB(mechanical.B, mechanical.C, mechanical.CB, wdet, feenox.fem.Ki));
 
   // thermal expansion strain vector
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
@@ -138,8 +137,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     }
     mechanical.compute_thermal_strain(x, feenox_fem_get_material(e));
     
-    feenox_call(gsl_blas_dgemv(CblasTrans, 1.0, mechanical.C, mechanical.et, 0, mechanical.Cet));
-    feenox_call(gsl_blas_dgemv(CblasTrans, wdet, mechanical.B, mechanical.Cet, 1.0, feenox.fem.bi));
+    feenox_call(feenox_blas_Atb_overwrite(mechanical.C, mechanical.et, 1.0, mechanical.Cet));
+    feenox_call(feenox_blas_Atb(mechanical.B, mechanical.Cet, wdet, feenox.fem.bi));
   }
   
 #endif

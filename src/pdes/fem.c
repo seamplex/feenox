@@ -220,6 +220,7 @@ gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi) {
   gsl_matrix *B = gsl_matrix_calloc(e->type->dim, e->type->nodes);
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, B_c, 0.0, B);
   
+  
   return B;
 }
 

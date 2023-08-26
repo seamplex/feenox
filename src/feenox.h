@@ -1703,22 +1703,30 @@ struct feenox_t {
     mesh_t *mesh_rough;      // in this mesh each elements has unique nodes (they are duplicated)
   
     // problem-specific virtual methods
+    // parse
     int (*parse_problem)(const char *token);
     int (*parse_write_results)(mesh_write_t *mesh_write, const char *token);
-    int (*parse_bc)(bc_data_t *, const char *, char *);
+    int (*parse_bc)(bc_data_t *bc_data, const char *lhs, char *rhs);
+    
+    // init
     int (*init_before_run)(void);
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
-#endif
-#ifdef HAVE_SLEPC
+  #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
+  #endif
 #endif
+
+    // build
     int (*element_build_volumetric)(element_t *e, unsigned int q);
     int (*element_build_volumetric_at_gauss)(element_t *e, unsigned int q);
-    int (*solve)(void);
-    int (*solve_post)(void);
     
+    // solve
+    int (*solve)(void);
+    
+    // post
+    int (*solve_post)(void);
     int (*gradient_fill)(void);
     int (*gradient_nodal_properties)(element_t *e, mesh_t *mesh);
     int (*gradient_alloc_nodal_fluxes)(node_t *node);
@@ -2363,6 +2371,17 @@ extern PetscInt *feenox_fem_compute_dof_indices(element_t *e, int G);
   feenox_var_value(feenox.mesh.vars.y) = val[1];\
   feenox_var_value(feenox.mesh.vars.z) = val[2];\
 }
+
+// blas.c
+extern int feenox_blas_Ab_overwrite(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_Atb_overwrite(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_Ab(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_Atb(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R);
+extern int feenox_blas_BtB_overwrite(gsl_matrix *B, double alpha, gsl_matrix *R);
+extern int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
+extern int feenox_blas_PtCB(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);
+
 
 
 // distribution.c

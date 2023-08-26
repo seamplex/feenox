@@ -199,7 +199,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
           gsl_vector_set(at_gauss, q, gsl_matrix_get(e->dphidx_gauss[q], g, d));
         }  
         
-        gsl_blas_dgemv(CblasNoTrans, 1.0, e->type->gauss[mesh->integration].extrap, at_gauss, 0, at_nodes);
+        gsl_blas_dgemv(CblasNoTrans, 1.0, e->type->gauss[mesh->integration].extrap, at_gauss, 0.0, at_nodes);
         for (unsigned int j = 0; j < J; j++) {
           gsl_matrix_set(e->dphidx_node[j], g, d, gsl_vector_get(at_nodes, j));
         }
