@@ -80,7 +80,7 @@ int feenox_problem_bc_set_neutron_diffusion_vacuum(bc_data_t *this, element_t *e
   // TODO: convenience call like  feenox_problem_rhs_set()?
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  feenox_call(feenox_blas_BtB(H, wdet*coeff, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtB_accum(H, wdet*coeff, feenox.fem.Ki));
   
 #endif
   

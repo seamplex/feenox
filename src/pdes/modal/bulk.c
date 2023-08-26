@@ -96,7 +96,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   
   // elemental stiffness B'*C*B
-  feenox_call(feenox_blas_BtCB(modal.B, modal.C, modal.CB, wdet, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtCB_accum(modal.B, modal.C, modal.CB, wdet, feenox.fem.Ki));
   
   // elemental mass H'*rho*H
   if (modal.rho.uniform == 0) {
@@ -104,7 +104,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
     modal.rho.eval(&modal.rho, x, feenox_fem_get_material(e));
   }
   gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  feenox_call(feenox_blas_BtB(H_Gc, wdet * modal.rho.value, feenox.fem.Mi));
+  feenox_call(feenox_blas_BtB_accum(H_Gc, wdet * modal.rho.value, feenox.fem.Mi));
   
 #endif
   

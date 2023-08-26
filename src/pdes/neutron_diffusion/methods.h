@@ -39,6 +39,8 @@ extern int feenox_problem_setup_eps_neutron_diffusion(EPS eps);
 
 // neutron_diffusion/bulk.c
 extern int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int n_nodes);
+extern int feenox_problem_neutron_diffusion_eval_XS(material_t *material, double *x);
+extern int feenox_problem_build_volumetric_neutron_diffusion(element_t *e);
 extern int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *element, unsigned int q);
 
 // neutron_diffusion/bc.c

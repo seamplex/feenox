@@ -42,6 +42,7 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_neutron_sn;
   feenox.pde.setup_pc = feenox_problem_setup_pc_neutron_sn;
   
+  feenox.pde.element_build_volumetric = feenox_problem_build_volumetric_neutron_sn;
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_neutron_sn;
   
   feenox.pde.solve_post = feenox_problem_solve_post_neutron_sn;
@@ -472,7 +473,7 @@ int feenox_problem_init_runtime_neutron_sn(void) {
   for (unsigned int m = 0; m < M; m++) {
     for (unsigned int g = 0; g < G; g++) {
       for (unsigned int d = 0; d < feenox.pde.dim; d++) {
-        gsl_matrix_set(neutron_sn.D, dof_index(m,g), d*MG + dof_index(m,g), neutron_sn.Omega[m][d]);
+        gsl_matrix_set(neutron_sn.D, sn_dof_index(m,g), d*MG + sn_dof_index(m,g), neutron_sn.Omega[m][d]);
       }
     }
   }  

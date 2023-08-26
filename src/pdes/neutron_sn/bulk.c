@@ -70,15 +70,22 @@ int feenox_problem_build_allocate_aux_neutron_sn(unsigned int J) {
   return FEENOX_OK;
 }
 
-int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigned int q) {
+int feenox_problem_build_volumetric_neutron_sn(element_t *e) {
 
-#ifdef HAVE_PETSC
-
-//  feenox_call(feenox_mesh_compute_wHB_at_gauss(e, q));
-  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, neutron_sn.space_XS);
-  material_t *material = feenox_fem_get_material(e);
+  // TODO: check this in the general framework and call the specific allocator
+  if (neutron_sn.n_nodes != e->type->nodes) {
+    feenox_call(feenox_problem_build_allocate_aux_neutron_sn(e->type->nodes));
+  }
   
-  // initialize to zero
+  if (neutron_sn.space_XS == 0) {
+    feenox_call(feenox_problem_neutron_sn_eval_XS(feenox_fem_get_material(e), NULL));
+  }
+  return FEENOX_OK;
+}
+
+int feenox_problem_neutron_sn_eval_XS(material_t *material, double *x) {
+  
+    // initialize to zero
   gsl_matrix_set_zero(neutron_sn.R);
   if (neutron_sn.has_fission) {
     gsl_matrix_set_zero(neutron_sn.X);
@@ -87,7 +94,6 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
     gsl_vector_set_zero(neutron_sn.s);
   }
 
-  // TODO: if XS are uniform then compute only once these cached properties
   for (int g = 0; g < neutron_sn.groups; g++) {
     // independent sources
     if (neutron_sn.S[g].defined) {
@@ -121,7 +127,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   for (unsigned int m = 0; m < neutron_sn.directions; m++) {
     for (unsigned int g = 0; g < neutron_sn.groups; g++) {
       // independent sources
-      int diag = dof_index(m,g);
+      int diag = sn_dof_index(m,g);
       gsl_vector_set(neutron_sn.s, diag, neutron_sn.S[g].value);
         
       // scattering and fission
@@ -133,11 +139,11 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
           if (neutron_sn.Sigma_s1[g_prime][g].defined) {
             accum -= neutron_sn.w[m_prime] * neutron_sn.Sigma_s1[g_prime][g].value * 3.0 * feenox_mesh_dot(neutron_sn.Omega[m], neutron_sn.Omega[m_prime]);
           }
-          gsl_matrix_set(neutron_sn.R, diag, dof_index(m_prime,g_prime), accum);
+          gsl_matrix_set(neutron_sn.R, diag, sn_dof_index(m_prime,g_prime), accum);
 
           // fision
           if (neutron_sn.has_fission) {
-            gsl_matrix_set(neutron_sn.X, diag, dof_index(m_prime,g_prime), +neutron_sn.w[m_prime] * neutron_sn.chi[g] * neutron_sn.nu_Sigma_f[g_prime].value);
+            gsl_matrix_set(neutron_sn.X, diag, sn_dof_index(m_prime,g_prime), +neutron_sn.w[m_prime] * neutron_sn.chi[g] * neutron_sn.nu_Sigma_f[g_prime].value);
           }
         }
       }
@@ -155,26 +161,21 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
       gsl_matrix_set(neutron_sn.R, diag, diag, accum);
     }
   }
+  
+  return FEENOX_OK;
+}
 
-  // TODO: store current number of nodes in feenox.pde and call the method automatically?
-  // this should be done outside the gauss loop!
-  if (neutron_sn.n_nodes != e->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_neutron_sn(e->type->nodes));
+int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigned int q) {
+
+#ifdef HAVE_PETSC
+
+  if (neutron_sn.space_XS != 0) {
+    double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    feenox_call(feenox_problem_neutron_sn_eval_XS(feenox_fem_get_material(e), x));
   }
   
-  // initialize Ki Ai Xi Si <- 0
-  gsl_matrix_set_zero(neutron_sn.Li);
-  gsl_matrix_set_zero(neutron_sn.Ai);
-  if (neutron_sn.has_fission) {
-    gsl_matrix_set_zero(neutron_sn.Fi);
-  }
-  if (neutron_sn.has_sources) {
-    gsl_vector_set_zero(neutron_sn.Si);
-  }
-
-  // petrov stabilization
+  // petrov stabilization matrix
   int MG = neutron_sn.directions * neutron_sn.groups;
-//  double tau = 0.5 * feenox_var_value(neutron_sn.sn_alpha) * neutron_sn.supg_dimension_factor * e->type->volume(e) / e->type->area(e);
   double tau = feenox_var_value(neutron_sn.sn_alpha) * e->type->size(e);
   
   gsl_matrix *H_G = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
@@ -186,7 +187,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
       for (unsigned int d = 0; d < feenox.pde.dim; d++) {
         double value = tau * neutron_sn.Omega[m][d] * gsl_matrix_get(B, d, j);
         for (unsigned int g = 0; g < neutron_sn.groups; g++) {
-          int diag = dof_index(m,g);
+          int diag = sn_dof_index(m,g);
           gsl_matrix_add_to_element(neutron_sn.P, diag, MGj + diag, value);
         }
       }
@@ -205,6 +206,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   if (neutron_sn.has_fission) {
     feenox_call(feenox_blas_PtCB(neutron_sn.P, neutron_sn.X, H_G, neutron_sn.XH, wdet, neutron_sn.Fi));
   }
+  
   // petrov-stabilized source term
   if (neutron_sn.has_sources) {
     feenox_call(feenox_blas_Atb(neutron_sn.P, neutron_sn.s, wdet, neutron_sn.Si));
@@ -215,21 +217,21 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   // for criticallity problems
   //   K = Ki + Ai
   //   M = Xi
-  gsl_matrix_add(neutron_sn.Li, neutron_sn.Ai);
+  feenox_call(gsl_matrix_add(neutron_sn.Li, neutron_sn.Ai));
   if (neutron_sn.has_fission) {
     if (neutron_sn.has_sources) {
-      gsl_matrix_scale(neutron_sn.Fi, -1.0);
-      gsl_matrix_add(neutron_sn.Li, neutron_sn.Fi);
+      feenox_call(gsl_matrix_scale(neutron_sn.Fi, -1.0));
+      feenox_call(gsl_matrix_add(neutron_sn.Li, neutron_sn.Fi));
     } else {
-      gsl_matrix_add(feenox.fem.Mi, neutron_sn.Fi);
+      feenox_call(gsl_matrix_add(feenox.fem.Mi, neutron_sn.Fi));
     }  
   }
 
   if (neutron_sn.has_sources) {
-      gsl_vector_add(feenox.fem.bi, neutron_sn.Si);
+    feenox_call(gsl_vector_add(feenox.fem.bi, neutron_sn.Si));
   }
   
-  gsl_matrix_add(feenox.fem.Ki, neutron_sn.Li);
+  feenox_call(gsl_matrix_add(feenox.fem.Ki, neutron_sn.Li));
 #endif
   
   return FEENOX_OK;

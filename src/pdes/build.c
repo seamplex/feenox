@@ -210,14 +210,22 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   if (feenox.pde.has_rhs) {
     gsl_vector_set_zero(feenox.fem.bi);
   }
+
+  // a single call over the element
+  // if the specific pde wants, it can loop over gauss point in the call
+  // or it can just do some things that are per-element only and then loop below
+  if (feenox.pde.element_build_volumetric) {
+    feenox_call(feenox.pde.element_build_volumetric(this));
+  }
   
-  // loop over gauss points to integrate elemental matrices and vectors
-  // TODO: loop inside the builder
-  int Q = this->type->gauss[feenox.pde.mesh->integration].Q;
-  for (unsigned int q = 0; q < Q; q++) {
-    // this is a virtual method that depends on the problem type
-    // TODO: hardcode the name of the method to allow inlining with LTO
-    feenox_call(feenox.pde.element_build_volumetric_at_gauss(this, q));
+  // or, if there's an entry point for gauss points, then we do the loop here
+  if (feenox.pde.element_build_volumetric_at_gauss != NULL) {
+    int Q = this->type->gauss[feenox.pde.mesh->integration].Q;
+    for (unsigned int q = 0; q < Q; q++) {
+      // this is a virtual method that depends on the problem type
+      // TODO: hardcode the name of the method to allow inlining with LTO
+      feenox_call(feenox.pde.element_build_volumetric_at_gauss(this, q));
+    }
   }
  
   // compute the indices of the DOFs to ensamble
@@ -399,7 +407,7 @@ int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
   
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  feenox_call(feenox_blas_Atb(H_Gc, feenox.fem.vec_f, wdet, feenox.fem.bi));
+  feenox_call(feenox_blas_Atb_accum(H_Gc, feenox.fem.vec_f, wdet, feenox.fem.bi));
 #endif
   
   return FEENOX_OK;

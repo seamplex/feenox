@@ -22,7 +22,7 @@
 #ifndef NEUTRON_SN_H
 #define NEUTRON_SN_H
 
-#define dof_index(m,g) ((m)*neutron_sn.groups + (g))
+#define sn_dof_index(m,g) ((m)*neutron_sn.groups + (g))
 
 typedef struct neutron_sn_t neutron_sn_t;
 
@@ -76,7 +76,7 @@ struct neutron_sn_t {
   // elemental matrices  
   unsigned int n_nodes;
   
-  // Petrov-stabilized H_cG
+  // Petrov-stabilized H_Gc
   gsl_matrix *P;
   
   // Direction matrix
@@ -92,7 +92,7 @@ struct neutron_sn_t {
   gsl_matrix *Li;  // leakage
   gsl_matrix *Ai;  // absorption
   gsl_matrix *Fi;  // fission
-  gsl_vector *Si;
+  gsl_vector *Si;  // sources (vector)
 
   
   int has_sources;

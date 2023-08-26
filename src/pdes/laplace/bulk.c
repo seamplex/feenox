@@ -30,7 +30,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
   gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
   
   // laplace stiffness matrix Ki += wdet * Bt*B
-  feenox_call(feenox_blas_BtB(B, wdet, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtB_accum(B, wdet, feenox.fem.Ki));
 
   // the material is needed for either RHS and/or mass
   material_t *material = feenox_fem_get_material(e);
@@ -51,7 +51,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
     gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     if (laplace.alpha.defined) {
       double alpha = laplace.alpha.eval(&laplace.alpha, x, material);
-      feenox_call(feenox_blas_BtB(H_Gc, wdet*alpha, feenox.fem.Mi));
+      feenox_call(feenox_blas_BtB_accum(H_Gc, wdet*alpha, feenox.fem.Mi));
     } else {
       // this should have been already checked
       feenox_push_error_message("no alpha found neede for Laplace's mass matrix");

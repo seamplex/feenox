@@ -53,13 +53,20 @@ int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int J) {
 }
 
 
+int feenox_problem_build_volumetric_neutron_diffusion(element_t *e) {
 
-int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, unsigned int q) {
-
-#ifdef HAVE_PETSC
+  if (neutron_diffusion.n_nodes != e->type->nodes) {
+    feenox_call(feenox_problem_build_allocate_aux_neutron_diffusion(e->type->nodes));
+  }
   
-  double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, neutron_diffusion.space_XS);
-  material_t *material = feenox_fem_get_material(e);
+  if (neutron_diffusion.space_XS == 0) {
+    feenox_call(feenox_problem_neutron_diffusion_eval_XS(feenox_fem_get_material(e), NULL));
+  }
+  return FEENOX_OK;
+}
+
+
+int feenox_problem_neutron_diffusion_eval_XS(material_t *material, double *x) {
   
   gsl_matrix_set_zero(neutron_diffusion.D_G);
   gsl_matrix_set_zero(neutron_diffusion.R);
@@ -84,43 +91,46 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
     }
     
     // absorption
-    double xi = gsl_matrix_get(neutron_diffusion.R, g, g);
+    double val = gsl_matrix_get(neutron_diffusion.R, g, g);
     if (neutron_diffusion.Sigma_t[g].defined) {
-      xi += neutron_diffusion.Sigma_t[g].eval(&neutron_diffusion.Sigma_t[g], x, material);
+      val += neutron_diffusion.Sigma_t[g].eval(&neutron_diffusion.Sigma_t[g], x, material);
     } else {
-      xi += neutron_diffusion.Sigma_a[g].eval(&neutron_diffusion.Sigma_a[g], x, material);
+      val += neutron_diffusion.Sigma_a[g].eval(&neutron_diffusion.Sigma_a[g], x, material);
       for (int g_prime = 0; g_prime < neutron_diffusion.groups; g_prime++) {
-        xi += neutron_diffusion.Sigma_s[g][g_prime].eval(&neutron_diffusion.Sigma_s[g][g_prime], x, material);
+        val += neutron_diffusion.Sigma_s[g][g_prime].eval(&neutron_diffusion.Sigma_s[g][g_prime], x, material);
       }
     }
-    gsl_matrix_set(neutron_diffusion.R, g, g, xi);
+    gsl_matrix_set(neutron_diffusion.R, g, g, val);
     
     // leaks
     for (int m = 0; m < feenox.pde.dim; m++) {
       if (neutron_diffusion.D[g].defined) {
-        xi = neutron_diffusion.D[g].eval(&neutron_diffusion.D[g], x, material);
+        val = neutron_diffusion.D[g].eval(&neutron_diffusion.D[g], x, material);
       } else if (neutron_diffusion.Sigma_t[g].defined) {
-        xi = 1.0/(3.0*neutron_diffusion.Sigma_t[g].eval(&neutron_diffusion.Sigma_t[g], x, material));
+        val = 1.0/(3.0*neutron_diffusion.Sigma_t[g].eval(&neutron_diffusion.Sigma_t[g], x, material));
       } else {
         feenox_push_error_message("neither D nor Sigma_t given for group %d", g);
         return FEENOX_ERROR;
       }
 
       unsigned int index = m*neutron_diffusion.groups + g;
-      gsl_matrix_set(neutron_diffusion.D_G, index, index, xi);
+      gsl_matrix_set(neutron_diffusion.D_G, index, index, val);
     }
   }
 
-  if (neutron_diffusion.n_nodes != e->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_neutron_diffusion(e->type->nodes));
+  return FEENOX_OK;  
+}
+
+
+int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, unsigned int q) {
+
+#ifdef HAVE_PETSC
+  
+  if (neutron_diffusion.space_XS != 0) {
+    double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+    feenox_call(feenox_problem_neutron_diffusion_eval_XS(feenox_fem_get_material(e), x));
   }
 
-  gsl_matrix_set_zero(neutron_diffusion.Li);
-  gsl_matrix_set_zero(neutron_diffusion.Ai);
-  if (neutron_diffusion.has_fission) {
-    gsl_matrix_set_zero(neutron_diffusion.Fi);
-  }
-  
   // elemental stiffness for the diffusion term B'*D*B
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *B = feenox_fem_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration);
@@ -136,7 +146,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   }
   
   if (neutron_diffusion.has_sources) {
-    feenox_call(feenox_blas_Atb(H, neutron_diffusion.s, wdet, feenox.fem.bi));
+    feenox_call(feenox_blas_Atb_accum(H, neutron_diffusion.s, wdet, feenox.fem.bi));
   }
   
   // for source-driven problems
@@ -144,17 +154,16 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   // for criticallity problems
   //   Ki = Li + Ai
   //   Mi = Xi
-  gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Ai);
+  feenox_call(gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Ai));
   if (neutron_diffusion.has_fission) {
     if (neutron_diffusion.has_sources) {
-      gsl_matrix_scale(neutron_diffusion.Fi, -1.0);
-      gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Fi);
+      feenox_call(gsl_matrix_scale(neutron_diffusion.Fi, -1.0));
+      feenox_call(gsl_matrix_add(neutron_diffusion.Li, neutron_diffusion.Fi));
     } else {
-      gsl_matrix_add(feenox.fem.Mi, neutron_diffusion.Fi);
+      feenox_call(gsl_matrix_add(feenox.fem.Mi, neutron_diffusion.Fi));
     }  
   }
-  gsl_matrix_add(feenox.fem.Ki, neutron_diffusion.Li);
-  
+  feenox_call(gsl_matrix_add(feenox.fem.Ki, neutron_diffusion.Li));
  
 #endif
   

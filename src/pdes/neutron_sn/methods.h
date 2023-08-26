@@ -41,6 +41,8 @@ extern int feenox_problem_setup_eps_neutron_sn(EPS eps);
 
 // neutron_sn/bulk.c
 extern int feenox_problem_build_allocate_aux_neutron_sn(unsigned int n_nodes);
+extern int feenox_problem_neutron_sn_eval_XS(material_t *material, double *x);
+extern int feenox_problem_build_volumetric_neutron_sn(element_t *e);
 extern int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *element, unsigned int q);
 
 // neutron_sn/bc.c

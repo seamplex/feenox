@@ -205,7 +205,7 @@ int feenox_problem_dirichlet_set_K(void) {
       PetscInt *l = feenox.pde.multifreedom_indexes[k];
 
       gsl_matrix_set_zero(P);
-      feenox_call(feenox_blas_BtB_overwrite(c, feenox_var_value(feenox.pde.vars.penalty_weight), P));
+      feenox_call(feenox_blas_BtB(c, feenox_var_value(feenox.pde.vars.penalty_weight), P));
       petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, gsl_matrix_ptr(P, 0, 0), ADD_VALUES));
     }
     gsl_matrix_free(P);

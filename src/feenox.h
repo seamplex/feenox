@@ -1716,10 +1716,11 @@ struct feenox_t {
   #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
   #endif
+    int (*setup_ts)(TS ksp);
 #endif
 
     // build
-    int (*element_build_volumetric)(element_t *e, unsigned int q);
+    int (*element_build_volumetric)(element_t *e);
     int (*element_build_volumetric_at_gauss)(element_t *e, unsigned int q);
     
     // solve
@@ -2373,13 +2374,15 @@ extern PetscInt *feenox_fem_compute_dof_indices(element_t *e, int G);
 }
 
 // blas.c
-extern int feenox_blas_Ab_overwrite(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
-extern int feenox_blas_Atb_overwrite(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
 extern int feenox_blas_Ab(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
 extern int feenox_blas_Atb(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_Ab_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_Atb_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
+extern int feenox_blas_BtB_accum(gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R);
-extern int feenox_blas_BtB_overwrite(gsl_matrix *B, double alpha, gsl_matrix *R);
+extern int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
+extern int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_PtCB(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);
 
 

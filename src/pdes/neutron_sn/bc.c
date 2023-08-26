@@ -70,7 +70,7 @@ int feenox_problem_bc_set_neutron_sn_vacuum(bc_data_t *this, element_t *e, size_
     if (feenox_mesh_dot(neutron_sn.Omega[m], outward_normal) < 0) {
       // if the direction is inward set it to zero
       for (unsigned int g = 0; g < neutron_sn.groups; g++) {
-        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[dof_index(m,g)], 0));
+        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[sn_dof_index(m,g)], 0));
       }
     }
   }
@@ -119,8 +119,8 @@ int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_
       feenox_check_alloc(coefficients = calloc(feenox.pde.dofs, sizeof(double)));
       
       for (unsigned int g = 0; g < neutron_sn.groups; g++) {
-        coefficients[dof_index(m,g)] = -1;
-        coefficients[dof_index(m_prime,g)] = +1;
+        coefficients[sn_dof_index(m,g)] = -1;
+        coefficients[sn_dof_index(m_prime,g)] = +1;
       }
       feenox_call(feenox_problem_multifreedom_add(j_global, coefficients));
       feenox_free(coefficients);
