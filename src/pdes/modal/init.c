@@ -36,6 +36,7 @@ int feenox_problem_parse_time_init_modal(void) {
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_modal;
   feenox.pde.setup_pc = feenox_problem_setup_pc_modal;
   
+  feenox.pde.element_build_allocate_aux = feenox_problem_build_allocate_aux_modal;
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_modal;
   
   feenox.pde.solve_post = feenox_problem_solve_post_modal;

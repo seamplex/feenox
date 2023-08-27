@@ -42,6 +42,7 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_neutron_sn;
   feenox.pde.setup_pc = feenox_problem_setup_pc_neutron_sn;
   
+  feenox.pde.element_build_allocate_aux = feenox_problem_build_allocate_aux_neutron_sn;
   feenox.pde.element_build_volumetric = feenox_problem_build_volumetric_neutron_sn;
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_neutron_sn;
   
@@ -354,11 +355,6 @@ int feenox_problem_init_runtime_neutron_sn(void) {
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
 
-  // set the size of the eigenvectors (we did not know their size in init_parser() above
-  for (PetscInt i = 0; i < feenox.pde.nev; i++) {
-    feenox_call(feenox_vector_set_size(feenox.pde.vectors.phi[i], feenox.pde.size_global));
-  }
-  
   // initialize XSs
   // TODO: allow not to give the group number in one-group problems
   unsigned int G = neutron_sn.groups;
@@ -420,7 +416,6 @@ int feenox_problem_init_runtime_neutron_sn(void) {
       
     }
   }
-
 
   if (neutron_sn.has_sources == 0 && neutron_sn.has_fission == 0) {
     feenox_push_error_message("neither fission nor sources found");

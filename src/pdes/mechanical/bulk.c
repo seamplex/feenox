@@ -45,10 +45,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   
 #ifdef HAVE_PETSC
   
-  if (mechanical.n_nodes != e->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_mechanical(e->type->nodes));
-  }
-  
   double *x = NULL;
   if (mechanical.uniform_C == 0) {
     // material stress-strain relationship

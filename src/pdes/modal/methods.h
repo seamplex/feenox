@@ -38,6 +38,7 @@ extern int feenox_problem_setup_eps_modal(EPS eps);
 #endif
 
 // modal/bulk.c
+extern int feenox_problem_build_allocate_aux_modal(unsigned int J);
 extern int feenox_problem_build_volumetric_gauss_point_modal(element_t *element, unsigned int q);
 
 // modal/bc.c

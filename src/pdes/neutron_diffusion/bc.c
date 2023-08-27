@@ -59,8 +59,7 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
 int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *this, element_t *e, size_t j_global) {
 
 #ifdef HAVE_PETSC
-  unsigned int g = 0;
-  for (g = 0; g < feenox.pde.dofs; g++) {
+  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
     feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[g], 0));
   }
 #endif

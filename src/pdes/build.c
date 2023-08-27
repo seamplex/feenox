@@ -124,7 +124,6 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
 
 #ifdef HAVE_PETSC
   
-//  feenox_call(feenox_fem_elemental_caches_reset());
   feenox_call(feenox_problem_build_elemental_objects_free());
       
   feenox.fem.current_elemental_type = this->type;
@@ -150,6 +149,10 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
     if (feenox.fem.vec_f == NULL) {
       feenox_check_alloc(feenox.fem.vec_f = gsl_vector_calloc(feenox.pde.dofs));
     }
+  }
+
+  if (feenox.pde.element_build_allocate_aux != NULL) {
+    feenox.pde.element_build_allocate_aux(this->type->nodes);
   }
   
 #endif  
@@ -222,7 +225,6 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   if (feenox.pde.element_build_volumetric_at_gauss != NULL) {
     int Q = this->type->gauss[feenox.pde.mesh->integration].Q;
     for (unsigned int q = 0; q < Q; q++) {
-      // this is a virtual method that depends on the problem type
       // TODO: hardcode the name of the method to allow inlining with LTO
       feenox_call(feenox.pde.element_build_volumetric_at_gauss(this, q));
     }

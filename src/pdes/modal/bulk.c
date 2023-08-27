@@ -43,10 +43,6 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
 
 #ifdef HAVE_PETSC
   
-  if (modal.n_nodes != e->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_modal(e->type->nodes));
-  }
-  
   if (modal.uniform_C == 0) {
     // material stress-strain relationship
     double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);

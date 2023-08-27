@@ -90,7 +90,6 @@ int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_
   
   // TODO: mark the BC as dependent on the normal and compute it in the caller
   feenox_call(feenox_mesh_compute_outward_normal(e, outward_normal));
-//  printf("element %lu node %lu outward normal %.3f %.3f %.3f\n", e->tag, j_global, outward_normal[0], outward_normal[1], outward_normal[2]);
   for (unsigned m = 0; m < neutron_sn.directions; m++) {
     if ((Omega_dot_outward = feenox_mesh_dot(neutron_sn.Omega[m], outward_normal)) < 0) {
       // if the direction is inward then we have to reflect it
@@ -101,8 +100,7 @@ int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_
         reflected[d] = neutron_sn.Omega[m][d] - 2*Omega_dot_outward * outward_normal[d];
       }
 
-      unsigned int m_prime = 0;
-      for (m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
+      for (unsigned int m_prime m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
         if (fabs(reflected[0] - neutron_sn.Omega[m_prime][0]) < eps &&
             fabs(reflected[1] - neutron_sn.Omega[m_prime][1]) < eps &&
             fabs(reflected[2] - neutron_sn.Omega[m_prime][2]) < eps) {

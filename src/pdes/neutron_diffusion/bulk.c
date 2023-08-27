@@ -54,11 +54,6 @@ int feenox_problem_build_allocate_aux_neutron_diffusion(unsigned int J) {
 
 
 int feenox_problem_build_volumetric_neutron_diffusion(element_t *e) {
-
-  if (neutron_diffusion.n_nodes != e->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_neutron_diffusion(e->type->nodes));
-  }
-  
   if (neutron_diffusion.space_XS == 0) {
     feenox_call(feenox_problem_neutron_diffusion_eval_XS(feenox_fem_get_material(e), NULL));
   }

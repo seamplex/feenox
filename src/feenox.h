@@ -1720,6 +1720,7 @@ struct feenox_t {
 #endif
 
     // build
+    int (*element_build_allocate_aux)(unsigned int J);
     int (*element_build_volumetric)(element_t *e);
     int (*element_build_volumetric_at_gauss)(element_t *e, unsigned int q);
     
@@ -1911,7 +1912,6 @@ struct feenox_t {
 
     // TODO: this is not thread safe! we stick to MPI anyway...
     size_t current_gauss_element_tag;
-//    unsigned int current_gauss_number_of_points;
     element_type_t *current_gauss_type;
 
     unsigned int current_GJ;

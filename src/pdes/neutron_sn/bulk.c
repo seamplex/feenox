@@ -72,11 +72,6 @@ int feenox_problem_build_allocate_aux_neutron_sn(unsigned int J) {
 
 int feenox_problem_build_volumetric_neutron_sn(element_t *e) {
 
-  // TODO: check this in the general framework and call the specific allocator
-  if (neutron_sn.n_nodes != e->type->nodes) {
-    feenox_call(feenox_problem_build_allocate_aux_neutron_sn(e->type->nodes));
-  }
-  
   if (neutron_sn.space_XS == 0) {
     feenox_call(feenox_problem_neutron_sn_eval_XS(feenox_fem_get_material(e), NULL));
   }
