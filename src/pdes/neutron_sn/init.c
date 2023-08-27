@@ -353,7 +353,6 @@ int feenox_problem_init_runtime_neutron_sn(void) {
 #ifdef HAVE_PETSC  
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // set the size of the eigenvectors (we did not know their size in init_parser() above
   for (PetscInt i = 0; i < feenox.pde.nev; i++) {

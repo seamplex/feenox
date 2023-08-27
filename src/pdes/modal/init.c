@@ -198,13 +198,6 @@ int feenox_problem_init_runtime_modal(void) {
 #ifdef HAVE_PETSC  
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
-
-  // set the size of the eigenvectors (we did not know their size in init_parser() above
-  unsigned int i = 0;
-  for (i = 0; i < feenox.pde.nev; i++) {
-    feenox_call(feenox_vector_set_size(feenox.pde.vectors.phi[i], feenox.pde.size_global));
-  }
   
   // initialize distributions
   feenox_distribution_define_mandatory(modal, rho, "rho", "density");

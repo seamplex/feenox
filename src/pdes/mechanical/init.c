@@ -186,7 +186,6 @@ int feenox_problem_init_runtime_mechanical(void) {
 #ifdef HAVE_PETSC 
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
 
   // initialize distributions
   

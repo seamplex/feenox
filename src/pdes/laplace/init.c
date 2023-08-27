@@ -56,9 +56,7 @@ int feenox_problem_init_runtime_laplace(void) {
 
   // we are FEM not FVM
   feenox.pde.mesh->data_type = data_type_node;
-  
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   
   // check if we were given an initial guess
   if ((feenox.pde.initial_guess = feenox_get_function_ptr("phi_guess")) != NULL) {

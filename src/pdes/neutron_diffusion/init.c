@@ -79,13 +79,6 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   feenox.mesh.default_field_location = field_location_nodes;
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
-  feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
-
-  // set the size of the eigenvectors (we did not know their size in init_parser() above
-  unsigned int i = 0;
-  for (i = 0; i < feenox.pde.nev; i++) {
-    feenox_call(feenox_vector_set_size(feenox.pde.vectors.phi[i], feenox.pde.size_global));
-  }
   
   // initialize XSs
   int G = neutron_diffusion.groups;  
@@ -173,11 +166,11 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   }
   
   // allocate elemental XS matrices
-  feenox_check_alloc(neutron_diffusion.D_G      = gsl_matrix_calloc(G * feenox.pde.dim, G * feenox.pde.dim));
+  feenox_check_alloc(neutron_diffusion.D_G = gsl_matrix_calloc(G * feenox.pde.dim, G * feenox.pde.dim));
   feenox_check_alloc(neutron_diffusion.R   = gsl_matrix_calloc(G, G));
-  feenox_check_alloc(neutron_diffusion.X = gsl_matrix_calloc(G, G));
-  feenox_check_alloc(neutron_diffusion.s       = gsl_vector_calloc(G));  
-  feenox_check_alloc(neutron_diffusion.chi       = calloc(G, sizeof(double)));
+  feenox_check_alloc(neutron_diffusion.X   = gsl_matrix_calloc(G, G));
+  feenox_check_alloc(neutron_diffusion.s   = gsl_vector_calloc(G));
+  feenox_check_alloc(neutron_diffusion.chi = calloc(G, sizeof(double)));
   // TODO: read a vector called "chi"
   neutron_diffusion.chi[0] = 1;
   

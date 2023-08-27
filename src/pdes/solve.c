@@ -41,6 +41,8 @@ int feenox_instruction_solve_problem(void *arg) {
       return FEENOX_ERROR;
     }
     feenox_call(feenox_problem_init_runtime_general());
+
+
   }
 
   if (feenox_var_value(feenox_special_var(in_static)) && feenox.pde.initial_guess != NULL) {

@@ -486,9 +486,18 @@ int feenox_problem_init_runtime_general(void) {
 
   // allocate global petsc objects
   if (feenox.pde.size_global == 0) {
-    feenox_push_error_message("internal error, problem init did not set global size");
-    return FEENOX_ERROR;
+    if (feenox.pde.spatial_unknowns == 0) {
+      feenox_push_error_message("internal error, problem init did not set global spatial unknowns");
+      return FEENOX_ERROR;
+    }
+    feenox.pde.size_global = feenox.pde.spatial_unknowns * feenox.pde.dofs;
   }
+
+  // set the size of the eigenvectors (we did not know their size in init_parser() above
+  for (int i = 0; i < feenox.pde.nev; i++) {
+    feenox_call(feenox_vector_set_size(feenox.pde.vectors.phi[i], feenox.pde.size_global));
+  }
+
   
   
   feenox_var_value(feenox.pde.vars.total_dofs) = (double)(feenox.pde.size_global);
