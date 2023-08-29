@@ -1,0 +1,31 @@
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 4
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2
+
+READ_MESH $0-$1.msh
+
+MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
+MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
+BC vacuum   vacuum
+
+sn_alpha = 0.5
+SOLVE_PROBLEM
+
+theta = $1*pi/180
+x'(d,x) = d*cos(theta) - x*sin(theta)
+y'(d,x) = d*sin(theta) + x*cos(theta)
+
+profile5(x) = phi1(x'(5.84375,x), y'(5.84375,x))
+profile7(x) = phi1(x'(7.84375,x), y'(7.84375,x))
+profile9(x) = phi1(x'(8.84375,x), y'(9.84375,x))
+
+# p51(x) = psi1.1(x'(x), y'(x))
+# p52(x) = psi2.1(x,5.84375)
+# p53(x) = psi3.1(x,5.84375)
+# p54(x) = psi4.1(x,5.84375)
+
+OUTPUT_FILE out PATH $0-$1-$2.dat
+PRINT_FUNCTION profile5 MIN -10 MAX 10 NSTEPS 400 FILE out
+
+WRITE_RESULTS FORMAT vtk
+PRINT %g total_dofs "unknowns for S" $2 ", memory needed =" %.1f memory() "Gb" SEP " "
