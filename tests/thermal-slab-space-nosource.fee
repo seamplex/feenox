@@ -1,5 +1,5 @@
 PROBLEM thermal DIMENSIONS 1
-READ_MESH slab.msh
+READ_MESH slab2.msh
 
 BC left  T=0
 BC right T=1

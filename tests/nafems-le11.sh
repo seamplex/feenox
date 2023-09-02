@@ -59,3 +59,8 @@ exitifwrong $?
 
 answer nafems-le11-alpha-of-T.fee "-104.8"
 exitifwrong $?
+
+checkhypre
+${feenox} ${dir}/nafems-le11.fee hex20 --ksp_view --pc_type=hypre | grep BoomerAMG > /dev/null
+exitifwrong $?
+
