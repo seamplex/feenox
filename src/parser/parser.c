@@ -1422,12 +1422,12 @@ int feenox_parse_sort_vector(void) {
 }
 
 
-int feenox_parse_file(char *mode) {
+int feenox_parse_file(char *default_mode) {
  
   char *token = NULL;
   char *name = NULL;
   char *format = NULL;
-  char *custom_mode = NULL;
+  char *mode = NULL;
   char **arg = NULL;
   int n_args = 0;
 
@@ -1462,13 +1462,15 @@ int feenox_parse_file(char *mode) {
 ///kw+FILE+detail If not explicitly given, the nature of the file will be taken from context, i.e. `FILE`s in `PRINT`
 ///kw+FILE+detail will be `OUTPUT`  and `FILE`s in `FUNCTION` will be `INPUT`.
    
-///kw+FILE+usage [ INPUT | OUTPUT | MODE <fopen_mode> ]
+///kw+FILE+usage [ INPUT | OUTPUT | APPEND | MODE <fopen_mode> ]
     } else if (strcasecmp(token, "MODE") == 0) {
-      feenox_call(feenox_parser_string(&custom_mode));
+      feenox_call(feenox_parser_string(&mode));
     } else if (strcasecmp(token, "INPUT") == 0) {
-      feenox_check_alloc(custom_mode = strdup("r"));
+      feenox_check_alloc(mode = strdup("r"));
     } else if (strcasecmp(token, "OUTPUT") == 0) {
-      feenox_check_alloc(custom_mode = strdup("w"));
+      feenox_check_alloc(mode = strdup("w"));
+    } else if (strcasecmp(token, "APPEND") == 0) {
+      feenox_check_alloc(mode = strdup("a"));
 
 ///kw+FILE+detail This keyword justs defines the `FILE`, it does not open it.
 ///kw+FILE+detail The file will be actually openened (and eventually closed) automatically.
@@ -1480,9 +1482,9 @@ int feenox_parse_file(char *mode) {
     }
   }
 
-  // the custom mode takes precedende over the argument's mode
-  if (custom_mode == NULL) {
-    custom_mode = mode;
+  // the custom mode takes precedence over the argument's mode
+  if (mode == NULL) {
+    mode = default_mode;
   }
 
   feenox_call(feenox_define_file(name, format, n_args, mode));
@@ -1492,8 +1494,8 @@ int feenox_parse_file(char *mode) {
   }
 
   feenox_free(format);
-  if (custom_mode != mode) {
-    feenox_free(custom_mode);
+  if (mode != default_mode) {
+    feenox_free(mode);
   }  
   feenox_free(name);
   

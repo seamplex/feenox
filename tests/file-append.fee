@@ -1,0 +1,2 @@
+FILE two APPEND PATH two-is-2.txt
+PRINT 3 FILE two

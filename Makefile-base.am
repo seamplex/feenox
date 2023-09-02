@@ -33,6 +33,7 @@ TESTS = \
         tests/iaea-pwr.sh \
         tests/iterative.sh \
         tests/fit.sh \
+        tests/file.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \
         tests/function_file.sh \
