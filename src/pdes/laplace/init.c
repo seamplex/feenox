@@ -44,7 +44,6 @@ int feenox_problem_parse_time_init_laplace(void) {
 ///re_laplace+phi+description The scalar field\ $\phi(\vec{x})$ whose Laplacian is equal to zero or to\ $f(\vec{x})$.
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));    
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("phi"));
-  feenox_call(feenox_problem_define_solutions());
 
 #endif
   return FEENOX_OK;

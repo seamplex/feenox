@@ -52,7 +52,6 @@ int feenox_problem_parse_time_init_thermal(void) {
 ///re_thermal+T+description The temperature field\ $T(\vec{x})$. This is the primary unknown of the problem.  
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("T"));
-  feenox_call(feenox_problem_define_solutions());
     
   // heat fluxes
 ///re_thermal+qx+description The heat flux field\ $q_x(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial x}$ in the\ $x$ direction. This is a secondary unknown of the problem.  

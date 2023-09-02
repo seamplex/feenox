@@ -3147,7 +3147,9 @@ int feenox_parse_problem(void) {
   
   feenox_call(feenox_problem_parse_time_init());
   feenox_call(feenox.pde.parse_problem(NULL));
-  
+  if (feenox.pde.solution == NULL) {
+    feenox_call(feenox_problem_define_solutions());
+  }  
 #endif  
       
   return FEENOX_OK;

@@ -60,7 +60,6 @@ int feenox_problem_parse_time_init_neutron_diffusion(void) {
   for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
     feenox_check_minusone(asprintf(&feenox.pde.unknown_name[g], "phi%u", g+1));
   }
-  feenox_call(feenox_problem_define_solutions());
   
   // TODO: for one group make an alias between phi1 and phi
   

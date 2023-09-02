@@ -263,6 +263,10 @@ int feenox_problem_define_solutions(void) {
     return FEENOX_ERROR;
   }
   
+  if (feenox.pde.solution != NULL) {
+    feenox_push_error_message("solutions already defined");
+    return FEENOX_ERROR;
+  }
   feenox_check_alloc(feenox.pde.solution = calloc(feenox.pde.dofs, sizeof(function_t *)));
   feenox_check_alloc(feenox.pde.gradient = calloc(feenox.pde.dofs, sizeof(function_t *)));
   feenox_check_alloc(feenox.pde.delta_gradient = calloc(feenox.pde.dofs, sizeof(function_t *)));
@@ -340,11 +344,15 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   // we can only define what's available at parse time
   if ((*function = feenox_define_function_get_ptr(name, feenox.pde.dim)) == NULL) {
     feenox_push_error_message("result function '%s' defined twice", name);
-    return FEENOX_OK;
+    return FEENOX_ERROR;
   }
   // we don't have a valid mesh here, do we?
 //  (*function)->mesh = feenox.pde.mesh; // esto puede cambiar a rough despues  
 //  feenox_problem_define_solution_clean_nodal_arguments(*function);
+  if (feenox.pde.solution == NULL) {
+    feenox_call(feenox_problem_define_solutions());
+  }
+  
   (*function)->var_argument = feenox.pde.solution[0]->var_argument;
   (*function)->type = (feenox.mesh.default_field_location == field_location_cells) ? function_type_pointwise_mesh_cell : function_type_pointwise_mesh_node;
   (*function)->is_gradient = is_gradient;

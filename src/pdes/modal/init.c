@@ -100,8 +100,6 @@ int feenox_problem_parse_time_init_modal(void) {
     }  
   }
   
-  feenox_call(feenox_problem_define_solutions());
-
   // if there are no explicit number of eigenvalues we set a non-zero value here
   if (feenox.pde.nev == 0) {
     feenox.pde.nev = DEFAULT_MODAL_MODES;

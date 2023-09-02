@@ -87,12 +87,11 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   // the angular fluxes psi
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   // TODO: document from comments
-  for (int n = 0; n < neutron_sn.directions; n++) {
-    for (int g = 0; g < neutron_sn.groups; g++) {
-      feenox_check_minusone(asprintf(&feenox.pde.unknown_name[n * neutron_sn.groups + g], "psi%d.%d", n+1, g+1));
+  for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+    for (unsigned int g = 0; g < neutron_sn.groups; g++) {
+      feenox_check_minusone(asprintf(&feenox.pde.unknown_name[m * neutron_sn.groups + g], "psi%d.%d", m+1, g+1));
     }
   }
-  feenox_call(feenox_problem_define_solutions());
 
   // the scalar fluxes psi
   // TODO: document

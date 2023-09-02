@@ -105,8 +105,6 @@ int feenox_problem_parse_time_init_mechanical(void) {
     }  
   }
   
-  feenox_call(feenox_problem_define_solutions());
-
   // ------- elasticity-related outputs -----------------------------------  
   // TODO: document
   feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, FEENOX_SOLUTION_GRADIENT));
