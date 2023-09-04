@@ -75,12 +75,13 @@ int feenox_problem_build_volumetric_neutron_sn(element_t *e) {
   if (neutron_sn.space_XS == 0) {
     feenox_call(feenox_problem_neutron_sn_eval_XS(feenox_fem_get_material(e), NULL));
   }
+
   return FEENOX_OK;
 }
 
 int feenox_problem_neutron_sn_eval_XS(material_t *material, double *x) {
   
-    // initialize to zero
+  // initialize to zero
   gsl_matrix_set_zero(neutron_sn.R);
   if (neutron_sn.has_fission) {
     gsl_matrix_set_zero(neutron_sn.X);

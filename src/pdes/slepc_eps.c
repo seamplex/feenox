@@ -25,26 +25,24 @@ int feenox_problem_solve_slepc_eigen(void) {
 
 #ifdef HAVE_SLEPC
 
+  // build ---------------------------------------------------------------------
+  petsc_call(PetscLogStagePush(feenox.pde.stage_build));  
+
   // we need the matrices to set the operators
   feenox_call(feenox_problem_build());
   feenox_call(feenox_problem_dirichlet_eval());
   feenox_call(feenox_problem_dirichlet_set_K());  
   feenox_call(feenox_problem_dirichlet_set_M());
+  
+  petsc_call(PetscLogStagePop());
+  // ---------------------------------------------------------------------------
+  
   if (feenox.pde.missed_dump != NULL) {
     feenox_call(feenox_instruction_dump(feenox.pde.missed_dump));
   }
 
-  // TODO: to help debug stuff, allow to execute DUMPs after building but before crashing  
-/*  
-  dump_t *dump = calloc(1, sizeof(dump));
-  dump->K = 1;
-  dump->K_bc = 1;
-  dump->M = 1;
-  dump->M_bc = 1;
-  dump->format = dump_format_octave;
-  feenox_instruction_dump(dump);
-*/
-  
+  // solve ---------------------------------------------------------------------
+  petsc_call(PetscLogStagePush(feenox.pde.stage_solve));    
   if (feenox.pde.eps == NULL) {
     petsc_call(EPSCreate(PETSC_COMM_WORLD, &feenox.pde.eps));
     if (feenox.pde.eps_type != NULL) {
@@ -135,9 +133,9 @@ int feenox_problem_solve_slepc_eigen(void) {
       feenox_push_error_message("the eigenvalue %d is complex (%g + i %g)", i+1, feenox.pde.eigenvalue[i], imag);
       return FEENOX_ERROR;
     }
-
   }
-  
+  petsc_call(PetscLogStagePop());
+  // ---------------------------------------------------------------------------
 #endif
   
   return FEENOX_OK;

@@ -281,6 +281,7 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
     
     // from the weights array now assign one weight to each direction
     feenox_call(feenox_problem_neutron_sn_init_triangles(weights_array));
+    feenox_free(weights_array);
     
     // print the nice SN triangle
 /*    
@@ -664,6 +665,7 @@ int feenox_problem_neutron_sn_init_triangles(double *weights_array) {
     }
     feenox_free(tmp[p]);
   }
+  feenox_free(tmp);
   feenox_free(weight_map);
   
   return FEENOX_OK;

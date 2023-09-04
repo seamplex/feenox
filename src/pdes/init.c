@@ -82,6 +82,7 @@ int feenox_problem_parse_time_init(void) {
   // initialize PETSc
   petsc_call(PetscInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULLPTR));
 #endif
+  feenox_free(petsc_argv);
 
   // check the headers correspond to the runtime
   petsc_call(PetscGetVersionNumber(&major, &minor, &subminor, NULL));
