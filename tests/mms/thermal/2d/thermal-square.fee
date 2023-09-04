@@ -1,24 +1,22 @@
+# MMS data, set T_mms(x) and k_mms(x) as desired
+T_mms(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
+k_mms(x,y) = 1 + x - 0.5*y
+
+READ_MESH square-$2-$3-$4.msh DIMENSIONS 2
+PROBLEM thermal
+
 DEFAULT_ARGUMENT_VALUE 1 dirichlet # BCs = dirichlet/neumann
 DEFAULT_ARGUMENT_VALUE 2 tri3      # shape = tri3/tri6/quad4/quad8/quad9
 DEFAULT_ARGUMENT_VALUE 3 struct    # algorithm = struct/frontal/delaunay
 DEFAULT_ARGUMENT_VALUE 4 8         # refinement factor = 1/2/3/4...
 DEFAULT_ARGUMENT_VALUE 5 0         # write vtk? = 0/1
 
-
-READ_MESH square-$2-$3-$4.msh DIMENSIONS 2
-
-PROBLEM thermal PC mumps
-
-# MMS data, set T_mms(x) and k_mms(x) as desired
-T_mms(x,y) := 1 + sin(2*x)^2 * cos(3*y)^2
-k_mms(x,y) := 1
-
 # read the results of the symbolic derivatives
 INCLUDE thermal-square-q.fee
 
 # set the PDE coefficients and BCs we just read above
-k(x,y) := k_mms(x,y)
-q(x,y) := q_mms(x,y)
+k(x,y) = k_mms(x,y)
+q(x,y) = q_mms(x,y)
 
 # set the BCs (depending on $1)
 INCLUDE thermal-square-bc-$1.fee
@@ -26,20 +24,18 @@ INCLUDE thermal-square-bc-$1.fee
 SOLVE_PROBLEM   # this line should be self-explanatory 
 
 # output
+PHYSICAL_GROUP bulk DIM 2 
+h = sqrt(bulk_area/cells)
+
+# L-2 error
+INTEGRATE (T(x,y)-T_mms(x,y))^2 RESULT e_2
+error_2 = sqrt(e_2)
+
+# L-inf error
+FIND_EXTREMA abs(T(x,y)-T_mms(x,y)) MAX error_inf
+
+PRINT %.6f log(h) log(error_inf) log(error_2) %g $4 cells nodes %.2f 1024*memory() wall_time()
+
 IF $5
-
-  WRITE_MESH thermal-square_$1-$2-$3-$4.vtk T T_mms
-
-ELSE
-
-  INTEGRATE 1 RESULT area
-  h = sqrt(area/cells)
-
-  INTEGRATE (T(x,y)-T_mms(x,y))^2 RESULT e_2
-  error_2 = sqrt(e_2)
-
-  FIND_EXTREMA abs(T(x,y)-T_mms(x,y)) MAX error_inf
-
-  PRINT %e h error_inf error_2 log(h) log(error_inf) log(error_2) %g $4 cells nodes %.3f memory() %.2f wall_time()
-
+  WRITE_MESH thermal-square_$1-$2-$3-$4.vtk T T_mms T(x,y)-T_mms(x,y)
 ENDIF

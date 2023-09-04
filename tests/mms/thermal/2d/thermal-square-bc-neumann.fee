@@ -1,6 +1,6 @@
 BC left   T=T_mms(x,y)
 BC top    T=T_mms(x,y)
 
-BC bottom q=-qy_mms(x,y)
-BC right  q=+qx_mms(x,y)
+BC bottom q=+qy_mms(x,y)
+BC right  q=-qx_mms(x,y)
 
