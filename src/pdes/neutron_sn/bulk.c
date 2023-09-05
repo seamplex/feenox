@@ -170,6 +170,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
     feenox_call(feenox_problem_neutron_sn_eval_XS(feenox_fem_get_material(e), x));
   }
   
+//  printf("build %ld %d\n", e->tag, q);
   // petrov stabilization matrix
   int MG = neutron_sn.directions * neutron_sn.groups;
   double tau = feenox_var_value(neutron_sn.sn_alpha) * e->type->size(e);

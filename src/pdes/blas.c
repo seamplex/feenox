@@ -48,12 +48,14 @@ int feenox_blas_Atb_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector
 
 // R += alpha * B'*B
 int feenox_blas_BtB_accum(gsl_matrix *B, double alpha, gsl_matrix *R) {
+//  printf("dgemm BtB accum\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, B, 1.0, R));
   return FEENOX_OK;
 }
 
 // R = alpha * B'*B
 int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R) {
+//  printf("dgemm BtB\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, B, 0.0, R));
   return FEENOX_OK;
 }
@@ -67,7 +69,9 @@ int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double 
     alloc = 1;
   }
   
+//  printf("dgemm C B accum\n");
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0.0, CB));
+//  printf("dgemm B CB accum\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, CB, 1.0, R));
   
   if (alloc) {
@@ -85,7 +89,9 @@ int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha,
     alloc = 1;
   }
   
+//  printf("dgemm C B\n");
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0.0, CB));
+//  printf("dgemm B CB\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, CB, 0.0, R));
   
   if (alloc) {
@@ -104,7 +110,9 @@ int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matr
     alloc = 1;
   }
 
+//  printf("dgemm CB accum\n");
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0.0, CB));
+//  printf("dgemm P CB accum\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, P, CB, 1.0, R));
   
   if (alloc) {
@@ -122,7 +130,9 @@ int feenox_blas_PtCB(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB
     alloc = 1;
   }
 
+//  printf("dgemm C B\n");
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, C, B, 0.0, CB));
+//  printf("dgemm P CB\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, P, CB, 0.0, R));
   
   if (alloc) {

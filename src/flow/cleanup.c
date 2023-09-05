@@ -590,7 +590,6 @@ void feenox_finalize(void) {
   MatDestroy(&feenox.pde.M_bc);
   MatDestroy(&feenox.pde.K);
   MatDestroy(&feenox.pde.K_bc);
-  VecDestroy(&feenox.pde.K);
   VecDestroy(&feenox.pde.phi);
   
 #ifdef HAVE_PETSC

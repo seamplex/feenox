@@ -218,6 +218,7 @@ gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi) {
   
   gsl_matrix *B_c = feenox_fem_compute_B_c(e, xi);
   gsl_matrix *B = gsl_matrix_calloc(e->type->dim, e->type->nodes);
+//  printf("dgemm invJ B_c at xi\n");
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, B_c, 0.0, B);
   
   
@@ -285,6 +286,7 @@ inline gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi) {
   gsl_matrix *J = gsl_matrix_calloc(e->type->dim, e->type->dim);
   gsl_matrix *B_c = feenox_fem_compute_B_c(e, xi);
   gsl_matrix *C = feenox_fem_compute_C(e);
+//  printf("dgemm B_c C\n");
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, B_c, C, 0.0, J);
   gsl_matrix_free(B_c);
   
@@ -483,6 +485,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
     J = gsl_matrix_calloc(e->type->dim, e->type->dim);
   }
 
+//  printf("dgemm C B_c\n");
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C, e->type->gauss[integration].B_c[q], 0.0, J);
   
   return J;
@@ -622,6 +625,7 @@ inline gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, i
   }
   
   gsl_matrix *invJ = feenox_fem_compute_invJ_at_gauss(e, q, feenox.pde.mesh->integration);
+//  printf("dgemm invJ B_c\n");
   gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, invJ, e->type->gauss[integration].B_c[q], 0.0, (*B)[q]);  
   return (*B)[q];
 }  

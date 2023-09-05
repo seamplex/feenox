@@ -38,14 +38,22 @@ int feenox_problem_solve_post_neutron_sn(void) {
     // normalization without power
     double num = 0;
     double den = 0;
-    unsigned int g = 0;
-    size_t i = 0;
-    for (i = 0; i < feenox.pde.mesh->n_elements; i++) {
+    int integration = feenox.pde.mesh->integration;
+    for (size_t i = 0; i < feenox.pde.mesh->n_elements; i++) {
       element_t *element = &feenox.pde.mesh->element[i]; 
       if (element->type != NULL && element->type->dim == feenox.pde.dim) {
         num += element->type->volume(element);
-        for (g = 0; g < feenox.pde.dofs; g++) {
-          den += feenox_mesh_integral_over_element(element, feenox.pde.mesh, feenox.pde.solution[g]);
+
+        // for now I'd rather perform the computation myself instead of 
+        // calling feenox_mesh_integral_over_element() because that wastes a lot of fem calls
+        for (unsigned int q = 0; q < element->type->gauss[integration].Q; q++) {
+          double wdet = feenox_fem_compute_w_det_at_gauss(element, q, integration);
+          for (unsigned int j = 0; j < element->type->nodes; j++) {
+            double h = gsl_matrix_get(element->type->gauss[integration].H_c[q], 0, j);
+            for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+              den += wdet * h * feenox_vector_get(feenox.pde.solution[g]->vector_value, element->node[j]->index_mesh);
+            }
+          }
         }
       }
     }  
@@ -54,7 +62,7 @@ int feenox_problem_solve_post_neutron_sn(void) {
   
     // normalize the fluxes
     for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
-      for (g = 0; g < feenox.pde.dofs; g++) {
+      for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
         double xi = feenox_vector_get(feenox.pde.solution[g]->vector_value, j);
         feenox_vector_set(feenox.pde.solution[g]->vector_value, j, factor*xi);
       }

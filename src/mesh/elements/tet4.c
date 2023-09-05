@@ -220,7 +220,7 @@ Tetrahedron:
 int feenox_mesh_gauss_init_tet1(element_type_t *element_type, gauss_t *gauss) {
  
   // ---- one Gauss point ----  
-  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 4));
+  feenox_call(feenox_mesh_alloc_gauss(gauss, element_type, 1));
     
   gauss->w[0] = 1.0/6.0 * 1.0;
   gauss->xi[0][0] = 1.0/4.0;
