@@ -1916,7 +1916,13 @@ struct feenox_t {
 
     unsigned int current_GJ;
     element_type_t *current_elemental_type;
-
+    element_type_t *current_jacobian_type;
+    
+    size_t current_weight_element_tag;
+    size_t current_jacobian_element_tag;
+    unsigned int current_weight_gauss_point;
+    unsigned int current_jacobian_gauss_point;
+    
     double *w;
     double **x;
     gsl_matrix *C;
