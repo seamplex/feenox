@@ -328,7 +328,7 @@ inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, in
   if ((*w) == NULL) {
     (*w) = calloc(e->type->gauss[integration].Q, sizeof(double));
     feenox.fem.current_gauss_type = e->type;
-  } else if (((feenox.fem.current_gauss_element_tag == e->tag && feenox.fem.current_jacobian_gauss_point == q) || feenox.fem.cache_J) && (*w)[q] != 0) {
+  } else if (((feenox.fem.current_weight_element_tag == e->tag && feenox.fem.current_weight_gauss_point == q) || feenox.fem.cache_J) && (*w)[q] != 0) {
     return (*w)[q];
   }
   
