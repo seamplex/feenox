@@ -21,12 +21,12 @@ Physical Surface("src", 1) = {1};
 Physical Surface("abs", 2) = {4, 2, 3, 5, 6, 7, 8, 9};
 Physical Curve("vacuum", 49) = {28, 31, 34, 32, 40, 47, 48, 43, 45, 46, 37, 27};
 
-n = 2;
+n = 2/Mesh.MeshSizeFactor;
 Transfinite Curve {31, 30, 39, 43, 37, 35, 38, 40} = 1+n*20;
 Transfinite Curve {28, 26, 36, 45, 34, 33, 41, 48, 27, 25, 29, 32, 46, 44, 42, 47} = 1+n*10;
 Transfinite Surface "*";
 Mesh.RecombineAll = 1;
-Mesh.ElementOrder = 2;
+Mesh.ElementOrder = 1;
 Mesh.SecondOrderIncomplete = 0;
 
 // c = Sqrt(5.84375*5.84375/2);
