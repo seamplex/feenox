@@ -58,14 +58,18 @@ int feenox_problem_parse_write_post_modal(mesh_write_t *mesh_write, const char *
     for (unsigned int i = 0; i < feenox.pde.nev; i++) {
       for (unsigned int g = 0; g < 3; g++) {
         if (g < feenox.pde.dofs) {
-          asprintf(&tokens[g], "%s%d", feenox.pde.unknown_name[g], i+1);
+          if (asprintf(&tokens[g], "%s%d", feenox.pde.unknown_name[g], i+1) <= 0) {
+            return FEENOX_ERROR;
+          }
         } else {
           tokens[g] = strdup("0");
         }
       }
       
       char *mode_name = NULL;
-      asprintf(&mode_name, "mode%d", i+1);
+      if (asprintf(&mode_name, "mode%d", i+1) <= 0) {
+        return FEENOX_ERROR;
+      }
       feenox_call(feenox_add_post_field(mesh_write, 3, tokens, mode_name, field_location_nodes));
       feenox_free(mode_name);
     
