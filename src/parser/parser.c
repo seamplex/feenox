@@ -198,6 +198,12 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_print());
       return FEENOX_OK;
 
+///kw+PRINTF+desc Instruction akin to C's `printf`.
+///kw+PRINTF+usage PRINTF
+    } else if (strcasecmp(token, "PRINTF") == 0) {
+      feenox_call(feenox_parse_printf());
+      return FEENOX_OK;
+      
 ///kw+PRINT_FUNCTION+desc Print one or more functions as a table of values of dependent and independent variables.
 ///kw+PRINT_FUNCTION+usage PRINT_FUNCTION
     } else if (strcasecmp(token, "PRINT_FUNCTION") == 0) {
@@ -1711,6 +1717,71 @@ int feenox_parse_print(void) {
   
   return FEENOX_OK;
 }
+
+
+int feenox_parse_printf(void) {
+ 
+  // I don't expect anybody to want to use this PRINT instruction through the API
+  // so we just parse and define everything here
+  printf_t *printf = NULL;
+  feenox_check_alloc(printf = calloc(1, sizeof(printf_t)));
+
+  
+///kw+PRINTF+detail The `format_string` should be a `printf`-like string containing double-precision
+///kw+PRINTF+detail format specifiers. A matching number of expressions should be given.
+///kw+PRINTF+detail No newline is written if not explicitly asked for in the format string with `\n`.  
+///kw+PRINTF+detail Do not ask for string literals `%s`.  
+///kw+PRINTF+detail As always, to get a literal `%` use `%%` in the format string.
+
+///kw+PRINTF+usage format_string [ expr_1 [ expr_2 [ ... ] ] ]
+
+  char *token = NULL;
+  if ((token = feenox_get_next_token(NULL)) == NULL) {
+    feenox_push_error_message("expected format string for PRINTF");
+    return FEENOX_ERROR;
+  }
+  feenox_check_alloc(printf->format_string = strdup(token));
+  
+  // count the number of needed expressions
+  int i = 0;
+  while (printf->format_string[i] != '\0') {
+    if (printf->format_string[i] == '%') {
+      if (printf->format_string[i+1] != '%') {
+        if (printf->format_string[i+1] == 's') {
+          feenox_push_error_message("string format '%s' not supported in PRINTF");
+          return FEENOX_ERROR;
+        } else if (printf->format_string[i+1] == 'd') {
+          // everything is a double but just in case
+          printf->format_string[i+1] = 'g';
+        }
+        printf->n_args++;
+      } else {
+        i++;
+      }
+    }
+    i++;
+  }
+  
+  feenox_check_alloc(printf->expressions = calloc(printf->n_args, sizeof(expr_t)));
+  for (int n = 0; n < printf->n_args; n++) {
+    if ((token = feenox_get_next_token(NULL)) == NULL) {
+      feenox_push_error_message("expected %d expressions in PRINTF", printf->n_args);
+      return FEENOX_ERROR;
+    }
+    feenox_call(feenox_expression_parse(&printf->expressions[n], token));
+  }
+  
+  // default file is stdout
+  if (printf->file == NULL) {
+    printf->file = feenox.special_files._stdout;
+  }
+  
+  LL_APPEND(feenox.printfs, printf);
+  feenox_call(feenox_add_instruction(feenox_instruction_printf, printf));
+  
+  return FEENOX_OK;
+}
+
 
 int feenox_parse_print_function(void) {
 

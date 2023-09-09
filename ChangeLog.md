@@ -1,6 +1,8 @@
 # Current
 
  * under development
+ * `PRINTF` instruction
+ * improved memory handling when building elemental objects
  * `PREALLOCATE` and `ALLOW_NEW_NONZEROS` options
  * choose either to fail or allow missed `BC`s
  * updated internal naming of FEM matrices to match the doc
