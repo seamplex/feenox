@@ -19,20 +19,20 @@ intro: |
 terminal: | 
   $ gmsh -2 azmy-structured.geo
   $ feenox azmy-structured.fee 2
-  LLQ     1.653e+00       (ref 1.676e+0)
-  LRQ     4.427e-02       (ref 4.159e-2)
-  URQ     2.712e-03       (ref 1.992e-3)
-  16900 unknowns for S 2 , memory needed = 0.1 Gb
+  LLQ = 1.653e+00 (ref 1.676e+0)
+  LRQ = 4.427e-02 (ref 4.159e-2)
+  URQ = 2.712e-03 (ref 1.992e-3)
+  16900 unknowns for S2, memory needed = 0.2 Gb
   $ feenox azmy-structured.fee 4
-  LLQ     1.676e+00       (ref 1.676e+0)
-  LRQ     4.164e-02       (ref 4.159e-2)
-  URQ     1.978e-03       (ref 1.992e-3)
-  50700 unknowns for S 4 , memory needed = 0.7 Gb
+  LLQ = 1.676e+00 (ref 1.676e+0)
+  LRQ = 4.164e-02 (ref 4.159e-2)
+  URQ = 1.978e-03 (ref 1.992e-3)
+  50700 unknowns for S4, memory needed = 0.7 Gb
   $ feenox azmy-structured.fee 6
-  LLQ     1.680e+00       (ref 1.676e+0)
-  LRQ     4.120e-02       (ref 4.159e-2)
-  URQ     1.874e-03       (ref 1.992e-3)
-  101400 unknowns for S 6 , memory needed = 2.8 Gb
+  LLQ = 1.680e+00 (ref 1.676e+0)
+  LRQ = 4.120e-02 (ref 4.159e-2)
+  URQ = 1.874e-03 (ref 1.992e-3)
+  101400 unknowns for S6, memory needed = 2.7 Gb
   $
 ...
 DEFAULT_ARGUMENT_VALUE 1 4
@@ -58,10 +58,10 @@ INTEGRATE phi1 OVER llq RESULT lower_left_quadrant
 INTEGRATE phi1 OVER lrq RESULT lower_right_quadrant
 INTEGRATE phi1 OVER urq RESULT upper_right_quadrant
 
-PRINT %.3e "LLQ" lower_left_quadrant/(5*5)  "(ref 1.676e+0)"
-PRINT %.3e "LRQ" lower_right_quadrant/(5*5) "(ref 4.159e-2)"
-PRINT %.3e "URQ" upper_right_quadrant/(5*5) "(ref 1.992e-3)"
+PRINTF "LLQ = %.3e (ref 1.676e+0)\n" lower_left_quadrant/(5*5)
+PRINTF "LRQ = %.3e (ref 4.159e-2)\n" lower_right_quadrant/(5*5)
+PRINTF "URQ = %.3e (ref 1.992e-3)\n" upper_right_quadrant/(5*5)
 
 WRITE_RESULTS
-PRINT %g total_dofs "unknowns for S" $1 ", memory needed =" %.1f memory() "Gb" SEP " "
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
 

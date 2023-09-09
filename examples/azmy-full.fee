@@ -1,3 +1,43 @@
+---
+category: neutron_sn
+intro: |
+  ## Flux profiles
+  
+  This section analyzes flux profiles along the\ $y$ axis at three different values of\ $x$ as in section\ 6.4.1 of HyeongKae Park's Master's thesis, namely
+  
+   a. $x=5.84375$
+   b. $x=7.84375$
+   c. $x=9.84375$
+   
+  To better understand these profiles, we rotate the original square a certaing angle\ $\theta < 45\textdegree$ keeping the S$_N$ directions fixed.
+  Since we cannot use mirror boundary conditions for an arbitrary\ $\theta$, we use the full geometry instead of only one quarter like in the two preceding sections.
+  
+  Therefore, we perform a parametric sweep over
+  
+   i. the angle\ $\theta$ of rotation of the original square in the $x$-$y$ plane
+   ii. a mesh scale factor
+   iii. $N=2,4,6,8$
+   
+  ```bash
+  #!/bin/sh
+
+  for angle in 0 5 15 30 45; do
+   echo "angle = ${angle};" > azmy-angle-${angle}.geo
+   for scale in 3 2 1.5 1; do
+    gmsh -v 0 -2 azmy-angle-${angle}.geo azmy-full.geo -clscale ${scale} -o azmy-full-${angle}.msh
+    for sn in 2 4 6 8; do
+     echo $angle $scale $sn
+     feenox azmy-full.fee ${angle} ${sn} ${scale} --progress
+    done
+   done
+  done
+  ```
+  
+terminal: |
+  $ ./azmy-full.sh
+  [...]
+  $
+...
 DEFAULT_ARGUMENT_VALUE 1 0
 DEFAULT_ARGUMENT_VALUE 2 4
 DEFAULT_ARGUMENT_VALUE 3 0
@@ -23,6 +63,6 @@ profile9(x) = phi1(x'(8.84375,x), y'(9.84375,x))
 PRINT_FUNCTION profile5 profile7 profile9 MIN -10 MAX 10 NSTEPS 1000 FILE $0-$1-$2-$3.dat
 
 # WRITE_RESULTS FORMAT vtk
-PRINT %g total_dofs "unknowns for S" $2 ", memory needed =" %.1f memory() "Gb" SEP " "
+PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb\n" total_dofs memory()
 FILE res MODE "a" PATH azmy-resources.dat 
 PRINT total_dofs wall_time() memory() $1 $2 $3 FILE res

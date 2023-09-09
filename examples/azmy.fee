@@ -14,22 +14,22 @@ terminal: |
   LLQ     1.653e+00       (ref 1.676e+0)
   LRQ     4.427e-02       (ref 4.159e-2)
   URQ     2.717e-03       (ref 1.992e-3)
-  15704 unknowns for S 2 , memory needed = 0.1 Gb
+  15704 unknowns for S2, memory needed = 0.1 Gb
   $ feenox azmy.fee 4
   LLQ     1.676e+00       (ref 1.676e+0)
   LRQ     4.160e-02       (ref 4.159e-2)
   URQ     1.991e-03       (ref 1.992e-3)
-  47112 unknowns for S 4 , memory needed = 0.4 Gb
+  47112 unknowns for S4, memory needed = 0.5 Gb
   $ feenox azmy.fee 6
   LLQ     1.680e+00       (ref 1.676e+0)
   LRQ     4.115e-02       (ref 4.159e-2)
   URQ     1.890e-03       (ref 1.992e-3)
-  94224 unknowns for S 6 , memory needed = 1.6 Gb
+  94224 unknowns for S6, memory needed = 1.6 Gb
   $ feenox azmy.fee 8
   LLQ     1.682e+00       (ref 1.676e+0)
   LRQ     4.093e-02       (ref 4.159e-2)
   URQ     1.844e-03       (ref 1.992e-3)
-  157040 unknowns for S 8 , memory needed = 4.3 Gb
+  157040 unknowns for S8, memory needed = 4.3 Gb
   $ gmsh azmy-s4.geo
   $ gmsh azmy-s6.geo
   $ gmsh azmy-s8.geo
@@ -71,8 +71,8 @@ profile9(y) = phi1(9.84375,y)
 
 PRINT_FUNCTION profile5 profile7 profile9 MIN 0 MAX 10 NSTEPS 100 FILE $0-$1.dat
 
-# WRITE_RESULTS
-PRINT %g total_dofs "unknowns for S" $1 ", memory needed =" %.1f memory() "Gb" SEP " "
+WRITE_RESULTS
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
 
 ---
 figures: |
