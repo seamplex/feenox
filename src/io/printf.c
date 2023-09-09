@@ -28,7 +28,8 @@
 int feenox_instruction_printf(void *arg) {
   printf_t *printf = (printf_t *)arg;
 
-  char *string = feenox_evaluate_string(printf->format_string, printf->n_args, printf->expressions);
+  char *string = NULL;
+  feenox_check_null(string = feenox_evaluate_string(printf->format_string, printf->n_args, printf->expressions));
   fprintf(printf->file->pointer, "%s", string);
   fflush(printf->file->pointer);
   feenox_free(string);

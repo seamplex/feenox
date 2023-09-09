@@ -12,6 +12,9 @@ fi
 answer print.fee "2"
 exitifwrong $?
 
+answerdiff printf.fee
+exitifwrong $?
+
 answerdiff print_function.fee
 exitifwrong $?
 
