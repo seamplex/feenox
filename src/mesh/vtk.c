@@ -252,13 +252,13 @@ int feenox_mesh_read_vtk(mesh_t *this) {
 
   // the \n
   char buffer[BUFFER_SIZE];
-  fgets(buffer, BUFFER_SIZE-1, fp);
+  feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
 
   // the case name, we can discard it
-  fgets(buffer, BUFFER_SIZE-1, fp);
+  feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
 
   // format has to be ASCII
-  fgets(buffer, BUFFER_SIZE-1, fp);
+  feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
   if (strncmp(buffer, "ASCII", 5) != 0) {
     buffer[strlen(buffer)-1] = '\0';
     feenox_push_error_message("only ASCII VTK files are supported, not '%s'", buffer);
@@ -268,7 +268,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   // dataset unstructured grid
   do {
     if (!feof(fp)) {
-      fgets(buffer, BUFFER_SIZE-1, fp);
+      feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
     } else {
       feenox_push_error_message("expecting DATASET");
       return FEENOX_ERROR;
@@ -283,7 +283,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   // POINTS n_nodes double
   do {
     if (!feof(fp)) {
-      fgets(buffer, BUFFER_SIZE-1, fp);
+      feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
     } else {
       feenox_push_error_message("expecting POINTS");
       return FEENOX_ERROR;
@@ -315,7 +315,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   // CELLS n_cells numdata
   do {
     if (!feof(fp)) {
-      fgets(buffer, BUFFER_SIZE-1, fp);
+      feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
     } else {
       feenox_push_error_message("expecting CELLS");
       return FEENOX_ERROR;
@@ -368,7 +368,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     // CONNECTIVITY vtktypeint64
     do {
       if (!feof(fp)) {
-        fgets(buffer, BUFFER_SIZE-1, fp);
+        feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
       } else {
         feenox_push_error_message("expecting CONNECTIVITY");
         return FEENOX_ERROR;
@@ -393,7 +393,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   // CELL_TYPES n_cells
   do {
     if (!feof(fp)) {
-      fgets(buffer, BUFFER_SIZE-1, fp);
+      feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
     } else {
       feenox_push_error_message("expecting CELL_TYPES");
       return FEENOX_ERROR;
@@ -572,14 +572,14 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     } else if (strncmp("METADATA", buffer, 8) == 0) {
       
       int size = 0;
-      fgets(buffer, BUFFER_SIZE-1, fp);
+      feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
       if (sscanf(buffer, "INFORMATION %d", &size) != 1) {
         feenox_push_error_message("expecting INFORMATION");
         return FEENOX_ERROR;
       }
       
       for (int i = 0; i < size; i++) {
-        fgets(buffer, BUFFER_SIZE-1, fp);
+        feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
       }
       
     } else if (strncmp("FIELD", buffer, 5) == 0) {
@@ -707,7 +707,7 @@ int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, un
     return FEENOX_ERROR;
   }
   if (c == 'L') {
-    fgets(buffer, BUFFER_SIZE-1, fp);
+    feenox_check_alloc(fgets(buffer, BUFFER_SIZE-1, fp));
   }
 
   for (unsigned int i = 0; i < size; i++) {
