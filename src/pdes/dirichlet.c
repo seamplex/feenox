@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to handle dirichlet BCs
  *
- *  Copyright (C) 2015-2022 jeremy theler
+ *  Copyright (C) 2015-2023 jeremy theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -63,9 +63,11 @@ int feenox_problem_dirichlet_eval(void) {
   if (feenox.pde.dirichlet_rows == 0) {
     // on the first iteration, assume that all the nodes need a dirichlet BC
     // then we trim the extra space to save memory
+    // caution! in small problems we might end up with more bcs than nodes 
+    // because there might nodes counted more than once because we loop over elements
+
     // TODO: allow the user to provide a factor at runtime
-    // TODO: be smarted and re-allocate as needed
-    n_bcs = feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
+    n_bcs = 1.2*feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
 
     feenox_check_alloc(feenox.pde.dirichlet_indexes = calloc(n_bcs, sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = calloc(n_bcs, sizeof(PetscScalar)));
