@@ -46,59 +46,59 @@ char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *ar
   
   switch (n_args) {
     case 0:
-      asprintf(&string, "%s", format);
+      feenox_check_minusone_null(asprintf(&string, "%s", format));
     break;
     case 1:
-      asprintf(&string, format,
-              feenox_expression_eval(&arg[0]));
+      feenox_check_minusone_null(asprintf(&string, format,
+              feenox_expression_eval(&arg[0])));
     break;
     case 2:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
-              feenox_expression_eval(&arg[1]));
+              feenox_expression_eval(&arg[1])));
     break;
     case 3:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
-              feenox_expression_eval(&arg[2]));
+              feenox_expression_eval(&arg[2])));
     break;
     case 4:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
-              feenox_expression_eval(&arg[3]));
+              feenox_expression_eval(&arg[3])));
     break;
     case 5:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
               feenox_expression_eval(&arg[3]),
-              feenox_expression_eval(&arg[4]));
+              feenox_expression_eval(&arg[4])));
     break;
     case 6:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
               feenox_expression_eval(&arg[3]),
               feenox_expression_eval(&arg[4]),
-              feenox_expression_eval(&arg[5]));
+              feenox_expression_eval(&arg[5])));
     break;
     case 7:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
               feenox_expression_eval(&arg[3]),
               feenox_expression_eval(&arg[4]),
               feenox_expression_eval(&arg[5]),
-              feenox_expression_eval(&arg[6]));
+              feenox_expression_eval(&arg[6])));
     break;
     case 8:
-      asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -106,7 +106,7 @@ char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *ar
               feenox_expression_eval(&arg[4]),
               feenox_expression_eval(&arg[5]),
               feenox_expression_eval(&arg[6]),
-              feenox_expression_eval(&arg[7]));
+              feenox_expression_eval(&arg[7])));
     break;
     default:
       feenox_push_error_message("more than eight arguments for printf-like format");
