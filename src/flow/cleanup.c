@@ -585,14 +585,16 @@ void feenox_finalize(void) {
   feenox_free(feenox.argv_orig);
 */
 //  feenox_free(feenox.main_input_filepath);
+#ifdef HAVE_SLEPC
   EPSDestroy(&feenox.pde.eps);
+#endif
+#ifdef HAVE_PETSC
   MatDestroy(&feenox.pde.M);
   MatDestroy(&feenox.pde.M_bc);
   MatDestroy(&feenox.pde.K);
   MatDestroy(&feenox.pde.K_bc);
   VecDestroy(&feenox.pde.phi);
   
-#ifdef HAVE_PETSC
   if (feenox.pde.petscinit_called == PETSC_TRUE) {
 #ifdef HAVE_SLEPC  
     SlepcFinalize();
