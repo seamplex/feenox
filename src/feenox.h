@@ -300,6 +300,7 @@ typedef struct assignment_t assignment_t;
 typedef struct file_t file_t;
 typedef struct print_t print_t;
 typedef struct print_token_t print_token_t;
+typedef struct printf_t printf_t;
 typedef struct print_function_t print_function_t;
 typedef struct multidim_range_t multidim_range_t;
 typedef struct print_vector_t print_vector_t;
@@ -788,6 +789,17 @@ struct print_token_t {
   function_t *function;
   
   print_token_t *next;
+};
+
+// printf-like instruction
+struct printf_t {
+  // pointer to the output file (if null, print to stdout)
+  file_t *file;
+  char *format_string;
+  int n_args;
+  expr_t *expressions;
+  
+  printf_t *next;
 };
 
 struct multidim_range_t {
@@ -1513,6 +1525,7 @@ struct feenox_t {
   assignment_t *assignments;
   file_t *files;
   print_t *prints;
+  printf_t *printfs;
   print_function_t *print_functions;
   print_vector_t *print_vectors;
   fit_t *fits;
@@ -1997,6 +2010,7 @@ extern int feenox_read_arguments(char *string, unsigned int n_arguments, char **
 
 
 // file.c
+char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *arg);
 extern int feenox_instruction_file(void *arg);
 FILE *feenox_fopen(const char *filepath, const char *mode);
 extern int feenox_instruction_file_open(void *arg);
@@ -2147,6 +2161,7 @@ extern int feenox_function_is_structured_grid_3d(double *x, double *y, double *z
 
 // print.c
 extern int feenox_instruction_print(void *arg);
+extern int feenox_instruction_printf(void *arg);
 extern int feenox_instruction_print_function(void *arg);
 extern int feenox_instruction_print_vector(void *arg);
 extern char *feenox_print_vector_current_format_reset(print_vector_t *);

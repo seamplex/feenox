@@ -8,7 +8,6 @@
     - dump states?
     - choose to use it or not
  * use `spack`? sow?
- * https://joss.theoj.org/
  * FIT to mesh-based functions
  * FIT taking into account uncertainties
  * extended integration (as in reduced, full, extended)
@@ -17,6 +16,9 @@
    - wrap all GSL calls inside `#ifdef`
    - use a large chunk of contiguous memory in the heap to store shape functions, gradients, etc
  * MPI
+ * V&V
+   - fully document tests
+   - section for MMS
  
 ## Tests
 
@@ -78,7 +80,6 @@
  * add a keyword and command-line argument to set `OMP_NUM_THREADS`
  * logaritmic ranges for `PRINT_FUNCTION`
  * default separator after `TEXT` should be space, after numerical should be tab
- * `PRINTF` instruction
  * `PRINT_FUNCTION` with `%f` in between arguments (like `PRINT_VECTOR`)
  * `BLAS` 
    - `BLAS a * b = s   # scalar dot`

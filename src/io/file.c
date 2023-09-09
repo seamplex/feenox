@@ -40,39 +40,38 @@ FILE *feenox_fopen(const char *filepath, const char *mode) {
   
 }
 
-char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
+char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *arg) {
 
-  int size = strlen(format)+1 + nargs*32;
-  char *string = calloc(size+1, sizeof(char));
+  char *string = NULL;
   
-  switch (nargs) {
+  switch (n_args) {
     case 0:
-      snprintf(string, size, "%s", format);
+      asprintf(&string, "%s", format);
     break;
     case 1:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]));
     break;
     case 2:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]));
     break;
     case 3:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]));
     break;
     case 4:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
               feenox_expression_eval(&arg[3]));
     break;
     case 5:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -80,7 +79,7 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
               feenox_expression_eval(&arg[4]));
     break;
     case 6:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -89,7 +88,7 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
               feenox_expression_eval(&arg[5]));
     break;
     case 7:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -99,7 +98,7 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
               feenox_expression_eval(&arg[6]));
     break;
     case 8:
-      snprintf(string, size, format,
+      asprintf(&string, format,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -110,7 +109,7 @@ char *feenox_evaluate_string(char *format, int nargs, expr_t *arg) {
               feenox_expression_eval(&arg[7]));
     break;
     default:
-      feenox_push_error_message("more than eight arguments for string");
+      feenox_push_error_message("more than eight arguments for printf-like format");
       feenox_free(string);
       return NULL;
     break;
