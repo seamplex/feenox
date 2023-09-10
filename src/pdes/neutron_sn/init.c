@@ -250,10 +250,10 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
       {
         feenox_call(feenox_problem_neutron_sn_init_cosines(0.1893213));
         feenox_check_alloc(weights_array = calloc(4, sizeof(double)));
-        weights_array[0] = 0.1402771*M_PI/2;
-        weights_array[1] = 0.1139285*M_PI/2;
-        weights_array[2] = 0.0707546*M_PI/2;       
-        weights_array[3] = 0.0847101*M_PI/2;       
+        weights_array[0] = 0.1402771*2/M_PI;
+        weights_array[1] = 0.1139285*2/M_PI;
+        weights_array[2] = 0.0707546*2/M_PI;       
+        weights_array[3] = 0.0847101*2/M_PI;       
       }
       break;
 
