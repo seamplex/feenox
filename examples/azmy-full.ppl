@@ -16,4 +16,6 @@ set ylabel "$\phi$"
 
 set key above
 
-load "azmy-full-fixed-angle-fixed-sn.ppl"
+load "azmy-full-fixed-theta-fixed-sn.ppl"
+load "azmy-full-fixed-theta-fixed-c.ppl"
+load "azmy-full-fixed-sn-fixed-c.ppl"
