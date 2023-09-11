@@ -8,5 +8,3 @@ Physical Curve("bottom", 4) = {1};
 Physical Curve("top", 5) = {3};
 
 n = 1;
-Mesh.SecondOrderLinear = 1;
-Mesh.SecondOrderIncomplete = 1;

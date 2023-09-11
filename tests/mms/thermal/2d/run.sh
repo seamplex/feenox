@@ -3,7 +3,8 @@
 bcs="dirichlet neumann"
 elems="tri3 tri6 quad4 quad8 quad9"
 algos="struct frontal delaunay"
-cs="4 6 8 10 12 16 20 24 30 36 48"
+cs="4 8 12 16 20 24"
+# cs="4 6 8 10 12 16 20 24 30 36 48"
 
 
 # bcs="dirichlet"
@@ -13,6 +14,9 @@ cs="4 6 8 10 12 16 20 24 30 36 48"
 
 # set this flag to 1 if you want to create one VTK for each run
 vtk=0
+if [ "x${1}" = "xvtk" ]; then
+  vtk=1  
+fi
 
 . styles.sh
 
@@ -49,6 +53,18 @@ cat << EOF > thermal-square-q.fee
 q_mms(x,y) = ${q}
 qx_mms(x,y) = ${qx}
 qy_mms(x,y) = ${qy}
+EOF
+
+# report what we found
+cat << EOF
+# manufactured solution
+${T_mms}
+${k_mms}
+# source terms
+q_mms(x,y) = ${q}
+qx_mms(x,y) = ${qx}
+qy_mms(x,y) = ${qy}
+
 EOF
 
 
