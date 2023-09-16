@@ -1,12 +1,11 @@
 set preamble "\usepackage{amsmath}"
 
-set width 18*unit(cm)
+set width 12*unit(cm)
 set size ratio 9.0/16.0
 
 set axis x arrow nomirrored
 set axis y arrow nomirrored
 set key above
-# set keycolumns 3
 
 set grid
 set terminal pdf

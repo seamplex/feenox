@@ -134,8 +134,8 @@ SOLVE_PROBLEM
 # for post-processing in Paraview
 WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigmax sigmay sigmaz
 
-PRINT "sigma_z(A) =" %.2f sigmaz(1,0,0)/1e6 "MPa" SEP " "
-PRINT "wall time  =" %.2f wall_time() "seconds"  SEP " "
+PRINTF "sigma_z(A) = %.2f MPa\n" sigmaz(1,0,0)/1e6
+PRINTF "wall time  = %.2f seconds\n" wall_time()^
 ```
 
 

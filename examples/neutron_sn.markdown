@@ -6,6 +6,8 @@
     structured rectangular grid][]
   - [<span class="toc-section-number">2.2</span> Fist-order
     locally-refined unstructured triangular grid][]
+  - [<span class="toc-section-number">2.3</span> Flux profiles with ray
+    effect][]
 
   [<span class="toc-section-number">1</span> Reed’s problem]: #reeds-problem
   [<span class="toc-section-number">2</span> Azmy’s problem]: #azmys-problem
@@ -13,6 +15,8 @@
     #second-order-complete-structured-rectangular-grid
   [<span class="toc-section-number">2.2</span> Fist-order locally-refined unstructured triangular grid]:
     #fist-order-locally-refined-unstructured-triangular-grid
+  [<span class="toc-section-number">2.3</span> Flux profiles with ray effect]:
+    #flux-profiles-with-ray-effect
 
 # Reed’s problem
 
@@ -128,31 +132,31 @@ INTEGRATE phi1 OVER llq RESULT lower_left_quadrant
 INTEGRATE phi1 OVER lrq RESULT lower_right_quadrant
 INTEGRATE phi1 OVER urq RESULT upper_right_quadrant
 
-PRINT %.3e "LLQ" lower_left_quadrant/(5*5)  "(ref 1.676e+0)"
-PRINT %.3e "LRQ" lower_right_quadrant/(5*5) "(ref 4.159e-2)"
-PRINT %.3e "URQ" upper_right_quadrant/(5*5) "(ref 1.992e-3)"
+PRINTF "LLQ = %.3e (ref 1.676e+0)\n" lower_left_quadrant/(5*5)
+PRINTF "LRQ = %.3e (ref 4.159e-2)\n" lower_right_quadrant/(5*5)
+PRINTF "URQ = %.3e (ref 1.992e-3)\n" upper_right_quadrant/(5*5)
 
 WRITE_RESULTS
-PRINT %g total_dofs "unknowns for S" $1 ", memory needed =" %.1f memory() "Gb" SEP " "
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
 ```
 
 ``` terminal
 $ gmsh -2 azmy-structured.geo
 $ feenox azmy-structured.fee 2
-LLQ     1.653e+00       (ref 1.676e+0)
-LRQ     4.427e-02       (ref 4.159e-2)
-URQ     2.712e-03       (ref 1.992e-3)
-16900 unknowns for S 2 , memory needed = 0.1 Gb
+LLQ = 1.653e+00 (ref 1.676e+0)
+LRQ = 4.427e-02 (ref 4.159e-2)
+URQ = 2.712e-03 (ref 1.992e-3)
+16900 unknowns for S2, memory needed = 0.2 Gb
 $ feenox azmy-structured.fee 4
-LLQ     1.676e+00       (ref 1.676e+0)
-LRQ     4.164e-02       (ref 4.159e-2)
-URQ     1.978e-03       (ref 1.992e-3)
-50700 unknowns for S 4 , memory needed = 0.7 Gb
+LLQ = 1.676e+00 (ref 1.676e+0)
+LRQ = 4.164e-02 (ref 4.159e-2)
+URQ = 1.978e-03 (ref 1.992e-3)
+50700 unknowns for S4, memory needed = 0.7 Gb
 $ feenox azmy-structured.fee 6
-LLQ     1.680e+00       (ref 1.676e+0)
-LRQ     4.120e-02       (ref 4.159e-2)
-URQ     1.874e-03       (ref 1.992e-3)
-101400 unknowns for S 6 , memory needed = 2.8 Gb
+LLQ = 1.680e+00 (ref 1.676e+0)
+LRQ = 4.120e-02 (ref 4.159e-2)
+URQ = 1.874e-03 (ref 1.992e-3)
+101400 unknowns for S6, memory needed = 2.7 Gb
 $
 ```
 
@@ -208,8 +212,8 @@ profile9(y) = phi1(9.84375,y)
 
 PRINT_FUNCTION profile5 profile7 profile9 MIN 0 MAX 10 NSTEPS 100 FILE $0-$1.dat
 
-# WRITE_RESULTS
-PRINT %g total_dofs "unknowns for S" $1 ", memory needed =" %.1f memory() "Gb" SEP " "
+WRITE_RESULTS
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
 ```
 
 ``` terminal
@@ -218,22 +222,22 @@ $ feenox azmy.fee 2
 LLQ     1.653e+00       (ref 1.676e+0)
 LRQ     4.427e-02       (ref 4.159e-2)
 URQ     2.717e-03       (ref 1.992e-3)
-15704 unknowns for S 2 , memory needed = 0.1 Gb
+15704 unknowns for S2, memory needed = 0.1 Gb
 $ feenox azmy.fee 4
 LLQ     1.676e+00       (ref 1.676e+0)
 LRQ     4.160e-02       (ref 4.159e-2)
 URQ     1.991e-03       (ref 1.992e-3)
-47112 unknowns for S 4 , memory needed = 0.4 Gb
+47112 unknowns for S4, memory needed = 0.5 Gb
 $ feenox azmy.fee 6
 LLQ     1.680e+00       (ref 1.676e+0)
 LRQ     4.115e-02       (ref 4.159e-2)
 URQ     1.890e-03       (ref 1.992e-3)
-94224 unknowns for S 6 , memory needed = 1.6 Gb
+94224 unknowns for S6, memory needed = 1.6 Gb
 $ feenox azmy.fee 8
 LLQ     1.682e+00       (ref 1.676e+0)
 LRQ     4.093e-02       (ref 4.159e-2)
 URQ     1.844e-03       (ref 1.992e-3)
-157040 unknowns for S 8 , memory needed = 4.3 Gb
+157040 unknowns for S8, memory needed = 4.3 Gb
 $ gmsh azmy-s4.geo
 $ gmsh azmy-s6.geo
 $ gmsh azmy-s8.geo
@@ -346,3 +350,214 @@ class="math inline"><sub>8</sub></span></figcaption>
 </figure>
 
   [`integral`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#integral
+
+## Flux profiles with ray effect
+
+This section analyzes flux profiles along the $y$ axis at three
+different values of $x$ as in section 6.4.1 of HyeongKae Park’s Master’s
+thesis, namely
+
+1.  $x=5.84375$
+2.  $x=7.84375$
+3.  $x=9.84375$
+
+Some kind of “ray effect” is expected since the flux is not as large as
+in the core source section and the discrete numbers of neutron
+directions might induce numerical artifacts when evaluating the total
+scalar neutron flux.
+
+To better understand these profiles, the original square is rotated a
+certaing angle $\theta \leq 45º$ around the $z$ direction (coming out of
+the screen) keeping the S$_N$ directions fixed. Since we cannot use
+mirror boundary conditions for an arbitrary $\theta$, we use the full
+geometry instead of only one quarter like in the two preceding sections.
+
+Therefore, we perform a parametric sweep over
+
+1.  the angle $\theta$ of rotation of the original square in the $x$-$y$
+    plane
+2.  a mesh scale factor $c$
+3.  $N=4,6,8,10,12$
+
+``` bash
+#!/bin/bash
+
+thetas="0 15 30 45"
+cs="4 3 2 1.5 1"
+sns="4 6 8 10 12"
+
+for theta in ${thetas}; do
+ echo "angle = ${theta};" > azmy-angle-${theta}.geo
+ for c in ${cs}; do
+  gmsh -v 0 -2 azmy-angle-${theta}.geo azmy-full.geo -clscale ${c} -o azmy-full-${theta}.msh
+  for sn in ${sns}; do
+   if [ ! -e azmy-full-${theta}-${sn}-${c}.dat ]; then
+     echo ${theta} ${c} ${sn}
+     feenox azmy-full.fee ${theta} ${sn} ${c} --progress
+   fi
+  done
+ done
+done
+```
+
+``` feenox
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 4
+DEFAULT_ARGUMENT_VALUE 3 0
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2
+
+READ_MESH $0-$1.msh
+
+MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
+MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
+BC vacuum   vacuum
+
+sn_alpha = 0.5
+SOLVE_PROBLEM
+
+theta = $1*pi/180
+x'(d,x) = d*cos(theta) - x*sin(theta)
+y'(d,x) = d*sin(theta) + x*cos(theta)
+
+profile5(x) = phi1(x'(5.84375,x), y'(5.84375,x))
+profile7(x) = phi1(x'(7.84375,x), y'(7.84375,x))
+profile9(x) = phi1(x'(8.84375,x), y'(9.84375,x))
+
+PRINT_FUNCTION profile5 profile7 profile9 MIN -10 MAX 10 NSTEPS 1000 FILE $0-$1-$2-$3.dat
+
+# WRITE_RESULTS FORMAT vtk
+PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb\n" total_dofs memory()
+# FILE res MODE "a" PATH azmy-resources.dat 
+# PRINT total_dofs wall_time() memory() $1 $2 $3 FILE res
+```
+
+``` terminal
+$ ./azmy-full.sh
+[...]
+$ pyxplot azmy-full.ppl
+$
+```
+
+There are lots (a lot) of results. Let’s show here a dozen to illustrate
+the ray effect.
+
+Let’s start with $\theta=0$ (i.e. the original geometry) for $N=4$,
+$N=8$ and $N=12$ to see how the profiles “improve”:
+
+<figure>
+<img src="azmy-full-theta-0-sn-4.svg" style="width:100.0%"
+alt="\theta=0 and N=4 for different values of c" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 0</span> and <span
+class="math inline"><em>N</em> = 4</span> for different values of <span
+class="math inline"><em>c</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-theta-0-sn-8.svg" style="width:100.0%"
+alt="\theta=0 and N=8 for different values of c" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 0</span> and <span
+class="math inline"><em>N</em> = 8</span> for different values of <span
+class="math inline"><em>c</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-theta-0-sn-12.svg" style="width:100.0%"
+alt="\theta=0 and N=12 for different values of c" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 0</span> and <span
+class="math inline"><em>N</em> = 12</span> for different values of <span
+class="math inline"><em>c</em></span></figcaption>
+</figure>
+
+Now let’s fix $c$ and see what happens for different angles. Some angles
+are “worse” than others. It seems that $\theta=45º$ gives the “best”
+solution:
+
+<figure>
+<img src="azmy-full-theta-0-c-1.5.svg" style="width:100.0%"
+alt="\theta=0 and c=1.5 for different values of $N" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 0</span> and <span
+class="math inline"><em>c</em> = 1.5</span> for different values of
+$N</figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-theta-15-c-1.5.svg" style="width:100.0%"
+alt="\theta=15 and c=1.5 for different values of N" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 15</span> and <span
+class="math inline"><em>c</em> = 1.5</span> for different values of
+<span class="math inline"><em>N</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-theta-30-c-1.5.svg" style="width:100.0%"
+alt="\theta=30 and c=1.5 for different values of N" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 30</span> and <span
+class="math inline"><em>c</em> = 1.5</span> for different values of
+<span class="math inline"><em>N</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-theta-45-c-1.5.svg" style="width:100.0%"
+alt="\theta=45 and c=1.5 for different values of N" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>θ</em> = 45</span> and <span
+class="math inline"><em>c</em> = 1.5</span> for different values of
+<span class="math inline"><em>N</em></span></figcaption>
+</figure>
+
+For a fixed spatial refinement $c=1$ it is clear that increasing $N$
+improves the profiles:
+
+<figure>
+<img src="azmy-full-sn-4-c-1.svg" style="width:100.0%"
+alt="N=4 and c=1 for different values of \theta" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>N</em> = 4</span> and <span
+class="math inline"><em>c</em> = 1</span> for different values of <span
+class="math inline"><em>θ</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-sn-6-c-1.svg" style="width:100.0%"
+alt="N=6 and c=1 for different values of \theta" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>N</em> = 6</span> and <span
+class="math inline"><em>c</em> = 1</span> for different values of <span
+class="math inline"><em>θ</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-sn-8-c-1.svg" style="width:100.0%"
+alt="N=9 and c=1 for different values of \theta" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>N</em> = 9</span> and <span
+class="math inline"><em>c</em> = 1</span> for different values of <span
+class="math inline"><em>θ</em></span></figcaption>
+</figure>
+
+Let’s how the profiles change with the angle $\theta$ at the “finest”
+solutions:
+
+<figure>
+<img src="azmy-full-sn-10-c-1.5.svg" style="width:100.0%"
+alt="N=10 and c=1.5 for different values of \theta" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>N</em> = 10</span> and <span
+class="math inline"><em>c</em> = 1.5</span> for different values of
+<span class="math inline"><em>θ</em></span></figcaption>
+</figure>
+
+<figure>
+<img src="azmy-full-sn-12-c-2.svg" style="width:100.0%"
+alt="N=12 and c=2 for different values of \theta" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>N</em> = 12</span> and <span
+class="math inline"><em>c</em> = 2</span> for different values of <span
+class="math inline"><em>θ</em></span></figcaption>
+</figure>

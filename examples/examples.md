@@ -68,3 +68,4 @@
     grid](neutron_sn.md#second-order-complete-structured-rectangular-grid)
     - [Fist-order locally-refined unstructured triangular
     grid](neutron_sn.md#fist-order-locally-refined-unstructured-triangular-grid)
+    - [Flux profiles with ray effect](neutron_sn.md#flux-profiles-with-ray-effect)

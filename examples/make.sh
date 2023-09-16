@@ -36,6 +36,7 @@ for i in hello          \
          reed           \
          azmy-structured  \
          azmy             \
+         azmy-full        \
          cubesphere     \
          two-zone-slab  \
          parallelepiped-thermal     \
