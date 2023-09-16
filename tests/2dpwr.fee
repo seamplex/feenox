@@ -53,5 +53,6 @@ BC mirror   mirror         # the first mirror is the name, the second is the BC 
 SOLVE_PROBLEM   # solve!
 PRINT %.4f keff
 
-
+WRITE_MESH $0-$1.vtk phi1 phi2 VECTOR NAME J1 Jx1 Jy2 0 VECTOR NAME J2 Jx2 Jy2 0
+PRINT_FUNCTION phi1 Jx1 Jy1
 

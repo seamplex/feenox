@@ -1,0 +1,11 @@
+PROBLEM thermal 2d
+READ_MESH square-centered.msh
+BC left    T=0
+BC right   T=0
+BC bottom  T=0
+BC up      T=0
+q = 1
+k = 1
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk
+PRINT dTdx(1,1)+qx(1,1)+dTdy(1,1)+qy(1,1)

@@ -29,6 +29,10 @@ exitifwrong $?
 answer thermal-two-squares-material-implicit-temperature.fee "0.600"
 exitifwrong $?
 
+answer thermal-two-squares-material-implicit-temperature.fee "0.600"
+exitifwrong $?
+
+answerzero thermal-square.fee
 checkmumps
 
 i=thermal-two-squares-material-explicit-uniform
