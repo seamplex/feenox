@@ -10,7 +10,7 @@ BC adiabatic q=0
 
 SOLVE_PROBLEM
 WRITE_RESULTS FORMAT vtk all
-FIND_EXTREMA sqrt(qx(x,y,z)^2+qy(x,y,z)^2) MAX q_max
+FIND_EXTREMA sqrt(qx(x,y,z)^2+qy(x,y,z)^2+qz(x,y,z)^2) MAX q_max
 
 # reference says target temp is 476 which needs a very fine mesh
 # TODO: axisymmetric
