@@ -1,0 +1,2 @@
+T_mms(x,y,z) = 1 + sin(2*x)^2 * cos(3*y)^2 * sin(4*z)
+k_mms(x,y,z) = 1

@@ -1,6 +1,6 @@
 # problem taken from Ansys Workbench Verification manual (case VMMECH002) 
 PROBLEM mechanical 3D
-READ_MESH $0.msh INTEGRATION reduced
+READ_MESH $0.msh INTEGRATION full
 
 E = 1000
 nu = 0

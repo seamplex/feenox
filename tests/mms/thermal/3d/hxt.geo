@@ -1,4 +1,4 @@
-Mesh.Algorithm = 5;
+// Mesh.Algorithm = 5;
 Mesh.Algorithm3D = 10;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;

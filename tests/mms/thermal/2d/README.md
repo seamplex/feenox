@@ -2,6 +2,8 @@
 
 This directory shows how to perform verification of the 2D thermal solver using the Method of Manufactured Solutions.
 
+> Make sure you follow up with the [3D cases](../3d) as well.
+
 The chosen domain is a square of size one with the lower left corner at $x=0$ and $y=0$ as in
 
 ```

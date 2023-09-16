@@ -3,14 +3,14 @@
 bcs="dirichlet neumann"
 elems="tri3 tri6 quad4 quad8 quad9"
 algos="struct frontal delaunay"
-cs="4 8 12 16 20 24"
+# cs="4 8 12 16 20 24"
 # cs="4 6 8 10 12 16 20 24 30 36 48"
 
 
-# bcs="dirichlet"
-# elems="tri3 quad8"
-# algos="struct"
-# cs="8 16 24 32 40"
+bcs="dirichlet"
+elems="quad9"
+algos="struct"
+cs="30 36 40"
 
 # set this flag to 1 if you want to create one VTK for each run
 vtk=0

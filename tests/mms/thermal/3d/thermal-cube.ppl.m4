@@ -19,15 +19,15 @@ set xlabel "element size~$h$"
 
 set key above
 
-load "thermal-cube1-fits.ppl"
+load "thermal-cube`'n`'-fits.ppl"
 
 set ylabel "$e_\infty = \max \Big| T(x,y,z)-T_\text{mms}(x,y,z) \Big|$"
-set title "FeenoX---Cube \#1--$e_\infty$"
-set output "thermal-cube1-einf.pdf"
-load "thermal-cube1-einf.ppl"
+set title "FeenoX---Cube case `'n`'--$e_\infty$"
+set output "thermal-cube`'n`'-einf.pdf"
+load "thermal-cube`'n`'-einf.ppl"
 
 set ylabel "$e_2 = \sqrt{\int \left[T(x,y,z)-T_\text{mms}(x,y,z)\right]^2 \, dx \, dy \, dz}$"
-set title "FeenoX---Cube \#1--$e_2$"
-set output "thermal-cube1-e2.pdf"
-load "thermal-cube1-e2.ppl"
+set title "FeenoX---Cube case `'n`'--$e_2$"
+set output "thermal-cube`'n`'-e2.pdf"
+load "thermal-cube`'n`'-e2.ppl"
 

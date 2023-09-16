@@ -37,5 +37,5 @@ FIND_EXTREMA abs(T(x,y)-T_mms(x,y)) MAX error_inf
 PRINT %.6f log(h) log(error_inf) log(error_2) %g $4 cells nodes %.2f 1024*memory() wall_time()
 
 IF $5
-  WRITE_MESH thermal-square_$1-$2-$3-$4.vtk T T_mms T(x,y)-T_mms(x,y)
+  WRITE_MESH thermal-square_$1-$2-$3-$4.vtk T q T_mms T(x,y)-T_mms(x,y)
 ENDIF
