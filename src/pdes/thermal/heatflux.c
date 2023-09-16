@@ -24,11 +24,11 @@
 
 int feenox_problem_gradient_fill_thermal(void) {
   
-  feenox_problem_fill_aux_solution(thermal.qx);
+  feenox_call(feenox_problem_fill_aux_solution(thermal.qx));
   if (feenox.pde.dim > 1) {
-    feenox_problem_fill_aux_solution(thermal.qy);
+    feenox_call(feenox_problem_fill_aux_solution(thermal.qy));
     if (feenox.pde.dim > 2) {
-      feenox_problem_fill_aux_solution(thermal.qz);
+      feenox_call(feenox_problem_fill_aux_solution(thermal.qz));
     }
   }
   
@@ -46,9 +46,8 @@ int feenox_problem_gradient_fluxes_at_node_alloc_thermal(node_t *node) {
   if (node->flux == NULL) {
     feenox_check_alloc(node->flux = calloc(feenox.pde.dim, sizeof(double)));
   } else {
-    unsigned int m = 0;
-    for (m = 0; m < feenox.pde.dim; m++) {
-      node->flux[m] = 0;
+    for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+      node->flux[d] = 0;
     }
   }
   return FEENOX_OK;
@@ -58,10 +57,9 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_thermal(node_t *n
   
   double heat_flux = 0;
   double k = thermal.k.eval(&thermal.k, node->x, element->physical_group->material);
-  unsigned int m = 0;
-  for (m = 0; m < feenox.pde.dim; m++) {
-    heat_flux = -k * gsl_matrix_get(element->dphidx_node[j], 0, m);
-    node->flux[m] += rel_weight * (heat_flux - node->flux[m]);
+  for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+    heat_flux = -k * gsl_matrix_get(element->dphidx_node[j], 0, d);
+    node->flux[d] += rel_weight * (heat_flux - node->flux[d]);
   }
   
   return FEENOX_OK;
@@ -72,9 +70,9 @@ int feenox_problem_gradient_fill_fluxes_thermal(mesh_t *mesh, size_t j) {
   // TODO: wrappers so pdes don't have to access the vectors
   feenox_vector_set(thermal.qx->vector_value, j, mesh->node[j].flux[0]);
   if (feenox.pde.dim > 1) {
-    feenox_vector_set(thermal.qx->vector_value, j, mesh->node[j].flux[1]);
+    feenox_vector_set(thermal.qy->vector_value, j, mesh->node[j].flux[1]);
     if (feenox.pde.dim > 2) {
-      feenox_vector_set(thermal.qx->vector_value, j, mesh->node[j].flux[2]);
+      feenox_vector_set(thermal.qz->vector_value, j, mesh->node[j].flux[2]);
     }
   }
   

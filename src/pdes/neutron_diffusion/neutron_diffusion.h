@@ -67,7 +67,11 @@ struct neutron_diffusion_t {
   int space_XS;
 
   var_t *keff;
-  
+
+  // neutron currents
+  function_t **Jx;
+  function_t **Jy;
+  function_t **Jz;  
 };  
 extern neutron_diffusion_t neutron_diffusion;
 

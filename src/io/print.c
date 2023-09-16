@@ -302,7 +302,7 @@ int feenox_instruction_print_function(void *arg) {
     double *x = NULL;
     feenox_check_alloc(x = calloc(print_function->first_function->n_arguments, sizeof(double)));
 
-    for (int j = 0; j < print_function->first_function->data_size; j++) {
+    for (size_t j = 0; j < print_function->first_function->data_size; j++) {
 
       // TODO
 /*        
@@ -319,7 +319,7 @@ int feenox_instruction_print_function(void *arg) {
 //       if (print_function->physical_entity == NULL || flag) {
       
         // los argumentos de la primera funcion
-        for (int k = 0; k < print_function->first_function->n_arguments; k++) {
+        for (unsigned int k = 0; k < print_function->first_function->n_arguments; k++) {
           // nos acordamos los argumentos para las otras funciones que vienen despues
           x[k] = feenox_vector_get(print_function->first_function->vector_argument[k], j);
           fprintf(print_function->file->pointer, print_function->format, x[k]);

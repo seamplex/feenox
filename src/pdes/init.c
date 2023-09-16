@@ -252,7 +252,6 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 
 int feenox_problem_define_solutions(void) {
   
-  
 #ifdef HAVE_PETSC
   char dimension_name[3][2] = {"x", "y", "z"};
   if (feenox.pde.dim == 0) {
@@ -283,39 +282,41 @@ int feenox_problem_define_solutions(void) {
       feenox_check_minusone(asprintf(&name, "%s", feenox.pde.unknown_name[g]));
     }
     feenox_check_alloc(feenox.pde.solution[g] = feenox_define_function_get_ptr(name, feenox.pde.dim));
+    feenox.pde.solution[g]->mesh = feenox.pde.mesh;
 
     if (feenox.pde.nev == 0) {
       // the derivatives of the solutions with respect to space
       feenox_check_alloc(feenox.pde.gradient[g] = calloc(feenox.pde.dim, sizeof(function_t *)));
       feenox_check_alloc(feenox.pde.delta_gradient[g] = calloc(feenox.pde.dim, sizeof(function_t *)));
       
-      unsigned int m = 0;
-      for (m = 0; m < feenox.pde.dim; m++) {
-        feenox.pde.solution[g]->var_argument[m] = feenox.mesh.vars.arr_x[m];
+      for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+        feenox.pde.solution[g]->var_argument[d] = feenox.mesh.vars.arr_x[d];
       
         char *gradname = NULL;
-        feenox_check_minusone(asprintf(&gradname, "d%sd%s", name, dimension_name[m]));
-        feenox_check_alloc(feenox.pde.gradient[g][m] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
+        feenox_check_minusone(asprintf(&gradname, "d%sd%s", name, dimension_name[d]));
+        feenox_check_alloc(feenox.pde.gradient[g][d] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
         feenox_free(gradname);
         
-        feenox.pde.gradient[g][m]->mesh = feenox.pde.solution[g]->mesh;
-        feenox.pde.gradient[g][m]->var_argument = feenox.pde.solution[g]->var_argument;
-        feenox.pde.gradient[g][m]->type = function_type_pointwise_mesh_node;
-        feenox.pde.gradient[g][m]->spatial_derivative_of = feenox.pde.solution[g];
+        feenox.pde.gradient[g][d]->mesh = feenox.pde.solution[g]->mesh;
+        feenox.pde.gradient[g][d]->var_argument = feenox.pde.solution[g]->var_argument;
+        feenox.pde.gradient[g][d]->type = function_type_pointwise_mesh_node;
+        feenox.pde.gradient[g][d]->spatial_derivative_of = feenox.pde.solution[g];
         // this flag is used when interpolating
-        feenox.pde.gradient[g][m]->spatial_derivative_with_respect_to = m;
+        feenox.pde.gradient[g][d]->spatial_derivative_with_respect_to = d;
         // this flag is used to know if gradients have to be computed
-        feenox.pde.gradient[g][m]->is_gradient = 1;
+        feenox.pde.gradient[g][d]->is_gradient = 1;
         
         // same for uncertainty
-        feenox_check_minusone(asprintf(&gradname, "delta_d%sd%s", name, dimension_name[m]));
-        feenox_check_alloc(feenox.pde.delta_gradient[g][m] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
+/*        
+        feenox_check_minusone(asprintf(&gradname, "delta_d%sd%s", name, dimension_name[d]));
+        feenox_check_alloc(feenox.pde.delta_gradient[g][d] = feenox_define_function_get_ptr(gradname, feenox.pde.dim));
         feenox_free(gradname);
         
-        feenox.pde.delta_gradient[g][m]->mesh = feenox.pde.solution[g]->mesh;
-        feenox.pde.delta_gradient[g][m]->var_argument = feenox.pde.solution[g]->var_argument;
-        feenox.pde.delta_gradient[g][m]->type = function_type_pointwise_mesh_node;
-        feenox.pde.delta_gradient[g][m]->is_gradient = 1;
+        feenox.pde.delta_gradient[g][d]->mesh = feenox.pde.solution[g]->mesh;
+        feenox.pde.delta_gradient[g][d]->var_argument = feenox.pde.solution[g]->var_argument;
+        feenox.pde.delta_gradient[g][d]->type = function_type_pointwise_mesh_node;
+        feenox.pde.delta_gradient[g][d]->is_gradient = 1;
+*/
       }
       
     } else {  
@@ -365,8 +366,8 @@ int feenox_problem_fill_aux_solution(function_t *function) {
   function->mesh = feenox.pde.rough==0 ? feenox.pde.mesh : feenox.pde.mesh_rough;
   function->data_size = function->mesh->n_nodes;
   feenox_call(feenox_create_pointwise_function_vectors(function));
-  for (unsigned int m = 0; m < function->n_arguments; m++) {
-    feenox_realloc_vector_ptr(function->vector_argument[m], gsl_vector_ptr(function->mesh->nodes_argument[m], 0), 0);
+  for (unsigned int d = 0; d < function->n_arguments; d++) {
+    feenox_realloc_vector_ptr(function->vector_argument[d], gsl_vector_ptr(function->mesh->nodes_argument[d], 0), 0);
   }
 
   return FEENOX_OK;
@@ -574,6 +575,9 @@ int feenox_problem_init_runtime_general(void) {
       feenox.pde.solution[g]->mesh = feenox.pde.mesh;
       feenox.pde.solution[g]->data_size = feenox.pde.spatial_unknowns;
       feenox_create_pointwise_function_vectors(feenox.pde.solution[g]);
+      for (unsigned int d = 0; d < feenox.pde.solution[g]->n_arguments; d++) {
+        feenox_realloc_vector_ptr(feenox.pde.solution[g]->vector_argument[d], gsl_vector_ptr(feenox.pde.solution[g]->mesh->nodes_argument[d], 0), 0);
+      }
     
       // in some cases (e.g. neutron) we do not know if we have to solve
       // a KSP or an EPS until we read the material data, which is far too late
@@ -584,6 +588,9 @@ int feenox_problem_init_runtime_general(void) {
           feenox.pde.mode[g][i]->mesh = feenox.pde.mesh;
           feenox.pde.mode[g][i]->data_size = feenox.pde.mesh->n_nodes;
           feenox_create_pointwise_function_vectors(feenox.pde.mode[g][i]);
+          for (unsigned int d = 0; d < feenox.pde.mode[g][i]->n_arguments; d++) {
+            feenox_realloc_vector_ptr(feenox.pde.mode[g][i]->vector_argument[d], gsl_vector_ptr(feenox.pde.mode[g][i]->mesh->nodes_argument[d], 0), 0);
+          }
         }
       }
     }

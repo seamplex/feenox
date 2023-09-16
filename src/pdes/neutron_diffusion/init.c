@@ -45,6 +45,11 @@ int feenox_problem_parse_time_init_neutron_diffusion(void) {
   feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_neutron_diffusion;
   
   feenox.pde.solve_post = feenox_problem_solve_post_neutron_diffusion;
+  feenox.pde.gradient_fill = feenox_problem_gradient_fill_neutron_diffusion;
+  feenox.pde.gradient_nodal_properties = feenox_problem_gradient_properties_at_element_nodes_neutron_diffusion;
+  feenox.pde.gradient_alloc_nodal_fluxes = feenox_problem_gradient_fluxes_at_node_alloc_neutron_diffusion;
+  feenox.pde.gradient_add_elemental_contribution_to_node = feenox_problem_gradient_add_elemental_contribution_to_node_neutron_diffusion;
+  feenox.pde.gradient_fill_fluxes = feenox_problem_gradient_fill_fluxes_neutron_diffusion;
   
   // we are FEM
   feenox.mesh.default_field_location = field_location_nodes;
@@ -56,11 +61,46 @@ int feenox_problem_parse_time_init_neutron_diffusion(void) {
   // dofs = number of groups
   feenox.pde.dofs = neutron_diffusion.groups;
   
+  // scalar fluxes and currents
   feenox_check_alloc(feenox.pde.unknown_name = calloc(neutron_diffusion.groups, sizeof(char *)));
   for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
+///re_neutron_diffusion+phi+description The scalar flux for the group $g$ is `phig`, i.e. `phi1`, `phi2`, etc. This is the primary unknown of the problem.  
     feenox_check_minusone(asprintf(&feenox.pde.unknown_name[g], "phi%u", g+1));
   }
+
+  // currents (we need a different loop from the one used for fluxes)
+  feenox_check_alloc(neutron_diffusion.Jx = calloc(neutron_diffusion.groups, sizeof(function_t *)));
+  if (feenox.pde.dim > 1) {
+    feenox_check_alloc(neutron_diffusion.Jy = calloc(neutron_diffusion.groups, sizeof(function_t *)));
+    if (feenox.pde.dim > 2) {
+      feenox_check_alloc(neutron_diffusion.Jz = calloc(neutron_diffusion.groups, sizeof(function_t *)));
+    }
+  }
   
+  
+///re_neutron_diffusion+Jx+description The\ $x$ component of the neutron current for group\ $g$ is `Jxg`,  i.e. `Jx1`, `Jx2`. etc. This is a secondary unknown of the problem.  
+///re_neutron_diffusion+Jx+description The\ $y$ component of the neutron current for group\ $g$ is `Jzg`,  i.e. `Jz1`, `Jz2`. etc. This is a secondary unknown of the problem.  
+///re_neutron_diffusion+Jy+description Only available for two and three-dimensional problems.  
+///re_neutron_diffusion+Jx+description The\ $z$ component of the neutron current for group\ $g$ is `Jzg`,  i.e. `Jz1`, `Jz2`. etc. This is a secondary unknown of the problem.  
+///re_neutron_diffusion+Jz+description Only available for three-dimensional problems.
+  for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
+    char *name = NULL;
+    feenox_check_minusone(asprintf(&name, "Jx%u", g+1));
+    feenox_call(feenox_problem_define_solution_function(name, &neutron_diffusion.Jx[g], FEENOX_SOLUTION_GRADIENT));
+    feenox_free(name);
+    if (feenox.pde.dim > 1) {
+      feenox_check_minusone(asprintf(&name, "Jy%u", g+1));
+      feenox_call(feenox_problem_define_solution_function(name, &neutron_diffusion.Jy[g], FEENOX_SOLUTION_GRADIENT));
+      feenox_free(name);
+      if (feenox.pde.dim > 2) {
+        feenox_check_minusone(asprintf(&name, "Jz%u", g+1));
+        feenox_call(feenox_problem_define_solution_function(name, &neutron_diffusion.Jz[g], FEENOX_SOLUTION_GRADIENT));
+        feenox_free(name);
+      }
+    }  
+  }
+  
+
   // TODO: for one group make an alias between phi1 and phi
   
 ///va_neutron_diffusion+keff+desc The effective multiplication factor\ $k_\text{eff}$.
@@ -88,7 +128,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   feenox_check_alloc(neutron_diffusion.nu_Sigma_f = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.S          = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.Sigma_s    = calloc(G, sizeof(distribution_t *)));
-  for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+  for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
     char *name = NULL;
 
     feenox_check_minusone(asprintf(&name, "D%d", g+1));
@@ -189,6 +229,13 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   
   feenox.pde.symmetric_K = 0;
   feenox.pde.symmetric_M = 0;
+  
+  // see if we have to compute gradients
+  for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
+    feenox.pde.compute_gradients |= (neutron_diffusion.Jx != NULL && neutron_diffusion.Jx[g]->used) ||
+                                    (neutron_diffusion.Jy != NULL && neutron_diffusion.Jy[g]->used) ||
+                                    (neutron_diffusion.Jz != NULL && neutron_diffusion.Jz[g]->used);
+  }
 #endif
   return FEENOX_OK;
 }

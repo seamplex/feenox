@@ -48,6 +48,13 @@ extern int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const c
 extern int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *bc_data, element_t *e, size_t j_global);
 extern int feenox_problem_bc_set_neutron_diffusion_vacuum(bc_data_t *bc_data, element_t *e, unsigned int q);
 
+// thermal/currents.c
+extern int feenox_problem_gradient_fill_neutron_diffusion(void);
+extern int feenox_problem_gradient_properties_at_element_nodes_neutron_diffusion(element_t *element, mesh_t *mesh);
+extern int feenox_problem_gradient_fluxes_at_node_alloc_neutron_diffusion(node_t *node);
+extern int feenox_problem_gradient_add_elemental_contribution_to_node_neutron_diffusion(node_t *node, element_t *element, unsigned int j, double rel_weight);
+extern int feenox_problem_gradient_fill_fluxes_neutron_diffusion(mesh_t *mesh, size_t j);
+
 // neutron_diffusion/post.c
 extern int feenox_problem_solve_post_neutron_diffusion(void);
 #endif  // NEUTRON_DIFFUSION_FEM

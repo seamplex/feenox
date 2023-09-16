@@ -909,7 +909,7 @@ struct dae_t {
 
 
 
-// mesh-realted structs -----------------------------
+// mesh-related structs -----------------------------
 // node
 struct node_t {
   double x[3];              // spatial coordinates of the node
