@@ -273,7 +273,7 @@ int feenox_instruction_mesh_read(void *arg) {
     char *name = NULL;
     feenox_check_minusone(asprintf(&name, "mesh_%c", 'x'+d));
     vector_t *vec_coords = feenox_get_vector_ptr(name);
-    if (vec_coords != NULL) {
+    if (vec_coords != NULL && feenox_vector_get_size(vec_coords) == 0) {
       feenox_call(feenox_vector_set_size(vec_coords, this->n_nodes));
       feenox_call(feenox_vector_init(vec_coords, FEENOX_VECTOR_NO_INITIAL));
       feenox_realloc_vector_ptr(vec_coords, gsl_vector_ptr(this->nodes_argument[0], 0), 0);

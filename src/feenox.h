@@ -2145,6 +2145,7 @@ extern double feenox_vector_get_initial_transient(vector_t *, const size_t i);
 extern int feenox_vector_set(vector_t *, const size_t i, double value);
 extern int feenox_vector_add(vector_t *, const size_t i, double value);
 extern int feenox_vector_set_size(vector_t *, const size_t size);
+extern size_t feenox_vector_get_size(vector_t *);
 
 // function.c
 extern int feenox_function_init(function_t *);

@@ -126,8 +126,12 @@ int feenox_vector_set_size(vector_t *this, size_t size) {
   this->size = size;
   
   return FEENOX_OK;
-  
 }
+
+size_t feenox_vector_get_size(vector_t *this) {
+  return this->size;
+}
+
 
 // no_initial = 0 means allocate and initialize initial static and initial transient
 // no_initial = 1 means do not allocate initial
