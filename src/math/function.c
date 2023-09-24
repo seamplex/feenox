@@ -289,7 +289,7 @@ int feenox_function_init(function_t *this) {
     if (this->vector_argument != NULL) {
       for (unsigned int i = 0; i < this->n_arguments; i++) {
         if (this->vector_argument[i]->initialized == 0) {
-          feenox_call(feenox_vector_init(this->vector_argument[i], 1));
+          feenox_call(feenox_vector_init(this->vector_argument[i], FEENOX_VECTOR_NO_INITIAL));
         }
 
         if (this->data_size == 0) {
@@ -302,7 +302,7 @@ int feenox_function_init(function_t *this) {
         }
 
         if (this->vector_value->initialized == 0) {
-          feenox_call(feenox_vector_init(this->vector_argument[i], 1));
+          feenox_call(feenox_vector_init(this->vector_argument[i], FEENOX_VECTOR_NO_INITIAL));
         }
       }
 

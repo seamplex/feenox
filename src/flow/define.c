@@ -202,7 +202,7 @@ vector_t *feenox_define_vector_get_ptr(const char *name, size_t size) {
   // this function is called from the code, that already knows what the vector size is
   // the function below is called from the API that allows a string
   // this is ugly but we don't need too much performance
-  char *size_string;
+  char *size_string = NULL;
   feenox_check_minusone_null(asprintf(&size_string, "%ld", size));
   if (feenox_define_vector(name, size_string) != FEENOX_OK) {
     return NULL;

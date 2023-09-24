@@ -53,7 +53,7 @@ int feenox_instruction_alias(void *arg) {
     } else if (alias->vector != NULL) {
       
       if (!alias->vector->initialized) {
-        feenox_call(feenox_vector_init(alias->vector, 0));
+        feenox_call(feenox_vector_init(alias->vector, FEENOX_VECTOR_INITIAL));
       }
       if (row >= alias->vector->size) {
         feenox_push_error_message("subscript %d greater than vector size %d in alias '%s'", row, alias->vector->size, alias->new_variable->name);

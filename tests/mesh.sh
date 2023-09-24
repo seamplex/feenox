@@ -40,3 +40,6 @@ exitifwrong $?
 
 answerzero read_vtk5.fee
 exitifwrong $?
+
+answer readmsh_writevtk_readbackvtk.fee ""
+exitifwrong $?

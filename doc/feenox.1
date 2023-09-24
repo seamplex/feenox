@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2023-08-17" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2023-09-16" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -303,7 +303,7 @@ input or as output.
 .IP
 .nf
 \f[C]
-< FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | MODE <fopen_mode> ]  
+< FILE | OUTPUT_FILE | INPUT_FILE > <name> PATH <format> expr_1 expr_2 ... expr_n [ INPUT | OUTPUT | APPEND | MODE <fopen_mode> ]  
 \f[R]
 .fi
 .PP
@@ -685,6 +685,32 @@ The \f[V]SKIP_HEADER_STEP\f[R] keyword works similarly for the optional
 \f[V]HEADER\f[R] but by default it is only printed once.
 The \f[V]SKIP_TIME\f[R] keyword use time advancements to choose how to
 skip printing and may be useful for non-constant time-step problems.
+.SS \f[V]PRINTF\f[R]
+.RS
+.PP
+Instruction akin to C\[cq]s \f[V]printf\f[R].
+.RE
+.IP
+.nf
+\f[C]
+PRINTF format_string [ expr_1 [ expr_2 [ ... ] ] ]  
+\f[R]
+.fi
+.PP
+The \f[V]format_string\f[R] should be a \f[V]printf\f[R]-like string
+containing double-precision format specifiers.
+A matching number of expressions should be given.
+No newline is written if not explicitly asked for in the format string
+with \f[V]\[rs]n\f[R].
+.PD 0
+.P
+.PD
+Do not ask for string literals \f[V]%s\f[R].
+.PD 0
+.P
+.PD
+As always, to get a literal \f[V]%\f[R] use \f[V]%%\f[R] in the format
+string.
 .SS \f[V]PRINT_FUNCTION\f[R]
 .RS
 .PP

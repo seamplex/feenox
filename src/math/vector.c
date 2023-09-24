@@ -29,7 +29,7 @@ int feenox_create_pointwise_function_vectors(function_t *function) {
   feenox_check_minusone(asprintf(&name, "vec_%s", function->name));
   feenox_check_alloc(function->vector_value = feenox_define_vector_get_ptr(name, function->data_size));
   if (function->data_size != 0) {
-    feenox_call(feenox_vector_init(function->vector_value, 1));
+    feenox_call(feenox_vector_init(function->vector_value, FEENOX_VECTOR_NO_INITIAL));
   }
   feenox_free(name);
 
@@ -45,7 +45,7 @@ int feenox_create_pointwise_function_vectors(function_t *function) {
     feenox_check_minusone(asprintf(&name, "vec_%s_%s", function->name, function->var_argument[i]->name));
     feenox_check_alloc(function->vector_argument[i] = feenox_define_vector_get_ptr(name, function->data_size));
     if (function->data_size != 0) {
-      feenox_call(feenox_vector_init(function->vector_argument[i], 1));
+      feenox_call(feenox_vector_init(function->vector_argument[i], FEENOX_VECTOR_NO_INITIAL));
     }
     feenox_free(name);
   }  
@@ -56,7 +56,7 @@ int feenox_create_pointwise_function_vectors(function_t *function) {
 double feenox_vector_get(vector_t *this, const size_t i) {
 
   if (this->initialized == 0) {
-    if (feenox_vector_init(this, 0) != FEENOX_OK) {
+    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -68,7 +68,7 @@ double feenox_vector_get(vector_t *this, const size_t i) {
 double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this, 0) != FEENOX_OK) {
+    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -80,7 +80,7 @@ double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
 double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this, 0) != FEENOX_OK) {
+    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       feenox_runtime_error();
     }
@@ -92,7 +92,7 @@ double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
 int feenox_vector_set(vector_t *this, const size_t i, double value) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this, 0) != FEENOX_OK) {
+    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       return FEENOX_ERROR;
     }
@@ -106,7 +106,7 @@ int feenox_vector_set(vector_t *this, const size_t i, double value) {
 int feenox_vector_add(vector_t *this, const size_t i, double value) {
   
   if (this->initialized == 0) {
-    if (feenox_vector_init(this, 0) != FEENOX_OK) {
+    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
       feenox_push_error_message("initialization of vector '%s' failed", this->name);
       return FEENOX_ERROR;
     }
@@ -129,7 +129,8 @@ int feenox_vector_set_size(vector_t *this, size_t size) {
   
 }
 
-
+// no_initial = 0 means allocate and initialize initial static and initial transient
+// no_initial = 1 means do not allocate initial
 int feenox_vector_init(vector_t *this, int no_initial) {
 
   int size;

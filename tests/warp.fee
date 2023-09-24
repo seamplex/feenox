@@ -11,9 +11,11 @@ VECTOR dzv[nodes]
 DEFAULT_ARGUMENT_VALUE 2 1e5
 k = $2
 
-dxv[i] = vec_u_x[i] + k*vec_u[i]
-dyv[i] = vec_u_y[i] + k*vec_v[i]
-dzv[i] = vec_u_z[i] + k*vec_w[i]
+# dxv[i] = vec_u_x[i] + k*vec_u[i]
+# dyv[i] = vec_u_y[i] + k*vec_v[i]
+# dzv[i] = vec_u_z[i] + k*vec_w[i]
+
+dxv[i] = mesh_x[i] + k*vec_u[i]
 
 # PRINT_VECTOR dxv dyv dzv
 PRINT %.3e dxv[1] vec_u_x[1] vec_u[1] SEP " "

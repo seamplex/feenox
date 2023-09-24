@@ -15,7 +15,8 @@
    - rewrite BLAS using ad-hoc routines
    - wrap all GSL calls inside `#ifdef`
    - use a large chunk of contiguous memory in the heap to store shape functions, gradients, etc
- * MPI
+ * optimize MPI usage
+   - variables `mpi_rank`, `mpi_size`,  `memory_total` y `memory_local(rank)`
  * V&V
    - fully document tests
    - section for MMS
@@ -33,8 +34,8 @@
 
  * if the elements are straight all the jacobians are the same and there is no need to sweep over gauss points
  * make two lists of elements, one for bulk and one for BCs and loop over those
- * rewrite `fem.c` to store per-gauss point data in a cache-friendly way
- * remove branches
+ * re-think `fem.c` to store per-gauss point data in a cache-friendly way
+ * remove branches (and replace with what?)
  * use ad-hoc matrices instead of `gsl_matrix`?
    - have a contiguous array of memory that stores all the per-element matrices in a row-major order
    - access them using macros `dhdx(row,col)`
@@ -50,7 +51,7 @@
    - full or axi-symmetry
    - scalar size (float or double)
    - all elements are of the same type
-   
+ * use `MatSetValuesBlocked()`
    
 ## Wasora keywords
 
@@ -114,6 +115,9 @@
  
  * full tensors
  
+# Meshes
+
+ * expose the vectors with the node coordinates
  
 # PDEs
 
@@ -124,7 +128,7 @@
  * remove the need of needing an explicit `SOLVE_PROBLEM`
    - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
  * benchmark MPI (read `.msh` with partitioning info first)
- * openmp to build matrices and compute stresses? not sure, should be mpi on a partitioned mesh
+ * openmp to build matrices and compute stresses? not sure, we'd have to rewrite the building stuff thread safe, it should be mpi on a partitioned mesh
  * glue (mortar)
  * investigate `-mpi_linear_solver_server`
  * direct elimination for multi-freedom BCs

@@ -22,7 +22,7 @@ done
 echo "    </list>"
 
 # secondary keywords (TO-DO)
-echo "    <list name=\"sec_keywords\">"
+echo "    <list name=\"sec_keywords\"><item>\$</item>"
 echo "    </list>"
 
 # special variables

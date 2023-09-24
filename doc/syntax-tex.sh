@@ -14,7 +14,7 @@ done
 echo "},"
 
 # secondary keywords (TO-DO)
-echo "morekeywords={[2]"
+echo "morekeywords={[2]\$"
 echo "},"
 
 # special variables

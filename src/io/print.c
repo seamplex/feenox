@@ -110,7 +110,7 @@ int feenox_instruction_print(void *arg) {
       
     } else if (print_token->vector != NULL) {
       if (!print_token->vector->initialized) {
-        feenox_call(feenox_vector_init(print_token->vector, 0));
+        feenox_call(feenox_vector_init(print_token->vector, FEENOX_VECTOR_INITIAL));
       }
       for (i = 0; i < print_token->vector->size; i++) {
         fprintf(print->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), i));
@@ -413,7 +413,7 @@ int feenox_instruction_print_vector(void *arg) {
   }
   
   if (!print_vector->first_vector->initialized) {
-    feenox_call(feenox_vector_init(print_vector->first_vector, 0));
+    feenox_call(feenox_vector_init(print_vector->first_vector, FEENOX_VECTOR_INITIAL));
   }
   
   char *current_format = feenox_print_vector_current_format_reset(print_vector);
@@ -423,7 +423,7 @@ int feenox_instruction_print_vector(void *arg) {
     LL_FOREACH(print_vector->tokens, print_token) {
       
       if (!print_token->vector->initialized) {
-        feenox_call(feenox_vector_init(print_token->vector, 0));
+        feenox_call(feenox_vector_init(print_token->vector, FEENOX_VECTOR_INITIAL));
       }
       
       if (print_token->vector->size != print_vector->first_vector->size) {
@@ -467,7 +467,7 @@ int feenox_instruction_print_vector(void *arg) {
         
         if (print_token->vector != NULL) {
           if (print_token->vector->initialized == 0) {
-            feenox_call(feenox_vector_init(print_token->vector, 0));
+            feenox_call(feenox_vector_init(print_token->vector, FEENOX_VECTOR_INITIAL));
           }
           if (print_token->vector->size != print_vector->first_vector->size) {
             feenox_push_error_message("vectors %s and %s do not have the same size", print_token->vector->name, print_vector->first_vector->name);

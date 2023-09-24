@@ -69,3 +69,5 @@ sn-square.msh
 square-struct.msh
 azmy*.msh
 thermal-square.vtk
+square_tmp.vtk
+2dpwr-*.vtk

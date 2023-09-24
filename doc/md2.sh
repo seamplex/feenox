@@ -104,6 +104,34 @@ if [ -z "${rootdir}" ]; then
  exit 1
 fi
 
+
+# ----------------------------------------------------------------
+currentdateedtf=$(date +%Y-%m-%d)
+
+headepoch=$(git log -1 --format="%ct")
+headdateedtf=$(date -d@${headepoch} +%Y-%m-%d)
+
+hash=$(git rev-parse --short HEAD)
+
+# if the current working tree is not clean, we add a "+"
+# (should be $\epsilon$, but it would screw the file name),
+# set the date to today and change the author to the current user,
+# as it is the most probable scenario
+if [ -z "$(git status --porcelain)" ]; then
+  dateedtf=${headdateedtf}
+else
+  dateedtf=${currentdateedtf}
+  hash="${hash}+dirty"
+fi
+
+cat << EOF > hash.yaml
+---
+hash: ${hash}
+date: ${dateedtf}
+...
+EOF
+# ----------------------------------------------------------------
+
 # check output dir
 in=$(basename ${path_to_md} .md)
 if [ -z "${output_dir}" ]; then
@@ -183,7 +211,7 @@ fi
 # TODO: check if filters, templates, etc. exist
 
 # here's the meat
-pandoc ${in}.md \
+pandoc hash.yaml ${in}.md \
     --standalone ${toc_option} \
     --metadata=rootdir:${rootdir} \
     --syntax-definition=${rootdir}/doc/feenox.xml \
@@ -194,7 +222,7 @@ pandoc ${in}.md \
     --lua-filter=${rootdir}/doc/only-in-format.lua \
     --lua-filter=${rootdir}/doc/img-width.lua \
     --filter pandoc-crossref \
-    --number-sections --toc --toc-depth=4 \
+    --number-sections --toc-depth=4 \
     ${template_args} ${format_args} -o ${out}
 
 if [ $? -ne 0 ]; then

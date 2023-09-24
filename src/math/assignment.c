@@ -194,7 +194,7 @@ int feenox_instruction_assignment_vector(void *arg) {
       i_max = (size_t)(round(feenox_expression_eval(&assignment->i_max)));
     } else {
       if (!assignment->vector->initialized) {
-        feenox_call(feenox_vector_init(assignment->vector, 0));
+        feenox_call(feenox_vector_init(assignment->vector, FEENOX_VECTOR_INITIAL));
       }
       i_max = assignment->vector->size;
     }
@@ -256,7 +256,7 @@ int feenox_get_assignment_array_boundaries(assignment_t *assignment, int *i_min,
       if (assignment->vector != NULL) {
         
         if (!assignment->vector->initialized) {
-          feenox_call(feenox_vector_init(assignment->vector, 0));
+          feenox_call(feenox_vector_init(assignment->vector, FEENOX_VECTOR_INITIAL));
         }
         
         *i_max = assignment->vector->size;
@@ -349,7 +349,7 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
   } else if (assignment->vector != NULL) {
     
     if (!assignment->vector->initialized) {
-      feenox_vector_init(assignment->vector, 0);
+      feenox_vector_init(assignment->vector, FEENOX_VECTOR_INITIAL);
     }
     
     current = gsl_vector_ptr(feenox_value_ptr(assignment->vector), row);

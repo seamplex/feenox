@@ -110,6 +110,9 @@ extern "C++" {
 #define FEENOX_ERROR      1
 #define FEENOX_UNHANDLED  2
 
+#define FEENOX_VECTOR_INITIAL    0
+#define FEENOX_VECTOR_NO_INITIAL 1
+
 #define BUFFER_TOKEN_SIZE        256
 #define BUFFER_LINE_SIZE        4096
 

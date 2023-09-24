@@ -336,7 +336,9 @@ inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, in
   
   // TODO: choose to complain about zero or negative?
   // TODO: choose to take the absolute value or not? put these two as defines
-  (*w)[q] = e->type->gauss[integration].w[q] * fabs(feenox_fem_determinant(J));
+  double det = feenox_fem_determinant(J);
+//  printf("element tag %ld gauss point %d det = %g\n", e->tag, q, det);
+  (*w)[q] = e->type->gauss[integration].w[q] * fabs(det);
   
   feenox.fem.current_weight_element_tag = e->tag;
   feenox.fem.current_weight_gauss_point = q;

@@ -1,0 +1,7 @@
+READ_MESH square.msh SCALE 1e-3
+WRITE_MESH square_tmp.vtk
+
+INPUT_FILE tmp PATH square_tmp.vtk
+READ_MESH tmp
+
+

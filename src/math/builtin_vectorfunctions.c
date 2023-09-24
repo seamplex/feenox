@@ -47,7 +47,7 @@ struct builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTION
 ///fv+vecsize+desc Returns the size of vector $\vec{b}$.
 double feenox_builtin_vecsize(vector_t **arg) {
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
   return (double)arg[0]->size;
 }
@@ -61,7 +61,7 @@ double feenox_builtin_vecsum(vector_t **arg) {
   double s;
   
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
 
   s = 0;
@@ -83,7 +83,7 @@ double feenox_builtin_vecnorm(vector_t **arg) {
   double s;
   
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
 
   s = 0;
@@ -103,7 +103,7 @@ double feenox_builtin_vecmin(vector_t **arg) {
   double y;
   
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
   
   y = gsl_vector_min(feenox_value_ptr(arg[0]));
@@ -119,7 +119,7 @@ double feenox_builtin_vecmax(vector_t **arg) {
   double y;
   
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
   
   y = gsl_vector_max(feenox_value_ptr(arg[0]));
@@ -135,7 +135,7 @@ double feenox_builtin_vecminindex(vector_t **arg) {
   double y;
   
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
   
   y = (double)(gsl_vector_min_index(feenox_value_ptr(arg[0]))+1);
@@ -151,7 +151,7 @@ double feenox_builtin_vecmaxindex(vector_t **arg) {
   double y;
   
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
   
   y = (double)(gsl_vector_max_index(feenox_value_ptr(arg[0]))+1);
@@ -168,11 +168,11 @@ double feenox_builtin_vecdot(vector_t **arg) {
   double s;
 
   if (!arg[0]->initialized) {
-    feenox_vector_init(arg[0], 0);
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
   }
 
   if (!arg[1]->initialized) {
-    feenox_vector_init(arg[1], 0);
+    feenox_vector_init(arg[1], FEENOX_VECTOR_INITIAL);
   }
   
   if (arg[0]->size != arg[1]->size) {

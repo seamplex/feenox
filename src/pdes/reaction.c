@@ -27,7 +27,7 @@ int feenox_instruction_reaction(void *arg) {
   reaction_t *reaction = (reaction_t *)arg;
   
   if (reaction->vector != NULL && reaction->vector->initialized == 0) {
-    feenox_vector_init(reaction->vector, 0);
+    feenox_vector_init(reaction->vector, FEENOX_VECTOR_NO_INITIAL);
   }
   
   // order == 1 for moment

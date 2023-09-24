@@ -716,7 +716,7 @@ int feenox_mesh_read_vtk_field_node(mesh_t *this, FILE *fp, const char *name, un
       functions[i]->mesh = this;
       functions[i]->data_size = this->n_nodes;
       functions[i]->vector_value->size = this->n_nodes;
-      feenox_call(feenox_vector_init(functions[i]->vector_value, 1));
+      feenox_call(feenox_vector_init(functions[i]->vector_value, FEENOX_VECTOR_NO_INITIAL));
     }
   }
 

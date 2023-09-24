@@ -93,12 +93,12 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
-  feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_min, 1));
+  feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_min, FEENOX_VECTOR_NO_INITIAL));
   gsl_vector_set(feenox.mesh.vars.bbox_min->value, 0, x_min[0]);
   gsl_vector_set(feenox.mesh.vars.bbox_min->value, 1, x_min[1]);
   gsl_vector_set(feenox.mesh.vars.bbox_min->value, 2, x_min[2]);
 
-  feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_max, 1));
+  feenox_call(feenox_vector_init(feenox.mesh.vars.bbox_max, FEENOX_VECTOR_NO_INITIAL));
   gsl_vector_set(feenox.mesh.vars.bbox_max->value, 0, x_max[0]);
   gsl_vector_set(feenox.mesh.vars.bbox_max->value, 1, x_max[1]);
   gsl_vector_set(feenox.mesh.vars.bbox_max->value, 2, x_max[2]);
@@ -231,7 +231,7 @@ int feenox_instruction_mesh_read(void *arg) {
         }
         
         if (physical_group->vector_cog->initialized == 0) {
-          feenox_call(feenox_vector_init(physical_group->vector_cog, 0));
+          feenox_call(feenox_vector_init(physical_group->vector_cog, FEENOX_VECTOR_NO_INITIAL));
         }
         gsl_vector_set(physical_group->vector_cog->value, 0, physical_group->cog[0]);
         gsl_vector_set(physical_group->vector_cog->value, 1, physical_group->cog[1]);
@@ -266,6 +266,21 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }  
   
+  // expose the coordinates of the nodes on vectors mesh_x mesh_y mesh_z
+  // TODO: mesh_name_x etc.
+  // TODO: make an alias from mesh_x to mesh_name_x (and cells nodes etc)
+  for (unsigned int d = 0; d < 3; d++) {
+    char *name = NULL;
+    feenox_check_minusone(asprintf(&name, "mesh_%c", 'x'+d));
+    vector_t *vec_coords = feenox_get_vector_ptr(name);
+    if (vec_coords != NULL) {
+      feenox_call(feenox_vector_set_size(vec_coords, this->n_nodes));
+      feenox_call(feenox_vector_init(vec_coords, FEENOX_VECTOR_NO_INITIAL));
+      feenox_realloc_vector_ptr(vec_coords, gsl_vector_ptr(this->nodes_argument[0], 0), 0);
+    }
+    feenox_free(name);
+  }
+
   // loop over all functions and see if some of them needs us
   function_t *function = NULL;
   for (function = feenox.functions; function != NULL; function = function->hh.next) {
@@ -277,13 +292,13 @@ int feenox_instruction_mesh_read(void *arg) {
       } else if (function->data_size != this->n_nodes) {
         feenox_push_error_message("internal mismatch, data size = %ld != n_ndoes = %ld", function->data_size, this->n_nodes);
       }
-      for (unsigned int m = 0; m < this->dim; m++) {
-        function->vector_argument[m]->size = function->data_size;
-        feenox_call(feenox_vector_init(function->vector_argument[m], 1));
-        feenox_realloc_vector_ptr(function->vector_argument[m], gsl_vector_ptr(this->nodes_argument[m], 0), 0);
+      for (unsigned int d = 0; d < this->dim; d++) {
+        feenox_call(feenox_vector_set_size(function->vector_argument[d], function->data_size));
+        feenox_call(feenox_vector_init(function->vector_argument[d], FEENOX_VECTOR_NO_INITIAL));
+        feenox_realloc_vector_ptr(function->vector_argument[d], gsl_vector_ptr(this->nodes_argument[d], 0), 0);
       }
       function->vector_value->size = function->data_size;
-      feenox_call(feenox_vector_init(function->vector_value, 1));
+      feenox_call(feenox_vector_init(function->vector_value, FEENOX_VECTOR_NO_INITIAL));
     }
   }
   
@@ -654,10 +669,10 @@ mesh_t *feenox_get_mesh_ptr(const char *name) {
 int feenox_mesh_create_nodes_argument(mesh_t *this) {
   
   feenox_check_alloc(this->nodes_argument = calloc(this->dim, sizeof(double *)));
-  for (unsigned int m = 0; m < this->dim; m++) {
-    feenox_check_alloc(this->nodes_argument[m] = gsl_vector_alloc(this->n_nodes));
+  for (unsigned int d = 0; d < this->dim; d++) {
+    feenox_check_alloc(this->nodes_argument[d] = gsl_vector_alloc(this->n_nodes));
     for (size_t j = 0; j < this->n_nodes; j++) {
-      gsl_vector_set(this->nodes_argument[m], j, this->node[j].x[m]); 
+      gsl_vector_set(this->nodes_argument[d], j, this->node[j].x[d]); 
     }  
   }
   

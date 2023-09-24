@@ -2321,6 +2321,13 @@ int feenox_parse_read_mesh(void) {
     mesh->dim = feenox.pde.dim;
   }
   
+  if (feenox_get_vector_ptr("mesh_x") == NULL) {
+    feenox_call(feenox_define_vector("mesh_x", 0));
+    feenox_call(feenox_define_vector("mesh_y", 0));
+    feenox_call(feenox_define_vector("mesh_z", 0));
+  }
+  
+  
   // TODO: API?
   if (feenox_get_mesh_ptr(mesh->file->name) != NULL) {
     feenox_push_error_message("there already exists a mesh named '%s'", mesh->file->name);

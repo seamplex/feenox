@@ -215,11 +215,11 @@ int feenox_dae_init(void) {
     } else if (phase_object->vector != NULL) {
       
       if (!phase_object->vector->initialized) {
-        feenox_call(feenox_vector_init(phase_object->vector, 0));
+        feenox_call(feenox_vector_init(phase_object->vector, FEENOX_VECTOR_INITIAL));
       }
       if (!phase_object->vector_dot->initialized) {
         phase_object->vector_dot->size = phase_object->vector->size;
-        feenox_call(feenox_vector_init(phase_object->vector_dot, 0));
+        feenox_call(feenox_vector_init(phase_object->vector_dot, FEENOX_VECTOR_INITIAL));
       }
       
       phase_object->size = phase_object->vector->size;
@@ -317,7 +317,7 @@ int feenox_dae_init(void) {
     } else if (dae->vector != NULL) {
       
       if (!dae->vector->initialized) {
-        feenox_call(feenox_vector_init(dae->vector, 0));
+        feenox_call(feenox_vector_init(dae->vector, FEENOX_VECTOR_INITIAL));
       }
       
       dae->i_min = (dae->expr_i_min.items != NULL) ? feenox_expression_eval(&dae->expr_i_min)-1 : 0;

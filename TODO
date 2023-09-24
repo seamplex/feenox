@@ -1,4 +1,4 @@
-
+2023-09-20
 
 -   1 General things to do
     -   1.1 Tests
@@ -48,7 +48,6 @@ General things to do
     -   dump states?
     -   choose to use it or not
 -   use spack? sow?
--   https://joss.theoj.org/
 -   FIT to mesh-based functions
 -   FIT taking into account uncertainties
 -   extended integration (as in reduced, full, extended)
@@ -58,6 +57,9 @@ General things to do
     -   use a large chunk of contiguous memory in the heap to store
         shape functions, gradients, etc
 -   MPI
+-   V&V
+    -   fully document tests
+    -   section for MMS
 
 Tests
 
@@ -75,8 +77,8 @@ Optimizations
     there is no need to sweep over gauss points
 -   make two lists of elements, one for bulk and one for BCs and loop
     over those
--   rewrite fem.c to store per-gauss point data in a cache-friendly way
--   remove branches
+-   re-think fem.c to store per-gauss point data in a cache-friendly way
+-   remove branches (and replace with what?)
 -   use ad-hoc matrices instead of gsl_matrix?
     -   have a contiguous array of memory that stores all the
         per-element matrices in a row-major order
@@ -93,6 +95,7 @@ Optimizations
     -   full or axi-symmetry
     -   scalar size (float or double)
     -   all elements are of the same type
+-   use MatSetValuesBlocked()
 
 Wasora keywords
 
@@ -124,7 +127,6 @@ Nice to have
 -   logaritmic ranges for PRINT_FUNCTION
 -   default separator after TEXT should be space, after numerical should
     be tab
--   PRINTF instruction
 -   PRINT_FUNCTION with %f in between arguments (like PRINT_VECTOR)
 -   BLAS
     -   BLAS a * b = s   # scalar dot
@@ -179,7 +181,8 @@ Laplace/Poisson/Helmholtz
 
 -   poisson f = 1, eta = 0
 -   helmholtz f = 1, eta = 1
--   see 2D example in Gmsh list
+-   investigate dsyrk() insted of dgemmv()
+    https://stackoverflow.com/questions/47013581/blas-matrix-by-matrix-transpose-multiply
 
 Heat
 

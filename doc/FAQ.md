@@ -68,6 +68,8 @@ licensing.md
 
 # Why is FeenoX written in C and not in...
 
+See the [programming guide](programming.md) for further discussion.
+
 ## C++?
 
 Let us first start with some generalities
