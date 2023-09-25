@@ -52,6 +52,7 @@ int feenox_problem_parse_problem_modal(const char *token) {
 
 int feenox_problem_parse_write_post_modal(mesh_write_t *mesh_write, const char *token) {
 
+#ifdef HAVE_SLEPC  
   if (strcmp(token, "all") == 0) {
     
     char *tokens[3] = {NULL, NULL, NULL};
@@ -82,7 +83,8 @@ int feenox_problem_parse_write_post_modal(mesh_write_t *mesh_write, const char *
     feenox_push_error_message("undefined keyword '%s' for modal WRITE_RESULTS", token);
     return FEENOX_ERROR;
   }
-  
+
+#endif
   return FEENOX_OK;
 }
   

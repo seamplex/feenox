@@ -1922,10 +1922,6 @@ struct feenox_t {
   } pde;
 
   struct {
-#ifdef HAVE_PETSC
-    PetscBool cache_J;
-    PetscBool cache_B;
-
     // TODO: this is not thread safe! we stick to MPI anyway...
     size_t current_gauss_element_tag;
     element_type_t *current_gauss_type;
@@ -1956,6 +1952,9 @@ struct feenox_t {
 
     gsl_vector *vec_f;               // temporary vector for rhs things like H'*f
 
+    int cache_J;
+    int cache_B;
+#ifdef HAVE_PETSC
     PetscInt *l;  // node-major-ordered vector with the global indexes of the DOFs in the element    
 #endif    
   } fem;

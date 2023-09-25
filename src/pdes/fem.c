@@ -246,7 +246,7 @@ inline gsl_matrix *feenox_fem_compute_invJ_at_gauss(element_t *e, unsigned int q
 
 // matrix with the coordinates
 inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
-  if (feenox.fem.cache_J == PETSC_FALSE && e->type != feenox.fem.current_gauss_type) {
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
     feenox_fem_elemental_caches_reset();
   }
   
@@ -320,7 +320,7 @@ inline material_t *feenox_fem_get_material(element_t *e) {
 
 inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  if (feenox.fem.cache_J == PETSC_FALSE && e->type != feenox.fem.current_gauss_type) {
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
     feenox_fem_elemental_caches_reset();
   }
   
@@ -497,7 +497,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
 // magic magic magic!
 inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, int integration) {
 
-  if (feenox.fem.cache_J == PETSC_FALSE && e->type != feenox.fem.current_gauss_type) {
+  if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
     feenox_fem_elemental_caches_reset();
   }
   
