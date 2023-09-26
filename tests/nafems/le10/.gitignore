@@ -10,6 +10,7 @@
 *.dats
 *.pdf
 *.svg
+version*.txt
 le10-ref.txt
 sparselizard
 output
@@ -35,3 +36,6 @@ arch-*.md
 calculix*.txt
 output
 hash.yaml
+sparselizard-le10
+arch-*.png
+arch-*.svg

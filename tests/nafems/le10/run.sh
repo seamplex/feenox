@@ -53,7 +53,7 @@ if [ ! -z "$(which feenox)" ]; then
 fi
 
 # --- Sparselizard ----------------------
-if [ -e "sparselizard/sparselizard" ]; then
+if [ -x "./sparselizard-le10" ]; then
   has_sparselizard="yes"
   rm -f sparselizard_mumps_${m}*.dat
   
@@ -129,13 +129,13 @@ fi
 # has_calculix=""
 # has_reflex=""
 
-# TODO: --check
 if [ "x${1}" == "x--check" ]; then
   echo "FeenoX GAMG:  ${has_feenox}"
   echo "FeenoX MUMPS: ${has_feenox_mumps}"
   echo "Sparselizard: ${has_sparselizard}"
   echo "Code Aster:   ${has_aster}"
   echo "CalculiX:     ${has_calculix}"
+  echo "Reflex:       ${has_reflex}"
   exit 0
 fi
 
@@ -156,7 +156,7 @@ EOF
 if [ ! -z "$(which lstopo)" ]; then
   rm -f arch-${m}.svg
   lstopo arch-${m}.svg
-  echo "![](arch-${m}.svg)\\ " >> arch-${m}.md
+  echo "![Architecture from \`lstopo\`](arch-${m}.svg)" >> arch-${m}.md
 fi
 
 
@@ -164,14 +164,14 @@ fi
 for c in $(feenox steps.fee ${min} ${steps}); do
 
   if [ ! -e le10-${m}-${c}.msh ]; then
-    gmsh -3 le10-${m}.geo -clscale ${c} -o le10-${m}-${c}.msh || exit 1
-    gmsh -3 le10-${m}-${c}.msh -setnumber Mesh.SecondOrderIncomplete 1 -order 2 -o le10_2nd-${m}-${c}.msh || exit 1
+    gmsh -v 0 -3 le10-${m}.geo -clscale ${c} -o le10-${m}-${c}.msh || exit 1
+    gmsh -v 0 -3 le10-${m}-${c}.msh -setnumber Mesh.SecondOrderIncomplete 1 -order 2 -o le10_2nd-${m}-${c}.msh || exit 1
   fi
 
   # ---- FeenoX (GAMG) -----------------------------------------
   if [ ! -z "${has_feenox}" ]; then
     if [ ! -e feenox_gamg_${m}-${c}.sigmay ]; then
-      echo "running FeenoX GAMG m = ${m} c = ${c}"
+      echo "FeenoX GAMG m = ${m} c = ${c}"
       ${time} -o feenox_gamg_${m}-${c}.time feenox le10.fee ${m}-${c} > feenox_gamg_${m}-${c}.sigmay
     fi
     
@@ -189,7 +189,7 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # ---- FeenoX (MUMPS) -----------------------------------------
   if [ ! -z "${has_feenox_mumps}" ]; then
     if [ ! -e feenox_mumps_${m}-${c}.sigmay ]; then
-      echo "running FeenoX MUMPS c = ${c}"
+      echo "FeenoX MUMPS c = ${c}"
       ${time} -o feenox_mumps_${m}-${c}.time ${feenox_mumps} le10.fee ${m}-${c} --mumps > feenox_mumps_${m}-${c}.sigmay
     fi
 
@@ -208,10 +208,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   if [ ! -z "${has_sparselizard}" ]; then
   
     if [ ! -e sparselizard_mumps_${m}-${c}.sigmay ]; then
-      echo "Running Sparselizard m = ${m} c = ${c}"
-      cd sparselizard
-      ${time} -o ../sparselizard_mumps_${m}-${c}.time ./run_sparselizard.sh ${m}-${c} | grep -v Info > ../sparselizard_mumps_${m}-${c}.sigmay
-      cd ..
+      echo "Sparselizard m = ${m} c = ${c}"
+      ${time} -o sparselizard_mumps_${m}-${c}.time ./sparselizard-le10 ${m}-${c} > sparselizard_mumps_${m}-${c}.sigmay
     fi
     
     if [ -e sparselizard_mumps_${m}-${c}.sigmay ]; then
@@ -230,14 +228,14 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # ---- Code Aster ----------------------------------
   if [ ! -z "${has_aster}" ]; then
     if [ ! -e le10_2nd-${m}-${c}.unv ]; then
-      gmsh -3 le10_2nd-${m}-${c}.msh -o le10_2nd-${m}-${c}.unv || exit 1
+      gmsh -v 0 -3 le10_2nd-${m}-${c}.msh -o le10_2nd-${m}-${c}.unv || exit 1
     fi
     
     # default
     if [ ! -e aster_default_${m}-${c}.sigmay ]; then
-      echo "running Aster c = ${c}"
+      echo "Aster c = ${c}"
       sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/default/ > le10_default-${m}-${c}.export
-      ${time} -o aster_default_${m}-${c}.time as_run le10_default-${m}-${c}.export
+      ${time} -o aster_default_${m}-${c}.time as_run le10_default-${m}-${c}.export > /dev/null
       grep "degrés de liberté:" message_default-${m}-${c} | head -n1 | awk '{printf("%g\t", $7)}' > aster_default_${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-default-${m}-${c}.txt | awk '{print $5}' >> aster_default_${m}-${c}.sigmay
     fi
@@ -254,9 +252,9 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     
     # cholesky
     if [ ! -e aster_cholesky_${m}-${c}.sigmay ]; then
-      echo "running Aster c = ${c}"
+      echo "Aster c = ${c}"
       sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/cholesky/ > le10_cholesky-${m}-${c}.export
-      ${time} -o aster_cholesky_${m}-${c}.time as_run le10_cholesky-${m}-${c}.export
+      ${time} -o aster_cholesky_${m}-${c}.time as_run le10_cholesky-${m}-${c}.export > /dev/null
       grep "degrés de liberté:" message_cholesky-${m}-${c} | head -n1 | awk '{printf("%g\t", $7)}' > aster_cholesky_${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-cholesky-${m}-${c}.txt | awk '{print $5}' >> aster_cholesky_${m}-${c}.sigmay
     fi
@@ -273,9 +271,9 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     
     # mumps
     if [ ! -e aster_mumps_${m}-${c}.sigmay ]; then
-      echo "running Aster c = ${c}"
+      echo "Aster c = ${c}"
       sed s/_m_/${m}-${c}/ le10.export | sed s/_s_/mumps/ > le10_mumps-${m}-${c}.export
-      ${time} -o aster_mumps_${m}-${c}.time as_run le10_mumps-${m}-${c}.export
+      ${time} -o aster_mumps_${m}-${c}.time as_run le10_mumps-${m}-${c}.export > /dev/null
       grep "degrés de liberté:" message_mumps-${m}-${c}  | head -n1 | awk '{printf("%g\t", $7)}' > aster_mumps_${m}-${c}.sigmay
       grep "2.00000000000000E+03  0.00000000000000E+00  3.00000000000000E+02" DD-mumps-${m}-${c}.txt | awk '{print $5}' >> aster_mumps_${m}-${c}.sigmay
     fi
@@ -297,16 +295,16 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # --- CalculiX ----------------------
   if [ ! -z "${has_calculix}" ]; then
     if [ ! -e le10_mesh-${m}-${c}.inp ]; then
-      gmsh -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_calculix-${m}-${c}.unv || exit 1
-      ./unical1 le10_calculix-${m}-${c}.unv le10_mesh-${m}-${c}.inp || exit
+      gmsh -v 0 -3 le10_2nd-${m}-${c}.msh -setnumber Mesh.SaveGroupsOfElements 1 -setnumber Mesh.SaveGroupsOfNodes 1 -o le10_calculix-${m}-${c}.unv || exit 1
+      ./unical1 le10_calculix-${m}-${c}.unv le10_mesh-${m}-${c}.inp > /dev/null || exit
     fi
     
     # Spooles
     if [[ -e le10-${m}.inp ]] && [[ -e le10_mesh-${m}-${c}.inp ]]; then
       if [ ! -e calculix_spooles_${m}-${c}.sigmay ]; then
-        echo "running CalculiX c = ${c} Spooles"
+        echo "CalculiX c = ${c} Spooles"
         sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Spooles/*Static, Solver=Spooles/' > le10_spooles_${m}-${c}.inp
-        ${time} -o calculix_spooles_${m}-${c}.time ccx -i le10_spooles_${m}-${c} | tee calculix_spooles_${m}-${c}.txt
+        ${time} -o calculix_spooles_${m}-${c}.time ccx -i le10_spooles_${m}-${c} > calculix_spooles_${m}-${c}.txt
         grep -C 1 "number of equations" calculix_spooles_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_spooles_${m}-${c}.sigmay
         gawk -f frd-stress-at-node.awk le10_spooles_${m}-${c}.frd >> calculix_spooles_${m}-${c}.sigmay
       fi  
@@ -325,9 +323,9 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     # Iterative diagonal
     if [[ -e le10-${m}.inp ]] && [[ -e le10_mesh-${m}-${c}.inp ]]; then
       if [ ! -e calculix_diagonal_${m}-${c}.sigmay ]; then
-        echo "running CalculiX c = ${c} Iterative diagonal"
+        echo "CalculiX c = ${c} Iterative diagonal"
         sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Iterative scaling/*Static, Solver=Iterative scaling/' > le10_diagonal_${m}-${c}.inp
-        ${time} -o calculix_diagonal_${m}-${c}.time ccx -i le10_diagonal_${m}-${c} | tee calculix_diagonal_${m}-${c}.txt
+        ${time} -o calculix_diagonal_${m}-${c}.time ccx -i le10_diagonal_${m}-${c} > calculix_diagonal_${m}-${c}.txt
         grep -C 1 "number of equations" calculix_diagonal_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_diagonal_${m}-${c}.sigmay
         gawk -f frd-stress-at-node.awk le10_diagonal_${m}-${c}.frd >> calculix_diagonal_${m}-${c}.sigmay
       fi  
@@ -346,9 +344,9 @@ for c in $(feenox steps.fee ${min} ${steps}); do
     # Iterative cholesky
     if [[ -e le10-${m}.inp ]] && [[ -e le10_mesh-${m}-${c}.inp ]]; then
       if [ ! -e calculix_cholesky_${m}-${c}.sigmay ]; then
-        echo "running CalculiX c = ${c} Iterative cholesky"
+        echo "CalculiX c = ${c} Iterative cholesky"
         sed s/xxx/${c}/ le10-${m}.inp | sed 's/**Static, Solver=Iterative Cholesky/*Static, Solver=Iterative Cholesky/' > le10_cholesky_${m}-${c}.inp
-        ${time} -o calculix_cholesky_${m}-${c}.time ccx -i le10_cholesky_${m}-${c} | tee calculix_cholesky_${m}-${c}.txt
+        ${time} -o calculix_cholesky_${m}-${c}.time ccx -i le10_cholesky_${m}-${c} > calculix_cholesky_${m}-${c}.txt
         grep -C 1 "number of equations" calculix_cholesky_${m}-${c}.txt | tail -n 1 | awk '{printf("%d\t", $1)}' > calculix_cholesky_${m}-${c}.sigmay
         gawk -f frd-stress-at-node.awk le10_cholesky_${m}-${c}.frd >> calculix_cholesky_${m}-${c}.sigmay
       fi  
@@ -373,8 +371,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # ---- Reflex MUMPS ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
     if [ ! -e reflex_mumps_${m}-${c}.sigmay ]; then
-      echo "running Reflex MUMPS c = ${c}"
-      ${time} -o reflex_mumps_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=mumps"
+      echo "Reflex MUMPS c = ${c}"
+      ${time} -o reflex_mumps_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=mumps" > /dev/null
       grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_mumps_${m}-${c}.sigmay
       jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_mumps_${m}-${c}.sigmay
     fi
@@ -393,8 +391,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # ---- Reflex GAMG ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
     if [ ! -e reflex_gamg_${m}-${c}.sigmay ]; then
-      echo "running Reflex GAMG c = ${c}"
-      ${time} -o reflex_gamg_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=gamg"
+      echo "Reflex GAMG c = ${c}"
+      ${time} -o reflex_gamg_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=gamg" > /dev/null
       grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_gamg_${m}-${c}.sigmay
       jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_gamg_${m}-${c}.sigmay
     fi
@@ -413,8 +411,8 @@ for c in $(feenox steps.fee ${min} ${steps}); do
   # ---- Reflex HYPRE ----------------------------------
   if [ ! -z "${has_reflex}" ]; then
     if [ ! -e reflex_hypre_${m}-${c}.sigmay ]; then
-      echo "running Reflex HYPRE c = ${c}"
-      ${time} -o reflex_hypre_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=hypre"
+      echo "Reflex HYPRE c = ${c}"
+      ${time} -o reflex_hypre_${m}-${c}.time reflexCLI -i le10.json -s "c=${m}-${c}" -s "x=hypre" > /dev/null
       grep "degrees of freedom" output/le10.log | awk '{printf("%g\t", $3)}' > reflex_hypre_${m}-${c}.sigmay
       jq .outputs.kpi_data[0].symm_tensor.data[0].yy output/le10_result_kpi.json >> reflex_hypre_${m}-${c}.sigmay
     fi

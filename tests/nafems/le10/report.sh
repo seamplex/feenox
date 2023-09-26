@@ -60,6 +60,9 @@ EOF
 
     cat << EOF >> report-${1}.md
     
+\\clearpage
+\\newpage
+    
 # Codes & versions
     
 EOF
@@ -81,7 +84,10 @@ EOF
   # terminal with reference
   if [ -e le10-ref.txt ]; then
   cat << EOF >> report-${1}.md
-  
+ 
+\\clearpage
+\\newpage
+ 
 # Reference solution
   
 \`\`\`terminal
@@ -90,20 +96,17 @@ $(cat le10-ref.txt)
 $
 \`\`\`
 
-EOF
-  fi
-  
-cat << EOF >> report-${1}.md
-# Initial mesh
-
 ![Coarser ${1} mesh for \$c=1\$](le10-${1}-mesh.png){width=90%}
 
 EOF
+  fi
+  
 
   # figures
   cat << EOF  >> report-${1}.md
 \\clearpage
 \\newpage
+
 # Figures
 
 EOF
@@ -132,10 +135,45 @@ EOF
     echo "gnuplot not installed, not creating the plots, just the data files *.dats"
   fi
 
-  for i in sigmay*${1}.svg wall*${1}.svg memory*${1}.svg user*${1}.svg kernel*${1}.svg; do
-    echo "![](${i})\\ " >> report-${1}.md
-    echo >> report-${1}.md
-  done
+  cat << EOF  >> report-${1}.md
+
+::: {#fig:sigma}
+![](sigmay-c-${1}.svg){width=90%}
+
+![](sigmay-dofs-${1}.svg){width=90%}
+
+Stress
+:::
+
+::: {#fig:memory}
+![](memory-c-${1}.svg){width=90%}
+
+![](memory-dofs-${1}.svg){width=90%}
+
+Memory
+:::
+
+::: {#fig:user}
+![](user-c-${1}.svg){width=90%}
+
+![](user-dofs-${1}.svg){width=90%}
+
+User
+:::
+
+::: {#fig:kernel}
+![](kernel-c-${1}.svg){width=90%}
+
+![](kernel-dofs-${1}.svg){width=90%}
+
+kernel
+:::
+
+
+
+EOF
+
+
   echo >> report-${1}.md
 
   
@@ -143,6 +181,7 @@ EOF
     cat << EOF  >> report-${1}.md
 \\clearpage
 \\newpage
+
 # Tables
 
 EOF

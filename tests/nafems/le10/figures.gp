@@ -10,30 +10,39 @@ cx = 1
 set xlabel "Mesh refinement factor"
 
 cy =  3
+unset logscale x
+unset logscale y
 set ylabel "Stress at D [MPa]"
 set output "sigmay-c-xxx.svg"
 load "plot-xxx-sigmay.gp"
 
 
 cy =  4
-set logscale y
+unset logscale x
+unset logscale y
 set ylabel "Wall time [sec]"
 set output "wall-c-xxx.svg"
 load "plot-xxx.gp"
 
 
 cy =  5
+unset logscale x
+unset logscale y
 set ylabel "Kernel-space CPU time [sec]"
 set output "kernel-c-xxx.svg"
 replot
 
 cy =  6
+unset logscale x
+unset logscale y
 set ylabel "User-space CPU time [sec]"
 set output "user-c-xxx.svg"
 replot
 
 
 cy =  7
+unset logscale x
+unset logscale y
 set ylabel "Memory [kB]"
 set output "memory-c-xxx.svg"
 replot

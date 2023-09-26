@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   double poisson = 0.3;
   
   std::string c = (argc > 1) ? argv[1] : "tet-1";
-  mesh mymesh("gmsh:../le10-"+c+".msh", 0);
+  mesh mymesh("gmsh:le10-"+c+".msh", 0);
   field u("h1xyz");
   
   parameter E;
@@ -33,10 +33,10 @@ int main(int argc, char **argv) {
   
   formulation elasticity;
   elasticity += integral(upper, array1x3(0,0,-1)*tf(u));  // p=1 @ upper
-  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);  // -2 gives an exact integration for up to 4th order polynomial"
+  elasticity += integral(bulk, predefinedelasticity(dof(u), tf(u), E, nu), -2);
   elasticity.generate();
   
-  vec solu = solve(elasticity.A(), elasticity.b(), "cholesky");
+  vec solu = solve(elasticity.A(), elasticity.b());
 
   // Transfer the data from the solution vector to the u field:
   u.setdata(bulk, solu);
@@ -52,14 +52,7 @@ int main(int argc, char **argv) {
                          0,                0,           0,  0,  0, mu});
 
   expression sigma = H*strain(u);
-//   u.write(bulk, "le10-sparselizard-displ.vtk", 2);
-//   comp(1, sigma).write(bulk, "le10-sparselizard-sigmay.vtk", 2);   
-
-  field sigmayy("h1");
-  sigmayy.setorder(bulk, 2);
-  sigmayy.setvalue(bulk, comp(1, sigma));  
-  
-  std::cout << elasticity.countdofs() << "\t" << sigmayy.interpolate(bulk, {2000, 0, 300})[0] << std::endl;
+  std::cout << elasticity.countdofs() << "\t" << sigma.interpolate(bulk, {2000, 0, 300})[1] << std::endl;
   
   return 0;
 }

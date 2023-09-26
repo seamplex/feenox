@@ -190,6 +190,8 @@ $ ./report.sh tet
 [...]
 $ ./report.sh hex
 [...]
+$ ../../../doc/md2.sh report-tet.md --pdf
+$ ../../../doc/md2.sh report-hex.md --pdf
 $
 ```
 
