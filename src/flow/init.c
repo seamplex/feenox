@@ -356,7 +356,7 @@ int feenox_init_special_objects(void) {
   feenox_special_var_value(ncores) = (double)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
   
-///va+pid+desc The UNIX process id of the FeenoX instance.
+///va+pid+desc The Unix process id of the FeenoX instance.
   feenox_special_var(pid) = feenox_get_or_define_variable_get_ptr("pid");
   feenox_special_var_value(pid) = (double)getpid();
 

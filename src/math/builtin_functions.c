@@ -83,6 +83,9 @@ double feenox_builtin_mark_max(expr_item_t *);
 double feenox_builtin_mark_min(expr_item_t *);
 double feenox_builtin_max(expr_item_t *);
 double feenox_builtin_memory(expr_item_t *);
+double feenox_builtin_petsc_memory(expr_item_t *);
+double feenox_builtin_mpi_size(expr_item_t *);
+double feenox_builtin_mpi_rank(expr_item_t *);
 double feenox_builtin_min(expr_item_t *);
 double feenox_builtin_mod(expr_item_t *);
 double feenox_builtin_not(expr_item_t *);
@@ -148,7 +151,10 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"memory",              0, 1, &feenox_builtin_memory},
     {"min",                 2, MINMAX_ARGS, &feenox_builtin_min},
     {"mod",                 2, 2, &feenox_builtin_mod},
+    {"mpi_rank",            0, 1, &feenox_builtin_mpi_rank},
+    {"mpi_size",            0, 1, &feenox_builtin_mpi_size},
     {"not",                 1, 2, &feenox_builtin_not},
+    {"petsc_memory",        0, 1, &feenox_builtin_petsc_memory},
     {"quasi_random",        2, 2, &feenox_builtin_quasi_random},
     {"random",              2, 3, &feenox_builtin_random},
     {"random_gauss",        2, 3, &feenox_builtin_random_gauss},
@@ -221,6 +227,49 @@ double feenox_builtin_memory(expr_item_t *f) {
   
   return memory_gb;
 }
+
+///fn+petsc_memory+usage petsc_memory()
+///fn+petsc_memory+desc Returns the current memory usage as reported by PETSc, in Gigabytes.
+double feenox_builtin_petsc_memory(expr_item_t *f) {
+
+// TODO: pass the rank as arguments
+  
+  double memory_b = 0;
+#ifdef HAVE_PETSC  
+  PetscMemoryGetCurrentUsage(&memory_b);
+#endif
+  
+  return memory_b/(1024.0*1024.0*1024.0);
+}
+
+///fn+mpi_size+usage mpi_size()
+///fn+mpi_size+desc Returns the number of MPI ranks.
+double feenox_builtin_mpi_size(expr_item_t *f) {
+
+  int mpi_size = 0;
+#ifdef HAVE_PETSC
+  if (feenox.pde.petscinit_called) {
+    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
+  }
+#endif
+  
+  return (double)mpi_size;
+}
+
+///fn+mpi_rank+usage mpi_rank()
+///fn+mpi_rank+desc Returns the number of MPI ranks.
+double feenox_builtin_mpi_rank(expr_item_t *f) {
+
+  int mpi_rank = 0;
+#ifdef HAVE_PETSC  
+  if (feenox.pde.petscinit_called) {
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  }
+#endif
+  
+  return (double)mpi_rank;
+}
+
 
 ///fn+cpu_time+usage cpu_time([f])
 ///fn+cpu_time+desc Returns the CPU time used by FeenoX, in seconds.

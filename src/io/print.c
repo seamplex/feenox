@@ -52,8 +52,8 @@ int feenox_instruction_print(void *arg) {
     }
   }
   
-  // in parallel runs only print from first processor
-  have_to_print &= (feenox.rank == 0);
+  // in parallel runs only print from first processor unless explicitly asked
+  have_to_print &= (feenox.rank == 0 || print->all_ranks);
 
   if (have_to_print == 0) {
     return FEENOX_OK;

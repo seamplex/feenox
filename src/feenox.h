@@ -271,7 +271,7 @@ enum version_type {
 
 
 // number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         58
+#define N_BUILTIN_FUNCTIONS         61
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
 
@@ -762,6 +762,9 @@ struct print_t {
   // flag to indicate if we need to send the newline char "\n" at the end
   // it's called nonewline so the default is zero and the "\n" is sent
   int nonewline;
+  
+  // by default only rank 0 prints but we can ask all ranks to print
+  int all_ranks;
 
   // stuff to help with the SKIP_*
   int last_static_step;

@@ -1652,6 +1652,15 @@ int feenox_parse_print(void) {
         return FEENOX_ERROR;
       }
 
+///kw+PRINT+usage @
+///kw+PRINT+usage [ FROM_ALL_RANKS ]
+    } else if (strcasecmp(token, "FROM_ALL_RANKS") == 0 || strcasecmp(token, "ALL_RANKS") == 0) {
+      print->all_ranks = 1;
+///kw+PRINT+detail In MPI executions, the `PRINT` instruction is executed in the main rank only.
+///kw+PRINT+detail If `FROM_ALL_RANKS` is given, all ranks execute it.
+///kw+PRINT+detail Note that this is needed to get a meaningful output from `mpi_rank()`.
+      
+      
     } else {
       
 ///kw+PRINT+usage @
