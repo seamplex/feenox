@@ -170,8 +170,8 @@ $
 You live in a country with a high inflation rate. A retailer offers you
 a good with two payment options:
 
-1.  30% off the full price plus 3 equal montly payments, or
-2.  full price in 12 equal monthly payments
+1.  30% off the full price plus 3 equal monthly installments, or
+2.  full price in 12 equal monthly installments
 
 If the inflation rate is small (large), option a (b) wins.
 
