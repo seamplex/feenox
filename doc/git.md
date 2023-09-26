@@ -12,6 +12,7 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX's
  1. Install mandatory dependencies
 
     ```terminal
+    sudo apt-get update
     sudo apt-get install gcc make git automake autoconf libgsl-dev
     ```
 

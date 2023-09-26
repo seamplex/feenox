@@ -4,32 +4,36 @@
   Universe)!][]
 - [<span class="toc-section-number">2</span> Ten ways of computing
   $\pi$][]
-- [<span class="toc-section-number">3</span> The logistic map][]
-- [<span class="toc-section-number">4</span> The Fibonacci sequence][]
-  - [<span class="toc-section-number">4.1</span> Using the closed-form
+- [<span class="toc-section-number">3</span> Financial decisions under
+  inflation][]
+- [<span class="toc-section-number">4</span> The logistic map][]
+- [<span class="toc-section-number">5</span> The Fibonacci sequence][]
+  - [<span class="toc-section-number">5.1</span> Using the closed-form
     formula as a function][]
-  - [<span class="toc-section-number">4.2</span> Using a vector][]
-  - [<span class="toc-section-number">4.3</span> Solving an iterative
+  - [<span class="toc-section-number">5.2</span> Using a vector][]
+  - [<span class="toc-section-number">5.3</span> Solving an iterative
     problem][]
-- [<span class="toc-section-number">5</span> Computing the derivative of
+- [<span class="toc-section-number">6</span> Computing the derivative of
   a function as a UNIX filter][]
-- [<span class="toc-section-number">6</span> On the evaluation of
+- [<span class="toc-section-number">7</span> On the evaluation of
   thermal expansion coefficients][]
 
   [<span class="toc-section-number">1</span> Hello World (and Universe)!]:
     #hello-world-and-universe
   [<span class="toc-section-number">2</span> Ten ways of computing $\pi$]:
     #ten-ways-of-computing-pi
-  [<span class="toc-section-number">3</span> The logistic map]: #the-logistic-map
-  [<span class="toc-section-number">4</span> The Fibonacci sequence]: #the-fibonacci-sequence
-  [<span class="toc-section-number">4.1</span> Using the closed-form formula as a function]:
+  [<span class="toc-section-number">3</span> Financial decisions under inflation]:
+    #financial-decisions-under-inflation
+  [<span class="toc-section-number">4</span> The logistic map]: #the-logistic-map
+  [<span class="toc-section-number">5</span> The Fibonacci sequence]: #the-fibonacci-sequence
+  [<span class="toc-section-number">5.1</span> Using the closed-form formula as a function]:
     #using-the-closed-form-formula-as-a-function
-  [<span class="toc-section-number">4.2</span> Using a vector]: #using-a-vector
-  [<span class="toc-section-number">4.3</span> Solving an iterative problem]:
+  [<span class="toc-section-number">5.2</span> Using a vector]: #using-a-vector
+  [<span class="toc-section-number">5.3</span> Solving an iterative problem]:
     #solving-an-iterative-problem
-  [<span class="toc-section-number">5</span> Computing the derivative of a function as a UNIX filter]:
+  [<span class="toc-section-number">6</span> Computing the derivative of a function as a UNIX filter]:
     #computing-the-derivative-of-a-function-as-a-unix-filter
-  [<span class="toc-section-number">6</span> On the evaluation of thermal expansion coefficients]:
+  [<span class="toc-section-number">7</span> On the evaluation of thermal expansion coefficients]:
     #on-the-evaluation-of-thermal-expansion-coefficients
 
 # Hello World (and Universe)!
@@ -159,6 +163,51 @@ $ feenox pi.fee
 3.1415926535897931      0.0000000000000000
 3.1415927109074255      0.0000000573176324
 $
+```
+
+# Financial decisions under inflation
+
+You live in a country with a high inflation rate. A retailer offers you
+a good with two payment options:
+
+1.  30% off the full price plus 3 equal montly payments, or
+2.  full price in 12 equal monthly payments
+
+If the inflation rate is small (large), option a (b) wins.
+
+**Question** What is the monthly inflation rate at which the two options
+are equally good (or bad)?
+
+``` feenox
+# n = number of payments
+# d = discount 
+# r = monthly inflation rate
+present_value(n, d, r) = sum((1-d)/n * (1/(1+r))^(i-1), i, 1, n)
+r0 = root(present_value(12,0,r) - present_value(3,0.3,r), r, 0, 0.2)
+
+PRINTF "the tipping monthly inflation is %g (that means %.1f%% per month and %.1f%% per year)\n" r0 100*r0 100*(1+r0)^12
+
+PRINT
+
+PRINTF "with 12 payments no discount with r = %g you pay %.3f\n"  r0+0.01 present_value(12,0,r0+0.01)
+PRINTF "with  3 payments and 30%% off with r = %g you pay %.3f\n" r0+0.01 present_value(3,0.3,r0+0.01)
+
+PRINT
+
+PRINTF "with 12 payments no discount with r = %g you pay %.3f\n"  r0-0.01 present_value(12,0,r0-0.01)
+PRINTF "with  3 payments and 30%% off with r = %g you pay %.3f\n" r0-0.01 present_value(3,0.3,r0-0.01)
+```
+
+``` terminal
+$ feenox inflation.fee 
+the tipping monthly inflation is 0.0931703 (that means 9.3% per month and 291.2% per year)
+
+with 12 payments no discount with r = 0.10317 you pay 0.617
+with  3 payments and 30% off with r = 0.10317 you pay 0.637
+
+with 12 payments no discount with r = 0.0831703 you pay 0.669
+with  3 payments and 30% off with r = 0.0831703 you pay 0.648
+$ 
 ```
 
 # The logistic map

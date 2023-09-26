@@ -7,6 +7,7 @@
       <item>ALIAS</item>
       <item>ALLOW_NEW_NONZEROS</item>
       <item>ALLOW_UNRESOLVED_BCS</item>
+      <item>APPEND</item>
       <item>AS</item>
       <item>ASCENDING</item>
       <item>ASCENDING_ORDER</item>
@@ -123,6 +124,7 @@
       <item>PREALLOCATE</item>
       <item>PRECONDITIONER</item>
       <item>PRINT</item>
+      <item>PRINTF</item>
       <item>PRINT_FUNCTION</item>
       <item>PRINT_VECTOR</item>
       <item>PROBLEM</item>
@@ -210,7 +212,7 @@
       <item>SKIP_TIME</item>
       <item>WAIT</item>
     </list>
-    <list name="sec_keywords">
+    <list name="sec_keywords"><item>$</item>
     </list>
     <list name="internals">
       <item>dae_rtol</item>

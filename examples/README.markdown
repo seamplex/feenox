@@ -86,6 +86,7 @@ propose benchmark problems to add to the suite.
 - Basic mathematics
   - [Hello World (and Universe)!][]
   - [Ten ways of computing *π*][]
+  - [Financial decisions under inflation][]
   - [The logistic map][]
   - [The Fibonacci sequence][]
     - [Using the closed-form formula as a function][]
@@ -140,6 +141,7 @@ propose benchmark problems to add to the suite.
 
   [Hello World (and Universe)!]: basic.md#hello-world-and-universe
   [Ten ways of computing *π*]: basic.md#ten-ways-of-computing-pi
+  [Financial decisions under inflation]: basic.md#financial-decisions-under-inflation
   [The logistic map]: basic.md#the-logistic-map
   [The Fibonacci sequence]: basic.md#the-fibonacci-sequence
   [Using the closed-form formula as a function]: basic.md#using-the-closed-form-formula-as-a-function

@@ -3,6 +3,7 @@ To compile the source tarball, proceed as follows. This procedure does not need 
  1. Install mandatory dependencies
 
     ```terminal
+    sudo apt-get update
     sudo apt-get install gcc make libgsl-dev
     ```
 

@@ -13,6 +13,7 @@ done
 
 for i in hello          \
          pi             \
+         inflation      \
          lorenz         \
          logistic       \
          double         \
