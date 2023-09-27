@@ -28,10 +28,21 @@
 int feenox_instruction_printf(void *arg) {
   printf_t *printf = (printf_t *)arg;
 
+  if (printf->all_ranks == 0 && feenox.mpi_rank != 0) {
+    return FEENOX_OK;
+  }
+
   char *string = NULL;
   feenox_check_null(string = feenox_evaluate_string(printf->format_string, printf->n_args, printf->expressions));
-  fprintf(printf->file->pointer, "%s", string);
-  fflush(printf->file->pointer);
+  
+  if (printf->all_ranks == 0) {
+    fprintf(printf->file->pointer, "%s", string);
+    fflush(printf->file->pointer);
+  } else {
+    petsc_call(PetscSynchronizedPrintf(PETSC_COMM_WORLD, "[%d/%d] %s\n", feenox.mpi_rank, feenox.mpi_size, string));
+    petsc_call(PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT));    
+  }
+  
   feenox_free(string);
 
   return FEENOX_OK;

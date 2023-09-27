@@ -46,7 +46,7 @@
 
 void feenox_show_help(const char *progname, int extra) {
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return;
   }
   
@@ -74,7 +74,7 @@ void feenox_show_help(const char *progname, int extra) {
 void feenox_show_version(int version) {
   
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return;
   }
   
@@ -115,7 +115,7 @@ void feenox_show_version(int version) {
 void feenox_shortversion(void) {
 
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return;
   }
   
@@ -135,7 +135,7 @@ void feenox_shortversion(void) {
 void feenox_copyright(void) {
 
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return;
   }
 
@@ -151,7 +151,7 @@ There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2023);
 void feenox_longversion(void) {
   
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return;
   }
 

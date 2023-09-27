@@ -53,7 +53,7 @@ int feenox_instruction_print(void *arg) {
   }
   
   // in parallel runs only print from first processor unless explicitly asked
-  have_to_print &= (feenox.rank == 0 || print->all_ranks);
+  have_to_print &= (feenox.mpi_rank == 0);
 
   if (have_to_print == 0) {
     return FEENOX_OK;
@@ -176,7 +176,7 @@ int feenox_instruction_print_function(void *arg) {
   print_token_t *print_token;
   
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return FEENOX_OK;
   }
   
@@ -400,7 +400,7 @@ int feenox_instruction_print_vector(void *arg) {
   int n_elems_per_line;
   
   // in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return FEENOX_OK;
   }
 

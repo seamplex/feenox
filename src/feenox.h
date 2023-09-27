@@ -271,7 +271,7 @@ enum version_type {
 
 
 // number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         61
+#define N_BUILTIN_FUNCTIONS         60
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
 
@@ -322,6 +322,7 @@ typedef struct fit_t fit_t;
 typedef struct solve_t solve_t;
 typedef struct dump_t dump_t;
 typedef struct reaction_t reaction_t;
+typedef struct mpi_init_t mpi_init_t;
 
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
@@ -763,9 +764,6 @@ struct print_t {
   // it's called nonewline so the default is zero and the "\n" is sent
   int nonewline;
   
-  // by default only rank 0 prints but we can ask all ranks to print
-  int all_ranks;
-
   // stuff to help with the SKIP_*
   int last_static_step;
   int last_step;
@@ -800,6 +798,7 @@ struct print_token_t {
 // printf-like instruction
 struct printf_t {
   // pointer to the output file (if null, print to stdout)
+  int all_ranks;
   file_t *file;
   char *format_string;
   int n_args;
@@ -1470,6 +1469,11 @@ struct dump_t {
   dump_t *next;
 };
 
+struct mpi_init_t {
+  int hello;  
+  mpi_init_t *next;  
+};
+
 
 struct reaction_t {
   physical_group_t *physical_group;
@@ -1503,8 +1507,8 @@ struct feenox_t {
   
   int debug;
   
-  int rank;            // in serial or without petsc, this is always zero
-  int n_procs;
+  int mpi_rank;
+  int mpi_size;
 
   char **error;
   int error_level;
@@ -1536,6 +1540,7 @@ struct feenox_t {
   print_vector_t *print_vectors;
   fit_t *fits;
   solve_t *solves;
+  mpi_init_t *mpi_inits;
   
   struct {
     var_t *done;
@@ -1569,8 +1574,11 @@ struct feenox_t {
     var_t *zero;
     var_t *infinite;
 
-    var_t *ncores;
+//    var_t *ncores;
     var_t *pid;
+    
+    var_t *mpi_size;
+    var_t *mpi_rank;
     
     var_t *on_nan;
     var_t *on_gsl_error;
@@ -2024,6 +2032,8 @@ extern int feenox_instruction_file_close(void *arg);
 // abort.c
 extern int feenox_instruction_abort(void *arg);
 
+// mpi_init.c
+extern int feenox_instruction_mpi_init(void *arg);
 
 // expressions.c
 extern int feenox_expression_parse(expr_t *, const char *string);

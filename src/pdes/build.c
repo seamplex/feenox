@@ -103,12 +103,12 @@ int feenox_problem_build(void) {
 
   // TODO: put 100 as a define or as a variable
   if (feenox.pde.progress_ascii == PETSC_TRUE) {  
-    if (feenox.n_procs == 1) {
+    if (feenox.mpi_size == 1) {
       while (ascii_progress_chars++ < 100) {
         printf(CHAR_PROGRESS_BUILD);
       }
     }
-    if (feenox.rank == 0) {
+    if (feenox.mpi_rank == 0) {
       printf("\n");  
       fflush(stdout);
     }  

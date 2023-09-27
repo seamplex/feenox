@@ -58,12 +58,12 @@ int feenox_problem_solve_petsc_nonlinear(void) {
   // finish the progress line
   if (feenox.pde.progress_ascii == PETSC_TRUE) {
     int i;
-    if (feenox.n_procs == 1) {
+    if (feenox.mpi_size == 1) {
       for (i = (int)(100*feenox.pde.progress_last); i < 100; i++) {
         printf(CHAR_PROGRESS_SOLVE);
       }
     }
-    if (feenox.rank == 0) {
+    if (feenox.mpi_rank == 0) {
       printf("\n");
       fflush(stdout);
     }  

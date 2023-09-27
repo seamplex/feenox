@@ -201,8 +201,15 @@ int feenox_parse_line(void) {
 ///kw+PRINTF+desc Instruction akin to C's `printf`.
 ///kw+PRINTF+usage PRINTF
     } else if (strcasecmp(token, "PRINTF") == 0) {
-      feenox_call(feenox_parse_printf());
+      feenox_call(feenox_parse_printf(0));
       return FEENOX_OK;
+      
+///kw+PRINTF+desc Instruction akin to C's `printf` executed locally from all MPI ranks.
+///kw+PRINTF+usage PRINTF_ALL
+    } else if (strcasecmp(token, "PRINTF_ALL") == 0) {
+      feenox_call(feenox_parse_printf(1));
+      return FEENOX_OK;
+      
       
 ///kw+PRINT_FUNCTION+desc Print one or more functions as a table of values of dependent and independent variables.
 ///kw+PRINT_FUNCTION+usage PRINT_FUNCTION
@@ -377,6 +384,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_solve());
       return FEENOX_OK;
 
+///kw+MPI_INIT+desc Explicitly initialize MPI (not needed for regular users)
+///kw+MPI_INIT+usage MPI_INIT
+      // -----  -----------------------------------------------------------
+    } else if (strcasecmp(token, "MPI_INIT") == 0) {
+      feenox_call(feenox_parse_mpi_init());
+      return FEENOX_OK;
+      
 // TODO: move this to a per-physics parser      
 ///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME\ VIII Div\ 2 Sec\ 5.
 ///kw_pde+LINEARIZE_STRESS+usage LINEARIZE_STRESS
@@ -1652,15 +1666,6 @@ int feenox_parse_print(void) {
         return FEENOX_ERROR;
       }
 
-///kw+PRINT+usage @
-///kw+PRINT+usage [ FROM_ALL_RANKS ]
-    } else if (strcasecmp(token, "FROM_ALL_RANKS") == 0 || strcasecmp(token, "ALL_RANKS") == 0) {
-      print->all_ranks = 1;
-///kw+PRINT+detail In MPI executions, the `PRINT` instruction is executed in the main rank only.
-///kw+PRINT+detail If `FROM_ALL_RANKS` is given, all ranks execute it.
-///kw+PRINT+detail Note that this is needed to get a meaningful output from `mpi_rank()`.
-      
-      
     } else {
       
 ///kw+PRINT+usage @
@@ -1728,13 +1733,14 @@ int feenox_parse_print(void) {
 }
 
 
-int feenox_parse_printf(void) {
+int feenox_parse_printf(int all_ranks) {
  
   // I don't expect anybody to want to use this PRINT instruction through the API
   // so we just parse and define everything here
   printf_t *printf = NULL;
   feenox_check_alloc(printf = calloc(1, sizeof(printf_t)));
 
+  printf->all_ranks = all_ranks;
   
 ///kw+PRINTF+detail The `format_string` should be a `printf`-like string containing double-precision
 ///kw+PRINTF+detail format specifiers. A matching number of expressions should be given.
@@ -3787,6 +3793,25 @@ int feenox_parse_dump(void) {
   
   return FEENOX_OK;
 }
+
+int feenox_parse_mpi_init(void) {
+
+  mpi_init_t *mpi_init = NULL;
+  feenox_check_alloc(mpi_init = calloc(1, sizeof(mpi_init_t)));
+  
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    if (strcasecmp(token, "HELLO") == 0) {
+      mpi_init->hello = 1;
+    }
+  }
+  
+  LL_APPEND(feenox.mpi_inits, mpi_init);
+  feenox_call(feenox_add_instruction(feenox_instruction_mpi_init, mpi_init));
+  
+  return FEENOX_OK;
+}
+
 
 int feenox_parse_solve(void) {
   

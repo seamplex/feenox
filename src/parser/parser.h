@@ -101,7 +101,7 @@ extern int feenox_parse_file(char *mode);
 extern int feenox_parse_open_close(const char *what);
 
 extern int feenox_parse_print(void);
-extern int feenox_parse_printf(void);
+extern int feenox_parse_printf(int all_ranks);
 extern int feenox_parse_print_function(void);
 extern int feenox_parse_print_vector(void);
 
@@ -125,6 +125,7 @@ extern int feenox_parse_integrate(void);
 extern int feenox_parse_find_extrema(void);
 extern int feenox_parse_fit(void);
 extern int feenox_parse_dump(void);
+extern int feenox_parse_mpi_init(void);
 extern int feenox_parse_solve(void);
 
 

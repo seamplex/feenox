@@ -348,18 +348,17 @@ int feenox_init_special_objects(void) {
   feenox_special_var(infinite) = feenox_get_or_define_variable_get_ptr("infinite");
   feenox_special_var_value(infinite) = INFTY;
 
-///va+ncores+desc The number of online available cores, as returned by `sysconf(_SC_NPROCESSORS_ONLN)`.
-///va+ncores+detail This value can be used in the `MAX_DAUGHTERS` expression of the `PARAMETRIC` keyword
-///va+ncores+detail (i.e `ncores/2`).
-  feenox_special_var(ncores) = feenox_get_or_define_variable_get_ptr("ncores");
-#ifdef HAVE_SYSCONF  
-  feenox_special_var_value(ncores) = (double)sysconf(_SC_NPROCESSORS_ONLN);
-#endif
-  
 ///va+pid+desc The Unix process id of the FeenoX instance.
   feenox_special_var(pid) = feenox_get_or_define_variable_get_ptr("pid");
   feenox_special_var_value(pid) = (double)getpid();
 
+///va+mpi_size+desc The number of total ranks in an MPI execution.
+  feenox_special_var(mpi_size) = feenox_get_or_define_variable_get_ptr("mpi_size");
+  feenox_special_var_value(mpi_size) = 0;
+
+///va+mpi_rank+desc The current rank in an MPI execution. Mind the `PRINTF_ALL` instruction.
+  feenox_special_var(mpi_rank) = feenox_get_or_define_variable_get_ptr("mpi_rank");
+  feenox_special_var_value(mpi_rank) = 0;
   
 ///va+on_nan+desc This should be set to a mask that indicates how to proceed if Not-A-Number signal (such as a division by zero)
 ///va+on_nan+desc is generated when evaluating any expression within feenox.
@@ -388,7 +387,7 @@ int feenox_init_special_objects(void) {
   feenox_var_value(dummy) = ON_ERROR_NO_REPORT;
 
   
-//va+realtime_scale+desc If this variable is not zero, then the transient problem is run trying to syncrhonize the
+//va+realtime_scale+desc If this variable is not zero, then the transient problem is run trying to synchronize the
 //va+realtime_scale+desc problem time with realtime, up to a scale given.
 //va+realtime_scale+detail  For example, if the scale is set to one, then
 //va+realtime_scale+detail FeenoX will advance the problem time at the same pace that the real wall time advances. If set to

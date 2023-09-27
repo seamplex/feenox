@@ -600,8 +600,12 @@ void feenox_finalize(void) {
     SlepcFinalize();
 #else
     PetscFinalize();
-#endif    
+#endif
+  } else if (feenox.mpi_size != 0) {
+    MPI_Finalize();
   }
+  
+  
 #endif
     
   return;

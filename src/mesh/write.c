@@ -27,7 +27,7 @@ int feenox_instruction_mesh_write(void *arg) {
   mesh_write_dist_t *mesh_write_dist;
 
   // TODO: in parallel runs only print from first processor
-  if (feenox.rank != 0) {
+  if (feenox.mpi_rank != 0) {
     return FEENOX_OK;
   }
   

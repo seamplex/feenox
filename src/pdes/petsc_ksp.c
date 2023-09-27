@@ -96,13 +96,13 @@ int feenox_problem_solve_petsc_linear(void) {
 
   // finish the progress line
   if (feenox.pde.progress_ascii == PETSC_TRUE) {
-    if (feenox.n_procs == 1) {
+    if (feenox.mpi_size == 1) {
       int i = 0;
       for (i = (int)(100*feenox.pde.progress_last); i < 100; i++) {
         printf(CHAR_PROGRESS_SOLVE);
       }
     }
-    if (feenox.rank == 0) {
+    if (feenox.mpi_rank == 0) {
       printf("\n");
       fflush(stdout);
     }  
@@ -123,7 +123,7 @@ PetscErrorCode feenox_problem_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, 
   int i;
   double current_progress;
   
-  if (feenox.rank == 0) {
+  if (feenox.mpi_rank == 0) {
   
     if (feenox.pde.progress_r0 == 0) {
       feenox.pde.progress_r0 = rnorm;

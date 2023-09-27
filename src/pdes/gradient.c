@@ -36,7 +36,7 @@ int feenox_problem_gradient_compute(void) {
   mesh_t *mesh = (feenox.pde.rough == 0) ? feenox.pde.mesh : feenox.pde.mesh_rough;
   
   // number of steps we need to make for progress bar
-  size_t step = ceil((double)(mesh->n_elements + mesh->n_nodes)*feenox.n_procs/100.0);
+  size_t step = ceil((double)(mesh->n_elements + mesh->n_nodes)*feenox.mpi_size/100.0);
   if (step < 1) {
     step = 1;
   }
@@ -100,12 +100,12 @@ int feenox_problem_gradient_compute(void) {
   
   // TODO: put 100 as a define or as a variable
   if (feenox.pde.progress_ascii == PETSC_TRUE) {  
-    if (feenox.n_procs == 1) {
+    if (feenox.mpi_size == 1) {
       while (ascii_progress_chars++ < 100) {
         printf(CHAR_PROGRESS_GRADIENT);
       }
     }
-    if (feenox.rank == 0) {
+    if (feenox.mpi_rank == 0) {
       printf("\n");  
       fflush(stdout);
     }  

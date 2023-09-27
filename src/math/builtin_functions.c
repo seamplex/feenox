@@ -83,9 +83,8 @@ double feenox_builtin_mark_max(expr_item_t *);
 double feenox_builtin_mark_min(expr_item_t *);
 double feenox_builtin_max(expr_item_t *);
 double feenox_builtin_memory(expr_item_t *);
-double feenox_builtin_petsc_memory(expr_item_t *);
-double feenox_builtin_mpi_size(expr_item_t *);
-double feenox_builtin_mpi_rank(expr_item_t *);
+double feenox_builtin_mpi_memory_local(expr_item_t *);
+double feenox_builtin_mpi_memory_global(expr_item_t *);
 double feenox_builtin_min(expr_item_t *);
 double feenox_builtin_mod(expr_item_t *);
 double feenox_builtin_not(expr_item_t *);
@@ -150,11 +149,10 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"max",                 2, MINMAX_ARGS, &feenox_builtin_max},
     {"memory",              0, 1, &feenox_builtin_memory},
     {"min",                 2, MINMAX_ARGS, &feenox_builtin_min},
+    {"mpi_memory_global",   0, 1, &feenox_builtin_mpi_memory_global},
+    {"mpi_memory_local",    0, 1, &feenox_builtin_mpi_memory_local},
     {"mod",                 2, 2, &feenox_builtin_mod},
-    {"mpi_rank",            0, 1, &feenox_builtin_mpi_rank},
-    {"mpi_size",            0, 1, &feenox_builtin_mpi_size},
     {"not",                 1, 2, &feenox_builtin_not},
-    {"petsc_memory",        0, 1, &feenox_builtin_petsc_memory},
     {"quasi_random",        2, 2, &feenox_builtin_quasi_random},
     {"random",              2, 3, &feenox_builtin_random},
     {"random_gauss",        2, 3, &feenox_builtin_random_gauss},
@@ -228,51 +226,50 @@ double feenox_builtin_memory(expr_item_t *f) {
   return memory_gb;
 }
 
-///fn+petsc_memory+usage petsc_memory()
-///fn+petsc_memory+desc Returns the current memory usage as reported by PETSc, in Gigabytes.
-double feenox_builtin_petsc_memory(expr_item_t *f) {
+///fn+mpi_memory_local+usage mpi_memory_local([rank])
+///fn+mpi_memory_local+desc Returns the memory usage as reported by PETSc in the give rank, in Gigabytes.
+///fn+mpi_memory_local+desc If no rank is given, each rank returns a local value which should be printed with `PRINTF_ALL`.
+double feenox_builtin_mpi_memory_local(expr_item_t *f) {
 
-// TODO: pass the rank as arguments
-  
-  double memory_b = 0;
-#ifdef HAVE_PETSC  
-  PetscMemoryGetCurrentUsage(&memory_b);
-#endif
-  
-  return memory_b/(1024.0*1024.0*1024.0);
-}
-
-///fn+mpi_size+usage mpi_size()
-///fn+mpi_size+desc Returns the number of MPI ranks.
-double feenox_builtin_mpi_size(expr_item_t *f) {
-
-  int mpi_size = 0;
+  double memory_local = 0;
 #ifdef HAVE_PETSC
-  if (feenox.pde.petscinit_called) {
-    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
+  if (f->arg[0].functions == NULL || feenox.mpi_size == 0) {
+    PetscMemoryGetCurrentUsage(&memory_local);
+  } else {
+    PetscInt rank = (PetscInt)feenox_expression_eval(&f->arg[0]);
+    double memory_rank = 0;
+    if (feenox.mpi_rank == rank) {
+      PetscMemoryGetCurrentUsage(&memory_rank);
+      MPI_Allreduce(&memory_rank, &memory_local, 1, MPIU_SCALAR, MPIU_SUM, (feenox.pde.petscinit_called) ? PETSC_COMM_WORLD : MPI_COMM_WORLD);
+    }
   }
 #endif
+
+  return memory_local/(1024.0*1024.0*1024.0);
   
-  return (double)mpi_size;
 }
 
-///fn+mpi_rank+usage mpi_rank()
-///fn+mpi_rank+desc Returns the number of MPI ranks.
-double feenox_builtin_mpi_rank(expr_item_t *f) {
+///fn+mpi_memory_local+usage mpi_memory_global()
+///fn+mpi_memory_local+desc Returns the memory global usage as reported by PETSc summing over all ranks, in Gigabytes.
+double feenox_builtin_mpi_memory_global(expr_item_t *f) {
 
-  int mpi_rank = 0;
+  double memory_local = 0;
+  double memory_global = 0;
 #ifdef HAVE_PETSC  
-  if (feenox.pde.petscinit_called) {
-    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  
+  if (feenox.mpi_size != 0) {
+    PetscMemoryGetCurrentUsage(&memory_local);
+    MPI_Allreduce(&memory_local, &memory_global, 1, MPIU_SCALAR, MPIU_SUM, (feenox.pde.petscinit_called) ? PETSC_COMM_WORLD : MPI_COMM_WORLD);
+  } else {
+    PetscMemoryGetCurrentUsage(&memory_global);
   }
 #endif
   
-  return (double)mpi_rank;
+  return memory_global/(1024.0*1024.0*1024.0);
 }
-
 
 ///fn+cpu_time+usage cpu_time([f])
-///fn+cpu_time+desc Returns the CPU time used by FeenoX, in seconds.
+///fn+cpu_time+desc Returns the CPU time used by the local FeenoX rank, in seconds.
 ///fn+cpu_time+desc If the optional argument `f` is not provided  or it is zero (default),
 ///fn+cpu_time+desc the sum of times for both user-space and kernel-space usage is returned.
 ///fn+cpu_time+desc For `f=1` only user time is returned.

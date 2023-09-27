@@ -47,6 +47,7 @@ feenox_SOURCES = \
 ./flow/instruction.c \
 ./flow/step.c \
 ./flow/run.c \
+./flow/mpi_init.c \
 ./parser/parser.c \
 ./parser/parser.h \
 ./parser/auxiliary.c \

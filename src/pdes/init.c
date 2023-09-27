@@ -93,8 +93,11 @@ int feenox_problem_parse_time_init(void) {
   
   feenox.pde.petscinit_called = PETSC_TRUE;
   
-  petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.n_procs));
-  petsc_call(MPI_Comm_rank(PETSC_COMM_WORLD, &feenox.rank));
+  petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.mpi_size));
+  feenox_special_var_value(mpi_size) = (double)feenox.mpi_size;
+  
+  petsc_call(MPI_Comm_rank(PETSC_COMM_WORLD, &feenox.mpi_rank));
+  feenox_special_var_value(mpi_rank) = (double)feenox.mpi_rank;
   
   petsc_call(PetscLogStageRegister("init", &feenox.pde.stage_init));
   petsc_call(PetscLogStageRegister("build", &feenox.pde.stage_build));
@@ -555,13 +558,13 @@ int feenox_problem_init_runtime_general(void) {
   
   // TODO: honor mesh partitions
   // https://lists.mcs.anl.gov/pipermail/petsc-users/2014-April/021433.html
-  feenox.pde.first_element = (feenox.pde.mesh->n_elements / feenox.n_procs) * feenox.rank;
-  if (feenox.pde.mesh->n_elements % feenox.n_procs > feenox.rank) {
-    feenox.pde.first_element += feenox.rank;
-    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.n_procs) + 1;
+  feenox.pde.first_element = (feenox.pde.mesh->n_elements / feenox.mpi_size) * feenox.mpi_rank;
+  if (feenox.pde.mesh->n_elements % feenox.mpi_size > feenox.mpi_rank) {
+    feenox.pde.first_element += feenox.mpi_rank;
+    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.mpi_size) + 1;
   } else {  
-    feenox.pde.first_element += feenox.pde.mesh->n_elements % feenox.n_procs;
-    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.n_procs);
+    feenox.pde.first_element += feenox.pde.mesh->n_elements % feenox.mpi_size;
+    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.mpi_size);
   }  
 
   // fill in the holders of the continuous functions that will hold the solution

@@ -105,7 +105,7 @@ int feenox_instruction_fit(void *arg) {
     feenox_var_value(fit->sigma[i]) = c*sqrt(gsl_matrix_get(covar, i, i));
   }
   
-  if (fit->verbose && feenox.rank == 0) {
+  if (fit->verbose && feenox.mpi_rank == 0) {
     double dof = fit->n_data - fit->n_via;
     printf("# status = %s\n", gsl_strerror (gsl_status));  
     printf("# summary from method '%s/%s'\n", gsl_multifit_nlinear_name(w), gsl_multifit_nlinear_trs_name(w));
