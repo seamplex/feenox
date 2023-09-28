@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 
 int feenox_instruction_printf(void *arg) {
@@ -36,10 +37,35 @@ int feenox_instruction_printf(void *arg) {
   feenox_check_null(string = feenox_evaluate_string(printf->format_string, printf->n_args, printf->expressions));
   
   if (printf->all_ranks == 0) {
+    // plain old printf
     fprintf(printf->file->pointer, "%s", string);
     fflush(printf->file->pointer);
+    
   } else {
-    petsc_call(PetscSynchronizedPrintf(PETSC_COMM_WORLD, "[%d/%d] %s\n", feenox.mpi_rank, feenox.mpi_size, string));
+    
+    // rank-synchronized printf
+    
+    // first, get the host name
+    char host[256];
+    if (gethostname(host, 255) != 0) {
+      feenox_push_error_message("cannot get hostname\n");
+      return FEENOX_ERROR;
+    }
+    
+    if (feenox.pde.petscinit_called == PETSC_FALSE) {
+      feenox_problem_parse_time_init();
+/*      
+      MPI_Init(&feenox.argc, &feenox.argv);
+      petsc_call(MPI_Comm_size(MPI_COMM_WORLD, &feenox.mpi_size));
+      feenox_special_var_value(mpi_size) = (double)feenox.mpi_size;
+  
+      petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.mpi_rank));
+      feenox_special_var_value(mpi_rank) = (double)feenox.mpi_rank;    
+*/
+    }
+    
+
+    petsc_call(PetscSynchronizedPrintf(PETSC_COMM_WORLD, "[%d/%d %s] %s\n", feenox.mpi_rank, feenox.mpi_size, host, string));
     petsc_call(PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT));    
   }
   

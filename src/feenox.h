@@ -322,7 +322,6 @@ typedef struct fit_t fit_t;
 typedef struct solve_t solve_t;
 typedef struct dump_t dump_t;
 typedef struct reaction_t reaction_t;
-typedef struct mpi_init_t mpi_init_t;
 
 typedef struct physical_group_t physical_group_t;
 typedef struct geometrical_entity_t geometrical_entity_t;
@@ -1469,12 +1468,6 @@ struct dump_t {
   dump_t *next;
 };
 
-struct mpi_init_t {
-  int hello;  
-  mpi_init_t *next;  
-};
-
-
 struct reaction_t {
   physical_group_t *physical_group;
   var_t *scalar;
@@ -1540,7 +1533,6 @@ struct feenox_t {
   print_vector_t *print_vectors;
   fit_t *fits;
   solve_t *solves;
-  mpi_init_t *mpi_inits;
   
   struct {
     var_t *done;
@@ -1574,9 +1566,7 @@ struct feenox_t {
     var_t *zero;
     var_t *infinite;
 
-//    var_t *ncores;
     var_t *pid;
-    
     var_t *mpi_size;
     var_t *mpi_rank;
     
@@ -2031,9 +2021,6 @@ extern int feenox_instruction_file_close(void *arg);
 
 // abort.c
 extern int feenox_instruction_abort(void *arg);
-
-// mpi_init.c
-extern int feenox_instruction_mpi_init(void *arg);
 
 // expressions.c
 extern int feenox_expression_parse(expr_t *, const char *string);

@@ -39,6 +39,7 @@ TESTS = \
         tests/function_file.sh \
         tests/function_mesh.sh \
         tests/function_vectors.sh \
+        tests/hello_mpi.sh \
         tests/integral.sh \
         tests/laplace2d.sh \
         tests/los-alamos.sh \

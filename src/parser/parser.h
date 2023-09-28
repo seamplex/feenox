@@ -125,7 +125,6 @@ extern int feenox_parse_integrate(void);
 extern int feenox_parse_find_extrema(void);
 extern int feenox_parse_fit(void);
 extern int feenox_parse_dump(void);
-extern int feenox_parse_mpi_init(void);
 extern int feenox_parse_solve(void);
 
 

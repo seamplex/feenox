@@ -601,10 +601,7 @@ void feenox_finalize(void) {
 #else
     PetscFinalize();
 #endif
-  } else if (feenox.mpi_size != 0) {
-    MPI_Finalize();
   }
-  
   
 #endif
     
