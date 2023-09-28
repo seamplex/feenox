@@ -72,7 +72,7 @@ profile9(x) = phi1(x'(8.84375,x), y'(9.84375,x))
 PRINT_FUNCTION profile5 profile7 profile9 MIN -10 MAX 10 NSTEPS 1000 FILE $0-$1-$2-$3.dat
 
 # WRITE_RESULTS FORMAT vtk
-PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb\n" total_dofs memory()
+PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb" total_dofs memory()
 # FILE res MODE "a" PATH azmy-resources.dat 
 # PRINT total_dofs wall_time() memory() $1 $2 $3 FILE res
 ---

@@ -10,5 +10,5 @@ a[2] = orig[3]*trans[1]-orig[1]*trans[3]
 a[3] = orig[1]*trans[2]-orig[2]*trans[1]
 
 theta = acos(vecdot(orig, trans)/(vecnorm(orig)*vecnorm(trans)))
-PRINTF "(%g, %g, %f), %g\n" a(1) a(2) a(3) theta
+PRINTF "(%g, %g, %f), %g" a(1) a(2) a(3) theta
 # PRINT  "(" a(1) "," a(2) "," a(3) ")," theta SEP " "

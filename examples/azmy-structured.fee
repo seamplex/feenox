@@ -58,10 +58,10 @@ INTEGRATE phi1 OVER llq RESULT lower_left_quadrant
 INTEGRATE phi1 OVER lrq RESULT lower_right_quadrant
 INTEGRATE phi1 OVER urq RESULT upper_right_quadrant
 
-PRINTF "LLQ = %.3e (ref 1.676e+0)\n" lower_left_quadrant/(5*5)
-PRINTF "LRQ = %.3e (ref 4.159e-2)\n" lower_right_quadrant/(5*5)
-PRINTF "URQ = %.3e (ref 1.992e-3)\n" upper_right_quadrant/(5*5)
+PRINTF "LLQ = %.3e (ref 1.676e+0)" lower_left_quadrant/(5*5)
+PRINTF "LRQ = %.3e (ref 4.159e-2)" lower_right_quadrant/(5*5)
+PRINTF "URQ = %.3e (ref 1.992e-3)" upper_right_quadrant/(5*5)
 
 WRITE_RESULTS
-PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb" total_dofs memory()
 

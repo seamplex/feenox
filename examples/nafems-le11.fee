@@ -42,8 +42,8 @@ SOLVE_PROBLEM
 # for post-processing in Paraview
 WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigmax sigmay sigmaz
 
-PRINTF "sigma_z(A) = %.2f MPa\n" sigmaz(1,0,0)/1e6
-PRINTF "wall time  = %.2f seconds\n" wall_time()^
+PRINTF "sigma_z(A) = %.2f MPa" sigmaz(1,0,0)/1e6
+PRINTF "wall time  = %.2f seconds" wall_time()
 ---
 figures: |
   ::: {#fig:nafems-le11-result}

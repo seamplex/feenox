@@ -14,4 +14,4 @@ nu = 0.3    # Poisson's ratio
 
 SOLVE_PROBLEM   # TODO: implicit
 
-PRINTF "sigma_y(D) = %.4f MPA (%g degrees of freedom)\n" sigmay(2000,0,300) total_dofs
+PRINTF "sigma_y(D) = %.4f MPa (%g degrees of freedom)" sigmay(2000,0,300) total_dofs

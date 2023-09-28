@@ -1,8 +1,8 @@
-PRINTF "hola%g\n"   1+1
-PRINTF "%ghola%d\n" 1+1 2*2
+PRINTF "hola%g"   1+1
+PRINTF "%ghola%d" 1+1 2*2
 PRINTF "%.1f %.2f %.3f" 10/3 10/4 10/7
 PRINTF "%.1e %.2e %.3e %.4e" pi pi pi pi
-PRINTF "%g %g %g %g %g\n" 1 2 3 4 5
-PRINTF "%g %g %g %g %g %d\n" 1 2 3 4 5 6
-PRINTF "%gx%gx%gx%gx%gx%dx%g\n" 1 2 3 4 5 6 7
-PRINTF "%gx%gx%gx%gx%gx%dx%gx%d\n" 1 2 3 4 5 6 7 8
+PRINTF "%g %g %g %g %g" 1 2 3 4 5
+PRINTF "%g %g %g %g %g %d" 1 2 3 4 5 6
+PRINTF "%gx%gx%gx%gx%gx%dx%g" 1 2 3 4 5 6 7
+PRINTF "%gx%gx%gx%gx%gx%dx%gx%d" 1 2 3 4 5 6 7 8

@@ -38,7 +38,7 @@ int feenox_instruction_printf(void *arg) {
   
   if (printf->all_ranks == 0) {
     // plain old printf
-    fprintf(printf->file->pointer, "%s", string);
+    fprintf(printf->file->pointer, "%s\n", string);
     fflush(printf->file->pointer);
     
   } else {
