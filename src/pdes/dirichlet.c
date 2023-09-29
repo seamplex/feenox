@@ -140,7 +140,7 @@ int feenox_problem_dirichlet_eval(void) {
 // this is called only when solving an explicit KSP (or EPS) so 
 // it takes K and b and writes K_bc and b_bc
 int feenox_problem_dirichlet_set_K(void) {
-  
+
   if (feenox.pde.dirichlet_scale == 0)
   {
     feenox_problem_dirichlet_compute_scale();
@@ -149,7 +149,7 @@ int feenox_problem_dirichlet_set_K(void) {
   // sometimes there are hanging nodes with no associated volumes
   // this can trigger zeros on the diagonal and MatZeroRowsColumns complains
   if (feenox.pde.hanging_nodes) {
-    PetscBool found = PETSC_FALSE;
+    int found = 0;
     Vec vec_diagonal = NULL;
     petsc_call(VecDuplicate(feenox.pde.phi, &vec_diagonal));
     petsc_call(MatGetDiagonal(feenox.pde.K, vec_diagonal));
@@ -160,12 +160,12 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatSetOption(feenox.pde.K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
     for (PetscInt j = 0; j < size; j++) {
       if (array_diagonal[j] == 0) {
-        found = PETSC_TRUE;
+        found = 1;
         if (feenox.pde.hanging_nodes == hanging_nodes_detect) {
           size_t index = j / feenox.pde.dofs;
           if (j % index == 0) {
             // only report the first dof where the hanging node is found
-            feenox_push_error_message("%d", feenox.pde.mesh->node[index].tag);
+            feenox_push_error_message("%ld", feenox.pde.mesh->node[index].tag);
           }  
         } else {
           PetscInt row = feenox.pde.first_row + j;
@@ -178,7 +178,9 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(VecRestoreArrayRead(vec_diagonal, &array_diagonal));
     petsc_call(VecDestroy(&vec_diagonal));
  
-    if (found) {
+    int found_global = 0;
+    MPI_Allreduce(&found, &found_global, 1, MPIU_INT, MPIU_SUM, PETSC_COMM_WORLD);
+    if (found_global) {
       if (feenox.pde.hanging_nodes == hanging_nodes_detect) {
         feenox_push_error_message("hanging nodes detected:");
         return FEENOX_ERROR;
@@ -188,7 +190,7 @@ int feenox_problem_dirichlet_set_K(void) {
       }
     }  
   }  
-  
+
   if (feenox.pde.K_bc == NULL) {
     petsc_call(MatDuplicate(feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.K_bc));
     petsc_call(PetscObjectSetName((PetscObject)(feenox.pde.K_bc), "K_bc"));
@@ -211,6 +213,13 @@ int feenox_problem_dirichlet_set_K(void) {
       petsc_call(MatSetValues(feenox.pde.K_bc, feenox.pde.dofs, l, feenox.pde.dofs, l, gsl_matrix_ptr(P, 0, 0), ADD_VALUES));
     }
     gsl_matrix_free(P);
+  }
+
+  int has_multidof_global = 0;
+  int has_multidof_local = (feenox.pde.multifreedom_nodes > 0);
+  MPI_Allreduce(&has_multidof_local, &has_multidof_global, 1, MPIU_INT, MPIU_SUM, PETSC_COMM_WORLD);
+
+  if (has_multidof_global) {
     petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
     petsc_call(MatAssemblyEnd(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));
   }
@@ -227,14 +236,12 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &rhs));
     petsc_call(VecSetValues(rhs, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   }  
-  
+
   if (feenox.pde.symmetric_K) {
     petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   } else {  
     petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
   }
-  
-//  petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0, NULL, NULL));  
   
   if (rhs != NULL) {
     petsc_call(VecDestroy(&rhs));
