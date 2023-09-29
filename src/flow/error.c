@@ -127,7 +127,11 @@ void feenox_gsl_handler(const char *reason, const char *file_ptr, int line, int 
 
 void feenox_signal_handler(int sig_num) {
 
-  fprintf(stderr, "\npid %d: signal #%d caught, finnishing... ", getpid(), sig_num);
+  if (feenox.mpi_size == 0) {
+    fprintf(stderr, "\npid %d: signal #%d caught, finnishing... ", getpid(), sig_num);
+  } else {
+    fprintf(stderr, "\n[%d] pid %d: signal #%d caught, finnishing... ", feenox.mpi_rank, getpid(), sig_num);
+  }
   fflush(stderr);
 
   feenox_special_var_value(done) = (double)1.0;
