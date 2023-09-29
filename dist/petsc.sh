@@ -10,7 +10,8 @@ fi
 # --- PETSc -------------------------------
 if [ ! -e petsc-${petsc_ver} ]; then
  if [ ! -e petsc-${petsc_ver}.tar.gz ]; then
-  wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-${petsc_ver}.tar.gz
+#   wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-${petsc_ver}.tar.gz
+  wget -c https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-${petsc_ver}.tar.gz
   if [ ! -e petsc-${petsc_ver}.tar.gz ]; then
    echo "error: cannot download PETSc"
    exit 1
@@ -25,17 +26,19 @@ export PETSC_ARCH=${PETSC_ARCH}
 
 # f2cblaslapack is not sse-enabled but download-openblas does not work
 # it fails saying that gcc_s is not found at link time
-# petsc does not use mucy use of blas and gsl uses cblas, we should be good
 ./configure --with-mpi=0 \
             --with-cxx=0 \
             --with-fortran-bindings=0 \
-            --with-fc=0 \
             --with-c2html=0 \
             --with-x=0 \
             --with-debugging=0 \
             --with-shared-libraries=0 \
-            --download-f2cblaslapack \
+            --download-openblas \
             --COPTFLAGS="-O3"
+            
+#            --with-fc=0 \
+#             --download-f2cblaslapack \
+            
 
 # export PETSC_ARCH=arch-linux2-serial-mumps-static
 # ./configure --with-mpi=0 --with-cxx=0 --with-fortran-bindings=0 --with-fc=0 --with-c2html=0 --with-x=0 --with-debugging=0 --with-shared-libraries=0 --with-mumps-serial=1 --download-mumps --download-openblas --COPTFLAGS="-O" --FOPTFLAGS="-O3"
