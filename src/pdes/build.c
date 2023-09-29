@@ -89,7 +89,10 @@ int feenox_problem_build(void) {
     }
   }
   
-  if (volumetric_elements == 0) {
+  int valid_local = (volumetric_elements > 0);
+  int valid_global = 0;
+  MPI_Allreduce(&valid_local, &valid_global, 1, MPIU_INT, MPIU_SUM, PETSC_COMM_WORLD);
+  if (valid_local == 0) {
     feenox_push_error_message("no volumetric elements found in '%s'", feenox.pde.mesh->file->name);
     return FEENOX_ERROR;
   }
