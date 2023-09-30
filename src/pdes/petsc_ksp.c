@@ -239,6 +239,8 @@ int feenox_problem_setup_pc(PC pc) {
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
 #if PETSC_VERSION_GT(3,9,0)
+    // need to set this guy otherwise PCFactorSetMatSolverType does not work
+    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 
 #else
