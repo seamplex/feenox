@@ -239,14 +239,8 @@ int feenox_problem_setup_pc(PC pc) {
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
 #if PETSC_VERSION_GT(3,9,0)
-    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 
-// if we want to set further options for mumps we need to retrieve the matrix
-// and then call MatMumpsSetIcntl()
-//  petsc_call(PCFactorSetUpMatSolverType(pc)); /* call MatGetFactor() to create F */
-//  petsc_call(PCFactorGetMatrix(pc, &F));    
-    
 #else
     feenox_push_error_message("MUMPS solver needs at least PETSc 3.9");
     return FEENOX_ERROR;
@@ -263,14 +257,20 @@ int feenox_problem_setup_pc(PC pc) {
   if (feenox.pde.setup_pc != NULL) {
     feenox_call(feenox.pde.setup_pc(pc));
   }
+
+  // if using MUMPS, set icntl if needed
+  MatSolverType stype;
+  petsc_call(PCFactorGetMatSolverType(pc, &stype));
+  if (stype != NULL && strcmp(stype, MATSOLVERMUMPS) == 0) {
+    if (feenox_var_value(feenox.pde.vars.mumps_icntl_14) != 0) {
+      Mat F;
+      petsc_call(PCFactorGetMatrix(pc, &F));
+      petsc_call(MatMumpsSetIcntl(F, 14, (PetscInt)feenox_var_value(feenox.pde.vars.mumps_icntl_14)));      
+    }
+  }
   
   // read command-line options
   petsc_call(PCSetFromOptions(pc));
-  
-/*  
-  PCType pc_type = NULL;
-  petsc_call(PCGetType(pc, &pc_type));
- */
 
   return FEENOX_OK;
 }

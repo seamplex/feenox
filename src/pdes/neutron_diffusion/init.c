@@ -249,11 +249,12 @@ int feenox_problem_setup_pc_neutron_diffusion(PC pc) {
     if (neutron_diffusion.has_sources == 0) {
       // PC for EPS
 #ifdef PETSC_HAVE_MUMPS
+    // if we don't set the pc type here then we PCFactorSetMatSolverType does not work
       petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
       petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #else
       // TODO: this will complain in parallel
-      petsc_call(PCSetType(pc, PCLU));    
+//      petsc_call(PCSetType(pc, PCLU));    
 #endif
     } else {
       // plain PC
@@ -285,8 +286,20 @@ int feenox_problem_setup_ksp_neutron_diffusion(KSP ksp ) {
 #ifdef HAVE_SLEPC
 int feenox_problem_setup_eps_neutron_diffusion(EPS eps) {
 
-  // generalized non-hermitian problem
-//  petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
+  petsc_call(EPSSetProblemType(eps, (neutron_diffusion.groups == 1) ? EPS_PGNHEP : EPS_GNHEP));
+  
+  // we expect the eigenvalue to be near one and an absolute test is fater
+  petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_ABS));
+  
+  // offsets around one
+  if (feenox_var_value(feenox.pde.vars.eps_st_sigma) == 0)
+  {
+    feenox_var_value(feenox.pde.vars.eps_st_sigma) = 1.0;
+  }
+  if (feenox_var_value(feenox.pde.vars.eps_st_nu) == 0)
+  {
+    feenox_var_value(feenox.pde.vars.eps_st_nu) = 1.0;
+  }
   
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));

@@ -65,6 +65,7 @@ map-*.msh
 mesh2d.vtk
 spinning-disk-parallel-*.vtk
 thermal-square*.msh
+thermal-square.vtk
 thermal-two-squares-*.msh
 ray-effect-*-?.msh
 orthotropic-beam-*.msh

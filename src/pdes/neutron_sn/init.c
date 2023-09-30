@@ -504,9 +504,13 @@ int feenox_problem_setup_pc_neutron_sn(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
-    petsc_call(PCSetType(pc, PCLU));
+    // if we don't set the pc type here then we PCFactorSetMatSolverType does not work
+    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
 #ifdef PETSC_HAVE_MUMPS
-      petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+    petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+#else
+    // defaults so in serial it should be petsc's lu and in parallel ilu (I think)
+//    petsc_call(PCSetType(pc, PCLU));
 #endif
   }
   
@@ -529,7 +533,20 @@ int feenox_problem_setup_ksp_neutron_sn(KSP ksp ) {
 int feenox_problem_setup_eps_neutron_sn(EPS eps) {
 
   // generalized non-hermitian problem
-//  petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
+  petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
+
+  // we expect the eigenvalue to be near one and an absolute test is fater
+  petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_ABS));
+  
+  // offsets around one
+  if (feenox_var_value(feenox.pde.vars.eps_st_sigma) == 0)
+  {
+    feenox_var_value(feenox.pde.vars.eps_st_sigma) = 1.0;
+  }
+  if (feenox_var_value(feenox.pde.vars.eps_st_nu) == 0)
+  {
+    feenox_var_value(feenox.pde.vars.eps_st_nu) = 1.0;
+  }
   
   if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
     petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_MAGNITUDE));

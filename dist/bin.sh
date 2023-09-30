@@ -1,8 +1,11 @@
 #!/bin/bash -ex
 
-doc=1
+doc=0
 if [ "x${1}" == "x--no-doc" ]; then
   doc=0
+fi
+if [ "x${1}" == "x--doc" ]; then
+  doc=1
 fi
 
 if [ ! -e ../tests ]; then
@@ -29,7 +32,7 @@ export PETSC_DIR=$(pwd)/petsc-${petsc_ver}
 export SLEPC_DIR=$(pwd)/slepc-${slepc_ver}
 cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
-              --enable-download-gsl CFLAGS="-O3 -flto -DLD_STATIC" LDFLAGS="-flto=auto -static"
+              --enable-download-gsl CFLAGS="-O3 -flto -DLD_STATIC" LDFLAGS="-flto=auto -static -static-libgcc"
 
   if [ ${doc} -ne 0 ]; then
     if [ "x${target}" = "xlinux-amd64" ]; then

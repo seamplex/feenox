@@ -495,7 +495,6 @@ int feenox_problem_setup_pc_mechanical(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
-    // TODO: should we use mumps by default if available?
     petsc_call(PCSetType(pc, PCGAMG));
   }
   

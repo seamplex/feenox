@@ -58,20 +58,12 @@ int feenox_problem_solve_slepc_eigen(void) {
     }
     if (feenox.pde.st_type != NULL) {
       petsc_call(STSetType(st, feenox.pde.st_type));
-
-      // shift and invert offsets
-      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
-      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
     }  
     
     if (feenox.pde.setup_eps != NULL) {
       feenox_call(feenox.pde.setup_eps(feenox.pde.eps));
     }  
 
-    // tolerances
-    petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
-                                                (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
-    
     // operators depending on formulation
     if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
       petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.K_bc, feenox.pde.M_bc));
@@ -91,9 +83,6 @@ int feenox_problem_solve_slepc_eigen(void) {
     // this should be faster but it is not
     // TODO: let the user choose
     petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
-    
-    // convergence with respect to the matrix norm
-//    petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_NORM));
   
     // specify how many eigenvalues (and eigenvectors) to compute.
     if (feenox.pde.eps_ncv.items != NULL) {
@@ -105,6 +94,18 @@ int feenox_problem_solve_slepc_eigen(void) {
     feenox_check_alloc(feenox.pde.eigenvalue = calloc(feenox.pde.nev, sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.eigenvector = calloc(feenox.pde.nev, sizeof(Vec)));
 
+    // tolerances
+    petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
+                                                (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
+    
+    // shift and invert offsets
+    if (feenox_var_value(feenox.pde.vars.eps_st_sigma) != 0) {
+      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
+    }
+    if (feenox_var_value(feenox.pde.vars.eps_st_nu) != 0) {
+      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
+    }
+    
     petsc_call(EPSSetFromOptions(feenox.pde.eps));
     
   }

@@ -3011,6 +3011,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
 ///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIM`.
 ///kw_pde+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
+///kw_pde+PROBLEM+detail Default is 3D.
 ///kw_pde+PROBLEM+usage [ 1D |
     if (strcasecmp(token, "1d") == 0) {
       feenox.pde.dim = 1;
@@ -3185,6 +3186,10 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail @
 ///kw_pde+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$ is solved,
 ///kw_pde+PROBLEM+detail and $M \phi = \lambda K \phi$ if it is `lambda`.
+///kw_pde+PROBLEM+detail Matrix always has a $K$ has a non-zero in the diagonal of Dirichlet rows.
+///kw_pde+PROBLEM+detail Matrix always has a $K$ has a zero in the diagonal of Dirichlet rows.
+///kw_pde+PROBLEM+detail Default is `lambda`.
+      
     } else if (strcasecmp(token, "EIGEN_FORMULATION") == 0) {
       char *keywords[] = {"omega", "lambda", ""};
       int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
@@ -3210,7 +3215,7 @@ int feenox_parse_problem(void) {
         feenox_push_error_message("expected either 'absolute' or 'relative' instead '%s'", scaling_type);
         return FEENOX_ERROR;
       }
-      
+
       
     } else if (feenox.pde.parse_problem != NULL) {
       feenox_call(feenox.pde.parse_problem(token));

@@ -209,17 +209,24 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 ///va+eps_st_sigma+name eps_st_sigma
 ///va+eps_st_sigma Shift $\sigma$ associated with the spectral transformation. 
 ///va+eps_st_sigma+detail as passed to SLEPc’s
-///va+ksp_rtol+detail [`STSetShift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STSetShift.html).
+///va+eps_st_sigma+detail [`STSetShift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STSetShift.html).
   feenox.pde.vars.eps_st_sigma = feenox_define_variable_get_ptr("eps_st_sigma");
-///va+snes_max_it+detail Default is zero.
+///va+eps_st_sigma+detail Default is zero (but some PDEs can change it).
   feenox_var_value(feenox.pde.vars.eps_st_sigma) = 0;
   
 ///va+eps_st_nu+name eps_st_nu
 ///va+eps_st_nu Value $\nu$ of the anti-shift for the Cayley spectral transformation
 ///va+eps_st_nu+detail as passed to SLEPc’s
-///va+ksp_rtol+detail [`STCayleySetAntishift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STCayleySetAntishift.html).
+///va+eps_st_nu+detail [`STCayleySetAntishift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STCayleySetAntishift.html).
   feenox.pde.vars.eps_st_nu = feenox_define_variable_get_ptr("eps_st_nu");
-///va+snes_max_it+detail Default is zero.
+///va+eps_st_nu+detail Default is zero (but some PDEs can change it).
+  feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
+  
+///va+mumps_icntl_14+name mumps_icntl_14
+///va+mumps_icntl_14 MUMPS icntl value with the offset 14, relaxation value for the internal array.
+///va+mumps_icntl_14+detail For some complex problems this value needs to be set. See MUMPS manual for details.
+  feenox.pde.vars.mumps_icntl_14 = feenox_define_variable_get_ptr("mumps_icntl_14");
+///va+mumps_icntl_14+detail Default is zero, which means use MUMPS default.
   feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
   
 ///va+feenox_penalty_weight+name feenox_penalty_weight

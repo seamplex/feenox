@@ -39,7 +39,7 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX's
     make -j4
     ```
     
-    If you cannot (or do not want) to use `libgsl-dev` from a package repository, call `configure` with `--enable-download-gsl`:
+    If you cannot (or do not want to) use `libgsl-dev` from a package repository, call `configure` with `--enable-download-gsl`:
     
     ```terminal
     ./configure --enable-download-gsl

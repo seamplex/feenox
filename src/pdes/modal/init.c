@@ -360,8 +360,8 @@ int feenox_problem_setup_pc_modal(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
-//    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
-    petsc_call(PCSetType(pc, PCLU));
+    // if we don't set the pc type here then we PCFactorSetMatSolverType does not work
+    petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
 #ifdef PETSC_HAVE_MUMPS
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
 #endif
@@ -417,7 +417,7 @@ int feenox_problem_setup_eps_modal(EPS eps) {
   // for free-free vibrations we need the omega formulation
   if (modal.has_dirichlet_bcs == 0) {
     if (feenox.pde.eigen_formulation == eigen_formulation_lambda) {
-      feenox_push_error_message("free-free vibrations do not work with the lambda formulation");
+      feenox_push_error_message("free-free eigen problems do not work with the lambda formulation");
       return FEENOX_ERROR;
     }
     feenox.pde.eigen_formulation = eigen_formulation_omega;

@@ -1780,6 +1780,7 @@ struct feenox_t {
       var_t *eps_max_it;
       var_t *eps_st_sigma;
       var_t *eps_st_nu;
+      var_t *mumps_icntl_14;
       
       var_t *penalty_weight;
       var_t *nodes_rough;
