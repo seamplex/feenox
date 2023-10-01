@@ -259,7 +259,7 @@ int feenox_problem_setup_pc(PC pc) {
   if (feenox.pde.setup_pc != NULL) {
     feenox_call(feenox.pde.setup_pc(pc));
   }
-
+  
   // if using MUMPS, set icntl if needed
   MatSolverType stype;
   petsc_call(PCFactorGetMatSolverType(pc, &stype));

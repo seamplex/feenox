@@ -405,7 +405,7 @@ int feenox_problem_setup_eps_modal(EPS eps) {
     return FEENOX_ERROR;
   }
   
-  // the user might have already set a custom ST, se we peek what it is
+  // the user might have already set a custom ST, so we peek what it is
   STType st_type = NULL;
   petsc_call(STGetType(st, &st_type));
   
@@ -417,7 +417,7 @@ int feenox_problem_setup_eps_modal(EPS eps) {
   // for free-free vibrations we need the omega formulation
   if (modal.has_dirichlet_bcs == 0) {
     if (feenox.pde.eigen_formulation == eigen_formulation_lambda) {
-      feenox_push_error_message("free-free eigen problems do not work with the lambda formulation");
+      feenox_push_error_message("free-free modal problems do not work with the lambda formulation");
       return FEENOX_ERROR;
     }
     feenox.pde.eigen_formulation = eigen_formulation_omega;
