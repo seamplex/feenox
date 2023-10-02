@@ -1,4 +1,4 @@
-PROBLEM thermal 3d
+PROBLEM thermal
 
 # create mesh with
 #  > wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl
