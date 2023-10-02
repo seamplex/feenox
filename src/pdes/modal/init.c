@@ -361,6 +361,7 @@ int feenox_problem_setup_pc_modal(PC pc) {
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
     // if we don't set the pc type here then we PCFactorSetMatSolverType does not work
+// xxx LU?
     petsc_call(PCSetType(pc, feenox.pde.symmetric_K ? PCCHOLESKY : PCLU));
 #ifdef PETSC_HAVE_MUMPS
     petsc_call(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));

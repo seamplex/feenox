@@ -49,24 +49,6 @@ int feenox_problem_solve_slepc_eigen(void) {
       petsc_call(EPSSetType(feenox.pde.eps, feenox.pde.eps_type));
     }
     
-    // operators depending on formulation
-    if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.K_bc, feenox.pde.M_bc));
-    } else {  
-      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.M_bc, feenox.pde.K_bc));
-    }
-
-    // this should be faster but it is not
-    // TODO: let the user choose, let the pdes fill in a type variable
-    // petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
-  
-    // specify how many eigenvalues (and eigenvectors) to compute.
-    if (feenox.pde.eps_ncv.items != NULL) {
-      petsc_call(EPSSetDimensions(feenox.pde.eps, feenox.pde.nev, (PetscInt)(feenox_expression_eval(&feenox.pde.eps_ncv)), PETSC_DEFAULT));
-    } else {
-      petsc_call(EPSSetDimensions(feenox.pde.eps, feenox.pde.nev, PETSC_DEFAULT, PETSC_DEFAULT));
-    }
-  
     // get the associated spectral transformation
     ST st = NULL;
     petsc_call(EPSGetST(feenox.pde.eps, &st));
@@ -74,13 +56,28 @@ int feenox_problem_solve_slepc_eigen(void) {
       feenox_push_error_message("cannot retrieve spectral transformation object");
       return FEENOX_ERROR;
     }
-    // we need to set the type to create it, otherwise the icntls do not work
-    petsc_call(STSetType(st, (feenox.pde.st_type != NULL) ? feenox.pde.st_type : (feenox.pde.eigen_formulation == eigen_formulation_omega) ? STSINVERT : STSHIFT));
-    petsc_call(STGetOperator(st,NULL));
+    if (feenox.pde.st_type != NULL) {
+      petsc_call(STSetType(st, feenox.pde.st_type));
 
+      // shift and invert offsets
+      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
+      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
+    }  
+    
     if (feenox.pde.setup_eps != NULL) {
       feenox_call(feenox.pde.setup_eps(feenox.pde.eps));
-    } 
+    }  
+
+    // tolerances
+    petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
+                                                (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
+    
+    // operators depending on formulation
+    if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
+      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.K_bc, feenox.pde.M_bc));
+    } else {  
+      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.M_bc, feenox.pde.K_bc));
+    }
     
     // setup the linear solver
     KSP ksp = NULL;
@@ -89,32 +86,29 @@ int feenox_problem_solve_slepc_eigen(void) {
       feenox_push_error_message("cannot retrieve linear solver object");
       return FEENOX_ERROR;
     }
+    feenox_call(feenox_problem_setup_ksp(ksp));
 
-    // tolerances
-    petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
-                                                (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
+    // this should be faster but it is not
+    // TODO: let the user choose
+    petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
     
-    // shift and invert offsets
-    if (feenox_var_value(feenox.pde.vars.eps_st_sigma) != 0) {
-      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
-    }
-    if (feenox_var_value(feenox.pde.vars.eps_st_nu) != 0) {
-      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
-    }
-    
-    petsc_call(EPSSetFromOptions(feenox.pde.eps));
-
-    
-  }
-
+    // convergence with respect to the matrix norm
+//    petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_NORM));
   
-  if (feenox.pde.eigenvalue == NULL) {
-    feenox_check_alloc(feenox.pde.eigenvalue = calloc(feenox.pde.nev, sizeof(PetscScalar)));
-  }
-  if (feenox.pde.eigenvector == NULL) {
-    feenox_check_alloc(feenox.pde.eigenvector = calloc(feenox.pde.nev, sizeof(Vec)));
-  }
+    // specify how many eigenvalues (and eigenvectors) to compute.
+    if (feenox.pde.eps_ncv.items != NULL) {
+      petsc_call(EPSSetDimensions(feenox.pde.eps, feenox.pde.nev, (PetscInt)(feenox_expression_eval(&feenox.pde.eps_ncv)), PETSC_DEFAULT));
+    } else {
+      petsc_call(EPSSetDimensions(feenox.pde.eps, feenox.pde.nev, PETSC_DEFAULT, PETSC_DEFAULT));
+    }
     
+    feenox_check_alloc(feenox.pde.eigenvalue = calloc(feenox.pde.nev, sizeof(PetscScalar)));
+    feenox_check_alloc(feenox.pde.eigenvector = calloc(feenox.pde.nev, sizeof(Vec)));
+
+    petsc_call(EPSSetFromOptions(feenox.pde.eps));
+    
+  }
+
   petsc_call(EPSSetInitialSpace(feenox.pde.eps, 1, &feenox.pde.phi));
   petsc_call(EPSSolve(feenox.pde.eps));
   PetscInt nconv = 0;
