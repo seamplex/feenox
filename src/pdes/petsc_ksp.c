@@ -261,15 +261,30 @@ int feenox_problem_setup_pc(PC pc) {
   }
   
   // if using MUMPS, set icntl if needed
+#ifdef PETSC_HAVE_MUMPS  
+  // in EPS we need to set the ST type to create it, otherwise the icntls do not work
+  if (feenox.pde.eps != NULL) {
+    ST st = NULL;
+    petsc_call(EPSGetST(feenox.pde.eps, &st));
+    STType st_type = NULL;
+    petsc_call(STGetType(st, &st_type));
+    if (st_type == NULL) {
+      petsc_call(STSetType(st, (feenox.pde.eigen_formulation == eigen_formulation_omega) ?  STSINVERT : STSHIFT));
+    }
+    // force creation of the operator
+    petsc_call(STGetOperator(st, NULL));
+  }
+  
   MatSolverType stype;
   petsc_call(PCFactorGetMatSolverType(pc, &stype));
   if (stype != NULL && strcmp(stype, MATSOLVERMUMPS) == 0) {
     if (feenox_var_value(feenox.pde.vars.mumps_icntl_14) != 0) {
       Mat F;
       petsc_call(PCFactorGetMatrix(pc, &F));
-      petsc_call(MatMumpsSetIcntl(F, 14, (PetscInt)feenox_var_value(feenox.pde.vars.mumps_icntl_14)));      
+      petsc_call(MatMumpsSetIcntl(F, 14, (PetscInt)feenox_var_value(feenox.pde.vars.mumps_icntl_14)));
     }
   }
+#endif
   
   // read command-line options
   petsc_call(PCSetFromOptions(pc));

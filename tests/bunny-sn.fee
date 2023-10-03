@@ -10,6 +10,9 @@ Sigma_t1   = 0.4
 BC base  vacuum 
 BC rest  vacuum 
 
+# test icntl
+mumps_icntl_14 = 60
+
 SOLVE_PROBLEM
 PRINT keff-1.013
 WRITE_RESULTS
