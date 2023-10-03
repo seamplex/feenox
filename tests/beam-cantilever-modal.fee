@@ -10,6 +10,8 @@ nu = 0.28
 rho = 7800
 E = 2.1e11
 
+mumps_icntl_14 = 30
+
 BC left fixed
 SOLVE_PROBLEM
 PRINT %.1f SEP " " f
