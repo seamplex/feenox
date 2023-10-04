@@ -1699,9 +1699,15 @@ struct feenox_t {
 
     enum {
       eigen_formulation_undefined,
-      eigen_formulation_omega,
-      eigen_formulation_lambda
+      eigen_formulation_lambda,
+      eigen_formulation_omega
     } eigen_formulation;
+    
+    enum {
+      eigen_dirichlet_zero_M,
+      eigen_dirichlet_zero_K
+    } eigen_dirichlet_zero;
+    
 
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
     unsigned int dofs;             // DoFs per node/cell

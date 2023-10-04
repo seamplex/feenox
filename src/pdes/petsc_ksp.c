@@ -50,6 +50,8 @@ int feenox_problem_solve_petsc_linear(void) {
     if (feenox.pde.progress_ascii == PETSC_TRUE) {  
       petsc_call(KSPMonitorSet(feenox.pde.ksp, feenox_problem_ksp_monitor, NULL, 0));
     }
+
+    petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K_bc, feenox.pde.K_bc));
     
     feenox_call(feenox_problem_setup_ksp(feenox.pde.ksp));
   }
@@ -63,7 +65,6 @@ int feenox_problem_solve_petsc_linear(void) {
     petsc_call(MatSetNearNullSpace(feenox.pde.K_bc, near_null_space));
   }
   
-  petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K_bc, feenox.pde.K_bc));
   
   // try to use the solution as the initial guess (it already has Dirichlet BCs
   // but in quasi-static it has the previous solution which should be similar)
@@ -269,13 +270,14 @@ int feenox_problem_setup_pc(PC pc) {
     STType st_type = NULL;
     petsc_call(STGetType(st, &st_type));
     if (st_type == NULL) {
-      petsc_call(STSetType(st, (feenox.pde.eigen_formulation == eigen_formulation_omega) ?  STSINVERT : STSHIFT));
+      feenox_push_error_message("internal error, ST type is not set");
+      return FEENOX_ERROR;
     }
     // force creation of the operator
     petsc_call(STGetOperator(st, NULL));
   }
   
-  MatSolverType stype;
+  MatSolverType stype = NULL;
   petsc_call(PCFactorGetMatSolverType(pc, &stype));
   if (stype != NULL && strcmp(stype, MATSOLVERMUMPS) == 0) {
     if (feenox_var_value(feenox.pde.vars.mumps_icntl_14) != 0) {

@@ -399,61 +399,16 @@ int feenox_problem_setup_ksp_modal(KSP ksp ) {
 // these two are not 
 int feenox_problem_setup_eps_modal(EPS eps) {
 
-  ST st = NULL;
-  petsc_call(EPSGetST(feenox.pde.eps, &st));
-  if (st == NULL) {
-    feenox_push_error_message("error getting spectral transform object");
-    return FEENOX_ERROR;
-  }
-  
-  // the user might have already set a custom ST, so we peek what it is
-  STType st_type = NULL;
-  petsc_call(STGetType(st, &st_type));
-  
-  if (st_type != NULL && feenox.pde.eigen_formulation == eigen_formulation_undefined) {
-    // if there is no formulation but an st_type, choose an appropriate one
-    feenox.pde.eigen_formulation = (strcmp(st_type, STSHIFT) == 0) ? eigen_formulation_lambda : eigen_formulation_omega;
-  }
-
-  // for free-free vibrations we need the omega formulation
+  // to be able to solve free-body vibrations we have to set a deflation space
   if (modal.has_dirichlet_bcs == 0) {
-    if (feenox.pde.eigen_formulation == eigen_formulation_lambda) {
+    
+    if (feenox.pde.eigen_formulation == eigen_formulation_undefined) {
+      feenox.pde.eigen_formulation = eigen_formulation_omega;
+    } else if (feenox.pde.eigen_formulation == eigen_formulation_lambda) {
       feenox_push_error_message("free-free modal problems do not work with the lambda formulation");
       return FEENOX_ERROR;
     }
-    feenox.pde.eigen_formulation = eigen_formulation_omega;
-  }
-
-  
-  if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-    if (st_type != NULL) {
-      if (strcmp(st_type, STSINVERT) != 0) {
-        feenox_push_error_message("eigen formulation omega needs shift-and-invert spectral transformation");
-        return FEENOX_ERROR;
-      }  
-    } else {
-      petsc_call(STSetType(st, STSINVERT));
-    }
-    // shift and invert needs a target
-    petsc_call(EPSSetTarget(eps, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
-    petsc_call(EPSSetWhichEigenpairs(eps, EPS_TARGET_MAGNITUDE));
     
-  } else {
-    // lambda needs shift
-    if (st_type != NULL) {
-      if (strcmp(st_type, STSHIFT) != 0) {
-        feenox_push_error_message("eigen formulation lambda needs shift spectral transformation");
-        return FEENOX_ERROR;
-      }
-    } else {
-      petsc_call(STSetType(st, STSHIFT));
-    }
-    // seek for largest lambda (i.e. smallest omega)
-    petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_MAGNITUDE));
-  }  
-
-  // to be able to solve free-body vibrations we have to set a deflation space
-  if (modal.has_dirichlet_bcs == 0) {
     if (modal.rigid_body_base == NULL) {
       feenox_problem_compute_rigid_nullspace(&modal.rigid_body_base);
     }  

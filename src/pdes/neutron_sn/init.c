@@ -548,23 +548,6 @@ int feenox_problem_setup_eps_neutron_sn(EPS eps) {
     feenox_var_value(feenox.pde.vars.eps_st_nu) = 1.0;
   }
   
-  petsc_call(EPSSetTarget(eps, 1.0));
-  petsc_call(EPSSetWhichEigenpairs(eps, EPS_TARGET_REAL));
-  
-  if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-    petsc_call(EPSSetWhichEigenpairs(eps, EPS_SMALLEST_REAL));
-  } else {
-    petsc_call(EPSSetWhichEigenpairs(eps, EPS_LARGEST_REAL));
-  }
-  
-#ifdef PETSC_HAVE_MUMPS
-  // if we have MUMPS then we want to use it by default
-  if (feenox.pde.ksp_type == NULL && feenox.pde.pc_type  == NULL) {
-    feenox.pde.pc_type = strdup("mumps");      
-  }
-#endif
-  
-
   return FEENOX_OK;
 }
 #endif

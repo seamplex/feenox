@@ -237,10 +237,11 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(VecSetValues(rhs, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_values, INSERT_VALUES));
   }  
 
+  PetscScalar diagonal = (feenox.pde.eigen_dirichlet_zero == eigen_dirichlet_zero_K) ? 0 : feenox.pde.dirichlet_scale;
   if (feenox.pde.symmetric_K) {
-    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
+    petsc_call(MatZeroRowsColumns(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diagonal, rhs, feenox.pde.b_bc));
   } else {  
-    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, rhs, feenox.pde.b_bc));
+    petsc_call(MatZeroRows(feenox.pde.K_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diagonal, rhs, feenox.pde.b_bc));
   }
   
   if (rhs != NULL) {
@@ -263,14 +264,12 @@ int feenox_problem_dirichlet_set_M(void) {
     petsc_call(MatCopy(feenox.pde.M, feenox.pde.M_bc, SAME_NONZERO_PATTERN));
   }
   
-  // the mass matrix is like the stiffness one but with zero instead of one
+  PetscScalar diagonal = (feenox.pde.eigen_dirichlet_zero == eigen_dirichlet_zero_M) ? 0 : feenox.pde.dirichlet_scale;
   if (feenox.pde.symmetric_M) {
-    petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));
+    petsc_call(MatZeroRowsColumns(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diagonal, NULL, NULL));
   } else {  
-    petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 0.0, NULL, NULL));  
+    petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diagonal, NULL, NULL));  
   }  
-
-//  petsc_call(MatZeroRows(feenox.pde.M_bc, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, 1, NULL, NULL));  
 
   return FEENOX_OK;
 }

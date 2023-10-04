@@ -11,6 +11,8 @@ BC top    tension=0.12345678
 BC right  tension=0.23456789
 BC back   compression=0.345678901
 
+ksp_rtol = 1e-9
+
 SOLVE_PROBLEM
 
 # WRITE_MESH $0.vtk VECTOR u v w sigmax sigmay sigmaz

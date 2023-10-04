@@ -13,6 +13,7 @@ BC top    mirror
 # sn_alpha = 0.19275
 # sn_alpha = 1
 penalty_weight = 1e4
+mumps_icntl_14 = 60
 
 # DUMP K K_bc b b_bc FORMAT octave
 SOLVE_PROBLEM

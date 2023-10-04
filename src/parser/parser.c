@@ -3186,15 +3186,23 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail @
 ///kw_pde+PROBLEM+detail If the `EIGEN_FORMULATION` is `omega` then $K \phi = \omega^2 M \phi$ is solved,
 ///kw_pde+PROBLEM+detail and $M \phi = \lambda K \phi$ if it is `lambda`.
-///kw_pde+PROBLEM+detail Matrix always has a $K$ has a non-zero in the diagonal of Dirichlet rows.
-///kw_pde+PROBLEM+detail Matrix always has a $K$ has a zero in the diagonal of Dirichlet rows.
-///kw_pde+PROBLEM+detail Default is `lambda`.
+///kw_pde+PROBLEM+detail Default is `lambda`, although some particular PDEs might change it (for example free-free modal switches to `omega`).
       
     } else if (strcasecmp(token, "EIGEN_FORMULATION") == 0) {
-      char *keywords[] = {"omega", "lambda", ""};
-      int values[] = {eigen_formulation_omega, eigen_formulation_lambda, 0};
+      char *keywords[] = {"lambda", "omega", ""};
+      int values[] = {eigen_formulation_lambda, eigen_formulation_omega, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.eigen_formulation));
 
+///kw_pde+PROBLEM+detail The `EIGEN_DIRICHLET_ZERO` keyword controls which of the matrices has a zero and which one
+///kw_pde+PROBLEM+detail has a non-zero in the diagonal when setting Dirichlet boundary conditions.
+///kw_pde+PROBLEM+detail Default is `M`, i.e. matrix $K$ has a non-zero and matrix $M$ has a zero.
+///kw_pde+PROBLEM+detail This setting, along with `EIGEN_FORMULATION` determines which spectral transforms can
+///kw_pde+PROBLEM+detail a cannot be used: you cannot invert the matrix with the zero in the diagonal.
+    } else if (strcasecmp(token, "EIGEN_DIRICHLET_ZERO") == 0) {
+      char *keywords[] = {"M", "K", ""};
+      int values[] = {eigen_dirichlet_zero_M, eigen_dirichlet_zero_K, 0};
+      feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.eigen_dirichlet_zero));
+      
 ///kw_pde+PROBLEM+usage [ DIRICHLET_SCALING { absolute <expr> | relative <expr> } ]@
 ///kw_pde+PROBLEM+detail The `DIRICHLET_SCALING` keyword controls the way Dirichlet boundary conditions
 ///kw_pde+PROBLEM+detail are scaled when computing the residual. Roughly, it defines how to compute
@@ -3240,7 +3248,6 @@ int feenox_parse_problem(void) {
   if (feenox.pde.dim == 0) {
     feenox.pde.dim = 3;
   }
-  
   
   feenox_call(feenox_problem_parse_time_init());
   feenox_call(feenox.pde.parse_problem(NULL));

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's eigen solver using SLEPc routines
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021--2023 jeremy theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -48,6 +48,28 @@ int feenox_problem_solve_slepc_eigen(void) {
     if (feenox.pde.eps_type != NULL) {
       petsc_call(EPSSetType(feenox.pde.eps, feenox.pde.eps_type));
     }
+
+    // here we might choose whether to use lambda or omega
+    if (feenox.pde.setup_eps != NULL) {
+      feenox_call(feenox.pde.setup_eps(feenox.pde.eps));
+    }  
+    
+    if (feenox.pde.eigen_formulation == eigen_formulation_undefined) {
+      feenox.pde.eigen_formulation = eigen_formulation_lambda;
+    }
+    
+    // operators depending on formulation
+    if (feenox.pde.eigen_formulation == eigen_formulation_lambda) {
+      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.M_bc, feenox.pde.K_bc));
+      petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_LARGEST_MAGNITUDE));
+    } else if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
+      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.K_bc, feenox.pde.M_bc));
+      petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_SMALLEST_MAGNITUDE));
+    } else {
+      feenox_push_error_message("internal error, neither omega nor lambda set");
+      return FEENOX_ERROR;
+    }
+    
     
     // get the associated spectral transformation
     ST st = NULL;
@@ -58,26 +80,35 @@ int feenox_problem_solve_slepc_eigen(void) {
     }
     if (feenox.pde.st_type != NULL) {
       petsc_call(STSetType(st, feenox.pde.st_type));
+    } else {
+      if ((feenox.pde.eigen_formulation == eigen_formulation_lambda && feenox.pde.eigen_dirichlet_zero == eigen_dirichlet_zero_M) ||
+          (feenox.pde.eigen_formulation == eigen_formulation_omega && feenox.pde.eigen_dirichlet_zero == eigen_dirichlet_zero_K)) {
+        petsc_call(STSetType(st, STSHIFT));
+      } else {
+        petsc_call(STSetType(st, STSINVERT));
+      }
+    }
 
-      // shift and invert offsets
-      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
-      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
-    }  
+    STType sttype = NULL;
+    feenox_call(STGetType(st, &sttype));
+    if (strcmp(sttype, STSINVERT) == 0) {
+      // shift and invert needs a target
+      petsc_call(EPSSetTarget(feenox.pde.eps, 0));
+      petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_TARGET_MAGNITUDE));
+    }
     
-    if (feenox.pde.setup_eps != NULL) {
-      feenox_call(feenox.pde.setup_eps(feenox.pde.eps));
-    }  
+    // shift and invert offsets
+    if (feenox_var_value(feenox.pde.vars.eps_st_sigma) != 0) {
+      petsc_call(STSetShift(st, feenox_var_value(feenox.pde.vars.eps_st_sigma)));
+    }
+    if (feenox_var_value(feenox.pde.vars.eps_st_nu) != 0) {
+      petsc_call(STCayleySetAntishift(st, feenox_var_value(feenox.pde.vars.eps_st_nu)));
+    }
+    
 
     // tolerances
     petsc_call(EPSSetTolerances(feenox.pde.eps, feenox_var_value(feenox.pde.vars.eps_tol),
                                                 (PetscInt)feenox_var_value(feenox.pde.vars.eps_max_it)));
-    
-    // operators depending on formulation
-    if (feenox.pde.eigen_formulation == eigen_formulation_omega) {
-      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.K_bc, feenox.pde.M_bc));
-    } else {  
-      petsc_call(EPSSetOperators(feenox.pde.eps, feenox.pde.M_bc, feenox.pde.K_bc));
-    }
     
     // setup the linear solver
     KSP ksp = NULL;
@@ -90,11 +121,12 @@ int feenox_problem_solve_slepc_eigen(void) {
 
     // this should be faster but it is not
     // TODO: let the user choose
-    petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
+    EPSProblemType eps_type;
+    petsc_call(EPSGetProblemType(feenox.pde.eps, &eps_type));
+    if (eps_type == 0)  {
+      petsc_call(EPSSetProblemType(feenox.pde.eps, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? EPS_GHEP : EPS_GNHEP));
+    }
     
-    // convergence with respect to the matrix norm
-//    petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_NORM));
-  
     // specify how many eigenvalues (and eigenvectors) to compute.
     if (feenox.pde.eps_ncv.items != NULL) {
       petsc_call(EPSSetDimensions(feenox.pde.eps, feenox.pde.nev, (PetscInt)(feenox_expression_eval(&feenox.pde.eps_ncv)), PETSC_DEFAULT));
