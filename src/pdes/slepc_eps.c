@@ -53,7 +53,8 @@ int feenox_problem_solve_slepc_eigen(void) {
     if (feenox.pde.setup_eps != NULL) {
       feenox_call(feenox.pde.setup_eps(feenox.pde.eps));
     }  
-    
+
+    // default is lambda but each PDE should choose whatever works better
     if (feenox.pde.eigen_formulation == eigen_formulation_undefined) {
       feenox.pde.eigen_formulation = eigen_formulation_lambda;
     }
@@ -91,7 +92,7 @@ int feenox_problem_solve_slepc_eigen(void) {
 
     STType sttype = NULL;
     feenox_call(STGetType(st, &sttype));
-    if (strcmp(sttype, STSINVERT) == 0) {
+    if (strcmp(sttype, STSINVERT) == 0 || strcmp(sttype, STCAYLEY) == 0) {
       // shift and invert needs a target
       petsc_call(EPSSetTarget(feenox.pde.eps, 0));
       petsc_call(EPSSetWhichEigenpairs(feenox.pde.eps, EPS_TARGET_MAGNITUDE));
