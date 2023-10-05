@@ -227,9 +227,16 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 ///va+mumps_icntl_14+detail For some complex problems this value needs to be set. See MUMPS manual for details.
   feenox.pde.vars.mumps_icntl_14 = feenox_define_variable_get_ptr("mumps_icntl_14");
 ///va+mumps_icntl_14+detail Default is zero, which means use MUMPS default.
-  feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
+  feenox_var_value(feenox.pde.vars.mumps_icntl_14) = 0;
   
-///va+feenox_penalty_weight+name feenox_penalty_weight
+///va+gamg_threshold+name gamg_threshold
+///va+gamg_threshold Relative threshold to use for dropping edges in aggregation graph when using GAMG.
+///va+gamg_threshold+detail See `PCGAMGSetThreshold()` in the PETSc documentation for further details.
+  feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("gamg_threshold");
+///va+gamg_threshold+detail Default is zero (note that PETSc's default is -1).
+  feenox_var_value(feenox.pde.vars.gamg_threshold) = 0;
+
+  ///va+feenox_penalty_weight+name feenox_penalty_weight
 ///va+feenox_penalty_weight+detail The weight\ $w$ used when setting multi-freedom boundary conditions.
 ///va+feenox_penalty_weight+detail Higher values mean better precision in the constrain but worsen
 ///va+feenox_penalty_weight+detail the matrix condition number. 

@@ -2,6 +2,7 @@ PROBLEM laplace 2d
 READ_MESH square-centered.msh
 BC zero  phi=0 PHYSICAL_GROUP left PHYSICAL_GROUP right PHYSICAL_GROUP bottom PHYSICAL_GROUP up
 f = 1
+gamg_threshold = 1e-4
 SOLVE_PROBLEM
 WRITE_RESULTS
 PRINT %.4f phi(0,0) dphidx(-0.5,-0.5) dphidy(0.5,0.5) SEP " "

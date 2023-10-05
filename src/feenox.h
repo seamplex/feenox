@@ -1787,6 +1787,7 @@ struct feenox_t {
       var_t *eps_st_sigma;
       var_t *eps_st_nu;
       var_t *mumps_icntl_14;
+      var_t *gamg_threshold;
       
       var_t *penalty_weight;
       var_t *nodes_rough;

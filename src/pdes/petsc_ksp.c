@@ -277,9 +277,9 @@ int feenox_problem_setup_pc(PC pc) {
     petsc_call(STGetOperator(st, NULL));
   }
   
-  MatSolverType stype = NULL;
-  petsc_call(PCFactorGetMatSolverType(pc, &stype));
-  if (stype != NULL && strcmp(stype, MATSOLVERMUMPS) == 0) {
+  MatSolverType mat_solver_type = NULL;
+  petsc_call(PCFactorGetMatSolverType(pc, &mat_solver_type));
+  if (mat_solver_type != NULL && strcmp(mat_solver_type, MATSOLVERMUMPS) == 0) {
     if (feenox_var_value(feenox.pde.vars.mumps_icntl_14) != 0) {
 #if PETSC_VERSION_LT(3,19,0)
       petsc_call(PCSetUp(pc));
@@ -290,6 +290,12 @@ int feenox_problem_setup_pc(PC pc) {
     }
   }
 #endif
+  
+  PCType pc_type;
+  petsc_call(PCGetType(pc, &pc_type));
+  if (pc_type != NULL && strcmp(pc_type, PCGAMG) == 0) {
+    petsc_call(PCGAMGSetThreshold(pc, &feenox_var_value(feenox.pde.vars.gamg_threshold), 1));
+  }
   
   // read command-line options
   petsc_call(PCSetFromOptions(pc));
