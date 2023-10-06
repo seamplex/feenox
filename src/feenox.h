@@ -972,6 +972,7 @@ struct physical_group_t {
 
 
 struct geometrical_entity_t {
+  int dim;
   int tag;
   int parent_dim;
   int parent_tag;
@@ -1084,6 +1085,7 @@ struct element_t {
 
   element_type_t *type;                  // pointer to the element type
   physical_group_t *physical_group;      // pointer to the physical group this element belongs to
+  geometrical_entity_t *geometrical_entity;
   node_t **node;                         // pointer to the nodes, node[j] points to the j-th local node
   cell_t *cell;                          // pointer to the associated cell (only for FVM)
 };
@@ -1232,6 +1234,7 @@ struct mesh_t {
   size_t n_elements;
   size_t n_elements_per_dim[4];
   size_t n_cells; // a cell is an element with the topological dimension of the mesh
+  int n_partitions;
 
   int degrees_of_freedom;        // per unknown
   unsigned int order;
@@ -2227,7 +2230,13 @@ extern int feenox_instruction_mesh_write(void *arg);
 // integrate.c
 extern int feenox_instruction_mesh_integrate(void *arg);
 extern double feenox_mesh_integral_over_element(element_t *, mesh_t *mesh, function_t *function);
-    
+extern double feenox_mesh_integral_function_cell_cell(function_t *function, mesh_t *mesh, physical_group_t *physical_group);
+extern double feenox_mesh_integral_function_general_cell(function_t *function, mesh_t *mesh, physical_group_t *physical_group);
+extern double feenox_mesh_integral_function_node_gauss(function_t *function, mesh_t *mesh, physical_group_t *physical_group);
+extern double feenox_mesh_integral_function_general_gauss(function_t *function, mesh_t *mesh, physical_group_t *physical_group);
+extern double feenox_mesh_integral_expression_cell(expr_t *expr, mesh_t *mesh, physical_group_t *physical_group);
+extern double feenox_mesh_integral_expression_gauss(expr_t *expr, mesh_t *mesh, physical_group_t *physical_group);
+
 // extrema.c
 extern int feenox_instruction_mesh_find_extrema(void *arg);
 

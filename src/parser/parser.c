@@ -3342,12 +3342,12 @@ int feenox_parse_integrate(void) {
     } else if (strcasecmp(token, "MESH") == 0) {
       feenox_call(feenox_parser_string(&name_mesh));
       
-///kw_pde+INTEGRATE+detail Either `NODES` or `CELLS` define how the integration is to be performed.
-///kw_pde+INTEGRATE+usage [ NODES
-///kw_pde+INTEGRATE+detail With `NODES` the integration is performed using the Gauss points
+///kw_pde+INTEGRATE+detail Either `GAUSS` or `CELLS` define how the integration is to be performed.
+///kw_pde+INTEGRATE+usage [ GAUSS
+///kw_pde+INTEGRATE+detail With `GAUSS` the integration is performed using the Gauss points
 ///kw_pde+INTEGRATE+detail and weights associated to each element type.
-    } else if (strcasecmp(token, "NODES") == 0) {
-      mesh_integrate->field_location = field_location_nodes;
+    } else if (strcasecmp(token, "GAUSS") == 0 || strcasecmp(token, "NODES") == 0) {
+      mesh_integrate->field_location = field_location_gauss;
             
 ///kw_pde+INTEGRATE+usage | CELLS ]@
 ///kw_pde+INTEGRATE+detail With `CELLS` the integral is computed as the sum of the product of the

@@ -36,8 +36,22 @@ int feenox_instruction_mesh_read(void *arg) {
     }
   }
   
+#ifdef HAVE_PETSC
+  if (feenox.pde.petscinit_called == PETSC_FALSE) {
+    feenox_problem_parse_time_init();
+  }
+#endif
+  
   // read the actual mesh with a format-dependent reader (who needs C++?)
   feenox_call(this->reader(this));
+  
+  // check that the number of partitions and ranks match
+  if (feenox.mpi_size > 1 && this->n_partitions > 1) {
+    if ((feenox.mpi_size % this->n_partitions) != 0) {
+      feenox_push_error_message("parallel mismatch, mesh '%s' has %d partitions but FeenoX is running with %d ranks", this->file->name, this->n_partitions, feenox.mpi_size);
+      return FEENOX_ERROR;
+    }
+  }
   
   // check if we found everything
   node_data_t *node_data = NULL;

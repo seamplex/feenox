@@ -68,6 +68,7 @@ TESTS = \
         tests/spinning-disk.sh \
         tests/statically_indeterminate_reaction.sh \
         tests/symmetry.sh \
+        tests/t21.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
         tests/thermal-3d.sh \

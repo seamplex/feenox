@@ -54,14 +54,6 @@ int feenox_instruction_printf(void *arg) {
     
     if (feenox.pde.petscinit_called == PETSC_FALSE) {
       feenox_problem_parse_time_init();
-/*      
-      MPI_Init(&feenox.argc, &feenox.argv);
-      petsc_call(MPI_Comm_size(MPI_COMM_WORLD, &feenox.mpi_size));
-      feenox_special_var_value(mpi_size) = (double)feenox.mpi_size;
-  
-      petsc_call(MPI_Comm_rank(MPI_COMM_WORLD, &feenox.mpi_rank));
-      feenox_special_var_value(mpi_rank) = (double)feenox.mpi_rank;    
-*/
     }
     
 

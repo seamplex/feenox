@@ -1,0 +1,13 @@
+READ_MESH t21.msh DIM 2 READ_FUNCTION f_nodes #READ_FUNCTION f_cells
+
+f_general(x,y) = 1
+
+# TODO: cell-cell
+INTEGRATE f_general CELLS RESULT f_general_cell
+INTEGRATE f_nodes         RESULT f_node_gauss
+INTEGRATE f_general GAUSS RESULT f_general_gauss
+
+INTEGRATE 1         CELLS RESULT e_cells
+INTEGRATE 1         GAUSS RESULT e_gauss
+
+PRINTF "%g %g %g %g %g" f_general_cell f_node_gauss f_general_gauss e_cells e_gauss
