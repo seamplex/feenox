@@ -17,7 +17,7 @@ fi
 
 for n in 1 2 3 4; do
   echo -n "hello_mpi with ${n} ranks ... "
-  if [ $(mpirun -n ${n} --map-by=OVERSUBSCRIBE ${feenox} ${dir}/hello_mpi.fee | wc -l) -ne ${n} ]; then
+  if [ $(mpirun -n ${n} --map-by :OVERSUBSCRIBE ${feenox} ${dir}/hello_mpi.fee | wc -l) -ne ${n} ]; then
     echo "failed"
     exit 1
   else

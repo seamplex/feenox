@@ -123,7 +123,7 @@ answer() {
 
 answermpi() {
   echo -n "${2} (${1} ranks) ... "
-  answer=$(mpirun -n ${1} --map-by=OVERSUBSCRIBE ${feenox} ${dir}/${2})
+  answer=$(mpirun -n ${1} --map-by :OVERSUBSCRIBE ${feenox} ${dir}/${2})
   error=$?
   
   if [ ${error} != 0 ]; then
