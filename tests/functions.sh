@@ -86,10 +86,19 @@ checkhypre() {
 # checks if gmsh executable is available in the path
 checkgmsh() {
  if [ -z "$(which gmsh)" ]; then
-  echo "Gmsh not found, skipping test"
+  echo "gmsh not found, skipping test"
   exit 77
  fi
 }
+
+# checks if mpirun is available
+checkmpirun() {
+ if [ -z "$(which mpirun)" ]; then
+  echo "mpirun not found, skipping test"
+  exit 77
+ fi
+}
+
 
 answer() {
   echo -n "${1} ... "
@@ -111,6 +120,29 @@ answer() {
 
   return ${level}
 }
+
+answermpi() {
+  echo -n "${2} (${1} ranks) ... "
+  answer=$(mpirun -n ${1} --map-by=OVERSUBSCRIBE ${feenox} ${dir}/${2})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    echo "failed"
+    return 2
+  fi
+  
+  if [ "${answer}" = "${3}" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected '${3}' and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
+
 
 answerdiff() {
   echo -n "${1} ... "
