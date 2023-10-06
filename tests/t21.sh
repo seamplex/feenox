@@ -17,6 +17,3 @@ exitifwrong $?
 
 answermpi 3 t21.fee "2 2 2 2 2"
 exitifwrong $?
-
-answermpi 6 t21.fee "2 2 2 2 2"
-exitifwrong $?

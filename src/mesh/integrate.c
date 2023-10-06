@@ -22,9 +22,11 @@
 #include <feenox.h>
 
 #define is_element_local(elm) \
-((feenox.mpi_size <= 1 || (((e->geometrical_entity != NULL && e->geometrical_entity->partition != NULL) ? e->geometrical_entity->partition[0] : 0) == rank_id)) && \
-        (((physical_group) == NULL && (elm)->type->dim == mesh->dim) || \
-         ((physical_group) != NULL && (elm)->physical_group == physical_group)))
+(feenox.mpi_size <= 1 || (e->geometrical_entity != NULL && e->geometrical_entity->partition != NULL && ((e->geometrical_entity->partition[0]-1)*feenox.mpi_size)/mesh->n_partitions == feenox.mpi_rank))  \
+
+#define is_physical_group_right(elm, p_grp) \
+        (((p_grp) == NULL && (elm)->type->dim == mesh->dim) || \
+         ((p_grp) != NULL && (elm)->physical_group == p_grp))
 
 int feenox_instruction_mesh_integrate(void *arg) {
 
@@ -119,11 +121,10 @@ double feenox_mesh_integral_function_cell_cell(function_t *function, mesh_t *mes
   
   // function defined over a cell integrated over a cell, cool!
   double integral = 0;
-  int rank_id = feenox.mpi_rank+1;
 
   for (size_t i = 0; i < mesh->n_cells; i++) {
     element_t *e = mesh->cell[i].element;
-    if (is_element_local(e)) {
+    if (is_element_local(e) && is_physical_group_right(e, physical_group)) {
       integral += feenox_vector_get(function->vector_value, i) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
     }
   }
@@ -135,11 +136,10 @@ double feenox_mesh_integral_function_general_cell(function_t *function, mesh_t *
 
   // location is cell but function is not cell
   double integral = 0;
-  int rank_id = feenox.mpi_rank+1;
 
   for (size_t i = 0; i < mesh->n_cells; i++) {
     element_t *e = mesh->cell[i].element;
-    if (is_element_local(e)) {
+    if (is_element_local(e) && is_physical_group_right(e, physical_group)) {
       integral += feenox_function_eval(function, mesh->cell[i].x) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
     }
   }
@@ -152,11 +152,10 @@ double feenox_mesh_integral_function_node_gauss(function_t *function, mesh_t *me
   
   // funcion mesh node, pretty cool
   double integral = 0;
-  int rank_id = feenox.mpi_rank+1;
 
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *e = &mesh->element[i];
-    if (is_element_local(e)) {
+    if (is_element_local(e) && is_physical_group_right(e, physical_group)) {
       for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
         double wdet = feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration);
 
@@ -178,11 +177,10 @@ double feenox_mesh_integral_function_general_gauss(function_t *function, mesh_t 
 
   // general function
   double integral = 0;
-  int rank_id = feenox.mpi_rank+1;
   
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *e = &mesh->element[i];
-    if (is_element_local(e)) {
+    if (is_element_local(e) && is_physical_group_right(e, physical_group)) {
       for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
         // TODO: check if the integrand depends on space
         double *x = feenox_fem_compute_x_at_gauss(e, q, mesh->integration);
@@ -199,12 +197,11 @@ double feenox_mesh_integral_function_general_gauss(function_t *function, mesh_t 
 double feenox_mesh_integral_expression_cell(expr_t *expr, mesh_t *mesh, physical_group_t *physical_group) {
 
   double integral = 0;
-  int rank_id = feenox.mpi_rank+1;
   
   // an expression integrated over cells
   for (size_t i = 0; i < mesh->n_cells; i++) {
     element_t *e = mesh->cell[i].element;
-    if (is_element_local(e)) {
+    if (is_element_local(e) && is_physical_group_right(e, physical_group)) {
       feenox_fem_update_coord_vars(mesh->cell[i].x);
       integral += feenox_expression_eval(expr) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
     }
@@ -215,14 +212,15 @@ double feenox_mesh_integral_expression_cell(expr_t *expr, mesh_t *mesh, physical
 double feenox_mesh_integral_expression_gauss(expr_t *expr, mesh_t *mesh, physical_group_t *physical_group) {
 
   double integral = 0;
-  int rank_id = feenox.mpi_rank+1;
   
   // an expression evaluated at the gauss points
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *e = &mesh->element[i];
-    if (is_element_local(e)) {
+//    printf("out tag %ld partition %d quotient = %d rank %d\n", e->tag, e->geometrical_entity->partition[0], e->geometrical_entity->partition[0]*feenox.mpi_size/mesh->n_partitions, feenox.mpi_rank);
+    
+    if (is_element_local(e) && is_physical_group_right(e, physical_group)) {
       
-//      printf("tag %ld partition %d rank_id %d\n", e->tag, partition, rank_id);
+//      printf("in tag %ld partition %d rank %d\n", e->tag, e->geometrical_entity->partition[0], feenox.mpi_rank);
 
       
       for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {

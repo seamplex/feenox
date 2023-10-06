@@ -68,7 +68,13 @@ void feenox_pop_error_message(void) {
 
 void feenox_pop_errors(void) {
 
-  fprintf(stderr, "error: ");
+  if (feenox.mpi_size == 0) {
+    fprintf(stderr, "error: ");
+  } else {
+    fprintf(stderr, "[%d] error: ", feenox.mpi_rank);
+  }
+  
+  // TODO: write into a string and then print the whole string at once
   if (feenox.error_level == 0) {
     fprintf(stderr, "unspecified error\n");
   } else {
@@ -127,16 +133,15 @@ void feenox_gsl_handler(const char *reason, const char *file_ptr, int line, int 
 
 void feenox_signal_handler(int sig_num) {
 
-  if (feenox.mpi_size == 0) {
-    fprintf(stderr, "\npid %d: signal #%d caught, finnishing... ", getpid(), sig_num);
+  if (feenox.mpi_size != 0) {
+    fprintf(stderr, "pid %d: signal #%d caught, finnishing...\n", getpid(), sig_num);
   } else {
-    fprintf(stderr, "\n[%d] pid %d: signal #%d caught, finnishing... ", feenox.mpi_rank, getpid(), sig_num);
+    fprintf(stderr, "[%d] pid %d: signal #%d caught, finnishing...\n", feenox.mpi_rank, getpid(), sig_num);
   }
   fflush(stderr);
 
   feenox_special_var_value(done) = (double)1.0;
 
-  fprintf(stderr, "ok\n");
   feenox_polite_exit(EXIT_SUCCESS);
   exit(1);
 

@@ -69,7 +69,7 @@ Mesh.PartitionOldStyleMsh2 = 0;
 // Should we save one mesh file per partition?
 Mesh.PartitionSplitMeshFiles = 0;
 
-N = 3;
+N = 6;
 partitioner = 0;
 
 If (partitioner == 0)
