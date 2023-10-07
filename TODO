@@ -1,4 +1,4 @@
-2023-09-20
+2023-10-07
 
 -   1 General things to do
     -   1.1 Tests
@@ -10,14 +10,15 @@
     -   1.7 Command-line arguments
     -   1.8 Error handling
     -   1.9 Postprocessing output
--   2 PDEs
-    -   2.1 Laplace/Poisson/Helmholtz
-    -   2.2 Heat
-    -   2.3 Mechanical
-    -   2.4 Modal
-    -   2.5 Neutron
--   3 V & V
--   4 PDEs
+-   2 Meshes
+-   3 PDEs
+    -   3.1 Laplace/Poisson/Helmholtz
+    -   3.2 Heat
+    -   3.3 Mechanical
+    -   3.4 Modal
+    -   3.5 Neutron
+-   4 V & V
+-   5 PDEs
 
   [1 General things to do]: #general-things-to-do
   [1.1 Tests]: #tests
@@ -29,14 +30,15 @@
   [1.7 Command-line arguments]: #command-line-arguments
   [1.8 Error handling]: #error-handling
   [1.9 Postprocessing output]: #postprocessing-output
-  [2 PDEs]: #pdes
-  [2.1 Laplace/Poisson/Helmholtz]: #laplacepoissonhelmholtz
-  [2.2 Heat]: #heat
-  [2.3 Mechanical]: #mechanical
-  [2.4 Modal]: #modal
-  [2.5 Neutron]: #neutron
-  [3 V & V]: #v-v
-  [4 PDEs]: #pdes-1
+  [2 Meshes]: #meshes
+  [3 PDEs]: #pdes
+  [3.1 Laplace/Poisson/Helmholtz]: #laplacepoissonhelmholtz
+  [3.2 Heat]: #heat
+  [3.3 Mechanical]: #mechanical
+  [3.4 Modal]: #modal
+  [3.5 Neutron]: #neutron
+  [4 V & V]: #v-v
+  [5 PDEs]: #pdes-1
 
 General things to do
 
@@ -56,7 +58,8 @@ General things to do
     -   wrap all GSL calls inside #ifdef
     -   use a large chunk of contiguous memory in the heap to store
         shape functions, gradients, etc
--   MPI
+-   optimize MPI usage
+    -   variables mpi_rank, mpi_size, memory_total y memory_local(rank)
 -   V&V
     -   fully document tests
     -   section for MMS
@@ -159,6 +162,10 @@ Postprocessing output
     -   med?
 -   full tensors
 
+Meshes
+
+-   expose the vectors with the node coordinates
+
 PDEs
 
 -   check when the matrices do not need to be rebuilt – use constant
@@ -171,8 +178,9 @@ PDEs
     -   detect which variables/functions are PDE outputs and call
         solve_problem() the first time they are needed
 -   benchmark MPI (read .msh with partitioning info first)
--   openmp to build matrices and compute stresses? not sure, should be
-    mpi on a partitioned mesh
+-   openmp to build matrices and compute stresses? not sure, we’d have
+    to rewrite the building stuff thread safe, it should be mpi on a
+    partitioned mesh
 -   glue (mortar)
 -   investigate -mpi_linear_solver_server
 -   direct elimination for multi-freedom BCs

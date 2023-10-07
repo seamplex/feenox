@@ -1,6 +1,11 @@
+```{=latex}
+\label{placemat}
+```
+
 ![Homer trying to solve a maze on a placemat](maze-homer.png){#fig:maze-homer}
 
-Say you are Homer Simpson and you want to solve a maze drawn in a restaurant's placemat, one where both the start and end are known beforehand as show in @fig:maze-homer. In order to avoid falling into the alligator's mouth, you can exploit the ellipticity of the Laplacian operator to solve any maze (even a hand-drawn one) without needing any fancy AI or ML algorithm. Just FeenoX and a bunch of standard open source tools to convert a bitmapped picture of the maze into an unstructured mesh.
+Say you are [Homer J. Simpson](https://en.wikipedia.org/wiki/Homer_Simpson) and you want to [solve a maze drawn in a restaurant's placemat while driving to your wife's aunt funeral](https://en.wikipedia.org/wiki/Selma%27s_Choice).
+One where both the start and end points are known beforehand as show in @fig:maze-homer. In order to avoid falling into the alligator's mouth, you can exploit the ellipticity of the Laplacian operator to solve any maze (even a hand-drawn one) without needing any fancy AI or ML algorithm. Just FeenoX and a bunch of standard open source tools to convert a bitmapped picture of the maze into an unstructured mesh.
 
 
 ::: {#fig:maze123 layout-ncol=2}

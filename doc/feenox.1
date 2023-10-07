@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2023-09-16" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2023-10-07" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -689,11 +689,13 @@ skip printing and may be useful for non-constant time-step problems.
 .RS
 .PP
 Instruction akin to C\[cq]s \f[V]printf\f[R].
+Instruction akin to C\[cq]s \f[V]printf\f[R] executed locally from all
+MPI ranks.
 .RE
 .IP
 .nf
 \f[C]
-PRINTF format_string [ expr_1 [ expr_2 [ ... ] ] ]  
+PRINTF PRINTF_ALL format_string [ expr_1 [ expr_2 [ ... ] ] ]  
 \f[R]
 .fi
 .PP
@@ -1055,7 +1057,7 @@ it).
 .IP
 .nf
 \f[C]
-INTEGRATE { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ NODES | CELLS ]
+INTEGRATE { <expression> | <function> } [ OVER <physical_group> ] [ MESH <mesh_identifier> ] [ GAUSS | CELLS ]
  RESULT <variable>
   
 \f[R]
@@ -1074,9 +1076,9 @@ If the integration is to be carried out over just a physical group, it
 has to be given in \f[V]OVER\f[R].
 If there are more than one mesh defined, an explicit one has to be given
 with \f[V]MESH\f[R].
-Either \f[V]NODES\f[R] or \f[V]CELLS\f[R] define how the integration is
+Either \f[V]GAUSS\f[R] or \f[V]CELLS\f[R] define how the integration is
 to be performed.
-With \f[V]NODES\f[R] the integration is performed using the Gauss points
+With \f[V]GAUSS\f[R] the integration is performed using the Gauss points
 and weights associated to each element type.
 With \f[V]CELLS\f[R] the integral is computed as the sum of the product
 of the integrand at the center of each cell (element) and the cell\[cq]s
@@ -1265,6 +1267,7 @@ as \f[V]1d\f[R], \f[V]2d\f[R], \f[V]3d\f[R] or after the keyword
 \f[V]DIM\f[R].
 Alternatively, one can define a \f[V]MESH\f[R] with an explicit
 \f[V]DIMENSIONS\f[R] keyword before \f[V]PROBLEM\f[R].
+Default is 3D.
 If the \f[V]AXISYMMETRIC\f[R] keyword is given, the mesh is expected to
 be two-dimensional in the \f[I]x\f[R]-\f[I]y\f[R] plane and the problem
 is assumed to be axi-symmetric around the given axis.
@@ -1338,6 +1341,16 @@ If the \f[V]EIGEN_FORMULATION\f[R] is \f[V]omega\f[R] then
 \f[I]K\f[R]\f[I]ϕ\f[R] = \f[I]ω\f[R]^2^\f[I]M\f[R]\f[I]ϕ\f[R] is solved,
 and \f[I]M\f[R]\f[I]ϕ\f[R] = \f[I]λ\f[R]\f[I]K\f[R]\f[I]ϕ\f[R] if it is
 \f[V]lambda\f[R].
+Default is \f[V]lambda\f[R], although some particular PDEs might change
+it (for example free-free modal switches to \f[V]omega\f[R]).
+The \f[V]EIGEN_DIRICHLET_ZERO\f[R] keyword controls which of the
+matrices has a zero and which one has a non-zero in the diagonal when
+setting Dirichlet boundary conditions.
+Default is \f[V]M\f[R], i.e.\ matrix\ \f[I]K\f[R] has a non-zero and
+matrix\ \f[I]M\f[R] has a zero.
+This setting, along with \f[V]EIGEN_FORMULATION\f[R] determines which
+spectral transforms can a cannot be used: you cannot invert the matrix
+with the zero in the diagonal.
 The \f[V]DIRICHLET_SCALING\f[R] keyword controls the way Dirichlet
 boundary conditions are scaled when computing the residual.
 Roughly, it defines how to compute the parameter\ \f[I]α\f[R].
@@ -1665,15 +1678,17 @@ systems.
 Minimum bound for the time step that feenox should take when solving DAE
 systems.
 .RE
-.SS \f[V]ncores\f[R]
+.SS \f[V]mpi_rank\f[R]
 .RS
 .PP
-The number of online available cores, as returned by
-\f[V]sysconf(_SC_NPROCESSORS_ONLN)\f[R].
+The current rank in an MPI execution.
+Mind the \f[V]PRINTF_ALL\f[R] instruction.
 .RE
+.SS \f[V]mpi_size\f[R]
+.RS
 .PP
-This value can be used in the \f[V]MAX_DAUGHTERS\f[R] expression of the
-\f[V]PARAMETRIC\f[R] keyword (i.e \f[V]ncores/2\f[R]).
+The number of total ranks in an MPI execution.
+.RE
 .SS \f[V]on_gsl_error\f[R]
 .RS
 .PP
@@ -1704,7 +1719,7 @@ It is equal to the \f[V]M_PI\f[R] constant in \f[V]math.h\f[R] .
 .SS \f[V]pid\f[R]
 .RS
 .PP
-The UNIX process id of the FeenoX instance.
+The Unix process id of the FeenoX instance.
 .RE
 .SS \f[V]static_steps\f[R]
 .RS
@@ -1898,7 +1913,7 @@ cosh(x)
 .SS \f[V]cpu_time\f[R]
 .RS
 .PP
-Returns the CPU time used by FeenoX, in seconds.
+Returns the CPU time used by the local FeenoX rank, in seconds.
 If the optional argument \f[V]f\f[R] is not provided or it is zero
 (default), the sum of times for both user-space and kernel-space usage
 is returned.
@@ -2371,6 +2386,22 @@ Both arguments may be non-integral.
 .nf
 \f[C]
 mod(a, b)  
+\f[R]
+.fi
+.SS \f[V]mpi_memory_local\f[R]
+.RS
+.PP
+Returns the memory usage as reported by PETSc in the give rank, in
+Gigabytes.
+If no rank is given, each rank returns a local value which should be
+printed with \f[V]PRINTF_ALL\f[R].
+Returns the memory global usage as reported by PETSc summing over all
+ranks, in Gigabytes.
+.RE
+.IP
+.nf
+\f[C]
+mpi_memory_local([rank]) mpi_memory_global()  
 \f[R]
 .fi
 .SS \f[V]not\f[R]

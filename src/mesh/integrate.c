@@ -231,6 +231,11 @@ double feenox_mesh_integral_expression_gauss(expr_t *expr, mesh_t *mesh, physica
         integral += feenox_fem_compute_w_det_at_gauss(e, q, mesh->integration) * feenox_expression_eval(expr);
       }
     }
-  }        
+  }
+ 
+// small debug-session for my phd thesis  
+//  petsc_call(PetscSynchronizedPrintf(PETSC_COMM_WORLD, "[proceso %d] mi integral parcial es %g\n", feenox.mpi_rank, integral));
+//  petsc_call(PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT));    
+  
   return integral;
 }

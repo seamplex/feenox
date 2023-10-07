@@ -684,7 +684,7 @@ Vec feenox_problem_create_vector(const char *name) {
 }
 #endif
 
-
+// TODO: see if PetscSplitOwnership(MPI_Comm comm, PetscInt *n, PetscInt *N) give the same results
 int feenox_compute_first_last_element(mesh_t *mesh) {
   mesh->first_element = (mesh->n_elements / feenox.mpi_size) * feenox.mpi_rank;
   if (mesh->n_elements % feenox.mpi_size > feenox.mpi_rank) {

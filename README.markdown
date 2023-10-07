@@ -609,6 +609,7 @@ ask in FeenoX’s [discussion page][].
 1.  Install mandatory dependencies
 
     ``` terminal
+    sudo apt-get update
     sudo apt-get install gcc make git automake autoconf libgsl-dev
     ```
 
@@ -638,7 +639,7 @@ ask in FeenoX’s [discussion page][].
     make -j4
     ```
 
-    If you cannot (or do not want) to use `libgsl-dev` from a package
+    If you cannot (or do not want to) use `libgsl-dev` from a package
     repository, call `configure` with `--enable-download-gsl`:
 
     ``` terminal

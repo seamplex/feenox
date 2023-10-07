@@ -37,6 +37,7 @@
       <item>DIMENSIONS</item>
       <item>DIRICHLET_SCALING</item>
       <item>DUMP</item>
+      <item>EIGEN_DIRICHLET_ZERO</item>
       <item>EIGEN_FORMULATION</item>
       <item>EIGEN_SOLVER</item>
       <item>ELSE</item>
@@ -125,6 +126,7 @@
       <item>PRECONDITIONER</item>
       <item>PRINT</item>
       <item>PRINTF</item>
+      <item>PRINTF_ALL</item>
       <item>PRINT_FUNCTION</item>
       <item>PRINT_VECTOR</item>
       <item>PROBLEM</item>
@@ -204,6 +206,8 @@
       <item>Z_MIN</item>
       <item>ALLOWED</item>
       <item>AS_PROVIDED</item>
+      <item>K</item>
+      <item>M</item>
       <item>NONE</item>
       <item>POST</item>
       <item>SKIP_HEADER_STEP</item>
@@ -234,7 +238,8 @@
       <item>j</item>
       <item>max_dt</item>
       <item>min_dt</item>
-      <item>ncores</item>
+      <item>mpi_rank</item>
+      <item>mpi_size</item>
       <item>on_gsl_error</item>
       <item>on_nan</item>
       <item>on_sundials_error</item>
@@ -296,6 +301,8 @@
       <item>memory</item>
       <item>min</item>
       <item>mod</item>
+      <item>mpi_memory_global</item>
+      <item>mpi_memory_local</item>
       <item>not</item>
       <item>prod</item>
       <item>quasi_random</item>
