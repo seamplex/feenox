@@ -239,6 +239,32 @@ answerzero() {
 }
 
 
+answerzerompi() {
+  echo -n "${2} (${1} ranks) ... "
+  answer=$(mpirun -n ${1} --map-by :OVERSUBSCRIBE ${feenox} ${dir}/${2})
+  error=$?
+  
+  if [ ${error} != 0 ]; then
+    return 2
+  fi
+
+  if [ -z "${3}" ]; then
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})")
+  else  
+    result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" "${3}")
+  fi  
+  if [ "${result}" = "1" ]; then
+    echo "ok"
+    level=0
+  else
+    echo "wrong, expected zero and got '${answer}'"
+    level=1
+  fi
+
+  return ${level}
+}
+
+
 answerzero1() {
   echo -n "${1} ${2}... "
   answer=$(${feenox} ${dir}/${1} ${2})

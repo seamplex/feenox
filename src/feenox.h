@@ -116,6 +116,10 @@ extern "C++" {
 #define BUFFER_TOKEN_SIZE        256
 #define BUFFER_LINE_SIZE        4096
 
+// number of internal functions, functional adn vector functions
+#define N_BUILTIN_FUNCTIONS         60
+#define N_BUILTIN_FUNCTIONALS       8
+#define N_BUILTIN_VECTOR_FUNCTIONS  8
 
 // no son enums porque hacemos operaciones con las mascaras de abajo
 #define EXPR_UNDEFINED                            0 
@@ -269,11 +273,19 @@ enum version_type {
 #define gsl_vector_add_to_element(vector,i,x)    gsl_vector_set((vector),(i),gsl_vector_get((vector),(i))+(x))
 #define gsl_matrix_add_to_element(matrix,i,j,x)  gsl_matrix_set((matrix),(i),(j),gsl_matrix_get((matrix),(i),(j))+(x))
 
+#define is_element_local(msh, elm) \
+((msh->mpi_matches_partitions == mpi_matches_partitions_serial) || \
+ (msh->mpi_matches_partitions == mpi_matches_partitions_one_to_one && \
+   (e->geometrical_entity != NULL && \
+    e->geometrical_entity->partition != NULL && \
+    (e->geometrical_entity->partition[0]-1) == feenox.mpi_rank)) || \
+ (msh->mpi_matches_partitions == mpi_matches_partitions_one_to_many && \
+   (e->geometrical_entity != NULL && \
+    e->geometrical_entity->partition != NULL && \
+    (((e->geometrical_entity->partition[0]-1)*feenox.mpi_size)/msh->n_partitions) == feenox.mpi_rank)) || \
+ (msh->mpi_matches_partitions == mpi_matches_partitions_no && \
+    (e->index >= msh->first_element && e->index < msh->last_element)))
 
-// number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         60
-#define N_BUILTIN_FUNCTIONALS       8
-#define N_BUILTIN_VECTOR_FUNCTIONS  8
 
 
 
@@ -1234,6 +1246,7 @@ struct mesh_t {
   size_t n_elements;
   size_t n_elements_per_dim[4];
   size_t n_cells; // a cell is an element with the topological dimension of the mesh
+
   int n_partitions;
 
   int degrees_of_freedom;        // per unknown
@@ -1265,6 +1278,18 @@ struct mesh_t {
     integration_full,
     integration_reduced
   } integration;
+  
+  enum {
+    mpi_matches_partitions_no,
+    mpi_matches_partitions_serial,
+    mpi_matches_partitions_one_to_one,
+    mpi_matches_partitions_one_to_many,
+  } mpi_matches_partitions;
+
+  // this is for mpi_matches_partitions_no
+  size_t first_element;
+  size_t last_element;
+  
   
   int update_each_step;
   
@@ -1855,7 +1880,6 @@ struct feenox_t {
     PetscInt nodes_local, size_local;
     PetscInt first_row, last_row;
     PetscInt first_node, last_node;
-    PetscInt first_element, last_element;
     
     // dirichlet BC scaling factor
     PetscScalar dirichlet_scale;
@@ -2324,6 +2348,7 @@ extern int feenox_problem_fill_aux_solution(function_t *function);
 extern Mat feenox_problem_create_matrix(const char *name);
 extern Vec feenox_problem_create_vector(const char *name); 
 #endif
+extern int feenox_compute_first_last_element(mesh_t *mesh);
 
 // bulk.c
 extern int feenox_problem_build(void);

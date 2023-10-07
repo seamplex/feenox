@@ -12,8 +12,7 @@ fi
 checkpetsc
 checkmpirun
 
-answermpi 1 t21.fee "2 2 2 2 2"
-exitifwrong $?
-
-answermpi 3 t21.fee "2 2 2 2 2"
-exitifwrong $?
+for n in $(seq 1 8); do
+  answermpi ${n} t21.fee "2 2 2 2 2"
+  exitifwrong $?
+done

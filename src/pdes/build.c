@@ -49,39 +49,42 @@ int feenox_problem_build(void) {
   
   size_t volumetric_elements = 0;
   int ascii_progress_chars = 0;  
-  for (size_t i = feenox.pde.first_element; i < feenox.pde.last_element; i++) {
-
-// ------ progress bar ------------------------------------------    
-    if (feenox.pde.progress_ascii == PETSC_TRUE && (i % step) == 0) {
-      printf(CHAR_PROGRESS_BUILD);  
-      fflush(stdout);
-      ascii_progress_chars++;
-    }
-// --------------------------------------------------------------    
+  for (size_t i = 0; i < feenox.pde.mesh->n_elements; i++) { 
+    element_t *e = &feenox.pde.mesh->element[i];
+    if (is_element_local(feenox.pde.mesh, e)) {
     
-    // TODO: make a list of bulk elements and another with BC elements
-    if (feenox.pde.mesh->element[i].type->dim == feenox.pde.dim) {
-      
-      // volumetric elements need volumetric builds
-      // TODO: process only elements that are local, i.e. the partition number
-      //       matches the local rank (not necessarily one to one)
-      // TODO: check if we can skip re-building in linear transient and/or
-      //       nonlinear BCs only
-      feenox_call(feenox_problem_build_element_volumetric(&feenox.pde.mesh->element[i]));
-      volumetric_elements++;
-      
-    } else if (feenox.pde.mesh->element[i].physical_group != NULL) {
-      
-      // lower-dimensional elements might have BCs (or not)
-      bc_t *bc = NULL;
-      LL_FOREACH(feenox.pde.mesh->element[i].physical_group->bcs, bc) {
-        bc_data_t *bc_data = NULL;
-        DL_FOREACH(bc->bc_datums, bc_data) {
-          // we only handle natural BCs here, essential BCs are handled in feenox_dirichlet_*()
-          if (bc_data->set_natural != NULL && bc_data->disabled == 0) {
-            // and only apply them if the condition holds true (or if there's no condition at all)
-            if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
-              feenox_call(feenox_problem_build_element_natural_bc(&feenox.pde.mesh->element[i], bc_data));
+  // ------ progress bar ------------------------------------------    
+      if (feenox.pde.progress_ascii == PETSC_TRUE && (i % step) == 0) {
+        printf(CHAR_PROGRESS_BUILD);  
+        fflush(stdout);
+        ascii_progress_chars++;
+      }
+  // --------------------------------------------------------------    
+
+      // TODO: make a list of bulk elements and another with BC elements
+      if (e->type->dim == feenox.pde.dim) {
+
+        // volumetric elements need volumetric builds
+        // TODO: process only elements that are local, i.e. the partition number
+        //       matches the local rank (not necessarily one to one)
+        // TODO: check if we can skip re-building in linear transient and/or
+        //       nonlinear BCs only
+        feenox_call(feenox_problem_build_element_volumetric(e));
+        volumetric_elements++;
+
+      } else if (e->physical_group != NULL) {
+
+        // lower-dimensional elements might have BCs (or not)
+        bc_t *bc = NULL;
+        LL_FOREACH(e->physical_group->bcs, bc) {
+          bc_data_t *bc_data = NULL;
+          DL_FOREACH(bc->bc_datums, bc_data) {
+            // we only handle natural BCs here, essential BCs are handled in feenox_dirichlet_*()
+            if (bc_data->set_natural != NULL && bc_data->disabled == 0) {
+              // and only apply them if the condition holds true (or if there's no condition at all)
+              if (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD) {
+                feenox_call(feenox_problem_build_element_natural_bc(e, bc_data));
+              }
             }
           }
         }

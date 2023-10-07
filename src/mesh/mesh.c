@@ -46,11 +46,14 @@ int feenox_instruction_mesh_read(void *arg) {
   feenox_call(this->reader(this));
   
   // check that the number of partitions and ranks match
-  if (feenox.mpi_size > 1 && this->n_partitions > 1) {
-    if ((this->n_partitions % feenox.mpi_size) != 0) {
-      feenox_push_error_message("parallel mismatch, mesh '%s' has %d partitions but FeenoX is running with %d ranks", this->file->name, this->n_partitions, feenox.mpi_size);
-      return FEENOX_ERROR;
-    }
+  if (feenox.mpi_size < 2) {
+    this->mpi_matches_partitions = mpi_matches_partitions_serial;
+  } else if (this->n_partitions > 0 && this->n_partitions == feenox.mpi_size) {
+    this->mpi_matches_partitions = mpi_matches_partitions_one_to_one;
+  } else if (this->n_partitions > 0 && (this->n_partitions % feenox.mpi_size) == 0) {
+    this->mpi_matches_partitions = mpi_matches_partitions_one_to_many;
+  } else {
+    this->mpi_matches_partitions = mpi_matches_partitions_no;
   }
   
   // check if we found everything

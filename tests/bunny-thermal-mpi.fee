@@ -1,0 +1,37 @@
+PROBLEM thermal
+
+# create mesh with
+#  > wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl
+#  > gmsh -3 bunny.geo
+READ_MESH bunny4.msh
+
+k = 1
+rho = 1
+cp = 1
+
+T_0(x,y,z) = 0
+end_time = 500
+
+# get the volume of the bunny
+PHYSICAL_GROUP bunny DIM 3
+# and the areas of the surfaces
+PHYSICAL_GROUP base DIM 2
+PHYSICAL_GROUP rest DIM 2
+
+convection_coeff = 1
+BC heated h=convection_coeff Tref=1 LABEL base LABEL rest
+
+SOLVE_PROBLEM
+
+
+INTEGRATE T RESULT integral_of_T
+T_mean = integral_of_T/bunny_volume
+
+# compare against the lumped capacitance result
+T_lumped = 1-exp(-convection_coeff*(base_area+rest_area)/(rho*bunny_volume*cp) * t)
+
+IF done
+ PRINT T_mean-1
+ENDIF
+
+# WRITE_RESULTS T

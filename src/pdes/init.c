@@ -572,14 +572,9 @@ int feenox_problem_init_runtime_general(void) {
   
   // TODO: honor mesh partitions
   // https://lists.mcs.anl.gov/pipermail/petsc-users/2014-April/021433.html
-  feenox.pde.first_element = (feenox.pde.mesh->n_elements / feenox.mpi_size) * feenox.mpi_rank;
-  if (feenox.pde.mesh->n_elements % feenox.mpi_size > feenox.mpi_rank) {
-    feenox.pde.first_element += feenox.mpi_rank;
-    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.mpi_size) + 1;
-  } else {  
-    feenox.pde.first_element += feenox.pde.mesh->n_elements % feenox.mpi_size;
-    feenox.pde.last_element = feenox.pde.first_element + (feenox.pde.mesh->n_elements / feenox.mpi_size);
-  }  
+  if (feenox.pde.mesh->mpi_matches_partitions == mpi_matches_partitions_no) {
+    feenox_call(feenox_compute_first_last_element(feenox.pde.mesh));
+  }
 
   // fill in the holders of the continuous functions that will hold the solution
   
@@ -689,3 +684,16 @@ Vec feenox_problem_create_vector(const char *name) {
 }
 #endif
 
+
+int feenox_compute_first_last_element(mesh_t *mesh) {
+  mesh->first_element = (mesh->n_elements / feenox.mpi_size) * feenox.mpi_rank;
+  if (mesh->n_elements % feenox.mpi_size > feenox.mpi_rank) {
+    mesh->first_element += feenox.mpi_rank;
+    mesh->last_element = mesh->first_element + (mesh->n_elements / feenox.mpi_size) + 1;
+  } else {  
+    mesh->first_element += mesh->n_elements % feenox.mpi_size;
+    mesh->last_element = mesh->first_element + (mesh->n_elements / feenox.mpi_size);
+  }  
+  
+  return FEENOX_OK;
+}
