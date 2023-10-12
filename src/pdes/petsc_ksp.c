@@ -263,6 +263,7 @@ int feenox_problem_setup_pc(PC pc) {
   
   // if using MUMPS, set icntl if needed
 #ifdef PETSC_HAVE_MUMPS  
+#ifdef HAVE_SLEPC
   // in EPS we need to set the ST type to create it, otherwise the icntls do not work
   if (feenox.pde.eps != NULL) {
     ST st = NULL;
@@ -276,6 +277,7 @@ int feenox_problem_setup_pc(PC pc) {
     // force creation of the operator
     petsc_call(STGetOperator(st, NULL));
   }
+#endif
   
   MatSolverType mat_solver_type = NULL;
   petsc_call(PCFactorGetMatSolverType(pc, &mat_solver_type));
