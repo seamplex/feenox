@@ -1,0 +1,17 @@
+# Los Alamos LA-13511 Analytical Benchmark Test Set for Criticallity Code Verification
+# problem 71
+PROBLEM neutron_sn 1D GROUPS 2 SN 8
+READ_MESH $0.msh
+
+INCLUDE URRa.fee
+
+BC mirror  mirror
+BC vacuum  vacuum 
+
+SOLVE_PROBLEM
+
+PRINT keff-0.996172
+
+rc = 9.491600
+PRINTF "%g %g %g %g" phi2(0.2*rc)/phi2(0)  phi2(0.5*rc)/phi2(0)  phi2(0.8*rc)/phi2(0) phi2(1.0*rc)/phi2(0) 
+PRINTF "%g %g %g %g" phi1(0.2*rc)/phi2(0)  phi1(0.5*rc)/phi2(0)  phi1(0.8*rc)/phi2(0) phi1(1.0*rc)/phi2(0) 

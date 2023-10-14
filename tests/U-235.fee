@@ -1,0 +1,22 @@
+# material U-235 (tables 33 and 34)
+
+# NOTE: 1 is the slow energy grop and 2 is the fast energy group
+
+# fast-energy group
+nu2_fuel = 2.70
+Sigma_f2_fuel = 0.06192
+nuSigma_f2_fuel = nu2_fuel*Sigma_f2_fuel
+Sigma_s2.2_fuel = 0.078240
+Sigma_s2.1_fuel = 0.0720  # note the table has the indexes reversed!
+Sigma_t2_fuel   = 0.2160
+chi[2] = 0.575
+
+# slow energy group
+nu1_fuel = 2.50
+Sigma_f1_fuel = 0.06912
+nuSigma_f1_fuel = nu1_fuel*Sigma_f1_fuel
+Sigma_s1.1_fuel = 0.26304
+Sigma_s1.2_fuel = 0       # note the table has the indexes reversed!
+Sigma_t1_fuel   = 0.3456
+chi[1] = 0.425
+

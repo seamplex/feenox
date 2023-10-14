@@ -6,6 +6,8 @@ nuSigma_f1_fuel = nu1_fuel*Sigma_f1_fuel
 Sigma_s1.1_fuel = 0.225216
 Sigma_t1_fuel   = 0.32640
 
+chi[1] = 1
+
 # these ones are not used by the problem but to check
 Sigma_c1_fuel = 0.019584
 c_fuel = 1.5

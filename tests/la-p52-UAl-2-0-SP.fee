@@ -1,0 +1,15 @@
+# Los Alamos LA-13511 Analytical Benchmark Test Set for Criticallity Code Verification
+# problem 51
+PROBLEM neutron_sn 3D GROUPS 2 SN 2
+READ_MESH $0.msh
+
+INCLUDE U-Al.fee
+
+BC mirror  mirror
+BC vacuum  vacuum 
+
+mumps_icntl_14 = 80
+
+SOLVE_PROBLEM
+
+PRINT keff-0.968656

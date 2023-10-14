@@ -13,6 +13,7 @@ checkgmsh
 checkslepc
 checkpde neutron_sn
 
+# one group
 gmsh -v 0 -1 ${dir}/la-IN.geo || exit $?
 answerzero la-p01-PUa-1-0-IN.fee
 exitifwrong $?
@@ -50,4 +51,27 @@ exitifwrong $?
 
 gmsh -v 0 -2 ${dir}/la-p10-PUb-H2O_10-1-0-CY.geo || exit $?
 answerzero la-p10-PUb-H2O_10-1-0-CY.fee
+exitifwrong $?
+
+
+# two groups
+answerzero la-p47-U-2-0-IN.fee
+exitifwrong $?
+
+gmsh -v 0 -1 ${dir}/la-p48-U-2-0-SL.geo || exit $?
+answerzero la-p48-U-2-0-SL.fee
+exitifwrong $?
+
+gmsh -v 0 -3 ${dir}/la-p49-U-2-0-SP.geo || exit $?
+answerzero la-p49-U-2-0-SP.fee
+exitifwrong $?
+
+answerzero la-p50-UAl-2-0-IN.fee
+exitifwrong $?
+
+answerzero la-p70-URRa-2-1-IN.fee
+exitifwrong $?
+
+gmsh -v 0 -1 ${dir}/la-p51-URRa-2-1-SL.geo || exit $?
+answerzero la-p51-URRa-2-1-SL.fee
 exitifwrong $?

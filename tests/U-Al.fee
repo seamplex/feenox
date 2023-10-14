@@ -1,0 +1,22 @@
+# material U-Al (tables 36 and 37)
+
+# NOTE: 1 is the slow energy grop and 2 is the fast energy group
+
+# fast-energy group
+nu2_fuel = 0
+Sigma_f2_fuel = 0
+nuSigma_f2_fuel = nu2_fuel*Sigma_f2_fuel
+Sigma_s2.2_fuel = 0.247516
+Sigma_s2.1_fuel = 0.020432  # note the table has the indexes reversed!
+Sigma_t2_fuel   = 0.26817
+chi[2] = 1.0
+
+# slow energy group
+nu1_fuel = 2.83
+Sigma_f1_fuel = 0.0607063042
+nuSigma_f1_fuel = nu1_fuel*Sigma_f1_fuel
+Sigma_s1.1_fuel = 1.21313
+Sigma_s1.2_fuel = 0       # note the table has the indexes reversed!
+Sigma_t1_fuel   = 1.27698
+chi[1] = 0.0
+
