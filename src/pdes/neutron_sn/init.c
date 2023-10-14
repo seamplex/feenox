@@ -111,6 +111,13 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   neutron_sn.sn_alpha = feenox_define_variable_get_ptr("sn_alpha");
   feenox_var_value(neutron_sn.sn_alpha) = 0.5;
   
+///va_neutron_sn+chi+desc A vector of size groups with the fission spectrum.
+///va_neutron_sn+chi+desc Default is one in the first group and zero in the rest.
+  neutron_sn.chi = feenox_define_vector_get_ptr("chi", neutron_sn.groups);
+  feenox_vector_set(neutron_sn.chi, 0, 1.0);
+  
+  
+  
   // ------------ initialize the SN weights ------------------------------------
   // TODO: when adding FVM, these are the same so we should move it into a single location
   feenox_check_alloc(neutron_sn.w = calloc(neutron_sn.directions, sizeof(double)));
@@ -369,6 +376,7 @@ int feenox_problem_init_runtime_neutron_sn(void) {
   // initialize XSs
   // TODO: allow not to give the group number in one-group problems
   unsigned int G = neutron_sn.groups;
+  double fission_spectrum_integral = 0;
   feenox_check_alloc(neutron_sn.Sigma_t    = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_sn.Sigma_a    = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_sn.nu_Sigma_f = calloc(G, sizeof(distribution_t)));
@@ -426,12 +434,20 @@ int feenox_problem_init_runtime_neutron_sn(void) {
       feenox_free(name);
       
     }
+    
+    fission_spectrum_integral += feenox_vector_get(neutron_sn.chi, g);
   }
 
   if (neutron_sn.has_sources == 0 && neutron_sn.has_fission == 0) {
     feenox_push_error_message("neither fission nor sources found");
     return FEENOX_ERROR;
   }
+  
+  if (fabs(fission_spectrum_integral-1) > 1e-6) {
+    feenox_push_error_message("fission spectrum is not normalized, its integral is %g", fission_spectrum_integral);
+    return FEENOX_ERROR;
+  }
+  
   
   if (neutron_sn.has_sources == 0) {
 #ifdef HAVE_SLEPC    
@@ -469,9 +485,6 @@ int feenox_problem_init_runtime_neutron_sn(void) {
   feenox_check_alloc(neutron_sn.R   = gsl_matrix_calloc(MG, MG));
   feenox_check_alloc(neutron_sn.X   = gsl_matrix_calloc(MG, MG));
   feenox_check_alloc(neutron_sn.s   = gsl_vector_calloc(MG));  
-  feenox_check_alloc(neutron_sn.chi = calloc(G, sizeof(double)));
-  // TODO: read a vector called "chi"
-  neutron_sn.chi[0] = 1;
   
   // direction matrix
   feenox_check_alloc(neutron_sn.D = gsl_matrix_calloc(MG, MG * feenox.pde.dim));

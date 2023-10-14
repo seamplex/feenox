@@ -68,7 +68,7 @@ void feenox_pop_error_message(void) {
 
 void feenox_pop_errors(void) {
 
-  if (feenox.mpi_size == 0) {
+  if (feenox.mpi_size < 2) {
     fprintf(stderr, "error: ");
   } else {
     fprintf(stderr, "[%d] error: ", feenox.mpi_rank);

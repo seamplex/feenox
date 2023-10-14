@@ -216,6 +216,24 @@ double feenox_mesh_integral_expression_gauss(expr_t *expr, mesh_t *mesh, physica
   // an expression evaluated at the gauss points
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *e = &mesh->element[i];
+/*    
+    int partition = e->geometrical_entity->partition[0];
+    int first = (mesh->n_nodes / mesh->n_partitions) * (partition-1);
+    int last = -1;
+    if (mesh->n_nodes % mesh->n_partitions > (partition-1)) {
+      first += (partition-1);
+      last = first + (mesh->n_nodes / mesh->n_partitions) + 1;
+    } else {  
+      first += mesh->n_nodes % mesh->n_partitions;
+      last = first + (mesh->n_nodes / mesh->n_partitions);
+    }      
+
+    printf("[%d] index = %ld tag = %ld partition = %d range = %d %d nodes = %ld %ld %ld\n", feenox.mpi_rank, e->index, e->tag, partition,
+        first, last,
+        e->type->nodes > 0 ? e->node[0]->index_mesh : -1,
+        e->type->nodes > 1 ? e->node[1]->index_mesh : -1,
+        e->type->nodes > 2 ? e->node[2]->index_mesh : -1);
+ */
     if (is_element_local(mesh, e) && is_physical_group_right(e, physical_group)) {
       
       for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {

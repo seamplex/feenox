@@ -68,11 +68,6 @@ struct neutron_sn_t {
   // independent sources: groups
   gsl_vector *s;  
   
-  // fission spectrum: groups
-  double *chi;
-  
-
-  
   // elemental matrices  
   unsigned int n_nodes;
   
@@ -99,10 +94,14 @@ struct neutron_sn_t {
   int has_fission;
   int space_XS;
 
+  // fission spectrum
+  vector_t *chi;
+  
+  // supg stabilization
   var_t *sn_alpha;
   
   // --- results ----------------------
-  
+
   // effective multiplication factor
   var_t *keff;
   // scalar fluxes (array of G functions)

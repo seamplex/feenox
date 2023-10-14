@@ -40,7 +40,8 @@ int feenox_instruction_printf(void *arg) {
     // plain old printf
     fprintf(printf->file->pointer, "%s\n", string);
     fflush(printf->file->pointer);
-    
+
+#ifdef HAVE_PETSC    
   } else {
     
     // rank-synchronized printf
@@ -59,6 +60,7 @@ int feenox_instruction_printf(void *arg) {
 
     petsc_call(PetscSynchronizedPrintf(PETSC_COMM_WORLD, "[%d/%d %s] %s\n", feenox.mpi_rank, feenox.mpi_size, host, string));
     petsc_call(PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT));    
+#endif
   }
   
   feenox_free(string);

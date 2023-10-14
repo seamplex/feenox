@@ -139,7 +139,7 @@ int feenox_problem_neutron_sn_eval_XS(material_t *material, double *x) {
 
           // fision
           if (neutron_sn.has_fission) {
-            gsl_matrix_set(neutron_sn.X, diag, sn_dof_index(m_prime,g_prime), +neutron_sn.w[m_prime] * neutron_sn.chi[g] * neutron_sn.nu_Sigma_f[g_prime].value);
+            gsl_matrix_set(neutron_sn.X, diag, sn_dof_index(m_prime,g_prime), +neutron_sn.w[m_prime] * feenox_vector_get(neutron_sn.chi, g) * neutron_sn.nu_Sigma_f[g_prime].value);
           }
         }
       }

@@ -351,6 +351,12 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
     if (!assignment->vector->initialized) {
       feenox_vector_init(assignment->vector, FEENOX_VECTOR_INITIAL);
     }
+
+    if (row >= assignment->vector->size) {
+      feenox_push_error_message("out-of-bound assignment, vector '%s' has size %d but element %d was requested", assignment->vector->name, assignment->vector->size, row+1);
+      return FEENOX_ERROR;
+    }
+    
     
     current = gsl_vector_ptr(feenox_value_ptr(assignment->vector), row);
     if (assignment->vector->initial_static != NULL) {
@@ -369,6 +375,16 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
     if (!assignment->matrix->initialized) {
       feenox_matrix_init(assignment->matrix);
     }
+    
+    if (col >= assignment->matrix->cols) {
+      feenox_push_error_message("out-of-bound assignment, matrix '%s' has %d cols but column %d was requested", assignment->matrix->name, assignment->matrix->cols, col+1);
+      return FEENOX_ERROR;
+    }
+    if (row >= assignment->matrix->rows) {
+      feenox_push_error_message("out-of-bound assignment, matrix '%s' has %d rows but row %d was requested", assignment->matrix->name, assignment->matrix->rows, row+1);
+      return FEENOX_ERROR;
+    }
+    
     
     current = gsl_matrix_ptr(feenox_value_ptr(assignment->matrix), row, col);
     if (assignment->matrix->initial_static != NULL) {

@@ -47,9 +47,6 @@ struct neutron_diffusion_t {
   // independent sources: groups
   gsl_vector *s;  
   
-  // fission spectrum: groups
-  double *chi;
-
   unsigned int n_nodes;
   // elemental matrices (size J*G x J*G)
   gsl_matrix *Li;  // leakage
@@ -66,6 +63,10 @@ struct neutron_diffusion_t {
   int has_fission;
   int space_XS;
 
+  // fission spectrum
+  vector_t *chi;
+  
+  // effective multiplication factor
   var_t *keff;
 
   // neutron currents

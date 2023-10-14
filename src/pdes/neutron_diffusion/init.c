@@ -103,9 +103,15 @@ int feenox_problem_parse_time_init_neutron_diffusion(void) {
 
   // TODO: for one group make an alias between phi1 and phi
   
+///va_neutron_diffusion+chi+desc A vector of size groups with the fission spectrum.
+///va_neutron_diffusion+chi+desc Default is one in the first group and zero in the rest.
+  neutron_diffusion.chi = feenox_define_vector_get_ptr("chi", neutron_diffusion.groups);
+  feenox_vector_set(neutron_diffusion.chi, 0, 1.0);
+  
+
 ///va_neutron_diffusion+keff+desc The effective multiplication factor\ $k_\text{eff}$.
   neutron_diffusion.keff = feenox_define_variable_get_ptr("keff");
-
+  
 #endif
   
   return FEENOX_OK;
@@ -122,13 +128,14 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   
   // initialize XSs
   int G = neutron_diffusion.groups;  
+  double fission_spectrum_integral = 0;
   feenox_check_alloc(neutron_diffusion.D          = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.Sigma_t    = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.Sigma_a    = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.nu_Sigma_f = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.S          = calloc(G, sizeof(distribution_t)));
   feenox_check_alloc(neutron_diffusion.Sigma_s    = calloc(G, sizeof(distribution_t *)));
-  for (unsigned int g = 0; g < neutron_diffusion.groups; g++) {
+  for (unsigned int g = 0; g < G; g++) {
     char *name = NULL;
 
     feenox_check_minusone(asprintf(&name, "D%d", g+1));
@@ -178,11 +185,17 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
       }  
       feenox_free(name);
     }
+    
+    fission_spectrum_integral += feenox_vector_get(neutron_diffusion.chi, g);
   }
-
 
   if (neutron_diffusion.has_sources == 0 && neutron_diffusion.has_fission == 0) {
     feenox_push_error_message("neither fission nor sources found");
+    return FEENOX_ERROR;
+  }
+  
+  if (fabs(fission_spectrum_integral-1) > 1e-6) {
+    feenox_push_error_message("fission spectrum is not normalized, its integral is %g", fission_spectrum_integral);
     return FEENOX_ERROR;
   }
   
@@ -210,9 +223,6 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   feenox_check_alloc(neutron_diffusion.R   = gsl_matrix_calloc(G, G));
   feenox_check_alloc(neutron_diffusion.X   = gsl_matrix_calloc(G, G));
   feenox_check_alloc(neutron_diffusion.s   = gsl_vector_calloc(G));
-  feenox_check_alloc(neutron_diffusion.chi = calloc(G, sizeof(double)));
-  // TODO: read a vector called "chi"
-  neutron_diffusion.chi[0] = 1;
   
 
   feenox.pde.math_type = neutron_diffusion.has_sources ? math_type_linear : math_type_eigen;

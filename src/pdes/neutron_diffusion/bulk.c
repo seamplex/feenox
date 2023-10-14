@@ -81,7 +81,7 @@ int feenox_problem_neutron_diffusion_eval_XS(material_t *material, double *x) {
       gsl_matrix_set(neutron_diffusion.R, g, g_prime, -neutron_diffusion.Sigma_s[g_prime][g].eval(&neutron_diffusion.Sigma_s[g_prime][g], x, material));
     
       if (neutron_diffusion.has_fission) {
-        gsl_matrix_set(neutron_diffusion.X, g, g_prime, neutron_diffusion.chi[g]*neutron_diffusion.nu_Sigma_f[g_prime].eval(&neutron_diffusion.nu_Sigma_f[g_prime], x, material));
+        gsl_matrix_set(neutron_diffusion.X, g, g_prime, feenox_vector_get(neutron_diffusion.chi, g)*neutron_diffusion.nu_Sigma_f[g_prime].eval(&neutron_diffusion.nu_Sigma_f[g_prime], x, material));
       }  
     }
     
