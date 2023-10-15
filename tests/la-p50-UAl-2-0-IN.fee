@@ -7,4 +7,4 @@ INCLUDE U-Al.fee
 BC mirror  mirror
 SOLVE_PROBLEM
 
-PRINT (keff-2.661745)+(phi2(0)/phi1(0))-3.1250
+PRINT (keff-2.661745)#+(phi2(0)/phi1(0))-3.1250
