@@ -9,8 +9,8 @@ INCLUDE U-235.fee
 BC mirror  mirror
 BC vacuum  vacuum 
 
-mumps_icntl_14 = 80
+mumps_icntl_14 = 180
 
 SOLVE_PROBLEM
 
-PRINT keff-1.00376
+PRINT keff-1.01028

@@ -1,5 +1,5 @@
 rc = 7.909444;
-n = 7;
+n = 3;
 
 SetFactory("OpenCASCADE");
 Sphere(1) = {0, 0, 0, rc, 0, Pi/2, Pi/2};
