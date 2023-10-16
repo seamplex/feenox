@@ -12,4 +12,4 @@ mumps_icntl_14 = 80
 
 SOLVE_PROBLEM
 
-PRINT keff-0.948641
+PRINT keff-0.940369
