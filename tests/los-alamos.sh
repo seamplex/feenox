@@ -69,9 +69,18 @@ exitifwrong $?
 answerzero la-p50-UAl-2-0-IN.fee
 exitifwrong $?
 
+gmsh -v 0 -1 ${dir}/la-p51-UAl-2-0-SL.geo || exit $?
+answerzero la-p51-UAl-2-0-SL.fee
+exitifwrong $?
+
+gmsh -v 0 -3 ${dir}/la-p52-UAl-2-0-SP.geo || exit $?
+answerzero la-p52-UAl-2-0-SP.fee
+exitifwrong $?
+
+
 answerzero la-p70-URRa-2-1-IN.fee
 exitifwrong $?
 
-gmsh -v 0 -1 ${dir}/la-p51-URRa-2-1-SL.geo || exit $?
-answerzero la-p51-URRa-2-1-SL.fee
+gmsh -v 0 -1 ${dir}/la-p71-URRa-2-1-SL.geo || exit $?
+answerzero la-p71-URRa-2-1-SL.fee
 exitifwrong $?
