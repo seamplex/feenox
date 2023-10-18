@@ -159,11 +159,11 @@
  
 ## Neutron
 
- * add currents to the outputs? J1x J1y J1x?
  * current in BCs
  * FVM?
- * benchmarks/tests
- * Why is it generally a bad idea to use EPS_SMALLEST_MAGNITUDE? where did I get this?
+ * allow per-material fission spectrum (it has to be uniform and normalized)
+
+
  
 # V & V
 

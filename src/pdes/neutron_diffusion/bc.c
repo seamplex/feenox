@@ -40,6 +40,20 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->fills_matrix = 1;
     bc_data->dof = -1;
 
+  } else if (strncmp(lhs, "phi", 3) == 0) {
+    bc_data->type_math = bc_type_math_dirichlet;
+    int dof = 0;
+    if (sscanf(lhs+3, "%d", &dof) != 1) {
+      feenox_push_error_message("could not read group number in neutron_diffusion boundary condition '%s'", lhs);
+      return FEENOX_ERROR;
+    }
+    if (dof < 0 || dof > neutron_diffusion.groups) {
+      feenox_push_error_message("invalid group number in neutron_diffusion boundary condition '%s'", lhs);
+      return FEENOX_ERROR;
+    }
+    bc_data->dof = dof-1;
+    bc_data->set_essential = feenox_problem_bc_set_neutron_diffusion_flux;
+
   // TODO: fixed current = pure neumann
     
   } else {
@@ -48,6 +62,23 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
   }
 
   feenox_call(feenox_expression_parse(&bc_data->expr, rhs));
+
+  // TODO: initial guesses
+  // if (bc_data->type_phys == BC_TYPE_THERMAL_TEMPERATURE || bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE ) {
+  //   thermal.guessed_initial_guess += feenox_expression_eval(&bc_data->expr);
+  //   thermal.n_bc_temperatures++;
+  // }
+
+  bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
+  bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
+
+
+  if (bc_data->nonlinear && bc_data->type_math == bc_type_math_dirichlet) {
+    feenox_push_error_message("essential boundary condition '%s' cannot depend on flux", rhs);
+    return FEENOX_ERROR;
+  }
+
+
 
   // TODO: check consistency, non-linearities, etc.
   
@@ -64,6 +95,16 @@ int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *this, element_t *e, 
   }
 #endif
   
+  return FEENOX_OK;
+}
+
+
+// this virtual method fills in the dirichlet indexes and values with bc_data
+int feenox_problem_bc_set_neutron_diffusion_flux(bc_data_t *this, element_t *e, size_t j_global) {
+
+#ifdef HAVE_PETSC
+  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[this->dof], feenox_expression_eval(&this->expr)));
+#endif
   return FEENOX_OK;
 }
 

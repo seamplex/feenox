@@ -46,6 +46,7 @@ extern int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element
 // neutron_diffusion/bc.c
 extern int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, char *rhs);
 extern int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *bc_data, element_t *e, size_t j_global);
+extern int feenox_problem_bc_set_neutron_diffusion_flux(bc_data_t *this, element_t *e, size_t j_global);
 extern int feenox_problem_bc_set_neutron_diffusion_vacuum(bc_data_t *bc_data, element_t *e, unsigned int q);
 
 // thermal/currents.c

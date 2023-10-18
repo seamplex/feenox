@@ -142,6 +142,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_distribution_init(&neutron_diffusion.D[g], name);
     if (neutron_diffusion.D[g].defined) {
       neutron_diffusion.D[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.D[g].dependency_variables);
+      neutron_diffusion.space_XS |= neutron_diffusion.D[g].uniform;
     }
     feenox_free(name);
     
@@ -149,6 +150,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_distribution_init(&neutron_diffusion.Sigma_t[g], name);
     if (neutron_diffusion.Sigma_t[g].defined) {
       neutron_diffusion.Sigma_t[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.Sigma_t[g].dependency_variables);
+      neutron_diffusion.space_XS |= neutron_diffusion.Sigma_t[g].uniform;
     }
     feenox_free(name);
     
@@ -156,7 +158,8 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_distribution_init(&neutron_diffusion.Sigma_a[g], name);
     if (neutron_diffusion.Sigma_a[g].defined) {
       neutron_diffusion.Sigma_a[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.Sigma_a[g].dependency_variables);
-    }  
+      neutron_diffusion.space_XS |= neutron_diffusion.Sigma_a[g].uniform;
+    }
     feenox_free(name);
 
     feenox_check_minusone(asprintf(&name, "nuSigma_f%d", g+1));
@@ -164,7 +167,8 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     if (neutron_diffusion.nu_Sigma_f[g].defined) {
       neutron_diffusion.has_fission = 1;
       neutron_diffusion.nu_Sigma_f[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.nu_Sigma_f[g].dependency_variables);
-    }  
+      neutron_diffusion.space_XS |= neutron_diffusion.nu_Sigma_f[g].uniform;
+    }
     feenox_free(name);
 
     feenox_check_minusone(asprintf(&name, "S%d", g+1));
@@ -172,7 +176,8 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     if (neutron_diffusion.S[g].defined) {
       neutron_diffusion.has_sources = 1;
       neutron_diffusion.S[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.S[g].dependency_variables);
-    }  
+      neutron_diffusion.space_XS |= neutron_diffusion.S[g].uniform;
+    }
     feenox_free(name);
     
     feenox_check_alloc(neutron_diffusion.Sigma_s[g] = calloc(feenox.pde.dofs, sizeof(distribution_t)));
