@@ -3,5 +3,9 @@ PROBLEM modal MODES 6 DIMENSIONS 3
 E = 6.9e10
 nu = 0.26
 rho = 2800
+
+# just to test the icntls
+mumps_icntl_14 = 60
+
 SOLVE_PROBLEM
 PRINT %.1f SEP " " f
