@@ -97,7 +97,7 @@ struct neutron_sn_t {
   // fission spectrum
   vector_t *chi;
   
-  // supg stabilization
+  // supg stabilization factor
   var_t *sn_alpha;
   
   // --- results ----------------------
