@@ -8,8 +8,8 @@ for i in grep sed sort mawk; do
 done
 
 src="../src"
-parsers="../src/parser/parser.c"
-inits="../src/flow/init.c"
+parsers="../src/parser/parser.c ../src/pdes/neutron_diffusion/parser.c ../src/pdes/neutron_sn/parser.c "
+inits="../src/flow/init.c ../src/pdes/neutron_diffusion/init.c ../src/pdes/neutron_sn/init.c"
 functions="../src/math/builtin_functions.c ../src/math/builtin_functionals.c ../src/math/builtin_vectorfunctions.c"
 
 UPPER1=$(grep strcasecmp ${parsers}   | sed -r 's/[^"]*("[^"]*")?/ \1/g;s/" +"/\n/g;s/ *"//g' | sort | mawk '$1 in p{next}{p[$1];print}' | mawk '/^[A-Z]/')
