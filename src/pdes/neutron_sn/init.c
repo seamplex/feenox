@@ -87,13 +87,15 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   // the angular fluxes psi
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   // TODO: document from comments
-  for (unsigned int m = 0; m < neutron_sn.directions; m++) {
-    for (unsigned int g = 0; g < neutron_sn.groups; g++) {
-      feenox_check_minusone(asprintf(&feenox.pde.unknown_name[m * neutron_sn.groups + g], "psi%u.%u", m+1, g+1));
+  // NOTE: it is more natural to put first the group and then the direction
+  //       while in the doc we use $\psi_{mg}$
+  for (unsigned int g = 0; g < neutron_sn.groups; g++) {
+    for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+      feenox_check_minusone(asprintf(&feenox.pde.unknown_name[sn_dof_index(m,g)], "psi%u.%u", g+1, m+1));
     }
   }
 
-  // the scalar fluxes psi
+  // the scalar fluxes phi
   // TODO: document
   // TODO: for one group make an alias between phi1 and phi
   feenox_check_alloc(neutron_sn.phi = calloc(neutron_sn.groups, sizeof(function_t *)));
@@ -122,7 +124,7 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   // TODO: when adding FVM, these are the same so we should move it into a single location
   feenox_check_alloc(neutron_sn.w = calloc(neutron_sn.directions, sizeof(double)));
   feenox_check_alloc(neutron_sn.Omega = calloc(neutron_sn.directions, sizeof(double *)));
-  for (int m = 0; m < neutron_sn.directions; m++) {
+  for (unsigned int m = 0; m < neutron_sn.directions; m++) {
     feenox_check_alloc(neutron_sn.Omega[m] = calloc(3, sizeof(double)));
   }
   
@@ -331,8 +333,8 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   
   // checks
   double s = 0;
-  for (unsigned int n = 0; n < neutron_sn.directions; n++) {
-    s += neutron_sn.w[n];
+  for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+    s += neutron_sn.w[m];
   }
   if (fabs(s-1) > 1e-6) {
     feenox_push_error_message("S%d weights do not sum up to one but to %g", neutron_sn.N, s);
@@ -341,8 +343,8 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   
   for (unsigned int d = 0; d < feenox.pde.dim; d++) {
     s = 0;
-    for (unsigned int n = 0; n < neutron_sn.directions; n++) {
-      s += neutron_sn.w[n] * neutron_sn.Omega[n][d];
+    for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+      s += neutron_sn.w[m] * neutron_sn.Omega[m][d];
     }
     if (fabs(s) > 1e-6) {
       feenox_push_error_message("S%d weights are not symmetric (zero != %g)", neutron_sn.N, s);
@@ -350,8 +352,8 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
     }
     
     s = 0;
-    for (unsigned int n = 0; n < neutron_sn.directions; n++) {
-      s += neutron_sn.w[n] * gsl_pow_2(neutron_sn.Omega[n][d]);
+    for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+      s += neutron_sn.w[m] * gsl_pow_2(neutron_sn.Omega[m][d]);
     }
     if (fabs(s-1.0/3.0) > 1e-6) {
       feenox_push_error_message("S%d weights are not symmetric (one third != %g)", neutron_sn.N, s);

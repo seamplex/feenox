@@ -76,33 +76,33 @@ PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb" total_dofs memory()
 
 ---
 figures: |
-  ![$\psi_{1,1}$ for S$_4$](azmy-4-01.png)
+  ![$\psi_{1}$ for S$_4$](azmy-4-01.png)
   
-  ![$\psi_{2,1}$ for S$_4$](azmy-4-02.png)
+  ![$\psi_{2}$ for S$_4$](azmy-4-02.png)
 
-  ![$\psi_{3,1}$ for S$_4$](azmy-4-03.png)
+  ![$\psi_{3}$ for S$_4$](azmy-4-03.png)
   
-  ![$\psi_{4,1}$ for S$_4$](azmy-4-04.png)
+  ![$\psi_{4}$ for S$_4$](azmy-4-04.png)
 
-  ![$\psi_{5,1}$ for S$_4$](azmy-4-05.png)
+  ![$\psi_{5}$ for S$_4$](azmy-4-05.png)
   
-  ![$\psi_{6,1}$ for S$_4$](azmy-4-06.png)
+  ![$\psi_{6}$ for S$_4$](azmy-4-06.png)
 
-  ![$\psi_{7,1}$ for S$_4$](azmy-4-07.png)
+  ![$\psi_{7}$ for S$_4$](azmy-4-07.png)
   
-  ![$\psi_{8,1}$ for S$_4$](azmy-4-08.png)
+  ![$\psi_{8}$ for S$_4$](azmy-4-08.png)
 
-  ![$\psi_{9,1}$ for S$_4$](azmy-4-09.png)
+  ![$\psi_{9}$ for S$_4$](azmy-4-09.png)
 
-  ![$\psi_{10,1}$ for S$_4$](azmy-4-10.png)
+  ![$\psi_{10}$ for S$_4$](azmy-4-10.png)
   
-  ![$\psi_{11,1}$ for S$_4$](azmy-4-11.png)
+  ![$\psi_{11}$ for S$_4$](azmy-4-11.png)
 
-  ![$\psi_{12,1}$ for S$_4$](azmy-4-12.png)
+  ![$\psi_{12}$ for S$_4$](azmy-4-12.png)
   
-  ![$\phi_{1}$ for S$_4$](azmy-4-00.png)
+  ![$\phi$ for S$_4$](azmy-4-00.png)
   
-  ![$\phi_{1}$ for S$_6$](azmy-6-00.png)
+  ![$\phi$ for S$_6$](azmy-6-00.png)
 
-  ![$\phi_{1}$ for S$_8$](azmy-8-00.png)  
+  ![$\phi$ for S$_8$](azmy-8-00.png)  
 ...

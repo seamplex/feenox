@@ -236,10 +236,10 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
 ///va+gamg_threshold+detail Default is zero (note that PETSc's default is -1).
   feenox_var_value(feenox.pde.vars.gamg_threshold) = 0;
 
-  ///va+feenox_penalty_weight+name feenox_penalty_weight
-///va+feenox_penalty_weight+detail The weight\ $w$ used when setting multi-freedom boundary conditions.
-///va+feenox_penalty_weight+detail Higher values mean better precision in the constrain but worsen
-///va+feenox_penalty_weight+detail the matrix condition number. 
+///va+penalty_weight+name feenox_penalty_weight
+///va+penalty_weight+detail The weight\ $w$ used when setting multi-freedom boundary conditions.
+///va+penalty_weight+detail Higher values mean better precision in the constrain but worsen
+///va+penalty_weight+detail the matrix condition number. 
   feenox.pde.vars.penalty_weight = feenox_define_variable_get_ptr("penalty_weight");
 ///va+feenox_penalty_weight+detail Default is `1e8`.
   feenox_var_value(feenox.pde.vars.penalty_weight) = 1e8;  

@@ -66,9 +66,9 @@ int feenox_problem_parse_write_post_neutron_sn(mesh_write_t *mesh_write, const c
     
   } else if (strcmp(token, "angular_flux") == 0 || strcmp(token, "angular_fluxes") == 0) {
 
-    for (int n = 0; n < neutron_sn.directions; n++) {
-      for (int g = 0; g < neutron_sn.groups; g++) {
-        feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.unknown_name[n * neutron_sn.groups + g], NULL, field_location_nodes));
+    for (unsigned int g = 0; g < neutron_sn.groups; g++) {
+      for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+        feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.unknown_name[sn_dof_index(m,g)], NULL, field_location_nodes));
       }
     }
     

@@ -22,7 +22,7 @@
 #ifndef NEUTRON_SN_H
 #define NEUTRON_SN_H
 
-#define sn_dof_index(m,g) ((m)*neutron_sn.groups + (g))
+#define sn_dof_index(m,g) ((g)*neutron_sn.directions + (m))
 
 typedef struct neutron_sn_t neutron_sn_t;
 

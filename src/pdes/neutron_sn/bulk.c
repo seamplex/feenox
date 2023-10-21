@@ -102,7 +102,7 @@ int feenox_problem_neutron_sn_eval_XS(material_t *material, double *x) {
     }
     
     // scattering
-    for (int g_prime = 0; g_prime < neutron_sn.groups; g_prime++) {
+    for (unsigned int g_prime = 0; g_prime < neutron_sn.groups; g_prime++) {
       if (neutron_sn.Sigma_s0[g_prime][g].defined) {
         neutron_sn.Sigma_s0[g_prime][g].eval(&neutron_sn.Sigma_s0[g_prime][g], x, material);
       }

@@ -79,8 +79,8 @@ int feenox_problem_solve_post_neutron_sn(void) {
   for (size_t j = 0; j < feenox.pde.mesh->n_nodes; j++) {
     for (unsigned int g = 0; g < neutron_sn.groups; g++) {
       double xi = 0;
-      for (unsigned int n = 0; n < neutron_sn.directions; n++) {
-        xi += neutron_sn.w[n] * feenox_vector_get(feenox.pde.solution[n * neutron_sn.groups + g]->vector_value, j);
+      for (unsigned int m = 0; m < neutron_sn.directions; m++) {
+        xi += neutron_sn.w[m] * feenox_vector_get(feenox.pde.solution[sn_dof_index(m,g)]->vector_value, j);
       }
       // TODO: wrapper, the pde has to set the function value not the vector
       feenox_vector_set(neutron_sn.phi[g]->vector_value, j, xi);
