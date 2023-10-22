@@ -119,6 +119,10 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   feenox_vector_set(neutron_sn.chi, 0, 1.0);
   
   
+  // decrease the penalty weight
+  feenox_var_value(feenox.pde.vars.penalty_weight) = 100;
+  
+  
   
   // ------------ initialize the SN weights ------------------------------------
   // TODO: when adding FVM, these are the same so we should move it into a single location
