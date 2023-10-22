@@ -59,6 +59,7 @@
       <item>GAUSS</item>
       <item>GRADIENT</item>
       <item>GROUP</item>
+      <item>GROUPS</item>
       <item>HANDLE_HANGING_NODES</item>
       <item>HEADER</item>
       <item>HISTORY</item>
@@ -99,6 +100,7 @@
       <item>MODE</item>
       <item>MODES</item>
       <item>MOMENT</item>
+      <item>N</item>
       <item>NAME</item>
       <item>NODE</item>
       <item>NODES</item>
@@ -156,6 +158,7 @@
       <item>SHM_OBJECT</item>
       <item>SIZE</item>
       <item>SIZES</item>
+      <item>SN</item>
       <item>SNES</item>
       <item>SNES_TYPE</item>
       <item>SOLVE</item>
@@ -227,6 +230,11 @@
       <item>dont_report</item>
       <item>dt</item>
       <item>end_time</item>
+      <item>eps_max_it</item>
+      <item>eps_st_nu</item>
+      <item>eps_st_sigma</item>
+      <item>eps_tol</item>
+      <item>gamg_threshold</item>
       <item>i</item>
       <item>infinite</item>
       <item>in_static</item>
@@ -236,22 +244,39 @@
       <item>in_transient_first</item>
       <item>in_transient_last</item>
       <item>j</item>
+      <item>keff</item>
+      <item>ksp_atol</item>
+      <item>ksp_divtol</item>
+      <item>ksp_max_it</item>
+      <item>ksp_rtol</item>
       <item>max_dt</item>
+      <item>memory_available</item>
       <item>min_dt</item>
       <item>mpi_rank</item>
       <item>mpi_size</item>
+      <item>mumps_icntl_14</item>
+      <item>nodes_rough</item>
       <item>on_gsl_error</item>
       <item>on_nan</item>
       <item>on_sundials_error</item>
+      <item>penalty_weight</item>
       <item>pi</item>
       <item>pid</item>
       <item>quit</item>
       <item>realtime_scale</item>
       <item>report</item>
+      <item>sn_alpha</item>
+      <item>snes_atol</item>
+      <item>snes_max_it</item>
+      <item>snes_rtol</item>
+      <item>snes_stol</item>
       <item>static_steps</item>
       <item>step_static</item>
       <item>step_transient</item>
       <item>t</item>
+      <item>total_dofs</item>
+      <item>ts_atol</item>
+      <item>ts_rtol</item>
       <item>zero</item>
     </list>
     <list name="functions">
