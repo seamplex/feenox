@@ -21,6 +21,7 @@
  */
 #include "feenox.h"
 #include "neutron_diffusion.h"
+#include "pdes/neutron_sn/neutron_sn.h"
 
 int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
@@ -54,7 +55,21 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->dof = dof-1;
     bc_data->set_essential = feenox_problem_bc_set_neutron_diffusion_flux;
 
-  // TODO: fixed current = pure neumann
+  } else if (strncmp(lhs, "J", 1) == 0) {
+    bc_data->type_math = bc_type_math_neumann;
+    int dof = 0;
+    if (sscanf(lhs+1, "%d", &dof) != 1) {
+      feenox_push_error_message("could not read group number in neutron_diffusion boundary condition '%s'", lhs);
+      return FEENOX_ERROR;
+    }
+    if (dof < 0 || dof > neutron_diffusion.groups) {
+      feenox_push_error_message("invalid group number in neutron_diffusion boundary condition '%s'", lhs);
+      return FEENOX_ERROR;
+    }
+    bc_data->dof = dof-1;
+    bc_data->set_natural = feenox_problem_bc_set_neutron_diffusion_current;
+    neutron_diffusion.has_sources = 1;
+
     
   } else {
     feenox_push_error_message("unknown neutron_diffusion boundary condition '%s'", lhs);
@@ -121,6 +136,23 @@ int feenox_problem_bc_set_neutron_diffusion_vacuum(bc_data_t *this, element_t *e
   double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_BtB_accum(H, wdet*coeff, feenox.fem.Ki));
+  
+#endif
+  
+  return FEENOX_OK;
+}
+
+
+
+int feenox_problem_bc_set_neutron_diffusion_current(bc_data_t *this, element_t *e, unsigned int q) {
+  
+#ifdef HAVE_PETSC
+  
+  feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, feenox.pde.mesh->integration, this->space_dependent);
+  double *current = calloc(neutron_sn.groups, sizeof(double)); 
+  current[this->dof] = feenox_expression_eval(&this->expr);
+  feenox_call(feenox_problem_rhs_set(e, q, current));
+  feenox_free(current);
   
 #endif
   
