@@ -98,6 +98,7 @@ double feenox_builtin_is_even(expr_item_t *);
 double feenox_builtin_is_odd(expr_item_t *);
 double feenox_builtin_sin(expr_item_t *);
 double feenox_builtin_j0(expr_item_t *);
+double feenox_builtin_sech(expr_item_t *);
 double feenox_builtin_sinh(expr_item_t *);
 double feenox_builtin_sqrt(expr_item_t *);
 double feenox_builtin_square_wave(expr_item_t *);
@@ -159,6 +160,7 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"round",               1, 1, &feenox_builtin_round},
     {"sawtooth_wave",       1, 1, &feenox_builtin_sawtooth_wave},
     {"sgn",                 1, 2, &feenox_builtin_sgn},
+    {"sech",                1, 1, &feenox_builtin_sech},
     {"sin",                 1, 1, &feenox_builtin_sin},
     {"sinh",                1, 1, &feenox_builtin_sinh},
     {"sqrt",                1, 1, &feenox_builtin_sqrt},
@@ -581,6 +583,14 @@ double feenox_builtin_cos(expr_item_t *f) {
 ///fn+tan+plotx -1.3 +1.3 1e-2    -1 +1 0.5    -4 +4 2   0.25 0.5
 double feenox_builtin_tan(expr_item_t *f) {
   return tan(feenox_expression_eval(&f->arg[0]));
+}
+
+///fn+sech+usage sech(x)
+///fn+sech+math \sech(x)
+///fn+sech+desc Computes the hyperbolic secant of the argument\ $x$, where\ $x$ is in radians.
+///fn+sech+plotx -2.5 2.5 1e-2    -3 +3 1    -6 +6 2   0.25 1
+double feenox_builtin_sech(expr_item_t *f) {
+  return 1.0/cosh(feenox_expression_eval(&f->arg[0]));
 }
 
 ///fn+sinh+usage sinh(x)

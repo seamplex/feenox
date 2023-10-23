@@ -13,7 +13,7 @@ intro: |
   One eight of two bare reactors
   :::
  
-  But what happens "in the middle"? That is to say, how does $k_\text{eff}$ changes when we morph
+  But what happens "in the middle"? That is to say, how does $k_\text{eff}$ change when we morph
   the cube into a sphere? Enter Gmsh & Feenox.
  
   ::: {#fig:cube-morph-sphere}

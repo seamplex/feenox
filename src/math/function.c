@@ -160,7 +160,7 @@ int function_set_buffered_data(function_t *function, double *buffer, size_t n_da
   feenox_call(feenox_create_pointwise_function_vectors(function));
   
   for (size_t j = 0; j < function->data_size; j++) {
-    int i = 0; // this is needed after the loop!
+    unsigned int i = 0; // this is needed after the loop!
     for (i = 0; i < function->n_arguments; i++) {
       feenox_vector_set(function->vector_argument[i], j, buffer[j*n_columns + ((columns != NULL) ? (columns[i]-1) : i)]);
     }

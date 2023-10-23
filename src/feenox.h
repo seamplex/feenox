@@ -117,7 +117,7 @@ extern "C++" {
 #define BUFFER_LINE_SIZE        4096
 
 // number of internal functions, functional adn vector functions
-#define N_BUILTIN_FUNCTIONS         60
+#define N_BUILTIN_FUNCTIONS         61
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
 

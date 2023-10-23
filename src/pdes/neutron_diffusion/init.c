@@ -138,7 +138,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
   for (unsigned int g = 0; g < G; g++) {
     char *name = NULL;
 
-    feenox_check_minusone(asprintf(&name, "D%d", g+1));
+    feenox_check_minusone(asprintf(&name, "D%u", g+1));
     feenox_distribution_init(&neutron_diffusion.D[g], name);
     if (neutron_diffusion.D[g].defined) {
       neutron_diffusion.D[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.D[g].dependency_variables);
@@ -146,7 +146,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     }
     feenox_free(name);
     
-    feenox_check_minusone(asprintf(&name, "Sigma_t%d", g+1));
+    feenox_check_minusone(asprintf(&name, "Sigma_t%u", g+1));
     feenox_distribution_init(&neutron_diffusion.Sigma_t[g], name);
     if (neutron_diffusion.Sigma_t[g].defined) {
       neutron_diffusion.Sigma_t[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.Sigma_t[g].dependency_variables);
@@ -154,7 +154,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     }
     feenox_free(name);
     
-    feenox_check_minusone(asprintf(&name, "Sigma_a%d", g+1));
+    feenox_check_minusone(asprintf(&name, "Sigma_a%u", g+1));
     feenox_distribution_init(&neutron_diffusion.Sigma_a[g], name);
     if (neutron_diffusion.Sigma_a[g].defined) {
       neutron_diffusion.Sigma_a[g].uniform = feenox_expression_depends_on_space(neutron_diffusion.Sigma_a[g].dependency_variables);
@@ -162,7 +162,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     }
     feenox_free(name);
 
-    feenox_check_minusone(asprintf(&name, "nuSigma_f%d", g+1));
+    feenox_check_minusone(asprintf(&name, "nuSigma_f%u", g+1));
     feenox_distribution_init(&neutron_diffusion.nu_Sigma_f[g], name);
     if (neutron_diffusion.nu_Sigma_f[g].defined) {
       neutron_diffusion.has_fission = 1;
@@ -171,7 +171,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     }
     feenox_free(name);
 
-    feenox_check_minusone(asprintf(&name, "S%d", g+1));
+    feenox_check_minusone(asprintf(&name, "S%u", g+1));
     feenox_distribution_init(&neutron_diffusion.S[g], name);
     if (neutron_diffusion.S[g].defined) {
       neutron_diffusion.has_sources = 1;
@@ -183,12 +183,22 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_check_alloc(neutron_diffusion.Sigma_s[g] = calloc(feenox.pde.dofs, sizeof(distribution_t)));
     unsigned int g_prime = 0;
     for (g_prime = 0; g_prime < feenox.pde.dofs; g_prime++) {
-      feenox_check_minusone(asprintf(&name, "Sigma_s%d.%d", g+1, g_prime+1));
+      feenox_check_minusone(asprintf(&name, "Sigma_s%u.%u", g+1, g_prime+1));
       feenox_distribution_init(&neutron_diffusion.Sigma_s[g][g_prime], name);
       if (neutron_diffusion.Sigma_s[g][g_prime].defined) {
         neutron_diffusion.Sigma_s[g][g_prime].uniform = feenox_expression_depends_on_space(neutron_diffusion.Sigma_s[g][g_prime].dependency_variables);
       }  
       feenox_free(name);
+      
+      // try again with another underscore
+      if (neutron_diffusion.Sigma_s[g][g_prime].defined == 0) {
+        feenox_check_minusone(asprintf(&name, "Sigma_s%u_%u", g+1, g_prime+1));
+        feenox_distribution_init(&neutron_diffusion.Sigma_s[g][g_prime], name);
+        if (neutron_diffusion.Sigma_s[g][g_prime].defined) {
+          neutron_diffusion.Sigma_s[g][g_prime].uniform = feenox_expression_depends_on_space(neutron_diffusion.Sigma_s[g][g_prime].dependency_variables);
+        }  
+        feenox_free(name);
+      }
     }
     
     fission_spectrum_integral += feenox_vector_get(neutron_diffusion.chi, g);
@@ -213,7 +223,7 @@ int feenox_problem_init_runtime_neutron_diffusion(void) {
     feenox_check_alloc(feenox.pde.vectors.phi = calloc(feenox.pde.nev, sizeof(vector_t *)));
     for (unsigned int g = 0; g < feenox.pde.nev; g++) {
       char *modename = NULL;
-      feenox_check_minusone(asprintf(&modename, "eig%d", g+1));
+      feenox_check_minusone(asprintf(&modename, "eig%u", g+1));
       feenox_check_alloc(feenox.pde.vectors.phi[g] = feenox_define_vector_get_ptr(modename, 0));
       feenox_free(modename);
     }
