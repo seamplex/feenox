@@ -9,58 +9,9 @@ number-sections: true
 toc: true
 ...
 
+# About FeenoX
 
-
-
-::: {.only-in-format .html .markdown}
-> **News**
->
-> * [Debian/Ubuntu `.deb` packages available](download.html#debian) for FeenoX version\ 0.3.
->
-> * A cloud-first approach for solving core-level neutron transport. 8a. Reunión Anual GArCyAR 2022, December 2022.
->   - [Recordings](https://www.youtube.com/watch?v=rdZtyMf5m0k)
->   - [Slides in PDF](8a. Reunión Anual GArCyAR 2022)
->   - [Markdown examples sources](https://github.com/gtheler/2022-garcar)
->
->
-> * FeenoX, a cloud-first free and open source finite-element(ish) tool. Science Circle, on-line course. November 2022.
->   - [Recordings](https://youtu.be/EZSjFzJAhbw)
->   - [Markdown examples sources](https://github.com/gtheler/2022-feenox-sci-circle)
->
->   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
->   <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/EZSjFzJAhbw?rel=0" allowfullscreen></iframe>
->   :::::
->
-> * FeenoX hands-on tutorial. Science Circle, on-line course. October 2022 <https://www.youtube.com/watch?v=b3K2QewI8jE>
->
->   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
->   <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/b3K2QewI8jE?rel=0" allowfullscreen></iframe>
->   :::::
-> 
-> * Why FeenoX works the way it works (i.e. does not run in Windows):
->
->   ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
->   <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/66WvYTb4pSg?rel=0" allowfullscreen></iframe>
->   :::::
->
-> * [FeenoX tutorials](doc/tutorials):
->   - [Setting up your workspace](doc/tutorials/000-setup)
->   - [Tensile test](doc/tutorials/110-tensile-test)
->   - [Solving mazes with PDES instead of AI](doc/tutorials/120-mazes)
->
-> * FeenoX for nuclear-related problems Presentation, December 2021
->   - [Recording with CCs](https://youtu.be/e8kFmFOsbPk)
->   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-brasil.pdf)
->   - [Markdown examples sources](https://github.com/gtheler/2021-brasil)
->
-> * FeenoX Overview Presentation, August 2021
->   - [Recording (audio in Spanish, slides in English)](https://youtu.be/-RJ5qn7E9uE)
->   - [Slides in PDF](https://www.seamplex.com/feenox/doc/2021-feenox.pdf)
->   - [Markdown examples sources](https://github.com/gtheler/2021-presentation)
-:::
-
-
-# Why FeenoX?
+## Why FeenoX?
 
 > If by "Why FeenoX?" you mean "Why is FeenoX named that way?," read the [FAQs](doc/FAQ.md).
 
@@ -73,7 +24,7 @@ Here is ***why FeenoX is different**.
 doc/why.md
 ```
 
-# How is FeenoX different?
+## How is FeenoX different?
 
 FeenoX meets fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html).
 The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
@@ -143,16 +94,18 @@ Engineers, researchers, scientists, developers and/or hobbyists just need to use
  #. re-run `autogen.sh`, `./configure` and `make` to get a FeenoX executable with support for the new PDE.
 
 They also ought to to read, understand and mind the [GPLv3+ licensing terms](#sec:licensing).
+See below for contribution guidelines.
 
 
-# What is FeenoX anyway?
+## What is FeenoX anyway?
 
 ```{.include}
 doc/introduction.md
 ```
 
+# Quickstart
 
-# Download
+## Download
 
 ```include
 doc/downloads.md
@@ -164,7 +117,47 @@ doc/downloads.md
 doc/git.md
 ```
 
-See the [detailed compilation instructions](doc/compilation.md) for further details.
+See the [download page](https://seamplex.com/feenox/download.html) for more detailed information.
+
+
+# Examples
+
+See the [examples page](https://seamplex.com/feenox/examples) for examples.
+The FeenoX examples are divided by the type of problem they solve:
+
+ #. [Basic mathematics](https://seamplex.com/feenox/examples/basic.html)
+ #. [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
+ #. [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
+ #. [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
+ #. [Linear elasticity](https://seamplex.com/feenox/examples/mechanical.html)
+ #. [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
+ #. [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
+ #. [Neutron $S_N$](https://seamplex.com/feenox/examples/neutron_sn.html)
+
+> Each type of partial differential equation (i.e. from Laplace downward) is implemented in a subdirectory within [`src/pde`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree.
+> Feel free to...
+>
+>  * ask questions in the [Github discussion page](https://github.com/seamplex/feenox/discussions)
+>  * propose features, corrections, improvements, etc.
+>  * create a pull request for other PDEs. Candidates would be
+>    - fluid mechanics
+>    - thermal hydraulics
+>    - electromagnetism
+>    - non-linear elasticity
+>    - cell-level neutronics (i.e. method of characteristics, collision probabilities, etc)
+ 
+All the files needed to run theses examples are available in the [examples](https://github.com/seamplex/feenox/tree/main/examples) directory of the [Git repository](https://github.com/seamplex/feenox) and any of the [tarballs](https://www.seamplex.com/feenox/download.html), both [source](https://www.seamplex.com/feenox/dist/src) and [binary](https://www.seamplex.com/feenox/dist/linux).
+
+
+## Test suite
+ 
+The `tests` [directory in the Github repository](https://github.com/seamplex/feenox/tree/main/tests) has dozens of test cases which can be used as examples for reference and for mathematical verification of the results obtained with FeenoX.
+These are run when doing `make check` after [compiling the source code](doc/compile.md). 
+
+The test cases usually return a single number (which should be near zero) comparing the numerical result with the expected one.
+Feel free to propose benchmark problems to add to the suite.
+
+
 
 # Licensing {#sec:licensing}
 
@@ -177,6 +170,21 @@ FeenoX is distributed under the terms of the [GNU General Public License](http:/
 ```include
 doc/licensing.md
 ```
+
+## Contributing
+
+Contributions under the terms of the GPLv3+ are welcome, especially new types of PDEs and new formulations of existing PDEs.
+For elliptic operators feel free to use the Laplace equation at `src/pdes/laplace` as a template.
+
+ 1. Read the [compilation](./doc/compilation.md) and [programming](./doc/programming.md) guides.
+ 2. Browse [Github discussions](https://github.com/seamplex/feenox/discussions) and open a new thread explaining what you want to do and/or asking for help.
+ 3. Fork the [Github repository](https://github.com/seamplex/feenox/)
+ 4. Create a pull request
+
+Note that
+
+ * It is mandatory to observe the [Code of Conduct](CODE_OF_CONDUCT.md).
+ * Each author keeps the copyright of the contributed code.
 
 
 # Further information

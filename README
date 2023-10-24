@@ -1,20 +1,32 @@
 FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
--   1 Why FeenoX?
--   2 How is FeenoX different?
--   3 What is FeenoX anyway?
--   4 Download
-    -   4.1 Git repository
--   5 Licensing
--   6 Further information
+-   1 About FeenoX
+    -   1.1 Why FeenoX?
+    -   1.2 How is FeenoX different?
+    -   1.3 What is FeenoX anyway?
+-   2 Quickstart
+    -   2.1 Download
+    -   2.2 Git repository
+-   3 Examples
+    -   3.1 Test suite
+-   4 Licensing
+    -   4.1 Contributing
+-   5 Further information
 
-  [1 Why FeenoX?]: #why-feenox
-  [2 How is FeenoX different?]: #how-is-feenox-different
-  [3 What is FeenoX anyway?]: #what-is-feenox-anyway
-  [4 Download]: #download
-  [4.1 Git repository]: #git-repository
-  [5 Licensing]: #sec:licensing
-  [6 Further information]: #further-information
+  [1 About FeenoX]: #about-feenox
+  [1.1 Why FeenoX?]: #why-feenox
+  [1.2 How is FeenoX different?]: #how-is-feenox-different
+  [1.3 What is FeenoX anyway?]: #what-is-feenox-anyway
+  [2 Quickstart]: #quickstart
+  [2.1 Download]: #download
+  [2.2 Git repository]: #git-repository
+  [3 Examples]: #examples
+  [3.1 Test suite]: #test-suite
+  [4 Licensing]: #sec:licensing
+  [4.1 Contributing]: #contributing
+  [5 Further information]: #further-information
+
+About FeenoX
 
 Why FeenoX?
 
@@ -189,7 +201,7 @@ need to use one of these directories (say laplace) as a template and
     with support for the new PDE.
 
 They also ought to to read, understand and mind the GPLv3+ licensing
-terms.
+terms. See below for contribution guidelines.
 
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
@@ -342,9 +354,8 @@ possible:
 
     PRINT t x y z        # four-column plain-ASCII output
 
-[The Lorenz attractor solved with FeenoX and drawn with Gnuplot]
-
-Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot
+[Figure 1: The Lorenz attractor solved with FeenoX and drawn with
+Gnuplot]
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
 columns (t, x, y and z) which we can then redirect to a file and plot it
@@ -395,16 +406,11 @@ mesh (rule of simplicity). And since the properties are uniform and
 isotropic, a single global scalar for E and a global single scalar for ν
 are enough.
 
-[The NAFEMS LE10 problem statement and the corresponding FeenoX input]
+[Figure 2: The NAFEMS LE10 problem statement and the corresponding
+FeenoX input]
 
-Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX
-input
-
-[Normal stress σ_(y) refined around point D over 5,000x-warped
+[Figure 3: Normal stress σ_(y) refined around point D over 5,000x-warped
 displacements for LE10 created with Paraview]
-
-Figure 3: Normal stress σ_(y) refined around point D over 5,000x-warped
-displacements for LE10 created with Paraview
 
 For the sake of visual completeness, post-processing data with the
 scalar distribution of σ_(y) and the vector field of displacements
@@ -496,12 +502,13 @@ details about how to contribute.
   [Lorenz’s dynamical system]: http://en.wikipedia.org/wiki/Lorenz_system
   [Gnuplot]: http://www.gnuplot.info/
   [Deterministic non-periodic flow]: http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2
-  [The Lorenz attractor solved with FeenoX and drawn with Gnuplot]: doc/lorenz.svg
+  [Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot]:
+    doc/lorenz.svg
   [3]: (http://www.gnuplot.info/)
   [NAFEMS LE10]: https://www.nafems.org/publications/resource_center/p18/
-  [The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
+  [Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
     doc/nafems-le10-problem-input.svg
-  [Normal stress σ_(y) refined around point D over 5,000x-warped displacements for LE10 created with Paraview]:
+  [Figure 3: Normal stress σ_(y) refined around point D over 5,000x-warped displacements for LE10 created with Paraview]:
     doc/nafems-le10.png
   [4]: https://www.paraview.org
   [Paraview]: https://www.paraview.org/
@@ -510,6 +517,8 @@ details about how to contribute.
   [Software Requirements Specification]: doc/sds.md
   [as in freedom]: https://www.gnu.org/philosophy/free-sw.en.html
   [documentation]: doc
+
+Quickstart
 
 Download
 
@@ -530,9 +539,11 @@ details.
   Github repository             https://github.com/seamplex/feenox/
   ----------------------------- ----------------------------------------------
 
--   Be aware that FeenoX is a backend. It does not have a GUI. Read the
-    documentation, especially the description and the FAQs. Ask for help
-    on the GitHub discussions page.
+-   FeenoX is cloud first. It was designed to run on servers.
+
+-   Be aware that FeenoX does not have a GUI. Read the documentation,
+    especially the description and the FAQs. Ask for help on the GitHub
+    discussions page.
 
 -   Debian/Ubuntu packages are unofficial, i.e. they are not available
     in apt repositories. They contain dynamically-linked binaries and
@@ -621,11 +632,74 @@ optionally install):
     ./autogen.sh; ./configure; make -j4
     sudo make install
 
-See the detailed compilation instructions for further details.
+See the download page for more detailed information.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [detailed compilation instructions]: compilation.md
-  [7]: doc/compilation.md
+  [download page]: https://seamplex.com/feenox/download.html
+
+Examples
+
+See the examples page for examples. The FeenoX examples are divided by
+the type of problem they solve:
+
+1.  Basic mathematics
+2.  Systems of ODEs/DAEs
+3.  Laplace’s equation
+4.  Heat conduction
+5.  Linear elasticity
+6.  Modal analysis
+7.  Neutron diffusion
+8.  Neutron S_(N)
+
+  Each type of partial differential equation (i.e. from Laplace
+  downward) is implemented in a subdirectory within src/pde of the
+  source tree. Feel free to…
+
+  -   ask questions in the Github discussion page
+  -   propose features, corrections, improvements, etc.
+  -   create a pull request for other PDEs. Candidates would be
+      -   fluid mechanics
+      -   thermal hydraulics
+      -   electromagnetism
+      -   non-linear elasticity
+      -   cell-level neutronics (i.e. method of characteristics,
+          collision probabilities, etc)
+
+All the files needed to run theses examples are available in the
+examples directory of the Git repository and any of the tarballs, both
+source and binary.
+
+  [examples page]: https://seamplex.com/feenox/examples
+  [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
+  [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
+  [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
+  [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html
+  [Linear elasticity]: https://seamplex.com/feenox/examples/mechanical.html
+  [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
+  [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
+  [Neutron S_(N)]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [src/pde]: https://github.com/seamplex/feenox/tree/main/src/pdes
+  [Github discussion page]: https://github.com/seamplex/feenox/discussions
+  [examples]: https://github.com/seamplex/feenox/tree/main/examples
+  [Git repository]: https://github.com/seamplex/feenox
+  [tarballs]: https://www.seamplex.com/feenox/download.html
+  [source]: https://www.seamplex.com/feenox/dist/src
+  [binary]: https://www.seamplex.com/feenox/dist/linux
+
+Test suite
+
+The tests directory in the Github repository has dozens of test cases
+which can be used as examples for reference and for mathematical
+verification of the results obtained with FeenoX. These are run when
+doing make check after compiling the source code.
+
+The test cases usually return a single number (which should be near
+zero) comparing the numerical result with the expected one. Feel free to
+propose benchmark problems to add to the suite.
+
+  [directory in the Github repository]: https://github.com/seamplex/feenox/tree/main/tests
+  [compiling the source code]: doc/compile.md
 
 Licensing
 
@@ -723,9 +797,33 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [8]: https://www.gnu.org/licenses/gpl-3.0
+  [7]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
+
+Contributing
+
+Contributions under the terms of the GPLv3+ are welcome, especially new
+types of PDEs and new formulations of existing PDEs. For elliptic
+operators feel free to use the Laplace equation at src/pdes/laplace as a
+template.
+
+1.  Read the compilation and programming guides.
+2.  Browse Github discussions and open a new thread explaining what you
+    want to do and/or asking for help.
+3.  Fork the Github repository
+4.  Create a pull request
+
+Note that
+
+-   It is mandatory to observe the Code of Conduct.
+-   Each author keeps the copyright of the contributed code.
+
+  [compilation]: ./doc/compilation.md
+  [programming]: ./doc/programming.md
+  [Github discussions]: https://github.com/seamplex/feenox/discussions
+  [Github repository]: https://github.com/seamplex/feenox/
+  [Code of Conduct]: CODE_OF_CONDUCT.md
 
 Further information
 
@@ -745,6 +843,6 @@ There is NO WARRANTY, to the extent permitted by law.
 
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
-  [9]: https://github.com/seamplex
+  [8]: https://github.com/seamplex
   [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html

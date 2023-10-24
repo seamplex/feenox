@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX builtin functions
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2023 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -586,7 +586,7 @@ double feenox_builtin_tan(expr_item_t *f) {
 }
 
 ///fn+sech+usage sech(x)
-///fn+sech+math \sech(x)
+///fn+sech+math \text{sech}(x)
 ///fn+sech+desc Computes the hyperbolic secant of the argument\ $x$, where\ $x$ is in radians.
 ///fn+sech+plotx -2.5 2.5 1e-2    -3 +3 1    -6 +6 2   0.25 1
 double feenox_builtin_sech(expr_item_t *f) {
