@@ -22,14 +22,14 @@ syntax-definition: feenox.xml
 
 [FeenoX](https://www.seamplex.com/feenox) is a computational tool to solve (currently)
 
- * [dynamical systems written as sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html), or
+ * [dynamical systems written as sets of differential-algebraic equations](https://seamplex.com/feenox/examples/daes.html), or
  * [steady or transient heat conduction problems](https://seamplex.com/feenox/examples/thermal.html), or
  * [steady or quasi-static thermo-mechanical problems](https://seamplex.com/feenox/examples/mechanical.html), or
  * [modal analysis problems](https://seamplex.com/feenox/examples/modal.html), or
- * [core-level steady-state neutronics](https://seamplex.com/feenox/examples/neutron_diffusion.html)
+ * [steady-state neutronics](https://seamplex.com/feenox/examples/neutron_diffusion.html)
  
 in such a way that the input is a near-English text file that defines the problem.
-FeenoX can be seen either as a finite-element(ish) tool with a particular design basis.
+FeenoX is a cloud-first tool to solve engineering problems, with a particular design basis.
 Two of the main features of this [design basis](https://seamplex.com/feenox/doc/sds.html) are
 
  #. Simple problems ought to have simple inputs.
