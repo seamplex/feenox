@@ -127,7 +127,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_diffusion(element_t *e, 
   }
 
   // elemental stiffness for the diffusion term B'*D*B
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   gsl_matrix *B = feenox_fem_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_BtCB(B, neutron_diffusion.D_G, neutron_diffusion.DB, wdet, neutron_diffusion.Li));
 

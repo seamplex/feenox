@@ -55,7 +55,6 @@ int feenox_blas_BtB_accum(gsl_matrix *B, double alpha, gsl_matrix *R) {
 
 // R = alpha * B'*B
 int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R) {
-//  printf("dgemm BtB\n");
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, B, 0.0, R));
   return FEENOX_OK;
 }

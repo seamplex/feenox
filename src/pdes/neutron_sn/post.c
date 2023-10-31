@@ -47,7 +47,7 @@ int feenox_problem_solve_post_neutron_sn(void) {
         // for now I'd rather perform the computation myself instead of 
         // calling feenox_mesh_integral_over_element() because that wastes a lot of fem calls
         for (unsigned int q = 0; q < element->type->gauss[integration].Q; q++) {
-          double wdet = feenox_fem_compute_w_det_at_gauss(element, q, integration);
+          double wdet = feenox_fem_compute_w_det_at_gauss_integration(element, q, integration);
           for (unsigned int j = 0; j < element->type->nodes; j++) {
             double h = gsl_matrix_get(element->type->gauss[integration].H_c[q], 0, j);
             for (unsigned int g = 0; g < feenox.pde.dofs; g++) {

@@ -405,18 +405,29 @@ int feenox_problem_build_assemble(void) {
   return FEENOX_OK;
 }
 
+int feenox_problem_stiffness_add(element_t *e, unsigned int q, gsl_matrix *Kiq) {
 
-int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value) {
+#ifdef HAVE_PETSC
+  double wdet = feenox_fem_compute_w_det_at_gauss(e, q);
+  gsl_matrix_scale(Kiq, wdet);
+  gsl_matrix_add(feenox.fem.Ki, Kiq);
+#endif
+  
+  return FEENOX_OK;
+}
+
+int feenox_problem_rhs_add(element_t *e, unsigned int q, double *value) {
 
 #ifdef HAVE_PETSC
   for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
     gsl_vector_set(feenox.fem.vec_f, g, value[g]);
   }  
   
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_Atb_accum(H_Gc, feenox.fem.vec_f, wdet, feenox.fem.bi));
 #endif
   
   return FEENOX_OK;
 }
+

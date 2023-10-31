@@ -105,14 +105,14 @@ int feenox_problem_bc_set_thermal_heatflux(bc_data_t *this, element_t *e, unsign
   // TODO: cache if neither space nor temperature dependent
   double *x = feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, feenox.pde.mesh->integration, this->space_dependent);
   double power = feenox_expression_eval(&this->expr);
-  feenox_call(feenox_problem_rhs_set(e, q, &power));
+  feenox_call(feenox_problem_rhs_add(e, q, &power));
   
   if (this->nonlinear) {
     double T = feenox_function_eval(feenox.pde.solution[0], x);
     double dqdT = feenox_expression_derivative_wrt_function(&this->expr, feenox.pde.solution[0], T);
     // mind the positive sign!
     gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-    double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+    double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
     feenox_call(feenox_blas_BtB_accum(H, +wdet*dqdT, feenox.fem.Jbi));
   }
   
@@ -149,11 +149,11 @@ int feenox_problem_bc_set_thermal_convection(bc_data_t *this, element_t *e, unsi
 
   // the h*Tref goes to b
   double rhs = h*Tref;
-  feenox_call(feenox_problem_rhs_set(e, q, &rhs));
+  feenox_call(feenox_problem_rhs_add(e, q, &rhs));
   
   // TODO: the h*T goes directly to the stiffness matrix
   // this is not efficient because if h depends on t or T we might need to re-build the whole K
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_BtB_accum(H, +wdet*h, feenox.fem.Ki));
 

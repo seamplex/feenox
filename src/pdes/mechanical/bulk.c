@@ -52,7 +52,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     mechanical.compute_C(x, feenox_fem_get_material(e));
   }
   
-  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
@@ -91,7 +91,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   }
 
   // wdet
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   
   // volumetric force densities
   if (mechanical.f_x.defined || mechanical.f_y.defined || mechanical.f_z.defined) {

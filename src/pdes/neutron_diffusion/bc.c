@@ -133,7 +133,7 @@ int feenox_problem_bc_set_neutron_diffusion_vacuum(bc_data_t *this, element_t *e
   double coeff = (this->expr.items != NULL) ? feenox_expression_eval(&this->expr) : 0.5;
   
   // TODO: convenience call like  feenox_problem_rhs_set()?
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_BtB_accum(H, wdet*coeff, feenox.fem.Ki));
   
@@ -151,7 +151,7 @@ int feenox_problem_bc_set_neutron_diffusion_current(bc_data_t *this, element_t *
   feenox_fem_compute_x_at_gauss_if_needed_and_update_var(e, q, feenox.pde.mesh->integration, this->space_dependent);
   double *current = calloc(neutron_sn.groups, sizeof(double)); 
   current[this->dof] = feenox_expression_eval(&this->expr);
-  feenox_call(feenox_problem_rhs_set(e, q, current));
+  feenox_call(feenox_problem_rhs_add(e, q, current));
   feenox_free(current);
   
 #endif

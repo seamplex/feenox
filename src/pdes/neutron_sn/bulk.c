@@ -176,7 +176,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   double tau = feenox_var_value(neutron_sn.sn_alpha) * e->type->size(e);
   
   gsl_matrix *H_G = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
-  gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *B = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   feenox_call(gsl_matrix_memcpy(neutron_sn.P, H_G));
   for (unsigned int j = 0; j < neutron_sn.n_nodes; j++) {
     int MGj = MG*j;
@@ -192,7 +192,7 @@ int feenox_problem_build_volumetric_gauss_point_neutron_sn(element_t *e, unsigne
   }
 
   // petrov-stabilized leakage term
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   gsl_matrix *B_G = feenox_fem_compute_B_G_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_PtCB(neutron_sn.P, neutron_sn.D, B_G, neutron_sn.DB, wdet, neutron_sn.Li));
 

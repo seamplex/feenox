@@ -50,7 +50,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   }
   
   // TODO: unify with mechanical!
-  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   for (unsigned int j = 0; j < modal.n_nodes; j++) {
     // TODO: virtual methods? they cannot be inlined...
     if (modal.variant == variant_full) {
@@ -89,7 +89,7 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   }
 
   // wdet
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   
   // elemental stiffness B'*C*B
   feenox_call(feenox_blas_BtCB_accum(modal.B, modal.C, modal.CB, wdet, feenox.fem.Ki));

@@ -318,7 +318,7 @@ inline material_t *feenox_fem_get_material(element_t *e) {
   return (e->physical_group != NULL) ? e->physical_group->material : NULL;
 }
 
-inline double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration) {
+inline double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsigned int q, int integration) {
 
   if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
     feenox_fem_elemental_caches_reset();
@@ -609,7 +609,7 @@ inline gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_t *e, unsigned int q
   return e->type->H_Gc[q];  
 }
 
-inline gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration) {
+inline gsl_matrix *feenox_fem_compute_B_at_gauss_integration(element_t *e, unsigned int q, int integration) {
 
   if (feenox.fem.cache_J == 0 && e->type != feenox.fem.current_gauss_type) {
     feenox_fem_elemental_caches_reset();
@@ -638,7 +638,7 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
   unsigned int G = feenox.pde.dofs;
   if (G == 1) {
     // for G=1 B_G = B
-    return feenox_fem_compute_B_at_gauss(e, q, integration);
+    return feenox_fem_compute_B_at_gauss_integration(e, q, integration);
   }
   gsl_matrix ***B_G = (feenox.fem.cache_B) ? &e->B_G : &feenox.fem.B_Gi;
   if ((*B_G) == NULL) {
@@ -654,7 +654,7 @@ inline gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q,
     return (*B_G)[q];
   }
 
-  gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, integration);
+  gsl_matrix *B = feenox_fem_compute_B_at_gauss_integration(e, q, integration);
   for (unsigned int d = 0; d < D; d++) {
     size_t Gd = G*d;
     for (unsigned int j = 0; j < J; j++) {

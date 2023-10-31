@@ -2410,7 +2410,9 @@ extern double *feenox_fem_compute_x_at_gauss_and_update_var(element_t *e, unsign
 extern double feenox_fem_determinant(gsl_matrix *);
 extern gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
 
-extern double feenox_fem_compute_w_det_at_gauss(element_t *e, unsigned int q, int integration);
+extern double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsigned int q, int integration);
+#define feenox_fem_compute_w_det_at_gauss(e, q) feenox_fem_compute_w_det_at_gauss_integration((e), (q), feenox.pde.mesh->integration)
+
 extern gsl_matrix *feenox_fem_compute_C(element_t *e);
 extern gsl_matrix *feenox_fem_compute_H_c_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_t *e, unsigned int q, int integration);
@@ -2425,7 +2427,9 @@ extern gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
 extern gsl_matrix *feenox_fem_compute_B_c(element_t *e, double *xi);
 extern gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi);
 
-extern gsl_matrix *feenox_fem_compute_B_at_gauss(element_t *e, unsigned int q, int integration);
+extern gsl_matrix *feenox_fem_compute_B_at_gauss_integration(element_t *e, unsigned int q, int integration);
+#define feenox_fem_compute_B_at_gauss(e, q) feenox_fem_compute_B_at_gauss_integration((e), (q), feenox.pde.mesh->integration)
+
 extern gsl_matrix *feenox_fem_compute_B_Gc_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_fem_compute_B_G_at_gauss(element_t *e, unsigned int q, int integration);
 
@@ -2478,7 +2482,8 @@ extern int feenox_problem_build_element_volumetric_gauss_point(element_t *, unsi
 extern int feenox_problem_build_elemental_objects_allocate(element_t *);
 extern int feenox_problem_build_elemental_objects_free(void);
 extern int feenox_problem_build_assemble(void);
-extern int feenox_problem_rhs_set(element_t *e, unsigned int q, double *value);
+extern int feenox_problem_rhs_add(element_t *e, unsigned int q, double *value);
+extern int feenox_problem_stiffness_add(element_t *e, unsigned int q, gsl_matrix *Kiq);
 
 // gradient.c
 extern int feenox_problem_gradient_compute(void);

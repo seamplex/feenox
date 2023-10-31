@@ -339,7 +339,7 @@ int feenox_problem_bc_set_mechanical_normal_stress(bc_data_t *this, element_t *e
   }
   
   //feenox_call(feenox_problem_bc_natural_set(e, v, t));
-  feenox_call(feenox_problem_rhs_set(e, q, t));
+  feenox_call(feenox_problem_rhs_add(e, q, t));
   
 #endif
   
@@ -362,7 +362,7 @@ int feenox_problem_bc_set_mechanical_traction(bc_data_t *this, element_t *e, uns
 //  printf("%g\n", t[bc_data->dof]);
 //  feenox_call(feenox_problem_bc_natural_set(e, v, t));
   
-  feenox_call(feenox_problem_rhs_set(e, q, t));  
+  feenox_call(feenox_problem_rhs_add(e, q, t));  
   
 #endif
   
@@ -381,7 +381,7 @@ int feenox_problem_bc_set_mechanical_force(bc_data_t *this, element_t *e, unsign
     feenox_call(feenox_physical_group_compute_volume(e->physical_group, feenox.pde.mesh));
   }
   t[this->dof] = feenox_expression_eval(&this->expr) / e->physical_group->volume;
-  feenox_call(feenox_problem_rhs_set(e, q, t));  
+  feenox_call(feenox_problem_rhs_add(e, q, t));  
   
 #endif
   

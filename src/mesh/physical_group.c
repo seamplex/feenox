@@ -172,7 +172,7 @@ int feenox_physical_group_compute_volume(physical_group_t *this, const mesh_t *m
   for (size_t i = 0; i < this->n_elements; i++) {
     element_t *element = &mesh->element[this->element[i]];
     for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
-      double wdet = feenox_fem_compute_w_det_at_gauss(element, q, mesh->integration);
+      double wdet = feenox_fem_compute_w_det_at_gauss_integration(element, q, mesh->integration);
 
       for (size_t j = 0; j < element->type->nodes; j++) {
         double wh = wdet * gsl_matrix_get(element->type->gauss[mesh->integration].H_c[q], 0, j);

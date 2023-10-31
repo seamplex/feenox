@@ -31,15 +31,15 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   material_t *material = feenox_fem_get_material(e);  
   double k = thermal.k.eval(&thermal.k, x, material);
 
-  double wdet = feenox_fem_compute_w_det_at_gauss(e, q, feenox.pde.mesh->integration);
-  gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q, feenox.pde.mesh->integration);
+  double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
+  gsl_matrix *B = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_BtB_accum(B, wdet*k, feenox.fem.Ki));
- 
+  
   // volumetric heat source term Ht*q
   // TODO: total source Q
   if (thermal.q.defined) {
     double power = thermal.q.eval(&thermal.q, x, material);
-    feenox_call(feenox_problem_rhs_set(e, q, &power));
+    feenox_call(feenox_problem_rhs_add(e, q, &power));
   }
     
   if (feenox.pde.has_jacobian) {
