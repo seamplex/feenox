@@ -125,7 +125,7 @@ FeenoX's main goal is to keep things simple as possible from the user’s point 
 There exist other tools which are similar in functionality but differ in the way the problem is set up.
 For example, [FeniCSx](https://fenicsproject.org/) uses the Unified Form Language where the PDE being solved has to be written by the user in weak form [@ufl].
 This approach is very flexible, but even simple problems end up with non-trivial input files so it does not fulfill the first requirement stated in the summary.
-As simple as it is, FeenoX is still pretty flexible. A prove of this fact is that its applications range from coupling neutronics with CFD in nuclear reactors [@milonga-openfoam] to providing a back end to [web-based thermo-mechanical solvers](https://www.caeplex.com).
+As simple as it is, FeenoX is still pretty flexible. A proof of this fact is that its applications range from coupling neutronics with CFD in nuclear reactors [@milonga-openfoam] to providing a back end to [web-based thermo-mechanical solvers](https://www.caeplex.com).
 
 
 # References
