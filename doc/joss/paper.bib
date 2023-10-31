@@ -61,3 +61,23 @@ author = {Vitor Vasconcelos and André Santos and Daniel Campolina and Germán T
 keywords = {Neutronics, Thermal-hydraulics, Coupling, Multi-physics, TRIGA, FOSS, Serpent, Simulation, Software},
 abstract = {The development of a fine mesh coupled neutronics/thermal-hydraulics framework mainly using free open source software is presented. The proposed contributions go in two different directions: one, is the focus on the open software approach development, a concept widely spread in many fields of knowledge but rarely explored in the nuclear engineering field; the second, is the use operating system shared memory as a fast and reliable storage area to couple the computational fluid dynamics (CFD) software OpenFOAM to the free and flexible reactor core analysis code milonga. This concept was applied to model the behavior of a TRIGA-IPR-R1 reactor fuel pin in steady-state mode. The macroscopic cross-sections for the model, a set of two-group cross-sections data, were generated using the Serpent code. The results show that this coupled system gives consistent results, encouraging system further development and its use for complex geometries simulations.}
 }
+
+@article{ufl,
+author = {Aln\ae{}s, Martin S. and Logg, Anders and \O{}lgaard, Kristian B. and Rognes, Marie E. and Wells, Garth N.},
+title = {Unified Form Language: A Domain-Specific Language for Weak Formulations of Partial Differential Equations},
+year = {2014},
+issue_date = {February 2014},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {40},
+number = {2},
+issn = {0098-3500},
+url = {https://doi.org/10.1145/2566630},
+doi = {10.1145/2566630},
+abstract = {We present the Unified Form Language (UFL), which is a domain-specific language for representing weak formulations of partial differential equations with a view to numerical approximation. Features of UFL include support for variational forms and functionals, automatic differentiation of forms and expressions, arbitrary function space hierarchies for multifield problems, general differential operators and flexible tensor algebra. With these features, UFL has been used to effortlessly express finite element methods for complex systems of partial differential equations in near-mathematical notation, resulting in compact, intuitive and readable programs. We present in this work the language and its construction. An implementation of UFL is freely available as an open-source software library. The library generates abstract syntax tree representations of variational problems, which are used by other software libraries to generate concrete low-level implementations. Some application examples are presented and libraries that support UFL are highlighted.},
+journal = {ACM Trans. Math. Softw.},
+month = {mar},
+articleno = {9},
+numpages = {37},
+keywords = {symbolic differentiation, functional, partial differential equation, AD, index notation, automatic functional differentiation, tensor algebra, embedded language, PDE, DSEL, DSL, mixed element, weak formulation, domain specific language, discretization, weak form, finite element method, algorithmic differentiation, FEM, einstein notation, implicit summation}
+}

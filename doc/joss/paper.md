@@ -74,9 +74,24 @@ The most important idea is that FeenoX should give a general mathematical framew
     ```
 
   - access element shape functions and its derivatives evaluated either at Gauss points or at arbitrary locations for computing elementary contributions to
+  
      * stiffness matrix
      * mass matrix
      * right-hand side vector
+     
+    For example, this snippet would build the elemental stiffness matrix for the Laplace problem:
+    
+    ```c
+    int build_laplace_Ki(element_t *e, unsigned int q) {
+      double wdet = feenox_fem_compute_w_det_at_gauss(e, q);
+      gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q);
+      feenox_call(feenox_blas_BtB_accum(B, wdet, feenox.fem.Ki));  
+      return FEENOX_OK;
+    }
+    ```
+    The calls for computing the weights and the matrices with the shape functions and/or their derivatives currently support first and second-order iso-geometric elements, but other element types can be added as well.    
+    More complex cases involving non-uniform material properties, volumetric sources, etc. can be found in the actual source.
+
     
   - solve the discretized equations using the appropriate [PETSc](https://petsc.org/) [@petsc-user-ref;@petsc-efficient] or [SLEPc](https://slepc.upv.es/) [@slepc-manual;@slepc-toms] objects, i.e.
     * [KSP](https://petsc.org/release/manual/ksp/) for linear static problems
@@ -104,9 +119,13 @@ Engineers, researchers, scientists, developers and/or hobbyists just need to use
      * etc.
  #. modify the contents of the elemental matrices in `bulk.c` in the FEM formulation of the problem being added
  #. modify the contents of how the boundary conditions are parsed and set in `bc.c`
- #. re-run `autogen.sh`, `./configure` and `make` to get a FeenoX executable with support for the new PDE.
+ #. re-run `autogen.sh`, `./configure` and `make` to get a FeenoX executable with support for the new PDE.
 
-FeenoX's main focus is on flexibility. Its applications range from coupling neutronics with CFD in nuclear reactors [@milonga-openfoam] to providing a back end to [web-based thermo-mechanical solvers](https://www.caeplex.com).
+FeenoX's main goal is to keep things simple as possible from the user’s point of view without sacrificing flexibility.
+There exist other tools which are similar in functionality but differ in the way the problem is set up.
+For example, [FeniCSx](https://fenicsproject.org/) uses the Unified Form Language where the PDE being solved has to be written by the user in weak form [@ufl].
+This approach is very flexible, but even simple problems end up with non-trivial input files so it does not fulfill the first requirement stated in the summary.
+As simple as it is, FeenoX is still pretty flexible. A prove of this fact is that its applications range from coupling neutronics with CFD in nuclear reactors [@milonga-openfoam] to providing a back end to [web-based thermo-mechanical solvers](https://www.caeplex.com).
 
 
 # References
