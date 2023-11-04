@@ -18,7 +18,6 @@ For large problems that do not fit in a single computer, a parallel run using **
 **mpirun** **-n** _number_of_threads_ **feenox** [_options_ ...] _input-file_ [_optional_commandline_replacement_arguments_ ...]
 
 
-Besides executing the **feenox** binary, there is an API that allows to use FeenoX from Python or Julia.
 
 
 # DESCRIPTION
