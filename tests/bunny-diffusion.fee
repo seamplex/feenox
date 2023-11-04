@@ -7,6 +7,8 @@ nuSigma_f1 = nu1*Sigma_f1
 Sigma_s1.1 = 0.22
 Sigma_t1   = 0.4
 
+chi[1] = 1.0
+
 BC base  vacuum 
 BC rest  vacuum 
 

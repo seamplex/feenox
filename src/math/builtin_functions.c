@@ -89,6 +89,16 @@ double feenox_builtin_min(expr_item_t *);
 double feenox_builtin_mod(expr_item_t *);
 double feenox_builtin_not(expr_item_t *);
 double feenox_builtin_quasi_random(expr_item_t *);
+double feenox_builtin_quasi_random_helper1d(expr_item_t *f, const gsl_qrng_type *T);
+double feenox_builtin_quasi_random_helper2d(expr_item_t *f, const gsl_qrng_type *T);
+double feenox_builtin_qrng_sobol(expr_item_t *f);
+double feenox_builtin_qrng_niederreiter(expr_item_t *f);
+double feenox_builtin_qrng_halton(expr_item_t *f);
+double feenox_builtin_qrng_reversehalton(expr_item_t *f);
+double feenox_builtin_qrng2d_sobol(expr_item_t *f);
+double feenox_builtin_qrng2d_niederreiter(expr_item_t *f);
+double feenox_builtin_qrng2d_halton(expr_item_t *f);
+double feenox_builtin_qrng2d_reversehalton(expr_item_t *f);
 double feenox_builtin_random(expr_item_t *);
 double feenox_builtin_random_gauss(expr_item_t *);
 double feenox_builtin_round(expr_item_t *);
@@ -155,6 +165,14 @@ struct builtin_function_t builtin_function[N_BUILTIN_FUNCTIONS] = {
     {"mod",                 2, 2, &feenox_builtin_mod},
     {"not",                 1, 2, &feenox_builtin_not},
     {"quasi_random",        2, 2, &feenox_builtin_quasi_random},
+    {"qrng_sobol",          2, 2, &feenox_builtin_qrng_sobol},
+    {"qrng_niederreiter",   2, 2, &feenox_builtin_qrng_niederreiter},
+    {"qrng_halton",         2, 2, &feenox_builtin_qrng_halton},
+    {"qrng_reversehalton",  2, 2, &feenox_builtin_qrng_reversehalton},
+    {"qrng2d_sobol",          1, 2, &feenox_builtin_qrng2d_sobol},
+    {"qrng2d_niederreiter",   1, 2, &feenox_builtin_qrng2d_niederreiter},
+    {"qrng2d_halton",         1, 2, &feenox_builtin_qrng2d_halton},
+    {"qrng2d_reversehalton",  1, 2, &feenox_builtin_qrng2d_reversehalton},
     {"random",              2, 3, &feenox_builtin_random},
     {"random_gauss",        2, 3, &feenox_builtin_random_gauss},
     {"round",               1, 1, &feenox_builtin_round},
@@ -242,7 +260,10 @@ double feenox_builtin_mpi_memory_local(expr_item_t *f) {
     double memory_rank = 0;
     if (feenox.mpi_rank == rank) {
       PetscMemoryGetCurrentUsage(&memory_rank);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
       MPI_Allreduce(&memory_rank, &memory_local, 1, MPIU_SCALAR, MPIU_SUM, (feenox.pde.petscinit_called) ? PETSC_COMM_WORLD : MPI_COMM_WORLD);
+#pragma GCC diagnostic pop
     }
   }
 #endif
@@ -261,7 +282,11 @@ double feenox_builtin_mpi_memory_global(expr_item_t *f) {
   
   if (feenox.mpi_size != 0) {
     PetscMemoryGetCurrentUsage(&memory_local);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
     MPI_Allreduce(&memory_local, &memory_global, 1, MPIU_SCALAR, MPIU_SUM, (feenox.pde.petscinit_called) ? PETSC_COMM_WORLD : MPI_COMM_WORLD);
+#pragma GCC diagnostic pop
+    
   } else {
     PetscMemoryGetCurrentUsage(&memory_global);
   }
@@ -1091,8 +1116,7 @@ double feenox_builtin_equal(expr_item_t *f) {
 
 }
 
-double feenox_builtin_quasi_random(expr_item_t *f) {
-
+double feenox_builtin_quasi_random_helper1d(expr_item_t *f, const gsl_qrng_type *T) {
   double y = 0;
   double r = 0;
   double x1 = feenox_expression_eval(&f->arg[0]);
@@ -1100,19 +1124,81 @@ double feenox_builtin_quasi_random(expr_item_t *f) {
 
   // si es la primera llamada inicializamos el generador
   if (f->aux == NULL) {
-    f->aux = (double *)gsl_qrng_alloc(gsl_qrng_sobol, 1);
+    feenox_check_alloc(f->aux = (double *)gsl_qrng_alloc(T, 1));
   }
 
-  // TODO: memory leaks en fiteo, minimizacion, etc
   gsl_qrng_get((const gsl_qrng *)f->aux, &r);
   y = x1 + r*(x2-x1);
 
-  if (feenox_special_var_value(done)) {
-    gsl_qrng_free((gsl_qrng *)f->aux);
-    f->aux = NULL;
+  return y;
+}
+
+
+double feenox_builtin_quasi_random(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper1d(f, gsl_qrng_sobol);
+}
+
+double feenox_builtin_qrng_sobol(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper1d(f, gsl_qrng_sobol);
+}
+
+double feenox_builtin_qrng_niederreiter(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper1d(f, gsl_qrng_niederreiter_2);
+}
+
+double feenox_builtin_qrng_halton(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper1d(f, gsl_qrng_halton);
+}
+
+double feenox_builtin_qrng_reversehalton(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper1d(f, gsl_qrng_reversehalton);
+}
+
+
+struct {
+  gsl_qrng *q;
+  double *v;
+} feenox_qrng_helper;
+
+double feenox_builtin_quasi_random_helper2d(expr_item_t *f, const gsl_qrng_type *T) {
+
+  if (feenox_qrng_helper.q == NULL) {
+    feenox_qrng_helper.q = gsl_qrng_alloc(T, 2);
+    feenox_qrng_helper.v = calloc(2, sizeof(double));
+    if (f->arg[1].items != NULL) {
+      unsigned int offset = (unsigned int)feenox_expression_eval(&f->arg[1]);
+      for (unsigned int i = 0; i < offset; i++) {
+        gsl_qrng_get(feenox_qrng_helper.q, feenox_qrng_helper.v);
+      }
+    }
   }
 
-  return y;
+  int d = (f->arg[0].items != NULL) ? (int)feenox_expression_eval(&f->arg[0])-1 : 0;
+  if (d == 0) {
+    gsl_qrng_get(feenox_qrng_helper.q, feenox_qrng_helper.v);
+  } else if (d < 0) {
+    feenox_push_error_message("offset starts in 1, not in 0 for qrng");
+    feenox_runtime_error();
+  }
+
+  return feenox_qrng_helper.v[d];
+}
+
+
+double feenox_builtin_qrng2d_sobol(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper2d(f, gsl_qrng_sobol);
+}
+
+double feenox_builtin_qrng2d_niederreiter(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper2d(f, gsl_qrng_niederreiter_2);
+}
+
+double feenox_builtin_qrng2d_halton(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper2d(f, gsl_qrng_halton);
+}
+
+double feenox_builtin_qrng2d_reversehalton(expr_item_t *f) {
+  return feenox_builtin_quasi_random_helper2d(f, gsl_qrng_reversehalton);
 }
 
 

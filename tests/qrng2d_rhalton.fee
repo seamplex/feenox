@@ -1,0 +1,2 @@
+static_steps = 8
+PRINT qrng2d_reversehalton(1) qrng2d_reversehalton(2)

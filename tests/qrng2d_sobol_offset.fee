@@ -1,0 +1,2 @@
+static_steps = $2
+PRINT qrng2d_sobol(1,$1) qrng2d_sobol(2,$1)

@@ -1,0 +1,2 @@
+static_steps = 10
+PRINT qrng_sobol(0,1) qrng_niederreiter(0,1) qrng_halton(0,1) qrng_reversehalton(0,1)

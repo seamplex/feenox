@@ -84,7 +84,10 @@ int feenox_instruction_mesh_integrate(void *arg) {
 
 
 #ifdef HAVE_PETSC  
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
   MPI_Allreduce(&integral_local, &integral_global, 1, MPIU_SCALAR, MPIU_SUM, PETSC_COMM_WORLD);
+#pragma GCC diagnostic pop
 #else
   integral_global = integral_local;    
 #endif

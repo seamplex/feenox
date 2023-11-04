@@ -1,0 +1,3 @@
+static_steps = 1024
+PRINT qrng2d_reversehalton(1) qrng2d_reversehalton(2)
+# PRINT qrng2d_sobol(1) qrng2d_sobol(2)
