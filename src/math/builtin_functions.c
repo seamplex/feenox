@@ -853,7 +853,6 @@ double feenox_builtin_mod(expr_item_t *f) {
 ///fn+floor+usage floor(x)
 ///fn+floor+math \lfloor x \rfloor
 ///fn+floor+plotx  -2.5 2.5 5e-3   -2 2 1   -3 2 1  0.5 0.5   
-
 double feenox_builtin_floor(expr_item_t *f) {
   return floor(feenox_expression_eval(&f->arg[0]));
 }
@@ -861,8 +860,7 @@ double feenox_builtin_floor(expr_item_t *f) {
 ///fn+gammaf+desc Computes the Gamma function $\Gamma(x)$.
 ///fn+gammaf+usage gammaf(x)
 ///fn+gammaf+math \int_0^\infty t^{x-1} \cdot e^{-t} \, dt
-///fn+gammaf+plotx  1 5 1e-1   1 5 1   0 25 5  0.5 2.5   
-
+///fn+gammaf+plotx  1 5 1e-1   1 5 1   0 25 5  0.5 2.5
 double feenox_builtin_gammaf(expr_item_t *f) {
   double x = feenox_expression_eval(&f->arg[0]);
   return (x <= 0) ? 1 : gsl_sf_gamma(x);
