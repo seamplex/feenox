@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2003-2020, Troy D. Hanson     http://troydhanson.github.com/uthash/
+Copyright (c) 2003-2022, Troy D. Hanson  https://troydhanson.github.io/uthash/
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTHASH_H
 #define UTHASH_H
 
-#define UTHASH_VERSION 2.2.0
+#define UTHASH_VERSION 2.3.0
 
 #include <string.h>   /* memcmp, memset, strlen */
 #include <stddef.h>   /* ptrdiff_t */
@@ -51,6 +51,8 @@ typedef unsigned char uint8_t;
 #else                   /* VS2008 or older (or VS2010 in C mode) */
 #define NO_DECLTYPE
 #endif
+#elif defined(__MCST__)  /* Elbrus C Compiler */
+#define DECLTYPE(x) (__typeof(x))
 #elif defined(__BORLANDC__) || defined(__ICCARM__) || defined(__LCC__) || defined(__WATCOMC__)
 #define NO_DECLTYPE
 #else                   /* GNU, Sun and other compilers */
@@ -85,15 +87,12 @@ do {                                                                            
 #define uthash_strlen(s) strlen(s)
 #endif
 
-#ifdef uthash_memcmp
-/* This warning will not catch programs that define uthash_memcmp AFTER including uthash.h. */
-#warning "uthash_memcmp is deprecated; please use HASH_KEYCMP instead"
-#else
-#define uthash_memcmp(a,b,n) memcmp(a,b,n)
+#ifndef HASH_FUNCTION
+#define HASH_FUNCTION(keyptr,keylen,hashv) HASH_JEN(keyptr, keylen, hashv)
 #endif
 
 #ifndef HASH_KEYCMP
-#define HASH_KEYCMP(a,b,n) uthash_memcmp(a,b,n)
+#define HASH_KEYCMP(a,b,n) memcmp(a,b,n)
 #endif
 
 #ifndef uthash_noexpand_fyi
@@ -151,7 +150,7 @@ do {                                                                            
 
 #define HASH_VALUE(keyptr,keylen,hashv)                                          \
 do {                                                                             \
-  HASH_FCN(keyptr, keylen, hashv);                                               \
+  HASH_FUNCTION(keyptr, keylen, hashv);                                          \
 } while (0)
 
 #define HASH_FIND_BYHASHVALUE(hh,head,keyptr,keylen,hashval,out)                 \
@@ -453,7 +452,7 @@ do {                                                                            
 
 #define HASH_DELETE_HH(hh,head,delptrhh)                                         \
 do {                                                                             \
-  struct UT_hash_handle *_hd_hh_del = (delptrhh);                                \
+  const struct UT_hash_handle *_hd_hh_del = (delptrhh);                          \
   if ((_hd_hh_del->prev == NULL) && (_hd_hh_del->next == NULL)) {                \
     HASH_BLOOM_FREE((head)->hh.tbl);                                             \
     uthash_free((head)->hh.tbl->buckets,                                         \
@@ -583,13 +582,6 @@ do {                                                                            
 #define HASH_EMIT_KEY(hh,head,keyptr,fieldlen)
 #endif
 
-/* default to Jenkin's hash unless overridden e.g. DHASH_FUNCTION=HASH_SAX */
-#ifdef HASH_FUNCTION
-#define HASH_FCN HASH_FUNCTION
-#else
-#define HASH_FCN HASH_JEN
-#endif
-
 /* The Bernstein hash function, used in Perl prior to v5.6. Note (x<<5+x)=x*33. */
 #define HASH_BER(key,keylen,hashv)                                               \
 do {                                                                             \
@@ -603,7 +595,9 @@ do {                                                                            
 
 
 /* SAX/FNV/OAT/JEN hash functions are macro variants of those listed at
- * http://eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx */
+ * http://eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx
+ * (archive link: https://archive.is/Ivcan )
+ */
 #define HASH_SAX(key,keylen,hashv)                                               \
 do {                                                                             \
   unsigned _sx_i;                                                                \
@@ -688,7 +682,8 @@ do {                                                                            
     case 4:  _hj_i += ( (unsigned)_hj_key[3] << 24 );  /* FALLTHROUGH */         \
     case 3:  _hj_i += ( (unsigned)_hj_key[2] << 16 );  /* FALLTHROUGH */         \
     case 2:  _hj_i += ( (unsigned)_hj_key[1] << 8 );   /* FALLTHROUGH */         \
-    case 1:  _hj_i += _hj_key[0];                                                \
+    case 1:  _hj_i += _hj_key[0];                      /* FALLTHROUGH */         \
+    default: ;                                                                   \
   }                                                                              \
   HASH_JEN_MIX(_hj_i, _hj_j, hashv);                                             \
 } while (0)
@@ -736,6 +731,8 @@ do {                                                                            
     case 1: hashv += *_sfh_key;                                                  \
             hashv ^= hashv << 10;                                                \
             hashv += hashv >> 1;                                                 \
+            break;                                                               \
+    default: ;                                                                   \
   }                                                                              \
                                                                                  \
   /* Force "avalanching" of final 127 bits */                                    \
