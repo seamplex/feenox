@@ -74,6 +74,7 @@ TESTS = \
         tests/thermal-3d.sh \
         tests/thermal-slab-no-k.sh \
         tests/thermal-slab-wrong-bc.sh \
+        tests/thermal-radiation.sh \
         tests/transient-mesh.sh \
         tests/trig.sh \
         tests/two-cubes-isotropic.sh \

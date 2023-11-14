@@ -94,7 +94,11 @@ int feenox_problem_build(void) {
   
   int valid_local = (volumetric_elements > 0);
   int valid_global = 0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
   MPI_Allreduce(&valid_local, &valid_global, 1, MPIU_INT, MPIU_SUM, PETSC_COMM_WORLD);
+#pragma GCC diagnostic pop
+  
   if (valid_global == 0) {
     feenox_push_error_message("no volumetric elements found in '%s'", feenox.pde.mesh->file->name);
     return FEENOX_ERROR;
@@ -235,6 +239,14 @@ int feenox_problem_build_element_volumetric(element_t *this) {
       feenox_call(feenox.pde.element_build_volumetric_at_gauss(this, q));
     }
   }
+  
+/*  
+  printf("result\n");
+  printf("Ki\n");
+  feenox_debug_print_gsl_matrix(feenox.fem.Ki, stdout);
+  printf("JKi\n");
+  feenox_debug_print_gsl_matrix(feenox.fem.JKi, stdout);
+*/  
  
   // compute the indices of the DOFs to ensamble
   PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);

@@ -179,7 +179,10 @@ int feenox_problem_dirichlet_set_K(void) {
     petsc_call(VecDestroy(&vec_diagonal));
  
     int found_global = 0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
     MPI_Allreduce(&found, &found_global, 1, MPIU_INT, MPIU_SUM, PETSC_COMM_WORLD);
+#pragma GCC diagnostic pop
     if (found_global) {
       if (feenox.pde.hanging_nodes == hanging_nodes_detect) {
         feenox_push_error_message("hanging nodes detected:");
@@ -217,7 +220,10 @@ int feenox_problem_dirichlet_set_K(void) {
 
   int has_multidof_global = 0;
   int has_multidof_local = (feenox.pde.multifreedom_nodes > 0);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
   MPI_Allreduce(&has_multidof_local, &has_multidof_global, 1, MPIU_INT, MPIU_SUM, PETSC_COMM_WORLD);
+#pragma GCC diagnostic pop
 
   if (has_multidof_global) {
     petsc_call(MatAssemblyBegin(feenox.pde.K_bc, MAT_FINAL_ASSEMBLY));

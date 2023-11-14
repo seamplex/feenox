@@ -1,0 +1,13 @@
+PROBLEM thermal 1D
+READ_MESH slab.msh
+TK = 273.15
+Tref = 20
+T_guess(x) = Tref
+k = 50
+sigma = 5.670374419e-8
+e = 0.8
+BC left  q=1200
+BC right q=sigma*e*((Tref+TK)^4-(T(x)+TK)^4)
+SOLVE_PROBLEM
+
+PRINT T(0.0)-179.747+T(1.0)-155.747+T(0.5)-167.747

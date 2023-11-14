@@ -103,33 +103,6 @@ int feenox_problem_setup_snes(SNES snes) {
   return FEENOX_OK;
 }  
 
-/*
-PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
-
-  feenox_call(feenox_problem_phi_to_solution(phi));
-  feenox_call(feenox_problem_build());
-  feenox_call(feenox_problem_dirichlet_eval());
-  
-  if (feenox.pde.phi_bc == NULL) {
-    feenox_check_alloc(feenox.pde.phi_bc = feenox_problem_create_vector("phi_bc"));
-  }
-    
-  // set dirichlet BCs on the solution and multiply by K
-  feenox_call(VecCopy(phi, feenox.pde.phi_bc));
-  feenox_call(feenox_problem_dirichlet_set_phi(feenox.pde.phi_bc));
-  petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
-  
-  // subtract b
-  petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
-  
-  // set dirichlet BCs on the residual
-  feenox_call(feenox_problem_dirichlet_set_r(r, phi));
-
-  return FEENOX_OK;
-}  
-*/
-
-
 PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
   // set dirichlet BCs on the solution
   if (feenox.pde.phi_bc == NULL) {
@@ -151,6 +124,13 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
   
   // set dirichlet BCs on the residual
   feenox_call(feenox_problem_dirichlet_set_r(r, phi));
+  
+/*  
+  printf("solution\n");
+  VecView(phi, PETSC_VIEWER_STDOUT_SELF);
+  printf("residual\n");
+  VecView(r, PETSC_VIEWER_STDOUT_SELF);
+*/
 
   return FEENOX_OK;
 }
@@ -159,7 +139,7 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
 PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *ctx) {
   
   
-  // J_snes = (K + JK*phi - Jb)_bc
+  // J_snes = (K + JK - Jb)_bc
   // TODO: we want SAME_NONZERO_PATTERN!
   petsc_call(MatAssemblyBegin(feenox.pde.K, MAT_FINAL_ASSEMBLY));
   petsc_call(MatAssemblyEnd(feenox.pde.K, MAT_FINAL_ASSEMBLY));
@@ -177,6 +157,10 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
   
   feenox_call(feenox_problem_dirichlet_set_J(J_snes));
   
+/*  
+  printf("jacobian\n");
+  MatView(J_snes, PETSC_VIEWER_STDOUT_SELF);
+*/
   
   return FEENOX_OK;
 }

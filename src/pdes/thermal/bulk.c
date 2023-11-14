@@ -43,14 +43,14 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
   }
     
   if (feenox.pde.has_jacobian) {
-    gsl_matrix *local_vec_T = NULL;
-    feenox_check_alloc(local_vec_T = gsl_matrix_calloc(e->type->nodes, 1));
+    gsl_matrix *elemental_T = NULL;
+    feenox_check_alloc(elemental_T = gsl_matrix_calloc(e->type->nodes, 1));
     double T = 0;
     double Tj = 0;
     gsl_matrix *H = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
     for (unsigned int j = 0; j < e->type->nodes; j++) {
       Tj = feenox_vector_get(feenox.pde.solution[0]->vector_value, e->node[j]->index_dof[0]);
-      gsl_matrix_set(local_vec_T, j, 0, Tj);
+      gsl_matrix_set(elemental_T, j, 0, Tj);
       T += gsl_matrix_get(H, 0, j) * Tj; 
     }  
 
@@ -59,7 +59,7 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
 
       gsl_matrix *BtB = gsl_matrix_calloc(e->type->nodes, e->type->nodes);
       feenox_call(feenox_blas_BtB(B, 1.0, BtB));
-      feenox_call(feenox_blas_PtCB_accum(BtB, local_vec_T, H, NULL, wdet*dkdT, feenox.fem.JKi));
+      feenox_call(feenox_blas_PtCB_accum(BtB, elemental_T, H, NULL, wdet*dkdT, feenox.fem.JKi));
       gsl_matrix_free(BtB);
     }
 
@@ -68,10 +68,10 @@ int feenox_problem_build_volumetric_gauss_point_thermal(element_t *e, unsigned i
       // mind the positive sign!
       feenox_call(feenox_blas_BtB_accum(H, +wdet*dqdT, feenox.fem.Jbi));
     } 
-    gsl_matrix_free(local_vec_T);
+
+    gsl_matrix_free(elemental_T);
   }
 
-    
   // mass matrix Ht*rho*cp*H
   if (feenox.pde.has_mass) {
     double rhocp = 0;

@@ -33,6 +33,7 @@ Just [FeenoX](https://www.seamplex.com/feenox/) and a bunch of standard open sou
 >
 > Other people's maze-related posts:
 >
+>  * <https://www.linkedin.com/feed/update/urn:li:activity:7117082910381232128/>
 >  * <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
 >  * <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
 >  * <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
