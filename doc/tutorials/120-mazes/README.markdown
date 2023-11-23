@@ -24,11 +24,11 @@ Welcome the the **Second Feenox tutorial**, very much inspired on Donald
 Knuth’s [Selected Papers on Fun and Games][]. And a little bit on Homer
 Simpson.
 
-<figure>
-<img src="maze-homer.png" id="fig:maze-homer"
-alt="Figure 1: Homer trying to solve a maze on a placemat" />
-<figcaption aria-hidden="true">Figure 1: Homer trying to solve a maze on
-a placemat</figcaption>
+<figure id="fig:maze-homer">
+<img src="maze-homer.png"
+alt="Homer trying to solve a maze on a placemat" />
+<figcaption>Figure 1: Homer trying to solve a maze on a
+placemat</figcaption>
 </figure>
 
 Say you want to solve a maze drawn in a restaurant’s placemat: one where
@@ -48,6 +48,7 @@ unstructured mesh.
 >
 > Other people’s maze-related posts:
 >
+> - <https://www.linkedin.com/feed/update/urn:li:activity:7117082910381232128/>
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
@@ -104,25 +105,23 @@ We will…
     “tries” all the paths and only keeps the ones that do not find any
     dead end.
 
-<div id="fig:maze123" class="subfigures">
-
-<figure>
-<img src="maze12.png" id="fig:maze12" data-width_html="100%"
-data-width_latex="95%" alt="a" />
-<figcaption aria-hidden="true">a</figcaption>
+<figure id="fig:maze123" class="subfigures">
+<figure id="fig:maze12">
+<img src="maze12.png" data-width_html="100%" data-width_latex="95%"
+alt="Bitmapped maze from https://www.mazegenerator.net (left) and 2D mesh (right)" />
+<figcaption>a</figcaption>
 </figure>
-
-<figure>
-<img src="maze3.png" id="fig:maze3" data-width_html="100%"
-data-width_latex="47.5%" alt="b" />
-<figcaption aria-hidden="true">b</figcaption>
+<figure id="fig:maze3">
+<img src="maze3.png" data-width_html="100%" data-width_latex="47.5%"
+alt="Solution to found by FeenoX (and drawn by Gmsh)" />
+<figcaption>b</figcaption>
 </figure>
-
-Figure 2: Bitmapped, meshed and solved mazes.. a — Bitmapped maze from
-<https://www.mazegenerator.net> (left) and 2D mesh (right), b — Solution
-to found by FeenoX (and drawn by Gmsh)
-
-</div>
+<figcaption><p>Figure 2: Bitmapped, meshed and solved mazes.. a —
+Bitmapped maze from <a href="https://www.mazegenerator.net"
+class="uri">https://www.mazegenerator.net</a> (left) and 2D mesh
+(right), b — Solution to found by FeenoX (and drawn by
+Gmsh)</p></figcaption>
+</figure>
 
   [Gmsh]: http://gmsh.info/
 
@@ -498,9 +497,12 @@ $ ffmpeg -y -framerate 10 -f image2 -i maze-tran-td-%03d.png maze-tran-td.gif
 $
 ```
 
-![Maze solved as a transient Laplace problem with FeenoX][]
-
-  [Maze solved as a transient Laplace problem with FeenoX]: maze-tran-td.gif
+<figure>
+<img src="maze-tran-td.gif"
+alt="Maze solved as a transient Laplace problem with FeenoX" />
+<figcaption aria-hidden="true">Maze solved as a transient Laplace
+problem with FeenoX</figcaption>
+</figure>
 
 # Homework
 
@@ -508,15 +510,11 @@ $
 2.  Play with different types of mazes! What if you actually draw and
     scan one yourself?
 
-<div id="fig:mazes" class="subfigures">
-
-<img src="maze-sigma.png" title="fig:" style="width:45.0%" alt="a" />
-<img src="maze-delta.png" title="fig:" style="width:45.0%" alt="b" />
-
-<img src="maze-theta.png" title="fig:" style="width:45.0%" alt="c" />
-<img src="maze-big.png" title="fig:" style="width:45.0%" alt="d" />
-
-Figure 3: Any arbitrary maze (even hand-drawn) can be solved with
-FeenoX.
-
-</div>
+<figure id="fig:mazes" class="subfigures">
+<p><img src="maze-sigma.png" style="width:45.0%" alt="a" /> <img
+src="maze-delta.png" style="width:45.0%" alt="b" /></p>
+<p><img src="maze-theta.png" style="width:45.0%" alt="c" /> <img
+src="maze-big.png" style="width:45.0%" alt="d" /></p>
+<figcaption><p>Figure 3: Any arbitrary maze (even hand-drawn) can be
+solved with FeenoX. </p></figcaption>
+</figure>

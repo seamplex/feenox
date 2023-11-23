@@ -330,12 +330,21 @@
       <item>mpi_memory_local</item>
       <item>not</item>
       <item>prod</item>
+      <item>qrng2d_halton</item>
+      <item>qrng2d_niederreiter</item>
+      <item>qrng2d_reversehalton</item>
+      <item>qrng2d_sobol</item>
+      <item>qrng_halton</item>
+      <item>qrng_niederreiter</item>
+      <item>qrng_reversehalton</item>
+      <item>qrng_sobol</item>
       <item>quasi_random</item>
       <item>random</item>
       <item>random_gauss</item>
       <item>root</item>
       <item>round</item>
       <item>sawtooth_wave</item>
+      <item>sech</item>
       <item>sgn</item>
       <item>sin</item>
       <item>sinh</item>

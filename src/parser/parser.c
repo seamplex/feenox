@@ -3266,6 +3266,7 @@ int feenox_parse_petsc_options(void) {
   size_t size_current = (feenox.pde.petsc_options == NULL) ? 0 : strlen(feenox.pde.petsc_options);
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw_pde+PETSC_OPTIONS+usage "command-line options for PETSc"
 ///kw_pde+PETSC_OPTIONS+detail Options for PETSc can be passed either in at run time in the command line
 ///kw_pde+PETSC_OPTIONS+detail (run with `-h` to see how) or they can be set in the input file with `PETSC_OPTIONS`.
 ///kw_pde+PETSC_OPTIONS+detail This is handy when a particular problem is best suited to be solved using a particular

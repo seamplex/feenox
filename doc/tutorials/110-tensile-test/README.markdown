@@ -42,7 +42,7 @@
 
 # Foreword
 
-Welcome to **FeenoX’ tutorial number one**. Good for you! This first
+Welcome to **FeenoX’s tutorial number one**. Good for you! This first
 case…
 
 1.  serves as a step-by-step tutorial to use [FeenoX][] for the first
@@ -177,15 +177,15 @@ surface not shown) and a tensile load of $F_x = 10~\text{kN}$ is applied
 at the other end (flat end face at $x>0$, green surface). The Young
 modulus is $E=200~\text{GPa}$ and the Poisson’s ratio is $\nu=0.3$.
 
-<div id="fig:tensile-cad" class="subfigures">
-
+<figure id="fig:tensile-cad" class="subfigures">
 <div class="ratio ratio-16x9">
  <iframe src="https://www.caeplex.com/project/problem.php?id=41dd1&embed" allowfullscreen></iframe>
 </div>
-Figure 1: Tensile test specimen CAD from CAEplex
-<https://caeplex.com/p/41dd1> (rotate and zoom it).
-
-</div>
+<figcaption><p>Figure 1: Tensile test specimen CAD from CAEplex <a
+href="https://caeplex.com/p/41dd1"
+class="uri">https://caeplex.com/p/41dd1</a> (rotate and zoom it).
+</p></figcaption>
+</figure>
 
 ## Expected results
 
@@ -276,11 +276,20 @@ as explained in the next section). But still, we need to identify it so
 as to have [Gmsh][] to generate the bulk elements.
 
 0.  If you have not already, clone the [FeenoX repository][] and `cd` to
-    [`doc/tutorials/110-tensile-test`][].
+    [`doc/tutorials/110-tensile-test`][]. Make sure you have `git`
+    installed first.
 
     ``` terminal
-    $ git clone https://github.com/seamplex/feenox/
+    $ sudo apt-get install git
     [...]
+    $ git clone https://github.com/seamplex/feenox/
+    Cloning into 'feenox'...
+    remote: Enumerating objects: 8224, done.
+    remote: Counting objects: 100% (1126/1126), done.
+    remote: Compressing objects: 100% (567/567), done.
+    remote: Total 8224 (delta 599), reused 959 (delta 528), pack-reused 7098
+    Receiving objects: 100% (8224/8224), 20.76 MiB | 17.25 MiB/s, done.
+    Resolving deltas: 100% (5873/5873), done.
     $ cd feenox/doc/tutorials/110-tensile-test
     $
     ```
@@ -485,11 +494,11 @@ surprise][]). The idea is that this input file should match as much as
 possible the definition of the problem as an engineer would cast it in a
 plain sheet of paper (or blackboard).
 
-<figure>
-<img src="blackboard.jpg" id="fig:blackboard"
-alt="Figure 2: Human-made formulation of the tensile test problem in a board." />
-<figcaption aria-hidden="true">Figure 2: Human-made formulation of the
-tensile test problem in a board.</figcaption>
+<figure id="fig:blackboard">
+<img src="blackboard.jpg"
+alt="Human-made formulation of the tensile test problem in a board." />
+<figcaption>Figure 2: Human-made formulation of the tensile test problem
+in a board.</figcaption>
 </figure>
 
 Yet in the extreme case that the complexity of the problem asks for, the
@@ -853,7 +862,7 @@ should go as smooth (and as fast) as follows.
 <div id="tensile-test-execution"></div>
 <script>AsciinemaPlayer.create('tensile-test.cast', document.getElementById('tensile-test-execution'), {cols:133,rows:32, poster: 'npt:0:20'});</script>
 
-Here is a static mimic of a 22-second terminal session:
+Here is a static mimic of a 12-second terminal session:
 
 ``` terminal
 $ gmsh -3 tensile-test.geo
@@ -1106,17 +1115,16 @@ to solve the discretized equations. And it does so on high grounds, both
 Check out the [programming and contributing][] section of the FeenoX
 documentation for further details regarding
 
-1.  FeenoX’ roadmap
+1.  FeenoX’s roadmap
 2.  Programming languages
 3.  Coding styles and guidelines
 4.  Rules of conduct
 5.  Related tools
 6.  etc.
 
-A final preliminary comment before starting the actual tutorial is that
-[FeenoX][] is designed to work as an engineering “transfer function”
-between one (or more) input files and zero (or more) output files (which
-might include the terminal):
+A final comment is that [FeenoX][] is designed to work as an engineering
+“transfer function” between one (or more) input files and zero (or more)
+output files (which might include the terminal):
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal

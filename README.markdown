@@ -1,19 +1,19 @@
 # FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
--   [<span class="toc-section-number">1</span> About FeenoX][]
-    -   [<span class="toc-section-number">1.1</span> Why FeenoX?][]
-    -   [<span class="toc-section-number">1.2</span> How is FeenoX
-        different?][]
-    -   [<span class="toc-section-number">1.3</span> What is FeenoX
-        anyway?][]
--   [<span class="toc-section-number">2</span> Quickstart][]
-    -   [<span class="toc-section-number">2.1</span> Download][]
-    -   [<span class="toc-section-number">2.2</span> Git repository][]
--   [<span class="toc-section-number">3</span> Examples][]
-    -   [<span class="toc-section-number">3.1</span> Test suite][]
--   [<span class="toc-section-number">4</span> Licensing][]
-    -   [<span class="toc-section-number">4.1</span> Contributing][]
--   [<span class="toc-section-number">5</span> Further information][]
+- [<span class="toc-section-number">1</span> About FeenoX][]
+  - [<span class="toc-section-number">1.1</span> Why FeenoX?][]
+  - [<span class="toc-section-number">1.2</span> How is FeenoX
+    different?][]
+  - [<span class="toc-section-number">1.3</span> What is FeenoX
+    anyway?][]
+- [<span class="toc-section-number">2</span> Quickstart][]
+  - [<span class="toc-section-number">2.1</span> Download][]
+  - [<span class="toc-section-number">2.2</span> Git repository][]
+- [<span class="toc-section-number">3</span> Examples][]
+  - [<span class="toc-section-number">3.1</span> Test suite][]
+- [<span class="toc-section-number">4</span> Licensing][]
+  - [<span class="toc-section-number">4.1</span> Contributing][]
+- [<span class="toc-section-number">5</span> Further information][]
 
   [<span class="toc-section-number">1</span> About FeenoX]: #about-feenox
   [<span class="toc-section-number">1.1</span> Why FeenoX?]: #why-feenox
@@ -127,62 +127,62 @@ functions) where new types of PDEs (e.g. electromagnetism, fluid
 mechanics, etc.) can be added to the set of what FeenoX can solve.
 FeenoX will provide means to
 
--   parse the input file, handle command-line arguments, read mesh
-    files, assign variables, evaluate conditionals, write results, etc.
+- parse the input file, handle command-line arguments, read mesh files,
+  assign variables, evaluate conditionals, write results, etc.
 
-    ``` feenox
-    PROBLEM laplace 2D
-    READ_MESH square-$1.msh
-    [...]
-    WRITE_RESULTS FORMAT vtk
-    ```
+  ``` feenox
+  PROBLEM laplace 2D
+  READ_MESH square-$1.msh
+  [...]
+  WRITE_RESULTS FORMAT vtk
+  ```
 
--   handle material properties given as algebraic expressions involving
-    pointwise-defined functions of space, temperature, time, etc.
+- handle material properties given as algebraic expressions involving
+  pointwise-defined functions of space, temperature, time, etc.
 
-    ``` feenox
-    MATERIAL steel     E=210e3*(1-1e-3*(T(x,y,z)-20))   nu=0.3
-    MATERIAL aluminum  E=69e3                           nu=7/25
-    ```
+  ``` feenox
+  MATERIAL steel     E=210e3*(1-1e-3*(T(x,y,z)-20))   nu=0.3
+  MATERIAL aluminum  E=69e3                           nu=7/25
+  ```
 
--   read problem-specific boundary conditions as algebraic expressions
+- read problem-specific boundary conditions as algebraic expressions
 
-    ``` feenox
-    sigma = 5.670374419e-8  # W m^2 / K^4 as in wikipedia
-    e = 0.98      # non-dimensional
-    T0 = 1000     # K
-    Tinf = 300    # K
+  ``` feenox
+  sigma = 5.670374419e-8  # W m^2 / K^4 as in wikipedia
+  e = 0.98      # non-dimensional
+  T0 = 1000     # K
+  Tinf = 300    # K
 
-    BC left  T=T0
-    BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
-    ```
+  BC left  T=T0
+  BC right q=sigma*e*(Tinf^4-T(x,y,z)^4)
+  ```
 
--   access shape functions and its derivatives evaluated eitehr at Gauss
-    points or at arbitrary locations for computing elementary
-    contributions to
+- access shape functions and its derivatives evaluated eitehr at Gauss
+  points or at arbitrary locations for computing elementary
+  contributions to
 
-    -   stiffness matrix
-    -   mass matrix
-    -   right-hand side vector
+  - stiffness matrix
+  - mass matrix
+  - right-hand side vector
 
--   solve the discretized equations using the appropriate
-    [PETSc][]/[SLEPc][] objects, i.e.
+- solve the discretized equations using the appropriate
+  [PETSc][]/[SLEPc][] objects, i.e.
 
-    -   [KSP][] for linear static problems
-    -   [SNES][] for non-linear static problems
-    -   [TS][] for transient problems
-    -   [EPS][] for eigenvalue problems
+  - [KSP][] for linear static problems
+  - [SNES][] for non-linear static problems
+  - [TS][] for transient problems
+  - [EPS][] for eigenvalue problems
 
 This general framework constitutes the bulk of [FeenoX’s source code][].
 The particular functions that implement each problem type are located in
 subdirectories [`src/pdes`][], namely
 
--   [`laplace`][]
--   [`thermal`][]
--   [`mechanical`][]
--   [`modal`][]
--   [`neutron_diffusion`][]
--   [`neutron_sn`][]
+- [`laplace`][]
+- [`thermal`][]
+- [`mechanical`][]
+- [`modal`][]
+- [`neutron_diffusion`][]
+- [`neutron_sn`][]
 
 Engineers, researchers, scientists, developers and/or hobbyists just
 need to use one of these directories (say [`laplace`][]) as a template
@@ -191,10 +191,10 @@ and
 1.  replace every occurrence of `laplace` in symbol names with the name
     of the new PDE
 2.  modify the initialization functions in `init.c` and set
-    -   the names of the unknowns
-    -   the names of the materials
-    -   the mathematical type and properties of problem
-    -   etc.
+    - the names of the unknowns
+    - the names of the materials
+    - the mathematical type and properties of problem
+    - etc.
 3.  modify the contents of the elemental matrices in `bulk.c` in the FEM
     formulation of the problem being added
 4.  modify the contents of how the boundary conditions are parsed and
@@ -227,9 +227,9 @@ terms][Licensing]. See below for contribution guidelines.
 
 FeenoX can be seen either as
 
--   a syntactically-sweetened way of asking the computer to solve
-    engineering-related mathematical problems, and/or
--   a finite-element(ish) tool with a particular design basis.
+- a syntactically-sweetened way of asking the computer to solve
+  engineering-related mathematical problems, and/or
+- a finite-element(ish) tool with a particular design basis.
 
 Note that some of the problems solved with FeenoX might not actually
 rely on the finite element method, but on general mathematical models
@@ -238,12 +238,12 @@ finite-element(ish) tool.
 
 In other words, FeenoX is a computational tool to solve
 
--   [dynamical systems written as sets of ODEs/DAEs][], or
--   [steady or transient heat conduction problems][], or
--   [steady or quasi-static thermo-mechanical problems][], or
--   [modal analysis problems][], or
--   [core-level steady-state neutronics][], or
--   community-contributed problems
+- [dynamical systems written as sets of ODEs/DAEs][], or
+- [steady or transient heat conduction problems][], or
+- [steady or quasi-static thermo-mechanical problems][], or
+- [modal analysis problems][], or
+- [core-level steady-state neutronics][], or
+- community-contributed problems
 
 in such a way that the input is a near-English text file that defines
 the problem to be solved.
@@ -254,8 +254,8 @@ simplicity*) or, quoting Alan Kay, “simple things should be simple,
 complex things should be possible.”
 
 For instance, to solve one-dimensional heat conduction over the domain
-*x* ∈ \[0,1\] (which is indeed one of the most simple engineering
-problems we can find) the following input file is enough:
+$x\in[0,1]$ (which is indeed one of the most simple engineering problems
+we can find) the following input file is enough:
 
 ``` feenox
 PROBLEM thermal 1D               # tell FeenoX what we want to solve 
@@ -286,8 +286,8 @@ conditions and/or material properties.
 Another design-basis decision is that **similar problems ought to have
 similar inputs** (*rule of least surprise*). So in order to have a
 space-dependent conductivity, we only have to replace one line in the
-input above: instead of defining a scalar *k* we define a function
-of *x* (we also update the output to show the analytical solution as
+input above: instead of defining a scalar $k$ we define a function
+of $x$ (we also update the output to show the analytical solution as
 well):
 
 ``` feenox
@@ -310,7 +310,7 @@ The other main decision in FeenoX design is an **everything is an
 expression** design principle, meaning that any numerical input can be
 an algebraic expression (e.g. `T(1/2)` is the same as `T(0.5)`). If we
 want to have a temperature-dependent conductivity (which renders the
-problem non-linear) we can take advantage of the fact that *T*(*x*) is
+problem non-linear) we can take advantage of the fact that $T(x)$ is
 available not only as an argument to `PRINT` but also for the definition
 of algebraic functions:
 
@@ -336,23 +336,23 @@ attractor using FeenoX to compute it and [Gnuplot][] to draw it. Solve
 
 <div class="only-in-format texi plain gfm">
 
-*ẋ* = *σ* ⋅ (*y*−*x*)  
-*ẏ* = *x* ⋅ (*r*−*z*) − *y*  
-*ż* = *x**y* − *b**z*
+$\dot{x} = \sigma \cdot (y - x)$  
+$\dot{y} = x \cdot (r - z) - y$  
+$\dot{z} = x y - b z$
 
 </div>
 
-for 0 \< *t* \< 40 with initial conditions
+for $0 < t < 40$ with initial conditions
 
 <div class="only-in-format texi plain gfm">
 
-*x*(0) =  − 11  
-*y*(0) =  − 16  
-*z*(0) = 22.5
+$x(0) = -11$  
+$y(0) = -16$  
+$z(0) = 22.5$
 
 </div>
 
-and *σ* = 10, *r* = 28 and *b* = 8/3, which are the classical parameters
+and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
 seminal 1963 paper [Deterministic non-periodic flow][].
 
@@ -380,16 +380,16 @@ z_dot = x*y - b*z
 PRINT t x y z        # four-column plain-ASCII output
 ```
 
-<figure>
-<img src="doc/lorenz.svg" id="fig:lorenz-gnuplot" data-width_latex="75%"
-data-width_html="100%" data-width_texinfo="12cm"
-alt="Figure 1: The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
-<figcaption aria-hidden="true">Figure 1: The Lorenz attractor solved
-with FeenoX and drawn with Gnuplot</figcaption>
+<figure id="fig:lorenz-gnuplot">
+<img src="doc/lorenz.svg" data-width_latex="75%" data-width_html="100%"
+data-width_texinfo="12cm"
+alt="The Lorenz attractor solved with FeenoX and drawn with Gnuplot" />
+<figcaption>Figure 1: The Lorenz attractor solved with FeenoX and drawn
+with Gnuplot</figcaption>
 </figure>
 
 Indeed, when executing FeenoX with this input file, we get four ASCII
-columns (*t*, *x*, *y* and *z*) which we can then redirect to a file and
+columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and
 plot it with a standard tool such as [Gnuplot][3]. Note the importance
 of relying on plain ASCII text formats both for input and output, as
 recommended by the UNIX philosophy and the *rule of composition*: other
@@ -426,9 +426,9 @@ SOLVE_PROBLEM   # solve!
 PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
 ```
 
-The problem asks for the normal stress in the *y* direction
-*σ*<sub>*y*</sub> at point “D,” which is what FeenoX writes (and nothing
-else, *rule of economy*):
+The problem asks for the normal stress in the $y$ direction $\sigma_y$
+at point “D,” which is what FeenoX writes (and nothing else, *rule of
+economy*):
 
 ``` terminal
 $ feenox nafems-le10.fee 
@@ -439,32 +439,30 @@ $
 Also note that since there is only one material there is no need to do
 an explicit link between material properties and physical volumes in the
 mesh (*rule of simplicity*). And since the properties are uniform and
-isotropic, a single global scalar for *E* and a global single scalar
-for *ν* are enough.
+isotropic, a single global scalar for $E$ and a global single scalar
+for $\nu$ are enough.
 
-<figure>
-<img src="doc/nafems-le10-problem-input.svg"
-id="fig:nafems-le10-problem-input" data-width_html="100%"
+<figure id="fig:nafems-le10-problem-input">
+<img src="doc/nafems-le10-problem-input.svg" data-width_html="100%"
 data-width_latex="100%" data-width_texinfo="15cm"
-alt="Figure 2: The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
-<figcaption aria-hidden="true">Figure 2: The NAFEMS LE10 problem
-statement and the corresponding FeenoX input</figcaption>
+alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption>Figure 2: The NAFEMS LE10 problem statement and the
+corresponding FeenoX input</figcaption>
 </figure>
 
-<figure>
-<img src="doc/nafems-le10.png" id="fig:nafems-le10-sigmay"
-data-width_html="100%" data-width_latex="70%" data-width_texinfo="12cm"
-alt="Figure 3: Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
-<figcaption aria-hidden="true">Figure 3: Normal stress <span
+<figure id="fig:nafems-le10-sigmay">
+<img src="doc/nafems-le10.png" data-width_html="100%"
+data-width_latex="70%" data-width_texinfo="12cm"
+alt="Normal stress \sigma_y refined around point D over 5,000x-warped displacements for LE10 created with Paraview" />
+<figcaption>Figure 3: Normal stress <span
 class="math inline"><em>σ</em><sub><em>y</em></sub></span> refined
 around point <span class="math inline"><em>D</em></span> over
 5,000x-warped displacements for LE10 created with Paraview</figcaption>
 </figure>
 
 For the sake of visual completeness, post-processing data with the
-scalar distribution of *σ*<sub>*y*</sub> and the vector field of
-displacements \[*u*,*v*,*w*\] can be created by adding one line to the
-input file:
+scalar distribution of $\sigma_y$ and the vector field of displacements
+$[u,v,w]$ can be created by adding one line to the input file:
 
 ``` feenox
 WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
@@ -495,49 +493,48 @@ Please note the following two points about both cases above:
 
 Some basic rules are
 
--   FeenoX is just a **solver** working as a *transfer function* between
-    input and output files.
+- FeenoX is just a **solver** working as a *transfer function* between
+  input and output files.
 
-                                     +------------+
-         mesh (*.msh)  }             |            |             { terminal
-         data (*.dat)  } input ----> |   FeenoX   |----> output { data files
-         input (*.fee) }             |            |             { post (vtk/msh)
-                                     +------------+
+                                   +------------+
+       mesh (*.msh)  }             |            |             { terminal
+       data (*.dat)  } input ----> |   FeenoX   |----> output { data files
+       input (*.fee) }             |            |             { post (vtk/msh)
+                                   +------------+
 
-    Following the *rules of separation, parsimony and diversity*,
-    **there is no embedded graphical interface** but means of using
-    generic pre and post processing tools—in particular, [Gmsh][2] and
-    [Paraview][] respectively. See also [CAEplex][] for a web-based
-    interface.
+  Following the *rules of separation, parsimony and diversity*, **there
+  is no embedded graphical interface** but means of using generic pre
+  and post processing tools—in particular, [Gmsh][2] and [Paraview][]
+  respectively. See also [CAEplex][] for a web-based interface.
 
--   The input files should be [syntactically sugared][] so as to be as
-    self-describing as possible.
+- The input files should be [syntactically sugared][] so as to be as
+  self-describing as possible.
 
--   **Simple** problems ought to need **simple** input files.
+- **Simple** problems ought to need **simple** input files.
 
--   Similar problems ought to need similar input files.
+- Similar problems ought to need similar input files.
 
--   **Everything is an expression**. Whenever a number is expected, an
-    algebraic expression can be entered as well. Variables, vectors,
-    matrices and functions are supported. Here is how to replace the
-    boundary condition on the right side of the slab above with a
-    radiation condition:
+- **Everything is an expression**. Whenever a number is expected, an
+  algebraic expression can be entered as well. Variables, vectors,
+  matrices and functions are supported. Here is how to replace the
+  boundary condition on the right side of the slab above with a
+  radiation condition:
 
-    ``` feenox
-    sigma = 1       # non-dimensional stefan-boltzmann constant
-    e = 0.8         # emissivity 
-    Tinf=1          # non-dimensional reference temperature
-    BC right q=sigma*e*(Tinf^4-T(x)^4)
-    ```
+  ``` feenox
+  sigma = 1       # non-dimensional stefan-boltzmann constant
+  e = 0.8         # emissivity 
+  Tinf=1          # non-dimensional reference temperature
+  BC right q=sigma*e*(Tinf^4-T(x)^4)
+  ```
 
-    This “everything is an expression” principle directly allows the
-    application of the Method of Manufactured Solutions for code
-    verification.
+  This “everything is an expression” principle directly allows the
+  application of the Method of Manufactured Solutions for code
+  verification.
 
--   FeenoX should run natively in the cloud and be able to massively
-    scale in parallel. See the [Software Requirements Specification][]
-    and the [Software Development
-    Specification][Software Requirements Specification] for details.
+- FeenoX should run natively in the cloud and be able to massively scale
+  in parallel. See the [Software Requirements Specification][] and the
+  [Software Development
+  Specification][Software Requirements Specification] for details.
 
 Since it is free ([as in freedom][]) and open source, contributions to
 add features (and to fix bugs) are welcome. In particular, each kind of
@@ -584,34 +581,33 @@ below][] for details.
 | Source tarballs                     | <https://www.seamplex.com/feenox/dist/src>     |
 | Github repository                   | <https://github.com/seamplex/feenox/>          |
 
--   FeenoX is **cloud first**. It was designed to run on servers.
+- FeenoX is **cloud first**. It was designed to run on servers.
 
--   Be aware that FeenoX **does not have a GUI**. Read the
-    [documentation][5], especially the [description][] and the
-    [FAQs][6]. Ask for help on the [GitHub discussions page][].
+- Be aware that FeenoX **does not have a GUI**. Read the
+  [documentation][5], especially the [description][] and the [FAQs][6].
+  Ask for help on the [GitHub discussions page][].
 
--   Debian/Ubuntu packages are unofficial, i.e. they are not available
-    in `apt` repositories. They contain dynamically-linked binaries and
-    their dependencies are hard-coded for each Debian/Ubuntu release.
-    Make sure you get the right `.deb` for your release
-    (i.e. `bookworm`/`bullseye` for Debian, `kinetic`/`focal` for
-    Ubuntu).
+- Debian/Ubuntu packages are unofficial, i.e. they are not available in
+  `apt` repositories. They contain dynamically-linked binaries and their
+  dependencies are hard-coded for each Debian/Ubuntu release. Make sure
+  you get the right `.deb` for your release (i.e. `bookworm`/`bullseye`
+  for Debian, `kinetic`/`focal` for Ubuntu).
 
--   Generic GNU/Linux binaries are provided as statically-linked
-    executables for convenience. They do not support MUMPS nor MPI and
-    have only basic optimization flags. Please compile from source for
-    high-end applications. See [detailed compilatation instructions][].
+- Generic GNU/Linux binaries are provided as statically-linked
+  executables for convenience. They do not support MUMPS nor MPI and
+  have only basic optimization flags. Please compile from source for
+  high-end applications. See [detailed compilatation instructions][].
 
--   Try to avoid Windows as much as you can. The binaries are provided
-    as transitional packages for people that for some reason still use
-    such an outdated, anachronous, awful and invasive operating system.
-    They are compiled with [Cygwin][] and have no support whatsoever.
-    Really, really, **get rid of Windows ASAP**.
+- Try to avoid Windows as much as you can. The binaries are provided as
+  transitional packages for people that for some reason still use such
+  an outdated, anachronous, awful and invasive operating system. They
+  are compiled with [Cygwin][] and have no support whatsoever. Really,
+  really, **get rid of Windows ASAP**.
 
-    > “It is really worth any amount of time and effort to get away from
-    > Windows if you are doing computational science.”
-    >
-    > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
+  > “It is really worth any amount of time and effort to get away from
+  > Windows if you are doing computational science.”
+  >
+  > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [licensing below]: #licensing
@@ -712,21 +708,21 @@ by the type of problem they solve:
 5.  [Linear elasticity][]
 6.  [Modal analysis][]
 7.  [Neutron diffusion][]
-8.  [Neutron *S*<sub>*N*</sub>][]
+8.  [Neutron $S_N$][]
 
 > Each type of partial differential equation (i.e. from Laplace
 > downward) is implemented in a subdirectory within [`src/pde`][] of the
 > source tree. Feel free to…
 >
-> -   ask questions in the [Github discussion page][]
-> -   propose features, corrections, improvements, etc.
-> -   create a pull request for other PDEs. Candidates would be
->     -   fluid mechanics
->     -   thermal hydraulics
->     -   electromagnetism
->     -   non-linear elasticity
->     -   cell-level neutronics (i.e. method of characteristics,
->         collision probabilities, etc)
+> - ask questions in the [Github discussion page][]
+> - propose features, corrections, improvements, etc.
+> - create a pull request for other PDEs. Candidates would be
+>   - fluid mechanics
+>   - thermal hydraulics
+>   - electromagnetism
+>   - non-linear elasticity
+>   - cell-level neutronics (i.e. method of characteristics, collision
+>     probabilities, etc)
 
 All the files needed to run theses examples are available in the
 [examples][] directory of the [Git repository][] and any of the
@@ -740,7 +736,7 @@ All the files needed to run theses examples are available in the
   [Linear elasticity]: https://seamplex.com/feenox/examples/mechanical.html
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
-  [Neutron *S*<sub>*N*</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [Neutron $S_N$]: https://seamplex.com/feenox/examples/neutron_sn.html
   [`src/pde`]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [Github discussion page]: https://github.com/seamplex/feenox/discussions
   [examples]: https://github.com/seamplex/feenox/tree/main/examples
@@ -879,8 +875,8 @@ a template.
 
 Note that
 
--   It is mandatory to observe the [Code of Conduct][].
--   Each author keeps the copyright of the contributed code.
+- It is mandatory to observe the [Code of Conduct][].
+- Each author keeps the copyright of the contributed code.
 
   [compilation]: ./doc/compilation.md
   [programming]: ./doc/programming.md

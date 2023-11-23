@@ -1,35 +1,34 @@
 # FeenoX documentation index
 
--   [<span class="toc-section-number">1</span> FeenoX manual and
-    description][]
-    -   [<span class="toc-section-number">1.1</span> Design][]
-    -   [<span class="toc-section-number">1.2</span> Frequently Asked
-        Questions][]
-    -   [<span class="toc-section-number">1.3</span> UNIX manpage][]
--   [<span class="toc-section-number">2</span> Hands on][]
-    -   [<span class="toc-section-number">2.1</span> Quick examples][]
-    -   [<span class="toc-section-number">2.2</span> Tutorials][]
-        -   [<span class="toc-section-number">2.2.1</span>
-            Introduction][]
-        -   [<span class="toc-section-number">2.2.2</span> General
-            tutorials][]
--   [<span class="toc-section-number">3</span> Background and
-    generalities][]
-    -   [<span class="toc-section-number">3.1</span> Software
-        requirements specifications][]
-    -   [<span class="toc-section-number">3.2</span> Software design
-        specifications][]
-    -   [<span class="toc-section-number">3.3</span> History][]
--   [<span class="toc-section-number">4</span> Programming and
-    contributing][]
-    -   [<span class="toc-section-number">4.1</span> Asking questions &
-        reporting bugs][]
-    -   [<span class="toc-section-number">4.2</span> Compiling from
-        source][]
-    -   [<span class="toc-section-number">4.3</span> Contributing
-        guidelines][]
-    -   [<span class="toc-section-number">4.4</span> How FeenoX
-        documentation system works][]
+- [<span class="toc-section-number">1</span> FeenoX manual and
+  description][]
+  - [<span class="toc-section-number">1.1</span> Design][]
+  - [<span class="toc-section-number">1.2</span> Frequently Asked
+    Questions][]
+  - [<span class="toc-section-number">1.3</span> UNIX manpage][]
+- [<span class="toc-section-number">2</span> Hands on][]
+  - [<span class="toc-section-number">2.1</span> Quick examples][]
+  - [<span class="toc-section-number">2.2</span> Tutorials][]
+    - [<span class="toc-section-number">2.2.1</span> Introduction][]
+    - [<span class="toc-section-number">2.2.2</span> General
+      tutorials][]
+- [<span class="toc-section-number">3</span> Background and
+  generalities][]
+  - [<span class="toc-section-number">3.1</span> Software requirements
+    specifications][]
+  - [<span class="toc-section-number">3.2</span> Software design
+    specifications][]
+  - [<span class="toc-section-number">3.3</span> History][]
+- [<span class="toc-section-number">4</span> Programming and
+  contributing][]
+  - [<span class="toc-section-number">4.1</span> Asking questions &
+    reporting bugs][]
+  - [<span class="toc-section-number">4.2</span> Compiling from
+    source][]
+  - [<span class="toc-section-number">4.3</span> Contributing
+    guidelines][]
+  - [<span class="toc-section-number">4.4</span> How FeenoX
+    documentation system works][]
 
 > FeenoX documentation is released under the terms of the [GNU Free
 > Documentation License v1.3][], or any later version.
@@ -75,11 +74,11 @@ tutorial and reference.” Due to the formatting restrictions, the
 [Texinfo][] version contains only the description and not the full
 reference.
 
--   [HTML manual][]
--   [PDF manual][]
--   [Texinfo description][]
--   [HTML description][]
--   [PDF description][]
+- [HTML manual][]
+- [PDF manual][]
+- [Texinfo description][]
+- [HTML description][]
+- [PDF description][]
 
 The sources are in the [doc][] directory of the Git repository.
 
@@ -102,22 +101,22 @@ The sources are in the [doc][] directory of the Git repository.
     [software design specifications][] document that explains the design
     decisions and features included in FeenoX.
 
--   [Software Requirements specifications][1] [PDF][] (Fictitious RFQ)
--   [Software Design specifications][2] [PDF][3] (Imaginary FeenoX’s
-    offer)
--   [Mid-term PhD review presentation slides with the SRS/SDS
-    explanation in PDF][] (August 2021).
-    -   [Video recording of the presentation][] (Slides are in English
-        but audio is in Spanish).
-    -   Browse the repository with the sources of the examples in the
-        presentation [here][]
--   [A free and open source computational tool for solving
-    (nuclear-related) differential equations in the cloud][] (INAC/ENFIR
-    Congress, December 2021).
-    -   [Video recording of the presentation][4] (Turn on the CCs, I am
-        not a native English speaker).
-    -   Browse the repository with the sources of the examples in the
-        presentation [here][5]
+- [Software Requirements specifications][1] [PDF][] (Fictitious RFQ)
+- [Software Design specifications][2] [PDF][3] (Imaginary FeenoX’s
+  offer)
+- [Mid-term PhD review presentation slides with the SRS/SDS explanation
+  in PDF][] (August 2021).
+  - [Video recording of the presentation][] (Slides are in English but
+    audio is in Spanish).
+  - Browse the repository with the sources of the examples in the
+    presentation [here][]
+- [A free and open source computational tool for solving
+  (nuclear-related) differential equations in the cloud][] (INAC/ENFIR
+  Congress, December 2021).
+  - [Video recording of the presentation][4] (Turn on the CCs, I am not
+    a native English speaker).
+  - Browse the repository with the sources of the examples in the
+    presentation [here][5]
 
   [software requirements specifications]: ./srs.md
   [software design specifications]: ./sds.md
@@ -138,8 +137,8 @@ The sources are in the [doc][] directory of the Git repository.
 
 Check out FeenoX’s [Frequently Asked Questions][].
 
--   Ask yours on [GitHub Discussions][]
--   Check also the [GitHub Issues][]
+- Ask yours on [GitHub Discussions][]
+- Check also the [GitHub Issues][]
 
   [Frequently Asked Questions]: ./FAQ.md
   [GitHub Discussions]: https://github.com/seamplex/feenox/discussions/
@@ -163,19 +162,19 @@ Everything (except the case files) is included in the Git repository.
 [Annotated examples][] can be found in the [examples][] directory of the
 Github repository.
 
--   [Online annotated examples][Annotated examples]
--   [Github examples directory][examples]
+- [Online annotated examples][Annotated examples]
+- [Github examples directory][examples]
 
 These are simple and quick (but varied) cases. They are based on the
 August 2021 presentation:
 
--   [Recording (audio in Spanish, slides in English)][]
--   [Slides in PDF][]
--   [Markdown examples sources][]
+- [Recording (audio in Spanish, slides in English)][]
+- [Slides in PDF][]
+- [Markdown examples sources][]
 
 The regression tests can also be used as quick examples:
 
--   [Regression tests][]
+- [Regression tests][]
 
   [Annotated examples]: https://www.seamplex.com/feenox/examples
   [examples]: https://github.com/seamplex/feenox/tree/main/examples
@@ -232,17 +231,17 @@ See the [FeenoX history][].
 
 ## Asking questions & reporting bugs
 
--   Use [Github discussions][6] to ask for help,
--   Use the [Github issue tracker][] to report bugs.
+- Use [Github discussions][6] to ask for help,
+- Use the [Github issue tracker][] to report bugs.
 
   [6]: https://github.com/seamplex/feenox/discussions
   [Github issue tracker]: https://github.com/seamplex/feenox/issues
 
 ## Compiling from source
 
--   See the [Compilation guide][] for a full explanation and of the
-    steps above.
--   See the [Programming guide][] for more details.
+- See the [Compilation guide][] for a full explanation and of the steps
+  above.
+- See the [Programming guide][] for more details.
 
   [Compilation guide]: ./compilation.md
   [Programming guide]: ./programming.md

@@ -45,9 +45,25 @@ compilation.md
 
 See <https://www.seamplex.com/feenox/examples>
 
-# Tutorial
+```{.include shift-heading-level-by=1}
+../examples/examples.md
+```
+
+# Tutorials
 
 See <https://www.seamplex.com/feenox/tutorials>
+
+```{.include shift-heading-level-by=1}
+tutorials/intro.md
+```
+
+## General tutorials
+ 
+```{.include shift-heading-level-by=1}
+tutorials/general.md
+```
+
+
 
 # Description
 

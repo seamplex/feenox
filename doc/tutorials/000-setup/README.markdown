@@ -355,11 +355,15 @@ your friend there.
 To enable syntax highlighting copy the file [`fee.vim`][] into
 `~/.vim/syntax`.
 
-![FeenoX input file edited in Vim on Konsole][]
+<figure>
+<img src="highlighting-vim.png"
+alt="FeenoX input file edited in Vim on Konsole" />
+<figcaption aria-hidden="true">FeenoX input file edited in Vim on
+Konsole</figcaption>
+</figure>
 
   [Vim]: https://www.vim.org/
   [`fee.vim`]: https://raw.githubusercontent.com/seamplex/feenox/main/doc/fee.vim
-  [FeenoX input file edited in Vim on Konsole]: highlighting-vim.png
 
 ## Kate
 
@@ -369,11 +373,15 @@ recommended editor is [Kate][].
 To enable syntax highlighting copy the file [`feenox.xml`][] into
 `~/.local/share/katepart5/syntax/`.
 
-![FeenoX input file edited in Kate on Plasma][]
+<figure>
+<img src="highlighting-kate.png"
+alt="FeenoX input file edited in Kate on Plasma" />
+<figcaption aria-hidden="true">FeenoX input file edited in Kate on
+Plasma</figcaption>
+</figure>
 
   [Kate]: https://kate-editor.org/
   [`feenox.xml`]: https://raw.githubusercontent.com/seamplex/feenox/main/doc/feenox.xml
-  [FeenoX input file edited in Kate on Plasma]: highlighting-kate.png
 
 # Post-processors
 
