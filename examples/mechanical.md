@@ -81,7 +81,10 @@ SOLVE_PROBLEM   # solve!
 PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
 
 # write post-processing data for paraview
-WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
+# WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
+
+PRINTF_ALL "local = %.2f, total = %.2f, average = %.2f" mpi_memory_local() mpi_memory_global() mpi_memory_global()/mpi_size
+
 ```
 
 
@@ -134,8 +137,8 @@ SOLVE_PROBLEM
 # for post-processing in Paraview
 WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigmax sigmay sigmaz
 
-PRINTF "sigma_z(A) = %.2f MPa\n" sigmaz(1,0,0)/1e6
-PRINTF "wall time  = %.2f seconds\n" wall_time()^
+PRINTF "sigma_z(A) = %.2f MPa" sigmaz(1,0,0)/1e6
+PRINTF "wall time  = %.2f seconds" wall_time()
 ```
 
 

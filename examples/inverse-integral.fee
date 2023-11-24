@@ -1,0 +1,25 @@
+---
+category: daes
+intro: |
+  ## Cinética inversa
+
+  Ahora tomamos la salida $\phi(t)$ del caso anterior y resolvemos cinética inversa de dos maneras diferentes:
+
+   1. Con la fórmula integral de la literatura clásica
+...
+INCLUDE parameters.fee
+FUNCTION flux(t) FILE flux.dat
+
+# definimos una función de flujo que permite tiempos negativos
+flux_a = vec_flux_t[1]
+flux_b = vec_flux_t[vecsize(vec_flux)]
+phi(t) = if(t<flux_a, flux(flux_a), flux(t))
+
+# calculamos la reactividad con la fórmula integral
+VAR t'
+rho(t) := { Lambda * derivative(log(phi(t')),t',t) +
+  Beta * ( 1 - 1/phi(t) *
+   integral(phi(t-t') * sum((lambda[i]*beta[i]/Beta)*exp(-lambda[i]*t'), i, 1, nprec), t', 0, 1e4) ) }
+
+PRINT_FUNCTION rho MIN 0 MAX 50 STEP 0.1
+

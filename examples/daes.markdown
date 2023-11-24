@@ -8,6 +8,13 @@
     formulation with uniform power distribution][]
   - [<span class="toc-section-number">3.2</span> Arbitrary power
     distribution][]
+- [<span class="toc-section-number">4</span> Reactor point kinetics][]
+  - [<span class="toc-section-number">4.1</span> Cinética puntual
+    directa con reactividad vs. tiempo][]
+  - [<span class="toc-section-number">4.2</span> Cinética inversa][]
+  - [<span class="toc-section-number">4.3</span> Control de
+    inestabilidades de xenón][]
+  - [<span class="toc-section-number">4.4</span> Mapas de diseño][]
 
   [<span class="toc-section-number">1</span> Lorenz’ attractor—the one with the butterfly]:
     #lorenz-attractorthe-one-with-the-butterfly
@@ -17,6 +24,13 @@
     #original-clausse-lahey-formulation-with-uniform-power-distribution
   [<span class="toc-section-number">3.2</span> Arbitrary power distribution]:
     #arbitrary-power-distribution
+  [<span class="toc-section-number">4</span> Reactor point kinetics]: #reactor-point-kinetics
+  [<span class="toc-section-number">4.1</span> Cinética puntual directa con reactividad vs. tiempo]:
+    #cinética-puntual-directa-con-reactividad-vs.-tiempo
+  [<span class="toc-section-number">4.2</span> Cinética inversa]: #cinética-inversa
+  [<span class="toc-section-number">4.3</span> Control de inestabilidades de xenón]:
+    #control-de-inestabilidades-de-xenón
+  [<span class="toc-section-number">4.4</span> Mapas de diseño]: #mapas-de-diseño
 
 # Lorenz’ attractor—the one with the butterfly
 
@@ -867,3 +881,334 @@ class="math inline">Eu = 9.725</span>.</figcaption>
   [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase Flow Loop]:
     https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017
   [third system effect]: ../doc/sds.md#sec:architecture
+
+# Reactor point kinetics
+
+En esta sección extra ilustramos rápidamente las funcionalidades,
+aplicadas a las ecuaciones de cinética puntual de reactores. Todos los
+casos usan los siguientes parámetros cinéticos:
+
+``` feenox
+nprec = 6    # seis grupos de precursores
+VECTOR c[nprec]
+VECTOR lambda[nprec] DATA 0.0124   0.0305   0.111    0.301    1.14     3.01
+VECTOR beta[nprec]   DATA 0.000215 0.001424 0.001274 0.002568 0.000748 0.000273
+Beta = vecsum(beta)
+Lambda = 40e-6
+```
+
+## Cinética puntual directa con reactividad vs. tiempo
+
+Este primer ejemplo resuelve cinética puntual con una
+reactividad $\rho(t)$ dada por una “tabla”, es decir, una función de un
+único argumento (el tiempo $t$) definida por pares de puntos
+$[t,\rho(t)]$ e interpolada linealmente.
+
+``` feenox
+INCLUDE parameters.fee   # parámetros cinéticos
+PHASE_SPACE phi c rho    # espacio de fases
+end_time = 100           # tiempo final
+
+rho_0 = 0                # condiciones iniciales
+phi_0 = 1
+c_0[i] = phi_0 * beta[i]/(Lambda*lambda[i])
+
+# "tabla" de reactividad vs. tiempo en pcm
+FUNCTION react(t) DATA {   0    0 
+                           5    0
+                           10  10
+                           30  10
+                           35   0
+                           100  0   }
+
+# sistema de DAEs
+rho = 1e-5*react(t)
+phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+
+PRINT t phi rho    # salida: phi y rho vs. tiempo
+
+```
+
+``` terminal
+$ feenox reactivity-vs.time.fee > flux.dat
+$ pyxplot kinetics.ppl
+```
+
+<figure>
+<img src="reactivity-from-table.svg"
+alt="Flujo y reactividad directa" />
+<figcaption aria-hidden="true">Flujo y reactividad directa</figcaption>
+</figure>
+
+## Cinética inversa
+
+Ahora tomamos la salida $\phi(t)$ del caso anterior y resolvemos
+cinética inversa de dos maneras diferentes:
+
+1.  Con la fórmula integral de la literatura clásica
+
+``` feenox
+INCLUDE parameters.fee
+FUNCTION flux(t) FILE flux.dat
+
+# definimos una función de flujo que permite tiempos negativos
+flux_a = vec_flux_t[1]
+flux_b = vec_flux_t[vecsize(vec_flux)]
+phi(t) = if(t<flux_a, flux(flux_a), flux(t))
+
+# calculamos la reactividad con la fórmula integral
+VAR t'
+rho(t) := { Lambda * derivative(log(phi(t')),t',t) +
+  Beta * ( 1 - 1/phi(t) *
+   integral(phi(t-t') * sum((lambda[i]*beta[i]/Beta)*exp(-lambda[i]*t'), i, 1, nprec), t', 0, 1e4) ) }
+
+PRINT_FUNCTION rho MIN 0 MAX 50 STEP 0.1
+```
+
+``` terminal
+null
+```
+
+2.  Resolviendo el mismo sistema de DAEs pero leyendo $\phi(t)$ en lugar
+    de $\rho(t)$
+
+El caso 2 es “adaptivo” en el sentido de que dependiendo del error
+tolerado y de las derivadas temporales de las variables del espacio de
+las fases, el esfuerzo computacional se adapta automáticamente a través
+del paso de tiempo $\Delta t$ con el que se resuelve el sistema DAE. Por
+defecto, el método es Adams-Bashforth de orden variable (implementado
+por la biblioteca SUNDIALS).
+
+``` feenox
+INCLUDE parameters.fee
+PHASE_SPACE phi c rho
+
+end_time = 50
+dae_rtol = 1e-7
+
+rho_0 = 0
+phi_0 = 1
+c_0[i] = phi_0 * beta[i]/(Lambda*lambda[i])
+
+FUNCTION flux(t) FILE flux.dat
+
+phi = flux(t)
+phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+
+PRINT t phi rho
+```
+
+``` terminal
+null
+```
+
+<div id="fig-inverse" layout="[1]">
+
+<figure id="fig-inverse1">
+<img src="inverse.svg" alt="t \in [0,100]" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>t</em> ∈ [0,100]</span></figcaption>
+</figure>
+
+<figure id="fig-inverse2">
+<img src="inverse-zoom.svg" alt="t \in [9.75,10.25]" />
+<figcaption aria-hidden="true"><span
+class="math inline"><em>t</em> ∈ [9.75,10.25]</span></figcaption>
+</figure>
+
+Reactividad calculada mediante cinética inversa de dos maneras
+diferentes
+
+</div>
+
+## Control de inestabilidades de xenón
+
+Ahora introducimos un poco más de complejidad. A las ecuaciones de
+cinética puntual le agregamos cinética de xenón 135. Como el sistema
+resultante es inestable ante cambios de flujo, la reactividad es ahora
+una función de la posición de una barra de control ficticia cuya
+importancia está dada por una interpolación tipo Steffen de su posición
+adimensional $z$. Una lógica de control PI (con una banda muerta del
+0.3%) “mueve” dicha barra de control de forma tal de forzar al reactor a
+bajar la potencia del 100% al 80% en mil segundos, mantenerse durante
+tres mil segundos a esa potencia y volver al 100% en cinco mil:
+
+``` feenox
+INCLUDE parameters.fee
+
+FUNCTION setpoint(t) DATA {
+0     1
+1000  1
+2000  0.8
+5000  0.8
+10000 1
+20000 1 }
+
+end_time = vecmax(vec_setpoint_t)  # tiempo final = último tiempo de setpoint(t)
+max_dt = 1                         # no dejamos que dt aumente demasiado
+
+# importancia de la barra de control como función de la inserción
+FUNCTION rodworth(z) INTERPOLATION akima DATA {
+0     2.155529e+01*1e-5*10
+0.2   6.337352e+00*1e-5*10    
+0.4  -3.253021e+01*1e-5*10
+0.6  -7.418505e+01*1e-5*10   
+0.8  -1.103352e+02*1e-5*10   
+1    -1.285819e+02*1e-5*10  
+}
+
+# constantes para el xenón
+gammaX = 1.4563E10       # xenon-135 direct fission yield
+gammaI = 1.629235E11     # iodine-135 direction fission yield
+GammaX = -3.724869E-17   # xenon-135 reactivity coefficiente
+
+lambdaX = 2.09607E-05    # xenon-135 decay constant
+lambdaI = 2.83097E-05    # iodine-135 decay constant
+
+sigmaX = 2.203206E-04    # microscopic XS of neutron absorption for Xe-134
+
+PHASE_SPACE rho phi c I X
+INITIAL_CONDITIONS_MODE FROM_VARIABLES
+
+z_0 = 0.5                # estado estacionario
+phi_0 = 1
+c_0[i] = phi_0 * beta[i]/(Lambda*lambda[i])
+I_0 = gammaI*phi_0/lambdaI
+X_0 = (gammaX + gammaI)/(lambdaX + sigmaX*phi_0) * phi_0
+rho_bias_0 = -rodworth(z_0) - GammaX*X_0
+
+# --- DAEs ------------------------------
+rho = rho_bias + rodworth(z) + GammaX*X
+phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+
+I_dot = gammaI * phi - lambdaI * I
+X_dot = gammaX * phi + lambdaI * I - lambdaX * X - sigmaX * phi * X
+
+# --- sistema de control ----------------
+# movemos la barra de control si el error excede una banda muerta del 0.3%
+vrod = 1/500    # 1/500-avos de núcleo por segundo
+band = 3e-3
+error = phi - setpoint(t)
+z = z_0 + integral_dt(vrod*((error>(+band))-(error<(-band))))
+
+PRINT t phi z setpoint(t)
+```
+
+``` terminal
+null
+```
+
+<figure>
+<img src="xenon.svg"
+alt="Flujo y posición de la barra de control en un caso con xenón bajo control" />
+<figcaption aria-hidden="true">Flujo y posición de la barra de control
+en un caso con xenón bajo control</figcaption>
+</figure>
+
+## Mapas de diseño
+
+Finalizamos recuperando unos resultados derivados de mi tesis de
+maestría <https://doi.org/10.1016/j.nucengdes.2010.03.007>. Consiste en
+cinética puntual de un reactor de investigación con retroalimentación
+termohidráulica por temperatura del refrigerante y del combustible
+escrita como modelos de capacitancia concentrada[^1] cero-dimensionales.
+El estudio consiste en barrer paramétricamente el espacio de
+coeficientes de reactividad $[\alpha_c, \alpha_f]$, perturbar el estado
+del sistema dinámico ($\Delta T_f = 2~\text{ºC}$) y marcar con un color
+la potencia luego de un minuto para obtener mapas de estabilidad tipo
+Lyapunov.
+
+Para barrer el espacio de parámetros usamos series de números
+cuasi-aleatorios \[@halton\] de forma tal de poder realizar ejecuciones
+sucesivas que van llenando densamente dicho espacio como ilustramos en
+la \[@fig-map\]:
+
+``` bash
+#!/bin/bash
+
+while read ac af; do
+#  echo $ac $af
+ feenox point-nucengdes.fee ${ac} ${af} | tee -a point.dat
+done < rhalton
+```
+
+``` feenox
+nprec = 6    # six precursor groups
+VECTOR c[nprec]
+VECTOR lambda[nprec] DATA 1.2400E-02 3.0500E-02 1.1100E-01 3.0100E-01 1.1400E+00 3.0100E+00 
+VECTOR beta[nprec]   DATA 2.4090e-04 1.5987E-03 1.4308E-03 2.8835E-03 8.3950E-04 3.0660E-04
+Beta = vecsum(beta)
+Lambda = 1.76e-4
+
+IF in_static
+ alpha_T_fuel = 100e-5*(qrng2d_reversehalton(1,$1)-0.5)
+ alpha_T_cool = 100e-5*(qrng2d_reversehalton(2,$1)-0.5)
+
+ Delta_T_cool = 2
+ Delta_T_fuel = 0
+
+ P_star = 18.8e6       # watts
+ T_in = 37             # grados C 
+ hA_core = 1.17e6      # watt/grado
+ mc_fuel = 47.7e3      # joule/grado
+ mc_cool = 147e3       # joule/grado
+ mflow_cool = 520      # kg/seg
+ c_cool = 4.18e3 * 147e3/mc_cool       # joule/kg
+ENDIF
+
+PHASE_SPACE phi c T_cool T_fuel rho
+end_time = 60
+dae_rtol = 1e-7
+
+rho_0 = 0
+phi_0 = 1
+c_0[i] = phi_0 * beta(i)/(Lambda*lambda(i))
+
+T_cool_star = 1/(2*mflow_cool*c_cool) * (P_star+2*mflow_cool*c_cool*T_in)
+T_fuel_star = 1/(hA_core) * (P_star + hA_core*T_cool_star)
+
+T_cool_0 = T_cool_star + Delta_T_cool
+T_fuel_0 = T_fuel_star + Delta_T_fuel
+INITIAL_CONDITIONS_MODE FROM_VARIABLES
+
+rho = 0
+phi_dot = (rho + alpha_T_fuel*(T_fuel-T_fuel_star) + alpha_T_cool*(T_cool-T_cool_star) - Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+T_fuel_dot = (1.0/(mc_fuel))*(P_star*phi - hA_core*(T_fuel-T_cool))
+T_cool_dot = (1.0/(mc_cool))*(hA_core*(T_fuel-T_cool) - 2*mflow_cool*c_cool*(T_cool-T_in))
+
+done = done | (phi > 4)
+
+IF done
+ PRINT alpha_T_fuel alpha_T_cool phi
+ENDIF
+```
+
+``` terminal
+$ ./point.sh 0 2048
+$ ./point.sh 2048 4096
+$
+```
+
+::: ![Estabilidad de Lyapunov utilizando series de números
+pseudo-aleatorios que van “rellenando” incremental y densamente el
+espacio de parámetros.][]
+
+<figure>
+<img src="figs-ned.png"
+alt="Figuras originales de la referencia [@stability-nucengdes]" />
+<figcaption aria-hidden="true">Figuras originales de la referencia <span
+class="citation"
+data-cites="stability-nucengdes">[@stability-nucengdes]</span></figcaption>
+</figure>
+
+Mapas de estabilidad de cinética puntual con realimentación
+termohidráulica :::
+
+[^1]: Del inglés <span lang="en-US">*lumped capacitance*</span>.
+
+  [Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van “rellenando” incremental y densamente el espacio de parámetros.]:
+    map.svg

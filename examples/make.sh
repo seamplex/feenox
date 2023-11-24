@@ -48,8 +48,13 @@ for i in hello          \
          cube-orthotropic-expansion \
          veeder                     \
          mechanical-square-temperature \
-         two-cubes-thermal \
+         two-cubes-thermal    \
          two-cubes-mechanical \
+         reactivity-from-table \
+         inverse-integral      \
+         inverse-dae           \
+         xenon                 \
+         point                 \
   ; do
   in=${i}.fee
   out=$(grep category ${in} | cut -d: -f2 | xargs).md
@@ -86,7 +91,7 @@ rm -f examples.md
 for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn; do
   echo "- $(yq -r .title ${i}.yaml)" >> examples.md
   # shift-heading-level does not work
-  pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed s/\(\#/\(${i}.md\#/ | sed 's/- /  - /'  >> examples.md
+  pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed s!\(\#!\(https://seamplex.com/feenox/examples/${i}.html\#! | sed 's/- /  - /'  >> examples.md
 #   ../doc/md2.sh --pdf  ${i}.md
   ../doc/md2.sh --gfm  ${i}.md
   ../doc/md2.sh --html ${i}.md

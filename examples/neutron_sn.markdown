@@ -132,12 +132,12 @@ INTEGRATE phi1 OVER llq RESULT lower_left_quadrant
 INTEGRATE phi1 OVER lrq RESULT lower_right_quadrant
 INTEGRATE phi1 OVER urq RESULT upper_right_quadrant
 
-PRINTF "LLQ = %.3e (ref 1.676e+0)\n" lower_left_quadrant/(5*5)
-PRINTF "LRQ = %.3e (ref 4.159e-2)\n" lower_right_quadrant/(5*5)
-PRINTF "URQ = %.3e (ref 1.992e-3)\n" upper_right_quadrant/(5*5)
+PRINTF "LLQ = %.3e (ref 1.676e+0)" lower_left_quadrant/(5*5)
+PRINTF "LRQ = %.3e (ref 4.159e-2)" lower_right_quadrant/(5*5)
+PRINTF "URQ = %.3e (ref 1.992e-3)" upper_right_quadrant/(5*5)
 
 WRITE_RESULTS
-PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb" total_dofs memory()
 ```
 
 ``` terminal
@@ -213,7 +213,7 @@ profile9(y) = phi1(9.84375,y)
 PRINT_FUNCTION profile5 profile7 profile9 MIN 0 MAX 10 NSTEPS 100 FILE $0-$1.dat
 
 WRITE_RESULTS
-PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb\n" total_dofs memory()
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb" total_dofs memory()
 ```
 
 ``` terminal
@@ -245,107 +245,107 @@ $
 ```
 
 <figure>
-<img src="azmy-4-01.png" alt="\psi_{1,1} for S_4" />
+<img src="azmy-4-01.png" alt="\psi_{1} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>1, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>1</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-02.png" alt="\psi_{2,1} for S_4" />
+<img src="azmy-4-02.png" alt="\psi_{2} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>2, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>2</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-03.png" alt="\psi_{3,1} for S_4" />
+<img src="azmy-4-03.png" alt="\psi_{3} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>3, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>3</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-04.png" alt="\psi_{4,1} for S_4" />
+<img src="azmy-4-04.png" alt="\psi_{4} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>4, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>4</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-05.png" alt="\psi_{5,1} for S_4" />
+<img src="azmy-4-05.png" alt="\psi_{5} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>5, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>5</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-06.png" alt="\psi_{6,1} for S_4" />
+<img src="azmy-4-06.png" alt="\psi_{6} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>6, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>6</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-07.png" alt="\psi_{7,1} for S_4" />
+<img src="azmy-4-07.png" alt="\psi_{7} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>7, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>7</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-08.png" alt="\psi_{8,1} for S_4" />
+<img src="azmy-4-08.png" alt="\psi_{8} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>8, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>8</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-09.png" alt="\psi_{9,1} for S_4" />
+<img src="azmy-4-09.png" alt="\psi_{9} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>9, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>9</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-10.png" alt="\psi_{10,1} for S_4" />
+<img src="azmy-4-10.png" alt="\psi_{10} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>10, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>10</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-11.png" alt="\psi_{11,1} for S_4" />
+<img src="azmy-4-11.png" alt="\psi_{11} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>11, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>11</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-12.png" alt="\psi_{12,1} for S_4" />
+<img src="azmy-4-12.png" alt="\psi_{12} for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ψ</em><sub>12, 1</sub></span> for S<span
+class="math inline"><em>ψ</em><sub>12</sub></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-4-00.png" alt="\phi_{1} for S_4" />
+<img src="azmy-4-00.png" alt="\phi for S_4" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ϕ</em><sub>1</sub></span> for S<span
+class="math inline"><em>ϕ</em></span> for S<span
 class="math inline"><sub>4</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-6-00.png" alt="\phi_{1} for S_6" />
+<img src="azmy-6-00.png" alt="\phi for S_6" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ϕ</em><sub>1</sub></span> for S<span
+class="math inline"><em>ϕ</em></span> for S<span
 class="math inline"><sub>6</sub></span></figcaption>
 </figure>
 
 <figure>
-<img src="azmy-8-00.png" alt="\phi_{1} for S_8" />
+<img src="azmy-8-00.png" alt="\phi for S_8" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>ϕ</em><sub>1</sub></span> for S<span
+class="math inline"><em>ϕ</em></span> for S<span
 class="math inline"><sub>8</sub></span></figcaption>
 </figure>
 
@@ -426,7 +426,7 @@ profile9(x) = phi1(x'(8.84375,x), y'(9.84375,x))
 PRINT_FUNCTION profile5 profile7 profile9 MIN -10 MAX 10 NSTEPS 1000 FILE $0-$1-$2-$3.dat
 
 # WRITE_RESULTS FORMAT vtk
-PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb\n" total_dofs memory()
+PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb" total_dofs memory()
 # FILE res MODE "a" PATH azmy-resources.dat 
 # PRINT total_dofs wall_time() memory() $1 $2 $3 FILE res
 ```

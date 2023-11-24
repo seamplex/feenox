@@ -1,7 +1,15 @@
 # Current
 
  * under development
- * `PRINTF` instruction
+ * two-dimensional quasi-random number sequences
+ * non-zero Neumann BCs in neutron diffusion
+ * `LABEL` in now an alias for `PHYSICAL_GROUP` in `MATERIAL`
+ * explicit fission spectrum
+ * `EIGEN_DIRICHLET_ZERO` keyword
+ * special variable `mumps_ictnl_14` to control MUMPS' over-relaxation factor
+ * improved MPI execution
+ * verification with MMS 
+ * `PRINTF` and `PRINTF_ALL` instructions
  * improved memory handling when building elemental objects
  * `PREALLOCATE` and `ALLOW_NEW_NONZEROS` options
  * choose either to fail or allow missed `BC`s

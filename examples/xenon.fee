@@ -1,0 +1,72 @@
+---
+category: daes
+intro: |
+  ## Control de inestabilidades de xenón
+
+  Ahora introducimos un poco más de complejidad.
+  A las ecuaciones de cinética puntual le agregamos cinética de xenón 135. Como el sistema resultante es inestable ante cambios de flujo, la reactividad es ahora una función de la posición de una barra de control ficticia cuya importancia está dada por una interpolación tipo Steffen de su posición adimensional $z$.
+  Una lógica de control PI (con una banda muerta del 0.3%) "mueve" dicha barra de control de forma tal de forzar al reactor a bajar la potencia del 100% al 80% en mil segundos, mantenerse durante tres mil segundos a esa potencia y volver al 100% en cinco mil:
+...
+INCLUDE parameters.fee
+
+FUNCTION setpoint(t) DATA {
+0     1
+1000  1
+2000  0.8
+5000  0.8
+10000 1
+20000 1 }
+
+end_time = vecmax(vec_setpoint_t)  # tiempo final = último tiempo de setpoint(t)
+max_dt = 1                         # no dejamos que dt aumente demasiado
+
+# importancia de la barra de control como función de la inserción
+FUNCTION rodworth(z) INTERPOLATION akima DATA {
+0     2.155529e+01*1e-5*10
+0.2   6.337352e+00*1e-5*10    
+0.4  -3.253021e+01*1e-5*10
+0.6  -7.418505e+01*1e-5*10   
+0.8  -1.103352e+02*1e-5*10   
+1    -1.285819e+02*1e-5*10  
+}
+
+# constantes para el xenón
+gammaX = 1.4563E10       # xenon-135 direct fission yield
+gammaI = 1.629235E11     # iodine-135 direction fission yield
+GammaX = -3.724869E-17   # xenon-135 reactivity coefficiente
+
+lambdaX = 2.09607E-05    # xenon-135 decay constant
+lambdaI = 2.83097E-05    # iodine-135 decay constant
+
+sigmaX = 2.203206E-04    # microscopic XS of neutron absorption for Xe-134
+
+PHASE_SPACE rho phi c I X
+INITIAL_CONDITIONS_MODE FROM_VARIABLES
+
+z_0 = 0.5                # estado estacionario
+phi_0 = 1
+c_0[i] = phi_0 * beta[i]/(Lambda*lambda[i])
+I_0 = gammaI*phi_0/lambdaI
+X_0 = (gammaX + gammaI)/(lambdaX + sigmaX*phi_0) * phi_0
+rho_bias_0 = -rodworth(z_0) - GammaX*X_0
+
+# --- DAEs ------------------------------
+rho = rho_bias + rodworth(z) + GammaX*X
+phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
+c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
+
+I_dot = gammaI * phi - lambdaI * I
+X_dot = gammaX * phi + lambdaI * I - lambdaX * X - sigmaX * phi * X
+
+# --- sistema de control ----------------
+# movemos la barra de control si el error excede una banda muerta del 0.3%
+vrod = 1/500    # 1/500-avos de núcleo por segundo
+band = 3e-3
+error = phi - setpoint(t)
+z = z_0 + integral_dt(vrod*((error>(+band))-(error<(-band))))
+
+PRINT t phi z setpoint(t)
+---
+figures: |
+  ![Flujo y posición de la barra de control en un caso con xenón bajo control](xenon.svg)
+...

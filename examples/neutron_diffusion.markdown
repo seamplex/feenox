@@ -264,8 +264,8 @@ reactor, b — Spherical reactor</p></figcaption>
 </figure>
 
 But what happens “in the middle”? That is to say, how does
-$k_\text{eff}$ changes when we morph the cube into a sphere? Enter Gmsh
-& Feenox.
+$k_\text{eff}$ change when we morph the cube into a sphere? Enter Gmsh &
+Feenox.
 
 <figure id="fig:cube-morph-sphere" class="subfigures">
 <p><img src="cubesphere-25.png" style="width:33.0%" alt="a" /> <img
@@ -433,13 +433,13 @@ $$
 We can then compare the numerical $k_\text{eff}$ computed using…
 
 1.  a non-uniform grid with $n+1$ nodes such that there is a node
-    exactly at $x=b$.
+    exactly at the interface $x=a$.
 2.  an uniform grid (mimicking a neutronic code that cannot handle case
     i.) with $n$ uniformly-spaced elements. The element that contains
     point $x=b$ is assigned to a pseudo material $AB$ that linearly
     interpolates the macroscopic cross sections according to where in
     the element the point $x=b$ lies. That is to say, if the element
-    width is 10 and $b=52$ then this $AB$ material will be 20% of
+    width is 10 and $a=52$ then this $AB$ material will be 20% of
     material $A$ and 80% of material $B$.
 
 > The objective of this example is to show that case i. will

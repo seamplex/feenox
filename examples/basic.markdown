@@ -185,17 +185,17 @@ are equally good (or bad)?
 present_value(n, d, r) = sum((1-d)/n * (1/(1+r))^(i-1), i, 1, n)
 r0 = root(present_value(12,0,r) - present_value(3,0.3,r), r, 0, 0.2)
 
-PRINTF "the tipping monthly inflation is %g (that means %.1f%% per month and %.1f%% per year)\n" r0 100*r0 100*(1+r0)^12
+PRINTF "the tipping monthly inflation is %g (that means %.1f%% per month and %.1f%% per year)" r0 100*r0 100*(1+r0)^12
 
 PRINT
 
-PRINTF "with 12 payments no discount with r = %g you pay %.3f\n"  r0+0.01 present_value(12,0,r0+0.01)
-PRINTF "with  3 payments and 30%% off with r = %g you pay %.3f\n" r0+0.01 present_value(3,0.3,r0+0.01)
+PRINTF "with 12 payments no discount with r = %g you pay %.3f"  r0+0.01 present_value(12,0,r0+0.01)
+PRINTF "with  3 payments and 30%% off with r = %g you pay %.3f" r0+0.01 present_value(3,0.3,r0+0.01)
 
 PRINT
 
-PRINTF "with 12 payments no discount with r = %g you pay %.3f\n"  r0-0.01 present_value(12,0,r0-0.01)
-PRINTF "with  3 payments and 30%% off with r = %g you pay %.3f\n" r0-0.01 present_value(3,0.3,r0-0.01)
+PRINTF "with 12 payments no discount with r = %g you pay %.3f"  r0-0.01 present_value(12,0,r0-0.01)
+PRINTF "with  3 payments and 30%% off with r = %g you pay %.3f" r0-0.01 present_value(3,0.3,r0-0.01)
 ```
 
 ``` terminal
