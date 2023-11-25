@@ -1,0 +1,21 @@
+# ask to solve a thermal problem
+PROBLEM thermal 1d
+
+# read the mesh
+READ_MESH slab.msh
+
+# conductivity: given as a the k variable means uniform single-material
+k = 1
+
+# boundary conditions: T=something means "fixed temperature"
+BC left  T=0
+BC right T=1
+
+SOLVE_PROBLEM
+
+# the solution is available as the function T(x), which we can
+# i. print its definition values
+PRINT_FUNCTION T
+
+#  ii. evaluate it at any arbitrary location `x`
+PRINT "\# the temperature at x=2/3 is" T(2/3) 

@@ -1,0 +1,11 @@
+PROBLEM thermal 1D
+READ_MESH slab.msh
+
+k = 50
+BC left q=1200
+BC right q=5.670374419e-8*0.8*((20+273.15)^4-(T(x)+273.15)^4)
+T_guess(x) = 20
+SOLVE_PROBLEM
+
+PRINT T(0)
+PRINT T(1)
