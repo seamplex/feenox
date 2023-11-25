@@ -9,6 +9,9 @@ number-sections: true
 toc: true
 prev_link: ../110-tensile-test
 prev_title: \#1 Tensile test
+next_link: ../320-thermal
+next_title: \#3 Heat conduction
+
 ...
 
 

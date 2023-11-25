@@ -37,7 +37,7 @@ general.md
 # Physics tutorials
  
  1. The Laplace equation
- 2. Heat conduction
+ 2. [Heat conduction](320-thermal)
  3. Linear elasticity
  4. Modal analysis
  5. Thermo-mechanical analysis

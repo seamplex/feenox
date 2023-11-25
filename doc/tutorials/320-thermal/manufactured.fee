@@ -1,0 +1,20 @@
+PROBLEM thermal 2D
+READ_MESH square.msh
+
+T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
+k(x,y) = 1 + x - 0.5*y
+
+VAR x' x'' y' y''
+q(x,y) = -(derivative(k(x',y) * derivative(T_manufactured(x'',y), x'', x'), x', x) + \
+           derivative(k(x,y') * derivative(T_manufactured(x,y''), y'', y'), y', y))
+
+BC left   T=T_manufactured(x,y)
+BC top    T=T_manufactured(x,y)
+BC bottom q=+(-k(x,y)*derivative(T_manufactured(x,y'),y',y))
+BC right  q=-(-k(x,y)*derivative(T_manufactured(x',y),x',x))
+
+SOLVE_PROBLEM
+
+WRITE_MESH manufactured.vtk T T_manufactured T(x,y)-T_manufactured(x,y)
+INTEGRATE (T(x,y)-T_manufactured(x,y))^2 RESULT e2
+PRINT e2
