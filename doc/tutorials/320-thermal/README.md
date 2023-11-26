@@ -50,11 +50,11 @@ Here you will learn how to solve the heat conduction equation with FeenoX in all
  
 # Linear steady-state problems
 
-In this section we are going to ask FeenoX to compute a temperature distribution $T(\vec{x})$ that satisfies 
+In this section we are going to ask FeenoX to compute a temperature distribution $T(\vec{x})$ that satisfies the linear heat conduction equation
 
 $$
 - \text{div} \Big[ k(\vec{x}) \cdot \text{grad} \left[ T(\vec{x}) \right] \Big] = q(\vec{x})
-$$
+$$ {#eq:heat}
 
 along with proper boundary conditions.
 
@@ -163,10 +163,18 @@ These problems need at least one fixed-temperature (a.k.a. Dirichlet) condition.
 
 # Non-linear state-state problems
 
-If the material properties or the volumetric heat source depends on the solution $T(\vec{x})$, or the boundary conditions depend non-linearly on $T(\vec{x})$ then the problem is non linear. FeenoX's parser can detect these dependencies so it will use a non-linear solver automatically. That is to say, there is no need for the user to tell the solver which kind of problem it needs to solve---which is reasonable. Why would the user have to tell the solver?
+If in the heat @eq:heat above the thermal conductivity $k$ or the volumetric heat source $q$ depends on the solution $T(\vec{x})$, or the boundary conditions depend non-linearly on $T(\vec{x})$ then the problem is non linear. FeenoX's parser can detect these dependencies so it will use a non-linear solver automatically. That is to say, there is no need for the user to tell the solver which kind of problem it needs to solve---which is reasonable. Why would the user have to tell the solver?
+
+
 
 As we all know, solving a non-linear system of equations is far more complex than solving linear problems.
-Even more, the most-widely used non-linear scheme, namely the Newton-Raphson method which is the basis of PETSc's SNES framework, involved repeatedly solving a linear system starting from an initial guess. The matrix associated with these linear solves (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed the jacobian is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
+Even more, the most-widely scheme used to solve the non-linear equation $\vec{F}(\vec{u})=0$,namely the Newton-Raphson method which is the basis of [PETSc's SNES framework](https://petsc.org/release/manual/snes/), involves repeatedly solving a linear system starting from an initial guess $\vec{u}_0$:
+
+ 1. Solve $J(\vec{u}_k) \cdot \Delta \vec{u}_k = -\vec{F}(\vec{u}_k)$
+ 2. Update $\vec{u}_{k+1} \leftarrow \vec{u}_{k} + \Delta \vec{u}_{k}$
+
+
+The matrix $J = \vec{F}^{\prime}$ associated with these linear solves (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed $J(\vec{u})$ is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
 
 
 ## Temperature-dependent heat flux: radiation
@@ -174,10 +182,11 @@ Even more, the most-widely used non-linear scheme, namely the Newton-Raphson met
 One way of introducing a non-linearity is by having a prescribed heat-flux boundary condition to depend on the temperature in a non-linear way.
 A radiation boundary condition is exactly this because the heat flux depends on $T^4(\vec{x})$.
 To illustrate this concept, let us consider the one-dimensional slab $x \in [0,1]$ with uniform conductivity equal to 50.
-At $x=0$ (`left`) we set a prescribed heat flux equal to 1200 W/m$^2$.
-At $x=1$ (`right`) we set a radiation boundary condition with an emissivity $e$ of 0.8 and an absolute reference temperature of 293.15 K. 
 
-This problem, even though it is non-linear, has an analytical solution: a linear interpolation between the temperature at $x=1$ is
+ * At $x=0$ (`left`) we set a prescribed heat flux equal to 1200 W/m$^2$.
+ * At $x=1$ (`right`) we set a radiation boundary condition with an emissivity $e$ of 0.8 and an absolute reference temperature of 293.15 K. 
+
+This problem, even though it is non-linear, has an analytical solution: a linear interpolation between the temperature at $x=1$ which is
 
 $$
 T(1) = \left( \frac{1200}{\sigma \cdot e} + T_\text{ref}^4\right)^{\frac{1}{4}}
@@ -228,7 +237,7 @@ If we wanted to get the temperature in Celsius, we could have done:
 >
 > 1. Rewrite the radiation boundary condition as a convection condition. Hint: note that $T^4 - T_\text{ref}^4$ is a difference of squares.
 > Look for `radiation-as-convection.fee` in FeenoX's `tests` directory for the answer.
-> 2. Explain why the solver converges even though there are no prescribed temperature conditions.
+> 2. Explain why the solver converges even though there are no prescribed temperature conditions. Hint: think it as a convection condition.
 
 ## Temperature-dependent conductivity
 
@@ -245,12 +254,12 @@ Consider a pellet of uranium dioxide as the ones used inside the fuel elements o
 According to ["Thermophysical Properties of Materials For Nuclear Engineering"](https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/), the thermal conductivity of UO$_2$ can be approximated by
 
 $$
-k(\tau) [ \text{W} \cdot \text{m}^{-1} \cdot \text{K}^{-1} ] = \frac{100}{7.5408· + 17.692 \cdot \tau + 3.614 \tau^2} + \frac{6400}{t^{5/2}} \cdot \exp \left( \frac{-16.35}{\tau} \right)
+k(\tau) [ \text{W} \cdot \text{m}^{-1} \cdot \text{K}^{-1} ] = \frac{100}{7.5408 + 17.692 \cdot \tau + 3.614 \tau^2} + \frac{6400}{t^{5/2}} \cdot \exp \left( \frac{-16.35}{\tau} \right)
 $$
 where $\tau = T [ \text{K} ] / 1000$.
 
 How do we tell FeenoX to use this correlation?
-Easy: we define a special function of space `k(x,y,z)` that uses to this correlation with `T(x,y,z)` as the argument.
+Easy: define a special function of space `k(x,y,z)` that uses to this correlation with `T(x,y,z)` as the argument.
 If we want `T` in Kelvin:
 
 ```feenox
@@ -286,8 +295,14 @@ Two points to take into account:
 
     If we tried to define `tau(T)` before `PROBLEM`, then FeenoX would fail when trying to allocate space for the `thermal` problem solution as there would already be defined a symbol `T` for the argument of `tau`.
    
- 2. When giving a non-uniform conductivity as a special function, this function has to be a function of space `k(x,y,z)`. The dependence on temperature is introduced by using the solution `T` evaluated at point `(x,y,z)`. That is why we defined the correlation as a function of a single variable and then defined the conductivity as the correlation evaluated at `T(x,y,z)`.
+ 2. When giving a non-uniform conductivity as a special function, this function has to be a function of space `k(x,y,z)`. The dependence on temperature is introduced by using the solution `T` evaluated at point `(x,y,z)`. That is why we defined the correlation as a function of a single variable and then defined the conductivity as the correlation evaluated at `T(x,y,z)`. But if we used the `MATERIALS` keyword, we could have directly written the whole expression:
+ 
+    ```feenox
+    MATERIAL uo2 k=100/(7.5408 + 17.692*tau(T(x,y,z)) + 3.614*tau(T(x,y,z))^2) + 6400/(tau(T(x,y,z))^(5/2))*exp(-16.35/tau(T(x,y,z)))
+    ```
 
+ 
+ 
 Other than this, we are ready to solve for the temperature distribution in a UO$_2$ pellet with a uniform power source (we will refine the power source and make it more interesting later on).
 The geometry is half a fuel pellet with 
 
@@ -346,9 +361,11 @@ It depends on...
  3. The spatial location $\vec{x}$ inside the pellet: points near the periphery of the pellet now dissipate more power than those located in the bulk because they "have access" to more moderated neutrons coming from the outside.
  4. The temperature $T(\vec{x})$: hot nuclei are less likely to fission.
 
-along with other nuclear-related stuff such as fuel burnup, concentration of poisons, control systems, etc.
+along with other nuclear-related stuff such as fuel burn-up, concentration of poisons, control systems, etc.
 
-Anyway, let us model a power source by depending both on the space $\vec{x}$ and 
+Anyway, this is a tutorial about FeenoX capabilities. Our goal here is to show what FeenoX can do and how to ask it to to such things.
+
+ that let us model a power source by depending both on the space $\vec{x}$ and 
  
 [Le Chatelier's principle](https://en.wikipedia.org/wiki/Le_Chatelier's_principle)
 
