@@ -1,0 +1,23 @@
+PROBLEM thermal
+READ_MESH pellet.msh SCALE 1e-3  # mesh is in mm, we want it in meters so we scale it
+ 
+# T is in Celsius, T' is in Kelvin
+VAR T'
+tau(T') = (T'+273.15)/1000 
+cond(T') = 100/(7.5408 + 17.692*tau(T') + 3.614*tau(T')^2) + 6400/(tau(T')^(5/2))*exp(-16.35/tau(T'))
+
+# k is in W/(m K)
+k(x,y,z) = cond(T(x,y,z))
+
+# q is in W / m^3 = 300 W/cm * 100 cm/m / area
+q = 300 * 100 / (pi*(4e-3)^2)
+
+BC symmetry q=0
+BC external T=420
+BC gap      h=100  Tref=400
+
+T_guess(x,y,z) = 800
+SOLVE_PROBLEM
+PRINT T_max
+
+WRITE_RESULTS   # default is .msh format
