@@ -18,6 +18,9 @@ gmsh -v 0 -3 ${dir}/pellet.geo || exit $?
 answerzero pellet-linear.fee 5e-2
 exitifwrong $?
 
+answerzero1 pellet-linear.fee --linear 5e-2
+exitifwrong $?
+
 answerzero pellet-linear-guess.fee 5e-2
 exitifwrong $?
 
@@ -33,6 +36,13 @@ answerzero pellet-nonlinear-guess.fee 12
 exitifwrong $?
 
 answerzero pellet-nonlinear-q.fee 12
+exitifwrong $?
+
+# tests for linear
+answerzero pellet-nonlinear-linear-keyword.fee 5e-2
+exitifwrong $?
+
+answerzero1 pellet-nonlinear-linear-option.fee --linear 5e-2
 exitifwrong $?
 
 

@@ -1,0 +1,16 @@
+PROBLEM thermal LINEAR
+READ_MESH pellet.msh
+
+VAR T'
+tau(T') = (T'+273.15)/1000 
+cond(T') = 100/(7.5408 + 17.692*tau(T') + 3.614*tau(T')^2) + 6400/(tau(T')^(5/2))*exp(-16.35/tau(T'))
+
+k(x,y,z) = cond(T(x,y,z))
+r = 4e-3
+q = 300 * 100 / (pi*r^2)
+
+BC symmetry q=0
+BC external T=420
+
+SOLVE_PROBLEM
+PRINT %.0f T_max-1115+393
