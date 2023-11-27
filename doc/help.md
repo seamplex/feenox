@@ -27,16 +27,6 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 :    output a document with information about the supported element types
 
 
-`--progress`
-
-:    print ASCII progress bars when solving PDEs
-
-
-`--mumps`
-
-:    ask PETSc to use the direct linear solver MUMPS
-
-
 `--linear`
 
 :    force FeenoX to solve the PDE problem as linear
@@ -45,6 +35,16 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 `--non-linear`
 
 :    force FeenoX to solve the PDE problem as non-linear
+
+
+`--progress`
+
+:    print ASCII progress bars when solving PDEs
+
+
+`--mumps`
+
+:    ask PETSc to use the direct linear solver MUMPS
 
 
 Instructions will be read from standard input if "-" is passed as `inputfile`, i.e.

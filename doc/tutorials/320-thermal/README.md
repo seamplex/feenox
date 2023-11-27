@@ -15,33 +15,43 @@ prev_title: \#2 Solving mazes
 
 Welcome to **FeenoX’s tutorial number three**.
 Here you will learn how to solve the heat conduction equation with FeenoX in all of its flavors: linear and non-linear, static and transient.
+All the files needed to go through the tutorial are available in [FeenoX's Git repository under `doc/tutorials/320-thermal`](https://github.com/seamplex/feenox/tree/main/doc/tutorials/320-thermal). 
 
 
- * We start solving steady-state problems. As long as neither of the
+ * We start solving linear steady-state problems. As long as neither of the
  
     a. material properties, nor
     b. sources
     
-   depend on the temperature $T(\vec{x})$ and 
+   depend on the temperature $T(\mathbf{x})$ and 
    
-    c. the boundary conditions do not depend or depend linearly on $T(\vec{x})$
+    c. the boundary conditions do not depend or depend linearly on $T(\mathbf{x})$
     
    then problem is linear.
-   If these three guys depend on space $\vec{x}$ (but not on $T(\vec{x})$), the problem is still linear no matter how complex it looks like:
+   If these three guys depend on space $\mathbf{x}$ (but not on $T(\mathbf{x})$), the problem is still linear no matter how complex it looks like:
 
    ```{.feenox include="manufactured.fee"}
    ```
 
- * If any of a. b. or c. do depend on the temperature $T(\vec{x})$, then the problem is non-linear.
-   FeenoX is able to detect this and will switch to a non-linear solver automatically.
-   You can check this by passing `--snes_view` in the command line. Here, SNES means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option will show some details about the solver. In linear problems, SNES is not used but the KSP (Krylov SubSpace solvers) framework is used instead. Therefore, `--snes_view` is empty for linear problems. 
-
- * We trigger non-linearities by
+ * If any of a. b. or c. do depend on the temperature $T(\mathbf{x})$, then the problem is non-linear.
+   FeenoX is able to detect this and will switch to a non-linear solver _automatically_.
+   Why would the user need to tell the solver if the problem is linear or not?
+   
+ * We can trigger non-linearities by
  
-    - adding a boundary conditions that depends on $T(\vec{x})$, such as radiation
+    - adding a boundary conditions that depends on $T(\mathbf{x})$, such as radiation
     - having a conductivity that depends on temperature, which is the case for most materials anyway
     - using heat sources that are temperature-dependent, where increasing $T$ decreases the source
-   
+
+ * We can check that FeenoX could detect the non-linearities by passing `--snes_monitor` and/or `--snes_view` in the command line. Here, SNES means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option will show some details about the solver. In linear problems, SNES is not used but the KSP (Krylov SubSpace solvers) framework is used instead. Therefore, if we used `--snes_view` in a linear problem then FeenoX will complain about an unused command-line option. 
+ 
+ * If, for some reason, the user does not want to have FeenoX to autodetect the non-linearities then she could force the problem type using either
+ 
+   a. the keywords `LINEAR` and `NON_LINEAR` in the `PROBLEM` definition, or
+   b. the command-line options `--linear` and `--non-linear`.
+ 
+ * Different linear and non-linear solvers (and pre-conditioners) can be chosen either from the command line (e.g. `--snes_type=newtonls`) or from the `PROBLEM` definition (e.g. `NONLINEAR_SOLVER newtonls`). Check out the [FeenoX manual section for the keyword `PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) for further details. FeenoX can have hard-coded PETSc options using the [`PETSC_OPTIONS` definition](https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options) as well.
+    
  * Finally we show how to solve transient problems, either
  
     i. starting from an arbitrary initial temperature distribution using constant boundary conditions
@@ -50,10 +60,10 @@ Here you will learn how to solve the heat conduction equation with FeenoX in all
  
 # Linear steady-state problems
 
-In this section we are going to ask FeenoX to compute a temperature distribution $T(\vec{x})$ that satisfies the linear heat conduction equation
+In this section we are going to ask FeenoX to compute a temperature distribution $T(\mathbf{x})$ that satisfies the linear heat conduction equation
 
 $$
-- \text{div} \Big[ k(\vec{x}) \cdot \text{grad} \left[ T(\vec{x}) \right] \Big] = q(\vec{x})
+- \text{div} \Big[ k(\mathbf{x}) \cdot \text{grad} \left[ T(\mathbf{x}) \right] \Big] = q(\mathbf{x})
 $$ {#eq:heat}
 
 along with proper boundary conditions.
@@ -156,31 +166,45 @@ These problems need at least one fixed-temperature (a.k.a. Dirichlet) condition.
 
 ## Convection conditions
 
+TBD
+
 ## Volumetric heat sources
+
+TBD
 
 ## Space-dependent properties: manufactured solution
 
+TBD
 
 # Non-linear state-state problems
 
-If in the heat @eq:heat above the thermal conductivity $k$ or the volumetric heat source $q$ depends on the solution $T(\vec{x})$, or the boundary conditions depend non-linearly on $T(\vec{x})$ then the problem is non linear. FeenoX's parser can detect these dependencies so it will use a non-linear solver automatically. That is to say, there is no need for the user to tell the solver which kind of problem it needs to solve---which is reasonable. Why would the user have to tell the solver?
+If in the heat @eq:heat above the thermal conductivity $k$ or the volumetric heat source $q$ depends on the solution $T(\mathbf{x})$, or the boundary conditions depend non-linearly on $T(\mathbf{x})$ then the problem is non linear. FeenoX's parser can detect these dependencies so it will use a non-linear solver automatically. That is to say, there is no need for the user to tell the solver which kind of problem it needs to solve---which is reasonable. Why would the user have to tell the solver?
 
 
 
 As we all know, solving a non-linear system of equations is far more complex than solving linear problems.
-Even more, the most-widely scheme used to solve the non-linear equation $\vec{F}(\vec{u})=0$,namely the Newton-Raphson method which is the basis of [PETSc's SNES framework](https://petsc.org/release/manual/snes/), involves repeatedly solving a linear system starting from an initial guess $\vec{u}_0$:
+Even more, the most-widely scheme used to solve the non-linear equation $\mathbf{F}(\mathbf{u})=0$,namely the Newton-Raphson method which is the basis of [PETSc's SNES framework](https://petsc.org/release/manual/snes/), involves repeatedly solving a linear system starting from an initial guess $\mathbf{u}_0$:
 
- 1. Solve $J(\vec{u}_k) \cdot \Delta \vec{u}_k = -\vec{F}(\vec{u}_k)$
- 2. Update $\vec{u}_{k+1} \leftarrow \vec{u}_{k} + \Delta \vec{u}_{k}$
+ 1. Solve $J(\mathbf{u}_k) \cdot \Delta \mathbf{u}_k = -\mathbf{F}(\mathbf{u}_k)$
+ 2. Update $\mathbf{u}_{k+1} \leftarrow \mathbf{u}_{k} + \Delta \mathbf{u}_{k}$
 
 
-The matrix $J = \vec{F}^{\prime}$ associated with these linear solves (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed $J(\vec{u})$ is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
+The matrix $J = \mathbf{F}^{\prime}$ associated with these linear solves (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed $J(\mathbf{u})$ is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
+
+The solver options can be changed at runtime either using keywors in the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition or command-line options:
+
+ * `NONLINEAR_SOLVER newtonls` or `--snes_type=newtonls`
+ * `LINEAR_SOLVER gmres` or `--ksp_type=gmres`
+ * `PRECONDITIONER gamg` or `--pc_type=gamg`
+ 
+Check out the [`PROBLEM` keyword entry in the FeenoX manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) and the links to PETSc's documentation for further details.
+Moreover, advanced users might notice that some problems might require a non-trivial combination of particular PETSC options. These can be given in the input file using the [`PETSC_OPTIONS` definition](https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options) as well.
 
 
 ## Temperature-dependent heat flux: radiation
 
 One way of introducing a non-linearity is by having a prescribed heat-flux boundary condition to depend on the temperature in a non-linear way.
-A radiation boundary condition is exactly this because the heat flux depends on $T^4(\vec{x})$.
+A radiation boundary condition is exactly this because the heat flux depends on $T^4(\mathbf{x})$.
 To illustrate this concept, let us consider the one-dimensional slab $x \in [0,1]$ with uniform conductivity equal to 50.
 
  * At $x=0$ (`left`) we set a prescribed heat flux equal to 1200 W/m$^2$.
@@ -350,7 +374,25 @@ $ feenox pellet-non-linear-k-uniform-q.fee --snes_monitor
 $ 
 ```
 
- 
+If, for some reason, we do not want to solve this problem as non-linear, then we can force FeenoX to solve it as if it was a linear problem.
+We can either choose so from the input file writing
+
+```feenox
+PROBLEM thermal LINEAR
+```
+
+or by passing `--linear` in the command-line options:
+
+```terminal
+$ feenox pellet-non-linear-k-uniform-q.fee --snes_monitor --linear
+717.484
+WARNING! There are options you set that were not used!
+WARNING! could be spelling mistake, etc!
+There is one unused database option. It is:
+Option left: name:-snes_monitor (no value) source: command line
+$ 
+```
+
 ## Temperature-dependent sources
 
 The volumetric power generated by fissioning nuclei of U$^{235}$ in the UO$_2$ is not uniform throughout the fuel.
@@ -358,25 +400,101 @@ It depends on...
 
  1. The location of the fuel bundle inside the core: in general, pellets located near the center dissipate more power than those located at the periphery).
  2. The location of the pellet inside the fuel element: the effect depends on the reactor design but for reactors where the moderator is separated from the coolant, this change is very significative.
- 3. The spatial location $\vec{x}$ inside the pellet: points near the periphery of the pellet now dissipate more power than those located in the bulk because they "have access" to more moderated neutrons coming from the outside.
- 4. The temperature $T(\vec{x})$: hot nuclei are less likely to fission.
+ 3. The spatial location $\mathbf{x}$ inside the pellet: points near the periphery of the pellet now dissipate more power than those located in the bulk because they "have access" to more moderated neutrons coming from the outside.
+ 4. The temperature $T(\mathbf{x})$: hot nuclei are less likely to fission.
 
 along with other nuclear-related stuff such as fuel burn-up, concentration of poisons, control systems, etc.
 
-Anyway, this is a tutorial about FeenoX capabilities. Our goal here is to show what FeenoX can do and how to ask it to to such things.
+Anyway, this is a tutorial about FeenoX capabilities.
+Our goal here is to show what FeenoX can do and how to ask it to to such things.
+So let us model a custom power surce depending both on space and on the local temperature like
 
- that let us model a power source by depending both on the space $\vec{x}$ and 
+$$
+q(x,y,z) = q_0 \cdot (1 + 20~\text{mm}^{-1} \cdot x) \cdot \left[1 - \frac{ T(x,y,z)-800~\text{ºC}}{2000 ~\text{ºC}} \right]
+$$
+
+> **Note:** According to [Le Chatelier's principle](https://en.wikipedia.org/wiki/Le_Chatelier's_principle), the power should decrease when the temperature increases.
+
+To also illustrate how to set a conductivity that depends directly on interpolated experimental data, in this case we use the numerical data from the IAEA report above by defining `cond(T')` as a function of type `DATA`:
  
-[Le Chatelier's principle](https://en.wikipedia.org/wiki/Le_Chatelier's_principle)
+```feenox
+VAR T'
+FUNCTION cond(T') INTERPOLATION steffen DATA {
+400                4.74
+450                4.50
+500                4.28
+550                4.07
+600                3.89
+650                3.91
+700                3.55
+750                3.40
+800                3.26
+850                3.13
+900                3.01
+950                2.90
+1000               2.79
+1050               2.70
+1100               2.61
+1132               2.55
+1150               2.52
+1200               2.45 }
+```
+
+Since we want to compare the temperature distribution using this non-linear power source with respect to the previous case with uniform power, we read back the temperature we wrote with the instruction `WRITE_RESULTS`. With no further arguments, that instruction writes a `.msh` file with the temperature distribution `T` as a scalar field and the three heat fluxes `qx`, `qy` and `qz` as a vector---which we used to create fig:pellet-non-linear-k-uniform-q. If no `FILE` keyword is given, the default mesh file is named like the FeenoX input file with the extension `.fee` renamed to `.msh`. So we can then ask FeenoX to retrieve the old temperature distribution as a function of space, with a new name (since there is already a function `T`), say `T_uniform`:
+ 
+```feenox
+READ_MESH pellet-non-linear-k-uniform-q.msh DIM 3 READ_FIELD T as T_uniform
+```
+
+Now we can write the results, including the algebraic difference (or any other operation) of `T` and `T_uniform`. For that end, we now use `WRITE_MESH`:
+
+```feenox
+WRITE_MESH $0.vtk T T(x,y,z)-T_uniform(x,y,z) q VECTOR qx qy qz 
+```
+
+Just to change things a little bit, we now write a VTK post-processing file (instead of `.msh` like in the previous case). Since `WRITE_MESH` is a generic instruction (while `WRITE_RESULTS` is PDE-aware so it knows which are the available fields) we have to list what we want to write in the VTK:
+
+ 1. The current temperature distribution `T`. Since `T` is a function of space, there is no need to pass the arguments `(x,y,z)`, it will be understood as "write the function of space `T` in the output mesh."
+ 2. The algebraic difference between the current temperature distribution and the one read from last case's output. This time, we are asking FeenoX to write an algebraic expression, so the arguments of both functions are needed.
+ 3. The heat power source `q` as a scalar function of space. Again, no need to give the arguments.
+ 4. A three-dimensional vector whose three components are the three heat fluxes.
+
+By default, `WRITE_MESH` writes nodal-based fields. If the `CELLS` keyword is used, all the following fields are written as cell-based fields, until the `NODES` keyword appears again (or until there are no more fields, of course).
+ 
+> **Note:** In this case the "old" mesh is the very same as the "current" mesh. Therefore, no interpolation is needed and the difference $T(x,y,z)-T_\text{uniform}(x,y,z)$ will be evaluated node by node. But if the mesh over which $T_\text{uniform}(x,y,z)$ was different (even with a different element order), then FeenoX would be able to interpolate it at the nodes (or cell centers) of the new mesh. 
+ 
+ 
+Putting everything together, we have:
+
+```{.feenox include="pellet-non-linear-k-non-linear-q.fee"}
+```
+
+which we can run as simply as
+
+```terminal
+$ feenox pellet-non-linear-k-non-linear-q.fee 
+1026.17
+$ 
+```
+
+to get an output VTK file we can then further post-process to get @fig:pellet-non-linear-k-non-linear-q.
+
+::: {#fig:pellet-non-linear-k-non-linear-q}
+![Temperature difference with respect to the uniform power case](diff-T.png){#fig:diff-T width_html=100% width_latex=75%}
+
+![Volumetric power source distribution](power.png){#fig:power width_html=100% width_latex=75%}
+
+Results for the non-uniform power case
+:::
 
 
 # Transient problems
 
 ## From an arbitrary initial condition
 
-UO$_2$
+TBD
 
 ## From a steady state
 
-Pump
+TBD
 

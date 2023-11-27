@@ -3,3 +3,5 @@
   -V, --versions     display detailed version information
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
   --elements_info    output a document with information about the supported element types
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear

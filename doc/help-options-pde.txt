@@ -1,4 +1,2 @@
   --progress         print ASCII progress bars when solving PDEs
   --mumps            ask PETSc to use the direct linear solver MUMPS
-  --linear           force FeenoX to solve the PDE problem as linear
-  --non-linear       force FeenoX to solve the PDE problem as non-linear

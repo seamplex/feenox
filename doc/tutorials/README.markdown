@@ -1,14 +1,13 @@
 # FeenoX tutorials
 
 - [<span class="toc-section-number">1</span> Introduction][]
-- [<span class="toc-section-number">2</span> General tutorials][]
-- [<span class="toc-section-number">3</span> Detailed functionality][]
-- [<span class="toc-section-number">4</span> Physics tutorials][]
+  - [<span class="toc-section-number">1.1</span> General tutorials][]
+  - [<span class="toc-section-number">1.2</span> Detailed
+    functionality][]
 
   [<span class="toc-section-number">1</span> Introduction]: #introduction
-  [<span class="toc-section-number">2</span> General tutorials]: #general-tutorials
-  [<span class="toc-section-number">3</span> Detailed functionality]: #detailed-functionality
-  [<span class="toc-section-number">4</span> Physics tutorials]: #physics-tutorials
+  [<span class="toc-section-number">1.1</span> General tutorials]: #general-tutorials
+  [<span class="toc-section-number">1.2</span> Detailed functionality]: #detailed-functionality
 
 # Introduction
 
@@ -59,17 +58,17 @@ since it is [free and open source software][].
   [Markdown]: https://commonmark.org/
   [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
   [free and open source software]: https://www.seamplex.com/feenox/#licensing
-  [Setting up your workspace]: 000-setup
+  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
 
-# General tutorials
+## General tutorials
 
 1.  [Overview: the tensile test case][]
 2.  [Fun & games: solving mazes with PDES instead of AI][]
 
-  [Overview: the tensile test case]: 110-tensile-test
-  [Fun & games: solving mazes with PDES instead of AI]: 120-mazes
+  [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
+  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
 
-# Detailed functionality
+## Detailed functionality
 
 1.  Input files, expressions and command-line arguments
 2.  Static & transient cases
@@ -77,15 +76,3 @@ since it is [free and open source software][].
 4.  Vectors & matrices
 5.  Differential-algebraic equations
 6.  Meshes & distributions
-
-# Physics tutorials
-
-1.  The Laplace equation
-2.  [Heat conduction][]
-3.  Linear elasticity
-4.  Modal analysis
-5.  Thermo-mechanical analysis
-6.  Neutron diffusion
-7.  Neutron transport
-
-  [Heat conduction]: 320-thermal

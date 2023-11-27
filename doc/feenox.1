@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2023-11-23" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2023-11-27" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -152,17 +152,17 @@ list the types of \f[V]PROBLEM\f[R]s that FeenoX can solve, one per line
 \f[V]--elements_info\f[R]
 output a document with information about the supported element types
 .TP
-\f[V]--progress\f[R]
-print ASCII progress bars when solving PDEs
-.TP
-\f[V]--mumps\f[R]
-ask PETSc to use the direct linear solver MUMPS
-.TP
 \f[V]--linear\f[R]
 force FeenoX to solve the PDE problem as linear
 .TP
 \f[V]--non-linear\f[R]
 force FeenoX to solve the PDE problem as non-linear
+.TP
+\f[V]--progress\f[R]
+print ASCII progress bars when solving PDEs
+.TP
+\f[V]--mumps\f[R]
+ask PETSc to use the direct linear solver MUMPS
 .PP
 Instructions will be read from standard input if \[lq]-\[rq] is passed
 as \f[V]inputfile\f[R], i.e.
@@ -1221,9 +1221,10 @@ Ask FeenoX to solve a partial differential equation problem.
 \f[C]
 PROBLEM { laplace | mechanical | modal | neutron_diffusion | neutron_sn | thermal }
  [ 1D | 2D | 3D | DIM <expr> ] [ AXISYMMETRIC { x | y } ] 
- [ MESH <identifier> ] [ PROGRESS ] [ DO_NOT_DETEC_HANGING_NODES | DETECT_HANGING_NODES | HANDLE_HANGING_NODES ]
+ [ MESH <identifier> ] [ PROGRESS ] [ DO_NOT_DETECT_HANGING_NODES | DETECT_HANGING_NODES | HANDLE_HANGING_NODES ]
  [ DETECT_UNRESOLVED_BCS | ALLOW_UNRESOLVED_BCS ]
- [ PREALLOCATE ] [ ALLOW_NEW_NONZEROS ] [ CACHE_J ] [ CACHE_B ] [ TRANSIENT | QUASISTATIC ] [ LINEAR | NON_LINEAR ] 
+ [ PREALLOCATE ] [ ALLOW_NEW_NONZEROS ] [ CACHE_J ] [ CACHE_B ] 
+ [ TRANSIENT | QUASISTATIC ] [ LINEAR | NON_LINEAR ] 
  [ MODES <expr> ] 
  [ PRECONDITIONER { gamg | mumps | lu | hypre | sor | bjacobi | cholesky | ... } ]
  [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]
@@ -1313,19 +1314,19 @@ The preconditioner (\f[V]PC\f[R]), linear (\f[V]KSP\f[R]), non-linear
 those available in PETSc (first option is the default):
 .IP \[bu] 2
 List of \f[V]PRECONDITIONER\f[R]s
-http://petsc.org/release/docs/manualpages/PC/PCType.html.
+https://petsc.org/release/manualpages/PC/PCType/.
 .IP \[bu] 2
 List of \f[V]LINEAR_SOLVER\f[R]s
-http://petsc.org/release/docs/manualpages/KSP/KSPType.html.
+https://petsc.org/release/manualpages/KSP/KSPType/.
 .IP \[bu] 2
 List of \f[V]NONLINEAR_SOLVER\f[R]s
-http://petsc.org/release/docs/manualpages/SNES/SNESType.html.
+https://petsc.org/release/manualpages/SNES/SNESType/.
 .IP \[bu] 2
 List of \f[V]TRANSIENT_SOLVER\f[R]s
 http://petsc.org/release/docs/manualpages/TS/TSType.html.
 .IP \[bu] 2
 List of \f[V]TIME_ADAPTATION\f[R]s
-http://petsc.org/release/docs/manualpages/TS/TSAdaptType.html.
+https://petsc.org/release/manualpages/TS/TSAdaptType/.
 .IP \[bu] 2
 List of \f[V]EIGEN_SOLVER\f[R]s
 https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSType.html.

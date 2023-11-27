@@ -1,0 +1,39 @@
+PROBLEM thermal
+READ_MESH pellet.msh SCALE 1e-3  # mesh is in mm, we want it in meters so we scale it
+ 
+VAR T'
+FUNCTION cond(T') INTERPOLATION steffen DATA {
+400                4.74
+450                4.50
+500                4.28
+550                4.07
+600                3.89
+650                3.91
+700                3.55
+750                3.40
+800                3.26
+850                3.13
+900                3.01
+950                2.90
+1000               2.79
+1050               2.70
+1100               2.61
+1132               2.55
+1150               2.52
+1200               2.45 }
+k(x,y,z) = cond(T(x,y,z))
+
+# q is in W / m^3 = 300 W/cm * 100 cm/m / area
+q0 = 300 * 100 / (pi*(4e-3)^2)
+q(x,y,z) = q0 * (1+60*x) * (1-(T(x,y,z)-800)/800)
+
+BC symmetry q=0
+BC external T=420
+BC gap      h=100  Tref=400
+
+T_guess(x,y,z) = 800
+SOLVE_PROBLEM
+PRINT T_max
+
+READ_MESH pellet-non-linear-k-uniform-q.msh DIM 3 READ_FIELD T as T_uniform
+WRITE_MESH $0.vtk T T(x,y,z)-T_uniform(x,y,z) q VECTOR qx qy qz 

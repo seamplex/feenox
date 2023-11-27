@@ -13,5 +13,4 @@ Recall by reading again the [project's main README](https://github.com/seamplex/
 
 Indeed, it is this the main goal of the tutorials, namely to be able to run relatively small problems in FeenoX by creating the appropriate input files and, eventually meshes or other needed data files. This way, by the end of each tutorial you will better understsand how FeenoX works and thus, how to make it work the way you need and/or want. And if not, you always have the _freedom_ to hire someone to explain it to you and even to modify the code to make it work the way you need and/or want since it is [free and open source software](https://www.seamplex.com/feenox/#licensing).
 
-1. [Setting up your workspace](000-setup)
 
