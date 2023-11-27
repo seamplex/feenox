@@ -931,7 +931,7 @@ PRINT t phi rho    # salida: phi y rho vs. tiempo
 ```
 
 ``` terminal
-$ feenox reactivity-vs.time.fee > flux.dat
+$ feenox reactivity-from-table.fee > flux.dat
 $ pyxplot kinetics.ppl
 ```
 
@@ -967,7 +967,7 @@ PRINT_FUNCTION rho MIN 0 MAX 50 STEP 0.1
 ```
 
 ``` terminal
-null
+$ feenox inverse-integral.fee 
 ```
 
 2.  Resolviendo el mismo sistema de DAEs pero leyendo $\phi(t)$ en lugar
@@ -1001,10 +1001,10 @@ PRINT t phi rho
 ```
 
 ``` terminal
-null
+$ feenox inverse-dae.fee 
 ```
 
-<div id="fig-inverse" layout="[1]">
+<div id="fig-inverse">
 
 <figure id="fig-inverse1">
 <img src="inverse.svg" alt="t \in [0,100]" />
@@ -1098,7 +1098,7 @@ PRINT t phi z setpoint(t)
 ```
 
 ``` terminal
-null
+$ feenox xenon.fee 
 ```
 
 <figure>
@@ -1122,17 +1122,11 @@ la potencia luego de un minuto para obtener mapas de estabilidad tipo
 Lyapunov.
 
 Para barrer el espacio de parámetros usamos series de números
-cuasi-aleatorios \[@halton\] de forma tal de poder realizar ejecuciones
-sucesivas que van llenando densamente dicho espacio como ilustramos en
-la \[@fig-map\]:
+cuasi-aleatorios de forma tal de poder realizar ejecuciones sucesivas
+que van llenando densamente dicho espacio:
 
 ``` bash
-#!/bin/bash
-
-while read ac af; do
-#  echo $ac $af
- feenox point-nucengdes.fee ${ac} ${af} | tee -a point.dat
-done < rhalton
+for i in $(seq $1 $2); do  feenox point.fee $i | tee -a point.dat; done
 ```
 
 ``` feenox
@@ -1193,22 +1187,25 @@ $ ./point.sh 2048 4096
 $
 ```
 
-::: ![Estabilidad de Lyapunov utilizando series de números
-pseudo-aleatorios que van “rellenando” incremental y densamente el
-espacio de parámetros.][]
+<div id="fig-map">
 
 <figure>
-<img src="figs-ned.png"
-alt="Figuras originales de la referencia [@stability-nucengdes]" />
-<figcaption aria-hidden="true">Figuras originales de la referencia <span
-class="citation"
-data-cites="stability-nucengdes">[@stability-nucengdes]</span></figcaption>
+<img src="map.svg"
+alt="Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van “rellenando” incremental y densamente el espacio de parámetros." />
+<figcaption aria-hidden="true">Estabilidad de Lyapunov utilizando series
+de números pseudo-aleatorios que van “rellenando” incremental y
+densamente el espacio de parámetros.</figcaption>
+</figure>
+
+<figure>
+<img src="figs-ned.png" alt="Figuras originales de la referencia" />
+<figcaption aria-hidden="true">Figuras originales de la
+referencia</figcaption>
 </figure>
 
 Mapas de estabilidad de cinética puntual con realimentación
-termohidráulica :::
+termohidráulica
+
+</div>
 
 [^1]: Del inglés <span lang="en-US">*lumped capacitance*</span>.
-
-  [Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van “rellenando” incremental y densamente el espacio de parámetros.]:
-    map.svg

@@ -23,8 +23,10 @@ c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
 
 PRINT t phi rho
 ---
+terminal: |
+  $ feenox inverse-dae.fee 
 figures: |
-  ::: {#fig-inverse layout="[1]"}
+  ::: {#fig-inverse}
   ![$t \in [0,100]$](inverse.svg){#fig-inverse1}
 
   ![$t \in [9.75,10.25]$](inverse-zoom.svg){#fig-inverse2}

@@ -9,7 +9,7 @@
 # check for needed tools
 for i in git autoconf m4 make; do
  if [ -z "$(which $i)" ]; then
-  echo "error: $i not installed"
+  echo "error: ${i} not installed"
   exit 1
  fi
 done

@@ -893,7 +893,7 @@ PRINT t phi rho    # salida: phi y rho vs. tiempo
 
 
 ```terminal
-$ feenox reactivity-vs.time.fee > flux.dat
+$ feenox reactivity-from-table.fee > flux.dat
 $ pyxplot kinetics.ppl
 
 ```
@@ -926,12 +926,12 @@ rho(t) := { Lambda * derivative(log(phi(t')),t',t) +
    integral(phi(t-t') * sum((lambda[i]*beta[i]/Beta)*exp(-lambda[i]*t'), i, 1, nprec), t', 0, 1e4) ) }
 
 PRINT_FUNCTION rho MIN 0 MAX 50 STEP 0.1
-
 ```
 
 
 ```terminal
-null
+$ feenox inverse-integral.fee 
+
 ```
 
 
@@ -969,11 +969,12 @@ PRINT t phi rho
 
 
 ```terminal
-null
+$ feenox inverse-dae.fee 
+
 ```
 
 
-::: {#fig-inverse layout="[1]"}
+::: {#fig-inverse}
 ![$t \in [0,100]$](inverse.svg){#fig-inverse1}
 
 ![$t \in [9.75,10.25]$](inverse-zoom.svg){#fig-inverse2}
@@ -1059,7 +1060,8 @@ PRINT t phi z setpoint(t)
 
 
 ```terminal
-null
+$ feenox xenon.fee 
+
 ```
 
 
@@ -1080,18 +1082,11 @@ la potencia luego de un minuto para obtener mapas de estabilidad tipo
 Lyapunov.
 
 Para barrer el espacio de parámetros usamos series de números
-cuasi-aleatorios @halton de forma tal de poder realizar ejecuciones
-sucesivas que van llenando densamente dicho espacio como ilustramos en
-la @fig-map:
+cuasi-aleatorios de forma tal de poder realizar ejecuciones sucesivas
+que van llenando densamente dicho espacio:
 
 ``` bash
-#!/bin/bash
-
-while read ac af; do
-#  echo $ac $af
- feenox point-nucengdes.fee ${ac} ${af} | tee -a point.dat
-done < rhalton
-
+for i in $(seq $1 $2); do  feenox point.fee $i | tee -a point.dat; done
 ```
 
 [^1]: Del inglés [*lumped capacitance*]{lang="en-US"}.
@@ -1158,10 +1153,10 @@ $
 ```
 
 
-:::
+::: {#fig-map}
 ![Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van "rellenando" incremental y densamente el espacio de parámetros.](map.svg)
 
-![Figuras originales de la referencia @stability-nucengdes](figs-ned.png)
+![Figuras originales de la referencia](figs-ned.png)
 
 Mapas de estabilidad de cinética puntual con realimentación termohidráulica
 :::

@@ -43,7 +43,8 @@ compilation.md
 
 # Examples
 
-See <https://www.seamplex.com/feenox/examples>
+> See <https://www.seamplex.com/feenox/examples> for updated information.
+
 
 ```{.include shift-heading-level-by=1}
 ../examples/examples.md
@@ -51,18 +52,23 @@ See <https://www.seamplex.com/feenox/examples>
 
 # Tutorials
 
-See <https://www.seamplex.com/feenox/tutorials>
+> See <https://www.seamplex.com/feenox/doc/tutorials> for updated information.
 
 ```{.include shift-heading-level-by=1}
-tutorials/intro.md
+tutorials/setup.md
 ```
-
-## General tutorials
  
 ```{.include shift-heading-level-by=1}
 tutorials/general.md
 ```
 
+```{.include shift-heading-level-by=1}
+tutorials/detailed.md
+```
+
+```{.include shift-heading-level-by=1}
+tutorials/physics.md
+```
 
 
 # Description

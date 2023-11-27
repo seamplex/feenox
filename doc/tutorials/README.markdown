@@ -4,10 +4,12 @@
   - [<span class="toc-section-number">1.1</span> General tutorials][]
   - [<span class="toc-section-number">1.2</span> Detailed
     functionality][]
+  - [<span class="toc-section-number">1.3</span> Physics tutorials][]
 
   [<span class="toc-section-number">1</span> Introduction]: #introduction
   [<span class="toc-section-number">1.1</span> General tutorials]: #general-tutorials
   [<span class="toc-section-number">1.2</span> Detailed functionality]: #detailed-functionality
+  [<span class="toc-section-number">1.3</span> Physics tutorials]: #physics-tutorials
 
 # Introduction
 
@@ -76,3 +78,15 @@ since it is [free and open source software][].
 4.  Vectors & matrices
 5.  Differential-algebraic equations
 6.  Meshes & distributions
+
+## Physics tutorials
+
+1.  The Laplace equation
+2.  [Heat conduction][]
+3.  Linear elasticity
+4.  Modal analysis
+5.  Thermo-mechanical analysis
+6.  Neutron diffusion
+7.  Neutron transport
+
+  [Heat conduction]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal

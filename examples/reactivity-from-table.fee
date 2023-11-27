@@ -38,7 +38,7 @@ c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
 PRINT t phi rho    # salida: phi y rho vs. tiempo
 ---
 terminal: |
-  $ feenox reactivity-vs.time.fee > flux.dat
+  $ feenox reactivity-from-table.fee > flux.dat
   $ pyxplot kinetics.ppl
 figures: |
   ![Flujo y reactividad directa](reactivity-from-table.svg)

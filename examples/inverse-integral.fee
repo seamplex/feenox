@@ -22,4 +22,6 @@ rho(t) := { Lambda * derivative(log(phi(t')),t',t) +
    integral(phi(t-t') * sum((lambda[i]*beta[i]/Beta)*exp(-lambda[i]*t'), i, 1, nprec), t', 0, 1e4) ) }
 
 PRINT_FUNCTION rho MIN 0 MAX 50 STEP 0.1
-
+---
+terminal: |
+  $ feenox inverse-integral.fee 

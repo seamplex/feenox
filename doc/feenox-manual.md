@@ -69,6 +69,9 @@ tutorials/general.md
 tutorials/detailed.md
 ```
 
+```{.include shift-heading-level-by=1}
+tutorials/physics.md
+```
 
 
 # Description

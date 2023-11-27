@@ -67,6 +67,8 @@ z = z_0 + integral_dt(vrod*((error>(+band))-(error<(-band))))
 
 PRINT t phi z setpoint(t)
 ---
+terminal: |
+  $ feenox xenon.fee 
 figures: |
   ![Flujo y posición de la barra de control en un caso con xenón bajo control](xenon.svg)
 ...
