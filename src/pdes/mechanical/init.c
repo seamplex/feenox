@@ -313,7 +313,7 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_call(feenox_distribution_init(&mechanical.T_ref, "T_0"));
   }
   if (mechanical.T_ref.defined) {
-    if (mechanical.T_ref.uniform == 0) {
+    if (mechanical.T_ref.non_uniform == 0) {
       feenox_push_error_message("reference temperature T0 has to be uniform");
       return FEENOX_ERROR;
     }
@@ -349,7 +349,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   switch (mechanical.material_model) {
   
     case material_model_elastic_isotropic:
-      mechanical.uniform_C = (mechanical.E.uniform && mechanical.nu.uniform);
+      mechanical.uniform_C = (mechanical.E.non_uniform && mechanical.nu.non_uniform);
       if (mechanical.variant == variant_full) {
       
         mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;

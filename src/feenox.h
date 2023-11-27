@@ -1185,7 +1185,7 @@ struct distribution_t  {
   function_ll_t *dependency_functions;
   
   // is this distribution uniform? (i.e. does not depend on space)
-  int uniform;
+  int non_uniform;
   // is this distribution constant? (i.e. does not depend on time) 
   int constant;
   // does this distribution depend on the solution itself?

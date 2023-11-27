@@ -200,14 +200,16 @@ int feenox_problem_init_runtime_modal(void) {
   
   // initialize distributions
   feenox_distribution_define_mandatory(modal, rho, "rho", "density");
-  modal.rho.uniform = feenox_expression_depends_on_space(modal.rho.dependency_variables);
+//  modal.rho.non_uniform = feenox_expression_depends_on_space(modal.rho.dependency_variables);
   
   
   // initialize distributions
   
   // first see if we have linear elastic
   feenox_call(feenox_distribution_init(&modal.E, "E"));  
+//  modal.E.non_uniform = feenox_expression_depends_on_space(modal.E.dependency_variables);
   feenox_call(feenox_distribution_init(&modal.nu, "nu"));  
+//  modal.nu.non_uniform = feenox_expression_depends_on_space(modal.nu.dependency_variables);
   
   // TODO: allow different volumes to have different material models
   if (modal.E.defined && modal.nu.defined) {
@@ -290,7 +292,7 @@ int feenox_problem_init_runtime_modal(void) {
   switch (modal.material_model) {
   
     case material_model_elastic_isotropic:
-      modal.uniform_C = (modal.E.uniform && modal.nu.uniform);
+      modal.uniform_C = ((modal.E.non_uniform == 0) && (modal.nu.non_uniform == 0));
       if (modal.variant == variant_full) {
         modal.compute_C = feenox_problem_build_compute_modal_C_elastic_isotropic;
       } else if (modal.variant == variant_plane_stress) {      

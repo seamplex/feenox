@@ -35,7 +35,7 @@ int feenox_problem_build_allocate_aux_modal(unsigned int n_nodes) {
     gsl_matrix_free(modal.CB);
   }
   feenox_check_alloc(modal.CB = gsl_matrix_calloc(modal.stress_strain_size, feenox.pde.dofs * modal.n_nodes));
-
+  
   return FEENOX_OK;
 }
 
@@ -43,11 +43,10 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
 
 #ifdef HAVE_PETSC
   
-  if (modal.uniform_C == 0) {
-    // material stress-strain relationship
-    double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
-    modal.compute_C(x, feenox_fem_get_material(e));
-  }
+  // material stress-strain relationship
+  // TODO: see how to optimize uniform properties
+  double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
+  modal.compute_C(x, feenox_fem_get_material(e));
   
   // TODO: unify with mechanical!
   gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
@@ -95,10 +94,8 @@ int feenox_problem_build_volumetric_gauss_point_modal(element_t *e, unsigned int
   feenox_call(feenox_blas_BtCB_accum(modal.B, modal.C, modal.CB, wdet, feenox.fem.Ki));
   
   // elemental mass H'*rho*H
-  if (modal.rho.uniform == 0) {
-    double *x = feenox_fem_compute_x_at_gauss_if_needed(e, q, feenox.pde.mesh->integration, modal.space_rho);
-    modal.rho.eval(&modal.rho, x, feenox_fem_get_material(e));
-  }
+  // TODO: see how to optimize uniform properties
+  modal.rho.eval(&modal.rho, x, feenox_fem_get_material(e));
   gsl_matrix *H_Gc = feenox_fem_compute_H_Gc_at_gauss(e, q, feenox.pde.mesh->integration);
   feenox_call(feenox_blas_BtB_accum(H_Gc, wdet * modal.rho.value, feenox.fem.Mi));
   
