@@ -3056,7 +3056,7 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
       feenox.pde.progress_ascii = PETSC_TRUE;
 
-///kw_pde+PROBLEM+usage [ DO_NOT_DETEC_HANGING_NODES
+///kw_pde+PROBLEM+usage [ DO_NOT_DETECT_HANGING_NODES
     } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_nothing;
 ///kw_pde+PROBLEM+usage | DETECT_HANGING_NODES
@@ -3098,6 +3098,7 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "CACHE_B") == 0) {
       feenox.fem.cache_J = 1;
       feenox.fem.cache_B = 1;
+///kw_pde+PROBLEM+usage @
       
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
@@ -3138,17 +3139,17 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail The preconditioner (`PC`), linear (`KSP`), non-linear (`SNES`) and time-stepper (`TS`)
 ///kw_pde+PROBLEM+detail solver types be any of those available in PETSc (first option is the default):
 ///kw_pde+PROBLEM+detail @
-///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <http://petsc.org/release/docs/manualpages/PC/PCType.html>.
+///kw_pde+PROBLEM+detail  * List of `PRECONDITIONER`s <https://petsc.org/release/manualpages/PC/PCType/>.
     } else if (strcasecmp(token, "PRECONDITIONER") == 0 || strcasecmp(token, "PC") == 0 || strcasecmp(token, "PC_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.pc_type));
 
 ///kw_pde+PROBLEM+usage [ LINEAR_SOLVER { gmres | mumps | bcgs | bicg | richardson | chebyshev | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <http://petsc.org/release/docs/manualpages/KSP/KSPType.html>.
+///kw_pde+PROBLEM+detail  * List of `LINEAR_SOLVER`s <https://petsc.org/release/manualpages/KSP/KSPType/>.
     } else if (strcasecmp(token, "LINEAR_SOLVER") == 0 || strcasecmp(token, "KSP") == 0 || strcasecmp(token, "KSP_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ksp_type));
           
 ///kw_pde+PROBLEM+usage [ NONLINEAR_SOLVER { newtonls | newtontr | nrichardson | ngmres | qn | ngs | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <http://petsc.org/release/docs/manualpages/SNES/SNESType.html>.
+///kw_pde+PROBLEM+detail  * List of `NONLINEAR_SOLVER`s <https://petsc.org/release/manualpages/SNES/SNESType/>.
         } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
@@ -3158,7 +3159,7 @@ int feenox_parse_problem(void) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
 
 ///kw_pde+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <http://petsc.org/release/docs/manualpages/TS/TSAdaptType.html>.
+///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <https://petsc.org/release/manualpages/TS/TSAdaptType/>.
     } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
 
