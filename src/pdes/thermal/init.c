@@ -285,7 +285,6 @@ int feenox_problem_init_runtime_thermal(void) {
     feenox_free(evaluated_temp);
   }
   
-  
   if (feenox.pde.math_type == math_type_automatic) {
     feenox.pde.math_type = (thermal.temperature_dependent_stiffness == 0 &&
                             thermal.temperature_dependent_mass      == 0 &&

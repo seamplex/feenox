@@ -419,23 +419,10 @@ int feenox_problem_init_runtime_general(void) {
     feenox.pde.pc_type = strdup("mumps");
   }
 
-///op+linear+option `--linear`
-///op+linear+desc force FeenoX to solve the PDE problem as linear
+// read these guys just to avoid the "unused database option" complain
   petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-linear", &flag));
-  if (flag == PETSC_TRUE) {
-    feenox.pde.math_type = math_type_linear;
-  }
-
-///op+non-linear+option `--non-linear`
-///op+non-linear+desc force FeenoX to solve the PDE problem as non-linear
   petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-non-linear", &flag));
-  if (flag == PETSC_TRUE) {
-    feenox.pde.math_type = math_type_nonlinear;
-  }
   petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-nonlinear", &flag));
-  if (flag == PETSC_TRUE) {
-    feenox.pde.math_type = math_type_nonlinear;
-  }
   
   // check if the dimensions match
   if (feenox.pde.dim != 0 && feenox.pde.mesh != NULL && feenox.pde.mesh->dim != 0 && feenox.pde.dim != feenox.pde.mesh->dim) {

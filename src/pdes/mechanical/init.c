@@ -426,7 +426,10 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // TODO: check nonlinearity!
-  feenox.pde.math_type = math_type_linear;
+  if (feenox.pde.math_type == math_type_automatic) {
+    feenox.pde.math_type = math_type_linear;
+  }
+  
   feenox.pde.solve = feenox_problem_solve_petsc_linear;
   
   feenox.pde.has_stiffness = 1;

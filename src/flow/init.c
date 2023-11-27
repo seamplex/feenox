@@ -61,6 +61,15 @@ int feenox_initialize(int argc, char **argv) {
 ///op+elements_info+option `--elements_info`
 ///op+elements_info+desc output a document with information about the supported element types
     { "elements_info", no_argument,       NULL, 'e'},
+    
+///op+linear+option `--linear`
+///op+linear+desc force FeenoX to solve the PDE problem as linear
+    { "linear",        no_argument,       NULL, 'l'},
+///op+non-linear+option `--non-linear`
+///op+non-linear+desc force FeenoX to solve the PDE problem as non-linear
+    { "nonlinear",     no_argument,       NULL, 'n'},
+    { "non-linear",    no_argument,       NULL, 'n'},
+
 //op+debug+option `-d`, `--debug`.
 //op+debug+desc start in debug mode
 //    { "debug",        no_argument,       NULL, 'd'},
@@ -127,6 +136,12 @@ int feenox_initialize(int argc, char **argv) {
         break;
       case 'e':
         show_version = version_elements_info;
+        break;
+      case 'l':
+        feenox.pde.math_type = math_type_linear;
+        break;
+      case 'n':
+        feenox.pde.math_type = math_type_nonlinear;
         break;
 //      case 'd':
 //        feenox.debug = 1;
