@@ -28,6 +28,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   feenox_check_alloc(this->name = strdup(name));
   
   // first try a property, if this is the case then we have it easy
+  int n_volumes = 0;
+  int non_uniform = 0;
   HASH_FIND_STR(feenox.mesh.properties, name, this->property);
   if (this->property != NULL) {
     // check if the property is "full," i.e. defined over all volumes
@@ -42,6 +44,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
           if (property_data != NULL) {
             feenox_pull_dependencies_variables(&this->dependency_variables, property_data->expr.variables);
             feenox_pull_dependencies_functions(&this->dependency_functions, property_data->expr.functions);
+            non_uniform = (n_volumes++ > 0) || (feenox_expression_depends_on_space(this->dependency_variables));
           } else  {
             full = 0;
           }  
@@ -53,8 +56,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
 
     this->defined = 1;
     this->full = full;
+    this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_property;
-    this->non_uniform = 0;
     this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
     
     return FEENOX_OK;
@@ -62,6 +65,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
 
   // try one function for each volume
   int full = 1;
+  non_uniform = 0;
+  n_volumes = 0;
   physical_group_t *physical_group = NULL;
   physical_group_t *tmp_group = NULL;
   HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
@@ -86,6 +91,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         
         feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, function));
         feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, function));
+        
+        non_uniform = (n_volumes++ > 0) || (feenox_expression_depends_on_space(this->dependency_variables));
 
       } else {
         full = 0;
@@ -97,8 +104,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   if (this->function) {
     this->defined = 1;
     this->full = full;
+    this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_function_local;
-    this->non_uniform = 0;
     this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
     return FEENOX_OK;
   }
@@ -117,7 +124,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->expr = &this->function->algebraic_expression;
     feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, this->function));
     feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, this->function));
-    this->non_uniform = (feenox_expression_depends_on_space(this->dependency_variables) == 0);
+    this->non_uniform = feenox_expression_depends_on_space(this->dependency_variables);
     this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
     
     return FEENOX_OK;
@@ -125,6 +132,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   
   // try one variable for each volume
   full = 1;
+  non_uniform = 0;
+  n_volumes = 0;
   physical_group = NULL;
   tmp_group = NULL;
   HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
@@ -140,7 +149,10 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         // if there's no explicit material we create one
         if (physical_group->material == NULL) {
           physical_group->material = feenox_define_material_get_ptr(physical_group->name, feenox.pde.mesh);
-        }  
+        }
+        
+        // if there are many volumes, we are not uniform
+        non_uniform = (n_volumes++ > 0);
 
       } else {
         full = 0;
@@ -152,8 +164,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   if (this->variable) {
     this->defined = 1;
     this->full = full;
+    this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_variable_local;
-    this->non_uniform = 0;
     return FEENOX_OK;
   }
   
@@ -163,7 +175,6 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_variable_global;
-    this->non_uniform = 0;
     return FEENOX_OK;
   }
   
