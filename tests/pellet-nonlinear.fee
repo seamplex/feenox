@@ -22,4 +22,4 @@ BC external T=420
 SOLVE_PROBLEM
 PRINT %.0f T_max-1115
 
-# WRITE_MESH pellet-nonlinear.vtk T
+# WRITE_RESULTS FORMAT vtk

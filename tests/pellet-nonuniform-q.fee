@@ -1,0 +1,15 @@
+PROBLEM thermal 3D
+READ_MESH pellet.msh
+
+k = 4
+
+# q is in W / m^3 = 300 W/cm * 100 cm/m / area
+r = 4e-3
+q0 = 300 * 100 / (pi*r^2)
+q(x,y,z) = q0 * (1+20*x)
+
+BC symmetry q=0
+BC external T=420
+
+SOLVE_PROBLEM
+PRINT %.0f T_max-1037

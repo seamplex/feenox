@@ -21,12 +21,18 @@ exitifwrong $?
 answerzero pellet-linear-guess.fee 5e-2
 exitifwrong $?
 
+answerzero pellet-nonuniform-q.fee 12
+exitifwrong $?
+
 
 # run with --snes_monitor
 answerzero pellet-nonlinear.fee 12
 exitifwrong $?
 
 answerzero pellet-nonlinear-guess.fee 12
+exitifwrong $?
+
+answerzero pellet-nonlinear-q.fee 12
 exitifwrong $?
 
 
