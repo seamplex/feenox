@@ -1,0 +1,14 @@
+PROBLEM thermal 1d
+READ_MESH slab.msh
+
+k = 1
+
+# boundary conditions: q=something means "prescribed heat flux"
+BC left  T=0
+BC right q=1
+
+SOLVE_PROBLEM
+PRINT_FUNCTION T
+
+COMPUTE_REACTION left RESULT q_left
+PRINTF "\# the heatflux at left is %g" q_left

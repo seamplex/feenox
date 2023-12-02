@@ -14,8 +14,14 @@ prev_title: \#2 Solving mazes
 # Summary
 
 Welcome to **FeenoX’s tutorial number three**.
-Here you will learn how to solve the heat conduction equation with FeenoX in all of its flavors: linear and non-linear, static and transient.
+Here you will learn how to solve the heat conduction equation with FeenoX in all of its flavors: 
+
+ a. linear and non-linear,
+ b. static and transient.
+
 All the files needed to go through the tutorial are available in [FeenoX's Git repository under `doc/tutorials/320-thermal`](https://github.com/seamplex/feenox/tree/main/doc/tutorials/320-thermal). 
+Make sure you also check the [heat conduction examples](https://www.seamplex.com/feenox/examples/thermal.html).
+
 
 
  * We start solving linear steady-state problems. As long as neither of the
@@ -33,24 +39,27 @@ All the files needed to go through the tutorial are available in [FeenoX's Git r
    ```{.feenox include="manufactured.fee"}
    ```
 
- * If any of a. b. or c. do depend on the temperature $T(\mathbf{x})$, then the problem is non-linear.
-   FeenoX is able to detect this and will switch to a non-linear solver _automatically_.
+ * If these conditions are not met, then the problem is non-linear.
+   FeenoX is able to detect this and will **automatically** switch to a non-linear solver.
    Why would the user need to tell the solver if the problem is linear or not?
+   If you think it through, it should be the other way round. And that is what FeenoX does.
    
- * We can trigger non-linearities by
+ * Non-linearities can be triggered by either
  
-    - adding a boundary conditions that depends on $T(\mathbf{x})$, such as radiation
-    - having a conductivity that depends on temperature, which is the case for most materials anyway
-    - using heat sources that are temperature-dependent, where increasing $T$ decreases the source
+    - adding a boundary conditions that depends non-linearly on $T(\mathbf{x})$, such as radiation, and/or
+    - having a conductivity that depends on temperature, which is the case for most materials anyway, and/or
+    - using heat sources that are temperature-dependent, where increasing $T$ decreases the source.
 
- * We can check that FeenoX could detect the non-linearities by passing `--snes_monitor` and/or `--snes_view` in the command line. Here, SNES means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option will show some details about the solver. In linear problems, SNES is not used but the KSP (Krylov SubSpace solvers) framework is used instead. Therefore, if we used `--snes_view` in a linear problem then FeenoX will complain about an unused command-line option. 
+ * We can check if FeenoX can detect the non-linearities by passing `--snes_monitor` and/or `--snes_view` in the command line. Here, [SNES](https://petsc.org/release/manual/snes/) means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option shows some details about the solver. In linear problems, SNES is not used but the [KSP](https://petsc.org/release/manual/ksp/) (Krylov SubSpace solvers) framework is used instead. Therefore, if we used `--snes_view` in a linear problem then FeenoX would complain about an unused command-line option. 
  
  * If, for some reason, the user does not want to have FeenoX to autodetect the non-linearities then she could force the problem type using either
  
-   a. the keywords `LINEAR` and `NON_LINEAR` in the `PROBLEM` definition, or
-   b. the command-line options `--linear` and `--non-linear`.
+   a. the keywords `LINEAR` and `NON_LINEAR` in the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition, or
+   b. the [command-line options](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) `--linear` and `--non-linear`.
  
- * Different linear and non-linear solvers (and pre-conditioners) can be chosen either from the command line (e.g. `--snes_type=newtonls`) or from the `PROBLEM` definition (e.g. `NONLINEAR_SOLVER newtonls`). Check out the [FeenoX manual section for the keyword `PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) for further details. FeenoX can have hard-coded PETSc options using the [`PETSC_OPTIONS` definition](https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options) as well.
+ * Different linear and non-linear solvers (and pre-conditioners) can be chosen either from the command line (e.g. `--snes_type=newtonls`) or from the `PROBLEM` definition (e.g. `NONLINEAR_SOLVER newtonls`).
+  Check out the [FeenoX manual section for the keyword `PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) for further details.
+  FeenoX can have hard-coded PETSc options using the [`PETSC_OPTIONS` definition](https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options) as well.
     
  * Finally we show how to solve transient problems, either
  
@@ -76,7 +85,7 @@ If the conductivity $k$ is uniform, then the solution is a linear interpolation
 
 ### Single-material slab
 
-Let us create a unitary slab between $x=0$ and $x=1$ with Gmsh using this `slab.geo`:
+Let us create a unitary slab between $x=0$ and $x=1$ with Gmsh using this `slab.geo`:
 
 ```{.c include="slab.geo"}
 ```
@@ -84,7 +93,7 @@ Let us create a unitary slab between $x=0$ and $x=1$ with Gmsh using this `slab.
 The end at $x=0$ is called `left` and the one at $x=1$ is called `right`.
 So we can ask FeenoX to solve a thermal problem with uniform conductivity $k$ and fixed temperatures at both ends by
 
- 1. Defining `PROBLEM` as `thermal` and giving either `1d` or `DIM 1`:
+ 1. Defining [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) as [`thermal`](http://seamplex.com/feenox/doc/feenox-manual.html#thermal) and giving either `1d` or `DIM 1`:
  
     ```feenox
     PROBLEM thermal 1d
@@ -103,35 +112,52 @@ So we can ask FeenoX to solve a thermal problem with uniform conductivity $k$ a
     $    
     ```
  
- 2. Setting the special variable `k` to a constant:
+ 2. Setting the [special variable `k`](https://www.seamplex.com/feenox/doc/feenox-manual.html#k) to a constant:
  
     ```feenox
     k = 1
     ```
  
-    The fact that the conductivity is givens as a variable means that 
-     a. There is a single material
-     b. Its conductivity is uniform, i.e. it does not depend on space
+    The fact that the conductivity is given as a variable means that 
+    
+     i. there is a single material, and
+     ii. its conductivity is uniform, i.e. it does not depend on space.
      
- 3. Giving `T` equal to the desired temperature values after the `BC` definition for both `left` and `right`
+ 3. Giving `T` equal to the desired temperature values after the [`BC`](https://www.seamplex.com/feenox/doc/feenox-manual.html#bc) definition for both `left` and `right`
 
     ```feenox
     BC left  T=0
     BC right T=1
     ```
+    
+    Recall that the names `left` and `right` come from the names of the physical grupos the `.msh` file read by FeenoX (which of course were defined in the `.geo`). 
 
-After the instruction `SOLVE_PROBLEM`, the solution $T(x)$ is available as the one-dimensional function `T(x)`.
+After the instruction [`SOLVE_PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#solve_problem) is executed, the solution $T(x)$ is available as the one-dimensional function `T(x)`.
 We can then
  
- i. print its definition values with `PRINT_FUNCTION`.
- ii. evaluate it at any arbitrary location `x`. FeenoX will use the shape functions to interpolate the nodal solutions, and/or
+ i. print its definition values with [`PRINT_FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function), and/or
+ ii. evaluate it at any arbitrary location `x`. FeenoX will use the shape functions to interpolate the nodal solutions.
  
 Here's a working input file `slab-uniform.fee`:
 
 ```{.feenox include="slab-uniform.fee"}
 ```
+
+We can run it to get the requested results:
  
 ```terminal
+$ gmsh -1 slab.geo 
+Info    : Running 'gmsh -1 slab.geo' [Gmsh 4.11.0-git-e8fe6f6a2, 1 node, max. 1 thread]
+Info    : Started on Sat Dec  2 14:12:31 2023
+Info    : Reading 'slab.geo'...
+Info    : Done reading 'slab.geo'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.000329053s, CPU 0.00022s)
+Info    : 11 nodes 12 elements
+Info    : Writing 'slab.msh'...
+Info    : Done writing 'slab.msh'
+Info    : Stopped on Sat Dec  2 14:12:31 2023 (From start: Wall 0.00535225s, CPU 0.020205s)
 $ feenox slab-uniform.fee 
 0       0
 1       1
@@ -154,27 +180,262 @@ $ feenox slab-uniform.fee
  
 ### Two-material slab
 
-If we have two materials we can give them in two ways:
+If we have two (or more) materials, there are two ways to give their properties:
 
- 1. Using the `MATERIALS` keyword, or
- 2. Appending `_materialname` to either a variable or a function of space.
+ 1. Using the [`MATERIAL`](https://www.seamplex.com/feenox/doc/feenox-manual.html#material) keyword, or
+ 2. Appending `_groupname` to either a variable or a function of space.
+
+For example, let us now create a geometry where the left half of the slab ($x<0.5$) is made of metal (i.e. high conductivity $k=9$) and the right half of the slab ($x>0.5$) is made of plastic (i.e. low conductivity $k=1$):
+
+```{.c include="metal-plastic-slab.geo"}
+```
+
+We now have two "volumetric" labels `metal` and `plastic`.
+The first way to give the conductivities is with the [`MATERIAL`](https://www.seamplex.com/feenox/doc/feenox-manual.html#material) keyword, one for each material:
+
+```{.feenox include="metal-plastic-material.fee"}
+```
+
+The other way is to use two variables, namely `k_metal` and `k_plastic`:
+
+```{.feenox include="metal-plastic-vars.fee"}
+```
+
+```terminal
+$ feenox metal-plastic-vars.fee | tee vars.txt
+0       0
+0.5     0.1
+1       1
+0.1     0.02
+0.2     0.04
+0.3     0.06
+0.4     0.08
+0.6     0.28
+0.7     0.46
+0.8     0.64
+0.9     0.82
+# the temperature at x=1/2 is   0.1
+$ feenox metal-plastic-material.fee > material.txt
+$ diff vars.txt material.txt 
+$ 
+```
+
 
 
 ## Heat flux conditions
 
-These problems need at least one fixed-temperature (a.k.a. Dirichlet) condition.
+Let us now investigate another boundary condition, namely setting a heat flux condition.
+Going back to the single-material one-dimensional slab, let us keep $T(x=0)=0$ but set $q'(x=1)=1$.
+We can check if the heat flux at the other side `left` (i.e. where we fixed the temperature) is equal in magnitude and oppposite in sign to the prescribed heat flux at `right` with the [`COMPUTE_REACTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#compute_reaction) instruction:
+```{.feenox include="slab-uniform-heatflux.fee"}
+```
+
+```terminal
+$ feenox slab-uniform-heatflux.fee 
+0       0
+1       1
+0.1     0.0999997
+0.2     0.2
+0.3     0.3
+0.4     0.4
+0.5     0.5
+0.6     0.6
+0.7     0.7
+0.8     0.8
+0.9     0.9
+# the heatflux at left is -0.999997
+$ 
+```
+
+Let us now introduce a non-uniform conductivity depending on space as
+
+$$
+k(x) = 1+x
+$$
+
+and set the heat flux to $1/\log(2)$.
+This problem has the analytical solution
+
+$$
+T(x) = \frac{\log(1+x)}{\log(2)}
+$$
+
+which we can check with [`PRINT_FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function):
+
+Since we have only one material, we can define a function `k(x)` to define the space-dependent property:
+
+```{.feenox include="slab-kofx-heatflux.fee"}
+```
+
+```terminal
+$ feenox slab-kofx-heatflux.fee | sort -g | tee slab-kofx-heatflux.dat
+0       0       0
+0.1     0.137399        -0.000104342
+0.2     0.262851        -0.000183236
+0.3     0.378267        -0.000244866
+0.4     0.485133        -0.000293832
+0.5     0.58463 -0.000332899
+0.6     0.677707        -0.000365263
+0.7     0.765143        -0.000392187
+0.8     0.847582        -0.000414528
+0.9     0.925566        -0.000433506
+1       0.99955 -0.000449861
+$ pyxplot slab-kofx-heatflux.ppl
+$ 
+```
+
+::: {#fig:slab-kofx}
+
+![Computed temperature](slab-kofx-heatflux.svg){#fig:slab-kofx-heatflux}
+
+![Error](slab-kofx-error.svg){#fig:slab-kofx-error}
+
+Output of `slab-kofx-heatflux.fee`
+:::
+
+> **Homework**
+>
+> 1. Verify that $T(x) = \frac{\log(1+x)}{\log(2)}$ is a solution of the differential equation and satisfies the boundary conditions.
+> 2. Rewrite the space-dependent conductivity $k(x)=1+x$ using the `MATERIAL` keyword.
 
 ## Convection conditions
 
-TBD
+To define a convection condition we need to pass two parameters to the `BC` keyword:
+
+ * A convection coefficient `h`
+ * A reference temperature `Tref`
+ 
+For instance
+
+```feenox
+BC right h=100+y  Tref=2000
+```
+
+To illustrate this feature, let us solve heat conduction on the [Stanford Bunny](https://en.wikipedia.org/wiki/Stanford_bunny) with
+
+ * A fixed space-dependent temperature in the base
+ * A convection condition on the rest of the external surface where the coefficient $h$ varies with the vertical $z$ coordinate
+ 
+```{.feenox include="bunny-thermal.fee"}
+```
+ 
+::: {#fig:bunny-thermal}
+![](bunny-thermal1.png){#fig:bunny-thermal1 width_html=100% width_latex=33%}
+![](bunny-thermal2.png){#fig:bunny-thermal2 width_html=100% width_latex=33%}
+![](bunny-thermal3.png){#fig:bunny-thermal3 width_html=100% width_latex=33%}
+
+Output of `bunny-thermal.fee`
+:::
+ 
 
 ## Volumetric heat sources
 
-TBD
+So far all the sources of heat came from boundary conditions.
+Let us now define volumetric heat sources, that is to say, heat which is dissipated in the bulk of the materials.
 
+To do so, we can use the [property `q`](https://www.seamplex.com/feenox/doc/feenox-manual.html#q) which works exactly like the [conductivity `k`]((https://www.seamplex.com/feenox/doc/feenox-manual.html#k)):
+
+ * If there is only one material, it can be defined either as a variable `q` or a function `q(x,y,z)`
+ * If there are many materials, it can be defined either
+    a. within the `MATERIAL` keyword, or
+    b. by defining a variable or function named `q_groupname`, one for each volumetric group in the mesh
+
+Consider the unit square $[0,1]\times[0,1]$:
+
+```{.c include="square.geo"}
+```
+
+Let us set 
+
+  * uniform unitary conductivity $k$
+  * uniform unitary power source $q$
+  * $T=0$ at the four edges
+
+Note that since there are four different groups holding the same boundary condition we can use the `LABEL` keyword in `BC` to "add" labels to the condition:
+  
+```{.feenox include="square-power.fee"}
+```
+
+![Output of `bunny-thermal.fee`](square-power.png){#fig:square-power}
+
+    
 ## Space-dependent properties: manufactured solution
 
-TBD
+To finish the linear steady-state section, we show how to perform a simple MMS verification using the same unit square as in the previous section.
+
+> Make sure you check out the [MMS](https://github.com/seamplex/feenox/tree/main/tests/mms) section within the [tests](https://github.com/seamplex/feenox/tree/main/tests) directory in the Git repository.
+
+First, let us manufacture a solution temperature, say
+
+$$
+T(x,y) = 1 + \sin^2(2x) \cdot \cos^2(3y)
+$$
+
+with a certain conductivity
+
+$$
+k(x,y) = 1 + x - \frac{y}{2}
+$$
+
+which translate to FeenoX ASCII syntax as
+
+```feenox
+T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
+k(x,y) = 1 + x - y/2
+```
+
+Then, using the differential equation we can work out what the source needs to be in order for that manufactured temperature to be the solution. For that end we use the [`derivative`](https://www.seamplex.com/feenox/doc/feenox-manual.html#derivative) functional:
+
+```feenox
+VAR x' x'' y' y''
+q(x,y) = -(derivative(k(x',y) * derivative(T_manufactured(x'',y), x'', x'), x', x) + \
+           derivative(k(x,y') * derivative(T_manufactured(x,y''), y'', y'), y', y))
+```
+
+We also decide that `left` and `top` get Dirichlet conditions:
+
+```feenox
+BC left   T=T_manufactured(x,y)
+BC top    T=T_manufactured(x,y)
+```
+
+But `bottom` and `right` get Neumann conditions:
+
+```feenox
+BC bottom q=+(-k(x,y)*derivative(T_manufactured(x,y'),y',y))
+BC right  q=-(-k(x,y)*derivative(T_manufactured(x',y),x',x))
+```
+
+After solving the problem, we want to show that the $L-2$ error is small.
+For that end, we use the [`INTEGRATE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#integrate) instruction:
+
+```feenox
+INTEGRATE (T(x,y)-T_manufactured(x,y))^2 RESULT e2
+```
+
+Putting everything together:
+
+```{.feenox include="manufactured.fee"}
+```
+
+```terminal
+$ feenox manufactured.fee 
+3.62229e-05
+$ 
+```
+
+
+
+> Once again, make sure you check out the [MMS](https://github.com/seamplex/feenox/tree/main/tests/mms) section.
+> A proper verification is performed there by using Maxima to compute the symbolic expressions for the sources and boundary conditions and by sweeping over different mesh sizes (and element types) to show that the convergence rate matches the theoretical value.
+
+::: {#fig:mms}
+![](mms-T.png){#fig:mms-T width=50%}
+![](mms-dT.png){#fig:mms-dT width=50%}
+
+Output of `manufactured.fee`
+:::
+
 
 # Non-linear state-state problems
 

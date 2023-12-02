@@ -1,0 +1,21 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+set key above
+
+set terminal pdf
+
+set xlabel "$x$"
+set ylabel "$T(x)$"
+
+set output "slab-kofx-heatflux.pdf"
+plot "slab-kofx-heatflux.dat" w lp pt 15 ps 1.5 lw 2 color blue ti ""
+
+set ylabel "error"
+
+set output "slab-kofx-error.pdf"
+plot "slab-kofx-error.dat" w l lw 2 lt 2 color red ti ""

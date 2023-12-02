@@ -1,0 +1,9 @@
+PROBLEM thermal 2D
+READ_MESH square.msh
+
+k = 1
+q = 1
+BC left T=0 LABEL right LABEL bottom LABEL top
+
+SOLVE_PROBLEM
+WRITE_RESULTS

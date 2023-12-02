@@ -1,0 +1,17 @@
+PROBLEM thermal 3d
+
+# https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl
+READ_MESH bunny.msh SCALE 1e-3
+PHYSICAL_GROUP bunny DIM 3 # this is to compute the COG
+
+# uniform conductivity
+k = 25
+
+# base with a prescribed space-dependent temperature
+BC base T=250-2e3*sqrt((x-bunny_cog[1])^2+(y-bunny_cog[2])^2)
+
+# rest with a convection condition
+BC rest h=10+50*(z-bunny_cog[3])  Tref=100
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk

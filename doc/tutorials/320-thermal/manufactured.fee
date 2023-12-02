@@ -5,7 +5,7 @@ READ_MESH square.msh
 T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
 
 # conductivity
-k(x,y) = 1 + x - 0.5*y
+k(x,y) = 1 + x - y/2
 
 # heat source needed to get the manufactured solution
 VAR x' x'' y' y''

@@ -1,0 +1,9 @@
+PROBLEM thermal 1d
+READ_MESH metal-plastic-slab.msh
+k_metal=9
+k_plastic=1
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT_FUNCTION T
+PRINT "\# the temperature at x=1/2 is" T(1/2) 

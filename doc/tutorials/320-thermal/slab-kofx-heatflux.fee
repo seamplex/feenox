@@ -1,0 +1,18 @@
+PROBLEM thermal 1d
+READ_MESH slab.msh
+
+k(x) = 1+x
+
+BC left  T=0
+BC right q=1/log(2)
+
+# define a function with the analytical solution
+error(x) = T(x)-log(1+x)/log(2)
+
+SOLVE_PROBLEM
+
+# without an explicit range the definition points are written
+PRINT_FUNCTION T error
+
+# since error is algebraic we hate to give an explicit range
+PRINT_FUNCTION error MIN 0 MAX 1 STEP 1e-2 FILE slab-kofx-error.dat

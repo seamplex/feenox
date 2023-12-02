@@ -2,3 +2,6 @@ README.pdf
 *.vtk
 *.msh
 *.pvsm
+Stanford_Bunny.stl
+*.txt
+*.dat
