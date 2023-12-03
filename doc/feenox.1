@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2023-11-27" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2023-12-02" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -216,10 +216,9 @@ See https://www.seamplex.com/feenox/examples for annotated examples.
 .SH INPUT-FILE KEYWORDS
 .SS GENERIC KEYWORDS
 .SS \f[V]ABORT\f[R]
-.RS
 .PP
-Catastrophically abort the execution and quit FeenoX.
-.RE
+::: Catastrophically abort the execution and quit FeenoX.
+:::
 .IP
 .nf
 \f[C]
@@ -234,10 +233,9 @@ The objective of this instruction is to either debug complex input files
 by using only parts of them or to conditionally abort the execution
 using \f[V]IF\f[R] clauses.
 .SS \f[V]ALIAS\f[R]
-.RS
 .PP
-Define a scalar alias of an already-defined indentifier.
-.RE
+::: Define a scalar alias of an already-defined indentifier.
+:::
 .IP
 .nf
 \f[C]
@@ -256,10 +254,9 @@ In the third case, to alias second element (2,3) of matrix \f[V]M\f[R]
 to the new name \f[V]new\f[R], \f[V]M(2,3)\f[R] should be given as the
 existing object.
 .SS \f[V]CLOSE\f[R]
-.RS
 .PP
-Explicitly close a file after input/output.
-.RE
+::: Explicitly close a file after input/output.
+:::
 .IP
 .nf
 \f[C]
@@ -270,10 +267,9 @@ CLOSE <name>
 The given \f[V]<name>\f[R] can be either a fixed-string path or an
 already-defined \f[V]FILE\f[R].
 .SS \f[V]DEFAULT_ARGUMENT_VALUE\f[R]
-.RS
 .PP
-Give a default value for an optional commandline argument.
-.RE
+::: Give a default value for an optional commandline argument.
+:::
 .IP
 .nf
 \f[C]
@@ -292,11 +288,10 @@ and \f[V]<string>\f[R] will be expanded character-by-character where the
 Whether the resulting expression is to be interpreted as a string or as
 a numerical expression will depend on the context.
 .SS \f[V]FILE\f[R]
-.RS
 .PP
-Define a file with a particularly formatted name to be used either as
-input or as output.
-.RE
+::: Define a file with a particularly formatted name to be used either
+as input or as output.
+:::
 .IP
 .nf
 \f[C]
@@ -334,11 +329,10 @@ In the rare case where the automated opening and closing does not fit
 the expected workflow, the file can be explicitly opened or closed with
 the instructions \f[V]FILE_OPEN\f[R] and \f[V]FILE_CLOSE\f[R].
 .SS \f[V]FIT\f[R]
-.RS
 .PP
-Find parameters to fit an analytical function to a pointwise-defined
+::: Find parameters to fit an analytical function to a pointwise-defined
 function.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -384,10 +378,9 @@ iterations \f[V]MAX_ITER\f[R] (default DEFAULT_NLIN_FIT_MAX_ITER).
 If the optional keyword \f[V]VERBOSE\f[R] is given, some data of the
 intermediate steps is written in the standard output.
 .SS \f[V]FUNCTION\f[R]
-.RS
 .PP
-Define a scalar function of one or more variables.
-.RE
+::: Define a scalar function of one or more variables.
+:::
 .IP
 .nf
 \f[C]
@@ -498,10 +491,9 @@ The exponent of the \f[V]shepard\f[R] method is given by
 \f[V]SHEPARD_EXPONENT\f[R].
 Default is \f[V]DEFAULT_SHEPARD_EXPONENT\f[R].
 .SS \f[V]IF\f[R]
-.RS
 .PP
-Execute a set of instructions if a condition is met.
-.RE
+::: Execute a set of instructions if a condition is met.
+:::
 .IP
 .nf
 \f[C]
@@ -513,10 +505,9 @@ IF expr
 \f[R]
 .fi
 .SS \f[V]IMPLICIT\f[R]
-.RS
 .PP
-Define whether implicit definition of variables is allowed or not.
-.RE
+::: Define whether implicit definition of variables is allowed or not.
+:::
 .IP
 .nf
 \f[C]
@@ -532,10 +523,9 @@ Whether implicit declaration is allowed or explicit declaration is
 required depends on the last \f[V]IMPLICIT\f[R] keyword given, which by
 default is \f[V]ALLOWED\f[R].
 .SS \f[V]INCLUDE\f[R]
-.RS
 .PP
-Include another FeenoX input file.
-.RE
+::: Include another FeenoX input file.
+:::
 .IP
 .nf
 \f[C]
@@ -560,10 +550,9 @@ after the main input file in the command line.
 The optional \f[V]FROM\f[R] and \f[V]TO\f[R] keywords can be used to
 include only portions of a file.
 .SS \f[V]MATRIX\f[R]
-.RS
 .PP
-Define a matrix.
-.RE
+::: Define a matrix.
+:::
 .IP
 .nf
 \f[C]
@@ -584,10 +573,9 @@ will be zero.
 If there are more elements than the matrix size, the values will be
 ignored.
 .SS \f[V]OPEN\f[R]
-.RS
 .PP
-Explicitly open a file for input/output.
-.RE
+::: Explicitly open a file for input/output.
+:::
 .IP
 .nf
 \f[C]
@@ -600,11 +588,10 @@ already-defined \f[V]FILE\f[R].
 The mode is only taken into account if the file is not already defined.
 Default is write \f[V]w\f[R].
 .SS \f[V]PRINT\f[R]
-.RS
 .PP
-Write plain-text and/or formatted data to the standard output or into an
-output file.
-.RE
+::: Write plain-text and/or formatted data to the standard output or
+into an output file.
+:::
 .IP
 .nf
 \f[C]
@@ -683,12 +670,11 @@ The \f[V]SKIP_HEADER_STEP\f[R] keyword works similarly for the optional
 The \f[V]SKIP_TIME\f[R] keyword use time advancements to choose how to
 skip printing and may be useful for non-constant time-step problems.
 .SS \f[V]PRINTF\f[R]
-.RS
 .PP
-Instruction akin to C\[cq]s \f[V]printf\f[R].
+::: Instruction akin to C\[cq]s \f[V]printf\f[R].
 Instruction akin to C\[cq]s \f[V]printf\f[R] executed locally from all
 MPI ranks.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -711,11 +697,10 @@ Do not ask for string literals \f[V]%s\f[R].
 As always, to get a literal \f[V]%\f[R] use \f[V]%%\f[R] in the format
 string.
 .SS \f[V]PRINT_FUNCTION\f[R]
-.RS
 .PP
-Print one or more functions as a table of values of dependent and
+::: Print one or more functions as a table of values of dependent and
 independent variables.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -765,10 +750,9 @@ The discretization steps of the ranges are given by either
 If the first function is not point-wise defined, the ranges are
 mandatory.
 .SS \f[V]PRINT_VECTOR\f[R]
-.RS
 .PP
-Print the elements of one or more vectors, one element per line.
-.RE
+::: Print the elements of one or more vectors, one element per line.
+:::
 .IP
 .nf
 \f[C]
@@ -794,10 +778,9 @@ like \f[V]SEP \[dq]\[dq]\f[R].
 The default is a tabulator character `DEFAULT_PRINT_SEPARATOR'
 character.
 .SS \f[V]SOLVE\f[R]
-.RS
 .PP
-Solve a (small) system of non-linear equations.
-.RE
+::: Solve a (small) system of non-linear equations.
+:::
 .IP
 .nf
 \f[C]
@@ -806,11 +789,10 @@ SOLVE FOR <n> UNKNOWNS <var_1> <var_2> ... <var_n> [ METHOD { dnewton | hybrid |
 \f[R]
 .fi
 .SS \f[V]SORT_VECTOR\f[R]
-.RS
 .PP
-Sort the elements of a vector, optionally making the same rearrangement
-in another vector.
-.RE
+::: Sort the elements of a vector, optionally making the same
+rearrangement in another vector.
+:::
 .IP
 .nf
 \f[C]
@@ -824,10 +806,9 @@ If \f[V]<other_vector>\f[R] is given, the same rearrangement is made on
 it.
 Default is ascending order.
 .SS \f[V]VAR\f[R]
-.RS
 .PP
-Explicitly define one or more scalar variables.
-.RE
+::: Explicitly define one or more scalar variables.
+:::
 .IP
 .nf
 \f[C]
@@ -845,10 +826,9 @@ But if one wants to define a function like
 \f[V]x\[aq]\f[R] needs to be explicitly defined as \f[V]VAR x\[aq]\f[R]
 before the integral.
 .SS \f[V]VECTOR\f[R]
-.RS
 .PP
-Define a vector.
-.RE
+::: Define a vector.
+:::
 .IP
 .nf
 \f[C]
@@ -873,10 +853,9 @@ If there are more elements than the vector size, the values will be
 ignored.
 .SS DAE-RELATED KEYWORDS
 .SS \f[V]INITIAL_CONDITIONS\f[R]
-.RS
 .PP
-Define how initial conditions of DAE problems are computed.
-.RE
+::: Define how initial conditions of DAE problems are computed.
+:::
 .IP
 .nf
 \f[C]
@@ -910,11 +889,10 @@ See the (SUNDIALS
 documentation)[https://computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf]
 for further information.
 .SS \f[V]PHASE_SPACE\f[R]
-.RS
 .PP
-Asks FeenoX to solve a set of algebraic-differntial equations and define
-the variables, vectors and/or matrices that span the phase space.
-.RE
+::: Asks FeenoX to solve a set of algebraic-differntial equations and
+define the variables, vectors and/or matrices that span the phase space.
+:::
 .IP
 .nf
 \f[C]
@@ -922,10 +900,10 @@ PHASE_SPACE PHASE_SPACE <vars> ... <vectors> ... <matrices> ...
 \f[R]
 .fi
 .SS \f[V]TIME_PATH\f[R]
-.RS
 .PP
-Force time-dependent problems to pass through specific instants of time.
-.RE
+::: Force time-dependent problems to pass through specific instants of
+time.
+:::
 .IP
 .nf
 \f[C]
@@ -941,11 +919,10 @@ The list of expresssions should evaluate to a sorted list of values for
 all times.
 .SS PDE-RELATED KEYWORDS
 .SS \f[V]BC\f[R]
-.RS
 .PP
-Define a boundary condition to be applied to faces, edges and/or
+::: Define a boundary condition to be applied to faces, edges and/or
 vertices.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -971,11 +948,10 @@ depend on space as the provided expression in a thermal problem and
 mechanical or modal problem.
 See the particular section on boundary conditions for further details.
 .SS \f[V]COMPUTE_REACTION\f[R]
-.RS
 .PP
-Compute the reaction (force, moment, power, etc.)
+::: Compute the reaction (force, moment, power, etc.)
 at selected face, edge or vertex.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -993,10 +969,9 @@ The resulting reaction will be stored in the variable (thermal) or
 vector (elasticity) provided.
 If the variable or vector does not exist, it will be created.
 .SS \f[V]DUMP\f[R]
-.RS
 .PP
-Dump raw PETSc objects used to solve PDEs into files.
-.RE
+::: Dump raw PETSc objects used to solve PDEs into files.
+:::
 .IP
 .nf
 \f[C]
@@ -1004,11 +979,10 @@ DUMP [ FORMAT { binary | ascii | octave } ] [ K |   K_bc |   b |   b_bc |   M | 
 \f[R]
 .fi
 .SS \f[V]FIND_EXTREMA\f[R]
-.RS
 .PP
-Find and/or compute the absolute extrema of a function or expression
+::: Find and/or compute the absolute extrema of a function or expression
 over a mesh (or a subset of it).
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1046,11 +1020,10 @@ The index (either node or cell) where the absolute minimum (maximum) is
 found is stored in the variable indicated by \f[V]I_MIN\f[R]
 (\f[V]I_MAX\f[R]).
 .SS \f[V]INTEGRATE\f[R]
-.RS
 .PP
-Spatially integrate a function or expression over a mesh (or a subset of
-it).
-.RE
+::: Spatially integrate a function or expression over a mesh (or a
+subset of it).
+:::
 .IP
 .nf
 \f[C]
@@ -1086,11 +1059,10 @@ The scalar result of the integration is stored in the variable given by
 the mandatory keyword \f[V]RESULT\f[R].
 If the variable does not exist, it is created.
 .SS \f[V]LINEARIZE_STRESS\f[R]
-.RS
 .PP
-Compute linearized membrane and/or bending stresses according to
+::: Compute linearized membrane and/or bending stresses according to
 ASME\ VIII Div\ 2 Sec\ 5.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1098,14 +1070,14 @@ LINEARIZE_STRESS
 \f[R]
 .fi
 .SS \f[V]MATERIAL\f[R]
-.RS
 .PP
-Define a material its and properties to be used in volumes.
-.RE
+::: Define a material its and properties to be used in volumes.
+:::
 .IP
 .nf
 \f[C]
-MATERIAL <name> [ MESH <name> ] [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ] [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]  
+MATERIAL <name> [ MESH <name> ] [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ] 
+ [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]  
 \f[R]
 .fi
 .PP
@@ -1132,10 +1104,9 @@ of boron in the material, a new per-material property can be added named
 \f[V]boron\f[R] and then the function \f[V]boron(x,y,z)\f[R] can be used
 in the expression that defines the mandatory property.
 .SS \f[V]PETSC_OPTIONS\f[R]
-.RS
 .PP
-Pass verbatim options to PETSc.
-.RE
+::: Pass verbatim options to PETSc.
+:::
 .IP
 .nf
 \f[C]
@@ -1163,10 +1134,9 @@ That is to say, while in the command line one would give
 Conversely, instead of \f[V]--mg_levels_pc_type=sor\f[R] one has to give
 \f[V]-mg_levels_pc_type sor\f[R].
 .SS \f[V]PHYSICAL_GROUP\f[R]
-.RS
 .PP
-Explicitly defines a physical group of elements on a mesh.
-.RE
+::: Explicitly defines a physical group of elements on a mesh.
+:::
 .IP
 .nf
 \f[C]
@@ -1212,10 +1182,9 @@ Note that while there can be only one \f[V]MATERIAL\f[R] associated to a
 physical group, there can be many \f[V]BC\f[R]s associated to a physical
 group.
 .SS \f[V]PROBLEM\f[R]
-.RS
 .PP
-Ask FeenoX to solve a partial differential equation problem.
-.RE
+::: Ask FeenoX to solve a partial differential equation problem.
+:::
 .IP
 .nf
 \f[C]
@@ -1357,11 +1326,10 @@ If \f[V]relative\f[R], then \f[I]α\f[R] is equal to the given fraction
 of the average diagonal entries in the stiffness matrix.
 Default is\ \f[I]α\f[R] = 1.
 .SS \f[V]READ_MESH\f[R]
-.RS
 .PP
-Read an unstructured mesh and (optionally) functions of space-time from
-a file.
-.RE
+::: Read an unstructured mesh and (optionally) functions of space-time
+from a file.
+:::
 .IP
 .nf
 \f[C]
@@ -1428,10 +1396,9 @@ The \f[V]READ_FUNCTION\f[R] keyword is a shortcut when the scalar name
 and the to-be-defined function are the same.
 If no mesh is marked as \f[V]MAIN\f[R], the first one is the main one.
 .SS \f[V]SOLVE_PROBLEM\f[R]
-.RS
 .PP
-Explicitly solve the PDE problem.
-.RE
+::: Explicitly solve the PDE problem.
+:::
 .IP
 .nf
 \f[C]
@@ -1446,11 +1413,10 @@ result functions.
 For transient or quasisstatic problems, that means advancing one time
 step.
 .SS \f[V]WRITE_MESH\f[R]
-.RS
 .PP
-Write a mesh and/or generic functions of space-time to a post-processing
-file.
-.RE
+::: Write a mesh and/or generic functions of space-time to a
+post-processing file.
+:::
 .IP
 .nf
 \f[C]
@@ -1510,11 +1476,10 @@ keyword are taken as the vector elements.
 In the latter, the next six fields following the
 \f[V]SYMMETRIC_TENSOR\f[R] keyword are taken as the tensor elements.
 .SS \f[V]WRITE_RESULTS\f[R]
-.RS
 .PP
-Write the problem mesh and problem results to a file for
+::: Write the problem mesh and problem results to a file for
 post-processing.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1548,10 +1513,9 @@ Make sure the format reads floating-point data, i.e.\ do not use
 Default is \f[V]%g\f[R].
 .SH SPECIAL VARIABLES
 .SS \f[V]done\f[R]
-.RS
 .PP
-Flag that indicates whether the overall calculation is over.
-.RE
+::: Flag that indicates whether the overall calculation is over.
+:::
 .PP
 This variable is set to true by FeenoX when the computation finished so
 it can be checked in an \f[V]IF\f[R] block to do something only in the
@@ -1563,10 +1527,9 @@ the computation at \f[I]t\f[R] = 10 by setting \f[V]done = t > 10\f[R].
 This \f[V]done\f[R] variable can also come from (and sent to) other
 sources, like a shared memory object for coupled calculations.
 .SS \f[V]done_static\f[R]
-.RS
 .PP
-Flag that indicates whether the static calculation is over or not.
-.RE
+::: Flag that indicates whether the static calculation is over or not.
+:::
 .PP
 It is set to true (i.e.\  ≠ 0) by feenox if \f[V]step_static\f[R] ≥
 \f[V]static_steps\f[R].
@@ -1575,10 +1538,10 @@ static step and the static calculation ends after finishing the step.
 It can be used in \f[V]IF\f[R] blocks to check if the static step is
 finished or not.
 .SS \f[V]done_transient\f[R]
-.RS
 .PP
-Flag that indicates whether the transient calculation is over or not.
-.RE
+::: Flag that indicates whether the transient calculation is over or
+not.
+:::
 .PP
 It is set to true (i.e.\  ≠ 0) by feenox if \f[V]t\f[R] ≥
 \f[V]end_time\f[R].
@@ -1588,10 +1551,9 @@ step.
 It can be used in \f[V]IF\f[R] blocks to check if the transient steps
 are finished or not.
 .SS \f[V]dt\f[R]
-.RS
 .PP
-Actual value of the time step for transient calculations.
-.RE
+::: Actual value of the time step for transient calculations.
+:::
 .PP
 When solving DAE systems, this variable is set by feenox.
 It can be written by the user for example by importing it from another
@@ -1601,152 +1563,131 @@ Care should be taken when solving DAE systems and overwriting
 Default value is DEFAULT_DT, which is a power of two and roundoff errors
 are thus reduced.
 .SS \f[V]end_time\f[R]
-.RS
 .PP
-Final time of the transient calculation, to be set by the user.
-.RE
+::: Final time of the transient calculation, to be set by the user.
+:::
 .PP
 The default value is zero, meaning no transient calculation.
 .SS \f[V]i\f[R]
-.RS
 .PP
-Dummy index, used mainly in vector and matrix row subindex expressions.
-.RE
+::: Dummy index, used mainly in vector and matrix row subindex
+expressions.
+:::
 .SS \f[V]infinite\f[R]
-.RS
 .PP
-A very big positive number.
-.RE
+::: A very big positive number.
+:::
 .PP
 It can be used as \f[V]end_time = infinite\f[R] or to define improper
 integrals with infinite limits.
 Default is 2^50^ ≈ 1 × 10^15^.
 .SS \f[V]in_static\f[R]
-.RS
 .PP
-Flag that indicates if FeenoX is solving the iterative static
+::: Flag that indicates if FeenoX is solving the iterative static
 calculation.
-.RE
+:::
 .PP
 This is a read-only variable that is non zero if the static calculation.
 .SS \f[V]in_static_first\f[R]
-.RS
 .PP
-Flag that indicates if feenox is in the first step of the iterative
+::: Flag that indicates if feenox is in the first step of the iterative
 static calculation.
-.RE
+:::
 .SS \f[V]in_static_last\f[R]
-.RS
 .PP
-Flag that indicates if feenox is in the last step of the iterative
+::: Flag that indicates if feenox is in the last step of the iterative
 static calculation.
-.RE
+:::
 .SS \f[V]in_transient\f[R]
-.RS
 .PP
-Flag that indicates if feenox is solving transient calculation.
-.RE
+::: Flag that indicates if feenox is solving transient calculation.
+:::
 .SS \f[V]in_transient_first\f[R]
-.RS
 .PP
-Flag that indicates if feenox is in the first step of the transient
+::: Flag that indicates if feenox is in the first step of the transient
 calculation.
-.RE
+:::
 .SS \f[V]in_transient_last\f[R]
-.RS
 .PP
-Flag that indicates if feenox is in the last step of the transient
+::: Flag that indicates if feenox is in the last step of the transient
 calculation.
-.RE
+:::
 .SS \f[V]j\f[R]
-.RS
 .PP
-Dummy index, used mainly in matrix column subindex expressions.
-.RE
+::: Dummy index, used mainly in matrix column subindex expressions.
+:::
 .SS \f[V]max_dt\f[R]
-.RS
 .PP
-Maximum bound for the time step that feenox should take when solving DAE
-systems.
-.RE
+::: Maximum bound for the time step that feenox should take when solving
+DAE systems.
+:::
 .SS \f[V]min_dt\f[R]
-.RS
 .PP
-Minimum bound for the time step that feenox should take when solving DAE
-systems.
-.RE
+::: Minimum bound for the time step that feenox should take when solving
+DAE systems.
+:::
 .SS \f[V]mpi_rank\f[R]
-.RS
 .PP
-The current rank in an MPI execution.
+::: The current rank in an MPI execution.
 Mind the \f[V]PRINTF_ALL\f[R] instruction.
-.RE
+:::
 .SS \f[V]mpi_size\f[R]
-.RS
 .PP
-The number of total ranks in an MPI execution.
-.RE
+::: The number of total ranks in an MPI execution.
+:::
 .SS \f[V]on_gsl_error\f[R]
-.RS
 .PP
-This should be set to a mask that indicates how to proceed if an error
-ir raised in any routine of the GNU Scientific Library.
-.RE
+::: This should be set to a mask that indicates how to proceed if an
+error ir raised in any routine of the GNU Scientific Library.
+:::
 .SS \f[V]on_ida_error\f[R]
-.RS
 .PP
-This should be set to a mask that indicates how to proceed if an error
-ir raised in any routine of the SUNDIALS Library.
-.RE
+::: This should be set to a mask that indicates how to proceed if an
+error ir raised in any routine of the SUNDIALS Library.
+:::
 .SS \f[V]on_nan\f[R]
-.RS
 .PP
-This should be set to a mask that indicates how to proceed if
+::: This should be set to a mask that indicates how to proceed if
 Not-A-Number signal (such as a division by zero) is generated when
 evaluating any expression within feenox.
-.RE
+:::
 .SS \f[V]pi\f[R]
-.RS
 .PP
-A double-precision floating point representaion of the number
-\f[I]π\f[R]
-.RE
+::: A double-precision floating point representaion of the number
+\f[I]π\f[R] :::
 .PP
 It is equal to the \f[V]M_PI\f[R] constant in \f[V]math.h\f[R] .
 .SS \f[V]pid\f[R]
-.RS
 .PP
-The Unix process id of the FeenoX instance.
-.RE
+::: The Unix process id of the FeenoX instance.
+:::
 .SS \f[V]static_steps\f[R]
-.RS
 .PP
-Number of steps that ought to be taken during the static calculation, to
-be set by the user.
-.RE
+::: Number of steps that ought to be taken during the static
+calculation, to be set by the user.
+:::
 .PP
 The default value is one, meaning only one static step.
 .SS \f[V]step_static\f[R]
-.RS
 .PP
-Indicates the current step number of the iterative static calculation.
-.RE
+::: Indicates the current step number of the iterative static
+calculation.
+:::
 .PP
 This is a read-only variable that contains the current step of the
 static calculation.
 .SS \f[V]step_transient\f[R]
-.RS
 .PP
-Indicates the current step number of the transient static calculation.
-.RE
+::: Indicates the current step number of the transient static
+calculation.
+:::
 .PP
 This is a read-only variable that contains the current step of the
 transient calculation.
 .SS \f[V]t\f[R]
-.RS
 .PP
-Actual value of the time for transient calculations.
-.RE
+::: Actual value of the time for transient calculations.
+:::
 .PP
 This variable is set by FeenoX, but can be written by the user for
 example by importing it from another transient code by means of
@@ -1754,10 +1695,9 @@ shared-memory objects.
 Care should be taken when solving DAE systems and overwriting
 \f[V]t\f[R].
 .SS \f[V]zero\f[R]
-.RS
 .PP
-A very small positive number.
-.RE
+::: A very small positive number.
+:::
 .PP
 It is taken to avoid roundoff errors when comparing floating point
 numbers such as replacing \f[I]a\f[R] ≤ \f[I]a\f[R]~max~ with
@@ -1774,10 +1714,9 @@ TBD.
 TBD.
 .SH BUILT-IN FUNCTIONS
 .SS \f[V]abs\f[R]
-.RS
 .PP
-Returns the absolute value of the argument\ \f[I]x\f[R].
-.RE
+::: Returns the absolute value of the argument\ \f[I]x\f[R].
+:::
 .IP
 .nf
 \f[C]
@@ -1787,12 +1726,11 @@ abs(x)
 .PP
 \ 
 .SS \f[V]acos\f[R]
-.RS
 .PP
-Computes the arc in radians whose cosine is equal to the
+::: Computes the arc in radians whose cosine is equal to the
 argument\ \f[I]x\f[R].
 A NaN error is raised if\ |\f[I]x\f[R]| > 1.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1802,12 +1740,11 @@ acos(x)
 .PP
 \ 
 .SS \f[V]asin\f[R]
-.RS
 .PP
-Computes the arc in radians whose sine is equal to the
+::: Computes the arc in radians whose sine is equal to the
 argument\ \f[I]x\f[R].
 A NaN error is raised if\ |\f[I]x\f[R]| > 1.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1817,10 +1754,9 @@ asin(x)
 .PP
 \ 
 .SS \f[V]atan\f[R]
-.RS
 .PP
-Computes, in radians, the arc tangent of the argument\ \f[I]x\f[R].
-.RE
+::: Computes, in radians, the arc tangent of the argument\ \f[I]x\f[R].
+:::
 .IP
 .nf
 \f[C]
@@ -1830,13 +1766,12 @@ atan(x)
 .PP
 \ 
 .SS \f[V]atan2\f[R]
-.RS
 .PP
-Computes, in radians, the arc tangent of
+::: Computes, in radians, the arc tangent of
 quotient\ \f[I]y\f[R]/\f[I]x\f[R], using the signs of the two arguments
 to determine the quadrant of the result, which is in the range
 [−\f[I]π\f[R],\f[I]π\f[R]].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1844,11 +1779,10 @@ atan2(y,x)
 \f[R]
 .fi
 .SS \f[V]ceil\f[R]
-.RS
 .PP
-Returns the smallest integral value not less than the
+::: Returns the smallest integral value not less than the
 argument\ \f[I]x\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1858,17 +1792,16 @@ ceil(x)
 .PP
 \ 
 .SS \f[V]clock\f[R]
-.RS
 .PP
-Returns the value of a certain clock in seconds measured from a certain
-(but specific) milestone.
+::: Returns the value of a certain clock in seconds measured from a
+certain (but specific) milestone.
 The kind of clock and the initial milestone depend on the optional
 integer argument\ \f[I]f\f[R].
 It defaults to one, meaning \f[V]CLOCK_MONOTONIC\f[R].
 The list and the meanings of the other available values for\ \f[I]f\f[R]
 can be checked in the \f[V]clock_gettime (2)\f[R] system call manual
 page.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1876,15 +1809,14 @@ clock([f])
 \f[R]
 .fi
 .SS \f[V]cos\f[R]
-.RS
 .PP
-Computes the cosine of the argument\ \f[I]x\f[R], where\ \f[I]x\f[R] is
-in radians.
+::: Computes the cosine of the argument\ \f[I]x\f[R], where\ \f[I]x\f[R]
+is in radians.
 A cosine wave can be generated by passing as the argument\ \f[I]x\f[R] a
 linear function of time such as\ \f[I]ω\f[R]\f[I]t\f[R] + \f[I]ϕ\f[R],
 where \f[I]ω\f[R] controls the frequency of the wave and \f[I]ϕ\f[R]
 controls its phase.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1894,11 +1826,10 @@ cos(x)
 .PP
 \ 
 .SS \f[V]cosh\f[R]
-.RS
 .PP
-Computes the hyperbolic cosine of the argument\ \f[I]x\f[R],
+::: Computes the hyperbolic cosine of the argument\ \f[I]x\f[R],
 where\ \f[I]x\f[R] is in radians.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1908,15 +1839,14 @@ cosh(x)
 .PP
 \ 
 .SS \f[V]cpu_time\f[R]
-.RS
 .PP
-Returns the CPU time used by the local FeenoX rank, in seconds.
+::: Returns the CPU time used by the local FeenoX rank, in seconds.
 If the optional argument \f[V]f\f[R] is not provided or it is zero
 (default), the sum of times for both user-space and kernel-space usage
 is returned.
 For \f[V]f=1\f[R] only user time is returned.
 For \f[V]f=2\f[R] only system time is returned.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1924,9 +1854,8 @@ cpu_time([f])
 \f[R]
 .fi
 .SS \f[V]d_dt\f[R]
-.RS
 .PP
-Computes the time derivative of the expression given in the
+::: Computes the time derivative of the expression given in the
 argument\ \f[I]x\f[R] during a transient problem using the difference
 between the value of the signal in the previous time step and the actual
 value divided by the time step\ \f[I]δ\f[R]\f[I]t\f[R] stored in
@@ -1938,7 +1867,7 @@ Unlike the functional \f[V]derivative\f[R], the full dependence of these
 variables with time does not need to be known beforehand, i.e.\ the
 expression \f[V]x\f[R] might involve variables read from a shared-memory
 object at each time step.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1946,11 +1875,10 @@ d_dt(x)
 \f[R]
 .fi
 .SS \f[V]deadband\f[R]
-.RS
 .PP
-Filters the first argument\ \f[I]x\f[R] with a deadband centered at zero
-with an amplitude given by the second argument \f[I]a\f[R].
-.RE
+::: Filters the first argument\ \f[I]x\f[R] with a deadband centered at
+zero with an amplitude given by the second argument \f[I]a\f[R].
+:::
 .IP
 .nf
 \f[C]
@@ -1958,9 +1886,8 @@ deadband(x, a)
 \f[R]
 .fi
 .SS \f[V]equal\f[R]
-.RS
 .PP
-Checks if the two first expressions \f[I]a\f[R] and \f[I]b\f[R] are
+::: Checks if the two first expressions \f[I]a\f[R] and \f[I]b\f[R] are
 equal, up to the tolerance given by the third optional argument
 \f[I]ϵ\f[R].
 If either |\f[I]a\f[R]| > 1 or |\f[I]b\f[R]| > 1, the arguments are
@@ -1969,7 +1896,7 @@ value of their difference is compared against \f[I]ϵ\f[R].
 This function returns zero if the arguments are not equal and one
 otherwise.
 Default value for \f[I]ϵ\f[R] = 10^−9^.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -1977,12 +1904,11 @@ equal(a, b, [eps])
 \f[R]
 .fi
 .SS \f[V]exp\f[R]
-.RS
 .PP
-Computes the exponential function the argument\ \f[I]x\f[R], i.e.\ the
-base of the natural logarithm\ \f[I]e\f[R] raised to the\ \f[I]x\f[R]-th
-power.
-.RE
+::: Computes the exponential function the argument\ \f[I]x\f[R],
+i.e.\ the base of the natural logarithm\ \f[I]e\f[R] raised to
+the\ \f[I]x\f[R]-th power.
+:::
 .IP
 .nf
 \f[C]
@@ -1992,12 +1918,11 @@ exp(x)
 .PP
 \ 
 .SS \f[V]expint1\f[R]
-.RS
 .PP
-Computes the first exponential integral function of the
+::: Computes the first exponential integral function of the
 argument\ \f[I]x\f[R].
 If\ \f[I]x\f[R] is zero, a NaN error is issued.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2007,11 +1932,10 @@ expint1(x)
 .PP
 \ 
 .SS \f[V]expint2\f[R]
-.RS
 .PP
-Computes the second exponential integral function of the
+::: Computes the second exponential integral function of the
 argument\ \f[I]x\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2021,11 +1945,10 @@ expint2(x)
 .PP
 \ 
 .SS \f[V]expint3\f[R]
-.RS
 .PP
-Computes the third exponential integral function of the
+::: Computes the third exponential integral function of the
 argument\ \f[I]x\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2035,13 +1958,12 @@ expint3(x)
 .PP
 \ 
 .SS \f[V]expintn\f[R]
-.RS
 .PP
-Computes the \f[I]n\f[R]-th exponential integral function of the
+::: Computes the \f[I]n\f[R]-th exponential integral function of the
 argument\ \f[I]x\f[R].
 If\ \f[I]n\f[R] is zero or one and\ \f[I]x\f[R] is zero, a NaN error is
 issued.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2049,11 +1971,10 @@ expintn(n,x)
 \f[R]
 .fi
 .SS \f[V]floor\f[R]
-.RS
 .PP
-Returns the largest integral value not greater than the
+::: Returns the largest integral value not greater than the
 argument\ \f[I]x\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2063,10 +1984,9 @@ floor(x)
 .PP
 \ 
 .SS \f[V]gammaf\f[R]
-.RS
 .PP
-Computes the Gamma function\ \f[I]Γ\f[R](\f[I]x\f[R]).
-.RE
+::: Computes the Gamma function\ \f[I]Γ\f[R](\f[I]x\f[R]).
+:::
 .IP
 .nf
 \f[C]
@@ -2076,14 +1996,13 @@ gammaf(x)
 .PP
 \ 
 .SS \f[V]heaviside\f[R]
-.RS
 .PP
-Computes the zero-centered Heaviside step function of the
+::: Computes the zero-centered Heaviside step function of the
 argument\ \f[I]x\f[R].
 If the optional second argument \f[I]δ\f[R] is provided, the
 discontinuous step at\ \f[I]x\f[R] = 0 is replaced by a ramp starting
 at\ \f[I]x\f[R] = 0 and finishing at\ \f[I]x\f[R] = \f[I]δ\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2093,12 +2012,11 @@ heaviside(x, [delta])
 .PP
 \ 
 .SS \f[V]if\f[R]
-.RS
 .PP
-Performs a conditional testing of the first argument \f[I]a\f[R], and
-returns either the second optional argument \f[I]b\f[R] if \f[I]a\f[R]
-is different from zero or the third optional argument \f[I]c\f[R] if
-\f[I]a\f[R] evaluates to zero.
+::: Performs a conditional testing of the first argument \f[I]a\f[R],
+and returns either the second optional argument \f[I]b\f[R] if
+\f[I]a\f[R] is different from zero or the third optional argument
+\f[I]c\f[R] if \f[I]a\f[R] evaluates to zero.
 The comparison of the condition \f[I]a\f[R] with zero is performed
 within the precision given by the optional fourth argument \f[I]ϵ\f[R].
 If the second argument \f[I]c\f[R] is not given and \f[I]a\f[R] is not
@@ -2108,7 +2026,7 @@ the function returns zero.
 The default precision is \f[I]ϵ\f[R] = 10^−9^.
 Even though \f[V]if\f[R] is a logical operation, all the arguments and
 the returned value are double-precision floating point numbers.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2116,9 +2034,8 @@ if(a, [b], [c], [eps])
 \f[R]
 .fi
 .SS \f[V]integral_dt\f[R]
-.RS
 .PP
-Computes the time integral of the expression given in the
+::: Computes the time integral of the expression given in the
 argument\ \f[I]x\f[R] during a transient problem with the trapezoidal
 rule using the value of the signal in the previous time step and the
 current value.
@@ -2127,7 +2044,7 @@ Unlike the functional \f[V]integral\f[R], the full dependence of these
 variables with time does not need to be known beforehand, i.e.\ the
 expression \f[V]x\f[R] might involve variables read from a shared-memory
 object at each time step.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2135,15 +2052,14 @@ integral_dt(x)
 \f[R]
 .fi
 .SS \f[V]integral_euler_dt\f[R]
-.RS
 .PP
-Idem as \f[V]integral_dt\f[R] but uses the backward Euler rule to update
-the instantaenous integral value.
+::: Idem as \f[V]integral_dt\f[R] but uses the backward Euler rule to
+update the instantaenous integral value.
 This function is provided in case this particular way of approximating
 time integrals is needed, for instance to compare FeenoX solutions with
 other computer codes.
 In general, it is recommended to use \f[V]integral_dt\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2151,11 +2067,10 @@ integral_euler_dt(x)
 \f[R]
 .fi
 .SS \f[V]is_even\f[R]
-.RS
 .PP
-Returns one if the argument\ \f[I]x\f[R] rounded to the nearest integer
-is even.
-.RE
+::: Returns one if the argument\ \f[I]x\f[R] rounded to the nearest
+integer is even.
+:::
 .IP
 .nf
 \f[C]
@@ -2163,12 +2078,11 @@ is_even(x)
 \f[R]
 .fi
 .SS \f[V]is_in_interval\f[R]
-.RS
 .PP
-Returns true if the argument\ \f[I]x\f[R] is in the
+::: Returns true if the argument\ \f[I]x\f[R] is in the
 interval\ [\f[I]a\f[R], \f[I]b\f[R]), i.e.\ including\ \f[I]a\f[R] but
 excluding\ \f[I]b\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2176,11 +2090,10 @@ is_in_interval(x, a, b)
 \f[R]
 .fi
 .SS \f[V]is_odd\f[R]
-.RS
 .PP
-Returns one if the argument\ \f[I]x\f[R] rounded to the nearest integer
-is odd.
-.RE
+::: Returns one if the argument\ \f[I]x\f[R] rounded to the nearest
+integer is odd.
+:::
 .IP
 .nf
 \f[C]
@@ -2188,11 +2101,10 @@ is_odd(x)
 \f[R]
 .fi
 .SS \f[V]j0\f[R]
-.RS
 .PP
-Computes the regular cylindrical Bessel function of zeroth order
+::: Computes the regular cylindrical Bessel function of zeroth order
 evaluated at the argument\ \f[I]x\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2202,18 +2114,17 @@ j0(x)
 .PP
 \ 
 .SS \f[V]lag\f[R]
-.RS
 .PP
-Filters the first argument\ \f[I]x\f[R](\f[I]t\f[R]) with a first-order
-lag of characteristic time \f[I]τ\f[R], i.e.\ this function applies the
-transfer function\ $G(s) = \[rs]frac{1}{1 + s\[rs]tau}$ to the
-time-dependent signal\ \f[I]x\f[R](\f[I]t\f[R]) to obtain a filtered
+::: Filters the first argument\ \f[I]x\f[R](\f[I]t\f[R]) with a
+first-order lag of characteristic time \f[I]τ\f[R], i.e.\ this function
+applies the transfer function\ $G(s) = \[rs]frac{1}{1 + s\[rs]tau}$ to
+the time-dependent signal\ \f[I]x\f[R](\f[I]t\f[R]) to obtain a filtered
 signal\ \f[I]y\f[R](\f[I]t\f[R]), by assuming that it is constant during
 the time interval\ [\f[I]t\f[R]−\f[I]Δ\f[R]\f[I]t\f[R],\f[I]t\f[R]] and
 using the analytical solution of the differential equation for that case
 at\ \f[I]t\f[R] = \f[I]Δ\f[R]\f[I]t\f[R] with the initial
 condition\ \f[I]y\f[R](0) = \f[I]y\f[R](\f[I]t\f[R]−\f[I]Δ\f[R]\f[I]t\f[R]).
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2221,13 +2132,12 @@ lag(x, tau)
 \f[R]
 .fi
 .SS \f[V]lag_bilinear\f[R]
-.RS
 .PP
-Filters the first argument\ \f[I]x\f[R](\f[I]t\f[R]) with a first-order
-lag of characteristic time \f[I]τ\f[R] to the time-dependent
+::: Filters the first argument\ \f[I]x\f[R](\f[I]t\f[R]) with a
+first-order lag of characteristic time \f[I]τ\f[R] to the time-dependent
 signal\ \f[I]x\f[R](\f[I]t\f[R]) by using the bilinear transformation
 formula.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2235,12 +2145,11 @@ lag_bilinear(x, tau)
 \f[R]
 .fi
 .SS \f[V]lag_euler\f[R]
-.RS
 .PP
-Filters the first argument\ \f[I]x\f[R](\f[I]t\f[R]) with a first-order
-lag of characteristic time \f[I]τ\f[R] to the time-dependent
+::: Filters the first argument\ \f[I]x\f[R](\f[I]t\f[R]) with a
+first-order lag of characteristic time \f[I]τ\f[R] to the time-dependent
 signal\ \f[I]x\f[R](\f[I]t\f[R]) by using the Euler forward rule.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2248,9 +2157,8 @@ lag_euler(x, tau)
 \f[R]
 .fi
 .SS \f[V]last\f[R]
-.RS
 .PP
-Returns the value the variable\ \f[I]x\f[R] had in the previous time
+::: Returns the value the variable\ \f[I]x\f[R] had in the previous time
 step.
 This function is equivalent to the\ \f[I]Z\f[R]-transform operator
 \[lq]delay\[rq] denoted by\ \f[I]z\f[R]^−1^[\f[I]x\f[R]].
@@ -2260,7 +2168,7 @@ The optional flag\ \f[I]p\f[R] should be set to one if the reference to
 \f[V]last\f[R] is done in an assignment over a variable that already
 appears inside expression\ \f[I]x\f[R] such as \f[V]x = last(x)\f[R].
 See example number 2.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2268,13 +2176,12 @@ last(x,[p])
 \f[R]
 .fi
 .SS \f[V]limit\f[R]
-.RS
 .PP
-Limits the first argument\ \f[I]x\f[R] to the interval
+::: Limits the first argument\ \f[I]x\f[R] to the interval
 [\f[I]a\f[R],\f[I]b\f[R]].
 The second argument \f[I]a\f[R] should be less than the third argument
 \f[I]b\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2282,14 +2189,13 @@ limit(x, a, b)
 \f[R]
 .fi
 .SS \f[V]limit_dt\f[R]
-.RS
 .PP
-Limits the value of the first argument\ \f[I]x\f[R](\f[I]t\f[R]) so to
-that its time derivative is bounded to the interval
+::: Limits the value of the first argument\ \f[I]x\f[R](\f[I]t\f[R]) so
+to that its time derivative is bounded to the interval
 [\f[I]a\f[R],\f[I]b\f[R]].
 The second argument \f[I]a\f[R] should be less than the third argument
 \f[I]b\f[R].
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2297,11 +2203,10 @@ limit_dt(x, a, b)
 \f[R]
 .fi
 .SS \f[V]log\f[R]
-.RS
 .PP
-Computes the natural logarithm of the argument\ \f[I]x\f[R].
+::: Computes the natural logarithm of the argument\ \f[I]x\f[R].
 If\ \f[I]x\f[R] is zero or negative, a NaN error is issued.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2311,12 +2216,11 @@ log(x)
 .PP
 \ 
 .SS \f[V]mark_max\f[R]
-.RS
 .PP
-Returns the integer index \f[I]i\f[R] of the maximum of the
+::: Returns the integer index \f[I]i\f[R] of the maximum of the
 arguments\ \f[I]x\f[R]~\f[I]i\f[R]~ provided.
 Currently only maximum of ten arguments can be provided.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2324,12 +2228,11 @@ mark_max(x1, x2, [...], [x10])
 \f[R]
 .fi
 .SS \f[V]mark_min\f[R]
-.RS
 .PP
-Returns the integer index \f[I]i\f[R] of the minimum of the
+::: Returns the integer index \f[I]i\f[R] of the minimum of the
 arguments\ \f[I]x\f[R]~\f[I]i\f[R]~ provided.
 Currently only maximum of ten arguments can be provided.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2337,11 +2240,11 @@ mark_max(x1, x2, [...], [x10])
 \f[R]
 .fi
 .SS \f[V]max\f[R]
-.RS
 .PP
-Returns the maximum of the arguments\ \f[I]x\f[R]~\f[I]i\f[R]~ provided.
+::: Returns the maximum of the arguments\ \f[I]x\f[R]~\f[I]i\f[R]~
+provided.
 Currently only maximum of ten arguments can be given.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2349,11 +2252,10 @@ max(x1, x2, [...], [x10])
 \f[R]
 .fi
 .SS \f[V]memory\f[R]
-.RS
 .PP
-Returns the maximum memory (resident set size) used by FeenoX, in
+::: Returns the maximum memory (resident set size) used by FeenoX, in
 Gigabytes.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2361,11 +2263,11 @@ memory()
 \f[R]
 .fi
 .SS \f[V]min\f[R]
-.RS
 .PP
-Returns the minimum of the arguments\ \f[I]x\f[R]~\f[I]i\f[R]~ provided.
+::: Returns the minimum of the arguments\ \f[I]x\f[R]~\f[I]i\f[R]~
+provided.
 Currently only maximum of ten arguments can be given.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2373,12 +2275,11 @@ min(x1, x2, [...], [x10])
 \f[R]
 .fi
 .SS \f[V]mod\f[R]
-.RS
 .PP
-Returns the remainder of the division between the first
+::: Returns the remainder of the division between the first
 argument\ \f[I]a\f[R] and the second one\ \f[I]b\f[R].
 Both arguments may be non-integral.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2386,15 +2287,14 @@ mod(a, b)
 \f[R]
 .fi
 .SS \f[V]mpi_memory_local\f[R]
-.RS
 .PP
-Returns the memory usage as reported by PETSc in the give rank, in
+::: Returns the memory usage as reported by PETSc in the give rank, in
 Gigabytes.
 If no rank is given, each rank returns a local value which should be
 printed with \f[V]PRINTF_ALL\f[R].
 Returns the memory global usage as reported by PETSc summing over all
 ranks, in Gigabytes.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2402,14 +2302,13 @@ mpi_memory_local([rank]) mpi_memory_global()
 \f[R]
 .fi
 .SS \f[V]not\f[R]
-.RS
 .PP
-Returns one if the first argument\ \f[I]x\f[R] is zero and zero
+::: Returns one if the first argument\ \f[I]x\f[R] is zero and zero
 otherwise.
 The second optional argument \f[I]ϵ\f[R] gives the precision of the
 \[lq]zero\[rq] evaluation.
 If not given, default is \f[I]ϵ\f[R] = 10^−9^.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2417,9 +2316,8 @@ not(x, [eps])
 \f[R]
 .fi
 .SS \f[V]random\f[R]
-.RS
 .PP
-Returns a random real number uniformly distributed between the first
+::: Returns a random real number uniformly distributed between the first
 real argument\ \f[I]x\f[R]~1~ and the second one\ \f[I]x\f[R]~2~.
 If the third integer argument \f[I]s\f[R] is given, it is used as the
 seed and thus repetitive sequences can be obtained.
@@ -2429,7 +2327,7 @@ Therefore, two successive calls to the function without seed (hopefully)
 do not give the same result.
 This function uses a second-order multiple recursive generator described
 by Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2437,11 +2335,10 @@ random(x1, x2, [s])
 \f[R]
 .fi
 .SS \f[V]random_gauss\f[R]
-.RS
 .PP
-Returns a random real number with a Gaussian distribution with a mean
-equal to the first argument\ \f[I]x\f[R]~1~ and a standard deviation
-equatl to the second one\ \f[I]x\f[R]~2~.
+::: Returns a random real number with a Gaussian distribution with a
+mean equal to the first argument\ \f[I]x\f[R]~1~ and a standard
+deviation equatl to the second one\ \f[I]x\f[R]~2~.
 If the third integer argument \f[I]s\f[R] is given, it is used as the
 seed and thus repetitive sequences can be obtained.
 If no seed is provided, the current time (in seconds) plus the internal
@@ -2450,7 +2347,7 @@ Therefore, two successive calls to the function without seed (hopefully)
 do not give the same result.
 This function uses a second-order multiple recursive generator described
 by Knuth in Seminumerical Algorithms, 3rd Ed., Section 3.6.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2458,11 +2355,10 @@ random_gauss(x1, x2, [s])
 \f[R]
 .fi
 .SS \f[V]round\f[R]
-.RS
 .PP
-Rounds the argument\ \f[I]x\f[R] to the nearest integer.
+::: Rounds the argument\ \f[I]x\f[R] to the nearest integer.
 Halfway cases are rounded away from zero.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2472,15 +2368,14 @@ round(x)
 .PP
 \ 
 .SS \f[V]sawtooth_wave\f[R]
-.RS
 .PP
-Computes a sawtooth wave between zero and one with a period equal to
+::: Computes a sawtooth wave between zero and one with a period equal to
 one.
 As with the sine wave, a sawtooh wave can be generated by passing as the
 argument\ \f[I]x\f[R] a linear function of time such
 as\ \f[I]ω\f[R]\f[I]t\f[R] + \f[I]ϕ\f[R], where\ \f[I]ω\f[R] controls
 the frequency of the wave and \f[I]ϕ\f[R] controls its phase.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2490,11 +2385,10 @@ sawtooth_wave(x)
 .PP
 \ 
 .SS \f[V]sech\f[R]
-.RS
 .PP
-Computes the hyperbolic secant of the argument\ \f[I]x\f[R],
+::: Computes the hyperbolic secant of the argument\ \f[I]x\f[R],
 where\ \f[I]x\f[R] is in radians.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2504,14 +2398,13 @@ sech(x)
 .PP
 \ 
 .SS \f[V]sgn\f[R]
-.RS
 .PP
-Returns minus one, zero or plus one depending on the sign of the first
-argument\ \f[I]x\f[R].
+::: Returns minus one, zero or plus one depending on the sign of the
+first argument\ \f[I]x\f[R].
 The second optional argument \f[I]ϵ\f[R] gives the precision of the
 \[lq]zero\[rq] evaluation.
 If not given, default is \f[I]ϵ\f[R] = 10^−9^.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2521,15 +2414,14 @@ sgn(x, [eps])
 .PP
 \ 
 .SS \f[V]sin\f[R]
-.RS
 .PP
-Computes the sine of the argument\ \f[I]x\f[R], where\ \f[I]x\f[R] is in
-radians.
+::: Computes the sine of the argument\ \f[I]x\f[R], where\ \f[I]x\f[R]
+is in radians.
 A sine wave can be generated by passing as the argument\ \f[I]x\f[R] a
 linear function of time such as\ \f[I]ω\f[R]\f[I]t\f[R] + \f[I]ϕ\f[R],
 where\ \f[I]ω\f[R] controls the frequency of the wave and\ \f[I]ϕ\f[R]
 controls its phase.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2539,11 +2431,10 @@ sin(x)
 .PP
 \ 
 .SS \f[V]sinh\f[R]
-.RS
 .PP
-Computes the hyperbolic sine of the argument\ \f[I]x\f[R],
+::: Computes the hyperbolic sine of the argument\ \f[I]x\f[R],
 where\ \f[I]x\f[R] is in radians.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2553,11 +2444,10 @@ sinh(x)
 .PP
 \ 
 .SS \f[V]sqrt\f[R]
-.RS
 .PP
-Computes the positive square root of the argument\ \f[I]x\f[R].
+::: Computes the positive square root of the argument\ \f[I]x\f[R].
 If\ \f[I]x\f[R] is negative, a NaN error is issued.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2567,17 +2457,16 @@ sqrt(x)
 .PP
 \ 
 .SS \f[V]square_wave\f[R]
-.RS
 .PP
-Computes a square function between zero and one with a period equal to
-one.
+::: Computes a square function between zero and one with a period equal
+to one.
 The output is one for 0 < \f[I]x\f[R] < 1/2 and zero for
 1/2 ≤ \f[I]x\f[R] < 1.
 As with the sine wave, a square wave can be generated by passing as the
 argument\ \f[I]x\f[R] a linear function of time such
 as\ \f[I]ω\f[R]\f[I]t\f[R] + \f[I]ϕ\f[R], where\ \f[I]ω\f[R] controls
 the frequency of the wave and\ \f[I]ϕ\f[R] controls its phase.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2587,11 +2476,10 @@ square_wave(x)
 .PP
 \ 
 .SS \f[V]tan\f[R]
-.RS
 .PP
-Computes the tangent of the argument\ \f[I]x\f[R], where\ \f[I]x\f[R] is
-in radians.
-.RE
+::: Computes the tangent of the argument\ \f[I]x\f[R],
+where\ \f[I]x\f[R] is in radians.
+:::
 .IP
 .nf
 \f[C]
@@ -2601,11 +2489,10 @@ tan(x)
 .PP
 \ 
 .SS \f[V]tanh\f[R]
-.RS
 .PP
-Computes the hyperbolic tangent of the argument\ \f[I]x\f[R],
+::: Computes the hyperbolic tangent of the argument\ \f[I]x\f[R],
 where\ \f[I]x\f[R] is in radians.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2615,14 +2502,13 @@ tanh(x)
 .PP
 \ 
 .SS \f[V]threshold_max\f[R]
-.RS
 .PP
-Returns one if the first argument\ \f[I]x\f[R] is greater than the
+::: Returns one if the first argument\ \f[I]x\f[R] is greater than the
 threshold given by the second argument \f[I]a\f[R], and zero otherwise.
 If the optional third argument \f[I]b\f[R] is provided, an hysteresis of
 width \f[I]b\f[R] is needed in order to reset the function value.
 Default is no hysteresis, i.e.\ \f[I]b\f[R] = 0.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2630,14 +2516,13 @@ threshold_max(x, a, [b])
 \f[R]
 .fi
 .SS \f[V]threshold_min\f[R]
-.RS
 .PP
-Returns one if the first argument\ \f[I]x\f[R] is less than the
+::: Returns one if the first argument\ \f[I]x\f[R] is less than the
 threshold given by the second argument \f[I]a\f[R], and zero otherwise.
 If the optional third argument \f[I]b\f[R] is provided, an hysteresis of
 width \f[I]b\f[R] is needed in order to reset the function value.
 Default is no hysteresis, i.e.\ \f[I]b\f[R] = 0.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2645,15 +2530,14 @@ threshold_min(x, a, [b])
 \f[R]
 .fi
 .SS \f[V]triangular_wave\f[R]
-.RS
 .PP
-Computes a triangular wave between zero and one with a period equal to
-one.
+::: Computes a triangular wave between zero and one with a period equal
+to one.
 As with the sine wave, a triangular wave can be generated by passing as
 the argument\ \f[I]x\f[R] a linear function of time such
 as\ \f[I]ω\f[R]\f[I]t\f[R] + \f[I]ϕ\f[R], where\ \f[I]ω\f[R] controls
 the frequency of the wave and\ \f[I]ϕ\f[R] controls its phase.
-.RE
+:::
 .IP
 .nf
 \f[C]
@@ -2663,10 +2547,10 @@ triangular_wave(x)
 .PP
 \ 
 .SS \f[V]wall_time\f[R]
-.RS
 .PP
-Returns the time ellapsed since the invocation of FeenoX, in seconds.
-.RE
+::: Returns the time ellapsed since the invocation of FeenoX, in
+seconds.
+:::
 .IP
 .nf
 \f[C]

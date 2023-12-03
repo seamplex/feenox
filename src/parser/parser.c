@@ -2762,7 +2762,7 @@ int feenox_parse_material(void) {
       }
       feenox_free(mesh_name);
           
-///kw_pde+MATERIAL+usage [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ]
+///kw_pde+MATERIAL+usage [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ] @
 ///kw_pde+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
 ///kw_pde+MATERIAL+detail added using as many `LABEL` keywords as needed.
     } else if (strcasecmp(token, "LABEL") == 0 ||strcasecmp(token, "PHYSICAL_GROUP") == 0) {

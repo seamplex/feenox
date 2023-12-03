@@ -162,14 +162,24 @@ reference-laplace-va.md
 
 
 
-## The heat conduction equation
+## The heat conduction equation {#thermal}
 
-Set `PROBLEM` to `thermal` to solve thermal conduction:
+Set [`PROBLEM`](#problem) to `thermal` to solve the heat conduction equation:
 
-$$\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)$$
+$$
+\rho(\vec{x},T) c_p(\vec{x},T) \cdot \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x}, T) \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)
+$$
 
-If `end_time` is zero, only the steady-state problem is solved.
-If $k$, $q'''$ or any Neumann boundary condition depends on\ $T$, the problem is set to non-linear automatically.
+ * If [`end_time`](#end_time) is zero, only the steady-state problem is solved.
+ * If [`end_time`](#end_time) $>$ zero, then a transient problem is solved.
+ * If either
+ 
+    a. [`k`](#k), and/or
+    b. [`q'''](#q-1)$, and/or
+    c. any Neumann boundary condition
+    
+   depends on [`T`](#t), the problem is set to non-linear automatically.
+
 
 ### Thermal results
 

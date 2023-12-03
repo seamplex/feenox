@@ -41,9 +41,9 @@ for kw in ${kws}; do
   echo "#  \`${kw}\`"
   echo
   
-  echo -n '> '
+  echo ":::"
   grep "///${tag}+${kw}+desc" ${src} | cut -d" " -f2-
-  echo  
+  echo ":::"
   echo  
   
   # usage

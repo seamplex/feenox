@@ -58,9 +58,13 @@
 
 Welcome to **FeenoX’s tutorial number three**. Here you will learn how
 to solve the heat conduction equation with FeenoX in all of its flavors:
-linear and non-linear, static and transient. All the files needed to go
-through the tutorial are available in [FeenoX’s Git repository under
-`doc/tutorials/320-thermal`][].
+
+1.  linear and non-linear,
+2.  static and transient.
+
+All the files needed to go through the tutorial are available in
+[FeenoX’s Git repository under `doc/tutorials/320-thermal`][]. Make sure
+you also check the [heat conduction examples][].
 
 - We start solving linear steady-state problems. As long as neither of
   the
@@ -85,7 +89,7 @@ through the tutorial are available in [FeenoX’s Git repository under
   T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
 
   # conductivity
-  k(x,y) = 1 + x - 0.5*y
+  k(x,y) = 1 + x - y/2
 
   # heat source needed to get the manufactured solution
   VAR x' x'' y' y''
@@ -107,43 +111,44 @@ through the tutorial are available in [FeenoX’s Git repository under
   PRINT e2
   ```
 
-- If any of a. b. or c. do depend on the temperature $T(\mathbf{x})$,
-  then the problem is non-linear. FeenoX is able to detect this and will
-  switch to a non-linear solver *automatically*. Why would the user need
-  to tell the solver if the problem is linear or not?
+- If these conditions are not met, then the problem is non-linear.
+  FeenoX is able to detect this and will **automatically** switch to a
+  non-linear solver. Why would the user need to tell the solver if the
+  problem is linear or not? If you think it through, it should be the
+  other way round. And that is what FeenoX does.
 
-- We can trigger non-linearities by
+- Non-linearities can be triggered by either
 
-  - adding a boundary conditions that depends on $T(\mathbf{x})$, such
-    as radiation
+  - adding a boundary conditions that depends non-linearly
+    on $T(\mathbf{x})$, such as radiation, and/or
   - having a conductivity that depends on temperature, which is the case
-    for most materials anyway
+    for most materials anyway, and/or
   - using heat sources that are temperature-dependent, where
-    increasing $T$ decreases the source
+    increasing $T$ decreases the source.
 
-- We can check that FeenoX could detect the non-linearities by passing
-  `--snes_monitor` and/or `--snes_view` in the command line. Here, SNES
-  means “Scalable Non-linear Equation Solvers” in PETSc’s jargon. The
-  `--snes_view` option will show some details about the solver. In
-  linear problems, SNES is not used but the KSP (Krylov SubSpace
+- We can check if FeenoX can detect the non-linearities by passing
+  `--snes_monitor` and/or `--snes_view` in the command line. Here,
+  [SNES][] means “Scalable Non-linear Equation Solvers” in PETSc’s
+  jargon. The `--snes_view` option shows some details about the solver.
+  In linear problems, SNES is not used but the [KSP][] (Krylov SubSpace
   solvers) framework is used instead. Therefore, if we used
-  `--snes_view` in a linear problem then FeenoX will complain about an
+  `--snes_view` in a linear problem then FeenoX would complain about an
   unused command-line option.
 
 - If, for some reason, the user does not want to have FeenoX to
   autodetect the non-linearities then she could force the problem type
   using either
 
-  1.  the keywords `LINEAR` and `NON_LINEAR` in the `PROBLEM`
+  1.  the keywords `LINEAR` and `NON_LINEAR` in the [`PROBLEM`][]
       definition, or
-  2.  the command-line options `--linear` and `--non-linear`.
+  2.  the [command-line options][] `--linear` and `--non-linear`.
 
 - Different linear and non-linear solvers (and pre-conditioners) can be
   chosen either from the command line (e.g. `--snes_type=newtonls`) or
   from the `PROBLEM` definition (e.g. `NONLINEAR_SOLVER newtonls`).
-  Check out the [FeenoX manual section for the keyword `PROBLEM`][] for
-  further details. FeenoX can have hard-coded PETSc options using the
-  [`PETSC_OPTIONS` definition][] as well.
+  Check out the [FeenoX manual section for the keyword
+  `PROBLEM`][`PROBLEM`] for further details. FeenoX can have hard-coded
+  PETSc options using the [`PETSC_OPTIONS` definition][] as well.
 
 - Finally we show how to solve transient problems, either
 
@@ -154,7 +159,11 @@ through the tutorial are available in [FeenoX’s Git repository under
   3.  both
 
   [FeenoX’s Git repository under `doc/tutorials/320-thermal`]: https://github.com/seamplex/feenox/tree/main/doc/tutorials/320-thermal
-  [FeenoX manual section for the keyword `PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
+  [heat conduction examples]: https://www.seamplex.com/feenox/examples/thermal.html
+  [SNES]: https://petsc.org/release/manual/snes/
+  [KSP]: https://petsc.org/release/manual/ksp/
+  [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
+  [command-line options]: https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation
   [`PETSC_OPTIONS` definition]: https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options
 
 # Linear steady-state problems
@@ -178,7 +187,7 @@ temperatures—independently of the actual value of the conductivity.
 
 ### Single-material slab
 
-Let us create a unitary slab between $x=0$ and $x=1$ with Gmsh using
+Let us create a unitary slab between $x=0$ and $x=1$ with Gmsh using
 this `slab.geo`:
 
 ``` c
@@ -197,7 +206,8 @@ The end at $x=0$ is called `left` and the one at $x=1$ is called
 `right`. So we can ask FeenoX to solve a thermal problem with uniform
 conductivity $k$ and fixed temperatures at both ends by
 
-1.  Defining `PROBLEM` as `thermal` and giving either `1d` or `DIM 1`:
+1.  Defining [`PROBLEM`][] as [`thermal`][] and giving either `1d` or
+    `DIM 1`:
 
     ``` feenox
     PROBLEM thermal 1d
@@ -217,31 +227,36 @@ conductivity $k$ and fixed temperatures at both ends by
     $    
     ```
 
-2.  Setting the special variable `k` to a constant:
+2.  Setting the [special variable `k`][] to a constant:
 
     ``` feenox
     k = 1
     ```
 
-    The fact that the conductivity is givens as a variable means that
+    The fact that the conductivity is given as a variable means that
 
-    1.  There is a single material
-    2.  Its conductivity is uniform, i.e. it does not depend on space
+    1.  there is a single material, and
+    2.  its conductivity is uniform, i.e. it does not depend on space.
 
-3.  Giving `T` equal to the desired temperature values after the `BC`
-    definition for both `left` and `right`
+3.  Giving `T` equal to the desired temperature values after the
+    [`BC`][] definition for both `left` and `right`
 
     ``` feenox
     BC left  T=0
     BC right T=1
     ```
 
-After the instruction `SOLVE_PROBLEM`, the solution $T(x)$ is available
-as the one-dimensional function `T(x)`. We can then
+    Recall that the names `left` and `right` come from the names of the
+    physical grupos the `.msh` file read by FeenoX (which of course were
+    defined in the `.geo`).
 
-1.  print its definition values with `PRINT_FUNCTION`.
+After the instruction [`SOLVE_PROBLEM`][] is executed, the
+solution $T(x)$ is available as the one-dimensional function `T(x)`. We
+can then
+
+1.  print its definition values with [`PRINT_FUNCTION`][], and/or
 2.  evaluate it at any arbitrary location `x`. FeenoX will use the shape
-    functions to interpolate the nodal solutions, and/or
+    functions to interpolate the nodal solutions.
 
 Here’s a working input file `slab-uniform.fee`:
 
@@ -269,7 +284,21 @@ PRINT_FUNCTION T
 PRINT "\# the temperature at x=2/3 is" T(2/3) 
 ```
 
+We can run it to get the requested results:
+
 ``` terminal
+$ gmsh -1 slab.geo 
+Info    : Running 'gmsh -1 slab.geo' [Gmsh 4.11.0-git-e8fe6f6a2, 1 node, max. 1 thread]
+Info    : Started on Sat Dec  2 14:12:31 2023
+Info    : Reading 'slab.geo'...
+Info    : Done reading 'slab.geo'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.000329053s, CPU 0.00022s)
+Info    : 11 nodes 12 elements
+Info    : Writing 'slab.msh'...
+Info    : Done writing 'slab.msh'
+Info    : Stopped on Sat Dec  2 14:12:31 2023 (From start: Wall 0.00535225s, CPU 0.020205s)
 $ feenox slab-uniform.fee 
 0       0
 1       1
@@ -291,30 +320,445 @@ $ feenox slab-uniform.fee
 > 2.  Change the values of the boundary conditions and check the result
 >     is always a linear interpolation.
 
+  [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
+  [`thermal`]: http://seamplex.com/feenox/doc/feenox-manual.html#thermal
+  [special variable `k`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#k
+  [`BC`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#bc
+  [`SOLVE_PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#solve_problem
+  [`PRINT_FUNCTION`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function
+
 ### Two-material slab
 
-If we have two materials we can give them in two ways:
+If we have two (or more) materials, there are two ways to give their
+properties:
 
-1.  Using the `MATERIALS` keyword, or
-2.  Appending `_materialname` to either a variable or a function of
-    space.
+1.  Using the [`MATERIAL`][] keyword, or
+2.  Appending `_groupname` to either a variable or a function of space.
+
+For example, let us now create a geometry where the left half of the
+slab ($x<0.5$) is made of metal (i.e. high conductivity $k=9$) and the
+right half of the slab ($x>0.5$) is made of plastic (i.e. low
+conductivity $k=1$):
+
+``` c
+Point(1) = {0.0, 0, 0};
+Point(2) = {0.5, 0, 0};
+Point(3) = {1.0, 0, 0};
+Line(1) = {1, 2};
+Line(2) = {2, 3};
+
+Physical Point("left") = {1};
+Physical Point("right") = {3};
+Physical Line("metal") = {1};
+Physical Line("plastic") = {2};
+
+Transfinite Curve {1,2} = 5+1;
+```
+
+We now have two “volumetric” labels `metal` and `plastic`. The first way
+to give the conductivities is with the [`MATERIAL`][] keyword, one for
+each material:
+
+``` feenox
+PROBLEM thermal 1d
+READ_MESH metal-plastic-slab.msh
+MATERIAL metal   k=9
+MATERIAL plastic k=1
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT_FUNCTION T
+PRINT "\# the temperature at x=1/2 is" T(1/2) 
+```
+
+The other way is to use two variables, namely `k_metal` and `k_plastic`:
+
+``` feenox
+PROBLEM thermal 1d
+READ_MESH metal-plastic-slab.msh
+k_metal=9
+k_plastic=1
+BC left  T=0
+BC right T=1
+SOLVE_PROBLEM
+PRINT_FUNCTION T
+PRINT "\# the temperature at x=1/2 is" T(1/2) 
+```
+
+``` terminal
+$ feenox metal-plastic-vars.fee | tee vars.txt
+0       0
+0.5     0.1
+1       1
+0.1     0.02
+0.2     0.04
+0.3     0.06
+0.4     0.08
+0.6     0.28
+0.7     0.46
+0.8     0.64
+0.9     0.82
+# the temperature at x=1/2 is   0.1
+$ feenox metal-plastic-material.fee > material.txt
+$ diff vars.txt material.txt 
+$ 
+```
+
+  [`MATERIAL`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#material
 
 ## Heat flux conditions
 
-These problems need at least one fixed-temperature (a.k.a. Dirichlet)
-condition.
+Let us now investigate another boundary condition, namely setting a heat
+flux condition. Going back to the single-material one-dimensional slab,
+let us keep $T(x=0)=0$ but set $q'(x=1)=1$. We can check if the heat
+flux at the other side `left` (i.e. where we fixed the temperature) is
+equal in magnitude and oppposite in sign to the prescribed heat flux at
+`right` with the [`COMPUTE_REACTION`][] instruction:
+
+``` feenox
+PROBLEM thermal 1d
+READ_MESH slab.msh
+
+k = 1
+
+# boundary conditions: q=something means "prescribed heat flux"
+BC left  T=0
+BC right q=1
+
+SOLVE_PROBLEM
+PRINT_FUNCTION T
+
+COMPUTE_REACTION left RESULT q_left
+PRINTF "\# the heatflux at left is %g" q_left
+```
+
+``` terminal
+$ feenox slab-uniform-heatflux.fee 
+0       0
+1       1
+0.1     0.0999997
+0.2     0.2
+0.3     0.3
+0.4     0.4
+0.5     0.5
+0.6     0.6
+0.7     0.7
+0.8     0.8
+0.9     0.9
+# the heatflux at left is -0.999997
+$ 
+```
+
+Let us now introduce a non-uniform conductivity depending on space as
+
+$$
+k(x) = 1+x
+$$
+
+and set the heat flux to $1/\log(2)$. This problem has the analytical
+solution
+
+$$
+T(x) = \frac{\log(1+x)}{\log(2)}
+$$
+
+which we can check with [`PRINT_FUNCTION`][]:
+
+Since we have only one material, we can define a function `k(x)` to
+define the space-dependent property:
+
+``` feenox
+PROBLEM thermal 1d
+READ_MESH slab.msh
+
+k(x) = 1+x
+
+BC left  T=0
+BC right q=1/log(2)
+
+# define a function with the analytical solution
+error(x) = T(x)-log(1+x)/log(2)
+
+SOLVE_PROBLEM
+
+# without an explicit range the definition points are written
+PRINT_FUNCTION T error
+
+# since error is algebraic we hate to give an explicit range
+PRINT_FUNCTION error MIN 0 MAX 1 STEP 1e-2 FILE slab-kofx-error.dat
+```
+
+``` terminal
+$ feenox slab-kofx-heatflux.fee | sort -g | tee slab-kofx-heatflux.dat
+0       0       0
+0.1     0.137399        -0.000104342
+0.2     0.262851        -0.000183236
+0.3     0.378267        -0.000244866
+0.4     0.485133        -0.000293832
+0.5     0.58463 -0.000332899
+0.6     0.677707        -0.000365263
+0.7     0.765143        -0.000392187
+0.8     0.847582        -0.000414528
+0.9     0.925566        -0.000433506
+1       0.99955 -0.000449861
+$ pyxplot slab-kofx-heatflux.ppl
+$ 
+```
+
+<figure id="fig:slab-kofx" class="subfigures">
+<figure id="fig:slab-kofx-heatflux">
+<img src="slab-kofx-heatflux.svg" alt="Computed temperature" />
+<figcaption>a</figcaption>
+</figure>
+<figure id="fig:slab-kofx-error">
+<img src="slab-kofx-error.svg" alt="Error" />
+<figcaption>b</figcaption>
+</figure>
+<figcaption><p>Figure 1: Output of <code>slab-kofx-heatflux.fee</code>.
+a — Computed temperature, b — Error</p></figcaption>
+</figure>
+
+> **Homework**
+>
+> 1.  Verify that $T(x) = \frac{\log(1+x)}{\log(2)}$ is a solution of
+>     the differential equation and satisfies the boundary conditions.
+> 2.  Rewrite the space-dependent conductivity $k(x)=1+x$ using the
+>     `MATERIAL` keyword.
+
+  [`COMPUTE_REACTION`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#compute_reaction
+  [`PRINT_FUNCTION`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function
 
 ## Convection conditions
 
-TBD
+To define a convection condition we need to pass two parameters to the
+`BC` keyword:
+
+- A convection coefficient `h`
+- A reference temperature `Tref`
+
+For instance
+
+``` feenox
+BC right h=100+y  Tref=2000
+```
+
+To illustrate this feature, let us solve heat conduction on the
+[Stanford Bunny][] with
+
+- A fixed space-dependent temperature in the base
+- A convection condition on the rest of the external surface where the
+  coefficient $h$ varies with the vertical $z$ coordinate
+
+``` feenox
+PROBLEM thermal 3d
+
+# https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl
+READ_MESH bunny.msh SCALE 1e-3
+PHYSICAL_GROUP bunny DIM 3 # this is to compute the COG
+
+# uniform conductivity
+k = 25
+
+# base with a prescribed space-dependent temperature
+BC base T=250-2e3*sqrt((x-bunny_cog[1])^2+(y-bunny_cog[2])^2)
+
+# rest with a convection condition
+BC rest h=10+50*(z-bunny_cog[3])  Tref=100
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk
+```
+
+<figure id="fig:bunny-thermal" class="subfigures">
+<p><img src="bunny-thermal1.png" id="fig:bunny-thermal1"
+data-width_html="100%" data-width_latex="33%" alt="a" /> <img
+src="bunny-thermal2.png" id="fig:bunny-thermal2" data-width_html="100%"
+data-width_latex="33%" alt="b" /> <img src="bunny-thermal3.png"
+id="fig:bunny-thermal3" data-width_html="100%" data-width_latex="33%"
+alt="c" /></p>
+<figcaption><p>Figure 2: Output of <code>bunny-thermal.fee</code>.
+</p></figcaption>
+</figure>
+
+  [Stanford Bunny]: https://en.wikipedia.org/wiki/Stanford_bunny
 
 ## Volumetric heat sources
 
-TBD
+So far all the sources of heat came from boundary conditions. Let us now
+define volumetric heat sources, that is to say, heat which is dissipated
+in the bulk of the materials.
+
+To do so, we can use the [property `q`][] which works exactly like the
+[conductivity `k`][]:
+
+- If there is only one material, it can be defined either as a variable
+  `q` or a function `q(x,y,z)`
+- If there are many materials, it can be defined either
+  1.  within the `MATERIAL` keyword, or
+  2.  by defining a variable or function named `q_groupname`, one for
+      each volumetric group in the mesh
+
+Consider the unit square $[0,1]\times[0,1]$:
+
+``` c
+SetFactory("OpenCASCADE");
+Rectangle(1) = {0, 0, 0, 1, 1, 0};
+
+Physical Surface("bulk", 1) = {1};
+Physical Curve("left", 2) = {4};
+Physical Curve("right", 3) = {2};
+Physical Curve("bottom", 4) = {1};
+Physical Curve("top", 5) = {3};
+
+Mesh.MeshSizeMax = 1/10;
+
+```
+
+Let us set
+
+- uniform unitary conductivity $k$
+- uniform unitary power source $q$
+- $T=0$ at the four edges
+
+Note that since there are four different groups holding the same
+boundary condition we can use the `LABEL` keyword in `BC` to “add”
+labels to the condition:
+
+``` feenox
+PROBLEM thermal 2D
+READ_MESH square.msh
+
+k = 1
+q = 1
+BC left T=0 LABEL right LABEL bottom LABEL top
+
+SOLVE_PROBLEM
+WRITE_RESULTS
+```
+
+<figure id="fig:square-power">
+<img src="square-power.png" alt="Output of bunny-thermal.fee" />
+<figcaption>Figure 3: Output of
+<code>bunny-thermal.fee</code></figcaption>
+</figure>
+
+  [property `q`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#q
+  [conductivity `k`]: (https://www.seamplex.com/feenox/doc/feenox-manual.html#k)
 
 ## Space-dependent properties: manufactured solution
 
-TBD
+To finish the linear steady-state section, we show how to perform a
+simple MMS verification using the same unit square as in the previous
+section.
+
+> Make sure you check out the [MMS][] section within the [tests][]
+> directory in the Git repository.
+
+First, let us manufacture a solution temperature, say
+
+$$
+T(x,y) = 1 + \sin^2(2x) \cdot \cos^2(3y)
+$$
+
+with a certain conductivity
+
+$$
+k(x,y) = 1 + x - \frac{y}{2}
+$$
+
+which translate to FeenoX ASCII syntax as
+
+``` feenox
+T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
+k(x,y) = 1 + x - y/2
+```
+
+Then, using the differential equation we can work out what the source
+needs to be in order for that manufactured temperature to be the
+solution. For that end we use the [`derivative`][] functional:
+
+``` feenox
+VAR x' x'' y' y''
+q(x,y) = -(derivative(k(x',y) * derivative(T_manufactured(x'',y), x'', x'), x', x) + \
+           derivative(k(x,y') * derivative(T_manufactured(x,y''), y'', y'), y', y))
+```
+
+We also decide that `left` and `top` get Dirichlet conditions:
+
+``` feenox
+BC left   T=T_manufactured(x,y)
+BC top    T=T_manufactured(x,y)
+```
+
+But `bottom` and `right` get Neumann conditions:
+
+``` feenox
+BC bottom q=+(-k(x,y)*derivative(T_manufactured(x,y'),y',y))
+BC right  q=-(-k(x,y)*derivative(T_manufactured(x',y),x',x))
+```
+
+After solving the problem, we want to show that the $L-2$ error is
+small. For that end, we use the [`INTEGRATE`][] instruction:
+
+``` feenox
+INTEGRATE (T(x,y)-T_manufactured(x,y))^2 RESULT e2
+```
+
+Putting everything together:
+
+``` feenox
+PROBLEM thermal 2D
+READ_MESH square.msh
+
+# manufactured solution
+T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
+
+# conductivity
+k(x,y) = 1 + x - y/2
+
+# heat source needed to get the manufactured solution
+VAR x' x'' y' y''
+q(x,y) = -(derivative(k(x',y) * derivative(T_manufactured(x'',y), x'', x'), x', x) + \
+           derivative(k(x,y') * derivative(T_manufactured(x,y''), y'', y'), y', y))
+
+# boundary conditions, two fixed temps and two heat fluxes
+BC left   T=T_manufactured(x,y)
+BC top    T=T_manufactured(x,y)
+BC bottom q=+(-k(x,y)*derivative(T_manufactured(x,y'),y',y))
+BC right  q=-(-k(x,y)*derivative(T_manufactured(x',y),x',x))
+
+SOLVE_PROBLEM
+
+WRITE_MESH manufactured.vtk T T_manufactured T(x,y)-T_manufactured(x,y)
+
+# compute and show L-2 error
+INTEGRATE (T(x,y)-T_manufactured(x,y))^2 RESULT e2
+PRINT e2
+```
+
+``` terminal
+$ feenox manufactured.fee 
+3.62229e-05
+$ 
+```
+
+> Once again, make sure you check out the [MMS][] section. A proper
+> verification is performed there by using Maxima to compute the
+> symbolic expressions for the sources and boundary conditions and by
+> sweeping over different mesh sizes (and element types) to show that
+> the convergence rate matches the theoretical value.
+
+<figure id="fig:mms" class="subfigures">
+<p><img src="mms-T.png" id="fig:mms-T" style="width:50.0%" alt="a" />
+<img src="mms-dT.png" id="fig:mms-dT" style="width:50.0%" alt="b" /></p>
+<figcaption><p>Figure 4: Output of <code>manufactured.fee</code>.
+</p></figcaption>
+</figure>
+
+  [MMS]: https://github.com/seamplex/feenox/tree/main/tests/mms
+  [tests]: https://github.com/seamplex/feenox/tree/main/tests
+  [`derivative`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#derivative
+  [`INTEGRATE`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#integrate
 
 # Non-linear state-state problems
 
@@ -620,7 +1064,7 @@ $
 alt="Bottom view (symmetry)" />
 <figcaption>b</figcaption>
 </figure>
-<figcaption><p>Figure 1: Temperature and heat flux distribution for a
+<figcaption><p>Figure 5: Temperature and heat flux distribution for a
 half UO<span class="math inline"><sub>2</sub></span> pellet with uniform
 power source.. a — Top view, b — Bottom view (symmetry)</p></figcaption>
 </figure>
@@ -829,7 +1273,7 @@ $
 ```
 
 to get an output VTK file we can then further post-process to get
-fig. 2.
+fig. 6.
 
 <figure id="fig:pellet-non-linear-k-non-linear-q" class="subfigures">
 <figure id="fig:diff-T">
@@ -842,7 +1286,7 @@ alt="Temperature difference with respect to the uniform power case" />
 alt="Volumetric power source distribution" />
 <figcaption>b</figcaption>
 </figure>
-<figcaption><p>Figure 2: Results for the non-uniform power case. a —
+<figcaption><p>Figure 6: Results for the non-uniform power case. a —
 Temperature difference with respect to the uniform power case, b —
 Volumetric power source distribution</p></figcaption>
 </figure>

@@ -7,9 +7,12 @@ for i in feenox touch sed pandoc makeinfo inkscape convert pandoc-crossref; do
  fi
 done
 
-pdf=1
+pdf=0
 if [ "x${1}" == "x--no-pdf" ]; then
   pdf=0
+fi
+if [ "x${1}" == "x--pdf" ]; then
+  pdf=1
 fi
 
 if [ ${pdf} = 1 ]; then

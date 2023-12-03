@@ -5,6 +5,7 @@ titleblock: |
  ===============
 lang: en-US
 toc: true 
+abstract: Check out the [thermal tutorial](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/).
 ...
 # Thermal slabs
 
