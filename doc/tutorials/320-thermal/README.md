@@ -52,7 +52,7 @@ Make sure you also check the [heat conduction examples](https://www.seamplex.com
 
  * We can check if FeenoX can detect the non-linearities by passing `--snes_monitor` and/or `--snes_view` in the command line. Here, [SNES](https://petsc.org/release/manual/snes/) means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option shows some details about the solver. In linear problems, SNES is not used but the [KSP](https://petsc.org/release/manual/ksp/) (Krylov SubSpace solvers) framework is used instead. Therefore, if we used `--snes_view` in a linear problem then FeenoX would complain about an unused command-line option. 
  
- * If, for some reason, the user does not want to have FeenoX to autodetect the non-linearities then she could force the problem type using either
+ * If, for some reason, the user does not want to have FeenoX to auto-detect the non-linearities then she could force the problem type using either
  
    a. the keywords `LINEAR` and `NON_LINEAR` in the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition, or
    b. the [command-line options](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) `--linear` and `--non-linear`.
@@ -61,11 +61,17 @@ Make sure you also check the [heat conduction examples](https://www.seamplex.com
   Check out the [FeenoX manual section for the keyword `PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) for further details.
   FeenoX can have hard-coded PETSc options using the [`PETSC_OPTIONS` definition](https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options) as well.
     
- * Finally we show how to solve transient problems, either
+ * Finally we show how to solve transient problems. Transients are triggered by setting [`end_time`](https://www.seamplex.com/feenox/doc/feenox-manual.html#end_time) to a positive value.
+ 
+ * FeenoX uses [PETSc's TS](https://petsc.org/release/manual/ts/) framework for transient problems. Different schemes can be chosen either from the command line (e.g. `--ts_type=bdf`) or from the `PROBLEM` definition (e.g. `TRANSIENT_SOLVER bdf`).
+ 
+ * We solve transient problems either
  
     i. starting from an arbitrary initial temperature distribution using constant boundary conditions
     ii. starting from a steady-state solution and changing the boundary conditions over time
     iii. both
+    
+ * Transient problems Different time stepping 
  
 # Linear steady-state problems
 
@@ -483,8 +489,7 @@ T(0) = T(1) + \frac{1200}{50}
 $$
 where $\sigma$ is the Stefan-Boltzmann constant. Just for fun, instead of looking up online its numerical value, we can FeenoX to compute it from the "more fundamental" constants $h$, $c$ and $k_b$.
 
-
-FeenoX uses PETSc's SNES framework to solve the resulting non-linear equations.
+FeenoX uses [PETSc's SNES framework](https://petsc.org/release/manual/snes/) to solve the resulting non-linear equations.
 The available solvers---which can be selected either through `PROBLEM SNES` definition or from the command line---are iterative in nature.
 The convergence of these algorithms depend on a good initial guess, which by default is a uniform distribution equal to the average of all the temperatures `T` or `Tref` that appear on the temperature and convection boundary conditions.
 Since in this case we only have heat fluxes, the initial guess would be zero which might not be appropriate.
@@ -668,7 +673,7 @@ along with other nuclear-related stuff such as fuel burn-up, concentration of po
 
 Anyway, this is a tutorial about FeenoX capabilities.
 Our goal here is to show what FeenoX can do and how to ask it to to such things.
-So let us model a custom power surce depending both on space and on the local temperature like
+So let us model a custom power source depending both on space and on the local temperature like
 
 $$
 q(x,y,z) = q_0 \cdot (1 + 20~\text{mm}^{-1} \cdot x) \cdot \left[1 - \frac{ T(x,y,z)-800~\text{ºC}}{2000 ~\text{ºC}} \right]
@@ -701,17 +706,19 @@ FUNCTION cond(T') INTERPOLATION steffen DATA {
 1200               2.45 }
 ```
 
-Since we want to compare the temperature distribution using this non-linear power source with respect to the previous case with uniform power, we read back the temperature we wrote with the instruction `WRITE_RESULTS`. With no further arguments, that instruction writes a `.msh` file with the temperature distribution `T` as a scalar field and the three heat fluxes `qx`, `qy` and `qz` as a vector---which we used to create fig:pellet-non-linear-k-uniform-q. If no `FILE` keyword is given, the default mesh file is named like the FeenoX input file with the extension `.fee` renamed to `.msh`. So we can then ask FeenoX to retrieve the old temperature distribution as a function of space, with a new name (since there is already a function `T`), say `T_uniform`:
+Since we want to compare the temperature distribution using this non-linear power source with respect to the previous case with uniform power, we read back the temperature we wrote with the instruction [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results). With no further arguments, that instruction writes a `.msh` file with the temperature distribution `T` as a scalar field and the three heat fluxes `qx`, `qy` and `qz` as a vector---which we used to create fig:pellet-non-linear-k-uniform-q. If no `FILE` keyword is given, the default mesh file is named like the FeenoX input file with the extension `.fee` renamed to `.msh`. So we can then ask FeenoX to retrieve the old temperature distribution as a function of space, with a new name (since there is already a function `T`), say `T_uniform`:
  
 ```feenox
 READ_MESH pellet-non-linear-k-uniform-q.msh DIM 3 READ_FIELD T as T_uniform
 ```
 
-Now we can write the results, including the algebraic difference (or any other operation) of `T` and `T_uniform`. For that end, we now use `WRITE_MESH`:
+Now we can write the results, including the algebraic difference (or any other operation) of `T` and `T_uniform`. For that end, we now use [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh):
 
 ```feenox
 WRITE_MESH $0.vtk T T(x,y,z)-T_uniform(x,y,z) q VECTOR qx qy qz 
 ```
+
+> **Note:** If the input file does not explicitly asks for the heat fluxes or does not have the instruction `WRITE_RESULTS`, then the heat fluxes are not computed at all to save CPU time.
 
 Just to change things a little bit, we now write a VTK post-processing file (instead of `.msh` like in the previous case). Since `WRITE_MESH` is a generic instruction (while `WRITE_RESULTS` is PDE-aware so it knows which are the available fields) we have to list what we want to write in the VTK:
 
@@ -751,6 +758,29 @@ Results for the non-uniform power case
 
 # Transient problems
 
+In this final section of the tutorial we solve the transient heat conduction equation
+
+$$
+\rho(\mathbf{x}, T) \cdot c_p(\mathbf{x}, T) \cdot \frac{\partial T}{\partial t} - \text{div} \left[ k(\mathbf{x}, T) \cdot \text{grad}{T} \right] = q'''(\mathbf{x}, T)
+$$
+
+For this end, we need the product of the density $\rho$ and heat capacity $c_p$.
+This product can be given by either
+
+ a. `rho` and `cp` separately
+ b. `rhocp` as a single property
+ c. the thermal diffusivity `kappa` (equal to $k / (\rho c_p)$)
+
+As with any other transient problem in FeenoX, it is triggered by setting the special variable `end_time` to a positive value.
+FeenoX uses [PETSc's TS](https://petsc.org/release/manual/ts/) framework for transient problems.
+By default, it uses an adaptive time stepper. An initial $\Delta t$ can be given with the special variable [`dt`](https://www.seamplex.com/feenox/doc/feenox-manual.html#dt).
+The range can be controlled with [`min_dt`](https://www.seamplex.com/feenox/doc/feenox-manual.html#min_dt) and [`max_dt`](https://www.seamplex.com/feenox/doc/feenox-manual.html#max_dt), which can be expressions of the special variable [`t`](https://www.seamplex.com/feenox/doc/feenox-manual.html#t).
+
+If one needs to stop the transient problem before it reaches the prescribed `end_time`, the special variable [`done`](https://www.seamplex.com/feenox/doc/feenox-manual.html#done) can be set to true. After the next `PROBLEM_SOLVE` instruction, the transient problem will finish.
+ 
+The initial condition can be given by defining a function `T_0` of space.
+If there is no `T_0` defined, the initial condition is obtained by solving a steady-state problem with `t=0`.
+ 
 ## From an arbitrary initial condition
 
 TBD

@@ -180,7 +180,6 @@ $$
     
    depends on [`T`](#t), the problem is set to non-linear automatically.
 
-
 ### Thermal results
 
 ```{.include shift-heading-level-by=3}
