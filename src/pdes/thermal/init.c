@@ -137,7 +137,7 @@ int feenox_problem_init_runtime_thermal(void) {
   if (feenox.pde.has_mass) {
 ///pr_thermal+kappa+usage kappa
 ///pr_thermal+kappa+description Thermal diffusivity in units of area per unit of time. 
-///pr_thermal+kappa+description Equal to the thermal conductivity `k` divided by the density `rho` and specific heat capacity `cp`.
+///pr_thermal+kappa+description Equal to $k / (\rho c_p)$, the thermal conductivity `k` divided by the density `rho` and specific heat capacity `cp`.
 ///pr_thermal+kappa+description Either `kappa`, `rhocp` or both `rho` and `cp` are needed for transient
     feenox_call(feenox_distribution_init(&thermal.kappa, "kappa"));
     if (thermal.kappa.defined == 0) {

@@ -166,7 +166,9 @@ reference-laplace-va.md
 
 Set `PROBLEM` to `thermal` to solve thermal conduction:
 
-$$\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)$$
+$$
+\rho \c_p \frac{\partial T}{\partial t} + \text{div} \left[ k(\vec{x, T} \cdot \text{grad}{T} \right] = q'''(\vec{x}, T)
+$$
 
 If `end_time` is zero, only the steady-state problem is solved.
 If $k$, $q'''$ or any Neumann boundary condition depends on\ $T$, the problem is set to non-linear automatically.

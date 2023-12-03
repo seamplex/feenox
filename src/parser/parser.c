@@ -265,7 +265,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_endif());
       return FEENOX_OK;
 
-///kw_dae+PHASE_SPACE+desc Asks FeenoX to solve a set of algebraic-differntial equations and define the variables, vectors and/or matrices that span the phase space.
+///kw_dae+PHASE_SPACE+desc Ask FeenoX to solve a set of algebraic-differntial equations and define the variables, vectors and/or matrices that span the phase space.
 ///kw_dae+PHASE_SPACE+usage PHASE_SPACE
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "PHASE_SPACE") == 0) {
