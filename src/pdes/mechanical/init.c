@@ -467,7 +467,7 @@ int feenox_problem_init_runtime_mechanical(void) {
 #ifdef HAVE_PETSC
 int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace) {
   
-  Vec vec_coords;
+  Vec vec_coords = NULL;
   if (feenox.pde.K != NULL) {
     petsc_call(MatCreateVecs(feenox.pde.K, NULL, &vec_coords));
   } else {
@@ -476,13 +476,11 @@ int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace) {
   petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dofs));
   petsc_call(VecSetUp(vec_coords));
 
-  PetscScalar *coords;
-  size_t j = 0;
-  unsigned int m = 0;
+  PetscScalar *coords = NULL;
   petsc_call(VecGetArray(vec_coords, &coords));
-  for (j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {          
-    for (m = 0; m < feenox.pde.dofs; m++) {
-      coords[feenox.pde.mesh->node[j].index_dof[m] - feenox.pde.first_row] = feenox.pde.mesh->node[j].x[m];
+  for (size_t j = feenox.pde.first_node; j < feenox.pde.last_node; j++) {          
+    for (unsigned int d = 0; d < feenox.pde.dim; d++) {
+      coords[feenox.pde.mesh->node[j].index_dof[d] - feenox.pde.first_row] = feenox.pde.mesh->node[j].x[d];
     }
   }
   petsc_call(VecRestoreArray(vec_coords, &coords));
