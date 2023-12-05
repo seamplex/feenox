@@ -473,7 +473,7 @@ int feenox_problem_compute_rigid_nullspace(MatNullSpace *nullspace) {
   } else {
     feenox_check_alloc(vec_coords = feenox_problem_create_vector("coordinates"));
   }  
-  petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dofs));
+  petsc_call(VecSetBlockSize(vec_coords, feenox.pde.dim));
   petsc_call(VecSetUp(vec_coords));
 
   PetscScalar *coords = NULL;
