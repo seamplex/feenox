@@ -1,0 +1,37 @@
+set preamble "\usepackage{amsmath}"
+
+set width 14*unit(cm)
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+
+set grid
+
+set terminal pdf
+
+set xlabel "Time~$t$ [sec]"
+set ylabel "Temperature~$T$ [$^\\circ$C]"
+set key top right
+
+set output "valve-1.pdf"
+plot "valve-1.csv" u 1:2  w l lt 1 lw 4  color dandelion   ti "$T_\\text{int}(t)$ for transient \#1",\
+     "valve-1.csv" u 1:4  w l lt 2 lw 2  color green       ti "SCL \#2 (carbon steel) center ",\
+     "valve-1.csv" u 1:5  w l lt 3 lw 2  color green       ti "SCL \#2 (carbon steel) end point",\
+     "valve-1.csv" u 1:7  w l lt 4 lw 3  color redviolet   ti "SCL \#4 (stainless) center",\
+     "valve-1.csv" u 1:8  w l lt 5 lw 3  color redviolet   ti "SCL \#4 (stainless) end point"
+     
+     
+set key bottom right
+set xrange [80:160]
+set yrange [180:260]
+set output "valve-1-zoom.pdf"
+set width 12*unit(cm)
+#set ytics 50
+set mytics 10
+set size ratio 0.5
+
+plot "valve-1.csv" u 1:2  w l lt 1 lw 4  color dandelion   ti "$T_\\text{int}(t)$ for transient \#1",\
+     "valve-1.csv" u 1:4  w l lt 2 lw 2  color green       ti "SCL \#2 (carbon steel) center ",\
+     "valve-1.csv" u 1:5  w l lt 3 lw 2  color green       ti "SCL \#2 (carbon steel) end point",\
+     "valve-1.csv" u 1:7  w l lt 4 lw 3  color redviolet   ti "SCL \#4 (stainless) center",\
+     "valve-1.csv" u 1:8  w l lt 5 lw 3  color redviolet   ti "SCL \#4 (stainless) end point"

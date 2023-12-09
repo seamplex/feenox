@@ -236,7 +236,7 @@ $
 
 Let us now investigate another boundary condition, namely setting a heat flux condition.
 Going back to the single-material one-dimensional slab, let us keep $T(x=0)=0$ but set $q'(x=1)=1$.
-We can check if the heat flux at the other side `left` (i.e. where we fixed the temperature) is equal in magnitude and oppposite in sign to the prescribed heat flux at `right` with the [`COMPUTE_REACTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#compute_reaction) instruction:
+We can check if the heat flux at the other side `left` (i.e. where we fixed the temperature) is equal in magnitude and opposite in sign to the prescribed heat flux at `right` with the [`COMPUTE_REACTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#compute_reaction) instruction:
 ```{.feenox include="slab-uniform-heatflux.fee"}
 ```
 
@@ -968,10 +968,8 @@ Since the geometry (and the boundary conditions) are symmetric, we can different
  3. External surface (pink)
 
 ::: {#fig:valve-mesh}
-
-![Volumetric labels](valve-materials.png){#fig:valve-materials}
-
-![Surface labels](valve-surfaces.png){#fig:valve-surfaces}
+![Volumetric labels](valve-materials.png){#fig:valve-materials width_html=100% width_latex=50%}
+![Surface labels](valve-surfaces.png){#fig:valve-surfaces width_html=100% width_latex=50%}
 
 Physical groups for the valve problem
 :::
@@ -1028,8 +1026,8 @@ BC external  h=1e-6      Tref=50
 BC symmetry  q=0
 ```
 
-The temperature-dependent material properties come from the ASME tables in section D.
-Check out the included file [asme-properties.fee]() for details:
+The temperature-dependent material properties come from the tables in ASME code div II section D.
+Check out the included file [`asme-properties.fee`](https://github.com/seamplex/feenox/blob/main/doc/tutorials/320-thermal/asme-properties.fee) for details:
 
 ```feenox
 INCLUDE asme-properties.fee
@@ -1042,8 +1040,10 @@ The full input file is then
 ```{.feenox include="valve.fee"}
 ```
 
+The idea is to run the input file through FeenoX and pipe the standard output to an ASCII file which we can plot to monitor temperatures at certain locations (around ASME's stress classification lines, for example as in @fig:valve-temp). The detailed results are written into a file `valve-1.msh` (or whatever `$1` expands to) which can then be used to create an animation of the temperature $T(\vec{x},t)$ and the heat flux $\vec{q}(\vec{x},t)$:
+
 ```terminal
-$ feenox valve.fee | tee valve-1.csv
+$ feenox valve.fee 1 | tee valve-1.csv
 0       40.000  40.000  40.004  40.008  40.000  40.004  40.007
 0.0625  40.131  40.131  40.004  40.008  40.131  40.004  40.007
 0.143101        40.301  40.301  40.005  40.008  40.301  40.004  40.007
@@ -1064,6 +1064,29 @@ $ feenox valve.fee | tee valve-1.csv
 1000    40.000  40.000  40.011  40.018  40.000  40.023  40.038
 $ 
 ```
+
+::: {#fig:valve-temp}
+![Full time range](valve-1.svg){#fig:valve-temp-1}
+
+![Zoom around $t=100~\text{seconds}$](valve-1-zoom.svg){#fig:valve-temp-1-zoom}
+
+Temperature vs. time at each side of the stainless/carbon steel interface
+:::
+
+> **Note:** We did not give any initial condition $T_0(\vec{x})$ so FeenoX decided to start from a steady-state condition, i.e. to solve a static problem with boundary conditions and material properties for $t=0$ and use that temperature distribution as the initial condition for the transient problem.
+
+The results file written by the `WRITE_RESULTS` instruction contains the temperature and heat flux fields at each time taken by FeenoX. If we wanted to create a smooth animation with the real time, we would need some python programming:
+
+```{.python include="valve-anim.py"}
+```
+
+
+
+> **Homework**
+>
+> 1. Create a new transient #2 and solve it with FeenoX using `$1 = 2`.
+> 2. Replace `WRITE_RESULTS` with `WRITE_RESULTS FORMAT vtk` and animate the result with [ParaView](https://www.paraview.org).
+
 
 
 ## From an arbitrary initial condition with time-dependent BCs

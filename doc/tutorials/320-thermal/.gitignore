@@ -5,3 +5,6 @@ README.pdf
 Stanford_Bunny.stl
 *.txt
 *.dat
+*gmsh*
+valve-temp-1*.png
+*.mp4
