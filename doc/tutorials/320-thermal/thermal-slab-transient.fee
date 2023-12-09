@@ -1,0 +1,34 @@
+# example of a 1D heat transient problem
+# from https://www.math.ubc.ca/~peirce/M257_316_2012_Lecture_20.pdf
+# T(0,t) = 0       for t < 1
+#          A*(t-1) for t > 1  
+# T(L,t) = 0
+# T(x,0) = 0
+READ_MESH slab.msh DIMENSIONS 1
+PROBLEM thermal
+
+end_time = 2
+
+# unitary non-dimensional properties
+k = 1
+rhocp = 1
+alpha = k/rhocp
+
+# initial condition
+T_0(x) = 0
+# analytical solution
+# example 20.2 equation 20.25
+A = 1.23456789
+L = 1
+N = 100
+T_a(x,t) = A*(t-1)*(1-x/L) + 2*A*L^2/(pi^3*alpha^2) * sum((exp(-alpha^2*(i*pi/L)^2*(t-1))-1)/i^3 * sin(i*pi*x/L), i, 1, N) 
+
+# boundary conditions
+BC left  T=if(t>1,A*(t-1),0)
+BC right T=0
+
+SOLVE_PROBLEM
+
+IF done
+  PRINT %e (T(0.5*L)-T_a(0.5*L,t))/T_a(0.5*L,t)
+ENDIF

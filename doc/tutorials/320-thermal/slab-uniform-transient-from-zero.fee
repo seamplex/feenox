@@ -1,0 +1,23 @@
+PROBLEM thermal 1d
+READ_MESH slab.msh
+
+# if end_time > 0 then we are in a transient problem
+end_time = 2
+
+# we can hint the solver what the first dt has to be
+dt_0 = 1e-3
+
+# if there exists a function of space T_0 then that's the initial condition
+T_0(x) = 0
+
+k = 1
+q = 1
+kappa = 1
+BC left  T=0
+BC right T=0
+
+SOLVE_PROBLEM
+
+# now t is a variable that holds the time
+# and dt holds the (variable) time step
+PRINT %.4f t dt %.6f T(1/2)

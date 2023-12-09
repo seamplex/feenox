@@ -11,7 +11,7 @@ prev_link: ../120-mazes
 prev_title: \#2 Solving mazes
 ...
 
-# Summary
+# Foreword {#sec:foreword}
 
 Welcome to **FeenoX’s tutorial number three**.
 Here you will learn how to solve the heat conduction equation with FeenoX in all of its flavors: 
@@ -22,6 +22,10 @@ Here you will learn how to solve the heat conduction equation with FeenoX in all
 All the files needed to go through the tutorial are available in [FeenoX's Git repository under `doc/tutorials/320-thermal`](https://github.com/seamplex/feenox/tree/main/doc/tutorials/320-thermal). 
 Make sure you also check the [heat conduction examples](https://www.seamplex.com/feenox/examples/thermal.html).
 
+> **Heads up**: this tutorial is quite long. For a quicker introduction, check out the [thermal annotated examples](https://seamplex.com/feenox/examples/thermal.html) in [FeenoX webpage](https://seamplex.com/feenox/).
+ 
+
+## Summary
 
 
  * We start solving linear steady-state problems. As long as neither of the
@@ -71,7 +75,7 @@ Make sure you also check the [heat conduction examples](https://www.seamplex.com
     ii. starting from a steady-state solution and changing the boundary conditions over time
     iii. both
     
- * Transient problems Different time stepping 
+ * If the initial condition does not satisfy the fixed temperature conditions, the solver will not converge. But we can be smart and use FeenoX's functions like [`limit`](https://seamplex.com/feenox/doc/feenox-manual.html#limit), [`if`](https://seamplex.com/feenox/doc/feenox-manual.html#if), [`min`](https://seamplex.com/feenox/doc/feenox-manual.html#min), [`max`](https://seamplex.com/feenox/doc/feenox-manual.html#max), etc. to satisfy them at $t=0$ and then quickly take the boundary conditions to their actual value.
  
 # Linear steady-state problems
 
@@ -363,6 +367,8 @@ Note that since there are four different groups holding the same boundary condit
 ```
 
 ![Output of `bunny-thermal.fee`](square-power.png){#fig:square-power}
+
+> **Heads up**: the volumetric source `q` works as any other material property. In multi-material problems. it can be defined using variables or functions where the material name is appended to the name or using the `MATERIAL` keyword.
 
     
 ## Space-dependent properties: manufactured solution
@@ -761,7 +767,7 @@ Results for the non-uniform power case
 In this final section of the tutorial we solve the transient heat conduction equation
 
 $$
-\rho(\mathbf{x}, T) \cdot c_p(\mathbf{x}, T) \cdot \frac{\partial T}{\partial t} - \text{div} \left[ k(\mathbf{x}, T) \cdot \text{grad}{T} \right] = q'''(\mathbf{x}, T)
+\rho(\mathbf{x}, T,t) \cdot c_p(\mathbf{x}, T,t) \cdot \frac{\partial T}{\partial t} - \text{div} \Big[ k(\mathbf{x}, T,t) \cdot \text{grad} \left[ T(\mathbf{x},t)\right] \Big] = q(\mathbf{x}, T,t)
 $$
 
 For this end, we need the product of the density $\rho$ and heat capacity $c_p$.
@@ -781,11 +787,295 @@ If one needs to stop the transient problem before it reaches the prescribed `end
 The initial condition can be given by defining a function `T_0` of space.
 If there is no `T_0` defined, the initial condition is obtained by solving a steady-state problem with `t=0`.
  
-## From an arbitrary initial condition
 
-TBD
+
+### From an initial condition up to steady state
+
+One common way of solving a time-dependent problem is to start with a certain initial temperature distribution (say everything is uniformly "cold") and then "do nothing" and wait until the steady-state conditions are achieved.
+In effect, let us consider again the unitary one-dimensional slab with 
+
+ 1. a uniform thermal conductivity $k=1$
+ 2. a uniform thermal diffusivity $\kappa=1$
+ 3. a uniformly distributed power source $q=1$
+ 
+subject to $T=0$ at both ends.
+From heat conduction theory, we know the steady state temperature will be a parabola that goes from zero at $x=0$ to a maximum value $q/(8k)$ at $x=1/2$ and then back to zero at $T=0$.
+Let us solve this transient case with FeenoX:
+
+```{.feenox include="slab-uniform-transient-from-zero.fee"}
+```
+
+```terminal
+$ feenox slab-uniform-transient-from-zero.fee 
+0.0000  0.0010  0.000000
+0.0010  0.0017  0.001000
+0.0027  0.0033  0.002663
+0.0059  0.0033  0.005914
+0.0092  0.0039  0.009195
+0.0131  0.0051  0.013068
+0.0182  0.0067  0.018146
+0.0249  0.0084  0.024665
+0.0333  0.0103  0.032534
+0.0436  0.0127  0.041471
+0.0563  0.0158  0.051386
+0.0721  0.0189  0.062179
+0.0910  0.0206  0.073040
+0.1116  0.0217  0.082798
+0.1333  0.0230  0.091131
+0.1563  0.0245  0.098173
+0.1808  0.0263  0.104087
+0.2071  0.0285  0.109013
+0.2356  0.0311  0.113064
+0.2667  0.0341  0.116340
+0.3008  0.0378  0.118929
+0.3386  0.0422  0.120922
+0.3808  0.0477  0.122405
+0.4285  0.0546  0.123462
+0.4831  0.0636  0.124176
+0.5468  0.0757  0.124622
+0.6225  0.0927  0.124872
+0.7152  0.1178  0.124988
+0.8330  0.1576  0.125023
+0.9906  0.2280  0.125020
+1.2186  0.3764  0.125008
+1.5950  0.4050  0.125000
+2.0000  0.8101  0.124999
+$ 
+```
+
+Note that:
+
+ 1. The special variable `end_time` controls the final time.
+ 2. The special variable `dt` _holds_ the actual time step. It is not a good idea to set the actual value of `dt` because it gets overwritten by the time stepper. But you can set `min_dt` and `max_dt`, which in turn can be expressions of the time `t`. If you set `min_dt` and `max_dt` to the same value, the time step will be uniform (although internally FeenoX might take internal sub-steps to take into account the errors in the derivatives)
+ 3. If there exists a function of space named `T_0` then that will be the initial condition. If not, a steady-state problem is solved (with all the expressions evaluated with `t=0`) and that solution is the initial condition.
+ 4. All the variable assignments and expressions in material properties which depend on the time `t` are re-evaluated at each time step, and possibly at other times as the time stepper considers fit to see if it can increase (or if it has to decrease) the time step `dt`.
+ 5. The transient solver and the time-adaptation schemes can be chosen with the keywords `TRANSIENT_SOLVER` and `TIME_ADAPTATION` in the [`PROBLEM`](https://seamplex.com/feenox/doc/feenox-manual.html#problem) keyword or with the `--ts_type` and `--ts_adapt_type` command-line options. 
+ 6. All the instructions, including `PRINT` and `WRITE_RESULTS` are executed in each time step.
+
+There might be cases where the end time is not known beforehand and we might want to stop the computation once a certain condition is met. For this end, FeenoX has the special variable `done` which can be set to a non-zero value to indicate the computation has to stop.
+For instance, instead of going up to $t=2$ we can ask FeenoX to stop once the temperature at the center is within 1% of the theoretical steady-state value:
+
+```{.feenox include="slab-uniform-transient-from-zero-done.fee"}
+```
+
+```terminal
+$ feenox slab-uniform-transient-from-zero-done.fee 
+0.0000  0.0010  0.000000
+0.0010  0.0017  0.001000
+0.0027  0.0033  0.002663
+0.0059  0.0033  0.005914
+0.0092  0.0039  0.009195
+0.0131  0.0051  0.013068
+0.0182  0.0067  0.018146
+0.0249  0.0084  0.024665
+0.0333  0.0103  0.032534
+0.0436  0.0127  0.041471
+0.0563  0.0158  0.051386
+0.0721  0.0189  0.062179
+0.0910  0.0206  0.073040
+0.1116  0.0217  0.082798
+0.1333  0.0230  0.091131
+0.1563  0.0245  0.098173
+0.1808  0.0263  0.104087
+0.2071  0.0285  0.109013
+0.2356  0.0311  0.113064
+0.2667  0.0341  0.116340
+0.3008  0.0378  0.118929
+0.3386  0.0422  0.120922
+0.3808  0.0477  0.122405
+0.4285  0.0546  0.123462
+0.4831  0.0636  0.124176
+$ 
+```
+
+
+If the initial condition does not satisfy the Dirichlet boundary conditions, the solver might struggle to converge for small times.
+One way of overcoming this issue is to go the other way round: make sure the boundary conditions match the initial condition at the boundaries for $t=0$ and then "quickly" move the boundary condition to the actual value.
+For example, if the condition was $T(1)=1$ instead of $T(1)=0$ and we blindy wrote
+
+```{.feenox include="slab-uniform-transient-from-zero-one-naive.fee"}
+```
+
+we would get 
+
+```terminal
+$ feenox slab-uniform-transient-from-zero-one-naive.fee
+0.0000  0.0010  0.000000
+[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0]PETSC ERROR: TSStep has failed due to DIVERGED_STEP_REJECTED
+[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0]PETSC ERROR: Petsc Release Version 3.20.0, Sep 28, 2023 
+[0]PETSC ERROR: feenox on a double-int32-release named tom by gtheler Sat Dec  9 11:23:52 2023
+[0]PETSC ERROR: Configure options --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-scalapack --download-slepc --with-64-bit-indices=no --with-debugging=no --with-precision=double --with-scalar-type=real COPTFLAGS=-O3 CXXOPTFLAGS=-O3 FOPTFLAGS=-O3
+[0]PETSC ERROR: #1 TSStep() at /home/gtheler/libs/petsc-3.20.0/src/ts/interface/ts.c:3398
+[0]PETSC ERROR: #2 TSSolve() at /home/gtheler/libs/petsc-3.20.0/src/ts/interface/ts.c:4015
+[0]PETSC ERROR: #3 feenox_problem_solve_petsc_transient() at pdes/petsc_ts.c:83
+error: PETSc error
+$ 
+```
+
+But if we do this instead
+
+```{.feenox include="slab-uniform-transient-from-zero-one-smart.fee"}
+```
+
+we get the right answer, paying some inital cost as small time steps:
+
+```terminal
+$ feenox slab-uniform-transient-from-zero-one-smart.fee 
+0.0000  0.0010  0.000000
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000002
+0.0000  0.0000  0.000003
+0.0000  0.0000  0.000005
+0.0000  0.0000  0.000008
+0.0000  0.0000  0.000014
+0.0000  0.0000  0.000026
+0.0000  0.0000  0.000049
+0.0001  0.0001  0.000094
+0.0001  0.0001  0.000177
+[...]
+0.9534  0.1495  0.625030
+1.1030  0.2130  0.625031
+1.3160  0.3419  0.625014
+1.6578  0.3422  0.625001
+2.0000  0.6843  0.624999
+$ 
+```
+
+
 
 ## From a steady state
 
-TBD
+Another usual requirement is to start from a steady state, disturb the system and see how this disturbance proceeds over time.
+Disturbances may come from 
 
+ a. time-dependent boundary conditions
+ b. time-dependent material properties, or
+ c. time-dependent power sources.
+ 
+Let us consider the following industrial-grade problem, taken from <https://github.com/seamplex/piping-asme-fatigue>.
+A valve in a certain system within a power plant (@fig:valve-materials) is made out of stainless steel (green), but it is connected through the output nozzle to a carbon steel pipe (magenta).
+Since the geometry (and the boundary conditions) are symmetric, we can differentiate three external surfaces (@fig:valve-surfaces)
+
+ 1. Symmetry plane (yellow)
+ 2. Internal surface (cyan)
+ 3. External surface (pink)
+
+::: {#fig:valve-mesh}
+
+![Volumetric labels](valve-materials.png){#fig:valve-materials}
+
+![Surface labels](valve-surfaces.png){#fig:valve-surfaces}
+
+Physical groups for the valve problem
+:::
+
+The Gmsh's `.geo` file to mesh a continuous CAD in BREP format and define such physical groups is:
+
+```{.c include="valve.geo"}
+```
+
+The transient problem we are going to solve is to find out the temperature distribution that results from a relatively simple operational transient by changing the internal temperature of the pipe in a certain prescribed way as a function of time.
+Since we want to be flexible (as in the original example at <https://github.com/seamplex/piping-asme-fatigue>) we are going to ask FeenoX to read the prescribed internal temperature vs. time from a text file containing the $(t,T(t))$ pairs. Moreover, we are going to assume there are many files with many transients and we want to pick which one to choose from the command line.
+
+We do this by using the `$1` wildcard: it will be expanded to the first argument in the command line after the input file.
+If none is provided, then FeenoX will complain unless we provide a default value with the definition [`DEFAULT_ARGUMENT_VALUE`](https://seamplex.com/feenox/doc/feenox-manual.html#default_argument_value):
+
+```feenox
+DEFAULT_ARGUMENT_VALUE 1 1
+FUNCTION Tint(t) FILE valve-internal-$1.csv INTERPOLATION linear
+```
+
+These lines mean "define a function `Tint(t)` by linearly-interpolating the data in the file `valve-internal-$1.csv` where `$1` is the argument after the input file in the command line or `1` if none is provided`.
+See the documentation for the [`FUNCTION`](https://seamplex.com/feenox/doc/feenox-manual.html#function) definition for other available interpolation schemes.
+
+The CSV file should contain something like
+
+```terminal
+$ cat valve-internal-1.csv 
+0    40
+100  250
+500  250
+600  40
+1000 40
+$ 
+```
+
+We want the final time to be equal to the last time defined in the transient, which we do not know at the time we are preparing the input file.
+But FeenoX provides the definition (and data) points for all the point-wise functions as [`VECTOR`](https://seamplex.com/feenox/doc/feenox-manual.html#vector)s, which we can then use to define `end_time` as the [`vecmax`](https://seamplex.com/feenox/doc/feenox-manual.html#vecmax) of `vec_Tint_t`:
+
+```feenox
+end_time = vecmax(vec_Tint_t)
+```
+
+Boundary conditions are
+
+ 1. Prescribed temperature equal to $T_\text{int}(t)$ at `internal` (cyan)
+ 2. Convection with a fixed reference temperature equal to 50ºC at `external` (pink)
+ 3. Zero heat flux (adiabatic condition) at `symmetry` (yellow)
+
+which easily translate to
+ 
+```feenox
+BC internal  T=Tref(t)
+BC external  h=1e-6      Tref=50
+BC symmetry  q=0
+```
+
+The temperature-dependent material properties come from the ASME tables in section D.
+Check out the included file [asme-properties.fee]() for details:
+
+```feenox
+INCLUDE asme-properties.fee
+MATERIAL CS k=k_carbon(T(x,y,z))*1e-3   kappa=kappa_carbon(T(x,y,z))
+MATERIAL SS k=k_312(T(x,y,z))*1e-3      kappa=kappa_312(T(x,y,z))
+```
+
+The full input file is then
+
+```{.feenox include="valve.fee"}
+```
+
+```terminal
+$ feenox valve.fee | tee valve-1.csv
+0       40.000  40.000  40.004  40.008  40.000  40.004  40.007
+0.0625  40.131  40.131  40.004  40.008  40.131  40.004  40.007
+0.143101        40.301  40.301  40.005  40.008  40.301  40.004  40.007
+0.272711        40.573  40.573  40.018  40.008  40.573  40.005  40.007
+0.430269        40.904  40.904  40.055  40.010  40.904  40.009  40.007
+0.620829        41.304  41.304  40.130  40.019  41.304  40.023  40.007
+0.858595        41.803  41.803  40.259  40.047  41.803  40.062  40.009
+1.15322 42.422  42.422  40.460  40.114  42.422  40.145  40.015
+1.52082 43.194  43.194  40.760  40.247  43.194  40.298  40.035
+1.972   44.141  44.141  41.189  40.484  44.141  40.548  40.088
+[...]
+880.907 40.000  40.000  40.022  40.033  40.000  40.050  40.081
+899.923 40.000  40.000  40.019  40.029  40.000  40.042  40.068
+920.597 40.000  40.000  40.016  40.025  40.000  40.036  40.058
+943.115 40.000  40.000  40.014  40.022  40.000  40.031  40.050
+967.671 40.000  40.000  40.013  40.020  40.000  40.027  40.043
+983.836 40.000  40.000  40.012  40.019  40.000  40.025  40.041
+1000    40.000  40.000  40.011  40.018  40.000  40.023  40.038
+$ 
+```
+
+
+## From an arbitrary initial condition with time-dependent BCs
+
+
+The following input file solves a transient heat conduction equation over a one-dimensional domain $x \in [0,L]$ as discussed in <https://www.math.ubc.ca/~peirce/M257_316_2012_Lecture_20.pdf> (example 20.2, equation 20.25).
+
+
+```{.feenox include="thermal-slab-transient.fee"}
+```
+
+
+
+```{.feenox include="thermal-slab-transient-mms-capacity-of-T.fee"}
+```

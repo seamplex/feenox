@@ -1,0 +1,17 @@
+PROBLEM thermal 1d
+READ_MESH slab.msh
+
+end_time = 2
+dt_0 = 1e-3
+T_0(x) = 0
+
+k = 1
+q = 1
+kappa = 1
+BC left  T=0
+BC right T=0
+
+SOLVE_PROBLEM
+
+done = abs((T(1/2)-q/(8*k))/(q/(8*k))) < 1e-2
+PRINT %.4f t dt %.6f T(1/2)

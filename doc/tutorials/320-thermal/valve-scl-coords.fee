@@ -1,0 +1,48 @@
+# location of the SCLs
+n_scls = 4
+VECTOR scl_xi[n_scls]
+VECTOR scl_yi[n_scls]
+VECTOR scl_zi[n_scls]
+
+VECTOR scl_xf[n_scls]
+VECTOR scl_yf[n_scls]
+VECTOR scl_zf[n_scls]
+
+ro = 57            # pipe's outer radius [ mm ]
+thickness = 8.5    # pipe's thickness    [ mm ]
+
+scl_xi[1] = +3
+scl_xi[2] = +3
+scl_xi[3] = -3
+scl_xi[4] = -3
+
+scl_yi[i] = 0
+
+scl_zi[1] = -(ro-thickness)
+scl_zi[2] = +(ro-thickness)
+scl_zi[3] = -(ro-thickness)
+scl_zi[4] = +(ro-thickness)
+
+scl_xf[i] = scl_xi(i)
+scl_yf[i] = scl_yi(i)
+
+scl_zf[1]  = -ro
+scl_zf[2]  = +ro
+scl_zf[3]  = -ro
+scl_zf[4]  = +ro
+
+# checks
+# PRINT scl_xi
+# PRINT scl_yi
+# PRINT scl_zi
+# PRINT
+# PRINT scl_xf
+# PRINT scl_yf
+# PRINT scl_zf
+# 
+# PRINT  scl_xi(2) scl_yi(2) scl_zi(2)
+# PRINT  0.5*(scl_xi(2)+scl_xf(2)) 0.5*(scl_yi(2)+scl_yf(2)) 0.5*(scl_zi(2)+scl_zf(2))
+# PRINT  scl_xf(2) scl_yf(2) scl_zf(2)
+# PRINT  scl_xi(4) scl_yi(4) scl_zi(4)
+# PRINT  0.5*(scl_xi(4)+scl_xf(4)) 0.5*(scl_yi(4)+scl_yf(4)) 0.5*(scl_zi(4)+scl_zf(4))
+# PRINT  scl_xf(4) scl_yf(4) scl_zf(4)
