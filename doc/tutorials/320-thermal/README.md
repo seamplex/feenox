@@ -800,7 +800,7 @@ If there is no `T_0` defined, the initial condition is obtained by solving a st
  
 
 
-### From an initial condition up to steady state
+## From an initial condition up to steady state
 
 One common way of solving a time-dependent problem is to start with a certain initial temperature distribution (say everything is uniformly "cold") and then "do nothing" and wait until the steady-state conditions are achieved.
 In effect, let us consider again the unitary one-dimensional slab with 
