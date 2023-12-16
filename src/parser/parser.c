@@ -3159,7 +3159,7 @@ int feenox_parse_problem(void) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_type));
 
 ///kw_pde+PROBLEM+usage [ TIME_ADAPTATION { basic | none | dsp | cfl | glee | ... } ]@
-///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <https://petsc.org/release/manualpages/TS/TSAdaptType/>.
+///kw_pde+PROBLEM+detail  * List of `TIME_ADAPTATION`s <https://petsc.org/release/manualpages/TS/TSType/>.
     } else if (strcasecmp(token, "TIME_ADAPTATION") == 0 || strcasecmp(token, "TS_ADAPT") == 0 || strcasecmp(token, "TS_ADAPT_TYPE") == 0) {
       feenox_call(feenox_parser_string((char **)&feenox.pde.ts_adapt_type));
 
