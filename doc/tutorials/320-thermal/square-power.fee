@@ -3,7 +3,7 @@ READ_MESH square.msh
 
 k = 1
 q = 1
-BC left T=0 LABEL right LABEL bottom LABEL top
+BC left T=0 GROUP right GROUP bottom GROUP top
 
 SOLVE_PROBLEM
 WRITE_RESULTS

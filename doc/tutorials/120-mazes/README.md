@@ -1,8 +1,8 @@
 ---
-title: Solving mazes with PDES instead of AI
+title: Solving mazes with PDEs instead of AI
 subtitle: FeenoX Tutorial \#2
 titleblock: |
- FeenoX Tutorial \#2: Solving mazes with PDES instead of AI
+ FeenoX Tutorial \#2: Solving mazes with PDEs instead of AI
  =================================
 lang: en-US
 number-sections: true

@@ -1,4 +1,4 @@
-# FeenoX Tutorial \#2: Solving mazes with PDES instead of AI
+# FeenoX Tutorial \#2: Solving mazes with PDEs instead of AI
 
 - [<span class="toc-section-number">1</span> Foreword][]
   - [<span class="toc-section-number">1.1</span> Executive summary][]

@@ -180,6 +180,9 @@ $$
     
    depends on [`T`](#t), the problem is set to non-linear automatically.
 
+> Check out the [heat conduction tutorial](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/) as well.
+
+
 ### Thermal results
 
 ```{.include shift-heading-level-by=3}
@@ -280,7 +283,7 @@ reference-fu.md
 ## Vector functions
 
 ```{.include shift-heading-level-by=2}
-reference-fu.md
+reference-fv.md
 ```
 
 

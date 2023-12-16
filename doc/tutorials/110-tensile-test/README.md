@@ -22,7 +22,7 @@ This first case...
  2. shows that [FeenoX](https://www.seamplex.com/feenox/) does what a finite-element(ish) tool is supposed to do, and
  3. (last but not least) illustrates [FeenoX](https://www.seamplex.com/feenox/)’ design basis and the philosophy behind its implementation (spoiler alert, it's the [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy), discussed in @sec:unix) and encourages the reader to consider and evaluate the differences (both advantages and disadvantages) between the approach proposed in this tutorial with traditional both free and non-free finite-element programs,.
 
-> _Heads up_: this tutorial, being the first is also detailed and long. Those impatient readers might want to check directly some of the [annotated examples](https://seamplex.com/feenox/examples/) in [FeenoX webpage](https://seamplex.com/feenox/).
+> **Heads up**: this tutorial, being the first is also detailed and long. Those impatient readers might want to check directly some of the [annotated examples](https://seamplex.com/feenox/examples/) in [FeenoX webpage](https://seamplex.com/feenox/).
  
 ## Summary
  
@@ -564,7 +564,7 @@ A further note is that not only is [FeenoX](https://www.seamplex.com/feenox/) bo
  
 and many others, including of course the operating system [GNU](https://www.gnu.org/)/[Linux](https://www.kernel.org/).
 
-> _Heads up_: it is extremely important to note here that 
+> **Heads up**: it is extremely important to note here that 
 >
 >  a. the adjective “free” in the expression “free software” refers to _freedom_ and not to _price_. A better wording would be “libre software” instead. When we say “free software” we mean “free” as in “free speech” not as in “free beer.” The difference will be made clear throughout the tutorial. In what follows, we use “gratis” or “for a fee” when referring to price and “free” and “privative” (because it privates users from their freedom) or “non-free” when referring to freedom.
 >  b. “free software” does not mean “open source.” The two terms are related but not equal, having different technical and ethical meanings with different roots and rationales for each one. There are books and discussions online about the matter. The important thing to remember here is that FeenoX is both _free_ and _open source_ under the terms of [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0) version\ 3 or, at the user convenience, any later version. The opposite is of “open source” is “closed source.” Note that a closed-source piece of software is privative by definition, but an open-source piece of software can be either free (as most open-source software is) or non-free (as a tiny fraction is).

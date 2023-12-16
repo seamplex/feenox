@@ -14,5 +14,5 @@ SOLVE_PROBLEM
 # without an explicit range the definition points are written
 PRINT_FUNCTION T error
 
-# since error is algebraic we hate to give an explicit range
+# since error is algebraic we have to give an explicit range
 PRINT_FUNCTION error MIN 0 MAX 1 STEP 1e-2 FILE slab-kofx-error.dat

@@ -56,8 +56,8 @@ case…
     disadvantages) between the approach proposed in this tutorial with
     traditional both free and non-free finite-element programs,.
 
-> *Heads up*: this tutorial, being the first is also detailed and long.
-> Those impatient readers might want to check directly some of the
+> **Heads up**: this tutorial, being the first is also detailed and
+> long. Those impatient readers might want to check directly some of the
 > [annotated examples][] in [FeenoX webpage][].
 
   [FeenoX]: https://www.seamplex.com/feenox/
@@ -995,7 +995,7 @@ with ([rule of composition][]) other free and open source software, like
 and many others, including of course the operating system
 [GNU][]/[Linux][].
 
-> *Heads up*: it is extremely important to note here that
+> **Heads up**: it is extremely important to note here that
 >
 > 1.  the adjective “free” in the expression “free software” refers to
 >     *freedom* and not to *price*. A better wording would be “libre

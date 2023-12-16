@@ -38,23 +38,25 @@ Make sure you also check the [heat conduction examples](https://www.seamplex.com
     c. the boundary conditions do not depend or depend linearly on $T(\mathbf{x})$
     
    then problem is linear.
-   If these three guys depend on space $\mathbf{x}$ (but not on $T(\mathbf{x})$), the problem is still linear no matter how complex it looks like:
+   If these three guys depend on space $\mathbf{x}$ (but not on $T(\mathbf{x})$), the problem is still linear no matter how complex it looks like. The following problem (whose output should be a small number, which is a "error" measure) discussed in @sec:mms is still linear:
 
    ```{.feenox include="manufactured.fee"}
    ```
 
  * If these conditions are not met, then the problem is non-linear.
    FeenoX is able to detect this and will **automatically** switch to a non-linear solver.
-   Why would the user need to tell the solver if the problem is linear or not?
+   Why would the user need to tell the solver if the problem is linear or not, as in most FEA tools?
    If you think it through, it should be the other way round. And that is what FeenoX does.
    
  * Non-linearities can be triggered by either
  
-    - adding a boundary conditions that depends non-linearly on $T(\mathbf{x})$, such as radiation, and/or
+    - setting a boundary condition that depends non-linearly on $T(\mathbf{x})$, such as radiation, and/or
     - having a conductivity that depends on temperature, which is the case for most materials anyway, and/or
-    - using heat sources that are temperature-dependent, where increasing $T$ decreases the source.
+    - using a heat source that is temperature-dependent, where increasing $T$ decreases the source.
 
- * We can check if FeenoX can detect the non-linearities by passing `--snes_monitor` and/or `--snes_view` in the command line. Here, [SNES](https://petsc.org/release/manual/snes/) means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option shows some details about the solver. In linear problems, SNES is not used but the [KSP](https://petsc.org/release/manual/ksp/) (Krylov SubSpace solvers) framework is used instead. Therefore, if we used `--snes_view` in a linear problem then FeenoX would complain about an unused command-line option. 
+ * We can check if FeenoX can detect the non-linearities by using the **advanced** options `--snes_monitor` and/or `--snes_view` in the command line. Here, [SNES](https://petsc.org/release/manual/snes/) means "Scalable Non-linear Equation Solvers" in PETSc's jargon. The `--snes_view` option shows some details about the solver. In linear problems, SNES is not used but the [KSP](https://petsc.org/release/manual/ksp/) (Krylov SubSpace solvers) framework is used instead. Therefore, if we used `--snes_view` in a linear problem then FeenoX would complain about an unused command-line option.
+ 
+   > **Heads up**: these are **advanced** options. If you did not understand the paragraph above, do not worry. You are still good to go.
  
  * If, for some reason, the user does not want to have FeenoX to auto-detect the non-linearities then she could force the problem type using either
  
@@ -64,8 +66,10 @@ Make sure you also check the [heat conduction examples](https://www.seamplex.com
  * Different linear and non-linear solvers (and pre-conditioners) can be chosen either from the command line (e.g. `--snes_type=newtonls`) or from the `PROBLEM` definition (e.g. `NONLINEAR_SOLVER newtonls`).
   Check out the [FeenoX manual section for the keyword `PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) for further details.
   FeenoX can have hard-coded PETSc options using the [`PETSC_OPTIONS` definition](https://www.seamplex.com/feenox/doc/feenox-manual.html#petsc_options) as well.
-    
- * Finally we show how to solve transient problems. Transients are triggered by setting [`end_time`](https://www.seamplex.com/feenox/doc/feenox-manual.html#end_time) to a positive value.
+
+   > **Heads up**: again, do not worry.
+  
+ * Finally we show how to solve transient problems. Transients are triggered by setting the [special variable `end_time`](https://www.seamplex.com/feenox/doc/feenox-manual.html#end_time) to a positive value.
  
  * FeenoX uses [PETSc's TS](https://petsc.org/release/manual/ts/) framework for transient problems. Different schemes can be chosen either from the command line (e.g. `--ts_type=bdf`) or from the `PROBLEM` definition (e.g. `TRANSIENT_SOLVER bdf`).
  
@@ -91,7 +95,7 @@ along with proper boundary conditions.
 ## Temperature conditions
 
 The simplest heat conduction problem involves a slab geometry with prescribed temperatures at both ends.
-If the conductivity $k$ is uniform, then the solution is a linear interpolation of these two temperatures---independently of the actual value of the conductivity.
+If the conductivity $k$ is uniform, then the solution is a linear interpolation of these two temperatures. Hence, the solution is independent of the actual value of the conductivity, provided it is uniform.
 
 ### Single-material slab
 
@@ -109,18 +113,18 @@ So we can ask FeenoX to solve a thermal problem with uniform conductivity $k$ a
     PROBLEM thermal 1d
     ```
     
-    We can check which problems FeenoX can solve by running it with `--pdes`:
-    
-    ```terminal
-    $ feenox --pdes
-    laplace
-    mechanical
-    modal
-    neutron_diffusion
-    neutron_sn
-    thermal
-    $    
-    ```
+    > **Note**: you can check which problems FeenoX can solve by running it with `--pdes`:
+    > 
+    > ```terminal
+    > $ feenox --pdes
+    > laplace
+    > mechanical
+    > modal
+    > neutron_diffusion
+    > neutron_sn
+    > thermal
+    > $
+    > ```
  
  2. Setting the [special variable `k`](https://www.seamplex.com/feenox/doc/feenox-manual.html#k) to a constant:
  
@@ -133,6 +137,8 @@ So we can ask FeenoX to solve a thermal problem with uniform conductivity $k$ a
      i. there is a single material, and
      ii. its conductivity is uniform, i.e. it does not depend on space.
      
+    but it can eventually depend on time, as discussed in @sec:transient.
+     
  3. Giving `T` equal to the desired temperature values after the [`BC`](https://www.seamplex.com/feenox/doc/feenox-manual.html#bc) definition for both `left` and `right`
 
     ```feenox
@@ -140,13 +146,13 @@ So we can ask FeenoX to solve a thermal problem with uniform conductivity $k$ a
     BC right T=1
     ```
     
-    Recall that the names `left` and `right` come from the names of the physical grupos the `.msh` file read by FeenoX (which of course were defined in the `.geo`). 
+    Recall that the names `left` and `right` come from the names of the physical groups in the `.msh` file read by FeenoX (which in turn were defined in the `.geo`). 
 
-After the instruction [`SOLVE_PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#solve_problem) is executed, the solution $T(x)$ is available as the one-dimensional function `T(x)`.
+After the instruction [`SOLVE_PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#solve_problem) is executed, the solution $T(x)$ is available as the [one-dimensional function](https://www.seamplex.com/feenox/doc/feenox-manual.html#function) `T(x)`.
 We can then
  
  i. print its definition values with [`PRINT_FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function), and/or
- ii. evaluate it at any arbitrary location `x`. FeenoX will use the shape functions to interpolate the nodal solutions.
+ ii. evaluate it at any arbitrary location $x$ (or `x` in the input file). FeenoX will use the shape functions to interpolate the nodal solutions.
  
 Here's a working input file `slab-uniform.fee`:
 
@@ -187,6 +193,7 @@ $ feenox slab-uniform.fee
 >
 > 1. Check that the solution does not depend on $k$.
 > 2. Change the values of the boundary conditions and check the result is always a linear interpolation.
+> 3. Why does the hash `#` need to be escaped in the [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) instruction?
  
 ### Two-material slab
 
@@ -270,8 +277,7 @@ $$
 T(x) = \frac{\log(1+x)}{\log(2)}
 $$
 
-which we can check with [`PRINT_FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function):
-
+which we can check with [`PRINT_FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function).
 Since we have only one material, we can define a function `k(x)` to define the space-dependent property:
 
 ```{.feenox include="slab-kofx-heatflux.fee"}
@@ -324,7 +330,7 @@ BC right h=100+y  Tref=2000
 To illustrate this feature, let us solve heat conduction on the [Stanford Bunny](https://en.wikipedia.org/wiki/Stanford_bunny) with
 
  * A fixed space-dependent temperature in the base
- * A convection condition on the rest of the external surface where the coefficient $h$ varies with the vertical $z$ coordinate
+ * A convection condition on the rest of the external surface where the coefficient $h$ varies linearly with the vertical $z$ coordinate
  
 ```{.feenox include="bunny-thermal.fee"}
 ```
@@ -341,9 +347,10 @@ Output of `bunny-thermal.fee`
 ## Volumetric heat sources
 
 So far all the sources of heat came from boundary conditions.
-Let us now define volumetric heat sources, that is to say, heat which is dissipated in the bulk of the materials.
+Let us now define volumetric heat sources, that is to say, heat which is generated within the bulk of the materials like electrical, chemical or fission heating.
 
-To do so, we can use the [property `q`](https://www.seamplex.com/feenox/doc/feenox-manual.html#q) which works exactly like the [conductivity `k`]((https://www.seamplex.com/feenox/doc/feenox-manual.html#k)):
+To do so, we can use the [property `q`](https://www.seamplex.com/feenox/doc/feenox-manual.html#q) which works exactly like the [conductivity `k`]((https://www.seamplex.com/feenox/doc/feenox-manual.html#k)).
+Even more, it works like any other material property:
 
  * If there is only one material, it can be defined either as a variable `q` or a function `q(x,y,z)`
  * If there are many materials, it can be defined either
@@ -361,17 +368,17 @@ Let us set
   * uniform unitary power source $q$
   * $T=0$ at the four edges
 
-Note that since there are four different groups holding the same boundary condition we can use the `LABEL` keyword in `BC` to "add" labels to the condition:
+Note that since there are four different groups holding the same boundary condition we can use the `GROUP` keyword in [`BC`](https://www.seamplex.com/feenox/doc/feenox-manual.html#bc) to apply the same condition to more than one physical group:
   
 ```{.feenox include="square-power.fee"}
 ```
 
 ![Output of `bunny-thermal.fee`](square-power.png){#fig:square-power}
 
-> **Heads up**: the volumetric source `q` works as any other material property. In multi-material problems. it can be defined using variables or functions where the material name is appended to the name or using the `MATERIAL` keyword.
+> **Note**: as we mentioned, the volumetric source `q` works as any other material property. In multi-material problems. it can be defined using variables or functions where the material name is appended to the name or using the `MATERIAL` keyword.
 
     
-## Space-dependent properties: manufactured solution
+## Space-dependent properties: manufactured solution {#sec:mms}
 
 To finish the linear steady-state section, we show how to perform a simple MMS verification using the same unit square as in the previous section.
 
@@ -396,7 +403,7 @@ T_manufactured(x,y) = 1 + sin(2*x)^2 * cos(3*y)^2
 k(x,y) = 1 + x - y/2
 ```
 
-Then, using the differential equation we can work out what the source needs to be in order for that manufactured temperature to be the solution. For that end we use the [`derivative`](https://www.seamplex.com/feenox/doc/feenox-manual.html#derivative) functional:
+Then, using the differential equation we can work out what the source needs to be in order for that manufactured temperature to be the solution. For that end we use the [`derivative`](https://www.seamplex.com/feenox/doc/feenox-manual.html#derivative) functional:^[Note that an actual verification using MMS would need an analytical expression for the source term (see <https://github.com/seamplex/feenox/tree/main/tests/mms>). In this case, we are using the `derivative` functional which computes a numerical result.]
 
 ```feenox
 VAR x' x'' y' y''
@@ -418,7 +425,7 @@ BC bottom q=+(-k(x,y)*derivative(T_manufactured(x,y'),y',y))
 BC right  q=-(-k(x,y)*derivative(T_manufactured(x',y),x',x))
 ```
 
-After solving the problem, we want to show that the $L-2$ error is small.
+After solving the problem, we want to show that the $L_2$ error is small.
 For that end, we use the [`INTEGRATE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#integrate) instruction:
 
 ```feenox
@@ -438,12 +445,12 @@ $
 
 
 
-> Once again, make sure you check out the [MMS](https://github.com/seamplex/feenox/tree/main/tests/mms) section.
+> **Note**: once again, make sure you check out the [MMS subdirectory in the `test` directory of the FeenoX repository](https://github.com/seamplex/feenox/tree/main/tests/mms).
 > A proper verification is performed there by using Maxima to compute the symbolic expressions for the sources and boundary conditions and by sweeping over different mesh sizes (and element types) to show that the convergence rate matches the theoretical value.
 
 ::: {#fig:mms}
-![](mms-T.png){#fig:mms-T width=50%}
-![](mms-dT.png){#fig:mms-dT width=50%}
+![Numerical temperature distribution](mms-T.png){#fig:mms-T width=50%}
+![Difference with respect to manufactured solution](mms-dT.png){#fig:mms-dT width=50%}
 
 Output of `manufactured.fee`
 :::
@@ -451,18 +458,19 @@ Output of `manufactured.fee`
 
 # Non-linear state-state problems
 
-If in the heat @eq:heat above the thermal conductivity $k$ or the volumetric heat source $q$ depends on the solution $T(\mathbf{x})$, or the boundary conditions depend non-linearly on $T(\mathbf{x})$ then the problem is non linear. FeenoX's parser can detect these dependencies so it will use a non-linear solver automatically. That is to say, there is no need for the user to tell the solver which kind of problem it needs to solve---which is reasonable. Why would the user have to tell the solver?
+If in the heat @eq:heat above the thermal conductivity $k$ or the volumetric heat source $q$ depends on the solution $T(\mathbf{x})$, or the boundary conditions depend non-linearly on $T(\mathbf{x})$ then the problem is _non linear_.
+FeenoX's parser can detect these dependencies so it will use a non-linear solver automatically. That is to say, there is no need for the user to tell the solver which kind of problem it needs to solve---which is reasonable. Why would the user have to tell the solver?
 
 
 
 As we all know, solving a non-linear system of equations is far more complex than solving linear problems.
-Even more, the most-widely scheme used to solve the non-linear equation $\mathbf{F}(\mathbf{u})=0$,namely the Newton-Raphson method which is the basis of [PETSc's SNES framework](https://petsc.org/release/manual/snes/), involves repeatedly solving a linear system starting from an initial guess $\mathbf{u}_0$:
+Even more, the most-widely scheme used to solve the non-linear equation $\mathbf{F}(\mathbf{u})=0$, namely the Newton-Raphson method which is the basis of [PETSc's SNES framework](https://petsc.org/release/manual/snes/), involves repeatedly solving a linear system starting from an initial guess $\mathbf{u}_0$:
 
  1. Solve $J(\mathbf{u}_k) \cdot \Delta \mathbf{u}_k = -\mathbf{F}(\mathbf{u}_k)$
  2. Update $\mathbf{u}_{k+1} \leftarrow \mathbf{u}_{k} + \Delta \mathbf{u}_{k}$
 
 
-The matrix $J = \mathbf{F}^{\prime}$ associated with these linear solves (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed $J(\mathbf{u})$ is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
+The matrix $J = \mathbf{F}^{\prime}$ associated with the linear solve step (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed $J(\mathbf{u})$ is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
 
 The solver options can be changed at runtime either using keywors in the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition or command-line options:
 
@@ -477,8 +485,8 @@ Moreover, advanced users might notice that some problems might require a non-tri
 ## Temperature-dependent heat flux: radiation
 
 One way of introducing a non-linearity is by having a prescribed heat-flux boundary condition to depend on the temperature in a non-linear way.
-A radiation boundary condition is exactly this because the heat flux depends on $T^4(\mathbf{x})$.
-To illustrate this concept, let us consider the one-dimensional slab $x \in [0,1]$ with uniform conductivity equal to 50.
+A radiation boundary condition is exactly this, because the heat flux depends on $T^4(\mathbf{x})$.
+To illustrate this concept, let us consider the one-dimensional slab $x \in [0,1]$ with uniform conductivity equal to 50 W / (m $\cdot$ K).
 
  * At $x=0$ (`left`) we set a prescribed heat flux equal to 1200 W/m$^2$.
  * At $x=1$ (`right`) we set a radiation boundary condition with an emissivity $e$ of 0.8 and an absolute reference temperature of 293.15 K. 
@@ -493,13 +501,15 @@ and the temperature at $x=0$
 $$
 T(0) = T(1) + \frac{1200}{50}
 $$
-where $\sigma$ is the Stefan-Boltzmann constant. Just for fun, instead of looking up online its numerical value, we can FeenoX to compute it from the "more fundamental" constants $h$, $c$ and $k_b$.
+where $\sigma$ is the Stefan-Boltzmann constant.
+
+> **Heads up**: just for fun, instead of looking up online its numerical value, we can FeenoX to compute it from the "more fundamental" constants $h$, $c$ and $k_b$.
 
 FeenoX uses [PETSc's SNES framework](https://petsc.org/release/manual/snes/) to solve the resulting non-linear equations.
 The available solvers---which can be selected either through `PROBLEM SNES` definition or from the command line---are iterative in nature.
-The convergence of these algorithms depend on a good initial guess, which by default is a uniform distribution equal to the average of all the temperatures `T` or `Tref` that appear on the temperature and convection boundary conditions.
+The convergence of these algorithms depends on a good initial guess, which by default is a uniform distribution equal to the average of all the temperatures `T` or `Tref` that appear on the temperature and convection boundary conditions.
 Since in this case we only have heat fluxes, the initial guess would be zero which might not be appropriate.
-We can give an explicit initial guess can be given with the function `T_guess(x)` (or `T_guess(x,y)` or `T_guess(x,y,z)` if the dimensions were two or three).
+We can give an explicit initial guess can be given with the [special function `T_guess(x)`](https://seamplex.com/feenox/doc/feenox-manual.html#t_guess) (or `T_guess(x,y)` or `T_guess(x,y,z)` if the dimensions were two or three).
 
 Putting everything together in a FeenoX input file:
 
@@ -533,15 +543,15 @@ If we wanted to get the temperature in Celsius, we could have done:
 >
 > 1. Rewrite the radiation boundary condition as a convection condition. Hint: note that $T^4 - T_\text{ref}^4$ is a difference of squares.
 > Look for `radiation-as-convection.fee` in FeenoX's `tests` directory for the answer.
-> 2. Explain why the solver converges even though there are no prescribed temperature conditions. Hint: think it as a convection condition.
+> 2. Explain why the solver converges even though there are no prescribed temperature conditions. Hint: think of it as a convection condition.
 
 ## Temperature-dependent conductivity
 
 Another general source of non-linearity in engineering problems modeled as PDEs is due to material properties depending on the unknown.
-For heat conduction, this is true when the thermal conductivity depends on the temperature as a certain function $k(T)$.
+For steady-state heat conduction, this happens when the thermal conductivity depends on the temperature as a certain function $k(T)$.
 In general, this dependency is given either using 
  
-  a. an algebraic expression with a correlation to experimental data, or
+  a. an algebraic expression with a correlation of experimental data, or
   b. a pointwise-defined "table" with the actual experimental data
  
 FeenoX can understand both of them.
@@ -555,7 +565,7 @@ $$
 where $\tau = T [ \text{K} ] / 1000$.
 
 How do we tell FeenoX to use this correlation?
-Easy: define a special function of space `k(x,y,z)` that uses to this correlation with `T(x,y,z)` as the argument.
+Easy: we define a special function of space like `k(x,y,z)` that uses to this correlation with `T(x,y,z)` as the argument.
 If we want `T` in Kelvin:
 
 ```feenox
@@ -594,9 +604,10 @@ Two points to take into account:
  2. When giving a non-uniform conductivity as a special function, this function has to be a function of space `k(x,y,z)`. The dependence on temperature is introduced by using the solution `T` evaluated at point `(x,y,z)`. That is why we defined the correlation as a function of a single variable and then defined the conductivity as the correlation evaluated at `T(x,y,z)`. But if we used the `MATERIALS` keyword, we could have directly written the whole expression:
  
     ```feenox
-    MATERIAL uo2 k=100/(7.5408 + 17.692*tau(T(x,y,z)) + 3.614*tau(T(x,y,z))^2) + 6400/(tau(T(x,y,z))^(5/2))*exp(-16.35/tau(T(x,y,z)))
+    MATERIAL uo2 "k=100/(7.5408 + 17.692*tau(T(x,y,z)) + 3.614*tau(T(x,y,z))^2) + 6400/(tau(T(x,y,z))^(5/2))*exp(-16.35/tau(T(x,y,z)))"
     ```
 
+    > **Note**: since the expression is fairly long and complex, we used spaces to separate terms. But the `MATERIAL` keyword expects `k=...` to be a _single_ token. Hence, we quoted the whole thing as `"k=1 + ..."`.
  
  
 Other than this, we are ready to solve for the temperature distribution in a UO$_2$ pellet with a uniform power source (we will refine the power source and make it more interesting later on).
@@ -667,7 +678,7 @@ $
 
 ## Temperature-dependent sources
 
-The volumetric power generated by fissioning nuclei of U$^{235}$ in the UO$_2$ is not uniform throughout the fuel.
+The volumetric power generated by fissioning nuclei of $^{235}$U in the UO$_2$ is not uniform throughout the fuel.
 It depends on...
 
  1. The location of the fuel bundle inside the core: in general, pellets located near the center dissipate more power than those located at the periphery).
@@ -712,21 +723,21 @@ FUNCTION cond(T') INTERPOLATION steffen DATA {
 1200               2.45 }
 ```
 
-Since we want to compare the temperature distribution using this non-linear power source with respect to the previous case with uniform power, we read back the temperature we wrote with the instruction [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results). With no further arguments, that instruction writes a `.msh` file with the temperature distribution `T` as a scalar field and the three heat fluxes `qx`, `qy` and `qz` as a vector---which we used to create fig:pellet-non-linear-k-uniform-q. If no `FILE` keyword is given, the default mesh file is named like the FeenoX input file with the extension `.fee` renamed to `.msh`. So we can then ask FeenoX to retrieve the old temperature distribution as a function of space, with a new name (since there is already a function `T`), say `T_uniform`:
+Since we want to compare the temperature distribution using this non-linear power source with respect to the previous case with uniform power, we read back the temperature we wrote with the instruction [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results). With no further arguments, that instruction writes a `.msh` file with the temperature distribution `T` as a scalar field and the three heat fluxes `qx`, `qy` and `qz` as a vector---which we used to create @fig:pellet-non-linear-k-uniform-q. If no `FILE` keyword is given, the default mesh file is named like the FeenoX input file with the extension `.fee` renamed to `.msh`. So we can then ask FeenoX to retrieve the old temperature distribution as a function of space, with a new name (since there is already a function `T`), say `T_uniform`:
  
 ```feenox
 READ_MESH pellet-non-linear-k-uniform-q.msh DIM 3 READ_FIELD T as T_uniform
 ```
 
-Now we can write the results, including the algebraic difference (or any other operation) of `T` and `T_uniform`. For that end, we now use [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh):
+Now we can write the results, including the algebraic difference (or any other operation) of `T` and `T_uniform`. For that end, we now use [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh) and enter the expression we want to write into the output mesh:
 
 ```feenox
 WRITE_MESH $0.vtk T T(x,y,z)-T_uniform(x,y,z) q VECTOR qx qy qz 
 ```
 
-> **Note:** If the input file does not explicitly asks for the heat fluxes or does not have the instruction `WRITE_RESULTS`, then the heat fluxes are not computed at all to save CPU time.
+> **Note:** If the input file does not explicitly ask for the heat fluxes or does not have the instruction `WRITE_RESULTS`, then the heat fluxes are not computed at all to save CPU time.
 
-Just to change things a little bit, we now write a VTK post-processing file (instead of `.msh` like in the previous case). Since `WRITE_MESH` is a generic instruction (while `WRITE_RESULTS` is PDE-aware so it knows which are the available fields) we have to list what we want to write in the VTK:
+To illustrate that things do not need to be only one way (i.e. [Unix rule of diversity](https://seamplex.com/feenox/doc/feenox-manual.html#sec:diversity)), we now write a VTK post-processing file (instead of `.msh` like in the previous case). Since `WRITE_MESH` is a generic instruction (while `WRITE_RESULTS` is PDE-aware so it knows which are the available fields) we have to list what we want to write in the VTK:
 
  1. The current temperature distribution `T`. Since `T` is a function of space, there is no need to pass the arguments `(x,y,z)`, it will be understood as "write the function of space `T` in the output mesh."
  2. The algebraic difference between the current temperature distribution and the one read from last case's output. This time, we are asking FeenoX to write an algebraic expression, so the arguments of both functions are needed.
@@ -735,7 +746,7 @@ Just to change things a little bit, we now write a VTK post-processing file (ins
 
 By default, `WRITE_MESH` writes nodal-based fields. If the `CELLS` keyword is used, all the following fields are written as cell-based fields, until the `NODES` keyword appears again (or until there are no more fields, of course).
  
-> **Note:** In this case the "old" mesh is the very same as the "current" mesh. Therefore, no interpolation is needed and the difference $T(x,y,z)-T_\text{uniform}(x,y,z)$ will be evaluated node by node. But if the mesh over which $T_\text{uniform}(x,y,z)$ was different (even with a different element order), then FeenoX would be able to interpolate it at the nodes (or cell centers) of the new mesh. 
+> **Note:** In this case the "old" mesh is the very same as the "current" mesh. Therefore, no interpolation is needed and the difference $T(x,y,z)-T_\text{uniform}(x,y,z)$ will be evaluated node by node. But if the mesh over which $T_\text{uniform}(x,y,z)$ was different (even with a different element order), then FeenoX would be able to interpolate it at the nodes (or cell centers) of the new mesh. See <https://github.com/gtheler/feenox-non-conformal-mesh-interpolation>.
  
  
 Putting everything together, we have:
@@ -762,7 +773,7 @@ Results for the non-uniform power case
 :::
 
 
-# Transient problems
+# Transient problems {#sec:transient}
 
 In this final section of the tutorial we solve the transient heat conduction equation
 
@@ -775,9 +786,9 @@ This product can be given by either
 
  a. `rho` and `cp` separately
  b. `rhocp` as a single property
- c. the thermal diffusivity `kappa` (equal to $k / (\rho c_p)$)
+ c. the thermal diffusivity `kappa` (equal to $k / (\rho \cdot c_p)$)
 
-As with any other transient problem in FeenoX, it is triggered by setting the special variable `end_time` to a positive value.
+As with any other transient problem in FeenoX, it is triggered by setting the [special variable `end_time`](https://www.seamplex.com/feenox/doc/feenox-manual.html#end_time) to a positive value.
 FeenoX uses [PETSc's TS](https://petsc.org/release/manual/ts/) framework for transient problems.
 By default, it uses an adaptive time stepper. An initial $\Delta t$ can be given with the special variable [`dt`](https://www.seamplex.com/feenox/doc/feenox-manual.html#dt).
 The range can be controlled with [`min_dt`](https://www.seamplex.com/feenox/doc/feenox-manual.html#min_dt) and [`max_dt`](https://www.seamplex.com/feenox/doc/feenox-manual.html#max_dt), which can be expressions of the special variable [`t`](https://www.seamplex.com/feenox/doc/feenox-manual.html#t).
@@ -1040,7 +1051,7 @@ The full input file is then
 ```{.feenox include="valve.fee"}
 ```
 
-The idea is to run the input file through FeenoX and pipe the standard output to an ASCII file which we can plot to monitor temperatures at certain locations (around ASME's stress classification lines, for example as in @fig:valve-temp). The detailed results are written into a file `valve-1.msh` (or whatever `$1` expands to) which can then be used to create an animation of the temperature $T(\vec{x},t)$ and the heat flux $\vec{q}(\vec{x},t)$:
+The idea is to run the input file through FeenoX and pipe (in the [Unix sense](https://en.wikipedia.org/wiki/Pipeline_(Unix)), not in the mechanical sense) the standard output to an ASCII file which we can plot to monitor temperatures at certain locations (around ASME's stress classification lines, for example as in @fig:valve-temp). The detailed results are written into a file `valve-1.msh` (or whatever `$1` expands to) which can then be used to create an animation of the temperature $T(\vec{x},t)$ and the heat flux $\vec{q}(\vec{x},t)$:
 
 ```terminal
 $ feenox valve.fee 1 | tee valve-1.csv
@@ -1075,7 +1086,7 @@ Temperature vs. time at each side of the stainless/carbon steel interface
 
 > **Note:** We did not give any initial condition $T_0(\vec{x})$ so FeenoX decided to start from a steady-state condition, i.e. to solve a static problem with boundary conditions and material properties for $t=0$ and use that temperature distribution as the initial condition for the transient problem.
 
-The results file written by the `WRITE_RESULTS` instruction contains the temperature and heat flux fields at each time taken by FeenoX. If we wanted to create a smooth animation with the real time, we would need some python programming:
+The results file written by the `WRITE_RESULTS` instruction contains the temperature and heat flux fields at each time taken by FeenoX. If we wanted to create a smooth animation using constant time steps, we would need some python programming:
 
 ```{.python include="valve-anim.py"}
 ```
@@ -1091,14 +1102,66 @@ The results file written by the `WRITE_RESULTS` instruction contains the tempera
 
 ## From an arbitrary initial condition with time-dependent BCs
 
-
 The following input file solves a transient heat conduction equation over a one-dimensional domain $x \in [0,L]$ as discussed in <https://www.math.ubc.ca/~peirce/M257_316_2012_Lecture_20.pdf> (example 20.2, equation 20.25).
+The problem has
 
+ 1. unitary material properties,
+ 2. an initial condition identically equal to zero,
+ 4. a fixed temperature equal to
+ 
+    $$
+    T(x=0) =
+    \begin{cases}
+    0 & \text{if $t \leq 1$} \\
+    A \cdot (t-1) & \text{if $t>1$} \\
+    \end{cases}
+    $$
+    
+    at $x=0$, and
+ 3. a fixed temperature equal to zero at $x=L$.
+
+The analytical solution is a power series
+
+$$
+T(x,t) = A \cdot t \left( 1 - \frac{x}{L} \right) + \frac{2 AL^2}{\pi^3 \cdot \kappa^2}
+\sum_{n=1}^{\infty} \frac{\exp(-\kappa^2 \cdot \left( \frac{n \pi}{L} \right)^2 \cdot t) - 1}{n^3} \sin \left( \frac{n \pi x}{L} \right)
+$$
+
+
+In the following input file we compute the analytical solution up to $n=100$.
+But since the expression blows up for $t<1$ we make sure we evaluate it only for $t>1$ with the [`IF`](https://seamplex.com/feenox/doc/feenox-manual.html#if) instruction:
 
 ```{.feenox include="thermal-slab-transient.fee"}
 ```
 
-
-
-```{.feenox include="thermal-slab-transient-mms-capacity-of-T.fee"}
+```terminal
+gtheler@tom:~/codigos/feenox/doc/tutorials/320-thermal$ feenox thermal-slab-transient.fee 
+1.00307 9.6e-06
+1.00649 1.6e-05
+1.01029 2.8e-05
+1.01386 4.3e-05
+1.02054 7.4e-05
+1.02878 1.1e-04
+1.03852 1.3e-04
+1.05027 1.5e-04
+1.06425 1.7e-04
+1.08075 1.9e-04
+1.10001 2.3e-04
+1.12221 2.6e-04
+1.14728 3.0e-04
+1.17494 3.4e-04
+1.20511 4.0e-04
+1.23803 4.6e-04
+1.27428 5.2e-04
+1.31469 5.9e-04
+1.36035 6.6e-04
+1.41275 7.3e-04
+1.47395 8.0e-04
+1.54701 8.6e-04
+1.63675 9.1e-04
+1.75122 9.6e-04
+1.87561 9.9e-04
+2       1.0e-03
+gtheler@tom:~/codigos/feenox/doc/tutorials/320-thermal$ 
 ```
+
