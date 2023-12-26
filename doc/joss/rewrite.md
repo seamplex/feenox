@@ -13,8 +13,6 @@
 
 - [ ] List of youtube videos
 
-- [ ] Comparison to Markdown @ Hackers
-
 - [ ] Explain why it is different
       - Unix philosophy
       - Cloud first: This particular aspect has no direct implication of being "cloud"-friendly. Almost every good library or application that can be deployed on Docker supports good CI, deployment, status reporting, etc. I suggest focusing on CAEPlex to emphasize cloud computing.
@@ -26,12 +24,13 @@
          - etc.
          
 - [ ] Explain idea of C entry points
-      - Devs $!\neq$ users
+      - Devs $\neq$ users
       - Development is not straightforward but _possible_
 
       
 - [ ] Section comparing how to solve a PDE with other guys (only FOSS), and answer "solving PDEs by writing weak forms in FEniCS and FreeFEM is totally different and much easier than developing the stiffness matrices from scratch as needed in this library".
       - Section "how to solve..."
+      - doc/differences
       - LE10? Some IAEA case?
       - Sparselizard
       - Code Aster
