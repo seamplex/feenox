@@ -1,53 +1,60 @@
 
 - [ ] Separate README in three:
-      - [ ] Academics: those who know the math behind PDEs and the FEA method
-      - [ ] Hackers: those who are comfortable with Unix terminals and cloud servers
-      - [ ] Engineers: those who need to solve industrial problems
+      - Academics: those who know the math behind PDEs and the FEA method
+      - Hackers: those who are comfortable with Unix terminals and cloud servers
+      - Engineers: those who need to solve industrial problems
+      
 - [ ] Illustrate
-      - [ ] Extents
-      - [ ] Capabilities
-      - [ ] Usefulness
+      - Extents
+      - Capabilities
+      - Usefulness
+      
 - [ ] FeenoX is _program_, **not a library**! It is not something you link against. It is something you run and feed the input file at runtime.
+
+- [ ] List of youtube videos
+
 - [ ] Comparison to Markdown @ Hackers
+
 - [ ] Explain why it is different
-      - [ ] Unix philosophy
-      - [ ] Cloud first: This particular aspect has no direct implication of being "cloud"-friendly. Almost every good library or application that can be deployed on Docker supports good CI, deployment, status reporting, etc. I suggest focusing on CAEPlex to emphasize cloud computing.
-      - [ ] FOSS
-      - [ ] Input syntax
-            - simple problems simple inputs
-            - self descriptive
-            - one to one correspondence
-            - etc.
+      - Unix philosophy
+      - Cloud first: This particular aspect has no direct implication of being "cloud"-friendly. Almost every good library or application that can be deployed on Docker supports good CI, deployment, status reporting, etc. I suggest focusing on CAEPlex to emphasize cloud computing.
+      - FOSS
+      - Input syntax
+         - simple problems simple inputs
+         - self descriptive
+         - one to one correspondence
+         - etc.
+         
 - [ ] Explain idea of C entry points
-      - [ ] Devs $!\neq$ users
-      - [ ] Development is not straightforward but _possible_
+      - Devs $!\neq$ users
+      - Development is not straightforward but _possible_
 
       
 - [ ] Section comparing how to solve a PDE with other guys (only FOSS), and answer "solving PDEs by writing weak forms in FEniCS and FreeFEM is totally different and much easier than developing the stiffness matrices from scratch as needed in this library".
-      - [ ] Section "how to solve..."
-      - [ ] LE10? Some IAEA case?
-      - [ ] Sparselizard
-      - [ ] Code Aster
-      - [ ] CalculiX
-      - [ ] FEniCS
-      - [ ] FreeFEM
-      - [ ] MoFEM
-      - [ ] ...
+      - Section "how to solve..."
+      - LE10? Some IAEA case?
+      - Sparselizard
+      - Code Aster
+      - CalculiX
+      - FEniCS
+      - FreeFEM
+      - MoFEM
+      - ...
       
 - [ ] "While the library contains solver capabilities only for a few basic problems (mostly steady-state/static, transient heat transfer but mostly linear problems) and offers FEM ingredients for further developments, the development of solvers for other PDEs, particularly for nonlinear problems, is not as simple as indicated in the paper."
-      - [ ] Neutronics
-      - [ ] DAEs
+      - Neutronics
+      - DAEs
       
 - [ ] State that "development of solvers for other PDEs, particularly nonlinear problems, is not simple" but **possible**
 
 - [ ] Show
-      - [ ] Flexibility
-          - [ ] Parametric sweeps
-          - [ ] Optimization
-          - [ ] Material properties
-          - [ ] Boundary conditions
-      - [ ] Scalability
-      - [ ] Performance
+      - Flexibility
+         - Parametric sweeps
+         - Optimization
+         - Material properties
+         - Boundary conditions
+      - Scalability
+      - Performance
       
 - [ ] FeenoX lessens the burden of PDE solving, not the burden of solver development!
 
@@ -61,10 +68,17 @@
 - [ ] and expected behavior when running examples (including ways to improve the solver).
 
 - [ ] Contributing
-      - [ ] How to create a PR
-      - [ ] Reviews
-      - [ ] Tests
+      - How to create a PR
+      - Reviews
+      - Tests
       
+- [ ] Highlight verification in academics
+      - MMS
+      - test suite: unit, regression and (primitive) verification
+      
+- [ ] Fun & games
+      - Maze
+      - Lorenz
 
 # Academics
 

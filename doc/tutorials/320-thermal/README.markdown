@@ -26,10 +26,10 @@
   - [<span class="toc-section-number">3.3</span> Temperature-dependent
     sources][]
 - [<span class="toc-section-number">4</span> Transient problems][]
-  - [<span class="toc-section-number">4.0.1</span> From an initial
+  - [<span class="toc-section-number">4.1</span> From an initial
     condition up to steady state][]
-  - [<span class="toc-section-number">4.1</span> From a steady state][]
-  - [<span class="toc-section-number">4.2</span> From an arbitrary
+  - [<span class="toc-section-number">4.2</span> From a steady state][]
+  - [<span class="toc-section-number">4.3</span> From an arbitrary
     initial condition with time-dependent BCs][]
 
   [<span class="toc-section-number">1</span> Foreword]: #sec:foreword
@@ -54,10 +54,10 @@
   [<span class="toc-section-number">3.3</span> Temperature-dependent sources]:
     #temperature-dependent-sources
   [<span class="toc-section-number">4</span> Transient problems]: #sec:transient
-  [<span class="toc-section-number">4.0.1</span> From an initial condition up to steady state]:
+  [<span class="toc-section-number">4.1</span> From an initial condition up to steady state]:
     #from-an-initial-condition-up-to-steady-state
-  [<span class="toc-section-number">4.1</span> From a steady state]: #from-a-steady-state
-  [<span class="toc-section-number">4.2</span> From an arbitrary initial condition with time-dependent BCs]:
+  [<span class="toc-section-number">4.2</span> From a steady state]: #from-a-steady-state
+  [<span class="toc-section-number">4.3</span> From an arbitrary initial condition with time-dependent BCs]:
     #from-an-arbitrary-initial-condition-with-time-dependent-bcs
 
 # Foreword
@@ -1421,7 +1421,7 @@ by solving a steady-state problem with `t=0`.
   [`t`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#t
   [`done`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#done
 
-### From an initial condition up to steady state
+## From an initial condition up to steady state
 
 One common way of solving a time-dependent problem is to start with a
 certain initial temperature distribution (say everything is uniformly

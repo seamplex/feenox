@@ -16,7 +16,7 @@ documentclass: report
 [FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems.
 
 ```include
-why.md
+word-md-tex.md
 ```
 
 Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). 

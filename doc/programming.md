@@ -123,6 +123,7 @@ Then create a new C/C++ project File->New Project... choose C/C++ Project with E
  
  * Do not worry about long lines. Only wrap lines when it makes sense to from a logic point of view not becuase "it looks bad on screen" because “screen” can be anything from a mobile phone to a desktop with many 24" LED monitors.
  * Make sure you understand and follow the 17 rules of UNIX philosophy <https://en.wikipedia.org/wiki/Unix_philosophy>
+ 
     1. modularity
     2. clarity
     3. composition
