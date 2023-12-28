@@ -10,6 +10,8 @@ toc: true
 
 ## Why
 
+Why is [FeenoX](https://www.seamplex.com/feenox) different from other "similar" tools?
+
 ```{.include}
 doc/word-md-tex.md
 ```
@@ -18,6 +20,9 @@ doc/word-md-tex.md
 
 cloud first
 unix
+
+explain aws, docker, MPI
+
 
 ## What
 

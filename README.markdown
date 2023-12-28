@@ -1,38 +1,68 @@
 # FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 - [<span class="toc-section-number">1</span> About FeenoX][]
-  - [<span class="toc-section-number">1.1</span> As seen on “The Science
-    Circle”][]
-- [<span class="toc-section-number">2</span> Quickstart][]
-  - [<span class="toc-section-number">2.1</span> Download][]
-  - [<span class="toc-section-number">2.2</span> Git repository][]
-- [<span class="toc-section-number">3</span> Examples][]
-  - [<span class="toc-section-number">3.1</span> Tutorials (work in
+  - [<span class="toc-section-number">1.1</span> Extents][]
+  - [<span class="toc-section-number">1.2</span> Capabilities][]
+  - [<span class="toc-section-number">1.3</span> Usefulness][]
+- [<span class="toc-section-number">2</span> Documentation][]
+- [<span class="toc-section-number">3</span> Quickstart][]
+  - [<span class="toc-section-number">3.1</span> Download][]
+  - [<span class="toc-section-number">3.2</span> Git repository][]
+- [<span class="toc-section-number">4</span> Examples][]
+  - [<span class="toc-section-number">4.1</span> Tutorials (work in
     progress)][]
-  - [<span class="toc-section-number">3.2</span> Test suite][]
-- [<span class="toc-section-number">4</span> Licensing][]
-  - [<span class="toc-section-number">4.1</span> Contributing][]
-- [<span class="toc-section-number">5</span> Further information][]
+    - [<span class="toc-section-number">4.1.1</span> General
+      tutorials][]
+    - [<span class="toc-section-number">4.1.2</span> Detailed
+      functionality][]
+    - [<span class="toc-section-number">4.1.3</span> Physics
+      tutorials][]
+  - [<span class="toc-section-number">4.2</span> Test suite][]
+- [<span class="toc-section-number">5</span> Licensing][]
+  - [<span class="toc-section-number">5.1</span> Contributing][]
+- [<span class="toc-section-number">6</span> Further information][]
 
   [<span class="toc-section-number">1</span> About FeenoX]: #about-feenox
-  [<span class="toc-section-number">1.1</span> As seen on “The Science Circle”]:
-    #as-seen-on-the-science-circle
-  [<span class="toc-section-number">2</span> Quickstart]: #quickstart
-  [<span class="toc-section-number">2.1</span> Download]: #download
-  [<span class="toc-section-number">2.2</span> Git repository]: #git-repository
-  [<span class="toc-section-number">3</span> Examples]: #examples
-  [<span class="toc-section-number">3.1</span> Tutorials (work in progress)]:
+  [<span class="toc-section-number">1.1</span> Extents]: #extents
+  [<span class="toc-section-number">1.2</span> Capabilities]: #capabilities
+  [<span class="toc-section-number">1.3</span> Usefulness]: #usefulness
+  [<span class="toc-section-number">2</span> Documentation]: #documentation
+  [<span class="toc-section-number">3</span> Quickstart]: #quickstart
+  [<span class="toc-section-number">3.1</span> Download]: #download
+  [<span class="toc-section-number">3.2</span> Git repository]: #git-repository
+  [<span class="toc-section-number">4</span> Examples]: #examples
+  [<span class="toc-section-number">4.1</span> Tutorials (work in progress)]:
     #tutorials-work-in-progress
-  [<span class="toc-section-number">3.2</span> Test suite]: #test-suite
-  [<span class="toc-section-number">4</span> Licensing]: #sec:licensing
-  [<span class="toc-section-number">4.1</span> Contributing]: #sec:contributing
-  [<span class="toc-section-number">5</span> Further information]: #further-information
+  [<span class="toc-section-number">4.1.1</span> General tutorials]: #general-tutorials
+  [<span class="toc-section-number">4.1.2</span> Detailed functionality]:
+    #detailed-functionality
+  [<span class="toc-section-number">4.1.3</span> Physics tutorials]: #physics-tutorials
+  [<span class="toc-section-number">4.2</span> Test suite]: #test-suite
+  [<span class="toc-section-number">5</span> Licensing]: #sec:licensing
+  [<span class="toc-section-number">5.1</span> Contributing]: #sec:contributing
+  [<span class="toc-section-number">6</span> Further information]: #further-information
 
 # About FeenoX
 
 FeenoX is a cloud-first free and open source tool to solve
 engineering-related problems using a computer (or many computers in
 parallel) with a particular design basis.
+
+<div class="not-in-format html">
+
+Choose your background for further details about the what, how and whys:
+
+- [Industry Engineer][]
+- [Unix Hacker][]
+- [Academic Professor][]
+
+</div>
+
+  [Industry Engineer]: README-engineers.md
+  [Unix Hacker]: README-hackers.md
+  [Academic Professor]: README-academics.md
+
+## Extents
 
 - See the [examples][] for an overview of the type of problems FeenoX
   can solve:
@@ -48,15 +78,17 @@ parallel) with a particular design basis.
 
 - Take the [tutorials][] to learn how to solve them yourself.
 
-- Choose your background for further details about the what, how and
-  whys:
+  1.  [Setting up your workspace][]
+  2.  [Overview: the tensile test case][]
+  3.  [Fun & games: solving mazes with PDES instead of AI][]
+  4.  [Heat conduction][1]
 
-  - [Industry Engineer][]
-  - [Unix Hacker][]
-  - [Academic Professor][]
+- Review the [tests][] directory in the repository for hundreds of
 
-- Make sure you also read the [FAQs][], including the question about
-  what the name means.
+  - examples,
+  - unit tests,
+  - regression tests, and/or
+  - (crude) mathematical verification tests.
 
   [examples]: https://www.seamplex.com/feenox/examples/
   [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
@@ -68,19 +100,88 @@ parallel) with a particular design basis.
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron $S_N$]: https://seamplex.com/feenox/examples/neutron_sn.html
   [tutorials]: https://www.seamplex.com/feenox/doc/tutorials/
-  [Industry Engineer]: README-engineers.md
-  [Unix Hacker]: README-hackers.md
-  [Academic Professor]: README-academics.md
-  [FAQs]: doc/FAQ.md
+  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
+  [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
+  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
+  [1]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
+  [tests]: https://github.com/seamplex/feenox/tree/main/tests
 
-## As seen on “The Science Circle”
+## Capabilities
 
-> <div class="container text-center my-5 ratio ratio-16x9">
->
-> <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/EZSjFzJAhbw?rel=0" allowfullscreen>
-> </iframe>
->
-> </div>
+- Problem defined through a self-descriptive English-like plain-text
+  input file
+  - No need to recompile if the problem changes (FeenoX is a **program**
+    not a library)
+  - Simple problems need simple inputs
+  - Similar problems need similar inputs
+  - Everything is an expresion
+  - 100%-defined user output (no print or write instructions, no output)
+- General mathematical problems using GNU GSL
+- Sets of ODEs/DAEs using SUNDIALS
+- PDEs using FEM
+  - Reads mesh in Gmsh format
+  - Uses PETSc/SLEPc to solve
+    - linear systems (KSP)
+    - non-linear systems (SNES)
+    - time-dependent systems (TS)
+    - generalized eigen-value problems (EPS)
+  - Writes results in either Gmsh or VTK (Paraview) format
+- Cloud-first design (cloud friendliness is not enough)
+- MPI parallelization
+- Unix programming philosophy
+  - rule of separation
+  - rule of silence
+  - rule of economy
+- Space, time and/or solution-dependent material properties and boundary
+  conditions
+  - algebraic expressions, and/or
+  - point-wise interpolated data
+- Command-line argument expansion for
+  - increased flexibility,
+  - parametric sweeps, and/or
+  - optimization loops
+- Steady-state, quasi-static and/or transient problems
+- Linear and non-linear problems
+
+## Usefulness
+
+- Web-based thermo-mechanical solver running on the cloud
+- Non-conformal mesh mapping
+- ASME stress linearization for pressurized pipes and vessels
+- Environmentally-assisted fatigue analysis
+- Neutron transport in the cloud
+- Solving a maze without AI
+- Parametric NAFEMS LE10 benchmark: comparison of resource consumption
+  for different FEA programs
+
+# Documentation
+
+Browse through the [documentation index][] and/or the [`doc`][]
+subdirectory of the [Github repository][] for
+
+- [FAQs][], including the [what FeenoX means][]
+- [Manual][]
+- [Description][]
+- [Software Design Requirements][]
+- [Software Design Specifications][]
+- [Unix man page][] (accesible through `man feenox` after installation)
+- [History][]
+- [Compilation guide][]
+- [Programming guide][]
+
+  [documentation index]: https://seamplex.com/feenox/doc/
+  [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
+  [Github repository]: https://github.com/seamplex/feenox/
+  [FAQs]: https://seamplex.com/feenox/doc/FAQ.html
+  [what FeenoX means]: https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean
+  [Manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
+  [Description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [Software Design Requirements]: https://seamplex.com/feenox/doc/srs.html
+  [Software Design Specifications]: https://seamplex.com/feenox/doc/sds.html
+  [Unix man page]: https://www.seamplex.com/feenox/doc/feenox.1.html
+  [History]: https://seamplex.com/feenox/doc/history.html
+  [Compilation guide]: https://seamplex.com/feenox/doc/compilation.html
+  [Programming guide]: https://seamplex.com/feenox/doc/programming.html
 
 # Quickstart
 
@@ -100,7 +201,7 @@ version 3][] or (at your option) any later version.
 - FeenoX is **cloud first**. It was designed to run on servers.
 
 - Be aware that FeenoX **does not have a GUI**. Read the
-  [documentation][], especially the [description][] and the [FAQs][1].
+  [documentation][], especially the [description][] and the [FAQs][].
   Ask for help on the [GitHub discussions page][].
 
 - Debian/Ubuntu packages are unofficial, i.e. they are not available in
@@ -128,7 +229,7 @@ version 3][] or (at your option) any later version.
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [1]: https://seamplex.com/feenox/doc/FAQ.html
+  [FAQs]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilatation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
@@ -234,18 +335,43 @@ See the [download page][] for more detailed information.
 
 ## Tutorials (work in progress)
 
-> <div class="container text-center my-5 ratio ratio-16x9">
->
-> <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/b3K2QewI8jE?rel=0" allowfullscreen>
-> </iframe>
->
-> </div>
-
 All the files needed are available in the [examples][examples2]
 directory of the [Git repository][]
 
+1.  [Setting up your workspace][]
+
   [examples2]: https://github.com/seamplex/feenox/tree/main/examples
   [Git repository]: https://github.com/seamplex/feenox
+  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
+
+### General tutorials
+
+1.  [Overview: the tensile test case][]
+2.  [Fun & games: solving mazes with PDES instead of AI][]
+
+  [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
+  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
+
+### Detailed functionality
+
+1.  Input files, expressions and command-line arguments
+2.  Static & transient cases
+3.  Functions & functionals
+4.  Vectors & matrices
+5.  Differential-algebraic equations
+6.  Meshes & distributions
+
+### Physics tutorials
+
+1.  The Laplace equation
+2.  [Heat conduction][Heat conduction1]
+3.  Linear elasticity
+4.  Modal analysis
+5.  Thermo-mechanical analysis
+6.  Neutron diffusion
+7.  Neutron transport
+
+  [Heat conduction1]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
 
 ## Test suite
 
@@ -382,10 +508,10 @@ types of PDEs and new formulations of existing PDEs. For elliptic
 operators feel free to use the Laplace equation at `src/pdes/laplace` as
 a template.
 
-1.  Read [programming guide][].
+1.  Read [programming guide][4].
 2.  Browse [Github discussions][] and open a new thread explaining what
     you want to do and/or asking for help.
-3.  Fork the [Git repository][4] under your Github account
+3.  Fork the [Git repository][5] under your Github account
 4.  Create a pull request, including
     - code,
     - documentation, and
@@ -398,9 +524,9 @@ Note that
 - The contributed code has to be compatible with the [GPLv3+ license][].
 - Each author keeps the copyright of the contribution.
 
-  [programming guide]: doc/programming.md
+  [4]: doc/programming.md
   [Github discussions]: https://github.com/seamplex/feenox/discussions
-  [4]: https://github.com/seamplex/feenox/
+  [5]: https://github.com/seamplex/feenox/
   [Code of Conduct]: CODE_OF_CONDUCT.md
   [GPLv3+ license]: #sec:licensing
 

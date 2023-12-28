@@ -13,6 +13,26 @@ toc: true
 
 FeenoX is a cloud-first free and open source tool to solve engineering-related problems using a computer (or many computers in parallel) with a particular design basis.
 
+::::: {.only-in-format .html }
+
+<a class="btn btn-primary"   href="https://www.seamplex.com/feenox/README-engineers.html" role="button">FeenoX for Engineers</a>
+<a class="btn btn-secondary" href="https://www.seamplex.com/feenox/README-hackers.html"   role="button">FeenoX for Hackers</a>
+<a class="btn btn-info"      href="https://www.seamplex.com/feenox/README-academics.html" role="button">FeenoX for Academics</a>
+
+:::::
+
+::::: {.not-in-format .html }
+
+Choose your background for further details about the what, how and whys:
+
+ - [Industry Engineer](README-engineers.md)
+ - [Unix Hacker](README-hackers.md)
+ - [Academic Professor](README-academics.md)
+
+:::::
+
+## Extents
+
  * See the [examples](https://www.seamplex.com/feenox/examples/) for an overview of the type of problems FeenoX can solve:
 
     #. [Basic mathematics](https://seamplex.com/feenox/examples/basic.html)
@@ -26,21 +46,88 @@ FeenoX is a cloud-first free and open source tool to solve engineering-related p
 
  * Take the [tutorials](https://www.seamplex.com/feenox/doc/tutorials/) to learn how to solve them yourself.
  
- * Choose your background for further details about the what, how and whys:
+    #. [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup)
+    #. [Overview: the tensile test case](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test)
+    #. [Fun & games: solving mazes with PDES instead of AI](https://www.seamplex.com/feenox/doc/tutorials/120-mazes)
+    #. [Heat conduction](https://www.seamplex.com/feenox/doc/tutorials/320-thermal)
 
-   - [Industry Engineer](README-engineers.md)
-   - [Unix Hacker](README-hackers.md)
-   - [Academic Professor](README-academics.md)
+ * Review the [tests](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository for hundreds of
+ 
+    - examples,
+    - unit tests,
+    - regression tests, and/or
+    - (crude) mathematical verification tests.
+ 
+## Capabilities
 
- * Make sure you also read the [FAQs](doc/FAQ.md), including the question about what the name means.
+ * Problem defined through a self-descriptive English-like plain-text input file
+   - No need to recompile if the problem changes (FeenoX is a **program** not a library)
+   - Simple problems need simple inputs
+   - Similar problems need similar inputs
+   - Everything is an expresion
+   - 100%-defined user output (no print or write instructions, no output) 
+ * General mathematical problems using GNU GSL
+ * Sets of ODEs/DAEs using SUNDIALS
+ * PDEs using FEM 
+   - Reads mesh in Gmsh format
+   - Uses PETSc/SLEPc to solve
+     - linear systems (KSP)
+     - non-linear systems (SNES)
+     - time-dependent systems (TS)
+     - generalized eigen-value problems (EPS)
+   - Writes results in either Gmsh or VTK (Paraview) format 
+ * Cloud-first design (cloud friendliness is not enough)
+ * MPI parallelization
+ * Unix programming philosophy
+   - rule of separation
+   - rule of silence
+   - rule of economy
+ * Space, time and/or solution-dependent material properties and boundary conditions
+   - algebraic expressions, and/or
+   - point-wise interpolated data
+ * Command-line argument expansion for
+   - increased flexibility,
+   - parametric sweeps, and/or
+   - optimization loops
+ * Steady-state, quasi-static and/or transient problems
+ * Linear and non-linear problems
+
+## Usefulness
+
+ * Web-based thermo-mechanical solver running on the cloud
+ * Non-conformal mesh mapping
+ * ASME stress linearization for pressurized pipes and vessels
+ * Environmentally-assisted fatigue analysis
+ * Neutron transport in the cloud
+ * Solving a maze without AI
+ * Parametric NAFEMS LE10 benchmark: comparison of resource consumption for different FEA programs
+
+::::: {.only-in-format .html }
 
 ## As seen on  "The Science Circle"
  
-> ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+> ::: {.container .text-center .my-5 .ratio .ratio-16x9}
 > <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/EZSjFzJAhbw?rel=0" allowfullscreen></iframe>
-> :::::
+> :::
 
+::::: 
+
+# Documentation
+
+Browse through the [documentation index](https://seamplex.com/feenox/doc/) and/or the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) subdirectory of the [Github repository](https://github.com/seamplex/feenox/) for
+
+ * [FAQs](https://seamplex.com/feenox/doc/FAQ.html), including the [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
+ * [Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html)
+ * [Description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
+ * [Software Design Requirements](https://seamplex.com/feenox/doc/srs.html)
+ * [Software Design Specifications](https://seamplex.com/feenox/doc/sds.html)
+ * [Unix man page](https://www.seamplex.com/feenox/doc/feenox.1.html) (accesible through `man feenox` after installation)
+ * [History](https://seamplex.com/feenox/doc/history.html)
+ * [Compilation guide](https://seamplex.com/feenox/doc/compilation.html)
+ * [Programming guide](https://seamplex.com/feenox/doc/programming.html)
  
+
+
 # Quickstart
 
 ## Download
@@ -71,28 +158,31 @@ See the [contributing](#sec:contributing) section below for further instructions
 
 ## Tutorials (work in progress)
 
+::::: {.only-in-format .html }
 
-> ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
+> ::: {.container .text-center .my-5 .ratio .ratio-16x9}
 > <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/b3K2QewI8jE?rel=0" allowfullscreen></iframe>
-> :::::
+> :::
+
+:::::
 
 All the files needed are available in the [examples](https://github.com/seamplex/feenox/tree/main/examples) directory of the [Git repository](https://github.com/seamplex/feenox)
 
-```{.include shift-heading-level-by=1}
-setup.md
+```{.include shift-heading-level-by=2}
+doc/tutorials/setup.md
 ```
  
  
-```{.include shift-heading-level-by=1}
-general.md
+```{.include shift-heading-level-by=2}
+doc/tutorials/general.md
 ```
 
-```{.include shift-heading-level-by=1}
-detailed.md
+```{.include shift-heading-level-by=2}
+doc/tutorials/detailed.md
 ```
 
-```{.include shift-heading-level-by=1}
-physics.md
+```{.include shift-heading-level-by=2}
+doc/tutorials/physics.md
 ```
 
  

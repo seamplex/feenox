@@ -1,8 +1,3 @@
-
-- [ ] Separate README in three:
-      - Academics: those who know the math behind PDEs and the FEA method
-      - Hackers: those who are comfortable with Unix terminals and cloud servers
-      - Engineers: those who need to solve industrial problems
       
 - [ ] Illustrate
       - Extents
@@ -12,6 +7,7 @@
 - [ ] FeenoX is _program_, **not a library**! It is not something you link against. It is something you run and feed the input file at runtime.
 
 - [ ] List of youtube videos
+      - In doc/README
 
 - [ ] Explain why it is different
       - Unix philosophy
@@ -79,66 +75,80 @@
       - Maze
       - Lorenz
 
-# Academics
 
-## What
+- [ ] Remark SRS + SDS
+      - hackers
+      - academics
 
-A program, i.e. something your run, reads the problem in a plain text file containing definitions and instructions, solves it, writes the output (if asked for with instructions in the input file) and returns back to the shell.
-It is deliberately not a library, i.e. something you have to link your code against. Link to SRS.
+- [ ] cloud includes
+      - thin clients
+      - scripted studies
+      
+- [ ] parametric
+      - link to SDS
+      
+- [ ] why is it different?
+      - no other guy fulfills the SRS
+      
+- [ ] What people say
+      - igor2
+      - vitor (about milonga)
+      - allvar: makes my life easy
+      
+- [ ] NOT A LIBRARY!
+      - unix
+      
+- [ ] optimization
+      - neural concept?
+      - uno que pidió una API por mail
+      - ver runs, repos @ projects.seamplex.com
+      
+- [ ] scalability
+      - vs. who?
 
+- [ ] mention PETSc & SLEPc in unix & academics
+      - glue layer
+      - for linear elasticity
+      
+      ```
+      
+      Gmsh   -> mesh                                                                             console
+                        --->  Feenox -> K & b -> PETSc Ku = b -> Feenox -> stresses from u --->  
+      editor -> input                                                                            .vtk -> paraview
+      
+## comparisons
 
-## How
+### sparselizard
 
-By leveraging the Unix programming philosophy to come up with a cloud-first tool suitable to serve as the back end of web-based interfaces such as CAEplex.
-A mathematical framework with C entry points that tell it what to put in the global stiffness matrix, residuals, etc.
-
-
-## Why
-
-Because there are either
-
- a. libraries which need code to use them, 
- b. end-user programs which need a GUI
-
-FeenoX sits in the middle:
-
- * to solve a problem one needs to prepare an input file (not a script) which is read at run-time, not code which calls a library
- * these input files can expand generic command-line options using Bash syntax as `$1`, `$2`, etc, which allows for parametric or optimization loops driven by higher-level scripts
- * for solving PDEs, the input file has to refer to at least one Gmsh `.msh` file that defines the domain where the PDE is solved
- * the material properties and boundary condition are defined using physical groups and not individual nodes nor elements, so the input file is independent of the mesh and thus can be tracked with Git to increase traceability and repeatability
- * it uses the Unix philosophy which, among others, separates policy from mechanism and thus FeenoX is a natural choice for web-based interfaces like CAEplex
+ - no odes/math
+ - have to compile each problem
+ - no MPI (or yes?)
  
+### calculix
 
-# Hackers
+ - inintelligible fortran
+ - no odes/math
+ - no multi-node MPI
+ - mesh in inp (nodal forces)
+ - no parametric
+ - cluttered output
+ - non-trivial input
+ 
+### aster
 
-## Why
+ - no odes/math
+ - cluttered output
+ - difficult to compile/install
+ - non-trivial input
+ 
+### fenics
 
-Word - Markdown - TeX
+ ?
+ 
+### freefem
 
-## How
+ ?
+ 
+### elmer
 
-A cloud-first computational engineering tool based on the Unix philosophy.
-
-
-## What
-
-SRS + SDS
-
-
-# Engineers
-
-
-## How
-
-How it works: terminal & cloud.
-A transfer function
-
-## What
-
-Tutorials
-
-## Why
-
-Why it works the way it does?
-Because it is cloud first and its objective is to power web-based interfaces like CAEplex.
-Depending on the complexity of the case, CAEplex might be enough or not. In the latter, one has to see what's sitting under the hood.
+ ? 

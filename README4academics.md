@@ -8,15 +8,6 @@ number-sections: true
 toc: true
 ...
 
-# What
-
-# How
-
-
-
-
-
-
 
 ## What
 
@@ -25,6 +16,12 @@ It is deliberately not a library, i.e. something you have to link your code agai
 
 
 ## How
+
+By leveraging the Unix programming philosophy to come up with a cloud-first tool suitable to serve as the back end of web-based interfaces such as CAEplex.
+A mathematical framework with C entry points that tell it what to put in the global stiffness matrix, residuals, etc.
+
+
+
 
 FeenoX meets fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html).
 The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
