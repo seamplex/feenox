@@ -67,23 +67,23 @@ Choose your background for further details about the what, how and whys:
 - See the [examples][] for an overview of the type of problems FeenoX
   can solve:
 
-  1.  [Basic mathematics][]
-  2.  [Systems of ODEs/DAEs][]
-  3.  [Laplace’s equation][]
-  4.  [Heat conduction][]
-  5.  [Linear elasticity][]
-  6.  [Modal analysis][]
-  7.  [Neutron diffusion][]
-  8.  [Neutron $S_N$][]
+  - [Basic mathematics][]
+  - [Systems of ODEs/DAEs][]
+  - [Laplace’s equation][]
+  - [Heat conduction][]
+  - [Linear elasticity][]
+  - [Modal analysis][]
+  - [Neutron diffusion][]
+  - [Neutron S<sub>N</sub>][]
 
 - Take the [tutorials][] to learn how to solve them yourself.
 
-  1.  [Setting up your workspace][]
-  2.  [Overview: the tensile test case][]
-  3.  [Fun & games: solving mazes with PDES instead of AI][]
-  4.  [Heat conduction][1]
+  0.  [Setting up your workspace][]
+  1.  [Overview: the tensile test case][]
+  2.  [Fun & games: solving mazes with PDES instead of AI][]
+  3.  [Heat conduction][1]
 
-- Review the [tests][] directory in the repository for hundreds of
+- Review the [`tests`][] directory in the repository for hundreds of
 
   - examples,
   - unit tests,
@@ -98,19 +98,19 @@ Choose your background for further details about the what, how and whys:
   [Linear elasticity]: https://seamplex.com/feenox/examples/mechanical.html
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
-  [Neutron $S_N$]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
   [tutorials]: https://www.seamplex.com/feenox/doc/tutorials/
   [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
   [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
   [1]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
-  [tests]: https://github.com/seamplex/feenox/tree/main/tests
+  [`tests`]: https://github.com/seamplex/feenox/tree/main/tests
 
 ## Capabilities
 
 - Problem defined through a self-descriptive English-like plain-text
   input file
-  - No need to recompile if the problem changes (FeenoX is a **program**
+  - No need to recompile if the problem changes (FeenoX is a *program*,
     not a library)
   - Simple problems need simple inputs
   - Similar problems need similar inputs

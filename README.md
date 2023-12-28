@@ -14,11 +14,13 @@ toc: true
 FeenoX is a cloud-first free and open source tool to solve engineering-related problems using a computer (or many computers in parallel) with a particular design basis.
 
 ::::: {.only-in-format .html }
-
-<a class="btn btn-primary"   href="https://www.seamplex.com/feenox/README-engineers.html" role="button">FeenoX for Engineers</a>
-<a class="btn btn-secondary" href="https://www.seamplex.com/feenox/README-hackers.html"   role="button">FeenoX for Hackers</a>
-<a class="btn btn-info"      href="https://www.seamplex.com/feenox/README-academics.html" role="button">FeenoX for Academics</a>
-
+```{=html}
+<div class="btn-group" role="group" aria-label="FeenoX for...">
+ <a class="btn btn-lg btn-outline-primary"   href="https://www.seamplex.com/feenox/README-engineers.html" role="button">FeenoX for Engineers</a>
+ <a class="btn btn-lg btn-outline-secondary" href="https://www.seamplex.com/feenox/README-hackers.html"   role="button">FeenoX for Hackers</a>
+ <a class="btn btn-lg btn-outline-info"      href="https://www.seamplex.com/feenox/README-academics.html" role="button">FeenoX for Academics</a>
+</div>
+```
 :::::
 
 ::::: {.not-in-format .html }
@@ -35,23 +37,23 @@ Choose your background for further details about the what, how and whys:
 
  * See the [examples](https://www.seamplex.com/feenox/examples/) for an overview of the type of problems FeenoX can solve:
 
-    #. [Basic mathematics](https://seamplex.com/feenox/examples/basic.html)
-    #. [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
-    #. [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
-    #. [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
-    #. [Linear elasticity](https://seamplex.com/feenox/examples/mechanical.html)
-    #. [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
-    #. [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
-    #. [Neutron $S_N$](https://seamplex.com/feenox/examples/neutron_sn.html)
+    - [Basic mathematics](https://seamplex.com/feenox/examples/basic.html)
+    - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
+    - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
+    - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
+    - [Linear elasticity](https://seamplex.com/feenox/examples/mechanical.html)
+    - [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
+    - [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
+    - [Neutron S<sub>N</sub>](https://seamplex.com/feenox/examples/neutron_sn.html)
 
  * Take the [tutorials](https://www.seamplex.com/feenox/doc/tutorials/) to learn how to solve them yourself.
  
-    #. [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup)
-    #. [Overview: the tensile test case](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test)
-    #. [Fun & games: solving mazes with PDES instead of AI](https://www.seamplex.com/feenox/doc/tutorials/120-mazes)
-    #. [Heat conduction](https://www.seamplex.com/feenox/doc/tutorials/320-thermal)
+    0. [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup)
+    1. [Overview: the tensile test case](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test)
+    2. [Fun & games: solving mazes with PDES instead of AI](https://www.seamplex.com/feenox/doc/tutorials/120-mazes)
+    3. [Heat conduction](https://www.seamplex.com/feenox/doc/tutorials/320-thermal)
 
- * Review the [tests](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository for hundreds of
+ * Review the [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository for hundreds of
  
     - examples,
     - unit tests,
@@ -61,7 +63,7 @@ Choose your background for further details about the what, how and whys:
 ## Capabilities
 
  * Problem defined through a self-descriptive English-like plain-text input file
-   - No need to recompile if the problem changes (FeenoX is a **program** not a library)
+   - No need to recompile if the problem changes (FeenoX is a _program_, not a library)
    - Simple problems need simple inputs
    - Similar problems need similar inputs
    - Everything is an expresion
@@ -106,9 +108,9 @@ Choose your background for further details about the what, how and whys:
 
 ## As seen on  "The Science Circle"
  
-> ::: {.container .text-center .my-5 .ratio .ratio-16x9}
-> <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/EZSjFzJAhbw?rel=0" allowfullscreen></iframe>
-> :::
+::: {.container .text-center .my-5 .ratio .ratio-16x9}
+<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/EZSjFzJAhbw?rel=0" allowfullscreen></iframe>
+:::
 
 ::::: 
 
