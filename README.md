@@ -69,29 +69,29 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
  
 ## Capabilities
 
- * The problem to solve is defined through a self-descriptive English-like plain-text input file
-   - no need to recompile if the problem changes (FeenoX is a _program_, not a library)
-   - simple problems need simple inputs
-   - similar problems need similar inputs
-   - everything is an expresion
+ * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) self-descriptive English-like plain-text [input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#matching-formulations) as much as possible
+   - [no need to recompile if the problem changes](https://seamplex.com/feenox/doc/sds.html#sec:introduction) (FeenoX is a _program_, not a library)
+   - [nouns are definitions and verbs are instructions](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
+   - [simple problems need simple inputs](https://seamplex.com/feenox/doc/sds.html#sec:simple)
+   - [everything is an expresion](https://seamplex.com/feenox/doc/sds.html#sec:expression)
    - 100%-defined user output (no print or write instructions, no output) 
- * General mathematical problems using GNU GSL
- * Sets of ODEs/DAEs using SUNDIALS
- * PDEs using FEM 
-   - reads mesh in Gmsh format
-   - uses PETSc/SLEPc to solve
-     - linear systems (KSP)
-     - non-linear systems (SNES)
-     - time-dependent systems (TS)
-     - generalized eigen-value problems (EPS)
-   - writes results in either Gmsh or VTK (Paraview) format 
+ * [General mathematical problems](https://seamplex.com/feenox/examples/basic.html) using [GNU GSL](https://www.gnu.org/software/gsl/)
+ * [Sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html) using [SUNDIALS](https://computing.llnl.gov/projects/sundials)
+ * [PDEs](https://github.com/seamplex/feenox/tree/main/src/pdes) formulated with the [finite element method](https://en.wikipedia.org/wiki/Finite_element_method)
+   - reads mesh in [Gmsh](http://gmsh.info/) format
+   - uses [PETSc](https://petsc.org/release/)/[SLEPc](https://slepc.upv.es/) to solve
+     - linear systems ([KSP](https://petsc.org/release/manual/ksp/))
+     - non-linear systems ([SNES](https://petsc.org/release/manual/snes/))
+     - time-dependent systems ([TS](https://petsc.org/release/manual/ts/))
+     - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
+   - writes results in either Gmsh or [VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) ([Paraview](https://www.paraview.org/)) format 
  * Cloud-first design (cloud friendliness is not enough)
  * MPI parallelization
- * Unix programming philosophy
-   - rule of separation
-   - rule of silence
-   - rule of economy
- * Each PDE (i.e. from Laplace downward in the list of examples) is implemented in a subdirectory within [`src/pde`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree
+ * [Unix programming philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)
+   - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)
+   - [rule of silence](https://seamplex.com/feenox/doc/sds.html#sec:silence)
+   - [rule of economy](https://seamplex.com/feenox/doc/sds.html#sec:economy)
+ * Each PDE (i.e. from Laplace downward in the list of examples) [is implemented in a subdirectory](https://seamplex.com/feenox/doc/sds.html#sec:extensibility) within [`src/pde`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree
    - any subdirectory can be removed if a particular PDE is not needed
    - any subdirectory can be used as a template to add a new PDE to the capabilities
  * Space, time and/or solution-dependent material properties and boundary conditions
