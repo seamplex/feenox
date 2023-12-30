@@ -94,9 +94,12 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
  * Each PDE (i.e. from Laplace downward in the list of examples) [is implemented in a subdirectory](https://seamplex.com/feenox/doc/sds.html#sec:extensibility) within [`src/pde`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree
    - any subdirectory can be removed if a particular PDE is not needed
    - any subdirectory can be used as a template to add a new PDE to the capabilities
- * Space, time and/or solution-dependent material properties and boundary conditions
-   - algebraic expressions, and/or
-   - point-wise interpolated data
+ * [Space](https://github.com/seamplex/feenox/blob/main/tests/thermal-two-squares-material-explicit-space.fee),
+   [time](https://github.com/seamplex/feenox/blob/main/tests/nafems-t3-1d.fee) and/or solution-dependent
+   [material properties](https://github.com/seamplex/feenox/blob/main/tests/wilson-2d.fee) and
+   [boundary conditions](https://github.com/seamplex/feenox/blob/main/tests/radiation-as-convection-celsius.fee)
+   - [algebraic expressions](https://seamplex.com/feenox/examples/mechanical.html#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature), and/or
+   - [point-wise interpolated data](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties)
  * Command-line argument expansion for
    - increased flexibility,
    - parametric sweeps, and/or
