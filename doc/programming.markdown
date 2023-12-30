@@ -1,29 +1,32 @@
 # FeenoX programming guide
 
-- [<span class="toc-section-number">1</span> Why we program FeenoX][]
-- [<span class="toc-section-number">2</span> Compiling and debuging][]
-- [<span class="toc-section-number">3</span> How we program FeenoX][]
-  - [<span class="toc-section-number">3.1</span> Operating systems][]
-  - [<span class="toc-section-number">3.2</span> Languages][]
-  - [<span class="toc-section-number">3.3</span> Programming IDEs][]
-    - [<span class="toc-section-number">3.3.1</span> Netbeans][]
-  - [<span class="toc-section-number">3.4</span> Makefiles][]
-  - [<span class="toc-section-number">3.5</span> Test suite][]
-  - [<span class="toc-section-number">3.6</span> Coding style][]
-  - [<span class="toc-section-number">3.7</span> Virtual methods][]
-  - [<span class="toc-section-number">3.8</span> Memory management][]
-  - [<span class="toc-section-number">3.9</span> Naming conventions][]
-  - [<span class="toc-section-number">3.10</span> Comments][]
-  - [<span class="toc-section-number">3.11</span> Indices in PDEs][]
-  - [<span class="toc-section-number">3.12</span> Git workflow][]
-  - [<span class="toc-section-number">3.13</span> Standards][]
-  - [<span class="toc-section-number">3.14</span> Mentioning other
-    libraries, programs, codes, etc.][]
-  - [<span class="toc-section-number">3.15</span> Documentation][]
-- [<span class="toc-section-number">4</span> What we program in
-  FeenoX][]
-- [<span class="toc-section-number">5</span> Code of coduct][]
-- [<span class="toc-section-number">6</span> Release plans][]
+-   [<span class="toc-section-number">1</span> Why we program FeenoX][]
+-   [<span class="toc-section-number">2</span> Compiling and debuging][]
+-   [<span class="toc-section-number">3</span> How we program FeenoX][]
+    -   [<span class="toc-section-number">3.1</span> Operating
+        systems][]
+    -   [<span class="toc-section-number">3.2</span> Languages][]
+    -   [<span class="toc-section-number">3.3</span> Programming IDEs][]
+        -   [<span class="toc-section-number">3.3.1</span> Netbeans][]
+    -   [<span class="toc-section-number">3.4</span> Makefiles][]
+    -   [<span class="toc-section-number">3.5</span> Test suite][]
+    -   [<span class="toc-section-number">3.6</span> Coding style][]
+    -   [<span class="toc-section-number">3.7</span> Virtual methods][]
+    -   [<span class="toc-section-number">3.8</span> Memory
+        management][]
+    -   [<span class="toc-section-number">3.9</span> Naming
+        conventions][]
+    -   [<span class="toc-section-number">3.10</span> Comments][]
+    -   [<span class="toc-section-number">3.11</span> Indices in PDEs][]
+    -   [<span class="toc-section-number">3.12</span> Git workflow][]
+    -   [<span class="toc-section-number">3.13</span> Standards][]
+    -   [<span class="toc-section-number">3.14</span> Mentioning other
+        libraries, programs, codes, etc.][]
+    -   [<span class="toc-section-number">3.15</span> Documentation][]
+-   [<span class="toc-section-number">4</span> What we program in
+    FeenoX][]
+-   [<span class="toc-section-number">5</span> Code of coduct][]
+-   [<span class="toc-section-number">6</span> Release plans][]
 
   [<span class="toc-section-number">1</span> Why we program FeenoX]: #why-we-program-feenox
   [<span class="toc-section-number">2</span> Compiling and debuging]: #compiling-and-debuging
@@ -78,14 +81,14 @@ See the [compilation instructions][].
 
 ## Operating systems
 
-- The main target operating system is GNU/Linux, particularly
-  `linux-x86_64`.
-- The reference distribution is Debian stable. All the required
-  dependencies should be available in any decently-modern Debian
-  repositories.
-- Support for other architectures (mainly the other two non-server
-  end-user mainstream OSes which are non-free and we do not want to
-  mention explicitly) is encouraged but not required.
+-   The main target operating system is GNU/Linux, particularly
+    `linux-x86_64`.
+-   The reference distribution is Debian stable. All the required
+    dependencies should be available in any decently-modern Debian
+    repositories.
+-   Support for other architectures (mainly the other two non-server
+    end-user mainstream OSes which are non-free and we do not want to
+    mention explicitly) is encouraged but not required.
 
 ## Languages
 
@@ -178,43 +181,44 @@ especially in
 
 Therefore:
 
-- Stick to plain C.
+-   Stick to plain C.
 
-  > C enables us to build data structures for storing sparse matrices,
-  > solver information, etc. in ways that Fortran simply does not allow.
-  > ANSI C is a complete standard that all modern C compilers support.
-  > The language is identical on all machines. C++ is still evolving and
-  > compilers on different machines are not identical. Using C function
-  > pointers to provide data encapsulation and polymorphism allows us to
-  > get many of the advantages of C++ without using such a large and
-  > more complicated language.
-  >
-  > PETSc FAQs  
-  > <https://www.mcs.anl.gov/petsc/documentation/faq.html#why-c>
+    > C enables us to build data structures for storing sparse matrices,
+    > solver information, etc. in ways that Fortran simply does not
+    > allow. ANSI C is a complete standard that all modern C compilers
+    > support. The language is identical on all machines. C++ is still
+    > evolving and compilers on different machines are not identical.
+    > Using C function pointers to provide data encapsulation and
+    > polymorphism allows us to get many of the advantages of C++
+    > without using such a large and more complicated language.
+    >
+    > PETSc FAQs  
+    > <https://www.mcs.anl.gov/petsc/documentation/faq.html#why-c>
 
-- Keep C++ away.
+-   Keep C++ away.
 
-  > C++ is a horrible language. It’s made more horrible by the fact that
-  > a lot of substandard programmers use it, to the point where it’s
-  > much much easier to generate total and utter crap with it. Quite
-  > frankly, even if the choice of C were to do *nothing* but keep the
-  > C++ programmers out, that in itself would be a huge reason to use C.
-  >
-  > Linus Torvalds about why Git is written in C  
-  > <http://harmful.cat-v.org/software/c++/linus>
+    > C++ is a horrible language. It’s made more horrible by the fact
+    > that a lot of substandard programmers use it, to the point where
+    > it’s much much easier to generate total and utter crap with it.
+    > Quite frankly, even if the choice of C were to do *nothing* but
+    > keep the C++ programmers out, that in itself would be a huge
+    > reason to use C.
+    >
+    > Linus Torvalds about why Git is written in C  
+    > <http://harmful.cat-v.org/software/c++/linus>
 
-  Libraries written in C++ are allowed as long as they provide C
-  wrappers and do not meddle with stuff we do not need nor want.
+    Libraries written in C++ are allowed as long as they provide C
+    wrappers and do not meddle with stuff we do not need nor want.
 
-- Keep Fortran even farther away. It is allowed only for existing
-  libaries dating from ancient well-tested and optimized code, but for
-  nothing else.
+-   Keep Fortran even farther away. It is allowed only for existing
+    libaries dating from ancient well-tested and optimized code, but for
+    nothing else.
 
-- Modern high-level languages like Python or Julia are targets and not
-  sources of FeenoX.
+-   Modern high-level languages like Python or Julia are targets and not
+    sources of FeenoX.
 
-- For documentation and comments within the code, American English
-  should be used.
+-   For documentation and comments within the code, American English
+    should be used.
 
   [LibreBlackjack]: https://seamplex.com/blackjack/
 
@@ -243,10 +247,11 @@ detected the configure script by adding “using configure” next to
 
 ## Makefiles
 
-- FeenoX uses the [GNU Autools][] (i.e. [Autoconf][] and [Automake][]).
-- If you really feel that you have to use [CMake][] for your
-  contributions, feel free to do so (UNIX rule of diversity) but make
-  sure that at the end of the day `./configure && make` still works.
+-   FeenoX uses the [GNU Autools][] (i.e. [Autoconf][] and
+    [Automake][]).
+-   If you really feel that you have to use [CMake][] for your
+    contributions, feel free to do so (UNIX rule of diversity) but make
+    sure that at the end of the day `./configure && make` still works.
 
   [GNU Autools]: https://en.wikipedia.org/wiki/GNU_Autotools
   [Autoconf]: https://www.gnu.org/software/autoconf/
@@ -255,68 +260,68 @@ detected the configure script by adding “using configure” next to
 
 ## Test suite
 
-- The directory `tests` contains the test suite with shell scripts that
-  return appropriate errorlevels according to [Automake’s generic test
-  scripts][]. In a nutshell:
+-   The directory `tests` contains the test suite with shell scripts
+    that return appropriate errorlevels according to [Automake’s generic
+    test scripts][]. In a nutshell:
 
-  > When no test protocol is in use, an exit status of 0 from a test
-  > script will denote a success, an exit status of 77 a skipped test,
-  > an exit status of 99 a hard error, and any other exit status will
-  > denote a failure.
+    > When no test protocol is in use, an exit status of 0 from a test
+    > script will denote a success, an exit status of 77 a skipped test,
+    > an exit status of 99 a hard error, and any other exit status will
+    > denote a failure.
 
-- If you add a new feature please also write a test script not just to
-  check your feature works but to prevent further changes by other
-  people (or even by yourself) from breaking the feature.
+-   If you add a new feature please also write a test script not just to
+    check your feature works but to prevent further changes by other
+    people (or even by yourself) from breaking the feature.
 
-- Try to make the check results meaningful and not just check for random
-  results. Try to create tests cases with analytical solution or use
-  benchmarks with known results.
+-   Try to make the check results meaningful and not just check for
+    random results. Try to create tests cases with analytical solution
+    or use benchmarks with known results.
 
-- We will eventually add some code coverage tools to have as most lines
-  covered by at least one test.
+-   We will eventually add some code coverage tools to have as most
+    lines covered by at least one test.
 
   [Automake’s generic test scripts]: https://www.gnu.org/software/automake/manual/html_node/Scripts_002dbased-Testsuites.html
 
 ## Coding style
 
-- K&R 1TBS with no tabs and two spaces per indent
-  <https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)>
+-   K&R 1TBS with no tabs and two spaces per indent
+    <https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)>
 
-  ``` c
-  void checknegative(x) {
-    if (x < 0) {
-      puts("Negative");
-    } else {
-      nonnegative(x);
+    ``` c
+    void checknegative(x) {
+      if (x < 0) {
+        puts("Negative");
+      } else {
+        nonnegative(x);
+      }
     }
-  }
-  ```
+    ```
 
-- Do not worry about long lines. Only wrap lines when it makes sense to
-  from a logic point of view not becuase “it looks bad on screen”
-  because “screen” can be anything from a mobile phone to a desktop with
-  many 24” LED monitors.
+-   Do not worry about long lines. Only wrap lines when it makes sense
+    to from a logic point of view not becuase “it looks bad on screen”
+    because “screen” can be anything from a mobile phone to a desktop
+    with many 24” LED monitors.
 
-- Make sure you understand and follow the 17 rules of UNIX philosophy
-  <https://en.wikipedia.org/wiki/Unix_philosophy>
+-   Make sure you understand and follow the 17 rules of UNIX philosophy
+    <https://en.wikipedia.org/wiki/Unix_philosophy>
 
-  1.  modularity
-  2.  clarity
-  3.  composition
-  4.  separation
-  5.  simplicity
-  6.  parsimony
-  7.  transparency
-  8.  robustness
-  9.  representation
-  10. least surprise
-  11. silence
-  12. repair
-  13. economy
-  14. generation
-  15. optimization
-  16. diversity
-  17. extensibility
+    1.  modularity
+    2.  clarity
+    3.  composition
+    4.  separation
+    5.  simplicity
+    6.  parsimony
+    7.  transparency
+    8.  robustness
+    9.  representation
+    10. least surprise
+    11. silence
+    12. repair
+    13. economy
+    14. generation
+    15. optimization
+    16. diversity
+    17. extensibility
 
 ## Virtual methods
 
@@ -336,83 +341,83 @@ format has to provide a virtual reader/writer method.
 
 ## Memory management
 
-- Check all `malloc()` calls for `NULL`. You can use the
-  `feenox_check_alloc()/feenox_check_alloc_null()` macros.
+-   Check all `malloc()` calls for `NULL`. You can use the
+    `feenox_check_alloc()/feenox_check_alloc_null()` macros.
 
-- Use the macro `feenox_free()` instead of plain `free()`. The former
-  explictly makes the pointer equal to `NULL` after freeing it, which is
-  handy.
+-   Use the macro `feenox_free()` instead of plain `free()`. The former
+    explictly makes the pointer equal to `NULL` after freeing it, which
+    is handy.
 
-- Use `valgrind` to check for invalid memory access and leaks
+-   Use `valgrind` to check for invalid memory access and leaks
 
-  > Memory analysis tools such as valgrind can be useful, but don’t
-  > complicate a program merely to avoid their false alarms. For
-  > example, if memory is used until just before a process exits, don’t
-  > free it simply to silence such a tool.
-  >
-  > GNU Coding Standars  
-  > <https://www.gnu.org/prep/standards/html_node/Memory-Usage.html>
+    > Memory analysis tools such as valgrind can be useful, but don’t
+    > complicate a program merely to avoid their false alarms. For
+    > example, if memory is used until just before a process exits,
+    > don’t free it simply to silence such a tool.
+    >
+    > GNU Coding Standars  
+    > <https://www.gnu.org/prep/standards/html_node/Memory-Usage.html>
 
-  Mind that FeenoX might be used in parametric or minimization mode
-  which would re-allocate some stuff so make sure you know which alarms
-  you ignore.
+    Mind that FeenoX might be used in parametric or minimization mode
+    which would re-allocate some stuff so make sure you know which
+    alarms you ignore.
 
 ## Naming conventions
 
-- Use snake case such as in `this_is_a_long_name`.
+-   Use snake case such as in `this_is_a_long_name`.
 
-- All functions ought to start with `feenox_`. This is the small price
-  we need to pay in order to keep a magnificent beast like C++ away from
-  our lives (those who can). The names of functions should go from
-  general to particular such as `feenox_expression_parse()` and
-  `feenox_expression_eval()` (and not
-  `feenox_parse_expression()`/`feenox_eval_expression()`) so all
-  function related with expressions can be easily found. There are
-  exceptions, like functions which do similar tasks such as
-  `feenox_add_assignemnt()` and `feenox_add_instructions()`. Here the
-  `add` part is the common one.
+-   All functions ought to start with `feenox_`. This is the small price
+    we need to pay in order to keep a magnificent beast like C++ away
+    from our lives (those who can). The names of functions should go
+    from general to particular such as `feenox_expression_parse()` and
+    `feenox_expression_eval()` (and not
+    `feenox_parse_expression()`/`feenox_eval_expression()`) so all
+    function related with expressions can be easily found. There are
+    exceptions, like functions which do similar tasks such as
+    `feenox_add_assignemnt()` and `feenox_add_instructions()`. Here the
+    `add` part is the common one.
 
-- In a similar way, “virtual” methods should add the particularity at
-  the end, like
+-   In a similar way, “virtual” methods should add the particularity at
+    the end, like
 
-  - `feenox_build_element_volumetric_gauss_point()`—the function pointer
-    which is invoked in the code
-  - `feenox_build_element_volumetric_gauss_point_thermal()`—the
-    particular function the pointer will point to and which is actually
-    called
+    -   `feenox_build_element_volumetric_gauss_point()`—the function
+        pointer which is invoked in the code
+    -   `feenox_build_element_volumetric_gauss_point_thermal()`—the
+        particular function the pointer will point to and which is
+        actually called
 
 ## Comments
 
-- Use single-line comments `//` to add comments to the code so we can
-  easily *comment out* certain parts of code using multiline comments
-  `/*`—`*/` while developing new features.
+-   Use single-line comments `//` to add comments to the code so we can
+    easily *comment out* certain parts of code using multiline comments
+    `/*`—`*/` while developing new features.
 
-- Explain any non-trivial block or flag that needs to be set. Example
+-   Explain any non-trivial block or flag that needs to be set. Example
 
-  ``` c
-    switch (c = fgetc(file_ptr)) {
-      case '"':
-        // if there's an escaped quote, we take away the escape char 
-        // and put a magic marker 0x1e, afterwards in get_next_token() 
-        // we change back the 0x1e with the unescaped quote
-        feenox_parser.line[i++] = 0x1e;
-  ```
+    ``` c
+      switch (c = fgetc(file_ptr)) {
+        case '"':
+          // if there's an escaped quote, we take away the escape char 
+          // and put a magic marker 0x1e, afterwards in get_next_token() 
+          // we change back the 0x1e with the unescaped quote
+          feenox_parser.line[i++] = 0x1e;
+    ```
 
-- Focus on the why and not on the how, except for very complex loops.
+-   Focus on the why and not on the how, except for very complex loops.
 
-- All nice-to-have things that are welcome to be done should be written
-  as
+-   All nice-to-have things that are welcome to be done should be
+    written as
 
-  ``` c
-  // TODO: allow refreshing file data before each transiet step
-  ```
+    ``` c
+    // TODO: allow refreshing file data before each transiet step
+    ```
 
-- Features that might or might not be added should be written as
-  questions
+-   Features that might or might not be added should be written as
+    questions
 
-  ``` c
-  // TODO: should we allow unquoted names in the $PhysicalNames section?
-  ```
+    ``` c
+    // TODO: should we allow unquoted names in the $PhysicalNames section?
+    ```
 
 ## Indices in PDEs
 
@@ -427,50 +432,50 @@ format has to provide a virtual reader/writer method.
 
 ## Git workflow
 
-- Of course, use `git`. This may seem obvious but predecessors of this
-  project have used Subversion, Bazaar and Mercurial in that order. I
-  have myself used CVS (in the past century).
-- Only team members are allowed to commit directly to the main branch.
-- All contributions ought to come from pull/merge requests either from
-  forked repositories and/or non-main branches.
-- Issues can be opened forked for
-  - bug reporting
-  - feature requests
-  - development discussion
-  - general questions (installation, usage, etc)
+-   Of course, use `git`. This may seem obvious but predecessors of this
+    project have used Subversion, Bazaar and Mercurial in that order. I
+    have myself used CVS (in the past century).
+-   Only team members are allowed to commit directly to the main branch.
+-   All contributions ought to come from pull/merge requests either from
+    forked repositories and/or non-main branches.
+-   Issues can be opened forked for
+    -   bug reporting
+    -   feature requests
+    -   development discussion
+    -   general questions (installation, usage, etc)
 
 ## Standards
 
-- Try to adhere to POSIX as much as possible. Eventually all operating
-  systems will adopt it.
+-   Try to adhere to POSIX as much as possible. Eventually all operating
+    systems will adopt it.
 
 ## Mentioning other libraries, programs, codes, etc.
 
-- Try no to mention any piece of software which is not free and open
-  source.
+-   Try no to mention any piece of software which is not free and open
+    source.
 
 ## Documentation
 
-- See the README in the `doc` directory.
-- TLDR;
-  1.  Use Pandoc-flavored Markdown as the main source.
-  2.  Knock yourself out with LaTeX maths.
-  3.  Bitmaps are off the table for figures.
+-   See the README in the `doc` directory.
+-   TLDR;
+    1.  Use Pandoc-flavored Markdown as the main source.
+    2.  Knock yourself out with LaTeX maths.
+    3.  Bitmaps are off the table for figures.
 
 # What we program in FeenoX
 
-- The features described in the SRS.
+-   The features described in the SRS.
 
 # Code of coduct
 
-- See the [code of conduct][].
+-   See the [code of conduct][].
 
   [code of conduct]: CODE_OF_CONDUCT.md
 
 # Release plans
 
-- v0.x for first development until partially fulfilling the SRS
-- v1.x first stable release meaning:
-  - usable features
-  - full documentation matching the code features
-- v2.x further features and improvements
+-   v0.x for first development until partially fulfilling the SRS
+-   v1.x first stable release meaning:
+    -   usable features
+    -   full documentation matching the code features
+-   v2.x further features and improvements

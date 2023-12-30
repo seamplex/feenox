@@ -101,13 +101,14 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
    - [algebraic expressions](https://seamplex.com/feenox/examples/mechanical.html#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature), and/or
    - [point-wise interpolated data](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties)
  * Command-line argument expansion for
-   - increased flexibility,
-   - parametric sweeps, and/or
-   - optimization loops
- * Steady-state, quasi-static and/or transient problems
- * Linear and non-linear problems
- * Possibility to verify the code using the Method of Manufactured Solutions
-
+   - [increased flexibility](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter),
+   - [parametric sweeps](https://seamplex.com/feenox/examples/mechanical.html#parametric-study-on-a-cantilevered-beam), and/or
+   - [optimization loops](https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork) (see also [this non-trivial example](https://seamplex.com/thesis/html/060-resultados/README.html#sec-tres-pescaditos))
+ * [Steady-state](https://www.seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation), [quasi-static] and/or [transient problems](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient)
+ * [Linear](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems) and [non-linear](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems) problems
+ * Possibility to verify the code using the [Method of Manufactured Solutions](https://github.com/seamplex/feenox/tree/main/tests/mms)
+ * Separate [repository to profile and study code performance](https://github.com/seamplex/feenox-benchmark) using [Google's benchmark library](https://github.com/google/benchmark) 
+ 
 ::::: {.only-in-format .html }
 
 ::: {.container .text-center .my-5 .ratio .ratio-16x9}
@@ -118,14 +119,15 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
  
 ## Usefulness
 
- * Web-based thermo-mechanical solver running on the cloud
- * Non-conformal mesh mapping
- * ASME stress linearization for pressurized pipes and vessels
- * Environmentally-assisted fatigue analysis
- * Neutron transport in the cloud
- * Solving a maze without AI
- * Parametric NAFEMS LE10 benchmark: comparison of resource consumption for different FEA programs
- * Some Youtube videos
+ * [Web-based thermo-mechanical solver running on the cloud](https://www.youtube.com/watch?v=DOnoXo_MCZg)
+ * [Non-conformal mesh mapping](https://github.com/gtheler/feenox-non-conformal-mesh-interpolation)
+ * [ASME stress linearization for pressurized pipes and vessels](https://github.com/seamplex/pipe-linearize)
+ * [Assessment of material properties from tabulated sources](https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients)
+ * [Environmentally-assisted fatigue analysis in dissimilar interfaces of nuclear pipes](https://github.com/seamplex/piping-asme-fatigue) 
+ * [Neutron transport in the cloud](https://seamplex.com/thesis/html/front/abstract.html)
+ * [Solving mazes without AI](https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/)
+ * [Parametric NAFEMS LE10 benchmark: comparison of resource consumption for different FEA programs](https://seamplex.com/feenox/tests/nafems/le10/)
+ * [Some Youtube videos](https://seamplex.com/feenox/doc/#sec:youtube)
 
 
 # Documentation
@@ -175,7 +177,7 @@ doc/licensing.md
 ## Contributing {#sec:contributing}
 
 Contributions from hackers and/or academics are welcome, especially new types of PDEs and new formulations of existing PDEs.
-For elliptic operators feel free to use the Laplace equation at `src/pdes/laplace` as a template.
+For elliptic operators feel free to use the Laplace equation at [`src/pdes/laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace) as a template.
 
  1. Read the [Programming Guide](doc/programming.md).
  2. Browse [Github discussions](https://github.com/seamplex/feenox/discussions) and open a new thread explaining what you want to do and/or asking for help.

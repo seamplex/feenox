@@ -1,9 +1,4 @@
       
-- [ ] Illustrate
-      - Extents
-      - Capabilities
-      - Usefulness
-      
 - [ ] FeenoX is _program_, **not a library**! It is not something you link against. It is something you run and feed the input file at runtime.
 
 - [ ] List of youtube videos
@@ -79,13 +74,12 @@
 - [ ] Remark SRS + SDS
       - hackers
       - academics
+      
+- [ ] Remark LE10 in Engineers
 
 - [ ] cloud includes
       - thin clients
       - scripted studies
-      
-- [ ] parametric
-      - link to SDS
       
 - [ ] why is it different?
       - no other guy fulfills the SRS
@@ -115,7 +109,10 @@
       Gmsh   -> mesh                                                                             console
                         --->  Feenox -> K & b -> PETSc Ku = b -> Feenox -> stresses from u --->  
       editor -> input                                                                            .vtk -> paraview
+      ```
       
+- [ ] Adding a new PDE to `src/pdes` in doc
+
 ## comparisons
 
 ### sparselizard

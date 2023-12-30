@@ -1,19 +1,19 @@
 # FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-- [<span class="toc-section-number">1</span> About FeenoX][]
-  - [<span class="toc-section-number">1.1</span> Extents][]
-    - [<span class="toc-section-number">1.1.1</span> Examples][]
-    - [<span class="toc-section-number">1.1.2</span> Tutorials][]
-    - [<span class="toc-section-number">1.1.3</span> Tests][]
-  - [<span class="toc-section-number">1.2</span> Capabilities][]
-  - [<span class="toc-section-number">1.3</span> Usefulness][]
-- [<span class="toc-section-number">2</span> Documentation][]
-- [<span class="toc-section-number">3</span> Quickstart][]
-  - [<span class="toc-section-number">3.1</span> Download][]
-  - [<span class="toc-section-number">3.2</span> Git repository][]
-- [<span class="toc-section-number">4</span> Licensing][]
-  - [<span class="toc-section-number">4.1</span> Contributing][]
-- [<span class="toc-section-number">5</span> Further information][]
+-   [<span class="toc-section-number">1</span> About FeenoX][]
+    -   [<span class="toc-section-number">1.1</span> Extents][]
+        -   [<span class="toc-section-number">1.1.1</span> Examples][]
+        -   [<span class="toc-section-number">1.1.2</span> Tutorials][]
+        -   [<span class="toc-section-number">1.1.3</span> Tests][]
+    -   [<span class="toc-section-number">1.2</span> Capabilities][]
+    -   [<span class="toc-section-number">1.3</span> Usefulness][]
+-   [<span class="toc-section-number">2</span> Documentation][]
+-   [<span class="toc-section-number">3</span> Quickstart][]
+    -   [<span class="toc-section-number">3.1</span> Download][]
+    -   [<span class="toc-section-number">3.2</span> Git repository][]
+-   [<span class="toc-section-number">4</span> Licensing][]
+    -   [<span class="toc-section-number">4.1</span> Contributing][]
+-   [<span class="toc-section-number">5</span> Further information][]
 
   [<span class="toc-section-number">1</span> About FeenoX]: #about-feenox
   [<span class="toc-section-number">1.1</span> Extents]: #extents
@@ -38,9 +38,9 @@ parallel) with a particular design basis.
 
 Choose your background for further details about the what, how and whys:
 
-- [Industry Engineer][]
-- [Unix Hacker][]
-- [Academic Professor][]
+-   [Industry Engineer][]
+-   [Unix Hacker][]
+-   [Academic Professor][]
 
   [Industry Engineer]: README-engineers.md
   [Unix Hacker]: README-hackers.md
@@ -50,14 +50,14 @@ Choose your background for further details about the what, how and whys:
 
 ### Examples
 
-- [Basic mathematics][]
-- [Systems of ODEs/DAEs][]
-- [Laplace’s equation][]
-- [Heat conduction][]
-- [Linear elasticity][]
-- [Modal analysis][]
-- [Neutron diffusion][]
-- [Neutron S<sub>N</sub>][]
+-   [Basic mathematics][]
+-   [Systems of ODEs/DAEs][]
+-   [Laplace’s equation][]
+-   [Heat conduction][]
+-   [Linear elasticity][]
+-   [Modal analysis][]
+-   [Neutron diffusion][]
+-   [Neutron S<sub>N</sub>][]
 
   [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
@@ -84,85 +84,151 @@ Choose your background for further details about the what, how and whys:
 
 The [`tests`][] directory in the repository has hundreds of
 
-- examples,
-- unit tests,
-- regression tests, and/or
-- (crude) mathematical verification tests.
+-   examples,
+-   unit tests,
+-   regression tests, and/or
+-   (crude) mathematical verification tests.
 
   [`tests`]: https://github.com/seamplex/feenox/tree/main/tests
 
 ## Capabilities
 
-- The problem to solve is defined through a self-descriptive
-  English-like plain-text input file
-  - no need to recompile if the problem changes (FeenoX is a *program*,
-    not a library)
-  - simple problems need simple inputs
-  - similar problems need similar inputs
-  - everything is an expresion
-  - 100%-defined user output (no print or write instructions, no output)
-- General mathematical problems using GNU GSL
-- Sets of ODEs/DAEs using SUNDIALS
-- PDEs using FEM
-  - reads mesh in Gmsh format
-  - uses PETSc/SLEPc to solve
-    - linear systems (KSP)
-    - non-linear systems (SNES)
-    - time-dependent systems (TS)
-    - generalized eigen-value problems (EPS)
-  - writes results in either Gmsh or VTK (Paraview) format
-- Cloud-first design (cloud friendliness is not enough)
-- MPI parallelization
-- Unix programming philosophy
-  - rule of separation
-  - rule of silence
-  - rule of economy
-- Each PDE (i.e. from Laplace downward in the list of examples) is
-  implemented in a subdirectory within [`src/pde`][] of the source tree
-  - any subdirectory can be removed if a particular PDE is not needed
-  - any subdirectory can be used as a template to add a new PDE to the
-    capabilities
-- Space, time and/or solution-dependent material properties and boundary
-  conditions
-  - algebraic expressions, and/or
-  - point-wise interpolated data
-- Command-line argument expansion for
-  - increased flexibility,
-  - parametric sweeps, and/or
-  - optimization loops
-- Steady-state, quasi-static and/or transient problems
-- Linear and non-linear problems
-- Possibility to verify the code using the Method of Manufactured
-  Solutions
+-   The [problem][] to solve is defined through a
+    [syntactically-sugared][] self-descriptive English-like plain-text
+    [input file][] that should [resemble the original human-friendly
+    problem formulation][] as much as possible
+    -   [no need to recompile if the problem changes][] (FeenoX is a
+        *program*, not a library)
+    -   [nouns are definitions and verbs are instructions][]
+    -   [simple problems need simple inputs][]
+    -   [everything is an expresion][]
+    -   100%-defined user output (no print or write instructions, no
+        output)
+-   [General mathematical problems][] using [GNU GSL][]
+-   [Sets of ODEs/DAEs][] using [SUNDIALS][]
+-   [PDEs][] formulated with the [finite element method][]
+    -   reads mesh in [Gmsh][] format
+    -   uses [PETSc][]/[SLEPc][] to solve
+        -   linear systems ([KSP][])
+        -   non-linear systems ([SNES][])
+        -   time-dependent systems ([TS][])
+        -   generalized eigen-value problems ([EPS][])
+    -   writes results in either Gmsh or [VTK][] ([Paraview][]) format
+-   Cloud-first design (cloud friendliness is not enough)
+-   MPI parallelization
+-   [Unix programming philosophy][]
+    -   [rule of separation][]
+    -   [rule of silence][]
+    -   [rule of economy][]
+-   Each PDE (i.e. from Laplace downward in the list of examples) [is
+    implemented in a subdirectory][] within [`src/pde`][PDEs] of the
+    source tree
+    -   any subdirectory can be removed if a particular PDE is not
+        needed
+    -   any subdirectory can be used as a template to add a new PDE to
+        the capabilities
+-   [Space][], [time][] and/or solution-dependent [material
+    properties][] and [boundary conditions][]
+    -   [algebraic expressions][], and/or
+    -   [point-wise interpolated data][]
+-   Command-line argument expansion for
+    -   [increased flexibility][],
+    -   [parametric sweeps][], and/or
+    -   [optimization loops][] (see also [this non-trivial example][])
+-   [Steady-state][], \[quasi-static\] and/or [transient problems][]
+-   [Linear][] and [non-linear][] problems
+-   Possibility to verify the code using the [Method of Manufactured
+    Solutions][]
+-   Separate [repository to profile and study code performance][] using
+    [Google’s benchmark library][]
 
-  [`src/pde`]: https://github.com/seamplex/feenox/tree/main/src/pdes
+  [problem]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
+  [syntactically-sugared]: https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting
+  [input file]: https://seamplex.com/feenox/doc/sds.html#sec:input
+  [resemble the original human-friendly problem formulation]: https://seamplex.com/feenox/doc/sds.html#matching-formulations
+  [no need to recompile if the problem changes]: https://seamplex.com/feenox/doc/sds.html#sec:introduction
+  [nouns are definitions and verbs are instructions]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
+  [simple problems need simple inputs]: https://seamplex.com/feenox/doc/sds.html#sec:simple
+  [everything is an expresion]: https://seamplex.com/feenox/doc/sds.html#sec:expression
+  [General mathematical problems]: https://seamplex.com/feenox/examples/basic.html
+  [GNU GSL]: https://www.gnu.org/software/gsl/
+  [Sets of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
+  [SUNDIALS]: https://computing.llnl.gov/projects/sundials
+  [PDEs]: https://github.com/seamplex/feenox/tree/main/src/pdes
+  [finite element method]: https://en.wikipedia.org/wiki/Finite_element_method
+  [Gmsh]: http://gmsh.info/
+  [PETSc]: https://petsc.org/release/
+  [SLEPc]: https://slepc.upv.es/
+  [KSP]: https://petsc.org/release/manual/ksp/
+  [SNES]: https://petsc.org/release/manual/snes/
+  [TS]: https://petsc.org/release/manual/ts/
+  [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
+  [VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
+  [Paraview]: https://www.paraview.org/
+  [Unix programming philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
+  [rule of separation]: https://seamplex.com/feenox/doc/sds.html#sec:separation
+  [rule of silence]: https://seamplex.com/feenox/doc/sds.html#sec:silence
+  [rule of economy]: https://seamplex.com/feenox/doc/sds.html#sec:economy
+  [is implemented in a subdirectory]: https://seamplex.com/feenox/doc/sds.html#sec:extensibility
+  [Space]: https://github.com/seamplex/feenox/blob/main/tests/thermal-two-squares-material-explicit-space.fee
+  [time]: https://github.com/seamplex/feenox/blob/main/tests/nafems-t3-1d.fee
+  [material properties]: https://github.com/seamplex/feenox/blob/main/tests/wilson-2d.fee
+  [boundary conditions]: https://github.com/seamplex/feenox/blob/main/tests/radiation-as-convection-celsius.fee
+  [algebraic expressions]: https://seamplex.com/feenox/examples/mechanical.html#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature
+  [point-wise interpolated data]: https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties
+  [increased flexibility]: https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter
+  [parametric sweeps]: https://seamplex.com/feenox/examples/mechanical.html#parametric-study-on-a-cantilevered-beam
+  [optimization loops]: https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork
+  [this non-trivial example]: https://seamplex.com/thesis/html/060-resultados/README.html#sec-tres-pescaditos
+  [Steady-state]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation
+  [transient problems]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient
+  [Linear]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems
+  [non-linear]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems
+  [Method of Manufactured Solutions]: https://github.com/seamplex/feenox/tree/main/tests/mms
+  [repository to profile and study code performance]: https://github.com/seamplex/feenox-benchmark
+  [Google’s benchmark library]: https://github.com/google/benchmark
 
 ## Usefulness
 
-- Web-based thermo-mechanical solver running on the cloud
-- Non-conformal mesh mapping
-- ASME stress linearization for pressurized pipes and vessels
-- Environmentally-assisted fatigue analysis
-- Neutron transport in the cloud
-- Solving a maze without AI
-- Parametric NAFEMS LE10 benchmark: comparison of resource consumption
-  for different FEA programs
-- Some Youtube videos
+-   [Web-based thermo-mechanical solver running on the cloud][]
+-   [Non-conformal mesh mapping][]
+-   [ASME stress linearization for pressurized pipes and vessels][]
+-   [Assessment of material properties from tabulated sources][]
+-   [Environmentally-assisted fatigue analysis in dissimilar interfaces
+    of nuclear pipes][]
+-   [Neutron transport in the cloud][]
+-   [Solving mazes without AI][]
+-   [Parametric NAFEMS LE10 benchmark: comparison of resource
+    consumption for different FEA programs][]
+-   [Some Youtube videos][]
+
+  [Web-based thermo-mechanical solver running on the cloud]: https://www.youtube.com/watch?v=DOnoXo_MCZg
+  [Non-conformal mesh mapping]: https://github.com/gtheler/feenox-non-conformal-mesh-interpolation
+  [ASME stress linearization for pressurized pipes and vessels]: https://github.com/seamplex/pipe-linearize
+  [Assessment of material properties from tabulated sources]: https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients
+  [Environmentally-assisted fatigue analysis in dissimilar interfaces of nuclear pipes]:
+    https://github.com/seamplex/piping-asme-fatigue
+  [Neutron transport in the cloud]: https://seamplex.com/thesis/html/front/abstract.html
+  [Solving mazes without AI]: https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/
+  [Parametric NAFEMS LE10 benchmark: comparison of resource consumption for different FEA programs]:
+    https://seamplex.com/feenox/tests/nafems/le10/
+  [Some Youtube videos]: https://seamplex.com/feenox/doc/#sec:youtube
 
 # Documentation
 
 Browse through the [documentation index][] and/or the [`doc`][]
 subdirectory of the [Github repository][] for
 
-- [FAQs][], including the [what FeenoX means][]
-- [Manual][]
-- [Description][]
-- [Software Design Requirements][]
-- [Software Design Specifications][]
-- [Unix man page][] (accesible through `man feenox` after installation)
-- [History][]
-- [Compilation guide][]
-- [Programming guide][]
+-   [FAQs][], including the [what FeenoX means][]
+-   [Manual][]
+-   [Description][]
+-   [Software Design Requirements][]
+-   [Software Design Specifications][]
+-   [Unix man page][] (accesible through `man feenox` after
+    installation)
+-   [History][]
+-   [Compilation guide][]
+-   [Programming guide][]
 
   [documentation index]: https://seamplex.com/feenox/doc/
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
@@ -193,33 +259,34 @@ version 3][] or (at your option) any later version.
 | Source tarballs                     | <https://www.seamplex.com/feenox/dist/src>     |
 | Github repository                   | <https://github.com/seamplex/feenox/>          |
 
-- FeenoX is **cloud first**. It was designed to run on servers.
+-   FeenoX is **cloud first**. It was designed to run on servers.
 
-- Be aware that FeenoX **does not have a GUI**. Read the
-  [documentation][], especially the [description][] and the [FAQs][].
-  Ask for help on the [GitHub discussions page][].
+-   Be aware that FeenoX **does not have a GUI**. Read the
+    [documentation][], especially the [description][] and the [FAQs][].
+    Ask for help on the [GitHub discussions page][].
 
-- Debian/Ubuntu packages are unofficial, i.e. they are not available in
-  `apt` repositories. They contain dynamically-linked binaries and their
-  dependencies are hard-coded for each Debian/Ubuntu release. Make sure
-  you get the right `.deb` for your release (i.e. `bookworm`/`bullseye`
-  for Debian, `kinetic`/`focal` for Ubuntu).
+-   Debian/Ubuntu packages are unofficial, i.e. they are not available
+    in `apt` repositories. They contain dynamically-linked binaries and
+    their dependencies are hard-coded for each Debian/Ubuntu release.
+    Make sure you get the right `.deb` for your release
+    (i.e. `bookworm`/`bullseye` for Debian, `kinetic`/`focal` for
+    Ubuntu).
 
-- Generic GNU/Linux binaries are provided as statically-linked
-  executables for convenience. They do not support MUMPS nor MPI and
-  have only basic optimization flags. Please compile from source for
-  high-end applications. See [detailed compilation instructions][].
+-   Generic GNU/Linux binaries are provided as statically-linked
+    executables for convenience. They do not support MUMPS nor MPI and
+    have only basic optimization flags. Please compile from source for
+    high-end applications. See [detailed compilation instructions][].
 
-- Try to avoid Windows as much as you can. The binaries are provided as
-  transitional packages for people that for some reason still use such
-  an outdated, anachronous, awful and invasive operating system. They
-  are compiled with [Cygwin][] and have no support whatsoever. Really,
-  really, **get rid of Windows ASAP**.
+-   Try to avoid Windows as much as you can. The binaries are provided
+    as transitional packages for people that for some reason still use
+    such an outdated, anachronous, awful and invasive operating system.
+    They are compiled with [Cygwin][] and have no support whatsoever.
+    Really, really, **get rid of Windows ASAP**.
 
-  > “It is really worth any amount of time and effort to get away from
-  > Windows if you are doing computational science.”
-  >
-  > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
+    > “It is really worth any amount of time and effort to get away from
+    > Windows if you are doing computational science.”
+    >
+    > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [documentation]: https://seamplex.com/feenox/doc/
@@ -412,25 +479,27 @@ Documentation License v1.3][] (or any later version).
 
 Contributions from hackers and/or academics are welcome, especially new
 types of PDEs and new formulations of existing PDEs. For elliptic
-operators feel free to use the Laplace equation at `src/pdes/laplace` as
-a template.
+operators feel free to use the Laplace equation at
+[`src/pdes/laplace`][] as a template.
 
 1.  Read the [Programming Guide][4].
 2.  Browse [Github discussions][] and open a new thread explaining what
     you want to do and/or asking for help.
 3.  Fork the [Git repository][] under your Github account
 4.  Create a pull request, including
-    - code,
-    - documentation, and
-    - tests.
+    -   code,
+    -   documentation, and
+    -   tests.
 5.  Follow up the review procedure.
 
 Note that
 
-- It is mandatory to observe the [Code of Conduct][].
-- The contributed code has to be compatible with the [GPLv3+ license][].
-- Each author keeps the copyright of the contribution.
+-   It is mandatory to observe the [Code of Conduct][].
+-   The contributed code has to be compatible with the [GPLv3+
+    license][].
+-   Each author keeps the copyright of the contribution.
 
+  [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [4]: doc/programming.md
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
