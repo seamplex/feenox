@@ -43,10 +43,10 @@ Choose your background for further details about the what, how and whys:
 - [Academic Professor][]
 
   [FeenoX]: https://seamplex.com/feenox
-  [cloud-first]: doc/sds.markdown#cloud-first
+  [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [free and open source]: #licensing
   [engineering-related problems]: #extents
-  [particular design basis]: doc/srs.markdown
+  [particular design basis]: https://seamplex.com/feenox/doc/sds.html
   [Industry Engineer]: README4engineers.markdown
   [Unix Hacker]: README4hackers.markdown
   [Academic Professor]: README4academics.markdown
@@ -64,7 +64,7 @@ Choose your background for further details about the what, how and whys:
 - [Neutron diffusion][]
 - [Neutron S<sub>N</sub>][]
 
-  [Basic mathematics]: examples/basic.markdown
+  [Basic mathematics]: https/seamplex.com/feenox/examples/examples/basic.markdown
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
   [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html

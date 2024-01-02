@@ -11,7 +11,7 @@ toc: true
 
 # About FeenoX
 
-[FeenoX](https://seamplex.com/feenox) is a [cloud-first](./doc/sds.md#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or many computers in parallel) with a [particular design basis](./doc/srs.md).
+[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or many computers in parallel) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).
 
 ::::: {.only-in-format .html }
 ```{=html}
@@ -32,7 +32,7 @@ Choose your background for further details about the what, how and whys:
 
 ### Examples
 
- - [Basic mathematics](./examples/basic.md)
+ - [Basic mathematics](https://seamplex.com/feenox/examples/examples/basic.md)
  - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
  - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
  - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
