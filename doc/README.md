@@ -23,13 +23,13 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 
 ## Design
 
- 1. The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool.
+ 1. The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](https://seamplex.com/feenox/doc/srs.html) for an open source computational tool.
 
-     * [Software Requirements specifications](./srs.md) (Fictitious RFQ) [[PDF]](https://www.seamplex.com/feenox/doc/srs.pdf)
+     * [Software Requirements specifications](https://seamplex.com/feenox/doc/srs.html) (Fictitious RFQ) [[PDF]](https://www.seamplex.com/feenox/doc/srs.pdf)
 
- 2. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
+ 2. Then a fictitious “offer” to the above tender is given in a [software design specifications](https://seamplex.com/feenox/doc/srs.html) document that explains the design decisions and features included in FeenoX.
 
-     * [Software Design specifications](./sds.md) (Imaginary FeenoX's offer) [[PDF]](https://www.seamplex.com/feenox/doc/sds.pdf)
+     * [Software Design specifications](https://seamplex.com/feenox/doc/sds.html) (Imaginary FeenoX's offer) [[PDF]](https://www.seamplex.com/feenox/doc/sds.pdf)
 
  
 ::::::::: {.only-in-format .html .markdown}

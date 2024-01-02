@@ -83,15 +83,16 @@ reference.
       [\[PDF\]][3]
 
 2.  Then a fictitious “offer” to the above tender is given in a
-    [software design specifications][] document that explains the design
-    decisions and features included in FeenoX.
+    [software design
+    specifications][software requirements specifications] document that
+    explains the design decisions and features included in FeenoX.
 
     - [Software Design specifications][] (Imaginary FeenoX’s offer)
       [\[PDF\]][4]
 
-  [software requirements specifications]: srs.markdown
+  [software requirements specifications]: https://seamplex.com/feenox/doc/srs.html
   [3]: https://www.seamplex.com/feenox/doc/srs.pdf
-  [software design specifications]: sds.markdown
+  [Software Design specifications]: https://seamplex.com/feenox/doc/sds.html
   [4]: https://www.seamplex.com/feenox/doc/sds.pdf
 
 ## Other documents

@@ -124,7 +124,7 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
  
 ## Usefulness
 
- * [Web-based thermo-mechanical solver running on the cloud](https://www.youtube.com/watch?v=DOnoXo_MCZg)
+ * [CAEplex](https://www.caeplex.com): a [web-based thermo-mechanical solver running on the cloud](https://www.youtube.com/watch?v=DOnoXo_MCZg)
  * [Non-conformal mesh mapping](https://github.com/gtheler/feenox-non-conformal-mesh-interpolation)
  * [ASME stress linearization for pressurized pipes and vessels](https://github.com/seamplex/pipe-linearize)
  * [Assessment of material properties from tabulated sources](https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients)
@@ -139,15 +139,14 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
 
 Browse through the [documentation index](doc) and/or the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) subdirectory of the [Github repository](https://github.com/seamplex/feenox/) for
 
- * [FAQs](./FAQ.md), including the [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
- * [Manual](./doc/feenox-manual.md)
- * [Description](./doc/feenox-desc.md)
- * [Software Design Requirements](./doc/srs.md)
- * [Software Design Specifications](./doc/sds.md)
- * [Unix man page](./doc/feenox.1.md) (accesible through `man feenox` after installation)
+ * [FAQs](./doc/FAQ.md), including [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
+ * [Manual](https://seamplex.com/feenox/doc/feenox-manual.md)
+ * [Software Design Requirements](https://seamplex.com/feenox/doc/srs.html)
+ * [Software Design Specifications](https://seamplex.com/feenox/doc/sds.html)
+ * [Unix man page](https://seamplex.com/feenox/doc/feenox.1.html) (accesible through `man feenox` after installation)
  * [History](./doc/history.md)
  * [Compilation guide](./doc/compilation.md)
- * [Programming guide](./programming.md)
+ * [Programming guide](./doc/programming.md)
  
 
 

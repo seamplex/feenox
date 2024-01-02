@@ -201,7 +201,7 @@ Capabilities
 
 Usefulness
 
--   Web-based thermo-mechanical solver running on the cloud
+-   CAEplex: a web-based thermo-mechanical solver running on the cloud
 -   Non-conformal mesh mapping
 -   ASME stress linearization for pressurized pipes and vessels
 -   Assessment of material properties from tabulated sources
@@ -213,7 +213,8 @@ Usefulness
     for different FEA programs
 -   Some Youtube videos
 
-  [Web-based thermo-mechanical solver running on the cloud]: https://www.youtube.com/watch?v=DOnoXo_MCZg
+  [CAEplex]: https://www.caeplex.com
+  [web-based thermo-mechanical solver running on the cloud]: https://www.youtube.com/watch?v=DOnoXo_MCZg
   [Non-conformal mesh mapping]: https://github.com/gtheler/feenox-non-conformal-mesh-interpolation
   [ASME stress linearization for pressurized pipes and vessels]: https://github.com/seamplex/pipe-linearize
   [Assessment of material properties from tabulated sources]: https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients
@@ -230,9 +231,8 @@ Documentation
 Browse through the documentation index and/or the doc subdirectory of
 the Github repository for
 
--   FAQs, including the what FeenoX means
+-   FAQs, including what FeenoX means
 -   Manual
--   Description
 -   Software Design Requirements
 -   Software Design Specifications
 -   Unix man page (accesible through man feenox after installation)
@@ -243,16 +243,15 @@ the Github repository for
   [documentation index]: doc
   [doc]: https://github.com/seamplex/feenox/tree/main/doc
   [Github repository]: https://github.com/seamplex/feenox/
-  [FAQs]: ./FAQ.md
+  [FAQs]: ./doc/FAQ.md
   [what FeenoX means]: https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean
-  [Manual]: ./doc/feenox-manual.md
-  [Description]: ./doc/feenox-desc.md
-  [Software Design Requirements]: ./doc/srs.md
-  [Software Design Specifications]: ./doc/sds.md
-  [Unix man page]: ./doc/feenox.1.md
+  [Manual]: https://seamplex.com/feenox/doc/feenox-manual.md
+  [Software Design Requirements]: https://seamplex.com/feenox/doc/srs.html
+  [Software Design Specifications]: https://seamplex.com/feenox/doc/sds.html
+  [Unix man page]: https://seamplex.com/feenox/doc/feenox.1.html
   [History]: ./doc/history.md
   [Compilation guide]: ./doc/compilation.md
-  [Programming guide]: ./programming.md
+  [Programming guide]: ./doc/programming.md
 
 Quickstart
 
@@ -304,8 +303,8 @@ version 3 or (at your option) any later version.
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
   [documentation]: https://seamplex.com/feenox/doc/
-  [2]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [3]: https://seamplex.com/feenox/doc/FAQ.html
+  [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [2]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
@@ -370,7 +369,7 @@ See the download page and the compilation guide for detailed
 information.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
-  [4]: compilation.md
+  [3]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
   [compilation guide]: ./doc/compilation.md
 
@@ -470,7 +469,7 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [5]: https://www.gnu.org/licenses/gpl-3.0
+  [4]: https://www.gnu.org/licenses/gpl-3.0
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
@@ -501,7 +500,7 @@ Note that
   [hackers]: http://localhost/milhouse/feenox/README4hackers.html
   [academics]: http://localhost/milhouse/feenox/README4academics.html
   [src/pdes/laplace]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [6]: https://seamplex.com/feenox/doc/programming.html
+  [5]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

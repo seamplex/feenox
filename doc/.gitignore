@@ -24,13 +24,10 @@ README
 README.html
 README-doc
 CODE_OF_CONDUCT
-CODE_OF_CONDUCT.markdown
 CODE_OF_CONDUCT.html
 FAQ
-FAQ.markdown
 FAQ.html
 compilation
-compilation.markdown
 compilation.html
 feenox-manual
 feenox-manual.markdown
@@ -47,6 +44,9 @@ srs
 srs.markdown
 srs.html
 srs.tex
+history.html
+history
+
 two-squares.msh
 two-squares.vtk
 two-squares-results.msh
