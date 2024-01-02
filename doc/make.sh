@@ -33,14 +33,20 @@ fi
 
 
 # main README & TODO
-echo "creating main README for Github"
-if [ ${pdf} = 1 ]; then
-  ./md2.sh --pdf   ../README
-fi
-./md2.sh --gfm   ../README
-./md2.sh --plain ../README
-./md2.sh --html  ../README
+echo "creating main READMEs for Github"
+for i in README README4engineers README4hackers README4academics; do
+ echo "${i}"
+ if [ ${pdf} = 1 ]; then
+   ./md2.sh --pdf   ../${i}
+ fi
+ ./md2.sh --gfm   ../${i}
+ ./md2.sh --plain ../${i}
+ ./md2.sh --html  ../${i}
+done
+
+echo "download"
 ./md2.sh --html  ../download.md
+echo "TODO"
 ./md2.sh --plain ../TODO
 
 echo "creating doc's README"

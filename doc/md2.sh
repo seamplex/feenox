@@ -239,11 +239,11 @@ if [ "x${format}" = "x.html" ]; then
     # set list-unstyled
     sed -i "${n1},${n2} s/<ul>/<ul class=\"list-unstyled\">/"   ${out}
 
-   # replace <li> with <li class="nav-item">
-   sed -i "${n1},${n2} s/<li>/<li class=\"nav-item\">/"        ${out}
+    # replace <li> with <li class="nav-item">
+    sed -i "${n1},${n2} s/<li>/<li class=\"nav-item\">/"        ${out}
 
-   # replace <a> width <a class="nav-link scrollto">
-   sed -i "${n1},${n2} s/<a/<a class=\"nav-link scrollto\"/" ${out}
+    # replace <a> width <a class="nav-link scrollto">
+    sed -i "${n1},${n2} s/<a/<a class=\"nav-link scrollto\"/" ${out}
   fi
 
   # sections
@@ -259,7 +259,8 @@ if [ "x${format}" = "x.html" ]; then
   # img-fluid
   sed -i 's/<img /<img class=\"img-fluid\" /'     ${out} 
 
-  # update links
-  sed -i 's/\.md/\.html/g' ${out}
+  # update links (if the link starts with ./file.md it gets translated to ./file.html otherwise it remains .md)
+#   sed -i 's/\.md/\.html/g' ${out}
+  sed -i 's/.\/\(.*\)\.md/\1.html/g'  ${out}
 fi
  

@@ -15,17 +15,17 @@ FeenoX is a cloud-first free and open source tool to solve engineering-related p
 
 ::::: {.only-in-format .html }
 ```{=html}
-<a class="btn btn-lg btn-outline-primary"   href="https://www.seamplex.com/feenox/README-engineers.html" role="button">FeenoX for Industry Engineers</a>
-<a class="btn btn-lg btn-outline-secondary" href="https://www.seamplex.com/feenox/README-hackers.html"   role="button">FeenoX for Unix Hackers</a>
-<a class="btn btn-lg btn-outline-info"      href="https://www.seamplex.com/feenox/README-academics.html" role="button">FeenoX for Academic Professors</a>
+<a class="btn btn-lg btn-outline-primary"   href="https://www.seamplex.com/feenox/README4engineers.html" role="button">FeenoX for Industry Engineers</a>
+<a class="btn btn-lg btn-outline-secondary" href="https://www.seamplex.com/feenox/README4hackers.html"   role="button">FeenoX for Unix Hackers</a>
+<a class="btn btn-lg btn-outline-info"      href="https://www.seamplex.com/feenox/README4academics.html" role="button">FeenoX for Academic Professors</a>
 ```
 :::::
 
 Choose your background for further details about the what, how and whys:
 
- - [Industry Engineer](README-engineers.md)
- - [Unix Hacker](README-hackers.md)
- - [Academic Professor](README-academics.md)
+ - [Industry Engineer](README4engineers.md)
+ - [Unix Hacker](README4hackers.md)
+ - [Academic Professor](README4academics.md)
 
 
 ## Extents
@@ -73,8 +73,13 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
    - [no need to recompile if the problem changes](https://seamplex.com/feenox/doc/sds.html#sec:introduction) (FeenoX is a _program_, not a library)
    - [nouns are definitions and verbs are instructions](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
    - [simple problems need simple inputs](https://seamplex.com/feenox/doc/sds.html#sec:simple)
-   - [everything is an expresion](https://seamplex.com/feenox/doc/sds.html#sec:expression)
-   - 100%-defined user output (no print or write instructions, no output) 
+   - [everything is an expression](https://seamplex.com/feenox/doc/sds.html#sec:expression)
+   - 100%-defined user output (no print or write instructions, no output)
+   
+   ```include
+   doc/transfer.md
+   ```
+   
  * [General mathematical problems](https://seamplex.com/feenox/examples/basic.html) using [GNU GSL](https://www.gnu.org/software/gsl/)
  * [Sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html) using [SUNDIALS](https://computing.llnl.gov/projects/sundials)
  * [PDEs](https://github.com/seamplex/feenox/tree/main/src/pdes) formulated with the [finite element method](https://en.wikipedia.org/wiki/Finite_element_method)
@@ -160,7 +165,7 @@ doc/downloads.md
 doc/git.md
 ```
 
-See the [download page](https://seamplex.com/feenox/download.html) for more detailed information.
+See the [download page](https://seamplex.com/feenox/download.html) and the [compilation guide](./doc/compilation.md) for  detailed information.
 
 # Licensing {#sec:licensing}
 
@@ -176,24 +181,9 @@ doc/licensing.md
 
 ## Contributing {#sec:contributing}
 
-Contributions from hackers and/or academics are welcome, especially new types of PDEs and new formulations of existing PDEs.
-For elliptic operators feel free to use the Laplace equation at [`src/pdes/laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace) as a template.
-
- 1. Read the [Programming Guide](doc/programming.md).
- 2. Browse [Github discussions](https://github.com/seamplex/feenox/discussions) and open a new thread explaining what you want to do and/or asking for help.
- 3. Fork the [Git repository](https://github.com/seamplex/feenox/) under your Github account
- 4. Create a pull request, including
-    - code,
-    - documentation, and
-    - tests.
- 5. Follow up the review procedure.
-
-Note that
-
- * It is mandatory to observe the [Code of Conduct](CODE_OF_CONDUCT.md).
- * The contributed code has to be compatible with the [GPLv3+ license](#sec:licensing).
- * Each author keeps the copyright of the contribution.
-
+```include
+doc/contributing-guidelines.md
+```
 
 # Further information
 

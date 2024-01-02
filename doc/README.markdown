@@ -1,27 +1,27 @@
 # FeenoX documentation index
 
--   [<span class="toc-section-number">1</span> Manual and description][]
-    -   [<span class="toc-section-number">1.1</span> Design][]
-    -   [<span class="toc-section-number">1.2</span> Other documents][]
-    -   [<span class="toc-section-number">1.3</span> Youtube videos][]
-    -   [<span class="toc-section-number">1.4</span> Markdown sources][]
--   [<span class="toc-section-number">2</span> Hands on][]
-    -   [<span class="toc-section-number">2.1</span> Examples][]
-    -   [<span class="toc-section-number">2.2</span> Tutorials][]
-        -   [<span class="toc-section-number">2.2.1</span> General
-            tutorials][]
-        -   [<span class="toc-section-number">2.2.2</span> Detailed
-            functionality][]
-        -   [<span class="toc-section-number">2.2.3</span> Physics
-            tutorials][]
-    -   [<span class="toc-section-number">2.3</span> Tests][]
--   [<span class="toc-section-number">3</span> Contributing][]
-    -   [<span class="toc-section-number">3.1</span> Asking questions &
-        reporting bugs][]
-    -   [<span class="toc-section-number">3.2</span> Adding a new PDE to
-        `src/pdes`][]
-    -   [<span class="toc-section-number">3.3</span> Contributing
-        guidelines][]
+- [<span class="toc-section-number">1</span> Manual and description][]
+  - [<span class="toc-section-number">1.1</span> Design][]
+  - [<span class="toc-section-number">1.2</span> Other documents][]
+  - [<span class="toc-section-number">1.3</span> Youtube videos][]
+  - [<span class="toc-section-number">1.4</span> Markdown sources][]
+- [<span class="toc-section-number">2</span> Hands on][]
+  - [<span class="toc-section-number">2.1</span> Examples][]
+  - [<span class="toc-section-number">2.2</span> Tutorials][]
+    - [<span class="toc-section-number">2.2.1</span> General
+      tutorials][]
+    - [<span class="toc-section-number">2.2.2</span> Detailed
+      functionality][]
+    - [<span class="toc-section-number">2.2.3</span> Physics
+      tutorials][]
+  - [<span class="toc-section-number">2.3</span> Tests][]
+- [<span class="toc-section-number">3</span> Contributing][]
+  - [<span class="toc-section-number">3.1</span> Asking questions &
+    reporting bugs][]
+  - [<span class="toc-section-number">3.2</span> Contributing
+    guidelines][]
+  - [<span class="toc-section-number">3.3</span> Adding a new PDE to
+    `src/pdes`][]
 
 > FeenoX documentation is released under the terms of the [GNU Free
 > Documentation License v1.3][], or any later version.
@@ -46,10 +46,10 @@ then converted to HTML, PDF, Unix manpage or Texinfo as needed.
   [<span class="toc-section-number">3</span> Contributing]: #contributing
   [<span class="toc-section-number">3.1</span> Asking questions & reporting bugs]:
     #asking-questions-reporting-bugs
-  [<span class="toc-section-number">3.2</span> Adding a new PDE to `src/pdes`]:
-    #adding-a-new-pde-to-srcpdes
-  [<span class="toc-section-number">3.3</span> Contributing guidelines]:
+  [<span class="toc-section-number">3.2</span> Contributing guidelines]:
     #contributing-guidelines
+  [<span class="toc-section-number">3.3</span> Adding a new PDE to `src/pdes`]:
+    #adding-a-new-pde-to-srcpdes
   [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
   [Pandoc]: https://pandoc.org/
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
@@ -62,8 +62,8 @@ tutorial and reference.” Due to the formatting restrictions, the
 [Texinfo][] version contains only the description and not the full
 reference.
 
--   [FeenoX manual][] [PDF][]
--   [FeenoX description][] [PDF][1] [Texinfo][2]
+- [FeenoX manual][] [PDF][]
+- [FeenoX description][] [PDF][1] [Texinfo][2]
 
   [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
   [Texinfo]: https://www.gnu.org/software/texinfo/
@@ -79,29 +79,31 @@ reference.
     quotations” that defines [software requirements specifications][]
     for an open source computational tool.
 
+    - [Software Requirements specifications][3] [PDF][4] (Fictitious
+      RFQ)
+
 2.  Then a fictitious “offer” to the above tender is given in a
     [software design specifications][] document that explains the design
     decisions and features included in FeenoX.
 
--   [Software Requirements specifications][3] [PDF][4] (Fictitious RFQ)
--   [Software Design specifications][5] [PDF][6] (Imaginary FeenoX’s
-    offer)
+    - [Software Design specifications][5] [PDF][6] (Imaginary FeenoX’s
+      offer)
 
   [software requirements specifications]: ./srs.md
-  [software design specifications]: ./sds.md
   [3]: srs.md
   [4]: https://www.seamplex.com/feenox/doc/srs.pdf
+  [software design specifications]: ./sds.md
   [5]: sds.md
   [6]: https://www.seamplex.com/feenox/doc/sds.pdf
 
 ## Other documents
 
--   [Unix manpage][] (accessible with `man feenox` after (global)
-    installation with `sudo make install`)
--   [Frequently Asked Questions][] [PDF][7]
--   [Compilation Guide][] [PDF][8]
--   [Programming Guide][] [PDF][9]
--   [History][] [PDF][10]
+- [Unix manpage][] (accessible with `man feenox` after (global)
+  installation with `sudo make install`)
+- [Frequently Asked Questions][] [PDF][7]
+- [Compilation Guide][] [PDF][8]
+- [Programming Guide][] [PDF][9]
+- [History][] [PDF][10]
 
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
   [Frequently Asked Questions]: https://www.seamplex.com/feenox/doc/FAQs.html
@@ -115,20 +117,20 @@ reference.
 
 ## Youtube videos
 
--   [FeenoX hands-on tutorial][]
--   [FeenoX, a cloud-first free and open source finite-element(ish)
-    tool][]
--   [Why FeenoX works the way it works][]
--   [Verification of PDE solvers using the Method of Manufactured
-    Solutions][]
--   [FeenoX: a free and open source computational tool for solving
-    (nuclear-related) DAEs in the cloud][]
--   [CAEplex: finite elements in the cloud][]
--   [Thermal finite elements in the cloud in 1 minute][]
--   [Add CAE to your Onshape CAD with CAEplex][]
--   [First 10 natural modes of a cylinder in less than 1 min. with
-    CAEplex][]
--   [Democratizing CAE][]
+- [FeenoX hands-on tutorial][]
+- [FeenoX, a cloud-first free and open source finite-element(ish)
+  tool][]
+- [Why FeenoX works the way it works][]
+- [Verification of PDE solvers using the Method of Manufactured
+  Solutions][]
+- [FeenoX: a free and open source computational tool for solving
+  (nuclear-related) DAEs in the cloud][]
+- [CAEplex: finite elements in the cloud][]
+- [Thermal finite elements in the cloud in 1 minute][]
+- [Add CAE to your Onshape CAD with CAEplex][]
+- [First 10 natural modes of a cylinder in less than 1 min. with
+  CAEplex][]
+- [Democratizing CAE][]
 
   [FeenoX hands-on tutorial]: https://www.youtube.com/watch?v=b3K2QewI8jE
   [FeenoX, a cloud-first free and open source finite-element(ish) tool]:
@@ -149,15 +151,15 @@ reference.
 
 The Markdown sources are in the [`doc`][]:
 
--   [`feenox-manual.md`][]
--   [`feenox-desc.md`][`feenox-manual.md`]
--   [`srs.md`][]
--   [`sds.md`][]
--   [`FAQ.md`][]
--   [`feenox.1.md`][]
--   [`history.md`][]
--   [`compilation.md`][]
--   [`programming.md`][]
+- [`feenox-manual.md`][]
+- [`feenox-desc.md`][`feenox-manual.md`]
+- [`srs.md`][]
+- [`sds.md`][]
+- [`FAQ.md`][]
+- [`feenox.1.md`][]
+- [`history.md`][]
+- [`compilation.md`][]
+- [`programming.md`][]
 
 They are compiled by running the [`make.sh`][] script.
 
@@ -185,16 +187,16 @@ etc.) is included in the [FeenoX repository][].
 [Annotated examples][] can be found in the [examples][] directory of the
 Github repository.
 
--   [Online annotated examples][Annotated examples]
-    -   [Basic mathematics][]
-    -   [Systems of ODEs/DAEs][]
-    -   [Laplace’s equation][]
-    -   [Heat conduction][]
-    -   [Linear elasticity][]
-    -   [Modal analysis][]
-    -   [Neutron diffusion][]
-    -   [Neutron S<sub>N</sub>][]
--   [Github examples directory][examples]
+- [Online annotated examples][Annotated examples]
+  - [Basic mathematics][]
+  - [Systems of ODEs/DAEs][]
+  - [Laplace’s equation][]
+  - [Heat conduction][]
+  - [Linear elasticity][]
+  - [Modal analysis][]
+  - [Neutron diffusion][]
+  - [Neutron S<sub>N</sub>][]
+- [Github examples directory][examples]
 
   [Annotated examples]: https://www.seamplex.com/feenox/examples
   [examples]: https://github.com/seamplex/feenox/tree/main/examples
@@ -246,10 +248,10 @@ Github repository.
 
 The [`tests`][] directory in the repository has hundreds of
 
--   examples,
--   unit tests,
--   regression tests, and/or
--   (crude) mathematical verification tests.
+- examples,
+- unit tests,
+- regression tests, and/or
+- (crude) mathematical verification tests.
 
   [`tests`]: https://github.com/seamplex/feenox/tree/main/tests
 
@@ -257,15 +259,11 @@ The [`tests`][] directory in the repository has hundreds of
 
 ## Asking questions & reporting bugs
 
--   Use [Github discussions][] to ask for help,
--   Use the [Github issue tracker][] to report bugs.
+- Use [Github discussions][] to ask for help,
+- Use the [Github issue tracker][] to report bugs.
 
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Github issue tracker]: https://github.com/seamplex/feenox/issues
-
-## Adding a new PDE to `src/pdes`
-
-To be explained.
 
 ## Contributing guidelines
 
@@ -279,23 +277,27 @@ elliptic operators feel free to use the Laplace equation at
     you want to do and/or asking for help.
 3.  Fork the [Git repository][] under your Github account
 4.  Create a pull request, including
-    -   code,
-    -   documentation, and
-    -   tests.
+    - code,
+    - documentation, and
+    - tests.
 5.  Follow up the review procedure.
 
 Note that
 
--   It is mandatory to observe the [Code of Conduct][].
--   The contributed code has to be compatible with the [GPLv3+
-    license][].
--   Each author keeps the copyright of the contribution.
+- It is mandatory to observe the [Code of Conduct][].
+- The contributed code has to be compatible with the [GPLv3+ license][].
+- Each author keeps the copyright of the contribution.
+- You can [ask][Github discussions]!
 
-  [hackers]: ../README4hackers.md
-  [academics]: ../README4academics.md
+  [hackers]: http://localhost/milhouse/feenox/README4hackers.html
+  [academics]: http://localhost/milhouse/feenox/README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [12]: doc/programming.md
+  [12]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
-  [Code of Conduct]: CODE_OF_CONDUCT.md
-  [GPLv3+ license]: #sec:licensing
+  [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html
+  [GPLv3+ license]: https://www.seamplex.com/feenox/#sec:licensing
+
+## Adding a new PDE to `src/pdes`
+
+To be explained.

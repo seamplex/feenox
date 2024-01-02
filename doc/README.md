@@ -24,10 +24,14 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 ## Design
 
  1. The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool.
- 
+
+     * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
+
  2. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
 
+     * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX's offer)
 
+ 
 ::::::::: {.only-in-format .html .markdown}
 > **Why FeenoX works the way it works** (i.e. why it does not run in Windows) 
 >
@@ -36,8 +40,6 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 > :::::
 ::::::::: 
  
- * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
- * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX's offer)
 
 
 
@@ -142,29 +144,13 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
  * Use [Github discussions](https://github.com/seamplex/feenox/discussions) to ask for help,
  * Use the [Github issue tracker](https://github.com/seamplex/feenox/issues) to report bugs.
 
+  
+## Contributing guidelines
+
+```include
+contributing-guidelines.md
+```
 
 ## Adding a new PDE to `src/pdes`
 
 To be explained.
-    
-## Contributing guidelines
-
-Contributions from [hackers](../README4hackers.md) and/or [academics](../README4academics.md) are welcome, especially new types of PDEs and new formulations of existing PDEs.
-For elliptic operators feel free to use the Laplace equation at [`src/pdes/laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace) as a template.
-
- 1. Read the [Programming Guide](doc/programming.md).
- 2. Browse [Github discussions](https://github.com/seamplex/feenox/discussions) and open a new thread explaining what you want to do and/or asking for help.
- 3. Fork the [Git repository](https://github.com/seamplex/feenox/) under your Github account
- 4. Create a pull request, including
-    - code,
-    - documentation, and
-    - tests.
- 5. Follow up the review procedure.
-
-Note that
-
- * It is mandatory to observe the [Code of Conduct](CODE_OF_CONDUCT.md).
- * The contributed code has to be compatible with the [GPLv3+ license](#sec:licensing).
- * Each author keeps the copyright of the contribution.
-
-

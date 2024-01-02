@@ -103,9 +103,20 @@ s0.parentNode.insertBefore(s1,s0);
       </button>
       <div class="collapse navbar-collapse" id="feenox_navbarcontent">
        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-         <a class="nav-link" href="$rootdir$/">Home</a>
+       
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Home
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="$rootdir$/">README</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="$rootdir$/README4engineers.html">FeenoX for Engineers</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/README4hackers.html">FeenoX for Hackers</a></li>
+            <li><a class="dropdown-item" href="$rootdir$/README4academics.html">FeenoX for Academics</a></li>
+          </ul>
         </li>
+        
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Examples
@@ -123,6 +134,7 @@ s0.parentNode.insertBefore(s1,s0);
             <li><a class="dropdown-item" href="$rootdir$/examples/neutron_sn.html">Neutron transport</a></li>
           </ul>
         </li>
+        
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Tutorials
@@ -137,6 +149,7 @@ s0.parentNode.insertBefore(s1,s0);
             <li><a class="dropdown-item" href="$rootdir$/doc/tutorials/320-thermal">Heat conduction</a></li>
           </ul>
         </li>
+        
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Documentation
@@ -156,9 +169,15 @@ s0.parentNode.insertBefore(s1,s0);
             <li><a class="dropdown-item" href="$rootdir$/doc/history.html">History</a></li>
           </ul>
         </li>
+        
         <li class="nav-item">
          <a class="nav-link" href="$rootdir$/download.html">Download</a>
         </li>
+        
+        <li class="nav-item">
+         <a class="nav-link" href="https://github.com/seamplex/feenox/">Github</a>
+        </li>
+        
        </ul>
       </div> <!--// collapse navbar-collapse-->
      </div> <!--// top-search-box-->
@@ -252,14 +271,11 @@ $table-of-contents$
    <small class="copyright">Designed with <span class="sr-only">love</span><i class="fas fa-heart"></i> by <a href="https://themes.3rdwavemedia.com/" target="_blank">Xiaoying Riley</a> for developers</small>
   </div><!--//container-->
  </footer><!--//footer-->
- 
-  
  <!-- Main Javascript -->    
  <script src="$rootdir$/assets/js/bootstrap.bundle.min.js"></script>
  <script src="$rootdir$/assets/js/stickyfill.min.js"></script>
  <script src="$rootdir$/assets/js/gumshoe.polyfills.min.js"></script> 
  <script src="$rootdir$/assets/js/main.js"></script> 
- 
  </body>
 </html> 
 
