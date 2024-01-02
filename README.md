@@ -11,13 +11,13 @@ toc: true
 
 # About FeenoX
 
-[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extentes) using a computer (or many computers in parallel) with a [particular design basis](./doc/srs.md).
+[FeenoX](https://seamplex.com/feenox) is a [cloud-first](./doc/sds.md#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or many computers in parallel) with a [particular design basis](./doc/srs.md).
 
 ::::: {.only-in-format .html }
 ```{=html}
-<a class="btn btn-lg btn-outline-primary"   href="https://www.seamplex.com/feenox/README4engineers.html" role="button">FeenoX for Industry Engineers</a>
-<a class="btn btn-lg btn-outline-secondary" href="https://www.seamplex.com/feenox/README4hackers.html"   role="button">FeenoX for Unix Hackers</a>
-<a class="btn btn-lg btn-outline-info"      href="https://www.seamplex.com/feenox/README4academics.html" role="button">FeenoX for Academic Professors</a>
+<a class="btn btn-lg btn-outline-primary"   href="./README4engineers.md" role="button">FeenoX for Industry Engineers</a>
+<a class="btn btn-lg btn-outline-secondary" href="./README4hackers.md"   role="button">FeenoX for Unix Hackers</a>
+<a class="btn btn-lg btn-outline-info"      href="./README4academics.md" role="button">FeenoX for Academic Professors</a>
 ```
 :::::
 
@@ -32,7 +32,7 @@ Choose your background for further details about the what, how and whys:
 
 ### Examples
 
- - [Basic mathematics](https://seamplex.com/feenox/examples/basic.html)
+ - [Basic mathematics](./examples/basic.md)
  - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
  - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
  - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
@@ -137,17 +137,17 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
 
 # Documentation
 
-Browse through the [documentation index](https://seamplex.com/feenox/doc/) and/or the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) subdirectory of the [Github repository](https://github.com/seamplex/feenox/) for
+Browse through the [documentation index](doc) and/or the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) subdirectory of the [Github repository](https://github.com/seamplex/feenox/) for
 
- * [FAQs](https://seamplex.com/feenox/doc/FAQ.html), including the [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
- * [Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html)
- * [Description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
- * [Software Design Requirements](https://seamplex.com/feenox/doc/srs.html)
- * [Software Design Specifications](https://seamplex.com/feenox/doc/sds.html)
- * [Unix man page](https://www.seamplex.com/feenox/doc/feenox.1.html) (accesible through `man feenox` after installation)
- * [History](https://seamplex.com/feenox/doc/history.html)
- * [Compilation guide](https://seamplex.com/feenox/doc/compilation.html)
- * [Programming guide](https://seamplex.com/feenox/doc/programming.html)
+ * [FAQs](./FAQ.md), including the [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
+ * [Manual](./doc/feenox-manual.md)
+ * [Description](./doc/feenox-desc.md)
+ * [Software Design Requirements](./doc/srs.md)
+ * [Software Design Specifications](./doc/sds.md)
+ * [Unix man page](./doc/feenox.1.md) (accesible through `man feenox` after installation)
+ * [History](./doc/history.md)
+ * [Compilation guide](./doc/compilation.md)
+ * [Programming guide](./programming.md)
  
 
 
@@ -169,7 +169,7 @@ See the [download page](https://seamplex.com/feenox/download.html) and the [comp
 
 # Licensing
 
-FeenoX is distributed under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html) version 3 or (at your option) any later version. The following text was borrowed from the [Gmsh documentation](http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions). Replacing “Gmsh” with “FeenoX” gives:
+FeenoX is distributed under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html) version 3 or (at your option) any later version. The following text was borrowed from the [Gmsh documentation](http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions). Replacing “Gmsh” with “FeenoX” (using Unix's `sed`) gives:
 
 > ```include
 > doc/freesw.md
@@ -197,7 +197,7 @@ Follow us: [YouTube](https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA)
 
 ---------------------------
 
-FeenoX is copyright ©2009-2023 [Seamplex](https://www.seamplex.com)  
+FeenoX is copyright ©2009-2025 [Seamplex](https://www.seamplex.com)  
 FeenoX is licensed under [GNU GPL version 3](http://www.gnu.org/copyleft/gpl.html) or (at your option) any later version.  
 FeenoX is free software: you are free to change and redistribute it.  
 There is **NO WARRANTY**, to the extent permitted by law.  

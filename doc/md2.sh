@@ -233,6 +233,7 @@ fi
 
 # post
 if [ "x${format}" = "x.html" ]; then
+  echo pistola
   n1=$(grep -n side_toc_start ${out} | cut -d':' -f1)
   n2=$(grep -n side_toc_end   ${out} | cut -d':' -f1)
 
@@ -264,6 +265,7 @@ if [ "x${format}" = "x.html" ]; then
   sed -i 's/.\/\(.*\)\.md/\1.html/g'  ${out}
   
 elif [ "x${format}" = "x.markdown" ]; then
+  echo mongocho
   sed -i 's/.\/\(.*\)\.md/\1.markdown/g'  ${out}
   
 fi
