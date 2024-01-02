@@ -47,10 +47,10 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 ## Other documents
  
  * [Unix manpage](https://www.seamplex.com/feenox/doc/feenox.1.html) (accessible with `man feenox` after (global) installation with `sudo make install`)
- * [Frequently Asked Questions](https://www.seamplex.com/feenox/doc/FAQs.html) [PDF](https://www.seamplex.com/feenox/doc/FAQs.pdf)
- * [Compilation Guide](https://www.seamplex.com/feenox/doc/compilation.html) [PDF](https://www.seamplex.com/feenox/doc/compilation.pdf)
- * [Programming Guide](https://www.seamplex.com/feenox/doc/programming.html) [PDF](https://www.seamplex.com/feenox/doc/programming.pdf)
- * [History](https://www.seamplex.com/feenox/doc/history.html) [PDF](https://www.seamplex.com/feenox/doc/history.pdf)
+ * [Frequently Asked Questions](./doc/FAQs.md) [PDF](https://www.seamplex.com/feenox/doc/FAQs.pdf)
+ * [Compilation Guide](./doc/compilation.md) [PDF](https://www.seamplex.com/feenox/doc/compilation.pdf)
+ * [Programming Guide](./doc/programming.md) [PDF](https://www.seamplex.com/feenox/doc/programming.pdf)
+ * [History](./doc/history.md) [PDF](https://www.seamplex.com/feenox/doc/history.pdf)
 
 ## Youtube videos {#sec:youtube}
 

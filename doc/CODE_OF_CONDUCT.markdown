@@ -43,7 +43,7 @@ figPrefix:
 figPrefixTemplate: $$p$$ $$i$$
 figureTemplate: $$figureTitle$$ $$i$$$$titleDelim$$ $$t$$
 figureTitle: Figure
-hash: 0960f0d+dirty
+hash: 9fef5ef+dirty
 lang: en-US
 lastDelim: ", "
 linkReferences: false
