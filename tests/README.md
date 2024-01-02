@@ -8,7 +8,7 @@ The main objective is to detect regressions which might be introduced into the c
    - regression tests, and/or
    - (crude) mathematical verification tests.
 
- * These tests are run when doing `make check` after [compiling the source code](doc/compile.md). 
+ * These tests are run when doing `make check` after [compiling the source code](../doc/compile.md). 
 
  * The test cases usually return a single number (which should be near zero) comparing the numerical result with the expected one.
  

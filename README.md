@@ -11,7 +11,7 @@ toc: true
 
 # About FeenoX
 
-FeenoX is a cloud-first free and open source tool to solve engineering-related problems using a computer (or many computers in parallel) with a particular design basis.
+[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extentes) using a computer (or many computers in parallel) with a [particular design basis](./doc/srs.md).
 
 ::::: {.only-in-format .html }
 ```{=html}
@@ -23,9 +23,9 @@ FeenoX is a cloud-first free and open source tool to solve engineering-related p
 
 Choose your background for further details about the what, how and whys:
 
- - [Industry Engineer](README4engineers.md)
- - [Unix Hacker](README4hackers.md)
- - [Academic Professor](README4academics.md)
+ - [Industry Engineer](./README4engineers.md)
+ - [Unix Hacker](./README4hackers.md)
+ - [Academic Professor](./README4academics.md)
 
 
 ## Extents
@@ -90,7 +90,7 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
      - time-dependent systems ([TS](https://petsc.org/release/manual/ts/))
      - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
    - writes results in either Gmsh or [VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) ([Paraview](https://www.paraview.org/)) format 
- * Cloud-first design (cloud friendliness is not enough)
+ * [Cloud-first design](https://seamplex.com/feenox/doc/sds.html#cloud-first) (cloud friendliness is not enough)
  * MPI parallelization
  * [Unix programming philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)
    - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)
@@ -167,7 +167,7 @@ doc/git.md
 
 See the [download page](https://seamplex.com/feenox/download.html) and the [compilation guide](./doc/compilation.md) for  detailed information.
 
-# Licensing {#sec:licensing}
+# Licensing
 
 FeenoX is distributed under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html) version 3 or (at your option) any later version. The following text was borrowed from the [Gmsh documentation](http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions). Replacing “Gmsh” with “FeenoX” gives:
 

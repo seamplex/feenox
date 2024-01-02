@@ -79,41 +79,39 @@ reference.
     quotations” that defines [software requirements specifications][]
     for an open source computational tool.
 
-    - [Software Requirements specifications][3] [PDF][4] (Fictitious
-      RFQ)
+    - [Software Requirements specifications][] (Fictitious RFQ)
+      [\[PDF\]][3]
 
 2.  Then a fictitious “offer” to the above tender is given in a
     [software design specifications][] document that explains the design
     decisions and features included in FeenoX.
 
-    - [Software Design specifications][5] [PDF][6] (Imaginary FeenoX’s
-      offer)
+    - [Software Design specifications][] (Imaginary FeenoX’s offer)
+      [\[PDF\]][4]
 
-  [software requirements specifications]: ./srs.md
-  [3]: srs.md
-  [4]: https://www.seamplex.com/feenox/doc/srs.pdf
-  [software design specifications]: ./sds.md
-  [5]: sds.md
-  [6]: https://www.seamplex.com/feenox/doc/sds.pdf
+  [software requirements specifications]: srs.markdown
+  [3]: https://www.seamplex.com/feenox/doc/srs.pdf
+  [software design specifications]: sds.markdown
+  [4]: https://www.seamplex.com/feenox/doc/sds.pdf
 
 ## Other documents
 
 - [Unix manpage][] (accessible with `man feenox` after (global)
   installation with `sudo make install`)
-- [Frequently Asked Questions][] [PDF][7]
-- [Compilation Guide][] [PDF][8]
-- [Programming Guide][] [PDF][9]
-- [History][] [PDF][10]
+- [Frequently Asked Questions][] [PDF][5]
+- [Compilation Guide][] [PDF][6]
+- [Programming Guide][] [PDF][7]
+- [History][] [PDF][8]
 
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
   [Frequently Asked Questions]: https://www.seamplex.com/feenox/doc/FAQs.html
-  [7]: https://www.seamplex.com/feenox/doc/FAQs.pdf
+  [5]: https://www.seamplex.com/feenox/doc/FAQs.pdf
   [Compilation Guide]: https://www.seamplex.com/feenox/doc/compilation.html
-  [8]: https://www.seamplex.com/feenox/doc/compilation.pdf
+  [6]: https://www.seamplex.com/feenox/doc/compilation.pdf
   [Programming Guide]: https://www.seamplex.com/feenox/doc/programming.html
-  [9]: https://www.seamplex.com/feenox/doc/programming.pdf
+  [7]: https://www.seamplex.com/feenox/doc/programming.pdf
   [History]: https://www.seamplex.com/feenox/doc/history.html
-  [10]: https://www.seamplex.com/feenox/doc/history.pdf
+  [8]: https://www.seamplex.com/feenox/doc/history.pdf
 
 ## Youtube videos
 
@@ -151,27 +149,27 @@ reference.
 
 The Markdown sources are in the [`doc`][]:
 
-- [`feenox-manual.md`][]
-- [`feenox-desc.md`][`feenox-manual.md`]
-- [`srs.md`][]
-- [`sds.md`][]
-- [`FAQ.md`][]
-- [`feenox.1.md`][]
-- [`history.md`][]
-- [`compilation.md`][]
-- [`programming.md`][]
+- [`feenox-manual`][]
+- [`feenox-desc`][`feenox-manual`]
+- [`srs`][]
+- [`sds`][]
+- [`FAQ`][]
+- [`feenox.1`][]
+- [`history`][]
+- [`compilation`][]
+- [`programming`][]
 
 They are compiled by running the [`make.sh`][] script.
 
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
-  [`feenox-manual.md`]: https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md
-  [`srs.md`]: https://github.com/seamplex/feenox/blob/main/doc/srs.md
-  [`sds.md`]: https://github.com/seamplex/feenox/blob/main/doc/sds.md
-  [`FAQ.md`]: https://github.com/seamplex/feenox/blob/main/doc/FAQ.md
-  [`feenox.1.md`]: https://github.com/seamplex/feenox/blob/main/doc/feenox.1.md
-  [`history.md`]: https://github.com/seamplex/feenox/blob/main/doc/history.md
-  [`compilation.md`]: https://github.com/seamplex/feenox/blob/main/doc/compilation.md
-  [`programming.md`]: https://github.com/seamplex/feenox/blob/main/doc/programming.md
+  [`feenox-manual`]: https/github.com/seamplex/feenox/blob/main/doc/feenox-desc.markdown
+  [`srs`]: https/github.com/seamplex/feenox/blob/main/doc/srs.markdown
+  [`sds`]: https/github.com/seamplex/feenox/blob/main/doc/sds.markdown
+  [`FAQ`]: https/github.com/seamplex/feenox/blob/main/doc/FAQ.markdown
+  [`feenox.1`]: https/github.com/seamplex/feenox/blob/main/doc/feenox.1.markdown
+  [`history`]: https/github.com/seamplex/feenox/blob/main/doc/history.markdown
+  [`compilation`]: https/github.com/seamplex/feenox/blob/main/doc/compilation.markdown
+  [`programming`]: https/github.com/seamplex/feenox/blob/main/doc/programming.markdown
   [`make.sh`]: https://github.com/seamplex/feenox/blob/main/doc/make.sh
 
 # Hands on
@@ -235,20 +233,20 @@ Github repository.
 ### Physics tutorials
 
 1.  The Laplace equation
-2.  [Heat conduction][11]
+2.  [Heat conduction][9]
 3.  Linear elasticity
 4.  Modal analysis
 5.  Thermo-mechanical analysis
 6.  Neutron diffusion
 7.  Neutron transport
 
-  [11]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
+  [9]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
 
 ## Tests
 
 The [`tests`][] directory in the repository has hundreds of
 
-- examples,
+- `grep`-able examples,
 - unit tests,
 - regression tests, and/or
 - (crude) mathematical verification tests.
@@ -272,7 +270,7 @@ especially new types of PDEs and new formulations of existing PDEs. For
 elliptic operators feel free to use the Laplace equation at
 [`src/pdes/laplace`][] as a template.
 
-1.  Read the [Programming Guide][12].
+1.  Read the [Programming Guide][10].
 2.  Browse [Github discussions][] and open a new thread explaining what
     you want to do and/or asking for help.
 3.  Fork the [Git repository][] under your Github account
@@ -292,7 +290,7 @@ Note that
   [hackers]: http://localhost/milhouse/feenox/README4hackers.html
   [academics]: http://localhost/milhouse/feenox/README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [12]: https://seamplex.com/feenox/doc/programming.html
+  [10]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

@@ -97,6 +97,7 @@ echo "help as a raw txt (which is used in feenox -h)"
 echo "unix man page"
 m4 date.m4 > date.yaml
 pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
+  --quiet \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \
   --lua-filter=not-in-format.lua \
@@ -105,15 +106,15 @@ pandoc -s date.yaml feenox.1.md -t man -o feenox.1 \
   --lua-filter=manfilter.lua
 
 echo "unix man page in html"
-pandoc -s -t html feenox.1 -o feenox.1.html
+pandoc --quiet -s -t html feenox.1 -o feenox.1.html
 
 # this one goes into the windows zip
-pandoc -s double-click.md -t plain -o double-click.txt --lua-filter=include-files.lua
+pandoc --quiet -s double-click.md -t plain -o double-click.txt --lua-filter=include-files.lua
 
 
 
 echo "PDF + HTML + Markdown + plain"
-for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
+for i in feenox-manual programming compilation srs sds FAQ CODE_OF_CONDUCT; do
  echo ${i}
  if [ ${pdf} = 1 ]; then
   ./md2.sh --pdf  ${i}
@@ -123,21 +124,10 @@ for i in programming compilation srs FAQ CODE_OF_CONDUCT; do
  ./md2.sh --plain ${i}
 done
 
-echo "PDF + HTML + plain"
-for i in sds feenox-manual; do
- echo ${i}
- if [ ${pdf} = 1 ]; then
-  ./md2.sh --pdf  ${i}
- fi
- ./md2.sh --html  ${i}
- ./md2.sh --plain ${i}
-done
-
-
-
 
 echo "feenox-desc as Texi"
 pandoc feenox-desc.md --template template.texi -o feenox-desc.texi \
+  --quiet \
   --standalone --toc \
   --lua-filter=include-files.lua \
   --lua-filter=include-code-files.lua \

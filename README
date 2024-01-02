@@ -26,7 +26,7 @@ FeenoX: A cloud-first free no-fee no-X uniX-like finite-element(ish) computation
   [3 Quickstart]: #quickstart
   [3.1 Download]: #download
   [3.2 Git repository]: #git-repository
-  [4 Licensing]: #sec:licensing
+  [4 Licensing]: #licensing
   [4.1 Contributing]: #sec:contributing
   [5 Further information]: #further-information
 
@@ -42,9 +42,14 @@ Choose your background for further details about the what, how and whys:
 -   Unix Hacker
 -   Academic Professor
 
-  [Industry Engineer]: README4engineers.md
-  [Unix Hacker]: README4hackers.md
-  [Academic Professor]: README4academics.md
+  [FeenoX]: https://seamplex.com/feenox
+  [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
+  [free and open source]: #licensing
+  [engineering-related problems]: #extentes
+  [particular design basis]: ./doc/srs.md
+  [Industry Engineer]: ./README4engineers.md
+  [Unix Hacker]: ./README4hackers.md
+  [Academic Professor]: ./README4academics.md
 
 Extents
 
@@ -170,6 +175,7 @@ Capabilities
   [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
   [VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
   [Paraview]: https://www.paraview.org/
+  [Cloud-first design]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [Unix programming philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
   [rule of separation]: https://seamplex.com/feenox/doc/sds.html#sec:separation
   [rule of silence]: https://seamplex.com/feenox/doc/sds.html#sec:silence

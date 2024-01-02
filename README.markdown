@@ -26,15 +26,15 @@
   [<span class="toc-section-number">3</span> Quickstart]: #quickstart
   [<span class="toc-section-number">3.1</span> Download]: #download
   [<span class="toc-section-number">3.2</span> Git repository]: #git-repository
-  [<span class="toc-section-number">4</span> Licensing]: #sec:licensing
+  [<span class="toc-section-number">4</span> Licensing]: #licensing
   [<span class="toc-section-number">4.1</span> Contributing]: #sec:contributing
   [<span class="toc-section-number">5</span> Further information]: #further-information
 
 # About FeenoX
 
-FeenoX is a cloud-first free and open source tool to solve
-engineering-related problems using a computer (or many computers in
-parallel) with a particular design basis.
+[FeenoX][] is a [cloud-first][] [free and open source][] tool to solve
+[engineering-related problems][] using a computer (or many computers in
+parallel) with a [particular design basis][].
 
 Choose your background for further details about the what, how and whys:
 
@@ -42,9 +42,14 @@ Choose your background for further details about the what, how and whys:
 - [Unix Hacker][]
 - [Academic Professor][]
 
-  [Industry Engineer]: README4engineers.md
-  [Unix Hacker]: README4hackers.md
-  [Academic Professor]: README4academics.md
+  [FeenoX]: https://seamplex.com/feenox
+  [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
+  [free and open source]: #licensing
+  [engineering-related problems]: #extentes
+  [particular design basis]: doc/srs.markdown
+  [Industry Engineer]: README4engineers.markdown
+  [Unix Hacker]: README4hackers.markdown
+  [Academic Professor]: README4academics.markdown
 
 ## Extents
 
@@ -121,7 +126,7 @@ The [`tests`][] directory in the repository has hundreds of
     - time-dependent systems ([TS][])
     - generalized eigen-value problems ([EPS][])
   - writes results in either Gmsh or [VTK][] ([Paraview][]) format
-- Cloud-first design (cloud friendliness is not enough)
+- [Cloud-first design][] (cloud friendliness is not enough)
 - MPI parallelization
 - [Unix programming philosophy][]
   - [rule of separation][]
@@ -171,6 +176,7 @@ The [`tests`][] directory in the repository has hundreds of
   [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
   [VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
   [Paraview]: https://www.paraview.org/
+  [Cloud-first design]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [Unix programming philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
   [rule of separation]: https://seamplex.com/feenox/doc/sds.html#sec:separation
   [rule of silence]: https://seamplex.com/feenox/doc/sds.html#sec:silence
@@ -378,7 +384,7 @@ information.
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [2]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
-  [3]: ./doc/compilation.md
+  [3]: doc/compilation.markdown
 
 # Licensing
 

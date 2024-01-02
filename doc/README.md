@@ -25,11 +25,11 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 
  1. The FeenoX project starts as an offer to an imaginary “request for quotations” that defines [software requirements specifications](./srs.md) for an open source computational tool.
 
-     * [Software Requirements specifications](srs.md) [PDF](https://www.seamplex.com/feenox/doc/srs.pdf) (Fictitious RFQ)
+     * [Software Requirements specifications](./srs.md) (Fictitious RFQ) [[PDF]](https://www.seamplex.com/feenox/doc/srs.pdf)
 
  2. Then a fictitious “offer” to the above tender is given in a [software design specifications](./sds.md) document that explains the design decisions and features included in FeenoX.
 
-     * [Software Design specifications](sds.md) [PDF](https://www.seamplex.com/feenox/doc/sds.pdf) (Imaginary FeenoX's offer)
+     * [Software Design specifications](./sds.md) (Imaginary FeenoX's offer) [[PDF]](https://www.seamplex.com/feenox/doc/sds.pdf)
 
  
 ::::::::: {.only-in-format .html .markdown}
@@ -73,15 +73,15 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 
 The Markdown sources are in the [`doc`](https://github.com/seamplex/feenox/tree/main/doc):
 
- * [`feenox-manual.md`](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
- * [`feenox-desc.md`](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
- * [`srs.md`](https://github.com/seamplex/feenox/blob/main/doc/srs.md)
- * [`sds.md`](https://github.com/seamplex/feenox/blob/main/doc/sds.md)
- * [`FAQ.md`](https://github.com/seamplex/feenox/blob/main/doc/FAQ.md)
- * [`feenox.1.md`](https://github.com/seamplex/feenox/blob/main/doc/feenox.1.md)
- * [`history.md`](https://github.com/seamplex/feenox/blob/main/doc/history.md)
- * [`compilation.md`](https://github.com/seamplex/feenox/blob/main/doc/compilation.md)
- * [`programming.md`](https://github.com/seamplex/feenox/blob/main/doc/programming.md) 
+ * [`feenox-manual`](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
+ * [`feenox-desc`](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
+ * [`srs`](https://github.com/seamplex/feenox/blob/main/doc/srs.md)
+ * [`sds`](https://github.com/seamplex/feenox/blob/main/doc/sds.md)
+ * [`FAQ`](https://github.com/seamplex/feenox/blob/main/doc/FAQ.md)
+ * [`feenox.1`](https://github.com/seamplex/feenox/blob/main/doc/feenox.1.md)
+ * [`history`](https://github.com/seamplex/feenox/blob/main/doc/history.md)
+ * [`compilation`](https://github.com/seamplex/feenox/blob/main/doc/compilation.md)
+ * [`programming`](https://github.com/seamplex/feenox/blob/main/doc/programming.md) 
  
 They are compiled by running the [`make.sh`](https://github.com/seamplex/feenox/blob/main/doc/make.sh) script.
  
@@ -131,7 +131,7 @@ tutorials/physics.md
  
 The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository has hundreds of
  
- - examples,
+ - `grep`-able examples,
  - unit tests,
  - regression tests, and/or
  - (crude) mathematical verification tests.

@@ -212,6 +212,7 @@ fi
 
 # here's the meat
 pandoc hash.yaml ${in}.md \
+    --quiet \
     --standalone ${toc_option} \
     --metadata=rootdir:${rootdir} \
     --syntax-definition=${rootdir}/doc/feenox.xml \
@@ -260,7 +261,10 @@ if [ "x${format}" = "x.html" ]; then
   sed -i 's/<img /<img class=\"img-fluid\" /'     ${out} 
 
   # update links (if the link starts with ./file.md it gets translated to ./file.html otherwise it remains .md)
-#   sed -i 's/\.md/\.html/g' ${out}
   sed -i 's/.\/\(.*\)\.md/\1.html/g'  ${out}
+  
+elif [ "x${format}" = "x.markdown" ]; then
+  sed -i 's/.\/\(.*\)\.md/\1.markdown/g'  ${out}
+  
 fi
  

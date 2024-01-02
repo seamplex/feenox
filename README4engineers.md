@@ -22,7 +22,7 @@ toc: true
 In plain engineering terms, FeenoX works like a transfer function between one or more input files and zero or more output files:
 
 ```include
-transfer.md
+doc/transfer.md
 ```
 
 When solving problems using the finite element method, FeenoX sits in the middle of pre and post-processing tools.

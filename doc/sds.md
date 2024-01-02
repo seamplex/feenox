@@ -1,7 +1,7 @@
 ---
-title: FeenoX Software Design Specification
+title: FeenoX Software Design Specifications
 lang: en-US
-abstract: This Software Design Specifications (SDS) document applies to an imaginary Software Requirement Specifications (SRS) document issued by a fictitious agency asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. The latter can be seen as a “Request for Quotation” and the former as an offer for the fictitious tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
+abstract: This Software Design Specifications (SDS) document applies to an imaginary [Software Requirement Specifications](./srs.md) (SRS) document issued by a fictitious agency asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. The latter can be seen as a “Request for Quotation” and the former as an offer for the fictitious tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
 number-sections: true
 toc: true
 documentclass: report
@@ -13,11 +13,21 @@ documentclass: report
 > 100-introduction.md
 > ```
 
-[FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems.
+[FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems with a particular design basis.
+
+### "Cloud first" vs. "cloud friendly" {#cloud-first .unnumbered}
+
+```include
+cloud-first.md
+```
+
+### Unfair advantage {.unnumbered}
 
 ```include
 word-md-tex.md
 ```
+
+### Licensing {.unnumbered}
 
 Besides noting that software being _free_ (regarding freedom, not price) does not imply the same as being _open source_, the requirement is clear in that the tool has to be both _free_ and _open source_, a combination which is usually called [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software). 
 
@@ -25,10 +35,11 @@ Besides noting that software being _free_ (regarding freedom, not price) does no
 licensing.md
 ```
 
-To sum up this section, FeenoX is...
+To sum up this introduction, FeenoX is...
 
- 1. a cloud-first computational tool (not just cloud _friendly,_ but cloud **first**).
- 2. both free ([as in freedom](https://en.wikipedia.org/wiki/Free_as_in_Freedom)) and open source.
+ #. a cloud-first computational tool (not just cloud _friendly,_ but cloud **first**).
+ #. to traditional computational software and to specialized libraries what [Markdown](https://en.wikipedia.org/wiki/Markdown) is to [Word](https://en.wikipedia.org/wiki/Microsoft_Word) and [TeX](https://en.wikipedia.org/wiki/TeX), respectively.
+ #. both free ([as in freedom](https://en.wikipedia.org/wiki/Free_as_in_Freedom)) and open source.
 
 
 
@@ -96,7 +107,7 @@ There are other FEA tools that even though born closer in time, also follow the 
 lorenz.md
 ```
 
-As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's\ 17\ Unix Rules (@sec:unix) in particular. One of the main ideas is the _rule of separation_ that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to partial differential equations (PDEs), where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows rule of separation.
+As already stated, FeenoX is designed and implemented following the UNIX philosophy in general and Eric Raymond's\ 17\ Unix Rules (@sec:unix) in particular. One of the main ideas is the _rule of separation_ (@sec:separation) that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend. The usage of FeenoX to compute and of Gnuplot to plot is a clear example of separation. Same idea applies to partial differential equations (PDEs), where the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows rule of separation.
 Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 
 From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user. Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based immersive augmented-reality application) without needing the modify the backend. Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
@@ -136,7 +147,7 @@ Very much like the C language (after A & B) and Unix itself (after a first attem
 
 Feenox is indeed the third version written from scratch after a first implementation in 2009 (different small components with different names) and a second one (named wasora) which was far more complex and had far more features circa 2012--2014. The third attempt, FeenoX, explicitly addresses the “do one thing well” idea from Unix. 
 
-Furthermore, not only is FeenoX itself both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but, following the _rule of composition_, it also is designed to connect and to work with  other free and open source software such as
+Furthermore, not only is FeenoX itself both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but, following the _rule of composition_ (@sec:composition), it also is designed to connect and to work with  other free and open source software such as
 
  * [Gmsh](http://gmsh.info/) for pre and/or post-processing
  * [ParaView](https://www.paraview.org/) for post-processing
@@ -199,9 +210,6 @@ Moreover, PETSc and SLEPc are scalable through the [MPI standard](https://www.mc
  - AWS/DigitalOcean/Contabo instances
 
 Due to the way that FeenoX is designed and the policy separated from the mechanism, it is possible to control a running instance remotely from a separate client which can eventually run on a mobile device ([@fig:caeplex-ipad]).
-
-![The web-based platform [CAEplex](https://www.caeplex.com) is mobile-friendly. <https://www.youtube.com/watch?v=7KqiMbrSLDc>](caeplex-ipad.jpg){#fig:caeplex-ipad}
-
 
 The following example illustrates how well FeenoX works as one of many links in a chain that goes from tracing a bitmap with the problem's geometry down to creating a nice figure with the results of a computation:
 
@@ -438,7 +446,7 @@ To illustrate how to use FeenoX in an optimization loop, let us consider the pro
 
 ![What length\ $\ell_1$ is needed so the fork vibrates at 440\ Hz?](fork-meshed.svg){#fig:fork-meshed width=20%}
 
-This extremely simple input file (_rule of simplicity_) solves the free-free mechanical modal problem (i.e. without any Dirichlet boundary condition) and prints the fundamental frequency:
+This extremely simple input file (_rule of simplicity_ @sec:simplicity) solves the free-free mechanical modal problem (i.e. without any Dirichlet boundary condition) and prints the fundamental frequency:
 
 ```{.feenox include="fork.fee"}
 ```
@@ -805,7 +813,7 @@ To illustrate both the filter approach, consider the following input file that s
 laplace.md
 ```
 
-A great deal of FeenoX interoperability capabilities comes from another design decision: **output is 100% controlled by the user** (further discussed in @sec:output), a.k.a. “no `PRINT`, no OUTPUT” whose corollary is the UNIX _rule of silence_.
+A great deal of FeenoX interoperability capabilities comes from another design decision: **output is 100% controlled by the user** (further discussed in @sec:output), a.k.a. “no `PRINT`, no OUTPUT” whose corollary is the UNIX _rule of silence_ (@sec:silence).
 The following input file computes the natural frequencies of oscillation of a cantilevered wire both using the Euler-Bernoulli theory and finite elements. It writes a [GFM table](https://github.github.com/gfm/#tables-extension-) into the standard output which is then piped to [Pandoc](https://pandoc.org/) and then converted to HTML:
 
 ```{.feenox include="wire.fee"}
@@ -1021,7 +1029,7 @@ $
 
 This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initiating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it.
 
-Following the _rule of repair_, ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
+Following the _rule of repair_ (@sec:repair), ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
 
 ```terminal
 $ feenox thermal-1d-dirichlet-no-k.fee
@@ -1268,7 +1276,7 @@ t = 0.003;
 Syntax highlighitng of input files in GUI and cloud-friendly text editors
 :::
 
-The ultimate goal of FeenoX is to solve mathematical equations that are hard to solve with pencil and paper. In particular, to integrate differential equations (recall that the first usable computer was named ENIAC, which stands for Electronic Numerical Integrator and Computer). The input file format was designed as to how to ask the _computer_ what to _compute_. The syntax, based on keywords and alphanumerical arguments was chosen as to sit in the middle of the purely binary numerical system employed by digital computers^[Analog and quantum computers are out of the scope.] and the purely linguistical nature of human communication. The rationale behind its design is that an average user can peek a FeenoX input file and tell what it is asking the computer to compute, as already illustrated for the [NAFEMS\ LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) in @fig:nafems-le10-problem-input. Even if the input files are created by a computer and not by a human, the code used to create a human-friendly input file will be human-friendlier than a code that writes only zeroes and ones as its output (that will become the input of another one following the Unix _rule of composition_).
+The ultimate goal of FeenoX is to solve mathematical equations that are hard to solve with pencil and paper. In particular, to integrate differential equations (recall that the first usable computer was named ENIAC, which stands for Electronic Numerical Integrator and Computer). The input file format was designed as to how to ask the _computer_ what to _compute_. The syntax, based on keywords and alphanumerical arguments was chosen as to sit in the middle of the purely binary numerical system employed by digital computers^[Analog and quantum computers are out of the scope.] and the purely linguistical nature of human communication. The rationale behind its design is that an average user can peek a FeenoX input file and tell what it is asking the computer to compute, as already illustrated for the [NAFEMS\ LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) in @fig:nafems-le10-problem-input. Even if the input files are created by a computer and not by a human, the code used to create a human-friendly input file will be human-friendlier than a code that writes only zeroes and ones as its output (that will become the input of another one following the Unix _rule of composition_ @sec:composition).
 As an exercise, compare the input file in @fig:nafems-le10-problem-input (or in @fig:highlighting) with the inputs files used by other open source FEA solvers shown in appendix @sec:le10-other.
 
 
@@ -1411,7 +1419,7 @@ As explained in the history of FeenoX (@sec:history), the first objective of the
 
 Besides ODEs, algebraic expressions are a must if one will be dealing with arbitrary functions in general and spatial distributions in particular---which is essentially what PDE solvers are for. If a piece of software wants to allow features ranging from comparing numerical results with analytical expression to converting material properties from a system of units to another one in a straightforward way for the user (either an actual human being or a computer creating an input file), it ought to be able to handle algebraic expressions. 
 
-Appropriately handling algebraic expressions leads to fulfilling the Unix rule of least surprise. If the user needs to define a function $f(x) = 1/2 \cdot x^2$, all she has to do is write
+Appropriately handling algebraic expressions leads to fulfilling the Unix rule of least surprise (@sec:least-surprise). If the user needs to define a function $f(x) = 1/2 \cdot x^2$, all she has to do is write
 
 ```feenox
 f(x) = 1/2 * x^2
@@ -1686,7 +1694,7 @@ Files that should not be tracked include
 
 since in principle they could be generated from the files in the Git repository by executing the scripts, Gmsh and/or FeenoX.
 
-Even more, in some cases, the FeenoX input files---following the Unix rule of generation--can be created out of generic macros that create particular cases. For example, say one has a mesh of a fin-based dissipator where all the surfaces are named `surf_1_`$i$ for $i=1,...,26$. All of them will have a convection boundary condition while surface number\ 6 is the one that is attached to the electronic part that has to be cooled. Instead of having to "manually" giving the list of surfaces that have the convection condition, we can use M4 to do it for us:
+Even more, in some cases, the FeenoX input files---following the Unix rule of generation @sec:generation--can be created out of generic macros that create particular cases. For example, say one has a mesh of a fin-based dissipator where all the surfaces are named `surf_1_`$i$ for $i=1,...,26$. All of them will have a convection boundary condition while surface number\ 6 is the one that is attached to the electronic part that has to be cooled. Instead of having to "manually" giving the list of surfaces that have the convection condition, we can use M4 to do it for us:
 
 ```{.feenox include="fins.fee.m4"}
 ```
