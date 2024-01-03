@@ -214,6 +214,43 @@ reference-thermal-kw.md
 reference-thermal-va.md
 ```
 
+## Linear elasticity {#mechanical}
+
+Set [`PROBLEM`](#problem) to `mechanical` to solve linear elasticity.
+
+> Check out the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) as well.
+
+
+### Elasticity results
+
+```{.include shift-heading-level-by=3}
+reference-mechanical-re.md
+```
+
+### Elasticity properties
+
+```{.include shift-heading-level-by=3}
+reference-mechanical-pr.md
+```
+
+
+### Elasticity boundary conditions
+
+```{.include shift-heading-level-by=3}
+reference-mechanical-bc.md
+```
+
+### Elasticity keywords
+
+```{.include shift-heading-level-by=3}
+reference-mechanical-kw.md
+```
+
+### Elasticity variables
+
+```{.include shift-heading-level-by=3}
+reference-mechanical-va.md
+```
 
 
 

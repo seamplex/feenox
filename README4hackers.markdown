@@ -1,14 +1,12 @@
 # FeenoX for Hackers
 
-- [<span class="toc-section-number">0.1</span> Why][]
-- [<span class="toc-section-number">0.2</span> How][]
-- [<span class="toc-section-number">0.3</span> What][]
+- [<span class="toc-section-number">1</span> Why][]
+- [<span class="toc-section-number">2</span> How][]
 
-  [<span class="toc-section-number">0.1</span> Why]: #why
-  [<span class="toc-section-number">0.2</span> How]: #how
-  [<span class="toc-section-number">0.3</span> What]: #what
+  [<span class="toc-section-number">1</span> Why]: #why
+  [<span class="toc-section-number">2</span> How]: #how
 
-## Why
+# Why
 
 Why is [FeenoX][] different from other “similar” tools?
 
@@ -81,12 +79,12 @@ programs (like [Code_Aster][] with [Salome-Meca][] or [CalculiX][] with
   [Gmsh]: http://gmsh.info
   [Paraview]: https://www.paraview.org/
 
-## How
+# How
 
 cloud first unix
 
 explain aws, docker, MPI
 
-## What
+\##What
 
 SRS + SDS

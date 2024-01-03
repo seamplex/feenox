@@ -385,8 +385,6 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
 // TODO: move this to a per-physics parser      
-///kw_pde+LINEARIZE_STRESS+desc Compute linearized membrane and/or bending stresses according to ASME\ VIII Div\ 2 Sec\ 5.
-///kw_pde+LINEARIZE_STRESS+usage LINEARIZE_STRESS
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
       feenox_call(feenox_parse_linearize_stress());
@@ -877,8 +875,8 @@ int feenox_parse_initial_conditions(void) {
 ///kw_dae+INITIAL_CONDITIONS+detail The `FROM_VARIABLES` option means calling IDA’s `IDACalcIC` routine with the parameter `IDA_YA_YDP_INIT`. 
 ///kw_dae+INITIAL_CONDITIONS+detail The `FROM_DERIVATIVES` option means calling IDA’s `IDACalcIC` routine with the parameter IDA_Y_INIT.
 ///kw_dae+INITIAL_CONDITIONS+detail Wasora should be able to automatically detect which variables in phase-space are differential and
-///kw_dae+INITIAL_CONDITIONS+detail which are purely algebraic. However, the [`DIFFERENTIAL`] keyword may be used to explicitly define them.
-///kw_dae+INITIAL_CONDITIONS+detail See the (SUNDIALS documentation)[https://computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf] for further information.
+///kw_dae+INITIAL_CONDITIONS+detail which are purely algebraic. However, the `DIFFERENTIAL` keyword may be used to explicitly define them.
+///kw_dae+INITIAL_CONDITIONS+detail See the [SUNDIALS documentation](https://computation.llnl.gov/casc/sundials/documentation/ida_guide.pdf) for further information.
   
 ///kw_dae+INITIAL_CONDITIONS+usage { AS_PROVIDED | FROM_VARIABLES | FROM_DERIVATIVES }
   char *keywords[] = {"AS_PROVIDED",

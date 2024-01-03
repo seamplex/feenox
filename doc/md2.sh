@@ -265,6 +265,7 @@ if [ "x${format}" = "x.html" ]; then
   
 elif [ "x${format}" = "x.markdown" ]; then
   sed -i 's/.\/\(.*\)\.md/\1.markdown/g'  ${out}
+  sed -i '/hash:/d' ${out}
   
 fi
  

@@ -1,21 +1,21 @@
 # FeenoX for Engineers
 
-- [<span class="toc-section-number">0.1</span> How FeenoX works][]
-- [<span class="toc-section-number">0.2</span> What][]
-- [<span class="toc-section-number">0.3</span> Why][]
+- [<span class="toc-section-number">1</span> How FeenoX works][]
+- [<span class="toc-section-number">2</span> What can FeenoX solve][]
+- [<span class="toc-section-number">3</span> Why][]
 
-  [<span class="toc-section-number">0.1</span> How FeenoX works]: #how-feenox-works
-  [<span class="toc-section-number">0.2</span> What]: #what
-  [<span class="toc-section-number">0.3</span> Why]: #sec:why
+  [<span class="toc-section-number">1</span> How FeenoX works]: #how-feenox-works
+  [<span class="toc-section-number">2</span> What can FeenoX solve]: #what-can-feenox-solve
+  [<span class="toc-section-number">3</span> Why]: #why
 
-## How FeenoX works
+# How FeenoX works
 
-> **Heads up** First things first:
+> **Heads up!** First things first:
 >
 > 1.  [FeenoX][] is not a traditional point-and-click finite-element
 >     solver. It **does not include** a graphical interface.
 >
-> 2.  FeenoX is designed as a cloud-first [back end][] for generic
+> 2.  FeenoX is designed as a [cloud-first][] [back end][] for generic
 >     computational workflows. One of these many workflows can be
 >     point-and-click graphical interface such as [CAEplex][] which
 >     allows to solve thermo-mechanical problems directly from the
@@ -23,7 +23,7 @@
 >
 > 3.  Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If
 >     you are using Windows, FeenoX may not be for you (but [CAEplex][]
->     may). See below
+>     may). See below to find out [why][] FeenoX works the way it does.
 
 In plain engineering terms, FeenoX works like a transfer function
 between one or more input files and zero or more output files:
@@ -37,29 +37,134 @@ between one or more input files and zero or more output files:
 When solving problems using the finite element method, FeenoX sits in
 the middle of pre and post-processing tools. The former should aid the
 engineer to prepare the mesh and, eventually, the input file. The latter
-should show the numerical results. See the tutorials.
+should show the numerical results. See the [tensile test tutorial][] for
+an in-depth step-by-step explanation.
 
-Terminal & cloud
+To fix ideas, let us consider the [NAFEMS LE10 “Thick plate pressure”
+benchmark][]. Fig. 1 shows that there is a one-to-one correspondence
+between the human-friendly problem formulation and the input file FeenoX
+reads.
+
+<figure id="fig:nafems-le10">
+<img src="nafems-le10-problem-input.svg" style="width:100.0%"
+alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption>Figure 1: The NAFEMS LE10 problem statement and the
+corresponding FeenoX input</figcaption>
+</figure>
+
+Say we already have a [`nafems-le10.geo`][] file which tells [Gmsh][]
+how to create a mesh `nafems-le10.msh` (check out the [tensile test
+tutorial][] for details). Then, we can create an input file for FeenoX
+(using [editors with syntax highlighting][] for example) as follows:
+
+``` feenox
+PROBLEM mechanical 3D
+READ_MESH nafems-le10.msh   # mesh in millimeters
+
+# LOADING: uniform normal pressure on the upper surface
+BC upper    p=1      # 1 Mpa
+
+# BOUNDARY CONDITIONS:
+BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
+BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
+BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+# MATERIAL PROPERTIES: isotropic single-material properties
+E = 210e3   # Young modulus in MPa
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # solve!
+
+# print the direct stress y at D (and nothing more)
+PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+```
+
+Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in
+the same directory, we call first Gmsh and then FeenoX from the terminal
+to solve the benchmark problem:
+
+<div id="cast-le10"></div>
+<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
+
+The trick is that this workflow is susceptible of being automated and
+customized to run in the cloud, possibly in parallel throughout several
+servers using the MPI standard. Check out this 1-minute video that
+covers a similar case from the [tensile-test
+tutorial][tensile test tutorial]:
+
+<div class="not-in-format latex">
+
+<video
+src="https://seamplex.com/feenox/doc/tutorials/110-tensile-test/quick.mp4"
+style="width:100.0%" controls=""><a
+href="https://seamplex.com/feenox/doc/tutorials/110-tensile-test/quick.mp4">Video</a></video> 
+
+</div>
+
+There is a sound explanation about [why FeenoX works this way][why] and
+not like other FEA tools you might have encountered in the past. If you
+are feeling curious, take a look at what FeenoX has to offer to
+[hackers][] and [academics][].
 
   [FeenoX]: https://www.seamplex.com/feenox
+  [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [back end]: https://en.wikipedia.org/wiki/Frontend_and_backend
   [CAEplex]: https://www.caeplex.com
+  [why]: #why
+  [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
+  [NAFEMS LE10 “Thick plate pressure” benchmark]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
+  [`nafems-le10.geo`]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo
+  [Gmsh]: http://gmsh.info/
+  [editors with syntax highlighting]: https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting
+  [hackers]: README4hackers.md
+  [academics]: README4academics.md
 
-## What
+# What can FeenoX solve
 
-Examples
+FeenoX can solve the following types of problems:
 
-Tutorials
+- [Basic mathematics][]
+- [Systems of ODEs/DAEs][]
+- [Laplace’s equation][]
+- [Heat conduction][]
+- [Linear elasticity][]
+- [Modal analysis][]
+- [Neutron diffusion][]
+- [Neutron S<sub>N</sub>][]
 
-Tests
+Take the tutorials to learn how to solve those types of problems:
 
-## Why
+0.  [Setting up your workspace][]
+1.  [Overview: the tensile test case][]
+2.  [Fun & games: solving mazes with PDES instead of AI][]
+3.  [Heat conduction][1]
+
+Browse through [the documentation][] to dive deeper into the details.
+
+  [Basic mathematics]: https://seamplex.com/feenox/examples/examples/basic.html
+  [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
+  [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
+  [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html
+  [Linear elasticity]: https://seamplex.com/feenox/examples/mechanical.html
+  [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
+  [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
+  [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
+  [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
+  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
+  [1]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
+  [the documentation]: https://seamplex.com/feenox/doc/
+
+# Why
 
 There are two “why” questions we have to answer.
 
 1.  Why is FeenoX different from other “similar” tools?
 
-    LE10
+    Consider again the NAFEMS LE10 case from fig. 1 above. Take some
+    time and think (or investigate) how other FEA tools handle this
+    case. Note the following features FeenoX provides:
 
     - ready-to-run executable (no need to compile)
     - self-explanatory plain-text near-English input file
@@ -71,19 +176,8 @@ There are two “why” questions we have to answer.
     - simple problems need simple inputs
     - similar problems need similar inputs
     - parametric and optimization runs through command-line arguments
-    - flexibility to handle many workflows
-
-2.  Why FeenoX works the way it does?
-
-    Because it is cloud first and its objective is to be flexible enough
-    to power web-based interfaces like [CAEplex][] and many other
-    workflows. More information in the details for [hackers][] and
-    [professors][].
-
-    Depending on the complexity of the case, [CAEplex][] might be enough
-    or not. If the latter, one has to see what’s sitting under the hood.
-    Again, peek into the [hackers][] and [professors][] details for more
-    information.
+    - flexibility to handle many workflows, including [web-based
+      interfaces][]
 
     > <div class="container text-center my-5 ratio ratio-16x9">
     >
@@ -99,6 +193,21 @@ There are two “why” questions we have to answer.
     >
     > </div>
 
-  [CAEplex]: https://www.caeplex.com
-  [hackers]: README4engineers.md
+2.  Why FeenoX works the way it does?
+
+    Because it is [cloud first][] and its objective is to be flexible
+    enough to power web-based interfaces like
+    [CAEplex][web-based interfaces] and many other workflows. More
+    information in the details for [hackers][2] and [professors][].
+
+    Depending on the complexity of the case,
+    [CAEplex][web-based interfaces] might be enough or not. If the
+    latter, one has to see what’s sitting under the hood. Peek into [the
+    documentation][] and [the repository][] for further details.
+
+  [web-based interfaces]: https://www.caeplex.com
+  [cloud first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
+  [2]: README4engineers.md
   [professors]: README4academics.md
+  [the documentation]: https://seamplex.com/feenox/doc/
+  [the repository]: https://github.com/seamplex/feenox/

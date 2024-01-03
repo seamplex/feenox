@@ -75,10 +75,10 @@ echo " - functionals"
 echo " - vector functions"
 ./reference.sh ../src/math/builtin_vectorfunctions.c fv > reference-fv.md
 
-for i in laplace thermal neutron_sn; do
+for i in laplace thermal mechanical neutron_sn; do
   echo " - ${i}"
   ./reference.sh ../src/pdes/${i}/init.c           pb_${i} > reference-${i}-pb.md
-  ./reference.sh ../src/pdes/${i}/init.c           kw_${i} > reference-${i}-kw.md
+  ./reference.sh ../src/pdes/${i}/parser.c         kw_${i} > reference-${i}-kw.md
   ./reference.sh ../src/pdes/${i}/init.c           va_${i} > reference-${i}-va.md
   ./reference.sh ../src/pdes/${i}/init.c           re_${i} > reference-${i}-re.md
   ./reference.sh ../src/pdes/${i}/init.c           pr_${i} > reference-${i}-pr.md

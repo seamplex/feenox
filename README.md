@@ -32,7 +32,7 @@ Choose your background for further details about the what, how and whys:
 
 ### Examples
 
- - [Basic mathematics](https://seamplex.com/feenox/examples/examples/basic.md)
+ - [Basic mathematics](https://seamplex.com/feenox/examples/examples/basic.html)
  - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
  - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
  - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
@@ -62,7 +62,7 @@ Choose your background for further details about the what, how and whys:
 
 The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository has hundreds of
  
- - examples,
+ - `grep`-able examples,
  - unit tests,
  - regression tests, and/or
  - (crude) mathematical verification tests.
@@ -140,7 +140,8 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
 Browse through the [documentation index](doc) and/or the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) subdirectory of the [Github repository](https://github.com/seamplex/feenox/) for
 
  * [FAQs](./doc/FAQ.md), including [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
- * [Manual](https://seamplex.com/feenox/doc/feenox-manual.md)
+ * [Manual](https://seamplex.com/feenox/doc/feenox-manual.html)
+ * [Description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
  * [Software Design Requirements](https://seamplex.com/feenox/doc/srs.html)
  * [Software Design Specifications](https://seamplex.com/feenox/doc/sds.html)
  * [Unix man page](https://seamplex.com/feenox/doc/feenox.1.html) (accesible through `man feenox` after installation)

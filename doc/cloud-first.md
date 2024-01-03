@@ -10,7 +10,7 @@ But what does this mean? Let us first start with the concept of "cloud friendlin
 Yet, the design of a cloud-first tool need concepts and more profound early-stage decisions.
 For instance, to make proper use of the computational resources available in remote servers launched on demand, it is needed to
 
- * have all the hosts in and particular network
+ * have all the hosts in a particular network
  * configure a proper domain name service
  * design shared network file systems
  * etc.
@@ -20,7 +20,7 @@ Instead of having to manually perform this set up each time a calculation is nee
  * launch and configure the remote computing instances, optionally using containerization technology
  * send the input files needed by the computational tools
  * launch the actual computational tools (Gmsh, FeenoX, etc.) over the instances, e.g. using `mpiexec` or similar
- * keep track of the calculation progress
+ * monitor and communicate with the solver as the calculation progresses
  * handle eventual errors
  * get back and process the results
  

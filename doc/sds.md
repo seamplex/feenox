@@ -1091,7 +1091,8 @@ $
 
 :::: {.only-in-format .html }
 ```{=html}
-<asciinema-player src="feenox-progress.cast" cols="128" rows="32" preload="true" poster="npt:0:1"></asciinema-player>
+<div id="feenox-progress"></div>
+<script>AsciinemaPlayer.create('feenox-progress.cast', document.getElementById('feenox-progress'), {cols:128,rows:32, poster: 'npt:0:1'});</script>
 ```
 ::::
 

@@ -64,7 +64,7 @@ Choose your background for further details about the what, how and whys:
 - [Neutron diffusion][]
 - [Neutron S<sub>N</sub>][]
 
-  [Basic mathematics]: https/seamplex.com/feenox/examples/examples/basic.markdown
+  [Basic mathematics]: https://seamplex.com/feenox/examples/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
   [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html
@@ -89,7 +89,7 @@ Choose your background for further details about the what, how and whys:
 
 The [`tests`][] directory in the repository has hundreds of
 
-- examples,
+- `grep`-able examples,
 - unit tests,
 - regression tests, and/or
 - (crude) mathematical verification tests.
@@ -235,6 +235,7 @@ subdirectory of the [Github repository][] for
 
 - [FAQs][], including [what FeenoX means][]
 - [Manual][]
+- [Description][]
 - [Software Design Requirements][]
 - [Software Design Specifications][]
 - [Unix man page][] (accesible through `man feenox` after installation)
@@ -247,7 +248,8 @@ subdirectory of the [Github repository][] for
   [Github repository]: https://github.com/seamplex/feenox/
   [FAQs]: doc/FAQ.markdown
   [what FeenoX means]: https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean
-  [Manual]: https/seamplex.com/feenox/doc/feenox-manual.markdown
+  [Manual]: https://seamplex.com/feenox/doc/feenox-manual.html
+  [Description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [Software Design Requirements]: https://seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://seamplex.com/feenox/doc/sds.html
   [Unix man page]: https://seamplex.com/feenox/doc/feenox.1.html

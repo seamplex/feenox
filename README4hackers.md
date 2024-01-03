@@ -8,7 +8,7 @@ number-sections: true
 toc: true
 ...
 
-## Why
+# Why
 
 Why is [FeenoX](https://www.seamplex.com/feenox) different from other "similar" tools?
 
@@ -16,7 +16,7 @@ Why is [FeenoX](https://www.seamplex.com/feenox) different from other "similar" 
 doc/word-md-tex.md
 ```
 
-## How
+# How
 
 cloud first
 unix
@@ -24,6 +24,6 @@ unix
 explain aws, docker, MPI
 
 
-## What
+##What
 
 SRS + SDS

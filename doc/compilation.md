@@ -305,7 +305,8 @@ The [`test`](https://github.com/seamplex/feenox/tree/main/tests) directory conta
 
 :::: {.only-in-format .html }
 ```{=html}
-<asciinema-player src="feenox-test-suite.cast" cols="128" rows="32" preload="true" poster="npt:0:6"></asciinema-player>
+<div id="feenox-test-suite"></div>
+<script>AsciinemaPlayer.create('feenox-test-suite.cast', document.getElementById('feenox-test-suite'), {cols:128,rows:32, poster: 'npt:0:6'});</script>
 ```
 ::::
 

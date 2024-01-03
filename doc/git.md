@@ -4,7 +4,8 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX's
 
 :::: {.only-in-format .html }
 ```{=html}
-<asciinema-player src="feenox-clone-configure-make-check-install.cast" cols="128" rows="32" preload="true" poster="npt:0:10"></asciinema-player>
+<div id="feenox-clone-configure-make-check-install"></div>
+<script>AsciinemaPlayer.create('feenox-clone-configure-make-check-install.cast', document.getElementById('feenox-clone-configure-make-check-install'), {cols:128,rows:32, poster: 'npt:0:10'});</script>
 ```
 ::::
 

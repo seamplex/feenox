@@ -41,9 +41,11 @@ for kw in ${kws}; do
   echo "#  \`${kw}\`"
   echo
   
-  echo ":::"
+  echo "::: {.fst-italic .body-blue}"
+  echo
   grep "///${tag}+${kw}+desc" ${src} | cut -d" " -f2-
   echo ":::"
+  echo
   echo  
   
   # usage
