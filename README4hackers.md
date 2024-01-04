@@ -42,6 +42,8 @@ Unlike other similar FEA tools, FeenoX provides...
 
  * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting)) self-explanatory ASCII file (passed as the first non-option argument to the `feenox` executable)  with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow
  
+ * continuous integration (using Github actions), an issue tracker (using Github issues) and a discussion page (using Github discussinos)
+ 
  * a Git repository with GPL sources (and FDL documentation) where contributions are welcome. In particular, each partial differential equation that FeenoX can solve correspondence to one of the subdirectories of `src/pdes`. The `autogen.sh` step (prior to `./configure` and `make`) detects the directory structure and includes all the subdirectories it finds as available [problem types](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem). They can be queried at runtime with the `--pdes` option:
  
     ```terminal
