@@ -113,6 +113,8 @@ There are two "why" questions we have to answer.
        - one-to-one correspondence between computer input file and human description of the problem
        - Git-traceable (mesh is not part of the input file)
        - everything is an expression
+         - material properties can be given as functions of space and/or time and/or temperature (or other intermediate variables)
+         - these functions can be given as algebraic expresions or come from interpolateed point-wise defined data
      * 100% user-defined output
      * simple problems need simple inputs
      * similar problems need similar inputs
