@@ -32,22 +32,16 @@ Choose your background for further details about the what, how and whys:
 
 ### Examples
 
- - [Basic mathematics](https://seamplex.com/feenox/examples/examples/basic.html)
- - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
- - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
- - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
- - [Linear elasticity](https://seamplex.com/feenox/examples/mechanical.html)
- - [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
- - [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
- - [Neutron S<sub>N</sub>](https://seamplex.com/feenox/examples/neutron_sn.html)
+```include
+doc/examples-list.md
+```
 
 ### Tutorials
 
+```include
+doc/tutorials-list.md
+```
 
- 0. [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup)
- 1. [Overview: the tensile test case](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test)
- 2. [Fun & games: solving mazes with PDES instead of AI](https://www.seamplex.com/feenox/doc/tutorials/120-mazes)
- 3. [Heat conduction](https://www.seamplex.com/feenox/doc/tutorials/320-thermal)
 
 ::::: {.only-in-format .html }
 
@@ -60,12 +54,9 @@ Choose your background for further details about the what, how and whys:
     
 ### Tests
 
-The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository has hundreds of
- 
- - `grep`-able examples,
- - unit tests,
- - regression tests, and/or
- - (crude) mathematical verification tests.
+```include
+doc/tests-list.md
+```
  
 ## Capabilities
 

@@ -14,6 +14,9 @@ toc: true
 A program, i.e. something your run, reads the problem in a plain text file containing definitions and instructions, solves it, writes the output (if asked for with instructions in the input file) and returns back to the shell.
 It is deliberately not a library, i.e. something you have to link your code against. Link to SRS.
 
+see engineers for examples, tutorials
+
+PhD
 
 ## How
 
@@ -110,6 +113,6 @@ FeenoX sits in the middle:
  * it uses the Unix philosophy which, among others, separates policy from mechanism and thus FeenoX is a natural choice for web-based interfaces like CAEplex
  
 
- 
+See hackers
  
  

@@ -80,21 +80,15 @@ There is a sound explanation about [why FeenoX works this way](#why) and not lik
 
 FeenoX can solve the following types of problems:
 
- - [Basic mathematics](https://seamplex.com/feenox/examples/examples/basic.html)
- - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
- - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
- - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
- - [Linear elasticity](https://seamplex.com/feenox/examples/mechanical.html)
- - [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
- - [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
- - [Neutron S<sub>N</sub>](https://seamplex.com/feenox/examples/neutron_sn.html)
+```include
+doc/examples-list.md
+```
 
 Take the tutorials to learn how to solve those types of problems:
  
- 0. [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup)
- 1. [Overview: the tensile test case](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test)
- 2. [Fun & games: solving mazes with PDES instead of AI](https://www.seamplex.com/feenox/doc/tutorials/120-mazes)
- 3. [Heat conduction](https://www.seamplex.com/feenox/doc/tutorials/320-thermal)
+```include
+doc/tutorials-list.md
+```
  
 Browse through [the documentation](https://seamplex.com/feenox/doc/) to dive deeper into the details.
  
@@ -132,7 +126,7 @@ There are two "why" questions we have to answer.
  2. Why FeenoX works the way it does?
  
     Because it is [cloud first](https://seamplex.com/feenox/doc/sds.html#cloud-first) and its objective is to be flexible enough to power web-based interfaces like [CAEplex](https://www.caeplex.com) and many other workflows.
-    More information in the details for [hackers](README4engineers.md) and [professors](README4academics.md).
+    More information in the details for [Unix experts](README4hackers.md) and [professors](README4academics.md).
     
     Depending on the complexity of the case, [CAEplex](https://www.caeplex.com) might be enough or not.
     If the latter, one has to see what's sitting under the hood.
