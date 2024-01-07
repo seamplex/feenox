@@ -532,9 +532,28 @@ Regarding storage, FeenoX needs space to store the input file (negligible), the 
 > 240-scalability.md
 > ```
 
-The time needed to solve a relatively large problem can be reduced by exploiting the fact that most cloud servers (and even laptop computers) have more than one CPU available. There are some tasks that can be split into several processors sharing a common memory address space that will scale up almost perfectly, such as building the elemental matrices and assembling the global stiffness matrix. There are some other tasks that might not scale perfectly but that nevertheless might (or might not) reduce the overall wall time if split among processors using a common memory space, such as solving the linear system\ $K \cdot \vec{u} = \vec{b}$. The usual scheme to parallelize a problem under these conditions is to use the [OpenMP](https://en.wikipedia.org/wiki/OpenMP) framework.
+When for a fixed problem the mesh is refined over and over, more and more computational resources are needed to solve it (and to obtain more accurate results, of course).
+Parallelization can help to 
 
-Yet, if the problem is large enough, a server might not have enough physical random-access memory to be able to handle the whole problem. The problem now has to be split among different servers which, in turn, might have several processors each. Some of the processors share the same address space but most of them will only have access to a fraction of the whole global problem data. In these cases, there are no tasks that can scale up perfectly since even when building and assembling the matrices, a processor needs some piece of data which is handled by another processor with a different address space and that has to be conveyed specifically from one process to another one. The usual scheme to parallelize a problem under these conditions is to use the [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) standard and one of its two most well-known implementations, either [Open\ MPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/).
+ a. reduce the wall time needed to solve a problem by using several processors at the same time
+ b. allow to solve big problems that would not fit into a single computer by splitting them into smaller parts, each of them fitting in a single computer
+
+There are three types of parallelization schemes:
+
+Shared-memory systems (OpenMP)
+
+:   several processing units sharing a single memory address space
+
+Distributed systems (MPI)
+
+:   several computational units, each with their own processing units and memory, inter-connected with high-speed network hardware
+
+Graphical processing units (GPU)
+
+:   used as co-processors to solve numerically-intensive problems
+
+In principle, any of these three schemes can be used to reduce the wall time (a).
+But only the distributed systems scheme allows to solve arbitrarily big problems (b).
 
 It might seem that the most effective approach to solve a large problem is to use OpenMP (not to be confused with OpenMPI!) among threads running in processors that share the memory address space and to use MPI among processes running in different hosts. But even though this hybrid OpenMP+MPI scheme is possible, there are at least three main drawbacks with respect to a pure MPI approach:
 
@@ -545,18 +564,180 @@ It might seem that the most effective approach to solve a large problem is to us
 In many ways, the pure MPI mode has fewer synchronizations and thus should perform better.
 Hence, FeenoX uses MPI (mainly through PETSc and SLEPc) to handle large parallel problems.
 
-::: {#fig:nafems-le1-metis layout-ncol=2}
-![Structured grid](nafems-le1-struct-metis.png){width=49%}
+To illustrate FeenoX's MPI features, let us consider the following input file (which is part of FeenoX's tests suite):
 
-![Unstructured grid](nafems-le1-unstruct-metis.png){width=49%}
+```feenox
+PRINTF_ALL "Hello MPI World!"
+```
 
-Partition of the [2D NAFEMS LE1](https://www.seamplex.com/feenox/examples/#nafems-le1-elliptical-membrane-plane-stress-benchmark) domain into four different sub-domains computed in [Gmsh](http://gmsh.info/) using [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview).
+The instruction `PRINTF_ALL` (at the end of the day, it is a verb) asks all the processes to write the `printf`-formatted arguments in the standard output. A prefix is added to each line with the process id and the name of the host.
+When running FeenoX with this input file through `mpiexec` in an AWS server which has already been properly configured to connect to another one and split the MPI processes, we get:
+
+```terminal
+ubuntu@ip-172-31-44-208:~/mpi/hello$ mpiexec --verbose --oversubscribe --hostfile hosts -np 4 ./feenox hello_mpi.fee 
+[0/4 ip-172-31-44-208] Hello MPI World!
+[1/4 ip-172-31-44-208] Hello MPI World!
+[2/4 ip-172-31-34-195] Hello MPI World!
+[3/4 ip-172-31-34-195] Hello MPI World!
+ubuntu@ip-172-31-44-208:~/mpi/hello$ 
+```
+
+That is to say,host `ip-172-31-44-208` spawns two local processes `feenox` and, at the same time, asks host `ip-172-31-34-195` to create two new processes  in it.
+These scheme would allow to solve a problem in parallel where the CPU and RAM loads are split into two different servers.
+
+![Gmsh's tutorial `t21`: two squares decomposed in 6 partitions.](t21.svg){#fig:t21 width=90%}
+
+We can used Gmsh's tutorial `t21` that illustrated the concept of domain decomposition (DDM) to show another aspect of how MPI parallelization works in FeenoX.
+In effect, let us consider the mesh from @fig:t21 that consists of two non-dimensional squares of size $1 \times 1$ and let us say we want to compute the integral of the constant 1 over the surface to obtain the numerical result 2.
+
+```feenox
+READ_MESH t21.msh
+INTEGRATE 1 RESULT two
+PRINTF_ALL "%g" two
+```
+
+In this case, the instruction `INTEGRATE` is executed in parallel where each process computes the local contribution and, before moving into the next instruction (`PRINTF_ALL`), all processes synchronize and sum up all these contributions (i.e. they perform a sum reduction) and all the processes obtain the global result in the variable `two`:
+
+```terminal
+$ mpiexec -n 2 feenox t21.fee 
+[0/2 tom] 2
+[1/2 tom] 2
+$ mpiexec -n 4 feenox t21.fee 
+[0/4 tom] 2
+[1/4 tom] 2
+[2/4 tom] 2
+[3/4 tom] 2
+$ mpiexec -n 6 feenox t21.fee 
+[0/6 tom] 2
+[1/6 tom] 2
+[2/6 tom] 2
+[3/6 tom] 2
+[4/6 tom] 2
+[5/6 tom] 2
+$ 
+```
+
+To illustrate what is happening under the hood, let us temporarily modify the FeenoX source code so that each process shows the local contribution:
+
+```terminal
+$ mpiexec -n 2 feenox t21.fee
+[process 0] my local integral is 0.996699
+[process 1] my local integral is 1.0033
+[0/2 tom] 2
+[1/2 tom] 2
+$ mpiexec -n 3 feenox t21.fee
+[process 0] my local integral is 0.658438
+[process 1] my local integral is 0.672813
+[process 2] my local integral is 0.668749
+[0/3 tom] 2
+[1/3 tom] 2
+[2/3 tom] 2
+$ mpiexec -n 4 feenox t21.fee
+[process 0] my local integral is 0.505285
+[process 1] my local integral is 0.496811
+[process 2] my local integral is 0.500788
+[process 3] my local integral is 0.497116
+[0/4 tom] 2
+[1/4 tom] 2
+[2/4 tom] 2
+[3/4 tom] 2
+$ mpiexec -n 5 feenox t21.fee
+[process 0] my local integral is 0.403677
+[process 1] my local integral is 0.401883
+[process 2] my local integral is 0.399116
+[process 3] my local integral is 0.400042
+[process 4] my local integral is 0.395281
+[0/5 tom] 2
+[1/5 tom] 2
+[2/5 tom] 2
+[3/5 tom] 2
+[4/5 tom] 2
+$ mpiexec -n 6 feenox t21.fee
+[process 0] my local integral is 0.327539
+[process 1] my local integral is 0.330899
+[process 2] my local integral is 0.338261
+[process 3] my local integral is 0.334552
+[process 4] my local integral is 0.332716
+[process 5] my local integral is 0.336033
+[0/6 tom] 2
+[1/6 tom] 2
+[2/6 tom] 2
+[3/6 tom] 2
+[4/6 tom] 2
+[5/6 tom] 2
+$ 
+```
+
+Note that in the cases with 4 and 5 processes, the number of partitions $P$ is not a multpiple of the number of processes $N$.
+Anyway, FeenoX is able to distribute the load is able to distribute the load among the $N$ processes, even though the efficiency is slighly less than in the other cases.
 :::
 
-Most of the overhead of parallelized tasks come from the fact that processes need data stored in other processes (i.e. the so-called ghost points) that use a differet virtual memory address space.
-Therefore, the discretized domain has to be split among processes in such a way as to minimize the number of inter-process communication. This problem, called domain decomposition, can be handled either by the mesher or by the solver itself, usually using a third-part library such as [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview). It should be noted that the domain decomposition problem does not have a unique solution. On the one hand, it depends on the actual mesh being distributed over parallel processes as illustrated in @fig:nafems-le1-metis. On the other hand, the optimal solution might depend on the kind of topology boundaries to minimize (shared nodes, shared faces) and other subtle parameters and options that partitioning libraries allow.
+When solving PDEs, FeenoX builds the local matrices and vectors and then asks PETSc to assemble the global objects by sending non-local information as MPI messages.
+This way, all processes have contiguous rows as local data and the system of equations can be solved in parallel using the distributed system paradigm.
 
-FeenoX relies on [Gmsh](http://gmsh.info/) to perform the domain decomposition (using Metis at mesh-time) and to provide the partitioning information in the mesh file read by the `READ_MESH` keyword.
+We can show that both
+
+ a. the wall time, and
+ b. the per-process memory
+ 
+decrease when running a fixed-sized problem with MPI in parallel using the IAEA 3D PWR benchmark:
+
+```feenox
+PROBLEM neutron_diffusion 3D GROUPS 2
+
+DEFAULT_ARGUMENT_VALUE 1 quarter
+READ_MESH iaea-3dpwr-$1.msh
+
+MATERIAL fuel1     D1=1.5 D2=0.4 Sigma_s1.2=0.02 Sigma_a1=0.01 Sigma_a2=0.08  nuSigma_f2=0.135
+MATERIAL fuel2     D1=1.5 D2=0.4 Sigma_s1.2=0.02 Sigma_a1=0.01 Sigma_a2=0.085 nuSigma_f2=0.135
+MATERIAL fuel2rod  D1=1.5 D2=0.4 Sigma_s1.2=0.02 Sigma_a1=0.01 Sigma_a2=0.13  nuSigma_f2=0.135
+MATERIAL reflector D1=2.0 D2=0.3 Sigma_s1.2=0.04 Sigma_a1=0    Sigma_a2=0.01  nuSigma_f2=0
+MATERIAL reflrod   D1=2.0 D2=0.3 Sigma_s1.2=0.04 Sigma_a1=0    Sigma_a2=0.055 nuSigma_f2=0
+  
+BC vacuum   vacuum=0.4692
+BC mirror   mirror
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk
+
+PRINT  "geometry = $1"
+PRINTF "    keff = %.5f"     keff
+PRINTF "   nodes = %g"       nodes
+PRINTF "    DOFs = %g"       total_dofs
+PRINTF "  memory = %.1f Gb (local) %.1f Gb (global)" mpi_memory_local() mpi_memory_global()
+PRINTF "    wall = %.1f sec" wall_time()
+```
+
+```terminal
+$ mpiexec -n 1 feenox iaea-3dpwr.fee quarter
+geometry = quarter
+    keff = 1.02918
+   nodes = 70779
+    DOFs = 141558
+[0/1 LIN54Z7SQ3]   memory = 2.3 Gb (local) 2.3 Gb (global)
+    wall = 26.2 sec
+$ mpiexec -n 2 feenox iaea-3dpwr.fee quarter
+geometry = quarter
+    keff = 1.02918
+   nodes = 70779
+    DOFs = 141558
+[0/2 LIN54Z7SQ3]   memory = 1.5 Gb (local) 3.0 Gb (global)
+[1/2 LIN54Z7SQ3]   memory = 1.5 Gb (local) 3.0 Gb (global)
+    wall = 17.0 sec
+$ mpiexec -n 4 feenox iaea-3dpwr.fee quarter
+geometry = quarter
+    keff = 1.02918
+   nodes = 70779
+    DOFs = 141558
+[0/4 LIN54Z7SQ3]   memory = 1.0 Gb (local) 3.9 Gb (global)
+[1/4 LIN54Z7SQ3]   memory = 0.9 Gb (local) 3.9 Gb (global)
+[2/4 LIN54Z7SQ3]   memory = 1.1 Gb (local) 3.9 Gb (global)
+[3/4 LIN54Z7SQ3]   memory = 0.9 Gb (local) 3.9 Gb (global)
+    wall = 13.0 sec
+$ 
+```
+
+
 
 
 ## Flexibility {#sec:flexibility}
