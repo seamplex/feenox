@@ -16,6 +16,8 @@ It is deliberately not a library, i.e. something you have to link your code agai
 
 see engineers for examples, tutorials
 
+MMS
+
 PhD
 
 ## How
@@ -90,6 +92,7 @@ Researchers with both knowledge of mathematical theory of finite elements and pr
 
 See the [programming guide](doc/programming.md) for details.
 
+See hackers for more technical details about how FeenoX works.
 
 
 
@@ -113,6 +116,6 @@ FeenoX sits in the middle:
  * it uses the Unix philosophy which, among others, separates policy from mechanism and thus FeenoX is a natural choice for web-based interfaces like CAEplex
  
 
-See hackers
- 
+See hackers for another explanation about why FeenoX is different from other computational tools.
+
  

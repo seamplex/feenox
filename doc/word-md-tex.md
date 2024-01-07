@@ -1,4 +1,4 @@
-To better illustrate FeenoX’s unfair advantage (in the entrepreneurial sense), let us first consider what the options are when an engineer needs to to write a technical report, paper or document:
+To better illustrate FeenoX’s unfair advantage (in the entrepreneurial sense), let us first consider what the options are when we need to write a technical report, paper or document:
 
 ::: {.not-in-format .latex}
  Feature                               | Microsoft Word |  Google Docs  |  Markdown[^1]    |  (La)TeX
@@ -33,11 +33,11 @@ After analyzing the pros and cons of each alternative, at some point it should b
 ::: {.not-in-format .latex}
  Feature                               | Desktop GUIs  |   Web frontends  |  FeenoX[^2]  |  Libraries
 :--------------------------------------|:--------------:|:-------------:|:------------:|:----------------:
- Flexibility                           |      😐       |         ❌        |     ✅    |      ✅
+ Flexibility                           |     ❌/😐      |        ❌/😐      |     ✅    |      ✅
  Scalability                           |      ❌        |         😐       |     ✅    |      ✅
  Traceability                          |      ❌        |         😐       |     ✅    |      ✅
  Cloud-friendliness                    |      ❌        |         ✅        |     ✅    |      ✅
- Collaborativeness                     |      ❌        |         ✅        |     ✅    |      ❌
+ Collaborativeness                     |      ❌        |         ✅        |     ✅    |      😐
  Licensing/openness                    |   ✅/😐/❌      |         ❌        |     ✅    |      ✅
  Non-nerd friendliness                 |      ✅        |         ✅        |     😐   |      ❌
 :::
@@ -49,7 +49,7 @@ After analyzing the pros and cons of each alternative, at some point it should b
  Scalability                           |      $\times$            |         $\sim$          |     $\checkmark$       |      $\checkmark$
  Traceability                          |      $\times$            |         $\sim$          |     $\checkmark$       |      $\checkmark$
  Cloud-friendliness                    |      $\times$            |         $\checkmark$        |     $\checkmark$       |      $\checkmark$
- Collaborativeness                     |      $\times$            |         $\checkmark$        |     $\checkmark$       |      $\times$
+ Collaborativeness                     |      $\times$            |         $\checkmark$        |     $\checkmark$       |      $\sim$
  Licensing/openness                    | $\checkmark$/$\sim$/$\times$ |         $\times$        |     $\checkmark$       |      $\checkmark$
  Non-nerd friendliness                 |      $\checkmark$            |         $\checkmark$        |     $\sim$         |      $\times$
 :::
@@ -59,4 +59,14 @@ After analyzing the pros and cons of each alternative, at some point it should b
 [^2]: Here “FeenoX” means ([FeenoX](https://seamplex.com/feenox) + [Gmsh](http://gmsh.info) + [Paraview](https://www.paraview.org/) + [Git](https://git-scm.com/) + [Github](https://github.com/) / [Gitlab](https://about.gitlab.com/) / [Gitea](https://gitea.com/}{Gitea}))
 
 
-Therefore, on the one hand, FeenoX is---in a certain sense---to desktop FEA programs (like [Code_Aster](https://www.code-aster.org/spip.php?rubrique2) with [Salome-Meca](https://www.code-aster.org/V2/spip.php?article303) or [CalculiX](http://www.calculix.de/) with [PrePoMax](https://prepomax.fs.um.si/)) and libraries (like [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) or [Sparselizard](http://sparselizard.org/)) what [Markdown](https://commonmark.org/) is to Word and [(La)TeX](https://en.wikipedia.org/wiki/LaTeX), respectively and _deliberately_.
+Therefore, FeenoX is---in a certain sense---to desktop FEA programs like
+
+ * [Code_Aster](https://www.code-aster.org/spip.php?rubrique2) with [Salome-Meca](https://www.code-aster.org/V2/spip.php?article303), or
+ * [CalculiX](http://www.calculix.de/) with [PrePoMax](https://prepomax.fs.um.si/))
+ 
+and to libraries like
+
+ * [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) or
+ * [Sparselizard](http://sparselizard.org/)
+
+what [Markdown](https://commonmark.org/) is to Word and [(La)TeX](https://en.wikipedia.org/wiki/LaTeX), respectively and _deliberately_.

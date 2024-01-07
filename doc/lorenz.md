@@ -1,5 +1,6 @@
 
-For example, let us consider the famous chaotic [Lorenz’s dynamical system](http://en.wikipedia.org/wiki/Lorenz_system). Here is one way of getting an image of the butterfly-shaped attractor using FeenoX to compute it and [Gnuplot](http://www.gnuplot.info/) to draw it. Solve 
+Let us consider the famous chaotic [Lorenz’s dynamical system](https://www.seamplex.com/feenox/examples/daes.html#lorenz-attractorthe-one-with-the-butterfly).
+Here is one way of getting an image of the butterfly-shaped attractor using FeenoX to compute it and [Gnuplot](http://www.gnuplot.info/) to draw it. Solve 
 
 ::: {.not-in-format .texi .plain .gfm}
 $$
@@ -45,7 +46,8 @@ The following ASCII input file ressembles the parameters, inital conditions and 
 
 ![The Lorenz attractor solved with FeenoX and drawn with Gnuplot](lorenz.svg){#fig:lorenz-gnuplot width_latex=75% width_html=100% width_texinfo=12cm}
 
-Indeed, when executing FeenoX with this input file, we get four ASCII columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and plot it with a standard tool such as [Gnuplot]((http://www.gnuplot.info/)). Note the importance of relying on plain ASCII text  formats both for input and output, as recommended by the UNIX philosophy and the _rule of composition_: other programs can easily create inputs for FeenoX and other programs can easily understand FeenoX's outputs. This is essentially how UNIX filters and pipes work.
+Indeed, when executing FeenoX with this input file, we get four ASCII columns ($t$, $x$, $y$ and $z$) which we can then redirect to a file and plot it with a standard tool such as [Gnuplot]((http://www.gnuplot.info/)). Note the importance of relying on plain ASCII text  formats both for input and output, as recommended by the Unix philosophy and the _rule of composition_: other programs can easily create inputs for FeenoX and other programs can easily understand FeenoX's outputs. This is essentially how Unix filters and pipes work.
 
+Note the one-to-one correspondence between the human-friendly differential equations (written in TeX and rendered as typesetted mathematical symbols) and the computer-friendly input file that FeenoX reads.
 
  

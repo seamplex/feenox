@@ -16,9 +16,9 @@ Why is [FeenoX](https://www.seamplex.com/feenox) different from other "similar" 
 doc/word-md-tex.md
 ```
 
-Unlike other similar FEA tools, FeenoX provides...
+Unlike these other FEA tools, FeenoX provides...
 
- * a ready-to-run executable (which uses Autotools and friends to compile) that reads the problem to be solved at run time (i.e. it is a **program** not a _library*) designed an implemented following the Unix programming philosophy:
+ * a ready-to-run executable (which uses Autotools and friends to compile) that reads the problem to be solved at run time (i.e. it is a **program** not a _library_) designed an implemented following the Unix programming philosophy:
 
    ```terminal
    $ feenox
@@ -40,7 +40,7 @@ Unlike other similar FEA tools, FeenoX provides...
    ```
 
 
- * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting)) self-explanatory ASCII file (passed as the first non-option argument to the `feenox` executable)  with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow using containerized images (because there is no need to recompile the binary for each problem)
+ * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) self-explanatory ASCII file (passed as the first non-optional argument to the `feenox` executable)  with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow using containerized images (because there is no need to recompile the binary for each problem).
  
  * a Git repository with GPL sources (and FDL documentation) where contributions are welcome. In particular, each partial differential equation that FeenoX can solve correspondence to one of the subdirectories of `src/pdes`. The `autogen.sh` step (prior to `./configure` and `make`) detects the directory structure and includes all the subdirectories it finds as available [problem types](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem). They can be queried at runtime with the `--pdes` option:
  
@@ -55,11 +55,11 @@ Unlike other similar FEA tools, FeenoX provides...
     $ 
     ```
     
- * continuous integration (using Github actions), an issue tracker (using Github issues) and a discussion page (using Github discussinos)
+ * continuous integration (using Github actions), an issue tracker (using Github issues) and a discussion page (using Github discussions)
   
  * a mechanism to expand command-line arguments as literal strings in the input file so as to allow parametric (and/or optimization) loops. For instance, if an input file `print.fee` looks like
  
-   ```fee
+   ```feenox
    PRINT 2*${1}
    ```
    then

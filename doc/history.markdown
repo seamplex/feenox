@@ -1,6 +1,6 @@
 # History and motivation
 
-Very much like UNIX in the late 1960s and C in the early 1970s,
+Very much like Unix in the late 1960s and C in the early 1970s,
 [FeenoX][] is a third-system effect: I wrote a first hack that seemed to
 work better than I had expected. Then I tried to add a lot of features
 and complexities which I felt the code needed. After ten years of actual

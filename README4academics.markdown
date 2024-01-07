@@ -16,6 +16,12 @@ output (if asked for with instructions in the input file) and returns
 back to the shell. It is deliberately not a library, i.e. something you
 have to link your code against. Link to SRS.
 
+see engineers for examples, tutorials
+
+MMS
+
+PhD
+
 ## How
 
 By leveraging the Unix programming philosophy to come up with a
@@ -108,6 +114,8 @@ using one of these directories (say [`laplace`][]) as a template and
 
 See the [programming guide][] for details.
 
+See hackers for more technical details about how FeenoX works.
+
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
   [PETSc]: https://petsc.org/
@@ -153,3 +161,6 @@ FeenoX sits in the middle:
 - it uses the Unix philosophy which, among others, separates policy from
   mechanism and thus FeenoX is a natural choice for web-based interfaces
   like CAEplex
+
+See hackers for another explanation about why FeenoX is different from
+other computational tools.

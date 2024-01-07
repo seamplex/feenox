@@ -160,7 +160,7 @@ running in virtually any hardware platform. FeenoX can run be run either
 in HPC cloud servers or a Raspberry Pi, and almost everything that sits
 in the middle.
 
-Following the UNIX philosophy discussed in the [SDS][], FeenoX re-uses a
+Following the Unix philosophy discussed in the [SDS][], FeenoX re-uses a
 lot of already-existing high-quality free and open source libraries that
 implement a wide variety of mathematical operations. This leads to a
 number of dependencies that FeenoX needs in order to implement certain
@@ -277,7 +277,7 @@ In absence of all these, FeenoX can still be used to
 - solve general mathematical problems such as the ones to compute the
   [Fibonacci sequence][] or the [Logistic map][],
 - operate on functions, either algebraically or point-wise interpolated
-  such as [Computing the derivative of a function as a UNIX filter][]
+  such as [Computing the derivative of a function as a Unix filter][]
 - read, operate over and write meshes,
 - etc.
 
@@ -292,7 +292,7 @@ time will be skipped.
   [SLEPc]: https://slepc.upv.es/
   [Fibonacci sequence]: https://www.seamplex.com/feenox/examples/#the-fibonacci-sequence
   [Logistic map]: https://www.seamplex.com/feenox/examples/#the-logistic-map
-  [Computing the derivative of a function as a UNIX filter]: https://www.seamplex.com/feenox/examples/#computing-the-derivative-of-a-function-as-a-unix-filter
+  [Computing the derivative of a function as a Unix filter]: https://www.seamplex.com/feenox/examples/#computing-the-derivative-of-a-function-as-a-unix-filter
 
 ### SUNDIALS
 

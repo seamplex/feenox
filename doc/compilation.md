@@ -23,7 +23,7 @@ git.md
 
 The main target and development environment is [Debian\ GNU/Linux](https://www.debian.org/), although it should be possible to compile FeenoX in any free GNU/Linux variant (and even the in non-free MacOS and/or Windows platforms) running in virtually any hardware platform. FeenoX can run be run either in HPC cloud servers or a Raspberry Pi, and almost everything that sits in the middle.
 
-Following the UNIX philosophy discussed in the [SDS](SDS.md), FeenoX re-uses a lot of already-existing high-quality free and open source libraries that implement a wide variety of mathematical operations. This leads to a number of dependencies that FeenoX needs in order to implement certain features.
+Following the Unix philosophy discussed in the [SDS](SDS.md), FeenoX re-uses a lot of already-existing high-quality free and open source libraries that implement a wide variety of mathematical operations. This leads to a number of dependencies that FeenoX needs in order to implement certain features.
 
 There is only one dependency that is mandatory, namely [GNU GSL](https://www.gnu.org/software/gsl/) (see\ @sec:gsl), which if it not found then FeenoX cannot be compiled. All other dependencies are optional, meaning that FeenoX can be compiled but its capabilities will be partially reduced.
 
@@ -80,7 +80,7 @@ FeenoX has three optional run-time dependencies. It can be compiled without any 
 In absence of all these, FeenoX can still be used to 
 
  * solve general mathematical problems such as the ones to compute the [Fibonacci sequence](https://www.seamplex.com/feenox/examples/#the-fibonacci-sequence) or the [Logistic map](https://www.seamplex.com/feenox/examples/#the-logistic-map),
- * operate on functions, either algebraically or point-wise interpolated such as [Computing the derivative of a function as a UNIX filter](https://www.seamplex.com/feenox/examples/#computing-the-derivative-of-a-function-as-a-unix-filter)
+ * operate on functions, either algebraically or point-wise interpolated such as [Computing the derivative of a function as a Unix filter](https://www.seamplex.com/feenox/examples/#computing-the-derivative-of-a-function-as-a-unix-filter)
  * read, operate over and write meshes,
  * etc.
  

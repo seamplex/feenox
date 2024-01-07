@@ -112,7 +112,7 @@ I nevertheless think that
 
  * std containers are pretty cool
  * templating can give and edge on some cases
- * sometimes OOP may be a better approach to the UNIX rule of representation (sometimes)
+ * sometimes OOP may be a better approach to the Unix rule of representation (sometimes)
 
 However, the pros of C++ do not outweigh its cons for a cloud-first finite-elementish tool.
 Also, the name C++ is lame.

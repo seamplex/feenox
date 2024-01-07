@@ -172,6 +172,10 @@ There are two “why” questions we have to answer.
         description of the problem
       - Git-traceable (mesh is not part of the input file)
       - everything is an expression
+        - material properties can be given as functions of space and/or
+          time and/or temperature (or other intermediate variables)
+        - these functions can be given as algebraic expresions or come
+          from interpolateed point-wise defined data
     - 100% user-defined output
     - simple problems need simple inputs
     - similar problems need similar inputs
@@ -198,7 +202,7 @@ There are two “why” questions we have to answer.
     Because it is [cloud first][] and its objective is to be flexible
     enough to power web-based interfaces like
     [CAEplex][web-based interfaces] and many other workflows. More
-    information in the details for [hackers][2] and [professors][].
+    information in the details for [Unix experts][] and [professors][].
 
     Depending on the complexity of the case,
     [CAEplex][web-based interfaces] might be enough or not. If the
@@ -207,7 +211,7 @@ There are two “why” questions we have to answer.
 
   [web-based interfaces]: https://www.caeplex.com
   [cloud first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
-  [2]: README4engineers.md
+  [Unix experts]: README4hackers.md
   [professors]: README4academics.md
   [the documentation]: https://seamplex.com/feenox/doc/
   [the repository]: https://github.com/seamplex/feenox/

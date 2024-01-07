@@ -1,7 +1,7 @@
 
 The tool must be aimed at being executed unattended on remote servers which are expected to have a mainstream (as of the 2020s) architecture regarding operating system (GNU/Linux variants and other UNIX-like OSes) and hardware stack, such as
 
- * a few Intel-compatible CPUs per host
+ * a few Intel-compatible or ARM-like CPUs per host
  * a few levels of memory caches
  * a few gigabytes of random-access memory
  * several gigabytes of solid-statee storage

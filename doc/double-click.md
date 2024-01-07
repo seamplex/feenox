@@ -6,7 +6,7 @@ Because by design, FeenoX does not have a Graphical User Interface. Instead, it 
 transfer.md
 ```
 
-Recall that FeenoX is designed as a cloud-first tool, and “the cloud” runs on UNIX (essentially GNU/Linux) so FeenoX is based on the [UNIX philosophy](unix.md). In this world, programs act like filters (i.e. transfer functions). They are executed from a command-line terminal. So instead of “double clicking” the executable, one has to open a terminal and execute it there. Without any arguments it says how to use it:
+Recall that FeenoX is designed as a cloud-first tool, and “the cloud” runs on Unix (essentially GNU/Linux) so FeenoX is based on the [Unix philosophy](./unix.md). In this world, programs act like filters (i.e. transfer functions). They are executed from a command-line terminal. So instead of “double clicking” the executable, one has to open a terminal and execute it there. Without any arguments it says how to use it:
 
 ```terminal
 > feenox.exe
