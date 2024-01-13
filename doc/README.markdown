@@ -23,12 +23,11 @@
   - [<span class="toc-section-number">3.3</span> Adding a new PDE to
     `src/pdes`][]
 
-> FeenoX documentation is released under the terms of the [GNU Free
-> Documentation License v1.3][], or any later version.
-
 Every bit of FeenoX documentation is written in [Pandoc][]-flavored
 Markdown in the [`doc`][] directory of the [FeenoX repository][]. It is
-then converted to HTML, PDF, Unix manpage or Texinfo as needed.
+then converted to HTML, PDF, Unix manpage or Texinfo as needed. FeenoX
+documentation is released under the terms of the [GNU Free Documentation
+License v1.3][], or any later version.
 
   [<span class="toc-section-number">1</span> Manual and description]: #manual-and-description
   [<span class="toc-section-number">1.1</span> Design]: #design
@@ -50,10 +49,10 @@ then converted to HTML, PDF, Unix manpage or Texinfo as needed.
     #contributing-guidelines
   [<span class="toc-section-number">3.3</span> Adding a new PDE to `src/pdes`]:
     #adding-a-new-pde-to-srcpdes
-  [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
   [Pandoc]: https://pandoc.org/
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
   [FeenoX repository]: https://github.com/seamplex/feenox/
+  [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
 
 # Manual and description
 
@@ -62,16 +61,16 @@ tutorial and reference.” Due to the formatting restrictions, the
 [Texinfo][] version contains only the description and not the full
 reference.
 
-- [FeenoX manual][] [PDF][]
-- [FeenoX description][] [PDF][1] [Texinfo][2]
+- [FeenoX manual][] [\[PDF\]][1]
+- [FeenoX description][] [\[PDF\]][2] [\[Texinfo\]][3]
 
   [GNU Coding Standards]: https://www.gnu.org/prep/standards/standards.html#GNU-Manuals
   [Texinfo]: https://www.gnu.org/software/texinfo/
   [FeenoX manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
-  [PDF]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
+  [1]: https://www.seamplex.com/feenox/doc/feenox-manual.pdf
   [FeenoX description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [1]: https://www.seamplex.com/feenox/doc/feenox-desc.pdf
-  [2]: https://www.seamplex.com/feenox/doc/feenox-desc.texi
+  [2]: https://www.seamplex.com/feenox/doc/feenox-desc.pdf
+  [3]: https://www.seamplex.com/feenox/doc/feenox-desc.texi
 
 ## Design
 
@@ -80,7 +79,7 @@ reference.
     for an open source computational tool.
 
     - [Software Requirements specifications][] (Fictitious RFQ)
-      [\[PDF\]][3]
+      [\[PDF\]][4]
 
 2.  Then a fictitious “offer” to the above tender is given in a
     [software design
@@ -88,25 +87,25 @@ reference.
     explains the design decisions and features included in FeenoX.
 
     - [Software Design specifications][] (Imaginary FeenoX’s offer)
-      [\[PDF\]][4]
+      [\[PDF\]][5]
 
   [software requirements specifications]: https://seamplex.com/feenox/doc/srs.html
-  [3]: https://www.seamplex.com/feenox/doc/srs.pdf
+  [4]: https://www.seamplex.com/feenox/doc/srs.pdf
   [Software Design specifications]: https://seamplex.com/feenox/doc/sds.html
-  [4]: https://www.seamplex.com/feenox/doc/sds.pdf
+  [5]: https://www.seamplex.com/feenox/doc/sds.pdf
 
 ## Other documents
 
 - [Unix manpage][] (accessible with `man feenox` after (global)
   installation with `sudo make install`)
-- [Frequently Asked Questions][] [PDF][5]
+- [Frequently Asked Questions][] [PDF][]
 - [Compilation Guide][] [PDF][6]
 - [Programming Guide][] [PDF][7]
 - [History][] [PDF][8]
 
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
   [Frequently Asked Questions]: doc/FAQs.markdown
-  [5]: https://www.seamplex.com/feenox/doc/FAQs.pdf
+  [PDF]: https://www.seamplex.com/feenox/doc/FAQs.pdf
   [Compilation Guide]: doc/compilation.markdown
   [6]: https://www.seamplex.com/feenox/doc/compilation.pdf
   [Programming Guide]: doc/programming.markdown

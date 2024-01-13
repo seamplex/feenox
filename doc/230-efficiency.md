@@ -1,5 +1,4 @@
-
-It is mandatory to be able to execute the tool automatically in a remote server. 
+As required in the previous section, it is mandatory to be able to execute the tool on one or more remote servers. 
 The computational resources needed from this server, i.e. costs measured in
 
  * CPU/GPU time

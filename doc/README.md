@@ -6,10 +6,9 @@ titleblock: |
 lang: en-US
 ...
 
-> FeenoX documentation is released under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html), or any later version.
-
 Every bit of FeenoX documentation is written in [Pandoc](https://pandoc.org/)-flavored Markdown in the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) directory of the [FeenoX repository](https://github.com/seamplex/feenox/).
 It is then converted to HTML, PDF, Unix manpage or Texinfo as needed.
+FeenoX documentation is released under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html), or any later version.
 
 
 # Manual and description
@@ -17,8 +16,8 @@ It is then converted to HTML, PDF, Unix manpage or Texinfo as needed.
 
 As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.html#GNU-Manuals), "a manual should serve both as tutorial and reference." Due to the formatting restrictions, the [Texinfo](https://www.gnu.org/software/texinfo/) version contains only the description and not the full reference.
 
- * [FeenoX manual](https://www.seamplex.com/feenox/doc/feenox-manual.html) [PDF](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
- * [FeenoX description](https://www.seamplex.com/feenox/doc/feenox-desc.html) [PDF](https://www.seamplex.com/feenox/doc/feenox-desc.pdf) [Texinfo](https://www.seamplex.com/feenox/doc/feenox-desc.texi)
+ * [FeenoX manual](https://www.seamplex.com/feenox/doc/feenox-manual.html) [[PDF]](https://www.seamplex.com/feenox/doc/feenox-manual.pdf)
+ * [FeenoX description](https://www.seamplex.com/feenox/doc/feenox-desc.html) [[PDF]](https://www.seamplex.com/feenox/doc/feenox-desc.pdf) [[Texinfo]](https://www.seamplex.com/feenox/doc/feenox-desc.texi)
 
 
 ## Design

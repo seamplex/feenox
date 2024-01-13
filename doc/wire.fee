@@ -1,7 +1,8 @@
 # compute the first five natural modes of a cantilever wire
-# see https://www.seamplex.com/fino/doc/alambre.pdf (in Spanish)
+# see https://www.seamplex.com/docs/alambre.pdf (in Spanish)
 # (note that there is a systematic error of a factor of two in the measured values)
-# see https://www.seamplex.com/feenox/examples for a slighly more complex example
+# see https://www.seamplex.com/feenox/examples/modal.html#five-natural-modes-of-a-cantilevered-wire
+# for a slighly more complex example
 
 # wire geometry
 l = 0.5*303e-3   # [ m ] cantilever length
