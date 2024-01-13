@@ -9,27 +9,54 @@ toc: true
 ...
 
 
-## What
+# What
 
-A program, i.e. something your run, reads the problem in a plain text file containing definitions and instructions, solves it, writes the output (if asked for with instructions in the input file) and returns back to the shell.
-It is deliberately not a library, i.e. something you have to link your code against. Link to SRS.
+FeenoX is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [Unix](./README4hackers.md) stand-alone program (i.e. something your run, not something you have to link existing code against) that reads an [engineering-related problem](./README4engineers.md) in a plain-text file containing definitions and instructions. This program then solves the problem and, eventually, writes the outputs which the input file requests with explicit instructions (and nothing if nothing is asked for) and returns back to the Unix shell.
+It can be seen as a Unix filter (or as a transfer function)
 
-see engineers for examples, tutorials
+```include
+doc/transfer.md
+```
 
-MMS
+which, when zoomed in, acts as a "glue layer" between a mesher (Gmsh) and a library for solving large sparse problems (PETSc) which for linear elastic looks as follows:
 
-PhD
+![](doc/transfer-le10-zoom.svg)\  
 
-## How
+
+
+The design responds to a [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) that acts as a "request for quotations" of a computational engineering tool that should satisfy some fictitious (but plausible) requirements.
+The [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) explains how FeenoX addresses each requirement of the SRS.
+
+In principle, even though FeenoX can solve [generic numerical problems](https://seamplex.com/feenox/examples/examples/basic.html) and [systems of ordinary differential/algebraic eq1uations](https://seamplex.com/feenox/examples/daes.html), its main focus is on solving partial differential equations using the finite element method---eventually [in parallel using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
+The current version can solve
+
+```include
+doc/examples-list.md
+```
+
+Two of the supported PDEs are related to neutron transport.
+There is a PhD thesis (in Spanish only) that discusses the design and implementation of FeenoX in view of core-level neutronics.
+
+But more importantly, FeenoX provides a mean to add new types of PDEs by adding a new subdirectory to the [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) [directory of the source tree and then re-bootstrapping, re-configuring and re-compiling the code](https://seamplex.com/feenox/doc/sds.html#sec:extensibility). See below for further details.
+
+Since in FeenoX's input file everything is an expression, the code is especially suited for [verification using the method of manufactured solutions](https://github.com/seamplex/feenox/tree/main/tests/mms).
+
+
+ * See [FeenoX for Engineers](./README4engineers.md) for links to further examples and tutorials.
+ * See [FeenoX for Hackers](./README4hackers.md) for more details about the implementation and the code.
+
+
+# How
 
 By leveraging the Unix programming philosophy to come up with a cloud-first tool suitable to serve as the back end of web-based interfaces such as CAEplex.
+
+The fact that FeenoX is a program and not a library is a deliberate decision discussed in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html).
+
 A mathematical framework with C entry points that tell it what to put in the global stiffness matrix, residuals, etc.
 
 
 
 
-FeenoX meets fictitious-yet-plausible [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html).
-The FeenoX [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
 FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve. FeenoX will provide means to
 
   - parse the input file, handle command-line arguments, read mesh files, assign variables, evaluate conditionals, write results, etc.
@@ -96,7 +123,7 @@ See hackers for more technical details about how FeenoX works.
 
 
 
-## Why
+# Why
 
 The world is already full of finite-element programs and every day a grad student creates a new one from scratch.
 So why adding FeenoX to the already-crowded space of FEA tools?
@@ -116,6 +143,12 @@ FeenoX sits in the middle:
  * it uses the Unix philosophy which, among others, separates policy from mechanism and thus FeenoX is a natural choice for web-based interfaces like CAEplex
  
 
-See hackers for another explanation about why FeenoX is different from other computational tools.
+See [FeenoX for hackers](./README4hackers.md) for another explanation about why FeenoX is different from other computational tools.
 
  
+::::: {.only-in-format .html }
+```{=html}
+<a class="btn btn-lg btn-outline-primary"   href="./README4engineers.md" role="button">FeenoX for Industry Engineers</a>
+<a class="btn btn-lg btn-outline-secondary" href="./README4hackers.md"   role="button">FeenoX for Unix Hackers</a>
+```
+:::::

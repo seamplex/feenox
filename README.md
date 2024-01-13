@@ -60,16 +60,12 @@ doc/tests-list.md
  
 ## Capabilities
 
- * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) self-descriptive English-like plain-text [input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#matching-formulations) as much as possible
+ * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) self-descriptive English-like plain-text [input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#matching-formulations) as much as possible:
    - [no need to recompile if the problem changes](https://seamplex.com/feenox/doc/sds.html#sec:introduction) (FeenoX is a _program_, not a library)
    - [nouns are definitions and verbs are instructions](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
    - [simple problems need simple inputs](https://seamplex.com/feenox/doc/sds.html#sec:simple)
    - [everything is an expression](https://seamplex.com/feenox/doc/sds.html#sec:expression)
-   - 100%-defined user output (no print or write instructions, no output)
-   
-   ```include
-   doc/transfer.md
-   ```
+   - [100%-defined user output](https://seamplex.com/feenox/doc/sds.html#sec:output) (no [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) nor [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) instructions, no output)
    
  * [General mathematical problems](https://seamplex.com/feenox/examples/basic.html) using [GNU GSL](https://www.gnu.org/software/gsl/)
  * [Sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html) using [SUNDIALS](https://computing.llnl.gov/projects/sundials)
@@ -82,7 +78,8 @@ doc/tests-list.md
      - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
    - writes results in either Gmsh or [VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) ([Paraview](https://www.paraview.org/)) format 
  * [Cloud-first design](https://seamplex.com/feenox/doc/sds.html#cloud-first) (cloud friendliness is not enough)
- * MPI parallelization
+ * [MPI parallelization](https://seamplex.com/feenox/doc/sds.html#sec:scalability)
+ * Focus on flexibility, especially when defining [non-uniform multi-solid material properties](https://seamplex.com/feenox/doc/sds.html#sec:flexibility)
  * [Unix programming philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)
    - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)
    - [rule of silence](https://seamplex.com/feenox/doc/sds.html#sec:silence)
@@ -98,8 +95,8 @@ doc/tests-list.md
    - [point-wise interpolated data](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties)
  * Command-line argument expansion for
    - [increased flexibility](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter),
-   - [parametric sweeps](https://seamplex.com/feenox/examples/mechanical.html#parametric-study-on-a-cantilevered-beam), and/or
-   - [optimization loops](https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork) (see also [this non-trivial example](https://seamplex.com/thesis/html/060-resultados/README.html#sec-tres-pescaditos))
+   - [parametric sweeps](https://seamplex.com/feenox/doc/sds.html#sec:parametric), and/or
+   - [optimization loops](https://seamplex.com/feenox/doc/sds.html#optimization-loops)
  * [Steady-state](https://www.seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation), [quasi-static] and/or [transient problems](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient)
  * [Linear](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems) and [non-linear](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems) problems
  * Possibility to verify the code using the [Method of Manufactured Solutions](https://github.com/seamplex/feenox/tree/main/tests/mms)

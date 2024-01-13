@@ -14,7 +14,7 @@ toc: true
 >
 > 1. [FeenoX](https://www.seamplex.com/feenox) is not a traditional point-and-click finite-element solver. It **does not include** a graphical interface.
 > 
-> 2. FeenoX is designed as a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [back end](https://en.wikipedia.org/wiki/Frontend_and_backend) for generic computational workflows. One of these many workflows can be point-and-click graphical interface such as [CAEplex](https://www.caeplex.com) which allows to solve thermo-mechanical problems directly from the browser.
+> 2. FeenoX is designed as a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [back end](https://en.wikipedia.org/wiki/Frontend_and_backend) for generic computational workflows to solve engineering-related problems. One of these many workflows can be point-and-click graphical interface such as [CAEplex](https://www.caeplex.com) which allows to solve thermo-mechanical problems directly from the browser.
 >
 > 3. Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If you are using Windows, FeenoX may not be for you (but [CAEplex](https://www.caeplex.com) may). See below to find out [why](#why) FeenoX works the way it does.
 
@@ -30,10 +30,22 @@ The former should aid the engineer to prepare the mesh and, eventually, the inpu
 The latter should show the numerical results. See the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) for an in-depth step-by-step explanation.
 
 To fix ideas, let us consider the [NAFEMS LE10 "Thick plate pressure" benchmark](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark). @Fig:nafems-le10 shows that there is a one-to-one correspondence between the human-friendly problem formulation and the input file FeenoX reads.
+There is no need to give extra settings if the problem does not ask for them.
+Note that since the problem is has only one volume, `E` means "the" Young modulus.
+No need to deal with a map between materials and mesh entitites (in this case, in [multi-material problems](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other) the mapping is needed). Nothing more, nothing less.
 
 ![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg){#fig:nafems-le10 width=100% }
 
 Say we already have a [`nafems-le10.geo`](https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo) file which tells [Gmsh](http://gmsh.info/) how to create a mesh `nafems-le10.msh` (check out the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) for details).
+
+> **Heads up!** The `.msh` file from Gmsh can be either
+> 
+>  a. version 2.2, or
+>  b. version 4.0, or
+>  c. version 4.1.
+>
+> and can be partitioned or not.
+
 Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) for example) as follows:
 
 ```feenox
@@ -66,7 +78,7 @@ Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in the same
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 ```
 
-The trick is that this workflow is susceptible of being automated and customized to run in the cloud, possibly in parallel throughout several servers using the MPI standard.
+The trick is that this workflow is susceptible of being automated and customized to run [in the cloud](), possibly [in parallel throughout several servers using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
 Check out this 1-minute video that covers a similar case from the [tensile-test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/):
 
 :::: {.not-in-format .latex}
@@ -141,4 +153,10 @@ There are two "why" questions we have to answer.
     > ::::::::: 
 
 
+::::: {.only-in-format .html }
+```{=html}
+<a class="btn btn-lg btn-outline-secondary" href="./README4hackers.md"   role="button">FeenoX for Unix Hackers</a>
+<a class="btn btn-lg btn-outline-info"      href="./README4academics.md" role="button">FeenoX for Academic Professors</a>
+```
+:::::
 

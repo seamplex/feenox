@@ -16,10 +16,10 @@
 >     solver. It **does not include** a graphical interface.
 >
 > 2.  FeenoX is designed as a [cloud-first][] [back end][] for generic
->     computational workflows. One of these many workflows can be
->     point-and-click graphical interface such as [CAEplex][] which
->     allows to solve thermo-mechanical problems directly from the
->     browser.
+>     computational workflows to solve engineering-related problems. One
+>     of these many workflows can be point-and-click graphical interface
+>     such as [CAEplex][] which allows to solve thermo-mechanical
+>     problems directly from the browser.
 >
 > 3.  Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If
 >     you are using Windows, FeenoX may not be for you (but [CAEplex][]
@@ -43,7 +43,11 @@ an in-depth step-by-step explanation.
 To fix ideas, let us consider the [NAFEMS LE10 “Thick plate pressure”
 benchmark][]. Fig. 1 shows that there is a one-to-one correspondence
 between the human-friendly problem formulation and the input file FeenoX
-reads.
+reads. There is no need to give extra settings if the problem does not
+ask for them. Note that since the problem is has only one volume, `E`
+means “the” Young modulus. No need to deal with a map between materials
+and mesh entitites (in this case, in [multi-material problems][] the
+mapping is needed). Nothing more, nothing less.
 
 <figure id="fig:nafems-le10">
 <img src="nafems-le10-problem-input.svg" style="width:100.0%"
@@ -54,8 +58,18 @@ corresponding FeenoX input</figcaption>
 
 Say we already have a [`nafems-le10.geo`][] file which tells [Gmsh][]
 how to create a mesh `nafems-le10.msh` (check out the [tensile test
-tutorial][] for details). Then, we can create an input file for FeenoX
-(using [editors with syntax highlighting][] for example) as follows:
+tutorial][] for details).
+
+> **Heads up!** The `.msh` file from Gmsh can be either
+>
+> 1.  version 2.2, or
+> 2.  version 4.0, or
+> 3.  version 4.1.
+>
+> and can be partitioned or not.
+
+Then, we can create an input file for FeenoX (using [editors with syntax
+highlighting][] for example) as follows:
 
 ``` feenox
 PROBLEM mechanical 3D
@@ -88,9 +102,9 @@ to solve the benchmark problem:
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 
 The trick is that this workflow is susceptible of being automated and
-customized to run in the cloud, possibly in parallel throughout several
-servers using the MPI standard. Check out this 1-minute video that
-covers a similar case from the [tensile-test
+customized to run [in the cloud][], possibly [in parallel throughout
+several servers using the MPI standard][]. Check out this 1-minute video
+that covers a similar case from the [tensile-test
 tutorial][tensile test tutorial]:
 
 <div class="not-in-format latex">
@@ -114,9 +128,12 @@ are feeling curious, take a look at what FeenoX has to offer to
   [why]: #why
   [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
   [NAFEMS LE10 “Thick plate pressure” benchmark]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
+  [multi-material problems]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
   [`nafems-le10.geo`]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo
   [Gmsh]: http://gmsh.info/
   [editors with syntax highlighting]: https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting
+  [in the cloud]:
+  [in parallel throughout several servers using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [hackers]: README4hackers.md
   [academics]: README4academics.md
 

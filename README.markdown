@@ -89,33 +89,51 @@ Choose your background for further details about the what, how and whys:
 
 The [`tests`][] directory in the repository has hundreds of
 
-- `grep`-able examples,
-- unit tests,
-- regression tests, and/or
-- (crude) mathematical verification tests.
+- `grep`-able examples, e.g. to see how to use the keywork
+  [`INTEGRATE`][], do
+
+``` terminal
+ $ cd tests
+ $ grep INTEGRATE *.fee
+ integrate2d.fee:INTEGRATE f RESULT I1
+ integrate2d.fee:INTEGRATE f(x,y)^2 RESULT I2
+ write_mesh2d.fee:INTEGRATE f RESULT I
+ $ 
+```
+
+- [unit and regression tests][],
+- (crude) mathematical verification tests,
+- subdirectories with further case studies
+  - [`mms`][]
+    - [`thermal`][]
+      - [`2d`][]
+      - [`3d`][]
+  - [`nafems`][]
+    - [`le10`][]
 
   [`tests`]: https://github.com/seamplex/feenox/tree/main/tests
+  [`INTEGRATE`]: https://seamplex.com/feenox/doc/feenox-manual.html#integrate
+  [unit and regression tests]: https://seamplex.com/feenox/doc/compilation.html#sec:test-suite
+  [`mms`]: https://github.com/seamplex/feenox/tree/main/tests/mms
+  [`thermal`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal
+  [`2d`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/2d
+  [`3d`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/3d
+  [`nafems`]: https://github.com/seamplex/feenox/tree/main/tests/nafems
+  [`le10`]: https://github.com/seamplex/feenox/tree/main/tests/nafems/le10
 
 ## Capabilities
 
 - The [problem][] to solve is defined through a
   [syntactically-sugared][] self-descriptive English-like plain-text
   [input file][] that should [resemble the original human-friendly
-  problem formulation][] as much as possible
+  problem formulation][] as much as possible:
   - [no need to recompile if the problem changes][] (FeenoX is a
     *program*, not a library)
   - [nouns are definitions and verbs are instructions][]
   - [simple problems need simple inputs][]
   - [everything is an expression][]
-  - 100%-defined user output (no print or write instructions, no output)
-
-  <!-- -->
-
-                                   +------------+
-       mesh (*.msh)  }             |            |             { terminal
-       data (*.dat)  } input ----> |   FeenoX   |----> output { data files
-       input (*.fee) }             |            |             { post (vtk/msh)
-                                   +------------+
+  - [100%-defined user output][] (no [`PRINT`][problem] nor
+    [`WRITE_RESULTS`][] instructions, no output)
 - [General mathematical problems][] using [GNU GSL][]
 - [Sets of ODEs/DAEs][] using [SUNDIALS][]
 - [PDEs][] formulated with the [finite element method][]
@@ -127,7 +145,9 @@ The [`tests`][] directory in the repository has hundreds of
     - generalized eigen-value problems ([EPS][])
   - writes results in either Gmsh or [VTK][] ([Paraview][]) format
 - [Cloud-first design][] (cloud friendliness is not enough)
-- MPI parallelization
+- [MPI parallelization][]
+- Focus on flexibility, especially when defining [non-uniform
+  multi-solid material properties][]
 - [Unix programming philosophy][]
   - [rule of separation][]
   - [rule of silence][]
@@ -145,7 +165,7 @@ The [`tests`][] directory in the repository has hundreds of
 - Command-line argument expansion for
   - [increased flexibility][],
   - [parametric sweeps][], and/or
-  - [optimization loops][] (see also [this non-trivial example][])
+  - [optimization loops][]
 - [Steady-state][], \[quasi-static\] and/or [transient problems][]
 - [Linear][] and [non-linear][] problems
 - Possibility to verify the code using the [Method of Manufactured
@@ -161,6 +181,8 @@ The [`tests`][] directory in the repository has hundreds of
   [nouns are definitions and verbs are instructions]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
   [simple problems need simple inputs]: https://seamplex.com/feenox/doc/sds.html#sec:simple
   [everything is an expression]: https://seamplex.com/feenox/doc/sds.html#sec:expression
+  [100%-defined user output]: https://seamplex.com/feenox/doc/sds.html#sec:output
+  [`WRITE_RESULTS`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results
   [General mathematical problems]: https://seamplex.com/feenox/examples/basic.html
   [GNU GSL]: https://www.gnu.org/software/gsl/
   [Sets of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
@@ -177,6 +199,8 @@ The [`tests`][] directory in the repository has hundreds of
   [VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
   [Paraview]: https://www.paraview.org/
   [Cloud-first design]: https://seamplex.com/feenox/doc/sds.html#cloud-first
+  [MPI parallelization]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
+  [non-uniform multi-solid material properties]: https://seamplex.com/feenox/doc/sds.html#sec:flexibility
   [Unix programming philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
   [rule of separation]: https://seamplex.com/feenox/doc/sds.html#sec:separation
   [rule of silence]: https://seamplex.com/feenox/doc/sds.html#sec:silence
@@ -189,9 +213,8 @@ The [`tests`][] directory in the repository has hundreds of
   [algebraic expressions]: https://seamplex.com/feenox/examples/mechanical.html#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature
   [point-wise interpolated data]: https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties
   [increased flexibility]: https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter
-  [parametric sweeps]: https://seamplex.com/feenox/examples/mechanical.html#parametric-study-on-a-cantilevered-beam
-  [optimization loops]: https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork
-  [this non-trivial example]: https://seamplex.com/thesis/html/060-resultados/README.html#sec-tres-pescaditos
+  [parametric sweeps]: https://seamplex.com/feenox/doc/sds.html#sec:parametric
+  [optimization loops]: https://seamplex.com/feenox/doc/sds.html#optimization-loops
   [Steady-state]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation
   [transient problems]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient
   [Linear]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems
