@@ -26,7 +26,7 @@
 >     may). See below to find out [why][] FeenoX works the way it does.
 
 In plain engineering terms, FeenoX works like a transfer function
-between one or more input files and zero or more output files:
+between one or more [input files][] and zero or more [output files][]:
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal
@@ -126,12 +126,14 @@ are feeling curious, take a look at what FeenoX has to offer to
   [back end]: https://en.wikipedia.org/wiki/Frontend_and_backend
   [CAEplex]: https://www.caeplex.com
   [why]: #why
+  [input files]: https://seamplex.com/feenox/doc/sds.html#sec:input
+  [output files]: https://seamplex.com/feenox/doc/sds.html#sec:output
   [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
   [NAFEMS LE10 “Thick plate pressure” benchmark]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
   [multi-material problems]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
   [`nafems-le10.geo`]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo
   [Gmsh]: http://gmsh.info/
-  [editors with syntax highlighting]: https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting
+  [editors with syntax highlighting]: https://seamplex.com/feenox/doc/sds.html#sec:syntactic
   [in the cloud]:
   [in parallel throughout several servers using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [hackers]: README4hackers.md
@@ -193,7 +195,7 @@ There are two “why” questions we have to answer.
           time and/or temperature (or other intermediate variables)
         - these functions can be given as algebraic expresions or come
           from interpolateed point-wise defined data
-    - 100% user-defined output
+    - [100% user-defined output][]
     - simple problems need simple inputs
     - similar problems need similar inputs
     - parametric and optimization runs through command-line arguments
@@ -226,6 +228,7 @@ There are two “why” questions we have to answer.
     latter, one has to see what’s sitting under the hood. Peek into [the
     documentation][] and [the repository][] for further details.
 
+  [100% user-defined output]: https://seamplex.com/feenox/doc/sds.html#sec:output
   [web-based interfaces]: https://www.caeplex.com
   [cloud first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [Unix experts]: README4hackers.md

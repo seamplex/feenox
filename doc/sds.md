@@ -354,8 +354,17 @@ The program can also be executed remotely either
  c. in a [container](https://en.wikipedia.org/wiki/OS-level_virtualization) as part of a provisioning script,
  d. in many other ways.
 
+As explained in the help message, FeenoX can read the input from the standard input if `-` is specified as the input path.
+This is useful in scripts where small calculations are needed, e.g.
+
+```terminal
+$ a=3
+$ echo "PRINT 1/$a" | feenox -
+0.333333
+$ 
+```
  
-FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. Progress can be as simple as an ASCII bar (triggered with `--progress` in the command line or with the keyword `PROGRESS` in the input file) to more complex mechanisms like writing the status in a shared memory segment.
+FeenoX provides mechanisms to inform its progress by writing certain information to devices or files, which in turn can be monitored remotely or even trigger server actions. Progress can be as simple as an ASCII bar (triggered with `--progress` in the command line or with the keyword [`PROGRESS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) in the input file) to more complex mechanisms like writing the status in a shared memory segment.
 @Fig:caeplex-progress shows how the [CAEplex](https://www.caeplex.com) platform shows the progress interactively in its web-based interface.
 
 ![ASCII progress bars parsed and converted into a web-based interface](caeplex-progress.png){#fig:caeplex-progress width_latex=65% width_html=100%}
@@ -1465,9 +1474,19 @@ $
 > ```
 
 FeenoX currently works by reading an input file (which in turn can recursively [`INCLUDE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#include) further input files) with an _ad-hoc_ format, whose rationale is described in this section.
-Therefore, it already does satisfy requirement\ a. but eventually could also satisfy requirement\ b.
+Therefore, it already does satisfy requirement\ a. but, eventually, could also satisfy requirement\ b. by adding a wrapper for high-level languages such as 
 
-As already explained in\ @sec:introduction, the motto is “FeenoX is---in a certain sense---to desktop FEA programs  and libraries what Markdown is to Word and (La)TeX, respectively and _deliberately_.” Hence, the input files act as the Markdown source: instructions about what to do but not how to do it.
+ * Python
+ * Julia
+ * R
+
+that would either
+
+ i. create an input file and run FeenoX in the back, or
+ ii. successively call the FeenoX functions that define definitions and execute instructions (to be done).
+ 
+As already explained in\ @sec:introduction, the motto is “FeenoX is---in a certain sense---to desktop FEA programs  and libraries what Markdown is to Word and (La)TeX, respectively and _deliberately_.”
+Hence, the input files act as the Markdown source: instructions about what to do but not how to do it.
 
 The input files are indeed plain-text ASCII files with English-like keywords that fully define the problem.
 The main features of the input format, thoroughly described below, are:
@@ -1482,28 +1501,20 @@ The main features of the input format, thoroughly described below, are:
  #. It should be possible to read run-time arguments from the command line.
  #. Input files are [distributed version control](https://en.wikipedia.org/wiki/Distributed_version_control)-friendly.
  
-### Syntactic sugar & highlighting
+### Syntactic sugar & highlighting {#sec:sugar}
+
+The ultimate goal of FeenoX is to solve mathematical equations that are hard to solve with pencil and paper.
+In particular, to integrate differential equations (recall that the first usable computer was named [ENIAC](https://en.wikipedia.org/wiki/ENIAC), which stands for Electronic Numerical Integrator and Computer).
+The input file format was designed as to how to ask the _computer_ what to _compute_.
+The syntax, based on keywords and alphanumerical arguments was chosen as to sit in the middle of the purely binary numerical system employed by digital computers^[Analog and quantum computers are out of the scope.] and the purely linguistical nature of human communication.
+The rationale behind its design is that an average user can peek a FeenoX input file and tell what it is asking the computer to compute, as already illustrated for the [NAFEMS\ LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) in @fig:nafems-le10-problem-input.
+Even if the input files are created by a computer and not by a human, the code used to create a human-friendly input file will be human-friendlier than a code that writes only zeroes and ones as its output (that will become the input of another one following the Unix _rule of composition_ @sec:unix-composition).
+As an exercise, compare the input file in @fig:nafems-le10-problem-input (or in @fig:highlighting) with the inputs files used by other open source FEA solvers shown in appendix @sec:le10-other.
+
 
 The first argument not starting with a dash to the `feenox` executable is the path to the main input file.
-This main input file can in turn include other FeenoX input files (with the [`INCLUDE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#include) keyword) and/or read data from other files (such as meshes with the [`READ_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh) instruction) or other resources (such as data files for point-wise data interpolation with [`FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#function) or shared memory objects TBD). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness).
+This main input file can in turn include other FeenoX input files (with the [`INCLUDE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#include) keyword) and/or read data from other files (such as meshes with the [`READ_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh) instruction) or other resources (such as data files for point-wise data interpolation with [`FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#function) or shared memory objects TBD).
 
-
-XXXXXXXXXXXXXXXXXXXXXXXXx
-The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)).
-
-In principle any extension (even no extension) can be used for the FeenoX input files.
-Throughout the FeenoX repository and documentation the extension `.fee` is used, which has a couple of advantages:
-
- 1. The `.fee` extension is detected by syntax-highlighting extensions as shown in @fig:highlighting.
- 2. The expression `$0` (or `${0}`) is expanded to the basename of the input file, i.e. the directory part (if present) is removed  and the `.fee` extension is removed. Therefore, 
- 
-    ```feenox
-    WRITE_MESH ${0}.vtk VECTOR u v w  sigma
-    ```
-    
-    would print the displacement field as a vector and the von\ Mises stress as a scalar in a file named `whatever-the-input-file-name-is.vtk`.
-
-Still, the extension is not enforced.
 For instance, the [test directory](https://github.com/seamplex/feenox/tree/main/tests) includes some [spinning-disk cases](https://github.com/seamplex/feenox/blob/main/tests/spinning-disk-parallel-solid-half.fee) that compare the analytical solution for the hoop and radial stresses with the numerical ones obtained with FeenoX.
 These cases read the radius\ $R$ and thickness\ $t$ from the `.geo` file used by Gmsh to build the mesh in the first place:
 
@@ -1522,17 +1533,26 @@ t = 0.003;
 ```
 
 
+The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness).
+In principle any extension (even no extension) can be used for the FeenoX input files.
+Throughout the FeenoX repository and documentation the extension `.fee` is used, which has a couple of advantages:
+
+ 1. The `.fee` extension is detected by syntax-highlighting extensions for common editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/)) as illustrated in @fig:highlighting.
+ 2. The expression `$0` (or `${0}`) is expanded to the basename of the input file, i.e. the directory part (if present) is removed  and the `.fee` extension is removed. Therefore, 
+ 
+    ```feenox
+    READ_MESH $0.msh
+    ```
+    
+    would read a mesh file whose name is the same as the FeenoX input file, without the `.fee` extension.
+    
+
 ::: {#fig:highlighting layout-ncol=2}
 ![Kate](highlighting-kate.png){width=49%}
-
 ![Vim](highlighting-vim.png){width=49%}
 
-Syntax highlighitng of input files in GUI and cloud-friendly text editors
+Syntax highlighting of input files in GUI and cloud-friendly text editors
 :::
-
-The ultimate goal of FeenoX is to solve mathematical equations that are hard to solve with pencil and paper. In particular, to integrate differential equations (recall that the first usable computer was named ENIAC, which stands for Electronic Numerical Integrator and Computer). The input file format was designed as to how to ask the _computer_ what to _compute_. The syntax, based on keywords and alphanumerical arguments was chosen as to sit in the middle of the purely binary numerical system employed by digital computers^[Analog and quantum computers are out of the scope.] and the purely linguistical nature of human communication. The rationale behind its design is that an average user can peek a FeenoX input file and tell what it is asking the computer to compute, as already illustrated for the [NAFEMS\ LE10 problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark) in @fig:nafems-le10-problem-input. Even if the input files are created by a computer and not by a human, the code used to create a human-friendly input file will be human-friendlier than a code that writes only zeroes and ones as its output (that will become the input of another one following the Unix _rule of composition_ @sec:unix-composition).
-As an exercise, compare the input file in @fig:nafems-le10-problem-input (or in @fig:highlighting) with the inputs files used by other open source FEA solvers shown in appendix @sec:le10-other.
-
 
 
 ### Definitions and instructions {#sec:nouns_verbs}
@@ -1548,13 +1568,13 @@ A primary keyword usually is followed by arguments and/or secondary keywords, wh
 
 ```feenox
 PROBLEM mechanical DIMENSIONS 3
-READ_MESH nafems-le10.msh 
+READ_MESH $0.msh 
 [...]
 # print the direct stress y at D (and nothing more)
 PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
 ```
 
-we have `PROBLEM` acting as a primary keyword, taking `mechanical` as its first argument and then `DIMENSIONS` as a secondary keyword with `3` being an argument to the secondary keyword. Then `READ_MESH` is another primary keyword  taking `nafems-le10.msh` as its argument. 
+we have [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) acting as a primary keyword, taking `mechanical` as its first argument and then `DIMENSIONS` as a secondary keyword with `3` being an argument to the secondary keyword. Then `READ_MESH` is another primary keyword  taking `$0.msh` (which would be expanded to something like `nafems-le10.msh`) as its argument. 
 
 A primary keyword can be
 
@@ -1563,7 +1583,7 @@ A primary keyword can be
  3. both.
  
 Definitions are English _nouns_ and instructions are English _verbs_. 
-In the example above, `PROBLEM` is a definition because it tells FeenoX about something it has to do (i.e. that it has to solve a three-dimensional problem), but does not do anything actually. On the other hand, `READ_MESH` is both a definition and an instruction: it defines that there exists a mesh named `nafems-le10.msh` which might be referenced later (for example in an `INTEGRATE` or `WRITE_MESH` instructions), but it also asks FeenoX to read the mesh at that point of the instruction list (more details below).  Finally, [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) is a primary keyword taking different types and number or arguments. It is an instruction because it does not define anything, it just asks FeenoX to print the value of the function named `sigmay` evaluated at\ $2000,0,300$. In this case, `sigmay` is a function which is implicitly defined when `PROBLEM` is set to `mechanical`. If `sigmay` was referenced before `PROBLEM`, FeenoX would not find it. And if the problem was of any other type, FeenoX would not find it even when referenced from the last line of the input file.
+In the example above, [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) is a definition because it tells FeenoX about something it has to do (i.e. that it has to solve a three-dimensional problem), but does not do anything actually. On the other hand, [`READ_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh) is both a definition and an instruction: it defines that there exists a mesh named `nafems-le10.msh` which might be referenced later (for example in an [`INTEGRATE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#integrate) or [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh) instructions), but it also asks FeenoX to read the mesh at that point of the instruction list (more details below).  Finally, [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) is a primary keyword taking different types and number or arguments. It is an instruction because it does not define anything, it just asks FeenoX to print the value of the function named `sigmay` evaluated at\ $2000,0,300$. In this case, `sigmay` is a function which is implicitly defined when [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) is set to `mechanical`. If `sigmay` was referenced before [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem), FeenoX would not find it. And if the problem was of any other type, FeenoX would not find it even when referenced from the last line of the input file.
 
 The following example further illustrates the differences between definitions and instructions. It compares the result of (numerically but adaptively) integrating $f(x,y,z) = \sin(x^3 + y^2 + z)$ over a unit cube against using a 3D Gauss integration scheme over a fixed set of quadrature points on the same unit cube meshes with two regular hexahedra in each direction (totalling 8 hexahedra). In one case hex20 are used and in the other one, hex27. Both cases use 27 quadrature points per element.
 
@@ -1612,7 +1632,7 @@ $ feenox thermal-1d-dirichlet-space-k.fee
 $
 ```
 
-Finally, if the conductivity depended on temperature (rendering the problem non-linear) say like\ $k(x) = 1 + T(x)$ then
+Finally, if the conductivity depended on temperature (rendering the problem [non-linear](https://seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems)) say like\ $k(x) = 1 + T(x)$ then
 
 ```{.feenox include=thermal-1d-dirichlet-temperature-k.fee}
 ```
@@ -1623,39 +1643,43 @@ $ feenox thermal-1d-dirichlet-space-k.fee
 $
 ```
 
-Note that FeenoX could figure out by itself that the two first cases were linear while the last one was not. This can be verified by passing the extra argument `--snes_view`. In the first two cases, there will be no extra output. In the last one, the details of the non-linear solver used by PETSc will be written into the standard output. The experienced reader should take some time to compare the effort and level of complexity that other FEA solvers require in order to set up simple problems like these. 
+Note that FeenoX could figure out by itself that the two first cases were linear while the last one was not.
+This can be verified by passing the extra argument `--snes_view`.
+In the first two cases, there will be no extra output.
+In the last one, the details of the non-linear solver used by PETSc will be written into the standard output.
+The experienced reader should take some time to compare the effort and level of complexity that other FEA solvers require in order to set up simple problems like these. 
+A discussion of the difference between linear and non-linear problems can be found in the [heat conduction tutorial](https://seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems).
 
 ### Complex things {#sec:complex}
 
-[Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible” has already been mentioned. The first part of the quote was addressed in the previous section. Of course, complexity can scale up almost indefinitely so we cannot show an example right here. But the following repositories contain the scripts and input files (for Gmsh, FeenoX and other common Unix tools such as Sed and Awk) that solve non-trivial problems using FeenoX as the main tool and employing free and open source software only, both for the computation and for the creation of figures and result tables.
+[Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)’s idea that “simple things should be simple, complex things should be possible” has already been mentioned in @sec:flexibility.
+The first part of the quote was addressed in the previous section.
+Of course, complexity can scale up almost indefinitely so we cannot show an example right here.
+But the following repositories contain the scripts and input files (for Gmsh, FeenoX and other common Unix tools such as Sed and Awk) that solve non-trivial problems using FeenoX as the main tool and employing free and open source software only, both for the computation and for the creation of figures and result tables.
 
-[Convergence study on stress linearization of an infinite pipe according to ASME](https://github.com/seamplex/pipe-linearize)
+* [Convergence study on stress linearization of an infinite pipe according to ASME](https://github.com/seamplex/pipe-linearize): a parametric study over the number of elements through the thickness of a pipe and the error committed when computing membrane and bending stresses according to ASME\ VIII Div\ 2 Sec\ 5. The study uses the following element types
 
-:   A parametric study over the number of elements through the thickness of a pipe and the error committed when computing membrane and bending stresses according to ASME\ VIII Div\ 2 Sec\ 5. The study uses the following element types
+   - unstructured tet4
+   - unstructured straight tet10
+   - unstructured curved tet10
+   - structured straight tet10
+   - structured curved tet10
+   - structured hex8
+   - structured straight hex20
+   - structured curved hex20
+   - structured straight hex27
+   - structured curved hex27
 
-     - unstructured tet4
-     - unstructured straight tet10
-     - unstructured curved tet10
-     - structured straight tet10
-     - structured curved tet10
-     - structured hex8
-     - structured straight hex20
-     - structured curved hex20
-     - structured straight hex27
-     - structured curved hex27
+  The linearized stresses for different number of elements through the pipe thickness are compared against the analytical solution. Figures with the meshes employed in each case and with plots of profiles vs. the radial coordinate and linearized stresses vs. number of elements through the thickness are created. 
 
-    The linearized stresses for different number of elements through the pipe thickness are compared against the analytical solution. Figures with the meshes employed in each case and with plots of profiles vs. the radial coordinate and linearized stresses vs. number of elements through the thickness are created. 
+* [Environmentally-assisted fatigue analysis of dissimilar material interfaces in piping systems of a nuclear power plant](https://github.com/seamplex/piping-asme-fatigue): a case that studies environmentally-assisted fatigue using environment factors applied to traditional in-air ASME fatigue analysis for operational an incidental transients in nuclear power plant as propose by EPRI. A fictitious CAD geometry representing a section of a piping system is studied. Four operational transients are made up with time-dependent data for pressure and water temperature.
 
-[Environmentally-assisted fatigue analysis of dissimilar material interfaces in piping systems of a nuclear power plant](https://github.com/seamplex/piping-asme-fatigue)
-
-:   A case that studies environmentally-assisted fatigue using environment factors applied to traditional in-air ASME fatigue analysis for operational an incidental transients in nuclear power plant as propose by EPRI. A fictitious CAD geometry representing a section of a piping system is studied. Four operational transients are made up with time-dependent data for pressure and water temperature.
-
-    1. A transient heat conduction problem with temperature-dependent material properties (according to ASME property tables) are solved over a small region around a material interface between carbon and stainless steel.
-    2. Primary stresses according to ASME are computed for each of the operational transients.
-    3. The results of a modal analysis study are convoluted with a frequency spectrum of a design-basis earthquake using the SRSS method to obtain an equivalent static volumetric force distribution.
-    4. The time-dependent temperature distribution for each transient is then used in quasi-static mechanical problems to compute secondary stresses according to ASME, including the equivalent seismic loads at the moment of higher thermal stresses.
-    5. The history of linearized Tresca stresses are juxtaposed to compute the cumulative usage factors using the ASME peak-valley method.
-    6. Environmental data is used to affect each cumulative usage factors with an environment factor to account for in-water conditions.
+   #. A transient heat conduction problem with temperature-dependent material properties (according to ASME property tables) are solved over a small region around a material interface between carbon and stainless steel.
+   #. Primary stresses according to ASME are computed for each of the operational transients.
+   #. The results of a modal analysis study are convoluted with a frequency spectrum of a design-basis earthquake using the SRSS method to obtain an equivalent static volumetric force distribution.
+   #. The time-dependent temperature distribution for each transient is then used in quasi-static mechanical problems to compute secondary stresses according to ASME, including the equivalent seismic loads at the moment of higher thermal stresses.
+   #. The history of linearized Tresca stresses are juxtaposed to compute the cumulative usage factors using the ASME peak-valley method.
+   #. Environmental data is used to affect each cumulative usage factors with an environment factor to account for in-water conditions.
 
 These repositories contain a `run.sh` that, when executed in a properly-set-up GNU/Linux host (either on premises or in the cloud), will perform a number of steps including
 
@@ -1669,7 +1693,9 @@ Refer to the READMEs in each repository for further details about the mathematic
  
 ### Everything is an expression {#sec:expression}
 
-As explained in the history of FeenoX (@sec:history), the first objective of the code was to solve ODEs written in an ASCII file as human-friendly as possible. So even before any other feature, the first thing I coded in the FeenoX ancestors was an algebraic parser and evaluator. This was back in 2009, and I performed an online search before writing the whole thing from scratch. I found a nice post in Slack Overflow^[<http://stackoverflow.com/questions/1384811/code-golf-mathematical-expression-evaluator-that-respects-pemdas>] that discussed some cool ideas and even had some code published under the terms of the Creative Commons license.
+As explained in the history of FeenoX (@sec:history), the first objective of the code was to solve ODEs written in an ASCII file as human-friendly as possible. So even before any other feature, the first thing the FeenoX ancestors had was an algebraic parser and evaluator.
+This was back in 2009, and I performed an online search before writing the whole thing from scratch.
+I found a nice post in Slack Overflow^[<http://stackoverflow.com/questions/1384811/code-golf-mathematical-expression-evaluator-that-respects-pemdas>] that discussed some cool ideas and even had some code published under the terms of the Creative Commons license.
 
 Besides ODEs, algebraic expressions are a must if one will be dealing with arbitrary functions in general and spatial distributions in particular---which is essentially what PDE solvers are for. If a piece of software wants to allow features ranging from comparing numerical results with analytical expression to converting material properties from a system of units to another one in a straightforward way for the user (either an actual human being or a computer creating an input file), it ought to be able to handle algebraic expressions. 
 
@@ -1762,20 +1788,24 @@ In real applications this distribution\ $T(x,y)$ can be read from the output of 
 
 So remember, in FeenoX *everything is an expression*---especially temperature, as also shown in the next section.
 
-### Matching formulations
+### Matching formulations {#sec:matching-formulations}
 
 
-The [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system) system and the [NAFEMS\ LE10](https://www.nafems.org/publications/resource_center/p18/) benchmark problem, both discussed earlier in @sec:scope, illustrate how well the FeenoX input file matches the usual human-readable formulation of ODE or PDE problems. In effect, @fig:nafems-le10-problem-input shows there is a trivial one-to-one correspondence between the sections of the problem formuated in a sheet of paper and the text file `nafems-le10.fee`. A further example can be given by solving the following case.
+The [Lorenz’ dynamical system](http://en.wikipedia.org/wiki/Lorenz_system) system and the [NAFEMS\ LE10](https://www.nafems.org/publications/resource_center/p18/) benchmark problem, both discussed earlier in @sec:scope, illustrate how well the FeenoX input file matches the usual human-readable formulation of ODE or PDE problems.
+In effect, @fig:nafems-le10-problem-input shows there is a trivial one-to-one correspondence between the sections of the problem formulated in a sheet of paper and the text file `nafems-le10.fee`.
+The same effect can be seen in the NAFEMS LE11 problem, which involves a temperature distribution given as an algebraic expression of $\vec{x}$:
 
 ```include
 nafems-le11.md
 ```
 
-This feature can be better appreciated by comparing the input files needed to solve these kind of NAFEMS benchmarks with other finite-element tools. @Sec:le10-other gives a glympse for the NAFEMS\ LE10 problem, where the input files are way too cryptic and cumbersome as compared to what FeenoX needs.
+![The NAFEMS LE11 problem statement and the corresponding FeenoX input](nafems-le11-problem-input.svg){#fig:nafems-le11-problem-input width_html=100% width_latex=100% width_texinfo=15cm} 
+
+This feature can be better appreciated by comparing the input files needed to solve these kind of NAFEMS benchmarks with other finite-element tools. @Sec:le10-other gives a glimpse for the NAFEMS\ LE10 problem, where the input files are way too cryptic and cumbersome as compared to what FeenoX needs.
 
 
 
-### Comparison of solutions
+### Comparison of solutions {#sec:comparison-of-solutions}
 
 One cornerstone design feature is that FeenoX has to provide a way to compare its numerical results with other already-know solutions---either analytical or numerical---in order to verify their validity. Indeed, being able to take the difference between the numerical result and an algebraic expression evaluated at arbitrary locations (usually quadrature points to compute~$L_p$ norms of the error) is a must if code verification through the Method of Manufactured Solutions is required (see @sec:mms).
 
@@ -1914,15 +1944,81 @@ First, the thermal problem is solved with FeenoX and the temperature distributio
 
 Then, the mechanical problem reads two meshes: one for solving the actual mechanical problem and another one for reading $T(x,y,z)$ from the previous step. Note that the former contains second-order hexahedra and the latter first-order tetrahedra. After effectively solving the problem, it writes again @tbl:parallelepiped in Markdown. 
 
-The FeenoX implementation illustrates several design features, namely????????????
 
+### Run-time arguments {#sec:run-time-arguments}
+
+The usage of run-time command-line arguments was illustrated in @sec:parametric.
+The idea is that if the expression `$n` (or `${n}`) is found in the input file, the FeenoX parser expands the expression literally as the $n$-th non-optional argument in the command line.
+The case $n=0$ is particular in the sense that, as explained in @sec:syntatic, expands to the name of the input file without the leading directory path and the trailing extension `.fee`.
+
+The definition [`DEFAULT_ARGUMENT_VALUE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#default_argument_value) can be used to give a default value for arguments not provided.
+otherwise, FeenoX would complain:
+
+```terminal
+$ echo "PRINT \$1" | feenox -
+error: input file needs at least one more argument in commandline
+$ echo -e "DEFAULT_ARGUMENT_VALUE 1 hello\nPRINT \$1" | feenox -
+hello
+$ 
+```
+
+This feature is extensively used in parametric and optimization runs such as in the [verification using the Method of Manufactured solutions](https://github.com/seamplex/feenox/tree/main/tests/mms):
+
+```{.feenox include="thermal-square-mms.fee"}
+```
+
+which is called from a Bash loop that looks like
+
+```bash
+bcs="dirichlet neumann"
+elems="tri3 tri6 quad4 quad8 quad9"
+algos="struct frontal delaunay"
+cs="4 6 8 10 12 16 20 24 30 36 48"
+
+[...]
+
+for bc in ${bcs}; do
+ for elem in ${elems}; do
+  for algo in ${algos}; do
+
+    [...]
+     
+    for c in ${cs}; do
+  
+     name="thermal_square_${bc}-${elem}-${algo}-${c}"
+   
+     # prepare mesh
+     if [ ! -e square-${elem}-${algo}-${c}.msh ]; then
+       lc=$(echo "PRINT 1/${c}" | feenox -)
+       gmsh -v 0 -2 square.geo ${elem}.geo ${algo}.geo -clscale ${lc} -o square-${elem}-${algo}-${c}.msh
+     fi
+   
+     # run feenox
+     feenox thermal-square.fee ${bc} ${elem} ${algo} ${c} ${vtk} | tee -a ${dat}.dat 
+      
+    done
  
+    [...]
+    
+  done
+ done
+done
+```
+
+The full script can be found in [`tests/mms/thermal2d/2d/run.sh`](https://github.com/seamplex/feenox/blob/main/tests/mms/thermal/2d/run.sh).
+
+In the input file above, the instruction [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh) with an explicit file name was given
+
+```feenox
+WRITE_MESH thermal-square_$1-$2-$3-$4.vtk T q T_mms T(x,y)-T_mms(x,y)
+```
+
+because non-standard output fields are needed (namely `T_mms` and `T(x,y)-T_mms(x,y)`).
+If the [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) is used without and explicit `FILE` keyword, the output file name is the basename of the input file and the expansion of all the arguments in the command line, i.e. `$0-[$1-[$2...]].msh`.
+
+The study ["Comparison of resource consumption for different FEA programs"](https://github.com/seamplex/feenox/tree/main/tests/nafems/le10) also performs a parametric run on the mesh size using similar ideas.
 
 
-
-### Run-time arguments
-
-Already shown
 
 ### Git and macro-friendliness {#sec:git-friendliness}
 
@@ -1977,20 +2073,51 @@ Mechanical plane-strain square with temperature-dependent Young modulus and comp
 :::
 
 
-
-macro-friendly inputs, rule of generation
-ejemplo del alpha-flex
-
-
-VCS tracking, example with hello world.
-data separated from mesh
-
-
 ## Results output {#sec:output}
 
 > ```include
 > 320-output.md
 > ```
+
+The output in FeenoX is 100% user defined, i.e. everything that FeenoX writes comes from one of the following output instructions:
+
+ * [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print)
+ * [`PRINTF`](https://www.seamplex.com/feenox/doc/feenox-manual.html#printf)
+ * [`PRINT_FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_function)
+ * [`PRINT_VECTOR`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print_vector)
+ * [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh)
+ * [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results)
+ * [`DUMP`](https://www.seamplex.com/feenox/doc/feenox-manual.html#dump)
+
+In the absence of any of these instructions, FeenoX will not write anything.
+Not in the standard output, not in any other file.
+
+ Computer | Monthly Rental  | Relative Speed | First Delivery 
+:----------------|:------------------------:|:-----------:|:-----------:
+ CDC 3800        |         $ 50,000         |     1       |  Jan 66
+ CDC 6600        |         $ 80,000         |     6       |  Sep 64
+ CDC 6800        |         $ 85,000         |     20      |  Jul 67
+ GE 635          |         $ 55,000         |     1       |  Nov 64
+ IBM 360/62      |         $ 58,000         |     1       |  Nov 65
+ IBM 360/70      |         $ 80,000         |     2       |  Nov 65
+ IBM 360/92      |         $ 142,000        |     20      |  Nov 66
+ PHILCO 213      |         $ 78,000         |     2       |  Sep 65
+ UNIVAC 1108     |         $ 45,000         |     2       |  Aug 65
+
+: [Relative speed is expressed with reference to IBM 7030. Data for computers expected to appear after 1965 was estimated.]{lang=en-US} {#tbl:1965}
+
+This is a sound design decision that follows the Unix rules of silence and, more importantly, of economy.
+In effect, more than fifty years ago CPU time was far more expensive than engineering time (@tbl:1965).
+At that time, engineering programs had to write _everything_ they computed because it was too expensive to re-run the calculation in case a single result was missing.
+
+Nowadays the engineering time is far more expensive than CPU time.
+Therefore, the time needed for the user to find and process a single result in a soup of megabytes of a cluttered output file far outweighs the cost of running a computation from scratch with the needed result as the only output.
+Especially if the expensive engineers are smart enough to set up the problem using a coarse mesh and run the actual fine execution only after having checked everything works as expected.
+
+Moreover, when solving PDEs, FeenoX will be also smart enough not to compute quantities which are not going to be written anywhere.
+For example, if the input file does not reference the principal stress `sigma1` (or [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) does not ask for it) then FeenoX will not compute it.
+
+## Output formats {#sec:output-formats}
 
 JSON/YAML, state of the art open post-processing formats.
 Mobile & web-friendly.
@@ -1999,12 +2126,9 @@ Common and preferably open-source formats.
 
 
 
-100% user-defined output with PRINT, rule of silence
-rule of economy, i.e. no RELAP
 yaml/json friendly outputs
 vtk (vtu), gmsh, frd?
 
-90% is serial (vtk), no need to complicate due to 10%
 
 ### Data exchange between non-conformal meshes {#sec:non-conformal}
 
@@ -2050,7 +2174,6 @@ $
 
 ::: {#fig:mechanical-square-from-temp layout-ncol=2}
 ![Numerical temperature$T(x,y)$ as the result of a thermal problem over an unstructured grid](thermal-square-temperature.png){width_latex=42%}
-
 ![Plane-strain with temperature-dependent$E(T)$ case](mechanical-square-temperature-from-msh.png){width_latex=55%}
 
 Mechanical plane-strain square with temperature-dependent Young modulus read from a non-conformal mesh as the result of a thermal problem. Compare with @fig:mechanical-square.
@@ -2071,10 +2194,6 @@ Mechanical plane-strain square with temperature-dependent Young modulus read fro
 > 410-reproducibility.md
 > ```
 
-
-simple <-> simple
-
-similar <-> Similar
 
 ## Automated testing {#sec:testing}
 

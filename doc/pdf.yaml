@@ -1,6 +1,7 @@
 ---
 fontsize: 11pt
 geometry:
+- paper=a4paper
 - left=2.5cm
 - right=2cm
 - bottom=3.5cm

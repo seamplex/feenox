@@ -63,7 +63,7 @@ $ echo 'PRINT $1+$2' | feenox - 3 4
 7
 ```
 
-PETSc and SLEPc options can be passed in `[petsc options]` as well, with the
+PETSc and SLEPc options can be passed in `[petsc options]` (or `[options]`) as well, with the
 difference that two hyphens have to be used instead of only once. For example,
 to pass the PETSc option `-ksp_view` the actual FeenoX invocation should be
 

@@ -1,5 +1,5 @@
 PROBLEM mechanical
-READ_MESH nafems-le11.msh
+READ_MESH $0.msh
 
 # linear temperature gradient in the radial and axial direction
 T(x,y,z) = (x^2 + y^2)^(1/2) + z
@@ -16,5 +16,5 @@ nu = 0.3            # dimensionless
 alpha = 2.3e-4      # in 1/ºC as in the problem
 
 SOLVE_PROBLEM
-WRITE_MESH nafems-le11.vtk VECTOR u v w   T sigma1 sigma2 sigma3 sigma sigmaz
+WRITE_RESULTS FORMAT vtk
 PRINT "sigma_z(A) =" sigmaz(0,1,0)/1e6 "MPa (target was -105 MPa)" SEP " "

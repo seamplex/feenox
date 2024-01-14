@@ -60,7 +60,7 @@ doc/tests-list.md
  
 ## Capabilities
 
- * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) [self-descriptive English-like plain-text input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#matching-formulations) as much as possible:
+ * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) [self-descriptive English-like plain-text input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations) as much as possible:
    - [no need to recompile if the problem changes](https://seamplex.com/feenox/doc/sds.html#sec:introduction) (FeenoX is a _program_, not a library)
    - [nouns are definitions and verbs are instructions](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
    - [simple problems need simple inputs](https://seamplex.com/feenox/doc/sds.html#sec:simple)
@@ -93,7 +93,7 @@ doc/tests-list.md
    [boundary conditions](https://github.com/seamplex/feenox/blob/main/tests/radiation-as-convection-celsius.fee)
    - [algebraic expressions](https://seamplex.com/feenox/examples/mechanical.html#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature), and/or
    - [point-wise interpolated data](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties)
- * Command-line argument expansion for
+ * [Command-line argument expansion](https://seamplex.com/feenox/doc/sds.html#sec:run-time-arguments) for
    - [increased flexibility](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter),
    - [parametric sweeps](https://seamplex.com/feenox/doc/sds.html#sec:parametric), and/or
    - [optimization loops](https://seamplex.com/feenox/doc/sds.html#optimization-loops)

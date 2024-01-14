@@ -40,7 +40,7 @@ Unlike these other FEA tools, FeenoX provides...
    ```
 
 
- * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) [self-explanatory ASCII file](https://seamplex.com/feenox/doc/sds.html#sec:input) (passed as the first non-optional argument to the `feenox` executable) with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow using containerized images (because there is no need to recompile the binary for each problem).
+ * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) [self-explanatory ASCII file](https://seamplex.com/feenox/doc/sds.html#sec:input) (passed as the first non-optional argument to the `feenox` executable) with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow using containerized images (because there is no need to recompile the binary for each problem).
  
  * a few supported [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) types and a mechanism to allow hacker and [academics](./README4academics.md) to add new PDEs, as explained in the next bullet. This bullet is about the fact that a [regular user](./README4engineers.md) wanting to solve heat conduction (even with [multi-material non-uniform conductivities $k$](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/)) just needs to do
  
@@ -100,7 +100,7 @@ Unlike these other FEA tools, FeenoX provides...
  
 The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input)...
 
- - has a [one-to-one correspondence with the human description of the problem](https://seamplex.com/feenox/doc/sds.html#matching-formulations)
+ - has a [one-to-one correspondence with the human description of the problem](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations)
  - is Git-traceable ([the mesh is defined in a separate file](https://seamplex.com/feenox/doc/sds.html#sec:input) created by Gmsh, which may or may not be tracked)
  - allows the user to enter [algebraic expressions whenever a numerical value is needed](https://seamplex.com/feenox/doc/sds.html#sec:expression) (everything is an expression)
  - understands [definitions (nouns) and instructions (verbs)](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs). FeenoX has an actual instruction pointer that loops over the instruction set (there might even be conditional blocks).

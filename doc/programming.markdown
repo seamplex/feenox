@@ -245,7 +245,7 @@ detected the configure script by adding “using configure” next to
 
 - FeenoX uses the [GNU Autools][] (i.e. [Autoconf][] and [Automake][]).
 - If you really feel that you have to use [CMake][] for your
-  contributions, feel free to do so (UNIX rule of diversity) but make
+  contributions, feel free to do so (Unix rule of diversity) but make
   sure that at the end of the day `./configure && make` still works.
 
   [GNU Autools]: https://en.wikipedia.org/wiki/GNU_Autotools
@@ -297,7 +297,7 @@ detected the configure script by adding “using configure” next to
   because “screen” can be anything from a mobile phone to a desktop with
   many 24” LED monitors.
 
-- Make sure you understand and follow the 17 rules of UNIX philosophy
+- Make sure you understand and follow the 17 rules of Unix philosophy
   <https://en.wikipedia.org/wiki/Unix_philosophy>
 
   1.  modularity

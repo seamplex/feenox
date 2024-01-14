@@ -46,7 +46,7 @@ Say we already have a [`nafems-le10.geo`](https://github.com/seamplex/feenox/blo
 >
 > and can be partitioned or not.
 
-Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) for example) as follows:
+Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) for example) as follows:
 
 ```feenox
 PROBLEM mechanical 3D
@@ -121,7 +121,7 @@ There are two "why" questions we have to answer.
        - everything is an expression
          - material properties can be given as functions of space and/or time and/or temperature (or other intermediate variables)
          - these functions can be given as algebraic expresions or come from interpolateed point-wise defined data
-     * 100% user-defined output
+     * [100% user-defined output](https://seamplex.com/feenox/doc/sds.html#sec:output)
      * simple problems need simple inputs
      * similar problems need similar inputs
      * parametric and optimization runs through command-line arguments

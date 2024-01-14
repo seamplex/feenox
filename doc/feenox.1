@@ -14,7 +14,7 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "FEENOX" "1" "2024-01-07" "FeenoX" "FeenoX User Manual"
+.TH "FEENOX" "1" "2024-01-14" "FeenoX" "FeenoX User Manual"
 .hy
 .SH NAME
 .PP
@@ -187,9 +187,9 @@ $ echo \[aq]PRINT $1+$2\[aq] | feenox - 3 4
 \f[R]
 .fi
 .PP
-PETSc and SLEPc options can be passed in \f[V][petsc options]\f[R] as
-well, with the difference that two hyphens have to be used instead of
-only once.
+PETSc and SLEPc options can be passed in \f[V][petsc options]\f[R] (or
+\f[V][options]\f[R]) as well, with the difference that two hyphens have
+to be used instead of only once.
 For example, to pass the PETSc option \f[V]-ksp_view\f[R] the actual
 FeenoX invocation should be
 .IP

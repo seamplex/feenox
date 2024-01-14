@@ -89,12 +89,12 @@ Unlike these other FEA tools, FeenoX provides…
   $ 
   ```
 
-- a parser for a [syntactically-sugared][] self-explanatory ASCII file
-  (passed as the first non-optional argument to the `feenox` executable)
-  with keywords that completely define the problem without requiring
-  further human actions, allowing a [cloud-first][] workflow using
-  containerized images (because there is no need to recompile the binary
-  for each problem).
+- a parser for a [syntactically-sugared][] [self-explanatory ASCII
+  file][] (passed as the first non-optional argument to the `feenox`
+  executable) with keywords that completely define the problem without
+  requiring further human actions, allowing a [cloud-first][] workflow
+  using containerized images (because there is no need to recompile the
+  binary for each problem).
 
 - a few supported [`PROBLEM`][] types and a mechanism to allow hacker
   and [academics][] to add new PDEs, as explained in the next bullet.
@@ -107,7 +107,9 @@ Unlike these other FEA tools, FeenoX provides…
   ```
 
   and does not need to know nor write the weak form of the Poisson
-  equation in the input file (as other tools ask for).
+  equation in the input file, since the vast majority of [users][] will
+  not know what a weak form is (even though other “similar” tools ask
+  their users for that).
 
 - a Git repository with GPL sources (and FDL documentation) where
   contributions are welcome. In particular, each partial differential
@@ -174,12 +176,13 @@ Unlike these other FEA tools, FeenoX provides…
 - flexibility to handle many workflows, including [web-based
   interfaces][] and thin command-line clients.
 
-The input file…
+The [input file][self-explanatory ASCII file]…
 
 - has a [one-to-one correspondence with the human description of the
   problem][]
-- is Git-traceable ([the mesh is defined in a separate file][] created
-  by Gmsh, which may or may not be tracked)
+- is Git-traceable ([the mesh is defined in a separate
+  file][self-explanatory ASCII file] created by Gmsh, which may or may
+  not be tracked)
 - allows the user to enter [algebraic expressions whenever a numerical
   value is needed][] (everything is an expression)
 - understands [definitions (nouns) and instructions (verbs)][]. FeenoX
@@ -210,18 +213,19 @@ and will not compute things that are not actually needed).
   [Sparselizard]: http://sparselizard.org/
   [1]: https://commonmark.org/
   [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
-  [syntactically-sugared]: https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting
+  [syntactically-sugared]: https://seamplex.com/feenox/doc/sds.html#sec:syntactic
+  [self-explanatory ASCII file]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
   [academics]: README4academics.markdown
   [regular user]: README4engineers.markdown
   [multi-material non-uniform conductivities $k$]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/
+  [users]: README4engineers.md
   [C entry points that the main mathematical framework calls as function pointer to build the elemental objects]:
     https://seamplex.com/feenox/doc/sds.html#sec:extensibility
   [web-based interfaces]: https://www.caeplex.com
   [one-to-one correspondence with the human description of the problem]:
-    https://seamplex.com/feenox/doc/sds.html#matching-formulations
-  [the mesh is defined in a separate file]: https://seamplex.com/feenox/doc/sds.html#sec:input
+    https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations
   [algebraic expressions whenever a numerical value is needed]: https://seamplex.com/feenox/doc/sds.html#sec:expression
   [definitions (nouns) and instructions (verbs)]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
   [simple for simple files]: https://seamplex.com/feenox/doc/sds.html#sec:simple
