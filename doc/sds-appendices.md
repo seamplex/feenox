@@ -22,7 +22,7 @@ git.md
 
 
 
-# Appendix: Rules of UNIX philosophy {#sec:unix}
+# Appendix: Rules of Unix philosophy {#sec:unix}
 
 ```{.include shift-heading-level-by=1}
 unix.md

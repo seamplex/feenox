@@ -454,7 +454,7 @@ To read the stress at point\ $D$, an `awk` file that parses the output `.frd` fi
  -1       371-1.52894E+00 1.19627E+00-5.85388E-02-8.97020E-03 1.73081E-03 7.02901E-01
 ```
 
-where negative values appear concatenated with the previous one as a single ASCII token in a non-UNIX-friendly way.
+where negative values appear concatenated with the previous one as a single ASCII token in a non-Unix-friendly way.
 
 
 ```{.awk include="frd-stress-at-node.awk"}

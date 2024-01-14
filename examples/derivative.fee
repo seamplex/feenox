@@ -2,9 +2,9 @@
 ---
 category: basic
 intro: |
-  # Computing the derivative of a function as a UNIX filter
+  # Computing the derivative of a function as a Unix filter
  
-  This example illustrates how well FeenoX integrates into the UNIX philosophy.
+  This example illustrates how well FeenoX integrates into the Unix philosophy.
   Let's say one has a function\ $f(t)$ as an ASCII file with two columns and
   one wants to compute the derivative\ $f'(t)$. Just pipe the function file
   into this example's input file `derivative.fee` used as a filter.
@@ -88,5 +88,5 @@ f'(t) = derivative(f(t'),t',t)
 PRINT_FUNCTION f' MIN a+0.5*h MAX b-0.5*h STEP h
 ---
 figures: |
-  ![Numerical derivative as a UNIX filter and actual analytical result](derivative.svg)
+  ![Numerical derivative as a Unix filter and actual analytical result](derivative.svg)
 ...

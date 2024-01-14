@@ -23,11 +23,11 @@ intro: |
    * The input written in a self-evident English-like dialect
       - Syntactic sugared plain-text ASCII file
       - Simple problems (like this one) need simple inputs
-      - FeenoX follows the UNIX rule of simplicity
+      - FeenoX follows the Unix rule of simplicity
      
    * Output is 100% user-defined
       - No `PRINT` no output
-      - Feenox follows the UNIX rule of silence
+      - Feenox follows the Unix rule of silence
     
    * There is no node at $x=1/2=0.5$!
       - FeenoX knows how to interpolate
@@ -37,7 +37,7 @@ intro: |
  
       ```{.c include="slab.geo"}
       ```
-      - UNIX rule of composition
+      - Unix rule of composition
       - The actual input file is a Git-friendly `.fee`
 terminal: |
   $ gmsh -1 slab.geo

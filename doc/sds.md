@@ -240,7 +240,7 @@ mazes.md
 As already stated, FeenoX can be compiled from its sources using the well-established `configure` & `make` procedure. The code’s source tree is hosted on Github so cloning the repository is the preferred way to obtain FeenoX, but source tarballs are periodically released too according to the requirements in @sec:traceability.
 There are also non-official binary `.deb` packages which can be installed with `apt` using a custom package repository location.
 
-The configuration and compilation is based on [GNU Autotools](https://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html) that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of UNIX variants. It has been tested with
+The configuration and compilation is based on [GNU Autotools](https://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html) that has more than thirty years of maturity and it is the most portable way of compiling C code in a wide variety of Unix variants. It has been tested with
 
  * [GNU C compiler](https://gcc.gnu.org/) (free)
  * [LLVM Clang compiler](http://clang.org/) (free)
@@ -471,7 +471,7 @@ It then calls FeenoX with the input above and passes `${element}` and `${c}` as 
 ```{.bash include="cantilever.sh"}
 ```
 
-After the execution of the script, thanks to the design decision (explained in @sec:output) that output is 100% defined by the user (in this case with the `PRINT` instruction), one has several files `cantilever-${element}.dat` files. When plotted, these show the shear locking effect of fully-integrated first-order elements as illustrated in @fig:cantilever-displacement. The theoretical [Euler-Bernoulli](https://en.wikipedia.org/wiki/Euler%E2%80%93Bernoulli_beam_theory) result is just a reference as, among other things, it does not take into account the effect of the material's [Poisson's ratio](https://en.wikipedia.org/wiki/Poisson%27s_ratio).
+After the execution of the script, thanks to the design decision (explained in @sec:output) that output is 100% defined by the user (in this case with the [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) instruction), one has several files `cantilever-${element}.dat` files. When plotted, these show the shear locking effect of fully-integrated first-order elements as illustrated in @fig:cantilever-displacement. The theoretical [Euler-Bernoulli](https://en.wikipedia.org/wiki/Euler%E2%80%93Bernoulli_beam_theory) result is just a reference as, among other things, it does not take into account the effect of the material's [Poisson's ratio](https://en.wikipedia.org/wiki/Poisson%27s_ratio).
 Note that the abscissa shows the number of _nodes_, which are proportional to the number of degrees of freedom (i.e. the size of the problem matrix) and not the number of _elements_, which is irrelevant here and in most problems.
 
 
@@ -788,7 +788,7 @@ $
 > ```
 
 The third-system effect mentioned in @sec:architecture involves more than ten years of experience in the nuclear industry,^[This experience also shaped many of the features that FeenoX has and most of the features is does deliberately not have.] where complex dependencies of multiple material properties over space through intermediate distributions (temperature, neutronic poisons, etc.) and time (control rod positions, fuel burn-up, etc.) are mandatory.
-One of the cornerstone design decisions in FeenoX is that **everything is an expression** (@sec:expression). Here, “everything” means any location in the input file where a numerical value is expected. The most common use case is in the `PRINT` keyword. For example, the [Sophomore's dream](https://en.wikipedia.org/wiki/Sophomore%27s_dream) (in contrast to [Freshman's dream](https://en.wikipedia.org/wiki/Freshman%27s_dream)) identity
+One of the cornerstone design decisions in FeenoX is that **everything is an expression** (@sec:expression). Here, “everything” means any location in the input file where a numerical value is expected. The most common use case is in the [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) keyword. For example, the [Sophomore's dream](https://en.wikipedia.org/wiki/Sophomore%27s_dream) (in contrast to [Freshman's dream](https://en.wikipedia.org/wiki/Freshman%27s_dream)) identity
 
 
 $$
@@ -1009,7 +1009,7 @@ neutron_diffusion
 ```
 
 
-Besides removals, additions---which are also handled by `autogen.sh` as describe aboved--- are far more interesting to discuss.
+Besides removals, additions---which are also handled by `autogen.sh` as describe aboved---are far more interesting to discuss.
 Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`).
 More information can be found in the [FeenoX programming & contributing](https://www.seamplex.com/feenox/doc/#programming-and-contributing) section.
 
@@ -1045,14 +1045,14 @@ Following the same principle, new models can be added by adding new routines and
  * [Pyxplot](http://www.pyxplot.org.uk/): [@fig:cantilever-displacement;@fig:fork;@fig:nafems-t3]
 
  
-To illustrate both the filter approach, consider the following input file that solves Laplace’s equation $\nabla^2 \phi = 0$ on a square with some space-dependent boundary conditions. Either Gmsh or Paraview can be used to post-process the results:
+To illustrate this approach, consider the following input file that solves Laplace’s equation $\nabla^2 \phi = 0$ on a square with some space-dependent boundary conditions. Either Gmsh or Paraview can be used to post-process the results:
  
 ```include
 laplace.md
 ```
 
-A great deal of FeenoX interoperability capabilities comes from another design decision: **output is 100% controlled by the user** (further discussed in @sec:output), a.k.a. “no `PRINT`, no OUTPUT” whose corollary is the UNIX _rule of silence_ (@sec:unix-silence).
-The following input file computes the natural frequencies of oscillation of a cantilevered wire both using the Euler-Bernoulli theory and finite elements. It writes a [GFM table](https://github.github.com/gfm/#tables-extension-) into the standard output which is then piped to [Pandoc](https://pandoc.org/) and then converted to HTML:
+A great deal of FeenoX interoperability capabilities comes from another design decision: **output is 100% controlled by the user** (further discussed in @sec:output), a.k.a. “no [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print), no OUTPUT” whose corollary is the Unix _rule of silence_ (@sec:unix-silence).
+The following input file computes the natural frequencies of oscillation of a cantilevered wire both using the Euler-Bernoulli theory and finite elements. It writes a [Gihub-formatted markdown table](https://github.github.com/gfm/#tables-extension-) into the standard output which is then piped to [Pandoc](https://pandoc.org/) and then converted to HTML:
 
 ```{.feenox include="wire.fee"}
 ```
@@ -1130,7 +1130,8 @@ Results of the same fatigue problem solved using two different philosophies.
 :::
 
  
-It should be noted that all of the programs and tools mentioned to be interoperable with FeenoX are [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software). This is not a requirement from the SRS, but is indeed a nice-to-have feature.
+It should be noted that all of the programs and tools mentioned to be interoperable with FeenoX are [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software).
+This is not a requirement from the SRS, but is indeed a nice-to-have feature.
  
 # Interfaces
 
@@ -1139,19 +1140,23 @@ It should be noted that all of the programs and tools mentioned to be interopera
 > 300-interfaces.md
 > ```
 
-FeenoX is provided as a console-only executable which can be run remotely through SSH or inside a containerized environment without any requirement such as graphical servers or special input devices.
-When executed without any arguments, FeenoX writes a brief message with the version (further discussed in\ @sec:traceability) and the basic usage on the standard output and return to the calling shell with a return errorlevel zero:
+FeenoX is provided as a console-only executable (recall it is a program, not a library) which can be run remotely through the mechanisms discussed in @sec:execution without any requirement such as graphical servers or special input devices.
+As already explained, when executed without any arguments, FeenoX writes a brief message with the version (further discussed in\ @sec:traceability) and the basic usage on the standard output and return to the calling shell with a return errorlevel zero:
 
 ```terminal
 $ feenox 
-FeenoX v0.2.12-gc5934bb
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v0.3.292-gc932cb5 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-usage: feenox [options] inputfile [replacement arguments]
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Run with --help for further explanations.
 $ echo $?
@@ -1163,10 +1168,10 @@ The `--version` option follows the [GNU Coding Standards guidelines](https://www
 
 ```terminal
 $ feenox --version
-FeenoX v0.2.14-gbbf48c9
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v0.3.292-gc932cb5 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright © 2009--2022 Seamplex, https://seamplex.com/feenox
+Copyright © 2009--2024 Seamplex, https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -1205,11 +1210,13 @@ usage: feenox [options] inputfile [replacement arguments] [petsc options]
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
   --progress         print ASCII progress bars when solving PDEs
   --mumps            ask PETSc to use the direct linear solver MUMPS
-  --linear           force FeenoX to solve the PDE problem as linear
-  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Instructions will be read from standard input if “-” is passed as
 inputfile, i.e.
@@ -1232,6 +1239,10 @@ invocation should be
 
     $ feenox input.fee --ksp_view
 
+For PETSc options that take values, en equal sign has to be used:
+
+    $ feenox input.fee --mg_levels_pc_type=sor
+
 See https://www.seamplex.com/feenox/examples for annotated examples.
 
 Report bugs at https://github.com/seamplex/feenox/issues
@@ -1241,8 +1252,8 @@ $
 ```
 
 
-The input file provided as the first argument to the `feenox` binary contains all the information needed to solve the problem, so any further human intervention is not needed after execution begins. 
-If the execution finishes successfully, FeenoX returns a zero errorlevel to the calling shell (and follows the UNIX _rule of silence_):
+The input file provided as the first argument to the `feenox` binary contains all the information needed to solve the problem, so any further human intervention is not needed after execution begins, as requested by the SRS.
+If the execution finishes successfully, FeenoX returns a zero errorlevel to the calling shell (and follows the Unix _rule of silence_, i.e. no [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) no output):
 
 ```terminal
 $ feenox maze.fee
@@ -1265,9 +1276,9 @@ $ echo $?
 $ 
 ```
 
-This way, the error line can easily be parsed with standard UNIX tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initiating entity---which depending on the workflow can be a human or an automation script---in order for he/she/it to fix it.
+This way, the error line can easily be parsed with standard Unix tools like `grep` and `cut` or with a proper regular expression parser. Eventually, any error should be forwarded back to the initiating entity---which depending on the workflow can be a human or an automation script---in order for her/him/it to fix it.
 
-Following the _rule of repair_ (@sec:unix-repair), ill input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
+Following the _rule of repair_ (@sec:unix-repair), ill-defined input files with missing material properties or inconsistent boundary conditions are detected before the actual assembly of the matrix begins:
 
 ```terminal
 $ feenox thermal-1d-dirichlet-no-k.fee
@@ -1425,7 +1436,7 @@ Hello universe!
 $
 ```
 
-For example, the following she-banged input file can be used to compute the derivative of a column with respect to the other as a UNIX filter:
+For example, the following she-banged input file can be used to [compute the derivative of a column with respect to the other as a Unix filter](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter):
 
 ```{.feenox include="derivative.fee"}
 ```
@@ -1453,9 +1464,11 @@ $
 > 310-input.md
 > ```
 
-FeenoX currently works by reading an input file (which in turn can recursively include further input files) with an _ad-hoc_ format, whose rationale is described in this section. Therefore, it does satisfy requirement\ a. but eventually could also satisfy requirement\ b.
+FeenoX currently works by reading an input file (which in turn can recursively [`INCLUDE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#include) further input files) with an _ad-hoc_ format, whose rationale is described in this section.
+Therefore, it already does satisfy requirement\ a. but eventually could also satisfy requirement\ b.
 
 As already explained in\ @sec:introduction, the motto is “FeenoX is---in a certain sense---to desktop FEA programs  and libraries what Markdown is to Word and (La)TeX, respectively and _deliberately_.” Hence, the input files act as the Markdown source: instructions about what to do but not how to do it.
+
 The input files are indeed plain-text ASCII files with English-like keywords that fully define the problem.
 The main features of the input format, thoroughly described below, are:
 
@@ -1471,7 +1484,12 @@ The main features of the input format, thoroughly described below, are:
  
 ### Syntactic sugar & highlighting
 
-The first argument not starting with a dash to the `feenox` executable is the path to the main input file. This main input file can in turn include other FeenoX input files and/or read data from other files (such as meshes) or resources (such as shared memory objects). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness). The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)).
+The first argument not starting with a dash to the `feenox` executable is the path to the main input file.
+This main input file can in turn include other FeenoX input files (with the [`INCLUDE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#include) keyword) and/or read data from other files (such as meshes with the [`READ_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh) instruction) or other resources (such as data files for point-wise data interpolation with [`FUNCTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#function) or shared memory objects TBD). The input files are plain text files, either pure ASCII or UTF-8 (more details in @sec:git-friendliness).
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXx
+The extension can be anything, but a particular one is recommended so that per-extension syntax highlighting can be enabled in text editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/) as illustrated in @fig:highlighting) and in documentation (e.g. both HTML and PDF using Pandoc/LaTeX as in the [FeenoX website](https://www.seamplex.com/feenox)).
 
 In principle any extension (even no extension) can be used for the FeenoX input files.
 Throughout the FeenoX repository and documentation the extension `.fee` is used, which has a couple of advantages:
@@ -1545,7 +1563,7 @@ A primary keyword can be
  3. both.
  
 Definitions are English _nouns_ and instructions are English _verbs_. 
-In the example above, `PROBLEM` is a definition because it tells FeenoX about something it has to do (i.e. that it has to solve a three-dimensional problem), but does not do anything actually. On the other hand, `READ_MESH` is both a definition and an instruction: it defines that there exists a mesh named `nafems-le10.msh` which might be referenced later (for example in an `INTEGRATE` or `WRITE_MESH` instructions), but it also asks FeenoX to read the mesh at that point of the instruction list (more details below).  Finally, `PRINT` is a primary keyword taking different types and number or arguments. It is an instruction because it does not define anything, it just asks FeenoX to print the value of the function named `sigmay` evaluated at\ $2000,0,300$. In this case, `sigmay` is a function which is implicitly defined when `PROBLEM` is set to `mechanical`. If `sigmay` was referenced before `PROBLEM`, FeenoX would not find it. And if the problem was of any other type, FeenoX would not find it even when referenced from the last line of the input file.
+In the example above, `PROBLEM` is a definition because it tells FeenoX about something it has to do (i.e. that it has to solve a three-dimensional problem), but does not do anything actually. On the other hand, `READ_MESH` is both a definition and an instruction: it defines that there exists a mesh named `nafems-le10.msh` which might be referenced later (for example in an `INTEGRATE` or `WRITE_MESH` instructions), but it also asks FeenoX to read the mesh at that point of the instruction list (more details below).  Finally, [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) is a primary keyword taking different types and number or arguments. It is an instruction because it does not define anything, it just asks FeenoX to print the value of the function named `sigmay` evaluated at\ $2000,0,300$. In this case, `sigmay` is a function which is implicitly defined when `PROBLEM` is set to `mechanical`. If `sigmay` was referenced before `PROBLEM`, FeenoX would not find it. And if the problem was of any other type, FeenoX would not find it even when referenced from the last line of the input file.
 
 The following example further illustrates the differences between definitions and instructions. It compares the result of (numerically but adaptively) integrating $f(x,y,z) = \sin(x^3 + y^2 + z)$ over a unit cube against using a 3D Gauss integration scheme over a fixed set of quadrature points on the same unit cube meshes with two regular hexahedra in each direction (totalling 8 hexahedra). In one case hex20 are used and in the other one, hex27. Both cases use 27 quadrature points per element.
 
@@ -1669,7 +1687,7 @@ PRINT integral(f(x), x, 0, 1)
 
 to be one third.
 
-Of course, expressions are needed to get 100%-user defined output (further discussed in\ @sec:output), as with the `PRINT` instruction above. 
+Of course, expressions are needed to get 100%-user defined output (further discussed in\ @sec:output), as with the [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) instruction above. 
 But once an algebraic parser and evaluator is available, it does not make sense to keep force the user to write numerical data only. What if a the angular speed is in RPM and the model needs it in radians per second? Instead of having to write `104.72`, FeenoX allows the user to write
 
 ```

@@ -326,7 +326,7 @@ reference-fv.md
 
 \appendix
 
-# FeenoX & the UNIX Philospohy
+# FeenoX & the Unix Philospohy
 
 ```{.include shift-heading-level-by=1}
 unix.md

@@ -95,7 +95,7 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc 7
 ///help+extra+desc ```
 ///help+extra+desc @
-///help+extra+desc PETSc and SLEPc options can be passed in `[petsc options]` as well, with the
+///help+extra+desc PETSc and SLEPc options can be passed in `[petsc options]` (or `[options]`) as well, with the
 ///help+extra+desc difference that two hyphens have to be used instead of only once. For example,
 ///help+extra+desc to pass the PETSc option `-ksp_view` the actual FeenoX invocation should be
 ///help+extra+desc @

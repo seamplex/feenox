@@ -95,7 +95,7 @@ Then create a new C/C++ project File->New Project... choose C/C++ Project with E
 ## Makefiles
 
  * FeenoX uses the [GNU Autools](https://en.wikipedia.org/wiki/GNU_Autotools) (i.e. [Autoconf](https://www.gnu.org/software/autoconf/) and [Automake](https://www.gnu.org/software/automake/)).
- * If you really feel that you have to use [CMake](https://cmake.org/) for your contributions, feel free to do so (UNIX rule of diversity) but make sure that at the end of the day `./configure && make` still works.
+ * If you really feel that you have to use [CMake](https://cmake.org/) for your contributions, feel free to do so (Unix rule of diversity) but make sure that at the end of the day `./configure && make` still works.
 
 ## Test suite {#sec:test-suite}
 
@@ -122,7 +122,7 @@ Then create a new C/C++ project File->New Project... choose C/C++ Project with E
    ```
  
  * Do not worry about long lines. Only wrap lines when it makes sense to from a logic point of view not becuase "it looks bad on screen" because “screen” can be anything from a mobile phone to a desktop with many 24" LED monitors.
- * Make sure you understand and follow the 17 rules of UNIX philosophy <https://en.wikipedia.org/wiki/Unix_philosophy>
+ * Make sure you understand and follow the 17 rules of Unix philosophy <https://en.wikipedia.org/wiki/Unix_philosophy>
  
     1. modularity
     2. clarity

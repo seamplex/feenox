@@ -19,7 +19,7 @@ toc: true
 > 3. Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If you are using Windows, FeenoX may not be for you (but [CAEplex](https://www.caeplex.com) may). See below to find out [why](#why) FeenoX works the way it does.
 
 
-In plain engineering terms, FeenoX works like a transfer function between one or more input files and zero or more output files:
+In plain engineering terms, FeenoX works like a transfer function between one or more [input files](https://seamplex.com/feenox/doc/sds.html#sec:input) and zero or more [output files](https://seamplex.com/feenox/doc/sds.html#sec:output):
 
 ```include
 doc/transfer.md

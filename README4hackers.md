@@ -40,7 +40,7 @@ Unlike these other FEA tools, FeenoX provides...
    ```
 
 
- * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) self-explanatory ASCII file (passed as the first non-optional argument to the `feenox` executable)  with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow using containerized images (because there is no need to recompile the binary for each problem).
+ * a parser for a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#syntactic-sugar-highlighting) [self-explanatory ASCII file](https://seamplex.com/feenox/doc/sds.html#sec:input) (passed as the first non-optional argument to the `feenox` executable) with keywords that completely define the problem without requiring further human actions, allowing a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow using containerized images (because there is no need to recompile the binary for each problem).
  
  * a few supported [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) types and a mechanism to allow hacker and [academics](./README4academics.md) to add new PDEs, as explained in the next bullet. This bullet is about the fact that a [regular user](./README4engineers.md) wanting to solve heat conduction (even with [multi-material non-uniform conductivities $k$](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/)) just needs to do
  
@@ -48,7 +48,7 @@ Unlike these other FEA tools, FeenoX provides...
    PROBLEM thermal
    ```
    
-   and does not need to know nor write the weak form of the Poisson equation in the input file (as other tools ask for).
+   and does not need to know nor write the weak form of the Poisson equation in the input file, since the vast majority of [users](README4engineers.md) will not know what a weak form is (even though other "similar" tools ask their users for that).
  
  * a Git repository with GPL sources (and FDL documentation) where contributions are welcome. In particular, each partial differential equation that FeenoX can solve correspondence to one of the subdirectories of `src/pdes` that provide [C entry points that the main mathematical framework calls as function pointer to build the elemental objects](https://seamplex.com/feenox/doc/sds.html#sec:extensibility). The `autogen.sh` step (prior to `./configure` and `make`) detects the directory structure and includes all the subdirectories it finds as available [problem types](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem). They can be queried at runtime with the `--pdes` option:
  
@@ -98,7 +98,7 @@ Unlike these other FEA tools, FeenoX provides...
  
  * flexibility to handle many workflows, including [web-based interfaces](https://www.caeplex.com) and thin command-line clients.
  
-The input file...
+The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input)...
 
  - has a [one-to-one correspondence with the human description of the problem](https://seamplex.com/feenox/doc/sds.html#matching-formulations)
  - is Git-traceable ([the mesh is defined in a separate file](https://seamplex.com/feenox/doc/sds.html#sec:input) created by Gmsh, which may or may not be tracked)
