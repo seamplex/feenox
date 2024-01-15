@@ -1774,9 +1774,9 @@ FUNCTION Tint(t) FILE valve-internal-$1.csv INTERPOLATION linear
 
 These lines mean “define a function `Tint(t)` by linearly-interpolating
 the data in the file `valve-internal-$1.csv` where `$1` is the argument
-after the input file in the command line or `1` if none is
-provided`. See the documentation for the [`FUNCTION\`\](https://seamplex.com/feenox/doc/feenox-manual.html#function)
-definition for other available interpolation schemes.
+after the input file in the command line or `1` if none is provided. See
+the documentation for the [`FUNCTION`][] definition for other available
+interpolation schemes.
 
 The CSV file should contain something like
 
@@ -2039,6 +2039,7 @@ print("to get a video")
 >     animate the result with [ParaView][].
 
   [`DEFAULT_ARGUMENT_VALUE`]: https://seamplex.com/feenox/doc/feenox-manual.html#default_argument_value
+  [`FUNCTION`]: https://seamplex.com/feenox/doc/feenox-manual.html#function
   [`VECTOR`]: https://seamplex.com/feenox/doc/feenox-manual.html#vector
   [`vecmax`]: https://seamplex.com/feenox/doc/feenox-manual.html#vecmax
   [`asme-properties.fee`]: https://github.com/seamplex/feenox/blob/main/doc/tutorials/320-thermal/asme-properties.fee

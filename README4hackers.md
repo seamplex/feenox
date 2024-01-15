@@ -101,7 +101,7 @@ Unlike these other FEA tools, FeenoX provides...
 The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input)...
 
  - has a [one-to-one correspondence with the human description of the problem](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations)
- - is Git-traceable ([the mesh is defined in a separate file](https://seamplex.com/feenox/doc/sds.html#sec:input) created by Gmsh, which may or may not be tracked)
+ - is Git-traceable ([the mesh is defined in a separate file](https://seamplex.com/feenox/doc/sds.html#sec:input) created by [Gmsh](http://gmsh.info/), which may or may not be tracked)
  - allows the user to enter [algebraic expressions whenever a numerical value is needed](https://seamplex.com/feenox/doc/sds.html#sec:expression) (everything is an expression)
  - understands [definitions (nouns) and instructions (verbs)](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs). FeenoX has an actual instruction pointer that loops over the instruction set (there might even be conditional blocks).
  - is [simple for simple files](https://seamplex.com/feenox/doc/sds.html#sec:simple) (but might get [more complicated for mor complex problems](https://seamplex.com/feenox/doc/sds.html#sec:complex)). Remember Alan Kay's quote: "simple things should be simple and complex things should be possible."

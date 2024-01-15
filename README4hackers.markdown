@@ -181,8 +181,8 @@ The [input file][self-explanatory ASCII file]…
 - has a [one-to-one correspondence with the human description of the
   problem][]
 - is Git-traceable ([the mesh is defined in a separate
-  file][self-explanatory ASCII file] created by Gmsh, which may or may
-  not be tracked)
+  file][self-explanatory ASCII file] created by [Gmsh][], which may or
+  may not be tracked)
 - allows the user to enter [algebraic expressions whenever a numerical
   value is needed][] (everything is an expression)
 - understands [definitions (nouns) and instructions (verbs)][]. FeenoX
@@ -200,7 +200,7 @@ and will not compute things that are not actually needed).
 [^1]: Here “[Markdown][]” means ([Pandoc][] + [Git][] + [Github][] /
     [Gitlab][] / [Gitea][])
 
-[^2]: Here “FeenoX” means ([FeenoX][2] + [Gmsh][] + [Paraview][] +
+[^2]: Here “FeenoX” means ([FeenoX][2] + [Gmsh][3] + [Paraview][] +
     [Git][] + [Github][] / [Gitlab][] / [Gitea][])
 
   [FeenoX]: https://www.seamplex.com/feenox
@@ -226,6 +226,7 @@ and will not compute things that are not actually needed).
   [web-based interfaces]: https://www.caeplex.com
   [one-to-one correspondence with the human description of the problem]:
     https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations
+  [Gmsh]: http://gmsh.info/
   [algebraic expressions whenever a numerical value is needed]: https://seamplex.com/feenox/doc/sds.html#sec:expression
   [definitions (nouns) and instructions (verbs)]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
   [simple for simple files]: https://seamplex.com/feenox/doc/sds.html#sec:simple
@@ -237,7 +238,7 @@ and will not compute things that are not actually needed).
   [Gitlab]: https://about.gitlab.com/
   [Gitea]: https://gitea.com/%7D%7BGitea%7D
   [2]: https://seamplex.com/feenox
-  [Gmsh]: http://gmsh.info
+  [3]: http://gmsh.info
   [Paraview]: https://www.paraview.org/
 
 # How
@@ -269,7 +270,7 @@ well-established and open source libraries:
 So even more, considering the [NAFEMS LE10 Benchmark problem][], it
 works as two [“glue layers,”][]
 
-1.  between the mesher [Gmsh][3] and the [PETSc library][]
+1.  between the mesher [Gmsh][] and the [PETSc library][]
 2.  between the [PETSc library][] and the post-processor [Paraview][]
 
 ![][4] 
@@ -334,7 +335,7 @@ Feel free to raise any concerns you might have in our discussions page.
   [SLEPc]: http://slepc.upv.es/
   [NAFEMS LE10 Benchmark problem]: https://seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
   [“glue layers,”]: https://www.linuxtopia.org/online_books/programming_books/art_of_unix_programming/ch04s03_1.html
-  [3]: http://gmsh.info/
+  [Gmsh]: http://gmsh.info/
   [PETSc library]: https://petsc.org/release/
   [Paraview]: https://www.paraview.org/
   [4]: doc/transfer-le10-zoom.svg

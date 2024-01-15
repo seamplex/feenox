@@ -1001,7 +1001,7 @@ DEFAULT_ARGUMENT_VALUE 1 1
 FUNCTION Tint(t) FILE valve-internal-$1.csv INTERPOLATION linear
 ```
 
-These lines mean "define a function `Tint(t)` by linearly-interpolating the data in the file `valve-internal-$1.csv` where `$1` is the argument after the input file in the command line or `1` if none is provided`.
+These lines mean "define a function `Tint(t)` by linearly-interpolating the data in the file `valve-internal-$1.csv` where `$1` is the argument after the input file in the command line or `1` if none is provided.
 See the documentation for the [`FUNCTION`](https://seamplex.com/feenox/doc/feenox-manual.html#function) definition for other available interpolation schemes.
 
 The CSV file should contain something like

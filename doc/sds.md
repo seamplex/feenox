@@ -1716,7 +1716,7 @@ to be one third.
 Of course, expressions are needed to get 100%-user defined output (further discussed in\ @sec:output), as with the [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) instruction above. 
 But once an algebraic parser and evaluator is available, it does not make sense to keep force the user to write numerical data only. What if a the angular speed is in RPM and the model needs it in radians per second? Instead of having to write `104.72`, FeenoX allows the user to write
 
-```
+```feenox
 w = 1000 * 60*pi/180
 ```
 
@@ -2104,7 +2104,7 @@ Not in the standard output, not in any other file.
  PHILCO 213      |         $ 78,000         |     2       |  Sep 65
  UNIVAC 1108     |         $ 45,000         |     2       |  Aug 65
 
-: [Relative speed is expressed with reference to IBM 7030. Data for computers expected to appear after 1965 was estimated.]{lang=en-US} {#tbl:1965}
+: Relative speed is expressed with reference to IBM 7030. Data for computers expected to appear after 1965 was estimated. {#tbl:1965}
 
 This is a sound design decision that follows the Unix rules of silence and, more importantly, of economy.
 In effect, more than fifty years ago CPU time was far more expensive than engineering time (@tbl:1965).
@@ -2117,7 +2117,7 @@ Especially if the expensive engineers are smart enough to set up the problem usi
 Moreover, when solving PDEs, FeenoX will be also smart enough not to compute quantities which are not going to be written anywhere.
 For example, if the input file does not reference the principal stress `sigma1` (or [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) does not ask for it) then FeenoX will not compute it.
 
-## Output formats {#sec:output-formats}
+### Output formats {#sec:output-formats}
 
 JSON/YAML, state of the art open post-processing formats.
 Mobile & web-friendly.
