@@ -49,9 +49,6 @@ nothing if nothing is asked for) and returns back to the Unix shell:
 ``` feenox
 ```
 
-<div id="cast-le10"></div>
-<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
-
 It can be seen as a Unix filter (or as a transfer function)
 
                                  +------------+

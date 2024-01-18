@@ -53,10 +53,12 @@ Then, we can create an input file for FeenoX (using [editors with syntax highlig
 
 Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in the same directory, say in the [`examples`](https://github.com/seamplex/feenox/tree/main/examples) directory of the repository, then we call first Gmsh and then FeenoX from the terminal to solve the benchmark problem:
 
+:::::: {.only-in-format .html }
 ```{=html}
 <div id="cast-le10"></div>
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 ```
+::::::
 
 The trick is that this workflow is susceptible of being automated and customized to run [in the cloud](https://www.seamplex.com/feenox/doc/sds.html#cloud-first), possibly [in parallel throughout several servers using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
 Check out this 1-minute video that covers a similar case from the [tensile-test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/):

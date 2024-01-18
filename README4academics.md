@@ -37,12 +37,12 @@ This program then solves the problem and, eventually, writes the outputs which t
 ```{.feenox include="nafems-le10.fee"}
 ```
 
-
+:::::: {.only-in-format .html }
 ```{=html}
 <div id="cast-le10"></div>
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 ```
-
+::::::
 
 It can be seen as a Unix filter (or as a transfer function)
 

@@ -116,10 +116,12 @@ Following the Unix rule of silence, [the output is 100% user-defined](https://se
 
 Feenox is a computational tool designed to be run on Unix servers as a part of a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow, optionally [involving MPI communication among different servers](https://seamplex.com/feenox/doc/sds.html#sec:scalability) to hande arbitrarily-large problems:
 
+:::::: {.only-in-format .html }
 ```{=html}
 <div id="cast-le10"></div>
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 ```
+::::::
 
 It has been [written in C](https://seamplex.com/feenox/doc/programming.html#languages) and designed under the Unix programming philosophy as quoted by Eric Raymond.
 Following the rule of composition, when solving PDEs FeenoX works very much as a Unix pipe between a mesher (such as Gmsh) and a post-processing tool (such as Paraview):

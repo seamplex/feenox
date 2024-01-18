@@ -64,9 +64,6 @@ Choose your background for further details about the what, how and whys:
 - [Neutron diffusion][]
 - [Neutron S<sub>N</sub>][]
 
-<div id="cast-le10"></div>
-<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
-
   [Basic mathematics]: https://seamplex.com/feenox/examples/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html

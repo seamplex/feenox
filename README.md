@@ -36,11 +36,12 @@ Choose your background for further details about the what, how and whys:
 doc/examples-list.md
 ```
 
+:::::: {.only-in-format .html }
 ```{=html}
 <div id="cast-le10"></div>
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 ```
-
+::::::
 
 ### Tutorials
 

@@ -80,9 +80,6 @@ the same directory, say in the [`examples`][] directory of the
 repository, then we call first Gmsh and then FeenoX from the terminal to
 solve the benchmark problem:
 
-<div id="cast-le10"></div>
-<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
-
 The trick is that this workflow is susceptible of being automated and
 customized to run [in the cloud][], possibly [in parallel throughout
 several servers using the MPI standard][]. Check out this 1-minute video

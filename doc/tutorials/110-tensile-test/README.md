@@ -459,10 +459,12 @@ Some notes summarizing the section:
 
 Opening a terminal and calling both [Gmsh](http://gmsh.info/) and [FeenoX](https://www.seamplex.com/feenox/) in sequence should go as smooth (and as fast) as follows.
 
+:::::: {.only-in-format .html }
 ```{=html}
 <div id="tensile-test-execution"></div>
 <script>AsciinemaPlayer.create('tensile-test.cast', document.getElementById('tensile-test-execution'), {cols:133,rows:32, poster: 'npt:0:20'});</script>
 ```
+::::::
 
 Here is a static mimic of a 12-second terminal session:
 
