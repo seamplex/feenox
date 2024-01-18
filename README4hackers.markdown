@@ -3,10 +3,14 @@
 - [<span class="toc-section-number">1</span> Why][]
 - [<span class="toc-section-number">2</span> How][]
 - [<span class="toc-section-number">3</span> What][]
+  - [<span class="toc-section-number">3.1</span> Design][]
+  - [<span class="toc-section-number">3.2</span> Performance][]
 
   [<span class="toc-section-number">1</span> Why]: #why
   [<span class="toc-section-number">2</span> How]: #how
   [<span class="toc-section-number">3</span> What]: #what
+  [<span class="toc-section-number">3.1</span> Design]: #design
+  [<span class="toc-section-number">3.2</span> Performance]: #performance
 
 # Why
 
@@ -53,7 +57,7 @@ equation, say by using a finite-element formulation:
 Therefore, FeenoX is—in a certain sense—to desktop FEA programs like
 
 - [Code_Aster][] with [Salome-Meca][], or
-- [CalculiX][] with [PrePoMax][])
+- [CalculiX][] with [PrePoMax][]
 
 and to libraries like
 
@@ -65,10 +69,10 @@ what [Markdown][1] is to Word and [(La)TeX][], respectively and
 
 Unlike these other FEA tools, FeenoX provides…
 
-- a ready-to-run executable (which uses Autotools and friends to
-  compile) that reads the problem to be solved at run time (i.e. it is a
-  **program** not a *library*) designed an implemented following the
-  Unix programming philosophy:
+- a [ready-to-run executable][] (which uses Autotools and friends to
+  compile) that [reads the problem to be solved from an input file][] at
+  run time (i.e. it is a program not a library) designed an implemented
+  following the [Unix programming philosophy][]:
 
   ``` terminal
   $ feenox
@@ -92,15 +96,16 @@ Unlike these other FEA tools, FeenoX provides…
 - a parser for a [syntactically-sugared][] [self-explanatory ASCII
   file][] (passed as the first non-optional argument to the `feenox`
   executable) with keywords that completely define the problem without
-  requiring further human actions, allowing a [cloud-first][] workflow
-  using containerized images (because there is no need to recompile the
-  binary for each problem).
+  requiring further human actions. Since the there is no need to
+  recompile the binary for each problem, this allows efficient
+  [cloud-first][] workflows using containerized images or even
+  provisioning by downloading binary tarballs or `.deb` packages.
 
 - a few supported [`PROBLEM`][] types and a mechanism to allow hacker
-  and [academics][] to add new PDEs, as explained in the next bullet.
+  and [academics][] to add new PDEs (as explained in the next bullet).
   This bullet is about the fact that a [regular user][] wanting to solve
   heat conduction (even with [multi-material non-uniform
-  conductivities $k$][]) just needs to do
+  conductivities][]) just needs to do
 
   ``` feenox
   PROBLEM thermal
@@ -111,10 +116,10 @@ Unlike these other FEA tools, FeenoX provides…
   not know what a weak form is (even though other “similar” tools ask
   their users for that).
 
-- a Git repository with GPL sources (and FDL documentation) where
-  contributions are welcome. In particular, each partial differential
-  equation that FeenoX can solve correspondence to one of the
-  subdirectories of `src/pdes` that provide [C entry points that the
+- a [Git repository][] with [GPL sources][] (and [FDL documentation][])
+  where [contributions are welcome][]. In particular, each partial
+  differential equation that FeenoX can solve correspondens to one of
+  the subdirectories of `src/pdes` that provide [C entry points that the
   main mathematical framework calls as function pointer to build the
   elemental objects][]. The `autogen.sh` step (prior to `./configure`
   and `make`) detects the directory structure and includes all the
@@ -137,12 +142,14 @@ Unlike these other FEA tools, FeenoX provides…
   [FeenoX for academics][academics] for more details about how the
   extensibility mechanism works.
 
-- continuous integration (using Github actions), an issue tracker (using
-  Github issues) and a discussion page (using Github discussions)
+- continuous integration (using [Github actions][]), an issue tracker
+  (using [Github issues][] and a discussion page (using [Github
+  discussions][])
 
-- a mechanism to expand command-line arguments as literal strings in the
-  input file so as to allow parametric (and/or optimization) loops. For
-  instance, if an input file `print.fee` looks like
+- a mechanism to [expand command-line arguments as literal strings in
+  the input file][] so as to allow [parametric][] (and/or
+  [optimization][]) loops. For instance, if an input file `print.fee`
+  looks like
 
   ``` feenox
   PRINT 2*${1}
@@ -174,7 +181,7 @@ Unlike these other FEA tools, FeenoX provides…
   ```
 
 - flexibility to handle many workflows, including [web-based
-  interfaces][] and thin command-line clients.
+  interfaces][] and [thin command-line clients][].
 
 The [input file][self-explanatory ASCII file]…
 
@@ -187,10 +194,10 @@ The [input file][self-explanatory ASCII file]…
   value is needed][] (everything is an expression)
 - understands [definitions (nouns) and instructions (verbs)][]. FeenoX
   has an actual instruction pointer that loops over the instruction set
-  (there might even be conditional blocks).
+  (there might even be [conditional blocks][]).
 - is [simple for simple files][] (but might get [more complicated for
-  mor complex problems][]). Remember Alan Kay’s quote: “simple things
-  should be simple and complex things should be possible.”
+  mor complex problems][]). Remember [Alan Kay][]’s quote: “simple
+  things should be simple and complex things should be possible.”
 
 Following the Unix rule of silence, [the output is 100% user-defined][]:
 if there are not explicit output instructions, FeenoX will not write
@@ -213,24 +220,40 @@ and will not compute things that are not actually needed).
   [Sparselizard]: http://sparselizard.org/
   [1]: https://commonmark.org/
   [(La)TeX]: https://en.wikipedia.org/wiki/LaTeX
+  [ready-to-run executable]: https://www.seamplex.com/feenox/doc/sds.html#sec:execution
+  [reads the problem to be solved from an input file]: https://www.seamplex.com/feenox/doc/sds.html#sec:input
+  [Unix programming philosophy]: https://www.seamplex.com/feenox/doc/sds.html#sec:unix
   [syntactically-sugared]: https://seamplex.com/feenox/doc/sds.html#sec:syntactic
   [self-explanatory ASCII file]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
   [academics]: README4academics.markdown
   [regular user]: README4engineers.markdown
-  [multi-material non-uniform conductivities $k$]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/
+  [multi-material non-uniform conductivities]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/
   [users]: README4engineers.md
+  [Git repository]: https://github.com/seamplex/feenox
+  [GPL sources]: https://github.com/seamplex/feenox/tree/main/src
+  [FDL documentation]: https://github.com/seamplex/feenox/tree/main/doc
+  [contributions are welcome]: https://www.seamplex.com/feenox/doc/#contributing
   [C entry points that the main mathematical framework calls as function pointer to build the elemental objects]:
     https://seamplex.com/feenox/doc/sds.html#sec:extensibility
+  [Github actions]: https://github.com/seamplex/feenox/actions
+  [Github issues]: https://github.com/seamplex/feenox/issues
+  [Github discussions]: https://github.com/seamplex/feenox/discussions
+  [expand command-line arguments as literal strings in the input file]: https://www.seamplex.com/feenox/doc/sds.html#sec:run-time-arguments
+  [parametric]: https://www.seamplex.com/feenox/doc/sds.html#sec:parametric
+  [optimization]: https://www.seamplex.com/feenox/doc/sds.html#sec:optimization
   [web-based interfaces]: https://www.caeplex.com
+  [thin command-line clients]: https://www.seamplex.com/feenox/doc/sds.html#cloud-first
   [one-to-one correspondence with the human description of the problem]:
     https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations
   [Gmsh]: http://gmsh.info/
   [algebraic expressions whenever a numerical value is needed]: https://seamplex.com/feenox/doc/sds.html#sec:expression
   [definitions (nouns) and instructions (verbs)]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
+  [conditional blocks]: https://www.seamplex.com/feenox/doc/feenox-manual.html#if
   [simple for simple files]: https://seamplex.com/feenox/doc/sds.html#sec:simple
   [more complicated for mor complex problems]: https://seamplex.com/feenox/doc/sds.html#sec:complex
+  [Alan Kay]: https://en.wikipedia.org/wiki/Alan_Kay
   [the output is 100% user-defined]: https://seamplex.com/feenox/doc/sds.html#sec:output
   [Pandoc]: https://pandoc.org/
   [Git]: https://git-scm.com/
@@ -243,15 +266,18 @@ and will not compute things that are not actually needed).
 
 # How
 
-Feenox is a computational too designed to be run on a Unix server as a
+Feenox is a computational tool designed to be run on Unix servers as a
 part of a [cloud-first][] workflow, optionally [involving MPI
 communication among different servers][] to hande arbitrarily-large
-problems. It has been designed and implemented in C following the Unix
-programming philosophy.
+problems:
 
-Following the rule of composition, when solving PDEs FeenoX works very
-much as a Unix pipe between a mesher (such as Gmsh) and a
-post-processing tool (such as Paraview):
+<div id="cast-le10"></div>
+<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
+
+It has been [written in C][] and designed under the Unix programming
+philosophy as quoted by Eric Raymond. Following the rule of composition,
+when solving PDEs FeenoX works very much as a Unix pipe between a mesher
+(such as Gmsh) and a post-processing tool (such as Paraview):
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal
@@ -313,7 +339,7 @@ compile the source code at all.
 
 Following the Unix rule of diversity, different compilers, both for the
 C code part of FeenoX as for the code in the dependencies (and their
-dependencies) can be used. So far we tested
+dependencies) can be used. So far there were tested
 
 - GCC (free)
 - Clang (free)
@@ -325,10 +351,12 @@ Also, different MPI implementations have been tested:
 - MPICH (free)
 - Intel MPI (privative)
 
-Feel free to raise any concerns you might have in our discussions page.
+Feel free to raise any concerns you might have in our [discussions
+forum][].
 
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [involving MPI communication among different servers]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
+  [written in C]: https://seamplex.com/feenox/doc/programming.html#languages
   [GNU Scientific Library]: https://www.gnu.org/software/gsl/
   [SUNDIALS IDA]: https://computing.llnl.gov/projects/sundials/ida
   [PETSc]: https://petsc.org/
@@ -339,6 +367,7 @@ Feel free to raise any concerns you might have in our discussions page.
   [PETSc library]: https://petsc.org/release/
   [Paraview]: https://www.paraview.org/
   [4]: doc/transfer-le10-zoom.svg
+  [discussions forum]: https://github.com/seamplex/feenox/discussions
 
 # What
 
@@ -354,25 +383,6 @@ workflows to solve [engineering-related problems][]:
 - [Neutron diffusion][]
 - [Neutron S<sub>N</sub>][]
 
-<!-- -->
-
-- FeenoX follows a [fictitious (yet plausible) Software Design
-  Requirements][].
-- The explanation of how FeenoX addresses the requirements can be found
-  in the [Software Design Specifications][].
-
-Regarding performance,
-
-- FeenoX’s performance can be profiled and analyzed with the Google
-  Benchmark library using [this repository][].
-- A rough comparison of FeenoX’s performance (and differences with
-  respect to problem set up and execution) with respect to other similar
-  tools can be found in this link:
-  <https://seamplex.com/feenox/tests/nafems/le10/>
-
-Check out [FeenoX for Engineers][] and [FeenoX for Academics][] for
-complementary information.
-
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [back end]: https://en.wikipedia.org/wiki/Frontend_and_backend
   [engineering-related problems]: README4engineers.markdown
@@ -384,8 +394,29 @@ complementary information.
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
+
+## Design
+
+- FeenoX follows a [fictitious (yet plausible) Software Design
+  Requirements][].
+- The explanation of how FeenoX addresses the requirements can be found
+  in the [Software Design Specifications][].
+
   [fictitious (yet plausible) Software Design Requirements]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
+
+## Performance
+
+- FeenoX’s performance can be profiled and analyzed with the Google
+  Benchmark library using [this repository][].
+- A rough comparison of FeenoX’s performance (and differences with
+  respect to problem set up and execution) with respect to other similar
+  tools can be found in this link:
+  <https://seamplex.com/feenox/tests/nafems/le10/>
+
+Check out [FeenoX for Engineers][] and [FeenoX for Academics][] for
+complementary information.
+
   [this repository]: https://github.com/seamplex/feenox-benchmark
   [FeenoX for Engineers]: README4engineers.md
   [FeenoX for Academics]: README4academics.md

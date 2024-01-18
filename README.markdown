@@ -64,6 +64,9 @@ Choose your background for further details about the what, how and whys:
 - [Neutron diffusion][]
 - [Neutron S<sub>N</sub>][]
 
+<div id="cast-le10"></div>
+<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
+
   [Basic mathematics]: https://seamplex.com/feenox/examples/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
@@ -89,20 +92,10 @@ Choose your background for further details about the what, how and whys:
 
 The [`tests`][] directory in the repository has hundreds of
 
-- `grep`-able examples, e.g. to see how to use the keywork
-  [`INTEGRATE`][], do
-
-``` terminal
- $ cd tests
- $ grep INTEGRATE *.fee
- integrate2d.fee:INTEGRATE f RESULT I1
- integrate2d.fee:INTEGRATE f(x,y)^2 RESULT I2
- write_mesh2d.fee:INTEGRATE f RESULT I
- $ 
-```
-
+- `grep`-able examples
 - [unit and regression tests][],
-- (crude) mathematical verification tests,
+- (crude) mathematical & code verification tests (as in “are we solving
+  right the equations?”),
 - subdirectories with further case studies
   - [`mms`][]
     - [`thermal`][]
@@ -112,7 +105,6 @@ The [`tests`][] directory in the repository has hundreds of
     - [`le10`][]
 
   [`tests`]: https://github.com/seamplex/feenox/tree/main/tests
-  [`INTEGRATE`]: https://seamplex.com/feenox/doc/feenox-manual.html#integrate
   [unit and regression tests]: https://seamplex.com/feenox/doc/compilation.html#sec:test-suite
   [`mms`]: https://github.com/seamplex/feenox/tree/main/tests/mms
   [`thermal`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal
@@ -123,6 +115,7 @@ The [`tests`][] directory in the repository has hundreds of
 
 ## Capabilities
 
+- Both *free* as in “free speech” and in “free beer”
 - The [problem][] to solve is defined through a
   [syntactically-sugared][] [self-descriptive English-like plain-text
   input file][] that should [resemble the original human-friendly
@@ -134,21 +127,23 @@ The [`tests`][] directory in the repository has hundreds of
   - [everything is an expression][]
   - [100%-defined user output][] (no [`PRINT`][problem] nor
     [`WRITE_RESULTS`][] instructions, no output)
-- [General mathematical problems][] using [GNU GSL][]
-- [Sets of ODEs/DAEs][] using [SUNDIALS][]
-- [PDEs][] formulated with the [finite element method][]
-  - reads mesh in [Gmsh][] format
-  - uses [PETSc][]/[SLEPc][] to solve
-    - linear systems ([KSP][])
-    - non-linear systems ([SNES][])
-    - time-dependent systems ([TS][])
-    - generalized eigen-value problems ([EPS][])
-  - writes results in either Gmsh or [VTK][] ([Paraview][]) format
 - [Cloud-first design][] (cloud friendliness is not enough)
 - [MPI parallelization][]
-- Focus on flexibility, especially when defining [non-uniform
-  multi-solid material properties][]
-- [Unix programming philosophy][]
+- Leverages high-quality well-established free and open source libraries
+  to solve…
+  - [general mathematical problems][] using [GNU GSL][]
+  - [sets of ODEs/DAEs][] using [SUNDIALS][]
+  - [PDEs][] formulated with the [finite element method][]
+    - reads mesh in [Gmsh][] format
+    - uses [PETSc][]/[SLEPc][] to solve
+      - linear systems ([KSP][])
+      - non-linear systems ([SNES][])
+      - time-dependent systems ([TS][])
+      - generalized eigen-value problems ([EPS][])
+    - writes results in either Gmsh or [VTK][] ([Paraview][]) format
+- Focuses on [flexibility][], especially when defining [non-uniform
+  multi-solid material properties from ASME tables][]
+- Follows the [Unix programming philosophy][]
   - [rule of separation][]
   - [rule of silence][]
   - [rule of economy][]
@@ -183,9 +178,11 @@ The [`tests`][] directory in the repository has hundreds of
   [everything is an expression]: https://seamplex.com/feenox/doc/sds.html#sec:expression
   [100%-defined user output]: https://seamplex.com/feenox/doc/sds.html#sec:output
   [`WRITE_RESULTS`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results
-  [General mathematical problems]: https://seamplex.com/feenox/examples/basic.html
+  [Cloud-first design]: https://seamplex.com/feenox/doc/sds.html#cloud-first
+  [MPI parallelization]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
+  [general mathematical problems]: https://seamplex.com/feenox/examples/basic.html
   [GNU GSL]: https://www.gnu.org/software/gsl/
-  [Sets of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
+  [sets of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [SUNDIALS]: https://computing.llnl.gov/projects/sundials
   [PDEs]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [finite element method]: https://en.wikipedia.org/wiki/Finite_element_method
@@ -198,10 +195,9 @@ The [`tests`][] directory in the repository has hundreds of
   [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
   [VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
   [Paraview]: https://www.paraview.org/
-  [Cloud-first design]: https://seamplex.com/feenox/doc/sds.html#cloud-first
-  [MPI parallelization]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
-  [non-uniform multi-solid material properties]: https://seamplex.com/feenox/doc/sds.html#sec:flexibility
-  [Unix programming philosophy]: https://en.wikipedia.org/wiki/Unix_philosophy
+  [flexibility]: https://seamplex.com/feenox/doc/sds.html#sec:flexibility
+  [non-uniform multi-solid material properties from ASME tables]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state
+  [Unix programming philosophy]: https://seamplex.com/feenox/doc/sds.html#sec:unix
   [rule of separation]: https://seamplex.com/feenox/doc/sds.html#sec:separation
   [rule of silence]: https://seamplex.com/feenox/doc/sds.html#sec:silence
   [rule of economy]: https://seamplex.com/feenox/doc/sds.html#sec:economy
@@ -296,11 +292,12 @@ version 3][] or (at your option) any later version.
 | Source tarballs                     | <https://www.seamplex.com/feenox/dist/src>     |
 | Github repository                   | <https://github.com/seamplex/feenox/>          |
 
-- FeenoX is **cloud first**. It was designed to run on servers.
+- FeenoX is [cloud-first][]. It was designed to run on servers.
 
 - Be aware that FeenoX **does not have a GUI**. Read the
   [documentation][], especially the [description][] and the [FAQs][2].
-  Ask for help on the [GitHub discussions page][].
+  Ask for help on the [GitHub discussions page][] if you do now
+  understand what this bullet means.
 
 - Debian/Ubuntu packages are unofficial, i.e. they are not available in
   `apt` repositories. They contain dynamically-linked binaries and their
@@ -325,6 +322,7 @@ version 3][] or (at your option) any later version.
   > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
   [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
+  [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [2]: https://seamplex.com/feenox/doc/FAQ.html

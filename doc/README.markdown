@@ -104,13 +104,13 @@ reference.
 - [History][] [PDF][8]
 
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
-  [Frequently Asked Questions]: doc/FAQs.markdown
+  [Frequently Asked Questions]: FAQs.markdown
   [PDF]: https://www.seamplex.com/feenox/doc/FAQs.pdf
-  [Compilation Guide]: doc/compilation.markdown
+  [Compilation Guide]: compilation.markdown
   [6]: https://www.seamplex.com/feenox/doc/compilation.pdf
-  [Programming Guide]: doc/programming.markdown
+  [Programming Guide]: programming.markdown
   [7]: https://www.seamplex.com/feenox/doc/programming.pdf
-  [History]: doc/history.markdown
+  [History]: history.markdown
   [8]: https://www.seamplex.com/feenox/doc/history.pdf
 
 ## Youtube videos

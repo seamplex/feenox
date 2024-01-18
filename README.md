@@ -36,6 +36,12 @@ Choose your background for further details about the what, how and whys:
 doc/examples-list.md
 ```
 
+```{=html}
+<div id="cast-le10"></div>
+<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
+```
+
+
 ### Tutorials
 
 ```include
@@ -43,44 +49,45 @@ doc/tutorials-list.md
 ```
 
 
-::::: {.only-in-format .html }
-
-::: {.container .text-center .my-5 .ratio .ratio-16x9}
-<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/b3K2QewI8jE?rel=0" allowfullscreen></iframe>
-:::
-
-:::::
-    
-    
 ### Tests
 
-```include
-doc/tests-list.md
-```
+The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository has hundreds of
+ 
+ - `grep`-able examples
+ - [unit and regression tests](https://seamplex.com/feenox/doc/compilation.html#sec:test-suite), 
+ - (crude) mathematical & code verification tests (as in "are we solving right the equations?"),
+ - subdirectories with further case studies
+    - [`mms`](https://github.com/seamplex/feenox/tree/main/tests/mms)
+      - [`thermal`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal)
+        - [`2d`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/2d)
+        - [`3d`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/3d)
+    - [`nafems`](https://github.com/seamplex/feenox/tree/main/tests/nafems)
+      - [`le10`](https://github.com/seamplex/feenox/tree/main/tests/nafems/le10)
  
 ## Capabilities
 
+ * Both _free_ as in "free speech" and in "free beer"
  * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) [self-descriptive English-like plain-text input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations) as much as possible:
    - [no need to recompile if the problem changes](https://seamplex.com/feenox/doc/sds.html#sec:introduction) (FeenoX is a _program_, not a library)
    - [nouns are definitions and verbs are instructions](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
    - [simple problems need simple inputs](https://seamplex.com/feenox/doc/sds.html#sec:simple)
    - [everything is an expression](https://seamplex.com/feenox/doc/sds.html#sec:expression)
    - [100%-defined user output](https://seamplex.com/feenox/doc/sds.html#sec:output) (no [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) nor [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) instructions, no output)
-   
- * [General mathematical problems](https://seamplex.com/feenox/examples/basic.html) using [GNU GSL](https://www.gnu.org/software/gsl/)
- * [Sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html) using [SUNDIALS](https://computing.llnl.gov/projects/sundials)
- * [PDEs](https://github.com/seamplex/feenox/tree/main/src/pdes) formulated with the [finite element method](https://en.wikipedia.org/wiki/Finite_element_method)
-   - reads mesh in [Gmsh](http://gmsh.info/) format
-   - uses [PETSc](https://petsc.org/release/)/[SLEPc](https://slepc.upv.es/) to solve
-     - linear systems ([KSP](https://petsc.org/release/manual/ksp/))
-     - non-linear systems ([SNES](https://petsc.org/release/manual/snes/))
-     - time-dependent systems ([TS](https://petsc.org/release/manual/ts/))
-     - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
-   - writes results in either Gmsh or [VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) ([Paraview](https://www.paraview.org/)) format 
  * [Cloud-first design](https://seamplex.com/feenox/doc/sds.html#cloud-first) (cloud friendliness is not enough)
  * [MPI parallelization](https://seamplex.com/feenox/doc/sds.html#sec:scalability)
- * Focus on flexibility, especially when defining [non-uniform multi-solid material properties](https://seamplex.com/feenox/doc/sds.html#sec:flexibility)
- * [Unix programming philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)
+ * Leverages high-quality well-established free and open source libraries to solve...
+   * [general mathematical problems](https://seamplex.com/feenox/examples/basic.html) using [GNU GSL](https://www.gnu.org/software/gsl/)
+   * [sets of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html) using [SUNDIALS](https://computing.llnl.gov/projects/sundials)
+   * [PDEs](https://github.com/seamplex/feenox/tree/main/src/pdes) formulated with the [finite element method](https://en.wikipedia.org/wiki/Finite_element_method)
+     - reads mesh in [Gmsh](http://gmsh.info/) format
+     - uses [PETSc](https://petsc.org/release/)/[SLEPc](https://slepc.upv.es/) to solve
+       - linear systems ([KSP](https://petsc.org/release/manual/ksp/))
+       - non-linear systems ([SNES](https://petsc.org/release/manual/snes/))
+       - time-dependent systems ([TS](https://petsc.org/release/manual/ts/))
+       - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
+     - writes results in either Gmsh or [VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) ([Paraview](https://www.paraview.org/)) format 
+ * Focuses on [flexibility](https://seamplex.com/feenox/doc/sds.html#sec:flexibility), especially when defining [non-uniform multi-solid material properties from ASME tables](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state)
+ * Follows the [Unix programming philosophy](https://seamplex.com/feenox/doc/sds.html#sec:unix)
    - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)
    - [rule of silence](https://seamplex.com/feenox/doc/sds.html#sec:silence)
    - [rule of economy](https://seamplex.com/feenox/doc/sds.html#sec:economy)
@@ -122,7 +129,15 @@ doc/tests-list.md
  * [Parametric NAFEMS LE10 benchmark: comparison of resource consumption for different FEA programs](https://seamplex.com/feenox/tests/nafems/le10/)
  * [Some Youtube videos](https://seamplex.com/feenox/doc/#sec:youtube)
 
+::::: {.only-in-format .html }
 
+::: {.container .text-center .my-5 .ratio .ratio-16x9}
+<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/b3K2QewI8jE?rel=0" allowfullscreen></iframe>
+:::
+
+:::::
+
+ 
 # Documentation
 
 Browse through the [documentation index](doc) and/or the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) subdirectory of the [Github repository](https://github.com/seamplex/feenox/) for

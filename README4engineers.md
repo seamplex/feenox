@@ -31,12 +31,17 @@ The latter should show the numerical results. See the [tensile test tutorial](ht
 
 To fix ideas, let us consider the [NAFEMS LE10 "Thick plate pressure" benchmark](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark). @Fig:nafems-le10 shows that there is a one-to-one correspondence between the human-friendly problem formulation and the input file FeenoX reads.
 There is no need to give extra settings if the problem does not ask for them.
-Note that since the problem is has only one volume, `E` means "the" Young modulus.
-No need to deal with a map between materials and mesh entitites (in this case, in [multi-material problems](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other) the mapping is needed). Nothing more, nothing less.
+Note that since the problem has only one volume, `E` means "the" Young modulus.
+No need to deal with a map between materials and mesh entitites (in this case the mapping is not needed but in [multi-material problems](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other) the mapping is needed indeed). Nothing more, nothing less.
 
 ![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg){#fig:nafems-le10 width=100% }
 
 Say we already have a [`nafems-le10.geo`](https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo) file which tells [Gmsh](http://gmsh.info/) how to create a mesh `nafems-le10.msh` (check out the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) for details).
+Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) for example) as follows:
+
+```{.feenox include="nafems-le10.fee"}
+```
+
 
 > **Heads up!** The `.msh` file from Gmsh can be either
 > 
@@ -46,39 +51,14 @@ Say we already have a [`nafems-le10.geo`](https://github.com/seamplex/feenox/blo
 >
 > and can be partitioned or not.
 
-Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) for example) as follows:
-
-```feenox
-PROBLEM mechanical 3D
-READ_MESH nafems-le10.msh   # mesh in millimeters
-
-# LOADING: uniform normal pressure on the upper surface
-BC upper    p=1      # 1 Mpa
-
-# BOUNDARY CONDITIONS:
-BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
-BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
-BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
-BC midplane w=0      #  z displacements fixed along mid-plane
-
-# MATERIAL PROPERTIES: isotropic single-material properties
-E = 210e3   # Young modulus in MPa
-nu = 0.3    # Poisson's ratio
-
-SOLVE_PROBLEM   # solve!
-
-# print the direct stress y at D (and nothing more)
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
-```
-
-Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in the same directory, we call first Gmsh and then FeenoX from the terminal to solve the benchmark problem:
+Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in the same directory, say in the [`examples`](https://github.com/seamplex/feenox/tree/main/examples) directory of the repository, then we call first Gmsh and then FeenoX from the terminal to solve the benchmark problem:
 
 ```{=html}
 <div id="cast-le10"></div>
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
 ```
 
-The trick is that this workflow is susceptible of being automated and customized to run [in the cloud](), possibly [in parallel throughout several servers using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
+The trick is that this workflow is susceptible of being automated and customized to run [in the cloud](https://www.seamplex.com/feenox/doc/sds.html#cloud-first), possibly [in parallel throughout several servers using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
 Check out this 1-minute video that covers a similar case from the [tensile-test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/):
 
 :::: {.not-in-format .latex}
@@ -88,7 +68,7 @@ Check out this 1-minute video that covers a similar case from the [tensile-test 
 There is a sound explanation about [why FeenoX works this way](#why) and not like other FEA tools you might have encountered in the past. If you are feeling curious, take a look at what FeenoX has to offer to [hackers](README4hackers.md) and [academics](README4academics.md).
 
 
-# What can FeenoX solve
+# What Feenox can solve
 
 FeenoX can solve the following types of problems:
 
@@ -104,17 +84,17 @@ doc/tutorials-list.md
  
 Browse through [the documentation](https://seamplex.com/feenox/doc/) to dive deeper into the details.
  
-# Why
+# Why FeenoX works the way it does
 
 There are two "why" questions we have to answer.
 
  1. Why is FeenoX different from other "similar" tools?
  
     Consider again the NAFEMS LE10 case from @fig:nafems-le10 above.
-    Take some time and think (or investigate) how other FEA tools handle this case.
+    Take some time to think (or investigate) how other FEA tools handle this case.
     Note the following features FeenoX provides:
     
-     * ready-to-run executable (no need to compile)
+     * [ready-to-run executable](https://www.seamplex.com/feenox/doc/sds.html#sec:execution) that reads the problem at runtime (no need to compile anything to solve a particular problem)
      * self-explanatory plain-text near-English input file
        - one-to-one correspondence between computer input file and human description of the problem
        - Git-traceable (mesh is not part of the input file)
@@ -138,7 +118,7 @@ There are two "why" questions we have to answer.
  2. Why FeenoX works the way it does?
  
     Because it is [cloud first](https://seamplex.com/feenox/doc/sds.html#cloud-first) and its objective is to be flexible enough to power web-based interfaces like [CAEplex](https://www.caeplex.com) and many other workflows.
-    More information in the details for [Unix experts](README4hackers.md) and [professors](README4academics.md).
+    More information in the details for [Unix experts](README4hackers.md) and [academic professors](README4academics.md).
     
     Depending on the complexity of the case, [CAEplex](https://www.caeplex.com) might be enough or not.
     If the latter, one has to see what's sitting under the hood.

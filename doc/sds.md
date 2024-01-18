@@ -312,7 +312,8 @@ This way, deployment of the solver can be customized and tweaked as needed, incl
 > 220-execution.md
 > ```
 
-As explained in @sec:scope, since FeenoX is designed to run as
+As requested by the SRS and explained in @sec:scope, FeenoX is a program that reads the problem to be solved at run-time and not a library that has to be linked against code that defines the problem.
+Since FeenoX is designed to run as
 
  * a Unix filter, or
  * as a transfer function between input and output files
@@ -339,6 +340,7 @@ usage: feenox [options] inputfile [replacement arguments] [petsc options]
   --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Run with --help for further explanations.
+$
 ```
 
 The program can also be executed remotely either
@@ -2113,6 +2115,12 @@ At that time, engineering programs had to write _everything_ they computed becau
 Nowadays the engineering time is far more expensive than CPU time.
 Therefore, the time needed for the user to find and process a single result in a soup of megabytes of a cluttered output file far outweighs the cost of running a computation from scratch with the needed result as the only output.
 Especially if the expensive engineers are smart enough to set up the problem using a coarse mesh and run the actual fine execution only after having checked everything works as expected.
+
+The input file from the [tensile-test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) illustrates this idea: only 8 lines are needed to define and solve the problem (including the instructions [`SOLVE_PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#solve_problem) and [`COMPUTE_REACTION`](https://www.seamplex.com/feenox/doc/feenox-manual.html#compute_reaction)) and almost twice as much instructions for getting the required output as needed (mostly [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print)s and one [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results)):
+
+```{.feenox include="tensile-test.fee"}
+```
+
 
 Moreover, when solving PDEs, FeenoX will be also smart enough not to compute quantities which are not going to be written anywhere.
 For example, if the input file does not reference the principal stress `sigma1` (or [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) does not ask for it) then FeenoX will not compute it.

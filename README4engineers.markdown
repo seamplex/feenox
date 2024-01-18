@@ -1,12 +1,14 @@
 # FeenoX for Engineers
 
 - [<span class="toc-section-number">1</span> How FeenoX works][]
-- [<span class="toc-section-number">2</span> What can FeenoX solve][]
-- [<span class="toc-section-number">3</span> Why][]
+- [<span class="toc-section-number">2</span> What Feenox can solve][]
+- [<span class="toc-section-number">3</span> Why FeenoX works the way it
+  does][]
 
   [<span class="toc-section-number">1</span> How FeenoX works]: #how-feenox-works
-  [<span class="toc-section-number">2</span> What can FeenoX solve]: #what-can-feenox-solve
-  [<span class="toc-section-number">3</span> Why]: #why
+  [<span class="toc-section-number">2</span> What Feenox can solve]: #what-feenox-can-solve
+  [<span class="toc-section-number">3</span> Why FeenoX works the way it does]:
+    #why-feenox-works-the-way-it-does
 
 # How FeenoX works
 
@@ -44,10 +46,11 @@ To fix ideas, let us consider the [NAFEMS LE10 “Thick plate pressure”
 benchmark][]. Fig. 1 shows that there is a one-to-one correspondence
 between the human-friendly problem formulation and the input file FeenoX
 reads. There is no need to give extra settings if the problem does not
-ask for them. Note that since the problem is has only one volume, `E`
-means “the” Young modulus. No need to deal with a map between materials
-and mesh entitites (in this case, in [multi-material problems][] the
-mapping is needed). Nothing more, nothing less.
+ask for them. Note that since the problem has only one volume, `E` means
+“the” Young modulus. No need to deal with a map between materials and
+mesh entitites (in this case the mapping is not needed but in
+[multi-material problems][] the mapping is needed indeed). Nothing more,
+nothing less.
 
 <figure id="fig:nafems-le10">
 <img src="nafems-le10-problem-input.svg" style="width:100.0%"
@@ -58,7 +61,11 @@ corresponding FeenoX input</figcaption>
 
 Say we already have a [`nafems-le10.geo`][] file which tells [Gmsh][]
 how to create a mesh `nafems-le10.msh` (check out the [tensile test
-tutorial][] for details).
+tutorial][] for details). Then, we can create an input file for FeenoX
+(using [editors with syntax highlighting][] for example) as follows:
+
+``` feenox
+```
 
 > **Heads up!** The `.msh` file from Gmsh can be either
 >
@@ -68,35 +75,10 @@ tutorial][] for details).
 >
 > and can be partitioned or not.
 
-Then, we can create an input file for FeenoX (using [editors with syntax
-highlighting][] for example) as follows:
-
-``` feenox
-PROBLEM mechanical 3D
-READ_MESH nafems-le10.msh   # mesh in millimeters
-
-# LOADING: uniform normal pressure on the upper surface
-BC upper    p=1      # 1 Mpa
-
-# BOUNDARY CONDITIONS:
-BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
-BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
-BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
-BC midplane w=0      #  z displacements fixed along mid-plane
-
-# MATERIAL PROPERTIES: isotropic single-material properties
-E = 210e3   # Young modulus in MPa
-nu = 0.3    # Poisson's ratio
-
-SOLVE_PROBLEM   # solve!
-
-# print the direct stress y at D (and nothing more)
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
-```
-
 Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in
-the same directory, we call first Gmsh and then FeenoX from the terminal
-to solve the benchmark problem:
+the same directory, say in the [`examples`][] directory of the
+repository, then we call first Gmsh and then FeenoX from the terminal to
+solve the benchmark problem:
 
 <div id="cast-le10"></div>
 <script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
@@ -134,12 +116,13 @@ are feeling curious, take a look at what FeenoX has to offer to
   [`nafems-le10.geo`]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo
   [Gmsh]: http://gmsh.info/
   [editors with syntax highlighting]: https://seamplex.com/feenox/doc/sds.html#sec:syntactic
-  [in the cloud]:
+  [`examples`]: https://github.com/seamplex/feenox/tree/main/examples
+  [in the cloud]: https://www.seamplex.com/feenox/doc/sds.html#cloud-first
   [in parallel throughout several servers using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [hackers]: README4hackers.md
   [academics]: README4academics.md
 
-# What can FeenoX solve
+# What Feenox can solve
 
 FeenoX can solve the following types of problems:
 
@@ -175,17 +158,18 @@ Browse through [the documentation][] to dive deeper into the details.
   [1]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
   [the documentation]: https://seamplex.com/feenox/doc/
 
-# Why
+# Why FeenoX works the way it does
 
 There are two “why” questions we have to answer.
 
 1.  Why is FeenoX different from other “similar” tools?
 
     Consider again the NAFEMS LE10 case from fig. 1 above. Take some
-    time and think (or investigate) how other FEA tools handle this
-    case. Note the following features FeenoX provides:
+    time to think (or investigate) how other FEA tools handle this case.
+    Note the following features FeenoX provides:
 
-    - ready-to-run executable (no need to compile)
+    - [ready-to-run executable][] that reads the problem at runtime (no
+      need to compile anything to solve a particular problem)
     - self-explanatory plain-text near-English input file
       - one-to-one correspondence between computer input file and human
         description of the problem
@@ -221,17 +205,19 @@ There are two “why” questions we have to answer.
     Because it is [cloud first][] and its objective is to be flexible
     enough to power web-based interfaces like
     [CAEplex][web-based interfaces] and many other workflows. More
-    information in the details for [Unix experts][] and [professors][].
+    information in the details for [Unix experts][] and [academic
+    professors][].
 
     Depending on the complexity of the case,
     [CAEplex][web-based interfaces] might be enough or not. If the
     latter, one has to see what’s sitting under the hood. Peek into [the
     documentation][] and [the repository][] for further details.
 
+  [ready-to-run executable]: https://www.seamplex.com/feenox/doc/sds.html#sec:execution
   [100% user-defined output]: https://seamplex.com/feenox/doc/sds.html#sec:output
   [web-based interfaces]: https://www.caeplex.com
   [cloud first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [Unix experts]: README4hackers.md
-  [professors]: README4academics.md
+  [academic professors]: README4academics.md
   [the documentation]: https://seamplex.com/feenox/doc/
   [the repository]: https://github.com/seamplex/feenox/

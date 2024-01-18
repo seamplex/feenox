@@ -62,7 +62,7 @@ After analyzing the pros and cons of each alternative, at some point it should b
 Therefore, FeenoX is---in a certain sense---to desktop FEA programs like
 
  * [Code_Aster](https://www.code-aster.org/spip.php?rubrique2) with [Salome-Meca](https://www.code-aster.org/V2/spip.php?article303), or
- * [CalculiX](http://www.calculix.de/) with [PrePoMax](https://prepomax.fs.um.si/))
+ * [CalculiX](http://www.calculix.de/) with [PrePoMax](https://prepomax.fs.um.si/)
  
 and to libraries like
 

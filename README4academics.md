@@ -11,8 +11,39 @@ toc: true
 
 # What
 
-FeenoX is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [Unix](./README4hackers.md) stand-alone program (i.e. something your run, not something you have to link existing code against) that reads an [engineering-related problem](./README4engineers.md) in a [plain-text file containing definitions and instructions](https://seamplex.com/feenox/doc/sds.html#sec:input).
-This program then solves the problem and, eventually, writes the outputs which the input file requests with explicit instructions (and nothing if nothing is asked for) and returns back to the Unix shell.
+[FeenoX](https://www.seamplex.com/feenox/) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [Unix](./README4hackers.md) stand-alone **program** (i.e. something your run, not something you have to link existing code against) that reads an [engineering-related problem](./README4engineers.md) in a [plain-text file containing definitions and instructions](https://seamplex.com/feenox/doc/sds.html#sec:input).
+That is to say, it reads the problem to be solved at run time and does not require the user (most of the time these will be [industry engineers](./README4engineers.md) and not [hackers](./README4hackers.md) nor PhDs) to compile and link custom code in order to solve a problem because it is _not a library_.
+It does not require the users to write a weak form of the PDE they want to solve, because most of them will not even know what a weak form is (and they certainly do not need to know that).
+The user chooses from a set of built-in PDEs using the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition which internally resolves (at run time) a set of function pointers to the appropriate locations which will build the elemental objects which correspond the to chosen PDE.
+The list of available PDEs can be peeked by executing the `feenox` binary with the `--pdes` option:
+
+```
+$ feenox --pdes
+laplace
+mechanical
+modal
+neutron_diffusion
+neutron_sn
+thermal
+$ 
+```
+
+During the compilation procedure (based on Autotools), the source tree in [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) is parsed.
+For each subdirectory, a new PDE is embedded into the compiled binary.
+See below for further details about this [extensibility mechanism](https://www.seamplex.com/feenox/doc/sds.html#sec:extensibility).
+
+This program then solves the problem and, eventually, writes the outputs which the input file requests with [explicit instructions](https://www.seamplex.com/feenox/doc/sds.html#sec:output) (and nothing if nothing is asked for) and returns back to the Unix shell:
+
+```{.feenox include="nafems-le10.fee"}
+```
+
+
+```{=html}
+<div id="cast-le10"></div>
+<script>AsciinemaPlayer.create('doc/le10.cast', document.getElementById('cast-le10'), {cols:133,rows:32, poster: 'npt:0:3'});</script>
+```
+
+
 It can be seen as a Unix filter (or as a transfer function)
 
 ```include
@@ -24,8 +55,10 @@ which, when zoomed in, acts as a "glue layer" between a mesher ([Gmsh](http://gm
 ![](doc/transfer-le10-zoom.svg)\  
 
 
+Further discussion can be found in the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/).
 
-The design responds to a [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) documente that acts as a "request for quotations" of a computational engineering tool that should satisfy some fictitious (but plausible) requirements.
+
+The design responds to a [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) document that acts as a "request for quotations" of a computational engineering tool that should satisfy some fictitious (but plausible) requirements.
 The [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) document explains how FeenoX addresses each requirement of the SRS.
 
 In principle, even though FeenoX can solve [generic numerical problems](https://seamplex.com/feenox/examples/examples/basic.html) and [systems of ordinary differential/algebraic equations](https://seamplex.com/feenox/examples/daes.html), its main objective is to solve partial differential equations using the finite element method---eventually [in parallel using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
@@ -38,10 +71,10 @@ doc/examples-list.md
 > **Heads up!** The background of FeenoX's main author is Nuclear Engineering.
 > Hence,
 >
->  * Two of the supported PDEs are related to neutron transport.
+>  * Two of the supported PDEs are related to neutron [diffusion](https://www.seamplex.com/feenox/examples/neutron_diffusion.html) and [transport](https://www.seamplex.com/feenox/examples/neutron_sn.html).
 >  * There is a [PhD thesis (in Spanish only)](https://seamplex.com/thesis/html/) that discusses the design and implementation of FeenoX in view of core-level neutronics.
 
-But, more importantly, FeenoX provides a mean to add new types of PDEs by adding a new subdirectory to the [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) [directory of the source tree and then re-bootstrapping, re-configuring and re-compiling the code](https://seamplex.com/feenox/doc/sds.html#sec:extensibility). See below for further details.
+As mentioned in the previous section, FeenoX provides a [mechanism to add new types of PDEs](https://www.seamplex.com/feenox/doc/sds.html#sec:extensibility) by adding a new subdirectory to the [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) [directory of the source tree and then re-bootstrapping, re-configuring and re-compiling the code](https://seamplex.com/feenox/doc/sds.html#sec:extensibility).
 
 Since in FeenoX's input file [everything is an expression](https://seamplex.com/feenox/doc/sds.html#sec:expression), the code is especially suited for [verification using the method of manufactured solutions](https://github.com/seamplex/feenox/tree/main/tests/mms).
 
@@ -52,16 +85,25 @@ Since in FeenoX's input file [everything is an expression](https://seamplex.com/
 
 # How
 
- * By leveraging the [Unix programming philosophy](https://seamplex.com/feenox/doc/sds.html#sec:unix) to come up with a [cloud-first tool](https://seamplex.com/feenox/doc/sds.html#cloud-first) suitable to be [automatically deployed](https://seamplex.com/feenox/doc/sds.html#sec:deployment) and serve as the back end of web-based interfaces such as [CAEplex](https://www.caeplex.com).
+FeenoX tries to achieve its goals by...
 
- * By providing a [ready-to-run program](https://seamplex.com/feenox/doc/sds.html#sec:execution) that reads [an input file at run time](https://seamplex.com/feenox/doc/sds.html#sec:input) (and not a library that has to be linked for each particular problem to be solved) as deliberate decision discussed in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html).
+ * on [both ethical (since it is free) and technical (since it is open source) ground](https://www.seamplex.com/feenox/doc/sds.html#sec:architecture) while interacting with other free and open specimens
+    - operating systems
+    - libraries
+    - compilers
+    - pre and post-processing tools
+  thus encouraging science and engineering to shift from privative environments into the free world.
 
- * By designing and implementing an extensibility mechanism to allow hackers and/or academics to add new PDE formulations by adding a new subdirectory to [`src/pdes`]() in the repository and then
-   a. re-boostrapping with `autogen.sh`,
+ * leveraging the [Unix programming philosophy](https://seamplex.com/feenox/doc/sds.html#sec:unix) to come up with a [cloud-first tool](https://seamplex.com/feenox/doc/sds.html#cloud-first) suitable to be [automatically deployed](https://seamplex.com/feenox/doc/sds.html#sec:deployment) and serve as the back end of web-based interfaces such as [CAEplex](https://www.caeplex.com).
+
+ * providing a [ready-to-run program](https://seamplex.com/feenox/doc/sds.html#sec:execution) that reads [an input file at run time](https://seamplex.com/feenox/doc/sds.html#sec:input) (and not a library that has to be linked for each particular problem to be solved) as deliberate decision discussed in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html).
+
+ * designing and implementing an extensibility mechanism to allow hackers and/or academics to add new PDE formulations by adding a new subdirectory to [`src/pdes`]() in the repository and then
+   a. re-bootstrapping with `autogen.sh`,
    b. re-configuring with `configure`, and
    c. re-compiling with `make`
 
-In effect, FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve.
+In effect, FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as [C functions](https://www.seamplex.com/feenox/doc/programming.html#languages)) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve.
 This general framework provides means to
 
   - [parse the input file](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs), [handle command-line arguments](https://seamplex.com/feenox/doc/sds.html#sec:run-time-arguments), [read mesh files](https://seamplex.com/feenox/doc/feenox-manual.html#read_mesh), [assign variables](https://seamplex.com/feenox/doc/feenox-manual.html#description), [evaluate conditionals](https://seamplex.com/feenox/doc/feenox-manual.html#if), [write results](https://seamplex.com/feenox/doc/sds.html#sec:output), etc.
@@ -110,7 +152,7 @@ The particular functions that implement each problem type are located in subdire
 doc/pdes.md
 ```
       
-Researchers with both knowledge of mathematical theory of finite elements and programming skills might add support for other PDES by using one of these directories (say [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)) as a template and
+Researchers with both knowledge of mathematical theory of finite elements and programming skills might, with the aid of [the community](https://github.com/seamplex/feenox/discussions), add support for other PDES by using one of these directories (say [`laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace)) as a template and
 
  #. replace every occurrence of `laplace` in symbol names with the name of the new PDE
  #. modify the initialization functions in `init.c` and set 
