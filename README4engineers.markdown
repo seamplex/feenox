@@ -80,6 +80,8 @@ the same directory, say in the [`examples`][] directory of the
 repository, then we call first Gmsh and then FeenoX from the terminal to
 solve the benchmark problem:
 
+Check out the section about [invocation][] in the [FeenoX manual][].
+
 The trick is that this workflow is susceptible of being automated and
 customized to run [in the cloud][], possibly [in parallel throughout
 several servers using the MPI standard][]. Check out this 1-minute video
@@ -114,6 +116,8 @@ are feeling curious, take a look at what FeenoX has to offer to
   [Gmsh]: http://gmsh.info/
   [editors with syntax highlighting]: https://seamplex.com/feenox/doc/sds.html#sec:syntactic
   [`examples`]: https://github.com/seamplex/feenox/tree/main/examples
+  [invocation]: https://www.seamplex.com/feenox/doc/feenox-manual.html#running-feenox
+  [FeenoX manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
   [in the cloud]: https://www.seamplex.com/feenox/doc/sds.html#cloud-first
   [in parallel throughout several servers using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [hackers]: README4hackers.md

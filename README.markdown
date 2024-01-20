@@ -33,8 +33,8 @@
 # About FeenoX
 
 [FeenoX][] is a [cloud-first][] [free and open source][] tool to solve
-[engineering-related problems][] using a computer (or many computers in
-parallel) with a [particular design basis][].
+[engineering-related problems][] using a computer (or [many computers in
+parallel][]) with a [particular design basis][].
 
 Choose your background for further details about the what, how and whys:
 
@@ -46,6 +46,7 @@ Choose your background for further details about the what, how and whys:
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [free and open source]: #licensing
   [engineering-related problems]: #extents
+  [many computers in parallel]: https://www.seamplex.com/feenox/doc/sds.html#sec:scalability
   [particular design basis]: https://seamplex.com/feenox/doc/sds.html
   [Industry Engineer]: README4engineers.markdown
   [Unix Hacker]: README4hackers.markdown

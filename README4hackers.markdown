@@ -196,8 +196,8 @@ The [input file][self-explanatory ASCII file]…
   has an actual instruction pointer that loops over the instruction set
   (there might even be [conditional blocks][]).
 - is [simple for simple files][] (but might get [more complicated for
-  mor complex problems][]). Remember [Alan Kay][]’s quote: “simple
-  things should be simple and complex things should be possible.”
+  mor complex problems][]). Remember [Alan Kay][]’s quote: [“simple
+  things should be simple and complex things should be possible.”][]
 
 Following the Unix rule of silence, [the output is 100% user-defined][]:
 if there are not explicit output instructions, FeenoX will not write
@@ -254,6 +254,8 @@ and will not compute things that are not actually needed).
   [simple for simple files]: https://seamplex.com/feenox/doc/sds.html#sec:simple
   [more complicated for mor complex problems]: https://seamplex.com/feenox/doc/sds.html#sec:complex
   [Alan Kay]: https://en.wikipedia.org/wiki/Alan_Kay
+  [“simple things should be simple and complex things should be possible.”]:
+    https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible
   [the output is 100% user-defined]: https://seamplex.com/feenox/doc/sds.html#sec:output
   [Pandoc]: https://pandoc.org/
   [Git]: https://git-scm.com/
@@ -270,6 +272,8 @@ Feenox is a computational tool designed to be run on Unix servers as a
 part of a [cloud-first][] workflow, optionally [involving MPI
 communication among different servers][] to hande arbitrarily-large
 problems:
+
+Check out the section about [invocation][] in the [FeenoX manual][].
 
 It has been [written in C][] and designed under the Unix programming
 philosophy as quoted by Eric Raymond. Following the rule of composition,
@@ -353,6 +357,8 @@ forum][].
 
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [involving MPI communication among different servers]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
+  [invocation]: https://www.seamplex.com/feenox/doc/feenox-manual.html#running-feenox
+  [FeenoX manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
   [written in C]: https://seamplex.com/feenox/doc/programming.html#languages
   [GNU Scientific Library]: https://www.gnu.org/software/gsl/
   [SUNDIALS IDA]: https://computing.llnl.gov/projects/sundials/ida

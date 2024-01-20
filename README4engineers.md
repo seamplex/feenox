@@ -60,6 +60,8 @@ Once we put these two files, `nafems-le10.geo` and `nafems-le10.fee` in the same
 ```
 ::::::
 
+Check out the section about [invocation](https://www.seamplex.com/feenox/doc/feenox-manual.html#running-feenox) in the [FeenoX manual](https://www.seamplex.com/feenox/doc/feenox-manual.html).
+
 The trick is that this workflow is susceptible of being automated and customized to run [in the cloud](https://www.seamplex.com/feenox/doc/sds.html#cloud-first), possibly [in parallel throughout several servers using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
 Check out this 1-minute video that covers a similar case from the [tensile-test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/):
 

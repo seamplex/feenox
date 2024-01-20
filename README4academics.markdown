@@ -11,11 +11,11 @@
 # What
 
 [FeenoX][] is a [cloud-first][] [Unix][] stand-alone **program**
-(i.e. something your run, not something you have to link existing code
-against) that reads an [engineering-related problem][] in a [plain-text
-file containing definitions and instructions][]. That is to say, it
-reads the problem to be solved at run time and does not require the user
-(most of the time these will be [industry
+(i.e. something your [run][], not something you have to link existing
+code against) that reads an [engineering-related problem][] in a
+[plain-text file containing definitions and instructions][]. That is to
+say, it reads the problem to be solved at run time and does not require
+the user (most of the time these will be [industry
 engineers][engineering-related problem] and not [hackers][Unix] nor
 PhDs) to compile and link custom code in order to solve a problem
 because it is *not a library*. It does not require the users to write a
@@ -63,7 +63,8 @@ which for linear elastic looks as follows:
 
 ![][1] 
 
-Further discussion can be found in the [tensile test tutorial][].
+Further discussion can be found in the [tensile test tutorial][]. Check
+out the section about [invocation][run] in the [FeenoX manual][].
 
 The design responds to a [Software Requirement Specifications][]
 document that acts as a “request for quotations” of a computational
@@ -113,6 +114,7 @@ solutions][].
   [FeenoX]: https://www.seamplex.com/feenox/
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [Unix]: README4hackers.markdown
+  [run]: https://www.seamplex.com/feenox/doc/feenox-manual.html#running-feenox
   [engineering-related problem]: README4engineers.markdown
   [plain-text file containing definitions and instructions]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
@@ -123,6 +125,7 @@ solutions][].
   [PETSc]: https://petsc.org/release/
   [1]: doc/transfer-le10-zoom.svg
   [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
+  [FeenoX manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
   [generic numerical problems]: https://seamplex.com/feenox/examples/examples/basic.html
@@ -219,6 +222,25 @@ to
   - [mass matrix][]
   - [right-hand side vector][]
 
+  For example, this snippet would build the elemental stiffness matrix
+  for the [Laplace problem][]:
+
+  ``` c
+  int build_laplace_Ki(element_t *e, unsigned int q) {
+    double wdet = feenox_fem_compute_w_det_at_gauss(e, q);
+    gsl_matrix *B = feenox_fem_compute_B_at_gauss(e, q);
+    feenox_call(feenox_blas_BtB_accum(B, wdet, feenox.fem.Ki));  
+    return FEENOX_OK;
+  }
+  ```
+
+  The calls for computing the weights and the matrices with the shape
+  functions and/or their derivatives currently support first and
+  second-order iso-geometric elements, but other element types can be
+  added as well.  
+  More complex cases involving non-uniform material properties,
+  volumetric sources, etc. can be found in the actual source.
+
 - solve the discretized equations using the appropriate
   [PETSc][3]/[SLEPc][] objects, i.e.
 
@@ -231,7 +253,7 @@ This general framework constitutes the bulk of [FeenoX’s source code][].
 The particular functions that implement each problem type are located in
 subdirectories [`src/pdes`][], namely
 
-- [`laplace`][]
+- [`laplace`][Laplace problem]
 - [`thermal`][]
 - [`mechanical`][]
 - [`modal`][]
@@ -240,8 +262,9 @@ subdirectories [`src/pdes`][], namely
 
 Researchers with both knowledge of mathematical theory of finite
 elements and programming skills might, with the aid of [the
-community][], add support for other PDES by using one of these
-directories (say [`laplace`][]) as a template and
+community][], add support for other PDES. They might do that by using
+one of these directories (say [`laplace`][Laplace problem]) as a
+template and
 
 1.  replace every occurrence of `laplace` in symbol names with the name
     of the new PDE
@@ -257,8 +280,12 @@ directories (say [`laplace`][]) as a template and
 5.  re-run `autogen.sh`, `./configure` and `make` to get a FeenoX
     executable with support for the new PDE.
 
-The [programming guide][] contains further details about how to
-contribute to the code base.
+As we mentioned in [FeenoX for hackers][], [Alan Kay][]’s says: [“simple
+things should be simple and complex things should be possible.”][] Of
+course, the addition of non-trivial PDEs is not straightforward, but
+possible (at that time we were discussing the first half of the quote,
+now we refer to the second part). The [programming guide][] contains
+further details about how to contribute to the code base.
 
 - See [FeenoX for engineers][] for more details about the problem types
   FeenoX can solve and how to solve them.
@@ -291,6 +318,7 @@ contribute to the code base.
   [stiffness matrix]: https://github.com/seamplex/feenox/blob/main/src/pdes/laplace/bulk.c#L33
   [mass matrix]: https://github.com/seamplex/feenox/blob/main/src/pdes/modal/bulk.c#L98
   [right-hand side vector]: https://github.com/seamplex/feenox/blob/main/src/pdes/thermal/bulk.c#L41
+  [Laplace problem]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [3]: https://petsc.org/
   [SLEPc]: https://slepc.upv.es/
   [KSP]: https://petsc.org/release/manual/ksp/
@@ -303,24 +331,24 @@ contribute to the code base.
   [eigenvalue problems]: https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-3d-pwr-benchmark
   [FeenoX’s source code]: https://github.com/seamplex/feenox
   [`src/pdes`]: https://github.com/seamplex/feenox/tree/main/src/pdes
-  [`laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [`thermal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal
   [`mechanical`]: https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical
   [`modal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/modal
   [`neutron_diffusion`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion
   [`neutron_sn`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_sn
   [the community]: https://github.com/seamplex/feenox/discussions
+  [FeenoX for hackers]: README4hackers.markdown
+  [Alan Kay]: https://en.wikipedia.org/wiki/Alan_Kay
+  [“simple things should be simple and complex things should be possible.”]:
+    https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible
   [programming guide]: doprogramming.markdown
   [FeenoX for engineers]: README4engineers.markdown
-  [FeenoX for hackers]: README4hackers.markdown
 
 # Why
 
 The world is already full of finite-element programs, and every day a
 grad student creates a new one from scratch. So why adding FeenoX to the
-already-crowded space of FEA tools?
-
-Because there are either
+already-crowded space of FEA tools? Because there are either
 
 1.  libraries which need code to use them such as
     - Sparselizard
@@ -331,13 +359,14 @@ Because there are either
     - CalculiX
     - CodeAster
 
-FeenoX sits in the middle:
+FeenoX sits in the middle. It is the only free and open-source tool that
+satisfies the [Software Requirement Specifications][], including that…
 
 - in order to solve a problem one needs to prepare an [input file][]
-  (not a script) which is [read at run-time][], not code which calls a
-  library
+  (not a script) which is [read at run-time][] (not code which calls a
+  library)
 - these input files can [expand generic command-line options using Bash
-  syntax as `$1`, `$2`, etc.][], which allows for [parametric][] or
+  syntax as `$1`, `$2`, etc.][], which allow [parametric][] or
   [optimization loops][] driven by higher-level scripts
 - for solving PDEs, the input file has to refer to at least [one Gmsh
   `.msh` file][] that defines the domain where the PDE is solved
@@ -352,6 +381,7 @@ FeenoX sits in the middle:
 See [FeenoX for hackers][] for another explanation about why FeenoX is
 different from other computational tools.
 
+  [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [input file]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [read at run-time]: https://seamplex.com/feenox/doc/sds.html#sec:execution
   [expand generic command-line options using Bash syntax as `$1`, `$2`, etc.]:

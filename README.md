@@ -11,7 +11,7 @@ toc: true
 
 # About FeenoX
 
-[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or many computers in parallel) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).
+[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or [many computers in parallel](https://www.seamplex.com/feenox/doc/sds.html#sec:scalability)) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).
 
 ::::: {.only-in-format .html }
 ```{=html}

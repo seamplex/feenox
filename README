@@ -46,6 +46,7 @@ Choose your background for further details about the what, how and whys:
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [free and open source]: #licensing
   [engineering-related problems]: #extents
+  [many computers in parallel]: https://www.seamplex.com/feenox/doc/sds.html#sec:scalability
   [particular design basis]: https://seamplex.com/feenox/doc/sds.html
   [Industry Engineer]: ./README4engineers.md
   [Unix Hacker]: ./README4hackers.md
