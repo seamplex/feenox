@@ -34,7 +34,7 @@ See below for further details about this [extensibility mechanism](https://www.s
 
 This program then solves the problem and, eventually, writes the outputs which the input file requests with [explicit instructions](https://www.seamplex.com/feenox/doc/sds.html#sec:output) (and nothing if nothing is asked for) and returns back to the Unix shell:
 
-```{.feenox include="nafems-le10.fee"}
+```{.feenox include="doc/nafems-le10.fee"}
 ```
 
 :::::: {.only-in-format .html }

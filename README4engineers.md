@@ -39,7 +39,7 @@ No need to deal with a map between materials and mesh entitites (in this case th
 Say we already have a [`nafems-le10.geo`](https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo) file which tells [Gmsh](http://gmsh.info/) how to create a mesh `nafems-le10.msh` (check out the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) for details).
 Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) for example) as follows:
 
-```{.feenox include="nafems-le10.fee"}
+```{.feenox include="doc/nafems-le10.fee"}
 ```
 
 

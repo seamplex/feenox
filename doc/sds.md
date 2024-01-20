@@ -1951,7 +1951,7 @@ Then, the mechanical problem reads two meshes: one for solving the actual mechan
 
 The usage of run-time command-line arguments was illustrated in @sec:parametric.
 The idea is that if the expression `$n` (or `${n}`) is found in the input file, the FeenoX parser expands the expression literally as the $n$-th non-optional argument in the command line.
-The case $n=0$ is particular in the sense that, as explained in @sec:syntatic, expands to the name of the input file without the leading directory path and the trailing extension `.fee`.
+The case $n=0$ is particular in the sense that, as explained in @sec:sugar, expands to the name of the input file without the leading directory path and the trailing extension `.fee`.
 
 The definition [`DEFAULT_ARGUMENT_VALUE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#default_argument_value) can be used to give a default value for arguments not provided.
 otherwise, FeenoX would complain:

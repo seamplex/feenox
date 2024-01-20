@@ -47,6 +47,27 @@ which the input file requests with [explicit instructions][] (and
 nothing if nothing is asked for) and returns back to the Unix shell:
 
 ``` feenox
+# NAFEMS Benchmark LE-10: thick plate pressure
+PROBLEM mechanical DIMENSIONS 3
+READ_MESH nafems-le10.msh   # mesh in millimeters
+
+# LOADING: uniform normal pressure on the upper surface
+BC upper    p=1      # 1 Mpa
+
+# BOUNDARY CONDITIONS:
+BC DCD'C'   v=0      # Face DCD'C' zero y-displacement
+BC ABA'B'   u=0      # Face ABA'B' zero x-displacement
+BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
+BC midplane w=0      #  z displacements fixed along mid-plane
+
+# MATERIAL PROPERTIES: isotropic single-material properties
+E = 210e3   # Young modulus in MPa
+nu = 0.3    # Poisson's ratio
+
+SOLVE_PROBLEM   # solve!
+
+# print the direct stress y at D (and nothing more)
+PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
 ```
 
 It can be seen as a Unix filter (or as a transfer function)
@@ -149,8 +170,9 @@ solutions][].
 
 FeenoX tries to achieve its goals by…
 
-- on [both ethical (since it is free) and technical (since it is open
-  source) ground][] while interacting with other free and open specimens
+- standing on [both ethical (since it is free) and technical (since it
+  is open source) ground][] while interacting with other free and open
+  specimens such as
 
   - operating systems
   - libraries
@@ -161,7 +183,7 @@ FeenoX tries to achieve its goals by…
 
 - leveraging the [Unix programming philosophy][] to come up with a
   [cloud-first tool][] suitable to be [automatically deployed][] and
-  serve as the back end of web-based interfaces such as [CAEplex][].
+  serve as the back end of web-based interfaces (fig. ).
 
 - providing a [ready-to-run program][] that reads [an input file at run
   time][] (and not a library that has to be linked for each particular
@@ -249,7 +271,6 @@ to
   - [TS][] for [transient problems][]
   - [EPS][] for [eigenvalue problems][]
 
-This general framework constitutes the bulk of [FeenoX’s source code][].
 The particular functions that implement each problem type are located in
 subdirectories [`src/pdes`][], namely
 
@@ -297,7 +318,6 @@ further details about how to contribute to the code base.
   [Unix programming philosophy]: https://seamplex.com/feenox/doc/sds.html#sec:unix
   [cloud-first tool]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [automatically deployed]: https://seamplex.com/feenox/doc/sds.html#sec:deployment
-  [CAEplex]: https://www.caeplex.com
   [ready-to-run program]: https://seamplex.com/feenox/doc/sds.html#sec:execution
   [an input file at run time]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
@@ -329,7 +349,6 @@ further details about how to contribute to the code base.
   [transient problems]: https://seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient
   [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
   [eigenvalue problems]: https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-3d-pwr-benchmark
-  [FeenoX’s source code]: https://github.com/seamplex/feenox
   [`src/pdes`]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [`thermal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal
   [`mechanical`]: https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical
@@ -373,7 +392,7 @@ satisfies the [Software Requirement Specifications][], including that…
 - the [material properties and boundary conditions][] are defined using
   physical groups and not individual nodes nor elements, so the input
   file is independent of the mesh and thus can be [tracked with Git][]
-  to increase [traceability and repeatability][]
+  to increase [traceability and repeatability][].
 - it uses the [Unix philosophy][] which, among others, [separates policy
   from mechanism][] and thus FeenoX is a natural choice for web-based
   interfaces like [CAEplex][].
