@@ -30,8 +30,8 @@ int main(int argc, char **argv) {
     feenox_pop_errors();
     exit(EXIT_FAILURE);
   }
-  
-  if (feenox_run() != FEENOX_OK) {
+
+  if (feenox.check == 0 && feenox_run() != FEENOX_OK) {
     feenox_runtime_error();
     exit(EXIT_FAILURE);
   }

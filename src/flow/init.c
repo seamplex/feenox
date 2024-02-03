@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX initialization routines
  *
- *  Copyright (C) 2009--2023 jeremy theler
+ *  Copyright (C) 2009--2024 jeremy theler
  *
  *  This file is part of FeenoX.
  *
@@ -55,6 +55,9 @@ int feenox_initialize(int argc, char **argv) {
     { "versions",      no_argument,       NULL, 'V'},
     { "long-version",  no_argument,       NULL, 'V'},
     { "version-long",  no_argument,       NULL, 'V'},
+///op+check+option `-c`, `--check`
+///op+check+desc validates if the input file is sane or not
+    { "check",         no_argument,       NULL, 'c'},
 ///op+pdes+option `--pdes`
 ///op+pdes+desc list the types of `PROBLEM`s that FeenoX can solve, one per line
     { "pdes",          no_argument,       NULL, 'p'},
@@ -120,7 +123,7 @@ int feenox_initialize(int argc, char **argv) {
   feenox.argv_orig[i] = NULL;
   
   opterr = 0;   // don't complain about unknown options, they can be for PETSc/SLEPc
-  while ((optc = getopt_long_only(argc, argv, "hvVs", longopts, &option_index)) != -1) {
+  while ((optc = getopt_long_only(argc, argv, "hvVc", longopts, &option_index)) != -1) {
     switch (optc) {
       case 'h':
         show_help = 1;
@@ -130,6 +133,9 @@ int feenox_initialize(int argc, char **argv) {
         break;
       case 'V':
         show_version = version_info;
+        break;
+      case 'c':
+        feenox.check= 1;
         break;
       case 'p':
         show_version = version_available_pdes;

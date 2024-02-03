@@ -1519,14 +1519,10 @@ struct feenox_t {
 #ifdef HAVE_CLOCK_GETTIME
   struct timespec tp0;  
 #endif
-  
-  enum {
-    mode_normal,
-    mode_fit,
-    mode_list_vars
-  } mode;
-  
-  int debug;
+
+  int check;
+  // TODO
+  // int debug;
   
   int mpi_rank;
   int mpi_size;
