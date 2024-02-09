@@ -92,6 +92,9 @@ XFAIL_TESTS = tests/abort.sh \
               tests/xfail-few-properties-ortho-poisson.sh \
               tests/xfail-few-properties-ortho-shear.sh
 
+# when getting
+# ERROR: files left in build directory after distclean:
+# when creating the source dist, add them here
 
 DISTCLEANFILES = \
                  config.guess \
@@ -189,9 +192,11 @@ DISTCLEANFILES = \
                  tests/annulus.msh \
                  cube-radial.vtk \
                  mesh2d.vtk \
-                 ./tests/expressions_cumbersome.last
-                 
-                 
+                 ./tests/expressions_cumbersome.last \
+                 ./tests/steps.last \
+                 ./tests/printf.last \
+                 ./square_tmp.vtk \
+                 ./two-is-2.txt                 
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .

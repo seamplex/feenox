@@ -27,8 +27,8 @@ Also Debian `.deb` packages can be created (if running in a Debian box).
  1. Edit `versions.sh` and set the version of both PETSc and SLEPc, for instance
 
     ```bash
-    petsc_ver=3.19.0
-    slepc_ver=3.19.0
+    petsc_ver=3.20.4
+    slepc_ver=3.20.1
     ```
    
  2. Run `./petsc.sh` to download, configure and compile the selected version of PETSc and SLEPc.
