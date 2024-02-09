@@ -35,10 +35,10 @@ Also Debian `.deb` packages can be created (if running in a Debian box).
     These will be unpacked in the current directory `dist` but are `.gitignore`d.
 
  3. Run `./bin.sh` to compile FeenoX and get a tarball with a statically-linked executable.
-    By default it does not include PDF documentation. Pass `--doc` to include it:
+    By default it does not include PDF documentation. Pass `--pdf` to include it:
     
     ```terminal
-    ./bin.sh --doc
+    ./bin.sh --pdf
     ```
     
     

@@ -1,11 +1,11 @@
 #!/bin/bash -ex
 
-doc=0
-if [ "x${1}" == "x--no-doc" ]; then
-  doc=0
+pdf=0
+if [ "x${1}" == "x--no-pdf" ]; then
+  pdf=0
 fi
-if [ "x${1}" == "x--doc" ]; then
-  doc=1
+if [ "x${1}" == "x--pdf" ]; then
+  pdf=1
 fi
 
 if [ ! -e ../tests ]; then
@@ -34,7 +34,7 @@ cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
               --enable-download-gsl CFLAGS="-O3 -flto -DLD_STATIC" LDFLAGS="-flto=auto -static -static-libgcc"
 
-  if [ ${doc} -ne 0 ]; then
+  if [ ${pdf} -ne 0 ]; then
     if [ "x${target}" = "xlinux-amd64" ]; then
       cd doc
         ./make.sh --pdf
@@ -67,7 +67,14 @@ cd ${package}-${version}-${target}
     cp ../${package}/README    share/doc/feenox
     cp ../${package}/TODO      share/doc/feenox
 
-    if [ ${doc} -ne 0 ]; then
+    cp ../${package}/doc/${package}-manual       share/doc/feenox
+    cp ../${package}/doc/${package}-desc         share/doc/feenox
+    cp ../${package}/doc/programming             share/doc/feenox
+    cp ../${package}/doc/compilation             share/doc/feenox
+    cp ../${package}/doc/FAQ                     share/doc/feenox
+    cp ../${package}/doc/CODE_OF_CONDUCT         share/doc/feenox
+    
+    if [ ${pdf} -ne 0 ]; then
       cp ../${package}/README.pdf                  share/doc/feenox
       cp ../${package}/doc/${package}-manual.pdf   share/doc/feenox
       cp ../${package}/doc/${package}-desc.pdf     share/doc/feenox
@@ -99,10 +106,10 @@ cd ${package}-${version}-${target}
   cp ../${package}/doc/fee.vim               share/doc/feenox
   cp ../${package}/doc/${package}-desc.texi  share/doc/feenox
   
-  if [ ${doc} -ne 0 ]; then
-    cp -rL ../${package}/examples/             share/doc/feenox
-    cp -rL ../${package}/tests/                share/doc/feenox
-  fi
+#   if [ ${pdf} -ne 0 ]; then
+#     cp -rL ../${package}/examples/             share/doc/feenox
+#     cp -rL ../${package}/tests/                share/doc/feenox
+#   fi
   
   echo "See https://www.seamplex.com/feenox/examples" > share/doc/feenox/examples/README
   echo "See https://github.com/seamplex/feenox/tree/main/tests" > share/doc/feenox/tests/README
