@@ -26,6 +26,7 @@ export PETSC_ARCH=${PETSC_ARCH}
 
 # TODO: neither mpi nor mumps work in static
 ./configure \
+  --with-mpi=0 \
   --with-cxx=0 \
   --with-fortran-bindings=0 \
   --with-c2html=0 \
@@ -34,12 +35,11 @@ export PETSC_ARCH=${PETSC_ARCH}
   --with-debugging=0 \
   --with-shared-libraries=0 \
   --download-openblas \
-  --download-mpich \
   --COPTFLAGS="-O3" --FOPTFLAGS="-O3"
-           
-#   --with-mpi=0 \
-#   --download-mpich \
 
+# this guy needs udev which does not provide a static lib because it's too big
+#   --download-mpich \
+# It is part of systemd, you will able to compile it using these flags: -Dstatic-libsystemd=true -Dstatic-libudev=true 
            
 # export PETSC_ARCH=arch-linux2-serial-mumps-static
 # ./configure --with-mpi=0 --with-cxx=0 --with-fortran-bindings=0 --with-fc=0 --with-c2html=0 --with-x=0 --with-debugging=0 --with-shared-libraries=0 --with-mumps-serial=1 --download-mumps --download-openblas --COPTFLAGS="-O" --FOPTFLAGS="-O3"

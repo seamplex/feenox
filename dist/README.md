@@ -17,7 +17,7 @@ Also Debian `.deb` packages can be created (if running in a Debian box).
 
  0. Install requirements
  
-    ```
+    ```terminal
     apt-get install texlive-xetex texlive-fonts-extra texlive-science librsvg2-bin
     ```
     
@@ -32,15 +32,22 @@ Also Debian `.deb` packages can be created (if running in a Debian box).
     ```
    
  2. Run `./petsc.sh` to download, configure and compile the selected version of PETSc and SLEPc.
-These will be unpacked in the current directory `dist` but are `.gitignore`d.
+    These will be unpacked in the current directory `dist` but are `.gitignore`d.
 
  3. Run `./bin.sh` to compile FeenoX and get a tarball with a statically-linked executable.
- Currently the supported architectures architectures are
-   
-    * Debian-based GNU/Linux
-    * Windows with Cygwin
-
- Contributions to build FeenoX in other architectures (other Unixes such as MacOS) are welcome.
+    By default it does not include PDF documentation. Pass `--doc` to include it:
+    
+    ```terminal
+    ./bin.sh --doc
+    ```
+    
+    
+Currently the supported architectures architectures are
+  
+ * Debian-based GNU/Linux
+ * Windows with Cygwin
+    
+Contributions to build FeenoX in other architectures (other Unixes such as MacOS) are welcome.
  
  The resulting binary has PETSc and SLEPc statically linked, but only their non-MPI versions.
  Also, it does not include MUMPS. Feel free to play with the scripts to see if you can make them work.

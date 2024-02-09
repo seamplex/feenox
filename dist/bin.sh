@@ -37,7 +37,7 @@ cd ${package}
   if [ ${doc} -ne 0 ]; then
     if [ "x${target}" = "xlinux-amd64" ]; then
       cd doc
-        ./make.sh
+        ./make.sh --pdf
         make info
         make pdf
       cd ..
@@ -50,8 +50,8 @@ mkdir -p ${package}-${version}-${target}
 cd ${package}-${version}-${target}
 
   mkdir -p bin
-  mkdir -p share/doc/examples
-  mkdir -p share/doc/tests
+  mkdir -p share/doc/feenox/examples
+  mkdir -p share/doc/feenox/tests
 
   if [ "x${target}" = "xlinux-amd64" ]; then
   
@@ -61,21 +61,21 @@ cd ${package}-${version}-${target}
     
     cp ../${package}/${package} bin
 
-    cp ../${package}/AUTHORS   share/doc
-    cp ../${package}/ChangeLog share/doc
-    cp ../${package}/COPYING   share/doc
-    cp ../${package}/README    share/doc
-    cp ../${package}/TODO      share/doc
+    cp ../${package}/AUTHORS   share/doc/feenox
+    cp ../${package}/ChangeLog share/doc/feenox
+    cp ../${package}/COPYING   share/doc/feenox
+    cp ../${package}/README    share/doc/feenox
+    cp ../${package}/TODO      share/doc/feenox
 
     if [ ${doc} -ne 0 ]; then
-      cp ../${package}/README.pdf                  share/doc
-      cp ../${package}/doc/${package}-manual.pdf   share/doc
-      cp ../${package}/doc/${package}-desc.pdf     share/doc
-      cp ../${package}/doc/${package}-desc.info    share/doc
-      cp ../${package}/doc/programming.pdf         share/doc
-      cp ../${package}/doc/compilation.pdf         share/doc
-      cp ../${package}/doc/FAQ.pdf                 share/doc
-      cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc
+      cp ../${package}/README.pdf                  share/doc/feenox
+      cp ../${package}/doc/${package}-manual.pdf   share/doc/feenox
+      cp ../${package}/doc/${package}-desc.pdf     share/doc/feenox
+      cp ../${package}/doc/${package}-desc.info    share/doc/feenox
+      cp ../${package}/doc/programming.pdf         share/doc/feenox
+      cp ../${package}/doc/compilation.pdf         share/doc/feenox
+      cp ../${package}/doc/FAQ.pdf                 share/doc/feenox
+      cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc/feenox
     fi
     
   elif [ "x${target}" = "xwindows64" ]; then   
@@ -95,17 +95,17 @@ cd ${package}-${version}-${target}
     
   fi
 
-  cp ../${package}/doc/${package}.xml        share/doc
-  cp ../${package}/doc/fee.vim               share/doc
-  cp ../${package}/doc/${package}-desc.texi  share/doc
+  cp ../${package}/doc/${package}.xml        share/doc/feenox
+  cp ../${package}/doc/fee.vim               share/doc/feenox
+  cp ../${package}/doc/${package}-desc.texi  share/doc/feenox
   
   if [ ${doc} -ne 0 ]; then
-    cp -rL ../${package}/examples/             share/doc
-    cp -rL ../${package}/tests/                share/doc
+    cp -rL ../${package}/examples/             share/doc/feenox
+    cp -rL ../${package}/tests/                share/doc/feenox
   fi
   
-  echo "See https://www.seamplex.com/feenox/examples" > share/doc/examples/README
-  echo "See https://github.com/seamplex/feenox/tree/main/tests" > share/doc/tests/README
+  echo "See https://www.seamplex.com/feenox/examples" > share/doc/feenox/examples/README
+  echo "See https://github.com/seamplex/feenox/tree/main/tests" > share/doc/feenox/tests/README
   
 cd ..
 
