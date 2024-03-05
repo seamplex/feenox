@@ -20,34 +20,34 @@ syntax-definition: feenox.xml
 
 # Summary
 
-[FeenoX](https://seamplex.com/feenox) is a
-[cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first)
-[free](https://seamplex.com/feenox/#licensing)
-[no-X](https://seamplex.com/feenox/README4engineers.html#how-feenox-works)
-[uniX-like](https://seamplex.com/feenox/doc/sds.html#sec:unix)
+FeenoX is a
+cloud-first
+free
+no-X
+uniX-like
 finite-element(ish) computational engineering tool designed to solve
 engineering-related problems using
-[cloud servers in parallel](https://seamplex.com/feenox/doc/sds.html#sec:scalability) in such a way that
-[the problem](https://seamplex.com/feenox/doc/sds.html#sec:scope) is defined in a plain-text near-English self descriptive
-[input file](https://seamplex.com/feenox/doc/sds.html#sec:input) read at
-[run time](https://seamplex.com/feenox/doc/sds.html#sec:architecture),
+cloud servers in parallel in such a way that
+the problem is defined in a plain-text near-English self descriptive
+input file read at
+run time,
 without requiring further user intervention after
-[the invocation](https://seamplex.com/feenox/doc/feenox-manual.html#running-feenox).
-FeenoX meets fictitious-yet-plausible [Software Requirement Specifications](https://seamplex.com/feenox/doc/srs.html) (SRS).
-The FeenoX [Software Design Specifications](https://seamplex.com/feenox/doc/sds.html) address each requirement of the SRS.
+the invocation.
+FeenoX meets fictitious-yet-plausible Software Requirement Specifications (SRS).
+The FeenoX Software Design Specifications address each requirement of the SRS.
 FeenoX provides a set of common
-[extents](https://seamplex.com/feenox/#extents),
-[capabilities](https://seamplex.com/feenox/#capabilities) and
-[usefulness](https://seamplex.com/feenox/#usefulness) but offers different features (following slightly different spirits) for
-[industry engineers](https://seamplex.com/feenox/README4engineers.html),
-[Unix hackers](https://seamplex.com/feenox/README4hackers.html) and
-[academic researchers](https://seamplex.com/feenox/README4academics.html).
+extents,
+capabilities and
+usefulness but offers different features (following slightly different spirits) for
+industry engineers,
+Unix hackers and
+academic researchers.
 The main features of this design basis are
 
  * The tool has to be an already-compiled program (not a library) so regular users do not have to compile anything to solve a problem.
- * Simple problems ought to need [simple input files](https://seamplex.com/feenox/doc/sds.html#sec:simple).
- * There should be a [one-to-one correspondence](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations) between the problem definition and FeenoX's input file, as illustrated in fig. \ref{le10}.
- * There should be an [extension mechanism](https://seamplex.com/feenox/doc/sds.html#sec:extensibility) to allow hackers and researchers to add new partial differential equations to the tool.
+ * Simple problems ought to need simple input files.
+ * There should be a one-to-one correspondence between the problem definition and FeenoX's input file, as illustrated in fig. \ref{le10}.
+ * There should be an extension mechanism to allow hackers and researchers to add new partial differential equations to the tool.
  
 ![The NAFEMS LE10 problem statement [@national1990nafems] and the corresponding FeenoX input illustrating the one-to-one correspondence between the two.\label{le10}](nafems-le10-problem-input.svg)
 
@@ -57,10 +57,10 @@ The main features of this design basis are
 Open-source finite-element tools are either
 
  a. libraries which need code to use them such as
-    - [Sparselizard](http://sparselizard.org/)
-    - [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/)
-    - [FEniCS](https://fenicsproject.org/)
-    - [MFEM](https://mfem.org/)
+    - [Sparselizard](http://sparselizard.org/) @sparselizard
+    - [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) @mofem
+    - [FEniCS](https://fenicsproject.org/) @fenics
+    - [MFEM](https://mfem.org/) @mfem
  b. end-user programs which need a GUI such as
     - [CalculiX](http://www.calculix.de/)
     - [CodeAster](https://code-aster.org)
@@ -68,50 +68,50 @@ Open-source finite-element tools are either
 FeenoX sits in the middle.
 First, it can solve
 
- - [Basic mathematics](https://seamplex.com/feenox/examples/basic.html)
- - [Systems of ODEs/DAEs](https://seamplex.com/feenox/examples/daes.html)
- - [Laplace’s equation](https://seamplex.com/feenox/examples/laplace.html)
- - [Heat conduction](https://seamplex.com/feenox/examples/thermal.html)
- - [Linear elasticity](https://seamplex.com/feenox/examples/mechanical.html)
- - [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
- - [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
- - [Neutron S$_N$](https://seamplex.com/feenox/examples/neutron_sn.html)
+ - [Basic mathematics](https://www.seamplex.com/feenox/examples/basic.html)
+ - [Systems of ODEs/DAEs](https://www.seamplex.com/feenox/examples/daes.html)
+ - [Laplace’s equation](https://www.seamplex.com/feenox/examples/laplace.html)
+ - [Heat conduction](https://www.seamplex.com/feenox/examples/thermal.html)
+ - [Linear elasticity](https://www.seamplex.com/feenox/examples/mechanical.html)
+ - [Modal analysis](https://www.seamplex.com/feenox/examples/modal.html)
+ - [Neutron diffusion](https://www.seamplex.com/feenox/examples/neutron_diffusion.html)
+ - [Neutron S$_N$](https://www.seamplex.com/feenox/examples/neutron_sn.html)
  
 
-Second, it is the only free and open-source tool that satisfies the Software Requirement Specifications, including that...
+Second, it is the only free and open-source tool that satisfies the [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html), including that...
 
- * in order to solve a problem one needs to prepare a (relatively) simple input file (not a script nor a deck) which is [read at run-time](https://seamplex.com/feenox/doc/sds.html#sec:execution) (not code which calls a library).
- For example, considering the [NAFEMS LE10 Benchmark problem](https://seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark) from fig. \ref{le10}, FeenoX works as two ["glue layers,"](https://www.linuxtopia.org/online_books/programming_books/art_of_unix_programming/ch04s03_1.html)
+ * in order to solve a problem one needs to prepare a (relatively) [simple input file](https://www.seamplex.com/feenox/doc/sds.html#sec:input) (not a script nor a deck) which is [read at run-time](https://www.seamplex.com/feenox/doc/sds.html#sec:execution) (not code which calls a library).
+ For example, considering the [NAFEMS LE10 Benchmark problem](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark) from fig. \ref{le10}, FeenoX works as two ["glue layers,"](https://www.linuxtopia.org/online_books/programming_books/art_of_unix_programming/ch04s03_1.html) @raymond
 
-   1. between the mesher [Gmsh](http://gmsh.info/) and the [PETSc library](https://petsc.org/release/) [@petsc-user-ref;@petsc-efficient]
-   2. between the PETSc library and a post-processor such as [Paraview](https://www.paraview.org/)
+   1. between the mesher [Gmsh](http://gmsh.info/) @gmsh and the [PETSc library](https://petsc.org/release/) [@petsc-user-ref;@petsc-efficient]
+   2. between the PETSc library and a post-processor such as [Paraview](https://www.paraview.org/) @paraview
 
    ![](transfer-le10-zoom.svg)\  
    
- * these input files can [expand generic command-line options using Bash syntax as `$1`, `$2`, etc.](https://seamplex.com/feenox/doc/sds.html#sec:run-time-arguments), which allow [parametric](https://seamplex.com/feenox/doc/sds.html#sec:parametric) or [optimization loops](https://seamplex.com/feenox/doc/sds.html#sec:optimization) driven by higher-level scripts.
- * for solving partial differential equations (PDEs), the input file has to refer to at least [one Gmsh `.msh` file](https://seamplex.com/feenox/doc/sds.html#sec:interoperability) that defines the domain where the PDE is solved.
- * the [material properties and boundary conditions](https://seamplex.com/feenox/doc/sds.html#nafems-le10-benchmark) are defined using physical groups and not individual nodes nor elements, so the input file is independent of the mesh and thus can be [tracked with Git](https://seamplex.com/feenox/doc/sds.html#sec:git-friendliness) to increase [traceability and repeatability](https://seamplex.com/feenox/doc/sds.html#sec:traceability).
- * it follows the Unix philosophy which, among others, [separates policy from mechanism](https://seamplex.com/feenox/doc/sds.html#sec:unix-separation) rendering FeenoX as a natural choice for web-based interfaces like [CAEplex](https://www.caeplex.com) (fig. \ref{caeplex}).
+ * these input files can expand generic command-line options using Bash syntax as `$1`, `$2`, etc., which allow parametric or optimization loops driven by higher-level scripts.
+ * for solving partial differential equations (PDEs), the input file has to refer to at least one Gmsh `.msh` file that defines the domain where the PDE is solved.
+ * the material properties and boundary conditions are defined using physical groups and not individual nodes nor elements, so the input file is independent of the mesh and thus can be tracked with Git to increase traceability and repeatability.
+ * it follows the Unix philosophy @raymond which, among others, separates policy from mechanism rendering FeenoX as a natural choice for web-based interfaces like [CAEplex](https://www.caeplex.com) (fig. \ref{caeplex}).
 
 ![[CAEplex](https://www.caeplex.com) is a web-based interface to solve thermo-mechanical problems in the cloud that uses FeenoX as the back end.\label{caeplex}](caeplex-ipad.jpg){width=65%}
  
 FeenoX tries to achieve its goals by...
 
- * standing on [both ethical (since it is free) and technical (since it is open source) grounds](https://seamplex.com/feenox/doc/sds.html#sec:architecture) while interacting with other free and open operating systems, libraries, compilers and pre and post-processing tools, thus encouraging science and engineering to shift from privative environments into the free world.
+ * standing on both ethical (since it is free) and technical (since it is open source) grounds while interacting with other free and open operating systems, libraries, compilers and pre and post-processing tools, thus encouraging science and engineering to shift from privative environments into the free world.
 
- * leveraging the Unix programming philosophy to come up with a cloud-first tool suitable to be [automatically deployed](https://seamplex.com/feenox/doc/sds.html#sec:deployment) and serve as the back end of web-based interfaces such as CAEplex.
+ * leveraging the Unix programming philosophy @raymond to come up with a cloud-first tool suitable to be automatically deployed and serve as the back end of web-based interfaces such as CAEplex.
 
- * providing a ready-to-run program that reads an input file at run time (and not a library that has to be linked for each particular problem to be solved) as a deliberate design decision discussed in the Software Design Specifications.
+ * providing a ready-to-run program that reads an input file at run time (and not a library that has to be linked for each particular problem to be solved) as a deliberate design decision discussed in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html).
 
  * designing and implementing an extensibility mechanism to allow hackers and/or academics to add new PDE formulations by adding a new subdirectory to [`src/pdes`]() in the repository and then
    a. re-bootstrapping with `autogen.sh`,
    b. re-configuring with `configure`, and
    c. re-compiling with `make`
 
-In effect, FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as [C functions](https://seamplex.com/feenox/doc/programming.html#languages)) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve.
+In effect, FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as [C functions](https://www.seamplex.com/feenox/doc/programming.html#languages)) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve.
 This general framework provides means to
 
-  - [parse the input file](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs), handle command-line arguments, [read mesh files](https://seamplex.com/feenox/doc/feenox-manual.html#read_mesh), [assign variables](https://seamplex.com/feenox/doc/feenox-manual.html#description), [evaluate conditionals](https://seamplex.com/feenox/doc/feenox-manual.html#if), [write results](https://seamplex.com/feenox/doc/sds.html#sec:output), etc.
+  - [parse the input file](https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs), [handle command-line arguments](https://www.seamplex.com/feenox/doc/sds.html#sec:run-time-arguments), [read mesh files](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh), [assign variables](https://www.seamplex.com/feenox/doc/feenox-manual.html#description), [evaluate conditionals](https://www.seamplex.com/feenox/doc/feenox-manual.html#if), [write results](https://www.seamplex.com/feenox/doc/sds.html#sec:output), etc.
 
     ```feenox
     PROBLEM laplace 2D
@@ -120,14 +120,14 @@ This general framework provides means to
     WRITE_RESULTS FORMAT vtk
     ```
     
-  - handle [material properties](https://seamplex.com/feenox/doc/sds.html#sec:flexibility) given as [algebraic expressions](https://seamplex.com/feenox/doc/sds.html#sec:expression) involving pointwise-defined functions of [space](https://seamplex.com/feenox/doc/tutorials/320-thermal/#sec:mms), [temperature](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties), [time](https://seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state), etc.
+  - handle [material properties](https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility) given as [algebraic expressions](https://www.seamplex.com/feenox/doc/sds.html#sec:expression) involving pointwise-defined functions of [space](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:mms), [temperature](https://www.seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties), [time](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state), etc.
     
     ```feenox
     MATERIAL steel     E=210e3*(1-1e-3*(T(x,y,z)-20))   nu=0.3
     MATERIAL aluminum  E=69e3                           nu=7/25
     ```
     
-  - read problem-specific [boundary conditions as algebraic expressions](https://seamplex.com/feenox/doc/tutorials/320-thermal/#temperature-dependent-heat-flux-radiation)
+  - read problem-specific [boundary conditions as algebraic expressions](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#temperature-dependent-heat-flux-radiation)
     
     ```feenox
     sigma = 5.670374419e-8  # W m^2 / K^4 as in wikipedia
@@ -144,7 +144,7 @@ This general framework provides means to
      * [mass matrix](https://github.com/seamplex/feenox/blob/main/src/pdes/modal/bulk.c#L98)
      * [right-hand side vector](https://github.com/seamplex/feenox/blob/main/src/pdes/thermal/bulk.c#L41)
      
-    For example, this snippet would build the elemental stiffness matrix for the Laplace problem:
+    For example, this snippet would build the elemental stiffness matrix for the [Laplace problem](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace):
     
     ```c
     int build_laplace_Ki(element_t *e, unsigned int q) {
@@ -155,13 +155,13 @@ This general framework provides means to
     }
     ```
     
-    The calls for computing the weights and the matrices with the shape functions and/or their derivatives currently support first and second-order iso-geometric elements, but other element types can be added as well. More complex cases involving non-uniform material properties, volumetric sources, etc. can be found in the [examples](https://seamplex.com/feenox/examples/), [tutorials](https://seamplex.com/feenox/doc/tutorials/) and [tests](https://github.com/seamplex/feenox/tree/main/tests).
+    The calls for computing the weights and the matrices with the shape functions and/or their derivatives currently support first and second-order iso-geometric elements, but other element types can be added as well. More complex cases involving non-uniform material properties, volumetric sources, etc. can be found in the [examples](https://www.seamplex.com/feenox/examples/), [tutorials](https://www.seamplex.com/feenox/doc/tutorials/) and [tests](https://github.com/seamplex/feenox/tree/main/tests).
 
   - solve the discretized equations using the appropriate PETSc [@petsc-user-ref;@petsc-efficient] or [SLEPc](https://slepc.upv.es/) [@slepc-manual;@slepc-toms] objects, i.e.
-    * [KSP](https://petsc.org/release/manual/ksp/) for [linear static problems](https://seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems)
-    * [SNES](https://petsc.org/release/manual/snes/) for [non-linear static problems](https://seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems)
-    * [TS](https://petsc.org/release/manual/ts/) for [transient problems](https://seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient)
-    * [EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html) for [eigenvalue problems](https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-3d-pwr-benchmark)
+    * [KSP](https://petsc.org/release/manual/ksp/) for [linear static problems](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems)
+    * [SNES](https://petsc.org/release/manual/snes/) for [non-linear static problems](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems)
+    * [TS](https://petsc.org/release/manual/ts/) for [transient problems](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient)
+    * [EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html) for [eigenvalue problems](https://www.seamplex.com/feenox/examples/neutron_diffusion.html#iaea-3d-pwr-benchmark)
 
 The particular functions that implement each problem type are located in subdirectories [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes), namely
 
@@ -186,7 +186,7 @@ They might do that by using one of these directories (say [`laplace`](https://gi
  #. re-run `autogen.sh`, `./configure` and `make` to get a FeenoX executable with support for the new PDE.
 
 The addition of non-trivial PDEs is not straightforward, but possible.
-The [programming guide](https://seamplex.com/feenox/doc/programming.html) contains further details about how to contribute to the code base.
+The [programming guide](https://www.seamplex.com/feenox/doc/programming.html) contains further details about how to contribute to the code base.
 
 # Conclusions
 
