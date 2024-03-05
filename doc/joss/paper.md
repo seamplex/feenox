@@ -57,10 +57,10 @@ The main features of this design basis are
 Open-source finite-element tools are either
 
  a. libraries which need code to use them such as
-    - [Sparselizard](http://sparselizard.org/) @sparselizard
-    - [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) @mofem
-    - [FEniCS](https://fenicsproject.org/) @fenics
-    - [MFEM](https://mfem.org/) @mfem
+    - [Sparselizard](http://sparselizard.org/) [@sparselizard]
+    - [MoFEM](http://mofem.eng.gla.ac.uk/mofem/html/) [@mofem]
+    - [FEniCS](https://fenicsproject.org/) [@fenics]
+    - [MFEM](https://mfem.org/) [@mfem]
  b. end-user programs which need a GUI such as
     - [CalculiX](http://www.calculix.de/)
     - [CodeAster](https://code-aster.org)
@@ -80,18 +80,18 @@ First, it can solve
 
 Second, it is the only free and open-source tool that satisfies the [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html), including that...
 
- * in order to solve a problem one needs to prepare a (relatively) [simple input file](https://www.seamplex.com/feenox/doc/sds.html#sec:input) (not a script nor a deck) which is [read at run-time](https://www.seamplex.com/feenox/doc/sds.html#sec:execution) (not code which calls a library).
- For example, considering the [NAFEMS LE10 Benchmark problem](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark) from fig. \ref{le10}, FeenoX works as two ["glue layers,"](https://www.linuxtopia.org/online_books/programming_books/art_of_unix_programming/ch04s03_1.html) @raymond
+ * in order to solve a problem one needs to prepare a (relatively) simple input file (not a script nor a deck) which is read at run-time (not code which calls a library).
+ For example, considering the [NAFEMS LE10 Benchmark problem](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark) from fig. \ref{le10}, FeenoX works as two "glue layers" [@raymond]
 
-   1. between the mesher [Gmsh](http://gmsh.info/) @gmsh and the [PETSc library](https://petsc.org/release/) [@petsc-user-ref;@petsc-efficient]
-   2. between the PETSc library and a post-processor such as [Paraview](https://www.paraview.org/) @paraview
+   1. between the mesher [Gmsh](http://gmsh.info/) [@gmsh] and the [PETSc library](https://petsc.org/release/) [@petsc-user-ref;@petsc-efficient]
+   2. between the PETSc library and a post-processor such as [Paraview](https://www.paraview.org/) [@paraview]
 
    ![](transfer-le10-zoom.svg)\  
    
  * these input files can expand generic command-line options using Bash syntax as `$1`, `$2`, etc., which allow parametric or optimization loops driven by higher-level scripts.
  * for solving partial differential equations (PDEs), the input file has to refer to at least one Gmsh `.msh` file that defines the domain where the PDE is solved.
  * the material properties and boundary conditions are defined using physical groups and not individual nodes nor elements, so the input file is independent of the mesh and thus can be tracked with Git to increase traceability and repeatability.
- * it follows the Unix philosophy @raymond which, among others, separates policy from mechanism rendering FeenoX as a natural choice for web-based interfaces like [CAEplex](https://www.caeplex.com) (fig. \ref{caeplex}).
+ * it follows the Unix philosophy [@raymond] which, among others, separates policy from mechanism rendering FeenoX as a natural choice for web-based interfaces like [CAEplex](https://www.caeplex.com) (fig. \ref{caeplex}).
 
 ![[CAEplex](https://www.caeplex.com) is a web-based interface to solve thermo-mechanical problems in the cloud that uses FeenoX as the back end.\label{caeplex}](caeplex-ipad.jpg){width=65%}
  
@@ -99,7 +99,7 @@ FeenoX tries to achieve its goals by...
 
  * standing on both ethical (since it is free) and technical (since it is open source) grounds while interacting with other free and open operating systems, libraries, compilers and pre and post-processing tools, thus encouraging science and engineering to shift from privative environments into the free world.
 
- * leveraging the Unix programming philosophy @raymond to come up with a cloud-first tool suitable to be automatically deployed and serve as the back end of web-based interfaces such as CAEplex.
+ * leveraging the Unix programming philosophy to come up with a cloud-first tool suitable to be automatically deployed and serve as the back end of web-based interfaces such as CAEplex.
 
  * providing a ready-to-run program that reads an input file at run time (and not a library that has to be linked for each particular problem to be solved) as a deliberate design decision discussed in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html).
 
@@ -108,7 +108,7 @@ FeenoX tries to achieve its goals by...
    b. re-configuring with `configure`, and
    c. re-compiling with `make`
 
-In effect, FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as [C functions](https://www.seamplex.com/feenox/doc/programming.html#languages)) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve.
+In effect, FeenoX provides a general mathematical framework to solve PDEs with a bunch of entry points (as C functions) where new types of PDEs (e.g. electromagnetism, fluid mechanics, etc.) can be added to the set of what FeenoX can solve.
 This general framework provides means to
 
   - [parse the input file](https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs), [handle command-line arguments](https://www.seamplex.com/feenox/doc/sds.html#sec:run-time-arguments), [read mesh files](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh), [assign variables](https://www.seamplex.com/feenox/doc/feenox-manual.html#description), [evaluate conditionals](https://www.seamplex.com/feenox/doc/feenox-manual.html#if), [write results](https://www.seamplex.com/feenox/doc/sds.html#sec:output), etc.
