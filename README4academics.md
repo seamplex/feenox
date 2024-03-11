@@ -62,7 +62,7 @@ Check out the section about [invocation](https://www.seamplex.com/feenox/doc/fee
 The design responds to a [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) document that acts as a "request for quotations" of a computational engineering tool that should satisfy some fictitious (but plausible) requirements.
 The [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) document explains how FeenoX addresses each requirement of the SRS.
 
-In principle, even though FeenoX can solve [generic numerical problems](https://seamplex.com/feenox/examples/examples/basic.html) and [systems of ordinary differential/algebraic equations](https://seamplex.com/feenox/examples/daes.html), its main objective is to solve partial differential equations using the finite element method---eventually [in parallel using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
+In principle, even though FeenoX can solve [generic numerical problems](https://seamplex.com/feenox/examples/basic.html) and [systems of ordinary differential/algebraic equations](https://seamplex.com/feenox/examples/daes.html), its main objective is to solve partial differential equations using the finite element method---eventually [in parallel using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
 The current version can solve
 
 ```include
