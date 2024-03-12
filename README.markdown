@@ -65,7 +65,7 @@ Choose your background for further details about the what, how and whys:
 - [Neutron diffusion][]
 - [Neutron S<sub>N</sub>][]
 
-  [Basic mathematics]: https://seamplex.com/feenox/examples/examples/basic.html
+  [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
   [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html
@@ -543,8 +543,8 @@ Note that
 - Each author keeps the copyright of the contribution.
 - You can [ask][Github discussions]!
 
-  [hackers]: http://localhost/milhouse/feenox/README4hackers.html
-  [academics]: http://localhost/milhouse/feenox/README4academics.html
+  [hackers]: README4hackers.html
+  [academics]: README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [5]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions

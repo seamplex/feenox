@@ -635,7 +635,7 @@ ubuntu@ip-172-31-44-208:~/mpi/hello$
 ```
 
 That is to say,host `ip-172-31-44-208` spawns two local processes `feenox` and, at the same time, asks host `ip-172-31-34-195` to create two new processes  in it.
-These scheme would allow to solve a problem in parallel where the CPU and RAM loads are split into two different servers.
+This scheme would allow to solve a problem in parallel where the CPU and RAM loads are split into two different servers.
 
 ![Gmsh's tutorial `t21`: two squares decomposed in 6 partitions.](t21.svg){#fig:t21 width=90%}
 

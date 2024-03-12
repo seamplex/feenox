@@ -166,7 +166,7 @@ Take the tutorials to learn how to solve those types of problems:
 
 Browse through [the documentation][] to dive deeper into the details.
 
-  [Basic mathematics]: https://seamplex.com/feenox/examples/examples/basic.html
+  [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
   [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html

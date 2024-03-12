@@ -17,6 +17,11 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 :    display detailed version information
 
 
+`-c`, `--check`
+
+:    validates if the input file is sane or not
+
+
 `--pdes`
 
 :    list the types of `PROBLEM`s that FeenoX can solve, one per line

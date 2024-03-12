@@ -50,8 +50,8 @@ mkdir -p ${package}-${version}-${target}
 cd ${package}-${version}-${target}
 
   mkdir -p bin
-  mkdir -p share/doc/feenox/examples
-  mkdir -p share/doc/feenox/tests
+  mkdir -p share/doc/${package}/examples
+  mkdir -p share/doc/${package}/tests
 
   if [ "x${target}" = "xlinux-amd64" ]; then
   
@@ -61,28 +61,27 @@ cd ${package}-${version}-${target}
     
     cp ../${package}/${package} bin
 
-    cp ../${package}/AUTHORS   share/doc/feenox
-    cp ../${package}/ChangeLog share/doc/feenox
-    cp ../${package}/COPYING   share/doc/feenox
-    cp ../${package}/README    share/doc/feenox
-    cp ../${package}/TODO      share/doc/feenox
+    cp ../${package}/AUTHORS   share/doc/${package}
+    cp ../${package}/ChangeLog share/doc/${package}
+    cp ../${package}/COPYING   share/doc/${package}
+    cp ../${package}/README    share/doc/${package}
+    cp ../${package}/TODO      share/doc/${package}
 
-    cp ../${package}/doc/${package}-manual       share/doc/feenox
-    cp ../${package}/doc/${package}-desc         share/doc/feenox
-    cp ../${package}/doc/programming             share/doc/feenox
-    cp ../${package}/doc/compilation             share/doc/feenox
-    cp ../${package}/doc/FAQ                     share/doc/feenox
-    cp ../${package}/doc/CODE_OF_CONDUCT         share/doc/feenox
+    cp ../${package}/doc/${package}-manual       share/doc/${package}
+    cp ../${package}/doc/programming             share/doc/${package}
+    cp ../${package}/doc/compilation             share/doc/${package}
+    cp ../${package}/doc/FAQ                     share/doc/${package}
+    cp ../${package}/doc/CODE_OF_CONDUCT         share/doc/${package}
     
     if [ ${pdf} -ne 0 ]; then
-      cp ../${package}/README.pdf                  share/doc/feenox
-      cp ../${package}/doc/${package}-manual.pdf   share/doc/feenox
-      cp ../${package}/doc/${package}-desc.pdf     share/doc/feenox
-      cp ../${package}/doc/${package}-desc.info    share/doc/feenox
-      cp ../${package}/doc/programming.pdf         share/doc/feenox
-      cp ../${package}/doc/compilation.pdf         share/doc/feenox
-      cp ../${package}/doc/FAQ.pdf                 share/doc/feenox
-      cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc/feenox
+      cp ../${package}/README.pdf                  share/doc/${package}
+      cp ../${package}/doc/${package}-manual.pdf   share/doc/${package}
+      cp ../${package}/doc/${package}-desc.pdf     share/doc/${package}
+      cp ../${package}/doc/${package}-desc.info    share/doc/${package}
+      cp ../${package}/doc/programming.pdf         share/doc/${package}
+      cp ../${package}/doc/compilation.pdf         share/doc/${package}
+      cp ../${package}/doc/FAQ.pdf                 share/doc/${package}
+      cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc/${package}
     fi
     
   elif [ "x${target}" = "xwindows64" ]; then   
@@ -102,17 +101,17 @@ cd ${package}-${version}-${target}
     
   fi
 
-  cp ../${package}/doc/${package}.xml        share/doc/feenox
-  cp ../${package}/doc/fee.vim               share/doc/feenox
-  cp ../${package}/doc/${package}-desc.texi  share/doc/feenox
+  cp ../${package}/doc/${package}.xml        share/doc/${package}
+  cp ../${package}/doc/fee.vim               share/doc/${package}
+  cp ../${package}/doc/${package}-desc.texi  share/doc/${package}
   
 #   if [ ${pdf} -ne 0 ]; then
-#     cp -rL ../${package}/examples/             share/doc/feenox
-#     cp -rL ../${package}/tests/                share/doc/feenox
+#     cp -rL ../${package}/examples/             share/doc/${package}
+#     cp -rL ../${package}/tests/                share/doc/${package}
 #   fi
   
-  echo "See https://www.seamplex.com/feenox/examples" > share/doc/feenox/examples/README
-  echo "See https://github.com/seamplex/feenox/tree/main/tests" > share/doc/feenox/tests/README
+  echo "See https://www.seamplex.com/feenox/examples" > share/doc/${package}/examples/README
+  echo "See https://github.com/seamplex/feenox/tree/main/tests" > share/doc/${package}/tests/README
   
 cd ..
 

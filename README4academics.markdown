@@ -149,7 +149,7 @@ solutions][].
   [FeenoX manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
   [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
   [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
-  [generic numerical problems]: https://seamplex.com/feenox/examples/examples/basic.html
+  [generic numerical problems]: https://seamplex.com/feenox/examples/basic.html
   [systems of ordinary differential/algebraic equations]: https://seamplex.com/feenox/examples/daes.html
   [in parallel using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
