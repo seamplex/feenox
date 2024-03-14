@@ -10,7 +10,7 @@ EXTRA_DIST = examples \
              doc/sds \
              doc/feenox-manual \
              tests/box.stl \
-             tests/reed-ref.csv \
+             tests/reed-ref.csv
 
 
 TESTS = \
