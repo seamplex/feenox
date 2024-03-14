@@ -92,9 +92,7 @@ The main source of simplicity comes from the design of the syntax of the input f
 > Developers should avoid writing big programs. This rule aims to prevent overinvestment of development time in failed or suboptimal approaches caused by the owners of the program’s reluctance to throw away visibly large pieces of work. Smaller programs are not only easier to write, optimize, and maintain; they are easier to delete when deprecated.
 
 We already said that FeenoX is a glue layer between a mesher and a post-processing tool.
-Even more, at another level, it acts as two glue layers between the mesher and PETSc, and PETSc and the post-processor:
-
-![](transfer-le10-zoom.svg)
+Even more, at another level, it acts as two glue layers between the mesher and PETSc, and PETSc and the post-processor.
 
 On the other hand, we also already stated that FeenoX was written from scratch after throwing away clumsy code from two previous attempts.
 For instance, these previous versions used to implement parametric and optimization schemes.
