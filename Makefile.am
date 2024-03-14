@@ -1,16 +1,26 @@
 SUBDIRS = src
-EXTRA_DIST = README4engineers \
-             README4hackers \
-             README4academics \
-             doc/programming \
-             doc/compilation \
-             doc/FAQ \
-             doc/CODE_OF_CONDUCT \
-             doc/srs \
-             doc/sds \
-             doc/feenox-manual \
-             tests/box.stl \
+EXTRA_DIST = tests/box.stl \
              tests/reed-ref.csv
+
+dist_doc_DATA = AUTHORS \
+                TODO \
+                ChangeLog \
+                COPYING \
+                README \
+                README4engineers \
+                README4hackers \
+                README4academics \
+                doc/programming \
+                doc/compilation \
+                doc/FAQ \
+                doc/CODE_OF_CONDUCT \
+                doc/srs \
+                doc/sds \
+                doc/feenox-manual \
+                doc/feenox.xml \
+                doc/fee.vim
+                
+dist_man_MANS = doc/feenox.1
 
 
 TESTS = \
