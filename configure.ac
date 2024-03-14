@@ -404,7 +404,8 @@ m4_include(config_links.m4)
 
   
 #AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile]) 
+#AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile]) 
 
 AS_BOX([Summary of dependencies])
 AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
