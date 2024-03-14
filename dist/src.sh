@@ -40,6 +40,7 @@ echo "temporary working directory: ${tmp_dir}"
 git clone .. ${tmp_dir}
 cd ${tmp_dir} 
  git checkout ${branch}
+#  ./autogen.sh --doc
  ./autogen.sh --doc
  ./configure --without-sundials --without-petsc
  cd doc
