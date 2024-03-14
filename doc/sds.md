@@ -466,8 +466,9 @@ To have an actual parametric run, an external loop has to successively call Feen
 ```
 
 ::: {#fig:cantilever-mesh layout-ncol=2}
-![Tetrahedra](cantilever-tet.png){width_latex=49%}
-![Hexahedra](cantilever-hex.png){width_latex=49%}
+![Tetrahedra](cantilever-tet.png)
+
+![Hexahedra](cantilever-hex.png)
 
 Cantilevered beam meshed with structured tetrahedra and hexahedra
 :::

@@ -3,34 +3,53 @@
 
 > Developers should build a program out of simple parts connected by well defined interfaces, so problems are local, and parts of the program can be replaced in future versions to support new features. This rule aims to save time on debugging code that is complex, long, and unreadable.
 
- * FeenoX uses third-party high-quality libraries
+FeenoX is designed to be as lightweight as possible.
+On the one hand, it relies on third-party high-quality libraries to do the heavy mathematical weightlifting
+
    - GNU Scientific Library
    - SUNDIALS
    - PETSc
    - SLEPc
 
+But also the extensibility feature (@sec:unix-extensibility) of having each PDE in separate directories which can be added or removed at compile time without changing any line of the source code goes into this direction as well.
+Relying of C function pointers allows (in principle) to replace these "virtual" methods with other ones using the same interface.
+
+> Note that our language in general and words in particular shape and limit the way we think.
+> Fortran's concept of "modules" is _not_ the same as Unix's concept of "modularity."
+> I wish two different words had been used.
 
 # Rule of Clarity {#sec:unix-clarity}
 
 > Developers should write programs as if the most important communication is to the developer who will read and maintain the program, rather than the computer. This rule aims to make code as readable and comprehensible as possible for whoever works on the code in the future.
 
- * Example two squares in thermal contact.
- * LE10 & LE11: a one-to-one correspondence between the problem text and the FeenoX input.
+The first design decision to fulfill this rule is the programming language.
+There is little change to fulfill it with Fortran.
+One might argue that C++ can be clearer than C in some points, but for the vast majority of the source code they are equally clear.
+Besides, C is far simpler than C++ (see rule of simplicity).
+
+
+The second decision is not about the FeenoX source code but about FeenoX inputs: clear human-readable input files without any extra unneeded computer-level nonsense.
+The two illustrative cases are the NAFEMS [LE10](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark) & [LE11](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le11-solid-cylindertapersphere-temperature-benchmark) benchmarks, where there is a clear one-to-one correspondence between the "engineering" formulation and the input file FeenoX understands.
 
 # Rule of Composition {#sec:unix-composition}
 
 > Developers should write programs that can communicate easily with other programs. This rule aims to allow developers to break down projects into small, simple programs rather than overly complex monolithic programs.
 
- * FeenoX uses meshes created by a separate mesher (i.e. Gmsh).
- * FeenoX writes data that has to be plotted or post-processed by other tools (Gnuplot, Gmsh, Paraview, etc.). 
- * ASCII output is 100% controlled by the user so it can be tailored to suit any other programs’ input needs such as AWK filters to create LaTeX tables.
+Previous designs of FeenoX' predecessors used to include instructions to perform parametric sweeps( and even optimization loops), non-trivial macro expansions using M4 and even execution of arbitrary shell commands. These non-trivial operations were removed from FeenoX to focus on the rule of composition, paying especially attention to easing the inclusion of calling the `feenox` binary from shell scripts, enforcing the composition with other Unix-like tools.
+Emphasis has been put on adding flexibility to programmatic generation of input files (see also rule of generation in @sec:unix-generation) and the handling and expansion of command-line arguments to increase the composition with other programs.
+
+Moreover, the output is 100% controlled by the user at run-time so it can be tailored to suit any other programs’ input needs as well.
+An illustrative example is [creating professional-looking tables with results using AWK & LaTeX](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability).
 
 
 # Rule of Separation {#sec:unix-separation}
 
 > Developers should separate the mechanisms of the programs from the policies of the programs; one method is to divide a program into a front-end interface and a back-end engine with which that interface communicates. This rule aims to prevent bug introduction by allowing policies to be changed with minimum likelihood of destabilizing operational mechanisms.
 
- * FeenoX does not include a GUI, but it is GUI-friendly.
+FeenoX relies of the rule of separation (which also links to the next two rules of simplicity and parsimony) from the very beginning of its design phase.
+It was explicitly designed as a glue layer between a mesher like Gmsh and a post-processor like Gnuplot, Gmsh or Paraview.
+This way, not only flexibility and diversity (see #sec:unix-diversity) can be boosted, but also technological changes can be embraced with little or no effort. For example, [CAEplex](https://www.caeplex.com) provides a web-based platform for performing thermo-mechanical analysis on the cloud running from the browser. Had FeenoX been designed as a traditional desktop-GUI program, this would have been impossible.
+If in the future CAD/CAE interfaces migrate into virtual and/or augmented reality with interactive 3D holographic input/output devices, the development effort needed to use FeenoX as the back end is negligible.
 
 
 # Rule of Simplicity {#sec:unix-simplicity}
@@ -54,6 +73,8 @@
 
 > Developers should design for visibility and discoverability by writing in a way that their thought process can lucidly be seen by future developers working on the project and using input and output formats that make it easy to identify valid input and correct output. This rule aims to reduce debugging time and extend the lifespan of programs.
 
+There is a risk of falling into the confirmation bias because every programmer thinks its code is transparent (and everybody else's is not).
+
  * Written in C99
  * Makes use of structures and function pointers to give the same functionality as C++’s virtual methods without needing to introduce other complexities that make the code base harder to maintain and to debug.
 
@@ -62,11 +83,14 @@
 
 > Developers should design robust programs by designing for transparency and discoverability, because code that is easy to understand is easier to stress test for unexpected conditions that may not be foreseeable in complex programs. This rule aims to help developers build robust, reliable products.
 
+Test suite.
 
 # Rule of Representation {#sec:unix-representation}
 
 > Developers should choose to make data more complicated rather than the procedural logic of the program when faced with the choice, because it is easier for humans to understand complex data compared with complex logic. This rule aims to make programs more readable for any developer working on the project, which allows the program to be maintained.
 
+Avoiding Fortran should already fulfill this rule.
+C structures with function pointers.
 
 # Rule of Least Surprise {#sec:unix-least-surprise}
 
@@ -105,7 +129,7 @@
    ```
 
  
- * Run-time errors can be user controled, they can be fatal or ignored.
+ * Run-time errors can be user controlled, they can be fatal or ignored.
 
 
 # Rule of Economy {#sec:unix-economy}

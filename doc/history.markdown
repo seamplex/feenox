@@ -7,7 +7,7 @@ and complexities which I felt the code needed. After ten years of actual
 usage, I then realized
 
 1.  what was worth keeping,
-2.  what needed to be rewrittenm and
+2.  what needed to be rewritten and
 3.  what had to be discarded.
 
 The first version was called wasora, the second was “The wasora suite”
@@ -29,6 +29,15 @@ think further about complexity and its mathematical description.
 Nevertheless, it was not not until college that I was able to really
 model and solve the differential equations that give rise to chaotic
 behavior.
+
+<figure>
+<img src="jurassicpark.jpg"
+alt="Dr. Ian Malcolm (Jeff Goldblum) explains sensitivity to initial conditions." />
+<figcaption aria-hidden="true"><a
+href="https://en.wikipedia.org/wiki/Ian_Malcolm_(character)">Dr. Ian
+Malcolm</a> (<a href="https://en.wikipedia.org/wiki/Jeff_Goldblum">Jeff
+Goldblum</a>) explains sensitivity to initial conditions.</figcaption>
+</figure>
 
 In fact, initial-value ordinary differential equations arise in a great
 variety of subjects in science and engineering. Classical mechanics,
@@ -68,7 +77,7 @@ with it.
 Regardless of this situation, during my last year of Nuclear
 Engineering, the tipping point came along. Here’s a
 slightly-fictionalized of a dialog between myself and the teacher at the
-computer lab, as it might have happened (or not):
+computer lab (Dr E.), as it might have happened (or not):
 
 > — (Prof.) Open MATLAB.™  
 > — (Me) It’s not installed here. I type `mathlab` and it does not

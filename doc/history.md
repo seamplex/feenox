@@ -1,6 +1,7 @@
 ---
 title: History and motivation
 lang: en-US
+toc: false
 titleblock: |
  History and motivation
  ======================
@@ -9,7 +10,7 @@ titleblock: |
 Very much like Unix in the late 1960s and C in the early 1970s, [FeenoX](https://www.seamplex.com/feenox) is a third-system effect: I wrote a first hack that seemed to work better than I had expected. Then I tried to add a lot of features and complexities which I felt the code needed. After ten years of actual usage, I then realized
 
  1. what was worth keeping,
- 2. what needed to be rewrittenm and
+ 2. what needed to be rewritten and
  3. what had to be discarded.
  
 The first version was called wasora, the second was "The wasora suite" (i.e. a generic framework plus a bunch of "plugins", including a thermo-mechanical one named Fino) and then finally FeenoX. The story that follows explains why I wrote the first hack to begin with.
@@ -17,6 +18,8 @@ The first version was called wasora, the second was "The wasora suite" (i.e. a g
 --------
 
 It was at the movies when I first heard about dynamical systems, non-linear equations and chaos theory. The year was\ 1993, I was ten years old and the movie was Jurassic Park. [Dr.\ Ian Malcolm](https://en.wikipedia.org/wiki/Ian_Malcolm_(character)) (the character portrayed by [Jeff Goldblum](https://en.wikipedia.org/wiki/Jeff_Goldblum)) explained sensitivity to initial conditions in a [memorable scene](https://www.youtube.com/watch?v=n-mpifTiPV4), which is worth watching again and again. Since then, the fact that tiny variations may lead to unexpected results has always fascinated me. During high school I attended a very interesting course on fractals and chaos that made me think further about complexity and its mathematical description. Nevertheless, it was not not until college that I was able to really model and solve the differential equations that give rise to chaotic behavior.
+
+![[Dr.\ Ian Malcolm](https://en.wikipedia.org/wiki/Ian_Malcolm_(character)) ([Jeff Goldblum](https://en.wikipedia.org/wiki/Jeff_Goldblum)) explains sensitivity to initial conditions.](jurassicpark.jpg)
 
 In fact, initial-value ordinary differential equations arise in a great variety of subjects in science and engineering. Classical mechanics, chemical kinetics, structural dynamics, heat transfer analysis and dynamical systems, among other disciplines, heavily rely on equations of the form
 
@@ -33,7 +36,7 @@ During my years of undergraduate student (circa 2004--2007), whenever I had to s
 Of course, each option had its pros and its cons. But none provided the combination of advantages I was looking for, namely flexibility (option one), efficiency (option two) and reduced input work (partially given by option three). Back in those days I ended up wandering between options one and two, depending on the type of problem I had to solve. However, even though one can, with some effort, make the code read some parameters from a text file, any other drastic change usually requires a modification in the source code---some times involving a substantial amount of work---and a further recompilation of the code. This was what I most disliked about this way of working, but I could nevertheless live with it.
 
 Regardless of this situation, during my last year of Nuclear Engineering, the tipping point came along.
-Here's a slightly-fictionalized of a dialog between myself and the teacher at the computer lab, as it might have happened (or not):
+Here's a slightly-fictionalized of a dialog between myself and the teacher at the computer lab (Dr E.), as it might have happened (or not):
 
 >   
 > --- (Prof.) Open MATLAB.™  

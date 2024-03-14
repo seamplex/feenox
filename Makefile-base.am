@@ -1,11 +1,16 @@
 EXTRA_DIST = examples \
+             README4engineers \
+             README4hackers \
+             README4academics \
              doc/programming \
              doc/compilation \
              doc/FAQ \
              doc/CODE_OF_CONDUCT \
              doc/srs \
              doc/sds \
-             doc/feenox-manual
+             doc/feenox-manual \
+             tests/box.stl \
+             tests/reed-ref.csv \
 
 
 TESTS = \
