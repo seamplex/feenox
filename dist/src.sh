@@ -46,6 +46,8 @@ cd ${tmp_dir}
  cd doc
   ./make.sh --no-pdf
  cd .. 
+ echo ${tmp_dir}
+ exit
  make distcheck
 cd ${current_dir}
 
