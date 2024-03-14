@@ -1,6 +1,5 @@
 SUBDIRS = src
-EXTRA_DIST = examples \
-             README4engineers \
+EXTRA_DIST = README4engineers \
              README4hackers \
              README4academics \
              doc/programming \
