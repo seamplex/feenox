@@ -40,6 +40,7 @@ echo "temporary working directory: ${tmp_dir}"
 git clone .. ${tmp_dir}
 cd ${tmp_dir} 
  git checkout ${branch}
+# revisit this when adding texinfo back 
 #  ./autogen.sh --doc
  ./autogen.sh
  ./configure --without-sundials --without-petsc
@@ -47,7 +48,6 @@ cd ${tmp_dir}
   ./make.sh --no-pdf
  cd .. 
  echo ${tmp_dir}
- exit
  make distcheck
 cd ${current_dir}
 
