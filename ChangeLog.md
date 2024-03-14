@@ -1,6 +1,13 @@
 # Current
 
  * under development
+ 
+# v1.0 (Mar 2024)
+
+ * option `--check`
+ * README for engineers, hackers and academics
+ * thermal tutorial
+ * thermal radiation tests
  * two-dimensional quasi-random number sequences
  * non-zero Neumann BCs in neutron diffusion
  * `LABEL` in now an alias for `PHYSICAL_GROUP` in `MATERIAL`
