@@ -26,8 +26,8 @@ $\nabla \phi \cdot \hat{n} =0 \quad$ for $y=+1$ (top)
 ```
 
 ::: {#fig:laplace}
-![Post-processed with Gmsh](laplace-square-gmsh.png){width_latex=46% width_texinfo=7cm}
-![Post-processed with Paraview](laplace-square-paraview.png){width_latex=51% width_texinfo=7cm}
+![Post-processed with Gmsh](laplace-square-gmsh){width_latex=46% width_texinfo=7cm}
+![Post-processed with Paraview](laplace-square-paraview){width_latex=51% width_texinfo=7cm}
 
 Laplace’s equation solved with FeenoX
 :::
