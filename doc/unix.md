@@ -208,12 +208,13 @@ There is even a FeenoX benchmarking repository that uses Google's Benchmark libr
 
 > Developers should design their programs to be flexible and open. This rule aims to make programs flexible, allowing them to be used in ways other than those their developers intended.
 
- * Either Gmsh or Paraview can be used to post-process results.
- * Other formats can be added.
+FeenoX can read Gmsh files, but they need not necessarily be created by Gmsh. Other meshing formats (VTK with group names?) are planned to be implemented. Also, either Gmsh or Paraview can be used to post-process results. But also other formats are planned. See @sec:unix-extensibility. Diversity is embraced from the bottom up!
 
 # Rule of Extensibility {#sec:unix-extensibility}
 
 > Developers should design for the future by making their protocols extensible, allowing for easy plugins without modification to the program's architecture by other developers, noting the version of the program, and more. This rule aims to extend the lifespan and enhance the utility of the code the developer writes.
 
- * FeenoX is GPLv3+. The '+' is for the future.
- * Each PDE has a separate source directory. Any of them can be used as a template for new PDEs, especially `laplace` for elliptic operators.
+The main extensibility feature is that each PDE has a separate source directory.
+Any of them can be used as as template to add new PDEs, which are detected at compile time by the Autotools bootstrapping script.
+
+A final note is that FeenoX is GPLv3+. First, this means that extensions and contributions are welcome. Each author retains the copyright on the contributed code (as long as it is free software). Second, the `+` is there for the future.
