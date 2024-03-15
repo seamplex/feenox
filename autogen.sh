@@ -157,12 +157,18 @@ find pdes \( -name "*.c" -o -name "*.h" \) | xargs echo -n >> Makefile.am
 cd ..
 echo "ok"
 
-# changelog
-if [ ! -z "$(which pandoc)" ]; then
-  pandoc ChangeLog.md -t plain -o ChangeLog
-else
-  cp ChangeLog.md ChangeLog
-fi
+# docs
+echo "md to txt... "
+for i in TODO ChangeLog doc/programming doc/compilation doc/FAQ doc/CODE_OF_CONDUCT doc/sds doc/srs doc/feenox-manual; do
+ if [ ! -e ${i} ]; then
+  if [ ! -z "$(which pandoc)" ]; then
+   pandoc ${i}.md -t plain -o ${i}
+  else
+   cp ${i}.md ${i}
+  fi
+ fi
+done
+
 
 echo "calling autoreconf... "
 autoreconf -i
