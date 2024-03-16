@@ -75,7 +75,7 @@ First, it can solve
  - [Linear elasticity](https://www.seamplex.com/feenox/examples/mechanical.html)
  - [Modal analysis](https://www.seamplex.com/feenox/examples/modal.html)
  - [Neutron diffusion](https://www.seamplex.com/feenox/examples/neutron_diffusion.html)
- - [Neutron $\text{S}_N$](https://www.seamplex.com/feenox/examples/neutron_sn.html)
+ - [Neutron discrete ordinates](https://www.seamplex.com/feenox/examples/neutron_sn.html)
  
 
 Second, it is the only free and open-source tool that satisfies the [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html), including that...
