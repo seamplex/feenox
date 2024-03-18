@@ -1,0 +1,29 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Theler
+  given-names: Jeremy
+  orcid: "https://orcid.org/0000-0002-4142-4980"
+doi: 10.5281/zenodo.10819606
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Theler
+    given-names: Jeremy
+    orcid: "https://orcid.org/0000-0002-4142-4980"
+  date-published: 2024-03-16
+  doi: 10.21105/joss.05846
+  issn: 2475-9066
+  issue: 95
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 5846
+  title: "FeenoX: a cloud-first finite-element(ish) computational
+    engineering tool"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.05846"
+  volume: 9
+title: "FeenoX: a cloud-first finite-element(ish) computational
+  engineering tool"
+  
