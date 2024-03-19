@@ -27,6 +27,9 @@ Choose your background for further details about the what, how and whys:
  - [Unix Hacker](./README4hackers.md)
  - [Academic Professor](./README4academics.md)
 
+See the following paper for a brief summary (and to [cite FeenoX in your work](./doc/FAQ.md#how-should-i-cite-feenox)):
+ 
+ * Theler, J. (2024). FeenoX: a cloud-first finite-element(ish) computational engineering tool. Journal of Open Source Software, 9(95), 5846. <https://doi.org/10.21105/joss.05846> 
 
 ## Extents
 

@@ -90,7 +90,7 @@ tar xvzf src/${package}-${version}.tar.gz
 mkdir -p ${dir}/usr/share/doc/feenox
 cp ${package}-${version}/README            ${dir}/usr/share/doc/feenox
 cp ${package}-${version}/ChangeLog         ${dir}/usr/share/doc/feenox/changelog
-cp ${package}-${version}/doc/README-doc    ${dir}/usr/share/doc/feenox
+# cp ${package}-${version}/doc/README-doc    ${dir}/usr/share/doc/feenox
 cp ${package}-${version}/doc/FAQ           ${dir}/usr/share/doc/feenox
 cp ${package}-${version}/doc/feenox-manual ${dir}/usr/share/doc/feenox
 cp ${package}-${version}/doc/sds           ${dir}/usr/share/doc/feenox

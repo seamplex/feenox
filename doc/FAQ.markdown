@@ -11,7 +11,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2024-03-18
+date: 2024-03-19
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -103,39 +103,43 @@ titleDelim: ":"
 - [<span class="toc-section-number">2</span> How should I cite
   FeenoX?][]
 - [<span class="toc-section-number">3</span> What does FeenoX mean?][]
-- [<span class="toc-section-number">4</span> Why nothing happens when I
+- [<span class="toc-section-number">4</span> How should FeenoX be
+  pronounced.][]
+- [<span class="toc-section-number">5</span> Why nothing happens when I
   double click on `feenox.exe`?][]
-- [<span class="toc-section-number">5</span> How do I create input decks
+- [<span class="toc-section-number">6</span> How do I create input decks
   for FeenoX?][]
-- [<span class="toc-section-number">6</span> Does FeenoX support beam
+- [<span class="toc-section-number">7</span> Does FeenoX support beam
   and/or shell elements?][]
-- [<span class="toc-section-number">7</span> What license does FeenoX
+- [<span class="toc-section-number">8</span> What license does FeenoX
   have?][]
-- [<span class="toc-section-number">8</span> Why is FeenoX written in C
+- [<span class="toc-section-number">9</span> Why is FeenoX written in C
   and not in…][]
-  - [<span class="toc-section-number">8.1</span> C++?][]
-  - [<span class="toc-section-number">8.2</span> Fortran?][]
-  - [<span class="toc-section-number">8.3</span> Python or R?][]
-  - [<span class="toc-section-number">8.4</span> Go, Rust or Julia?][]
+  - [<span class="toc-section-number">9.1</span> C++?][]
+  - [<span class="toc-section-number">9.2</span> Fortran?][]
+  - [<span class="toc-section-number">9.3</span> Python or R?][]
+  - [<span class="toc-section-number">9.4</span> Go, Rust or Julia?][]
 
   [<span class="toc-section-number">1</span> What is FeenoX?]: #what-is-feenox
   [<span class="toc-section-number">2</span> How should I cite FeenoX?]:
     #how-should-i-cite-feenox
   [<span class="toc-section-number">3</span> What does FeenoX mean?]: #what-does-feenox-mean
-  [<span class="toc-section-number">4</span> Why nothing happens when I double click on `feenox.exe`?]:
+  [<span class="toc-section-number">4</span> How should FeenoX be pronounced.]:
+    #how-should-feenox-be-pronounced.
+  [<span class="toc-section-number">5</span> Why nothing happens when I double click on `feenox.exe`?]:
     #why-nothing-happens-when-i-double-click-on-feenox.exe
-  [<span class="toc-section-number">5</span> How do I create input decks for FeenoX?]:
+  [<span class="toc-section-number">6</span> How do I create input decks for FeenoX?]:
     #how-do-i-create-input-decks-for-feenox
-  [<span class="toc-section-number">6</span> Does FeenoX support beam and/or shell elements?]:
+  [<span class="toc-section-number">7</span> Does FeenoX support beam and/or shell elements?]:
     #does-feenox-support-beam-andor-shell-elements
-  [<span class="toc-section-number">7</span> What license does FeenoX have?]:
+  [<span class="toc-section-number">8</span> What license does FeenoX have?]:
     #what-license-does-feenox-have
-  [<span class="toc-section-number">8</span> Why is FeenoX written in C and not in…]:
+  [<span class="toc-section-number">9</span> Why is FeenoX written in C and not in…]:
     #why-is-feenox-written-in-c-and-not-in
-  [<span class="toc-section-number">8.1</span> C++?]: #c
-  [<span class="toc-section-number">8.2</span> Fortran?]: #fortran
-  [<span class="toc-section-number">8.3</span> Python or R?]: #python-or-r
-  [<span class="toc-section-number">8.4</span> Go, Rust or Julia?]: #go-rust-or-julia
+  [<span class="toc-section-number">9.1</span> C++?]: #c
+  [<span class="toc-section-number">9.2</span> Fortran?]: #fortran
+  [<span class="toc-section-number">9.3</span> Python or R?]: #python-or-r
+  [<span class="toc-section-number">9.4</span> Go, Rust or Julia?]: #go-rust-or-julia
 
 # What is FeenoX?
 
@@ -155,6 +159,9 @@ explain what [FeenoX][] is:
   problems.
 - The [README][] in the [GitHub repository][] has a brief introduction
   (after explaining why).
+- Theler, J. (2024). FeenoX: a cloud-first finite-element(ish)
+  computational engineering tool. Journal of Open Source Software,
+  9(95), 5846. <https://doi.org/10.21105/joss.05846>
 - There is also a [description][] in the [documentation][].
 - FeenoX is an “offer” to a fictitious “tender” for a computational
   tool. The RFQ is the [Software Requirements Specification][] and the
@@ -180,8 +187,8 @@ explain what [FeenoX][] is:
 
 # How should I cite FeenoX?
 
-If you use FeenoX and need to cite it, use this BiBTeX entry that points
-to [the 2024 paper in JOSS][]:
+If you use FeenoX and need to cite it, use this [BiBTeX][] entry that
+points to [the 2024 paper in JOSS][]:
 
 ``` bib
 @article{feenox-2024,
@@ -203,8 +210,9 @@ APA format:
 
 Theler, J. (2024). FeenoX: a cloud-first finite-element(ish)
 computational engineering tool. Journal of Open Source Software, 9(95),
-5846. https://doi.org/10.21105/joss.05846
+5846. <https://doi.org/10.21105/joss.05846>
 
+  [BiBTeX]: https://www.bibtex.org/
   [the 2024 paper in JOSS]: https://joss.theoj.org/papers/10.21105/joss.05846
 
 # What does FeenoX mean?
@@ -218,6 +226,11 @@ It does not mean anything particular, but
 - It rhymes with FEniCS
 - With some luck one can read “Finite ElEments NO-X”
 - With mode luck, “FrEE” (as in “free speech”)
+
+# How should FeenoX be pronounced.
+
+It would be something like *fee*-*naaks*: /fiːnɒks/ But whatever works
+for you is fine.
 
 # Why nothing happens when I double click on `feenox.exe`?
 

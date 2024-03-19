@@ -13,7 +13,9 @@ documentclass: report
 > 100-introduction.md
 > ```
 
-[FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems with a particular design basis.
+[FeenoX](https://www.seamplex.com/feenox/) is a cloud-first computational tool aimed at solving engineering problems with a particular design basis, as explained in
+
+ * Theler, J. (2024). FeenoX: a cloud-first finite-element(ish) computational engineering tool. Journal of Open Source Software, 9(95), 5846. <https://doi.org/10.21105/joss.05846>
 
 ### "Cloud first" vs. "cloud friendly" {#cloud-first .unnumbered}
 
@@ -1779,9 +1781,9 @@ $
 ```
 
 ::: {#fig:mechanical-square layout-ncol=2}
-![Temperature-dependent\ $E$](mechanical-square-temperature.png){width_latex=49%}
+![Temperature-dependent $E$](mechanical-square-temperature.png)
 
-![Uniform $E$ for reference](mechanical-square-uniform.png){width_latex=49%}
+![Uniform $E$ for reference](mechanical-square-uniform.png)
 
 Mechanical plane-strain square with temperature-dependent Young modulus and comparison with uniform reference case.
 :::
@@ -2072,7 +2074,7 @@ Besides being ASCII files, should special characters be needed for any reason wi
 
 ![UTF-8 in Bash (through Konsole)](utf8-shell.png)
 
-Mechanical plane-strain square with temperature-dependent Young modulus and comparison with uniform reference case.
+Special characters in Kate and in Bash.
 :::
 
 
@@ -2180,14 +2182,6 @@ $ diff mechanical-square-temperature-from-msh.fee mechanical-square-temperature.
 > WRITE_MESH mechanical-square-temperature.vtk  E  VECTOR u v 0   
 $ 
 ```
-
-::: {#fig:mechanical-square-from-temp layout-ncol=2}
-![Numerical temperature$T(x,y)$ as the result of a thermal problem over an unstructured grid](thermal-square-temperature.png){width_latex=42%}
-![Plane-strain with temperature-dependent$E(T)$ case](mechanical-square-temperature-from-msh.png){width_latex=55%}
-
-Mechanical plane-strain square with temperature-dependent Young modulus read from a non-conformal mesh as the result of a thermal problem. Compare with @fig:mechanical-square.
-:::
-
 
 
 # Quality assurance {#sec:qa}
