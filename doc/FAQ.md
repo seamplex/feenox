@@ -22,6 +22,30 @@ In increasing order of complexity and comprehensiveness, these resources explain
  * Finally the [manual](https://www.seamplex.com/feenox/doc/feenox-manual.pdf) will be the ultimate guide.
 
 
+# How should I cite FeenoX?
+
+If you use FeenoX and need to cite it, use this BiBTeX entry that points to [the 2024 paper in JOSS](https://joss.theoj.org/papers/10.21105/joss.05846):
+
+```bib
+@article{feenox-2024,
+author = {Theler, Jeremy},
+doi = {10.21105/joss.05846},
+journal = {Journal of Open Source Software},
+month = mar,
+number = {95},
+pages = {5846},
+title = {{FeenoX: a cloud-first finite-element(ish) computational engineering tool}},
+url = {https://joss.theoj.org/papers/10.21105/joss.05846},
+volume = {9},
+year = {2024}
+}
+```
+
+If you are not using BiBTeX (which you should), just use the plain-text APA format:
+
+
+Theler, J. (2024). FeenoX: a cloud-first finite-element(ish) computational engineering tool. Journal of Open Source Software, 9(95), 5846. https://doi.org/10.21105/joss.05846
+
 
 # What does FeenoX mean?
 
