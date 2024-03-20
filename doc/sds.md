@@ -1074,7 +1074,7 @@ The following input file computes the natural frequencies of oscillation of a ca
 ```terminal
 $ gmsh -3 wire-hex.geo 
 [...]
-$ $ feenox wire.fee | pandoc  
+$ feenox wire.fee | pandoc  
 <table>
 <caption>Comparison of analytical and numerical frequencies, in Hz</caption>
 <thead>
@@ -2094,8 +2094,8 @@ The output in FeenoX is 100% user defined, i.e. everything that FeenoX writes co
  * [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results)
  * [`DUMP`](https://www.seamplex.com/feenox/doc/feenox-manual.html#dump)
 
-In the absence of any of these instructions, FeenoX will not write anything.
-Not in the standard output, not in any other file.
+In the absence of any of these instructions, FeenoX _will not_ write anything.
+Not in the standard output, not in any other file. Nothing (Unix rule of silence, @sec:unix-silence).
 
  Computer | Monthly Rental  | Relative Speed | First Delivery 
 :----------------|:------------------------:|:-----------:|:-----------:
@@ -2130,15 +2130,64 @@ For example, if the input file does not reference the principal stress `sigma1` 
 
 ### Output formats {#sec:output-formats}
 
-JSON/YAML, state of the art open post-processing formats.
-Mobile & web-friendly.
+With the ASCII output to standard output (and other text files) controlled with `PRINT`-like instructions, YAML or JSON outputs can be easily implemented within the input file itself.
+For example,
 
-Common and preferably open-source formats.
+```feenox
+DEFAULT_ARGUMENT_VALUE 1 "hello world"
+phi = (1+sqrt(5))/2 
 
+PRINTF "a: %.3f" 1/3
+PRINT TEXT "phi:" phi SEP " "
+PRINT message: ${1}   SEP " "
+```
 
+would give
 
-yaml/json friendly outputs
-vtk (vtu), gmsh, frd?
+```terminal
+$ feenox yaml.fee | tee test.yaml | yq .
+{
+  "a": 0.333,
+  "phi": 1.61803,
+  "message": "hello world"
+}
+$ cat test.yaml 
+a: 0.333
+phi: 1.61803
+message: hello world
+$ 
+```
+
+Now, JSON is more picky and care with quoted characters is needed:
+
+ 1. Curly brackets `{` and `}` are used for multi-line input in FeenoX so they have to be quoted as `\{` and `\}`.
+ 2. Double quotes `"`  are used to delimit keywords with blanks, so they also have to be quoted `\"` when appearing verbatim in an output token.
+
+```feenox
+DEFAULT_ARGUMENT_VALUE 1 "hello world"
+phi = (1+sqrt(5))/2 
+
+PRINTF "\{ \"a\": %.3f," 1/3
+PRINT  TEXT "\"phi\":" phi ,
+PRINT  "\"message\": \"${1}\" \}"
+```
+
+```terminal
+$ feenox json.fee | jq .
+{
+  "a": 0.333,
+  "phi": 1.61803,
+  "message": "hello world"
+}
+$
+```
+
+In the same sense, in principle any ASCII-based format can be implemented this way.
+Markdown output, which can then be converted to other formats as well (such as LaTeX which can then create professionally-looking tables as in @fig:latex-tables), has been already covered in @sec:interoperability.
+
+Current version can write space and time-dependent distributions into Gmsh's `.msh` and VTK's `.vtk` formats.
+Both of them are open standard and have open-source readers.
+Other formats such as VTK's `.vtu` or CalculiX's `.frd` should be easy to add, but in any case the mesh data converters such as [Meshio](https://github.com/nschloe/meshio) can be used to convert FeenoX's post-processing output to other formats as well.
 
 
 ### Data exchange between non-conformal meshes {#sec:non-conformal}
@@ -2183,13 +2232,17 @@ $ diff mechanical-square-temperature-from-msh.fee mechanical-square-temperature.
 $ 
 ```
 
-
 # Quality assurance {#sec:qa}
 
 > ```include
 > 400-qa.md
 > ```
 
+The development of FeenoX is tracked with the distributed version control system Git.
+The official repository is hosted on Github at <https://github.com/seamplex/feenox/>.
+New non-trivial features are added in new branches which are then eventually merged into the main branch.
+
+Note that nowadays mentioning that the source code of a piece of software is tracked with Git (why wouldn't it?) is like saying a hotel has a private bathroom in each room (why wouldn't it?). But the reader ought to keep in mind that there is a non-negligible fraction of production calculation codes (even nuclear-related) whose source code is _not_ tracked with a DVCS, let alone features and bugfixes follow the branch-review-merge path.
 
 ## Reproducibility and traceability {#sec:traceability}
 
@@ -2197,6 +2250,85 @@ $
 > 410-reproducibility.md
 > ```
 
+As stated in the previous section, the official repository is freely available on Github.
+As long as the copying conditions (GPLv3+) are met, the repository can be freelu cloned and/or forked.
+
+Each binary executable `feenox` has embedded a literal string with the version of the source code used to build it.
+When running without arguments, it will print the version (which includes the hash of the last commit to the repository) and the usage:
+
+```terminal
+$ feenox
+FeenoX v1.0.7-g9b98430 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+usage: feenox [options] inputfile [replacement arguments] [petsc options]
+
+  -h, --help         display options and detailed explanations of commmand-line usage
+  -v, --version      display brief version information and exit
+  -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
+  --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
+
+Run with --help for further explanations.
+$ 
+```
+
+As required by the GNU Standards, running with `-v` or `--version` will print copyright information as well:
+
+```terminal
+$ feenox -v
+FeenoX v1.0.7-g9b98430 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Copyright © 2009--2024 Seamplex, https://seamplex.com/feenox
+GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
+FeenoX is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+$ 
+```
+
+And running with `-V` or `--versions` will print detailed versioning information about 
+
+ #. the date and time of the last commit to the repository
+ #. the date and time of compilation
+ #. the architecture, compiler type, version and flags used to build the executable
+ #. the versions of the external numerical libraries used to link the executable
+
+```terminal
+$ feenox --versions
+FeenoX v1.0.7-g9b98430 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Last commit date   : Tue Mar 19 16:17:30 2024 -0300
+Build date         : Wed Mar 20 07:40:34 2024 -0300
+Build architecture : linux-gnu x86_64
+Compiler version   : gcc (Debian 12.2.0-14) 12.2.0
+Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
+Compiler flags     : -O3 -flto=auto -no-pie
+Builder            : gtheler@tom
+GSL version        : 2.7.1
+SUNDIALS version   : N/A
+PETSc version      : Petsc Development GIT revision: v3.20.5-856-g0d3f65ad054  GIT Date: 2024-03-20 02:13:21 +0000
+PETSc arch         : arch-linux-c-debug
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-scalapack --download-slepc --with-64-bit-indices=no --with-debugging=yes --with-precision=double --with-scalar-type=real PETSC_ARCH=arch-linux-c-debug --force
+SLEPc version      : SLEPc Development GIT revision: v3.20.1-36-g7a35a7b97  GIT Date: 2023-12-02 02:30:03 -0600
+$ 
+```
+
+The version is composed of three dot-separted integers: 
+
+ #. the major version (major changes)
+ #. the minor version (incompatible input changes)
+ #. the revision (individual commits from last tag)
+
+The `autogen.sh` script builds this string at compile time, which is stored in a header and finally embedded into the executable.
+Periodically, source and binary tarballs are built (using automated scripts in the `dist` subdirectory) and published online.
+
+Given the input-file scheme thoroughfully explained in @sec:input---especially the separation of the problem formulation from the mesh data--the input files can be tracked with Git (or any other VCS) as well, therefore enhancing traceability of results and data governance.
+Again, this might be obvious in the 2020s. But there are many FEM solvers which mix the mesh data with the problem definition (e.g. when external loads have to be given at the nodes instead of using expressions like `p=rho*g*z` or `Fx=1e3`).
 
 ## Automated testing {#sec:testing}
 
@@ -2205,9 +2337,32 @@ $
 > 420-testing.md
 > ```
 
-make check
+The `make check` target will execute a set of Bash scripts which will run hundreds of cases and compare their solutions to reference values.
+These references might be
 
-regressions, example of the change of a sign
+ i. analytical solutions,
+ ii. known reference solutions, or
+ iii. random reference solutions.
+ 
+Depending on the type of case being run, some of these tests might work as very simplified verification cases.
+But the bulk work as regressions tests so developers adding new features can check they do not break existing working code.
+
+For example, if by mistake a developer flips a sign of one term when setting convection boundary conditions in the heat-conduction PDE, i.e. from
+
+```c
+double rhs = h*Tref;
+```
+
+to 
+
+```c
+double rhs = -h*Tref;
+```
+
+then the `make check` step will detect it:
+
+```terminal
+```
 
 ## Bug reporting and tracking
 
@@ -2255,6 +2410,11 @@ Compactness is the property that a design can fit inside a human being's head. A
 unix man page
 markdown + pandoc = html, pdf, texinfo
 
+
+
+```include
+sds-appendices.md
+```
 
 
 ```include
