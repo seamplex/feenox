@@ -1,6 +1,4 @@
 SUBDIRS = src
-EXTRA_DIST = tests/box.stl \
-             tests/reed-ref.csv
 
 dist_doc_DATA = AUTHORS \
                 TODO \
