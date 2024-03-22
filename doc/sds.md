@@ -1812,7 +1812,7 @@ This feature can be better appreciated by comparing the input files needed to so
 
 ### Comparison of solutions {#sec:comparison-of-solutions}
 
-One cornerstone design feature is that FeenoX has to provide a way to compare its numerical results with other already-know solutions---either analytical or numerical---in order to verify their validity. Indeed, being able to take the difference between the numerical result and an algebraic expression evaluated at arbitrary locations (usually quadrature points to compute~$L_p$ norms of the error) is a must if code verification through the Method of Manufactured Solutions is required (see @sec:mms).
+One cornerstone design feature is that FeenoX has to provide a way to compare its numerical results with other already-know solutions---either analytical or numerical---in order to verify their validity. Indeed, being able to take the difference between the numerical result and an algebraic expression evaluated at arbitrary locations (usually quadrature points to compute~$L_p$ norms of the error) is a must if code verification is required.
 
 Let us consider a one-dimensional slab reactor with uniform macroscopic cross sections
 
@@ -2325,6 +2325,7 @@ The version is composed of three dot-separted integers:
  #. the revision (individual commits from last tag)
 
 The `autogen.sh` script builds this string at compile time, which is stored in a header and finally embedded into the executable.
+The major $m$ and minor $n$ integers are read from the git tag formatted as `vm.n`, which is bumped manually by adding an annotated tag to a particular commit. The revision is computed automatically with `git describe` as the number of commits in the main branch from the tag to the last commit. The hash is also added to avoid ambiguities in case the repository is forked and diverged from the official one.
 Periodically, source and binary tarballs are built (using automated scripts in the `dist` subdirectory) and published online.
 
 Given the input-file scheme thoroughfully explained in @sec:input---especially the separation of the problem formulation from the mesh data--the input files can be tracked with Git (or any other VCS) as well, therefore enhancing traceability of results and data governance.
@@ -2359,9 +2360,44 @@ to
 double rhs = -h*Tref;
 ```
 
-then the `make check` step will detect it:
+then the `make check` step will detect it. In effect,
 
 ```terminal
+$ make check
+[...]
+XFAIL: tests/abort.sh
+PASS: tests/algebraic_expr.sh
+PASS: tests/annulus-modal.sh
+PASS: tests/uo2-pellet.sh
+[...]
+PASS: tests/t21.sh
+FAIL: tests/thermal-1d.sh
+PASS: tests/thermal-2d.sh
+FAIL: tests/thermal-3d.sh
+XFAIL: tests/thermal-slab-no-k.sh
+XFAIL: tests/thermal-slab-wrong-bc.sh
+FAIL: tests/thermal-radiation.sh
+PASS: tests/transient-mesh.sh
+PASS: tests/trig.sh
+[...]
+============================================================================
+Testsuite summary for feenox 1.0.7
+============================================================================
+# TOTAL: 75
+# PASS:  64
+# SKIP:  2
+# XFAIL: 6
+# FAIL:  3
+# XPASS: 0
+# ERROR: 0
+============================================================================
+See ./test-suite.log
+Please report to jeremy@seamplex.com
+============================================================================
+make[3]: *** [Makefile:1723: test-suite.log] Error 1
+[...]
+make: *** [Makefile:1608: check-recursive] Error 1
+$ 
 ```
 
 ## Bug reporting and tracking
@@ -2371,33 +2407,10 @@ then the `make check` step will detect it:
 > 430-bugs.md
 > ```
 
-github
+The Github Issues feature at <https://github.com/seamplex/feenox/issues> is used to report and track bugs and errors (@fig:github-issues).
 
+![Github Issues for FeenoX](issues.png){#fig:github-issues}
 
-## Verification {#sec:verification}
-
-> ```include
-> 440-verification.md
-> ```
-
-
-open source (really, not like CCX -> mostrar ejemplo)
-GPLv3+ free
-Git + gitlab, github, bitbucket
-
-### Method of Exact Solutions {#sec:mes}
-
-### Method of Manufactured Solutions {#sec:mms}
-
-## Validation
-
-> ```include
-> 450-validation.md
-> ```
-
-already done for Fino
-
-hip implant, 120+ pages, ASME, cases of increasing complexity
 
 ## Documentation {#sec:documentation}
 

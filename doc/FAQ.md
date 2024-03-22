@@ -60,11 +60,12 @@ It does not mean anything particular, but
  * With some luck one can read "Finite ElEments NO-X"
  * With mode luck, "FrEE" (as in "free speech")
 
-# How should FeenoX be pronounced.
+# How should FeenoX be pronounced?
 
-It would be something like _fee_-_naaks_: /fiːnɒks/
+It would be something like _fee_-_naaks_: /fiːnɒks/  
 But whatever works for you is fine. 
  
+
 ```include
 double-click.md
 ```
