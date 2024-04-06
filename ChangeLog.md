@@ -5,7 +5,7 @@
 # v1.0 (Mar 2024)
 
  * option `--check`
- * README for engineers, hackers and academics
+ * `README` for engineers, hackers and academics
  * thermal tutorial
  * thermal radiation tests
  * two-dimensional quasi-random number sequences
@@ -26,10 +26,10 @@
  * CI using Github actions
  * Los Alamos criticallity benchmarks in tests
  * support for reading VTK v5 files
- * WRITE_RESULTS keyword
+ * `WRITE_RESULTS` keyword
  * split examples by problem type
  * YAML blocks in input file for metadata are allowed (so far they are ignored by FeenoX)
- * $0 (or ${0} or $(1)) expands to the base name of the main input, i.e. without the `.fee` extension
+ * `$0` (or `${0}` or `$(1)`) expands to the base name of the main input, i.e. without the `.fee` extension
  * bracketed argumens so ${1}1$(1) is a valid string
  * multi-group neutron transport with discrete ordinates ($S_N$ method)
  * mimicked-nodes BCs

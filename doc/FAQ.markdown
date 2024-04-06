@@ -11,7 +11,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2024-03-19
+date: 2024-03-22
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -104,7 +104,7 @@ titleDelim: ":"
   FeenoX?][]
 - [<span class="toc-section-number">3</span> What does FeenoX mean?][]
 - [<span class="toc-section-number">4</span> How should FeenoX be
-  pronounced.][]
+  pronounced?][]
 - [<span class="toc-section-number">5</span> Why nothing happens when I
   double click on `feenox.exe`?][]
 - [<span class="toc-section-number">6</span> How do I create input decks
@@ -124,8 +124,8 @@ titleDelim: ":"
   [<span class="toc-section-number">2</span> How should I cite FeenoX?]:
     #how-should-i-cite-feenox
   [<span class="toc-section-number">3</span> What does FeenoX mean?]: #what-does-feenox-mean
-  [<span class="toc-section-number">4</span> How should FeenoX be pronounced.]:
-    #how-should-feenox-be-pronounced.
+  [<span class="toc-section-number">4</span> How should FeenoX be pronounced?]:
+    #how-should-feenox-be-pronounced
   [<span class="toc-section-number">5</span> Why nothing happens when I double click on `feenox.exe`?]:
     #why-nothing-happens-when-i-double-click-on-feenox.exe
   [<span class="toc-section-number">6</span> How do I create input decks for FeenoX?]:
@@ -227,10 +227,10 @@ It does not mean anything particular, but
 - With some luck one can read “Finite ElEments NO-X”
 - With mode luck, “FrEE” (as in “free speech”)
 
-# How should FeenoX be pronounced.
+# How should FeenoX be pronounced?
 
-It would be something like *fee*-*naaks*: /fiːnɒks/ But whatever works
-for you is fine.
+It would be something like *fee*-*naaks*: /fiːnɒks/  
+But whatever works for you is fine.
 
 # Why nothing happens when I double click on `feenox.exe`?
 

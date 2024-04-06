@@ -45,9 +45,9 @@ Choose your background for further details about the what, how and whys:
 See the following paper for a brief summary (and to [cite FeenoX in your
 work][]):
 
-- Theler, J. (2024). FeenoX: a cloud-first finite-element(ish)
-  computational engineering tool. Journal of Open Source Software,
-  9(95), 5846. <https://doi.org/10.21105/joss.05846>
+- Theler J, “FeenoX: a cloud-first finite-element(ish) computational
+  engineering tool,” *Journal of Open Source Software*, vol. 9, no. 95,
+  p. 5846, Mar. 2024, doi: [10.21105/joss.05846][].
 
   [FeenoX]: https://seamplex.com/feenox
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
@@ -59,6 +59,7 @@ work][]):
   [Unix Hacker]: README4hackers.markdown
   [Academic Professor]: README4academics.markdown
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
+  [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
 
 ## Extents
 

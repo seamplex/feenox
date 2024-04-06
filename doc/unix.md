@@ -139,6 +139,8 @@ There might be more illustrative examples showing how FeenoX' design is more rep
 The rules of input syntax have been designed with this rule in mind.
 Just note a couple of them:
 
+ * The command-line arguments after the input file are available to be expanded verbatim in the input file as `$1`, `$2`, etc. (or `${1}`, `${2}`, etc. if they appear in the midle of strings). This syntax matches Bash' syntax for expanding command-line arguments, so any person reading an input file with this syntax already knows what it does.
+´
  * If one needs a problem where the conductivity depends on\ $x$ as $k(x)=1+x$ then the input is
  
    ```feenox
@@ -150,7 +152,8 @@ Just note a couple of them:
    ```feenox
    T(x,y,z) = sqrt(x^2+y^2) + z
    ```
- 
+   
+ * This syntax for (basic) algebraic expressions matches the common syntax found in Gmsh, Maxima and many other scientific tools. More complex expressions (e.g. involving hyperbolic tangents) might differ slightly.
 
 # Rule of Silence {#sec:unix-silence}
 
@@ -193,6 +196,8 @@ Some key points:
  * Parametric runs can be done from scripts through expansion of command line arguments.
  * Documentation is created out of simple Markdown sources and assembled as needed.
 
+More saliently, the automatic detection of the available PDEs in `src/pdes` is an example of this rule.
+The `autogen.sh` would loop over each subdirectory and create a source file `src/pdes/parser.c` with a function `feenox_pde_parse_problem_type()` which then will be part of the actual FeenoX source base as the entry point for parsing the `PROBLEM` keyword.
 
 # Rule of Optimization {#sec:unix-optimization}
 
