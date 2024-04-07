@@ -14,7 +14,7 @@ The main objective is to comply with the Software Requirements Specification. Wi
  2. FeenoX is Open Source as defined by The Open Source initiative. Stick to open standards, formats, practices, etc. Make sure you understand what the difference between "free software" and "open source" is.
  3. Only after making sure every piece of code meets the two criteria above, the technical and/or efficiency aspects mentioned in the SRS are to be considered.
 
-# Compiling and debuging
+# Compiling and debugging
 
 See the [compilation instructions](compilation.md).
 
@@ -33,7 +33,7 @@ See the [compilation instructions](compilation.md).
 
 > Rule of Simplicity: Design for simplicity; add complexity only where you must.
 
-C++ is a great language when used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not rubust and hard to debug (especially when using templates and this nightmare called smart pointers). The cons are far more than the pros. There is no need to add complexity.
+C++ is a great language when used to solve problems it solves naturally well without being forced to solve it (see [LibreBlackjack](https://seamplex.com/blackjack/)). C++ is a terrible language whenever else. It is messy, overwhelming, complicated, not robust and hard to debug (especially when using templates and this nightmare called smart pointers). The cons are far more than the pros. There is no need to add complexity.
 
 Fortran is a terrible language. Fortran90+ is a patched FORTRAN\ 77. The assumptions that the language had over the kind of computers it has to run on worked in the early days but are now widely outdated. That's it.
 
@@ -73,7 +73,7 @@ Therefore:
  
    Libraries written in C++ are allowed as long as they provide C wrappers and do not meddle with stuff we do not need nor want.
    
- * Keep Fortran even farther away. It is allowed only for existing libaries dating from ancient well-tested and optimized code, but for nothing else.
+ * Keep Fortran even farther away. It is allowed only for existing libraries dating from ancient well-tested and optimized code, but for nothing else.
  * Modern high-level languages like Python or Julia are targets and not sources of FeenoX.
  * For documentation and comments within the code, American English should be used.
 
@@ -121,7 +121,7 @@ Then create a new C/C++ project File->New Project... choose C/C++ Project with E
    }
    ```
  
- * Do not worry about long lines. Only wrap lines when it makes sense to from a logic point of view not becuase "it looks bad on screen" because “screen” can be anything from a mobile phone to a desktop with many 24" LED monitors.
+ * Do not worry about long lines. Only wrap lines when it makes sense to from a logic point of view not because "it looks bad on screen" because “screen” can be anything from a mobile phone to a desktop with many 24" LED monitors.
  * Make sure you understand and follow the 17 rules of Unix philosophy <https://en.wikipedia.org/wiki/Unix_philosophy>
  
     1. modularity
@@ -151,12 +151,12 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
 ## Memory management
 
  * Check all `malloc()` calls for `NULL`. You can use the `feenox_check_alloc()/feenox_check_alloc_null()` macros.
- * Use the macro `feenox_free()` instead of plain `free()`. The former explictly makes the pointer equal to `NULL` after freeing it, which is handy.
+ * Use the macro `feenox_free()` instead of plain `free()`. The former explicitly makes the pointer equal to `NULL` after freeing it, which is handy.
  * Use `valgrind` to check for invalid memory access and leaks
  
     > Memory analysis tools such as valgrind can be useful, but don’t complicate a program merely to avoid their false alarms. For example, if memory is used until just before a process exits, don’t free it simply to silence such a tool. 
     >
-    > GNU Coding Standars  
+    > GNU Coding Standards  
     > <https://www.gnu.org/prep/standards/html_node/Memory-Usage.html>
 
    Mind that FeenoX might be used in parametric or minimization mode which would re-allocate some stuff so make sure you know which alarms you ignore.
@@ -172,7 +172,7 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
  
 ## Comments
 
- * Use single-line comments `//` to add comments to the code so we can easily _comment out_ certain parts of code using multiline comments `/*`---`*/` while developing new features.
+ * Use single-line comments `//` to add comments to the code so we can easily _comment out_ certain parts of code using multi-line comments `/*`---`*/` while developing new features.
  * Explain any non-trivial block or flag that needs to be set. Example
  
    ```c
@@ -188,7 +188,7 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
  * All nice-to-have things that are welcome to be done should be written as
  
    ```c
-   // TODO: allow refreshing file data before each transiet step
+   // TODO: allow refreshing file data before each transit step
    ```
  * Features that might or might not be added should be written as questions
  
@@ -240,7 +240,7 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
  * See the README in the `doc` directory.
  * TLDR;
     1. Use Pandoc-flavored Markdown as the main source.
-    2. Knock yourself out with LaTeX maths.
+    2. Knock yourself out with LaTeX math.
     3. Bitmaps are off the table for figures.
 
  
@@ -248,16 +248,15 @@ Reading and writing mesh/post-processing files work the same way. Each format ha
 
  * The features described in the SRS.
 
-# Code of coduct
+# Code of conduct
 
  * See the [code of conduct](CODE_OF_CONDUCT.md).
 
  
 # Release plans
 
- * v0.x for first development until partially fulfilling the SRS
  * v1.x first stable release meaning:
     - usable features
-    - full documentation matching the code features
+    - full documentation matching the code features (PhD thesis)
  * v2.x further features and improvements 
  

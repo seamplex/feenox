@@ -403,10 +403,10 @@ workflows to solve [engineering-related problems][]:
 - FeenoX follows a [fictitious (yet plausible) Software Design
   Requirements][].
 - The explanation of how FeenoX addresses the requirements can be found
-  in the [Software Design Specifications][].
+  in the [Software Design Specification][].
 
   [fictitious (yet plausible) Software Design Requirements]: https://www.seamplex.com/feenox/doc/srs.html
-  [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
+  [Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html
 
 ## Performance
 

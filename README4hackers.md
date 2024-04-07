@@ -196,7 +196,7 @@ doc/examples-list.md
 ## Design
 
  * FeenoX follows a [fictitious (yet plausible) Software Design Requirements](https://www.seamplex.com/feenox/doc/srs.html).
- * The explanation of how FeenoX addresses the requirements can be found in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html). 
+ * The explanation of how FeenoX addresses the requirements can be found in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html). 
 
 ## Performance
 

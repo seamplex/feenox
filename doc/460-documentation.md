@@ -15,5 +15,5 @@ The documentation shall also include procedures for
  * contributing to the code base, including
    * code of conduct
    * coding styles
-   * variable and function naming convections
+   * variable and function naming conventions
    

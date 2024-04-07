@@ -1,7 +1,7 @@
 Browse to <https://www.seamplex.com/feenox/dist/> and check what the latest version for your architecture is. Then do
 
 ```terminal
-feenox_version=0.2.85-g48a2b76
+feenox_version=1.0.8
 wget -c https://www.seamplex.com/feenox/dist/linux/feenox-v${feenox_version}-linux-amd64.tar.gz
 tar xzf feenox-v${feenox_version}-linux-amd64.tar.gz
 sudo cp feenox-v${feenox_version}-linux-amd64/bin/feenox /usr/local/bin
@@ -30,15 +30,19 @@ Check if it works by calling `feenox` from any directory (you might need to open
 
 ```terminal
 $ feenox
-FeenoX v0.2.102-g0cb44d2
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.0.8-g731ca5d 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-usage: feenox [options] inputfile [replacement arguments] [petsc options]
+usage: ./feenox [options] inputfile [replacement arguments] [petsc options]
 
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Run with --help for further explanations.
 $ 

@@ -59,8 +59,8 @@ Further discussion can be found in the [tensile test tutorial](https://www.seamp
 Check out the section about [invocation](https://www.seamplex.com/feenox/doc/feenox-manual.html#running-feenox) in the [FeenoX manual](https://www.seamplex.com/feenox/doc/feenox-manual.html).
 
 
-The design responds to a [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html) document that acts as a "request for quotations" of a computational engineering tool that should satisfy some fictitious (but plausible) requirements.
-The [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html) document explains how FeenoX addresses each requirement of the SRS.
+The design responds to a [Software Requirements Specification](https://www.seamplex.com/feenox/doc/srs.html) document that acts as a "request for quotations" of a computational engineering tool that should satisfy some fictitious (but plausible) requirements.
+The [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html) document explains how FeenoX addresses each requirement of the SRS.
 
 In principle, even though FeenoX can solve [generic numerical problems](https://seamplex.com/feenox/examples/basic.html) and [systems of ordinary differential/algebraic equations](https://seamplex.com/feenox/examples/daes.html), its main objective is to solve partial differential equations using the finite element method---eventually [in parallel using the MPI standard](https://seamplex.com/feenox/doc/sds.html#sec:scalability).
 The current version can solve
@@ -97,7 +97,7 @@ FeenoX tries to achieve its goals by...
 
  * leveraging the [Unix programming philosophy](https://seamplex.com/feenox/doc/sds.html#sec:unix) to come up with a [cloud-first tool](https://seamplex.com/feenox/doc/sds.html#cloud-first) suitable to be [automatically deployed](https://seamplex.com/feenox/doc/sds.html#sec:deployment) and serve as the back end of web-based interfaces (fig. \ref{caeplex}).
 
- * providing a [ready-to-run program](https://seamplex.com/feenox/doc/sds.html#sec:execution) that reads [an input file at run time](https://seamplex.com/feenox/doc/sds.html#sec:input) (and not a library that has to be linked for each particular problem to be solved) as deliberate decision discussed in the [Software Design Specifications](https://www.seamplex.com/feenox/doc/sds.html).
+ * providing a [ready-to-run program](https://seamplex.com/feenox/doc/sds.html#sec:execution) that reads [an input file at run time](https://seamplex.com/feenox/doc/sds.html#sec:input) (and not a library that has to be linked for each particular problem to be solved) as deliberate decision discussed in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html).
 
  * designing and implementing an extensibility mechanism to allow hackers and/or academics to add new PDE formulations by adding a new subdirectory to [`src/pdes`]() in the repository and then
    a. re-bootstrapping with `autogen.sh`,
@@ -205,7 +205,7 @@ Because there are either
     - CalculiX
     - CodeAster
 
-FeenoX sits in the middle. It is the only free and open-source tool that satisfies the [Software Requirement Specifications](https://www.seamplex.com/feenox/doc/srs.html), including that...
+FeenoX sits in the middle. It is the only free and open-source tool that satisfies the [Software Requirements Specification](https://www.seamplex.com/feenox/doc/srs.html), including that...
 
  * in order to solve a problem one needs to prepare an [input file](https://seamplex.com/feenox/doc/sds.html#sec:input) (not a script) which is [read at run-time](https://seamplex.com/feenox/doc/sds.html#sec:execution) (not code which calls a library)
  * these input files can [expand generic command-line options using Bash syntax as `$1`, `$2`, etc.](https://seamplex.com/feenox/doc/sds.html#sec:run-time-arguments), which allow [parametric](https://seamplex.com/feenox/doc/sds.html#sec:parametric) or [optimization loops](https://seamplex.com/feenox/doc/sds.html#sec:optimization) driven by higher-level scripts

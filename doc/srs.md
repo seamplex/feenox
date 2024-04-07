@@ -72,7 +72,7 @@ toc: true
 270-interoperatibility.md
 ```
 
-# Interfaces
+# Interfaces {#sec:interfaces}
 
 ```include
 300-interfaces.md
@@ -107,7 +107,7 @@ toc: true
 420-testing.md
 ```
 
-## Bug reporting and tracking
+## Bug reporting and tracking {#sec:bug-reporting}
 
 
 ```include

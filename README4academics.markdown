@@ -87,10 +87,10 @@ which for linear elastic looks as follows:
 Further discussion can be found in the [tensile test tutorial][]. Check
 out the section about [invocation][run] in the [FeenoX manual][].
 
-The design responds to a [Software Requirement Specifications][]
+The design responds to a [Software Requirements Specification][]
 document that acts as a “request for quotations” of a computational
 engineering tool that should satisfy some fictitious (but plausible)
-requirements. The [Software Design Specifications][] document explains
+requirements. The [Software Design Specification][] document explains
 how FeenoX addresses each requirement of the SRS.
 
 In principle, even though FeenoX can solve [generic numerical
@@ -147,8 +147,8 @@ solutions][].
   [1]: doc/transfer-le10-zoom.svg
   [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
   [FeenoX manual]: https://www.seamplex.com/feenox/doc/feenox-manual.html
-  [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
-  [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
+  [Software Requirements Specification]: https://www.seamplex.com/feenox/doc/srs.html
+  [Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html
   [generic numerical problems]: https://seamplex.com/feenox/examples/basic.html
   [systems of ordinary differential/algebraic equations]: https://seamplex.com/feenox/examples/daes.html
   [in parallel using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
@@ -188,7 +188,7 @@ FeenoX tries to achieve its goals by…
 - providing a [ready-to-run program][] that reads [an input file at run
   time][] (and not a library that has to be linked for each particular
   problem to be solved) as deliberate decision discussed in the
-  [Software Design Specifications][].
+  [Software Design Specification][].
 
 - designing and implementing an extensibility mechanism to allow hackers
   and/or academics to add new PDE formulations by adding a new
@@ -320,7 +320,7 @@ further details about how to contribute to the code base.
   [automatically deployed]: https://seamplex.com/feenox/doc/sds.html#sec:deployment
   [ready-to-run program]: https://seamplex.com/feenox/doc/sds.html#sec:execution
   [an input file at run time]: https://seamplex.com/feenox/doc/sds.html#sec:input
-  [Software Design Specifications]: https://www.seamplex.com/feenox/doc/sds.html
+  [Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html
   [2]:
   [C functions]: https://www.seamplex.com/feenox/doc/programming.html#languages
   [parse the input file]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
@@ -379,7 +379,7 @@ already-crowded space of FEA tools? Because there are either
     - CodeAster
 
 FeenoX sits in the middle. It is the only free and open-source tool that
-satisfies the [Software Requirement Specifications][], including that…
+satisfies the [Software Requirements Specification][], including that…
 
 - in order to solve a problem one needs to prepare an [input file][]
   (not a script) which is [read at run-time][] (not code which calls a
@@ -400,7 +400,7 @@ satisfies the [Software Requirement Specifications][], including that…
 See [FeenoX for hackers][] for another explanation about why FeenoX is
 different from other computational tools.
 
-  [Software Requirement Specifications]: https://www.seamplex.com/feenox/doc/srs.html
+  [Software Requirements Specification]: https://www.seamplex.com/feenox/doc/srs.html
   [input file]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [read at run-time]: https://seamplex.com/feenox/doc/sds.html#sec:execution
   [expand generic command-line options using Bash syntax as `$1`, `$2`, etc.]:

@@ -264,7 +264,7 @@ subdirectory of the [Github repository][] for
 - [Manual][]
 - [Description][]
 - [Software Design Requirements][]
-- [Software Design Specifications][]
+- [Software Design Specification][]
 - [Unix man page][] (accessible through `man feenox` after installation)
 - [History][]
 - [Compilation guide][]
@@ -278,7 +278,7 @@ subdirectory of the [Github repository][] for
   [Manual]: https://seamplex.com/feenox/doc/feenox-manual.html
   [Description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [Software Design Requirements]: https://seamplex.com/feenox/doc/srs.html
-  [Software Design Specifications]: https://seamplex.com/feenox/doc/sds.html
+  [Software Design Specification]: https://seamplex.com/feenox/doc/sds.html
   [Unix man page]: https://seamplex.com/feenox/doc/feenox.1.html
   [History]: doc/history.markdown
   [Compilation guide]: doc/compilation.markdown

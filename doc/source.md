@@ -15,7 +15,7 @@ To compile the source tarball, proceed as follows. This procedure does not need 
     sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
- 3. Download and uncompress FeenoX source tarball. Browse to <https://www.seamplex.com/feenox/dist/src/> and pick the latest version:
+ 3. Download and un-compress FeenoX source tarball. Browse to <https://www.seamplex.com/feenox/dist/src/> and pick the latest version:
  
  
     ```terminal

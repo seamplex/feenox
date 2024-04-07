@@ -139,7 +139,7 @@ There might be more illustrative examples showing how FeenoX' design is more rep
 The rules of input syntax have been designed with this rule in mind.
 Just note a couple of them:
 
- * The command-line arguments after the input file are available to be expanded verbatim in the input file as `$1`, `$2`, etc. (or `${1}`, `${2}`, etc. if they appear in the midle of strings). This syntax matches Bash' syntax for expanding command-line arguments, so any person reading an input file with this syntax already knows what it does.
+ * The command-line arguments after the input file are available to be expanded verbatim in the input file as `$1`, `$2`, etc. (or `${1}`, `${2}`, etc. if they appear in the middle of strings). This syntax matches Bash' syntax for expanding command-line arguments, so any person reading an input file with this syntax already knows what it does.
 ´
  * If one needs a problem where the conductivity depends on\ $x$ as $k(x)=1+x$ then the input is
  

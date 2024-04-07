@@ -39,7 +39,7 @@ $z(0) = 22.5$
 
 and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters that generate the butterfly as presented by Edward Lorenz back in his seminal 1963 paper [Deterministic non-periodic flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
 
-The following ASCII input file ressembles the parameters, inital conditions and differential equations of the problem as naturally as possible:
+The following ASCII input file resembles the parameters, initial conditions and differential equations of the problem as naturally as possible:
 
 ```{.feenox include="lorenz.fee"}
 ```

@@ -1,7 +1,7 @@
 # FeenoX programming guide
 
 - [<span class="toc-section-number">1</span> Why we program FeenoX][]
-- [<span class="toc-section-number">2</span> Compiling and debuging][]
+- [<span class="toc-section-number">2</span> Compiling and debugging][]
 - [<span class="toc-section-number">3</span> How we program FeenoX][]
   - [<span class="toc-section-number">3.1</span> Operating systems][]
   - [<span class="toc-section-number">3.2</span> Languages][]
@@ -22,11 +22,11 @@
   - [<span class="toc-section-number">3.15</span> Documentation][]
 - [<span class="toc-section-number">4</span> What we program in
   FeenoX][]
-- [<span class="toc-section-number">5</span> Code of coduct][]
+- [<span class="toc-section-number">5</span> Code of conduct][]
 - [<span class="toc-section-number">6</span> Release plans][]
 
   [<span class="toc-section-number">1</span> Why we program FeenoX]: #why-we-program-feenox
-  [<span class="toc-section-number">2</span> Compiling and debuging]: #compiling-and-debuging
+  [<span class="toc-section-number">2</span> Compiling and debugging]: #compiling-and-debugging
   [<span class="toc-section-number">3</span> How we program FeenoX]: #how-we-program-feenox
   [<span class="toc-section-number">3.1</span> Operating systems]: #operating-systems
   [<span class="toc-section-number">3.2</span> Languages]: #languages
@@ -47,7 +47,7 @@
   [<span class="toc-section-number">3.15</span> Documentation]: #documentation
   [<span class="toc-section-number">4</span> What we program in FeenoX]:
     #what-we-program-in-feenox
-  [<span class="toc-section-number">5</span> Code of coduct]: #code-of-coduct
+  [<span class="toc-section-number">5</span> Code of conduct]: #code-of-conduct
   [<span class="toc-section-number">6</span> Release plans]: #release-plans
 
 # Why we program FeenoX
@@ -68,7 +68,7 @@ Specification. Within this goal, there are three levels of importance:
     above, the technical and/or efficiency aspects mentioned in the SRS
     are to be considered.
 
-# Compiling and debuging
+# Compiling and debugging
 
 See the [compilation instructions][].
 
@@ -95,7 +95,7 @@ See the [compilation instructions][].
 C++ is a great language when used to solve problems it solves naturally
 well without being forced to solve it (see [LibreBlackjack][]). C++ is a
 terrible language whenever else. It is messy, overwhelming, complicated,
-not rubust and hard to debug (especially when using templates and this
+not robust and hard to debug (especially when using templates and this
 nightmare called smart pointers). The cons are far more than the pros.
 There is no need to add complexity.
 
@@ -207,7 +207,7 @@ Therefore:
   wrappers and do not meddle with stuff we do not need nor want.
 
 - Keep Fortran even farther away. It is allowed only for existing
-  libaries dating from ancient well-tested and optimized code, but for
+  libraries dating from ancient well-tested and optimized code, but for
   nothing else.
 
 - Modern high-level languages like Python or Julia are targets and not
@@ -293,7 +293,7 @@ detected the configure script by adding “using configure” next to
   ```
 
 - Do not worry about long lines. Only wrap lines when it makes sense to
-  from a logic point of view not becuase “it looks bad on screen”
+  from a logic point of view not because “it looks bad on screen”
   because “screen” can be anything from a mobile phone to a desktop with
   many 24” LED monitors.
 
@@ -340,8 +340,8 @@ format has to provide a virtual reader/writer method.
   `feenox_check_alloc()/feenox_check_alloc_null()` macros.
 
 - Use the macro `feenox_free()` instead of plain `free()`. The former
-  explictly makes the pointer equal to `NULL` after freeing it, which is
-  handy.
+  explicitly makes the pointer equal to `NULL` after freeing it, which
+  is handy.
 
 - Use `valgrind` to check for invalid memory access and leaks
 
@@ -350,7 +350,7 @@ format has to provide a virtual reader/writer method.
   > example, if memory is used until just before a process exits, don’t
   > free it simply to silence such a tool.
   >
-  > GNU Coding Standars  
+  > GNU Coding Standards  
   > <https://www.gnu.org/prep/standards/html_node/Memory-Usage.html>
 
   Mind that FeenoX might be used in parametric or minimization mode
@@ -384,7 +384,7 @@ format has to provide a virtual reader/writer method.
 ## Comments
 
 - Use single-line comments `//` to add comments to the code so we can
-  easily *comment out* certain parts of code using multiline comments
+  easily *comment out* certain parts of code using multi-line comments
   `/*`—`*/` while developing new features.
 
 - Explain any non-trivial block or flag that needs to be set. Example
@@ -404,7 +404,7 @@ format has to provide a virtual reader/writer method.
   as
 
   ``` c
-  // TODO: allow refreshing file data before each transiet step
+  // TODO: allow refreshing file data before each transit step
   ```
 
 - Features that might or might not be added should be written as
@@ -454,14 +454,14 @@ format has to provide a virtual reader/writer method.
 - See the README in the `doc` directory.
 - TLDR;
   1.  Use Pandoc-flavored Markdown as the main source.
-  2.  Knock yourself out with LaTeX maths.
+  2.  Knock yourself out with LaTeX math.
   3.  Bitmaps are off the table for figures.
 
 # What we program in FeenoX
 
 - The features described in the SRS.
 
-# Code of coduct
+# Code of conduct
 
 - See the [code of conduct][].
 
@@ -469,8 +469,7 @@ format has to provide a virtual reader/writer method.
 
 # Release plans
 
-- v0.x for first development until partially fulfilling the SRS
 - v1.x first stable release meaning:
   - usable features
-  - full documentation matching the code features
+  - full documentation matching the code features (PhD thesis)
 - v2.x further features and improvements

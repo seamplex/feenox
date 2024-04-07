@@ -1,7 +1,7 @@
 ---
-title: FeenoX Software Design Specifications
+title: FeenoX Software Design Specification
 lang: en-US
-abstract: This Software Design Specifications (SDS) document applies to an imaginary [Software Requirement Specifications](./srs.md) (SRS) document issued by a fictitious agency asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. The latter can be seen as a “Request for Quotation” and the former as an offer for the fictitious tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
+abstract: This Software Design Specification (SDS) document applies to an imaginary [Software Requirements Specification](./srs.md) (SRS) document issued by a fictitious agency asking for vendors to offer a free and open source cloud-based computational tool to solve engineering problems. The latter can be seen as a “Request for Quotation” and the former as an offer for the fictitious tender. Each section  of this SDS addresses one section of the SRS. The original text from the SRS is shown quoted at the very beginning before the actual SDS content.
 number-sections: true
 toc: true
 documentclass: report
@@ -107,15 +107,15 @@ Keep in mind that even though both the quotes above and many finite-element prog
 
 There are other FEA tools that, even though born closer in time, also follow the above bullets literally.
 But FeenoX does not, since it follows the Unix philosophy in general and Eric Raymond's\ 17\ Unix Rules (@sec:unix) in particular.
-One of the main ideas is the _rule of separation_ (@sec:unix-separation) that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the frontend from the backend as illustrated in @fig:front-back.
+One of the main ideas is the _rule of separation_ (@sec:unix-separation) that essentially asks to separate mechanism from policy, that in the computational engineering world translates into separating the front end from the back end as illustrated in @fig:front-back.
 
 When solving ordinary differential equations, the usual workflow involves solving them with FeenoX and plotting the results with Gnuplot or Pyxplot.
 When solving partial differential equations (PDEs), the mesh is created with Gmsh and the output can be post-processed with Gmsh, Paraview or any other post-processing system (even a web-based interface) that follows rule of separation.
 Even though most FEA programs eventually separate the interface from the solver up to some degree, there are cases in which they are still dependent such that changing the former needs updating the latter.
 This is the usual case with legacy programs designed back in the 1990s (or even one or two decades before) that are still around nowadays. They usually still fulfill almost all of the bullets above and are the ones which their owners are trying to convert from desktop to cloud-enabled programs instead of starting from scratch.
 
-From the very beginning, FeenoX is designed as a pure backend which should nevertheless provide appropriate mechanisms for different frontends to be able to communicate and to provide a friendly interface for the final user.
-Yet, the separation is complete in the sense that the nature of the frontends can radically change (say from a desktop-based point-and-click program to a web-based interface or an immersive augmented-reality application with goggles) without needing the modify the backend.
+From the very beginning, FeenoX is designed as a pure back end which should nevertheless provide appropriate mechanisms for different front ends to be able to communicate and to provide a friendly interface for the final user.
+Yet, the separation is complete in the sense that the nature of the front ends can radically change (say from a desktop-based point-and-click program to a web-based interface or an immersive augmented-reality application with goggles) without needing the modify the back end.
 Not only far more flexibility is given by following this path, but also develop efficiency and quality is encouraged since programmers working on the lower-level of an engineering tool usually do not have the skills needed to write good user-experience interfaces, and conversely.
 
 In the very same sense, FeenoX does not discretize continuous domains for PDE problems itself, but relies on separate tools for this end. Fortunately, there already exists one meshing tool which is FOSS (GPLv2) and shares most (if not all) of the design basis principles with FeenoX: the three-dimensional finite element mesh generator [Gmsh](http://gmsh.info/).
@@ -202,7 +202,7 @@ All the dependencies are free and/or open source and already available in Debian
 The POSIX standard is followed whenever possible, allowing thus FeenoX to be compiled in other operating systems and architectures such as Windows (using [Cygwin](https://www.cygwin.com/)) and MacOS. The build procedure is the well-known and mature `./configure && make` command. 
 
 FeenoX is written in\ [C](https://en.wikipedia.org/wiki/C_(programming_language)) conforming to the [ISO\ C99](https://en.wikipedia.org/wiki/C99) specification (plus POSIX extensions), which is a standard, mature and widely supported language with compilers for a wide variety of architectures. 
-As listed above, for its basic mathematical capabilities, FeenoX uses the [GNU Scientifc Library](https://www.gnu.org/software/gsl/).
+As listed above, for its basic mathematical capabilities, FeenoX uses the [GNU Scientific Library](https://www.gnu.org/software/gsl/).
 For solving ODEs/DAEs, FeenoX relies on [Lawrence Livermore’s SUNDIALS library](https://computing.llnl.gov/projects/sundials/ida).
 For PDEs, FeenoX uses [Argonne’s PETSc library](https://www.mcs.anl.gov/petsc/) and [Universitat Politècnica de València's SLEPc library](https://slepc.upv.es/). All of them are
 
@@ -328,7 +328,7 @@ When invoked without arguments, it prints its version (a thorough explanation of
 
 ```terminal
 $ feenox
-FeenoX v0.3.325-gbfdb7be
+FeenoX v1.0.8-g731ca5d 
 a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
@@ -336,6 +336,7 @@ usage: feenox [options] inputfile [replacement arguments] [petsc options]
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
   --elements_info    output a document with information about the supported element types
   --linear           force FeenoX to solve the PDE problem as linear
@@ -723,7 +724,7 @@ $ mpiexec -n 6 feenox t21.fee
 $ 
 ```
 
-Note that in the cases with 4 and 5 processes, the number of partitions $P$ is not a multpiple of the number of processes $N$.
+Note that in the cases with 4 and 5 processes, the number of partitions $P$ is not a multiple of the number of processes $N$.
 Anyway, FeenoX is able to distribute the load is able to distribute the load among the $N$ processes, even though the efficiency is slightly less than in the other cases.
 :::
 
@@ -769,25 +770,25 @@ geometry = quarter
     keff = 1.02918
    nodes = 70779
     DOFs = 141558
-[0/1 LIN54Z7SQ3]   memory = 2.3 Gb (local) 2.3 Gb (global)
+[0/1 tux]   memory = 2.3 Gb (local) 2.3 Gb (global)
     wall = 26.2 sec
 $ mpiexec -n 2 feenox iaea-3dpwr.fee quarter
 geometry = quarter
     keff = 1.02918
    nodes = 70779
     DOFs = 141558
-[0/2 LIN54Z7SQ3]   memory = 1.5 Gb (local) 3.0 Gb (global)
-[1/2 LIN54Z7SQ3]   memory = 1.5 Gb (local) 3.0 Gb (global)
+[0/2 tux]   memory = 1.5 Gb (local) 3.0 Gb (global)
+[1/2 tux]   memory = 1.5 Gb (local) 3.0 Gb (global)
     wall = 17.0 sec
 $ mpiexec -n 4 feenox iaea-3dpwr.fee quarter
 geometry = quarter
     keff = 1.02918
    nodes = 70779
     DOFs = 141558
-[0/4 LIN54Z7SQ3]   memory = 1.0 Gb (local) 3.9 Gb (global)
-[1/4 LIN54Z7SQ3]   memory = 0.9 Gb (local) 3.9 Gb (global)
-[2/4 LIN54Z7SQ3]   memory = 1.1 Gb (local) 3.9 Gb (global)
-[3/4 LIN54Z7SQ3]   memory = 0.9 Gb (local) 3.9 Gb (global)
+[0/4 tux]   memory = 1.0 Gb (local) 3.9 Gb (global)
+[1/4 tux]   memory = 0.9 Gb (local) 3.9 Gb (global)
+[2/4 tux]   memory = 1.1 Gb (local) 3.9 Gb (global)
+[3/4 tux]   memory = 0.9 Gb (local) 3.9 Gb (global)
     wall = 13.0 sec
 $ 
 ```
@@ -1023,7 +1024,7 @@ neutron_diffusion
 ```
 
 
-Besides removals, additions---which are also handled by `autogen.sh` as describe aboved---are far more interesting to discuss.
+Besides removals, additions---which are also handled by `autogen.sh` as describe above---are far more interesting to discuss.
 Additional elliptic problems can be added by using the `laplace` directory as a template while using the other directories as examples about how to add further features (e.g. a Robin-type boundary condition in `thermal` and a vector-valued unknown in `mechanical`).
 More information can be found in the [FeenoX programming & contributing](https://www.seamplex.com/feenox/doc/#programming-and-contributing) section.
 
@@ -1136,7 +1137,7 @@ Of course these kind of FeenoX-generated tables can be inserted verbatim into Ma
 
 
 ::: {#fig:latex-tables layout-ncol=1}
-![A multi-billion-dollar agency using the Windows philosophy (presumably mouse-based copy and paste into Word)](nureg.png)
+![A multi-billion-dollar agency using the Windows philosophy (presumably mouse-based copy and pasted into Word)](nureg.png){#fig:nureg}
 
 ![A small third-world consulting company using the Unix philosophy (FeenoX+AWK+LaTeX)](cne.png){#fig:cne}
 
@@ -1147,7 +1148,7 @@ Results of the same fatigue problem solved using two different philosophies.
 It should be noted that all of the programs and tools mentioned to be interoperable with FeenoX are [free and open source software](https://en.wikipedia.org/wiki/Free_and_open-source_software).
 This is not a requirement from the SRS, but is indeed a nice-to-have feature.
  
-# Interfaces
+# Interfaces {#sec:interfaces}
 
  
 > ```include
@@ -1196,22 +1197,22 @@ The `--versions` option shows more information about the FeenoX build and the li
 
 ```terminal
 $ feenox -V
-FeenoX v0.2.14-gbbf48c9
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.0.8-g731ca5d 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Sat Feb 12 15:35:05 2022 -0300
-Build date         : Sat Feb 12 15:35:44 2022 -0300
+Last commit date   : Wed Mar 20 08:11:05 2024 -0300
+Build date         : Wed Mar 20 16:38:10 2024 -0300
 Build architecture : linux-gnu x86_64
-Compiler version   : gcc (Debian 10.2.1-6) 10.2.1 20210110
+Compiler version   : gcc (Debian 12.2.0-14) 12.2.0
 Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
-Compiler flags     : -O3
+Compiler flags     : -O3 -flto=auto -no-pie
 Builder            : gtheler@tom
-GSL version        : 2.6
-SUNDIALS version   : 5.7.0
-PETSc version      : Petsc Release Version 3.16.3, Jan 05, 2022 
+GSL version        : 2.7.1
+SUNDIALS version   : N/A
+PETSc version      : Petsc Development GIT revision: v3.20.5-935-g78ad52f83fb  GIT Date: 2024-03-25 05:31:58 +0000
 PETSc arch         : arch-linux-c-debug
-PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack
-SLEPc version      : SLEPc Release Version 3.16.1, Nov 17, 2021
+PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-scalapack --download-slepc --with-64-bit-indices=no --with-debugging=yes --with-precision=double --with-scalar-type=real PETSC_ARCH=arch-linux-c-debug
+SLEPc version      : SLEPc Development GIT revision: v3.20.1-36-g7a35a7b97  GIT Date: 2023-12-02 02:30:03 -0600
 $
 ```
 
@@ -1224,6 +1225,7 @@ usage: feenox [options] inputfile [replacement arguments] [petsc options]
   -h, --help         display options and detailed explanations of commmand-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
   --elements_info    output a document with information about the supported element types
   --linear           force FeenoX to solve the PDE problem as linear
@@ -1246,10 +1248,10 @@ $2, etc. For example
     $ echo 'PRINT $1+$2' | feenox - 3 4
     7
 
-PETSc and SLEPc options can be passed in [petsc options] as well, with
-the difference that two hyphens have to be used instead of only once.
-For example, to pass the PETSc option -ksp_view the actual FeenoX
-invocation should be
+PETSc and SLEPc options can be passed in [petsc options] (or [options])
+as well, with the difference that two hyphens have to be used instead of
+only once. For example, to pass the PETSc option -ksp_view the actual
+FeenoX invocation should be
 
     $ feenox input.fee --ksp_view
 
@@ -1375,7 +1377,7 @@ $ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor
 $
 ```
 
-Any PETSc command-line option takes precedence over the settings in the input file, so the preconditioner can be changed even if explicitly given with the [`PRECONDITIONER`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword:
+Any PETSc command-line option takes precedence over the settings in the input file, so the pre-conditioner can be changed even if explicitly given with the [`PRECONDITIONER`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword:
 
 ```terminal
 $ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor --pc_type ilu
@@ -1543,7 +1545,7 @@ In principle any extension (even no extension) can be used for the FeenoX input 
 Throughout the FeenoX repository and documentation the extension `.fee` is used, which has a couple of advantages:
 
  1. The `.fee` extension is detected by syntax-highlighting extensions for common editors (both graphical such as [Kate](https://kate-editor.org/) and cloud-friendly such as [Vim](https://www.vim.org/)) as illustrated in @fig:highlighting.
- 2. The expression `$0` (or `${0}`) is expanded to the basename of the input file, i.e. the directory part (if present) is removed  and the `.fee` extension is removed. Therefore, 
+ 2. The expression `$0` (or `${0}`) is expanded to the base name of the input file, i.e. the directory part (if present) is removed  and the `.fee` extension is removed. Therefore, 
  
     ```feenox
     READ_MESH $0.msh
@@ -1590,7 +1592,7 @@ A primary keyword can be
 Definitions are English _nouns_ and instructions are English _verbs_. 
 In the example above, [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) is a definition because it tells FeenoX about something it has to do (i.e. that it has to solve a three-dimensional problem), but does not do anything actually. On the other hand, [`READ_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#read_mesh) is both a definition and an instruction: it defines that there exists a mesh named `nafems-le10.msh` which might be referenced later (for example in an [`INTEGRATE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#integrate) or [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh) instructions), but it also asks FeenoX to read the mesh at that point of the instruction list (more details below).  Finally, [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#print) is a primary keyword taking different types and number or arguments. It is an instruction because it does not define anything, it just asks FeenoX to print the value of the function named `sigmay` evaluated at\ $2000,0,300$. In this case, `sigmay` is a function which is implicitly defined when [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) is set to `mechanical`. If `sigmay` was referenced before [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem), FeenoX would not find it. And if the problem was of any other type, FeenoX would not find it even when referenced from the last line of the input file.
 
-The following example further illustrates the differences between definitions and instructions. It compares the result of (numerically but adaptively) integrating $f(x,y,z) = \sin(x^3 + y^2 + z)$ over a unit cube against using a 3D Gauss integration scheme over a fixed set of quadrature points on the same unit cube meshes with two regular hexahedra in each direction (totalling 8 hexahedra). In one case hex20 are used and in the other one, hex27. Both cases use 27 quadrature points per element.
+The following example further illustrates the differences between definitions and instructions. It compares the result of (numerically but adaptively) integrating $f(x,y,z) = \sin(x^3 + y^2 + z)$ over a unit cube against using a 3D Gauss integration scheme over a fixed set of quadrature points on the same unit cube meshes with two regular hexahedra in each direction (totaling 8 hexahedra). In one case hex20 are used and in the other one, hex27. Both cases use 27 quadrature points per element.
 
 ```{.feenox include=integral_over_hex.fee}
 ```
@@ -1756,7 +1758,7 @@ It goes without saying that algebraic expressions are a must when defining trans
 Besides purely algebraic expressions, FeenoX can handle point-wise defined functions which can then be used in algebraic expressions.
 A useful example is allowing material properties (e.g. Young modulus) to depend on temperature.
 Consider a simple plane-strain square\ $[-1,+1]\times[-1,+1]$ fixed on one side and with a uniform tension in the opposite one while leaving the other two free.
-The square's Young modulus depends on temperature according to a one-dimensional point-wise defined function $E_\text{carbon}(T)$ given by pairs stated according to one of the many material properties tables from ASME\ II and interpolated using Steffen's method. Althouhg in this example the temperature is given as an algebraic expression of space, in particular
+The square's Young modulus depends on temperature according to a one-dimensional point-wise defined function $E_\text{carbon}(T)$ given by pairs stated according to one of the many material properties tables from ASME\ II and interpolated using Steffen's method. Although in this example the temperature is given as an algebraic expression of space, in particular
 
 $$T(x,y)~[\text{ºC}] = 200 + 350 \cdot y$$
 
@@ -2223,7 +2225,7 @@ $ diff mechanical-square-temperature-from-msh.fee mechanical-square-temperature.
 ---
 > 
 > # known temperature distribution
-> # (we could have read it from an outpout of a thermal problem)
+> # (we could have read it from an output of a thermal problem)
 > T(x,y) := 200 + 350*y
 36c38
 < WRITE_MESH mechanical-square-temperature-from-msh.vtk  E T VECTOR u v 0   
@@ -2242,7 +2244,7 @@ The development of FeenoX is tracked with the distributed version control system
 The official repository is hosted on Github at <https://github.com/seamplex/feenox/>.
 New non-trivial features are added in new branches which are then eventually merged into the main branch.
 
-Note that nowadays mentioning that the source code of a piece of software is tracked with Git (why wouldn't it?) is like saying a hotel has a private bathroom in each room (why wouldn't it?). But the reader ought to keep in mind that there is a non-negligible fraction of production calculation codes (even nuclear-related) whose source code is _not_ tracked with a DVCS, let alone features and bugfixes follow the branch-review-merge path.
+Note that nowadays mentioning that the source code of a piece of software is tracked with Git (why wouldn't it?) is like saying a hotel has a private bathroom in each room (why wouldn't it?). But the reader ought to keep in mind that there is a non-negligible fraction of production calculation codes (even nuclear-related) whose source code is _not_ tracked with a DVCS, let alone features and bug fixes follow the branch-review-merge path.
 
 ## Reproducibility and traceability {#sec:traceability}
 
@@ -2251,7 +2253,7 @@ Note that nowadays mentioning that the source code of a piece of software is tra
 > ```
 
 As stated in the previous section, the official repository is freely available on Github.
-As long as the copying conditions (GPLv3+) are met, the repository can be freelu cloned and/or forked.
+As long as the copying conditions (GPLv3+) are met, the repository can be freely cloned and/or forked.
 
 Each binary executable `feenox` has embedded a literal string with the version of the source code used to build it.
 When running without arguments, it will print the version (which includes the hash of the last commit to the repository) and the usage:
@@ -2318,7 +2320,7 @@ SLEPc version      : SLEPc Development GIT revision: v3.20.1-36-g7a35a7b97  GIT 
 $ 
 ```
 
-The version is composed of three dot-separted integers: 
+The version is composed of three dot-separated integers: 
 
  #. the major version (major changes)
  #. the minor version (incompatible input changes)
@@ -2400,7 +2402,7 @@ make: *** [Makefile:1608: check-recursive] Error 1
 $ 
 ```
 
-## Bug reporting and tracking
+## Bug reporting and tracking {#sec:bug-reporting}
 
 
 > ```include
@@ -2422,7 +2424,7 @@ According to Eric Raymond's book "The Art of Unix Programming":
 
 > Compactness is the property that a design can fit inside a human being's head. A good practical test for compactness is this: Does an experienced user normally need a manual? If not, then the design (or at least the subset of it that covers normal use) is compact.
 
-Following to 20-80 rule, we could say that FeenoX is compact for 80% of its usage. But the most complex 20% of the cases might need users (even the author) to look up the syntax of the definition and instruciones in the manual page (illustrated in @fig:sds-manpage), which is accessible with `man feenox` after installing  with `make install`:
+Following to 20-80 rule, we could say that FeenoX is compact for 80% of its usage. But the most complex 20% of the cases might need users (even the author) to look up the syntax of the definition and instructions in the manual page (illustrated in @fig:sds-manpage), which is accessible with `man feenox` after installing  with `make install`:
 
 ```terminal
 $ man -k feenox
@@ -2442,7 +2444,7 @@ The FeenoX Unix manpage in section 1 when running `man feenox`
 
 This man page is compiled into troff from a markdown source, which in turn has some sections involving the syntax and reference of the
 
- * definitinos and instructions
+ * definitions and instructions
  * special variables
  * internal built-in functions and functionals
  
@@ -2498,8 +2500,8 @@ Other pieces of documentation in markdown which then are converted to HTML & PDF
 
  * [The FeenoX manual](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
  * [The FeenoX description](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md) (converted to Texinfo as well)
- * [Software Requirements Specifications](https://github.com/seamplex/feenox/blob/main/doc/srs.md)
- * [Software Design Specifications](https://github.com/seamplex/feenox/blob/main/doc/sds.md)
+ * [Software Requirements Specification](https://github.com/seamplex/feenox/blob/main/doc/srs.md)
+ * [Software Design Specification](https://github.com/seamplex/feenox/blob/main/doc/sds.md)
  * [Frequently Asked Questions](https://github.com/seamplex/feenox/blob/main/doc/FAQ.md)
  * [FeenoX Unix man page](https://github.com/seamplex/feenox/blob/main/doc/feenox.1.md)
  * [History](https://github.com/seamplex/feenox/blob/main/doc/history.md)

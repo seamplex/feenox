@@ -4,6 +4,6 @@ A system to allow developers and users to report bugs and errors and to suggest 
 Here, "bug and errors" mean failure to
 
  * compile on supported architectures,
- * run (unxepected run-time errors, segmentation faults, etc.)
+ * run (unexpected run-time errors, segmentation faults, etc.)
  * return a correct result
  

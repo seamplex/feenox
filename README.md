@@ -152,7 +152,7 @@ Browse through the [documentation index](doc) and/or the [`doc`](https://github.
  * [Manual](https://seamplex.com/feenox/doc/feenox-manual.html)
  * [Description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
  * [Software Design Requirements](https://seamplex.com/feenox/doc/srs.html)
- * [Software Design Specifications](https://seamplex.com/feenox/doc/sds.html)
+ * [Software Design Specification](https://seamplex.com/feenox/doc/sds.html)
  * [Unix man page](https://seamplex.com/feenox/doc/feenox.1.html) (accessible through `man feenox` after installation)
  * [History](./doc/history.md)
  * [Compilation guide](./doc/compilation.md)

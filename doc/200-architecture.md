@@ -4,7 +4,7 @@ The tool must be aimed at being executed unattended on remote servers which are 
  * a few Intel-compatible or ARM-like CPUs per host
  * a few levels of memory caches
  * a few gigabytes of random-access memory
- * several gigabytes of solid-statee storage
+ * several gigabytes of solid-state storage
  
 It should successfully run on 
 

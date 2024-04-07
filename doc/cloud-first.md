@@ -24,7 +24,7 @@ Instead of having to manually perform this set up each time a calculation is nee
  * send the input files needed by the computational tools
  * launch the actual computational tools (Gmsh, FeenoX, etc.) over the instances, e.g. using `mpiexec` or similar to be able to either
    a. to reduce the wall time needed to solve a problem, and/or
-   b. to allow the solution of large problems that do not fit into a single copmuter
+   b. to allow the solution of large problems that do not fit into a single computer
  * monitor and communicate with the solver as the calculation progresses
  * handle eventual errors
  * get back and process the results
@@ -41,7 +41,7 @@ Furthermore, we could design and implement more complex clients able to handle t
 
 Therefore, the computational tools that would perform the actual calculations should be designed in such a way not only to allow these kind of workflows but also to make them efficient.
 In fact, we say "clients" in plural because---as the Unix rule of diversity (@sec:unix-diversity) asks for--depending on the particular problem type and requirements different clients might be needed.
-And since FeenoX itself is flexible enough to be able to solve not only different types of parial differential equations but also
+And since FeenoX itself is flexible enough to be able to solve not only different types of partial differential equations but also
 
  * different types of problems
    - coupled

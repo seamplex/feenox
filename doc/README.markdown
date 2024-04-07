@@ -78,20 +78,21 @@ reference.
     quotations” that defines [software requirements specifications][]
     for an open source computational tool.
 
-    - [Software Requirements specifications][] (Fictitious RFQ)
-      [\[PDF\]][4]
+    - [Software Requirements
+      Specification][software requirements specifications] (Fictitious
+      RFQ) [\[PDF\]][4]
 
 2.  Then a fictitious “offer” to the above tender is given in a
     [software design
     specifications][software requirements specifications] document that
     explains the design decisions and features included in FeenoX.
 
-    - [Software Design specifications][] (Imaginary FeenoX’s offer)
+    - [Software Design Specification][] (Imaginary FeenoX’s offer)
       [\[PDF\]][5]
 
   [software requirements specifications]: https://seamplex.com/feenox/doc/srs.html
   [4]: https://www.seamplex.com/feenox/doc/srs.pdf
-  [Software Design specifications]: https://seamplex.com/feenox/doc/sds.html
+  [Software Design Specification]: https://seamplex.com/feenox/doc/sds.html
   [5]: https://www.seamplex.com/feenox/doc/sds.pdf
 
 ## Other documents
