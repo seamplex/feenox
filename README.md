@@ -9,6 +9,9 @@ number-sections: true
 toc: true
 ...
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05846/status.svg)](https://doi.org/10.21105/joss.05846)
+
+
 # About FeenoX
 
 [FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or [many computers in parallel](https://www.seamplex.com/feenox/doc/sds.html#sec:scalability)) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).

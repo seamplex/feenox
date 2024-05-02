@@ -3100,7 +3100,7 @@ int feenox_parse_problem(void) {
       
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
-///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasistatic problem.
+///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasi-static problem.
 ///kw_pde+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
 ///kw_pde+PROBLEM+usage [ TRANSIENT |
     } else if (strcasecmp(token, "TRANSIENT") == 0) {
