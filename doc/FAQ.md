@@ -17,6 +17,9 @@ In increasing order of complexity and comprehensiveness, these resources explain
  * The [tutorials](https://www.seamplex.com/feenox/doc/tutorials) will walk your through how to use FeenoX to solve problems.
  * The [README](https://www.seamplex.com/feenox/) in the [GitHub repository](https://github.com/seamplex/feenox/) has a brief introduction (after explaining why).
  * Theler, J. (2024). FeenoX: a cloud-first finite-element(ish) computational engineering tool. Journal of Open Source Software, 9(95), 5846. <https://doi.org/10.21105/joss.05846>
+ 
+   [![DOI](https://joss.theoj.org/papers/10.21105/joss.05846/status.svg)](https://doi.org/10.21105/joss.05846)    
+ 
  * There is also a [description](https://www.seamplex.com/feenox/doc/feenox-desc.html) in the [documentation](https://seamplex.com/feenox/doc/).
  * FeenoX is an "offer" to a fictitious "tender" for a computational tool. The RFQ is the [Software Requirements Specification](https://www.seamplex.com/feenox/doc/srs.pdf) and the explanation of how FeenoX addresses each requirement is the [Software Design Specification](https://www.seamplex.com/feenox/doc/srs.pdf).
  * This [presentation from August 2021]((https://www.seamplex.com/feenox/doc/2021-feenox.pdf)) explains the SRS/SDS pair. The sources and the examples can be found in [this Github repository](https://github.com/gtheler/2021-presentation). There is a [recording of the presentation]((https://youtu.be/-RJ5qn7E9uE)) (audio is in Spanish).
