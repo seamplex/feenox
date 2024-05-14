@@ -89,13 +89,13 @@ BC vacuum   vacuum=0.4692
 BC mirror   mirror
 
 SOLVE_PROBLEM
-WRITE_RESULTS FORMAT vtk
 
 # print results
-PRINT SEP " " "  keff = " %.5f keff
-PRINT SEP " " " nodes = " %g   nodes
-PRINT SEP " " "memory = " %.1f memory() "Gb"
-PRINT SEP " " "  wall = " %.1f clock()-t0 "sec"
+WRITE_RESULTS FORMAT vtk
+PRINTF "  keff = %.5f" keff
+PRINTF " nodes = %g"   nodes
+PRINTF "memory = %.1f Gb" memory()
+PRINTF "  wall = %.1f sec" clock()-t0
 ---
 figures: |
   ::: {#fig:iaea-3dpwr-eighth-phi1}
