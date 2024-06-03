@@ -11,7 +11,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2024-05-02
+date: 2024-06-03
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -155,21 +155,30 @@ In increasing order of complexity and comprehensiveness, these resources
 explain what [FeenoX][] is:
 
 - The [examples][] will give a brief overview of what FeenoX can do.
+
 - The [tutorials][] will walk your through how to use FeenoX to solve
   problems.
+
 - The [README][] in the [GitHub repository][] has a brief introduction
   (after explaining why).
+
 - Theler, J. (2024). FeenoX: a cloud-first finite-element(ish)
   computational engineering tool. Journal of Open Source Software,
   9(95), 5846. <https://doi.org/10.21105/joss.05846>
+
+  [![DOI][]][1]
+
 - There is also a [description][] in the [documentation][].
+
 - FeenoX is an “offer” to a fictitious “tender” for a computational
   tool. The RFQ is the [Software Requirements Specification][] and the
   explanation of how FeenoX addresses each requirement is the [Software
   Design Specification][Software Requirements Specification].
+
 - This [presentation from August 2021][] explains the SRS/SDS pair. The
   sources and the examples can be found in [this Github repository][].
   There is a [recording of the presentation][] (audio is in Spanish).
+
 - Finally the [manual][] will be the ultimate guide.
 
   [FeenoX]: https://www.seamplex.com/feenox
@@ -177,6 +186,8 @@ explain what [FeenoX][] is:
   [tutorials]: https://www.seamplex.com/feenox/doc/tutorials
   [README]: https://www.seamplex.com/feenox/
   [GitHub repository]: https://github.com/seamplex/feenox/
+  [DOI]: https://joss.theoj.org/papers/10.21105/joss.05846/status.svg
+  [1]: https://doi.org/10.21105/joss.05846
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [documentation]: https://seamplex.com/feenox/doc/
   [Software Requirements Specification]: https://www.seamplex.com/feenox/doc/srs.pdf
@@ -345,11 +356,12 @@ compiled with [Cygwin][] and have no support whatsoever. Really, really,
 
 FeenoX does not have “input decks.” It has “input files,” which are
 syntactically-sugared English-like plain-text ASCII files that describe
-the problem to be solved. First see the [examples][1] and the [test
-directory][]. Then read the [documentation][2].
+the problem to be solved. First see the [examples][2] and the [test
+directory][]. Then read the [documentation][3].
 
-There is a syntax highlight file for the text Kate that helps the
-edition of input files.
+There are syntax highlighting files [for Kate][] and [for Vim][] that
+helps the edition of input files. Contributions for other editors
+(emacs?) are welcome.
 
 <figure>
 <img src="nafems-le10-problem-input.svg"
@@ -358,9 +370,11 @@ alt="The Kate Text Editor can be used to prepare input files with syntax highlig
 prepare input files with syntax highlighting.</figcaption>
 </figure>
 
-  [1]: https://www.seamplex.com/feenox/examples/
+  [2]: https://www.seamplex.com/feenox/examples/
   [test directory]: https://github.com/seamplex/feenox/tree/main/tests
-  [2]: https://www.seamplex.com/feenox/doc/
+  [3]: https://www.seamplex.com/feenox/doc/
+  [for Kate]: https://github.com/seamplex/feenox/blob/main/doc/feenox.xml
+  [for Vim]: https://github.com/seamplex/feenox/blob/main/doc/fee.vim
 
 # Does FeenoX support beam and/or shell elements?
 
@@ -462,7 +476,7 @@ chains running over free and open source operating systems.
 
 See the [programming guide][] for further discussion.
 
-  [programming guide]: programming.md
+  [programming guide]: https://seamplex.com/feenox/doc/programming.html
 
 ## C++?
 

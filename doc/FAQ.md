@@ -78,7 +78,8 @@ double-click.md
 
 FeenoX does not have "input decks." It has "input files," which are syntactically-sugared English-like plain-text ASCII files that describe the problem to be solved. First see the [examples](https://www.seamplex.com/feenox/examples/) and the [test directory](https://github.com/seamplex/feenox/tree/main/tests). Then read the [documentation](https://www.seamplex.com/feenox/doc/).
 
-There is a syntax highlight file for the text Kate that helps the edition of input files.
+There are syntax highlighting files [for Kate](https://github.com/seamplex/feenox/blob/main/doc/feenox.xml) and [for Vim](https://github.com/seamplex/feenox/blob/main/doc/fee.vim) that helps the edition of input files.
+Contributions for other editors (emacs?) are welcome.
 
 ![The Kate Text Editor can be used to prepare input files with syntax highlighting.](nafems-le10-problem-input.svg)
 
@@ -103,7 +104,7 @@ licensing.md
 
 # Why is FeenoX written in C and not in...
 
-See the [programming guide](programming.md) for further discussion.
+See the [programming guide](https://seamplex.com/feenox/doc/programming.html) for further discussion.
 
 ## C++?
 

@@ -100,10 +100,10 @@ Keep in mind that even though both the quotes above and many finite-element prog
 
  * do not make just only one thing well,
  * do complicate old programs by adding new features,
- * do not expect the their output to become the input to another,
+ * do not expect their output to become the input to another,
  * do clutter output with extraneous information,
  * do use stringently columnar and/or binary input (and output!) formats, and/or
- * do insist on interactive output.
+ * do insist on interactive input.
 
 There are other FEA tools that, even though born closer in time, also follow the above bullets literally.
 But FeenoX does not, since it follows the Unix philosophy in general and Eric Raymond's\ 17\ Unix Rules (@sec:unix) in particular.
@@ -157,7 +157,7 @@ Very much like the C language (after A & B) and Unix itself (after a first attem
 > 
 > From [Eric Raymond](http://www.catb.org/esr/)’s [The Art of Unix Programming](http://www.catb.org/esr/writings/taoup/)
 
-Feenox is indeed the third version written from scratch after a first implementation in 2009 (different small components with different names) and a second one (named wasora that allowed dynamically-shared plugins to be linked at runtime to provide particular PDEs) which was far more complex and had far more features circa 2012--2015pets. The third attempt, FeenoX, explicitly addresses the “do one thing well” idea from Unix. 
+Feenox is indeed the third version written from scratch after a first implementation in 2009 (different small components with different names) and a second one (named wasora that allowed dynamically-shared plugins to be linked at runtime to provide particular PDEs) which was far more complex and had far more features circa 2012--2015. The third attempt, FeenoX, explicitly addresses the “do one thing well” idea from Unix. 
 
 Furthermore, not only is FeenoX itself both [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open-source](https://opensource.com/resources/what-open-source) software but, following the _rule of composition_ (@sec:unix-composition), it also is designed to connect and to work with  other free and open source software such as
 
@@ -1346,9 +1346,9 @@ Info    : Writing 'nafems-le10.msh'...
 Info    : Done writing 'nafems-le10.msh'
 Info    : Stopped on Sat Feb  5 11:26:40 2022 (From start: Wall 1.08693s, CPU 1.1709s)
 $ feenox nafems-le10.fee --progress
-....................................................................................................
-----------------------------------------------------------------------------------------------------
-====================================================================================================
+.................................................................................................
+-------------------------------------------------------------------------------------------------
+=================================================================================================
 sigma_y @ D =   -5.38228        MPa
 $ 
 ```
@@ -1380,11 +1380,11 @@ $
 Any PETSc command-line option takes precedence over the settings in the input file, so the pre-conditioner can be changed even if explicitly given with the [`PRECONDITIONER`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) keyword:
 
 ```terminal
-$ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor --pc_type ilu
-  0 KSP Residual norm 1.962141687033e+00 
-  1 KSP Residual norm 5.362273771017e-16 
+$ feenox thermal-1d-dirichlet-uniform-k.fee --ksp_monitor --pc_type=ilu
+  0 KSP Residual norm 2.678619047193e+00
+  1 KSP Residual norm 7.172418823644e-16
 0.5
-$
+$ 
 ```
 
 If PETSc is compiled with MUMPS, FeenoX provides a `--mumps` option:
