@@ -78,7 +78,7 @@ double feenox_mesh_interpolate_function_node(struct function_t *this, const doub
     
     gsl_matrix *B = feenox_fem_compute_B(element, xi);
     for (int j = 0; j < element->type->nodes; j++) {
-      y += gsl_matrix_get(B, j, this->spatial_derivative_with_respect_to)
+      y += gsl_matrix_get(B, this->spatial_derivative_with_respect_to, j)
             * feenox_vector_get(this->spatial_derivative_of->vector_value, element->node[j]->index_mesh);
     }
     gsl_matrix_free(B);

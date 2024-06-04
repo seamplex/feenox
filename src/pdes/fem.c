@@ -287,7 +287,7 @@ inline gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi) {
   gsl_matrix *B_c = feenox_fem_compute_B_c(e, xi);
   gsl_matrix *C = feenox_fem_compute_C(e);
 //  printf("dgemm B_c C\n");
-  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, B_c, C, 0.0, J);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, C, B_c, 0.0, J);
   gsl_matrix_free(B_c);
   
   return J;
