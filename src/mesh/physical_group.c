@@ -99,15 +99,12 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
     char *measure[4] = {"size", "length", "area", "volume"};
     feenox_check_minusone_null(asprintf(&name_measure, "%s_%s", physical_group->name, measure[physical_group->dimension]));
     if (feenox_check_name(name_measure) == FEENOX_OK) {
-      // check again in case there are duplicates in meshes
-      if (feenox_check_name(name_measure) == FEENOX_OK) {
-        if ((physical_group->var_volume = feenox_define_variable_get_ptr(name_measure)) == NULL) {
-          return NULL;
-        }
-      } else {
-        feenox_pop_error_message();
-      }  
-    }
+      if ((physical_group->var_volume = feenox_define_variable_get_ptr(name_measure)) == NULL) {
+        return NULL;
+      }
+    } else {
+      feenox_pop_error_message();
+    }  
     feenox_free(name_measure);
        
     // center of gravity
@@ -121,9 +118,6 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
       feenox_pop_error_message();
     }  
     feenox_free(name_cog);
-      
-  } else {
-    feenox_pop_error_message();
   }
   
   return physical_group;
