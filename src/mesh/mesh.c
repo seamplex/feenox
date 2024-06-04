@@ -213,47 +213,45 @@ int feenox_instruction_mesh_read(void *arg) {
   // compute the volume (or area or length) and center of gravity of the groups
   // but only if the variable groupname_vol or the vector groupname_cog 
   // are used in one of the expressions
-  if (this->dim != 0) {
-    for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+  for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
       
-      if ((physical_group->var_volume != NULL && physical_group->var_volume->used) ||
-          (physical_group->vector_cog != NULL && physical_group->vector_cog->used)) {
+    if ((physical_group->var_volume != NULL && physical_group->var_volume->used) ||
+        (physical_group->vector_cog != NULL && physical_group->vector_cog->used)) {
         
-        // TODO: why dont' we use feenox_physical_group_compute_volume()?
+      // TODO: why dont' we use feenox_physical_group_compute_volume()?
         
-        physical_group->volume = 0;
-        physical_group->cog[0] = 0;
-        physical_group->cog[1] = 0;
-        physical_group->cog[2] = 0;
+      physical_group->volume = 0;
+      physical_group->cog[0] = 0;
+      physical_group->cog[1] = 0;
+      physical_group->cog[2] = 0;
         
-        for (size_t i = 0; i < physical_group->n_elements; i++) {
-          element_t *element = &this->element[physical_group->element[i]];
-          for (unsigned int q = 0; q < element->type->gauss[this->integration].Q; q++) {
-            double wdet = feenox_fem_compute_w_det_at_gauss_integration(element, q, this->integration);
-            gsl_matrix *H_c = feenox_fem_compute_H_c_at_gauss(element, q, this->integration);
+      for (size_t i = 0; i < physical_group->n_elements; i++) {
+        element_t *element = &this->element[physical_group->element[i]];
+        for (unsigned int q = 0; q < element->type->gauss[this->integration].Q; q++) {
+          double wdet = feenox_fem_compute_w_det_at_gauss_integration(element, q, this->integration);
+          gsl_matrix *H_c = feenox_fem_compute_H_c_at_gauss(element, q, this->integration);
 
-            for (unsigned int j = 0; j < element->type->nodes; j++) {
-              double wdeth = wdet * gsl_matrix_get(H_c, 0, j);
-              physical_group->volume += wdeth ;
-              for (unsigned int d = 0; d < 3; d++) {
-                physical_group->cog[d] += wdeth * element->node[j]->x[d];
-              }
+          for (unsigned int j = 0; j < element->type->nodes; j++) {
+            double wdeth = wdet * gsl_matrix_get(H_c, 0, j);
+            physical_group->volume += wdeth ;
+            for (unsigned int d = 0; d < 3; d++) {
+              physical_group->cog[d] += wdeth * element->node[j]->x[d];
             }
           }
         }
-        
-        feenox_var_value(physical_group->var_volume) = physical_group->volume;
-        for (size_t m = 0; m < 3; m++) {
-          physical_group->cog[m] /= physical_group->volume;
-        }
-        
-        if (physical_group->vector_cog->initialized == 0) {
-          feenox_call(feenox_vector_init(physical_group->vector_cog, FEENOX_VECTOR_NO_INITIAL));
-        }
-        gsl_vector_set(physical_group->vector_cog->value, 0, physical_group->cog[0]);
-        gsl_vector_set(physical_group->vector_cog->value, 1, physical_group->cog[1]);
-        gsl_vector_set(physical_group->vector_cog->value, 2, physical_group->cog[2]);
       }
+        
+      feenox_var_value(physical_group->var_volume) = physical_group->volume;
+      for (size_t m = 0; m < 3; m++) {
+        physical_group->cog[m] /= physical_group->volume;
+      }
+        
+      if (physical_group->vector_cog->initialized == 0) {
+        feenox_call(feenox_vector_init(physical_group->vector_cog, FEENOX_VECTOR_NO_INITIAL));
+      }
+      gsl_vector_set(physical_group->vector_cog->value, 0, physical_group->cog[0]);
+      gsl_vector_set(physical_group->vector_cog->value, 1, physical_group->cog[1]);
+      gsl_vector_set(physical_group->vector_cog->value, 2, physical_group->cog[2]);
     }
   }
 

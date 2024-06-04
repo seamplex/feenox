@@ -94,42 +94,38 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
   
   // -----------------------------  
   if (already_exists == 0) {
-    if (feenox_check_name(name) == FEENOX_OK) {
-      if (physical_group->dimension > 0) {
-        
-        // volume (or area or length)
-        char *name_measure = NULL;
-        char *measure[4] = {"", "length", "area", "volume"};
-        feenox_check_minusone_null(asprintf(&name_measure, "%s_%s", physical_group->name, measure[physical_group->dimension]));
-        // check again in case there are duplicates in meshes
-        if (feenox_check_name(name_measure) == FEENOX_OK) {
-          if ((physical_group->var_volume = feenox_define_variable_get_ptr(name_measure)) == NULL) {
-            return NULL;
-          }
-        } else {
-          feenox_pop_error_message();
-        }  
-        feenox_free(name_measure);
+    // volume (or area or length)
+    char *name_measure = NULL;
+    char *measure[4] = {"size", "length", "area", "volume"};
+    feenox_check_minusone_null(asprintf(&name_measure, "%s_%s", physical_group->name, measure[physical_group->dimension]));
+    if (feenox_check_name(name_measure) == FEENOX_OK) {
+      // check again in case there are duplicates in meshes
+      if (feenox_check_name(name_measure) == FEENOX_OK) {
+        if ((physical_group->var_volume = feenox_define_variable_get_ptr(name_measure)) == NULL) {
+          return NULL;
+        }
+      } else {
+        feenox_pop_error_message();
+      }  
+    }
+    feenox_free(name_measure);
        
-        // center of gravity
-        char *name_cog = NULL;
-        feenox_check_minusone_null(asprintf(&name_cog, "%s_cog", physical_group->name));
-        if (feenox_check_name(name_cog) == FEENOX_OK) {
-          if ((physical_group->vector_cog = feenox_define_vector_get_ptr(name_cog, 3)) == NULL) {
-            return NULL;
-          }
-        } else {
-          feenox_pop_error_message();
-        }  
-        feenox_free(name_cog);
+    // center of gravity
+    char *name_cog = NULL;
+    feenox_check_minusone_null(asprintf(&name_cog, "%s_cog", physical_group->name));
+    if (feenox_check_name(name_cog) == FEENOX_OK) {
+      if ((physical_group->vector_cog = feenox_define_vector_get_ptr(name_cog, 3)) == NULL) {
+        return NULL;
       }
-      
     } else {
       feenox_pop_error_message();
-    }
-
-
-  } 
+    }  
+    feenox_free(name_cog);
+      
+  } else {
+    feenox_pop_error_message();
+  }
+  
   return physical_group;
 }
 
