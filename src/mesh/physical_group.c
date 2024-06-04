@@ -93,7 +93,7 @@ physical_group_t *feenox_define_physical_group_get_ptr(const char *name, mesh_t 
   }
   
   // -----------------------------  
-  if (already_exists == 0) {
+  if (already_exists == 0 && physical_group->dimension >= 0) {
     // volume (or area or length)
     char *name_measure = NULL;
     char *measure[4] = {"size", "length", "area", "volume"};
