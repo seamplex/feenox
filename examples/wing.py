@@ -1,3 +1,4 @@
+import sys
 import math
 import cmath
 import gmsh
@@ -9,15 +10,16 @@ a = 20
 b = 10
 
 # characteristic element sizes
-lc0 = 0.5       # near the boundary
+lc0 = 1       # near the boundary
 lc = 0.1*lc0    # near the wing
 
 # number of points of definition
 nperf = 50
 # attack angle
-alpha = 10 * math.pi/180
+alpha = (float(sys.argv[1]) if len(sys.argv) > 1 else 10) * math.pi/180
+
 # Joukowsky parameters
-x0 = -0.11
+x0 = (float(sys.argv[2]) if len(sys.argv) > 2 else -0.11)
 y0 = 0
 r = math.sqrt((x0-1)**2+y0**2)
 
@@ -41,6 +43,36 @@ spl = []
 spl.append(gmsh.model.occ.addSpline(pts))
 wing = gmsh.model.occ.addCurveLoop(spl)
 
+# compute the location where to evaluate the Kutta condition 
+# this is ugly and not pythonic at all!
+vsup = [-(coords[1][0] - coords[0][0]),
+        -(coords[1][1] - coords[0][1])]  
+norm = math.sqrt(vsup[0]**2 + vsup[1]**2)
+vsup[0] /= norm
+vsup[1] /= norm
+
+vinf = [-(coords[0][0] - coords[2][0]),
+        -(coords[0][1] - coords[2][1])] 
+norm = math.sqrt(vinf[0]**2 + vinf[1]**2)
+vinf[0] /= norm
+vinf[1] /= norm
+
+vmed = vsup + vinf
+norm = math.sqrt(vmed[0]**2 + vmed[1]**2)
+vmed[0] /= norm
+vmed[1] /= norm
+
+eps = 0.04
+p = [coords[0][0] + eps * vmed[0],
+     coords[0][1] + eps * vmed[1]]
+# this is just to show the point in case one opens the .brep
+kutta = gmsh.model.occ.addPoint(p[0], p[1], 0, lc)
+
+# f = open("p.fee", "w")
+# f.write( "VECTOR p[2] DATA %g %g\n" % (p[0], p[1]))
+# f.close()
+
+
 # add the external boundary
 p1 = gmsh.model.occ.addPoint(-a, -b, 0, lc0)
 p2 = gmsh.model.occ.addPoint(+a, -b, 0, lc0)
@@ -53,39 +85,46 @@ left     = gmsh.model.occ.addLine(p4, p1)
 boundary = gmsh.model.occ.addCurveLoop([bottom, right, top, left])
 air      = gmsh.model.occ.addPlaneSurface([boundary, wing])
 
+# create a circle to compute the circulation
+r_circle = 3
+circle = gmsh.model.occ.addCircle(0, 0, 0, r_circle)
+
+
+# we could embed the kutta point into the mesh but
+# then the geometrical entities 
+ov, ovv = gmsh.model.occ.fragment([(2, air)], [(0, kutta), (1,circle)])
+print(ov)
+print(ovv)
+
 gmsh.model.occ.synchronize()
-gmsh.write("wing.brep")
 
 # physical groups
-gmsh.model.addPhysicalGroup(1, [bottom], name="bottom")
-gmsh.model.addPhysicalGroup(1, [right],  name="right")
-gmsh.model.addPhysicalGroup(1, [top],    name="top")
-gmsh.model.addPhysicalGroup(1, [left],   name="left")
-gmsh.model.addPhysicalGroup(1, [wing],   name="wing")
-gmsh.model.addPhysicalGroup(2, [air],    name="air")
+# after the boolean fragment we lost the ids
+# gmsh.model.addPhysicalGroup(1, [bottom], name="bottom")
+# gmsh.model.addPhysicalGroup(1, [right],  name="right")
+# gmsh.model.addPhysicalGroup(1, [top],    name="top")
+# gmsh.model.addPhysicalGroup(1, [left],   name="left")
+# gmsh.model.addPhysicalGroup(1, [wing],   name="wing")
+# gmsh.model.addPhysicalGroup(2, [air],    name="air")
 
-# named points to compute the locations to evaluate the Kutta condition
-gmsh.model.addPhysicalGroup(0, [1],     name="tip")
-gmsh.model.addPhysicalGroup(0, [2],     name="first")
-gmsh.model.addPhysicalGroup(0, [nperf], name="last")
+gmsh.model.addPhysicalGroup(0, [kutta], name="kutta")
+gmsh.model.addPhysicalGroup(1, [6],     name="circle")
+gmsh.model.addPhysicalGroup(1, [7],     name="bottom")
+gmsh.model.addPhysicalGroup(1, [9],     name="right")
+gmsh.model.addPhysicalGroup(1, [10],    name="top")
+gmsh.model.addPhysicalGroup(1, [8],     name="left")
+gmsh.model.addPhysicalGroup(1, [11],    name="wing")
+gmsh.model.addPhysicalGroup(2, [1,2],   name="air")
 
+# dump the brep (or xao) just in case
+gmsh.write("wing.brep")
+gmsh.write("wing.xao")
 
-
-# boundary layer
-f = gmsh.model.mesh.field.add("BoundaryLayer")
-gmsh.model.mesh.field.setNumbers(f, "CurvesList", spl)
-gmsh.model.mesh.field.setNumber(f, "Size", 0.1*lc)
-gmsh.model.mesh.field.setNumber(f, "Ratio", 2)
-gmsh.model.mesh.field.setNumber(f, "Quads", 1)
-gmsh.model.mesh.field.setNumber(f, "Thickness", lc)
-
-gmsh.option.setNumber("Mesh.BoundaryLayerFanElements", 7)
-gmsh.model.mesh.field.setNumbers(f, "FanPointsList", [1])
-gmsh.model.mesh.field.setAsBoundaryLayer(f)
 
 # mesh
 gmsh.option.setNumber("Mesh.RecombineAll", 1)
 gmsh.option.setNumber("Mesh.Algorithm", 8)
+gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 2*math.pi * 0.5*r_circle/lc)
 gmsh.model.mesh.generate(2)
 gmsh.model.mesh.optimize("Netgen")
 gmsh.model.mesh.optimize("Laplace2D")

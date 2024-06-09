@@ -1,6 +1,3 @@
-# Solve the laplace equation for the streamfunction
-# receives one argument: the fraction of fluid passing
-# below the airfoil, adjust to achieve the kutta condition
 PROBLEM laplace 2D
 static_steps = 20
 READ_MESH wing.msh
@@ -9,7 +6,6 @@ READ_MESH wing.msh
 BC bottom  phi=0
 BC top     phi=1
 
-# initial value
 DEFAULT_ARGUMENT_VALUE 1 0.5
 c_init = $1
 BC wing    phi=c
@@ -17,63 +13,35 @@ BC wing    phi=c
 SOLVE_PROBLEM
 
 # velocities
-vx(x,y) = +dphidy(x,y)
-vy(x,y) = -dphidx(x,y)
+PHYSICAL_GROUP left DIM 1
+vx(x,y) = +dphidy(x,y) * left_length
+vy(x,y) = -dphidx(x,y) * left_length
 
-# --------------------------------------------------------
-# evaluate the Kutta condition
-eps = 0.04 # ~ 1% of the chord length
-
-PHYSICAL_GROUP tip   DIM 0
-PHYSICAL_GROUP first DIM 0
-PHYSICAL_GROUP last  DIM 0
-
-# location of evaluation point
-VECTOR vsup[2]
-vsup[i] = -(first_cog[i] - tip_cog[i])
-norm = vecnorm(vsup)
-vsup[i] = vsup[i] / norm
-
-VECTOR vinf[2]
-vinf[i] = +(tip_cog[i] - last_cog[i])
-norm = vecnorm(vinf)
-vinf[i] = vinf[i] / norm
-
-VECTOR vmed[2]
-vmed[i] = (vsup[i] + vinf[i])
-norm = vecnorm(vmed)
-vmed[i] = vmed[i] / norm
-
-VECTOR p[2]
-p[i] = tip_cog[i] + eps * vmed[i]
-
-# compute the error
-error = phi(p[1], p[2]) - c
-
-PRINT step_static %.10f c %.1e error
+PHYSICAL_GROUP kutta DIM 0
+error = phi(kutta_cog[1], kutta_cog[2]) - c
+PRINT step_static %.10f c %.0e error
 c = c + 10*error
 
-# # update the streamline value
-# a_init = 0
-# b_init = 1
-# a = if(error > 0, c, a)
-# b = if(error < 0, c, b)
-# c = 0.5*(a+b)
-# PRINT step_static a b %.10f c phi(p[1],p[2]) c %.1e error
-
-
 # check for convergence
-done_static = abs(error) < 1e-8
+done_static = done_static | (abs(error) < 1e-8)
 IF done_static
   WRITE_MESH $0-converged.msh phi VECTOR vx vy 0
   WRITE_MESH $0-converged.vtk phi VECTOR vx vy 0
   
-  # counter-clockwise line integral of the velocitiy
-  INTEGRATE vx(x,y)*(-1) OVER top    RESULT int_top
-  INTEGRATE vx(x,y)*(+1) OVER bottom RESULT int_bottom
-  INTEGRATE vy(x,y)*(-1) OVER left   RESULT int_left
-  INTEGRATE vy(x,y)*(+1) OVER right  RESULT int_right
-  PRINT "Int.top,left,bottom,right:" int_top int_left int_bottom int_right
-  PRINT "Circulation:" int_top+int_left+int_bottom+int_right
-ENDIF
+  # Function unit tangent:
+  PHYSICAL_GROUP circle DIM 1
+  cx = circle_cog[1]
+  cy = circle_cog[2]
+  tx(x,y) = -(y-cy)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  ty(x,y) = +(x-cx)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
 
+  # Circulation on the circumference:
+  INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ
+  PRINT "circ: " circ
+  
+  INTEGRATE -vx(x,y) OVER top    GAUSS RESULT inttop
+  INTEGRATE +vx(x,y) OVER bottom GAUSS RESULT intbottom
+  INTEGRATE -vy(x,y) OVER left   GAUSS RESULT intleft
+  INTEGRATE +vy(x,y) OVER right  GAUSS RESULT intright
+  PRINT "box: " inttop+intleft+intbottom+intright
+ENDIF
