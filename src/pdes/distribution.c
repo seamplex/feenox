@@ -44,7 +44,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
           if (property_data != NULL) {
             feenox_pull_dependencies_variables(&this->dependency_variables, property_data->expr.variables);
             feenox_pull_dependencies_functions(&this->dependency_functions, property_data->expr.functions);
-            non_uniform = (n_volumes++ > 0) || (feenox_expression_depends_on_space(this->dependency_variables));
+            non_uniform = (n_volumes++ > 0) || (feenox_depends_on_space(this->dependency_variables));
           } else  {
             full = 0;
           }  
@@ -58,7 +58,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->full = full;
     this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_property;
-    this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
+    this->constant = (feenox_depends_on_time(this->dependency_variables) == 0);
     
     return FEENOX_OK;
   }
@@ -92,7 +92,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, function));
         feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, function));
         
-        non_uniform = (n_volumes++ > 0) || (feenox_expression_depends_on_space(this->dependency_variables));
+        non_uniform = (n_volumes++ > 0) || (feenox_depends_on_space(this->dependency_variables));
 
       } else {
         full = 0;
@@ -106,7 +106,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->full = full;
     this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_function_local;
-    this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
+    this->constant = (feenox_depends_on_time(this->dependency_variables) == 0);
     return FEENOX_OK;
   }
   
@@ -124,8 +124,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     this->expr = &this->function->algebraic_expression;
     feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, this->function));
     feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, this->function));
-    this->non_uniform = feenox_expression_depends_on_space(this->dependency_variables);
-    this->constant = (feenox_expression_depends_on_time(this->dependency_variables) == 0);
+    this->non_uniform = feenox_depends_on_space(this->dependency_variables);
+    this->constant = (feenox_depends_on_time(this->dependency_variables) == 0);
     
     return FEENOX_OK;
   }

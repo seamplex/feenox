@@ -77,8 +77,8 @@ int feenox_problem_init_runtime_laplace(void) {
 ///pr_laplace+f+description The right hand side of the equation\ $\nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+f+description If not given, default is zero (i.e. Laplace).
   feenox_call(feenox_distribution_init(&laplace.f, "f"));
-  laplace.f.non_uniform = feenox_expression_depends_on_space(laplace.f.dependency_variables);
-  laplace.f.non_linear = feenox_expression_depends_on_function(laplace.f.dependency_functions, feenox.pde.solution[0]);  
+  laplace.f.non_uniform = feenox_depends_on_space(laplace.f.dependency_variables);
+  laplace.f.non_linear = feenox_depends_on_function(laplace.f.dependency_functions, feenox.pde.solution[0]);  
   
 ///pr_laplace+alpha+description The coefficient of the temporal derivative for the transient
 ///pr_laplace+alpha+description equation \ $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
@@ -97,13 +97,13 @@ int feenox_problem_init_runtime_laplace(void) {
     }
   }
 
-  laplace.alpha.non_uniform = feenox_expression_depends_on_space(laplace.alpha.dependency_variables);
-  laplace.alpha.non_linear  = feenox_expression_depends_on_function(laplace.alpha.dependency_functions,  feenox.pde.solution[0]);
+  laplace.alpha.non_uniform = feenox_depends_on_space(laplace.alpha.dependency_variables);
+  laplace.alpha.non_linear  = feenox_depends_on_function(laplace.alpha.dependency_functions,  feenox.pde.solution[0]);
   
   laplace.space_dependent_source = laplace.f.non_uniform;
   laplace.space_dependent_mass = laplace.alpha.non_uniform;
   
-  laplace.phi_dependent_mass = feenox_expression_depends_on_function(laplace.alpha.dependency_functions, feenox.pde.solution[0]);
+  laplace.phi_dependent_mass = feenox_depends_on_function(laplace.alpha.dependency_functions, feenox.pde.solution[0]);
   
   if (feenox.pde.math_type == math_type_automatic) {
     feenox.pde.math_type = (laplace.phi_dependent_mass   == 0 &&

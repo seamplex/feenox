@@ -139,10 +139,15 @@ double feenox_mesh_integral_function_general_cell(function_t *function, mesh_t *
 
   // location is cell but function is not cell
   double integral = 0;
+  double n[3] = {0, 0, 0};
+  int depends_on_normal = feenox_expression_depends_on_normal(&function->algebraic_expression);
 
   for (size_t i = 0; i < mesh->n_cells; i++) {
     element_t *e = mesh->cell[i].element;
     if (is_element_local(mesh, e) && is_physical_group_right(e, physical_group)) {
+      if (depends_on_normal) {
+        feenox_call(feenox_mesh_compute_outward_normal(e, n));
+      }  
       integral += feenox_function_eval(function, mesh->cell[i].x) * mesh->cell[i].element->type->volume(mesh->cell[i].element);
     }
   }
@@ -166,7 +171,6 @@ double feenox_mesh_integral_function_node_gauss(function_t *function, mesh_t *me
         for (unsigned int j = 0; j < e->type->nodes; j++) {
           xi += gsl_matrix_get(e->type->gauss[mesh->integration].H_c[q], 0, j) * feenox_vector_get(function->vector_value, e->node[j]->index_mesh);
         }
-
         integral += wdet * xi;
       }
     }
@@ -179,14 +183,18 @@ double feenox_mesh_integral_function_node_gauss(function_t *function, mesh_t *me
 double feenox_mesh_integral_function_general_gauss(function_t *function, mesh_t *mesh, physical_group_t *physical_group) {
 
   // general function
+  double n[3] = {0, 0, 0};
   double integral = 0;
-  
+  int depends_on_normal = feenox_expression_depends_on_normal(&function->algebraic_expression);
+
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *e = &mesh->element[i];
     if (is_element_local(mesh, e) && is_physical_group_right(e, physical_group)) {
       for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
-        // TODO: check if the integrand depends on space
         double *x = feenox_fem_compute_x_at_gauss(e, q, mesh->integration);
+        if (depends_on_normal) {
+          feenox_call(feenox_mesh_compute_outward_normal(e, n));
+        }  
         double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, mesh->integration);
         integral += wdet * feenox_function_eval(function, x);
       }  
@@ -215,40 +223,20 @@ double feenox_mesh_integral_expression_cell(expr_t *expr, mesh_t *mesh, physical
 double feenox_mesh_integral_expression_gauss(expr_t *expr, mesh_t *mesh, physical_group_t *physical_group) {
 
   double integral = 0;
+  double n[3] = {0,0,0};
+  
+  int depends_on_normal = feenox_expression_depends_on_normal(expr);
   
   // an expression evaluated at the gauss points
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *e = &mesh->element[i];
-/*    
-    int partition = e->geometrical_entity->partition[0];
-    int first = (mesh->n_nodes / mesh->n_partitions) * (partition-1);
-    int last = -1;
-    if (mesh->n_nodes % mesh->n_partitions > (partition-1)) {
-      first += (partition-1);
-      last = first + (mesh->n_nodes / mesh->n_partitions) + 1;
-    } else {  
-      first += mesh->n_nodes % mesh->n_partitions;
-      last = first + (mesh->n_nodes / mesh->n_partitions);
-    }      
-
-    printf("[%d] index = %ld tag = %ld partition = %d range = %d %d nodes = %ld %ld %ld\n", feenox.mpi_rank, e->index, e->tag, partition,
-        first, last,
-        e->type->nodes > 0 ? e->node[0]->index_mesh : -1,
-        e->type->nodes > 1 ? e->node[1]->index_mesh : -1,
-        e->type->nodes > 2 ? e->node[2]->index_mesh : -1);
- */
     if (is_element_local(mesh, e) && is_physical_group_right(e, physical_group)) {
       
       for (unsigned int q = 0; q < e->type->gauss[mesh->integration].Q; q++) {
-        // TODO: check if the integrand depends on space
         feenox_fem_compute_x_at_gauss_and_update_var(e, q, mesh->integration);
-        // si el elemento es de linea o de superficie calculamos la normal para tenerla en nx, ny y nz
-        // TODO: nx
-/*            
-        if (mesh->dim - element->type->dim == 1) {
-          feenox_call(mesh_compute_normal(element));
+        if (depends_on_normal) {
+          feenox_call(feenox_mesh_compute_outward_normal(e, n));
         }  
-*/
         integral += feenox_fem_compute_w_det_at_gauss_integration(e, q, mesh->integration) * feenox_expression_eval(expr);
       }
     }

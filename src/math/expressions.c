@@ -996,21 +996,42 @@ int feenox_pull_dependencies_functions(function_ll_t **to, function_ll_t *from) 
   return FEENOX_OK;
 }
 
-int feenox_expression_depends_on_space(var_ll_t *variables) {
-  int depends = 0;
+int feenox_depends_on_space(var_ll_t *variables) {
   var_ll_t *item = NULL;
   LL_FOREACH(variables, item) {
-    if (item->var != NULL) {
-      depends |= (item->var == feenox.mesh.vars.x) ||
-                 (item->var == feenox.mesh.vars.y) ||
-                 (item->var == feenox.mesh.vars.z);
+    if (item->var != NULL && ((item->var == feenox.mesh.vars.x) ||
+                              (item->var == feenox.mesh.vars.y) ||
+                              (item->var == feenox.mesh.vars.z))) {
+      return 1;
     }  
   }
       
-  return depends;
+  return 0;
 }
 
-int feenox_expression_depends_on_time(var_ll_t *variables) {
+int feenox_expression_depends_on_space(expr_t *expr) {
+  return feenox_depends_on_space(expr->variables);
+}
+
+
+int feenox_depends_on_normal(var_ll_t *variables) {
+  var_ll_t *item = NULL;
+  LL_FOREACH(variables, item) {
+    if (item->var != NULL && ((item->var == feenox.mesh.vars.nx) ||
+                              (item->var == feenox.mesh.vars.ny) ||
+                              (item->var == feenox.mesh.vars.nz))) {
+      return 1;
+    }  
+  }
+      
+  return 0;
+}
+
+int feenox_expression_depends_on_normal(expr_t *expr) {
+  return feenox_depends_on_normal(expr->variables);
+}
+
+int feenox_depends_on_time(var_ll_t *variables) {
   var_ll_t *item = NULL;
   LL_FOREACH(variables, item) {
     if (item->var != NULL && item->var == feenox.special_vars.t) {
@@ -1021,7 +1042,7 @@ int feenox_expression_depends_on_time(var_ll_t *variables) {
   return 0;
 }
 
-int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function) {
+int feenox_depends_on_function(function_ll_t *functions, function_t *function) {
   int depends = 0;
   function_ll_t *item = NULL;
   LL_FOREACH(functions, item) {

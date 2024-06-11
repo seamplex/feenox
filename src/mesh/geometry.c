@@ -107,7 +107,7 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
     
   } else if (element->type->dim == 1) {
 
-    // OJO que no camina con lineas que no estan en el plano xy!!
+    // WATCH out! this does not work with lines which do not lie on the xy plane!
     double module = feenox_mesh_subtract_module(element->node[1]->x, element->node[0]->x);
     n[0] = -(element->node[1]->x[1] - element->node[0]->x[1])/module;
     n[1] = +(element->node[1]->x[0] - element->node[0]->x[0])/module;
@@ -115,7 +115,6 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   
   } else if (element->type->dim == 2) {
     
-    // este algoritmo viene de sn_elements_compute_outward_normal
     feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
     feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
     feenox_mesh_normalized_cross(a, b, n);
@@ -126,56 +125,29 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   }
 
   
-  // ahora tenemos que ver si la normal que elegimos es efectivamente la outward
-  // para eso primero calculamos el centro del elemento de superficie
-  feenox_call(feenox_mesh_compute_element_barycenter(element, surface_center));
+  // if there's only one volumetric element, we check if n is the outward normal
+  // if there's none (or more than one) then we rely on the element orientation
+  if (feenox_mesh_count_element_volumetric_neighbors(element) == 1) {
+    // first compute the center of the surface element
+    feenox_call(feenox_mesh_compute_element_barycenter(element, surface_center));
 
-  // y despues el centro del elemento de volumen
-  if ((volumetric_neighbor = feenox_mesh_find_element_volumetric_neighbor(element)) == NULL) {
-    feenox_push_error_message("cannot find any volumetric neighbor for surface element %d", element->tag);
-    return FEENOX_ERROR;
-  }
-    
-  volumetric_neighbor = feenox_mesh_find_element_volumetric_neighbor(element);
-  feenox_call(feenox_mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
+    // then the center of the volume element
+    volumetric_neighbor = feenox_mesh_find_element_volumetric_neighbor(element);
+    feenox_call(feenox_mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
 
-  // calculamos el producto entre la normal propuesta y la resta de estos dos vectores
-  // si elegimos la otra direccion, la damos tavuel
-  if (feenox_mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
-    n[0] = -n[0];
-    n[1] = -n[1];
-    n[2] = -n[2];
-  }    
-          
-  return FEENOX_OK;
-}
-
-/*
-int mesh_compute_outward_normal(element_t *element, double *n) {
-    // viene de sn_elements_compute_outward_normal
-    // calculamos el vector normal para las variables nx ny y nx
-    mesh_subtract(element->node[0]->x, element->node[1]->x, a);
-    mesh_subtract(element->node[0]->x, element->node[2]->x, b);
-    mesh_normalized_cross(a, b, n);
-    
-    // ahora tenemos que ver si la normal que elegimos es efectivamente la outward
-    // para eso primero calculamos el centro del elemento de superficie
-    feenox_call(mesh_compute_element_barycenter(element, surface_center));
-
-    // y despues el centro del elemento de volumen
-    if ((volumetric_neighbor = mesh_find_element_volumetric_neighbor(element)) == NULL) {
-      feenox_push_error_message("cannot find any volumetric neighbor for surface element %d", element->id);
-      PetscFunctionReturn(FEENOX_ERROR);
-    }
-    
-    volumetric_neighbor = mesh_find_element_volumetric_neighbor(element);
-    feenox_call(mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
-
-    // calculamos el producto entre la normal propuesta y la resta de estos dos vectores
-    // si elegimos la otra direccion, la damos tavuel
-    if (mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
+    // compute the product between the proposed normal and the difference between these two
+    // if the product is positve, invert the normal
+    if (feenox_mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
       n[0] = -n[0];
       n[1] = -n[1];
       n[2] = -n[2];
-    }    
-*/
+    }
+  }
+  
+  // update nx ny and nz
+  feenox_var_value(feenox.mesh.vars.arr_n[0]) = n[0];
+  feenox_var_value(feenox.mesh.vars.arr_n[1]) = n[1];
+  feenox_var_value(feenox.mesh.vars.arr_n[2]) = n[2];
+     
+  return FEENOX_OK;
+}

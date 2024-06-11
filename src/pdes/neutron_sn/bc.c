@@ -44,8 +44,8 @@ int feenox_problem_bc_parse_neutron_sn(bc_data_t *bc_data, const char *lhs, char
     return FEENOX_ERROR;
   }
   
-  bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
-  bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
+  bc_data->space_dependent = feenox_depends_on_space(bc_data->expr.variables);
+  bc_data->nonlinear = feenox_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
 
   if (bc_data->nonlinear && bc_data->type_math == bc_type_math_dirichlet) {
     feenox_push_error_message("essential boundary condition '%s' cannot depend on phi", rhs);

@@ -42,15 +42,12 @@ int mesh_count_common_nodes(element_t *e1, element_t *e2, int *nodes) {
 }
 
 element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
-  int j;
-  int target;
-  element_ll_t *element_item;
 
   // en mallas de primer orden esto sirve para mezclar elementos raros
   // en segundo hay que hacerlo completo
-  target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
-
-  for (j = 0; j < this->type->nodes; j++) {
+  int target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
+  element_ll_t *element_item = NULL;
+  for (unsigned int j = 0; j < this->type->nodes; j++) {
     LL_FOREACH(this->node[j]->element_list, element_item) {
       if (this->type->dim == (element_item->element->type->dim-1)) {  // los vecinos volumetricos
         if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
@@ -62,6 +59,27 @@ element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
   
   return NULL;
 }
+
+int feenox_mesh_count_element_volumetric_neighbors(element_t *this) {
+
+  // en mallas de primer orden esto sirve para mezclar elementos raros
+  // en segundo hay que hacerlo completo
+  int target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
+  element_ll_t *element_item = NULL;
+  int n = 0;
+  for (unsigned int j = 0; j < this->type->nodes; j++) {
+    LL_FOREACH(this->node[j]->element_list, element_item) {
+      if (this->type->dim == (element_item->element->type->dim-1)) {  // los vecinos volumetricos
+        if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
+          n++;
+        }
+      }
+    }
+  }
+  
+  return n;
+}
+
 
 element_t *mesh_find_node_neighbor_of_dim(node_t *node, int dim) {
   int j;

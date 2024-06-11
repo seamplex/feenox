@@ -2332,6 +2332,7 @@ extern int feenox_mesh_write_data_vtk(mesh_write_t *, mesh_write_dist_t *dist);
 
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *);
+extern int feenox_mesh_count_element_volumetric_neighbors(element_t *this);
 
 
 // init.c
@@ -2465,9 +2466,14 @@ extern double feenox_distribution_eval_variable_local(distribution_t *, const do
 extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function);
 extern int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function);
 
-extern int feenox_expression_depends_on_space(var_ll_t *variables);
-extern int feenox_expression_depends_on_time(var_ll_t *variables);
-extern int feenox_expression_depends_on_function(function_ll_t *functions, function_t *function);
+extern int feenox_depends_on_space(var_ll_t *variables);
+extern int feenox_depends_on_normal(var_ll_t *variables);
+extern int feenox_depends_on_time(var_ll_t *variables);
+extern int feenox_depends_on_function(function_ll_t *functions, function_t *function);
+
+extern int feenox_expression_depends_on_space(expr_t *expr);
+extern int feenox_expression_depends_on_normal(expr_t *expr);
+
 
 // build.c
 extern int feenox_problem_build(void);

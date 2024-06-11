@@ -395,14 +395,14 @@ int feenox_problem_init_runtime_neutron_sn(void) {
     feenox_check_minusone(asprintf(&name, "Sigma_t%d", g+1));
     feenox_distribution_init(&neutron_sn.Sigma_t[g], name);
     if (neutron_sn.Sigma_t[g].defined) {
-      neutron_sn.Sigma_t[g].non_uniform = feenox_expression_depends_on_space(neutron_sn.Sigma_t[g].dependency_variables);
+      neutron_sn.Sigma_t[g].non_uniform = feenox_depends_on_space(neutron_sn.Sigma_t[g].dependency_variables);
     }
     feenox_free(name);
     
     feenox_check_minusone(asprintf(&name, "Sigma_a%d", g+1));
     feenox_distribution_init(&neutron_sn.Sigma_a[g], name);
     if (neutron_sn.Sigma_a[g].defined) {
-      neutron_sn.Sigma_a[g].non_uniform = feenox_expression_depends_on_space(neutron_sn.Sigma_a[g].dependency_variables);
+      neutron_sn.Sigma_a[g].non_uniform = feenox_depends_on_space(neutron_sn.Sigma_a[g].dependency_variables);
     }  
     feenox_free(name);
 
@@ -410,7 +410,7 @@ int feenox_problem_init_runtime_neutron_sn(void) {
     feenox_distribution_init(&neutron_sn.nu_Sigma_f[g], name);
     if (neutron_sn.nu_Sigma_f[g].defined) {
       neutron_sn.has_fission = 1;
-      neutron_sn.nu_Sigma_f[g].non_uniform = feenox_expression_depends_on_space(neutron_sn.nu_Sigma_f[g].dependency_variables);
+      neutron_sn.nu_Sigma_f[g].non_uniform = feenox_depends_on_space(neutron_sn.nu_Sigma_f[g].dependency_variables);
     }  
     feenox_free(name);
 
@@ -418,7 +418,7 @@ int feenox_problem_init_runtime_neutron_sn(void) {
     feenox_distribution_init(&neutron_sn.S[g], name);
     if (neutron_sn.S[g].defined) {
       neutron_sn.has_sources = 1;
-      neutron_sn.S[g].non_uniform = feenox_expression_depends_on_space(neutron_sn.S[g].dependency_variables);
+      neutron_sn.S[g].non_uniform = feenox_depends_on_space(neutron_sn.S[g].dependency_variables);
     }  
     feenox_free(name);
     
@@ -428,14 +428,14 @@ int feenox_problem_init_runtime_neutron_sn(void) {
       feenox_check_minusone(asprintf(&name, "Sigma_s%d.%d", g+1, g_prime+1));
       feenox_distribution_init(&neutron_sn.Sigma_s0[g][g_prime], name);
       if (neutron_sn.Sigma_s0[g][g_prime].defined) {
-        neutron_sn.Sigma_s0[g][g_prime].non_uniform = feenox_expression_depends_on_space(neutron_sn.Sigma_s0[g][g_prime].dependency_variables);
+        neutron_sn.Sigma_s0[g][g_prime].non_uniform = feenox_depends_on_space(neutron_sn.Sigma_s0[g][g_prime].dependency_variables);
       }  
       feenox_free(name);
       
       feenox_check_minusone(asprintf(&name, "Sigma_s_one%d.%d", g+1, g_prime+1));
       feenox_distribution_init(&neutron_sn.Sigma_s1[g][g_prime], name);
       if (neutron_sn.Sigma_s1[g][g_prime].defined) {
-        neutron_sn.Sigma_s1[g][g_prime].non_uniform = feenox_expression_depends_on_space(neutron_sn.Sigma_s1[g][g_prime].dependency_variables);
+        neutron_sn.Sigma_s1[g][g_prime].non_uniform = feenox_depends_on_space(neutron_sn.Sigma_s1[g][g_prime].dependency_variables);
       }  
       feenox_free(name);
       

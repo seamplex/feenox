@@ -37,7 +37,10 @@ IF done_static
 
   # Circulation on the circumference:
   INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ
-  PRINT "circ: " circ
+  PRINT "circt: " circ
+
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER circle RESULT circ
+  PRINT "circn: " circ
   
   INTEGRATE -vx(x,y) OVER top    GAUSS RESULT inttop
   INTEGRATE +vx(x,y) OVER bottom GAUSS RESULT intbottom

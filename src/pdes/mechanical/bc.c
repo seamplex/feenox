@@ -133,12 +133,12 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
     feenox_call(feenox_expression_parse(&bc_data->expr, rhs));
   }
   
-  bc_data->space_dependent = feenox_expression_depends_on_space(bc_data->expr.variables);
-  bc_data->nonlinear = feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
+  bc_data->space_dependent = feenox_depends_on_space(bc_data->expr.variables);
+  bc_data->nonlinear = feenox_depends_on_function(bc_data->expr.functions, feenox.pde.solution[0]);
   if (feenox.pde.dofs > 1) {
-    bc_data->nonlinear |= feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[1]);
+    bc_data->nonlinear |= feenox_depends_on_function(bc_data->expr.functions, feenox.pde.solution[1]);
     if (feenox.pde.dofs > 2) {
-      bc_data->nonlinear |= feenox_expression_depends_on_function(bc_data->expr.functions, feenox.pde.solution[2]);
+      bc_data->nonlinear |= feenox_depends_on_function(bc_data->expr.functions, feenox.pde.solution[2]);
     }
   }
 
@@ -193,9 +193,6 @@ int feenox_problem_bc_set_mechanical_symmetry(bc_data_t *this, element_t *e, siz
       normal[2] += n_element[2];
     }
   }
-
-//    feenox_call(feenox_mesh_compute_outward_normal(element, normal));
-
 
   int coordinate_direction = -1;
   double norm = gsl_hypot3(normal[0], normal[1], normal[2]);
