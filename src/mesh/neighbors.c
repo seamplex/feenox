@@ -62,16 +62,29 @@ element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
 
 int feenox_mesh_count_element_volumetric_neighbors(element_t *this) {
 
+  size_t tags[this->type->faces];
+  for (unsigned int k = 0; k < this->type->faces; k++) {
+    tags[k] = 0;
+  }
+  
   // en mallas de primer orden esto sirve para mezclar elementos raros
   // en segundo hay que hacerlo completo
   int target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
   element_ll_t *element_item = NULL;
+  unsigned int index = 0;
   int n = 0;
   for (unsigned int j = 0; j < this->type->nodes; j++) {
     LL_FOREACH(this->node[j]->element_list, element_item) {
       if (this->type->dim == (element_item->element->type->dim-1)) {  // los vecinos volumetricos
         if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
-          n++;
+          int exists = 0;
+          for (unsigned int k = 0; exists == 0 && k < index; k++) {
+            exists |= element_item->element->tag == tags[k];
+          }
+          if (exists == 0) {
+            tags[index++] = element_item->element->tag;
+            n++;
+          }
         }
       }
     }

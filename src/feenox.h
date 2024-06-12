@@ -1029,7 +1029,7 @@ struct element_type_t {
   unsigned int order;
   unsigned int nodes;           // total, i.e. 10 for tet10
   unsigned int vertices;        // the corner nodes, i.e 4 for tet10
-  unsigned int faces;           // facess == number of neighbors
+  unsigned int faces;           // faces == number of neighbors
   unsigned int nodes_per_face;  // (max) number of nodes per face
 
   double *barycenter_coords;
