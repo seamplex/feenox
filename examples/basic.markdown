@@ -519,9 +519,9 @@ initial temperature $T_0$ up to $T$ so that $\epsilon(T_0)=0$.
 
 <figure id="fig:table-asme-expansion">
 <img src="asme-expansion-table.png"
-alt="Table TE2 of thermal expansion properties for Aluminum alloys from ASME II Part D (figure from this report." />
-<figcaption>Figure 1: Table TE2 of thermal expansion properties for
-Aluminum alloys from ASME II Part D (figure from <a
+alt="Figure 1: Table TE2 of thermal expansion properties for Aluminum alloys from ASME II Part D (figure from this report." />
+<figcaption aria-hidden="true">Figure 1: Table TE2 of thermal expansion
+properties for Aluminum alloys from ASME II Part D (figure from <a
 href="https://www.ramsay-maunder.co.uk/knowledge-base/technical-notes/asmeansys-potential-issue-with-thermal-expansion-calculations/">this
 report</a>.</figcaption>
 </figure>

@@ -19,8 +19,8 @@ to the base A frequency at 440 Hz.
 
 <figure id="fig:fork-meshed">
 <img src="fork-meshed.svg" style="width:20.0%"
-alt="What length \ell_1 is needed so the fork vibrates at 440 Hz?" />
-<figcaption>Figure 1: What length <span
+alt="Figure 1: What length \ell_1 is needed so the fork vibrates at 440 Hz?" />
+<figcaption aria-hidden="true">Figure 1: What length <span
 class="math inline">ℓ<sub>1</sub></span> is needed so the fork vibrates
 at 440 Hz?</figcaption>
 </figure>
@@ -109,8 +109,8 @@ $
 
 <figure id="fig:fork">
 <img src="fork.svg"
-alt="Estimated length \ell_1 needed to get 440 Hz for different mesh refinement levels n" />
-<figcaption>Figure 2: Estimated length <span
+alt="Figure 2: Estimated length \ell_1 needed to get 440 Hz for different mesh refinement levels n" />
+<figcaption aria-hidden="true">Figure 2: Estimated length <span
 class="math inline">ℓ<sub>1</sub></span> needed to get 440 Hz for
 different mesh refinement levels <span
 class="math inline"><em>n</em></span></figcaption>

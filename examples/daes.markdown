@@ -102,8 +102,9 @@ in fig. 2.
 
 <figure id="fig:double-pendulum">
 <img src="double.svg" style="width:60.0%"
-alt="A chaotic double pendulum" />
-<figcaption>Figure 2: A chaotic double pendulum</figcaption>
+alt="Figure 2: A chaotic double pendulum" />
+<figcaption aria-hidden="true">Figure 2: A chaotic double
+pendulum</figcaption>
 </figure>
 
 Use these four different approaches:

@@ -392,8 +392,8 @@ $$
 
 <figure id="fig:parallelepiped">
 <img src="parallelepiped.svg"
-alt="Original figure from v7.03.100.pdf" />
-<figcaption>Figure 4: Original figure from <a
+alt="Figure 4: Original figure from v7.03.100.pdf" />
+<figcaption aria-hidden="true">Figure 4: Original figure from <a
 href="http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf">v7.03.100.pdf</a></figcaption>
 </figure>
 

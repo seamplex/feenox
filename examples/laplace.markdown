@@ -231,9 +231,6 @@ BC top     phi=1
 DEFAULT_ARGUMENT_VALUE 1 0.5
 IF in_static_first
  c = $1
- c_last = c
- e = 1
- e_last = e
 ENDIF
 BC wing    phi=c
 

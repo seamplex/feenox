@@ -107,20 +107,23 @@ conditions are shown in figs. 1-3.
 
 <figure id="fig:iaea-3dpwr-fig1">
 <img src="iaea-3dpwr-fig1.png"
-alt="The IAEA 3D PWR Benchmark, fig. 1" />
-<figcaption>Figure 1: The IAEA 3D PWR Benchmark, fig. 1</figcaption>
+alt="Figure 1: The IAEA 3D PWR Benchmark, fig. 1" />
+<figcaption aria-hidden="true">Figure 1: The IAEA 3D PWR Benchmark,
+fig. 1</figcaption>
 </figure>
 
 <figure id="fig:iaea-3dpwr-fig2">
 <img src="iaea-3dpwr-fig2.png"
-alt="The IAEA 3D PWR Benchmark, fig. 2" />
-<figcaption>Figure 2: The IAEA 3D PWR Benchmark, fig. 2</figcaption>
+alt="Figure 2: The IAEA 3D PWR Benchmark, fig. 2" />
+<figcaption aria-hidden="true">Figure 2: The IAEA 3D PWR Benchmark,
+fig. 2</figcaption>
 </figure>
 
 <figure id="fig:iaea-3dpwr-fig3">
 <img src="iaea-3dpwr-fig3.png"
-alt="The IAEA 3D PWR Benchmark, fig. 3" />
-<figcaption>Figure 3: The IAEA 3D PWR Benchmark, fig. 3</figcaption>
+alt="Figure 3: The IAEA 3D PWR Benchmark, fig. 3" />
+<figcaption aria-hidden="true">Figure 3: The IAEA 3D PWR Benchmark,
+fig. 3</figcaption>
 </figure>
 
 The FeenoX approach consists of modeling both the original
@@ -132,16 +135,16 @@ FeenoX to solve the multi-group neutron diffusion equation (figs. 6, 7)
 
 <figure id="fig:iaea-3dpwr-quarter-onshape">
 <img src="iaea-3dpwr-quarter-onshape.png"
-alt="IAEA 3D PWR one-quarter CAD in Onshape (“fuel 2” is hidden)" />
-<figcaption>Figure 4: IAEA 3D PWR one-quarter CAD in Onshape (“fuel 2”
-is hidden)</figcaption>
+alt="Figure 4: IAEA 3D PWR one-quarter CAD in Onshape (“fuel 2” is hidden)" />
+<figcaption aria-hidden="true">Figure 4: IAEA 3D PWR one-quarter CAD in
+Onshape (“fuel 2” is hidden)</figcaption>
 </figure>
 
 <figure id="fig:iaea-3dpwr-eighth-onshape">
 <img src="iaea-3dpwr-eighth-onshape.png"
-alt="IAEA 3D PWR one-eighth CAD in Onshape (“fuel 2” is hidden)" />
-<figcaption>Figure 5: IAEA 3D PWR one-eighth CAD in Onshape (“fuel 2” is
-hidden)</figcaption>
+alt="Figure 5: IAEA 3D PWR one-eighth CAD in Onshape (“fuel 2” is hidden)" />
+<figcaption aria-hidden="true">Figure 5: IAEA 3D PWR one-eighth CAD in
+Onshape (“fuel 2” is hidden)</figcaption>
 </figure>
 
 <figure id="fig:iaea-3d-quarter-mesh" class="subfigures">
