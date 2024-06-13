@@ -10,7 +10,7 @@ a = 20
 b = 10
 
 # characteristic element sizes
-lc0 = 1       # near the boundary
+lc0 = 0.6      # near the boundary
 lc = 0.1*lc0    # near the wing
 
 # number of points of definition
@@ -123,8 +123,12 @@ gmsh.write("wing.xao")
 
 # mesh
 gmsh.option.setNumber("Mesh.RecombineAll", 1)
-gmsh.option.setNumber("Mesh.Algorithm", 8)
-gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 2*math.pi * 0.5*r_circle/lc)
+gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 2*math.pi * 0.25 * r_circle/lc)
+gmsh.option.setNumber("Mesh.Algorithm", 6)
+gmsh.model.mesh.setAlgorithm(2, 1, 8);
+gmsh.model.mesh.setAlgorithm(2, 2, 6);
+gmsh.option.setNumber("Mesh.Smoothing", 10)
+
 gmsh.model.mesh.generate(2)
 gmsh.model.mesh.optimize("Netgen")
 gmsh.model.mesh.optimize("Laplace2D")

@@ -20,7 +20,7 @@ SOLVE_PROBLEM
 
 PHYSICAL_GROUP kutta DIM 0
 e = phi(kutta_cog[1], kutta_cog[2]) - c
-PRINT step_static c e
+PRINT step_static %.6f c %+.1e e
 
 # check for convergence
 done_static = done_static | (abs(e) < 1e-8)
@@ -58,9 +58,9 @@ ELSE
  IF in_static_first
   c_last = c
   e_last = e
-  c = c_last - 0.01
+  c = c_last - 0.1
  ELSE
-  c_next = c_last-e_last/(e_last-e)*(c_last-c) # c-10*error
+  c_next = c_last - e_last * (c_last-c)/(e_last-e)
   c_last = c
   e_last = e
   c = c_next
