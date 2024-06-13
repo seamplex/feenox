@@ -1,3 +1,38 @@
+---
+category: laplace
+intro: |
+  # Potential flow around a wing profile
+ 
+  The Laplace equation can be used to model potential flow.
+  For the particular case of a wing profile, the Dirichlet condition at the wing has to satisfy the Kutta condition.
+  
+  This example
+ 
+   1. Creates a symmetric wing-like Joukowsky profile using the the Gmsh Python API.
+   2. Solves the steady-state 2D Laplace equation with a different Dirichlet value at the wing until the solution $\phi$ evaluated at the continuation of the wing tip matches the boundary value $c$. It then computes the circulation integral of the velocities 
+       a. over a circle around the wing profile, computing the unitary tangential vector
+          i. from the internal normal variables `nx` and `ny`
+          ii. from two functions `tx` and `ty` using the circle's equation
+       b. around the original rectangular domain 
+   
+  ![Full domain](wing-msh1.png){width=100%}
+  
+  ![Zoom over the wing profile](wing-msh2.png){width=100%}
+  
+terminal: | 
+  $ python wing.py
+  [...]
+  Info    : Writing 'wing.msh'...
+  Info    : Done writing 'wing.msh'
+  $ $ feenox wing.fee 
+  1       0.500000        -3.4e-03
+  2       0.400000        +3.7e-03
+  3       0.452068        +5.5e-10
+  circt:  -2.49946
+  circn:  -2.49878
+  box:    -2.50177
+  $ 
+...
 PROBLEM laplace 2D
 static_steps = 20
 READ_MESH wing.msh
@@ -66,3 +101,9 @@ ELSE
   c = c_next
  ENDIF
 ENDIF
+---
+figures: |
+  ![Potential and velocities on the whole domain](wing-converged1.png){width=100%}
+
+  ![Potential and velocities zoomed over the wing](wing-converged2.png){width=100%}
+...

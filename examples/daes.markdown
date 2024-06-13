@@ -1,20 +1,19 @@
 # Ordinary Differential Equations & Differential-Algebraic Equations
 
 - [<span class="toc-section-number">1</span> Lorenz’ attractor—the one
-  with the butterfly][]
-- [<span class="toc-section-number">2</span> The double pendulum][]
-- [<span class="toc-section-number">3</span> Vertical boiling channel][]
+  with the butterfly]
+- [<span class="toc-section-number">2</span> The double pendulum]
+- [<span class="toc-section-number">3</span> Vertical boiling channel]
   - [<span class="toc-section-number">3.1</span> Original Clausse-Lahey
-    formulation with uniform power distribution][]
+    formulation with uniform power distribution]
   - [<span class="toc-section-number">3.2</span> Arbitrary power
-    distribution][]
-- [<span class="toc-section-number">4</span> Reactor point kinetics][]
+    distribution]
+- [<span class="toc-section-number">4</span> Reactor point kinetics]
   - [<span class="toc-section-number">4.1</span> Cinética puntual
-    directa con reactividad vs. tiempo][]
-  - [<span class="toc-section-number">4.2</span> Cinética inversa][]
+    directa con reactividad vs. tiempo]
+  - [<span class="toc-section-number">4.2</span> Cinética inversa]
   - [<span class="toc-section-number">4.3</span> Control de
-    inestabilidades de xenón][]
-  - [<span class="toc-section-number">4.4</span> Mapas de diseño][]
+    inestabilidades de xenón]
 
   [<span class="toc-section-number">1</span> Lorenz’ attractor—the one with the butterfly]:
     #lorenz-attractorthe-one-with-the-butterfly
@@ -30,7 +29,6 @@
   [<span class="toc-section-number">4.2</span> Cinética inversa]: #cinética-inversa
   [<span class="toc-section-number">4.3</span> Control de inestabilidades de xenón]:
     #control-de-inestabilidades-de-xenón
-  [<span class="toc-section-number">4.4</span> Mapas de diseño]: #mapas-de-diseño
 
 # Lorenz’ attractor—the one with the butterfly
 
@@ -56,7 +54,7 @@ $$
 
 and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
-seminal 1963 paper [Deterministic non-periodic flow][]. This example’s
+seminal 1963 paper [Deterministic non-periodic flow]. This example’s
 input file ressembles the parameters, inital conditions and differential
 equations of the problem as naturally as possible with an ASCII file.
 
@@ -322,12 +320,12 @@ analytical</p></figcaption>
 Implementation of the dynamical system as described in
 
 - [The Moving Boiling-Boundary Model Of A Vertical Two-Phase Flow
-  Channel Revisited][], by Jeremy Theler, Alejandro Clausse and
-  Fabián J. Bonetto (2010).
+  Channel Revisited], by Jeremy Theler, Alejandro Clausse and Fabián J.
+  Bonetto (2010).
 
 > The original paper was written using the **first** version of the
 > code, named mochin.  
-> Recall that FeenoX is a [third system effect][].
+> Recall that FeenoX is a [third system effect].
 
 <figure>
 <img src="boiling-2010-figure.png" alt="Figure from the paper above." />
@@ -374,8 +372,8 @@ When run, FeenoX…
     2.  the non-dimesinoal location of the boiling interface $\lambda$
     3.  the non-dimensional inlet velocity $u_i$
 
-The input file [`boiling-2010.fee`][] contains the original
-Clausse-Lahey formulation without the intermediate variable $\eta$.
+The input file [`boiling-2010.fee`] contains the original Clausse-Lahey
+formulation without the intermediate variable $\eta$.
 
 ``` feenox
 ##############################
@@ -581,7 +579,7 @@ green shows a limit cycle.</figcaption>
 
   [The Moving Boiling-Boundary Model Of A Vertical Two-Phase Flow Channel Revisited]:
     http://www.cimec.org.ar/ojs/index.php/mc/article/view/3277/3200
-  [third system effect]: ../doc/sds.md#sec:architecture
+  [third system effect]: .doc/sds.markdown#sec:architecture
   [`boiling-2010.fee`]: boiling-2010.fee
 
 ## Arbitrary power distribution
@@ -590,12 +588,12 @@ Extension of the Clausse-Lahey model to support arbitrary (and
 potentially time-dependent) power profiles as explained in
 
 - [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase
-  Flow Loop][], by Jeremy Theler, Alejandro Clausse and Fabián J.
-  Bonetto (2012).
+  Flow Loop], by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto
+  (2012).
 
 > The original paper was written using the **second** version of the
 > code, named wasora.  
-> Recall that FeenoX is a [third system effect][].
+> Recall that FeenoX is a [third system effect].
 
 <figure>
 <img src="boiling-2012-figure.png" alt="Figure from the paper above." />
@@ -880,7 +878,7 @@ class="math inline">Eu = 9.725</span>.</figcaption>
 
   [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase Flow Loop]:
     https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017
-  [third system effect]: ../doc/sds.md#sec:architecture
+  [third system effect]: .doc/sds.markdown#sec:architecture
 
 # Reactor point kinetics
 
@@ -889,12 +887,6 @@ aplicadas a las ecuaciones de cinética puntual de reactores. Todos los
 casos usan los siguientes parámetros cinéticos:
 
 ``` feenox
-nprec = 6    # seis grupos de precursores
-VECTOR c[nprec]
-VECTOR lambda[nprec] DATA 0.0124   0.0305   0.111    0.301    1.14     3.01
-VECTOR beta[nprec]   DATA 0.000215 0.001424 0.001274 0.002568 0.000748 0.000273
-Beta = vecsum(beta)
-Lambda = 40e-6
 ```
 
 ## Cinética puntual directa con reactividad vs. tiempo
@@ -1009,13 +1001,13 @@ $ feenox inverse-dae.fee
 <figure id="fig-inverse1">
 <img src="inverse.svg" alt="t \in [0,100]" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>t</em> ∈ [0,100]</span></figcaption>
+class="math inline"><em>t</em> ∈ [0, 100]</span></figcaption>
 </figure>
 
 <figure id="fig-inverse2">
 <img src="inverse-zoom.svg" alt="t \in [9.75,10.25]" />
 <figcaption aria-hidden="true"><span
-class="math inline"><em>t</em> ∈ [9.75,10.25]</span></figcaption>
+class="math inline"><em>t</em> ∈ [9.75, 10.25]</span></figcaption>
 </figure>
 
 Reactividad calculada mediante cinética inversa de dos maneras
@@ -1107,105 +1099,3 @@ alt="Flujo y posición de la barra de control en un caso con xenón bajo control
 <figcaption aria-hidden="true">Flujo y posición de la barra de control
 en un caso con xenón bajo control</figcaption>
 </figure>
-
-## Mapas de diseño
-
-Finalizamos recuperando unos resultados derivados de mi tesis de
-maestría <https://doi.org/10.1016/j.nucengdes.2010.03.007>. Consiste en
-cinética puntual de un reactor de investigación con retroalimentación
-termohidráulica por temperatura del refrigerante y del combustible
-escrita como modelos de capacitancia concentrada[^1] cero-dimensionales.
-El estudio consiste en barrer paramétricamente el espacio de
-coeficientes de reactividad $[\alpha_c, \alpha_f]$, perturbar el estado
-del sistema dinámico ($\Delta T_f = 2~\text{ºC}$) y marcar con un color
-la potencia luego de un minuto para obtener mapas de estabilidad tipo
-Lyapunov.
-
-Para barrer el espacio de parámetros usamos series de números
-cuasi-aleatorios de forma tal de poder realizar ejecuciones sucesivas
-que van llenando densamente dicho espacio:
-
-``` bash
-for i in $(seq $1 $2); do  feenox point.fee $i | tee -a point.dat; done
-```
-
-``` feenox
-nprec = 6    # six precursor groups
-VECTOR c[nprec]
-VECTOR lambda[nprec] DATA 1.2400E-02 3.0500E-02 1.1100E-01 3.0100E-01 1.1400E+00 3.0100E+00 
-VECTOR beta[nprec]   DATA 2.4090e-04 1.5987E-03 1.4308E-03 2.8835E-03 8.3950E-04 3.0660E-04
-Beta = vecsum(beta)
-Lambda = 1.76e-4
-
-IF in_static
- alpha_T_fuel = 100e-5*(qrng2d_reversehalton(1,$1)-0.5)
- alpha_T_cool = 100e-5*(qrng2d_reversehalton(2,$1)-0.5)
-
- Delta_T_cool = 2
- Delta_T_fuel = 0
-
- P_star = 18.8e6       # watts
- T_in = 37             # grados C 
- hA_core = 1.17e6      # watt/grado
- mc_fuel = 47.7e3      # joule/grado
- mc_cool = 147e3       # joule/grado
- mflow_cool = 520      # kg/seg
- c_cool = 4.18e3 * 147e3/mc_cool       # joule/kg
-ENDIF
-
-PHASE_SPACE phi c T_cool T_fuel rho
-end_time = 60
-dae_rtol = 1e-7
-
-rho_0 = 0
-phi_0 = 1
-c_0[i] = phi_0 * beta(i)/(Lambda*lambda(i))
-
-T_cool_star = 1/(2*mflow_cool*c_cool) * (P_star+2*mflow_cool*c_cool*T_in)
-T_fuel_star = 1/(hA_core) * (P_star + hA_core*T_cool_star)
-
-T_cool_0 = T_cool_star + Delta_T_cool
-T_fuel_0 = T_fuel_star + Delta_T_fuel
-INITIAL_CONDITIONS_MODE FROM_VARIABLES
-
-rho = 0
-phi_dot = (rho + alpha_T_fuel*(T_fuel-T_fuel_star) + alpha_T_cool*(T_cool-T_cool_star) - Beta)/Lambda * phi + vecdot(lambda, c)
-c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
-T_fuel_dot = (1.0/(mc_fuel))*(P_star*phi - hA_core*(T_fuel-T_cool))
-T_cool_dot = (1.0/(mc_cool))*(hA_core*(T_fuel-T_cool) - 2*mflow_cool*c_cool*(T_cool-T_in))
-
-done = done | (phi > 4)
-
-IF done
- PRINT alpha_T_fuel alpha_T_cool phi
-ENDIF
-```
-
-``` terminal
-$ ./point.sh 0 2048
-$ ./point.sh 2048 4096
-$
-```
-
-<div id="fig-map">
-
-<figure>
-<img src="map.svg"
-alt="Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van “rellenando” incremental y densamente el espacio de parámetros." />
-<figcaption aria-hidden="true">Estabilidad de Lyapunov utilizando series
-de números pseudo-aleatorios que van “rellenando” incremental y
-densamente el espacio de parámetros.</figcaption>
-</figure>
-
-<figure>
-<img src="figs-ned.png" alt="Figuras originales de la referencia" />
-<figcaption aria-hidden="true">Figuras originales de la
-referencia</figcaption>
-</figure>
-
-Mapas de estabilidad de cinética puntual con realimentación
-termohidráulica
-
-</div>
-
-[^1]: Del inglés <span lang="en-US">*lumped capacitance*</span>.

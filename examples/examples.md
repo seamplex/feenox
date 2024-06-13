@@ -9,7 +9,7 @@
     function](https://seamplex.com/feenox/examples/basic.html#using-the-closed-form-formula-as-a-function)
     - [Using a vector](https://seamplex.com/feenox/examples/basic.html#using-a-vector)
     - [Solving an iterative problem](https://seamplex.com/feenox/examples/basic.html#solving-an-iterative-problem)
-  - [Computing the derivative of a function as a UNIX
+  - [Computing the derivative of a function as a Unix
   filter](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter)
   - [On the evaluation of thermal expansion
   coefficients](https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients)
@@ -27,11 +27,12 @@
     - [Cinética inversa](https://seamplex.com/feenox/examples/daes.html#cinética-inversa)
     - [Control de inestabilidades de
     xenón](https://seamplex.com/feenox/examples/daes.html#control-de-inestabilidades-de-xenón)
-    - [Mapas de diseño](https://seamplex.com/feenox/examples/daes.html#mapas-de-diseño)
 - Laplace’s equation
   - [How to solve a maze without AI](https://seamplex.com/feenox/examples/laplace.html#how-to-solve-a-maze-without-ai)
     - [Transient top-down](https://seamplex.com/feenox/examples/laplace.html#transient-top-down)
     - [Transient bottom-up](https://seamplex.com/feenox/examples/laplace.html#transient-bottom-up)
+  - [Potential flow around a wing
+  profile](https://seamplex.com/feenox/examples/laplace.html#potential-flow-around-a-wing-profile)
 - Heat conduction
   - [Thermal slabs](https://seamplex.com/feenox/examples/thermal.html#thermal-slabs)
     - [One-dimensional linear](https://seamplex.com/feenox/examples/thermal.html#one-dimensional-linear)

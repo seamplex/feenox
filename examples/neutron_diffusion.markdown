@@ -1,11 +1,11 @@
 # Neutron diffusion
 
-- [<span class="toc-section-number">1</span> IAEA 2D PWR Benchmark][]
-- [<span class="toc-section-number">2</span> IAEA 3D PWR Benchmark][]
+- [<span class="toc-section-number">1</span> IAEA 2D PWR Benchmark]
+- [<span class="toc-section-number">2</span> IAEA 3D PWR Benchmark]
 - [<span class="toc-section-number">3</span> Cube-spherical bare
-  reactor][]
+  reactor]
 - [<span class="toc-section-number">4</span> Illustration of the XS
-  dilution & smearing effect][]
+  dilution & smearing effect]
 
   [<span class="toc-section-number">1</span> IAEA 2D PWR Benchmark]: #iaea-2d-pwr-benchmark
   [<span class="toc-section-number">2</span> IAEA 3D PWR Benchmark]: #iaea-3d-pwr-benchmark
@@ -204,13 +204,13 @@ BC vacuum   vacuum=0.4692
 BC mirror   mirror
 
 SOLVE_PROBLEM
-WRITE_RESULTS FORMAT vtk
 
 # print results
-PRINT SEP " " "  keff = " %.5f keff
-PRINT SEP " " " nodes = " %g   nodes
-PRINT SEP " " "memory = " %.1f memory() "Gb"
-PRINT SEP " " "  wall = " %.1f clock()-t0 "sec"
+WRITE_RESULTS FORMAT vtk
+PRINTF "  keff = %.5f" keff
+PRINTF " nodes = %g"   nodes
+PRINTF "memory = %.1f Gb" memory()
+PRINTF "  wall = %.1f sec" clock()-t0
 ```
 
 ``` terminal

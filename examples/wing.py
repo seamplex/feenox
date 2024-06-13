@@ -137,6 +137,6 @@ gmsh.model.mesh.optimize("HighOrderFastCurving")
 gmsh.model.mesh.optimize("HighOrder")
 gmsh.write("wing.msh")
 
-gmsh.fltk.run()
+# gmsh.fltk.run()
 gmsh.finalize()
 

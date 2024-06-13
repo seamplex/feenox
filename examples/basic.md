@@ -456,7 +456,7 @@ $
 ```
 
 
-![Numerical derivative as a UNIX filter and actual analytical result](derivative.svg)
+![Numerical derivative as a Unix filter and actual analytical result](derivative.svg)
 
 
 # On the evaluation of thermal expansion coefficients

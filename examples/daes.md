@@ -848,12 +848,6 @@ aplicadas a las ecuaciones de cinética puntual de reactores. Todos los
 casos usan los siguientes parámetros cinéticos:
 
 ``` feenox
-nprec = 6    # seis grupos de precursores
-VECTOR c[nprec]
-VECTOR lambda[nprec] DATA 0.0124   0.0305   0.111    0.301    1.14     3.01
-VECTOR beta[nprec]   DATA 0.000215 0.001424 0.001274 0.002568 0.000748 0.000273
-Beta = vecsum(beta)
-Lambda = 40e-6
 ```
 
 ## Cinética puntual directa con reactividad vs. tiempo
@@ -1066,99 +1060,5 @@ $ feenox xenon.fee
 
 
 ![Flujo y posición de la barra de control en un caso con xenón bajo control](xenon.svg)
-
-
-## Mapas de diseño
-
-Finalizamos recuperando unos resultados derivados de mi tesis de
-maestría <https://doi.org/10.1016/j.nucengdes.2010.03.007>. Consiste en
-cinética puntual de un reactor de investigación con retroalimentación
-termohidráulica por temperatura del refrigerante y del combustible
-escrita como modelos de capacitancia concentrada[^1] cero-dimensionales.
-El estudio consiste en barrer paramétricamente el espacio de
-coeficientes de reactividad $[\alpha_c, \alpha_f]$, perturbar el estado
-del sistema dinámico ($\Delta T_f = 2~\text{ºC}$) y marcar con un color
-la potencia luego de un minuto para obtener mapas de estabilidad tipo
-Lyapunov.
-
-Para barrer el espacio de parámetros usamos series de números
-cuasi-aleatorios de forma tal de poder realizar ejecuciones sucesivas
-que van llenando densamente dicho espacio:
-
-``` bash
-for i in $(seq $1 $2); do  feenox point.fee $i | tee -a point.dat; done
-```
-
-[^1]: Del inglés [*lumped capacitance*]{lang="en-US"}.
-
-
-```feenox
-nprec = 6    # six precursor groups
-VECTOR c[nprec]
-VECTOR lambda[nprec] DATA 1.2400E-02 3.0500E-02 1.1100E-01 3.0100E-01 1.1400E+00 3.0100E+00 
-VECTOR beta[nprec]   DATA 2.4090e-04 1.5987E-03 1.4308E-03 2.8835E-03 8.3950E-04 3.0660E-04
-Beta = vecsum(beta)
-Lambda = 1.76e-4
-
-IF in_static
- alpha_T_fuel = 100e-5*(qrng2d_reversehalton(1,$1)-0.5)
- alpha_T_cool = 100e-5*(qrng2d_reversehalton(2,$1)-0.5)
-
- Delta_T_cool = 2
- Delta_T_fuel = 0
-
- P_star = 18.8e6       # watts
- T_in = 37             # grados C 
- hA_core = 1.17e6      # watt/grado
- mc_fuel = 47.7e3      # joule/grado
- mc_cool = 147e3       # joule/grado
- mflow_cool = 520      # kg/seg
- c_cool = 4.18e3 * 147e3/mc_cool       # joule/kg
-ENDIF
-
-PHASE_SPACE phi c T_cool T_fuel rho
-end_time = 60
-dae_rtol = 1e-7
-
-rho_0 = 0
-phi_0 = 1
-c_0[i] = phi_0 * beta(i)/(Lambda*lambda(i))
-
-T_cool_star = 1/(2*mflow_cool*c_cool) * (P_star+2*mflow_cool*c_cool*T_in)
-T_fuel_star = 1/(hA_core) * (P_star + hA_core*T_cool_star)
-
-T_cool_0 = T_cool_star + Delta_T_cool
-T_fuel_0 = T_fuel_star + Delta_T_fuel
-INITIAL_CONDITIONS_MODE FROM_VARIABLES
-
-rho = 0
-phi_dot = (rho + alpha_T_fuel*(T_fuel-T_fuel_star) + alpha_T_cool*(T_cool-T_cool_star) - Beta)/Lambda * phi + vecdot(lambda, c)
-c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
-T_fuel_dot = (1.0/(mc_fuel))*(P_star*phi - hA_core*(T_fuel-T_cool))
-T_cool_dot = (1.0/(mc_cool))*(hA_core*(T_fuel-T_cool) - 2*mflow_cool*c_cool*(T_cool-T_in))
-
-done = done | (phi > 4)
-
-IF done
- PRINT alpha_T_fuel alpha_T_cool phi
-ENDIF
-```
-
-
-```terminal
-$ ./point.sh 0 2048
-$ ./point.sh 2048 4096
-$
-
-```
-
-
-::: {#fig-map}
-![Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van "rellenando" incremental y densamente el espacio de parámetros.](map.svg)
-
-![Figuras originales de la referencia](figs-ned.png)
-
-Mapas de estabilidad de cinética puntual con realimentación termohidráulica
-:::
 
 

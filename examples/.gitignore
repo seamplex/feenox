@@ -100,3 +100,7 @@ azmy-full-fixed-sn-fixed-c.ppl
 azmy-full*.svg
 
 output
+
+wing*.msh
+wing.brep
+wing.xao

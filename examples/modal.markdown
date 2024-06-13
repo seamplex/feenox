@@ -1,9 +1,9 @@
 # Mechanical modal analysis
 
 - [<span class="toc-section-number">1</span> Optimizing the length of a
-  tuning fork][]
+  tuning fork]
 - [<span class="toc-section-number">2</span> Five natural modes of a
-  cantilevered wire][]
+  cantilevered wire]
 
   [<span class="toc-section-number">1</span> Optimizing the length of a tuning fork]:
     #optimizing-the-length-of-a-tuning-fork
@@ -31,8 +31,8 @@ boundary condition). All it has to do is to print the fundamental
 frequency.
 
 To find the length $\ell_1$, FeenoX is sucessively called from a Python
-driving script called [`fork.py`][]. This script uses Gmsh’s Python API
-to create the CAD and the mesh of the tuning fork given the geometrical
+driving script called [`fork.py`]. This script uses Gmsh’s Python API to
+create the CAD and the mesh of the tuning fork given the geometrical
 arguments $r$, $w$, $\ell_1$ and $\ell_2$. The parameter $n$ controls
 the number of elements through the fork’s thickness. Here is the driving
 script without the CAD & mesh details (the full implementation of the
@@ -120,9 +120,9 @@ class="math inline"><em>n</em></span></figcaption>
 
 # Five natural modes of a cantilevered wire
 
-Back in [College][], we had this subject Experimental Physics 101. I had
+Back in [College], we had this subject Experimental Physics 101. I had
 to measure the natural modes of two cantilevered wires and determine the
-Young modulus of of those measurements. The [report is here][]. Two
+Young modulus of of those measurements. The [report is here]. Two
 comments:
 
 1.  It is in Spanish

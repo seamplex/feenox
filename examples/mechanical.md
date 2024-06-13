@@ -82,9 +82,6 @@ PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
 
 # write post-processing data for paraview
 # WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
-
-PRINTF_ALL "local = %.2f, total = %.2f, average = %.2f" mpi_memory_local() mpi_memory_global() mpi_memory_global()/mpi_size
-
 ```
 
 

@@ -1,12 +1,11 @@
 # Heat conduction
 
-- [<span class="toc-section-number">1</span> Thermal slabs][]
-  - [<span class="toc-section-number">1.1</span> One-dimensional
-    linear][]
+- [<span class="toc-section-number">1</span> Thermal slabs]
+  - [<span class="toc-section-number">1.1</span> One-dimensional linear]
 - [<span class="toc-section-number">2</span> Non-dimensional transient
-  heat conduction on a cylinder][]
+  heat conduction on a cylinder]
 - [<span class="toc-section-number">3</span> Non-dimensional transient
-  heat conduction with time-dependent properties][]
+  heat conduction with time-dependent properties]
 
   [<span class="toc-section-number">1</span> Thermal slabs]: #thermal-slabs
   [<span class="toc-section-number">1.1</span> One-dimensional linear]: #one-dimensional-linear
@@ -35,10 +34,10 @@ Please note that:
 - The input written in a self-evident English-like dialect
   - Syntactic sugared plain-text ASCII file
   - Simple problems (like this one) need simple inputs
-  - FeenoX follows the UNIX rule of simplicity
+  - FeenoX follows the Unix rule of simplicity
 - Output is 100% user-defined
   - No `PRINT` no output
-  - Feenox follows the UNIX rule of silence
+  - Feenox follows the Unix rule of silence
 - There is no node at $x=1/2=0.5$!
   - FeenoX knows how to interpolate
 - Mesh separated from problem
@@ -57,7 +56,7 @@ Please note that:
   Mesh.MeshSizeMin = Mesh.MeshSizeMax;
   ```
 
-  - UNIX rule of composition
+  - Unix rule of composition
   - The actual input file is a Git-friendly `.fee`
 
 ``` feenox

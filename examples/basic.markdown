@@ -1,22 +1,22 @@
 # Basic mathematics
 
 - [<span class="toc-section-number">1</span> Hello World (and
-  Universe)!][]
+  Universe)!]
 - [<span class="toc-section-number">2</span> Ten ways of computing
-  $\pi$][]
+  $\pi$]
 - [<span class="toc-section-number">3</span> Financial decisions under
-  inflation][]
-- [<span class="toc-section-number">4</span> The logistic map][]
-- [<span class="toc-section-number">5</span> The Fibonacci sequence][]
+  inflation]
+- [<span class="toc-section-number">4</span> The logistic map]
+- [<span class="toc-section-number">5</span> The Fibonacci sequence]
   - [<span class="toc-section-number">5.1</span> Using the closed-form
-    formula as a function][]
-  - [<span class="toc-section-number">5.2</span> Using a vector][]
+    formula as a function]
+  - [<span class="toc-section-number">5.2</span> Using a vector]
   - [<span class="toc-section-number">5.3</span> Solving an iterative
-    problem][]
+    problem]
 - [<span class="toc-section-number">6</span> Computing the derivative of
-  a function as a UNIX filter][]
+  a function as a Unix filter]
 - [<span class="toc-section-number">7</span> On the evaluation of
-  thermal expansion coefficients][]
+  thermal expansion coefficients]
 
   [<span class="toc-section-number">1</span> Hello World (and Universe)!]:
     #hello-world-and-universe
@@ -31,7 +31,7 @@
   [<span class="toc-section-number">5.2</span> Using a vector]: #using-a-vector
   [<span class="toc-section-number">5.3</span> Solving an iterative problem]:
     #solving-an-iterative-problem
-  [<span class="toc-section-number">6</span> Computing the derivative of a function as a UNIX filter]:
+  [<span class="toc-section-number">6</span> Computing the derivative of a function as a Unix filter]:
     #computing-the-derivative-of-a-function-as-a-unix-filter
   [<span class="toc-section-number">7</span> On the evaluation of thermal expansion coefficients]:
     #on-the-evaluation-of-thermal-expansion-coefficients
@@ -212,7 +212,7 @@ $
 
 # The logistic map
 
-Plot the asymptotic behavior of the [logistic map][]
+Plot the asymptotic behavior of the [logistic map]
 
 $$
 x_{n+1} = r \cdot x \cdot (1-x)
@@ -267,13 +267,13 @@ map.</figcaption>
 When directly executing FeenoX, one gives a single argument to the
 executable with the path to the main input file. For example, the
 following input computes the first twenty numbers of the [Fibonacci
-sequence][] using the closed-form formula
+sequence] using the closed-form formula
 
 $$
 f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}
 $$
 
-where $\varphi=(1+\sqrt{5})/2$ is the [Golden ratio][].
+where $\varphi=(1+\sqrt{5})/2$ is the [Golden ratio].
 
 ``` feenox
 # the fibonacci sequence as function
@@ -359,9 +359,9 @@ $ diff two three
 $
 ```
 
-# Computing the derivative of a function as a UNIX filter
+# Computing the derivative of a function as a Unix filter
 
-This example illustrates how well FeenoX integrates into the UNIX
+This example illustrates how well FeenoX integrates into the Unix
 philosophy. Let’s say one has a function $f(t)$ as an ASCII file with
 two columns and one wants to compute the derivative $f'(t)$. Just pipe
 the function file into this example’s input file `derivative.fee` used
@@ -402,16 +402,15 @@ Then we can pipe the output of this command to the derivative filter.
 Note that
 
 - The `derivative.fee` has the execution flag has on and a [shebang
-  line][] pointing to a global location of the FeenoX binary in
+  line] pointing to a global location of the FeenoX binary in
   `/usr/local/bin` e.g. after doing `sudo make install`.
 - The first argument of `derivative.fee` controls the time step. This is
   only important to control the number of output lines. It does not have
   anything to do with precision, since the derivative is computed using
   an adaptive centered numerical differentiation scheme using the [GNU
-  Scientific Library][].
+  Scientific Library].
 - Before doing the actual differentiation, the input data is
-  interpolated using a third-order monotonous scheme (also with
-  [GSL][]).
+  interpolated using a third-order monotonous scheme (also with [GSL]).
 - TL;DR: this is not just “current value minus last value divided time
   increment.”
 
@@ -454,8 +453,8 @@ $
 
 <figure>
 <img src="derivative.svg"
-alt="Numerical derivative as a UNIX filter and actual analytical result" />
-<figcaption aria-hidden="true">Numerical derivative as a UNIX filter and
+alt="Numerical derivative as a Unix filter and actual analytical result" />
+<figcaption aria-hidden="true">Numerical derivative as a Unix filter and
 actual analytical result</figcaption>
 </figure>
 
@@ -602,7 +601,7 @@ alt="Column B(T) from A(T) and C(T)" />
 <img src="asme-expansion-C.svg" style="width:100.0%"
 alt="Column C(T) from A(T)" />
 
-> The conclusion (see [this][], [this][1] and [this][2] reports) is that
+> The conclusion (see [this], [this][1] and [this][2] reports) is that
 > values rounded to only one decimal value as presented in the ASME code
 > section II subsection D tables are not enough to satisfy the
 > mathematical relationships between the physical magnitudes related to

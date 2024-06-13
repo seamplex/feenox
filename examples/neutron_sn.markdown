@@ -1,13 +1,13 @@
 # Neutron transport using $S_N$
 
-- [<span class="toc-section-number">1</span> Reed’s problem][]
-- [<span class="toc-section-number">2</span> Azmy’s problem][]
+- [<span class="toc-section-number">1</span> Reed’s problem]
+- [<span class="toc-section-number">2</span> Azmy’s problem]
   - [<span class="toc-section-number">2.1</span> Second-order complete
-    structured rectangular grid][]
+    structured rectangular grid]
   - [<span class="toc-section-number">2.2</span> Fist-order
-    locally-refined unstructured triangular grid][]
+    locally-refined unstructured triangular grid]
   - [<span class="toc-section-number">2.3</span> Flux profiles with ray
-    effect][]
+    effect]
 
   [<span class="toc-section-number">1</span> Reed’s problem]: #reeds-problem
   [<span class="toc-section-number">2</span> Azmy’s problem]: #azmys-problem
@@ -24,7 +24,7 @@ Reed’s problem as in
 
 - [William H. Reed, New Difference Schemes for the Neutron Transport
   Equation, Nuclear Science and Engineering, 46:2, 309-314 (1971). DOI:
-  10.13182/NSE46-309][]
+  10.13182/NSE46-309]
 
 is a common test problem for transport codes. It is comprised of
 heterogeneous materials with strong absorber, vacuum, and scattering
@@ -83,7 +83,7 @@ As in
 
 - [Y. Y. Azmy, The Weighted Diamond-Difference Form of Nodal Transport
   Methods. NUCLEAR SCIENCE AND ENGINEERING: 98, 29-40 (1988). DOI:
-  10.13182/NSE88-6][]
+  10.13182/NSE88-6]
 
 <figure>
 <img src="azmy-problem.png"
@@ -99,7 +99,7 @@ paper</figcaption>
 
 This example solves the problem using a structured second-order grid. It
 computes the mean flux in each quadrant by integrating $\phi_1$ over
-each physical group using the instruction [`INTEGRATE`][].
+each physical group using the instruction [`INTEGRATE`].
 
 <figure>
 <img src="azmy-structured-mesh.png"
@@ -166,7 +166,7 @@ $
 
 This example solves the problem using an unstructured first-order grid.
 It computes the mean flux in each quadrant by integrating $\phi_1$
-over $x$ and $y$ in custom ranges using the functional [`integral`][].
+over $x$ and $y$ in custom ranges using the functional [`integral`].
 
 <figure>
 <img src="azmy-mesh.png"

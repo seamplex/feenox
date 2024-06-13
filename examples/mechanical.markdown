@@ -1,25 +1,25 @@
 # Linear elasticity
 
 - [<span class="toc-section-number">1</span> NAFEMS LE10 “Thick plate
-  pressure” benchmark][]
+  pressure” benchmark]
 - [<span class="toc-section-number">2</span> NAFEMS LE11 “Solid
-  Cylinder/Taper/Sphere-Temperature” benchmark][]
+  Cylinder/Taper/Sphere-Temperature” benchmark]
 - [<span class="toc-section-number">3</span> NAFEMS LE1 “Elliptical
-  membrane” plane-stress benchmark][]
+  membrane” plane-stress benchmark]
 - [<span class="toc-section-number">4</span> Parametric study on a
-  cantilevered beam][]
+  cantilevered beam]
 - [<span class="toc-section-number">5</span> Parallelepiped whose
-  Young’s modulus is a function of the temperature][]
-  - [<span class="toc-section-number">5.1</span> Thermal problem][]
-  - [<span class="toc-section-number">5.2</span> Mechanical problem][]
+  Young’s modulus is a function of the temperature]
+  - [<span class="toc-section-number">5.1</span> Thermal problem]
+  - [<span class="toc-section-number">5.2</span> Mechanical problem]
 - [<span class="toc-section-number">6</span> Orthotropic free expansion
-  of a cube][]
+  of a cube]
 - [<span class="toc-section-number">7</span> Thermo-elastic expansion of
-  finite cylinders][]
+  finite cylinders]
 - [<span class="toc-section-number">8</span> Temperature-dependent
-  material properties][]
+  material properties]
 - [<span class="toc-section-number">9</span> Two cubes compressing each
-  other][]
+  other]
 
   [<span class="toc-section-number">1</span> NAFEMS LE10 “Thick plate pressure” benchmark]:
     #nafems-le10-thick-plate-pressure-benchmark
@@ -51,10 +51,9 @@ alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
 corresponding FeenoX input</figcaption>
 </figure>
 
-Assuming the CAD has already been created in [STEP format][] (for
-instance using Gmsh with [this geo file][]), create a tetrahedral
-locally-refined unstructured grid with Gmsh using the following `.geo`
-file:
+Assuming the CAD has already been created in [STEP format] (for instance
+using Gmsh with [this geo file]), create a tetrahedral locally-refined
+unstructured grid with Gmsh using the following `.geo` file:
 
 ``` c
 // NAFEMS LE10 benchmark unstructured locally-refined tetrahedral mesh
@@ -119,8 +118,6 @@ PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
 
 # write post-processing data for paraview
 # WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
-
-PRINTF_ALL "local = %.2f, total = %.2f, average = %.2f" mpi_memory_local() mpi_memory_global() mpi_memory_global()/mpi_size
 ```
 
 ``` terminal
@@ -255,8 +252,8 @@ displacement in the vertical direction $w(500,0,0)$ at the center of the
 cantilever’s free face.
 
 The following Bash script first calls Gmsh to create the meshes. To do
-so, it first starts with a base [`cantilever.geo`][] file that creates
-the CAD:
+so, it first starts with a base [`cantilever.geo`] file that creates the
+CAD:
 
 ``` c
 // https://autofem.com/examples/determining_natural_frequencie.html
@@ -284,7 +281,7 @@ Transfinite Volume "*";
 Then another `.geo` file is merged to build
 `cantilever-${element}-${c}.msh` where
 
-- `${element}`: [tet4][], [tet10][], [hex8][], [hex20][], [hex27][]
+- `${element}`: [tet4], [tet10], [hex8], [hex20], [hex27]
 - `${c}`: 1,2,$\dots$,10
 
 <figure id="fig:cantilever-mesh" class="subfigures">
@@ -294,7 +291,7 @@ src="cantilever-hex.png" style="width:45.0%" alt="b" /></p>
 tetrahedra and hexahedra. a — Tetrahedra, b — Hexahedra</p></figcaption>
 </figure>
 
-It then calls FeenoX with the input [`cantilever.fee`][] and passes
+It then calls FeenoX with the input [`cantilever.fee`] and passes
 `${element}` and `${c}` as extra arguments, which then are expanded as
 `$1` and `$2` respectively.
 
@@ -633,7 +630,7 @@ $
 <img src="cube-orthotropic-expansion.png" style="width:100.0%"
 alt="Warped displacement (\times 500) of the cube using ASME’s three columns." />
 <figcaption aria-hidden="true">Warped displacement (<span
-class="math inline"> × 500</span>) of the cube using ASME’s three
+class="math inline">×500</span>) of the cube using ASME’s three
 columns.</figcaption>
 </figure>
 
@@ -645,7 +642,7 @@ columns.</figcaption>
 # Thermo-elastic expansion of finite cylinders
 
 Let us solve the following problem introduced by J. Veeder in his
-[technical report AECL-2660 from 1967][].
+[technical report AECL-2660 from 1967].
 
 > <img src="veeder-problem.png" style="width:50.0%" />
 >
@@ -792,7 +789,7 @@ profiles</figcaption>
 Let us solve a plane-strain square fixed on the left, with an horizontal
 traction on the right and free on the other two sides. The Young modulus
 depends on the temperature $E(T)$ as given in the ASME II part D tables
-of material properties, interpolated using a [monotonic cubic scheme][].
+of material properties, interpolated using a [monotonic cubic scheme].
 
 Actually, this example shows three cases:
 

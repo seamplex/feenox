@@ -1,14 +1,18 @@
 # Laplace’s equation
 
 - [<span class="toc-section-number">1</span> How to solve a maze without
-  AI][]
-  - [<span class="toc-section-number">1.1</span> Transient top-down][]
-  - [<span class="toc-section-number">1.2</span> Transient bottom-up][]
+  AI]
+  - [<span class="toc-section-number">1.1</span> Transient top-down]
+  - [<span class="toc-section-number">1.2</span> Transient bottom-up]
+- [<span class="toc-section-number">2</span> Potential flow around a
+  wing profile]
 
   [<span class="toc-section-number">1</span> How to solve a maze without AI]:
     #how-to-solve-a-maze-without-ai
   [<span class="toc-section-number">1.1</span> Transient top-down]: #transient-top-down
   [<span class="toc-section-number">1.2</span> Transient bottom-up]: #transient-bottom-up
+  [<span class="toc-section-number">2</span> Potential flow around a wing profile]:
+    #potential-flow-around-a-wing-profile
 
 # How to solve a maze without AI
 
@@ -26,6 +30,8 @@
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6974663157952745472/>
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6974979951049519104/>
 > - <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:7206676495879028736/>
 
 Say you are Homer Simpson and you want to solve a maze drawn in a
 restaurant’s placemat, one where both the start and end are known
@@ -179,4 +185,135 @@ data-width_latex="50%"
 alt="Transient bottom-up solution. The first attempt does not seem to be good." />
 <figcaption aria-hidden="true">Transient bottom-up solution. The first
 attempt does not seem to be good.</figcaption>
+</figure>
+
+# Potential flow around a wing profile
+
+The Laplace equation can be used to model potential flow. For the
+particular case of a wing profile, the Dirichlet condition at the wing
+has to satisfy the Kutta condition.
+
+This example
+
+1.  Creates a symmetric wing-like Joukowsky profile using the the Gmsh
+    Python API.
+2.  Solves the steady-state 2D Laplace equation with a different
+    Dirichlet value at the wing until the solution $\phi$ evaluated at
+    the continuation of the wing tip matches the boundary value $c$. It
+    then computes the circulation integral of the velocities
+    1.  over a circle around the wing profile, computing the unitary
+        tangential vector
+        1.  from the internal normal variables `nx` and `ny`
+        2.  from two functions `tx` and `ty` using the circle’s equation
+    2.  around the original rectangular domain
+
+<figure>
+<img src="wing-msh1.png" style="width:100.0%" alt="Full domain" />
+<figcaption aria-hidden="true">Full domain</figcaption>
+</figure>
+
+<figure>
+<img src="wing-msh2.png" style="width:100.0%"
+alt="Zoom over the wing profile" />
+<figcaption aria-hidden="true">Zoom over the wing profile</figcaption>
+</figure>
+
+``` feenox
+PROBLEM laplace 2D
+static_steps = 20
+READ_MESH wing.msh
+
+# boundary conditions constant -> streamline
+BC bottom  phi=0
+BC top     phi=1
+
+# initialize c = streamline constant for the wing
+DEFAULT_ARGUMENT_VALUE 1 0.5
+IF in_static_first
+ c = $1
+ c_last = c
+ e = 1
+ e_last = e
+ENDIF
+BC wing    phi=c
+
+SOLVE_PROBLEM
+
+PHYSICAL_GROUP kutta DIM 0
+e = phi(kutta_cog[1], kutta_cog[2]) - c
+PRINT step_static %.6f c %+.1e e
+
+# check for convergence
+done_static = done_static | (abs(e) < 1e-8)
+IF done_static
+  PHYSICAL_GROUP left DIM 1
+  vx(x,y) = +dphidy(x,y) * left_length
+  vy(x,y) = -dphidx(x,y) * left_length
+
+  WRITE_MESH $0-converged.msh phi VECTOR vx vy 0
+  WRITE_MESH $0-converged.vtk phi VECTOR vx vy 0
+  
+  # Function unit tangent:
+  PHYSICAL_GROUP circle DIM 1
+  cx = circle_cog[1]
+  cy = circle_cog[2]
+  tx(x,y) = -(y-cy)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  ty(x,y) = +(x-cx)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+
+  # Circulation on the circumference:
+  INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ
+  PRINT "circt: " circ
+
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER circle RESULT circn
+  PRINT "circn: " circn
+  
+  INTEGRATE -vx(x,y) OVER top    GAUSS RESULT inttop
+  INTEGRATE +vx(x,y) OVER bottom GAUSS RESULT intbottom
+  INTEGRATE -vy(x,y) OVER left   GAUSS RESULT intleft
+  INTEGRATE +vy(x,y) OVER right  GAUSS RESULT intright
+  PRINT "box: " inttop+intleft+intbottom+intright
+  
+ELSE
+
+ # update c
+ IF in_static_first
+  c_last = c
+  e_last = e
+  c = c_last - 0.1
+ ELSE
+  c_next = c_last - e_last * (c_last-c)/(e_last-e)
+  c_last = c
+  e_last = e
+  c = c_next
+ ENDIF
+ENDIF
+```
+
+``` terminal
+$ python wing.py
+[...]
+Info    : Writing 'wing.msh'...
+Info    : Done writing 'wing.msh'
+$ $ feenox wing.fee 
+1       0.500000        -3.4e-03
+2       0.400000        +3.7e-03
+3       0.452068        +5.5e-10
+circt:  -2.49946
+circn:  -2.49878
+box:    -2.50177
+$ 
+```
+
+<figure>
+<img src="wing-converged1.png" style="width:100.0%"
+alt="Potential and velocities on the whole domain" />
+<figcaption aria-hidden="true">Potential and velocities on the whole
+domain</figcaption>
+</figure>
+
+<figure>
+<img src="wing-converged2.png" style="width:100.0%"
+alt="Potential and velocities zoomed over the wing" />
+<figcaption aria-hidden="true">Potential and velocities zoomed over the
+wing</figcaption>
 </figure>
