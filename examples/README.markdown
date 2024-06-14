@@ -104,6 +104,7 @@ propose benchmark problems to add to the suite.
     - [Cinética puntual directa con reactividad vs. tiempo]
     - [Cinética inversa]
     - [Control de inestabilidades de xenón]
+    - [Mapas de diseño]
 - Laplace’s equation
   - [How to solve a maze without AI]
     - [Transient top-down]
@@ -162,6 +163,7 @@ propose benchmark problems to add to the suite.
   [Cinética puntual directa con reactividad vs. tiempo]: https://seamplex.com/feenox/examples/daes.html#cinética-puntual-directa-con-reactividad-vs.-tiempo
   [Cinética inversa]: https://seamplex.com/feenox/examples/daes.html#cinética-inversa
   [Control de inestabilidades de xenón]: https://seamplex.com/feenox/examples/daes.html#control-de-inestabilidades-de-xenón
+  [Mapas de diseño]: https://seamplex.com/feenox/examples/daes.html#mapas-de-diseño
   [How to solve a maze without AI]: https://seamplex.com/feenox/examples/laplace.html#how-to-solve-a-maze-without-ai
   [Transient top-down]: https://seamplex.com/feenox/examples/laplace.html#transient-top-down
   [Transient bottom-up]: https://seamplex.com/feenox/examples/laplace.html#transient-bottom-up

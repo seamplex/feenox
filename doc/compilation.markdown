@@ -1,40 +1,38 @@
 # Compilation instructions
 
-- [<span class="toc-section-number">1</span> Quickstart][]
+- [<span class="toc-section-number">1</span> Quickstart]
 - [<span class="toc-section-number">2</span> Detailed configuration and
-  compilation][]
-  - [<span class="toc-section-number">2.1</span> Mandatory
-    dependencies][]
+  compilation]
+  - [<span class="toc-section-number">2.1</span> Mandatory dependencies]
     - [<span class="toc-section-number">2.1.1</span> The GNU Scientific
-      Library][]
-  - [<span class="toc-section-number">2.2</span> Optional
-    dependencies][]
-    - [<span class="toc-section-number">2.2.1</span> SUNDIALS][]
-    - [<span class="toc-section-number">2.2.2</span> PETSc][]
-    - [<span class="toc-section-number">2.2.3</span> SLEPc][]
-  - [<span class="toc-section-number">2.3</span> FeenoX source code][]
-    - [<span class="toc-section-number">2.3.1</span> Git repository][]
-    - [<span class="toc-section-number">2.3.2</span> Source tarballs][]
-  - [<span class="toc-section-number">2.4</span> Configuration][]
+      Library]
+  - [<span class="toc-section-number">2.2</span> Optional dependencies]
+    - [<span class="toc-section-number">2.2.1</span> SUNDIALS]
+    - [<span class="toc-section-number">2.2.2</span> PETSc]
+    - [<span class="toc-section-number">2.2.3</span> SLEPc]
+  - [<span class="toc-section-number">2.3</span> FeenoX source code]
+    - [<span class="toc-section-number">2.3.1</span> Git repository]
+    - [<span class="toc-section-number">2.3.2</span> Source tarballs]
+  - [<span class="toc-section-number">2.4</span> Configuration]
   - [<span class="toc-section-number">2.5</span> Source code
-    compilation][]
-  - [<span class="toc-section-number">2.6</span> Test suite][]
-  - [<span class="toc-section-number">2.7</span> Installation][]
-- [<span class="toc-section-number">3</span> Advanced settings][]
+    compilation]
+  - [<span class="toc-section-number">2.6</span> Test suite]
+  - [<span class="toc-section-number">2.7</span> Installation]
+- [<span class="toc-section-number">3</span> Advanced settings]
   - [<span class="toc-section-number">3.1</span> Compiling with debug
-    symbols][]
+    symbols]
   - [<span class="toc-section-number">3.2</span> Using a different
-    compiler][]
-  - [<span class="toc-section-number">3.3</span> Compiling PETSc][]
+    compiler]
+  - [<span class="toc-section-number">3.3</span> Compiling PETSc]
 
 These detailed compilation instructions are aimed at `amd64`
 Debian-based GNU/Linux distributions. The compilation procedure follows
-the [POSIX standard][], so it should work in other operating systems and
+the [POSIX standard], so it should work in other operating systems and
 architectures as well. Distributions not using `apt` for packages
 (i.e. `yum`) should change the package installation commands (and
 possibly the package names). The instructions should also work for in
 MacOS, although the `apt-get` commands should be replaced by `brew` or
-similar. Same for Windows under [Cygwin][], the packages should be
+similar. Same for Windows under [Cygwin], the packages should be
 installed through the Cygwin installer. WSL was not tested, but should
 work as well.
 
@@ -67,7 +65,7 @@ work as well.
 
 # Quickstart
 
-Note that the quickest way to get started is to [download][] an
+Note that the quickest way to get started is to [download] an
 already-compiled statically-linked binary executable. Note that getting
 a binary is the quickest and easiest way to go but it is the less
 flexible one. Mind the following instructions if a binary-only option is
@@ -80,7 +78,7 @@ See sec. 2 for the actual detailed explanations.
 To compile the Git repository, proceed as follows. This procedure does
 need `git` and `autoconf` but new versions can be pulled and recompiled
 easily. If something goes wrong and you get an error, do not hesitate to
-ask in FeenoX’s [discussion page][].
+ask in FeenoX’s [discussion page].
 
 1.  Install mandatory dependencies
 
@@ -124,7 +122,7 @@ ask in FeenoX’s [discussion page][].
 
     If you do not have Internet access, get the tarball manually, copy
     it to the same directory as `configure` and run again. See the
-    [detailed compilation instructions][] for an explanation.
+    [detailed compilation instructions] for an explanation.
 
 5.  Run test suite (optional)
 
@@ -153,38 +151,37 @@ sudo make install
 
 # Detailed configuration and compilation
 
-The main target and development environment is [Debian GNU/Linux][],
+The main target and development environment is [Debian GNU/Linux],
 although it should be possible to compile FeenoX in any free GNU/Linux
 variant (and even the in non-free MacOS and/or Windows platforms)
 running in virtually any hardware platform. FeenoX can run be run either
 in HPC cloud servers or a Raspberry Pi, and almost everything that sits
 in the middle.
 
-Following the Unix philosophy discussed in the [SDS][], FeenoX re-uses a
+Following the Unix philosophy discussed in the [SDS], FeenoX re-uses a
 lot of already-existing high-quality free and open source libraries that
 implement a wide variety of mathematical operations. This leads to a
 number of dependencies that FeenoX needs in order to implement certain
 features.
 
-There is only one dependency that is mandatory, namely [GNU GSL][]
+There is only one dependency that is mandatory, namely [GNU GSL]
 (see sec. 2.1.1), which if it not found then FeenoX cannot be compiled.
 All other dependencies are optional, meaning that FeenoX can be compiled
 but its capabilities will be partially reduced.
 
-As per the [SRS][], all dependencies have to be available on mainstream
+As per the [SRS], all dependencies have to be available on mainstream
 GNU/Linux distributions and have to be free and open source software.
 But they can also be compiled from source in case the package
 repositories are not available or customized compilation flags are
 needed (i.e. optimization or debugging settings).
 
-In particular, [PETSc][] (and [SLEPc][]) also depend on other
-mathematical libraries to perform particular operations such as
-low-level linear algebra operations. These extra dependencies can be
-either free (such as [LAPACK][]) or non-free (such as [Intel’s MKL][]),
-but there is always at least one combination of a working setup that
-involves only free and open source software which is compatible with
-FeenoX licensing terms (GPLv3+). See the documentation of each package
-for licensing details.
+In particular, [PETSc] (and [SLEPc]) also depend on other mathematical
+libraries to perform particular operations such as low-level linear
+algebra operations. These extra dependencies can be either free (such as
+[LAPACK]) or non-free (such as [Intel’s MKL]), but there is always at
+least one combination of a working setup that involves only free and
+open source software which is compatible with FeenoX licensing terms
+(GPLv3+). See the documentation of each package for licensing details.
 
   [Debian GNU/Linux]: https://www.debian.org/
   [SDS]: SDS.md
@@ -213,7 +210,7 @@ the build toolchain is not already installed, do so with
 sudo apt-get install gcc make
 ```
 
-If the source is to be fetched from the [Git repository][] then not only
+If the source is to be fetched from the [Git repository] then not only
 is `git` needed but also `autoconf` and `automake` since the `configure`
 script is not stored in the Git repository but the `autogen.sh` script
 that bootstraps the tree and creates it. So if instead of compiling a
@@ -231,8 +228,8 @@ already installed.
 
 ### The GNU Scientific Library
 
-The only run-time dependency is [GNU GSL][] (not to be confused with
-[Microsoft GSL][]). It can be installed with
+The only run-time dependency is [GNU GSL] (not to be confused with
+[Microsoft GSL]). It can be installed with
 
 ``` terminal
 sudo apt-get install libgsl-dev
@@ -243,7 +240,7 @@ permissions to install system-wide packages, there are two options.
 
 1.  Pass the option `--enable-download-gsl` to the `configure` script
     below.
-2.  Manually download, compile and install [GNU GSL][]
+2.  Manually download, compile and install [GNU GSL]
 
 If the `configure` script cannot find both the headers and the actual
 library, it will refuse to proceed. Note that the FeenoX binaries
@@ -258,7 +255,7 @@ it installed in order to run the statically-linked binaries.
 FeenoX has three optional run-time dependencies. It can be compiled
 without any of these, but functionality will be reduced:
 
-- [SUNDIALS][] provides support for solving systems of ordinary
+- [SUNDIALS] provides support for solving systems of ordinary
   differential equations (ODEs) or differential-algebraic equations
   (DAEs). This dependency is needed when running inputs with the
   `PHASE_SPACE` keyword.
@@ -267,7 +264,7 @@ without any of these, but functionality will be reduced:
   (PDEs). This dependency is needed when running inputs with the
   `PROBLEM` keyword.
 
-- [SLEPc][] provides support for solving eigen-value problems in partial
+- [SLEPc] provides support for solving eigen-value problems in partial
   differential equations (PDEs). This dependency is needed for inputs
   with `PROBLEM` types with eigen-value formulations such as `modal` and
   `neutron_sn`.
@@ -275,9 +272,9 @@ without any of these, but functionality will be reduced:
 In absence of all these, FeenoX can still be used to
 
 - solve general mathematical problems such as the ones to compute the
-  [Fibonacci sequence][] or the [Logistic map][],
+  [Fibonacci sequence] or the [Logistic map],
 - operate on functions, either algebraically or point-wise interpolated
-  such as [Computing the derivative of a function as a Unix filter][]
+  such as [Computing the derivative of a function as a Unix filter]
 - read, operate over and write meshes,
 - etc.
 
@@ -296,9 +293,9 @@ time will be skipped.
 
 ### SUNDIALS
 
-[SUNDIALS][] is a SUite of Nonlinear and DIfferential/ALgebraic equation
+[SUNDIALS] is a SUite of Nonlinear and DIfferential/ALgebraic equation
 Solvers. It is used by FeenoX to solve dynamical systems casted as DAEs
-with the keyword [`PHASE_SPACE`][], like [the Lorenz system][].
+with the keyword [`PHASE_SPACE`], like [the Lorenz system].
 
 Install either by doing
 
@@ -314,12 +311,12 @@ or by following the instructions in the documentation.
 
 ### PETSc
 
-The [Portable, Extensible Toolkit for Scientific Computation][],
+The [Portable, Extensible Toolkit for Scientific Computation],
 pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and
 routines for the scalable (parallel) solution of scientific applications
 modeled by partial differential equations. It is used by FeenoX to solve
-PDEs with the keyword [`PROBLEM`][], like the [NAFEMS LE10 benchmark
-problem][].
+PDEs with the keyword [`PROBLEM`], like the [NAFEMS LE10 benchmark
+problem].
 
 Install either by doing
 
@@ -333,7 +330,7 @@ Note that
 
 - Configuring and compiling PETSc from scratch might be difficult the
   first time. It has a lot of dependencies and options. Read the
-  official [documentation][] for a detailed explanation.
+  official [documentation] for a detailed explanation.
 - There is a huge difference in efficiency between using PETSc compiled
   with debugging symbols and with optimization flags. Make sure to
   configure `--with-debugging=0` for FeenoX production runs and leave
@@ -354,11 +351,11 @@ Note that
 
 ### SLEPc
 
-The [Scalable Library for Eigenvalue Problem Computations][], is a
+The [Scalable Library for Eigenvalue Problem Computations], is a
 software library for the solution of large scale sparse eigenvalue
 problems on parallel computers. It is used by FeenoX to solve PDEs with
-the keyword [`PROBLEM`][] that need eigen-value computations, such as
-[modal analysis of a cantilevered beam][].
+the keyword [`PROBLEM`] that need eigen-value computations, such as
+[modal analysis of a cantilevered beam].
 
 Install either by doing
 
@@ -397,7 +394,7 @@ There are two ways of getting FeenoX’s source code:
 The main Git repository is hosted on GitHub at
 <https://github.com/seamplex/feenox>. It is public so it can be cloned
 either through HTTPS or SSH without needing any particular credentials.
-It can also be forked freely. See the [Programming Guide][] for details
+It can also be forked freely. See the [Programming Guide] for details
 about pull requests and/or write access to the main repository.
 
 Ideally, the `main` branch should have a usable snapshot. All other
@@ -437,14 +434,14 @@ whole source tarball has to be downloaded again.
 
 To create a proper `Makefile` for the particular architecture,
 dependencies and compilation options, the script `configure` has to be
-executed. This procedure follows the [GNU Coding Standards][].
+executed. This procedure follows the [GNU Coding Standards].
 
 ``` terminal
 ./configure
 ```
 
 Without any particular options, `configure` will check if the mandatory
-[GNU Scientific Library][] is available (both its headers and run-time
+[GNU Scientific Library] is available (both its headers and run-time
 library). If it is not, then the option `--enable-download-gsl` can be
 used. This option will try to use `wget` (which should be installed) to
 download a source tarball, uncompress, configure and compile it. If
@@ -577,9 +574,9 @@ $
 
 ## Test suite
 
-The [`test`][] directory contains a set of test cases whose output is
+The [`test`] directory contains a set of test cases whose output is
 known so that unintended regressions can be detected quickly (see the
-[programming guide][] for more information). The test suite ought to be
+[programming guide] for more information). The test suite ought to be
 run after each modification in FeenoX’s source code. It consists of a
 set of scripts and input files needed to solve dozens of cases. The
 output of each execution is compared to a reference solution. In case
@@ -1038,7 +1035,7 @@ compiled with
 ## Compiling PETSc
 
 Particular explanation for FeenoX is to be done. For now, follow the
-[general explanation from PETSc’s website][].
+[general explanation from PETSc’s website].
 
 ``` terminal
 export PETSC_DIR=$PWD

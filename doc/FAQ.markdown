@@ -11,7 +11,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2024-06-03
+date: 2024-06-14
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -99,26 +99,25 @@ title: Frequently Asked Questions about FeenoX
 titleDelim: ":"
 ---
 
-- [<span class="toc-section-number">1</span> What is FeenoX?][]
-- [<span class="toc-section-number">2</span> How should I cite
-  FeenoX?][]
-- [<span class="toc-section-number">3</span> What does FeenoX mean?][]
+- [<span class="toc-section-number">1</span> What is FeenoX?]
+- [<span class="toc-section-number">2</span> How should I cite FeenoX?]
+- [<span class="toc-section-number">3</span> What does FeenoX mean?]
 - [<span class="toc-section-number">4</span> How should FeenoX be
-  pronounced?][]
+  pronounced?]
 - [<span class="toc-section-number">5</span> Why nothing happens when I
-  double click on `feenox.exe`?][]
+  double click on `feenox.exe`?]
 - [<span class="toc-section-number">6</span> How do I create input decks
-  for FeenoX?][]
+  for FeenoX?]
 - [<span class="toc-section-number">7</span> Does FeenoX support beam
-  and/or shell elements?][]
+  and/or shell elements?]
 - [<span class="toc-section-number">8</span> What license does FeenoX
-  have?][]
+  have?]
 - [<span class="toc-section-number">9</span> Why is FeenoX written in C
-  and not in…][]
-  - [<span class="toc-section-number">9.1</span> C++?][]
-  - [<span class="toc-section-number">9.2</span> Fortran?][]
-  - [<span class="toc-section-number">9.3</span> Python or R?][]
-  - [<span class="toc-section-number">9.4</span> Go, Rust or Julia?][]
+  and not in…]
+  - [<span class="toc-section-number">9.1</span> C++?]
+  - [<span class="toc-section-number">9.2</span> Fortran?]
+  - [<span class="toc-section-number">9.3</span> Python or R?]
+  - [<span class="toc-section-number">9.4</span> Go, Rust or Julia?]
 
   [<span class="toc-section-number">1</span> What is FeenoX?]: #what-is-feenox
   [<span class="toc-section-number">2</span> How should I cite FeenoX?]:
@@ -152,34 +151,34 @@ with a particular design basis:
 > respectively.
 
 In increasing order of complexity and comprehensiveness, these resources
-explain what [FeenoX][] is:
+explain what [FeenoX] is:
 
-- The [examples][] will give a brief overview of what FeenoX can do.
+- The [examples] will give a brief overview of what FeenoX can do.
 
-- The [tutorials][] will walk your through how to use FeenoX to solve
+- The [tutorials] will walk your through how to use FeenoX to solve
   problems.
 
-- The [README][] in the [GitHub repository][] has a brief introduction
+- The [README] in the [GitHub repository] has a brief introduction
   (after explaining why).
 
 - Theler, J. (2024). FeenoX: a cloud-first finite-element(ish)
   computational engineering tool. Journal of Open Source Software,
   9(95), 5846. <https://doi.org/10.21105/joss.05846>
 
-  [![DOI][]][1]
+  [![DOI]][1]
 
-- There is also a [description][] in the [documentation][].
+- There is also a [description] in the [documentation].
 
 - FeenoX is an “offer” to a fictitious “tender” for a computational
-  tool. The RFQ is the [Software Requirements Specification][] and the
+  tool. The RFQ is the [Software Requirements Specification] and the
   explanation of how FeenoX addresses each requirement is the [Software
   Design Specification][Software Requirements Specification].
 
-- This [presentation from August 2021][] explains the SRS/SDS pair. The
-  sources and the examples can be found in [this Github repository][].
-  There is a [recording of the presentation][] (audio is in Spanish).
+- This [presentation from August 2021] explains the SRS/SDS pair. The
+  sources and the examples can be found in [this Github repository].
+  There is a [recording of the presentation] (audio is in Spanish).
 
-- Finally the [manual][] will be the ultimate guide.
+- Finally the [manual] will be the ultimate guide.
 
   [FeenoX]: https://www.seamplex.com/feenox
   [examples]: https://www.seamplex.com/feenox/examples
@@ -198,7 +197,7 @@ explain what [FeenoX][] is:
 
 # How should I cite FeenoX?
 
-If you use FeenoX and need to cite it, use this [BiBTeX][] entry that
+If you use FeenoX and need to cite it, use this [BiBTeX] entry that
 points to [the 2024 paper in JOSS][]:
 
 ``` bib
@@ -257,7 +256,7 @@ files and zero or more output files:
 
 Recall that FeenoX is designed as a cloud-first tool, and “the cloud”
 runs on Unix (essentially GNU/Linux) so FeenoX is based on the [Unix
-philosophy][]. In this world, programs act like filters (i.e. transfer
+philosophy]. In this world, programs act like filters (i.e. transfer
 functions). They are executed from a command-line terminal. So instead
 of “double clicking” the executable, one has to open a terminal and
 execute it there. Without any arguments it says how to use it:
@@ -335,12 +334,12 @@ you like and run it:
 In any case, recall once again that FeenoX is a cloud-first tool, and
 Windows is not cloud-friendly, let alone cloud-first. It is time to
 re-think what you expect from a finite-element(ish) tool. If you still
-need a GUI, please check [CAEplex][].
+need a GUI, please check [CAEplex].
 
 Try to avoid Windows as much as you can. The binaries are provided as
 transitional packages for people that for some reason still use such an
 outdated, anachronous, awful and invasive operating system. They are
-compiled with [Cygwin][] and have no support whatsoever. Really, really,
+compiled with [Cygwin] and have no support whatsoever. Really, really,
 **get rid of Windows ASAP**.
 
 > “It is really worth any amount of time and effort to get away from
@@ -357,11 +356,11 @@ compiled with [Cygwin][] and have no support whatsoever. Really, really,
 FeenoX does not have “input decks.” It has “input files,” which are
 syntactically-sugared English-like plain-text ASCII files that describe
 the problem to be solved. First see the [examples][2] and the [test
-directory][]. Then read the [documentation][3].
+directory]. Then read the [documentation][3].
 
-There are syntax highlighting files [for Kate][] and [for Vim][] that
-helps the edition of input files. Contributions for other editors
-(emacs?) are welcome.
+There are syntax highlighting files [for Kate] and [for Vim] that helps
+the edition of input files. Contributions for other editors (emacs?) are
+welcome.
 
 <figure>
 <img src="nafems-le10-problem-input.svg"
@@ -385,7 +384,7 @@ quadrangles.
 
 It might support non-solid elements for elasticity in future versions,
 though. Contributions are welcome. Check out the [contributing
-guidelines][].
+guidelines].
 
   [contributing guidelines]: https://www.seamplex.com/feenox/doc/#contributing-guidelines
 
@@ -401,7 +400,7 @@ TL;DR:
   version: same thing but with particular considerations for
   documentation instead of code.
 
-FeenoX is licensed under the terms of the [GNU General Public License][]
+FeenoX is licensed under the terms of the [GNU General Public License]
 version 3 or, at the user convenience, any later version. This means
 that users get the four essential freedoms:[^1]
 
@@ -423,9 +422,9 @@ compiled with `./configure && make`). Anyone wanting to modify the
 program either to fix bugs, improve it or add new features is free to do
 so. And if they do not know how to program, the have the freedom to hire
 a programmer to do it without needing to ask permission to the original
-authors. Even more, [the documentation][] is released under the terms of
-the [GNU Free Documentation License][] so these new (or modified)
-features can be properly documented as well.
+authors. Even more, [the documentation] is released under the terms of
+the [GNU Free Documentation License] so these new (or modified) features
+can be properly documented as well.
 
 Nevertheless, since these original authors are the copyright holders,
 they still can use it to either enforce or prevent further actions from
@@ -442,7 +441,7 @@ discussed here such as
   under a different license)
 - what is an aggregate (in which each part be distributed under
   different licenses)
-- usage over a network and the possibility of using [AGPL][] instead of
+- usage over a network and the possibility of using [AGPL] instead of
   GPL to further enforce freedom
 
 These issues are already taken into account in the FeenoX licensing
@@ -474,7 +473,7 @@ chains running over free and open source operating systems.
 
 # Why is FeenoX written in C and not in…
 
-See the [programming guide][] for further discussion.
+See the [programming guide] for further discussion.
 
   [programming guide]: https://seamplex.com/feenox/doc/programming.html
 
@@ -512,7 +511,7 @@ that in itself would be a huge reason to use C.
 
 In particular, I think that even though object-oriented programming does
 provide a heck of a paradigm (hey, I actually rewrote my [Blackjack
-engine][] in C++ from its first version in C), it might subtly “force”
+engine] in C++ from its first version in C), it might subtly “force”
 people to do stuff that is either way too
 
 - convoluted

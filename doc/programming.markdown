@@ -1,29 +1,28 @@
 # FeenoX programming guide
 
-- [<span class="toc-section-number">1</span> Why we program FeenoX][]
-- [<span class="toc-section-number">2</span> Compiling and debugging][]
-- [<span class="toc-section-number">3</span> How we program FeenoX][]
-  - [<span class="toc-section-number">3.1</span> Operating systems][]
-  - [<span class="toc-section-number">3.2</span> Languages][]
-  - [<span class="toc-section-number">3.3</span> Programming IDEs][]
-    - [<span class="toc-section-number">3.3.1</span> Netbeans][]
-  - [<span class="toc-section-number">3.4</span> Makefiles][]
-  - [<span class="toc-section-number">3.5</span> Test suite][]
-  - [<span class="toc-section-number">3.6</span> Coding style][]
-  - [<span class="toc-section-number">3.7</span> Virtual methods][]
-  - [<span class="toc-section-number">3.8</span> Memory management][]
-  - [<span class="toc-section-number">3.9</span> Naming conventions][]
-  - [<span class="toc-section-number">3.10</span> Comments][]
-  - [<span class="toc-section-number">3.11</span> Indices in PDEs][]
-  - [<span class="toc-section-number">3.12</span> Git workflow][]
-  - [<span class="toc-section-number">3.13</span> Standards][]
+- [<span class="toc-section-number">1</span> Why we program FeenoX]
+- [<span class="toc-section-number">2</span> Compiling and debugging]
+- [<span class="toc-section-number">3</span> How we program FeenoX]
+  - [<span class="toc-section-number">3.1</span> Operating systems]
+  - [<span class="toc-section-number">3.2</span> Languages]
+  - [<span class="toc-section-number">3.3</span> Programming IDEs]
+    - [<span class="toc-section-number">3.3.1</span> Netbeans]
+  - [<span class="toc-section-number">3.4</span> Makefiles]
+  - [<span class="toc-section-number">3.5</span> Test suite]
+  - [<span class="toc-section-number">3.6</span> Coding style]
+  - [<span class="toc-section-number">3.7</span> Virtual methods]
+  - [<span class="toc-section-number">3.8</span> Memory management]
+  - [<span class="toc-section-number">3.9</span> Naming conventions]
+  - [<span class="toc-section-number">3.10</span> Comments]
+  - [<span class="toc-section-number">3.11</span> Indices in PDEs]
+  - [<span class="toc-section-number">3.12</span> Git workflow]
+  - [<span class="toc-section-number">3.13</span> Standards]
   - [<span class="toc-section-number">3.14</span> Mentioning other
-    libraries, programs, codes, etc.][]
-  - [<span class="toc-section-number">3.15</span> Documentation][]
-- [<span class="toc-section-number">4</span> What we program in
-  FeenoX][]
-- [<span class="toc-section-number">5</span> Code of conduct][]
-- [<span class="toc-section-number">6</span> Release plans][]
+    libraries, programs, codes, etc.]
+  - [<span class="toc-section-number">3.15</span> Documentation]
+- [<span class="toc-section-number">4</span> What we program in FeenoX]
+- [<span class="toc-section-number">5</span> Code of conduct]
+- [<span class="toc-section-number">6</span> Release plans]
 
   [<span class="toc-section-number">1</span> Why we program FeenoX]: #why-we-program-feenox
   [<span class="toc-section-number">2</span> Compiling and debugging]: #compiling-and-debugging
@@ -70,7 +69,7 @@ Specification. Within this goal, there are three levels of importance:
 
 # Compiling and debugging
 
-See the [compilation instructions][].
+See the [compilation instructions].
 
   [compilation instructions]: compilation.md
 
@@ -93,7 +92,7 @@ See the [compilation instructions][].
 > you must.
 
 C++ is a great language when used to solve problems it solves naturally
-well without being forced to solve it (see [LibreBlackjack][]). C++ is a
+well without being forced to solve it (see [LibreBlackjack]). C++ is a
 terrible language whenever else. It is messy, overwhelming, complicated,
 not robust and hard to debug (especially when using templates and this
 nightmare called smart pointers). The cons are far more than the pros.
@@ -222,7 +221,7 @@ Therefore:
 
 ### Netbeans
 
-To work on FeenoX using [NetBeans][], first make sure you have the C/C++
+To work on FeenoX using [NetBeans], first make sure you have the C/C++
 module working. If you don’t, do this:
 
 > In Netbeans go to Tools-\>Plugins-\>Settings. Entry NetBeans 8.2
@@ -243,8 +242,8 @@ detected the configure script by adding “using configure” next to
 
 ## Makefiles
 
-- FeenoX uses the [GNU Autools][] (i.e. [Autoconf][] and [Automake][]).
-- If you really feel that you have to use [CMake][] for your
+- FeenoX uses the [GNU Autools] (i.e. [Autoconf] and [Automake]).
+- If you really feel that you have to use [CMake] for your
   contributions, feel free to do so (Unix rule of diversity) but make
   sure that at the end of the day `./configure && make` still works.
 
@@ -257,7 +256,7 @@ detected the configure script by adding “using configure” next to
 
 - The directory `tests` contains the test suite with shell scripts that
   return appropriate errorlevels according to [Automake’s generic test
-  scripts][]. In a nutshell:
+  scripts]. In a nutshell:
 
   > When no test protocol is in use, an exit status of 0 from a test
   > script will denote a success, an exit status of 77 a skipped test,
@@ -416,14 +415,14 @@ format has to provide a virtual reader/writer method.
 
 ## Indices in PDEs
 
-| Index | Loop over…                                                                                       |
-|:-----:|:-------------------------------------------------------------------------------------------------|
-|  `i`  | elements or cells                                                                                |
-|  `j`  | nodes, either global or local. If there are loops which need both, use `j_local` and `j_global`. |
-|  `k`  | dummy index                                                                                      |
-|  `d`  | **d**imensions                                                                                   |
-|  `g`  | degree of freedoms (from **g**roups of energy actually)                                          |
-|  `q`  | Gauss (**q**uadrature) points                                                                    |
+| Index | Loop over… |
+|:--:|:---|
+| `i` | elements or cells |
+| `j` | nodes, either global or local. If there are loops which need both, use `j_local` and `j_global`. |
+| `k` | dummy index |
+| `d` | **d**imensions |
+| `g` | degree of freedoms (from **g**roups of energy actually) |
+| `q` | Gauss (**q**uadrature) points |
 
 ## Git workflow
 
@@ -463,7 +462,7 @@ format has to provide a virtual reader/writer method.
 
 # Code of conduct
 
-- See the [code of conduct][].
+- See the [code of conduct].
 
   [code of conduct]: CODE_OF_CONDUCT.md
 

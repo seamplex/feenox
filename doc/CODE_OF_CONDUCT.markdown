@@ -11,7 +11,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2024-06-03
+date: 2024-06-14
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -99,18 +99,18 @@ title: FeenoX Code of Conduct
 titleDelim: ":"
 ---
 
-- [<span class="toc-section-number">1</span> Our Pledge][]
-- [<span class="toc-section-number">2</span> Our Standards][]
+- [<span class="toc-section-number">1</span> Our Pledge]
+- [<span class="toc-section-number">2</span> Our Standards]
 - [<span class="toc-section-number">3</span> Enforcement
-  Responsibilities][]
-- [<span class="toc-section-number">4</span> Scope][]
-- [<span class="toc-section-number">5</span> Enforcement][]
-- [<span class="toc-section-number">6</span> Enforcement Guidelines][]
-  - [<span class="toc-section-number">6.1</span> 1. Correction][]
-  - [<span class="toc-section-number">6.2</span> 2. Warning][]
-  - [<span class="toc-section-number">6.3</span> 3. Temporary Ban][]
-  - [<span class="toc-section-number">6.4</span> 4. Permanent Ban][]
-- [<span class="toc-section-number">7</span> Attribution][]
+  Responsibilities]
+- [<span class="toc-section-number">4</span> Scope]
+- [<span class="toc-section-number">5</span> Enforcement]
+- [<span class="toc-section-number">6</span> Enforcement Guidelines]
+  - [<span class="toc-section-number">6.1</span> 1. Correction]
+  - [<span class="toc-section-number">6.2</span> 2. Warning]
+  - [<span class="toc-section-number">6.3</span> 3. Temporary Ban]
+  - [<span class="toc-section-number">6.4</span> 4. Permanent Ban]
+- [<span class="toc-section-number">7</span> Attribution]
 
 - Be kind to others. Do not insult or put down others. Behave
   professionally. Remember that harassment and sexist, racist, or
@@ -260,12 +260,12 @@ within the community.
 
 # Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant][],
-version 2.0, available at
+This Code of Conduct is adapted from the [Contributor Covenant], version
+2.0, available at
 <https://www.contributor-covenant.org/version/2/0/code_of_conduct.html>.
 
 Community Impact Guidelines were inspired by [Mozilla’s code of conduct
-enforcement ladder][].
+enforcement ladder].
 
 For answers to common questions about this code of conduct, see the FAQ
 at <https://www.contributor-covenant.org/faq>. Translations are

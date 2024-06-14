@@ -1,9 +1,9 @@
 # History and motivation
 
-Very much like Unix in the late 1960s and C in the early 1970s,
-[FeenoX][] is a third-system effect: I wrote a first hack that seemed to
-work better than I had expected. Then I tried to add a lot of features
-and complexities which I felt the code needed. After ten years of actual
+Very much like Unix in the late 1960s and C in the early 1970s, [FeenoX]
+is a third-system effect: I wrote a first hack that seemed to work
+better than I had expected. Then I tried to add a lot of features and
+complexities which I felt the code needed. After ten years of actual
 usage, I then realized
 
 1.  what was worth keeping,
@@ -19,16 +19,15 @@ that follows explains why I wrote the first hack to begin with.
 
 It was at the movies when I first heard about dynamical systems,
 non-linear equations and chaos theory. The year was 1993, I was ten
-years old and the movie was Jurassic Park. [Dr. Ian Malcolm][] (the
-character portrayed by [Jeff Goldblum][]) explained sensitivity to
-initial conditions in a [memorable scene][], which is worth watching
-again and again. Since then, the fact that tiny variations may lead to
-unexpected results has always fascinated me. During high school I
-attended a very interesting course on fractals and chaos that made me
-think further about complexity and its mathematical description.
-Nevertheless, it was not not until college that I was able to really
-model and solve the differential equations that give rise to chaotic
-behavior.
+years old and the movie was Jurassic Park. [Dr. Ian Malcolm] (the
+character portrayed by [Jeff Goldblum]) explained sensitivity to initial
+conditions in a [memorable scene], which is worth watching again and
+again. Since then, the fact that tiny variations may lead to unexpected
+results has always fascinated me. During high school I attended a very
+interesting course on fractals and chaos that made me think further
+about complexity and its mathematical description. Nevertheless, it was
+not not until college that I was able to really model and solve the
+differential equations that give rise to chaotic behavior.
 
 <figure>
 <img src="jurassicpark.jpg"
@@ -53,13 +52,13 @@ During my years of undergraduate student (circa 2004–2007), whenever I
 had to solve these kind of equations I had to choose one of the
 following three options:
 
-1.  to program an *ad-hoc* numerical method such as [Euler][] or
-    [Runge-Kutta][], matching the requirements of the system of
-    equations to solve, or
+1.  to program an *ad-hoc* numerical method such as [Euler] or
+    [Runge-Kutta], matching the requirements of the system of equations
+    to solve, or
 2.  to use a standard numerical library such as the [GNU Scientific
-    Library][] and code the equations to solve into a C program (or
-    maybe in Python), or
-3.  to use a high-level system such as [Octave][], [Maxima][], or some
+    Library] and code the equations to solve into a C program (or maybe
+    in Python), or
+3.  to use a high-level system such as [Octave], [Maxima], or some
     non-free (and worse, see below) programs.
 
 Of course, each option had its pros and its cons. But none provided the

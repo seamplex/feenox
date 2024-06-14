@@ -27,6 +27,7 @@
     - [Cinética inversa](https://seamplex.com/feenox/examples/daes.html#cinética-inversa)
     - [Control de inestabilidades de
     xenón](https://seamplex.com/feenox/examples/daes.html#control-de-inestabilidades-de-xenón)
+    - [Mapas de diseño](https://seamplex.com/feenox/examples/daes.html#mapas-de-diseño)
 - Laplace’s equation
   - [How to solve a maze without AI](https://seamplex.com/feenox/examples/laplace.html#how-to-solve-a-maze-without-ai)
     - [Transient top-down](https://seamplex.com/feenox/examples/laplace.html#transient-top-down)

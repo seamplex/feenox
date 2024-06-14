@@ -81,7 +81,7 @@ int feenox_mesh_count_element_volumetric_neighbors(element_t *this) {
         if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
           int exists = 0;
           for (unsigned int k = 0; exists == 0 && k < index; k++) {
-            exists |= element_item->element->tag == tags[k];
+            exists |= (element_item->element->tag == tags[k]);
           }
           if (exists == 0) {
             tags[index++] = element_item->element->tag;

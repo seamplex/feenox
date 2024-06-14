@@ -54,6 +54,7 @@ for i in hello          \
          inverse-integral      \
          inverse-dae           \
          xenon                 \
+         point                 \
          wing                  \
   ; do
   in=${i}.fee

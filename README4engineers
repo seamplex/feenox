@@ -50,7 +50,8 @@ mesh entitites (in this case the mapping is not needed but in
 multi-material problems the mapping is needed indeed). Nothing more,
 nothing less.
 
-[The NAFEMS LE10 problem statement and the corresponding FeenoX input]
+[Figure 1: The NAFEMS LE10 problem statement and the corresponding
+FeenoX input]
 
 Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX
 input
@@ -119,7 +120,7 @@ academics.
   [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
   [NAFEMS LE10 “Thick plate pressure” benchmark]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
   [multi-material problems]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
-  [The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
+  [Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
     nafems-le10-problem-input.svg
   [nafems-le10.geo]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo
   [Gmsh]: http://gmsh.info/
