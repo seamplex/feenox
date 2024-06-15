@@ -191,7 +191,7 @@ attempt does not seem to be good.</figcaption>
 
 The Laplace equation can be used to model potential flow. For the
 particular case of a airfoil profile, the Dirichlet condition at the
-wing has to satisfy the Kutta condition.
+wing has to satisfy the [Kutta condition].
 
 This example
 
@@ -483,4 +483,5 @@ alt="Potential and velocities zoomed over the airfoil" />
 airfoil</figcaption>
 </figure>
 
+  [Kutta condition]: https://en.wikipedia.org/wiki/Kutta%E2%80%93Joukowski_theorem
   [Joukowsky profile]: https://en.wikipedia.org/wiki/Joukowsky_transform
