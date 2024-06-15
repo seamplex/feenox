@@ -179,8 +179,9 @@ wing has to satisfy the Kutta condition.
 
 This example
 
-1.  Creates a symmetric airfoil-like Joukowsky profile using the the
-    Gmsh Python API.
+1.  Creates a symmetric airfoil-like [Joukowsky
+    profile](https://en.wikipedia.org/wiki/Joukowsky_transform) using
+    the the Gmsh Python API
 2.  Solves the steady-state 2D Laplace equation with a different
     Dirichlet value at the airfoil until the solution $\phi$ evaluated
     at the continuation of the wing tip matches the boundary value $c$.
@@ -188,13 +189,13 @@ This example
     a.  over the profile itself
     b.  over a circle around the airfoil, computing the unitary
         tangential vector
-        i.  from the internal normal variables `nx` and `ny`
-        ii. from two functions `tx` and `ty` using the circle's equation
+        i.  from the internal normal variables `nx` and `ny`
+        ii. from two functions `tx` and `ty` using the circle's equation
     c.  around the original rectangular domain
 
     It also computes the drag and the lift scalars as the integral of
-    the pressure (computed from Bernoulli's principle) times `nx` and
-    `nz` over the circle, respectively.
+    the pressure (computed from Bernoulli's principle) times `nx`
+    and `nz` over the circle, respectively.
 
 ![Full domain](airfoil-msh1.png){width="100%"}
 
