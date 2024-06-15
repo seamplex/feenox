@@ -32,8 +32,8 @@
   - [How to solve a maze without AI](https://seamplex.com/feenox/examples/laplace.html#how-to-solve-a-maze-without-ai)
     - [Transient top-down](https://seamplex.com/feenox/examples/laplace.html#transient-top-down)
     - [Transient bottom-up](https://seamplex.com/feenox/examples/laplace.html#transient-bottom-up)
-  - [Potential flow around a wing
-  profile](https://seamplex.com/feenox/examples/laplace.html#potential-flow-around-a-wing-profile)
+  - [Potential flow around an airfoil
+  profile](https://seamplex.com/feenox/examples/laplace.html#potential-flow-around-an-airfoil-profile)
 - Heat conduction
   - [Thermal slabs](https://seamplex.com/feenox/examples/thermal.html#thermal-slabs)
     - [One-dimensional linear](https://seamplex.com/feenox/examples/thermal.html#one-dimensional-linear)

@@ -171,35 +171,185 @@ $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-bu-%03d.png maze-tran-bu.gif
 ![Transient bottom-up solution. The first attempt does not seem to be good.](maze-tran-bu.gif){width_html=100% width_latex=50%}
 
 
-# Potential flow around a wing profile
+# Potential flow around an airfoil profile
 
 The Laplace equation can be used to model potential flow. For the
-particular case of a wing profile, the Dirichlet condition at the wing
-has to satisfy the Kutta condition.
+particular case of a airfoil profile, the Dirichlet condition at the
+wing has to satisfy the Kutta condition.
 
 This example
 
-1.  Creates a symmetric wing-like Joukowsky profile using the the Gmsh
-    Python API.
+1.  Creates a symmetric airfoil-like Joukowsky profile using the the
+    Gmsh Python API.
 2.  Solves the steady-state 2D Laplace equation with a different
-    Dirichlet value at the wing until the solution $\phi$ evaluated at
-    the continuation of the wing tip matches the boundary value $c$. It
-    then computes the circulation integral of the velocities
-    a.  over a circle around the wing profile, computing the unitary
+    Dirichlet value at the airfoil until the solution $\phi$ evaluated
+    at the continuation of the wing tip matches the boundary value $c$.
+    It then computes the circulation integral of the velocities
+    a.  over the profile itself
+    b.  over a circle around the airfoil, computing the unitary
         tangential vector
         i.  from the internal normal variables `nx` and `ny`
         ii. from two functions `tx` and `ty` using the circle's equation
-    b.  around the original rectangular domain
+    c.  around the original rectangular domain
 
-![Full domain](wing-msh1.png){width="100%"}
+    It also computes the drag and the lift scalars as the integral of
+    the pressure (computed from Bernoulli's principle) times `nx` and
+    `nz` over the circle, respectively.
 
-![Zoom over the wing profile](wing-msh2.png){width="100%"}
+![Full domain](airfoil-msh1.png){width="100%"}
+
+![Zoom over the airfoil profile](airfoil-msh2.png){width="100%"}
+
+``` python
+import sys
+import math
+import cmath
+import gmsh
+
+gmsh.initialize()
+
+# size of the domain [-a,+a]x[-b,+b]
+a = 20
+b = 10
+
+# characteristic element sizes
+lc0 = 0.6       # near the boundary
+lc = 0.1*lc0    # near the wing
+
+# number of points of definition
+nperf = 50
+# attack angle
+alpha = (float(sys.argv[1]) if len(sys.argv) > 1 else 10) * math.pi/180
+
+# Joukowsky parameters
+x0 = (float(sys.argv[2]) if len(sys.argv) > 2 else -0.11)
+y0 = 0
+r = math.sqrt((x0-1)**2+y0**2)
+
+# append points
+pts = []
+coords = []
+for i in range(nperf):
+  theta = i * 2*math.pi/nperf
+  dz = complex(x0 + r*math.cos(theta), y0 + r*math.sin(theta))
+  z = (dz + 1/dz)*cmath.exp(complex(0, -alpha))
+  # remember the coords of these three points
+  if i == 0 or i == 1 or i == nperf-1:
+    coords.append([z.real, z.imag])
+  pts.append(gmsh.model.occ.addPoint(z.real, z.imag, 0, lc))
+
+# create a closed loop of points
+pts.append(pts[0])
+
+# add a spline
+spl = []
+spl.append(gmsh.model.occ.addSpline(pts))
+wing = gmsh.model.occ.addCurveLoop(spl)
+
+# compute the location where to evaluate the Kutta condition 
+# this is ugly and not pythonic at all!
+vsup = [-(coords[1][0] - coords[0][0]),
+        -(coords[1][1] - coords[0][1])]  
+norm = math.sqrt(vsup[0]**2 + vsup[1]**2)
+vsup[0] /= norm
+vsup[1] /= norm
+
+vinf = [-(coords[0][0] - coords[2][0]),
+        -(coords[0][1] - coords[2][1])] 
+norm = math.sqrt(vinf[0]**2 + vinf[1]**2)
+vinf[0] /= norm
+vinf[1] /= norm
+
+vmed = vsup + vinf
+norm = math.sqrt(vmed[0]**2 + vmed[1]**2)
+vmed[0] /= norm
+vmed[1] /= norm
+
+eps = 0.04
+p = [coords[0][0] + eps * vmed[0],
+     coords[0][1] + eps * vmed[1]]
+# this is just to show the point in case one opens the .brep
+kutta = gmsh.model.occ.addPoint(p[0], p[1], 0, lc)
+
+# f = open("p.fee", "w")
+# f.write( "VECTOR p[2] DATA %g %g\n" % (p[0], p[1]))
+# f.close()
+
+
+# add the external boundary
+p1 = gmsh.model.occ.addPoint(-a, -b, 0, lc0)
+p2 = gmsh.model.occ.addPoint(+a, -b, 0, lc0)
+p3 = gmsh.model.occ.addPoint(+a, +b, 0, lc0)
+p4 = gmsh.model.occ.addPoint(-a, +b, 0, lc0)
+bottom   = gmsh.model.occ.addLine(p1, p2)
+right    = gmsh.model.occ.addLine(p2, p3)
+top      = gmsh.model.occ.addLine(p3, p4)
+left     = gmsh.model.occ.addLine(p4, p1)
+boundary = gmsh.model.occ.addCurveLoop([bottom, right, top, left])
+air      = gmsh.model.occ.addPlaneSurface([boundary, wing])
+
+# create a circle to compute the circulation
+r_circle = 3
+circle = gmsh.model.occ.addCircle(0, 0, 0, r_circle)
+
+
+# we could embed the kutta point into the mesh but
+# then the geometrical entities 
+ov, ovv = gmsh.model.occ.fragment([(2, air)], [(0, kutta), (1,circle)])
+print(ov)
+print(ovv)
+
+gmsh.model.occ.synchronize()
+
+# physical groups
+# after the boolean fragment we lost the ids
+# gmsh.model.addPhysicalGroup(1, [bottom], name="bottom")
+# gmsh.model.addPhysicalGroup(1, [right],  name="right")
+# gmsh.model.addPhysicalGroup(1, [top],    name="top")
+# gmsh.model.addPhysicalGroup(1, [left],   name="left")
+# gmsh.model.addPhysicalGroup(1, [wing],   name="wing")
+# gmsh.model.addPhysicalGroup(2, [air],    name="air")
+
+gmsh.model.addPhysicalGroup(0, [kutta], name="kutta")
+gmsh.model.addPhysicalGroup(1, [6],     name="circle")
+gmsh.model.addPhysicalGroup(1, [7],     name="bottom")
+gmsh.model.addPhysicalGroup(1, [9],     name="right")
+gmsh.model.addPhysicalGroup(1, [10],    name="top")
+gmsh.model.addPhysicalGroup(1, [8],     name="left")
+gmsh.model.addPhysicalGroup(1, [11],    name="wing")
+gmsh.model.addPhysicalGroup(2, [1,2],   name="air")
+
+# dump the brep (or xao) just in case
+gmsh.write("airfoil.brep")
+gmsh.write("airfoil.xao")
+
+
+# mesh
+gmsh.option.setNumber("Mesh.RecombineAll", 1)
+gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 2*math.pi * 0.25 * r_circle/lc)
+gmsh.option.setNumber("Mesh.Algorithm", 6)
+gmsh.model.mesh.setAlgorithm(2, 1, 8);
+gmsh.model.mesh.setAlgorithm(2, 2, 6);
+gmsh.option.setNumber("Mesh.Smoothing", 10)
+
+gmsh.model.mesh.generate(2)
+gmsh.model.mesh.optimize("Netgen")
+gmsh.model.mesh.optimize("Laplace2D")
+gmsh.model.mesh.setOrder(2)
+gmsh.model.mesh.optimize("HighOrderFastCurving")
+gmsh.model.mesh.optimize("HighOrder")
+gmsh.write("airfoil.msh")
+
+# gmsh.fltk.run()
+gmsh.finalize()
+
+```
 
 
 ```feenox
 PROBLEM laplace 2D
 static_steps = 20
-READ_MESH wing.msh
+READ_MESH airfoil.msh
 
 # boundary conditions constant -> streamline
 BC bottom  phi=0
@@ -216,7 +366,7 @@ SOLVE_PROBLEM
 
 PHYSICAL_GROUP kutta DIM 0
 e = phi(kutta_cog[1], kutta_cog[2]) - c
-PRINT step_static %.6f c %+.1e e
+PRINT TEXT "\# "step_static %.6f c %+.1e e HEADER
 
 # check for convergence
 done_static = done_static | (abs(e) < 1e-8)
@@ -225,28 +375,42 @@ IF done_static
   vx(x,y) = +dphidy(x,y) * left_length
   vy(x,y) = -dphidx(x,y) * left_length
 
-  WRITE_MESH $0-converged.msh phi VECTOR vx vy 0
-  WRITE_MESH $0-converged.vtk phi VECTOR vx vy 0
+  # write post-processing views
+  WRITE_MESH $0-converged.msh   phi VECTOR vx vy 0
+  WRITE_MESH $0-converged.vtk   phi VECTOR vx vy 0
   
-  # Function unit tangent:
+  # circulation on profile
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER wing RESULT circ_profile
+  PRINTF "circ_profile  = %g" -circ_profile
+
+  # function unit tangent
   PHYSICAL_GROUP circle DIM 1
   cx = circle_cog[1]
   cy = circle_cog[2]
   tx(x,y) = -(y-cy)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
   ty(x,y) = +(x-cx)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  
+  # circulation on the circumference with tangent
+  INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ_circle_t
+  PRINTF "circ_circle_t = %g" -circ_circle_t
 
-  # Circulation on the circumference:
-  INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ
-  PRINT "circt: " circ
-
-  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER circle RESULT circn
-  PRINT "circn: " circn
+  # circulation on the outer box
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER circle RESULT circ_circle_n
+  PRINTF "circ_circle_n = %g" -circ_circle_n
   
   INTEGRATE -vx(x,y) OVER top    GAUSS RESULT inttop
   INTEGRATE +vx(x,y) OVER bottom GAUSS RESULT intbottom
   INTEGRATE -vy(x,y) OVER left   GAUSS RESULT intleft
   INTEGRATE +vy(x,y) OVER right  GAUSS RESULT intright
-  PRINT "box: " inttop+intleft+intbottom+intright
+  circ_box = inttop + intleft + intbottom + intright
+  PRINTF "circ_box      = %g" -circ_box
+  
+  # pressure forces
+  p(x,y) = 1.0 - vx(x,y)^2 + vy(x,y)^2
+  INTEGRATE p(x,y)*(nx) OVER circle RESULT pFx
+  PRINTF "pressure_drag = %g" pFx
+  INTEGRATE p(x,y)*(ny) OVER circle RESULT pFy
+  PRINTF "pressure_lift = %g" pFy
   
 ELSE
 
@@ -266,24 +430,28 @@ ENDIF
 
 
 ```terminal
-$ python wing.py
+$ python airfoil.py
 [...]
-Info    : Writing 'wing.msh'...
-Info    : Done writing 'wing.msh'
-$ $ feenox wing.fee 
-1       0.500000        -3.4e-03
-2       0.400000        +3.7e-03
-3       0.452068        +5.5e-10
-circt:  -2.49946
-circn:  -2.49878
-box:    -2.50177
+Info    : Writing 'airfoil.msh'...
+Info    : Done writing 'airfoil.msh'
+$ feenox airfoil.fee 
+# #     step_static     c       e
+#       1       0.500000        -3.4e-03
+#       2       0.400000        +3.7e-03
+#       3       0.452067        +2.0e-09
+circ_profile  = 2.49918
+circ_circle_t = 2.49975
+circ_circle_n = 2.49907
+circ_box      = 2.50379
+pressure_drag = -0.00168068
+pressure_lift = 2.60614
 $ 
 
 ```
 
 
-![Potential and velocities on the whole domain](wing-converged1.png){width=100%}
+![Potential and velocities on the whole domain](airfoil-converged1.png){width=100%}
 
-![Potential and velocities zoomed over the wing](wing-converged2.png){width=100%}
+![Potential and velocities zoomed over the airfoil](airfoil-converged2.png){width=100%}
 
 

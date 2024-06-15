@@ -55,7 +55,7 @@ for i in hello          \
          inverse-dae           \
          xenon                 \
          point                 \
-         wing                  \
+         airfoil               \
   ; do
   in=${i}.fee
   out=$(grep category ${in} | cut -d: -f2 | xargs).md

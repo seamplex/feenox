@@ -10,7 +10,7 @@ a = 20
 b = 10
 
 # characteristic element sizes
-lc0 = 0.6      # near the boundary
+lc0 = 0.6       # near the boundary
 lc = 0.1*lc0    # near the wing
 
 # number of points of definition
@@ -117,8 +117,8 @@ gmsh.model.addPhysicalGroup(1, [11],    name="wing")
 gmsh.model.addPhysicalGroup(2, [1,2],   name="air")
 
 # dump the brep (or xao) just in case
-gmsh.write("wing.brep")
-gmsh.write("wing.xao")
+gmsh.write("airfoil.brep")
+gmsh.write("airfoil.xao")
 
 
 # mesh
@@ -135,7 +135,7 @@ gmsh.model.mesh.optimize("Laplace2D")
 gmsh.model.mesh.setOrder(2)
 gmsh.model.mesh.optimize("HighOrderFastCurving")
 gmsh.model.mesh.optimize("HighOrder")
-gmsh.write("wing.msh")
+gmsh.write("airfoil.msh")
 
 # gmsh.fltk.run()
 gmsh.finalize()
