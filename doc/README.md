@@ -46,7 +46,7 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 ## Other documents
  
  * [Unix manpage](https://www.seamplex.com/feenox/doc/feenox.1.html) (accessible with `man feenox` after (global) installation with `sudo make install`)
- * [Frequently Asked Questions](./FAQs.md) [PDF](https://www.seamplex.com/feenox/doc/FAQs.pdf)
+ * [Frequently Asked Questions](./FAQ.md) [PDF](https://www.seamplex.com/feenox/doc/FAQ.pdf)
  * [Compilation Guide](./compilation.md) [PDF](https://www.seamplex.com/feenox/doc/compilation.pdf)
  * [Programming Guide](./programming.md) [PDF](https://www.seamplex.com/feenox/doc/programming.pdf)
  * [History](./history.md) [PDF](https://www.seamplex.com/feenox/doc/history.pdf)
