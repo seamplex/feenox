@@ -189,9 +189,12 @@ attempt does not seem to be good.</figcaption>
 
 # Potential flow around an airfoil profile
 
-The Laplace equation can be used to model potential flow. For the
-particular case of a airfoil profile, the Dirichlet condition at the
-wing has to satisfy the [Kutta condition].
+The Laplace equation can be used to model potential flow, as illustrated
+with this example from [Prof. Enzo Dari] for his course “Fluid
+Mechanics” at [Instituto Balseiro].
+
+For the particular case of a airfoil profile, the Dirichlet condition at
+the wing has to satisfy the [Kutta condition].
 
 This example
 
@@ -483,5 +486,7 @@ alt="Potential and velocities zoomed over the airfoil" />
 airfoil</figcaption>
 </figure>
 
+  [Prof. Enzo Dari]: https://www.conicet.gov.ar/new_scp/detalle.php?keywords=enzo%2Bdari&id=32035&datos_academicos=yes
+  [Instituto Balseiro]: https://www.ib.edu.ar/
   [Kutta condition]: https://en.wikipedia.org/wiki/Kutta%E2%80%93Joukowski_theorem
   [Joukowsky profile]: https://en.wikipedia.org/wiki/Joukowsky_transform

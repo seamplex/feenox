@@ -127,8 +127,7 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   
   // if there's only one volumetric element, we check if n is the outward normal
   // if there's none (or more than one) then we rely on the element orientation
-  int nn = feenox_mesh_count_element_volumetric_neighbors(element);
-  // if (feenox_mesh_count_element_volumetric_neighbors(element) == 1) {
+  if (feenox_mesh_count_element_volumetric_neighbors(element) == 1) {
     // first compute the center of the surface element
     feenox_call(feenox_mesh_compute_element_barycenter(element, surface_center));
 
@@ -143,7 +142,7 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
       n[1] = -n[1];
       n[2] = -n[2];
     }
-  // }
+  }
   
   // update nx ny and nz
   feenox_var_value(feenox.mesh.vars.arr_n[0]) = n[0];

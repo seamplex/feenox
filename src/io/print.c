@@ -74,7 +74,7 @@ int feenox_instruction_print(void *arg) {
   if (print->header) {
     if (print->skip_header_step.items != NULL && print->header_already_printed == 0) {
       have_to_header = 1;
-    } else if (((int)(feenox_special_var_value(step_transient)) - print->last_header_step) < feenox_expression_eval(&print->skip_header_step)) {
+    } else if ((int)(feenox_special_var_value(step_static)) == 1 || ((int)(feenox_special_var_value(step_transient)) - print->last_header_step) < feenox_expression_eval(&print->skip_header_step)) {
       have_to_header = 1;
     }
   }

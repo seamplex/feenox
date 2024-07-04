@@ -286,7 +286,7 @@ AM_CONDITIONAL([INCLUDE_SLEPC], [test "x${have_slepc}" = "xyes"])
 
 ######################
 # see if we have --enable-download-gsl
-gslver=2.7
+gslver=2.8
 gsldist=gsl-${gslver}
 gslmirror=http://ftpmirror.gnu.org/gsl/${gsldist}.tar.gz
 
