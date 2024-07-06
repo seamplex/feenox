@@ -47,6 +47,7 @@ TESTS = \
         tests/iterative.sh \
         tests/fit.sh \
         tests/file.sh \
+        tests/func_min.sh \
         tests/function_algebraic.sh \
         tests/function_data.sh \
         tests/function_file.sh \

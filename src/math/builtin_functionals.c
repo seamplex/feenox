@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox builtin functionals
  *
- *  Copyright (C) 2009--2020 jeremy theler
+ *  Copyright (C) 2009--2024 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -49,7 +49,7 @@ struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
     {"prod",                4, 4, &feenox_builtin_prod},
     {"sum",                 4, 4, &feenox_builtin_sum},
     {"root",                4, 7, &feenox_builtin_root},
-    {"func_min",            4, 8, &feenox_builtin_func_min},
+    {"func_min",            4, 6, &feenox_builtin_func_min},
 };
 
 
@@ -544,11 +544,11 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
 
 ///fu+func_min+function_name func_min
 ///fu+func_min+escaped_name func\_min
-///fu+func_min+desc Finds the value of the variable $x$ given in the second argument
-///fu+func_min+desc which makes the expression $f(x)$ given in the first argument to
-///fu+func_min+desc take local a minimum in the in the range $[a,b]$ given by
+///fu+func_min+desc Finds the value of the variable $x$ given in the second argument
+///fu+func_min+desc which makes the expression $f(x)$ given in the first argument to
+///fu+func_min+desc be local a minimum in the in the range $[a,b]$ given by
 ///fu+func_min+desc the third and fourth arguments. If there are many local minima,
-///fu+func_min+desc the one that is closest to $(a+b)/2$ is returned.
+///fu+func_min+desc which one is returned cannot be known beforehand.
 ///fu+func_min+desc The optional fifth argument $\epsilon$ gives a relative tolerance
 ///fu+func_min+desc for testing convergence, corresponding to GSL `epsrel` (note that
 ///fu+func_min+desc `epsabs` is set also to $\epsilon)$.
@@ -557,49 +557,26 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
 ///fu+func_min+desc 0 (default) is `quad_golden`,
 ///fu+func_min+desc 1 is `brent` and
 ///fu+func_min+desc 2 is `goldensection`.
-///fu+func_min+desc See the GSL documentation for further information on the algorithms.
-///fu+func_min+desc The seventh optional argument $p$ is a flag that indicates how to proceed
-///fu+func_min+desc if there is no local minimum in the range $[a,b]$.
-///fu+func_min+desc If $p = 0$ (default), $a$ is returned if $f(a) < f(b)$ and $b$ otherwise.
-///fu+func_min+desc If $p = 1$ then the local minimum algorimth is tried nevertheless.
+///fu+func_min+desc See the GSL documentation for further information on the algorithms:
+///fu+func_min+desc <https://www.gnu.org/software/gsl/doc/html/min.html>
 ///fu+func_min+desc Default is $\epsilon = (1/2)^{-20} \approx 9.6\times 10^{-7}$.
-///fu+func_min+usage y = func_min(f(x), x, a, b, [eps], [alg], [p])
+///fu+func_min+usage y = func_min(f(x), x, a, b, [eps], [alg])
 ///fu+func_min+math y = \left\{ x \in [a,b] / f(x) = \min_{[a,b]} f(x) \right \} 
 
 double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   
-  int iter, gsl_status;
-  double x, x_old;
-  double x_lower, x_upper;
-  double epsrel;
+  // keep the old value from x to restore it after we are done
+  double x_old = feenox_var_value(var_x);
 
-  
-  const gsl_min_fminimizer_type *T;
-  gsl_min_fminimizer *s = NULL;
-  gsl_function function_to_solve;
-  gsl_function_arguments_t function_arguments;
+  double x_lower = feenox_expression_eval(&a->arg[2]);
+  double x_upper = feenox_expression_eval(&a->arg[3]);
 
-  int max_iter;
-  int nocomplain;
-  max_iter = DEFAULT_ROOT_MAX_TER;
-  
-  // evaluamos el intervalo donde sospechamos esta la solucion
-  // nos acordamos cuanto vale x para despues volver a dejarle ese valor
-  x_old = feenox_var_value(var_x);
-
-  x_lower = feenox_expression_eval(&a->arg[2]);
-  x_upper = feenox_expression_eval(&a->arg[3]);
-
-  // arrancamos desde la mitad
-  x = 0.5*(x_lower + x_upper);
-  
-  // la precision
-  if ((epsrel = feenox_expression_eval(&a->arg[4])) == 0) {
+  double epsrel = feenox_expression_eval(&a->arg[4]);
+  if (epsrel == 0) {
     epsrel = DEFAULT_ROOT_TOLERANCE;
   }
 
-
-  // el algoritmo
+  const gsl_min_fminimizer_type *T;
   switch((int)feenox_expression_eval(&a->arg[5])) {
     case 0:
       T = gsl_min_fminimizer_quad_golden;
@@ -610,43 +587,44 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
     case 2:
       T = gsl_min_fminimizer_goldensection;
     break;
+    default:
+      T = gsl_min_fminimizer_quad_golden;
+    break;
   }
   
-  // un flag que nos indica si tenemos que ser quejosos o no
-  nocomplain = feenox_expression_eval(&a->arg[6]);  
-
-
+  // these guys are needed for GSL
+  gsl_function_arguments_t function_arguments;
   function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
+  gsl_function function_to_solve;
   function_to_solve.function = feenox_gsl_function;
   function_to_solve.params = (void *)(&function_arguments);
 
-  // TODO: poner en aux para no tener que hacer alloc cada vez
-  s = gsl_min_fminimizer_alloc(T);
+  // TODO: store in aux to avoid having to allocate each time
+  gsl_min_fminimizer *s = gsl_min_fminimizer_alloc(T);
 
-  // si no tenemos que ser quejosos entonces sacamos temporalmente
-  // el handler de errores de la GSL 
-  if (nocomplain) {
-    gsl_set_error_handler_off();
-    gsl_min_fminimizer_set(s, &function_to_solve, x, x_lower, x_upper);
-    gsl_set_error_handler(feenox_gsl_handler);
-  } else {
-    gsl_set_error_handler_off();
-    if (gsl_min_fminimizer_set(s, &function_to_solve, x, x_lower, x_upper) != GSL_SUCCESS) {
-      gsl_set_error_handler(feenox_gsl_handler);
-      
-      gsl_min_fminimizer_free(s);
-      if (feenox_gsl_function(x_lower, function_to_solve.params) < feenox_gsl_function(x_upper, function_to_solve.params)) {
-        return x_lower;
-      } else {
-        return x_upper;
-      }
+  // try to find a good initial guess
+  double initial_factors[] = {0.5, 0.25, 0.75, 0.125, 1-0.125, 0.0625, 1-0.0625, 0.025, 1-0.025, 0.01, 0.99};
+  gsl_set_error_handler_off();
+
+  double x = 0;
+  int gsl_status = GSL_SUCCESS;
+  for (int i = 0; i < sizeof(initial_factors)/sizeof(initial_factors[0]); i++) {
+    x = initial_factors[i] * x_lower+ (1-initial_factors[i]) * x_upper;
+    gsl_status = gsl_min_fminimizer_set(s, &function_to_solve, x, x_lower, x_upper);
+    if (gsl_status == GSL_SUCCESS) {
+      break;
     }
-    gsl_set_error_handler(feenox_gsl_handler);
+  }
+  gsl_set_error_handler(feenox_gsl_handler);
+
+  if (gsl_status != GSL_SUCCESS) {
+    feenox_var_value(var_x) = x_old;
+    return (feenox_gsl_function(x_lower, function_to_solve.params) < feenox_gsl_function(x_upper, function_to_solve.params)) ?  x_lower : x_upper;
   }
   
-  iter = 0;
+  int iter = 0;
   do {
     iter++;
     gsl_min_fminimizer_iterate(s);
@@ -654,7 +632,7 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
     x_lower = gsl_min_fminimizer_x_lower(s);
     x_upper = gsl_min_fminimizer_x_upper(s);
     gsl_status = gsl_min_test_interval(x_lower, x_upper, epsrel, epsrel);
-  } while (gsl_status == GSL_CONTINUE && iter < max_iter);
+  } while (gsl_status == GSL_CONTINUE && iter < DEFAULT_ROOT_MAX_TER);
 
   feenox_var_value(var_x) = x_old;
 
