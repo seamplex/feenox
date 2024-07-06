@@ -1,0 +1,4 @@
+VAR x
+xmin1 = func_min(0.25*(x^2-1), x, -0.30, 0.99, 1.0e-10)
+xmin2 = func_min(0.25*(x^2-1), x, -0.95, 0.99, 1.0e-10)
+PRINT xmin1-xmin2
