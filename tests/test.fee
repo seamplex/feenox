@@ -1,0 +1,4 @@
+READ_MESH single-arc2.msh
+PHYSICAL_GROUP quarter DIM 1
+PRINT quarter_length
+
