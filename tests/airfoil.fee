@@ -1,0 +1,74 @@
+PROBLEM laplace 2D
+static_steps = 20
+READ_MESH airfoil.msh
+
+# boundary conditions constant -> streamline
+BC bottom  phi=0
+BC top     phi=1
+
+# initialize c = streamline constant for the wing
+DEFAULT_ARGUMENT_VALUE 1 0.5
+IF in_static_first
+ c = $1
+ENDIF
+BC wing    phi=c
+
+SOLVE_PROBLEM
+
+PHYSICAL_GROUP kutta DIM 0
+e = phi(kutta_cog[1], kutta_cog[2]) - c
+# PRINT TEXT "\# "step_static %.6f c %+.1e e HEADER
+
+# check for convergence
+done_static = done_static | (abs(e) < 1e-8)
+IF done_static
+  PHYSICAL_GROUP left DIM 1
+  vx(x,y) = +dphidy(x,y) * left_length
+  vy(x,y) = -dphidx(x,y) * left_length
+
+  # write post-processing views
+  WRITE_MESH $0-converged.msh   phi VECTOR vx vy 0
+  WRITE_MESH $0-converged.vtk   phi VECTOR vx vy 0
+  
+  # circulation on profile
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER wing RESULT circ_profile
+
+  # function unit tangent
+  PHYSICAL_GROUP circle DIM 1
+  cx = circle_cog[1]
+  cy = circle_cog[2]
+  tx(x,y) = -(y-cy)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  ty(x,y) = +(x-cx)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  
+  # circulation on the circumference with tangent
+  INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ_circle_t
+
+  # circulation on the outer box
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER circle RESULT circ_circle_n
+  
+  INTEGRATE -vx(x,y) OVER top    GAUSS RESULT inttop
+  INTEGRATE +vx(x,y) OVER bottom GAUSS RESULT intbottom
+  INTEGRATE -vy(x,y) OVER left   GAUSS RESULT intleft
+  INTEGRATE +vy(x,y) OVER right  GAUSS RESULT intright
+  circ_box = inttop + intleft + intbottom + intright
+  
+  # pressure forces
+  p(x,y) = 1.0 - vx(x,y)^2 + vy(x,y)^2
+  INTEGRATE p(x,y)*(nx) OVER circle RESULT pFx
+  INTEGRATE p(x,y)*(ny) OVER circle RESULT pFy
+  
+  PRINTF "%.2f %.2f %.2f %.2f %.2f %.2f" -circ_profile -circ_circle_t -circ_circle_n -circ_box pFy pFx
+ELSE
+
+ # update c
+ IF in_static_first
+  c_last = c
+  e_last = e
+  c = c_last - 0.1
+ ELSE
+  c_next = c_last - e_last * (c_last-c)/(e_last-e)
+  c_last = c
+  e_last = e
+  c = c_next
+ ENDIF
+ENDIF

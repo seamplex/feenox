@@ -71,3 +71,7 @@ azmy*.msh
 thermal-square.vtk
 square_tmp.vtk
 2dpwr-*.vtk
+airfoil*.msh
+airfoil*.vtk
+airfoil.brep
+airfoil.xao

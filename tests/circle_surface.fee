@@ -1,0 +1,4 @@
+# gmsh -2 circle.geo -order ${1} -o circle1.msh
+READ_MESH circle${1}.msh
+PHYSICAL_GROUP surface DIM 2
+PRINT surface_area

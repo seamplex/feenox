@@ -1,0 +1,29 @@
+$MeshFormat
+4.1 0 8
+$EndMeshFormat
+$PhysicalNames
+1
+1 2 "quarter"
+$EndPhysicalNames
+$Entities
+3 1 0 0
+1 0 0 0 0 
+2 1 0 0 0 
+3 0 1 0 0 
+1 5.551115123125783e-17 0 0 1 1 0 1 2 2 2 -3 
+$EndEntities
+$Nodes
+3 2 1 2
+0 2 0 1
+1
+1 0 0
+0 3 0 1
+2
+0 1 0
+1 1 0 0
+$EndNodes
+$Elements
+1 1 1 1
+1 1 1 1
+1 1 2 
+$EndElements
