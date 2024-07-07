@@ -80,7 +80,7 @@ gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
   switch (direct->size1) {
     case 1:
       if (inverse == NULL) {
-        inverse = gsl_matrix_alloc(1, 1);
+        feenox_check_alloc_null(inverse = gsl_matrix_alloc(1, 1));
       }
     	gsl_matrix_set(inverse, 0, 0, 1.0/gsl_matrix_get(direct, 0, 0));
       break;
@@ -252,7 +252,7 @@ inline gsl_matrix *feenox_fem_compute_C(element_t *e) {
   
   gsl_matrix **C = (feenox.fem.cache_J) ? &e->C : &feenox.fem.C;
   if ((*C) == NULL) {
-    (*C) = gsl_matrix_calloc(e->type->dim, e->type->nodes);
+    feenox_check_alloc_null((*C) = gsl_matrix_calloc(e->type->dim, e->type->nodes));
   } else if (feenox.fem.cache_J || e->tag == feenox.fem.current_gauss_element_tag) {
     return (*C);
   }
@@ -326,7 +326,7 @@ inline double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsign
   
   double **w = (feenox.fem.cache_J) ? &e->w : &feenox.fem.w;
   if ((*w) == NULL) {
-    (*w) = calloc(e->type->gauss[integration].Q, sizeof(double));
+    feenox_check_alloc((*w) = calloc(e->type->gauss[integration].Q, sizeof(double)));
     feenox.fem.current_gauss_type = e->type;
   } else if (((feenox.fem.current_weight_element_tag == e->tag && feenox.fem.current_weight_gauss_point == q) || feenox.fem.cache_J) && (*w)[q] != 0) {
     return (*w)[q];
@@ -348,8 +348,8 @@ inline double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsign
 
 inline gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration, gsl_matrix *J) {
   double dxdxi = 0;
-
-  if (e->type->nodes == 2) {  
+/*
+//  if (e->type->nodes == 2) {  
     // we are a line but not aligned with the x axis we have to compute the axial coordinate l
     double dx = e->node[1]->x[0] - e->node[0]->x[0];
     double dy = e->node[1]->x[1] - e->node[0]->x[1];
@@ -358,13 +358,32 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q
     dx /= l;
     dy /= l;
     dz /= l;
-
+*/
+/*    
+    dx = -M_PI/4;
+    dy = +M_PI/4;
+    dz = 0;
+*/
+/*  
     for (unsigned int j = 0; j < e->type->nodes; j++) {
       dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, j) *
                 (e->node[j]->x[0] * dx + e->node[j]->x[1] * dy + e->node[j]->x[2] * dz);
     }
+*/
+
+  for (unsigned int d = 0; d < 3; d++) {
+    double sum = 0;
+    for (unsigned int j = 0; j < e->type->nodes; j++) {
+      sum += e->node[j]->x[d] * gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, j);
+    }
+    dxdxi += sum*sum;
+  }
+  
+  dxdxi = sqrt(dxdxi);
+    
+/*    
   } else if (e->type->nodes == 3) {
- 
+    
     // take the line3 element as made by two line2 elements
     double dx1 = e->node[2]->x[0] - e->node[0]->x[0];
     double dy1 = e->node[2]->x[1] - e->node[0]->x[1];
@@ -387,7 +406,14 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q
 
     dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, 2) * (e->node[0]->x[0] * dx2 + e->node[2]->x[1] * dy2 + e->node[2]->x[2] * dz2);
     dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, 1) * (e->node[1]->x[0] * dx2 + e->node[1]->x[1] * dy2 + e->node[1]->x[2] * dz2);  
-  }
+
+    for (unsigned int j = 0; j < e->type->nodes; j++) {
+      dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, j) *
+                (e->node[j]->x[0] * M_PI/4 + e->node[j]->x[1] * M_PI/4);
+    }
+*/
+
+//  }
   
   if (J == NULL) {
     feenox_check_alloc_null(J = gsl_matrix_calloc(1,1));
@@ -544,6 +570,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, i
   if (e->type->dim == 1 && (e->node[0]->x[1] != 0 || e->node[1]->x[1] != 0 ||
                             e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0)) {
 
+//    (*J)[q] = feenox_fem_compute_J_at_gauss_general(e, q, integration, (*J)[q]);
     (*J)[q] = feenox_fem_compute_J_at_gauss_1d(e, q, integration, (*J)[q]);
 
   } else if (e->type->dim == 2 && (e->node[0]->x[2] != 0 || e->node[1]->x[2] != 0 || e->node[2]->x[2])) {
