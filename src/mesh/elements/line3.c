@@ -28,10 +28,6 @@
 
 
 int feenox_mesh_line3_init(void) {
-
-  double xi[1];
-  unsigned int j, q;
-  
   element_type_t *element_type = &feenox.mesh.element_types[ELEMENT_TYPE_LINE3];
   element_type->name = "line3";
   element_type->id = ELEMENT_TYPE_LINE3;
@@ -53,10 +49,10 @@ Line3:
             
 0-----2----1   
 */  
-  element_type->node_coords = calloc(element_type->nodes, sizeof(double *));
-  element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *));  
-  for (j = 0; j < element_type->nodes; j++) {
-    element_type->node_coords[j] = calloc(element_type->dim, sizeof(double));  
+  feenox_check_alloc(element_type->node_coords = calloc(element_type->nodes, sizeof(double *)));
+  feenox_check_alloc(element_type->node_parents = calloc(element_type->nodes, sizeof(node_relative_t *)));  
+  for (unsigned int j = 0; j < element_type->nodes; j++) {
+    feenox_check_alloc(element_type->node_coords[j] = calloc(element_type->dim, sizeof(double)));  
   }
   
   element_type->vertices++;
@@ -74,12 +70,12 @@ Line3:
   
   // full integration: three points
   feenox_mesh_gauss_init_line3(element_type, &element_type->gauss[integration_full]);
-  element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3);
+  feenox_check_alloc(element_type->gauss[integration_full].extrap = gsl_matrix_calloc(element_type->nodes, 3));
   
-  for (j = 0; j < element_type->nodes; j++) {
-    xi[0] = M_SQRT5/M_SQRT3 * element_type->node_coords[j][0];
+  for (unsigned int j = 0; j < element_type->nodes; j++) {
+    double xi[] = { M_SQRT5/M_SQRT3 * element_type->node_coords[j][0] };
     
-    for (q = 0; q < 3; q++) {
+    for (unsigned int q = 0; q < 3; q++) {
       gsl_matrix_set(element_type->gauss[integration_full].extrap, j, q, feenox_mesh_line3_h(q, xi));
     }
   }
@@ -88,10 +84,10 @@ Line3:
   feenox_mesh_gauss_init_line2(element_type, &element_type->gauss[integration_reduced]);
   element_type->gauss[integration_reduced].extrap = gsl_matrix_calloc(element_type->nodes, 2);
   
-  for (j = 0; j < element_type->nodes; j++) {
-    xi[0] = M_SQRT3 * element_type->node_coords[j][0];
+  for (unsigned int j = 0; j < element_type->nodes; j++) {
+    double xi[] = { M_SQRT3 * element_type->node_coords[j][0] };
     
-    for (q = 0; q < 2; q++) {
+    for (unsigned q = 0; q < 2; q++) {
       gsl_matrix_set(element_type->gauss[integration_reduced].extrap, j, q, feenox_mesh_line2_h(q, xi));
     }
   }

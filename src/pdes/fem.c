@@ -347,24 +347,50 @@ inline double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsign
 }
 
 inline gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration, gsl_matrix *J) {
-  
-  // we are a line but not aligned with the x axis we have to compute the axial coordinate l
-  double dx = e->node[1]->x[0] - e->node[0]->x[0];
-  double dy = e->node[1]->x[1] - e->node[0]->x[1];
-  double dz = e->node[1]->x[2] - e->node[0]->x[2];
-  double l = gsl_hypot3(dx, dy, dz);
-  dx /= l;
-  dy /= l;
-  dz /= l;
-
   double dxdxi = 0;
-  for (unsigned int j = 0; j < e->type->nodes; j++) {
-    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, j) *
-              (e->node[j]->x[0] * dx + e->node[j]->x[1] * dy + e->node[j]->x[2] * dz);
+
+  if (e->type->nodes == 2) {  
+    // we are a line but not aligned with the x axis we have to compute the axial coordinate l
+    double dx = e->node[1]->x[0] - e->node[0]->x[0];
+    double dy = e->node[1]->x[1] - e->node[0]->x[1];
+    double dz = e->node[1]->x[2] - e->node[0]->x[2];
+    double l = gsl_hypot3(dx, dy, dz);
+    dx /= l;
+    dy /= l;
+    dz /= l;
+
+    for (unsigned int j = 0; j < e->type->nodes; j++) {
+      dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, j) *
+                (e->node[j]->x[0] * dx + e->node[j]->x[1] * dy + e->node[j]->x[2] * dz);
+    }
+  } else if (e->type->nodes == 3) {
+ 
+    // take the line3 element as made by two line2 elements
+    double dx1 = e->node[2]->x[0] - e->node[0]->x[0];
+    double dy1 = e->node[2]->x[1] - e->node[0]->x[1];
+    double dz1 = e->node[2]->x[2] - e->node[0]->x[2];
+    double l1 = gsl_hypot3(dx1, dy1, dz1);
+    dx1 /= l1;
+    dy1 /= l1;
+    dz1 /= l1;
+
+    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, 0) * (e->node[0]->x[0] * dx1 + e->node[0]->x[1] * dy1 + e->node[0]->x[2] * dz1);
+    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, 2) * (e->node[2]->x[0] * dx1 + e->node[2]->x[1] * dy1 + e->node[2]->x[2] * dz1);
+    
+    double dx2 = e->node[1]->x[0] - e->node[2]->x[0];
+    double dy2 = e->node[1]->x[1] - e->node[2]->x[1];
+    double dz2 = e->node[1]->x[2] - e->node[2]->x[2];
+    double l2 = gsl_hypot3(dx2, dy2, dz2);
+    dx2 /= l2;
+    dy2 /= l2;
+    dz2 /= l2;
+
+    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, 2) * (e->node[0]->x[0] * dx2 + e->node[2]->x[1] * dy2 + e->node[2]->x[2] * dz2);
+    dxdxi += gsl_matrix_get(e->type->gauss[integration].B_c[q], 0, 1) * (e->node[1]->x[0] * dx2 + e->node[1]->x[1] * dy2 + e->node[1]->x[2] * dz2);  
   }
   
   if (J == NULL) {
-    J = gsl_matrix_calloc(1,1);
+    feenox_check_alloc_null(J = gsl_matrix_calloc(1,1));
   }
   gsl_matrix_set(J, 0, 0, dxdxi);
   return J;
@@ -484,7 +510,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned 
   
   gsl_matrix *C = feenox_fem_compute_C(e);
   if (J == NULL) {
-    J = gsl_matrix_calloc(e->type->dim, e->type->dim);
+    feenox_check_alloc_null(J = gsl_matrix_calloc(e->type->dim, e->type->dim));
   }
 
 //  printf("dgemm C B_c\n");
@@ -507,7 +533,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, i
     feenox.fem.current_gauss_type = e->type;
   }
   if ((*J)[q] == NULL) {
-    (*J)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim);
+    feenox_check_alloc_null((*J)[q] = gsl_matrix_calloc(e->type->dim, e->type->dim));
   } else if ((feenox.fem.current_gauss_element_tag == e->tag && feenox.fem.current_jacobian_gauss_point == q) || feenox.fem.cache_J) {
     return (*J)[q];
   }
@@ -538,6 +564,7 @@ inline gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, i
   } else {
 
     (*J)[q] = feenox_fem_compute_J_at_gauss_general(e, q, integration, (*J)[q]);
+
   }
   
   feenox.fem.current_jacobian_element_tag = e->tag;
