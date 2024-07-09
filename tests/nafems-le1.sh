@@ -29,7 +29,7 @@ exitifwrong $?
 answer1 nafems-le1.fee 2 78.6
 exitifwrong $?
 
-answer1 nafems-le1.fee 3 83.4
+answer1 nafems-le1.fee 3 83.5
 exitifwrong $?
 
 answer1 nafems-le1.fee 4 81.3
@@ -38,11 +38,11 @@ exitifwrong $?
 answer1 nafems-le1.fee 5 99.6
 exitifwrong $?
 
-answer1 nafems-le1.fee 6 86.8
+answer1 nafems-le1.fee 6 86.9
 exitifwrong $?
 
 answer1 nafems-le1.fee 7 107.7
 exitifwrong $?
 
-answer1 nafems-le1.fee 8 92.0
+answer1 nafems-le1.fee 8 92.1
 exitifwrong $?
