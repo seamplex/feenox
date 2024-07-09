@@ -81,4 +81,7 @@ bunny*.vtk
 bunny*.msh
 2dpwr-*.vtk
 two-is-2.txt
-
+circle*.msh
+airfoil-converged.msh
+airfoil-converged.vtk
+circle_perimeter*.dat

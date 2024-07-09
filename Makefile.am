@@ -213,7 +213,21 @@ DISTCLEANFILES = \
                  ./tests/steps.last \
                  ./tests/printf.last \
                  ./square_tmp.vtk \
-                 ./two-is-2.txt                 
+                 ./two-is-2.txt \
+                 ./circle_perimeter2.dat \
+                 ./circle-1-0.4.msh      \
+                 ./circle-2-0.3.msh      \
+                 ./circle-1-0.7.msh      \
+                 ./circle-2-0.35.msh     \
+                 ./circle-1-0.5.msh      \
+                 ./circle-1-0.6.msh      \
+                 ./circle-2-0.7.msh      \
+                 ./circle-2-0.4.msh      \
+                 ./circle-1-0.3.msh      \
+                 ./circle-1-0.35.msh     \
+                 ./circle-2-0.6.msh      \
+                 ./circle-2-0.5.msh      \
+                 ./circle_perimeter1.dat
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .

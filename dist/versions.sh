@@ -1,7 +1,7 @@
 #!/bin/false
 
-petsc_ver=3.21.1
-slepc_ver=3.21.0
+petsc_ver=3.21.3
+slepc_ver=3.21.1
 package=feenox
 
 # check for needed tools
