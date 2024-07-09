@@ -1,0 +1,6 @@
+VAR log_a b
+fitted_log_e(log_h) := log_a + b*log_h
+FUNCTION log_e(log_h) FILE circle_perimeter${1}.dat
+FIT fitted_log_e TO log_e VIA log_a b
+PRINT b-$1
+

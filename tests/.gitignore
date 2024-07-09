@@ -71,3 +71,9 @@ azmy*.msh
 thermal-square.vtk
 square_tmp.vtk
 2dpwr-*.vtk
+airfoil*.vtk
+airfoil.brep
+airfoil.xao
+circle*.msh
+circle_perimeter*.dat
+

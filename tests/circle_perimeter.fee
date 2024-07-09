@@ -1,0 +1,4 @@
+# gmsh -2 circle.geo -order ${1} -o circle1.msh
+READ_MESH circle-${1}.msh
+PHYSICAL_GROUP perimeter DIM 1
+PRINT log(1/elements) log(abs(perimeter_length-2*pi))

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related routines
  *
- *  Copyright (C) 2014--2023 jeremy theler
+ *  Copyright (C) 2014--2024 jeremy theler
  *
  *  This file is part of feenox.
  *

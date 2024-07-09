@@ -2419,7 +2419,7 @@ extern gsl_matrix *feenox_fem_compute_J(element_t *e, double *xi);
 extern gsl_matrix *feenox_fem_compute_J_at_gauss(element_t *e, unsigned int q, int integration);
 extern gsl_matrix *feenox_fem_compute_J_at_gauss_1d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
 extern gsl_matrix *feenox_fem_compute_J_at_gauss_2d(element_t *e, unsigned int q, int integration, gsl_matrix *J);
-extern gsl_matrix *feenox_fem_compute_J_at_gauss_general(element_t *e, unsigned int q, int integration, gsl_matrix *J);
+extern gsl_matrix *feenox_fem_compute_J_square_at_gauss(element_t *e, unsigned int q, int integration, gsl_matrix *J);
 
 extern gsl_matrix *feenox_fem_compute_B_c(element_t *e, double *xi);
 extern gsl_matrix *feenox_fem_compute_B(element_t *e, double *xi);
