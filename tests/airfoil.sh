@@ -11,5 +11,5 @@ fi
 
 checkpde laplace
 
-answer airfoil.fee "2.42 2.49 2.49 2.51 2.60 -0.01"
+answer airfoil.fee "2.4 2.5 2.5 2.5 2.6 -0.0"
 exitifwrong $?

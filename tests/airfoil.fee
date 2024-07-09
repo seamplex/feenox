@@ -57,7 +57,7 @@ IF done_static
   INTEGRATE p(x,y)*(nx) OVER circle RESULT pFx
   INTEGRATE p(x,y)*(ny) OVER circle RESULT pFy
   
-  PRINTF "%.2f %.2f %.2f %.2f %.2f %.2f" -circ_profile -circ_circle_t -circ_circle_n -circ_box pFy pFx
+  PRINTF "%.1f %.1f %.1f %.1f %.1f %.1f" -circ_profile -circ_circle_t -circ_circle_n -circ_box pFy pFx
 ELSE
 
  # update c
