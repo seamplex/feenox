@@ -26,6 +26,7 @@ TESTS = \
         tests/algebraic_expr.sh \
         tests/annulus-modal.sh \
         tests/uo2-pellet.sh \
+        tests/airfoil.sh \
         tests/arguments.sh \
         tests/azmy.sh \
         tests/beam-modal.sh \
@@ -36,6 +37,7 @@ TESTS = \
         tests/bunny-sn.sh \
         tests/bunny-thermal.sh \
         tests/builtin.sh \
+        tests/circle.sh \
         tests/cog.sh \
         tests/cylinder-traction-force.sh \
         tests/encased_rod.sh \
@@ -56,6 +58,7 @@ TESTS = \
         tests/hello_mpi.sh \
         tests/integral.sh \
         tests/laplace2d.sh \
+        tests/lebesgue.sh \
         tests/los-alamos.sh \
         tests/map-cube.sh \
         tests/materials.sh \

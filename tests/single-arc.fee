@@ -1,4 +1,4 @@
 READ_MESH single-arc${1}.msh
 PHYSICAL_GROUP quarter DIM 1
-PRINT quarter_length pi/2
+PRINT %.1e quarter_length-pi/2
 

@@ -75,3 +75,6 @@ airfoil*.msh
 airfoil*.vtk
 airfoil.brep
 airfoil.xao
+circle*.msh
+circle_perimeter*.dat
+
