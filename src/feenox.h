@@ -70,7 +70,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_version.h>
 
-#if HAVE_SUNDIALS
+#ifdef HAVE_SUNDIALS
  #include <ida/ida.h>
  #include <ida/ida_direct.h>
  #include <nvector/nvector_serial.h>
@@ -1675,7 +1675,7 @@ struct feenox_t {
       initial_conditions_from_derivatives,
     } initial_conditions_mode;
 
-#if HAVE_SUNDIALS
+#ifdef HAVE_SUNDIALS
     N_Vector x;
     N_Vector dxdt;
     N_Vector id;
