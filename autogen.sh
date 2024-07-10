@@ -58,7 +58,7 @@ echo "define(feenoxversion, ${version})dnl" > version.m4
 
 # these links are needed for make dist-check
 rm -f config_links.m4
-for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref tests/*.vtk; do
+for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref tests/*.vtk tests/reed*.csv; do
  echo "AC_CONFIG_LINKS([${i}:${i}])" >> config_links.m4
 done
 
