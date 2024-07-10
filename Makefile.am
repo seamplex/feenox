@@ -223,7 +223,58 @@ DISTCLEANFILES = \
                  ./circle-1-0.35.msh     \
                  ./circle-2-0.6.msh      \
                  ./circle-2-0.5.msh      \
-                 ./circle_perimeter1.dat
+                 ./circle_perimeter1.dat                                      \
+                 ./orthotropic-beam-hex27.msh                                 \
+                 ./2dpwr-eighth.vtk                                           \
+                 ./poisson-square.msh                                         \
+                 ./ray-effect-diffusion-full.msh                              \
+                 ./ray-effect-quarter-4.msh                                   \
+                 ./thermal-square.vtk                                         \
+                 ./orthotropic-beam-hex8.msh                                  \
+                 ./tests/la-p08-PUb-1-0-SP.msh                                \
+                 ./tests/square-struct.msh                                    \
+                 ./tests/reed.msh                                             \
+                 ./tests/pipe-ust10-2-2.msh                                   \
+                 ./tests/la-p10-PUb-H2O_10-1-0-CY.msh                         \
+                 ./tests/pipe-sch27-2-2.msh                                   \
+                 ./tests/PF.msh                                               \
+                 ./tests/la-p02-PUa-1-0-SL.msh                                \
+                 ./tests/la-p06-PUb-1-0-SL.msh                                \
+                 ./tests/pipe-ssh20-2-2.msh                                   \
+                 ./tests/azmy-structured.msh                                  \
+                 ./tests/la-p09-PUb-H2O_1-1-0-CY.msh                          \
+                 ./tests/pipe-sct10-2-2.msh                                   \
+                 ./tests/la-IN.msh                                            \
+                 ./tests/pipe-ssh27-2-2.msh                                   \
+                 ./tests/la-p48-U-2-0-SL.msh                                  \
+                 ./tests/maze.msh                                             \
+                 ./tests/la-p49-U-2-0-SP.msh                                  \
+                 ./tests/bimetallic-strip.msh                                 \
+                 ./tests/la-p03-PUa-H2O_1-1-0-SL.msh                          \
+                 ./tests/pipe-sst10-2-2.msh                                   \
+                 ./tests/heater-cylinder-inches.msh                           \
+                 ./tests/la-p07-PUb-1-0-CY.msh                                \
+                 ./tests/pipe-sch20-2-2.msh                                   \
+                 ./tests/la-p04-PUa-H2O_0.5-1-0-SL.msh                        \
+                 ./tests/la-p51-UAl-2-0-SL.msh                                \
+                 ./tests/pipe-uct10-2-2.msh                                   \
+                 ./ray-effect-full-4.msh                                      \
+                 ./orthotropic-beam-tet4.msh                                  \
+                 ./ray-effect-half-4.msh                                      \
+                 ./spinning-disk-parallel-plane-eighth_unstruct.vtk           \
+                 ./2dpwr-quarter.vtk                                          \
+                 ./ray-effect-diffusion-quarter.msh                           \
+                 ./ray-effect-diffusion-half.msh                              \
+                 ./orthotropic-beam-hex20.msh                                 \
+                 ./orthotropic-beam-tet10.msh                                 \
+                 ./spinning-disk-parallel-plane-quarter_unstruct.vtk          \
+                 ./reaction-force.vtk                                         \
+                 ./airfoil-converged.vtk                                      \
+                 ./spinning-disk-parallel-plane-sixteenth_unstruct.vtk        \
+                 ./heater-cylinder-inches.vtk                                 \
+                 ./ray-effect-diffusion-eighth.msh                            \
+                 ./airfoil-converged.msh                                      \
+                 ./ray-effect-eighth-4.msh
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
