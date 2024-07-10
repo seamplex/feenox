@@ -53,6 +53,7 @@ else
   what="all"
 fi
 version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
+
 echo "define(feenoxversion, ${version})dnl" > version.m4
 
 # these links are needed for make dist-check
@@ -172,6 +173,9 @@ done
 
 echo "calling autoreconf... "
 autoreconf -i
+# for some reason, autoreconf calls autoheader which in turns overwrites
+# the template config.h.in so we keep ours in config.h.ac and copy it now
+cp config.h.ac config.h.in
 echo "done"
 
 

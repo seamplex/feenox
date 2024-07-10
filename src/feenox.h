@@ -23,6 +23,10 @@
 #ifndef FEENOX_H
 #define FEENOX_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 // for POSIX in C99
 #ifndef _GNU_SOURCE   
 #define _GNU_SOURCE   

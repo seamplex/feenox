@@ -11,7 +11,7 @@ dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 m4_include([version.m4])
 m4_include([ax_gcc_builtin.m4])
 AC_INIT([feenox],feenoxversion,[jeremy@seamplex.com])
-
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([${srcdir}/src/feenox.c])
 AC_CANONICAL_HOST
 
@@ -155,7 +155,7 @@ AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
             "x${ac_cv_lib_sundials_nvecserial_N_VNew_Serial}" = "xyes" -a \
             "x${ac_cv_header_nvector_nvector_serial_h}" = "xyes"],
   [
-    AC_DEFINE(HAVE_SUNDIALS)
+    Use AC_DEFINE([HAVE_SUNDIALS], [], [SUNDIALS is available])
     have_sundials="yes"
   ]
 )
@@ -213,7 +213,7 @@ https://seamplex.com/feenox/doc/compilation.html])
 
   AS_IF([test ${petsc_found} -eq 1],
     [
-      AC_DEFINE(HAVE_PETSC)
+      AC_DEFINE([HAVE_PETSC], [1], [PETSc is available])
       have_petsc="yes"
     ]
   )  
@@ -271,7 +271,7 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
 
   AS_IF([test ${slepc_found} -eq 1],
     [
-      AC_DEFINE(HAVE_SLEPC)
+      AC_DEFINE([HAVE_SLEPC], [1], [SLEPc is available])
       have_slepc="yes"
     ]
   )  
@@ -358,44 +358,33 @@ compiler_show="${compiler_command}"
 AS_IF([test "x${have_petsc}" = "xyes"],[
   AS_IF([test ! -z "$(which mpicc)"],[
     compiler_command="mpicc"
-    compiler_show="$(${compiler_command} -show)"
+    compiler_show="$(${compiler_command} -show | sed 's/"/\\"/g')"
   ])
 ])
-
+compiler_version=$(${compiler_command} --version | head -n1 | tr -d \\n])
 
 ######################
 # create version.h
-AC_MSG_NOTICE([creating ${srcdir}/src/version.h])
-rm -f ${srcdir}/src/version.h
-
-feenox_version=feenoxversion
-cat << EOF >> ${srcdir}/src/version.h
-#define FEENOX_VERSION              "${feenox_version}"
-
-EOF
+AC_MSG_NOTICE([gathering versions])
+AC_DEFINE([FEENOX_VERSION], "feenoxversion", [FeenoX version string])
 
 AS_IF([test -e .git -a ! -z "$(which git)"],[
-  cat << EOF >> ${srcdir}/src/version.h
-#define FEENOX_GIT_VERSION          "$(git describe --tags | sed 's/-/./')"
-#define FEENOX_GIT_BRANCH           "$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')"
-#define FEENOX_GIT_DATE             "$(git log --pretty=format:"%ad" | head -n1)"
-#define FEENOX_GIT_CLEAN            $(git status --porcelain | wc -l)
-EOF
+  AC_DEFINE([FEENOX_GIT_VERSION], ["m4_esyscmd([git describe --tags | sed 's/-/./' | tr -d \\n])"], [FeenoX Git version string])
+  AC_DEFINE([FEENOX_GIT_BRANCH],  ["m4_esyscmd([git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,' | tr -d \\n])"], [FeenoX Git branch])
+  AC_DEFINE([FEENOX_GIT_DATE],    ["m4_esyscmd([git log --pretty=format:"%ad" | head -n1 | tr -d \\n])"], [FeenoX Git date])
+  AC_DEFINE([FEENOX_GIT_CLEAN],   ["m4_esyscmd([git status --porcelain | wc -l | tr -d \\n])"], [FeenoX Git clean])
 ])
 
-cat << EOF >> ${srcdir}/src/version.h
-#define FEENOX_COMPILATION_DATE     "$(date +'%a %b %d %H:%M:%S %Y %z')"
+AC_DEFINE([FEENOX_COMPILATION_DATE],      ["m4_esyscmd([date +'%a %b %d %H:%M:%S %Y %z' | tr -d \\n])"], [FeenoX compilation date])
+AC_DEFINE([FEENOX_COMPILATION_USERNAME],  ["m4_esyscmd([whoami | sed s/\\\\\\\\// | tr -d \\n])"], [FeenoX compilation username])
+AC_DEFINE([FEENOX_COMPILATION_HOSTNAME],  ["m4_esyscmd([hostname | tr -d \\n])"], [FeenoX compilation hostname])
 
-#define FEENOX_COMPILATION_USERNAME "$(whoami | sed s/\\\\\\\\//)"
-#define FEENOX_COMPILATION_HOSTNAME "$(hostname)"
-
-#define FEENOX_COMPILER_COMMAND     "${compiler_command}"
-#define FEENOX_COMPILER_ARCH        "${host_os} ${host_cpu}"
-#define FEENOX_COMPILER_VERSION     "$(${compiler_command} --version | head -n1)"
-#define FEENOX_COMPILER_CFLAGS      "${CFLAGS}"
-#define FEENOX_COMPILER_LDFLAGS     "${LDFLAGS}"
-#define FEENOX_COMPILER_SHOW        "$(echo ${compiler_show} | sed 's/"/\\"/g')"
-EOF
+AC_DEFINE_UNQUOTED([FEENOX_COMPILER_COMMAND], ["$compiler_command"],  [FeenoX compiler command])
+AC_DEFINE_UNQUOTED([FEENOX_COMPILER_ARCH],    ["$host_os $host_cpu"], [FeenoX compiler architecture])
+AC_DEFINE_UNQUOTED([FEENOX_COMPILER_VERSION], ["$compiler_version"],  [Feenox compiler version])
+AC_DEFINE_UNQUOTED([FEENOX_COMPILER_SHOW],    ["${compiler_show}"],   [FeenoX actual compiler command])
+AC_DEFINE_UNQUOTED([FEENOX_COMPILER_CFLAGS],  ["${CFLAGS}"],  [CFLAGS])
+AC_DEFINE_UNQUOTED([FEENOX_COMPILER_LDFLAGS], ["${LDFLAGS}"], [LDFLAGS])
 
 
 ######################

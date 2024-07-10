@@ -31,7 +31,6 @@ feenox_SOURCES = \
 ./feenox.c \
 ./feenox.h \
 ./version.c \
-./version.h \
 ./help.h \
 ./contrib/kdtree.c \
 ./contrib/kdtree.h \

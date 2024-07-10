@@ -21,26 +21,25 @@
  */
 #include "feenox.h"
 
-#include "version.h"
 #include "help.h"
 #include "pdes/available.h"
 
 #include <stdio.h>
 #include <gsl/gsl_version.h>
 
-#if HAVE_READLINE
+#ifdef HAVE_READLINE
 #include <readline/readline.h>
 #endif
 
-#if HAVE_SUNDIALS
+#ifdef HAVE_SUNDIALS
 #include <sundials/sundials_version.h>
 #endif
 
-#if HAVE_PETSC
+#ifdef HAVE_PETSC
 #include <petscsys.h>
 #include <petscconfiginfo.h>
 #endif
-#if HAVE_SLEPC
+#ifdef HAVE_SLEPC
 #include <slepcsys.h>
 #endif
 
@@ -79,7 +78,7 @@ void feenox_show_version(int version) {
   }
   
   if (version == version_available_pdes) {
-#if HAVE_PETSC
+#ifdef HAVE_PETSC
     printf(AVAILABLE_PDES);
 #else
     printf("FeenoX was not linked against PETSc. No PDEs are available.\n");
@@ -196,7 +195,7 @@ void feenox_longversion(void) {
 //   );
 
 
-#if HAVE_PETSC
+#ifdef HAVE_PETSC
   char petscversion[BUFFER_TOKEN_SIZE];
   char petscarch[BUFFER_TOKEN_SIZE];
   
