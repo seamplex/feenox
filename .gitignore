@@ -12,6 +12,7 @@ config.status
 config.sub
 config.h
 config.h.in
+stamp-h1
 configure
 depcomp
 install-sh

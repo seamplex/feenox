@@ -5,6 +5,7 @@ depcomp
 test-driver
 
 feenox
+feenox_*
 feenox-*
 linux-*
 petsc-*

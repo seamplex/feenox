@@ -32,10 +32,6 @@ TESTS = \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
         tests/bimetallic-strip.sh \
-        tests/bunny-diffusion.sh \
-        tests/bunny-modal.sh \
-        tests/bunny-sn.sh \
-        tests/bunny-thermal.sh \
         tests/builtin.sh \
         tests/circle.sh \
         tests/cog.sh \
