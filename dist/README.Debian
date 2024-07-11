@@ -1,7 +1,37 @@
 FeenoX for Debian
-----------------
+-----------------
 
-A cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX is a cloud-first free no-X uniX-like finite-element(ish)
+computational engineering tool designed to solve engineering-related
+problems using cloud servers in parallel in such a way that the problem
+is defined in a plain-text near-English self descriptive input file
+read at run time, without requiring further user intervention after the
+invocation.
+
+So far it can solve 
+
+ * Basic mathematics
+ * Systems of ODEs/DAEs
+ * Laplace’s equation
+ * Heat conduction
+ * Linear elasticity
+ * Modal analysis
+ * Neutron diffusion
+ * Neutron SN
+
+Other PDEs can be added by providing compile-time entry points as C
+functions that build the elemental objects. The binary depends on
+
+ * GNU Scientific Library
+ * PETSc
+ * SLEPc
+ 
+The usage depends on Gmsh to create the meshes.
+Optionally, FeenoX's output can be post-processed with Paraview.
+
+
+The software and its design basis is described in this JOSS paper:
+https://doi.org/10.21105/joss.05846
 
 See <https://www.seamplex.com/feenox> for 
 

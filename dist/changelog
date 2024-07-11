@@ -1,0 +1,5 @@
+feenox (feenox_version-1) UNRELEASED; urgency=low
+
+  * Initial release. (Closes: #1068648)
+
+ -- Jeremy Theler <jeremy@seamplex.com>  Tue, 09 Jul 2024 19:05:41 -0300

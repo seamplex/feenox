@@ -385,7 +385,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       
       if (version_maj == 2) {
         // number of nodes
-        if (fscanf(fp, "%ld", &(this->n_nodes)) == 0) {
+        if (fscanf(fp, "%lu", &(this->n_nodes)) == 0) {
           return FEENOX_ERROR;
         }
         if (this->n_nodes == 0) {
@@ -397,7 +397,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 
         for (size_t j = 0; j < this->n_nodes; j++) {
           size_t tag;
-          if (fscanf(fp, "%ld %lf %lf %lf",
+          if (fscanf(fp, "%lu %lf %lf %lf",
                   &tag,
                   &this->node[j].x[0],
                   &this->node[j].x[1],
@@ -497,7 +497,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           if (version_min == 0) {
             // here we have tag and coordinate in the same line
             for (size_t k = 0; k < num_nodes; k++) {
-              if (fscanf(fp, "%ld %lf %lf %lf",
+              if (fscanf(fp, "%lu %lf %lf %lf",
                          &this->node[j].tag,
                          &this->node[j].x[0],
                          &this->node[j].x[1],
@@ -572,7 +572,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       
       if (version_maj == 2) {
         // number of elements
-        if (fscanf(fp, "%ld", &(this->n_elements)) == 0) {
+        if (fscanf(fp, "%lu", &(this->n_elements)) == 0) {
           return FEENOX_ERROR;
         }
         if (this->n_elements == 0) {
@@ -587,7 +587,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           size_t tag = 0;
           int ntags22 = 0;
           int type = 0;
-          if (fscanf(fp, "%ld %d %d", &tag, &type, &ntags22) < 3) {
+          if (fscanf(fp, "%lu %d %d", &tag, &type, &ntags22) < 3) {
             return FEENOX_ERROR;
           }
 
@@ -653,7 +653,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_check_alloc(this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *)));
           size_t j = 0;
           for (j = 0; j < this->element[i].type->nodes; j++) {
-            if (fscanf(fp, "%ld", &node) < 1) {
+            if (fscanf(fp, "%lu", &node) < 1) {
               return FEENOX_ERROR;
             }
             if (this->sparse == 0 && (node < 1 || node > this->n_nodes)) {
@@ -676,7 +676,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           // in 4.0 there's no min/max (I asked for this)
           tag_min = 0;
           tag_max = 0;
-          if (fscanf(fp, "%ld %ld", &num_blocks, &this->n_elements) < 2) {
+          if (fscanf(fp, "%lu %lu", &num_blocks, &this->n_elements) < 2) {
             feenox_push_error_message("error reading element blocks");
             return FEENOX_ERROR;
           }
@@ -703,7 +703,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           int type = 0;
           size_t num_elements = 0;
           if (version_min == 0) {
-            if (fscanf(fp, "%d %d %d %ld", &geometrical, &dimension, &type, &num_elements) < 4) {
+            if (fscanf(fp, "%d %d %d %lu", &geometrical, &dimension, &type, &num_elements) < 4) {
               return FEENOX_ERROR;
             }
           } else {

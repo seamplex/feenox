@@ -291,7 +291,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   } while (strncmp(buffer, "POINTS", 6) != 0);
   
   char tmp[BUFFER_SIZE];
-  if (sscanf(buffer, "POINTS %ld %s", &this->n_nodes, tmp) != 2) {
+  if (sscanf(buffer, "POINTS %lu %s", &this->n_nodes, tmp) != 2) {
     feenox_push_error_message("expected POINTS");
     return FEENOX_ERROR;
   }
@@ -326,7 +326,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   size_t num_cells = 0;
   size_t num_data = 0;
   size_t num_indexes = 0;
-  if (sscanf(buffer, "CELLS %ld %ld", &num_cells, &num_data) != 2) {
+  if (sscanf(buffer, "CELLS %lu %lu", &num_cells, &num_data) != 2) {
     feenox_push_error_message("expected CELLS");
     return FEENOX_ERROR;
   }
@@ -358,7 +358,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   
   feenox_check_alloc(celldata = calloc(num_data, sizeof(size_t)));
   for (size_t i = 0; i < num_indexes; i++) {
-    if (fscanf(fp, "%ld", &celldata[i]) != 1) {
+    if (fscanf(fp, "%lu", &celldata[i]) != 1) {
       feenox_push_error_message("ran out of CELLS data");
       return FEENOX_ERROR;
     }
@@ -382,7 +382,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
 
     feenox_check_alloc(connectivity = calloc(num_data, sizeof(size_t)));
     for (size_t i = 0; i < num_data; i++) {
-      if (fscanf(fp, "%ld", &connectivity[i]) != 1) {
+      if (fscanf(fp, "%lu", &connectivity[i]) != 1) {
         feenox_push_error_message("ran out of CONNECTIVITY data");
         return FEENOX_ERROR;
       }
@@ -400,7 +400,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     }  
   } while (strncmp(buffer, "CELL_TYPES", 10) != 0);
   
-  if (sscanf(buffer, "CELL_TYPES %ld", &this->n_elements) != 1) {
+  if (sscanf(buffer, "CELL_TYPES %lu", &this->n_elements) != 1) {
     feenox_push_error_message("expected CELL_TYPES");
     return FEENOX_ERROR;
   }
@@ -554,7 +554,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       point_data = 1;
 
       size_t check = 0;
-      if (sscanf(buffer, "POINT_DATA %ld", &check) != 1) {
+      if (sscanf(buffer, "POINT_DATA %lu", &check) != 1) {
         feenox_push_error_message("expecting POINT_DATA");
         return FEENOX_ERROR;
       }
@@ -629,7 +629,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
       char name[BUFFER_SIZE];
       int size = 0;
       size_t check = 0;
-      if ((sscanf(buffer, "%s %d %ld %s", name, &size, &check, tmp) == 4) && (strcmp(tmp, "double") == 0 || strcmp(tmp, "float") == 0)) {
+      if ((sscanf(buffer, "%s %d %lu %s", name, &size, &check, tmp) == 4) && (strcmp(tmp, "double") == 0 || strcmp(tmp, "float") == 0)) {
         
         if (check != this->n_nodes) {
           feenox_push_error_message("expected %ld data values but there are %ld", this->n_nodes, check);
