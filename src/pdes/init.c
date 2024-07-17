@@ -567,7 +567,7 @@ int feenox_problem_init_runtime_general(void) {
   
   if (feenox.pde.rough == 0) {
     if (feenox.pde.solution == NULL) {
-      feenox_push_error_message("inconsistent internal state, solution funcions not allocated");
+      feenox_push_error_message("inconsistent internal state, solution functions not allocated");
       return FEENOX_ERROR;
     }
     for (unsigned int g = 0; g < feenox.pde.dofs; g++) {

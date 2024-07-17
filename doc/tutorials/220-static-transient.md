@@ -41,7 +41,7 @@ Output of lag.was
 
 Instead of writing the long input shown in lag.was, we could have obtained the same result with a couple of lines. Indeed, the terminal shows that the output of this input is the same as the one of the previous longer example.
 
-# the preceeding example could have been written in fewer
+# the preceding example could have been written in fewer
 # lines as follows (although the SPOT rule is broken)
 end_time = 5
 dt = 1/20

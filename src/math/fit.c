@@ -37,7 +37,7 @@ int feenox_instruction_fit(void *arg) {
     fit->n_data = fit->data->data_size;
   }
   if (fit->n_data < fit->n_via) {
-    feenox_push_error_message("less data points than free paramters for the fit");
+    feenox_push_error_message("less data points than free parameters for the fit");
     return FEENOX_ERROR;
   }
   

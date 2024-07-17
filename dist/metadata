@@ -1,15 +1,14 @@
-#
-# DEP-12: Per-package machine-readable metadata about Upstream
-#        Please check * https://dep-team.pages.debian.net/deps/dep12/
-#                     * https://wiki.debian.org/UpstreamMetadata
+Bug-Database: https://github.com/seamplex/feenox/issues
+Bug-Submit: https://github.com/seamplex/feenox/issues/new
+Repository: https://github.com/seamplex/feenox.git
+Repository-Browse: https://github.com/seamplex/feenox
 Reference:
   Author: Jeremy Theler
-  Title: FeenoX: a cloud-first finite-element(ish) computational engineering tool
-  Journal: Journal of Open Source Software,
+  Title: FeenoX, a cloud-first finite-element(ish) computational engineering tool
+  Journal: Journal of Open Source Software
   Year: 2024
   Volume: 9
   Number: 95
   Pages: 5846
   DOI: 10.21105/joss.05846
   URL: https://doi.org/10.21105/joss.05846
-

@@ -847,7 +847,7 @@ int feenox_parse_time_path(void) {
 ///kw_dae+TIME_PATH+detail The time step `dt` will be reduced whenever the distance between
 ///kw_dae+TIME_PATH+detail the current time `t` and the next expression in the list is greater
 ///kw_dae+TIME_PATH+detail than `dt` so as to force `t` to coincide with the expressions given.
-///kw_dae+TIME_PATH+detail The list of expresssions should evaluate to a sorted list of values for all times.          
+///kw_dae+TIME_PATH+detail The list of expressions should evaluate to a sorted list of values for all times.          
 
   char *token;
   
@@ -898,7 +898,7 @@ int feenox_parse_variables(void) {
 ///kw+VAR+detail When implicit definition is allowed (see [`IMPLICIT`]), scalar variables
 ///kw+VAR+detail need not to be defined before being used if from the context FeenoX can tell
 ///kw+VAR+detail that an scalar variable is needed. For instance, when defining a function like
-///kw+VAR+detail `f(x) = x^2` it is not needed to declare `x` explictly as a scalar variable.
+///kw+VAR+detail `f(x) = x^2` it is not needed to declare `x` explicitly as a scalar variable.
 ///kw+VAR+detail But if one wants to define a function like `g(x) = integral(f(x'), x', 0, x)` then
 ///kw+VAR+detail the variable `x'` needs to be explicitly defined as `VAR x'` before the integral. 
 
@@ -1142,7 +1142,7 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+usage <function_name>(<var_1>[,var2,...,var_n]) {
 ///kw+FUNCTION+usage @  
 ///kw+FUNCTION+detail The number of variables $n$ is given by the number of arguments given between parenthesis after the function name.
-///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined explictly as scalar variables.
+///kw+FUNCTION+detail The arguments are defined as new variables if they had not been already defined explicitly as scalar variables.
   char *token = NULL;
   feenox_call(feenox_parser_string(&token));
   
@@ -1156,7 +1156,7 @@ int feenox_parse_function(void) {
   feenox_call(feenox_add_function_from_string(token, &name));
   function_t *function = NULL;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
+    feenox_push_error_message("unknown function '%s'", name);
     return FEENOX_ERROR;
   }      
   
@@ -1166,7 +1166,7 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+usage = <expr> |
 ///kw+FUNCTION+usage @  
 ///kw+FUNCTION+detail If the function is given as an algebraic expression, the short-hand operator `=`
-///kw+FUNCTION+detail (or `:=` for compatiblity with Maxima) can be used.
+///kw+FUNCTION+detail (or `:=` for compatibility with Maxima) can be used.
 ///kw+FUNCTION+detail That is to say, `FUNCTION f(x) = x^2` is equivalent to `f(x) = x^2` (or `f(x) := x^2`).
 
     if (strcasecmp(token, "=") == 0 || strcasecmp(token, ":=") == 0) {
@@ -1205,7 +1205,7 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+usage }
 ///kw+FUNCTION+usage @
 ///kw+FUNCTION+detail The function can be pointwise-defined inline in the input using `DATA`.
-///kw+FUNCTION+detail This should be the last keyword of the line, followed by $N=k \cdot (n+1)$ expresions
+///kw+FUNCTION+detail This should be the last keyword of the line, followed by $N=k \cdot (n+1)$ expressions
 ///kw+FUNCTION+detail giving\ $k$ definition points: $n$ arguments and the value of the function.
 ///kw+FUNCTION+detail Multiline continuation using brackets `{` and `}` can be used for a clean data organization.
     } else if (strcasecmp(token, "DATA") == 0) {
@@ -1483,8 +1483,8 @@ int feenox_parse_file(char *default_mode) {
     } else if (strcasecmp(token, "APPEND") == 0) {
       feenox_check_alloc(mode = strdup("a"));
 
-///kw+FILE+detail This keyword justs defines the `FILE`, it does not open it.
-///kw+FILE+detail The file will be actually openened (and eventually closed) automatically.
+///kw+FILE+detail This keyword just defines the `FILE`, it does not open it.
+///kw+FILE+detail The file will be actually opened (and eventually closed) automatically.
 ///kw+FILE+detail In the rare case where the automated opening and closing does not fit the expected workflow,
 ///kw+FILE+detail the file can be explicitly opened or closed with the instructions `FILE_OPEN` and `FILE_CLOSE`.
     } else {
@@ -2702,7 +2702,7 @@ int feenox_parse_physical_group(void) {
 ///kw_pde+PHYSICAL_GROUP+usage | BC <name> [ BC ... ] ]@
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
 ///kw_pde+PHYSICAL_GROUP+detail Likewise, for non-volumetric elements, physical groups can be linked to boundary using `BC`.
-///kw_pde+PHYSICAL_GROUP+detail As in the preceeding case, if a boundary condition is created with the same name as a physical group in the mesh,
+///kw_pde+PHYSICAL_GROUP+detail As in the preceding case, if a boundary condition is created with the same name as a physical group in the mesh,
 ///kw_pde+PHYSICAL_GROUP+detail they will be linked automatically, so there is no need to use `PHYSCAL_GROUP` for this.
 ///kw_pde+PHYSICAL_GROUP+detail The `BC` keyword in `PHYSICAL_GROUP` is used to link a physical group
 ///kw_pde+PHYSICAL_GROUP+detail in a mesh file and a boundary condition in the feenox input file with different names.
@@ -2786,7 +2786,7 @@ int feenox_parse_material(void) {
 ///kw_pde+MATERIAL+detail Mechanical problems need Young modulus\ `E` and Poisson’s ratio\ `nu`.
 ///kw_pde+MATERIAL+detail Modal also needs density\ `rho`. Check the particular documentation for each problem type.
 ///kw_pde+MATERIAL+detail Besides these mandatory properties, any other one can be defined.
-///kw_pde+MATERIAL+detail For instance, if one mandatory property dependend on the concentration of boron in the material,
+///kw_pde+MATERIAL+detail For instance, if one mandatory property depended on the concentration of boron in the material,
 ///kw_pde+MATERIAL+detail a new per-material property can be added named `boron` and then the function `boron(x,y,z)` can
 ///kw_pde+MATERIAL+detail be used in the expression that defines the mandatory property.
       
@@ -3110,7 +3110,7 @@ int feenox_parse_problem(void) {
       feenox.pde.transient_type = transient_type_quasistatic;
 
 
-///kw_pde+PROBLEM+detail By default FeenoX tries to detect wheter the computation should be linear or non-linear.
+///kw_pde+PROBLEM+detail By default FeenoX tries to detect whether the computation should be linear or non-linear.
 ///kw_pde+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
 ///kw_pde+PROBLEM+usage [ LINEAR
     } else if (strcasecmp(token, "LINEAR") == 0) {

@@ -45,7 +45,7 @@ int feenox_initialize(int argc, char **argv) {
 ///help+usage+desc [options] inputfile [replacement arguments] [petsc options]  
   const struct option longopts[] = {
 ///op+help+option `-h`, `--help`
-///op+help+desc display options and detailed explanations of commmand-line usage
+///op+help+desc display options and detailed explanations of command-line usage
     { "help",          no_argument,       NULL, 'h'},
 ///op+version+option `-v`, `--version`
 ///op+version+desc display brief version information and exit
@@ -348,7 +348,7 @@ int feenox_init_special_objects(void) {
 ///va+j+desc Dummy index, used mainly in matrix column subindex expressions.
   feenox_special_var(j) = feenox_get_or_define_variable_get_ptr("j");
   
-///va+pi+desc A double-precision floating point representaion of the number $\pi$
+///va+pi+desc A double-precision floating point representation of the number $\pi$
 ///va+pi+detail It is equal to the `M_PI` constant in `math.h` .
   feenox_special_var(pi) = feenox_get_or_define_variable_get_ptr("pi");
   feenox_special_var_value(pi) = M_PI;

@@ -103,8 +103,8 @@ reference.
 - [History][] [PDF][8]
 
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
-  [Frequently Asked Questions]: FAQs.markdown
-  [PDF]: https://www.seamplex.com/feenox/doc/FAQs.pdf
+  [Frequently Asked Questions]: FAQ.markdown
+  [PDF]: https://www.seamplex.com/feenox/doc/FAQ.pdf
   [Compilation Guide]: compilation.markdown
   [6]: https://www.seamplex.com/feenox/doc/compilation.pdf
   [Programming Guide]: programming.markdown

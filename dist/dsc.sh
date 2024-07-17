@@ -12,11 +12,16 @@ fi
 
 rm -rf feenox-${version}
 tar -xvzf feenox-${version}.tar.gz
+
 cd feenox-${version}
 debmake
-cp ../README.Debian ../control ../copyright ../rules debian/
+cp ../README.Debian ../control ../copyright ../rules ../watch debian/
 cp ../metadata debian/upstream
 m4 -Dfeenox_version=${version} ../changelog > debian/changelog
-rm debian/watch debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
+rm debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
 rmdir debian/patches
+rm COPYING
 debuild
+
+cd ..
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.dsc 

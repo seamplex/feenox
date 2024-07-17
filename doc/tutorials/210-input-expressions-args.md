@@ -16,7 +16,7 @@ $ wasora hello.was
 hello world!    
 $ 
 
-The keyword TEXT is not strictly needed (unless given the IMPLICIT NONE keyword), as the construction hello world! does not resolve to any known symbol. However, it is a good practice to explictly precede any text with the TEXT keyword.
+The keyword TEXT is not strictly needed (unless given the IMPLICIT NONE keyword), as the construction hello world! does not resolve to any known symbol. However, it is a good practice to explicitly precede any text with the TEXT keyword.
 
 # The Peano axiom
 
@@ -88,7 +88,7 @@ When PRINT finds a new argument, it tries to evaluate it. If it does not make an
 
 ```
 # actually arguments of the PRINT keyword may be either text
-# strings, scalar expresions, vectors or matrices (more about
+# strings, scalar expressions, vectors or matrices (more about
 # these latter two issues in more complex examples)
 
 # the example of Kernigham & Ritchie HOC code

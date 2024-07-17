@@ -4,7 +4,7 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 
 `-h`, `--help`
 
-:    display options and detailed explanations of commmand-line usage
+:    display options and detailed explanations of command-line usage
 
 
 `-v`, `--version`

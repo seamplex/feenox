@@ -1,4 +1,4 @@
-# the preceeding example could have been written in fewer
+# the preceding example could have been written in fewer
 # lines as follows (although the SPOT rule is broken)
 end_time = 5
 dt = 1/20

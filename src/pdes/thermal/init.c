@@ -94,7 +94,7 @@ int feenox_problem_init_runtime_thermal(void) {
   // check if we were given an initial guess
   if ((feenox.pde.initial_guess = feenox_get_function_ptr("T_guess")) != NULL) {
     if (feenox.pde.initial_guess->n_arguments != feenox.pde.dim) {
-      feenox_push_error_message("intial guess function T_guess ought to have %d arguments instead of %d", feenox.pde.dim, feenox.pde.initial_guess->n_arguments);
+      feenox_push_error_message("initial guess function T_guess ought to have %d arguments instead of %d", feenox.pde.dim, feenox.pde.initial_guess->n_arguments);
       return FEENOX_ERROR;
     }
   }

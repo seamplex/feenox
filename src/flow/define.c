@@ -219,11 +219,11 @@ int feenox_vector_attach_function(const char *name, const char *function_data) {
   vector_t *vector;
   function_t *function;
   if ((vector = feenox_get_vector_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown vector '%s'", name);
+    feenox_push_error_message("unknown vector '%s'", name);
     return FEENOX_ERROR;
   }
   if ((function = feenox_get_function_ptr(function_data)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", function_data);
+    feenox_push_error_message("unknown function '%s'", function_data);
     return FEENOX_ERROR;
   }
   
@@ -236,7 +236,7 @@ int feenox_vector_attach_data(const char *name, expr_t *datas) {
 
   vector_t *vector;
   if ((vector = feenox_get_vector_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown vector '%s'", name);
+    feenox_push_error_message("unknown vector '%s'", name);
     return FEENOX_ERROR;
   }
   
@@ -267,7 +267,7 @@ int feenox_matrix_attach_data(const char *name, expr_t *datas) {
 
   matrix_t *matrix;
   if ((matrix = feenox_get_matrix_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown matrix '%s'", name);
+    feenox_push_error_message("unknown matrix '%s'", name);
     return FEENOX_ERROR;
   }
   
@@ -320,7 +320,7 @@ int feenox_file_set_path_argument(const char *name, int i, const char *expressio
   
   file_t *file = NULL;
   if ((file = feenox_get_file_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown file '%s'", name);
+    feenox_push_error_message("unknown file '%s'", name);
     return FEENOX_ERROR;
   }
   

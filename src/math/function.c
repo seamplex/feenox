@@ -50,7 +50,7 @@ int feenox_function_set_argument_variable(const char *name, unsigned int i, cons
   
   function_t *function;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
+    feenox_push_error_message("unknown function '%s'", name);
     return FEENOX_ERROR;
   }
   
@@ -78,7 +78,7 @@ int feenox_function_set_expression(const char *name, const char *expression) {
   
   function_t *function = NULL;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
+    feenox_push_error_message("unknown function '%s'", name);
     return FEENOX_ERROR;
   }
   
@@ -92,7 +92,7 @@ int feenox_function_set_file(const char *name, file_t *file, unsigned int *colum
   
   function_t *function = NULL;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
+    feenox_push_error_message("unknown function '%s'", name);
     return FEENOX_ERROR;
   }
 
@@ -181,7 +181,7 @@ int feenox_function_set_interpolation(const char *name, const char *type) {
 
   function_t *function = NULL;
   if ((function = feenox_get_function_ptr(name)) == NULL) {
-    feenox_push_error_message("unkown function '%s'", name);
+    feenox_push_error_message("unknown function '%s'", name);
     return FEENOX_ERROR;
   }
   

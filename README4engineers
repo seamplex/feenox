@@ -190,8 +190,8 @@ There are two “why” questions we have to answer.
             -   material properties can be given as functions of space
                 and/or time and/or temperature (or other intermediate
                 variables)
-            -   these functions can be given as algebraic expresions or
-                come from interpolateed point-wise defined data
+            -   these functions can be given as algebraic expressions or
+                come from interpolated point-wise defined data
     -   100% user-defined output
     -   simple problems need simple inputs
     -   similar problems need similar inputs

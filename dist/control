@@ -3,11 +3,11 @@ Section: science
 Priority: optional
 Maintainer: Jeremy Theler <jeremy@seamplex.com>
 Build-Depends: debhelper-compat (= 13),
- libgsl-dev, 
+ libgsl-dev,
  libsundials-dev,
  petsc-dev,
  slepc-dev
-Standards-Version: 4.5.1
+Standards-Version: 4.6.2
 Homepage: https://www.seamplex.com/feenox
 Rules-Requires-Root: no
 Vcs-Git: https://github.com/seamplex/feenox.git
@@ -25,7 +25,7 @@ Description: cloud-first free no-X uniX-like finite-element(ish) tool
  near-English self descriptive input file read at run time,
  without requiring further user intervention after the invocation.
  .
- So far it can solve 
+ So far it can solve
  .
   * Basic mathematics
   * Systems of ODEs/DAEs

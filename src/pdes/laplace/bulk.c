@@ -54,7 +54,7 @@ int feenox_problem_build_volumetric_gauss_point_laplace(element_t *e, unsigned i
       feenox_call(feenox_blas_BtB_accum(H_Gc, wdet*alpha, feenox.fem.Mi));
     } else {
       // this should have been already checked
-      feenox_push_error_message("no alpha found neede for Laplace's mass matrix");
+      feenox_push_error_message("no alpha found needed for Laplace's mass matrix");
       return FEENOX_ERROR;
     }
   }
