@@ -398,7 +398,7 @@ int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned in
     assigned_init = assignment->matrix->assigned_init;
     
   } else {
-    feenox_push_error_message("internal mistmatch, neither variable nor vector nor matrix found for assigment");
+    feenox_push_error_message("internal mismatch, neither variable nor vector nor matrix found for assignment");
     return FEENOX_OK;
   }
   
