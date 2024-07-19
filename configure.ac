@@ -155,7 +155,7 @@ AS_IF([test "x${ac_cv_lib_sundials_ida_IDAInit}" = "xyes" -a \
             "x${ac_cv_lib_sundials_nvecserial_N_VNew_Serial}" = "xyes" -a \
             "x${ac_cv_header_nvector_nvector_serial_h}" = "xyes"],
   [
-    Use AC_DEFINE([HAVE_SUNDIALS], [], [SUNDIALS is available])
+    AC_DEFINE([HAVE_SUNDIALS], [], [SUNDIALS is available])
     have_sundials="yes"
   ]
 )

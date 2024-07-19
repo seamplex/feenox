@@ -18,7 +18,7 @@ debmake
 cp ../README.Debian ../control ../copyright ../rules ../watch debian/
 cp ../metadata debian/upstream
 m4 -Dfeenox_version=${version} ../changelog > debian/changelog
-rm debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
+rm -f debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
 rmdir debian/patches
 rm COPYING
 debuild
