@@ -20,8 +20,21 @@ cp ../metadata debian/upstream
 m4 -Dfeenox_version=${version} ../changelog > debian/changelog
 rm -f debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
 rmdir debian/patches
-rm COPYING
+rm -f COPYING debian/feenox/usr/share/doc/feenox/COPYRIGHT.gz
 debuild
+# # we could have also used
+# pdebuild
 
 cd ..
 lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.dsc 
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.deb
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.changes
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.buildinfo
+
+
+feenox_1.0.66-1_amd64.changes
+
+# # check
+# sudo pbuilder create --debootstrapopts --variant=buildd
+# sudo pbuilder update
+# sudo pbuilder build feenox_${version}-1.dsc
