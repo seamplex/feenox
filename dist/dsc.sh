@@ -21,20 +21,26 @@ m4 -Dfeenox_version=${version} ../changelog > debian/changelog
 rm -f debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
 rmdir debian/patches
 rm -f COPYING debian/feenox/usr/share/doc/feenox/COPYRIGHT.gz
+
+export DEBEMAIL="jeremy@seamplex.com"
+export DEBFULLNAME="Jeremy Theler"
+export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-i -I -us -uc"
+export DEBUILD_LINTIAN_OPTS="-i -I --show-overrides"
+# export DEBSIGN_KEYID="Your_GPG_keyID
 debuild
 # # we could have also used
 # pdebuild
 
 cd ..
-lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.dsc 
-lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.deb
-lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.changes
-lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.buildinfo
+rm -f lintian.log
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.dsc | tee -a lintian.log
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1.deb | tee -a lintian.log
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.changes | tee -a lintian.log
+lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.buildinfo | tee -a lintian.log
 
-
-feenox_1.0.66-1_amd64.changes
 
 # # check
+# # see https://wiki.ubuntu.com/PbuilderHowto
 # sudo pbuilder create --debootstrapopts --variant=buildd
 # sudo pbuilder update
 # sudo pbuilder build feenox_${version}-1.dsc
