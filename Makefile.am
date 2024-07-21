@@ -3,7 +3,6 @@ SUBDIRS = src
 dist_doc_DATA = AUTHORS \
                 TODO \
                 ChangeLog \
-                COPYING \
                 README \
                 README4engineers \
                 README4hackers \
