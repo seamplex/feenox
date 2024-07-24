@@ -97,8 +97,11 @@ checkmpirun() {
   echo "mpirun not found, skipping test"
   exit 77
  fi
+ if [ "x$(id -u)" = "x0" ]; then
+  echo "attempting to run MPI as root, skipping test"
+  exit 77
+ fi
 }
-
 
 answer() {
   echo -n "${1} ... "
