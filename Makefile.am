@@ -274,7 +274,15 @@ DISTCLEANFILES = \
                  ./heater-cylinder-inches.vtk                                 \
                  ./ray-effect-diffusion-eighth.msh                            \
                  ./airfoil-converged.msh                                      \
-                 ./ray-effect-eighth-4.msh
+                 ./ray-effect-eighth-4.msh \
+                 ./tests/bc-groups1.last \
+                 ./tests/bc-groups2.last \
+                 ./tests/bc-groups3.last \
+                 ./tests/bc-groups4.last \
+                 ./bc-groups1.last \
+                 ./bc-groups2.last \
+                 ./bc-groups3.last \
+                 ./bc-groups4.last
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
