@@ -150,7 +150,7 @@ answermpi() {
 answerdiff() {
   echo -n "${1} ... "
   base=$(basename ${1} .fee)
-  ${feenox} ${dir}/${1} | sed 's/-0.0000/0.0000/g' > ${dir}/${base}.last
+  ${feenox} ${dir}/${1} ${2} | sed 's/-0.0000/0.0000/g' > ${dir}/${base}.last
   error=$?
   
   if [ ${error} != 0 ]; then

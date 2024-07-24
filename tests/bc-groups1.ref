@@ -1,0 +1,16 @@
+{
+  "bcs": [
+    { "name": "A",
+      "groups": [
+        "left",
+        "front",
+        "bottom"
+      ] },
+    { "name": "B",
+      "groups": [
+        "right",
+        "back",
+        "top"
+      ] }
+  ]
+}

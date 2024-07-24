@@ -1,0 +1,15 @@
+PROBLEM mechanical
+READ_MESH cube.msh
+
+E = 1
+nu = 0.3
+
+BC A  fixed  GROUPS left front
+BC A  GROUP bottom
+BC B   p=1    GROUP right GROUP back 
+BC B  GROUP top
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtk
+
+

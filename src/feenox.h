@@ -970,7 +970,8 @@ struct physical_group_t {
   int dimension;
   
   material_t *material;    // pointer to single material
-  bc_t *bcs;               // linked list 
+  size_t n_bcs;
+  bc_t **bc;              // array of pointers to bc_t
      
   // volume (or area or length depending on the dim, sometimes called mass)
   double volume;
@@ -1214,10 +1215,8 @@ struct bc_t {
   mesh_t *mesh;
 //  name_item_t *groups;
   bc_data_t *bc_datums;
-//  int has_explicit_groups;
 
   UT_hash_handle hh;  // for the hashed list mesh.bcs
-  bc_t *next;         // for the linked list in each physical group
 };
 
 struct bc_data_t {
@@ -1267,7 +1266,7 @@ struct mesh_t {
   unsigned int order;
 
   physical_group_t *physical_groups;              // global hash table
-  physical_group_t *physical_groups_by_tag[4];    // 4 hash tablesm one per tag
+  physical_group_t *physical_groups_by_tag[4];    // 4 hash tables one per tag
   int physical_tag_max;   // the higher tag of the entities
   
   // number of geometric entities of each dimension

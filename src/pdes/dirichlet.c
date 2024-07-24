@@ -93,10 +93,9 @@ int feenox_problem_dirichlet_eval(void) {
       element_t *element = element_list->element;
       if (element != NULL && element->type->dim < feenox.pde.dim && element->physical_group != NULL && element->physical_group != last_physical_group) {
         last_physical_group = element->physical_group;
-        bc_t *bc = NULL;
-        LL_FOREACH(element->physical_group->bcs, bc) {
+        for (int i = 0; i < element->physical_group->n_bcs; i++) {
           bc_data_t *bc_data = NULL;
-          DL_FOREACH(bc->bc_datums, bc_data) {
+          DL_FOREACH(element->physical_group->bc[i]->bc_datums, bc_data) {
             // if there is a condition we evaluate it now
             if (bc_data->set_essential != NULL && (bc_data->condition.items == NULL || fabs(feenox_expression_eval(&bc_data->condition)) > DEFAULT_CONDITION_THRESHOLD)) {
               

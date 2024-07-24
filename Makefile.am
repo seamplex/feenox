@@ -28,6 +28,7 @@ TESTS = \
         tests/airfoil.sh \
         tests/arguments.sh \
         tests/azmy.sh \
+        tests/bc-groups.sh \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
         tests/bimetallic-strip.sh \

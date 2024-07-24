@@ -75,10 +75,9 @@ int feenox_problem_build(void) {
       } else if (e->physical_group != NULL) {
 
         // lower-dimensional elements might have BCs (or not)
-        bc_t *bc = NULL;
-        LL_FOREACH(e->physical_group->bcs, bc) {
+        for (int i = 0; i < e->physical_group->n_bcs; i++) {
           bc_data_t *bc_data = NULL;
-          DL_FOREACH(bc->bc_datums, bc_data) {
+          DL_FOREACH(e->physical_group->bc[i]->bc_datums, bc_data) {
             // we only handle natural BCs here, essential BCs are handled in feenox_dirichlet_*()
             if (bc_data->set_natural != NULL && bc_data->disabled == 0) {
               // and only apply them if the condition holds true (or if there's no condition at all)

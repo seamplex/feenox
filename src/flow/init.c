@@ -242,9 +242,8 @@ int feenox_initialize(int argc, char **argv) {
       int first = 1;
       physical_group_t *physical_group = NULL;
       for (physical_group = bc->mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-        bc_t *bc_inner = NULL;
-        LL_FOREACH(physical_group->bcs, bc_inner) {
-          if (bc_inner == bc) {
+        for (int i = 0; i < physical_group->n_bcs; i++) {
+          if (physical_group->bc[i] == bc) {
             if (first == 0) {
               printf(",\n");
             } else {

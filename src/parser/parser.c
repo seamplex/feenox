@@ -2822,7 +2822,9 @@ int feenox_parse_bc_add_group(bc_t *bc, const char *physical_group_name) {
   }
           
   // TODO: api
-  LL_APPEND(physical_group->bcs, bc);
+  physical_group->n_bcs++;
+  feenox_check_alloc(physical_group->bc = realloc(physical_group->bc, physical_group->n_bcs * sizeof(bc_t *)));
+  physical_group->bc[physical_group->n_bcs-1] = bc;
 
   // nice but not needed  
   /*  
@@ -2839,7 +2841,8 @@ int feenox_parse_bc_add_group(bc_t *bc, const char *physical_group_name) {
 int feenox_parse_bc(void) {
 
 ///kw_pde+BC+usage <name>
-///kw_pde+BC+detail If the name of the boundary condition matches a physical group in the mesh, it is automatically linked to that physical group.
+///kw_pde+BC+detail If the name of the boundary condition matches a physical group in the mesh,
+///kw_pde+BC+detail and neither `GROUP` nor `GROUPS` are given,  it is automatically linked to that physical group.
 
   if (feenox.mesh.mesh_main == NULL) {
     feenox_push_error_message("BC before giving a MESH");

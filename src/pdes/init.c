@@ -468,7 +468,7 @@ int feenox_problem_init_runtime_general(void) {
     
     // this is a loop over a hash, not over a linked list
     for (physical_group_t *physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-      if (physical_group->bcs != NULL && physical_group->n_elements == 0) {
+      if (physical_group->n_bcs != 0 && physical_group->n_elements == 0) {
         feenox_push_error_message("physical entity '%s' has a BC but no associated elements. Set ALLOW_UNRESOLVED_BCS if you want to skip this check.", physical_group->name);
         return FEENOX_ERROR;
       }
