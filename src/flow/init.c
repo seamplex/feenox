@@ -239,16 +239,23 @@ int feenox_initialize(int argc, char **argv) {
       printf("    { \"name\": \"%s\",\n", bc->name);
       printf("      \"groups\": [\n");
       
+      int first = 1;
       physical_group_t *physical_group = NULL;
       for (physical_group = bc->mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
         bc_t *bc_inner = NULL;
         LL_FOREACH(physical_group->bcs, bc_inner) {
           if (bc_inner == bc) {
-            printf("        \"%s\"\n", physical_group->name);
+            if (first == 0) {
+              printf(",\n");
+            } else {
+              first = 0;
+            }
+            printf("        \"%s\"", physical_group->name);
           }
         }
       }
       
+      printf("\n");
       printf("      ] }");
       if (bc->hh.next != NULL) {
         printf(",");
