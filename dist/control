@@ -6,7 +6,8 @@ Build-Depends: debhelper-compat (= 13),
  libgsl-dev,
  libsundials-dev,
  petsc-dev,
- slepc-dev
+ slepc-dev,
+ gmsh
 Standards-Version: 4.6.2
 Homepage: https://www.seamplex.com/feenox
 Rules-Requires-Root: no
