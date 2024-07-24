@@ -116,6 +116,7 @@ extern int feenox_parse_write_mesh(void);
 extern int feenox_parse_write_results(void);
 extern int feenox_parse_physical_group(void);
 extern int feenox_parse_material(void);
+extern int feenox_parse_bc_add_group(bc_t *bc, const char *physical_group_name);
 extern int feenox_parse_bc(void);
 extern int feenox_parse_reaction(void);
 extern int feenox_parse_problem(void);

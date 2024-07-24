@@ -1,6 +1,6 @@
 PROBLEM laplace 2d
 READ_MESH square-centered.msh
-BC zero  phi=0 PHYSICAL_GROUP left PHYSICAL_GROUP right PHYSICAL_GROUP bottom PHYSICAL_GROUP up
+BC zero  phi=0 GROUPS left right bottom up
 f = 1
 gamg_threshold = 1e-4
 SOLVE_PROBLEM

@@ -2815,6 +2815,27 @@ int feenox_parse_material(void) {
 
 
 
+int feenox_parse_bc_add_group(bc_t *bc, const char *physical_group_name) {
+  physical_group_t *physical_group = NULL;
+  if ((physical_group = feenox_get_or_define_physical_group_get_ptr(physical_group_name, bc->mesh, 0, 0)) == NULL) {
+    return FEENOX_ERROR;
+  }
+          
+  // TODO: api
+  LL_APPEND(physical_group->bcs, bc);
+
+  // nice but not needed  
+  /*  
+  name_item_t *name_item = NULL;
+  feenox_check_alloc(name_item = calloc(1, sizeof(name_item_t)));
+  name_item->name = strdup(physical_group_name);
+  LLq_APPEND(bc->groups, name_item);
+  */
+  
+  return FEENOX_OK;
+  
+}
+
 int feenox_parse_bc(void) {
 
 ///kw_pde+BC+usage <name>
@@ -2838,6 +2859,7 @@ int feenox_parse_bc(void) {
   bc_t *bc = feenox_define_bc_get_ptr(bc_name, NULL);
   
   char *token = NULL;
+  int has_explicit_groups = 0;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
 ///kw_pde+BC+usage [ MESH <name> ]
@@ -2852,27 +2874,25 @@ int feenox_parse_bc(void) {
       }
       feenox_free(mesh_name);
     
-///kw_pde+BC+usage [ PHYSICAL_GROUP <name_1>  PHYSICAL_GROUP <name_2> ... ]
+///kw_pde+BC+usage [ GROUP <name_1>  GROUP <name_2> ... ]
 ///kw_pde+BC+detail If the boundary condition applies to more than one physical group in the mesh,
-///kw_pde+BC+detail they can be added using as many `PHYSICAL_GROUP` keywords as needed. 
-///kw_pde+BC+detail If at least one `PHYSICAL_GROUP` is given explicitly, then the `BC` name
-///kw_pde+BC+detail is not used to try to implicitly link it to a physical group in the mesh.
-    } else if (strcasecmp(token, "PHYSICAL_GROUP") == 0 || strcasecmp(token, "GROUP") == 0 || strcasecmp(token, "LABEL") == 0) {
+///kw_pde+BC+detail they can be added using as many `GROUP` keywords as needed. 
+    } else if (strcasecmp(token, "GROUP") == 0 || strcasecmp(token, "LABEL") == 0) {
       
-      bc->has_explicit_groups = 1;
-      
-      char *physical_group_name;
-      feenox_call(feenox_parser_string(&physical_group_name));  
-
-      physical_group_t *physical_group = NULL;
-      if ((physical_group = feenox_get_or_define_physical_group_get_ptr(physical_group_name, bc->mesh, 0, 0)) == NULL) {
-        return FEENOX_ERROR;
-      }
-          
-      // TODO: api
-      LL_APPEND(physical_group->bcs, bc);
+      has_explicit_groups = 1;
+      char *physical_group_name = NULL;
+      feenox_call(feenox_parser_string(&physical_group_name));
+      feenox_call(feenox_parse_bc_add_group(bc, physical_group_name));
       feenox_free(physical_group_name);
-        
+
+    } else if (strcasecmp(token, "GROUPS") == 0 || strcasecmp(token, "LABELS") == 0) {
+
+      has_explicit_groups = 1;
+      while ((token = feenox_get_next_token(NULL)) != NULL) {
+        feenox_call(feenox_parse_bc_add_group(bc, token));
+      }
+      break;
+      
     } else {
 ///kw_pde+BC+usage [ <bc_data1> <bc_data2> ... ]
 ///kw_pde+BC+detail Each `<bc_data>` argument is a single string whose meaning depends on the type
@@ -2886,7 +2906,18 @@ int feenox_parse_bc(void) {
         return FEENOX_ERROR;
       }
     }
+///kw_pde+BC+usage [ GROUPS <name_1>  <name_2> ... ]
+///kw_pde+BC+detail If the keyword `GROUPS` is given, then the rest of the tokens are parsed
+///kw_pde+BC+detail as group names where the boundary condition is applied.
+///kw_pde+BC+detail If either `GROUP` or `GROUPS` are given explicitly, then the `BC` name
+///kw_pde+BC+detail is not used to try to implicitly link it to a physical group in the mesh.
+    
   }
+  
+  if (has_explicit_groups == 0) {
+    feenox_call(feenox_parse_bc_add_group(bc, bc_name));
+  }
+  
   feenox_free(bc_name);
   
   return FEENOX_OK;

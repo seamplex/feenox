@@ -122,7 +122,7 @@ int feenox_instruction_mesh_read(void *arg) {
   
   // allocate arrays for the elements that belong to a physical group
   // (arrays are more efficient than a linked list)
-  physical_group_t *physical_group;
+  physical_group_t *physical_group = NULL;
   for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->n_elements != 0) {
       feenox_check_alloc(physical_group->element = calloc(physical_group->n_elements, sizeof(size_t)));

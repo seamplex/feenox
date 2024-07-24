@@ -19,7 +19,7 @@ PHYSICAL_GROUP base DIM 2
 PHYSICAL_GROUP rest DIM 2
 
 convection_coeff = 1
-BC heated h=convection_coeff Tref=1 LABEL base LABEL rest
+BC heated h=convection_coeff Tref=1 GROUP base GROUP rest
 
 SOLVE_PROBLEM
 

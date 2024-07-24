@@ -64,6 +64,9 @@ int feenox_initialize(int argc, char **argv) {
 ///op+elements_info+option `--elements_info`
 ///op+elements_info+desc output a document with information about the supported element types
     { "elements_info", no_argument,       NULL, 'e'},
+///op+ast+option `--ast`
+///op+ast+desc dump an abstract syntax tree of the input
+    { "ast",           no_argument,       NULL, 'a'},
     
 ///op+linear+option `--linear`
 ///op+linear+desc force FeenoX to solve the PDE problem as linear
@@ -122,6 +125,7 @@ int feenox_initialize(int argc, char **argv) {
   }
   feenox.argv_orig[i] = NULL;
   
+  int dump_ast = 0;
   opterr = 0;   // don't complain about unknown options, they can be for PETSc/SLEPc
   while ((optc = getopt_long_only(argc, argv, "hvVc", longopts, &option_index)) != -1) {
     switch (optc) {
@@ -135,7 +139,11 @@ int feenox_initialize(int argc, char **argv) {
         show_version = version_info;
         break;
       case 'c':
-        feenox.check= 1;
+        feenox.check = 1;
+        break;
+      case 'a':
+        feenox.check = 1;
+        dump_ast = 1;
         break;
       case 'p':
         show_version = version_available_pdes;
@@ -222,6 +230,34 @@ int feenox_initialize(int argc, char **argv) {
   
   feenox_call(feenox_init_special_objects());
   feenox_call(feenox_parse_main_input_file(feenox.main_input_filepath));
+  
+  if (dump_ast) {
+    printf("{\n");
+    printf("  \"bcs\": [\n");
+    // this is a loop over a hash, not over a linked list
+    for (bc_t *bc = feenox.mesh.bcs; bc != NULL; bc = bc->hh.next) {
+      printf("    { \"name\": \"%s\",\n", bc->name);
+      printf("      \"groups\": [\n");
+      
+      physical_group_t *physical_group = NULL;
+      for (physical_group = bc->mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+        bc_t *bc_inner = NULL;
+        LL_FOREACH(physical_group->bcs, bc_inner) {
+          if (bc_inner == bc) {
+            printf("        \"%s\"\n", physical_group->name);
+          }
+        }
+      }
+      
+      printf("      ] }");
+      if (bc->hh.next != NULL) {
+        printf(",");
+      }
+      printf("\n");
+    }
+    printf("  ]\n");
+    printf("}\n");
+  }
   
   return FEENOX_OK;
 }

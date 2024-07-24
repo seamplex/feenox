@@ -13,7 +13,7 @@ BC B u=0 w=0
 BC C u=0
 
 # here "load" is a fantasy name
-BC load tension=1 PHYSICAL_GROUP left PHYSICAL_GROUP right
+BC load tension=1 GROUP left GROUP right
 
 SOLVE_PROBLEM
 

@@ -10,8 +10,8 @@ READ_MESH wilson-2d.msh
 k(x,y) = 1 + 0.5*T(x,y)
 rhocp(x,y) = 1 + 0.5*T(x,y)
 
-BC heat q=1                PHYSICAL_GROUP left  PHYSICAL_GROUP bottom
-BC temp T=limit(1e5*t,0,1) PHYSICAL_GROUP right PHYSICAL_GROUP top
+BC heat q=1                GROUP left  GROUP bottom
+BC temp T=limit(1e5*t,0,1) GROUP right GROUP top
 T_0(x,y) = 0
 
 end_time = 17.25

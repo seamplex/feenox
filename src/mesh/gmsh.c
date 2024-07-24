@@ -181,13 +181,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           HASH_FIND_STR(feenox.mesh.materials, name, physical_group->material);
         }
         
-        // same for BCs, although slightly different because there can be many
-        bc_t *bc = NULL;
-        HASH_FIND_STR(feenox.mesh.bcs, name, bc);
-        if (bc != NULL) {
-          LL_APPEND(physical_group->bcs, bc);
-        }
-
         feenox_free(name);
 
       }

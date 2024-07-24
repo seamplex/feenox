@@ -348,6 +348,8 @@ typedef struct material_t material_t;
 typedef struct material_ll_t material_ll_t;
 typedef struct distribution_t distribution_t;
 
+// nice but not needed
+// typedef struct name_item_t name_item_t;
 typedef struct bc_t bc_t;
 typedef struct bc_data_t bc_data_t;
 
@@ -1199,12 +1201,20 @@ struct distribution_t  {
   double (*eval)(distribution_t *, const double *x, material_t *material);
 };
 
+// nice but not needed
+/*
+struct name_item_t {
+  char *name;
+  name_item_t *next;
+};
+*/
 
 struct bc_t {
   char *name;
   mesh_t *mesh;
+//  name_item_t *groups;
   bc_data_t *bc_datums;
-  int has_explicit_groups;
+//  int has_explicit_groups;
 
   UT_hash_handle hh;  // for the hashed list mesh.bcs
   bc_t *next;         // for the linked list in each physical group

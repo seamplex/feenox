@@ -4,7 +4,7 @@ READ_MESH reaction.msh SCALE 1e-3
 E = 70e9
 nu = 0.33
 
-BC dummy_name symmetry PHYSICAL_GROUP surf_1_1 PHYSICAL_GROUP surf_1_2 symmetry  PHYSICAL_GROUP surf_1_3  PHYSICAL_GROUP surf_1_4 PHYSICAL_GROUP surf_1_6
+BC dummy_name symmetry GROUPS surf_1_1 surf_1_2 surf_1_3  surf_1_4 surf_1_6
 BC surf_1_5 w=-5.35655e-08
 
 SOLVE_PROBLEM
