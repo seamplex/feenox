@@ -157,9 +157,12 @@ void feenox_longversion(void) {
 #ifdef FEENOX_GIT_DATE
   printf("Last commit date   : %s\n", FEENOX_GIT_DATE);
 #endif
-#ifdef FEENOX_COMPILATION_DATE
-  printf("Build date         : %s\n", FEENOX_COMPILATION_DATE);
-#endif
+  
+// this guy here prevents reproducible build in debian
+// #ifdef FEENOX_COMPILATION_DATE
+//  printf("Build date         : %s\n", FEENOX_COMPILATION_DATE);
+// #endif
+  
 #ifdef FEENOX_COMPILER_ARCH
   printf("Build architecture : %s\n", FEENOX_COMPILER_ARCH);
 #endif
