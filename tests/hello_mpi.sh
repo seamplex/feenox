@@ -10,10 +10,7 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkpetsc
-
-if [ -z "$(which mpirun)" ]; then
-  exit 77
-fi
+checkmpirun
 
 for n in 1 2 3 4; do
   echo -n "hello_mpi with ${n} ranks ... "
