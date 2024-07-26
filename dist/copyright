@@ -17,7 +17,12 @@ Files:
  debian/*
 Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
 License: GPL-3.0+
-  
+
+Files:
+ README INSTALL config* *.m4
+Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
+License: FSFAP
+
 Files:
  src/contrib/kdtree.*
 Copyright: 2007-2011 John Tsiombikas <nuclear@member.fsf.org>
@@ -26,7 +31,7 @@ License: BSD-3-clause
 Files:
  src/contrib/ut*
 Copyright: 2003-2022, Troy D. Hanson <http://troydhanson.github.com/uthash/>
-License: BSD-2-clause
+License: BSD-1-clause
 
   
 License: GPL-3.0+
@@ -77,7 +82,7 @@ License: BSD-3-clause
  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  OF SUCH DAMAGE.
 
-License: BSD-2-clause
+License: BSD-1-clause
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -95,3 +100,10 @@ License: BSD-2-clause
  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: FSFAP
+ Copying and distribution of this file, with or without modification,
+ are permitted in any medium without royalty provided the copyright
+ notice and this notice are preserved.  This file is offered as-is,
+ without any warranty.
+ 
