@@ -56,6 +56,9 @@ version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
 
 cat << EOF > version.m4
 define(feenoxversion, ${version})dnl
+EOF
+
+cat << EOF > versiongit.m4
 AC_DEFINE([FEENOX_GIT_VERSION], ["$(git describe --tags | sed 's/-/./' | tr -d \\n])"], [FeenoX Git version string])
 AC_DEFINE([FEENOX_GIT_BRANCH],  ["$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,' | tr -d \\n])"], [FeenoX Git branch])
 AC_DEFINE([FEENOX_GIT_DATE],    ["$(git log --pretty=format:"%ad" | head -n1 | tr -d \\n])"], [FeenoX Git date])

@@ -20,6 +20,7 @@ missing
 test-driver
 test-suite.log
 version.m4
+versiongit.m4
 ChangeLog
 .deps
 *.Po

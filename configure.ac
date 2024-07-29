@@ -373,6 +373,8 @@ AC_DEFINE([FEENOX_VERSION], "feenoxversion", [FeenoX version string])
 # AC_DEFINE([FEENOX_COMPILATION_USERNAME],  ["m4_esyscmd([whoami | sed s/\\\\\\\\// | tr -d \\n])"], [FeenoX compilation username])
 # AC_DEFINE([FEENOX_COMPILATION_HOSTNAME],  ["m4_esyscmd([hostname | tr -d \\n])"], [FeenoX compilation hostname])
 
+m4_include(versiongit.m4)
+
 AC_DEFINE_UNQUOTED([FEENOX_COMPILER_COMMAND], ["$compiler_command"],  [FeenoX compiler command])
 AC_DEFINE_UNQUOTED([FEENOX_COMPILER_ARCH],    ["$host_os $host_cpu"], [FeenoX compiler architecture])
 AC_DEFINE_UNQUOTED([FEENOX_COMPILER_VERSION], ["$compiler_version"],  [Feenox compiler version])
