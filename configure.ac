@@ -368,16 +368,10 @@ compiler_version=$(${compiler_command} --version | head -n1 | tr -d \\n])
 AC_MSG_NOTICE([gathering versions])
 AC_DEFINE([FEENOX_VERSION], "feenoxversion", [FeenoX version string])
 
-AS_IF([test -e .git -a ! -z "$(which git)"],[
-  AC_DEFINE([FEENOX_GIT_VERSION], ["m4_esyscmd([git describe --tags | sed 's/-/./' | tr -d \\n])"], [FeenoX Git version string])
-  AC_DEFINE([FEENOX_GIT_BRANCH],  ["m4_esyscmd([git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,' | tr -d \\n])"], [FeenoX Git branch])
-  AC_DEFINE([FEENOX_GIT_DATE],    ["m4_esyscmd([git log --pretty=format:"%ad" | head -n1 | tr -d \\n])"], [FeenoX Git date])
-  AC_DEFINE([FEENOX_GIT_CLEAN],   ["m4_esyscmd([git status --porcelain | wc -l | tr -d \\n])"], [FeenoX Git clean])
-])
-
-AC_DEFINE([FEENOX_COMPILATION_DATE],      ["m4_esyscmd([date +'%a %b %d %H:%M:%S %Y %z' | tr -d \\n])"], [FeenoX compilation date])
-AC_DEFINE([FEENOX_COMPILATION_USERNAME],  ["m4_esyscmd([whoami | sed s/\\\\\\\\// | tr -d \\n])"], [FeenoX compilation username])
-AC_DEFINE([FEENOX_COMPILATION_HOSTNAME],  ["m4_esyscmd([hostname | tr -d \\n])"], [FeenoX compilation hostname])
+# these guys create problems with reprotest
+# AC_DEFINE([FEENOX_COMPILATION_DATE],      ["m4_esyscmd([date +'%a %b %d %H:%M:%S %Y %z' | tr -d \\n])"], [FeenoX compilation date])
+# AC_DEFINE([FEENOX_COMPILATION_USERNAME],  ["m4_esyscmd([whoami | sed s/\\\\\\\\// | tr -d \\n])"], [FeenoX compilation username])
+# AC_DEFINE([FEENOX_COMPILATION_HOSTNAME],  ["m4_esyscmd([hostname | tr -d \\n])"], [FeenoX compilation hostname])
 
 AC_DEFINE_UNQUOTED([FEENOX_COMPILER_COMMAND], ["$compiler_command"],  [FeenoX compiler command])
 AC_DEFINE_UNQUOTED([FEENOX_COMPILER_ARCH],    ["$host_os $host_cpu"], [FeenoX compiler architecture])

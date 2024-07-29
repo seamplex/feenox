@@ -158,11 +158,15 @@ void feenox_longversion(void) {
   printf("Last commit date   : %s\n", FEENOX_GIT_DATE);
 #endif
   
-// this guy here prevents reproducible build in debian
-// #ifdef FEENOX_COMPILATION_DATE
-//  printf("Build date         : %s\n", FEENOX_COMPILATION_DATE);
-// #endif
-  
+// these guys here prevent reproducible builds in debian
+/*
+#ifdef FEENOX_COMPILATION_DATE
+  printf("Build date         : %s\n", FEENOX_COMPILATION_DATE);
+#endif
+#ifdef FEENOX_COMPILATION_USERNAME
+  printf("Builder            : %s@%s\n", FEENOX_COMPILATION_USERNAME, FEENOX_COMPILATION_HOSTNAME);
+#endif  
+*/
 #ifdef FEENOX_COMPILER_ARCH
   printf("Build architecture : %s\n", FEENOX_COMPILER_ARCH);
 #endif
@@ -175,9 +179,6 @@ void feenox_longversion(void) {
 #ifdef FEENOX_COMPILER_CFLAGS
   printf("Compiler flags     : %s\n", FEENOX_COMPILER_CFLAGS);
 #endif
-#ifdef FEENOX_COMPILATION_USERNAME
-  printf("Builder            : %s@%s\n", FEENOX_COMPILATION_USERNAME, FEENOX_COMPILATION_HOSTNAME);
-#endif  
   
   printf("GSL version        : %s\n", gsl_version);
   

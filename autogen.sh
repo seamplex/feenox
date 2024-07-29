@@ -54,7 +54,14 @@ else
 fi
 version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
 
-echo "define(feenoxversion, ${version})dnl" > version.m4
+cat << EOF > version.m4
+define(feenoxversion, ${version})dnl
+AC_DEFINE([FEENOX_GIT_VERSION], ["$(git describe --tags | sed 's/-/./' | tr -d \\n])"], [FeenoX Git version string])
+AC_DEFINE([FEENOX_GIT_BRANCH],  ["$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,' | tr -d \\n])"], [FeenoX Git branch])
+AC_DEFINE([FEENOX_GIT_DATE],    ["$(git log --pretty=format:"%ad" | head -n1 | tr -d \\n])"], [FeenoX Git date])
+AC_DEFINE([FEENOX_GIT_CLEAN],   ["$(git status --porcelain | wc -l | tr -d \\n])"], [FeenoX Git clean])
+EOF
+
 
 # these links are needed for make dist-check
 rm -f config_links.m4
