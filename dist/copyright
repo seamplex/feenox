@@ -19,7 +19,7 @@ Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
 License: GPL-3.0+
 
 Files:
- README INSTALL config* *.m4
+ README INSTALL config* aclocal.m4  ax_gcc_builtin.m4  config_links.m4  versiongit.m4  version.m4
 Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
 License: FSFAP
 
