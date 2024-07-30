@@ -385,7 +385,7 @@ AC_DEFINE_UNQUOTED([FEENOX_COMPILER_LDFLAGS], ["${LDFLAGS}"], [LDFLAGS])
 
 ######################
 # create some links to pass make distcheck
-m4_include(config_links.m4)
+m4_include(auto_links.m4)
 
   
 #AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
