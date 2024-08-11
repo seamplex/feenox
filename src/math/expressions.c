@@ -103,7 +103,7 @@ int feenox_count_arguments(char *string, size_t *n_chars) {
 }
 
 
-int feenox_read_arguments(char *string, unsigned int n_arguments, char ***arg, size_t *n_chars) {
+int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars) {
 
   if (string[0] != '(' && string[0] != '[') {
     feenox_push_error_message("arguments must start with a parenthesis for functions and with a bracket for vectors or matrices");
@@ -413,7 +413,7 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
         (builtin_vectorfunction = feenox_get_builtin_vectorfunction_ptr(token)) != NULL ||
         (builtin_functional = feenox_get_builtin_functional_ptr(token)) != NULL) {
 
-      // copy into argument whatever is after the nam
+      // copy into argument whatever is after the name
       char *argument = NULL;
       feenox_check_alloc_null(argument = strdup(string+strlen(token)));
 

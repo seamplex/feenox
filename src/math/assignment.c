@@ -152,19 +152,65 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
     }
   }
   
-  // the right-hand side is easy!
-  feenox_call(feenox_expression_parse(&assignment->rhs, right_hand));
+  if (assignment->vector == NULL || bracket != NULL || index_range != NULL) {
+    // the right-hand side is easy (
+    feenox_call(feenox_expression_parse(&assignment->rhs, right_hand));
   
-  LL_APPEND(feenox.assignments, assignment);
-  if (assignment->variable != NULL) {
-    feenox_call(feenox_add_instruction(feenox_instruction_assignment_scalar, assignment));
-  } else if (assignment->vector != NULL) {
-    feenox_call(feenox_add_instruction(feenox_instruction_assignment_vector, assignment));      
-  } else if (assignment->matrix != NULL) {
-    feenox_call(feenox_add_instruction(feenox_instruction_assignment_matrix, assignment));      
+    LL_APPEND(feenox.assignments, assignment);
+    if (assignment->variable != NULL) {
+      feenox_call(feenox_add_instruction(feenox_instruction_assignment_scalar, assignment));
+    } else if (assignment->vector != NULL) {
+      feenox_call(feenox_add_instruction(feenox_instruction_assignment_vector, assignment));      
+    } else if (assignment->matrix != NULL) {
+      feenox_call(feenox_add_instruction(feenox_instruction_assignment_matrix, assignment));      
+    } else {
+      feenox_push_error_message("invalid assignment");
+      return FEENOX_ERROR;
+    }
   } else {
-    feenox_push_error_message("invalid assignment");
-    return FEENOX_ERROR;
+    // this block handles the vector initialization 
+    vector_t *vector = assignment->vector;
+    feenox_free(assignment);
+    char *non_const_rhs = strdup(right_hand);
+    char *rhs_starting_with_bracket = non_const_rhs;
+    while (*rhs_starting_with_bracket != '(') {
+      if (*rhs_starting_with_bracket == '\0') {
+        feenox_push_error_message("right hand side for vector initialization has to be inside brackets '(' and ')'");
+        return FEENOX_ERROR;
+      }
+      *rhs_starting_with_bracket++;
+    }
+    size_t n_chars_count = 0;
+    int n_expressions = 0;
+    if ((n_expressions = feenox_count_arguments(rhs_starting_with_bracket, &n_chars_count)) <= 0) {
+      feenox_push_error_message("invalid initialization expression");
+      return FEENOX_ERROR;
+    }
+    
+    if (vector->size != 0 && n_expressions > vector->size) {
+      feenox_push_error_message("more expressions (%d) than vector size (%d)", n_expressions, vector->size);
+      return FEENOX_ERROR;
+    }
+
+    char **expr = NULL;
+    feenox_call(feenox_read_arguments(rhs_starting_with_bracket, n_expressions, &expr, &n_chars_count));
+    for (int i = 0; i < n_expressions; i++) {
+      feenox_check_alloc(assignment = calloc(1, sizeof(assignment_t)));
+      assignment->vector = vector;
+      assignment->scalar = 1;
+      
+      char *i_str = NULL;
+      feenox_check_minusone(asprintf(&i_str, "%d", i+1));
+      feenox_call(feenox_expression_parse(&assignment->row, i_str));
+      feenox_call(feenox_expression_parse(&assignment->rhs, expr[i]));
+      feenox_call(feenox_add_instruction(feenox_instruction_assignment_vector, assignment));      
+      LL_APPEND(feenox.assignments, assignment);
+      feenox_free(i_str);
+      feenox_free(expr[i]);
+    }
+    feenox_free(expr);
+    
+    feenox_free(non_const_rhs);
   }
     
   return FEENOX_OK;
