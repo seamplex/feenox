@@ -1267,7 +1267,7 @@ struct mesh_t {
 
   physical_group_t *physical_groups;              // global hash table
   physical_group_t *physical_groups_by_tag[4];    // 4 hash tables one per tag
-  int physical_tag_max;   // the higher tag of the entities
+  int physical_tag_max;                           // the higher tag of the entities
   
   // number of geometric entities of each dimension
   size_t points, curves, surfaces, volumes;
@@ -1281,6 +1281,8 @@ struct mesh_t {
 
   int sparse;            // flag that indicates if the nodes are sparse
   size_t *tag2index;     // array to map tags to indexes (we need a -1)
+  // pointer to tag_min entries before so we can use the tag as an offset
+  size_t *tag2index_from_tag_min; 
   
   enum {
     data_type_element,
@@ -2248,6 +2250,7 @@ extern int feenox_mesh_compute_r_tetrahedron(element_t *, const double *x, doubl
 
 // gmsh.c
 extern int feenox_mesh_read_gmsh(mesh_t *);
+extern int feenox_mesh_tag2index_alloc(mesh_t *, size_t, size_t );
 extern int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt);
 extern int feenox_mesh_write_header_gmsh(FILE *file);
 extern int feenox_mesh_write_mesh_gmsh(mesh_t *, FILE *file, int no_physical_names);

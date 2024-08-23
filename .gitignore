@@ -49,7 +49,7 @@ gsl-*
 
 
 # config_links
-config_links.m4
+auto_links.m4
 
 # netbeans IDE project
 nbproject

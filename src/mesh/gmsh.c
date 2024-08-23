@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related gmsh routines
  *
- *  Copyright (C) 2014--2023 jeremy theler
+ *  Copyright (C) 2014--2024 jeremy theler
  *
  *  This file is part of feenox.
  *
@@ -420,12 +420,13 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           if (tag_max < this->n_nodes) {
             feenox_push_error_message("maximum node tag %d is less that number of nodes %d", tag_max, this->n_nodes);
           }
-          feenox_check_alloc(this->tag2index = malloc((tag_max+1) * sizeof(size_t)));
-          for (size_t k = 0; k <= tag_max; k++) {
-            this->tag2index[k] = SIZE_MAX;
-          }
-          for (size_t i = 0; i < this->n_nodes; i++) {
-            this->tag2index[this->node[i].tag] = i;
+          feenox_call(feenox_mesh_tag2index_alloc(this, tag_min, tag_max));
+          for (size_t j = 0; j < this->n_nodes; j++) {
+            if (feenox_unlikely(this->tag2index_from_tag_min[this->node[j].tag] != SIZE_MAX)) {
+              feenox_push_error_message("duplicate node tag %ld in mesh '%s'", this->node[j].tag, this->file->name);
+              return FEENOX_ERROR;
+            }
+            this->tag2index_from_tag_min[this->node[j].tag] = j;
           }
         }
 
@@ -434,7 +435,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         // number of blocks and nodes
         size_t num_blocks;
         if (version_min == 0) {
-          // en 4.0 no tenemos min y max
+          // in 4.0 there is no min/ max
           size_t data[2] = {0,0};
           feenox_call(feenox_gmsh_read_data_size_t(this, 2, data, binary));
           num_blocks = data[0];
@@ -455,20 +456,15 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
 
         feenox_check_alloc(this->node = calloc(this->n_nodes, sizeof(node_t)));
 
-        // tag_min?
         if (tag_max != 0) {
           // we can do this as a one single pass because we have tag_max (I asked for this in v4.1)
-          // TODO: offset with tag_min?
           if (tag_max < this->n_nodes) {
             feenox_push_error_message("maximum node tag %d is less that number of nodes %d", tag_max, this->n_nodes);
           }
-          feenox_check_alloc(this->tag2index = calloc((tag_max+1), sizeof(size_t)));
-          for (size_t k = 0; k <= tag_max; k++) {
-            this->tag2index[k] = SIZE_MAX;
-          }
+          feenox_call(feenox_mesh_tag2index_alloc(this, tag_min, tag_max));
         }
         
-        size_t j = 0;
+        size_t node_index = 0;
         for (size_t l = 0; l < num_blocks; l++) {
           size_t num_nodes = 0;
 
@@ -476,6 +472,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_call(feenox_gmsh_read_data_int(this, 3, data, binary));
           
           // v4.0 and v4.1 have geometrical and dimension switched
+          // the way we read nodes, we do not need them
 //          int dimension = (version_min == 0) ? data[1] : data[0];
 //          int geometrical = (version_min == 0) ? data[0] : data[1];
           int parametric = data[2];
@@ -491,22 +488,21 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             // here we have tag and coordinate in the same line
             for (size_t k = 0; k < num_nodes; k++) {
               if (fscanf(fp, "%lu %lf %lf %lf",
-                         &this->node[j].tag,
-                         &this->node[j].x[0],
-                         &this->node[j].x[1],
-                         &this->node[j].x[2]) < 4) {
+                         &this->node[node_index].tag,
+                         &this->node[node_index].x[0],
+                         &this->node[node_index].x[1],
+                         &this->node[node_index].x[2]) < 4) {
                 feenox_push_error_message("reading node data");
                 return FEENOX_ERROR;
               }
               
-              if (this->node[j].tag > tag_max) {
-                tag_max = this->node[j].tag;
+              if (this->node[node_index].tag > tag_max) {
+                tag_max = this->node[node_index].tag;
               }
               
-              // in msh4 the tags are the incides of the global mesh
-              this->node[j].index_mesh = j;
-              
-              j++;
+              // in msh4 the tags are the indices of the global mesh
+              this->node[node_index].index_mesh = node_index;
+              node_index++;
             }
           } else {
 
@@ -514,23 +510,27 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             size_t *node_tags = NULL;
             feenox_check_alloc(node_tags = calloc(num_nodes, sizeof(size_t)));
             feenox_call(feenox_gmsh_read_data_size_t(this, num_nodes, node_tags, binary));
-            size_t k = 0;
-            // i has the last fully-read node index
-            for (k = 0; k < num_nodes; k++) {
-              this->node[j+k].tag = node_tags[k];
+            // node_index has the last fully-read node index
+            for (size_t k = 0; k < num_nodes; k++) {
+              this->node[node_index+k].tag = node_tags[k];
             }
             feenox_free(node_tags);
             
             double *node_coords = NULL;
             feenox_check_alloc(node_coords = calloc(3*num_nodes, sizeof(size_t)));
             feenox_call(feenox_gmsh_read_data_double(this, 3*num_nodes, node_coords, binary));
-            for (k = 0; k < num_nodes; k++) {
-              this->node[j].x[0] = node_coords[3*k+0];
-              this->node[j].x[1] = node_coords[3*k+1];
-              this->node[j].x[2] = node_coords[3*k+2];
-              this->node[j].index_mesh = j;
-              this->tag2index[this->node[j].tag] = j;
-              j++;
+            for (size_t k = 0; k < num_nodes; k++) {
+              this->node[node_index].x[0] = node_coords[3*k+0];
+              this->node[node_index].x[1] = node_coords[3*k+1];
+              this->node[node_index].x[2] = node_coords[3*k+2];
+              this->node[node_index].index_mesh = node_index;
+
+              if (feenox_unlikely(this->tag2index_from_tag_min[this->node[node_index].tag] != SIZE_MAX)) {
+                feenox_push_error_message("duplicate node tag %ld in mesh '%s'", this->node[node_index].tag, this->file->name);
+                return FEENOX_ERROR;
+              }
+              this->tag2index_from_tag_min[this->node[node_index].tag] = node_index;
+              node_index++;
             }
             feenox_free(node_coords);
           }
@@ -538,12 +538,14 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         
         if (version_min == 0) {
           // for v4.0 we need an extra loop because we did not have the actual tag_max
-          feenox_check_alloc(this->tag2index = malloc((tag_max+1) * sizeof(size_t)));
-          for (size_t k = 0; k <= tag_max; k++) {
-            this->tag2index[k] = SIZE_MAX;
-          }
-          for (size_t i = 0; i < this->n_nodes; i++) {
-            this->tag2index[this->node[i].tag] = i;
+          feenox_mesh_tag2index_alloc(this, tag_min, tag_max);
+          
+          for (size_t j = 0; j < this->n_nodes; j++) {
+            if (feenox_unlikely(this->tag2index_from_tag_min[this->node[j].tag] != SIZE_MAX)) {
+              feenox_push_error_message("duplicate node tag %ld in mesh '%s'", this->node[j].tag, this->file->name);
+              return FEENOX_ERROR;
+            }
+            this->tag2index_from_tag_min[this->node[j].tag] = j;
           }
         }
       }
@@ -654,7 +656,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
               return FEENOX_ERROR;
             }
 
-            if ((node_index = (this->sparse==0)?node-1:this->tag2index[node]) < 0) {
+            if ((node_index = (this->sparse==0) ? (node-1) : (this->tag2index[node - tag_min])) == SIZE_MAX) {
               feenox_push_error_message("node %d in element %d does not exist", node, tag);
               return FEENOX_ERROR;
             }
@@ -720,8 +722,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             return FEENOX_ERROR;
           }
 
-//          printf("block %ld geometrical %d\n", l, geometrical);
-          
           physical_group_t *physical_group = NULL;
           if (geometrical != 0) {
             // the whole block has the same physical group, find it once and that's it
@@ -752,7 +752,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           feenox_check_alloc(element_data = calloc(num_elements*size_block, sizeof(size_t)));
           feenox_call(feenox_gmsh_read_data_size_t(this, num_elements*size_block, element_data, binary));
           
-          // index has the last fully-read node index
+          // index has the last fully-read element index
           for (size_t k = 0; k < num_elements; k++) {
             this->element[index].tag = element_data[size_block * k + 0];
             this->element[index].index = index;
@@ -766,12 +766,13 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
             
             feenox_check_alloc(this->element[index].node = calloc(this->element[index].type->nodes, sizeof(node_t *)));
             for (size_t j = 0; j < this->element[index].type->nodes; j++) {
-              node = element_data[size_block * k + 1 + j];
               // for msh4 we need to use tag2index
-              if ((this->element[index].node[j] = &this->node[this->tag2index[node]]) == 0) {
+              node_index = this->tag2index_from_tag_min[element_data[size_block * k + 1 + j]];
+              if (feenox_unlikely(node_index) == SIZE_MAX) {
                 feenox_push_error_message("node %d in element %d does not exist", node, this->element[index].tag);
                 return FEENOX_ERROR;
               }
+              this->element[index].node[j] = &this->node[node_index];
               feenox_mesh_add_element_to_list(&this->element[index].node[j]->element_list, &this->element[index]);
             }
             index++;
@@ -928,8 +929,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         feenox_call(feenox_gmsh_read_data_int(this, 1, &node, binary));
         for (unsigned int g = 0; g < dofs; g++) {
           feenox_call(feenox_gmsh_read_data_double(this, 1, &value, binary));
-        
-          if ((node_index = (this->sparse==0) ? node-1 : this->tag2index[node]) < 0) {
+          if ((node_index = (this->sparse==0) ? node-1 : this->tag2index_from_tag_min[node]) == SIZE_MAX) {
             feenox_push_error_message("node %d does not exist", node);
             return FEENOX_ERROR;
           }
@@ -967,6 +967,17 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
   return FEENOX_OK;
 }
 
+int feenox_mesh_tag2index_alloc(mesh_t *this, size_t tag_min, size_t tag_max) {
+  size_t tag2index_size = tag_max - tag_min + 1;
+  feenox_check_alloc(this->tag2index = malloc(tag2index_size * sizeof(size_t)));
+  for (size_t k = 0; k < tag2index_size; k++) {
+    this->tag2index[k] = SIZE_MAX;
+  }
+  this->tag2index_from_tag_min = this->tag2index - tag_min;
+
+  return FEENOX_OK;
+}
+
 
 int feenox_mesh_write_header_gmsh(FILE *file) {
   fprintf(file, "$MeshFormat\n");
@@ -996,15 +1007,14 @@ int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names)
   
   fprintf(file, "$Nodes\n");
   fprintf(file, "%ld\n", this->n_nodes);
-  size_t i = 0;
-  for (i = 0; i < this->n_nodes; i++) {
-    fprintf(file, "%ld %g %g %g\n", this->node[i].tag, this->node[i].x[0], this->node[i].x[1], this->node[i].x[2]);
+  for (size_t j = 0; j < this->n_nodes; j++) {
+    fprintf(file, "%ld %g %g %g\n", this->node[j].tag, this->node[j].x[0], this->node[j].x[1], this->node[j].x[2]);
   }
   fprintf(file, "$EndNodes\n");
 
   fprintf(file, "$Elements\n");
   fprintf(file, "%ld\n", this->n_elements);
-  for (i = 0; i < this->n_elements; i++) {
+  for (size_t i = 0; i < this->n_elements; i++) {
     fprintf(file, "%ld ", this->element[i].tag);
     fprintf(file, "%d ", this->element[i].type->id);
 
@@ -1237,7 +1247,7 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
           feenox_push_error_message("error reading file");
           return FEENOX_ERROR;
         }
-        if ((node_index = (mesh->sparse==0) ? node-1 : mesh->tag2index[node]) < 0) {
+        if ((node_index = (mesh->sparse==0) ? node-1 : mesh->tag2index_from_tag_min[node]) == SIZE_MAX) {
           feenox_push_error_message("node %d does not exist", node);
           return FEENOX_ERROR;
         }
