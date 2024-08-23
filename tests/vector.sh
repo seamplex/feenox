@@ -12,5 +12,8 @@ fi
 answer vector.fee "196"
 exitifwrong $?
 
+answer vector_init.fee "1 2 3 4"
+exitifwrong $?
+
 answerdiff fibo_vector.fee
 exitifwrong $?

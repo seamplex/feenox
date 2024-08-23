@@ -1,0 +1,6 @@
+VECTOR x1[2] DATA 1 2
+VECTOR x2[2]
+ 
+x2 = (3, 4)
+ 
+PRINT x1 x2 SEP " "
