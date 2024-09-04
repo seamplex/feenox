@@ -341,6 +341,9 @@ int feenox_init_special_objects(void) {
 ///va+in_transient_last+desc Flag that indicates if feenox is in the last step of the transient calculation.
   feenox_special_var(in_transient_last) = feenox_get_or_define_variable_get_ptr("in_transient_last");
 
+///va+in_time_path+desc Flag that indicates if feenox is in a time belonging to a `TIME_PATH` keyword.
+  feenox_special_var(in_time_path) = feenox_get_or_define_variable_get_ptr("in_time_path");
+  
 
 ///va+static_steps+desc Number of steps that ought to be taken during the static calculation, to be set by the user. 
 ///va+static_steps+detail The default value is one, meaning only one static step. 

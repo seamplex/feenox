@@ -19,3 +19,13 @@ exitifwrong $?
 gmsh -v 0 -2 ${dir}/wilson-2d.geo || exit $?
 answerzero wilson-2d.fee 2e-2
 exitifwrong $?
+
+# check TIME_PATH
+echo -n "time_path_petsc.fee ... "
+rm -rf wilson-2d*.vtk
+${feenox} ${dir}/time_path_petsc.fee
+if [ "x$(ls wilson-2d*.vtk | wc -l)" != "x6" ]; then
+  echo "failed"
+  return 1
+fi
+echo "ok"

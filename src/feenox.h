@@ -1587,6 +1587,7 @@ struct feenox_t {
     var_t *in_transient;
     var_t *in_transient_first;
     var_t *in_transient_last;
+    var_t *in_time_path;
 
     var_t *static_steps;
     var_t *end_time;
