@@ -16,7 +16,10 @@ r = heaviside(t-a)-heaviside(t-b)
 # of characteristic time tau
 y = lag(r, tau)
 
-PRINT t r y
+# PRINT t r y
+IF done
+ PRINT %.2f y
+ENDIF
 
 # exercise: investigate how the result of the lag
 # depends on the time step

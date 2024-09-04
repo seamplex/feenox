@@ -2,4 +2,8 @@
 # lines as follows (although the SPOT rule is broken)
 end_time = 5
 dt = 1/20
-PRINT t heaviside(t-1)-heaviside(t-3) lag(heaviside(t-1)-heaviside(t-3),1.234)
+# PRNT t heaviside(t-1)-heaviside(t-3) lag(heaviside(t-1)-heaviside(t-3),1.234)
+y = lag(heaviside(t-1)-heaviside(t-3),1.234)
+IF done
+ PRINT %.2f y
+ENDIF

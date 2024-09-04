@@ -53,6 +53,7 @@ TESTS = \
         tests/function_vectors.sh \
         tests/hello_mpi.sh \
         tests/integral.sh \
+        tests/lag.sh \
         tests/laplace2d.sh \
         tests/lebesgue.sh \
         tests/los-alamos.sh \
