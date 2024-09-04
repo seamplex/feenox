@@ -12,3 +12,12 @@ fi
 checkida
 answer exp.fee "1"
 exitifwrong $?
+
+# check TIME_PATH
+echo -n "time_path_sundials.fee ... "
+
+if [ "x$(${feenox} ${dir}/time_path_sundials.fee | wc -l)" != "x5" ]; then
+  echo "failed"
+  return 1
+fi
+echo "ok"

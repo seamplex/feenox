@@ -1,9 +1,3 @@
-# 2d problem from
-# Gary L. Wilson, Roger A. Rydin & Seppo Orivuori (1988) A Comparison of Two
-# Efficient Nonlinear Heat Conduction Methodologies Using a Two-Dimensional Time-Dependent
-# Benchmark Problem, Nuclear Technology, 82:1, 94-105, DOI: 10.13182/NT88-A34120
-# http://dx.doi.org/10.13182/NT88-A34120
-
 PROBLEM thermal 2d
 READ_MESH wilson-2d.msh
 
@@ -19,7 +13,7 @@ TIME_PATH 1 10/2 end_time/2 10
 
 SOLVE_PROBLEM
 
-# PRINT t
+PRINT t
 IF in_static|in_time_path|done
   FILE out PATH wilson-2d-%g.vtk 10*t
   WRITE_RESULTS FILE out T
