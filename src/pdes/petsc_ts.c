@@ -81,7 +81,6 @@ int feenox_problem_solve_petsc_transient(void) {
 
   petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
   petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));  
-//  petsc_call(TSStep(feenox.pde.ts));
   petsc_call(TSGetTime(feenox.pde.ts, feenox_value_ptr(feenox_special_var(t))));  
   petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
   
