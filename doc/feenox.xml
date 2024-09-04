@@ -84,6 +84,7 @@
       <item>KSP</item>
       <item>KSP_TYPE</item>
       <item>LABEL</item>
+      <item>LABELS</item>
       <item>LINEAR</item>
       <item>LINEARIZE_STRESS</item>
       <item>LINEAR_SOLVER</item>
@@ -272,6 +273,7 @@
       <item>in_static</item>
       <item>in_static_first</item>
       <item>in_static_last</item>
+      <item>in_time_path</item>
       <item>in_transient</item>
       <item>in_transient_first</item>
       <item>in_transient_last</item>

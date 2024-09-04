@@ -282,7 +282,20 @@ DISTCLEANFILES = \
                  ./bc-groups1.last \
                  ./bc-groups2.last \
                  ./bc-groups3.last \
-                 ./bc-groups4.last
+                 ./bc-groups4.last \
+                 ./tests/wilson-2d-0.vtk \
+                 ./tests/wilson-2d-100.vtk \
+                 ./tests/wilson-2d-10.vtk \
+                 ./tests/wilson-2d-175.vtk \
+                 ./tests/wilson-2d-50.vtk \
+                 ./tests/wilson-2d-87.5.vtk \
+                 ./wilson-2d-0.vtk \
+                 ./wilson-2d-100.vtk \
+                 ./wilson-2d-10.vtk \
+                 ./wilson-2d-175.vtk \
+                 ./wilson-2d-50.vtk \
+                 ./wilson-2d-87.5.vtk
+                 
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .

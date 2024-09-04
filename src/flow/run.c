@@ -20,7 +20,6 @@
  *------------------- ------------  ----    -x-------  --     -       -         -
  */
 #include "feenox.h"
-#include "dist/feenox/src/feenox.h"
 
 int feenox_run(void) {
 
