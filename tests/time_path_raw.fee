@@ -1,0 +1,7 @@
+end_time = 5
+dt = 7/37
+TIME_PATH 1 2 3 4 5
+IF in_time_path
+ PRINT t heaviside(t-1)-heaviside(t-3) lag(heaviside(t-1)-heaviside(t-3),1.234)
+ENDIF
+

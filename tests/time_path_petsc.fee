@@ -13,7 +13,7 @@ TIME_PATH 1 10/2 end_time/2 10
 
 SOLVE_PROBLEM
 
-PRINT t
+# PRINT t
 IF in_static|in_time_path|done
   FILE out PATH wilson-2d-%g.vtk 10*t
   WRITE_RESULTS FILE out T
