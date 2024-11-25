@@ -208,7 +208,7 @@ provided to create the mesh. Read it with `READ_MESH`, set material
 properties, `BC`s and `SOLVE_PROBLEM`!
 
 ``` feenox
-PROBLEM mechanical plane_stress
+PROBLEM mechanical 2D plane_stress
 READ_MESH nafems-le1.msh
 
 E = 210e3

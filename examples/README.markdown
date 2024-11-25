@@ -93,6 +93,7 @@ propose benchmark problems to add to the suite.
     - [Solving an iterative problem]
   - [Computing the derivative of a function as a Unix filter]
   - [On the evaluation of thermal expansion coefficients]
+  - [Buffon’s needle]
 - Ordinary Differential Equations & Differential-Algebraic Equations
   - [Lorenz’ attractor—the one with the butterfly]
   - [The double pendulum]
@@ -154,6 +155,7 @@ propose benchmark problems to add to the suite.
   [Solving an iterative problem]: https://seamplex.com/feenox/examples/basic.html#solving-an-iterative-problem
   [Computing the derivative of a function as a Unix filter]: https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter
   [On the evaluation of thermal expansion coefficients]: https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients
+  [Buffon’s needle]: https://seamplex.com/feenox/examples/basic.html#buffons-needle
   [Lorenz’ attractor—the one with the butterfly]: https://seamplex.com/feenox/examples/daes.html#lorenz-attractorthe-one-with-the-butterfly
   [The double pendulum]: https://seamplex.com/feenox/examples/daes.html#the-double-pendulum
   [Vertical boiling channel]: https://seamplex.com/feenox/examples/daes.html#vertical-boiling-channel

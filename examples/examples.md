@@ -13,6 +13,7 @@
   filter](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter)
   - [On the evaluation of thermal expansion
   coefficients](https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients)
+  - [Buffon’s needle](https://seamplex.com/feenox/examples/basic.html#buffons-needle)
 - Ordinary Differential Equations & Differential-Algebraic Equations
   - [Lorenz’ attractor—the one with the
   butterfly](https://seamplex.com/feenox/examples/daes.html#lorenz-attractorthe-one-with-the-butterfly)

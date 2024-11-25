@@ -228,7 +228,7 @@ cp_right = 1
 # BCs 
 BC zero  T=0
 BC ramp  T=limit(t,0,1)
-BC side  adiabatic
+BC side  q=0
 
 SOLVE_PROBLEM
 

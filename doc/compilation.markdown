@@ -84,7 +84,7 @@ ask in FeenoX’s [discussion page].
 
     ``` terminal
     sudo apt-get update
-    sudo apt-get install gcc make git automake autoconf libgsl-dev
+    sudo apt-get install git build-essential make automake autoconf libgsl-dev
     ```
 
     If you cannot install `libgsl-dev` but still have `git` and the

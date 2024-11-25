@@ -17,6 +17,7 @@
   a function as a Unix filter]
 - [<span class="toc-section-number">7</span> On the evaluation of
   thermal expansion coefficients]
+- [<span class="toc-section-number">8</span> Buffon’s needle]
 
   [<span class="toc-section-number">1</span> Hello World (and Universe)!]:
     #hello-world-and-universe
@@ -35,6 +36,7 @@
     #computing-the-derivative-of-a-function-as-a-unix-filter
   [<span class="toc-section-number">7</span> On the evaluation of thermal expansion coefficients]:
     #on-the-evaluation-of-thermal-expansion-coefficients
+  [<span class="toc-section-number">8</span> Buffon’s needle]: #buffons-needle
 
 # Hello World (and Universe)!
 
@@ -616,3 +618,91 @@ alt="Column C(T) from A(T)" />
   [this]: https://www.linkedin.com/pulse/accuracy-thermal-expansion-properties-asme-bpv-code-angus-ramsay/
   [1]: https://www.seamplex.com/docs/SP-WA-17-TN-F38B-A.pdf
   [2]: https://www.linkedin.com/pulse/ansys-potential-issue-thermal-expansion-calculations-angus-ramsay/
+
+# Buffon’s needle
+
+Buffon’s needle is a classical probability problem that dates back from
+the XVIII century whose solution depends on the value of $\pi$. When I
+first read about this problem in my high-school years, I could not
+believe two things. The first one, that the number $\pi$ had something
+to do with the probability a stick has of crossing a line. And the
+other, that one would actually be able to compute $\pi$ by throwing away
+sticks. Of course, this was long before I learned about calculus,
+distributions and Monte Carlo methods.
+
+The problem consists of a table of length $L$ over which transversal
+lines separated by a length $d$ are drawn. A stick (needle) of
+length $\ell$ is randomly thrown over the table. What is the
+probability $p$ that the stick crosses one line?
+
+<figure>
+<img src="needle.svg" alt="Setup of the Buffon’s needle problem" />
+<figcaption aria-hidden="true">Setup of the Buffon’s needle
+problem</figcaption>
+</figure>
+
+For $\ell < d$ the answer is
+
+$$
+p = \frac{ 2 \ell }{ \pi d}
+$$
+
+To convince myself that the two facts I did not believe back when I was
+a youngster were actually true, I would just run the example below. Four
+experiments (I know that generating random numbers in a digital computer
+is not a real experiment, as neither is solving the equations of a
+chaotic natural convection loop. However, I could not come up with a
+better word) of ten millions throws each are simulated, and the
+experimental frequency is compared to the theoretical value. I am now
+convinced.
+
+To solve the Buffon’s needle problem the Monte Carlo way, two random
+numbers are generated: the distance $0 \leq x < L$ from one side of the
+table to the center of the thrown stick, and the angle
+$0 \leq \theta < 2\pi$ with respect to the table longitudinal axis. One
+way of checking whether a stick crosses or not a line is the following.
+First, compute the location of both ends of the stick
+
+Now, if the floor of $x_1/d$ is equal to the floor of $x_2/d$, the stick
+does not cross a line. Otherwise, it does.
+
+The input file iteratively performs $10^7$ throws and prints the partial
+frequency of crosses as a function of the number of throws, along with
+the constant analytical result. Four runs are performed, and the results
+are plotted in the figure.
+
+``` feenox
+static_steps = 1e7  # number of times we trow the stick
+
+L = 10    # length of the table
+l = 0.8   # length of the stick
+d = 1     # distance between lines
+result = 2*l/(pi*d) # expected theoretical result
+
+x = random(0, L)          # location of the center of the stick
+theta = random(0, 2*pi)   # the resulting angle
+
+x1 = x + 0.5*l*cos(theta) # coordinates of the stick ends 
+x2 = x - 0.5*l*cos(theta)
+
+# increase count if the stick crosses one line
+# (remember ! is the "not equal" operator)
+count = count + (floor(x1/d)!floor(x2/d))
+
+# print the partial results
+PRINT %g step_static count/step_static result SKIP_STATIC_STEP 1e5
+```
+
+``` terminal
+$ for i in $(seq 1 4); do echo $i; feenox buffon.fee > buffon${i}.dat; done
+1
+2
+3
+4
+$ pyxplot buffon.ppl
+```
+
+<figure>
+<img src="buffon.svg" alt="Results of Buffon’s needle" />
+<figcaption aria-hidden="true">Results of Buffon’s needle</figcaption>
+</figure>

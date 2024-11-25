@@ -32,6 +32,11 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 :    output a document with information about the supported element types
 
 
+`--ast`
+
+:    dump an abstract syntax tree of the input
+
+
 `--linear`
 
 :    force FeenoX to solve the PDE problem as linear
