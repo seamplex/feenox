@@ -11,7 +11,7 @@ end_time = vecmax(vec_Tint_t)
 
 BC internal  T=Tint(t)
 BC external  h=1e-6      Tref=50
-BC symmetry  q=0
+BC symmetry  adiabatic
 
 INCLUDE asme-properties.fee
 MATERIAL CS k=k_carbon(T(x,y,z))*1e-3   kappa=kappa_carbon(T(x,y,z))

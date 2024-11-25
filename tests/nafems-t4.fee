@@ -7,7 +7,7 @@ k = 52               # [ W/(m ºC) ]
 
 # boundary conditions
 BC AB T=100          # [ ºC ]
-BC DA q=0            # adiabatic
+BC DA adiabatic
 BC BC h=750 Tref=0   # [ W/(m^2 ºC) , ºC ]
 BC CD h=750 Tref=0   # [ W/(m^2 ºC) , ºC ]
 

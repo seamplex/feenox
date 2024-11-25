@@ -33,8 +33,8 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *r
     bc_data->type_phys = BC_TYPE_THERMAL_TEMPERATURE;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_thermal_temperature;
-    
-  } else if (strcmp(lhs, "q''") == 0 || strcmp(lhs, "q") == 0) {
+
+  } else if (strcmp(lhs, "q''") == 0 || strcmp(lhs, "q") == 0 || strcmp(lhs, "adiabatic") == 0) {
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_HEATFLUX;
     bc_data->type_math = bc_type_math_neumann;

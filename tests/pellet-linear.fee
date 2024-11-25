@@ -14,7 +14,7 @@ k = 2.8
 q = 300 * 100 / (pi*r^2)
 # PRINT q
 
-BC symmetry q=0
+BC symmetry adiabatic
 BC external T=420
 
 # analytical solution

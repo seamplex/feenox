@@ -9,7 +9,7 @@ k(x,y,z) = cond(T(x,y,z))
 r = 4e-3
 q = 300 * 100 / (pi*r^2)
 
-BC symmetry q=0
+BC symmetry adiabatic
 BC external T=420
 
 SOLVE_PROBLEM

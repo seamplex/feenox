@@ -9,6 +9,8 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+checkida
+
 answer lag.fee "0.16"
 exitifwrong $?
 

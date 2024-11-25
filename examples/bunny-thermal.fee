@@ -16,7 +16,7 @@ rho = 10970
 cp = 320e3
 
 Toven = 400
-BC base q=0
+BC base adiabatic
 BC rest h=1000 Tref=Toven*heaviside(t,1)
 
 T_0(x,y,z) = 0
