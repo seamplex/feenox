@@ -3,7 +3,7 @@ category: basic
 intro: |
   # Buffon’s needle
   
-  Buffon's needle is a classical probability problem that dates back from the XVIII century whose solution depends on the value of $\pi$. When I first read about this problem in my high-school years, I could not believe two things. The first one, that the number $\pi$ had something to do with the probability a stick has of crossing a line. And the other, that one would actually be able to compute $\pi$ by throwing away sticks. Of course, this was long before I learned about calculus, distributions and Monte Carlo methods. 
+  Buffon's needle is a classical probability problem that dates back from the 18th century whose solution depends on the value of $\pi$. When I first read about this problem in my high-school years, I could not believe two things. The first one, that the number $\pi$ had something to do with the probability a stick has of crossing a line. And the other, that one would actually be able to compute $\pi$ by throwing away sticks. Of course, this was long before I learned about calculus, distributions and Monte Carlo methods. 
 
   The problem consists of a table of length $L$ over which transversal lines separated by a length $d$ are drawn. A stick (needle) of length $\ell$ is randomly thrown over the table. What is the probability $p$ that the stick crosses one line?
 

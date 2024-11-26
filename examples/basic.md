@@ -612,7 +612,7 @@ $
 # Buffon's needle
 
 Buffon's needle is a classical probability problem that dates back from
-the XVIII century whose solution depends on the value of $\pi$. When I
+the 18th century whose solution depends on the value of $\pi$. When I
 first read about this problem in my high-school years, I could not
 believe two things. The first one, that the number $\pi$ had something
 to do with the probability a stick has of crossing a line. And the

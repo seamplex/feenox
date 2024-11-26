@@ -104,3 +104,5 @@ output
 wing*.msh
 wing.brep
 wing.xao
+
+buffon*.dat
