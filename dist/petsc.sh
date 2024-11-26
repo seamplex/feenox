@@ -24,26 +24,25 @@ cd petsc-${petsc_ver}
 export PETSC_DIR=$(pwd)
 export PETSC_ARCH=${PETSC_ARCH}
 
-# TODO: neither mpi nor mumps work in static
+# openblas is fast but needs libgfortran, we stay with f2cblaslapack
+# same for mumps
+
+# this is doable but the resulting binary is huge
+#   --download-mpich \
+
 ./configure \
+  --download-f2cblaslapack --download-f2cblaslapack-shared=0 \
+  --with-shared-libraries=0 \
+  --with-debugging=0 \
   --with-mpi=0 \
   --with-cxx=0 \
+  --with-fc=0 \
   --with-fortran-bindings=0 \
   --with-c2html=0 \
   --with-bison=0 \
   --with-x=0 \
-  --with-debugging=0 \
-  --with-shared-libraries=0 \
-  --download-openblas \
-  --COPTFLAGS="-O3" --FOPTFLAGS="-O3"
+  --COPTFLAGS="-O3" #CC=$CC FC=$FC F77=$F77 CXX=$CXX
 
-# this guy needs udev which does not provide a static lib because it's too big
-#   --download-mpich \
-# It is part of systemd, you will able to compile it using these flags: -Dstatic-libsystemd=true -Dstatic-libudev=true 
-           
-# export PETSC_ARCH=arch-linux2-serial-mumps-static
-# ./configure --with-mpi=0 --with-cxx=0 --with-fortran-bindings=0 --with-fc=0 --with-c2html=0 --with-x=0 --with-debugging=0 --with-shared-libraries=0 --with-mumps-serial=1 --download-mumps --download-openblas --COPTFLAGS="-O" --FOPTFLAGS="-O3"
-# OJO! hay que sacar a mano el -lgcc_s de ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables
 make
 make check
 cd ..
