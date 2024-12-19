@@ -35,6 +35,9 @@ See the following paper for a brief summary (and to [cite FeenoX in your work](.
  * Theler J, “FeenoX: a cloud-first finite-element(ish) computational engineering tool,” _Journal of Open Source Software_, vol. 9,
 no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/joss.05846).
 
+> ### Open-source web-based UX for FeenoX
+>
+> Take a look at [SunCAE](https://www.seamplex.com/suncae) for an example of how to write a front end for FeenoX.
 
 ## Extents
 
