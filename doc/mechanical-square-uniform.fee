@@ -25,7 +25,7 @@ FUNCTION E_carbon(temp) INTERPOLATION steffen DATA {
 
 
 # known temperature distribution
-# (we could have read it from an outpout of a thermal problem)
+# (we could have read it from an output of a thermal problem)
 T(x,y) := 200
 
 # Young modulus is the function above evaluated at the local temperature

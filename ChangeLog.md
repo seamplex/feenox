@@ -30,7 +30,7 @@
  * split examples by problem type
  * YAML blocks in input file for metadata are allowed (so far they are ignored by FeenoX)
  * `$0` (or `${0}` or `$(1)`) expands to the base name of the main input, i.e. without the `.fee` extension
- * bracketed argumens so ${1}1$(1) is a valid string
+ * bracketed arguments so ${1}1$(1) is a valid string
  * multi-group neutron transport with discrete ordinates ($S_N$ method)
  * mimicked-nodes BCs
  * read mesh fields from VTK files

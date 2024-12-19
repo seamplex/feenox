@@ -23,9 +23,9 @@ f(x,y,z) = sin(x^3 + y^2 + z)
 vec_f20[i] = f(vec_f20_x[i], vec_f20_y[i], vec_f20_z[i])
 vec_f27[i] = f(vec_f27_x[i], vec_f27_y[i], vec_f27_z[i])
 
-# this line is an assignment, that first defines a variale If0
+# this line is an assignment, that first defines a variable If0
 # and then calls the functional integral three times to perform a
-# "continuous" (in the sense that it is numeric but adapative) triple integration
+# "continuous" (in the sense that it is numeric but adaptive) triple integration
 If0 = integral(integral(integral(f(x,y,z), z, 0, 1), y, 0, 1), x, 0, 1)
 
 # these two lines are instructions, they integrate functions f20 and f27 over

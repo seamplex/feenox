@@ -320,7 +320,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
           return WASORA_RUNTIME_ERROR;
         }
         if (type > 13) {
-          feenox_push_error_message("element type '%d' shold be less than 14", type);
+          feenox_push_error_message("element type '%d' should be less than 14", type);
           return WASORA_RUNTIME_ERROR;
         }
         mesh->element[i].type = &(feenox_mesh.element_type[frdfromgmsh_types[type]]);

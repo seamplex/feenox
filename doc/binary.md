@@ -35,7 +35,7 @@ a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engin
 
 usage: ./feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   -c, --check        validates if the input file is sane or not

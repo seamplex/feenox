@@ -32,7 +32,7 @@ int feenox_mesh_init_special_objects(void) {
   // como ahora hacemos alias de a los elementos del vector x_global lo inicializamos
   feenox_call(feenox_vector_init(feenox.mesh.vars.vec_x, FEENOX_VECTOR_INITIAL));
   
-//va+x+desc Holder variable for spatial dependance of functions, such spatial distribution
+//va+x+desc Holder variable for spatial dependence of functions, such spatial distribution
 //va+x+desc of physical properties or results of partial differential equations.
   feenox_check_null(feenox.mesh.vars.x = feenox_get_or_define_variable_get_ptr("x"));
   feenox_realloc_variable_ptr(feenox.mesh.vars.x, gsl_vector_ptr(feenox_value_ptr(feenox.mesh.vars.vec_x), 0), 0);
@@ -96,7 +96,7 @@ int feenox_mesh_init_special_objects(void) {
   
 //va+mesh_failed_interpolation_factor+desc When interpolating a mesh-defined function, the interpolation point\ $\vec{x}$ seems to fall outside
 //va+mesh_failed_interpolation_factor+desc an element using the $k$-dimensional tree (most efficient), and more robust brute-force approach is taken
-//va+mesh_failed_interpolation_factor+desc less eficient using a radius of size `mesh_failed_interpolation_factor` times the distance between $\vec{x}$
+//va+mesh_failed_interpolation_factor+desc less efficient using a radius of size `mesh_failed_interpolation_factor` times the distance between $\vec{x}$
 //va+mesh_failed_interpolation_factor+desc and the nearest node to \vec{x$} is performed.
 //va+mesh_failed_interpolation_factor+desc If this factor is zero, then the value at the nearest node to $x$ is returned. Default is DEFAULT_MESH_FAILED_INTERPOLATION_FACTOR.
   feenox_check_null(feenox.mesh.vars.mesh_failed_interpolation_factor = feenox_get_or_define_variable_get_ptr("mesh_failed_interpolation_factor"));

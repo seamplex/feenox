@@ -32,7 +32,7 @@ In order to better illustrate the different approaches proposed by each FEA tool
 ![NAFEMS LE-10 Benchmark problem statement](nafems-le10.png){#fig:nafems-le10}
 
 
-The geometry is defined by two ellipses, namely $(x/2)^2+y^2=1$ and $(x/3.25)^2+(y/2.75)^2=1$. As such, the continuous geometry can be created programatically (and exactly) by a CAD kernel. Since FeenoX better interacts with [Gmsh](http://gmsh.info/), which in turn uses [OpenCASCADE](https://dev.opencascade.org/), it can be easily created using for example the script [`le10-cad.geo`](le10-cad.geo). Other people might want to use an interactive 3D CAD tool to create the continuous geometry.
+The geometry is defined by two ellipses, namely $(x/2)^2+y^2=1$ and $(x/3.25)^2+(y/2.75)^2=1$. As such, the continuous geometry can be created programmatically (and exactly) by a CAD kernel. Since FeenoX better interacts with [Gmsh](http://gmsh.info/), which in turn uses [OpenCASCADE](https://dev.opencascade.org/), it can be easily created using for example the script [`le10-cad.geo`](le10-cad.geo). Other people might want to use an interactive 3D CAD tool to create the continuous geometry.
 
 ![CAD geometry in STEP format created with OpenCASCADE through Gmsh. The tags of the geometrical entities are shown.](le10-tags.svg){#fig:nafems-le10-tags width=70%}
 
@@ -106,11 +106,11 @@ Note that there is no need to define a density.
 <https://cofea.readthedocs.io/en/latest/benchmarks/001-thick-plate/tested-codes.html>
 
 
-### Diferences with FeenoX
+### Differences with FeenoX
 
 [CalculiX](http://www.calculix.de/) reads an input file like FeenoX, but by design it was decided that these files had to be “compatible” with Abaqus’ `.inp` format. The result is that the input files are clotted up with mesh data because the loads have to be given node-wise, so
 
-  1. A particular pre-processor (such as ccg, PrePoMax or FreeCAD) is needed to compute the nodal contributions of the external laods.
+  1. A particular pre-processor (such as ccg, PrePoMax or FreeCAD) is needed to compute the nodal contributions of the external loads.
   2. If the pressure changes from 1 to 2 then the pre-processor has to be re-run.
   3. The input files cannot be Git-tracked.
   4. Simple problems still need complex inputs.

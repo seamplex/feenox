@@ -39,7 +39,7 @@ int feenox_instruction_reaction(void *arg) {
     feenox_check_alloc(node_index = calloc(feenox.pde.size_local, sizeof(PetscInt)));
     for (g = 0; g < feenox.pde.dofs; g++) {
       if (reaction->x0[g].items != NULL) {
-        // if an explcit coordinate was given, use it
+        // if an explicit coordinate was given, use it
         x0[g] = feenox_expression_eval(&reaction->x0[g]);
       } else {
         // use the COG

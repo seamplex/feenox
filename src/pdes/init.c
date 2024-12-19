@@ -402,7 +402,7 @@ int feenox_problem_init_runtime_general(void) {
   
   // command-line arguments take precedence over the options in the input file
   // so we have to read them here and overwrite what he have so far
-  // recall that we alreay stripped off one dash from the original argv array
+  // recall that we already stripped off one dash from the original argv array
 
   PetscBool flag = PETSC_FALSE;
   

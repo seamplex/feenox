@@ -13,7 +13,7 @@ intro: |
   The FeenoX input is extremely simple input file, since it has to solve the free-free mechanical modal
   problem (i.e. without any Dirichlet boundary condition). All it has to do is to print the fundamental frequency.
  
-  To find the length\ $\ell_1$, FeenoX is sucessively called from a Python driving script
+  To find the length\ $\ell_1$, FeenoX is successively called from a Python driving script
   called [`fork.py`](https://github.com/seamplex/feenox/blob/main/examples/fork.py). This script
   uses Gmsh's Python API to create the CAD and the mesh of the tuning fork given the geometrical
   arguments $r$, $w$, $\ell_1$ and $\ell_2$. The parameter $n$ controls the number of elements through

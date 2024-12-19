@@ -68,7 +68,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -113,7 +113,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -122,7 +122,7 @@ Run with --help for further explanations.
 $
 ```
 
-If you get stuck or get an error, plase ask for help in the [Github discussion page](https://github.com/seamplex/feenox/discussions).
+If you get stuck or get an error, please ask for help in the [Github discussion page](https://github.com/seamplex/feenox/discussions).
 
 
 ## Compiling from source
@@ -182,7 +182,7 @@ If any of the lines does not say `ok` but something else, then the code contains
 
 # Gmsh
 
-To solve problems involving partial differential equations (i.e. elasticity, heat conduction, neutron transport, etc.) FeenoX needs a mesh in [Gmsh's MSH format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format). Any mesher whose output format can be converted to `.msh` should work, altough of course the most natural way to create these meshes is to use [Gmsh](http://gmsh.info/) itself.
+To solve problems involving partial differential equations (i.e. elasticity, heat conduction, neutron transport, etc.) FeenoX needs a mesh in [Gmsh's MSH format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format). Any mesher whose output format can be converted to `.msh` should work, although of course the most natural way to create these meshes is to use [Gmsh](http://gmsh.info/) itself.
 
 The easiest way to go is to install Gmsh from the `apt` repository:
 
@@ -210,7 +210,7 @@ Issue tracker : https://gitlab.onelab.info/gmsh/gmsh/issues
 $
 ```
 
-It should be noted that depending on the version of the base opearating system, the Gmsh version in the `apt` repository might be old enough so as to fail with the examples provided in the tutorials, that are based on recent Gmsh versions. If this is the case, as with FeenoX above, you can always [download newer Gmsh binaries](http://gmsh.info/#Download):
+It should be noted that depending on the version of the base operating system, the Gmsh version in the `apt` repository might be old enough so as to fail with the examples provided in the tutorials, that are based on recent Gmsh versions. If this is the case, as with FeenoX above, you can always [download newer Gmsh binaries](http://gmsh.info/#Download):
 
 ```terminal
 $ wget http://gmsh.info/bin/Linux/gmsh-4.10.5-Linux64.tgz
@@ -241,7 +241,7 @@ $ feenox parallelepiped-mechanical.fee
 $ 
 ```
 
-Don't worry if you do not undertsand the Gmsh command line. We will work out the details in the tutorials.
+Don't worry if you do not understand the Gmsh command line. We will work out the details in the tutorials.
 
 
 # Text editor

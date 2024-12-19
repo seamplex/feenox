@@ -230,7 +230,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
       
       } else {
         
-        // direct evalution at the nodes
+        // direct evaluation at the nodes
         gsl_matrix *B = feenox_fem_compute_B(e, e->type->node_coords[j]);
       
         // the derivatives of each dof g with respect to the coordinate mas nueve derivadas (o menos)

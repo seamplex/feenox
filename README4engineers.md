@@ -32,7 +32,7 @@ The latter should show the numerical results. See the [tensile test tutorial](ht
 To fix ideas, let us consider the [NAFEMS LE10 "Thick plate pressure" benchmark](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark). @Fig:nafems-le10 shows that there is a one-to-one correspondence between the human-friendly problem formulation and the input file FeenoX reads.
 There is no need to give extra settings if the problem does not ask for them.
 Note that since the problem has only one volume, `E` means "the" Young modulus.
-No need to deal with a map between materials and mesh entitites (in this case the mapping is not needed but in [multi-material problems](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other) the mapping is needed indeed). Nothing more, nothing less.
+No need to deal with a map between materials and mesh entities (in this case the mapping is not needed but in [multi-material problems](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other) the mapping is needed indeed). Nothing more, nothing less.
 
 ![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg){#fig:nafems-le10 width=100% }
 

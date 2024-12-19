@@ -27,7 +27,7 @@ for n in $(seq 1 4); do
   exitifwrong $?
 done
 
-# this input file reads bunny.msh that doest not have partitions
+# this input file reads bunny.msh that does not have partitions
 for n in $(seq 1 4); do
   answerzerompi ${n} bunny-thermal.fee 1e-2
   exitifwrong $?

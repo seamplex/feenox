@@ -6,7 +6,7 @@ DEFAULT_ARGUMENT_VALUE 1 1  # no extra args means $1=1
 FUNCTION Tint(t) FILE valve-internal-$1.csv INTERPOLATION linear
 
 # the vector vec_Tint_t has all the times in the file
-# so vecmax() gives the last definiton time
+# so vecmax() gives the last definition time
 end_time = vecmax(vec_Tint_t)
 
 BC internal  T=Tint(t)

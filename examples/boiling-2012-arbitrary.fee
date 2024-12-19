@@ -1,4 +1,4 @@
-# arbitray normalized interpolated power profile
+# arbitrary normalized interpolated power profile
 FUNCTION potencia(z) INTERPOLATION splines DATA {
 0      0
 0.2    2.5 

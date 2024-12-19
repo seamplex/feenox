@@ -212,7 +212,7 @@ void wasora_debug(void) {
         argument = debugcommand + strlen(token)+1;
         
         if (wasora_get_next_token(NULL) != NULL && wasora_parse_expression(argument, &wasora.cond_breakpoint) == 0) {
-          fprintf(stderr, "next breakpoint will ocurr whenever '%s' is not zero\n", argument);
+          fprintf(stderr, "next breakpoint will occur whenever '%s' is not zero\n", argument);
         } else {
           wasora_debug_printerror();
           fprintf(stderr, "no breakpoint set\n");

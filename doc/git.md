@@ -31,7 +31,7 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX's
     git clone https://github.com/seamplex/feenox
     ```
 
- 4. Boostrap, configure, compile & make
+ 4. Bootstrap, configure, compile & make
  
     ```terminal
     cd feenox

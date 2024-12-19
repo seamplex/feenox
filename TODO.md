@@ -65,7 +65,7 @@
  
 ## Wasora-like stuff
 
- * vector & matrix assignements & DAEs
+ * vector & matrix assignments & DAEs
  * debug mode, line-by-line
    - run `feenox` with an option like `-d` or `--debug` and then present a gdb-like interface with print, and step by step advances
  * trap and handle signit & sigterm
@@ -79,7 +79,7 @@
 ## Nice to have
 
  * add a keyword and command-line argument to set `OMP_NUM_THREADS`
- * logaritmic ranges for `PRINT_FUNCTION`
+ * logarithmic ranges for `PRINT_FUNCTION`
  * default separator after `TEXT` should be space, after numerical should be tab
  * `PRINT_FUNCTION` with `%f` in between arguments (like `PRINT_VECTOR`)
  * `BLAS` 
@@ -137,7 +137,7 @@
 
  * poisson f = 1, eta = 0
  * helmholtz f = 1, eta = 1
- * investigate `dsyrk()` insted of `dgemmv()` https://stackoverflow.com/questions/47013581/blas-matrix-by-matrix-transpose-multiply
+ * investigate `dsyrk()` instead of `dgemmv()` https://stackoverflow.com/questions/47013581/blas-matrix-by-matrix-transpose-multiply
  
 ## Heat
 

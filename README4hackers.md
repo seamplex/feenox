@@ -27,7 +27,7 @@ Unlike these other FEA tools, FeenoX provides...
    
    usage: feenox [options] inputfile [replacement arguments] [petsc options]
    
-     -h, --help         display options and detailed explanations of commmand-line usage
+     -h, --help         display options and detailed explanations of command-line usage
      -v, --version      display brief version information and exit
      -V, --versions     display detailed version information
      --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -106,7 +106,7 @@ The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input)...
  - is Git-traceable ([the mesh is defined in a separate file](https://seamplex.com/feenox/doc/sds.html#sec:input) created by [Gmsh](http://gmsh.info/), which may or may not be tracked)
  - allows the user to enter [algebraic expressions whenever a numerical value is needed](https://seamplex.com/feenox/doc/sds.html#sec:expression) (everything is an expression)
  - understands [definitions (nouns) and instructions (verbs)](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs). FeenoX has an actual instruction pointer that loops over the instruction set (there might even be [conditional blocks](https://www.seamplex.com/feenox/doc/feenox-manual.html#if)).
- - is [simple for simple files](https://seamplex.com/feenox/doc/sds.html#sec:simple) (but might get [more complicated for mor complex problems](https://seamplex.com/feenox/doc/sds.html#sec:complex)). Remember [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)'s quote: ["simple things should be simple and complex things should be possible."](https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible)
+ - is [simple for simple files](https://seamplex.com/feenox/doc/sds.html#sec:simple) (but might get [more complicated for more complex problems](https://seamplex.com/feenox/doc/sds.html#sec:complex)). Remember [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)'s quote: ["simple things should be simple and complex things should be possible."](https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible)
  
  
 Following the Unix rule of silence, [the output is 100% user-defined](https://seamplex.com/feenox/doc/sds.html#sec:output): if there are not explicit output instructions, FeenoX will not write anything. And probably nothing will be computed (because FeenoX is smart and will not compute things that are not actually needed).
@@ -114,7 +114,7 @@ Following the Unix rule of silence, [the output is 100% user-defined](https://se
 
 # How
 
-Feenox is a computational tool designed to be run on Unix servers as a part of a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow, optionally [involving MPI communication among different servers](https://seamplex.com/feenox/doc/sds.html#sec:scalability) to hande arbitrarily-large problems:
+Feenox is a computational tool designed to be run on Unix servers as a part of a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) workflow, optionally [involving MPI communication among different servers](https://seamplex.com/feenox/doc/sds.html#sec:scalability) to handle arbitrarily-large problems:
 
 :::::: {.only-in-format .html }
 ```{=html}

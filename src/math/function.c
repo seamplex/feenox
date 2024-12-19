@@ -713,7 +713,7 @@ double feenox_function_eval(function_t *this, const double *const_x) {
         double *r = NULL;
         feenox_check_alloc(r = calloc(this->n_arguments, sizeof(double)));
 
-        int flag = 1;  // asume we've been asked a point of the grid
+        int flag = 1;  // assume we've been asked a point of the grid
         unsigned int i = 0;
         for (i = 0; i < this->n_arguments; i++) {
 

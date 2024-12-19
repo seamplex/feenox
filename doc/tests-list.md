@@ -1,6 +1,6 @@
 The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in the repository has hundreds of
  
- - `grep`-able examples, e.g. to see how to use the keywork [`INTEGRATE`](https://seamplex.com/feenox/doc/feenox-manual.html#integrate), do
+ - `grep`-able examples, e.g. to see how to use the keyword [`INTEGRATE`](https://seamplex.com/feenox/doc/feenox-manual.html#integrate), do
  
   ```terminal
    $ cd tests

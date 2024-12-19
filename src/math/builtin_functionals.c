@@ -124,11 +124,11 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 ///fu+integral+desc scheme, in which the domain is divided into a number of maximum number
 ///fu+integral+desc of subintervals
 ///fu+integral+desc and a fixed-point Gauss-Kronrod-Patterson scheme is applied to each
-///fu+integral+desc quadrature subinterval. Based on an estimation of the error commited,
+///fu+integral+desc quadrature subinterval. Based on an estimation of the error committed,
 ///fu+integral+desc one or more of these subintervals may be split to repeat
-///fu+integral+desc the numerical integration alogorithm with a refined division.
+///fu+integral+desc the numerical integration algorithm with a refined division.
 ///fu+integral+desc The fifth optional argument $\epsilon$ is is a relative tolerance
-///fu+integral+desc used to check for convergence. It correspondes to GSL's `epsrel` 
+///fu+integral+desc used to check for convergence. It corresponds to GSL's `epsrel` 
 ///fu+integral+desc parameter (`epsabs` is set to zero). 
 ///fu+integral+desc The sixth optional argument $1\leq k \le 6$ is an integer key that
 ///fu+integral+desc indicates the integration rule to apply in each interval.
@@ -227,7 +227,7 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
 ///fu+gauss_kronrod+desc 43-point and 87-point integration rules in succession until an
 ///fu+gauss_kronrod+desc estimate of the integral is achieved within the relative tolerance
 ///fu+gauss_kronrod+desc given in the fifth optional argument $\epsilon$
-///fu+gauss_kronrod+desc It correspondes to GSL's `epsrel` parameter (`epsabs` is set to zero).  
+///fu+gauss_kronrod+desc It corresponds to GSL's `epsrel` parameter (`epsabs` is set to zero).  
 ///fu+gauss_kronrod+desc The rules are designed in such a way that each rule uses all
 ///fu+gauss_kronrod+desc the results of its predecessors, in order to minimize the total
 ///fu+gauss_kronrod+desc number of function evaluations.

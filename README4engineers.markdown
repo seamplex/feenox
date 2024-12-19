@@ -48,7 +48,7 @@ between the human-friendly problem formulation and the input file FeenoX
 reads. There is no need to give extra settings if the problem does not
 ask for them. Note that since the problem has only one volume, `E` means
 “the” Young modulus. No need to deal with a map between materials and
-mesh entitites (in this case the mapping is not needed but in
+mesh entities (in this case the mapping is not needed but in
 [multi-material problems] the mapping is needed indeed). Nothing more,
 nothing less.
 

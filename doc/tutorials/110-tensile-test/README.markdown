@@ -136,7 +136,7 @@ case…
   3.  [ParaView][]
 
   to obtain the results listed in sec. 2.1. Note that these three tools
-  (and any other tool used throuhgout any of the tutorials, including
+  (and any other tool used throughout any of the tutorials, including
   the operating system is free (as an “free speech”) and open source (as
   in “the source code is available”).
 
@@ -780,7 +780,7 @@ Some notes summarizing the section:
     blackboard) formulation of the problem.
   - Input files are [distributed version control][]-friendly.
 
-  See a more detailed decription (and discussion) about the input in
+  See a more detailed description (and discussion) about the input in
   [section 3 of the Software Design Specification][].
 
 - The mesh `tensile-test.msh` file is the output of [Gmsh][] when
@@ -1029,7 +1029,7 @@ and many others, including of course the operating system
 >     3.  understand
 >
 >     what equations are being solved and how they are being solved
->     withing a digital computer. The most important issue of FeenoX
+>     with a digital computer. The most important issue of FeenoX
 >     being free software, besides the three pints above, is that anyone
 >     can *modify* it to suit their needs and then share those
 >     modifications. Of course most people do not know how to see,

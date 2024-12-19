@@ -98,7 +98,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -155,7 +155,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -164,7 +164,7 @@ Run with --help for further explanations.
 $
 ```
 
-If you get stuck or get an error, plase ask for help in the [Github
+If you get stuck or get an error, please ask for help in the [Github
 discussion page][].
 
   [download]: https://www.seamplex.com/feenox/download.html
@@ -250,7 +250,7 @@ contains at least one error.
 To solve problems involving partial differential equations
 (i.e. elasticity, heat conduction, neutron transport, etc.) FeenoX needs
 a mesh in [Gmsh’s MSH format][]. Any mesher whose output format can be
-converted to `.msh` should work, altough of course the most natural way
+converted to `.msh` should work, although of course the most natural way
 to create these meshes is to use [Gmsh][] itself.
 
 The easiest way to go is to install Gmsh from the `apt` repository:
@@ -279,7 +279,7 @@ Issue tracker : https://gitlab.onelab.info/gmsh/gmsh/issues
 $
 ```
 
-It should be noted that depending on the version of the base opearating
+It should be noted that depending on the version of the base operating
 system, the Gmsh version in the `apt` repository might be old enough so
 as to fail with the examples provided in the tutorials, that are based
 on recent Gmsh versions. If this is the case, as with FeenoX above, you
@@ -328,7 +328,7 @@ $ feenox parallelepiped-mechanical.fee
 $ 
 ```
 
-Don’t worry if you do not undertsand the Gmsh command line. We will work
+Don’t worry if you do not understand the Gmsh command line. We will work
 out the details in the tutorials.
 
   [“Parallelepiped…”]: https://www.seamplex.com/feenox/examples/#parallelepiped-whose-youngs-modulus-is-a-function-of-the-temperature

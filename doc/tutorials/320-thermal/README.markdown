@@ -859,7 +859,7 @@ the PETSc options `--snes_test_jacobian` and, for smaller problems,
 `--snes_test_jacobian_view`. Note that these options render the
 execution far slower, so make sure the mesh is coarse.
 
-The solver options can be changed at runtime either using keywors in the
+The solver options can be changed at runtime either using keywords in the
 [`PROBLEM`][] definition or command-line options:
 
 - `NONLINEAR_SOLVER newtonls` or `--snes_type=newtonls`
@@ -930,7 +930,7 @@ BC left q=1200     # prescribed heat flux at x=0
 Tref = 293.15
 
 # for fun: compute the Stefan-Boltzmann from fundamental constants
-h = 6.62606957e-34      # planck's contant [J s]
+h = 6.62606957e-34      # planck's constant [J s]
 c = 299792458           # speed of light in vacuum [m s^(-1)]
 k_b = 1.3806488e-23     # boltzmann constant  [m^2 kg s^(-2) K^(-1)]
 sigma = 2*pi*k_b^4/(h^3*c^2) * integral(1/(t^5*(exp(1/t)-1)), t, 1e-2, infinite)
@@ -1591,7 +1591,7 @@ way of overcoming this issue is to go the other way round: make sure the
 boundary conditions match the initial condition at the boundaries for
 $t=0$ and then “quickly” move the boundary condition to the actual
 value. For example, if the condition was $T(1)=1$ instead of $T(1)=0$
-and we blindy wrote
+and we blindly wrote
 
 ``` feenox
 PROBLEM thermal 1d
@@ -1643,7 +1643,7 @@ SOLVE_PROBLEM
 PRINT %.4f t dt %.6f T(1/2)
 ```
 
-we get the right answer, paying some inital cost as small time steps:
+we get the right answer, paying some initial cost as small time steps:
 
 ``` terminal
 $ feenox slab-uniform-transient-from-zero-one-smart.fee 
@@ -1837,7 +1837,7 @@ DEFAULT_ARGUMENT_VALUE 1 1  # no extra args means $1=1
 FUNCTION Tint(t) FILE valve-internal-$1.csv INTERPOLATION linear
 
 # the vector vec_Tint_t has all the times in the file
-# so vecmax() gives the last definiton time
+# so vecmax() gives the last definition time
 end_time = vecmax(vec_Tint_t)
 
 BC internal  T=Tint(t)

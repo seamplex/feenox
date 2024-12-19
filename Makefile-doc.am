@@ -1,6 +1,6 @@
 SUBDIRS = src doc
 
-# the eps files are neded for the description in texinfo
+# the eps files are needed for the description in texinfo
 dist_doc_DATA = AUTHORS \
                 ChangeLog \
                 TODO \

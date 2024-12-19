@@ -14,7 +14,7 @@
 * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
 *****************************************************************************/
 /*
-This small program converts finite elemet meshes given in the SDRL universal
+This small program converts finite element meshes given in the SDRL universal
 file format into ABAQUS / Calculix compatible input decks. The format 
 of the universal data sets can be found at http://www.sdrl.uc.edu.
 

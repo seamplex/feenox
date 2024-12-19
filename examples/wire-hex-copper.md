@@ -22,5 +22,5 @@
    10    +5.4e-04   +9.9e-02   0.0134   0.6130
 
   : copper wire over hex mesh, participation and excitation factors $L$
-  and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
+  and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$
   and $M$

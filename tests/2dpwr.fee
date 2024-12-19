@@ -19,7 +19,7 @@
 #           2. Two-dimensional (x,y)-geometry
 #
 PROBLEM neutron_diffusion 2D GROUPS 2
-DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eigth
+DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eighth
 READ_MESH 2dpwr-$1.msh
 
 # define materials and cross sections according to the two-group constants

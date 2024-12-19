@@ -32,7 +32,7 @@ The FeenoX examples are divided by the type of problem they solve:
 >    - non-linear elasticity
 >    - cell-level neutronics (i.e. method of characteristics, collision probabilities, etc)
  
-All the files needed to run theses examples are available in the [examples](https://github.com/seamplex/feenox/tree/main/examples) directory of the [Git repository](https://github.com/seamplex/feenox) and any of the [tarballs](https://www.seamplex.com/feenox/download.html), both [source](https://www.seamplex.com/feenox/dist/src) and [binary](https://www.seamplex.com/feenox/dist/linux).
+All the files needed to run these examples are available in the [examples](https://github.com/seamplex/feenox/tree/main/examples) directory of the [Git repository](https://github.com/seamplex/feenox) and any of the [tarballs](https://www.seamplex.com/feenox/download.html), both [source](https://www.seamplex.com/feenox/dist/src) and [binary](https://www.seamplex.com/feenox/dist/linux).
 
 For a presentation of these examples, see the "FeenoX Overview Presentation" (August 2021).
 

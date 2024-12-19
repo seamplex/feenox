@@ -372,7 +372,7 @@ ask in FeenoX’s [discussion page].
     git clone https://github.com/seamplex/feenox
     ```
 
-4.  Boostrap, configure, compile & make
+4.  Bootstrap, configure, compile & make
 
     ``` terminal
     cd feenox

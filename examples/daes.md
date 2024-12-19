@@ -32,7 +32,7 @@ and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
 seminal 1963 paper [Deterministic non-periodic
 flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
-This example's input file ressembles the parameters, inital conditions
+This example's input file ressembles the parameters, initial conditions
 and differential equations of the problem as naturally as possible with
 an ASCII file.
 
@@ -253,7 +253,7 @@ l1 = 0.3
 l2 = 0.25
 g = 9.8
 
-# inital conditions
+# initial conditions
 theta1_0 = pi/2
 theta2_0 = pi
 
@@ -494,7 +494,7 @@ ENDIF
 ##############################
 # output results
 ##############################
-# write information (commented out) in the ouput header
+# write information (commented out) in the output header
 IF in_static
  PRINT "\# vertical boiling channel with uniform power (eta formulation 2010)"
  PRINT "\# Npch = "   Npch
@@ -632,7 +632,7 @@ where
     c.  `arbitrary`
 
         ``` feenox
-        # arbitray normalized interpolated power profile
+        # arbitrary normalized interpolated power profile
         FUNCTION potencia(z) INTERPOLATION splines DATA {
         0      0
         0.2    2.5 
@@ -810,7 +810,7 @@ ENDIF
 ##############################
 # output results
 ##############################
-# write information (commented out) in the ouput header
+# write information (commented out) in the output header
 IF in_static
  PRINT TEXT "\# vertical boiling channel with arbitrary power: $(1) (2012)"
  PRINT TEXT "\# Npch = "   Npch

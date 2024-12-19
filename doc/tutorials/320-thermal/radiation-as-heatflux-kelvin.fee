@@ -8,7 +8,7 @@ BC left q=1200     # prescribed heat flux at x=0
 Tref = 293.15
 
 # for fun: compute the Stefan-Boltzmann from fundamental constants
-h = 6.62606957e-34      # planck's contant [J s]
+h = 6.62606957e-34      # planck's constant [J s]
 c = 299792458           # speed of light in vacuum [m s^(-1)]
 k_b = 1.3806488e-23     # boltzmann constant  [m^2 kg s^(-2) K^(-1)]
 sigma = 2*pi*k_b^4/(h^3*c^2) * integral(1/(t^5*(exp(1/t)-1)), t, 1e-2, infinite)

@@ -69,7 +69,7 @@ By default this will run over a few combinations of
    - struct
    - frontal
    - dealaunay
- * refinement factors $c$ such that the mesh size $h$ is propotional to $1/c$,
+ * refinement factors $c$ such that the mesh size $h$ is proportional to $1/c$,
    - 4
    - 8
    - 12

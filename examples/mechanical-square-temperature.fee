@@ -9,7 +9,7 @@ intro: |
   
   Actually, this example shows three cases:
  
-   1. Uniform temperature indentically equal to 200ºC
+   1. Uniform temperature identically equal to 200ºC
    2. Linear temperature profile on the vertical direction given by an algebraic expression
  
       $$

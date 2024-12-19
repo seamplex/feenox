@@ -136,7 +136,7 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
     feenox_call(feenox_mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
 
     // compute the product between the proposed normal and the difference between these two
-    // if the product is positve, invert the normal
+    // if the product is positive, invert the normal
     if (feenox_mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
       n[0] = -n[0];
       n[1] = -n[1];

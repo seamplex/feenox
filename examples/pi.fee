@@ -76,7 +76,7 @@ piapprox[2] = 4*atan(1)
 # the abscissae x where tan(x) = 0 in the range [3:3.5]
 piapprox[3] = root(tan(x), x, 3, 3.5)
 
-# the square of the numerical integral of the guassian curve 
+# the square of the numerical integral of the gaussian curve 
 piapprox[4] = integral(exp(-x^2), x, -10, 10)^2
 
 # the numerical integral of a circle inscribed in a unit square

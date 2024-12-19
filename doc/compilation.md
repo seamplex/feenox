@@ -36,7 +36,7 @@ In particular, [PETSc](https://petsc.org/release/) (and [SLEPc](https://slepc.up
 FeenoX has one mandatory dependency for run-time execution and the standard build toolchain for compilation. It is written in\ C99 so only a C compiler is needed, although `make` is also required. Free and open source compilers are favored.
 The usual C compiler is `gcc` but `clang` or Intel’s `icc` and the newer `icx` can also be used.
 
-Note that there is no need to have a Fortran nor a C++ compiler to build FeenoX. They might be needed to build other dependencies (such as PETSc and its dependencies), but not to compile FeenoX if all the dependencies are installed from the oeprating system's package repositories. In case the build toolchain is not already installed, do so with
+Note that there is no need to have a Fortran nor a C++ compiler to build FeenoX. They might be needed to build other dependencies (such as PETSc and its dependencies), but not to compile FeenoX if all the dependencies are installed from the operating system's package repositories. In case the build toolchain is not already installed, do so with
 
 ```terminal
 sudo apt-get install gcc make
@@ -253,7 +253,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
 

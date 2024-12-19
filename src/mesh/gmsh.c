@@ -273,14 +273,14 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
     // ------------------------------------------------------      
     } else if (strncmp("$PartitionedEntities", buffer, 20) == 0) {
       
-      // number of partitions and ghost entitites
+      // number of partitions and ghost entities
       size_t numbers[2] = {0,0};
       feenox_call(feenox_gmsh_read_data_size_t(this, 2, numbers, binary));
       this->num_partitions = numbers[0];
       this->num_ghost_entitites = numbers[1];
       
       if (this->num_ghost_entitites != 0) {
-        feenox_push_error_message("ghost entitites not yet handled");
+        feenox_push_error_message("ghost entities not yet handled");
         return FEENOX_ERROR;
       }
       
@@ -1018,7 +1018,7 @@ int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names)
     fprintf(file, "%ld ", this->element[i].tag);
     fprintf(file, "%d ", this->element[i].type->id);
 
-    // in principle we should write the detailed information about groups and partitons
+    // in principle we should write the detailed information about groups and partitions
 //    fprintf(file, "%d ", this->element[i].ntags);
     
     // but for now only two tags are enough:
@@ -1057,7 +1057,7 @@ int feenox_mesh_write_data_gmsh(mesh_write_t *this, mesh_write_dist_t *dist) {
 
   // one string tag
   fprintf(this->file->pointer, "1\n");
-  // the name of the vew
+  // the name of the view
   fprintf(this->file->pointer, "\"%s\"\n", dist->name);
   // the other one (optional) is the interpolation scheme
   

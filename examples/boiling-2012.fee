@@ -239,7 +239,7 @@ ENDIF
 ##############################
 # output results
 ##############################
-# write information (commented out) in the ouput header
+# write information (commented out) in the output header
 IF in_static
  PRINT TEXT "\# vertical boiling channel with arbitrary power: $(1) (2012)"
  PRINT TEXT "\# Npch = "   Npch

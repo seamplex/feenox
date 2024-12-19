@@ -1,5 +1,5 @@
 ---
-title: FeenoX documenation directory
+title: FeenoX documentation directory
 language: en-US
 ---
 

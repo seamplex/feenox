@@ -218,7 +218,7 @@ int feenox_instruction_mesh_read(void *arg) {
     if ((physical_group->var_volume != NULL && physical_group->var_volume->used) ||
         (physical_group->vector_cog != NULL && physical_group->vector_cog->used)) {
         
-      // TODO: why dont' we use feenox_physical_group_compute_volume()?
+      // TODO: why dont we use feenox_physical_group_compute_volume()?
         
       physical_group->volume = 0;
       physical_group->cog[0] = 0;

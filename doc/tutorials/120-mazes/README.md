@@ -148,7 +148,7 @@ Bitmapped, meshed and solved mazes.
         ./dxf2geo maze.dxf 0.1
         ```
         
-    The tutorial directory contains a convenience script to perfom all these steps in a single call.
+    The tutorial directory contains a convenience script to perform all these steps in a single call.
     Just name your PNG `maze.png` and run `./png2geo.sh`.
     
     

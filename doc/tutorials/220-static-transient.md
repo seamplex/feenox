@@ -24,7 +24,7 @@ tau = 1.234
 r = 0
 r[a:b] = 1
 
-# signal y is equal to signal r fitered through a lag
+# signal y is equal to signal r filtered through a lag
 # of characteristic time tau
 y = lag(r, tau)
 

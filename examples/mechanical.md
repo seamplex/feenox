@@ -204,7 +204,7 @@ If an external loop successively calls FeenoX with extra command-line
 arguments, a parametric run is obtained. This file `cantilever.fee`
 fixes the face called "left" and sets a load in the negative $z$
 direction of a mesh called `cantilever-$1-$2.msh`, where `$1` is the
-first argument after the inpt file and `$2` the second one. The output
+first argument after the input file and `$2` the second one. The output
 is a single line containing the number of nodes of the mesh and the
 displacement in the vertical direction $w(500,0,0)$ at the center of the
 cantilever's free face.
@@ -267,7 +267,7 @@ rm -f *.dat
 for element in tet4 tet10 hex8 hex20 hex27; do
  for c in $(seq 1 10); do
  
-  # create mesh if not alreay cached
+  # create mesh if not already cached
   mesh=cantilever-${element}-${c}
   if [ ! -e ${mesh}.msh ]; then
     scale=$(echo "PRINT 1/${c}" | feenox -)
@@ -732,7 +732,7 @@ scheme](https://en.wikipedia.org/wiki/Monotone_cubic_interpolation).
 
 Actually, this example shows three cases:
 
-1.  Uniform temperature indentically equal to 200ºC
+1.  Uniform temperature identically equal to 200ºC
 
 2.  Linear temperature profile on the vertical direction given by an
     algebraic expression

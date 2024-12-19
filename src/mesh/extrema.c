@@ -69,7 +69,7 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
         }
       } else {
         
-        // unless explcitily asked, check for all nodes, cells and gauss
+        // unless explicitly asked, check for all nodes, cells and gauss
         if (mesh_find_extrema->field_location == field_location_default || mesh_find_extrema->field_location == field_location_cells) {
           
           if (mesh->cell == NULL) {
