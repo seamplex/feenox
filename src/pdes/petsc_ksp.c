@@ -283,7 +283,7 @@ int feenox_problem_setup_pc(PC pc) {
   petsc_call(PCFactorGetMatSolverType(pc, &mat_solver_type));
   if (mat_solver_type != NULL && strcmp(mat_solver_type, MATSOLVERMUMPS) == 0) {
     if (feenox_var_value(feenox.pde.vars.mumps_icntl_14) != 0) {
-#if PETSC_VERSION_LT(3,19,0)
+#if PETSC_VERSION_LT(3,20,0)
       petsc_call(PCSetUp(pc));
 #endif
       Mat F;

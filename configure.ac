@@ -239,7 +239,7 @@ AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
   AC_MSG_CHECKING([for SLEPc dir])
   
   AS_IF([test -z "${SLEPC_DIR}"], [
-    # first try to see if PETSc was configured with --with-download-slepc
+    # first try to see if PETSc was configured with --download-slepc
     export SLEPC_DIR=${PETSC_DIR}/${PETSC_ARCH}/externalpackages/git.slepc
     AS_IF([test ! -d ${SLEPC_DIR}],[
       # otherwise see if it is in the standard location as installed with apt
