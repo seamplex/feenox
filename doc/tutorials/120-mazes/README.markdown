@@ -181,7 +181,7 @@ Gmsh)</p></figcaption>
         ./dxf2geo maze.dxf 0.1
         ```
 
-    The tutorial directory contains a convenience script to perfom all
+    The tutorial directory contains a convenience script to perform all
     these steps in a single call. Just name your PNG `maze.png` and run
     `./png2geo.sh`.
 
@@ -413,7 +413,7 @@ $$
 PROBLEM laplace 2D
 READ_MESH maze.msh
 
-phi_0(x,y) = 0              # inital condition
+phi_0(x,y) = 0              # initial condition
 end_time = 500              # some end time where we know we reached the steady-state
 alpha = 1e-3                # factor of the time derivative to make it advance faster
 BC start   phi=if(t<1,t,1)  # a ramp from zero to avoid discontinuities with the initial condition

@@ -111,7 +111,7 @@ int feenox_problem_parse_time_init_modal(void) {
 ///va+M_T+desc \[ M_T = \frac{1}{n_\text{DOFs}} \cdot \vec{1}^T \cdot M \cdot \vec{1} \]
 ///va+M_T+desc 
 ///va+M_T+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node.
-///va+M_T+desc Note that this is only approximately equal to the actual mass whih is
+///va+M_T+desc Note that this is only approximately equal to the actual mass which is
 ///va+M_T+desc the integral of the density $\rho(x,y,z)$ over the problem domain.
   feenox_check_alloc(modal.M_T = feenox_define_variable_get_ptr("M_T"));
 

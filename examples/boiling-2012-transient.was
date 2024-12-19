@@ -123,7 +123,7 @@ ENDIF
 0 = hi_dot
 0 = Eu_dot
 
-# write information (commented out) in the ouput header
+# write information (commented out) in the output header
 IF in_static
  PRINT TEXT "\# vertical boiling channel"
  PRINT TEXT "\# Npch = "  Npch

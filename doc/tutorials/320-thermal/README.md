@@ -472,7 +472,7 @@ Even more, the most-widely scheme used to solve the non-linear equation $\mathb
 
 The matrix $J = \mathbf{F}^{\prime}$ associated with the linear solve step (which changes from iteration to iteration) is called the jacobian matrix. FeenoX builds an appropriate jacobian for each type of non-linearity, ensuring the convergence is as fast as possible. Advanced users might investigate that indeed $J(\mathbf{u})$ is correct by using the PETSc options `--snes_test_jacobian` and, for smaller problems, `--snes_test_jacobian_view`. Note that these options render the execution far slower, so make sure the mesh is coarse.
 
-The solver options can be changed at runtime either using keywors in the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition or command-line options:
+The solver options can be changed at runtime either using keywords in the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition or command-line options:
 
  * `NONLINEAR_SOLVER newtonls` or `--snes_type=newtonls`
  * `LINEAR_SOLVER gmres` or `--ksp_type=gmres`
@@ -902,7 +902,7 @@ $
 
 If the initial condition does not satisfy the Dirichlet boundary conditions, the solver might struggle to converge for small times.
 One way of overcoming this issue is to go the other way round: make sure the boundary conditions match the initial condition at the boundaries for $t=0$ and then "quickly" move the boundary condition to the actual value.
-For example, if the condition was $T(1)=1$ instead of $T(1)=0$ and we blindy wrote
+For example, if the condition was $T(1)=1$ instead of $T(1)=0$ and we blindly wrote
 
 ```{.feenox include="slab-uniform-transient-from-zero-one-naive.fee"}
 ```
@@ -930,7 +930,7 @@ But if we do this instead
 ```{.feenox include="slab-uniform-transient-from-zero-one-smart.fee"}
 ```
 
-we get the right answer, paying some inital cost as small time steps:
+we get the right answer, paying some initial cost as small time steps:
 
 ```terminal
 $ feenox slab-uniform-transient-from-zero-one-smart.fee 

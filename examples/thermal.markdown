@@ -201,7 +201,7 @@ distribution</figcaption>
 
 Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one
 made with a material with unitary properties and the other one whose
-properties depend explicitly ony time. We glue the two cubes together,
+properties depend explicitly on time. We glue the two cubes together,
 fix one side of the unitary material to a fixed zero temperature and set
 a ramp of temperature between zero and one at the opposite end of the
 material with time-varying properties.

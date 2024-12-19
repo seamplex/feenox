@@ -27,7 +27,7 @@ intro: |
   that generate the butterfly as presented by Edward Lorenz back in his
   seminal 1963 paper [Deterministic non-periodic
   flow](http://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2).
-  This example's input file ressembles the parameters, inital
+  This example's input file ressembles the parameters, initial
   conditions and differential equations of the problem as naturally as
   possible with an ASCII file.
 ...

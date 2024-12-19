@@ -116,7 +116,7 @@ int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) 
     p.element = this;
     p.x = x;
   
-    test = gsl_vector_calloc(this->type->dim);    // guess inicial cero
+    test = gsl_vector_calloc(this->type->dim);    // guess initial cero
 
 //    T = gsl_multiroot_fsolver_hybrids;
 //    T = gsl_multiroot_fsolver_hybrid;      

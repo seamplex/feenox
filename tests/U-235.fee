@@ -1,6 +1,6 @@
 # material U-235 (tables 33 and 34)
 
-# NOTE: 1 is the slow energy grop and 2 is the fast energy group
+# NOTE: 1 is the slow energy group and 2 is the fast energy group
 
 # fast-energy group
 nu2_fuel = 2.70

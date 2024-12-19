@@ -60,7 +60,7 @@ void *wasora_get_shared_pointer(char *name, size_t size) {
     wasora_runtime_error();
   }
   if ((pointer = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
-    wasora_push_error_message("'%s' maping shared memory object '%s'", strerror(errno), name);
+    wasora_push_error_message("'%s' mapping shared memory object '%s'", strerror(errno), name);
     wasora_runtime_error();
   }
 
@@ -86,7 +86,7 @@ sem_t *wasora_get_semaphore(char *name) {
 
 #if !defined(LD_STATIC)
   if ((dangling_pid = wasora_create_lock(name, 1)) != 0) {
-    wasora_push_error_message("sempahore '%s' is being used by process %d", name, dangling_pid);
+    wasora_push_error_message("semaphore '%s' is being used by process %d", name, dangling_pid);
     wasora_runtime_error();
   }
 

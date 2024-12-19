@@ -36,7 +36,7 @@ intro: |
  > The objective of this example is to show that
  > case\ i. will monotonically converge to the analytical multiplication factor as $n \rightarrow \infty$ while
  > case\ ii. will show a XS dilution and smearing effect.
- > FeenoX of course can solve both cases, but there are many other neutronic tools out there that can handle ony structured grids.
+ > FeenoX of course can solve both cases, but there are many other neutronic tools out there that can handle only structured grids.
 
  ```{.bash include="two-zone-slab.sh"}
  ```

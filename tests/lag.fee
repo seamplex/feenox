@@ -12,7 +12,7 @@ tau = 1.234
 # signal r is equal to zero except for a < t < b
 r = heaviside(t-a)-heaviside(t-b)
 
-# signal y is equal to signal r fitered through a lag
+# signal y is equal to signal r filtered through a lag
 # of characteristic time tau
 y = lag(r, tau)
 

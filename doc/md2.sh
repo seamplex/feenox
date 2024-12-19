@@ -12,7 +12,7 @@ usage() {
   cat << EOF
 usage: $0 <path_to_md> [ --pdf | --html | --gfm | --plain ] [ --output_dir <dir> ]
  
- The <path_to_md> might or migh not include the extension .md.
+ The <path_to_md> might or might not include the extension .md.
  Default is to convert to HTML (just because it is faster) and to
  write the converted file in the same directory where the input is.
 EOF
@@ -254,7 +254,7 @@ if [ "x${format}" = "x.html" ]; then
   # bootstrap tables
   sed -i 's/<table>/<table class=\"table table-striped table-hover table-sm table-responsive-sm\">/'  ${out} 
 
-  # boostrap/prettydocs blockquotes
+  # bootstrap/prettydocs blockquotes
   sed -i 's/<blockquote>/<blockquote class=\"callout-block callout-blockquote\">/'     ${out} 
 
   # img-fluid

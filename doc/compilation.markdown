@@ -104,7 +104,7 @@ ask in FeenoX’s [discussion page].
     git clone https://github.com/seamplex/feenox
     ```
 
-4.  Boostrap, configure, compile & make
+4.  Bootstrap, configure, compile & make
 
     ``` terminal
     cd feenox
@@ -203,7 +203,7 @@ or Intel’s `icc` and the newer `icx` can also be used.
 Note that there is no need to have a Fortran nor a C++ compiler to build
 FeenoX. They might be needed to build other dependencies (such as PETSc
 and its dependencies), but not to compile FeenoX if all the dependencies
-are installed from the oeprating system’s package repositories. In case
+are installed from the operating system’s package repositories. In case
 the build toolchain is not already installed, do so with
 
 ``` terminal
@@ -525,7 +525,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
 

@@ -11,12 +11,12 @@ A person can tell if a keyword is a definition or an instruction because the for
     ```{.feenox include="examples/fxy.fee"}
     ```
  
- b. If there is a variable, vector or matrix, it is an instruction: evaluate the expression on the right-hand side and assign it to the varible or vector (or matrix) element indicated in the left-hand side. Strictly speaking, if the variable has not already been defined (and implicit declaration is allowed), then the variable is also defined as well, e.g:
+ b. If there is a variable, vector or matrix, it is an instruction: evaluate the expression on the right-hand side and assign it to the variable or vector (or matrix) element indicated in the left-hand side. Strictly speaking, if the variable has not already been defined (and implicit declaration is allowed), then the variable is also defined as well, e.g:
  
     ```{.feenox include="examples/equal.fee"}
     ```
     
-    There is no need to explicitly define the scalar variable `a` with `VAR` since the first assigment also defines it implicitly (if this is allowed by the keyword `IMPLICIT`).
+    There is no need to explicitly define the scalar variable `a` with `VAR` since the first assignment also defines it implicitly (if this is allowed by the keyword `IMPLICIT`).
 
 
 An input file can define its own variables as needed, such as `my_var` or `flag`. But there are some reserved names that are special in the sense that they either
@@ -55,12 +55,12 @@ The timestep is chosen by the SUNDIALS library in order to keep an estimate of t
 
 
 In the third cae, the type of PDE being solved is given by the keyword `PROBLEM`. Some types of PDEs do support transient problems (such as `thermal`) but some others do not (such as `modal`). See the detailed explanation of each problem type for details. Now the transient problem is handled by the TS framework of the PETSc library.
-In general transient PDEs involve a mesh, material properties, inital conditions, transient boundary conditions, etc. And they create a lot of data since results mean spatial and temporal distributions of one or more scalar fields:
+In general transient PDEs involve a mesh, material properties, initial conditions, transient boundary conditions, etc. And they create a lot of data since results mean spatial and temporal distributions of one or more scalar fields:
 
 ```{.feenox include="examples/transient_pde.fee"}
 ```
 
-PETSc’s TS also honors the `min_dt` and `max_dt` variables, but the time step is controled by the allowed relative error with the special variable `ts_rtol`. Again, see the section of the [Partial Differential Equations subsystem] for more information. 
+PETSc’s TS also honors the `min_dt` and `max_dt` variables, but the time step is controlled by the allowed relative error with the special variable `ts_rtol`. Again, see the section of the [Partial Differential Equations subsystem] for more information. 
 
 
 # Algebraic expressions

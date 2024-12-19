@@ -36,7 +36,7 @@ The FeenoX examples are divided by the type of problem they solve:
 >   - cell-level neutronics (i.e. method of characteristics, collision
 >     probabilities, etc)
 
-All the files needed to run theses examples are available in the
+All the files needed to run these examples are available in the
 [examples] directory of the [Git repository] and any of the [tarballs],
 both [source] and [binary].
 

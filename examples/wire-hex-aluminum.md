@@ -22,5 +22,5 @@
    10    -9.5e-06   -5.2e-03   0.0000   0.6128
 
   : aluminum wire over hex mesh, participation and excitation factors
-  $L$ and $\Gamma$, effective per-mode and cummulative mass fractions
+  $L$ and $\Gamma$, effective per-mode and cumulative mass fractions
   $\mu$ and $M$

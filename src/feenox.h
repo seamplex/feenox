@@ -120,7 +120,7 @@ extern "C++" {
 #define BUFFER_TOKEN_SIZE        256
 #define BUFFER_LINE_SIZE        4096
 
-// number of internal functions, functional adn vector functions
+// number of internal functions, functional and vector functions
 #define N_BUILTIN_FUNCTIONS         70
 #define N_BUILTIN_FUNCTIONALS       8
 #define N_BUILTIN_VECTOR_FUNCTIONS  8
@@ -1328,7 +1328,7 @@ struct mesh_t {
   
   unsigned int max_nodes_per_element;
   unsigned int max_faces_per_element;
-  unsigned int max_first_neighbor_nodes;  // to estimate matrix bandwith
+  unsigned int max_first_neighbor_nodes;  // to estimate matrix bandwidth
 
   // kd-trees to make efficient searches
   void *kd_nodes;
@@ -1884,7 +1884,7 @@ struct feenox_t {
 
 #ifdef HAVE_PETSC    
     char *petsc_options;
-    PetscBool pre_allocate;        // preallocate? onyl works for petsc >= 3.19
+    PetscBool pre_allocate;        // preallocate? only works for petsc >= 3.19
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
 

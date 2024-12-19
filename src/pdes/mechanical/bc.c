@@ -354,7 +354,7 @@ int feenox_problem_bc_set_mechanical_traction(bc_data_t *this, element_t *e, uns
 
   // TODO: set all the DOFs at the same time
   double t[3] = {0,0,0};
-  // TODO: wrap feenox_expression_eval() with vitrual methods according to the dependence of the bc
+  // TODO: wrap feenox_expression_eval() with virtual methods according to the dependence of the bc
   t[this->dof] = feenox_expression_eval(&this->expr);
 //  printf("%g\n", t[bc_data->dof]);
 //  feenox_call(feenox_problem_bc_natural_set(e, v, t));

@@ -3,7 +3,7 @@ FUNCTION flux(t) FILE flux.dat
 
 VAR t'   # dummy integration variable
 
-# define a flux function that allos for negative times
+# define a flux function that allows for negative times
 flux_a = vec_flux_t[1]
 flux_b = vec_flux_t[vecsize(vec_flux)]
 phi(t) := if(t<flux_a, flux(flux_a), flux(t))

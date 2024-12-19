@@ -100,7 +100,7 @@ reference-dae-va.md
 ```
 
 
-## Partial Differential Equations subsytem
+## Partial Differential Equations subsystem
 
 ### PDE keywords
 

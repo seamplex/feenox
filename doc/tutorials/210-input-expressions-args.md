@@ -46,7 +46,7 @@ $
 
 # Mathematical expressions
 
-These examples show how algebraic expressions work in wasora, which is basically as they should. The basic operators are composed by the four basic operations +, -, * and / plus the exponentation operator ^. Parenthesis also work as expected, and can be nested up to any level. Other operators such as comparisons and logicals are introduced in other examples.
+These examples show how algebraic expressions work in wasora, which is basically as they should. The basic operators are composed by the four basic operations +, -, * and / plus the exponentiation operator ^. Parenthesis also work as expected, and can be nested up to any level. Other operators such as comparisons and logicals are introduced in other examples.
 
 
 Expressions works as expected. If you find one case where they do not, please report it to the author of wasora.

@@ -95,7 +95,7 @@ AX_GCC_BUILTIN(__builtin_expect)
   #AC_CHECK_LIB([readline], [readline],
     #[],
     #AS_IF([test "x${with_readline}" != "xcheck"],
-      #AC_MSG_FAILURE([--with-readline was given, but test for readline libray failed])
+      #AC_MSG_FAILURE([--with-readline was given, but test for readline library failed])
     #)
   #)  
 #])
@@ -132,19 +132,19 @@ AS_IF([test "x${with_sundials}" != "xno"] , [
   AC_CHECK_LIB([sundials_ida], [IDAInit],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
+      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev library failed])
     )
   )  
   AC_CHECK_HEADER([nvector/nvector_serial.h],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
+      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev library failed])
     )
   )
   AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev libray failed])
+      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev library failed])
     )  
   )
 ])
@@ -177,7 +177,7 @@ AS_IF([test "x${with_petsc}" != "xno"], [
   AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
   AC_ARG_VAR(PETSC_ARCH, [PETSc architecture])
 
-  # asume we found it
+  # assume we found it
   petsc_found=1
 
   AC_MSG_CHECKING([for PETSc dir])
@@ -233,7 +233,7 @@ have_slepc="no"
 AS_IF([test "x${have_petsc}" != "xno" -a "x${with_slepc}" != "xno"], [
   AC_ARG_VAR(SLEPC_DIR, [location of SLEPc installation])
 
-  # asume we found it
+  # assume we found it
   slepc_found=1
 
   AC_MSG_CHECKING([for SLEPc dir])

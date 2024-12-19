@@ -313,7 +313,7 @@ int feenox_problem_setup_eps_neutron_diffusion(EPS eps) {
 
   petsc_call(EPSSetProblemType(eps, (neutron_diffusion.groups == 1) ? EPS_PGNHEP : EPS_GNHEP));
   
-  // we expect the eigenvalue to be near one and an absolute test is fater
+  // we expect the eigenvalue to be near one and an absolute test is faster
   petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_ABS));
   
   // offsets around one

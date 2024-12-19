@@ -22,5 +22,5 @@
    10    -7.3e-05   -6.9e-02   0.0038   0.6129
 
   : aluminum wire over tet mesh, participation and excitation factors
-  $L$ and $\Gamma$, effective per-mode and cummulative mass fractions
+  $L$ and $\Gamma$, effective per-mode and cumulative mass fractions
   $\mu$ and $M$

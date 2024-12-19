@@ -44,7 +44,7 @@ alt="The IAEA 2D PWR Benchmark" />
 #           2. Two-dimensional (x,y)-geometry
 #
 PROBLEM neutron_diffusion 2D GROUPS 2
-DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eigth
+DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eighth
 READ_MESH iaea-2dpwr-$1.msh
 
 # define materials and cross sections according to the two-group constants
@@ -449,7 +449,7 @@ We can then compare the numerical $k_\text{eff}$ computed using…
 > monotonically converge to the analytical multiplication factor as
 > $n \rightarrow \infty$ while case ii. will show a XS dilution and
 > smearing effect. FeenoX of course can solve both cases, but there are
-> many other neutronic tools out there that can handle ony structured
+> many other neutronic tools out there that can handle only structured
 > grids.
 
 ``` bash

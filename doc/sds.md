@@ -297,7 +297,7 @@ $ wget https://seamplex.com/feenox/dist/linux/feenox-linux-amd64.tar.gz
 Appendix @sec:download has more details about how to download and compile FeenoX.
 The full online documentation contains a [compilation guide](https://seamplex.com/feenox/doc/compilation.html) with further detailed explanations of each of the steps involved.
 
-All the commands needed to either download a binary executable or to compile from source with customized optimization flags can be automatized.
+All the commands needed to either download a binary executable or to compile from source with customized optimization flags can be automated.
 The repository contains a subdirectory [`dist`](https://github.com/seamplex/feenox/tree/main/dist) with instructions and scripts to build
 
  * source tarballs
@@ -333,7 +333,7 @@ a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engin
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   -c, --check        validates if the input file is sane or not
@@ -1165,7 +1165,7 @@ a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engin
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -1222,7 +1222,7 @@ The `--help` option gives a more detailed usage:
 $ feenox --help
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   -c, --check        validates if the input file is sane or not
@@ -2268,7 +2268,7 @@ a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engin
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
   -c, --check        validates if the input file is sane or not

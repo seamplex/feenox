@@ -18,7 +18,7 @@ For instance, to make proper use of the computational resources available in rem
  * design shared network file systems
  * etc.
  
-Instead of having to manually perform this set up each time a calculation is needed, one can automatize the workflow with _ad-hoc_ scripts acting as "thin clients" which would, for instance,
+Instead of having to manually perform this set up each time a calculation is needed, one can automate the workflow with _ad-hoc_ scripts acting as "thin clients" which would, for instance,
 
  * launch and configure the remote computing instances, optionally using containerization technology
  * send the input files needed by the computational tools

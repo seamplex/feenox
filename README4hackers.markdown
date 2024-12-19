@@ -81,7 +81,7 @@ Unlike these other FEA tools, FeenoX provides…
 
   usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-    -h, --help         display options and detailed explanations of commmand-line usage
+    -h, --help         display options and detailed explanations of command-line usage
     -v, --version      display brief version information and exit
     -V, --versions     display detailed version information
     --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
@@ -194,7 +194,7 @@ The [input file][self-explanatory ASCII file]…
 - understands [definitions (nouns) and instructions (verbs)]. FeenoX has
   an actual instruction pointer that loops over the instruction set
   (there might even be [conditional blocks]).
-- is [simple for simple files] (but might get [more complicated for mor
+- is [simple for simple files] (but might get [more complicated for more
   complex problems]). Remember [Alan Kay]’s quote: [“simple things
   should be simple and complex things should be possible.”]
 
@@ -251,7 +251,7 @@ and will not compute things that are not actually needed).
   [definitions (nouns) and instructions (verbs)]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
   [conditional blocks]: https://www.seamplex.com/feenox/doc/feenox-manual.html#if
   [simple for simple files]: https://seamplex.com/feenox/doc/sds.html#sec:simple
-  [more complicated for mor complex problems]: https://seamplex.com/feenox/doc/sds.html#sec:complex
+  [more complicated for more complex problems]: https://seamplex.com/feenox/doc/sds.html#sec:complex
   [Alan Kay]: https://en.wikipedia.org/wiki/Alan_Kay
   [“simple things should be simple and complex things should be possible.”]:
     https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible
@@ -269,7 +269,7 @@ and will not compute things that are not actually needed).
 
 Feenox is a computational tool designed to be run on Unix servers as a
 part of a [cloud-first] workflow, optionally [involving MPI
-communication among different servers] to hande arbitrarily-large
+communication among different servers] to handle arbitrarily-large
 problems:
 
 Check out the section about [invocation] in the [FeenoX manual].

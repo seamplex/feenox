@@ -89,7 +89,7 @@ int feenox_parse_input_file(const char *filepath, int from, int to) {
       }
       
       // the line is broken by strtok inside parse_line() and we need
-      // the original for assignements and equations
+      // the original for assignments and equations
       feenox_check_alloc(feenox_parser.full_line = strdup(feenox_parser.line));
       if (feenox_parse_line() != FEENOX_OK) {
         feenox_free(feenox_parser.full_line);
@@ -163,7 +163,7 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
     
 ///kw+ALIAS+usage ALIAS
-///kw+ALIAS+desc Define a scalar alias of an already-defined indentifier.
+///kw+ALIAS+desc Define a scalar alias of an already-defined identifier.
     } else if (strcasecmp(token, "ALIAS") == 0) {
       feenox_call(feenox_parse_alias());
       return FEENOX_OK;
@@ -1308,7 +1308,7 @@ int feenox_parse_function(void) {
       }
 
 //kw+FUNCTION+usage [ X_INCREASES_FIRST <expr> ]
-//kw+FUNCTION+detail and wether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
+//kw+FUNCTION+detail and whether the definition data is sorted with the first argument changing first (`X_INCREASES_FIRST` evaluating to non-zero) or with the last argument changing first (zero).
     } else if (strcasecmp(token,"X_INCREASES_FIRST") == 0) {
 
       feenox_call(feenox_parser_expression(&function->expr_x_increases_first));
@@ -1455,7 +1455,7 @@ int feenox_parse_file(char *default_mode) {
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 ///kw+FILE+usage PATH <format>
 ///kw+FILE+usage expr_1 expr_2 ... expr_n
-///kw+FILE+detail The path should be given as a `printf`-like format string followed by the expressions which shuold be
+///kw+FILE+detail The path should be given as a `printf`-like format string followed by the expressions which should be
 ///kw+FILE+detail evaluated in order to obtain the actual file path. The expressions will always be floating-point expressions,
 ///kw+FILE+detail but the particular integer specifier `%d` is allowed and internally transformed to `%.0f`.
     if (strcasecmp(token, "PATH") == 0) {
@@ -1608,7 +1608,7 @@ int feenox_parse_print(void) {
 ///kw+PRINT+detail If the `FILE` keyword is not provided, default is to write to `stdout`.
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
       feenox_call(feenox_parser_file(&print->file));
-      // we don't have the file name becuase it was already consumed by the above call
+      // we don't have the file name because it was already consumed by the above call
       // and we do not expect the PRINT instruction to be used from the API
       // so we directly access the internals of the structure
       if (print->file->mode == NULL) {
@@ -2391,7 +2391,7 @@ int feenox_parse_write_mesh(void) {
       mesh_write->no_mesh = 1;
       
 ///kw_pde+WRITE_MESH+usage [ NO_PHYSICAL_NAMES ]@
-///kw_pde+WRITE_MESH+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+///kw_pde+WRITE_MESH+detail When targeting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
 ///kw_pde+WRITE_MESH+detail section that sets the actual names of the physical entities is not written.      
 ///kw_pde+WRITE_MESH+detail This might be needed in some cases to avoid name clashes when dealing with multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
@@ -2551,7 +2551,7 @@ int feenox_parse_write_results(void) {
 ///kw_pde+WRITE_RESULTS+usage [ FILE <file> ]@
 ///kw_pde+WRITE_RESULTS+detail If no `FILE` is provided, the output file is the same as the input file replacing the
 ///kw_pde+WRITE_RESULTS+detail `.fee` extension with the format extension, i.e. `$0.msh`.
-///kw_pde+WRITE_RESULTS+detail If there are further optional command line arguments, they are added pre-pending a dash,
+///kw_pde+WRITE_RESULTS+detail If there are further optional command line arguments, they are added prepending a dash,
 ///kw_pde+WRITE_RESULTS+detail i.e. `$0-[$1-[$2...]].msh`
 ///kw_pde+WRITE_RESULTS+detail Otherwise the given `FILE` is used.
 ///kw_pde+WRITE_RESULTS+detail If no explicit `FORMAT` is given, the format is read from the `FILE` extension.
@@ -2561,7 +2561,7 @@ int feenox_parse_write_results(void) {
       }
 
 ///kw_pde+WRITE_RESULTS+usage [ NO_PHYSICAL_NAMES ]
-///kw_pde+WRITE_RESULTS+detail When targetting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
+///kw_pde+WRITE_RESULTS+detail When targeting the `.msh` output format, if `NO_PHYSICAL_NAMES` is given then the
 ///kw_pde+WRITE_RESULTS+detail section that sets the actual names of the physical entities is not written.      
 ///kw_pde+WRITE_RESULTS+detail This might be needed in some cases to avoid name clashes when dealing with multiple `.msh` files.
     } else if (strcasecmp(token, "NO_PHYSICAL_NAMES") == 0) {
@@ -3026,7 +3026,7 @@ int feenox_parse_problem(void) {
 
 #ifdef HAVE_PETSC
   if (feenox.pde.petscinit_called == PETSC_TRUE) {
-    feenox_push_error_message("ony one PROBLEM keyword allowed");
+    feenox_push_error_message("only one PROBLEM keyword allowed");
     return FEENOX_ERROR;    
   } 
   
@@ -3094,7 +3094,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+usage | DETECT_HANGING_NODES
 ///kw_pde+PROBLEM+detail If either `DETECT_HANGING_NODES` or `HANDLE_HANGING_NODES` are given, 
 ///kw_pde+PROBLEM+detail an intermediate check for nodes without any associated elements will be performed.
-///kw_pde+PROBLEM+detail For well-behaved meshes this check is redundant so by detault it is not done (`DO_NOT_DETEC_HANGING_NODES`).
+///kw_pde+PROBLEM+detail For well-behaved meshes this check is redundant so by default it is not done (`DO_NOT_DETEC_HANGING_NODES`).
 ///kw_pde+PROBLEM+detail With `DETECT_HANGING_NODES`, FeenoX will report the tag of the hanging nodes and stop.
     } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_detect;
@@ -3105,7 +3105,7 @@ int feenox_parse_problem(void) {
  
      
 ///kw_pde+PROBLEM+usage [ DETECT_UNRESOLVED_BCS
-///kw_pde+PROBLEM+detail By default, FeenoX checks that all physical groups referred to in the `BC` keywors exists (`DETECT_UNRESOLVED_BCS`).
+///kw_pde+PROBLEM+detail By default, FeenoX checks that all physical groups referred to in the `BC` keywords exists (`DETECT_UNRESOLVED_BCS`).
     } else if (strcasecmp(token, "DETECT_UNRESOLVED_BCS") == 0) {
       feenox.pde.unresolved_bcs = unresolved_bcs_detect;
 ///kw_pde+PROBLEM+usage | ALLOW_UNRESOLVED_BCS ]@

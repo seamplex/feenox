@@ -33,7 +33,7 @@ toc: true
 #           2. Two-dimensional (x,y)-geometry
 #
 PROBLEM neutron_diffusion 2D GROUPS 2
-DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eigth
+DEFAULT_ARGUMENT_VALUE 1 quarter   # either quarter or eighth
 READ_MESH iaea-2dpwr-$1.msh
 
 # define materials and cross sections according to the two-group constants
@@ -421,7 +421,7 @@ ii. an uniform grid (mimicking a neutronic code that cannot handle case
 > monotonically converge to the analytical multiplication factor as
 > $n \rightarrow \infty$ while case ii. will show a XS dilution and
 > smearing effect. FeenoX of course can solve both cases, but there are
-> many other neutronic tools out there that can handle ony structured
+> many other neutronic tools out there that can handle only structured
 > grids.
 
 ``` bash

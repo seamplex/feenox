@@ -49,7 +49,7 @@ This first case...
     3. [ParaView](https://www.paraview.org/)
     
    to obtain the results listed in @sec:expected.
-   Note that these three tools (and any other tool used throuhgout any of the tutorials, including the operating system is free (as an “free speech”) and open source (as in “the source code is available”).
+   Note that these three tools (and any other tool used throughout any of the tutorials, including the operating system is free (as an “free speech”) and open source (as in “the source code is available”).
 
  * We are going to illustrate that [FeenoX](https://www.seamplex.com/feenox/) (and [Gmsh](http://gmsh.info/) and up to some degree, [ParaView](https://www.paraview.org/) as well) works very much like an engineering “transfer function” between one (or more) input files and zero (or more) output files (which might include the terminal):
 
@@ -426,7 +426,7 @@ Some notes summarizing the section:
     - The input file should match as much as possible the paper (or blackboard) formulation of the problem.
     - Input files are [distributed version control](https://en.wikipedia.org/wiki/Distributed_version_control)-friendly.
  
-   See a more detailed decription (and discussion) about the input in [section\ 3 of the Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html#sec:input).
+   See a more detailed description (and discussion) about the input in [section\ 3 of the Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html#sec:input).
  
  * The mesh `tensile-test.msh` file is the output of [Gmsh](http://gmsh.info/) when invoked with the input [`tensile-test.geo`](tensile-test.geo) above. It can be either [version\ 4.1](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format) or [2.2](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format-version-2-_0028Legacy_0029). It is not part of [FeenoX](https://www.seamplex.com/feenox/) the input file, but referred to by the file name. This allows the input file to be tracked by Git (or any other DVCS).
    
@@ -576,7 +576,7 @@ and many others, including of course the operating system [GNU](https://www.gnu.
 >      2. analyze, and eventually
 >      3. understand
 >
->     what equations are being solved and how they are being solved withing a digital computer. The most important issue of FeenoX being free software, besides the three pints above, is that anyone can _modify_ it to suit their needs and then share those modifications. Of course most people do not know how to see, analyze, understand and/or modify computational source code. But the main key is that these people have the _freedom_ to ask somebody else to do it for them, either gratis or for a fee. This is not the case for other non-free (wrongly called “commercial”) engineering tools, where users do not have the freedom to see what and how the equations are being solved, let alone asking a third party to review them.
+>     what equations are being solved and how they are being solved with a digital computer. The most important issue of FeenoX being free software, besides the three pints above, is that anyone can _modify_ it to suit their needs and then share those modifications. Of course most people do not know how to see, analyze, understand and/or modify computational source code. But the main key is that these people have the _freedom_ to ask somebody else to do it for them, either gratis or for a fee. This is not the case for other non-free (wrongly called “commercial”) engineering tools, where users do not have the freedom to see what and how the equations are being solved, let alone asking a third party to review them.
 >
 >     On the other hand, even though it is true that FeenoX can be executed by anyone without paying any royalty to the owner of the copyright, that does not mean that its usage is completely gratis. These issues still hold:
 >      #. Downloading and executing the tool might incur in expenses such as electricity consumption, network connections, storage capacity, computing power, etc. 

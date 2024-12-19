@@ -149,7 +149,7 @@ int feenox_define_property_data(const char *property_name, const char *material_
 property_data_t *feenox_define_property_data_get_ptr(property_t *property, material_t *material, const char *expr_string) {
   // there's a function called material_property with the algebraic
   // expression that depends on x,y,z
-  // if we need to fail, fail befor allocating
+  // if we need to fail, fail before allocating
   if (property == NULL || material == NULL || material->mesh == NULL) {
     feenox_push_error_message("something is null when calling feenox_define_property_data_get_ptr()");
     return NULL;

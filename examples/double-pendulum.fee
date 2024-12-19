@@ -10,7 +10,7 @@ l1 = 0.3
 l2 = 0.25
 g = 9.8
 
-# inital conditions
+# initial conditions
 theta1_0 = pi/2
 theta2_0 = pi
 

@@ -25,7 +25,7 @@ toc: true
 > <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kD3tQdq17ZE?rel=0" allowfullscreen></iframe>
 > :::::
 >
-> Any contribution to make dekstop GUIs such as [PrePoMax](https://prepomax.fs.um.si/) or [FreeCAD](http://https://www.freecadweb.org) to work with FeenoX are welcome.
+> Any contribution to make desktop GUIs such as [PrePoMax](https://prepomax.fs.um.si/) or [FreeCAD](http://https://www.freecadweb.org) to work with FeenoX are welcome.
 
 
 

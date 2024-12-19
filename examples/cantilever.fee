@@ -5,7 +5,7 @@ intro: |
  
   If an external loop successively calls FeenoX with extra command-line arguments, a parametric run is obtained.
   This file `cantilever.fee` fixes the face called "left" and sets a load in the negative\ $z$ direction
-  of a mesh called `cantilever-$1-$2.msh`, where `$1` is the first argument after the inpt file and `$2` the second one.
+  of a mesh called `cantilever-$1-$2.msh`, where `$1` is the first argument after the input file and `$2` the second one.
   The output is a single line containing the number of nodes of the mesh and the displacement in the
   vertical direction\ $w(500,0,0)$ at the center of the cantilever's free face.
  

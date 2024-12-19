@@ -175,7 +175,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   char last_op = '(';  // initially it is like we start with an opening parenthesis
   size_t level = 1;
   expr_item_t *item;
-  // TODO: maybe we can get away wih half delta_level?
+  // TODO: maybe we can get away with half delta_level?
   size_t delta_level = strlen(operators);
 
   while (*string != '\0') {
@@ -191,7 +191,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       // blanks are ignored
       string++;
     } else if ((oper = strchr(operators, *string)) != NULL) {
-      // handle one of the operatos
+      // handle one of the operators
       if (*string == '(') {
         
         level += delta_level;

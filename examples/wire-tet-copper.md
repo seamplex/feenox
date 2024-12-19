@@ -22,5 +22,5 @@
    10    -2.2e-04   -6.9e-02   0.0038   0.6129
 
   : copper wire over tet mesh, participation and excitation factors $L$
-  and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
+  and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$
   and $M$

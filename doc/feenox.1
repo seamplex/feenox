@@ -207,7 +207,7 @@ by using only parts of them or to conditionally abort the execution
 using \f[CR]IF\f[R] clauses.
 .SS \f[CR]ALIAS\f[R]
 .PP
-Define a scalar alias of an already\-defined indentifier.
+Define a scalar alias of an already\-defined identifier.
 .IP
 .EX
 ALIAS { <new_var_name> IS <existing_object> | <existing_object> AS <new_name> }  
@@ -272,7 +272,7 @@ referenced by the given name.
 .P
 .PD
 The path should be given as a \f[CR]printf\f[R]\-like format string
-followed by the expressions which shuold be evaluated in order to obtain
+followed by the expressions which should be evaluated in order to obtain
 the actual file path.
 The expressions will always be floating\-point expressions, but the
 particular integer specifier \f[CR]%d\f[R] is allowed and internally
@@ -1121,14 +1121,14 @@ of gradients (stresses, heat fluxes, etc.), if applicable.
 If either \f[CR]DETECT_HANGING_NODES\f[R] or
 \f[CR]HANDLE_HANGING_NODES\f[R] are given, an intermediate check for
 nodes without any associated elements will be performed.
-For well\-behaved meshes this check is redundant so by detault it is not
+For well\-behaved meshes this check is redundant so by default it is not
 done (\f[CR]DO_NOT_DETEC_HANGING_NODES\f[R]).
 With \f[CR]DETECT_HANGING_NODES\f[R], FeenoX will report the tag of the
 hanging nodes and stop.
 With \f[CR]HANDLE_HANGING_NODES\f[R], FeenoX will fix those nodes and
 try to solve the problem anyway.
 By default, FeenoX checks that all physical groups referred to in the
-\f[CR]BC\f[R] keywors exists (\f[CR]DETECT_UNRESOLVED_BCS\f[R]).
+\f[CR]BC\f[R] keywords exists (\f[CR]DETECT_UNRESOLVED_BCS\f[R]).
 If \f[CR]ALLOW_UNRESOLVED_BCS\f[R] is given, FeenoX will ignore
 unresolved boundary conditions instead of complaining.
 This is handy when using the same input for different meshes which might
@@ -1304,7 +1304,7 @@ into the output file without any mesh data.
 Depending on the output format, this can be used to avoid repeating data
 and/or creating partial output files which can the be latter assembled
 by post\-processing scripts.
-When targetting the \f[CR].msh\f[R] output format, if
+When targeting the \f[CR].msh\f[R] output format, if
 \f[CR]NO_PHYSICAL_NAMES\f[R] is given then the section that sets the
 actual names of the physical entities is not written.
 .PD 0
@@ -1358,7 +1358,7 @@ pre\-pending a dash, i.e.\ \f[CR]$0\-[$1\-[$2...]].msh\f[R] Otherwise
 the given \f[CR]FILE\f[R] is used.
 If no explicit \f[CR]FORMAT\f[R] is given, the format is read from the
 \f[CR]FILE\f[R] extension.
-When targetting the \f[CR].msh\f[R] output format, if
+When targeting the \f[CR].msh\f[R] output format, if
 \f[CR]NO_PHYSICAL_NAMES\f[R] is given then the section that sets the
 actual names of the physical entities is not written.
 .PD 0
@@ -1661,7 +1661,7 @@ argument\ \f[I]x\f[R] during a transient problem using the difference
 between the value of the signal in the previous time step and the actual
 value divided by the time step\ \f[I]δ\f[R]\f[I]t\f[R] stored in
 \f[CR]dt\f[R].
-The argument\ \f[I]x\f[R] does not neet to be a variable, it can be an
+The argument\ \f[I]x\f[R] does not need to be a variable, it can be an
 expression involving one or more variables that change in time.
 For \f[I]t\f[R] = 0, the return value is zero.
 Unlike the functional \f[CR]derivative\f[R], the full dependence of
@@ -2203,7 +2203,7 @@ triangular_wave(x)
 \ 
 .SS \f[CR]wall_time\f[R]
 .PP
-Returns the time ellapsed since the invocation of FeenoX, in seconds.
+Returns the time elapsed since the invocation of FeenoX, in seconds.
 .IP
 .EX
 wall_time()  

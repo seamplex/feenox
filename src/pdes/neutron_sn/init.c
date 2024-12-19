@@ -554,7 +554,7 @@ int feenox_problem_setup_eps_neutron_sn(EPS eps) {
   // generalized non-hermitian problem
   petsc_call(EPSSetProblemType(eps, EPS_GNHEP));
 
-  // we expect the eigenvalue to be near one and an absolute test is fater
+  // we expect the eigenvalue to be near one and an absolute test is faster
   petsc_call(EPSSetConvergenceTest(feenox.pde.eps, EPS_CONV_ABS));
   
   // offsets around one

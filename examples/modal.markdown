@@ -30,7 +30,7 @@ the free-free mechanical modal problem (i.e. without any Dirichlet
 boundary condition). All it has to do is to print the fundamental
 frequency.
 
-To find the length $\ell_1$, FeenoX is sucessively called from a Python
+To find the length $\ell_1$, FeenoX is successively called from a Python
 driving script called [`fork.py`]. This script uses Gmsh’s Python API to
 create the CAD and the mesh of the tuning fork given the geometrical
 arguments $r$, $w$, $\ell_1$ and $\ell_2$. The parameter $n$ controls
@@ -190,7 +190,7 @@ PRINT "  \$n\$   |          \$L\$          |       \$\\Gamma\$        |      \$\
 PRINT   ":------:+:---------------------:+:---------------------:+:-------------:+:--------------:"
 PRINT_VECTOR SEP "\t|\t" i "%+.1e" L Gamma "%.4f" mu Mu  
 PRINT
-PRINT ": $2 wire over $1 mesh, participation and excitation factors \$L\$ and \$\\Gamma\$, effective per-mode and cummulative mass fractions \$\\mu\$ and \$M\$"
+PRINT ": $2 wire over $1 mesh, participation and excitation factors \$L\$ and \$\\Gamma\$, effective per-mode and cumulative mass fractions \$\\mu\$ and \$M\$"
 
 # write the modes into a vtk file
 WRITE_MESH wire-$1-$2.vtk \
@@ -252,7 +252,7 @@ $ feenox wire.fee
 9       |       +5.4e-04        |       +9.9e-02        |       0.0134  |       0.6129
 10      |       +2.7e-05        |       +4.9e-03        |       0.0000  |       0.6129
 
-: copper wire over hex mesh, participation and excitation factors $L$ and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and $M$
+: copper wire over hex mesh, participation and excitation factors $L$ and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and $M$
 $ feenox wire.fee hex copper   | pandoc -o wire-hex-copper.md
 $ feenox wire.fee tet copper   | pandoc -o wire-tet-copper.md
 $ feenox wire.fee hex aluminum | pandoc -o wire-hex-aluminum.md
@@ -283,7 +283,7 @@ copper wire over hex mesh
 | 10  | +5.4e-04 | +9.9e-02 | 0.0134 | 0.6130 |
 
 copper wire over hex mesh, participation and excitation factors $L$ and
-$\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and
+$\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and
 $M$
 
 | $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
@@ -310,7 +310,7 @@ copper wire over tet mesh
 | 10  | -2.2e-04 | -6.9e-02 | 0.0038 | 0.6129 |
 
 copper wire over tet mesh, participation and excitation factors $L$ and
-$\Gamma$, effective per-mode and cummulative mass fractions $\mu$ and
+$\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and
 $M$
 
 | $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
@@ -337,7 +337,7 @@ aluminum wire over hex mesh
 | 10  | -9.5e-06 | -5.2e-03 | 0.0000 | 0.6128 |
 
 aluminum wire over hex mesh, participation and excitation factors $L$
-and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
+and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$
 and $M$
 
 | $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
@@ -364,7 +364,7 @@ aluminum wire over tet mesh
 | 10  | -7.3e-05 | -6.9e-02 | 0.0038 | 0.6129 |
 
 aluminum wire over tet mesh, participation and excitation factors $L$
-and $\Gamma$, effective per-mode and cummulative mass fractions $\mu$
+and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$
 and $M$
 
   [College]: https://www.ib.edu.ar/

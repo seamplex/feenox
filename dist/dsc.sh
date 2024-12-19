@@ -41,6 +41,6 @@ lintian -v -i -I -E --pedantic --profile debian feenox_${version}-1_amd64.buildi
 
 # # check
 # # see https://wiki.ubuntu.com/PbuilderHowto
-# sudo pbuilder create --debootstrapopts --variant=buildd
+# sudo pbuilder create --debootstrapopts --variant=build
 # sudo pbuilder update
 # sudo pbuilder build feenox_${version}-1.dsc

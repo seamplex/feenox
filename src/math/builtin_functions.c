@@ -215,7 +215,7 @@ double feenox_builtin_clock(expr_item_t *f) {
 }
 
 ///fn+wall_time+usage wall_time()
-///fn+wall_time+desc Returns the time ellapsed since the invocation of FeenoX, in seconds.
+///fn+wall_time+desc Returns the time elapsed since the invocation of FeenoX, in seconds.
 double feenox_builtin_wall_time(expr_item_t *f) {
 
 #ifdef HAVE_CLOCK_GETTIME
@@ -384,7 +384,7 @@ double feenox_builtin_last(expr_item_t *f) {
 ///fn+d_dt+desc during a transient problem
 ///fn+d_dt+desc using the difference between the value of the signal in the previous time step
 ///fn+d_dt+desc and the actual value divided by the time step\ $\delta t$ stored in `dt`.
-///fn+d_dt+desc The argument\ $x$ does not neet to be a variable, it can be an expression
+///fn+d_dt+desc The argument\ $x$ does not need to be a variable, it can be an expression
 ///fn+d_dt+desc involving one or more variables that change in time.
 ///fn+d_dt+desc For $t=0$, the return value is zero.
 ///fn+d_dt+desc Unlike the functional `derivative`, the full dependence of these variables with time

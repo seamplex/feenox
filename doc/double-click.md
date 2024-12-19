@@ -15,7 +15,7 @@ a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
 
@@ -29,7 +29,7 @@ With `-h` it gives more information:
 > feenox.exe -h
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
-  -h, --help         display options and detailed explanations of commmand-line usage
+  -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
 
