@@ -53,6 +53,11 @@ work]):
   engineering tool,” *Journal of Open Source Software*, vol. 9, no. 95,
   p. 5846, Mar. 2024, doi: [10.21105/joss.05846].
 
+> ### Open-source web-based UX for FeenoX
+>
+> Take a look at [SunCAE] for an example of how to write a front end for
+> FeenoX.
+
   [FeenoX]: https://seamplex.com/feenox
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [free and open source]: #licensing
@@ -64,6 +69,7 @@ work]):
   [Academic Professor]: README4academics.markdown
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
+  [SunCAE]: https://www.seamplex.com/suncae
 
 ## Extents
 
