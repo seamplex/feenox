@@ -68,6 +68,10 @@ Files:
 Copyright: 2011 Bernhardi
 License: GPL-3.0+
 
+Files:
+ ax_gcc_builtin.m4
+Copyright: 2011 2013 Gabriele Svelto <gabriele.svelto@gmail.com>
+License: MIT
 
 License: GPL-3.0+
  This program is free software: you can redistribute it and/or modify
