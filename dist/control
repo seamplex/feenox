@@ -16,7 +16,6 @@ Vcs-Browser: https://github.com/seamplex/feenox
 
 Package: feenox
 Architecture: any
-Multi-Arch: foreign
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Recommends: gmsh, paraview
 Description: cloud-first free no-X uniX-like finite-element(ish) tool
