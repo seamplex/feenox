@@ -11,8 +11,8 @@ Build-Depends: debhelper-compat (= 13),
 Standards-Version: 4.7.0
 Homepage: https://www.seamplex.com/feenox
 Rules-Requires-Root: no
-Vcs-Git: https://github.com/seamplex/feenox.git
-Vcs-Browser: https://github.com/seamplex/feenox
+Vcs-Git: https://salsa.debian.org/jtheler/feenox.git
+Vcs-Browser: https://salsa.debian.org/jtheler/feenox
 
 Package: feenox
 Architecture: any
