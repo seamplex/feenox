@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's PDE initialization routines
  *
- *  Copyright (C) 2015--2023 Seamplex
+ *  Copyright (C) 2015--2023 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *

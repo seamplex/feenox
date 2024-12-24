@@ -1,8 +1,8 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related second-order quadrangle element routines
  *
- *  Copyright (C) 2017 C.P.Camusso.
- *  Copyright (C) 2018--2023 jeremy theler
+ *  Copyright (C) 2017 C.P. Camusso.
+ *  Copyright (C) 2018--2023 Jeremy Theler
  *
  *  This file is part of feenox.
  *

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related tetrahedron element routines
  *
- *  Copyright (C) 2015--2023 jeremy theler
+ *  Copyright (C) 2015--2023 Jeremy Theler
  *
  *  This file is part of feenox.
  *

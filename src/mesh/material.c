@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's materials
  *
- *  Copyright (C) 2021 jeremy theler
+ *  Copyright (C) 2021 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *

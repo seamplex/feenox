@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox pointer lookup functions
  *
- *  Copyright (C) 2009--2013 jeremy theler
+ *  Copyright (C) 2009--2013 Jeremy Theler
  *
  *  This file is part of feenox.
  *

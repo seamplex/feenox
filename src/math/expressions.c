@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX algebraic expressions evaluation routines
  *
- *  Copyright (C) 2009--2022 jeremy theler
+ *  Copyright (C) 2009--2022 Jeremy Theler
  *
  *  This file is part of Feenox. It is based on ideas posted at
  *  http://stackoverflow.com/questions/1384811/code-golf-mathematical-expression-evaluator-that-respects-pemdas

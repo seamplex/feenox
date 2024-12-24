@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox builtin functionals
  *
- *  Copyright (C) 2009--2024 jeremy theler
+ *  Copyright (C) 2009--2024 Jeremy Theler
  *
  *  This file is part of feenox.
  *

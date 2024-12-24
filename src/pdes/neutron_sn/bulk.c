@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for neutron transport FEM: bulk elements
  *
- *  Copyright (C) 2023 jeremy theler
+ *  Copyright (C) 2023 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *

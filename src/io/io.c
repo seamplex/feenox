@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  wasora I/O routines
  *
- *  Copyright (C) 2009--2015 jeremy theler
+ *  Copyright (C) 2009--2015 Jeremy Theler
  *
  *  This file is part of wasora.
  *

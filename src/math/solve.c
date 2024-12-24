@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox multidimensional root finding instruction
  *
- *  Copyright (C) 2022 jeremy theler
+ *  Copyright (C) 2022 Jeremy Theler
  *
  *  This file is part of feenox.
  *

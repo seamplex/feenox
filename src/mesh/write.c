@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related post-processing generation routines
  *
- *  Copyright (C) 2014--2021 jeremy theler
+ *  Copyright (C) 2014--2021 Jeremy Theler
  *
  *  This file is part of feenox.
  *

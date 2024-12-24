@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's eigen solver using SLEPc routines
  *
- *  Copyright (C) 2021--2023 jeremy theler
+ *  Copyright (C) 2021--2023 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *

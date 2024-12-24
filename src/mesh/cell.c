@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related cell routines
  *
- *  Copyright (C) 2014--2016 jeremy theler
+ *  Copyright (C) 2014--2016 Jeremy Theler
  *
  *  This file is part of feenox.
  *

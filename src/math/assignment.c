@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX assignment of variables/vectors/matrices
  *
- *  Copyright (C) 2009--2021 jeremy theler
+ *  Copyright (C) 2009--2021 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *

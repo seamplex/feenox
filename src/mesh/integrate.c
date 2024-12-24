@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related integration routines
  *
- *  Copyright (C) 2016,2018,2022--2023 jeremy theler
+ *  Copyright (C) 2016,2018,2022--2023 Jeremy Theler
  *
  *  This file is part of feenox.
  *

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser for mechanical-specific keywords
  *
- *  Copyright (C) 2022--2023 jeremy theler
+ *  Copyright (C) 2022--2023 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *

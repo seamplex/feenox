@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's approach to handling distributions of properties
  *
- *  Copyright (C) 2015-2021 jeremy theler
+ *  Copyright (C) 2015-2021 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *

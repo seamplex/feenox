@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox error handling functions
  *
- *  Copyright (C) 2009--2013,2020 jeremy theler
+ *  Copyright (C) 2009--2013,2020 Jeremy Theler
  *
  *  This file is part of feenox.
  *

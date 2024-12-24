@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX's mesh-related element header
  *
- *  Copyright (C) 2021--2023 jeremy theler
+ *  Copyright (C) 2021--2023 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *

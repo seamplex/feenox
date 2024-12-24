@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox method for stress linearization over SCLs according to ASME
  *
- *  Copyright (C) 2017-2022 jeremy theler
+ *  Copyright (C) 2017-2022 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *

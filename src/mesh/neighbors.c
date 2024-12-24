@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related neighbor routines
  *
- *  Copyright (C) 2014--2018 jeremy theler
+ *  Copyright (C) 2014--2018 Jeremy Theler
  *
  *  This file is part of feenox.
  *

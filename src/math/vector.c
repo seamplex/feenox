@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX vector routines
  *
- *  Copyright (C) 2015--2017 jeremy theler
+ *  Copyright (C) 2015--2017 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *

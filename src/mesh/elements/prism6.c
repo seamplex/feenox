@@ -1,8 +1,8 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related prism element routines
  *
- *  Copyright (C) 2015 jeremy theler & ezequiel manavela chiapero
- *  Copyright (C) 2017--2023 jeremy theler
+ *  Copyright (C) 2015 Ezequiel Manavela Chiapero
+ *  Copyright (C) 2015,2017--2023 Jeremy Theler
  *
  *  This file is part of feenox.
  *

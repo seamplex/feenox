@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox cleanup routines
  *
- *  Copyright (C) 2009--2018,2020 jeremy theler
+ *  Copyright (C) 2009--2018,2020 Jeremy Theler
  *
  *  This file is part of feenox.
  *

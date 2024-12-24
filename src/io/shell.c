@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  wasora shell routines
  *
- *  Copyright (C) 2012--2013 jeremy theler
+ *  Copyright (C) 2012--2013 Jeremy Theler
  *
  *  This file is part of wasora.
  *

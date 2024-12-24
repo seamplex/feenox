@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to compute stresses
  *
- *  Copyright (C) 2021-2023 jeremy theler
+ *  Copyright (C) 2021-2023 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *

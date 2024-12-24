@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  wasora shared memory routines
  *
- *  Copyright (C) 2009--2014 jeremy theler
+ *  Copyright (C) 2009--2014 Jeremy Theler
  *
  *  This file is part of wasora.
  *

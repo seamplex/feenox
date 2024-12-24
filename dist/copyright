@@ -33,7 +33,42 @@ Files:
 Copyright: 2003-2022, Troy D. Hanson <http://troydhanson.github.com/uthash/>
 License: BSD-1-clause
 
-  
+Files:
+ src/mesh/elements/hexa27.c src/mesh/elements/quad9.c src/mesh/elements/quad8.c src/mesh/elements/hexa20.c
+Copyright: 2014-2017 C.P. Camusso
+License: GPL-3.0+
+ 
+Files:
+ src/mesh/elements/prism15.c src/mesh/elements/prism6.c
+Copyright: 2015 Ezequiel Manavela Chiapero
+License: GPL-3.0+
+
+Files:
+ src/flow/debug.c
+Copyright: 2015 Juan Pablo Gomez Omil
+License: GPL-3.0+
+
+Files:
+ doc/include-files.lua
+Copyright: 2019--2021 Albert Krewinkel
+License: MIT
+
+Files:
+ doc/include-code-files.lua
+Copyright: 2020 Bruno BEAUFILS
+License: MIT
+
+Files:
+ doc/tutorials/120-mazes/dxf2geo.cpp
+Copyright: 1997-2008 C. Geuzaine, J.-F. Remacle
+License: GPL-3.0+
+
+Files:
+ tests/nafems/le10/unical1.c
+Copyright: 2011 Bernhardi
+License: GPL-3.0+
+
+
 License: GPL-3.0+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -107,3 +142,9 @@ License: FSFAP
  notice and this notice are preserved.  This file is offered as-is,
  without any warranty.
  
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's problem-solving routines
  *
- *  Copyright (C) 2021--2022 jeremy theler
+ *  Copyright (C) 2021--2022 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *

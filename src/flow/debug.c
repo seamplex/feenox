@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  wasora debug function
  *
- *  Copyright (C) 2013 jeremy theler
+ *  Copyright (C) 2013 Jeremy Theler
  *  Copyright (C) 2015 Juan Pablo Gomez Omil
  *
  *  This file is part of wasora.

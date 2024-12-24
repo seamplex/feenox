@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  wasora M4 routines
  *
- *  Copyright (C) 2015--2020 jeremy theler
+ *  Copyright (C) 2015--2020 Jeremy Theler
  *
  *  This file is part of wasora.
  *

@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX builtin functions
  *
- *  Copyright (C) 2009--2023 jeremy theler
+ *  Copyright (C) 2009--2023 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *

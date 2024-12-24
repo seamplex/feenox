@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  wasora user routine calling
  *
- *  Copyright (C) 2009--2013 jeremy theler
+ *  Copyright (C) 2009--2013 Jeremy Theler
  *
  *  This file is part of wasora.
  *

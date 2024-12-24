@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's non-linear solver using PETSc routines
  *
- *  Copyright (C) 2020--2021 jeremy theler
+ *  Copyright (C) 2020--2021 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *

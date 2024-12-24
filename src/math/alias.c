@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX alias routines
  *
- *  Copyright (C) 2015 jeremy theler
+ *  Copyright (C) 2015 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *
