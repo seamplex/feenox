@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related geometry routines
  *
- *  Copyright (C) 2014--2023 Jeremy Theler
+ *  Copyright (C) 2014--2024 Jeremy Theler
  *
  *  This file is part of feenox.
  *
@@ -94,17 +94,13 @@ double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a)
 
 
 // TODO: make a faster one assuming the elements are already oriented
-int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
-
-  // gcc14 with optimizations give segfault with these extra dummy assignments
-  // double opt_breaker = 0;
+int feenox_mesh_compute_outward_normal(element_t *element, double n[3]) {
 
   // TODO: a method linked to the element type
   if (element->type->dim == 0) {
     n[0] = 1;
     n[1] = 0;
     n[2] = 0;
-    // opt_breaker = n[0];
     
   } else if (element->type->dim == 1) {
 
@@ -126,8 +122,6 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
     feenox_push_error_message("trying to compute the outward normal of a volume (element %d)", element->tag);
     return FEENOX_ERROR;
   }
-
-  // opt_breaker = n[0];
 
   // if there's only one volumetric element, we check if n is the outward normal
   // if there's none (or more than one) then we rely on the element orientation

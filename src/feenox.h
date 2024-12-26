@@ -2327,7 +2327,7 @@ extern double feenox_mesh_subtract_module(const double *b, const double *a);
 extern double feenox_mesh_subtract_squared_module(const  double *b, const  double *a);
 extern double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a);
 
-extern int feenox_mesh_compute_outward_normal(element_t *element, double *n);
+extern int feenox_mesh_compute_outward_normal(element_t *element, double n[3]);
 
 // element.c
 extern int feenox_mesh_compute_normal_2d(element_t *e);
