@@ -100,7 +100,8 @@ int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_
         reflected[d] = neutron_sn.Omega[m][d] - 2*Omega_dot_outward * outward_normal[d];
       }
 
-      for (unsigned int m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
+      unsigned int m_prime = 0; // leave this out of the loop, it is used below
+      for (m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
         if (fabs(reflected[0] - neutron_sn.Omega[m_prime][0]) < eps &&
             fabs(reflected[1] - neutron_sn.Omega[m_prime][1]) < eps &&
             fabs(reflected[2] - neutron_sn.Omega[m_prime][2]) < eps) {

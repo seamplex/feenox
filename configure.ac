@@ -125,6 +125,8 @@ AC_ARG_WITH(
  
 have_sundials="no"
 AS_IF([test "x${with_sundials}" != "xno"] , [
+  CC_OLD=$CC
+  CC=mpicc
   AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"], AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev headers failed]))
@@ -147,6 +149,7 @@ AS_IF([test "x${with_sundials}" != "xno"] , [
       AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev library failed])
     )  
   )
+  CC=$CC_OLD
 ])
 
 # check if we have everything
