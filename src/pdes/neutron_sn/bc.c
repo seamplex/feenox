@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for neutron transport FEM: boundary conditions
  *
- *  Copyright (C) 2023 Jeremy Theler
+ *  Copyright (C) 2023--2024 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -64,7 +64,7 @@ int feenox_problem_bc_parse_neutron_sn(bc_data_t *bc_data, const char *lhs, char
 int feenox_problem_bc_set_neutron_sn_vacuum(bc_data_t *this, element_t *e, size_t j_global) {
 
 #ifdef HAVE_PETSC
-  double outward_normal[3];
+  PetscScalar outward_normal[3] = {0,0,0};
   feenox_call(feenox_mesh_compute_outward_normal(e, outward_normal));
   for (unsigned m = 0; m < neutron_sn.directions; m++) {
     if (feenox_mesh_dot(neutron_sn.Omega[m], outward_normal) < 0) {
@@ -83,10 +83,10 @@ int feenox_problem_bc_set_neutron_sn_vacuum(bc_data_t *this, element_t *e, size_
 int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_t j_global) {
   
 #ifdef HAVE_PETSC
-  double outward_normal[3];
-  double reflected[3];
-  double Omega_dot_outward = 0;
-  double eps = feenox_var_value(feenox.mesh.vars.eps);
+  PetscScalar outward_normal[3] = {0,0,0};
+  PetscScalar reflected[3] = {0,0,0};
+  PetscScalar Omega_dot_outward = 0;
+  PetscScalar eps = feenox_var_value(feenox.mesh.vars.eps);
   
   // TODO: mark the BC as dependent on the normal and compute it in the caller
   feenox_call(feenox_mesh_compute_outward_normal(e, outward_normal));
@@ -100,8 +100,7 @@ int feenox_problem_bc_set_neutron_sn_mirror(bc_data_t *this, element_t *e, size_
         reflected[d] = neutron_sn.Omega[m][d] - 2*Omega_dot_outward * outward_normal[d];
       }
 
-      unsigned int m_prime = 0;
-      for (m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
+      for (unsigned int m_prime = 0; m_prime < neutron_sn.directions; m_prime++) {
         if (fabs(reflected[0] - neutron_sn.Omega[m_prime][0]) < eps &&
             fabs(reflected[1] - neutron_sn.Omega[m_prime][1]) < eps &&
             fabs(reflected[2] - neutron_sn.Omega[m_prime][2]) < eps) {

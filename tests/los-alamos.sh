@@ -15,7 +15,6 @@ checkpde neutron_sn
 
 # one group
 gmsh -v 0 -1 ${dir}/la-IN.geo || exit $?
-valgrind ./feenox tests/la-p01-PUa-1-0-IN.fee
 answerzero la-p01-PUa-1-0-IN.fee
 exitifwrong $?
 
