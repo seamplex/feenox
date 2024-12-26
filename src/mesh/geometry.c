@@ -116,7 +116,8 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   
   } else if (element->type->dim == 2) {
     
-    double a[3], b[3];
+    double a[3] = {0,0,0};
+    double b[3] = {0,0,0};
     feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
     feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
     feenox_mesh_normalized_cross(a, b, n);
