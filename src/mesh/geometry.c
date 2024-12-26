@@ -96,19 +96,21 @@ double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a)
 // TODO: make a faster one assuming the elements are already oriented
 int feenox_mesh_compute_outward_normal(element_t *element, double n[3]) {
 
+  double local_n[3] = {n[0], n[1], n[2]};
+  
   // TODO: a method linked to the element type
   if (element->type->dim == 0) {
-    n[0] = 1;
-    n[1] = 0;
-    n[2] = 0;
+    local_n[0] = 1;
+    local_n[1] = 0;
+    local_n[2] = 0;
     
   } else if (element->type->dim == 1) {
 
     // WATCH out! this does not work with lines which do not lie on the xy plane!
     double module = feenox_mesh_subtract_module(element->node[1]->x, element->node[0]->x);
-    n[0] = -(element->node[1]->x[1] - element->node[0]->x[1])/module;
-    n[1] = +(element->node[1]->x[0] - element->node[0]->x[0])/module;
-    n[2] = 0;
+    local_n[0] = -(element->node[1]->x[1] - element->node[0]->x[1])/module;
+    local_n[1] = +(element->node[1]->x[0] - element->node[0]->x[0])/module;
+    local_n[2] = 0;
   
   } else if (element->type->dim == 2) {
     
@@ -116,7 +118,7 @@ int feenox_mesh_compute_outward_normal(element_t *element, double n[3]) {
     double b[3] = {0,0,0};
     feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
     feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
-    feenox_mesh_normalized_cross(a, b, n);
+    feenox_mesh_normalized_cross(a, b, local_n);
 
   } else if (element->type->dim == 3) {
     feenox_push_error_message("trying to compute the outward normal of a volume (element %d)", element->tag);
@@ -139,17 +141,21 @@ int feenox_mesh_compute_outward_normal(element_t *element, double n[3]) {
 
     // compute the product between the proposed normal and the difference between these two
     // if the product is positive, invert the normal
-    if (feenox_mesh_subtract_dot(volumetric_neighbor_center, surface_center, n) > 0) {
-      n[0] = -n[0];
-      n[1] = -n[1];
-      n[2] = -n[2];
+    if (feenox_mesh_subtract_dot(volumetric_neighbor_center, surface_center, local_n) > 0) {
+      local_n[0] = -local_n[0];
+      local_n[1] = -local_n[1];
+      local_n[2] = -local_n[2];
     }
   }
 
   // update nx ny and nz
-  feenox_var_value(feenox.mesh.vars.arr_n[0]) = n[0];
-  feenox_var_value(feenox.mesh.vars.arr_n[1]) = n[1];
-  feenox_var_value(feenox.mesh.vars.arr_n[2]) = n[2];
+  feenox_var_value(feenox.mesh.vars.arr_n[0]) = local_n[0];
+  feenox_var_value(feenox.mesh.vars.arr_n[1]) = local_n[1];
+  feenox_var_value(feenox.mesh.vars.arr_n[2]) = local_n[2];
 
+  n[0] = local_n[0];
+  n[1] = local_n[1];
+  n[2] = local_n[2];
+  
   return FEENOX_OK;
 }
