@@ -95,15 +95,16 @@ double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a)
 
 // TODO: make a faster one assuming the elements are already oriented
 int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
-  
-  double a[3], b[3], surface_center[3], volumetric_neighbor_center[3];
-  element_t *volumetric_neighbor = NULL;
+
+  // gcc14 with optimizations give segfault with these extra dummy assignments
+  double opt_breaker = 0;
 
   // TODO: a method linked to the element type
   if (element->type->dim == 0) {
     n[0] = 1;
     n[1] = 0;
-    n[2] = 0;    
+    n[2] = 0;
+    opt_breaker = n[0];
     
   } else if (element->type->dim == 1) {
 
@@ -115,6 +116,7 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
   
   } else if (element->type->dim == 2) {
     
+    double a[3], b[3];
     feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
     feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
     feenox_mesh_normalized_cross(a, b, n);
@@ -124,15 +126,20 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
     return FEENOX_ERROR;
   }
 
-  
+  opt_breaker = n[0];
+
   // if there's only one volumetric element, we check if n is the outward normal
   // if there's none (or more than one) then we rely on the element orientation
   if (feenox_mesh_count_element_volumetric_neighbors(element) == 1) {
     // first compute the center of the surface element
+    double surface_center[3];
     feenox_call(feenox_mesh_compute_element_barycenter(element, surface_center));
 
     // then the center of the volume element
+    element_t *volumetric_neighbor = NULL;
     volumetric_neighbor = feenox_mesh_find_element_volumetric_neighbor(element);
+
+    double volumetric_neighbor_center[3];
     feenox_call(feenox_mesh_compute_element_barycenter(volumetric_neighbor, volumetric_neighbor_center));
 
     // compute the product between the proposed normal and the difference between these two
@@ -143,11 +150,11 @@ int feenox_mesh_compute_outward_normal(element_t *element, double *n) {
       n[2] = -n[2];
     }
   }
-  
+
   // update nx ny and nz
   feenox_var_value(feenox.mesh.vars.arr_n[0]) = n[0];
   feenox_var_value(feenox.mesh.vars.arr_n[1]) = n[1];
   feenox_var_value(feenox.mesh.vars.arr_n[2]) = n[2];
-     
+
   return FEENOX_OK;
 }
