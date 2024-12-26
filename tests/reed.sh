@@ -14,6 +14,7 @@ checkpde neutron_sn
 
 gmsh -v 0 -1 ${dir}/reed.geo || exit $?
 
+valgrind ../feenox reed.fee 2 0.08
 answer1zero reed.fee 2 0.08
 exitifwrong $?
 
