@@ -27,7 +27,7 @@ jobs:
         run: ./autogen.sh
         
       - name: Configure
-        run: ./configure CFLAGS="-g -O0"
+        run: ./configure
 
       - name: Compile
         run: make
