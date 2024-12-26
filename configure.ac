@@ -90,12 +90,12 @@ AX_GCC_BUILTIN(__builtin_expect)
 #AS_IF([test "x${with_readline}" != "xno"] , [
   #AC_CHECK_HEADER([readline/readline.h],
     #[],
-    #AS_IF([test "x${with_readline}" != "xcheck"], AC_MSG_FAILURE([--with-readline was given, but test for readline headers failed]))
+    #AS_IF([test "x${with_readline}" != "xcheck"], AC_MSG_FAILURE([--with-readline was given but test for readline headers failed]))
   #)
   #AC_CHECK_LIB([readline], [readline],
     #[],
     #AS_IF([test "x${with_readline}" != "xcheck"],
-      #AC_MSG_FAILURE([--with-readline was given, but test for readline library failed])
+      #AC_MSG_FAILURE([--with-readline was given but test for readline library failed])
     #)
   #)  
 #])
@@ -127,24 +127,24 @@ have_sundials="no"
 AS_IF([test "x${with_sundials}" != "xno"] , [
   AC_CHECK_HEADERS([sundials/sundials_types.h ida/ida.h sundials/sundials_linearsolver.h],
     [],
-    AS_IF([test "x${with_sundials}" != "xcheck"], AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev headers failed]))
+    AS_IF([test "x${with_sundials}" != "xcheck"], AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev headers failed]))
   )
   AC_CHECK_LIB([sundials_ida], [IDAInit],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev library failed])
+      AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev library failed])
     )
   )  
   AC_CHECK_HEADER([nvector/nvector_serial.h],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev library failed])
+      AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev library failed])
     )
   )
   AC_CHECK_LIB([sundials_nvecserial], [N_VNew_Serial],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],
-      AC_MSG_FAILURE([--with-sundials was given, but test for libsundials-dev library failed])
+      AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev library failed])
     )  
   )
 ])
