@@ -2314,7 +2314,6 @@ extern int feenox_mesh_elements_info(void);
 extern int feenox_mesh_elements_info_geo(element_type_t *element_type);
 
 // geom.c
-// TODO: rename mesh_* -> feenox_mesh_*
 extern void feenox_mesh_subtract(const double *a, const double *b, double *c);
 extern void feenox_mesh_cross(const double *a, const double *b, double *c);
 extern void feenox_mesh_normalized_cross(const double *a, const double *b, double *c);
@@ -2327,7 +2326,7 @@ extern double feenox_mesh_subtract_module(const double *b, const double *a);
 extern double feenox_mesh_subtract_squared_module(const  double *b, const  double *a);
 extern double feenox_mesh_subtract_squared_module2d(const  double *b, const  double *a);
 
-extern int feenox_mesh_compute_outward_normal(element_t *element, double n[3]);
+extern int feenox_mesh_compute_outward_normal(element_t *element, double n[3]) __attribute__((noinline));
 
 // element.c
 extern int feenox_mesh_compute_normal_2d(element_t *e);
@@ -2348,8 +2347,8 @@ extern int feenox_mesh_write_data_vtk(mesh_write_t *, mesh_write_dist_t *dist);
 
 
 // neighbors.c
-extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *);
-extern int feenox_mesh_count_element_volumetric_neighbors(element_t *this);
+extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *e)  __attribute__((noinline));
+extern int feenox_mesh_count_element_volumetric_neighbors(element_t *e)  __attribute__((noinline));
 
 
 // init.c

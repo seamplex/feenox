@@ -19,7 +19,6 @@ dist_doc_DATA = AUTHORS \
                 
 dist_man_MANS = doc/feenox.1
 
-
 TESTS = \
         tests/abort.sh \
         tests/algebraic_expr.sh \
