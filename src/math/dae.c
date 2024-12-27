@@ -198,7 +198,7 @@ char *feenox_find_first_dot(const char *s) {
 int feenox_dae_init(void) {
   
 #ifdef HAVE_SUNDIALS
-  if (sizeof(realtype) != sizeof(double)) {
+  if (sizeof(sunrealtype) != sizeof(double)) {
     feenox_push_error_message("SUNDIALS's realtype is not double");
     return FEENOX_ERROR;
   }
@@ -480,7 +480,7 @@ int feenox_dae_ic(void) {
 
 
 #ifdef HAVE_SUNDIALS
-int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params) {
+int feenox_ida_dae(sunrealtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params) {
 
   // this function is called many times in a single FeenoX time step for intermediate
   // times which are internal to IDA, nevertheless there might be some residuals

@@ -20,7 +20,7 @@ exitifwrong $?
 # check TIME_PATH
 echo -n "time_path_raw.fee ... "
 
-if [ "x$(${feenox} ${dir}/time_path_sundials.fee | wc -l)" != "x5" ]; then
+if [ "x$(${feenox} ${dir}/time_path_raw.fee | wc -l)" != "x5" ]; then
   echo "failed"
   return 1
 fi

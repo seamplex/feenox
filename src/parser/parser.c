@@ -2123,7 +2123,7 @@ int feenox_parse_phase_space(void) {
     return FEENOX_ERROR;
   }
 #ifdef HAVE_SUNDIALS
-  if (sizeof(realtype) != sizeof(double)) {
+  if (sizeof(sunrealtype) != sizeof(double)) {
     feenox_push_error_message("\nSUNDIALS was compiled using a different word size than FeenoX, please recompile with double precision floating point arithmetic.");
     return FEENOX_ERROR;
   }
