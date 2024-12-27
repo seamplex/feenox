@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related neighbor routines
  *
- *  Copyright (C) 2014--2018 Jeremy Theler
+ *  Copyright (C) 2014--2024 Jeremy Theler
  *
  *  This file is part of feenox.
  *
@@ -61,26 +61,20 @@ element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *this) {
 }
 
 int feenox_mesh_count_element_volumetric_neighbors(element_t *this) {
-
-  // en mallas de primer orden esto sirve para mezclar elementos raros
-  // en segundo hay que hacerlo completo
-//  int target = (this->type->order == 1) ? this->type->dim : this->type->nodes;
-  int target = this->type->nodes;
-
   size_t tags[this->type->faces];
-  for (unsigned int k = 0; k < this->type->faces; k++) {
+  for (int k = 0; k < this->type->faces; k++) {
     tags[k] = 0;
   }
   
   element_ll_t *element_item = NULL;
-  unsigned int index = 0;
+  int index = 0;
   int n = 0;
-  for (unsigned int j = 0; j < this->type->nodes; j++) {
+  for (int j = 0; j < this->type->nodes; j++) {
     LL_FOREACH(this->node[j]->element_list, element_item) {
       if (this->type->dim == (element_item->element->type->dim-1)) {  // los vecinos volumetricos
-        if (mesh_count_common_nodes(this, element_item->element, NULL) >= target) {
+        if (mesh_count_common_nodes(this, element_item->element, NULL) >= this->type->nodes) {
           int exists = 0;
-          for (unsigned int k = 0; exists == 0 && k < index; k++) {
+          for (int k = 0; exists == 0 && k < index; k++) {
             exists |= (element_item->element->tag == tags[k]);
           }
           if (exists == 0) {
