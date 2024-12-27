@@ -345,7 +345,13 @@ int feenox_dae_init(void) {
  
   int err = 0; // this is used inside the ida_call() macro
 #if SUNDIALS_VERSION_MAJOR >= 6
+ #ifdef SUNDIALS_MPI_ENABLED
+  MPI_Init(NULL, NULL);
+  ida_call(SUNContext_Create(MPI_COMM_WORLD, &feenox.dae.ctx));
+ #else
   ida_call(SUNContext_Create(NULL, &feenox.dae.ctx));
+ #endif
+
   feenox_check_alloc(feenox.dae.x = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
   feenox_check_alloc(feenox.dae.dxdt = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
   feenox_check_alloc(feenox.dae.id = N_VNew_Serial(feenox.dae.dimension, feenox.dae.ctx));
