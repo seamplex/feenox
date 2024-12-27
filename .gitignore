@@ -89,3 +89,4 @@ circle*.msh
 airfoil-converged.msh
 airfoil-converged.vtk
 circle_perimeter*.dat
+wilson-2d*.vtk
