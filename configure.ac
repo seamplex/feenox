@@ -137,6 +137,12 @@ AS_IF([test "x${with_sundials}" != "xno"] , [
       AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev library failed])
     )
   )  
+  AC_CHECK_LIB([sundials_core], [SUNContext_Create],
+    [],
+    AS_IF([test "x${with_sundials}" != "xcheck"],
+      AC_MSG_FAILURE([--with-sundials was given but test for libsundials-dev library failed])
+    )
+  )  
   AC_CHECK_HEADER([nvector/nvector_serial.h],
     [],
     AS_IF([test "x${with_sundials}" != "xcheck"],

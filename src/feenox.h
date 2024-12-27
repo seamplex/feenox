@@ -72,12 +72,16 @@
 
 #ifdef HAVE_SUNDIALS
  #include <ida/ida.h>
- #include <ida/ida_direct.h>
+ // #include <ida/ida_direct.h>
  #include <nvector/nvector_serial.h>
  #include <sundials/sundials_types.h>
  #include <sundials/sundials_math.h>
  #include <sunmatrix/sunmatrix_dense.h>
  #include <sunlinsol/sunlinsol_dense.h>
+ 
+ #ifndef sunrealtype 
+  #define sunrealty realtype
+ #endif
 #endif
 
 // petsc complains if its headers are included from c++ within extern C
@@ -2094,7 +2098,7 @@ extern int feenox_add_dae(const char *lhs, const char *rhs);
 extern int feenox_dae_init(void);
 extern int feenox_dae_ic(void);
 #ifdef HAVE_SUNDIALS
-extern int feenox_ida_dae(realtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params);
+extern int feenox_ida_dae(sunrealtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *params);
 #else
 extern int feenox_ida_dae(void);
 #endif
