@@ -345,7 +345,7 @@ int feenox_dae_init(void) {
  
   int err = 0; // this is used inside the ida_call() macro
 #if SUNDIALS_VERSION_MAJOR >= 6
- #ifdef SUNDIALS_MPI_ENABLED
+ #if defined(SUNDIALS_MPI_ENABLED) && defined(PETSC_HAVE_MPI_COUNT)
   MPI_Init(NULL, NULL);
   ida_call(SUNContext_Create(MPI_COMM_WORLD, &feenox.dae.ctx));
  #else
