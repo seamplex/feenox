@@ -8,6 +8,7 @@ if [ -e src/feenox-${version}.tar.gz ]; then
   cp src/feenox-${version}.tar.gz .
 else
   wget https://seamplex.com/feenox/dist/src/feenox-${version}.tar.gz
+  cp feenox-${version}.tar.gz src
 fi
 
 rm -rf feenox-${version}
@@ -18,9 +19,26 @@ debmake
 cp ../README.Debian ../control ../copyright ../rules ../watch debian/
 cp ../metadata debian/upstream
 m4 -Dfeenox_version=${version} ../changelog > debian/changelog
-rm -f debian/source/control debian/tests/control debian/patches/series debian/source/local-options debian/source/options debian/source/patch-header
-rmdir debian/patches
+rm -f debian/source/control \
+      debian/tests/control \
+      debian/patches/series \
+      debian/source/local-options \
+      debian/source/options \
+      debian/source/patch-header \
+      debian/*.ex \
+      debian/source/*.ex \
+      debian/clean \
+      debian/dirs \
+      debian/gbp.conf \
+      debian/install \
+      debian/links
+rmdir debian/patches debian/tests
 rm -f COPYING debian/feenox/usr/share/doc/feenox/COPYRIGHT.gz
+
+# copy the debian directory to dist
+rm -rf ../debian
+cp -r debian ..
+exit
 
 export DEBEMAIL="jeremy@seamplex.com"
 export DEBFULLNAME="Jeremy Theler"
