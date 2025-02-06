@@ -5,23 +5,58 @@ Upstream-Contact: Jeremy Theler <jeremy@seamplex.com>
 
 Files:
  *
-Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
+Copyright: 2025 Jeremy Theler <jeremy@seamplex.com>
 License: GPL-3.0+
 
 Files:
  doc/*
-Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
-License: GFDL-1.3+
+Copyright: 2025 Jeremy Theler <jeremy@seamplex.com>
+License: CC BY-SA 4.0
 
 Files:
  debian/*
-Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
+Copyright: 2025 Jeremy Theler <jeremy@seamplex.com>
 License: GPL-3.0+
 
-Files:
- README INSTALL config* *.m4
+Files: README
 Copyright: 2024 Jeremy Theler <jeremy@seamplex.com>
 License: FSFAP
+
+Files: INSTALL
+Copyright: 1994-1996, 1999-2002, 2004-2016 Free Software Foundation, Inc.
+License: FSFULLR
+
+Files: Makefile.in src/Makefile.in
+Copyright: 1994-2021 Free Software Foundation, Inc.
+License: FSFULLR
+
+Files: aclocal.m4
+Copyright: 1996-2021 Free Software Foundation, Inc.
+License: FSFULLR
+
+Files: config.guess config.sub
+Copyright: 1992-2021 Free Software Foundation, Inc.
+License: GPL-2+ with Autoconf-data exception
+
+Files: configure
+Copyright: 1992-1996, 1998-2017, 2020-2021 Free Software Foundation, Inc.
+License: FSFAP
+
+Files: missing
+Copyright: 1996-2021 Free Software Foundation, Inc.
+License: GPL-2+ with Autoconf-data exception
+
+Files: compile depcomp
+Copyright: 1999-2021 Free Software Foundation, Inc.
+License: GPL-2+ with Autoconf-data exception
+
+Files: test-driver
+Copyright: 2011-2021 Free Software Foundation, Inc.
+License: GPL-2+ with Autoconf-data exception
+
+Files: install-sh
+Copyright: 1994 X Consortium
+License: X11
 
 Files:
  src/contrib/kdtree.*
@@ -51,12 +86,12 @@ License: GPL-3.0+
 Files:
  doc/include-files.lua
 Copyright: 2019--2021 Albert Krewinkel
-License: MIT
+License: Expat
 
 Files:
  doc/include-code-files.lua
 Copyright: 2020 Bruno BEAUFILS
-License: MIT
+License: Expat
 
 Files:
  doc/tutorials/120-mazes/dxf2geo.cpp
@@ -71,7 +106,8 @@ License: GPL-3.0+
 Files:
  ax_gcc_builtin.m4
 Copyright: 2011 2013 Gabriele Svelto <gabriele.svelto@gmail.com>
-License: MIT
+License: Expat
+
 
 License: GPL-3.0+
  This program is free software: you can redistribute it and/or modify
@@ -89,14 +125,6 @@ License: GPL-3.0+
  .
  On Debian systems, the complete text of the GNU General Public License
  Version 3 can be found in `/usr/share/common-licenses/GPL-3'.
-
-License: GFDL-1.3+
- Permission is granted to copy, distribute and/or modify this document
- under the terms of the GNU Free Documentation License, Version 1.3
- or any later version published by the Free Software Foundation.
- .
- On Debian systems, the complete text of the GNU Free Documentation
- License can be found in `/usr/share/common-licenses/GFDL-1.3'.
 
 License: BSD-3-clause
  Redistribution and use in source and binary forms, with or without
@@ -141,14 +169,76 @@ License: BSD-1-clause
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: FSFAP
- Copying and distribution of this file, with or without modification,
- are permitted in any medium without royalty provided the copyright
- notice and this notice are preserved.  This file is offered as-is,
- without any warranty.
+ This file is free software; the Free Software Foundation gives
+ unlimited permission to copy, distribute and modify it.
+
+License: FSFULLR
+ This file is free software; the Free Software Foundation
+ gives unlimited permission to copy and/or distribute it,
+ with or without modifications, as long as this notice is preserved.
  
-License: MIT
+License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
+ .
  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
+ .
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+License: X11
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, distribute with modifications, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ .
+ Except as contained in this notice, the name(s) of the above copyright
+ holders shall not be used in advertising or otherwise to promote the
+ sale, use or other dealings in this Software without prior written
+ authorization.
+
+License: GPL-2+ with Autoconf-data exception
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2, or (at your option)
+ any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ As a special exception to the GNU General Public License, if you
+ distribute this file as part of a program that contains a
+ configuration script generated by Autoconf, you may include it under
+ the same distribution terms that you use for the rest of that program.
+
+License: CC BY-SA 4.0
+ You are free to:
+ .
+  * Share: Copy and redistribute the material in any medium or format.
+  * Adapt: Remix, transform, and build upon the material for any purpose, even commercially.
+ .
+ Under the following terms:
+ .
+  * Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+  * ShareAlike: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+  * No additional restrictions: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+ .
+ You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable exception or limitation.
+ .
+ No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.

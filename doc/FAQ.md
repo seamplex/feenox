@@ -95,7 +95,7 @@ Contributions are welcome. Check out the [contributing guidelines](https://www.s
 TL;DR:
 
  * The code is GPLv3+: you can use it, modify it and re-distribute it freely (as in free speech) as long as you keep the same licensing terms.
- * The documentation is released under the terms of the GNU Free Documentation License version 1.3 or, at your option, any later version: same thing but with particular considerations for documentation instead of code.
+ * The documentation is released under the terms of the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)
  
 ```include
 licensing.md

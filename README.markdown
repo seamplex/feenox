@@ -487,8 +487,8 @@ program either to fix bugs, improve it or add new features is free to do
 so. And if they do not know how to program, the have the freedom to hire
 a programmer to do it without needing to ask permission to the original
 authors. Even more, [the documentation] is released under the terms of
-the [GNU Free Documentation License] so these new (or modified) features
-can be properly documented as well.
+the [Creative Commons Attribution-ShareAlike 4.0 International License]
+so these new (or modified) features can be properly documented as well.
 
 Nevertheless, since these original authors are the copyright holders,
 they still can use it to either enforce or prevent further actions from
@@ -535,7 +535,7 @@ chains running over free and open source operating systems.
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
   [5]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
-  [GNU Free Documentation License]: https://www.gnu.org/licenses/fdl-1.3.html
+  [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
 
 ## Contributing
@@ -581,7 +581,6 @@ Follow us: [YouTube][] [LinkedIn][] [Github]
 
 ------------------------------------------------------------------------
 
-FeenoX is copyright ©2009-2024 [Seamplex]  
 FeenoX is licensed under [GNU GPL version 3] or (at your option) any
 later version.  
 FeenoX is free software: you are free to change and redistribute it.  
@@ -590,5 +589,4 @@ There is **NO WARRANTY**, to the extent permitted by law.
   [YouTube]: https://www.youtube.com/channel/UCC6SzVLxO8h6j5rLlfCQPhA
   [LinkedIn]: https://www.linkedin.com/company/seamplex/
   [Github]: https://github.com/seamplex
-  [Seamplex]: https://www.seamplex.com
   [GNU GPL version 3]: http://www.gnu.org/copyleft/gpl.html

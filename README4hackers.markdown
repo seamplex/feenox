@@ -116,10 +116,10 @@ Unlike these other FEA tools, FeenoX provides…
   not know what a weak form is (even though other “similar” tools ask
   their users for that).
 
-- a [Git repository] with [GPL sources] (and [FDL documentation]) where
-  [contributions are welcome]. In particular, each partial differential
-  equation that FeenoX can solve correspondens to one of the
-  subdirectories of `src/pdes` that provide [C entry points that the
+- a [Git repository] with [GPL sources] (and [CC-BY SA documentation])
+  where [contributions are welcome]. In particular, each partial
+  differential equation that FeenoX can solve correspondens to one of
+  the subdirectories of `src/pdes` that provide [C entry points that the
   main mathematical framework calls as function pointer to build the
   elemental objects]. The `autogen.sh` step (prior to `./configure` and
   `make`) detects the directory structure and includes all the
@@ -232,7 +232,7 @@ and will not compute things that are not actually needed).
   [users]: README4engineers.md
   [Git repository]: https://github.com/seamplex/feenox
   [GPL sources]: https://github.com/seamplex/feenox/tree/main/src
-  [FDL documentation]: https://github.com/seamplex/feenox/tree/main/doc
+  [CC-BY SA documentation]: https://github.com/seamplex/feenox/tree/main/doc
   [contributions are welcome]: https://www.seamplex.com/feenox/doc/#contributing
   [C entry points that the main mathematical framework calls as function pointer to build the elemental objects]:
     https://seamplex.com/feenox/doc/sds.html#sec:extensibility

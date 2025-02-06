@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX version and description routines
  *
- *  Copyright (C) 2009--2024 Jeremy Theler
+ *  Copyright (C) 2009--2025 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *
@@ -141,10 +141,10 @@ void feenox_copyright(void) {
   /* It is important to separate the year from the rest of the message,
      as done here, to avoid having to retranslate the message when a new
      year comes around.  */  
-  printf("Copyright © %d--%d Seamplex, https://seamplex.com/feenox\n\
+  printf("Copyright © %d--%d Jeremy Theler, https://seamplex.com/feenox\n\
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. \n\
 FeenoX is free software: you are free to change and redistribute it.\n\
-There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2024); 
+There is NO WARRANTY, to the extent permitted by law.\n", 2009, 2025); 
 }
 
 void feenox_longversion(void) {

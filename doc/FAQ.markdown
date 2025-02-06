@@ -11,7 +11,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2024-11-25
+date: 2025-02-06
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -395,10 +395,8 @@ TL;DR:
 - The code is GPLv3+: you can use it, modify it and re-distribute it
   freely (as in free speech) as long as you keep the same licensing
   terms.
-- The documentation is released under the terms of the GNU Free
-  Documentation License version 1.3 or, at your option, any later
-  version: same thing but with particular considerations for
-  documentation instead of code.
+- The documentation is released under the terms of the Creative Commons
+  Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)
 
 FeenoX is licensed under the terms of the [GNU General Public License]
 version 3 or, at the user convenience, any later version. This means
@@ -423,8 +421,8 @@ program either to fix bugs, improve it or add new features is free to do
 so. And if they do not know how to program, the have the freedom to hire
 a programmer to do it without needing to ask permission to the original
 authors. Even more, [the documentation] is released under the terms of
-the [GNU Free Documentation License] so these new (or modified) features
-can be properly documented as well.
+the [Creative Commons Attribution-ShareAlike 4.0 International License]
+so these new (or modified) features can be properly documented as well.
 
 Nevertheless, since these original authors are the copyright holders,
 they still can use it to either enforce or prevent further actions from
@@ -468,7 +466,7 @@ chains running over free and open source operating systems.
 
   [GNU General Public License]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
-  [GNU Free Documentation License]: https://www.gnu.org/licenses/fdl-1.3.html
+  [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
 
 # Why is FeenoX written in C and not in…

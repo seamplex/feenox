@@ -10,7 +10,7 @@ There are some examples of pieces of computational software which are described 
 So a free program has to be open source, but it also has to explicitly provide the four freedoms above both through the written license and through appropriate mechanisms to get, modify, compile, run and document these modifications using well-established and/or reasonable straightforward procedures. 
 That is why licensing FeenoX as GPLv3+ also implies that the source code and all the scripts and makefiles needed to compile and run it are available for anyone that requires it (i.e. it is compiled with `./configure && make`).
 Anyone wanting to modify the program either to fix bugs, improve it or add new features is free to do so. And if they do not know how to program, the have the freedom to hire a programmer to do it without needing to ask permission to the original authors.
-Even more, [the documentation](https://seamplex.com/feenox/doc/) is released under the terms of the [GNU Free Documentation License](https://www.gnu.org/licenses/fdl-1.3.html) so these new (or modified) features can be properly documented as well.
+Even more, [the documentation](https://seamplex.com/feenox/doc/) is released under the terms of the [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/) so these new (or modified) features can be properly documented as well.
 
 Nevertheless, since these original authors are the copyright holders, they still can use it to either enforce or prevent further actions from the users that receive FeenoX under the GPLv3+.
 In particular, the license allows re-distribution of modified versions only if

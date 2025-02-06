@@ -24,8 +24,8 @@
 Every bit of FeenoX documentation is written in [Pandoc]-flavored
 Markdown in the [`doc`] directory of the [FeenoX repository]. It is then
 converted to HTML, PDF, Unix manpage or Texinfo as needed. FeenoX
-documentation is released under the terms of the [GNU Free Documentation
-License v1.3], or any later version.
+documentation is released under the terms of the [Creative Commons
+Attribution-ShareAlike 4.0 International License].
 
   [<span class="toc-section-number">1</span> Manual and description]: #manual-and-description
   [<span class="toc-section-number">1.1</span> Design]: #design
@@ -50,7 +50,7 @@ License v1.3], or any later version.
   [Pandoc]: https://pandoc.org/
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
   [FeenoX repository]: https://github.com/seamplex/feenox/
-  [GNU Free Documentation License v1.3]: https://www.gnu.org/licenses/fdl-1.3.html
+  [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
 
 # Manual and description
 

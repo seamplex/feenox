@@ -8,7 +8,7 @@ lang: en-US
 
 Every bit of FeenoX documentation is written in [Pandoc](https://pandoc.org/)-flavored Markdown in the [`doc`](https://github.com/seamplex/feenox/tree/main/doc) directory of the [FeenoX repository](https://github.com/seamplex/feenox/).
 It is then converted to HTML, PDF, Unix manpage or Texinfo as needed.
-FeenoX documentation is released under the terms of the [GNU Free Documentation License v1.3](https://www.gnu.org/licenses/fdl-1.3.html), or any later version.
+FeenoX documentation is released under the terms of the [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
 
 
 # Manual and description

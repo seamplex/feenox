@@ -1186,7 +1186,7 @@ $ feenox --version
 FeenoX v0.3.292-gc932cb5 
 a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright © 2009--2024 Seamplex, https://seamplex.com/feenox
+Copyright © 2009--2024 https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -2288,7 +2288,7 @@ $ feenox -v
 FeenoX v1.0.7-g9b98430 
 a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright © 2009--2024 Seamplex, https://seamplex.com/feenox
+Copyright © 2009--2024 https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
