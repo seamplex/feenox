@@ -3,4 +3,4 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all buildinfo=+path
 
 %:
-	dh $@ --with autoreconf
+	dh $@
