@@ -31,7 +31,8 @@ rm -f debian/source/control \
       debian/dirs \
       debian/gbp.conf \
       debian/install \
-      debian/links
+      debian/links \
+      debian/README.source
 rmdir debian/patches debian/tests
 rm -f COPYING debian/feenox/usr/share/doc/feenox/COPYRIGHT.gz
 
