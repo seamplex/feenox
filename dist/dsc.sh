@@ -38,7 +38,7 @@ rm -f COPYING debian/feenox/usr/share/doc/feenox/COPYRIGHT.gz
 # copy the debian directory to dist
 rm -rf ../debian
 cp -r debian ..
-exit
+# exit
 
 export DEBEMAIL="jeremy@seamplex.com"
 export DEBFULLNAME="Jeremy Theler"
