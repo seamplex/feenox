@@ -12,5 +12,4 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all buildinfo=+path
 # as the libs don't link to anything private
 override_dh_auto_install:
 	dh_auto_install
-#	chrpath -d ./feenox
 	chrpath -d ./debian/feenox/usr/bin/feenox
