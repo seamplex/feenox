@@ -5,7 +5,12 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all buildinfo=+path
 %:
 	dh $@
 
-execute_after_dh-auto-install:
-	# remove the runpath introduced by mpicc
-	# as the libs don't link to anything private
-	find debian/tmp/ -name 'feenox' -exec chrpath -d '{}' \;
+# execute_after_dh-auto-install:
+# 	find debian/tmp/ -name 'feenox' -exec chrpath -d '{}' \;
+
+# remove the runpath introduced by mpicc
+# as the libs don't link to anything private
+override_dh_auto_install:
+	dh_auto_install
+#	chrpath -d ./feenox
+	chrpath -d ./debian/feenox/usr/bin/feenox

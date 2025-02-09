@@ -4,13 +4,11 @@ Upstream-Name: feenox
 Upstream-Contact: Jeremy Theler <jeremy@seamplex.com>
 
 
-Files:
- 
+Files: *
 Copyright: 2013-2025 Jeremy Theler <jeremy@seamplex.com>
 License: GPL-3.0+
 
-Files:
- doc/*
+Files: doc/*
 Copyright: 2025 Jeremy Theler <jeremy@seamplex.com>
 License: CC-BY-SA-4.0
 
@@ -54,23 +52,19 @@ Files: install-sh
 Copyright: 1994 X Consortium
 License: X11
 
-Files:
- src/contrib/kdtree.*
+Files: src/contrib/kdtree.*
 Copyright: 2007-2011 John Tsiombikas <nuclear@member.fsf.org>
 License: BSD-3-clause
 
-Files:
- src/contrib/ut*
+Files: src/contrib/ut*
 Copyright: 2003-2022, Troy D. Hanson <http://troydhanson.github.com/uthash/>
 License: BSD-1-clause
 
-Files:
- src/mesh/elements/hexa27.c src/mesh/elements/quad9.c src/mesh/elements/quad8.c src/mesh/elements/hexa20.c
+Files: src/mesh/elements/hexa27.c src/mesh/elements/quad9.c src/mesh/elements/quad8.c src/mesh/elements/hexa20.c
 Copyright: 2014-2017 C.P. Camusso
 License: GPL-3.0+
  
-Files:
- src/mesh/elements/prism15.c src/mesh/elements/prism6.c
+Files: src/mesh/elements/prism15.c src/mesh/elements/prism6.c
 Copyright: 2015 Ezequiel Manavela Chiapero
 License: GPL-3.0+
 
@@ -78,8 +72,7 @@ Files: ax_gcc_builtin.m4
 Copyright: 2013 Gabriele Svelto <gabriele.svelto@gmail.com>
 License: FSFAP
 
-Files:
- debian/*
+Files: debian/*
 Copyright: 2025 Jeremy Theler <jeremy@seamplex.com>
 License: GPL-3.0+
 
