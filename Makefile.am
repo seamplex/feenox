@@ -24,6 +24,7 @@ TESTS = \
         tests/algebraic_expr.sh \
         tests/annulus-modal.sh \
         tests/uo2-pellet.sh \
+        tests/barra.sh \
         tests/airfoil.sh \
         tests/arguments.sh \
         tests/azmy.sh \
