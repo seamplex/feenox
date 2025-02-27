@@ -51,13 +51,10 @@ for kw in ${kws}; do
   # usage
   usage=$(grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2-)
   if [ -n "${usage}" ]; then
-#     echo -n "\`${usage}\`"
-#     echo "::: {.usage}"
     echo "~~~feenox"
     grep "///${tag}+${kw}+usage" ${src} | cut -d" " -f2- | xargs -0 | tr \\n " " | tr @ \\n
     echo
     echo "~~~"
-#     echo ":::"
     echo
   fi
 
@@ -217,11 +214,27 @@ EOF
     if [ -e ${svg} ]; then
       echo "![${ex}](${svg}){width=90%}\ "
     fi
-
+    echo
 
     echo
     echo
   done
+  
+  
+  # examples
+  examples=$(find ../tests ../examples -type f -name "*.fee" | xargs grep ${kw} | cut -d: -f1 | sort | uniq)
+  if [ -n "${examples}" ]; then
+    echo ":::::::: {.only-in-format .html}"
+    echo "## Examples of usage {.unnumbered}"
+    echo 
+    for i in ${examples}; do
+      lineno=$(grep -n ${kw} ${i} | head -n1 | cut -d: -f1)
+      echo " * [$(basename ${i}):${lineno}]($(echo ${i} | sed 's_.._https://github.com/seamplex/feenox/tree/main/_')#L${lineno})"
+    done
+    echo "::::::::"
+    echo
+  fi
+  
 done
 
 echo 

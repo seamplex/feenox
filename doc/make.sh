@@ -75,7 +75,7 @@ echo " - functionals"
 echo " - vector functions"
 ./reference.sh ../src/math/builtin_vectorfunctions.c fv > reference-fv.md
 
-for i in laplace thermal mechanical neutron_sn; do
+for i in laplace thermal mechanical neutron_diffusion neutron_sn; do
   echo " - ${i}"
   ./reference.sh ../src/pdes/${i}/init.c           pb_${i} > reference-${i}-pb.md
   ./reference.sh ../src/pdes/${i}/parser.c         kw_${i} > reference-${i}-kw.md
@@ -124,7 +124,7 @@ for i in programming compilation FAQ CODE_OF_CONDUCT history; do
  ./md2.sh --plain ${i}
 done
 
-echo "PDF + HTML + Markdown + plain"
+echo "PDF + HTML + plain"
 for i in feenox-manual srs sds; do
  echo ${i}
  if [ ${pdf} = 1 ]; then
