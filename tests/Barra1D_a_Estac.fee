@@ -1,0 +1,33 @@
+PROBLEM thermal 1d
+READ_MESH Barra1D.msh
+
+# all units SI
+
+D = 0.02
+Area = pi * D * D / 4
+Perim = pi * D
+k = 50
+#k = kv * Area
+q0 = 30
+rho = 8000
+cp = 400
+h = 10
+Tinf = 300
+# fuente: dependiente de T (convección)
+q(x) = h * Perim * (Tinf - T(x)) / Area
+
+# boundary conditions: q=something means "prescribed heat flux"
+BC left  q=q0/Area
+BC right q=q0/Area
+
+# PRINTF "\#Tinf: %g" Tinf
+# PRINTF "\#Perim: %g" Perim
+# PRINTF "\#q left, right: %g" q0/Area
+#PRINT "Source term:"
+#PRINT q(0.1) q(0.2) q(0.3) q(0.4) q(0.5)
+
+SOLVE_PROBLEM
+# PRINT_FUNCTION T q
+
+COMPUTE_REACTION left RESULT q_left
+PRINT q_left-81766.95

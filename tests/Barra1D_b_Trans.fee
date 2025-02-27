@@ -1,0 +1,45 @@
+PROBLEM thermal 1d
+READ_MESH Barra1D.msh
+
+# all units SI
+
+D = 0.02
+Area = pi * D * D / 4
+Perim = pi * D
+k = 50
+q0 = 30
+rho = 8000
+cp = 400
+h = 10
+Tinf = 300
+
+# cte de tiempo ~ D * rho * cp / 4 / h
+tau = D * rho * cp / 4 / h
+end_time = 4*tau
+#end_time = 3200
+
+# fuente: dependiente de T (convección)
+q(x) = h * Perim * (Tinf - T(x)) / Area
+
+# Esta sí funciona:
+# fuente (x): mejor con media 0 (CC Neumann puro = 0)
+#q(x) = 100000*sin((x-0.5)*pi)
+
+# boundary conditions:
+BC left  q=0
+BC right q=0
+
+FUNCTION T_0(x) FILE "Tini.dat" INTERPOLATION linear
+#T_0(x) = 323 + 277 * (1-cos((x-0.5) * pi))
+
+SOLVE_PROBLEM
+# IF done
+#   PRINT_FUNCTION T
+# ENDIF
+# PRINT t T(0.5) T(1)
+
+IF done
+  PRINT T(0.5)-301.655
+ENDIF
+
+#WRITE_RESULTS FORMAT gmsh
