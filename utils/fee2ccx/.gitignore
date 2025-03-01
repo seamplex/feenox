@@ -1,0 +1,5 @@
+configure
+configure~
+config.log
+*.o
+fee2ccx

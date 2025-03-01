@@ -31,11 +31,6 @@ AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-O3 -flto=auto -no-pie"])
 
 ######################
 # libraries
-#AC_CHECK_LIB([rt],[shm_open])
-#AC_CHECK_LIB([pthread],[pthread_create])
-
-#AC_SEARCH_LIBS([dlopen],[dl dld],[])
-#AC_CHECK_HEADER([dlfcn.h],[],AC_MSG_ERROR([dlfcn.h not found]))
 
 # check for math
 AC_SEARCH_LIBS([cos],[m],[],AC_MSG_ERROR([libm not found]))
@@ -399,7 +394,9 @@ m4_include(auto_links.m4)
   
 #AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
 #AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
-AC_CONFIG_FILES([Makefile src/Makefile]) 
+#AC_CONFIG_FILES([Makefile src/Makefile]) 
+AC_CONFIG_FILES([Makefile src/Makefile utils/fee2ccx/Makefile]) 
+
 
 AS_BOX([Summary of dependencies])
 AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
