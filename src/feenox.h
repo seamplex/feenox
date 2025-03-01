@@ -1923,6 +1923,8 @@ struct feenox_t {
 
     
     // internal storage of evaluated dirichlet conditions
+    size_t          *dirichlet_nodes;
+    unsigned int    *dirichlet_dofs;
     PetscInt        *dirichlet_indexes;
     PetscScalar     *dirichlet_values;
     PetscScalar     *dirichlet_derivatives;
@@ -2401,7 +2403,7 @@ extern PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, P
 extern int feenox_problem_solve_slepc_eigen(void);
 
 // dirichlet.c
-extern int feenox_problem_dirichlet_add(size_t index, double value);
+extern int feenox_problem_dirichlet_add(size_t j_global, unsigned int g, double value);
 extern int feenox_problem_multifreedom_add(size_t index, double *coefficients);
 extern int feenox_problem_mimicked_add(size_t index_guide, size_t index_follower, double coefficient_follower);
 extern int feenox_problem_dirichlet_eval(void);

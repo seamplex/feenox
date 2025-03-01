@@ -21,9 +21,66 @@
  */
 #include "feenox.h"
 feenox_t feenox;
+#include "pdes/mechanical/mechanical.h"
 
 #include <stdlib.h>
 #include <libgen.h>
+
+char *ccx_names[] = {
+  "",
+  "C3D8",
+  "C3D6",
+  "C3D4",
+  "C3D20",
+  "C3D15",
+  "C3D10",
+  "CPS3",
+  "CPS6",
+  "CPS4",
+  "CPS8",
+  "T3D2",
+  "T3D3",
+  "MASS"  
+};
+
+ int ccx2gmsh_types[] = {
+  ELEMENT_TYPE_UNDEFINED,     // 0
+  ELEMENT_TYPE_HEXAHEDRON8,   // 1
+  ELEMENT_TYPE_PRISM6,        // 2
+  ELEMENT_TYPE_TETRAHEDRON4,  // 3
+  ELEMENT_TYPE_HEXAHEDRON20,  // 4
+  ELEMENT_TYPE_PRISM15,       // 6
+  ELEMENT_TYPE_TETRAHEDRON10, // 6
+  ELEMENT_TYPE_TRIANGLE3,     // 7
+  ELEMENT_TYPE_TRIANGLE6,     // 8
+  ELEMENT_TYPE_QUADRANGLE4,   // 9
+  ELEMENT_TYPE_QUADRANGLE8,   // 10
+  ELEMENT_TYPE_LINE2,         // 11
+  ELEMENT_TYPE_LINE3,         // 12
+  ELEMENT_TYPE_POINT1         // 13
+};
+    
+int gmsh2ccx_types[] = {  
+   0,      // ELEMENT_TYPE_UNDEFINED      0
+  11,      // ELEMENT_TYPE_LINE2          1
+   7,      // ELEMENT_TYPE_TRIANGLE3      2
+   9,      // ELEMENT_TYPE_QUADRANGLE4    3
+   3,      // ELEMENT_TYPE_TETRAHEDRON4   4
+   1,      // ELEMENT_TYPE_HEXAHEDRON8    5
+   2,      // ELEMENT_TYPE_PRISM6         6
+   0,      // ELEMENT_TYPE_PYRAMID5       7
+  12,      // ELEMENT_TYPE_LINE3          8
+   8,      // ELEMENT_TYPE_TRIANGLE6      9
+   0,      // ELEMENT_TYPE_QUADRANGLE9    10
+   6,      // ELEMENT_TYPE_TETRAHEDRON10  11
+   0,      // ELEMENT_TYPE_HEXAHEDRON27   12 
+  13,      // ELEMENT_TYPE_POINT1         15
+  10,      // ELEMENT_TYPE_QUADRANGLE8    16
+   4,      // ELEMENT_TYPE_HEXAHEDRON20   17
+   5       // ELEMENT_TYPE_PRISM15        18
+};
+        
+
 
 int main(int argc, char **argv) {
 
@@ -55,26 +112,43 @@ int main(int argc, char **argv) {
   }
   printf("\n");
 
-  // TODO: other elements (think how)
-  // TODO: if all the volumes have the same property we can do
-  //       *Element, TYPE=C3D4, ELSET=volumes
-  printf("*ELEMENT, TYPE=C3D4, ELSET=tet4\n");
+  int element_type = ELEMENT_TYPE_UNDEFINED;
+  char element_types[512]; // this is a string of all the element types we've seen
   for (size_t i = 0; i < mesh->n_elements; i++) {
-    if (mesh->element[i].type == &(feenox.mesh.element_types[ELEMENT_TYPE_TETRAHEDRON4])) {
+    element_t *e = &mesh->element[i];  
+    if (e->type->dim == feenox.pde.dim) {
+      if (e->type->id != element_type) {
+        if (element_type == ELEMENT_TYPE_UNDEFINED) {
+          strncpy(element_types, e->type->name, 512);
+        } else {
+          strcat(element_types, e->type->name);  
+        }
+        strcat(element_types, ", ");
+        printf("*ELEMENT, TYPE=%s, ELSET=%s\n", ccx_names[gmsh2ccx_types[e->type->id]], e->type->name);
+        element_type = e->type->id;
+      }  
       printf("%ld", mesh->element[i].tag);
-      // the nodes
       for (unsigned int j = 0; j < mesh->element[i].type->nodes; j++) {
-        printf(", %ld", mesh->element[i].node[j]->tag);
+        if (e->type->id == ELEMENT_TYPE_TETRAHEDRON10 && j == 8) {
+          printf(", %ld", mesh->element[i].node[9]->tag);
+        } else if (e->type->id == ELEMENT_TYPE_TETRAHEDRON10 && j == 9) {
+          printf(", %ld", mesh->element[i].node[8]->tag);
+        } else {
+          printf(", %ld", mesh->element[i].node[j]->tag);
+        }  
       }
       printf("\n");
     }
   }  
   printf("\n");
 
+  // TODO: if material properties are all from variables and functions use this
+  // otherwise go one by one
   printf("*ELSET, ELSET=bulk\n");
-  printf("tet4\n");
+  element_types[strlen(element_types)-2] = '\0';
+  printf("%s\n", element_types);
   printf("\n");
-  
+
 /*  
   printf("*ELSET, ELSET=bulk\n");
   int first = 1;
@@ -98,35 +172,29 @@ int main(int argc, char **argv) {
   printf("\n");
   printf("\n");
 */
-  
-  printf("*NSET, NSET=left\n");
-  for (size_t i = 0; i < mesh->n_elements; i++) {
-    element_t *e = &mesh->element[i];
-    if (e->physical_group != NULL && strcmp(e->physical_group->name, "left") == 0) {
-      for (unsigned int j = 0; j < e->type->nodes; j++) {
-        if (j != 0) {
-          printf(", ");
-        }
-        printf("%ld", e->node[j]->tag);
-      }
-      printf("\n");
-    }
+    
+  printf("*BOUNDARY\n");
+  for (size_t k = 0; k < feenox.pde.dirichlet_rows; k++) {
+//  <node set or node>, <first DOF>, <last DOF>, <displacement value>
+    printf("%ld, %d, %d, %g\n", feenox.pde.dirichlet_nodes[k],
+                                feenox.pde.dirichlet_dofs[k]+1,
+                                feenox.pde.dirichlet_dofs[k]+1,
+                                feenox.pde.dirichlet_values[k]);
   }
   printf("\n");
   
+  // single material
+  double x[] = {0, 0, 0};
+  double E = mechanical.E.eval(&mechanical.E, x, NULL);
+  double nu = mechanical.nu.eval(&mechanical.nu, x, NULL);
   printf("*MATERIAL, NAME=bulk\n");
   printf("*ELASTIC\n");
-  printf("210e9, 0.3\n");
+  printf("%g, %g\n", E, nu);
   printf("\n");
-  printf("*SOLID SECTION, ELSET=bulk, MATERIAL=bulk");
-  printf("\n");
-  
-  printf("*BOUNDARY\n");
-  printf("left, 1, 3, 0\n");
+  printf("*SOLID SECTION, ELSET=bulk, MATERIAL=bulk\n");
   printf("\n");
       
   printf("*STEP\n");
-  printf("\n");
   printf("*EL FILE     # Commands responsible for saving results\n");
   printf("E, S\n");
   printf("*NODE FILE\n");
@@ -134,37 +202,20 @@ int main(int argc, char **argv) {
   printf("\n");
   
   printf("*CLOAD\n");
-  
-  int dofs = feenox.pde.dofs;
-  
-  for (size_t i = 0; i < mesh->n_elements; i++) {
-    element_t *e = &mesh->element[i];
-    // TODO: compare pointers not strings
-    if (e->physical_group != NULL && strcmp(e->physical_group->name, "right") == 0) {
-      
-      // compute the indices of the DOFs to ensamble
-      PetscInt *l = feenox_fem_compute_dof_indices(e, dofs);
-      PetscInt size = dofs * e->type->nodes;
-      PetscScalar values[size];
-      petsc_call(VecGetValues(feenox.pde.b, size, l, values));
-      
-      for (unsigned int j = 0; j < e->type->nodes; j++) {
-        for (unsigned int g = 0; g < dofs; g++) {
-          if (values[j*dofs + g] != 0) {
-            printf("%ld, %d, %g\n", e->node[j]->tag, g+1, values[j*dofs + g]);
-          }
-        }
+  PetscScalar *b = NULL;
+  petsc_call(VecGetArray(feenox.pde.b, &b));  
+  for (size_t j = 0; j < mesh->n_nodes; j++) {
+    for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
+      if (b[mesh->node[j].index_dof[g]] != 0) {
+        printf("%ld, %d, %g\n", mesh->node[j].tag, g+1, b[mesh->node[j].index_dof[g]]);          
       }
     }
   }
+  petsc_call(VecRestoreArray(feenox.pde.b, &b));
   printf("\n");
-
+  
   printf("*STATIC\n");
-  printf("\n");
   printf("*END STEP\n");
-
-
-
 
   feenox_finalize();
 

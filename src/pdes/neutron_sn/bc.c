@@ -70,7 +70,7 @@ int feenox_problem_bc_set_neutron_sn_vacuum(bc_data_t *this, element_t *e, size_
     if (feenox_mesh_dot(neutron_sn.Omega[m], outward_normal) < 0) {
       // if the direction is inward set it to zero
       for (unsigned int g = 0; g < neutron_sn.groups; g++) {
-        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[sn_dof_index(m,g)], 0));
+        feenox_call(feenox_problem_dirichlet_add(j_global, sn_dof_index(m,g), 0));
       }
     }
   }

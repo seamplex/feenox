@@ -61,7 +61,7 @@ int feenox_problem_bc_set_laplace_phi(bc_data_t *this, element_t *e, size_t j_gl
   
 #ifdef HAVE_PETSC
   
-  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[0], feenox_expression_eval(&this->expr)));
+  feenox_call(feenox_problem_dirichlet_add(j_global, 0, feenox_expression_eval(&this->expr)));
   // TODO: only in transient
 //  feenox.pde.dirichlet_derivatives[*k] = feenox_expression_derivative_wrt_variable(&bc_data->expr, feenox_special_var(t), feenox_special_var_value(t));
   

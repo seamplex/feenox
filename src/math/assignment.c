@@ -178,7 +178,7 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
         feenox_push_error_message("right hand side for vector initialization has to be inside brackets '(' and ')'");
         return FEENOX_ERROR;
       }
-      *rhs_starting_with_bracket++;
+      rhs_starting_with_bracket++;
     }
     size_t n_chars_count = 0;
     int n_expressions = 0;

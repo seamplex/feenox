@@ -106,7 +106,7 @@ int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *this, element_t *e, 
 
 #ifdef HAVE_PETSC
   for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
-    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[g], 0));
+    feenox_call(feenox_problem_dirichlet_add(j_global, g, 0));
   }
 #endif
   
@@ -118,7 +118,7 @@ int feenox_problem_bc_set_neutron_diffusion_null(bc_data_t *this, element_t *e, 
 int feenox_problem_bc_set_neutron_diffusion_flux(bc_data_t *this, element_t *e, size_t j_global) {
 
 #ifdef HAVE_PETSC
-  feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[this->dof], feenox_expression_eval(&this->expr)));
+  feenox_call(feenox_problem_dirichlet_add(j_global, this->dof, feenox_expression_eval(&this->expr)));
 #endif
   return FEENOX_OK;
 }

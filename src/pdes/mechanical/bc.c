@@ -156,16 +156,16 @@ int feenox_problem_bc_set_mechanical_displacement(bc_data_t *this, element_t *e,
   if (this->dof != -1) {
     
     // only one dof
-    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[this->dof], feenox_expression_eval(&this->expr)));
+    feenox_call(feenox_problem_dirichlet_add(j_global, this->dof, feenox_expression_eval(&this->expr)));
     
   } else {
     
     // -1 means all dofs (and the only possibility is to have all them equal to zero)
-    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[0], 0));
+    feenox_call(feenox_problem_dirichlet_add(j_global, 0, 0));
     if (feenox.pde.dofs > 1) {
-      feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[1], 0));
+      feenox_call(feenox_problem_dirichlet_add(j_global, 1, 0));
       if (feenox.pde.dofs > 2) {
-        feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[2], 0));
+        feenox_call(feenox_problem_dirichlet_add(j_global, 2, 0));
       }
     }
     
@@ -213,7 +213,7 @@ int feenox_problem_bc_set_mechanical_symmetry(bc_data_t *this, element_t *e, siz
   // then we set a traditional dirichlet bc (i.e. u=0 or v=0 or w=0)
   // otherwise we need a generic multifreedom
   if (coordinate_direction != -1) {
-    feenox_call(feenox_problem_dirichlet_add(feenox.pde.mesh->node[j_global].index_dof[coordinate_direction], 0));
+    feenox_call(feenox_problem_dirichlet_add(j_global, coordinate_direction, 0));
   } else {
     feenox_call(feenox_problem_multifreedom_add(j_global, normal));
   }  

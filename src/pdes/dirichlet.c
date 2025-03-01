@@ -21,13 +21,16 @@
  */
 #include "feenox.h"
 
-int feenox_problem_dirichlet_add(size_t index, double value) {
+int feenox_problem_dirichlet_add(size_t j_global, unsigned int g, double value) {
 
+  feenox.pde.dirichlet_nodes[feenox.pde.dirichlet_k] = feenox.pde.mesh->node[j_global].tag;
+  feenox.pde.dirichlet_dofs[feenox.pde.dirichlet_k] = g;
+  
 #ifdef HAVE_PETSC
-  feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = index;
+  feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = feenox.pde.mesh->node[j_global].index_dof[g];
   feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = value;
-  feenox.pde.dirichlet_k++;
 #endif
+  feenox.pde.dirichlet_k++;
   
   return FEENOX_OK;
 }
@@ -69,6 +72,8 @@ int feenox_problem_dirichlet_eval(void) {
     // TODO: allow the user to provide a factor at runtime
     n_bcs = 1.2*feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
 
+    feenox_check_alloc(feenox.pde.dirichlet_nodes = calloc(n_bcs, sizeof(size_t)));
+    feenox_check_alloc(feenox.pde.dirichlet_dofs = calloc(n_bcs, sizeof(int)));
     feenox_check_alloc(feenox.pde.dirichlet_indexes = calloc(n_bcs, sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = calloc(n_bcs, sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.dirichlet_derivatives = calloc(n_bcs, sizeof(PetscScalar)));
@@ -119,6 +124,8 @@ int feenox_problem_dirichlet_eval(void) {
     feenox.pde.dirichlet_rows = feenox.pde.dirichlet_k;
     
     // if k == 0 this like freeing
+    feenox_check_alloc(feenox.pde.dirichlet_nodes = realloc(feenox.pde.dirichlet_nodes, feenox.pde.dirichlet_rows * sizeof(size_t)));
+    feenox_check_alloc(feenox.pde.dirichlet_dofs = realloc(feenox.pde.dirichlet_dofs, feenox.pde.dirichlet_rows * sizeof(int)));
     feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_rows * sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.dirichlet_rows * sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.dirichlet_derivatives = realloc(feenox.pde.dirichlet_derivatives, feenox.pde.dirichlet_rows * sizeof(PetscScalar)));
@@ -140,8 +147,7 @@ int feenox_problem_dirichlet_eval(void) {
 // it takes K and b and writes K_bc and b_bc
 int feenox_problem_dirichlet_set_K(void) {
 
-  if (feenox.pde.dirichlet_scale == 0)
-  {
+  if (feenox.pde.dirichlet_scale == 0) {
     feenox_problem_dirichlet_compute_scale();
   }
   

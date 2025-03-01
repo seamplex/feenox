@@ -27,7 +27,7 @@ AC_PROG_INSTALL
 # default optimization flags
 AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-O3 -flto=auto -no-pie"])
 # the CFLAGS are passed down to the linker as well
-# AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
+AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
 
 ######################
 # libraries
@@ -391,11 +391,10 @@ AC_DEFINE_UNQUOTED([FEENOX_COMPILER_LDFLAGS], ["${LDFLAGS}"], [LDFLAGS])
 # create some links to pass make distcheck
 m4_include(auto_links.m4)
 
-  
-#AC_CONFIG_FILES([Makefile src/Makefile src/benchmark/Makefile doc/Makefile]) 
-#AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
-#AC_CONFIG_FILES([Makefile src/Makefile]) 
-AC_CONFIG_FILES([Makefile src/Makefile utils/fee2ccx/Makefile]) 
+AC_CONFIG_FILES([Makefile src/Makefile])
+# AC_CONFIG_FILES([src/benchmark/Makefile]) 
+# AC_CONFIG_FILES([doc/Makefile])
+AS_IF([test -d utils/fee2ccx],[AC_CONFIG_FILES([utils/fee2ccx/Makefile])]) 
 
 
 AS_BOX([Summary of dependencies])
