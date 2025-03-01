@@ -97,7 +97,4 @@ fee2ccx_SOURCES = fee2ccx.c \
  ../../src/pdes/mechanical/post.c \
  ../../src/pdes/mechanical/stress.c \
  ../../src/flow/step.c \
- ./parsepde.c
- 
-
-
+ ./parsepde-mechanical.c

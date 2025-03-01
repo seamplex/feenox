@@ -79,7 +79,7 @@ int gmsh2ccx_types[] = {
    4,      // ELEMENT_TYPE_HEXAHEDRON20   17
    5       // ELEMENT_TYPE_PRISM15        18
 };
-        
+
 
 
 int main(int argc, char **argv) {
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
     printf("usage: %s feenox-input.fee\n", argv[0]);
     return 0;
   }
-  
+
   // TODO: check this ir run in serial
   // TODO: particular argc && argv
   // e.g. --version
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     feenox_pop_errors();
     exit(EXIT_FAILURE);
   }
-  
+
   if (feenox_step(feenox.instructions, NULL) != FEENOX_OK) {
     feenox_pop_errors();
     exit(EXIT_FAILURE);
@@ -160,29 +160,17 @@ int main(int argc, char **argv) {
       }
       printf("%ld", mesh->element[i].tag);
       first = 0;
-      
       if (++n == 16) {
         printf("\n");
         n = 0;
         first = 1;
       }
-      
     }
   }
   printf("\n");
   printf("\n");
 */
-    
-  printf("*BOUNDARY\n");
-  for (size_t k = 0; k < feenox.pde.dirichlet_rows; k++) {
-//  <node set or node>, <first DOF>, <last DOF>, <displacement value>
-    printf("%ld, %d, %d, %g\n", feenox.pde.dirichlet_nodes[k],
-                                feenox.pde.dirichlet_dofs[k]+1,
-                                feenox.pde.dirichlet_dofs[k]+1,
-                                feenox.pde.dirichlet_values[k]);
-  }
-  printf("\n");
-  
+
   // single material
   double x[] = {0, 0, 0};
   double E = mechanical.E.eval(&mechanical.E, x, NULL);
@@ -193,7 +181,17 @@ int main(int argc, char **argv) {
   printf("\n");
   printf("*SOLID SECTION, ELSET=bulk, MATERIAL=bulk\n");
   printf("\n");
-      
+
+  printf("*BOUNDARY\n");
+  for (size_t k = 0; k < feenox.pde.dirichlet_rows; k++) {
+//  <node set or node>, <first DOF>, <last DOF>, <displacement value>
+    printf("%ld, %d, %d, %g\n", feenox.pde.dirichlet_nodes[k],
+                                feenox.pde.dirichlet_dofs[k]+1,
+                                feenox.pde.dirichlet_dofs[k]+1,
+                                feenox.pde.dirichlet_values[k]);
+  }
+  printf("\n");
+
   printf("*STEP\n");
   printf("*EL FILE     # Commands responsible for saving results\n");
   printf("E, S\n");

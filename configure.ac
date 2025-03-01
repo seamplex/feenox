@@ -17,17 +17,29 @@ AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 AC_PROG_CC
-
 AC_PROG_INSTALL
 
 # TODO: investigate
 #AX_CODE_COVERAGE
 
+AC_ARG_WITH(
+  [debug],
+  AS_HELP_STRING([--with-debug], [compile with debugging symbols @<:@default=no@:>@]),
+  [],
+  [with_debug=no]
+)
+
 ######################
 # default optimization flags
-AS_IF([test "x$CFLAGS" = "x-g -O2"], [CFLAGS="-O3 -flto=auto -no-pie"])
-# the CFLAGS are passed down to the linker as well
-AS_IF([test "x$LDFLAGS" = "x"], [LDFLAGS="-flto=auto"])
+AS_IF([test "x$CFLAGS" = "x-g -O2"],
+  AS_IF([test "x${with_debug}" = "xyes"] , [
+    CFLAGS="-g -O0"
+  ],[
+    CFLAGS="-O3 -flto=auto -no-pie"
+  ])
+])
+
+
 
 ######################
 # libraries
@@ -399,7 +411,7 @@ AS_IF([test -d utils/fee2ccx],[AC_CONFIG_FILES([utils/fee2ccx/Makefile])])
 
 AS_BOX([Summary of dependencies])
 AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
-#AS_ECHO(  ["  Readline                ${have_readline}"])
+# AS_ECHO(  ["  Readline                ${have_readline}"])
 AS_ECHO(  ["  SUNDIALS                ${have_sundials}"])
 AS_ECHO_N(["  PETSc                   ${have_petsc}"])
 AS_IF([test "x${have_petsc}" = "xyes"],
@@ -413,6 +425,6 @@ AS_IF([test "x${have_slepc}" = "xyes"],
 )
 AS_ECHO(  ["  Compiler                ${compiler_show}"])
 AS_ECHO(  ["  Compiler flags          ${CFLAGS}"])
-AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])
+# AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])
 
 AC_OUTPUT
