@@ -24,6 +24,7 @@ versiongit.m4
 ChangeLog
 .deps
 *.Po
+*~
 
 # doc
 /README.html

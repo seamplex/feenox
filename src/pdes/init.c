@@ -31,11 +31,11 @@ int feenox_problem_parse_time_init(void) {
   if (feenox.pde.petscinit_called == PETSC_TRUE) {
     return FEENOX_OK;
   }
-  
+
   if (sizeof(PetscReal) != sizeof(PetscScalar)) {
     feenox_push_error_message("PETSc should be compiled with real scalar types and we have PetscReal = %d and PetscScalar = %d", sizeof(PetscReal), sizeof(PetscScalar));
     return FEENOX_ERROR;
-  }  
+  }
   if (sizeof(PetscScalar) != sizeof(double)) {
     feenox_push_error_message("PETSc should be compiled with double-precision real scalar types and we have double = %d and PetscScalar = %d", sizeof(double), sizeof(PetscReal));
     return FEENOX_ERROR;
@@ -65,14 +65,13 @@ int feenox_problem_parse_time_init(void) {
     // this one takes into account argv[0]
     petsc_argc++;
   }
-  
   PetscInt major = 0;
   PetscInt minor = 0;
   PetscInt subminor = 0;
 #ifdef HAVE_SLEPC  
   // initialize SLEPc (which in turn initializes PETSc) with the original argv & argc
   petsc_call(SlepcInitialize(&petsc_argc, &petsc_argv, (char*)0, PETSC_NULLPTR));
-  
+
   // check the headers correspond to the runtime
   petsc_call(SlepcGetVersionNumber(&major, &minor, &subminor, NULL));
   if (major != SLEPC_VERSION_MAJOR || minor != SLEPC_VERSION_MINOR || subminor != SLEPC_VERSION_SUBMINOR) {
@@ -91,23 +90,23 @@ int feenox_problem_parse_time_init(void) {
     feenox_push_error_message("linked against PETSc %d.%d.%d but using headers from %d.%d.%d", major, minor, subminor, PETSC_VERSION_MAJOR, PETSC_VERSION_MINOR, PETSC_VERSION_SUBMINOR);
     return FEENOX_ERROR;
   }
-  
+
   feenox.pde.petscinit_called = PETSC_TRUE;
-  
+
   petsc_call(MPI_Comm_size(PETSC_COMM_WORLD, &feenox.mpi_size));
   feenox_special_var_value(mpi_size) = (double)feenox.mpi_size;
-  
+
   petsc_call(MPI_Comm_rank(PETSC_COMM_WORLD, &feenox.mpi_rank));
   feenox_special_var_value(mpi_rank) = (double)feenox.mpi_rank;
-  
+
   petsc_call(PetscLogStageRegister("init", &feenox.pde.stage_init));
   petsc_call(PetscLogStageRegister("build", &feenox.pde.stage_build));
   petsc_call(PetscLogStageRegister("solve", &feenox.pde.stage_solve));
   petsc_call(PetscLogStageRegister("post", &feenox.pde.stage_post));
-  
+
   // segfaults are segfaults, try to leave PETSC out of them
   signal(SIGSEGV, SIG_DFL);
-  
+
   // TODO: install out error handler for PETSc
 //  petsc_call(PetscPushErrorHandler(&feenox_handler, NULL));
 
@@ -118,7 +117,7 @@ int feenox_problem_parse_time_init(void) {
   // TODO: set to PETSC_DEFAULT?
 ///va+ksp_atol+detail Default `1e-50`.
   feenox_var_value(feenox.pde.vars.ksp_atol) = 1e-50;   // same as PETSc
- 
+
 ///va+ksp_rtol+name ksp_rtol
 ///va+ksp_rtol+detail Relative tolerance of the iterative linear solver,
 ///va+ksp_rtol+detail as passed to PETSc’s
@@ -126,7 +125,7 @@ int feenox_problem_parse_time_init(void) {
 feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 ///va+ksp_rtol+detail Default `1e-6`.
   feenox_var_value(feenox.pde.vars.ksp_rtol) = 1e-6;    // PETSc is 1e-5
-  
+
 ///va+ksp_divtol+name ksp_divtol
 ///va+ksp_divtol+detail Divergence tolerance of the iterative linear solver,
 ///va+ksp_divtol+detail as passed to PETSc’s
@@ -134,7 +133,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
   feenox.pde.vars.ksp_divtol = feenox_define_variable_get_ptr("ksp_divtol");
 ///va+ksp_divtol+detail Default `1e+4`.  
   feenox_var_value(feenox.pde.vars.ksp_divtol) = 1e+4;  // same as PETSc
-  
+
 ///va+ksp_max_it+name ksp_max_it
 ///va+ksp_max_it+detail Number of maximum iterations of the iterative linear solver before diverging,
 ///va+ksp_max_it+detail as passed to PETSc’s
@@ -150,7 +149,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
   feenox.pde.vars.snes_atol = feenox_define_variable_get_ptr("snes_atol");
 ///va+snes_atol+detail Default `1e-50`.
   feenox_var_value(feenox.pde.vars.snes_atol) = 1e-50;   // same as PETSc
- 
+
 ///va+snes_rtol+name snes_rtol
 ///va+snes_rtol+detail Relative tolerance of the non-linear solver,
 ///va+snes_rtol+detail as passed to PETSc’s
@@ -158,7 +157,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
 ///va+feenox_snes_rtol+detail Default `1e-8`.
   feenox_var_value(feenox.pde.vars.snes_rtol) = 1e-8;    // same as PETSc
-  
+
 ///va+snes_stol+name snes_stol
 ///va+snes_stol+detail Convergence tolerance of the non-linear solver in terms of the norm of the change in the solution between steps,
 ///va+snes_stol+detail as passed to PETSc’s
