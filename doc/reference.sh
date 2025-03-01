@@ -225,7 +225,7 @@ EOF
   examples=$(find ../tests ../examples -type f -name "*.fee" | xargs grep ${kw} | cut -d: -f1 | sort | uniq)
   if [ -n "${examples}" ]; then
     echo ":::::::: {.only-in-format .html}"
-    echo "## Examples of usage {.unnumbered}"
+    echo "## Examples of usage {.unnumbered .unlisted}"
     echo 
     for i in ${examples}; do
       lineno=$(grep -n ${kw} ${i} | head -n1 | cut -d: -f1)
