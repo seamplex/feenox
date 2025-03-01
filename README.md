@@ -35,9 +35,24 @@ See the following paper for a brief summary (and to [cite FeenoX in your work](.
  * Theler J, “FeenoX: a cloud-first finite-element(ish) computational engineering tool,” _Journal of Open Source Software_, vol. 9,
 no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/joss.05846).
 
-> ### Open-source web-based UX for FeenoX
+> ### News
 >
-> Take a look at [SunCAE](https://www.seamplex.com/suncae) for an example of how to write a front end for FeenoX.
+>  * This FeenoX is not about a scam crypto game.
+>
+>    If you want to be scammed, knock yourself out at <https://feenox.com/>.
+>
+>  * IB students!
+>
+>    Remember that your first read should be the 0-th tutorial, [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup/)
+> 
+>  * FeenoX is waiting to be part of Debian.
+>
+>    Eventually, you'll be abe to do `sudo apt install feenox` in Debian Sid: <https://ftp-master.debian.org/new
+/feenox_1.0.133-1.html>
+> 
+>  * Open-source web-based UX for FeenoX.
+>
+>    Take a look at [SunCAE](https://www.seamplex.com/suncae) for an example of how to write a front end for FeenoX.
 
 ## Extents
 

@@ -53,10 +53,27 @@ work]):
   engineering tool,” *Journal of Open Source Software*, vol. 9, no. 95,
   p. 5846, Mar. 2024, doi: [10.21105/joss.05846].
 
-> ### Open-source web-based UX for FeenoX
+> ### News
 >
-> Take a look at [SunCAE] for an example of how to write a front end for
-> FeenoX.
+> - This FeenoX is not about a scam crypto game.
+>
+>   If you want to be scammed, knock yourself out at
+>   <https://feenox.com/>.
+>
+> - IB students!
+>
+>   Remember that your first read should be the 0-th tutorial, [Setting
+>   up your workspace]
+>
+> - FeenoX is waiting to be part of Debian.
+>
+>   Eventually, you’ll be abe to do `sudo apt install feenox` in Debian
+>   Sid: \<https://ftp-master.debian.org/new /feenox_1.0.133-1.html\>
+>
+> - Open-source web-based UX for FeenoX.
+>
+>   Take a look at [SunCAE] for an example of how to write a front end
+>   for FeenoX.
 
   [FeenoX]: https://seamplex.com/feenox
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
@@ -69,6 +86,7 @@ work]):
   [Academic Professor]: README4academics.markdown
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
+  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup/
   [SunCAE]: https://www.seamplex.com/suncae
 
 ## Extents
@@ -95,15 +113,15 @@ work]):
 
 ### Tutorials
 
-0.  [Setting up your workspace]
+0.  [Setting up your workspace][2]
 1.  [Overview: the tensile test case]
 2.  [Fun & games: solving mazes with PDES instead of AI]
-3.  [Heat conduction][2]
+3.  [Heat conduction][3]
 
-  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
+  [2]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
   [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
-  [2]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
+  [3]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
 
 ### Tests
 
@@ -312,7 +330,7 @@ version 3] or (at your option) any later version.
 - FeenoX is [cloud-first]. It was designed to run on servers.
 
 - Be aware that FeenoX **does not have a GUI**. Read the
-  [documentation], especially the [description] and the [FAQs][3]. Ask
+  [documentation], especially the [description] and the [FAQs][4]. Ask
   for help on the [GitHub discussions page] if you do now understand
   what this bullet means.
 
@@ -342,7 +360,7 @@ version 3] or (at your option) any later version.
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [3]: https://seamplex.com/feenox/doc/FAQ.html
+  [4]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [detailed compilation instructions]: https://seamplex.com/feenox/doc/compilation.html
   [Cygwin]: http://cygwin.com/
@@ -396,7 +414,7 @@ ask in FeenoX’s [discussion page].
 
     If you do not have Internet access, get the tarball manually, copy
     it to the same directory as `configure` and run again. See the
-    [detailed compilation instructions][4] for an explanation.
+    [detailed compilation instructions][5] for an explanation.
 
 5.  Run test suite (optional)
 
@@ -423,7 +441,7 @@ See the [download page] and the [compilation guide] for detailed
 information.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
-  [4]: compilation.md
+  [5]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
   [compilation guide]: doc/compilation.markdown
 
@@ -465,7 +483,7 @@ text was borrowed from the [Gmsh documentation]. Replacing “Gmsh” with
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][5] version 3 or, at the user convenience, any later version.
+License][6] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[^1]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -533,7 +551,7 @@ chains running over free and open source operating systems.
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [5]: https://www.gnu.org/licenses/gpl-3.0
+  [6]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
   [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
@@ -545,7 +563,7 @@ new types of PDEs and new formulations of existing PDEs. For elliptic
 operators feel free to use the Laplace equation at [`src/pdes/laplace`]
 as a template.
 
-1.  Read the [Programming Guide][6].
+1.  Read the [Programming Guide][7].
 2.  Browse [Github discussions] and open a new thread explaining what
     you want to do and/or asking for help.
 3.  Fork the [Git repository] under your Github account
@@ -565,7 +583,7 @@ Note that
   [hackers]: README4hackers.html
   [academics]: README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [6]: https://seamplex.com/feenox/doc/programming.html
+  [7]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

@@ -1030,8 +1030,7 @@ int feenox_mesh_write_mesh_gmsh(mesh_t *this, FILE *file, int no_physical_names)
       fprintf(file, "2 0 0");
     }
     // the nodes
-    unsigned int j = 0;
-    for (j = 0; j < this->element[i].type->nodes; j++) {
+    for (unsigned int j = 0; j < this->element[i].type->nodes; j++) {
       fprintf(file, " %ld", this->element[i].node[j]->tag);
     }
     fprintf(file, "\n");
