@@ -22,6 +22,9 @@
 #include "../feenox.h"
 
 int feenox_instruction_mesh_write(void *arg) {
+  if (feenox.pde.do_not_solve) {
+    return FEENOX_OK;
+  }
 
   mesh_write_t *mesh_write = (mesh_write_t *)arg;
   mesh_write_dist_t *mesh_write_dist;

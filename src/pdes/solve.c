@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's problem-solving routines
  *
- *  Copyright (C) 2021--2022 Jeremy Theler
+ *  Copyright (C) 2021--2025 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -54,7 +54,9 @@ int feenox_instruction_solve_problem(void *arg) {
   
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)
-  feenox_call(feenox.pde.solve());
+  if (feenox.pde.do_not_solve == 0) {
+    feenox_call(feenox.pde.solve());
+  }
   
   // post ----------------------------------------------------------------------
   petsc_call(PetscLogStagePush(feenox.pde.stage_post));  

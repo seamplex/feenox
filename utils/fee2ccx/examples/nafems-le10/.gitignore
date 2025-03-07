@@ -1,0 +1,9 @@
+*.msh
+*.vtk
+*.12d
+*.cvg
+*.dat
+*.frd
+*.inp
+*.sta
+spooles.out

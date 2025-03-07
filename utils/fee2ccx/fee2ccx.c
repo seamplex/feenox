@@ -98,6 +98,8 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
+  // turn off the solve
+  feenox.pde.do_not_solve = 1;
   if (feenox_step(feenox.instructions, NULL) != FEENOX_OK) {
     feenox_pop_errors();
     exit(EXIT_FAILURE);

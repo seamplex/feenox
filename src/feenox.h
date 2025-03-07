@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX common framework header
  *
- *  Copyright (C) 2009--2023 Jeremy Theler
+ *  Copyright (C) 2009--2025 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *
@@ -1759,6 +1759,7 @@ struct feenox_t {
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
     size_t size_global;            // total number of DoFs
     
+    int do_not_solve;        // flag to skip solves in particular cases (e.g. convert to other format)
     int compute_gradients;   // do we need to compute gradients?
     void *missed_dump;
 //    gsl_matrix *m2;

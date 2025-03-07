@@ -599,7 +599,7 @@ inline gsl_matrix *feenox_fem_compute_H_Gc_at_gauss(element_t *e, unsigned int q
     }
   }
 
-  return e->type->H_Gc[q];  
+  return e->type->H_Gc[q];
 }
 
 inline gsl_matrix *feenox_fem_compute_B_at_gauss_integration(element_t *e, unsigned int q, int integration) {

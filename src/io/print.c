@@ -26,6 +26,10 @@
 
 
 int feenox_instruction_print(void *arg) {
+  if (feenox.pde.do_not_solve) {
+    return FEENOX_OK;
+  }
+  
   print_t *print = (print_t *)arg;
   print_token_t *print_token;
   char *current_format = (print->tokens != NULL) ? print->tokens->format : NULL;

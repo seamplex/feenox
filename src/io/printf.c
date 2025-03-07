@@ -27,6 +27,10 @@
 
 
 int feenox_instruction_printf(void *arg) {
+  if (feenox.pde.do_not_solve) {
+    return FEENOX_OK;
+  }
+  
   printf_t *printf = (printf_t *)arg;
 
   if (printf->all_ranks == 0 && feenox.mpi_rank != 0) {
