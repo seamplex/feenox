@@ -52,10 +52,8 @@ int feenox_problem_solve_petsc_linear(void) {
     }
 
     petsc_call(KSPSetOperators(feenox.pde.ksp, feenox.pde.K_bc, feenox.pde.K_bc));
-    
     feenox_call(feenox_problem_setup_ksp(feenox.pde.ksp));
   }
-
   
   // check if the stiffness matrix K has a near nullspace 
   // and pass it on to K_bc
@@ -78,21 +76,22 @@ int feenox_problem_solve_petsc_linear(void) {
   feenox.pde.progress_last = 0;
 
   // do the work!
-  // TODO: have a flag in case we want to just build
-  petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
+  if (feenox.pde.do_not_solve == 0) {
+    petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
   
-  // check for convergence
-  KSPConvergedReason reason = 0;
-  petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));
-  if (reason < 0) {
-    // if the input file asks for a DUMP then we do it now
-    if (feenox.pde.dumps != NULL) {
-      feenox_instruction_dump((void *)feenox.pde.dumps);
-    }
+    // check for convergence
+    KSPConvergedReason reason = 0;
+    petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));
+    if (reason < 0) {
+      // if the input file asks for a DUMP then we do it now
+      if (feenox.pde.dumps != NULL) {
+        feenox_instruction_dump((void *)feenox.pde.dumps);
+      }
     
-    feenox_push_error_message("PETSc's linear solver did not converge with reason '%s' (%d)", KSPConvergedReasons[reason], reason);
-    // TODO: dive into the PC
-    return FEENOX_ERROR;
+      feenox_push_error_message("PETSc's linear solver did not converge with reason '%s' (%d)", KSPConvergedReasons[reason], reason);
+      // TODO: dive into the PC
+      return FEENOX_ERROR;
+    }
   }
 
   // finish the progress line

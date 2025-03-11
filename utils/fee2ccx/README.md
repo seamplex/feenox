@@ -63,12 +63,12 @@ In particular, `fee2ccx`
 
  * Linear isotropic elasticity (orthotropic TO-DO)
  * Single-material only (TO-DOs)
- * Steady state (for now)
+ * Steady state (TO-DOs)
 
 ## TODOs
 
  * command-line options to include or not the original input
- * do not solve (nor write outputs) in the original problem
  * orthotropic materials (might need some re-thinking on FeenoX's side)
  * multi-volume material properties
  * non-uniform material properties
+ * quasi-static

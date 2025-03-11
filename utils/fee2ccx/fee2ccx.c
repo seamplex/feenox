@@ -26,60 +26,9 @@ feenox_t feenox;
 #include <stdlib.h>
 #include <libgen.h>
 
-char *ccx_names[] = {
-  "",
-  "C3D8",
-  "C3D6",
-  "C3D4",
-  "C3D20",
-  "C3D15",
-  "C3D10",
-  "CPS3",
-  "CPS6",
-  "CPS4",
-  "CPS8",
-  "T3D2",
-  "T3D3",
-  "MASS"  
-};
-
- int ccx2gmsh_types[] = {
-  ELEMENT_TYPE_UNDEFINED,     // 0
-  ELEMENT_TYPE_HEXAHEDRON8,   // 1
-  ELEMENT_TYPE_PRISM6,        // 2
-  ELEMENT_TYPE_TETRAHEDRON4,  // 3
-  ELEMENT_TYPE_HEXAHEDRON20,  // 4
-  ELEMENT_TYPE_PRISM15,       // 6
-  ELEMENT_TYPE_TETRAHEDRON10, // 6
-  ELEMENT_TYPE_TRIANGLE3,     // 7
-  ELEMENT_TYPE_TRIANGLE6,     // 8
-  ELEMENT_TYPE_QUADRANGLE4,   // 9
-  ELEMENT_TYPE_QUADRANGLE8,   // 10
-  ELEMENT_TYPE_LINE2,         // 11
-  ELEMENT_TYPE_LINE3,         // 12
-  ELEMENT_TYPE_POINT1         // 13
-};
-    
-int gmsh2ccx_types[] = {  
-   0,      // ELEMENT_TYPE_UNDEFINED      0
-  11,      // ELEMENT_TYPE_LINE2          1
-   7,      // ELEMENT_TYPE_TRIANGLE3      2
-   9,      // ELEMENT_TYPE_QUADRANGLE4    3
-   3,      // ELEMENT_TYPE_TETRAHEDRON4   4
-   1,      // ELEMENT_TYPE_HEXAHEDRON8    5
-   2,      // ELEMENT_TYPE_PRISM6         6
-   0,      // ELEMENT_TYPE_PYRAMID5       7
-  12,      // ELEMENT_TYPE_LINE3          8
-   8,      // ELEMENT_TYPE_TRIANGLE6      9
-   0,      // ELEMENT_TYPE_QUADRANGLE9    10
-   6,      // ELEMENT_TYPE_TETRAHEDRON10  11
-   0,      // ELEMENT_TYPE_HEXAHEDRON27   12 
-  13,      // ELEMENT_TYPE_POINT1         15
-  10,      // ELEMENT_TYPE_QUADRANGLE8    16
-   4,      // ELEMENT_TYPE_HEXAHEDRON20   17
-   5       // ELEMENT_TYPE_PRISM15        18
-};
-
+extern char *ccx_names[];
+extern int ccx2gmsh_types[];
+extern int gmsh2ccx_types[];
 
 
 int main(int argc, char **argv) {
@@ -89,7 +38,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  // TODO: check this ir run in serial
+  // TODO: check this is run in serial
   // TODO: particular argc && argv
   // e.g. --version
   //      --do-not-include-original-input

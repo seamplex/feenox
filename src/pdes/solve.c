@@ -54,9 +54,7 @@ int feenox_instruction_solve_problem(void *arg) {
   
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)
-  if (feenox.pde.do_not_solve == 0) {
-    feenox_call(feenox.pde.solve());
-  }
+  feenox_call(feenox.pde.solve());
   
   // post ----------------------------------------------------------------------
   petsc_call(PetscLogStagePush(feenox.pde.stage_post));  

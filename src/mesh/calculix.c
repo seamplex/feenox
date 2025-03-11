@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related routines to read frd files from calculix
  *
- *  Copyright (C) 2018--2020 Jeremy Theler
+ *  Copyright (C) 2018--2025 Jeremy Theler
  *
  *  This file is part of feenox.
  *
@@ -20,6 +20,9 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
+
+// main reference
+//   https://web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node168.html
 
 /*
      _________________________________________________________________
@@ -124,277 +127,325 @@
    
 */
 
-int frdfromgmsh_types[] = {
- ELEMENT_TYPE_UNDEFINED,     // 0
- ELEMENT_TYPE_HEXAHEDRON8,   // 1
- ELEMENT_TYPE_PRISM6,        // 2
- ELEMENT_TYPE_TETRAHEDRON4,  // 3
- ELEMENT_TYPE_HEXAHEDRON20,  // 4
- ELEMENT_TYPE_PRISM15,       // 6
- ELEMENT_TYPE_TETRAHEDRON10, // 6
- ELEMENT_TYPE_TRIANGLE3,     // 7
- ELEMENT_TYPE_TRIANGLE6,     // 8
- ELEMENT_TYPE_QUADRANGLE4,   // 9
- ELEMENT_TYPE_QUADRANGLE8,   // 10
- ELEMENT_TYPE_LINE2,         // 11
- ELEMENT_TYPE_LINE3,         // 12
- ELEMENT_TYPE_POINT1         // 13
+char *ccx_names[] = {
+  "",
+  "C3D8",
+  "C3D6",
+  "C3D4",
+  "C3D20",
+  "C3D15",
+  "C3D10",
+  "CPS3",
+  "CPS6",
+  "CPS4",
+  "CPS8",
+  "T3D2",
+  "T3D3",
+  "MASS"  
 };
 
+int ccx2gmsh_types[] = {
+  ELEMENT_TYPE_UNDEFINED,     // 0
+  ELEMENT_TYPE_HEXAHEDRON8,   // 1
+  ELEMENT_TYPE_PRISM6,        // 2
+  ELEMENT_TYPE_TETRAHEDRON4,  // 3
+  ELEMENT_TYPE_HEXAHEDRON20,  // 4
+  ELEMENT_TYPE_PRISM15,       // 6
+  ELEMENT_TYPE_TETRAHEDRON10, // 6
+  ELEMENT_TYPE_TRIANGLE3,     // 7
+  ELEMENT_TYPE_TRIANGLE6,     // 8
+  ELEMENT_TYPE_QUADRANGLE4,   // 9
+  ELEMENT_TYPE_QUADRANGLE8,   // 10
+  ELEMENT_TYPE_LINE2,         // 11
+  ELEMENT_TYPE_LINE3,         // 12
+  ELEMENT_TYPE_POINT1         // 13
+};
+    
+int gmsh2ccx_types[] = {  
+   0,      // ELEMENT_TYPE_UNDEFINED      0
+  11,      // ELEMENT_TYPE_LINE2          1
+   7,      // ELEMENT_TYPE_TRIANGLE3      2
+   9,      // ELEMENT_TYPE_QUADRANGLE4    3
+   3,      // ELEMENT_TYPE_TETRAHEDRON4   4
+   1,      // ELEMENT_TYPE_HEXAHEDRON8    5
+   2,      // ELEMENT_TYPE_PRISM6         6
+   0,      // ELEMENT_TYPE_PYRAMID5       7
+  12,      // ELEMENT_TYPE_LINE3          8
+   8,      // ELEMENT_TYPE_TRIANGLE6      9
+   0,      // ELEMENT_TYPE_QUADRANGLE9    10
+   6,      // ELEMENT_TYPE_TETRAHEDRON10  11
+   0,      // ELEMENT_TYPE_HEXAHEDRON27   12 
+  13,      // ELEMENT_TYPE_POINT1         15
+  10,      // ELEMENT_TYPE_QUADRANGLE8    16
+   4,      // ELEMENT_TYPE_HEXAHEDRON20   17
+   5       // ELEMENT_TYPE_PRISM15        18
+};
+
+
+#define BUFFER_SIZE 512
 int feenox_mesh_read_frd(mesh_t *this) {
 
-/*
   char buffer[BUFFER_SIZE];
   char tmp[BUFFER_SIZE];
-  double offset[3];
-  
-  double scale_factor;
-  double scalar;
-  
-  int i, j, j_gmsh, k;
-  int tag, tag_max;
-  int type;
-  int tags[2];
-  int node, node_index;
-  int spatial_dimensions;
-  int bulk_dimensions;
-  int order;
-  
-  int numnod, ictype, numstp, format, ncomps, irtype, menu;
-  int minusone, minustwo, minusthree, minusfour, minusfive;
-  
-  int sparse = 0; // assume the nodes are not sparse
   int *tag2index = NULL;
   
-  if (mesh->file->pointer == NULL) {
-    feenox_call(feenox_instruction_open_file(mesh->file));
+  if (this->file->pointer == NULL) {
+    feenox_call(feenox_instruction_file_open(this->file));
   }
-  scale_factor = feenox_evaluate_expression(mesh->scale_factor);
-  offset[0] = feenox_evaluate_expression(mesh->offset_x);
-  offset[1] = feenox_evaluate_expression(mesh->offset_y);
-  offset[2] = feenox_evaluate_expression(mesh->offset_z);
 
-  // empezamos suponiendo cero dimensiones y vamos viendo cual es el elemento
-  // de mayor dimension que aparece -> esa es la de la malla
-  bulk_dimensions = 0;
-  spatial_dimensions = 0;
-  order = 0;
+  int sparse = 0;
   
-  while (fgets(buffer, BUFFER_SIZE-1, mesh->file->pointer) != NULL) {
+  // start assuming all these are zero
+  int bulk_dimensions = 0;
+  int spatial_dimensions = 0;
+  int order = 0;
+  
+  while (fgets(buffer, BUFFER_SIZE-1, this->file->pointer) != NULL) {
 
     if (strncmp("\n", buffer, 1) == 0) {
       ;
     
     // ------------------------------------------------------  
     } else if (strncmp("    1C", buffer, 6) == 0) {
+      // Format:(1X,'   1','C',A6)  
+      // Values: KEY, CODE, NAME
+      // >    1Ctest             !''1C'' defines a new calc of name ''test''
+      //
       // case name at buffer+6
+      // 
       ;
       
     // ------------------------------------------------------  
     } else if (strncmp("    1U", buffer, 6) == 0) {
+      // Format:(1X,'   1','U',A66)  
+      // Values: KEY, CODE, STRING
+      // >    1UDATE  26.01.2000 !''1U'' stores user job-informations      
+      //
       // user-provided field at buffer+6 and user-provided data afterwards
       ;
       
     // ------------------------------------------------------  
     } else if (strncmp("    2C", buffer, 6) == 0) {
+      // Format:(1X,'   2','C',18X,I12,37X,I1)
+      // Values: KEY, CODE,NUMNOD, FORMAT
+      // Where: KEY    = 2
+      //        CODE   = C
+      //        NUMNOD = Number of nodes in this block
+      //        FORMAT = Format indicator
+      //                 0  short format
+      //                 1  long format 
+      //                 2  binary format       
  
-      // la cantidad de nodos y el formato
-      if (sscanf(buffer, "%s %d %d", tmp, &mesh->n_nodes, &format) != 3) {
+      // number of nodes and "format"
+      int format;
+      if (sscanf(buffer, "%s %d %d", tmp, &this->n_nodes, &format) != 3) {
         feenox_push_error_message("error parsing number of nodes '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
-      if (mesh->n_nodes == 0) {
-        feenox_push_error_message("no nodes found in mesh '%s'", mesh->file->path);
-        return WASORA_RUNTIME_ERROR;
+      if (this->n_nodes == 0) {
+        feenox_push_error_message("no nodes found in mesh '%s'", this->file->path);
+        return FEENOX_ERROR;
       }
       if (format > 1) {
         feenox_push_error_message("node format %d not supported'", format);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
-      mesh->node = calloc(mesh->n_nodes, sizeof(node_t));
+      feenox_check_alloc(this->node = calloc(this->n_nodes, sizeof(node_t)));
 
-      for (i = 0; i < mesh->n_nodes; i++) {
-        if (fscanf(mesh->file->pointer, "%d", &minusone) != 1) {
+      int tag_max = this->n_nodes;
+      for (size_t j = 0; j < this->n_nodes; j++) {
+        int minusone;
+        if (fscanf(this->file->pointer, "%d", &minusone) != 1) {
           feenox_push_error_message("error parsing nodes", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         if (minusone != -1) {
           feenox_push_error_message("expected minus one as line starter", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
 
-        if (fscanf(mesh->file->pointer, "%d", &tag) == 0) {
-          return WASORA_RUNTIME_ERROR;
+        int tag = 0;
+        if (fscanf(this->file->pointer, "%d", &tag) == 0) {
+          return FEENOX_ERROR;
         }
         
-        if (i+1 != tag) {
+        if (j+1 != tag) {
           sparse = 1;
         }
         
-        if ((mesh->node[i].tag = tag) > tag_max) {
-          tag_max = mesh->node[i].tag;
+        if ((this->node[j].tag = tag) > tag_max) {
+          tag_max = this->node[j].tag;
         }
         
-        mesh->node[i].index_mesh = i;
+        this->node[j].index_mesh = j;
 
-        for (j = 0; j < 3; j++) {
-          if (fscanf(mesh->file->pointer, "%lf", &mesh->node[i].x[j]) == 0) {
-            return WASORA_RUNTIME_ERROR;
-          }
-          if (scale_factor != 0 || offset[j] != 0) {
-            mesh->node[i].x[j] = scale_factor*mesh->node[i].x[j] - offset[j];
+        for (unsigned int d = 0; d < 3; d++) {
+          if (fscanf(this->file->pointer, "%lf", &this->node[j].x[d]) == 0) {
+            return FEENOX_ERROR;
           }
         }
         
-        if (spatial_dimensions < 1 && fabs(mesh->node[i].x[0]) > 1e-6) {
+        if (spatial_dimensions < 1 && fabs(this->node[j].x[0]) > 1e-6) {
           spatial_dimensions = 1;
         }
-        if (spatial_dimensions < 2 && fabs(mesh->node[i].x[1]) > 1e-6) {
+        if (spatial_dimensions < 2 && fabs(this->node[j].x[1]) > 1e-6) {
           spatial_dimensions = 2;
         }
-        if (spatial_dimensions < 3 && fabs(mesh->node[i].x[2]) > 1e-6) {
+        if (spatial_dimensions < 3 && fabs(this->node[j].x[2]) > 1e-6) {
           spatial_dimensions = 3;
         }
       }
   
-      // el -3
-      if (fscanf(mesh->file->pointer, "%d", &minusthree) != 1) {
+      // -3
+      int minusthree;
+      if (fscanf(this->file->pointer, "%d", &minusthree) != 1) {
         feenox_push_error_message("error parsing nodes", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       if (minusthree != -3) {
         feenox_push_error_message("expected minus three as line starter", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
-      // terminamos de leer los nodos, si los nodos son sparse tenemos que hacer el tag2index
+      // finished reading the nodes, handle sparse node tags
       if (sparse) {
-        tag2index = malloc((tag_max+1) * sizeof(int));
-        for (k = 0; k <= tag_max; k++) {
+        feenox_check_alloc(tag2index = malloc((tag_max+1) * sizeof(int)));
+        for (size_t k = 0; k <= tag_max; k++) {
           tag2index[k] = -1;
         }
-        for (i = 0; i < mesh->n_nodes; i++) {
-          tag2index[mesh->node[i].tag] = i;
+        for (size_t j = 0; j < this->n_nodes; j++) {
+          tag2index[this->node[j].tag] = j;
         }
       }
 
 
     // ------------------------------------------------------      
     } else if (strncmp("    3C", buffer, 6) == 0) {
+      // Format:(1X,'   3','C',18X,I12,37X,I1)
+      // Values: KEY, CODE,NUMELEM, FORMAT
+      // Where: KEY    = 3
+      //        CODE   = C
+      //        NUMELEM= Number of elements in this block
+      //        FORMAT = Format indicator
+      //                 0  short format
+      //                 1  long format 
+      //                 2  binary format       
 
-      // la cantidad de elementos
-      if (sscanf(buffer, "%s %d %d", tmp, &mesh->n_elements, &format) != 3) {
+      // TODO: mind the fact that tere might be different "element blocks" for different materials
+      // number of elements and "format"
+      int format;
+      if (sscanf(buffer, "%s %d %d", tmp, &this->n_elements, &format) != 3) {
         feenox_push_error_message("error parsing number of elements '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
-      if (mesh->n_elements == 0) {
-        feenox_push_error_message("no elements found in mesh '%s'", mesh->file->path);
-        return WASORA_RUNTIME_ERROR;
+      if (this->n_elements == 0) {
+        feenox_push_error_message("no elements found in mesh '%s'", this->file->path);
+        return FEENOX_ERROR;
       }
       if (format > 1) {
         feenox_push_error_message("element format %d not supported'", format);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
 
-      mesh->element = calloc(mesh->n_elements, sizeof(element_t));
-
-      for (i = 0; i < mesh->n_elements; i++) {
-
-        if (fscanf(mesh->file->pointer, "%d", &minusone) != 1) {
+      feenox_check_alloc(this->element = calloc(this->n_elements, sizeof(element_t)));
+      for (size_t i = 0; i < this->n_elements; i++) {
+        
+        // The following block of records must be repeated for each element:
+        //  The first record initializes an element definition:
+        //  Short Format:(1X,'-1',I5,3I5)
+        //  Long Format:(1X,'-1',I10,3I5)
+        //  Values: KEY, ELEMENT, TYPE, GROUP, MATERIAL
+        // Where: KEY    = -1
+        //       NODE   = element number
+        //       TYPE   = element type, see section ''Element Types''
+        //       GROUP  = element group number, see command ''grps''
+        //       MATERIAL= element material number, see command ''mats''.        
+        
+        int minusone;
+        if (fscanf(this->file->pointer, "%d", &minusone) != 1) {
           feenox_push_error_message("error parsing nodes", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         if (minusone != -1) {
           feenox_push_error_message("expected minus one as line starter", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         
-        if (fscanf(mesh->file->pointer, "%d", &tag) == 0) {
-          return WASORA_RUNTIME_ERROR;
+        int tag = 0;
+        if (fscanf(this->file->pointer, "%d", &tag) == 0) {
+          return FEENOX_ERROR;
         }
-        mesh->element[i].index = i;
-        mesh->element[i].tag = tag;
+        this->element[i].index = i;
+        this->element[i].tag = tag;
     
-        if (fscanf(mesh->file->pointer, "%d", &type) == 0) {
-          return WASORA_RUNTIME_ERROR;
+        int ccx_element_type;
+        if (fscanf(this->file->pointer, "%d", &ccx_element_type) == 0) {
+          return FEENOX_ERROR;
         }
-        if (type > 13) {
-          feenox_push_error_message("element type '%d' should be less than 14", type);
-          return WASORA_RUNTIME_ERROR;
+        if (ccx_element_type > 13) {
+          feenox_push_error_message("element type '%d' should be less than 14", ccx_element_type);
+          return FEENOX_ERROR;
         }
-        mesh->element[i].type = &(feenox_mesh.element_type[frdfromgmsh_types[type]]);
-        if (mesh->element[i].type->nodes == 0) {
-          feenox_push_error_message("elements of type '%s' are not supported in this version :-(", mesh->element[i].type->name);
-          return WASORA_RUNTIME_ERROR;
+        this->element[i].type = &(feenox.mesh.element_types[ccx2gmsh_types[ccx_element_type]]);
+        if (this->element[i].type->nodes == 0) {
+          feenox_push_error_message("elements of type '%s' are not supported in this version :-(", this->element[i].type->name);
+          return FEENOX_ERROR;
         }
 
-        if (fscanf(mesh->file->pointer, "%d %d", &tags[0], &tags[1]) < 2) {
-          return WASORA_RUNTIME_ERROR;
-        }
-*/
-        // agregamos uno a la cantidad de elementos asociados a la entidad fisica
-/*        
-        if (mesh == feenox_mesh.main_mesh) {
-          if (mesh->element[i].tag != NULL && mesh->element[i].tag[0] != 0) {
-            HASH_FIND(hh_id, feenox_mesh.physical_entities_by_id, &mesh->element[i].tag[0], sizeof(int), physical_entity);
-            if ((mesh->element[i].physical_entity = physical_entity) != NULL) {
-              physical_entity->n_elements++;
-              // ponemos la dimension de la entidad fisica
-              if (mesh->element[i].type->dim > physical_entity->dimension) {
-                physical_entity->dimension = mesh->element[i].type->dim;
-              }
-            }
-          }
-        }
-*/      
-/*
-        // vemos la dimension del elemento -> la mayor es la de la malla
-        if (mesh->element[i].type->dim > bulk_dimensions) {
-          bulk_dimensions = mesh->element[i].type->dim;
-        }
-        
-        // el orden
-        if (mesh->element[i].type->order > order) {
-          order = mesh->element[i].type->order;
-        }
-        
-        // nos acordamos del elemento que tenga el mayor numero de nodos
-        if (mesh->element[i].type->nodes > mesh->max_nodes_per_element) {
-          mesh->max_nodes_per_element = mesh->element[i].type->nodes;
+        // rec[0] = element group
+        // rec[1] = material
+        int rec[2];
+        if (fscanf(this->file->pointer, "%d %d", &rec[0], &rec[1]) < 2) {
+          return FEENOX_ERROR;
         }
 
-        // y del que tenga mayor cantidad de vecinos
-        if (mesh->element[i].type->faces > mesh->max_faces_per_element) {
-          mesh->max_faces_per_element = mesh->element[i].type->faces;
+        if (this->element[i].type->dim > bulk_dimensions) {
+          bulk_dimensions = this->element[i].type->dim;
+        }
+        
+        if (this->element[i].type->order > order) {
+          order = this->element[i].type->order;
+        }
+        
+        // highest node count
+        if (this->element[i].type->nodes > this->max_nodes_per_element) {
+          this->max_nodes_per_element = this->element[i].type->nodes;
+        }
+
+        // highest neighbors count
+        if (this->element[i].type->faces > this->max_faces_per_element) {
+          this->max_faces_per_element = this->element[i].type->faces;
         }
     
-        // el -2
-        if (fscanf(mesh->file->pointer, "%d", &minustwo) != 1) {
+        // -2
+        int minustwo;
+        if (fscanf(this->file->pointer, "%d", &minustwo) != 1) {
           feenox_push_error_message("error parsing elements", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         if (minustwo != -2) {
           feenox_push_error_message("expected minus two as line starter", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         
-        mesh->element[i].node = calloc(mesh->element[i].type->nodes, sizeof(node_t *));
-        for (j = 0; j < mesh->element[i].type->nodes; j++) {
+        feenox_check_alloc(this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *)));
+        for (size_t j = 0; j < this->element[i].type->nodes; j++) {
+          int node = 0;
           do {
-            if (fscanf(mesh->file->pointer, "%d", &node) == 0) {
-              return WASORA_RUNTIME_ERROR;
+            if (fscanf(this->file->pointer, "%d", &node) == 0) {
+              return FEENOX_ERROR;
             }
-            if (sparse == 0 && node > mesh->n_nodes) {
+            if (sparse == 0 && node > this->n_nodes) {
               feenox_push_error_message("node %d in element %d does not exist", node, tag);
-              return WASORA_RUNTIME_ERROR;
+              return FEENOX_ERROR;
             }
           } while (node == -2);
           
-          // pelar ojo al orden!
-          // el tet10 tiene un unico cambio
-          // ojo que hexa20y wedge 2nd order tambien tienen cambios
-          if (mesh->element[i].type->id == ELEMENT_TYPE_TETRAHEDRON10) {
+          // tet10 has a single swap
+          // TODO: hexa20 and wedge 2nd order
+          int j_gmsh = j;
+          if (this->element[i].type->id == ELEMENT_TYPE_TETRAHEDRON10) {
             if (j == 8) {
               j_gmsh = 9;
             } else if (j == 9) {
@@ -402,120 +453,170 @@ int feenox_mesh_read_frd(mesh_t *this) {
             } else {
               j_gmsh = j;
             }
-          } else {
-            j_gmsh = j;
           }
           
-          if ((node_index = (sparse==0)?node-1:tag2index[node]) < 0) {
+          int node_index = (sparse==0) ? node-1 : tag2index[node];
+          if (node_index < 0) {
             feenox_push_error_message("node %d in element %d does not exist", node, tag);
-            return WASORA_RUNTIME_ERROR;
+            return FEENOX_ERROR;
           }
-          mesh->element[i].node[j_gmsh] = &mesh->node[node_index];
-          mesh_add_element_to_list(&mesh->element[i].node[j_gmsh]->associated_elements, &mesh->element[i]);
-            
-*/          
-/*          
-          if (mesh->element[id].physical_entity != NULL && mesh->element[id].physical_entity->material != NULL) {
-            mesh_add_material_to_list(&mesh->element[id].node[j]->materials_list, mesh->element[id].physical_entity->material);
-          }
- */
-/*
+          this->element[i].node[j_gmsh] = &this->node[node_index];
+          // TODO: why a list? use a hash!
+          feenox_mesh_add_element_to_list(&this->element[i].node[j_gmsh]->element_list, &this->element[i]);
         }
       }
 
-      // el -3
-      if (fscanf(mesh->file->pointer, "%d", &minusthree) != 1) {
+      // -3
+      int minusthree;
+      if (fscanf(this->file->pointer, "%d", &minusthree) != 1) {
         feenox_push_error_message("error parsing nodes", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       if (minusthree != -3) {
         feenox_push_error_message("expected minus three as line starter", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
      
     // ------------------------------------------------------      
     } else if (strncmp("  100C", buffer, 6) == 0) {
       
+      // Format:(1X,' 100','C',6A1,E12.5,I12,20A1,I2,I5,10A1,I2)
+      // Values: KEY,CODE,SETNAME,VALUE,NUMNOD,TEXT,ICTYPE,NUMSTP,ANALYS,
+      //         FORMAT
+      // Where: KEY    = 100
+      //        CODE   = C
+      //        SETNAME= Name (not used)
+      //        VALUE  = Could be frequency, time or any numerical value
+      //        NUMNOD = Number of nodes in this nodal results block
+      //        TEXT   = Any text
+      //        ICTYPE = Analysis type
+      //                 0  static
+      //                 1  time step
+      //                 2  frequency
+      //                 3  load step
+      //                 4  user named
+      //        NUMSTP = Step number
+      //        ANALYS = Type of analysis (description)
+      //        FORMAT = Format indicator
+      //                 0  short format
+      //                 1  long format 
+      //                 2  binary format       
+      
       node_data_t *node_data;
       function_t **function;
       
-      // la cantidad de nodos
-      if (sscanf(buffer+25, "%d", &numnod) != 1) {
+      int number_of_nodes;
+      if (sscanf(buffer+25, "%d", &number_of_nodes) != 1) {
         feenox_push_error_message("error parsing 100CL '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
 
+      int ictype;
+      int numstp;
       if (sscanf(buffer+38, "%d %d", &ictype, &numstp) != 2) {
         feenox_push_error_message("error parsing 100CL '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
+      int format;
       if (sscanf(buffer+74, "%d", &format) != 1) {
         feenox_push_error_message("error parsing 100CL '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
       
-      if (numnod != mesh->n_nodes || ictype != 0 || numstp != 1 || format > 1) {
+      if (number_of_nodes != this->n_nodes || ictype != 0 || numstp != 1 || format > 1) {
         continue;
       }
       
-      if (fgets(buffer, BUFFER_SIZE-1, mesh->file->pointer) == NULL) {
+      if (fgets(buffer, BUFFER_SIZE-1, this->file->pointer) == NULL) {
         feenox_push_error_message("error parsing -4");
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
+      // Format:(1X,I2,2X,8A1,2I5)
+      // Values: KEY, NAME, NCOMPS, IRTYPE
+      // Where: KEY    = -4
+      //        NAME   = Dataset name to be used in the menu
+      //        NCOMPS = Number of entities
+      //        IRTYPE = 1  Nodal data, material independent
+      //                 2  Nodal data, material dependant
+      //                 3  Element data at nodes (not used)       
+      int minusfour;
+      int ncomps;
+      int irtype;
       if (sscanf(buffer, "%d %s %d %d", &minusfour, tmp, &ncomps, &irtype) != 4) {
         feenox_push_error_message("error parsing -4 '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
       if (minusfour != -4) {
         feenox_push_error_message("error parsing -4 '%s'", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
-      if (irtype != 1) {
+      if (irtype > 2) {
         continue;
       }
       
       // esto es un array de apuntadores, arrancamos en null y si
       // el nombre en el frd coincide con alguna de las funciones
       // que nos pidieron, entonces lo hacemos apuntar ahi
-      function = calloc(ncomps, sizeof(function_t *));
+      feenox_check_alloc(function = calloc(ncomps, sizeof(function_t *)));
       
-      for (i = 0; i < ncomps; i++) {
-        function[i] = NULL;
+      for (unsigned int g = 0; g < ncomps; g++) {
         
-        if (fgets(buffer, BUFFER_SIZE-1, mesh->file->pointer) == NULL) {
+        // Format:(1X,I2,2X,8A1,5I5,8A1) 
+        // Values: KEY, NAME, MENU, ICTYPE, ICIND1, ICIND2, IEXIST, ICNAME
+        // Where: KEY    = -5
+        //        NAME   = Entity name to be used in the menu for this comp.
+        //        MENU   = 1
+        //        ICTYPE = Type of entity
+        //                 1  scalar
+        //                 2  vector with 3 components
+        //                 4  matrix
+        //                12  vector with 3 amplitudes and 3 phase-angles in
+        //                    degree
+        //        ICIND1 = sub-component index or row number
+        //        ICIND2 = column number for ICTYPE=4
+        //        IEXIST = 0  data are provided
+        //                 1  data are to be calculated by predefined
+        //                    functions (not used)
+        //                 2  as 0 but earmarked
+        //        ICNAME = Name of the predefined calculation (not used)
+        //                 ALL  calculate the total displacement if ICTYPE=2        
+        
+        if (fgets(buffer, BUFFER_SIZE-1, this->file->pointer) == NULL) {
           feenox_push_error_message("error parsing -5");
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         
+        int minusfive;
+        int menu;
         if (sscanf(buffer, "%d %s %d", &minusfive, tmp, &menu) != 3) {
           feenox_push_error_message("error parsing -5 '%s'", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         
         if (minusfive != -5) {
           feenox_push_error_message("error parsing -5 '%s'", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         if (menu != 1) {
           feenox_push_error_message("menu should be 1 '%s'", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
-        
-        LL_FOREACH(mesh->node_datas, node_data) {
+
+        LL_FOREACH(this->node_datas, node_data) {
           if (strcmp(tmp, node_data->name_in_mesh) == 0) {
-            function[i] = node_data->function;
-            
-            function[i]->type = type_pointwise_mesh_node;
-            function[i]->mesh = mesh;
-            function[i]->data_argument = mesh->nodes_argument;
-            function[i]->data_size = numnod;
-            function[i]->data_value = calloc(numnod, sizeof(double));
-            
+            function[g] = node_data->function;
+
+            function[g]->type = function_type_pointwise_mesh_node;
+            function[g]->data_size = this->n_nodes;
+            function[g]->mesh = this;
+            function[g]->vector_value->size = this->n_nodes;
+            feenox_call(feenox_vector_init(function[g]->vector_value, 1));
+            node_data->found = 1;
           }
         }
         
@@ -529,52 +630,57 @@ int feenox_mesh_read_frd(mesh_t *this) {
         
       }
         
-      for (j = 0; j < numnod; j++) {
-        if (fscanf(mesh->file->pointer, "%d %d", &minusone, &node) != 2) {
+      for (size_t j = 0; j < number_of_nodes; j++) {
+        int minusone;
+        int node;
+        if (fscanf(this->file->pointer, "%d %d", &minusone, &node) != 2) {
           feenox_push_error_message("error reading file");
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
         if (minusone != -1) {
           feenox_push_error_message("expected -1 '%s'", buffer);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
-        if (sparse == 0 && (node < 1 || node > mesh->n_nodes)) {
+        if (sparse == 0 && (node < 1 || node > this->n_nodes)) {
           feenox_push_error_message("invalid node number '%d'", node);
-          return WASORA_RUNTIME_ERROR;
+          return FEENOX_ERROR;
         }
           
-        for (i = 0; i < ncomps; i++) {
-          // no entran mas de 6 por vez, hay que leer un -2 si hay mas
-          if (fscanf(mesh->file->pointer, "%lf", &scalar) == 0) {
+        for (unsigned int g = 0; g < ncomps; g++) {
+          // TODO: mind that if there are more than 6 we'd need to read a -2
+          double scalar;
+          if (fscanf(this->file->pointer, "%lf", &scalar) == 0) {
             feenox_push_error_message("error reading file");
-            return WASORA_RUNTIME_ERROR;
+            return FEENOX_ERROR;
           }
-          if (function[i] != NULL) {
-            if ((node_index = (sparse==0)?node-1:tag2index[node]) < 0) {
-              feenox_push_error_message("node %d in element %d does not exist", node, tag);
-              return WASORA_RUNTIME_ERROR;
+          if (function[g] != NULL) {
+            int node_index = (sparse==0) ? node-1 : tag2index[node];
+            if (node_index < 0) {
+              feenox_push_error_message("node %d does not exist", node);
+              return FEENOX_ERROR;
             }
-            function[i]->data_value[node_index] = scalar;
+            feenox_vector_set(function[g]->vector_value, node_index, scalar);
           }
         }
       }
       
-      // el -3
-      if (fscanf(mesh->file->pointer, "%d", &minusthree) != 1) {
+      // -3
+      int minusthree;
+      if (fscanf(this->file->pointer, "%d", &minusthree) != 1) {
         feenox_push_error_message("error parsing -3");
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       if (minusthree != -3) {
         feenox_push_error_message("expected minus three as line starter", buffer);
-        return WASORA_RUNTIME_ERROR;
+        return FEENOX_ERROR;
       }
       
     // ------------------------------------------------------      
     }
   }
 
-  fclose(mesh->file->pointer);
-  mesh->file->pointer = NULL;
+  fclose(this->file->pointer);
+  this->file->pointer = NULL;
 
   if (tag2index != NULL) {
     feenox_free(tag2index);
@@ -582,15 +688,14 @@ int feenox_mesh_read_frd(mesh_t *this) {
 
   
   // verificamos que la malla tenga la dimension esperada
-  if (mesh->bulk_dimensions == 0) {
-    mesh->bulk_dimensions = bulk_dimensions;
-  } else if (mesh->bulk_dimensions != bulk_dimensions) {
-    feenox_push_error_message("mesh '%s' is expected to have %d dimensions but it has %d", mesh->file->path, mesh->bulk_dimensions, bulk_dimensions);
-    return WASORA_RUNTIME_ERROR;
+  if (this->dim_topo == 0) {
+    this->dim = bulk_dimensions;
+  } else if (this->dim != bulk_dimensions) {
+    feenox_push_error_message("mesh '%s' is expected to have %d dimensions but it has %d", this->file->path, this->dim, bulk_dimensions);
+    return FEENOX_ERROR;
   }
-  
-  mesh->spatial_dimensions = spatial_dimensions;
-  mesh->order = order;  
-*/
+  this->dim = spatial_dimensions;
+  this->order = order;  
+
   return FEENOX_OK;
 }
