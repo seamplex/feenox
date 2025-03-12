@@ -1,0 +1,39 @@
+READ_MESH $1.vtk DIM 3 { 
+  READ_FUNCTION displacements1
+  READ_FUNCTION displacements2
+  READ_FUNCTION displacements3
+  READ_FUNCTION sigmax
+  READ_FUNCTION sigmay
+  READ_FUNCTION sigmaz
+  READ_FUNCTION tauxy
+  READ_FUNCTION tauyz
+  READ_FUNCTION tauzx
+}
+
+READ_MESH $1.frd DIM 3 {
+  READ_FUNCTION D1
+  READ_FUNCTION D2
+  READ_FUNCTION D3
+  READ_FUNCTION SXX
+  READ_FUNCTION SYY
+  READ_FUNCTION SZZ
+  READ_FUNCTION SXY
+  READ_FUNCTION SYZ
+  READ_FUNCTION SZX
+}
+
+du(x,y,z) = displacements1(x,y,z) - D1(x,y,z)
+dy(x,y,z) = displacements2(x,y,z) - D2(x,y,z)
+dz(x,y,z) = displacements3(x,y,z) - D3(x,y,z)
+
+dsigmax = sigmax(x,y,z) - SXX(x,y,z)
+dsigmay = sigmay(x,y,z) - SYY(x,y,z)
+dsigmaz = sigmaz(x,y,z) - SZZ(x,y,z)
+dtauxy = tauxy(x,y,z) - SXY(x,y,z)
+dtauyz = tauyz(x,y,z) - SYZ(x,y,z)
+dtauzx = tauzx(x,y,z) - SZX(x,y,z)
+
+WRITE_MESH $1-diff.vtk VECTOR du dy dz dsigmax dsigmay dsigmaz dtauxy dtauyz dtauzx
+
+INTEGRATE du(x,y,z)^2+dy(x,y,z)^2+dz(x,y,z)^2 RESULT e2
+PRINT e2

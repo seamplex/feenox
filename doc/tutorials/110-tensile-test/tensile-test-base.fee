@@ -12,3 +12,6 @@ BC right Fx=10e3  # [ N ]
 
 # we can now solve the problem, after this keyword the results will be available for output
 SOLVE_PROBLEM
+
+# guess
+WRITE_RESULTS FORMAT vtk
