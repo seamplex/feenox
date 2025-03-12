@@ -2265,7 +2265,7 @@ int feenox_parse_read_mesh(void) {
       node_data_t *node_data = NULL;
       feenox_check_alloc(node_data = calloc(1, sizeof(node_data_t)));
       feenox_check_alloc(node_data->name_in_mesh = strdup(name_in_mesh));
-      node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim);
+      feenox_check_null(node_data->function = feenox_define_function_get_ptr(function_name, mesh->dim));
       node_data->function->mesh = mesh;
       feenox_call(feenox_create_pointwise_function_vectors(node_data->function));
       

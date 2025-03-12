@@ -25,6 +25,7 @@
 //   https://web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node168.html
 
 /*
+https://github.com/calculix/ccx2paraview
      _________________________________________________________________
     |                               |                                 |
     | №№      CalculiX type         |  №№         VTK type            |
@@ -461,7 +462,6 @@ int feenox_mesh_read_frd(mesh_t *this) {
             return FEENOX_ERROR;
           }
           this->element[i].node[j_gmsh] = &this->node[node_index];
-          // TODO: why a list? use a hash!
           feenox_mesh_add_element_to_list(&this->element[i].node[j_gmsh]->element_list, &this->element[i]);
         }
       }

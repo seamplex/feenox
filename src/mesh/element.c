@@ -260,30 +260,14 @@ int feenox_mesh_create_element(element_t *e, size_t index, size_t tag, unsigned 
 }
 
 int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *e) {
-  
+
   element_ll_t *item = NULL;
   feenox_check_alloc(item = calloc(1, sizeof(element_ll_t)));
   item->element = e;
-  LL_APPEND(*list, item);
-  
-  return FEENOX_OK;
-  
-}
+  // it is way faster to prepend than to append
+//  LL_APPEND(*list, item);
+  LL_PREPEND(*list, item);
 
-int feenox_mesh_add_material_to_list(material_ll_t **list, material_t *material) {
-  
-  // solo agregamos el material si es que no esta en la lista
-  material_ll_t *item = NULL;
-  LL_FOREACH(*list, item) {
-    if (item->material == material) {
-      return FEENOX_OK;
-    }
-  }
-  
-  feenox_check_alloc(item = calloc(1, sizeof(material_ll_t)));
-  item->material = material;
-  LL_APPEND(*list, item);
-  
   return FEENOX_OK;
   
 }
@@ -349,7 +333,8 @@ unsigned int feenox_mesh_compute_local_node_index(element_t *element, size_t glo
 void feenox_mesh_add_node_parent(node_relative_t **parents, int index) {
   node_relative_t *parent = calloc(1, sizeof(node_relative_t));
   parent->index = index;
-  LL_APPEND(*parents, parent);
+//  LL_APPEND(*parents, parent);
+  LL_PREPEND(*parents, parent);
   return;
 }
 

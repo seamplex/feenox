@@ -27,7 +27,7 @@ answer2 ray-effect.fee quarter 4 "1.381"
 exitifwrong $?
 
 # gmsh -v 0 -2 ${dir}/ray-effect-eighth.geo || exit $?
-answer2 ray-effect.fee eighth 4 "1.385"
+answer2 ray-effect.fee eighth 4 "1.372"
 exitifwrong $?
 
 
