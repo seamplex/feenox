@@ -37,7 +37,7 @@ AS_IF([test "x$CFLAGS" = "x-g -O2"],
   ],[
     CFLAGS="-O3 -flto=auto -no-pie"
   ])
-])
+)
 
 
 
