@@ -44,6 +44,13 @@ cd ${package}
     fi
   fi
   make
+  
+  cd utils
+  ln -sf ../gsl-2.8
+  cd fee2ccx
+  make
+  cd ../..
+  
 cd ..
 
 mkdir -p ${package}-${version}-${target}
@@ -60,6 +67,7 @@ cd ${package}-${version}-${target}
     gzip -f share/man/man1/${package}.1
     
     cp ../${package}/${package} bin
+    cp ../${package}/utils/fee2ccx/fee2ccx bin
 
     cp ../${package}/AUTHORS   share/doc/${package}
     cp ../${package}/ChangeLog share/doc/${package}

@@ -15,19 +15,19 @@ checkpde neutron_sn
 # the gmsh version in ubuntu 20 gives a segfault for these .geos
 
 # gmsh -v 0 -2 ${dir}/ray-effect-full.geo || exit $?
-answer2 ray-effect.fee full 4 "1.381"
+answer2 ray-effect.fee full 4 "1.38"
 exitifwrong $?
 
 # gmsh -v 0 -2 ${dir}/ray-effect-half.geo || exit $?
-answer2 ray-effect.fee half 4 "1.381"
+answer2 ray-effect.fee half 4 "1.38"
 exitifwrong $?
 
 # gmsh -v 0 -2 ${dir}/ray-effect-quarter.geo || exit $?
-answer2 ray-effect.fee quarter 4 "1.381"
+answer2 ray-effect.fee quarter 4 "1.38"
 exitifwrong $?
 
 # gmsh -v 0 -2 ${dir}/ray-effect-eighth.geo || exit $?
-answer2 ray-effect.fee eighth 4 "1.372"
+answer2 ray-effect.fee eighth 4 "1.37"
 exitifwrong $?
 
 

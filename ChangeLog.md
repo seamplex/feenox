@@ -1,6 +1,26 @@
 # Current
 
  * under development
+ * `READ_MESH` can read CalculiX's `.frd` output files
+ * `utils/fee2ccx` converter from FeenoX's `.fee` to CalculiX's `.fee`
+ * links to examples and tests in HTML manual
+ * cleanups to create `debian` directory in Salsa (see <https://salsa.debian.org/jtheler/feenox>)
+ * distribution binaries are dynamic instead of static
+ * `BC` type `adiabatic` in `thermal`
+ * fixed `TIME_PATH` with PETSc and SUNDIALS
+ * improved vector initialization syntax
+ * remove compilation date to allow reproducible builds
+ * BCs as arrays instead of linked lists
+ * option `--ast`
+ * `BC GROUPS` to select many labels at once
+ * cleanups to create Debian `dsc`
+ * use `config.h` instead of `version.h`
+ * compute perimeters using second-order precision
+ * bump GSL to v2.8
+ * `INTEGRATE` expressions of `nx`, `ny` and `nz`
+ * create `_cog` variables for points as well
+ * fix for evaluation of derivatives at arbitrary locations
+ * paper in FOSS: <https://doi.org/10.21105/joss.05846>
  
 # v1.0 (Mar 2024)
 
