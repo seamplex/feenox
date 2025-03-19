@@ -406,7 +406,8 @@ m4_include(auto_links.m4)
 AC_CONFIG_FILES([Makefile src/Makefile])
 # AC_CONFIG_FILES([src/benchmark/Makefile]) 
 # AC_CONFIG_FILES([doc/Makefile])
-AS_IF([test -d utils/fee2ccx],[AC_CONFIG_FILES([utils/fee2ccx/Makefile])]) 
+# choose fee2ccx as a target with a command-line option
+# AS_IF([test -d utils/fee2ccx],[AC_CONFIG_FILES([utils/fee2ccx/Makefile])]) 
 
 
 AS_BOX([Summary of dependencies])
