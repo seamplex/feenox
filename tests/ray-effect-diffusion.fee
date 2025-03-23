@@ -16,6 +16,6 @@ MATERIAL bulk Sigma_t1=Sigma_t Sigma_s1.1=Sigma_s S1=0
 
 SOLVE_PROBLEM
 
-PRINT %.3f 10*phi1(0,1.875)
+PRINT %.1f 10*phi1(0,1.875)
 
 WRITE_RESULTS FILE $0-$1.msh

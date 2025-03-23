@@ -22,7 +22,7 @@ sn_alpha = 0.15
 
 SOLVE_PROBLEM
 
-PRINT %.2f 10*phi1(0,1.875)
+PRINT %.1f 10*phi1(0,1.875)
 # PRINT "\# memory= " memory()
 
 WRITE_RESULTS FILE $0-$1-$2.msh
