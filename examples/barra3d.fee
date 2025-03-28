@@ -1,0 +1,40 @@
+# "barra" means "rod" in Spanish
+READ_MESH barra3d.msh
+PROBLEM thermal 3d
+
+# times
+TIME_PATH 1 10 100 1000
+end_time = 1000
+
+
+# problem constants
+D = 0.02
+L = 1
+A = pi*(0.5*D)^2
+k = 50
+rho = 8000
+cp = 400
+
+# boundary conditions
+eps = 1e-4
+f(t) = 30/A*(1-heaviside(t-eps,eps))
+BC hot  q=f(t)
+BC cool h=10 Tref=300
+
+SOLVE_PROBLEM
+
+# sample the 1d profile along the x axis at the time paths
+profile(x) = T(x,0,0)
+IF in_time_path
+  PRINT_FUNCTION profile t MIN 0 MAX L NSTEPS 10 FILE profiles.dat
+ENDIF
+
+
+# print the progress so we know how much is left when we run it
+PRINT t T(0.5,0,0) f(t) in_time_path
+
+# write the full transient in a .msh
+WRITE_RESULTS FILE barra3d-transient.msh
+
+# TODO
+# WRITE_RESULTS FILE barra3d-transient.vtk
