@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+#include "dist/feenox/src/feenox.h"
 const double zero[3] = {0, 0, 0};
 
 int feenox_define_function(const char *name, unsigned int n_arguments) {
@@ -314,6 +315,11 @@ int feenox_function_init(function_t *this) {
 
 
     if (this->mesh == NULL) {
+      
+      if (this->vector_argument == NULL) {
+        feenox_push_error_message("function '%s' is not ready to be used, mind the location of SOLVE_PROBLEM", this->name);
+        return FEENOX_ERROR;
+      }
       
       double **data_argument = NULL;
       feenox_check_alloc(data_argument = calloc(this->n_arguments, sizeof(double *)));
