@@ -94,12 +94,14 @@ TESTS = \
         tests/two-cubes-isotropic.sh \
         tests/two-cubes-orthotropic.sh \
         tests/vector.sh \
+        tests/wilson.sh \
         tests/xfail-few-properties-ortho-young.sh \
         tests/xfail-few-properties-ortho-poisson.sh \
         tests/xfail-few-properties-ortho-shear.sh \
-        tests/wilson.sh
+        tests/xfail-data-variable.sh
 
 XFAIL_TESTS = tests/abort.sh \
+              tests/xfail-data-variable.sh \
               tests/thermal-slab-no-k.sh \
               tests/thermal-slab-wrong-bc.sh \
               tests/xfail-few-properties-ortho-young.sh \

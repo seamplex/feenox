@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser
  *
- *  Copyright (C) 2009--2024 Jeremy Theler
+ *  Copyright (C) 2009--2025 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *
@@ -1351,6 +1351,14 @@ int feenox_parse_function_data(function_t *function) {
     expr_t *expr = NULL;
     feenox_check_alloc(expr = calloc(1, sizeof(expr_t)));
     feenox_call(feenox_expression_parse(expr, token));
+    if (expr->variables != NULL) {
+      feenox_push_error_message("FUNCTION DATA cannot reference variables");
+      return FEENOX_ERROR;
+    }
+    if (expr->variables != NULL) {
+      feenox_push_error_message("FUNCTION DATA cannot reference functions");
+      return FEENOX_ERROR;
+    }
     buffer[n++] = feenox_expression_eval(expr);
     feenox_free(expr);
   }

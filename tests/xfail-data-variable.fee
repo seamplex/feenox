@@ -1,0 +1,7 @@
+Rho0 = 1
+FUNCTION RhoExt(t) DATA {0      0
+                         5      0
+                         6      Rho0
+                         20     Rho0
+                         21     0
+                        100     0 }
