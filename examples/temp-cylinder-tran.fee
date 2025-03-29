@@ -85,8 +85,17 @@ BC cool  h=0.1  Tref=1
 
 SOLVE_PROBLEM
 
+
+profile(x) = T(x,0,0)
+VECTOR profile_times[5] DATA 0 0.5 1 1.5 2
+has_to_dump_profile = sum(abs(t-profile_times[i])<0.5*dt, i, 1, vecsize(profile_times))
+
+IF has_to_dump_profile
+  PRINT_FUNCTION profile t MIN 0 MAX 1 NSTEPS 10 FILE profiles.dat
+ENDIF
+
 # print the temperature at the center of the base vs time
-PRINT %e t T(0,0,0) T(0.5,0,0) T(1,0,0)
+PRINT %e t T(0,0,0) T(0.5,0,0) T(1,0,0) has_to_dump_profile
 
 WRITE_MESH temp-cylinder.msh T
 

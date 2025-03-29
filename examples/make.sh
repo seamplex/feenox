@@ -42,6 +42,7 @@ for i in hello          \
          two-zone-slab  \
          parallelepiped-thermal     \
          parallelepiped-mechanical  \
+         barra3d                    \
          temp-cylinder-tran         \
          wire                       \
          asme-expansion             \

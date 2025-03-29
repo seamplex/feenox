@@ -80,6 +80,99 @@ $
 
 
 
+# Transient heat conduction from steady-state by "turning off" BCs
+
+This problem solves the transient over a slender cylider arising from
+"turning off" a heat source that provided a fixed heat flux at both
+ends, while the cylindrical surface is subject to convection conditions.
+
+The transient goes from $t=0~\text{s}$ up to end time $t=1000~\text{s}$.
+We force the time stepper to pass exactly through the following
+times $t$
+
+-   1
+-   10
+-   100
+-   `end_time`/2
+
+At these times, the special variable `in_time_path` is true. We use an
+`IF` condition to write the profile along the $x$ axis on
+
+1.  a single file named `profiles.dat` with an extra column for the time
+    $t$
+2.  one file for each time step `profile-t.dat`
+
+for the selected times (or during the static step at $t=0$ and the final
+step at $t=1000$).
+
+
+```feenox
+# "barra" means "rod" in Spanish
+READ_MESH barra3d.msh
+PROBLEM thermal 3d
+
+# times
+end_time = 1000
+TIME_PATH 1 10 100 end_time/2
+
+
+# problem constants [SI]
+# D = 0.02
+# A = pi*(0.5*D)^2
+# instead of computing the area from the geometry we can ask 
+# feenox to do it for us by explicitly defining a physical
+# group with the right dimension, we'll have the variable
+# hot_area available with, well you guessed, the group's area
+PHYSICAL_GROUP hot DIMENSION 2
+
+L = 1             # length
+k = 50            # conductivity 
+rho = 8000        # density 
+cp = 400          # heat capaccity
+
+# boundary conditions
+
+# 30 watts, turned off starting at t=eps and ending at t=2*eps
+eps = 1e-2
+BC hot  q=30/hot_area*(1-heaviside(t-eps,eps))  # "hot" has two areas
+BC cool h=10 Tref=300
+
+# advance one step
+SOLVE_PROBLEM
+
+# sample the 1d profile along the x axis at the time paths
+profile(x) = T(x,0,0)
+IF in_static|in_time_path|done
+  # one single file with all the profiles
+  PRINT_FUNCTION profile t MIN 0 MAX L NSTEPS 100 FILE profiles.dat
+  
+  # one file fore ach profile
+  FILE profilet PATH profile-%g.dat t
+  PRINT_FUNCTION profile   MIN 0 MAX L NSTEPS 100 FILE profilet
+  CLOSE profilet
+ENDIF
+
+# print the progress so we know how much is left when we run it
+PRINT t T(0.1,0,0)
+
+# write the full transient in a .msh
+WRITE_RESULTS FILE barra3d-transient.msh
+
+# TODO
+# WRITE_RESULTS FILE barra3d-transient.vtk
+```
+
+
+```terminal
+$ gmsh -3 barra3d.geo
+$ feenox barra3d.fee
+
+```
+
+
+![Temperature profiles along the $x$ axis for different times.](barra3d.svg){width=100%}
+
+
 # Non-dimensional transient heat conduction on a cylinder
 
 Let us solve a dimensionless transient problem over a cylinder.
@@ -124,8 +217,17 @@ BC cool  h=0.1  Tref=1
 
 SOLVE_PROBLEM
 
+
+profile(x) = T(x,0,0)
+VECTOR profile_times[5] DATA 0 0.5 1 1.5 2
+has_to_dump_profile = sum(abs(t-profile_times[i])<0.5*dt, i, 1, vecsize(profile_times))
+
+IF has_to_dump_profile
+  PRINT_FUNCTION profile t MIN 0 MAX 1 NSTEPS 10 FILE profiles.dat
+ENDIF
+
 # print the temperature at the center of the base vs time
-PRINT %e t T(0,0,0) T(0.5,0,0) T(1,0,0)
+PRINT %e t T(0,0,0) T(0.5,0,0) T(1,0,0) has_to_dump_profile
 
 WRITE_MESH temp-cylinder.msh T
 

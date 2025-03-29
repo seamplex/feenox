@@ -283,8 +283,7 @@ copper wire over hex mesh
 | 10  | +5.4e-04 | +9.9e-02 | 0.0134 | 0.6130 |
 
 copper wire over hex mesh, participation and excitation factors $L$ and
-$\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and
-$M$
+$\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and $M$
 
 | $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
 |:---:|:----------:|:------------:|:-------------------------:|
@@ -310,8 +309,7 @@ copper wire over tet mesh
 | 10  | -2.2e-04 | -6.9e-02 | 0.0038 | 0.6129 |
 
 copper wire over tet mesh, participation and excitation factors $L$ and
-$\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and
-$M$
+$\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and $M$
 
 | $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
 |:---:|:----------:|:------------:|:-------------------------:|
@@ -337,8 +335,8 @@ aluminum wire over hex mesh
 | 10  | -9.5e-06 | -5.2e-03 | 0.0000 | 0.6128 |
 
 aluminum wire over hex mesh, participation and excitation factors $L$
-and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$
-and $M$
+and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and
+$M$
 
 | $n$ | FEM \[Hz\] | Euler \[Hz\] | Relative difference \[%\] |
 |:---:|:----------:|:------------:|:-------------------------:|
@@ -364,8 +362,8 @@ aluminum wire over tet mesh
 | 10  | -7.3e-05 | -6.9e-02 | 0.0038 | 0.6129 |
 
 aluminum wire over tet mesh, participation and excitation factors $L$
-and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$
-and $M$
+and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and
+$M$
 
   [College]: https://www.ib.edu.ar/
   [report is here]: https://www.seamplex.com/fino/doc/alambre.pdf

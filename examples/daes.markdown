@@ -57,8 +57,9 @@ $$
 and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
 seminal 1963 paper [Deterministic non-periodic flow]. This example’s
-input file ressembles the parameters, initial conditions and differential
-equations of the problem as naturally as possible with an ASCII file.
+input file ressembles the parameters, initial conditions and
+differential equations of the problem as naturally as possible with an
+ASCII file.
 
 ``` feenox
 PHASE_SPACE x y z     # Lorenz attractor’s phase space is x-y-z

@@ -38,6 +38,8 @@
 - Heat conduction
   - [Thermal slabs](https://seamplex.com/feenox/examples/thermal.html#thermal-slabs)
     - [One-dimensional linear](https://seamplex.com/feenox/examples/thermal.html#one-dimensional-linear)
+  - [Transient heat conduction from steady-state by “turning off”
+  BCs](https://seamplex.com/feenox/examples/thermal.html#transient-heat-conduction-from-steady-state-by-turning-off-bcs)
   - [Non-dimensional transient heat conduction on a
   cylinder](https://seamplex.com/feenox/examples/thermal.html#non-dimensional-transient-heat-conduction-on-a-cylinder)
   - [Non-dimensional transient heat conduction with time-dependent

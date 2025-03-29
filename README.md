@@ -37,22 +37,33 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 
 > ### News
 >
->  * This FeenoX is not about a scam crypto game.
+> FeenoX is now in Debian!
 >
->    If you want to be scammed, knock yourself out at <https://feenox.com/>.
+> :   You can install FeenoX from APT
 >
->  * IB students!
+>     ```terminal
+>     sudo apt install feenox
+>     ```
 >
->    Remember that your first read should be the 0-th tutorial, [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup/)
+>     For now it is in Debian sid only
+>
+>     <https://packages.debian.org/unstable/science/feenox>
 > 
->  * FeenoX is waiting to be part of Debian.
+>     but eventually it will be part of Debian stable.
+>     And probably it will be availabe in Ubuntu as well.
+>     Follow the status at
 >
->    Eventually, you'll be abe to do `sudo apt install feenox` in Debian Sid: <https://ftp-master.debian.org/new
-/feenox_1.0.133-1.html>
+>     <https://tracker.debian.org/pkg/feenox>
+>
 > 
->  * Open-source web-based UX for FeenoX.
+> Open-source web-based UX for FeenoX.
 >
->    Take a look at [SunCAE](https://www.seamplex.com/suncae) for an example of how to write a front end for FeenoX.
+> :    Take a look at [SunCAE](https://www.seamplex.com/suncae) for an example of how to write a front end for FeenoX.
+>
+> IB students
+>
+> :    Remember that your first read should be the 0-th tutorial, [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup/)
+> 
 
 ## Extents
 
