@@ -64,7 +64,7 @@ int hexa27fromgmsh[27] = {
  10 , 12 , 14 , 15 , 22 , 23 , 21 , 24 ,
  20 , 25 , 26} ;
 
-int feenox_mesh_write_header_vtk(FILE *file) {
+int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file) {
   fprintf(file, "# vtk DataFile Version 2.0\n");
   fprintf(file, "FeenoX VTK output\n");
   fprintf(file, "ASCII\n");
@@ -72,7 +72,60 @@ int feenox_mesh_write_header_vtk(FILE *file) {
   return FEENOX_OK;
 }
 
+int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
+  for (size_t i = 0; i < mesh->n_elements; i++) {
+    if (mesh->element[i].type->dim == mesh->dim_topo) {
+      if (with_size) { 
+        fprintf(file, "%d ", mesh->element[i].type->nodes);
+      }
+      switch(mesh->element[i].type->id) {
+        case ELEMENT_TYPE_HEXAHEDRON27: 
+          for (int j = 0; j < 27 ; ++j) {
+            fprintf(file, " %ld", (mesh->element[i].node[hexa27fromgmsh[j]]->tag)-1);
+           }
+          fprintf(file, "\n");
+        break;
+        case ELEMENT_TYPE_HEXAHEDRON20:
+          for (int j = 0; j < 20 ; ++j) {
+            fprintf(file, " %ld", (mesh->element[i].node[hexa20fromgmsh[j]]->tag)-1);
+          }
+        fprintf(file, "\n");
+        break;
+        default:
+          for (unsigned int j = 0; j < mesh->element[i].type->nodes; j++) {
+            // el tet10 es diferente!
+            if (vtkfromgmsh_types[mesh->element[i].type->id] == 24 && (j == 8 || j == 9)) {
+              if (j == 8) {
+                fprintf(file, " %ld", (mesh->element[i].node[9]->tag)-1);
+              } else if (j == 9) {
+                fprintf(file, " %ld", (mesh->element[i].node[8]->tag)-1);
+              }
+            } else {
+              fprintf(file, " %ld", (mesh->element[i].node[j]->tag)-1);
+            }
+          }
+          fprintf(file, "\n");
+        break;
+      }
+    }
+  }
 
+  return FEENOX_OK;
+}
+
+
+
+int feenox_mesh_write_vtk_types(mesh_t *mesh, FILE *file) {
+  for (size_t i = 0; i < mesh->n_elements; i++) {
+    if (mesh->element[i].type->dim == mesh->dim_topo) {
+      fprintf(file, "%d\n", vtkfromgmsh_types[mesh->element[i].type->id]);
+    }
+  }
+  
+  return FEENOX_OK;
+}
+
+// this dummy is for other formats
 int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
     
   fprintf(file, "DATASET UNSTRUCTURED_GRID\n");
@@ -96,52 +149,11 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
   }
 
   fprintf(file, "CELLS %ld %ld\n", volumelements, size);
-  for (size_t i = 0; i < this->n_elements; i++) {
-    if (this->element[i].type->dim == this->dim_topo) {
-      switch(this->element[i].type->id)
-        {
-        case ELEMENT_TYPE_HEXAHEDRON27: 
-          fprintf(file, "%d ", 27);
-          for (int j = 0; j < 27 ; ++j) {
-            fprintf(file, " %ld", (this->element[i].node[hexa27fromgmsh[j]]->tag)-1);
-           }
-          fprintf(file, "\n");
-        break;
-        case ELEMENT_TYPE_HEXAHEDRON20:
-          fprintf(file, "%d ", 20);
-          for (int j = 0; j < 20 ; ++j) {
-            fprintf(file, " %ld", (this->element[i].node[hexa20fromgmsh[j]]->tag)-1);
-          }
-          fprintf(file, "\n");
-        break;
-        default:
-          fprintf(file, "%d ", this->element[i].type->nodes);
-          // ojo! capaz que no funcione si no estan ordenados los indices
-          for (unsigned int j = 0; j < this->element[i].type->nodes; j++) {
-            // el tet10 es diferente!
-            if (vtkfromgmsh_types[this->element[i].type->id] == 24 && (j == 8 || j == 9)) {
-              if (j == 8) {
-                fprintf(file, " %ld", (this->element[i].node[9]->tag)-1);
-              } else if (j == 9) {
-                fprintf(file, " %ld", (this->element[i].node[8]->tag)-1);
-              }
-            } else {
-              fprintf(file, " %ld", (this->element[i].node[j]->tag)-1);
-            }
-          }
-          fprintf(file, "\n");
-        break;
-        }
-      }
-    }
+  feenox_mesh_write_vtk_cells(this, file, 1);
   fprintf(file, "\n");
   
   fprintf(file, "CELL_TYPES %ld\n", volumelements);
-  for (size_t i = 0; i < this->n_elements; i++) {
-    if (this->element[i].type->dim == this->dim_topo) {
-      fprintf(file, "%d\n", vtkfromgmsh_types[this->element[i].type->id]);
-    }
-  }
+  feenox_mesh_write_vtk_types(this, file);
   
   return FEENOX_OK;  
 }

@@ -180,7 +180,6 @@ for i in TODO ChangeLog doc/programming doc/compilation doc/FAQ doc/CODE_OF_COND
  fi
 done
 
-
 echo "calling autoreconf... "
 autoreconf -i
 # for some reason, autoreconf calls autoheader which in turns overwrites

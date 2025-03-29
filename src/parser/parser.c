@@ -2524,6 +2524,11 @@ int feenox_parse_write_mesh(void) {
       mesh_write->write_mesh   = feenox_mesh_write_mesh_vtk;
       mesh_write->write_data   = feenox_mesh_write_data_vtk;
     break;
+    case post_format_vtu:
+      mesh_write->write_header = feenox_mesh_write_header_vtu;
+      mesh_write->write_mesh   = feenox_mesh_write_mesh_vtu;
+//      mesh_write->write_data   = feenox_mesh_write_data_vtu;
+    break;
     default:
       return FEENOX_ERROR;
     break;
@@ -2548,11 +2553,11 @@ int feenox_parse_write_results(void) {
 
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {          
-///kw_pde+WRITE_RESULTS+usage [ FORMAT { gmsh | vtk } ]
+///kw_pde+WRITE_RESULTS+usage [ FORMAT { gmsh | vtu | vtk } ]
 ///kw_pde+WRITE_RESULTS+detail Default format is `gmsh`.
     if (strcasecmp(token, "FORMAT") == 0) {
-      char *keywords[] = {"gmsh", "vtk", ""};
-      int values[] = {post_format_gmsh, post_format_vtk, 0};
+      char *keywords[] = {"gmsh", "vtu", "vtk", ""};
+      int values[] = {post_format_gmsh, post_format_vtu, post_format_vtk, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&mesh_write->post_format));
       
     } else if (strcasecmp(token, "FILE") == 0) {
@@ -2602,7 +2607,8 @@ int feenox_parse_write_results(void) {
       feenox_check_alloc(strcat(file_path, feenox.argv[i]));
     }
     feenox_check_alloc(strcat(file_path, "."));
-    feenox_check_alloc(strcat(file_path, (mesh_write->post_format == post_format_vtk) ? "vtk" : "msh"));
+    feenox_check_alloc(strcat(file_path, (mesh_write->post_format == post_format_vtu) ? "vtu" :
+                                           ((mesh_write->post_format == post_format_vtk) ? "vtk" : "msh")));
     
     feenox_call(feenox_define_file(file_path, file_path, 0, "w"));
     if ((mesh_write->file = feenox_get_file_ptr(file_path)) == NULL) {
@@ -2630,6 +2636,8 @@ int feenox_parse_write_results(void) {
 
     if (strcasecmp(ext, ".msh") == 0) {
       mesh_write->post_format = post_format_gmsh;
+    } else if (strcasecmp(ext, ".vtu") == 0) {
+      mesh_write->post_format = post_format_vtu;
     } else if (strcasecmp(ext, ".vtk") == 0) {
       mesh_write->post_format = post_format_vtk;
     } else {
@@ -2646,12 +2654,20 @@ int feenox_parse_write_results(void) {
       mesh_write->write_mesh   = feenox_mesh_write_mesh_gmsh;
       mesh_write->write_data   = feenox_mesh_write_data_gmsh;
     break;
+    case post_format_vtu:
+      mesh_write->write_header = feenox_mesh_write_header_vtu;
+      mesh_write->write_mesh   = feenox_mesh_write_mesh_vtu;
+//      mesh_write->write_data   = feenox_mesh_write_data_vtu;
+      mesh_write->write_footer  = feenox_mesh_write_footer_vtu;
+      
+    break;
     case post_format_vtk:
       mesh_write->write_header = feenox_mesh_write_header_vtk;
       mesh_write->write_mesh   = feenox_mesh_write_mesh_vtk;
       mesh_write->write_data   = feenox_mesh_write_data_vtk;
     break;
     default:
+      feenox_push_error_message("unknown post format %d", mesh_write->post_format);
       return FEENOX_ERROR;
     break;
   }

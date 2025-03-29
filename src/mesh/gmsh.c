@@ -979,7 +979,7 @@ int feenox_mesh_tag2index_alloc(mesh_t *this, size_t tag_min, size_t tag_max) {
 }
 
 
-int feenox_mesh_write_header_gmsh(FILE *file) {
+int feenox_mesh_write_header_gmsh(mesh_t *this, FILE *file) {
   fprintf(file, "$MeshFormat\n");
   fprintf(file, "2.2 0 8\n");
   fprintf(file, "$EndMeshFormat\n");

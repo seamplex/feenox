@@ -239,7 +239,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
  
       // number of nodes and "format"
       int format;
-      if (sscanf(buffer, "%s %d %d", tmp, &this->n_nodes, &format) != 3) {
+      if (sscanf(buffer, "%s %ld %d", tmp, &this->n_nodes, &format) != 3) {
         feenox_push_error_message("error parsing number of nodes '%s'", buffer);
         return FEENOX_ERROR;
       }
@@ -336,7 +336,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
       // TODO: mind the fact that tere might be different "element blocks" for different materials
       // number of elements and "format"
       int format;
-      if (sscanf(buffer, "%s %d %d", tmp, &this->n_elements, &format) != 3) {
+      if (sscanf(buffer, "%s %ld %d", tmp, &this->n_elements, &format) != 3) {
         feenox_push_error_message("error parsing number of elements '%s'", buffer);
         return FEENOX_ERROR;
       }
