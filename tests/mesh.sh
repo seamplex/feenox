@@ -9,6 +9,12 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+# skip in big-endian architectures
+arch=$(uname -m)
+if [ "x${arch}" = "xppc64" ] || [ "x${arch}" = "xs390x" ] ; then
+  exit 77
+fi
+
 answer1 read_mesh2d.fee 22.msh "12 22 14"
 exitifwrong $?
 

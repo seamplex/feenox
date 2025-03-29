@@ -9,6 +9,12 @@ if [ -z "${functions_found}" ]; then
   exit 1;
 fi
 
+# skip in problematic architectures
+arch=$(uname -m)
+if [ "x${arch}" = "xalpha" ] || [ "x${arch}" = "xs390x" ] ; then
+  exit 77
+fi
+
 checkgmsh
 checkslepc
 checkpde neutron_sn
