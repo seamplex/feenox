@@ -2519,15 +2519,16 @@ int feenox_parse_write_mesh(void) {
       mesh_write->write_mesh   = feenox_mesh_write_mesh_gmsh;
       mesh_write->write_data   = feenox_mesh_write_data_gmsh;
     break;
+    case post_format_vtu:
+      mesh_write->write_header  = feenox_mesh_write_header_vtu;
+      mesh_write->write_mesh    = feenox_mesh_write_mesh_vtu;
+      mesh_write->write_data    = feenox_mesh_write_data_vtu;
+      mesh_write->write_footer  = feenox_mesh_write_footer_vtu;
+    break;
     case post_format_vtk:
       mesh_write->write_header = feenox_mesh_write_header_vtk;
       mesh_write->write_mesh   = feenox_mesh_write_mesh_vtk;
       mesh_write->write_data   = feenox_mesh_write_data_vtk;
-    break;
-    case post_format_vtu:
-      mesh_write->write_header = feenox_mesh_write_header_vtu;
-      mesh_write->write_mesh   = feenox_mesh_write_mesh_vtu;
-//      mesh_write->write_data   = feenox_mesh_write_data_vtu;
     break;
     default:
       return FEENOX_ERROR;
@@ -2657,9 +2658,8 @@ int feenox_parse_write_results(void) {
     case post_format_vtu:
       mesh_write->write_header = feenox_mesh_write_header_vtu;
       mesh_write->write_mesh   = feenox_mesh_write_mesh_vtu;
-//      mesh_write->write_data   = feenox_mesh_write_data_vtu;
-      mesh_write->write_footer  = feenox_mesh_write_footer_vtu;
-      
+      mesh_write->write_data   = feenox_mesh_write_data_vtu;
+      mesh_write->write_footer  = feenox_mesh_write_footer_vtu;      
     break;
     case post_format_vtk:
       mesh_write->write_header = feenox_mesh_write_header_vtk;

@@ -66,7 +66,7 @@ int feenox_instruction_mesh_write(void *arg) {
   }
   
   if (mesh_write->write_footer) {
-    feenox_call(mesh_write->write_footer(mesh_write->file->pointer));
+    feenox_call(mesh_write->write_footer(mesh_write));
   }
 
   if (mesh_write->post_format == post_format_vtu || mesh_write->post_format == post_format_vtk) {

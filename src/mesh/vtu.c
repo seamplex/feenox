@@ -26,15 +26,23 @@ int feenox_mesh_write_header_vtu(mesh_t *mesh, FILE *fp) {
   fprintf(fp, "<?xml version=\"1.0\"?>\n");
   fprintf(fp, "<VTKFile type=\"UnstructuredGrid\" version=\"1.0\" byte_order=\"LittleEndian\">\n");
   fprintf(fp, "  <UnstructuredGrid>\n");
+  if (mesh->n_cells == 0) {
+    feenox_call(feenox_mesh_element2cell(mesh));
+  }
   fprintf(fp, "    <Piece NumberOfPoints=\"%ld\" NumberOfCells=\"%ld\">\n", mesh->n_nodes, mesh->n_cells);
 
   return FEENOX_OK;
 }
 
-int feenox_mesh_write_footer_vtu(FILE *fp) {
-  fprintf(fp, "    </Piece>\n");
-  fprintf(fp, "  </UnstructuredGrid>\n");
-  fprintf(fp, "</VTKFile>\n");
+int feenox_mesh_write_footer_vtu(mesh_write_t *this) {
+  if (this->point_init == 1) {
+    fprintf(this->file->pointer, "      </PointData>\n");
+  } else {
+    fprintf(this->file->pointer, "      </CellData>\n");
+  } 
+  fprintf(this->file->pointer, "    </Piece>\n");
+  fprintf(this->file->pointer, "  </UnstructuredGrid>\n");
+  fprintf(this->file->pointer, "</VTKFile>\n");
 
   return FEENOX_OK;
 }
@@ -78,4 +86,77 @@ int feenox_mesh_write_mesh_vtu(mesh_t *mesh, FILE *file, int dummy) {
   fprintf(file, "      </Cells>\n");
   
   return FEENOX_OK;
+}
+
+
+int feenox_mesh_write_data_vtu(mesh_write_t *this, mesh_write_dist_t *dist) {
+
+  if (dist->field_location == field_location_cells) {
+    if (this->cell_init == 0) {
+      if (this->point_init == 1) {
+        fprintf(this->file->pointer, "      </PointData>\n");
+      }
+      fprintf(this->file->pointer, "      <CellData>\n");
+      this->cell_init = 1;
+      this->point_init = 0;
+    }
+  } else {
+    if (this->point_init == 0) {
+      if (this->cell_init == 1) {
+        fprintf(this->file->pointer, "      </CellData>\n");
+      }
+      fprintf(this->file->pointer, "      <PointData>\n");
+      this->point_init = 1;
+      this->cell_init = 0;
+    }
+  }
+      
+  // custom printf format
+  char *format = NULL;
+  if (dist->printf_format == NULL) {
+    feenox_check_alloc(format = strdup(" %g"));
+  } else {
+    if (dist->printf_format[0] == '%') {
+      feenox_check_minusone(asprintf(&format, " %s", dist->printf_format));
+    } else {
+      feenox_check_minusone(asprintf(&format, " %%%s", dist->printf_format));
+    }  
+  }
+
+  fprintf(this->file->pointer, "        <DataArray Name=\"%s\" type=\"Float64\" NumberOfComponents=\"%d\" format=\"ascii\">\n", dist->name, dist->size);  
+  
+  // TODO: virtual methods
+  if (dist->field_location == field_location_cells) {
+
+    for (size_t i = 0; i < this->mesh->n_cells; i++) {
+      for (int g = 0; g < dist->size; g++) {
+        // TODO: remove the conditional from the loop
+        double value = (dist->field[g]->type == function_type_pointwise_mesh_cell && dist->field[g]->mesh == this->mesh) ?
+                  feenox_vector_get(dist->field[g]->vector_value, i) :
+                  feenox_function_eval(dist->field[g], this->mesh->cell[i].x);
+        fprintf(this->file->pointer, format, value);
+      }
+      fprintf(this->file->pointer, "\n");
+    }
+    
+  } else {
+    
+    for (size_t j = 0; j < this->mesh->n_nodes; j++) {
+      for (int g = 0; g < dist->size; g++) {
+        // TODO: remove the conditional from the loop
+        double value = (dist->field[g]->type == function_type_pointwise_mesh_node && dist->field[g]->mesh == this->mesh) ?
+                  feenox_vector_get(dist->field[g]->vector_value, j) :
+                  feenox_function_eval(dist->field[g], this->mesh->node[j].x);
+        fprintf(this->file->pointer, format, value);
+      }
+      fprintf(this->file->pointer, "\n");
+    }
+  }  
+  fprintf(this->file->pointer, "        </DataArray>\n");  
+ 
+  fflush(this->file->pointer);
+  feenox_free(format);
+  
+  return FEENOX_OK;
+  
 }

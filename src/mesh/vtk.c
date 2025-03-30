@@ -66,6 +66,7 @@ int hexa27fromgmsh[27] = {
 
 int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file) {
   fprintf(file, "# vtk DataFile Version 2.0\n");
+  // TODO: $0 and time
   fprintf(file, "FeenoX VTK output\n");
   fprintf(file, "ASCII\n");
 

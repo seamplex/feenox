@@ -1358,7 +1358,7 @@ typedef enum {
 
 struct mesh_write_dist_t {
   char *name;
-  unsigned int size;
+  unsigned int size;  // TODO: rename to num_of_components
   function_t **field;
   
   field_location_t field_location;
@@ -1385,8 +1385,8 @@ struct mesh_write_t {
   
   int (*write_header)(mesh_t *mesh, FILE *file);
   int (*write_mesh)(mesh_t *mesh, FILE *file, int no_physical_names);
-  int (*write_data)(mesh_write_t *, mesh_write_dist_t *dist);
-  int (*write_footer)(FILE *file);
+  int (*write_data)(mesh_write_t *this, mesh_write_dist_t *dist);
+  int (*write_footer)(mesh_write_t *this);
    
   // these two are to know if we have to change the type in VTK
   int point_init;
@@ -2352,14 +2352,14 @@ extern int feenox_mesh_write_unstructured_mesh_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE * file, int with_size);
 extern int feenox_mesh_write_vtk_types(mesh_t *mesh, FILE * file);
-extern int feenox_mesh_write_mesh_vtk(mesh_t *, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtk(mesh_write_t *, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_mesh_vtk(mesh_t *mesh, FILE *file, int dummy);
+extern int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist);
 
 // vtu.c
 extern int feenox_mesh_write_header_vtu(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_mesh_vtu(mesh_t *, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtu(mesh_write_t *, mesh_write_dist_t *dist);
-extern int feenox_mesh_write_footer_vtu(FILE *file);
+extern int feenox_mesh_write_data_vtu(mesh_write_t *this, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_footer_vtu(mesh_write_t *this);
 
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *e)  __attribute__((noinline));

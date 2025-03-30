@@ -16,7 +16,7 @@ dist_doc_DATA = AUTHORS \
                 doc/feenox-manual \
                 doc/feenox.xml \
                 doc/fee.vim
-                
+
 dist_man_MANS = doc/feenox.1
 
 TESTS = \
