@@ -198,7 +198,7 @@ DISTCLEANFILES = \
                  nafems-t4-result.msh \
                  nafems-le1-3.vtk \
                  nafems-le11-tet10.vtk \
-                 two-cubes-isotropic-functions.vtk \
+                 two-cubes-isotropic-functions.vtu \
                  nafems-le11-hex8.vtk \
                  two-cubes-orthotropic-materials.vtk \
                  two-cubes-isotropic-variables.vtk \
@@ -228,7 +228,7 @@ DISTCLEANFILES = \
                  ./circle-2-0.5.msh      \
                  ./circle_perimeter1.dat                                      \
                  ./orthotropic-beam-hex27.msh                                 \
-                 ./2dpwr-eighth.vtk                                           \
+                 ./2dpwr-eighth.vtu                                           \
                  ./poisson-square.msh                                         \
                  ./ray-effect-diffusion-full.msh                              \
                  ./ray-effect-quarter-4.msh                                   \
@@ -265,16 +265,16 @@ DISTCLEANFILES = \
                  ./orthotropic-beam-tet4.msh                                  \
                  ./ray-effect-half-4.msh                                      \
                  ./spinning-disk-parallel-plane-eighth_unstruct.vtk           \
-                 ./2dpwr-quarter.vtk                                          \
+                 ./2dpwr-quarter.vtu                                          \
                  ./ray-effect-diffusion-quarter.msh                           \
                  ./ray-effect-diffusion-half.msh                              \
                  ./orthotropic-beam-hex20.msh                                 \
                  ./orthotropic-beam-tet10.msh                                 \
                  ./spinning-disk-parallel-plane-quarter_unstruct.vtk          \
-                 ./reaction-force.vtk                                         \
+                 ./reaction-force.vtu                                         \
                  ./airfoil-converged.vtk                                      \
                  ./spinning-disk-parallel-plane-sixteenth_unstruct.vtk        \
-                 ./heater-cylinder-inches.vtk                                 \
+                 ./heater-cylinder-inches.vtu                                 \
                  ./ray-effect-diffusion-eighth.msh                            \
                  ./airfoil-converged.msh                                      \
                  ./ray-effect-eighth-4.msh \
