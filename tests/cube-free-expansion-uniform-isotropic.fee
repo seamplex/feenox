@@ -13,7 +13,7 @@ T = 9.87654321
 
 SOLVE_PROBLEM
 
-WRITE_RESULTS FORMAT vtk displacements vonmises
+WRITE_RESULTS FORMAT vtu displacements vonmises
 
 VECTOR diff_displ[3]
 diff_displ[1] = u(1,1,1)-alpha*T

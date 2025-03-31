@@ -12,5 +12,5 @@ BC right Fx=1000
 
 SOLVE_PROBLEM
 
-WRITE_RESULTS FORMAT vtk displ stress
+WRITE_RESULTS FORMAT vtu displ stress
 PRINT %.1f sigma(0,0,0)

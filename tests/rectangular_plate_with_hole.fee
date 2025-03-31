@@ -12,5 +12,5 @@ SOLVE_PROBLEM
 
 FIND_EXTREMA sigmax OVER hole MAX sigmax_max
 PRINT sigmax_max 
-WRITE_MESH $0.vtk VECTOR u v w sigmax
+WRITE_MESH $0.vtu VECTOR u v w sigmax
 
