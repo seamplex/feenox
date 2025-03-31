@@ -13,7 +13,7 @@ dt = 1
 end_time = 10
 
 SOLVE_PROBLEM
-WRITE_MESH bunny-mech.msh VECTOR u v w
+WRITE_RESULTS FILE bunny-mech.msh displacements
 
 PRINT t
 

@@ -274,7 +274,7 @@ To enable syntax highlighting copy the file [`feenox.xml`](https://raw.githubuse
 
 # Post-processors
 
-FeenoX can write mesh results either in `.msh` or `.vtk` format.
+FeenoX can write mesh results either in `.msh` or `.vtu`/`.vtk` format.
 The former can be read and postprocessed by [Gmsh](http://gmsh.info/).
 The latter can be read and postprocessed by a few different tools, but [Paraview](https://www.paraview.org/) is the flagship postprocessor.
 In general any version will do, so it can be installed with

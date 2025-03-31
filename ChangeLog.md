@@ -1,6 +1,6 @@
-# Current
+# Current (under development)
 
- * under development
+ * skip some tests in big-endian architectures
  * `READ_MESH` can read CalculiX's `.frd` output files
  * `utils/fee2ccx` converter from FeenoX's `.fee` to CalculiX's `.fee`
  * links to examples and tests in HTML manual

@@ -20,6 +20,7 @@ cantilever*.dat
 fork*.msh
 fork.dat
 *.vtk
+*.vtu
 nafems-le11.msh
 nafems-le1.msh
 nafems-le1.pvsm
@@ -27,7 +28,6 @@ iaea-2dpwr*.msh
 cubesphere*.msh
 temp-cylinder*.png
 *.mp4
-parallelepiped*.vtk
 cylinder.msh
 temp-cylinder.msh
 wire-*.msh
@@ -37,7 +37,6 @@ cube-orthotropic-expansion.pvsm
 veeder-veeder-displacements.pdf
 veeder.msh
 veeder.pvsm
-veeder.vtk
 veeder_v.dat
 veeder_w.dat
 thermal-square-temperature.msh
@@ -109,5 +108,4 @@ buffon*.dat
 
 barra3d.msh
 barra3d-transient.msh
-barra3d-transient.vtk
 barra3d.pdf

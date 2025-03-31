@@ -4,12 +4,10 @@
  * for/while loops?
  * use `DMPlex`?
     - allocate matrices?
-    - write vtus?
     - dump states?
     - choose to use it or not
- * use `spack`? sow?
- * FIT to mesh-based functions
- * FIT taking into account uncertainties
+ * `FIT` to mesh-based functions
+ * `FIT` taking into account uncertainties
  * extended integration (as in reduced, full, extended)
  * make GSL optional
    - rewrite BLAS using ad-hoc routines
@@ -23,12 +21,11 @@
  
 ## Tests
 
- * move all `doc/examples` to `tests`
+ * use the same documentation strategy from `doc/examples` in `tests`
  * write a `README` and an explanation of each test
- * make an index of the keywords used in each test and link them from the doc as examples
  * cell-based mesh writes and integrations
  * `FIT` ranges
- * MPI
+ * more MPI tests
 
 ## Optimizations
 
@@ -78,7 +75,7 @@
 
 ## Nice to have
 
- * add a keyword and command-line argument to set `OMP_NUM_THREADS`
+ * ask how to set `OMP_NUM_THREADS=1`
  * logarithmic ranges for `PRINT_FUNCTION`
  * default separator after `TEXT` should be space, after numerical should be tab
  * `PRINT_FUNCTION` with `%f` in between arguments (like `PRINT_VECTOR`)
@@ -105,10 +102,9 @@
 ## Postprocessing output
 
  * formats
-   - vtu?
    - xdmf? (needs DMView() and VecView())
    - frd? (to be able to use ccx's post processor... is it worth it?)
-   - binary msh and vtk
+   - binary msh and vtu
    - msh v4.1
    - cgns?
    - med?
@@ -141,7 +137,7 @@
  
 ## Heat
 
- * parallel runs
+ * improve parallel runs
  * convection with a separate matrix? think!
  * explain that radiation is better off as an expression
  * same for total heat sources/bcs
@@ -149,7 +145,8 @@
  
 ## Mechanical
 
- * non-linear
+ * large deformation
+ * non-linear materials
  * stresses: count negative jacobians and worst jacobians
  * strain energy density
 

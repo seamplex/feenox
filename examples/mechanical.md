@@ -81,7 +81,7 @@ SOLVE_PROBLEM   # solve!
 PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
 
 # write post-processing data for paraview
-# WRITE_MESH nafems-le10.vtk sigmay VECTOR u v w
+# WRITE_MESH nafems-le10.vtu sigmay VECTOR u v w
 ```
 
 
@@ -865,15 +865,15 @@ made out of a (non-dimensional) "soft" material and one made out of a
 "hard" material. We glue the two cubes together, set radial and
 tangential symmetry conditions on one side of the soft cube (so as to
 allow pure traction conditions) and set a normal compressive pressure at
-the other end on the hard cube. Besides on single VTK file with the
-overall results, the von Mises stress output is split into two VTK
-files---namely `soft.vtk` and `hard.vtk` where the stress is non-zero
+the other end on the hard cube. Besides on single VTU file with the
+overall results, the von Mises stress output is split into two VTU
+files---namely `soft.vtu` and `hard.vtu` where the stress is non-zero
 only in the corresponding volume.
 
 This example illustrates how to
 
 1.  assign different material properties to different volumes
-2.  write VTK outputs segmented by mesh volumes
+2.  write VTU outputs segmented by mesh volumes
 3.  write results at nodes (default) and at cells
 
 
@@ -893,9 +893,9 @@ SOLVE_PROBLEM
 sigma_at_1(x,y,z) = sigma(x,y,z)*(mat(x,y,z)=1)
 sigma_at_2(x,y,z) = sigma(x,y,z)*(mat(x,y,z)=2)
 
-WRITE_RESULTS format vtk displacements vonmises
-WRITE_MESH two-cubes-left.vtk  sigma_at_1 CELL NAME sigma_at_1_cells sigma_at_1
-WRITE_MESH two-cubes-right.vtk sigma_at_2 CELL NAME sigma_at_2_cells sigma_at_2
+WRITE_RESULTS FORMAT vtu displacements vonmises
+WRITE_MESH two-cubes-left.vtu  sigma_at_1 CELL NAME sigma_at_1_cells sigma_at_1
+WRITE_MESH two-cubes-right.vtu sigma_at_2 CELL NAME sigma_at_2_cells sigma_at_2
 
 ```
 

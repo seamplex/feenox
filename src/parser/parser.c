@@ -2503,6 +2503,8 @@ int feenox_parse_write_mesh(void) {
 
     if (strcasecmp(ext, ".msh") == 0) {
       mesh_write->post_format = post_format_gmsh;
+    } else if (strcasecmp(ext, ".vtu") == 0) {
+      mesh_write->post_format = post_format_vtu;
     } else if (strcasecmp(ext, ".vtk") == 0) {
       mesh_write->post_format = post_format_vtk;
     } else {

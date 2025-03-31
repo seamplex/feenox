@@ -123,7 +123,7 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
        - non-linear systems ([SNES](https://petsc.org/release/manual/snes/))
        - time-dependent systems ([TS](https://petsc.org/release/manual/ts/))
        - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
-     - writes results in either Gmsh or [VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) ([Paraview](https://www.paraview.org/)) format 
+     - writes results in  Gmsh's [.msh](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format) format and/or [Paraview](https://www.paraview.org/)'s [VTU/VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) formats
  * Focuses on [flexibility](https://seamplex.com/feenox/doc/sds.html#sec:flexibility), especially when defining [non-uniform multi-solid material properties from ASME tables](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state)
  * Follows the [Unix programming philosophy](https://seamplex.com/feenox/doc/sds.html#sec:unix)
    - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)

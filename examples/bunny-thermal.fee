@@ -26,4 +26,5 @@ SOLVE_PROBLEM
 done = T(bunny_cog[1],bunny_cog[2],bunny_cog[3]) > 0.5*Toven
 
 PRINT t T(bunny_cog[1],bunny_cog[2],bunny_cog[3])
-WRITE_RESULTS FORMAT vtu
+# TODO: pvd
+# WRITE_RESULTS FORMAT vtu

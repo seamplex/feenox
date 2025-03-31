@@ -179,7 +179,8 @@ The [`tests`] directory in the repository has hundreds of
       - non-linear systems ([SNES])
       - time-dependent systems ([TS])
       - generalized eigen-value problems ([EPS])
-    - writes results in either Gmsh or [VTK] ([Paraview]) format
+    - writes results in Gmsh’s [.msh] format and/or [Paraview]’s
+      [VTU/VTK] formats
 - Focuses on [flexibility], especially when defining [non-uniform
   multi-solid material properties from ASME tables]
 - Follows the [Unix programming philosophy]
@@ -232,8 +233,9 @@ The [`tests`] directory in the repository has hundreds of
   [SNES]: https://petsc.org/release/manual/snes/
   [TS]: https://petsc.org/release/manual/ts/
   [EPS]: https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html
-  [VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
+  [.msh]: http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format
   [Paraview]: https://www.paraview.org/
+  [VTU/VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
   [flexibility]: https://seamplex.com/feenox/doc/sds.html#sec:flexibility
   [non-uniform multi-solid material properties from ASME tables]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state
   [Unix programming philosophy]: https://seamplex.com/feenox/doc/sds.html#sec:unix

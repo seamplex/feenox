@@ -580,7 +580,7 @@ Even though FeenoX is still evolving so it could be premature in many cases, it 
 Resource consumption when solving the NAFEMS LE10 problem in the cloud for tetrahedral meshes.
 :::
 
-Regarding storage, FeenoX needs space to store the input file (negligible), the mesh file in `.msh` format (which can be either ASCII or binary) and the optional output files in `.msh` or `.vtk` formats. All of these files can be stored gzip-compressed and un-compressed on demand by exploiting FeenoX’s script-friendliness using proper calls to `gzip` before and/or after calling the `feenox` binary.
+Regarding storage, FeenoX needs space to store the input file (negligible), the mesh file in `.msh` format (which can be either ASCII or binary) and the optional output files in `.msh` or `.vtu`/`.vtk` formats. All of these files can be stored gzip-compressed and un-compressed on demand by exploiting FeenoX’s script-friendliness using proper calls to `gzip` before and/or after calling the `feenox` binary.
  
 ## Scalability  {#sec:scalability}
  
@@ -2050,7 +2050,7 @@ Files that should not be tracked include
 
  1. Documentation in HTML or PDF
  2. Mesh files
- 3. VTK and result files
+ 3. VTU/VTK and result files
 
 since in principle they could be generated from the files in the Git repository by executing the scripts, Gmsh and/or FeenoX.
 
@@ -2190,9 +2190,9 @@ $
 In the same sense, in principle any ASCII-based format can be implemented this way.
 Markdown output, which can then be converted to other formats as well (such as LaTeX which can then create professionally-looking tables as in @fig:latex-tables), has been already covered in @sec:interoperability.
 
-Current version can write space and time-dependent distributions into Gmsh's `.msh` and VTK's `.vtk` formats.
+Current version can write space and time-dependent distributions into Gmsh's `.msh` and VTK's `vtu`/`.vtk` formats.
 Both of them are open standard and have open-source readers.
-Other formats such as VTK's `.vtu` or CalculiX's `.frd` should be easy to add, but in any case the mesh data converters such as [Meshio](https://github.com/nschloe/meshio) can be used to convert FeenoX's post-processing output to other formats as well.
+Other formats such `.med` should be easy to add, but in any case the mesh data converters such as [Meshio](https://github.com/nschloe/meshio) can be used to convert FeenoX's post-processing output to other formats as well.
 
 
 ### Data exchange between non-conformal meshes {#sec:non-conformal}

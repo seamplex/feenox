@@ -182,8 +182,8 @@ PRINT_VECTOR SEP "\t|\t" i "%+.1e" L Gamma "%.4f" mu Mu
 PRINT
 PRINT ": $2 wire over $1 mesh, participation and excitation factors \$L\$ and \$\\Gamma\$, effective per-mode and cumulative mass fractions \$\\mu\$ and \$M\$"
 
-# write the modes into a vtk file
-WRITE_MESH wire-$1-$2.vtk \
+# write the modes into a vtu file
+WRITE_MESH wire-$1-$2.vtu \
  VECTOR u1 v1 w1 VECTOR u2 v2 w2 VECTOR u3 v3 w3 \
  VECTOR u4 v4 w4 VECTOR u5 v5 w5 VECTOR u6 v6 w6 \
  VECTOR u7 v7 w7 VECTOR u8 v8 w8 VECTOR u9 v9 w9 VECTOR u10 v10 w10
