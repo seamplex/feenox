@@ -275,6 +275,8 @@ DISTCLEANFILES = \
                  ./airfoil-converged.vtk                                      \
                  ./spinning-disk-parallel-plane-sixteenth_unstruct.vtk        \
                  ./heater-cylinder-inches.vtu                                 \
+                 ./heater-cylinder-inches.vtk                                 \
+                 ./heater-cylinder-inches-results.msh                         \
                  ./ray-effect-diffusion-eighth.msh                            \
                  ./airfoil-converged.msh                                      \
                  ./ray-effect-eighth-4.msh \
