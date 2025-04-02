@@ -2,9 +2,8 @@ FeenoX is distributed under the terms of the [GNU General Public License version
 
 |                                        |                                                       |
 |----------------------------------------|-------------------------------------------------------|
-|  Debian/Ubuntu packages (unofficial)   | <https://www.seamplex.com/feenox/dist/deb>            |
-|  GNU/Linux static binaries             | <https://www.seamplex.com/feenox/dist/linux>          |
-|  Windows binaries                      | <https://www.seamplex.com/feenox/dist/windows>        |
+|  Debian packages                       | <https://packages.debian.org/unstable/science/feenox> |
+|  GNU/Linux binaries                    | <https://www.seamplex.com/feenox/dist/linux>          |
 |  Source tarballs                       | <https://www.seamplex.com/feenox/dist/src>            |
 |  Github repository                     | <https://github.com/seamplex/feenox/>                 |
 

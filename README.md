@@ -45,15 +45,11 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 >     sudo apt install feenox
 >     ```
 >
->     For now it is in Debian sid only
+>     Check progress on the following pages:
 >
->     <https://packages.debian.org/unstable/science/feenox>
-> 
->     but eventually it will be part of Debian stable.
->     And probably it will be availabe in Ubuntu as well.
->     Follow the status at
->
->     <https://tracker.debian.org/pkg/feenox>
+>      * <https://packages.debian.org/unstable/science/feenox>
+>      * <https://tracker.debian.org/pkg/feenox>
+>      * <https://buildd.debian.org/status/package.php?p=feenox>
 >
 > 
 > Open-source web-based UX for FeenoX.

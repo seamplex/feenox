@@ -1,5 +1,11 @@
 # Current (under development)
 
+ * ...
+
+# v1.1 (Apr 2025)
+
+ * misc fixes for Debian packaging
+ * steady-state writer in VTU `.vtu` format
  * skip some tests in big-endian architectures
  * `READ_MESH` can read CalculiX's `.frd` output files
  * `utils/fee2ccx` converter from FeenoX's `.fee` to CalculiX's `.fee`
