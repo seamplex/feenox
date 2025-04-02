@@ -10,36 +10,21 @@ else
   wget https://seamplex.com/feenox/dist/src/feenox-${version}.tar.gz
   cp feenox-${version}.tar.gz src
 fi
-
 rm -rf feenox-${version}
 tar -xvzf feenox-${version}.tar.gz
+mv feenox-${version}.tar.gz feenox_${version}.orig.tar.gz
+
+if [ ! -d feenox-salsa ]; then
+  git clone https://salsa.debian.org/jtheler/feenox.git feenox-salsa
+else
+  cd feenox-salsa
+  git pull
+  cd ..
+fi
 
 cd feenox-${version}
-debmake
-cp ../README.Debian ../control ../copyright ../rules ../watch debian/
-cp ../metadata debian/upstream
-m4 -Dfeenox_version=${version} ../changelog > debian/changelog
-rm -f debian/source/control \
-      debian/tests/control \
-      debian/patches/series \
-      debian/source/local-options \
-      debian/source/options \
-      debian/source/patch-header \
-      debian/*.ex \
-      debian/source/*.ex \
-      debian/clean \
-      debian/dirs \
-      debian/gbp.conf \
-      debian/install \
-      debian/links \
-      debian/README.source
-rmdir debian/patches debian/tests
-rm -f COPYING debian/feenox/usr/share/doc/feenox/COPYRIGHT.gz
-
-# copy the debian directory to dist
-rm -rf ../debian
-cp -r debian ..
-# exit
+rm -rf debian
+cp -r ../feenox-salsa/debian .
 
 export DEBEMAIL="jeremy@seamplex.com"
 export DEBFULLNAME="Jeremy Theler"
@@ -47,6 +32,7 @@ export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-i -I -us -uc"
 export DEBUILD_LINTIAN_OPTS="-i -I --show-overrides"
 # export DEBSIGN_KEYID="Your_GPG_keyID
 debuild
+
 # # we could have also used
 # pdebuild
 

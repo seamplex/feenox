@@ -11,4 +11,5 @@ linux-*
 petsc-*
 slepc-*
 debian
+feenox-debian
 lintian.log

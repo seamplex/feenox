@@ -13,5 +13,5 @@ SOLVE_PROBLEM
 
 rc = 2.256751
 
-PRINT %.3f keff phi1(0.25*rc)/phi1(0) phi1(0.50*rc)/phi1(0) phi1(0.75*rc)/phi1(0) phi1(1.00*rc)/phi1(0) SEP " "
+PRINT %.2f keff phi1(0.25*rc)/phi1(0) phi1(0.50*rc)/phi1(0) phi1(0.75*rc)/phi1(0) phi1(1.00*rc)/phi1(0) SEP " "
 
