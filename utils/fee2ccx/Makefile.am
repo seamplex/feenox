@@ -67,6 +67,7 @@ fee2ccx_SOURCES = fee2ccx.c \
  ../../src/mesh/elements/triang3.c \
  ../../src/mesh/elements/triang6.c \
  ../../src/mesh/vtk.c \
+ ../../src/mesh/vtu.c \
  ../../src/math/builtin_functions.c \
  ../../src/math/builtin_functionals.c \
  ../../src/math/builtin_vectorfunctions.c \
