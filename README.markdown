@@ -62,14 +62,11 @@ work]):
 > sudo apt install feenox
 > ```
 >
-> For now it is in Debian sid only
+> Check progress on the following pages:
 >
-> <https://packages.debian.org/unstable/science/feenox>
->
-> but eventually it will be part of Debian stable. And probably it will
-> be availabe in Ubuntu as well. Follow the status at
->
-> <https://tracker.debian.org/pkg/feenox>
+> - <https://packages.debian.org/unstable/science/feenox>
+> - <https://tracker.debian.org/pkg/feenox>
+> - <https://buildd.debian.org/status/package.php?p=feenox>
 >
 > Open-source web-based UX for FeenoX.  
 > Take a look at [SunCAE] for an example of how to write a front end for
@@ -325,13 +322,12 @@ of the [Github repository] for
 FeenoX is distributed under the terms of the [GNU General Public License
 version 3] or (at your option) any later version.
 
-|  |  |
-|----|----|
-| Debian/Ubuntu packages (unofficial) | <https://www.seamplex.com/feenox/dist/deb> |
-| GNU/Linux static binaries | <https://www.seamplex.com/feenox/dist/linux> |
-| Windows binaries | <https://www.seamplex.com/feenox/dist/windows> |
-| Source tarballs | <https://www.seamplex.com/feenox/dist/src> |
-| Github repository | <https://github.com/seamplex/feenox/> |
+|                    |                                                       |
+|--------------------|-------------------------------------------------------|
+| Debian packages    | <https://packages.debian.org/unstable/science/feenox> |
+| GNU/Linux binaries | <https://www.seamplex.com/feenox/dist/linux>          |
+| Source tarballs    | <https://www.seamplex.com/feenox/dist/src>            |
+| Github repository  | <https://github.com/seamplex/feenox/>                 |
 
 - FeenoX is [cloud-first]. It was designed to run on servers.
 

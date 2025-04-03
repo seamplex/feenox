@@ -29,12 +29,12 @@ AC_ARG_WITH(
   [with_debug=no]
 )
 
-AC_ARG_WITH(
-  [fee2ccx],
-  AS_HELP_STRING([--with-fee2ccx], [compile fee2ccx @<:@default=no@:>@]),
-  [],
-  [with_fee2ccx=no]
-)
+# AC_ARG_WITH(
+#   [fee2ccx],
+#   AS_HELP_STRING([--with-fee2ccx], [compile fee2ccx @<:@default=no@:>@]),
+#   [],
+#   [with_fee2ccx=no]
+# )
 
 ######################
 # default optimization flags
@@ -413,9 +413,9 @@ m4_include(auto_links.m4)
 AC_CONFIG_FILES([Makefile src/Makefile])
 # AC_CONFIG_FILES([src/benchmark/Makefile]) 
 # AC_CONFIG_FILES([doc/Makefile])
-AS_IF([test "x${with_fee2ccx}" = "xyes"] , [
-  AC_CONFIG_FILES([utils/fee2ccx/Makefile])
-])
+# AS_IF([test "x${with_fee2ccx}" = "xyes"] , [
+#   AC_CONFIG_FILES([utils/fee2ccx/Makefile])
+# ])
 
 
 AS_BOX([Summary of dependencies])
@@ -432,7 +432,7 @@ AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO([" ${SLEPC_DIR}"]),
  AS_ECHO
 )
-AS_ECHO(  ["  Configure fee2ccx       ${with_fee2ccx}"])
+# AS_ECHO(  ["  Configure fee2ccx       ${with_fee2ccx}"])
 AS_ECHO(  ["  Compiler                ${compiler_show}"])
 AS_ECHO(  ["  Compiler flags          ${CFLAGS}"])
 # AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])
