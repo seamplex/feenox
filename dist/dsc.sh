@@ -14,13 +14,13 @@ rm -rf feenox-${version}
 tar -xvzf feenox-${version}.tar.gz
 mv feenox-${version}.tar.gz feenox_${version}.orig.tar.gz
 
-if [ ! -d feenox-salsa ]; then
-  git clone https://salsa.debian.org/jtheler/feenox.git feenox-salsa
-else
-  cd feenox-salsa
-  git pull
-  cd ..
-fi
+# if [ ! -d feenox-salsa ]; then
+#   git clone https://salsa.debian.org/jtheler/feenox.git feenox-salsa
+# else
+#   cd feenox-salsa
+#   git pull
+#   cd ..
+# fi
 
 cd feenox-${version}
 rm -rf debian
