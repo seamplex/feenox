@@ -318,23 +318,19 @@ int feenox_problem_dirichlet_set_phi_dot(Vec phi_dot) {
 // r - residual: the BC indexes are set to the difference between the value and the solution, scaled by alpha
 int feenox_problem_dirichlet_set_r(Vec r, Vec phi) {
 
-  size_t k;
-  
   // TODO: put this array somewhere and avoid allocating/freeing each time
   PetscScalar *diff;
   feenox_check_alloc(diff = calloc(feenox.pde.dirichlet_rows, sizeof(PetscScalar)));
   petsc_call(VecGetValues(phi, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diff));
   
-  if (feenox.pde.dirichlet_scale == 0)
-  {
+  if (feenox.pde.dirichlet_scale == 0) {
     feenox_problem_dirichlet_compute_scale();
   }
   
-  for (k = 0; k < feenox.pde.dirichlet_rows; k++) {
+  for (size_t k = 0; k < feenox.pde.dirichlet_rows; k++) {
     diff[k] -= feenox.pde.dirichlet_values[k];
     diff[k] *= feenox.pde.dirichlet_scale;
   }
-  
   
   petsc_call(VecSetValues(r, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, diff, INSERT_VALUES));
   feenox_free(diff);

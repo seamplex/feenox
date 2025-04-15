@@ -430,7 +430,8 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox.pde.math_type = math_type_linear;
   }
   
-  feenox.pde.solve = feenox_problem_solve_petsc_linear;
+  feenox.pde.solve = ((feenox.pde.math_type == math_type_linear) ? feenox_problem_solve_petsc_linear :
+                                                                   feenox_problem_solve_petsc_nonlinear);;
   
   feenox.pde.has_stiffness = 1;
   // TODO: transient
