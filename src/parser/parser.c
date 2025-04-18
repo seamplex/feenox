@@ -3211,6 +3211,11 @@ int feenox_parse_problem(void) {
         } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
+///kw_pde+PROBLEM+usage [ LINE_SEARCH { bt | nleqerr | basic | none | l2 | cp | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `LINE_SEARCH`s <https://petsc.org/release/manualpages/SNES/SNESLineSearchType/>.
+        } else if (strcasecmp(token, "LINE_SEARCH") == 0 || strcasecmp(token, "LS") == 0 || strcasecmp(token, "LS_TYPE") == 0) {
+          feenox_call(feenox_parser_string((char **)&feenox.pde.ls_type));
+          
 ///kw_pde+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
 ///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http://petsc.org/release/docs/manualpages/TS/TSType.html>.
     } else if (strcasecmp(token, "TRANSIENT_SOLVER") == 0 || strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {

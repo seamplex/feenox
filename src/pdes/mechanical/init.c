@@ -430,15 +430,22 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox.pde.math_type = math_type_linear;
   }
   
-  feenox.pde.solve = ((feenox.pde.math_type == math_type_linear) ? feenox_problem_solve_petsc_linear :
-                                                                   feenox_problem_solve_petsc_nonlinear);;
+  if (feenox.pde.math_type == math_type_linear) {
+    feenox.pde.solve = feenox_problem_solve_petsc_linear;
+  } else if (feenox.pde.math_type == math_type_nonlinear) {
+    feenox.pde.solve = feenox_problem_solve_petsc_nonlinear;
+    feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear;
+    feenox.pde.has_internal_fluxes = 1;
+  } else {
+    feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);
+  }
   
   feenox.pde.has_stiffness = 1;
   // TODO: transient
   feenox.pde.has_mass = 0;
   feenox.pde.has_rhs = 1;
   
-  feenox.pde.has_jacobian_K = 0;
+  feenox.pde.has_jacobian_K = feenox.pde.math_type == math_type_nonlinear;
   feenox.pde.has_jacobian_M = 0;
   feenox.pde.has_jacobian_b = 0;
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;

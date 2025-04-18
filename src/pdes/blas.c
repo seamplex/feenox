@@ -59,6 +59,13 @@ int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R) {
   return FEENOX_OK;
 }
 
+// R = alpha * A*B'
+int feenox_blas_ABt(gsl_matrix *A, gsl_matrix *B, double alpha, gsl_matrix *R) {
+  feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasTrans, alpha, A, B, 0.0, R));
+  return FEENOX_OK;
+}
+
+
 
 // R += alpha * B'*C*B
 int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R) {

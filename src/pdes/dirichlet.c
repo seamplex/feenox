@@ -296,6 +296,7 @@ int feenox_problem_dirichlet_set_J(Mat J) {
   
   // the jacobian is exactly one (actually alpha) for the dirichlet values and zero otherwise without keeping symmetry
   petsc_call(MatZeroRowsColumns(J, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, NULL, NULL));
+//  petsc_call(MatZeroRows(J, feenox.pde.dirichlet_rows, feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_scale, NULL, NULL));
 
   return FEENOX_OK;
 }

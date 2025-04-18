@@ -198,6 +198,7 @@ int feenox_problem_setup_ksp(KSP ksp) {
         petsc_call(MatSetOption(feenox.pde.M_bc, MAT_SYMMETRIC, PETSC_TRUE));  
       }  
     }  
+/*    
     if (feenox.pde.has_jacobian_K) {
       if (feenox.pde.JK != NULL) {
         petsc_call(MatSetOption(feenox.pde.JK, MAT_SYMMETRIC, PETSC_TRUE));  
@@ -210,6 +211,7 @@ int feenox_problem_setup_ksp(KSP ksp) {
         petsc_call(MatSetOption(feenox.pde.Jb, MAT_SPD, PETSC_TRUE));  
       }  
     }  
+*/
   }  
   
   petsc_call(KSPSetTolerances(ksp, feenox_var_value(feenox.pde.vars.ksp_rtol),

@@ -1882,6 +1882,7 @@ struct feenox_t {
     int has_stiffness;
     int has_mass;
     int has_rhs;
+    int has_internal_fluxes;
     int has_jacobian;
     int has_jacobian_K;
     int has_jacobian_M;
@@ -1909,6 +1910,7 @@ struct feenox_t {
     Vec phi_bc;    // the unknown (solution) vector with dirichlet BCs
     Vec b;         // the right-hand side vector without dirichlet BCs
     Vec b_bc;      // idem with dirichlet BCs (for KSP)
+    Vec f;         // internal fluxes (forces) for non-linear problems
     Vec r;         // residual vector for SNES and TS
     
     Mat K;       // stiffness matrix without dirichlet BCs
@@ -1950,6 +1952,7 @@ struct feenox_t {
     PCType pc_type;
     KSPType ksp_type;
     SNESType snes_type;
+    SNESLineSearchType ls_type;
     TSType ts_type;
     TSAdaptType ts_adapt_type;
 
@@ -2006,6 +2009,8 @@ struct feenox_t {
     gsl_matrix *JKi;              // elementary jacobian for stiffness matrix
     gsl_matrix *Jbi;              // elementary jacobian for RHS vector
     gsl_vector *bi;               // elementary right-hand side vector
+    gsl_vector *fi;               // elementary non-linear internal "force" vector
+    gsl_vector *phii;             // elementary solution vector
 
     gsl_vector *vec_f;               // temporary vector for rhs things like H'*f
 
@@ -2478,6 +2483,7 @@ extern int feenox_blas_Ab_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_
 extern int feenox_blas_Atb_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
 extern int feenox_blas_BtB_accum(gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R);
+extern int feenox_blas_ABt(gsl_matrix *A, gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);

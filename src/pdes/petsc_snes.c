@@ -84,6 +84,12 @@ int feenox_problem_setup_snes(SNES snes) {
     // if we have an explicit type, we set it
     petsc_call(SNESSetType(snes, feenox.pde.snes_type));
   }
+
+  if (feenox.pde.ls_type != NULL) {
+    SNESLineSearch  ls;
+    petsc_call(SNESGetLineSearch(snes, &ls));
+    petsc_call(SNESLineSearchSetType(ls, feenox.pde.ls_type));
+  }
   
   petsc_call(SNESSetTolerances(snes, feenox_var_value(feenox.pde.vars.snes_atol),
                                      feenox_var_value(feenox.pde.vars.snes_rtol),
@@ -109,35 +115,45 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
     feenox_check_alloc(feenox.pde.phi_bc = feenox_problem_create_vector("phi_bc"));
   }
   feenox_call(feenox_problem_dirichlet_eval());  
-  feenox_call(VecCopy(phi, feenox.pde.phi_bc));
+  petsc_call(VecCopy(phi, feenox.pde.phi_bc));
   feenox_call(feenox_problem_dirichlet_set_phi(feenox.pde.phi_bc));
 
-  // build the jacobian
+  // build both the residual and the jacobian
   feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi_bc));
   feenox_call(feenox_problem_build());
   
-  // multiply  K by phi_bc
-  petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
+  
+  if (feenox.pde.has_internal_fluxes) {
+    // if the problem provides an internal flux, use it
+    petsc_call(VecCopy(feenox.pde.f, r));
+  } else {
+    // otherwise make it up from the stiffness and the solution
+    petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
+  }
+  
+//  printf("r as in f\n");
+//  petsc_call(VecView(r, PETSC_VIEWER_STDOUT_SELF));
   
   // subtract b
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
+//  printf("r as in f-b\n");
+//  VecView(r, PETSC_VIEWER_STDOUT_SELF);
   
   // set dirichlet BCs on the residual
   feenox_call(feenox_problem_dirichlet_set_r(r, phi));
   
-/*  
-  printf("solution\n");
-  VecView(phi, PETSC_VIEWER_STDOUT_SELF);
-  printf("residual\n");
-  VecView(r, PETSC_VIEWER_STDOUT_SELF);
-*/
+//  printf("r as in f-b + bcs\n");
+//  VecView(r, PETSC_VIEWER_STDOUT_SELF);
+  
+//  printf("solution\n");
+//  VecView(phi, PETSC_VIEWER_STDOUT_SELF);
+  
 
   return FEENOX_OK;
 }
 
 
 PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *ctx) {
-  
   
   // J_snes = (K + JK - Jb)_bc
   // TODO: we want SAME_NONZERO_PATTERN!
@@ -146,6 +162,12 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
   petsc_call(MatAssemblyBegin(J_snes, MAT_FINAL_ASSEMBLY));
   petsc_call(MatAssemblyEnd(J_snes, MAT_FINAL_ASSEMBLY));
   petsc_call(MatCopy(feenox.pde.K, J_snes, DIFFERENT_NONZERO_PATTERN));
+
+//  printf("K\n");
+//  MatView(feenox.pde.K, PETSC_VIEWER_STDOUT_SELF);
+  
+//  printf("JK\n");
+//  MatView(feenox.pde.JK, PETSC_VIEWER_STDOUT_SELF);
   
   if (feenox.pde.has_jacobian_K) {
     petsc_call(MatAXPY(J_snes, +1.0, feenox.pde.JK, DIFFERENT_NONZERO_PATTERN));
@@ -157,10 +179,8 @@ PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *
   
   feenox_call(feenox_problem_dirichlet_set_J(J_snes));
   
-/*  
-  printf("jacobian\n");
-  MatView(J_snes, PETSC_VIEWER_STDOUT_SELF);
-*/
+//  printf("jacobian\n");
+//  MatView(J_snes, PETSC_VIEWER_STDOUT_SELF);
   
   return FEENOX_OK;
 }
