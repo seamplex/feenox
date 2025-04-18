@@ -1783,6 +1783,7 @@ struct feenox_t {
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
+    int (*setup_snes)(SNES snes);
   #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
   #endif

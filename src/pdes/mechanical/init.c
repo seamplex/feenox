@@ -32,6 +32,7 @@ int feenox_problem_parse_time_init_mechanical(void) {
 
   feenox.pde.init_before_run = feenox_problem_init_runtime_mechanical;
 
+  feenox.pde.setup_snes = feenox_problem_setup_snes_mechanical;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_mechanical;
   feenox.pde.setup_pc = feenox_problem_setup_pc_mechanical;
   
@@ -534,6 +535,24 @@ int feenox_problem_setup_ksp_mechanical(KSP ksp) {
     petsc_call(KSPSetType(ksp, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES));
   }  
 
+  return FEENOX_OK;
+}
+
+int feenox_problem_setup_snes_mechanical(SNES snes) {
+
+  // TODO! set a default snes type
+//  SNESType snes_type = NULL;
+//  petsc_call(SNESGetType(snes, &snes_type));
+  
+  SNESLineSearch ls;
+  petsc_call(SNESGetLineSearch(snes, &ls));
+  
+  SNESLineSearchType ls_type;
+  petsc_call(SNESLineSearchGetType(ls, &ls_type));
+  
+  if (ls_type == NULL) {
+    petsc_call(SNESLineSearchSetType(ls, SNESLINESEARCHBASIC));
+  }
   return FEENOX_OK;
 }
 

@@ -90,12 +90,17 @@ int feenox_problem_setup_snes(SNES snes) {
     petsc_call(SNESGetLineSearch(snes, &ls));
     petsc_call(SNESLineSearchSetType(ls, feenox.pde.ls_type));
   }
-  
+
+  if (feenox.pde.setup_snes != NULL) {
+    feenox_call(feenox.pde.setup_snes(snes));
+  }
   petsc_call(SNESSetTolerances(snes, feenox_var_value(feenox.pde.vars.snes_atol),
                                      feenox_var_value(feenox.pde.vars.snes_rtol),
                                      feenox_var_value(feenox.pde.vars.snes_stol),
                                      (PetscInt)feenox_var_value(feenox.pde.vars.snes_max_it),
                                      PETSC_DEFAULT));
+  
+  petsc_call(SNESSetDivergenceTolerance(snes, PETSC_UNLIMITED));
   
   petsc_call(SNESSetFromOptions(snes));
   // TODO: this call complains about DM (?) in thermal-slab-transient.fee 

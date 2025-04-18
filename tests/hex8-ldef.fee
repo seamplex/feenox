@@ -1,9 +1,9 @@
 READ_MESH hex8.msh
 PROBLEM mechanical LS none PC mumps NON_LINEAR
 E = 1
-nu = 0
+nu = 0.25
 BC left fixed
-BC right tz=1e-1
+BC right tz=1e-4
 SOLVE_PROBLEM
-PRINT_FUNCTION u v w
-# WRITE_RESULTS FORMAT vtu displacements
+# PRINT_FUNCTION u v w
+WRITE_RESULTS FORMAT vtu displacements
