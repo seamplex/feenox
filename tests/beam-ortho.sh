@@ -14,19 +14,18 @@ checkpde mechanical
 # the meshes are in the git repository, but just in case this is how they can be re-generated
 # for i in beam-cantilever-*.geo; do gmsh -v 0 -3 $i; done
 
-
-answer1 orthotropic-beam.fee tet4 "12.5 2.4 2.3 -2.4 -2.6"
+answer1 beam-orthotropic.fee tet4 "12.5 2.4 2.3 -2.4 -2.6"
 exitifwrong $?
 
-answer1 orthotropic-beam.fee tet10 "139.0 21.8 23.0 -2.1 -0.2"
+answer1 beam-orthotropic.fee tet10 "139.0 21.8 23.0 -2.1 -0.2"
 exitifwrong $?
 
-answer1 orthotropic-beam.fee hex8 "38.0 10.9 9.4 -1.2 -34.1"
+answer1 beam-orthotropic.fee hex8 "38.0 10.9 9.4 -1.2 -34.1"
 exitifwrong $?
 
-answer1 orthotropic-beam.fee hex20 "151.3 43.4 37.5 -6.9 3.2"
+answer1 beam-orthotropic.fee hex20 "151.3 43.4 37.5 -6.9 3.2"
 exitifwrong $?
 
-answer1 orthotropic-beam.fee hex27 "158.9 45.6 39.4 -8.2 3.1"
+answer1 beam-orthotropic.fee hex27 "158.9 45.6 39.4 -8.2 3.1"
 exitifwrong $?
 

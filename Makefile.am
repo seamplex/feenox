@@ -31,6 +31,7 @@ TESTS = \
         tests/bc-groups.sh \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
+        tests/beam-ldef.sh \
         tests/bimetallic-strip.sh \
         tests/builtin.sh \
         tests/circle.sh \

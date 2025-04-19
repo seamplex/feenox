@@ -520,6 +520,11 @@ int feenox_problem_init_runtime_general(void) {
   if (feenox.pde.has_rhs) {
     feenox.pde.b = feenox_problem_create_vector("b");
   }
+
+  // the internal fluxes (i.e. forces) vector
+  if (feenox.pde.has_internal_fluxes) {
+    feenox.pde.f = feenox_problem_create_vector("f");
+  }
   
   // the mass matrix for modal or heat transient
   if (feenox.pde.has_mass) {
