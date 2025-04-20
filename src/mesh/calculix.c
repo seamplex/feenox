@@ -161,8 +161,9 @@ int ccx2gmsh_types[] = {
   ELEMENT_TYPE_LINE3,         // 12
   ELEMENT_TYPE_POINT1         // 13
 };
-    
-int gmsh2ccx_types[] = {  
+
+
+int gmsh2ccx_types[] = {
    0,      // ELEMENT_TYPE_UNDEFINED      0
   11,      // ELEMENT_TYPE_LINE2          1
    7,      // ELEMENT_TYPE_TRIANGLE3      2
@@ -175,13 +176,17 @@ int gmsh2ccx_types[] = {
    8,      // ELEMENT_TYPE_TRIANGLE6      9
    0,      // ELEMENT_TYPE_QUADRANGLE9    10
    6,      // ELEMENT_TYPE_TETRAHEDRON10  11
-   0,      // ELEMENT_TYPE_HEXAHEDRON27   12 
+   0,      // ELEMENT_TYPE_HEXAHEDRON27   12
+   0,      // ELEMENT_TYPE_PRISM18        13
+   0,      // ELEMENT_TYPE_PYRAMID14      14
   13,      // ELEMENT_TYPE_POINT1         15
   10,      // ELEMENT_TYPE_QUADRANGLE8    16
    4,      // ELEMENT_TYPE_HEXAHEDRON20   17
    5       // ELEMENT_TYPE_PRISM15        18
 };
 
+int gmsh2ccx_hex20[] = {0,1,2,3,4,5,6,7, 8,11,13,9,16,18,19,17,10,12,14,15};
+int ccx2gmsh_hex20[] = {0,1,2,3,4,5,6,7, 8,11,16,9,17,10,18,19,12,15,13,14};
 
 #define BUFFER_SIZE 512
 int feenox_mesh_read_frd(mesh_t *this) {
@@ -189,23 +194,23 @@ int feenox_mesh_read_frd(mesh_t *this) {
   char buffer[BUFFER_SIZE];
   char tmp[BUFFER_SIZE];
   int *tag2index = NULL;
-  
+
   if (this->file->pointer == NULL) {
     feenox_call(feenox_instruction_file_open(this->file));
   }
 
   int sparse = 0;
-  
+
   // start assuming all these are zero
   int bulk_dimensions = 0;
   int spatial_dimensions = 0;
   int order = 0;
-  
+
   while (fgets(buffer, BUFFER_SIZE-1, this->file->pointer) != NULL) {
 
     if (strncmp("\n", buffer, 1) == 0) {
       ;
-    
+
     // ------------------------------------------------------  
     } else if (strncmp("    1C", buffer, 6) == 0) {
       // Format:(1X,'   1','C',A6)  
@@ -215,7 +220,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
       // case name at buffer+6
       // 
       ;
-      
+
     // ------------------------------------------------------  
     } else if (strncmp("    1U", buffer, 6) == 0) {
       // Format:(1X,'   1','U',A66)  
@@ -224,7 +229,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
       //
       // user-provided field at buffer+6 and user-provided data afterwards
       ;
-      
+
     // ------------------------------------------------------  
     } else if (strncmp("    2C", buffer, 6) == 0) {
       // Format:(1X,'   2','C',18X,I12,37X,I1)
@@ -251,7 +256,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
         feenox_push_error_message("node format %d not supported'", format);
         return FEENOX_ERROR;
       }
-      
+
       feenox_check_alloc(this->node = calloc(this->n_nodes, sizeof(node_t)));
 
       int tag_max = this->n_nodes;
@@ -270,15 +275,15 @@ int feenox_mesh_read_frd(mesh_t *this) {
         if (fscanf(this->file->pointer, "%d", &tag) == 0) {
           return FEENOX_ERROR;
         }
-        
+
         if (j+1 != tag) {
           sparse = 1;
         }
-        
+
         if ((this->node[j].tag = tag) > tag_max) {
           tag_max = this->node[j].tag;
         }
-        
+
         this->node[j].index_mesh = j;
 
         for (unsigned int d = 0; d < 3; d++) {
@@ -286,7 +291,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
             return FEENOX_ERROR;
           }
         }
-        
+
         if (spatial_dimensions < 1 && fabs(this->node[j].x[0]) > 1e-6) {
           spatial_dimensions = 1;
         }
@@ -297,7 +302,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
           spatial_dimensions = 3;
         }
       }
-  
+
       // -3
       int minusthree;
       if (fscanf(this->file->pointer, "%d", &minusthree) != 1) {
@@ -308,7 +313,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
         feenox_push_error_message("expected minus three as line starter", buffer);
         return FEENOX_ERROR;
       }
-      
+
       // finished reading the nodes, handle sparse node tags
       if (sparse) {
         feenox_check_alloc(tag2index = malloc((tag_max+1) * sizeof(int)));
@@ -351,7 +356,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
 
       feenox_check_alloc(this->element = calloc(this->n_elements, sizeof(element_t)));
       for (size_t i = 0; i < this->n_elements; i++) {
-        
+
         // The following block of records must be repeated for each element:
         //  The first record initializes an element definition:
         //  Short Format:(1X,'-1',I5,3I5)
@@ -362,7 +367,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
         //       TYPE   = element type, see section ''Element Types''
         //       GROUP  = element group number, see command ''grps''
         //       MATERIAL= element material number, see command ''mats''.        
-        
+
         int minusone;
         if (fscanf(this->file->pointer, "%d", &minusone) != 1) {
           feenox_push_error_message("error parsing nodes", buffer);
@@ -372,14 +377,14 @@ int feenox_mesh_read_frd(mesh_t *this) {
           feenox_push_error_message("expected minus one as line starter", buffer);
           return FEENOX_ERROR;
         }
-        
+
         int tag = 0;
         if (fscanf(this->file->pointer, "%d", &tag) == 0) {
           return FEENOX_ERROR;
         }
         this->element[i].index = i;
         this->element[i].tag = tag;
-    
+
         int ccx_element_type;
         if (fscanf(this->file->pointer, "%d", &ccx_element_type) == 0) {
           return FEENOX_ERROR;
@@ -404,11 +409,11 @@ int feenox_mesh_read_frd(mesh_t *this) {
         if (this->element[i].type->dim > bulk_dimensions) {
           bulk_dimensions = this->element[i].type->dim;
         }
-        
+
         if (this->element[i].type->order > order) {
           order = this->element[i].type->order;
         }
-        
+
         // highest node count
         if (this->element[i].type->nodes > this->max_nodes_per_element) {
           this->max_nodes_per_element = this->element[i].type->nodes;
@@ -418,7 +423,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
         if (this->element[i].type->faces > this->max_faces_per_element) {
           this->max_faces_per_element = this->element[i].type->faces;
         }
-    
+
         // -2
         int minustwo;
         if (fscanf(this->file->pointer, "%d", &minustwo) != 1) {
@@ -429,7 +434,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
           feenox_push_error_message("expected minus two as line starter", buffer);
           return FEENOX_ERROR;
         }
-        
+
         feenox_check_alloc(this->element[i].node = calloc(this->element[i].type->nodes, sizeof(node_t *)));
         for (size_t j = 0; j < this->element[i].type->nodes; j++) {
           int node = 0;
@@ -437,14 +442,15 @@ int feenox_mesh_read_frd(mesh_t *this) {
             if (fscanf(this->file->pointer, "%d", &node) == 0) {
               return FEENOX_ERROR;
             }
-            if (sparse == 0 && node > this->n_nodes) {
+            // printf("node %d\n", node);
+            // printf("max nodes %d\n", this->n_nodes);
+            if (sparse == 0 && node != -2 && node > this->n_nodes) {
               feenox_push_error_message("node %d in element %d does not exist", node, tag);
               return FEENOX_ERROR;
             }
           } while (node == -2);
-          
-          // tet10 has a single swap
-          // TODO: hexa20 and wedge 2nd order
+
+          // TODO: wedge 2nd order
           int j_gmsh = j;
           if (this->element[i].type->id == ELEMENT_TYPE_TETRAHEDRON10) {
             if (j == 8) {
@@ -454,8 +460,10 @@ int feenox_mesh_read_frd(mesh_t *this) {
             } else {
               j_gmsh = j;
             }
+          } else if (this->element[i].type->id == ELEMENT_TYPE_TETRAHEDRON10) {
+            j_gmsh = ccx2gmsh_hex20[j];
           }
-          
+
           int node_index = (sparse==0) ? node-1 : tag2index[node];
           if (node_index < 0) {
             feenox_push_error_message("node %d in element %d does not exist", node, tag);

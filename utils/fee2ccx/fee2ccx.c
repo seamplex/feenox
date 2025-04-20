@@ -29,10 +29,20 @@ feenox_t feenox;
 extern char *ccx_names[];
 extern int ccx2gmsh_types[];
 extern int gmsh2ccx_types[];
+extern int gmsh2ccx_hex20[];
 
 
 int main(int argc, char **argv) {
 
+  for (int i = 0; i < 20; i++) {
+    for (int j = 0; j < 20; j++) {
+      if (gmsh2ccx_hex20[j] == i) {
+        printf("%d %d\n", i, j);
+      }
+    }
+  }
+  exit(0);
+  
   if (argc == 1) {
     printf("usage: %s feenox-input.fee\n", argv[0]);
     return 0;
@@ -72,21 +82,38 @@ int main(int argc, char **argv) {
         if (element_type == ELEMENT_TYPE_UNDEFINED) {
           strncpy(element_types, e->type->name, 512);
         } else {
-          strcat(element_types, e->type->name);  
+          strcat(element_types, e->type->name);
         }
         strcat(element_types, ", ");
-        printf("*ELEMENT, TYPE=%s, ELSET=%s\n", ccx_names[gmsh2ccx_types[e->type->id]], e->type->name);
+        int ccx_type = gmsh2ccx_types[e->type->id];
+        if (ccx_type == 0) {
+          fprintf(stderr, "error: calculix does not support element type '%s'\n", e->type->name);
+          return FEENOX_ERROR;
+        }
+        printf("*ELEMENT, TYPE=%s, ELSET=%s\n", ccx_names[ccx_type], e->type->name);
         element_type = e->type->id;
-      }  
+      }
       printf("%ld", mesh->element[i].tag);
+      int entry = 1;
       for (unsigned int j = 0; j < mesh->element[i].type->nodes; j++) {
-        if (e->type->id == ELEMENT_TYPE_TETRAHEDRON10 && j == 8) {
-          printf(", %ld", mesh->element[i].node[9]->tag);
-        } else if (e->type->id == ELEMENT_TYPE_TETRAHEDRON10 && j == 9) {
-          printf(", %ld", mesh->element[i].node[8]->tag);
+        printf(",");
+        if (entry++ == 16) {
+          printf("\n");
+          entry = 0;
         } else {
-          printf(", %ld", mesh->element[i].node[j]->tag);
-        }  
+          printf(" ");
+        }
+        if (e->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
+          if (j == 8) {
+            printf("%ld", mesh->element[i].node[9]->tag);
+          } else if (j == 9) {
+            printf("%ld", mesh->element[i].node[8]->tag);
+          } else {
+            printf("%ld", mesh->element[i].node[j]->tag);
+          }
+        } else if (e->type->id == ELEMENT_TYPE_HEXAHEDRON20) {
+          printf("%ld", mesh->element[i].node[gmsh2ccx_hex20[j]]->tag);
+        }
       }
       printf("\n");
     }
@@ -143,13 +170,22 @@ int main(int argc, char **argv) {
   }
   printf("\n");
 
-  printf("*STEP\n");
-  printf("*EL FILE     # Commands responsible for saving results\n");
+  printf("*STEP");
+  if (feenox.pde.math_type == math_type_nonlinear) {
+    printf(", NLGEOM");
+  }
+  printf("\n");
+  printf("*EL FILE\n");
   printf("E, S\n");
   printf("*NODE FILE\n");
   printf("U\n");
   printf("\n");
-  
+  printf("*STATIC\n");
+  if (feenox.pde.math_type == math_type_nonlinear) {
+    printf("1.0, 1.0, 0.01, 1.0\n");
+  }
+  printf("\n");
+
   printf("*CLOAD\n");
   PetscScalar *b = NULL;
   petsc_call(VecGetArray(feenox.pde.b, &b));  
@@ -162,8 +198,7 @@ int main(int argc, char **argv) {
   }
   petsc_call(VecRestoreArray(feenox.pde.b, &b));
   printf("\n");
-  
-  printf("*STATIC\n");
+
   printf("*END STEP\n");
 
   feenox_finalize();

@@ -43,15 +43,17 @@ int feenox_problem_solve_petsc_nonlinear(void) {
 
   // solve
   feenox.pde.progress_last = 0; // reset the progress bar counter
-  petsc_call(SNESSolve(feenox.pde.snes, NULL, feenox.pde.phi));
+  if (feenox.pde.do_not_solve == 0) {
+    petsc_call(SNESSolve(feenox.pde.snes, NULL, feenox.pde.phi));
 
-  // check convergence
-  SNESConvergedReason reason;
-  petsc_call(SNESGetConvergedReason(feenox.pde.snes, &reason));
-  if (reason < 0) {
-    feenox_push_error_message("PETSc's non-linear solver did not converge with reason '%s' (%d)", SNESConvergedReasons[reason], reason);
-    // TODO: go deeper into the KSP and PC
-    return FEENOX_ERROR;
+    // check convergence
+    SNESConvergedReason reason;
+    petsc_call(SNESGetConvergedReason(feenox.pde.snes, &reason));
+    if (reason < 0) {
+      feenox_push_error_message("PETSc's non-linear solver did not converge with reason '%s' (%d)", SNESConvergedReasons[reason], reason);
+      // TODO: go deeper into the KSP and PC
+      return FEENOX_ERROR;
+    }
   }
 
   // finish the progress line
