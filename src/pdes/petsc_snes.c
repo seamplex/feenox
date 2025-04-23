@@ -54,6 +54,9 @@ int feenox_problem_solve_petsc_nonlinear(void) {
       // TODO: go deeper into the KSP and PC
       return FEENOX_ERROR;
     }
+  } else {
+    // this branch is for the fee2ccx converter
+    feenox_snes_residual(feenox.pde.snes, feenox.pde.phi, feenox.pde.r, NULL);
   }
 
   // finish the progress line

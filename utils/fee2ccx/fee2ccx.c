@@ -34,15 +34,6 @@ extern int gmsh2ccx_hex20[];
 
 int main(int argc, char **argv) {
 
-  for (int i = 0; i < 20; i++) {
-    for (int j = 0; j < 20; j++) {
-      if (gmsh2ccx_hex20[j] == i) {
-        printf("%d %d\n", i, j);
-      }
-    }
-  }
-  exit(0);
-  
   if (argc == 1) {
     printf("usage: %s feenox-input.fee\n", argv[0]);
     return 0;
@@ -65,8 +56,6 @@ int main(int argc, char **argv) {
   }
 
   mesh_t *mesh = feenox.mesh.mesh_main;
-  feenox_instruction_mesh_read(mesh);
-
   printf("*NODE\n");
   for (size_t j = 0; j < mesh->n_nodes; j++) {
     printf("%ld, %g, %g, %g\n", mesh->node[j].tag, mesh->node[j].x[0], mesh->node[j].x[1], mesh->node[j].x[2]);
@@ -113,6 +102,8 @@ int main(int argc, char **argv) {
           }
         } else if (e->type->id == ELEMENT_TYPE_HEXAHEDRON20) {
           printf("%ld", mesh->element[i].node[gmsh2ccx_hex20[j]]->tag);
+        } else {
+          printf("%ld", mesh->element[i].node[j]->tag);
         }
       }
       printf("\n");

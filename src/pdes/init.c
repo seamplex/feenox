@@ -395,7 +395,7 @@ int feenox_problem_init_runtime_general(void) {
 #ifdef HAVE_PETSC
 
   // first set options from PETSC_OPTIONS
-  if (feenox.pde.petsc_options != NULL) {
+  if (feenox.pde.petsc_options != NULL && feenox.pde.do_not_solve == 0) {
     petsc_call(PetscOptionsInsertString(NULL, feenox.pde.petsc_options));
   }
   
