@@ -3171,14 +3171,18 @@ int feenox_parse_problem(void) {
 
 
 ///kw_pde+PROBLEM+detail By default FeenoX tries to detect whether the computation should be linear or non-linear.
-///kw_pde+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+///kw_pde+PROBLEM+detail For instance, a thermal problem with a temperature-dependent conductivity is automatically detected as non-linear. 
+///kw_pde+PROBLEM+detail Particular problems can also have special variables to trigger non-linearities, e.g.
+///kw_pde+PROBLEM+detail the special variable `ldef` in mechanical. 
+///kw_pde+PROBLEM+detail In any case, an explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+///kw_pde+PROBLEM+detail Yet the command-line options `--linear` and `--non-linear` take precedence.
 ///kw_pde+PROBLEM+usage [ LINEAR
     } else if (strcasecmp(token, "LINEAR") == 0) {
       feenox.pde.math_type = math_type_linear;
 
 ///kw_pde+PROBLEM+usage | NON_LINEAR ]
 ///kw_pde+PROBLEM+usage @
-    } else if (strcasecmp(token, "NON_LINEAR") == 0) {
+    } else if (strcasecmp(token, "NON_LINEAR") == 0 || strcasecmp(token, "NONLINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
 

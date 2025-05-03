@@ -110,9 +110,9 @@ struct mechanical_t {
   gsl_vector *et;   // thermal strain vector, size 6 for 3d
   gsl_vector *Cet;  // product of C times et, size 6 for 3d
   
+  
   // non-linear stuff
   gsl_matrix *grad_u;  // displacement gradient
-  gsl_matrix *eye;     // 3x3 identity
   gsl_matrix *F;       // deformation gradient
   gsl_matrix *EGL;     // green-lagrange strain
   gsl_matrix *S;       // second piola-kirchoff stress
@@ -121,8 +121,15 @@ struct mechanical_t {
   gsl_matrix *SigmaG;  // temporary holder
   gsl_vector *S_voigt; // S in voigt notation
   
-//  double hourglass_epsilon;
+  gsl_matrix *eye;     // 3x3 identity
+  gsl_matrix *twomuE;  // temporary holder
+
   
+//  double hourglass_epsilon;
+
+  var_t *ldef;
+  var_t *ldef_check;
+
   // for implicit multi-dof BCs
   var_t *displ_for_bc[3];
 

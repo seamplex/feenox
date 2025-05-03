@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
   printf("\n");
 
   printf("*STEP");
-  if (feenox.pde.math_type == math_type_nonlinear) {
+  if (feenox_var_value(mechanical.ldef)) {
     printf(", NLGEOM");
   }
   printf("\n");

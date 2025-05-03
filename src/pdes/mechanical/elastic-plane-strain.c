@@ -25,10 +25,8 @@
 
 int feenox_problem_build_compute_mechanical_C_elastic_plane_strain(const double *x, material_t *material) {
   
-  double E = mechanical.E.eval(&mechanical.E, x, material);
-  double nu = mechanical.nu.eval(&mechanical.nu, x, material);
-  double lambda = E*nu/((1+nu)*(1-2*nu));
-  double mu = 0.5*E/(1+nu);
+  double lambda, mu;
+  feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
   double lambda2mu = lambda + 2*mu;
   
   gsl_matrix_set(mechanical.C, 0, 0, lambda2mu);

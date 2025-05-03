@@ -70,7 +70,7 @@ int feenox_problem_dirichlet_eval(void) {
     // because there might nodes counted more than once because we loop over elements
 
     // TODO: allow the user to provide a factor at runtime
-    n_bcs = 1.2*feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
+    n_bcs = 1.5*feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
 
     feenox_check_alloc(feenox.pde.dirichlet_nodes = calloc(n_bcs, sizeof(size_t)));
     feenox_check_alloc(feenox.pde.dirichlet_dofs = calloc(n_bcs, sizeof(int)));
@@ -125,7 +125,7 @@ int feenox_problem_dirichlet_eval(void) {
     
     // if k == 0 this like freeing
     feenox_check_alloc(feenox.pde.dirichlet_nodes = realloc(feenox.pde.dirichlet_nodes, feenox.pde.dirichlet_rows * sizeof(size_t)));
-    feenox_check_alloc(feenox.pde.dirichlet_dofs = realloc(feenox.pde.dirichlet_dofs, feenox.pde.dirichlet_rows * sizeof(int)));
+    feenox_check_alloc(feenox.pde.dirichlet_dofs = realloc(feenox.pde.dirichlet_dofs, feenox.pde.dirichlet_rows * sizeof(unsigned int)));
     feenox_check_alloc(feenox.pde.dirichlet_indexes = realloc(feenox.pde.dirichlet_indexes, feenox.pde.dirichlet_rows * sizeof(PetscInt)));
     feenox_check_alloc(feenox.pde.dirichlet_values = realloc(feenox.pde.dirichlet_values, feenox.pde.dirichlet_rows * sizeof(PetscScalar)));
     feenox_check_alloc(feenox.pde.dirichlet_derivatives = realloc(feenox.pde.dirichlet_derivatives, feenox.pde.dirichlet_rows * sizeof(PetscScalar)));

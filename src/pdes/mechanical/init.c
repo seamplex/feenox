@@ -125,7 +125,15 @@ int feenox_problem_parse_time_init_mechanical(void) {
 //  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, FEENOX_SOLUTION_GRADIENT));
 
+///va+ldef+detail Flag that turns the large-deformation formulation on or off.
+///va+ldef+detail It can also be turned on with the `NONLINEAR` keyword in `PROBLEM`
+///va+ldef+detail or with the `--non-linear` command-line option.
+  feenox_check_alloc(mechanical.ldef = feenox_define_variable_get_ptr("ldef"));
 
+///va+ldef+detail Flag that asks FeenoX to check if the deformations are large after
+///va+ldef+detail solving a linear problem. If they are, a warning is issued.
+  feenox_check_alloc(mechanical.ldef_check = feenox_define_variable_get_ptr("ldef_check"));
+  
 // these are for the algebraic expressions in the  implicitly-defined BCs
 // i.e. 0=u*nx+v*ny or 0=u*y-v*x
 // here they are defined as uppercase because there already exist functions named u, v and w
@@ -406,8 +414,6 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_call(mechanical.compute_C(NULL, NULL));
   } 
 
-
-  
   switch (mechanical.thermal_expansion_model) {
     case thermal_expansion_model_isotropic:
       mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_isotropic;
@@ -426,9 +432,13 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
   }
   
-  // TODO: check nonlinearity!
   if (feenox.pde.math_type == math_type_automatic) {
-    feenox.pde.math_type = math_type_linear;
+    if (feenox_var_value(mechanical.ldef) == 0) {
+      feenox.pde.math_type = math_type_linear;
+      feenox_var_value(mechanical.ldef_check) = 1;
+    } else {
+      feenox.pde.math_type = math_type_nonlinear;
+    }
   }
   
   if (feenox.pde.math_type == math_type_linear) {
@@ -437,6 +447,8 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox.pde.solve = feenox_problem_solve_petsc_nonlinear;
     feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear;
     feenox.pde.has_internal_fluxes = 1;
+    feenox_var_value(mechanical.ldef) = 1;
+    feenox_var_value(mechanical.ldef_check) = 0;
   } else {
     feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);
   }

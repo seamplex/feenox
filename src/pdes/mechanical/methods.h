@@ -60,13 +60,18 @@ extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *, u
 extern int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *, unsigned int q);
 
 // material models
+extern void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu);
 extern int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x, material_t *material);
-extern int feenox_problem_build_compute_mechanical_C_elastic_plane_stress(const double *x, material_t *material);
-extern int feenox_problem_build_compute_mechanical_C_elastic_plane_strain(const double *x, material_t *material);
-extern int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *x, material_t *material);
-
+extern int feenox_problem_build_compute_mechanical_S_elastic_isotropic(const double *x, material_t *material);
 extern int feenox_problem_build_compute_mechanical_strain_isotropic (const double *x, material_t *material);
+
+extern int feenox_problem_build_compute_mechanical_C_elastic_orthotropic(const double *x, material_t *material);
 extern int feenox_problem_build_compute_mechanical_strain_orthotropic (const double *x, material_t *material);
+
+extern int feenox_problem_build_compute_mechanical_C_elastic_plane_stress(const double *x, material_t *material);
+
+extern int feenox_problem_build_compute_mechanical_C_elastic_plane_strain(const double *x, material_t *material);
+
 
 extern int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j, double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx, double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyx, double *tauzx);
 extern int feenox_problem_build_compute_mechanical_stress_isotropic (const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z);
