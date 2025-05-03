@@ -10,12 +10,7 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkpde mechanical
-checkgmsh
 
-gmsh -v 0 -3 ${dir}/cube.geo || exit $?
-
-for i in $(seq 1 4); do
-  answerdiff bc-groups${i}.fee --ast
-  exitifwrong $?
-done
+${feenox} ${dir}/hex8-ldef.fee --snes_test_jacobian | grep "||J - Jfd||_F/||J||_F =" | tr -d , | awk '{d+=$5}END{exit d>1e-5}' 
+exitifwrong $?
 

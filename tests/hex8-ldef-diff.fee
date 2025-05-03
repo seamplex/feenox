@@ -1,0 +1,6 @@
+READ_MESH hex8-ldef.frd DIM 3 READ_FUNCTION D1  READ_FUNCTION D2  READ_FUNCTION D3
+READ_MESH hex8-ldef.vtk DIM 3 READ_FUNCTION displacementsx  READ_FUNCTION displacementsy  READ_FUNCTION displacementsz
+
+INTEGRATE (D1(x,y,z)-displacementsx(x,y,z))^2+(D2(x,y,z)-displacementsy(x,y,z))^2+(D2(x,y,z)-displacementsz(x,y,z))^2 RESULT e2
+
+PRINT e2

@@ -6,16 +6,15 @@ for i in . tests; do
 done
 if [ -z "${functions_found}" ]; then
   echo "could not find functions.sh"
-   exit 1
+  exit 1
 fi
 
-checkpde mechanical
-checkgmsh
+if [ -z "$(which ccx)" ]; then
+  exit 77
+fi
 
-gmsh -v 0 -3 ${dir}/cube.geo || exit $?
+ccx -i hex8-ldef > hex8-ldef.txt
+${feenox} ${dir}/hex8-ldef.fee
 
-for i in $(seq 1 4); do
-  answerdiff bc-groups${i}.fee --ast
-  exitifwrong $?
-done
-
+answerzero hex8-ldef-diff.fee
+exitifwrong $?
