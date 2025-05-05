@@ -1153,6 +1153,8 @@ struct material_t {
   char *name;
   mesh_t *mesh;
   property_data_t *property_datums;
+  
+  void *ctx;
 
   UT_hash_handle hh;
 };
@@ -1180,7 +1182,8 @@ struct property_data_t {
 struct distribution_t  {
   char *name;
   
-  int defined;             // true or false if is defined
+  int defined;             // true or false if is defined at least in one group
+  int *defined_per_group;  // true or false if is defined for each group
   int full;                // true if all the groups have the property
   
   property_t *property;

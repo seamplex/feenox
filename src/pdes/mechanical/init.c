@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic mechanical initialization routines
  *
- *  Copyright (C) 2021--2023 Jeremy Theler
+ *  Copyright (C) 2021--2025 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -299,7 +299,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // check for consistency
-  n_ortho = mechanical.alpha_x.defined   + mechanical.alpha_y.defined   + mechanical.alpha_z.defined;
+  n_ortho = mechanical.alpha_x.defined + mechanical.alpha_y.defined + mechanical.alpha_z.defined;
   
   if (n_ortho > 0) {
     if (mechanical.thermal_expansion_model == thermal_expansion_model_isotropic) {

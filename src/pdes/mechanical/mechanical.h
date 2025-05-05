@@ -34,7 +34,15 @@
 #define BC_TYPE_MECHANICAL_FORCE                19
 
 typedef struct mechanical_t mechanical_t;
+typedef struct mechanical_material_ctx_t mechanical_material_ctx_t;
 typedef struct feenox_linearize_t feenox_linearize_t;
+
+struct mechanical_material_ctx_t {
+
+  double E;
+  
+};
+
 
 struct mechanical_t {
   
@@ -45,7 +53,6 @@ struct mechanical_t {
     variant_axisymmetric,
   } variant;  
   
-  // TODO: have a "mixed" material model where each volume has its own model
   enum {
     material_model_unknown,
     material_model_elastic_isotropic,
@@ -68,7 +75,7 @@ struct mechanical_t {
   distribution_t nu_xy, nu_yz, nu_zx;       // Poisson's ratios
   distribution_t G_xy, G_yz, G_zx;          // Shear moduli
   distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient
-  
+          
   // temperature field
   distribution_t T;     // temperature distribution
   distribution_t T_ref; // reference temperature (has to be a constant)
@@ -172,7 +179,6 @@ struct mechanical_t {
   
   feenox_linearize_t *linearizes;
 };
-
 
 struct feenox_linearize_t {
   expr_t x1;
