@@ -105,7 +105,7 @@ for bc in ${bcs}; do
      # prepare mesh
      if [ ! -e sdefcube-${elem}-${algo}-${c}.msh ]; then
        lc=$(echo "PRINT 1/${c}" | feenox -)
-       gmsh -v 0 -3 sdefcube.geo ${elem}.geo ${algo}.geo -clscale ${lc} -o sdefcube-${elem}-${algo}-${c}.msh
+       gmsh -v 0 -3 cube.geo ${elem}.geo ${algo}.geo -clscale ${lc} -o cube-${elem}-${algo}-${c}.msh
      fi
      
      # run feenox

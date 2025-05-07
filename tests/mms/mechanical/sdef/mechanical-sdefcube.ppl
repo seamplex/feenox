@@ -19,10 +19,10 @@ set xlabel "element size~$h$"
 
 set key above
 
-load "mechanical-cube-fits.ppl"
+load "mechanical-sdefcube-fits.ppl"
 
 set ylabel "$e_2 = \sqrt{\int \left[\vec{u}(x,y,z)-\vec{u}_\text{mms}(x,y,z)\right]^2 \, dx \, dy \, dz}$"
 set title "FeenoX---Mechanical small deformation--$e_2$"
-set output "mechanical-cube-e2.pdf"
-load "mechanical-cube-e2.ppl"
+set output "mechanical-sdefcube-e2.pdf"
+load "mechanical-sdefcube-e2.ppl"
 

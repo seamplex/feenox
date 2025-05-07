@@ -9,5 +9,5 @@
  dirichlet | hex20 | struct | 3.0
  dirichlet | hex27 | struct | 3.0
     
-![$L-2$ error for the small-deformation linear mechanical problem in FeenoX](mechanical-cube-results.svg)
+![$L-2$ error for the small-deformation linear mechanical problem in FeenoX](mechanical-sdefcube-results.svg)
 
