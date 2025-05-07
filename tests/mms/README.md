@@ -1,6 +1,5 @@
 # Verification with the Method of Manufactured Solution
 
-Check out this video for an explanation about MMS: <https://youtu.be/mGNwL8TGijg>
 
 Verification of problems in FeenoX:
 
@@ -10,3 +9,6 @@ Verification of problems in FeenoX:
  * [Elasticity `mechanical`](mecahnical)
    - [3D small deformation](mechanical/sdef)
    - [3D large deformation](mechanical/ldef)
+
+> [!NOTE]
+> Check out this video for an explanation about MMS: <https://youtu.be/mGNwL8TGijg>
