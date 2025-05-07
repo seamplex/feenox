@@ -1,0 +1,4 @@
+u_mms(x,y,z) = sin(pi*x)
+v_mms(x,y,z) = y^2*z
+w_mms(x,y,z) = x*log(1+y)
+

@@ -1,0 +1,3 @@
+bx(x,y,z) = pi^2*sin(pi*x)*lambda+2*mu*pi^2*sin(pi*x)
+by(x,y,z) = (-2*z*lambda)-4*mu*z
+bz(x,y,z) = (-2*y*lambda)-1.0*mu*(2*y-x/(y+1)^2)

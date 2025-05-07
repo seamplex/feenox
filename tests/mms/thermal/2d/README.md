@@ -1,8 +1,47 @@
 # MMS verification: thermal 2D square
 
+ Boundary condition | Element type | Algorithm | Order of convergence
+--------------------|--------------|-----------|:----------------------:
+ dirichlet | tri3 | struct | 1.9
+ dirichlet | tri3 | frontal | 2.0
+ dirichlet | tri3 | delaunay | 2.0
+ dirichlet | tri6 | struct | 3.0
+ dirichlet | tri6 | frontal | 3.0
+ dirichlet | tri6 | delaunay | 3.0
+ dirichlet | quad4 | struct | 2.0
+ dirichlet | quad4 | frontal | 2.1
+ dirichlet | quad4 | delaunay | 2.0
+ dirichlet | quad8 | struct | 2.8
+ dirichlet | quad8 | frontal | 2.9
+ dirichlet | quad8 | delaunay | 2.6
+ dirichlet | quad9 | struct | 2.9
+ dirichlet | quad9 | frontal | 3.0
+ dirichlet | quad9 | delaunay | 2.8
+ neumann | tri3 | struct | 1.9
+ neumann | tri3 | frontal | 2.1
+ neumann | tri3 | delaunay | 2.0
+ neumann | tri6 | struct | 2.9
+ neumann | tri6 | frontal | 3.1
+ neumann | tri6 | delaunay | 3.0
+ neumann | quad4 | struct | 2.0
+ neumann | quad4 | frontal | 2.1
+ neumann | quad4 | delaunay | 2.0
+ neumann | quad8 | struct | 2.8
+ neumann | quad8 | frontal | 2.8
+ neumann | quad8 | delaunay | 2.6
+ neumann | quad9 | struct | 2.9
+ neumann | quad9 | frontal | 3.1
+ neumann | quad9 | delaunay | 2.8
+
+
+ 
+![Plot of $L_2$ error vs. element size $h$](thermal-square-e2.svg)
+
+
+
 This directory shows how to perform verification of the 2D thermal solver using the Method of Manufactured Solutions.
 
-> Make sure you follow up with the [3D cases](../3d) as well.
+> Make sure you follow up with the [3D thermal cases](../3d) and the [mechanical cases](../../mechanical) as well.
 
 The chosen domain is a square of size one with the lower left corner at $x=0$ and $y=0$ as in
 
@@ -121,52 +160,3 @@ pyxplot thermal-square.ppl
 
 There's also a markdown file with a table listing the order of convergence of each combination at `thermal-square-results.md`.
 
-
-# Detailed explanation
-
-To be done.
-
-
-
-# Results
-
-
-
-
-
- boundary condition | element type | algorithm | order of convergence
---------------------|--------------|-----------|:----------------------:
- dirichlet | tri3 | struct |  1.9
- dirichlet | tri3 | frontal |  2.1
- dirichlet | tri3 | delaunay |  1.9
- dirichlet | tri6 | struct |  3.0
- dirichlet | tri6 | frontal |  3.1
- dirichlet | tri6 | delaunay |  3.1
- dirichlet | quad4 | struct |  2.0
- dirichlet | quad4 | frontal |  2.1
- dirichlet | quad4 | delaunay |  1.9
- dirichlet | quad8 | struct |  3.0
- dirichlet | quad8 | frontal |  3.2
- dirichlet | quad8 | delaunay |  2.7
- dirichlet | quad9 | struct |  3.0
- dirichlet | quad9 | frontal |  3.1
- dirichlet | quad9 | delaunay |  2.8
- neumann | tri3 | struct |  1.9
- neumann | tri3 | frontal |  2.1
- neumann | tri3 | delaunay |  2.0
- neumann | tri6 | struct |  2.9
- neumann | tri6 | frontal |  3.1
- neumann | tri6 | delaunay |  3.1
- neumann | quad4 | struct |  2.0
- neumann | quad4 | frontal |  2.0
- neumann | quad4 | delaunay |  1.9
- neumann | quad8 | struct |  3.0
- neumann | quad8 | frontal |  3.2
- neumann | quad8 | delaunay |  2.8
- neumann | quad9 | struct |  3.0
- neumann | quad9 | frontal |  3.1
- neumann | quad9 | delaunay |  2.8
-
-
- 
-![Plot of $L_2$ error vs. element size $h$](thermal-square-e2.svg)

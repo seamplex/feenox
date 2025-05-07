@@ -1,0 +1,17 @@
+plot \
+      "thermal_cube4_dirichlet_tet4_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 4 lw 1 lt 2 color plum  ti "dirichlet-tet4-struct = " + e_inf_thermal_cube4_dirichlet_tet4_struct_title,\
+      "thermal_cube4_dirichlet_tet4_hxt.dat"                              u (exp($1)):(exp($2)) w lp pt 4 lw 1 lt 2 color salmon  ti "dirichlet-tet4-hxt = " + e_inf_thermal_cube4_dirichlet_tet4_hxt_title,\
+      "thermal_cube4_dirichlet_tet10_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 18 lw 1 lt 2 color plum  ti "dirichlet-tet10-struct = " + e_inf_thermal_cube4_dirichlet_tet10_struct_title,\
+      "thermal_cube4_dirichlet_tet10_hxt.dat"                              u (exp($1)):(exp($2)) w lp pt 18 lw 1 lt 2 color salmon  ti "dirichlet-tet10-hxt = " + e_inf_thermal_cube4_dirichlet_tet10_hxt_title,\
+      "thermal_cube4_dirichlet_hex8_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 2 lw 1 lt 2 color plum  ti "dirichlet-hex8-struct = " + e_inf_thermal_cube4_dirichlet_hex8_struct_title,\
+      "thermal_cube4_dirichlet_hex20_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 16 lw 1 lt 2 color plum  ti "dirichlet-hex20-struct = " + e_inf_thermal_cube4_dirichlet_hex20_struct_title,\
+      "thermal_cube4_dirichlet_hex27_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 17 lw 1 lt 2 color plum  ti "dirichlet-hex27-struct = " + e_inf_thermal_cube4_dirichlet_hex27_struct_title,\
+      "thermal_cube4_neumann_tet4_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 4 lw 1 lt 2 color blue  ti "neumann-tet4-struct = " + e_inf_thermal_cube4_neumann_tet4_struct_title,\
+      "thermal_cube4_neumann_tet4_hxt.dat"                              u (exp($1)):(exp($2)) w lp pt 4 lw 1 lt 2 color seagreen  ti "neumann-tet4-hxt = " + e_inf_thermal_cube4_neumann_tet4_hxt_title,\
+      "thermal_cube4_neumann_tet10_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 18 lw 1 lt 2 color blue  ti "neumann-tet10-struct = " + e_inf_thermal_cube4_neumann_tet10_struct_title,\
+      "thermal_cube4_neumann_tet10_hxt.dat"                              u (exp($1)):(exp($2)) w lp pt 18 lw 1 lt 2 color seagreen  ti "neumann-tet10-hxt = " + e_inf_thermal_cube4_neumann_tet10_hxt_title,\
+      "thermal_cube4_neumann_hex8_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 2 lw 1 lt 2 color blue  ti "neumann-hex8-struct = " + e_inf_thermal_cube4_neumann_hex8_struct_title,\
+      "thermal_cube4_neumann_hex20_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 16 lw 1 lt 2 color blue  ti "neumann-hex20-struct = " + e_inf_thermal_cube4_neumann_hex20_struct_title,\
+      "thermal_cube4_neumann_hex27_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 17 lw 1 lt 2 color blue  ti "neumann-hex27-struct = " + e_inf_thermal_cube4_neumann_hex27_struct_title,\
+  x**2    w l lt 2 lw 4 color gray ti "$h^2$",\
+  x**3    w l lt 3 lw 4 color gray ti "$h^3$"

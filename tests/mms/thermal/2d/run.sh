@@ -7,9 +7,6 @@ cs="4 6 8 10 12 16 20 24 30 36 48"
 
 # set this flag to 1 if you want to create one VTK for each run
 vtk=0
-if [ "x${1}" = "xvtk" ]; then
-  vtk=1  
-fi
 
 . styles.sh
 
@@ -116,8 +113,19 @@ EOF
 
 cat << EOF > thermal-square-results.md
 
- boundary condition | element type | algorithm | order of convergence
+ Boundary condition | Element type | Algorithm | Order of convergence
 --------------------|--------------|-----------|:----------------------:
 EOF
 grep ^# thermal-square-fits.ppl | tr -d \# | sed s/thermal_square_// | sed 's/_/ | /g' >> thermal-square-results.md
 
+if [ ! -z "$(which pyxplot)" ]; then
+  pyxplot thermal-square.ppl
+  if [ ! -z "$(which pdf2svg)" ]; then
+    pdf2svg thermal-square-e2.pdf thermal-square-e2.svg
+    cat << EOF >> thermal-square-results.md
+    
+![\$L-2\$ error for the 2d heat conduction problem in FeenoX](thermal-square-results.svg)
+
+EOF
+  fi
+fi

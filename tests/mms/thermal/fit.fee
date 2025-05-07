@@ -9,10 +9,10 @@ FUNCTION log_e_2(log_h)   FILE $1.dat COLUMNS 1 3
 FIT fitted_log_e_inf TO log_e_inf VIA log_a_inf b_inf #GRADIENT 1 log_h VERBOSE
 FIT fitted_log_e_2   TO log_e_2   VIA log_a_2   b_2   #GRADIENT 1 log_h VERBOSE
 
-PRINT SEP " " "\# $1 | " %.1f b_2  
+PRINTF "\# $1 | %.1f" b_2  
 
-PRINT SEP " " "e_2_$1(x) = "   exp(log_a_2)   "* x **" b_2
-PRINT SEP " " "e_2_$1_title = \"" "\$" %.1f exp(log_a_2) "\\cdot h^\{" %.2f b_2 " \\pm " sigma_b_2 "\}\$\"
+PRINTF "e_2_$1(x) = %g * x ** %g" exp(log_a_2) b_2
+PRINTF "e_2_$1_title = \"\$ %.1f \\cdot h^\{ %.2f \\pm %.2f \}\$\"" exp(log_a_2) b_2 sigma_b_2
 
-PRINT SEP " " "e_inf_$1(x) = " exp(log_a_inf) "* x **" b_inf
-PRINT SEP " " "e_inf_$1_title = \"" "\$" %.1f exp(log_a_inf) "\\cdot h^\{" %.2f b_inf " \\pm " sigma_b_inf "\}\$\"
+PRINTF "e_inf_$1(x) = %g * x ** %g" exp(log_a_inf) b_inf
+PRINTF "e_inf_$1_title = \" \$ %.1f \\cdot h^\{ %.2f \\pm %.2f \}\$\"" exp(log_a_inf) b_inf sigma_b_inf

@@ -1,0 +1,21 @@
+# mechanical_cube_dirichlet_tet4_struct | 2.0
+e_2_mechanical_cube_dirichlet_tet4_struct(x) = 1.97846 * x ** 1.99061
+e_2_mechanical_cube_dirichlet_tet4_struct_title = " $2.0 \cdot h^{ 1.99 \pm 0.00 }$"
+# mechanical_cube_dirichlet_tet4_hxt | 2.2
+e_2_mechanical_cube_dirichlet_tet4_hxt(x) = 3.07828 * x ** 2.21868
+e_2_mechanical_cube_dirichlet_tet4_hxt_title = " $3.1 \cdot h^{ 2.22 \pm 0.03 }$"
+# mechanical_cube_dirichlet_tet10_struct | 3.0
+e_2_mechanical_cube_dirichlet_tet10_struct(x) = 0.906183 * x ** 2.99691
+e_2_mechanical_cube_dirichlet_tet10_struct_title = " $0.9 \cdot h^{ 3.00 \pm 0.00 }$"
+# mechanical_cube_dirichlet_tet10_hxt | 3.2
+e_2_mechanical_cube_dirichlet_tet10_hxt(x) = 2.00952 * x ** 3.19064
+e_2_mechanical_cube_dirichlet_tet10_hxt_title = " $2.0 \cdot h^{ 3.19 \pm 0.02 }$"
+# mechanical_cube_dirichlet_hex8_struct | 2.0
+e_2_mechanical_cube_dirichlet_hex8_struct(x) = 0.580924 * x ** 1.98996
+e_2_mechanical_cube_dirichlet_hex8_struct_title = " $0.6 \cdot h^{ 1.99 \pm 0.00 }$"
+# mechanical_cube_dirichlet_hex20_struct | 3.0
+e_2_mechanical_cube_dirichlet_hex20_struct(x) = 0.102368 * x ** 2.98769
+e_2_mechanical_cube_dirichlet_hex20_struct_title = " $0.1 \cdot h^{ 2.99 \pm 0.00 }$"
+# mechanical_cube_dirichlet_hex27_struct | 3.0
+e_2_mechanical_cube_dirichlet_hex27_struct(x) = 0.10279 * x ** 2.99042
+e_2_mechanical_cube_dirichlet_hex27_struct_title = " $0.1 \cdot h^{ 2.99 \pm 0.00 }$"
