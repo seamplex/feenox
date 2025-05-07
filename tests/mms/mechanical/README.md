@@ -5,7 +5,7 @@ This directory has two subdirectories with scripts to perform verification using
  * [Small deformations](sdef)
  * [Large deformations](ldef)
 
-> [!HINT]
+> [!TIP]
 > The [thermal cases](../mechanical) exaplain the basis of the MMS method with more details.
 
 > [!NOTE]
