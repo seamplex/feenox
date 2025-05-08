@@ -270,6 +270,34 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   // wdet
   double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   
+  // volumetric force densities
+  if (mechanical.f_x.defined || mechanical.f_y.defined || mechanical.f_z.defined) {
+    if (x == NULL) {
+      x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);           
+    }
+    material_t *material = feenox_fem_get_material(e);
+      
+    gsl_matrix *H = feenox_fem_compute_H_c_at_gauss(e, q, feenox.pde.mesh->integration);
+    double f_x = mechanical.f_x.eval(&mechanical.f_x, x, material);
+    double f_y = mechanical.f_y.eval(&mechanical.f_y, x, material);
+    double f_z = mechanical.f_z.eval(&mechanical.f_z, x, material);
+
+    for (int j = 0; j < e->type->nodes; j++) {
+      int offset = feenox.pde.dofs*j;
+      // TODO: matrix-vector product
+      double wh = wdet * gsl_matrix_get(H, 0, j);
+      if (mechanical.f_x.defined) {
+        gsl_vector_add_to_element(feenox.fem.bi, offset+0, wh * f_x);
+      }  
+      if (mechanical.f_y.defined) {
+        gsl_vector_add_to_element(feenox.fem.bi, offset+1, wh * f_y);
+      }
+      if (mechanical.f_z.defined) {
+        gsl_vector_add_to_element(feenox.fem.bi, offset+2, wh * f_z);
+      }  
+    }
+  }  
+  
   // elemental stiffness B'*C*B
   feenox_call(feenox_blas_BtCB_accum(mechanical.B, mechanical.C, mechanical.CB, wdet, feenox.fem.Ki));
   
