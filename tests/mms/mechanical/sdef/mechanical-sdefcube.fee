@@ -13,7 +13,7 @@ nu = 0.3
 lambda = E * nu / ((1 + nu) * (1 - 2*nu))
 mu = E / (2 * (1 + nu))
 
-INCLUDE mechanical-sdefcube-mms.fee
+INCLUDE mechanical-cube-mms.fee
 INCLUDE mechanical-sdefcube-b.fee
 
 f_x(x,y,z) = bx(x,y,z)

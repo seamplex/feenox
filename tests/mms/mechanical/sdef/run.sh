@@ -16,9 +16,9 @@ done
 
 . styles.sh
 
-u=$(grep "u_mms(x,y,z) =" mechanical-sdefcube-mms.fee | sed 's/u_mms(x,y,z)//' | sed 's/=//')
-v=$(grep "v_mms(x,y,z) =" mechanical-sdefcube-mms.fee | sed 's/v_mms(x,y,z)//' | sed 's/=//')
-w=$(grep "w_mms(x,y,z) =" mechanical-sdefcube-mms.fee | sed 's/w_mms(x,y,z)//' | sed 's/=//')
+u=$(grep "u_mms(x,y,z) =" mechanical-cube-mms.fee | sed 's/u_mms(x,y,z)//' | sed 's/=//' | sed 's/pi/%pi/')
+v=$(grep "v_mms(x,y,z) =" mechanical-cube-mms.fee | sed 's/v_mms(x,y,z)//' | sed 's/=//' | sed 's/pi/%pi/')
+w=$(grep "w_mms(x,y,z) =" mechanical-cube-mms.fee | sed 's/w_mms(x,y,z)//' | sed 's/=//' | sed 's/pi/%pi/')
 
 maxima --very-quiet << EOF > /dev/null
 /* Method of Manufactured Solutions - Small Deformation Linear Elasticity */
