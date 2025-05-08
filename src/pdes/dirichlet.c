@@ -57,6 +57,21 @@ int feenox_problem_multifreedom_add(size_t j_global, double *coefficients) {
   return FEENOX_OK;
 }
 
+int feenox_problem_dirichlet_reallocate(size_t n_bcs) {
+  size_t size_plus_safety = n_bcs + feenox.pde.dofs + 1;
+
+  feenox_check_alloc(feenox.pde.dirichlet_nodes = reallocarray(feenox.pde.dirichlet_nodes, size_plus_safety, sizeof(size_t)));
+  feenox_check_alloc(feenox.pde.dirichlet_dofs = reallocarray(feenox.pde.dirichlet_dofs, size_plus_safety, sizeof(unsigned int)));
+  feenox_check_alloc(feenox.pde.dirichlet_indexes = reallocarray(feenox.pde.dirichlet_indexes, size_plus_safety, sizeof(PetscInt)));
+  feenox_check_alloc(feenox.pde.dirichlet_values = reallocarray(feenox.pde.dirichlet_values, size_plus_safety, sizeof(PetscScalar)));
+  feenox_check_alloc(feenox.pde.dirichlet_derivatives = reallocarray(feenox.pde.dirichlet_derivatives, size_plus_safety, sizeof(PetscScalar)));
+    
+  feenox_check_alloc(feenox.pde.multifreedom_indexes = reallocarray(feenox.pde.multifreedom_indexes, size_plus_safety, sizeof(PetscInt *)));
+  feenox_check_alloc(feenox.pde.multifreedom_coefficients = reallocarray(feenox.pde.multifreedom_coefficients, size_plus_safety, sizeof(PetscScalar *)));
+  
+  return FEENOX_OK;
+}
+
 // evaluates the dirichlet BCs and stores them in the internal representation
 int feenox_problem_dirichlet_eval(void) {
 
@@ -69,17 +84,8 @@ int feenox_problem_dirichlet_eval(void) {
     // caution! in small problems we might end up with more bcs than nodes 
     // because there might nodes counted more than once because we loop over elements
 
-    // TODO: allow the user to provide a factor at runtime
-    n_bcs = 1.5*feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);    
-
-    feenox_check_alloc(feenox.pde.dirichlet_nodes = calloc(n_bcs, sizeof(size_t)));
-    feenox_check_alloc(feenox.pde.dirichlet_dofs = calloc(n_bcs, sizeof(int)));
-    feenox_check_alloc(feenox.pde.dirichlet_indexes = calloc(n_bcs, sizeof(PetscInt)));
-    feenox_check_alloc(feenox.pde.dirichlet_values = calloc(n_bcs, sizeof(PetscScalar)));
-    feenox_check_alloc(feenox.pde.dirichlet_derivatives = calloc(n_bcs, sizeof(PetscScalar)));
-    
-    feenox_check_alloc(feenox.pde.multifreedom_indexes = calloc(n_bcs, sizeof(PetscInt *)));
-    feenox_check_alloc(feenox.pde.multifreedom_coefficients = calloc(n_bcs, sizeof(PetscScalar *)));
+    n_bcs = 0.5 * feenox.pde.dofs * (feenox.pde.last_node - feenox.pde.first_node);
+    feenox_call(feenox_problem_dirichlet_reallocate(n_bcs));
 
   } else {
     // if we are here then we know more or less the number of BCs we need
@@ -107,6 +113,11 @@ int feenox_problem_dirichlet_eval(void) {
               // TODO: normal-dependent
               if (bc_data->space_dependent) {
                 feenox_fem_update_coord_vars(feenox.pde.mesh->node[j_global].x);
+              }
+              
+              if (feenox.pde.dirichlet_k >= n_bcs) {
+                n_bcs *= 1.4;
+                feenox_call(feenox_problem_dirichlet_reallocate(n_bcs));
               }
               
               // TODO: for multi-freedom high-order nodes end up with a different penalty weight
