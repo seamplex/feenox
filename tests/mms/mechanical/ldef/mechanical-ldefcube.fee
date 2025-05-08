@@ -1,0 +1,49 @@
+DEFAULT_ARGUMENT_VALUE 1 dirichlet # BCs = dirichlet/neumann
+DEFAULT_ARGUMENT_VALUE 2 hex8      # shape = tri/quad
+DEFAULT_ARGUMENT_VALUE 3 struct    # algorithm = struct/frontal/delaunay
+DEFAULT_ARGUMENT_VALUE 4 4         # refinement factor = 1/2/3/4...
+DEFAULT_ARGUMENT_VALUE 5 0         # write vtk? = 0/1
+
+READ_MESH cube-$2-$3-$4.msh
+PROBLEM mechanical 3D PC mumps
+# PETSC_OPTIONS -snes_monitor
+
+snes_rtol = 1e-9
+snes_atol = 1e-7
+
+ldef = 1
+E = 200e3
+nu = 0.3
+
+lambda = E * nu / ((1 + nu) * (1 - 2*nu))
+mu = E / (2 * (1 + nu))
+
+INCLUDE mechanical-cube-mms.fee
+INCLUDE mechanical-ldefcube-b.fee
+
+f_x(x,y,z) = bx(x,y,z)
+f_y(x,y,z) = by(x,y,z)
+f_z(x,y,z) = bz(x,y,z)
+
+BC left   u=u_mms(x,y,z) v=v_mms(x,y,z) w=w_mms(x,y,z)
+BC right  u=u_mms(x,y,z) v=v_mms(x,y,z) w=w_mms(x,y,z)
+BC bottom u=u_mms(x,y,z) v=v_mms(x,y,z) w=w_mms(x,y,z)
+BC top    u=u_mms(x,y,z) v=v_mms(x,y,z) w=w_mms(x,y,z)
+BC front  u=u_mms(x,y,z) v=v_mms(x,y,z) w=w_mms(x,y,z)
+BC back   u=u_mms(x,y,z) v=v_mms(x,y,z) w=w_mms(x,y,z)
+
+SOLVE_PROBLEM
+
+# output
+PHYSICAL_GROUP bulk DIM 3
+h = (bulk_volume/cells)^(1/3)
+
+# L-2 error
+INTEGRATE (u(x,y,z)-u_mms(x,y,z))^2+(v(x,y,z)-v_mms(x,y,z))^2+(v(x,y,z)-v_mms(x,y,z))^2 RESULT e_2
+error_2 = sqrt(e_2)
+
+PRINT %.6f log(h) log(error_2) %g $4 cells nodes %.2f 1024*memory() wall_time()
+
+IF $5
+  WRITE_RESULTS FORMAT vtu displacements
+ENDIF

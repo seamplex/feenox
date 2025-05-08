@@ -116,7 +116,7 @@ int feenox_problem_dirichlet_eval(void) {
               }
               
               if (feenox.pde.dirichlet_k >= n_bcs) {
-                n_bcs *= 1.4;
+                n_bcs *= M_SQRT2;
                 feenox_call(feenox_problem_dirichlet_reallocate(n_bcs));
               }
               
