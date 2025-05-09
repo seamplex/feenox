@@ -166,8 +166,8 @@ int main(int argc, char **argv) {
     printf(", NLGEOM");
   }
   printf("\n");
-  // printf("*EL FILE\n");
-  // printf("E, S\n");
+  printf("*EL FILE\n");
+  printf("E, S\n");
   printf("*NODE FILE\n");
   printf("U\n");
   printf("\n");
