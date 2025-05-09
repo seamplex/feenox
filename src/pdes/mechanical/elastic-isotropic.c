@@ -30,7 +30,7 @@ void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *ma
   return;
 }
 
-int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, material_t *material) {
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
   double lambda2mu = lambda + 2*mu;
@@ -54,9 +54,9 @@ int feenox_problem_build_compute_mechanical_C_elastic_isotropic(const double *x,
   return FEENOX_OK;
 }
 
-
+  
 // compute the seconde Piola-Kirchoff stress tensor
-int feenox_problem_build_compute_mechanical_S_elastic_isotropic(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(const double *x, material_t *material) {
   
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
@@ -69,62 +69,6 @@ int feenox_problem_build_compute_mechanical_S_elastic_isotropic(const double *x,
   gsl_matrix_memcpy(mechanical.twomuE, mechanical.EGL);
   gsl_matrix_scale(mechanical.twomuE, 2*mu);
   gsl_matrix_add(mechanical.S, mechanical.twomuE);
-
-  // S in voigt notation
-  double Sxx = gsl_matrix_get(mechanical.S, 0, 0);
-  double Syy = gsl_matrix_get(mechanical.S, 1, 1);
-  double Szz = gsl_matrix_get(mechanical.S, 2, 2);
-  double Sxy = gsl_matrix_get(mechanical.S, 0, 1);
-  double Syz = gsl_matrix_get(mechanical.S, 1, 2);
-  double Szx = gsl_matrix_get(mechanical.S, 2, 0);
-
-  gsl_vector_set(mechanical.S_voigt, 0, Sxx);
-  gsl_vector_set(mechanical.S_voigt, 1, Syy);
-  gsl_vector_set(mechanical.S_voigt, 2, Szz);
-  gsl_vector_set(mechanical.S_voigt, 3, Sxy);
-  gsl_vector_set(mechanical.S_voigt, 4, Syz);
-  gsl_vector_set(mechanical.S_voigt, 5, Szx);
-
-  // the 9x9 Sigma matrix
-  // row 1  
-  gsl_matrix_set(mechanical.Sigma, 0, 0, Sxx);
-  gsl_matrix_set(mechanical.Sigma, 1, 1, Sxx);
-  gsl_matrix_set(mechanical.Sigma, 2, 2, Sxx);
-      
-  gsl_matrix_set(mechanical.Sigma, 0, 3, Sxy);
-  gsl_matrix_set(mechanical.Sigma, 1, 4, Sxy);
-  gsl_matrix_set(mechanical.Sigma, 2, 5, Sxy);
-      
-  gsl_matrix_set(mechanical.Sigma, 0, 6, Szx);
-  gsl_matrix_set(mechanical.Sigma, 1, 7, Szx);
-  gsl_matrix_set(mechanical.Sigma, 2, 8, Szx);
-      
-  // row 2
-  gsl_matrix_set(mechanical.Sigma, 3, 0, Sxy);
-  gsl_matrix_set(mechanical.Sigma, 4, 1, Sxy);
-  gsl_matrix_set(mechanical.Sigma, 5, 2, Sxy);
-      
-  gsl_matrix_set(mechanical.Sigma, 3, 3, Syy);
-  gsl_matrix_set(mechanical.Sigma, 4, 4, Syy);
-  gsl_matrix_set(mechanical.Sigma, 5, 5, Syy);
-      
-  gsl_matrix_set(mechanical.Sigma, 3, 6, Syz);
-  gsl_matrix_set(mechanical.Sigma, 4, 7, Syz);
-  gsl_matrix_set(mechanical.Sigma, 5, 8, Syz);
-      
-  // row 3
-  gsl_matrix_set(mechanical.Sigma, 6, 0, Szx);
-  gsl_matrix_set(mechanical.Sigma, 7, 1, Szx);
-  gsl_matrix_set(mechanical.Sigma, 8, 2, Szx);
-      
-  gsl_matrix_set(mechanical.Sigma, 6, 3, Syz);
-  gsl_matrix_set(mechanical.Sigma, 7, 4, Syz);
-  gsl_matrix_set(mechanical.Sigma, 8, 5, Syz);
-      
-  gsl_matrix_set(mechanical.Sigma, 6, 6, Szz);
-  gsl_matrix_set(mechanical.Sigma, 7, 7, Szz);
-  gsl_matrix_set(mechanical.Sigma, 8, 8, Szz);
-  
     
   return FEENOX_OK;
 }
@@ -134,22 +78,18 @@ int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
 
-  // TODO: cache properties
-  // TODO: check what has to be computed and what not
-  double E  = mechanical.E.eval(&mechanical.E, node->x, element->physical_group->material);
-  double nu = mechanical.nu.eval(&mechanical.nu, node->x, element->physical_group->material);
-  double lambda = E*nu/((1+nu)*(1-2*nu));
-  double mu = 0.5*E/(1+nu);
+  double lambda, mu;
+  feenox_problem_mechanical_compute_lambda_mu(node->x, element->physical_group->material, &lambda, &mu);
   
-  double lambda_div = lambda*(epsilonx + epsilony + epsilonz);
-  double two_mu = two_mu = 2*mu;
+  double lambda_trE = lambda*(epsilonx + epsilony + epsilonz);
+  double two_mu = 2*mu;
 
   // TODO: separate
   if (mechanical.variant == variant_full || mechanical.variant == variant_plane_strain) {
     // normal stresses
-    *sigmax = lambda_div + two_mu * epsilonx;
-    *sigmay = lambda_div + two_mu * epsilony;
-    *sigmaz = lambda_div + two_mu * epsilonz;
+    *sigmax = lambda_trE + two_mu * epsilonx;
+    *sigmay = lambda_trE + two_mu * epsilony;
+    *sigmaz = lambda_trE + two_mu * epsilonz;
   
     // shear stresses
     *tauxy = mu * gammaxy;

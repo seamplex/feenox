@@ -60,7 +60,7 @@ int feenox_instruction_solve_problem(void *arg) {
   petsc_call(PetscLogStagePush(feenox.pde.stage_post));  
   
   // TODO: how to do this in parallel?
-  feenox_call(feenox_problem_phi_to_solution((feenox.pde.nev == 0) ? feenox.pde.phi : feenox.pde.eigenvector[0]));
+  feenox_call(feenox_problem_phi_to_solution((feenox.pde.nev == 0) ? feenox.pde.phi : feenox.pde.eigenvector[0], 1));
   
   if (feenox.pde.solve_post != NULL) {
     feenox_call(feenox.pde.solve_post());
@@ -88,7 +88,7 @@ int feenox_function_to_phi(function_t *function, Vec phi) {
 }
 
 
-int feenox_problem_phi_to_solution(Vec phi) {
+int feenox_problem_phi_to_solution(Vec phi, int gradients) {
 
   VecScatter         vscat;
   Vec                phi_full;
@@ -157,7 +157,7 @@ int feenox_problem_phi_to_solution(Vec phi) {
     }
   }
 
-  if (feenox.pde.compute_gradients) {
+  if (feenox.pde.compute_gradients && gradients) {
     feenox_call(feenox_problem_gradient_compute());
   }  
   

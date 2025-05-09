@@ -124,12 +124,15 @@ struct mechanical_t {
   gsl_matrix *EGL;     // green-lagrange strain
   gsl_matrix *S;       // second piola-kirchoff stress
   gsl_matrix *Sigma;   // 9x9 expansion of Ss
+  gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
   gsl_matrix *G;       // matrix with derivatives of shape functions
   gsl_matrix *SigmaG;  // temporary holder
   gsl_vector *S_voigt; // S in voigt notation
   
+  // temporary non-linear
   gsl_matrix *eye;     // 3x3 identity
   gsl_matrix *twomuE;  // temporary holder
+  gsl_matrix *SF;  // temporary holder
 
   
 //  double hourglass_epsilon;

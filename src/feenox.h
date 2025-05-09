@@ -2398,7 +2398,7 @@ extern int feenox_instruction_solve_problem(void *arg);
 #ifdef HAVE_PETSC
 // solve.c
 extern int feenox_function_to_phi(function_t *function, Vec phi);
-extern int feenox_problem_phi_to_solution(Vec phi);
+extern int feenox_problem_phi_to_solution(Vec phi, int gradients);
 
 // petsc_ksp.c
 extern int feenox_problem_solve_petsc_linear(void);

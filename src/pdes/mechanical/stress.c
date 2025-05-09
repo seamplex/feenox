@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to compute stresses
  *
- *  Copyright (C) 2021-2023 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -83,21 +83,22 @@ int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
   return FEENOX_OK;
 }
 
-// TODO: why both node and j?
-int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight) {
+int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u) {
+  // deformation gradient
+  // F = I + grad_u
+  gsl_matrix_memcpy(mechanical.F, mechanical.eye);
+  gsl_matrix_add(mechanical.F, grad_u);
 
-  // read strains from gradient
-  double epsilonx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
-  double epsilony = gsl_matrix_get(element->dphidx_node[j], 1, 1);
-  double epsilonz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
+  // EGL = 1/2 * (FtF - I)   green-lagrange strain tensor  
+  feenox_blas_BtB(mechanical.F, 1.0, mechanical.EGL);
+  gsl_matrix_sub(mechanical.EGL, mechanical.eye);
+  gsl_matrix_scale(mechanical.EGL, 0.5);
   
-  double gammaxy = gsl_matrix_get(element->dphidx_node[j], 0, 1) + gsl_matrix_get(element->dphidx_node[j], 1, 0);
-  double gammayz = 0;
-  double gammazx = 0;
-  if (feenox.pde.dofs == 3) {
-    gammayz = gsl_matrix_get(element->dphidx_node[j], 1, 2) + gsl_matrix_get(element->dphidx_node[j], 2, 1);
-    gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
-  }  
+  return FEENOX_OK;
+}
+
+
+int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight) {
 
   double sigmax = 0;
   double sigmay = 0;
@@ -105,11 +106,45 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   double tauxy = 0;
   double tauyz = 0;
   double tauzx = 0;
-
-  // compute stresses
-  feenox_call(mechanical.compute_stress_from_strain(node, element, j,
+  
+  
+  // TODO: virtual methods in the material ctx
+  // TODO: use an integer flag
+  if (feenox_var_value(mechanical.ldef) == 0) {
+    double epsilonx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
+    double epsilony = gsl_matrix_get(element->dphidx_node[j], 1, 1);
+    double epsilonz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
+  
+    double gammaxy = gsl_matrix_get(element->dphidx_node[j], 0, 1) + gsl_matrix_get(element->dphidx_node[j], 1, 0);
+    double gammayz = 0;
+    double gammazx = 0;
+    if (feenox.pde.dofs == 3) {
+      gammayz = gsl_matrix_get(element->dphidx_node[j], 1, 2) + gsl_matrix_get(element->dphidx_node[j], 2, 1);
+      gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
+    }
+    
+    feenox_call(mechanical.compute_stress_from_strain(node, element, j,
                                                     epsilonx, epsilony, epsilonz, gammaxy, gammayz, gammazx,
                                                     &sigmax, &sigmay, &sigmaz, &tauxy, &tauyz, &tauzx));
+    
+  } else {
+    
+    feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]));  
+    feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(node->x, element->physical_group->material));
+
+    // cauchy stress  
+    double J = feenox_fem_determinant(mechanical.F);
+    feenox_call(feenox_blas_BtCB(mechanical.F, mechanical.S, mechanical.SF, 1/J, mechanical.cauchy));
+  
+    sigmax = gsl_matrix_get(mechanical.cauchy, 0, 0);
+    sigmay = gsl_matrix_get(mechanical.cauchy, 1, 1);
+    sigmaz = gsl_matrix_get(mechanical.cauchy, 2, 2);
+    tauxy = gsl_matrix_get(mechanical.cauchy, 0, 1);
+    tauyz = gsl_matrix_get(mechanical.cauchy, 1, 2);
+    tauzx = gsl_matrix_get(mechanical.cauchy, 2, 0);
+  }
+  
+
   
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
     // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)

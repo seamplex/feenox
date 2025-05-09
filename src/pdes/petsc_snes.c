@@ -127,7 +127,7 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
   feenox_call(feenox_problem_dirichlet_set_phi(feenox.pde.phi_bc));
 
   // build both the residual and the jacobian
-  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi_bc));
+  feenox_call(feenox_problem_phi_to_solution(feenox.pde.phi_bc, 0));
   feenox_call(feenox_problem_build());
 
   if (feenox.pde.has_internal_fluxes) {

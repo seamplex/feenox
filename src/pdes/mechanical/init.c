@@ -282,20 +282,20 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
   if (mechanical.alpha.defined) {
     mechanical.thermal_expansion_model = thermal_expansion_model_isotropic;
-  }
-  
-  // see if there are orthotropic properties
-  feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alphax"));
-  if (mechanical.alpha_x.defined == 0) {
-    feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alpha_x"));
-  }
-  feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alphay"));
-  if (mechanical.alpha_y.defined == 0) {
-    feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alpha_y"));
-  }
-  feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alphaz"));
-  if (mechanical.alpha_z.defined == 0) {
-    feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alpha_z"));
+  } else {
+    // see if there are orthotropic properties
+    feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alphax"));
+    if (mechanical.alpha_x.defined == 0) {
+      feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alpha_x"));
+    }
+    feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alphay"));
+    if (mechanical.alpha_y.defined == 0) {
+      feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alpha_y"));
+    }
+    feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alphaz"));
+    if (mechanical.alpha_z.defined == 0) {
+      feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alpha_z"));
+    }
   }
   
   // check for consistency
@@ -361,17 +361,17 @@ int feenox_problem_init_runtime_mechanical(void) {
       mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
       if (mechanical.variant == variant_full) {
       
-        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
+        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_isotropic;
         mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_elastic_isotropic;
       
       } else if (mechanical.variant == variant_plane_stress) {      
       
-        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_plane_stress;  
         mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
       
       } else if (mechanical.variant == variant_plane_strain) {  
       
-        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
+        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_plane_strain;
         mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
       
       }  
@@ -384,7 +384,7 @@ int feenox_problem_init_runtime_mechanical(void) {
         return FEENOX_ERROR;
       }
 
-      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
+      mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_orthotropic;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
     
     break;
@@ -416,12 +416,12 @@ int feenox_problem_init_runtime_mechanical(void) {
 
   switch (mechanical.thermal_expansion_model) {
     case thermal_expansion_model_isotropic:
-      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_isotropic;
-      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_isotropic;
+      mechanical.compute_thermal_strain = feenox_problem_mechanical_compute_thermal_strain_isotropic;
+      mechanical.compute_thermal_stress = feenox_problem_mechanical_compute_thermal_stress_isotropic;
     break;
     case thermal_expansion_model_orthotropic:
-      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_orthotropic;
-      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_orthotropic;
+      mechanical.compute_thermal_strain = feenox_problem_mechanical_compute_thermal_strain_orthotropic;
+      mechanical.compute_thermal_stress = feenox_problem_mechanical_compute_thermal_stress_orthotropic;
     break;
     default:
     break;

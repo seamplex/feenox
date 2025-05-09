@@ -22,7 +22,7 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-int feenox_problem_build_compute_mechanical_strain_isotropic (const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_thermal_strain_isotropic (const double *x, material_t *material) {
   
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
   double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
@@ -38,7 +38,7 @@ int feenox_problem_build_compute_mechanical_strain_isotropic (const double *x, m
   
 }
 
-int feenox_problem_build_compute_mechanical_stress_isotropic (const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z) {
+int feenox_problem_mechanical_compute_thermal_stress_isotropic (const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z) {
 
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
   double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
