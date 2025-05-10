@@ -23,13 +23,19 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-// this works for both 2d and 3d
 #define FLUX_SIGMAX  0
 #define FLUX_SIGMAY  1
-#define FLUX_TAUXY   2
 #define FLUX_SIGMAZ  3
+#define FLUX_TAUXY   2
 #define FLUX_TAUYZ   4
 #define FLUX_TAUZX   5
+#define FLUX_EXX     6
+#define FLUX_EYY     7
+#define FLUX_EZZ     9
+#define FLUX_EXY     8
+#define FLUX_EYZ    10
+#define FLUX_EZX    11
+#define FLUX_SIZE   12
 
 int feenox_problem_gradient_fill_mechanical(void) {
   
@@ -70,9 +76,9 @@ int feenox_problem_gradient_properties_at_element_nodes_mechanical(element_t *el
 
 int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
   
-  size_t flux_size = (feenox.pde.dim == 3) ? 6 : 3;
+  size_t flux_size = 12;
   if (node->flux == NULL) {
-    feenox_check_alloc(node->flux = calloc(flux_size, sizeof(double)));
+    feenox_check_alloc(node->flux = calloc(FLUX_SIZE, sizeof(double)));
   } else {
     unsigned int m = 0;
     for (m = 0; m < flux_size; m++) {
@@ -100,6 +106,13 @@ int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *gr
 
 int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight) {
 
+  double exx = 0;
+  double eyy = 0;
+  double ezz = 0;
+  double exy = 0;
+  double eyz = 0;
+  double ezx = 0;
+
   double sigmax = 0;
   double sigmay = 0;
   double sigmaz = 0;
@@ -111,9 +124,9 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   // TODO: virtual methods in the material ctx
   // TODO: use an integer flag
   if (feenox_var_value(mechanical.ldef) == 0) {
-    double epsilonx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
-    double epsilony = gsl_matrix_get(element->dphidx_node[j], 1, 1);
-    double epsilonz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
+    exx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
+    eyy = gsl_matrix_get(element->dphidx_node[j], 1, 1);
+    ezz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
   
     double gammaxy = gsl_matrix_get(element->dphidx_node[j], 0, 1) + gsl_matrix_get(element->dphidx_node[j], 1, 0);
     double gammayz = 0;
@@ -122,14 +135,29 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       gammayz = gsl_matrix_get(element->dphidx_node[j], 1, 2) + gsl_matrix_get(element->dphidx_node[j], 2, 1);
       gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
     }
+    exy = 0.5 * gammaxy;
+    eyz = 0.5 * gammayz;
+    ezx = 0.5 * gammazx;
     
     feenox_call(mechanical.compute_stress_from_strain(node, element, j,
-                                                    epsilonx, epsilony, epsilonz, gammaxy, gammayz, gammazx,
+                                                    exx, eyy, ezz, gammaxy, gammayz, gammazx,
                                                     &sigmax, &sigmay, &sigmaz, &tauxy, &tauyz, &tauzx));
     
-  } else {
     
+    
+  } else {
+
+    // green-lagrange strain  
     feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]));  
+
+    exx = gsl_matrix_get(mechanical.EGL, 0, 0);
+    eyy = gsl_matrix_get(mechanical.EGL, 1, 1);
+    ezz = gsl_matrix_get(mechanical.EGL, 2, 2);
+    exy = gsl_matrix_get(mechanical.EGL, 0, 1);
+    eyz = gsl_matrix_get(mechanical.EGL, 1, 2);
+    ezx = gsl_matrix_get(mechanical.EGL, 2, 0);
+
+    // second piola kirchoff    
     feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(node->x, element->physical_group->material));
 
     // cauchy stress  
@@ -159,6 +187,14 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     sigmaz -= sigmat_z;
   }
 
+  node->flux[FLUX_EXX] += rel_weight * (exx - node->flux[FLUX_EXX]);
+  node->flux[FLUX_EYY] += rel_weight * (eyy - node->flux[FLUX_EYY]);
+  node->flux[FLUX_EXY] += rel_weight * (exy - node->flux[FLUX_EXY]);
+  if (feenox.pde.dofs == 3) {
+    node->flux[FLUX_EZZ] += rel_weight * (ezz - node->flux[FLUX_EZZ]);
+    node->flux[FLUX_EYZ] += rel_weight * (eyz - node->flux[FLUX_EYZ]);
+    node->flux[FLUX_EZX] += rel_weight * (ezx - node->flux[FLUX_EZX]);
+  }  
   
   node->flux[FLUX_SIGMAX] += rel_weight * (sigmax - node->flux[FLUX_SIGMAX]);
   node->flux[FLUX_SIGMAY] += rel_weight * (sigmay - node->flux[FLUX_SIGMAY]);

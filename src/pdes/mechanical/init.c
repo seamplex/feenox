@@ -108,6 +108,16 @@ int feenox_problem_parse_time_init_mechanical(void) {
   
   // ------- elasticity-related outputs -----------------------------------  
   // TODO: document
+  feenox_call(feenox_problem_define_solution_function("exx", &mechanical.exx, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("eyy", &mechanical.eyy, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("exy", &mechanical.exy, FEENOX_SOLUTION_GRADIENT));
+
+  if (feenox.pde.dofs == 3) {
+    feenox_call(feenox_problem_define_solution_function("ezz", &mechanical.ezz, FEENOX_SOLUTION_GRADIENT));
+    feenox_call(feenox_problem_define_solution_function("eyz", &mechanical.eyz, FEENOX_SOLUTION_GRADIENT));
+    feenox_call(feenox_problem_define_solution_function("ezx", &mechanical.ezx, FEENOX_SOLUTION_GRADIENT));
+  }
+
   feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, FEENOX_SOLUTION_GRADIENT));

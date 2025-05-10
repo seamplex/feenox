@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  FeenoX parser for mechanical-specific keywords
  *
- *  Copyright (C) 2022--2023 Jeremy Theler
+ *  Copyright (C) 2022--2025 Jeremy Theler
  *
  *  This file is part of FeenoX.
  *
@@ -71,13 +71,25 @@ int feenox_problem_parse_write_post_mechanical(mesh_write_t *mesh_write, const c
     }
 
   } else if (strcmp(token, "strains") == 0 || strcmp(token, "strain") == 0) {
-    
+/*    
     for (unsigned int g = 0; g < feenox.pde.dofs; g++) {
       for (unsigned int m = 0; m < feenox.pde.dim; m++) {
         feenox_call(feenox_add_post_field(mesh_write, 1, &feenox.pde.gradient[g][m]->name, NULL, field_location_nodes));
       }
     }
-    
+*/
+      
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.exx->name, NULL, field_location_nodes));
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.eyy->name, NULL, field_location_nodes));
+    if (feenox.pde.dim == 3) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.ezz->name, NULL, field_location_nodes));
+    }
+    feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.exy->name, NULL, field_location_nodes));
+    if (feenox.pde.dim == 3) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.eyz->name, NULL, field_location_nodes));
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.ezx->name, NULL, field_location_nodes));
+    }
+      
   } else if (strcmp(token, "stresses") == 0 || strcmp(token, "stress") == 0) {
     
     feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.sigmax->name, NULL, field_location_nodes));

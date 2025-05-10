@@ -164,6 +164,13 @@ struct mechanical_t {
   var_t *v_at_sigma_max;
   var_t *w_at_sigma_max;
   
+  // strains
+  function_t *exx;
+  function_t *eyy;
+  function_t *ezz;
+  function_t *exy;
+  function_t *eyz;
+  function_t *ezx;
   
   // cauchy stresses
   function_t *sigmax;
