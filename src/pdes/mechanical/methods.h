@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox mechanical methods
  *
- *  Copyright (C) 2021-2023 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -62,18 +62,29 @@ extern int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(elem
 extern int feenox_problem_mechanical_compute_strain_sdef (const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_strain_thermal_orthotropic (const double *x, material_t *material);
 
+// mechanical/strain.c
 extern int feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u);
 extern int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u);
 extern int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u);
+
+// mechanica/stress.c
 
 // material models
 extern void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu);
 extern int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, material_t *material);
 
+// linear elastic
+extern int feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material);
+
+// neohookean
+extern int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material);
+
 extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void);
 extern int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material);
-      
+ 
+
+
 extern int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
@@ -92,19 +103,21 @@ extern int feenox_problem_mechanical_compute_thermal_stress_orthotropic (const d
 // mechanical/post.c
 extern int feenox_problem_solve_post_mechanical(void);
 
-// mechanical/stress.c
+// mechanical/gradient.c
 extern int feenox_problem_gradient_fill_mechanical(void);
 extern int feenox_problem_gradient_properties_at_element_nodes_mechanical(element_t *element, mesh_t *mesh);
 extern int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node);
 extern int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight);
 extern int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j);
 
+// mechanical/stress.c
 extern int feenox_stress_from_strain(node_t *node, element_t *element, unsigned int j, double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx, double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyx, double *tauzx);
 extern int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3);
 extern double feenox_vonmises_from_principal(double sigma1, double sigma2, double sigma3);
 extern double feenox_vonmises_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx);
 extern double feenox_tresca_from_stress_tensor(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx);
 extern int feenox_strain_energy(void);
+
 // mechanical/linearize.c
 extern int feenox_instruction_linearize(void *arg);
 
