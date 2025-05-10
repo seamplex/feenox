@@ -26,16 +26,19 @@
 int feenox_distribution_init(distribution_t *this, const char *name) {
 
   feenox_check_alloc(this->name = strdup(name));
+
+  int n_groups = HASH_COUNT(feenox.pde.mesh->physical_groups);
+  feenox_check_alloc(this->defined_per_group = calloc(n_groups, sizeof(int)));
   
   // first try a property, if this is the case then we have it easy
   int n_volumes = 0;
   int non_uniform = 0;
   HASH_FIND_STR(feenox.mesh.properties, name, this->property);
   if (this->property != NULL) {
-    // check if the property is "full," i.e. defined over all volumes
-    int full = 1;
+    int full = 1; // asume it is full
     physical_group_t *physical_group = NULL;
     physical_group_t *tmp_group = NULL;
+    int i = 0;
     HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
       if (physical_group->dimension == feenox.pde.dim) {
         if (physical_group->material != NULL) {
@@ -45,6 +48,8 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
             feenox_pull_dependencies_variables(&this->dependency_variables, property_data->expr.variables);
             feenox_pull_dependencies_functions(&this->dependency_functions, property_data->expr.functions);
             non_uniform = (n_volumes++ > 0) || (feenox_depends_on_space(this->dependency_variables));
+            this->defined_per_group[i] = 1;            
+            this->defined = 1;
           } else  {
             full = 0;
           }  
@@ -52,9 +57,9 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
           full = 0;
         }
       }
+      i++;
     }
-
-    this->defined = 1;
+    
     this->full = full;
     this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_property;
@@ -69,6 +74,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   n_volumes = 0;
   physical_group_t *physical_group = NULL;
   physical_group_t *tmp_group = NULL;
+  int i = 0;
   HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *function_name = NULL;
@@ -93,16 +99,18 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, function));
         
         non_uniform = (n_volumes++ > 0) || (feenox_depends_on_space(this->dependency_variables));
+        this->defined_per_group[i] = 1;            
+        this->defined = 1;
 
       } else {
         full = 0;
       }
       feenox_free(function_name);
-    }  
+    }
+    i++;
   }
   
   if (this->function) {
-    this->defined = 1;
     this->full = full;
     this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_function_local;
@@ -118,6 +126,9 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
       return FEENOX_ERROR;
     }
 
+    for (int i = 0; i < n_groups; i++) {
+      this->defined_per_group[i] = 1;            
+    }
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_function_global;
@@ -136,6 +147,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   n_volumes = 0;
   physical_group = NULL;
   tmp_group = NULL;
+  i = 0;
   HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *var_name = NULL;
@@ -153,16 +165,18 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
         
         // if there are many volumes, we are not uniform
         non_uniform = (n_volumes++ > 0);
+        this->defined_per_group[i] = 1;
+        this->defined = 1;
 
       } else {
         full = 0;
       }
       feenox_free(var_name);
     }  
+    i++;
   }
   
   if (this->variable) {
-    this->defined = 1;
     this->full = full;
     this->non_uniform = non_uniform;
     this->eval = feenox_distribution_eval_variable_local;
@@ -172,6 +186,9 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   
   // try a single global variable
   if ((this->variable = feenox_get_variable_ptr(name)) != NULL) {
+    for (int i = 0; i < n_groups; i++) {
+      this->defined_per_group[i] = 1;
+    }
     this->defined = 1;
     this->full = 1;
     this->eval = feenox_distribution_eval_variable_global;
@@ -180,7 +197,6 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   
 
   // not finding an actual distribution is not an error, there are optional distributions
-  this->defined = 0;
   this->full = 0;
   this->eval = feenox_distribution_eval;
   return FEENOX_OK;

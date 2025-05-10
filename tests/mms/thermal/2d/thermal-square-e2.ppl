@@ -1,0 +1,63 @@
+plot \
+     "thermal_square_dirichlet_tri3_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 4 lw 1 lt 2 color plum  ti "dirichlet-tri3-struct = " + e_inf_thermal_square_dirichlet_tri3_struct_title,\
+  e_2_thermal_square_dirichlet_tri3_struct(x)        w l                    lw 2 lt 1 color plum  ti "",\
+     "thermal_square_dirichlet_tri3_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 4 lw 1 lt 2 color rhodamine  ti "dirichlet-tri3-frontal = " + e_inf_thermal_square_dirichlet_tri3_frontal_title,\
+  e_2_thermal_square_dirichlet_tri3_frontal(x)        w l                    lw 2 lt 1 color rhodamine  ti "",\
+     "thermal_square_dirichlet_tri3_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 4 lw 1 lt 2 color salmon  ti "dirichlet-tri3-delaunay = " + e_inf_thermal_square_dirichlet_tri3_delaunay_title,\
+  e_2_thermal_square_dirichlet_tri3_delaunay(x)        w l                    lw 2 lt 1 color salmon  ti "",\
+     "thermal_square_dirichlet_tri6_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 18 lw 1 lt 2 color plum  ti "dirichlet-tri6-struct = " + e_inf_thermal_square_dirichlet_tri6_struct_title,\
+  e_2_thermal_square_dirichlet_tri6_struct(x)        w l                    lw 2 lt 1 color plum  ti "",\
+     "thermal_square_dirichlet_tri6_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 18 lw 1 lt 2 color rhodamine  ti "dirichlet-tri6-frontal = " + e_inf_thermal_square_dirichlet_tri6_frontal_title,\
+  e_2_thermal_square_dirichlet_tri6_frontal(x)        w l                    lw 2 lt 1 color rhodamine  ti "",\
+     "thermal_square_dirichlet_tri6_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 18 lw 1 lt 2 color salmon  ti "dirichlet-tri6-delaunay = " + e_inf_thermal_square_dirichlet_tri6_delaunay_title,\
+  e_2_thermal_square_dirichlet_tri6_delaunay(x)        w l                    lw 2 lt 1 color salmon  ti "",\
+     "thermal_square_dirichlet_quad4_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 2 lw 1 lt 2 color plum  ti "dirichlet-quad4-struct = " + e_inf_thermal_square_dirichlet_quad4_struct_title,\
+  e_2_thermal_square_dirichlet_quad4_struct(x)        w l                    lw 2 lt 1 color plum  ti "",\
+     "thermal_square_dirichlet_quad4_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 2 lw 1 lt 2 color rhodamine  ti "dirichlet-quad4-frontal = " + e_inf_thermal_square_dirichlet_quad4_frontal_title,\
+  e_2_thermal_square_dirichlet_quad4_frontal(x)        w l                    lw 2 lt 1 color rhodamine  ti "",\
+     "thermal_square_dirichlet_quad4_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 2 lw 1 lt 2 color salmon  ti "dirichlet-quad4-delaunay = " + e_inf_thermal_square_dirichlet_quad4_delaunay_title,\
+  e_2_thermal_square_dirichlet_quad4_delaunay(x)        w l                    lw 2 lt 1 color salmon  ti "",\
+     "thermal_square_dirichlet_quad8_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 16 lw 1 lt 2 color plum  ti "dirichlet-quad8-struct = " + e_inf_thermal_square_dirichlet_quad8_struct_title,\
+  e_2_thermal_square_dirichlet_quad8_struct(x)        w l                    lw 2 lt 1 color plum  ti "",\
+     "thermal_square_dirichlet_quad8_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 16 lw 1 lt 2 color rhodamine  ti "dirichlet-quad8-frontal = " + e_inf_thermal_square_dirichlet_quad8_frontal_title,\
+  e_2_thermal_square_dirichlet_quad8_frontal(x)        w l                    lw 2 lt 1 color rhodamine  ti "",\
+     "thermal_square_dirichlet_quad8_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 16 lw 1 lt 2 color salmon  ti "dirichlet-quad8-delaunay = " + e_inf_thermal_square_dirichlet_quad8_delaunay_title,\
+  e_2_thermal_square_dirichlet_quad8_delaunay(x)        w l                    lw 2 lt 1 color salmon  ti "",\
+     "thermal_square_dirichlet_quad9_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 17 lw 1 lt 2 color plum  ti "dirichlet-quad9-struct = " + e_inf_thermal_square_dirichlet_quad9_struct_title,\
+  e_2_thermal_square_dirichlet_quad9_struct(x)        w l                    lw 2 lt 1 color plum  ti "",\
+     "thermal_square_dirichlet_quad9_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 17 lw 1 lt 2 color rhodamine  ti "dirichlet-quad9-frontal = " + e_inf_thermal_square_dirichlet_quad9_frontal_title,\
+  e_2_thermal_square_dirichlet_quad9_frontal(x)        w l                    lw 2 lt 1 color rhodamine  ti "",\
+     "thermal_square_dirichlet_quad9_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 17 lw 1 lt 2 color salmon  ti "dirichlet-quad9-delaunay = " + e_inf_thermal_square_dirichlet_quad9_delaunay_title,\
+  e_2_thermal_square_dirichlet_quad9_delaunay(x)        w l                    lw 2 lt 1 color salmon  ti "",\
+     "thermal_square_neumann_tri3_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 4 lw 1 lt 2 color blue  ti "neumann-tri3-struct = " + e_inf_thermal_square_neumann_tri3_struct_title,\
+  e_2_thermal_square_neumann_tri3_struct(x)        w l                    lw 2 lt 1 color blue  ti "",\
+     "thermal_square_neumann_tri3_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 4 lw 1 lt 2 color cyan  ti "neumann-tri3-frontal = " + e_inf_thermal_square_neumann_tri3_frontal_title,\
+  e_2_thermal_square_neumann_tri3_frontal(x)        w l                    lw 2 lt 1 color cyan  ti "",\
+     "thermal_square_neumann_tri3_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 4 lw 1 lt 2 color seagreen  ti "neumann-tri3-delaunay = " + e_inf_thermal_square_neumann_tri3_delaunay_title,\
+  e_2_thermal_square_neumann_tri3_delaunay(x)        w l                    lw 2 lt 1 color seagreen  ti "",\
+     "thermal_square_neumann_tri6_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 18 lw 1 lt 2 color blue  ti "neumann-tri6-struct = " + e_inf_thermal_square_neumann_tri6_struct_title,\
+  e_2_thermal_square_neumann_tri6_struct(x)        w l                    lw 2 lt 1 color blue  ti "",\
+     "thermal_square_neumann_tri6_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 18 lw 1 lt 2 color cyan  ti "neumann-tri6-frontal = " + e_inf_thermal_square_neumann_tri6_frontal_title,\
+  e_2_thermal_square_neumann_tri6_frontal(x)        w l                    lw 2 lt 1 color cyan  ti "",\
+     "thermal_square_neumann_tri6_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 18 lw 1 lt 2 color seagreen  ti "neumann-tri6-delaunay = " + e_inf_thermal_square_neumann_tri6_delaunay_title,\
+  e_2_thermal_square_neumann_tri6_delaunay(x)        w l                    lw 2 lt 1 color seagreen  ti "",\
+     "thermal_square_neumann_quad4_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 2 lw 1 lt 2 color blue  ti "neumann-quad4-struct = " + e_inf_thermal_square_neumann_quad4_struct_title,\
+  e_2_thermal_square_neumann_quad4_struct(x)        w l                    lw 2 lt 1 color blue  ti "",\
+     "thermal_square_neumann_quad4_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 2 lw 1 lt 2 color cyan  ti "neumann-quad4-frontal = " + e_inf_thermal_square_neumann_quad4_frontal_title,\
+  e_2_thermal_square_neumann_quad4_frontal(x)        w l                    lw 2 lt 1 color cyan  ti "",\
+     "thermal_square_neumann_quad4_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 2 lw 1 lt 2 color seagreen  ti "neumann-quad4-delaunay = " + e_inf_thermal_square_neumann_quad4_delaunay_title,\
+  e_2_thermal_square_neumann_quad4_delaunay(x)        w l                    lw 2 lt 1 color seagreen  ti "",\
+     "thermal_square_neumann_quad8_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 16 lw 1 lt 2 color blue  ti "neumann-quad8-struct = " + e_inf_thermal_square_neumann_quad8_struct_title,\
+  e_2_thermal_square_neumann_quad8_struct(x)        w l                    lw 2 lt 1 color blue  ti "",\
+     "thermal_square_neumann_quad8_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 16 lw 1 lt 2 color cyan  ti "neumann-quad8-frontal = " + e_inf_thermal_square_neumann_quad8_frontal_title,\
+  e_2_thermal_square_neumann_quad8_frontal(x)        w l                    lw 2 lt 1 color cyan  ti "",\
+     "thermal_square_neumann_quad8_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 16 lw 1 lt 2 color seagreen  ti "neumann-quad8-delaunay = " + e_inf_thermal_square_neumann_quad8_delaunay_title,\
+  e_2_thermal_square_neumann_quad8_delaunay(x)        w l                    lw 2 lt 1 color seagreen  ti "",\
+     "thermal_square_neumann_quad9_struct.dat"                              u (exp($1)):(exp($3)) w lp pt 17 lw 1 lt 2 color blue  ti "neumann-quad9-struct = " + e_inf_thermal_square_neumann_quad9_struct_title,\
+  e_2_thermal_square_neumann_quad9_struct(x)        w l                    lw 2 lt 1 color blue  ti "",\
+     "thermal_square_neumann_quad9_frontal.dat"                              u (exp($1)):(exp($3)) w lp pt 17 lw 1 lt 2 color cyan  ti "neumann-quad9-frontal = " + e_inf_thermal_square_neumann_quad9_frontal_title,\
+  e_2_thermal_square_neumann_quad9_frontal(x)        w l                    lw 2 lt 1 color cyan  ti "",\
+     "thermal_square_neumann_quad9_delaunay.dat"                              u (exp($1)):(exp($3)) w lp pt 17 lw 1 lt 2 color seagreen  ti "neumann-quad9-delaunay = " + e_inf_thermal_square_neumann_quad9_delaunay_title,\
+  e_2_thermal_square_neumann_quad9_delaunay(x)        w l                    lw 2 lt 1 color seagreen  ti "",\
+ x**2    w l lt 2 lw 4 color gray ti "$h^2$",\
+ x**3    w l lt 3 lw 4 color gray ti "$h^3$"

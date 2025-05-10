@@ -31,6 +31,7 @@ TESTS = \
         tests/bc-groups.sh \
         tests/beam-modal.sh \
         tests/beam-ortho.sh \
+        tests/beam-ldef.sh \
         tests/bimetallic-strip.sh \
         tests/builtin.sh \
         tests/circle.sh \
@@ -52,6 +53,8 @@ TESTS = \
         tests/function_mesh.sh \
         tests/function_vectors.sh \
         tests/hello_mpi.sh \
+        tests/hex8-ldef-jacobian.sh \
+        tests/hex8-ldef-ccx.sh \
         tests/integral.sh \
         tests/lag.sh \
         tests/laplace2d.sh \

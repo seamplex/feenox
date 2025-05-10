@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to build elemental objects
  *
- *  Copyright (C) 2015-2023 Jeremy Theler
+ *  Copyright (C) 2015-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -45,6 +45,9 @@ int feenox_problem_build(void) {
   }
   if (feenox.pde.has_rhs) {
     petsc_call(VecZeroEntries(feenox.pde.b));
+  }
+  if (feenox.pde.has_internal_fluxes) {
+    petsc_call(VecZeroEntries(feenox.pde.f));
   }  
   
   size_t volumetric_elements = 0;
@@ -139,7 +142,6 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
   feenox.fem.current_GJ = feenox.pde.dofs * this->type->nodes;
 
   feenox_check_alloc(feenox.fem.l = calloc(feenox.fem.current_GJ, sizeof(PetscInt)));
-
   
   if (feenox.pde.has_stiffness) {
     feenox_check_alloc(feenox.fem.Ki = gsl_matrix_calloc(feenox.fem.current_GJ, feenox.fem.current_GJ));
@@ -159,6 +161,10 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
       feenox_check_alloc(feenox.fem.vec_f = gsl_vector_calloc(feenox.pde.dofs));
     }
   }
+  if (feenox.pde.has_internal_fluxes) {
+    feenox_check_alloc(feenox.fem.fi = gsl_vector_calloc(feenox.fem.current_GJ));
+    feenox_check_alloc(feenox.fem.phii = gsl_vector_calloc(feenox.fem.current_GJ));
+  }
 
   if (feenox.pde.element_build_allocate_aux != NULL) {
     feenox.pde.element_build_allocate_aux(this->type->nodes);
@@ -170,20 +176,29 @@ int feenox_problem_build_elemental_objects_allocate(element_t *this) {
 
 }
 
-
 int feenox_problem_build_elemental_objects_free(void) {
 
 #ifdef HAVE_PETSC
-  
-  gsl_matrix_free(feenox.fem.Ki);
-  gsl_matrix_free(feenox.fem.Mi);
-  gsl_matrix_free(feenox.fem.JKi);
-  gsl_matrix_free(feenox.fem.Jbi);
-  gsl_vector_free(feenox.fem.bi);
   feenox_free(feenox.fem.l);
+  gsl_matrix_free(feenox.fem.Ki);
+  feenox.fem.Ki = NULL;
+  gsl_matrix_free(feenox.fem.Mi);
+  feenox.fem.Mi = NULL;
+  gsl_matrix_free(feenox.fem.JKi);
+  feenox.fem.JKi = NULL;
+  gsl_matrix_free(feenox.fem.Jbi);
+  feenox.fem.Jbi = NULL;
+  gsl_vector_free(feenox.fem.bi);
+  feenox.fem.bi = NULL;
+  gsl_vector_free(feenox.fem.vec_f);  
+  feenox.fem.vec_f = NULL;
+  gsl_vector_free(feenox.fem.fi);
+  feenox.fem.fi = NULL;
+  gsl_vector_free(feenox.fem.phii);
+  feenox.fem.phii = NULL;
+  
   
   feenox.fem.current_elemental_type = NULL;
-  
 #endif  
   return FEENOX_OK;
 
@@ -222,7 +237,18 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   if (feenox.pde.has_rhs) {
     gsl_vector_set_zero(feenox.fem.bi);
   }
+  if (feenox.pde.has_internal_fluxes) {
+    gsl_vector_set_zero(feenox.fem.fi);
+  }
 
+  // compute the indices of the DOFs to ensamble
+  PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);
+  
+  // if the guy has internal forces, we need the solution
+  if (feenox.pde.has_internal_fluxes) {
+    petsc_call(VecGetValues(feenox.pde.phi_bc, feenox.fem.current_GJ, l, gsl_vector_ptr(feenox.fem.phii, 0)));
+  }
+  
   // a single call over the element
   // if the specific pde wants, it can loop over gauss point in the call
   // or it can just do some things that are per-element only and then loop below
@@ -247,9 +273,6 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   feenox_debug_print_gsl_matrix(feenox.fem.JKi, stdout);
 */  
  
-  // compute the indices of the DOFs to ensamble
-  PetscInt *l = feenox_fem_compute_dof_indices(this, feenox.pde.dofs);
-
   if (feenox.pde.has_stiffness)  {
     petsc_call(MatSetValues(feenox.pde.K, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Ki, 0, 0), ADD_VALUES));
   }  
@@ -264,6 +287,9 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   }
   if (feenox.pde.has_rhs) {
     petsc_call(VecSetValues(feenox.pde.b, feenox.fem.current_GJ, l, gsl_vector_ptr(feenox.fem.bi, 0), ADD_VALUES));
+  }
+  if (feenox.pde.has_internal_fluxes) {
+    petsc_call(VecSetValues(feenox.pde.f, feenox.fem.current_GJ, l, gsl_vector_ptr(feenox.fem.fi, 0), ADD_VALUES));
   }
 
 #endif  

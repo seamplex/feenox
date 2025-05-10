@@ -1,7 +1,3 @@
----
-title: NAFEMS LE11 benchmark
-...
-
 PROBLEM mechanical 3D
 READ_MESH $0-$1.msh
 

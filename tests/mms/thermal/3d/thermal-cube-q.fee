@@ -1,0 +1,4 @@
+q_mms(x,y,z) = (-'diff(T_mms(x,y,z),z,1)*'diff(k_mms(x,y,z),z,1))-'diff(T_mms(x,y,z),y,1)*'diff(k_mms(x,y,z),y,1)-'diff(T_mms(x,y,z),x,1)*'diff(k_mms(x,y,z),x,1)-k_mms(x,y,z)*'diff(T_mms(x,y,z),z,2)-k_mms(x,y,z)*'diff(T_mms(x,y,z),y,2)-k_mms(x,y,z)*'diff(T_mms(x,y,z),x,2)
+qx_mms(x,y,z) = -k_mms(x,y,z)*'diff(T_mms(x,y,z),x,1)
+qy_mms(x,y,z) = -k_mms(x,y,z)*'diff(T_mms(x,y,z),y,1)
+qz_mms(x,y,z) = -k_mms(x,y,z)*'diff(T_mms(x,y,z),z,1)

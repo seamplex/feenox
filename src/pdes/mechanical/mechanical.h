@@ -34,7 +34,15 @@
 #define BC_TYPE_MECHANICAL_FORCE                19
 
 typedef struct mechanical_t mechanical_t;
+typedef struct mechanical_material_ctx_t mechanical_material_ctx_t;
 typedef struct feenox_linearize_t feenox_linearize_t;
+
+struct mechanical_material_ctx_t {
+
+  double E;
+  
+};
+
 
 struct mechanical_t {
   
@@ -45,7 +53,6 @@ struct mechanical_t {
     variant_axisymmetric,
   } variant;  
   
-  // TODO: have a "mixed" material model where each volume has its own model
   enum {
     material_model_unknown,
     material_model_elastic_isotropic,
@@ -68,7 +75,7 @@ struct mechanical_t {
   distribution_t nu_xy, nu_yz, nu_zx;       // Poisson's ratios
   distribution_t G_xy, G_yz, G_zx;          // Shear moduli
   distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient
-  
+          
   // temperature field
   distribution_t T;     // temperature distribution
   distribution_t T_ref; // reference temperature (has to be a constant)
@@ -110,8 +117,31 @@ struct mechanical_t {
   gsl_vector *et;   // thermal strain vector, size 6 for 3d
   gsl_vector *Cet;  // product of C times et, size 6 for 3d
   
-//  double hourglass_epsilon;
   
+  // non-linear stuff
+  gsl_matrix *grad_u;  // displacement gradient
+  gsl_matrix *F;       // deformation gradient
+  gsl_matrix *invF;    // inverse deformation gradient
+  gsl_matrix *epsilon;     // green-lagrange strain
+  gsl_matrix *LCG;     // left cauchy-green
+  gsl_matrix *PK;      // piola-kirchoff stress (either first or second)
+  gsl_matrix *Sigma;   // 9x9 expansion of Ss
+  gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
+  gsl_matrix *G;       // matrix with derivatives of shape functions
+  gsl_matrix *SigmaG;  // temporary holder
+  gsl_vector *PK_voigt; // S in voigt notation
+  
+  // temporary non-linear
+  gsl_matrix *eye;     // 3x3 identity
+  gsl_matrix *twomuE;  // temporary holder
+  gsl_matrix *SF;  // temporary holder
+
+  
+//  double hourglass_epsilon;
+
+  var_t *ldef;
+  var_t *ldef_check;
+
   // for implicit multi-dof BCs
   var_t *displ_for_bc[3];
 
@@ -136,6 +166,13 @@ struct mechanical_t {
   var_t *v_at_sigma_max;
   var_t *w_at_sigma_max;
   
+  // strains
+  function_t *exx;
+  function_t *eyy;
+  function_t *ezz;
+  function_t *exy;
+  function_t *eyz;
+  function_t *ezx;
   
   // cauchy stresses
   function_t *sigmax;
@@ -154,7 +191,6 @@ struct mechanical_t {
   
   feenox_linearize_t *linearizes;
 };
-
 
 struct feenox_linearize_t {
   expr_t x1;

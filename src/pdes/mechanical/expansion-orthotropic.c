@@ -22,7 +22,7 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-int feenox_problem_build_compute_mechanical_strain_orthotropic (const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_thermal_strain_orthotropic (const double *x, material_t *material) {
   
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
 
@@ -36,7 +36,7 @@ int feenox_problem_build_compute_mechanical_strain_orthotropic (const double *x,
   
 }
 
-int feenox_problem_build_compute_mechanical_stress_orthotropic (const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z) {
+int feenox_problem_mechanical_compute_thermal_stress_orthotropic(const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z) {
 
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
   double alpha_x = mechanical.alpha_x.eval(&mechanical.alpha_x, x, material);

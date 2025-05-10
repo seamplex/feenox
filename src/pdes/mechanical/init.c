@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic mechanical initialization routines
  *
- *  Copyright (C) 2021--2023 Jeremy Theler
+ *  Copyright (C) 2021--2025 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -32,6 +32,7 @@ int feenox_problem_parse_time_init_mechanical(void) {
 
   feenox.pde.init_before_run = feenox_problem_init_runtime_mechanical;
 
+  feenox.pde.setup_snes = feenox_problem_setup_snes_mechanical;
   feenox.pde.setup_ksp = feenox_problem_setup_ksp_mechanical;
   feenox.pde.setup_pc = feenox_problem_setup_pc_mechanical;
   
@@ -107,6 +108,16 @@ int feenox_problem_parse_time_init_mechanical(void) {
   
   // ------- elasticity-related outputs -----------------------------------  
   // TODO: document
+  feenox_call(feenox_problem_define_solution_function("exx", &mechanical.exx, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("eyy", &mechanical.eyy, FEENOX_SOLUTION_GRADIENT));
+  feenox_call(feenox_problem_define_solution_function("exy", &mechanical.exy, FEENOX_SOLUTION_GRADIENT));
+
+  if (feenox.pde.dofs == 3) {
+    feenox_call(feenox_problem_define_solution_function("ezz", &mechanical.ezz, FEENOX_SOLUTION_GRADIENT));
+    feenox_call(feenox_problem_define_solution_function("eyz", &mechanical.eyz, FEENOX_SOLUTION_GRADIENT));
+    feenox_call(feenox_problem_define_solution_function("ezx", &mechanical.ezx, FEENOX_SOLUTION_GRADIENT));
+  }
+
   feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, FEENOX_SOLUTION_GRADIENT));
@@ -124,7 +135,15 @@ int feenox_problem_parse_time_init_mechanical(void) {
 //  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, FEENOX_SOLUTION_GRADIENT));
 
+///va+ldef+detail Flag that turns the large-deformation formulation on or off.
+///va+ldef+detail It can also be turned on with the `NONLINEAR` keyword in `PROBLEM`
+///va+ldef+detail or with the `--non-linear` command-line option.
+  feenox_check_alloc(mechanical.ldef = feenox_define_variable_get_ptr("ldef"));
 
+///va+ldef+detail Flag that asks FeenoX to check if the deformations are large after
+///va+ldef+detail solving a linear problem. If they are, a warning is issued.
+  feenox_check_alloc(mechanical.ldef_check = feenox_define_variable_get_ptr("ldef_check"));
+  
 // these are for the algebraic expressions in the  implicitly-defined BCs
 // i.e. 0=u*nx+v*ny or 0=u*y-v*x
 // here they are defined as uppercase because there already exist functions named u, v and w
@@ -273,24 +292,24 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
   if (mechanical.alpha.defined) {
     mechanical.thermal_expansion_model = thermal_expansion_model_isotropic;
-  }
-  
-  // see if there are orthotropic properties
-  feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alphax"));
-  if (mechanical.alpha_x.defined == 0) {
-    feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alpha_x"));
-  }
-  feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alphay"));
-  if (mechanical.alpha_y.defined == 0) {
-    feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alpha_y"));
-  }
-  feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alphaz"));
-  if (mechanical.alpha_z.defined == 0) {
-    feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alpha_z"));
+  } else {
+    // see if there are orthotropic properties
+    feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alphax"));
+    if (mechanical.alpha_x.defined == 0) {
+      feenox_call(feenox_distribution_init(&mechanical.alpha_x, "alpha_x"));
+    }
+    feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alphay"));
+    if (mechanical.alpha_y.defined == 0) {
+      feenox_call(feenox_distribution_init(&mechanical.alpha_y, "alpha_y"));
+    }
+    feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alphaz"));
+    if (mechanical.alpha_z.defined == 0) {
+      feenox_call(feenox_distribution_init(&mechanical.alpha_z, "alpha_z"));
+    }
   }
   
   // check for consistency
-  n_ortho = mechanical.alpha_x.defined   + mechanical.alpha_y.defined   + mechanical.alpha_z.defined;
+  n_ortho = mechanical.alpha_x.defined + mechanical.alpha_y.defined + mechanical.alpha_z.defined;
   
   if (n_ortho > 0) {
     if (mechanical.thermal_expansion_model == thermal_expansion_model_isotropic) {
@@ -352,17 +371,17 @@ int feenox_problem_init_runtime_mechanical(void) {
       mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
       if (mechanical.variant == variant_full) {
       
-        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_isotropic;
+        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_isotropic;
         mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_elastic_isotropic;
       
       } else if (mechanical.variant == variant_plane_stress) {      
       
-        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_stress;  
+        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_plane_stress;  
         mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
       
       } else if (mechanical.variant == variant_plane_strain) {  
       
-        mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_plane_strain;
+        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_plane_strain;
         mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
       
       }  
@@ -375,7 +394,7 @@ int feenox_problem_init_runtime_mechanical(void) {
         return FEENOX_ERROR;
       }
 
-      mechanical.compute_C = feenox_problem_build_compute_mechanical_C_elastic_orthotropic;
+      mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_orthotropic;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
     
     break;
@@ -405,16 +424,14 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_call(mechanical.compute_C(NULL, NULL));
   } 
 
-
-  
   switch (mechanical.thermal_expansion_model) {
     case thermal_expansion_model_isotropic:
-      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_isotropic;
-      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_isotropic;
+      mechanical.compute_thermal_strain = feenox_problem_mechanical_compute_thermal_strain_isotropic;
+      mechanical.compute_thermal_stress = feenox_problem_mechanical_compute_thermal_stress_isotropic;
     break;
     case thermal_expansion_model_orthotropic:
-      mechanical.compute_thermal_strain = feenox_problem_build_compute_mechanical_strain_orthotropic;
-      mechanical.compute_thermal_stress = feenox_problem_build_compute_mechanical_stress_orthotropic;
+      mechanical.compute_thermal_strain = feenox_problem_mechanical_compute_thermal_strain_orthotropic;
+      mechanical.compute_thermal_stress = feenox_problem_mechanical_compute_thermal_stress_orthotropic;
     break;
     default:
     break;
@@ -425,19 +442,33 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
   }
   
-  // TODO: check nonlinearity!
   if (feenox.pde.math_type == math_type_automatic) {
-    feenox.pde.math_type = math_type_linear;
+    if (feenox_var_value(mechanical.ldef) == 0) {
+      feenox.pde.math_type = math_type_linear;
+      feenox_var_value(mechanical.ldef_check) = 1;
+    } else {
+      feenox.pde.math_type = math_type_nonlinear;
+    }
   }
   
-  feenox.pde.solve = feenox_problem_solve_petsc_linear;
+  if (feenox.pde.math_type == math_type_linear) {
+    feenox.pde.solve = feenox_problem_solve_petsc_linear;
+  } else if (feenox.pde.math_type == math_type_nonlinear) {
+    feenox.pde.solve = feenox_problem_solve_petsc_nonlinear;
+    feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear;
+    feenox.pde.has_internal_fluxes = 1;
+    feenox_var_value(mechanical.ldef) = 1;
+    feenox_var_value(mechanical.ldef_check) = 0;
+  } else {
+    feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);
+  }
   
   feenox.pde.has_stiffness = 1;
   // TODO: transient
   feenox.pde.has_mass = 0;
   feenox.pde.has_rhs = 1;
   
-  feenox.pde.has_jacobian_K = 0;
+  feenox.pde.has_jacobian_K = feenox.pde.math_type == math_type_nonlinear;
   feenox.pde.has_jacobian_M = 0;
   feenox.pde.has_jacobian_b = 0;
   feenox.pde.has_jacobian = feenox.pde.has_jacobian_K || feenox.pde.has_jacobian_M || feenox.pde.has_jacobian_b;
@@ -446,7 +477,14 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.symmetric_M = 1;
 
   // see if we have to compute gradients
-  feenox.pde.compute_gradients |= (mechanical.sigmax != NULL && mechanical.sigmax->used) ||
+  feenox.pde.compute_gradients |= 
+                                  (mechanical.exx    != NULL && mechanical.exx->used) ||
+                                  (mechanical.eyy    != NULL && mechanical.eyy->used) ||
+                                  (mechanical.ezz    != NULL && mechanical.ezz->used) ||
+                                  (mechanical.exy    != NULL && mechanical.exy->used) ||
+                                  (mechanical.eyz    != NULL && mechanical.eyz->used) ||
+                                  (mechanical.ezx    != NULL && mechanical.ezx->used) ||
+                                  (mechanical.sigmax != NULL && mechanical.sigmax->used) ||
                                   (mechanical.sigmay != NULL && mechanical.sigmay->used) ||
                                   (mechanical.sigmaz != NULL && mechanical.sigmaz->used) ||
                                   (mechanical.tauxy  != NULL && mechanical.tauxy->used) ||
@@ -526,6 +564,24 @@ int feenox_problem_setup_ksp_mechanical(KSP ksp) {
     petsc_call(KSPSetType(ksp, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES));
   }  
 
+  return FEENOX_OK;
+}
+
+int feenox_problem_setup_snes_mechanical(SNES snes) {
+
+  // TODO! set a default snes type
+//  SNESType snes_type = NULL;
+//  petsc_call(SNESGetType(snes, &snes_type));
+  
+  SNESLineSearch ls;
+  petsc_call(SNESGetLineSearch(snes, &ls));
+  
+  SNESLineSearchType ls_type;
+  petsc_call(SNESLineSearchGetType(ls, &ls_type));
+  
+  if (ls_type == NULL) {
+    petsc_call(SNESLineSearchSetType(ls, SNESLINESEARCHBASIC));
+  }
   return FEENOX_OK;
 }
 
