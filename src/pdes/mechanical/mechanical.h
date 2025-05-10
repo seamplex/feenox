@@ -121,13 +121,16 @@ struct mechanical_t {
   // non-linear stuff
   gsl_matrix *grad_u;  // displacement gradient
   gsl_matrix *F;       // deformation gradient
+  gsl_matrix *invF;    // inverse deformation gradient
   gsl_matrix *EGL;     // green-lagrange strain
+  gsl_matrix *LCG;     // left cauchy-green
+  gsl_matrix *P;       // first piola-kirchoff stress
   gsl_matrix *S;       // second piola-kirchoff stress
   gsl_matrix *Sigma;   // 9x9 expansion of Ss
   gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
   gsl_matrix *G;       // matrix with derivatives of shape functions
   gsl_matrix *SigmaG;  // temporary holder
-  gsl_vector *S_voigt; // S in voigt notation
+  gsl_vector *voigt; // S in voigt notation
   
   // temporary non-linear
   gsl_matrix *eye;     // 3x3 identity

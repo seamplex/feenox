@@ -61,12 +61,18 @@ extern int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(elem
 
 extern int feenox_problem_mechanical_compute_strain_sdef (const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_strain_thermal_orthotropic (const double *x, material_t *material);
+
+extern int feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u);
 extern int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u);
+extern int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u);
 
 // material models
 extern void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu);
 extern int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, material_t *material);
+
+extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void);
 extern int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(const double *x, material_t *material);
+extern int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material);
       
 extern int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
