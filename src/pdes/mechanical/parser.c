@@ -81,11 +81,9 @@ int feenox_problem_parse_write_post_mechanical(mesh_write_t *mesh_write, const c
       
     feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.exx->name, NULL, field_location_nodes));
     feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.eyy->name, NULL, field_location_nodes));
-    if (feenox.pde.dim == 3) {
-      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.ezz->name, NULL, field_location_nodes));
-    }
     feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.exy->name, NULL, field_location_nodes));
     if (feenox.pde.dim == 3) {
+      feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.ezz->name, NULL, field_location_nodes));
       feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.eyz->name, NULL, field_location_nodes));
       feenox_call(feenox_add_post_field(mesh_write, 1, &mechanical.ezx->name, NULL, field_location_nodes));
     }

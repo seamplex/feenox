@@ -477,7 +477,14 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.symmetric_M = 1;
 
   // see if we have to compute gradients
-  feenox.pde.compute_gradients |= (mechanical.sigmax != NULL && mechanical.sigmax->used) ||
+  feenox.pde.compute_gradients |= 
+                                  (mechanical.exx    != NULL && mechanical.exx->used) ||
+                                  (mechanical.eyy    != NULL && mechanical.eyy->used) ||
+                                  (mechanical.ezz    != NULL && mechanical.ezz->used) ||
+                                  (mechanical.exy    != NULL && mechanical.exy->used) ||
+                                  (mechanical.eyz    != NULL && mechanical.eyz->used) ||
+                                  (mechanical.ezx    != NULL && mechanical.ezx->used) ||
+                                  (mechanical.sigmax != NULL && mechanical.sigmax->used) ||
                                   (mechanical.sigmay != NULL && mechanical.sigmay->used) ||
                                   (mechanical.sigmaz != NULL && mechanical.sigmaz->used) ||
                                   (mechanical.tauxy  != NULL && mechanical.tauxy->used) ||

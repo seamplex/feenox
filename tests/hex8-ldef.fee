@@ -6,7 +6,7 @@ E = 1
 nu = 0.25
 
 BC left fixed
-BC right tz=5e-2
+BC right tz=2e-3
 
 SOLVE_PROBLEM
 

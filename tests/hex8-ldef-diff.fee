@@ -1,6 +1,22 @@
-READ_MESH hex8-ldef.frd DIM 3 READ_FUNCTION D1  READ_FUNCTION D2  READ_FUNCTION D3
-READ_MESH hex8-ldef.vtk DIM 3 READ_FUNCTION displacementsx  READ_FUNCTION displacementsy  READ_FUNCTION displacementsz
+READ_MESH hex8-ldef.frd DIM 3 {
+  READ_FUNCTION D1
+  READ_FUNCTION D2
+  READ_FUNCTION D3 }
+READ_MESH hex8-ldef.vtk DIM 3 {
+  READ_FUNCTION displacementsx
+  READ_FUNCTION displacementsy
+  READ_FUNCTION displacementsz
+}
 
-INTEGRATE (D1(x,y,z)-displacementsx(x,y,z))^2+(D2(x,y,z)-displacementsy(x,y,z))^2+(D2(x,y,z)-displacementsz(x,y,z))^2 RESULT e2
+INTEGRATE (D1(x,y,z)-displacementsx(x,y,z))^2+(D2(x,y,z)-displacementsy(x,y,z))^2+(D3(x,y,z)-displacementsz(x,y,z))^2 RESULT e2
 
-PRINT e2
+# FIND_EXTREMA abs(D1(x,y,z)-displacementsx(x,y,z))+abs(D2(x,y,z)-displacementsy(x,y,z))+abs(D3(x,y,z)-displacementsz(x,y,z)) MAX einf
+
+# FIND_EXTREMA abs(D1(x,y,z)-displacementsx(x,y,z)) MAX ex
+# FIND_EXTREMA abs(D2(x,y,z)-displacementsy(x,y,z)) MAX ey
+# FIND_EXTREMA abs(D3(x,y,z)-displacementsz(x,y,z)) MAX ez
+
+# PRINT_FUNCTION D3 displacementsz D3(x,y,z)-displacementsz(x,y,z)
+# PRINT ex ey ez einf sqrt(e2)
+PRINT sqrt(e2)
+

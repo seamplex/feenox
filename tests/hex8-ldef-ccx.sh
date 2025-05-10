@@ -16,5 +16,5 @@ fi
 ccx -i ${dir}/hex8-ldef > hex8-ldef.txt
 ${feenox} ${dir}/hex8-ldef.fee
 
-answerzero hex8-ldef-diff.fee
+answerzero hex8-ldef-diff.fee 1e-6
 exitifwrong $?

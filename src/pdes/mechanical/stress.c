@@ -25,19 +25,28 @@
 
 #define FLUX_SIGMAX  0
 #define FLUX_SIGMAY  1
-#define FLUX_SIGMAZ  3
-#define FLUX_TAUXY   2
+#define FLUX_SIGMAZ  2
+#define FLUX_TAUXY   3
 #define FLUX_TAUYZ   4
 #define FLUX_TAUZX   5
 #define FLUX_EXX     6
 #define FLUX_EYY     7
-#define FLUX_EZZ     9
-#define FLUX_EXY     8
+#define FLUX_EZZ     8
+#define FLUX_EXY     9
 #define FLUX_EYZ    10
 #define FLUX_EZX    11
 #define FLUX_SIZE   12
 
 int feenox_problem_gradient_fill_mechanical(void) {
+
+  feenox_problem_fill_aux_solution(mechanical.exx);
+  feenox_problem_fill_aux_solution(mechanical.eyy);
+  feenox_problem_fill_aux_solution(mechanical.exy);
+  if (feenox.pde.dofs == 3) {
+    feenox_problem_fill_aux_solution(mechanical.ezz);
+    feenox_problem_fill_aux_solution(mechanical.eyz);
+    feenox_problem_fill_aux_solution(mechanical.ezx);
+  }
   
   feenox_problem_fill_aux_solution(mechanical.sigmax);
   feenox_problem_fill_aux_solution(mechanical.sigmay);
@@ -80,8 +89,7 @@ int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
   if (node->flux == NULL) {
     feenox_check_alloc(node->flux = calloc(FLUX_SIZE, sizeof(double)));
   } else {
-    unsigned int m = 0;
-    for (m = 0; m < flux_size; m++) {
+    for (unsigned int m = 0; m < flux_size; m++) {
       node->flux[m] = 0;
     }
   }
@@ -122,7 +130,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   
   
   // TODO: virtual methods in the material ctx
-  // TODO: use an integer flag
+  // TODO: use an integer flag for ldef
   if (feenox_var_value(mechanical.ldef) == 0) {
     exx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
     eyy = gsl_matrix_get(element->dphidx_node[j], 1, 1);
@@ -176,15 +184,15 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
     // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
-    double sigmat_x = 0;
-    double sigmat_y = 0;
-    double sigmat_z = 0;
+    double sigmax_thermal = 0;
+    double sigmay_thermal = 0;
+    double sigmaz_thermal = 0;
     
-    feenox_call(mechanical.compute_thermal_stress(node->x, element->physical_group->material, &sigmat_x, &sigmat_y, &sigmat_z));
+    feenox_call(mechanical.compute_thermal_stress(node->x, element->physical_group->material, &sigmax_thermal, &sigmay_thermal, &sigmaz_thermal));
 
-    sigmax -= sigmat_x;
-    sigmay -= sigmat_y;
-    sigmaz -= sigmat_z;
+    sigmax -= sigmax_thermal;
+    sigmay -= sigmay_thermal;
+    sigmaz -= sigmaz_thermal;
   }
 
   node->flux[FLUX_EXX] += rel_weight * (exx - node->flux[FLUX_EXX]);
@@ -209,6 +217,15 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
 }
 
 int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
+
+  feenox_vector_set(mechanical.exx->vector_value, j, mesh->node[j].flux[FLUX_EXX]);
+  feenox_vector_set(mechanical.eyy->vector_value, j, mesh->node[j].flux[FLUX_EYY]);
+  feenox_vector_set(mechanical.exy->vector_value, j, mesh->node[j].flux[FLUX_EXY]);
+  if (feenox.pde.dofs == 3) {
+    feenox_vector_set(mechanical.ezz->vector_value, j, mesh->node[j].flux[FLUX_EZZ]);
+    feenox_vector_set(mechanical.eyz->vector_value, j, mesh->node[j].flux[FLUX_EYZ]);
+    feenox_vector_set(mechanical.ezx->vector_value, j, mesh->node[j].flux[FLUX_EZX]);
+  }
   
   feenox_vector_set(mechanical.sigmax->vector_value, j, mesh->node[j].flux[FLUX_SIGMAX]);
   feenox_vector_set(mechanical.sigmay->vector_value, j, mesh->node[j].flux[FLUX_SIGMAY]);

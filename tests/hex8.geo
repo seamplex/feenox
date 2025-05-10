@@ -11,6 +11,7 @@ Physical Surface("right", 2) = {2};
 Physical Volume("bulk", 3) = {1};
 
 Mesh.ElementOrder = 1;
+Mesh.SecondOrderIncomplete = 1;
 Mesh.RecombineAll = 1;
 
 // Transfinite Curve {1, 3, 5, 7} = 4/Mesh.ElementOrder + 1;
