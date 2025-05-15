@@ -23,47 +23,8 @@
 #include "mechanical.h"
 
 int feenox_mechanical_material_init_linear_elastic(material_t *material, int i) {
-  // TODO: check E & nu or lambda & mu (use i)
- 
-  return material_model_elastic_isotropic;
-}
-
-int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i) {
-/*  
-  if (material->ctx == NULL) {
-    feenox_push_error_message("internal error");
-    return FEENOX_ERROR;
-  }
-  mechanical_material_ctx_t *context = material->ctx;  
-*/  
-  int n_ortho = mechanical.E_x.defined_per_group[i]   + mechanical.E_y.defined_per_group[i]   + mechanical.E_z.defined_per_group[i]   +
-                mechanical.nu_xy.defined_per_group[i] + mechanical.nu_yz.defined_per_group[i] + mechanical.nu_zx.defined_per_group[i] +
-                mechanical.G_xy.defined_per_group[i]  + mechanical.G_yz.defined_per_group[i]  + mechanical.G_zx.defined_per_group[i];
-  
-  if (n_ortho < 9) {
-    feenox_push_error_message("%d orthotropic properties missing for material '%s'", 9-n_ortho, material->name);
-    return FEENOX_ERROR;
-  }
-
-  // TODO: check E & nu or lambda & mu
-  
-  return material_model_elastic_orthotropic;
-
-}
-
-
-int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
-/*  
-  if (material->ctx == NULL) {
-    feenox_push_error_message("internal error");
-    return FEENOX_ERROR;
-  }
-  mechanical_material_ctx_t *context = material->ctx;  
-*/  
-  // TO-DO
-
-  return material_model_hyperelastic_neohookean;
-
+  // TODO: for lambda & mu 
+  return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_elastic_isotropic : material_model_unknown;
 }
 
 void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu) {

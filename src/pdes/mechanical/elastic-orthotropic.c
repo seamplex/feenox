@@ -22,6 +22,21 @@
 #include "feenox.h"
 #include "mechanical.h"
 
+int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i) {
+  int n_ortho = mechanical.E_x.defined_per_group[i]   + mechanical.E_y.defined_per_group[i]   + mechanical.E_z.defined_per_group[i]   +
+                mechanical.nu_xy.defined_per_group[i] + mechanical.nu_yz.defined_per_group[i] + mechanical.nu_zx.defined_per_group[i] +
+                mechanical.G_xy.defined_per_group[i]  + mechanical.G_yz.defined_per_group[i]  + mechanical.G_zx.defined_per_group[i];
+  
+  if (n_ortho < 9) {
+    feenox_push_error_message("%d orthotropic properties missing for material '%s'", 9-n_ortho, material->name);
+    return FEENOX_ERROR;
+  }
+
+  return material_model_elastic_orthotropic;
+
+}
+
+
 int feenox_problem_mechanical_compute_C_elastic_orthotropic(const double *x, material_t *material) {
   
   // TODO: check ranges of validity

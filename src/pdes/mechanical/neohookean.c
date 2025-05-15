@@ -22,6 +22,12 @@
 #include "feenox.h"
 #include "mechanical.h"
 
+int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
+  // TO-DO: mu and K
+  return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_hyperelastic_neohookean : material_model_unknown;
+}
+
+
 // TODO: ask for grad_u as parameter
 int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material) {
   // cauchy-green strain
@@ -35,3 +41,6 @@ int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, m
   
   return FEENOX_OK;
 }
+
+// TODO:
+// int feenox_problem_mechanical_compute_C_hyperelastic_neohookean(const double *x, material_t *material);
