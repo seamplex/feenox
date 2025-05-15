@@ -2789,7 +2789,7 @@ int feenox_parse_material(void) {
 ///kw_pde+MATERIAL+usage [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ] @
 ///kw_pde+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
 ///kw_pde+MATERIAL+detail added using as many `LABEL` keywords as needed.
-    } else if (strcasecmp(token, "LABEL") == 0 ||strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+    } else if (strcasecmp(token, "LABEL") == 0 || strcasecmp(token, "GROUP") == 0 ||strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
 
@@ -2801,7 +2801,13 @@ int feenox_parse_material(void) {
       // TODO: api
       physical_group->material = material;
       feenox_free(physical_group_name);
-        
+
+    } else if (strcasecmp(token, "MODEL") == 0) {
+///kw_pde+MATERIAL+usage [ MODEL <model_name> ] @
+///kw_pde+MATERIAL+detail For the mechanical problem, a string with the material model can be passed with `MODEL`.
+///kw_pde+MATERIAL+detail See the particular documentation of the mechanical problem for details.
+      feenox_call(feenox_parser_string(&material->model));  
+      
     } else {
 ///kw_pde+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
 ///kw_pde+MATERIAL+detail The names of the properties in principle can be arbitrary, but each problem type

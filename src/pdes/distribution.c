@@ -27,8 +27,10 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
 
   feenox_check_alloc(this->name = strdup(name));
 
-  int n_groups = HASH_COUNT(feenox.pde.mesh->physical_groups);
-  feenox_check_alloc(this->defined_per_group = calloc(n_groups, sizeof(int)));
+  if (feenox.pde.mesh->n_groups == 0) {
+    feenox.pde.mesh->n_groups = HASH_COUNT(feenox.pde.mesh->physical_groups);
+  }
+  feenox_check_alloc(this->defined_per_group = calloc(feenox.pde.mesh->n_groups, sizeof(int)));
   
   // first try a property, if this is the case then we have it easy
   int n_volumes = 0;
@@ -39,7 +41,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     physical_group_t *physical_group = NULL;
     physical_group_t *tmp_group = NULL;
     int i = 0;
-    HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
+    for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
       if (physical_group->dimension == feenox.pde.dim) {
         if (physical_group->material != NULL) {
           property_data_t *property_data = NULL;
@@ -75,7 +77,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   physical_group_t *physical_group = NULL;
   physical_group_t *tmp_group = NULL;
   int i = 0;
-  HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
+  for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *function_name = NULL;
       feenox_check_minusone(asprintf(&function_name, "%s_%s", name, physical_group->name));
@@ -126,7 +128,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
       return FEENOX_ERROR;
     }
 
-    for (int i = 0; i < n_groups; i++) {
+    for (int i = 0; i < feenox.pde.mesh->n_groups; i++) {
       this->defined_per_group[i] = 1;            
     }
     this->defined = 1;
@@ -148,7 +150,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   physical_group = NULL;
   tmp_group = NULL;
   i = 0;
-  HASH_ITER(hh, feenox.pde.mesh->physical_groups, physical_group, tmp_group) {
+  for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->dimension == feenox.pde.dim) {
       char *var_name = NULL;
       feenox_check_minusone(asprintf(&var_name, "%s_%s", name, physical_group->name));
@@ -186,7 +188,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   
   // try a single global variable
   if ((this->variable = feenox_get_variable_ptr(name)) != NULL) {
-    for (int i = 0; i < n_groups; i++) {
+    for (int i = 0; i < feenox.pde.mesh->n_groups; i++) {
       this->defined_per_group[i] = 1;
     }
     this->defined = 1;

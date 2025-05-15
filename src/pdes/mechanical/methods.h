@@ -70,13 +70,19 @@ extern int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix 
 // mechanica/stress.c
 
 // material models
+
+// linear elastic isotropic
+extern int feenox_mechanical_material_init_linear_elastic(material_t *material, int i);
 extern void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu);
 extern int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, material_t *material);
 
-// linear elastic
 extern int feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material);
 
+// linear elastic orthotropic
+extern int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i);
+
 // neohookean
+extern int feenox_mechanical_material_init_neohookean(material_t *material, int i);
 extern int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material);
 
 extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void);

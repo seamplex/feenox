@@ -205,32 +205,32 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox.pde.mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = feenox.pde.mesh->n_nodes;
 
-  // initialize distributions
+/*  
+  // in mechanical we use the material's context
+  // we have to move this down this function when we are good with models and real materials 
+  material_t *material = NULL;
+  for (material = feenox.mesh.materials; material != NULL; material = material->hh.next) {
+    mechanical_material_ctx_t *context = calloc(1, sizeof(mechanical_material_ctx_t));
+    material->ctx = context;
+    if (material->model != NULL) {
+      if (strcmp(material->model, "linear_elastic") == 0 || strcmp(material->model, "linear_elastic_isotropic") == 0) {
+        context->material_model = material_model_elastic_isotropic;
+      } else if (strcmp(material->model, "linear_elastic_orthotropic") == 0) {
+        context->material_model = material_model_elastic_orthotropic;
+      } else if (strcmp(material->model, "neohookean") == 0) {
+        context->material_model = material_model_hyperelastic_neohookean;
+      }
+    }
+  }
+*/
   
-  // first see if we have linear elastic
+  // valid property names
   feenox_call(feenox_distribution_init(&mechanical.E, "E"));  
   feenox_call(feenox_distribution_init(&mechanical.nu, "nu"));  
+  feenox_call(feenox_distribution_init(&mechanical.lambda, "lambda"));  
+  feenox_call(feenox_distribution_init(&mechanical.mu, "mu"));  
   
-  // TODO: allow different volumes to have different material models
-  if (mechanical.E.defined && mechanical.nu.defined) {
-    if (mechanical.E.full == 0) {
-      feenox_push_error_message("Young modulus 'E' is not defined over all volumes");
-      return FEENOX_ERROR;
-    }
-    if (mechanical.nu.full == 0) {
-      feenox_push_error_message("Poisson’s ratio 'nu' is not defined over all volumes");
-      return FEENOX_ERROR;
-    }
-    mechanical.material_model = material_model_elastic_isotropic;
-  } else if (mechanical.E.defined) {
-    feenox_push_error_message("Young modulus 'E' defined but Poisson’s ratio 'nu' not defined");
-    return FEENOX_ERROR;
-  } else if (mechanical.nu.defined) {
-    feenox_push_error_message("Poisson’s ratio 'nu' defined but Young modulus 'E' not defined");
-    return FEENOX_ERROR;
-  }
-  
-  // see if there are orthotropic properties
+  // orthotropic properties
   feenox_call(feenox_distribution_init(&mechanical.E_x, "Ex"));
   if (mechanical.E_x.defined == 0) {
     feenox_call(feenox_distribution_init(&mechanical.E_x, "E_x"));
@@ -270,21 +270,83 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_call(feenox_distribution_init(&mechanical.G_zx, "G_zx"));
   }
   
-  // check for consistency
-  int n_ortho = mechanical.E_x.defined   + mechanical.E_y.defined   + mechanical.E_z.defined   +
-                mechanical.nu_xy.defined + mechanical.nu_yz.defined + mechanical.nu_zx.defined +
-                mechanical.G_xy.defined  + mechanical.G_yz.defined  + mechanical.G_zx.defined;
   
-  if (n_ortho > 0) {
-    if (mechanical.material_model == material_model_elastic_isotropic) {
-      feenox_push_error_message("both isotropic and orthotropic properties given, choose one");
-      return FEENOX_ERROR;
-    } else if (n_ortho < 9) {
-      feenox_push_error_message("%d orthotropic properties missing", 9-n_ortho);
-      return FEENOX_ERROR;
-    } else if (mechanical.material_model == material_model_unknown) {
-      mechanical.material_model = material_model_elastic_orthotropic;
+  mechanical.material_model = -1;
+  int material_model[feenox.pde.mesh->n_groups];
+  physical_group_t *physical_group = NULL;
+  int i = 0;
+  for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+    if (physical_group->dimension == feenox.pde.dim) {
+    
+      material_model[i] = material_model_unknown;
+      material_t *material = physical_group->material;
+    
+      // first see if the materials have explicit models via MODEL model_name
+      if ((material) != NULL) {
+        if (material->model != NULL) {
+          if (strcmp(material->model, "linear_elastic") == 0 || strcmp(physical_group->material->model, "linear_elastic_isotropic") == 0) {
+            material_model[i] = material_model_elastic_isotropic;
+          } else if (strcmp(material->model, "linear_elastic_orthotropic") == 0) {
+            material_model[i] = material_model_elastic_orthotropic;
+          } else if (strcmp(material->model, "neohookean") == 0) {
+            material_model[i] = material_model_hyperelastic_neohookean;
+          }
+        }
+      }
+        
+      // if not, see if we can figure it out automatically
+      if (material_model[i] == material_model_unknown) {
+        if ((mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ||
+            (mechanical.lambda.defined_per_group[i] && mechanical.mu.defined_per_group[i])) {
+          material_model[i] = material_model_elastic_isotropic;
+        } else if (mechanical.E_x.defined_per_group[i]   + mechanical.E_y.defined_per_group[i]   + mechanical.E_z.defined_per_group[i]   +
+                   mechanical.nu_xy.defined_per_group[i] + mechanical.nu_yz.defined_per_group[i] + mechanical.nu_zx.defined_per_group[i] +
+                   mechanical.G_xy.defined_per_group[i]  + mechanical.G_yz.defined_per_group[i]  + mechanical.G_zx.defined_per_group[i]) {
+          material_model[i] = material_model_elastic_orthotropic;
+        } else {
+          feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
+          return FEENOX_ERROR;
+        }
+      }
+    
+      // now fill in the details
+      switch (material_model[i]) {
+        case material_model_elastic_isotropic:
+          material_model[i] = feenox_mechanical_material_init_linear_elastic(material, i);
+        break;
+        case material_model_elastic_orthotropic:
+          material_model[i] = feenox_mechanical_material_init_linear_elastic_orthotropic(material, i);
+        break;
+        case material_model_hyperelastic_neohookean:
+          material_model[i] = feenox_mechanical_material_init_neohookean(material, i);
+        break;
+        default:
+          feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
+          return FEENOX_ERROR;
+      }
+      
+      if (material_model[i] <= 0) {
+        return FEENOX_ERROR;
+      }
+
+      // if there is an actual material, set it in the context
+      if (material != NULL) {
+        if (material->ctx == NULL) {
+          feenox_check_alloc(material->ctx = calloc(1, sizeof(mechanical_material_ctx_t)));
+        }
+        mechanical_material_ctx_t *context = material->ctx;
+        context->material_model = material_model[i];
+      }
+      
+      // see if all the materials have the same model
+      if (mechanical.material_model == -1) {
+        mechanical.material_model = material_model[i];
+      } else if (mechanical.material_model != material_model[i]) {
+        mechanical.material_model = material_model_unknown;
+      }
     }
+
+    i++;
   }
   
   // thermal expansion model
@@ -309,7 +371,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // check for consistency
-  n_ortho = mechanical.alpha_x.defined + mechanical.alpha_y.defined + mechanical.alpha_z.defined;
+  int n_ortho = mechanical.alpha_x.defined + mechanical.alpha_y.defined + mechanical.alpha_z.defined;
   
   if (n_ortho > 0) {
     if (mechanical.thermal_expansion_model == thermal_expansion_model_isotropic) {
@@ -362,9 +424,8 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_call(feenox_distribution_init(&mechanical.f_z, "f_z"));
   }
   
-  
-
   // set material model virtual methods
+  // TODO: handle different models
   switch (mechanical.material_model) {
   
     case material_model_elastic_isotropic:
@@ -400,6 +461,7 @@ int feenox_problem_init_runtime_mechanical(void) {
     break;
     
     default:
+      // TODO
       feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
       return FEENOX_ERROR;
     break;

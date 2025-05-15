@@ -1154,6 +1154,7 @@ struct material_t {
   mesh_t *mesh;
   property_data_t *property_datums;
   
+  char *model;
   void *ctx;
 
   UT_hash_handle hh;
@@ -1277,6 +1278,7 @@ struct mesh_t {
   physical_group_t *physical_groups;              // global hash table
   physical_group_t *physical_groups_by_tag[4];    // 4 hash tables one per tag
   int physical_tag_max;                           // the higher tag of the entities
+  int n_groups;
   
   // number of geometric entities of each dimension
   size_t points, curves, surfaces, volumes;

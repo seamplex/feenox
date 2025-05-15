@@ -39,7 +39,18 @@ typedef struct feenox_linearize_t feenox_linearize_t;
 
 struct mechanical_material_ctx_t {
 
-  double E;
+  enum {
+    material_model_unknown,
+    material_model_elastic_isotropic,
+    material_model_elastic_orthotropic,    
+    material_model_hyperelastic_neohookean,
+  } material_model;
+
+  enum {
+    thermal_expansion_model_none,
+    thermal_expansion_model_isotropic,
+    thermal_expansion_model_orthotropic,    
+  } thermal_expansion_model;
   
 };
 
@@ -53,22 +64,16 @@ struct mechanical_t {
     variant_axisymmetric,
   } variant;  
   
-  enum {
-    material_model_unknown,
-    material_model_elastic_isotropic,
-    material_model_elastic_orthotropic,    
-  } material_model;
-
-  enum {
-    thermal_expansion_model_none,
-    thermal_expansion_model_isotropic,
-    thermal_expansion_model_orthotropic,    
-  } thermal_expansion_model;
+  // using the enums above
+  int material_model;
+  int thermal_expansion_model;
   
   // isotropic properties  
-  distribution_t E;     // Young's modulus
-  distribution_t nu;    // Poisson's ratio
-  distribution_t alpha; // (mean) thermal expansion coefficient
+  distribution_t E;           // Young's modulus
+  distribution_t nu;          // Poisson's ratio
+  distribution_t lambda;      // Lame 
+  distribution_t mu;          // Lame
+  distribution_t alpha;       // (mean) thermal expansion coefficient
   
   // orthotropic properties
   distribution_t E_x, E_y, E_z;             // Young's moduli
