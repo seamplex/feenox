@@ -29,18 +29,39 @@ int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
 
 
 // TODO: ask for grad_u as parameter
+/*
 int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material) {
-  // cauchy-green strain
-  feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(mechanical.grad_u));  
-
-  // cauchy stress
-  feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(x, material));  
-
-  // first piola kirchoff
-  feenox_call(feenox_problem_mechanical_compute_stress_first_piola_kirchoff());
   
   return FEENOX_OK;
 }
-
+*/
 // TODO:
 // int feenox_problem_mechanical_compute_C_hyperelastic_neohookean(const double *x, material_t *material);
+
+int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material) {
+  // volume change    
+  double J = feenox_fem_determinant(mechanical.F);
+    
+  // invariant
+//  double I1 = gsl_matrix_get(mechanical.LCG, 0, 0) + gsl_matrix_get(mechanical.LCG, 1, 1) + gsl_matrix_get(mechanical.LCG, 1, 1);
+    
+  // neo-hookean cauchy stress
+  // sigma = (mu/J) * (b - I) + lambda/J * log(J) * I
+    
+  double lambda, mu;
+  feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
+    
+  // deviatoric
+  gsl_matrix_memcpy(mechanical.cauchy, mechanical.epsilon);
+  gsl_matrix_sub(mechanical.cauchy, mechanical.eye);
+  gsl_matrix_scale(mechanical.cauchy, mu/J);
+    
+  // volumetric
+  gsl_matrix_memcpy(mechanical.volumetric, mechanical.eye);
+  gsl_matrix_scale(mechanical.volumetric, lambda/J * log(J));
+    
+  // cauchy
+  gsl_matrix_add(mechanical.cauchy, mechanical.volumetric);
+    
+  return FEENOX_OK;
+}

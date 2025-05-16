@@ -37,7 +37,7 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
   }
   feenox_check_alloc(mechanical.CB = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
 
-  // --- ldef stuff ------------------
+  // --- non-linear stuff ------------------
   if (feenox.pde.math_type == math_type_nonlinear) {
     // displacement gradient
     if (mechanical.grad_u == NULL) {
@@ -68,24 +68,23 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
       feenox_check_alloc(mechanical.invF = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
     
-    // green-lagrange strain tensor
-    if (mechanical.epsilon == NULL) {
-      feenox_check_alloc(mechanical.epsilon = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    // strains
+    if (mechanical.epsilon_cauchy_green == NULL) {
+      feenox_check_alloc(mechanical.epsilon_cauchy_green = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
-
-    // cauchy-green
-    if (mechanical.LCG == NULL) {
-      feenox_check_alloc(mechanical.LCG = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    if (mechanical.epsilon_green_lagrange == NULL) {
+      feenox_check_alloc(mechanical.epsilon_green_lagrange = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
     
-    // cauchy stress tensor
+    // stresses
+    if (mechanical.PK1 == NULL) {
+      feenox_check_alloc(mechanical.PK1 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    }
+    if (mechanical.PK2 == NULL) {
+      feenox_check_alloc(mechanical.PK2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    }
     if (mechanical.cauchy == NULL) {
       feenox_check_alloc(mechanical.cauchy = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    
-    // first/second piola-kirchoff stress tensor
-    if (mechanical.PK == NULL) {
-      feenox_check_alloc(mechanical.PK = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
     
     if (mechanical.PK_voigt == NULL) {
@@ -101,7 +100,13 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
       gsl_matrix_free(mechanical.G);
     }
     feenox_check_alloc(mechanical.G = gsl_matrix_calloc(feenox.pde.dofs*feenox.pde.dofs, feenox.pde.dofs * mechanical.n_nodes));
-  
+
+    // holders
+    if (mechanical.volumetric == NULL) {
+      feenox_check_alloc(mechanical.volumetric = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    }
+    
+    
     // this is a temporary holder to compute GtSigmaG
     if (mechanical.SigmaG != NULL) {
       gsl_matrix_free(mechanical.SigmaG);
@@ -155,7 +160,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   if (mechanical.uniform_C == 0) {
     // material stress-strain relationship
     x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
-    mechanical.compute_C(x, feenox_fem_get_material(e));
+    feenox_call(mechanical.compute_C(x, feenox_fem_get_material(e)));
   }
   
   gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
@@ -239,38 +244,46 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
     }
   }
 
-  int model = 1;
-  
-  double Sxx;
-  double Syy;
-  double Szz;
-  double Sxy;
-  double Syz;
-  double Szx;
-  
-  if (model == 1) {
+  // TODO: orthotropic
+  if (mechanical.material_model == material_model_elastic_isotropic) {
     // linear elastic
-    feenox_call(feenox_problem_build_mechanical_stress_measure_linear_elastic(x, material));
+    mechanical.epsilon = mechanical.epsilon_green_lagrange;
+    mechanical.PK = mechanical.PK2;
+    mechanical.S = mechanical.PK2;
     
-    Sxx = gsl_matrix_get(mechanical.PK, 0, 0);
-    Syy = gsl_matrix_get(mechanical.PK, 1, 1);
-    Szz = gsl_matrix_get(mechanical.PK, 2, 2);
-    Sxy = gsl_matrix_get(mechanical.PK, 0, 1);
-    Syz = gsl_matrix_get(mechanical.PK, 1, 2);
-    Szx = gsl_matrix_get(mechanical.PK, 2, 0);
+//    feenox_call(feenox_problem_build_mechanical_stress_measure_linear_elastic(x, material));
+    // green-lagrange strain
+    feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.grad_u));
+    // second piola kirchoff stress tensor
+    feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(x, material));
     
-  } else if (model == 2) {
+  } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
     // neohookean
-    feenox_call(feenox_problem_build_mechanical_stress_measure_neohookean(x, material));
- 
-    Sxx = gsl_matrix_get(mechanical.cauchy, 0, 0);
-    Syy = gsl_matrix_get(mechanical.cauchy, 1, 1);
-    Szz = gsl_matrix_get(mechanical.cauchy, 2, 2);
-    Sxy = gsl_matrix_get(mechanical.cauchy, 0, 1);
-    Syz = gsl_matrix_get(mechanical.cauchy, 1, 2);
-    Szx = gsl_matrix_get(mechanical.cauchy, 2, 0);
+//    feenox_call(feenox_problem_build_mechanical_stress_measure_neohookean(x, material));
+    
+    // cauchy-green strain
+//    feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(mechanical.grad_u));
+
+    mechanical.epsilon = mechanical.epsilon_cauchy_green;
+    mechanical.PK = mechanical.PK1;
+    mechanical.S = mechanical.cauchy;
+
+  
+    feenox_call(mechanical.compute_C(x, feenox_fem_get_material(e)));
+    
+    feenox_call(feenox_problem_mechanical_compute_deformation_gradient(mechanical.grad_u));
+    // LCG = Ft * F   left cauchy-green tensor
+    feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_cauchy_green);
+    
+    // cauchy stress
+    feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(x, material));  
+
+    // first piola kirchoff
+    feenox_call(feenox_problem_mechanical_compute_stress_first_piola_kirchoff());
     
   }
+
+//  feenox_debug_print_gsl_matrix(mechanical.C, stdout);
   
 
   gsl_vector_set(mechanical.PK_voigt, 0, gsl_matrix_get(mechanical.PK, 0, 0));
@@ -282,6 +295,13 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
      
   // the 9x9 Sigma matrix
   // row 1  
+  double Sxx = gsl_matrix_get(mechanical.S, 0, 0);
+  double Syy = gsl_matrix_get(mechanical.S, 1, 1);
+  double Szz = gsl_matrix_get(mechanical.S, 2, 2);
+  double Sxy = gsl_matrix_get(mechanical.S, 0, 1);
+  double Syz = gsl_matrix_get(mechanical.S, 1, 2);
+  double Szx = gsl_matrix_get(mechanical.S, 2, 0);
+  
   gsl_matrix_set(mechanical.Sigma, 0, 0, Sxx);
   gsl_matrix_set(mechanical.Sigma, 1, 1, Sxx);
   gsl_matrix_set(mechanical.Sigma, 2, 2, Sxx);

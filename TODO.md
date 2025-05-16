@@ -1,8 +1,12 @@
 # General things to do
 
+ * `PROGRESS` `ascii_art` `percentage` `norm` 
+   - build, KSP, SNES
  * implicit call to `SOLVE_PROBLEM`?
  * for/while loops?
  * use `DMPlex`?
+    - to read non-gmsh meshes?
+    - to partition meshes on the fly?
     - allocate matrices?
     - dump states?
     - choose to use it or not
@@ -118,16 +122,14 @@
 # PDEs
 
  * check when the matrices do not need to be rebuilt -- use constant flag
- * allow different material model for each volume!
-   - so far we have a global material model, i.e. all the materials have to be orthotropic
-   - this is wrong!
  * remove the need of needing an explicit `SOLVE_PROBLEM`
    - detect which variables/functions are PDE outputs and call `solve_problem()` the first time they are needed
  * benchmark MPI (read `.msh` with partitioning info first)
- * openmp to build matrices and compute stresses? not sure, we'd have to rewrite the building stuff thread safe, it should be mpi on a partitioned mesh
  * glue (mortar)
  * investigate `-mpi_linear_solver_server`
  * direct elimination for multi-freedom BCs
+ * third-medium contact?
+
  
 ## Laplace/Poisson/Helmholtz
 
@@ -145,10 +147,17 @@
  
 ## Mechanical
 
- * large deformation
- * non-linear materials
+ * be able to use $\lambda$ & $\mu$ for elasticity
+ * plasticity
  * stresses: count negative jacobians and worst jacobians
  * strain energy density
+ * compare non-linear solutions against other solvers
+ * quasi-static: use PETSc's TS
+   - if a simple SNES does not converge, convert to TS
+   - if $\det{F} \leq 0$, convert to TS
+   - `PROBLEM` `AUTO_LOAD_STEPS`
+ *   
+   
 
 ## Modal
 

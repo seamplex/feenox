@@ -36,7 +36,7 @@ int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u
   feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
   
   // LCG = Ft * F   left cauchy-green tensor
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.LCG);
+  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon);
 
   return FEENOX_OK;
 }

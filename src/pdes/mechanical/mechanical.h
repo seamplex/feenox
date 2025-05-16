@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox mechanical header
  *
- *  Copyright (C) 2021-2022 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -57,6 +57,9 @@ struct mechanical_material_ctx_t {
 
 struct mechanical_t {
   
+  int nonlinear_geom;
+  int nonlinear_material;
+  
   enum {
     variant_full,
     variant_plane_stress,
@@ -80,7 +83,9 @@ struct mechanical_t {
   distribution_t nu_xy, nu_yz, nu_zx;       // Poisson's ratios
   distribution_t G_xy, G_yz, G_zx;          // Shear moduli
   distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient
-          
+
+  // TODO: neohookean with mu and K
+  
   // temperature field
   distribution_t T;     // temperature distribution
   distribution_t T_ref; // reference temperature (has to be a constant)
@@ -127,25 +132,34 @@ struct mechanical_t {
   gsl_matrix *grad_u;  // displacement gradient
   gsl_matrix *F;       // deformation gradient
   gsl_matrix *invF;    // inverse deformation gradient
-  gsl_matrix *epsilon;     // green-lagrange strain
-  gsl_matrix *LCG;     // left cauchy-green
-  gsl_matrix *PK;      // piola-kirchoff stress (either first or second)
-  gsl_matrix *Sigma;   // 9x9 expansion of Ss
-  gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
-  gsl_matrix *G;       // matrix with derivatives of shape functions
-  gsl_matrix *SigmaG;  // temporary holder
+  
+  gsl_matrix *epsilon_green_lagrange; // green-lagrange strain
+  gsl_matrix *epsilon_cauchy_green ;  // cauchy-green strain
+  gsl_matrix *epsilon; // pointer to one of above
+
+  gsl_matrix *PK1;     // first piola-kirchoff stress
+  gsl_matrix *PK2;     // second piola-kirchoff stress
+  gsl_matrix *PK;      // pointer to one of above
   gsl_vector *PK_voigt; // S in voigt notation
   
+  gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
+  gsl_matrix *S;       // stress for Sigma (pointer to either PK2 or cauchy)
+  gsl_matrix *Sigma;   // 9x9 expansion of S
+  
+  gsl_matrix *G;       // matrix with derivatives of shape functions
+  gsl_matrix *SigmaG;  // temporary holder
+  
   // temporary non-linear
-  gsl_matrix *eye;     // 3x3 identity
-  gsl_matrix *twomuE;  // temporary holder
-  gsl_matrix *SF;  // temporary holder
+  gsl_matrix *eye;        // 3x3 identity (the symbol I is already taken by complex.h)
+  gsl_matrix *twomuE;     // temporary holder
+  gsl_matrix *SF;         // temporary holder
+  gsl_matrix *volumetric;
 
   
 //  double hourglass_epsilon;
 
   var_t *ldef;
-  var_t *ldef_check;
+//  var_t *ldef_check;
 
   // for implicit multi-dof BCs
   var_t *displ_for_bc[3];

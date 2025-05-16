@@ -140,8 +140,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     
   } else {
 
-    int model = 1;
-    if (model == 1) {
+    if (mechanical.material_model == material_model_elastic_isotropic) {
       // linear elastic
       // green-lagrange strain  
       feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]));  
@@ -166,18 +165,18 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       tauxy = gsl_matrix_get(mechanical.cauchy, 0, 1);
       tauyz = gsl_matrix_get(mechanical.cauchy, 1, 2);
       tauzx = gsl_matrix_get(mechanical.cauchy, 2, 0);
-    } else if (model == 2) {
+      
+    } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
       // neo-hookean
       // left cauchy green
       feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(element->dphidx_node[j]));  
 
-      // is this ok? or should we always use the green-lagrange strain?
-      exx = gsl_matrix_get(mechanical.LCG, 0, 0);
-      eyy = gsl_matrix_get(mechanical.LCG, 1, 1);
-      ezz = gsl_matrix_get(mechanical.LCG, 2, 2);
-      exy = gsl_matrix_get(mechanical.LCG, 0, 1);
-      eyz = gsl_matrix_get(mechanical.LCG, 1, 2);
-      ezx = gsl_matrix_get(mechanical.LCG, 2, 0);
+      exx = gsl_matrix_get(mechanical.epsilon, 0, 0);
+      eyy = gsl_matrix_get(mechanical.epsilon, 1, 1);
+      ezz = gsl_matrix_get(mechanical.epsilon, 2, 2);
+      exy = gsl_matrix_get(mechanical.epsilon, 0, 1);
+      eyz = gsl_matrix_get(mechanical.epsilon, 1, 2);
+      ezx = gsl_matrix_get(mechanical.epsilon, 2, 0);
 
       // second piola kirchoff    
       feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(node->x, element->physical_group->material));

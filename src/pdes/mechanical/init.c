@@ -140,9 +140,9 @@ int feenox_problem_parse_time_init_mechanical(void) {
 ///va+ldef+detail or with the `--non-linear` command-line option.
   feenox_check_alloc(mechanical.ldef = feenox_define_variable_get_ptr("ldef"));
 
-///va+ldef+detail Flag that asks FeenoX to check if the deformations are large after
-///va+ldef+detail solving a linear problem. If they are, a warning is issued.
-  feenox_check_alloc(mechanical.ldef_check = feenox_define_variable_get_ptr("ldef_check"));
+//va+ldef+detail Flag that asks FeenoX to check if the deformations are large after
+//va+ldef+detail solving a linear problem. If they are, a warning is issued.
+//  feenox_check_alloc(mechanical.ldef_check = feenox_define_variable_get_ptr("ldef_check"));
   
 // these are for the algebraic expressions in the  implicitly-defined BCs
 // i.e. 0=u*nx+v*ny or 0=u*y-v*x
@@ -291,6 +291,9 @@ int feenox_problem_init_runtime_mechanical(void) {
         material_model[i] = attemped_model;
       }
       
+      // zero means "that's not my model" so it should be caught in the default about
+      // -1 means "there's something wrong" so we should fail (the error message
+      // should be pushed by the particular model)
       if (material_model[i] <= 0) {
         return FEENOX_ERROR;
       }
@@ -425,7 +428,23 @@ int feenox_problem_init_runtime_mechanical(void) {
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
     
     break;
-    
+
+    case material_model_hyperelastic_neohookean:
+
+      
+      // TODO: this should go into neohookean.c
+      if (mechanical.variant != variant_full) {
+        feenox_push_error_message("hyperelastic neohookean materials cannot be used in plane stress/strain");
+        return FEENOX_ERROR;
+      }
+      
+      // TODO: compute C
+      mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_isotropic;
+      mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+      mechanical.nonlinear_material = 1;
+      
+    break;
+      
     default:
       // TODO
       feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
@@ -471,11 +490,11 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   if (feenox.pde.math_type == math_type_automatic) {
-    if (feenox_var_value(mechanical.ldef) == 0) {
-      feenox.pde.math_type = math_type_linear;
-      feenox_var_value(mechanical.ldef_check) = 1;
-    } else {
+    if (mechanical.nonlinear_material || feenox_var_value(mechanical.ldef) != 0) {
       feenox.pde.math_type = math_type_nonlinear;
+    } else {
+      feenox.pde.math_type = math_type_linear;
+//      feenox_var_value(mechanical.ldef_check) = 1;
     }
   }
   
@@ -486,7 +505,7 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear;
     feenox.pde.has_internal_fluxes = 1;
     feenox_var_value(mechanical.ldef) = 1;
-    feenox_var_value(mechanical.ldef_check) = 0;
+//    feenox_var_value(mechanical.ldef_check) = 0;
   } else {
     feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);
   }

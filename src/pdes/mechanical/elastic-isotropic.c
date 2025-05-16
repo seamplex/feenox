@@ -88,36 +88,6 @@ int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotr
   return FEENOX_OK;
 }
 
-int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material) {
-  // volume change    
-  double J = feenox_fem_determinant(mechanical.F);
-    
-  // invariant
-//  double I1 = gsl_matrix_get(mechanical.LCG, 0, 0) + gsl_matrix_get(mechanical.LCG, 1, 1) + gsl_matrix_get(mechanical.LCG, 1, 1);
-    
-  // neo-hookean cauchy stress
-  // sigma = (mu/J) * (b - I) + lambda/J * log(J) * I
-    
-  double lambda, mu;
-  feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
-    
-  // deviatoric
-  gsl_matrix_memcpy(mechanical.cauchy, mechanical.LCG);
-  gsl_matrix_sub(mechanical.cauchy, mechanical.eye);
-  gsl_matrix_scale(mechanical.cauchy, mu/J);
-    
-  // volumetric
-  gsl_matrix *volumetric = gsl_matrix_calloc(3, 3);
-  gsl_matrix_memcpy(volumetric, mechanical.eye);
-  gsl_matrix_scale(volumetric, lambda/J * log(J));
-    
-  // cauchy
-  gsl_matrix_add(mechanical.cauchy, volumetric);
-  gsl_matrix_free(volumetric);
-    
-  return FEENOX_OK;
-}
-
 int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
@@ -161,7 +131,7 @@ int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element
 }
 
 
-
+/*
 int feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material) {
   // green-lagrange strain
   feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.grad_u));
@@ -170,3 +140,4 @@ int feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *
 
   return FEENOX_OK;
 }
+*/

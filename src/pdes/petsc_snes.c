@@ -138,22 +138,30 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
     petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
   }
 
-//  printf("r as in f\n");
-//  petsc_call(VecView(r, PETSC_VIEWER_STDOUT_SELF));
-
+//#define VERBOSE
+  
+#ifdef VERBOSE
+  printf("r as in f\n");
+  petsc_call(VecView(r, PETSC_VIEWER_STDOUT_SELF));
+#endif
+  
   // subtract b
   petsc_call(VecAXPY(r, -1.0, feenox.pde.b));
-//  printf("r as in f-b\n");
-//  VecView(r, PETSC_VIEWER_STDOUT_SELF);
+#ifdef VERBOSE
+  printf("r as in f-b\n");
+  VecView(r, PETSC_VIEWER_STDOUT_SELF);
+#endif
 
   // set dirichlet BCs on the residual
   feenox_call(feenox_problem_dirichlet_set_r(r, phi));
 
-//  printf("r as in f-b + bcs\n");
-//  VecView(r, PETSC_VIEWER_STDOUT_SELF);
+#ifdef VERBOSE  
+  printf("r as in f-b + bcs\n");
+  VecView(r, PETSC_VIEWER_STDOUT_SELF);
 
-//  printf("solution\n");
-//  VecView(phi, PETSC_VIEWER_STDOUT_SELF);
+  printf("solution\n");
+  VecView(phi, PETSC_VIEWER_STDOUT_SELF);
+#endif
 
   return FEENOX_OK;
 }
