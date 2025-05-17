@@ -1,0 +1,14 @@
+READ_MESH hex8.msh
+PROBLEM mechanical PC mumps
+
+ldef = 1
+E = 1
+nu = 0.25
+
+BC left fixed
+BC right tz=2e-3
+
+SOLVE_PROBLEM
+
+# PRINT_FUNCTION u v w
+WRITE_RESULTS FORMAT vtk

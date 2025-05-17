@@ -4,12 +4,4 @@ old
 *.txt
 *.vtk
 thermal-*.pdf
-thermal*-fits.ppl
-
-thermal-cube*-e2.ppl
-thermal-cube*-einf.ppl
-
-thermal-cube?.fee
-thermal-cube?.ppl
-thermal-cube?-results.md
-thermal-cube?-q.fee
+thermal-cube-results.md

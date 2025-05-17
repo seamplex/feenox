@@ -1,0 +1,40 @@
+/* Method of Manufactured Solutions - Small Deformation Linear Elasticity */
+load("vect")$  
+ratprint: false$
+
+/* Material properties */
+lambda: \lambda$  
+mu: \mu$
+
+/* Reference coordinates */
+X: X$  
+Y: Y$  
+Z: Z$
+
+/* Manufactured displacement field u(X,Y,Z) */
+u: sin(%pi*X)$  
+v: Y^2 * Z$  
+w: X * exp(Y)$
+
+/* Small strain tensor epsilon = 0.5*(grad(u) + grad(u)^T) */
+epsilon: matrix(
+  [diff(u, X),       0.5*(diff(u, Y) + diff(v, X)), 0.5*(diff(u, Z) + diff(w, X))],
+  [0.5*(diff(v, X) + diff(u, Y)),       diff(v, Y),       0.5*(diff(v, Z) + diff(w, Y))],
+  [0.5*(diff(w, X) + diff(u, Z)), 0.5*(diff(w, Y) + diff(v, Z)),       diff(w, Z)]
+)$
+
+/* Cauchy stress sigma = lambda*tr(epsilon)*I + 2*mu*epsilon */
+tr_epsilon: epsilon[1,1] + epsilon[2,2] + epsilon[3,3]$
+sigma: lambda * tr_epsilon * ident(3) + 2 * mu * epsilon$
+
+/* Body force b0 = -Div(sigma) */
+b0_x: -diff(sigma[1,1], X) - diff(sigma[1,2], Y) - diff(sigma[1,3], Z)$  
+b0_y: -diff(sigma[2,1], X) - diff(sigma[2,2], Y) - diff(sigma[2,3], Z)$  
+b0_z: -diff(sigma[3,1], X) - diff(sigma[3,2], Y) - diff(sigma[3,3], Z)$
+
+/* Simplify and display */
+display2d: false$  
+b0_x: ratsimp(b0_x);  
+b0_y: ratsimp(b0_y);  
+b0_z: ratsimp(b0_z);
+

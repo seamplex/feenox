@@ -6,7 +6,7 @@ for i in . tests; do
 done
 if [ -z "${functions_found}" ]; then
   echo "could not find functions.sh"
-  exit 1;
+   exit 1
 fi
 
 answer materials.fee "0.1	10"

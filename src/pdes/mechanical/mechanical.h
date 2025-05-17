@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox mechanical header
  *
- *  Copyright (C) 2021-2022 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -34,22 +34,16 @@
 #define BC_TYPE_MECHANICAL_FORCE                19
 
 typedef struct mechanical_t mechanical_t;
+typedef struct mechanical_material_ctx_t mechanical_material_ctx_t;
 typedef struct feenox_linearize_t feenox_linearize_t;
 
-struct mechanical_t {
-  
-  enum {
-    variant_full,
-    variant_plane_stress,
-    variant_plane_strain,
-    variant_axisymmetric,
-  } variant;  
-  
-  // TODO: have a "mixed" material model where each volume has its own model
+struct mechanical_material_ctx_t {
+
   enum {
     material_model_unknown,
     material_model_elastic_isotropic,
     material_model_elastic_orthotropic,    
+    material_model_hyperelastic_neohookean,
   } material_model;
 
   enum {
@@ -58,16 +52,39 @@ struct mechanical_t {
     thermal_expansion_model_orthotropic,    
   } thermal_expansion_model;
   
+};
+
+
+struct mechanical_t {
+  
+  int nonlinear_geom;
+  int nonlinear_material;
+  
+  enum {
+    variant_full,
+    variant_plane_stress,
+    variant_plane_strain,
+    variant_axisymmetric,
+  } variant;  
+  
+  // using the enums above
+  int material_model;
+  int thermal_expansion_model;
+  
   // isotropic properties  
-  distribution_t E;     // Young's modulus
-  distribution_t nu;    // Poisson's ratio
-  distribution_t alpha; // (mean) thermal expansion coefficient
+  distribution_t E;           // Young's modulus
+  distribution_t nu;          // Poisson's ratio
+  distribution_t lambda;      // Lame 
+  distribution_t mu;          // Lame
+  distribution_t alpha;       // (mean) thermal expansion coefficient
   
   // orthotropic properties
   distribution_t E_x, E_y, E_z;             // Young's moduli
   distribution_t nu_xy, nu_yz, nu_zx;       // Poisson's ratios
   distribution_t G_xy, G_yz, G_zx;          // Shear moduli
   distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient
+
+  // TODO: neohookean with mu and K
   
   // temperature field
   distribution_t T;     // temperature distribution
@@ -110,8 +127,40 @@ struct mechanical_t {
   gsl_vector *et;   // thermal strain vector, size 6 for 3d
   gsl_vector *Cet;  // product of C times et, size 6 for 3d
   
-//  double hourglass_epsilon;
   
+  // non-linear stuff
+  gsl_matrix *grad_u;  // displacement gradient
+  gsl_matrix *F;       // deformation gradient
+  gsl_matrix *invF;    // inverse deformation gradient
+  
+  gsl_matrix *epsilon_green_lagrange; // green-lagrange strain
+  gsl_matrix *epsilon_cauchy_green ;  // cauchy-green strain
+  gsl_matrix *epsilon; // pointer to one of above
+
+  gsl_matrix *PK1;     // first piola-kirchoff stress
+  gsl_matrix *PK2;     // second piola-kirchoff stress
+  gsl_matrix *PK;      // pointer to one of above
+  gsl_vector *PK_voigt; // S in voigt notation
+  
+  gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
+  gsl_matrix *S;       // stress for Sigma (pointer to either PK2 or cauchy)
+  gsl_matrix *Sigma;   // 9x9 expansion of S
+  
+  gsl_matrix *G;       // matrix with derivatives of shape functions
+  gsl_matrix *SigmaG;  // temporary holder
+  
+  // temporary non-linear
+  gsl_matrix *eye;        // 3x3 identity (the symbol I is already taken by complex.h)
+  gsl_matrix *twomuE;     // temporary holder
+  gsl_matrix *SF;         // temporary holder
+  gsl_matrix *volumetric;
+
+  
+//  double hourglass_epsilon;
+
+  var_t *ldef;
+//  var_t *ldef_check;
+
   // for implicit multi-dof BCs
   var_t *displ_for_bc[3];
 
@@ -136,6 +185,13 @@ struct mechanical_t {
   var_t *v_at_sigma_max;
   var_t *w_at_sigma_max;
   
+  // strains
+  function_t *exx;
+  function_t *eyy;
+  function_t *ezz;
+  function_t *exy;
+  function_t *eyz;
+  function_t *ezx;
   
   // cauchy stresses
   function_t *sigmax;
@@ -154,7 +210,6 @@ struct mechanical_t {
   
   feenox_linearize_t *linearizes;
 };
-
 
 struct feenox_linearize_t {
   expr_t x1;

@@ -176,6 +176,10 @@ int feenox_instruction_print(void *arg) {
 
 
 int feenox_instruction_print_function(void *arg) {
+  if (feenox.pde.do_not_solve) {
+    return FEENOX_OK;
+  }
+  
   print_function_t *print_function = (print_function_t *)arg;
   print_token_t *print_token;
   
