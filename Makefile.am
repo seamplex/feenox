@@ -111,6 +111,31 @@ XFAIL_TESTS = tests/abort.sh \
               tests/xfail-few-properties-ortho-poisson.sh \
               tests/xfail-few-properties-ortho-shear.sh
 
+# TODO: create all these and the do
+# TESTS = $thermal_tests $mechanical_tests ....
+# TODO: also split XFAIL_TESTS
+# @$(MAKE) check TESTS="$(thermal_tests)" XFAIL_TESTS="$(thermal_xfail_tests)"
+
+thermal_tests = tests/uo2-pellet.sh \
+                tests/barra.sh \
+                tests/nafems-t1-4.sh \
+                tests/nafems-t2-3.sh
+                
+mechanical_tests = tests/nafems-le1.sh \
+                   tests/nafems-le10.sh \
+                   tests/nafems-le11.sh
+                   
+                   
+
+check-thermal:
+	@echo "Running thermal tests"
+	@$(MAKE) check TESTS="$(thermal_tests)"
+
+check-mechanical:
+	@echo "Running mechanical tests"
+	@$(MAKE) check TESTS="$(mechanical_tests)"
+
+
 # when getting
 # ERROR: files left in build directory after distclean:
 # when creating the source dist, add them here

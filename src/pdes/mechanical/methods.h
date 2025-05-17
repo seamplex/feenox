@@ -59,45 +59,55 @@ extern int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes);
 extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *, unsigned int q);
 extern int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *, unsigned int q);
 
-extern int feenox_problem_mechanical_compute_strain_sdef (const double *x, material_t *material);
-extern int feenox_problem_mechanical_compute_strain_thermal_orthotropic (const double *x, material_t *material);
-
 // mechanical/strain.c
 extern int feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u);
 extern int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u);
 extern int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u);
 
-// mechanica/stress.c
+// ---- material models ---------------------------------
 
-// material models
-
-// linear elastic isotropic
+// -- linear elastic isotropic  ------
+// init
 extern int feenox_mechanical_material_init_linear_elastic(material_t *material, int i);
+
+// stress-strain 4th-order tensor
 extern void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu);
 extern int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, material_t *material);
+extern int feenox_problem_mechanical_compute_C_elastic_plane_stress(const double *x, material_t *material);
+extern int feenox_problem_mechanical_compute_C_elastic_plane_strain(const double *x, material_t *material);
 
-extern int feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material);
+// stress measure
+extern int feenox_problem_build_mechanical_stress_measure_elastic_linear(const gsl_matrix *grad_u, const double *x, material_t *material);
 
-// linear elastic orthotropic
+// -- linear elastic orthotropic  ------
+// init
 extern int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i);
 
-// neohookean
-extern int feenox_mechanical_material_init_neohookean(material_t *material, int i);
-extern int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material);
+// stress-strain 4th-order tensor
+extern int feenox_problem_mechanical_compute_C_elastic_orthotropic(const double *x, material_t *material);
 
+// stress measure
+
+// -- linear elastic orthotropic  ------
+// init
+extern int feenox_mechanical_material_init_neohookean(material_t *material, int i);
+
+// stress measure
+extern int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material);
+
+
+
+
+
+// stress.c
 extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void);
-extern int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(const double *x, material_t *material);
+extern int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material);
  
-
-
 extern int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
 
-extern int feenox_problem_mechanical_compute_C_elastic_orthotropic(const double *x, material_t *material);
-extern int feenox_problem_mechanical_compute_C_elastic_plane_stress(const double *x, material_t *material);
-extern int feenox_problem_mechanical_compute_C_elastic_plane_strain(const double *x, material_t *material);
 
 // thermal effects
 extern int feenox_problem_mechanical_compute_thermal_strain_isotropic(const double *x, material_t *material);

@@ -28,13 +28,27 @@ int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
 }
 
 
-// TODO: ask for grad_u as parameter
-/*
-int feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material) {
+int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material) {
+  
+  mechanical.epsilon = mechanical.epsilon_cauchy_green;
+  mechanical.PK = mechanical.PK1;
+  mechanical.S = mechanical.cauchy;
+  
+  feenox_call(mechanical.compute_C(x, material));
+    
+  feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
+  // LCG = Ft * F   left cauchy-green tensor
+  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_cauchy_green);
+    
+  // cauchy stress
+  feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(x, material));  
+
+  // first piola kirchoff
+  feenox_call(feenox_problem_mechanical_compute_stress_first_piola_kirchoff());
   
   return FEENOX_OK;
 }
-*/
+
 // TODO:
 // int feenox_problem_mechanical_compute_C_hyperelastic_neohookean(const double *x, material_t *material);
 

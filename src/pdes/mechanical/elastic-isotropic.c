@@ -71,7 +71,7 @@ int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void) {
 }
 
 // compute the seconde Piola-Kirchoff stress tensor
-int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(const double *x, material_t *material) {
   
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
@@ -131,13 +131,14 @@ int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element
 }
 
 
-/*
-int feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material) {
-  // green-lagrange strain
-  feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.grad_u));
-  // second piola kirchoff stress tensor
-  feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic_isotropic(x, material));
+int feenox_problem_build_mechanical_stress_measure_elastic_linear(const gsl_matrix *grad_u, const double *x, material_t *material) {
+  
+  mechanical.epsilon = mechanical.epsilon_green_lagrange;
+  mechanical.PK = mechanical.PK2;
+  mechanical.S = mechanical.PK2;
+  
+  feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(grad_u));
+  feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(x, material));
 
   return FEENOX_OK;
 }
-*/
