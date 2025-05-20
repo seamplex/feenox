@@ -158,15 +158,15 @@ PetscErrorCode feenox_problem_ksp_monitor(KSP ksp, PetscInt n, PetscReal rnorm, 
 int feenox_problem_setup_ksp(KSP ksp) {
 
 // the KSP type
-#ifdef PETSC_HAVE_MUMPS
   if ((feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0) ||
       (feenox.pde.pc_type  != NULL && strcasecmp(feenox.pde.pc_type,  "mumps") == 0)) {
     // mumps is a particular case, see feenox_problem_setup_pc
+#ifdef PETSC_HAVE_MUMPS
     petsc_call(KSPSetType(ksp, KSPPREONLY));
-  } else if (feenox.pde.ksp_type != NULL) {
 #else
-  if (feenox.pde.ksp_type != NULL) {
+    feenox_push_error_message("this version of FeenoX does not support MUMPS")
 #endif
+  } else if (feenox.pde.ksp_type != NULL) {
     petsc_call(KSPSetType(ksp, feenox.pde.ksp_type));
   }
   
