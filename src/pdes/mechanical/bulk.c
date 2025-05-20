@@ -247,7 +247,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   // residual = B^T*PK_voigt
   // material stiffness = B^T*C*B
   // geometric stiffness = G^T*S*G
-  // each material points PK, and S to the right measure
   
   // TODO: function pointers
   if (mechanical.material_model == material_model_elastic_isotropic) {
@@ -315,6 +314,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
     
   
   for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
+//    gsl_matrix_set_identity(mechanical.F);
     // strain-displacement matrix B
     gsl_matrix_set(mechanical.B, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 0));
     gsl_matrix_set(mechanical.B, 0, 3*j+1, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 0));

@@ -91,12 +91,15 @@ fee2ccx_SOURCES = fee2ccx.c \
  ../../src/pdes/mechanical/elastic-orthotropic.c \
  ../../src/pdes/mechanical/elastic-plane-strain.c \
  ../../src/pdes/mechanical/elastic-plane-stress.c \
+ ../../src/pdes/mechanical/hyperelastic-neohookean.c \
  ../../src/pdes/mechanical/expansion-isotropic.c \
  ../../src/pdes/mechanical/expansion-orthotropic.c \
  ../../src/pdes/mechanical/init.c \
  ../../src/pdes/mechanical/linearize.c \
  ../../src/pdes/mechanical/parser.c \
  ../../src/pdes/mechanical/post.c \
+ ../../src/pdes/mechanical/gradient.c \
+ ../../src/pdes/mechanical/strain.c \
  ../../src/pdes/mechanical/stress.c \
  ../../src/flow/step.c \
  ./parsepde-mechanical.c

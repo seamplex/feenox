@@ -142,10 +142,10 @@ int main(int argc, char **argv) {
 
   // single material
   double x[] = {0, 0, 0};
-  double E = mechanical.E.eval(&mechanical.E, x, NULL);
-  double nu = mechanical.nu.eval(&mechanical.nu, x, NULL);
+  double E = mechanical.E.eval(&mechanical.E, x, feenox.mesh.materials);
+  double nu = mechanical.nu.eval(&mechanical.nu, x, feenox.mesh.materials);
   printf("*MATERIAL, NAME=bulk\n");
-  printf("*ELASTIC\n");
+  printf("*HYPERELASTIC\n");
   printf("%g, %g\n", E, nu);
   printf("\n");
   printf("*SOLID SECTION, ELSET=bulk, MATERIAL=bulk\n");

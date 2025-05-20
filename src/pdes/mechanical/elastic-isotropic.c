@@ -59,8 +59,8 @@ int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, mater
   return FEENOX_OK;
 }
 
-// compute the seconde Piola-Kirchoff stress tensor
-int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void) {
+// compute the first Piola-Kirchoff stress tensor
+int feenox_problem_mechanical_compute_stress_first_piola_kirchoff_elastic(void) {
   // first piola-kirchoff
   double J = feenox_fem_determinant(mechanical.F);
   feenox_fem_matrix_invert(mechanical.F, mechanical.invF);
