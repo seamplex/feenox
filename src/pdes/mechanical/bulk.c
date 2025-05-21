@@ -53,6 +53,10 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
     if (mechanical.twomuE == NULL) {
       feenox_check_alloc(mechanical.twomuE = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
+    
+    if (mechanical.invC == NULL) {
+      feenox_check_alloc(mechanical.invC = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    }
 
     if (mechanical.SF == NULL) {
       feenox_check_alloc(mechanical.SF = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
@@ -102,8 +106,8 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
     feenox_check_alloc(mechanical.G = gsl_matrix_calloc(feenox.pde.dofs*feenox.pde.dofs, feenox.pde.dofs * mechanical.n_nodes));
 
     // holders
-    if (mechanical.volumetric == NULL) {
-      feenox_check_alloc(mechanical.volumetric = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    if (mechanical.tmp == NULL) {
+      feenox_check_alloc(mechanical.tmp = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
     
     
@@ -258,12 +262,12 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   }
 
 
-  gsl_vector_set(mechanical.PK_voigt, 0, gsl_matrix_get(mechanical.PK, 0, 0));
-  gsl_vector_set(mechanical.PK_voigt, 1, gsl_matrix_get(mechanical.PK, 1, 1));
-  gsl_vector_set(mechanical.PK_voigt, 2, gsl_matrix_get(mechanical.PK, 2, 2));
-  gsl_vector_set(mechanical.PK_voigt, 3, gsl_matrix_get(mechanical.PK, 0, 1));
-  gsl_vector_set(mechanical.PK_voigt, 4, gsl_matrix_get(mechanical.PK, 1, 2));
-  gsl_vector_set(mechanical.PK_voigt, 5, gsl_matrix_get(mechanical.PK, 2, 0));
+  gsl_vector_set(mechanical.PK_voigt, 0, gsl_matrix_get(mechanical.PK2, 0, 0));
+  gsl_vector_set(mechanical.PK_voigt, 1, gsl_matrix_get(mechanical.PK2, 1, 1));
+  gsl_vector_set(mechanical.PK_voigt, 2, gsl_matrix_get(mechanical.PK2, 2, 2));
+  gsl_vector_set(mechanical.PK_voigt, 3, gsl_matrix_get(mechanical.PK2, 0, 1));
+  gsl_vector_set(mechanical.PK_voigt, 4, gsl_matrix_get(mechanical.PK2, 1, 2));
+  gsl_vector_set(mechanical.PK_voigt, 5, gsl_matrix_get(mechanical.PK2, 2, 0));
      
   // the 9x9 Sigma matrix
   double Sxx = gsl_matrix_get(mechanical.S, 0, 0);

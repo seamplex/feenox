@@ -139,7 +139,6 @@ struct mechanical_t {
 
   gsl_matrix *PK1;     // first piola-kirchoff stress
   gsl_matrix *PK2;     // second piola-kirchoff stress
-  gsl_matrix *PK;      // pointer to one of above
   gsl_vector *PK_voigt; // S in voigt notation
   
   gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
@@ -151,9 +150,10 @@ struct mechanical_t {
   
   // temporary non-linear
   gsl_matrix *eye;        // 3x3 identity (the symbol I is already taken by complex.h)
+  gsl_matrix *tmp;        // temporary holder
   gsl_matrix *twomuE;     // temporary holder
   gsl_matrix *SF;         // temporary holder
-  gsl_matrix *volumetric;
+  gsl_matrix *invC;
 
   
 //  double hourglass_epsilon;

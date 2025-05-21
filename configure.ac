@@ -22,12 +22,14 @@ AC_PROG_INSTALL
 # TODO: investigate
 #AX_CODE_COVERAGE
 
-AC_ARG_WITH(
-  [debug],
-  AS_HELP_STRING([--with-debug], [compile with debugging symbols @<:@default=no@:>@]),
-  [],
-  [with_debug=no]
-)
+# Support both --with-debug and --enable-debug options
+AC_ARG_WITH([debug],
+    [AS_HELP_STRING([--with-debug], [Compile with debugging symbols (legacy option)])],
+    [with_debug=$withval], [with_debug=no])
+
+AC_ARG_ENABLE([debug],
+    [AS_HELP_STRING([--enable-debug], [Compile with debugging symbols])],
+    [enable_debug=$enableval], [enable_debug=no])
 
 AC_ARG_WITH(
   [fee2ccx],
@@ -39,8 +41,9 @@ AC_ARG_WITH(
 ######################
 # default optimization flags
 AS_IF([test "x$CFLAGS" = "x-g -O2"],
-  AS_IF([test "x${with_debug}" = "xyes"] , [
+  AS_IF([test "x$with_debug" = "xyes" -o "x$enable_debug" = "xyes"] , [
     CFLAGS="-g -O0"
+    AC_DEFINE([DEBUG], [1], [Define to 1 if debugging is enabled])
   ],[
     CFLAGS="-O3 -flto=auto -no-pie"
   ])

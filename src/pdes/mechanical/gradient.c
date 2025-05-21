@@ -157,7 +157,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
 
       // cauchy stress  
       double J = feenox_fem_determinant(mechanical.F);
-      feenox_call(feenox_blas_BtCB(mechanical.F, mechanical.PK, mechanical.SF, 1/J, mechanical.cauchy));
+      feenox_call(feenox_blas_BtCB(mechanical.F, mechanical.PK2, mechanical.SF, 1/J, mechanical.cauchy));
   
       sigmax = gsl_matrix_get(mechanical.cauchy, 0, 0);
       sigmay = gsl_matrix_get(mechanical.cauchy, 1, 1);
