@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox elastic isotropic mechanical material
  *
- *  Copyright (C) 2021-2022 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -20,7 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "mechanical.h"
+#include "../mechanical.h"
 
 int feenox_mechanical_material_init_linear_elastic(material_t *material, int i) {
   // TODO: for lambda & mu 
@@ -59,6 +59,7 @@ int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, mater
   return FEENOX_OK;
 }
 
+/*
 // compute the first Piola-Kirchoff stress tensor
 int feenox_problem_mechanical_compute_stress_first_piola_kirchoff_elastic(void) {
   // first piola-kirchoff
@@ -69,7 +70,7 @@ int feenox_problem_mechanical_compute_stress_first_piola_kirchoff_elastic(void) 
   
   return FEENOX_OK;
 }
-
+*/
 // compute the seconde Piola-Kirchoff stress tensor
 int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(const double *x, material_t *material) {
   

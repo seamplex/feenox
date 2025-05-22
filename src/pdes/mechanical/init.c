@@ -265,12 +265,18 @@ int feenox_problem_init_runtime_mechanical(void) {
       material_t *material = physical_group->material;
       if ((material) != NULL) {
         if (material->model != NULL) {
-          if (strcmp(material->model, "linear_elastic") == 0 || strcmp(physical_group->material->model, "linear_elastic_isotropic") == 0) {
+          if (strcmp(material->model, "linear") == 0 || strcmp(material->model, "isotropic") == 0 || strcmp(material->model, "linear_elastic") == 0 || strcmp(physical_group->material->model, "linear_elastic_isotropic") == 0) {
             material_model[i] = feenox_mechanical_material_init_linear_elastic(material, i);
-          } else if (strcmp(material->model, "linear_elastic_orthotropic") == 0) {
+          } else if (strcmp(material->model, "orthotropic") == 0 || strcmp(material->model, "elastic_orthotropic") == 0 || strcmp(material->model, "linear_elastic_orthotropic") == 0) {
             material_model[i] = feenox_mechanical_material_init_linear_elastic_orthotropic(material, i);
           } else if (strcmp(material->model, "neohookean") == 0) {
             material_model[i] = feenox_mechanical_material_init_neohookean(material, i);
+          // TODO: saint venant-kirchoff = linear with ldef
+          // TODO: hencky
+          // TODO: mooney-rivlin
+          } else {
+            feenox_push_error_message("unknown material model '%s'", material->model);
+            return FEENOX_ERROR;
           }
         }
       }
@@ -468,7 +474,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   feenox_check_alloc(mechanical.C = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
   if (mechanical.uniform_C) {
     // cache properties
-    feenox_call(mechanical.compute_C(NULL, NULL));
+    feenox_call(mechanical.compute_C(NULL, feenox.mesh.materials));
   } 
 
   switch (mechanical.thermal_expansion_model) {

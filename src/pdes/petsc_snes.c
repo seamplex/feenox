@@ -105,7 +105,6 @@ int feenox_problem_setup_snes(SNES snes) {
   petsc_call(SNESSetDivergenceTolerance(snes, PETSC_UNLIMITED));
 #endif
 
-  petsc_call(SNESSetFromOptions(snes));
   // TODO: this call complains about DM (?) in thermal-slab-transient.fee 
   // petsc_call(SNESSetUp(snes));
 
@@ -114,6 +113,9 @@ int feenox_problem_setup_snes(SNES snes) {
   petsc_call(SNESGetKSP(snes, &ksp));
   feenox_call(feenox_problem_setup_ksp(ksp));
 
+  // this has to come after setting up the ksp
+  petsc_call(SNESSetFromOptions(snes));
+  
   return FEENOX_OK;
 }
 

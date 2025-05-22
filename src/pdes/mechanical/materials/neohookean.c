@@ -20,7 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "mechanical.h"
+#include "../mechanical.h"
 
 int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
   // TO-DO: mu and K

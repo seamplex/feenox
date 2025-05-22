@@ -20,7 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
-#include "mechanical.h"
+#include "../mechanical.h"
 
 int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i) {
   int n_ortho = mechanical.E_x.defined_per_group[i]   + mechanical.E_y.defined_per_group[i]   + mechanical.E_z.defined_per_group[i]   +

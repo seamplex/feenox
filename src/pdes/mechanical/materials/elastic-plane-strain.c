@@ -1,5 +1,5 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
- *  feenox elastic isotropic plane-stress mechanical material
+ *  feenox elastic isotropic plane-strain mechanical material
  *
  *  Copyright (C) 2021-2022 Jeremy Theler
  *
@@ -21,23 +21,21 @@
  */
 
 #include "feenox.h"
-#include "mechanical.h"
+#include "../mechanical.h"
 
-int feenox_problem_mechanical_compute_C_elastic_plane_stress(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_C_elastic_plane_strain(const double *x, material_t *material) {
   
-  double E = mechanical.E.eval(&mechanical.E, x, material);
-  double nu = mechanical.nu.eval(&mechanical.nu, x, material);
+  double lambda, mu;
+  feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
+  double lambda2mu = lambda + 2*mu;
   
-  double c1 = E/(1-nu*nu);
-  double c2 = nu * c1;
-  
-  gsl_matrix_set(mechanical.C, 0, 0, c1);
-  gsl_matrix_set(mechanical.C, 0, 1, c2);
+  gsl_matrix_set(mechanical.C, 0, 0, lambda2mu);
+  gsl_matrix_set(mechanical.C, 0, 1, lambda);
     
-  gsl_matrix_set(mechanical.C, 1, 0, c2);
-  gsl_matrix_set(mechanical.C, 1, 1, c1);
+  gsl_matrix_set(mechanical.C, 1, 0, lambda);
+  gsl_matrix_set(mechanical.C, 1, 1, lambda2mu);
 
-  gsl_matrix_set(mechanical.C, 2, 2, c1*0.5*(1-nu));
-    
+  gsl_matrix_set(mechanical.C, 2, 2, mu);
+        
   return FEENOX_OK;
 }
