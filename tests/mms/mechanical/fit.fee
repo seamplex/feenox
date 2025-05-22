@@ -1,0 +1,9 @@
+VAR log_a b
+fitted_log_e_2(log_h) = log_a + b*log_h
+FUNCTION log_e_2(log_h)   FILE $1.dat
+
+FIT fitted_log_e_2   TO log_e_2   VIA log_a   b   #GRADIENT 1 log_h VERBOSE
+
+PRINTF "\# $1 | %.1f" b
+PRINTF "e_2_$1(x) = %g * x ** %g" exp(log_a) b
+PRINTF "e_2_$1_title = \" \$%.1f \\cdot h^\{ %.2f \\pm %.2f \}\$\""  exp(log_a) b sigma_b

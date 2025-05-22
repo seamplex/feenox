@@ -1,0 +1,40 @@
+DEFAULT_ARGUMENT_VALUE 1 dirichlet # BCs = dirichlet/neumann
+DEFAULT_ARGUMENT_VALUE 2 tet4      # shape = tri/quad
+DEFAULT_ARGUMENT_VALUE 3 struct    # algorithm = struct/frontal/delaunay
+DEFAULT_ARGUMENT_VALUE 4 4         # refinement factor = 1/2/3/4...
+DEFAULT_ARGUMENT_VALUE 5 0         # write vtk? = 0/1
+
+READ_MESH cube-$2-$3-$4.msh
+PROBLEM thermal 3D
+
+# include the manufactured solution and conductivity
+INCLUDE thermal-cube2-T.fee
+
+# read the results of the symbolic derivatives
+INCLUDE thermal-cube2-q.fee
+
+# set the PDE coefficients and BCs
+k(x,y,z) = k_mms(x,y,z)
+q(x,y,z) = q_mms(x,y,z)
+
+# set the BCs (depending on $1)
+INCLUDE thermal-cube-bc-$1.fee
+
+SOLVE_PROBLEM   # this line should be self-explanatory 
+
+# output
+PHYSICAL_GROUP bulk DIM 3
+h = (bulk_volume/cells)^(1/3)
+
+# L-2 error
+INTEGRATE (T(x,y,z)-T_mms(x,y,z))^2 RESULT e_2
+error_2 = sqrt(e_2)
+
+# L-inf error
+FIND_EXTREMA abs(T(x,y,z)-T_mms(x,y,z)) MAX error_inf
+
+PRINT %.6f log(h) log(error_inf) log(error_2) %g $4 cells nodes %.2f 1024*memory() wall_time()
+
+IF $5
+  WRITE_MESH thermal-cube2_$1-$2-$3-$4.vtk T T_mms T(x,y,z)-T_mms(x,y,z)
+ENDIF

@@ -1,0 +1,2 @@
+plot \
+     "mechanical_sdefcube_dirichlet_tet4_struct.dat"                              u (exp($1)):(exp($2)) w lp pt 4 lw 1 lt 2 color plum  ti "dirichlet-tet4-struct = " + e_2_mechanical_sdefcube_dirichlet_tet4_struct_title,\

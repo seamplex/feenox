@@ -1,0 +1,68 @@
+{
+    "physics": [
+        {
+            "physics_type": "Mechanical",
+            "boundary_conditions": [
+                {
+                    "group_names":[ "left" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "values": [ "0", "0", "0" ]
+                },
+                {
+                    "group_names":[ "right" ],
+                    "boundary_condition_type": "Dirichlet",
+                    "values": [ "0.25" ]
+                }
+                
+            ]
+        }
+    ],
+    "mesh_filename": "cube-single.msh",
+    "element_order": 1,
+    "materials": [
+        {
+            "name": "dummy",
+            "mechanical_properties": {
+                "elasticity_type": "IsotropicLinearElastic",
+                "elasticity": {
+                    "youngs_modulus": "1",
+                    "poissons_ratio": "0.25",
+                    "large_strain": false               
+                }
+            }
+        }
+    ],
+    "sections": [
+        {
+            "group_names": [ "volume" ],
+            "section_type": "Solid",
+            "section": {
+                "material": "dummy",
+                "source": "Reflex"
+            }
+        }
+    ],
+    "points": [
+        {
+            "point_name": "p1",
+            "coordinates": [ 1, 1, 1 ]
+        },
+        {
+            "point_name": "p2",
+            "coordinates": [ 1, 1, 0 ]
+        }
+    ],
+    "outputs": {    
+      "kpi_data": [
+        {
+            "group_name": "p1",
+            "field_name": "Displacement"
+        },
+        {
+            "group_name": "p2",
+            "field_name": "Displacement"
+        }
+      ],
+    },
+    "analysis_type": "StaticAnalysis",
+}

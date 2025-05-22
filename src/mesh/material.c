@@ -155,8 +155,7 @@ property_data_t *feenox_define_property_data_get_ptr(property_t *property, mater
     return NULL;
   }
   if (material->mesh->dim == 0) {
-    feenox_push_error_message("mesh '%s' has zero dimensions when defining property '%s', keyword DIMENSIONS is needed for MESH definition", material->mesh->file->format, property->name);
-    return NULL;
+    material->mesh->dim = 3;
   }
 
   property_data_t *property_data = NULL;

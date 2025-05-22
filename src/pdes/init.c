@@ -395,7 +395,7 @@ int feenox_problem_init_runtime_general(void) {
 #ifdef HAVE_PETSC
 
   // first set options from PETSC_OPTIONS
-  if (feenox.pde.petsc_options != NULL) {
+  if (feenox.pde.petsc_options != NULL && feenox.pde.do_not_solve == 0) {
     petsc_call(PetscOptionsInsertString(NULL, feenox.pde.petsc_options));
   }
   
@@ -519,6 +519,11 @@ int feenox_problem_init_runtime_general(void) {
   // the right-hand-side vector
   if (feenox.pde.has_rhs) {
     feenox.pde.b = feenox_problem_create_vector("b");
+  }
+
+  // the internal fluxes (i.e. forces) vector
+  if (feenox.pde.has_internal_fluxes) {
+    feenox.pde.f = feenox_problem_create_vector("f");
   }
   
   // the mass matrix for modal or heat transient

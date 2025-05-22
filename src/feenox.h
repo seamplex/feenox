@@ -218,7 +218,9 @@ extern "C++" {
 #define ELEMENT_TYPE_TRIANGLE6      9
 #define ELEMENT_TYPE_QUADRANGLE9    10
 #define ELEMENT_TYPE_TETRAHEDRON10  11
-#define ELEMENT_TYPE_HEXAHEDRON27   12 
+#define ELEMENT_TYPE_HEXAHEDRON27   12
+#define ELEMENT_TYPE_PRISM18        13
+#define ELEMENT_TYPE_PYRAMID14      14
 #define ELEMENT_TYPE_POINT1         15
 #define ELEMENT_TYPE_QUADRANGLE8    16
 #define ELEMENT_TYPE_HEXAHEDRON20   17
@@ -1151,6 +1153,9 @@ struct material_t {
   char *name;
   mesh_t *mesh;
   property_data_t *property_datums;
+  
+  char *model;
+  void *ctx;
 
   UT_hash_handle hh;
 };
@@ -1178,7 +1183,8 @@ struct property_data_t {
 struct distribution_t  {
   char *name;
   
-  int defined;             // true or false if is defined
+  int defined;             // true or false if is defined at least in one group
+  int *defined_per_group;  // true or false if is defined for each group
   int full;                // true if all the groups have the property
   
   property_t *property;
@@ -1272,6 +1278,7 @@ struct mesh_t {
   physical_group_t *physical_groups;              // global hash table
   physical_group_t *physical_groups_by_tag[4];    // 4 hash tables one per tag
   int physical_tag_max;                           // the higher tag of the entities
+  int n_groups;
   
   // number of geometric entities of each dimension
   size_t points, curves, surfaces, volumes;
@@ -1783,6 +1790,7 @@ struct feenox_t {
 #ifdef HAVE_PETSC
     int (*setup_pc)(PC pc);
     int (*setup_ksp)(KSP ksp);
+    int (*setup_snes)(SNES snes);
   #ifdef HAVE_SLEPC
     int (*setup_eps)(EPS eps);
   #endif
@@ -1882,6 +1890,7 @@ struct feenox_t {
     int has_stiffness;
     int has_mass;
     int has_rhs;
+    int has_internal_fluxes;
     int has_jacobian;
     int has_jacobian_K;
     int has_jacobian_M;
@@ -1909,6 +1918,7 @@ struct feenox_t {
     Vec phi_bc;    // the unknown (solution) vector with dirichlet BCs
     Vec b;         // the right-hand side vector without dirichlet BCs
     Vec b_bc;      // idem with dirichlet BCs (for KSP)
+    Vec f;         // internal fluxes (forces) for non-linear problems
     Vec r;         // residual vector for SNES and TS
     
     Mat K;       // stiffness matrix without dirichlet BCs
@@ -1950,6 +1960,7 @@ struct feenox_t {
     PCType pc_type;
     KSPType ksp_type;
     SNESType snes_type;
+    SNESLineSearchType ls_type;
     TSType ts_type;
     TSAdaptType ts_adapt_type;
 
@@ -2006,6 +2017,8 @@ struct feenox_t {
     gsl_matrix *JKi;              // elementary jacobian for stiffness matrix
     gsl_matrix *Jbi;              // elementary jacobian for RHS vector
     gsl_vector *bi;               // elementary right-hand side vector
+    gsl_vector *fi;               // elementary non-linear internal "force" vector
+    gsl_vector *phii;             // elementary solution vector
 
     gsl_vector *vec_f;               // temporary vector for rhs things like H'*f
 
@@ -2387,7 +2400,7 @@ extern int feenox_instruction_solve_problem(void *arg);
 #ifdef HAVE_PETSC
 // solve.c
 extern int feenox_function_to_phi(function_t *function, Vec phi);
-extern int feenox_problem_phi_to_solution(Vec phi);
+extern int feenox_problem_phi_to_solution(Vec phi, int gradients);
 
 // petsc_ksp.c
 extern int feenox_problem_solve_petsc_linear(void);
@@ -2478,6 +2491,7 @@ extern int feenox_blas_Ab_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_
 extern int feenox_blas_Atb_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c);
 extern int feenox_blas_BtB_accum(gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R);
+extern int feenox_blas_ABt(gsl_matrix *A, gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);

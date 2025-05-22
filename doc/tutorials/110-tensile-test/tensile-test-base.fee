@@ -8,7 +8,7 @@ nu = 0.3
 # boundary conditions, fixed and Fx are "special" keywords for the mechanical problem
 # the names "left" and "right" should match the physcal names in the .geo
 BC left  fixed
-BC right Fx=10e3  # [ N ]
+BC right Fx=10e6  # [ N ]
 
 # we can now solve the problem, after this keyword the results will be available for output
 SOLVE_PROBLEM

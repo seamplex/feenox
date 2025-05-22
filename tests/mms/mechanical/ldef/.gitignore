@@ -1,0 +1,6 @@
+*.msh
+*.pdf
+*.vtu
+*.vtk
+mechanical-ldefcube-results.md
+

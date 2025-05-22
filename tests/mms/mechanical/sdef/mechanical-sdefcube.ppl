@@ -1,0 +1,28 @@
+set preamble "\usepackage{amsmath}"
+
+set width 18*unit(cm)
+set size ratio 9.0/16.0
+
+set axis x arrow nomirrored
+set axis y arrow nomirrored
+set key top right
+set keycolumns 3
+
+set grid
+set terminal pdf
+
+set logscale x
+set logscale y
+
+set xlabel "element size~$h$"
+# set xrange [2e-3:2e-1]
+
+set key above
+
+load "mechanical-sdefcube-fits.ppl"
+
+set ylabel "$e_2 = \sqrt{\int \left[\vec{u}(x,y,z)-\vec{u}_\text{mms}(x,y,z)\right]^2 \, dx \, dy \, dz}$"
+set title "FeenoX---Mechanical small deformation--$e_2$"
+set output "mechanical-sdefcube-e2.pdf"
+load "mechanical-sdefcube-e2.ppl"
+
