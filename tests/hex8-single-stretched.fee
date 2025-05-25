@@ -1,5 +1,5 @@
-READ_MESH cube-single.msh
-PROBLEM mechanical PC mumps
+READ_MESH hex8-single.msh
+PROBLEM mechanical
 
 MATERIAL dummy MODEL $1 E=1 nu=0.25 
 

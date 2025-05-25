@@ -23,7 +23,7 @@
 #include "feenox.h"
 #include "../mechanical.h"
 
-int feenox_problem_mechanical_compute_C_elastic_plane_stress(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress(const double *x, material_t *material) {
   
   double E = mechanical.E.eval(&mechanical.E, x, material);
   double nu = mechanical.nu.eval(&mechanical.nu, x, material);

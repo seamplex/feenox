@@ -35,7 +35,7 @@ void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *ma
   return;
 }
 
-int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic(const double *x, material_t *material) {
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
   double lambda2mu = lambda + 2*mu;
@@ -56,6 +56,9 @@ int feenox_problem_mechanical_compute_C_elastic_isotropic(const double *x, mater
   gsl_matrix_set(mechanical.C, 4, 4, mu);
   gsl_matrix_set(mechanical.C, 5, 5, mu);
     
+//  printf("\n");
+//  feenox_debug_print_gsl_matrix(mechanical.C, stdout);
+  
   return FEENOX_OK;
 }
 
@@ -89,7 +92,7 @@ int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(const
   return FEENOX_OK;
 }
 
-int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element, unsigned int j,
+int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
 
@@ -132,7 +135,7 @@ int feenox_stress_from_strain_elastic_isotropic(node_t *node, element_t *element
 }
 
 
-int feenox_problem_build_mechanical_stress_measure_elastic_linear(const gsl_matrix *grad_u, const double *x, material_t *material) {
+int feenox_problem_build_mechanical_stress_measure_linear_elastic(const gsl_matrix *grad_u, const double *x, material_t *material) {
   
   mechanical.epsilon = mechanical.epsilon_green_lagrange;
 //  mechanical.PK = mechanical.PK2;

@@ -79,10 +79,10 @@ airfoil.xao
 circle*.msh
 circle_perimeter*.dat
 wilson-2d-*.vtk
-hex8-ldef.12d
-hex8-ldef.cvg
+*.12d
+*.cvg
 hex8-ldef.dat
-hex8-ldef.frd
-hex8-ldef.sta
+*.frd
+*.sta
 hex8-ldef.vtk
 spooles.out

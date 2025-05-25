@@ -23,7 +23,7 @@
 #include "feenox.h"
 #include "../mechanical.h"
 
-int feenox_problem_mechanical_compute_C_elastic_plane_strain(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain(const double *x, material_t *material) {
   
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);

@@ -37,7 +37,7 @@ int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *mater
 }
 
 
-int feenox_problem_mechanical_compute_C_elastic_orthotropic(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const double *x, material_t *material) {
   
   // TODO: check ranges of validity
   // E > 0

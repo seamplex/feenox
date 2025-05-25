@@ -55,6 +55,7 @@ TESTS = \
         tests/hello_mpi.sh \
         tests/hex8-ldef-jacobian.sh \
         tests/hex8-ldef-ccx.sh \
+        tests/hex8-ldef-ccx.sh \
         tests/integral.sh \
         tests/lag.sh \
         tests/laplace2d.sh \

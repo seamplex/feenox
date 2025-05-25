@@ -407,18 +407,18 @@ int feenox_problem_init_runtime_mechanical(void) {
       mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
       if (mechanical.variant == variant_full) {
       
-        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_isotropic;
-        mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_elastic_isotropic;
+        mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
+        mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_linear_elastic;
       
       } else if (mechanical.variant == variant_plane_stress) {      
       
-        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_plane_stress;  
-        mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
+        mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
+        mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
       
       } else if (mechanical.variant == variant_plane_strain) {  
       
-        mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_plane_strain;
-        mechanical.compute_stress_from_strain = feenox_stress_from_strain_elastic_isotropic;
+        mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain;
+        mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
       
       }  
     break;
@@ -430,7 +430,7 @@ int feenox_problem_init_runtime_mechanical(void) {
         return FEENOX_ERROR;
       }
 
-      mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_orthotropic;
+      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
     
     break;
@@ -444,8 +444,8 @@ int feenox_problem_init_runtime_mechanical(void) {
         return FEENOX_ERROR;
       }
       
-      // TODO: compute C
-      mechanical.compute_C = feenox_problem_mechanical_compute_C_elastic_isotropic;
+      // TODO: evaluate PK2 + C in a single call? stresses
+      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_neohookean;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
       mechanical.nonlinear_material = 1;
       

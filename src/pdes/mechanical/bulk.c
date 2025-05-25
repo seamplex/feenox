@@ -252,9 +252,9 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   // material stiffness = B^T*C*B
   // geometric stiffness = G^T*S*G
   
-  // TODO: function pointers
+  // TODO: function pointers stores in material's context
   if (mechanical.material_model == material_model_elastic_isotropic) {
-    feenox_problem_build_mechanical_stress_measure_elastic_linear(mechanical.grad_u, x, material);
+    feenox_problem_build_mechanical_stress_measure_linear_elastic(mechanical.grad_u, x, material);
     
   } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
     feenox_problem_build_mechanical_stress_measure_neohookean(mechanical.grad_u, x, material);
