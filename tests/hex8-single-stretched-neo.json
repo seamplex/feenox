@@ -10,7 +10,7 @@
                 },
                 {
                     "group_names":[ "right" ],
-                    "boundary_condition_type": "Dirichlet",
+                    "boundary_condition_type": "ForceLoad",
                     "values": [ "0.25" ]
                 }
                 
@@ -63,7 +63,8 @@
         }
       ],
     },
-    "petsc_options": "-snes_test_jacobian -snes_monitor",
+//    "petsc_options": "-snes_test_jacobian -snes_monitor",
+    "petsc_options": "-snes_monitor",
     "analysis_type": "StaticAnalysis",
     "analysis": {
         "nonlinear_solver": {
@@ -75,3 +76,4 @@
         }
     }
 }
+

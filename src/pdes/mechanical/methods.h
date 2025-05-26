@@ -94,16 +94,18 @@ extern int feenox_mechanical_material_init_neohookean(material_t *material, int 
 
 // stress measure
 extern int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material);
-extern int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material);
-extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff_neohookean(const double *x, material_t *material);
-extern int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_neohookean(const double *x, material_t *material);
+//extern int feenox_problem_mechanical_compute_stress_PK1_neohookean(const double *x, material_t *material);
+extern int feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *x, material_t *material);
+
+// TODO: this one is general
+extern int feenox_problem_mechanical_compute_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2);
 
 
 
 // stress.c
 extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void);
-extern int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(const double *x, material_t *material);
+extern int feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material);
  
 extern int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, unsigned int j,

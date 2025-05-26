@@ -75,7 +75,7 @@ int feenox_fem_elemental_caches_reset(void) {
 
 // inverts a small-size square matrix
 // TODO: virtual methods linked to the element type?
-gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
+gsl_matrix *feenox_fem_matrix_invert(const gsl_matrix *direct, gsl_matrix *inverse) {
 
   switch (direct->size1) {
     case 1:
@@ -146,7 +146,7 @@ gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse) {
   return inverse;
 }
 
-inline double feenox_fem_determinant(gsl_matrix *this) {
+inline double feenox_fem_determinant(const gsl_matrix *this) {
 
   if (this == NULL) {
     return 1.0;

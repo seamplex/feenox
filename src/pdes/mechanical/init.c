@@ -445,7 +445,7 @@ int feenox_problem_init_runtime_mechanical(void) {
       }
       
       // TODO: evaluate PK2 + C in a single call? stresses
-      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_neohookean;
+//      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_neohookean;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
       mechanical.nonlinear_material = 1;
       

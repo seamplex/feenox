@@ -2237,8 +2237,8 @@ extern int feenox_instruction_printf(void *arg);
 extern int feenox_instruction_print_function(void *arg);
 extern int feenox_instruction_print_vector(void *arg);
 extern char *feenox_print_vector_current_format_reset(print_vector_t *);
-extern int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file);
-extern int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file);
+extern int feenox_debug_print_gsl_vector(const gsl_vector *b, FILE *file);
+extern int feenox_debug_print_gsl_matrix(const gsl_matrix *A, FILE *file);
 
 // conditional.c
 extern int feenox_instruction_if(void *arg);
@@ -2448,8 +2448,8 @@ extern double *feenox_fem_compute_x_at_gauss_if_needed(element_t *e, unsigned in
 extern double *feenox_fem_compute_x_at_gauss_if_needed_and_update_var(element_t *e, unsigned int q, int integration, int condition);
 extern double *feenox_fem_compute_x_at_gauss_and_update_var(element_t *e, unsigned int q, int integration);
 
-extern double feenox_fem_determinant(gsl_matrix *);
-extern gsl_matrix *feenox_fem_matrix_invert(gsl_matrix *direct, gsl_matrix *inverse);
+extern double feenox_fem_determinant(const gsl_matrix *);
+extern gsl_matrix *feenox_fem_matrix_invert(const gsl_matrix *direct, gsl_matrix *inverse);
 
 extern double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsigned int q, int integration);
 #define feenox_fem_compute_w_det_at_gauss(e, q) feenox_fem_compute_w_det_at_gauss_integration((e), (q), feenox.pde.mesh->integration)
@@ -2494,6 +2494,7 @@ extern int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_ABt(gsl_matrix *A, gsl_matrix *B, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
+extern int feenox_blas_BCBt(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);
 extern int feenox_blas_PtCB(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R);
 

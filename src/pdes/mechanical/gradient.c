@@ -153,7 +153,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       ezx = gsl_matrix_get(mechanical.epsilon, 2, 0);
 
       // second piola kirchoff    
-      feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(node->x, element->physical_group->material));
+      feenox_call(feenox_problem_mechanical_compute_stress_PK2_elastic(node->x, element->physical_group->material));
 
       // cauchy stress  
       double J = feenox_fem_determinant(mechanical.F);
@@ -169,6 +169,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
       // neo-hookean
       // left cauchy green
+      // TODO
       feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(element->dphidx_node[j]));  
 
       exx = gsl_matrix_get(mechanical.epsilon, 0, 0);
@@ -179,7 +180,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       ezx = gsl_matrix_get(mechanical.epsilon, 2, 0);
 
       // second piola kirchoff    
-      feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(node->x, element->physical_group->material));
+//      feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(node->x, element->physical_group->material));
   
       sigmax = gsl_matrix_get(mechanical.cauchy, 0, 0);
       sigmay = gsl_matrix_get(mechanical.cauchy, 1, 1);

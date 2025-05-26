@@ -520,7 +520,7 @@ char *feenox_print_vector_current_format_reset(print_vector_t *this) {
 }
 
 
-int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file) {
+int feenox_debug_print_gsl_vector(const gsl_vector *b, FILE *file) {
 
   double xi;
   int i;
@@ -539,7 +539,7 @@ int feenox_debug_print_gsl_vector(gsl_vector *b, FILE *file) {
 
 }
 
-int feenox_debug_print_gsl_matrix(gsl_matrix *A, FILE *file) {
+int feenox_debug_print_gsl_matrix(const gsl_matrix *A, FILE *file) {
 
   double xi;
   int i, j;

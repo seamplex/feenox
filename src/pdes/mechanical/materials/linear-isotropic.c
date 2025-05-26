@@ -75,7 +75,7 @@ int feenox_problem_mechanical_compute_stress_first_piola_kirchoff_elastic(void) 
 }
 */
 // compute the seconde Piola-Kirchoff stress tensor
-int feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(const double *x, material_t *material) {
+int feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, material_t *material) {
   
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
@@ -142,7 +142,7 @@ int feenox_problem_build_mechanical_stress_measure_linear_elastic(const gsl_matr
   mechanical.S = mechanical.PK2;
   
   feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(grad_u));
-  feenox_call(feenox_problem_mechanical_compute_stress_second_piola_kirchoff_elastic(x, material));
+  feenox_call(feenox_problem_mechanical_compute_stress_PK2_elastic(x, material));
 
   return FEENOX_OK;
 }

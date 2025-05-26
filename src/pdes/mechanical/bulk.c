@@ -184,7 +184,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 
       gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j));
       gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 0, j));
-      
+
     } else if (mechanical.variant == variant_axisymmetric) {
       
       feenox_push_error_message("axisymmetric still not implemented");
@@ -268,6 +268,10 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   gsl_vector_set(mechanical.PK_voigt, 3, gsl_matrix_get(mechanical.PK2, 0, 1));
   gsl_vector_set(mechanical.PK_voigt, 4, gsl_matrix_get(mechanical.PK2, 1, 2));
   gsl_vector_set(mechanical.PK_voigt, 5, gsl_matrix_get(mechanical.PK2, 2, 0));
+  
+  // this is Landau's Voigt: 11 22 33 12 13 23 in lexicographical order
+//  gsl_vector_set(mechanical.PK_voigt, 4, gsl_matrix_get(mechanical.PK2, 0, 2));
+//  gsl_vector_set(mechanical.PK_voigt, 5, gsl_matrix_get(mechanical.PK2, 1, 2));
      
   // the 9x9 Sigma matrix
   double Sxx = gsl_matrix_get(mechanical.S, 0, 0);
@@ -319,7 +323,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   
   for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
 //    gsl_matrix_set_identity(mechanical.F);
-    // strain-displacement matrix B
     gsl_matrix_set(mechanical.B, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 0));
     gsl_matrix_set(mechanical.B, 0, 3*j+1, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 0));
     gsl_matrix_set(mechanical.B, 0, 3*j+2, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 0));
@@ -343,7 +346,18 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
     gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 2));
     gsl_matrix_set(mechanical.B, 5, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 2));
     gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 2));
-    
+
+/*    
+    // strain-displacement matrix B for lexicographical Voigt 11 22 33 12 13 23
+    gsl_matrix_set(mechanical.B, 4, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 2));
+    gsl_matrix_set(mechanical.B, 4, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 2));
+    gsl_matrix_set(mechanical.B, 4, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 2));
+
+    gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 2));
+    gsl_matrix_set(mechanical.B, 5, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 2));
+    gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 2));
+*/
+
     // the matrix of shape function derivatives G
     gsl_matrix_set(mechanical.G, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j));
     gsl_matrix_set(mechanical.G, 1, 3*j+1, gsl_matrix_get(dhdx, 0, j));
@@ -372,6 +386,25 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   
   // elemental geometric stiffness G'*S*G
   feenox_call(feenox_blas_BtCB_accum(mechanical.G, mechanical.Sigma, mechanical.SigmaG, wdet, feenox.fem.JKi));
+
+  printf("B\n");
+  feenox_debug_print_gsl_matrix(mechanical.B, stdout);
+
+  printf("C\n");
+  feenox_debug_print_gsl_matrix(mechanical.C, stdout);
+  
+  printf("K\n");
+  feenox_debug_print_gsl_matrix(feenox.fem.Ki, stdout);
+
+  printf("G\n");
+  feenox_debug_print_gsl_matrix(mechanical.G, stdout);
+
+  printf("Sigma\n");
+  feenox_debug_print_gsl_matrix(mechanical.Sigma, stdout);
+  
+  printf("JK\n");
+  feenox_debug_print_gsl_matrix(feenox.fem.JKi, stdout);
+  
   
   
 #endif

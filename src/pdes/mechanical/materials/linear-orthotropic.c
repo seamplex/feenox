@@ -113,11 +113,11 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const
   gsl_matrix_set(mechanical.C, 2, 2, gsl_matrix_get(C, 2, 2));
     
   // the following subscripts have to match rows 3-5 of mechanical.B
-  // note that this is not voigt notation! that would be
-  // xx,yy,zz,yz,xz,xy and we use xx,yy,zz,xy,yz,zx
+  // we use Landau's Voigt notation in lexicographic order, i.e
+  // 11 22 33 12 13 23
   gsl_matrix_set(mechanical.C, 3, 3, G_xy);
-  gsl_matrix_set(mechanical.C, 4, 4, G_yz);
-  gsl_matrix_set(mechanical.C, 5, 5, G_zx);
+  gsl_matrix_set(mechanical.C, 4, 4, G_zx);
+  gsl_matrix_set(mechanical.C, 5, 5, G_yz);
     
   gsl_matrix_free(C);
   gsl_matrix_free(S);
