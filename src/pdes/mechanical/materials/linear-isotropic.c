@@ -31,13 +31,13 @@ int feenox_mechanical_material_setup_linear_elastic(void) {
 
   mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
   if (mechanical.variant == variant_full) {
-    mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
+    mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
     mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_linear_elastic;
   } else if (mechanical.variant == variant_plane_stress) {      
-    mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
+    mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
     mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
   } else if (mechanical.variant == variant_plane_strain) {  
-    mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain;
+    mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain;
     mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
   }
   
@@ -58,21 +58,21 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic(const doub
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
   double lambda2mu = lambda + 2*mu;
   
-  gsl_matrix_set(mechanical.C, 0, 0, lambda2mu);
-  gsl_matrix_set(mechanical.C, 0, 1, lambda);
-  gsl_matrix_set(mechanical.C, 0, 2, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 0, 0, lambda2mu);
+  gsl_matrix_set(mechanical.C_tangent, 0, 1, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 0, 2, lambda);
 
-  gsl_matrix_set(mechanical.C, 1, 0, lambda);
-  gsl_matrix_set(mechanical.C, 1, 1, lambda2mu);
-  gsl_matrix_set(mechanical.C, 1, 2, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 1, 0, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 1, 1, lambda2mu);
+  gsl_matrix_set(mechanical.C_tangent, 1, 2, lambda);
 
-  gsl_matrix_set(mechanical.C, 2, 0, lambda);
-  gsl_matrix_set(mechanical.C, 2, 1, lambda);
-  gsl_matrix_set(mechanical.C, 2, 2, lambda2mu);
+  gsl_matrix_set(mechanical.C_tangent, 2, 0, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 2, 1, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 2, 2, lambda2mu);
   
-  gsl_matrix_set(mechanical.C, 3, 3, mu);
-  gsl_matrix_set(mechanical.C, 4, 4, mu);
-  gsl_matrix_set(mechanical.C, 5, 5, mu);
+  gsl_matrix_set(mechanical.C_tangent, 3, 3, mu);
+  gsl_matrix_set(mechanical.C_tangent, 4, 4, mu);
+  gsl_matrix_set(mechanical.C_tangent, 5, 5, mu);
     
 //  printf("\n");
 //  feenox_debug_print_gsl_matrix(mechanical.C, stdout);
@@ -97,16 +97,26 @@ int feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, materi
   
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
+
+  double lambdatrE = lambda * (gsl_matrix_get(mechanical.eps, 0, 0) + gsl_matrix_get(mechanical.eps, 1, 1) + gsl_matrix_get(mechanical.eps, 2, 2));
+  double twomu = 2*mu;
   
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      gsl_matrix_set(mechanical.PK2, i, j, lambdatrE * (i == j) + twomu * gsl_matrix_get(mechanical.eps, i, j));
+    }
+  }  
+  
+/*  
   gsl_matrix_set_identity(mechanical.PK2);
-  double trE = gsl_matrix_get(mechanical.epsilon_green_lagrange, 0, 0) + gsl_matrix_get(mechanical.epsilon_green_lagrange, 1, 1) + gsl_matrix_get(mechanical.epsilon_green_lagrange, 2, 2);
+  double trE = gsl_matrix_get(mechanical.eps, 0, 0) + gsl_matrix_get(mechanical.eps, 1, 1) + gsl_matrix_get(mechanical.eps, 2, 2);
   gsl_matrix_scale(mechanical.PK2, lambda * trE);
   
   gsl_matrix_set_zero(mechanical.twomuE);
-  gsl_matrix_memcpy(mechanical.twomuE, mechanical.epsilon_green_lagrange);
+  gsl_matrix_memcpy(mechanical.twomuE, mechanical.E);
   gsl_matrix_scale(mechanical.twomuE, 2*mu);
   gsl_matrix_add(mechanical.PK2, mechanical.twomuE);
-    
+*/    
   return FEENOX_OK;
 }
 
@@ -155,10 +165,7 @@ int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, u
 
 int feenox_problem_build_mechanical_stress_measure_linear_elastic(const gsl_matrix *grad_u, const double *x, material_t *material) {
   
-//  mechanical.epsilon = mechanical.epsilon_green_lagrange;
-  
-  feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(grad_u));
-  feenox_call(feenox_problem_mechanical_compute_stress_PK2_elastic(x, material));
+  feenox_problem_mechanical_compute_stress_PK2_elastic(x, material);
 
   return FEENOX_OK;
 }

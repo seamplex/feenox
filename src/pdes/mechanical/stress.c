@@ -58,15 +58,15 @@ int feenox_stress_from_strain(node_t *node, element_t *element, unsigned int j,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
   
   if (mechanical.uniform_C == 0) {
-    mechanical.compute_C(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
+    mechanical.compute_material_tangent(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
   }  
   
-  *sigmax = gsl_matrix_get(mechanical.C, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C, 0, 1) * epsilony + gsl_matrix_get(mechanical.C, 0, 2) * epsilonz;
-  *sigmay = gsl_matrix_get(mechanical.C, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C, 1, 1) * epsilony + gsl_matrix_get(mechanical.C, 1, 2) * epsilonz;
-  *sigmaz = gsl_matrix_get(mechanical.C, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C, 2, 1) * epsilony + gsl_matrix_get(mechanical.C, 2, 2) * epsilonz;
-  *tauxy = gsl_matrix_get(mechanical.C, 3, 3) * gammaxy;
-  *tauyz = gsl_matrix_get(mechanical.C, 4, 4) * gammayz;
-  *tauzx = gsl_matrix_get(mechanical.C, 5, 5) * gammazx;
+  *sigmax = gsl_matrix_get(mechanical.C_tangent, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C_tangent, 0, 1) * epsilony + gsl_matrix_get(mechanical.C_tangent, 0, 2) * epsilonz;
+  *sigmay = gsl_matrix_get(mechanical.C_tangent, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C_tangent, 1, 1) * epsilony + gsl_matrix_get(mechanical.C_tangent, 1, 2) * epsilonz;
+  *sigmaz = gsl_matrix_get(mechanical.C_tangent, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C_tangent, 2, 1) * epsilony + gsl_matrix_get(mechanical.C_tangent, 2, 2) * epsilonz;
+  *tauxy = gsl_matrix_get(mechanical.C_tangent, 3, 3) * gammaxy;
+  *tauyz = gsl_matrix_get(mechanical.C_tangent, 4, 4) * gammayz;
+  *tauzx = gsl_matrix_get(mechanical.C_tangent, 5, 5) * gammazx;
   
   return FEENOX_OK;
 }

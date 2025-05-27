@@ -60,9 +60,9 @@ extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *, u
 extern int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *, unsigned int q);
 
 // mechanical/strain.c
-extern int feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u);
-extern int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u);
-extern int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u);
+extern gsl_matrix *feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u);
+extern gsl_matrix *feenox_problem_mechanical_compute_strain_cauchy_green_left(const gsl_matrix *F);
+extern gsl_matrix *feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *C);
 
 // ---- material models ---------------------------------
 

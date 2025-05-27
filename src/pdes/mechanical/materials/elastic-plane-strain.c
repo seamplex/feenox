@@ -29,13 +29,13 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain(cons
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
   double lambda2mu = lambda + 2*mu;
   
-  gsl_matrix_set(mechanical.C, 0, 0, lambda2mu);
-  gsl_matrix_set(mechanical.C, 0, 1, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 0, 0, lambda2mu);
+  gsl_matrix_set(mechanical.C_tangent, 0, 1, lambda);
     
-  gsl_matrix_set(mechanical.C, 1, 0, lambda);
-  gsl_matrix_set(mechanical.C, 1, 1, lambda2mu);
+  gsl_matrix_set(mechanical.C_tangent, 1, 0, lambda);
+  gsl_matrix_set(mechanical.C_tangent, 1, 1, lambda2mu);
 
-  gsl_matrix_set(mechanical.C, 2, 2, mu);
+  gsl_matrix_set(mechanical.C_tangent, 2, 2, mu);
         
   return FEENOX_OK;
 }

@@ -44,10 +44,10 @@ int feenox_mechanical_material_setup_neohookean(void) {
 int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material) {
 
   // TODO: ask epsilon through arg, it it's null point it to mechanical.epsilon
-  
   feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
-  // RCG = Ft * F   right cauchy-green tensor
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_cauchy_green);
+  // right cauchy-green tensor
+  // C = Ft * F   
+  feenox_blas_BtB(mechanical.F, 1.0, mechanical.C);
     
   // second piola kirchoff
   feenox_call(feenox_problem_mechanical_compute_stress_PK2_neohookean(x, material));
@@ -64,7 +64,7 @@ int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *
 int feenox_problem_mechanical_compute_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2) {
   // volume change    
   double J = feenox_fem_determinant(F);
-  feenox_blas_BCBt(mechanical.F, PK2, NULL, 1/J, mechanical.cauchy);
+  feenox_blas_BCBt(mechanical.F, PK2, NULL, 1/J, mechanical.S);
     
   return FEENOX_OK;
 }
@@ -76,10 +76,10 @@ int feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, mat
   
   double J23 = pow(J, -2.0/3.0); // Isochoric scaling
   
-  gsl_matrix *C = mechanical.epsilon_cauchy_green;
+  gsl_matrix *C = mechanical.C;
   double trC = gsl_matrix_get(C, 0, 0) + gsl_matrix_get(C, 1, 1) + gsl_matrix_get(C, 2, 2);
 
-  gsl_matrix *C_inv = mechanical.invC;
+  gsl_matrix *C_inv = mechanical.C_inv;
   feenox_fem_matrix_invert(C, C_inv);
     
   double lambda, mu;
@@ -252,11 +252,11 @@ void compute_neohookean_jacobian_compact(
 */
 int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *x, material_t *material) {
   
-    gsl_matrix *C = mechanical.epsilon_cauchy_green;
+    gsl_matrix *C = mechanical.C;
     
     // Compute C inverse
     // TODO: we have already tthis
-    gsl_matrix *Cinv = mechanical.invC;
+    gsl_matrix *Cinv = mechanical.C_inv;
     feenox_fem_matrix_invert(C, Cinv);
 
     // Bulk modulus
@@ -337,8 +337,8 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *
     gsl_matrix_scale(temp2, term2_scale);
     
     // Combine both parts
-    gsl_matrix_memcpy(mechanical.C, temp1);
-    gsl_matrix_add(mechanical.C, temp2);    
+    gsl_matrix_memcpy(mechanical.C_tangent, temp1);
+    gsl_matrix_add(mechanical.C_tangent, temp2);    
     
     
     return FEENOX_OK;

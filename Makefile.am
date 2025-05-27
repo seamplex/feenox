@@ -91,7 +91,8 @@ TESTS_mechanical_ortho = \
 TESTS_mechanical_ldef = \
         tests/beam-ldef.sh \
         tests/hex8-ldef-jacobian.sh \
-        tests/hex8-ldef-ccx.sh
+        tests/hex8-ldef-ccx.sh \
+        tests/hex8-single-stretched.sh
         
 TESTS_mechanical = $(TESTS_mechanical_iso) $(TESTS_mechanical_ortho) $(TESTS_mechanical_ldef)
         

@@ -440,10 +440,10 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // allocate stress-strain objects
-  feenox_check_alloc(mechanical.C = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
+  feenox_check_alloc(mechanical.C_tangent = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
   if (mechanical.uniform_C) {
     // cache properties
-    feenox_call(mechanical.compute_C(NULL, feenox.mesh.materials));
+    feenox_call(mechanical.compute_material_tangent(NULL, feenox.mesh.materials));
   } 
 
   switch (mechanical.thermal_expansion_model) {
@@ -464,8 +464,9 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox_check_alloc(mechanical.Cet = gsl_vector_calloc(mechanical.stress_strain_size));
   }
   
+  mechanical.nonlinear_geom = feenox_var_value(mechanical.ldef) != 0;
   if (feenox.pde.math_type == math_type_automatic) {
-    if (mechanical.nonlinear_material || feenox_var_value(mechanical.ldef) != 0) {
+    if (mechanical.nonlinear_material || mechanical.nonlinear_geom) {
       feenox.pde.math_type = math_type_nonlinear;
     } else {
       feenox.pde.math_type = math_type_linear;
@@ -480,6 +481,7 @@ int feenox_problem_init_runtime_mechanical(void) {
     feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear;
     feenox.pde.has_internal_fluxes = 1;
     feenox_var_value(mechanical.ldef) = 1;
+    mechanical.nonlinear_geom = 1;
 //    feenox_var_value(mechanical.ldef_check) = 0;
   } else {
     feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);

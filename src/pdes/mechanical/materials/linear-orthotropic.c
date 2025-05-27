@@ -42,7 +42,7 @@ int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *mater
 }
 
 int feenox_mechanical_material_setup_linear_elastic_orthotropic(void) {
-  mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic;
+  mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic;
   mechanical.compute_stress_from_strain = feenox_stress_from_strain;
   
   return FEENOX_OK;
@@ -114,20 +114,20 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const
   C = feenox_fem_matrix_invert(S, C);
     
   // now fill the full 6x6 C
-  gsl_matrix_set(mechanical.C, 0, 0, gsl_matrix_get(C, 0, 0));
-  gsl_matrix_set(mechanical.C, 0, 1, gsl_matrix_get(C, 0, 1));
-  gsl_matrix_set(mechanical.C, 0, 2, gsl_matrix_get(C, 0, 2));
-  gsl_matrix_set(mechanical.C, 1, 0, gsl_matrix_get(C, 1, 0));
-  gsl_matrix_set(mechanical.C, 1, 1, gsl_matrix_get(C, 1, 1));
-  gsl_matrix_set(mechanical.C, 1, 2, gsl_matrix_get(C, 1, 2));
-  gsl_matrix_set(mechanical.C, 2, 0, gsl_matrix_get(C, 2, 0));
-  gsl_matrix_set(mechanical.C, 2, 1, gsl_matrix_get(C, 2, 1));
-  gsl_matrix_set(mechanical.C, 2, 2, gsl_matrix_get(C, 2, 2));
+  gsl_matrix_set(mechanical.C_tangent, 0, 0, gsl_matrix_get(C, 0, 0));
+  gsl_matrix_set(mechanical.C_tangent, 0, 1, gsl_matrix_get(C, 0, 1));
+  gsl_matrix_set(mechanical.C_tangent, 0, 2, gsl_matrix_get(C, 0, 2));
+  gsl_matrix_set(mechanical.C_tangent, 1, 0, gsl_matrix_get(C, 1, 0));
+  gsl_matrix_set(mechanical.C_tangent, 1, 1, gsl_matrix_get(C, 1, 1));
+  gsl_matrix_set(mechanical.C_tangent, 1, 2, gsl_matrix_get(C, 1, 2));
+  gsl_matrix_set(mechanical.C_tangent, 2, 0, gsl_matrix_get(C, 2, 0));
+  gsl_matrix_set(mechanical.C_tangent, 2, 1, gsl_matrix_get(C, 2, 1));
+  gsl_matrix_set(mechanical.C_tangent, 2, 2, gsl_matrix_get(C, 2, 2));
     
   // the following subscripts have to match rows 3-5 of mechanical.B
-  gsl_matrix_set(mechanical.C, 3, 3, G_xy);
-  gsl_matrix_set(mechanical.C, 4, 4, G_yz);
-  gsl_matrix_set(mechanical.C, 5, 5, G_zx);
+  gsl_matrix_set(mechanical.C_tangent, 3, 3, G_xy);
+  gsl_matrix_set(mechanical.C_tangent, 4, 4, G_yz);
+  gsl_matrix_set(mechanical.C_tangent, 5, 5, G_zx);
     
   gsl_matrix_free(C);
   gsl_matrix_free(S);

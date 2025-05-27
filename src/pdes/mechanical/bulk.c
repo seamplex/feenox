@@ -26,10 +26,11 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
   
   mechanical.n_nodes = n_nodes;
   
-  if (mechanical.B != NULL) {
-    gsl_matrix_free(mechanical.B);
+  // matrix with the shape functions
+  if (mechanical.B_shape != NULL) {
+    gsl_matrix_free(mechanical.B_shape);
   }
-  feenox_check_alloc(mechanical.B = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
+  feenox_check_alloc(mechanical.B_shape = gsl_matrix_calloc(mechanical.stress_strain_size, feenox.pde.dofs * mechanical.n_nodes));
   
   // this is a temporary holder to compute things like BtCB
   if (mechanical.CB != NULL) {
@@ -39,83 +40,50 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
 
   // --- non-linear stuff ------------------
   if (feenox.pde.math_type == math_type_nonlinear) {
-    // displacement gradient
-    if (mechanical.grad_u == NULL) {
-      feenox_check_alloc(mechanical.grad_u = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-  
-    // 3x3 identity (the symbol I is already taken by complex.h)
-    if (mechanical.eye == NULL) {
-      feenox_check_alloc(mechanical.eye = gsl_matrix_alloc(feenox.pde.dofs, feenox.pde.dofs));
-      gsl_matrix_set_identity(mechanical.eye);
-    }
-
-    if (mechanical.twomuE == NULL) {
-      feenox_check_alloc(mechanical.twomuE = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
     
-    if (mechanical.invC == NULL) {
-      feenox_check_alloc(mechanical.invC = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-
-    if (mechanical.SF == NULL) {
-      feenox_check_alloc(mechanical.SF = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    
-    // deformation gradient
-    if (mechanical.F == NULL) {
-      feenox_check_alloc(mechanical.F = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-
-    // inverse deformation gradient
-    if (mechanical.invF == NULL) {
-      feenox_check_alloc(mechanical.invF = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    
-    // strains
-    if (mechanical.epsilon_cauchy_green == NULL) {
-      feenox_check_alloc(mechanical.epsilon_cauchy_green = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    if (mechanical.epsilon_green_lagrange == NULL) {
-      feenox_check_alloc(mechanical.epsilon_green_lagrange = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    
-    // stresses
-    if (mechanical.PK1 == NULL) {
-      feenox_check_alloc(mechanical.PK1 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    if (mechanical.PK2 == NULL) {
-      feenox_check_alloc(mechanical.PK2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    if (mechanical.cauchy == NULL) {
-      feenox_check_alloc(mechanical.cauchy = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
-    }
-    
-    if (mechanical.PK2_voigt == NULL) {
-      feenox_check_alloc(mechanical.PK2_voigt = gsl_vector_calloc(mechanical.stress_strain_size));
-    }
-  
-    if (mechanical.Sigma == NULL) {
-      feenox_check_alloc(mechanical.Sigma = gsl_matrix_calloc(feenox.pde.dofs*feenox.pde.dofs, feenox.pde.dofs*feenox.pde.dofs));
-    }
-
-    // matrix with shape derivativesp
+    // matrix with shape derivatives for jacobian
     if (mechanical.G != NULL) {
       gsl_matrix_free(mechanical.G);
     }
     feenox_check_alloc(mechanical.G = gsl_matrix_calloc(feenox.pde.dofs*feenox.pde.dofs, feenox.pde.dofs * mechanical.n_nodes));
 
-    // holders
-    if (mechanical.tmp == NULL) {
-      feenox_check_alloc(mechanical.tmp = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    // 9x9 expansion of stresses for jacobian
+    if (mechanical.Sigma != NULL) {
+      gsl_matrix_free(mechanical.Sigma);
     }
-    
-    
-    // this is a temporary holder to compute GtSigmaG
+    feenox_check_alloc(mechanical.Sigma = gsl_matrix_calloc(feenox.pde.dofs*feenox.pde.dofs, feenox.pde.dofs*feenox.pde.dofs));
+
+    // temporary holder to compute GtSigmaG
     if (mechanical.SigmaG != NULL) {
       gsl_matrix_free(mechanical.SigmaG);
     }
     feenox_check_alloc(mechanical.SigmaG = gsl_matrix_calloc(feenox.pde.dofs*feenox.pde.dofs, feenox.pde.dofs * mechanical.n_nodes));
+    
+    
+    if (mechanical.grad_u == NULL) {
+      // 3x3 identity (the symbol I is already taken by complex.h)
+      feenox_check_alloc(mechanical.eye = gsl_matrix_alloc(feenox.pde.dofs, feenox.pde.dofs));
+      gsl_matrix_set_identity(mechanical.eye);
+
+      // displacement gradient
+      feenox_check_alloc(mechanical.grad_u = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      
+      // deformation gradient
+      feenox_check_alloc(mechanical.F = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.F_inv = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+
+      // strains
+      feenox_check_alloc(mechanical.eps = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.B = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.C = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    
+      // stresses
+      feenox_check_alloc(mechanical.PK1 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.PK2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.PK2_voigt = gsl_vector_calloc(mechanical.stress_strain_size));
+      feenox_check_alloc(mechanical.S = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+    }
+
   }
   
   
@@ -164,7 +132,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   if (mechanical.uniform_C == 0) {
     // material stress-strain relationship
     x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
-    feenox_call(mechanical.compute_C(x, feenox_fem_get_material(e)));
+    feenox_call(mechanical.compute_material_tangent(x, feenox_fem_get_material(e)));
   }
   
   gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
@@ -172,18 +140,18 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     // TODO: virtual methods? they cannot be inlined...
     if (mechanical.variant == variant_full) {
       
-      gsl_matrix_set(mechanical.B, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j));
-      gsl_matrix_set(mechanical.B, 1, 3*j+1, gsl_matrix_get(dhdx, 1, j));
-      gsl_matrix_set(mechanical.B, 2, 3*j+2, gsl_matrix_get(dhdx, 2, j));
+      gsl_matrix_set(mechanical.B_shape, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j));
+      gsl_matrix_set(mechanical.B_shape, 1, 3*j+1, gsl_matrix_get(dhdx, 1, j));
+      gsl_matrix_set(mechanical.B_shape, 2, 3*j+2, gsl_matrix_get(dhdx, 2, j));
     
-      gsl_matrix_set(mechanical.B, 3, 3*j+0, gsl_matrix_get(dhdx, 1, j));
-      gsl_matrix_set(mechanical.B, 3, 3*j+1, gsl_matrix_get(dhdx, 0, j));
+      gsl_matrix_set(mechanical.B_shape, 3, 3*j+0, gsl_matrix_get(dhdx, 1, j));
+      gsl_matrix_set(mechanical.B_shape, 3, 3*j+1, gsl_matrix_get(dhdx, 0, j));
 
-      gsl_matrix_set(mechanical.B, 4, 3*j+1, gsl_matrix_get(dhdx, 2, j));
-      gsl_matrix_set(mechanical.B, 4, 3*j+2, gsl_matrix_get(dhdx, 1, j));
+      gsl_matrix_set(mechanical.B_shape, 4, 3*j+1, gsl_matrix_get(dhdx, 2, j));
+      gsl_matrix_set(mechanical.B_shape, 4, 3*j+2, gsl_matrix_get(dhdx, 1, j));
 
-      gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j));
-      gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 0, j));
+      gsl_matrix_set(mechanical.B_shape, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j));
+      gsl_matrix_set(mechanical.B_shape, 5, 3*j+2, gsl_matrix_get(dhdx, 0, j));
 
     } else if (mechanical.variant == variant_axisymmetric) {
       
@@ -194,11 +162,11 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
       
       // plane stress and plane strain are the same
       // see equation 14.18 IFEM CH.14 sec 14.4.1 pag 14-11
-      gsl_matrix_set(mechanical.B, 0, 2*j+0, gsl_matrix_get(dhdx, 0, j));
-      gsl_matrix_set(mechanical.B, 1, 2*j+1, gsl_matrix_get(dhdx, 1, j));
+      gsl_matrix_set(mechanical.B_shape, 0, 2*j+0, gsl_matrix_get(dhdx, 0, j));
+      gsl_matrix_set(mechanical.B_shape, 1, 2*j+1, gsl_matrix_get(dhdx, 1, j));
     
-      gsl_matrix_set(mechanical.B, 2, 2*j+0, gsl_matrix_get(dhdx, 1, j));
-      gsl_matrix_set(mechanical.B, 2, 2*j+1, gsl_matrix_get(dhdx, 0, j));
+      gsl_matrix_set(mechanical.B_shape, 2, 2*j+0, gsl_matrix_get(dhdx, 1, j));
+      gsl_matrix_set(mechanical.B_shape, 2, 2*j+1, gsl_matrix_get(dhdx, 0, j));
 
     } else {
       return FEENOX_ERROR;
@@ -212,7 +180,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   feenox_call(feenox_problem_build_volumetric_forces(e, q, wdet, x));
 
   // elemental stiffness B'*C*B
-  feenox_call(feenox_blas_BtCB_accum(mechanical.B, mechanical.C, mechanical.CB, wdet, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtCB_accum(mechanical.B_shape, mechanical.C_tangent, mechanical.CB, wdet, feenox.fem.Ki));
 
   // thermal expansion strain vector
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
@@ -221,8 +189,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     }
     mechanical.compute_thermal_strain(x, feenox_fem_get_material(e));
     
-    feenox_call(feenox_blas_Atb(mechanical.C, mechanical.et, 1.0, mechanical.Cet));
-    feenox_call(feenox_blas_Atb_accum(mechanical.B, mechanical.Cet, wdet, feenox.fem.bi));
+    feenox_call(feenox_blas_Atb(mechanical.C_tangent, mechanical.et, 1.0, mechanical.Cet));
+    feenox_call(feenox_blas_Atb_accum(mechanical.B_shape, mechanical.Cet, wdet, feenox.fem.bi));
   }
   
 #endif
@@ -247,6 +215,10 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
       }
     }
   }
+  
+  mechanical.F = feenox_problem_mechanical_compute_deformation_gradient(mechanical.grad_u);
+  mechanical.C = feenox_problem_mechanical_compute_strain_cauchy_green_left(mechanical.F);
+  mechanical.eps = feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.C);  
 
   // residual = B^T*PK_voigt
   // material stiffness = B^T*C*B
@@ -322,29 +294,29 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
     
   
   for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
-    gsl_matrix_set(mechanical.B, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 0));
-    gsl_matrix_set(mechanical.B, 0, 3*j+1, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 0));
-    gsl_matrix_set(mechanical.B, 0, 3*j+2, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 0));
+    gsl_matrix_set(mechanical.B_shape, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 0));
+    gsl_matrix_set(mechanical.B_shape, 0, 3*j+1, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 0));
+    gsl_matrix_set(mechanical.B_shape, 0, 3*j+2, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 0));
     
-    gsl_matrix_set(mechanical.B, 1, 3*j+0, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 1));
-    gsl_matrix_set(mechanical.B, 1, 3*j+1, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 1));
-    gsl_matrix_set(mechanical.B, 1, 3*j+2, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 1));
+    gsl_matrix_set(mechanical.B_shape, 1, 3*j+0, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 1));
+    gsl_matrix_set(mechanical.B_shape, 1, 3*j+1, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 1));
+    gsl_matrix_set(mechanical.B_shape, 1, 3*j+2, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 1));
 
-    gsl_matrix_set(mechanical.B, 2, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 2));
-    gsl_matrix_set(mechanical.B, 2, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 2));
-    gsl_matrix_set(mechanical.B, 2, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 2));
+    gsl_matrix_set(mechanical.B_shape, 2, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 2));
+    gsl_matrix_set(mechanical.B_shape, 2, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 2));
+    gsl_matrix_set(mechanical.B_shape, 2, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 2));
     
-    gsl_matrix_set(mechanical.B, 3, 3*j+0, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 1));
-    gsl_matrix_set(mechanical.B, 3, 3*j+1, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 1));
-    gsl_matrix_set(mechanical.B, 3, 3*j+2, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 1));
+    gsl_matrix_set(mechanical.B_shape, 3, 3*j+0, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 1));
+    gsl_matrix_set(mechanical.B_shape, 3, 3*j+1, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 1));
+    gsl_matrix_set(mechanical.B_shape, 3, 3*j+2, gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 1));
 
-    gsl_matrix_set(mechanical.B, 4, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 2));
-    gsl_matrix_set(mechanical.B, 4, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 2));
-    gsl_matrix_set(mechanical.B, 4, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 2));
+    gsl_matrix_set(mechanical.B_shape, 4, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 2));
+    gsl_matrix_set(mechanical.B_shape, 4, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 2));
+    gsl_matrix_set(mechanical.B_shape, 4, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 2));
 
-    gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 2));
-    gsl_matrix_set(mechanical.B, 5, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 2));
-    gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 2));
+    gsl_matrix_set(mechanical.B_shape, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 2));
+    gsl_matrix_set(mechanical.B_shape, 5, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 2));
+    gsl_matrix_set(mechanical.B_shape, 5, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 2));
     
     // the matrix of shape function derivatives G
     gsl_matrix_set(mechanical.G, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j));
@@ -367,10 +339,10 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   feenox_call(feenox_problem_build_volumetric_forces(e, q, wdet, x));
   
   // internal non-linear force
-  feenox_call(feenox_blas_Atb_accum(mechanical.B, mechanical.PK2_voigt, wdet, feenox.fem.fi));
+  feenox_call(feenox_blas_Atb_accum(mechanical.B_shape, mechanical.PK2_voigt, wdet, feenox.fem.fi));
   
   // elemental stiffness B'*C*B
-  feenox_call(feenox_blas_BtCB_accum(mechanical.B, mechanical.C, mechanical.CB, wdet, feenox.fem.Ki));
+  feenox_call(feenox_blas_BtCB_accum(mechanical.B_shape, mechanical.C_tangent, mechanical.CB, wdet, feenox.fem.Ki));
   
   // elemental geometric stiffness G'*S*G
   feenox_call(feenox_blas_BtCB_accum(mechanical.G, mechanical.Sigma, mechanical.SigmaG, wdet, feenox.fem.JKi));
@@ -379,10 +351,10 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
 //#define VERBOSE  
 #ifdef VERBOSE  
   printf("B\n");
-  feenox_debug_print_gsl_matrix(mechanical.B, stdout);
+  feenox_debug_print_gsl_matrix(mechanical.B_shape, stdout);
 
   printf("C\n");
-  feenox_debug_print_gsl_matrix(mechanical.C, stdout);
+  feenox_debug_print_gsl_matrix(mechanical.C_tangent, stdout);
   
   printf("K\n");
   feenox_debug_print_gsl_matrix(feenox.fem.Ki, stdout);

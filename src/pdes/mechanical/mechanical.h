@@ -53,6 +53,8 @@ struct mechanical_material_ctx_t {
     thermal_expansion_model_orthotropic,    
   } thermal_expansion_model;
   
+  // TODO: union with pointers to specific material data
+  
 };
 
 
@@ -68,7 +70,8 @@ struct mechanical_t {
     variant_axisymmetric,
   } variant;  
   
-  // using the enums above
+  // global models using the enums above
+  // if different volumes have different models, these are unknown and each material uses its own context
   int material_model;
   int thermal_expansion_model;
   
@@ -77,6 +80,7 @@ struct mechanical_t {
   distribution_t nu;          // Poisson's ratio
   distribution_t lambda;      // Lame 
   distribution_t mu;          // Lame
+  distribution_t K;           // bulk modulus
   distribution_t alpha;       // (mean) thermal expansion coefficient
   
   // orthotropic properties
@@ -85,8 +89,6 @@ struct mechanical_t {
   distribution_t G_xy, G_yz, G_zx;          // Shear moduli
   distribution_t alpha_x, alpha_y, alpha_z; // (mean) thermal expansion coefficient
 
-  // TODO: neohookean with mu and K
-  
   // temperature field
   distribution_t T;     // temperature distribution
   distribution_t T_ref; // reference temperature (has to be a constant)
@@ -102,9 +104,12 @@ struct mechanical_t {
   int constant_C;
   int uniform_expansion;
   int constant_expansion;
+
   
-  unsigned int n_nodes;
+  // this one depends if we are 3D or 2D
   unsigned int stress_strain_size;
+  // this one changes when changing the element type (even between BCs and bulk)
+  unsigned int n_nodes;
 
   // holder for the rigid-body displacements
 #ifdef HAVE_PETSC  
@@ -112,7 +117,7 @@ struct mechanical_t {
 #endif
   
   // C-like virtual methods (i.e. function pointers)
-  int (*compute_C)(const double *x, material_t *material);
+  int (*compute_material_tangent)(const double *x, material_t *material);
   int (*compute_stress_from_strain)(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
@@ -122,40 +127,41 @@ struct mechanical_t {
 
   
   // auxiliary intermediate matrices
-  gsl_matrix *C;    // stress-strain matrix, 6x6 for 3d
-  gsl_matrix *B;    // strain-displacement matrix, 6x(3*n_nodes) for 3d
-  gsl_matrix *CB;   // product of C times B, 6x(3*n_nodes) for 3d
-  gsl_vector *et;   // thermal strain vector, size 6 for 3d
-  gsl_vector *Cet;  // product of C times et, size 6 for 3d
+  gsl_matrix *C_tangent;    // stress-strain tangent matrix (i.e. fourth-order tensor in voigt projection 6x6 for 3d)
+  gsl_matrix *B_shape;      // matrix with the derivatives of the shape functions 6x(3*n_nodes) for 3d
+  gsl_matrix *CB;           // product of C_tangent times B_shape, 6x(3*n_nodes) for 3d
+  gsl_vector *et;           // thermal strain in voigt, size 6 for 3d
+  gsl_vector *Cet;          // product of C times et, size 6 for 3d
   
   
   // non-linear stuff
+  gsl_matrix *eye;     // 3x3 identity (the symbol I is already taken by complex.h)
   gsl_matrix *grad_u;  // displacement gradient
   gsl_matrix *F;       // deformation gradient
-  gsl_matrix *invF;    // inverse deformation gradient
+  gsl_matrix *F_inv;   // inverse deformation gradient
+  double J;            // determinant of F
   
-  gsl_matrix *epsilon_green_lagrange; // green-lagrange strain
-  gsl_matrix *epsilon_cauchy_green ;  // cauchy-green strain
-//  gsl_matrix *epsilon; // pointer to one of above
+  gsl_matrix *eps;       // green-lagrange strain tensor
+  gsl_matrix *B;       // left green-lagrange strain tensor
+  gsl_matrix *C;       // right green-lagrange strain tensor
+  gsl_matrix *C_inv;   // inverse right green-lagrange strain tensor
 
   gsl_matrix *PK1;       // first piola-kirchoff stress
   gsl_matrix *PK2;       // second piola-kirchoff stress
-  gsl_vector *PK2_voigt; // S in voigt notation
+  gsl_vector *PK2_voigt; // PK2 in voigt notation
+  gsl_matrix *Sigma;   // 9x9 expansion of PK2
   
-  gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
-//  gsl_matrix *S;       // stress for Sigma (pointer to either PK2 or cauchy)
-  gsl_matrix *Sigma;   // 9x9 expansion of S
-  
+  gsl_matrix *S;       // cauchy stress tensor
   gsl_matrix *G;       // matrix with derivatives of shape functions
   gsl_matrix *SigmaG;  // temporary holder
   
   // temporary non-linear
-  gsl_matrix *eye;        // 3x3 identity (the symbol I is already taken by complex.h)
+  gsl_matrix *SF;         // temporary holder
+/*
   gsl_matrix *tmp;        // temporary holder
   gsl_matrix *twomuE;     // temporary holder
-  gsl_matrix *SF;         // temporary holder
   gsl_matrix *invC;
-
+*/
   
 //  double hourglass_epsilon;
 

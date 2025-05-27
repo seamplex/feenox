@@ -46,13 +46,13 @@ int feenox_problem_mechanical_compute_thermal_stress_isotropic (const double *x,
   
   // if the material is isotropic but non uniform, we do not have the proper C matrix
   if (mechanical.uniform_C == 0 && mechanical.material_model == material_model_elastic_isotropic) {
-    mechanical.compute_C(x, material);
+    mechanical.compute_material_tangent(x, material);
   }
 
-  *sigmat_x = alpha_delta_T * (gsl_matrix_get(mechanical.C, 0, 0) + gsl_matrix_get(mechanical.C, 0, 1) + gsl_matrix_get(mechanical.C, 0, 2));
-  *sigmat_y = alpha_delta_T * (gsl_matrix_get(mechanical.C, 1, 0) + gsl_matrix_get(mechanical.C, 1, 1) + gsl_matrix_get(mechanical.C, 1, 2));
+  *sigmat_x = alpha_delta_T * (gsl_matrix_get(mechanical.C_tangent, 0, 0) + gsl_matrix_get(mechanical.C_tangent, 0, 1) + gsl_matrix_get(mechanical.C_tangent, 0, 2));
+  *sigmat_y = alpha_delta_T * (gsl_matrix_get(mechanical.C_tangent, 1, 0) + gsl_matrix_get(mechanical.C_tangent, 1, 1) + gsl_matrix_get(mechanical.C_tangent, 1, 2));
   if (feenox.pde.dofs > 2) {
-    *sigmat_z = alpha_delta_T * (gsl_matrix_get(mechanical.C, 2, 0) + gsl_matrix_get(mechanical.C, 2, 1) + gsl_matrix_get(mechanical.C, 2, 2));
+    *sigmat_z = alpha_delta_T * (gsl_matrix_get(mechanical.C_tangent, 2, 0) + gsl_matrix_get(mechanical.C_tangent, 2, 1) + gsl_matrix_get(mechanical.C_tangent, 2, 2));
   }  
   
   return FEENOX_OK;

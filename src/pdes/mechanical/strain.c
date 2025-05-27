@@ -23,32 +23,30 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-int feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u) {
+gsl_matrix *feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u) {
   // deformation gradient
   // F = I + grad_u
   gsl_matrix_memcpy(mechanical.F, mechanical.eye);
   gsl_matrix_add(mechanical.F, grad_u);
 
-  return FEENOX_OK;
+  return mechanical.F;
 }
-/*
-int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u) {
-  feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
+gsl_matrix *feenox_problem_mechanical_compute_strain_cauchy_green_left(const gsl_matrix *F) {
   
-  // LCG = Ft * F   left cauchy-green tensor
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_green_lagrange);
+  // left cauchy-green tensor
+  // C = Ft * F   
+  feenox_blas_BtB(F, 1.0, mechanical.C);
 
-  return FEENOX_OK;
+  return mechanical.C;
 }
-*/
 
-int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u) {
-  feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
+gsl_matrix *feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *C) {
   
-  // EGL = 1/2 * (FtF - I)   green-lagrange strain tensor  
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_green_lagrange);
-  gsl_matrix_sub(mechanical.epsilon_green_lagrange, mechanical.eye);
-  gsl_matrix_scale(mechanical.epsilon_green_lagrange, 0.5);
+  // green-lagrange strain tensor
+  // E = 1/2 * (C - I)   
+  gsl_matrix_memcpy(mechanical.eps, C);
+  gsl_matrix_sub(mechanical.eps, mechanical.eye);
+  gsl_matrix_scale(mechanical.eps, 0.5);
   
-  return FEENOX_OK;
+  return mechanical.eps;
 }
