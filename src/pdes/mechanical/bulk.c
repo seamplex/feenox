@@ -91,8 +91,8 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
       feenox_check_alloc(mechanical.cauchy = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
     
-    if (mechanical.PK_voigt == NULL) {
-      feenox_check_alloc(mechanical.PK_voigt = gsl_vector_calloc(mechanical.stress_strain_size));
+    if (mechanical.PK2_voigt == NULL) {
+      feenox_check_alloc(mechanical.PK2_voigt = gsl_vector_calloc(mechanical.stress_strain_size));
     }
   
     if (mechanical.Sigma == NULL) {
@@ -256,31 +256,31 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   if (mechanical.material_model == material_model_elastic_isotropic) {
     feenox_problem_build_mechanical_stress_measure_linear_elastic(mechanical.grad_u, x, material);
     
+  } else if (mechanical.material_model == material_model_hyperelastic_svk) {
+    feenox_problem_build_mechanical_stress_measure_linear_elastic(mechanical.grad_u, x, material);
+
   } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
     feenox_problem_build_mechanical_stress_measure_neohookean(mechanical.grad_u, x, material);
      
   }
 
+  
+  double Sxx = gsl_matrix_get(mechanical.PK2, 0, 0);
+  double Syy = gsl_matrix_get(mechanical.PK2, 1, 1);
+  double Szz = gsl_matrix_get(mechanical.PK2, 2, 2);
+  double Sxy = gsl_matrix_get(mechanical.PK2, 0, 1);
+  double Syz = gsl_matrix_get(mechanical.PK2, 1, 2);
+  double Szx = gsl_matrix_get(mechanical.PK2, 2, 0);
 
-  gsl_vector_set(mechanical.PK_voigt, 0, gsl_matrix_get(mechanical.PK2, 0, 0));
-  gsl_vector_set(mechanical.PK_voigt, 1, gsl_matrix_get(mechanical.PK2, 1, 1));
-  gsl_vector_set(mechanical.PK_voigt, 2, gsl_matrix_get(mechanical.PK2, 2, 2));
-  gsl_vector_set(mechanical.PK_voigt, 3, gsl_matrix_get(mechanical.PK2, 0, 1));
-  gsl_vector_set(mechanical.PK_voigt, 4, gsl_matrix_get(mechanical.PK2, 1, 2));
-  gsl_vector_set(mechanical.PK_voigt, 5, gsl_matrix_get(mechanical.PK2, 2, 0));
+  // here voigt is not Landau's lexicographical but the cyclic ordering
+  gsl_vector_set(mechanical.PK2_voigt, 0, Sxx);
+  gsl_vector_set(mechanical.PK2_voigt, 1, Syy);
+  gsl_vector_set(mechanical.PK2_voigt, 2, Szz);
+  gsl_vector_set(mechanical.PK2_voigt, 3, Sxy);
+  gsl_vector_set(mechanical.PK2_voigt, 4, Syz);
+  gsl_vector_set(mechanical.PK2_voigt, 5, Szx);
   
-  // this is Landau's Voigt: 11 22 33 12 13 23 in lexicographical order
-//  gsl_vector_set(mechanical.PK_voigt, 4, gsl_matrix_get(mechanical.PK2, 0, 2));
-//  gsl_vector_set(mechanical.PK_voigt, 5, gsl_matrix_get(mechanical.PK2, 1, 2));
-     
   // the 9x9 Sigma matrix
-  double Sxx = gsl_matrix_get(mechanical.S, 0, 0);
-  double Syy = gsl_matrix_get(mechanical.S, 1, 1);
-  double Szz = gsl_matrix_get(mechanical.S, 2, 2);
-  double Sxy = gsl_matrix_get(mechanical.S, 0, 1);
-  double Syz = gsl_matrix_get(mechanical.S, 1, 2);
-  double Szx = gsl_matrix_get(mechanical.S, 2, 0);
-  
   // row 1  
   gsl_matrix_set(mechanical.Sigma, 0, 0, Sxx);
   gsl_matrix_set(mechanical.Sigma, 1, 1, Sxx);
@@ -322,7 +322,6 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
     
   
   for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
-//    gsl_matrix_set_identity(mechanical.F);
     gsl_matrix_set(mechanical.B, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 0));
     gsl_matrix_set(mechanical.B, 0, 3*j+1, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 0));
     gsl_matrix_set(mechanical.B, 0, 3*j+2, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 0));
@@ -346,18 +345,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
     gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 2));
     gsl_matrix_set(mechanical.B, 5, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 2));
     gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 2));
-
-/*    
-    // strain-displacement matrix B for lexicographical Voigt 11 22 33 12 13 23
-    gsl_matrix_set(mechanical.B, 4, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 2));
-    gsl_matrix_set(mechanical.B, 4, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 2));
-    gsl_matrix_set(mechanical.B, 4, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 0) + gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 2));
-
-    gsl_matrix_set(mechanical.B, 5, 3*j+0, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 0, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 0, 2));
-    gsl_matrix_set(mechanical.B, 5, 3*j+1, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 1, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 1, 2));
-    gsl_matrix_set(mechanical.B, 5, 3*j+2, gsl_matrix_get(dhdx, 2, j) * gsl_matrix_get(mechanical.F, 2, 1) + gsl_matrix_get(dhdx, 1, j) * gsl_matrix_get(mechanical.F, 2, 2));
-*/
-
+    
     // the matrix of shape function derivatives G
     gsl_matrix_set(mechanical.G, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j));
     gsl_matrix_set(mechanical.G, 1, 3*j+1, gsl_matrix_get(dhdx, 0, j));
@@ -379,7 +367,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   feenox_call(feenox_problem_build_volumetric_forces(e, q, wdet, x));
   
   // internal non-linear force
-  feenox_call(feenox_blas_Atb_accum(mechanical.B, mechanical.PK_voigt, wdet, feenox.fem.fi));
+  feenox_call(feenox_blas_Atb_accum(mechanical.B, mechanical.PK2_voigt, wdet, feenox.fem.fi));
   
   // elemental stiffness B'*C*B
   feenox_call(feenox_blas_BtCB_accum(mechanical.B, mechanical.C, mechanical.CB, wdet, feenox.fem.Ki));
@@ -387,6 +375,9 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   // elemental geometric stiffness G'*S*G
   feenox_call(feenox_blas_BtCB_accum(mechanical.G, mechanical.Sigma, mechanical.SigmaG, wdet, feenox.fem.JKi));
 
+
+//#define VERBOSE  
+#ifdef VERBOSE  
   printf("B\n");
   feenox_debug_print_gsl_matrix(mechanical.B, stdout);
 
@@ -404,7 +395,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   
   printf("JK\n");
   feenox_debug_print_gsl_matrix(feenox.fem.JKi, stdout);
-  
+#endif  
   
   
 #endif

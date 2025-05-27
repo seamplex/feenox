@@ -22,44 +22,44 @@
 #include "../feenox.h"
 
 // c = alpha * A*b
-int feenox_blas_Ab(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c) {
+int feenox_blas_Ab(const gsl_matrix *A, const gsl_vector *b, const double alpha, gsl_vector *c) {
   feenox_call(gsl_blas_dgemv(CblasNoTrans, alpha, A, b, 0.0, c));
   return FEENOX_OK;
 }
 
 // c = alpha * A'*b
-int feenox_blas_Atb(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c) {
+int feenox_blas_Atb(const gsl_matrix *A, const gsl_vector *b, const double alpha, gsl_vector *c) {
   feenox_call(gsl_blas_dgemv(CblasTrans, alpha, A, b, 0.0, c));
   return FEENOX_OK;
 }
 
 // c += alpha * A*b
-int feenox_blas_Ab_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c) {
+int feenox_blas_Ab_accum(const gsl_matrix *A, const gsl_vector *b, const double alpha, gsl_vector *c) {
   feenox_call(gsl_blas_dgemv(CblasNoTrans, alpha, A, b, 1.0, c));
   return FEENOX_OK;
 }
 
 // c += alpha * A'*b
-int feenox_blas_Atb_accum(gsl_matrix *A, gsl_vector *b, double alpha, gsl_vector *c) {
+int feenox_blas_Atb_accum(const gsl_matrix *A, const gsl_vector *b, const double alpha, gsl_vector *c) {
   feenox_call(gsl_blas_dgemv(CblasTrans, alpha, A, b, 1.0, c));
   return FEENOX_OK;
 }
 
 
 // R += alpha * B'*B
-int feenox_blas_BtB_accum(gsl_matrix *B, double alpha, gsl_matrix *R) {
+int feenox_blas_BtB_accum(const gsl_matrix *B, const double alpha, gsl_matrix *R) {
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, B, 1.0, R));
   return FEENOX_OK;
 }
 
 // R = alpha * B'*B
-int feenox_blas_BtB(gsl_matrix *B, double alpha, gsl_matrix *R) {
+int feenox_blas_BtB(const gsl_matrix *B, const double alpha, gsl_matrix *R) {
   feenox_call(gsl_blas_dgemm(CblasTrans, CblasNoTrans, alpha, B, B, 0.0, R));
   return FEENOX_OK;
 }
 
 // R = alpha * A*B'
-int feenox_blas_ABt(gsl_matrix *A, gsl_matrix *B, double alpha, gsl_matrix *R) {
+int feenox_blas_ABt(const gsl_matrix *A, const gsl_matrix *B, const double alpha, gsl_matrix *R) {
   feenox_call(gsl_blas_dgemm(CblasNoTrans, CblasTrans, alpha, A, B, 0.0, R));
   return FEENOX_OK;
 }
@@ -67,7 +67,7 @@ int feenox_blas_ABt(gsl_matrix *A, gsl_matrix *B, double alpha, gsl_matrix *R) {
 
 
 // R += alpha * B'*C*B
-int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R) {
+int feenox_blas_BtCB_accum(const gsl_matrix *B, const gsl_matrix *C, gsl_matrix *CB, const double alpha, gsl_matrix *R) {
   int alloc = 0;
   if (CB == NULL) {
     CB = gsl_matrix_alloc(C->size1, B->size2);
@@ -85,7 +85,7 @@ int feenox_blas_BtCB_accum(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double 
 }
 
 // R = alpha * B'*C*B
-int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R) {
+int feenox_blas_BtCB(const gsl_matrix *B, const gsl_matrix *C, gsl_matrix *CB, const double alpha, gsl_matrix *R) {
   int alloc = 0;
   if (CB == NULL) {
     CB = gsl_matrix_alloc(C->size1, B->size2);
@@ -103,7 +103,7 @@ int feenox_blas_BtCB(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha,
 }
 
 // R = alpha * B*C*B'
-int feenox_blas_BCBt(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha, gsl_matrix *R) {
+int feenox_blas_BCBt(const gsl_matrix *B, const gsl_matrix *C, gsl_matrix *CB, const double alpha, gsl_matrix *R) {
   int alloc = 0;
   if (CB == NULL) {
     CB = gsl_matrix_alloc(C->size1, B->size2);
@@ -122,7 +122,7 @@ int feenox_blas_BCBt(gsl_matrix *B, gsl_matrix *C, gsl_matrix *CB, double alpha,
 
 
 // R += alpha * P'*C*B
-int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R) {
+int feenox_blas_PtCB_accum(const gsl_matrix *P, const gsl_matrix *C, const gsl_matrix *B, gsl_matrix *CB, const double alpha, gsl_matrix *R) {
   int alloc = 0;
   if (CB == NULL) {
     CB = gsl_matrix_alloc(C->size1, B->size2);
@@ -140,7 +140,7 @@ int feenox_blas_PtCB_accum(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matr
 }
 
 // R = alpha * P'*C*B
-int feenox_blas_PtCB(gsl_matrix *P, gsl_matrix *C, gsl_matrix *B, gsl_matrix *CB, double alpha, gsl_matrix *R) {
+int feenox_blas_PtCB(const gsl_matrix *P, const gsl_matrix *C, const gsl_matrix *B, gsl_matrix *CB, const double alpha, gsl_matrix *R) {
   int alloc = 0;
   if (CB == NULL) {
     CB = gsl_matrix_alloc(C->size1, B->size2);

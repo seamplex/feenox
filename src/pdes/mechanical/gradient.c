@@ -145,12 +145,12 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       // green-lagrange strain  
       feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]));  
 
-      exx = gsl_matrix_get(mechanical.epsilon, 0, 0);
-      eyy = gsl_matrix_get(mechanical.epsilon, 1, 1);
-      ezz = gsl_matrix_get(mechanical.epsilon, 2, 2);
-      exy = gsl_matrix_get(mechanical.epsilon, 0, 1);
-      eyz = gsl_matrix_get(mechanical.epsilon, 1, 2);
-      ezx = gsl_matrix_get(mechanical.epsilon, 2, 0);
+      exx = gsl_matrix_get(mechanical.epsilon_green_lagrange, 0, 0);
+      eyy = gsl_matrix_get(mechanical.epsilon_green_lagrange, 1, 1);
+      ezz = gsl_matrix_get(mechanical.epsilon_green_lagrange, 2, 2);
+      exy = gsl_matrix_get(mechanical.epsilon_green_lagrange, 0, 1);
+      eyz = gsl_matrix_get(mechanical.epsilon_green_lagrange, 1, 2);
+      ezx = gsl_matrix_get(mechanical.epsilon_green_lagrange, 2, 0);
 
       // second piola kirchoff    
       feenox_call(feenox_problem_mechanical_compute_stress_PK2_elastic(node->x, element->physical_group->material));
@@ -170,14 +170,14 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       // neo-hookean
       // left cauchy green
       // TODO
-      feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(element->dphidx_node[j]));  
+//      feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(element->dphidx_node[j]));  
 
-      exx = gsl_matrix_get(mechanical.epsilon, 0, 0);
-      eyy = gsl_matrix_get(mechanical.epsilon, 1, 1);
-      ezz = gsl_matrix_get(mechanical.epsilon, 2, 2);
-      exy = gsl_matrix_get(mechanical.epsilon, 0, 1);
-      eyz = gsl_matrix_get(mechanical.epsilon, 1, 2);
-      ezx = gsl_matrix_get(mechanical.epsilon, 2, 0);
+      exx = gsl_matrix_get(mechanical.epsilon_green_lagrange, 0, 0);
+      eyy = gsl_matrix_get(mechanical.epsilon_green_lagrange, 1, 1);
+      ezz = gsl_matrix_get(mechanical.epsilon_green_lagrange, 2, 2);
+      exy = gsl_matrix_get(mechanical.epsilon_green_lagrange, 0, 1);
+      eyz = gsl_matrix_get(mechanical.epsilon_green_lagrange, 1, 2);
+      ezx = gsl_matrix_get(mechanical.epsilon_green_lagrange, 2, 0);
 
       // second piola kirchoff    
 //      feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(node->x, element->physical_group->material));

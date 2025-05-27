@@ -88,7 +88,12 @@ extern int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropi
 
 // stress measure
 
-// -- neo-hookea ------
+// -- saint venant-kirchoff
+// init
+extern int feenox_mechanical_material_init_svk(material_t *material, int i);
+
+
+// -- neo-hookean ------
 // init
 extern int feenox_mechanical_material_init_neohookean(material_t *material, int i);
 

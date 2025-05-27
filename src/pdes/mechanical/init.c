@@ -271,7 +271,8 @@ int feenox_problem_init_runtime_mechanical(void) {
             material_model[i] = feenox_mechanical_material_init_linear_elastic_orthotropic(material, i);
           } else if (strcmp(material->model, "neohookean") == 0) {
             material_model[i] = feenox_mechanical_material_init_neohookean(material, i);
-          // TODO: saint venant-kirchoff = linear with ldef
+          } else if (strcmp(material->model, "svk") == 0 || strcmp(material->model, "saint-venant-kirchoff") == 0 || strcmp(material->model, "saint-venant") == 0) {
+            material_model[i] = feenox_mechanical_material_init_svk(material, i);
           // TODO: hencky
           // TODO: mooney-rivlin
           } else {
@@ -324,6 +325,7 @@ int feenox_problem_init_runtime_mechanical(void) {
     i++;
   }
   
+  // TODO: something similar for mechanical models
   // thermal expansion model
   // first try isotropic
   feenox_call(feenox_distribution_init(&mechanical.alpha, "alpha"));
@@ -437,19 +439,22 @@ int feenox_problem_init_runtime_mechanical(void) {
 
     case material_model_hyperelastic_neohookean:
 
-      
-      // TODO: this should go into neohookean.c
-      if (mechanical.variant != variant_full) {
-        feenox_push_error_message("hyperelastic neohookean materials cannot be used in plane stress/strain");
-        return FEENOX_ERROR;
-      }
-      
       // TODO: evaluate PK2 + C in a single call? stresses
-//      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_neohookean;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
       mechanical.nonlinear_material = 1;
       
     break;
+    
+    case material_model_hyperelastic_svk:
+
+      // TODO: evaluate PK2 + C in a single call? stresses
+      mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
+      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
+      mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+      mechanical.nonlinear_material = 1;
+      
+    break;
+    
       
     default:
       // TODO

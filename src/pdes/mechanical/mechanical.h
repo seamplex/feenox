@@ -43,6 +43,7 @@ struct mechanical_material_ctx_t {
     material_model_unknown,
     material_model_elastic_isotropic,
     material_model_elastic_orthotropic,    
+    material_model_hyperelastic_svk,
     material_model_hyperelastic_neohookean,
   } material_model;
 
@@ -135,14 +136,14 @@ struct mechanical_t {
   
   gsl_matrix *epsilon_green_lagrange; // green-lagrange strain
   gsl_matrix *epsilon_cauchy_green ;  // cauchy-green strain
-  gsl_matrix *epsilon; // pointer to one of above
+//  gsl_matrix *epsilon; // pointer to one of above
 
-  gsl_matrix *PK1;     // first piola-kirchoff stress
-  gsl_matrix *PK2;     // second piola-kirchoff stress
-  gsl_vector *PK_voigt; // S in voigt notation
+  gsl_matrix *PK1;       // first piola-kirchoff stress
+  gsl_matrix *PK2;       // second piola-kirchoff stress
+  gsl_vector *PK2_voigt; // S in voigt notation
   
   gsl_matrix *cauchy;  // 3x3 cauchy stress tensor
-  gsl_matrix *S;       // stress for Sigma (pointer to either PK2 or cauchy)
+//  gsl_matrix *S;       // stress for Sigma (pointer to either PK2 or cauchy)
   gsl_matrix *Sigma;   // 9x9 expansion of S
   
   gsl_matrix *G;       // matrix with derivatives of shape functions

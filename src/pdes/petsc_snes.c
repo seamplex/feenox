@@ -140,7 +140,7 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
     petsc_call(MatMult(feenox.pde.K, feenox.pde.phi_bc, r));
   }
 
-#define VERBOSE
+//#define VERBOSE
   
 #ifdef VERBOSE
   printf("r as in f\n");

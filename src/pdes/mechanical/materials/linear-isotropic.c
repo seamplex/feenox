@@ -81,11 +81,11 @@ int feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, materi
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
   
   gsl_matrix_set_identity(mechanical.PK2);
-  double trE = gsl_matrix_get(mechanical.epsilon, 0, 0) + gsl_matrix_get(mechanical.epsilon, 1, 1) + gsl_matrix_get(mechanical.epsilon, 2, 2);
+  double trE = gsl_matrix_get(mechanical.epsilon_green_lagrange, 0, 0) + gsl_matrix_get(mechanical.epsilon_green_lagrange, 1, 1) + gsl_matrix_get(mechanical.epsilon_green_lagrange, 2, 2);
   gsl_matrix_scale(mechanical.PK2, lambda * trE);
   
   gsl_matrix_set_zero(mechanical.twomuE);
-  gsl_matrix_memcpy(mechanical.twomuE, mechanical.epsilon);
+  gsl_matrix_memcpy(mechanical.twomuE, mechanical.epsilon_green_lagrange);
   gsl_matrix_scale(mechanical.twomuE, 2*mu);
   gsl_matrix_add(mechanical.PK2, mechanical.twomuE);
     
@@ -137,9 +137,7 @@ int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, u
 
 int feenox_problem_build_mechanical_stress_measure_linear_elastic(const gsl_matrix *grad_u, const double *x, material_t *material) {
   
-  mechanical.epsilon = mechanical.epsilon_green_lagrange;
-//  mechanical.PK = mechanical.PK2;
-  mechanical.S = mechanical.PK2;
+//  mechanical.epsilon = mechanical.epsilon_green_lagrange;
   
   feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(grad_u));
   feenox_call(feenox_problem_mechanical_compute_stress_PK2_elastic(x, material));

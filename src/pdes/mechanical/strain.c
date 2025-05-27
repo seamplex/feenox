@@ -31,24 +31,24 @@ int feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *gra
 
   return FEENOX_OK;
 }
-
+/*
 int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix *grad_u) {
   feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
   
   // LCG = Ft * F   left cauchy-green tensor
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon);
+  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_green_lagrange);
 
   return FEENOX_OK;
 }
-
+*/
 
 int feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *grad_u) {
   feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
   
   // EGL = 1/2 * (FtF - I)   green-lagrange strain tensor  
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon);
-  gsl_matrix_sub(mechanical.epsilon, mechanical.eye);
-  gsl_matrix_scale(mechanical.epsilon, 0.5);
+  feenox_blas_BtB(mechanical.F, 1.0, mechanical.epsilon_green_lagrange);
+  gsl_matrix_sub(mechanical.epsilon_green_lagrange, mechanical.eye);
+  gsl_matrix_scale(mechanical.epsilon_green_lagrange, 0.5);
   
   return FEENOX_OK;
 }
