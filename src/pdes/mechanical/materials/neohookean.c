@@ -34,31 +34,27 @@ int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
 }
 
 int feenox_mechanical_material_setup_neohookean(void) {
-  mechanical.uniform_C = 0;
+  mechanical.compute_PK2 = feenox_problem_build_mechanical_stress_measure_neohookean;
   mechanical.compute_stress_from_strain = feenox_stress_from_strain;
   mechanical.nonlinear_material = 1;
   return FEENOX_OK;
 }
 
 
-int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material) {
+gsl_matrix *feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material) {
 
-  // TODO: ask epsilon through arg, it it's null point it to mechanical.epsilon
-  feenox_call(feenox_problem_mechanical_compute_deformation_gradient(grad_u));
-  // right cauchy-green tensor
-  // C = Ft * F   
-  feenox_blas_BtB(mechanical.F, 1.0, mechanical.C);
-    
   // second piola kirchoff
-  feenox_call(feenox_problem_mechanical_compute_stress_PK2_neohookean(x, material));
+  // mechanical.PK2 =
+  feenox_problem_mechanical_compute_stress_PK2_neohookean(x, material);
 
   // cauchy stress
-  feenox_call(feenox_problem_mechanical_compute_stress_cauchy_from_PK2(mechanical.F, mechanical.PK2));  
+  // feenox_call(feenox_problem_mechanical_compute_stress_cauchy_from_PK2(mechanical.F, mechanical.PK2));  
   
   // tangent matrix
-  feenox_call(feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(x, material));
+//  mechanical.C = 
+  feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(x, material);
 
-  return FEENOX_OK;
+  return mechanical.PK2;
 }
 
 int feenox_problem_mechanical_compute_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2) {
@@ -212,7 +208,7 @@ void compute_tensor_product_ILJK(const gsl_vector *A_voigt, const gsl_vector *B_
     return;
 }
 
-
+/*
 // Inputs: Cinv (3x3), lambda, mu, trC, J, etc.
 // Output: tangent (6x6 Voigt matrix)
 void compute_neohookean_jacobian_compact(
@@ -220,7 +216,7 @@ void compute_neohookean_jacobian_compact(
 {
     // Precompute constants
     double J23 = pow(J, -2.0/3.0);
-    double K = lambda + 2.0/3.0 * mu;
+    // double K = lambda + 2.0/3.0 * mu;
     
     int voigt_map[6][2] = {{0,0}, {1,1}, {2,2}, {0,1}, {1,2}, {2,0}};
 
@@ -241,7 +237,7 @@ void compute_neohookean_jacobian_compact(
         }
     }
 }    
-
+*/
 
 /*    
         (2.0 / 3.0) * std::pow(J, -2.0 / 3.0) * mu *

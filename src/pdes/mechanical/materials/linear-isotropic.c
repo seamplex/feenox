@@ -32,6 +32,7 @@ int feenox_mechanical_material_setup_linear_elastic(void) {
   mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
   if (mechanical.variant == variant_full) {
     mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
+    mechanical.compute_PK2 = feenox_problem_build_mechanical_stress_measure_linear_elastic;
     mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_linear_elastic;
   } else if (mechanical.variant == variant_plane_stress) {      
     mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
@@ -163,9 +164,10 @@ int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, u
 }
 
 
-int feenox_problem_build_mechanical_stress_measure_linear_elastic(const gsl_matrix *grad_u, const double *x, material_t *material) {
+gsl_matrix *feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material) {
   
   feenox_problem_mechanical_compute_stress_PK2_elastic(x, material);
 
-  return FEENOX_OK;
+  // TODO: re-compute C if non-uniform
+  return mechanical.PK2;
 }

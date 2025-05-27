@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's approach to handling distributions of properties
  *
- *  Copyright (C) 2015-2021 Jeremy Theler
+ *  Copyright (C) 2015-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -39,7 +39,6 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   if (this->property != NULL) {
     int full = 1; // asume it is full
     physical_group_t *physical_group = NULL;
-    physical_group_t *tmp_group = NULL;
     int i = 0;
     for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
       if (physical_group->dimension == feenox.pde.dim) {
@@ -75,7 +74,6 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   non_uniform = 0;
   n_volumes = 0;
   physical_group_t *physical_group = NULL;
-  physical_group_t *tmp_group = NULL;
   int i = 0;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->dimension == feenox.pde.dim) {
@@ -87,11 +85,11 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
           feenox_push_error_message("function '%s' should have %d arguments instead of %d to be used as a distribution", function->name, feenox.pde.dim, function->n_arguments);
           return FEENOX_ERROR;
         }
-        
+
         if (this->function == NULL) {
           this->function = function;
         }
-        
+
         // if there's no explicit material we create one
         if (physical_group->material == NULL) {
           physical_group->material = feenox_define_material_get_ptr(physical_group->name, feenox.pde.mesh);
@@ -148,7 +146,6 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   non_uniform = 0;
   n_volumes = 0;
   physical_group = NULL;
-  tmp_group = NULL;
   i = 0;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->dimension == feenox.pde.dim) {

@@ -76,9 +76,10 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
       feenox_check_alloc(mechanical.eps = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
       feenox_check_alloc(mechanical.B = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
       feenox_check_alloc(mechanical.C = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.C_inv = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     
       // stresses
-      feenox_check_alloc(mechanical.PK1 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+//      feenox_check_alloc(mechanical.PK1 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
       feenox_check_alloc(mechanical.PK2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
       feenox_check_alloc(mechanical.PK2_voigt = gsl_vector_calloc(mechanical.stress_strain_size));
       feenox_check_alloc(mechanical.S = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
@@ -205,37 +206,16 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
   material_t *material = feenox_fem_get_material(e);
   
-  // displacement gradient from elemental solution
   gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
-  gsl_matrix_set_zero(mechanical.grad_u);
-  for (int row = 0; row < 3; row++) {
-    for (int col = 0; col < 3; col++) {
-      for (int j = 0; j < mechanical.n_nodes; j++) {
-        gsl_matrix_add_to_element(mechanical.grad_u, row, col, gsl_matrix_get(dhdx, col, j) * gsl_vector_get(feenox.fem.phii, 3*j + row));
-      }
-    }
-  }
-  
-  mechanical.F = feenox_problem_mechanical_compute_deformation_gradient(mechanical.grad_u);
+  mechanical.grad_u = feenox_problem_mechanical_compute_gradient_displacement(dhdx, feenox.fem.phii);
+  mechanical.F = feenox_problem_mechanical_compute_gradient_deformation(mechanical.grad_u);
   mechanical.C = feenox_problem_mechanical_compute_strain_cauchy_green_left(mechanical.F);
   mechanical.eps = feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.C);  
-
+  mechanical.PK2 = mechanical.compute_PK2(x, material);
+ 
   // residual = B^T*PK_voigt
   // material stiffness = B^T*C*B
   // geometric stiffness = G^T*S*G
-  
-  // TODO: function pointers stores in material's context
-  if (mechanical.material_model == material_model_elastic_isotropic) {
-    feenox_problem_build_mechanical_stress_measure_linear_elastic(mechanical.grad_u, x, material);
-    
-  } else if (mechanical.material_model == material_model_hyperelastic_svk) {
-    feenox_problem_build_mechanical_stress_measure_linear_elastic(mechanical.grad_u, x, material);
-
-  } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
-    feenox_problem_build_mechanical_stress_measure_neohookean(mechanical.grad_u, x, material);
-     
-  }
-
   
   double Sxx = gsl_matrix_get(mechanical.PK2, 0, 0);
   double Syy = gsl_matrix_get(mechanical.PK2, 1, 1);

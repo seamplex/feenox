@@ -23,7 +23,20 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-gsl_matrix *feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u) {
+gsl_matrix *feenox_problem_mechanical_compute_gradient_displacement(const gsl_matrix *dhdx, const gsl_vector *u) {
+  gsl_matrix_set_zero(mechanical.grad_u);
+  for (int row = 0; row < 3; row++) {
+    for (int col = 0; col < 3; col++) {
+      for (int j = 0; j < mechanical.n_nodes; j++) {
+        gsl_matrix_add_to_element(mechanical.grad_u, row, col, gsl_matrix_get(dhdx, col, j) * gsl_vector_get(u, 3*j + row));
+      }
+    }
+  }
+  
+  return mechanical.grad_u;
+}
+
+gsl_matrix *feenox_problem_mechanical_compute_gradient_deformation(const gsl_matrix *grad_u) {
   // deformation gradient
   // F = I + grad_u
   gsl_matrix_memcpy(mechanical.F, mechanical.eye);

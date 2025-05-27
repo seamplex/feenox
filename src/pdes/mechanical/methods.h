@@ -60,7 +60,8 @@ extern int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *, u
 extern int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *, unsigned int q);
 
 // mechanical/strain.c
-extern gsl_matrix *feenox_problem_mechanical_compute_deformation_gradient(const gsl_matrix *grad_u);
+extern gsl_matrix *feenox_problem_mechanical_compute_gradient_displacement(const gsl_matrix *dhdx, const gsl_vector *u);
+extern gsl_matrix *feenox_problem_mechanical_compute_gradient_deformation(const gsl_matrix *grad_u);
 extern gsl_matrix *feenox_problem_mechanical_compute_strain_cauchy_green_left(const gsl_matrix *F);
 extern gsl_matrix *feenox_problem_mechanical_compute_strain_green_lagrange(const gsl_matrix *C);
 
@@ -78,7 +79,7 @@ extern int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stre
 extern int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain(const double *x, material_t *material);
 
 // stress measure
-extern int feenox_problem_build_mechanical_stress_measure_linear_elastic(const gsl_matrix *grad_u, const double *x, material_t *material);
+extern gsl_matrix *feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material);
 
 // -- linear elastic orthotropic  ------
 // init
@@ -102,8 +103,7 @@ extern int feenox_mechanical_material_init_neohookean(material_t *material, int 
 extern int feenox_mechanical_material_setup_neohookean(void);
 
 // stress measure
-extern int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material);
-//extern int feenox_problem_mechanical_compute_stress_PK1_neohookean(const double *x, material_t *material);
+extern gsl_matrix *feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *x, material_t *material);
 

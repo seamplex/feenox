@@ -1,8 +1,7 @@
 # ldef
 
- * Put `J`, `J23`, `E`, `C`, `B` in the material's context
-   - `mechanical.C` = stress-strain tensor
-   - `material.ctx->C` = right cauchy-green tensor
+ * bump version to 1.2 when everything works well
+ * create a source tarball
  * virtual methods
  * stresses in output
    - strain energy

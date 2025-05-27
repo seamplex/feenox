@@ -117,7 +117,9 @@ struct mechanical_t {
 #endif
   
   // C-like virtual methods (i.e. function pointers)
+  // TODO: return matrix
   int (*compute_material_tangent)(const double *x, material_t *material);
+  gsl_matrix *(*compute_PK2)(const double *x, material_t *material);
   int (*compute_stress_from_strain)(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
@@ -146,7 +148,7 @@ struct mechanical_t {
   gsl_matrix *C;       // right green-lagrange strain tensor
   gsl_matrix *C_inv;   // inverse right green-lagrange strain tensor
 
-  gsl_matrix *PK1;       // first piola-kirchoff stress
+//  gsl_matrix *PK1;       // first piola-kirchoff stress
   gsl_matrix *PK2;       // second piola-kirchoff stress
   gsl_vector *PK2_voigt; // PK2 in voigt notation
   gsl_matrix *Sigma;   // 9x9 expansion of PK2

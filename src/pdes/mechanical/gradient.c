@@ -143,7 +143,8 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     if (mechanical.material_model == material_model_elastic_isotropic) {
       // linear elastic
       // green-lagrange strain  
-      feenox_call(feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]));  
+      //mechanical.E = 
+      feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]);
 
       exx = gsl_matrix_get(mechanical.eps, 0, 0);
       eyy = gsl_matrix_get(mechanical.eps, 1, 1);
