@@ -20,6 +20,7 @@
 
 # General things to do
 
+ * windows build (against my will)
  * `PROGRESS` `ascii_art` `percentage` `norm` 
    - build, KSP, SNES
  * implicit call to `SOLVE_PROBLEM`?
