@@ -1,3 +1,23 @@
+# ldef
+
+ * Put `J`, `J23`, `E`, `C`, `B` in the material's context
+   - `mechanical.C` = stress-strain tensor
+   - `material.ctx->C` = right cauchy-green tensor
+ * virtual methods
+ * stresses in output
+   - strain energy
+ * many volumes
+   - same models
+   - different models
+ * compare with other solvers
+   - mofem
+   - fenicsx
+   - ccx
+   - code aster
+ * check $\det(\mathbf{F}) \neq 0$
+ * use TS with quasi-static
+ * examples
+
 # General things to do
 
  * `PROGRESS` `ascii_art` `percentage` `norm` 
@@ -15,6 +35,9 @@
  * extended integration (as in reduced, full, extended)
  * make GSL optional
    - rewrite BLAS using ad-hoc routines
+     - profile GSL BLAS vs. manual implementation vs. OpenBLAS
+     - eigen in C++ (optional)
+   - define `fee_matrix` as `gsl_matrix` but allow to change the implementation
    - wrap all GSL calls inside `#ifdef`
    - use a large chunk of contiguous memory in the heap to store shape functions, gradients, etc
  * optimize MPI usage

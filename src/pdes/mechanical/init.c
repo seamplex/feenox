@@ -405,6 +405,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   // TODO: handle different models
   switch (mechanical.material_model) {
   
+    // we need to call particular methods instead of hard-coding
     case material_model_elastic_isotropic:
       mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
       if (mechanical.variant == variant_full) {
@@ -439,7 +440,6 @@ int feenox_problem_init_runtime_mechanical(void) {
 
     case material_model_hyperelastic_neohookean:
 
-      // TODO: evaluate PK2 + C in a single call? stresses
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;
       mechanical.nonlinear_material = 1;
       
@@ -447,7 +447,6 @@ int feenox_problem_init_runtime_mechanical(void) {
     
     case material_model_hyperelastic_svk:
 
-      // TODO: evaluate PK2 + C in a single call? stresses
       mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
       mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
       mechanical.compute_stress_from_strain = feenox_stress_from_strain;

@@ -58,6 +58,7 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const
   double G_yz = mechanical.G_yz.eval(&mechanical.G_yz, x, material);
   double G_zx = mechanical.G_zx.eval(&mechanical.G_zx, x, material);
   
+  // TODO: put these guys in the material contex
   gsl_matrix *S = NULL; // reduced compliance matrix (only the normal-stress stuff)
   feenox_check_alloc(S = gsl_matrix_calloc(3, 3));  
   gsl_matrix *C = NULL; // reduced stiffness matrix
@@ -113,11 +114,9 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const
   gsl_matrix_set(mechanical.C, 2, 2, gsl_matrix_get(C, 2, 2));
     
   // the following subscripts have to match rows 3-5 of mechanical.B
-  // we use Landau's Voigt notation in lexicographic order, i.e
-  // 11 22 33 12 13 23
   gsl_matrix_set(mechanical.C, 3, 3, G_xy);
-  gsl_matrix_set(mechanical.C, 4, 4, G_zx);
-  gsl_matrix_set(mechanical.C, 5, 5, G_yz);
+  gsl_matrix_set(mechanical.C, 4, 4, G_yz);
+  gsl_matrix_set(mechanical.C, 5, 5, G_zx);
     
   gsl_matrix_free(C);
   gsl_matrix_free(S);
