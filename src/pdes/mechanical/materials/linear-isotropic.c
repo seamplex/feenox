@@ -27,6 +27,24 @@ int feenox_mechanical_material_init_linear_elastic(material_t *material, int i) 
   return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_elastic_isotropic : material_model_unknown;
 }
 
+int feenox_mechanical_material_setup_linear_elastic(void) {
+
+  mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
+  if (mechanical.variant == variant_full) {
+    mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
+    mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_linear_elastic;
+  } else if (mechanical.variant == variant_plane_stress) {      
+    mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
+    mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
+  } else if (mechanical.variant == variant_plane_strain) {  
+    mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain;
+    mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
+  }
+  
+  return FEENOX_OK;
+}
+  
+
 void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu) {
   double E = mechanical.E.eval(&mechanical.E, x, material);
   double nu = mechanical.nu.eval(&mechanical.nu, x, material);

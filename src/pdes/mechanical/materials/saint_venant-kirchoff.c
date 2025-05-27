@@ -25,10 +25,19 @@
 int feenox_mechanical_material_init_svk(material_t *material, int i) {
   
   if (mechanical.variant != variant_full) {
-    feenox_push_error_message("hyperelastic neohookean materials cannot be used in plane stress/strain");
+    feenox_push_error_message("hyperelastic SVK materials cannot be used in plane stress/strain");
     return FEENOX_ERROR;
   }
   
   // TO-DO: lambda and mu
   return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_hyperelastic_svk : material_model_unknown;
+}
+
+int feenox_mechanical_material_setup_svk(void) {
+  mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
+  mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
+  mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+  mechanical.nonlinear_material = 1;
+  
+  return FEENOX_OK;
 }

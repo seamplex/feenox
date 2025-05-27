@@ -23,6 +23,11 @@
 #include "../mechanical.h"
 
 int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i) {
+  if (mechanical.variant != variant_full) {
+    feenox_push_error_message("elastic orthotropic materials cannot be used in plane stress/strain");
+    return FEENOX_ERROR;
+ }
+  
   int n_ortho = mechanical.E_x.defined_per_group[i]   + mechanical.E_y.defined_per_group[i]   + mechanical.E_z.defined_per_group[i]   +
                 mechanical.nu_xy.defined_per_group[i] + mechanical.nu_yz.defined_per_group[i] + mechanical.nu_zx.defined_per_group[i] +
                 mechanical.G_xy.defined_per_group[i]  + mechanical.G_yz.defined_per_group[i]  + mechanical.G_zx.defined_per_group[i];
@@ -36,6 +41,12 @@ int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *mater
 
 }
 
+int feenox_mechanical_material_setup_linear_elastic_orthotropic(void) {
+  mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic;
+  mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+  
+  return FEENOX_OK;
+}
 
 int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const double *x, material_t *material) {
   

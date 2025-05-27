@@ -69,6 +69,7 @@ extern int feenox_problem_mechanical_compute_left_cauchy_green(const gsl_matrix 
 // -- linear elastic isotropic  ------
 // init
 extern int feenox_mechanical_material_init_linear_elastic(material_t *material, int i);
+extern int feenox_mechanical_material_setup_linear_elastic(void);
 
 // stress-strain 4th-order tensor
 extern void feenox_problem_mechanical_compute_lambda_mu(const double *x, material_t *material, double *lambda, double *mu);
@@ -82,6 +83,7 @@ extern int feenox_problem_build_mechanical_stress_measure_linear_elastic(const g
 // -- linear elastic orthotropic  ------
 // init
 extern int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *material, int i);
+extern int feenox_mechanical_material_setup_linear_elastic_orthotropic(void);
 
 // stress-strain 4th-order tensor
 extern int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic(const double *x, material_t *material);
@@ -91,11 +93,13 @@ extern int feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropi
 // -- saint venant-kirchoff
 // init
 extern int feenox_mechanical_material_init_svk(material_t *material, int i);
+extern int feenox_mechanical_material_setup_svk(void);
 
 
 // -- neo-hookean ------
 // init
 extern int feenox_mechanical_material_init_neohookean(material_t *material, int i);
+extern int feenox_mechanical_material_setup_neohookean(void);
 
 // stress measure
 extern int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material);

@@ -33,6 +33,14 @@ int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
   return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_hyperelastic_neohookean : material_model_unknown;
 }
 
+int feenox_mechanical_material_setup_neohookean(void) {
+  mechanical.uniform_C = 0;
+  mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+  mechanical.nonlinear_material = 1;
+  return FEENOX_OK;
+}
+
+
 int feenox_problem_build_mechanical_stress_measure_neohookean(const gsl_matrix *grad_u, const double *x, material_t *material) {
 
   // TODO: ask epsilon through arg, it it's null point it to mechanical.epsilon
@@ -77,35 +85,16 @@ int feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, mat
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
     
-  // Deviatoric term
-  gsl_matrix_set_identity(mechanical.PK2);
-  
-  gsl_matrix_memcpy(mechanical.tmp, C_inv);
-  gsl_matrix_scale(mechanical.tmp, trC / 3.0);
-  gsl_matrix_sub(mechanical.PK2, mechanical.tmp);
-  gsl_matrix_scale(mechanical.PK2, mu * J23);
-    
-  // Volumetric term
-  gsl_matrix_scale(C_inv, (lambda + 2.0/3.0 * mu) * (J - 1) * J);
-  gsl_matrix_add(mechanical.PK2, C_inv);  
-  
-/*  
-    // Compute PK2 stress in Voigt form
-    double PK2[3][3];
-    double J_minus_2_3 = pow(J, -2.0/3.0);
-    
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            // Deviatoric part
-            double dev_part = mu * J_minus_2_3 * 
-                             ((i == j ? 1.0 : 0.0) - (1.0/3.0) * trC * Cinv[i][j]);
-            // Volumetric part  
-            double vol_part = K * (J - 1.0) * J * Cinv[i][j];
+  double K = lambda + 2.0/3.0 * mu;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      double dev_part = mu * J23 * ((i == j ? 1.0 : 0.0) - (1.0/3.0) * trC * gsl_matrix_get(C_inv, i, j));
+      double vol_part = K * (J - 1.0) * J * gsl_matrix_get(C_inv, i, j);
             
-            PK2[i][j] = dev_part + vol_part;
-        }
-    }  
-*/
+      gsl_matrix_set(mechanical.PK2, i, j, dev_part + vol_part);
+    }
+  }  
+
 
   return FEENOX_OK;
 }
@@ -223,6 +212,44 @@ void compute_tensor_product_ILJK(const gsl_vector *A_voigt, const gsl_vector *B_
     return;
 }
 
+
+// Inputs: Cinv (3x3), lambda, mu, trC, J, etc.
+// Output: tangent (6x6 Voigt matrix)
+void compute_neohookean_jacobian_compact(
+    const gsl_matrix *Cinv, double lambda, double mu, double trC, double J, gsl_matrix *tangent)
+{
+    // Precompute constants
+    double J23 = pow(J, -2.0/3.0);
+    double K = lambda + 2.0/3.0 * mu;
+    
+    int voigt_map[6][2] = {{0,0}, {1,1}, {2,2}, {0,1}, {1,2}, {2,0}};
+
+    // Fill Voigt notation manually using symmetry, e.g.:
+    // Voigt indices: 0:xx, 1:yy, 2:zz, 3:xy, 4:yz, 5:xz
+    for (int p = 0; p < 6; p++) {
+        for (int q = 0; q < 6; q++) {
+            // Map I and J to tensor indices (i,j) and (k,l)
+            int i = voigt_map[p][0], j = voigt_map[p][1];
+            int k = voigt_map[q][0], l = voigt_map[q][1];
+            double val = lambda * gsl_matrix_get(Cinv,i,j) * gsl_matrix_get(Cinv,k,l)
+                + mu * (
+                    gsl_matrix_get(Cinv,i,k) * gsl_matrix_get(Cinv,j,l)
+                    + gsl_matrix_get(Cinv,i,l) * gsl_matrix_get(Cinv,j,k)
+                    - 2.0/3.0 * gsl_matrix_get(Cinv,i,j) * gsl_matrix_get(Cinv,k,l)
+                );
+            gsl_matrix_set(tangent, I, J, val * J23); // or include other scalings as required
+        }
+    }
+}    
+
+
+/*    
+        (2.0 / 3.0) * std::pow(J, -2.0 / 3.0) * mu *
+            (-IxinvC - invCxI + (1.0 / 3.0) * trC * invCxinvC +
+             (1.0 / 2.0) * trC * (invCxinvC_ikjl + invCxinvC_iljk)) +
+        K * J *
+            ((2.0 * J - 1.0) * invCxinvC - (J - 1.0) * (invCxinvC_ikjl + invCxinvC_iljk));    
+*/
 int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *x, material_t *material) {
   
     gsl_matrix *C = mechanical.epsilon_cauchy_green;
@@ -237,7 +264,7 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *
     double lambda, mu;
     feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
     double K = lambda + (2.0/3.0) * mu;
-    
+
     gsl_matrix *invCxI = gsl_matrix_calloc(6, 6);
     voigt_outer_product(Cinv, mechanical.eye, invCxI);
 
@@ -258,23 +285,15 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *
     gsl_matrix *invCxinvC_ikjl = gsl_matrix_calloc(6, 6);
     compute_tensor_product_IKJL(invC_voigt, invC_voigt, invCxinvC_ikjl);
     
-    
-    
     gsl_matrix *invCxinvC_iljk = gsl_matrix_calloc(6, 6);
     compute_tensor_product_ILJK(invC_voigt, invC_voigt, invCxinvC_iljk);
     
     double trC = gsl_matrix_get(C, 0, 0) + gsl_matrix_get(C, 1, 1) + gsl_matrix_get(C, 2, 2);
-/*    
-        (2.0 / 3.0) * std::pow(J, -2.0 / 3.0) * mu *
-            (-IxinvC - invCxI + (1.0 / 3.0) * trC * invCxinvC +
-             (1.0 / 2.0) * trC * (invCxinvC_ikjl + invCxinvC_iljk)) +
-        K * J *
-            ((2.0 * J - 1.0) * invCxinvC - (J - 1.0) * (invCxinvC_ikjl + invCxinvC_iljk));    
-*/
     
     // Precompute common terms
     double J = sqrt(feenox_fem_determinant(C));
     double J23 = pow(J, -2.0/3.0);
+    
     double term1_scale = (2.0/3.0) * J23 * mu;
     double term2_scale = K * J;
     
@@ -321,8 +340,6 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *
     gsl_matrix_memcpy(mechanical.C, temp1);
     gsl_matrix_add(mechanical.C, temp2);    
     
-    gsl_matrix_free(temp1);
-    gsl_matrix_free(temp2);
     
     return FEENOX_OK;
 }

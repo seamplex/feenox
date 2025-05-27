@@ -402,61 +402,26 @@ int feenox_problem_init_runtime_mechanical(void) {
   }
   
   // set material model virtual methods
-  // TODO: handle different models
+  // TODO: handle several volumes each one with a differen model
   switch (mechanical.material_model) {
   
     // we need to call particular methods instead of hard-coding
     case material_model_elastic_isotropic:
-      mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
-      if (mechanical.variant == variant_full) {
-      
-        mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
-        mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_linear_elastic;
-      
-      } else if (mechanical.variant == variant_plane_stress) {      
-      
-        mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
-        mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
-      
-      } else if (mechanical.variant == variant_plane_strain) {  
-      
-        mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain;
-        mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
-      
-      }  
+      feenox_call(feenox_mechanical_material_setup_linear_elastic());
     break;
     
     case material_model_elastic_orthotropic:
-      
-      if (mechanical.variant != variant_full) {
-        feenox_push_error_message("elastic orthotropic materials cannot be used in plane stress/strain");
-        return FEENOX_ERROR;
-      }
-
-      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_orthotropic;
-      mechanical.compute_stress_from_strain = feenox_stress_from_strain;
-    
+      feenox_call(feenox_mechanical_material_setup_linear_elastic_orthotropic());
     break;
 
     case material_model_hyperelastic_neohookean:
-
-      mechanical.compute_stress_from_strain = feenox_stress_from_strain;
-      mechanical.nonlinear_material = 1;
-      
+      feenox_call(feenox_mechanical_material_setup_neohookean());
     break;
     
     case material_model_hyperelastic_svk:
-
-      mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
-      mechanical.compute_C = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
-      mechanical.compute_stress_from_strain = feenox_stress_from_strain;
-      mechanical.nonlinear_material = 1;
-      
+      feenox_call(feenox_mechanical_material_setup_svk());
     break;
-    
-      
     default:
-      // TODO
       feenox_push_error_message("unknown material model, usual way to go is to define E and nu");
       return FEENOX_ERROR;
     break;
