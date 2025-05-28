@@ -34,10 +34,10 @@ int feenox_mechanical_material_init_svk(material_t *material, int i) {
 }
 
 int feenox_mechanical_material_setup_svk(void) {
-  mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
+  mechanical.uniform_properties = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
   mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
   mechanical.compute_PK2 = feenox_problem_build_mechanical_stress_measure_linear_elastic;
-  mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+  mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear;
   mechanical.nonlinear_material = 1;
   
   return FEENOX_OK;

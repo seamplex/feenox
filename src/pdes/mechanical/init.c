@@ -441,7 +441,7 @@ int feenox_problem_init_runtime_mechanical(void) {
   
   // allocate stress-strain objects
   feenox_check_alloc(mechanical.C_tangent = gsl_matrix_calloc(mechanical.stress_strain_size, mechanical.stress_strain_size));
-  if (mechanical.uniform_C) {
+  if (mechanical.uniform_properties) {
     // cache properties
     feenox_call(mechanical.compute_material_tangent(NULL, feenox.mesh.materials));
   } 

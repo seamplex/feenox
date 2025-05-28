@@ -23,23 +23,30 @@
 #include "../mechanical.h"
 
 int feenox_mechanical_material_init_linear_elastic(material_t *material, int i) {
-  // TODO: for lambda & mu 
+  // TODO: allow lambda & mu 
   return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_elastic_isotropic : material_model_unknown;
 }
 
 int feenox_mechanical_material_setup_linear_elastic(void) {
 
-  mechanical.uniform_C = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
+  mechanical.uniform_properties = (mechanical.E.non_uniform == 0 && mechanical.nu.non_uniform == 0);
   if (mechanical.variant == variant_full) {
+    
     mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic;
     mechanical.compute_PK2 = feenox_problem_build_mechanical_stress_measure_linear_elastic;
-    mechanical.compute_stress_from_strain = mechanical.uniform_C ? feenox_stress_from_strain : feenox_stress_from_strain_linear_elastic;
+    // not sure which one is better
+    mechanical.compute_stress_from_strain = mechanical.uniform_properties ? feenox_stress_from_strain_linear : feenox_stress_from_strain_linear_elastic;
+    
   } else if (mechanical.variant == variant_plane_stress) {      
+    
     mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_stress;  
     mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
+    
   } else if (mechanical.variant == variant_plane_strain) {  
+    
     mechanical.compute_material_tangent = feenox_problem_mechanical_compute_tangent_matrix_C_elastic_plane_strain;
     mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear_elastic;
+    
   }
   
   return FEENOX_OK;
@@ -75,26 +82,11 @@ int feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic(const doub
   gsl_matrix_set(mechanical.C_tangent, 4, 4, mu);
   gsl_matrix_set(mechanical.C_tangent, 5, 5, mu);
     
-//  printf("\n");
-//  feenox_debug_print_gsl_matrix(mechanical.C, stdout);
-  
   return FEENOX_OK;
 }
 
-/*
-// compute the first Piola-Kirchoff stress tensor
-int feenox_problem_mechanical_compute_stress_first_piola_kirchoff_elastic(void) {
-  // first piola-kirchoff
-  double J = feenox_fem_determinant(mechanical.F);
-  feenox_fem_matrix_invert(mechanical.F, mechanical.invF);
-  feenox_blas_ABt(mechanical.cauchy, mechanical.invF, J, mechanical.PK1);
-  
-  
-  return FEENOX_OK;
-}
-*/
-// compute the seconde Piola-Kirchoff stress tensor
-int feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, material_t *material) {
+// compute the second Piola-Kirchoff stress tensor
+gsl_matrix *feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, material_t *material) {
   
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
@@ -108,17 +100,7 @@ int feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, materi
     }
   }  
   
-/*  
-  gsl_matrix_set_identity(mechanical.PK2);
-  double trE = gsl_matrix_get(mechanical.eps, 0, 0) + gsl_matrix_get(mechanical.eps, 1, 1) + gsl_matrix_get(mechanical.eps, 2, 2);
-  gsl_matrix_scale(mechanical.PK2, lambda * trE);
-  
-  gsl_matrix_set_zero(mechanical.twomuE);
-  gsl_matrix_memcpy(mechanical.twomuE, mechanical.E);
-  gsl_matrix_scale(mechanical.twomuE, 2*mu);
-  gsl_matrix_add(mechanical.PK2, mechanical.twomuE);
-*/    
-  return FEENOX_OK;
+  return mechanical.PK2;
 }
 
 int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, unsigned int j,
@@ -147,16 +129,16 @@ int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, u
     
   } else if (mechanical.variant == variant_plane_stress) {
     
-      double E = mu*(3*lambda + 2*mu)/(lambda+mu);
-      double nu = lambda / (2*(lambda+mu));
+    double E = mu*(3*lambda + 2*mu)/(lambda+mu);
+    double nu = lambda / (2*(lambda+mu));
     
-      double c1 = E/(1-nu*nu);
-      double c2 = nu * c1;
+    double c1 = E/(1-nu*nu);
+    double c2 = nu * c1;
 
-      *sigmax = c1 * epsilonx + c2 * epsilony;
-      *sigmay = c2 * epsilonx + c1 * epsilony;
-      *sigmaz = 0;
-      *tauxy = c1*0.5*(1-nu) * gammaxy;
+    *sigmax = c1 * epsilonx + c2 * epsilony;
+    *sigmay = c2 * epsilonx + c1 * epsilony;
+    *sigmaz = 0;
+    *tauxy = c1*0.5*(1-nu) * gammaxy;
     
   }
   
@@ -167,7 +149,9 @@ int feenox_stress_from_strain_linear_elastic(node_t *node, element_t *element, u
 gsl_matrix *feenox_problem_build_mechanical_stress_measure_linear_elastic(const double *x, material_t *material) {
   
   feenox_problem_mechanical_compute_stress_PK2_elastic(x, material);
+  if (mechanical.uniform_properties == 0) {
+    feenox_problem_mechanical_compute_tangent_matrix_C_linear_elastic(x, material);
+  }
 
-  // TODO: re-compute C if non-uniform
   return mechanical.PK2;
 }

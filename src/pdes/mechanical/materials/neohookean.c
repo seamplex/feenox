@@ -29,13 +29,14 @@ int feenox_mechanical_material_init_neohookean(material_t *material, int i) {
     return FEENOX_ERROR;
   }
   
-  // TO-DO: mu and K
+  // TO-DO: lambda & my or mu & K
   return (mechanical.E.defined_per_group[i] && mechanical.nu.defined_per_group[i]) ? material_model_hyperelastic_neohookean : material_model_unknown;
 }
 
 int feenox_mechanical_material_setup_neohookean(void) {
   mechanical.compute_PK2 = feenox_problem_build_mechanical_stress_measure_neohookean;
-  mechanical.compute_stress_from_strain = feenox_stress_from_strain;
+  // TODO: compute cauchy from PK2?
+  mechanical.compute_stress_from_strain = feenox_stress_from_strain_linear;
   mechanical.nonlinear_material = 1;
   return FEENOX_OK;
 }
@@ -44,14 +45,9 @@ int feenox_mechanical_material_setup_neohookean(void) {
 gsl_matrix *feenox_problem_build_mechanical_stress_measure_neohookean(const double *x, material_t *material) {
 
   // second piola kirchoff
-  // mechanical.PK2 =
   feenox_problem_mechanical_compute_stress_PK2_neohookean(x, material);
 
-  // cauchy stress
-  // feenox_call(feenox_problem_mechanical_compute_stress_cauchy_from_PK2(mechanical.F, mechanical.PK2));  
-  
   // tangent matrix
-//  mechanical.C = 
   feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(x, material);
 
   return mechanical.PK2;
@@ -65,18 +61,13 @@ int feenox_problem_mechanical_compute_stress_cauchy_from_PK2(const gsl_matrix *F
   return FEENOX_OK;
 }
 
-int feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, material_t *material) {
+gsl_matrix *feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, material_t *material) {
   // second piola-kirchoff
-  double J = feenox_fem_determinant(mechanical.F);
+  mechanical.J = feenox_fem_determinant(mechanical.F);
   // TODO: check J > 0
-  
-  double J23 = pow(J, -2.0/3.0); // Isochoric scaling
-  
-  gsl_matrix *C = mechanical.C;
-  double trC = gsl_matrix_get(C, 0, 0) + gsl_matrix_get(C, 1, 1) + gsl_matrix_get(C, 2, 2);
-
-  gsl_matrix *C_inv = mechanical.C_inv;
-  feenox_fem_matrix_invert(C, C_inv);
+  mechanical.J23 = pow(mechanical.J, -2.0/3.0); // isochoric scaling
+  mechanical.trC = gsl_matrix_get(mechanical.C, 0, 0) + gsl_matrix_get(mechanical.C, 1, 1) + gsl_matrix_get(mechanical.C, 2, 2);
+  mechanical.C_inv = feenox_fem_matrix_invert(mechanical.C, mechanical.C_inv);
     
   double lambda, mu;
   feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
@@ -84,15 +75,14 @@ int feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, mat
   double K = lambda + 2.0/3.0 * mu;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      double dev_part = mu * J23 * ((i == j ? 1.0 : 0.0) - (1.0/3.0) * trC * gsl_matrix_get(C_inv, i, j));
-      double vol_part = K * (J - 1.0) * J * gsl_matrix_get(C_inv, i, j);
+      double dev_part = mu * mechanical.J23 * ((i == j ? 1.0 : 0.0) - (1.0/3.0) * mechanical.trC * gsl_matrix_get(mechanical.C_inv, i, j));
+      double vol_part = K * (mechanical.J - 1.0) * mechanical.J * gsl_matrix_get(mechanical.C_inv, i, j);
             
       gsl_matrix_set(mechanical.PK2, i, j, dev_part + vol_part);
     }
   }  
 
-
-  return FEENOX_OK;
+  return mechanical.PK2;
 }
 
 

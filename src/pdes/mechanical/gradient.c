@@ -154,7 +154,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
       ezx = gsl_matrix_get(mechanical.eps, 2, 0);
 
       // second piola kirchoff    
-      feenox_call(feenox_problem_mechanical_compute_stress_PK2_elastic(node->x, element->physical_group->material));
+      mechanical.PK2 = feenox_problem_mechanical_compute_stress_PK2_elastic(node->x, element->physical_group->material);
 
       // cauchy stress  
       double J = feenox_fem_determinant(mechanical.F);

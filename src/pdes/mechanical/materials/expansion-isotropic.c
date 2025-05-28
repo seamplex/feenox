@@ -22,7 +22,7 @@
 #include "feenox.h"
 #include "../mechanical.h"
 
-int feenox_problem_mechanical_compute_thermal_strain_isotropic (const double *x, material_t *material) {
+gsl_vector *feenox_problem_mechanical_compute_thermal_strain_isotropic (const double *x, material_t *material) {
   
   double delta_T = mechanical.T.eval(&mechanical.T, x, material) - mechanical.T0;
   double alpha = mechanical.alpha.eval(&mechanical.alpha, x, material);
@@ -34,7 +34,7 @@ int feenox_problem_mechanical_compute_thermal_strain_isotropic (const double *x,
     gsl_vector_set(mechanical.et, 2, alpha_delta_T);
   }
   
-  return FEENOX_OK;
+  return mechanical.et;
   
 }
 
@@ -45,7 +45,7 @@ int feenox_problem_mechanical_compute_thermal_stress_isotropic (const double *x,
   double alpha_delta_T = alpha * delta_T;
   
   // if the material is isotropic but non uniform, we do not have the proper C matrix
-  if (mechanical.uniform_C == 0 && mechanical.material_model == material_model_elastic_isotropic) {
+  if (mechanical.uniform_properties == 0 && mechanical.material_model == material_model_elastic_isotropic) {
     mechanical.compute_material_tangent(x, material);
   }
 

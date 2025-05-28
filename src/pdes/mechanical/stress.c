@@ -53,11 +53,11 @@ int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sig
   
 }
 
-int feenox_stress_from_strain(node_t *node, element_t *element, unsigned int j,
+int feenox_stress_from_strain_linear(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
   
-  if (mechanical.uniform_C == 0) {
+  if (mechanical.uniform_properties == 0) {
     mechanical.compute_material_tangent(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
   }  
   

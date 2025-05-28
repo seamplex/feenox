@@ -130,7 +130,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 #ifdef HAVE_PETSC
   
   double *x = NULL;
-  if (mechanical.uniform_C == 0) {
+  if (mechanical.uniform_properties == 0) {
     // material stress-strain relationship
     x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
     feenox_call(mechanical.compute_material_tangent(x, feenox_fem_get_material(e)));
@@ -178,6 +178,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
   double wdet = feenox_fem_compute_w_det_at_gauss_integration(e, q, feenox.pde.mesh->integration);
   
   // volumetric forces
+  // TODO: this is wrong! if the forces depend on x we have to evaluate it
   feenox_call(feenox_problem_build_volumetric_forces(e, q, wdet, x));
 
   // elemental stiffness B'*C*B
@@ -188,7 +189,7 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
     if (x == NULL) {
       x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);    
     }
-    mechanical.compute_thermal_strain(x, feenox_fem_get_material(e));
+    mechanical.et = mechanical.compute_thermal_strain(x, feenox_fem_get_material(e));
     
     feenox_call(feenox_blas_Atb(mechanical.C_tangent, mechanical.et, 1.0, mechanical.Cet));
     feenox_call(feenox_blas_Atb_accum(mechanical.B_shape, mechanical.Cet, wdet, feenox.fem.bi));
@@ -203,20 +204,27 @@ int feenox_problem_build_volumetric_gauss_point_mechanical(element_t *e, unsigne
 int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *e, unsigned int q) {
   
 #ifdef HAVE_PETSC
+  // compute the derivatives of the shape function at the q-th integration point
+  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
+  // gradient of the displacements out of the elemental solution phi
+  mechanical.grad_u = feenox_problem_mechanical_compute_gradient_displacement(dhdx, feenox.fem.phii);
+  // deformation gradient
+  mechanical.F = feenox_problem_mechanical_compute_gradient_deformation(mechanical.grad_u);
+  // right cauchy-green stress tensor
+  mechanical.C = feenox_problem_mechanical_compute_strain_cauchy_green_left(mechanical.F);
+  // green-lagrange strain tensor
+  mechanical.eps = feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.C);  
+
+  // each material now has to compute the second piola kirchoff stress tensor
   double *x = feenox_fem_compute_x_at_gauss(e, q, feenox.pde.mesh->integration);
   material_t *material = feenox_fem_get_material(e);
-  
-  gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
-  mechanical.grad_u = feenox_problem_mechanical_compute_gradient_displacement(dhdx, feenox.fem.phii);
-  mechanical.F = feenox_problem_mechanical_compute_gradient_deformation(mechanical.grad_u);
-  mechanical.C = feenox_problem_mechanical_compute_strain_cauchy_green_left(mechanical.F);
-  mechanical.eps = feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.C);  
   mechanical.PK2 = mechanical.compute_PK2(x, material);
  
   // residual = B^T*PK_voigt
   // material stiffness = B^T*C*B
   // geometric stiffness = G^T*S*G
   
+  // individual stresses from PK2
   double Sxx = gsl_matrix_get(mechanical.PK2, 0, 0);
   double Syy = gsl_matrix_get(mechanical.PK2, 1, 1);
   double Szz = gsl_matrix_get(mechanical.PK2, 2, 2);
@@ -272,8 +280,8 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
   gsl_matrix_set(mechanical.Sigma, 7, 7, Szz);
   gsl_matrix_set(mechanical.Sigma, 8, 8, Szz);
     
-  
   for (unsigned int j = 0; j < mechanical.n_nodes; j++) {
+    // the non-linear B matrix with the shape functions
     gsl_matrix_set(mechanical.B_shape, 0, 3*j+0, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 0, 0));
     gsl_matrix_set(mechanical.B_shape, 0, 3*j+1, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 1, 0));
     gsl_matrix_set(mechanical.B_shape, 0, 3*j+2, gsl_matrix_get(dhdx, 0, j) * gsl_matrix_get(mechanical.F, 2, 0));

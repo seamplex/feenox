@@ -100,8 +100,8 @@ struct mechanical_t {
   distribution_t f_z;
   
   // flags to speed up things
-  int uniform_C;
-  int constant_C;
+  int uniform_properties;
+  int constant_properties;
   int uniform_expansion;
   int constant_expansion;
 
@@ -124,7 +124,7 @@ struct mechanical_t {
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx);
 
-  int (*compute_thermal_strain)(const double *x, material_t *material);
+  gsl_vector *(*compute_thermal_strain)(const double *x, material_t *material);
   int (*compute_thermal_stress)(const double *x, material_t *material, double *sigmat_x, double *sigmat_y, double *sigmat_z);
 
   
@@ -142,6 +142,8 @@ struct mechanical_t {
   gsl_matrix *F;       // deformation gradient
   gsl_matrix *F_inv;   // inverse deformation gradient
   double J;            // determinant of F
+  double J23;          // isochoric factor
+  double trC;          // trace of C
   
   gsl_matrix *eps;       // green-lagrange strain tensor
   gsl_matrix *B;       // left green-lagrange strain tensor
@@ -157,13 +159,10 @@ struct mechanical_t {
   gsl_matrix *G;       // matrix with derivatives of shape functions
   gsl_matrix *SigmaG;  // temporary holder
   
-  // temporary non-linear
-  gsl_matrix *SF;         // temporary holder
-/*
-  gsl_matrix *tmp;        // temporary holder
-  gsl_matrix *twomuE;     // temporary holder
-  gsl_matrix *invC;
-*/
+  // temporary things
+  gsl_matrix *SF;
+  gsl_matrix *S_ortho;
+  gsl_matrix *C_ortho;
   
 //  double hourglass_epsilon;
 
