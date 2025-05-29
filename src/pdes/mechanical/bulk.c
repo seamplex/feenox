@@ -82,7 +82,7 @@ int feenox_problem_build_allocate_aux_mechanical(unsigned int n_nodes) {
 //      feenox_check_alloc(mechanical.PK1 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
       feenox_check_alloc(mechanical.PK2 = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
       feenox_check_alloc(mechanical.PK2_voigt = gsl_vector_calloc(mechanical.stress_strain_size));
-      feenox_check_alloc(mechanical.S = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
+      feenox_check_alloc(mechanical.cauchy = gsl_matrix_calloc(feenox.pde.dofs, feenox.pde.dofs));
     }
 
   }
@@ -206,8 +206,11 @@ int feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear(element_t *
 #ifdef HAVE_PETSC
   // compute the derivatives of the shape function at the q-th integration point
   gsl_matrix *dhdx = feenox_fem_compute_B_at_gauss_integration(e, q, feenox.pde.mesh->integration);
+  
   // gradient of the displacements out of the elemental solution phi
   mechanical.grad_u = feenox_problem_mechanical_compute_gradient_displacement(dhdx, feenox.fem.phii);
+
+  // TODO: these three are repeated in gradient, should we make a function for them?
   // deformation gradient
   mechanical.F = feenox_problem_mechanical_compute_gradient_deformation(mechanical.grad_u);
   // right cauchy-green stress tensor

@@ -23,6 +23,16 @@
 #include "feenox.h"
 #include "mechanical.h"
 
+gsl_matrix *feenox_cauchy_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2, double J) {
+  
+  if (J == 0) {
+    J = feenox_fem_determinant(F);
+  }
+  feenox_blas_BCBt(mechanical.F, PK2, NULL, 1/J, mechanical.cauchy);
+    
+  return mechanical.cauchy;
+}
+
 int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
   // stress invariants
   // https://en.wikiversity.org/wiki/Principal_stresses

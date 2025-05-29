@@ -155,7 +155,7 @@ struct mechanical_t {
   gsl_vector *PK2_voigt; // PK2 in voigt notation
   gsl_matrix *Sigma;   // 9x9 expansion of PK2
   
-  gsl_matrix *S;       // cauchy stress tensor
+  gsl_matrix *cauchy;  // cauchy stress tensor
   gsl_matrix *G;       // matrix with derivatives of shape functions
   gsl_matrix *SigmaG;  // temporary holder
   

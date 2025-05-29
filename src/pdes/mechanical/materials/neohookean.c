@@ -53,14 +53,6 @@ gsl_matrix *feenox_problem_build_mechanical_stress_measure_neohookean(const doub
   return mechanical.PK2;
 }
 
-int feenox_problem_mechanical_compute_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2) {
-  // volume change    
-  double J = feenox_fem_determinant(F);
-  feenox_blas_BCBt(mechanical.F, PK2, NULL, 1/J, mechanical.S);
-    
-  return FEENOX_OK;
-}
-
 gsl_matrix *feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, material_t *material) {
   // second piola-kirchoff
   mechanical.J = feenox_fem_determinant(mechanical.F);

@@ -85,11 +85,10 @@ int feenox_problem_gradient_properties_at_element_nodes_mechanical(element_t *el
 
 int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
   
-  size_t flux_size = 12;
   if (node->flux == NULL) {
     feenox_check_alloc(node->flux = calloc(FLUX_SIZE, sizeof(double)));
   } else {
-    for (unsigned int m = 0; m < flux_size; m++) {
+    for (int m = 0; m < FLUX_SIZE; m++) {
       node->flux[m] = 0;
     }
   }
@@ -114,9 +113,7 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
   double tauzx = 0;
   
   
-  // TODO: virtual methods in the material ctx
-  // TODO: use an integer flag for ldef
-  if (feenox_var_value(mechanical.ldef) == 0) {
+  if (mechanical.nonlinear_material == 0 && mechanical.nonlinear_geom == 0) {
     exx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
     eyy = gsl_matrix_get(element->dphidx_node[j], 1, 1);
     ezz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
@@ -140,58 +137,31 @@ int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t
     
   } else {
 
-    if (mechanical.material_model == material_model_elastic_isotropic) {
-      // linear elastic
-      // green-lagrange strain  
-      //mechanical.E = 
-      feenox_problem_mechanical_compute_strain_green_lagrange(element->dphidx_node[j]);
+    // TODO: these three are repeated in bulk, should we make a function for them?
+    mechanical.F = feenox_problem_mechanical_compute_gradient_deformation(element->dphidx_node[j]);
+    mechanical.C = feenox_problem_mechanical_compute_strain_cauchy_green_left(mechanical.F);
+    mechanical.eps = feenox_problem_mechanical_compute_strain_green_lagrange(mechanical.C);    
 
-      exx = gsl_matrix_get(mechanical.eps, 0, 0);
-      eyy = gsl_matrix_get(mechanical.eps, 1, 1);
-      ezz = gsl_matrix_get(mechanical.eps, 2, 2);
-      exy = gsl_matrix_get(mechanical.eps, 0, 1);
-      eyz = gsl_matrix_get(mechanical.eps, 1, 2);
-      ezx = gsl_matrix_get(mechanical.eps, 2, 0);
-
-      // second piola kirchoff    
-      mechanical.PK2 = feenox_problem_mechanical_compute_stress_PK2_elastic(node->x, element->physical_group->material);
-
-      // cauchy stress  
-      double J = feenox_fem_determinant(mechanical.F);
-      feenox_call(feenox_blas_BtCB(mechanical.F, mechanical.PK2, mechanical.SF, 1/J, mechanical.S));
+    // each material now has to compute the second piola kirchoff stress tensor
+    mechanical.PK2 = mechanical.compute_PK2(node->x, feenox_fem_get_material(element));
+    // and then we convert it to cauchy
+    mechanical.cauchy = feenox_cauchy_stress_cauchy_from_PK2(mechanical.F, mechanical.PK2, mechanical.J);
   
-      sigmax = gsl_matrix_get(mechanical.S, 0, 0);
-      sigmay = gsl_matrix_get(mechanical.S, 1, 1);
-      sigmaz = gsl_matrix_get(mechanical.S, 2, 2);
-      tauxy = gsl_matrix_get(mechanical.S, 0, 1);
-      tauyz = gsl_matrix_get(mechanical.S, 1, 2);
-      tauzx = gsl_matrix_get(mechanical.S, 2, 0);
-      
-    } else if (mechanical.material_model == material_model_hyperelastic_neohookean) {
-      // neo-hookean
-      // left cauchy green
-      // TODO
-//      feenox_call(feenox_problem_mechanical_compute_left_cauchy_green(element->dphidx_node[j]));  
-
-      exx = gsl_matrix_get(mechanical.eps, 0, 0);
-      eyy = gsl_matrix_get(mechanical.eps, 1, 1);
-      ezz = gsl_matrix_get(mechanical.eps, 2, 2);
-      exy = gsl_matrix_get(mechanical.eps, 0, 1);
-      eyz = gsl_matrix_get(mechanical.eps, 1, 2);
-      ezx = gsl_matrix_get(mechanical.eps, 2, 0);
-
-      // second piola kirchoff    
-//      feenox_call(feenox_problem_mechanical_compute_stress_cauchy_neohookean(node->x, element->physical_group->material));
+    // note this is voigt in cyclic order, not Landau's lexicographical order
+    exx = gsl_matrix_get(mechanical.eps, 0, 0);
+    eyy = gsl_matrix_get(mechanical.eps, 1, 1);
+    ezz = gsl_matrix_get(mechanical.eps, 2, 2);
+    exy = gsl_matrix_get(mechanical.eps, 0, 1);
+    eyz = gsl_matrix_get(mechanical.eps, 1, 2);
+    ezx = gsl_matrix_get(mechanical.eps, 2, 0);
   
-      sigmax = gsl_matrix_get(mechanical.S, 0, 0);
-      sigmay = gsl_matrix_get(mechanical.S, 1, 1);
-      sigmaz = gsl_matrix_get(mechanical.S, 2, 2);
-      tauxy = gsl_matrix_get(mechanical.S, 0, 1);
-      tauyz = gsl_matrix_get(mechanical.S, 1, 2);
-      tauzx = gsl_matrix_get(mechanical.S, 2, 0);
-    }
+    sigmax = gsl_matrix_get(mechanical.cauchy, 0, 0);
+    sigmay = gsl_matrix_get(mechanical.cauchy, 1, 1);
+    sigmaz = gsl_matrix_get(mechanical.cauchy, 2, 2);
+    tauxy = gsl_matrix_get(mechanical.cauchy, 0, 1);
+    tauyz = gsl_matrix_get(mechanical.cauchy, 1, 2);
+    tauzx = gsl_matrix_get(mechanical.cauchy, 2, 0);
   }
-
   
   if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
     // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)

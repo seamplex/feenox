@@ -107,12 +107,9 @@ extern gsl_matrix *feenox_problem_build_mechanical_stress_measure_neohookean(con
 extern gsl_matrix *feenox_problem_mechanical_compute_stress_PK2_neohookean(const double *x, material_t *material);
 extern int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *x, material_t *material);
 
-// TODO: this one is general
-extern int feenox_problem_mechanical_compute_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2);
-
-
 
 // stress.c
+extern gsl_matrix *feenox_cauchy_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2, double J);
 extern int feenox_problem_mechanical_compute_stress_first_piola_kirchoff(void);
 extern gsl_matrix *feenox_problem_mechanical_compute_stress_PK2_elastic(const double *x, material_t *material);
 extern gsl_matrix *feenox_problem_mechanical_compute_stress_cauchy_neohookean(const double *x, material_t *material);

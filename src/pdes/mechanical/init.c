@@ -269,7 +269,7 @@ int feenox_problem_init_runtime_mechanical(void) {
             material_model[i] = feenox_mechanical_material_init_linear_elastic(material, i);
           } else if (strcmp(material->model, "orthotropic") == 0 || strcmp(material->model, "elastic_orthotropic") == 0 || strcmp(material->model, "linear_elastic_orthotropic") == 0) {
             material_model[i] = feenox_mechanical_material_init_linear_elastic_orthotropic(material, i);
-          } else if (strcmp(material->model, "neohookean") == 0) {
+          } else if (strcmp(material->model, "neohookean") == 0 || strcmp(material->model, "neo") == 0) {
             material_model[i] = feenox_mechanical_material_init_neohookean(material, i);
           } else if (strcmp(material->model, "svk") == 0 || strcmp(material->model, "saint-venant-kirchoff") == 0 || strcmp(material->model, "saint-venant") == 0) {
             material_model[i] = feenox_mechanical_material_init_svk(material, i);
@@ -585,7 +585,7 @@ int feenox_problem_setup_ksp_mechanical(KSP ksp) {
   petsc_call(KSPGetType(ksp, &ksp_type));
   if (ksp_type == NULL) {
     // if the user did not choose anything, we default to CG or GMRES
-    petsc_call(KSPSetType(ksp, (feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES));
+    petsc_call(KSPSetType(ksp, (feenox.pde.math_type == math_type_linear && feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES));
   }  
 
   return FEENOX_OK;
