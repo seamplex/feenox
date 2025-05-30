@@ -164,6 +164,16 @@ struct mechanical_t {
   gsl_matrix *S_ortho;
   gsl_matrix *C_ortho;
   
+  gsl_matrix *invCxI;
+  gsl_matrix *IxinvC;
+  gsl_matrix *invCxinvC;
+  gsl_vector *invC_voigt;
+  gsl_matrix *invCxinvC_ikjl;
+  gsl_matrix *invCxinvC_iljk;
+  gsl_matrix *tmp1;
+  gsl_matrix *tmp2;
+  gsl_matrix *tmp3;
+  
 //  double hourglass_epsilon;
 
   var_t *ldef;

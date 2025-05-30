@@ -1,22 +1,3 @@
-# ldef
-
- * bump version to 1.2 when everything works well
- * create a source tarball
- * virtual methods
- * stresses in output
-   - strain energy
- * many volumes
-   - same models
-   - different models
- * compare with other solvers
-   - mofem
-   - fenicsx
-   - ccx
-   - code aster
- * check $\det(\mathbf{F}) \neq 0$
- * use TS with quasi-static
- * examples
-
 # General things to do
 
  * windows build (against my will)
@@ -170,17 +151,26 @@
  
 ## Mechanical
 
- * be able to use $\lambda$ & $\mu$ for elasticity
+ * be able to use $\lambda$ & $\mu$, $K$ & $\mu$, etc.
+ * strain energy for non-linear
+ * reactions for non-linear
+ * many volumes
+   - same models
+   - different models
+ * compare with other solvers
+   - mofem
+   - fenicsx
+   - ccx
+   - code aster
+ * check $\det(\mathbf{F}) \neq 0$
+ * examples
  * plasticity
  * stresses: count negative jacobians and worst jacobians
  * strain energy density
- * compare non-linear solutions against other solvers
  * quasi-static: use PETSc's TS
    - if a simple SNES does not converge, convert to TS
    - if $\det{F} \leq 0$, convert to TS
    - `PROBLEM` `AUTO_LOAD_STEPS`
- *   
-   
 
 ## Modal
 

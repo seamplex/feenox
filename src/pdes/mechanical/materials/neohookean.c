@@ -78,149 +78,85 @@ gsl_matrix *feenox_problem_mechanical_compute_stress_PK2_neohookean(const double
 }
 
 
-
-void voigt_outer_product(const gsl_matrix *A, const gsl_matrix *B, gsl_matrix *C_voigt) {
-  int voigt_map[6][2] = {{0,0}, {1,1}, {2,2}, {0,1}, {1,2}, {0,2}};  
+void feenox_tensor_outer_product_voigt(const gsl_matrix *A, const gsl_matrix *B, gsl_matrix *C_voigt) {
+  static const int voigt_map[6][2] = {{0,0}, {1,1}, {2,2}, {0,1}, {1,2}, {0,2}};  
 
   for (int i = 0; i < 6; i++) {
     for (int j = 0; j < 6; j++) {
-      int p = voigt_map[i][0], q = voigt_map[i][1];
-      int r = voigt_map[j][0], s = voigt_map[j][1];
-      double val = gsl_matrix_get(A, p, q) * gsl_matrix_get(B, r, s);
-       gsl_matrix_set(C_voigt, i, j, val);
+      int p = voigt_map[i][0];
+      int q = voigt_map[i][1];
+      int r = voigt_map[j][0];
+      int s = voigt_map[j][1];
+      gsl_matrix_set(C_voigt, i, j, gsl_matrix_get(A, p, q) * gsl_matrix_get(B, r, s));
     }
   }
   
   return;
 }
 
-
-void compute_tensor_product_IKJL(const gsl_vector *A_voigt, const gsl_vector *B_voigt, gsl_matrix *C_voigt) {
-
-    gsl_matrix_set(C_voigt, 0, 0, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 0));
-    gsl_matrix_set(C_voigt, 0, 1, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 0, 2, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 0, 3, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 0, 4, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 0, 5, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 5));
+void feenox_tensor_outer_product_ikjl(const gsl_vector *A_voigt, const gsl_vector *B_voigt, gsl_matrix *C_voigt) {
+  // Lookup tables mapping from (row, col) in C_voigt to indices in A_voigt and B_voigt
+  // These tables encode the specific tensor contraction pattern IKJL
+  static const int A_ikjl[6][6] = {
+    {0, 3, 5, 0, 3, 0},  // row 0
+    {3, 1, 4, 3, 1, 3},  // row 1
+    {5, 4, 2, 5, 4, 5},  // row 2
+    {0, 3, 5, 0, 3, 0},  // row 3
+    {3, 1, 4, 3, 1, 3},  // row 4
+    {0, 3, 5, 0, 3, 0}   // row 5
+  };
     
-    gsl_matrix_set(C_voigt, 1, 0, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 1, 1, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 1, 2, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 1, 3, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 1, 4, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 1, 5, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 4));
+  static const int B_ikjl[6][6] = {
+    {0, 3, 5, 3, 5, 5},  // row 0
+    {3, 1, 4, 1, 4, 4},  // row 1
+    {5, 4, 2, 4, 2, 2},  // row 2
+    {3, 1, 4, 1, 4, 4},  // row 3
+    {5, 4, 2, 4, 2, 2},  // row 4
+    {5, 4, 2, 4, 2, 2}   // row 5
+  };
     
-    gsl_matrix_set(C_voigt, 2, 0, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 2, 1, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 2, 2, gsl_vector_get(A_voigt, 2) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 2, 3, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 2, 4, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 2, 5, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 2));
-    
-    gsl_matrix_set(C_voigt, 3, 0, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 3, 1, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 3, 2, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 3, 3, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 3, 4, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 3, 5, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 4));
-    
-    gsl_matrix_set(C_voigt, 4, 0, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 4, 1, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 4, 2, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 4, 3, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 4, 4, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 4, 5, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 2));
-    
-    gsl_matrix_set(C_voigt, 5, 0, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 5, 1, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 5, 2, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 5, 3, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 5, 4, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 5, 5, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 2));
-
-    return;
-}
-
-//void compute_tensor_product_IKJL(const gsl_vector *A_voigt, const gsl_vector *B_voigt, gsl_matrix *C_voigt) {
-void compute_tensor_product_ILJK(const gsl_vector *A_voigt, const gsl_vector *B_voigt, gsl_matrix *C_voigt) {
-
-    gsl_matrix_set(C_voigt, 0, 0, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 0));
-    gsl_matrix_set(C_voigt, 0, 1, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 0, 2, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 0, 3, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 0));
-    gsl_matrix_set(C_voigt, 0, 4, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 0, 5, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 0));
-
-    gsl_matrix_set(C_voigt, 1, 0, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 1, 1, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 1, 2, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 1, 3, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 1, 4, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 1, 5, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 3));
-
-    gsl_matrix_set(C_voigt, 2, 0, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 2, 1, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 2, 2, gsl_vector_get(A_voigt, 2) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 2, 3, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 2, 4, gsl_vector_get(A_voigt, 2) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 2, 5, gsl_vector_get(A_voigt, 2) * gsl_vector_get(B_voigt, 5));
-
-    gsl_matrix_set(C_voigt, 3, 0, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 3, 1, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 3, 2, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 3, 3, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 3));
-    gsl_matrix_set(C_voigt, 3, 4, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 1));
-    gsl_matrix_set(C_voigt, 3, 5, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 3));
-
-    gsl_matrix_set(C_voigt, 4, 0, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 4, 1, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 4, 2, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 4, 3, gsl_vector_get(A_voigt, 1) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 4, 4, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 4, 5, gsl_vector_get(A_voigt, 4) * gsl_vector_get(B_voigt, 5));
-
-    gsl_matrix_set(C_voigt, 5, 0, gsl_vector_get(A_voigt, 0) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 5, 1, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 5, 2, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 2));
-    gsl_matrix_set(C_voigt, 5, 3, gsl_vector_get(A_voigt, 3) * gsl_vector_get(B_voigt, 5));
-    gsl_matrix_set(C_voigt, 5, 4, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 4));
-    gsl_matrix_set(C_voigt, 5, 5, gsl_vector_get(A_voigt, 5) * gsl_vector_get(B_voigt, 5));
-
-    return;
-}
-
-/*
-// Inputs: Cinv (3x3), lambda, mu, trC, J, etc.
-// Output: tangent (6x6 Voigt matrix)
-void compute_neohookean_jacobian_compact(
-    const gsl_matrix *Cinv, double lambda, double mu, double trC, double J, gsl_matrix *tangent)
-{
-    // Precompute constants
-    double J23 = pow(J, -2.0/3.0);
-    // double K = lambda + 2.0/3.0 * mu;
-    
-    int voigt_map[6][2] = {{0,0}, {1,1}, {2,2}, {0,1}, {1,2}, {2,0}};
-
-    // Fill Voigt notation manually using symmetry, e.g.:
-    // Voigt indices: 0:xx, 1:yy, 2:zz, 3:xy, 4:yz, 5:xz
-    for (int p = 0; p < 6; p++) {
-        for (int q = 0; q < 6; q++) {
-            // Map I and J to tensor indices (i,j) and (k,l)
-            int i = voigt_map[p][0], j = voigt_map[p][1];
-            int k = voigt_map[q][0], l = voigt_map[q][1];
-            double val = lambda * gsl_matrix_get(Cinv,i,j) * gsl_matrix_get(Cinv,k,l)
-                + mu * (
-                    gsl_matrix_get(Cinv,i,k) * gsl_matrix_get(Cinv,j,l)
-                    + gsl_matrix_get(Cinv,i,l) * gsl_matrix_get(Cinv,j,k)
-                    - 2.0/3.0 * gsl_matrix_get(Cinv,i,j) * gsl_matrix_get(Cinv,k,l)
-                );
-            gsl_matrix_set(tangent, I, J, val * J23); // or include other scalings as required
-        }
+  for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < 6; j++) {
+      double a_val = gsl_vector_get(A_voigt, A_ikjl[i][j]);
+      double b_val = gsl_vector_get(B_voigt, B_ikjl[i][j]);
+      gsl_matrix_set(C_voigt, i, j, a_val * b_val);
     }
-}    
-*/
+  }
+  
+  return;
+}
 
+void feenox_tensor_outer_product_iljk(const gsl_vector *A_voigt, const gsl_vector *B_voigt, gsl_matrix *C_voigt) {
+  // Lookup tables mapping from (row, col) in C_voigt to indices in A_voigt and B_voigt
+  // These tables encode the specific tensor contraction pattern ILJK: C[IJ,LK] = A[IL] × B[JK]
+  static const int A_iljk[6][6] = {
+    {0, 3, 5, 3, 5, 5},  // row 0: I=0, J=0 -> A[IL] for L=0,1,2,1,2,2
+    {3, 1, 4, 1, 4, 4},  // row 1: I=1, J=1 -> A[IL] for L=0,1,2,1,2,2  
+    {5, 4, 2, 4, 2, 2},  // row 2: I=2, J=2 -> A[IL] for L=0,1,2,1,2,2
+    {0, 3, 5, 3, 5, 5},  // row 3: I=0, J=1 -> A[IL] for L=0,1,2,1,2,2
+    {3, 1, 4, 1, 4, 4},  // row 4: I=1, J=2 -> A[IL] for L=0,1,2,1,2,2
+    {0, 3, 5, 3, 5, 5}   // row 5: I=0, J=2 -> A[IL] for L=0,1,2,1,2,2
+  };
+    
+  static const int B_iljk[6][6] = {
+    {0, 3, 5, 0, 3, 0},  // row 0: I=0, J=0 -> B[JK] for K=0,1,2,1,2,2
+    {3, 1, 4, 3, 1, 3},  // row 1: I=1, J=1 -> B[JK] for K=0,1,2,1,2,2
+    {5, 4, 2, 5, 4, 5},  // row 2: I=2, J=2 -> B[JK] for K=0,1,2,1,2,2
+    {3, 1, 4, 3, 1, 3},  // row 3: I=0, J=1 -> B[JK] for K=0,1,2,1,2,2
+    {5, 4, 2, 5, 4, 5},  // row 4: I=1, J=2 -> B[JK] for K=0,1,2,1,2,2
+    {5, 4, 2, 5, 4, 5}   // row 5: I=0, J=2 -> B[JK] for K=0,1,2,1,2,2
+  };
+    
+  for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < 6; j++) {
+      double a_val = gsl_vector_get(A_voigt, A_iljk[i][j]);
+      double b_val = gsl_vector_get(B_voigt, B_iljk[i][j]);
+      gsl_matrix_set(C_voigt, i, j, a_val * b_val);
+    }
+  }
+  
+  return;
+}
 /*    
         (2.0 / 3.0) * std::pow(J, -2.0 / 3.0) * mu *
             (-IxinvC - invCxI + (1.0 / 3.0) * trC * invCxinvC +
@@ -229,94 +165,83 @@ void compute_neohookean_jacobian_compact(
             ((2.0 * J - 1.0) * invCxinvC - (J - 1.0) * (invCxinvC_ikjl + invCxinvC_iljk));    
 */
 int feenox_problem_mechanical_compute_tangent_matrix_C_neohookean(const double *x, material_t *material) {
-  
-    gsl_matrix *C = mechanical.C;
-    
-    // Compute C inverse
-    // TODO: we have already tthis
-    gsl_matrix *Cinv = mechanical.C_inv;
-    feenox_fem_matrix_invert(C, Cinv);
-
     // Bulk modulus
-    // we already have this!
+    // TODO: we already have these! think where to store them...
     double lambda, mu;
     feenox_problem_mechanical_compute_lambda_mu(x, material, &lambda, &mu);
     double K = lambda + (2.0/3.0) * mu;
 
-    gsl_matrix *invCxI = gsl_matrix_calloc(6, 6);
-    voigt_outer_product(Cinv, mechanical.eye, invCxI);
-
-    gsl_matrix *IxinvC = gsl_matrix_calloc(6, 6);
-    voigt_outer_product(mechanical.eye, Cinv, IxinvC);
-
-    gsl_matrix *invCxinvC = gsl_matrix_calloc(6, 6);
-    voigt_outer_product(Cinv, Cinv, invCxinvC);
+    if (mechanical.invCxI == NULL) {
+      mechanical.invCxI = gsl_matrix_calloc(6, 6);
+      mechanical.IxinvC = gsl_matrix_calloc(6, 6);
+      mechanical.invCxinvC = gsl_matrix_calloc(6, 6);
+      mechanical.invC_voigt = gsl_vector_calloc(6);
+      mechanical.invCxinvC_ikjl = gsl_matrix_calloc(6, 6);
+      mechanical.invCxinvC_iljk = gsl_matrix_calloc(6, 6);
+      mechanical.tmp1 = gsl_matrix_calloc(6, 6);
+      mechanical.tmp2 = gsl_matrix_calloc(6, 6);
+      mechanical.tmp3 = gsl_matrix_calloc(6, 6);
+    }
+    feenox_tensor_outer_product_voigt(mechanical.C_inv, mechanical.eye, mechanical.invCxI);
+    feenox_tensor_outer_product_voigt(mechanical.eye, mechanical.C_inv, mechanical.IxinvC);
+    feenox_tensor_outer_product_voigt(mechanical.C_inv, mechanical.C_inv, mechanical.invCxinvC);
     
-    gsl_vector *invC_voigt = gsl_vector_calloc(6);
-    gsl_vector_set(invC_voigt, 0, gsl_matrix_get(Cinv, 0, 0));
-    gsl_vector_set(invC_voigt, 1, gsl_matrix_get(Cinv, 1, 1));
-    gsl_vector_set(invC_voigt, 2, gsl_matrix_get(Cinv, 2, 2));
-    gsl_vector_set(invC_voigt, 3, gsl_matrix_get(Cinv, 0, 1));
-    gsl_vector_set(invC_voigt, 4, gsl_matrix_get(Cinv, 1, 2));
-    gsl_vector_set(invC_voigt, 5, gsl_matrix_get(Cinv, 2, 0));
+    gsl_vector_set(mechanical.invC_voigt, 0, gsl_matrix_get(mechanical.C_inv, 0, 0));
+    gsl_vector_set(mechanical.invC_voigt, 1, gsl_matrix_get(mechanical.C_inv, 1, 1));
+    gsl_vector_set(mechanical.invC_voigt, 2, gsl_matrix_get(mechanical.C_inv, 2, 2));
+    gsl_vector_set(mechanical.invC_voigt, 3, gsl_matrix_get(mechanical.C_inv, 0, 1));
+    gsl_vector_set(mechanical.invC_voigt, 4, gsl_matrix_get(mechanical.C_inv, 1, 2));
+    gsl_vector_set(mechanical.invC_voigt, 5, gsl_matrix_get(mechanical.C_inv, 2, 0));
     
-    gsl_matrix *invCxinvC_ikjl = gsl_matrix_calloc(6, 6);
-    compute_tensor_product_IKJL(invC_voigt, invC_voigt, invCxinvC_ikjl);
+    feenox_tensor_outer_product_ikjl(mechanical.invC_voigt, mechanical.invC_voigt, mechanical.invCxinvC_ikjl);    
+    feenox_tensor_outer_product_iljk(mechanical.invC_voigt, mechanical.invC_voigt, mechanical.invCxinvC_iljk);
     
-    gsl_matrix *invCxinvC_iljk = gsl_matrix_calloc(6, 6);
-    compute_tensor_product_ILJK(invC_voigt, invC_voigt, invCxinvC_iljk);
-    
-    double trC = gsl_matrix_get(C, 0, 0) + gsl_matrix_get(C, 1, 1) + gsl_matrix_get(C, 2, 2);
+    double trC = gsl_matrix_get(mechanical.C, 0, 0) + gsl_matrix_get(mechanical.C, 1, 1) + gsl_matrix_get(mechanical.C, 2, 2);
     
     // Precompute common terms
-    double J = sqrt(feenox_fem_determinant(C));
+    double J = sqrt(feenox_fem_determinant(mechanical.C));
     double J23 = pow(J, -2.0/3.0);
     
     double term1_scale = (2.0/3.0) * J23 * mu;
     double term2_scale = K * J;
-    
-    // Temporary matrix storage
-    gsl_matrix *temp1 = gsl_matrix_calloc(6, 6);
-    gsl_matrix *temp2 = gsl_matrix_calloc(6, 6);
-    
+        
     // First part: (2/3)*J^(-2/3)*mu * [...]
     // -IxinvC - invCxI
-    gsl_matrix_memcpy(temp1, IxinvC);
-    gsl_matrix_scale(temp1, -1.0);
-    gsl_matrix_sub(temp1, invCxI);
+    gsl_matrix_memcpy(mechanical.tmp1, mechanical.IxinvC);
+    gsl_matrix_scale(mechanical.tmp1, -1.0);
+    gsl_matrix_sub(mechanical.tmp1, mechanical.invCxI);
     
     // + (1/3)*trC*invCxinvC
-    gsl_matrix_memcpy(temp2, invCxinvC);
-    gsl_matrix_scale(temp2, (1.0/3.0) * trC);
-    gsl_matrix_add(temp1, temp2);
+    gsl_matrix_memcpy(mechanical.tmp2, mechanical.invCxinvC);
+    gsl_matrix_scale(mechanical.tmp2, (1.0/3.0) * trC);
+    gsl_matrix_add(mechanical.tmp1, mechanical.tmp2);
     
     // + (1/2)*trC*(invCxinvC_ikjl + invCxinvC_iljk)
-    gsl_matrix_memcpy(temp2, invCxinvC_ikjl);
-    gsl_matrix_add(temp2, invCxinvC_iljk);
-    gsl_matrix_scale(temp2, (1.0/2.0) * trC);
-    gsl_matrix_add(temp1, temp2);
+    gsl_matrix_memcpy(mechanical.tmp2, mechanical.invCxinvC_ikjl);
+    gsl_matrix_add(mechanical.tmp2, mechanical.invCxinvC_iljk);
+    gsl_matrix_scale(mechanical.tmp2, (1.0/2.0) * trC);
+    gsl_matrix_add(mechanical.tmp1, mechanical.tmp2);
     
     // Scale by term1_scale
-    gsl_matrix_scale(temp1, term1_scale);
+    gsl_matrix_scale(mechanical.tmp1, term1_scale);
     
     // Second part: K*J * [...]
     // (2*J-1)*invCxinvC
-    gsl_matrix_memcpy(temp2, invCxinvC);
-    gsl_matrix_scale(temp2, (2.0*J - 1.0));
+    gsl_matrix_memcpy(mechanical.tmp2, mechanical.invCxinvC);
+    gsl_matrix_scale(mechanical.tmp2, (2.0*J - 1.0));
     
     // - (J-1)*(invCxinvC_ikjl + invCxinvC_iljk)
-    gsl_matrix *temp3 = gsl_matrix_calloc(6, 6);
-    gsl_matrix_memcpy(temp3, invCxinvC_ikjl);
-    gsl_matrix_add(temp3, invCxinvC_iljk);
-    gsl_matrix_scale(temp3, -(J - 1.0));
-    gsl_matrix_add(temp2, temp3);
+    gsl_matrix_memcpy(mechanical.tmp3, mechanical.invCxinvC_ikjl);
+    gsl_matrix_add(mechanical.tmp3, mechanical.invCxinvC_iljk);
+    gsl_matrix_scale(mechanical.tmp3, -(J - 1.0));
+    gsl_matrix_add(mechanical.tmp2, mechanical.tmp3);
     
     // Scale by term2_scale
-    gsl_matrix_scale(temp2, term2_scale);
+    gsl_matrix_scale(mechanical.tmp2, term2_scale);
     
     // Combine both parts
-    gsl_matrix_memcpy(mechanical.C_tangent, temp1);
-    gsl_matrix_add(mechanical.C_tangent, temp2);    
+    gsl_matrix_memcpy(mechanical.C_tangent, mechanical.tmp1);
+    gsl_matrix_add(mechanical.C_tangent, mechanical.tmp2);    
     
     
     return FEENOX_OK;
