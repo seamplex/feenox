@@ -5,4 +5,8 @@ This directory has two subdirectories with scripts to perform verification using
  * [2D](2d)
  * [3D](3d)
 
-Check out this video for an explanation about MMS: <https://youtu.be/mGNwL8TGijg>
+> [!TIP]
+> Make sure you also look at the [mechanical cases](../mechanical) as well.
+ 
+> [!NOTE]
+> Check out this video for an explanation about MMS: <https://youtu.be/mGNwL8TGijg>

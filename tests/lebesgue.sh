@@ -6,7 +6,7 @@ for i in . tests; do
 done
 if [ -z "${functions_found}" ]; then
   echo "could not find functions.sh"
-  exit 1;
+   exit 1
 fi
 
 answer1 single-arc.fee 1   "-1.6e-01"

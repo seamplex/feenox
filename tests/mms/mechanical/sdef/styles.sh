@@ -1,0 +1,1 @@
+../../thermal/3d/styles.sh

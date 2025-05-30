@@ -1,0 +1,14 @@
+ dirichlet | tet4 | struct | 1.8
+ dirichlet | tet4 | hxt | 2.0
+ dirichlet | tet10 | struct | 3.0
+ dirichlet | tet10 | hxt | 3.1
+ dirichlet | hex8 | struct | 2.0
+ dirichlet | hex20 | struct | 3.1
+ dirichlet | hex27 | struct | 3.0
+ neumann | tet4 | struct | 1.8
+ neumann | tet4 | hxt | 2.0
+ neumann | tet10 | struct | 3.0
+ neumann | tet10 | hxt | 3.0
+ neumann | hex8 | struct | 2.0
+ neumann | hex20 | struct | 3.0
+ neumann | hex27 | struct | 3.0

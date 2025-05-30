@@ -1,0 +1,14 @@
+READ_MESH hex8-single.msh
+PROBLEM mechanical
+
+MATERIAL dummy MODEL $1 E=1 nu=0.25 
+
+BC left fixed
+BC right u=0.25
+# BC right Fx=0.25
+
+SOLVE_PROBLEM
+
+# PRINT_FUNCTION u v w
+WRITE_RESULTS FORMAT vtk
+PRINT %.4f v(1,1,1) #sigmax(1,1,1)

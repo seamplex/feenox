@@ -1,5 +1,8 @@
 # Current (under development)
 
+ * Neo-hookean material model
+ * Saint Venant-Kirchoff material model for ldef
+ * large deformation formulation for `mechanical`
  * ...
 
 # v1.1 (Apr 2025)

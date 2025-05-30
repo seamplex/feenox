@@ -1,0 +1,3 @@
+# mechanical_sdefcube_dirichlet_tet4_struct | 2.0
+e_2_mechanical_sdefcube_dirichlet_tet4_struct(x) = 1.97513 * x ** 1.98992
+e_2_mechanical_sdefcube_dirichlet_tet4_struct_title = " $2.0 \cdot h^{ 1.99 \pm 0.00 }$"

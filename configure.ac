@@ -22,25 +22,26 @@ AC_PROG_INSTALL
 # TODO: investigate
 #AX_CODE_COVERAGE
 
-AC_ARG_WITH(
-  [debug],
-  AS_HELP_STRING([--with-debug], [compile with debugging symbols @<:@default=no@:>@]),
-  [],
-  [with_debug=no]
-)
+# Support both --with-debug and --enable-debug options
+AC_ARG_WITH([debug],
+  [AS_HELP_STRING([--with-debug], [Compile with debugging symbols (legacy option)])],
+  [with_debug=$withval], [with_debug=no])
 
-# AC_ARG_WITH(
-#   [fee2ccx],
-#   AS_HELP_STRING([--with-fee2ccx], [compile fee2ccx @<:@default=no@:>@]),
-#   [],
-#   [with_fee2ccx=no]
-# )
+AC_ARG_ENABLE([debug],
+  [AS_HELP_STRING([--enable-debug], [Compile with debugging symbols])],
+  [enable_debug=$enableval], [enable_debug=no])
+
+AC_ARG_ENABLE([fee2ccx],
+  [AS_HELP_STRING([--enable-fee2ccx], [Compile the tool fee2ccx @<:@default=no@:>@])],
+  [enable_fee2ccx=$enableval], [enable_fee2ccx=no])
+
 
 ######################
 # default optimization flags
 AS_IF([test "x$CFLAGS" = "x-g -O2"],
-  AS_IF([test "x${with_debug}" = "xyes"] , [
+  AS_IF([test "x$with_debug" = "xyes" -o "x$enable_debug" = "xyes"] , [
     CFLAGS="-g -O0"
+    AC_DEFINE([DEBUG], [1], [Define to 1 if debugging is enabled])
   ],[
     CFLAGS="-O3 -flto=auto -no-pie"
   ])
@@ -413,9 +414,9 @@ m4_include(auto_links.m4)
 AC_CONFIG_FILES([Makefile src/Makefile])
 # AC_CONFIG_FILES([src/benchmark/Makefile]) 
 # AC_CONFIG_FILES([doc/Makefile])
-# AS_IF([test "x${with_fee2ccx}" = "xyes"] , [
-#   AC_CONFIG_FILES([utils/fee2ccx/Makefile])
-# ])
+AS_IF([test "x${enable_fee2ccx}" = "xyes"] , [
+  AC_CONFIG_FILES([utils/fee2ccx/Makefile])
+])
 
 
 AS_BOX([Summary of dependencies])
@@ -432,7 +433,7 @@ AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO([" ${SLEPC_DIR}"]),
  AS_ECHO
 )
-# AS_ECHO(  ["  Configure fee2ccx       ${with_fee2ccx}"])
+AS_ECHO(  ["  Compile fee2ccx         ${enable_fee2ccx}"])
 AS_ECHO(  ["  Compiler                ${compiler_show}"])
 AS_ECHO(  ["  Compiler flags          ${CFLAGS}"])
 # AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])

@@ -97,12 +97,9 @@ int feenox_problem_build_compute_modal_C_elastic_orthotropic(const double *x, ma
   gsl_matrix_set(modal.C, 2, 1, gsl_matrix_get(C, 2, 1));
   gsl_matrix_set(modal.C, 2, 2, gsl_matrix_get(C, 2, 2));
     
-  // the following subscripts have to match rows 3-5 of modal.B
-  // note that this is not voigt notation! that would be
-  // xx,yy,zz,yz,xz,xy and we use xx,yy,zz,xy,yz,zx
   gsl_matrix_set(modal.C, 3, 3, G_xy);
-  gsl_matrix_set(modal.C, 4, 4, G_yz);
-  gsl_matrix_set(modal.C, 5, 5, G_zx);
+  gsl_matrix_set(modal.C, 4, 4, G_zx);
+  gsl_matrix_set(modal.C, 5, 5, G_yz);
     
   gsl_matrix_free(C);
   gsl_matrix_free(S);

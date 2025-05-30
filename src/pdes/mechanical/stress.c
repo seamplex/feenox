@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox routines to compute stresses
  *
- *  Copyright (C) 2021-2023 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of Feenox <https://www.seamplex.com/feenox>.
  *
@@ -23,176 +23,15 @@
 #include "feenox.h"
 #include "mechanical.h"
 
-// this works for both 2d and 3d
-#define FLUX_SIGMAX  0
-#define FLUX_SIGMAY  1
-#define FLUX_TAUXY   2
-#define FLUX_SIGMAZ  3
-#define FLUX_TAUYZ   4
-#define FLUX_TAUZX   5
-
-int feenox_problem_gradient_fill_mechanical(void) {
+gsl_matrix *feenox_cauchy_stress_cauchy_from_PK2(const gsl_matrix *F, const gsl_matrix *PK2, double J) {
   
-  feenox_problem_fill_aux_solution(mechanical.sigmax);
-  feenox_problem_fill_aux_solution(mechanical.sigmay);
-  feenox_problem_fill_aux_solution(mechanical.tauxy);
-  if (feenox.pde.dofs == 3) {
-    feenox_problem_fill_aux_solution(mechanical.sigmaz);
-    feenox_problem_fill_aux_solution(mechanical.tauyz);
-    feenox_problem_fill_aux_solution(mechanical.tauzx);
+  if (J == 0) {
+    J = feenox_fem_determinant(F);
   }
-  
-  // if one is used, all of them are
-  if (mechanical.sigma1->used || mechanical.sigma2->used || mechanical.sigma3->used) {
-    feenox_problem_fill_aux_solution(mechanical.sigma1);
-    feenox_problem_fill_aux_solution(mechanical.sigma2);
-    feenox_problem_fill_aux_solution(mechanical.sigma3);
-  }
-  if (mechanical.sigma->used) {
-    feenox_problem_fill_aux_solution(mechanical.sigma);
-  }
-  if (mechanical.tresca->used) {
-    feenox_problem_fill_aux_solution(mechanical.tresca);
-  }
-  
-  return FEENOX_OK;
-  
-}
-
-// used only in rough
-int feenox_problem_gradient_properties_at_element_nodes_mechanical(element_t *element, mesh_t *mesh) {
-
-  
-  
-  
-  return FEENOX_OK;
-}
-
-int feenox_problem_gradient_fluxes_at_node_alloc_mechanical(node_t *node) {
-  
-  size_t flux_size = (feenox.pde.dim == 3) ? 6 : 3;
-  if (node->flux == NULL) {
-    feenox_check_alloc(node->flux = calloc(flux_size, sizeof(double)));
-  } else {
-    unsigned int m = 0;
-    for (m = 0; m < flux_size; m++) {
-      node->flux[m] = 0;
-    }
-  }
-  
-  return FEENOX_OK;
-}
-
-// TODO: why both node and j?
-int feenox_problem_gradient_add_elemental_contribution_to_node_mechanical(node_t *node, element_t *element, unsigned int j, double rel_weight) {
-
-  // read strains from gradient
-  double epsilonx = gsl_matrix_get(element->dphidx_node[j], 0, 0);
-  double epsilony = gsl_matrix_get(element->dphidx_node[j], 1, 1);
-  double epsilonz = (feenox.pde.dofs == 3) ? gsl_matrix_get(element->dphidx_node[j], 2, 2) : 0;
-  
-  double gammaxy = gsl_matrix_get(element->dphidx_node[j], 0, 1) + gsl_matrix_get(element->dphidx_node[j], 1, 0);
-  double gammayz = 0;
-  double gammazx = 0;
-  if (feenox.pde.dofs == 3) {
-    gammayz = gsl_matrix_get(element->dphidx_node[j], 1, 2) + gsl_matrix_get(element->dphidx_node[j], 2, 1);
-    gammazx = gsl_matrix_get(element->dphidx_node[j], 2, 0) + gsl_matrix_get(element->dphidx_node[j], 0, 2);
-  }  
-
-  double sigmax = 0;
-  double sigmay = 0;
-  double sigmaz = 0;
-  double tauxy = 0;
-  double tauyz = 0;
-  double tauzx = 0;
-
-  // compute stresses
-  feenox_call(mechanical.compute_stress_from_strain(node, element, j,
-                                                    epsilonx, epsilony, epsilonz, gammaxy, gammayz, gammazx,
-                                                    &sigmax, &sigmay, &sigmaz, &tauxy, &tauyz, &tauzx));
-  
-  if (mechanical.thermal_expansion_model != thermal_expansion_model_none) {
-    // subtract the thermal contribution to the normal stresses (see IFEM.Ch30)
-    double sigmat_x = 0;
-    double sigmat_y = 0;
-    double sigmat_z = 0;
+  feenox_blas_BCBt(mechanical.F, PK2, NULL, 1/J, mechanical.cauchy);
     
-    feenox_call(mechanical.compute_thermal_stress(node->x, element->physical_group->material, &sigmat_x, &sigmat_y, &sigmat_z));
-
-    sigmax -= sigmat_x;
-    sigmay -= sigmat_y;
-    sigmaz -= sigmat_z;
-  }
-
-  
-  node->flux[FLUX_SIGMAX] += rel_weight * (sigmax - node->flux[FLUX_SIGMAX]);
-  node->flux[FLUX_SIGMAY] += rel_weight * (sigmay - node->flux[FLUX_SIGMAY]);
-  node->flux[FLUX_TAUXY] += rel_weight * (tauxy - node->flux[FLUX_TAUXY]);
-  if (feenox.pde.dofs == 3) {
-    node->flux[FLUX_SIGMAZ] += rel_weight * (sigmaz - node->flux[FLUX_SIGMAZ]);
-    node->flux[FLUX_TAUYZ] += rel_weight * (tauyz - node->flux[FLUX_TAUYZ]);
-    node->flux[FLUX_TAUZX] += rel_weight * (tauzx - node->flux[FLUX_TAUZX]);
-  }  
-  
-  return FEENOX_OK;
+  return mechanical.cauchy;
 }
-
-int feenox_problem_gradient_fill_fluxes_mechanical(mesh_t *mesh, size_t j) {
-  
-  feenox_vector_set(mechanical.sigmax->vector_value, j, mesh->node[j].flux[FLUX_SIGMAX]);
-  feenox_vector_set(mechanical.sigmay->vector_value, j, mesh->node[j].flux[FLUX_SIGMAY]);
-  feenox_vector_set(mechanical.tauxy->vector_value, j, mesh->node[j].flux[FLUX_TAUXY]);
-  if (feenox.pde.dofs == 3) {
-    feenox_vector_set(mechanical.sigmaz->vector_value, j, mesh->node[j].flux[FLUX_SIGMAZ]);
-    feenox_vector_set(mechanical.tauyz->vector_value, j, mesh->node[j].flux[FLUX_TAUYZ]);
-    feenox_vector_set(mechanical.tauzx->vector_value, j, mesh->node[j].flux[FLUX_TAUZX]);
-  }
-
-  if ((mechanical.sigma1 != NULL && mechanical.sigma1->used) ||
-      (mechanical.sigma2 != NULL && mechanical.sigma2->used) ||
-      (mechanical.sigma3 != NULL && mechanical.sigma3->used) ||
-      (mechanical.tresca != NULL && mechanical.tresca->used)) {
-    
-    double sigma1 = 0;
-    double sigma2 = 0;
-    double sigma3 = 0;
-    feenox_principal_stress_from_cauchy(mesh->node[j].flux[FLUX_SIGMAX],
-                                        mesh->node[j].flux[FLUX_SIGMAY],
-                                        mesh->node[j].flux[FLUX_SIGMAZ],
-                                        mesh->node[j].flux[FLUX_TAUXY],
-                                        mesh->node[j].flux[FLUX_TAUYZ],
-                                        mesh->node[j].flux[FLUX_TAUZX],
-                                        &sigma1,
-                                        &sigma2,
-                                        &sigma3);
-    feenox_vector_set(mechanical.sigma1->vector_value, j, sigma1);
-    feenox_vector_set(mechanical.sigma2->vector_value, j, sigma2);
-    feenox_vector_set(mechanical.sigma3->vector_value, j, sigma3);
-    
-    if (mechanical.sigma->used) {
-      feenox_vector_set(mechanical.sigma->vector_value, j, feenox_vonmises_from_principal(sigma1, sigma2, sigma3));
-    }
-    if (mechanical.tresca->used) {
-      feenox_vector_set(mechanical.tresca->vector_value, j, sigma1 - sigma3);
-    }
-  } else if (mechanical.sigma->used) {
-    
-    feenox_vector_set(mechanical.sigma->vector_value, j, feenox_vonmises_from_stress_tensor(mesh->node[j].flux[FLUX_SIGMAX],
-                                                                         mesh->node[j].flux[FLUX_SIGMAY],
-                                                                         mesh->node[j].flux[FLUX_SIGMAZ],
-                                                                         mesh->node[j].flux[FLUX_TAUXY],
-                                                                         mesh->node[j].flux[FLUX_TAUYZ],
-                                                                         mesh->node[j].flux[FLUX_TAUZX]));
-    
-  }
-  
-  // TODO: uncertainties
-  
-  return FEENOX_OK;
-  
-}
-
-
 
 int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sigmaz, double tauxy, double tauyz, double tauzx, double *sigma1, double *sigma2, double *sigma3) {
   // stress invariants
@@ -224,20 +63,20 @@ int feenox_principal_stress_from_cauchy(double sigmax, double sigmay, double sig
   
 }
 
-int feenox_stress_from_strain(node_t *node, element_t *element, unsigned int j,
+int feenox_stress_from_strain_linear(node_t *node, element_t *element, unsigned int j,
     double epsilonx, double epsilony, double epsilonz, double gammaxy, double gammayz, double gammazx,
     double *sigmax, double *sigmay, double *sigmaz, double *tauxy, double *tauyz, double *tauzx) {
   
-  if (mechanical.uniform_C == 0) {
-    mechanical.compute_C(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
+  if (mechanical.uniform_properties == 0) {
+    mechanical.compute_material_tangent(node->x, (element->physical_group != NULL) ? element->physical_group->material : NULL);
   }  
   
-  *sigmax = gsl_matrix_get(mechanical.C, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C, 0, 1) * epsilony + gsl_matrix_get(mechanical.C, 0, 2) * epsilonz;
-  *sigmay = gsl_matrix_get(mechanical.C, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C, 1, 1) * epsilony + gsl_matrix_get(mechanical.C, 1, 2) * epsilonz;
-  *sigmaz = gsl_matrix_get(mechanical.C, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C, 2, 1) * epsilony + gsl_matrix_get(mechanical.C, 2, 2) * epsilonz;
-  *tauxy = gsl_matrix_get(mechanical.C, 3, 3) * gammaxy;
-  *tauyz = gsl_matrix_get(mechanical.C, 4, 4) * gammayz;
-  *tauzx = gsl_matrix_get(mechanical.C, 5, 5) * gammazx;
+  *sigmax = gsl_matrix_get(mechanical.C_tangent, 0, 0) * epsilonx + gsl_matrix_get(mechanical.C_tangent, 0, 1) * epsilony + gsl_matrix_get(mechanical.C_tangent, 0, 2) * epsilonz;
+  *sigmay = gsl_matrix_get(mechanical.C_tangent, 1, 0) * epsilonx + gsl_matrix_get(mechanical.C_tangent, 1, 1) * epsilony + gsl_matrix_get(mechanical.C_tangent, 1, 2) * epsilonz;
+  *sigmaz = gsl_matrix_get(mechanical.C_tangent, 2, 0) * epsilonx + gsl_matrix_get(mechanical.C_tangent, 2, 1) * epsilony + gsl_matrix_get(mechanical.C_tangent, 2, 2) * epsilonz;
+  *tauxy = gsl_matrix_get(mechanical.C_tangent, 3, 3) * gammaxy;
+  *tauyz = gsl_matrix_get(mechanical.C_tangent, 4, 4) * gammayz;
+  *tauzx = gsl_matrix_get(mechanical.C_tangent, 5, 5) * gammazx;
   
   return FEENOX_OK;
 }

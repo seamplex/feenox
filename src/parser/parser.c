@@ -2789,7 +2789,7 @@ int feenox_parse_material(void) {
 ///kw_pde+MATERIAL+usage [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ] @
 ///kw_pde+MATERIAL+detail If the material applies to more than one physical group in the mesh, they can be
 ///kw_pde+MATERIAL+detail added using as many `LABEL` keywords as needed.
-    } else if (strcasecmp(token, "LABEL") == 0 ||strcasecmp(token, "PHYSICAL_GROUP") == 0) {
+    } else if (strcasecmp(token, "LABEL") == 0 || strcasecmp(token, "GROUP") == 0 ||strcasecmp(token, "PHYSICAL_GROUP") == 0) {
       char *physical_group_name;
       feenox_call(feenox_parser_string(&physical_group_name));  
 
@@ -2801,7 +2801,13 @@ int feenox_parse_material(void) {
       // TODO: api
       physical_group->material = material;
       feenox_free(physical_group_name);
-        
+
+    } else if (strcasecmp(token, "MODEL") == 0) {
+///kw_pde+MATERIAL+usage [ MODEL <model_name> ] @
+///kw_pde+MATERIAL+detail For the mechanical problem, a string with the material model can be passed with `MODEL`.
+///kw_pde+MATERIAL+detail See the particular documentation of the mechanical problem for details.
+      feenox_call(feenox_parser_string(&material->model));  
+      
     } else {
 ///kw_pde+MATERIAL+usage [ <property_name_1>=<expr_1> [ <property_name_2>=<expr_2> [ ... ] ] ]
 ///kw_pde+MATERIAL+detail The names of the properties in principle can be arbitrary, but each problem type
@@ -3171,14 +3177,18 @@ int feenox_parse_problem(void) {
 
 
 ///kw_pde+PROBLEM+detail By default FeenoX tries to detect whether the computation should be linear or non-linear.
-///kw_pde+PROBLEM+detail An explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+///kw_pde+PROBLEM+detail For instance, a thermal problem with a temperature-dependent conductivity is automatically detected as non-linear. 
+///kw_pde+PROBLEM+detail Particular problems can also have special variables to trigger non-linearities, e.g.
+///kw_pde+PROBLEM+detail the special variable `ldef` in mechanical. 
+///kw_pde+PROBLEM+detail In any case, an explicit mode can be set with either `LINEAR` on `NON_LINEAR`.
+///kw_pde+PROBLEM+detail Yet the command-line options `--linear` and `--non-linear` take precedence.
 ///kw_pde+PROBLEM+usage [ LINEAR
     } else if (strcasecmp(token, "LINEAR") == 0) {
       feenox.pde.math_type = math_type_linear;
 
 ///kw_pde+PROBLEM+usage | NON_LINEAR ]
 ///kw_pde+PROBLEM+usage @
-    } else if (strcasecmp(token, "NON_LINEAR") == 0) {
+    } else if (strcasecmp(token, "NON_LINEAR") == 0 || strcasecmp(token, "NONLINEAR") == 0) {
       feenox.pde.math_type = math_type_nonlinear;
 
 
@@ -3211,6 +3221,11 @@ int feenox_parse_problem(void) {
         } else if (strcasecmp(token, "NONLINEAR_SOLVER") == 0 || strcasecmp(token, "NON_LINEAR_SOLVER") == 0 || strcasecmp(token, "SNES") == 0 || strcasecmp(token, "SNES_TYPE") == 0) {
           feenox_call(feenox_parser_string((char **)&feenox.pde.snes_type));
 
+///kw_pde+PROBLEM+usage [ LINE_SEARCH { bt | nleqerr | basic | none | l2 | cp | ... } ]@
+///kw_pde+PROBLEM+detail  * List of `LINE_SEARCH`s <https://petsc.org/release/manualpages/SNES/SNESLineSearchType/>.
+        } else if (strcasecmp(token, "LINE_SEARCH") == 0 || strcasecmp(token, "LS") == 0 || strcasecmp(token, "LS_TYPE") == 0) {
+          feenox_call(feenox_parser_string((char **)&feenox.pde.ls_type));
+          
 ///kw_pde+PROBLEM+usage [ TRANSIENT_SOLVER { bdf | beuler | arkimex | rosw | glee | ... } ]@
 ///kw_pde+PROBLEM+detail  * List of `TRANSIENT_SOLVER`s <http://petsc.org/release/docs/manualpages/TS/TSType.html>.
     } else if (strcasecmp(token, "TRANSIENT_SOLVER") == 0 || strcasecmp(token, "TS") == 0 || strcasecmp(token, "TS_TYPE") == 0) {

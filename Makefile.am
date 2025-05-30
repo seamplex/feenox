@@ -19,29 +19,15 @@ dist_doc_DATA = AUTHORS \
 
 dist_man_MANS = doc/feenox.1
 
-TESTS = \
-        tests/abort.sh \
+TESTS_general = \
         tests/algebraic_expr.sh \
-        tests/annulus-modal.sh \
-        tests/uo2-pellet.sh \
-        tests/barra.sh \
-        tests/airfoil.sh \
         tests/arguments.sh \
-        tests/azmy.sh \
-        tests/bc-groups.sh \
-        tests/beam-modal.sh \
-        tests/beam-ortho.sh \
-        tests/bimetallic-strip.sh \
         tests/builtin.sh \
         tests/circle.sh \
         tests/cog.sh \
-        tests/cylinder-traction-force.sh \
-        tests/encased_rod.sh \
         tests/expressions.sh \
         tests/expressions_constants.sh \
         tests/exp.sh \
-        tests/i-beam-euler-bernoulli.sh \
-        tests/iaea-pwr.sh \
         tests/iterative.sh \
         tests/fit.sh \
         tests/file.sh \
@@ -51,55 +37,97 @@ TESTS = \
         tests/function_file.sh \
         tests/function_mesh.sh \
         tests/function_vectors.sh \
-        tests/hello_mpi.sh \
         tests/integral.sh \
         tests/lag.sh \
-        tests/laplace2d.sh \
         tests/lebesgue.sh \
-        tests/los-alamos.sh \
         tests/map-cube.sh \
-        tests/materials.sh \
         tests/mesh.sh \
+        tests/materials.sh \
         tests/moment-of-inertia.sh \
+        tests/petsc_options.sh \
+        tests/point-kinetics.sh \
+        tests/print.sh \
+        tests/solve.sh \
+        tests/trig.sh \
+        tests/transient-mesh.sh \
+        tests/vector.sh \
+        tests/xfail-data-variable.sh \
+        tests/abort.sh
+
+TESTS_mpi = \
+        tests/hello_mpi.sh \
+        tests/t21.sh
+
+TESTS_laplace = \
+        tests/airfoil.sh \
+        tests/laplace2d.sh
+
+TESTS_mechanical_iso = \
+        tests/bc-groups.sh \
+        tests/bimetallic-strip.sh \
+        tests/cylinder-traction-force.sh \
+        tests/i-beam-euler-bernoulli.sh \
         tests/nafems-le1.sh \
         tests/nafems-le10.sh \
         tests/nafems-le11.sh \
         tests/nafems-t1-4.sh \
         tests/nafems-t2-3.sh \
-        tests/neutron_diffusion_src.sh \
-        tests/neutron_diffusion_keff.sh \
-        tests/neutron-fully-mirrored.sh \
         tests/parallelepiped.sh \
-        tests/petsc_options.sh \
         tests/pipe.sh \
-        tests/point-kinetics.sh \
-        tests/print.sh \
-        tests/ray-effect.sh \
         tests/reactions.sh \
         tests/reactions-elastic.sh \
-        tests/reed.sh \
-        tests/solve.sh \
         tests/spinning-disk.sh \
         tests/statically_indeterminate_reaction.sh \
         tests/symmetry.sh \
-        tests/t21.sh \
+        tests/two-cubes-isotropic.sh
+        
+TESTS_mechanical_ortho = \
+        tests/beam-ortho.sh \
+        tests/two-cubes-orthotropic.sh \
+        tests/xfail-few-properties-ortho-young.sh \
+        tests/xfail-few-properties-ortho-poisson.sh \
+        tests/xfail-few-properties-ortho-shear.sh
+
+TESTS_mechanical_ldef = \
+        tests/beam-ldef.sh \
+        tests/hex8-ldef-jacobian.sh \
+        tests/hex8-ldef-ccx.sh \
+        tests/hex8-single-stretched.sh
+        
+TESTS_mechanical = $(TESTS_mechanical_iso) $(TESTS_mechanical_ortho) $(TESTS_mechanical_ldef)
+        
+TESTS_modal = \
+        tests/annulus-modal.sh \
+        tests/beam-modal.sh
+
+TESTS_neutron_diffusion = \
+        tests/iaea-pwr.sh \
+        tests/neutron_diffusion_src.sh \
+        tests/neutron_diffusion_keff.sh
+
+TESTS_neutron_sn = \
+        tests/azmy.sh \
+        tests/los-alamos.sh \
+        tests/neutron-fully-mirrored.sh \
+        tests/ray-effect.sh \
+        tests/reed.sh
+
+TESTS_thermal = \
+        tests/barra.sh \
+        tests/encased_rod.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \
         tests/thermal-3d.sh \
         tests/thermal-slab-no-k.sh \
         tests/thermal-slab-wrong-bc.sh \
         tests/thermal-radiation.sh \
-        tests/transient-mesh.sh \
-        tests/trig.sh \
-        tests/two-cubes-isotropic.sh \
-        tests/two-cubes-orthotropic.sh \
-        tests/vector.sh \
-        tests/wilson.sh \
-        tests/xfail-few-properties-ortho-young.sh \
-        tests/xfail-few-properties-ortho-poisson.sh \
-        tests/xfail-few-properties-ortho-shear.sh \
-        tests/xfail-data-variable.sh
+        tests/uo2-pellet.sh \
+        tests/wilson.sh
 
+TESTS_serial = $(TESTS_general) $(TESTS_laplace) $(TESTS_mechanical) $(TESTS_modal) $(TESTS_neutron_diffusion) $(TESTS_neutron_sn) $(TESTS_thermal)
+
+TESTS = $(TESTS_serial) $(TESTS_mpi)
+        
 XFAIL_TESTS = tests/abort.sh \
               tests/xfail-data-variable.sh \
               tests/thermal-slab-no-k.sh \
@@ -107,6 +135,23 @@ XFAIL_TESTS = tests/abort.sh \
               tests/xfail-few-properties-ortho-young.sh \
               tests/xfail-few-properties-ortho-poisson.sh \
               tests/xfail-few-properties-ortho-shear.sh
+
+# TODO: also split XFAIL_TESTS
+# @$(MAKE) check TESTS="$(thermal_tests)" XFAIL_TESTS="$(thermal_xfail_tests)"
+
+
+check-thermal:
+	@echo "Running thermal tests"
+	@$(MAKE) check TESTS="$(TESTS_thermal)"
+
+check-mechanical:
+	@echo "Running mechanical tests"
+	@$(MAKE) check TESTS="$(TESTS_mechanical)"
+
+check-ldef:
+	@echo "Running mechanical tests"
+	@$(MAKE) check TESTS="$(TESTS_mechanical_ldef)"
+
 
 # when getting
 # ERROR: files left in build directory after distclean:

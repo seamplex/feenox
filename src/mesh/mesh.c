@@ -210,11 +210,18 @@ int feenox_instruction_mesh_read(void *arg) {
   }
  */
   
+  int n_materials = HASH_COUNT(feenox.mesh.materials);
+  
   // compute the volume (or area or length) and center of gravity of the groups
   // but only if the variable groupname_vol or the vector groupname_cog 
   // are used in one of the expressions
   for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-      
+    
+    // if there is a single material, that's our guy
+    if (n_materials == 1 && physical_group->dimension == feenox.pde.dim && physical_group->material == NULL) {
+      physical_group->material = feenox.mesh.materials;
+    }
+    
     if ((physical_group->var_volume != NULL && physical_group->var_volume->used) ||
         (physical_group->vector_cog != NULL && physical_group->vector_cog->used)) {
         
@@ -242,7 +249,7 @@ int feenox_instruction_mesh_read(void *arg) {
       }
         
       feenox_var_value(physical_group->var_volume) = physical_group->volume;
-      for (size_t m = 0; m < 3; m++) {
+      for (int m = 0; m < 3; m++) {
         physical_group->cog[m] /= physical_group->volume;
       }
         

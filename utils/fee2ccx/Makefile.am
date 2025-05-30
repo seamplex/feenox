@@ -83,19 +83,26 @@ fee2ccx_SOURCES = fee2ccx.c \
  ../../src/pdes/build.c \
  ../../src/pdes/blas.c \
  ../../src/pdes/petsc_ksp.c \
+ ../../src/pdes/petsc_snes.c \
  ../../src/pdes/distribution.c \
- ../../src/pdes/mechanical/bc.c \
- ../../src/pdes/mechanical/bulk.c \
- ../../src/pdes/mechanical/elastic-isotropic.c \
- ../../src/pdes/mechanical/elastic-orthotropic.c \
- ../../src/pdes/mechanical/elastic-plane-strain.c \
- ../../src/pdes/mechanical/elastic-plane-stress.c \
- ../../src/pdes/mechanical/expansion-isotropic.c \
- ../../src/pdes/mechanical/expansion-orthotropic.c \
- ../../src/pdes/mechanical/init.c \
- ../../src/pdes/mechanical/linearize.c \
+ ../../src/pdes/mechanical/gradient.c \
  ../../src/pdes/mechanical/parser.c \
- ../../src/pdes/mechanical/post.c \
+ ../../src/pdes/mechanical/strain.c \
+ ../../src/pdes/mechanical/linearize.c \
+ ../../src/pdes/mechanical/bc.c \
+ ../../src/pdes/mechanical/init.c \
  ../../src/pdes/mechanical/stress.c \
+ ../../src/pdes/mechanical/post.c \
+ ../../src/pdes/mechanical/bulk.c \
+ ../../src/pdes/mechanical/materials/expansion-isotropic.c \
+ ../../src/pdes/mechanical/materials/linear-orthotropic.c \
+ ../../src/pdes/mechanical/materials/neohookean.c \
+ ../../src/pdes/mechanical/materials/expansion-orthotropic.c \
+ ../../src/pdes/mechanical/materials/hencky.c \
+ ../../src/pdes/mechanical/materials/elastic-plane-strain.c \
+ ../../src/pdes/mechanical/materials/mooney-rivlin.c \
+ ../../src/pdes/mechanical/materials/saint_venant-kirchoff.c \
+ ../../src/pdes/mechanical/materials/elastic-plane-stress.c \
+ ../../src/pdes/mechanical/materials/linear-isotropic.c \
  ../../src/flow/step.c \
  ./parsepde-mechanical.c
