@@ -44,9 +44,8 @@ terminal: |
   pressure_lift = 2.60614
   $ 
 ...
-PROBLEM laplace 2D
+PROBLEM laplace 2D MESH airfoil.msh
 static_steps = 20
-READ_MESH airfoil.msh
 
 # boundary conditions constant -> streamline
 BC bottom  phi=0

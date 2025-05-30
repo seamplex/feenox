@@ -1,5 +1,4 @@
-PROBLEM mechanical 2D plane_stress
-READ_MESH nafems-t1.msh
+PROBLEM mechanical 2D plane_stress MESH nafems-t1.msh
 
 E = 100e3
 nu = 0.3

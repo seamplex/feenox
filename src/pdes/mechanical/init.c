@@ -25,6 +25,10 @@
 mechanical_t mechanical;
 
 int feenox_problem_parse_time_init_mechanical(void) {
+  
+///kw_pde+PROBLEM+detail  * `mechanical` steady-state solid mechanics with elastic or hyperelastic materials
+ 
+  
 #ifdef HAVE_PETSC
   // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_mechanical;

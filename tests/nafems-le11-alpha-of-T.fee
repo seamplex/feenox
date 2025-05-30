@@ -1,5 +1,4 @@
-PROBLEM mechanical 3D
-READ_MESH nafems-le11-hex27.msh
+PROBLEM mechanical 3D MESH nafems-le11-hex27.msh
 
 T(x,y,z) = sqrt(sqrt(x^2 + y^2) + z)
 

@@ -36,9 +36,7 @@ terminal: |
   $
 ...
 DEFAULT_ARGUMENT_VALUE 1 4
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
-
-READ_MESH $0.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1 MESH $0.msh
 
 S1_src = 1
 Sigma_t1_src = 1

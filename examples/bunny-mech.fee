@@ -1,5 +1,4 @@
 PROBLEM mechanical 3d
-
 READ_MESH bunny.msh SCALE 1e-3
 
 E = 220e9

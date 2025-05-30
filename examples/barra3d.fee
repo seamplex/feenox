@@ -26,8 +26,7 @@ terminal: |
   $ feenox barra3d.fee
 ...
 # "barra" means "rod" in Spanish
-READ_MESH barra3d.msh
-PROBLEM thermal 3d
+PROBLEM thermal 3d MESH barra3d.msh
 
 # times
 end_time = 1000

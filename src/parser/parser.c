@@ -2154,9 +2154,6 @@ int feenox_parse_phase_space(void) {
 
 int feenox_parse_read_mesh(void) {
   
-  // we have at least one mesh so we need to define the whole set of special vars
-  feenox_call(feenox_mesh_init_special_objects());
-  
   // TODO: api? yes
   mesh_t *mesh = NULL;
   feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
@@ -2310,13 +2307,23 @@ int feenox_parse_read_mesh(void) {
     return FEENOX_ERROR;
   }
 
+  // this is shared with PROBLEM xxx MESH yyy
+  feenox_call(feenox_parse_mesh_add(mesh));
+  
+  return FEENOX_OK;
+}
+
+int feenox_parse_mesh_add(mesh_t *mesh) {
+  
+  // we have at least one mesh so we need to define the whole set of special vars
+  feenox_call(feenox_mesh_init_special_objects());
+  
   char *ext = strrchr(mesh->file->format, '.');
   if (ext == NULL) {
-    feenox_push_error_message("no file extension given");
+    feenox_push_error_message("no file extension given for the mesh '%s'",  mesh->file);
     return FEENOX_ERROR;
   }
 
-  // TODO: pointer to reader function
   if (strncasecmp(ext, ".msh", 4) == 0 ||
       strncasecmp(ext, ".msh2", 5) == 0 ||
       strncasecmp(ext, ".msh4", 5) == 0) {
@@ -2342,16 +2349,16 @@ int feenox_parse_read_mesh(void) {
   }
   
   
-  // TODO: API?
   if (feenox_get_mesh_ptr(mesh->file->name) != NULL) {
     feenox_push_error_message("there already exists a mesh named '%s'", mesh->file->name);
     return FEENOX_ERROR;
   }
   HASH_ADD_KEYPTR(hh, feenox.mesh.meshes, mesh->file->name, strlen(mesh->file->name), mesh);
   feenox_call(feenox_add_instruction(feenox_instruction_mesh_read, mesh));
-  
-  return FEENOX_OK;
+
+  return FEENOX_OK;  
 }
+
 
 
 int feenox_parse_write_mesh(void) {
@@ -3062,6 +3069,8 @@ int feenox_parse_problem(void) {
     return FEENOX_ERROR;    
   } 
   
+  mesh_t *mesh = NULL;
+  
   char *token = feenox_get_next_token(NULL);
   feenox_call(feenox_pde_parse_problem_type(token));
 
@@ -3072,12 +3081,24 @@ int feenox_parse_problem(void) {
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
 
+///kw_pde+PROBLEM+usage [ MESH { <file_path> } ]
+///kw_pde+PROBLEM+detail The mesh can be given directly with the `MESH` keyword in the `PROBLEM` definition
+///kw_pde+PROBLEM+detail or can be given later (or before) with an explicit `READ_MESH` instruction.
+///kw_pde+PROBLEM+detail If non-trivial arguments are needed (e.g. `SCALE` or fields), use a separate
+///kw_pde+PROBLEM+detail `READ_MESH` instruction instead.
+    if (strcasecmp(token, "MESH") == 0) {
+      feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
+      feenox_call(feenox_parser_file(&mesh->file));
+      if (mesh->file->mode == NULL) {
+        feenox_check_alloc(mesh->file->mode = strdup("r"));
+      }
+    
 ///kw_pde+PROBLEM+detail The number of spatial dimensions of the problem needs to be given either
 ///kw_pde+PROBLEM+detail as `1d`, `2d`, `3d` or after the keyword `DIM`.
 ///kw_pde+PROBLEM+detail Alternatively, one can define a `MESH` with an explicit `DIMENSIONS` keyword before `PROBLEM`.
 ///kw_pde+PROBLEM+detail Default is 3D.
 ///kw_pde+PROBLEM+usage [ 1D |
-    if (strcasecmp(token, "1d") == 0) {
+    } else if (strcasecmp(token, "1d") == 0) {
       feenox.pde.dim = 1;
 ///kw_pde+PROBLEM+usage 2D |
     } else if (strcasecmp(token, "2d") == 0) {
@@ -3103,15 +3124,6 @@ int feenox_parse_problem(void) {
       int values[] = {symmetry_axis_x, symmetry_axis_y, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.symmetry_axis));
 
-///kw_pde+PROBLEM+usage [ MESH <identifier> ]
-///kw_pde+PROBLEM+detail If there are more than one `MESH`es defined, the one over which the problem is to be solved
-///kw_pde+PROBLEM+detail can be defined by giving the explicit mesh name with `MESH`. By default, the first mesh to be
-///kw_pde+PROBLEM+detail defined in the input file with `READ_MESH` (which can be defined after the `PROBLEM` keyword) is the one over which the problem is solved.
-    } else if (strcasecmp(token, "MESH") == 0) {
-      if ((feenox.pde.mesh = feenox_parser_mesh()) == NULL) {
-        return FEENOX_ERROR;
-      }
-      
 ///kw_pde+PROBLEM+usage [ PROGRESS ]
 ///kw_pde+PROBLEM+detail If the keyword `PROGRESS` is given, three ASCII lines will show in the terminal the
 ///kw_pde+PROBLEM+detail progress of the ensamble of the stiffness matrix (or matrices),
@@ -3121,7 +3133,7 @@ int feenox_parse_problem(void) {
       feenox.pde.progress_ascii = PETSC_TRUE;
 
 ///kw_pde+PROBLEM+usage [ DO_NOT_DETECT_HANGING_NODES
-    } else if (strcasecmp(token, "DETECT_HANGING_NODES") == 0) {
+    } else if (strcasecmp(token, "DO_NOT_DETECT_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_nothing;
 ///kw_pde+PROBLEM+usage | DETECT_HANGING_NODES
 ///kw_pde+PROBLEM+detail If either `DETECT_HANGING_NODES` or `HANDLE_HANGING_NODES` are given, 
@@ -3307,7 +3319,13 @@ int feenox_parse_problem(void) {
       return FEENOX_ERROR;
       
     }
-  } 
+  }
+  
+  if (mesh != NULL) {
+    feenox.mesh.mesh_main = mesh;
+    // this is shared with READ_MESH
+    feenox_call(feenox_parse_mesh_add(mesh));
+  }
 
   // if there is already a mesh, use it
   if (feenox.pde.mesh == NULL && feenox.mesh.mesh_main != NULL) {
@@ -4009,7 +4027,6 @@ int feenox_parse_solve(void) {
       
   return FEENOX_OK;        
 }
-
 
 mesh_t *feenox_parser_mesh(void) {
   

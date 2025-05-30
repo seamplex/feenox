@@ -1,5 +1,4 @@
-PROBLEM mechanical 3D
-READ_MESH $0-$1.msh
+PROBLEM mechanical 3D MESH $0-$1.msh
 
 T(x,y,z) = sqrt(x^2 + y^2) + z
 

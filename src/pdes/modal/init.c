@@ -25,6 +25,8 @@ modal_t modal;
 
 int feenox_problem_parse_time_init_modal(void) {
 
+///kw_pde+PROBLEM+detail  * `modal` natural mechanical frequencies and modes of oscillation
+  
 #ifdef HAVE_SLEPC  
   // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_modal;

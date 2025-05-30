@@ -1,8 +1,7 @@
 ---
 title: NAFEMS LE1 plane-stress benchmark
 ...
-PROBLEM mechanical 2D plane_stress
-READ_MESH ${0}-${1}.msh
+PROBLEM mechanical 2D plane_stress MESH ${0}-${1}.msh
 
 E = 210e3
 nu = 0.3

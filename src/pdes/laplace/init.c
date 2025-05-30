@@ -25,6 +25,9 @@ laplace_t laplace;
 
 int feenox_problem_parse_time_init_laplace(void) {
 
+///kw_pde+PROBLEM+detail  * `laplace` the Laplace (or Poisson) equation, either steady state or transient
+
+  
 #ifdef HAVE_PETSC
   // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_laplace;

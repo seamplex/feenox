@@ -25,6 +25,8 @@ thermal_t thermal;
 
 int feenox_problem_parse_time_init_thermal(void) {
 
+///kw_pde+PROBLEM+detail  * `thermal` heat conduction including transients and non-linear conductivity
+  
 #ifdef HAVE_PETSC
   // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_thermal;
