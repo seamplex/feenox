@@ -75,10 +75,13 @@ code from scratch.
 On a GNU/Linux box (preferably Debian-based), follow these quick steps.
 See sec. 2 for the actual detailed explanations.
 
-To compile the Git repository, proceed as follows. This procedure does
-need `git` and `autoconf` but new versions can be pulled and recompiled
-easily. If something goes wrong and you get an error, do not hesitate to
-ask in FeenoX’s [discussion page].
+The Git repository has the latest sources repository. To compile,
+proceed as follows. If something goes wrong and you get an error, do not
+hesitate to ask in FeenoX’s [discussion page].
+
+> If you do not have Git or Autotools, download a [source tarball] and
+> proceed with the usual `configure` & `make` procedure. See [these
+> instructions].
 
 1.  Install mandatory dependencies
 
@@ -136,17 +139,30 @@ ask in FeenoX’s [discussion page].
     sudo make install
     ```
 
-To stay up to date, pull and then autogen, configure and make (and
+    > If you do not have root permissions, configure with your home
+    > directory as prefix and then make install as a regular user:
+    >
+    > ``` terminal
+    > ./configure --prefix=$HOME
+    > make
+    > make install
+    > ```
+
+To stay up to date, pull and then `autogen`, `configure` and `make` (and
 optionally install):
 
 ``` terminal
 git pull
-./autogen.sh; ./configure; make -j4
+./autogen.sh
+./configure
+make -j4
 sudo make install
 ```
 
   [download]: https://www.seamplex.com/feenox/#download
   [discussion page]: https://github.com/seamplex/feenox/discussions
+  [source tarball]: https://seamplex.com/feenox/dist/src/
+  [these instructions]: dosource.markdown
   [detailed compilation instructions]: compilation.md
 
 # Detailed configuration and compilation

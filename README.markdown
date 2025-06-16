@@ -9,8 +9,9 @@
   - [<span class="toc-section-number">1.3</span> Usefulness]
 - [<span class="toc-section-number">2</span> Documentation]
 - [<span class="toc-section-number">3</span> Quickstart]
-  - [<span class="toc-section-number">3.1</span> Download]
-  - [<span class="toc-section-number">3.2</span> Git repository]
+  - [<span class="toc-section-number">3.1</span> Install from apt]
+  - [<span class="toc-section-number">3.2</span> Download]
+  - [<span class="toc-section-number">3.3</span> Git repository]
 - [<span class="toc-section-number">4</span> Licensing]
   - [<span class="toc-section-number">4.1</span> Contributing]
 - [<span class="toc-section-number">5</span> Further information]
@@ -26,8 +27,9 @@
   [<span class="toc-section-number">1.3</span> Usefulness]: #usefulness
   [<span class="toc-section-number">2</span> Documentation]: #documentation
   [<span class="toc-section-number">3</span> Quickstart]: #quickstart
-  [<span class="toc-section-number">3.1</span> Download]: #download
-  [<span class="toc-section-number">3.2</span> Git repository]: #git-repository
+  [<span class="toc-section-number">3.1</span> Install from apt]: #install-from-apt
+  [<span class="toc-section-number">3.2</span> Download]: #download
+  [<span class="toc-section-number">3.3</span> Git repository]: #git-repository
   [<span class="toc-section-number">4</span> Licensing]: #licensing
   [<span class="toc-section-number">4.1</span> Contributing]: #sec:contributing
   [<span class="toc-section-number">5</span> Further information]: #further-information
@@ -55,7 +57,7 @@ work]):
 
 > ### News
 >
-> FeenoX is now in Debian!  
+> FeenoX is now in Debian (sid) and Ubuntu 25.04!  
 > You can install FeenoX from APT
 >
 > ``` terminal
@@ -65,8 +67,7 @@ work]):
 > Check progress on the following pages:
 >
 > - <https://packages.debian.org/unstable/science/feenox>
-> - <https://tracker.debian.org/pkg/feenox>
-> - <https://buildd.debian.org/status/package.php?p=feenox>
+> - <https://launchpad.net/ubuntu/+source/feenox>
 >
 > Open-source web-based UX for FeenoX.  
 > Take a look at [SunCAE] for an example of how to write a front end for
@@ -137,6 +138,9 @@ The [`tests`] directory in the repository has hundreds of
     - [`thermal`]
       - [`2d`]
       - [`3d`]
+    - [`mechanical`]
+      - [`sdef`]
+      - [`ldef`]
   - [`nafems`]
     - [`le10`]
 
@@ -146,6 +150,9 @@ The [`tests`] directory in the repository has hundreds of
   [`thermal`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal
   [`2d`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/2d
   [`3d`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/3d
+  [`mechanical`]: https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical
+  [`sdef`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/sdef
+  [`ldef`]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/ldef
   [`nafems`]: https://github.com/seamplex/feenox/tree/main/tests/nafems
   [`le10`]: https://github.com/seamplex/feenox/tree/main/tests/nafems/le10
 
@@ -317,62 +324,65 @@ of the [Github repository] for
 
 # Quickstart
 
+## Install from apt
+
+If you use [Debian] (either [Sid], or [Trixie] with [backports]) or
+[Ubuntu 25.04] or higher, you can do
+
+    sudo apt install feenox
+
+See these links for details about the packages:
+
+- <https://packages.debian.org/unstable/science/feenox>
+- <https://launchpad.net/ubuntu/+source/feenox>
+
+  [Debian]: https://www.debian.org
+  [Sid]: https://wiki.debian.org/DebianUnstable
+  [Trixie]: https://www.debian.org/releases/trixie
+  [backports]: https://backports.debian.org
+  [Ubuntu 25.04]: https://releases.ubuntu.com/plucky
+
 ## Download
 
-FeenoX is distributed under the terms of the [GNU General Public License
-version 3] or (at your option) any later version.
+If you do not use Debian nor Ubuntu, check these download links:
 
 |                    |                                                       |
 |--------------------|-------------------------------------------------------|
-| Debian packages    | <https://packages.debian.org/unstable/science/feenox> |
+| Debian package     | <https://packages.debian.org/unstable/science/feenox> |
+| Ubuntu package     | <https://launchpad.net/ubuntu/+source/feenox>         |
 | GNU/Linux binaries | <https://www.seamplex.com/feenox/dist/linux>          |
 | Source tarballs    | <https://www.seamplex.com/feenox/dist/src>            |
 | Github repository  | <https://github.com/seamplex/feenox/>                 |
 
-- FeenoX is [cloud-first]. It was designed to run on servers.
+Generic GNU/Linux binaries are provided as statically-linked executables
+for convenience. They do not support MUMPS nor MPI and have only basic
+optimization flags. Please compile from source for high-end
+applications. See [detailed compilation instructions].
 
-- Be aware that FeenoX **does not have a GUI**. Read the
-  [documentation], especially the [description] and the [FAQs][4]. Ask
-  for help on the [GitHub discussions page] if you do now understand
-  what this bullet means.
+> Be aware that FeenoX **does not have a GUI**. Read the
+> [documentation], especially the [description] and the [FAQs][4]. Ask
+> for help on the [GitHub discussions page] if you do now understand
+> what this means.
 
-- Debian/Ubuntu packages are unofficial, i.e. they are not available in
-  `apt` repositories. They contain dynamically-linked binaries and their
-  dependencies are hard-coded for each Debian/Ubuntu release. Make sure
-  you get the right `.deb` for your release (i.e. `bookworm`/`bullseye`
-  for Debian, `kinetic`/`focal` for Ubuntu).
+> You can still use FeenoX through a **web-based UI** through
+> [SunCAE][5]
 
-- Generic GNU/Linux binaries are provided as statically-linked
-  executables for convenience. They do not support MUMPS nor MPI and
-  have only basic optimization flags. Please compile from source for
-  high-end applications. See [detailed compilation instructions].
-
-- Try to avoid Windows as much as you can. The binaries are provided as
-  transitional packages for people that for some reason still use such
-  an outdated, anachronous, awful and invasive operating system. They
-  are compiled with [Cygwin] and have no support whatsoever. Really,
-  really, **get rid of Windows ASAP**.
-
-  > “It is really worth any amount of time and effort to get away from
-  > Windows if you are doing computational science.”
-  >
-  > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
-
-  [GNU General Public License version 3]: https://www.gnu.org/licenses/gpl-3.0.en.html
-  [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
+  [detailed compilation instructions]: docompilation.markdown
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [4]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
-  [detailed compilation instructions]: https://seamplex.com/feenox/doc/compilation.html
-  [Cygwin]: http://cygwin.com/
+  [5]: https://www.seamplex.com/suncae.
 
 ## Git repository
 
-To compile the Git repository, proceed as follows. This procedure does
-need `git` and `autoconf` but new versions can be pulled and recompiled
-easily. If something goes wrong and you get an error, do not hesitate to
-ask in FeenoX’s [discussion page].
+The Git repository has the latest sources repository. To compile,
+proceed as follows. If something goes wrong and you get an error, do not
+hesitate to ask in FeenoX’s [discussion page].
+
+> If you do not have Git or Autotools, download a [source tarball] and
+> proceed with the usual `configure` & `make` procedure. See [these
+> instructions].
 
 1.  Install mandatory dependencies
 
@@ -416,7 +426,7 @@ ask in FeenoX’s [discussion page].
 
     If you do not have Internet access, get the tarball manually, copy
     it to the same directory as `configure` and run again. See the
-    [detailed compilation instructions][5] for an explanation.
+    [detailed compilation instructions][6] for an explanation.
 
 5.  Run test suite (optional)
 
@@ -430,12 +440,23 @@ ask in FeenoX’s [discussion page].
     sudo make install
     ```
 
-To stay up to date, pull and then autogen, configure and make (and
+    > If you do not have root permissions, configure with your home
+    > directory as prefix and then make install as a regular user:
+    >
+    > ``` terminal
+    > ./configure --prefix=$HOME
+    > make
+    > make install
+    > ```
+
+To stay up to date, pull and then `autogen`, `configure` and `make` (and
 optionally install):
 
 ``` terminal
 git pull
-./autogen.sh; ./configure; make -j4
+./autogen.sh
+./configure
+make -j4
 sudo make install
 ```
 
@@ -443,7 +464,9 @@ See the [download page] and the [compilation guide] for detailed
 information.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
-  [5]: compilation.md
+  [source tarball]: https://seamplex.com/feenox/dist/src/
+  [these instructions]: dosource.markdown
+  [6]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
   [compilation guide]: doc/compilation.markdown
 
@@ -485,7 +508,7 @@ text was borrowed from the [Gmsh documentation]. Replacing “Gmsh” with
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][6] version 3 or, at the user convenience, any later version.
+License][7] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[^1]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -553,7 +576,7 @@ chains running over free and open source operating systems.
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [6]: https://www.gnu.org/licenses/gpl-3.0
+  [7]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
   [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
@@ -565,7 +588,7 @@ new types of PDEs and new formulations of existing PDEs. For elliptic
 operators feel free to use the Laplace equation at [`src/pdes/laplace`]
 as a template.
 
-1.  Read the [Programming Guide][7].
+1.  Read the [Programming Guide][8].
 2.  Browse [Github discussions] and open a new thread explaining what
     you want to do and/or asking for help.
 3.  Fork the [Git repository] under your Github account
@@ -585,7 +608,7 @@ Note that
   [hackers]: README4hackers.html
   [academics]: README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [7]: https://seamplex.com/feenox/doc/programming.html
+  [8]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

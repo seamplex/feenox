@@ -19,14 +19,14 @@ To compile the source tarball, proceed as follows. This procedure does not need 
  
  
     ```terminal
-    wget https://www.seamplex.com/feenox/dist/src/feenox-v0.1.66-g1c4b17b.tar.gz
-    tar xvzf feenox-v0.1.66-g1c4b17b.tar.gz
+    wget https://www.seamplex.com/feenox/dist/src/feenox-v1.1.tar.gz
+    tar xvzf feenox-v1.1.tar.gz
     ```
  
  4. Configure, compile & make
  
     ```terminal
-    cd feenox-v0.1.66-g1c4b17b
+    cd feenox-v1.1
     ./configure
     make -j4
     ```

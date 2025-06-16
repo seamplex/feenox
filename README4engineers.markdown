@@ -54,9 +54,9 @@ nothing less.
 
 <figure id="fig:nafems-le10">
 <img src="nafems-le10-problem-input.svg" style="width:100.0%"
-alt="Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
-<figcaption aria-hidden="true">Figure 1: The NAFEMS LE10 problem
-statement and the corresponding FeenoX input</figcaption>
+alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption>Figure 1: The NAFEMS LE10 problem statement and the
+corresponding FeenoX input</figcaption>
 </figure>
 
 Say we already have a [`nafems-le10.geo`] file which tells [Gmsh] how to

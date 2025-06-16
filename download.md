@@ -19,7 +19,9 @@ toc: true
 >
 >
 >
-> For an easy-to-use web-based front end with FeenoX running in the cloud directly from your browser see [CAEplex](https://www.caeplex.com) at <https://www.caeplex.com>.
+> For an easy-to-use web-based front end with FeenoX running in the cloud directly from your browser see either
+>  * [CAEplex](https://www.caeplex.com)
+>  * [SunCAE](htts://www.seamplex.com/suncae)
 >
 > ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
 > <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kD3tQdq17ZE?rel=0" allowfullscreen></iframe>
@@ -28,19 +30,23 @@ toc: true
 > Any contribution to make desktop GUIs such as [PrePoMax](https://prepomax.fs.um.si/) or [FreeCAD](http://https://www.freecadweb.org) to work with FeenoX are welcome.
 
 
+# Debian/Ubuntu install
+
+```
+sudo apt install feenox
+```
+
+See these links for details about the packages:
+
+ * <https://packages.debian.org/unstable/science/feenox>
+ * <https://launchpad.net/ubuntu/+source/feenox>
+
 
 # Downloads {#sec:downloads}
 
 ```{.include}
 doc/downloads.md
 ```
-
-## Debian/Ubuntu packages {#sec:debian}
-
-```{.include}
-doc/debian.md
-```
-
 
 ## Statically-linked binaries {#sec:binaries}
 

@@ -22,15 +22,15 @@ a technical report, paper or document:
 
 <div class="not-in-format latex">
 
-| Feature | Microsoft Word | Google Docs | Markdown[^1] | (La)TeX |
-|:---|:--:|:--:|:--:|:--:|
-| Aesthetics | ❌ | ❌ | ✅ | ✅ |
-| Convertibility (to other formats) | 😐 | 😐 | ✅ | 😐 |
-| Traceability | ❌ | 😐 | ✅ | ✅ |
-| Mobile-friendliness | ❌ | ✅ | ✅ | ❌ |
-| Collaborativeness | ❌ | ✅ | ✅ | 😐 |
-| Licensing/openness | ❌ | ❌ | ✅ | ✅ |
-| Non-nerd friendliness | ✅ | ✅ | 😐 | ❌ |
+| Feature                           | Microsoft Word | Google Docs | Markdown[^1] | (La)TeX |
+|:----------------------------------|:--------------:|:-----------:|:------------:|:-------:|
+| Aesthetics                        |       ❌       |     ❌      |      ✅      |   ✅    |
+| Convertibility (to other formats) |       😐       |     😐      |      ✅      |   😐    |
+| Traceability                      |       ❌       |     😐      |      ✅      |   ✅    |
+| Mobile-friendliness               |       ❌       |     ✅      |      ✅      |   ❌    |
+| Collaborativeness                 |       ❌       |     ✅      |      ✅      |   😐    |
+| Licensing/openness                |       ❌       |     ❌      |      ✅      |   ✅    |
+| Non-nerd friendliness             |       ✅       |     ✅      |      😐      |   ❌    |
 
 </div>
 

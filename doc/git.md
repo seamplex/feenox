@@ -1,6 +1,8 @@
-To compile the Git repository, proceed as follows.
-This procedure does need `git` and `autoconf` but new versions can be pulled and recompiled easily.
+The Git repository has the latest sources repository.
+To compile, proceed as follows.
 If something goes wrong and you get an error, do not hesitate to ask in FeenoX's [discussion page](https://github.com/seamplex/feenox/discussions).
+
+> If you do not have Git or Autotools, download a [source tarball](https://seamplex.com/feenox/dist/src/) and proceed with the usual `configure` & `make` procedure. See [these instructions](doc/source.md).
 
 :::: {.only-in-format .html }
 ```{=html}
@@ -59,11 +61,21 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX's
     ```terminal
     sudo make install
     ```
+    
+    > If you do not have root permissions, configure with your home directory as prefix and then make install as a regular user:
+    >
+    > ```terminal
+    > ./configure --prefix=$HOME
+    > make
+    > make install
+    > ```
  
-To stay up to date, pull and then autogen, configure and make (and optionally install):
+To stay up to date, pull and then `autogen`, `configure` and `make` (and optionally install):
 
 ```terminal
 git pull
-./autogen.sh; ./configure; make -j4
+./autogen.sh
+./configure
+make -j4
 sudo make install
 ```

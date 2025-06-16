@@ -37,7 +37,7 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 
 > ### News
 >
-> FeenoX is now in Debian!
+> FeenoX is now in Debian (sid) and Ubuntu 25.04!
 >
 > :   You can install FeenoX from APT
 >
@@ -48,8 +48,7 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 >     Check progress on the following pages:
 >
 >      * <https://packages.debian.org/unstable/science/feenox>
->      * <https://tracker.debian.org/pkg/feenox>
->      * <https://buildd.debian.org/status/package.php?p=feenox>
+>      * <https://launchpad.net/ubuntu/+source/feenox>
 >
 > 
 > Open-source web-based UX for FeenoX.
@@ -95,6 +94,9 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
       - [`thermal`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal)
         - [`2d`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/2d)
         - [`3d`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/3d)
+      - [`mechanical`](https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical)
+        - [`sdef`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/sdef)
+        - [`ldef`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/ldef)
     - [`nafems`](https://github.com/seamplex/feenox/tree/main/tests/nafems)
       - [`le10`](https://github.com/seamplex/feenox/tree/main/tests/nafems/le10)
  
@@ -190,7 +192,22 @@ Browse through the [documentation index](doc) and/or the [`doc`](https://github.
 
 # Quickstart
 
+## Install from apt
+
+If you use [Debian](https://www.debian.org) (either [Sid](https://wiki.debian.org/DebianUnstable), or [Trixie](https://www.debian.org/releases/trixie) with [backports](https://backports.debian.org)) or [Ubuntu 25.04](https://releases.ubuntu.com/plucky) or higher, you can do
+
+```
+sudo apt install feenox
+```
+
+See these links for details about the packages:
+
+ * <https://packages.debian.org/unstable/science/feenox>
+ * <https://launchpad.net/ubuntu/+source/feenox>
+
 ## Download
+
+If you do not use Debian nor Ubuntu, check these download links:
 
 ```include
 doc/downloads.md
