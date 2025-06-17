@@ -4,7 +4,6 @@ subtitle: A cloud-first free no-fee no-X uniX-like finite-element(ish) computati
 author: Jeremy Theler
 infoname: feenox
 lang: en-US
-template: manual
 documentclass: book
 classoption: oneside
 ...

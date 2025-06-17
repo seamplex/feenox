@@ -44,9 +44,9 @@ chemical kinetics, structural dynamics, heat transfer analysis and
 dynamical systems, among other disciplines, heavily rely on equations of
 the form
 
-$$
+``` math
 \dot{\mathbf{x}} = F(\mathbf{x},t)
-$$
+```
 
 During my years of undergraduate student (circa 2004–2007), whenever I
 had to solve these kind of equations I had to choose one of the
@@ -88,12 +88,12 @@ computer lab (Dr E.), as it might have happened (or not):
 > — (Prof.) The point reactor equations.  
 > — (Me) It’s not. These are the point reactor equations:
 >
-> $$
+> ``` math
 > \begin{cases}
 > \dot{\phi}(t) = \displaystyle \frac{\rho(t) - \beta}{\Lambda} \cdot \phi(t) + \sum_{i=1}^{N} \lambda_i \cdot c_i \\
 > \dot{c}_i(t)  = \displaystyle \frac{\beta_i}{\Lambda} \cdot \phi(t) - \lambda_i \cdot c_i
 > \end{cases}
-> $$
+> ```
 >
 > — (Me) And in any case, I’d write them like this in a computer:
 >

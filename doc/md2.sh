@@ -181,8 +181,8 @@ elif [ "x${format}" = "x.tex" ]; then
     pdfyaml="pdf.yaml"
   fi
   
-  format_args="--pdf-engine=xelatex --listings --metadata=listings:true ${rootdir}/doc/${pdfyaml}"
-  template_args="--template=${rootdir}/doc/${template}.tex"
+  format_args="--pdf-engine=xelatex --listings --metadata=listings:true -H ${rootdir}/doc/syntax-feenox.tex -H ${rootdir}/doc/syntax.tex ${rootdir}/doc/${pdfyaml}"
+#   template_args="--template=${rootdir}/doc/${template}.tex"
   
 elif [ "x${format}" = "x.pdf" ]; then
 
@@ -197,8 +197,8 @@ elif [ "x${format}" = "x.pdf" ]; then
     pdfyaml="pdf.yaml"
   fi
   
-  format_args="--pdf-engine=xelatex --listings --metadata=listings:true ${rootdir}/doc/${pdfyaml}"
-  template_args="--template=${rootdir}/doc/${template}.tex"
+  format_args="--pdf-engine=xelatex --listings --metadata=listings:true -H ${rootdir}/doc/crossref.tex -H ${rootdir}/doc/syntax-feenox.tex -H ${rootdir}/doc/syntax.tex ${rootdir}/doc/${pdfyaml}"
+#   template_args="--template=${rootdir}/doc/${template}.tex"
 fi
 
 

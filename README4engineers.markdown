@@ -54,9 +54,9 @@ nothing less.
 
 <figure id="fig:nafems-le10">
 <img src="nafems-le10-problem-input.svg" style="width:100.0%"
-alt="The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
-<figcaption>Figure 1: The NAFEMS LE10 problem statement and the
-corresponding FeenoX input</figcaption>
+alt="Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
+<figcaption aria-hidden="true">Figure 1: The NAFEMS LE10 problem
+statement and the corresponding FeenoX input</figcaption>
 </figure>
 
 Say we already have a [`nafems-le10.geo`] file which tells [Gmsh] how to
@@ -211,6 +211,7 @@ There are two “why” questions we have to answer.
     > <div class="container text-center my-5 ratio ratio-16x9">
     >
     > <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/kD3tQdq17ZE" allowfullscreen>
+    >
     > </iframe>
     >
     > </div>
@@ -218,6 +219,7 @@ There are two “why” questions we have to answer.
     > <div class="container text-center my-5 ratio ratio-16x9">
     >
     > <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/ylXAUAsfb5E" allowfullscreen>
+    >
     > </iframe>
     >
     > </div>
@@ -234,6 +236,8 @@ There are two “why” questions we have to answer.
     [CAEplex][web-based interfaces] might be enough or not. If the
     latter, one has to see what’s sitting under the hood. Peek into [the
     documentation] and [the repository] for further details.
+
+    > 
 
   [ready-to-run executable]: https://www.seamplex.com/feenox/doc/sds.html#sec:execution
   [100% user-defined output]: https://seamplex.com/feenox/doc/sds.html#sec:output

@@ -1,8 +1,8 @@
 FeenoX for Engineers
 
--   1 How FeenoX works
--   2 What Feenox can solve
--   3 Why FeenoX works the way it does
+- 1 How FeenoX works
+- 2 What Feenox can solve
+- 3 Why FeenoX works the way it does
 
   [1 How FeenoX works]: #how-feenox-works
   [2 What Feenox can solve]: #what-feenox-can-solve
@@ -50,10 +50,8 @@ mesh entities (in this case the mapping is not needed but in
 multi-material problems the mapping is needed indeed). Nothing more,
 nothing less.
 
-[The NAFEMS LE10 problem statement and the corresponding FeenoX input]
-
-Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX
-input
+[Figure 1: The NAFEMS LE10 problem statement and the corresponding
+FeenoX input]
 
 Say we already have a nafems-le10.geo file which tells Gmsh how to
 create a mesh nafems-le10.msh (check out the tensile test tutorial for
@@ -119,7 +117,7 @@ academics.
   [tensile test tutorial]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/
   [NAFEMS LE10 “Thick plate pressure” benchmark]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
   [multi-material problems]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
-  [The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
+  [Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX input]:
     nafems-le10-problem-input.svg
   [nafems-le10.geo]: https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo
   [Gmsh]: http://gmsh.info/
@@ -137,14 +135,14 @@ What Feenox can solve
 
 FeenoX can solve the following types of problems:
 
--   Basic mathematics
--   Systems of ODEs/DAEs
--   Laplace’s equation
--   Heat conduction
--   Linear elasticity
--   Modal analysis
--   Neutron diffusion
--   Neutron SN
+- Basic mathematics
+- Systems of ODEs/DAEs
+- Laplace’s equation
+- Heat conduction
+- Linear elasticity
+- Modal analysis
+- Neutron diffusion
+- Neutron SN
 
 Take the tutorials to learn how to solve those types of problems:
 
@@ -179,24 +177,27 @@ There are two “why” questions we have to answer.
     time to think (or investigate) how other FEA tools handle this case.
     Note the following features FeenoX provides:
 
-    -   ready-to-run executable that reads the problem at runtime (no
-        need to compile anything to solve a particular problem)
-    -   self-explanatory plain-text near-English input file
-        -   one-to-one correspondence between computer input file and
-            human description of the problem
-        -   Git-traceable (mesh is not part of the input file)
-        -   everything is an expression
-            -   material properties can be given as functions of space
-                and/or time and/or temperature (or other intermediate
-                variables)
-            -   these functions can be given as algebraic expressions or
-                come from interpolated point-wise defined data
-    -   100% user-defined output
-    -   simple problems need simple inputs
-    -   similar problems need similar inputs
-    -   parametric and optimization runs through command-line arguments
-    -   flexibility to handle many workflows, including web-based
-        interfaces
+    - ready-to-run executable that reads the problem at runtime (no need
+      to compile anything to solve a particular problem)
+    - self-explanatory plain-text near-English input file
+      - one-to-one correspondence between computer input file and human
+        description of the problem
+      - Git-traceable (mesh is not part of the input file)
+      - everything is an expression
+        - material properties can be given as functions of space and/or
+          time and/or temperature (or other intermediate variables)
+        - these functions can be given as algebraic expressions or come
+          from interpolated point-wise defined data
+    - 100% user-defined output
+    - simple problems need simple inputs
+    - similar problems need similar inputs
+    - parametric and optimization runs through command-line arguments
+    - flexibility to handle many workflows, including web-based
+      interfaces
+
+      
+
+      
 
 2.  Why FeenoX works the way it does?
 
@@ -208,6 +209,8 @@ There are two “why” questions we have to answer.
     Depending on the complexity of the case, CAEplex might be enough or
     not. If the latter, one has to see what’s sitting under the hood.
     Peek into the documentation and the repository for further details.
+
+      
 
   [ready-to-run executable]: https://www.seamplex.com/feenox/doc/sds.html#sec:execution
   [100% user-defined output]: https://seamplex.com/feenox/doc/sds.html#sec:output

@@ -415,14 +415,14 @@ format has to provide a virtual reader/writer method.
 
 ## Indices in PDEs
 
-| Index | Loop over…                                                                                       |
-|:-----:|:-------------------------------------------------------------------------------------------------|
-|  `i`  | elements or cells                                                                                |
-|  `j`  | nodes, either global or local. If there are loops which need both, use `j_local` and `j_global`. |
-|  `k`  | dummy index                                                                                      |
-|  `d`  | **d**imensions                                                                                   |
-|  `g`  | degree of freedoms (from **g**roups of energy actually)                                          |
-|  `q`  | Gauss (**q**uadrature) points                                                                    |
+| Index | Loop over… |
+|:--:|:---|
+| `i` | elements or cells |
+| `j` | nodes, either global or local. If there are loops which need both, use `j_local` and `j_global`. |
+| `k` | dummy index |
+| `d` | **d**imensions |
+| `g` | degree of freedoms (from **g**roups of energy actually) |
+| `q` | Gauss (**q**uadrature) points |
 
 ## Git workflow
 

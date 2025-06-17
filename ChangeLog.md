@@ -1,9 +1,11 @@
 # Current (under development)
 
+ * ...
+ * `PROBLEM` can define `MESH` in a single line without an explicit `READ_MESH` instruction
  * Neo-hookean material model
+ * MMS verification for mechanical with both sdef & ldef
  * Saint Venant-Kirchoff material model for ldef
  * large deformation formulation for `mechanical`
- * ...
 
 # v1.1 (Apr 2025)
 
