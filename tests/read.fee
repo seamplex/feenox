@@ -1,0 +1,5 @@
+VAR a
+# VECTOR b[3]
+READ_DATA FILE onetwothree.txt a
+# READ_DATA FILE onetwothree.txt b
+PRINT a # b

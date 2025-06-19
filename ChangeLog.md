@@ -1,6 +1,7 @@
 # Current (under development)
 
  * ...
+ * keyword `READ_DATA` to read variables and vectors from files
  * `PROBLEM` can define `MESH` in a single line without an explicit `READ_MESH` instruction
  * Neo-hookean material model
  * MMS verification for mechanical with both sdef & ldef

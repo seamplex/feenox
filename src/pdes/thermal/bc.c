@@ -64,6 +64,7 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *r
   
   // for non-linear problems it is important to have a good initial guess
   // if the user did not give us one in T_guess we average all the temperatures from the BCs
+  // but we have to be sure that the BC expression does not involve a function coming from somewhere else
   if (bc_data->type_phys == BC_TYPE_THERMAL_TEMPERATURE || bc_data->type_phys == BC_TYPE_THERMAL_CONVECTION_TEMPERATURE ) {
     thermal.guessed_initial_guess += feenox_expression_eval(&bc_data->expr);
     thermal.n_bc_temperatures++;

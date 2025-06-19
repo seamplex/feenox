@@ -100,6 +100,8 @@ extern int feenox_parse_sort_vector(void);
 extern int feenox_parse_file(char *mode);
 extern int feenox_parse_open_close(const char *what);
 
+extern int feenox_parse_read_data(void);
+
 extern int feenox_parse_print(void);
 extern int feenox_parse_printf(int all_ranks);
 extern int feenox_parse_print_function(void);

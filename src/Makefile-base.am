@@ -50,6 +50,7 @@ feenox_SOURCES = \
 ./parser/parser.h \
 ./parser/auxiliary.c \
 ./io/file.c \
+./io/read.c \
 ./io/print.c \
 ./io/printf.c \
 ./math/alias.c \

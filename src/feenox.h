@@ -329,6 +329,8 @@ typedef struct printf_t printf_t;
 typedef struct print_function_t print_function_t;
 typedef struct multidim_range_t multidim_range_t;
 typedef struct print_vector_t print_vector_t;
+typedef struct read_data_t read_data_t;
+
 
 typedef struct sort_vector_t sort_vector_t;
 typedef struct phase_object_t phase_object_t;
@@ -828,6 +830,15 @@ struct printf_t {
   expr_t *expressions;
   
   printf_t *next;
+};
+
+struct read_data_t {
+  file_t *file;
+  // TODO: several things mixed together, this is where I miss C++'s STL
+  var_t *variable;
+  vector_t *vector;
+  
+  read_data_t *next;
 };
 
 struct multidim_range_t {
@@ -2087,6 +2098,10 @@ extern int feenox_instruction_file(void *arg);
 FILE *feenox_fopen(const char *filepath, const char *mode);
 extern int feenox_instruction_file_open(void *arg);
 extern int feenox_instruction_file_close(void *arg);
+
+// read.c
+extern int feenox_instruction_read_data(void *arg);
+
 
 // abort.c
 extern int feenox_instruction_abort(void *arg);

@@ -191,7 +191,13 @@ int feenox_parse_line(void) {
     } else if (strcasecmp(token, "FUNCTION") == 0) {
       feenox_call(feenox_parse_function());
       return FEENOX_OK;
-    
+
+///kw+READ_DATA+desc Read data from a file (or standard output, or pipe, or queue, etc.).
+///kw+PRINT+usage READ_DATA
+    } else if (strcasecmp(token, "READ_DATA") == 0) {
+      feenox_call(feenox_parse_read_data());
+      return FEENOX_OK;
+      
 ///kw+PRINT+desc Write plain-text and/or formatted data to the standard output or into an output file.
 ///kw+PRINT+usage PRINT
     } else if (strcasecmp(token, "PRINT") == 0) {
@@ -1568,6 +1574,34 @@ int feenox_parse_open_close(const char *what) {
   return FEENOX_OK;  
 }
 
+int feenox_parse_read_data(void) {
+
+  read_data_t *read_data = NULL;
+  feenox_check_alloc(read_data = calloc(1, sizeof(read_data_t)));
+  
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw+READ_DATA+usage [ FILE { <file_path> | <file_id> } ]
+    if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+      feenox_call(feenox_parser_file(&read_data->file));
+      if (read_data->file->mode == NULL) {
+        feenox_check_alloc(read_data->file->mode = strdup("r"));
+      }
+    } else {
+      if ((read_data->variable = feenox_get_variable_ptr(token)) == NULL) {
+        if ((read_data->vector = feenox_get_vector_ptr(token)) == NULL) {
+          feenox_push_error_message("unknown symbol '%s'", token);
+          return FEENOX_ERROR;
+        }
+      }
+      
+    }
+  }
+  
+  feenox_call(feenox_add_instruction(feenox_instruction_read_data, read_data));
+  
+  return FEENOX_OK;
+}
 int feenox_parse_print(void) {
  
   // I don't expect anybody to want to use this PRINT instruction through the API

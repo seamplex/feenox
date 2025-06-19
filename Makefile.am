@@ -47,6 +47,7 @@ TESTS_general = \
         tests/petsc_options.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
+        tests/read.sh \
         tests/solve.sh \
         tests/trig.sh \
         tests/transient-mesh.sh \

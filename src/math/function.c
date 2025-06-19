@@ -513,6 +513,19 @@ double feenox_function_eval(function_t *this, const double *const_x) {
   
   // check if we need to initialize
   if (this->initialized == 0) {
+    // there is a pathological case where a BC or a property depends on T(x,y,z)
+    // but T(x,y,z) itself is not ready before SOLVE_PROBLEM so we have to look
+    // for the initial condition T_0(x,y,z)...
+    if (this->algebraic_expression.items == NULL && this->mesh == NULL && this->vector_argument == NULL) {
+      function_t *initial = feenox_get_function_ptr("T_0");
+      if (initial != NULL) {
+        return feenox_function_eval(initial, x);
+      } else {
+        feenox_push_error_message("function '%s' is not ready to be used and no initial condition '%s_0' found", this->name, this->name);
+        return FEENOX_ERROR;
+      }
+    }
+      
     if (feenox_function_init(this) != FEENOX_OK) {
       feenox_runtime_error();
     }
