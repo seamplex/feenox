@@ -1,5 +1,5 @@
 VAR a
 # VECTOR b[3]
-READ_DATA FILE onetwothree.txt a
-# READ_DATA FILE onetwothree.txt b
+READ_DATA FILE onetwothree.dat a
+# READ_DATA FILE onetwothree.dat b
 PRINT a # b
