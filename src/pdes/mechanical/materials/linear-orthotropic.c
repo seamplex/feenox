@@ -33,8 +33,8 @@ int feenox_mechanical_material_init_linear_elastic_orthotropic(material_t *mater
                 mechanical.G_xy.defined_per_group[i]  + mechanical.G_yz.defined_per_group[i]  + mechanical.G_zx.defined_per_group[i];
   
   if (n_ortho < 9) {
-    feenox_push_error_message("%d orthotropic properties missing for material '%s'", 9-n_ortho, material->name);
-    return FEENOX_ERROR;
+    feenox_push_error_message("%d orthotropic properties missing for material", 9-n_ortho);
+    return -1;
   }
 
   return material_model_elastic_orthotropic;
