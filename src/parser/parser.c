@@ -3101,19 +3101,17 @@ int feenox_parse_reaction(void) {
 int feenox_parse_problem(void) {
 
 #ifdef HAVE_PETSC
-  if (feenox.pde.petscinit_called == PETSC_TRUE) {
-    feenox_push_error_message("only one PROBLEM keyword allowed");
-    return FEENOX_ERROR;    
-  } 
-  
   mesh_t *mesh = NULL;
+  char *token = NULL;
   
-  char *token = feenox_get_next_token(NULL);
-  feenox_call(feenox_pde_parse_problem_type(token));
-
+  // this way we can allow setting PC or KSP etc. with subsequent PROBLEMs
   if (feenox.pde.parse_problem == NULL) {
-    feenox_push_error_message("unknown PROBLEM type '%s', run with --pdes to see the list", token);
-    return FEENOX_ERROR;     
+    token = feenox_get_next_token(NULL);
+    feenox_call(feenox_pde_parse_problem_type(token));
+    if (feenox.pde.parse_problem == NULL) {
+      feenox_push_error_message("unknown PROBLEM type '%s', run with --pdes to see the list", token);
+      return FEENOX_ERROR;     
+    }
   }
   
   while ((token = feenox_get_next_token(NULL)) != NULL) {
@@ -3358,31 +3356,33 @@ int feenox_parse_problem(void) {
     }
   }
   
-  if (mesh != NULL) {
-    feenox.mesh.mesh_main = mesh;
-    // this is shared with READ_MESH
-    feenox_call(feenox_parse_mesh_add(mesh));
-  }
+  if (feenox.pde.petscinit_called == PETSC_FALSE) {
+    if (mesh != NULL) {
+      feenox.mesh.mesh_main = mesh;
+      // this is shared with READ_MESH
+      feenox_call(feenox_parse_mesh_add(mesh));
+    }
 
-  // if there is already a mesh, use it
-  if (feenox.pde.mesh == NULL && feenox.mesh.mesh_main != NULL) {
-    feenox.pde.mesh = feenox.mesh.mesh_main;
-  }
+    // if there is already a mesh, use it
+    if (feenox.pde.mesh == NULL && feenox.mesh.mesh_main != NULL) {
+      feenox.pde.mesh = feenox.mesh.mesh_main;
+    }
   
-  if (feenox.pde.dim == 0 && feenox.pde.mesh != 0) {
-    feenox.pde.dim = feenox.pde.mesh->dim;
-  }
+    if (feenox.pde.dim == 0 && feenox.pde.mesh != 0) {
+      feenox.pde.dim = feenox.pde.mesh->dim;
+    }
   
-  // if we still do not have a dimension, use 3d
-  if (feenox.pde.dim == 0) {
-    feenox.pde.dim = 3;
-  }
+    // if we still do not have a dimension, use 3d
+    if (feenox.pde.dim == 0) {
+      feenox.pde.dim = 3;
+    }
   
-  feenox_call(feenox_problem_parse_time_init());
-  feenox_call(feenox.pde.parse_problem(NULL));
-  if (feenox.pde.solution == NULL) {
-    feenox_call(feenox_problem_define_solutions());
-  }  
+    feenox_call(feenox_problem_parse_time_init());
+    feenox_call(feenox.pde.parse_problem(NULL));
+    if (feenox.pde.solution == NULL) {
+      feenox_call(feenox_problem_define_solutions());
+    }
+  }
 #endif  
       
   return FEENOX_OK;
