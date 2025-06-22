@@ -1,13 +1,5 @@
 #!/bin/bash -ex
 
-pdf=0
-if [ "x${1}" == "x--no-pdf" ]; then
-  pdf=0
-fi
-if [ "x${1}" == "x--pdf" ]; then
-  pdf=1
-fi
-
 if [ ! -e ../tests ]; then
   echo "error: run from dist directory"
   exit 1
@@ -34,14 +26,10 @@ cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
               --enable-fee2ccx --enable-download-gsl CFLAGS="-O3 -flto" LDFLAGS="-flto"
 
-  if [ ${pdf} -ne 0 ]; then
-    if [ "x${target}" = "xlinux-amd64" ]; then
-      cd doc
-        ./make.sh --pdf
-        make info
-        make pdf
-      cd ..
-    fi
+  if [ "x${target}" = "xlinux-amd64" ]; then
+    cd doc
+      ./make.sh
+    cd ..
   fi
   make
 
@@ -80,23 +68,12 @@ cd ${package}-${version}-${target}
     cp ../${package}/doc/compilation             share/doc/${package}
     cp ../${package}/doc/FAQ                     share/doc/${package}
     cp ../${package}/doc/CODE_OF_CONDUCT         share/doc/${package}
-    
-    if [ ${pdf} -ne 0 ]; then
-      cp ../${package}/README.pdf                  share/doc/${package}
-      cp ../${package}/doc/${package}-manual.pdf   share/doc/${package}
-      cp ../${package}/doc/${package}-desc.pdf     share/doc/${package}
-      cp ../${package}/doc/${package}-desc.info    share/doc/${package}
-      cp ../${package}/doc/programming.pdf         share/doc/${package}
-      cp ../${package}/doc/compilation.pdf         share/doc/${package}
-      cp ../${package}/doc/FAQ.pdf                 share/doc/${package}
-      cp ../${package}/doc/CODE_OF_CONDUCT.pdf     share/doc/${package}
-    fi
-    
+
   elif [ "x${target}" = "xwindows64" ]; then   
-  
+
     cp ../${package}/${package}.exe bin
     cp /bin/cygwin1.dll bin
-    
+
     # -n means "new file"
     unix2dos -n ../${package}/AUTHORS   AUTHORS.txt
     unix2dos -n ../${package}/ChangeLog ChangeLog.txt
@@ -104,20 +81,12 @@ cd ${package}-${version}-${target}
     unix2dos -n ../${package}/README    README.txt
     unix2dos -n ../${package}/TODO      TODO.txt
     unix2dos -n ../${package}/TODO      TODO.txt
-    
     unix2dos -n ../${package}/doc/double-click.txt why-nothing-happens-when-I-double-click-on-feenox.exe.txt
-    
   fi
 
   cp ../${package}/doc/${package}.xml        share/doc/${package}
   cp ../${package}/doc/fee.vim               share/doc/${package}
   cp ../${package}/doc/${package}-desc.texi  share/doc/${package}
-  
-#   if [ ${pdf} -ne 0 ]; then
-#     cp -rL ../${package}/examples/             share/doc/${package}
-#     cp -rL ../${package}/tests/                share/doc/${package}
-#   fi
-  
   echo "See https://www.seamplex.com/feenox/examples" > share/doc/${package}/examples/README
   echo "See https://github.com/seamplex/feenox/tree/main/tests" > share/doc/${package}/tests/README
   
