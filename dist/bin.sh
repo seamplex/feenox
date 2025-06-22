@@ -32,7 +32,7 @@ export PETSC_DIR=$(pwd)/petsc-${petsc_ver}
 export SLEPC_DIR=$(pwd)/slepc-${slepc_ver}
 cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
-              --with-fee2ccx --enable-download-gsl CFLAGS="-O3 -flto" LDFLAGS="-flto"
+              --enable-fee2ccx --enable-download-gsl CFLAGS="-O3 -flto" LDFLAGS="-flto"
 
   if [ ${pdf} -ne 0 ]; then
     if [ "x${target}" = "xlinux-amd64" ]; then
@@ -44,13 +44,13 @@ cd ${package}
     fi
   fi
   make
-  
+
   cd utils
   ln -sf ../gsl-2.8
   cd fee2ccx
   make
   cd ../..
-  
+
 cd ..
 
 mkdir -p ${package}-${version}-${target}

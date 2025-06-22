@@ -164,7 +164,8 @@ int feenox_problem_setup_ksp(KSP ksp) {
 #ifdef PETSC_HAVE_MUMPS
     petsc_call(KSPSetType(ksp, KSPPREONLY));
 #else
-    feenox_push_error_message("this version of FeenoX does not support MUMPS")
+    feenox_push_error_message("this version of FeenoX does not support MUMPS");
+    return FEENOX_ERROR;
 #endif
   } else if (feenox.pde.ksp_type != NULL) {
     petsc_call(KSPSetType(ksp, feenox.pde.ksp_type));
