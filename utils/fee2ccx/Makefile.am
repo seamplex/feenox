@@ -35,6 +35,7 @@ fee2ccx_SOURCES = fee2ccx.c \
  ../../src/io/file.c \
  ../../src/io/print.c \
  ../../src/io/printf.c \
+ ../../src/io/read.c \
  ../../src/version.c \
  ../../src/mesh/interpolate.c \
  ../../src/mesh/init.c \
