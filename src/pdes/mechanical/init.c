@@ -593,7 +593,7 @@ int feenox_problem_setup_ksp_mechanical(KSP ksp) {
     // if we have mumps, let's use it only if the problem is small
     // TODO: choose the threshold?
     if ((feenox.pde.ksp_type == NULL && feenox.pde.pc_type == NULL && feenox.pde.size_global < 3e5) ||
-        (strcasecmp(feenox.pde.ksp_type, "mumps") == 0)) {
+        (feenox.pde.ksp_type != NULL && strcasecmp(feenox.pde.ksp_type, "mumps") == 0)) {
       feenox.pde.ksp_type = KSPPREONLY;
       feenox.pde.pc_type = "mumps";
     }
