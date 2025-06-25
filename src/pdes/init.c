@@ -415,10 +415,18 @@ int feenox_problem_init_runtime_general(void) {
 ///op+mumps+desc ask PETSc to use the direct linear solver MUMPS
   petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-mumps", &flag));
   if (flag == PETSC_TRUE) {
-    feenox.pde.ksp_type = strdup("mumps");
-    feenox.pde.pc_type = strdup("mumps");
+    // mumps is different, we detect these strings later on
+    feenox.pde.ksp_type = "mumps";
+    feenox.pde.pc_type = "mumps";
   }
 
+///op+gamg+option `--gamg`
+///op+gamg+desc ask PETSc to use a GAMG-preconditioned iterative linear solver
+  petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-gamg", &flag));
+  if (flag == PETSC_TRUE) {
+    feenox.pde.pc_type = PCGAMG;
+  }
+  
 // read these guys just to avoid the "unused database option" complain
   petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-linear", &flag));
   petsc_call(PetscOptionsHasName(PETSC_NULLPTR, PETSC_NULLPTR, "-non-linear", &flag));

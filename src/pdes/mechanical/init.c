@@ -562,7 +562,7 @@ int feenox_problem_setup_pc_mechanical(PC pc) {
   PCType pc_type = NULL;
   petsc_call(PCGetType(pc, &pc_type));
   if (pc_type == NULL) {
-    petsc_call(PCSetType(pc, PCGAMG));
+    petsc_call(PCSetType(pc, (feenox.pde.pc_type != NULL) ? feenox.pde.pc_type : PCGAMG));
   }
   
   petsc_call(PCGetType(pc, &pc_type));
@@ -587,11 +587,25 @@ int feenox_problem_setup_ksp_mechanical(KSP ksp) {
 
   KSPType ksp_type = NULL;
   petsc_call(KSPGetType(ksp, &ksp_type));
-  if (ksp_type == NULL) {
-    // if the user did not choose anything, we default to CG or GMRES
-    petsc_call(KSPSetType(ksp, (feenox.pde.math_type == math_type_linear && feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES));
-  }  
 
+  if (ksp_type == NULL) {
+#ifdef PETSC_HAVE_MUMPS  
+    // if we have mumps, let's use it only if the problem is small
+    // TODO: choose the threshold?
+    if ((feenox.pde.ksp_type == NULL && feenox.pde.pc_type == NULL && feenox.pde.size_global < 3e5) ||
+        (strcasecmp(feenox.pde.ksp_type, "mumps") == 0)) {
+      feenox.pde.ksp_type = KSPPREONLY;
+      feenox.pde.pc_type = "mumps";
+    }
+#endif  
+    if (feenox.pde.ksp_type == NULL) {
+      // if mumps is not avaialable or the problem is big, we default to CG or GMRES
+      feenox.pde.ksp_type = (feenox.pde.math_type == math_type_linear && feenox.pde.symmetric_K && feenox.pde.symmetric_M) ? KSPCG : KSPGMRES;
+    }
+    
+    petsc_call(KSPSetType(ksp, feenox.pde.ksp_type));
+  }  
+  
   return FEENOX_OK;
 }
 

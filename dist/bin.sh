@@ -24,7 +24,7 @@ export PETSC_DIR=$(pwd)/petsc-${petsc_ver}
 export SLEPC_DIR=$(pwd)/slepc-${slepc_ver}
 cd ${package}
   ./configure PETSC_DIR=${PETSC_DIR} SLEPC_DIR=${SLEPC_DIR} PETSC_ARCH=${PETSC_ARCH} \
-              --enable-fee2ccx --enable-download-gsl CFLAGS="-O3 -flto" LDFLAGS="-flto"
+              --enable-fee2ccx --enable-download-gsl --with-sundials=no CFLAGS="-O3 -flto" LDFLAGS="-flto"
 
   if [ "x${target}" = "xlinux-amd64" ]; then
     cd doc

@@ -1,0 +1,14 @@
+twophi = 1+sqrt(5)
+# PRINT phi^(-16)+phi^(-11)+phi^(-6)+phi^1+phi^3+phi^5+phi^10+phi^13+phi^15
+r = {
+(twophi)^(-16) * (1/2)^(-16) +
+(twophi)^(-11) * (1/2)^(-11) +
+(twophi)^(-6)  * (1/2)^(-6)  +
+(twophi)^1     * (1/2)^(1)   +
+(twophi)^3     * (1/2)^(3)   +
+(twophi)^5     * (1/2)^(5)   +
+(twophi)^10    * (1/2)^(10)  +
+(twophi)^13    * (1/2)^(13)  +
+(twophi)^15    * (1/2)^(15)
+}
+PRINT r

@@ -1,0 +1,19 @@
+PROBLEM neutron_diffusion 1d
+READ_MESH ud20-1-0-sl.msh
+
+a = 2 * 10.371065 # critical size of the problem UD20-1-0-SL (number 22 report Los Alamos)
+
+Sigma_t1 = 1
+Sigma_s1.1 = 0.5
+S1 = 0.5
+nuSigma_f1 = 0.507722225
+
+BC left  null
+BC right null
+
+SOLVE_PROBLEM
+
+PRINT (phi1(5)<0)&(phi1(15)<0)
+
+# PRINT %.3f phi1(5) phi1(15) SEP " "
+
