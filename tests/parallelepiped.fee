@@ -9,8 +9,8 @@ E(x,y,z) = 1000/(800-T(x,y,z))
 nu = 0.3
 
 BC O fixed
-BC B u=0 w=0
-BC C u=0
+BC B u=0 w=0    # no v=0 means "released"
+BC C u=0 v= w=  # v="" means "released"
 
 # here "load" is a fantasy name
 BC load tension=1 GROUP left GROUP right

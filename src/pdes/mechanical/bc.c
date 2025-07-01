@@ -30,13 +30,13 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
     bc_data->set_essential = feenox_problem_bc_set_mechanical_displacement;
     bc_data->dof = -1;
     
-  } else if (strcmp(lhs, "u") == 0 || strcmp(lhs, "u_x") == 0) {
+  } else if ((strcmp(lhs, "u") == 0 || strcmp(lhs, "u_x") == 0) && strcmp(rhs, "") != 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_mechanical_displacement;
     bc_data->dof = 0;
     
-  } else if (strcmp(lhs, "v") == 0 || strcmp(lhs, "u_y") == 0) {
+  } else if ((strcmp(lhs, "v") == 0 || strcmp(lhs, "u_y") == 0) && strcmp(rhs, "") != 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_mechanical_displacement;
@@ -46,7 +46,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
       return FEENOX_ERROR;
     }
 
-  } else if (strcmp(lhs, "w") == 0 || strcmp(lhs, "u_z") == 0) {
+  } else if ((strcmp(lhs, "w") == 0 || strcmp(lhs, "u_z") == 0) && strcmp(rhs, "") != 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_mechanical_displacement;
@@ -124,7 +124,7 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
       s++;
     }
     
-  } else {
+  } else if (strcmp(rhs, "") != 0) {
     feenox_push_error_message("unknown mechanical boundary condition '%s'", lhs);
     return FEENOX_ERROR;
   }
