@@ -57,44 +57,14 @@ Contributions to build FeenoX in other architectures (other Unixes such as MacOS
 
 # Debian packages
 
-So far the `deb.sh` uses the source tarball, compiles it and copies the binary and other plain-text docs into a binary-only tree that gets packed with `dpkg-deb`. 
+To build Debian packages, we need 
 
-We should investigate using `dpk-buildpackage` to build both the source and the binary packages.
+ 1. a source tarball
+ 2. a proper `debian` directory
+ 
+The first item can come from the output of `src.sh` or from <https://seamplex.com/feenox/dist/src/>.
+The second from <https://salsa.debian.org/jtheler/feenox>.
 
-Note that since the `.deb` package contains a dynamically linked binary, it has to be compiled with the available headers each dependency has in the `apt` repository for each release. Hopefully, the `deb.sh` package should figure out the dependencies automatically (i.e. `libpetsc-3.18-real` or `libepetsc-3.16-real` or 3.12 or whatever, etc).
+Once you have both, run `dsc.sh`.
 
 
-## Using Vagrant
-
-```terminal
-mkdir jammy
-cd jammy
-vagrant init ubuntu/jammy64       # <- this needs virtualbox
-vagrant init generic/ubuntu2204   # <- this works with libvrt
-vagrant up
-vagrant ssh
-```
-
-Then clone FeenoX, compile, go to `dist` and run `deb.sh`:
-
-```terminal
-sudo apt-get install -y git autoconf automake make gcc g++ libgsl-dev libsundials-dev wget
-sudo apt-get install -y petsc-dev slepc-dev           # <- these names depend on the linux dist/version
-sudo apt-get install -y libpetsc-dev libslepc-dev     # <- these names depend on the linux dist/version
-git clone https://github.com/seamplex/feenox/
-cd feenox
-./autogen.sh
-./configure
-make
-cd dist
-./deb.sh
-```
-
-## Names
-
- * `bookworm` is Debian 12
- * `bullseye` is Debian 11
- * `buster` is Debian 10
- * `kinetic` is Ubuntu 22.10
- * `jammy` is Ubuntu 22.04
- * `focal` is Ubuntu 20.04

@@ -26,6 +26,17 @@ cd feenox-${version}
 rm -rf debian
 cp -r ../feenox-salsa/debian .
 
+cat << EOF > tmp
+feenox (${version}-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Jeremy Theler <jeremy@seamplex.com>  $(date -R)
+ 
+EOF
+cat debian/changelog >> tmp
+mv tmp debian/changelog
+
 export DEBEMAIL="jeremy@seamplex.com"
 export DEBFULLNAME="Jeremy Theler"
 export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-i -I -us -uc"
