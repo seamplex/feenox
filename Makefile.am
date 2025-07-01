@@ -345,8 +345,29 @@ DISTCLEANFILES = \
                  ./wilson-2d-10.vtk \
                  ./wilson-2d-175.vtk \
                  ./wilson-2d-50.vtk \
-                 ./wilson-2d-87.5.vtk
-                 
+                 ./wilson-2d-87.5.vtk \
+                 ./beam-orthotropic-hex20.msh \
+                 ./hex8-ldef.vtk \
+                 ./hex8-single-stretched-neohookean.vtk \
+                 ./beam-ldef-hex27.vtu \
+                 ./spooles.out \
+                 ./beam-orthotropic-hex8.msh \
+                 ./hex8-single-stretched-svk.vtk \
+                 ./tests/hex8-ldef.12d \
+                 ./tests/hex8-ldef.cvg \
+                 ./tests/hex8-ldef.sta \
+                 ./tests/hex8-ldef.txt \
+                 ./tests/hex8-ldef.dat \
+                 ./tests/hex8-ldef.frd \
+                 ./beam-orthotropic-tet4.msh \
+                 ./beam-orthotropic-hex27.msh \
+                 ./beam-ldef-tet4.vtu \
+                 ./beam-ldef-hex20.vtu \
+                 ./beam-orthotropic-tet10.msh \
+                 ./hex8-single-stretched-linear.vtk \
+                 ./beam-ldef-hex8.vtu \
+                 ./beam-ldef-tet10.vtu
+    
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
