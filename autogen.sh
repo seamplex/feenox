@@ -1,4 +1,4 @@
-#!/bin/sh
+# #!/bin/sh
 # 
 # Execute this script to generate a configure script
 #
@@ -68,7 +68,7 @@ EOF
 
 # these links are needed for make dist-check
 rm -f auto_links.m4
-for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref tests/*.vtk tests/reed*.csv; do
+for i in tests/*.sh tests/*.fee tests/*.geo tests/*.msh tests/*.dat tests/*.ref tests/*.vtk tests/reed*.csv tests/*.inp; do
  echo "AC_CONFIG_LINKS([${i}:${i}])" >> auto_links.m4
 done
 
