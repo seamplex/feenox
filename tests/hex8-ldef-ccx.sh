@@ -13,7 +13,7 @@ if [ -z "$(which ccx)" ]; then
   exit 77
 fi
 
-ccx -i ${dir}/hex8-ldef > hex8-ldef.txt
+ccx -i ${dir}/hex8-ldef > ${dir}/hex8-ldef.txt
 ${feenox} ${dir}/hex8-ldef.fee
 
 answerzero hex8-ldef-diff.fee 1e-6
