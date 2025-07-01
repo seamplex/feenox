@@ -1,5 +1,13 @@
+aclocal.m4
+autom4te.cache
+config.status
+.deps
+.dirstamp
 configure
 configure~
 config.log
+Makefile
+Makefile.in
+nbproject
 *.o
 fee2ccx

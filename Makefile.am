@@ -1,4 +1,5 @@
-SUBDIRS = src utils/fee2ccx
+SUBDIRS = src
+EXTRA_DIST = utils
 
 dist_doc_DATA = AUTHORS \
                 TODO \

@@ -11,4 +11,6 @@ cat .gitignore | grep -v nbproject | grep -v gsl | sed '/^#.*/ d' | sed '/^\s*$/
 cd tests
 cat .gitignore | grep -v nafems | grep -v Stanford_Bunny.stl | sed '/^#.*/ d' | sed '/^\s*$/ d' | sed 's/^/rm -rf /' | bash
 cd ..
-
+cd utils/fee2ccx
+cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$/ d' | sed 's/^/rm -rf /' | bash
+cd ../..
