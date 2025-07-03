@@ -390,20 +390,18 @@ Let us consider a two-zone slab reactor:
 a.  Zone $A$ has $k_\infty < 1$ and extends from $x=0$ to $x=a$.
 b.  Zone $B$ has $k_\infty > 1$ and extends from $x=a$ to $x=b$.
 
--   The slab is solved with a one-group diffusion approach.
--   Both zones have uniform macroscopic cross sections.
--   Flux $\phi$ is equal to zero at both at $x=0$ and at $x=b$.
+- The slab is solved with a one-group diffusion approach.
+- Both zones have uniform macroscopic cross sections.
+- Flux $\phi$ is equal to zero at both at $x=0$ and at $x=b$.
 
 Under these conditions, the overall analytical effective multiplication
 factor is $k_\text{eff}$ such that
 
-$$
- \sqrt{D_A\cdot\left(\Sigma_{aA}- \frac{\nu\Sigma_{fA}}{k_\text{eff}}\right)} \cdot
-  \tan\left[\sqrt{\frac{1}{D_B} \cdot\left( \frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB} \right) }\cdot (a-b) \right]
-$$ $$
- = \sqrt{D_B\cdot\left(\frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB}\right)} \cdot
-  \tanh\left[\sqrt{\frac{1}{D_A} \cdot\left( \Sigma_{aA}-\frac{\nu\Sigma_{fA}}{k_\text{eff}} \right)} \cdot b\right]
-$$
+$$ \sqrt{D_A\cdot\left(\Sigma_{aA}- \frac{\nu\Sigma_{fA}}{k_\text{eff}}\right)} \cdot
+  \tan\left[\sqrt{\frac{1}{D_B} \cdot\left( \frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB} \right) }\cdot (a-b) \right]$$
+
+$$ = \sqrt{D_B\cdot\left(\frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB}\right)} \cdot
+  \tanh\left[\sqrt{\frac{1}{D_A} \cdot\left( \Sigma_{aA}-\frac{\nu\Sigma_{fA}}{k_\text{eff}} \right)} \cdot b\right]$$
 
 We can then compare the numerical $k_\text{eff}$ computed using...
 

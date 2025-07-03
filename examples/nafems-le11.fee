@@ -22,12 +22,11 @@ terminal: |
   $
 ...
 # NAFEMS Benchmark LE-11: solid cylinder/taper/sphere-temperature
-PROBLEM mechanical 3D
-READ_MESH nafems-le11.msh
+PROBLEM mechanical 3D MESH nafems-le11.msh
 
 # linear temperature gradient in the radial and axial direction
 # as an algebraic expression as human-friendly as it can be
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 BC xz     v=0       # displacement vector is [u,v,w]
 BC yz     u=0       # u = displacement in x

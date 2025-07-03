@@ -10,23 +10,19 @@ toc: true
 
 Solve
 
-$$
-\begin{cases}
+$$\begin{cases}
 \dot{x} &= \sigma \cdot (y - x)  \\
 \dot{y} &= x \cdot (r - z) - y   \\
 \dot{z} &= x y - b z             \\
-\end{cases}
-$$
+\end{cases}$$
 
 for $0 < t < 40$ with initial conditions
 
-$$
-\begin{cases}
+$$\begin{cases}
 x(0) = -11  \\
 y(0) = -16  \\
 z(0) = 22.5 \\
-\end{cases}
-$$
+\end{cases}$$
 
 and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
 that generate the butterfly as presented by Edward Lorenz back in his
@@ -87,23 +83,19 @@ Use these four different approaches:
 
 a.  Hamiltonian formulation with numerical derivatives
 
-    $$
-    \begin{aligned}
+    $$\begin{aligned}
     \mathcal{H}(\theta_1, \theta_2, p_1, p_2) =&
      - \frac{\ell_2^2 m_2 p_1^2 - 2 \ell_1 \ell_2 m_2 \cos(\theta_1-\theta_2) p_1 p_2 + \ell_1^2 (m_1+m_2) p_2^2}
      {\ell_1^2 \ell_2^2 m_2 \left[-2m_1-m_2+m_2\cos\Big(2(\theta_1-\theta_2)\Big)\right]} \\
      & - \Big[ m_1 g \ell_1 \cos \theta_1 + m_2 g (\ell_1 \cos \theta_1 + \ell_2 \cos \theta_2) \Big]
-    \end{aligned}
-    $$
+    \end{aligned}$$
 
-    $$
-    \begin{cases}
+    $$\begin{cases}
     \displaystyle  \dot{\theta}_1 &= \displaystyle +\frac{\partial \mathcal{H}}{\partial p_1} \\
     \displaystyle  \dot{\theta}_2 &= \displaystyle +\frac{\partial \mathcal{H}}{\partial p_2} \\
     \displaystyle  \dot{p}_1 &= \displaystyle -\frac{\partial \mathcal{H}}{\partial \theta_1} \\
     \displaystyle  \dot{p}_2 &= \displaystyle -\frac{\partial \mathcal{H}}{\partial \theta_2} \\
-    \end{cases}
-    $$
+    \end{cases}$$
 
     ``` feenox
     # the double pendulum solved by the hamiltonian formulation
@@ -129,22 +121,20 @@ a.  Hamiltonian formulation with numerical derivatives
 
 b.  Hamiltonian formulation with analytical derivatives
 
-    $$
-    \begin{cases}
+    $$\begin{cases}
     \dot{\theta}_1 &= \displaystyle         \frac{p_1 \ell_2 - p_2 \ell_1 \cos(\theta_1-\theta_2)}{\ell_1^2 \ell_2 [m_1 + m_2 \sin^2(\theta_1-\theta_2)]} \\
     \dot{\theta}_2 &= \displaystyle  \frac{p_2 (m_1+m_2)/m_2 \ell_1 - p_1 \ell_2 \cos(\theta_1-\theta_2)}{\ell_1 \ell_2^2 [m_1 + m_2 \sin^2(\theta_1-\theta_2)]} \\
     \dot{p_1} &= \displaystyle -(m_1+m_2) g \ell_1 \sin(\theta_1) - c_1 + c_2 \\
     \dot{p_2} &= \displaystyle -m_2 g \ell_2 \sin(\theta_2) + c_1 - c_2
-    \end{cases}
-    $$ where the expressions $c_1$ and $c_2$ are
+    \end{cases}$$
+    where the expressions $c_1$ and $c_2$ are
 
     $$\begin{aligned}
     c1 &= \frac{p_1 p_2 \sin(\theta_1-\theta_2)}{\ell_1 \ell_2 \Big[m_1+m_2 \sin(\theta_1-\theta_2)^2\Big]} \\
     c2 &= \frac{\Big[ p_1^2 m_2 \ell_2^2 - 2 p_1 p_2 m_2 \ell_1 \ell_2 \cos(\theta_1-\theta_2)
        + p_2^2 (m_1+m_2) \ell_1^2)\Big] \sin(2 (\theta_1-\theta_2)}{
       2 \ell_1^2 \ell_2^2 \left[m_1+m_2 \sin^2(\theta_1-\theta_2)\right]^2}
-    \end{aligned}
-    $$
+    \end{aligned}$$
 
     ``` feenox
     # the double pendulum solved by the hamiltonian formulation
@@ -166,21 +156,17 @@ b.  Hamiltonian formulation with analytical derivatives
 
 c.  Lagrangian formulation with numerical derivatives
 
-    $$
-    \begin{aligned}
+    $$\begin{aligned}
     \mathcal{L}(\theta_1, \theta_2, \dot{\theta}_1, \dot{\theta}_2) =& 
     \frac{1}{2} m_1 \ell_1^2 \dot{\theta}_1^2 +
     \frac{1}{2} m_2 \left[\ell_1^2 \dot{\theta}_1^2 + \ell_2^2 \dot{\theta}_2^2 + 2 \ell_1 \ell_2 \dot{\theta}_1 \dot{\theta}_2 \cos(\theta_1-\theta_2)\right] + \\
     & m_1 g  \ell_1\cos \theta_1 + m_2 g \left(\ell_1\cos \theta_1 + \ell_2 \cos \theta_2 \right)
-    \end{aligned}
-    $$
+    \end{aligned}$$
 
-    $$
-    \begin{cases}
+    $$\begin{cases}
     \displaystyle \frac{\partial}{\partial t}\left(\frac{\partial \mathcal{L}}{\partial \dot{\theta}_1}\right) &= \displaystyle \frac{\partial \mathcal{L}}{\partial \theta_1} \\
     \displaystyle  \frac{\partial}{\partial t}\left(\frac{\partial \mathcal{L}}{\partial \dot{\theta}_2}\right) &= \displaystyle \frac{\partial \mathcal{L}}{\partial \theta_2}
-    \end{cases}
-    $$
+    \end{cases}$$
 
     ``` feenox
     # the double pendulum solved by the lagrangian formulation
@@ -212,12 +198,10 @@ c.  Lagrangian formulation with numerical derivatives
 
 d.  Lagrangian formulation with analytical derivatives
 
-    $$
-    \begin{cases}
+    $$\begin{cases}
     0 &= (m_1+m_2) \ell_1^2 \ddot{\theta}_1 + m_2 \ell_1 \ell_2 \ddot{\theta}_2 \cos(\theta_1-\theta_2) + m_2 \ell_1 \ell_2 \dot{\theta}_2^2 \sin(\theta_1-\theta_2) + \ell_1 (m_1+m_2) g \sin(\theta_1) \\
     0 &= m_2 \ell_2^2 \ddot{\theta}_2 + m_2 \ell_1 \ell_2 \ddot{\theta}_1 \cos(\theta_1-\theta_2) - m_2 \ell_1 \ell_2 \dot{\theta}_1^2 \sin(\theta_1-\theta_2) + \ell_2 m_2 g \sin(\theta_2)
-    \end{cases}
-    $$
+    \end{cases}$$
 
     ``` feenox
     # the double pendulum solved by the lagrangian formulation
@@ -298,10 +282,10 @@ Position of the double pendulum's $m_2$ solved with four (slightly) different f
 
 Implementation of the dynamical system as described in
 
--   [The Moving Boiling-Boundary Model Of A Vertical Two-Phase Flow
-    Channel
-    Revisited](http://www.cimec.org.ar/ojs/index.php/mc/article/view/3277/3200),
-    by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2010).
+- [The Moving Boiling-Boundary Model Of A Vertical Two-Phase Flow
+  Channel
+  Revisited](http://www.cimec.org.ar/ojs/index.php/mc/article/view/3277/3200),
+  by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2010).
 
 > | The original paper was written using the **first** version of the
 >   code, named mochin.
@@ -312,8 +296,7 @@ Implementation of the dynamical system as described in
 
 For reference, the non-dimensional equations are
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 0 &=  \frac{1}{2} \left (\frac{d\ell_{n-1}}{dt} + \frac{d\ell_n}{dt} \right) + N_{1} (\ell_n - \ell_{n-1}) - u_i \quad\quad \text{for $n=1,\dots,N_1$} \nonumber\\
 0 &=  u_i - u_e + N_\text{sub} \, (1 - \lambda ) \nonumber\\
 0 &= \rho_e - \frac{1}{1+N_\text{pch} \, \eta (1-\lambda)} \nonumber \\
@@ -322,9 +305,9 @@ $$
 0 &= m \, \dot{u}_i + u_i \, \dot{m} - \frac{N_\text{sub} (1-m)}{\eta^2 N_\text{pch}} \, \dot{\eta} - \frac{N_\text{sub}}{\eta N_\text{pch}} \, \dot{m} + \rho_e {u_e}^2 - {u_i}^2 + \frac{m}{\text{Fr}}  - \text{Eu}  \nonumber\\
 & \quad\quad\quad + \Lambda \left\{ m \cdot u_i^2 + \frac{N_\text{sub} \ln(1/\rho_e)}{(\eta N_\text{pch})^2}\left( \frac{N_\text{sub}}{\eta N_\text{pch}} - 2 u_i \right) +  \frac{\lambda^2 N_\text{sub}^2}{2 N_\text{pch}} +  \frac{2 u_i N_\text{sub}(1-\lambda)}{(\eta N_\text{pch})} \right. \nonumber \\
 & \quad\quad\quad\quad\quad\quad \left. + \frac{N_\text{sub}^2}{\eta N_\text{pch}} \left[ \left(\frac{1}{2} - \lambda \right) - \frac{1-\lambda}{\eta N_\text{pch}} \right] \right\} + k_i u_i^2 + k_e \rho_e u_e^2  & 
-\end{aligned}
-$$ where $\ell_0 = 0$ and $\ell_{N_1}=\lambda$. See the full paper for
-the details.
+\end{aligned}$$
+where $\ell_0 = 0$ and $\ell_{N_1}=\lambda$. See the full paper for the
+details.
 
 The input file `boiling-2010-eta.fee` takes two optional arguments from
 the command line:
@@ -556,10 +539,10 @@ $
 Extension of the Clausse-Lahey model to support arbitrary (and
 potentially time-dependent) power profiles as explained in
 
--   [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase
-    Flow
-    Loop](https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017),
-    by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2012).
+- [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase
+  Flow
+  Loop](https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017),
+  by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2012).
 
 > | The original paper was written using the **second** version of the
 >   code, named wasora.
@@ -570,8 +553,7 @@ potentially time-dependent) power profiles as explained in
 
 For reference, the non-dimensional equations are
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
 + \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
 & \quad\quad\quad\quad - u_\text{i}(t) - \frac{N_1}{h_\text{i}(t)} \cdot \frac{N_\text{sub}}{N_\text{pch}} \int_{\ell_{n-1}(t)}^{\ell{n}(t)} q(z,t) \, dz \quad\quad\quad\quad\quad \text{for $n=1,\dots,N_1$}
@@ -598,17 +580,16 @@ $$
 + \frac{m(t)}{\text{Fr}} - \text{Eu}(t) \\
 0 &= h_\text{i}(t) + f(\mathbf{x}, \mathbf{\dot{x}}, t) \\
 0 &= \text{Eu}(t) + g(\mathbf{x}, \mathbf{\dot{x}}, t)
-\end{aligned}
-$$
+\end{aligned}$$
 
 Again, see the full paper for the details.
 
 The input file `boiling-2012-steady.fee` computes the steady-state
 profiles of
 
--   the velocity $u(z)$
--   the enthalpy $h(z)$
--   the density $h(z)$
+- the velocity $u(z)$
+- the enthalpy $h(z)$
+- the density $h(z)$
 
 where
 

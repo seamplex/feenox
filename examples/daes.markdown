@@ -36,28 +36,28 @@
 
 Solve
 
-$$
+``` math
 \begin{cases}
 \dot{x} &= \sigma \cdot (y - x)  \\
 \dot{y} &= x \cdot (r - z) - y   \\
 \dot{z} &= x y - b z             \\
 \end{cases}
-$$
+```
 
-for $0 < t < 40$ with initial conditions
+for $`0 < t < 40`$ with initial conditions
 
-$$
+``` math
 \begin{cases}
 x(0) = -11  \\
 y(0) = -16  \\
 z(0) = 22.5 \\
 \end{cases}
-$$
+```
 
-and $\sigma=10$, $r=28$ and $b=8/3$, which are the classical parameters
-that generate the butterfly as presented by Edward Lorenz back in his
-seminal 1963 paper [Deterministic non-periodic flow]. This example’s
-input file ressembles the parameters, initial conditions and
+and $`\sigma=10`$, $`r=28`$ and $`b=8/3`$, which are the classical
+parameters that generate the butterfly as presented by Edward Lorenz
+back in his seminal 1963 paper [Deterministic non-periodic flow]. This
+example’s input file ressembles the parameters, initial conditions and
 differential equations of the problem as naturally as possible with an
 ASCII file.
 
@@ -114,23 +114,23 @@ Use these four different approaches:
 
 1.  Hamiltonian formulation with numerical derivatives
 
-    $$
+    ``` math
     \begin{aligned}
     \mathcal{H}(\theta_1, \theta_2, p_1, p_2) =&
      - \frac{\ell_2^2 m_2 p_1^2 - 2 \ell_1 \ell_2 m_2 \cos(\theta_1-\theta_2) p_1 p_2 + \ell_1^2 (m_1+m_2) p_2^2}
      {\ell_1^2 \ell_2^2 m_2 \left[-2m_1-m_2+m_2\cos\Big(2(\theta_1-\theta_2)\Big)\right]} \\
      & - \Big[ m_1 g \ell_1 \cos \theta_1 + m_2 g (\ell_1 \cos \theta_1 + \ell_2 \cos \theta_2) \Big]
     \end{aligned}
-    $$
+    ```
 
-    $$
+    ``` math
     \begin{cases}
     \displaystyle  \dot{\theta}_1 &= \displaystyle +\frac{\partial \mathcal{H}}{\partial p_1} \\
     \displaystyle  \dot{\theta}_2 &= \displaystyle +\frac{\partial \mathcal{H}}{\partial p_2} \\
     \displaystyle  \dot{p}_1 &= \displaystyle -\frac{\partial \mathcal{H}}{\partial \theta_1} \\
     \displaystyle  \dot{p}_2 &= \displaystyle -\frac{\partial \mathcal{H}}{\partial \theta_2} \\
     \end{cases}
-    $$
+    ```
 
     ``` feenox
     # the double pendulum solved by the hamiltonian formulation
@@ -156,22 +156,24 @@ Use these four different approaches:
 
 2.  Hamiltonian formulation with analytical derivatives
 
-    $$
+    ``` math
     \begin{cases}
     \dot{\theta}_1 &= \displaystyle         \frac{p_1 \ell_2 - p_2 \ell_1 \cos(\theta_1-\theta_2)}{\ell_1^2 \ell_2 [m_1 + m_2 \sin^2(\theta_1-\theta_2)]} \\
     \dot{\theta}_2 &= \displaystyle  \frac{p_2 (m_1+m_2)/m_2 \ell_1 - p_1 \ell_2 \cos(\theta_1-\theta_2)}{\ell_1 \ell_2^2 [m_1 + m_2 \sin^2(\theta_1-\theta_2)]} \\
     \dot{p_1} &= \displaystyle -(m_1+m_2) g \ell_1 \sin(\theta_1) - c_1 + c_2 \\
     \dot{p_2} &= \displaystyle -m_2 g \ell_2 \sin(\theta_2) + c_1 - c_2
     \end{cases}
-    $$ where the expressions $c_1$ and $c_2$ are
+    ```
+    where the expressions $`c_1`$ and $`c_2`$ are
 
-    $$\begin{aligned}
+    ``` math
+    \begin{aligned}
     c1 &= \frac{p_1 p_2 \sin(\theta_1-\theta_2)}{\ell_1 \ell_2 \Big[m_1+m_2 \sin(\theta_1-\theta_2)^2\Big]} \\
     c2 &= \frac{\Big[ p_1^2 m_2 \ell_2^2 - 2 p_1 p_2 m_2 \ell_1 \ell_2 \cos(\theta_1-\theta_2)
        + p_2^2 (m_1+m_2) \ell_1^2)\Big] \sin(2 (\theta_1-\theta_2)}{
       2 \ell_1^2 \ell_2^2 \left[m_1+m_2 \sin^2(\theta_1-\theta_2)\right]^2}
     \end{aligned}
-    $$
+    ```
 
     ``` feenox
     # the double pendulum solved by the hamiltonian formulation
@@ -193,21 +195,21 @@ Use these four different approaches:
 
 3.  Lagrangian formulation with numerical derivatives
 
-    $$
+    ``` math
     \begin{aligned}
     \mathcal{L}(\theta_1, \theta_2, \dot{\theta}_1, \dot{\theta}_2) =& 
     \frac{1}{2} m_1 \ell_1^2 \dot{\theta}_1^2 +
     \frac{1}{2} m_2 \left[\ell_1^2 \dot{\theta}_1^2 + \ell_2^2 \dot{\theta}_2^2 + 2 \ell_1 \ell_2 \dot{\theta}_1 \dot{\theta}_2 \cos(\theta_1-\theta_2)\right] + \\
     & m_1 g  \ell_1\cos \theta_1 + m_2 g \left(\ell_1\cos \theta_1 + \ell_2 \cos \theta_2 \right)
     \end{aligned}
-    $$
+    ```
 
-    $$
+    ``` math
     \begin{cases}
     \displaystyle \frac{\partial}{\partial t}\left(\frac{\partial \mathcal{L}}{\partial \dot{\theta}_1}\right) &= \displaystyle \frac{\partial \mathcal{L}}{\partial \theta_1} \\
     \displaystyle  \frac{\partial}{\partial t}\left(\frac{\partial \mathcal{L}}{\partial \dot{\theta}_2}\right) &= \displaystyle \frac{\partial \mathcal{L}}{\partial \theta_2}
     \end{cases}
-    $$
+    ```
 
     ``` feenox
     # the double pendulum solved by the lagrangian formulation
@@ -238,12 +240,12 @@ Use these four different approaches:
 
 4.  Lagrangian formulation with analytical derivatives
 
-    $$
+    ``` math
     \begin{cases}
     0 &= (m_1+m_2) \ell_1^2 \ddot{\theta}_1 + m_2 \ell_1 \ell_2 \ddot{\theta}_2 \cos(\theta_1-\theta_2) + m_2 \ell_1 \ell_2 \dot{\theta}_2^2 \sin(\theta_1-\theta_2) + \ell_1 (m_1+m_2) g \sin(\theta_1) \\
     0 &= m_2 \ell_2^2 \ddot{\theta}_2 + m_2 \ell_1 \ell_2 \ddot{\theta}_1 \cos(\theta_1-\theta_2) - m_2 \ell_1 \ell_2 \dot{\theta}_1^2 \sin(\theta_1-\theta_2) + \ell_2 m_2 g \sin(\theta_2)
     \end{cases}
-    $$
+    ```
 
     ``` feenox
     # the double pendulum solved by the lagrangian formulation
@@ -338,7 +340,7 @@ Implementation of the dynamical system as described in
 
 For reference, the non-dimensional equations are
 
-$$
+``` math
 \begin{aligned}
 0 &=  \frac{1}{2} \left (\frac{d\ell_{n-1}}{dt} + \frac{d\ell_n}{dt} \right) + N_{1} (\ell_n - \ell_{n-1}) - u_i \quad\quad \text{for $n=1,\dots,N_1$} \nonumber\\
 0 &=  u_i - u_e + N_\text{sub} \, (1 - \lambda ) \nonumber\\
@@ -349,14 +351,15 @@ $$
 & \quad\quad\quad + \Lambda \left\{ m \cdot u_i^2 + \frac{N_\text{sub} \ln(1/\rho_e)}{(\eta N_\text{pch})^2}\left( \frac{N_\text{sub}}{\eta N_\text{pch}} - 2 u_i \right) +  \frac{\lambda^2 N_\text{sub}^2}{2 N_\text{pch}} +  \frac{2 u_i N_\text{sub}(1-\lambda)}{(\eta N_\text{pch})} \right. \nonumber \\
 & \quad\quad\quad\quad\quad\quad \left. + \frac{N_\text{sub}^2}{\eta N_\text{pch}} \left[ \left(\frac{1}{2} - \lambda \right) - \frac{1-\lambda}{\eta N_\text{pch}} \right] \right\} + k_i u_i^2 + k_e \rho_e u_e^2  & 
 \end{aligned}
-$$ where $\ell_0 = 0$ and $\ell_{N_1}=\lambda$. See the full paper for
+```
+where $`\ell_0 = 0`$ and $`\ell_{N_1}=\lambda`$. See the full paper for
 the details.
 
 The input file `boiling-2010-eta.fee` takes two optional arguments from
 the command line:
 
-1.  The phase-change number $N_\text{pch}$ (default is 14)
-2.  The subcooling number $N_\text{sub}$ (default is 6.5)
+1.  The phase-change number $`N_\text{pch}`$ (default is 14)
+2.  The subcooling number $`N_\text{sub}`$ (default is 6.5)
 
 When run, FeenoX…
 
@@ -372,12 +375,12 @@ When run, FeenoX…
 
 5.  for each time step, writes three columns:
 
-    1.  the non-dimensional time $t$
-    2.  the non-dimesinoal location of the boiling interface $\lambda$
-    3.  the non-dimensional inlet velocity $u_i$
+    1.  the non-dimensional time $`t`$
+    2.  the non-dimesinoal location of the boiling interface $`\lambda`$
+    3.  the non-dimensional inlet velocity $`u_i`$
 
 The input file [`boiling-2010.fee`] contains the original Clausse-Lahey
-formulation without the intermediate variable $\eta$.
+formulation without the intermediate variable $`\eta`$.
 
 ``` feenox
 ##############################
@@ -606,7 +609,7 @@ potentially time-dependent) power profiles as explained in
 
 For reference, the non-dimensional equations are
 
-$$
+``` math
 \begin{aligned}
 0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
 + \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
@@ -635,16 +638,16 @@ $$
 0 &= h_\text{i}(t) + f(\mathbf{x}, \mathbf{\dot{x}}, t) \\
 0 &= \text{Eu}(t) + g(\mathbf{x}, \mathbf{\dot{x}}, t)
 \end{aligned}
-$$
+```
 
 Again, see the full paper for the details.
 
 The input file `boiling-2012-steady.fee` computes the steady-state
 profiles of
 
-- the velocity $u(z)$
-- the enthalpy $h(z)$
-- the density $h(z)$
+- the velocity $`u(z)`$
+- the enthalpy $`h(z)`$
+- the density $`h(z)`$
 
 where
 
@@ -681,11 +684,12 @@ where
         qstar(z) = 1/norm * potencia(z)
         ```
 
-2.  the second argument is the subcooling number $N_\text{sub}$ (default
-    6.5)
+2.  the second argument is the subcooling number $`N_\text{sub}`$
+    (default 6.5)
 
-3.  the third argument is the Euler number $\text{Eu}$ (default is 11),
-    from which the phase-change number $N_\text{pch}$ is computed.
+3.  the third argument is the Euler number $`\text{Eu}`$ (default is
+    11), from which the phase-change number $`N_\text{pch}`$ is
+    computed.
 
 The transient problem is solved using the input below,
 `boiling-2012.fee`.
@@ -902,9 +906,9 @@ Lambda = 40e-6
 ## Cinética puntual directa con reactividad vs. tiempo
 
 Este primer ejemplo resuelve cinética puntual con una
-reactividad $\rho(t)$ dada por una “tabla”, es decir, una función de un
-único argumento (el tiempo $t$) definida por pares de puntos
-$[t,\rho(t)]$ e interpolada linealmente.
+reactividad $`\rho(t)`$ dada por una “tabla”, es decir, una función de
+un único argumento (el tiempo $`t`$) definida por pares de puntos
+$`[t,\rho(t)]`$ e interpolada linealmente.
 
 ``` feenox
 INCLUDE parameters.fee   # parámetros cinéticos
@@ -945,7 +949,7 @@ alt="Flujo y reactividad directa" />
 
 ## Cinética inversa
 
-Ahora tomamos la salida $\phi(t)$ del caso anterior y resolvemos
+Ahora tomamos la salida $`\phi(t)`$ del caso anterior y resolvemos
 cinética inversa de dos maneras diferentes:
 
 1.  Con la fórmula integral de la literatura clásica
@@ -972,15 +976,15 @@ PRINT_FUNCTION rho MIN 0 MAX 50 STEP 0.1
 $ feenox inverse-integral.fee 
 ```
 
-2.  Resolviendo el mismo sistema de DAEs pero leyendo $\phi(t)$ en lugar
-    de $\rho(t)$
+2.  Resolviendo el mismo sistema de DAEs pero leyendo $`\phi(t)`$ en
+    lugar de $`\rho(t)`$
 
 El caso 2 es “adaptivo” en el sentido de que dependiendo del error
 tolerado y de las derivadas temporales de las variables del espacio de
 las fases, el esfuerzo computacional se adapta automáticamente a través
-del paso de tiempo $\Delta t$ con el que se resuelve el sistema DAE. Por
-defecto, el método es Adams-Bashforth de orden variable (implementado
-por la biblioteca SUNDIALS).
+del paso de tiempo $`\Delta t`$ con el que se resuelve el sistema DAE.
+Por defecto, el método es Adams-Bashforth de orden variable
+(implementado por la biblioteca SUNDIALS).
 
 ``` feenox
 INCLUDE parameters.fee
@@ -1032,7 +1036,7 @@ cinética puntual le agregamos cinética de xenón 135. Como el sistema
 resultante es inestable ante cambios de flujo, la reactividad es ahora
 una función de la posición de una barra de control ficticia cuya
 importancia está dada por una interpolación tipo Steffen de su posición
-adimensional $z$. Una lógica de control PI (con una banda muerta del
+adimensional $`z`$. Una lógica de control PI (con una banda muerta del
 0.3%) “mueve” dicha barra de control de forma tal de forzar al reactor a
 bajar la potencia del 100% al 80% en mil segundos, mantenerse durante
 tres mil segundos a esa potencia y volver al 100% en cinco mil:
@@ -1118,10 +1122,10 @@ cinética puntual de un reactor de investigación con retroalimentación
 termohidráulica por temperatura del refrigerante y del combustible
 escrita como modelos de capacitancia concentrada[^1] cero-dimensionales.
 El estudio consiste en barrer paramétricamente el espacio de
-coeficientes de reactividad $[\alpha_c, \alpha_f]$, perturbar el estado
-del sistema dinámico ($\Delta T_f = 2~\text{ºC}$) y marcar con un color
-la potencia luego de un minuto para obtener mapas de estabilidad tipo
-Lyapunov.
+coeficientes de reactividad $`[\alpha_c, \alpha_f]`$, perturbar el
+estado del sistema dinámico ($`\Delta T_f = 2~\text{ºC}`$) y marcar con
+un color la potencia luego de un minuto para obtener mapas de
+estabilidad tipo Lyapunov.
 
 Para barrer el espacio de parámetros usamos series de números
 cuasi-aleatorios de forma tal de poder realizar ejecuciones sucesivas

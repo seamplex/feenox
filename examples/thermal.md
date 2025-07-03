@@ -15,44 +15,42 @@ abstract: |
 
 Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
 
-$$
-\begin{cases}
+$$\begin{cases}
 T(0) = 0 & \text{(left)} \\
 T(1) = 1 & \text{(right)} \\
-\end{cases}
-$$
+\end{cases}$$
 
 and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
 
 Please note that:
 
--   The input written in a self-evident English-like dialect
-    -   Syntactic sugared plain-text ASCII file
-    -   Simple problems (like this one) need simple inputs
-    -   FeenoX follows the Unix rule of simplicity
--   Output is 100% user-defined
-    -   No `PRINT` no output
-    -   Feenox follows the Unix rule of silence
--   There is no node at $x=1/2=0.5$!
-    -   FeenoX knows how to interpolate
--   Mesh separated from problem
-    -   The geometry comes from a Git-friendly `.geo`
+- The input written in a self-evident English-like dialect
+  - Syntactic sugared plain-text ASCII file
+  - Simple problems (like this one) need simple inputs
+  - FeenoX follows the Unix rule of simplicity
+- Output is 100% user-defined
+  - No `PRINT` no output
+  - Feenox follows the Unix rule of silence
+- There is no node at $x=1/2=0.5$!
+  - FeenoX knows how to interpolate
+- Mesh separated from problem
+  - The geometry comes from a Git-friendly `.geo`
 
-    ``` c
-    Point(1) = {0, 0, 0};          // geometry: 
-    Point(2) = {1, 0, 0};          // two points
-    Line(1) = {1, 2};              // and a line connecting them!
+  ``` c
+  Point(1) = {0, 0, 0};          // geometry: 
+  Point(2) = {1, 0, 0};          // two points
+  Line(1) = {1, 2};              // and a line connecting them!
 
-    Physical Point("left") = {1};  // groups for BCs and materials
-    Physical Point("right") = {2};
-    Physical Line("bulk") = {1};   // needed due to how Gmsh works
+  Physical Point("left") = {1};  // groups for BCs and materials
+  Physical Point("right") = {2};
+  Physical Line("bulk") = {1};   // needed due to how Gmsh works
 
-    Mesh.MeshSizeMax = 1/3;        // mesh size, three line elements
-    Mesh.MeshSizeMin = Mesh.MeshSizeMax;
-    ```
+  Mesh.MeshSizeMax = 1/3;        // mesh size, three line elements
+  Mesh.MeshSizeMin = Mesh.MeshSizeMax;
+  ```
 
-    -   Unix rule of composition
-    -   The actual input file is a Git-friendly `.fee`
+  - Unix rule of composition
+  - The actual input file is a Git-friendly `.fee`
 
 
 ```feenox
@@ -90,10 +88,10 @@ The transient goes from $t=0~\text{s}$ up to end time $t=1000~\text{s}$.
 We force the time stepper to pass exactly through the following
 times $t$
 
--   1
--   10
--   100
--   `end_time`/2
+- 1
+- 10
+- 100
+- `end_time`/2
 
 At these times, the special variable `in_time_path` is true. We use an
 `IF` condition to write the profile along the $x$ axis on
@@ -108,8 +106,7 @@ step at $t=1000$).
 
 ```feenox
 # "barra" means "rod" in Spanish
-READ_MESH barra3d.msh
-PROBLEM thermal 3d
+PROBLEM thermal 3d MESH barra3d.msh
 
 # times
 end_time = 1000
@@ -179,16 +176,12 @@ Let us solve a dimensionless transient problem over a cylinder.
 Conductivity and heat capacity are unity. Initial condition is a linear
 temperature profile along the $x$ axis:
 
-$$
-T(x,y,z,0) = x
-$$
+$$T(x,y,z,0) = x$$
 
 The base of the cylinder has a prescribed time and space-dependent
 temperature
 
-$$
-T(0,y,z,t) = \sin( 2\pi \cdot t) \cdot \sin( 2\pi \cdot y)
-$$
+$$T(0,y,z,t) = \sin( 2\pi \cdot t) \cdot \sin( 2\pi \cdot y)$$
 
 The other faces have a convection conditions with (non-dimensional) heat
 transfer coefficient $h=0.1$ and $T_\text{ref} = 1$.

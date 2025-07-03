@@ -95,8 +95,7 @@ one-to-one correspondence with the original problem formulation from
 
 ``` feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical 3D
-READ_MESH nafems-le10.msh   # mesh in millimeters
+PROBLEM mechanical MESH nafems-le10.msh   # mesh in millimeters
 
 # LOADING: uniform normal pressure on the upper surface
 BC upper    p=1      # 1 Mpa
@@ -151,16 +150,15 @@ Problem statement, b — Structured hex mesh</p></figcaption>
 
 Following the spirit from LE10, note how easy it is to give a
 space-dependent temperature field in FeenoX. Just write
-$\sqrt{x^2+y^2}+z$ like `sqrt(x^2 + y^2) + z`!
+$`\sqrt{x^2+y^2}+z`$ like `sqrt(x^2 + y^2) + z`!
 
 ``` feenox
 # NAFEMS Benchmark LE-11: solid cylinder/taper/sphere-temperature
-PROBLEM mechanical 3D
-READ_MESH nafems-le11.msh
+PROBLEM mechanical 3D MESH nafems-le11.msh
 
 # linear temperature gradient in the radial and axial direction
 # as an algebraic expression as human-friendly as it can be
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 BC xz     v=0       # displacement vector is [u,v,w]
 BC yz     u=0       # u = displacement in x
@@ -208,8 +206,7 @@ provided to create the mesh. Read it with `READ_MESH`, set material
 properties, `BC`s and `SOLVE_PROBLEM`!
 
 ``` feenox
-PROBLEM mechanical 2D plane_stress
-READ_MESH nafems-le1.msh
+PROBLEM mechanical 2D plane_stress MESH nafems-le1.msh
 
 E = 210e3
 nu = 0.3
@@ -244,12 +241,12 @@ class="math inline"><em>σ</em><sub><em>y</em></sub></span> over
 
 If an external loop successively calls FeenoX with extra command-line
 arguments, a parametric run is obtained. This file `cantilever.fee`
-fixes the face called “left” and sets a load in the negative $z$
+fixes the face called “left” and sets a load in the negative $`z`$
 direction of a mesh called `cantilever-$1-$2.msh`, where `$1` is the
 first argument after the input file and `$2` the second one. The output
 is a single line containing the number of nodes of the mesh and the
-displacement in the vertical direction $w(500,0,0)$ at the center of the
-cantilever’s free face.
+displacement in the vertical direction $`w(500,0,0)`$ at the center of
+the cantilever’s free face.
 
 The following Bash script first calls Gmsh to create the meshes. To do
 so, it first starts with a base [`cantilever.geo`] file that creates the
@@ -282,7 +279,7 @@ Then another `.geo` file is merged to build
 `cantilever-${element}-${c}.msh` where
 
 - `${element}`: [tet4], [tet10], [hex8], [hex20], [hex27]
-- `${c}`: 1,2,$\dots$,10
+- `${c}`: 1,2,$`\dots`$,10
 
 <figure id="fig:cantilever-mesh" class="subfigures">
 <p><img src="cantilever-tet.png" style="width:45.0%" alt="a" /> <img
@@ -373,22 +370,22 @@ types</figcaption>
 
 # Parallelepiped whose Young’s modulus is a function of the temperature
 
-The problem consists of finding the non-dimensional temperature $T$ and
-displacements $u$, $v$ and $w$ distributions within a solid
-parallelepiped of length $l$ whose base is a square of $h\times h$. The
-solid is subject to heat fluxes and to a traction pressure at the same
-time. The non-dimensional Young’s modulus $E$ of the material depends on
-the temperature $T$ in a know algebraically way, whilst both the Poisson
-coefficient $\nu$ and the thermal conductivity $k$ are uniform and do
-not depend on the spatial coordinates:
+The problem consists of finding the non-dimensional temperature $`T`$
+and displacements $`u`$, $`v`$ and $`w`$ distributions within a solid
+parallelepiped of length $`l`$ whose base is a square of $`h\times h`$.
+The solid is subject to heat fluxes and to a traction pressure at the
+same time. The non-dimensional Young’s modulus $`E`$ of the material
+depends on the temperature $`T`$ in a know algebraically way, whilst
+both the Poisson coefficient $`\nu`$ and the thermal conductivity $`k`$
+are uniform and do not depend on the spatial coordinates:
 
-$$
+``` math
 \begin{aligned}
 E(T) &= \frac{1000}{800-T} \\
 \nu &= 0.3 \\
 k &= 1 \\
 \end{aligned}
-$$
+```
 
 <figure id="fig:parallelepiped">
 <img src="parallelepiped.svg"
@@ -405,14 +402,16 @@ References:
 This thermo-mechanical problem is solved in two stages. First, the heat
 conduction equation is solved over a coarse first-order mesh to find the
 non-dimensional temperature distribution. Then, a mechanical problem is
-solved where $T(x,y,z)$ is read from the first mesh and interpolated
+solved where $`T(x,y,z)`$ is read from the first mesh and interpolated
 into a finer second-order mesh so to as evaluate the non-dimensional
 Young’s modulus as
 
-$$E\Big(T(x,y,z)\Big) = \frac{1000}{800-T(x,y,z)}$$
+``` math
+E\Big(T(x,y,z)\Big) = \frac{1000}{800-T(x,y,z)}
+```
 
 Note that there are not thermal expansion effects (i.e. the thermal
-expansion coefficient is $\alpha=0$). Yet, suprinsingly enough, the
+expansion coefficient is $`\alpha=0`$). Yet, suprinsingly enough, the
 problem has analytical solutions for both the temperature and the
 displacement fields.
 
@@ -420,9 +419,9 @@ displacement fields.
 
 The following input solves the thermal problem over a coarse first-order
 mesh, writes the resulting temperature distribution into
-`parallelepiped-temperature.msh`, and prints the $L_2$ error of the
+`parallelepiped-temperature.msh`, and prints the $`L_2`$ error of the
 numerical result with respect to the analytical
-solution $T(x,y,z) = 40 - 2x - 3y - 4z$.
+solution $`T(x,y,z) = 40 - 2x - 3y - 4z`$.
 
 ``` feenox
 PROBLEM thermal 3D
@@ -476,7 +475,7 @@ solve the mechanical problem in the finer second-order mesh
 `parallelepiped.msh`. The numerical solution for the displacements over
 the fine mesh is written in a VTK file (along with the temperature as
 interpolated from the coarse mesh) and compared to the analytical
-solution using the $L_2$ norm.
+solution using the $`L_2`$ norm.
 
 ``` feenox
 PROBLEM mechanical 3D
@@ -544,16 +543,17 @@ pallete)</figcaption>
 
 To illustrate the point of the previous discussion, let us solve the
 thermal expansion of an unrestrained unitary cube
-$[0,1~\text{mm}]\times[0,1~\text{mm}]\times[0,1~\text{mm}]$ subject to a
-linear radially-symmetric temperature field $$
+$`[0,1~\text{mm}]\times[0,1~\text{mm}]\times[0,1~\text{mm}]`$ subject to
+a linear radially-symmetric temperature field
+``` math
 T(x,y,z) = 30 \text{ºC} + 150 \frac{\text{ºC}}{\text{mm}} \sqrt{x^2+y^2+z^2}
-$$
+```
 
 with a mean thermal expansion coefficient for each of the three
-directions $x$, $y$ and $z$ computed from each of the three columns of
-the ASME table TE-2, respectively. If the data was consistent, the
-displacement at any point with the same coordinates $x=y=z$ would be
-exactly equal.
+directions $`x`$, $`y`$ and $`z`$ computed from each of the three
+columns of the ASME table TE-2, respectively. If the data was
+consistent, the displacement at any point with the same coordinates
+$`x=y=z`$ would be exactly equal.
 
 ``` feenox
 DEFAULT_ARGUMENT_VALUE 1 steffen
@@ -646,18 +646,20 @@ Let us solve the following problem introduced by J. Veeder in his
 
 > <img src="veeder-problem.png" style="width:50.0%" />
 >
-> Consider a finite solid cylinder (see insert) of radius $b$ and
-> length $2h$, with the origin of coordinates at the centre. It may be
+> Consider a finite solid cylinder (see insert) of radius $`b`$ and
+> length $`2h`$, with the origin of coordinates at the centre. It may be
 > shown that the temperature distribution in a cylindrical fuel pellet
 > operating in a reactor is given approximately by
 >
-> $$T(r) = T_0 + T_1 \cdot \left[ 1 - \left(\frac{r}{b} \right)^2 \right]$$
+> ``` math
+> T(r) = T_0 + T_1 \cdot \left[ 1 - \left(\frac{r}{b} \right)^2 \right]
+> ```
 >
-> where $T_0$ is the pellet surface temperature and $T_1$ is the
+> where $`T_0`$ is the pellet surface temperature and $`T_1`$ is the
 > temperature difference between the centre and surface. The thermal
 > expansion is thus seen to be the sum of two terms, the first of which
 > produces uniform expansion (zero stress) at constant
-> temperature $T_0$, and is therefore computationally trivial. Tho
+> temperature $`T_0`$, and is therefore computationally trivial. Tho
 > second term introduces non-uniform body forces which distort the
 > pellet from its original cylindrical shape.
 
@@ -666,14 +668,14 @@ along the mid-plane. The FeenoX input uses the `tangential` and `radial`
 boundary conditions applied to the base of the upper half of a 3D
 cylinder. The geometry is meshed using 27-noded hexahedra.
 
-Two one-dimensional profiles for the non-dimensional range $[0:1]$ at
+Two one-dimensional profiles for the non-dimensional range $`[0:1]`$ at
 the external surfaces are written into an ASCII file ready to be
 plotted:
 
-1.  axial dependency of the displacement $v(z') = v(0,v,z'h)$ in the $y$
-    direction at fixed $x=0$ and $y=b$, and
-2.  radial dependency of the displacement $w(r') = w(0,r'b, h)$ in
-    the $z$ direction at fixed $x=0$ and $z=h$
+1.  axial dependency of the displacement $`v(z') = v(0,v,z'h)`$ in
+    the $`y`$ direction at fixed $`x=0`$ and $`y=b`$, and
+2.  radial dependency of the displacement $`w(r') = w(0,r'b, h)`$ in
+    the $`z`$ direction at fixed $`x=0`$ and $`z=h`$
 
 These two profiles are compared to the power expansion series given in
 the original report from 1967. Note that the authors expect a 5%
@@ -788,8 +790,9 @@ profiles</figcaption>
 
 Let us solve a plane-strain square fixed on the left, with an horizontal
 traction on the right and free on the other two sides. The Young modulus
-depends on the temperature $E(T)$ as given in the ASME II part D tables
-of material properties, interpolated using a [monotonic cubic scheme].
+depends on the temperature $`E(T)`$ as given in the ASME II part D
+tables of material properties, interpolated using a [monotonic cubic
+scheme].
 
 Actually, this example shows three cases:
 
@@ -798,9 +801,9 @@ Actually, this example shows three cases:
 2.  Linear temperature profile on the vertical direction given by an
     algebraic expression
 
-    $$
+    ``` math
     T(x,y) = 200 + 350\cdot y
-    $$
+    ```
 
 3.  The same linear profile but read from the output of a thermal
     conduction problem over a non-conformal mesh using this FeenoX
@@ -928,9 +931,9 @@ displacements.</figcaption>
 
 # Two cubes compressing each other
 
-Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one
-made out of a (non-dimensional) “soft” material and one made out of a
-“hard” material. We glue the two cubes together, set radial and
+Say we have two cubes of non-dimensional size $`1\times 1 \times 1`$,
+one made out of a (non-dimensional) “soft” material and one made out of
+a “hard” material. We glue the two cubes together, set radial and
 tangential symmetry conditions on one side of the soft cube (so as to
 allow pure traction conditions) and set a normal compressive pressure at
 the other end on the hard cube. Besides on single VTU file with the

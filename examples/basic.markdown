@@ -3,7 +3,7 @@
 - [<span class="toc-section-number">1</span> Hello World (and
   Universe)!]
 - [<span class="toc-section-number">2</span> Ten ways of computing
-  $\pi$]
+  $`\pi`$]
 - [<span class="toc-section-number">3</span> Financial decisions under
   inflation]
 - [<span class="toc-section-number">4</span> The logistic map]
@@ -21,7 +21,7 @@
 
   [<span class="toc-section-number">1</span> Hello World (and Universe)!]:
     #hello-world-and-universe
-  [<span class="toc-section-number">2</span> Ten ways of computing $\pi$]:
+  [<span class="toc-section-number">2</span> Ten ways of computing $`\pi`$]:
     #ten-ways-of-computing-pi
   [<span class="toc-section-number">3</span> Financial decisions under inflation]:
     #financial-decisions-under-inflation
@@ -52,67 +52,67 @@ Hello Universe!
 $
 ```
 
-# Ten ways of computing $\pi$
+# Ten ways of computing $`\pi`$
 
 1.  Internal symbol `pi` equal to libc’s `M_PI`
 
-    $$
+    ``` math
     \pi = \pi
-    $$
+    ```
 
 2.  Four times the arc tangent of one
 
-    $$
+    ``` math
     \pi = 4 \cdot \arctan{1}
-    $$
+    ```
 
-3.  The root of $\tan x=0$
+3.  The root of $`\tan x=0`$
 
-    $$
+    ``` math
     x / \tan x = 0
-    $$
+    ```
 
 4.  The integral of the gaussian bell, squared
 
-    $$
+    ``` math
     \pi = \left[ \int_{-\infty}^{\infty} e^{-x^2} \, dx \right]^2
-    $$
+    ```
 
-5.  The integral of $(x^2 + y^2) < 1$ inside a unit square
+5.  The integral of $`(x^2 + y^2) < 1`$ inside a unit square
 
-    $$
+    ``` math
     \pi = \int_{-1}^{+1} \int_{-1}^{+1} \left[(x^2 + y^2) < 1\right] \, dy \, dx
-    $$
+    ```
 
 6.  The integral of one inside a parametrized circle
 
-    $$
+    ``` math
     \pi = \int_{-1}^{+1} \int_{-\sqrt{1-x^2}}^{+\sqrt{1-x^2}} \, dy \, dx
-    $$
+    ```
 
 7.  The Gregoy-Leibniz sum
 
-    $$
+    ``` math
     \pi = 4 \cdot \sum_{i}^{\infty} \frac{(-1)^{i+1}}{2i-1}
-    $$
+    ```
 
 8.  The Abraham-Sharp sum
 
-    $$
+    ``` math
     \pi =  \sum_{i}^{\infty} \frac{2 \cdot (-1)^i \cdot 3^{\frac{1}{2-i}}}{2i+1}
-    $$
+    ```
 
-9.  An integral which is equal to $22/7-\pi$
+9.  An integral which is equal to $`22/7-\pi`$
 
-    $$
+    ``` math
     22/7 - \pi = \int_{0}^{1} \frac{x^4 \cdot (1-x)^4}{1+x^2} \, dx
-    $$
+    ```
 
 10. Ramanujan-Sato series
 
-    $$
+    ``` math
     \frac{1}{\pi} = \frac{2 \cdot \sqrt{2}}{99^2} \cdot \sum_{i=0}^{\infty} \frac{(4i)!}{(i^4)!} \cdot \frac{26390 \cdot i +  1103}{396^{4i}}
-    $$
+    ```
 
 ``` feenox
 # computing pi in ten different ways
@@ -216,11 +216,11 @@ $
 
 Plot the asymptotic behavior of the [logistic map]
 
-$$
+``` math
 x_{n+1} = r \cdot x \cdot (1-x)
-$$
+```
 
-for a range of the parameter $r$.
+for a range of the parameter $`r`$.
 
 ``` feenox
 DEFAULT_ARGUMENT_VALUE 1 2.6   # by default show r in [2.6:4]
@@ -271,11 +271,11 @@ executable with the path to the main input file. For example, the
 following input computes the first twenty numbers of the [Fibonacci
 sequence] using the closed-form formula
 
-$$
+``` math
 f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}
-$$
+```
 
-where $\varphi=(1+\sqrt{5})/2$ is the [Golden ratio].
+where $`\varphi=(1+\sqrt{5})/2`$ is the [Golden ratio].
 
 ``` feenox
 # the fibonacci sequence as function
@@ -315,7 +315,7 @@ $
 ## Using a vector
 
 We could also have computed these twenty numbers by using the direct
-definition of the sequence into a vector $\vec{f}$ of size 20.
+definition of the sequence into a vector $`\vec{f}`$ of size 20.
 
 ``` feenox
 # the fibonacci sequence as a vector
@@ -364,8 +364,8 @@ $
 # Computing the derivative of a function as a Unix filter
 
 This example illustrates how well FeenoX integrates into the Unix
-philosophy. Let’s say one has a function $f(t)$ as an ASCII file with
-two columns and one wants to compute the derivative $f'(t)$. Just pipe
+philosophy. Let’s say one has a function $`f(t)`$ as an ASCII file with
+two columns and one wants to compute the derivative $`f'(t)`$. Just pipe
 the function file into this example’s input file `derivative.fee` used
 as a filter.
 
@@ -470,54 +470,55 @@ When solving thermal-mechanical problems it is customary to use thermal
 expansion coefficients in order to take into account the mechanical
 strains induced by changes in the material temperature with respect to a
 reference temperature where the deformation is identically zero. These
-coefficients $\alpha$ are defined as the partial derivative of the
-strain $\epsilon$ with respect to temperature $T$ such that differential
-relationships like
+coefficients $`\alpha`$ are defined as the partial derivative of the
+strain $`\epsilon`$ with respect to temperature $`T`$ such that
+differential relationships like
 
-$$
+``` math
 d\epsilon = \frac{\partial \epsilon}{\partial T} \, dT = \alpha \cdot dT
-$$
+```
 
-hold. This derivative $\alpha$ is called the *instantaneous* thermal
+hold. This derivative $`\alpha`$ is called the *instantaneous* thermal
 expansion coefficient. For finite temperature increments, one would like
 to be able to write
 
-$$
+``` math
 \Delta \epsilon = \alpha \cdot \Delta T
-$$
+```
 
 But if the strain is not linear with respect to the temperature—which is
-the most common case—then $\alpha$ depends on $T$. Therefore, when
-dealing with finite temperature increments $\Delta T = T-T_0$ where the
-thermal expansion coefficient $\alpha(T)$ depends on the temperature
-itself then *mean* values for the thermal expansion ought to be used:
+the most common case—then $`\alpha`$ depends on $`T`$. Therefore, when
+dealing with finite temperature increments $`\Delta T = T-T_0`$ where
+the thermal expansion coefficient $`\alpha(T)`$ depends on the
+temperature itself then *mean* values for the thermal expansion ought to
+be used:
 
-$$
+``` math
 \Delta \epsilon = \int_{\epsilon_0}^{\epsilon} d\epsilon^{\prime} 
 = \int_{T_0}^{T} \frac{\partial \epsilon}{\partial T^\prime} \, dT^\prime
 = \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime
-$$
+```
 
-We can multiply and divide by $\Delta T$ to obtain
+We can multiply and divide by $`\Delta T`$ to obtain
 
-$$
+``` math
 \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime \cdot \frac{\Delta T}{\Delta T}
 = \bar{\alpha}(T) \cdot \Delta T
-$$
+```
 
-where the mean expansion coefficient for the temperature range $[T_0,T]$
-is
+where the mean expansion coefficient for the temperature
+range $`[T_0,T]`$ is
 
-$$
+``` math
 \bar{\alpha}(T) = \frac{\displaystyle \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime}{T-T_0}
-$$
+```
 
 This is of course the classical calculus result of the mean value of a
 continuous one-dimensional function in a certain range.
 
-Let $\epsilon(T)$ be the linear thermal expansion of a given material in
-a certain direction when heating a piece of such material from an
-initial temperature $T_0$ up to $T$ so that $\epsilon(T_0)=0$.
+Let $`\epsilon(T)`$ be the linear thermal expansion of a given material
+in a certain direction when heating a piece of such material from an
+initial temperature $`T_0`$ up to $`T`$ so that $`\epsilon(T_0)=0`$.
 
 <figure id="fig:table-asme-expansion">
 <img src="asme-expansion-table.png"
@@ -530,19 +531,19 @@ report</a>.</figcaption>
 
 From our previous analysis, we can see that in fig. 1:
 
-$$
+``` math
 \begin{aligned}
 A(T) &= \alpha(T)       = \frac{\partial \epsilon}{\partial T} \\
 B(T) &= \bar{\alpha}(T) = \frac{\epsilon(T)}{T-T_0} = \frac{\displaystyle \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime}{T - T_0} \\
 C(T) &= \epsilon(T)     = \int_{T_0}^T \alpha(T^\prime) \, dT^\prime
 \end{aligned}
-$$
+```
 
 Therefore,
 
-1.  $A(T)$ can be computed out of $C(T)$
-2.  $B(T)$ can be computed either out of $A(T)$ or $C(T)$
-3.  $C(T)$ can be computed out of $A(T)$
+1.  $`A(T)`$ can be computed out of $`C(T)`$
+2.  $`B(T)`$ can be computed either out of $`A(T)`$ or $`C(T)`$
+3.  $`C(T)`$ can be computed out of $`A(T)`$
 
 ``` feenox
 # just in case we wanted to interpolate with another method (linear, splines, etc.)
@@ -622,18 +623,18 @@ alt="Column C(T) from A(T)" />
 # Buffon’s needle
 
 Buffon’s needle is a classical probability problem that dates back from
-the 18th century whose solution depends on the value of $\pi$. When I
+the 18th century whose solution depends on the value of $`\pi`$. When I
 first read about this problem in my high-school years, I could not
-believe two things. The first one, that the number $\pi$ had something
+believe two things. The first one, that the number $`\pi`$ had something
 to do with the probability a stick has of crossing a line. And the
-other, that one would actually be able to compute $\pi$ by throwing away
-sticks. Of course, this was long before I learned about calculus,
+other, that one would actually be able to compute $`\pi`$ by throwing
+away sticks. Of course, this was long before I learned about calculus,
 distributions and Monte Carlo methods.
 
-The problem consists of a table of length $L$ over which transversal
-lines separated by a length $d$ are drawn. A stick (needle) of
-length $\ell$ is randomly thrown over the table. What is the
-probability $p$ that the stick crosses one line?
+The problem consists of a table of length $`L`$ over which transversal
+lines separated by a length $`d`$ are drawn. A stick (needle) of
+length $`\ell`$ is randomly thrown over the table. What is the
+probability $`p`$ that the stick crosses one line?
 
 <figure>
 <img src="needle.svg" alt="Setup of the Buffon’s needle problem" />
@@ -641,11 +642,11 @@ probability $p$ that the stick crosses one line?
 problem</figcaption>
 </figure>
 
-For $\ell < d$ the answer is
+For $`\ell < d`$ the answer is
 
-$$
+``` math
 p = \frac{ 2 \ell }{ \pi d}
-$$
+```
 
 To convince myself that the two facts I did not believe back when I was
 a youngster were actually true, I would just run the example below. Four
@@ -657,19 +658,19 @@ experimental frequency is compared to the theoretical value. I am now
 convinced.
 
 To solve the Buffon’s needle problem the Monte Carlo way, two random
-numbers are generated: the distance $0 \leq x < L$ from one side of the
-table to the center of the thrown stick, and the angle
-$0 \leq \theta < 2\pi$ with respect to the table longitudinal axis. One
-way of checking whether a stick crosses or not a line is the following.
-First, compute the location of both ends of the stick
+numbers are generated: the distance $`0 \leq x < L`$ from one side of
+the table to the center of the thrown stick, and the angle
+$`0 \leq \theta < 2\pi`$ with respect to the table longitudinal axis.
+One way of checking whether a stick crosses or not a line is the
+following. First, compute the location of both ends of the stick
 
-Now, if the floor of $x_1/d$ is equal to the floor of $x_2/d$, the stick
-does not cross a line. Otherwise, it does.
+Now, if the floor of $`x_1/d`$ is equal to the floor of $`x_2/d`$, the
+stick does not cross a line. Otherwise, it does.
 
-The input file iteratively performs $10^7$ throws and prints the partial
-frequency of crosses as a function of the number of throws, along with
-the constant analytical result. Four runs are performed, and the results
-are plotted in the figure.
+The input file iteratively performs $`10^7`$ throws and prints the
+partial frequency of crosses as a function of the number of throws,
+along with the constant analytical result. Four runs are performed, and
+the results are plotted in the figure.
 
 ``` feenox
 static_steps = 1e7  # number of times we trow the stick

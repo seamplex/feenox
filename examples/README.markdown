@@ -20,7 +20,7 @@ The FeenoX examples are divided by the type of problem they solve:
 5.  [Linear elasticity]
 6.  [Modal analysis]
 7.  [Neutron diffusion]
-8.  [Neutron $S_N$]
+8.  [Neutron $`S_N`$]
 
 > Each type of partial differential equation (i.e. from Laplace
 > downward) is implemented in a subdirectory within [`src/pde`] of the
@@ -54,7 +54,7 @@ Presentation” (August 2021).
   [Linear elasticity]: mechanical.md
   [Modal analysis]: modal.md
   [Neutron diffusion]: neutron_diffusion.md
-  [Neutron $S_N$]: neutron_sn.md
+  [Neutron $`S_N`$]: neutron_sn.md
   [`src/pde`]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [Github discussion page]: https://github.com/seamplex/feenox/discussions
   [examples]: https://github.com/seamplex/feenox/tree/main/examples
@@ -139,7 +139,7 @@ propose benchmark problems to add to the suite.
   - [IAEA 3D PWR Benchmark]
   - [Cube-spherical bare reactor]
   - [Illustration of the XS dilution & smearing effect]
-- Neutron transport using $S_N$
+- Neutron transport using $`S_N`$
   - [Reed’s problem]
   - [Azmy’s problem]
     - [Second-order complete structured rectangular grid]

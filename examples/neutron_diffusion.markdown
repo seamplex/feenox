@@ -256,7 +256,7 @@ alt="c" /></p>
 
 It is easy to compute the effective multiplication factor of a one-group
 bare cubical reactor. Or a spherical reactor. And we know that for the
-same mass, the $k_\text{eff}$ for the former is smaller than for the
+same mass, the $`k_\text{eff}`$ for the former is smaller than for the
 latter.
 
 <figure id="fig:cube-and-sphere" class="subfigures">
@@ -267,8 +267,8 @@ reactor, b — Spherical reactor</p></figcaption>
 </figure>
 
 But what happens “in the middle”? That is to say, how does
-$k_\text{eff}$ change when we morph the cube into a sphere? Enter Gmsh &
-Feenox.
+$`k_\text{eff}`$ change when we morph the cube into a sphere? Enter Gmsh
+& Feenox.
 
 <figure id="fig:cube-morph-sphere" class="subfigures">
 <p><img src="cubesphere-25.png" style="width:33.0%" alt="a" /> <img
@@ -415,39 +415,41 @@ sphericity</figcaption>
 
 Let us consider a two-zone slab reactor:
 
-1.  Zone $A$ has $k_\infty < 1$ and extends from $x=0$ to $x=a$.
-2.  Zone $B$ has $k_\infty > 1$ and extends from $x=a$ to $x=b$.
+1.  Zone $`A`$ has $`k_\infty < 1`$ and extends from $`x=0`$ to $`x=a`$.
+2.  Zone $`B`$ has $`k_\infty > 1`$ and extends from $`x=a`$ to $`x=b`$.
 
 - The slab is solved with a one-group diffusion approach.
 - Both zones have uniform macroscopic cross sections.
-- Flux $\phi$ is equal to zero at both at $x=0$ and at $x=b$.
+- Flux $`\phi`$ is equal to zero at both at $`x=0`$ and at $`x=b`$.
 
 Under these conditions, the overall analytical effective multiplication
-factor is $k_\text{eff}$ such that
+factor is $`k_\text{eff}`$ such that
 
-$$
+``` math
  \sqrt{D_A\cdot\left(\Sigma_{aA}- \frac{\nu\Sigma_{fA}}{k_\text{eff}}\right)} \cdot
   \tan\left[\sqrt{\frac{1}{D_B} \cdot\left( \frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB} \right) }\cdot (a-b) \right]
-$$ $$
+```
+
+``` math
  = \sqrt{D_B\cdot\left(\frac{\nu\Sigma_{fB}}{k_\text{eff}}-\Sigma_{aB}\right)} \cdot
   \tanh\left[\sqrt{\frac{1}{D_A} \cdot\left( \Sigma_{aA}-\frac{\nu\Sigma_{fA}}{k_\text{eff}} \right)} \cdot b\right]
-$$
+```
 
-We can then compare the numerical $k_\text{eff}$ computed using…
+We can then compare the numerical $`k_\text{eff}`$ computed using…
 
-1.  a non-uniform grid with $n+1$ nodes such that there is a node
-    exactly at the interface $x=a$.
+1.  a non-uniform grid with $`n+1`$ nodes such that there is a node
+    exactly at the interface $`x=a`$.
 2.  an uniform grid (mimicking a neutronic code that cannot handle case
-    i.) with $n$ uniformly-spaced elements. The element that contains
-    point $x=b$ is assigned to a pseudo material $AB$ that linearly
+    i.) with $`n`$ uniformly-spaced elements. The element that contains
+    point $`x=b`$ is assigned to a pseudo material $`AB`$ that linearly
     interpolates the macroscopic cross sections according to where in
-    the element the point $x=b$ lies. That is to say, if the element
-    width is 10 and $a=52$ then this $AB$ material will be 20% of
-    material $A$ and 80% of material $B$.
+    the element the point $`x=b`$ lies. That is to say, if the element
+    width is 10 and $`a=52`$ then this $`AB`$ material will be 20% of
+    material $`A`$ and 80% of material $`B`$.
 
 > The objective of this example is to show that case i. will
 > monotonically converge to the analytical multiplication factor as
-> $n \rightarrow \infty$ while case ii. will show a XS dilution and
+> $`n \rightarrow \infty`$ while case ii. will show a XS dilution and
 > smearing effect. FeenoX of course can solve both cases, but there are
 > many other neutronic tools out there that can handle only structured
 > grids.

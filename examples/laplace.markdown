@@ -201,9 +201,10 @@ This example
 1.  Creates a symmetric airfoil-like [Joukowsky profile] using the the
     Gmsh Python API
 2.  Solves the steady-state 2D Laplace equation with a different
-    Dirichlet value at the airfoil until the solution $\phi$ evaluated
-    at the continuation of the wing tip matches the boundary value $c$.
-    It then computes the circulation integral of the velocities
+    Dirichlet value at the airfoil until the solution $`\phi`$ evaluated
+    at the continuation of the wing tip matches the boundary
+    value $`c`$. It then computes the circulation integral of the
+    velocities
     1.  over the profile itself
     2.  over a circle around the airfoil, computing the unitary
         tangential vector
@@ -372,9 +373,8 @@ gmsh.finalize()
 ```
 
 ``` feenox
-PROBLEM laplace 2D
+PROBLEM laplace 2D MESH airfoil.msh
 static_steps = 20
-READ_MESH airfoil.msh
 
 # boundary conditions constant -> streamline
 BC bottom  phi=0

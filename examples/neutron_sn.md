@@ -10,9 +10,9 @@ toc: true
 
 Reed's problem as in
 
--   [William H. Reed, New Difference Schemes for the Neutron Transport
-    Equation, Nuclear Science and Engineering, 46:2, 309-314 (1971).
-    DOI: 10.13182/NSE46-309](http://dx.doi.org/10.13182/NSE46-309)
+- [William H. Reed, New Difference Schemes for the Neutron Transport
+  Equation, Nuclear Science and Engineering, 46:2, 309-314 (1971). DOI:
+  10.13182/NSE46-309](http://dx.doi.org/10.13182/NSE46-309)
 
 is a common test problem for transport codes. It is comprised of
 heterogeneous materials with strong absorber, vacuum, and scattering
@@ -60,9 +60,9 @@ The solutions obtained in FeenoX with $S_2$, $S_4$, $S_6$ and $S_8$ are plotted 
 
 As in
 
--   [Y. Y. Azmy, The Weighted Diamond-Difference Form of Nodal Transport
-    Methods. NUCLEAR SCIENCE AND ENGINEERING: 98, 29-40 (1988). DOI:
-    10.13182/NSE88-6](https://doi.org/10.13182/NSE88-6)
+- [Y. Y. Azmy, The Weighted Diamond-Difference Form of Nodal Transport
+  Methods. NUCLEAR SCIENCE AND ENGINEERING: 98, 29-40 (1988). DOI:
+  10.13182/NSE88-6](https://doi.org/10.13182/NSE88-6)
 
 ![Original problem formulation from 1988 paper](azmy-problem.png)
 
@@ -79,9 +79,7 @@ grid](azmy-structured-mesh.png)
 
 ```feenox
 DEFAULT_ARGUMENT_VALUE 1 4
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
-
-READ_MESH $0.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1 MESH $0.msh
 
 MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
 MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
@@ -147,9 +145,7 @@ grid](azmy-mesh.png)
 
 ```feenox
 DEFAULT_ARGUMENT_VALUE 1 4
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
-
-READ_MESH $0.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1 MESH $0.msh
 
 S1_src = 1
 Sigma_t1_src = 1
@@ -303,9 +299,7 @@ done
 DEFAULT_ARGUMENT_VALUE 1 0
 DEFAULT_ARGUMENT_VALUE 2 4
 DEFAULT_ARGUMENT_VALUE 3 0
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2
-
-READ_MESH $0-$1.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2 MESH $0-$1.msh
 
 MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
 MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1

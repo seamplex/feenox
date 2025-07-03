@@ -1,4 +1,4 @@
-# Neutron transport using $S_N$
+# Neutron transport using $`S_N`$
 
 - [<span class="toc-section-number">1</span> Reed’s problem]
 - [<span class="toc-section-number">2</span> Azmy’s problem]
@@ -63,8 +63,8 @@ $ for n in 2 4 6 8; do feenox reed.fee ${n} | sort -g > reed-s${n}.csv; done
 $
 ```
 
-The solutions obtained in FeenoX with $S_2$, $S_4$, $S_6$ and $S_8$ are
-plotted and compared against and independent solution from
+The solutions obtained in FeenoX with $`S_2`$, $`S_4`$, $`S_6`$ and
+$`S_8`$ are plotted and compared against and independent solution from
 <https://www.drryanmc.com/solutions-to-reeds-problem/>.
 
 <figure>
@@ -98,7 +98,7 @@ paper</figcaption>
 ## Second-order complete structured rectangular grid
 
 This example solves the problem using a structured second-order grid. It
-computes the mean flux in each quadrant by integrating $\phi_1$ over
+computes the mean flux in each quadrant by integrating $`\phi_1`$ over
 each physical group using the instruction [`INTEGRATE`].
 
 <figure>
@@ -110,9 +110,7 @@ rectangular grid</figcaption>
 
 ``` feenox
 DEFAULT_ARGUMENT_VALUE 1 4
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
-
-READ_MESH $0.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1 MESH $0.msh
 
 MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
 MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
@@ -165,8 +163,8 @@ $
 ## Fist-order locally-refined unstructured triangular grid
 
 This example solves the problem using an unstructured first-order grid.
-It computes the mean flux in each quadrant by integrating $\phi_1$
-over $x$ and $y$ in custom ranges using the functional [`integral`].
+It computes the mean flux in each quadrant by integrating $`\phi_1`$
+over $`x`$ and $`y`$ in custom ranges using the functional [`integral`].
 
 <figure>
 <img src="azmy-mesh.png"
@@ -177,9 +175,7 @@ triangular grid</figcaption>
 
 ``` feenox
 DEFAULT_ARGUMENT_VALUE 1 4
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1
-
-READ_MESH $0.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1 MESH $0.msh
 
 S1_src = 1
 Sigma_t1_src = 1
@@ -353,13 +349,13 @@ class="math inline"><sub>8</sub></span></figcaption>
 
 ## Flux profiles with ray effect
 
-This section analyzes flux profiles along the $y$ axis at three
-different values of $x$ as in section 6.4.1 of HyeongKae Park’s Master’s
-thesis, namely
+This section analyzes flux profiles along the $`y`$ axis at three
+different values of $`x`$ as in section 6.4.1 of HyeongKae Park’s
+Master’s thesis, namely
 
-1.  $x=5.84375$
-2.  $x=7.84375$
-3.  $x=9.84375$
+1.  $`x=5.84375`$
+2.  $`x=7.84375`$
+3.  $`x=9.84375`$
 
 Some kind of “ray effect” is expected since the flux is not as large as
 in the core source section and the discrete numbers of neutron
@@ -367,17 +363,18 @@ directions might induce numerical artifacts when evaluating the total
 scalar neutron flux.
 
 To better understand these profiles, the original square is rotated a
-certaing angle $\theta \leq 45º$ around the $z$ direction (coming out of
-the screen) keeping the S$_N$ directions fixed. Since we cannot use
-mirror boundary conditions for an arbitrary $\theta$, we use the full
-geometry instead of only one quarter like in the two preceding sections.
+certaing angle $`\theta \leq 45º`$ around the $`z`$ direction (coming
+out of the screen) keeping the S$`_N`$ directions fixed. Since we cannot
+use mirror boundary conditions for an arbitrary $`\theta`$, we use the
+full geometry instead of only one quarter like in the two preceding
+sections.
 
 Therefore, we perform a parametric sweep over
 
-1.  the angle $\theta$ of rotation of the original square in the $x$-$y$
-    plane
-2.  a mesh scale factor $c$
-3.  $N=4,6,8,10,12$
+1.  the angle $`\theta`$ of rotation of the original square in the
+    $`x`$-$`y`$ plane
+2.  a mesh scale factor $`c`$
+3.  $`N=4,6,8,10,12`$
 
 ``` bash
 #!/bin/bash
@@ -404,9 +401,7 @@ done
 DEFAULT_ARGUMENT_VALUE 1 0
 DEFAULT_ARGUMENT_VALUE 2 4
 DEFAULT_ARGUMENT_VALUE 3 0
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2
-
-READ_MESH $0-$1.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2 MESH $0-$1.msh
 
 MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
 MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
@@ -441,8 +436,8 @@ $
 There are lots (a lot) of results. Let’s show here a dozen to illustrate
 the ray effect.
 
-Let’s start with $\theta=0$ (i.e. the original geometry) for $N=4$,
-$N=8$ and $N=12$ to see how the profiles “improve”:
+Let’s start with $`\theta=0`$ (i.e. the original geometry) for $`N=4`$,
+$`N=8`$ and $`N=12`$ to see how the profiles “improve”:
 
 <figure>
 <img src="azmy-full-theta-0-sn-4.svg" style="width:100.0%"
@@ -471,9 +466,9 @@ class="math inline"><em>N</em> = 12</span> for different values of <span
 class="math inline"><em>c</em></span></figcaption>
 </figure>
 
-Now let’s fix $c$ and see what happens for different angles. Some angles
-are “worse” than others. It seems that $\theta=45º$ gives the “best”
-solution:
+Now let’s fix $`c`$ and see what happens for different angles. Some
+angles are “worse” than others. It seems that $`\theta=45º`$ gives the
+“best” solution:
 
 <figure>
 <img src="azmy-full-theta-0-c-1.5.svg" style="width:100.0%"
@@ -511,7 +506,7 @@ class="math inline"><em>c</em> = 1.5</span> for different values of
 <span class="math inline"><em>N</em></span></figcaption>
 </figure>
 
-For a fixed spatial refinement $c=1$ it is clear that increasing $N$
+For a fixed spatial refinement $`c=1`$ it is clear that increasing $`N`$
 improves the profiles:
 
 <figure>
@@ -541,7 +536,7 @@ class="math inline"><em>c</em> = 1</span> for different values of <span
 class="math inline"><em>θ</em></span></figcaption>
 </figure>
 
-Let’s how the profiles change with the angle $\theta$ at the “finest”
+Let’s how the profiles change with the angle $`\theta`$ at the “finest”
 solutions:
 
 <figure>

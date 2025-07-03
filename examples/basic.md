@@ -29,63 +29,43 @@ $
 
 1.  Internal symbol `pi` equal to libc's `M_PI`
 
-    $$
-    \pi = \pi
-    $$
+    $$\pi = \pi$$
 
 2.  Four times the arc tangent of one
 
-    $$
-    \pi = 4 \cdot \arctan{1}
-    $$
+    $$\pi = 4 \cdot \arctan{1}$$
 
 3.  The root of $\tan x=0$
 
-    $$
-    x / \tan x = 0
-    $$
+    $$x / \tan x = 0$$
 
 4.  The integral of the gaussian bell, squared
 
-    $$
-    \pi = \left[ \int_{-\infty}^{\infty} e^{-x^2} \, dx \right]^2
-    $$
+    $$\pi = \left[ \int_{-\infty}^{\infty} e^{-x^2} \, dx \right]^2$$
 
 5.  The integral of $(x^2 + y^2) < 1$ inside a unit square
 
-    $$
-    \pi = \int_{-1}^{+1} \int_{-1}^{+1} \left[(x^2 + y^2) < 1\right] \, dy \, dx
-    $$
+    $$\pi = \int_{-1}^{+1} \int_{-1}^{+1} \left[(x^2 + y^2) < 1\right] \, dy \, dx$$
 
 6.  The integral of one inside a parametrized circle
 
-    $$
-    \pi = \int_{-1}^{+1} \int_{-\sqrt{1-x^2}}^{+\sqrt{1-x^2}} \, dy \, dx
-    $$
+    $$\pi = \int_{-1}^{+1} \int_{-\sqrt{1-x^2}}^{+\sqrt{1-x^2}} \, dy \, dx$$
 
 7.  The Gregoy-Leibniz sum
 
-    $$
-    \pi = 4 \cdot \sum_{i}^{\infty} \frac{(-1)^{i+1}}{2i-1}
-    $$
+    $$\pi = 4 \cdot \sum_{i}^{\infty} \frac{(-1)^{i+1}}{2i-1}$$
 
 8.  The Abraham-Sharp sum
 
-    $$
-    \pi =  \sum_{i}^{\infty} \frac{2 \cdot (-1)^i \cdot 3^{\frac{1}{2-i}}}{2i+1}
-    $$
+    $$\pi =  \sum_{i}^{\infty} \frac{2 \cdot (-1)^i \cdot 3^{\frac{1}{2-i}}}{2i+1}$$
 
 9.  An integral which is equal to $22/7-\pi$
 
-    $$
-    22/7 - \pi = \int_{0}^{1} \frac{x^4 \cdot (1-x)^4}{1+x^2} \, dx
-    $$
+    $$22/7 - \pi = \int_{0}^{1} \frac{x^4 \cdot (1-x)^4}{1+x^2} \, dx$$
 
 10. Ramanujan-Sato series
 
-    $$
-    \frac{1}{\pi} = \frac{2 \cdot \sqrt{2}}{99^2} \cdot \sum_{i=0}^{\infty} \frac{(4i)!}{(i^4)!} \cdot \frac{26390 \cdot i +  1103}{396^{4i}}
-    $$
+    $$\frac{1}{\pi} = \frac{2 \cdot \sqrt{2}}{99^2} \cdot \sum_{i=0}^{\infty} \frac{(4i)!}{(i^4)!} \cdot \frac{26390 \cdot i +  1103}{396^{4i}}$$
 
 
 ```feenox
@@ -200,9 +180,7 @@ $
 Plot the asymptotic behavior of the [logistic
 map](https://en.wikipedia.org/wiki/Logistic_map)
 
-$$
-x_{n+1} = r \cdot x \cdot (1-x)
-$$
+$$x_{n+1} = r \cdot x \cdot (1-x)$$
 
 for a range of the parameter $r$.
 
@@ -254,9 +232,7 @@ following input computes the first twenty numbers of the [Fibonacci
 sequence](https://en.wikipedia.org/wiki/Fibonacci_number) using the
 closed-form formula
 
-$$
-f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}
-$$
+$$f(n) = \frac{\varphi^n - (1-\varphi)^n}{\sqrt{5}}$$
 
 where $\varphi=(1+\sqrt{5})/2$ is the [Golden
 ratio](https://en.wikipedia.org/wiki/Golden_ratio).
@@ -399,21 +375,21 @@ $
 Then we can pipe the output of this command to the derivative filter.
 Note that
 
--   The `derivative.fee` has the execution flag has on and a [shebang
-    line](https://en.wikipedia.org/wiki/Shebang_(Unix)) pointing to a
-    global location of the FeenoX binary in `/usr/local/bin` e.g. after
-    doing `sudo make install`.
--   The first argument of `derivative.fee` controls the time step. This
-    is only important to control the number of output lines. It does not
-    have anything to do with precision, since the derivative is computed
-    using an adaptive centered numerical differentiation scheme using
-    the [GNU Scientific
-    Library](https://www.gnu.org/software/gsl/doc/html/diff.html).
--   Before doing the actual differentiation, the input data is
-    interpolated using a third-order monotonous scheme (also with
-    [GSL](https://www.gnu.org/software/gsl/doc/html/interp.html#c.gsl_interp_type.gsl_interp_steffen)).
--   TL;DR: this is not just "current value minus last value divided time
-    increment."
+- The `derivative.fee` has the execution flag has on and a [shebang
+  line](https://en.wikipedia.org/wiki/Shebang_(Unix)) pointing to a
+  global location of the FeenoX binary in `/usr/local/bin` e.g. after
+  doing `sudo make install`.
+- The first argument of `derivative.fee` controls the time step. This is
+  only important to control the number of output lines. It does not have
+  anything to do with precision, since the derivative is computed using
+  an adaptive centered numerical differentiation scheme using the [GNU
+  Scientific
+  Library](https://www.gnu.org/software/gsl/doc/html/diff.html).
+- Before doing the actual differentiation, the input data is
+  interpolated using a third-order monotonous scheme (also with
+  [GSL](https://www.gnu.org/software/gsl/doc/html/interp.html#c.gsl_interp_type.gsl_interp_steffen)).
+- TL;DR: this is not just "current value minus last value divided time
+  increment."
 
 
 ```feenox
@@ -469,17 +445,13 @@ coefficients $\alpha$ are defined as the partial derivative of the
 strain $\epsilon$ with respect to temperature $T$ such that differential
 relationships like
 
-$$
-d\epsilon = \frac{\partial \epsilon}{\partial T} \, dT = \alpha \cdot dT
-$$
+$$d\epsilon = \frac{\partial \epsilon}{\partial T} \, dT = \alpha \cdot dT$$
 
 hold. This derivative $\alpha$ is called the *instantaneous* thermal
 expansion coefficient. For finite temperature increments, one would like
 to be able to write
 
-$$
-\Delta \epsilon = \alpha \cdot \Delta T
-$$
+$$\Delta \epsilon = \alpha \cdot \Delta T$$
 
 But if the strain is not linear with respect to the temperature---which
 is the most common case---then $\alpha$ depends on $T$. Therefore, when
@@ -487,25 +459,19 @@ dealing with finite temperature increments $\Delta T = T-T_0$ where the
 thermal expansion coefficient $\alpha(T)$ depends on the temperature
 itself then *mean* values for the thermal expansion ought to be used:
 
-$$
-\Delta \epsilon = \int_{\epsilon_0}^{\epsilon} d\epsilon^{\prime} 
+$$\Delta \epsilon = \int_{\epsilon_0}^{\epsilon} d\epsilon^{\prime} 
 = \int_{T_0}^{T} \frac{\partial \epsilon}{\partial T^\prime} \, dT^\prime
-= \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime
-$$
+= \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime$$
 
 We can multiply and divide by $\Delta T$ to obtain
 
-$$
-\int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime \cdot \frac{\Delta T}{\Delta T}
-= \bar{\alpha}(T) \cdot \Delta T
-$$
+$$\int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime \cdot \frac{\Delta T}{\Delta T}
+= \bar{\alpha}(T) \cdot \Delta T$$
 
 where the mean expansion coefficient for the temperature range $[T_0,T]$
 is
 
-$$
-\bar{\alpha}(T) = \frac{\displaystyle \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime}{T-T_0}
-$$
+$$\bar{\alpha}(T) = \frac{\displaystyle \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime}{T-T_0}$$
 
 This is of course the classical calculus result of the mean value of a
 continuous one-dimensional function in a certain range.
@@ -521,13 +487,11 @@ report](https://www.ramsay-maunder.co.uk/knowledge-base/technical-notes/asmeansy
 From our previous analysis, we can see that in
 @fig:table-asme-expansion:
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 A(T) &= \alpha(T)       = \frac{\partial \epsilon}{\partial T} \\
 B(T) &= \bar{\alpha}(T) = \frac{\epsilon(T)}{T-T_0} = \frac{\displaystyle \int_{T_0}^{T} \alpha(T^\prime) \, dT^\prime}{T - T_0} \\
 C(T) &= \epsilon(T)     = \int_{T_0}^T \alpha(T^\prime) \, dT^\prime
-\end{aligned}
-$$
+\end{aligned}$$
 
 Therefore,
 
@@ -629,9 +593,7 @@ probability $p$ that the stick crosses one line?
 
 For $\ell < d$ the answer is
 
-$$
-p = \frac{ 2 \ell }{ \pi d}
-$$
+$$p = \frac{ 2 \ell }{ \pi d}$$
 
 To convince myself that the two facts I did not believe back when I was
 a youngster were actually true, I would just run the example below. Four

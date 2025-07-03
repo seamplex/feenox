@@ -23,8 +23,7 @@ terminal: |
   $
 ...
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical 3D
-READ_MESH nafems-le10.msh   # mesh in millimeters
+PROBLEM mechanical MESH nafems-le10.msh   # mesh in millimeters
 
 # LOADING: uniform normal pressure on the upper surface
 BC upper    p=1      # 1 Mpa

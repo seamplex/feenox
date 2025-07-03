@@ -10,20 +10,20 @@ toc: true
 
 > See these LinkedIn posts to see some comments and discussions:
 >
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6831291311832760320/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6973982270852325376/>
 >
 > Other people's maze-related posts:
 >
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6973921855275458560/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6974663157952745472/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6974979951049519104/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
-> -   <https://www.linkedin.com/feed/update/urn:li:activity:7206676495879028736/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6972370982489509888/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6972949021711630336/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6973522069703516160/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6973921855275458560/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6974663157952745472/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6974979951049519104/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:6982049404568449024/>
+> - <https://www.linkedin.com/feed/update/urn:li:activity:7206676495879028736/>
 
 Say you are Homer Simpson and you want to solve a maze drawn in a
 restaurant's placemat, one where both the start and end are known
@@ -354,9 +354,8 @@ gmsh.finalize()
 
 
 ```feenox
-PROBLEM laplace 2D
+PROBLEM laplace 2D MESH airfoil.msh
 static_steps = 20
-READ_MESH airfoil.msh
 
 # boundary conditions constant -> streamline
 BC bottom  phi=0

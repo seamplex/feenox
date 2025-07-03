@@ -22,16 +22,17 @@
 
 ## One-dimensional linear
 
-Solve heat conduction on the slab $x \in [0:1]$ with boundary conditions
+Solve heat conduction on the slab $`x \in [0:1]`$ with boundary
+conditions
 
-$$
+``` math
 \begin{cases}
 T(0) = 0 & \text{(left)} \\
 T(1) = 1 & \text{(right)} \\
 \end{cases}
-$$
+```
 
-and uniform conductivity. Compute $T\left(\frac{1}{2}\right)$.
+and uniform conductivity. Compute $`T\left(\frac{1}{2}\right)`$.
 
 Please note that:
 
@@ -42,7 +43,7 @@ Please note that:
 - Output is 100% user-defined
   - No `PRINT` no output
   - Feenox follows the Unix rule of silence
-- There is no node at $x=1/2=0.5$!
+- There is no node at $`x=1/2=0.5`$!
   - FeenoX knows how to interpolate
 - Mesh separated from problem
   - The geometry comes from a Git-friendly `.geo`
@@ -90,9 +91,9 @@ This problem solves the transient over a slender cylider arising from
 “turning off” a heat source that provided a fixed heat flux at both
 ends, while the cylindrical surface is subject to convection conditions.
 
-The transient goes from $t=0~\text{s}$ up to end time $t=1000~\text{s}$.
-We force the time stepper to pass exactly through the following
-times $t$
+The transient goes from $`t=0~\text{s}`$ up to end time
+$`t=1000~\text{s}`$. We force the time stepper to pass exactly through
+the following times $`t`$
 
 - 1
 - 10
@@ -100,19 +101,18 @@ times $t$
 - `end_time`/2
 
 At these times, the special variable `in_time_path` is true. We use an
-`IF` condition to write the profile along the $x$ axis on
+`IF` condition to write the profile along the $`x`$ axis on
 
 1.  a single file named `profiles.dat` with an extra column for the time
-    $t$
+    $`t`$
 2.  one file for each time step `profile-t.dat`
 
-for the selected times (or during the static step at $t=0$ and the final
-step at $t=1000$).
+for the selected times (or during the static step at $`t=0`$ and the
+final step at $`t=1000`$).
 
 ``` feenox
 # "barra" means "rod" in Spanish
-READ_MESH barra3d.msh
-PROBLEM thermal 3d
+PROBLEM thermal 3d MESH barra3d.msh
 
 # times
 end_time = 1000
@@ -182,21 +182,21 @@ times.</figcaption>
 
 Let us solve a dimensionless transient problem over a cylinder.
 Conductivity and heat capacity are unity. Initial condition is a linear
-temperature profile along the $x$ axis:
+temperature profile along the $`x`$ axis:
 
-$$
+``` math
 T(x,y,z,0) = x
-$$
+```
 
 The base of the cylinder has a prescribed time and space-dependent
 temperature
 
-$$
+``` math
 T(0,y,z,t) = \sin( 2\pi \cdot t) \cdot \sin( 2\pi \cdot y)
-$$
+```
 
 The other faces have a convection conditions with (non-dimensional) heat
-transfer coefficient $h=0.1$ and $T_\text{ref} = 1$.
+transfer coefficient $`h=0.1`$ and $`T_\text{ref} = 1`$.
 
 <figure>
 <img src="cylinder.png" style="width:100.0%"
@@ -306,8 +306,8 @@ distribution</figcaption>
 
 # Non-dimensional transient heat conduction with time-dependent properties
 
-Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one
-made with a material with unitary properties and the other one whose
+Say we have two cubes of non-dimensional size $`1\times 1 \times 1`$,
+one made with a material with unitary properties and the other one whose
 properties depend explicitly on time. We glue the two cubes together,
 fix one side of the unitary material to a fixed zero temperature and set
 a ramp of temperature between zero and one at the opposite end of the

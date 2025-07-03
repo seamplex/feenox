@@ -59,8 +59,7 @@ one-to-one correspondence with the original problem formulation from
 
 ```feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical 3D
-READ_MESH nafems-le10.msh   # mesh in millimeters
+PROBLEM mechanical MESH nafems-le10.msh   # mesh in millimeters
 
 # LOADING: uniform normal pressure on the upper surface
 BC upper    p=1      # 1 Mpa
@@ -114,12 +113,11 @@ $\sqrt{x^2+y^2}+z$ like `sqrt(x^2 + y^2) + z`!
 
 ```feenox
 # NAFEMS Benchmark LE-11: solid cylinder/taper/sphere-temperature
-PROBLEM mechanical 3D
-READ_MESH nafems-le11.msh
+PROBLEM mechanical 3D MESH nafems-le11.msh
 
 # linear temperature gradient in the radial and axial direction
 # as an algebraic expression as human-friendly as it can be
-T(x,y,z) := sqrt(x^2 + y^2) + z
+T(x,y,z) = sqrt(x^2 + y^2) + z
 
 BC xz     v=0       # displacement vector is [u,v,w]
 BC yz     u=0       # u = displacement in x
@@ -168,8 +166,7 @@ properties, `BC`s and `SOLVE_PROBLEM`!
 
 
 ```feenox
-PROBLEM mechanical 2D plane_stress
-READ_MESH nafems-le1.msh
+PROBLEM mechanical 2D plane_stress MESH nafems-le1.msh
 
 E = 210e3
 nu = 0.3
@@ -240,13 +237,13 @@ Transfinite Volume "*";
 Then another `.geo` file is merged to build
 `cantilever-${element}-${c}.msh` where
 
--   `${element}`:
-    [tet4](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet4.geo),
-    [tet10](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet10.geo),
-    [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
-    [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
-    [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
--   `${c}`: 1,2,$\dots$,10
+- `${element}`:
+  [tet4](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet4.geo),
+  [tet10](https://github.com/seamplex/feenox/blob/main/examples/cantilever-tet10.geo),
+  [hex8](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex8.geo),
+  [hex20](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex20.geo),
+  [hex27](https://github.com/seamplex/feenox/blob/main/examples/cantilever-hex27.geo)
+- `${c}`: 1,2,$\dots$,10
 
 ::: {#fig:cantilever-mesh}
 ![Tetrahedra](cantilever-tet.png){width="45%"}
@@ -338,21 +335,19 @@ the temperature $T$ in a know algebraically way, whilst both the Poisson
 coefficient $\nu$ and the thermal conductivity $k$ are uniform and do
 not depend on the spatial coordinates:
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 E(T) &= \frac{1000}{800-T} \\
 \nu &= 0.3 \\
 k &= 1 \\
-\end{aligned}
-$$
+\end{aligned}$$
 
 ![Original figure from
 [v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
 
 References:
 
--   <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
--   <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
+- <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
+- <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
 
 This thermo-mechanical problem is solved in two stages. First, the heat
 conduction equation is solved over a coarse first-order mesh to find the
@@ -496,9 +491,8 @@ $
 To illustrate the point of the previous discussion, let us solve the
 thermal expansion of an unrestrained unitary cube
 $[0,1~\text{mm}]\times[0,1~\text{mm}]\times[0,1~\text{mm}]$ subject to a
-linear radially-symmetric temperature field $$
-T(x,y,z) = 30 \text{ºC} + 150 \frac{\text{ºC}}{\text{mm}} \sqrt{x^2+y^2+z^2}
-$$
+linear radially-symmetric temperature field
+$$T(x,y,z) = 30 \text{ºC} + 150 \frac{\text{ºC}}{\text{mm}} \sqrt{x^2+y^2+z^2}$$
 
 with a mean thermal expansion coefficient for each of the three
 directions $x$, $y$ and $z$ computed from each of the three columns of
@@ -737,9 +731,7 @@ Actually, this example shows three cases:
 2.  Linear temperature profile on the vertical direction given by an
     algebraic expression
 
-    $$
-    T(x,y) = 200 + 350\cdot y
-    $$
+    $$T(x,y) = 200 + 350\cdot y$$
 
 3.  The same linear profile but read from the output of a thermal
     conduction problem over a non-conformal mesh using this FeenoX
