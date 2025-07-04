@@ -1,11 +1,8 @@
-PROBLEM thermal DIMENSIONS 1
-READ_MESH slab2.msh
+PROBLEM thermal DIMENSIONS 1 MESH slab2.msh
 
 BC left  T=0
 BC right T=1
 
 k(x) = 1+x
-
-SOLVE_PROBLEM
 
 PRINT T(0.5)-log(1+0.5)/log(2)

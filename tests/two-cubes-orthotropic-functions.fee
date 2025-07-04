@@ -1,5 +1,4 @@
-PROBLEM mechanical
-READ_MESH two-cubes.msh
+PROBLEM mechanical MESH two-cubes.msh
 
 Ex_soft(x,y,z) = 0.1*100000
 Ey_soft(x,y,z) = 0.1*75000
@@ -26,7 +25,7 @@ nuzx_hard(x,y,z) = nu13_hard(x,y,z) * Ez_hard(x,y,z)/Ex_hard(x,y,z)
 BC left  fixed
 BC right Fx=1000
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_MESH two-cubes-orthotropic-functions.vtk VECTOR u v w sigmax sigmay sigmaz tauxy tauyz tauzx
 PRINT %.1f sigma(0,0,0)

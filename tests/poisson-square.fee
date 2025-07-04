@@ -3,6 +3,5 @@ READ_MESH square-centered.msh
 BC zero  phi=0 GROUPS left right bottom up
 f = 1
 gamg_threshold = 1e-4
-SOLVE_PROBLEM
 WRITE_RESULTS
 PRINT %.4f phi(0,0) dphidx(-0.5,-0.5) dphidy(0.5,0.5) SEP " "

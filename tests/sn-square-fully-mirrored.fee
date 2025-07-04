@@ -1,5 +1,4 @@
-PROBLEM neutron_sn DIM 2 GROUPS 1 SN 4
-READ_MESH square-struct.msh
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN 4 MESH square-struct.msh
 
 S1 = 1
 Sigma_t1 = 2

@@ -9,7 +9,7 @@ T(x,y) = (x^2+y^2) < 1
 BC x v=0
 BC y u=0
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT sigmay(1.005,0)
 

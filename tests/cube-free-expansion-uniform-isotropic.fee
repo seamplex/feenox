@@ -11,7 +11,7 @@ BC bottom w=0
 alpha = 0.123456879
 T = 9.87654321
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_RESULTS FORMAT vtu displacements vonmises
 

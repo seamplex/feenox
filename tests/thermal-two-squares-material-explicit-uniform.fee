@@ -1,13 +1,10 @@
-PROBLEM thermal 2d
-READ_MESH two-squares.msh
+PROBLEM thermal 2d MESH two-squares.msh
 
 MATERIAL soft k=1
 MATERIAL hard k=3
 
 BC left  T=0
 BC right T=1
-
-SOLVE_PROBLEM
 
 PRINT %.3f T(1,0.5)
 # WRITE_RESULTS

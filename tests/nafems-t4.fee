@@ -11,7 +11,7 @@ BC DA adiabatic
 BC BC h=750 Tref=0   # [ W/(m^2 ºC) , ºC ]
 BC CD h=750 Tref=0   # [ W/(m^2 ºC) , ºC ]
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 PRINT %.1f T(0.6,0.2)
 
 WRITE_MESH nafems-t4-result.msh T VECTOR qx qy 0

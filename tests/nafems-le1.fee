@@ -10,7 +10,5 @@ BC AB u=0
 BC CD v=0
 BC BC tension=10
 
-SOLVE_PROBLEM
-
 WRITE_RESULTS FILE ${0}-${1}.vtk displacements stresses
 PRINT %.1f sigmay(2000,0)

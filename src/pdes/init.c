@@ -300,6 +300,7 @@ int feenox_problem_define_solutions(void) {
     }
     feenox_check_alloc(feenox.pde.solution[g] = feenox_define_function_get_ptr(name, feenox.pde.dim));
     feenox.pde.solution[g]->mesh = feenox.pde.mesh;
+    feenox.pde.solution[g]->is_solution = 1;
 
     if (feenox.pde.nev == 0) {
       // the derivatives of the solutions with respect to space
@@ -347,6 +348,7 @@ int feenox_problem_define_solutions(void) {
         feenox_free(modename);
         
         feenox.pde.mode[g][i]->mesh = feenox.pde.solution[g]->mesh;
+        feenox.pde.mode[g][i]->is_solution = 1;
         feenox.pde.mode[g][i]->var_argument = feenox.pde.solution[g]->var_argument;
         
       }

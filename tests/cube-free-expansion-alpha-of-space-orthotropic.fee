@@ -16,7 +16,7 @@ BC left   u=0
 BC front  v=0
 BC bottom w=0
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 # subscript a stands for "analytical"
 u_a = integral(alpha_x(x,y,z) * (T(x,y,z)-T0), x, 0, 1)

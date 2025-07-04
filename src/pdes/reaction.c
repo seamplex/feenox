@@ -29,7 +29,11 @@ int feenox_instruction_reaction(void *arg) {
   if (reaction->vector != NULL && reaction->vector->initialized == 0) {
     feenox_vector_init(reaction->vector, FEENOX_VECTOR_NO_INITIAL);
   }
-  
+
+  // this is an implicit SOLVE_PROBLEM point
+  if (feenox.pde.problem_solved == 0) {
+    feenox_call(feenox_instruction_solve_problem(NULL));
+  }  
   // order == 1 for moment
   unsigned int g = 0;
   Vec arm[] = {NULL, NULL, NULL};

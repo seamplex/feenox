@@ -11,7 +11,7 @@ nuSigma_f1 = 0.507722225
 BC left  null
 BC right null
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT (phi1(5)<0)&(phi1(15)<0)
 

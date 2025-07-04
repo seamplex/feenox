@@ -1,5 +1,4 @@
-PROBLEM neutron_diffusion 1d
-READ_MESH ud20-1-0-sl.msh
+PROBLEM neutron_diffusion 1d MESH ud20-1-0-sl.msh
 
 a = 2 * 10.371065 # critical size of the problem UD20-1-0-SL (number 22 report Los Alamos)
 

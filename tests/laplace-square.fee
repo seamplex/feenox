@@ -2,6 +2,5 @@ PROBLEM laplace 2d
 READ_MESH square-centered.msh
 BC left  phi=+y
 BC right phi=-y
-SOLVE_PROBLEM
 WRITE_RESULTS FILE laplace-square.msh
 PRINT phi(1,1) dphidx(1,1) dphidy(1,1) SEP " "

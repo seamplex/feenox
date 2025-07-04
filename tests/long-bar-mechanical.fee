@@ -13,7 +13,7 @@ T0 = 5
 BC rear  tangential radial
 BC front tangential radial
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 FIND_EXTREMA w MAX w_max X_MAX w_max_x Y_MAX w_max_y Z_MAX w_max_z
 # "target" is 0.00232 but that's too small

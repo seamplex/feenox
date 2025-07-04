@@ -40,6 +40,11 @@ int feenox_instruction_linearize(void *arg) {
   
   feenox_linearize_t *linearize = (feenox_linearize_t *)arg;
 
+  // this is an implicit SOLVE_PROBLEM point
+  if (feenox.pde.problem_solved == 0) {
+    feenox_call(feenox_instruction_solve_problem(NULL));
+  }
+  
   // http://www.eng-tips.com/faqs.cfm?fid=982
   // the actual equations are in ASME VIII-div 2 sec 5
   // also see the mecway manual

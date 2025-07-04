@@ -1,6 +1,5 @@
 # problem taken from Ansys Workbench Verification manual (case VMMECH001) 
-PROBLEM mechanical 3D
-READ_MESH statically_indeterminate_reaction.msh
+PROBLEM mechanical 3D MESH statically_indeterminate_reaction.msh
 
 E = 2.9008e7
 nu = 0.3
@@ -10,7 +9,7 @@ BC top    fixed
 BC one    Fz=-1000
 BC two    Fz=-500
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 REACTION bottom RESULT R_bottom
 REACTION top    RESULT R_top

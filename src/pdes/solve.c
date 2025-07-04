@@ -24,7 +24,10 @@
 int feenox_instruction_solve_problem(void *arg) {
   
 #ifdef HAVE_PETSC
-
+  // we say that we already solved this because if say a BC depends on
+  // the unkown, we get into an infinite loop for implicit SOLVE_PROBLEM
+  feenox.pde.problem_solved = 1;
+  
   // init ----------------------------------------------------------------------
   petsc_call(PetscLogStagePush(feenox.pde.stage_init));  
   // initialize only if we did not initialize before
@@ -67,9 +70,6 @@ int feenox_instruction_solve_problem(void *arg) {
   }
   petsc_call(PetscLogStagePop());
   // ---------------------------------------------------------------------------
-  
-  // mark that we solved the problem
-  feenox.pde.problem_solved = 1;
   
 #endif  
   return FEENOX_OK;

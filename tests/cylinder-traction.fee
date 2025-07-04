@@ -5,6 +5,6 @@ nu=0.25
 BC bottom fixed
 PHYSICAL_GROUP top DIMENSION 2
 BC top    tx=1/top_area
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 PRINT %.3f u(1,0,0)
 

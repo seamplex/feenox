@@ -1,11 +1,8 @@
-PROBLEM thermal 1D
-READ_MESH slab.msh
+PROBLEM thermal 1D MESH slab.msh
 
 BC left  T=0
 BC right h=1 Tref=1
 
 k = 1
-
-SOLVE_PROBLEM
 
 PRINT T(0.5)-1/4

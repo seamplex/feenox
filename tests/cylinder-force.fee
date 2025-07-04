@@ -5,5 +5,5 @@ nu=0.25
 BC bottom fixed
 BC top    Fx=1
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 PRINT %.3f u(1,0,0)

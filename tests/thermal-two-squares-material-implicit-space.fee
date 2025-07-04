@@ -8,6 +8,6 @@ k_hard(x,y) = 1.5+2*(x-1)
 BC left  T=0
 BC right T=1
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT %.3f T(1,0.5)

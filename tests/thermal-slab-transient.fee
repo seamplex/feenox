@@ -4,8 +4,8 @@
 #          A*(t-1) for t > 1  
 # T(L,t) = 0
 # T(x,0) = 0
-READ_MESH slab-1d-0.1m.msh DIMENSIONS 1
-PROBLEM thermal
+PROBLEM thermal MESH slab-1d-0.1m.msh DIMENSIONS 1
+
 
 end_time = 2
 

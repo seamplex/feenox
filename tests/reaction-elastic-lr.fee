@@ -1,5 +1,4 @@
-PROBLEM mechanical 3D
-READ_MESH cube-hex.msh
+PROBLEM mechanical 3D MESH cube-hex.msh
 
 E = 1
 nu = 0
@@ -7,7 +6,6 @@ nu = 0
 BC left  fixed
 BC right Fx=1
 
-SOLVE_PROBLEM
 REACTION left   RESULT left
 REACTION right  RESULT right
 REACTION bottom RESULT bottom

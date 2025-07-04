@@ -1,5 +1,4 @@
-READ_MESH reflected.msh DIMENSIONS 1
-PROBLEM neutron_diffusion GROUPS 2 
+PROBLEM neutron_diffusion DIM 1 GROUPS 2 MESH reflected.msh
 
 MATERIAL fuel {
   D1=1.5

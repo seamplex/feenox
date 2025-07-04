@@ -1,5 +1,4 @@
-PROBLEM mechanical
-READ_MESH spinning-disk-parallel-solid-half$1.msh
+PROBLEM mechanical MESH spinning-disk-parallel-solid-half$1.msh
 
 # MKS
 E = 200e9

@@ -27,7 +27,6 @@ BC left symmetry
 BC A    fixed
 BC B    w=0
 
-SOLVE_PROBLEM
 
 l = 10
 ta = 0.05
@@ -36,6 +35,8 @@ dx = l*(T(0,0,0)-T0)*(alpha_top+alpha_bottom)/2
 K1 = 4 + 6*ta/tb + 4*(ta/tb)^2 + E_top/E_bottom*(ta/tb)^3 + E_bottom/E_top*(tb/ta)
 dz = 3*l^2*(alpha_bottom-alpha_top)*(T(0,0,0)-T0)*(ta+tb)/(tb^2*K1)
 sigma_bottom =(alpha_bottom-alpha_top)*(T(0,0,0)-T0)*(E_bottom)/K1 * (3*ta/tb + 2 - E_top/E_bottom*(ta/tb)^3)
+
+# SOLVE_PROBLEM
 
 PRINT (u(l,0,0)-dx)^2+(w(l,0,0)-dz)^2+(1e-6*sigmax(0,0,-tb)-1e-6*sigma_bottom)^2
 

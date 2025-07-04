@@ -72,7 +72,7 @@ SOLVE_PROBLEM
 
 # compute linearized stresses for both von Mises and Tresca
 LINEARIZE_STRESS FROM 0 a 0 TO 0 b 0     M Mv   MB MBv        Mt Mt   MBt MBt
- 
+
 # compute L2 errors
 volume = pi*(b^2-a^2)*l
 h = (volume/cells)^(1/3)

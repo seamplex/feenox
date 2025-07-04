@@ -14,7 +14,8 @@ PHYSICAL_GROUP ulq MATERIAL abs
 BC mirror   mirror
 BC vacuum   vacuum
 
-SOLVE_PROBLEM
+# implicit solve
+# SOLVE_PROBLEM
 
 # compute mean values in each quadrant
 INTEGRATE phi1 OVER llq RESULT lower_left_quadrant

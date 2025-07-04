@@ -11,6 +11,6 @@ E = 2.11e11
 nu = 0.3
 alpha(x,y,z) = 0.00023*T(x,y,z)
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT %.1f sigmaz(1,0,0)/1e6

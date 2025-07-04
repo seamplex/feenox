@@ -7,7 +7,7 @@ nu = 0.3
 BC A  fixed  GROUPS left  front bottom right
 BC C  p=1    GROUPS right back  top
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 WRITE_RESULTS FORMAT vtk
 
 

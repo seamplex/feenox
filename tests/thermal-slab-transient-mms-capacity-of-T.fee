@@ -1,5 +1,4 @@
-READ_MESH slab2.msh
-PROBLEM thermal DIMENSIONS 1 DIRICHLET_SCALING relative 1
+PROBLEM thermal DIMENSIONS 1 DIRICHLET_SCALING relative 1 MESH slab2.msh
 
 end_time = 1
 T_0(x) = 0

@@ -17,7 +17,7 @@ alpha_y = 0.23456879
 alpha_z = 0.3456879
 T = 9.87654321
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_MESH cube-restrained-expansion-uniform-orthotropic.vtk VECTOR u v w sigmax sigmay sigmaz
 

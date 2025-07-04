@@ -7,6 +7,6 @@ k_hard(x,y) = 2.0-T(x,y)
 BC left  T=0
 BC right T=1
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT %.3f T(1,0.5)

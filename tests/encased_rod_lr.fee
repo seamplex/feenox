@@ -7,7 +7,7 @@ k_ss = 18
 BC left  T=400
 BC right T=100
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_MESH encased_rod_lb.vtk T VECTOR qx qy qz
 

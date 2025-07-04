@@ -9,6 +9,6 @@ BC Flux       q=50000
 
 k = 400
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT T(1.25,1,5.91044)

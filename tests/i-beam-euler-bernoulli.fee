@@ -19,5 +19,5 @@ k_right = 3
 k_top = 8
 w_eb = total_force*length^3/(k_$1*E*I)
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 PRINT %+.0e (w(1000,0,0)-w_eb)/w_eb

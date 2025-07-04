@@ -13,7 +13,7 @@ BC midplane w=0
 E = 210e3
 nu = 0.3
 
-SOLVE_PROBLEM 
+# SOLVE_PROBLEM
 
 # stress tensor at point D
 MATRIX stress ROWS 3 COLS 3 DATA \

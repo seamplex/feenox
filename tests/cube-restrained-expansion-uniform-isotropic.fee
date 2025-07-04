@@ -15,7 +15,7 @@ BC restrain fixed \
 alpha = 0.123456879
 T = 9.87654321
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_MESH cube-restrained-expansion-uniform-orthotropic.vtk VECTOR u v w sigmax sigmay sigmaz
 

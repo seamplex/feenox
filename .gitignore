@@ -107,3 +107,8 @@ heater-cylinder-inches-results.msh
 heater-cylinder-inches.vtu
 reaction-force.vtu
 two-cubes-isotropic-functions.vtu
+hex8-ldef.vtk
+hex8-single-stretched-linear.vtk
+hex8-single-stretched-neohookean.vtk
+hex8-single-stretched-svk.vtk
+spooles.out

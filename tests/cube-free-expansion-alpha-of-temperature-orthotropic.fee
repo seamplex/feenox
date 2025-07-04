@@ -19,6 +19,6 @@ alpha_x(x,y,z) = 1e-6*B(T(x,y,z))
 alpha_y(x,y,z) = 1e-6*integral(A(T'), T', T0, T(x,y,z))/(T(x,y,z)-T0)
 alpha_z(x,y,z) = 1e-3*C(T(x,y,z))/(T(x,y,z)-T0)
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 PRINT %.3e SEP " " u(1,1,1) v(1,1,1) w(1,1,1)

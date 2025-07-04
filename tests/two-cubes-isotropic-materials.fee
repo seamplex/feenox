@@ -1,6 +1,10 @@
 PROBLEM mechanical
 READ_MESH two-cubes.msh
 
+# TODO! this does not work
+# PROBLEM mechanical MESH two-cubes.msh
+
+
 MATERIAL soft E=1e3   nu=0.2
 MATERIAL hard E=200e3 nu=0.3
 

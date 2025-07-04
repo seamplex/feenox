@@ -17,10 +17,10 @@ nuyz = 0.25
 nu13 = 0.4
 nuzx = nu13 * Ez/Ex
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_RESULTS displ stress
-b = 0.05;
-h = 0.02;
+b = 0.05
+h = 0.02
 PRINTF "%.1f %.1f %.1f %.1f %.1f" sigmax(0,b/2,h/2) sigmay(0,b/2,h/2) sigmaz(0,b/2,h/2) tauxy(0,b/2,h/2) tauzx(0,b/2,h/2)
 

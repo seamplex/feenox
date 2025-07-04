@@ -1,13 +1,10 @@
 # this binary was converted from the ASCII with meshio-convert
-READ_MESH two-squares-bin-meshio.msh DIMENSIONS 2
-PROBLEM thermal
+PROBLEM thermal MESH two-squares-bin-meshio.msh DIMENSIONS 2
 
 MATERIAL soft k=0.5+x
 MATERIAL hard k=1.5+2*(x-1)
 
 BC left  T=0
 BC right T=1
-
-SOLVE_PROBLEM
 
 PRINT %.3f T(1,0.5)

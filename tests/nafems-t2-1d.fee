@@ -14,7 +14,7 @@ Tinf = 300    # K
 BC left  T=T0
 BC right q=sigma*e*(Tinf^4-T(x)^4)
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 VAR T'
 T_analytical = root((T'-T0)*k/l + sigma*e*(T'^4-Tinf^4), T', 0, 2000, 1e-12)

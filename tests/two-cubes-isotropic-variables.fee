@@ -1,5 +1,4 @@
-PROBLEM mechanical
-READ_MESH two-cubes.msh
+PROBLEM mechanical MESH two-cubes.msh
 
 E_soft = 1e3
 nu_soft = 0.2
@@ -10,7 +9,7 @@ nu_hard = 0.3
 BC left  fixed
 BC right Fx=1000
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 WRITE_RESULTS FORMAT vtk displacements stresses
 

@@ -1,5 +1,4 @@
-PROBLEM thermal 1D
-READ_MESH slab.msh
+PROBLEM thermal 1D MESH slab.msh
 TK = 273.15
 Tref = 20+TK
 T_guess(x) = Tref
@@ -8,6 +7,5 @@ sigma = 5.670374419e-8
 e = 0.8
 BC left q=1200
 BC right h=sigma*e*(T(x)^2+Tref^2)*(T(x)+Tref) Tref=Tref
-SOLVE_PROBLEM
 
 PRINT T(0.0)-TK-179.747+T(1.0)-TK-155.747+T(0.5)-TK-167.747

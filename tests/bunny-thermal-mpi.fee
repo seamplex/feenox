@@ -21,7 +21,7 @@ PHYSICAL_GROUP rest DIM 2
 convection_coeff = 1
 BC heated h=convection_coeff Tref=1 GROUP base GROUP rest
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 
 INTEGRATE T RESULT integral_of_T

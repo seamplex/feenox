@@ -1,5 +1,4 @@
-PROBLEM thermal 1d
-READ_MESH slab2.msh
+PROBLEM thermal 1d MESH slab2.msh
 
 BC left  T=0
 BC right q=0
@@ -7,7 +6,7 @@ BC right q=0
 k = 1
 q = 1
 
-SOLVE_PROBLEM
+# SOLVE_PROBLEM
 
 INTEGRATE q    RESULT q_total
 REACTION left  RESULT q_left
