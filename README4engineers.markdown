@@ -20,12 +20,13 @@
 > 2.  FeenoX is designed as a [cloud-first][] [back end] for generic
 >     computational workflows to solve engineering-related problems. One
 >     of these many workflows can be point-and-click graphical interface
->     such as [CAEplex] which allows to solve thermo-mechanical problems
->     directly from the browser.
+>     such as [CAEplex] or [SunCAE] which allows to solve
+>     thermo-mechanical problems directly from the browser.
 >
 > 3.  Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If
->     you are using Windows, FeenoX may not be for you (but [CAEplex]
->     may). See below to find out [why] FeenoX works the way it does.
+>     you are using Windows, FeenoX may not be for you (but [CAEplex] or
+>     [SunCAE] may). See below to find out [why] FeenoX works the way it
+>     does.
 
 In plain engineering terms, FeenoX works like a transfer function
 between one or more [input files] and zero or more [output files][]:
@@ -127,6 +128,7 @@ are feeling curious, take a look at what FeenoX has to offer to
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [back end]: https://en.wikipedia.org/wiki/Frontend_and_backend
   [CAEplex]: https://www.caeplex.com
+  [SunCAE]: https:://www.seamplex.com/suncae
   [why]: #why
   [input files]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [output files]: https://seamplex.com/feenox/doc/sds.html#sec:output

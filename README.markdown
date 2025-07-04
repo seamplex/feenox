@@ -42,6 +42,48 @@
 [engineering-related problems] using a computer (or [many computers in
 parallel]) with a [particular design basis].
 
+Consider the following input file:
+
+``` feenox
+PROBLEM mechanical MESH box.msh
+
+T(x,y,z) = sqrt(x^2 + y^2) + z   # non-trivial temperature distribution
+E = 200e3 * (1-T(x,y,z)/300)     # temperature-dependent Young modulus
+nu = 0.3
+
+BC left fixed           # left face fully fixed
+BC top  p=1e4*(1+x)     # top face with a triapezoidal load
+
+WRITE_RESULTS FORMAT vtu
+```
+
+Note that
+
+- The [input file] is made of [simple][] [self-descriptive English][]
+  [keywords]
+- [Material properties and boundary conditions] can be [expressions of
+  $`x`$, $`y`$ and $`z`$]
+- Input mesh is is [Gmsh’s format `.msh`]
+- Output results are in [Paraview’s `.vtk`/`.vtu`
+  formats][Gmsh’s format `.msh`]
+
+Each of these items has a lot of design and usage implications,
+thoroughly discussed in the [Software Design Specification], ranging
+from integrating FeenoX as a back end for different front ends with a
+reasonably low effort (e.g. [SunCAE]), down to suitability for
+interaction with Large Language Models. As a reference, the reader is
+encouraged to compare the above input syntax with any other FEA solver
+and then consider how to ask ChatGPT & friends for help to create an
+input file from scratch. Or how to write a Graphical User Interface that
+would need to create something the solver can read. Plus, it can be
+installed with
+
+``` terminal
+apt install feenox
+```
+
+------------------------------------------------------------------------
+
 Choose your background for further details about the what, how and whys:
 
 - [Industry Engineer]
@@ -83,12 +125,20 @@ work]):
   [engineering-related problems]: #extents
   [many computers in parallel]: https://www.seamplex.com/feenox/doc/sds.html#sec:scalability
   [particular design basis]: https://seamplex.com/feenox/doc/sds.html
+  [input file]: https://www.seamplex.com/feenox/doc/sds.html#sec:input
+  [simple]: https://www.seamplex.com/feenox/doc/sds.html#sec:simple
+  [self-descriptive English]: https://www.seamplex.com/feenox/doc/sds.html#sec:sugar
+  [keywords]: https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
+  [Material properties and boundary conditions]: https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility
+  [expressions of $`x`$, $`y`$ and $`z`$]: https://www.seamplex.com/feenox/doc/sds.html#sec:expression
+  [Gmsh’s format `.msh`]: https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability
+  [Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html
+  [SunCAE]: https://www.seamplex.com/suncae
   [Industry Engineer]: README4engineers.markdown
   [Unix Hacker]: README4hackers.markdown
   [Academic Professor]: README4academics.markdown
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
-  [SunCAE]: https://www.seamplex.com/suncae
   [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup/
 
 ## Extents
@@ -302,7 +352,7 @@ of the [Github repository] for
 - [Manual]
 - [Description]
 - [Software Design Requirements]
-- [Software Design Specification]
+- [Software Design Specification][4]
 - [Unix man page] (accessible through `man feenox` after installation)
 - [History]
 - [Compilation guide]
@@ -316,7 +366,7 @@ of the [Github repository] for
   [Manual]: https://seamplex.com/feenox/doc/feenox-manual.html
   [Description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [Software Design Requirements]: https://seamplex.com/feenox/doc/srs.html
-  [Software Design Specification]: https://seamplex.com/feenox/doc/sds.html
+  [4]: https://seamplex.com/feenox/doc/sds.html
   [Unix man page]: https://seamplex.com/feenox/doc/feenox.1.html
   [History]: doc/history.markdown
   [Compilation guide]: doc/compilation.markdown
@@ -360,7 +410,7 @@ optimization flags. Please compile from source for high-end
 applications. See [detailed compilation instructions].
 
 > - Be aware that FeenoX **does not have a GUI**. Read the
->   [documentation], especially the [description] and the [FAQs][4]. Ask
+>   [documentation], especially the [description] and the [FAQs][5]. Ask
 >   for help on the [GitHub discussions page] if you do now understand
 >   what this means.
 >
@@ -370,7 +420,7 @@ applications. See [detailed compilation instructions].
   [detailed compilation instructions]: docompilation.markdown
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [4]: https://seamplex.com/feenox/doc/FAQ.html
+  [5]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [SunCAE]: https://www.seamplex.com/suncae
 
@@ -426,7 +476,7 @@ hesitate to ask in FeenoX’s [discussion page].
 
     If you do not have Internet access, get the tarball manually, copy
     it to the same directory as `configure` and run again. See the
-    [detailed compilation instructions][5] for an explanation.
+    [detailed compilation instructions][6] for an explanation.
 
 5.  Run test suite (optional)
 
@@ -466,7 +516,7 @@ information.
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [source tarball]: https://seamplex.com/feenox/dist/src/
   [these instructions]: dosource.markdown
-  [5]: compilation.md
+  [6]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
   [compilation guide]: doc/compilation.markdown
 
@@ -508,7 +558,7 @@ text was borrowed from the [Gmsh documentation]. Replacing “Gmsh” with
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][6] version 3 or, at the user convenience, any later version.
+License][7] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[^1]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -576,7 +626,7 @@ chains running over free and open source operating systems.
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [6]: https://www.gnu.org/licenses/gpl-3.0
+  [7]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
   [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
@@ -588,7 +638,7 @@ new types of PDEs and new formulations of existing PDEs. For elliptic
 operators feel free to use the Laplace equation at [`src/pdes/laplace`]
 as a template.
 
-1.  Read the [Programming Guide][7].
+1.  Read the [Programming Guide][8].
 2.  Browse [Github discussions] and open a new thread explaining what
     you want to do and/or asking for help.
 3.  Fork the [Git repository] under your Github account
@@ -608,7 +658,7 @@ Note that
   [hackers]: README4hackers.html
   [academics]: README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [7]: https://seamplex.com/feenox/doc/programming.html
+  [8]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

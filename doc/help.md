@@ -57,6 +57,11 @@ feenox [options] inputfile [replacement arguments] [petsc options]
 :    ask PETSc to use the direct linear solver MUMPS
 
 
+`--gamg`
+
+:    ask PETSc to use a GAMG-preconditioned iterative linear solver
+
+
 Instructions will be read from standard input if "-" is passed as `inputfile`, i.e.
 
 ```terminal

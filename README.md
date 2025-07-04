@@ -16,6 +16,41 @@ toc: true
 
 [FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or [many computers in parallel](https://www.seamplex.com/feenox/doc/sds.html#sec:scalability)) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).
 
+Consider the following input file:
+
+```feenox
+PROBLEM mechanical MESH box.msh
+
+T(x,y,z) = sqrt(x^2 + y^2) + z   # non-trivial temperature distribution
+E = 200e3 * (1-T(x,y,z)/300)     # temperature-dependent Young modulus
+nu = 0.3
+
+BC left fixed           # left face fully fixed
+BC top  p=1e4*(1+x)     # top face with a triapezoidal load
+
+WRITE_RESULTS FORMAT vtu
+```
+
+Note that
+
+ * The [input file](https://www.seamplex.com/feenox/doc/sds.html#sec:input) is made of [simple](https://www.seamplex.com/feenox/doc/sds.html#sec:simple) [self-descriptive English](https://www.seamplex.com/feenox/doc/sds.html#sec:sugar) [keywords](https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
+ * [Material properties and boundary conditions](https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility) can be [expressions of $x$, $y$ and $z$](https://www.seamplex.com/feenox/doc/sds.html#sec:expression)
+ * Input mesh is is [Gmsh's format `.msh`](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
+ * Output results are in [Paraview's `.vtk`/`.vtu` formats](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
+  
+Each of these items has a lot of design and usage implications, thoroughly discussed in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html), ranging from integrating FeenoX as a back end for different front ends with a reasonably low effort (e.g. [SunCAE](https://www.seamplex.com/suncae)), down to suitability for interaction with Large Language Models.
+As a reference, the reader is encouraged to compare the above input syntax with any other FEA solver and then consider how to ask ChatGPT & friends for help to create an input file from scratch.
+Or how to write a Graphical User Interface that would need to create something the solver can read.
+Plus, it can be installed with
+
+```terminal
+apt install feenox
+```
+
+---
+
+Choose your background for further details about the what, how and whys:
+
 ::::: {.only-in-format .html }
 ```{=html}
 <a class="btn btn-lg btn-outline-primary"   href="./README4engineers.md" role="button">FeenoX for Industry Engineers</a>
@@ -24,7 +59,6 @@ toc: true
 ```
 :::::
 
-Choose your background for further details about the what, how and whys:
 
  - [Industry Engineer](./README4engineers.md)
  - [Unix Hacker](./README4hackers.md)

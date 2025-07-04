@@ -1,2 +1,3 @@
   --progress         print ASCII progress bars when solving PDEs
   --mumps            ask PETSc to use the direct linear solver MUMPS
+  --gamg             ask PETSc to use a GAMG-preconditioned iterative linear solver

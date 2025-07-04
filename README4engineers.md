@@ -14,9 +14,9 @@ toc: true
 >
 > 1. [FeenoX](https://www.seamplex.com/feenox) is not a traditional point-and-click finite-element solver. It **does not include** a graphical interface.
 > 
-> 2. FeenoX is designed as a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [back end](https://en.wikipedia.org/wiki/Frontend_and_backend) for generic computational workflows to solve engineering-related problems. One of these many workflows can be point-and-click graphical interface such as [CAEplex](https://www.caeplex.com) which allows to solve thermo-mechanical problems directly from the browser.
+> 2. FeenoX is designed as a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [back end](https://en.wikipedia.org/wiki/Frontend_and_backend) for generic computational workflows to solve engineering-related problems. One of these many workflows can be point-and-click graphical interface such as [CAEplex](https://www.caeplex.com) or [SunCAE](https:://www.seamplex.com/suncae) which allows to solve thermo-mechanical problems directly from the browser.
 >
-> 3. Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If you are using Windows, FeenoX may not be for you (but [CAEplex](https://www.caeplex.com) may). See below to find out [why](#why) FeenoX works the way it does.
+> 3. Since it is a cloud-first tool, FeenoX targets at GNU/Linux. If you are using Windows, FeenoX may not be for you (but [CAEplex](https://www.caeplex.com) or [SunCAE](https:://www.seamplex.com/suncae) may). See below to find out [why](#why) FeenoX works the way it does.
 
 
 In plain engineering terms, FeenoX works like a transfer function between one or more [input files](https://seamplex.com/feenox/doc/sds.html#sec:input) and zero or more [output files](https://seamplex.com/feenox/doc/sds.html#sec:output):
