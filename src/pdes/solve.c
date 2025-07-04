@@ -68,6 +68,9 @@ int feenox_instruction_solve_problem(void *arg) {
   petsc_call(PetscLogStagePop());
   // ---------------------------------------------------------------------------
   
+  // mark that we solved the problem
+  feenox.pde.problem_solved = 1;
+  
 #endif  
   return FEENOX_OK;
 }

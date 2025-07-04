@@ -637,23 +637,13 @@ double feenox_expression_eval(expr_t *this) {
   size_t j = 0;
   expr_item_t *item = NULL;
   
-//#define DEBUG
-#ifdef DEBUG
-  printf("\n------ %s -----------\n", this->string);
-#endif  
   LL_FOREACH(this->items, item) {
-#ifdef DEBUG
-    printf("factor level %ld\n", item->level);
-#endif  
     item->tmp_level = item->level;
 
     // TODO: replace the switch by pointer to functions (i.e. virtual methods in C++ slang)?
     switch(item->type & EXPR_BASICTYPE_MASK) {
       case EXPR_CONSTANT:
         item->value = item->constant;
-#ifdef DEBUG
-        printf("constant = %g\n", item->value);
-#endif  
       break;
         
       case EXPR_VARIABLE:
@@ -668,9 +658,6 @@ double feenox_expression_eval(expr_t *this) {
             item->value = *(item->variable->initial_static);
           break;
         }
-#ifdef DEBUG
-        printf("variable %s = %g\n", item->variable->name, item->value);
-#endif  
 
       break;
       case EXPR_VECTOR:
@@ -740,9 +727,6 @@ double feenox_expression_eval(expr_t *this) {
 
       case EXPR_BUILTIN_FUNCTION:
         item->value = item->builtin_function->routine(item);
-#ifdef DEBUG
-        printf("builtin function %s = %g\n", item->builtin_function->name, item->value);
-#endif  
       break;
       case EXPR_BUILTIN_VECTORFUNCTION:
         item->value = item->builtin_vectorfunction->routine(item->vector_arg);
@@ -752,19 +736,8 @@ double feenox_expression_eval(expr_t *this) {
       break;
       case EXPR_FUNCTION:
         item->value = feenox_factor_function_eval(item);
-#ifdef DEBUG
-        printf("user function %s = %g\n", item->function->name, item->value);
-#endif  
       break;
- 
-#ifdef DEBUG
-      default:
-        printf("operator %ld\n", item->oper);
-#endif  
     }
-#ifdef DEBUG
-    printf("\n");
-#endif  
   }
 
   // get the highest level

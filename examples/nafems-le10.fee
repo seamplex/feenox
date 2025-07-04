@@ -38,13 +38,11 @@ BC midplane w=0      #  z displacements fixed along mid-plane
 E = 210e3   # Young modulus in MPa
 nu = 0.3    # Poisson's ratio
 
-SOLVE_PROBLEM   # solve!
-
 # print the direct stress y at D (and nothing more)
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+PRINTF "sigma_y @ D = %g Mpa" sigmay(2000,0,300)
 
 # write post-processing data for paraview
-# WRITE_MESH nafems-le10.vtu sigmay VECTOR u v w
+WRITE_RESULTS FORMAT vtu 
 ---
 figures: |
   ![Normal stress $\sigma_y$ refined around point\ $D$ over 5,000x-warped displacements for LE10 created with Paraview](nafems-le10.png){width_latex=75% width_html=100%}

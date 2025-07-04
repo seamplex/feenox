@@ -629,6 +629,9 @@ struct function_t {
 //  double (*routine_internal)(const double *, function_t *);
 //  void *params;
   
+  // if this is true, we can hint feenox to do the implicit SOLVE_PROBLEM
+  int is_solution;
+  
   // if this is true and the parser sees this function,
   // then pde.compute_gradients is set to true
   int is_gradient;   
@@ -1781,6 +1784,8 @@ struct feenox_t {
     
     int do_not_solve;        // flag to skip solves in particular cases (e.g. convert to other format)
     int compute_gradients;   // do we need to compute gradients?
+    int problem_solved;      // status to detect implicit SOLVE_PROBLEMs
+    
     void *missed_dump;
 //    gsl_matrix *m2;
     

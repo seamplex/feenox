@@ -375,6 +375,7 @@ int feenox_problem_define_solution_function(const char *name, function_t **funct
   (*function)->var_argument = feenox.pde.solution[0]->var_argument;
   (*function)->type = (feenox.mesh.default_field_location == field_location_cells) ? function_type_pointwise_mesh_cell : function_type_pointwise_mesh_node;
   (*function)->is_gradient = is_gradient;
+  (*function)->is_solution = 1;
 
   return FEENOX_OK;
 }

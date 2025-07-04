@@ -33,6 +33,7 @@ int feenox_run(void) {
     // TODO
 //    feenox_debug();
 
+    feenox.pde.problem_solved = 0;
     feenox_special_var_value(step_static) = feenox_special_var_value(step_static) + 1;
     if ((int)feenox_special_var_value(step_static) != 1 &&
         (int)feenox_special_var_value(step_static) == (int)feenox_special_var_value(static_steps)) {
@@ -71,6 +72,7 @@ int feenox_run(void) {
   feenox_special_var_value(in_transient_first) = 1;
   while (feenox_special_var_value(done) == 0) {
 
+  feenox.pde.problem_solved = 0;
 //    feenox_debug();
     
     feenox_special_var_value(step_transient)++;

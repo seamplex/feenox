@@ -236,36 +236,17 @@ int feenox_function_set_args(function_t *this, double *x) {
 // the arguments are inside the structure
 double feenox_factor_function_eval(expr_item_t *this) {
 
-  double y = 0;
-
-  // in order to avoid having to allocate and free too much,
-  // one-dimensional functions are treated differently
-  if (this->function->n_arguments == 1) {
-    
-    double x0 = feenox_expression_eval(&this->arg[0]);
-    y = feenox_function_eval(this->function, &x0);
-
-  } else {
-
-    double *x = NULL;
-    feenox_check_alloc(x = calloc(this->function->n_arguments, sizeof(double)));
-
-    unsigned int i;
-    for (i = 0; i < this->function->n_arguments; i++) {
-      x[i] = feenox_expression_eval(&this->arg[i]);
-    }
-
-    y = feenox_function_eval(this->function, x);
-    feenox_free(x);
-    
+  double x[this->function->n_arguments];
+  for (int i = 0; i < this->function->n_arguments; i++) {
+    x[i] = feenox_expression_eval(&this->arg[i]);
   }
+  double  y = feenox_function_eval(this->function, x);
 
   if (gsl_isnan(y) || gsl_isinf(y)) {
     feenox_nan_error();
   }
 
   return y;
-
 }
 
 
@@ -508,6 +489,12 @@ double feenox_function_eval(function_t *this, const double *const_x) {
   // y is the returned value
   double y = 0;
   
+  // implicit SOLVE_PROBLEM
+  if (this->is_solution && feenox.pde.problem_solved == 0) {
+    feenox_call(feenox_instruction_solve_problem(NULL));
+  }
+  
+  
   // if x is null we assume it is a 3d-vector with zeroes
   const double *x = (const_x != NULL) ? const_x : zero;
   
@@ -517,12 +504,15 @@ double feenox_function_eval(function_t *this, const double *const_x) {
     // but T(x,y,z) itself is not ready before SOLVE_PROBLEM so we have to look
     // for the initial condition T_0(x,y,z)...
     if (this->algebraic_expression.items == NULL && this->mesh == NULL && this->vector_argument == NULL) {
-      function_t *initial = feenox_get_function_ptr("T_0");
+      char *initial_condition_name;
+      feenox_check_minusone(asprintf(&initial_condition_name, "%s_0", this->name));
+      function_t *initial = feenox_get_function_ptr("initial_condition_name");
+      feenox_free(initial_condition_name);
       if (initial != NULL) {
         return feenox_function_eval(initial, x);
       } else {
         feenox_push_error_message("function '%s' is not ready to be used and no initial condition '%s_0' found", this->name, this->name);
-        return FEENOX_ERROR;
+        feenox_runtime_error();
       }
     }
       

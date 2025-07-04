@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines to handle mechanical BCs
  *
- *  Copyright (C) 2021-2023 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
