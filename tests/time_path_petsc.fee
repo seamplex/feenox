@@ -10,7 +10,7 @@ T_0(x,y) = 0
 end_time = 17.5
 TIME_PATH 1 10/2 end_time/2 10
 
-# SOLVE_PROBLEM
+SOLVE_PROBLEM
 
 # PRINT t
 IF in_static|in_time_path|done
