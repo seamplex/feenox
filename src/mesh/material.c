@@ -101,7 +101,7 @@ property_t *feenox_define_property_get_ptr(const char *name, mesh_t *mesh) {
   // that depends on x,y,z (or the dimension of the mesh)
   function_t *function = feenox_get_function_ptr(name);
   if (function != NULL) {
-    if (function->n_arguments != actual_mesh->dim) {
+    if (function->n_arguments != 0 && function->n_arguments != actual_mesh->dim) {
       feenox_push_error_message("there already exists a function named '%s' and it has %d arguments instead of %d", name, function->n_arguments, actual_mesh->dim);
       return NULL;  
     }
