@@ -54,7 +54,7 @@ mesh entities (in this case the mapping is not needed but in
 nothing less.
 
 <figure id="fig:nafems-le10">
-<img src="nafems-le10-problem-input.svg" style="width:100.0%"
+<img src="doc/nafems-le10-problem-input.svg" style="width:100.0%"
 alt="Figure 1: The NAFEMS LE10 problem statement and the corresponding FeenoX input" />
 <figcaption aria-hidden="true">Figure 1: The NAFEMS LE10 problem
 statement and the corresponding FeenoX input</figcaption>
@@ -67,8 +67,7 @@ for details). Then, we can create an input file for FeenoX (using
 
 ``` feenox
 # NAFEMS Benchmark LE-10: thick plate pressure
-PROBLEM mechanical DIMENSIONS 3
-READ_MESH nafems-le10.msh   # mesh in millimeters
+PROBLEM mechanical MESH nafems-le10.msh   # mesh in millimeters
 
 # LOADING: uniform normal pressure on the upper surface
 BC upper    p=1      # 1 Mpa
@@ -80,13 +79,11 @@ BC BCB'C'   u=0 v=0  # Face BCB'C' x and y displ. fixed
 BC midplane w=0      #  z displacements fixed along mid-plane
 
 # MATERIAL PROPERTIES: isotropic single-material properties
-E = 210e3   # Young modulus in MPa
-nu = 0.3    # Poisson's ratio
-
-SOLVE_PROBLEM   # solve!
+E = 210 * 1e3   # Young modulus in MPa
+nu = 0.3        # Poisson's ratio
 
 # print the direct stress y at D (and nothing more)
-PRINT "σ_y @ D = " sigmay(2000,0,300) "MPa"
+PRINTF "σ_y @ D = %.4f MPa" sigmay(2000,0,300)
 ```
 
 > **Heads up!** The `.msh` file from Gmsh can be either

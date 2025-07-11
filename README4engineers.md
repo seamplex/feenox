@@ -34,7 +34,7 @@ There is no need to give extra settings if the problem does not ask for them.
 Note that since the problem has only one volume, `E` means "the" Young modulus.
 No need to deal with a map between materials and mesh entities (in this case the mapping is not needed but in [multi-material problems](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other) the mapping is needed indeed). Nothing more, nothing less.
 
-![The NAFEMS LE10 problem statement and the corresponding FeenoX input](nafems-le10-problem-input.svg){#fig:nafems-le10 width=100% }
+![The NAFEMS LE10 problem statement and the corresponding FeenoX input](doc/nafems-le10-problem-input.svg){#fig:nafems-le10 width=100% }
 
 Say we already have a [`nafems-le10.geo`](https://github.com/seamplex/feenox/blob/main/examples/nafems-le10.geo) file which tells [Gmsh](http://gmsh.info/) how to create a mesh `nafems-le10.msh` (check out the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) for details).
 Then, we can create an input file for FeenoX (using [editors with syntax highlighting](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) for example) as follows:
