@@ -39,7 +39,7 @@ E = 210e3   # Young modulus in MPa
 nu = 0.3    # Poisson's ratio
 
 # print the direct stress y at D (and nothing more)
-PRINTF "sigma_y @ D = %g MPa" sigmay(2000,0,300)
+PRINTF "σ_y @ D = %.4f MPa" sigmay(2000,0,300)
 
 # write post-processing data for paraview
 WRITE_RESULTS FORMAT vtu 
