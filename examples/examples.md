@@ -64,6 +64,7 @@
   - [Temperature-dependent material
   properties](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties)
   - [Two cubes compressing each other](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other)
+  - [Steel/aluminum paradox](https://seamplex.com/feenox/examples/mechanical.html#steelaluminum-paradox)
 - Mechanical modal analysis
   - [Optimizing the length of a tuning
   fork](https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork)

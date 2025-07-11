@@ -20,6 +20,7 @@
   material properties]
 - [<span class="toc-section-number">9</span> Two cubes compressing each
   other]
+- [<span class="toc-section-number">10</span> Steel/aluminum paradox]
 
   [<span class="toc-section-number">1</span> NAFEMS LE10 “Thick plate pressure” benchmark]:
     #nafems-le10-thick-plate-pressure-benchmark
@@ -41,6 +42,7 @@
     #temperature-dependent-material-properties
   [<span class="toc-section-number">9</span> Two cubes compressing each other]:
     #two-cubes-compressing-each-other
+  [<span class="toc-section-number">10</span> Steel/aluminum paradox]: #steelaluminum-paradox
 
 # NAFEMS LE10 “Thick plate pressure” benchmark
 
@@ -110,20 +112,18 @@ BC midplane w=0      #  z displacements fixed along mid-plane
 E = 210e3   # Young modulus in MPa
 nu = 0.3    # Poisson's ratio
 
-SOLVE_PROBLEM   # solve!
-
 # print the direct stress y at D (and nothing more)
-PRINT "sigma_y @ D = " sigmay(2000,0,300) "MPa"
+PRINTF "sigma_y @ D = %g MPa" sigmay(2000,0,300)
 
 # write post-processing data for paraview
-# WRITE_MESH nafems-le10.vtu sigmay VECTOR u v w
+WRITE_RESULTS FORMAT vtu 
 ```
 
 ``` terminal
 $ gmsh -3 nafems-le10.geo
 [...]
 $ feenox nafems-le10.fee
-sigma_y @ D =   -5.38016        MPa
+sigma_y @ D = -5.37968 MPa
 $
 ```
 
@@ -994,4 +994,85 @@ alt="Displacements and von Mises stresses from WRITE_RESULTS" />
 <img src="two-cubes-right-cells.png" style="width:48.0%" alt="b" /></p>
 <figcaption><p>Figure 6: Von Mises stresses non-zero only over the right
 (hard) cube.. a — Data at nodes, b — Data at cells</p></figcaption>
+</figure>
+
+# Steel/aluminum paradox
+
+> Can the maximum displacement decrease if we replace one of the steel
+> components in the assembly by an aluminum component of the same
+> geometry?
+>
+> Source:
+> <https://www.linkedin.com/posts/mir-abbas-77654764_can-deflection-decrease-with-youngs-modulus-activity-7349026944690081794-7Rc0>
+
+Consider the following configuration
+
+<figure>
+<img src="steel-alum.svg" alt="Steel/aluminum paradox" />
+<figcaption aria-hidden="true">Steel/aluminum paradox</figcaption>
+</figure>
+
+for the following two cases:
+
+1.  blue and pink is steel
+2.  blue is steel and pink is aluminum
+
+We can create this geometry in Gmsh as
+
+``` c
+SetFactory("OpenCASCADE");
+Box(1) = {0, 0, 0, 5.5, 1, 1};
+Box(2) = {5, 1, 0, 5, 1, 1};
+Box(3) = {10, 1, 0, 5, 1, 1};
+Coherence;
+Mesh.MeshSizeMax = 0.2;
+Mesh.ElementOrder = 2;
+
+Physical Volume("pink") = { 1 };
+Physical Volume("blue") = { 2, 3 };
+Physical Surface("fixed", 35) = {1};
+Physical Surface("2p", 36) = {8};
+Physical Surface("p", 37) = {14};
+Physical Curve("pin", 38) = {19};
+```
+
+and then call FeenoX twice with either `steel` or `alum` in the command
+line to see which case has a larger deflection.
+
+``` feenox
+PROBLEM mechanical MESH steel-alum.msh
+
+MATERIAL steel E=210e3 nu=0.3
+MATERIAL alum  E=69e3  nu=0.25
+
+# choose the material for the pink block from command line
+PHYSICAL_GROUP pink MATERIAL $1
+PHYSICAL_GROUP blue MATERIAL steel
+
+BC fixed fixed
+BC pin v=0
+F = 1000
+BC p  Fy=-F
+BC 2p Fy=-2*F
+
+WRITE_RESULTS FORMAT vtu
+PRINT %.1f displ_max
+```
+
+``` terminal
+$ gmsh -3 steel-alum.geo
+[...]
+$ feenox steel-alum.fee steel
+3.9
+$ feenox steel-alum.fee alum
+2.6
+$ 
+```
+
+<figure id="fig:steel-alum" class="subfigures">
+<p><img src="steel-alum-steel.png" style="width:48.0%" alt="a" /> <img
+src="steel-alum-alum.png" style="width:48.0%" alt="b" /></p>
+<figcaption><p>Figure 7: The Steel/aluminum paradox: replacing steel
+with aluminum gives rise to smaller maximum displacements.. a — Pink is
+steel, b — Pink is aluminum</p></figcaption>
 </figure>

@@ -491,7 +491,9 @@ double feenox_function_eval(function_t *this, const double *const_x) {
   
   // implicit SOLVE_PROBLEM
   if (this->is_solution && feenox.pde.problem_solved == 0) {
-    feenox_call(feenox_instruction_solve_problem(NULL));
+    if (feenox_instruction_solve_problem(NULL) != FEENOX_OK) {
+      feenox_runtime_error();
+    }
   }
   
   

@@ -131,6 +131,7 @@ propose benchmark problems to add to the suite.
   - [Thermo-elastic expansion of finite cylinders]
   - [Temperature-dependent material properties]
   - [Two cubes compressing each other]
+  - [Steel/aluminum paradox]
 - Mechanical modal analysis
   - [Optimizing the length of a tuning fork]
   - [Five natural modes of a cantilevered wire]
@@ -189,6 +190,7 @@ propose benchmark problems to add to the suite.
   [Thermo-elastic expansion of finite cylinders]: https://seamplex.com/feenox/examples/mechanical.html#thermo-elastic-expansion-of-finite-cylinders
   [Temperature-dependent material properties]: https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties
   [Two cubes compressing each other]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
+  [Steel/aluminum paradox]: https://seamplex.com/feenox/examples/mechanical.html#steelaluminum-paradox
   [Optimizing the length of a tuning fork]: https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork
   [Five natural modes of a cantilevered wire]: https://seamplex.com/feenox/examples/modal.html#five-natural-modes-of-a-cantilevered-wire
   [IAEA 2D PWR Benchmark]: https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-2d-pwr-benchmark

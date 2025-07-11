@@ -58,6 +58,7 @@ for i in hello          \
          point                 \
          airfoil               \
          buffon                \
+         steel-alum            \
   ; do
   in=${i}.fee
   out=$(grep category ${in} | cut -d: -f2 | xargs).md

@@ -19,7 +19,7 @@ terminal: |
   $ gmsh -3 nafems-le10.geo
   [...]
   $ feenox nafems-le10.fee
-  sigma_y @ D =   -5.38016        MPa
+  sigma_y @ D = -5.37968 MPa
   $
 ...
 # NAFEMS Benchmark LE-10: thick plate pressure
@@ -39,7 +39,7 @@ E = 210e3   # Young modulus in MPa
 nu = 0.3    # Poisson's ratio
 
 # print the direct stress y at D (and nothing more)
-PRINTF "sigma_y @ D = %g Mpa" sigmay(2000,0,300)
+PRINTF "sigma_y @ D = %g MPa" sigmay(2000,0,300)
 
 # write post-processing data for paraview
 WRITE_RESULTS FORMAT vtu 
