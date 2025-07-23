@@ -79,16 +79,23 @@ int feenox_problem_solve_petsc_linear(void) {
     petsc_call(KSPSolve(feenox.pde.ksp, feenox.pde.b_bc, feenox.pde.phi));
 
     // check for convergence
-    KSPConvergedReason reason = 0;
-    petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &reason));
-    if (reason < 0) {
+    KSPConvergedReason ksp_reason = 0;
+    petsc_call(KSPGetConvergedReason(feenox.pde.ksp, &ksp_reason));
+    if (ksp_reason < 0) {
       // if the input file asks for a DUMP then we do it now
       if (feenox.pde.dumps != NULL) {
         feenox_instruction_dump((void *)feenox.pde.dumps);
       }
-
-      feenox_push_error_message("PETSc's linear solver did not converge with reason '%s' (%d)", KSPConvergedReasons[reason], reason);
-      // TODO: dive into the PC
+      
+      if (ksp_reason == KSP_DIVERGED_PC_FAILED) {
+        PC pc;
+        petsc_call(KSPGetPC(feenox.pde.ksp, &pc));
+        PCFailedReason pc_reason;
+        petsc_call(PCGetFailedReason(pc, &pc_reason));
+        feenox_push_error_message("PETSc's pre-conditioner failed '%s' (%d)", PCFailedReasons[pc_reason], pc_reason);
+      } else {
+        feenox_push_error_message("PETSc's linear solver did not converge '%s' (%d)", KSPConvergedReasons[ksp_reason], ksp_reason);
+      }
       return FEENOX_ERROR;
     }
   }
@@ -283,13 +290,38 @@ int feenox_problem_setup_pc(PC pc) {
   MatSolverType mat_solver_type = NULL;
   petsc_call(PCFactorGetMatSolverType(pc, &mat_solver_type));
   if (mat_solver_type != NULL && strcmp(mat_solver_type, MATSOLVERMUMPS) == 0) {
-    if (feenox_var_value(feenox.pde.vars.mumps_icntl_14) != 0) {
-#if PETSC_VERSION_LT(3,20,0)
-      petsc_call(PCSetUp(pc));
-#endif
-      Mat F;
-      petsc_call(PCFactorGetMatrix(pc, &F));
-      petsc_call(MatMumpsSetIcntl(F, 14, (PetscInt)feenox_var_value(feenox.pde.vars.mumps_icntl_14)));
+    // calling MatMumpsSetCntl()/MatMumpsSetIcntl() needs the matrices to be created
+    // and when using SNES that does not happen until the first newton-raphson iteration
+    // this is far simpler for us
+    
+    char *value_s = NULL;
+    double value_f = 0;
+    if ((value_f = feenox_var_value(feenox.pde.vars.mumps_cntl_1)) != 0) {
+      feenox_check_minusone(asprintf(&value_s, "%g", value_f));
+      if (feenox.pde.math_type != math_type_eigen) {
+        petsc_call(PetscOptionsSetValue(NULL, "-mat_mumps_cntl_1", value_s));
+      } else {
+        petsc_call(PetscOptionsSetValue(NULL, "-st_mat_mumps_cntl_1", value_s));
+      }
+      feenox_free(value_s);
+    }
+    if ((value_f = feenox_var_value(feenox.pde.vars.mumps_icntl_14)) != 0) {
+      feenox_check_minusone(asprintf(&value_s, "%g", value_f));
+      if (feenox.pde.math_type != math_type_eigen) {
+        petsc_call(PetscOptionsSetValue(NULL, "-mat_mumps_icntl_14", value_s));
+      } else {
+        petsc_call(PetscOptionsSetValue(NULL, "-st_mat_mumps_icntl_14", value_s));
+      }
+      feenox_free(value_s);
+    }
+    if ((value_f = feenox_var_value(feenox.pde.vars.mumps_icntl_24)) != 0) {
+      feenox_check_minusone(asprintf(&value_s, "%g", value_f));
+      if (feenox.pde.math_type != math_type_eigen) {
+        petsc_call(PetscOptionsSetValue(NULL, "-mat_mumps_icntl_24", value_s));
+      } else {
+        petsc_call(PetscOptionsSetValue(NULL, "-st_mat_mumps_icntl_24", value_s));
+      }
+      feenox_free(value_s);
     }
   }
 #endif

@@ -221,6 +221,15 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox.pde.vars.eps_st_nu = feenox_define_variable_get_ptr("eps_st_nu");
 ///va+eps_st_nu+detail Default is zero (but some PDEs can change it).
   feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
+
+///va+mumps_cntl_1+name mumps_cntl_1
+///va+mumps_cntl_1 MUMPS cntl value with the offset 1, relative threshold for numerical pivoting
+///va+mumps_cntl_1+detail It forms a trade-off between preserving sparsity and ensuring numerical stability during
+///va+mumps_cntl_1+detail the factorization. In general, a larger value of `CNTL(1)` increases fill-in but leads to
+///va+mumps_cntl_1+detail a more accurate factorization.
+  feenox.pde.vars.mumps_cntl_1 = feenox_define_variable_get_ptr("mumps_cntl_1");
+///va+mumps_cntl_1+detail Default is $10^{-3}$
+  feenox_var_value(feenox.pde.vars.mumps_cntl_1) = 1e-3;
   
 ///va+mumps_icntl_14+name mumps_icntl_14
 ///va+mumps_icntl_14 MUMPS icntl value with the offset 14, relaxation value for the internal array.
@@ -228,6 +237,14 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox.pde.vars.mumps_icntl_14 = feenox_define_variable_get_ptr("mumps_icntl_14");
 ///va+mumps_icntl_14+detail Default is zero, which means use MUMPS default.
   feenox_var_value(feenox.pde.vars.mumps_icntl_14) = 0;
+
+///va+mumps_icntl_24+name mumps_icntl_24
+///va+mumps_icntl_24 MUMPS icntl value with the offset 24, flag to detect null pivot rows.
+///va+mumps_icntl_24+detail For most problems, it is ok to leave this flag as true (default).
+///va+mumps_icntl_24+detail For very particular problems, it might be needed to turn it off.
+  feenox.pde.vars.mumps_icntl_24 = feenox_define_variable_get_ptr("mumps_icntl_24");
+///va+mumps_icntl_14+detail Default is true, which asks MUMPS to detect (and handle) null pivot rows.
+  feenox_var_value(feenox.pde.vars.mumps_icntl_24) = 1;
   
 ///va+gamg_threshold+name gamg_threshold
 ///va+gamg_threshold Relative threshold to use for dropping edges in aggregation graph when using GAMG.
