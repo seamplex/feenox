@@ -240,6 +240,11 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
             
       } else if (last_op == '\0' || last_op == ')') {
         
+        if (*string == ',') {
+          feenox_push_error_message("unexpected comma in '%s' (note that decimal separator is dot)", orig_string);
+          feenox_free(string_copy);
+          return FEENOX_ERROR;
+        }
         feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
         item->type = EXPR_OPERATOR;
         // precedence two by two from left to right

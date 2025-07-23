@@ -28,6 +28,7 @@ TESTS_general = \
         tests/cog.sh \
         tests/expressions.sh \
         tests/expressions_constants.sh \
+        tests/xfail-expressions_comma.sh \
         tests/exp.sh \
         tests/iterative.sh \
         tests/fit.sh \
@@ -131,6 +132,7 @@ TESTS_serial = $(TESTS_general) $(TESTS_laplace) $(TESTS_mechanical) $(TESTS_mod
 TESTS = $(TESTS_serial) $(TESTS_mpi)
         
 XFAIL_TESTS = tests/abort.sh \
+              tests/xfail-expressions_comma.sh \
               tests/xfail-data-variable.sh \
               tests/thermal-slab-no-k.sh \
               tests/thermal-slab-wrong-bc.sh \
