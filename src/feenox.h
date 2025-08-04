@@ -1401,6 +1401,8 @@ struct mesh_write_t {
   } post_format;
 
   int no_physical_names;
+  size_t base_extension_offset;
+  char *base_extension;
   field_location_t field_location;
   char *printf_format;
   

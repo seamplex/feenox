@@ -72,7 +72,7 @@ int feenox_run(void) {
   feenox_special_var_value(in_transient_first) = 1;
   while (feenox_special_var_value(done) == 0) {
 
-  feenox.pde.problem_solved = 0;
+    feenox.pde.problem_solved = 0;
 //    feenox_debug();
     
     feenox_special_var_value(step_transient)++;

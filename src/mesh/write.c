@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related post-processing generation routines
  *
- *  Copyright (C) 2014--2021 Jeremy Theler
+ *  Copyright (C) 2014--2025 Jeremy Theler
  *
  *  This file is part of feenox.
  *
@@ -27,26 +27,58 @@ int feenox_instruction_mesh_write(void *arg) {
   }
 
   mesh_write_t *mesh_write = (mesh_write_t *)arg;
-  mesh_write_dist_t *mesh_write_dist;
 
   // TODO: in parallel runs only print from first processor
   if (feenox.mpi_rank != 0) {
     return FEENOX_OK;
   }
-  
-  if (feenox_special_var(end_time) == 0) {
-    // close the file and open it again
+
+  if (mesh_write->post_format == post_format_gmsh) {  
+    // in gmsh we put all the transient steps in the same file
+    if (feenox_special_var(end_time) == 0) {
+      // close the file and open it again
+      if (mesh_write->file->pointer != NULL) {
+        feenox_call(feenox_instruction_file_close(mesh_write->file));
+      }
+      feenox_call(feenox_instruction_file_open(mesh_write->file));
+    }
+  } else if (feenox_special_var(end_time) > 0) {
+    // in other formats we have to write one file per time step  
     if (mesh_write->file->pointer != NULL) {
       feenox_call(feenox_instruction_file_close(mesh_write->file));
     }
-    feenox_call(feenox_instruction_file_open(mesh_write->file));  
-  } else {
-    if (mesh_write->file->pointer == NULL) {
-      feenox_call(feenox_instruction_file_open(mesh_write->file));  
+    
+    char new_file_format[strlen(mesh_write->file->format) + 32];
+    char *ext = mesh_write->file->format + mesh_write->base_extension_offset;
+    if (mesh_write->base_extension_offset == 0) {
+      if ((ext = strrchr(mesh_write->file->format, '.')) == NULL) {
+        feenox_push_error_message("output path '%s' needs an extension", mesh_write->file->format);
+        return FEENOX_ERROR;
+      }
+      mesh_write->base_extension_offset = ext - mesh_write->file->format;
+      mesh_write->base_extension = strdup(ext+1);
     }
+    *ext = '\0';
+    
+    strcpy(new_file_format, mesh_write->file->format);
+    char string_step[32];
+    snprintf(string_step, 32, "-%g", feenox_special_var_value(step_transient));
+    strcat(new_file_format, string_step);
+    int n = strlen(new_file_format);
+    new_file_format[n] = '.';
+    new_file_format[n+1] = '\0';
+    strcat(new_file_format, mesh_write->base_extension);
+    
+    feenox_free(mesh_write->file->format);
+    mesh_write->file->format = strdup(new_file_format);
+
+  }
+
+  if (mesh_write->file->pointer == NULL) {
+    feenox_call(feenox_instruction_file_open(mesh_write->file));
   }  
 
-
+  // this makes sense only for gmsh
   if (ftell(mesh_write->file->pointer) == 0) {
     feenox_call(mesh_write->write_header(mesh_write->mesh, mesh_write->file->pointer));
     if (mesh_write->no_mesh == 0) {
@@ -55,6 +87,7 @@ int feenox_instruction_mesh_write(void *arg) {
     mesh_write->point_init = 0;
   }
 
+  mesh_write_dist_t *mesh_write_dist = NULL;
   LL_FOREACH(mesh_write->mesh_write_dists, mesh_write_dist) {
     if (mesh_write_dist->field_location == field_location_cells && mesh_write->mesh->n_cells == 0) {
       feenox_call(feenox_mesh_element2cell(mesh_write->mesh));
