@@ -35,14 +35,14 @@ int feenox_instruction_mesh_write(void *arg) {
 
   if (mesh_write->post_format == post_format_gmsh) {  
     // in gmsh we put all the transient steps in the same file
-    if (feenox_special_var(end_time) == 0) {
+    if (feenox_special_var_value(end_time) == 0) {
       // close the file and open it again
       if (mesh_write->file->pointer != NULL) {
         feenox_call(feenox_instruction_file_close(mesh_write->file));
       }
       feenox_call(feenox_instruction_file_open(mesh_write->file));
     }
-  } else if (feenox_special_var(end_time) > 0) {
+  } else if (feenox_special_var_value(end_time) > 0) {
     // in other formats we have to write one file per time step  
     if (mesh_write->file->pointer != NULL) {
       feenox_call(feenox_instruction_file_close(mesh_write->file));
