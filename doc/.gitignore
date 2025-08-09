@@ -64,3 +64,6 @@ mechanical-square-temperature.vtk
 mechanical-square-temperature-from-msh.vtk
 fins.msh
 fins.vtk
+
+nafems-le10-problem-input.png
+

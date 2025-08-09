@@ -16,11 +16,6 @@ T_0(x,y) = 0
 
 end_time = 17.25
 
-T_q1_ref = 2.3872
-T_q2_ref = 1.1972
-T_q3_ref = 1.5903
-T_q4_ref = 1.5903
-
 SOLVE_PROBLEM
 
 PRINT t
@@ -33,6 +28,11 @@ IF done
  INTEGRATE T OVER quadrant4 RESULT int_q4
  area = 1.5^2
 
+ # reference solutions
+ T_q1_ref = 2.3872
+ T_q2_ref = 1.1972
+ T_q3_ref = 1.5903
+ T_q4_ref = 1.5903
  PRINT int_q1/area-T_q1_ref
  PRINT int_q2/area-T_q2_ref
  PRINT int_q3/area-T_q3_ref

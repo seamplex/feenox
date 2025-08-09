@@ -21,6 +21,7 @@ fork*.msh
 fork.dat
 *.vtk
 *.vtu
+*.pvd
 nafems-le11.msh
 nafems-le1.msh
 nafems-le1.pvsm
@@ -43,6 +44,7 @@ thermal-square-temperature.msh
 square-centered-unstruct.msh
 square-centered.msh
 wilson-*.msh
+wilson-*.vtu
 two-zone-*.dat
 two-zone-*.msh
 ab.geo
@@ -109,9 +111,17 @@ buffon*.dat
 barra3d.msh
 barra3d-transient.msh
 barra3d.pdf
+profile-0.dat
+profile-1.dat
+profile-10.dat
+profile-100.dat
+profile-1000.dat
+profile-500.dat
+profiles.dat
 
 gnl-straight-cantilever.msh
 
 steel-alum.msh
 steel-alum-alum.vtu
 steel-alum-steel.vtu
+

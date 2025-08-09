@@ -40,6 +40,7 @@ SOLVE_PROBLEM
 PRINT t
 
 WRITE_MESH maze-tran-bu.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+WRITE_RESULTS FILE maze-tran-td.vtu
 ---
 figures: |
   ![Transient bottom-up solution. The first attempt does not seem to be good.](maze-tran-bu.gif){width_html=100% width_latex=50%}

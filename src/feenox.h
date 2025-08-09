@@ -1391,6 +1391,7 @@ struct mesh_write_dist_t {
 struct mesh_write_t {
   mesh_t *mesh;
   file_t *file;
+  file_t *file_pvd;
   int no_mesh;
   
   enum  {

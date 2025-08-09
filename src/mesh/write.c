@@ -33,6 +33,7 @@ int feenox_instruction_mesh_write(void *arg) {
     return FEENOX_OK;
   }
 
+  // I don't like these ifs, there should be some "virtual method"
   if (mesh_write->post_format == post_format_gmsh) {  
     // in gmsh we put all the transient steps in the same file
     if (feenox_special_var_value(end_time) == 0) {
@@ -43,6 +44,31 @@ int feenox_instruction_mesh_write(void *arg) {
       feenox_call(feenox_instruction_file_open(mesh_write->file));
     }
   } else if (feenox_special_var_value(end_time) > 0) {
+    // check if we have to start a pvd
+    if (mesh_write->file_pvd == NULL) {
+      feenox_check_alloc(mesh_write->file_pvd = calloc(1, sizeof(file_t)));
+      feenox_check_alloc(mesh_write->file_pvd->format = strdup(mesh_write->file->format));
+      mesh_write->file_pvd->n_format_args = mesh_write->file->n_format_args;
+      mesh_write->file_pvd->arg = mesh_write->file->arg;
+      feenox_check_alloc(mesh_write->file_pvd->mode = strdup("w"));
+      
+      // change extension to pvd
+      char *dot = NULL;
+      if ((dot = strrchr(mesh_write->file_pvd->format, '.')) == NULL) {
+        feenox_push_error_message("output path '%s' needs an extension", mesh_write->file->format);
+        return FEENOX_ERROR;
+      }
+      dot[1] = 'p';
+      dot[2] = 'v';
+      dot[3] = 'd';
+      
+      feenox_call(feenox_instruction_file_open(mesh_write->file_pvd));
+      
+      fprintf(mesh_write->file_pvd->pointer, "<VTKFile type=\"Collection\" version=\"1.0\">\n");
+      fprintf(mesh_write->file_pvd->pointer, " <Collection>\n");
+    }  
+      
+      
     // in other formats we have to write one file per time step  
     if (mesh_write->file->pointer != NULL) {
       feenox_call(feenox_instruction_file_close(mesh_write->file));
@@ -71,14 +97,14 @@ int feenox_instruction_mesh_write(void *arg) {
     
     feenox_free(mesh_write->file->format);
     mesh_write->file->format = strdup(new_file_format);
-
   }
 
   if (mesh_write->file->pointer == NULL) {
     feenox_call(feenox_instruction_file_open(mesh_write->file));
-  }  
+  }
 
   // this makes sense only for gmsh
+  // THINK!
   if (ftell(mesh_write->file->pointer) == 0) {
     feenox_call(mesh_write->write_header(mesh_write->mesh, mesh_write->file->pointer));
     if (mesh_write->no_mesh == 0) {
@@ -105,6 +131,18 @@ int feenox_instruction_mesh_write(void *arg) {
   if (mesh_write->post_format == post_format_vtu || mesh_write->post_format == post_format_vtk) {
     feenox_call(feenox_instruction_file_close(mesh_write->file));
   }
+
+  if (mesh_write->file_pvd != NULL && mesh_write->file_pvd->pointer != NULL) {  
+    fprintf(mesh_write->file_pvd->pointer, "  <DataSet timestep=\"%g\" file=\"%s\"/>\n", feenox_special_var_value(t), mesh_write->file->path);
+ 
+    // TODO: maybe this should go in the cleanup routine so it is called when trapping a sigterm
+    if (feenox_special_var_value(done) != 0) {
+      fprintf(mesh_write->file_pvd->pointer, " </Collection>\n");
+      fprintf(mesh_write->file_pvd->pointer, "</VTKFile>\n");
+    }
+  }
+  
+  
   // for .msh we leave that to the user, to use CLOSE or whatever explicitly
 
   return FEENOX_OK;

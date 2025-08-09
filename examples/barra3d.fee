@@ -72,8 +72,9 @@ ENDIF
 # print the progress so we know how much is left when we run it
 PRINT t T(0.1,0,0)
 
-# write the full transient in a .msh
+# write the full transient in a .msh and vtu (+pvd)
 WRITE_RESULTS FILE barra3d-transient.msh
+WRITE_RESULTS FILE barra3d.vtu
 
 # TODO
 # WRITE_RESULTS FILE barra3d-transient.vtk
