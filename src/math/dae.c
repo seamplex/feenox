@@ -368,12 +368,12 @@ int feenox_dae_init(void) {
   
   // fill in the IDA vector with the user variables
   for (i = 0; i < feenox.dae.dimension; i++) {
-    NV_DATA_S(feenox.dae.x)[i] = *(feenox.dae.phase_value[i]);
-    NV_DATA_S(feenox.dae.dxdt)[i] = *(feenox.dae.phase_derivative[i]);
+    N_VGetArrayPointer(feenox.dae.x)[i] = *(feenox.dae.phase_value[i]);
+    N_VGetArrayPointer(feenox.dae.dxdt)[i] = *(feenox.dae.phase_derivative[i]);
     // assume they are algebraic, then we'll mark the differentials
     // but we need to initialize the vector id
     // TODO: user IDA's header
-    NV_DATA_S(feenox.dae.id)[i] = DAE_ALGEBRAIC; 
+    N_VGetArrayPointer(feenox.dae.id)[i] = DAE_ALGEBRAIC; 
   }
   // initialize IDA
   ida_call(IDAInit(feenox.dae.system, feenox_ida_dae, feenox_special_var_value(t), feenox.dae.x, feenox.dae.dxdt));
@@ -395,9 +395,9 @@ int feenox_dae_init(void) {
 
     for (i = 0; i < feenox.dae.dimension; i++) {
       if (gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i) > 0) {
-        NV_DATA_S(feenox.dae.abs_error)[i] = gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i);
+        N_VGetArrayPointer(feenox.dae.abs_error)[i] = gsl_vector_get(feenox_value_ptr(feenox.special_vectors.abs_error), i);
       } else {
-        NV_DATA_S(feenox.dae.abs_error)[i] = feenox_special_var_value(dae_rtol);
+        N_VGetArrayPointer(feenox.dae.abs_error)[i] = feenox_special_var_value(dae_rtol);
       }
     }
 
@@ -413,7 +413,7 @@ int feenox_dae_init(void) {
   LL_FOREACH(feenox.dae.phase_objects, phase_object) {
     if (phase_object->differential) {
       for (i = phase_object->offset; i < phase_object->offset+phase_object->size; i++) {
-        NV_DATA_S(feenox.dae.id)[i] = DAE_DIFFERENTIAL;
+        N_VGetArrayPointer(feenox.dae.id)[i] = DAE_DIFFERENTIAL;
       }
     }
   }
@@ -495,8 +495,8 @@ int feenox_ida_dae(sunrealtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *p
 
   // copy the phase space from IDA to FeenoX
   for (int k = 0; k < feenox.dae.dimension; k++) {
-    *(feenox.dae.phase_value[k]) = NV_DATA_S(yy)[k];
-    *(feenox.dae.phase_derivative[k]) = NV_DATA_S(yp)[k];
+    *(feenox.dae.phase_value[k]) = N_VGetArrayPointer(yy)[k];
+    *(feenox.dae.phase_derivative[k]) = N_VGetArrayPointer(yp)[k];
   }
 
   // evaluate the residuals in FeenoX and leave them for IDA
@@ -506,7 +506,7 @@ int feenox_ida_dae(sunrealtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *p
     
     if (dae->i_max == 0) {
       // ecuacion escalar
-      NV_DATA_S(rr)[k++] = feenox_expression_eval(&dae->residual);
+      N_VGetArrayPointer(rr)[k++] = feenox_expression_eval(&dae->residual);
       
     } else {
          
@@ -515,13 +515,13 @@ int feenox_ida_dae(sunrealtype t, N_Vector yy, N_Vector yp, N_Vector rr, void *p
         if (dae->j_max == 0) {
           
           // ecuacion vectorial
-          NV_DATA_S(rr)[k++] = feenox_expression_eval(&dae->residual);
+          N_VGetArrayPointer(rr)[k++] = feenox_expression_eval(&dae->residual);
         } else {
           for (int j = dae->j_min; j < dae->j_max; j++) {
             feenox_special_var_value(j) = (double)j+1;
             
             // ecuacion matricial
-            NV_DATA_S(rr)[k++] = feenox_expression_eval(&dae->residual);
+            N_VGetArrayPointer(rr)[k++] = feenox_expression_eval(&dae->residual);
             
           }
         }
