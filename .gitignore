@@ -112,3 +112,6 @@ hex8-single-stretched-linear.vtk
 hex8-single-stretched-neohookean.vtk
 hex8-single-stretched-svk.vtk
 spooles.out
+wilson-2d-*.vtk
+bunny.msh
+Stanford_Bunny.stl
