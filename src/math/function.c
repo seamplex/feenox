@@ -488,17 +488,26 @@ double feenox_function_eval(function_t *this, const double *const_x) {
 
   // y is the returned value
   double y = 0;
+  double x_copy[this->n_arguments];
+  int copied = 0;
   
   // implicit SOLVE_PROBLEM
   if (this->is_solution && feenox.pde.problem_solved == 0) {
+    if (const_x != NULL) {
+      // we might need to keep a copy of x
+      for (int i = 0; i < this->n_arguments; i++) {
+        x_copy[i] = const_x[i];
+      }
+      copied = 1;
+    }
+    
     if (feenox_instruction_solve_problem(NULL) != FEENOX_OK) {
       feenox_runtime_error();
     }
   }
   
-  
   // if x is null we assume it is a 3d-vector with zeroes
-  const double *x = (const_x != NULL) ? const_x : zero;
+  const double *x = copied ? (x_copy) : ((const_x != NULL) ? const_x : zero);
   
   // check if we need to initialize
   if (this->initialized == 0) {

@@ -1,6 +1,11 @@
 #!/bin/sh
 # take the output of this script as a kate syntax definition file for FeenoX
 #
+# KDE 6:
+# mkdir -p $HOME/.local/share/org.kde.syntax-highlighting/syntax/
+# ./syntax-kate.sh > $HOME/.local/share/org.kde.syntax-highlighting/syntax/feenox.xml
+#
+# KDE 5:
 # mkdir -p $HOME/.local/share/katepart5/syntax/
 # ./syntax-kate.sh > $HOME/.local/share/katepart5/syntax/feenox.xml
 #
@@ -88,7 +93,7 @@ cat << EOF
 
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>
-      <itemData name="Keyword1" defStyleNum="dsKeyword"/>
+      <itemData name="Keyword1" defStyleNum="dsKeyword" bold="1"/>
       <itemData name="Keyword2" defStyleNum="dsKeyword" color="#003300"/>
       <itemData name="Operator" defStyleNum="dsOperator" color="#666666"/>
       <itemData name="Identifier" defStyleNum="dsOthers" color="#663333" italic="1"/>

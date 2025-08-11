@@ -117,6 +117,7 @@ TESTS_neutron_sn = \
 
 TESTS_thermal = \
         tests/barra.sh \
+        tests/bunny-thermal.sh \
         tests/encased_rod.sh \
         tests/thermal-1d.sh \
         tests/thermal-2d.sh \

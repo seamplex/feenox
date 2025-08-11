@@ -552,7 +552,7 @@ inline double *feenox_fem_compute_x_at_gauss(element_t *e, unsigned int q, int i
     feenox.fem.current_gauss_type = e->type;
   }
   if ((*x)[q] == NULL) {
-    (*x)[q] = calloc(3, sizeof(double));
+    feenox_check_alloc_null((*x)[q] = calloc(3, sizeof(double)));
   } else if (feenox.fem.cache_J) {
     return (*x)[q];
   }

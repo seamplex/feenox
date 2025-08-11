@@ -1,10 +1,11 @@
 # Current (under development)
 
  * ...
+ * outputs from `WRITE_RESULTS` or `WRITE_MESH` in `vtu` or `vtk` for transient problems create a `.pvd` file
  * instruction `PROBLEM_SOLVE` is not mandatory anymore, now FeenoX can guess where it should be called
  * keyword `READ_DATA` to read variables and vectors from files
  * `PROBLEM` can define `MESH` in a single line without an explicit `READ_MESH` instruction
- * Neo-hookean material model
+ * neo-hookean material model
  * MMS verification for mechanical with both sdef & ldef
  * Saint Venant-Kirchoff material model for ldef
  * large deformation formulation for `mechanical`

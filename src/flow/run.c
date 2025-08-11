@@ -158,7 +158,10 @@ int feenox_run(void) {
         feenox_special_var_value(done_transient) = 1;
       }
       
-      feenox_call(feenox_step(feenox.pde.instruction->next, NULL));
+      // if we have an implicit PROBLEM, then we stay apple
+      if (feenox.pde.instruction != NULL) {
+        feenox_call(feenox_step(feenox.pde.instruction->next, NULL));
+      }
       
       
     } else if (feenox.dae.dimension != 0) {
