@@ -44,6 +44,10 @@
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
 
+#ifndef sunrealtype
+#define sunrealtype realtype
+#endif
+
 // we need all the includes here so they all follow the inline directive above
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_errno.h>
