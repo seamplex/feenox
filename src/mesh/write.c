@@ -19,6 +19,7 @@
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
  *------------------- ------------  ----    --------  --     -       -         -
  */
+#include <libgen.h>
 #include "../feenox.h"
 
 int feenox_instruction_mesh_write(void *arg) {
@@ -133,7 +134,7 @@ int feenox_instruction_mesh_write(void *arg) {
   }
 
   if (mesh_write->file_pvd != NULL && mesh_write->file_pvd->pointer != NULL) {  
-    fprintf(mesh_write->file_pvd->pointer, "  <DataSet timestep=\"%g\" file=\"%s\"/>\n", feenox_special_var_value(t), mesh_write->file->path);
+    fprintf(mesh_write->file_pvd->pointer, "  <DataSet timestep=\"%g\" file=\"%s\"/>\n", feenox_special_var_value(t), basename(mesh_write->file->path));
  
     // TODO: maybe this should go in the cleanup routine so it is called when trapping a sigterm
     if (feenox_special_var_value(done) != 0) {
