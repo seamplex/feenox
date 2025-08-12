@@ -28,6 +28,10 @@ int feenox_instruction_mesh_write(void *arg) {
   }
 
   mesh_write_t *mesh_write = (mesh_write_t *)arg;
+  
+  // re-initialize flags
+  mesh_write->point_init = 0;
+  mesh_write->cell_init = 0;
 
   // TODO: in parallel runs only print from first processor
   if (feenox.mpi_rank != 0) {

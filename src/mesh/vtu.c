@@ -24,7 +24,7 @@
 
 int feenox_mesh_write_header_vtu(mesh_t *mesh, FILE *fp) {
   fprintf(fp, "<?xml version=\"1.0\"?>\n");
-  fprintf(fp, "<VTKFile type=\"UnstructuredGrid\" version=\"1.0\" byte_order=\"LittleEndian\">\n");
+  fprintf(fp, "<VTKFile type=\"UnstructuredGrid\" version=\"1.0\">\n");
   fprintf(fp, "  <UnstructuredGrid>\n");
   if (mesh->n_cells == 0) {
     feenox_call(feenox_mesh_element2cell(mesh));

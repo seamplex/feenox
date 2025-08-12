@@ -2654,8 +2654,8 @@ int feenox_parse_write_results(void) {
       feenox_check_alloc(strcat(file_path, feenox.argv[i]));
     }
     feenox_check_alloc(strcat(file_path, "."));
-    feenox_check_alloc(strcat(file_path, (mesh_write->post_format == post_format_vtu) ? "vtu" :
-                                           ((mesh_write->post_format == post_format_vtk) ? "vtk" : "msh")));
+    feenox_check_alloc(strcat(file_path, (mesh_write->post_format == post_format_gmsh) ? "msh" :
+                                           ((mesh_write->post_format == post_format_vtk) ? "vtk" : "vtu")));
     
     feenox_call(feenox_define_file(file_path, file_path, 0, "w"));
     if ((mesh_write->file = feenox_get_file_ptr(file_path)) == NULL) {
