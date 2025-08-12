@@ -37,7 +37,6 @@ int feenox_instruction_print(void *arg) {
   char default_print_format[] = DEFAULT_PRINT_FORMAT;
   int have_to_print = 1;
   int have_to_header = 0;
-  int i, j;
   int flag = 1;  // flag to know if we already printed something or not (for matrices)
   
   if ((int)feenox_special_var_value(in_static) != 0) {
@@ -116,7 +115,7 @@ int feenox_instruction_print(void *arg) {
       if (!print_token->vector->initialized) {
         feenox_call(feenox_vector_init(print_token->vector, FEENOX_VECTOR_INITIAL));
       }
-      for (i = 0; i < print_token->vector->size; i++) {
+      for (int i = 0; i < print_token->vector->size; i++) {
         fprintf(print->file->pointer, current_format, gsl_vector_get(feenox_value_ptr(print_token->vector), i));
         if (i != print_token->vector->size-1) {
           fprintf(print->file->pointer, "%s", print->separator);
@@ -132,8 +131,8 @@ int feenox_instruction_print(void *arg) {
       if (!print_token->matrix->initialized) {
         feenox_call(feenox_matrix_init(print_token->matrix));
       }
-      for (i = 0; i < print_token->matrix->rows; i++) {
-        for (j = 0; j < print_token->matrix->cols; j++) {
+      for (int i = 0; i < print_token->matrix->rows; i++) {
+        for (int j = 0; j < print_token->matrix->cols; j++) {
           fprintf(print->file->pointer, current_format, gsl_matrix_get(feenox_value_ptr(print_token->matrix), i, j));
           if (j != print_token->matrix->cols-1) {
             fprintf(print->file->pointer, "%s", print->separator);

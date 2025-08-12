@@ -315,7 +315,15 @@ double feenox_function_property_eval(struct function_t *function, const double *
     return 1.0;
   }
   
-  element_t *element = feenox_mesh_find_element(function->mesh, NULL, x);
+  node_t *node = feenox_mesh_find_nearest_node(function->mesh, x);
+  element_t *element = feenox_mesh_find_element(function->mesh, node, x);
+  
+  if (element == NULL) {
+    // the point is off and does not enclose an element, get the first one which
+    // is attached to the nearest node
+    element = node->element_list->element;
+  }
+  
   if (element != NULL && element->physical_group != NULL && element->physical_group->material != NULL) {
     HASH_FIND_STR(element->physical_group->material->property_datums, property->name, property_data);
     if (property_data != NULL) {
@@ -327,7 +335,7 @@ double feenox_function_property_eval(struct function_t *function, const double *
         }  
       }
 
-      // finally evalaute the expression of the material found
+      // finally evaluate the expression of the material found
       y = feenox_expression_eval(&property_data->expr);
     }
   }
