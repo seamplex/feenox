@@ -370,8 +370,16 @@ DISTCLEANFILES = \
                  ./beam-orthotropic-tet10.msh \
                  ./hex8-single-stretched-linear.vtk \
                  ./beam-ldef-hex8.vtu \
-                 ./beam-ldef-tet10.vtu
-    
+                 ./beam-ldef-tet10.vtu \
+                 ./wilson-2d-175-111.vtk \
+                 ./wilson-2d-100-105.vtk \
+                 ./wilson-2d-87.5-103.vtk \
+                 ./wilson-2d-50-95.vtk \
+                 ./wilson-2d-10-75.vtk \
+                 ./wilson-2d-0-0.vtk \
+                 ./wilson-2d-0.pvd \
+                 ./tests/bunny.msh \
+                 ./tests/Stanford_Bunny.stl
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
