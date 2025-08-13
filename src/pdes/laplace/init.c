@@ -86,7 +86,7 @@ int feenox_problem_init_runtime_laplace(void) {
 ///pr_laplace+alpha+description The coefficient of the temporal derivative for the transient
 ///pr_laplace+alpha+description equation \ $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+alpha+description If not given, default is one.
-  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0);
+  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0 && feenox.pde.transient_type != transient_type_quasistatic);
   if (feenox.pde.has_mass) {
     feenox_call(feenox_distribution_init(&laplace.alpha, "alpha"));
     if (laplace.alpha.defined == 0) {

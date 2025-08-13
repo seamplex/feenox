@@ -95,7 +95,8 @@ TESTS_mechanical_ldef = \
         tests/beam-ldef.sh \
         tests/hex8-ldef-jacobian.sh \
         tests/hex8-ldef-ccx.sh \
-        tests/hex8-single-stretched.sh
+        tests/hex8-single-stretched.sh \
+        tests/beam-quasi.sh
         
 TESTS_mechanical = $(TESTS_mechanical_iso) $(TESTS_mechanical_ortho) $(TESTS_mechanical_ldef)
         
@@ -279,7 +280,7 @@ DISTCLEANFILES = \
                  ./circle_perimeter1.dat                                      \
                  ./orthotropic-beam-hex27.msh                                 \
                  ./2dpwr-eighth.vtu                                           \
-                 ./poisson-square.msh                                         \
+                 ./poisson-square.vtu                                         \
                  ./ray-effect-diffusion-full.msh                              \
                  ./ray-effect-quarter-4.msh                                   \
                  ./thermal-square.vtk                                         \
@@ -350,12 +351,10 @@ DISTCLEANFILES = \
                  ./wilson-2d-175.vtk \
                  ./wilson-2d-50.vtk \
                  ./wilson-2d-87.5.vtk \
-                 ./beam-orthotropic-hex20.msh \
                  ./hex8-ldef.vtk \
                  ./hex8-single-stretched-neohookean.vtk \
                  ./beam-ldef-hex27.vtu \
                  ./spooles.out \
-                 ./beam-orthotropic-hex8.msh \
                  ./hex8-single-stretched-svk.vtk \
                  ./tests/hex8-ldef.12d \
                  ./tests/hex8-ldef.cvg \
@@ -363,11 +362,8 @@ DISTCLEANFILES = \
                  ./tests/hex8-ldef.txt \
                  ./tests/hex8-ldef.dat \
                  ./tests/hex8-ldef.frd \
-                 ./beam-orthotropic-tet4.msh \
-                 ./beam-orthotropic-hex27.msh \
                  ./beam-ldef-tet4.vtu \
                  ./beam-ldef-hex20.vtu \
-                 ./beam-orthotropic-tet10.msh \
                  ./hex8-single-stretched-linear.vtk \
                  ./beam-ldef-hex8.vtu \
                  ./beam-ldef-tet10.vtu \
@@ -379,7 +375,12 @@ DISTCLEANFILES = \
                  ./wilson-2d-0-0.vtk \
                  ./wilson-2d-0.pvd \
                  ./tests/bunny.msh \
-                 ./tests/Stanford_Bunny.stl
+                 ./tests/Stanford_Bunny.stl \
+                 ./beam-orthotropic-hex27.vtu \
+                 ./beam-orthotropic-hex20.vtu \
+                 ./beam-orthotropic-hex8.vtu \
+                 ./beam-orthotropic-tet10.vtu \
+                 ./beam-orthotropic-tet4.vtu
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .

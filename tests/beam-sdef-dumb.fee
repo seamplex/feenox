@@ -1,0 +1,19 @@
+PROBLEM mechanical QUASISTATIC_DUMB
+READ_MESH beam-cantilever-tet4.msh
+
+end_time = 1
+E = 100000
+nu = 0.3
+
+BC left  fixed
+BC right tz=-25*t
+
+SOLVE_PROBLEM
+
+# PRINTF "%.4f %.6f %.6f" t w(0.5,-0.25,0.01) w(0.5,-0.25,-0.01)
+# WRITE_RESULTS
+
+IF done
+  PRINT w(0.5,-0.25,-0.01)+0.016068
+ENDIF
+

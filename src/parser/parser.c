@@ -3214,13 +3214,21 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail If the special variable `end_time` is zero, FeenoX solves a static
 ///kw_pde+PROBLEM+detail  problem---although the variable `static_steps` is still honored.
 ///kw_pde+PROBLEM+detail If `end_time` is non-zero, FeenoX solves a transient or quasi-static problem.
-///kw_pde+PROBLEM+detail This can be controlled by `TRANSIENT` or `QUASISTATIC`.
-///kw_pde+PROBLEM+usage [ TRANSIENT |
+///kw_pde+PROBLEM+detail This can be controlled by `TRANSIENT` (default) or `QUASISTATIC`:
+///kw_pde+PROBLEM+detail @
+///kw_pde+PROBLEM+detail  * `TRANSIENT` (default) means solve a real transient problem within PETSc's TS framework.
+///kw_pde+PROBLEM+detail  * `QUASISTATIC` solves the problem with TS (with optional time adaptation) but without any inertia (mass) effects.
+///kw_pde+PROBLEM+detail  * `QUASISTATIC_DUMB` just solves one KSP (or SNES) after the other without any TS nor automatic time adaptation.
+///kw_pde+PROBLEM+detail @
+     ///kw_pde+PROBLEM+usage [ TRANSIENT |
     } else if (strcasecmp(token, "TRANSIENT") == 0) {
       feenox.pde.transient_type = transient_type_transient;
-///kw_pde+PROBLEM+usage QUASISTATIC ]
+///kw_pde+PROBLEM+usage QUASISTATIC |
     } else if (strcasecmp(token, "QUASISTATIC") == 0) {
       feenox.pde.transient_type = transient_type_quasistatic;
+///kw_pde+PROBLEM+usage QUASISTATIC_DUMB ]
+    } else if (strcasecmp(token, "QUASISTATIC_DUMB") == 0) {
+      feenox.pde.transient_type = transient_type_quasistatic_dumb;
 
 
 ///kw_pde+PROBLEM+detail By default FeenoX tries to detect whether the computation should be linear or non-linear.

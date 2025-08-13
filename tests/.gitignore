@@ -78,7 +78,7 @@ airfoil.brep
 airfoil.xao
 circle*.msh
 circle_perimeter*.dat
-wilson-2d-*.vtk
+wilson-2d-*.vt*
 *.12d
 *.cvg
 hex8-ldef.dat

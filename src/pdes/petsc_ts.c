@@ -66,7 +66,7 @@ int feenox_problem_solve_petsc_transient(void) {
       petsc_call(TSSetMaxTime(feenox.pde.ts, 0.0));
       petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));
 
-      petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_var_value(feenox_special_var(end_time))));
+      petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_special_var_value(end_time)));
       petsc_call(TSSetExactFinalTime(feenox.pde.ts, TS_EXACTFINALTIME_MATCHSTEP));
     }  
     
@@ -79,6 +79,7 @@ int feenox_problem_solve_petsc_transient(void) {
   petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_step));
   petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_step+1));
 
+  petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_special_var_value(end_time)));
   petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
   petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));  
   petsc_call(TSGetTime(feenox.pde.ts, feenox_value_ptr(feenox_special_var(t))));  
@@ -95,15 +96,23 @@ int feenox_problem_solve_petsc_transient(void) {
 
 int feenox_problem_setup_ts(TS ts) {
   
-  // TODO: the default depends on the physics type
-  petsc_call(TSSetType(ts, (feenox.pde.ts_type != NULL) ? feenox.pde.ts_type : TSBDF));
+  
+  if (feenox.pde.ts_type != NULL) {
+    petsc_call(TSSetType(ts, feenox.pde.ts_type));
+  } else if (feenox.pde.transient_type == transient_type_quasistatic) {
+    // TODO: the default depends on the physics type
+    petsc_call(TSSetType(ts, TSBEULER));
+  } else {
+    // TODO: the default depends on the physics type
+    petsc_call(TSSetType(ts, TSBDF));
+  }
 
   TSAdapt adapt;
   petsc_call(TSGetAdapt(ts, &adapt));
   petsc_call(TSAdaptSetType(adapt, (feenox.pde.ts_adapt_type != NULL) ? feenox.pde.ts_adapt_type : TSADAPTBASIC));
   // the factors are so we can pass min_dt = max_dt
   petsc_call(TSAdaptSetStepLimits(adapt, (feenox_special_var_value(min_dt) > 0) ? (1-1e-8)*feenox_special_var_value(min_dt) : PETSC_DEFAULT,
-                                         (feenox_special_var_value(max_dt) > 0) ? (1+1e-8)*feenox_special_var_value(max_dt) : PETSC_DEFAULT));
+                                         (feenox_special_var_value(max_dt) > 0) ? (1+1e-8)*feenox_special_var_value(max_dt) : feenox_special_var_value(end_time)));
   
   // TODO: choose
 //  petsc_call(TSSetMaxStepRejections(feenox.pde.ts, 10000));
@@ -124,7 +133,7 @@ int feenox_problem_setup_ts(TS ts) {
     if (ksp != NULL) {
       feenox_call(feenox_problem_setup_ksp(ksp));
     }
-  }  
+  }
 
 
 
@@ -153,11 +162,16 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
   petsc_call(VecDuplicate(phi, &tmp));
 
   // set dirichlet BCs on the time derivative and multiply by M
-  petsc_call(VecCopy(phi_dot, tmp));
-  feenox_call(feenox_problem_dirichlet_set_phi_dot(tmp));
-  petsc_call(MatMult(feenox.pde.M, tmp, r));
+  if (feenox.pde.M != NULL) {
+    petsc_call(VecCopy(phi_dot, tmp));
+    feenox_call(feenox_problem_dirichlet_set_phi_dot(tmp));
+    petsc_call(MatMult(feenox.pde.M, tmp, r));
+  } else  {
+    petsc_call(VecZeroEntries(r));
+  }
   
   // set dirichlet BCs on the solution and multiply by K
+  // TODO: only if the problem does not compute an actual residual!
   petsc_call(VecCopy(phi, tmp));
   feenox_call(feenox_problem_dirichlet_set_phi(tmp));
 
@@ -176,7 +190,9 @@ PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec phi, Vec phi_dot, Pets
 
   // return (K + s*M)_dirichlet
   petsc_call(MatCopy(feenox.pde.K, J, SAME_NONZERO_PATTERN));
-  petsc_call(MatAXPY(J, s, feenox.pde.M, SAME_NONZERO_PATTERN));
+  if (feenox.pde.M != NULL) {
+    petsc_call(MatAXPY(J, s, feenox.pde.M, SAME_NONZERO_PATTERN));
+  }
   feenox_call(feenox_problem_dirichlet_set_J(J));
   
   return FEENOX_OK;

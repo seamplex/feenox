@@ -477,18 +477,36 @@ int feenox_problem_init_runtime_mechanical(void) {
 //      feenox_var_value(mechanical.ldef_check) = 1;
     }
   }
-  
-  if (feenox.pde.math_type == math_type_linear) {
-    feenox.pde.solve = feenox_problem_solve_petsc_linear;
-  } else if (feenox.pde.math_type == math_type_nonlinear) {
-    feenox.pde.solve = feenox_problem_solve_petsc_nonlinear;
+
+  if (feenox.pde.math_type == math_type_nonlinear || feenox.pde.math_type == math_type_nonlinear_pseudo) {
     feenox.pde.element_build_volumetric_at_gauss = feenox_problem_build_volumetric_gauss_point_mechanical_nonlinear;
     feenox.pde.has_internal_fluxes = 1;
     feenox_var_value(mechanical.ldef) = 1;
     mechanical.nonlinear_geom = 1;
-//    feenox_var_value(mechanical.ldef_check) = 0;
+//      feenox_var_value(mechanical.ldef_check) = 0;
+  }
+
+  
+  if (feenox_special_var_value(end_time) == 0 || feenox.pde.transient_type == transient_type_quasistatic_dumb) {
+    switch (feenox.pde.math_type) {
+      case math_type_linear:
+        feenox.pde.solve = feenox_problem_solve_petsc_linear;
+        break;
+      case math_type_nonlinear:
+        feenox.pde.solve = feenox_problem_solve_petsc_nonlinear;
+        break;
+        
+      case math_type_nonlinear_pseudo:
+//        feenox.pde.solve = feenox_problem_solve_petsc_nonlinear_pseudo;
+        feenox_push_error_message("work in progress");
+        break;
+        
+      default:
+        feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);
+        break;
+    }
   } else {
-    feenox_push_error_message("unknown math problem type %d", feenox.pde.math_type);
+    feenox.pde.solve = feenox_problem_solve_petsc_transient;
   }
   
   feenox.pde.has_stiffness = 1;

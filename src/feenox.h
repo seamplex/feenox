@@ -1760,14 +1760,16 @@ struct feenox_t {
     // these can be read from the input but also we can figure them out
     enum {
       transient_type_undefined,
-      transient_type_transient,
-      transient_type_quasistatic
+      transient_type_transient,            // real transient
+      transient_type_quasistatic,          // a TS without mass
+      transient_type_quasistatic_dumb      // several KSPs/SNESes one after the other
     } transient_type;
     
     enum {
       math_type_automatic,
       math_type_linear,
       math_type_nonlinear,
+      math_type_nonlinear_pseudo,
       math_type_eigen,
     } math_type;
 

@@ -20,6 +20,11 @@ gmsh -v 0 -2 ${dir}/wilson-2d.geo || exit $?
 answerzero wilson-2d.fee 2e-2
 exitifwrong $?
 
+gmsh -v 0 -2 ${dir}/wilson-2d.geo || exit $?
+answerzero wilson-2d-quasi.fee 1e-4
+exitifwrong $?
+
+
 # check TIME_PATH
 echo -n "time_path_petsc.fee ... "
 rm -rf wilson-2d*.vtk

@@ -1,0 +1,19 @@
+PROBLEM thermal 2d MESH wilson-2d.msh QUASISTATIC
+
+k(x,y) = 1 + 0.5*T(x,y)
+rhocp = 1
+
+BC heat q=limit(t,0,1)     GROUP left  GROUP bottom
+BC temp T=limit(1e5*t,0,1) GROUP right GROUP top
+T_0(x,y) = 0
+
+end_time = 1.1
+
+SOLVE_PROBLEM
+
+# PRINT t T(0,0)
+# WRITE_RESULTS
+
+IF done
+ PRINT T(0,0)-3.02124
+ENDIF
