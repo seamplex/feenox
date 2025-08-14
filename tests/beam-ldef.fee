@@ -8,7 +8,6 @@ BC left  fixed
 BC right tz=-25
 
 # SOLVE_PROBLEM
-
 PRINTF "%.3f %.3f" w(0.5,-0.25,0.01) w(0.5,-0.25,-0.01)
-WRITE_RESULTS FORMAT vtu
+# WRITE_RESULTS
 

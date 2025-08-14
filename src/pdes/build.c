@@ -271,7 +271,11 @@ int feenox_problem_build_element_volumetric(element_t *this) {
   feenox_debug_print_gsl_matrix(feenox.fem.Ki, stdout);
   printf("JKi\n");
   feenox_debug_print_gsl_matrix(feenox.fem.JKi, stdout);
-*/  
+  printf("fi\n");
+  feenox_debug_print_gsl_vector(feenox.fem.fi, stdout);
+  printf("bi\n");
+  feenox_debug_print_gsl_vector(feenox.fem.bi, stdout);
+*/
  
   if (feenox.pde.has_stiffness)  {
     petsc_call(MatSetValues(feenox.pde.K, feenox.fem.current_GJ, l, feenox.fem.current_GJ, l, gsl_matrix_ptr(feenox.fem.Ki, 0, 0), ADD_VALUES));

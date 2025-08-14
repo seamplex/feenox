@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's non-linear solver using PETSc routines
  *
- *  Copyright (C) 2020--2021 Jeremy Theler
+ *  Copyright (C) 2020--2025 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -169,7 +169,7 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
 }
 
 
-PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J_snes, Mat P, void *ctx) {
+PetscErrorCode feenox_snes_jacobian(SNES snes, Vec phi, Mat J_snes, Mat P, void *ctx) {
 
   // J_snes = (K + JK - Jb)_bc
   // TODO: we want SAME_NONZERO_PATTERN!

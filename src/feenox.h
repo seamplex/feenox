@@ -1958,7 +1958,7 @@ struct feenox_t {
     Mat JM;      // jacobian for mass matrix = M'*phi_dot
     Mat Jb;      // jacobian for rhs vector = dq/dT for both volumetric and BCs
     Mat J_snes;  // jacobian for SNES
-    Mat J_tran;  // jacobian for TS
+    Mat J_ts;    // jacobian for TS
     
     PetscScalar *eigenvalue;    // eigenvalue vector
     Vec *eigenvector;           // eivenvectors vector

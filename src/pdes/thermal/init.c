@@ -135,7 +135,7 @@ int feenox_problem_init_runtime_thermal(void) {
   thermal.q.non_uniform = feenox_depends_on_space(thermal.q.dependency_variables);
   thermal.q.non_linear = feenox_depends_on_function(thermal.q.dependency_functions, feenox.pde.solution[0]);  
   
-  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) && (feenox.pde.transient_type != transient_type_quasistatic);  
+  feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0) && (feenox.pde.transient_type != transient_type_quasistatic); 
   if (feenox.pde.has_mass) {
 ///pr_thermal+kappa+usage kappa
 ///pr_thermal+kappa+description Thermal diffusivity in units of area per unit of time. 

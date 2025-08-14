@@ -3,6 +3,7 @@
 *.trs
 *.last
 *.m
+*.pvd
 tmp.*
 mesh2d.msh
 square-centered.msh
@@ -84,5 +85,6 @@ wilson-2d-*.vt*
 hex8-ldef.dat
 *.frd
 *.sta
-hex8-ldef.vtk
+hex8-ldef.vt*
 spooles.out
+beam*.vt*

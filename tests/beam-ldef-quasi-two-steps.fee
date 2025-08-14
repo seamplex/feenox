@@ -1,0 +1,18 @@
+PROBLEM mechanical QUASISTATIC
+READ_MESH beam-cantilever-tet4.msh
+
+ldef = 1
+end_time = 1
+dt_0 = 0.5
+
+E = 100000
+nu = 0.3
+
+BC left  fixed
+BC right tz=-25*t
+
+SOLVE_PROBLEM
+
+IF done
+  PRINT w(0.5,-0.25,+0.01)+0.016062
+ENDIF
