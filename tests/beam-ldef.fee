@@ -1,4 +1,4 @@
-PROBLEM mechanical PC mumps
+PROBLEM mechanical #PC mumps
 READ_MESH beam-cantilever-$1.msh
 
 E = 100000

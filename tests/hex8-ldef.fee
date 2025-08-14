@@ -1,5 +1,5 @@
 READ_MESH hex8.msh
-PROBLEM mechanical PC mumps
+PROBLEM mechanical #PC mumps
 
 ldef = 1
 E = 1

@@ -53,8 +53,8 @@ int feenox_problem_solve_petsc_transient(void) {
       }  
 
       // THINK! whats is going on here?
-//      feenox_check_alloc(feenox.pde.J_ts = feenox_problem_create_matrix("J_ts"));
-      petsc_call(MatDuplicate(feenox.pde.has_jacobian_K ? feenox.pde.JK : feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.J_ts));
+      feenox_check_alloc(feenox.pde.J_ts = feenox_problem_create_matrix("J_ts"));
+//      petsc_call(MatDuplicate(feenox.pde.has_jacobian_K ? feenox.pde.JK : feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.J_ts));
       petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_ts, feenox.pde.J_ts, feenox_ts_jacobian, NULL));
 
       petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
@@ -122,6 +122,13 @@ int feenox_problem_setup_ts(TS ts) {
 //  petsc_call(TSSetMaxStepRejections(feenox.pde.ts, 10000));
 //  petsc_call(TSSetMaxSNESFailures(feenox.pde.ts, 1000));
 
+  // PETSc 3.19 is buggy and needs this guys here
+  // the problem is that calling TSSetFromOptions here sets the line search to bt
+  // and we want to default to basic
+  if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 19) {
+    petsc_call(TSSetFromOptions(ts));    
+  }
+  
   SNES snes;
   petsc_call(TSGetSNES(ts, &snes));
   if (snes != NULL) {
@@ -193,6 +200,7 @@ PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec 
   // set dirichlet bcs on the residual
   feenox_call(feenox_problem_dirichlet_set_r(r, phi));
 
+  
   return FEENOX_OK;
 }
 
