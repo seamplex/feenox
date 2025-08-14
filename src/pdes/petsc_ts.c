@@ -52,8 +52,9 @@ int feenox_problem_solve_petsc_transient(void) {
         feenox_call(feenox_problem_build());
       }  
 
-      feenox_check_alloc(feenox.pde.J_ts = feenox_problem_create_matrix("J_ts"));
-//      petsc_call(MatDuplicate(feenox.pde.has_jacobian_K ? feenox.pde.JK : feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.J_ts));
+      // THINK! whats is going on here?
+//      feenox_check_alloc(feenox.pde.J_ts = feenox_problem_create_matrix("J_ts"));
+      petsc_call(MatDuplicate(feenox.pde.has_jacobian_K ? feenox.pde.JK : feenox.pde.K, MAT_COPY_VALUES, &feenox.pde.J_ts));
       petsc_call(TSSetIJacobian(feenox.pde.ts, feenox.pde.J_ts, feenox.pde.J_ts, feenox_ts_jacobian, NULL));
 
       petsc_call(TSSetProblemType(feenox.pde.ts, (feenox.pde.math_type == math_type_linear) ? TS_LINEAR : TS_NONLINEAR));
