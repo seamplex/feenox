@@ -31,3 +31,5 @@ exitifwrong $?
 answerzero beam-ldef-quasi-many-steps.fee
 exitifwrong $?
 
+answerzero beam-ldef-quasi-pseudo.fee
+exitifwrong $?

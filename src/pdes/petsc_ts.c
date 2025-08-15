@@ -34,10 +34,24 @@ int feenox_problem_solve_petsc_transient(void) {
         feenox.pde.ksp = NULL;
       
       } else if (feenox.pde.math_type == math_type_nonlinear) {
+        
+        // when using PSEUDO, we should not solve the initial SNES because
+        // in pseudo we do not have to scale the BCs so the full problem is
+        // already set up at t=0 and then we don't take advantage of pseudo
+        int do_not_solve_update = 0;
+        int do_not_solve_old = feenox.pde.do_not_solve;
+        if (feenox.pde.ts_type != NULL && strcmp(feenox.pde.ts_type, TSPSEUDO) == 0) {
+          do_not_solve_update = 1;
+          feenox.pde.do_not_solve = 1;
+        }
+        
         feenox_call(feenox_problem_solve_petsc_nonlinear());
         petsc_call(SNESDestroy(&feenox.pde.snes));
         feenox.pde.snes = NULL;
-
+        
+        if (do_not_solve_update) {
+          feenox.pde.do_not_solve = do_not_solve_old;
+        }          
       }
     } else {
       feenox_function_to_phi(feenox.pde.initial_condition, feenox.pde.phi);
