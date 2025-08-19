@@ -23,8 +23,8 @@ T_0(x,y,z) = 0
 end_time = 1e5
 
 SOLVE_PROBLEM
-done = T(bunny_cog[1],bunny_cog[2],bunny_cog[3]) > 0.5*Toven
 
+done = T(bunny_cog[1],bunny_cog[2],bunny_cog[3]) > 0.5*Toven
 PRINT t T(bunny_cog[1],bunny_cog[2],bunny_cog[3])
-# TODO: pvd
-# WRITE_RESULTS FORMAT vtu
+
+WRITE_RESULTS

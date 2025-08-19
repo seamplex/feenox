@@ -1,56 +1,3 @@
----
-category: neutron_diffusion
-intro: |
-  # IAEA 3D PWR Benchmark
-  
-  The IAEA 3D PWR Benchmark is a classical problem for core-level diffusion codes.
-  The original geometry, cross sections and boundary conditions are shown in [@fig:iaea-3dpwr-fig1;@fig:iaea-3dpwr-fig2;@fig:iaea-3dpwr-fig3].
-  
-  ![The IAEA 3D PWR Benchmark, fig. 1](iaea-3dpwr-fig1.png){#fig:iaea-3dpwr-fig1}
-  
-  ![The IAEA 3D PWR Benchmark, fig. 2](iaea-3dpwr-fig2.png){#fig:iaea-3dpwr-fig2}
-
-  ![The IAEA 3D PWR Benchmark, fig. 3](iaea-3dpwr-fig3.png){#fig:iaea-3dpwr-fig3}
-  
-  The FeenoX approach consists of modeling both the original one-quarter-symmetric geometry _and_ the more reasonable one-eighth-symmetry geometry in a 3D CAD cloud tool such as Onshape ([@fig:iaea-3dpwr-quarter-onshape;@fig:iaea-3dpwr-eighth-onshape]). Then, the CAD is imported and meshed in Gmsh to obtain a second-order unstructured tetrahedral grids suitable to be used by FeenoX to solve the multi-group neutron diffusion equation ([@fig:iaea-3d-quarter-mesh;@fig:iaea-3d-eighth-mesh])
-  
-  ![IAEA 3D PWR one-quarter CAD in Onshape ("fuel 2" is hidden)](iaea-3dpwr-quarter-onshape.png){#fig:iaea-3dpwr-quarter-onshape}
-
-  ![IAEA 3D PWR one-eighth CAD in Onshape ("fuel 2" is hidden)](iaea-3dpwr-eighth-onshape.png){#fig:iaea-3dpwr-eighth-onshape}
-  
-  ::: {#fig:iaea-3d-quarter-mesh}
-  ![Full view](iaea-3dpwr-quarter-mesh1.png){width=49%}
-  ![Cutaway view](iaea-3dpwr-quarter-mesh2.png){width=49%}
-  
-  Unstructured second-order tetrahedral grid for the quarter case
-  :::
-
-  ::: {#fig:iaea-3d-eighth-mesh}
-  ![Full view](iaea-3dpwr-eighth-mesh1.png)
-  ![Cutaway view](iaea-3dpwr-eighth-mesh2.png)
-  
-  Unstructured second-order tetrahedral grid for the eighth case
-  :::
-
-  The terminal mimic shows that the eighth case can be solved faster and needs less memory than the original quarter-symmetry case. Recall that the original problem does have 1/8th symmetry but since historically all core-level solvers can only handle structured hexahedral grids, nobody ever took advantage of it.
-  
-terminal: | 
-  $ gmsh -3 iaea-3dpwr-quarter.geo
-  $ [...]
-  $ gmsh -3 iaea-3dpwr-eighth.geo
-  $ [...]
-  $ feenox iaea-3dpwr.fee quarter
-    keff =  1.02918
-   nodes =  70779
-  memory =  3.9 Gb
-    wall =  33.8 sec
-  $ feenox iaea-3dpwr.fee eighth
-    keff =  1.02912
-   nodes =  47798
-  memory =  2.5 Gb
-    wall =  16.0 sec
-  $
-...
 #                       BENCHMARK PROBLEM
 #          
 # Identification: 11
@@ -96,21 +43,3 @@ PRINTF "  keff = %.5f" keff
 PRINTF " nodes = %g"   nodes
 PRINTF "memory = %.1f Gb" memory()
 PRINTF "  wall = %.1f sec" clock()-t0
----
-figures: |
-  ::: {#fig:iaea-3dpwr-eighth-phi1}
-  ![](iaea-3dpwr-eighth-phi1-1.png){width=25%}
-  ![](iaea-3dpwr-eighth-phi1-2.png){width=25%}
-  ![](iaea-3dpwr-eighth-phi1-3.png){width=45%}
-  
-  Fast flux for the 3D IAEA PWR benchmark in 1/8th symmetry
-  :::
-  
-  ::: {#fig:iaea-3dpwr-eighth-phi2}
-  ![](iaea-3dpwr-eighth-phi2-1.png){width=25%}
-  ![](iaea-3dpwr-eighth-phi2-2.png){width=25%}
-  ![](iaea-3dpwr-eighth-phi2-3.png){width=45%}
-  
-  Thermal flux for the 3D IAEA PWR benchmark in 1/8th symmetry
-  :::
-...

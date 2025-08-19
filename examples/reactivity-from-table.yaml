@@ -1,0 +1,23 @@
+---
+category: daes
+intro: |
+  # Reactor point kinetics
+
+  En esta sección extra ilustramos rápidamente las funcionalidades, aplicadas a las ecuaciones de cinética puntual de reactores.
+  Todos los casos usan los siguientes parámetros cinéticos:
+
+  ```{.feenox include="parameters.fee"}
+  ```
+
+
+  ## Cinética puntual directa con reactividad vs. tiempo
+
+  Este primer ejemplo resuelve cinética puntual con una reactividad $\rho(t)$ dada por una "tabla", es decir, una función de un único argumento (el tiempo $t$) definida por pares de puntos $[t,\rho(t)]$ e interpolada linealmente.
+terminal: |
+  $ feenox reactivity-from-table.fee > flux.dat
+  $ pyxplot kinetics.ppl
+figures: |
+  ![Flujo y reactividad directa](reactivity-from-table.svg)
+...
+
+

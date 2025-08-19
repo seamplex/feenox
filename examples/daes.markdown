@@ -933,7 +933,6 @@ phi_dot = (rho-Beta)/Lambda * phi + vecdot(lambda, c)
 c_dot[i] = beta[i]/Lambda * phi - lambda[i]*c[i]
 
 PRINT t phi rho    # salida: phi y rho vs. tiempo
-
 ```
 
 ``` terminal

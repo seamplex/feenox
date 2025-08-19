@@ -1,0 +1,56 @@
+---
+category: mechanical
+intro: |
+  # Parallelepiped whose Young’s modulus is a function of the temperature
+ 
+  The problem consists of finding the non-dimensional temperature\ $T$ and displacements\ $u$, $v$
+  and $w$ distributions within a solid parallelepiped of length\ $l$ whose base is a square of $h\times h$.
+  The solid is subject to heat fluxes and to a traction pressure at the same time.
+  The non-dimensional Young’s modulus\ $E$ of the material depends on the temperature\ $T$
+  in a know algebraically way, whilst both the Poisson coefficient\ $\nu$ and the thermal conductivity\ $k$
+  are uniform and do not depend on the spatial coordinates:
+ 
+  $$
+  \begin{aligned}
+  E(T) &= \frac{1000}{800-T} \\
+  \nu &= 0.3 \\
+  k &= 1 \\
+  \end{aligned}
+  $$
+ 
+  ![Original figure from [v7.03.100.pdf](http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf)](parallelepiped.svg){#fig:parallelepiped}
+ 
+  References:
+  
+   * <http://www.code-aster.org/V2/doc/default/fr/man_v/v7/v7.03.100.pdf>
+   * <https://www.seamplex.com/docs/SP-FI-17-BM-12F2-A.pdf>
+ 
+  This thermo-mechanical problem is solved in two stages. First, the heat conduction
+  equation is solved over a coarse first-order mesh to find the non-dimensional temperature distribution.
+  Then, a mechanical problem is solved where $T(x,y,z)$ is read from the first mesh
+  and interpolated into a finer second-order mesh so to as evaluate the non-dimensional Young's modulus
+  as
+ 
+  $$E\Big(T(x,y,z)\Big) = \frac{1000}{800-T(x,y,z)}$$
+ 
+  Note that there are not thermal expansion effects (i.e. the thermal expansion coefficient is $\alpha=0$).
+  Yet, suprinsingly enough, the problem has analytical solutions for both the temperature and the displacement fields.
+ 
+  ## Thermal problem
+ 
+  The following input solves the thermal problem over a coarse first-order mesh, writes the resulting
+  temperature distribution into `parallelepiped-temperature.msh`, and prints the $L_2$ error of the numerical
+  result with respect to the analytical solution $T(x,y,z) = 40 - 2x - 3y - 4z$.
+terminal: | 
+  $ gmsh -3 parallelepiped.geo -order 1 -clscale 2 -o parallelepiped-coarse.msh
+  [...]
+  Info    : 117 nodes 567 elements
+  Info    : Writing 'parallelepiped-coarse.msh'...
+  Info    : Done writing 'parallelepiped-coarse.msh'
+  Info    : Stopped on Fri Dec 10 10:32:30 2021 (From start: Wall 0.0386516s, CPU 0.183052s)
+  $ feenox parallelepiped-thermal.fee 
+  6.18981e-12
+  $
+figures: |
+  ![Temperature distribution over the coarse mesh in Gmsh (yes, it is a rainbow pallete)](parallelepiped-temperature.png)
+...

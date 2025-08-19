@@ -180,7 +180,6 @@ PRINT_FUNCTION profile5 profile7 profile9 MIN 0 MAX 10 NSTEPS 100 FILE $0-$1.dat
 
 WRITE_RESULTS
 PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb" total_dofs memory()
-
 ```
 
 

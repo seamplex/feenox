@@ -1,0 +1,93 @@
+---
+category: daes
+intro: |
+  ## Arbitrary power distribution
+ 
+  Extension of the Clausse-Lahey model to support arbitrary (and potentially time-dependent) power profiles as explained in
+  
+   * [A Moving Boiling-Boundary Model Of An Arbitraryly-Powered Two-Phase Flow Loop](https://cimec.org.ar/ojs/index.php/mc/article/view/4091/4017), by Jeremy Theler, Alejandro Clausse and Fabián J. Bonetto (2012).
+  
+  > | The original paper was written using the **second** version of the code, named wasora.
+  > | Recall that FeenoX is a [third system effect](../doc/sds.md#sec:architecture).
+  
+  
+  ![Figure from the paper above.](boiling-2012-figure.png)  
+  
+  For reference, the non-dimensional equations are
+
+  $$
+  \begin{aligned}
+  0 &= \, -\frac{1}{h_\text{i}(t)} \cdot \frac{d h_\text{i}}{dt} \left( N_1 - n - \frac{1}{2} \right) \Big[\ell_{n}(t) - \ell_{n-1}(t) \Big]  
+  + \frac{1}{2} \left( \frac{d\ell_n}{dt} + \frac{d\ell_{n-1}}{dt} \right)  \quad\quad & \nonumber \\
+  & \quad\quad\quad\quad - u_\text{i}(t) - \frac{N_1}{h_\text{i}(t)} \cdot \frac{N_\text{sub}}{N_\text{pch}} \int_{\ell_{n-1}(t)}^{\ell{n}(t)} q(z,t) \, dz \quad\quad\quad\quad\quad \text{for $n=1,\dots,N_1$}
+  \\
+  0 &=  u_\text{i}(t) - u_\text{e}(t)  + N_\text{sub} \int_{\lambda(t)}^{1} q(z',t) \, dz' 
+  \\
+  0 &=  \, \rho_\text{e}(t) - \frac{1}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{1} q(z',t) \, dz'}
+  \\
+  0 &= \lambda(t) - m(t) + \int_{\lambda(t)}^{1} \frac{dz}{\displaystyle 1 + N_\text{pch} \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} 
+  \\
+  0 &= \varphi(t) - \int_{\lambda(t)}^{1} \frac{ \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz
+  \\
+  0 &= \frac{d m(t)}{dt} + \rho_\text{e}(t) \cdot u_\text{e}(t) - u_\text{i}(t)
+  \\
+  0 &= 
+   \frac{d u_\text{i}(t)}{dt} \cdot \lambda(t) + u_\text{i}(t) \cdot \frac{d \lambda(t)}{dt} + \frac{d\varphi(t)}{dt}
+   + \rho_\text{e}(t) \, u_\text{e}^2(t) - \rho_\text{i}(t) \, u_\text{i}^2(t)  \\
+  & \quad\quad\quad\quad +
+  \Lambda \cdot \left[ u_\text{i}^2(t) \cdot \lambda(t) +
+   \int_{\lambda(t)}^{1} \frac{\left( \displaystyle u_\text{i}(t) + N_\text{sub}  \int_{\lambda(t)}^{z} q(z',t) \, dz'\right)^2}{\displaystyle 1 + N_\text{pch}  \cdot \eta(t) \cdot \int_{\lambda(t)}^{z} q(z',t) \, dz'} \, dz \right] \\
+  & \quad\quad\quad\quad\quad\quad
+   + k_\text{i} \cdot \rho_\text{i}(t) \, u_\text{i}^2(t)
+   + k_\text{e} \cdot \rho_\text{e}(t) \, u_\text{e}^2(t)
+  + \frac{m(t)}{\text{Fr}} - \text{Eu}(t) \\
+  0 &= h_\text{i}(t) + f(\mathbf{x}, \mathbf{\dot{x}}, t) \\
+  0 &= \text{Eu}(t) + g(\mathbf{x}, \mathbf{\dot{x}}, t)
+  \end{aligned}
+  $$
+  
+  Again, see the full paper for the details.
+  
+  The input file `boiling-2012-steady.fee` computes the steady-state profiles of
+  
+   * the velocity $u(z)$
+   * the enthalpy $h(z)$
+   * the density $h(z)$
+   
+  where
+  
+   1. the first argument is a string with the power profile (default `uniform`), either
+   
+      a. `uniform`
+      
+          ```{.feenox include="boiling-2012-uniform.fee"}
+         ```
+   
+      b. `sine`
+   
+         ```{.feenox include="boiling-2012-sine.fee"}
+         ```
+   
+      c. `arbitrary`
+   
+         ```{.feenox include="boiling-2012-arbitrary.fee"}
+         ```
+  2. the second argument is the subcooling number $N_\text{sub}$ (default 6.5)
+  
+  3. the third argument is the Euler number $\text{Eu}$ (default is 11), from which the phase-change number $N_\text{pch}$ is computed.
+  
+  The transient problem is solved using the input below, `boiling-2012.fee`.
+  
+  > There is a slight difference in the distributed head loss term between the 2010 and 2012 formulations for the uniform power profile case. There's a bounty for those who can find it.
+  
+terminal: |
+  $ feenox boiling-2012.fee uniform | tee boiling-2012-uniform.dat
+  [...]
+  $ feenox boiling-2012.fee sine | tee boiling-2012-sine.dat
+  [...]
+  $ feenox boiling-2012.fee arbitrary | tee boiling-2012-arbitrary.dat
+  [...]
+  $ 
+figures: |
+  ![Projection of the full space into $\lambda$-$u_i$ for $N_\text{sub} = 6.5$ and $\text{Eu} = 9.725$.](boiling-2012.svg){width=85%}
+...

@@ -1,0 +1,130 @@
+---
+category: laplace
+intro: |
+  # Potential flow around an airfoil profile
+ 
+  The Laplace equation can be used to model potential flow, as illustrated with this example from [Prof. Enzo Dari](https://www.conicet.gov.ar/new_scp/detalle.php?keywords=enzo%2Bdari&id=32035&datos_academicos=yes) for his course "Fluid Mechanics" at [Instituto Balseiro](https://www.ib.edu.ar/).
+  
+  For the particular case of a airfoil profile, the Dirichlet condition at the wing has to satisfy the [Kutta condition](https://en.wikipedia.org/wiki/Kutta%E2%80%93Joukowski_theorem).
+  
+  This example
+ 
+   1. Creates a symmetric airfoil-like [Joukowsky profile](https://en.wikipedia.org/wiki/Joukowsky_transform) using the the Gmsh Python API
+   2. Solves the steady-state 2D Laplace equation with a different Dirichlet value at the airfoil until the solution $\phi$ evaluated at the continuation of the wing tip matches the boundary value $c$. It then computes the circulation integral of the velocities 
+       a. over the profile itself
+       b. over a circle around the airfoil, computing the unitary tangential vector
+          i. from the internal normal variables `nx` and `ny`
+          ii. from two functions `tx` and `ty` using the circle's equation
+       c. around the original rectangular domain 
+       
+       It also computes the drag and the lift scalars as the integral of the pressure (computed from Bernoulli's principle) times `nx` and `nz` over the circle, respectively.
+   
+  ![Full domain](airfoil-msh1.png){width=100%}
+  
+  ![Zoom over the airfoil profile](airfoil-msh2.png){width=100%}
+
+  ```{.python include="airfoil.py"}
+  ```
+  
+terminal: | 
+  $ python airfoil.py
+  [...]
+  Info    : Writing 'airfoil.msh'...
+  Info    : Done writing 'airfoil.msh'
+  $ feenox airfoil.fee 
+  # #     step_static     c       e
+  #       1       0.500000        -3.4e-03
+  #       2       0.400000        +3.7e-03
+  #       3       0.452067        +2.0e-09
+  circ_profile  = 2.49918
+  circ_circle_t = 2.49975
+  circ_circle_n = 2.49907
+  circ_box      = 2.50379
+  pressure_drag = -0.00168068
+  pressure_lift = 2.60614
+  $ 
+...
+PROBLEM laplace 2D MESH airfoil.msh
+static_steps = 20
+
+# boundary conditions constant -> streamline
+BC bottom  phi=0
+BC top     phi=1
+
+# initialize c = streamline constant for the wing
+DEFAULT_ARGUMENT_VALUE 1 0.5
+IF in_static_first
+ c = $1
+ENDIF
+BC wing    phi=c
+
+SOLVE_PROBLEM
+
+PHYSICAL_GROUP kutta DIM 0
+e = phi(kutta_cog[1], kutta_cog[2]) - c
+PRINT TEXT "\# "step_static %.6f c %+.1e e HEADER
+
+# check for convergence
+done_static = done_static | (abs(e) < 1e-8)
+IF done_static
+  PHYSICAL_GROUP left DIM 1
+  vx(x,y) = +dphidy(x,y) * left_length
+  vy(x,y) = -dphidx(x,y) * left_length
+
+  # write post-processing views
+  WRITE_MESH $0-converged.msh   phi VECTOR vx vy 0
+  WRITE_MESH $0-converged.vtk   phi VECTOR vx vy 0
+  
+  # circulation on profile
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER wing RESULT circ_profile
+  PRINTF "circ_profile  = %g" -circ_profile
+
+  # function unit tangent
+  PHYSICAL_GROUP circle DIM 1
+  cx = circle_cog[1]
+  cy = circle_cog[2]
+  tx(x,y) = -(y-cy)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  ty(x,y) = +(x-cx)/sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy))
+  
+  # circulation on the circumference with tangent
+  INTEGRATE vx(x,y)*tx(x,y)+vy(x,y)*ty(x,y) OVER circle RESULT circ_circle_t
+  PRINTF "circ_circle_t = %g" -circ_circle_t
+
+  # circulation on the outer box
+  INTEGRATE vx(x,y)*(+ny)+vy(x,y)*(-nx) OVER circle RESULT circ_circle_n
+  PRINTF "circ_circle_n = %g" -circ_circle_n
+  
+  INTEGRATE -vx(x,y) OVER top    GAUSS RESULT inttop
+  INTEGRATE +vx(x,y) OVER bottom GAUSS RESULT intbottom
+  INTEGRATE -vy(x,y) OVER left   GAUSS RESULT intleft
+  INTEGRATE +vy(x,y) OVER right  GAUSS RESULT intright
+  circ_box = inttop + intleft + intbottom + intright
+  PRINTF "circ_box      = %g" -circ_box
+  
+  # pressure forces
+  p(x,y) = 1.0 - vx(x,y)^2 + vy(x,y)^2
+  INTEGRATE p(x,y)*(nx) OVER circle RESULT pFx
+  PRINTF "pressure_drag = %g" pFx
+  INTEGRATE p(x,y)*(ny) OVER circle RESULT pFy
+  PRINTF "pressure_lift = %g" pFy
+  
+ELSE
+
+ # update c
+ IF in_static_first
+  c_last = c
+  e_last = e
+  c = c_last - 0.1
+ ELSE
+  c_next = c_last - e_last * (c_last-c)/(e_last-e)
+  c_last = c
+  e_last = e
+  c = c_next
+ ENDIF
+ENDIF
+---
+figures: |
+  ![Potential and velocities on the whole domain](airfoil-converged1.png){width=100%}
+
+  ![Potential and velocities zoomed over the airfoil](airfoil-converged2.png){width=100%}
+...

@@ -1,12 +1,3 @@
----
-category: daes
-intro: |
-  ## Control de inestabilidades de xenón
-
-  Ahora introducimos un poco más de complejidad.
-  A las ecuaciones de cinética puntual le agregamos cinética de xenón 135. Como el sistema resultante es inestable ante cambios de flujo, la reactividad es ahora una función de la posición de una barra de control ficticia cuya importancia está dada por una interpolación tipo Steffen de su posición adimensional $z$.
-  Una lógica de control PI (con una banda muerta del 0.3%) "mueve" dicha barra de control de forma tal de forzar al reactor a bajar la potencia del 100% al 80% en mil segundos, mantenerse durante tres mil segundos a esa potencia y volver al 100% en cinco mil:
-...
 INCLUDE parameters.fee
 
 FUNCTION setpoint(t) DATA {
@@ -66,9 +57,3 @@ error = phi - setpoint(t)
 z = z_0 + integral_dt(vrod*((error>(+band))-(error<(-band))))
 
 PRINT t phi z setpoint(t)
----
-terminal: |
-  $ feenox xenon.fee 
-figures: |
-  ![Flujo y posición de la barra de control en un caso con xenón bajo control](xenon.svg)
-...

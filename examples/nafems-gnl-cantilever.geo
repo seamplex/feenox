@@ -1,5 +1,5 @@
 SetFactory("OpenCASCADE");
-Box(1) = {0, 0, 0, 3.2, 0.1, 0.1};
+Box(1) = {0, -0.05, -0.05, 3.2, 0.1, 0.1};
 
 Physical Surface("left") = {1};
 Physical Surface("right") = {2};
@@ -17,4 +17,4 @@ Transfinite Volume{1};
 
 Mesh.RecombineAll = 1;
 Mesh.ElementOrder = 2;
-Mesh.SecondOrderIncomplete = 1;
+// Mesh.SecondOrderIncomplete = 1;

@@ -1,4 +1,4 @@
-PROBLEM mechanical QUASISTATIC TS pseudo
+PROBLEM mechanical TS pseudo
 READ_MESH beam-cantilever-tet4.msh
 
 ldef = 1
@@ -14,7 +14,7 @@ BC right tz=-25
 SOLVE_PROBLEM
 
 # PRINT t w(0.5,-0.25,+0.01)
-
+# WRITE_RESULTS
 IF done
   PRINT w(0.5,-0.25,+0.01)+0.016062
 ENDIF

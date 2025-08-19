@@ -1,0 +1,68 @@
+---
+category: modal
+intro: |
+ # Five natural modes of a cantilevered wire
+
+ Back in [College](https://www.ib.edu.ar/), we had this subject Experimental Physics\ 101.
+ I had to measure the natural modes of two cantilevered wires and determine the
+ Young modulus of of those measurements. The [report is here](https://www.seamplex.com/fino/doc/alambre.pdf).
+ Two comments:
+
+  1. It is in Spanish
+  2. There was a systematic error and a factor of two sneaked in into the measured values
+
+ Here is a finite-element version of the experimental setup with a comparison to then
+ theoretical values written directly as Markdown tables. The material (either aluminum or copper)
+ and the mesh type (either tet or hex) and be chosen at runtime through command line arguments.
+terminal: | 
+  $ gmsh -3 wire-hex.geo
+  [...]
+  Info    : Done meshing order 2 (Wall 0.0169025s, CPU 0.016804s)
+  Info    : 8398 nodes 4676 elements
+  Info    : Writing 'wire-hex.msh'...
+  Info    : Done writing 'wire-hex.msh'
+  Info    : Stopped on Fri Dec 24 17:07:19 2021 (From start: Wall 0.0464517s, CPU 0.133498s)
+  $ gmsh -3 wire-tet.geo
+  [...]
+  Info    : Done optimizing mesh (Wall 0.0229018s, CPU 0.022892s)
+  Info    : 16579 nodes 13610 elements
+  Info    : Writing 'wire-tet.msh'...
+  Info    : Done writing 'wire-tet.msh'
+  Info    : Stopped on Fri Dec 24 17:07:59 2021 (From start: Wall 2.5798s, CPU 2.64745s)
+  $ feenox wire.fee 
+    $n$   |    FEM [Hz]   |   Euler [Hz]  |  Relative difference [%]
+  :------:|:-------------:|:-------------:|:--------------:
+  1       |       45.84   |       45.84   |       0.02
+  2       |       287.1   |       287.3   |       0.06
+  3       |       803.4   |       804.5   |       0.13
+  4       |       1573    |       1576    |       0.24
+  5       |       2596    |       2606    |       0.38
+  
+  : copper wire over hex mesh
+  
+    $n$   |          $L$          |       $\Gamma$        |      $\mu$    |       $M$
+  :------:+:---------------------:+:---------------------:+:-------------:+:--------------:
+  1       |       +1.3e-03        |       +4.2e-01        |       0.1371  |       0.1371
+  2       |       -1.8e-03        |       -5.9e-01        |       0.2716  |       0.4087
+  3       |       +9.1e-05        |       +1.7e-02        |       0.0004  |       0.4091
+  4       |       -1.7e-03        |       -3.0e-01        |       0.1252  |       0.5343
+  5       |       -3.3e-05        |       -5.9e-03        |       0.0000  |       0.5343
+  6       |       -9.9e-04        |       -1.8e-01        |       0.0431  |       0.5775
+  7       |       +7.3e-04        |       +1.2e-01        |       0.0221  |       0.5995
+  8       |       +4.5e-06        |       +7.5e-04        |       0.0000  |       0.5995
+  9       |       +5.4e-04        |       +9.9e-02        |       0.0134  |       0.6129
+  10      |       +2.7e-05        |       +4.9e-03        |       0.0000  |       0.6129
+  
+  : copper wire over hex mesh, participation and excitation factors $L$ and $\Gamma$, effective per-mode and cumulative mass fractions $\mu$ and $M$
+  $ feenox wire.fee hex copper   | pandoc -o wire-hex-copper.md
+  $ feenox wire.fee tet copper   | pandoc -o wire-tet-copper.md
+  $ feenox wire.fee hex aluminum | pandoc -o wire-hex-aluminum.md
+  $ feenox wire.fee tet aluminum | pandoc -o wire-tet-aluminum.md
+figures: |
+  ```include
+  wire-hex-copper.md
+  wire-tet-copper.md
+  wire-hex-aluminum.md
+  wire-tet-aluminum.md
+  ```
+...

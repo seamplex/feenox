@@ -1,0 +1,30 @@
+---
+category: mechanical
+intro: |
+  # NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark
+ 
+  ::: {#fig:nafems-le11-problem}
+  ![Problem statement](nafems-le11-problem.png){width=48%}
+  ![Structured hex mesh](nafems-le11-mesh.png){width=48%}
+  
+  The NAFEMS LE11 problem formulation
+  :::
+ 
+  Following the spirit from LE10, note how easy it is to give a
+  space-dependent temperature field in FeenoX.
+  Just write $\sqrt{x^2+y^2}+z$ like `sqrt(x^2 + y^2) + z`!
+terminal: |
+  $ gmsh -3 nafems-le11.geo
+  [...]
+  $ feenox nafems-le11.fee
+  sigma_z(A) = -105.04 MPa
+  wall time  = wall time  = 1.91 seconds
+  $
+figures: |
+  ::: {#fig:nafems-le11-result}
+  ![Problem statement](nafems-le11-temperature.png){width=48%}
+  ![Structured hex mesh](nafems-le11-sigmaz.png){width=48%}
+  
+  The NAFEMS LE11 problem results
+  :::
+...

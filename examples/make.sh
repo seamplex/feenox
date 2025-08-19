@@ -61,11 +61,12 @@ for i in hello          \
          steel-alum            \
   ; do
   in=${i}.fee
-  out=$(grep category ${in} | cut -d: -f2 | xargs).md
+  in_yaml=${i}.yaml
+  out=$(grep category ${in_yaml} | cut -d: -f2 | xargs).md
   echo ${i} '->' ${out}
   
   # the actual markdown
-  awk -f extract_yaml.awk ${in} | yq -r .intro | \
+  awk -f extract_yaml.awk ${in_yaml} | yq -r .intro | \
     pandoc -t markdown   --lua-filter=../doc/include-files.lua \
                          --lua-filter=../doc/include-code-files.lua \
                          --lua-filter=../doc/not-in-format.lua \
@@ -82,12 +83,12 @@ for i in hello          \
   
   echo >> ${out}
   echo '```terminal' >> ${out}
-  awk -f extract_yaml.awk ${in} | yq -r .terminal >> ${out}
+  awk -f extract_yaml.awk ${in_yaml} | yq -r .terminal >> ${out}
   echo '```' >> ${out}
   echo >> ${out}
   
   echo >> ${out}
-  awk -f extract_yaml.awk ${in} | yq -r .figures | grep -v null >> ${out}
+  awk -f extract_yaml.awk ${in_yaml} | yq -r .figures | grep -v null >> ${out}
   echo >> ${out}
 done
 

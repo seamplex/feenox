@@ -125,3 +125,9 @@ steel-alum.msh
 steel-alum-alum.vtu
 steel-alum-steel.vtu
 
+nafems-gnl-cantilever*.vtu
+nafems-gnl-cantilever*.msh
+nafems-gnl-cantilever*.pdf
+nafems-gnl-cantilever*.dat
+
+steel-*.pvsm

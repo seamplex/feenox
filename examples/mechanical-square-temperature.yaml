@@ -1,0 +1,69 @@
+---
+category: mechanical
+intro: |
+  # Temperature-dependent material properties
+ 
+  Let us solve a plane-strain square fixed on the left, with an horizontal traction on the right and free on the other two sides.
+  The Young modulus depends on the temperature\ $E(T)$ as given in the ASME\ II part\ D tables of material properties, interpolated
+  using a [monotonic cubic scheme](https://en.wikipedia.org/wiki/Monotone_cubic_interpolation).
+  
+  Actually, this example shows three cases:
+ 
+   1. Uniform temperature identically equal to 200ºC
+   2. Linear temperature profile on the vertical direction given by an algebraic expression
+ 
+      $$
+      T(x,y) = 200 + 350\cdot y
+      $$
+ 
+   3. The same linear profile but read from the output of a thermal conduction problem
+      over a non-conformal mesh using this FeenoX input:
+ 
+      ```{.feenox include="thermal-square.fee"}
+      ```
+ 
+  Which of the three cases is executed is given by the first argument provided in the command line after the main input file.
+  Depending on this argument, which is expanded as `$1` in the main input file, either one of three secondary input files are included:
+ 
+   1. `uniform`
+ 
+      ```{.feenox include="mechanical-square-temperature-uniform.fee"}
+      ```
+ 
+   2. `linear`
+ 
+      ```{.feenox include="mechanical-square-temperature-linear.fee"}
+      ```
+ 
+   3. `mesh`
+ 
+      ```{.feenox include="mechanical-square-temperature-mesh.fee"}
+      ```
+terminal: | 
+  $ gmsh -2 square-centered.geo
+  [...]
+  Info    : Done meshing 2D (Wall 0.00117144s, CPU 0.00373s)
+  Info    : 1089 nodes 1156 elements
+  Info    : Writing 'square-centered.msh'...
+  Info    : Done writing 'square-centered.msh'
+  Info    : Stopped on Thu Aug  4 09:40:09 2022 (From start: Wall 0.00818854s, CPU 0.031239s)
+  $ feenox mechanical-square-temperature.fee uniform
+  0.465632        -0.105128
+  $ feenox mechanical-square-temperature.fee linear
+  0.589859        -0.216061
+  $ gmsh -2 square-centered-unstruct.geo 
+  [...]
+  Info    : Done meshing 2D (Wall 0.0274833s, CPU 0.061072s)
+  Info    : 65 nodes 132 elements
+  Info    : Writing 'square-centered-unstruct.msh'...
+  Info    : Done writing 'square-centered-unstruct.msh'
+  Info    : Stopped on Sun Aug  7 18:33:41 2022 (From start: Wall 0.0401667s, CPU 0.107659s)
+  $ feenox thermal-square.fee
+  $ feenox mechanical-square-temperature.fee mesh
+  0.589859        -0.216061
+  $ 
+figures: |
+  ![Temperature distribution from a heat conduction problem.](thermal-square-temperature.png){width=100%}
+ 
+  ![Young modulus distribution over the final displacements.](mechanical-square-temperature.png){width=100%}
+...

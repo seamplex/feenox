@@ -1,0 +1,113 @@
+---
+category: neutron_sn
+intro: |
+  ## Flux profiles with ray effect
+  
+  This section analyzes flux profiles along the\ $y$ axis at three different values of\ $x$ as in section\ 6.4.1 of HyeongKae Park's Master's thesis, namely
+  
+   a. $x=5.84375$
+   b. $x=7.84375$
+   c. $x=9.84375$
+   
+  Some kind of "ray effect" is expected since the flux is not as large as in the core source section and the discrete numbers of neutron directions might induce numerical artifacts when evaluating the total scalar neutron flux.
+  
+  To better understand these profiles, the original square is rotated a certaing angle\ $\theta \leq 45º$ around the $z$ direction (coming out of the screen) keeping the S$_N$ directions fixed.
+  Since we cannot use mirror boundary conditions for an arbitrary\ $\theta$, we use the full geometry instead of only one quarter like in the two preceding sections.
+  
+  Therefore, we perform a parametric sweep over
+  
+   i. the angle\ $\theta$ of rotation of the original square in the $x$-$y$ plane
+   ii. a mesh scale factor $c$
+   iii. $N=4,6,8,10,12$
+   
+  ```bash
+  #!/bin/bash
+  
+  thetas="0 15 30 45"
+  cs="4 3 2 1.5 1"
+  sns="4 6 8 10 12"
+  
+  for theta in ${thetas}; do
+   echo "angle = ${theta};" > azmy-angle-${theta}.geo
+   for c in ${cs}; do
+    gmsh -v 0 -2 azmy-angle-${theta}.geo azmy-full.geo -clscale ${c} -o azmy-full-${theta}.msh
+    for sn in ${sns}; do
+     if [ ! -e azmy-full-${theta}-${sn}-${c}.dat ]; then
+       echo ${theta} ${c} ${sn}
+       feenox azmy-full.fee ${theta} ${sn} ${c} --progress
+     fi
+    done
+   done
+  done
+  ```
+  
+terminal: |
+  $ ./azmy-full.sh
+  [...]
+  $ pyxplot azmy-full.ppl
+  $
+...
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 4
+DEFAULT_ARGUMENT_VALUE 3 0
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $2 MESH $0-$1.msh
+
+MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
+MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
+BC vacuum   vacuum
+
+sn_alpha = 0.5
+SOLVE_PROBLEM
+
+theta = $1*pi/180
+x'(d,x) = d*cos(theta) - x*sin(theta)
+y'(d,x) = d*sin(theta) + x*cos(theta)
+
+profile5(x) = phi1(x'(5.84375,x), y'(5.84375,x))
+profile7(x) = phi1(x'(7.84375,x), y'(7.84375,x))
+profile9(x) = phi1(x'(8.84375,x), y'(9.84375,x))
+
+PRINT_FUNCTION profile5 profile7 profile9 MIN -10 MAX 10 NSTEPS 1000 FILE $0-$1-$2-$3.dat
+
+# WRITE_RESULTS FORMAT vtk
+PRINTF "%g unknowns for S${2} scale factor = ${3}, memory needed = %.1f Gb" total_dofs memory()
+# FILE res MODE "a" PATH azmy-resources.dat 
+# PRINT total_dofs wall_time() memory() $1 $2 $3 FILE res
+---
+figures: |
+  There are lots (a lot) of results. Let's show here a dozen to illustrate the ray effect.
+  
+  Let's start with $\theta=0$ (i.e. the original geometry) for $N=4$, $N=8$ and $N=12$ to see how the profiles "improve":
+  
+  ![$\theta=0$ and $N=4$ for different values of $c$](azmy-full-theta-0-sn-4.svg){width=100%}
+  
+  ![$\theta=0$ and $N=8$ for different values of $c$](azmy-full-theta-0-sn-8.svg){width=100%}
+
+  ![$\theta=0$ and $N=12$ for different values of $c$](azmy-full-theta-0-sn-12.svg){width=100%}
+  
+  Now let's fix $c$ and see what happens for different angles. Some angles are "worse" than others. It seems that $\theta=45º$ gives the "best" solution:
+  
+  ![$\theta=0$ and $c=1.5$ for different values of $N](azmy-full-theta-0-c-1.5.svg){width=100%}
+  
+  ![$\theta=15$ and $c=1.5$ for different values of $N$](azmy-full-theta-15-c-1.5.svg){width=100%}
+
+  ![$\theta=30$ and $c=1.5$ for different values of $N$](azmy-full-theta-30-c-1.5.svg){width=100%}
+  
+  ![$\theta=45$ and $c=1.5$ for different values of $N$](azmy-full-theta-45-c-1.5.svg){width=100%}
+  
+  For a fixed spatial refinement $c=1$ it is clear that increasing $N$ improves the profiles:
+  
+  ![$N=4$ and $c=1$ for different values of $\theta$](azmy-full-sn-4-c-1.svg){width=100%}
+  
+  ![$N=6$ and $c=1$ for different values of $\theta$](azmy-full-sn-6-c-1.svg){width=100%}
+
+  ![$N=9$ and $c=1$ for different values of $\theta$](azmy-full-sn-8-c-1.svg){width=100%}
+  
+  Let's how the profiles change with the angle $\theta$ at the "finest" solutions:
+  
+  ![$N=10$ and $c=1.5$ for different values of $\theta$](azmy-full-sn-10-c-1.5.svg){width=100%}
+
+  ![$N=12$ and $c=2$ for different values of $\theta$](azmy-full-sn-12-c-2.svg){width=100%}
+  
+
+...

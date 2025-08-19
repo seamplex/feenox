@@ -1,0 +1,20 @@
+---
+category: basic
+intro: |
+  # The logistic map
+ 
+  Plot the asymptotic behavior of the [logistic map](https://en.wikipedia.org/wiki/Logistic_map)
+  
+  $$
+  x_{n+1} = r \cdot x \cdot (1-x)
+  $$
+ 
+  for a range of the parameter\ $r$.
+terminal: |
+  $ gnuplot
+  gnuplot> plot "< feenox logistic.fee" w p pt 50 ps 0.02
+  gnuplot> quit
+  $
+figures: |
+  ![Asymptotic behavior of the logistic map.](logistic.png)
+...

@@ -1,20 +1,3 @@
----
-category: mechanical
-intro: |
-  # NAFEMS LE1 “Elliptical membrane” plane-stress benchmark
- 
-  ![The NAFEMS LE1 problem](nafems-le1-figure.svg){width=90%}
- 
-  Tell FenooX the problem is `plane_stress`.
-  Use the `nafems-le1.geo` file provided to create the mesh.
-  Read it with `READ_MESH`, set material properties, `BC`s and `SOLVE_PROBLEM`!
-terminal: |
-  $ gmsh -2 nafems-le11.geo
-  [...]
-  $ feenox nafems-le1.fee
-  σy at point D =  92.7011 (reference is 92.7)
-  $
-...
 PROBLEM mechanical 2D plane_stress MESH nafems-le1.msh
 
 E = 210e3
@@ -28,7 +11,3 @@ SOLVE_PROBLEM
 
 WRITE_MESH nafems-le1.vtk VECTOR u v 0 sigmax sigmay tauxy
 PRINT "σy at point D = " %.4f sigmay(2000,0) "(reference is 92.7)" SEP " "
----
-figures: |
-  ![Normal stress $\sigma_y$ over 500x-warped displacements for LE1 created with Paraview](nafems-le1-sigmay.png){width=85%}
-...

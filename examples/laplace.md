@@ -88,6 +88,7 @@ SOLVE_PROBLEM
 PRINT t
 
 WRITE_MESH maze-tran-td.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+WRITE_RESULTS
 ```
 
 
@@ -140,6 +141,7 @@ SOLVE_PROBLEM
 PRINT t
 
 WRITE_MESH maze-tran-bu.msh phi    sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+WRITE_RESULTS
 ```
 
 

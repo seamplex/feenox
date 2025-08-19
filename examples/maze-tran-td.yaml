@@ -1,0 +1,31 @@
+---
+category: laplace
+intro: |
+  ## Transient top-down
+ 
+  Instead of solving a steady-state en exploiting the ellipticity of Laplace’s operator,
+  let us see what happens if we solve a transient instead.
+terminal: | 
+  $ feenox maze-tran-td.fee
+  0
+  0.00433078
+  0.00949491
+  0.0170774
+  0.0268599
+  [...]
+  55.8631
+  64.0819
+  74.5784
+  87.2892
+  100
+  $ gmsh maze-tran-td-anim.geo
+  # all frames dumped, now run
+  ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.mp4
+  ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.gif
+  $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.mp4
+  [...]
+  $ ffmpeg -y -framerate 20 -f image2 -i maze-tran-td-%03d.png maze-tran-td.gif
+  [...]
+figures: |
+ ![Transient top-bottom solution to the maze found by FeenoX (and drawn by Gmsh)](maze-tran-td.gif){width_html=100% width_latex=50%}
+...

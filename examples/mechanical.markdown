@@ -113,10 +113,10 @@ E = 210e3   # Young modulus in MPa
 nu = 0.3    # Poisson's ratio
 
 # print the direct stress y at D (and nothing more)
-PRINTF "sigma_y @ D = %g MPa" sigmay(2000,0,300)
+PRINTF "σ_y @ D = %.4f MPa" sigmay(2000,0,300)
 
 # write post-processing data for paraview
-WRITE_RESULTS FORMAT vtu 
+WRITE_RESULTS
 ```
 
 ``` terminal
@@ -689,8 +689,7 @@ problem</figcaption>
 </figure>
 
 ``` feenox
-PROBLEM mechanical
-READ_MESH veeder.msh
+PROBLEM mechanical MESH veeder.msh
 
 b = 1     # cylinder radius
 h = 0.5   # cylinder height 
@@ -702,17 +701,14 @@ alpha = 1e-5  # temperature expansion coefficient
 # temperature distribution as in the original paper
 T1 = 1        # maximum temperature
 T0 = 0        # reference temperature (where expansion is zero)
-T(x,y,z) := T0 + T1*(1-(x^2+y^2)/(b^2))
+T(x,y,z) = T0 + T1*(1-(x^2+y^2)/(b^2))
 
 
 # boundary conditions (note that the cylinder can still expand on the x-y plane)
 BC inf      tangential radial
 
-# solve!
-SOLVE_PROBLEM
-
-# write vtk output
-WRITE_MESH veeder.vtk    T sigma dudx dudy dudz dvdx dvdy dvdz dwdx dwdy dwdz  sigma1 sigma2 sigma3  VECTOR u v w
+# write vtu output
+WRITE_RESULTS
 
 # non-dimensional numerical displacement profiles 
 v_num(z') = v(0, b, z'*h)/(alpha*T1*b)
@@ -1055,7 +1051,7 @@ F = 1000
 BC p  Fy=-F
 BC 2p Fy=-2*F
 
-WRITE_RESULTS FORMAT vtu
+WRITE_RESULTS
 PRINT %.1f displ_max
 ```
 

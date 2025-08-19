@@ -1,0 +1,22 @@
+---
+category: thermal
+intro: |
+  # Non-dimensional transient heat conduction with time-dependent properties
+
+  Say we have two cubes of non-dimensional size $1\times 1 \times 1$, one made with a material with unitary properties and the other one whose properties depend explicitly on time. We glue the two cubes together, fix one side of the unitary material to a fixed zero temperature and set a ramp of temperature between zero and one at the opposite end of the material with time-varying properties.
+  
+  This example illustrates how to
+ 
+   #. assign different material properties to different volumes
+   #. give time-dependent material properties and boundary conditions
+   #. plot temperatures as function of time at arbitrary locations on space
+  
+ 
+terminal: |
+  $ gmsh -3 two-cubes.geo
+  [...]
+  $ feenox two-cubes-thermal.fee > two-cubes-thermal.dat
+  $ 
+figures: |
+  ![Temporal evolution of temperatures at three locations](two-cubes-thermal.svg){width=100%}
+...

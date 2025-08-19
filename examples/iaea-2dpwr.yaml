@@ -1,0 +1,19 @@
+---
+category: neutron_diffusion
+intro: |
+  # IAEA 2D PWR Benchmark
+ 
+  ![The IAEA 2D PWR Benchmark](iaea-2dpwr-figure.svg){width=100%}
+terminal: | 
+  $ gmsh -2 iaea-2dpwr-quarter.geo
+  $ [...]
+  $ gmsh -2 iaea-2dpwr-eighth.geo
+  $ [...]
+  $ feenox iaea-2dpwr.fee quarter
+  keff =  1.02986
+  $ feenox iaea-2dpwr.fee eighth
+  keff =  1.02975
+  $
+figures: |
+  ![Fast and thermal flux for the 2D IAEA PWR benchmark](iaea-2dpwr-fluxes.png){width=100%}
+...

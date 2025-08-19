@@ -1,14 +1,3 @@
----
-category: basic
-intro: |
-  ## Using a vector
- 
-  We could also have computed these twenty numbers by using the direct definition
-  of the sequence into a vector $\vec{f}$ of size 20.
-terminal: |
-  $ feenox fibo_vector.fee > two
-  $
-...
 # the fibonacci sequence as a vector
 VECTOR f SIZE 20
 

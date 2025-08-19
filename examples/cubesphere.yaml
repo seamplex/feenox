@@ -1,0 +1,55 @@
+---
+category: neutron_diffusion
+intro: |
+  # Cube-spherical bare reactor
+ 
+  It is easy to compute the effective multiplication factor of a one-group bare cubical reactor.
+  Or a spherical reactor. And we know that for the same mass, the $k_\text{eff}$ for the former is smaller than for the latter.
+ 
+  ::: {#fig:cube-and-sphere}
+  ![Cubical reactor](cubesphere-0.png){width=49%}
+  ![Spherical reactor](cubesphere-100.png){width=49%}
+ 
+  One eight of two bare reactors
+  :::
+ 
+  But what happens "in the middle"? That is to say, how does $k_\text{eff}$ change when we morph
+  the cube into a sphere? Enter Gmsh & Feenox.
+ 
+  ::: {#fig:cube-morph-sphere}
+  ![75% cube/25% sphere](cubesphere-25.png){width=33%}
+  ![50% cube/50% sphere](cubesphere-50.png){width=33%}
+  ![25% cube/75% sphere](cubesphere-75.png){width=33%}
+ 
+  Continuous morph between a cube and a sphere
+  :::
+ 
+  ```{.python include="cubesphere.py"}
+  ```
+terminal: |
+  $ python cubesphere.py | tee cubesphere.dat 
+  0       1.05626 5326.13 1e+06
+  5       1.05638 5337.54 999980
+  10      1.05675 5370.58 999980
+  15      1.05734 5423.19 999992
+  20      1.05812 5492.93 999995
+  25      1.05906 5576.95 999995
+  30      1.06013 5672.15 999996
+  35      1.06129 5775.31 999997
+  40      1.06251 5883.41 999998
+  45      1.06376 5993.39 999998
+  50      1.06499 6102.55 999998
+  55      1.06619 6208.37 999998
+  60      1.06733 6308.65 999998
+  65      1.06839 6401.41 999999
+  70      1.06935 6485.03 999998
+  75      1.07018 6557.96 999998
+  80      1.07088 6618.95 999998
+  85      1.07143 6666.98 999999
+  90      1.07183 6701.24 999999
+  95      1.07206 6721.33 999998
+  100     1.07213 6727.64 999999
+  $
+figures: |
+  ![Static reactivity vs. percentage of sphericity](cubesphere.svg){width=100%}
+...

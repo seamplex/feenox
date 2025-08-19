@@ -1,42 +1,3 @@
----
-category: mechanical
-intro: |
-  # Orthotropic free expansion of a cube
- 
-  To illustrate the point of the previous discussion, let us solve the thermal
-  expansion of an unrestrained unitary cube $[0,1~\text{mm}]\times[0,1~\text{mm}]\times[0,1~\text{mm}]$
-  subject to a linear radially-symmetric temperature field
-  $$
-  T(x,y,z) = 30 \text{ºC} + 150 \frac{\text{ºC}}{\text{mm}} \sqrt{x^2+y^2+z^2}
-  $$
- 
-  with a mean thermal expansion coefficient for each of the three directions $x$, $y$ and $z$
-  computed from each of the three columns of the ASME table TE-2, respectively.
-  If the data was consistent, the displacement at any point with the same
-  coordinates $x=y=z$ would be exactly equal.
-terminal: |
-  $ gmsh -3 cube-hex.geo
-  [...]
-  $ gmsh -3 cube-tet.geo
-  [...]
-  $ feenox cube-orthotropic-expansion.fee 
-  displacement in x at (1,1,1) =  4.451e-03
-  displacement in y at (1,1,1) =  4.449e-03
-  displacement in z at (1,1,1) =  4.437e-03
-  $ feenox cube-orthotropic-expansion.fee linear tet
-  displacement in x at (1,1,1) =  4.452e-03
-  displacement in y at (1,1,1) =  4.447e-03
-  displacement in z at (1,1,1) =  4.438e-03
-  $ feenox cube-orthotropic-expansion.fee akima hex
-  displacement in x at (1,1,1) =  4.451e-03
-  displacement in y at (1,1,1) =  4.451e-03
-  displacement in z at (1,1,1) =  4.437e-03
-  $ feenox cube-orthotropic-expansion.fee splines tet
-  displacement in x at (1,1,1) =  4.451e-03
-  displacement in y at (1,1,1) =  4.450e-03
-  displacement in z at (1,1,1) =  4.438e-03
-  $ 
-...
 DEFAULT_ARGUMENT_VALUE 1 steffen
 DEFAULT_ARGUMENT_VALUE 2 hex
 
@@ -81,11 +42,3 @@ WRITE_MESH cube-orthotropic-expansion-$1-$2.vtk T VECTOR u v w
 PRINT %.3e "displacement in x at (1,1,1) = " u(1,1,1)
 PRINT %.3e "displacement in y at (1,1,1) = " v(1,1,1)
 PRINT %.3e "displacement in z at (1,1,1) = " w(1,1,1)
----
-figures: |
-  ![Warped displacement ($\times 500$) of the cube using ASME's three columns.](cube-orthotropic-expansion.png){width=100%}
- 
-  > Differences cannot be seen graphically, but they are there as the terminal mimic illustrates.
-  > Yet, they are not as large nor as sensible to meshing and interpolation settings as one would
-  > have expected after seeing the plots from the previous section. 
-...

@@ -1,0 +1,10 @@
+---
+category: daes
+intro: |
+  ## Cinética inversa
+
+  Ahora tomamos la salida $\phi(t)$ del caso anterior y resolvemos cinética inversa de dos maneras diferentes:
+
+   1. Con la fórmula integral de la literatura clásica
+terminal: |
+  $ feenox inverse-integral.fee 

@@ -1,49 +1,4 @@
----
-category: mechanical
-intro: |
-  # Thermo-elastic expansion of finite cylinders
- 
-  Let us solve the following problem introduced by J.\ Veeder in his [technical report AECL-2660 from 1967](https://inis.iaea.org/search/search.aspx?orig_q=RN:40103718).
- 
-  > ![](veeder-problem.png){width=50%}
-  >
-  > Consider a finite solid cylinder (see insert) of radius\ $b$ and length\ $2h$,
-  > with the origin of coordinates at the centre.
-  > It may be shown that the temperature distribution in a cylindrical
-  > fuel pellet operating in a reactor is given approximately by
-  > 
-  > $$T(r) = T_0 + T_1 \cdot \left[ 1 - \left(\frac{r}{b} \right)^2 \right]$$
-  > 
-  > where\ $T_0$ is the pellet surface temperature and\ $T_1$ is the
-  > temperature difference between the centre and surface.
-  > The thermal expansion is thus seen to be the sum of two terms,
-  > the first of which produces uniform expansion (zero stress)
-  > at constant temperature\ $T_0$, and is therefore computationally trivial.
-  > Tho second term introduces non-uniform body forces
-  > which distort the pellet from its original cylindrical shape.
- 
-  The problem is axisymmetric on the azimutal angle and axially-symmetric along the mid-plane.
-  The FeenoX input uses the `tangential` and `radial` boundary conditions applied to the base of
-  the upper half of a 3D cylinder. The geometry is meshed using 27-noded hexahedra.
- 
-  Two one-dimensional profiles for the non-dimensional range\ $[0:1]$ at the external surfaces are written into an ASCII file ready to be plotted:
- 
-   1. axial dependency of the displacement\ $v(z') = v(0,v,z'h)$ in the\ $y$ direction at fixed $x=0$ and $y=b$, and
-   2. radial dependency of the displacement\ $w(r') = w(0,r'b, h)$ in the\ $z$ direction at fixed $x=0$ and $z=h$
-  
-  These two profiles are compared to the power expansion series given in the original report from 1967.
-  Note that the authors expect a 5% difference between the reference solution and the real one.
- 
-  ![3D mesh of the upper half of the Veeder problem](veeder-mesh.png)
-terminal: |
-  $ gmsh -3 veeder.geo
-  [...]
-  $ feenox veeder.fee
-  $ pyxplot veeder.ppl 
-  $
-...
-PROBLEM mechanical
-READ_MESH veeder.msh
+PROBLEM mechanical MESH veeder.msh
 
 b = 1     # cylinder radius
 h = 0.5   # cylinder height 
@@ -55,17 +10,14 @@ alpha = 1e-5  # temperature expansion coefficient
 # temperature distribution as in the original paper
 T1 = 1        # maximum temperature
 T0 = 0        # reference temperature (where expansion is zero)
-T(x,y,z) := T0 + T1*(1-(x^2+y^2)/(b^2))
+T(x,y,z) = T0 + T1*(1-(x^2+y^2)/(b^2))
 
 
 # boundary conditions (note that the cylinder can still expand on the x-y plane)
 BC inf      tangential radial
 
-# solve!
-SOLVE_PROBLEM
-
-# write vtk output
-WRITE_MESH veeder.vtk    T sigma dudx dudy dudz dvdx dvdy dvdz dwdx dwdy dwdz  sigma1 sigma2 sigma3  VECTOR u v w
+# write vtu output
+WRITE_RESULTS
 
 # non-dimensional numerical displacement profiles 
 v_num(z') = v(0, b, z'*h)/(alpha*T1*b)
@@ -113,9 +65,3 @@ w_ref(r',z') = z' * (b00 + b01*R(r') + b10*Z(z') + b02* R(r')^2 + b11 * R(r')*Z(
 
 PRINT_FUNCTION FILE veeder_v.dat  v_num v_ref(1,z') MIN 0 MAX 1 NSTEPS 50 HEADER
 PRINT_FUNCTION FILE veeder_w.dat  w_num w_ref(r',1) MIN 0 MAX 1 NSTEPS 50 HEADER
----
-figures: |
-  ![100,000x-warped displacements](veeder.png){width_latex=75% width_html=100%}
-
-  ![Comparison of 1-D displacement profiles](veeder-displacements.svg){width=100%}
-...

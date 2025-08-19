@@ -393,7 +393,8 @@ Note that
 
 
 ```feenox
-#!/usr/local/bin/feenox
+#!/usr/bin/feenox
+
 # read the function from stdin
 FUNCTION f(t) FILE - INTERPOLATION steffen
 

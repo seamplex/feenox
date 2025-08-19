@@ -1,0 +1,11 @@
+---
+category: basic
+intro: |
+  # Hello World (and Universe)!
+terminal: |
+  $ feenox hello.fee World
+  Hello World!
+  $ feenox hello.fee Universe
+  Hello Universe!
+  $
+...

@@ -1,4 +1,4 @@
-set preamble "\usepackage{amsmath}"
+set preamble "\\usepackage{amsmath}"
 set width 12*unit(cm)
 set axis x arrow nomirrored
 set axis y arrow nomirrored

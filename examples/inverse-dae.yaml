@@ -1,0 +1,17 @@
+---
+category: daes
+intro: |
+   2. Resolviendo el mismo sistema de DAEs pero leyendo $\phi(t)$ en lugar de $\rho(t)$
+
+   El caso 2 es "adaptivo" en el sentido de que dependiendo del error tolerado y de las derivadas temporales de las variables del espacio de las fases, el esfuerzo computacional se adapta automáticamente a través del paso de tiempo $\Delta t$ con el que se resuelve el sistema DAE. Por defecto, el método es Adams-Bashforth de orden variable (implementado por la biblioteca SUNDIALS).
+terminal: |
+  $ feenox inverse-dae.fee 
+figures: |
+  ::: {#fig-inverse}
+  ![$t \in [0,100]$](inverse.svg){#fig-inverse1}
+
+  ![$t \in [9.75,10.25]$](inverse-zoom.svg){#fig-inverse2}
+
+  Reactividad calculada mediante cinética inversa de dos maneras diferentes
+  :::
+...

@@ -1,17 +1,3 @@
----
-category: daes
-intro: |
-  ## Mapas de diseño
-
-  Finalizamos recuperando unos resultados derivados de mi tesis de maestría <https://doi.org/10.1016/j.nucengdes.2010.03.007>.
-  Consiste en cinética puntual de un reactor de investigación con retroalimentación termohidráulica por temperatura del refrigerante y del combustible escrita como modelos de capacitancia concentrada^[Del inglés [_lumped capacitance_]{lang=en-US}.] cero-dimensionales.
-  El estudio consiste en barrer paramétricamente el espacio de coeficientes de reactividad $[\alpha_c, \alpha_f]$, perturbar el estado del sistema dinámico ($\Delta T_f = 2~\text{ºC}$) y marcar con un color la potencia luego de un minuto para obtener mapas de estabilidad tipo Lyapunov.
-
-  Para barrer el espacio de parámetros usamos series de números cuasi-aleatorios de forma tal de poder realizar ejecuciones sucesivas que van llenando densamente dicho espacio:
-
-  ```{.bash include="point.sh"}
-  ```
-...
 nprec = 6    # six precursor groups
 VECTOR c[nprec]
 VECTOR lambda[nprec] DATA 1.2400E-02 3.0500E-02 1.1100E-01 3.0100E-01 1.1400E+00 3.0100E+00 
@@ -61,18 +47,3 @@ done = done | (phi > 4)
 IF done
  PRINT alpha_T_fuel alpha_T_cool phi
 ENDIF
----
-terminal: |
-  $ ./point.sh 0 2048
-  $ ./point.sh 2048 4096
-  $
-figures: |
-  ::: {#fig-map}
-  ![Estabilidad de Lyapunov utilizando series de números pseudo-aleatorios que van "rellenando" incremental y densamente el espacio de parámetros.](map.svg)
-
-  ![Figuras originales de la referencia](figs-ned.png)
-
-  Mapas de estabilidad de cinética puntual con realimentación termohidráulica
-  :::
-
-...

@@ -1,0 +1,65 @@
+---
+category: neutron_sn
+intro: |
+  # Azmy’s problem
+  
+  As in
+   
+    * [Y. Y. Azmy, The Weighted Diamond-Difference Form of Nodal Transport Methods. NUCLEAR SCIENCE AND ENGINEERING: 98, 29-40 (1988). DOI: 10.13182/NSE88-6](https://doi.org/10.13182/NSE88-6)    
+    
+  ![Original problem formulation from 1988 paper](azmy-problem.png)
+    
+  ## Second-order complete structured rectangular grid
+  
+  This example solves the problem using a structured second-order grid.
+  It computes the mean flux in each quadrant by integrating $\phi_1$ over each physical group using the instruction [`INTEGRATE`](https://www.seamplex.com/feenox/doc/feenox-manual.html#integrate).
+  
+  ![Second-order complete structured rectangular grid](azmy-structured-mesh.png)
+  
+terminal: | 
+  $ gmsh -2 azmy-structured.geo
+  $ feenox azmy-structured.fee 2
+  LLQ = 1.653e+00 (ref 1.676e+0)
+  LRQ = 4.427e-02 (ref 4.159e-2)
+  URQ = 2.712e-03 (ref 1.992e-3)
+  16900 unknowns for S2, memory needed = 0.2 Gb
+  $ feenox azmy-structured.fee 4
+  LLQ = 1.676e+00 (ref 1.676e+0)
+  LRQ = 4.164e-02 (ref 4.159e-2)
+  URQ = 1.978e-03 (ref 1.992e-3)
+  50700 unknowns for S4, memory needed = 0.7 Gb
+  $ feenox azmy-structured.fee 6
+  LLQ = 1.680e+00 (ref 1.676e+0)
+  LRQ = 4.120e-02 (ref 4.159e-2)
+  URQ = 1.874e-03 (ref 1.992e-3)
+  101400 unknowns for S6, memory needed = 2.7 Gb
+  $
+...
+DEFAULT_ARGUMENT_VALUE 1 4
+PROBLEM neutron_sn DIM 2 GROUPS 1 SN $1 MESH $0.msh
+
+MATERIAL src S1=1 Sigma_t1=1 Sigma_s1.1=0.5
+MATERIAL abs S1=0 Sigma_t1=2 Sigma_s1.1=0.1
+
+PHYSICAL_GROUP llq MATERIAL src
+PHYSICAL_GROUP lrq MATERIAL abs
+PHYSICAL_GROUP urq MATERIAL abs
+PHYSICAL_GROUP ulq MATERIAL abs
+
+BC mirror   mirror
+BC vacuum   vacuum
+
+SOLVE_PROBLEM
+
+# compute mean values in each quadrant
+INTEGRATE phi1 OVER llq RESULT lower_left_quadrant
+INTEGRATE phi1 OVER lrq RESULT lower_right_quadrant
+INTEGRATE phi1 OVER urq RESULT upper_right_quadrant
+
+PRINTF "LLQ = %.3e (ref 1.676e+0)" lower_left_quadrant/(5*5)
+PRINTF "LRQ = %.3e (ref 4.159e-2)" lower_right_quadrant/(5*5)
+PRINTF "URQ = %.3e (ref 1.992e-3)" upper_right_quadrant/(5*5)
+
+WRITE_RESULTS
+PRINTF "%g unknowns for S${1}, memory needed = %.1f Gb" total_dofs memory()
+

@@ -158,8 +158,9 @@ ENDIF
 # print the progress so we know how much is left when we run it
 PRINT t T(0.1,0,0)
 
-# write the full transient in a .msh
+# write the full transient in a .msh and vtu (+pvd)
 WRITE_RESULTS FILE barra3d-transient.msh
+WRITE_RESULTS FILE barra3d.vtu
 
 # TODO
 # WRITE_RESULTS FILE barra3d-transient.vtk
@@ -237,7 +238,9 @@ ENDIF
 # print the temperature at the center of the base vs time
 PRINT %e t T(0,0,0) T(0.5,0,0) T(1,0,0) has_to_dump_profile
 
+# outputs in both Gmsh and VTU formats (.pvd + .vtu)
 WRITE_MESH temp-cylinder.msh T
+WRITE_MESH temp-cylinder.vtu T
 
 IF done
  PRINT "\# open temp-anim-cylinder.geo in Gmsh to create a quick rough video"
@@ -342,8 +345,6 @@ cp_right = 1
 BC zero  T=0
 BC ramp  T=limit(t,0,1)
 BC side  q=0
-
-SOLVE_PROBLEM
 
 PRINT t T(0,0,0) T(0.5,0,0) T(1,0,0) T(1.5,0,0) T(2,0,0)
 ```

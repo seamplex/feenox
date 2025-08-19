@@ -1,4 +1,4 @@
-set preamble "\usepackage{amsmath}"
+set preamble "\\usepackage{amsmath}"
 
 set width 14*unit(cm)
 set size ratio 1.0/2.5

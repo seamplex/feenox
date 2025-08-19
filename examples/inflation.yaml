@@ -1,0 +1,25 @@
+---
+category: basic
+intro: |
+  # Financial decisions under inflation
+  
+  You live in a country with a high inflation rate.
+  A retailer offers you a good with two payment options:
+
+   a. 30% off the full price plus 3 equal monthly installments, or
+   b. full price in 12 equal monthly installments
+   
+  If the inflation rate is small (large), option a (b) wins.
+  
+  **Question** What is the monthly inflation rate at which the two options are equally good (or bad)?
+terminal: |
+  $ feenox inflation.fee 
+  the tipping monthly inflation is 0.0931703 (that means 9.3% per month and 291.2% per year)
+  
+  with 12 payments no discount with r = 0.10317 you pay 0.617
+  with  3 payments and 30% off with r = 0.10317 you pay 0.637
+  
+  with 12 payments no discount with r = 0.0831703 you pay 0.669
+  with  3 payments and 30% off with r = 0.0831703 you pay 0.648
+  $ 
+...

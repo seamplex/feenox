@@ -1,0 +1,15 @@
+# NAFEMS geometrically-non-linear cantilevered beam
+PROBLEM mechanical MESH $0.msh
+
+E = 2.1e11
+nu = 0
+ldef = 1
+
+end_time = 1
+BC left fixed
+BC right Fx=-3.844e6*t Fy=-3.844e3*t
+
+SOLVE_PROBLEM
+PRINT t u(3.2,0,0) v(3.2,0,0)
+
+WRITE_RESULTS
