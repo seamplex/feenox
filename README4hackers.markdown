@@ -380,7 +380,7 @@ workflows to solve [engineering-related problems][]:
 - [Systems of ODEs/DAEs]
 - [Laplace’s equation]
 - [Heat conduction]
-- [Linear elasticity]
+- [Elasticity (small and large strain)]
 - [Modal analysis]
 - [Neutron diffusion]
 - [Neutron S<sub>N</sub>]
@@ -392,7 +392,7 @@ workflows to solve [engineering-related problems][]:
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
   [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html
-  [Linear elasticity]: https://seamplex.com/feenox/examples/mechanical.html
+  [Elasticity (small and large strain)]: https://seamplex.com/feenox/examples/mechanical.html
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html

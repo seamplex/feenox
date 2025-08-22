@@ -44,7 +44,7 @@
   cylinder](https://seamplex.com/feenox/examples/thermal.html#non-dimensional-transient-heat-conduction-on-a-cylinder)
   - [Non-dimensional transient heat conduction with time-dependent
   properties](https://seamplex.com/feenox/examples/thermal.html#non-dimensional-transient-heat-conduction-with-time-dependent-properties)
-- Linear elasticity
+- Elasticity (small and large deformation)
   - [NAFEMS LE10 “Thick plate pressure”
   benchmark](https://seamplex.com/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark)
   - [NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature”
@@ -65,6 +65,8 @@
   properties](https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties)
   - [Two cubes compressing each other](https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other)
   - [Steel/aluminum paradox](https://seamplex.com/feenox/examples/mechanical.html#steelaluminum-paradox)
+  - [NAFEMS GNL5 “Large-deformation
+  beam”](https://seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)
 - Mechanical modal analysis
   - [Optimizing the length of a tuning
   fork](https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork)

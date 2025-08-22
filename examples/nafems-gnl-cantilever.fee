@@ -1,15 +1,22 @@
-# NAFEMS geometrically-non-linear cantilevered beam
-PROBLEM mechanical MESH $0.msh
+# NAFEMS Geometrically-Non-Linear cantilever beam
+PROBLEM mechanical MESH nafems-gnl-cantilever.msh
 
-E = 2.1e11
+E = 2.1e11     # linear elastic material
 nu = 0
-ldef = 1
+ldef = 1       # with large-strain (i.e. SVK model)
 
-end_time = 1
+end_time = 1   # quasistatic (because problem is mechanical)
+dt_0 = 1e-2    # initial time step = 1% 
+min_dt = 1e-3  # minimum load increament = 0.1%
+
+# boundary conditions with loads scaled by t
 BC left fixed
 BC right Fx=-3.844e6*t Fy=-3.844e3*t
 
 SOLVE_PROBLEM
-PRINT t u(3.2,0,0) v(3.2,0,0)
 
+# show step, t, incremente and horizontal and vertical displacements
+PRINT step_transient t dt u(3.2,0,0) v(3.2,0,0)
+
+# write one vtu for each step and a global pvd file
 WRITE_RESULTS

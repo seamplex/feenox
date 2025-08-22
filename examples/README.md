@@ -15,7 +15,7 @@ The FeenoX examples are divided by the type of problem they solve:
  #. [Systems of ODEs/DAEs](daes.md)
  #. [Laplace’s equation](laplace.md)
  #. [Heat conduction](thermal.md)
- #. [Linear elasticity](mechanical.md)
+ #. [Elasticity (small and large def.)](mechanical.md)
  #. [Modal analysis](modal.md)
  #. [Neutron diffusion](neutron_diffusion.md)
  #. [Neutron $S_N$](neutron_sn.md)

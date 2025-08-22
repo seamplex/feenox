@@ -101,7 +101,7 @@ current version can solve
   ODEs/DAEs][systems of ordinary differential/algebraic equations]
 - [Laplace’s equation]
 - [Heat conduction]
-- [Linear elasticity]
+- [Elasticity (small and large strain)]
 - [Modal analysis]
 - [Neutron diffusion]
 - [Neutron S<sub>N</sub>]
@@ -150,7 +150,7 @@ solutions].
   [in parallel using the MPI standard]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html
   [Heat conduction]: https://seamplex.com/feenox/examples/thermal.html
-  [Linear elasticity]: https://seamplex.com/feenox/examples/mechanical.html
+  [Elasticity (small and large strain)]: https://seamplex.com/feenox/examples/mechanical.html
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html

@@ -7,13 +7,13 @@ n = $3    # number of bins
 a = $4    # lower end of range
 b = $5    # upper end of range
 
-VECTOR data SIZE N     # vector with the actual data
-VECTOR hist SIZE n     # histogram bins
+VECTOR data[N]     # vector with the actual data
+VECTOR hist[n]     # histogram bins
 
 # either read data from a file 
-# READ data ASCII_FILE_PATH $1
+READ_DATA FILE $1 data
 # or generate some random data
-data[i] = random_gauss(0.5*(a+b),0.25*(b-a))
+# data[i] = random_gauss(0.5*(a+b),0.25*(b-a))
 
 s = (b-a)/n
 hist[i] = sum(is_in_interval(data[j], a+(i-1)*s, a+i*s), j, 1, N)

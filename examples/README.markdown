@@ -17,7 +17,7 @@ The FeenoX examples are divided by the type of problem they solve:
 2.  [Systems of ODEs/DAEs]
 3.  [Laplace’s equation]
 4.  [Heat conduction]
-5.  [Linear elasticity]
+5.  [Elasticity (small and large def.)]
 6.  [Modal analysis]
 7.  [Neutron diffusion]
 8.  [Neutron $`S_N`$]
@@ -51,7 +51,7 @@ Presentation” (August 2021).
   [Systems of ODEDAEs]: daes.markdown
   [Laplace’s equation]: laplace.md
   [Heat conduction]: thermal.md
-  [Linear elasticity]: mechanical.md
+  [Elasticity (small and large def.)]: mechanical.md
   [Modal analysis]: modal.md
   [Neutron diffusion]: neutron_diffusion.md
   [Neutron $`S_N`$]: neutron_sn.md
@@ -118,7 +118,7 @@ propose benchmark problems to add to the suite.
   - [Non-dimensional transient heat conduction on a cylinder]
   - [Non-dimensional transient heat conduction with time-dependent
     properties]
-- Linear elasticity
+- Elasticity (small and large deformation)
   - [NAFEMS LE10 “Thick plate pressure” benchmark]
   - [NAFEMS LE11 “Solid Cylinder/Taper/Sphere-Temperature” benchmark]
   - [NAFEMS LE1 “Elliptical membrane” plane-stress benchmark]
@@ -132,6 +132,7 @@ propose benchmark problems to add to the suite.
   - [Temperature-dependent material properties]
   - [Two cubes compressing each other]
   - [Steel/aluminum paradox]
+  - [NAFEMS GNL5 “Large-deformation beam”]
 - Mechanical modal analysis
   - [Optimizing the length of a tuning fork]
   - [Five natural modes of a cantilevered wire]
@@ -191,6 +192,7 @@ propose benchmark problems to add to the suite.
   [Temperature-dependent material properties]: https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties
   [Two cubes compressing each other]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
   [Steel/aluminum paradox]: https://seamplex.com/feenox/examples/mechanical.html#steelaluminum-paradox
+  [NAFEMS GNL5 “Large-deformation beam”]: https://seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
   [Optimizing the length of a tuning fork]: https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork
   [Five natural modes of a cantilevered wire]: https://seamplex.com/feenox/examples/modal.html#five-natural-modes-of-a-cantilevered-wire
   [IAEA 2D PWR Benchmark]: https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-2d-pwr-benchmark

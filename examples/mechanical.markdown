@@ -1,4 +1,4 @@
-# Linear elasticity
+# Elasticity (small and large deformation)
 
 - [<span class="toc-section-number">1</span> NAFEMS LE10 “Thick plate
   pressure” benchmark]
@@ -21,6 +21,8 @@
 - [<span class="toc-section-number">9</span> Two cubes compressing each
   other]
 - [<span class="toc-section-number">10</span> Steel/aluminum paradox]
+- [<span class="toc-section-number">11</span> NAFEMS GNL5
+  “Large-deformation beam”]
 
   [<span class="toc-section-number">1</span> NAFEMS LE10 “Thick plate pressure” benchmark]:
     #nafems-le10-thick-plate-pressure-benchmark
@@ -43,6 +45,8 @@
   [<span class="toc-section-number">9</span> Two cubes compressing each other]:
     #two-cubes-compressing-each-other
   [<span class="toc-section-number">10</span> Steel/aluminum paradox]: #steelaluminum-paradox
+  [<span class="toc-section-number">11</span> NAFEMS GNL5 “Large-deformation beam”]:
+    #nafems-gnl5-large-deformation-beam
 
 # NAFEMS LE10 “Thick plate pressure” benchmark
 
@@ -1072,3 +1076,168 @@ src="steel-alum-alum.png" style="width:48.0%" alt="b" /></p>
 with aluminum gives rise to smaller maximum displacements.. a — Pink is
 steel, b — Pink is aluminum</p></figcaption>
 </figure>
+
+# NAFEMS GNL5 “Large-deformation beam”
+
+> Large-strain problems in FeenoX are **WORK IN PROGRESS**. Evaluation
+> of stresses, performance, parallelization, etc. will improve. Take
+> this example with a grain of salt.
+
+<figure>
+<img src="nafems-gnl-cantilever-problem.svg" style="width:100.0%"
+alt="The NAFEMS Geometric-non-linear cantilever beam benchmark problem." />
+<figcaption aria-hidden="true">The NAFEMS Geometric-non-linear
+cantilever beam benchmark problem.</figcaption>
+</figure>
+
+Consider a cantilevered beam with a square
+$`0.1~\text{m} \times 0.1~\text{m}`$ cross section and axial length
+$`3.2~\text{m}`$ along the $`x`$ axis. The material es linear elastic
+with $`E=2.1 \times 10^{11} \text{Pa}`$ and $`\nu=0`$. The left end at
+plane $`y`$-$`z`$ is fixed. The right end is subject to a total load of
+$`F_x = -3.844 \times 10^6~\text{N}`$ (compressive) and
+$`F_y = -3.844 \times 10^3~\text{N}`$ (downward).
+
+A large-deformation buckling effect is expected due to the massive
+compression of a slender structural geometry and the slight $`0.1\%`$
+loading imperfection in the $`y`$ direction. The reference results are
+
+| Scalar quantity                          |       Reference result        |
+|:-----------------------------------------|:-----------------------------:|
+| Maximum vertical displacement at the tip | $`(-2.58 \pm 0.02)~\text{m}`$ |
+| Final vertical displacement at the tip   | $`(-1.36 \pm 0.02)~\text{m}`$ |
+| Final vertical displacement at the tip   | $`(-5.04 \pm 0.04)~\text{m}`$ |
+
+Reference results for the NAFEMS GNL-5 benchmark problem
+
+------------------------------------------------------------------------
+
+To solve the problem, let’s start with a Gmsh input file to create a
+nice structured hex20 mesh:
+
+``` c
+SetFactory("OpenCASCADE");
+l = 3.2;
+h = 0.1;
+Box(1) = {0, -h/2, -h/2, l, h, h};
+
+Physical Surface("left") = {1};
+Physical Surface("right") = {2};
+Physical Volume("steel") = {1};
+
+n = 2;  // number of elements across thickness
+Transfinite Curve {2, 4, 3, 1, 7, 8, 5, 6} = n+1;
+Transfinite Curve {11, 12, 9, 10} = n*32+1;
+Transfinite Surface "*";
+Transfinite Volume "*";
+
+Mesh.RecombineAll = 1;            // quads & hexes
+Mesh.ElementOrder = 2;            // second order
+Mesh.SecondOrderIncomplete = 1;   // hex20 (and quad8) instead of hex27 (quad9)
+```
+
+<figure>
+<img src="nafems-gnl-cantilever-mesh.png"
+alt="Structured $2 % hex20 grid." />
+<figcaption aria-hidden="true">Structured $2 % hex20 grid.</figcaption>
+</figure>
+
+This problem is non-linear and path dependent so we have to make sure
+FeenoX can detect the critical buckling load, otherwise it might
+converge to other possible solutions.
+
+For that end, we run a quasi-static problem with a non-dimensional
+time $`t`$ from $`t=0`$ up to $`t=1`$ (i.e. `end_time = 1`) and scale
+the loads with the factor $`t`$. We start with $`\Delta t_0 = 0.01`$
+(i.e. `dt_0 = 1e-2` meaning $`1\%`$ of the load) and then allow FeenoX
+to choose the time (load) step.
+
+In FeenoX, to use a linear-elastic isotropic material model in the
+large-deformation (a.k.a. [Saint Venant-Kirchoff model]) one can either
+
+1.  keep $`E`$ and $`\nu`$ as global variables `E` and `nu` respectively
+    as in the [linear case] above and then
+
+    1.  set the special variable `ldef` to non-zero, or
+    2.  write the `NONLINEAR` keyword in the `PROBLEM` line, or
+    3.  pass `--non-linear` option in the command line, or
+
+2.  write a special `MATERIAL` with `MODEL svk` like
+
+    ``` fee
+    MATERIAL E=2.1e11 nu=0 MODEL svk
+    ```
+
+In the actual input file we use a-i:
+
+``` feenox
+# NAFEMS Geometrically-Non-Linear cantilever beam
+PROBLEM mechanical MESH nafems-gnl-cantilever.msh
+
+E = 2.1e11     # linear elastic material
+nu = 0
+ldef = 1       # with large-strain (i.e. SVK model)
+
+end_time = 1   # quasistatic (because problem is mechanical)
+dt_0 = 1e-2    # initial time step = 1% 
+min_dt = 1e-3  # minimum load increament = 0.1%
+
+# boundary conditions with loads scaled by t
+BC left fixed
+BC right Fx=-3.844e6*t Fy=-3.844e3*t
+
+SOLVE_PROBLEM
+
+# show step, t, incremente and horizontal and vertical displacements
+PRINT step_transient t dt u(3.2,0,0) v(3.2,0,0)
+
+# write one vtu for each step and a global pvd file
+WRITE_RESULTS
+```
+
+``` terminal
+$ gmsh -3 nafems-gnl-cantilever.geo
+[...]
+$ feenox nafems-gnl-cantilever.fee | tee nafems-gnl-cantilever.dat
+[...]
+$ awk '{print $5}' nafems-gnl-cantilever.dat | sort -rg | tail -n1
+-2.58023
+$ awk '{print $5}' nafems-gnl-cantilever.dat | tail -n1
+-1.33159
+$ awk '{print $4}' nafems-gnl-cantilever.dat | tail -n1
+-5.08797
+$ ./quasistatic-video.py nafems-gnl-cantilever.pvd
+[...]
+Saved animation to nafems-gnl-cantilever.pvd.mp4
+$ pyxplot nafems-gnl-cantilever.ppl 
+$ 
+```
+
+<video
+src="https://www.seamplex.com/feenox/examples/nafems-gnl-cantilever.pvd.mp4"
+style="width:100.0%" controls=""><a
+href="https://www.seamplex.com/feenox/examples/nafems-gnl-cantilever.pvd.mp4">Video</a></video>
+
+<figure>
+<img src="nafems-gnl-cantilever.svg" style="width:100.0%"
+alt="Displacements vs. non-dimensional time (load factor)" />
+<figcaption aria-hidden="true">Displacements vs. non-dimensional time
+(load factor)</figcaption>
+</figure>
+
+> Take some time to compare FeenoX’s approach, namely
+>
+> - one text file for the geometry
+> - one text file for the problem,
+> - a solver [designed to follow the Unix philosophy]
+> - standard Unix tools to get results
+>
+> against [the proposed way to solve this very same problem with a
+> point-and-click tool]. Spoiler: it needs 15 pages of instructions
+> about where to click to solve the problem.
+
+  [Saint Venant-Kirchoff model]: https://en.wikipedia.org/wiki/Hyperelastic_material#Saint_Venant%E2%80%93Kirchhoff_model
+  [linear case]: http://localhost/milhouse/feenox/examples/mechanical.html#nafems-le10-thick-plate-pressure-benchmark
+  [designed to follow the Unix philosophy]: https://www.seamplex.com/feenox/doc/sds.html
+  [the proposed way to solve this very same problem with a point-and-click tool]:
+    https://cds.comsol.com/model/download/837521/models.sme.large_deformation_beam.pdf?__gda__=1755866244_4e06a2471efdf19e9a27923cfc27bdc9&fileExt=.pdf

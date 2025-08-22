@@ -213,9 +213,9 @@ reference-thermal-kw.md
 reference-thermal-va.md
 ```
 
-## Linear elasticity {#mechanical}
+## Elasticity {#mechanical}
 
-Set [`PROBLEM`](#problem) to `mechanical` to solve linear elasticity.
+Set [`PROBLEM`](#problem) to `mechanical` to solve the elasticity problem.
 
 > Check out the [tensile test tutorial](https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/) as well.
 

@@ -36,6 +36,7 @@
       <item>DIMENSION</item>
       <item>DIMENSIONS</item>
       <item>DIRICHLET_SCALING</item>
+      <item>DO_NOT_DETECT_HANGING_NODES</item>
       <item>DUMP</item>
       <item>EIGEN_DIRICHLET_ZERO</item>
       <item>EIGEN_FORMULATION</item>
@@ -88,6 +89,9 @@
       <item>LINEAR</item>
       <item>LINEARIZE_STRESS</item>
       <item>LINEAR_SOLVER</item>
+      <item>LINE_SEARCH</item>
+      <item>LS</item>
+      <item>LS_TYPE</item>
       <item>M</item>
       <item>MAIN</item>
       <item>MATERIAL</item>
@@ -99,6 +103,7 @@
       <item>METHOD</item>
       <item>MIN</item>
       <item>MODE</item>
+      <item>MODEL</item>
       <item>MODES</item>
       <item>MOMENT</item>
       <item>N</item>
@@ -109,6 +114,7 @@
       <item>NOMESH</item>
       <item>NONEWLINE</item>
       <item>NON_LINEAR</item>
+      <item>NONLINEAR</item>
       <item>NON_LINEAR_SOLVER</item>
       <item>NONLINEAR_SOLVER</item>
       <item>NO_PHYSICAL_NAMES</item>
@@ -136,10 +142,12 @@
       <item>PROGRESS</item>
       <item>PROGRESS_ASCII</item>
       <item>QUASISTATIC</item>
+      <item>QUASISTATIC_DUMB</item>
       <item>RANGE_MAX</item>
       <item>RANGE_MIN</item>
       <item>REACTION</item>
       <item>READ</item>
+      <item>READ_DATA</item>
       <item>READ_FIELD</item>
       <item>READ_FUNCTION</item>
       <item>READ_MESH</item>
@@ -285,12 +293,18 @@
       <item>ksp_divtol</item>
       <item>ksp_max_it</item>
       <item>ksp_rtol</item>
+      <item>lambda</item>
+      <item>ldef</item>
+      <item>ldef_check</item>
       <item>max_dt</item>
       <item>memory_available</item>
       <item>min_dt</item>
       <item>mpi_rank</item>
       <item>mpi_size</item>
+      <item>mu</item>
+      <item>mumps_cntl_1</item>
       <item>mumps_icntl_14</item>
+      <item>mumps_icntl_24</item>
       <item>nodes_rough</item>
       <item>nu</item>
       <item>nu_xy</item>
@@ -482,7 +496,7 @@
 
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>
-      <itemData name="Keyword1" defStyleNum="dsKeyword"/>
+      <itemData name="Keyword1" defStyleNum="dsKeyword" bold="1"/>
       <itemData name="Keyword2" defStyleNum="dsKeyword" color="#003300"/>
       <itemData name="Operator" defStyleNum="dsOperator" color="#666666"/>
       <itemData name="Identifier" defStyleNum="dsOthers" color="#663333" italic="1"/>

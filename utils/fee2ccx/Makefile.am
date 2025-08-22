@@ -85,6 +85,7 @@ fee2ccx_SOURCES = fee2ccx.c \
  ../../src/pdes/blas.c \
  ../../src/pdes/petsc_ksp.c \
  ../../src/pdes/petsc_snes.c \
+ ../../src/pdes/petsc_ts.c \
  ../../src/pdes/distribution.c \
  ../../src/pdes/mechanical/gradient.c \
  ../../src/pdes/mechanical/parser.c \

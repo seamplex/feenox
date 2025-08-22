@@ -59,6 +59,7 @@ for i in hello          \
          airfoil               \
          buffon                \
          steel-alum            \
+         nafems-gnl-cantilever \
   ; do
   in=${i}.fee
   in_yaml=${i}.yaml
