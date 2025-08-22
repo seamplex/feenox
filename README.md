@@ -71,7 +71,9 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 
 > ### News
 >
-> * FeenoX is now in Debian (sid) and Ubuntu 25.04!
+> * First non-trivial large-deformation mechanical example: [NAFEMS GNL5 “Large-deformation beam”](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)
+>
+> * FeenoX is now in Debian (testing) and Ubuntu 25.04!
 >
 >   :   You can install FeenoX from APT
 >
