@@ -29,7 +29,10 @@ int feenox_instruction_read_data(void *arg) {
   }  
   
   if (read_data->variable != NULL) {
-    fscanf(read_data->file->pointer, "%lf", read_data->variable->value);
+    if (fscanf(read_data->file->pointer, "%lf", read_data->variable->value) != 1) {
+      feenox_push_error_message("error reading data from file '%s' into variable '%s'", read_data->file->name, read_data->variable->name);
+      return FEENOX_ERROR;
+    }
   } else {
     
     if (read_data->vector->initialized == 0) {
@@ -39,7 +42,10 @@ int feenox_instruction_read_data(void *arg) {
     }    
     double xi = 0;
     for (int i = 0; i < read_data->vector->size; i++) {
-      fscanf(read_data->file->pointer, "%lf", &xi);
+      if (fscanf(read_data->file->pointer, "%lf", &xi) != 1) {
+        feenox_push_error_message("error reading data from file '%s' into vector '%s' at offset %d", read_data->file->name, read_data->vector->name, i+1);
+        return FEENOX_ERROR;
+      }
       gsl_vector_set(read_data->vector->value, i, xi);
     }
   }
