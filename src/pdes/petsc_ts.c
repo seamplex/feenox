@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's transient solver using PETSc routines
  *
- *  Copyright (C) 2021 Jeremy Theler
+ *  Copyright (C) 2021-2025 Jeremy Theler
  *
  *  This file is part of FeenoX <https://www.seamplex.com/feenox>.
  *
@@ -24,7 +24,6 @@
 int feenox_problem_solve_petsc_transient(void) {
 
 #ifdef HAVE_PETSC
-
   if (feenox_var_value(feenox_special_var(in_static))) {
     // if we are in the static step and no initial condition was given, we solve a steady state
     if (feenox.pde.initial_condition == NULL) {
@@ -56,7 +55,7 @@ int feenox_problem_solve_petsc_transient(void) {
     } else {
       feenox_function_to_phi(feenox.pde.initial_condition, feenox.pde.phi);
     }
-    
+
     if (feenox.pde.ts == NULL) {
       petsc_call(TSCreate(PETSC_COMM_WORLD, &feenox.pde.ts));
       petsc_call(TSSetIFunction(feenox.pde.ts, NULL, feenox_ts_residual, NULL));
@@ -92,16 +91,17 @@ int feenox_problem_solve_petsc_transient(void) {
     
   }
   
+  if (feenox.pde.do_not_solve == 0) {  
+    PetscInt ts_step = 0;
+    petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_step));
+    petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_step+1));
 
-  PetscInt ts_step = 0;
-  petsc_call(TSGetStepNumber(feenox.pde.ts, &ts_step));
-  petsc_call(TSSetMaxSteps(feenox.pde.ts, ts_step+1));
-
-  petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_special_var_value(end_time)));
-  petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
-  petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));  
-  petsc_call(TSGetTime(feenox.pde.ts, feenox_value_ptr(feenox_special_var(t))));  
-  petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
+    petsc_call(TSSetMaxTime(feenox.pde.ts, feenox_special_var_value(end_time)));
+    petsc_call(TSSetTimeStep(feenox.pde.ts, feenox_special_var_value(dt)));
+    petsc_call(TSSolve(feenox.pde.ts, feenox.pde.phi));  
+    petsc_call(TSGetTime(feenox.pde.ts, feenox_value_ptr(feenox_special_var(t))));  
+    petsc_call(TSGetTimeStep(feenox.pde.ts, feenox_value_ptr(feenox_special_var(dt))));  
+  }
   
 #endif
   
@@ -117,9 +117,9 @@ int feenox_problem_setup_ts(TS ts) {
   
   if (feenox.pde.ts_type != NULL) {
     petsc_call(TSSetType(ts, feenox.pde.ts_type));
-  } else if (feenox.pde.transient_type == transient_type_quasistatic) {
-    // TODO: the default depends on the physics type
-    petsc_call(TSSetType(ts, TSBEULER));
+  // } else if (feenox.pde.transient_type == transient_type_quasistatic) {
+  //   // TODO: the default depends on the physics type
+  //   petsc_call(TSSetType(ts, TSBEULER));
   } else {
     // TODO: the default depends on the physics type
     petsc_call(TSSetType(ts, TSBDF));

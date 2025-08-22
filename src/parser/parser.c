@@ -193,7 +193,7 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
 ///kw+READ_DATA+desc Read data from a file (or standard output, or pipe, or queue, etc.).
-///kw+PRINT+usage READ_DATA
+///kw+READ_DATA+usage READ_DATA
     } else if (strcasecmp(token, "READ_DATA") == 0) {
       feenox_call(feenox_parse_read_data());
       return FEENOX_OK;
@@ -1581,13 +1581,14 @@ int feenox_parse_read_data(void) {
   
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+READ_DATA+usage [ FILE { <file_path> | <file_id> } ]
     if (strcasecmp(token, "FILE") == 0 || strcasecmp(token, "FILE_PATH") == 0) {
+///kw+READ_DATA+usage FILE { <file_path> | <file_id> }
       feenox_call(feenox_parser_file(&read_data->file));
       if (read_data->file->mode == NULL) {
         feenox_check_alloc(read_data->file->mode = strdup("r"));
       }
     } else {
+///kw+READ_DATA+usage [ <variable1> [ <variable2> [...] [ <vector1> [...] ] ] ]
       if ((read_data->variable = feenox_get_variable_ptr(token)) == NULL) {
         if ((read_data->vector = feenox_get_vector_ptr(token)) == NULL) {
           feenox_push_error_message("unknown symbol '%s'", token);

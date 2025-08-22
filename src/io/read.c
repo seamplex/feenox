@@ -31,6 +31,12 @@ int feenox_instruction_read_data(void *arg) {
   if (read_data->variable != NULL) {
     fscanf(read_data->file->pointer, "%lf", read_data->variable->value);
   } else {
+    
+    if (read_data->vector->initialized == 0) {
+      if (feenox_vector_init(read_data->vector, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
+        return FEENOX_ERROR;
+      }
+    }    
     double xi = 0;
     for (int i = 0; i < read_data->vector->size; i++) {
       fscanf(read_data->file->pointer, "%lf", &xi);
