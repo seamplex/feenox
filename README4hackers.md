@@ -64,9 +64,8 @@ Unlike these other FEA tools, FeenoX provides...
     thermal
     $ 
     ```
-    
    The decision of extensibility through compiled code is, as the choice of making FeenoX a program and not a library, a thoughtful one. See [FeenoX for academics](./README4academics.md) for more details about how the extensibility mechanism works.
-    
+
  * continuous integration (using [Github actions](https://github.com/seamplex/feenox/actions)), an issue tracker (using [Github issues](https://github.com/seamplex/feenox/issues) and a discussion page (using [Github discussions](https://github.com/seamplex/feenox/discussions))
   
  * a mechanism to [expand command-line arguments as literal strings in the input file](https://www.seamplex.com/feenox/doc/sds.html#sec:run-time-arguments) so as to allow [parametric](https://www.seamplex.com/feenox/doc/sds.html#sec:parametric) (and/or [optimization](https://www.seamplex.com/feenox/doc/sds.html#sec:optimization)) loops. For instance, if an input file `print.fee` looks like
@@ -75,7 +74,7 @@ Unlike these other FEA tools, FeenoX provides...
    PRINT 2*${1}
    ```
    then
-   
+
    ```terminal
    $ for i in $(seq 1 5); do feenox print.fee $i; done
    2
@@ -85,7 +84,7 @@ Unlike these other FEA tools, FeenoX provides...
    10
    $ 
    ``` 
-   
+
  * the possibility to provide the input from `stdin` (so as to use it as a Unix pipe) by passing `-` as the input file path:
  
    ```terminal
@@ -95,10 +94,13 @@ Unlike these other FEA tools, FeenoX provides...
    6
    8
    10
-   $ 
-   ``` 
+   $
+   ```
  
  * flexibility to handle many workflows, including [web-based interfaces](https://www.caeplex.com) and [thin command-line clients](https://www.seamplex.com/feenox/doc/sds.html#cloud-first).
+   - In particular, FeenoX is particularly well suited to be incldued in workflows involving LLMs and/or AI agents.
+   
+ * official Debian and Ubuntu packages built on Salsa from the source tarballs.
  
 The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input)...
 
@@ -107,6 +109,7 @@ The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input)...
  - allows the user to enter [algebraic expressions whenever a numerical value is needed](https://seamplex.com/feenox/doc/sds.html#sec:expression) (everything is an expression)
  - understands [definitions (nouns) and instructions (verbs)](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs). FeenoX has an actual instruction pointer that loops over the instruction set (there might even be [conditional blocks](https://www.seamplex.com/feenox/doc/feenox-manual.html#if)).
  - is [simple for simple files](https://seamplex.com/feenox/doc/sds.html#sec:simple) (but might get [more complicated for more complex problems](https://seamplex.com/feenox/doc/sds.html#sec:complex)). Remember [Alan Kay](https://en.wikipedia.org/wiki/Alan_Kay)'s quote: ["simple things should be simple and complex things should be possible."](https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible)
+ - can be created using assistance from LLMs and AI agents.
  
  
 Following the Unix rule of silence, [the output is 100% user-defined](https://seamplex.com/feenox/doc/sds.html#sec:output): if there are not explicit output instructions, FeenoX will not write anything. And probably nothing will be computed (because FeenoX is smart and will not compute things that are not actually needed).

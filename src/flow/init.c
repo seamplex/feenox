@@ -351,26 +351,33 @@ int feenox_init_special_objects(void) {
   feenox_special_var_value(static_steps) = 1;
   
 
-///va+end_time+desc Final time of the transient calculation, to be set by the user. 
-///va+end_time+detail The default value is zero, meaning no transient calculation.
+///va+end_time+desc Final time of the transient calculation. 
+///va+end_time+detail Set this variable to a positive value to ask for a transient calculation.
+///va+end_time+detail For some PDEs, the default might be a quasi-static problem instead of an actual transient one.
+///va+end_time+detail For instance, setting a non-zero `end_time` in `PROBLEM mechanical` starts a quasi-static computation
+///va+end_time+detail but a real transient one for `PROBLEM thermal`.
+///va+end_time+detail The default value is zero, meaning a static problem.
   feenox_special_var(end_time) = feenox_get_or_define_variable_get_ptr("end_time");
   
 
-///va+t+desc Actual value of the time for transient calculations.
-///va+t+detail This variable is set by FeenoX, but can be written by
-///va+t+detail the user for example by importing it from another
-///va+t+detail transient code by means of shared-memory objects.
-///va+t+detail Care should be taken when solving DAE systems and overwriting `t`.
+///va+t+desc Actual value of the time for transient or quasi-static calculations.
+///va+t+detail This variable can be `PRINT`ed and used in expressions involving time and/or
+///va+t+detail as arguments of time-dependent functions.
+///va+t+detail It stars equal to zero and it is updated by FeenoX according to
+///va+t+detail the time-stepping scheme. At the end, it is exactly equal to `end_time`.
+
   feenox_special_var(t) = feenox_get_or_define_variable_get_ptr("t");
   feenox_special_var_value(t) = 0;  
   
 
-///va+dt+desc Actual value of the time step for transient calculations.
-///va+dt+detail  When solving DAE systems,
-///va+dt+detail this variable is set by feenox. It can be written by the user for example by importing it from another
-///va+dt+detail transient code by means of shared-memory objects. Care should be taken when
-///va+dt+detail solving DAE systems and overwriting `t`. Default value is DEFAULT_DT, which is
-///va+dt+detail a power of two and roundoff errors are thus reduced.
+///va+dt+desc Actual value of the time step for transient or quasi-static calculations.
+///va+dt+detail This variable can be `PRINT`ed and used in expressions involving time and/or
+///va+dt+detail as arguments of time-dependent functions.
+///va+dt+detail The initial time step can be set by assigning a non-zero value to `dt_0`.
+///va+dt+detail Do not set `dt` explicitly in an assignment.
+///va+dt+detail If you want to have a constant time step set both `min_dt` and `max_dt` to the same value.
+///va+dt+detail Default initial time step is DEFAULT_DT, which is
+///va+dt+detail a power of two and round-off errors are thus reduced.
   feenox_special_var(dt) = feenox_get_or_define_variable_get_ptr("dt");
   feenox_special_var_value(dt) = DEFAULT_DT;
 
@@ -381,10 +388,10 @@ int feenox_init_special_objects(void) {
   feenox_special_var(dae_rtol) = feenox_get_or_define_variable_get_ptr("dae_rtol");
   feenox_special_var_value(dae_rtol) = DEFAULT_DAE_RTOL;
   
-///va+min_dt+desc Minimum bound for the time step that feenox should take when solving DAE systems.
+///va+min_dt+desc Minimum bound for the time step that FeenoX should take when solving transient problems.
   feenox_special_var(min_dt) = feenox_get_or_define_variable_get_ptr("min_dt");
   
-///va+max_dt+desc Maximum bound for the time step that feenox should take when solving DAE systems.
+///va+max_dt+desc Maximum bound for the time step that FeenoX should take when solving transient systems.
   feenox_special_var(max_dt) = feenox_get_or_define_variable_get_ptr("max_dt");
   
 ///va+i+desc Dummy index, used mainly in vector and matrix row subindex expressions.
@@ -393,7 +400,7 @@ int feenox_init_special_objects(void) {
 ///va+j+desc Dummy index, used mainly in matrix column subindex expressions.
   feenox_special_var(j) = feenox_get_or_define_variable_get_ptr("j");
   
-///va+pi+desc A double-precision floating point representation of the number $\pi$
+///va+pi+desc A double-precision floating· point representation of the number $\pi$
 ///va+pi+detail It is equal to the `M_PI` constant in `math.h` .
   feenox_special_var(pi) = feenox_get_or_define_variable_get_ptr("pi");
   feenox_special_var_value(pi) = M_PI;

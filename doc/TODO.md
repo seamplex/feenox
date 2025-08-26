@@ -2,12 +2,13 @@
  
  * FeenoX focuses on:
  
-    a. cloud-firtness
+    a. cloud-firstness
     b. parametric runs: script-friendly through command-line arguments and ASCII files
     c. material properties: everything is an expression
+    d. LLM-friendlyness
 
  * NAFEMS LE10 & LE11: keep a single case in `differences` and create a new one in `cases` with a full parametric run
-   
+
    ```
    READ_MESH le10-$1.msh
    ...

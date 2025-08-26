@@ -2,6 +2,10 @@
  
 # Appendix: Downloading and compiling FeenoX
 
+## Debian & Ubuntu packages
+
+To be explained
+
 ## Binary executables
 
 ```include

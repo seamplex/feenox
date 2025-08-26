@@ -1,4 +1,4 @@
-To compile the source tarball, proceed as follows. This procedure does not need `git` nor `autoconf` but a new tarball has to be downloaded each time there is a new FeenoX version.
+To compile the source tarball, proceed as follows. This procedure does not need `git` nor `autoconf` but a new [source tarball]() has to be downloaded each time there is a new FeenoX version.
 
  1. Install mandatory dependencies
 
@@ -8,16 +8,15 @@ To compile the source tarball, proceed as follows. This procedure does not need 
     ```
 
     If you cannot install `libgsl-dev`, you can have the `configure` script to download and compile it for you. See point\ 4 below.
-    
+
  2. Install optional dependencies (of course these are _optional_ but recommended)
- 
+
     ```terminal
     sudo apt-get install libsundials-dev petsc-dev slepc-dev
     ```
 
  3. Download and un-compress FeenoX source tarball. Browse to <https://www.seamplex.com/feenox/dist/src/> and pick the latest version:
- 
- 
+
     ```terminal
     wget https://www.seamplex.com/feenox/dist/src/feenox-v1.1.tar.gz
     tar xvzf feenox-v1.1.tar.gz

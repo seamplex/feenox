@@ -1,6 +1,7 @@
 PROBLEM thermal 3D
 READ_MESH pellet.msh
 
+dt_0 = 1e-3
 end_time = 3  # small time to run the test faster [seconds]
 
 # https://www.nuclear-power.com/nuclear-engineering/heat-transfer/thermal-conduction/thermal-conductivity/thermal-conductivity-of-uranium-dioxide/

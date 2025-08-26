@@ -17,7 +17,7 @@ It does not require the users to write a weak form of the PDE they want to solve
 The user chooses from a set of built-in PDEs using the [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) definition which internally resolves (at run time) a set of function pointers to the appropriate locations which will build the elemental objects which correspond the to chosen PDE.
 The list of available PDEs can be peeked by executing the `feenox` binary with the `--pdes` option:
 
-```
+```terminal
 $ feenox --pdes
 laplace
 mechanical
