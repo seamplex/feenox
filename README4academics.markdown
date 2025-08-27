@@ -28,14 +28,16 @@ elemental objects which correspond the to chosen PDE. The list of
 available PDEs can be peeked by executing the `feenox` binary with the
 `--pdes` option:
 
-    $ feenox --pdes
-    laplace
-    mechanical
-    modal
-    neutron_diffusion
-    neutron_sn
-    thermal
-    $ 
+``` terminal
+$ feenox --pdes
+laplace
+mechanical
+modal
+neutron_diffusion
+neutron_sn
+thermal
+$ 
+```
 
 During the compilation procedure (based on Autotools), the source tree
 in [`src/pdes`] is parsed. For each subdirectory, a new PDE is embedded

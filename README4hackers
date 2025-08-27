@@ -174,10 +174,16 @@ Unlike these other FEA tools, FeenoX provides…
       6
       8
       10
-      $ 
+      $
 
 - flexibility to handle many workflows, including web-based interfaces
   and thin command-line clients.
+
+  - In particular, FeenoX is particularly well suited to be incldued in
+    workflows involving LLMs and/or AI agents.
+
+- official Debian and Ubuntu packages built on Salsa from the source
+  tarballs.
 
 The input file…
 
@@ -193,6 +199,7 @@ The input file…
 - is simple for simple files (but might get more complicated for more
   complex problems). Remember Alan Kay’s quote: “simple things should be
   simple and complex things should be possible.”
+- can be created using assistance from LLMs and AI agents.
 
 Following the Unix rule of silence, the output is 100% user-defined: if
 there are not explicit output instructions, FeenoX will not write
