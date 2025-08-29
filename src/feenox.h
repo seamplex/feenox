@@ -1277,6 +1277,21 @@ struct bc_data_t {
 };
 
 
+// hash map entry for sparse node ids
+typedef struct {
+  size_t gmsh_tag;     // Gmsh node tag (key)
+  size_t vtk_idx;      // VTK point index (value)
+  UT_hash_handle hh;
+} tag_index_hash_t;
+
+// struct to encapsulate either mapping
+typedef struct {
+  int use_array;    // 1 for array, 0 for hashmap
+  size_t min_id, max_id;
+  size_t*array;       // if use_array
+  tag_index_hash_t *hash; // if !use_array
+} tag_index_map_t;
+
 // unstructured mesh
 struct mesh_t {
   file_t *file;
@@ -1312,6 +1327,9 @@ struct mesh_t {
   size_t *tag2index;     // array to map tags to indexes (we need a -1)
   // pointer to tag_min entries before so we can use the tag as an offset
   size_t *tag2index_from_tag_min; 
+  size_t node_tag_min;
+  size_t node_tag_max;
+  tag_index_map_t *index2tag;
   
   enum {
     data_type_element,
@@ -2284,6 +2302,7 @@ extern double feenox_gsl_function(double x, void *params);
 // mesh.c
 extern int feenox_instruction_mesh_read(void *arg);
 extern int feenox_mesh_create_nodes_argument(mesh_t *);
+extern int feenox_mesh_create_index2tag(mesh_t *this);
 extern int feenox_mesh_free(mesh_t *);
 
 extern int feenox_mesh_read_vtk(mesh_t *);
@@ -2391,6 +2410,12 @@ extern int feenox_mesh_init_nodal_indexes(mesh_t *, int dofs);
 
 // cell.c
 extern int feenox_mesh_element2cell(mesh_t *);
+
+// tag_index_map.c
+extern int tag_index_map_init(tag_index_map_t *map, size_t min_id, size_t max_id, size_t n_nodes, double threshold);
+extern int tag_index_map_insert(tag_index_map_t *map, size_t gmsh_id, size_t vtk_idx);
+extern size_t tag_index_map_lookup(tag_index_map_t *map, size_t gmsh_id);
+extern int tag_index_map_free(tag_index_map_t *map);
 
 // vtk.c
 extern int feenox_mesh_read_vtk_field_node(mesh_t *mesh, FILE *fp, const char *name, unsigned int size);

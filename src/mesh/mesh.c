@@ -671,8 +671,12 @@ int feenox_mesh_free(mesh_t *mesh) {
     // feenox_free(physical_group->element);
     // feenox_free(physical_group);
   }
-*/    
+*/ 
   
+  if (mesh->index2tag != NULL) {
+    feenox_call(tag_index_map_free(mesh->index2tag));
+    feenox_free(mesh->index2tag);
+  }  
   mesh->initialized = 0;
 
   return FEENOX_OK;
@@ -696,6 +700,25 @@ int feenox_mesh_create_nodes_argument(mesh_t *this) {
     for (size_t j = 0; j < this->n_nodes; j++) {
       gsl_vector_set(this->nodes_argument[d], j, this->node[j].x[d]); 
     }  
+  }
+  
+  return FEENOX_OK;
+}
+
+int feenox_mesh_create_index2tag(mesh_t *this) {
+  if (this->index2tag != NULL) {
+    feenox_call(tag_index_map_free(this->index2tag));
+    feenox_free(this->index2tag);
+  }
+  this->index2tag = calloc(1, sizeof(tag_index_map_t));
+  tag_index_map_init(this->index2tag, this->node_tag_min, this->node_tag_max, this->n_nodes, 4);
+  size_t index = 0;
+  size_t n_nodes = 0;
+  for (size_t tag = this->node_tag_min; tag <= this->node_tag_max; tag++) {
+    if ((index = this->tag2index_from_tag_min[tag]) != SIZE_MAX) {
+      tag_index_map_insert(this->index2tag, tag, index);
+      n_nodes++;
+    }
   }
   
   return FEENOX_OK;

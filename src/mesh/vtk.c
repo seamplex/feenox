@@ -23,7 +23,6 @@
 #include "element.h"
 #include <ctype.h>
 
-
 #define BUFFER_SIZE 256
 
 // conversion from gmsh to vtk element types
@@ -74,35 +73,38 @@ int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file) {
 }
 
 int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
+  
   for (size_t i = 0; i < mesh->n_elements; i++) {
-    if (mesh->element[i].type->dim == mesh->dim_topo) {
+    element_t *element = &mesh->element[i];
+    if (element->type->dim == mesh->dim_topo) {
       if (with_size) { 
-        fprintf(file, "%d ", mesh->element[i].type->nodes);
+        fprintf(file, "%d ", element->type->nodes);
       }
-      switch(mesh->element[i].type->id) {
+      switch(element->type->id) {
         case ELEMENT_TYPE_HEXAHEDRON27: 
           for (int j = 0; j < 27 ; ++j) {
-            fprintf(file, " %ld", (mesh->element[i].node[hexa27fromgmsh[j]]->tag)-1);
+            fprintf(file, " %ld", tag_index_map_lookup(mesh->index2tag, element->node[hexa27fromgmsh[j]]->tag));
            }
           fprintf(file, "\n");
         break;
         case ELEMENT_TYPE_HEXAHEDRON20:
           for (int j = 0; j < 20 ; ++j) {
-            fprintf(file, " %ld", (mesh->element[i].node[hexa20fromgmsh[j]]->tag)-1);
+            fprintf(file, " %ld", tag_index_map_lookup(mesh->index2tag, element->node[hexa20fromgmsh[j]]->tag));
           }
         fprintf(file, "\n");
         break;
         default:
-          for (unsigned int j = 0; j < mesh->element[i].type->nodes; j++) {
-            // el tet10 es diferente!
-            if (vtkfromgmsh_types[mesh->element[i].type->id] == 24 && (j == 8 || j == 9)) {
+          int is_tet10 = vtkfromgmsh_types[element->type->id] == 24;
+          for (int j = 0; j < element->type->nodes; j++) {
+            // tet10 has nodes 8 & 9 swapped
+            if (is_tet10 && (j == 8 || j == 9)) {
               if (j == 8) {
-                fprintf(file, " %ld", (mesh->element[i].node[9]->tag)-1);
+                fprintf(file, " %ld", tag_index_map_lookup(mesh->index2tag, element->node[9]->tag));
               } else if (j == 9) {
-                fprintf(file, " %ld", (mesh->element[i].node[8]->tag)-1);
+                fprintf(file, " %ld", tag_index_map_lookup(mesh->index2tag, element->node[8]->tag));
               }
             } else {
-              fprintf(file, " %ld", (mesh->element[i].node[j]->tag)-1);
+              fprintf(file, " %ld", tag_index_map_lookup(mesh->index2tag, element->node[j]->tag));
             }
           }
           fprintf(file, "\n");
@@ -126,16 +128,18 @@ int feenox_mesh_write_vtk_types(mesh_t *mesh, FILE *file) {
   return FEENOX_OK;
 }
 
-// this dummy is for other formats
+
+// the dummy argument is for other formats
 int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
     
   fprintf(file, "DATASET UNSTRUCTURED_GRID\n");
   fprintf(file, "POINTS %ld double\n", this->n_nodes);
+
+  if (this->sparse && this->tag2index == NULL) {
+    feenox_call(feenox_mesh_create_index2tag(this));
+  }
+  
   for (size_t j = 0; j < this->n_nodes; j++) { 
-    if (this->node[j].tag != j+1) {
-      feenox_push_error_message("VTK output needs sorted nodes");
-      return FEENOX_ERROR;
-    }
     fprintf(file, "%g %g %g\n", this->node[j].x[0], this->node[j].x[1], this->node[j].x[2]);
   }
   fprintf(file, "\n");
@@ -150,6 +154,7 @@ int feenox_mesh_write_mesh_vtk(mesh_t *this, FILE *file, int dummy) {
   }
 
   fprintf(file, "CELLS %ld %ld\n", volumelements, size);
+  // the one means "write the number of nodes"
   feenox_mesh_write_vtk_cells(this, file, 1);
   fprintf(file, "\n");
   
@@ -338,15 +343,13 @@ int feenox_mesh_read_vtk(mesh_t *this) {
 
   size_t num_cells = 0;
   size_t num_data = 0;
-  size_t num_indexes = 0;
   if (sscanf(buffer, "CELLS %lu %lu", &num_cells, &num_data) != 2) {
     feenox_push_error_message("expected CELLS");
     return FEENOX_ERROR;
   }
   
   // in vtk version 5.1 the cells are stored as offset + connectivy
-  size_t *celldata = NULL;
-  size_t *connectivity = NULL;
+  size_t num_indexes = 0;
   int offset_connectivity = 0;
   int c = fgetc(fp);
   if (isdigit(c)) {
@@ -369,6 +372,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
   }
   
   
+  size_t *celldata = NULL;
   feenox_check_alloc(celldata = calloc(num_data, sizeof(size_t)));
   for (size_t i = 0; i < num_indexes; i++) {
     if (fscanf(fp, "%lu", &celldata[i]) != 1) {
@@ -377,6 +381,7 @@ int feenox_mesh_read_vtk(mesh_t *this) {
     }
   }
   
+  size_t *connectivity = NULL;
   if (offset_connectivity) {
     // CONNECTIVITY vtktypeint64
     do {

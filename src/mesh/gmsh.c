@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's mesh-related gmsh routines
  *
- *  Copyright (C) 2014--2024 Jeremy Theler
+ *  Copyright (C) 2014--2025 Jeremy Theler
  *
  *  This file is part of feenox.
  *
@@ -399,9 +399,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           }
           
           // en msh2 si no es sparse, los tags son indices pero si es sparse es otro cantar
-          if (j+1 != tag) {
-            this->sparse = 1;
-          }
+          this->sparse |= (j+1 != tag);
           
           this->node[j].tag = tag;
           if (tag < tag_min) {
@@ -416,6 +414,7 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         
         // finished reading the node data, check if they are sparse
         // if they are, build tag2index
+        // TODO: use the vtk hashmap
         if (this->sparse) {
           if (tag_max < this->n_nodes) {
             feenox_push_error_message("maximum node tag %d is less that number of nodes %d", tag_max, this->n_nodes);
@@ -433,9 +432,19 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         
       } else if (version_maj == 4) {
         // number of blocks and nodes
-        size_t num_blocks;
+        size_t num_blocks = 0;
         if (version_min == 0) {
-          // in 4.0 there is no min/ max
+          // in 4.0 there's no min/max, I asked for this in
+          // https://onelab.info/pipermail/gmsh/2018/012432.html
+          //
+          // > I would need to know the biggest tag of the nodes or elements before
+          // > readuing them, not just the number of non-zero elements. Otherwise I
+          // > need to either double-parse the file or reallocate the array each time.
+          //  
+          // we could indeed add min/max vertex/element tags in the section header
+          // in a future revision of the format
+          //
+          // see also https://gitlab.onelab.info/gmsh/gmsh/-/issues/444
           size_t data[2] = {0,0};
           feenox_call(feenox_gmsh_read_data_size_t(this, 2, data, binary));
           num_blocks = data[0];
@@ -457,7 +466,8 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
         feenox_check_alloc(this->node = calloc(this->n_nodes, sizeof(node_t)));
 
         if (tag_max != 0) {
-          // we can do this as a one single pass because we have tag_max (I asked for this in v4.1)
+          // we can do this as a one single pass because we have tag_max
+          // (I asked for this in v4.1, see links above)
           if (tag_max < this->n_nodes) {
             feenox_push_error_message("maximum node tag %d is less that number of nodes %d", tag_max, this->n_nodes);
           }
@@ -496,12 +506,15 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
                 return FEENOX_ERROR;
               }
               
+              if (this->node[node_index].tag < tag_min) {
+                tag_min = this->node[node_index].tag;
+              }
               if (this->node[node_index].tag > tag_max) {
                 tag_max = this->node[node_index].tag;
               }
-              
-              // in msh4 the tags are the indices of the global mesh
               this->node[node_index].index_mesh = node_index;
+              // we don't have tag2index yet, but we can check if it is sparse
+              this->sparse |= (this->node[node_index].tag != node_index+1);
               node_index++;
             }
           } else {
@@ -530,14 +543,18 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
                 return FEENOX_ERROR;
               }
               this->tag2index_from_tag_min[this->node[node_index].tag] = node_index;
+              this->sparse |= (this->node[node_index].tag != node_index+1);
               node_index++;
             }
             feenox_free(node_coords);
           }
         }
         
+        this->node_tag_min = tag_min;
+        this->node_tag_max = tag_max;
         if (version_min == 0) {
-          // for v4.0 we need an extra loop because we did not have the actual tag_max
+          // for v4.0 we need an extra loop because we did not have
+          // the actual tag_min/tag_max before reading
           feenox_mesh_tag2index_alloc(this, tag_min, tag_max);
           
           for (size_t j = 0; j < this->n_nodes; j++) {
@@ -668,7 +685,6 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
       } else if (version_maj == 4) {
         size_t num_blocks;
         if (version_min == 0) {
-          // in 4.0 there's no min/max (I asked for this)
           tag_min = 0;
           tag_max = 0;
           if (fscanf(fp, "%lu %lu", &num_blocks, &this->n_elements) < 2) {

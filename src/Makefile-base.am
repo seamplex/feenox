@@ -83,6 +83,7 @@ feenox_SOURCES = \
 ./mesh/calculix.c \
 ./mesh/vtk.c \
 ./mesh/vtu.c \
+./mesh/tag_index_map.c \
 ./mesh/elements/line2.c \
 ./mesh/elements/line3.c \
 ./mesh/elements/triang3.c \

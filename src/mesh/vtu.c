@@ -17,6 +17,9 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with feenox.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Portions of this file were developed with the assistance of GitHub Copilot.
+ * 
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "../feenox.h"
@@ -47,8 +50,12 @@ int feenox_mesh_write_footer_vtu(mesh_write_t *this) {
   return FEENOX_OK;
 }
 
-// Write mesh geometry and topology
 int feenox_mesh_write_mesh_vtu(mesh_t *mesh, FILE *file, int dummy) {
+  
+  if (mesh->sparse && mesh->tag2index == NULL) {
+    feenox_call(feenox_mesh_create_index2tag(mesh));
+  }
+  
   // Points
   fprintf(file, "      <Points>\n");
   fprintf(file, "        <DataArray Name=\"Points\" type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n");
@@ -64,6 +71,7 @@ int feenox_mesh_write_mesh_vtu(mesh_t *mesh, FILE *file, int dummy) {
   // Cells
   fprintf(file, "      <Cells>\n");
   fprintf(file, "        <DataArray Name=\"connectivity\" type=\"Int32\" format=\"ascii\">\n");
+  // the zero means "do not write the number of nodes"
   feenox_mesh_write_vtk_cells(mesh, file, 0);
   fprintf(file, "        </DataArray>\n");
  
