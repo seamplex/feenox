@@ -470,6 +470,11 @@ int feenox_mesh_read_gmsh(mesh_t *this) {
           // (I asked for this in v4.1, see links above)
           if (tag_max < this->n_nodes) {
             feenox_push_error_message("maximum node tag %d is less that number of nodes %d", tag_max, this->n_nodes);
+            return FEENOX_ERROR;
+          }
+          if (tag_min <= 0) {
+            feenox_push_error_message("minumum node tag %d has to be positive", tag_min);
+            return FEENOX_ERROR;
           }
           feenox_call(feenox_mesh_tag2index_alloc(this, tag_min, tag_max));
         }

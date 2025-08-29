@@ -316,6 +316,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
 
       // finished reading the nodes, handle sparse node tags
       if (sparse) {
+        // TODO: use the array/map from vtk
         feenox_check_alloc(tag2index = malloc((tag_max+1) * sizeof(int)));
         for (size_t k = 0; k <= tag_max; k++) {
           tag2index[k] = -1;

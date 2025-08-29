@@ -63,7 +63,8 @@ TESTS_mpi = \
 
 TESTS_laplace = \
         tests/airfoil.sh \
-        tests/laplace2d.sh
+        tests/laplace2d.sh \
+        tests/hex8-sparse.sh
 
 TESTS_mechanical_iso = \
         tests/bc-groups.sh \

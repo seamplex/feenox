@@ -51,11 +51,12 @@ int feenox_mesh_write_footer_vtu(mesh_write_t *this) {
 }
 
 int feenox_mesh_write_mesh_vtu(mesh_t *mesh, FILE *file, int dummy) {
-  
+
+/*
   if (mesh->sparse && mesh->tag2index == NULL) {
     feenox_call(feenox_mesh_create_index2tag(mesh));
   }
-  
+*/  
   // Points
   fprintf(file, "      <Points>\n");
   fprintf(file, "        <DataArray Name=\"Points\" type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n");

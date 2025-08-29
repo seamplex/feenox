@@ -26,6 +26,7 @@
 #include "feenox.h"
 
 int tag_index_map_init(tag_index_map_t *map, size_t min_id, size_t max_id, size_t n_nodes, double threshold) {
+  printf("mamoncho\n");
   map->min_id = min_id;
   map->max_id = max_id;
   size_t range = max_id - min_id + 1;

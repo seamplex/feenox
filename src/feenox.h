@@ -1329,7 +1329,7 @@ struct mesh_t {
   size_t *tag2index_from_tag_min; 
   size_t node_tag_min;
   size_t node_tag_max;
-  tag_index_map_t *index2tag;
+//  tag_index_map_t *index2tag;
   
   enum {
     data_type_element,

@@ -672,11 +672,13 @@ int feenox_mesh_free(mesh_t *mesh) {
     // feenox_free(physical_group);
   }
 */ 
-  
+
+/*  
   if (mesh->index2tag != NULL) {
     feenox_call(tag_index_map_free(mesh->index2tag));
     feenox_free(mesh->index2tag);
-  }  
+  }
+*/
   mesh->initialized = 0;
 
   return FEENOX_OK;
@@ -705,7 +707,9 @@ int feenox_mesh_create_nodes_argument(mesh_t *this) {
   return FEENOX_OK;
 }
 
+/*
 int feenox_mesh_create_index2tag(mesh_t *this) {
+    
   if (this->index2tag != NULL) {
     feenox_call(tag_index_map_free(this->index2tag));
     feenox_free(this->index2tag);
@@ -723,3 +727,4 @@ int feenox_mesh_create_index2tag(mesh_t *this) {
   
   return FEENOX_OK;
 }
+*/

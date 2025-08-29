@@ -1,0 +1,9 @@
+PROBLEM laplace MESH $0.msh
+
+BC left  phi=0
+BC right phi=1
+
+WRITE_RESULTS FORMAT vtk
+WRITE_RESULTS FORMAT vtu
+
+PRINT 0
