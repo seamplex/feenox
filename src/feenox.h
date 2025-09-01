@@ -1329,7 +1329,7 @@ struct mesh_t {
   size_t *tag2index_from_tag_min; 
   size_t node_tag_min;
   size_t node_tag_max;
-//  tag_index_map_t *index2tag;
+  // TODO: we can have a hash map to handle very sparse indexing but I'm not sure it is worth
   
   enum {
     data_type_element,
@@ -2412,10 +2412,12 @@ extern int feenox_mesh_init_nodal_indexes(mesh_t *, int dofs);
 extern int feenox_mesh_element2cell(mesh_t *);
 
 // tag_index_map.c
+/*
 extern int tag_index_map_init(tag_index_map_t *map, size_t min_id, size_t max_id, size_t n_nodes, double threshold);
 extern int tag_index_map_insert(tag_index_map_t *map, size_t gmsh_id, size_t vtk_idx);
 extern size_t tag_index_map_lookup(tag_index_map_t *map, size_t gmsh_id);
 extern int tag_index_map_free(tag_index_map_t *map);
+*/
 
 // vtk.c
 extern int feenox_mesh_read_vtk_field_node(mesh_t *mesh, FILE *fp, const char *name, unsigned int size);

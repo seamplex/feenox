@@ -193,7 +193,6 @@ int feenox_mesh_read_frd(mesh_t *this) {
 
   char buffer[BUFFER_SIZE];
   char tmp[BUFFER_SIZE];
-  int *tag2index = NULL;
 
   if (this->file->pointer == NULL) {
     feenox_call(feenox_instruction_file_open(this->file));
@@ -259,7 +258,8 @@ int feenox_mesh_read_frd(mesh_t *this) {
 
       feenox_check_alloc(this->node = calloc(this->n_nodes, sizeof(node_t)));
 
-      int tag_max = this->n_nodes;
+      size_t tag_min = 0;
+      size_t tag_max = this->n_nodes;
       for (size_t j = 0; j < this->n_nodes; j++) {
         int minusone;
         if (fscanf(this->file->pointer, "%d", &minusone) != 1) {
@@ -280,7 +280,11 @@ int feenox_mesh_read_frd(mesh_t *this) {
           sparse = 1;
         }
 
-        if ((this->node[j].tag = tag) > tag_max) {
+        if ((this->node[j].tag = tag) < tag_min) {
+          tag_min = this->node[j].tag;
+        }
+        
+        if (tag > tag_max) {
           tag_max = this->node[j].tag;
         }
 
@@ -316,13 +320,9 @@ int feenox_mesh_read_frd(mesh_t *this) {
 
       // finished reading the nodes, handle sparse node tags
       if (sparse) {
-        // TODO: use the array/map from vtk
-        feenox_check_alloc(tag2index = malloc((tag_max+1) * sizeof(int)));
-        for (size_t k = 0; k <= tag_max; k++) {
-          tag2index[k] = -1;
-        }
+        feenox_call(feenox_mesh_tag2index_alloc(this, tag_min, tag_max));
         for (size_t j = 0; j < this->n_nodes; j++) {
-          tag2index[this->node[j].tag] = j;
+          this->tag2index[this->node[j].tag] = j;
         }
       }
 
@@ -465,7 +465,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
             j_gmsh = ccx2gmsh_hex20[j];
           }
 
-          int node_index = (sparse==0) ? node-1 : tag2index[node];
+          int node_index = (sparse==0) ? node-1 : this->tag2index_from_tag_min[node];
           if (node_index < 0) {
             feenox_push_error_message("node %d in element %d does not exist", node, tag);
             return FEENOX_ERROR;
@@ -663,7 +663,7 @@ int feenox_mesh_read_frd(mesh_t *this) {
             return FEENOX_ERROR;
           }
           if (function[g] != NULL) {
-            int node_index = (sparse==0) ? node-1 : tag2index[node];
+            int node_index = (sparse==0) ? node-1 : this->tag2index_from_tag_min[node];
             if (node_index < 0) {
               feenox_push_error_message("node %d does not exist", node);
               return FEENOX_ERROR;
@@ -691,11 +691,6 @@ int feenox_mesh_read_frd(mesh_t *this) {
   fclose(this->file->pointer);
   this->file->pointer = NULL;
 
-  if (tag2index != NULL) {
-    feenox_free(tag2index);
-  }  
-
-  
   // verificamos que la malla tenga la dimension esperada
   if (this->dim_topo == 0) {
     this->dim = bulk_dimensions;

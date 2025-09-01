@@ -22,7 +22,7 @@
  * Portions of this file were developed with the assistance of GitHub Copilot.
  *------------------- ------------  ----    --------  --     -       -         -
  */
-
+/*
 #include "feenox.h"
 
 int tag_index_map_init(tag_index_map_t *map, size_t min_id, size_t max_id, size_t n_nodes, double threshold) {
@@ -93,3 +93,4 @@ int tag_index_map_free(tag_index_map_t *map) {
   }
   return FEENOX_OK;
 }
+*/
