@@ -381,7 +381,9 @@ DISTCLEANFILES = \
                  ./beam-orthotropic-hex20.vtu \
                  ./beam-orthotropic-hex8.vtu \
                  ./beam-orthotropic-tet10.vtu \
-                 ./beam-orthotropic-tet4.vtu
+                 ./beam-orthotropic-tet4.vtu \
+                 ./hex8-sparse.vtu \
+                 ./hex8-sparse.vtk
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
