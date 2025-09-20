@@ -1,0 +1,2 @@
+VECTOR r[10] DATA +1 +2 +2 -1 +1 0 +1 +1.5 -1 -1
+PRINTF "%.4f %.4f %.4f" vecmean(r) vecvariance(r) vecsd(r)

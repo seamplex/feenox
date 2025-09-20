@@ -17,3 +17,6 @@ exitifwrong $?
 
 answerdiff fibo_vector.fee
 exitifwrong $?
+
+answer stats.fee "0.5500 1.4694 1.2122"
+exitifwrong $?

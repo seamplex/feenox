@@ -30,6 +30,9 @@ double feenox_builtin_vecminindex(vector_t **);
 double feenox_builtin_vecmaxindex(vector_t **);
 double feenox_builtin_vecsum(vector_t **);
 double feenox_builtin_vecsize(vector_t **);
+double feenox_builtin_vecmean(vector_t **);
+double feenox_builtin_vecvariance(vector_t **);
+double feenox_builtin_vecsd(vector_t **);
 
 
 struct builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTIONS] = {
@@ -41,6 +44,9 @@ struct builtin_vectorfunction_t builtin_vectorfunction[N_BUILTIN_VECTOR_FUNCTION
     {"vecminindex",         1, 1, &feenox_builtin_vecminindex},
     {"vecmaxindex",         1, 1, &feenox_builtin_vecmaxindex},
     {"vecsum",              1, 1, &feenox_builtin_vecsum},
+    {"vecmean",             1, 1, &feenox_builtin_vecmean},
+    {"vecvariance",         1, 1, &feenox_builtin_vecvariance},
+    {"vecsd",               1, 1, &feenox_builtin_vecsd},
 };
 
 ///fv+vecsize+usage vecsize(b)
@@ -188,3 +194,39 @@ double feenox_builtin_vecdot(vector_t **arg) {
   return s;
 }
 
+///fv+vecmean+usage vecmean(a)
+///fv+vecmean+math \hat{\vec{a}} = \frac{1}{\text{vecsize}(\vec{a})} \cdot \sum_{i=1}^{\text{vecsize}(\vec{a})} a_i
+///fv+vecmean+desc Computes the mean value of the elements of vector $\vec{a}$.
+double feenox_builtin_vecmean(vector_t **arg) {
+
+  if (!arg[0]->initialized) {
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
+  }
+
+  return gsl_stats_mean(arg[0]->value->data, arg[0]->value->stride, arg[0]->size);
+}
+
+///fv+vecvariance+usage vecvariance(a)
+///fv+vecvariance+math \hat{\Sigma_\vec{a}} = \frac{1}{\text{vecsize}(\vec{a}) -1} \cdot \sum_{i=1}^{\text{vecsize}(\vec{a})} (a_i - \hat{\vec{a}})^2
+///fv+vecvariance+desc Computes the variance of the elements of vector $\vec{a}$.
+double feenox_builtin_vecvariance(vector_t **arg) {
+
+  if (!arg[0]->initialized) {
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
+  }
+
+  return gsl_stats_variance(arg[0]->value->data, arg[0]->value->stride, arg[0]->size);
+}
+
+///fv+vecsd+usage vecsd(a)
+///fv+vecsd+math \sqrt(\hat{\Sigma_\vec{a}}) = \sqrt{\frac{1}{\text{vecsize}(\vec{a}) -1} \cdot \sum_{i=1}^{\text{vecsize}(\vec{a})} (a_i - \hat{\vec{a}})^2}
+///fv+vecsd+desc Computes the standar deviation of the elements of vector $\vec{a}$.
+///fv+vecsd+desc This is the square root of the variance `vecvariance(a)`.
+double feenox_builtin_vecsd(vector_t **arg) {
+
+  if (!arg[0]->initialized) {
+    feenox_vector_init(arg[0], FEENOX_VECTOR_INITIAL);
+  }
+
+  return gsl_stats_sd(arg[0]->value->data, arg[0]->value->stride, arg[0]->size);
+}
