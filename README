@@ -58,6 +58,8 @@ Consider the following input file:
 Note that
 
 - The input file is made of simple self-descriptive English keywords
+  - Note that if one asks an LLM to create an input—which is a
+    straightforward task—hallucinations are easily detected.
 - Material properties and boundary conditions can be expressions of x, y
   and z
 - Input mesh is is Gmsh’s format .msh
@@ -70,8 +72,9 @@ reasonably low effort (e.g. SunCAE), down to suitability for interaction
 with Large Language Models. As a reference, the reader is encouraged to
 compare the above input syntax with any other FEA solver and then
 consider how to ask ChatGPT & friends for help to create an input file
-from scratch. Or how to write a Graphical User Interface that would need
-to create something the solver can read. Plus, it can be installed with
+from scratch. Good luck detecting hallucinations. Or how to write a
+Graphical User Interface that would need to create something the solver
+can read. Plus, it can be installed with
 
     apt install feenox
 
@@ -97,16 +100,11 @@ work):
 
   - 
 
-    FeenoX is now in Debian (testing) and Ubuntu 25.04!
+    FeenoX is now in Debian (Trixie backports, Forky and Sid) and Ubuntu (25.04 onward).
 
         You can install FeenoX from APT
 
             sudo apt install feenox
-
-        Check progress on the following pages:
-
-        - https://packages.debian.org/unstable/science/feenox
-        - https://launchpad.net/ubuntu/+source/feenox
 
   - 
 
@@ -143,6 +141,10 @@ work):
   [cite FeenoX in your work]: ./doc/FAQ.md#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
   [NAFEMS GNL5 “Large-deformation beam”]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
+  [Trixie backports]: https://packages.debian.org/trixie-backports/feenox
+  [Forky]: https://packages.debian.org/forky/feenox
+  [Sid]: https://packages.debian.org/sid/feenox
+  [Ubuntu]: https://launchpad.net/ubuntu/+source/feenox
   [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup/
 
 Extents
@@ -389,7 +391,7 @@ See these links for details about the packages:
 - https://launchpad.net/ubuntu/+source/feenox
 
   [Debian]: https://www.debian.org
-  [Sid]: https://wiki.debian.org/DebianUnstable
+  [5]: https://wiki.debian.org/DebianUnstable
   [Trixie]: https://www.debian.org/releases/trixie
   [backports]: https://backports.debian.org
   [Ubuntu 25.04]: https://releases.ubuntu.com/plucky
@@ -422,7 +424,7 @@ applications. See detailed compilation instructions.
   [detailed compilation instructions]: doc/compilation.md
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [5]: https://seamplex.com/feenox/doc/FAQ.html
+  [6]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [SunCAE]: https://www.seamplex.com/suncae
 
@@ -500,7 +502,7 @@ information.
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [source tarball]: https://seamplex.com/feenox/dist/src/
   [these instructions]: doc/source.md
-  [6]: compilation.md
+  [7]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
   [compilation guide]: ./doc/compilation.md
 
@@ -609,7 +611,7 @@ source code is provided after signing the agreement, but it is not free
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [7]: https://www.gnu.org/licenses/gpl-3.0
+  [8]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
   [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
@@ -641,7 +643,7 @@ Note that
   [hackers]: README4hackers.html
   [academics]: README4academics.html
   [src/pdes/laplace]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [8]: https://seamplex.com/feenox/doc/programming.html
+  [9]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

@@ -36,10 +36,21 @@ toc: true
 sudo apt install feenox
 ```
 
-See these links for details about the packages:
+For Debian Trixie backports you will need to add
 
- * <https://packages.debian.org/unstable/science/feenox>
- * <https://launchpad.net/ubuntu/+source/feenox>
+```
+deb http://deb.debian.org/debian trixie-backports main
+```
+
+to your APT sources.
+
+
+| Distribution            | URL                                                      |
+|-------------------------|----------------------------------------------------------|
+| Debian Trixie backports | <https://packages.debian.org/trixie-backports/feenox>    |
+| Debian Forky            | <https://packages.debian.org/forky/feenox>               |
+| Debian Sid              | <https://packages.debian.org/sid/feenox>                 |
+| Ubuntu                  | <https://launchpad.net/ubuntu/+source/feenox>            |
 
 
 # Downloads {#sec:downloads}

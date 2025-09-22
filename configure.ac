@@ -8,7 +8,11 @@ dnl This program is distributed in the hope that it will be useful, but
 dnl WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 dnl implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-m4_include([version.m4])
+m4_ifndef([_VERSION_M4_INCLUDED], [
+  m4_define([_VERSION_M4_INCLUDED], 1)
+  m4_include([version.m4])
+])
+
 m4_include([ax_gcc_builtin.m4])
 AC_INIT([feenox],feenoxversion,[jeremy@seamplex.com])
 AC_CONFIG_HEADERS([config.h])

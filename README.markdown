@@ -61,6 +61,8 @@ Note that
 
 - The [input file] is made of [simple][] [self-descriptive English][]
   [keywords]
+  - Note that if one asks an LLM to create an input—which is a
+    straightforward task—hallucinations are easily detected.
 - [Material properties and boundary conditions] can be [expressions of
   $`x`$, $`y`$ and $`z`$]
 - Input mesh is is [Gmsh’s format `.msh`]
@@ -74,9 +76,9 @@ reasonably low effort (e.g. [SunCAE]), down to suitability for
 interaction with Large Language Models. As a reference, the reader is
 encouraged to compare the above input syntax with any other FEA solver
 and then consider how to ask ChatGPT & friends for help to create an
-input file from scratch. Or how to write a Graphical User Interface that
-would need to create something the solver can read. Plus, it can be
-installed with
+input file from scratch. Good luck detecting hallucinations. Or how to
+write a Graphical User Interface that would need to create something the
+solver can read. Plus, it can be installed with
 
 ``` terminal
 apt install feenox
@@ -102,17 +104,12 @@ work]):
 > - First non-trivial large-deformation mechanical example: [NAFEMS GNL5
 >   “Large-deformation beam”]
 >
-> - FeenoX is now in Debian (testing) and Ubuntu 25.04!  
+> - FeenoX is now in Debian ([Trixie backports], [Forky] and [Sid]) and [Ubuntu] (25.04 onward).  
 >   You can install FeenoX from APT
 >
 >   ``` terminal
 >   sudo apt install feenox
 >   ```
->
->   Check progress on the following pages:
->
->   - <https://packages.debian.org/unstable/science/feenox>
->   - <https://launchpad.net/ubuntu/+source/feenox>
 >
 > - Open-source web-based UX for FeenoX.  
 >   Take a look at [SunCAE] for an example of how to write a front end
@@ -143,6 +140,10 @@ work]):
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
   [NAFEMS GNL5 “Large-deformation beam”]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
+  [Trixie backports]: https://packages.debian.org/trixie-backports/feenox
+  [Forky]: https://packages.debian.org/forky/feenox
+  [Sid]: https://packages.debian.org/sid/feenox
+  [Ubuntu]: https://launchpad.net/ubuntu/+source/feenox
   [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup/
 
 ## Extents
@@ -380,7 +381,7 @@ of the [Github repository] for
 
 ## Install from apt
 
-If you use [Debian] (either [Sid], or [Trixie] with [backports]) or
+If you use [Debian] (either [Sid][5], or [Trixie] with [backports]) or
 [Ubuntu 25.04] or higher, you can do
 
 ``` terminal
@@ -393,7 +394,7 @@ See these links for details about the packages:
 - <https://launchpad.net/ubuntu/+source/feenox>
 
   [Debian]: https://www.debian.org
-  [Sid]: https://wiki.debian.org/DebianUnstable
+  [5]: https://wiki.debian.org/DebianUnstable
   [Trixie]: https://www.debian.org/releases/trixie
   [backports]: https://backports.debian.org
   [Ubuntu 25.04]: https://releases.ubuntu.com/plucky
@@ -414,7 +415,7 @@ optimization flags. Please compile from source for high-end
 applications. See [detailed compilation instructions].
 
 > - Be aware that FeenoX **does not have a GUI**. Read the
->   [documentation], especially the [description] and the [FAQs][5]. Ask
+>   [documentation], especially the [description] and the [FAQs][6]. Ask
 >   for help on the [GitHub discussions page] if you do now understand
 >   what this means.
 >
@@ -424,7 +425,7 @@ applications. See [detailed compilation instructions].
   [detailed compilation instructions]: docompilation.markdown
   [documentation]: https://seamplex.com/feenox/doc/
   [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
-  [5]: https://seamplex.com/feenox/doc/FAQ.html
+  [6]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [SunCAE]: https://www.seamplex.com/suncae
 
@@ -480,7 +481,7 @@ hesitate to ask in FeenoX’s [discussion page].
 
     If you do not have Internet access, get the tarball manually, copy
     it to the same directory as `configure` and run again. See the
-    [detailed compilation instructions][6] for an explanation.
+    [detailed compilation instructions][7] for an explanation.
 
 5.  Run test suite (optional)
 
@@ -520,7 +521,7 @@ information.
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [source tarball]: https://seamplex.com/feenox/dist/src/
   [these instructions]: dosource.markdown
-  [6]: compilation.md
+  [7]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
   [compilation guide]: doc/compilation.markdown
 
@@ -562,7 +563,7 @@ text was borrowed from the [Gmsh documentation]. Replacing “Gmsh” with
 > webpage <http://www.gnu.org/copyleft/gpl-faq.html>.
 
 FeenoX is licensed under the terms of the [GNU General Public
-License][7] version 3 or, at the user convenience, any later version.
+License][8] version 3 or, at the user convenience, any later version.
 This means that users get the four essential freedoms:[^1]
 
 0.  The freedom to *run* the program as they wish, for *any* purpose.
@@ -630,7 +631,7 @@ chains running over free and open source operating systems.
   [GNU General Public License]: http://www.gnu.org/copyleft/gpl.html
   [Gmsh documentation]: http://gmsh.info/doc/texinfo/gmsh.html#Copying-conditions
   [General Public License]: https://github.com/seamplex/feenox/blob/master/COPYING
-  [7]: https://www.gnu.org/licenses/gpl-3.0
+  [8]: https://www.gnu.org/licenses/gpl-3.0
   [the documentation]: https://seamplex.com/feenox/doc/
   [Creative Commons Attribution-ShareAlike 4.0 International License]: https://creativecommons.org/licenses/by-sa/4.0/
   [AGPL]: https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License
@@ -642,7 +643,7 @@ new types of PDEs and new formulations of existing PDEs. For elliptic
 operators feel free to use the Laplace equation at [`src/pdes/laplace`]
 as a template.
 
-1.  Read the [Programming Guide][8].
+1.  Read the [Programming Guide][9].
 2.  Browse [Github discussions] and open a new thread explaining what
     you want to do and/or asking for help.
 3.  Fork the [Git repository] under your Github account
@@ -662,7 +663,7 @@ Note that
   [hackers]: README4hackers.html
   [academics]: README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
-  [8]: https://seamplex.com/feenox/doc/programming.html
+  [9]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions
   [Git repository]: https://github.com/seamplex/feenox/
   [Code of Conduct]: https://seamplex.com/feenox/doc/CODE_OF_CONDUCT.html

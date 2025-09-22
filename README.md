@@ -34,12 +34,13 @@ WRITE_RESULTS FORMAT vtu
 Note that
 
  * The [input file](https://www.seamplex.com/feenox/doc/sds.html#sec:input) is made of [simple](https://www.seamplex.com/feenox/doc/sds.html#sec:simple) [self-descriptive English](https://www.seamplex.com/feenox/doc/sds.html#sec:sugar) [keywords](https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
+    - Note that if one asks an LLM to create an input---which is a straightforward task---hallucinations are easily detected.
  * [Material properties and boundary conditions](https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility) can be [expressions of $x$, $y$ and $z$](https://www.seamplex.com/feenox/doc/sds.html#sec:expression)
  * Input mesh is is [Gmsh's format `.msh`](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
  * Output results are in [Paraview's `.vtk`/`.vtu` formats](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
   
 Each of these items has a lot of design and usage implications, thoroughly discussed in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html), ranging from integrating FeenoX as a back end for different front ends with a reasonably low effort (e.g. [SunCAE](https://www.seamplex.com/suncae)), down to suitability for interaction with Large Language Models.
-As a reference, the reader is encouraged to compare the above input syntax with any other FEA solver and then consider how to ask ChatGPT & friends for help to create an input file from scratch.
+As a reference, the reader is encouraged to compare the above input syntax with any other FEA solver and then consider how to ask ChatGPT & friends for help to create an input file from scratch. Good luck detecting hallucinations.
 Or how to write a Graphical User Interface that would need to create something the solver can read.
 Plus, it can be installed with
 
@@ -73,19 +74,13 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 >
 > * First non-trivial large-deformation mechanical example: [NAFEMS GNL5 “Large-deformation beam”](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)
 >
-> * FeenoX is now in Debian (testing) and Ubuntu 25.04!
+> * FeenoX is now in Debian ([Trixie backports](https://packages.debian.org/trixie-backports/feenox), [Forky](https://packages.debian.org/forky/feenox) and [Sid](https://packages.debian.org/sid/feenox)) and [Ubuntu](https://launchpad.net/ubuntu/+source/feenox) (25.04 onward).
 >
 >   :   You can install FeenoX from APT
 >
 >       ```terminal
 >       sudo apt install feenox
 >       ```
-> 
->       Check progress on the following pages:
->
->        * <https://packages.debian.org/unstable/science/feenox>
->        * <https://launchpad.net/ubuntu/+source/feenox>
->
 > 
 > * Open-source web-based UX for FeenoX.
 >
