@@ -131,7 +131,7 @@ extern "C++" {
 // number of internal functions, functional and vector functions
 #define N_BUILTIN_FUNCTIONS         70
 #define N_BUILTIN_FUNCTIONALS       8
-#define N_BUILTIN_VECTOR_FUNCTIONS  8
+#define N_BUILTIN_VECTOR_FUNCTIONS  11
 
 // no son enums porque hacemos operaciones con las mascaras de abajo
 #define EXPR_UNDEFINED                            0 
@@ -470,7 +470,7 @@ struct vector_t {
   int used;
   int assigned_init;
   int assigned_zero;
-  
+
   expr_t size_expr;
   int size;
 
@@ -478,7 +478,6 @@ struct vector_t {
   gsl_vector *initial_transient;
   gsl_vector *initial_static;
 
-  
   // linked list with the expressions of the initial elements
   expr_t *datas;
 

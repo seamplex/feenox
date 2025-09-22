@@ -1,3 +1,7 @@
+# Development (current)
+
+ * functions `vecmean`, `vecvariance` and `vecsd`
+
 # v1.2 (Sep 2025)
 
  * VTK/VTU writer now supports sparse or unsorted node tags
