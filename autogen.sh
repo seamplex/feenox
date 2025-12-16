@@ -54,6 +54,7 @@ else
 fi
 version=$(git describe --${what} | sed 's/-/./' | cut -d- -f1 | tr -d v)
 
+
 cat << EOF > version.m4
 define(feenoxversion, ${version})dnl
 EOF

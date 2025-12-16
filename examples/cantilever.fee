@@ -1,5 +1,4 @@
-PROBLEM mechanical 3D
-READ_MESH cantilever-$1-$2.msh   # in meters
+PROBLEM mechanical 3D MESH cantilever-$1-$2.msh   # in meters
 
 E = 2.1e11         # Young modulus in Pascals
 nu = 0.3           # Poisson's ratio
@@ -7,7 +6,5 @@ nu = 0.3           # Poisson's ratio
 BC left   fixed
 BC right  tz=-1e5  # traction in Pascals, negative z
  
-SOLVE_PROBLEM
-
 # z-displacement (components are u,v,w) at the tip vs. number of nodes
-PRINT nodes %e w(500,0,0) "\# $1 $2"
+PRINT nodes %e w(0.5,0,0) "\# $1 $2"

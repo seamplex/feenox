@@ -26,7 +26,7 @@ E = 200e3 * (1-T(x,y,z)/300)     # temperature-dependent Young modulus
 nu = 0.3
 
 BC left fixed           # left face fully fixed
-BC top  p=1e4*(1+x)     # top face with a triapezoidal load
+BC top  p=1e4*(1+x)     # top face with a trapezoidal load
 
 WRITE_RESULTS FORMAT vtu
 ```
@@ -36,7 +36,7 @@ Note that
  * The [input file](https://www.seamplex.com/feenox/doc/sds.html#sec:input) is made of [simple](https://www.seamplex.com/feenox/doc/sds.html#sec:simple) [self-descriptive English](https://www.seamplex.com/feenox/doc/sds.html#sec:sugar) [keywords](https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
     - Note that if one asks an LLM to create an input---which is a straightforward task---hallucinations are easily detected.
  * [Material properties and boundary conditions](https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility) can be [expressions of $x$, $y$ and $z$](https://www.seamplex.com/feenox/doc/sds.html#sec:expression)
- * Input mesh is is [Gmsh's format `.msh`](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
+ * Input mesh is in [Gmsh's format `.msh`](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
  * Output results are in [Paraview's `.vtk`/`.vtu` formats](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
   
 Each of these items has a lot of design and usage implications, thoroughly discussed in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html), ranging from integrating FeenoX as a back end for different front ends with a reasonably low effort (e.g. [SunCAE](https://www.seamplex.com/suncae)), down to suitability for interaction with Large Language Models.

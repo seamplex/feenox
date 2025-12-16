@@ -12,8 +12,12 @@ fi
 checkpde mechanical
 checkgmsh
 
-gmsh -v 0 -3 ${dir}/i-beam-hex.geo || exit $?
-gmsh -v 0 -3 ${dir}/i-beam-tet.geo || exit $?
+if [ ! -e ${dir}/i-beam-hex.msh ]; then
+  gmsh -v 0 -3 ${dir}/i-beam-hex.geo || exit $?
+fi
+if [ ! -e ${dir}/i-beam-hex.msh ]; then
+  gmsh -v 0 -3 ${dir}/i-beam-tet.geo || exit $?
+fi
 
 answer2 i-beam-euler-bernoulli.fee right tet "+3e-02"
 exitifwrong $?
