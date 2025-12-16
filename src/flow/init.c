@@ -469,6 +469,16 @@ int feenox_init_special_objects(void) {
 //va+realtime_scale+detail and execution will proceed as quick as possible with no delays.
 //  feenox_special_var(realtime_scale) = feenox_get_or_define_variable_get_ptr("realtime_scale");
 
+///va+nearest_node_threshold+desc Threshold distance to interpolate instead of using the nearest-node value.
+///va+nearest_node_threshold+detail When evaluating a multi-dimensional point-defined function $F(\vec{x})$, if $\vec{x}$ is
+///va+nearest_node_threshold+detail “close enough” to one of the definition points, the value of the defined point is returned.
+///va+nearest_node_threshold+detail Otherwise, FeenoX will interpolate the definition points---depending on the settings on how $F(\vec{x})$ was defined.
+///va+nearest_node_threshold+detail This variable controls what “close enough” means as an euclidean distance.
+///va+nearest_node_threshold+detail The default value $\left(\frac{1}{2}\right)^20 \appox 10^{-8}$.
+  feenox_special_var(nearest_node_threshold) = feenox_get_or_define_variable_get_ptr("nearest_node_threshold");
+  feenox_special_var_value(nearest_node_threshold) = DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
+  
+  
   // standard unix files 
   feenox_call(feenox_define_file("stdin", "stdin", 0, "r"));
   feenox.special_files._stdin = feenox_get_file_ptr("stdin");

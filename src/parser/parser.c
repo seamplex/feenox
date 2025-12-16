@@ -1276,7 +1276,7 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+detail @
 ///kw+FUNCTION+usage [ INTERPOLATION_THRESHOLD <expr> ]
 ///kw+FUNCTION+detail For $n>1$, if the euclidean distance between the arguments and the definition points is smaller than `INTERPOLATION_THRESHOLD`, the definition point is returned and no interpolation is performed.
-///kw+FUNCTION+detail Default value is square root of `DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD`.
+///kw+FUNCTION+detail Otherwise, the value of the special variable `nearest_node_threshold` at the moment the function is defined is used as the threshold.
       } else if (strcasecmp(token, "INTERPOLATION_THRESHOLD") == 0) {
 
        feenox_parser_expression(&function->expr_multidim_threshold);

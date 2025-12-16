@@ -265,7 +265,7 @@ int feenox_function_init(function_t *this) {
    
   if (this->algebraic_expression.items == NULL) {
     
-    this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD;
+    this->multidim_threshold = (this->expr_multidim_threshold.items != NULL) ? feenox_expression_eval(&this->expr_multidim_threshold) : feenox_special_var_value(nearest_node_threshold);
 
     if (this->vector_argument != NULL) {
       for (unsigned int i = 0; i < this->n_arguments; i++) {

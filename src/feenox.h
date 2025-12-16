@@ -1665,6 +1665,8 @@ struct feenox_t {
     var_t *on_gsl_error;
     var_t *on_ida_error;
 //    var_t *realtime_scale;
+    
+    var_t *nearest_node_threshold;
   } special_vars;
 
 
