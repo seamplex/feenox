@@ -74,6 +74,7 @@ int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file) {
 
 int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
   
+  int is_tet10 = 0;
   for (size_t i = 0; i < mesh->n_elements; i++) {
     element_t *element = &mesh->element[i];
     if (element->type->dim == mesh->dim_topo) {
@@ -95,7 +96,7 @@ int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
         fprintf(file, "\n");
         break;
         default:
-          int is_tet10 = vtkfromgmsh_types[element->type->id] == 24;
+          is_tet10 = vtkfromgmsh_types[element->type->id] == 24;
           for (int j = 0; j < element->type->nodes; j++) {
             // tet10 has nodes 8 & 9 swapped
             if (is_tet10 && (j == 8 || j == 9)) {
