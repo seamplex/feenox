@@ -23,14 +23,14 @@
 
 int feenox_problem_dirichlet_add(size_t j_global, unsigned int g, double value) {
 
+#ifdef HAVE_PETSC
   feenox.pde.dirichlet_nodes[feenox.pde.dirichlet_k] = feenox.pde.mesh->node[j_global].tag;
   feenox.pde.dirichlet_dofs[feenox.pde.dirichlet_k] = g;
   
-#ifdef HAVE_PETSC
   feenox.pde.dirichlet_indexes[feenox.pde.dirichlet_k] = feenox.pde.mesh->node[j_global].index_dof[g];
   feenox.pde.dirichlet_values[feenox.pde.dirichlet_k] = value;
-#endif
   feenox.pde.dirichlet_k++;
+#endif
   
   return FEENOX_OK;
 }
@@ -58,6 +58,7 @@ int feenox_problem_multifreedom_add(size_t j_global, double *coefficients) {
 }
 
 int feenox_problem_dirichlet_reallocate(size_t n_bcs) {
+#ifdef HAVE_PETSC
   size_t size_plus_safety = n_bcs + feenox.pde.dofs + 1;
 
   feenox_check_alloc(feenox.pde.dirichlet_nodes = reallocarray(feenox.pde.dirichlet_nodes, size_plus_safety, sizeof(size_t)));
@@ -68,7 +69,7 @@ int feenox_problem_dirichlet_reallocate(size_t n_bcs) {
     
   feenox_check_alloc(feenox.pde.multifreedom_indexes = reallocarray(feenox.pde.multifreedom_indexes, size_plus_safety, sizeof(PetscInt *)));
   feenox_check_alloc(feenox.pde.multifreedom_coefficients = reallocarray(feenox.pde.multifreedom_coefficients, size_plus_safety, sizeof(PetscScalar *)));
-  
+#endif  
   return FEENOX_OK;
 }
 
