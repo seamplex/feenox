@@ -9,6 +9,8 @@ if [ -z "${functions_found}" ]; then
   exit 1
 fi
 
+checkpde mechanical
+
 # reflex linear  -0.044117647059
 answer1  hex8-single-stretched.fee linear "-0.0441"
 exitifwrong $?

@@ -9,6 +9,8 @@ if [ -z "${functions_found}" ]; then
   exit 1
 fi
 
+checkpde mechanical
+
 if [ -z "$(which ccx)" ]; then
   exit 77
 fi
