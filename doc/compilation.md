@@ -248,14 +248,20 @@ The binary executable will be located in the `src` directory but a copy will be 
 
 ```terminal
 $ ./feenox
-FeenoX v0.2.14-gbbf48c9
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
   -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
+  --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --ast              dump an abstract syntax tree of the input
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Run with --help for further explanations.
 $
@@ -265,10 +271,10 @@ The `-v` (or `--version`) option shows the version and a copyright notice:
 
 ```terminal
 $ ./feenox -v
-FeenoX v0.2.14-gbbf48c9
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright © 2009--2022 https://seamplex.com/feenox
+Copyright © 2009--2025 Jeremy Theler, https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -279,22 +285,19 @@ The `-V` (or `--versions`) option shows the dates of the last commits, the compi
 
 ```terminal
 $ ./feenox -V
-FeenoX v0.1.24-g6cfe063
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Sun Aug 29 11:34:04 2021 -0300
-Build date         : Sun Aug 29 11:44:50 2021 -0300
+Last commit date   : Mon Jan 26 14:12:53 2026 -0300
 Build architecture : linux-gnu x86_64
-Compiler version   : gcc (Debian 10.2.1-6) 10.2.1 20210110
-Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
-Compiler flags     : -O3
-Builder            : gtheler@chalmers
-GSL version        : 2.6
-SUNDIALS version   : 4.1.0
-PETSc version      : Petsc Release Version 3.14.5, Mar 03, 2021 
-PETSc arch         : 
-PETSc options      : --build=x86_64-linux-gnu --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --with-option-checking=0 --with-silent-rules=0 --libdir=${prefix}/lib/x86_64-linux-gnu --runstatedir=/run --with-maintainer-mode=0 --with-dependency-tracking=0 --with-debugging=0 --shared-library-extension=_real --with-shared-libraries --with-pic=1 --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-cxx-dialect=C++11 --with-opencl=1 --with-blas-lib=-lblas --with-lapack-lib=-llapack --with-scalapack=1 --with-scalapack-lib=-lscalapack-openmpi --with-ptscotch=1 --with-ptscotch-include=/usr/include/scotch --with-ptscotch-lib="-lptesmumps -lptscotch -lptscotcherr" --with-fftw=1 --with-fftw-include="[]" --with-fftw-lib="-lfftw3 -lfftw3_mpi" --with-superlu_dist=1 --with-superlu_dist-include=/usr/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --with-hdf5-include=/usr/include/hdf5/openmpi --with-hdf5-lib="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lhdf5 -lmpi" --CXX_LINKER_FLAGS=-Wl,--no-as-needed --with-hypre=1 --with-hypre-include=/usr/include/hypre --with-hypre-lib=-lHYPRE_core --with-mumps=1 --with-mumps-include="[]" --with-mumps-lib="-ldmumps -lzmumps -lsmumps -lcmumps -lmumps_common -lpord" --with-suitesparse=1 --with-suitesparse-include=/usr/include/suitesparse --with-suitesparse-lib="-lumfpack -lamd -lcholmod -lklu" --with-superlu=1 --with-superlu-include=/usr/include/superlu --with-superlu-lib=-lsuperlu --prefix=/usr/lib/petscdir/petsc3.14/x86_64-linux-gnu-real --PETSC_ARCH=x86_64-linux-gnu-real CFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC" CXXFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC" FCFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fPIC -ffree-line-length-0" FFLAGS="-g -O2 -ffile-prefix-map=/build/petsc-pVufYp/petsc-3.14.5+dfsg1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fPIC -ffree-line-length-0" CPPFLAGS="-Wdate-time -D_FORTIFY_SOURCE=2" LDFLAGS="-Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -fPIC" MAKEFLAGS=w
-SLEPc version      : SLEPc Release Version 3.14.2, Feb 01, 2021
+Compiler version   : gcc (Debian 14.2.0-19) 14.2.0
+Compiler expansion : gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
+Compiler flags     : -O3 -flto=auto -no-pie
+GSL version        : 2.8
+SUNDIALS version   : 7.1.1
+PETSc version      : Petsc Release Version 3.22.5, Mar 28, 2025 
+PETSc options      : --build=x86_64-linux-gnu --prefix=/usr --includedir=${prefix}/include --mandir=${prefix}/share/man --infodir=${prefix}/share/info --sysconfdir=/etc --localstatedir=/var --with-option-checking=0 --with-silent-rules=0 --libdir=${prefix}/lib/x86_64-linux-gnu --runstatedir=/run --with-maintainer-mode=0 --with-dependency-tracking=0 --with-debugging=0 --with-library-name-suffix=_real --with-shared-libraries --with-pic=1 --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-cxx-dialect=C++11 --with-opencl=1 --with-blas-lib=-lblas --with-lapack-lib=-llapack --with-scalapack=1 --with-scalapack-lib=-lscalapack-openmpi --with-fftw=1 --with-fftw-include="[]" --with-fftw-lib="-lfftw3 -lfftw3_mpi" --with-yaml=1 --with-hdf5-include=/usr/include/hdf5/openmpi --with-hdf5-lib="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi -lhdf5 -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi_usempif08 -lmpi_usempi_ignore_tkr -lmpi_mpifh -lmpi " --CXX_LINKER_FLAGS=-Wl,--no-as-needed --with-ptscotch=1 --with-ptscotch-include=/usr/include/scotch --with-ptscotch-lib="-lptesmumps -lptscotch -lptscotcherr" --with-hypre=1 --with-hypre-include=/usr/include/hypre --with-hypre-lib=-lHYPRE --with-mumps=1 --with-mumps-include="[]" --with-mumps-lib="-ldmumps -lzmumps -lsmumps -lcmumps -lmumps_common -lpord" --with-suitesparse=1 --with-suitesparse-include=/usr/include/suitesparse --with-suitesparse-lib="-lspqr -lumfpack -lamd -lcholmod -lklu" --with-superlu=1 --with-superlu-include=/usr/include/superlu --with-superlu-lib=-lsuperlu --with-superlu_dist=1 --with-superlu_dist-include=/usr/include/superlu-dist --with-superlu_dist-lib=-lsuperlu_dist --prefix=/usr/lib/petscdir/petsc3.22/x86_64-linux-gnu-real --PETSC_ARCH=x86_64-linux-gnu-real CFLAGS="-g -O2 -Werror=implicit-function-declaration -ffile-prefix-map=/build/reproducible-path/petsc-3.22.5+dfsg1=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fPIC" CXXFLAGS="-g -O2 -ffile-prefix-map=/build/reproducible-path/petsc-3.22.5+dfsg1=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fPIC" FCFLAGS="-g -O2 -ffile-prefix-map=/build/reproducible-path/petsc-3.22.5+dfsg1=. -fstack-protector-strong -fstack-clash-protection -fcf-protection -fPIC -ffree-line-length-0" FFLAGS="-g -O2 -ffile-prefix-map=/build/reproducible-path/petsc-3.22.5+dfsg1=. -fstack-protector-strong -fstack-clash-protection -fcf-protection -fPIC -ffree-line-length-0" CPPFLAGS="-Wdate-time -D_FORTIFY_SOURCE=2" LDFLAGS="-Wl,-z,relro -fPIC" MAKEFLAGS=
+SLEPc version      : SLEPc Release Version 3.22.2, Dec 02, 2024
 $
 ```
 
@@ -613,7 +616,14 @@ $
 
 If you do not have root access or do not want to populate `/usr/local/bin`, you can either
 
- * Configure with a different prefix (not covered here), or
+ * Configure with your home as a prefix and add `$HOME/bin` to the path
+ 
+   ```
+   ./configure --prefix=$HOME
+   make
+   make install
+   export PATH=$PATH:$HOME/bin
+   ```
  
  * Copy (or symlink) the `feenox` executable to `$HOME/bin`:
  
@@ -634,10 +644,10 @@ Check that FeenoX is now available from any directory (note the command is `feen
 ```terminal
 $ cd
 $ feenox -v
-FeenoX v0.2.14-gbbf48c9
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Copyright © 2009--2022 https://seamplex.com/feenox
+Copyright © 2009--2025 Jeremy Theler, https://seamplex.com/feenox
 GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
 FeenoX is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
@@ -689,18 +699,16 @@ The FeenoX executable will show the configured compiler and flags when invoked w
 
 ```terminal
 $ feenox --versions
-FeenoX v0.2.14-gbbf48c9
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
-Last commit date   : Sat Feb 12 15:35:05 2022 -0300
-Build date         : Sat Feb 12 15:35:44 2022 -0300
+Last commit date   : Mon Jan 26 14:12:53 2026 -0300
 Build architecture : linux-gnu x86_64
-Compiler version   : gcc (Debian 10.2.1-6) 10.2.1 20210110
-Compiler expansion : gcc -Wl,-z,relro -I/usr/include/x86_64-linux-gnu/mpich -L/usr/lib/x86_64-linux-gnu -lmpich
-Compiler flags     : -O3
-Builder            : gtheler@tom
-GSL version        : 2.6
-SUNDIALS version   : 5.7.0
+Compiler version   : gcc (Debian 14.2.0-19) 14.2.0
+Compiler expansion : gcc -I/usr/lib/x86_64-linux-gnu/openmpi/include -I/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi
+Compiler flags     : -O3 -flto=auto -no-pie
+GSL version        : 2.8
+SUNDIALS version   : 7.1.1
 PETSc version      : Petsc Release Version 3.16.3, Jan 05, 2022 
 PETSc arch         : arch-linux-c-debug
 PETSc options      : --download-eigen --download-hdf5 --download-hypre --download-metis --download-mumps --download-parmetis --download-pragmatic --download-scalapack

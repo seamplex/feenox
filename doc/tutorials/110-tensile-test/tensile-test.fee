@@ -1,5 +1,4 @@
-PROBLEM mechanical           # self-descriptive
-READ_MESH tensile-test.msh   # lengths are in mm
+PROBLEM mechanical MESH tensile-test.msh   # lengths are in mm
 
 # material properties, E and nu are "special" variables for the mechanical problem
 E = 200e3   # [ MPa = N / mm^2 ]

@@ -14,24 +14,44 @@ next_title: \#1 Tensile test
 ...
 
 
+TL;DR: Do
+
+```terminal
+sudo apt install feenox gmsh paraview
+```
+
+and you are good.
+
+
+
 # Foreword
 
-[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool. Therefore, it runs natively on [GNU/Linux](https://en.wikipedia.org/wiki/Linux) platforms.
+[FeenoX](https://www.seamplex.com/feenox) is a cloud-first engineering tool.
+Therefore, it runs natively on [GNU/Linux](https://en.wikipedia.org/wiki/Linux) platforms.
+
+> If you do not use GNU/Linux and do not want to learn to use it, then **FeenoX is not for you**.
+> You can still use it through graphical interfaces. Please take a look at
+>
+>  * [CAEplex](https://www.caeplex.com) which is an app to perform CAE in the cloud CAD tool [Onshape](https://www.onshape.com), and/or
+>  * [SunCAE](https://www.seamplex.com/suncae) which a free and open-source web-based interface for FeenoX and other back ends. SunCAE also runs on GNU/Linux but the interface can be used from a browser in any operating system (including mobile). Since it is free software, you have the freedom to hire someone to set it up for you and then use it from Windows.
 
 ::::::::: {.only-in-format .html .markdown}
-Here is a 5-min explanation of why it works this way, and why it is not expected to run in Windows (although it _can_ run in Windows if you try hard enough, but it is not worth it):
+Here is a 5-min explanation of why it works this way, and why it is not expected to run in Windows (although it _can_/_may_/_might_ run in Windows if you try hard enough---but trust me, it is not worth it):
 
 ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
 <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/66WvYTb4pSg?rel=0" allowfullscreen></iframe>
 :::::
 ::::::::: 
 
-Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach. However, this is _highly_ discouraged because those two operating systems are
+Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach.
+However, this is _highly_ discouraged because those two operating systems are
 
  1. not cloud-friendly, let alone cloud-first; and
  2. neither free-as-in-free-beer nor open source.
- 
+
 In order to take the tutorials that follow, it is then recommended to stick to **GNU/Linux** as explained below.
+
+
 
 The best way to learn and to understand how FeenoX works is to use a native GNU/Linux distribution as the main operating system, either in a laptop or a desktop\ PC. This sentence from [PETSc](https://petsc.org/)'s Matt Kneppley from 2015 speaks for itself:
 
@@ -40,20 +60,19 @@ The best way to learn and to understand how FeenoX works is to use a native GNU/
 > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
 
-
- * If you already use GNU/Linux then you are almost set! Any distribution will do, although FeenoX is developed in [Debian](https://www.debian.org/) so `apt-get` (or `apt`) will be used as the package manager. Note that the names of the packages being installed as dependencies may vary from distribution to distribution.
+ * If you already use GNU/Linux then you are almost set! Any distribution will do, although FeenoX is developed in [Debian](https://www.debian.org/) so `apt-get` (or `apt`) will be used as the package manager. Note that the names of the packages being installed as dependencies may vary from distribution to distribution. The instructions work for Debian and Ubuntu.
 
  * If you do not currently use GNU/Linux as your main operating system and still do not want to spend any time nor effort on doing things right, you can either
 
     i. fire up a virtual GNU/Linux server in a cloud provider (e.g. AWS, Azure, DigitalOcean, Contabo, etc.) and connect through SSH, or
     ii. use a containerized GNU/Linux (e.g. with `docker`), or
     iii. use a GNU/Linux box through an virtual computer emulator (e.g. VirtualBox, VMWare, Vagrant, etc.)
-    
-   Note that any of these three options is at least as difficult as using a native GNU/Linux box.
+
+   Note that any of these three options is at least as difficult as using a native GNU/Linux box. Anyway, everything is free software so you get the _freedom_ to hire someone to help you.
 
 
 Up to this point, I assume you have access to a Unix-like shell (i.e. a GNU/Linux terminal, MacOS or even Cygwin or something of the like) as a regular user and that you have permissions to use `sudo`.
-If you do not know what this means, look it up in your favorite search engine, watch some videos online or---even better---ask for help.
+If you do not know what this means, ask your favorite LLM for help.
 Spend some time (which will be really worth it) familiarizing with working with the terminal, issuing commands, etc.
 
 In the following sections there will be terminal mimics.
@@ -63,15 +82,20 @@ Lines not starting with a dollar sign show the output of the invoked command. Fo
 
 ```terminal
 $ feenox
-FeenoX v0.2.144-g31d72de
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
   -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --ast              dump an abstract syntax tree of the input
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Run with --help for further explanations.
 $
@@ -89,45 +113,124 @@ $
 
 # FeenoX
 
-The most important thing to set up is FeenoX itself. Since there are still no Debian packages for FeenoX, the most straightforward way to go is to download the Linux binary tarball from <https://seamplex.com/feenox/dist/linux/> and copy the executable into `/usr/local/bin` so it is globally available. To download the tarball you need `wget` and to un-compress it `tar` and `gz` (which should be already installed anyway), so do
+The most important thing to set up is FeenoX itself.
+
+ * If you have a recent Debian or Ubuntu version (i.e. from 2025 or later) then you can install FeenoX from the official repositories, or
+ * You can download a pre-compiled binary from the FeenoX's servers, or
+ * You download the source code and compile FeenoX yourself. Do not worry, it is a matter of pasting some lines in a terminal.
+
+If you get stuck or get an error, please ask for help in the [Github discussions page](https://github.com/seamplex/feenox/discussions).
+
+## Using Apt in Debian/Ubuntu newer than 2025
+
+Use Apt to install FeenoX:
+
+```terminal
+$ sudo apt install feenox
+```
+
+If you are using Debian Trixie and have not done so, activate the [backports](https://backports.debian.org/)
+
+```terminal
+$ sudo echo "deb http://deb.debian.org/debian trixie-backports main" > /etc/apt/sources.list.d/trixie-backports.list
+$ sudo apt update
+[...]
+$ apt-cache search feenox
+feenox - cloud-first free no-X uniX-like finite-element(ish) tool
+```
+
+and then do `sudo apt install feenox`.
+
+You can check it worked by doing
+
+```terminal
+$ feenox -v
+FeenoX v1.2 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+
+Copyright © 2009--2025 Jeremy Theler, https://seamplex.com/feenox
+GNU General Public License v3+, https://www.gnu.org/licenses/gpl.html. 
+FeenoX is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+```
+
+## Download pre-compiled binaries
+
+Download a binary tarball from <https://seamplex.com/feenox/dist/linux/> and copy the executable into `/usr/local/bin` so it is globally available.
+To download the tarball you need `wget` and to un-compress it `tar` and `gz` (which should be already installed anyway), so do
 
 ```terminal
 $ sudo apt-get install wget tar gzip
-$ wget https://seamplex.com/feenox/dist/linux/feenox-v0.2.142-g8f80cb9-linux-amd64.tar.gz
+$ wget https://seamplex.com/feenox/dist/linux/feenox-1.2.9-linux-amd64.tar.gz
 [...]
-$ tar xvzf feenox-v0.2.142-g8f80cb9-linux-amd64.tar.gz
+$ tar xvzf feenox-1.2.9-linux-amd64.tar.gz
 [...]
-$ sudo cp feenox-v0.2.142-g8f80cb9-linux-amd64/bin/feenox /usr/local/bin/
+$ sudo cp feenox-1.2.9-linux-amd64/bin/feenox /usr/local/bin/
 $
 ```
 
-If you do not have root access, read the complete [download](https://www.seamplex.com/feenox/download.html) or [compilation](https://www.seamplex.com/feenox/doc/compilation.html) instructions. Search for "root" and read along.
+If you do not have root access, read the complete [download](https://www.seamplex.com/feenox/download.html) and [compilation](https://www.seamplex.com/feenox/doc/compilation.html) instructions. Search for "root" and read along.
 
-You should now be able to invoke FeenoX by executing `feenox` from any directory. See the “Invocation” section of the [FeenoX Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) for details about how to invoke it.
+You should now be able to invoke FeenoX by executing `feenox` from any directory.
+See the “Invocation” section of the [FeenoX Manual](https://www.seamplex.com/feenox/doc/feenox-manual.html#invocation) for details about how to invoke it.
 Check this is the case:
 
 ```terminal
 $ feenox
-FeenoX v0.2.144-g31d72de
-a free no-fee no-X uniX-like finite-element(ish) computational engineering tool
+FeenoX v1.2.9-gba91ca3 
+a cloud-first free no-fee no-X uniX-like finite-element(ish) computational engineering tool
 
 usage: feenox [options] inputfile [replacement arguments] [petsc options]
 
   -h, --help         display options and detailed explanations of command-line usage
   -v, --version      display brief version information and exit
   -V, --versions     display detailed version information
+  -c, --check        validates if the input file is sane or not
   --pdes             list the types of PROBLEMs that FeenoX can solve, one per line
+  --elements_info    output a document with information about the supported element types
+  --ast              dump an abstract syntax tree of the input
+  --linear           force FeenoX to solve the PDE problem as linear
+  --non-linear       force FeenoX to solve the PDE problem as non-linear
 
 Run with --help for further explanations.
 $
 ```
 
-If you get stuck or get an error, please ask for help in the [Github discussion page](https://github.com/seamplex/feenox/discussions).
 
 
 ## Compiling from source
 
-If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, follow the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html).
+You can get FeenoX's source code by either 
+
+ * downloading a source tarball from <https://seamplex.com/feenox/dist/src/>
+ * cloning the Git repository at <https://github.com/seamplex/feenox>
+
+The basic compilation instructions are
+
+```
+sudo apt-get update
+sudo apt-get install git build-essential make automake autoconf libgsl-dev libsundials-dev petsc-dev slepc-dev
+git clone https://github.com/seamplex/feenox
+cd feenox
+./autogen.sh
+./configure
+make -j4
+make check
+sudo make install
+```
+
+ * If using a source tarball instead of the Git repository, replace `git clone` by `wget` and skip `autogen.sh`.
+ * If you do not have root permissions, configure with your home directory as prefix and then make install as a regular user:
+
+   ```
+   ./configure --prefix=$HOME
+   make
+   make install
+   export PATH=$PATH:$HOME/bin
+   ```
+
+ * If you want to tweak the compilation flags, use other libraries, modify the code or just learn how FeenoX works, follow the [Compilation instructions](https://www.seamplex.com/feenox/doc/compilation.html).
+
 Again, do not hesitate to ask in the [Github discussion page](https://github.com/seamplex/feenox/discussions). 
 
 
@@ -290,13 +393,17 @@ Note that both Gmsh in post-processing mode and Paraview make sense only if you 
 
 # Notes on hardware
 
+TL;DR: Use a remote server to run large problems.
+
 ## Memory
 
 Solving PDEs with FeenoX might need a lot of memory (depending on the problem size).
 Mind the total RAM your system has. If you are using a laptop, FeenoX might thrash it if the problem is way too big.
 
+
 ## CPU
 
 Solving problems with FeenoX during a lot of time might increase the CPU temperature significantly.
 Make sure your hardware is properly cooled before executing FeenoX during a long period of time.
+
 

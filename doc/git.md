@@ -68,6 +68,7 @@ If something goes wrong and you get an error, do not hesitate to ask in FeenoX's
     > ./configure --prefix=$HOME
     > make
     > make install
+    > export PATH=$PATH:$HOME/bin
     > ```
  
 To stay up to date, pull and then `autogen`, `configure` and `make` (and optionally install):
