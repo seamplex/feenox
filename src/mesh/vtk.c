@@ -72,6 +72,7 @@ int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file) {
   return FEENOX_OK;
 }
 
+#define vtk_node_tag(t) (mesh->tag2index_from_tag_min) ? (mesh->tag2index_from_tag_min[(t)]) : ((t)-1)
 int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
   
   int is_tet10 = 0;
@@ -84,14 +85,13 @@ int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
       switch(element->type->id) {
         case ELEMENT_TYPE_HEXAHEDRON27: 
           for (int j = 0; j < 27 ; ++j) {
-//            fprintf(file, " %ld", tag_index_map_lookup(mesh->index2tag, element->node[hexa27fromgmsh[j]]->tag));
-            fprintf(file, " %ld", mesh->tag2index_from_tag_min[element->node[hexa27fromgmsh[j]]->tag]);
+            fprintf(file, " %ld", vtk_node_tag(element->node[hexa27fromgmsh[j]]->tag));
            }
           fprintf(file, "\n");
         break;
         case ELEMENT_TYPE_HEXAHEDRON20:
           for (int j = 0; j < 20 ; ++j) {
-            fprintf(file, " %ld", mesh->tag2index_from_tag_min[element->node[hexa20fromgmsh[j]]->tag]);
+            fprintf(file, " %ld", vtk_node_tag(element->node[hexa20fromgmsh[j]]->tag));
           }
         fprintf(file, "\n");
         break;
@@ -101,12 +101,12 @@ int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE *file, int with_size) {
             // tet10 has nodes 8 & 9 swapped
             if (is_tet10 && (j == 8 || j == 9)) {
               if (j == 8) {
-                fprintf(file, " %ld", mesh->tag2index_from_tag_min[element->node[9]->tag]);
+                fprintf(file, " %ld", vtk_node_tag(element->node[9]->tag));
               } else if (j == 9) {
-                fprintf(file, " %ld", mesh->tag2index_from_tag_min[element->node[8]->tag]);
+                fprintf(file, " %ld", vtk_node_tag(element->node[8]->tag));
               }
             } else {
-              fprintf(file, " %ld", mesh->tag2index_from_tag_min[element->node[j]->tag]);
+              fprintf(file, " %ld", vtk_node_tag(element->node[j]->tag));
             }
           }
           fprintf(file, "\n");
