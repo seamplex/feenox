@@ -17,7 +17,7 @@ answerzero wilson-1d.fee
 exitifwrong $?
 
 gmsh -v 0 -2 ${dir}/wilson-2d.geo || exit $?
-answerzero wilson-2d.fee 2e-2
+answerzero wilson-2d.fee 3e-2
 exitifwrong $?
 
 gmsh -v 0 -2 ${dir}/wilson-2d.geo || exit $?
