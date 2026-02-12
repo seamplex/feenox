@@ -285,8 +285,8 @@ Note that
 - Each author keeps the copyright of the contribution.
 - You can [ask][Github discussions]!
 
-  [hackers]: README4hackers.html
-  [academics]: README4academics.html
+  [hackers]: ../README4hackers.html
+  [academics]: ../README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [10]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions

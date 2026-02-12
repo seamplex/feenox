@@ -33,8 +33,8 @@ between one or more [input files] and zero or more [output files][]:
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal
-     data (*.dat)  } input ----> |   FeenoX   |----> output { data files
-     input (*.fee) }             |            |             { post (vtk/msh)
+     input (*.fee) } input ----> |   FeenoX   |----> output { data files
+     data file     }             |            |             { post (vtk/msh)
                                  +------------+
 
 When solving problems using the finite element method, FeenoX sits in

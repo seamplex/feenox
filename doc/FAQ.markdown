@@ -20,7 +20,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2025-09-22
+date: 2026-02-10
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -436,8 +436,8 @@ files and zero or more output files:
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal
-     data (*.dat)  } input ----> |   FeenoX   |----> output { data files
-     input (*.fee) }             |            |             { post (vtk/msh)
+     input (*.fee) } input ----> |   FeenoX   |----> output { data files
+     data file     }             |            |             { post (vtk/msh)
                                  +------------+
 
 Recall that FeenoX is designed as a cloud-first tool, and “the cloud”

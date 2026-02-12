@@ -52,7 +52,7 @@ E = 200e3 * (1-T(x,y,z)/300)     # temperature-dependent Young modulus
 nu = 0.3
 
 BC left fixed           # left face fully fixed
-BC top  p=1e4*(1+x)     # top face with a triapezoidal load
+BC top  p=1e4*(1+x)     # top face with a trapezoidal load
 
 WRITE_RESULTS FORMAT vtu
 ```
@@ -65,7 +65,7 @@ Note that
     straightforward task—hallucinations are easily detected.
 - [Material properties and boundary conditions] can be [expressions of
   $`x`$, $`y`$ and $`z`$]
-- Input mesh is is [Gmsh’s format `.msh`]
+- Input mesh is in [Gmsh’s format `.msh`]
 - Output results are in [Paraview’s `.vtk`/`.vtu`
   formats][Gmsh’s format `.msh`]
 
@@ -502,6 +502,7 @@ hesitate to ask in FeenoX’s [discussion page].
     > ./configure --prefix=$HOME
     > make
     > make install
+    > export PATH=$PATH:$HOME/bin
     > ```
 
 To stay up to date, pull and then `autogen`, `configure` and `make` (and
@@ -660,8 +661,8 @@ Note that
 - Each author keeps the copyright of the contribution.
 - You can [ask][Github discussions]!
 
-  [hackers]: README4hackers.html
-  [academics]: README4academics.html
+  [hackers]: ../README4hackers.html
+  [academics]: ../README4academics.html
   [`src/pdes/laplace`]: https://github.com/seamplex/feenox/tree/main/src/pdes/laplace
   [9]: https://seamplex.com/feenox/doc/programming.html
   [Github discussions]: https://github.com/seamplex/feenox/discussions

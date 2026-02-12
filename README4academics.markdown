@@ -73,8 +73,8 @@ It can be seen as a Unix filter (or as a transfer function)
 
                                  +------------+
      mesh (*.msh)  }             |            |             { terminal
-     data (*.dat)  } input ----> |   FeenoX   |----> output { data files
-     input (*.fee) }             |            |             { post (vtk/msh)
+     input (*.fee) } input ----> |   FeenoX   |----> output { data files
+     data file     }             |            |             { post (vtk/msh)
                                  +------------+
 
 which, when zoomed in, acts as a “glue layer” between a mesher ([Gmsh])

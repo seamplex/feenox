@@ -1,4 +1,4 @@
-Contributions from [hackers](README4hackers.html) and/or [academics](README4academics.html) are welcome, especially new types of PDEs and new formulations of existing PDEs.
+Contributions from [hackers](../README4hackers.html) and/or [academics](../README4academics.html) are welcome, especially new types of PDEs and new formulations of existing PDEs.
 For elliptic operators feel free to use the Laplace equation at [`src/pdes/laplace`](https://github.com/seamplex/feenox/tree/main/src/pdes/laplace) as a template.
 
  1. Read the [Programming Guide](https://seamplex.com/feenox/doc/programming.html).
