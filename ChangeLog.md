@@ -1,5 +1,9 @@
 # Development (current)
 
+ * whitepaper [“Why FeenoX is different”](https://seamplex.com/feenox/doc/whitepaper/)
+ * small fix when writing to VTU/VTK from `.msh` version 2.2
+ * updated [Tutorial #0](https://www.seamplex.com/feenox/doc/tutorials/000-setup/)
+ * variable `nearest_node_threshold` can be modified to change the multi-dim interpolation behavior near nodes
  * functions `vecmean`, `vecvariance` and `vecsd`
 
 # v1.2 (Sep 2025)

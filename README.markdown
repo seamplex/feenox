@@ -101,6 +101,8 @@ work]):
 
 > ### News
 >
+> - White paper [“Why FeenoX is different”]
+>
 > - First non-trivial large-deformation mechanical example: [NAFEMS GNL5
 >   “Large-deformation beam”]
 >
@@ -139,6 +141,7 @@ work]):
   [Academic Professor]: README4academics.markdown
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
+  [“Why FeenoX is different”]: https://seamplex.com/feenox/doc/whitepaper/
   [NAFEMS GNL5 “Large-deformation beam”]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
   [Trixie backports]: https://packages.debian.org/trixie-backports/feenox
   [Forky]: https://packages.debian.org/forky/feenox
