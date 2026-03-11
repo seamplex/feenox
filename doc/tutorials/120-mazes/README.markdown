@@ -1,13 +1,13 @@
 # FeenoX Tutorial \#2: Solving mazes with PDEs instead of AI
 
-- [<span class="toc-section-number">1</span> Foreword][]
-  - [<span class="toc-section-number">1.1</span> Executive summary][]
-- [<span class="toc-section-number">2</span> Creating the mesh][]
+- [<span class="toc-section-number">1</span> Foreword]
+  - [<span class="toc-section-number">1.1</span> Executive summary]
+- [<span class="toc-section-number">2</span> Creating the mesh]
 - [<span class="toc-section-number">3</span> Solving the steady-state
-  Laplace equation][]
-- [<span class="toc-section-number">4</span> Results][]
-- [<span class="toc-section-number">5</span> Transient Laplace][]
-- [<span class="toc-section-number">6</span> Homework][]
+  Laplace equation]
+- [<span class="toc-section-number">4</span> Results]
+- [<span class="toc-section-number">5</span> Transient Laplace]
+- [<span class="toc-section-number">6</span> Homework]
 
   [<span class="toc-section-number">1</span> Foreword]: #foreword
   [<span class="toc-section-number">1.1</span> Executive summary]: #executive-summary
@@ -21,14 +21,14 @@
 # Foreword
 
 Welcome the the **Second Feenox tutorial**, very much inspired on Donald
-Knuth’s [Selected Papers on Fun and Games][]. And a little bit on Homer
+Knuth’s [Selected Papers on Fun and Games]. And a little bit on Homer
 Simpson.
 
 <figure id="fig:maze-homer">
 <img src="maze-homer.png"
-alt="Homer trying to solve a maze on a placemat" />
-<figcaption>Figure 1: Homer trying to solve a maze on a
-placemat</figcaption>
+alt="Figure 1: Homer trying to solve a maze on a placemat" />
+<figcaption aria-hidden="true">Figure 1: Homer trying to solve a maze on
+a placemat</figcaption>
 </figure>
 
 Say you want to solve a maze drawn in a restaurant’s placemat: one where
@@ -37,7 +37,7 @@ Nowadays the first instinctive reaction would be to fire some fancy AI
 or ML algorithm. But we are actual engineers and we do value nice maths
 hacks, don’t we? In order to avoid falling into the alligator’s mouth,
 we can exploit the ellipticity of the Laplacian operator to solve any
-maze—even hand-drawn ones. Just [FeenoX][] and a bunch of standard open
+maze—even hand-drawn ones. Just [FeenoX] and a bunch of standard open
 source tools to convert a bitmapped picture of the maze into an
 unstructured mesh.
 
@@ -67,18 +67,18 @@ We will…
 1.  Create and download a random maze online.
 
 2.  Create a FEM mesh for the aisle of the maze (the walls will be the
-    boundary of the domain) using [Gmsh][].
+    boundary of the domain) using [Gmsh].
 
-3.  Solve $\nabla^2 \phi(x,y) = 0$ subject to the following boundary
+3.  Solve $`\nabla^2 \phi(x,y) = 0`$ subject to the following boundary
     conditions:
 
-    $$
+    ``` math
     \begin{cases}
     \phi(x,y) = 1 & \text{at the inlet} \\
     \phi(x,y) = 0 & \text{at the outlet} \\
     \frac{\partial \phi}{\partial n} = 0 & \text{everywhere else} \\
     \end{cases}
-    $$
+    ```
 
     ``` feenox
     PROBLEM laplace 2D
@@ -90,7 +90,7 @@ We will…
     SOLVE_PROBLEM
     ```
 
-4.  Show the solution of the maze given by $\nabla \phi$, properly
+4.  Show the solution of the maze given by $`\nabla \phi`$, properly
     scaled, in [Gmsh][]:
 
     ``` feenox
@@ -108,13 +108,13 @@ We will…
 <figure id="fig:maze123" class="subfigures">
 <figure id="fig:maze12">
 <img src="maze12.png" data-width_html="100%" data-width_latex="95%"
-alt="Bitmapped maze from https://www.mazegenerator.net (left) and 2D mesh (right)" />
-<figcaption>a</figcaption>
+alt="a" />
+<figcaption aria-hidden="true">a</figcaption>
 </figure>
 <figure id="fig:maze3">
 <img src="maze3.png" data-width_html="100%" data-width_latex="47.5%"
-alt="Solution to found by FeenoX (and drawn by Gmsh)" />
-<figcaption>b</figcaption>
+alt="b" />
+<figcaption aria-hidden="true">b</figcaption>
 </figure>
 <figcaption><p>Figure 2: Bitmapped, meshed and solved mazes.. a —
 Bitmapped maze from <a href="https://www.mazegenerator.net"
@@ -200,8 +200,9 @@ Gmsh)</p></figcaption>
     1.  Add a surface for the aisles of the maze (i.e. the 2D domain
         where we will apply the Laplace operator):
 
-        - In the left-pane tree, go to Geometry $\rightarrow$ Elementary
-          entities $\rightarrow$ Add $\rightarrow$ Plane Surface.
+        - In the left-pane tree, go to Geometry $`\rightarrow`$
+          Elementary entities $`\rightarrow`$ Add $`\rightarrow`$ Plane
+          Surface.
 
         - When prompted to “select surface boundary” click on any of the
           blue edges. They all should turn to red:
@@ -214,8 +215,8 @@ Gmsh)</p></figcaption>
 
           ![][7] 
 
-        - Go to Geometry $\rightarrow$ Physical groups $\rightarrow$ Add
-          $\rightarrow$ Surface.
+        - Go to Geometry $`\rightarrow`$ Physical groups $`\rightarrow`$
+          Add $`\rightarrow`$ Surface.
 
         - When prompted to “select surfaces” click on any point of the
           maze. The mesh should turn red:
@@ -236,8 +237,8 @@ Gmsh)</p></figcaption>
     2.  Set physical curves for “start” and “end” (i.e. the 1D edges
         that will hold the Dirichlet boundary conditions)
 
-        - In the left-pane tree, go to Geometry $\rightarrow$ Physical
-          groups $\rightarrow$ Add $\rightarrow$ Curve.
+        - In the left-pane tree, go to Geometry $`\rightarrow`$ Physical
+          groups $`\rightarrow`$ Add $`\rightarrow`$ Curve.
 
         - When prompted to “select curves” click on the edge (or edges)
           that define the inlet.
@@ -253,8 +254,8 @@ Gmsh)</p></figcaption>
         - Do the same thing for the outlet, and name it “end.”
           Alternatively, find out the edge id of the outlet by zooming
           in a little bit into the outlet and then going to Tools
-          $\rightarrow$ Options $\rightarrow$ Geometry $\rightarrow$
-          Curve Labels:
+          $`\rightarrow`$ Options $`\rightarrow`$ Geometry
+          $`\rightarrow`$ Curve Labels:
 
           ![][10] 
 
@@ -266,7 +267,7 @@ Gmsh)</p></figcaption>
           ```
 
           Now our `maze.geo` contains a proper definition of the domain
-          where we will solve $\nabla^2 \phi = 0$.
+          where we will solve $`\nabla^2 \phi = 0`$.
 
 6.  Create the actual mesh `maze.msh` out of `maze.geo`
 
@@ -287,19 +288,19 @@ Gmsh)</p></figcaption>
 
 # Solving the steady-state Laplace equation
 
-We have to solve $\nabla^2 \phi = 0$ with the following boundary
+We have to solve $`\nabla^2 \phi = 0`$ with the following boundary
 conditions
 
-$$
+``` math
 \begin{cases}
 \phi=0 & \text{at “start”} \\
 \phi=1 & \text{at “end”} \\
 \nabla \phi \cdot \hat{\mathbf{n}} = 0 & \text{everywhere else} \\
 \end{cases}
-$$
+```
 
 The solution to the maze is given by the gradient of the
-solution $\nabla \phi$.
+solution $`\nabla \phi`$.
 
 This translates into FeenoX to the following input file:
 
@@ -320,23 +321,25 @@ WRITE_MESH maze-solved.msh \
     VECTOR dphidx dphidy 0 
 ```
 
-Let us break the [`WRITE_MESH`][] instruction up. The resulting mesh
-name is `maze-solved.msh`. It cannot be the same `maze.msh` we used as
-the input mesh.
+Let us break the [`WRITE_MESH`] instruction up. The resulting mesh name
+is `maze-solved.msh`. It cannot be the same `maze.msh` we used as the
+input mesh.
 
 Those aisles that go into dead ends are expected to have a very small
 gradient, while the aisles that lead to the exit are expected to have a
-large gradient. The solution $\phi(x,y)$ is mapped into a function
+large gradient. The solution $`\phi(x,y)`$ is mapped into a function
 `phi(x,y)`. Its gradient
 
-$$\nabla \phi =
+``` math
+\nabla \phi =
 \begin{bmatrix}
 \frac{\partial \phi}{\partial x} \\
 \frac{\partial \phi}{\partial y}
 \end{bmatrix}
-$$ is mapped into two scalar functions, `dphidx(x,y)` and `dphidy(x,y)`.
-So we write a scalar field with the magnitude of the
-gradient $\nabla \phi$ as `sqrt(dphidx(x,y)^2+dphidy(x,y)^2)`(remember
+```
+is mapped into two scalar functions, `dphidx(x,y)` and `dphidy(x,y)`. So
+we write a scalar field with the magnitude of the
+gradient $`\nabla \phi`$ as `sqrt(dphidx(x,y)^2+dphidy(x,y)^2)`(remember
 that everything is an expression, including the fields written in the
 post-processing files). We also write the gradient itself as a vector so
 we can follow the arrows from the start down to the end.
@@ -346,7 +349,7 @@ $ feenox maze.fee
 $
 ```
 
-That’s it. Remember the [Unix rule][] of silence.
+That’s it. Remember the [Unix rule] of silence.
 
   [`WRITE_MESH`]: https://seamplex.com/feenox/doc/feenox-manual.html#write_mesh
   [Unix rule]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test/#sec:unix
@@ -405,9 +408,9 @@ $
 Use this transient input file for FeenoX, with the same mesh, to solve
 for the transient Laplace problem going from top to down (i.e. `td`):
 
-$$
+``` math
 \nabla^2 \phi = \alpha \frac{\partial \phi}{\partial t}
-$$
+```
 
 ``` feenox
 PROBLEM laplace 2D
@@ -420,9 +423,9 @@ BC start   phi=if(t<1,t,1)  # a ramp from zero to avoid discontinuities with the
 BC end     phi=0            # homogeneous BC at the end (so we move from top to bottom)
 
 SOLVE_PROBLEM
-PRINT t
+# PRINT t
 
-WRITE_MESH maze-tran-td.msh phi sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
+# WRITE_MESH maze-tran-td.msh phi sqrt(dphidx(x,y)^2+dphidy(x,y)^2) VECTOR -dphidx(x,y) -dphidy(x,y) 0 
 ```
 
 ``` terminal

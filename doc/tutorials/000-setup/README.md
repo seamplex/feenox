@@ -41,6 +41,8 @@ Here is a 5-min explanation of why it works this way, and why it is not expected
 ::::: {.container .text-center .my-5 .ratio .ratio-16x9}
 <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/66WvYTb4pSg?rel=0" allowfullscreen></iframe>
 :::::
+
+Also, check out the whitepaper [“Why FeenoX is different”](https://seamplex.com/feenox/doc/whitepaper/).
 ::::::::: 
 
 Theoretically, the tool could be compiled and run in other architectures such as Windows or MacOS in a non-cloud approach.

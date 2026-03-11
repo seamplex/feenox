@@ -1,10 +1,9 @@
 # FeenoX tutorials
 
-- [<span class="toc-section-number">1</span> Introduction][]
-  - [<span class="toc-section-number">1.1</span> General tutorials][]
-  - [<span class="toc-section-number">1.2</span> Detailed
-    functionality][]
-  - [<span class="toc-section-number">1.3</span> Physics tutorials][]
+- [<span class="toc-section-number">1</span> Introduction]
+  - [<span class="toc-section-number">1.1</span> General tutorials]
+  - [<span class="toc-section-number">1.2</span> Detailed functionality]
+  - [<span class="toc-section-number">1.3</span> Physics tutorials]
 
   [<span class="toc-section-number">1</span> Introduction]: #introduction
   [<span class="toc-section-number">1.1</span> General tutorials]: #general-tutorials
@@ -13,11 +12,11 @@
 
 # Introduction
 
-[FeenoX][] is a cloud-first engineering tool. This idea is thoroughly
-discussed in the [documentation][], particularly in the
+[FeenoX] is a cloud-first engineering tool. This idea is thoroughly
+discussed in the [documentation], particularly in the
 
-- [Software Requirements Specification][], and
-- [Software Design Specification][]
+- [Software Requirements Specification], and
+- [Software Design Specification]
 
 As such, it is a tool that in principle should be used from a
 higher-level interface (e.g. a web-based UI such as \<www.caeplex.com\>)
@@ -29,11 +28,11 @@ or how to implement an optimization workflow on your own, you will need
 to start running simple cases manually and then increasing the
 complexity until reaching the solve state-of-the-art capabilities.
 
-Recall by reading again the [project’s main README][], that FeenoX is—in
-a certain sense—to desktop FEA programs (like [Code_Aster][] with
-[Salome-Meca][] or [CalculiX][] with [PrePoMax][]) and libraries (like
-[MoFEM][] or [Sparselizard][]) what [Markdown][] is to Word and
-[(La)TeX][], respectively and *deliberately*.
+Recall by reading again the [project’s main README], that FeenoX is—in a
+certain sense—to desktop FEA programs (like [Code_Aster] with
+[Salome-Meca] or [CalculiX] with [PrePoMax]) and libraries (like [MoFEM]
+or [Sparselizard]) what [Markdown] is to Word and [(La)TeX],
+respectively and *deliberately*.
 
 Indeed, it is this the main goal of the tutorials, namely to be able to
 run relatively small problems in FeenoX by creating the appropriate
@@ -42,9 +41,9 @@ by the end of each tutorial you will better understsand how FeenoX works
 and thus, how to make it work the way you need and/or want. And if not,
 you always have the *freedom* to hire someone to explain it to you and
 even to modify the code to make it work the way you need and/or want
-since it is [free and open source software][].
+since it is [free and open source software].
 
-1.  [Setting up your workspace][]
+1.  [Setting up your workspace]
 
   [FeenoX]: https://www.seamplex.com/feenox
   [documentation]: https://www.seamplex.com/feenox/doc
@@ -64,8 +63,8 @@ since it is [free and open source software][].
 
 ## General tutorials
 
-1.  [Overview: the tensile test case][]
-2.  [Fun & games: solving mazes with PDES instead of AI][]
+1.  [Overview: the tensile test case]
+2.  [Fun & games: solving mazes with PDES instead of AI]
 
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
   [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
@@ -82,7 +81,7 @@ since it is [free and open source software][].
 ## Physics tutorials
 
 1.  The Laplace equation
-2.  [Heat conduction][]
+2.  [Heat conduction]
 3.  Linear elasticity
 4.  Modal analysis
 5.  Thermo-mechanical analysis
