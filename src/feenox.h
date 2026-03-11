@@ -579,16 +579,10 @@ struct function_t {
   size_t *rectangular_mesh_size;
   double **rectangular_mesh_point;
 
-#ifdef HAVE_GSL
   // helpers to interpolate 1D with GSL
   gsl_interp *interp;
   gsl_interp_accel *interp_accel;
   gsl_interp_type interp_type;
-#else
-  void *interp;
-  void *interp_accel;
-  gsl_interp_type interp_type;
-#endif
 
   // multidimensional interpolation type
   enum {

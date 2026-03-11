@@ -29,7 +29,7 @@
   #ifndef HAVE_GSL
     #define HAVE_GSL
   #endif
-  
+
   // Include GSL headers if not already included
   #ifndef __GSL_BLAS_H__
     #include <gsl/gsl_blas.h>
@@ -115,6 +115,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+
+#define GSL_SUCCESS 0
+#define gsl_multiroot_fsolver_type void
 
 // Don't define GSL constants here to avoid conflicts if GSL headers
 // are included elsewhere (e.g., through PETSc). The compatibility

@@ -465,26 +465,32 @@ AS_IF([test "x${enable_fee2ccx}" = "xyes"] , [
 
 
 AS_BOX([Summary of dependencies])
-AS_ECHO(  ["  GNU Scientific Library  ${have_gsl}"])
+AS_ECHO_N(  ["  GNU Scientific Library  ${have_gsl}"])
 AS_IF([test "x${have_gsl}" = "xyes"],
- AS_ECHO(["    version: ${gsl_version}"]),
+ AS_ECHO([" ${gsl_version}"]),
  AS_ECHO
 )
+
 # AS_ECHO(  ["  Readline                ${have_readline}"])
+
 AS_ECHO(  ["  SUNDIALS                ${have_sundials}"])
+
 AS_ECHO_N(["  PETSc                   ${have_petsc}"])
 AS_IF([test "x${have_petsc}" = "xyes"],
  AS_ECHO([" ${PETSC_DIR} ${PETSC_ARCH}"]),
  AS_ECHO
 )
+
 AS_ECHO_N(["  SLEPc                   ${have_slepc}"])
 AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO([" ${SLEPC_DIR}"]),
  AS_ECHO
 )
+
 AS_ECHO(  ["  Compile fee2ccx         ${enable_fee2ccx}"])
 AS_ECHO(  ["  Compiler                ${compiler_show}"])
 AS_ECHO(  ["  Compiler flags          ${CFLAGS}"])
+AS_ECHO(  ["  Compiler version        ${compiler_version}"])
 # AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])
 
 AC_OUTPUT

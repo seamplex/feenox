@@ -129,7 +129,7 @@ int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) 
 
     do {
       iter++;
-      if ((gsl_status = gsl_multiroot_fdfsolver_iterate(s)) != 0) {  // 0 /* GSL_SUCCESS */
+      if ((gsl_status = gsl_multiroot_fdfsolver_iterate(s)) != GSL_SUCCESS) {
         return FEENOX_ERROR;
       }
       gsl_status = gsl_multiroot_test_residual(s->f, feenox_var_value(feenox.mesh.vars.eps));
@@ -169,7 +169,7 @@ int feenox_mesh_interp_residual(const gsl_vector *test, void *params, gsl_vector
     gsl_vector_set(residual, i, xi);
   }
   
-  return 0;  // 0 /* GSL_SUCCESS */
+  return GSL_SUCCESS;
   
 }
 
@@ -193,7 +193,7 @@ int feenox_mesh_interp_jacob(const gsl_vector *test, void *params, gsl_matrix *J
     }
   }
      
-  return 0;  // 0 /* GSL_SUCCESS */
+  return GSL_SUCCESS;
 
 }
 
@@ -203,7 +203,7 @@ int feenox_mesh_interp_residual_jacob(const gsl_vector *test, void *params, gsl_
   feenox_mesh_interp_residual(test, params, residual);
   feenox_mesh_interp_jacob(test, params, J);
   
-  return 0;  // 0 /* GSL_SUCCESS */
+  return GSL_SUCCESS;
 }
 
 
