@@ -26,6 +26,7 @@ feenox_parser_t feenox_parser;
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #if HAVE_SYSCONF
  #include <unistd.h>
 #endif
@@ -3991,16 +3992,24 @@ int feenox_parse_solve(void) {
 ///kw+SOLVE+usage {
 ///kw+SOLVE+usage dnewton |
       if (strcasecmp(token, "dnewton") == 0) {
+#ifdef HAVE_GSL
         solve->type = gsl_multiroot_fsolver_dnewton;
+#endif
 ///kw+SOLVE+usage hybrid |
       } else if (strcasecmp(token, "hybrid") == 0) {
+#ifdef HAVE_GSL
         solve->type = gsl_multiroot_fsolver_hybrid;
+#endif
 ///kw+SOLVE+usage hybrids |
       } else if (strcasecmp(token, "hybrids") == 0) {
+#ifdef HAVE_GSL
         solve->type = gsl_multiroot_fsolver_hybrids;
+#endif
 ///kw+SOLVE+usage broyden }
       } else if (strcasecmp(token, "broyden") == 0) {
+#ifdef HAVE_GSL
         solve->type = gsl_multiroot_fsolver_hybrid;
+#endif
 ///kw+SOLVE+usage ]@
       }
           

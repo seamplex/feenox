@@ -25,7 +25,9 @@
 #include "pdes/available.h"
 
 #include <stdio.h>
+#ifdef HAVE_GSL
 #include <gsl/gsl_version.h>
+#endif
 
 #ifdef HAVE_READLINE
 #include <readline/readline.h>
@@ -180,6 +182,9 @@ void feenox_longversion(void) {
   printf("Compiler flags     : %s\n", FEENOX_COMPILER_CFLAGS);
 #endif
   
+#ifndef HAVE_GSL
+  char *gsl_version = "N/A";
+#endif  
   printf("GSL version        : %s\n", gsl_version);
   
 #ifdef HAVE_SUNDIALS

@@ -9,6 +9,8 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
+checkgsl
+
 answer fit1d.fee "1 0 1"
 exitifwrong $?
 

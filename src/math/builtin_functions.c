@@ -1114,6 +1114,8 @@ double feenox_builtin_equal(expr_item_t *f) {
 
 }
 
+#ifdef HAVE_GSL
+
 double feenox_builtin_quasi_random_helper1d(expr_item_t *f, const gsl_qrng_type *T) {
   double y = 0;
   double r = 0;
@@ -1198,6 +1200,77 @@ double feenox_builtin_qrng2d_halton(expr_item_t *f) {
 double feenox_builtin_qrng2d_reversehalton(expr_item_t *f) {
   return feenox_builtin_quasi_random_helper2d(f, gsl_qrng_reversehalton);
 }
+
+#else
+// Quasi-random number generators require GSL
+
+double feenox_builtin_quasi_random_helper1d(expr_item_t *f, const gsl_qrng_type *T) {
+  feenox_push_error_message("quasi-random number generation requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_quasi_random(expr_item_t *f) {
+  feenox_push_error_message("quasi-random numbers require GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng_sobol(expr_item_t *f) {
+  feenox_push_error_message("qrng_sobol requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng_niederreiter(expr_item_t *f) {
+  feenox_push_error_message("qrng_niederreiter requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng_halton(expr_item_t *f) {
+  feenox_push_error_message("qrng_halton requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng_reversehalton(expr_item_t *f) {
+  feenox_push_error_message("qrng_reversehalton requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_quasi_random_helper2d(expr_item_t *f, const gsl_qrng_type *T) {
+  feenox_push_error_message("2D quasi-random number generation requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng2d_sobol(expr_item_t *f) {
+  feenox_push_error_message("qrng2d_sobol requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng2d_niederreiter(expr_item_t *f) {
+  feenox_push_error_message("qrng2d_niederreiter requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng2d_halton(expr_item_t *f) {
+  feenox_push_error_message("qrng2d_halton requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+double feenox_builtin_qrng2d_reversehalton(expr_item_t *f) {
+  feenox_push_error_message("qrng2d_reversehalton requires GSL support");
+  feenox_runtime_error();
+  return 0;
+}
+
+#endif // HAVE_GSL
 
 
 

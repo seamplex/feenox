@@ -8,6 +8,6 @@ if [ -z "${functions_found}" ]; then
   echo "could not find functions.sh"
    exit 1
 fi
-
+checkgsl
 answer logphi.fee 1
 exitifwrong $?

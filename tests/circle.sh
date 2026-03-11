@@ -9,6 +9,7 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
+checkgsl
 checkgmsh
 
 for order in 1 2; do

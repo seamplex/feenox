@@ -21,6 +21,7 @@
  */
 #include "feenox.h"
 
+#ifdef HAVE_GSL
 
 int feenox_solve_f(const gsl_vector *x, void *params, gsl_vector *f);
 int feenox_solve_print_state (solve_t *solve, const size_t iter, gsl_multiroot_fsolver *s);
@@ -129,3 +130,23 @@ int feenox_solve_print_state(solve_t *solve, const size_t iter, gsl_multiroot_fs
   
   return FEENOX_OK;
 }
+
+#else // !HAVE_GSL
+
+int feenox_instruction_solve(void *arg) {
+  feenox_push_error_message("SOLVE instruction needs FeenoX to be compiled with GSL support");
+  return FEENOX_ERROR;
+}
+
+int feenox_solve_f(const gsl_vector *x, void *params, gsl_vector *f) {
+  return -1;  // GSL_FAILURE
+}
+
+// Forward declaration for solver type
+typedef struct gsl_multiroot_fsolver gsl_multiroot_fsolver;
+
+int feenox_solve_print_state(solve_t *solve, const size_t iter, gsl_multiroot_fsolver *s) {
+  return FEENOX_ERROR;
+}
+
+#endif // HAVE_GSL

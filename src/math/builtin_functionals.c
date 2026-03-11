@@ -21,6 +21,7 @@
  */
 #include "feenox.h"
 
+#ifdef HAVE_GSL
 // from gsl/roots/root.h
 #define SAFE_FUNC_CALL(f, x, yp) \
 do { \
@@ -28,6 +29,7 @@ do { \
   if (!gsl_finite(*yp)) \
     GSL_ERROR("function value is not finite", GSL_EBADFUNC); \
 } while (0)
+#endif
 
 
 double feenox_builtin_derivative(expr_item_t *, var_t *);
@@ -75,7 +77,7 @@ typedef struct {
 ///fu+derivative+desc Defaults are $h = (1/2)^{-10} \approx 9.8 \times 10^{-4}$ and $p = 0$.
 ///fu+derivative+math \left. \frac{d}{dx} \Big[ f(x) \Big] \right|_{x = a} 
 double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
-
+#ifdef HAVE_GSL
   double error;
 
   double x, x_old;
@@ -114,6 +116,12 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 
 
   return result;
+#else
+  feenox_push_error_message("derivative() functional needs FeenoX to be compiled with GSL support");
+  feenox_pop_errors();
+  feenox_polite_exit(FEENOX_ERROR);
+  return 0;
+#endif  
 }
 
 ///fu+integral+usage integral(f(x), x, a, b, [eps], [k], [max_subdivisions])
@@ -153,6 +161,7 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 ///fu+integral+desc See GSL reference for further information.
 ///fu+integral+math \int_a^b f(x) \, dx  
 double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
+#ifdef HAVE_GSL
   double x_old;
   double x_lower;
   double x_upper;
@@ -213,6 +222,12 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
   gsl_integration_workspace_free(w);
 
   return result;
+#else
+  feenox_push_error_message("integral() functional needs FeenoX to be compiled with GSL support");
+  feenox_pop_errors();
+  feenox_polite_exit(FEENOX_ERROR);
+  return 0;
+#endif
 }
 
 ///fu+gauss_kronrod+usage gauss_kronrod(f(x), x, a, b, [eps])
@@ -236,6 +251,7 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
 ///fu+gauss_kronrod+math \int_a^b f(x) \, dx  
 
 double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
+#ifdef HAVE_GSL
   double error;
 
   double x_old;
@@ -272,6 +288,12 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
 
 
   return result;
+#else
+  feenox_push_error_message("gauss_kronrod() functional needs FeenoX to be compiled with GSL support");
+  feenox_pop_errors();
+  feenox_polite_exit(FEENOX_ERROR);
+  return 0;
+#endif
 }
 
 ///fu+gauss_legendre+usage gauss_legendre(f(x), x, a, b, [n])
@@ -289,7 +311,7 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
 ///fu+gauss_legendre+desc See GSL reference for further information.
 ///fu+gauss_legendre+math \int_a^b f(x) \, dx  
 double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
-
+#ifdef HAVE_GSL
   double x_old;
   double x_lower;
   double x_upper;
@@ -326,6 +348,11 @@ double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
   feenox_var_value(var_x) = x_old;
 
   return result;
+#else
+  feenox_push_error_message("gauss_legendre requires GSL support");
+  feenox_runtime_error();
+  return 0;
+#endif
   
 }
 
@@ -424,6 +451,7 @@ double feenox_builtin_sum(expr_item_t *a, var_t *var_x) {
 ///fu+root+desc $p \neq 0$, the returned value can be any value.
 ///fu+root+desc Default is $\epsilon = (1/2)^{-10} \approx 10^{3}$.
 double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
+#ifdef HAVE_GSL  
   int iter;
   int gsl_status;
   double x, x_old;
@@ -538,7 +566,12 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
   gsl_root_fsolver_free(s);
 
   return x;
-
+#else
+  feenox_push_error_message("root() functional needs FeenoX to be compiled with GSL support");
+  feenox_pop_errors();
+  feenox_polite_exit(FEENOX_ERROR);
+  return 0;
+#endif
 }
 
 
@@ -564,7 +597,7 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
 ///fu+func_min+math y = \left\{ x \in [a,b] / f(x) = \min_{[a,b]} f(x) \right \} 
 
 double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
-  
+#ifdef HAVE_GSL  
   // keep the old value from x to restore it after we are done
   double x_old = feenox_var_value(var_x);
 
@@ -639,10 +672,15 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   gsl_min_fminimizer_free(s);
 
   return x;
-
+#else
+  feenox_push_error_message("func_min() functional needs FeenoX to be compiled with GSL support");
+  feenox_pop_errors();
+  feenox_polite_exit(FEENOX_ERROR);
+  return 0;
+#endif
 }
 
-
+#ifdef HAVE_GSL
 double feenox_gsl_function(double x, void *params) {
 
   double y;
@@ -659,3 +697,11 @@ double feenox_gsl_function(double x, void *params) {
   return y;
 
 }
+
+#else // !HAVE_GSL
+
+double feenox_gsl_function(double x, void *params) {
+  return 0;
+}
+
+#endif // HAVE_GSL
