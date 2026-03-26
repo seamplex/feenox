@@ -25,9 +25,9 @@
 
 int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
 int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
-int feenox_fit_in_range(fit_t *fit);
-void feenox_fit_update_x(fit_t *fit, size_t j);
-void feenox_fit_update_vias(fit_t *fit, const gsl_vector *via);
+int feenox_fit_in_range(fit_t *this);
+void feenox_fit_update_x(fit_t *this, size_t j);
+void feenox_fit_update_vias(fit_t *this, const gsl_vector *via);
 void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w);
 
 
@@ -139,32 +139,32 @@ int feenox_instruction_fit(void *arg) {
   
 }
 
-void feenox_fit_update_x(fit_t *fit, size_t j) {
+void feenox_fit_update_x(fit_t *this, size_t j) {
   unsigned int i = 0;
-  for (i = 0; i < fit->data->n_arguments; i++) {
-    fit->x[i] = feenox_vector_get(fit->data->vector_argument[i], j);
-    feenox_var_value(fit->function->var_argument[i]) = fit->x[i];
+  for (i = 0; i < this->data->n_arguments; i++) {
+    this->x[i] = feenox_vector_get(this->data->vector_argument[i], j);
+    feenox_var_value(this->function->var_argument[i]) = this->x[i];
   }
   return;
 }
 
 
-void feenox_fit_update_vias(fit_t *fit, const gsl_vector *via) {
+void feenox_fit_update_vias(fit_t *this, const gsl_vector *via) {
   unsigned int i = 0;
-  for (i = 0; i < fit->n_via; i++) {
-    feenox_var_value(fit->via[i]) = gsl_vector_get(via, i);
+  for (i = 0; i < this->n_via; i++) {
+    feenox_var_value(this->via[i]) = gsl_vector_get(via, i);
   }
   return;
 }
 
-int feenox_fit_in_range(fit_t *fit) {
+int feenox_fit_in_range(fit_t *this) {
 
-  if (fit->range_min == NULL || fit->range_max == NULL) {
+  if (this->range_min == NULL || this->range_max == NULL) {
     return 1;
   }
   unsigned int i = 0;
-  for (i = 0; i < fit->data->n_arguments; i++) {
-    if (fit->x[i] < fit->range_min[i] || fit->x[i] > fit->range_max[i]) {
+  for (i = 0; i < this->data->n_arguments; i++) {
+    if (this->x[i] < this->range_min[i] || this->x[i] > this->range_max[i]) {
       return 0;
     }
   }
@@ -174,14 +174,14 @@ int feenox_fit_in_range(fit_t *fit) {
 
 
 int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f) {
-  fit_t *fit = (fit_t *)arg;
+  fit_t *this = (fit_t *)arg;
   
-  feenox_fit_update_vias(fit, via);  
+  feenox_fit_update_vias(this, via);  
   
   size_t j = 0;
-  for (j = 0; j < fit->n_data; j++) {
-    feenox_fit_update_x(fit, j);
-    gsl_vector_set(f, j, feenox_fit_in_range(fit) ? (feenox_function_eval(fit->function, fit->x) - feenox_vector_get(fit->data->vector_value, j)) : 0);
+  for (j = 0; j < this->n_data; j++) {
+    feenox_fit_update_x(this, j);
+    gsl_vector_set(f, j, feenox_fit_in_range(this) ? (feenox_function_eval(this->function, this->x) - feenox_vector_get(this->data->vector_value, j)) : 0);
   }
 //  feenox_debug_print_gsl_vector(f, stdout);
 
@@ -190,19 +190,19 @@ int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f) {
 
 
 int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J) {
-  fit_t *fit = (fit_t *)arg;
+  fit_t *this = (fit_t *)arg;
 
-  feenox_fit_update_vias(fit, via);  
+  feenox_fit_update_vias(this, via);  
   
   unsigned int i = 0;
   size_t j = 0;  
   int in_range = 0;
-  for (j = 0; j < fit->n_data; j++) {
-    feenox_fit_update_x(fit, j);
-    in_range = feenox_fit_in_range(fit);
+  for (j = 0; j < this->n_data; j++) {
+    feenox_fit_update_x(this, j);
+    in_range = feenox_fit_in_range(this);
     
-    for (i = 0; i < fit->n_via; i++) {
-      gsl_matrix_set (J, j, i, (in_range) ? ((fit->gradient != NULL) ? feenox_expression_eval(&fit->gradient[i]) : feenox_expression_derivative_wrt_variable(&fit->function->algebraic_expression, fit->via[i], feenox_var_value(fit->via[i]))) : 0); 
+    for (i = 0; i < this->n_via; i++) {
+      gsl_matrix_set (J, j, i, (in_range) ? ((this->gradient != NULL) ? feenox_expression_eval(&this->gradient[i]) : feenox_expression_derivative_wrt_variable(&this->function->algebraic_expression, this->via[i], feenox_var_value(this->via[i]))) : 0); 
     }      
   }
 //  feenox_debug_print_gsl_matrix(J, stdout);
@@ -211,15 +211,15 @@ int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J) {
 }
 
 void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w) {
-  fit_t *fit = (fit_t *)arg;
+  fit_t *this = (fit_t *)arg;
 
-  if (fit->verbose) {
+  if (this->verbose) {
     gsl_vector *via = gsl_multifit_nlinear_position(w);
     gsl_vector *f = gsl_multifit_nlinear_residual(w);
 
     printf ("# iter %2zu\t", iter);
     unsigned int i = 0;
-    for (i = 0; i < fit->n_via; i++) {
+    for (i = 0; i < this->n_via; i++) {
       printf("%+e ", gsl_vector_get(via, i));
     }
     printf("\tres = %.4g\n", gsl_blas_dnrm2(f));
@@ -243,15 +243,15 @@ int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J) {
   return -1;  // GSL_FAILURE
 }
 
-int feenox_fit_in_range(fit_t *fit) {
+int feenox_fit_in_range(fit_t *this) {
   return 0;
 }
 
-void feenox_fit_update_x(fit_t *fit, size_t j) {
+void feenox_fit_update_x(fit_t *this, size_t j) {
   return;
 }
 
-void feenox_fit_update_vias(fit_t *fit, const gsl_vector *via) {
+void feenox_fit_update_vias(fit_t *this, const gsl_vector *via) {
   return;
 }
 
