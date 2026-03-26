@@ -1419,8 +1419,8 @@ struct mesh_write_t {
   
   int (*write_header)(mesh_t *mesh, FILE *file);
   int (*write_mesh)(mesh_t *mesh, FILE *file, int no_physical_names);
-  int (*write_data)(mesh_write_t *this, mesh_write_dist_t *dist);
-  int (*write_footer)(mesh_write_t *this);
+  int (*write_data)(mesh_write_t *mesh, mesh_write_dist_t *dist);
+  int (*write_footer)(mesh_write_t *mesh);
    
   // these two are to know if we have to change the type in VTK
   int point_init;
@@ -2296,7 +2296,7 @@ extern double feenox_gsl_function(double x, void *params);
 // mesh.c
 extern int feenox_instruction_mesh_read(void *arg);
 extern int feenox_mesh_create_nodes_argument(mesh_t *);
-extern int feenox_mesh_create_index2tag(mesh_t *this);
+extern int feenox_mesh_create_index2tag(mesh_t *mesh);
 extern int feenox_mesh_free(mesh_t *);
 
 extern int feenox_mesh_read_vtk(mesh_t *);
@@ -2420,13 +2420,13 @@ extern int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE * file, int with_size);
 extern int feenox_mesh_write_vtk_types(mesh_t *mesh, FILE * file);
 extern int feenox_mesh_write_mesh_vtk(mesh_t *mesh, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_data_vtk(mesh_write_t *mesh, mesh_write_dist_t *dist);
 
 // vtu.c
 extern int feenox_mesh_write_header_vtu(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_mesh_vtu(mesh_t *, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtu(mesh_write_t *this, mesh_write_dist_t *dist);
-extern int feenox_mesh_write_footer_vtu(mesh_write_t *this);
+extern int feenox_mesh_write_data_vtu(mesh_write_t *mesh, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_footer_vtu(mesh_write_t *mesh);
 
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *e)  __attribute__((noinline));
